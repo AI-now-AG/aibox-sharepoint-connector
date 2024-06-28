@@ -15,11 +15,11 @@ export const onRequest = defineMiddleware((context, next) => {
     // Get the username and password. NB: the decoded string is in the form "username:password"
     const [username, pwd] = atob(authValue).split(":");
 
+    const user = import.meta.env.BASIC_AUTH_USER || DEFAULT_USER;
+    const pass = import.meta.env.BASIC_AUTH_PASS || DEFAULT_PASS;
+
     // check if the username and password are valid
-    if (
-      username === (import.meta.env.BASIC_AUTH_USER || DEFAULT_USER) &&
-      pwd === (import.meta.env.BASIC_AUTH_PASS || DEFAULT_PASS)
-    ) {
+    if (username === user && pwd === pass) {
       // forward request
       return next();
     }
