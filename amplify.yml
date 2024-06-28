@@ -5,14 +5,13 @@ frontend:
       commands:
         - echo "node-linker=hoisted" > .npmrc
         - npm i -g pnpm
-        - pnpm config set store-dir .pnpm-store
+        - pnpm config set store-dir ./.amplify-hosting/compute/default/.pnpm-store
         - pnpm i
     build:
       commands:
         - env >> .env
         - pnpm run build
         - mv .env ./.amplify-hosting/compute/default/.env
-        # - mv pnpm-store ./.amplify-hosting/compute/default
 
   artifacts:
     baseDirectory: .amplify-hosting
@@ -21,4 +20,4 @@ frontend:
 
   cache:
     paths:
-      - .pnpm-store/**/*
+      - ./.amplify-hosting/compute/default/.pnpm-store/**/*
