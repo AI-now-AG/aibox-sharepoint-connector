@@ -1,5 +1,8 @@
 import { defineMiddleware } from "astro/middleware";
 
+const DEFAULT_USER = "preview";
+const DEFAULT_PASS = "aiderdaus";
+
 export const onRequest = defineMiddleware((context, next) => {
   // If a basic auth header is present, it wil take the string form: "Basic authValue"
   const basicAuth = context.request.headers.get("authorization");
@@ -14,8 +17,8 @@ export const onRequest = defineMiddleware((context, next) => {
 
     // check if the username and password are valid
     if (
-      username === import.meta.env.BASIC_AUTH_USER &&
-      pwd === import.meta.env.BASIC_AUTH_PASS
+      username === (import.meta.env.BASIC_AUTH_USER || DEFAULT_USER) &&
+      pwd === (import.meta.env.BASIC_AUTH_PASS || DEFAULT_PASS)
     ) {
       // forward request
       return next();
