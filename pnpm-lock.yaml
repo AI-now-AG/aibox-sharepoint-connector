@@ -23,6 +23,12 @@ importers:
       astro:
         specifier: ^4.11.3
         version: 4.11.3(typescript@5.5.2)
+      astro-aws-amplify:
+        specifier: ^0.1.0
+        version: 0.1.0(typescript@5.5.2)
+      dotenv:
+        specifier: ^16.4.5
+        version: 16.4.5
       svelte:
         specifier: ^4.2.18
         version: 4.2.18
@@ -874,6 +880,9 @@ packages:
     resolution: {integrity: sha512-Z7tMw1ytTXt5jqMcOP+OQteU1VuNK9Y02uuJtKQ1Sv69jXQKKg5cibLwGJow8yzZP+eAc18EmLGPal0bp36rvQ==}
     engines: {node: '>=8'}
 
+  astro-aws-amplify@0.1.0:
+    resolution: {integrity: sha512-fDFehdh2cF3jdoeqhz2BmsBucla5YGSa6tnwC2MnYc1AEh71QoKw6GNEAlrpXino7eM1MnD0axUK9i8yXpjZHA==}
+
   astro-eslint-parser@1.0.2:
     resolution: {integrity: sha512-8hJaCuqxObShWl2wEsnASqh/DbQ2O+S66m0Q3ctJlzBPEQ4pfGwwama3FCjZO3GDLQsjvn1T0v93Vxyu/+5fGw==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
@@ -888,6 +897,11 @@ packages:
     engines: {node: ^18.18.0 || >=20.9.0}
     peerDependencies:
       '@astrojs/compiler': '>=0.27.0'
+
+  astrojs-node-aws-amplify@7.0.1:
+    resolution: {integrity: sha512-Ay3FEx6ZQKiyFzp7Yln0fKRFy8OjrBlkk3PdjSNuGS82d2dww3C2DGv3c/YW+FWbNCFlk6lGD6BF1Sc368Vfyw==}
+    peerDependencies:
+      astro: ^4.0.0
 
   autoprefixer@10.4.19:
     resolution: {integrity: sha512-BaENR2+zBZ8xXhM4pUaKUxlVdxZ0EZhjvbopwnXmxRUfqDmwSpC2lAi/QXvx7NRdPCo1WKEcEF6mV64si1z4Ew==}
@@ -1142,6 +1156,10 @@ packages:
 
   dlv@1.1.3:
     resolution: {integrity: sha512-+HlytyjlPKnIG8XuRG8WvmBP8xs8P71y+SKKS6ZXWoEgLuePxtDoUEiH7WkdePWrQ5JBpE6aoVqfZfJUQkjXwA==}
+
+  dotenv@16.4.5:
+    resolution: {integrity: sha512-ZmdL2rui+eB2YwhsWzjInR8LldtZHGDoQ1ugH85ppHKwpUHL7j7rN0Ti9NCnGiQbhaZ11FpR+7ao1dNsmduNUg==}
+    engines: {node: '>=12'}
 
   dset@3.1.3:
     resolution: {integrity: sha512-20TuZZHCEZ2O71q9/+8BwKwZ0QtD9D8ObhrihJPr+vLLYlSuAU3/zL4cSlgbfeoGHTjCSJBa7NGcrF9/Bx/WJQ==}
@@ -3644,6 +3662,22 @@ snapshots:
 
   astral-regex@2.0.0: {}
 
+  astro-aws-amplify@0.1.0(typescript@5.5.2):
+    dependencies:
+      astro: 4.11.3(typescript@5.5.2)
+      astrojs-node-aws-amplify: 7.0.1(astro@4.11.3(typescript@5.5.2))
+      dotenv: 16.4.5
+    transitivePeerDependencies:
+      - '@types/node'
+      - less
+      - lightningcss
+      - sass
+      - stylus
+      - sugarss
+      - supports-color
+      - terser
+      - typescript
+
   astro-eslint-parser@1.0.2(typescript@5.5.2):
     dependencies:
       '@astrojs/compiler': 2.8.1
@@ -3744,6 +3778,14 @@ snapshots:
     dependencies:
       '@astrojs/compiler': 2.8.1
       synckit: 0.9.0
+
+  astrojs-node-aws-amplify@7.0.1(astro@4.11.3(typescript@5.5.2)):
+    dependencies:
+      astro: 4.11.3(typescript@5.5.2)
+      send: 0.18.0
+      server-destroy: 1.0.1
+    transitivePeerDependencies:
+      - supports-color
 
   autoprefixer@10.4.19(postcss@8.4.38):
     dependencies:
@@ -3975,6 +4017,8 @@ snapshots:
       path-type: 4.0.0
 
   dlv@1.1.3: {}
+
+  dotenv@16.4.5: {}
 
   dset@3.1.3: {}
 
