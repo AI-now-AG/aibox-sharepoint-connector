@@ -3,17 +3,22 @@ frontend:
   phases:
     preBuild:
       commands:
-        - npm ci
+        - echo "node-linker=hoisted" > .npmrc
+        - npm i -g pnpm
+        - pnpm config set store-dir .pnpm-store
+        - pnpm i
     build:
       commands:
         - env >> .env
-        - npm run build
-        - mv node_modules ./.amplify-hosting/compute/default
+        - pnpm run build
         - mv .env ./.amplify-hosting/compute/default/.env
+        # - mv pnpm-store ./.amplify-hosting/compute/default
+
   artifacts:
     baseDirectory: .amplify-hosting
     files:
       - "**/*"
+
   cache:
     paths:
-      - node_modules/**/*
+      - .pnpm-store/**/*
