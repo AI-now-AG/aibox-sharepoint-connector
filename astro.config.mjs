@@ -14,4 +14,5 @@ export default defineConfig({
   devToolbar: {
     enabled: false,
   },
+  styles: ["src/styles/global.css"],
 });
