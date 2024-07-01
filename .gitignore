@@ -1,5 +1,7 @@
 # build output
 dist/
+.amplify-hosting
+
 # generated types
 .astro/
 .vscode/
@@ -15,7 +17,7 @@ pnpm-debug.log*
 
 
 # environment variables
-.env
+.env.local
 .env.production
 
 # macOS-specific files

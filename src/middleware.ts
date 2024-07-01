@@ -1,0 +1,34 @@
+import { defineMiddleware } from "astro/middleware";
+
+const DEFAULT_USER = "preview";
+const DEFAULT_PASS = "aiderdaus";
+
+export const onRequest = defineMiddleware((context, next) => {
+  // If a basic auth header is present, it wil take the string form: "Basic authValue"
+  const basicAuth = context.request.headers.get("authorization");
+
+  if (basicAuth) {
+    // Get the auth value from string "Basic authValue"
+    const authValue = basicAuth.split(" ")[1] ?? "username:password";
+
+    // Decode the Base64 encoded string via atob (https://developer.mozilla.org/en-US/docs/Web/API/atob)
+    // Get the username and password. NB: the decoded string is in the form "username:password"
+    const [username, pwd] = atob(authValue).split(":");
+
+    const user = import.meta.env.BASIC_AUTH_USER || DEFAULT_USER;
+    const pass = import.meta.env.BASIC_AUTH_PASS || DEFAULT_PASS;
+
+    // check if the username and password are valid
+    if (username === user && pwd === pass) {
+      // forward request
+      return next();
+    }
+  }
+
+  return new Response("Auth required", {
+    status: 401,
+    headers: {
+      "WWW-authenticate": 'Basic realm="Restricted Area"',
+    },
+  });
+});
