@@ -1,10 +1,10 @@
 ---
+// Component
 import Layout from "../layouts/layout.astro";
 import avatar from "../images/Avatar.svg";
-import { ViewTransitions } from "astro:transitions";
 ---
 
-<Layout title="Welcome to AI Toolbox">
+<Layout title="Welcome to AI Toolbox" isFooterVisible={true}>
   <div class="flex-1 flex-col w-100 h-100 text-center space-y-4">
     <h1 class="text-3xl font-extrabold mt-9 mb-4">
       AI for easy and efficient business operations
@@ -16,19 +16,21 @@ import { ViewTransitions } from "astro:transitions";
       fostering innovation.
     </p>
     <div class="row space-x-4">
-      <button class="btn btn-outline text-blue-500">
+      <button class="btn btn-outline text-primary">
         Get Started
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="24"
           height="24"
           viewBox="0 0 24 24"
-          stroke="currentColor">
+          stroke="currentColor"
+        >
           <polygon
-            points="7.293 4.707 14.586 12 7.293 19.293 8.707 20.707 17.414 12 8.707 3.293 7.293 4.707"></polygon>
+            points="7.293 4.707 14.586 12 7.293 19.293 8.707 20.707 17.414 12 8.707 3.293 7.293 4.707"
+          ></polygon>
         </svg>
       </button>
-      <button class="btn btn-outline text-black-500">
+      <button class="btn btn-outline text-neutral">
         explore more widges
       </button>
     </div>
@@ -36,33 +38,30 @@ import { ViewTransitions } from "astro:transitions";
     <div class="container lg:px-4 mx-auto">
       <div
         class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 justify-center"
-        transition:animate="slide">
-        <div
-          class="card w-full bg-base-100 shadow-lg dark:bg-slate-800 hover:dark:bg-slate-600">
+        transition:animate="slide"
+      >
+        <div class="card w-full bg-base-300 shadow-lg">
           <div class="card-body items-center text-center">
             <img alt="Avatar Image" src={avatar.src} />
             <h2 class="card-title">Newsletter generation</h2>
             <p>Card content</p>
           </div>
         </div>
-        <div
-          class="card w-full bg-base-100 shadow-lg dark:bg-slate-800 hover:dark:bg-slate-600">
+        <div class="card w-full bg-base-300 shadow-lg">
           <div class="card-body items-center text-center">
             <img alt="Avatar Image" src={avatar.src} />
             <h2 class="card-title">Translations</h2>
             <p>Card content</p>
           </div>
         </div>
-        <div
-          class="card w-full bg-base-100 shadow-lg dark:bg-slate-800 hover:dark:bg-slate-600">
+        <div class="card w-full bg-base-300 shadow-lg">
           <div class="card-body items-center text-center">
             <img alt="Avatar Image" src={avatar.src} />
             <h2 class="card-title">Grammar Check</h2>
             <p>Card content</p>
           </div>
         </div>
-        <div
-          class="card w-full bg-base-100 shadow-lg dark:bg-slate-800 hover:dark:bg-slate-600">
+        <div class="card w-full bg-base-300 shadow-lg">
           <div class="card-body items-center text-center">
             <img alt="Avatar Image" src={avatar.src} />
             <h2 class="card-title">Social Media Posts</h2>
@@ -70,7 +69,8 @@ import { ViewTransitions } from "astro:transitions";
           </div>
         </div>
         <div
-          class="card w-full md:w-64 lg:w-4/5 xl:w-4/5 border-dashed border-2 bg-indigo-50 border-indigo-500 dark:border-slate-400 shadow-xl dark:bg-slate-950 hover:dark:bg-slate-600">
+          class="card w-full md:w-64 lg:w-4/5 xl:w-4/5 border-dashed border bg-base-300 shadow-xl"
+        >
           <div class="card-body items-center text-center">
             <img alt="Avatar Image" src={avatar.src} />
             <h2 class="card-title">customize your AI Toolbox</h2>
@@ -80,4 +80,3 @@ import { ViewTransitions } from "astro:transitions";
     </div>
   </div>
 </Layout>
-<ViewTransitions />

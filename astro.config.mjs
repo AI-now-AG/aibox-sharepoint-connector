@@ -12,6 +12,5 @@ export default defineConfig({
   integrations: [tailwind(), svelte()],
   devToolbar: {
     enabled: false,
-  },
-  styles: ["src/styles/global.css"],
+  }
 });

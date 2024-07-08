@@ -1,46 +1,67 @@
 ---
+interface Props {
+  title?: string;
+  description?: string;
+  isFooterVisible?: boolean;
+}
+
+// Components
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
-const { title } = Astro.props;
+import MainHead from "./MainHead.astro";
+
+// import data
+import navData from "../data/navData";
+
+import '../styles/global.css'
+
+const {
+  title = "Welcome to AI Toolbox",
+  description = "Welcome to AI Toolbox",
+  isFooterVisible = false,
+} = Astro.props;
 ---
 
 <!doctype html>
-<html lang="en" data-theme="winter">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{title}</title>
-  </head>
-  <body class="h-screen">
+<html lang="en" data-theme="light">
+  <MainHead {title} {description} />
+  <body class="min-h-screen">
     <Header />
-
     <div class="drawer lg:drawer-open">
-      <input id="my-drawer" type="checkbox" class="drawer-toggle" />
-      <div class="drawer-content flex flex-col bg-slate-50 dark:bg-slate-950">
-        <main class="container mx-auto p-4">
+      <input id="left-drawer-trigger" type="checkbox" class="drawer-toggle" />
+      <div class="drawer-content flex flex-col">
+        <main class="min-w-xs flex w-full flex-col p-4 lg:basis-2/3">
           <slot />
         </main>
+        { isFooterVisible && <Footer /> }
       </div>
-      <div class="drawer-side">
-        <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"
-        ></label>
-        <ul
-          class="menu bg-white dark:bg-slate-800 border-2 border-gray-100 shadow-lg min-h-full w-80 p-4"
-        >
+      <div class="drawer-side top-16 z-20 h-[calc(100vh-4rem)]">
+        <label for="left-drawer-trigger" aria-label="close sidebar" class="drawer-overlay"></label>
+        <ul class="menu menu-md min-h-full w-64 bg-base-300 text-base-content">
+          <li class="menu-title text-lg">Categories</li>
           <!-- Sidebar content here -->
-          <li><a>Introduction</a></li>
-          <li>
-            <a>Pricing & FAQs</a>
-            <ul class="p-2">
-              <li><a>Pricing</a></li>
-              <li><a>FAQs</a></li>
-            </ul>
-          </li>
-          <li><a>Contact</a></li>
+          {
+            navData.map((item) => (
+              <li>
+                {item.list ? (
+                    <a>{item.name}</a>
+                    <ul class="p-2">
+                      {item.list.map((subItem) => (
+                        <li>
+                          <a href={subItem.path}>{subItem.name}</a>
+                        </li>
+                      ))}
+                    </ul>
+                ) : (
+                  <a href={item.path}>{item.name}</a>
+                )}
+              </li>
+            ))
+          }
         </ul>
       </div>
     </div>
 
-    <Footer />
+    
   </body>
 </html>
