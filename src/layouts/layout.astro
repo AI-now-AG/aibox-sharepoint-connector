@@ -8,7 +8,7 @@ interface Props {
 // Components
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
-import MainHead from "./MainHead.astro";
+import Head from "./Head.astro";
 
 // import data
 import navData from "../data/navData";
@@ -24,7 +24,7 @@ const {
 
 <!doctype html>
 <html lang="en" data-theme="light">
-  <MainHead {title} {description} />
+  <Head {title} {description} />
   <body class="min-h-screen">
     <Header />
     <div class="drawer lg:drawer-open">
