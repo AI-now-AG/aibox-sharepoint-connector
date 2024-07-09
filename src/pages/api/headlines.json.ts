@@ -7,7 +7,7 @@ export const model = new ChatOpenAI({
   model: "gpt-4o",
 });
 
-export async function getHeadline(text) {
+export async function getHeadline(text: string) {
   const messages = [
     new SystemMessage(
       "Please generate three possible titles for a news site that aims to cover a broad range of topics, from follwing contents.",
