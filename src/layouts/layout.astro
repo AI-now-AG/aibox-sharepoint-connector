@@ -16,28 +16,28 @@ import navData from "../data/navData";
 import '../styles/global.css'
 
 const {
-  title = "Welcome to AI Toolbox",
-  description = "Welcome to AI Toolbox",
+  title = "Welcome to AI Box",
+  description = "Welcome to AI Box",
   isFooterVisible = false,
 } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="somedia">
   <Head {title} {description} />
   <body class="min-h-screen">
     <Header />
     <div class="drawer lg:drawer-open">
       <input id="left-drawer-trigger" type="checkbox" class="drawer-toggle" />
       <div class="drawer-content flex flex-col">
-        <main class="min-w-xs flex w-full flex-col p-4 lg:basis-2/3">
+        <main class="min-w-xs flex w-full flex-col p-4 lg:basis-2/3 bg-base-200">
           <slot />
         </main>
         { isFooterVisible && <Footer /> }
       </div>
       <div class="drawer-side top-16 z-20 h-[calc(100vh-4rem)]">
         <label for="left-drawer-trigger" aria-label="close sidebar" class="drawer-overlay"></label>
-        <ul class="menu menu-md min-h-full w-64 bg-base-300 text-base-content">
+        <ul class="menu menu-md min-h-full w-64 bg-base-100 text-base-content">
           <li class="menu-title text-lg">Categories</li>
           <!-- Sidebar content here -->
           {
