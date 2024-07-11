@@ -1,9 +1,10 @@
 import { defineMiddleware } from "astro/middleware";
+import { getUserByEmailAndPassword } from './models/user.model';
 
-const DEFAULT_USER = "preview";
-const DEFAULT_PASS = "aiderdaus";
+// const DEFAULT_USER = "preview";
+// const DEFAULT_PASS = "aiderdaus";
 
-export const onRequest = defineMiddleware((context, next) => {
+export const onRequest = defineMiddleware(async (context, next) => {
   // If a basic auth header is present, it wil take the string form: "Basic authValue"
   const basicAuth = context.request.headers.get("authorization");
 
@@ -15,20 +16,28 @@ export const onRequest = defineMiddleware((context, next) => {
     // Get the username and password. NB: the decoded string is in the form "username:password"
     const [username, pwd] = atob(authValue).split(":");
 
-    const user = import.meta.env.BASIC_AUTH_USER || DEFAULT_USER;
-    const pass = import.meta.env.BASIC_AUTH_PASS || DEFAULT_PASS;
-
-    // check if the username and password are valid
-    if (username === user && pwd === pass) {
-      // forward request
-      return next();
+    if (!username || !pwd) {
+      // Redirect to login page if no credentials provided
+      return Response.redirect('/login');
     }
+
+    //const user = import.meta.env.BASIC_AUTH_USER || DEFAULT_USER;
+    //const pass = import.meta.env.BASIC_AUTH_PASS || DEFAULT_PASS;
+    const user = await getUserByEmailAndPassword(username, pwd);
+    if (!user) {
+      // Redirect to login page if invalid credentials
+      return Response.redirect('/login');
+    }
+
+    // Login successful, continue to protected page
+    return next();
   }
 
-  return new Response("Auth required", {
-    status: 401,
-    headers: {
-      "WWW-authenticate": 'Basic realm="Restricted Area"',
-    },
-  });
+  return Response.redirect('/login');
+  // return new Response("Auth required", {
+  //   status: 401,
+  //   headers: {
+  //     "WWW-authenticate": 'Basic realm="Restricted Area"',
+  //   },
+  // });
 });
