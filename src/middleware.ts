@@ -1,5 +1,5 @@
 import { defineMiddleware } from "astro/middleware";
-import { getUserByEmailAndPassword } from './models/user.model';
+import { getUserByEmailAndPassword } from "./models/user.model";
 
 // const DEFAULT_USER = "preview";
 // const DEFAULT_PASS = "aiderdaus";
@@ -18,7 +18,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
     if (!username || !pwd) {
       // Redirect to login page if no credentials provided
-      return Response.redirect('/login');
+
+      return context.redirect("/login");
     }
 
     //const user = import.meta.env.BASIC_AUTH_USER || DEFAULT_USER;
@@ -26,15 +27,15 @@ export const onRequest = defineMiddleware(async (context, next) => {
     const user = await getUserByEmailAndPassword(username, pwd);
     if (!user) {
       // Redirect to login page if invalid credentials
-      return Response.redirect('/login');
+      return context.redirect("/login");
     }
 
     // Login successful, continue to protected page
     return next();
   }
 
-  return Response.redirect('/login');
-  // return new Response("Auth required", {
+  return context.redirect("/login");
+  // return new context("Auth required", {
   //   status: 401,
   //   headers: {
   //     "WWW-authenticate": 'Basic realm="Restricted Area"',
