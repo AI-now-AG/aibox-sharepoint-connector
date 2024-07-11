@@ -1,5 +1,5 @@
 {
-  "name": "AI Toolbox",
+  "name": "AI Box",
   "type": "module",
   "version": "0.0.1",
   "scripts": {
@@ -14,14 +14,21 @@
     "@astrojs/node": "^8.3.2",
     "@astrojs/svelte": "^5.6.0",
     "@astrojs/tailwind": "^5.1.0",
+    "@langchain/core": "^0.2.13",
+    "@langchain/openai": "^0.2.1",
     "astro": "^4.11.3",
     "astro-aws-amplify": "^0.1.0",
     "dotenv": "^16.4.5",
+    "langchain": "^0.2.8",
+    "mongodb": "^6.8.0",
     "svelte": "^4.2.18",
     "tailwindcss": "^3.4.4",
     "typescript": "^5.5.2"
   },
   "devDependencies": {
+    "@eslint/js": "^9.5.0",
+    "daisyui": "^4.12.10",
+    "eslint": "^9.5.0",
     "eslint-plugin-astro": "^1.2.2",
     "globals": "^15.6.0",
     "postcss-lit": "^1.1.1",

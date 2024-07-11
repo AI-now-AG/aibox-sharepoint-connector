@@ -1,8 +1,101 @@
 /** @type {import('tailwindcss').Config} */
+const colors = require("tailwindcss/colors");
+
 export default {
   content: ["./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}"],
   theme: {
-    extend: {},
+    extend: {
+      backgroundImage: {
+        "blue-design": "url('/img/aibox-login-background.svg')",
+      },
+      keyframes: {
+        typing: {
+          "0%": {
+            width: "0%",
+            visibility: "hidden",
+          },
+          "50%": {
+            width: "100%",
+          },
+        },
+        blink: {
+          "0%": {
+            borderColor: "transparent",
+          },
+          "50%": {
+            borderColor: "white",
+          },
+        },
+      },
+      animation: {
+        typing: "typing 2s steps(10) infinite alternate, blink .7s infinite",
+      },
+    },
   },
-  plugins: [],
+  daisyui: {
+    themes: [
+      "light",
+      "dark",
+      "cupcake",
+      "bumblebee",
+      "emerald",
+      "corporate",
+      "synthwave",
+      "retro",
+      "cyberpunk",
+      "valentine",
+      "halloween",
+      "garden",
+      "forest",
+      "aqua",
+      "lofi",
+      "pastel",
+      "fantasy",
+      "wireframe",
+      "black",
+      "luxury",
+      "dracula",
+      "cmyk",
+      "autumn",
+      "business",
+      "acid",
+      "lemonade",
+      "night",
+      "coffee",
+      "winter",
+      "dim",
+      "nord",
+      "sunset",
+      {
+        somedia: {
+          primary: "#4338CA",
+          "primary-focus": "#3730A3",
+          "primary-content": "#C7D2FE",
+          secondary: "#EC4899",
+          "secondary-focus": "#DB2777",
+          "secondary-content": "#FBCFE8",
+          accent: "#2DD4BF",
+          "accent-focus": "#14B8A6",
+          "accent-content": "#134E4A",
+          neutral: "#374151",
+          "neutral-focus": "#1F2937",
+          "neutral-content": "#F9FAFB",
+          "base-100": "#F3F4F6",
+          "base-200": "#E5E7EB",
+          "base-300": "#D1D5DB",
+          "base-content": "#1F2937",
+          info: "#06B6D4",
+          "info-content": "#164E63",
+          success: "#4ADE80",
+          "success-content": "#14532D",
+          warning: "#EAB308",
+          "warning-content": "#713F12",
+          error: "#F87171",
+          "error-content": "#7F1D1D",
+        },
+      },
+    ],
+  },
+  darkMode: ["class", '[data-theme="night"]'],
+  plugins: [require("daisyui")],
 };
