@@ -1,0 +1,47 @@
+---
+interface Props {
+  title?: string;
+  description?: string;
+  isFooterVisible?: boolean;
+}
+
+// Components
+import Header from "$components/Header.astro";
+import Footer from "$components/Footer.astro";
+import Head from "./Head.astro";
+import Navigation from "$components/nav/Navigation.astro";
+
+import "$styles/global.css";
+
+const {
+  title = "Welcome to AI Box",
+  description = "Welcome to AI Box",
+  isFooterVisible = false,
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" data-theme="somedia">
+  <Head {title} {description} />
+  <body class="min-h-screen">
+    <Header />
+    <div class="drawer lg:drawer-open">
+      <input id="left-drawer-trigger" type="checkbox" class="drawer-toggle" />
+      <div class="drawer-content grid grid-rows-[1fr_min-content]">
+        <main
+          class="min-w-xs flex w-full flex-col p-4 lg:basis-2/3 bg-base-200"
+        >
+          <slot />
+        </main>
+        {isFooterVisible && <Footer />}
+      </div>
+      <div class="drawer-side top-16 z-20 h-[calc(100vh-4rem)]">
+        <label
+          for="left-drawer-trigger"
+          aria-label="close sidebar"
+          class="drawer-overlay"></label>
+        <Navigation />
+      </div>
+    </div>
+  </body>
+</html>

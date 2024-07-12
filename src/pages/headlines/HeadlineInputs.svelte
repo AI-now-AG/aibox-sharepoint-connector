@@ -1,9 +1,9 @@
 <script>
   // Components
-  import InputForm from "../../components/InputForm.svelte";
+  import InputForm from "$components/InputForm.svelte";
 
   // API calls
-  import { getHeadline } from "../api/headlines.json";
+  import { getHeadline } from "$api/headlines.json";
 
   var input = "";
   var output = "";

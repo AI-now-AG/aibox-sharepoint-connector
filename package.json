@@ -23,12 +23,13 @@
     "mongodb": "^6.8.0",
     "svelte": "^4.2.18",
     "tailwindcss": "^3.4.4",
+    "ts-pattern": "^5.2.0",
     "typescript": "^5.5.2"
   },
   "devDependencies": {
-    "@eslint/js": "^9.5.0",
+    "@eslint/js": "^8",
     "daisyui": "^4.12.10",
-    "eslint": "^9.5.0",
+    "eslint": "^8",
     "eslint-plugin-astro": "^1.2.2",
     "globals": "^15.6.0",
     "postcss-lit": "^1.1.1",

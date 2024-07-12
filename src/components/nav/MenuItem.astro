@@ -1,0 +1,23 @@
+---
+import { match, Pattern } from "ts-pattern";
+
+export type MenuItem = {
+  title: string;
+  path?: string;
+};
+
+interface Props extends MenuItem {}
+
+const { title, path } = Astro.props;
+---
+
+{
+  match(path)
+    .with(undefined, () => <div class="menu-title">{title}</div>)
+    .with(Pattern.string, () => (
+      <a href={path} class:list={[{ active: path === Astro.url.pathname }]}>
+        {title}
+      </a>
+    ))
+    .exhaustive()
+}

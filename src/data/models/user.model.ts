@@ -14,15 +14,6 @@
 //   return usersCollection.findOne({ username, password });
 // }
 
-import { Users } from "./mongodb";
+import { Users } from "../mongodb";
 
-export const getUserByEmailAndPassword = async (email: string, password: string) => {
-    const user = await (await Users()).findOne({ email, password });
-    return user
-    //return usersCollection.findOne({ email, password });
-}
-
-export const getAllUsers = async () => {
-  const users = await (await Users()).find({}).toArray();
-  return users;
-};
+export const getUser = async (email: string) => Users().findOne({ email });
