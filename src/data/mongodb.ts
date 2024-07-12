@@ -6,13 +6,9 @@ if (!import.meta.env.MONGODB_URI) {
 
 const options = {};
 
-const mongo = await new MongoClient(
-  import.meta.env.MONGODB_URI,
-  options,
-).connect();
+const mongo = new MongoClient(import.meta.env.MONGODB_URI, options);
 const db = () => mongo.db(import.meta.env.MONGODB_DATABASE);
 
-export const Users = async () => {
+export const Users = () => {
   return db().collection("users");
 };
-
