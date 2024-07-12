@@ -1,5 +1,5 @@
 import { defineMiddleware } from "astro/middleware";
-import { getUser } from "./data/models/user.model";
+import { getUser } from "$data/models/user.model";
 
 // const DEFAULT_USER = "preview";
 // const DEFAULT_PASS = "aiderdaus";
@@ -9,8 +9,6 @@ export const onRequest = defineMiddleware((context, next) => {
   const basicAuth = context.request.headers.get("authorization");
 
   if (basicAuth) {
-    console.log(import.meta.env.BASIC_AUTH_USER);
-    console.log(import.meta.env.BASIC_AUTH_PASS);
     // Get the auth value from string "Basic authValue"
     const authValue = basicAuth.split(" ")[1] ?? "username:password";
 
