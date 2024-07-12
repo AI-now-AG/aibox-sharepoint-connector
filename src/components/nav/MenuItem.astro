@@ -13,9 +13,11 @@ const { title, path } = Astro.props;
 
 {
   match(path)
-    .with(undefined, () => (
-      <div class="menu-title text-base-content">{title}</div>
+    .with(undefined, () => <div class="menu-title">{title}</div>)
+    .with(Pattern.string, () => (
+      <a href={path} class:list={[{ active: path === Astro.url.pathname }]}>
+        {title}
+      </a>
     ))
-    .with(Pattern.string, () => <a href={path}>{title}</a>)
     .exhaustive()
 }
