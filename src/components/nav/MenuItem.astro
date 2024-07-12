@@ -1,0 +1,21 @@
+---
+import { match, Pattern } from "ts-pattern";
+
+export type MenuItem = {
+  title: string;
+  path?: string;
+};
+
+interface Props extends MenuItem {}
+
+const { title, path } = Astro.props;
+---
+
+{
+  match(path)
+    .with(undefined, () => (
+      <div class="menu-title text-base-content">{title}</div>
+    ))
+    .with(Pattern.string, () => <a href={path}>{title}</a>)
+    .exhaustive()
+}

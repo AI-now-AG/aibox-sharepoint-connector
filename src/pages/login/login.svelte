@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getUser } from "../../data/models/user.model";
+  import { getUser } from "$data/models/user.model";
 
   var email: string;
   var password: string;

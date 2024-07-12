@@ -1,0 +1,45 @@
+---
+import MenuItem from "./MenuItem.astro";
+
+const modules = [
+  {
+    title: "Editing",
+    items: [
+      {
+        title: "Headline",
+        path: "/headlines",
+      },
+      {
+        title: "Summarize",
+        path: "/summarize",
+      },
+      {
+        title: "Rewrite",
+        path: "/rewrite",
+      },
+    ],
+  },
+];
+---
+
+<nav class="min-h-full block">
+  <ul class="menu bg-base-200 min-h-full w-64">
+    {
+      modules.map((mod) => (
+        <li>
+          <MenuItem {...mod} />
+
+          {"items" in mod && (
+            <ul>
+              {mod.items.map((sub) => (
+                <li>
+                  <MenuItem {...sub} />
+                </li>
+              ))}
+            </ul>
+          )}
+        </li>
+      ))
+    }
+  </ul>
+</nav>

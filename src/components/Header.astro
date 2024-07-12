@@ -2,8 +2,38 @@
 // import local images
 import avatar from "../images/Avatar.svg";
 
-// import data
-import navData from "../data/navData";
+const navItems = [
+  {
+    name: "Introduction",
+    path: "/",
+  },
+  {
+    name: "Login",
+    path: "/login",
+  },
+  {
+    name: "Headlines",
+    path: "/headlines",
+  },
+  {
+    name: "About",
+    path: "/about",
+  },
+  {
+    name: "Pricing & FAQs",
+    // path: "/pricing&faqs",
+    list: [
+      {
+        name: "Pricing",
+        path: "/pricing",
+      },
+      {
+        name: "FAQs",
+        path: "/faqs",
+      },
+    ],
+  },
+];
 ---
 
 <header class="container-fluid mx-auto navbar">
@@ -33,7 +63,7 @@ import navData from "../data/navData";
     <div class="hidden lg:flex">
       <ul class="menu menu-horizontal px-1">
         {
-          navData.map((item) => (
+          navItems.map((item) => (
             <li>
               {item.list ? (
                 <details>
@@ -54,19 +84,6 @@ import navData from "../data/navData";
               )}
             </li>
           ))
-        }
-
-        {
-          /* <li>
-          <details>
-            <summary class:list={[]}>Pricing & FAQs</summary>
-            <ul class="p-2">
-              <li><a>Pricing</a></li>
-              <li><a>FAQs</a></li>
-            </ul>
-          </details>
-        </li>
-        <li><a>Contact</a></li> */
         }
       </ul>
     </div>

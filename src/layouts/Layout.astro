@@ -6,14 +6,12 @@ interface Props {
 }
 
 // Components
-import Header from "../components/Header.astro";
-import Footer from "../components/Footer.astro";
+import Header from "$components/Header.astro";
+import Footer from "$components/Footer.astro";
 import Head from "./Head.astro";
+import Navigation from "$components/nav/Navigation.astro";
 
-// import data
-import navData from "../data/navData";
-
-import '../styles/global.css'
+import "../styles/global.css";
 
 const {
   title = "Welcome to AI Box",
@@ -30,38 +28,20 @@ const {
     <div class="drawer lg:drawer-open">
       <input id="left-drawer-trigger" type="checkbox" class="drawer-toggle" />
       <div class="drawer-content flex flex-col">
-        <main class="min-w-xs flex w-full flex-col p-4 lg:basis-2/3 bg-base-200">
+        <main
+          class="min-w-xs flex w-full flex-col p-4 lg:basis-2/3 bg-base-200"
+        >
           <slot />
         </main>
-        { isFooterVisible && <Footer /> }
+        {isFooterVisible && <Footer />}
       </div>
       <div class="drawer-side top-16 z-20 h-[calc(100vh-4rem)]">
-        <label for="left-drawer-trigger" aria-label="close sidebar" class="drawer-overlay"></label>
-        <ul class="menu menu-md min-h-full w-64 bg-base-100 text-base-content">
-          <li class="menu-title text-lg">Categories</li>
-          <!-- Sidebar content here -->
-          {
-            navData.map((item) => (
-              <li>
-                {item.list ? (
-                    <a>{item.name}</a>
-                    <ul class="p-2">
-                      {item.list.map((subItem) => (
-                        <li>
-                          <a href={subItem.path}>{subItem.name}</a>
-                        </li>
-                      ))}
-                    </ul>
-                ) : (
-                  <a href={item.path}>{item.name}</a>
-                )}
-              </li>
-            ))
-          }
-        </ul>
+        <label
+          for="left-drawer-trigger"
+          aria-label="close sidebar"
+          class="drawer-overlay"></label>
+        <Navigation />
       </div>
     </div>
-
-    
   </body>
 </html>
