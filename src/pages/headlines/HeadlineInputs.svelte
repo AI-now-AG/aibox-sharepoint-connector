@@ -3,7 +3,7 @@
   import InputForm from "$components/InputForm.svelte";
 
   // API calls
-  import { getHeadline } from "$pages/api/headlines.json";
+  // import { getHeadline } from "$pages/api/headlines.json";
 
   var input = "";
   var output = "";
@@ -13,10 +13,10 @@
     const userInputText = e.detail.text;
     if (userInputText) {
       input = userInputText;
-      let response = await getHeadline(input); // global events to local news and human interest stories.
+      /*let response = await getHeadline(input); // global events to local news and human interest stories.
       if (response) {
         output = response;
-      }
+      }*/
     }
   }
 </script>
