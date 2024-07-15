@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getUser } from "$data/models/user.model";
+  // import { getUser } from "$data/models/user.model";
 
   var email: string;
   var password: string;
@@ -7,14 +7,15 @@
   const handleSubmit = async (event: SubmitEvent) => {
     event.preventDefault();
     console.log("hello");
-    const user = await getUser(email);
+    /* const user = await getUser(email);
+   
     if (user) {
       // Login successful, redirect to protected page
       window.location.href = "/protected";
     } else {
       // Login failed, show error message
       alert("Invalid username or password");
-    }
+    }*/
   };
 </script>
 
