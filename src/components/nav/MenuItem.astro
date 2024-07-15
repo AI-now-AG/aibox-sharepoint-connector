@@ -4,16 +4,22 @@ import { match, Pattern } from "ts-pattern";
 export type MenuItem = {
   title: string;
   path?: string;
+  icon?: object;
 };
 
 interface Props extends MenuItem {}
 
-const { title, path } = Astro.props;
+const { title, path, icon } = Astro.props;
 ---
 
 {
   match(path)
-    .with(undefined, () => <div class="menu-title">{title}</div>)
+    .with(undefined, () => (
+      <div class="menu-title flex flex-row items-center gap-2">
+        <slot name="icon" />
+        {title}
+      </div>
+    ))
     .with(Pattern.string, () => (
       <a href={path} class:list={[{ active: path === Astro.url.pathname }]}>
         {title}
