@@ -3,17 +3,24 @@
   import InputForm from "$components/InputForm.svelte";
 
   // API calls
-  import { getHeadline } from "$api/headlines.json";
+  import { getHeadline } from "$pages/api/headlines.json";
 
+  import PromptConfiguration from "$components/PromptConfiguration.svelte";
   var input = "";
   var output = "";
+
+  export let promptStore;
 
   async function fetchHeadline(e) {
     e.preventDefault();
     const userInputText = e.detail.text;
     if (userInputText) {
       input = userInputText;
-      let response = await getHeadline(input); // global events to local news and human interest stories.
+      let response = await getHeadline(
+        promptStore.prompt,
+        promptStore.instruction,
+        input,
+      ); // global events to local news and human interest stories.
       if (response) {
         output = response;
       }
@@ -21,27 +28,82 @@
   }
 </script>
 
-<div class="flex-1 relative">
-  <div class="bottom-0 left-0 right-0 p-4 flex flex-col">
-    <div id="output"></div>
+<div class="flex-1">
+  <div class="grid justify-items-end">
+    <button
+      class="btn btn-square bg-base-100 grid justify-items"
+      onclick="configuration_dialog.showModal()"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#000000"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        ><path
+          d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"
+        ></path><polygon points="18 2 22 6 12 16 8 16 8 12 18 2"></polygon></svg
+      >
+    </button>
+    <PromptConfiguration bind:promptStore={promptStore} />
   </div>
-  <div class="absolute bottom-0 w-full">
-    {#if input}
-      <div>
-        <div class="chat chat-end mb-2">
-          <div class="chat-bubble">
-            {input}
-          </div>
-        </div>
-        {#if output}
-          <div class="chat chat-start mb-2">
-            <div class="chat-bubble">
-              {output}
+
+  <div class="flex flex-wrap">
+    <div class="grow md:w-1/2 p-2">
+      <h1 class="text-3xl pb-4">
+        Hello Somedia, I help you with writing a headline
+      </h1>
+      <InputForm on:message={fetchHeadline} />
+      {#if input}
+        <div>
+          {#if output}
+            <div class="chat chat-start mt-2">
+              <div class="chat-bubble">
+                {output}
+              </div>
+            </div>
+          {/if}
+          <div class="chat chat-end mt-2">
+            <div class="chat-bubble bg-neutral-content text-info-content">
+              {input}
             </div>
           </div>
-        {/if}
-      </div>
-    {/if}
-    <InputForm on:message={fetchHeadline} />
+        </div>
+      {/if}
+    </div>
+    <!-- <div class="w-full md:w-2/5 p-2">
+        <div role="tablist" class="tabs tabs-lifted">
+          <input
+            type="radio"
+            name="history_tabs"
+            role="tab"
+            class="tab"
+            aria-label="History"
+            checked="checked"
+          />
+          <div
+            role="tabpanel"
+            class="tab-content bg-base-100 border-base-300 rounded-box p-6"
+          >
+            History List
+          </div>
+    
+          <input
+            type="radio"
+            name="history_tabs"
+            role="tab"
+            class="tab"
+            aria-label="Settings"/>
+          <div
+            role="tabpanel"
+            class="tab-content bg-base-100 border-base-300 rounded-box p-6">
+            Settings
+          </div>
+        </div>
+      </div> -->
   </div>
 </div>

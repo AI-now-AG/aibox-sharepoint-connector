@@ -2,27 +2,25 @@
 import Login from "./login.svelte";
 ---
 
-<div class="h-screen flex-1 bg-base-200 flex-col">
-  <div class="h-screen grid grid-cols-1 lg:grid-cols-2">
-    <div
-      class="lg:block hidden bg-primary content-center p-10 bg-cover bg-center">
-      <h1 class="text-base-100 font-bold text-8xl">
-        welcome to
-        <br />
-        <div class="w-max">
-          <h1
-            class="animate-typing overflow-hidden whitespace-nowrap border-r-4 border-r-white pr-5 text-warning">
-            aibox
-          </h1>
-        </div>
-      </h1>
-    </div>
-    <div
-      class="flex flex-col p-5 md:p-10 items-center justify-center content-center">
-      <h2 class="text-3xl font-bold mb-5 text-center sm:pb-4 md:pb-10 lg:pb-20">
-        Sign in to your acccount
-      </h2>
-      <Login client:load />
-    </div>
+<div class="h-screen bg-base-200 grid grid-cols-1 lg:grid-cols-2">
+  <div
+    class="lg:block hidden bg-primary content-center p-10 bg-cover bg-center">
+    <h1 class="text-base-100 font-bold text-8xl">
+      welcome to
+      <br />
+      <div class="w-max">
+        <h1
+          class="animate-typing overflow-hidden whitespace-nowrap border-r-4 border-r-white pr-5 text-warning">
+          aibox
+        </h1>
+      </div>
+    </h1>
+  </div>
+  <div
+    class="flex flex-col p-5 md:p-10 items-center justify-center content-center">
+    <h2 class="text-3xl font-bold mb-5 text-center sm:pb-4 md:pb-10 lg:pb-20">
+      Sign in to your acccount
+    </h2>
+    <Login client:load />
   </div>
 </div>

@@ -7,12 +7,11 @@ export const model = new ChatOpenAI({
   model: "gpt-4o",
 });
 
-export async function getHeadline(text: string) {
+export async function getHeadline(prompt: string, instructionText: string, text: string) {
   const messages = [
-    new SystemMessage(
-      "Please generate three possible titles for a news site that aims to cover a broad range of topics, from follwing contents.",
-    ),
-    new SystemMessage("Make sure each title start with new line."),
+    new SystemMessage(prompt),
+    new SystemMessage(instructionText),
+    new SystemMessage("Ensure that the response is properly structured."),
     new HumanMessage(text),
   ];
   await model.invoke(messages);

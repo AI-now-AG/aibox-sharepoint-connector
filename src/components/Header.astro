@@ -1,6 +1,7 @@
 ---
 // import local images
 import avatar from "$images/Avatar.svg";
+import ThemeSwitcher from "$components/ThemeSwitcher.svelte";
 
 const navItems = [
   {
@@ -12,25 +13,33 @@ const navItems = [
     path: "/login",
   },
   {
-    name: "Headlines",
-    path: "/headlines",
-  },
-  {
     name: "About",
     path: "/about",
   },
   {
-    name: "Pricing & FAQs",
+    name: "Theme",
     // path: "/pricing&faqs",
     list: [
       {
-        name: "Pricing",
-        path: "/pricing",
+        name: "Light",
+        theme: "light",
       },
       {
-        name: "FAQs",
-        path: "/faqs",
+        name: "Dark",
+        theme: "dark",
       },
+      {
+        name: "Somedia",
+        theme: "somedia",
+      },
+      {
+        name: "Luxury",
+        theme: "luxury",
+      },
+      {
+        name: "Lemonade",
+        theme: "lemonade",
+      }
     ],
   },
 ];
@@ -70,12 +79,9 @@ const navItems = [
                   <summary class:list={[]}>{item.name}</summary>
                   <ul
                     tabindex="0"
-                    class="menu menu-sm dropdown-content bg-base-100 rounded-box z-10 mt-3 w-52 p-2 shadow border p-2"
-                  >
+                    class="menu menu-sm dropdown-content bg-base-100 rounded-box z-10 mt-3 w-52 p-2 shadow border p-2">
                     {item.list.map((subItem) => (
-                      <li>
-                        <a href={subItem.path}>{subItem.name}</a>
-                      </li>
+                        <ThemeSwitcher message={subItem.theme} title={subItem.name} client:load />
                     ))}
                   </ul>
                 </details>
