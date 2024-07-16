@@ -1,7 +1,19 @@
 <script>
   import BasicPrompt from "$components/PromptInput.svelte";
-  
-  export let promptStore;
+  import { onMount } from "svelte";
+
+  let prompt;
+  let instructions;
+
+  onMount(async function () {
+    const response = await fetch("/api/headlines.json?prompt=true");
+    const data = await response.json();
+
+    if (data.prompt && data.instructions) {
+      prompt = data.prompt;
+      instructions = data.instructions;
+    }
+  });
 </script>
 
 <dialog id="configuration_dialog" class="modal">
@@ -22,7 +34,7 @@
       >
         <BasicPrompt
           placeholder="Edit your prompt here..."
-          bind:promptText={promptStore.prompt}
+          bind:promptText={prompt}
         />
       </div>
 
@@ -38,14 +50,14 @@
         class="tab-content bg-base-100 border-base-300 rounded-box p-6"
       >
         <BasicPrompt
-          bind:promptText={promptStore.instruction}
+          bind:promptText={instructions}
           placeholder="Edit your instruction here..."
         />
       </div>
     </div>
     <div class="modal-action">
       <form method="dialog">
-        <button class="btn" type='submit'>Apply</button>
+        <button class="btn" type="submit">Apply</button>
       </form>
     </div>
   </div>

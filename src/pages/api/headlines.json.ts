@@ -23,6 +23,16 @@ const loader = new TextLoader("src/data/somedia_instruction.txt");
 const docs = await loader.load();
 
 export const GET: APIRoute = async ({ url }) => {
+  // tmp
+  if (url.searchParams.has("prompt")) {
+    return new Response(
+      JSON.stringify({
+        instructions: docs[0].pageContent,
+        prompt: promptText,
+      }),
+    );
+  }
+
   if (!url.searchParams.has("article")) {
     return new Response(
       JSON.stringify({
