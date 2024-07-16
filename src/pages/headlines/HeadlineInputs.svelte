@@ -1,11 +1,11 @@
 <script>
   // Components
   import InputForm from "$components/InputForm.svelte";
+  import PromptConfiguration from "$components/PromptConfiguration.svelte";
   import { fade } from "svelte/transition";
 
-  import PromptConfiguration from "$components/PromptConfiguration.svelte";
-  var input = "";
-  var output = "";
+  let input = "";
+  let output = "";
 
   async function fetchHeadline(e) {
     e.preventDefault();

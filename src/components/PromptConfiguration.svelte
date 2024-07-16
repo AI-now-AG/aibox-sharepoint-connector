@@ -2,10 +2,11 @@
   import BasicPrompt from "$components/PromptInput.svelte";
   import { onMount } from "svelte";
 
-  let prompt;
-  let instructions;
+  export let prompt;
+  export let instructions;
 
   onMount(async function () {
+    // TODO: That was a workaround for the demo. This components needs a context
     const response = await fetch("/api/headlines.json?prompt=true");
     const data = await response.json();
 
