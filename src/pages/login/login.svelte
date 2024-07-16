@@ -1,28 +1,9 @@
 <script lang="ts">
   var email: string;
   var password: string;
-
-  const handleSubmit = async (event: SubmitEvent) => {
-    event.preventDefault();
-    if (email == "somedia@aibox.io") {
-      window.location.href = "/";
-    }
-    // const user = await getUser(email);
-    // if (user) {
-    //   // Login successful, redirect to protected page
-    //   window.location.href = "/protected";
-    // } else {
-    //   // Login failed, show error message
-    //   alert("Invalid username or password");
-    // }
-  };
 </script>
 
-<form
-class="bg-base-100 shadow-md rounded-xl p-5 md:p-10 w-full max-w-md"
-novalidate
-on:submit={handleSubmit}
->
+<div>
   <label class="input input-bordered flex items-center gap-2 mb-5">
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -59,11 +40,4 @@ on:submit={handleSubmit}
       bind:value={password}
     />
   </label>
-  <button
-
-  type="submit"
-  class="bg-primary hover:bg-primary-focus text-base-100 font-bold py-2 px-4 rounded-md w-full"
->
-  Login
-</button>
-</form>
+</div>

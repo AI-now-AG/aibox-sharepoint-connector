@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
 import { TOKEN } from "$constants";
 
-export const post: APIRoute = async (ctx) => {
+export const POST: APIRoute = async (ctx) => {
   try {
     // unset cookies
     ctx.cookies.set(TOKEN, "", {
