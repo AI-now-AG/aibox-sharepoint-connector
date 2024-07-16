@@ -1,5 +1,4 @@
 <script lang="ts">
-  
   var email: string;
   var password: string;
 

@@ -1,6 +1,9 @@
 ---
 import MenuItem from "./MenuItem.astro";
 
+import AppsIcon from "./icons/Apps.astro";
+import WritingIcon from "./icons/Writing.astro";
+
 const modules = [
   {
     title: "Text writing",
@@ -22,25 +25,33 @@ const modules = [
 ];
 ---
 
-<nav class="min-h-full block flex">
-  <ul class="menu bg-base-300 min-h-full w-64">
-    <li class="text-lg pl-4 py-4">Widgets</li>
-    {
-      modules.map((mod) => (
-        <li>
-          <MenuItem {...mod} />
 
-          {"items" in mod && (
-            <ul>
-              {mod.items.map((sub) => (
-                <li>
-                  <MenuItem {...sub} />
-                </li>
-              ))}
-            </ul>
-          )}
-        </li>
-      ))
-    }
-  </ul>
+<nav class="min-h-full flex flex-col bg-base-200">
+  <div>
+    <div class="text-lg pl-4 py-4 flex flex-row items-center">
+      <AppsIcon class="w-8 h-8 mr-1" />
+      Apps
+    </div>
+    <ul class="menu w-64">
+      {
+        modules.map((mod) => (
+          <li>
+            <MenuItem {...mod}>
+              <WritingIcon slot="icon" />
+            </MenuItem>
+
+            {"items" in mod && (
+              <ul>
+                {mod.items.map((sub) => (
+                  <li>
+                    <MenuItem {...sub} />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </li>
+        ))
+      }
+    </ul>
+  </div>
 </nav>
