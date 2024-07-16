@@ -4,7 +4,9 @@
 
   const handleSubmit = async (event: SubmitEvent) => {
     event.preventDefault();
-    console.log("hello");
+    if (email == "somedia@aibox.io") {
+      window.location.href = "/";
+    }
     // const user = await getUser(email);
     // if (user) {
     //   // Login successful, redirect to protected page
@@ -16,7 +18,11 @@
   };
 </script>
 
-<div>
+<form
+class="bg-base-100 shadow-md rounded-xl p-5 md:p-10 w-full max-w-md"
+novalidate
+on:submit={handleSubmit}
+>
   <label class="input input-bordered flex items-center gap-2 mb-5">
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -53,4 +59,11 @@
       bind:value={password}
     />
   </label>
-</div>
+  <button
+
+  type="submit"
+  class="bg-primary hover:bg-primary-focus text-base-100 font-bold py-2 px-4 rounded-md w-full"
+>
+  Login
+</button>
+</form>

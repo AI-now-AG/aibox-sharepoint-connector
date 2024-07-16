@@ -25,18 +25,7 @@ import Login from "./login.svelte";
       Sign in to your acccount
     </h2>
 
-    <form
-      class="bg-base-100 shadow-md rounded-xl p-5 md:p-10 w-full max-w-md"
-      novalidate
-    >
-      <Login client:load />
-      <button
-        id="login"
-        class="bg-primary hover:bg-primary-focus text-base-100 font-bold py-2 px-4 rounded-md w-full"
-      >
-        Login
-      </button>
-    </form>
+    <Login client:load />
   </div>
 </div>
 
