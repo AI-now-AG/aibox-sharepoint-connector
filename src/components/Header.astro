@@ -38,7 +38,7 @@ const navItems = [
       {
         name: "Lemonade",
         theme: "lemonade",
-      }
+      },
     ],
   },
 ];
@@ -78,9 +78,14 @@ const navItems = [
                   <summary class:list={[]}>{item.name}</summary>
                   <ul
                     tabindex="0"
-                    class="menu menu-sm dropdown-content bg-base-100 rounded-box z-10 mt-3 w-52 p-2 shadow border p-2">
+                    class="menu menu-sm dropdown-content bg-base-100 rounded-box z-10 mt-3 w-52 p-2 shadow border p-2"
+                  >
                     {item.list.map((subItem) => (
-                        <ThemeSwitcher message={subItem.theme} title={subItem.name} client:load />
+                      <ThemeSwitcher
+                        message={subItem.theme}
+                        title={subItem.name}
+                        client:load
+                      />
                     ))}
                   </ul>
                 </details>
@@ -111,8 +116,28 @@ const navItems = [
           </a>
         </li>
         <li><a>Settings</a></li>
-        <li><a>Logout</a></li>
+        <li id="logout"><a>Logout</a></li>
       </ul>
     </div>
   </div>
 </header>
+
+<script>
+  const logoutButton = document.getElementById("logout");
+
+  if (logoutButton) {
+    logoutButton.addEventListener("click", () => {
+      fetch("/api/logout", { method: "POST" })
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error("Not OK!");
+          }
+          window.location.href = "/";
+        })
+        .catch((error) => {
+          console.warn("Fetch call failed");
+          console.error(error);
+        });
+    });
+  }
+</script>

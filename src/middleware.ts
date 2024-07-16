@@ -1,7 +1,7 @@
 import { errors, jwtVerify } from "jose";
 import { defineMiddleware } from "astro/middleware";
 //import { getUser } from "$data/models/user.model";
-import { TOKEN, PUBLIC_ROUTES } from "./constants";
+import { TOKEN, PUBLIC_ROUTES, } from "$constants";
 
 const secret = new TextEncoder().encode(import.meta.env.JWT_SECRET_KEY);
 
