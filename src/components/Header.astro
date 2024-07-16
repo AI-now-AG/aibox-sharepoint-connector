@@ -38,11 +38,26 @@ const navItems = [
       {
         name: "Lemonade",
         theme: "lemonade",
-      }
+      },
     ],
   },
 ];
 ---
+
+<style is:global>
+  .non-somedia {
+    display: block;
+  }
+  [data-theme="somedia"] .non-somedia {
+    display: none;
+  }
+  .somedia {
+    display: none;
+  }
+  [data-theme="somedia"] .somedia {
+    display: block;
+  }
+</style>
 
 <header class="container-fluid mx-auto navbar">
   <div class="navbar-start">
@@ -67,7 +82,10 @@ const navItems = [
         </svg>
       </label>
     </div>
-    <a href="/" class="btn btn-ghost text-2xl font-semibold">AI Box</a>
+    <a href="/" class="btn btn-ghost text-2xl font-semibold flex flex-col">
+      <img src="/logo-somedia.svg" alt="Somedia Logo" class="h-8 somedia" />
+      <span class="non-somedia">aibox</span>
+    </a>
     <div class="hidden lg:flex">
       <ul class="menu menu-horizontal px-1">
         {
@@ -78,9 +96,14 @@ const navItems = [
                   <summary class:list={[]}>{item.name}</summary>
                   <ul
                     tabindex="0"
-                    class="menu menu-sm dropdown-content bg-base-100 rounded-box z-10 mt-3 w-52 p-2 shadow border p-2">
+                    class="menu menu-sm dropdown-content bg-base-100 rounded-box z-10 mt-3 w-52 p-2 shadow border p-2"
+                  >
                     {item.list.map((subItem) => (
-                        <ThemeSwitcher message={subItem.theme} title={subItem.name} client:load />
+                      <ThemeSwitcher
+                        message={subItem.theme}
+                        title={subItem.name}
+                        client:load
+                      />
                     ))}
                   </ul>
                 </details>
@@ -116,3 +139,4 @@ const navItems = [
     </div>
   </div>
 </header>
+

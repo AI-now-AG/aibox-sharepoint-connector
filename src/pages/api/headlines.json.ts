@@ -10,7 +10,9 @@ export const model = new ChatOpenAI({
 
 const promptText = `Create three headlines for a Swiss press article in german language. The article covers the following topic. Ensure that the headlines align with the style and expectations of Swiss press articles and your knowledge base. Follow the specific instructions provided.
 
-Respond in HTML with the following format:
+Focus on the core and central message of the article and incorporate SEO best practices for writing headlines.
+
+Respond with a HTML ol following exactly this format:
 <ol class="ml-4 list-decimal">
 <li>First headline</li>
 <li>Second headline</li>
