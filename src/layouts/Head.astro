@@ -9,6 +9,7 @@ const { title, description } = Astro.props;
   <meta name="descrption" content={description} />
 
   <script>
+    /* We set the theme in a render blocking script tag early to avoid flashing */
     const theme = localStorage.getItem("theme");
     if (theme) {
       document.documentElement.setAttribute("data-theme", theme);
