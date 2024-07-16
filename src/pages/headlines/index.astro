@@ -2,46 +2,21 @@
 // Component
 import Layout from "$layouts/Layout.astro";
 import HeadlineInputs from "./HeadlineInputs.svelte";
+import PromptConfiguration from "$components/PromptConfiguration.svelte";
+
+let promtText =
+  "Create headlines for a Swiss press article. The article covers the following topic. Ensure that the headlines align with the style and expectations of Swiss press articles and your knowledge base. Follow the specific instructions provided.";
+
+import { TextLoader } from "langchain/document_loaders/fs/text";
+const loader = new TextLoader("src/data/somedia_instruction.txt");
+const docs = await loader.load();
+
+const promptStore = {
+  prompt: promtText,
+  instruction: docs[0].pageContent,
+};
 ---
 
 <Layout>
-  <div class="grid justify-items-end">
-    <button
-      class="btn btn-square bg-base-100 grid justify-items"
-      onclick="my_modal_4.showModal()"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="#000000"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        ><path
-          d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"
-        ></path><polygon points="18 2 22 6 12 16 8 16 8 12 18 2"></polygon></svg
-      >
-    </button>
-    <dialog id="my_modal_4" class="modal">
-      <div class="modal-box w-6/12 max-w-5xl">
-        <h3 class="text-lg font-bold">Configuration</h3>
-        <p class="py-4">Edit your prompt</p>
-        <div class="flex space-y-2">
-          <textarea
-            id="article-text"
-            class="w-full p-2 textarea textarea-ghost textarea-lg"
-            placeholder="Edit your prompt here..."></textarea>
-        </div>
-        <div class="modal-action">
-          <form method="dialog">
-            <button class="btn">Apply</button>
-          </form>
-        </div>
-      </div>
-    </dialog>
-  </div>
-  <HeadlineInputs client:load />
+  <HeadlineInputs promptStore={promptStore} client:load />
 </Layout>

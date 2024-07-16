@@ -7,7 +7,11 @@ export const model = new ChatOpenAI({
   model: "gpt-4o",
 });
 
-export async function getHeadline(prompt: string, instructionText: string, text: string) {
+export async function getHeadline(
+  prompt: string,
+  instructionText: string,
+  text: string,
+) {
   const messages = [
     new SystemMessage(prompt),
     new SystemMessage(instructionText),
