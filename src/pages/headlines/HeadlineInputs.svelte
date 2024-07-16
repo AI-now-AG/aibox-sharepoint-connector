@@ -1,28 +1,28 @@
 <script>
   // Components
   import InputForm from "$components/InputForm.svelte";
-
-  // API calls
-  import { getHeadline } from "$pages/api/headlines.json";
+  import { fade } from "svelte/transition";
 
   import PromptConfiguration from "$components/PromptConfiguration.svelte";
   var input = "";
   var output = "";
 
-  export let promptStore;
-
   async function fetchHeadline(e) {
     e.preventDefault();
+
+    console.log("hai");
     const userInputText = e.detail.text;
     if (userInputText) {
       input = userInputText;
-      let response = await getHeadline(
-        promptStore.prompt,
-        promptStore.instruction,
-        input,
-      ); // global events to local news and human interest stories.
-      if (response) {
-        output = response;
+      const article = new URLSearchParams({
+        article: input,
+      }).toString();
+      const response = await fetch(`/api/headlines.json?${article}`);
+      const data = await response.json();
+
+      if (data && data.headlines) {
+        console.log(data.headlines);
+        output = data.headlines.replaceAll("\n", "<br>");
       }
     }
   }
@@ -50,7 +50,7 @@
         ></path><polygon points="18 2 22 6 12 16 8 16 8 12 18 2"></polygon></svg
       >
     </button>
-    <PromptConfiguration bind:promptStore={promptStore} />
+    <!-- <PromptConfiguration bind:promptStore /> -->
   </div>
 
   <div class="flex flex-wrap">
@@ -60,11 +60,11 @@
       </h1>
       <InputForm on:message={fetchHeadline} />
       {#if input}
-        <div>
+        <div transition:fade>
           {#if output}
-            <div class="chat chat-start mt-2">
+            <div class="chat chat-start mt-2" transition:fade>
               <div class="chat-bubble">
-                {output}
+                {@html output}
               </div>
             </div>
           {/if}

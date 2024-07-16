@@ -1,26 +1,51 @@
 import { ChatOpenAI } from "@langchain/openai";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { StringOutputParser } from "@langchain/core/output_parsers";
+import type { APIRoute } from "astro";
 
 export const model = new ChatOpenAI({
   apiKey: import.meta.env.OPENAI_API_KEY,
   model: "gpt-4o",
 });
 
-export async function getHeadline(
-  prompt: string,
-  instructionText: string,
-  text: string,
-) {
+const promptText = `Create three headlines for a Swiss press article in german language. The article covers the following topic. Ensure that the headlines align with the style and expectations of Swiss press articles and your knowledge base. Follow the specific instructions provided.
+
+Respond in HTML with the following format:
+<ol class="ml-4 list-decimal">
+<li>First headline</li>
+<li>Second headline</li>
+<li>Third headline</li>
+</ol>
+`;
+
+import { TextLoader } from "langchain/document_loaders/fs/text";
+const loader = new TextLoader("src/data/somedia_instruction.txt");
+const docs = await loader.load();
+
+export const GET: APIRoute = async ({ url }) => {
+  if (!url.searchParams.has("article")) {
+    return new Response(
+      JSON.stringify({
+        error: "foo",
+      }),
+    );
+  }
+
+  const article = url.searchParams.get("article") as string;
+
   const messages = [
-    new SystemMessage(prompt),
-    new SystemMessage(instructionText),
-    new SystemMessage("Ensure that the response is properly structured."),
-    new HumanMessage(text),
+    new SystemMessage(promptText),
+    new SystemMessage(docs[0].pageContent),
+    new HumanMessage(article),
   ];
-  await model.invoke(messages);
+
   const parser = new StringOutputParser();
   const result = await model.invoke(messages);
-  const outputObj = await parser.invoke(result);
-  return outputObj;
-}
+  const headlines = await parser.invoke(result);
+
+  return new Response(
+    JSON.stringify({
+      headlines,
+    }),
+  );
+};
