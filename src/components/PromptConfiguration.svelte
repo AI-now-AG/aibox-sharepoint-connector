@@ -1,5 +1,5 @@
 <script>
-  import BasicPrompt from "$components/PromptInput.svelte";
+  import InputArea from "$components/InputArea.svelte";
   
   export let promptStore;
 </script>
@@ -20,7 +20,7 @@
         role="tabpanel"
         class="tab-content bg-base-100 border-base-300 rounded-box p-6"
       >
-        <BasicPrompt
+        <InputArea
           placeholder="Edit your prompt here..."
           bind:promptText={promptStore.prompt}
         />
@@ -37,7 +37,7 @@
         role="tabpanel"
         class="tab-content bg-base-100 border-base-300 rounded-box p-6"
       >
-        <BasicPrompt
+        <InputArea
           bind:promptText={promptStore.instruction}
           placeholder="Edit your instruction here..."
         />

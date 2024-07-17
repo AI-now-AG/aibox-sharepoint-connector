@@ -2,27 +2,34 @@
   // Components
   import InputForm from "$components/InputForm.svelte";
 
-  // API calls
-  import { getHeadline } from "$pages/api/headlines.json";
-
   import PromptConfiguration from "$components/PromptConfiguration.svelte";
-  var input = "";
-  var output = "";
+  let input = "";
+  let output = "";
 
   export let promptStore;
 
   async function fetchHeadline(e) {
     e.preventDefault();
     const userInputText = e.detail.text;
+    input = "";
+    let form = new FormData();
+    form.append("prompt", promptStore.prompt);
+    form.append("instruction", promptStore.instruction);
+    form.append("article", userInputText);
     if (userInputText) {
       input = userInputText;
-      let response = await getHeadline(
-        promptStore.prompt,
-        promptStore.instruction,
-        input,
-      ); // global events to local news and human interest stories.
-      if (response) {
-        output = response;
+      output = "";
+      try {
+        const response = await fetch("/api/headlines.json", {
+          method: "POST",
+          body: form,
+        });
+        const data = await response.json();
+        if (data && data.headlines) {
+          output = data.headlines.replaceAll("\n", "<br>");
+        }
+      } catch (error) {
+        console.error("Fetch headlines error:" + error);
       }
     }
   }
