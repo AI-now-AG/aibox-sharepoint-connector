@@ -13,21 +13,30 @@
     console.log("hai");
     const userInputText = e.detail.text;
     input = "";
-    let form = new FormData();
-    form.append("prompt", promptStore.prompt);
-    form.append("instruction", promptStore.instruction);
-    form.append("article", userInputText);
+    let body = {
+      prompt: promptStore.prompt,
+      instruction: promptStore.instruction,
+      article: userInputText
+    }
     if (userInputText) {
       input = userInputText;
-      const article = new URLSearchParams({
-        article: input,
-      }).toString();
-      const response = await fetch(`/api/headlines.json?${article}`);
-      const data = await response.json();
-
-      if (data && data.headlines) {
-        console.log(data.headlines);
-        output = data.headlines.replaceAll("\n", "<br>");
+      output = "";
+      try {
+        const response = await fetch("/api/headlines.json", {
+          method: "POST",
+          body: JSON.stringify(body),
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
+        const data = await response.json();
+        if (data && data.headlines) {
+          output = data.headlines.replaceAll("\n", "<br>");
+        } else {
+          output = data.message;
+        }
+      } catch (error) {
+        console.error("Fetch headlines error:" + error);
       }
     }
   }

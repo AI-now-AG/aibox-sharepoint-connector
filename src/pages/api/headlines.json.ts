@@ -24,9 +24,10 @@ import { TextLoader } from "langchain/document_loaders/fs/text";
 const loader = new TextLoader("src/data/somedia_instruction.txt");
 const docs = await loader.load();
 
-export const GET: APIRoute = async ({ url }) => {
-  // tmp
-  if (url.searchParams.has("prompt")) {
+export const POST: APIRoute = async (ctx) => {
+  //const params = await ctx.params;
+  const params = await ctx.request.json();
+  if (!params.prompt) {
     return new Response(
       JSON.stringify({
         instructions: docs[0].pageContent,
@@ -35,10 +36,18 @@ export const GET: APIRoute = async ({ url }) => {
     );
   }
 
-  if (!url.searchParams.has("article")) {
+  if (!params.instruction) {
     return new Response(
       JSON.stringify({
-        error: "foo",
+        message: "Require 'instruction' field",
+      }),
+    );
+  }
+  
+  if (!params.article) {
+    return new Response(
+      JSON.stringify({
+        message: "Require 'article' field",
       }),
     );
   }
@@ -46,11 +55,10 @@ export const GET: APIRoute = async ({ url }) => {
   const article = url.searchParams.get("article") as string;
 
   const messages = [
-    new SystemMessage(promptText),
-    new SystemMessage(docs[0].pageContent),
-    new HumanMessage(article),
+    new SystemMessage(params.prompt),
+    new SystemMessage(params.instruction),
+    new HumanMessage(params.article),
   ];
-
   const parser = new StringOutputParser();
   const result = await model.invoke(messages);
   const headlines = await parser.invoke(result);
