@@ -1,13 +1,13 @@
 <script>
-  import BasicPrompt from "$components/PromptInput.svelte";
   import { onMount } from "svelte";
+  import InputArea from "$components/InputArea.svelte";
 
-  export let prompt;
-  export let instructions;
+  let prompt;
+  let instructions;
 
   onMount(async function () {
     // TODO: That was a workaround for the demo. This components needs a context
-    const response = await fetch("/api/headlines.json?prompt=true");
+    const response = await fetch("/api/headlines.json?prompt=true", {method: 'POST'});
     const data = await response.json();
 
     if (data.prompt && data.instructions) {
@@ -50,7 +50,7 @@
         role="tabpanel"
         class="tab-content bg-base-100 border-base-300 rounded-box p-6"
       >
-        <BasicPrompt
+        <InputArea
           bind:promptText={instructions}
           placeholder="Edit your instruction here..."
         />

@@ -25,13 +25,20 @@ const loader = new TextLoader("src/data/somedia_instruction.txt");
 const docs = await loader.load();
 
 export const POST: APIRoute = async (ctx) => {
-  //const params = await ctx.params;
-  const params = await ctx.request.json();
-  if (!params.prompt) {
+  if (ctx.url.searchParams.has("prompt")) {
     return new Response(
       JSON.stringify({
         instructions: docs[0].pageContent,
-        prompt: promptText,
+        prompt: promptText
+      }),
+    );
+  }
+
+  const params = await ctx.request.json();
+  /*if (!params.prompt) {
+    return new Response(
+      JSON.stringify({
+        messages: "Require 'Prompt' field"
       }),
     );
   }
@@ -42,8 +49,8 @@ export const POST: APIRoute = async (ctx) => {
         message: "Require 'instruction' field",
       }),
     );
-  }
-  
+  }*/
+
   if (!params.article) {
     return new Response(
       JSON.stringify({
@@ -52,11 +59,9 @@ export const POST: APIRoute = async (ctx) => {
     );
   }
 
-  const article = url.searchParams.get("article") as string;
-
   const messages = [
-    new SystemMessage(params.prompt),
-    new SystemMessage(params.instruction),
+    new SystemMessage(promptText),
+    new SystemMessage(docs[0].pageContent),
     new HumanMessage(params.article),
   ];
   const parser = new StringOutputParser();
