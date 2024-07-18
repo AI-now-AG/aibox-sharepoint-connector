@@ -1,15 +1,16 @@
 <script>
   // Components
   import InputForm from "$components/InputForm.svelte";
-
   import PromptConfiguration from "$components/PromptConfiguration.svelte";
+  import { fade } from "svelte/transition";
+
   let input = "";
   let output = "";
 
-  export let promptStore;
-
   async function fetchHeadline(e) {
     e.preventDefault();
+
+    console.log("hai");
     const userInputText = e.detail.text;
     input = "";
     let form = new FormData();
@@ -18,18 +19,15 @@
     form.append("article", userInputText);
     if (userInputText) {
       input = userInputText;
-      output = "";
-      try {
-        const response = await fetch("/api/headlines.json", {
-          method: "POST",
-          body: form,
-        });
-        const data = await response.json();
-        if (data && data.headlines) {
-          output = data.headlines.replaceAll("\n", "<br>");
-        }
-      } catch (error) {
-        console.error("Fetch headlines error:" + error);
+      const article = new URLSearchParams({
+        article: input,
+      }).toString();
+      const response = await fetch(`/api/headlines.json?${article}`);
+      const data = await response.json();
+
+      if (data && data.headlines) {
+        console.log(data.headlines);
+        output = data.headlines.replaceAll("\n", "<br>");
       }
     }
   }
@@ -57,7 +55,7 @@
         ></path><polygon points="18 2 22 6 12 16 8 16 8 12 18 2"></polygon></svg
       >
     </button>
-    <PromptConfiguration bind:promptStore={promptStore} />
+    <PromptConfiguration />
   </div>
 
   <div class="flex flex-wrap">
@@ -67,14 +65,59 @@
       </h1>
       <InputForm on:message={fetchHeadline} />
       {#if input}
-        <div>
-          {#if output}
-            <div class="chat chat-start mt-2">
-              <div class="chat-bubble">
-                {output}
-              </div>
+        <div transition:fade>
+          <div class="chat chat-start mt-2" transition:fade>
+            <div class="chat-bubble">
+              {#if output}
+                {@html output}
+              {:else}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="1em"
+                  height="1em"
+                  viewBox="0 0 24 24"
+                  class="w-8 h-8"
+                >
+                  <g stroke="currentColor">
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="9.5"
+                      fill="none"
+                      stroke-linecap="round"
+                      stroke-width="3"
+                    >
+                      <animate
+                        attributeName="stroke-dasharray"
+                        calcMode="spline"
+                        dur="1.125s"
+                        keySplines="0.42,0,0.58,1;0.42,0,0.58,1;0.42,0,0.58,1"
+                        keyTimes="0;0.475;0.95;1"
+                        repeatCount="indefinite"
+                        values="0 150;42 150;42 150;42 150"
+                      />
+                      <animate
+                        attributeName="stroke-dashoffset"
+                        calcMode="spline"
+                        dur="1.125s"
+                        keySplines="0.42,0,0.58,1;0.42,0,0.58,1;0.42,0,0.58,1"
+                        keyTimes="0;0.475;0.95;1"
+                        repeatCount="indefinite"
+                        values="0;-16;-59;-59"
+                      />
+                    </circle>
+                    <animateTransform
+                      attributeName="transform"
+                      dur="1.5s"
+                      repeatCount="indefinite"
+                      type="rotate"
+                      values="0 12 12;360 12 12"
+                    />
+                  </g>
+                </svg>
+              {/if}
             </div>
-          {/if}
+          </div>
           <div class="chat chat-end mt-2">
             <div class="chat-bubble bg-neutral-content text-info-content">
               {input}

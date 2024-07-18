@@ -44,6 +44,22 @@ const navItems = [
 ];
 ---
 
+<style is:global>
+  /* TODO: Workaround for the demo. The logo has to be part of the theme. */
+  .non-somedia {
+    display: block;
+  }
+  [data-theme="somedia"] .non-somedia {
+    display: none;
+  }
+  .somedia {
+    display: none;
+  }
+  [data-theme="somedia"] .somedia {
+    display: block;
+  }
+</style>
+
 <header class="container-fluid mx-auto navbar">
   <div class="navbar-start">
     <div class="lg:hidden">
@@ -67,7 +83,10 @@ const navItems = [
         </svg>
       </label>
     </div>
-    <a href="/" class="btn btn-ghost text-2xl font-semibold">AI Box</a>
+    <a href="/" class="btn btn-ghost text-2xl font-semibold flex flex-col">
+      <img src="/logo-somedia.svg" alt="Somedia Logo" class="h-8 somedia" />
+      <span class="non-somedia">aibox</span>
+    </a>
     <div class="hidden lg:flex">
       <ul class="menu menu-horizontal px-1">
         {
@@ -141,3 +160,4 @@ const navItems = [
     });
   }
 </script>
+  

@@ -2,21 +2,8 @@
 // Component
 import Layout from "$layouts/Layout.astro";
 import HeadlineInputs from "./HeadlineInputs.svelte";
-import PromptConfiguration from "$components/PromptConfiguration.svelte";
-
-let promtText =
-  "Create headlines for a Swiss press article. The article covers the following topic. Ensure that the headlines align with the style and expectations of Swiss press articles and your knowledge base. Follow the specific instructions provided.";
-
-import { TextLoader } from "langchain/document_loaders/fs/text";
-const loader = new TextLoader("src/data/somedia_instruction.txt");
-const docs = await loader.load();
-
-const promptStore = {
-  prompt: promtText,
-  instruction: docs[0].pageContent,
-};
 ---
 
 <Layout>
-  <HeadlineInputs promptStore={promptStore} client:load />
+  <HeadlineInputs client:load />
 </Layout>

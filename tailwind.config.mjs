@@ -68,7 +68,7 @@ export default {
       "sunset",
       {
         somedia: {
-          primary: "#4338CA",
+          primary: "#0068a5",
           "primary-focus": "#3730A3",
           "primary-content": "#C7D2FE",
           secondary: "#EC4899",
