@@ -27,44 +27,44 @@ import Login from "./login.svelte";
 
     <form
       class="bg-base-100 shadow-md rounded-xl p-5 md:p-10 w-full max-w-md"
+      method="post"
+      action="/api/login"
       novalidate
     >
       <Login client:load />
       <button
-        id="login"
+        type="submit"
         class="bg-primary hover:bg-primary-focus text-base-100 font-bold py-2 px-4 rounded-md w-full"
       >
         Login
       </button>
+      <p id="form-error" class="text-error item-center text-right py-2"></p>
     </form>
   </div>
 </div>
 
 <script>
-  const loginButton = document.getElementById("login");
+  const errorMessageElement = document.getElementById("form-error")!;
+  
+  document.forms[0].addEventListener("submit", (e) => {
+    e.preventDefault();
+    const formElement = e.target as HTMLFormElement;
+    fetchUserData(formElement);
+  });
 
-  if (loginButton) {
-    loginButton.addEventListener("click", (e) => {
-      e.preventDefault();
-      fetchUserData();
-    });
-  }
-
-  async function fetchUserData() {
+  async function fetchUserData(formElement: HTMLFormElement) {
     try {
-      await fetch("/api/login", { method: "POST" })
-        .then((res) => {
-          if (!res.ok) {
-            throw new Error("Not OK!");
-          }
-          window.location.href = "/";
-        })
-        .catch((error) => {
-          console.warn("Fetch call failed");
-          console.error(error);
-        });
+      const response = await fetch("/api/login", {
+        method: formElement.method,
+        body: new FormData(formElement),
+      })
+      if (response.ok) {
+			window.location.href = "/";
+		} else {
+			errorMessageElement.innerText = '\u{2022} ' + (await response.json()).message;
+		}
     } catch (error) {
-      console.error("Fetch error:" + error);
+      console.error("Fetch login error:" + error);
     }
   }
 </script>

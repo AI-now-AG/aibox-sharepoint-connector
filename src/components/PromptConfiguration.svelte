@@ -33,7 +33,7 @@
         role="tabpanel"
         class="tab-content bg-base-100 border-base-300 rounded-box p-6"
       >
-        <BasicPrompt
+        <InputArea
           placeholder="Edit your prompt here..."
           bind:promptText={prompt}
         />

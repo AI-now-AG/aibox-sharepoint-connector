@@ -12,6 +12,11 @@
 
     console.log("hai");
     const userInputText = e.detail.text;
+    input = "";
+    let form = new FormData();
+    form.append("prompt", promptStore.prompt);
+    form.append("instruction", promptStore.instruction);
+    form.append("article", userInputText);
     if (userInputText) {
       input = userInputText;
       const article = new URLSearchParams({

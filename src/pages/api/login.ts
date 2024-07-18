@@ -6,16 +6,25 @@ import { getUser } from "$data/models/user.model";
 
 const secret = new TextEncoder().encode(import.meta.env.JWT_SECRET_KEY);
 export const POST: APIRoute = async (ctx) => {
+  const formData = await ctx.request.formData();
   try {
-    const token = await new SignJWT({})
-      .setProtectedHeader({ alg: "HS256" })
-      .setJti(nanoid())
-      .setIssuedAt()
-      .setExpirationTime("2h")
-      .sign(secret);
-
-    const user = await getUser("somedia@aibox.io");
+    const email = formData.get("email") as string;
+    if (
+      typeof email !== "string" ||
+      !/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)
+    ) {
+      return new Response(JSON.stringify({ message: "Invalid username" }), {
+        status: 400
+      });
+    }
+    const user = await getUser(email);
     if (user) {
+      const token = await new SignJWT({})
+        .setProtectedHeader({ alg: "HS256" })
+        .setJti(nanoid())
+        .setIssuedAt()
+        .setExpirationTime("2h")
+        .sign(secret);
       // Login successful, redirect to authentic page
       // set cookies
       ctx.cookies.set(TOKEN, token, {
