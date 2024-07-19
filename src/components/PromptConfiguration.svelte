@@ -1,6 +1,6 @@
 <script>
   import { onMount } from "svelte";
-  import InputArea from "$components/InputArea.svelte";
+  import InputArea from "$components/PromptConfiguration/InputArea.svelte";
 
   let prompt;
   let instructions;

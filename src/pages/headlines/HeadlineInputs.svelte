@@ -14,8 +14,6 @@
     const userInputText = e.detail.text;
     input = "";
     let body = {
-      prompt: "",
-      instruction: "",
       article: userInputText
     }
     if (userInputText) {

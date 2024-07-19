@@ -1,6 +1,5 @@
 <script>
   import { createEventDispatcher } from "svelte";
-  import InputArea from "$components/InputArea.svelte";
 
   let userInputText;
   const dispatch = createEventDispatcher();
@@ -19,13 +18,16 @@
     on:submit={submitAction}
   >
     <div class="flex-1 space-y-2">
-      <InputArea
-        bind:promptText={userInputText}
-        placeholder="Write the article text here..."
-      />
+      <div class="flex space-y-2">
+        <textarea
+          class="w-full min-h-64 p-2 textarea textarea-ghost textarea-lg"
+          placeholder="Write the article text here..."
+          bind:value={userInputText}
+        ></textarea>
+      </div>
     </div>
     <button
-      class="btn btn-square text-red-800 fill-current bg-base-content grid justify-items"
+      class="btn btn-square fill-current bg-base-content grid justify-items"
       type="submit"
     >
       <svg
