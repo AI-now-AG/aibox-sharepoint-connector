@@ -1,3 +1,0 @@
-* Still there is an ID https://github.com/AI-now-AG/ai-toolbox/pull/6/files#diff-6b773d8c318a7566d1c4cc41b5e2ea88f07b37c10c058093eab75283956e4343R8 
-* Still text-red-800 https://github.com/AI-now-AG/ai-toolbox/pull/6/files#diff-65af43535fd6d5efabe56edd9c7f242d6f50552cd0b9cd6d6572aed145e9e4d0R28
-* Prefer working with const over let, as it makes variables and their values mroe predictable. Keep it as is, as this code will change anyway. https://github.com/AI-now-AG/ai-toolbox/pull/6/files#diff-9aca53ac9c5549d625058617cc6462fa817bad7ff65cc30f8af137af88667a78R16
