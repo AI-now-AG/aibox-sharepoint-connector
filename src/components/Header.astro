@@ -1,6 +1,7 @@
 ---
 // import local images
 import avatar from "$images/Avatar.svg";
+import ThemeSwitcher from "$components/ThemeSwitcher.svelte";
 
 const navItems = [
   {
@@ -12,28 +13,52 @@ const navItems = [
     path: "/login",
   },
   {
-    name: "Headlines",
-    path: "/headlines",
-  },
-  {
     name: "About",
     path: "/about",
   },
   {
-    name: "Pricing & FAQs",
+    name: "Theme",
     list: [
       {
-        name: "Pricing",
-        path: "/pricing",
+        name: "Light",
+        theme: "light",
       },
       {
-        name: "FAQs",
-        path: "/faqs",
+        name: "Dark",
+        theme: "dark",
+      },
+      {
+        name: "Somedia",
+        theme: "somedia",
+      },
+      {
+        name: "Luxury",
+        theme: "luxury",
+      },
+      {
+        name: "Lemonade",
+        theme: "lemonade",
       },
     ],
   },
 ];
 ---
+
+<style is:global>
+  /* TODO: Workaround for the demo. The logo has to be part of the theme. */
+  .non-somedia {
+    display: block;
+  }
+  [data-theme="somedia"] .non-somedia {
+    display: none;
+  }
+  .somedia {
+    display: none;
+  }
+  [data-theme="somedia"] .somedia {
+    display: block;
+  }
+</style>
 
 <header class="container-fluid mx-auto navbar">
   <div class="navbar-start">
@@ -58,7 +83,10 @@ const navItems = [
         </svg>
       </label>
     </div>
-    <a href="/" class="btn btn-ghost text-2xl font-semibold">AI Box</a>
+    <a href="/" class="btn btn-ghost text-2xl font-semibold flex flex-col">
+      <img src="/logo-somedia.svg" alt="Somedia Logo" class="h-8 somedia" />
+      <span class="non-somedia">aibox</span>
+    </a>
     <div class="hidden lg:flex">
       <ul class="menu menu-horizontal px-1">
         {
@@ -72,9 +100,11 @@ const navItems = [
                     class="menu menu-sm dropdown-content bg-base-100 rounded-box z-10 mt-3 w-52 p-2 shadow border p-2"
                   >
                     {item.list.map((subItem) => (
-                      <li>
-                        <a href={subItem.path}>{subItem.name}</a>
-                      </li>
+                      <ThemeSwitcher
+                        message={subItem.theme}
+                        title={subItem.name}
+                        client:load
+                      />
                     ))}
                   </ul>
                 </details>
@@ -105,8 +135,29 @@ const navItems = [
           </a>
         </li>
         <li><a>Settings</a></li>
-        <li><a>Logout</a></li>
+        <li id="logout"><a>Logout</a></li>
       </ul>
     </div>
   </div>
 </header>
+
+<script>
+  const logoutButton = document.getElementById("logout");
+
+  if (logoutButton) {
+    logoutButton.addEventListener("click", () => {
+      fetch("/api/logout", { method: "POST" })
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error("Not OK!");
+          }
+          window.location.href = "/";
+        })
+        .catch((error) => {
+          console.warn("Fetch logout failed");
+          console.error(error);
+        });
+    });
+  }
+</script>
+  

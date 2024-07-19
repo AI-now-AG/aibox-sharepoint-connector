@@ -1,29 +1,9 @@
 <script lang="ts">
-  // import { getUser } from "$data/models/user.model";
-
-  var email: string;
-  var password: string;
-
-  const handleSubmit = async (event: SubmitEvent) => {
-    event.preventDefault();
-    console.log("hello");
-    /* const user = await getUser(email);
-   
-    if (user) {
-      // Login successful, redirect to protected page
-      window.location.href = "/protected";
-    } else {
-      // Login failed, show error message
-      alert("Invalid username or password");
-    }*/
-  };
+  let email: string;
+  let password: string;
 </script>
 
-<form
-  class="bg-base-100 shadow-md rounded-xl p-5 md:p-10 w-full max-w-md"
-  novalidate
-  on:submit={handleSubmit}
->
+<div>
   <label class="input input-bordered flex items-center gap-2 mb-5">
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -38,7 +18,7 @@
         d="M15 6.954 8.978 9.86a2.25 2.25 0 0 1-1.956 0L1 6.954V11.5A1.5 1.5 0 0 0 2.5 13h11a1.5 1.5 0 0 0 1.5-1.5V6.954Z"
       ></path>
     </svg>
-    <input type="text" class="grow" placeholder="Email" bind:value={email} />
+    <input name="email" id="email" type="text" class="grow" placeholder="Email" bind:value={email} />
   </label>
   <label class="input input-bordered flex items-center gap-2 mb-5">
     <svg
@@ -54,16 +34,12 @@
       ></path>
     </svg>
     <input
+      name="password"
+      id="password"
       type="password"
       class="grow"
       placeholder="Password"
       bind:value={password}
     />
   </label>
-  <button
-    type="submit"
-    class="bg-primary hover:bg-primary-focus text-base-100 font-bold py-2 px-4 rounded-md w-full"
-  >
-    Login
-  </button>
-</form>
+</div>

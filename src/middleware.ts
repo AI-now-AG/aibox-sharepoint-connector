@@ -1,75 +1,63 @@
+import { errors, jwtVerify } from "jose";
 import { defineMiddleware } from "astro/middleware";
-import { getUser } from "$data/models/user.model";
+import { TOKEN, PUBLIC_ROUTES, } from "$constants";
 
-// const DEFAULT_USER = "preview";
-// const DEFAULT_PASS = "aiderdaus";
+const secret = new TextEncoder().encode(import.meta.env.JWT_SECRET_KEY);
 
-export const onRequest = defineMiddleware((context, next) => {
-  // If a basic auth header is present, it wil take the string form: "Basic authValue"
-  const basicAuth = context.request.headers.get("authorization");
-
-  if (basicAuth) {
-    // Get the auth value from string "Basic authValue"
-    const authValue = basicAuth.split(" ")[1] ?? "username:password";
-
-    // Decode the Base64 encoded string via atob (https://developer.mozilla.org/en-US/docs/Web/API/atob)
-    // Get the username and password. NB: the decoded string is in the form "username:password"
-    const [username, pwd] = atob(authValue).split(":");
-
-    // check if the username and password are valid
-    if (
-      username === import.meta.env.BASIC_AUTH_USER &&
-      pwd === import.meta.env.BASIC_AUTH_PASS
-    ) {
-      // forward request
-      return next();
-    }
+const verifyAuth = async (token?: string) => {
+  if (!token) {
+    return {
+      status: "unauthorized",
+      msg: "please pass a request token",
+    } as const;
   }
 
-  return new Response("Auth required", {
-    status: 401,
-    headers: {
-      "WWW-authenticate": 'Basic realm="Restricted Area"',
-    },
-  });
-});
-/*
+  try {
+    const jwtVerifyResult = await jwtVerify(token, secret);
+
+    return {
+      status: "authorized",
+      payload: jwtVerifyResult.payload,
+      msg: "successfully verified auth token",
+    } as const;
+  } catch (err) {
+    if (err instanceof errors.JOSEError) {
+      return { status: "error", msg: err.message } as const;
+    }
+
+    console.debug(err);
+    return { status: "error", msg: "could not validate auth token" } as const;
+  }
+};
+
 export const onRequest = defineMiddleware(async (context, next) => {
-  // If a basic auth header is present, it wil take the string form: "Basic authValue"
-  const basicAuth = context.request.headers.get("authorization");
-
-  if (basicAuth) {
-    // Get the auth value from string "Basic authValue"
-    const authValue = basicAuth.split(" ")[1] ?? "username:password";
-
-    // Decode the Base64 encoded string via atob (https://developer.mozilla.org/en-US/docs/Web/API/atob)
-    // Get the username and password. NB: the decoded string is in the form "username:password"
-    const [username, pwd] = atob(authValue).split(":");
-
-    if (!username || !pwd) {
-      // Redirect to login page if no credentials provided
-
-      return context.redirect("/login");
-    }
-
-    //const user = import.meta.env.BASIC_AUTH_USER || DEFAULT_USER;
-    //const pass = import.meta.env.BASIC_AUTH_PASS || DEFAULT_PASS;
-    const user = await getUser(username);
-    if (!user) {
-      // Redirect to login page if invalid credentials
-      return context.redirect("/login");
-    }
-
-    // Login successful, continue to protected page
+  // Ignore auth validation for public routes
+  if (PUBLIC_ROUTES.includes(context.url.pathname)) {
     return next();
   }
 
-  return context.redirect("/login");
-  // return new context("Auth required", {
-  //   status: 401,
-  //   headers: {
-  //     "WWW-authenticate": 'Basic realm="Restricted Area"',
-  //   },
-  // });
+  const token = context.cookies.get(TOKEN)?.value;
+  const validationResult = await verifyAuth(token);
+
+  console.log(validationResult);
+
+  switch (validationResult.status) {
+    case "authorized":
+      return next();
+
+    case "error":
+    case "unauthorized":
+      if (context.url.pathname.startsWith("/api/")) {
+        return new Response(JSON.stringify({ message: validationResult.msg }), {
+          status: 401,
+        });
+      }
+      // otherwise, redirect to the root page for the user to login
+      else {
+        return Response.redirect(new URL("/login", context.url));
+      }
+
+    default:
+      return Response.redirect(new URL("/login", context.url));
+  }
 });
-*/
