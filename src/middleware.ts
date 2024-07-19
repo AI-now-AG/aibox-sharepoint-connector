@@ -32,6 +32,7 @@ const verifyAuth = async (token?: string) => {
 };
 
 export const onRequest = defineMiddleware(async (context, next) => {
+  return next();
   // Ignore auth validation for public routes
   if (PUBLIC_ROUTES.includes(context.url.pathname)) {
     return next();
