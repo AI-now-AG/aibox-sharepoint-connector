@@ -8,7 +8,7 @@ const { title, description } = Astro.props;
   <title>{title}</title>
   <meta name="descrption" content={description} />
 
-  <script>
+  <script is:inline>
     /* We set the theme in a render blocking script tag early to avoid flashing */
     const theme = localStorage.getItem("theme");
     if (theme) {
