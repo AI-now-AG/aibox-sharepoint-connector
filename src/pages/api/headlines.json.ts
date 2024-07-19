@@ -1,6 +1,7 @@
 import { ChatOpenAI } from "@langchain/openai";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { StringOutputParser } from "@langchain/core/output_parsers";
+import somediaInstructions from "$data/somedia_instructions";
 import type { APIRoute } from "astro";
 
 export const model = new ChatOpenAI({
@@ -20,16 +21,16 @@ Respond with a HTML ol following exactly this format:
 </ol>
 `;
 
-import { TextLoader } from "langchain/document_loaders/fs/text";
-const loader = new TextLoader("src/data/somedia_instruction.txt");
-const docs = await loader.load();
+// import { TextLoader } from "langchain/document_loaders/fs/text";
+// const loader = new TextLoader("src/data/somedia_instruction.txt");
+// const docs = await loader.load();
 
 export const POST: APIRoute = async (ctx) => {
   if (ctx.url.searchParams.has("prompt")) {
     return new Response(
       JSON.stringify({
-        instructions: docs[0].pageContent,
-        prompt: promptText
+        instructions: somediaInstructions,
+        prompt: promptText,
       }),
     );
   }
@@ -61,7 +62,7 @@ export const POST: APIRoute = async (ctx) => {
 
   const messages = [
     new SystemMessage(promptText),
-    new SystemMessage(docs[0].pageContent),
+    new SystemMessage(somediaInstructions),
     new HumanMessage(params.article),
   ];
   const parser = new StringOutputParser();
@@ -74,3 +75,4 @@ export const POST: APIRoute = async (ctx) => {
     }),
   );
 };
+

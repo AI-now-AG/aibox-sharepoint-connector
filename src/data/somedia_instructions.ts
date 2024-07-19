@@ -1,4 +1,4 @@
-Headlines are becoming increasingly important in the internet age. Not only do they capture the reader's attention, they serve as source material for search engines. Today a reader is just as likely to come across an article by reading a list of search engine results as by scanning a newspaper page.
+export default `Headlines are becoming increasingly important in the internet age. Not only do they capture the reader's attention, they serve as source material for search engines. Today a reader is just as likely to come across an article by reading a list of search engine results as by scanning a newspaper page.
 
 General instruction:
 
@@ -102,4 +102,4 @@ Transportation:
 	Identify transportation topics using terms like "road," "rail," "public transportation," "traffic planning," and "infrastructure."
 	Formulate current and concise headlines.
 	Example: "Planned Expansion Work on the Gotthard Tunnel Announced."
-
+`;
