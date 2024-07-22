@@ -9,9 +9,12 @@ import { promisify } from "util";
 
 const scrypt = promisify(crypto.scrypt);
 
+const SALT_LEN = 32;
+const HASH_LEN = 64;
+
 const hash = async (password) => {
-  const salt = crypto.randomBytes(32).toString("hex");
-  const derivedKey = await scrypt(password, salt, 64);
+  const salt = crypto.randomBytes(SALT_LEN).toString("hex");
+  const derivedKey = await scrypt(password, salt, HASH_LEN);
   return `${salt}.${derivedKey.toString("hex")}`;
 };
 
