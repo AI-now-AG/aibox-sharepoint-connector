@@ -3,6 +3,18 @@ import { SignJWT } from "jose";
 import type { APIRoute } from "astro";
 import { TOKEN } from "$constants";
 import { getUser } from "$data/models/user.model";
+import crypto from "node:crypto";
+
+const verify = (password: string, hash: string) =>
+  new Promise((resolve, reject) => {
+    const [salt, key] = hash.split(".");
+    const keyBuffer = Buffer.from(key, "hex");
+
+    crypto.scrypt(password, salt, 64, (err, derivedKey) => {
+      if (err) return reject(err);
+      resolve(crypto.timingSafeEqual(keyBuffer, derivedKey));
+    });
+  });
 
 const secret = new TextEncoder().encode(import.meta.env.JWT_SECRET_KEY);
 export const POST: APIRoute = async (ctx) => {
@@ -14,11 +26,14 @@ export const POST: APIRoute = async (ctx) => {
       !/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)
     ) {
       return new Response(JSON.stringify({ message: "Invalid username" }), {
-        status: 400
+        status: 400,
       });
     }
+    const password = (formData.get("password") as string) || "";
+
     const user = await getUser(email);
-    if (user) {
+
+    if (user && (await verify(password, user.password))) {
       const token = await new SignJWT({})
         .setProtectedHeader({ alg: "HS256" })
         .setJti(nanoid())
@@ -57,7 +72,7 @@ export const POST: APIRoute = async (ctx) => {
     return new Response(
       JSON.stringify({
         message: "Login failed....",
-        error: error
+        error: error,
       }),
       {
         status: 500,
