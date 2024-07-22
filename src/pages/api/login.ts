@@ -29,7 +29,7 @@ export const POST: APIRoute = async (ctx) => {
         status: 400,
       });
     }
-    const password = formData.get("password") as string;
+    const password = (formData.get("password") as string) || "";
 
     const user = await getUser(email);
 
