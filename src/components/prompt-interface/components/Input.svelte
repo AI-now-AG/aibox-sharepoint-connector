@@ -5,9 +5,7 @@
   let inputText = "";
   let output = "";
 
-  async function fetchHeadline(e) {
-    e.preventDefault();
-
+  async function fetchHeadline() {
     input = "";
 
     if (inputText) {
@@ -155,7 +153,7 @@
         height="1em"
         viewBox="0 0 24 24"
         class="w-8 h-8 text-primary"
-        on:click={fetchHeadline}
+        on:click|preventDefault={fetchHeadline}
       >
         <path fill="currentColor" d="M3 20v-6l8-2l-8-2V4l19 8z"></path>
       </svg>

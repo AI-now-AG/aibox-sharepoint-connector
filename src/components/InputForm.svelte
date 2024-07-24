@@ -4,8 +4,7 @@
   let userInputText;
   const dispatch = createEventDispatcher();
 
-  function submitAction(e) {
-    e.preventDefault();
+  function submitAction() {
     dispatch("message", {
       text: userInputText,
     });
@@ -15,7 +14,7 @@
 <div class="w-full shadow-md border border-base-300 rounded bg-base-100">
   <form
     class="p-4 flex space-x-4 items-center justify-between"
-    on:submit={submitAction}
+    on:submit|preventDefault={submitAction}
   >
     <div class="flex-1 space-y-2">
       <div class="flex space-y-2">
