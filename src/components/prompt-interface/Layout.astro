@@ -5,11 +5,13 @@
 <div
   class="grid grid-cols-1 xl:grid-cols-[1fr_min-content_minmax(min-content,_320px)] bg-base-200 h-full"
 >
-  <div class="p-6 xl:pr-0">
+  <div class="p-6">
     <slot name="content" />
   </div>
-  <div class="divider divider-horizontal hidden xl:block"></div>
-  <div class="p-6 pl-0 hidden xl:block">
+
+  <div class="border-r border-base-content/20"></div>
+
+  <div class="p-6 hidden xl:block">
     <slot name="prompt" />
   </div>
 </div>
