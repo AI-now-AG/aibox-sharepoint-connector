@@ -1,0 +1,28 @@
+---
+import { match } from "ts-pattern";
+import type { HTMLAttributes } from "astro/types";
+
+import AppsIcon from "./Apps.astro";
+import WritingIcon from "./Writing.astro";
+import SettingsIcon from "./Settings.astro";
+
+export enum Name {
+  Apps,
+  Writing,
+  Settings,
+}
+
+interface Props extends HTMLAttributes<"svg"> {
+  icon: Name;
+}
+
+const { icon, ...attrs } = Astro.props;
+---
+
+{
+  match(icon)
+    .with(Name.Apps, () => <AppsIcon {...attrs} />)
+    .with(Name.Writing, () => <WritingIcon {...attrs} />)
+    .with(Name.Settings, () => <SettingsIcon {...attrs} />)
+    .run()
+}

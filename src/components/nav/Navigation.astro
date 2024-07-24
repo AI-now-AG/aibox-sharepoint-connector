@@ -1,12 +1,12 @@
 ---
 import MenuItem from "./MenuItem.astro";
 
-import AppsIcon from "./icons/Apps.astro";
-import WritingIcon from "./icons/Writing.astro";
+import Icon, { Name } from "./icons/Icon.astro";
 
 const modules = [
   {
     title: "Text writing",
+    icon: Name.Writing,
     items: [
       {
         title: "Headline",
@@ -32,6 +32,7 @@ const modules = [
   },
   {
     title: "Settings",
+    icon: Name.Settings,
     items: [
       {
         title: "Prompts",
@@ -49,7 +50,7 @@ const modules = [
 <nav class="flex flex-col bg-base-100 w-80 h-full">
   <div>
     <div class="text-lg pl-4 pt-5 flex flex-row items-center">
-      <AppsIcon class="w-8 h-8 mr-1" />
+      <Icon icon={Name.Apps} class="w-8 h-8 mr-1" />
       Apps
     </div>
     <ul class="menu w-full pr-6">
@@ -61,7 +62,7 @@ const modules = [
             </li>
             <li>
               <MenuItem {...mod}>
-                <WritingIcon slot="icon" />
+                <Icon icon={mod.icon} slot="icon" />
               </MenuItem>
 
               {"items" in mod && (
