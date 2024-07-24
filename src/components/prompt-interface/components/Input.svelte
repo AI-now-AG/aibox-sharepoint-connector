@@ -112,7 +112,7 @@
 </div>
 
 <div
-  class="rounded-lg bg-base-100 border border-base-content/20 focus:ring-base-200 has-[:focus]:ring-2 has-[:focus]:ring-base-primary has-[:focus]:ring-offset-4 has-[:focus]:ring-offset-base-200"
+  class="rounded-lg bg-base-100 border border-base-content/20 focus:ring-base-200 has-[:focus]:ring-2 has-[:focus]:ring-base-primary has-[:focus]:ring-offset-2 has-[:focus]:ring-offset-base-200"
 >
   <textarea
     name="input"
