@@ -1,9 +1,15 @@
-<script>
+<script lang="ts">
   import { fade } from "svelte/transition";
 
   let input = "";
   let inputText = "";
   let output = "";
+
+  function onKeyDown(e: KeyboardEvent) {
+    if (e.key === "Enter" && e.ctrlKey) {
+      fetchHeadline();
+    }
+  }
 
   async function fetchHeadline() {
     input = "";
@@ -39,7 +45,7 @@
 
 <div class="flex-1">
   <div class="flex flex-wrap">
-    <div class="grow md:w-1/2 p-2">
+    <div class="grow md:w-1/2 p-2 pb-4">
       {#if input}
         <div transition:fade>
           <div class="chat chat-start mt-2" transition:fade>
@@ -114,6 +120,7 @@
     class="textarea textarea-ghost h-32 w-full focus:outline-none focus:border-base-100 text-base"
     placeholder="Your input..."
     bind:value={inputText}
+    on:keydown={onKeyDown}
   ></textarea>
   <div class="grid grid-cols-[1fr_min-content] gap-4">
     <div class="p-4 flex flex-row gap-2">
