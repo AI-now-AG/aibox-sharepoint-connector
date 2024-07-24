@@ -1,0 +1,28 @@
+---
+import InputArea from "./Input.svelte";
+---
+
+<div class="grid grid-cols-1 grid-rows-[1fr_min-content] h-full">
+  <div class="flex flex-col gap-6">
+    <h1 class="text-4xl font-bold">Hello User, let's write some headlines</h1>
+    <p class="">
+      Get started with predefined prompt below or provide me your own.
+    </p>
+    <div class="grid grid-cols-3 gap-4">
+      <button
+        class="btn btn-primary btn-active w-48 h-auto py-4 px-2 leading-6"
+      >
+        <!-- Active variant -->
+        Summarize the main points of a pdf
+      </button>
+      <button class="btn bg-base-100 w-48 h-auto py-4 px-4 leading-6"
+        >List the key points from a text</button
+      >
+      <button class="btn bg-base-100 w-48 h-auto py-4 px-4 leading-6"
+        >Summarize the text with an academic focus</button
+      >
+    </div>
+  </div>
+
+  <InputArea client:load />
+</div>

@@ -1,55 +1,81 @@
 ---
 import MenuItem from "./MenuItem.astro";
 
-import AppsIcon from "./icons/Apps.astro";
-import WritingIcon from "./icons/Writing.astro";
+import Icon, { Name } from "./icons/Icon.astro";
 
 const modules = [
   {
     title: "Text writing",
+    icon: Name.Writing,
     items: [
       {
         title: "Headline",
         path: "/headlines",
       },
       {
+        title: "Headline UI Demo",
+        path: "/headlines/demo",
+      },
+      {
         title: "Summarize",
         path: "/summarize",
       },
       {
-        title: "Rewrite",
-        path: "/rewrite",
+        title: "Shorten test",
+        path: "/shorten-text",
+      },
+      {
+        title: "Police Report",
+        path: "/police-report",
+      },
+    ],
+  },
+  {
+    title: "Settings",
+    icon: Name.Settings,
+    items: [
+      {
+        title: "Prompts",
+        path: "/prompts",
+      },
+      {
+        title: "Knowledge Base",
+        path: "/knowledge-base",
       },
     ],
   },
 ];
 ---
 
-
-<nav class="min-h-full flex flex-col bg-base-200">
+<nav class="flex flex-col bg-base-100 w-80 h-full">
   <div>
-    <div class="text-lg pl-4 py-4 flex flex-row items-center">
-      <AppsIcon class="w-8 h-8 mr-1" />
+    <div class="text-lg pl-4 pt-5 flex flex-row items-center">
+      <Icon icon={Name.Apps} class="w-8 h-8 mr-1" />
       Apps
     </div>
-    <ul class="menu w-64">
+    <ul class="menu w-full pr-6">
       {
         modules.map((mod) => (
-          <li>
-            <MenuItem {...mod}>
-              <WritingIcon slot="icon" />
-            </MenuItem>
+          <>
+            <li>
+              <div class="border-t-base-content border-t rounded-none mt-4 ml-4 h-0 opacity-20" />
+            </li>
+            <li>
+              <MenuItem {...mod}>
+                <Icon icon={mod.icon} slot="icon" />
+              </MenuItem>
 
-            {"items" in mod && (
-              <ul>
-                {mod.items.map((sub) => (
-                  <li>
-                    <MenuItem {...sub} />
-                  </li>
-                ))}
-              </ul>
-            )}
-          </li>
+              {"items" in mod && (
+                <ul>
+                  {mod.items.map((sub) => (
+                    <li>
+                      <MenuItem {...sub} />
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          </>
         ))
       }
     </ul>
