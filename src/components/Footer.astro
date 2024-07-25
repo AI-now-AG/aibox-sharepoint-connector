@@ -1,10 +1,16 @@
+---
+import { useTranslations } from "$i18n/utils";
+
+const t = useTranslations(Astro.preferredLocale);
+---
+
 <footer class="footer footer-center bg-base-200 text-base-content rounded p-10">
   <nav class="grid grid-flow-col gap-4">
-    <a class="link link-hover h-22">How it works</a>
+    <a class="link link-hover h-22">{t("footer.how-it-works")}</a>
     <div class="divider lg:divider-horizontal"></div>
-    <a class="link link-hover">Privacy Policy</a>
+    <a class="link link-hover">{t("footer.privacy-policy")}</a>
     <div class="divider lg:divider-horizontal"></div>
-    <a class="link link-hover">Terms of Service</a>
+    <a class="link link-hover">{t("footer.terms-of-service")}</a>
   </nav>
   <nav>
     <div class="grid grid-flow-col gap-4">
@@ -51,7 +57,7 @@
   </nav>
   <aside>
     <p>
-      Copyright © {new Date().getFullYear()} - All right reserved by AI BOX
+      Copyright © {new Date().getFullYear()} - All right reserved by AI now AG
     </p>
   </aside>
 </footer>
