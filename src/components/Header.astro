@@ -2,22 +2,25 @@
 // import local images
 import avatar from "$images/Avatar.svg";
 import ThemeSwitcher from "$components/ThemeSwitcher.svelte";
+import { useTranslations } from "$i18n/utils";
+
+const t = useTranslations(Astro.preferredLocale);
 
 const navItems = [
   {
-    name: "Introduction",
+    name: t("header.introduction"),
     path: "/",
   },
   {
-    name: "Login",
+    name: t("header.login"),
     path: "/login",
   },
   {
-    name: "About",
+    name: t("header.about"),
     path: "/about",
   },
   {
-    name: "Theme",
+    name: t("header.theme"),
     list: [
       {
         name: "Light",

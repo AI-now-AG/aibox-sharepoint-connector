@@ -1,6 +1,6 @@
 import { errors, jwtVerify } from "jose";
 import { defineMiddleware } from "astro/middleware";
-import { TOKEN, PUBLIC_ROUTES, } from "$constants";
+import { TOKEN, PUBLIC_ROUTES } from "$constants";
 
 const secret = new TextEncoder().encode(import.meta.env.JWT_SECRET_KEY);
 
@@ -31,6 +31,12 @@ const verifyAuth = async (token?: string) => {
 };
 
 export const onRequest = defineMiddleware(async (context, next) => {
+  console.log(
+    "context.preferredLocale",
+    context.preferredLocaleList,
+    context.preferredLocale,
+  );
+
   // Ignore auth validation for public routes
   if (PUBLIC_ROUTES.includes(context.url.pathname)) {
     return next();

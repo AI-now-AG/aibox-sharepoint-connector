@@ -1,11 +1,4 @@
 ---
-interface Props {
-  title?: string;
-  description?: string;
-  isFooterVisible?: boolean;
-}
-
-// Components
 import Header from "$components/Header.astro";
 import Footer from "$components/Footer.astro";
 import Head from "./Head.astro";
@@ -13,9 +6,19 @@ import Navigation from "$components/nav/Navigation.astro";
 
 import "$styles/global.css";
 
+import { useTranslations } from "$i18n/utils";
+
+interface Props {
+  title?: string;
+  description?: string;
+  isFooterVisible?: boolean;
+}
+
+const t = useTranslations(Astro.preferredLocale);
+
 const {
-  title = "Welcome to AI Box",
-  description = "Welcome to AI Box",
+  title = t("site.title"),
+  description = t("site.description"),
   isFooterVisible = false,
 } = Astro.props;
 ---

@@ -1,11 +1,14 @@
 ---
+import { useTranslations } from "$i18n/utils";
 import MenuItem from "./MenuItem.astro";
 
 import Icon, { Name } from "./icons/Icon.astro";
 
+const t = useTranslations(Astro.preferredLocale);
+
 const modules = [
   {
-    title: "Text writing",
+    title: t("nav.text-writing"),
     icon: Name.Writing,
     items: [
       {
@@ -31,15 +34,15 @@ const modules = [
     ],
   },
   {
-    title: "Settings",
+    title: t("nav.settings"),
     icon: Name.Settings,
     items: [
       {
-        title: "Prompts",
+        title: t("nav.settings.prompts"),
         path: "/prompts",
       },
       {
-        title: "Knowledge Base",
+        title: t("nav.settings.knowledge-base"),
         path: "/knowledge-base",
       },
     ],
@@ -51,7 +54,7 @@ const modules = [
   <div>
     <div class="text-sm pl-6 pt-5 flex flex-row items-center gap-2">
       <Icon icon={Name.Apps} class="w-4 h-4" />
-      <span>All AI Widgets</span>
+      <span>{t("nav.all-widgets")}</span>
     </div>
     <ul class="menu w-full pr-6">
       {
