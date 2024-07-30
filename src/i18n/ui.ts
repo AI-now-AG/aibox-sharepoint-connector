@@ -56,6 +56,7 @@ export const ui = {
     "nav.all-widgets": "Alle KI-Widgets",
     "nav.text-writing": "Redaktion",
     "nav.settings": "Einstellungen",
+    "nav.settings.categories": "Kategorien",
 
     "login.welcome": "Willkommen bei der",
     "login.title": "In Ihr Konto einloggen",
