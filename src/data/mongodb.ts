@@ -1,4 +1,4 @@
-import { MongoClient } from "mongodb";
+import { MongoClient, ObjectId } from "mongodb";
 
 if (!import.meta.env.MONGODB_URI) {
   throw new Error('Invalid environment variable: "MONGODB_URI"');
@@ -12,3 +12,13 @@ const db = () => mongo.db(import.meta.env.MONGODB_DATABASE);
 export const Users = () => {
   return db().collection("users");
 };
+
+export const Prompts = () => {
+  return db().collection("prompts");
+};
+
+export const Categories = () => {
+  return db().collection("categories");
+};
+
+export { ObjectId };

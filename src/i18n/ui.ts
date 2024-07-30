@@ -25,6 +25,7 @@ export const ui = {
     "nav.settings": "Settings",
     "nav.settings.prompts": "Prompts",
     "nav.settings.knowledge-base": "Knowledge Base",
+    "nav.settings.categories": "Categories",
 
     "login.welcome": "Welcome to",
     "login.title": "Sign in to your account",
