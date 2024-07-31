@@ -5,7 +5,7 @@ export const GET: APIRoute = async () => {
   try {
     const result = await CategoryModel.list();
 
-    return new Response(JSON.stringify(result.toArray()));
+    return new Response(JSON.stringify(await result.toArray()));
   } catch (error) {
     console.error(error);
 

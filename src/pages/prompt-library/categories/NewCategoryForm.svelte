@@ -8,7 +8,7 @@
     if (!categoryTitle) {
       alert("Please enter category title");
     } else if (textGroups.length > 0) {
-      const response = await fetch("/api/addCategory.json", {
+      const response = await fetch("/api/categories.json", {
         method: "POST",
         body: JSON.stringify({
           title: categoryTitle,
@@ -77,7 +77,7 @@
                 stroke-linejoin="round"
               ></path>
             </svg>
-            <a href="/addCategory">Add a group</a>
+            Add a group
           </button>
         </div>
         <div

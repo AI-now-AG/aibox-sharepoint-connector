@@ -1,9 +1,7 @@
-import { ObjectId } from "mongodb";
-import { db } from "../mongodb";
+import { db, type Document } from "../mongodb";
 import { z } from "zod";
 
 const CategorySchema = z.object({
-  _id: z.instanceof(ObjectId),
   title: z.string(),
   created_at: z.date(),
   updated_at: z.date(),
@@ -19,5 +17,5 @@ export default {
     return collection.insertOne(validated);
   },
 
-  list: async () => collection.find<Category>({}),
+  list: async () => collection.find<Document<Category>>({}),
 };

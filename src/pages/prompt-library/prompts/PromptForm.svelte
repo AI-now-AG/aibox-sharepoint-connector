@@ -1,37 +1,41 @@
-<script>
-  import MultiInput from "./MultiInput.svelte";
+<script lang="ts">
   import SingleInput from "./SingleInput.svelte";
+  import type { CreatePromptParams } from "$pages/api/prompts.json";
 
   import { onMount } from "svelte";
 
-  let categoryList;
+  let categoryList: {
+    title: string;
+    _id: string;
+    groups: { title: string; _id: string }[];
+  }[];
   let categories = ["Test Writing", "SEO", "Marketing"];
-  let activatedCategory = "",
-    selectedCategoryId;
+  let activatedCategory = "";
+  let selectedCategoryId: string;
 
   let groups = ["Headlines", "Summarize", "Shorten text", "Police Report"];
-  let activatedGroup = "",
-    selectedGroupId;
+  let activatedGroup = "";
+  let selectedGroupId: string;
 
-  function handleUpdateCategory(newValue) {
+  function handleUpdateCategory(title: string) {
     activatedGroup = "";
     selectedGroupId = "";
-    const idx = categoryList.findIndex((n) => n.title === newValue);
+    const idx = categoryList.findIndex((n) => n.title === title);
     if (idx !== -1) {
-      groups = categoryList[idx].group.map((n) => n.title);
+      groups = categoryList[idx].groups.map((n) => n.title);
       selectedCategoryId = categoryList[idx]._id;
     }
   }
 
-  function handleUpdateGroup(newValue) {
+  function handleUpdateGroup(title: string) {
     const idx = categoryList.findIndex((n) => n.title === activatedCategory);
     if (idx !== -1) {
-      const groupIdx = categoryList[idx].group.findIndex(
-        (n) => n.title === newValue,
+      const groupIdx = categoryList[idx].groups.findIndex(
+        (n) => n.title === title,
       );
       if (groupIdx !== -1) {
-        selectedGroupId = categoryList[idx].group[groupIdx]._id;
-        console.log(selectedGroupId)
+        selectedGroupId = categoryList[idx].groups[groupIdx]._id;
+        console.log(selectedGroupId);
       }
     }
   }
@@ -41,9 +45,9 @@
   function handleUpdateKB(newValue) {}
 
   onMount(async function () {
-    // TODO: That was a workaround for the demo. This components needs a context
-    const response = await fetch("/api/getCategories.json", { method: "GET" });
+    const response = await fetch("/api/categories.json", { method: "GET" });
     const data = await response.json();
+    console.log("Categories", data);
     if (data.categories) {
       categoryList = data.categories;
       categories = categoryList.map((n) => n.title);
@@ -52,32 +56,29 @@
 
   let promptTitle = "",
     promptText = "";
-  let inputTypes = ["Text", "Image", "File"];
-  let selectedInputTypes = [];
 
-  let outputTypes = ["Text"];
-  let selectedOutputTypes = [];
-
-  let instructions = ["Instrunctions 1", "Instrunctions 2", "Instrunctions 3"];
+  let instructions = ["Instructions 1", "Instructions 2", "Instructions 3"];
   let selectedInstruction = "";
 
   let kbs = ["KB 1", "KB 2", "KB 3"];
   let selectedKb = "";
 
   async function savePrompt() {
-    alert(promptText);
-    const response = await fetch("/api/addPrompt.json", {
+    const newPrompt: CreatePromptParams = {
+      tenant_id: "66aa2169d40d0b194e280142", // AI now AG
+      creator_id: "669e044a6e55bbb8fe31a868", // admin@aibox.ch
+      title: promptTitle,
+      category: selectedCategoryId,
+      prompt: promptText,
+      instructions: selectedInstruction,
+      documents: [selectedKb],
+    };
+
+    console.log("creating new prompt", newPrompt);
+
+    const response = await fetch("/api/prompts.json", {
       method: "POST",
-      body: JSON.stringify({
-        title: promptTitle,
-        category: selectedCategoryId,
-        group: selectedGroupId,
-        prompt: promptText,
-        inputTypes: selectedInputTypes,
-        outputTypes: selectedOutputTypes,
-        instruction: selectedInstruction,
-        kb: selectedKb,
-      }),
+      body: JSON.stringify(newPrompt),
       headers: {
         "Content-Type": "application/json",
       },
@@ -97,7 +98,7 @@
           <input
             type="text"
             bind:value={promptTitle}
-            placeholder="e.g. Create a three sports headlines"
+            placeholder="e.g. Create three sports headlines"
             class="input input-bordered w-full min-w-xs"
           />
         </div>
@@ -126,28 +127,9 @@
       <div class="mb-4">
         <p class="mb-2">Prompt Text</p>
         <textarea
-          type="text"
           bind:value={promptText}
-          placeholder="e.g. Create [insert number of variants] headlines..."
-          class="input input-bordered w-full min-w-xs shadow appearance-none min-h-32 w-full py-2 px-3"
-        />
-      </div>
-
-      <div
-        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 justify-center"
-      >
-        <MultiInput
-          title="Select Input Type"
-          placeholder="e.g. Headline instructions"
-          items={inputTypes}
-          bind:selectedItems={selectedInputTypes}
-        />
-
-        <MultiInput
-          title="Select Output Type"
-          placeholder="e.g. Headline instructions"
-          items={outputTypes}
-          bind:selectedItems={selectedOutputTypes}
+          placeholder="e.g. Create three headlines..."
+          class="input input-bordered min-w-xs shadow appearance-none min-h-32 w-full py-2 px-3"
         />
       </div>
 

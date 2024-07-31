@@ -1,9 +1,8 @@
 import { ObjectId } from "mongodb";
-import { db } from "../mongodb";
+import { db, type Document } from "../mongodb";
 import { z } from "zod";
 
 const TenantSchema = z.object({
-  _id: z.instanceof(ObjectId),
   name: z.string(),
   created_at: z.date(),
   updated_at: z.date(),
@@ -19,10 +18,10 @@ export default {
     return collection.insertOne(validated);
   },
 
-  list: async () => collection.find<Tenant>({}),
+  list: async () => collection.find<Document<Tenant>>({}),
 
   get: async (id: string) => {
     const _id = new ObjectId(id);
-    return collection.findOne<Tenant>({ _id });
+    return collection.findOne<Document<Tenant>>({ _id });
   },
 };

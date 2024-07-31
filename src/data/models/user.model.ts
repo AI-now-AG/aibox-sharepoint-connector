@@ -1,9 +1,8 @@
 import { ObjectId } from "mongodb";
-import { db } from "../mongodb";
+import { db, type Document } from "../mongodb";
 import { z } from "zod";
 
 const UserSchema = z.object({
-  _id: z.instanceof(ObjectId),
   tenant_id: z.instanceof(ObjectId),
   username: z.string().min(2),
   password: z.string().min(8),
@@ -22,7 +21,7 @@ export default {
     return collection.insertOne(validated);
   },
 
-  list: async () => collection.find<User>({}),
+  list: async () => collection.find<Document<User>>({}),
 
-  get: async (email: string) => collection.findOne<User>({ email }),
+  get: async (email: string) => collection.findOne<Document<User>>({ email }),
 };
