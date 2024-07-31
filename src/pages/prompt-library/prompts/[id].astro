@@ -1,0 +1,23 @@
+---
+import Layout from "$layouts/Layout.astro";
+import { useTranslations } from "$i18n/utils";
+import Prompts from "$data/models/prompt.model";
+
+export interface Props {
+  id: string;
+}
+
+const t = useTranslations(Astro.preferredLocale);
+
+const { id } = Astro.params;
+
+const prompt = id ? await Prompts.get(id) : undefined; // TODO: Render 404 if not found
+---
+
+<Layout>
+  <div
+    class="container max-w-5xl mx-auto p-6 grid grid-cols-1 md:grid-cols-[1fr_max-content] gap-8"
+  >
+    {prompt && <h1 class="pt-2 lg:pt-8 text-4xl font-bold">{prompt.title}</h1>}
+  </div>
+</Layout>

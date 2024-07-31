@@ -9,6 +9,7 @@ const PromptSchema = z.object({
   title: z.string(),
   description: z.string(),
   category: z.string(),
+  group: z.string(),
   instructions: z.string(),
   prompt: z.string(),
   documents: z.array(z.instanceof(ObjectId)),
@@ -26,7 +27,10 @@ export default {
     return collection.insertOne(validated);
   },
 
-  get: async () => collection.findOne<Document<Prompt>>({}),
+  get: async (id: string) => {
+    const _id = new ObjectId(id);
+    return collection.findOne<Document<Prompt>>({ _id });
+  },
 
   list: async () => collection.find<Document<Prompt>>({}),
 };

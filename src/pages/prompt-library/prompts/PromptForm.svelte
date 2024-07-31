@@ -69,6 +69,7 @@
       creator_id: "669e044a6e55bbb8fe31a868", // admin@aibox.ch
       title: promptTitle,
       category: selectedCategoryId,
+      group: selectedGroupId,
       prompt: promptText,
       instructions: selectedInstruction,
       documents: [selectedKb],

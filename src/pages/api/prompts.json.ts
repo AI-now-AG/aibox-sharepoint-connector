@@ -8,6 +8,7 @@ const CreatePromptParamsSchema = z.object({
   parent_id: z.string().optional(),
   title: z.string(),
   category: z.string(),
+  group: z.string(),
   instructions: z.string(),
   prompt: z.string(),
   documents: z.array(z.string()),
