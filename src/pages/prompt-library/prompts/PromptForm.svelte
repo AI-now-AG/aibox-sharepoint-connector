@@ -109,7 +109,7 @@
         class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 justify-center"
       >
         <SingleInput
-          title="Select Category"
+          title="Category"
           placeholder="e.g. Editing"
           items={categories}
           bind:selectedItem={activatedCategory}
@@ -117,7 +117,7 @@
         />
 
         <SingleInput
-          title="Select Group"
+          title="Group"
           placeholder="e.g. Headlines"
           items={groups}
           bind:selectedItem={activatedGroup}
@@ -126,7 +126,7 @@
       </div>
 
       <div class="mb-4">
-        <p class="mb-2">Prompt Text</p>
+        <p class="mb-2">Prompt</p>
         <textarea
           bind:value={promptText}
           placeholder="e.g. Create three headlines..."
@@ -138,7 +138,7 @@
         class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 justify-center"
       >
         <SingleInput
-          title="Select Instruction"
+          title="Instruction"
           placeholder="e.g. Instruction 1"
           items={instructions}
           bind:selectedItem={selectedInstruction}
@@ -146,7 +146,7 @@
         />
 
         <SingleInput
-          title="Select KB"
+          title="Documents"
           placeholder="e.g. KB 1"
           items={kbs}
           bind:selectedItem={selectedKb}

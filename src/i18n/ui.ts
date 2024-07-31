@@ -50,7 +50,7 @@ const de = {
   "site.description":
     "KI-gestützte Lösung zur Optimierung von Aufgaben und Steigerung der Produktivität. Anpassbar für kleine bis mittlere Unternehmen. Verbessern Sie Effizienz und fördern Sie Innovation in Ihrem Arbeitsablauf.",
 
-  "header.introduction": "Einführung",
+  "header.introduction": "Hilfe",
   "header.about": "Über",
   "header.theme": "Farben",
   "header.login": "Anmelden",

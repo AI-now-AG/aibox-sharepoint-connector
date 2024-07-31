@@ -24,7 +24,7 @@
       value={selectedItem}
       tabindex="30"
       role="button"
-      class="input font-medium w-full min-w-xs"
+      class="input input-bordered font-medium w-full min-w-xs"
       readonly
     />
     <ul
