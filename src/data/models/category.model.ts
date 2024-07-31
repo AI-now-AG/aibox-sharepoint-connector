@@ -1,7 +1,10 @@
-import { Categories, ObjectId } from "../mongodb";
+import { db } from "../mongodb";
 
-export const addCategory = async (cateogryObj: any) => Categories().insertOne(cateogryObj);
+export const Categories = () => {
+  return db().collection("categories");
+};
 
-export const categories = async () => Categories().find({}).toArray();
+export const addCategory = async (category: any) =>
+  Categories().insertOne(category);
 
-export { ObjectId };
+export const categories = async () => Categories().find({});

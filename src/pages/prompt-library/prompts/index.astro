@@ -1,0 +1,39 @@
+---
+import Layout from "$layouts/Layout.astro";
+import { useTranslations } from "$i18n/utils";
+
+const t = useTranslations(Astro.preferredLocale);
+---
+
+<Layout>
+  <div class="container mx-auto p-4">
+    <div class="w-full min-w-xs">
+      <div class="flex justify-center">
+        <h1 class="text-4xl grow font-medium pb-6">
+          {t("prompt-library.prompts.title")}
+        </h1>
+
+        <a
+          href="prompts/new"
+          class="btn btn-active btn-neutral font-normal grow-0"
+        >
+          <svg
+            width="13"
+            height="12"
+            viewBox="0 0 13 12"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M6.5 1V6M6.5 6V11M6.5 6H11.5M6.5 6L1.5 6"
+              stroke="white"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"></path>
+          </svg>
+          {t("prompt-library.prompts.add")}
+        </a>
+      </div>
+    </div>
+  </div>
+</Layout>

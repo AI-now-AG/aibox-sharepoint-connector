@@ -1,3 +1,8 @@
-import { Prompts, ObjectId } from "../mongodb";
+import { db } from "../mongodb";
 
-export const addPrompt = async (promptObj: any) => Prompts().insertOne(promptObj);
+export const Prompts = () => {
+  return db().collection("prompts");
+};
+
+export const addPrompt = async (promptObj: any) =>
+  Prompts().insertOne(promptObj);

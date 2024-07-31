@@ -14,6 +14,10 @@
 //   return usersCollection.findOne({ username, password });
 // }
 
-import { Users } from "../mongodb";
+import { db } from "../mongodb";
+
+export const Users = () => {
+  return db().collection("users");
+};
 
 export const getUser = async (email: string) => Users().findOne({ email });

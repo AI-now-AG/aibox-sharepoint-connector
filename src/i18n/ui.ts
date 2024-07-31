@@ -24,6 +24,7 @@ const en = {
   "nav.settings": "Settings",
   "nav.settings.prompts": "Prompts",
   "nav.settings.knowledge-base": "Knowledge Base",
+  "nav.settings.categories": "Categories",
 
   "login.welcome": "Welcome to",
   "login.title": "Sign in to your account",
@@ -31,18 +32,17 @@ const en = {
   "login.password": "Password",
   "login.submit": "Sign in",
 
-  "nav.all-widgets": "All AI Widgets",
-  "nav.text-writing": "Text Writing",
-  "nav.settings": "Settings",
-  "nav.settings.prompts": "Prompts",
-  "nav.settings.knowledge-base": "Knowledge Base",
-  "nav.settings.categories": "Categories",
-
   "welcome.title": "AI for easy and efficient business operations",
   "welcome.text":
     "aibox is designed to streamline internal tasks and enhance productivity in workflows. Perfect for small to mid-sized companies, our solution is customizable to meet your needs, driving efficiency and fostering innovation.",
   "welcome.get-started": "Get started",
   "welcome.explore": "Explore more widgets",
+
+  "prompt-library.prompts.title": "Prompts",
+  "prompt-library.prompts.add": "Add Prompt",
+
+  "prompt-library.categories.title": "Categories",
+  "prompt-library.categories.add": "Add Category",
 };
 
 const de = {
@@ -62,10 +62,6 @@ const de = {
   "nav.all-widgets": "Alle KI-Widgets",
   "nav.text-writing": "Redaktion",
   "nav.settings": "Einstellungen",
-
-  "nav.all-widgets": "Alle KI-Widgets",
-  "nav.text-writing": "Redaktion",
-  "nav.settings": "Einstellungen",
   "nav.settings.categories": "Kategorien",
 
   "login.welcome": "Willkommen bei der",
@@ -79,6 +75,11 @@ const de = {
     "aibox wurde entwickelt, um interne Aufgaben zu optimieren und die Produktivität in Arbeitsabläufen zu steigern. Unsere Lösung ist perfekt für kleine bis mittelgroße Unternehmen und lässt sich an Ihre Bedürfnisse anpassen, um Effizienz voranzutreiben und Innovation zu fördern.",
   "welcome.get-started": "Los geht's",
   "welcome.explore": "Mehr Widgets entdecken",
+
+  "prompt-library.prompts.add": "Neuer Prompt",
+
+  "prompt-library.categories.title": "Kategorien",
+  "prompt-library.categories.add": "Neue Kategorie",
 };
 
 export const ui = {
