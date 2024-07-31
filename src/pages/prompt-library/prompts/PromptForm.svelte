@@ -15,21 +15,16 @@
   let selectedCategory: Category;
   let selectedGroup: Group;
 
-  function handleUpdateCategory(category: Category) {
-    selectedCategory = category;
-  }
+  let promptTitle = "";
+  let promptText = "";
 
   onMount(async function () {
     const response = await fetch("/api/categories.json", { method: "GET" });
     const data = await response.json();
-    console.log("Category data", data);
     if (data) {
       categories = data;
     }
   });
-
-  let promptTitle = "",
-    promptText = "";
 
   async function savePrompt() {
     const newPrompt: CreatePromptParams = {
@@ -37,7 +32,7 @@
       creator_id: "669e044a6e55bbb8fe31a868", // admin@aibox.ch
       title: promptTitle,
       category: selectedCategory._id,
-      group: selectedGroupId,
+      group: selectedGroup._id,
       prompt: promptText,
       instructions: "",
       documents: [""],
