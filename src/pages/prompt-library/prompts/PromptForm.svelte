@@ -28,8 +28,8 @@
 
   async function savePrompt() {
     const newPrompt: CreatePromptParams = {
-      tenant_id: "66aa2169d40d0b194e280142", // AI now AG
-      creator_id: "669e044a6e55bbb8fe31a868", // admin@aibox.ch
+      tenant_id: "66aa2169d40d0b194e280142", // AI now AG TODO: Move to endpoint, get data based on token
+      creator_id: "669e044a6e55bbb8fe31a868", // admin@aibox.ch TODO: Move to endpoint, get data based on token
       title: promptTitle,
       category: selectedCategory._id,
       group: selectedGroup._id,
