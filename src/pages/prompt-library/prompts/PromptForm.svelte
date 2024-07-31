@@ -4,29 +4,25 @@
 
   import { onMount } from "svelte";
 
-  let categories: {
+  type Group = { title: string; _id: string }; // TODO: Get the type from the API endpoint
+  type Category = {
     title: string;
     _id: string;
-    groups: { title: string; _id: string }[];
-  }[] = [];
-  let selectedCategory = "";
-  let selectedCategoryId: string;
+    groups: Group[];
+  };
 
-  let selectedGroup = "";
-  let selectedGroupId: string;
+  let categories: Category[] = [];
+  let selectedCategory: Category;
+  let selectedGroup: Group;
 
-  function handleUpdateCategory(title: string) {
-    selectedGroup = "";
-    selectedGroupId = "";
-    const category = categories.find((n) => n.title === title);
-    if (category) {
-      selectedCategoryId = category._id;
-    }
+  function handleUpdateCategory(category: Category) {
+    selectedCategory = category;
   }
 
   onMount(async function () {
     const response = await fetch("/api/categories.json", { method: "GET" });
     const data = await response.json();
+    console.log("Category data", data);
     if (data) {
       categories = data;
     }
@@ -35,22 +31,16 @@
   let promptTitle = "",
     promptText = "";
 
-  let instructions = ["Instructions 1", "Instructions 2", "Instructions 3"];
-  let selectedInstruction = "";
-
-  let kbs = ["KB 1", "KB 2", "KB 3"];
-  let selectedKb = "";
-
   async function savePrompt() {
     const newPrompt: CreatePromptParams = {
       tenant_id: "66aa2169d40d0b194e280142", // AI now AG
       creator_id: "669e044a6e55bbb8fe31a868", // admin@aibox.ch
       title: promptTitle,
-      category: selectedCategoryId,
+      category: selectedCategory._id,
       group: selectedGroupId,
       prompt: promptText,
-      instructions: selectedInstruction,
-      documents: [selectedKb],
+      instructions: "",
+      documents: [""],
     };
 
     console.log("creating new prompt", newPrompt);
@@ -89,16 +79,15 @@
         <SingleInput
           title="Category"
           placeholder="e.g. Editing"
-          items={categories.map((n) => n.title)}
+          items={categories}
           bind:selectedItem={selectedCategory}
-          onUpdate={handleUpdateCategory}
         />
 
         {#if selectedCategory}
           <SingleInput
             title="Group"
             placeholder="e.g. Headlines"
-            items={groups}
+            items={selectedCategory.groups}
             bind:selectedItem={selectedGroup}
           />
         {/if}
@@ -113,6 +102,7 @@
         />
       </div>
 
+      <!--
       <div
         class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 justify-center"
       >
@@ -132,6 +122,7 @@
           onUpdate={handleUpdateKB}
         />
       </div>
+      -->
 
       <div class="flex items-center justify-between">
         <button
