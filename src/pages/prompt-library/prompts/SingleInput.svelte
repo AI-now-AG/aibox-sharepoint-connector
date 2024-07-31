@@ -1,18 +1,17 @@
-<script>
+<script lang="ts">
   export let title;
   export let placeholder;
   export let items;
   export let selectedItem = "";
-  export let onUpdate;
+  export let onUpdate: (selected: string) => void | undefined;
 
-  function handleSelectedItems(event) {
-    const currentSelected = event.target.innerText;
-    if (selectedItem == currentSelected) {
+  function handleSelectedItems(selected: string) {
+    if (selectedItem === selected) {
       selectedItem = "";
     } else {
-      selectedItem = currentSelected;
+      selectedItem = selected;
     }
-    onUpdate(selectedItem);
+    onUpdate && onUpdate(selectedItem);
   }
 </script>
 
@@ -32,11 +31,12 @@
       class="dropdown-content menu bg-base-100 space-y-2 rounded-box z-[1] w-52 p-2 shadow"
     >
       {#each items as item}
-        <li on:click={handleSelectedItems}>
-          <a
+        <li>
+          <button
+            on:click|preventDefault={() => handleSelectedItems(item)}
             class={`${selectedItem == item ? "bg-primary text-base-100 hover:bg-primary" : "hover:text-neutral"}`}
             >{item}
-          </a>
+          </button>
         </li>
       {/each}
     </ul>

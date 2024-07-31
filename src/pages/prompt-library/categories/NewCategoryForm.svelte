@@ -4,7 +4,6 @@
   let textGroups = [];
 
   async function saveCategory() {
-    textGroups.filter((n) => n);
     if (!categoryTitle) {
       alert("Please enter category title");
     } else if (textGroups.length > 0) {

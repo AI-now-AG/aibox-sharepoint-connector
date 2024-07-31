@@ -4,53 +4,31 @@
 
   import { onMount } from "svelte";
 
-  let categoryList: {
+  let categories: {
     title: string;
     _id: string;
     groups: { title: string; _id: string }[];
-  }[];
-  let categories = ["Test Writing", "SEO", "Marketing"];
-  let activatedCategory = "";
+  }[] = [];
+  let selectedCategory = "";
   let selectedCategoryId: string;
 
-  let groups = ["Headlines", "Summarize", "Shorten text", "Police Report"];
-  let activatedGroup = "";
+  let selectedGroup = "";
   let selectedGroupId: string;
 
   function handleUpdateCategory(title: string) {
-    activatedGroup = "";
+    selectedGroup = "";
     selectedGroupId = "";
-    const idx = categoryList.findIndex((n) => n.title === title);
-    if (idx !== -1) {
-      groups = categoryList[idx].groups.map((n) => n.title);
-      selectedCategoryId = categoryList[idx]._id;
+    const category = categories.find((n) => n.title === title);
+    if (category) {
+      selectedCategoryId = category._id;
     }
   }
-
-  function handleUpdateGroup(title: string) {
-    const idx = categoryList.findIndex((n) => n.title === activatedCategory);
-    if (idx !== -1) {
-      const groupIdx = categoryList[idx].groups.findIndex(
-        (n) => n.title === title,
-      );
-      if (groupIdx !== -1) {
-        selectedGroupId = categoryList[idx].groups[groupIdx]._id;
-        console.log(selectedGroupId);
-      }
-    }
-  }
-
-  function handleUpdateInstruction(newValue) {}
-
-  function handleUpdateKB(newValue) {}
 
   onMount(async function () {
     const response = await fetch("/api/categories.json", { method: "GET" });
     const data = await response.json();
-    console.log("Categories", data);
-    if (data.categories) {
-      categoryList = data.categories;
-      categories = categoryList.map((n) => n.title);
+    if (data) {
+      categories = data;
     }
   });
 
@@ -111,18 +89,19 @@
         <SingleInput
           title="Category"
           placeholder="e.g. Editing"
-          items={categories}
-          bind:selectedItem={activatedCategory}
+          items={categories.map((n) => n.title)}
+          bind:selectedItem={selectedCategory}
           onUpdate={handleUpdateCategory}
         />
 
-        <SingleInput
-          title="Group"
-          placeholder="e.g. Headlines"
-          items={groups}
-          bind:selectedItem={activatedGroup}
-          onUpdate={handleUpdateGroup}
-        />
+        {#if selectedCategory}
+          <SingleInput
+            title="Group"
+            placeholder="e.g. Headlines"
+            items={groups}
+            bind:selectedItem={selectedGroup}
+          />
+        {/if}
       </div>
 
       <div class="mb-4">
