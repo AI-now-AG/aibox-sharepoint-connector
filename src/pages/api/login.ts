@@ -2,7 +2,7 @@ import { nanoid } from "nanoid";
 import { SignJWT } from "jose";
 import type { APIRoute } from "astro";
 import { TOKEN } from "$constants";
-import { getUser } from "$data/models/user.model";
+import UserModel from "$data/models/user.model";
 import crypto from "node:crypto";
 
 const verify = (password: string, hash: string) =>
@@ -31,7 +31,7 @@ export const POST: APIRoute = async (ctx) => {
     }
     const password = (formData.get("password") as string) || "";
 
-    const user = await getUser(email);
+    const user = await UserModel.get(email);
 
     if (user && (await verify(password, user.password))) {
       const token = await new SignJWT({})

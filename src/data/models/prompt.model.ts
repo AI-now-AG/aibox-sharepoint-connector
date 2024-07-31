@@ -26,5 +26,5 @@ export default {
     return collection.insertOne(validated);
   },
 
-  all: async () => collection.find<Prompt>({}),
+  list: async () => collection.find<Prompt>({}),
 };

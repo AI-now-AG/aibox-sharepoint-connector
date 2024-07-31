@@ -19,7 +19,7 @@ export default {
     return collection.insertOne(validated);
   },
 
-  all: async () => collection.find<Tenant>({}),
+  list: async () => collection.find<Tenant>({}),
 
   get: async (id: string) => {
     const _id = new ObjectId(id);

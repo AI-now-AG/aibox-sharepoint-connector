@@ -19,5 +19,5 @@ export default {
     return collection.insertOne(validated);
   },
 
-  all: async () => collection.find<Category>({}),
+  list: async () => collection.find<Category>({}),
 };

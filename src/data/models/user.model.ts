@@ -22,7 +22,7 @@ export default {
     return collection.insertOne(validated);
   },
 
-  all: async () => collection.find<User>({}),
+  list: async () => collection.find<User>({}),
 
   get: async (email: string) => collection.findOne<User>({ email }),
 };
