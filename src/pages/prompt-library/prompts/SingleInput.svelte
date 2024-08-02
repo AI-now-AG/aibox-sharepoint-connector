@@ -1,4 +1,6 @@
 <script lang="ts">
+  // TODO: Use radio buttons instead of button, it's what they are used for. That
+  // way we don't have to manage selected state ourselves.
   type Item = { title: string } | string;
 
   export let title;
@@ -6,17 +8,21 @@
   export let items: Item[];
   export let selectedItem: Item | undefined;
 
-  let selectedItemTitle = "";
+  $: {
+    if (items) {
+      resetSelection();
+    }
+  }
+
+  const resetSelection = () => {
+    selectedItem = undefined;
+  };
 
   function handleSelectedItems(selected: Item) {
     if (selectedItem === selected) {
-      selectedItem = undefined;
-      selectedItemTitle = "";
+      resetSelection();
     } else {
       selectedItem = selected;
-
-      selectedItemTitle =
-        typeof selected === "string" ? selected : selected.title;
     }
   }
 </script>
@@ -26,7 +32,11 @@
   <div class="dropdown dropdown-bottom w-full min-w-xs">
     <input
       {placeholder}
-      value={selectedItemTitle}
+      value={(selectedItem &&
+        (typeof selectedItem === "string"
+          ? selectedItem
+          : selectedItem.title)) ||
+        ""}
       tabindex="30"
       role="button"
       class="input input-bordered font-medium w-full min-w-xs"

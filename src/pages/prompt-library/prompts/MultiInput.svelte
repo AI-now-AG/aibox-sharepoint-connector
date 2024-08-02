@@ -1,4 +1,6 @@
 <script>
+  // TODO: Us checkboxes instead of anchors, it's what they are used for. That
+  // way we don't have to manage selected state ourselves.
   export let title;
   export let placeholder;
   export let items;
