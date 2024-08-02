@@ -3,6 +3,7 @@ import { db, type Document } from "../mongodb";
 import { z } from "zod";
 
 export const GroupSchema = z.object({
+  _id: z.instanceof(ObjectId),
   title: z.string(),
   slug: z.string(),
 });
@@ -47,7 +48,12 @@ export default {
 
   list: async () => collection.find<Document<Category>>({}),
 
-  get: async (title: string) => {
+  get: async (id: string) => {
+    const _id = new ObjectId(id);
+    return collection.findOne<Document<Category>>({ _id });
+  },
+
+  getByTitle: async (title: string) => {
     return collection.findOne<Document<Category>>({ title });
   },
 

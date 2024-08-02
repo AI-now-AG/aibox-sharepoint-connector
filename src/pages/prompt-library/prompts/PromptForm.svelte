@@ -27,6 +27,8 @@
   });
 
   async function savePrompt() {
+    console.log("selectedGroup", selectedGroup);
+
     const newPrompt: CreatePromptParams = {
       title: promptTitle,
       category: selectedCategory._id,

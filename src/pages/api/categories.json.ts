@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import { ObjectId } from "mongodb";
 import { z } from "zod";
 import slug from "slug";
 import { stringToObjectId } from "$utils/stringToObjectId";
@@ -37,7 +38,11 @@ export const POST: APIRoute = async (ctx) => {
   const data = CreateCategoryParamsSchema.parse(params);
 
   let groups = new Set<Group>(
-    data.groups.map((title) => ({ title, slug: slug(title) })),
+    data.groups.map((title) => ({
+      _id: new ObjectId(),
+      title,
+      slug: slug(title),
+    })),
   );
   const existingCategory = await CategoryModel.get(data.title);
   if (existingCategory && existingCategory.groups?.length > 0) {
@@ -59,8 +64,6 @@ export const POST: APIRoute = async (ctx) => {
         created_at: new Date(),
         updated_at: new Date(),
       };
-
-  console.log("NEW CATEGORY", newCategory);
 
   try {
     await CategoryModel.upsert(newCategory);

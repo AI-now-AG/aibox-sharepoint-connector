@@ -2,10 +2,42 @@
 import Layout from "$layouts/Layout.astro";
 import { useTranslations } from "$i18n/utils";
 import Prompts from "$data/models/prompt.model";
+import CategoryModel from "$data/models/category.model";
 
 const t = useTranslations(Astro.preferredLocale);
 
-const prompts = await Prompts.list();
+const promptsCursor = await Prompts.list();
+const prompts = await promptsCursor.toArray();
+
+const calls = prompts.map(async (prompt) => {
+  const category = await CategoryModel.get(prompt.category.toString());
+
+  return category;
+});
+
+const categories = await Promise.all(calls);
+
+const promptsEnriched = prompts.map((prompt) => {
+  const category = categories.find(
+    (category) => category?._id.toString() === prompt.category.toString(),
+  );
+
+  const group = category?.groups.find(
+    (g) => g._id.toString() === prompt.group.toString(),
+  );
+
+  return {
+    ...prompt,
+    categoryName: category?.title,
+    groupName: group?.title,
+  };
+});
+
+//console.log("prompts", prompts);
+// console.log("promptsEnriched", promptsEnriched);
+console.log("categories", categories);
+
+// const group = category?.groups.find((g) => g.slug === groupSlug)?.title;
 ---
 
 <Layout>
@@ -36,20 +68,22 @@ const prompts = await Prompts.list();
       </svg>
       {t("prompt-library.prompts.add")}
     </a>
+  </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+  <div class="container max-w-5xl mx-auto p-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
       {
-        prompts.map((prompt) => (
+        promptsEnriched.map((prompt) => (
           <div class="card bg-base-100 shadow-xl overflow-hidden">
             <div class="card-body">
-<!-- 
-              <div>
-                <span class="rounded border border-base-content/10 px-2">
-                  {prompt.category}{" "}
-                  {prompt.group && <span set:html={`&rang; ${prompt.group}`} />}
+              <div class="text-sm">
+                <span class="rounded border border-base-content/10 px-1">
+                  {prompt.categoryName}
+                </span>
+                <span class="rounded border border-base-content/10 px-1 ml-2">
+                  {prompt.groupName}
                 </span>
               </div>
--->
               <h2 class="card-title">{prompt.title}</h2>
               <p class="text-base-content/80">{prompt.description}</p>
               <div class="card-actions">
