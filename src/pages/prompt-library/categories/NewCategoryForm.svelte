@@ -105,7 +105,7 @@
               </label>
               <button
                 class="btn btn-sm btn-circle btn-outline"
-                on:click|preventDefault={removeGroup(index)}
+                on:click|preventDefault={() => removeGroup(index)}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

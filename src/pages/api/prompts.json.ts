@@ -47,7 +47,6 @@ const generatePromptDescription = async (prompt: string) => {
 
 export const POST: APIRoute<CreatePromptParams> = async (ctx) => {
   const params = await ctx.request.json();
-  console.log("params", params);
   const data = CreatePromptParamsSchema.parse(params);
 
   // We generate a description based on the prompt
@@ -67,8 +66,6 @@ export const POST: APIRoute<CreatePromptParams> = async (ctx) => {
     created_at: new Date(),
     updated_at: new Date(),
   };
-
-  console.log("NEW PROMPT", prompt);
 
   try {
     if (prompt) {
