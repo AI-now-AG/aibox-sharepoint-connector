@@ -10,12 +10,11 @@
   async function fetchHeadline(e) {
     e.preventDefault();
 
-    console.log("hai");
     const userInputText = e.detail.text;
     input = "";
     let body = {
-      article: userInputText
-    }
+      article: userInputText,
+    };
     if (userInputText) {
       input = userInputText;
       output = "";
@@ -24,8 +23,8 @@
           method: "POST",
           body: JSON.stringify(body),
           headers: {
-            "Content-Type": "application/json"
-          }
+            "Content-Type": "application/json",
+          },
         });
         const data = await response.json();
         if (data && data.headlines) {

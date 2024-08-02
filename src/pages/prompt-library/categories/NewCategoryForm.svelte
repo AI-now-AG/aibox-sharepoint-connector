@@ -1,39 +1,50 @@
-<script>
-  let categoryTitle = "";
+<script lang="ts">
+  import type { CreateCategoryParams } from "$pages/api/categories.json";
 
-  let textGroups = [];
+  /**
+   * TODO: Please question the user flow of creating groups here. It will be more natural
+   * to create groups on demand when creating prompts.
+   */
 
-  async function saveCategory() {
-    if (!categoryTitle) {
+  let title: string | undefined;
+  let groups: string[] = [];
+
+  async function save() {
+    if (!title) {
       alert("Please enter category title");
-    } else if (textGroups.length > 0) {
+    } else if (groups && groups.length > 0) {
+      const newCategory: CreateCategoryParams = {
+        title,
+        groups,
+      };
+
       const response = await fetch("/api/categories.json", {
         method: "POST",
-        body: JSON.stringify({
-          title: categoryTitle,
-          group: textGroups,
-        }),
+        body: JSON.stringify(newCategory),
         headers: {
           "Content-Type": "application/json",
         },
       });
+
       const data = await response.json();
-      textGroups = [];
-      categoryTitle = "";
+
+      groups = [];
+      title = undefined;
+
       alert(data.message);
     } else {
       alert("At lease one group must be created");
     }
   }
 
-  function addAGroup() {
-    if (textGroups.length < 6) {
-      textGroups = [...textGroups, ""];
+  function addGroup() {
+    if (groups && groups.length < 6) {
+      groups = [...groups, ""];
     }
   }
 
-  function deleteAGroup(index) {
-    textGroups = textGroups.filter((_, i) => i !== index);
+  function removeGroup(index: number) {
+    groups = groups.filter((_, i) => i !== index);
   }
 </script>
 
@@ -46,7 +57,7 @@
           <p class="mb-2">Title</p>
           <input
             type="text"
-            bind:value={categoryTitle}
+            bind:value={title}
             placeholder="e.g. Headline"
             class="input input-bordered w-full min-w-xs"
           />
@@ -59,7 +70,7 @@
 
           <button
             class="btn btn-active btn-neutral font-normal grow-0"
-            on:click|preventDefault={addAGroup}
+            on:click|preventDefault={addGroup}
           >
             <svg
               width="13"
@@ -82,19 +93,19 @@
         <div
           class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 justify-center"
         >
-          {#each textGroups as text, index (index)}
+          {#each groups as _text, index (index)}
             <div class="flex flex-row items-center gap-4">
               <label class="input input-bordered flex items-center gap-2">
                 <input
                   type="text"
-                  bind:value={textGroups[index]}
+                  bind:value={groups[index]}
                   placeholder="e.g. Headline"
                   class="grow w-full min-w-xs"
                 />
               </label>
               <button
                 class="btn btn-sm btn-circle btn-outline"
-                on:click|preventDefault={deleteAGroup(index)}
+                on:click|preventDefault={removeGroup(index)}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -119,7 +130,7 @@
       <div class="flex items-center justify-between">
         <button
           class="btn btn-active btn-primary py-4 px-8 font-normal"
-          on:click|preventDefault={saveCategory}
+          on:click|preventDefault={save}
         >
           Save Category
         </button>

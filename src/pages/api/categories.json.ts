@@ -1,5 +1,16 @@
 import type { APIRoute } from "astro";
+import { z } from "zod";
+import slug from "slug";
+import { stringToObjectId } from "$utils/stringToObjectId";
 import CategoryModel from "$data/models/category.model";
+import type { Category, Group } from "$data/models/category.model";
+
+const CreateCategoryParamsSchema = z.object({
+  title: z.string(),
+  groups: z.array(z.string()),
+});
+
+export type CreateCategoryParams = z.infer<typeof CreateCategoryParamsSchema>;
 
 export const GET: APIRoute = async () => {
   try {
@@ -23,34 +34,45 @@ export const GET: APIRoute = async () => {
 
 export const POST: APIRoute = async (ctx) => {
   const params = await ctx.request.json();
+  const data = CreateCategoryParamsSchema.parse(params);
+
+  let groups = new Set<Group>(
+    data.groups.map((title) => ({ title, slug: slug(title) })),
+  );
+  const existingCategory = await CategoryModel.get(data.title);
+  if (existingCategory && existingCategory.groups?.length > 0) {
+    groups = new Set([...existingCategory.groups, ...groups]);
+  }
+
+  const newCategory: Category = existingCategory
+    ? {
+        ...existingCategory,
+        groups: Array.from(groups),
+      }
+    : {
+        ...data,
+        title: data.title,
+        groups: Array.from(groups),
+        slug: slug(data.title),
+        tenant_id: stringToObjectId.parse("66aa2169d40d0b194e280142"), // AI now AG
+        creator_id: stringToObjectId.parse("669e044a6e55bbb8fe31a868"), // admin@aibox.ch
+        created_at: new Date(),
+        updated_at: new Date(),
+      };
+
+  console.log("NEW CATEGORY", newCategory);
+
   try {
-    if (params.title && params.group) {
-      /*
-      const groups = params.group.map((title: string) => ({
-        title,
-      }));
+    await CategoryModel.upsert(newCategory);
 
-      await CategoryModel.add({ title: params.title, groups });
-      */
-
-      return new Response(
-        JSON.stringify({
-          message: "Category added",
-        }),
-        {
-          status: 200,
-        },
-      );
-    } else {
-      return new Response(
-        JSON.stringify({
-          message: "Error while add the Category",
-        }),
-        {
-          status: 400,
-        },
-      );
-    }
+    return new Response(
+      JSON.stringify({
+        message: "Category added",
+      }),
+      {
+        status: 200,
+      },
+    );
   } catch (error) {
     console.debug(error);
 

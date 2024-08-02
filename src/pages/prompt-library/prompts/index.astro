@@ -42,12 +42,14 @@ const prompts = await Prompts.list();
         prompts.map((prompt) => (
           <div class="card bg-base-100 shadow-xl overflow-hidden">
             <div class="card-body">
+<!-- 
               <div>
                 <span class="rounded border border-base-content/10 px-2">
                   {prompt.category}{" "}
                   {prompt.group && <span set:html={`&rang; ${prompt.group}`} />}
                 </span>
               </div>
+-->
               <h2 class="card-title">{prompt.title}</h2>
               <p class="text-base-content/80">{prompt.description}</p>
               <div class="card-actions">

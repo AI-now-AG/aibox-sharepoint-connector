@@ -39,8 +39,6 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const token = context.cookies.get(TOKEN)?.value;
   const validationResult = await verifyAuth(token);
 
-  console.log(validationResult);
-
   switch (validationResult.status) {
     case "authorized":
       return next();

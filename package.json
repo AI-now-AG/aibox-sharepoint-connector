@@ -25,6 +25,7 @@
     "langchain": "^0.2.9",
     "mongodb": "^6.8.0",
     "nanoid": "^5.0.7",
+    "slug": "^9.1.0",
     "svelte": "^4.2.18",
     "tailwindcss": "^3.4.5",
     "ts-pattern": "^5.2.0",
@@ -33,6 +34,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^8.57.0",
+    "@types/slug": "^5.0.8",
     "daisyui": "^4.12.10",
     "eslint": "^8.57.0",
     "eslint-plugin-astro": "^1.2.3",

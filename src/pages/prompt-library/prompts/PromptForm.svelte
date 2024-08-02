@@ -34,8 +34,6 @@
       prompt: promptText,
     };
 
-    console.log("creating new prompt", newPrompt);
-
     const response = await fetch("/api/prompts.json", {
       method: "POST",
       body: JSON.stringify(newPrompt),

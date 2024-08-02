@@ -5,7 +5,7 @@ import { Name } from "./icons/Icon.astro";
 export type MenuItem = {
   title: string;
   path?: string;
-  icon?: Name;
+  icon?: Name | string;
 };
 
 interface Props extends MenuItem {}

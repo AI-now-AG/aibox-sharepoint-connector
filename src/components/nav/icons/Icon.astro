@@ -13,7 +13,7 @@ export enum Name {
 }
 
 interface Props extends HTMLAttributes<"svg"> {
-  icon: Name;
+  icon?: Name;
 }
 
 const { icon, ...attrs } = Astro.props;
