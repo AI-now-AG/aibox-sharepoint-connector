@@ -5,7 +5,6 @@ import { z } from "zod";
 const PromptSchema = z.object({
   tenant_id: z.instanceof(ObjectId),
   creator_id: z.instanceof(ObjectId),
-  parent_id: z.instanceof(ObjectId).optional(),
   title: z.string(),
   description: z.string(),
   category: z.instanceof(ObjectId),
