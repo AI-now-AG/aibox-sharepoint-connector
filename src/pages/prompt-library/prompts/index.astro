@@ -1,12 +1,12 @@
 ---
 import Layout from "$layouts/Layout.astro";
 import { useTranslations } from "$i18n/utils";
-import Prompts from "$data/models/prompt.model";
+import PromptModel from "$data/models/prompt.model";
 import CategoryModel from "$data/models/category.model";
 
 const t = useTranslations(Astro.preferredLocale);
 
-const promptsCursor = await Prompts.list();
+const promptsCursor = await PromptModel.list();
 const prompts = await promptsCursor.toArray();
 
 const calls = prompts.map(async (prompt) => {
@@ -146,7 +146,9 @@ console.log("categories", categories);
   </div>
 
   <div class="container max-w-5xl mx-auto p-6 space-y-4">
-    <label class="text-lg font-normal text-base-content/80">{t("prompt-library.prompts.allPrompt")}</label>
+    <label class="text-lg font-normal text-base-content/80"
+      >{t("prompt-library.prompts.allPrompt")}</label
+    >
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
       {
         promptsEnriched.map((prompt) => (
