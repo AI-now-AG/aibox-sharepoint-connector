@@ -1,0 +1,105 @@
+import type { APIRoute } from "astro";
+import PromptModel, { type Prompt } from "$data/models/prompt.model";
+import { z } from "zod";
+import { ChatOpenAI } from "@langchain/openai";
+import { HumanMessage, SystemMessage } from "@langchain/core/messages";
+import { StringOutputParser } from "@langchain/core/output_parsers";
+import { stringToObjectId } from "$utils/stringToObjectId";
+
+const CreatePromptParamsSchema = z.object({
+  title: z.string(),
+  category: z.string(),
+  group: z.string(),
+  instructions: z.string().optional(),
+  prompt: z.string(),
+  documents: z.array(z.string()).optional(),
+});
+
+export type CreatePromptParams = z.infer<typeof CreatePromptParamsSchema>;
+
+export const model = new ChatOpenAI({
+  apiKey: import.meta.env.OPENAI_API_KEY,
+  model: "gpt-4o-mini",
+});
+
+const instructions = `You are a helpful assistant who writes helpful descriptions of prompts for a UI:
+* You receive a prompt
+* You create a friendly description of the prompt, describing what it does and what it is about
+* Use at most 2 sentences
+* Return just the description, without any formatting or the prompt
+* The description must be german and target a swiss audience
+* Use a friendly and personal tone
+* Only describe what the prompt does, do not add a call to action
+
+Example:
+Input: Erstelle eine Titel für einen Schweizer Presseartikel im Stil von "Knowledge Base Somedia-Schlagzeilen" und "Instructions Headline" auf Basis der folgenden Texteingabe. Stelle sicher, dass die Schlagzeilen dem Stil und den Erwartungen der Schweizer Presseartikel und sowie der vorhandenen Knowledge Base entsprechen. Befolge die angegebenen spezifischen Instruktionen.
+
+Output: Hier kannst du einen prägnanten Titel für einen Schweizer Presseartikel erstellen, der den spezifischen Anforderungen und dem gewünschten Stil entspricht. Die Überschrift wird an die Erwartungen der Schweizer Medien angepasst und berücksichtigt die vorhandene Knowledge Base.`;
+
+const generatePromptDescription = async (prompt: string) => {
+  const messages = [new SystemMessage(instructions), new HumanMessage(prompt)];
+  const parser = new StringOutputParser();
+  const result = await model.invoke(messages);
+  const description = await parser.invoke(result);
+
+  return description;
+};
+
+export const POST: APIRoute<CreatePromptParams> = async (ctx) => {
+  const params = await ctx.request.json();
+  const data = CreatePromptParamsSchema.parse(params);
+
+  // We generate a description based on the prompt
+  const description = await generatePromptDescription(data.prompt);
+
+  // TODO: Here we would add user informations like the tenant and the user id. We don't have that
+  // feature to get these just based on the token for now. Wait until the Auth0 task is done. Until
+  // then we use fixed values.
+  const prompt: Prompt = {
+    ...data,
+    category: stringToObjectId.parse(data.category),
+    group: stringToObjectId.parse(data.group),
+    documents: data.documents?.map((doc) => stringToObjectId.parse(doc)),
+    description,
+    tenant_id: stringToObjectId.parse("66aa2169d40d0b194e280142"), // AI now AG
+    creator_id: stringToObjectId.parse("669e044a6e55bbb8fe31a868"), // admin@aibox.ch
+    created_at: new Date(),
+    updated_at: new Date(),
+  };
+
+  try {
+    if (prompt) {
+      await PromptModel.add(prompt);
+
+      return new Response(
+        JSON.stringify({
+          message: "Prompt added",
+        }),
+        {
+          status: 200,
+        },
+      );
+    } else {
+      return new Response(
+        JSON.stringify({
+          message: "Error while adding the prompt",
+        }),
+        {
+          status: 400,
+        },
+      );
+    }
+  } catch (error) {
+    console.debug(error);
+
+    return new Response(
+      JSON.stringify({
+        message: "Error while adding the prompt",
+        error: error,
+      }),
+      {
+        status: 500,
+      },
+    );
+  }
+};

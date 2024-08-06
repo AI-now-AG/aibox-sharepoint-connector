@@ -1,19 +1,27 @@
-// import { MongoClient } from 'mongodb';
+import { ObjectId } from "mongodb";
+import { db, type Document } from "../mongodb";
+import { z } from "zod";
 
-// interface User {
-//   _id: string;
-//   username: string;
-//   password: string;
-// }
+const UserSchema = z.object({
+  tenant_id: z.instanceof(ObjectId),
+  username: z.string().min(2),
+  password: z.string().min(8),
+  roles: z.array(z.string()),
+  created_at: z.date(),
+  updated_at: z.date(),
+});
 
-// const client = new MongoClient(import.meta.env.MONGODB_URI);
-// const db = client.db();
-// const usersCollection = db.collection<User>('users');
+export type User = z.infer<typeof UserSchema>;
 
-// export async function getUserByUsernameAndPassword(username: string, password: string) {
-//   return usersCollection.findOne({ username, password });
-// }
+const collection = db.collection("users");
 
-import { Users } from "../mongodb";
+export default {
+  add: async (user: User) => {
+    const validated = UserSchema.parse(user);
+    return collection.insertOne(validated);
+  },
 
-export const getUser = async (email: string) => Users().findOne({ email });
+  list: async () => collection.find<Document<User>>({}),
+
+  get: async (email: string) => collection.findOne<Document<User>>({ email }),
+};
