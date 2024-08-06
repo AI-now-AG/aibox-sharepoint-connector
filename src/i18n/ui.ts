@@ -38,8 +38,11 @@ const en = {
   "welcome.get-started": "Get started",
   "welcome.explore": "Explore more widgets",
 
-  "prompt-library.prompts.title": "Prompts",
+  "prompt-library.prompts.title": "Prompt Management",
   "prompt-library.prompts.add": "Add Prompt",
+  "prompt-library.prompts.search": "Type here",
+  "prompt-library.prompts.filter": "Filter",
+  "prompt-library.prompts.allPrompt": "All Prompts",
 
   "prompt-library.categories.title": "Categories",
   "prompt-library.categories.add": "Add Category",
@@ -76,7 +79,11 @@ const de = {
   "welcome.get-started": "Los geht's",
   "welcome.explore": "Mehr Widgets entdecken",
 
+  "prompt-library.prompts.title": "Prompte Verwaltung",
   "prompt-library.prompts.add": "Neuer Prompt",
+  "prompt-library.prompts.search": "Geben Sie hier ein",
+  "prompt-library.prompts.filter": "Filter",
+  "prompt-library.prompts.allPrompt": "Alle Eingabeaufforderungen",
 
   "prompt-library.categories.title": "Kategorien",
   "prompt-library.categories.add": "Neue Kategorie",
