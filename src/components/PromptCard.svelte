@@ -42,7 +42,7 @@
           <p class="text-base-content/60 line-clamp-3">
             {prompt.description}
           </p>
-          <div class="flex justify-between items-end mt-4">
+          <div class="flex flex-col space-y-2 items-end mt-4">
             <div class="card-actions">
               <a
                 href={`prompts/${prompt._id.toString()}`}
