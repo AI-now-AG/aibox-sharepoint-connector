@@ -65,7 +65,7 @@ export const GET: APIRoute = async () => {
 
     return new Response(
       JSON.stringify({
-        message: "Error while fetching categories",
+        message: "Error while fetching instuctions",
         error: error,
       }),
       {

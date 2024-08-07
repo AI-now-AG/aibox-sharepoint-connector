@@ -125,13 +125,22 @@ export const DELETE: APIRoute<DeletePromptParams> = async (ctx) => {
     if (data._id) {
       const result = await PromptModel.remove(data._id.toString());
       return new Response(JSON.stringify(result));
+    } else {
+      return new Response(
+        JSON.stringify({
+          message: "Id error while deleting the prompt",
+        }),
+        {
+          status: 400,
+        },
+      );
     }
   } catch (error) {
     console.error(error);
 
     return new Response(
       JSON.stringify({
-        message: "Error while fetching categories",
+        message: "Error while deleting prompt",
         error: error,
       }),
       {

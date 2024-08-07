@@ -7,8 +7,6 @@ export interface Props {
   id: string;
 }
 
-const t = useTranslations(Astro.preferredLocale);
-
 const { id } = Astro.params;
 
 const knowledgeBase = id ? await KnowledgeBaseModel.get(id) : undefined; // TODO: Render 404 if not found
