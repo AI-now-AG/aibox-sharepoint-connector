@@ -34,6 +34,11 @@ export default {
     return collection.insertOne(validated);
   },
 
+  remove: async (id: string) => {
+    const _id = new ObjectId(id);
+    return collection.deleteOne({ _id });
+  },
+
   upsert: async (category: Category) => {
     const validated = CategoryGroupSchema.parse(category);
 

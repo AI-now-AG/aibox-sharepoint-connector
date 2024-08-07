@@ -3,6 +3,7 @@ import Layout from "$layouts/Layout.astro";
 import { useTranslations } from "$i18n/utils";
 import PromptModel from "$data/models/prompt.model";
 import CategoryModel from "$data/models/category.model";
+import PromptCard from "$components/PromptCard.svelte";
 
 const t = useTranslations(Astro.preferredLocale);
 
@@ -30,15 +31,11 @@ const promptsEnriched = prompts.map((prompt) => {
 
   return {
     ...prompt,
+    _id: prompt._id.toString(),
     categoryName: category?.title,
     groupName: group?.title,
   };
 });
-
-//console.log("prompts", prompts);
-// console.log("promptsEnriched", promptsEnriched);
-console.log("categories", categories);
-// const group = category?.groups.find((g) => g.slug === groupSlug)?.title;
 ---
 
 <Layout>
@@ -145,37 +142,9 @@ console.log("categories", categories);
     </div>
   </div>
 
-  <div class="container max-w-5xl mx-auto p-6 space-y-4">
-    <label class="text-lg font-normal text-base-content/80"
-      >{t("prompt-library.prompts.allPrompt")}</label
-    >
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-      {
-        promptsEnriched.map((prompt) => (
-          <div class="card bg-base-100 shadow-xl">
-            <div class="card-body">
-              <div class="card-actions justify-start">
-                <div class="badge px-2 border-base-300">
-                  {prompt.categoryName}
-                </div>
-                <div class="badge px-2 border-base-300">{prompt.groupName}</div>
-              </div>
-              <h2 class="card-title">{prompt.title}</h2>
-              <p class="text-base-content/60 line-clamp-3">
-                {prompt.description}
-              </p>
-              <div class="card-actions mt-4">
-                <a
-                  href={`prompts/${prompt._id.toString()}`}
-                  class="btn btn-primary font-light"
-                >
-                  View prompt
-                </a>
-              </div>
-            </div>
-          </div>
-        ))
-      }
-    </div>
-  </div>
+  <PromptCard
+    promptsEnriched={promptsEnriched}
+    preferredLocale={Astro.preferredLocale}
+    client:load
+  />
 </Layout>

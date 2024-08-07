@@ -24,7 +24,7 @@ const { title, path } = Astro.props;
     .with(Pattern.string, () => (
       <a
         href={path}
-        class:list={["font-bold", { active: path === Astro.url.pathname }]}
+        class:list={["font-semibold", { active: path === Astro.url.pathname }]}
       >
         {title}
       </a>

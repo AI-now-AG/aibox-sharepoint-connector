@@ -1,0 +1,103 @@
+---
+import Layout from "$layouts/Layout.astro";
+import { useTranslations } from "$i18n/utils";
+import InstructionModel from "$data/models/instruction.model";
+
+const t = useTranslations(Astro.preferredLocale);
+
+const instructionsCursor = await InstructionModel.list();
+const instructions = await instructionsCursor.toArray();
+
+let index = 1;
+const instructionsEnriched = instructions.map((instruction) => ({
+  number: String(index++).padStart(2, "0"),
+  _id: instruction._id.toString(),
+  title: instruction.title,
+  description: instruction.description,
+}));
+---
+
+<Layout>
+  <div
+    class="container max-w-5xl mx-auto p-6 grid grid-cols-1 md:grid-cols-[1fr_max-content] gap-8"
+  >
+    <h1 class="pt-2 lg:pt-8 text-4xl font-bold">
+      {t("prompt-library.instructions.title")}
+    </h1>
+
+    <a
+      href="instructions/add"
+      class="mt-2 lg:mt-8 btn btn-active btn-neutral font-normal grow-0"
+    >
+      <svg
+        width="13"
+        height="12"
+        viewBox="0 0 13 12"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M6.5 1V6M6.5 6V11M6.5 6H11.5M6.5 6L1.5 6"
+          stroke="white"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"></path>
+      </svg>
+      {t("prompt-library.instructions.add")}
+    </a>
+  </div>
+
+  <div class="container max-w-5xl mx-auto px-6">
+    <label class="input input-bordered flex items-center gap-2">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 16 16"
+        fill="currentColor"
+        class="h-4 w-4 opacity-70"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
+          clip-rule="evenodd"></path>
+      </svg>
+      <input
+        type="text"
+        class="grow"
+        placeholder={t("prompt-library.prompts.search")}
+      />
+    </label>
+  </div>
+
+  <div class="container max-w-5xl mx-auto p-6 space-y-4">
+    <label class="text-lg font-normal text-base-content/80"
+      >{t("prompt-library.instructions.all")}</label
+    >
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+      {
+        instructionsEnriched.map((instruction) => (
+          <div class="card bg-base-100 shadow-xl">
+            <div class="card-body space-y-2">
+              <div class="card-actions justify-start">
+                <div class="badge px-2 bg-neutral text-neutral-content">
+                  {instruction.number}
+                </div>
+              </div>
+              <h2 class="card-title">{instruction.title}</h2>
+              <p class="text-base-content/60 line-clamp-3">
+                {instruction.description}
+              </p>
+              <div class="card-actions mt-4">
+                <a
+                  href={`instructions/${instruction._id.toString()}`}
+                  class="btn btn-primary font-light"
+                >
+                  {t("prompt-library.instructions.view")}
+                </a>
+              </div>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</Layout>

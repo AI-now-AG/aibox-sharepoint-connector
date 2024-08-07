@@ -9,7 +9,8 @@ const PromptSchema = z.object({
   description: z.string(),
   category: z.instanceof(ObjectId),
   group: z.instanceof(ObjectId),
-  instructions: z.string().optional(),
+  instructions: z.array(z.instanceof(ObjectId)).optional(),
+  knowledgebase: z.array(z.instanceof(ObjectId)).optional(),
   prompt: z.string(),
   documents: z.array(z.instanceof(ObjectId)).optional(),
   created_at: z.date(),
@@ -24,6 +25,11 @@ export default {
   add: async (prompt: Prompt) => {
     const validated = PromptSchema.parse(prompt);
     return collection.insertOne(validated);
+  },
+
+  remove: async (id: string) => {
+    const _id = new ObjectId(id);
+    return collection.deleteOne({ _id });
   },
 
   get: async (id: string) => {

@@ -13,11 +13,19 @@ const CreateCategoryParamsSchema = z.object({
 
 export type CreateCategoryParams = z.infer<typeof CreateCategoryParamsSchema>;
 
+const extractRequiredFields = (categories: any) => {
+  return categories.map((category: any) => ({
+    _id: category._id,
+    title: category.title,
+    groups: category.groups,
+  }));
+};
+
 export const GET: APIRoute = async () => {
   try {
     const result = await CategoryModel.list();
-
-    return new Response(JSON.stringify(await result.toArray()));
+    const data = extractRequiredFields(await result.toArray());
+    return new Response(JSON.stringify(data));
   } catch (error) {
     console.error(error);
 

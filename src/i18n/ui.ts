@@ -23,6 +23,7 @@ const en = {
   "nav.text-writing": "Text Writing",
   "nav.settings": "Settings",
   "nav.settings.prompts": "Prompts",
+  "nav.settings.instructions": "Instructions",
   "nav.settings.knowledge-base": "Knowledge Base",
   "nav.settings.categories": "Categories",
 
@@ -42,7 +43,34 @@ const en = {
   "prompt-library.prompts.add": "Add Prompt",
   "prompt-library.prompts.search": "Type here",
   "prompt-library.prompts.filter": "Filter",
-  "prompt-library.prompts.allPrompt": "All Prompts",
+  "prompt-library.prompts.all": "All Prompts",
+  "prompt-library.prompts.view": "View prompt",
+
+  "prompt-library.add.prompts.title": "Title",
+  "prompt-library.add.prompts.category": "Category",
+  "prompt-library.add.prompts.group": "Group",
+  "prompt-library.add.prompts.prompt": "Prompt",
+  "prompt-library.add.prompts.instructions": "Instructions",
+  "prompt-library.add.prompts.knowledge-base": "Knowledge Base",
+  "prompt-library.add.prompts.save": "Save Prompt",
+
+  "prompt-library.instructions.title": "Instruction Management",
+  "prompt-library.instructions.add": "Add instruction",
+  "prompt-library.instructions.all": "All Instructions",
+  "prompt-library.instructions.view": "View",
+
+  "prompt-library.add.instructions.title": "Instruction title",
+  "prompt-library.add.instructions.text": "Instruction text",
+  "prompt-library.add.instructions.save": "Save instruction",
+
+  "prompt-library.knowledgebase.title": "Knowledge Base Management",
+  "prompt-library.knowledgebase.add": "Add knowledge base",
+  "prompt-library.knowledgebase.all": "All knowledge base",
+  "prompt-library.knowledgebase.view": "View",
+
+  "prompt-library.add.knowledgebase.title": "Knowledge base title",
+  "prompt-library.add.knowledgebase.text": "Knowledge base text",
+  "prompt-library.add.knowledgebase.save": "Save knowledge base",
 
   "prompt-library.categories.title": "Categories",
   "prompt-library.categories.add": "Add Category",
@@ -68,6 +96,9 @@ const de = {
   "nav.all-widgets": "Alle KI-Widgets",
   "nav.text-writing": "Redaktion",
   "nav.settings": "Einstellungen",
+  "nav.settings.prompts": "Aufforderungen",
+  "nav.settings.instructions": "Anweisungen",
+  "nav.settings.knowledge-base": "Wissensbasis",
   "nav.settings.categories": "Kategorien",
 
   "login.welcome": "Willkommen bei der",
@@ -86,7 +117,25 @@ const de = {
   "prompt-library.prompts.add": "Neuer Prompt",
   "prompt-library.prompts.search": "Geben Sie hier ein",
   "prompt-library.prompts.filter": "Filter",
-  "prompt-library.prompts.allPrompt": "Alle Eingabeaufforderungen",
+  "prompt-library.prompts.all": "Alle Eingabeaufforderungen",
+  "prompt-library.prompts.view": "Eingabeaufforderung anzeigen",
+
+  "prompt-library.add.prompts.title": "Titel",
+  "prompt-library.add.prompts.category": "Kategorie",
+  "prompt-library.add.prompts.group": "Gruppe",
+  "prompt-library.add.prompts.prompt": "Prompt",
+  "prompt-library.add.prompts.instructions": "Anweisungen",
+  "prompt-library.add.prompts.knowledge-base": "Wissensbasis",
+  "prompt-library.add.prompts.save": "Eingabeaufforderung speichern",
+
+  "prompt-library.instructions.title": "Unterrichtsverwaltung",
+  "prompt-library.instructions.add": "Anweisung hinzufügen",
+  "prompt-library.instructions.all": "Alle Anweisungen",
+  "prompt-library.instructions.view": "View",
+
+  "prompt-library.add.instructions.title": "Titel der Anweisung",
+  "prompt-library.add.instructions.text": "Anweisungstext",
+  "prompt-library.add.instructions.save": "Anleitung speichern",
 
   "prompt-library.categories.title": "Kategorien",
   "prompt-library.categories.add": "Neue Kategorie",

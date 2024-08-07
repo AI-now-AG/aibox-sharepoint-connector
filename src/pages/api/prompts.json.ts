@@ -10,7 +10,8 @@ const CreatePromptParamsSchema = z.object({
   title: z.string(),
   category: z.string(),
   group: z.string(),
-  instructions: z.string().optional(),
+  instructions: z.array(z.string().optional()),
+  knowledgebase: z.array(z.string().optional()),
   prompt: z.string(),
   documents: z.array(z.string()).optional(),
 });
@@ -21,6 +22,12 @@ export const model = new ChatOpenAI({
   apiKey: import.meta.env.OPENAI_API_KEY,
   model: "gpt-4o-mini",
 });
+
+const DeletePromptParamsSchema = z.object({
+  _id: z.string(),
+});
+
+export type DeletePromptParams = z.infer<typeof DeletePromptParamsSchema>;
 
 const instructions = `You are a helpful assistant who writes helpful descriptions of prompts for a UI:
 * You receive a prompt
@@ -59,6 +66,12 @@ export const POST: APIRoute<CreatePromptParams> = async (ctx) => {
     ...data,
     category: stringToObjectId.parse(data.category),
     group: stringToObjectId.parse(data.group),
+    instructions: data.instructions?.map((inst) =>
+      stringToObjectId.parse(inst),
+    ),
+    knowledgebase: data.knowledgebase?.map((inst) =>
+      stringToObjectId.parse(inst),
+    ),
     documents: data.documents?.map((doc) => stringToObjectId.parse(doc)),
     description,
     tenant_id: stringToObjectId.parse("66aa2169d40d0b194e280142"), // AI now AG
@@ -95,6 +108,30 @@ export const POST: APIRoute<CreatePromptParams> = async (ctx) => {
     return new Response(
       JSON.stringify({
         message: "Error while adding the prompt",
+        error: error,
+      }),
+      {
+        status: 500,
+      },
+    );
+  }
+};
+
+export const DELETE: APIRoute<DeletePromptParams> = async (ctx) => {
+  try {
+    const params = await ctx.request.json();
+    const data = DeletePromptParamsSchema.parse(params);
+
+    if (data._id) {
+      const result = await PromptModel.remove(data._id.toString());
+      return new Response(JSON.stringify(result));
+    }
+  } catch (error) {
+    console.error(error);
+
+    return new Response(
+      JSON.stringify({
+        message: "Error while fetching categories",
         error: error,
       }),
       {
