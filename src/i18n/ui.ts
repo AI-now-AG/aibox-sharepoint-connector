@@ -46,6 +46,9 @@ const en = {
 
   "prompt-library.categories.title": "Categories",
   "prompt-library.categories.add": "Add Category",
+
+  "prompt-execution.card.showMore": "more prompts",
+  "prompt-execution.card.showLess": "less prompts",
 };
 
 const de = {
@@ -87,6 +90,9 @@ const de = {
 
   "prompt-library.categories.title": "Kategorien",
   "prompt-library.categories.add": "Neue Kategorie",
+
+  "prompt-execution.card.showMore": "weitere Anregungen",
+  "prompt-execution.card.showLess": "weniger Aufforderungen",
 };
 
 export const ui = {

@@ -1,34 +1,45 @@
 ---
-import InputArea from "./Input.svelte";
+import { useTranslations } from "$i18n/utils";
+
+import CategoryModel from "$data/models/category.model";
+import PromptModel from "$data/models/prompt.model";
+import PromptExecution from "./PromptExecution.svelte";
+
+const t = useTranslations(Astro.currentLocale);
+const { category: categorySlug, group: groupSlug } = Astro.params;
+
+const category = await CategoryModel.getBySlug(categorySlug || "");
+const group = category?.groups.find((g) => g.slug === groupSlug);
+
+const cursor = await PromptModel.list();
+const prompts = await cursor.toArray();
+
+const categoryPrompt = prompts.filter(
+  (g) => g.category.toString() === category?._id.toString(),
+);
+const categoryGroupPrompt = categoryPrompt.filter(
+  (g) => g.group.toString() === group?._id.toString(),
+);
+const promptItems = categoryGroupPrompt.map((prompt) => ({
+  _id: prompt._id.toString(),
+  title: prompt.title,
+  description: prompt.description,
+}));
 ---
 
-<div
-  class="grid grid-cols-1 grid-rows-[1fr_min-content] h-full max-w-4xl mx-auto"
->
-  <div class="flex flex-col gap-8">
-    <h1 class="pt-2 lg:pt-8 text-4xl font-bold">
-      Hello User, let's write some headlines
+<div class="flex flex-col h-full max-w-6xl mx-auto">
+  <div class="space-y-6 mb-4">
+    <h1 class="text-4xl font-bold">
+      Hallo Somedia, lass uns schreiben {group?.title}
     </h1>
-    <p class="">
-      Get started with predefined prompt below or provide me your own.
-    </p>
-    <div
-      class="grid grid-cols-2 sm:grid-cols-3 lg:flex lg:flex-row lg:flex-wrap gap-4"
-    >
-      <button
-        class="btn btn-primary btn-active lg:w-48 h-auto py-4 px-2 leading-6"
-      >
-        <!-- Active variant -->
-        Summarize the main points of a pdf
-      </button>
-      <button class="btn bg-base-100 lg:w-48 h-auto py-4 px-4 leading-6"
-        >List the key points from a text</button
-      >
-      <button class="btn bg-base-100 lg:w-48 h-auto py-4 px-4 leading-6"
-        >Summarize the text with an academic focus</button
-      >
-    </div>
   </div>
-
-  <InputArea client:load />
+  {
+    promptItems.length > 0 && (
+      <PromptExecution
+        promptItems={promptItems}
+        preferredLocale={Astro.preferredLocale}
+        client:load
+      />
+    )
+  }
 </div>

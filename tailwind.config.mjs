@@ -39,6 +39,14 @@ export default {
         "blue-design": "url('/img/aibox-login-background.svg')",
       },
       keyframes: {
+        "slide-in": {
+          "0%": { transform: "scale(0.95)", opacity: "0" },
+          "100%": { transform: "scale(1)", opacity: "1" },
+        },
+        "slide-out": {
+          "0%": { transform: "scale(1)", opacity: "1" },
+          "100%": { transform: "scale(0.95)", opacity: "0" },
+        },
         typing: {
           "0%": {
             width: "0%",
@@ -58,6 +66,8 @@ export default {
         },
       },
       animation: {
+        "slide-in": "slide-in 0.5s ease-in-out forwards",
+        "slide-out": "slide-out 0.5s ease-in-out forwards",
         typing: "typing 2s steps(10) infinite alternate, blink .7s infinite",
       },
     },
@@ -109,7 +119,7 @@ export default {
           "accent-content": "#134E4A",
           neutral: "#374151",
           "neutral-focus": "#1F2937",
-          "neutral-content": "#F9FAFB",
+          "neutral-content": "#D7DDE4",
           "base-100": "#F3F4F6",
           "base-200": "#E5E7EB",
           "base-300": "#D1D5DB",
