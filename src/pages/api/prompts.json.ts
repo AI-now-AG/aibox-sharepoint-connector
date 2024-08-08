@@ -157,7 +157,7 @@ export const GET: APIRoute = async (ctx) => {
         );
       }
 
-      let instructions: any[];
+      let instructions: any[] = [];
       if (prompt?.instructions) {
         const calls = prompt.instructions.map(async (inst) => {
           const instruction = await InstructionModel.get(inst.toString());
@@ -166,7 +166,7 @@ export const GET: APIRoute = async (ctx) => {
         instructions = await Promise.all(calls);
       }
 
-      let knowledgebases: any[];
+      let knowledgebases: any[] = [];
       if (prompt?.knowledgebase) {
         const calls = prompt.knowledgebase.map(async (kb) => {
           const instruction = await KnowledgeBaseModel.get(kb.toString());
