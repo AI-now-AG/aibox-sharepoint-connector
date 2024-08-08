@@ -5,8 +5,12 @@ import { ChatOpenAI } from "@langchain/openai";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import { stringToObjectId } from "$utils/stringToObjectId";
-import InstructionModel, { type Instruction } from "$data/models/instruction.model";
-import KnowledgeBaseModel, { type KnowledgeBase } from "$data/models/knowledgeBase.model";
+import InstructionModel, {
+  type Instruction,
+} from "$data/models/instruction.model";
+import KnowledgeBaseModel, {
+  type KnowledgeBase,
+} from "$data/models/knowledgeBase.model";
 
 const CreatePromptParamsSchema = z.object({
   title: z.string(),
@@ -119,16 +123,26 @@ export const POST: APIRoute<CreatePromptParams> = async (ctx) => {
   }
 };
 
-const extractRequiredFields = (prompt: Prompt, instructions: Instruction[], knowledgebase: KnowledgeBase[]) => ({
+const extractRequiredFields = (
+  prompt: Prompt,
+  instructions: Instruction[],
+  knowledgebase: KnowledgeBase[],
+) => ({
   title: prompt.title,
   prompt: prompt.prompt,
-  instructions: instructions.map((inst) => ({ title: inst.title, instruction: inst.instruction })),
-  knowledgebase: knowledgebase.map((kb) => ({ title: kb.title, knowledge_base: kb.knowledge_base })),
+  instructions: instructions.map((inst) => ({
+    title: inst.title,
+    instruction: inst.instruction,
+  })),
+  knowledgebase: knowledgebase.map((kb) => ({
+    title: kb.title,
+    knowledge_base: kb.knowledge_base,
+  })),
 });
 
 export const GET: APIRoute = async (ctx) => {
   try {
-    const promptId = ctx.url.searchParams.get("_id")
+    const promptId = ctx.url.searchParams.get("_id");
 
     if (promptId) {
       const prompt = await PromptModel.get(promptId);
@@ -159,9 +173,12 @@ export const GET: APIRoute = async (ctx) => {
           return instruction;
         });
         knowledgebases = await Promise.all(calls);
-
       }
-      const promptData = extractRequiredFields(prompt, instructions, knowledgebases);
+      const promptData = extractRequiredFields(
+        prompt,
+        instructions,
+        knowledgebases,
+      );
 
       return new Response(JSON.stringify(promptData));
     } else {
@@ -188,7 +205,6 @@ export const GET: APIRoute = async (ctx) => {
     );
   }
 };
-
 
 export const DELETE: APIRoute<PromptParams> = async (ctx) => {
   try {
