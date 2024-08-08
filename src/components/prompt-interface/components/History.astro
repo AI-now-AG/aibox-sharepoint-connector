@@ -1,5 +1,5 @@
 ---
-
+import PromptDetails from "./PromptDetails.svelte";
 ---
 
 <div role="tablist" class="tabs tabs-bordered">
@@ -20,5 +20,7 @@
     aria-label="Settings"
     checked="checked"
   />
-  <div role="tabpanel" class="tab-content py-8 px-2">Settings content</div>
+  <div role="tabpanel" class="tab-content py-8 px-2">
+    <PromptDetails client:load />
+  </div>
 </div>

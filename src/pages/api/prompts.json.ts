@@ -5,12 +5,19 @@ import { ChatOpenAI } from "@langchain/openai";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import { stringToObjectId } from "$utils/stringToObjectId";
+import InstructionModel, {
+  type Instruction,
+} from "$data/models/instruction.model";
+import KnowledgeBaseModel, {
+  type KnowledgeBase,
+} from "$data/models/knowledgeBase.model";
 
 const CreatePromptParamsSchema = z.object({
   title: z.string(),
   category: z.string(),
   group: z.string(),
-  instructions: z.string().optional(),
+  instructions: z.array(z.string().optional()),
+  knowledgebase: z.array(z.string().optional()),
   prompt: z.string(),
   documents: z.array(z.string()).optional(),
 });
@@ -21,6 +28,12 @@ export const model = new ChatOpenAI({
   apiKey: import.meta.env.OPENAI_API_KEY,
   model: "gpt-4o-mini",
 });
+
+const PromptParamsSchema = z.object({
+  _id: z.string(),
+});
+
+export type PromptParams = z.infer<typeof PromptParamsSchema>;
 
 const instructions = `You are a helpful assistant who writes helpful descriptions of prompts for a UI:
 * You receive a prompt
@@ -59,6 +72,12 @@ export const POST: APIRoute<CreatePromptParams> = async (ctx) => {
     ...data,
     category: stringToObjectId.parse(data.category),
     group: stringToObjectId.parse(data.group),
+    instructions: data.instructions?.map((inst) =>
+      stringToObjectId.parse(inst),
+    ),
+    knowledgebase: data.knowledgebase?.map((inst) =>
+      stringToObjectId.parse(inst),
+    ),
     documents: data.documents?.map((doc) => stringToObjectId.parse(doc)),
     description,
     tenant_id: stringToObjectId.parse("66aa2169d40d0b194e280142"), // AI now AG
@@ -95,6 +114,122 @@ export const POST: APIRoute<CreatePromptParams> = async (ctx) => {
     return new Response(
       JSON.stringify({
         message: "Error while adding the prompt",
+        error: error,
+      }),
+      {
+        status: 500,
+      },
+    );
+  }
+};
+
+const extractRequiredFields = (
+  prompt: Prompt,
+  instructions: Instruction[],
+  knowledgebase: KnowledgeBase[],
+) => ({
+  title: prompt.title,
+  prompt: prompt.prompt,
+  instructions: instructions.map((inst) => ({
+    title: inst.title,
+    instruction: inst.instruction,
+  })),
+  knowledgebase: knowledgebase.map((kb) => ({
+    title: kb.title,
+    knowledge_base: kb.knowledge_base,
+  })),
+});
+
+export const GET: APIRoute = async (ctx) => {
+  try {
+    const promptId = ctx.url.searchParams.get("_id");
+
+    if (promptId) {
+      const prompt = await PromptModel.get(promptId);
+      if (!prompt) {
+        return new Response(
+          JSON.stringify({
+            message: "prompt not found",
+          }),
+          {
+            status: 400,
+          },
+        );
+      }
+
+      let instructions: any[] = [];
+      if (prompt?.instructions) {
+        const calls = prompt.instructions.map(async (inst) => {
+          const instruction = await InstructionModel.get(inst.toString());
+          return instruction;
+        });
+        instructions = await Promise.all(calls);
+      }
+
+      let knowledgebases: any[] = [];
+      if (prompt?.knowledgebase) {
+        const calls = prompt.knowledgebase.map(async (kb) => {
+          const instruction = await KnowledgeBaseModel.get(kb.toString());
+          return instruction;
+        });
+        knowledgebases = await Promise.all(calls);
+      }
+      const promptData = extractRequiredFields(
+        prompt,
+        instructions,
+        knowledgebases,
+      );
+
+      return new Response(JSON.stringify(promptData));
+    } else {
+      return new Response(
+        JSON.stringify({
+          message: "Id error while fetching the prompt",
+        }),
+        {
+          status: 400,
+        },
+      );
+    }
+  } catch (error) {
+    console.error(error);
+
+    return new Response(
+      JSON.stringify({
+        message: "Error while fetching prompt",
+        error: error,
+      }),
+      {
+        status: 500,
+      },
+    );
+  }
+};
+
+export const DELETE: APIRoute<PromptParams> = async (ctx) => {
+  try {
+    const params = await ctx.request.json();
+    const data = PromptParamsSchema.parse(params);
+
+    if (data._id) {
+      const result = await PromptModel.remove(data._id.toString());
+      return new Response(JSON.stringify(result));
+    } else {
+      return new Response(
+        JSON.stringify({
+          message: "Id error while deleting the prompt",
+        }),
+        {
+          status: 400,
+        },
+      );
+    }
+  } catch (error) {
+    console.error(error);
+
+    return new Response(
+      JSON.stringify({
+        message: "Error while deleting prompt",
         error: error,
       }),
       {

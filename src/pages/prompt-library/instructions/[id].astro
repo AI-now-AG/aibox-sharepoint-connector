@@ -1,0 +1,24 @@
+---
+import Layout from "$layouts/Layout.astro";
+import InstructionModel from "$data/models/instruction.model";
+
+export interface Props {
+  id: string;
+}
+
+const { id } = Astro.params;
+
+const instruction = id ? await InstructionModel.get(id) : undefined; // TODO: Render 404 if not found
+---
+
+<Layout>
+  <div
+    class="container max-w-5xl mx-auto p-6 grid grid-cols-1 md:grid-cols-[1fr_max-content] gap-8"
+  >
+    {
+      instruction && (
+        <h1 class="pt-2 lg:pt-8 text-4xl font-bold">{instruction.title}</h1>
+      )
+    }
+  </div>
+</Layout>

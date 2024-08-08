@@ -1,12 +1,7 @@
-<script>
+<script lang="ts">
   // TODO: Us checkboxes instead of anchors, it's what they are used for. That
   // way we don't have to manage selected state ourselves.
-  export let title;
-  export let placeholder;
-  export let items;
-  export let selectedItems = [];
-
-  const addOrRemoveInputType = (array, item) => {
+  const addOrRemoveInputType = (array: Item[], item: Item) => {
     const exists = array.includes(item);
 
     if (exists) {
@@ -20,9 +15,25 @@
     }
   };
 
-  function handleSelectedItems(event) {
-    const currentSelected = event.target.innerText;
-    selectedItems = addOrRemoveInputType(selectedItems, currentSelected);
+  type Item = { title: string } | string;
+
+  export let title;
+  export let placeholder;
+  export let items: Item[];
+  export let selectedItems: Item[] | [];
+
+  $: {
+    if (items) {
+      resetSelection();
+    }
+  }
+
+  const resetSelection = () => {
+    selectedItems = [];
+  };
+
+  function handleSelectedItems(selected: Item) {
+    selectedItems = addOrRemoveInputType(selectedItems!, selected);
   }
 </script>
 
@@ -50,7 +61,7 @@
       <input
         type="text"
         {placeholder}
-        value={selectedItems.join(", ")}
+        value={selectedItems?.map((e) => e.title).join(", ")}
         tabindex="9"
         role="button"
         class="grow font-medium w-full min-w-xs"
@@ -72,18 +83,20 @@
         />
       </svg>
     </label>
-    <ul
-      tabindex="9"
-      class="dropdown-content menu bg-base-100 space-y-2 rounded-box z-[1] w-52 p-2 shadow"
-    >
-      {#each items as item}
-        <li on:click={handleSelectedItems}>
-          <a
-            class={`${selectedItems.includes(item) ? "bg-primary text-base-100 hover:bg-primary" : "hover:text-neutral"}`}
-            >{item}
-          </a>
-        </li>
-      {/each}
-    </ul>
+    {#if items}
+      <ul
+        tabindex="9"
+        class="dropdown-content menu bg-base-100 space-y-2 rounded-box z-[1] w-52 p-2 shadow"
+      >
+        {#each items as item}
+          <li on:click|preventDefault={() => handleSelectedItems(item)}>
+            <a
+              class={`${selectedItems?.includes(item) ? "bg-primary text-base-100 hover:bg-primary" : "hover:text-neutral"}`}
+              >{item.title}
+            </a>
+          </li>
+        {/each}
+      </ul>
+    {/if}
   </div>
 </div>

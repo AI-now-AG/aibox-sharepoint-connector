@@ -1,5 +1,5 @@
 <script>
-  import PromptCard from "$components/prompt-interface/components/PromptCard.svelte";
+  import ExecutionCard from "$components/prompt-interface/components/ExecutionCard.svelte";
   import InputArea from "./Input.svelte";
   import PromptResults from "./PromptResults.svelte";
 
@@ -18,7 +18,7 @@
           {promptItems.filter((e) => e._id === selectedPromptId)[0].description}
         {/if}
       </p>
-      <PromptCard cards={promptItems} bind:selectedPromptId {preferredLocale} />
+      <ExecutionCard cards={promptItems} bind:selectedPromptId {preferredLocale} />
     </div>
   {/if}
   <PromptResults bind:input bind:output />

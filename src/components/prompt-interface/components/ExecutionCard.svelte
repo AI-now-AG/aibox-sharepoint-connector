@@ -3,6 +3,7 @@
   import { useTranslations } from "$i18n/utils";
   export let preferredLocale;
   const t = useTranslations(preferredLocale);
+  import { storePromptId } from '$components/prompt-interface/components/Stores';
 
   let showMore = false;
   let selectedCardIndex = null;
@@ -15,6 +16,7 @@
   onMount(async function () {
     selectedCardIndex = 0;
     selectedPromptId = cards[0]._id;
+    storePromptId.set(selectedPromptId);
   });
 
   function selectCard(index) {
@@ -22,6 +24,7 @@
     selectedCardIndex = index;
     // selectedCardIndex = index === selectedCardIndex ? null : index;
     selectedPromptId = promptId;
+    storePromptId.set(selectedPromptId);
   }
 </script>
 
