@@ -5,7 +5,6 @@ import CategoryModel from "$data/models/category.model";
 import PromptModel from "$data/models/prompt.model";
 import PromptExecution from "./PromptExecution.svelte";
 
-const t = useTranslations(Astro.currentLocale);
 const { category: categorySlug, group: groupSlug } = Astro.params;
 
 const category = await CategoryModel.getBySlug(categorySlug || "");
