@@ -3,9 +3,11 @@ import Head from "$layouts/Head.astro";
 import { useTranslations } from "$i18n/utils";
 
 const t = useTranslations(Astro.preferredLocale);
+
+const theme = (Astro.locals.username === "Somedia") ? "somedia" : "somedia"
 ---
 
-<html lang="en" data-theme="somedia">
+<html lang="en" data-theme={theme}>
   <Head />
 
   <body>

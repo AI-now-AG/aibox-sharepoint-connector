@@ -55,9 +55,9 @@ const extractRequiredFields = (knowledgeBases: any) => {
   }));
 };
 
-export const GET: APIRoute = async () => {
+export const GET: APIRoute = async (ctx) => {
   try {
-    const result = await KnowledgeBaseModel.list();
+    const result = await KnowledgeBaseModel.listByUser(ctx.locals.userId);
     const data = extractRequiredFields(await result.toArray());
     return new Response(JSON.stringify(data));
   } catch (error) {
@@ -92,8 +92,8 @@ export const POST: APIRoute<CreateKnowledgeBaseParams> = async (ctx) => {
   const knowledgeBase: KnowledgeBase = {
     ...data,
     description,
-    tenant_id: stringToObjectId.parse("66aa2169d40d0b194e280142"), // AI now AG
-    creator_id: stringToObjectId.parse("669e044a6e55bbb8fe31a868"), // admin@aibox.ch
+    tenant_id: stringToObjectId.parse(ctx.locals.tenantId), // AI now AG
+    creator_id: stringToObjectId.parse(ctx.locals.userId), // admin@aibox.ch
     created_at: new Date(),
     updated_at: new Date(),
   };

@@ -21,10 +21,12 @@ const {
   description = t("site.description"),
   isFooterVisible = false,
 } = Astro.props;
+
+const theme = (Astro.locals.username === "Somedia") ? "somedia" : "light"
 ---
 
 <!doctype html>
-<html lang="en" data-theme="somedia">
+<html lang="en" data-theme={theme}>
   <Head {title} {description} />
   <body class="min-h-screen grid grid-rows-[min-content_1fr]">
     <Header />

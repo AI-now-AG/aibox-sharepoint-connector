@@ -32,5 +32,10 @@ export default {
     return collection.findOne<Document<Instruction>>({ _id });
   },
 
-  list: async () => collection.find<Document<Instruction>>({}),
+  list: async () => collection.find<Document<Instruction>>({}).sort({created_at: 1}),
+
+  listByUser: async (id: string) => {
+    const _id = new ObjectId(id);
+    return collection.find<Document<Instruction>>({ creator_id: _id }).sort({created_at: 1})
+  },
 };

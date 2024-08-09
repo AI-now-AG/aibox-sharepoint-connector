@@ -55,9 +55,9 @@ const extractRequiredFields = (instuctions: any) => {
   }));
 };
 
-export const GET: APIRoute = async () => {
+export const GET: APIRoute = async (ctx) => {
   try {
-    const result = await InstructionModel.list();
+    const result = await InstructionModel.listByUser(ctx.locals.userId);
     const data = extractRequiredFields(await result.toArray());
     return new Response(JSON.stringify(data));
   } catch (error) {
@@ -87,8 +87,8 @@ export const POST: APIRoute<CreateInstructionParams> = async (ctx) => {
   const instruction: Instruction = {
     ...data,
     description,
-    tenant_id: stringToObjectId.parse("66aa2169d40d0b194e280142"), // AI now AG
-    creator_id: stringToObjectId.parse("669e044a6e55bbb8fe31a868"), // admin@aibox.ch
+    tenant_id: stringToObjectId.parse(ctx.locals.tenantId), // AI now AG
+    creator_id: stringToObjectId.parse(ctx.locals.userId), // admin@aibox.ch
     created_at: new Date(),
     updated_at: new Date(),
   };

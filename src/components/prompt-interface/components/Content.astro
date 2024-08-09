@@ -1,6 +1,4 @@
 ---
-import { useTranslations } from "$i18n/utils";
-
 import CategoryModel from "$data/models/category.model";
 import PromptModel from "$data/models/prompt.model";
 import PromptExecution from "./PromptExecution.svelte";
@@ -10,7 +8,7 @@ const { category: categorySlug, group: groupSlug } = Astro.params;
 const category = await CategoryModel.getBySlug(categorySlug || "");
 const group = category?.groups.find((g) => g.slug === groupSlug);
 
-const cursor = await PromptModel.list();
+const cursor = await PromptModel.listByUser(Astro.locals.userId);
 const prompts = await cursor.toArray();
 
 const categoryPrompt = prompts.filter(
@@ -29,7 +27,7 @@ const promptItems = categoryGroupPrompt.map((prompt) => ({
 <div class="flex flex-col h-full max-w-6xl mx-auto">
   <div class="space-y-6 mb-4">
     <h1 class="text-4xl font-bold">
-      Hallo Somedia, lass uns schreiben {group?.title}
+      Hallo {Astro.locals.username}, lass uns schreiben {group?.title}
     </h1>
   </div>
   {

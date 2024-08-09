@@ -32,5 +32,10 @@ export default {
     return collection.findOne<Document<KnowledgeBase>>({ _id });
   },
 
-  list: async () => collection.find<Document<KnowledgeBase>>({}),
+  list: async () => collection.find<Document<KnowledgeBase>>({}).sort({created_at: 1}),
+
+  listByUser: async (id: string) => {
+    const _id = new ObjectId(id);
+    return collection.find<Document<KnowledgeBase>>({ creator_id: _id }).sort({created_at: 1})
+  },
 };

@@ -5,7 +5,7 @@ import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
 
 const t = useTranslations(Astro.preferredLocale);
 
-const knowledgeBaseCursor = await KnowledgeBaseModel.list();
+const knowledgeBaseCursor = await KnowledgeBaseModel.listByUser(Astro.locals.userId);
 const knowledgeBases = await knowledgeBaseCursor.toArray();
 
 let index = 1;
