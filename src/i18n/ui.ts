@@ -96,9 +96,9 @@ const de = {
   "nav.all-widgets": "Alle KI-Widgets",
   "nav.text-writing": "Redaktion",
   "nav.settings": "Einstellungen",
-  "nav.settings.prompts": "Aufforderungen",
-  "nav.settings.instructions": "Anweisungen",
-  "nav.settings.knowledge-base": "Wissensbasis",
+  "nav.settings.prompts": "Prompts",
+  "nav.settings.instructions": "Instructions",
+  "nav.settings.knowledge-base": "Knowledge Base",
   "nav.settings.categories": "Kategorien",
 
   "login.welcome": "Willkommen bei der",
@@ -113,7 +113,7 @@ const de = {
   "welcome.get-started": "Los geht's",
   "welcome.explore": "Mehr Widgets entdecken",
 
-  "prompt-library.prompts.title": "Prompte Verwaltung",
+  "prompt-library.prompts.title": "Prompt Management",
   "prompt-library.prompts.add": "Neuer Prompt",
   "prompt-library.prompts.search": "Geben Sie hier ein",
   "prompt-library.prompts.filter": "Filter",
@@ -128,7 +128,7 @@ const de = {
   "prompt-library.add.prompts.knowledge-base": "Wissensbasis",
   "prompt-library.add.prompts.save": "Eingabeaufforderung speichern",
 
-  "prompt-library.instructions.title": "Unterrichtsverwaltung",
+  "prompt-library.instructions.title": "Instruction Management",
   "prompt-library.instructions.add": "Anweisung hinzufügen",
   "prompt-library.instructions.all": "Alle Anweisungen",
   "prompt-library.instructions.view": "View",
