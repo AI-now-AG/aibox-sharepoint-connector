@@ -6,7 +6,7 @@ import type { APIRoute } from "astro";
 
 export const model = new ChatOpenAI({
   apiKey: import.meta.env.OPENAI_API_KEY,
-  model: "gpt-4o",
+  model: import.meta.env.OPENAI_MODEL,
 });
 
 const promptText = `Create three headlines for a Swiss press article in german language. The article covers the following topic. Ensure that the headlines align with the style and expectations of Swiss press articles and your knowledge base. Follow the specific instructions provided.

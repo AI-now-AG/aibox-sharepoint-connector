@@ -12,7 +12,7 @@ import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
 
 export const model = new ChatOpenAI({
   apiKey: import.meta.env.OPENAI_API_KEY,
-  model: "gpt-4o",
+  model: import.meta.env.OPENAI_MODEL,
 });
 
 export const POST: APIRoute = async (ctx) => {
