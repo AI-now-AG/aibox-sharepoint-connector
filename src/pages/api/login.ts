@@ -34,7 +34,7 @@ export const POST: APIRoute = async (ctx) => {
     const user = await UserModel.get(email);
 
     if (user && (await verify(password, user.password))) {
-      const token = await new SignJWT({})
+      const token = await new SignJWT({ userId: user._id, username: user.username, tenantId: user.tenant_id})
         .setProtectedHeader({ alg: "HS256" })
         .setJti(nanoid())
         .setIssuedAt()

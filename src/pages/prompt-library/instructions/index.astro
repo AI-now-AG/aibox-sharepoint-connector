@@ -5,7 +5,7 @@ import InstructionModel from "$data/models/instruction.model";
 
 const t = useTranslations(Astro.preferredLocale);
 
-const instructionsCursor = await InstructionModel.list();
+const instructionsCursor = await InstructionModel.listByUser(Astro.locals.userId);
 const instructions = await instructionsCursor.toArray();
 
 let index = 1;

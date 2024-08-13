@@ -6,7 +6,7 @@ import { useTranslations } from "$i18n/utils";
 
 const t = useTranslations(Astro.preferredLocale);
 
-const navItems = [
+let navItems = [
   {
     name: t("header.introduction"),
     path: "/",
@@ -41,6 +41,14 @@ const navItems = [
     ],
   },
 ];
+
+if (Astro.locals.username != "Somedia") {
+  let idx = navItems[2].list?.findIndex((e) => e.name == "Somedia")
+  if (idx && idx > -1){
+    console.log(idx)
+    navItems[2].list?.splice(idx, 1);
+  }
+}
 ---
 
 <style is:global>

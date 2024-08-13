@@ -37,5 +37,10 @@ export default {
     return collection.findOne<Document<Prompt>>({ _id });
   },
 
-  list: async () => collection.find<Document<Prompt>>({}),
+  list: async () => collection.find<Document<Prompt>>({}).sort({created_at: 1}),
+
+  listByUser: async (id: string) => {
+    const _id = new ObjectId(id);
+    return collection.find<Document<Prompt>>({ creator_id: _id }).sort({created_at: 1})
+  },
 };

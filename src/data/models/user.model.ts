@@ -5,6 +5,7 @@ import { z } from "zod";
 const UserSchema = z.object({
   tenant_id: z.instanceof(ObjectId),
   username: z.string().min(2),
+  email: z.string(),
   password: z.string().min(8),
   roles: z.array(z.string()),
   created_at: z.date(),

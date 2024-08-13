@@ -51,7 +51,12 @@ export default {
     );
   },
 
-  list: async () => collection.find<Document<Category>>({}),
+  list: async () => collection.find<Document<Category>>({}).sort({created_at: 1}).sort({created_at: 1}),
+
+  listByUser: async (id: string) => {
+    const _id = new ObjectId(id);
+    return collection.find<Document<Category>>({ creator_id: _id }).sort({created_at: 1})
+  },
 
   get: async (id: string) => {
     const _id = new ObjectId(id);
