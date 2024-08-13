@@ -19,7 +19,7 @@ export type CreateKnowledgeBaseParams = z.infer<
 
 export const model = new ChatOpenAI({
   apiKey: import.meta.env.OPENAI_API_KEY,
-  model: "gpt-4o-mini",
+  model: import.meta.env.OPENAI_MODEL,
 });
 
 const knowledgeBaseInfo = `You are a helpful assistant who writes helpful descriptions of knowledge base for a UI:

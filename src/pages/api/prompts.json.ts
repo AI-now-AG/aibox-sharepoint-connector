@@ -26,7 +26,7 @@ export type CreatePromptParams = z.infer<typeof CreatePromptParamsSchema>;
 
 export const model = new ChatOpenAI({
   apiKey: import.meta.env.OPENAI_API_KEY,
-  model: "gpt-4o-mini",
+  model: import.meta.env.OPENAI_MODEL,
 });
 
 const PromptParamsSchema = z.object({
