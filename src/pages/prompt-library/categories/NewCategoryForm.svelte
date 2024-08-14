@@ -30,7 +30,7 @@
     } else if (groups && groups.length > 0) {
       const newCategory: CreateCategoryParams = {
         title,
-        groups: groups.map((e) => ({_id: e._id?.toString(), title: e.title})),
+        groups: groups.map((e) => ({_id: e._id, title: e.title})),
         ...(categoryId && { _id: categoryId }),
       };
       

@@ -9,7 +9,7 @@ export interface Props {
 
 const { id } = Astro.params;
 
-const prompt = id ? await Prompts.get(id) : undefined; // TODO: Render 404 if not found
+const prompt = id ? await Prompts.getAsString(id) : undefined; // TODO: Render 404 if not found
 ---
 
 <Layout>

@@ -7,11 +7,11 @@ import CategoryModel from "$data/models/category.model";
 import type { Category, Group } from "$data/models/category.model";
 
 const CreateCategoryParamsSchema = z.object({
-  _id: z.string().optional(), // expecting a string
+  _id: z.instanceof(ObjectId).optional(),
   title: z.string(),
   groups: z.array(
     z.object({
-      _id: z.string().optional(), // expecting a string
+      _id: z.instanceof(ObjectId).optional(),
       title: z.string(),
     }),
   ),

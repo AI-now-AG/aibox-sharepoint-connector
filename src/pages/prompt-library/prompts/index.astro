@@ -26,7 +26,7 @@ const promptsEnriched = prompts.map((prompt) => {
   );
 
   const group = category?.groups.find(
-    (g) => g._id.toString() === prompt.group.toString(),
+    (g) => g._id?.toString() === prompt.group.toString(),
   );
 
   return {

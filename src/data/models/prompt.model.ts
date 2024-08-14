@@ -21,8 +21,8 @@ const convertObjectIdToString = (doc: Document<Prompt>) => {
   return {
     ...doc,
     _id: doc._id.toString(),
-    tenant_id: doc.tenant_id.toString(),
-    creator_id: doc.creator_id.toString(),
+    tenant_id: doc.tenant_id?.toString(),
+    creator_id: doc.creator_id?.toString(),
     category: doc.category.toString(),
     group: doc.group.toString(),
     instructions: doc.instructions?.map((id) => id.toString()),
@@ -48,7 +48,11 @@ export default {
 
   get: async (id: string) => {
     const _id = new ObjectId(id);
-    //return collection.findOne<Document<Prompt>>({ _id });
+    return collection.findOne<Document<Prompt>>({ _id });
+  },
+
+  getAsString: async (id: string) => {
+    const _id = new ObjectId(id);
     const doc = await collection.findOne<Document<Prompt>>({ _id });
     if (!doc) return null;
     return convertObjectIdToString(doc);
