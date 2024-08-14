@@ -7,15 +7,14 @@ import CategoryModel from "$data/models/category.model";
 import type { Category, Group } from "$data/models/category.model";
 
 const CreateCategoryParamsSchema = z.object({
-  _id: z.instanceof(ObjectId).optional(),
+  _id: z.string().optional(),
   title: z.string(),
   groups: z.array(
     z.object({
-      _id: z.instanceof(ObjectId).optional(),
+      _id: z.string().optional(),
       title: z.string(),
     }),
   ),
-  // other fields...
 });
 
 export type CreateCategoryParams = z.infer<typeof CreateCategoryParamsSchema>;
@@ -118,7 +117,6 @@ export const PUT: APIRoute = async (ctx) => {
       slug: slug(group.title),
     })),
   );
-
   const newCategory: Category = {
     ...data,
     title: data.title,
