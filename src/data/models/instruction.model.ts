@@ -3,12 +3,12 @@ import { db, type Document } from "../mongodb";
 import { z } from "zod";
 
 const InstructionSchema = z.object({
-  tenant_id: z.instanceof(ObjectId),
-  creator_id: z.instanceof(ObjectId),
+  tenant_id: z.instanceof(ObjectId).optional(),
+  creator_id: z.instanceof(ObjectId).optional(),
   title: z.string(),
   description: z.string(),
   instruction: z.string(),
-  created_at: z.date(),
+  created_at: z.date().optional(),
   updated_at: z.date(),
 });
 
@@ -32,10 +32,23 @@ export default {
     return collection.findOne<Document<Instruction>>({ _id });
   },
 
-  list: async () => collection.find<Document<Instruction>>({}).sort({created_at: 1}),
+  list: async () =>
+    collection.find<Document<Instruction>>({}).sort({ created_at: 1 }),
 
   listByUser: async (id: string) => {
     const _id = new ObjectId(id);
-    return collection.find<Document<Instruction>>({ creator_id: _id }).sort({created_at: 1})
+    return collection
+      .find<Document<Instruction>>({ creator_id: _id })
+      .sort({ created_at: 1 });
+  },
+
+  update: async (id: string, updatedInstruction: Partial<Instruction>) => {
+    const _id = new ObjectId(id);
+    const validated = InstructionSchema.partial().parse(updatedInstruction);
+    const result = await collection.updateOne(
+      { _id },
+      { $set: { ...validated } },
+    );
+    return result;
   },
 };

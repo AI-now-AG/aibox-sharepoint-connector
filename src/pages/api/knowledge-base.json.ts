@@ -9,6 +9,7 @@ import { StringOutputParser } from "@langchain/core/output_parsers";
 import { stringToObjectId } from "$utils/stringToObjectId";
 
 const CreateKnowledgeBaseParamsSchema = z.object({
+  _id: z.string().optional(),
   title: z.string(),
   knowledge_base: z.string(),
 });
@@ -16,6 +17,12 @@ const CreateKnowledgeBaseParamsSchema = z.object({
 export type CreateKnowledgeBaseParams = z.infer<
   typeof CreateKnowledgeBaseParamsSchema
 >;
+
+const KnowledgeBaseParamsSchema = z.object({
+  _id: z.string(),
+});
+
+export type KnowledgeBaseParams = z.infer<typeof KnowledgeBaseParamsSchema>;
 
 export const model = new ChatOpenAI({
   apiKey: import.meta.env.OPENAI_API_KEY,
@@ -83,9 +90,6 @@ export const POST: APIRoute<CreateKnowledgeBaseParams> = async (ctx) => {
   const description = await generateKnowledgeBaseDescription(
     data.knowledge_base,
   );
-  console.log("----");
-  console.log(data);
-  console.log("----");
   // TODO: Here we would add user informations like the tenant and the user id. We don't have that
   // feature to get these just based on the token for now. Wait until the Auth0 task is done. Until
   // then we use fixed values.
@@ -97,9 +101,6 @@ export const POST: APIRoute<CreateKnowledgeBaseParams> = async (ctx) => {
     created_at: new Date(),
     updated_at: new Date(),
   };
-  console.log("---1-");
-  console.log(knowledgeBase);
-  console.log("---2-");
   try {
     if (knowledgeBase) {
       await KnowledgeBaseModel.add(knowledgeBase);
@@ -128,6 +129,89 @@ export const POST: APIRoute<CreateKnowledgeBaseParams> = async (ctx) => {
     return new Response(
       JSON.stringify({
         message: "Error while adding the Knowledgebase",
+        error: error,
+      }),
+      {
+        status: 500,
+      },
+    );
+  }
+};
+
+export const PUT: APIRoute<CreateKnowledgeBaseParams> = async (ctx) => {
+  const params = await ctx.request.json();
+  const data = CreateKnowledgeBaseParamsSchema.parse(params);
+
+  // We generate a description based on the KnowledgeBase
+  const description = await generateKnowledgeBaseDescription(
+    data.knowledge_base,
+  );
+  const knowledgeBase: KnowledgeBase = {
+    ...data,
+    description,
+    updated_at: new Date(),
+  };
+  try {
+    if (knowledgeBase && data._id) {
+      await KnowledgeBaseModel.update(data._id, knowledgeBase);
+
+      return new Response(
+        JSON.stringify({
+          message: "Knowledgebase updated",
+        }),
+        {
+          status: 200,
+        },
+      );
+    } else {
+      return new Response(
+        JSON.stringify({
+          message: "Error while updating the Knowledge base",
+        }),
+        {
+          status: 400,
+        },
+      );
+    }
+  } catch (error) {
+    console.debug(error);
+
+    return new Response(
+      JSON.stringify({
+        message: "Error while updating the Knowledge base",
+        error: error,
+      }),
+      {
+        status: 500,
+      },
+    );
+  }
+};
+
+export const DELETE: APIRoute<KnowledgeBaseParams> = async (ctx) => {
+  try {
+    const params = await ctx.request.json();
+    const data = KnowledgeBaseParamsSchema.parse(params);
+
+    if (data._id) {
+      const result = await KnowledgeBaseModel.remove(data._id.toString());
+      return new Response(JSON.stringify(result));
+    } else {
+      return new Response(
+        JSON.stringify({
+          message: "Id error while deleting the Knowledge base",
+        }),
+        {
+          status: 400,
+        },
+      );
+    }
+  } catch (error) {
+    console.error(error);
+
+    return new Response(
+      JSON.stringify({
+        message: "Error while deleting Knowledge base",
         error: error,
       }),
       {

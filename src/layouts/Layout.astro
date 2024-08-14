@@ -22,7 +22,7 @@ const {
   isFooterVisible = false,
 } = Astro.props;
 
-const theme = (Astro.locals.username === "Somedia") ? "somedia" : "light"
+const theme = Astro.locals.username === "Somedia" ? "somedia" : "light";
 ---
 
 <!doctype html>

@@ -9,6 +9,7 @@ import { StringOutputParser } from "@langchain/core/output_parsers";
 import { stringToObjectId } from "$utils/stringToObjectId";
 
 const CreateInstructionParamsSchema = z.object({
+  _id: z.string().optional(),
   title: z.string(),
   instruction: z.string(),
 });
@@ -16,6 +17,12 @@ const CreateInstructionParamsSchema = z.object({
 export type CreateInstructionParams = z.infer<
   typeof CreateInstructionParamsSchema
 >;
+
+const InstructionParamsSchema = z.object({
+  _id: z.string(),
+});
+
+export type InstructionParams = z.infer<typeof InstructionParamsSchema>;
 
 export const model = new ChatOpenAI({
   apiKey: import.meta.env.OPENAI_API_KEY,
@@ -120,6 +127,90 @@ export const POST: APIRoute<CreateInstructionParams> = async (ctx) => {
     return new Response(
       JSON.stringify({
         message: "Error while adding the intruction",
+        error: error,
+      }),
+      {
+        status: 500,
+      },
+    );
+  }
+};
+
+export const PUT: APIRoute<CreateInstructionParams> = async (ctx) => {
+  const params = await ctx.request.json();
+  const data = CreateInstructionParamsSchema.parse(params);
+
+  // We generate a description based on the instruction
+  const description = await generateInstructionDescription(data.instruction);
+  // TODO: Here we would add user informations like the tenant and the user id. We don't have that
+  // feature to get these just based on the token for now. Wait until the Auth0 task is done. Until
+  // then we use fixed values.
+  const instruction: Instruction = {
+    ...data,
+    description,
+    updated_at: new Date(),
+  };
+  try {
+    if (instruction && data._id) {
+      await InstructionModel.update(data._id, instruction);
+
+      return new Response(
+        JSON.stringify({
+          message: "Intruction updated",
+        }),
+        {
+          status: 200,
+        },
+      );
+    } else {
+      return new Response(
+        JSON.stringify({
+          message: "Error while updating the intruction",
+        }),
+        {
+          status: 400,
+        },
+      );
+    }
+  } catch (error) {
+    console.debug(error);
+
+    return new Response(
+      JSON.stringify({
+        message: "Error while updating the intruction",
+        error: error,
+      }),
+      {
+        status: 500,
+      },
+    );
+  }
+};
+
+export const DELETE: APIRoute<InstructionParams> = async (ctx) => {
+  try {
+    const params = await ctx.request.json();
+    const data = InstructionParamsSchema.parse(params);
+
+    if (data._id) {
+      const result = await InstructionModel.remove(data._id.toString());
+      return new Response(JSON.stringify(result));
+    } else {
+      return new Response(
+        JSON.stringify({
+          message: "Id error while deleting the instruction",
+        }),
+        {
+          status: 400,
+        },
+      );
+    }
+  } catch (error) {
+    console.error(error);
+
+    return new Response(
+      JSON.stringify({
+        message: "Error while deleting instruction",
         error: error,
       }),
       {

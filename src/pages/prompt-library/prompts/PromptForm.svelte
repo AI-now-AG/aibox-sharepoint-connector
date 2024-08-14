@@ -1,10 +1,11 @@
 <script lang="ts">
-  import SingleInput from "./SingleInput.svelte";
+  import SingleInput from "$pages/prompt-library/prompts/SingleInput.svelte";
   import type { CreatePromptParams } from "$pages/api/prompts.json";
   import { useTranslations } from "$i18n/utils";
 
   import { onMount } from "svelte";
-  import MultiInput from "./MultiInput.svelte";
+  import MultiInput from "$pages/prompt-library/prompts/MultiInput.svelte";
+  import type { Prompt } from "$data/models/prompt.model";
   export let preferredLocale;
   const t = useTranslations(preferredLocale);
 
@@ -38,31 +39,77 @@
   let promptTitle = "";
   let promptText = "";
 
+  export let promptId: string;
+  export let prompt: Prompt;
+  let isSaving = false;
+
   onMount(async function () {
     const response = await fetch("/api/categories.json", { method: "GET" });
     const data = await response.json();
     if (data) {
       categories = data;
     }
-    
+
+    await fetchInstructionAndKB();
+
+    if (prompt) {
+      promptTitle = prompt.title;
+      promptText = prompt.prompt;
+
+      const category = categories.find(
+        (e) => e._id == prompt.category.toString(),
+      );
+      if (category) {
+        selectedCategory = category;
+      }
+
+      const group = category?.groups.find(
+        (e) => e._id == prompt.group.toString(),
+      );
+      if (group) {
+        selectedGroup = group;
+      }
+    }
+  });
+
+  async function fetchInstructionAndKB() {
     const instructionResponse = await fetch("/api/instructions.json", {
       method: "GET",
     });
     const instructionData = await instructionResponse.json();
     if (instructionData) {
+      if (prompt) {
+        prompt.instructions?.forEach((instructionObj) => {
+          const instruction = instructionData.find(
+            (e: any) => e._id == instructionObj.toString(),
+          );
+          if (instruction) {
+            selectedInstructions.push(instruction);
+          }
+        });
+      }
       instructions = instructionData;
     }
-    
+
     const knowledgeBaseResponse = await fetch("/api/knowledge-base.json", {
       method: "GET",
     });
     const knowledgeBaseData = await knowledgeBaseResponse.json();
     if (knowledgeBaseData) {
+      if (prompt) {
+        prompt.knowledgebase?.forEach((kbObj) => {
+          const kb = knowledgeBaseData.find((e) => e._id == kbObj.toString());
+          if (kb) {
+            selectedKnowledgeBases.push(kb);
+          }
+        });
+      }
       knowledgeBases = knowledgeBaseData;
     }
-  });
+  }
 
   async function savePrompt() {
+    isSaving = true;
     const newPrompt: CreatePromptParams = {
       title: promptTitle,
       category: selectedCategory._id,
@@ -70,16 +117,18 @@
       prompt: promptText,
       instructions: selectedInstructions.map((inst) => inst._id),
       knowledgebase: selectedKnowledgeBases.map((inst) => inst._id),
+      ...(promptId && { _id: promptId }),
     };
 
     const response = await fetch("/api/prompts.json", {
-      method: "POST",
+      method: prompt ? "PUT" : "POST",
       body: JSON.stringify(newPrompt),
       headers: {
         "Content-Type": "application/json",
       },
     });
     const data = await response.json();
+    isSaving = false;
     alert(data.message);
   }
 </script>
@@ -87,7 +136,11 @@
 <div class="container max-w-5xl p-6 mx-auto p-4">
   <div class="w-full min-w-xs pt-2 lg:pt-6">
     <h1 class="pt-2 text-4xl font-bold pb-6">
-      {t("prompt-library.prompts.add")}
+      {#if prompt}
+        {t("prompt-library.prompts.edit")}
+      {:else}
+        {t("prompt-library.prompts.add")}
+      {/if}
     </h1>
     <form class="rounded pt-6 mb-4 space-y-6">
       <div class="grid grid-cols-1 gap-4 justify-center">
@@ -159,12 +212,17 @@
 
       <div class="flex items-center justify-between">
         <button
-          class="btn btn-active btn-primary py-4 px-8 font-normal"
+          class={`btn btn-active btn-primary px-8 font-normal ${isSaving && "btn-disabled"}`}
           on:click|preventDefault={savePrompt}
         >
-          {t("prompt-library.add.prompts.save")}
+          {#if isSaving}
+            <span class="loading loading-spinner"></span>
+            {t("prompt-library.add.prompts.saving")}
+          {:else}
+            {t("prompt-library.add.prompts.save")}
+          {/if}
         </button>
-        <button class="btn btn-active btn-ghost py-4 px-8 font-normal">
+        <button class="btn btn-active btn-ghost px-8 font-normal">
           Try It Out
         </button>
       </div>

@@ -7,15 +7,19 @@
   export let placeholder;
   export let items: Item[];
   export let selectedItem: Item | undefined;
+  let inputValue = "";
 
   $: {
-    if (items) {
+    if (selectedItem) {
+      setInputValue();
+    } else if (items) {
       resetSelection();
     }
   }
 
   const resetSelection = () => {
     selectedItem = undefined;
+    setInputValue();
   };
 
   function handleSelectedItems(selected: Item) {
@@ -23,7 +27,17 @@
       resetSelection();
     } else {
       selectedItem = selected;
+      setInputValue();
     }
+  }
+
+  function setInputValue() {
+    inputValue =
+      (selectedItem &&
+        (typeof selectedItem === "string"
+          ? selectedItem
+          : selectedItem.title)) ||
+      "";
   }
 </script>
 
@@ -32,11 +46,7 @@
   <div class="dropdown dropdown-bottom w-full min-w-xs">
     <input
       {placeholder}
-      value={(selectedItem &&
-        (typeof selectedItem === "string"
-          ? selectedItem
-          : selectedItem.title)) ||
-        ""}
+      bind:value={inputValue}
       tabindex="2"
       role="button"
       class="input input-bordered font-medium w-full min-w-xs"

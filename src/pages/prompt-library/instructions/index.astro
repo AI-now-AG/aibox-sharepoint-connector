@@ -2,10 +2,13 @@
 import Layout from "$layouts/Layout.astro";
 import { useTranslations } from "$i18n/utils";
 import InstructionModel from "$data/models/instruction.model";
+import InstructionCard from "$components/InstructionCard.svelte";
 
 const t = useTranslations(Astro.preferredLocale);
 
-const instructionsCursor = await InstructionModel.listByUser(Astro.locals.userId);
+const instructionsCursor = await InstructionModel.listByUser(
+  Astro.locals.userId,
+);
 const instructions = await instructionsCursor.toArray();
 
 let index = 1;
@@ -68,36 +71,9 @@ const instructionsEnriched = instructions.map((instruction) => ({
     </label>
   </div>
 
-  <div class="container max-w-5xl mx-auto p-6 space-y-4">
-    <label class="text-lg font-normal text-base-content/80"
-      >{t("prompt-library.instructions.all")}</label
-    >
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-      {
-        instructionsEnriched.map((instruction) => (
-          <div class="card bg-base-100 shadow-xl">
-            <div class="card-body space-y-2">
-              <div class="card-actions justify-start">
-                <div class="badge px-2 bg-neutral text-neutral-content">
-                  {instruction.number}
-                </div>
-              </div>
-              <h2 class="card-title">{instruction.title}</h2>
-              <p class="text-base-content/60 line-clamp-3">
-                {instruction.description}
-              </p>
-              <div class="card-actions mt-4">
-                <a
-                  href={`instructions/${instruction._id.toString()}`}
-                  class="btn btn-primary font-light"
-                >
-                  {t("prompt-library.instructions.view")}
-                </a>
-              </div>
-            </div>
-          </div>
-        ))
-      }
-    </div>
-  </div>
+  <InstructionCard
+    instructionEnriched={instructionsEnriched}
+    preferredLocale={Astro.preferredLocale}
+    client:load
+  />
 </Layout>

@@ -1,6 +1,13 @@
 <script lang="ts">
+  import { onMount, afterUpdate } from "svelte";
+
   // TODO: Us checkboxes instead of anchors, it's what they are used for. That
   // way we don't have to manage selected state ourselves.
+
+  afterUpdate(() => {
+    inputValue = selectedItems?.map((e) => e.title).join(", ")
+  });
+  
   const addOrRemoveInputType = (array: Item[], item: Item) => {
     const exists = array.includes(item);
 
@@ -21,19 +28,29 @@
   export let placeholder;
   export let items: Item[];
   export let selectedItems: Item[] | [];
+  let inputValue = ""
 
   $: {
-    if (items) {
+    if(selectedItems.length > 0){
+      setInputValue();
+    }
+    else if (items) {
       resetSelection();
     }
   }
 
   const resetSelection = () => {
     selectedItems = [];
+    setInputValue();
   };
 
   function handleSelectedItems(selected: Item) {
     selectedItems = addOrRemoveInputType(selectedItems!, selected);
+    setInputValue();
+  }
+
+  function setInputValue() {
+    inputValue = selectedItems?.map((e) => e.title).join(", ")
   }
 </script>
 
@@ -61,7 +78,7 @@
       <input
         type="text"
         {placeholder}
-        value={selectedItems?.map((e) => e.title).join(", ")}
+        bind:value={inputValue}
         tabindex="9"
         role="button"
         class="grow font-medium w-full min-w-xs"

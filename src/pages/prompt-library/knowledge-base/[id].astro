@@ -1,6 +1,7 @@
 ---
 import Layout from "$layouts/Layout.astro";
 import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
+import KnowledgeBaseForm from "$pages/prompt-library/knowledge-base/KnowledgeBaseForm.svelte";
 
 export interface Props {
   id: string;
@@ -12,13 +13,12 @@ const knowledgeBase = id ? await KnowledgeBaseModel.get(id) : undefined; // TODO
 ---
 
 <Layout>
-  <div
-    class="container max-w-5xl mx-auto p-6 grid grid-cols-1 md:grid-cols-[1fr_max-content] gap-8"
-  >
-    {
-      knowledgeBase && (
-        <h1 class="pt-2 lg:pt-8 text-4xl font-bold">{knowledgeBase.title}</h1>
-      )
-    }
+  <div>
+    <KnowledgeBaseForm
+      preferredLocale={Astro.preferredLocale}
+      knowledgeBaseId={id}
+      knowledgeBase={knowledgeBase}
+      client:load
+    />
   </div>
 </Layout>
