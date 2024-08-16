@@ -93,13 +93,27 @@
           },
         });
 
-        const data = await response.json();
+        const reader = response.body?.getReader();
 
-        if (data && data.headlines) {
-          output = data.headlines.replaceAll("\n", "<br>");
-        } else {
-          output = data.message;
+        if (reader) {
+          const decoder = new TextDecoder();
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            const chunk = decoder.decode(value);
+            console.log("Received chunk:", chunk);
+            // Process the chunk (e.g., append to the DOM)
+
+            if (chunk) {
+              output += chunk;
+            } else {
+              output = chunk;
+            }
+          }
         }
+
+        // const data = await response.json();
       } catch (error) {
         console.error("Fetch headlines error:" + error);
       }

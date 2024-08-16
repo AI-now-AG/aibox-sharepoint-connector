@@ -17,6 +17,7 @@ export const model = new ChatOpenAI({
 
 export const POST: APIRoute = async (ctx) => {
   try {
+    const encoder = new TextEncoder();
     const params = await ctx.request.json();
     if (!params.promptId) {
       return new Response(
@@ -80,16 +81,17 @@ export const POST: APIRoute = async (ctx) => {
       params.images.forEach((object: any) => {
         if (object.content) {
           messages.push(
-            new HumanMessage({
-              content: [
-                {
-                  type: "image_url",
-                  image_url: {
-                    url: object.content,
-                  },
-                },
-              ],
-            }),
+            new HumanMessage(object.content),
+            // new HumanMessage({
+            //   content: [
+            //     {
+            //       type: "image_url",
+            //       image_url: {
+            //         url: object.content,
+            //       },
+            //     },
+            //   ],
+            // }),
           );
         }
       });
@@ -103,21 +105,61 @@ export const POST: APIRoute = async (ctx) => {
           //   ? object.content
           //   : `data:${object.type};base64,${object.content}`;
           messages.push(
-            new HumanMessage(object.content),
+            new HumanMessage({
+              content: [
+                {
+                  type: "text", // TODO: make this dynamically change as needed
+                  text: object.content,
+                },
+              ],
+            }),
           );
         }
       });
     }
 
     const parser = new StringOutputParser();
-    const result = await model.invoke(messages);
-    const headlines = await parser.invoke(result);
 
-    return new Response(
-      JSON.stringify({
-        headlines,
-      }),
-    );
+    // Set headers to enable chunked transfer
+    const headers = new Headers();
+    headers.set("Content-Type", "text/plain");
+    headers.set("Transfer-Encoding", "chunked");
+
+    const { readable, writable } = new TransformStream();
+    const writer = writable.getWriter();
+
+    (async () => {
+      try {
+        const stream = await model.pipe(parser).stream(messages);
+
+        for await (const chunk of stream) {
+          await writer.write(encoder.encode(chunk + "\n"));
+        }
+      } catch (error) {
+        console.error("Error processing chunks:", error);
+      } finally {
+        writer.close();
+      }
+    })();
+
+    return new Response(readable, {
+      headers,
+    });
+
+    // const stream = await model.pipe(parser).stream(messages);
+    // //const result = await model.invoke(messages);
+    // //const headlines = await parser.stream(result);
+    // let data = "";
+    // for await (const chunk of stream) {
+    //   console.log("-----"+chunk);
+    //   data += chunk;
+    // }
+    
+    // return new Response(
+    //   JSON.stringify({
+    //     data,
+    //   }),
+    // );
   } catch (error) {
     console.error("Error processing request:", error);
     return new Response(
