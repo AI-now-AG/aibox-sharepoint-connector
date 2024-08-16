@@ -140,6 +140,11 @@
             d="M5 21q-.825 0-1.412-.587T3 19V5q0-.825.588-1.412T5 3h14q.825 0 1.413.588T21 5v14q0 .825-.587 1.413T19 21zm0-2h14V5H5zm1-2h12l-3.75-5l-3 4L9 13zm-1 2V5zm3.5-9q.625 0 1.063-.437T10 8.5t-.437-1.062T8.5 7t-1.062.438T7 8.5t.438 1.063T8.5 10"
           ></path>
         </svg>
+        {#if imageFiles.length > 0}
+          <div class="badge badge-sm badge-neutral font-normal">
+            {imageFiles.length}
+          </div>
+        {/if}
       </button>
       <button
         class="btn h-auto w-auto p-1 min-h-0"
@@ -161,6 +166,11 @@
             d="M18.5 2h-13C3.6 2 2 3.6 2 5.5v13C2 20.4 3.6 22 5.5 22H16l6-6V5.5C22 3.6 20.4 2 18.5 2m1.6 13h-1.5c-1.9 0-3.5 1.6-3.5 3.5V20H5.8c-1 0-1.8-.8-1.8-1.8V5.8C4 4.8 4.8 4 5.8 4h12.5c1 0 1.8.8 1.8 1.8zM7 7h10v2H7zm0 4h10v2H7zm0 4h6v2H7z"
           ></path>
         </svg>
+        {#if inputFiles.length > 0}
+          <div class="badge badge-sm badge-neutral font-normal">
+            {inputFiles.length}
+          </div>
+        {/if}
       </button>
     </div>
     <button

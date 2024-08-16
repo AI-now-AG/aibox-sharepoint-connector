@@ -79,8 +79,13 @@
 </script>
 
 <dialog bind:this={model} class="modal">
-  <div class="modal-box p-4 rounded-lg mx-auto max-w-7xl">
+  <div class="modal-box p-4 rounded-lg mx-auto max-w-6xl">
     <h3 class="text-lg font-bold pb-4">{title}</h3>
+    <form method="dialog">
+      <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+        >✕</button
+      >
+    </form>
     <div class="p7 rounded w-9/12 mx-auto">
       <div
         class="relative flex flex-col p-4 border border-neutral-content rounded"

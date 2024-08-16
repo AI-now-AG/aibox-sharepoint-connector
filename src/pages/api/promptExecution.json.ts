@@ -99,10 +99,9 @@ export const POST: APIRoute = async (ctx) => {
     if (params.files) {
       params.files.forEach((object: any) => {
         if (object.content) {
-          const messageContent = object.type.startsWith("text/")
-            ? object.content
-            : `data:${object.type};base64,${object.content}`;
-
+          // const messageContent = object.type.startsWith("text/")
+          //   ? object.content
+          //   : `data:${object.type};base64,${object.content}`;
           messages.push(
             new HumanMessage({
               content: [
