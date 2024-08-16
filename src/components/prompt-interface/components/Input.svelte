@@ -3,12 +3,48 @@
   export let input = "";
   let inputText = "";
   export let output = "";
+  import FileUpload from "$components/FileUpload.svelte";
+  import * as fs from "node:fs/promises";
+  import path from "path";
+
+  const fileTypes = {
+    "audio/*": ["audio/mp3"],
+    "video/*": ["video/mp4", "video/quicktime"],
+    "application/*": ["application/pdf", "application/json"],
+    "text/*": [
+      "text/plain",
+      "application/x-subrip",
+      "text/tab-separated-values",
+    ],
+  };
+
+  const imageTypes = {
+    "image/*": ["image/svg+xml", "image/png", "image/jpeg"],
+  };
+
+  let inputFiles: never[] = [];
+  let imageFiles: never[] = [];
+  let isClickOnFile = false;
+  let imageDialogId = "imageDialog";
+  let fileDialogId = "fileDialog";
+  let imageModel: { showModal: () => void },
+    fileModel: { showModal: () => void };
 
   function onKeyDown(e: KeyboardEvent) {
     if (e.key === "Enter" && e.ctrlKey) {
       fetchHeadline();
     }
   }
+
+  const readFileContent = (file) => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        resolve(reader.result)
+      };
+      reader.readAsDataURL(file);
+    });
+  };
 
   async function fetchHeadline() {
     input = "";
@@ -17,11 +53,39 @@
       input = inputText;
       output = "";
       try {
+        const userInputFilesList: { name: any; content: unknown; type: any; }[] = [];
+        await Promise.all(
+          inputFiles.map(async (file: { name: any; type: any; }) => {
+            const fileContent = await readFileContent(file);
+            const userInputFile = {
+              name: file.name,
+              content: fileContent,
+              type: file.type,
+            };
+            await userInputFilesList.push(userInputFile);
+          }),
+        );
+
+        const userInputImagesList: { name: any; content: unknown; type: any; }[] = [];
+        await Promise.all(
+          imageFiles.map(async (image: { name: any; type: any; }) => {
+            const imageContent = await readFileContent(image);
+            const userInputImage = {
+              name: image.name,
+              content: imageContent,
+              type: image.type,
+            };
+            await userInputImagesList.push(userInputImage);
+          }),
+        );
+
         const response = await fetch("/api/promptExecution.json", {
           method: "POST",
           body: JSON.stringify({
             article: inputText,
             promptId: promptId,
+            files: userInputFilesList,
+            images: userInputImagesList,
           }),
           credentials: "include",
           headers: {
@@ -56,7 +120,14 @@
   ></textarea>
   <div class="grid grid-cols-[1fr_min-content] gap-4">
     <div class="p-4 flex flex-row gap-2">
-      <button class="btn h-auto w-auto p-1 min-h-0" disabled={!promptId}>
+      <button
+        class="btn h-auto w-auto p-1 min-h-0 model-toggle"
+        disabled={!promptId}
+        on:click={() => {
+          isClickOnFile = false;
+          imageModel.showModal();
+        }}
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="1em"
@@ -70,7 +141,14 @@
           ></path>
         </svg>
       </button>
-      <button class="btn h-auto w-auto p-1 min-h-0" disabled={!promptId}>
+      <button
+        class="btn h-auto w-auto p-1 min-h-0"
+        disabled={!promptId}
+        on:click={() => {
+          isClickOnFile = true;
+          fileModel.showModal();
+        }}
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="1em"
@@ -100,5 +178,26 @@
         <path fill="currentColor" d="M3 20v-6l8-2l-8-2V4l19 8z"></path>
       </svg>
     </button>
+  </div>
+  <div>
+    <input
+      type="checkbox"
+      id={isClickOnFile ? fileDialogId : imageDialogId}
+      class="modal-toggle"
+    />
+    <FileUpload
+      id={imageDialogId}
+      bind:model={imageModel}
+      title="Upload Images"
+      acceptedTypes={imageTypes}
+      bind:files={imageFiles}
+    />
+    <FileUpload
+      id={fileDialogId}
+      bind:model={fileModel}
+      title="Upload Files"
+      acceptedTypes={fileTypes}
+      bind:files={inputFiles}
+    />
   </div>
 </div>
