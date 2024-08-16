@@ -3,8 +3,8 @@ import { db, type Document } from "../mongodb";
 import { z } from "zod";
 
 const PromptSchema = z.object({
-  tenant_id: z.instanceof(ObjectId),
-  creator_id: z.instanceof(ObjectId),
+  tenant_id: z.instanceof(ObjectId).optional(),
+  creator_id: z.instanceof(ObjectId).optional(),
   title: z.string(),
   description: z.string(),
   category: z.instanceof(ObjectId),
@@ -13,9 +13,23 @@ const PromptSchema = z.object({
   knowledgebase: z.array(z.instanceof(ObjectId)).optional(),
   prompt: z.string(),
   documents: z.array(z.instanceof(ObjectId)).optional(),
-  created_at: z.date(),
+  created_at: z.date().optional(),
   updated_at: z.date(),
 });
+
+const convertObjectIdToString = (doc: Document<Prompt>) => {
+  return {
+    ...doc,
+    _id: doc._id.toString(),
+    tenant_id: doc.tenant_id?.toString(),
+    creator_id: doc.creator_id?.toString(),
+    category: doc.category.toString(),
+    group: doc.group.toString(),
+    instructions: doc.instructions?.map((id) => id.toString()),
+    knowledgebase: doc.knowledgebase?.map((id) => id.toString()),
+    documents: doc.documents?.map((id) => id.toString()),
+  };
+};
 
 export type Prompt = z.infer<typeof PromptSchema>;
 
@@ -37,10 +51,30 @@ export default {
     return collection.findOne<Document<Prompt>>({ _id });
   },
 
-  list: async () => collection.find<Document<Prompt>>({}).sort({created_at: 1}),
+  getAsString: async (id: string) => {
+    const _id = new ObjectId(id);
+    const doc = await collection.findOne<Document<Prompt>>({ _id });
+    if (!doc) return null;
+    return convertObjectIdToString(doc);
+  },
+
+  list: async () =>
+    collection.find<Document<Prompt>>({}).sort({ created_at: 1 }),
 
   listByUser: async (id: string) => {
     const _id = new ObjectId(id);
-    return collection.find<Document<Prompt>>({ creator_id: _id }).sort({created_at: 1})
+    return collection
+      .find<Document<Prompt>>({ creator_id: _id })
+      .sort({ created_at: 1 });
+  },
+
+  update: async (id: string, updatedPrompt: Partial<Prompt>) => {
+    const _id = new ObjectId(id);
+    const validated = PromptSchema.partial().parse(updatedPrompt);
+    const result = await collection.updateOne(
+      { _id },
+      { $set: { ...validated } },
+    );
+    return result;
   },
 };

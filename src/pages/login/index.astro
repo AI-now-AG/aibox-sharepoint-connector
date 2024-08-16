@@ -4,7 +4,7 @@ import { useTranslations } from "$i18n/utils";
 
 const t = useTranslations(Astro.preferredLocale);
 
-const theme = (Astro.locals.username === "Somedia") ? "somedia" : "somedia"
+const theme = Astro.locals.username === "Somedia" ? "somedia" : "somedia";
 ---
 
 <html lang="en" data-theme={theme}>

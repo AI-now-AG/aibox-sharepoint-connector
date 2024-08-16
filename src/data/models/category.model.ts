@@ -3,19 +3,19 @@ import { db, type Document } from "../mongodb";
 import { z } from "zod";
 
 export const GroupSchema = z.object({
-  _id: z.instanceof(ObjectId),
+  _id: z.instanceof(ObjectId).optional(),
   title: z.string(),
-  slug: z.string(),
+  slug: z.string().optional(),
 });
 
 const CategorySchema = z.object({
-  tenant_id: z.instanceof(ObjectId),
-  creator_id: z.instanceof(ObjectId),
+  tenant_id: z.instanceof(ObjectId).optional(),
+  creator_id: z.instanceof(ObjectId).optional(),
   title: z.string(),
   slug: z.string(),
   icon: z.string().optional(),
-  created_at: z.date(),
-  updated_at: z.date(),
+  created_at: z.date().optional(),
+  updated_at: z.date().optional(),
 });
 
 const CategoryGroupSchema = CategorySchema.extend({
@@ -26,6 +26,23 @@ export type Category = z.infer<typeof CategoryGroupSchema>;
 export type Group = z.infer<typeof GroupSchema>;
 
 const collection = db.collection("categories");
+
+const convertGroupObjectIdToString = (group: Group) => {
+  return {
+    ...group,
+    _id: group._id?.toString(),
+  };
+};
+
+// Function to convert ObjectId to string in a Category object
+const convertObjectIdToString = (category: Document<Category>) => {
+  return {
+    ...category,
+    tenant_id: category.tenant_id?.toString(),
+    creator_id: category.creator_id?.toString(),
+    groups: category.groups.map(convertGroupObjectIdToString),
+  };
+};
 
 export default {
   add: async (category: Category) => {
@@ -51,16 +68,24 @@ export default {
     );
   },
 
-  list: async () => collection.find<Document<Category>>({}).sort({created_at: 1}).sort({created_at: 1}),
+  list: async () =>
+    collection
+      .find<Document<Category>>({})
+      .sort({ created_at: 1 })
+      .sort({ created_at: 1 }),
 
   listByUser: async (id: string) => {
     const _id = new ObjectId(id);
-    return collection.find<Document<Category>>({ creator_id: _id }).sort({created_at: 1})
+    return collection
+      .find<Document<Category>>({ creator_id: _id })
+      .sort({ created_at: 1 });
   },
 
   get: async (id: string) => {
     const _id = new ObjectId(id);
-    return collection.findOne<Document<Category>>({ _id });
+    const doc = await collection.findOne<Document<Category>>({ _id });
+    if (!doc) return null;
+    return convertObjectIdToString(doc);
   },
 
   getByTitle: async (title: string) => {
@@ -69,5 +94,15 @@ export default {
 
   getBySlug: async (slug: string) => {
     return collection.findOne<Document<Category>>({ slug });
+  },
+
+  update: async (id: string, updatedInstruction: Partial<Category>) => {
+    const _id = new ObjectId(id);
+    const validated = CategoryGroupSchema.partial().parse(updatedInstruction);
+    const result = await collection.updateOne(
+      { _id },
+      { $set: { ...validated } },
+    );
+    return result;
   },
 };

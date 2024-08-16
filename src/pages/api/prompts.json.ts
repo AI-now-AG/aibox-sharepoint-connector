@@ -13,6 +13,7 @@ import KnowledgeBaseModel, {
 } from "$data/models/knowledgeBase.model";
 
 const CreatePromptParamsSchema = z.object({
+  _id: z.string().optional(),
   title: z.string(),
   category: z.string(),
   group: z.string(),
@@ -116,6 +117,65 @@ export const POST: APIRoute<CreatePromptParams> = async (ctx) => {
     return new Response(
       JSON.stringify({
         message: "Error while adding the prompt",
+        error: error,
+      }),
+      {
+        status: 500,
+      },
+    );
+  }
+};
+
+export const PUT: APIRoute<CreatePromptParams> = async (ctx) => {
+  const params = await ctx.request.json();
+  const data = CreatePromptParamsSchema.parse(params);
+
+  // We generate a description based on the prompt
+  const description = await generatePromptDescription(data.prompt);
+
+  const prompt: Prompt = {
+    ...data,
+    category: stringToObjectId.parse(data.category),
+    group: stringToObjectId.parse(data.group),
+    instructions: data.instructions?.map((inst) =>
+      stringToObjectId.parse(inst),
+    ),
+    knowledgebase: data.knowledgebase?.map((inst) =>
+      stringToObjectId.parse(inst),
+    ),
+    documents: data.documents?.map((doc) => stringToObjectId.parse(doc)),
+    description,
+    updated_at: new Date(),
+  };
+
+  try {
+    if (prompt && data._id) {
+      await PromptModel.update(data._id, prompt);
+
+      return new Response(
+        JSON.stringify({
+          message: "Prompt updated",
+        }),
+        {
+          status: 200,
+        },
+      );
+    } else {
+      return new Response(
+        JSON.stringify({
+          message: "Error while updating the prompt",
+        }),
+        {
+          status: 400,
+        },
+      );
+    }
+  } catch (error) {
+    console.debug(error);
+
+    return new Response(
+      JSON.stringify({
+        message: "Error while updating the prompt",
         error: error,
       }),
       {

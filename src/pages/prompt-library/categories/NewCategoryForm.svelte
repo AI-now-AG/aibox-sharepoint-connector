@@ -1,5 +1,10 @@
 <script lang="ts">
   import type { CreateCategoryParams } from "$pages/api/categories.json";
+  import { onMount } from "svelte";
+  import type { Category, Group } from "$data/models/category.model";
+  import { useTranslations } from "$i18n/utils";
+  export let preferredLocale;
+  const t = useTranslations(preferredLocale);
 
   /**
    * TODO: Please question the user flow of creating groups here. It will be more natural
@@ -7,7 +12,17 @@
    */
 
   let title: string | undefined;
-  let groups: string[] = [];
+  let groups: Group[] = [];
+
+  export let categoryId: string;
+  export let category: Category;
+
+  onMount(async function () {
+    if (category) {
+      title = category.title;
+      groups = category.groups;
+    }
+  });
 
   async function save() {
     if (!title) {
@@ -15,22 +30,21 @@
     } else if (groups && groups.length > 0) {
       const newCategory: CreateCategoryParams = {
         title,
-        groups,
+        groups: groups.map((e) => ({_id: e._id, title: e.title})),
+        ...(categoryId && { _id: categoryId }),
       };
-
+      
       const response = await fetch("/api/categories.json", {
-        method: "POST",
+        method: category ? "PUT" : "POST",
         body: JSON.stringify(newCategory),
         headers: {
           "Content-Type": "application/json",
         },
       });
-
       const data = await response.json();
-
+      
       groups = [];
       title = undefined;
-
       alert(data.message);
     } else {
       alert("At lease one group must be created");
@@ -39,7 +53,10 @@
 
   function addGroup() {
     if (groups && groups.length < 6) {
-      groups = [...groups, ""];
+      const newGroup: Group = {
+        title: "",
+      };
+      groups = [...groups, newGroup];
     }
   }
 
@@ -48,10 +65,16 @@
   }
 </script>
 
-<div class="container mx-auto p-4">
-  <div class="w-full min-w-xs">
-    <h1 class="text-4xl font-medium pb-6">Add Category</h1>
-    <form class="rounded px-6 pt-6 mb-4 space-y-6">
+<div class="container max-w-5xl p-6 mx-auto p-4">
+  <div class="w-full min-w-xs pt-2 lg:pt-6">
+    <h1 class="pt-2 text-4xl font-bold pb-6">
+      {#if category}
+        {t("prompt-library.categories.edit")}
+      {:else}
+        {t("prompt-library.categories.add")}
+      {/if}
+    </h1>
+    <form class="rounded pt-6 mb-4 space-y-6">
       <div class="grid grid-cols-1 gap-4 justify-center">
         <div>
           <p class="mb-2">Title</p>
@@ -98,7 +121,7 @@
               <label class="input input-bordered flex items-center gap-2">
                 <input
                   type="text"
-                  bind:value={groups[index]}
+                  bind:value={groups[index].title}
                   placeholder="e.g. Headline"
                   class="grow w-full min-w-xs"
                 />
@@ -129,7 +152,7 @@
 
       <div class="flex items-center justify-between">
         <button
-          class="btn btn-active btn-primary py-4 px-8 font-normal"
+          class="btn btn-active btn-primary px-8 font-normal"
           on:click|preventDefault={save}
         >
           Save Category

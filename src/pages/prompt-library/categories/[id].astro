@@ -1,0 +1,24 @@
+---
+import Layout from "$layouts/Layout.astro";
+import CategoryModel from "$data/models/category.model";
+import NewCategoryForm from "$pages/prompt-library/categories/NewCategoryForm.svelte";
+
+export interface Props {
+  id: string;
+}
+
+const { id } = Astro.params;
+
+const instruction = id ? await CategoryModel.get(id) : undefined; // TODO: Render 404 if not found
+---
+
+<Layout>
+  <div>
+    <NewCategoryForm
+      categoryId={id}
+      category={instruction}
+      preferredLocale={Astro.preferredLocale}
+      client:load
+    />
+  </div>
+</Layout>

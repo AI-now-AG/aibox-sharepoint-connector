@@ -41,6 +41,7 @@ const en = {
 
   "prompt-library.prompts.title": "Prompt Management",
   "prompt-library.prompts.add": "Add Prompt",
+  "prompt-library.prompts.edit": "Edit Prompt",
   "prompt-library.prompts.search": "Type here",
   "prompt-library.prompts.filter": "Filter",
   "prompt-library.prompts.all": "All Prompts",
@@ -53,9 +54,11 @@ const en = {
   "prompt-library.add.prompts.instructions": "Instructions",
   "prompt-library.add.prompts.knowledge-base": "Knowledge Base",
   "prompt-library.add.prompts.save": "Save Prompt",
+  "prompt-library.add.prompts.saving": "Saving...",
 
   "prompt-library.instructions.title": "Instruction Management",
   "prompt-library.instructions.add": "Add instruction",
+  "prompt-library.instructions.edit": "Edit instruction",
   "prompt-library.instructions.all": "All Instructions",
   "prompt-library.instructions.view": "View",
 
@@ -65,6 +68,7 @@ const en = {
 
   "prompt-library.knowledgebase.title": "Knowledge Base Management",
   "prompt-library.knowledgebase.add": "Add knowledge base",
+  "prompt-library.knowledgebase.edit": "Edit knowledge base",
   "prompt-library.knowledgebase.all": "All knowledge base",
   "prompt-library.knowledgebase.view": "View",
 
@@ -74,6 +78,7 @@ const en = {
 
   "prompt-library.categories.title": "Categories",
   "prompt-library.categories.add": "Add Category",
+  "prompt-library.categories.edit": "Edit Category",
 
   "prompt-execution.card.showMore": "more prompts",
   "prompt-execution.card.showLess": "less prompts",
@@ -115,6 +120,7 @@ const de = {
 
   "prompt-library.prompts.title": "Prompt Management",
   "prompt-library.prompts.add": "Neuer Prompt",
+  "prompt-library.prompts.edit": "Eingabeaufforderung bearbeiten",
   "prompt-library.prompts.search": "Geben Sie hier ein",
   "prompt-library.prompts.filter": "Filter",
   "prompt-library.prompts.all": "Alle Eingabeaufforderungen",
@@ -127,9 +133,11 @@ const de = {
   "prompt-library.add.prompts.instructions": "Anweisungen",
   "prompt-library.add.prompts.knowledge-base": "Wissensbasis",
   "prompt-library.add.prompts.save": "Eingabeaufforderung speichern",
+  "prompt-library.add.prompts.saving": "Speichern...",
 
   "prompt-library.instructions.title": "Instruction Management",
   "prompt-library.instructions.add": "Anweisung hinzufügen",
+  "prompt-library.instructions.edit": "Anweisung bearbeiten",
   "prompt-library.instructions.all": "Alle Anweisungen",
   "prompt-library.instructions.view": "View",
 
@@ -137,8 +145,19 @@ const de = {
   "prompt-library.add.instructions.text": "Anweisungstext",
   "prompt-library.add.instructions.save": "Anleitung speichern",
 
+  "prompt-library.knowledgebase.title": "Knowledge Base Management",
+  "prompt-library.knowledgebase.add": "Add knowledge base",
+  "prompt-library.knowledgebase.edit": "Edit knowledge base",
+  "prompt-library.knowledgebase.all": "All knowledge base",
+  "prompt-library.knowledgebase.view": "View",
+
+  "prompt-library.add.knowledgebase.title": "Knowledge base title",
+  "prompt-library.add.knowledgebase.text": "Knowledge base text",
+  "prompt-library.add.knowledgebase.save": "Save knowledge base",
+
   "prompt-library.categories.title": "Kategorien",
   "prompt-library.categories.add": "Neue Kategorie",
+  "prompt-library.categories.edit": "Kategorie bearbeiten",
 
   "prompt-execution.card.showMore": "weitere Anregungen",
   "prompt-execution.card.showLess": "weniger Aufforderungen",

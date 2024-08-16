@@ -1,7 +1,7 @@
 declare namespace App {
-    interface Locals {
-        userId: string;
-        tenantId?: string;
-        username?: string;
-    }
+  interface Locals {
+    userId: string;
+    tenantId?: string;
+    username?: string;
+  }
 }
