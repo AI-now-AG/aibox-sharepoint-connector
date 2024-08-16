@@ -122,7 +122,7 @@ export const POST: APIRoute = async (ctx) => {
 
     // Set headers to enable chunked transfer
     const headers = new Headers();
-    headers.set("Content-Type", "text/plain");
+    headers.set("Content-Type", "text/plain; charset=UTF-8");
     headers.set("Transfer-Encoding", "chunked");
 
     const { readable, writable } = new TransformStream();
@@ -132,11 +132,37 @@ export const POST: APIRoute = async (ctx) => {
       try {
         const stream = await model.pipe(parser).stream(messages);
 
+        let partialChunk = "";
         for await (const chunk of stream) {
-          await writer.write(encoder.encode(chunk + "\n"));
+          partialChunk += chunk;
+
+          // Try to process and send the complete part of the chunk
+          let lastCompleteCharIndex = partialChunk.length;
+          try {
+            encoder.encode(partialChunk); // Attempt to encode the whole string
+          } catch {
+            // If encoding fails, determine the last valid character
+            lastCompleteCharIndex = Buffer.byteLength(partialChunk) - 1;
+          }
+
+          const validChunk = partialChunk.slice(0, lastCompleteCharIndex);
+          partialChunk = partialChunk.slice(lastCompleteCharIndex); // Save the incomplete part for the next iteration
+
+          // Send the valid part of the chunk
+          if (validChunk) {
+            await writer.write(encoder.encode(validChunk));
+          }
         }
+        // for await (const chunk of stream) {
+        //   const formattedChunk = chunk.trim() + "\n";
+        //   console.log(formattedChunk)
+        //   await writer.write(encoder.encode(formattedChunk));
+        // }
       } catch (error) {
-        console.error("Error processing chunks:", error);
+        console.error();
+        await writer.write(
+          encoder.encode("Error processing chunks:" + error + "\n"),
+        );
       } finally {
         writer.close();
       }
