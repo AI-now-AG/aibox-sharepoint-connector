@@ -103,14 +103,7 @@ export const POST: APIRoute = async (ctx) => {
           //   ? object.content
           //   : `data:${object.type};base64,${object.content}`;
           messages.push(
-            new HumanMessage({
-              content: [
-                {
-                  type: "text", // TODO: make this dynamically change as needed
-                  text: object.content,
-                },
-              ],
-            }),
+            new HumanMessage(object.content),
           );
         }
       });
