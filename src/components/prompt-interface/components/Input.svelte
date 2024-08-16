@@ -36,13 +36,23 @@
     }
   }
 
+  const readImageContent = (image) => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        resolve(reader.result);
+      };
+      reader.readAsDataURL(image);
+    });
+  };
+
   const readFileContent = (file) => {
     return new Promise((resolve) => {
       const reader = new FileReader();
       reader.onloadend = () => {
-        resolve(reader.result)
+        resolve(reader.result);
       };
-      reader.readAsDataURL(file);
+      reader.readAsText(file);
     });
   };
 
@@ -68,8 +78,8 @@
 
         const userInputImagesList: { name: any; content: unknown; type: any; }[] = [];
         await Promise.all(
-          imageFiles.map(async (image: { name: any; type: any; }) => {
-            const imageContent = await readFileContent(image);
+          imageFiles.map(async (image: { name: any; type: any }) => {
+            const imageContent = await readImageContent(image);
             const userInputImage = {
               name: image.name,
               content: imageContent,
