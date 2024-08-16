@@ -23,7 +23,7 @@ export const POST: APIRoute = async (ctx) => {
         JSON.stringify({
           message: "Require 'PromptId' field",
         }),
-        { status: 400 }
+        { status: 400 },
       );
     }
     if (!params.article) {
@@ -31,7 +31,7 @@ export const POST: APIRoute = async (ctx) => {
         JSON.stringify({
           message: "Require 'article' field",
         }),
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -41,7 +41,7 @@ export const POST: APIRoute = async (ctx) => {
         JSON.stringify({
           message: "Prompt field not defined",
         }),
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -73,7 +73,6 @@ export const POST: APIRoute = async (ctx) => {
       });
     }
 
-
     messages.push(new HumanMessage(params.article));
 
     // Handle image uploads
@@ -87,9 +86,10 @@ export const POST: APIRoute = async (ctx) => {
                   type: "image_url",
                   image_url: {
                     url: object.content,
-                  }
-                }],
-            })
+                  },
+                },
+              ],
+            }),
           );
         }
       });
@@ -99,17 +99,19 @@ export const POST: APIRoute = async (ctx) => {
     if (params.files) {
       params.files.forEach((object: any) => {
         if (object.content) {
-          const messageContent = object.type.startsWith('text/')
+          const messageContent = object.type.startsWith("text/")
             ? object.content
             : `data:${object.type};base64,${object.content}`;
 
           messages.push(
             new HumanMessage({
-              content: [{
-                type: "text", // TODO: make this dynamically change as needed
-                text: object.content,
-              }],
-            })
+              content: [
+                {
+                  type: "text", // TODO: make this dynamically change as needed
+                  text: object.content,
+                },
+              ],
+            }),
           );
         }
       });
@@ -130,7 +132,7 @@ export const POST: APIRoute = async (ctx) => {
       JSON.stringify({
         message: "Internal Server Error: " + error,
       }),
-      { status: 500 }
+      { status: 500 },
     );
   }
 };
