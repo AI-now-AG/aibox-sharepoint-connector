@@ -36,13 +36,23 @@
     }
   }
 
+  const readImageContent = (image) => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        resolve(reader.result);
+      };
+      reader.readAsDataURL(image);
+    });
+  };
+
   const readFileContent = (file) => {
     return new Promise((resolve) => {
       const reader = new FileReader();
       reader.onloadend = () => {
-        resolve(reader.result)
+        resolve(reader.result);
       };
-      reader.readAsDataURL(file);
+      reader.readAsText(file);
     });
   };
 
@@ -68,8 +78,8 @@
 
         const userInputImagesList: { name: any; content: unknown; type: any; }[] = [];
         await Promise.all(
-          imageFiles.map(async (image: { name: any; type: any; }) => {
-            const imageContent = await readFileContent(image);
+          imageFiles.map(async (image: { name: any; type: any }) => {
+            const imageContent = await readImageContent(image);
             const userInputImage = {
               name: image.name,
               content: imageContent,
@@ -93,17 +103,48 @@
           },
         });
 
-        const data = await response.json();
+        const reader = response.body?.getReader();
+        let partialData = "";
+        if (reader) {
+          const decoder = new TextDecoder();
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
 
-        if (data && data.headlines) {
-          output = data.headlines.replaceAll("\n", "<br>");
-        } else {
-          output = data.message;
+            const chunk = decoder.decode(value, { stream: true });
+            // const chunk = decoder.decode(value);
+            partialData += chunk;
+            const formattedChunk = formatMarkdown(partialData)
+              .split("\n")
+              // .filter(Boolean)
+              .map((line) => formatMarkdown(line))
+              .join("\n");
+            output = formattedChunk;
+          }
         }
+
+        // const data = await response.json();
       } catch (error) {
         console.error("Fetch headlines error:" + error);
       }
     }
+  }
+
+  function formatMarkdown(text: string) {
+    text = text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+    text = text.replace(/(\*|_)(.*?)\1/g, "<em>$2</em>");
+    text = text.replace(/__(.*?)__/g, "<u>$1</u>");
+    text = text.replace(/~~(.*?)~~/g, "<del>$1</del>");
+    text = text.replace(/`(.*?)`/g, "<code>$1</code>");
+    text = text.replace(/```([\s\S]*?)```/g, "<pre><code>$1</code></pre>");
+    text = text.replace(/^###### (.*)$/gm, "<h6 class='text-xs'>$1</h6>");
+    text = text.replace(/^##### (.*)$/gm, "<h5 class='text-sm'>$1</h5>");
+    text = text.replace(/^#### (.*)$/gm, "<h4 class='text-base'>$1</h4>");
+    text = text.replace(/^### (.*)$/gm, "<h3 class='text-lg'>$1</h3>");
+    text = text.replace(/^## (.*)$/gm, "<h2 class='text-xl'>$1</h2>");
+    text = text.replace(/^# (.*)$/gm, "<h1 class='text-2xl'>$1</h1>");
+    text = text.replace(/\n/g, "<br>");
+    return text;
   }
 </script>
 
