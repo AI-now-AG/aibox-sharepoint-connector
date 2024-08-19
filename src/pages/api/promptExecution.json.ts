@@ -180,12 +180,13 @@ export const POST: APIRoute = async (ctx) => {
     //   console.log("-----"+chunk);
     //   data += chunk;
     // }
-    
+    // console.log("Response", result);
     // return new Response(
     //   JSON.stringify({
     //     data,
     //   }),
     // );
+
   } catch (error) {
     console.error("Error processing request:", error);
     return new Response(
