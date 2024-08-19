@@ -102,9 +102,7 @@ export const POST: APIRoute = async (ctx) => {
           // const messageContent = object.type.startsWith("text/")
           //   ? object.content
           //   : `data:${object.type};base64,${object.content}`;
-          messages.push(
-            new HumanMessage(object.content),
-          );
+          messages.push(new HumanMessage(object.content));
         }
       });
     }
@@ -112,6 +110,8 @@ export const POST: APIRoute = async (ctx) => {
     const parser = new StringOutputParser();
     const result = await model.invoke(messages);
     const headlines = await parser.invoke(result);
+
+    console.log("Response", result);
 
     return new Response(
       JSON.stringify({
