@@ -58,8 +58,10 @@ const generateKnowledgeBaseDescription = async (knowledgeBase: string) => {
 export const GET: APIRoute = async (ctx) => {
   try {
     const result = await KnowledgeBaseModel.listByUser(ctx.locals.userId);
-    const data = await result.toArray();
-    return new Response(JSON.stringify(data));
+    const documents = await result.toArray();
+    return new Response(
+      JSON.stringify(documents.map((doc) => ({ _id: doc._id }))),
+    );
   } catch (error) {
     console.error(error);
 

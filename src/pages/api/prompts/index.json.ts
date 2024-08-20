@@ -238,11 +238,19 @@ export const GET: APIRoute = async (ctx) => {
         });
         knowledgebases = (await Promise.all(calls)).filter((kb) => kb !== null);
       }
-      const promptData = extractRequiredFields(
-        prompt,
-        instructions,
-        knowledgebases,
-      );
+
+      const promptData = {
+        title: prompt.title,
+        prompt: prompt.prompt,
+        instructions: instructions.map((inst) => ({
+          title: inst.title,
+          instruction: inst.instruction,
+        })),
+        knowledgebase: knowledgebases.map((kb) => ({
+          title: kb.title,
+          knowledge_base: kb.knowledge_base,
+        })),
+      };
 
       return new Response(JSON.stringify(promptData));
     } else {

@@ -58,8 +58,15 @@ const generateInstructionDescription = async (instruction: string) => {
 export const GET: APIRoute = async (ctx) => {
   try {
     const result = await InstructionModel.listByUser(ctx.locals.userId);
-    const data = await result.toArray();
-    return new Response(JSON.stringify(data));
+    const instructions = await result.toArray();
+    return new Response(
+      JSON.stringify(
+        instructions.map((instruction) => ({
+          _id: instruction._id,
+          title: instruction.title,
+        })),
+      ),
+    );
   } catch (error) {
     console.error(error);
 
