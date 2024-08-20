@@ -9,6 +9,14 @@ import type { APIRoute } from "astro";
 import PromptModel from "$data/models/prompt.model";
 import InstructionModel from "$data/models/instruction.model";
 import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
+import { z } from "zod";
+
+const RunPromptParamsSchema = z.object({
+  _id: z.string(),
+  article: z.string().min(1),
+});
+
+export type RunPromptParams = z.infer<typeof RunPromptParamsSchema>;
 
 export const model = new ChatOpenAI({
   apiKey: import.meta.env.OPENAI_API_KEY,
@@ -21,25 +29,13 @@ export const POST: APIRoute = async ({ params, request }) => {
   try {
     const encoder = new TextEncoder();
 
-    const data = await request.json();
-    if (!id) {
-      return new Response(
-        JSON.stringify({
-          message: "Require 'id' param",
-        }),
-        { status: 400 },
-      );
-    }
-    if (!data.article) {
-      return new Response(
-        JSON.stringify({
-          message: "Require 'article' field",
-        }),
-        { status: 400 },
-      );
-    }
+    const requestParams = await request.json();
+    const data = RunPromptParamsSchema.parse({
+      ...requestParams,
+      ...{ _id: id },
+    });
 
-    const prompt = await PromptModel.get(id);
+    const prompt = await PromptModel.get(data._id);
     if (!prompt?.prompt) {
       return new Response(
         JSON.stringify({
