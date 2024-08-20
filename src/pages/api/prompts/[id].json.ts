@@ -11,9 +11,17 @@ import InstructionModel from "$data/models/instruction.model";
 import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
 import { z } from "zod";
 
+const AttachmentSchema = z.object({
+  name: z.string(),
+  type: z.string(),
+  content: z.string(),
+});
+
 const RunPromptParamsSchema = z.object({
   _id: z.string(),
   article: z.string().min(1),
+  images: z.array(AttachmentSchema).optional(),
+  files: z.array(AttachmentSchema).optional(),
 });
 
 export type RunPromptParams = z.infer<typeof RunPromptParamsSchema>;
@@ -77,7 +85,7 @@ export const POST: APIRoute = async ({ params, request }) => {
 
     // Handle image uploads
     if (data.images) {
-      data.images.forEach((object: any) => {
+      data.images.forEach((object) => {
         if (object.content) {
           messages.push(
             new HumanMessage(object.content),
@@ -98,7 +106,7 @@ export const POST: APIRoute = async ({ params, request }) => {
 
     // Handle file uploads
     if (data.files) {
-      data.files.forEach((object: any) => {
+      data.files.forEach((object) => {
         if (object.content) {
           // const messageContent = object.type.startsWith("text/")
           //   ? object.content
