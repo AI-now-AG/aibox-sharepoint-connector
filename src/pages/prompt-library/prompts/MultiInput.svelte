@@ -1,13 +1,30 @@
 <script lang="ts">
-  import { onMount, afterUpdate } from "svelte";
-
   // TODO: Us checkboxes instead of anchors, it's what they are used for. That
   // way we don't have to manage selected state ourselves.
 
+  import { afterUpdate } from "svelte";
+
+  type Item = { title: string };
+
+  export let title;
+  export let placeholder;
+  export let items: Item[];
+  export let selectedItems: Item[];
+
+  let inputValue = "";
+
+  $: {
+    if (selectedItems.length > 0) {
+      setInputValue();
+    } else if (items) {
+      resetSelection();
+    }
+  }
+
   afterUpdate(() => {
-    inputValue = selectedItems?.map((e) => e.title).join(", ")
+    inputValue = selectedItems?.map((e) => e.title).join(", ");
   });
-  
+
   const addOrRemoveInputType = (array: Item[], item: Item) => {
     const exists = array.includes(item);
 
@@ -22,23 +39,6 @@
     }
   };
 
-  type Item = { title: string } | string;
-
-  export let title;
-  export let placeholder;
-  export let items: Item[];
-  export let selectedItems: Item[] | [];
-  let inputValue = ""
-
-  $: {
-    if(selectedItems.length > 0){
-      setInputValue();
-    }
-    else if (items) {
-      resetSelection();
-    }
-  }
-
   const resetSelection = () => {
     selectedItems = [];
     setInputValue();
@@ -50,7 +50,7 @@
   }
 
   function setInputValue() {
-    inputValue = selectedItems?.map((e) => e.title).join(", ")
+    inputValue = selectedItems?.map((e) => e.title).join(", ");
   }
 </script>
 
@@ -79,7 +79,6 @@
         type="text"
         {placeholder}
         bind:value={inputValue}
-        tabindex="9"
         role="button"
         class="grow font-medium w-full min-w-xs"
         readonly
@@ -102,18 +101,20 @@
     </label>
     {#if items}
       <ul
-        tabindex="9"
         class="dropdown-content menu bg-base-100 space-y-2 rounded-box z-[1] w-52 p-2 shadow"
       >
         {#each items as item}
-          <li on:click|preventDefault={() => handleSelectedItems(item)}>
-            <a
+          <li>
+            <button
+              on:click|preventDefault={() => handleSelectedItems(item)}
               class={`${selectedItems?.includes(item) ? "bg-primary text-base-100 hover:bg-primary" : "hover:text-neutral"}`}
-              >{item.title}
-            </a>
+            >
+              {item.title}
+            </button>
           </li>
         {/each}
       </ul>
     {/if}
   </div>
 </div>
+

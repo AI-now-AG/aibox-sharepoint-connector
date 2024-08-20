@@ -1,14 +1,34 @@
 import globals from "globals";
-import pluginJs from "@eslint/js";
+import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
 import eslintPluginAstro from "eslint-plugin-astro";
 import eslintPluginSvelte from "eslint-plugin-svelte";
 
-export default [
-  pluginJs.configs.recommended,
+const eslintPluginSvelteWithTS = {
+  files: ["*.svelte"],
+  extends: [...eslintPluginSvelte.configs["flat/recommended"]],
+  parser: eslintPluginSvelte,
+  parserOptions: {
+    parser: tseslint.parser,
+    project: ["./tsconfig.json"],
+  },
+};
+
+export default tseslint.config(
+  eslint.configs.recommended,
   ...tseslint.configs.recommended,
   ...eslintPluginAstro.configs.recommended,
-  ...eslintPluginSvelte.configs["flat/recommended"],
+  eslintPluginSvelteWithTS,
 
-  { languageOptions: { globals: { ...globals.browser, ...globals.node } } },
-];
+  {
+    languageOptions: {
+      ecmaVersion: "latest",
+      sourceType: "module",
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+        ...globals.es2022,
+      },
+    },
+  },
+);

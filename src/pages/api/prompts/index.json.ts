@@ -219,22 +219,24 @@ export const GET: APIRoute = async (ctx) => {
         );
       }
 
-      let instructions: any[] = [];
+      let instructions: Instruction[] = [];
       if (prompt?.instructions) {
         const calls = prompt.instructions.map(async (inst) => {
           const instruction = await InstructionModel.get(inst.toString());
           return instruction;
         });
-        instructions = await Promise.all(calls);
+        instructions = (await Promise.all(calls)).filter(
+          (instr) => instr !== null,
+        );
       }
 
-      let knowledgebases: any[] = [];
+      let knowledgebases: KnowledgeBase[] = [];
       if (prompt?.knowledgebase) {
         const calls = prompt.knowledgebase.map(async (kb) => {
           const instruction = await KnowledgeBaseModel.get(kb.toString());
           return instruction;
         });
-        knowledgebases = await Promise.all(calls);
+        knowledgebases = (await Promise.all(calls)).filter((kb) => kb !== null);
       }
       const promptData = extractRequiredFields(
         prompt,

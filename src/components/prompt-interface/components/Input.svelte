@@ -22,13 +22,12 @@
     "image/*": ["image/svg+xml", "image/png", "image/jpeg"],
   };
 
-  let inputFiles: never[] = [];
-  let imageFiles: never[] = [];
+  let inputFiles: File[] = [];
+  let imageFiles: File[] = [];
   let isClickOnFile = false;
-  let imageDialogId = "imageDialog";
-  let fileDialogId = "fileDialog";
-  let imageModel: { showModal: () => void },
-    fileModel: { showModal: () => void };
+
+  type ModalTrigger = { showModal: () => void };
+  let imageModal: ModalTrigger, fileModal: ModalTrigger;
 
   function onKeyDown(e: KeyboardEvent) {
     if (e.key === "Enter" && e.ctrlKey) {
@@ -36,7 +35,7 @@
     }
   }
 
-  const readImageContent = (image) => {
+  const readImageContent = (image: File) => {
     return new Promise((resolve) => {
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -46,7 +45,7 @@
     });
   };
 
-  const readFileContent = (file) => {
+  const readFileContent = (file: File) => {
     return new Promise((resolve) => {
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -62,11 +61,17 @@
     if (inputText) {
       input = inputText;
       output = "";
+
+      type FileInput = {
+        name: string;
+        content: unknown;
+        type: string;
+      };
+
       try {
-        const userInputFilesList: { name: any; content: unknown; type: any }[] =
-          [];
+        const userInputFilesList: FileInput[] = [];
         await Promise.all(
-          inputFiles.map(async (file: { name: any; type: any }) => {
+          inputFiles.map(async (file) => {
             const fileContent = await readFileContent(file);
             const userInputFile = {
               name: file.name,
@@ -77,13 +82,9 @@
           }),
         );
 
-        const userInputImagesList: {
-          name: any;
-          content: unknown;
-          type: any;
-        }[] = [];
+        const userInputImagesList: FileInput[] = [];
         await Promise.all(
-          imageFiles.map(async (image: { name: any; type: any }) => {
+          imageFiles.map(async (image) => {
             const imageContent = await readImageContent(image);
             const userInputImage = {
               name: image.name,
@@ -117,18 +118,14 @@
             if (done) break;
 
             const chunk = decoder.decode(value, { stream: true });
-            // const chunk = decoder.decode(value);
             partialData += chunk;
             const formattedChunk = formatMarkdown(partialData)
               .split("\n")
-              // .filter(Boolean)
               .map((line) => formatMarkdown(line))
               .join("\n");
             output = formattedChunk;
           }
         }
-
-        // const data = await response.json();
       } catch (error) {
         console.error("Fetch headlines error:" + error);
       }
@@ -171,7 +168,7 @@
         disabled={!promptId}
         on:click={() => {
           isClickOnFile = false;
-          imageModel.showModal();
+          imageModal.showModal();
         }}
       >
         <svg
@@ -197,7 +194,7 @@
         disabled={!promptId}
         on:click={() => {
           isClickOnFile = true;
-          fileModel.showModal();
+          fileModal.showModal();
         }}
       >
         <svg
@@ -222,6 +219,7 @@
     <button
       class="btn btn-ghost btn-md self-center disabled:bg-base-100 disabled:text-slate-500 disabled:cursor-not-allowed"
       disabled={!promptId}
+      on:click|preventDefault={fetchHeadline}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -229,28 +227,21 @@
         height="1em"
         viewBox="0 0 24 24"
         class={`w-8 h-8 ${promptId ? "text-primary" : "text-base-300"}`}
-        on:click|preventDefault={fetchHeadline}
       >
         <path fill="currentColor" d="M3 20v-6l8-2l-8-2V4l19 8z"></path>
       </svg>
     </button>
   </div>
   <div>
-    <input
-      type="checkbox"
-      id={isClickOnFile ? fileDialogId : imageDialogId}
-      class="modal-toggle"
-    />
+    <input type="checkbox" class="modal-toggle" />
     <FileUpload
-      id={imageDialogId}
-      bind:model={imageModel}
+      bind:modal={imageModal}
       title="Upload Images"
       acceptedTypes={imageTypes}
       bind:files={imageFiles}
     />
     <FileUpload
-      id={fileDialogId}
-      bind:model={fileModel}
+      bind:modal={fileModal}
       title="Upload Files"
       acceptedTypes={fileTypes}
       bind:files={inputFiles}
