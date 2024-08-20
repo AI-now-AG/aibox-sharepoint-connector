@@ -1,11 +1,12 @@
 <script>
-  import { fade } from 'svelte/transition';
+  import { fade } from "svelte/transition";
   import { useTranslations } from "$i18n/utils";
+
   export let preferredLocale;
-  const t = useTranslations(preferredLocale);
   export let promptsEnriched;
-  
-  
+
+  const t = useTranslations(preferredLocale);
+
   async function deletePrompt(id) {
     const response = await fetch(`/api/prompts.json`, {
       method: "DELETE",
@@ -16,9 +17,7 @@
     });
 
     if (response.ok) {
-      const data = await response.json(); 
-      promptsEnriched = promptsEnriched.filter(card => card._id !== id);
-      // console.log(data);
+      promptsEnriched = promptsEnriched.filter((card) => card._id !== id);
     } else {
       console.error("API call failed");
     }
@@ -26,7 +25,9 @@
 </script>
 
 <div class="container max-w-5xl mx-auto p-6 space-y-4">
-  <label class="text-lg font-normal text-base-content/80">{t("prompt-library.prompts.all")}</label>
+  <h1 class="text-lg font-normal text-base-content/80">
+    {t("prompt-library.prompts.all")}
+  </h1>
 
   <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
     {#each promptsEnriched as prompt}
