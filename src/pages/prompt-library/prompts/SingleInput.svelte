@@ -1,6 +1,7 @@
 <script lang="ts">
   // TODO: Use radio buttons instead of button, it's what they are used for. That
   // way we don't have to manage selected state ourselves.
+  // @ts-ignore
   type Item = { title: string } | string;
 
   export let title;
@@ -70,3 +71,4 @@
     </ul>
   </div>
 </div>
+
