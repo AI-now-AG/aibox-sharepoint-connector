@@ -1,11 +1,11 @@
 <script lang="ts">
+  import FileUpload from "$components/FileUpload.svelte";
+
   export let promptId = "";
   export let input = "";
-  let inputText = "";
   export let output = "";
-  import FileUpload from "$components/FileUpload.svelte";
-  import * as fs from "node:fs/promises";
-  import path from "path";
+
+  let inputText = "";
 
   const fileTypes = {
     "audio/*": ["audio/mp3"],
