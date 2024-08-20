@@ -63,20 +63,25 @@
       input = inputText;
       output = "";
       try {
-        const userInputFilesList: { name: any; content: unknown; type: any; }[] = [];
+        const userInputFilesList: { name: any; content: unknown; type: any }[] =
+          [];
         await Promise.all(
-          inputFiles.map(async (file: { name: any; type: any; }) => {
+          inputFiles.map(async (file: { name: any; type: any }) => {
             const fileContent = await readFileContent(file);
             const userInputFile = {
               name: file.name,
               content: fileContent,
               type: file.type,
             };
-            await userInputFilesList.push(userInputFile);
+            userInputFilesList.push(userInputFile);
           }),
         );
 
-        const userInputImagesList: { name: any; content: unknown; type: any; }[] = [];
+        const userInputImagesList: {
+          name: any;
+          content: unknown;
+          type: any;
+        }[] = [];
         await Promise.all(
           imageFiles.map(async (image: { name: any; type: any }) => {
             const imageContent = await readImageContent(image);
@@ -85,11 +90,11 @@
               content: imageContent,
               type: image.type,
             };
-            await userInputImagesList.push(userInputImage);
+            userInputImagesList.push(userInputImage);
           }),
         );
 
-        const response = await fetch("/api/promptExecution.json", {
+        const response = await fetch(`/api/prompts/${promptId}.json`, {
           method: "POST",
           body: JSON.stringify({
             article: inputText,

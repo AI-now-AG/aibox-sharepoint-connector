@@ -15,11 +15,14 @@ export const model = new ChatOpenAI({
   model: import.meta.env.OPENAI_MODEL,
 });
 
-export const POST: APIRoute = async (ctx) => {
+export const POST: APIRoute = async ({ params, request }) => {
+  const id = params.id;
+
   try {
     const encoder = new TextEncoder();
-    const params = await ctx.request.json();
-    if (!params.promptId) {
+
+    const data = await request.json();
+    if (!id) {
       return new Response(
         JSON.stringify({
           message: "Require 'PromptId' field",
@@ -27,7 +30,7 @@ export const POST: APIRoute = async (ctx) => {
         { status: 400 },
       );
     }
-    if (!params.article) {
+    if (!data.article) {
       return new Response(
         JSON.stringify({
           message: "Require 'article' field",
@@ -36,7 +39,7 @@ export const POST: APIRoute = async (ctx) => {
       );
     }
 
-    const prompt = await PromptModel.get(params.promptId);
+    const prompt = await PromptModel.get(id);
     if (!prompt?.prompt) {
       return new Response(
         JSON.stringify({
@@ -74,11 +77,11 @@ export const POST: APIRoute = async (ctx) => {
       });
     }
 
-    messages.push(new HumanMessage(params.article));
+    messages.push(new HumanMessage(data.article));
 
     // Handle image uploads
-    if (params.images) {
-      params.images.forEach((object: any) => {
+    if (data.images) {
+      data.images.forEach((object: any) => {
         if (object.content) {
           messages.push(
             new HumanMessage(object.content),
@@ -98,8 +101,8 @@ export const POST: APIRoute = async (ctx) => {
     }
 
     // Handle file uploads
-    if (params.files) {
-      params.files.forEach((object: any) => {
+    if (data.files) {
+      data.files.forEach((object: any) => {
         if (object.content) {
           // const messageContent = object.type.startsWith("text/")
           //   ? object.content
@@ -186,7 +189,6 @@ export const POST: APIRoute = async (ctx) => {
     //     data,
     //   }),
     // );
-
   } catch (error) {
     console.error("Error processing request:", error);
     return new Response(

@@ -6,7 +6,7 @@
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro check && astro build",
-    "check": "astro check",
+    "check": "astro check && eslint 'src/**/*.{js,mjs,cjs,ts,astro}'",
     "preview": "astro preview",
     "astro": "astro"
   },
