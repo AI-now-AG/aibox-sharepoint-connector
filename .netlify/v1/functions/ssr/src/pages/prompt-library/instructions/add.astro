@@ -1,0 +1,9 @@
+---
+// Component
+import Layout from "$layouts/Layout.astro";
+import InstructionForm from "$pages/prompt-library/instructions/InstructionForm.svelte";
+---
+
+<Layout>
+  <InstructionForm preferredLocale={Astro.preferredLocale} client:load />
+</Layout>

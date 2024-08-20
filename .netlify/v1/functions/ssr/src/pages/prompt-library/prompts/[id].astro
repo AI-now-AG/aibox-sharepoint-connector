@@ -1,0 +1,24 @@
+---
+import Layout from "$layouts/Layout.astro";
+import Prompts from "$data/models/prompt.model";
+import PromptForm from "$pages/prompt-library/prompts/PromptForm.svelte";
+
+export interface Props {
+  id: string;
+}
+
+const { id } = Astro.params;
+
+const prompt = id ? await Prompts.getAsString(id) : undefined; // TODO: Render 404 if not found
+---
+
+<Layout>
+  <div>
+    <PromptForm
+      preferredLocale={Astro.preferredLocale}
+      promptId={id}
+      prompt={prompt}
+      client:load
+    />
+  </div>
+</Layout>

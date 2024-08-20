@@ -1,0 +1,24 @@
+---
+import Layout from "$layouts/Layout.astro";
+import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
+import KnowledgeBaseForm from "$pages/prompt-library/knowledge-base/KnowledgeBaseForm.svelte";
+
+export interface Props {
+  id: string;
+}
+
+const { id } = Astro.params;
+
+const knowledgeBase = id ? await KnowledgeBaseModel.get(id) : undefined; // TODO: Render 404 if not found
+---
+
+<Layout>
+  <div>
+    <KnowledgeBaseForm
+      preferredLocale={Astro.preferredLocale}
+      knowledgeBaseId={id}
+      knowledgeBase={knowledgeBase}
+      client:load
+    />
+  </div>
+</Layout>
