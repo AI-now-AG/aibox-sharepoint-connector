@@ -25,18 +25,10 @@ const CategoryParamsSchema = z.object({
 
 export type CategoryParams = z.infer<typeof CategoryParamsSchema>;
 
-const extractRequiredFields = (categories: any) => {
-  return categories.map((category: any) => ({
-    _id: category._id,
-    title: category.title,
-    groups: category.groups,
-  }));
-};
-
 export const GET: APIRoute = async (ctx) => {
   try {
     const result = await CategoryModel.listByUser(ctx.locals.userId);
-    const data = extractRequiredFields(await result.toArray());
+    const data = await result.toArray();
     return new Response(JSON.stringify(data));
   } catch (error) {
     console.error(error);
