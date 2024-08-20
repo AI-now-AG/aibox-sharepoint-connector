@@ -25,7 +25,7 @@ export const POST: APIRoute = async ({ params, request }) => {
     if (!id) {
       return new Response(
         JSON.stringify({
-          message: "Require 'PromptId' field",
+          message: "Require 'id' param",
         }),
         { status: 400 },
       );
