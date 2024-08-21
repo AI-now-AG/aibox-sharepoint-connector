@@ -40,13 +40,14 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const validationResult = await verifyAuth(token);
 
   switch (validationResult.status) {
-    case "authorized":
+    case "authorized": {
       const { payload } = validationResult;
       const { userId, username, tenantId } = payload;
       context.locals.userId = userId as string;
       context.locals.tenantId = tenantId as string;
       context.locals.username = username as string;
       return next();
+    }
 
     case "error":
     case "unauthorized":

@@ -26,9 +26,10 @@
 </script>
 
 <div class="container max-w-5xl mx-auto p-6 space-y-4">
-  <label class="text-lg font-normal text-base-content/80">
+  <h1 class="text-lg font-normal text-base-content/80">
     {t("prompt-library.instructions.all")}
-  </label>
+  </h1>
+
   <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
     {#each instructionEnriched as instruction}
       <div class="card bg-base-100 shadow-xl" out:fade>
@@ -64,4 +65,3 @@
     {/each}
   </div>
 </div>
-

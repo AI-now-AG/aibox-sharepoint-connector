@@ -1,10 +1,11 @@
 <script>
   import { fade } from "svelte/transition";
   import { useTranslations } from "$i18n/utils";
+
   export let preferredLocale;
-  const t = useTranslations(preferredLocale);
   export let knowledgeBasesEnriched;
 
+  const t = useTranslations(preferredLocale);
   async function deleteKnowledgeBase(id) {
     const response = await fetch(`/api/knowledge-base.json`, {
       method: "DELETE",
@@ -15,7 +16,6 @@
     });
 
     if (response.ok) {
-      const data = await response.json();
       knowledgeBasesEnriched = knowledgeBasesEnriched.filter(
         (card) => card._id !== id,
       );
@@ -26,9 +26,9 @@
 </script>
 
 <div class="container max-w-5xl mx-auto p-6 space-y-4">
-  <label class="text-lg font-normal text-base-content/80">
+  <h1 class="text-lg font-normal text-base-content/80">
     {t("prompt-library.knowledgebase.all")}
-  </label>
+  </h1>
   <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
     {#each knowledgeBasesEnriched as knowledgeBase}
       <div class="card bg-base-100 shadow-xl" out:fade>

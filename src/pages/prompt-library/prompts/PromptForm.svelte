@@ -1,6 +1,6 @@
 <script lang="ts">
   import SingleInput from "$pages/prompt-library/prompts/SingleInput.svelte";
-  import type { CreatePromptParams } from "$pages/api/prompts.json";
+  import type { CreatePromptParams } from "$pages/api/prompts/index.json";
   import { useTranslations } from "$i18n/utils";
 
   import { onMount } from "svelte";
@@ -76,7 +76,7 @@
     const instructionResponse = await fetch("/api/instructions.json", {
       method: "GET",
     });
-    const instructionData = await instructionResponse.json();
+    const instructionData = (await instructionResponse.json()) as Instruction[];
     if (instructionData) {
       if (prompt) {
         prompt.instructions?.forEach((instructionObj) => {
@@ -94,7 +94,8 @@
     const knowledgeBaseResponse = await fetch("/api/knowledge-base.json", {
       method: "GET",
     });
-    const knowledgeBaseData = await knowledgeBaseResponse.json();
+    const knowledgeBaseData =
+      (await knowledgeBaseResponse.json()) as KnowledgeBase[];
     if (knowledgeBaseData) {
       if (prompt) {
         prompt.knowledgebase?.forEach((kbObj) => {
@@ -133,7 +134,7 @@
   }
 </script>
 
-<div class="container max-w-5xl p-6 mx-auto p-4">
+<div class="container max-w-5xl mx-auto p-4">
   <div class="w-full min-w-xs pt-2 lg:pt-6">
     <h1 class="pt-2 text-4xl font-bold pb-6">
       {#if prompt}

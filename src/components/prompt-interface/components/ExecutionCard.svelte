@@ -1,15 +1,17 @@
 <script>
   import { onMount } from "svelte";
   import { useTranslations } from "$i18n/utils";
+  import { storePromptId } from "$components/prompt-interface/components/Stores";
+
   export let preferredLocale;
+  export let cards;
+  export let selectedPromptId;
+
   const t = useTranslations(preferredLocale);
-  import { storePromptId } from '$components/prompt-interface/components/Stores';
 
   let showMore = false;
   let selectedCardIndex = null;
-  export let cards;
 
-  export let selectedPromptId;
   const promptLimit = 5;
 
   // TODO: Remove below function once default prompt functionality implemented
@@ -34,14 +36,12 @@
   >
     {#each cards as card, index}
       {#if index < promptLimit || showMore}
-        <div
-          class={`transition-all duration-500 ease-in-out transform scale-95 opacity-0 animate-slide-in card outline-base-300 ${selectedCardIndex === index ? "bg-primary text-base-100" : "outline outline-2 text-base-content"}`}
+        <button
+          class={`transition-all duration-500 ease-in-out transform scale-95 opacity-0 animate-slide-in card outline-base-300 p-6 ${selectedCardIndex === index ? "bg-primary text-base-100" : "outline outline-2 text-base-content"}`}
           on:click={() => selectCard(index)}
         >
-          <button class="p-6">
-            <p class="card-title text-sm font-normal">{card.title}</p>
-          </button>
-        </div>
+          <p class="card-title text-sm font-normal">{card.title}</p>
+        </button>
       {/if}
     {/each}
   </div>
