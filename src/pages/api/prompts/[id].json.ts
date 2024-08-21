@@ -55,6 +55,7 @@ export const POST: APIRoute = async ({ params, request }) => {
     }
 
     const messages: BaseMessage[] = [];
+    messages.push(new SystemMessage(prompt.prompt));
 
     if (prompt?.instructions) {
       const calls = prompt.instructions.map(async (inst) => {

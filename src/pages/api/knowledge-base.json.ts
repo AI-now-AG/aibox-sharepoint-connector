@@ -60,7 +60,10 @@ export const GET: APIRoute = async (ctx) => {
     const result = await KnowledgeBaseModel.listByUser(ctx.locals.userId);
     const documents = await result.toArray();
     return new Response(
-      JSON.stringify(documents.map((doc) => ({ _id: doc._id }))),
+      JSON.stringify(documents.map((doc) => ({
+        _id: doc._id,
+        title: doc.title,
+      }))),
     );
   } catch (error) {
     console.error(error);
