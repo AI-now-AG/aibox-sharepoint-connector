@@ -1,9 +1,11 @@
 <script>
   import { fade } from "svelte/transition";
   import { useTranslations } from "$i18n/utils";
+
   export let preferredLocale;
-  const t = useTranslations(preferredLocale);
   export let categoryEnriched;
+
+  const t = useTranslations(preferredLocale);
 
   async function deletecCategoryEnriched(id) {
     const response = await fetch(`/api/categories.json`, {
@@ -15,10 +17,7 @@
     });
 
     if (response.ok) {
-      const data = await response.json();
-      categoryEnriched = categoryEnriched.filter(
-        (card) => card._id !== id,
-      );
+      categoryEnriched = categoryEnriched.filter((card) => card._id !== id);
     } else {
       console.error("API call failed");
     }
@@ -26,9 +25,9 @@
 </script>
 
 <div class="container max-w-5xl mx-auto p-6 space-y-4">
-  <label class="text-lg font-normal text-base-content/80">
+  <h1 class="text-lg font-normal text-base-content/80">
     {t("prompt-library.instructions.all")}
-  </label>
+  </h1>
   <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
     {#each categoryEnriched as category}
       <div class="card bg-base-100 shadow-xl" out:fade>

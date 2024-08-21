@@ -1,7 +1,9 @@
 <script lang="ts">
-  import type { CreateCategoryParams } from "$pages/api/categories.json";
+  import type {
+    CreateCategoryParams,
+    GroupParam,
+  } from "$pages/api/categories.json";
   import { onMount } from "svelte";
-  import type { Category, Group } from "$data/models/category.model";
   import { useTranslations } from "$i18n/utils";
   export let preferredLocale;
   const t = useTranslations(preferredLocale);
@@ -12,10 +14,10 @@
    */
 
   let title: string | undefined;
-  let groups: Group[] = [];
+  let groups: GroupParam[] = [];
 
   export let categoryId: string;
-  export let category: Category;
+  export let category: CreateCategoryParams;
 
   onMount(async function () {
     if (category) {
@@ -30,10 +32,10 @@
     } else if (groups && groups.length > 0) {
       const newCategory: CreateCategoryParams = {
         title,
-        groups: groups.map((e) => ({_id: e._id, title: e.title})),
+        groups: groups.map((e) => ({ _id: e._id, title: e.title })),
         ...(categoryId && { _id: categoryId }),
       };
-      
+
       const response = await fetch("/api/categories.json", {
         method: category ? "PUT" : "POST",
         body: JSON.stringify(newCategory),
@@ -42,7 +44,7 @@
         },
       });
       const data = await response.json();
-      
+
       groups = [];
       title = undefined;
       alert(data.message);
@@ -53,7 +55,7 @@
 
   function addGroup() {
     if (groups && groups.length < 6) {
-      const newGroup: Group = {
+      const newGroup: GroupParam = {
         title: "",
       };
       groups = [...groups, newGroup];
