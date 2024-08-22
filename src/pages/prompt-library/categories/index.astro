@@ -3,7 +3,7 @@ import Layout from "$layouts/Layout.astro";
 import { useTranslations } from "$i18n/utils";
 import CategoryModel from "$data/models/category.model";
 import ViewCards from "$components/ViewCards.svelte";
-import { CardType } from "$utils/types";
+import { CardType, type CardItem } from "$utils/types";
 
 const t = useTranslations(Astro.preferredLocale);
 
@@ -11,12 +11,10 @@ const categoriesCursor = await CategoryModel.listByUser(Astro.locals.userId);
 const categories = await categoriesCursor.toArray();
 
 let index = 1;
-const categoriesEnriched = categories.map((category) => ({
+const categoriesEnriched: CardItem[] = categories.map((category) => ({
   number: String(index++).padStart(2, "0"),
-  _id: category._id.toString(),
+  id: category._id.toString(),
   title: category.title,
-  groups: category.groups,
-  icon: category.icon,
 }));
 ---
 

@@ -4,7 +4,7 @@ import { useTranslations } from "$i18n/utils";
 import PromptModel from "$data/models/prompt.model";
 import CategoryModel from "$data/models/category.model";
 import ViewCards from "$components/ViewCards.svelte";
-import { CardType } from "$utils/types";
+import { CardType, type CardItem } from "$utils/types";
 
 const t = useTranslations(Astro.preferredLocale);
 
@@ -21,7 +21,7 @@ const categories = await Promise.all(calls);
 
 const categoryAll = await CategoryModel.listByUser(Astro.locals.userId);
 
-const promptsEnriched = prompts.map((prompt) => {
+const promptsEnriched: CardItem[] = prompts.map((prompt) => {
   const category = categories.find(
     (category) => category?._id.toString() === prompt.category.toString(),
   );
@@ -31,8 +31,9 @@ const promptsEnriched = prompts.map((prompt) => {
   );
 
   return {
-    ...prompt,
-    _id: prompt._id.toString(),
+    title: prompt.title,
+    description: prompt.description,
+    id: prompt._id.toString(),
     categoryName: category?.title,
     groupName: group?.title,
   };

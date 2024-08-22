@@ -3,7 +3,7 @@ import Layout from "$layouts/Layout.astro";
 import { useTranslations } from "$i18n/utils";
 import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
 import ViewCards from "$components/ViewCards.svelte";
-import { CardType } from "$utils/types";
+import { CardType, type CardItem } from "$utils/types";
 
 const t = useTranslations(Astro.preferredLocale);
 
@@ -13,9 +13,9 @@ const knowledgeBaseCursor = await KnowledgeBaseModel.listByUser(
 const knowledgeBases = await knowledgeBaseCursor.toArray();
 
 let index = 1;
-const knowledgeBasesEnriched = knowledgeBases.map((knowledgeBase) => ({
+const knowledgeBasesEnriched: CardItem[]  = knowledgeBases.map((knowledgeBase) => ({
   number: String(index++).padStart(2, "0"),
-  _id: knowledgeBase._id.toString(),
+  id: knowledgeBase._id.toString(),
   title: knowledgeBase.title,
   description: knowledgeBase.description,
 }));

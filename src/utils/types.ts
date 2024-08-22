@@ -5,6 +5,15 @@ export enum CardType {
     Category = 'categories'
 }
 
+export interface CardItem {
+    id: string;
+    title: string;
+    description?: string;
+    category?: string;
+    group?: string;
+    number?: string;
+}
+
 export const CardTypeEndpoints: { [key in CardType]: string } = {
     [CardType.Prompt]: '/api/prompts.json',
     [CardType.Instruction]: '/api/instructions.json',

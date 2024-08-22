@@ -3,7 +3,7 @@ import Layout from "$layouts/Layout.astro";
 import { useTranslations } from "$i18n/utils";
 import InstructionModel from "$data/models/instruction.model";
 import ViewCards from "$components/ViewCards.svelte";
-import { CardType } from "$utils/types";
+import { CardType, type CardItem } from "$utils/types";
 
 const t = useTranslations(Astro.preferredLocale);
 
@@ -13,9 +13,10 @@ const instructionsCursor = await InstructionModel.listByUser(
 const instructions = await instructionsCursor.toArray();
 
 let index = 1;
-const instructionsEnriched = instructions.map((instruction) => ({
+
+const instructionsEnriched: CardItem[] = instructions.map((instruction) => ({
   number: String(index++).padStart(2, "0"),
-  _id: instruction._id.toString(),
+  id: instruction._id.toString(),
   title: instruction.title,
   description: instruction.description,
 }));

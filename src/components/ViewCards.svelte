@@ -1,11 +1,11 @@
 <script lang="ts">
   import { fade } from "svelte/transition";
-  import { CardType, CardTypeEndpoints } from "$utils/types";
+  import { CardType, CardTypeEndpoints, type CardItem } from "$utils/types";
   import { useTranslations } from "$i18n/utils";
 
   export let preferredLocale;
   const t = useTranslations(preferredLocale);
-  export let enriched: any[] = [];
+  export let enriched: CardItem[] = [];
   export let cardType: CardType = CardType.Prompt;
 
   async function deleteCard(id: any) {
@@ -48,13 +48,13 @@
               class={`badge px-2 ${cardType == CardType.Prompt ? "border-base-300" : "bg-neutral text-neutral-content"}`}
             >
               {#if cardType == CardType.Prompt}
-                {card.categoryName}
+                {card.category}
               {:else}
                 {card.number}
               {/if}
             </div>
             {#if cardType == CardType.Prompt}
-              <div class="badge px-2 border-base-300">{card.groupName}</div>
+              <div class="badge px-2 border-base-300">{card.group}</div>
             {/if}
           </div>
           <h2 class="card-title">{card.title}</h2>
