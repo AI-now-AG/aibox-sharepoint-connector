@@ -2,25 +2,28 @@
 import PromptDetails from "./PromptDetails.svelte";
 ---
 
-<div role="tablist" class="tabs tabs-bordered">
+<div role="tablist" class="w-full tabs">
   <input
     type="radio"
     name="my_tabs_1"
     role="tab"
-    class="tab"
+    class="tab checked:font-bold"
     aria-label="History"
   />
-  <div role="tabpanel" class="tab-content py-8 px-2">History content</div>
+  <div role="tabpanel" class="tab-content w-full"><div class="divider"></div>History content</div>
 
   <input
     type="radio"
     name="my_tabs_1"
     role="tab"
-    class="tab"
+    class="tab checked:font-bold"
     aria-label="Settings"
     checked="checked"
   />
-  <div role="tabpanel" class="tab-content py-8 px-2">
-    <PromptDetails client:load />
+  <div role="tabpanel" class="tab-content w-full">
+    <div class="divider"></div>
+    <div class="px-2">
+      <PromptDetails preferredLocale={Astro.preferredLocale} client:load />
+    </div>
   </div>
 </div>

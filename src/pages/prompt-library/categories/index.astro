@@ -2,7 +2,8 @@
 import Layout from "$layouts/Layout.astro";
 import { useTranslations } from "$i18n/utils";
 import CategoryModel from "$data/models/category.model";
-import CategoryCard from "$components/CategoryCard.svelte";
+import ViewCards from "$components/ViewCards.svelte";
+import { CardType } from "$utils/types";
 
 const t = useTranslations(Astro.preferredLocale);
 
@@ -70,9 +71,10 @@ const categoriesEnriched = categories.map((category) => ({
     </label>
   </div>
 
-  <CategoryCard
-    categoryEnriched={categoriesEnriched}
+  <ViewCards
+    enriched={categoriesEnriched}
     preferredLocale={Astro.preferredLocale}
+    cardType={CardType.Category}
     client:load
   />
 </Layout>

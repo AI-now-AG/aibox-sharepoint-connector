@@ -2,7 +2,8 @@
 import Layout from "$layouts/Layout.astro";
 import { useTranslations } from "$i18n/utils";
 import InstructionModel from "$data/models/instruction.model";
-import InstructionCard from "$components/InstructionCard.svelte";
+import ViewCards from "$components/ViewCards.svelte";
+import { CardType } from "$utils/types";
 
 const t = useTranslations(Astro.preferredLocale);
 
@@ -71,9 +72,10 @@ const instructionsEnriched = instructions.map((instruction) => ({
     </label>
   </div>
 
-  <InstructionCard
-    instructionEnriched={instructionsEnriched}
+  <ViewCards
+    enriched={instructionsEnriched}
     preferredLocale={Astro.preferredLocale}
+    cardType={CardType.Instruction}
     client:load
   />
 </Layout>

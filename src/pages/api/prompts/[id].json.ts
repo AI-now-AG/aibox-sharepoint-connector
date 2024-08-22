@@ -9,7 +9,16 @@ import type { APIRoute } from "astro";
 import PromptModel from "$data/models/prompt.model";
 import InstructionModel from "$data/models/instruction.model";
 import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
+import type { CreateInstructionParams } from "../instructions.json";
+import type { CreateKnowledgeBaseParams } from "../knowledge-base.json";
 import { z } from "zod";
+
+export type PromptDetails = {
+  title: string;
+  prompt: string;
+  instructions: CreateInstructionParams[];
+  knowledgebase: CreateKnowledgeBaseParams[];
+};
 
 const AttachmentSchema = z.object({
   name: z.string(),
@@ -202,6 +211,63 @@ export const POST: APIRoute = async ({ params, request }) => {
         message: "Internal Server Error: " + error,
       }),
       { status: 500 },
+    );
+  }
+};
+
+export const PUT: APIRoute<PromptDetails> = async (ctx) => {
+  try {
+    const promptId = ctx.url.searchParams.get("_id") as string;
+    const params = await ctx.request.json() as PromptDetails;
+
+    if (params) {
+      await PromptModel.updatePromptField(promptId, params.prompt)
+
+      if (params.instructions) {
+        const calls = params.instructions.map(async (inst) => {
+          const instruction = await InstructionModel.updateInstruction(inst._id!, inst.instruction)
+          return instruction;
+        });
+        await Promise.all(calls);
+      }
+
+      if (params.knowledgebase) {
+        const calls = params.knowledgebase.map(async (kb) => {
+          const instruction = await KnowledgeBaseModel.updateKnowledgeBase(kb._id!, kb.knowledge_base)
+          return instruction;
+        });
+        await Promise.all(calls);
+      }
+
+      return new Response(
+        JSON.stringify({
+          message: "Prompt updated",
+        }),
+        {
+          status: 200,
+        },
+      );
+    } else {
+      return new Response(
+        JSON.stringify({
+          message: "Error while parsing the prompt",
+        }),
+        {
+          status: 500,
+        },
+      );
+    }
+  } catch (error) {
+    console.debug(error);
+
+    return new Response(
+      JSON.stringify({
+        message: "Error while updating the prompt",
+        error: error,
+      }),
+      {
+        status: 500,
+      },
     );
   }
 };

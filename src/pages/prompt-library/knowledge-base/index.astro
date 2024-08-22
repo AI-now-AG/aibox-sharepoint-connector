@@ -2,7 +2,8 @@
 import Layout from "$layouts/Layout.astro";
 import { useTranslations } from "$i18n/utils";
 import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
-import KnowledgeBaseCard from "$components/KnowledgeBaseCard.svelte";
+import ViewCards from "$components/ViewCards.svelte";
+import { CardType } from "$utils/types";
 
 const t = useTranslations(Astro.preferredLocale);
 
@@ -71,9 +72,10 @@ const knowledgeBasesEnriched = knowledgeBases.map((knowledgeBase) => ({
     </label>
   </div>
 
-  <KnowledgeBaseCard
-    knowledgeBasesEnriched={knowledgeBasesEnriched}
+  <ViewCards
+    enriched={knowledgeBasesEnriched}
     preferredLocale={Astro.preferredLocale}
+    cardType={CardType.Knowledgebase}
     client:load
   />
 </Layout>

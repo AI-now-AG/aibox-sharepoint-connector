@@ -243,10 +243,12 @@ export const GET: APIRoute = async (ctx) => {
         title: prompt.title,
         prompt: prompt.prompt,
         instructions: instructions.map((inst) => ({
+          _id: inst._id,
           title: inst.title,
           instruction: inst.instruction,
         })),
         knowledgebase: knowledgebases.map((kb) => ({
+          _id: kb._id,
           title: kb.title,
           knowledge_base: kb.knowledge_base,
         })),

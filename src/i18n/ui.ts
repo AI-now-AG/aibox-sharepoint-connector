@@ -79,9 +79,13 @@ const en = {
   "prompt-library.categories.title": "Categories",
   "prompt-library.categories.add": "Add Category",
   "prompt-library.categories.edit": "Edit Category",
+  "prompt-library.categories.all": "All Categories",
+  "prompt-library.categories.view": "View",
 
   "prompt-execution.card.showMore": "more prompts",
   "prompt-execution.card.showLess": "less prompts",
+  "prompt-execution.showGlobal": "Save Global",
+
 };
 
 const de = {
@@ -158,9 +162,13 @@ const de = {
   "prompt-library.categories.title": "Kategorien",
   "prompt-library.categories.add": "Neue Kategorie",
   "prompt-library.categories.edit": "Kategorie bearbeiten",
+  "prompt-library.categories.all": "Alle Kategorien",
+  "prompt-library.categories.view": "View",
 
   "prompt-execution.card.showMore": "weitere Anregungen",
   "prompt-execution.card.showLess": "weniger Aufforderungen",
+  "prompt-execution.showGlobal": "Save Global",
+  
 };
 
 export const ui = {
