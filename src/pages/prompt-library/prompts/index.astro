@@ -3,8 +3,7 @@ import Layout from "$layouts/Layout.astro";
 import { useTranslations } from "$i18n/utils";
 import PromptModel from "$data/models/prompt.model";
 import CategoryModel from "$data/models/category.model";
-import ViewCards from "$components/ViewCards.svelte";
-import { CardType, type CardItem } from "$utils/types";
+import ViewCards, { type CardItem } from "$components/ViewCards.svelte";
 
 const t = useTranslations(Astro.preferredLocale);
 
@@ -34,8 +33,8 @@ const promptsEnriched: CardItem[] = prompts.map((prompt) => {
     title: prompt.title,
     description: prompt.description,
     id: prompt._id.toString(),
-    categoryName: category?.title,
-    groupName: group?.title,
+    badge1: category?.title,
+    badge2: group?.title,
   };
 });
 ---
@@ -146,9 +145,9 @@ const promptsEnriched: CardItem[] = prompts.map((prompt) => {
 
   <ViewCards
     enriched={promptsEnriched}
-    preferredLocale={Astro.preferredLocale}
-    cardType={CardType.Prompt}
-    viewLabel={t("prompt-library.prompts.all")}
+    type="prompts"
+    viewAllLabel={t("prompt-library.prompts.all")}
+    viewLabel={t("prompt-library.prompts.view")}
     client:load
   />
 </Layout>

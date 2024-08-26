@@ -2,8 +2,7 @@
 import Layout from "$layouts/Layout.astro";
 import { useTranslations } from "$i18n/utils";
 import CategoryModel from "$data/models/category.model";
-import ViewCards from "$components/ViewCards.svelte";
-import { CardType, type CardItem } from "$utils/types";
+import ViewCards, { type CardItem } from "$components/ViewCards.svelte";
 
 const t = useTranslations(Astro.preferredLocale);
 
@@ -12,9 +11,9 @@ const categories = await categoriesCursor.toArray();
 
 let index = 1;
 const categoriesEnriched: CardItem[] = categories.map((category) => ({
-  number: String(index++).padStart(2, "0"),
   id: category._id.toString(),
   title: category.title,
+  badge1: String(index++).padStart(2, "0"),
 }));
 ---
 
@@ -71,9 +70,9 @@ const categoriesEnriched: CardItem[] = categories.map((category) => ({
 
   <ViewCards
     enriched={categoriesEnriched}
-    preferredLocale={Astro.preferredLocale}
-    cardType={CardType.Category}
-    viewLabel={t("prompt-library.categories.all")}
+    type="categories"
+    viewAllLabel={t("prompt-library.categories.all")}
+    viewLabel={t("prompt-library.categories.view")}
     client:load
   />
 </Layout>
