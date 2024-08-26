@@ -1,62 +1,68 @@
-<script>
-  export let id;
-  export let title;
-  export let acceptedTypes;
-  //   export let files;
-  export let model;
+<script lang="ts">
+  export let title: string;
+  export let acceptedTypes: Record<string, string[]>;
+  export let modal;
+  export let files: File[] = [];
 
-  export let files = [];
   let isDragOver = false;
-  let fileDragging = null;
-  let fileDropping = null;
-  let imgElements = []; // Store references to image elements
-  let videoElements = []; // Store references to video elements
+  let fileDragging = -1;
+  let fileDropping = -1;
+
+  let imgElements: HTMLImageElement[] = [];
+  let videoElements: HTMLSourceElement[] = [];
 
   const acceptedMimeTypes = Object.values(acceptedTypes).flat().join(", ");
+  const units = ["B", "kB", "MB", "GB", "TB"];
 
-  function humanFileSize(size) {
+  function humanFileSize(size: number) {
     const i = Math.floor(Math.log(size) / Math.log(1024));
-    return (
-      (size / Math.pow(1024, i)).toFixed(2) * 1 +
-      " " +
-      ["B", "kB", "MB", "GB", "TB"][i]
-    );
+    const unit = units[i];
+    const formatted = size / Math.pow(1024, i);
+    return `${formatted.toFixed(2)} ${unit}`;
   }
 
-  function remove(index) {
+  function remove(index: number) {
     files = files.slice(0, index).concat(files.slice(index + 1));
   }
 
-  function drop(event) {
+  function drop(event: DragEvent) {
     event.preventDefault();
     let removed = files.splice(fileDragging, 1);
     files.splice(fileDropping, 0, ...removed);
 
-    fileDropping = null;
-    fileDragging = null;
+    fileDropping = -1;
+    fileDragging = -1;
   }
 
-  function dragenter(event, index) {
+  function dragenter(_event: DragEvent, index: number) {
     fileDropping = index;
   }
 
-  function dragstart(event, index) {
+  function dragstart(event: DragEvent, index: number) {
     fileDragging = index;
-    event.dataTransfer.effectAllowed = "move";
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = "move";
+    }
   }
 
-  function loadFile(file) {
+  function loadFile(file: File) {
     return URL.createObjectURL(file);
   }
 
-  function isFileTypeAllowed(file) {
+  function isFileTypeAllowed(file: File) {
     const fileType = file.type;
     return Object.values(acceptedTypes).flat().includes(fileType);
   }
 
-  function addFiles(event) {
-    const newFiles = Array.from(event.target.files).filter(isFileTypeAllowed);
-    files = [...files, ...newFiles];
+  function addFiles(
+    event: Event & { currentTarget: EventTarget & HTMLInputElement },
+  ) {
+    const eventTarget = event.target as HTMLInputElement;
+    const attachedFiles = eventTarget.files;
+    if (attachedFiles) {
+      const newFiles = Array.from(attachedFiles).filter(isFileTypeAllowed);
+      files = [...files, ...newFiles];
+    }
   }
 
   $: {
@@ -78,7 +84,7 @@
   }
 </script>
 
-<dialog bind:this={model} class="modal">
+<dialog bind:this={modal} class="modal">
   <div class="modal-box p-4 rounded-lg mx-auto max-w-6xl">
     <h3 class="text-lg font-bold pb-4">{title}</h3>
     <form method="dialog">
@@ -90,7 +96,7 @@
       <div
         class="relative flex flex-col p-4 border border-neutral-content rounded"
       >
-        <div
+        <label
           class={`relative flex flex-col text-base-content border border-neutral-content border-dashed rounded cursor-pointer ${isDragOver && "border-primary ring-4 ring-inset"}`}
           on:dragover={() => {
             isDragOver = true;
@@ -129,14 +135,16 @@
             </svg>
             <p class="m-0">Drag your files here or click in this area.</p>
           </div>
-        </div>
+        </label>
 
         {#if files.length > 0}
           <div
             class="grid grid-cols-2 gap-4 mt-4 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8"
             on:drop={drop}
             on:dragover={(e) => {
-              e.dataTransfer.dropEffect = "move";
+              if (e.dataTransfer) {
+                e.dataTransfer.dropEffect = "move";
+              }
             }}
           >
             {#each files as file, index (file.name)}
@@ -144,7 +152,7 @@
                 class="relative flex flex-col items-center overflow-hidden text-center bg-base-100 border border-neutral-content rounded cursor-move select-none image-box pt-36"
                 on:dragstart={(e) => dragstart(e, index)}
                 on:dragend={() => {
-                  fileDragging = null;
+                  fileDragging = -1;
                 }}
                 draggable="true"
                 data-index={index}
@@ -234,7 +242,7 @@
                   class="absolute inset-0 z-40 transition-colors duration-300"
                   on:dragenter={(e) => dragenter(e, index)}
                   on:dragleave={() => {
-                    fileDropping = null;
+                    fileDropping = -1;
                   }}
                   class:bg-primary={fileDropping == index &&
                     fileDragging != index}

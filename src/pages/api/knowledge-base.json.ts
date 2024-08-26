@@ -55,18 +55,13 @@ const generateKnowledgeBaseDescription = async (knowledgeBase: string) => {
   return description;
 };
 
-const extractRequiredFields = (knowledgeBases: any) => {
-  return knowledgeBases.map((knowledgeBase: any) => ({
-    _id: knowledgeBase._id,
-    title: knowledgeBase.title,
-  }));
-};
-
 export const GET: APIRoute = async (ctx) => {
   try {
     const result = await KnowledgeBaseModel.listByUser(ctx.locals.userId);
-    const data = extractRequiredFields(await result.toArray());
-    return new Response(JSON.stringify(data));
+    const documents = await result.toArray();
+    return new Response(
+      JSON.stringify(documents.map((doc) => ({ _id: doc._id }))),
+    );
   } catch (error) {
     console.error(error);
 

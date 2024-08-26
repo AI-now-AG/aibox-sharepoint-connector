@@ -6,18 +6,19 @@ import { stringToObjectId } from "$utils/stringToObjectId";
 import CategoryModel from "$data/models/category.model";
 import type { Category, Group } from "$data/models/category.model";
 
+const GroupParamSchema = z.object({
+  _id: z.string().optional(),
+  title: z.string(),
+});
+
 const CreateCategoryParamsSchema = z.object({
   _id: z.string().optional(),
   title: z.string(),
-  groups: z.array(
-    z.object({
-      _id: z.string().optional(),
-      title: z.string(),
-    }),
-  ),
+  groups: z.array(GroupParamSchema),
 });
 
 export type CreateCategoryParams = z.infer<typeof CreateCategoryParamsSchema>;
+export type GroupParam = z.infer<typeof GroupParamSchema>;
 
 const CategoryParamsSchema = z.object({
   _id: z.string(),
@@ -25,19 +26,19 @@ const CategoryParamsSchema = z.object({
 
 export type CategoryParams = z.infer<typeof CategoryParamsSchema>;
 
-const extractRequiredFields = (categories: any) => {
-  return categories.map((category: any) => ({
-    _id: category._id,
-    title: category.title,
-    groups: category.groups,
-  }));
-};
-
 export const GET: APIRoute = async (ctx) => {
   try {
     const result = await CategoryModel.listByUser(ctx.locals.userId);
-    const data = extractRequiredFields(await result.toArray());
-    return new Response(JSON.stringify(data));
+    const categories = await result.toArray();
+    return new Response(
+      JSON.stringify(
+        categories.map((category) => ({
+          _id: category._id,
+          title: category.title,
+          groups: category.groups,
+        })),
+      ),
+    );
   } catch (error) {
     console.error(error);
 

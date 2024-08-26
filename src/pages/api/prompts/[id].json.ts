@@ -9,34 +9,42 @@ import type { APIRoute } from "astro";
 import PromptModel from "$data/models/prompt.model";
 import InstructionModel from "$data/models/instruction.model";
 import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
+import { z } from "zod";
+
+const AttachmentSchema = z.object({
+  name: z.string(),
+  type: z.string(),
+  content: z.string(),
+});
+
+const RunPromptParamsSchema = z.object({
+  _id: z.string(),
+  article: z.string().min(1),
+  images: z.array(AttachmentSchema).optional(),
+  files: z.array(AttachmentSchema).optional(),
+});
+
+export type RunPromptParams = z.infer<typeof RunPromptParamsSchema>;
+export type Attachment = z.infer<typeof AttachmentSchema>;
 
 export const model = new ChatOpenAI({
   apiKey: import.meta.env.OPENAI_API_KEY,
   model: import.meta.env.OPENAI_MODEL,
 });
 
-export const POST: APIRoute = async (ctx) => {
+export const POST: APIRoute = async ({ params, request }) => {
+  const id = params.id;
+
   try {
     const encoder = new TextEncoder();
-    const params = await ctx.request.json();
-    if (!params.promptId) {
-      return new Response(
-        JSON.stringify({
-          message: "Require 'PromptId' field",
-        }),
-        { status: 400 },
-      );
-    }
-    if (!params.article) {
-      return new Response(
-        JSON.stringify({
-          message: "Require 'article' field",
-        }),
-        { status: 400 },
-      );
-    }
 
-    const prompt = await PromptModel.get(params.promptId);
+    const requestParams = await request.json();
+    const data = RunPromptParamsSchema.parse({
+      ...requestParams,
+      ...{ _id: id },
+    });
+
+    const prompt = await PromptModel.get(data._id);
     if (!prompt?.prompt) {
       return new Response(
         JSON.stringify({
@@ -74,11 +82,11 @@ export const POST: APIRoute = async (ctx) => {
       });
     }
 
-    messages.push(new HumanMessage(params.article));
+    messages.push(new HumanMessage(data.article));
 
     // Handle image uploads
-    if (params.images) {
-      params.images.forEach((object: any) => {
+    if (data.images) {
+      data.images.forEach((object) => {
         if (object.content) {
           messages.push(
             new HumanMessage(object.content),
@@ -98,8 +106,8 @@ export const POST: APIRoute = async (ctx) => {
     }
 
     // Handle file uploads
-    if (params.files) {
-      params.files.forEach((object: any) => {
+    if (data.files) {
+      data.files.forEach((object) => {
         if (object.content) {
           // const messageContent = object.type.startsWith("text/")
           //   ? object.content
@@ -186,7 +194,6 @@ export const POST: APIRoute = async (ctx) => {
     //     data,
     //   }),
     // );
-
   } catch (error) {
     console.error("Error processing request:", error);
     return new Response(

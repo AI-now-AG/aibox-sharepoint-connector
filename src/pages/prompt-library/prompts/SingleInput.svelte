@@ -1,6 +1,7 @@
 <script lang="ts">
   // TODO: Use radio buttons instead of button, it's what they are used for. That
   // way we don't have to manage selected state ourselves.
+  // @ts-ignore
   type Item = { title: string } | string;
 
   export let title;
@@ -47,13 +48,11 @@
     <input
       {placeholder}
       bind:value={inputValue}
-      tabindex="2"
       role="button"
       class="input input-bordered font-medium w-full min-w-xs"
       readonly
     />
     <ul
-      tabindex="2"
       class="dropdown-content menu bg-base-100 space-y-2 rounded-box z-[1] w-52 p-2 shadow"
     >
       {#if items}

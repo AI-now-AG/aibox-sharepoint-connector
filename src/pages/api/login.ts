@@ -23,7 +23,7 @@ export const POST: APIRoute = async (ctx) => {
     const email = formData.get("email") as string;
     if (
       typeof email !== "string" ||
-      !/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)
+      !/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)
     ) {
       return new Response(JSON.stringify({ message: "Invalid username" }), {
         status: 400,
