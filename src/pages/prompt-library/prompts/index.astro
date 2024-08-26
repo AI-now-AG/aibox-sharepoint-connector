@@ -3,7 +3,7 @@ import Layout from "$layouts/Layout.astro";
 import { useTranslations } from "$i18n/utils";
 import PromptModel from "$data/models/prompt.model";
 import CategoryModel from "$data/models/category.model";
-import ViewCards, { type CardItem } from "$components/ViewCards.svelte";
+import Card, { type CardItem } from "$components/Card.svelte";
 
 const t = useTranslations(Astro.preferredLocale);
 
@@ -143,7 +143,7 @@ const promptsEnriched: CardItem[] = prompts.map((prompt) => {
     </div>
   </div>
 
-  <ViewCards
+  <Card
     enriched={promptsEnriched}
     type="prompts"
     viewAllLabel={t("prompt-library.prompts.all")}

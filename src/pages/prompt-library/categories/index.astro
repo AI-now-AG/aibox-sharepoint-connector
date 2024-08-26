@@ -2,7 +2,7 @@
 import Layout from "$layouts/Layout.astro";
 import { useTranslations } from "$i18n/utils";
 import CategoryModel from "$data/models/category.model";
-import ViewCards, { type CardItem } from "$components/ViewCards.svelte";
+import Card, { type CardItem } from "$components/Card.svelte";
 
 const t = useTranslations(Astro.preferredLocale);
 
@@ -68,7 +68,7 @@ const categoriesEnriched: CardItem[] = categories.map((category) => ({
     </label>
   </div>
 
-  <ViewCards
+  <Card
     enriched={categoriesEnriched}
     type="categories"
     viewAllLabel={t("prompt-library.categories.all")}
