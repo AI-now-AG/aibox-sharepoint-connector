@@ -148,6 +148,7 @@ const promptsEnriched: CardItem[] = prompts.map((prompt) => {
     enriched={promptsEnriched}
     preferredLocale={Astro.preferredLocale}
     cardType={CardType.Prompt}
+    viewLabel={t("prompt-library.prompts.all")}
     client:load
   />
 </Layout>

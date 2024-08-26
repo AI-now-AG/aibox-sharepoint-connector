@@ -215,7 +215,8 @@
     <div class="modal-action">
       <form method="dialog">
         <button
-          class={`btn btn-lg btn-primary font-normal ${isSaving && "btn-disabled"}`}
+          class="btn btn-lg btn-primary font-normal"
+          class:btn-disable={isSaving}
           on:click|preventDefault={savePromptGlobal}
         >
           {#if isSaving}

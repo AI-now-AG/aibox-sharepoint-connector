@@ -73,6 +73,7 @@ const categoriesEnriched: CardItem[] = categories.map((category) => ({
     enriched={categoriesEnriched}
     preferredLocale={Astro.preferredLocale}
     cardType={CardType.Category}
+    viewLabel={t("prompt-library.categories.all")}
     client:load
   />
 </Layout>

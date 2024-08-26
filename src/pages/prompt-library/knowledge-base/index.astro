@@ -76,6 +76,7 @@ const knowledgeBasesEnriched: CardItem[]  = knowledgeBases.map((knowledgeBase) =
     enriched={knowledgeBasesEnriched}
     preferredLocale={Astro.preferredLocale}
     cardType={CardType.Knowledgebase}
+    viewLabel={t("prompt-library.knowledgebase.all")}
     client:load
   />
 </Layout>

@@ -223,21 +223,18 @@ export const PUT: APIRoute<PromptDetails> = async (ctx) => {
     if (params) {
       await PromptModel.updatePromptField(promptId, params.prompt)
 
-      if (params.instructions) {
-        const calls = params.instructions.map(async (inst) => {
-          const instruction = await InstructionModel.updateInstruction(inst._id!, inst.instruction)
-          return instruction;
-        });
-        await Promise.all(calls);
-      }
+      const instructionCalls = params.instructions.map(async (inst) => {
+        const instruction = await InstructionModel.updateInstruction(inst._id!, inst.instruction)
+        return instruction;
+      });
+      await Promise.all(instructionCalls);
 
-      if (params.knowledgebase) {
-        const calls = params.knowledgebase.map(async (kb) => {
-          const instruction = await KnowledgeBaseModel.updateKnowledgeBase(kb._id!, kb.knowledge_base)
-          return instruction;
-        });
-        await Promise.all(calls);
-      }
+      const kbCalls = params.knowledgebase.map(async (kb) => {
+        const instruction = await KnowledgeBaseModel.updateKnowledgeBase(kb._id!, kb.knowledge_base)
+        return instruction;
+      });
+      await Promise.all(kbCalls);
+
 
       return new Response(
         JSON.stringify({

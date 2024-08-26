@@ -77,6 +77,7 @@ const instructionsEnriched: CardItem[] = instructions.map((instruction) => ({
     enriched={instructionsEnriched}
     preferredLocale={Astro.preferredLocale}
     cardType={CardType.Instruction}
+    viewLabel={t("prompt-library.instructions.all")}
     client:load
   />
 </Layout>

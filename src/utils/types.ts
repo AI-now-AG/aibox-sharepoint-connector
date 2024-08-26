@@ -9,21 +9,7 @@ export interface CardItem {
     id: string;
     title: string;
     description?: string;
-    category?: string;
-    group?: string;
+    categoryName?: string;
+    groupName?: string;
     number?: string;
 }
-
-export const CardTypeEndpoints: { [key in CardType]: string } = {
-    [CardType.Prompt]: '/api/prompts.json',
-    [CardType.Instruction]: '/api/instructions.json',
-    [CardType.Knowledgebase]: '/api/knowledge-base.json',
-    [CardType.Category]: '/api/categories.json'
-};
-
-export const CardTypeRawValue: { [key in CardType]: string } = {
-    [CardType.Prompt]: '/api/prompts.json',
-    [CardType.Instruction]: '/api/instructions.json',
-    [CardType.Knowledgebase]: '/api/knowledge-base.json',
-    [CardType.Category]: '/api/categories.json'
-};
