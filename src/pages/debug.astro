@@ -1,0 +1,13 @@
+---
+const account = JSON.stringify(Astro.locals.netlify.context.account);
+const deploy = JSON.stringify(Astro.locals.netlify.context.deploy);
+const site = JSON.stringify(Astro.locals.netlify.context.site);
+---
+
+<pre>
+  {account}
+
+  {deploy}
+
+  {site}
+</pre>
