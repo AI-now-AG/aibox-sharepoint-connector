@@ -42,7 +42,7 @@ console.log(import.meta.env.URL);
 console.log("-------");
 
 const netlifyHostname =
-  (import.meta.env.DEPLOY_PRIME_URL as string) || "http://localhost:4321";
+  (import.meta.env.DEPLOY_URL as string) || "http://localhost:4321";
 const hostname = netlifyHostname.includes("main--")
   ? import.meta.env.URL
   : netlifyHostname;
