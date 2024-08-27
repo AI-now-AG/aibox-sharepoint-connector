@@ -1,5 +1,7 @@
 ---
 // @ts-expect-error 2339
+console.log(Astro.locals.netlify.context);
+// @ts-expect-error 2339
 const account = JSON.stringify(Astro.locals.netlify.context.account);
 // @ts-expect-error 2339
 const deploy = JSON.stringify(Astro.locals.netlify.context.deploy);
