@@ -1,4 +1,5 @@
 export const PUBLIC_ROUTES = [
+  "/debug",
   "/login",
   "/api/login",
   "/login/auth0",
