@@ -7,7 +7,7 @@ const t = useTranslations(Astro.preferredLocale);
 
 // TODO: save theme settings in db
 const theme =
-  Astro.locals.user.tenant_id === new ObjectId("66aa21a3d40d0b194e280143")
+  Astro.locals.user.tenant_id.toString() === "66aa21a3d40d0b194e280143"
     ? "somedia"
     : "light";
 ---
