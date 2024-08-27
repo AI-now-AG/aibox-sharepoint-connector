@@ -1,83 +1,96 @@
 import { auth0, lucia } from "$auth";
-import { OAuth2RequestError } from "arctic";
-import { User, Session, type UserDoc } from "$auth/db";
-import { generateId } from "lucia";
+import { decodeJwt } from "jose";
 
 import type { APIContext } from "astro";
+import userModel from "$data/models/user.model";
+import { z } from "zod";
+import tenantModel from "$data/models/tenant.model";
+
+const Auth0JWTSchema = z.object({
+  sub: z.string().min(24),
+  org_name: z.string().min(2),
+  "ainow/roles": z.array(z.string().min(1)),
+  email: z.string().email(),
+  nickname: z.string(),
+  picture: z.string().url(),
+});
 
 export async function GET(context: APIContext): Promise<Response> {
   console.log("searchParams", context.url.searchParams);
-  console.log("state", context.cookies.get("github_oauth_state"));
+  console.log("state", context.cookies.get("auth0_state"));
 
   const code = context.url.searchParams.get("code");
   const state = context.url.searchParams.get("state");
-  const storedState = context.cookies.get("github_oauth_state")?.value ?? null;
+  const storedState = context.cookies.get("auth0_state")?.value ?? null;
 
   if (!code || !state || !storedState || state !== storedState) {
+    console.debug("missing required params");
     return new Response(null, {
       status: 400,
     });
   }
-  return new Response(null, {
-    status: 200,
-  });
 
-  /*
-  try {
-    const tokens = await auth0.validateAuthorizationCode(code);
-    const githubUserResponse = await fetch("https://api.github.com/user", {
-      headers: {
-        Authorization: `Bearer ${tokens.accessToken}`,
-      },
+  const tokens = await auth0.validateAuthorizationCode(code);
+  const decoded = decodeJwt(tokens.idToken);
+  console.log("decoded", decoded);
+
+  const userData = Auth0JWTSchema.safeParse(decoded);
+  if (userData.error) {
+    console.debug(
+      "Decoded id token does not contain the required fields",
+      userData.error,
+    );
+    return new Response(null, {
+      status: 400,
     });
-    const githubUser: GitHubUser = await githubUserResponse.json();
-    const existingUser = db
-      .prepare("SELECT * FROM user WHERE github_id = ?")
-      .get(githubUser.id) as UserDoc | undefined;
+  }
 
-    const existingUser = User.findOne({ auth0_id:   })
+  const existingUser = await userModel.getAuth0Sub(userData.data.sub);
+  console.log("existingUser", existingUser);
 
-    if (existingUser) {
-      const session = await lucia.createSession(existingUser._id, {});
-      const sessionCookie = lucia.createSessionCookie(session.id);
-      context.cookies.set(
-        sessionCookie.name,
-        sessionCookie.value,
-        sessionCookie.attributes,
-      );
-      return context.redirect("/");
-    }
-
-    const userId = generateId(15);
-    db.prepare(
-      "INSERT INTO user (id, github_id, username) VALUES (?, ?, ?)",
-    ).run(userId, githubUser.id, githubUser.login);
-    const session = await lucia.createSession(userId, {});
+  if (existingUser) {
+    const session = await lucia.createSession(existingUser._id, {});
     const sessionCookie = lucia.createSessionCookie(session.id);
+
     context.cookies.set(
       sessionCookie.name,
       sessionCookie.value,
       sessionCookie.attributes,
     );
+
     return context.redirect("/");
-  } catch (e) {
-    if (
-      e instanceof OAuth2RequestError &&
-      e.message === "bad_verification_code"
-    ) {
-      // invalid code
-      return new Response(null, {
-        status: 400,
-      });
-    }
+  }
+
+  // TODO: fetch logo from auth0 org?
+  const tenant = await tenantModel.getByName(userData.data.org_name);
+  if (!tenant) {
+    console.debug("Tenant not found");
     return new Response(null, {
-      status: 500,
+      status: 400,
     });
   }
-  */
-}
 
-interface Auth0User {
-  id: string;
-  login: string;
+  const newUser = await userModel.add({
+    tenant_id: tenant._id,
+    auth0_sub: userData.data.sub,
+    username: userData.data.nickname,
+    email: userData.data.email,
+    picture: userData.data.picture,
+    roles: userData.data["ainow/roles"], // This is currently the role name, should be ID in the future
+    created_at: new Date(),
+    updated_at: new Date(),
+  });
+
+  console.log("newUser", newUser);
+
+  const session = await lucia.createSession(newUser.insertedId, {});
+  const sessionCookie = lucia.createSessionCookie(session.id);
+
+  context.cookies.set(
+    sessionCookie.name,
+    sessionCookie.value,
+    sessionCookie.attributes,
+  );
+
+  return context.redirect("/");
 }

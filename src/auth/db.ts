@@ -1,23 +1,23 @@
 // TODO move to model
 import { MongodbAdapter } from "@lucia-auth/adapter-mongodb";
-import { Collection } from "mongodb";
+import { ObjectId } from "mongodb";
 import { db } from "$data/mongodb";
 
 export interface UserDoc {
-  _id: string;
-  auth0_id: string;
-  tenant_id: string;
+  _id: ObjectId;
+  auth0_sub: string;
+  tenant_id: ObjectId;
   username: string;
   email: string;
 }
 
 export interface SessionDoc {
   _id: string;
+  user_id: ObjectId;
   expires_at: Date;
-  user_id: string;
 }
 
-export const User = db.collection("oauth_users") as Collection<UserDoc>;
-export const Session = db.collection("sessions") as Collection<SessionDoc>;
+export const User = db.collection<UserDoc>("oauth_users");
+export const Session = db.collection<SessionDoc>("sessions");
 
 export const adapter = new MongodbAdapter(Session, User);

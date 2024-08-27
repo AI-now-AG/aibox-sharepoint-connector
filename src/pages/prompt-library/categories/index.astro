@@ -6,7 +6,7 @@ import CategoryCard from "$components/CategoryCard.svelte";
 
 const t = useTranslations(Astro.preferredLocale);
 
-const categoriesCursor = await CategoryModel.listByUser(Astro.locals.userId);
+const categoriesCursor = await CategoryModel.listByUser(Astro.locals.user.id);
 const categories = await categoriesCursor.toArray();
 
 let index = 1;

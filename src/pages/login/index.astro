@@ -1,10 +1,15 @@
 ---
 import Head from "$layouts/Head.astro";
 import { useTranslations } from "$i18n/utils";
+import { ObjectId } from "mongodb";
 
 const t = useTranslations(Astro.preferredLocale);
 
-const theme = Astro.locals.username === "Somedia" ? "somedia" : "somedia";
+// TODO: save theme settings in db
+const theme =
+  Astro.locals.user.tenant_id === new ObjectId("66aa21a3d40d0b194e280143")
+    ? "somedia"
+    : "light";
 ---
 
 <html lang="en" data-theme={theme}>

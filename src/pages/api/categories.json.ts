@@ -28,7 +28,7 @@ export type CategoryParams = z.infer<typeof CategoryParamsSchema>;
 
 export const GET: APIRoute = async (ctx) => {
   try {
-    const result = await CategoryModel.listByUser(ctx.locals.userId);
+    const result = await CategoryModel.listByUser(ctx.locals.user.id);
     const categories = await result.toArray();
     return new Response(
       JSON.stringify(
@@ -71,8 +71,8 @@ export const POST: APIRoute = async (ctx) => {
     title: data.title,
     groups: Array.from(groups),
     slug: slug(data.title),
-    tenant_id: stringToObjectId.parse(ctx.locals.tenantId), // AI now AG
-    creator_id: stringToObjectId.parse(ctx.locals.userId), // admin@aibox.ch
+    tenant_id: stringToObjectId.parse(ctx.locals.user.tenant_id),
+    creator_id: stringToObjectId.parse(ctx.locals.user.id),
     created_at: new Date(),
     updated_at: new Date(),
     icon: z

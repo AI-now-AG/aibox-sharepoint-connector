@@ -3,6 +3,7 @@ import { adapter } from "./db";
 import { Auth0 } from "arctic";
 
 import type { UserDoc } from "./db";
+import type { ObjectId } from "mongodb";
 
 export const lucia = new Lucia(adapter, {
   sessionCookie: {
@@ -11,8 +12,12 @@ export const lucia = new Lucia(adapter, {
     },
   },
   getUserAttributes: (attributes) => {
+    // This defines what values will be returned (and attached to the request context)
+    // when validating a session
     return {
       username: attributes.username,
+      tenant_id: attributes.tenant_id,
+      email: attributes.email,
     };
   },
 });
@@ -21,6 +26,7 @@ declare module "lucia" {
   interface Register {
     Lucia: typeof lucia;
     DatabaseUserAttributes: Omit<UserDoc, "_id">;
+    UserId: ObjectId;
   }
 }
 

@@ -7,7 +7,7 @@ import Icon, { Name } from "./icons/Icon.astro";
 
 const t = useTranslations(Astro.preferredLocale);
 
-const cursor = await Category.listByUser(Astro.locals.userId);
+const cursor = await Category.listByUser(Astro.locals.user.id);
 const categories = await cursor.toArray();
 
 const menuItems = categories.map((category) => ({

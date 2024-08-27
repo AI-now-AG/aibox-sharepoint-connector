@@ -8,7 +8,7 @@ const { category: categorySlug, group: groupSlug } = Astro.params;
 const category = await CategoryModel.getBySlug(categorySlug || "");
 const group = category?.groups.find((g) => g.slug === groupSlug);
 
-const cursor = await PromptModel.listByUser(Astro.locals.userId);
+const cursor = await PromptModel.listByUser(Astro.locals.user.id);
 const prompts = await cursor.toArray();
 
 const categoryPrompt = prompts.filter(
@@ -27,7 +27,7 @@ const promptItems = categoryGroupPrompt.map((prompt) => ({
 <div class="flex flex-col h-full max-w-6xl mx-auto">
   <div class="space-y-6 mb-4">
     <h1 class="text-4xl font-bold">
-      Hallo {Astro.locals.username}, lass uns starten {group?.title}
+      Hallo {Astro.locals.user.username}, lass uns starten {group?.title}
     </h1>
   </div>
   {

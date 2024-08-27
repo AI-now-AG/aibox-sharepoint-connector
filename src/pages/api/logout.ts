@@ -1,33 +1,22 @@
+import { lucia } from "$auth";
+
 import type { APIRoute } from "astro";
-import { TOKEN } from "$constants";
 
-export const POST: APIRoute = async (ctx) => {
-  try {
-    // unset cookies
-    ctx.cookies.set(TOKEN, "", {
-      httpOnly: true,
-      maxAge: 0,
-      path: "/",
+export const POST: APIRoute = async (context) => {
+  if (!context.locals.session) {
+    return new Response(null, {
+      status: 401,
     });
-
-    return new Response(
-      JSON.stringify({
-        message: "You're logged out!",
-      }),
-      {
-        status: 200,
-      },
-    );
-  } catch (error) {
-    console.debug(error);
-
-    return new Response(
-      JSON.stringify({
-        message: "Logout failed",
-      }),
-      {
-        status: 500,
-      },
-    );
   }
+
+  await lucia.invalidateSession(context.locals.session.id);
+
+  const sessionCookie = lucia.createBlankSessionCookie();
+  context.cookies.set(
+    sessionCookie.name,
+    sessionCookie.value,
+    sessionCookie.attributes,
+  );
+
+  return new Response();
 };

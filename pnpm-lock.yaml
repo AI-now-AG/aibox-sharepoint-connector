@@ -45,8 +45,8 @@ importers:
         specifier: ^16.4.5
         version: 16.4.5
       jose:
-        specifier: ^5.6.3
-        version: 5.6.3
+        specifier: ^5.8.0
+        version: 5.8.0
       langchain:
         specifier: ^0.2.9
         version: 0.2.10(ignore@5.3.1)(mongodb@6.8.0)(openai@4.53.0)
@@ -2346,8 +2346,8 @@ packages:
     resolution: {integrity: sha512-2yTgeWTWzMWkHu6Jp9NKgePDaYHbntiwvYuuJLbbN9vl7DC9DvXKOB2BC3ZZ92D3cvV/aflH0osDfwpHepQ53w==}
     hasBin: true
 
-  jose@5.6.3:
-    resolution: {integrity: sha512-1Jh//hEEwMhNYPDDLwXHa2ePWgWiFNNUadVmguAAw2IJ6sj9mNxV5tGXJNqlMkJAybF6Lgw1mISDxTePP/187g==}
+  jose@5.8.0:
+    resolution: {integrity: sha512-E7CqYpL/t7MMnfGnK/eg416OsFCVUrU/Y3Vwe7QjKhu/BkS1Ms455+2xsqZQVN57/U2MHMBvEb5SrmAZWAIntA==}
 
   js-tiktoken@1.0.12:
     resolution: {integrity: sha512-L7wURW1fH9Qaext0VzaUDpFGVQgjkdE3Dgsy9/+yXyGEpBKnylTd0mU0bfbNkKDlXRb6TEsZkwuflu1B8uQbJQ==}
@@ -6506,7 +6506,7 @@ snapshots:
 
   jiti@1.21.6: {}
 
-  jose@5.6.3: {}
+  jose@5.8.0: {}
 
   js-tiktoken@1.0.12:
     dependencies:

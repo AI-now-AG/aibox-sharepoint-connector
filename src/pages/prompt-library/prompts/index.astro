@@ -7,7 +7,7 @@ import PromptCard from "$components/PromptCard.svelte";
 
 const t = useTranslations(Astro.preferredLocale);
 
-const promptsCursor = await PromptModel.listByUser(Astro.locals.userId);
+const promptsCursor = await PromptModel.listByUser(Astro.locals.user.id);
 const prompts = await promptsCursor.toArray();
 
 const calls = prompts.map(async (prompt) => {
@@ -18,7 +18,7 @@ const calls = prompts.map(async (prompt) => {
 
 const categories = await Promise.all(calls);
 
-const categoryAll = await CategoryModel.listByUser(Astro.locals.userId);
+const categoryAll = await CategoryModel.listByUser(Astro.locals.user.id);
 
 const promptsEnriched = prompts.map((prompt) => {
   const category = categories.find(

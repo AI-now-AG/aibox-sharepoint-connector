@@ -7,7 +7,7 @@ import InstructionCard from "$components/InstructionCard.svelte";
 const t = useTranslations(Astro.preferredLocale);
 
 const instructionsCursor = await InstructionModel.listByUser(
-  Astro.locals.userId,
+  Astro.locals.user.id,
 );
 const instructions = await instructionsCursor.toArray();
 

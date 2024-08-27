@@ -7,7 +7,7 @@ import KnowledgeBaseCard from "$components/KnowledgeBaseCard.svelte";
 const t = useTranslations(Astro.preferredLocale);
 
 const knowledgeBaseCursor = await KnowledgeBaseModel.listByUser(
-  Astro.locals.userId,
+  Astro.locals.user.id,
 );
 const knowledgeBases = await knowledgeBaseCursor.toArray();
 

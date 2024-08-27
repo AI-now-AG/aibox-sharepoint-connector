@@ -57,7 +57,7 @@ const generateKnowledgeBaseDescription = async (knowledgeBase: string) => {
 
 export const GET: APIRoute = async (ctx) => {
   try {
-    const result = await KnowledgeBaseModel.listByUser(ctx.locals.userId);
+    const result = await KnowledgeBaseModel.listByUser(ctx.locals.user.id);
     const documents = await result.toArray();
     return new Response(
       JSON.stringify(documents.map((doc) => ({ _id: doc._id }))),
@@ -91,8 +91,8 @@ export const POST: APIRoute<CreateKnowledgeBaseParams> = async (ctx) => {
   const knowledgeBase: KnowledgeBase = {
     ...data,
     description,
-    tenant_id: stringToObjectId.parse(ctx.locals.tenantId), // AI now AG
-    creator_id: stringToObjectId.parse(ctx.locals.userId), // admin@aibox.ch
+    tenant_id: stringToObjectId.parse(ctx.locals.user.tenant_id),
+    creator_id: stringToObjectId.parse(ctx.locals.user.id),
     created_at: new Date(),
     updated_at: new Date(),
   };

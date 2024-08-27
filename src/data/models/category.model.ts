@@ -74,10 +74,9 @@ export default {
       .sort({ created_at: 1 })
       .sort({ created_at: 1 }),
 
-  listByUser: async (id: string) => {
-    const _id = new ObjectId(id);
+  listByUser: async (id: ObjectId) => {
     return collection
-      .find<Document<Category>>({ creator_id: _id })
+      .find<Document<Category>>({ creator_id: id })
       .sort({ created_at: 1 });
   },
 
