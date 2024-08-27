@@ -6,7 +6,6 @@ import { z } from "zod";
 import { ChatOpenAI } from "@langchain/openai";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { StringOutputParser } from "@langchain/core/output_parsers";
-import { stringToObjectId } from "$utils/stringToObjectId";
 
 const CreateKnowledgeBaseParamsSchema = z.object({
   _id: z.string().optional(),
@@ -60,10 +59,12 @@ export const GET: APIRoute = async (ctx) => {
     const result = await KnowledgeBaseModel.listByUser(ctx.locals.user.id);
     const documents = await result.toArray();
     return new Response(
-      JSON.stringify(documents.map((doc) => ({
-        _id: doc._id,
-        title: doc.title,
-      }))),
+      JSON.stringify(
+        documents.map((doc) => ({
+          _id: doc._id,
+          title: doc.title,
+        })),
+      ),
     );
   } catch (error) {
     console.error(error);
@@ -94,8 +95,8 @@ export const POST: APIRoute<CreateKnowledgeBaseParams> = async (ctx) => {
   const knowledgeBase: KnowledgeBase = {
     ...data,
     description,
-    tenant_id: stringToObjectId.parse(ctx.locals.user.tenant_id),
-    creator_id: stringToObjectId.parse(ctx.locals.user.id),
+    tenant_id: ctx.locals.user.tenant_id,
+    creator_id: ctx.locals.user.id,
     created_at: new Date(),
     updated_at: new Date(),
   };

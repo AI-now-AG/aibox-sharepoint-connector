@@ -1,6 +1,5 @@
 ---
 // import local images
-import avatar from "$images/Avatar.svg";
 import ThemeSwitcher from "$components/ThemeSwitcher.svelte";
 import { useTranslations } from "$i18n/utils";
 import { ObjectId } from "mongodb";
@@ -50,6 +49,8 @@ if (Astro.locals.user.tenant_id !== new ObjectId("66aa21a3d40d0b194e280143")) {
     navItems[2].list?.splice(idx, 1);
   }
 }
+
+const user = Astro.locals.user;
 ---
 
 <style is:global>
@@ -129,7 +130,7 @@ if (Astro.locals.user.tenant_id !== new ObjectId("66aa21a3d40d0b194e280143")) {
     <div class="dropdown dropdown-end">
       <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
         <div class="w-10 rounded-full">
-          <img alt="Avatar Image" src={avatar.src} />
+          <img alt="Avatar Image" src={user.picture} />
         </div>
       </div>
       <ul

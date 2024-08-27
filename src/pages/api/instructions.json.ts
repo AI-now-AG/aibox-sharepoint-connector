@@ -6,7 +6,6 @@ import { z } from "zod";
 import { ChatOpenAI } from "@langchain/openai";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { StringOutputParser } from "@langchain/core/output_parsers";
-import { stringToObjectId } from "$utils/stringToObjectId";
 
 const CreateInstructionParamsSchema = z.object({
   _id: z.string().optional(),
@@ -94,8 +93,8 @@ export const POST: APIRoute<CreateInstructionParams> = async (ctx) => {
   const instruction: Instruction = {
     ...data,
     description,
-    tenant_id: stringToObjectId.parse(ctx.locals.user.tenant_id),
-    creator_id: stringToObjectId.parse(ctx.locals.user.id),
+    tenant_id: ctx.locals.user.tenant_id,
+    creator_id: ctx.locals.user.id,
     created_at: new Date(),
     updated_at: new Date(),
   };

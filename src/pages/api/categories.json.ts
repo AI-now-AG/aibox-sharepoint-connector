@@ -71,8 +71,8 @@ export const POST: APIRoute = async (ctx) => {
     title: data.title,
     groups: Array.from(groups),
     slug: slug(data.title),
-    tenant_id: stringToObjectId.parse(ctx.locals.user.tenant_id),
-    creator_id: stringToObjectId.parse(ctx.locals.user.id),
+    tenant_id: ctx.locals.user.tenant_id,
+    creator_id: ctx.locals.user.id,
     created_at: new Date(),
     updated_at: new Date(),
     icon: z

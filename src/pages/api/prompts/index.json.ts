@@ -81,8 +81,8 @@ export const POST: APIRoute<CreatePromptParams> = async (ctx) => {
     ),
     documents: data.documents?.map((doc) => stringToObjectId.parse(doc)),
     description,
-    tenant_id: stringToObjectId.parse(ctx.locals.user.tenant_id),
-    creator_id: stringToObjectId.parse(ctx.locals.user.id),
+    tenant_id: ctx.locals.user.tenant_id,
+    creator_id: ctx.locals.user.id,
     created_at: new Date(),
     updated_at: new Date(),
   };

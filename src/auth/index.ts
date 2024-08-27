@@ -1,9 +1,15 @@
 import { Lucia } from "lucia";
-import { adapter } from "./db";
+import { MongodbAdapter } from "@lucia-auth/adapter-mongodb";
+import {
+  collection as userCollection,
+  type User,
+} from "$data/models/user.model";
+import { collection as sessionCollection } from "$data/models/session.model";
 import { Auth0 } from "arctic";
 
-import type { UserDoc } from "./db";
 import type { ObjectId } from "mongodb";
+
+export const adapter = new MongodbAdapter(sessionCollection, userCollection);
 
 export const lucia = new Lucia(adapter, {
   sessionCookie: {
@@ -18,6 +24,7 @@ export const lucia = new Lucia(adapter, {
       username: attributes.username,
       tenant_id: attributes.tenant_id,
       email: attributes.email,
+      picture: attributes.picture,
     };
   },
 });
@@ -25,7 +32,7 @@ export const lucia = new Lucia(adapter, {
 declare module "lucia" {
   interface Register {
     Lucia: typeof lucia;
-    DatabaseUserAttributes: Omit<UserDoc, "_id">;
+    DatabaseUserAttributes: Omit<User, "_id">;
     UserId: ObjectId;
   }
 }
