@@ -8,11 +8,11 @@ const deploy = JSON.stringify(Astro.locals.netlify.context.deploy);
 // @ts-expect-error 2339
 const site = JSON.stringify(Astro.locals.netlify.context.site);
 
-const reviewId = import.meta.env.REVIEW_ID;
+const hostname = Astro.url.origin;
 ---
 
 <pre>
-  {reviewId}
+  {hostname}
 
   {account}
 
