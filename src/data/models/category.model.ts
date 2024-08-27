@@ -80,12 +80,6 @@ export default {
       .sort({ created_at: 1 });
   },
 
-  listByCreator: async (id: ObjectId) => {
-    return collection
-      .find<Document<Category>>({ creator_id: id })
-      .sort({ created_at: 1 });
-  },
-
   get: async (id: string) => {
     const _id = new ObjectId(id);
     const doc = await collection.findOne<Document<Category>>({ _id });

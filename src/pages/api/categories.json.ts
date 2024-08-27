@@ -28,7 +28,7 @@ export type CategoryParams = z.infer<typeof CategoryParamsSchema>;
 
 export const GET: APIRoute = async (ctx) => {
   try {
-    const result = await CategoryModel.listByUser(ctx.locals.user.id);
+    const result = await CategoryModel.listByTenant(ctx.locals.user.tenant_id);
     const categories = await result.toArray();
     return new Response(
       JSON.stringify(

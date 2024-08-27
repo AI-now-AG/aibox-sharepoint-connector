@@ -8,7 +8,7 @@ const { category: categorySlug, group: groupSlug } = Astro.params;
 const category = await CategoryModel.getBySlug(categorySlug || "");
 const group = category?.groups.find((g) => g.slug === groupSlug);
 
-const cursor = await PromptModel.listByUser(Astro.locals.user.id);
+const cursor = await PromptModel.listByTenant(Astro.locals.user.tenant_id);
 const prompts = await cursor.toArray();
 
 const categoryPrompt = prompts.filter(

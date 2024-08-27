@@ -61,9 +61,9 @@ export default {
   list: async () =>
     collection.find<Document<Prompt>>({}).sort({ created_at: 1 }),
 
-  listByUser: async (id: ObjectId) => {
+  listByTenant: async (id: ObjectId) => {
     return collection
-      .find<Document<Prompt>>({ creator_id: id })
+      .find<Document<Prompt>>({ tenant_id: id })
       .sort({ created_at: 1 });
   },
 

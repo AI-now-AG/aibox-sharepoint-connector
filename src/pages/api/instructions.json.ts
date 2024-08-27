@@ -56,7 +56,9 @@ const generateInstructionDescription = async (instruction: string) => {
 
 export const GET: APIRoute = async (ctx) => {
   try {
-    const result = await InstructionModel.listByUser(ctx.locals.user.id);
+    const result = await InstructionModel.listByTenant(
+      ctx.locals.user.tenant_id,
+    );
     const instructions = await result.toArray();
     return new Response(
       JSON.stringify(
