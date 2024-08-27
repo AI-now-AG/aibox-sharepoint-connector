@@ -2,7 +2,7 @@ import { lucia } from "$auth";
 
 import type { APIRoute } from "astro";
 
-export const POST: APIRoute = async (context) => {
+export const GET: APIRoute = async (context) => {
   if (!context.locals.session) {
     return new Response(null, {
       status: 401,
@@ -18,5 +18,8 @@ export const POST: APIRoute = async (context) => {
     sessionCookie.attributes,
   );
 
-  return new Response();
+  return context.redirect(
+    //"https://ainow.eu.auth0.com/v2/logout?returnTo=http://localhost:4321",
+    "https://ainow.eu.auth0.com/v2/logout",
+  );
 };

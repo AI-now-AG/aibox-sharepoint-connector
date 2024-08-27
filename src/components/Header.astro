@@ -144,28 +144,8 @@ const user = Astro.locals.user;
           </a>
         </li>
         <li><a>Settings</a></li>
-        <li id="logout"><a>Logout</a></li>
+        <li id="logout"><a href="/api/logout">Logout</a></li>
       </ul>
     </div>
   </div>
 </header>
-
-<script>
-  const logoutButton = document.getElementById("logout");
-
-  if (logoutButton) {
-    logoutButton.addEventListener("click", () => {
-      fetch("/api/logout", { method: "POST" })
-        .then((res) => {
-          if (!res.ok) {
-            throw new Error("Not OK!");
-          }
-          window.location.href = "/";
-        })
-        .catch((error) => {
-          console.warn("Fetch logout failed");
-          console.error(error);
-        });
-    });
-  }
-</script>

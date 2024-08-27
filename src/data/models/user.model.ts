@@ -20,7 +20,7 @@ export const collection = db.collection<User>("oauth_users");
 
 export default {
   add: async (user: Omit<User, "_id">) => {
-    const validated = UserSchema.parse(user);
+    const validated = UserSchema.parse({ _id: new ObjectId(), ...user });
     return collection.insertOne(validated);
   },
 
