@@ -37,19 +37,10 @@ declare module "lucia" {
   }
 }
 
-console.log("-------");
-console.log(import.meta.env.URL);
-console.log("-------");
-
-const netlifyHostname =
-  (import.meta.env.DEPLOY_URL as string) || "http://localhost:4321";
-const hostname = netlifyHostname.includes("main--")
-  ? import.meta.env.URL
-  : netlifyHostname;
-
-export const auth0 = new Auth0(
-  "https://ainow.eu.auth0.com",
-  import.meta.env.AUTH0_CLIENT_ID,
-  import.meta.env.AUTH0_CLIENT_SECRET,
-  `${hostname}/login/auth0/callback`,
-);
+export const auth0 = (basepath: string) =>
+  new Auth0(
+    "https://ainow.eu.auth0.com",
+    import.meta.env.AUTH0_CLIENT_ID,
+    import.meta.env.AUTH0_CLIENT_SECRET,
+    `${basepath}/login/auth0/callback`,
+  );

@@ -5,7 +5,7 @@ import type { APIContext } from "astro";
 
 export async function GET(context: APIContext): Promise<Response> {
   const state = generateState();
-  const url = await auth0.createAuthorizationURL(state, {
+  const url = await auth0(context.url.origin).createAuthorizationURL(state, {
     scopes: ["openid", "profile", "email", "ainow/roles"],
   });
 

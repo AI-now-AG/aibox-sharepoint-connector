@@ -30,7 +30,9 @@ export async function GET(context: APIContext): Promise<Response> {
     });
   }
 
-  const tokens = await auth0.validateAuthorizationCode(code);
+  const tokens = await auth0(context.url.origin).validateAuthorizationCode(
+    code,
+  );
   const decoded = decodeJwt(tokens.idToken);
   console.log("decoded", decoded);
 
