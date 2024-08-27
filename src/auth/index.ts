@@ -41,9 +41,15 @@ console.log("-------");
 console.log(import.meta.env.URL);
 console.log("-------");
 
+const netlifyHostname =
+  (import.meta.env.DEPLOY_PRIME_URL as string) || "http://localhost:4321";
+const hostname = netlifyHostname.includes("main--")
+  ? import.meta.env.URL
+  : netlifyHostname;
+
 export const auth0 = new Auth0(
   "https://ainow.eu.auth0.com",
   import.meta.env.AUTH0_CLIENT_ID,
   import.meta.env.AUTH0_CLIENT_SECRET,
-  `${import.meta.env.URL || "http://localhost:4321"}/login/auth0/callback`,
+  `${hostname}/login/auth0/callback`,
 );
