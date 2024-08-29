@@ -3,7 +3,7 @@ import Layout from "$layouts/Layout.astro";
 import { useTranslations } from "$i18n/utils";
 import PromptModel from "$data/models/prompt.model";
 import CategoryModel from "$data/models/category.model";
-import PromptCard from "$components/PromptCard.svelte";
+import Card, { type CardItem } from "$components/Card.svelte";
 
 const t = useTranslations(Astro.preferredLocale);
 
@@ -20,7 +20,7 @@ const categories = await Promise.all(calls);
 
 const categoryAll = await CategoryModel.listByUser(Astro.locals.userId);
 
-const promptsEnriched = prompts.map((prompt) => {
+const promptsEnriched: CardItem[] = prompts.map((prompt) => {
   const category = categories.find(
     (category) => category?._id.toString() === prompt.category.toString(),
   );
@@ -29,11 +29,12 @@ const promptsEnriched = prompts.map((prompt) => {
     (g) => g._id?.toString() === prompt.group.toString(),
   );
 
+  const tags = [category?.title, group?.title].filter(Boolean) as string[];
   return {
-    ...prompt,
-    _id: prompt._id.toString(),
-    categoryName: category?.title,
-    groupName: group?.title,
+    title: prompt.title,
+    description: prompt.description,
+    id: prompt._id.toString(),
+    tags,
   };
 });
 ---
@@ -142,9 +143,11 @@ const promptsEnriched = prompts.map((prompt) => {
     </div>
   </div>
 
-  <PromptCard
-    promptsEnriched={promptsEnriched}
-    preferredLocale={Astro.preferredLocale}
+  <Card
+    title={t("prompt-library.prompts.all")}
+    items={promptsEnriched}
+    type="prompts"
+    viewLabel={t("prompt-library.prompts.view")}
     client:load
   />
 </Layout>
