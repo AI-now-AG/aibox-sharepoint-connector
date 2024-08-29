@@ -203,6 +203,7 @@
         {/if}
       </div>
     </div>
+    <!--
     <div class="modal-action">
       <form method="dialog">
         <button class="btn btn-lg btn-primary font-normal" type="submit"
@@ -210,5 +211,6 @@
         >
       </form>
     </div>
+    -->
   </div>
 </dialog>
