@@ -85,7 +85,6 @@ const en = {
   "prompt-execution.card.showMore": "more prompts",
   "prompt-execution.card.showLess": "less prompts",
   "prompt-execution.showGlobal": "Save Global",
-
 };
 
 const de = {
@@ -124,11 +123,11 @@ const de = {
 
   "prompt-library.prompts.title": "Prompt Management",
   "prompt-library.prompts.add": "Neuer Prompt",
-  "prompt-library.prompts.edit": "Eingabeaufforderung bearbeiten",
+  "prompt-library.prompts.edit": "Bearbeiten",
   "prompt-library.prompts.search": "Geben Sie hier ein",
   "prompt-library.prompts.filter": "Filter",
   "prompt-library.prompts.all": "Alle Eingabeaufforderungen",
-  "prompt-library.prompts.view": "Eingabeaufforderung anzeigen",
+  "prompt-library.prompts.view": "Anzeigen",
 
   "prompt-library.add.prompts.title": "Titel",
   "prompt-library.add.prompts.category": "Kategorie",
@@ -168,7 +167,6 @@ const de = {
   "prompt-execution.card.showMore": "weitere Anregungen",
   "prompt-execution.card.showLess": "weniger Aufforderungen",
   "prompt-execution.showGlobal": "Save Global",
-  
 };
 
 export const ui = {

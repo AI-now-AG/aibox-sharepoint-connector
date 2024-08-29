@@ -11,13 +11,10 @@ const instructionsCursor = await InstructionModel.listByUser(
 );
 const instructions = await instructionsCursor.toArray();
 
-let index = 1;
-
 const instructionsEnriched: CardItem[] = instructions.map((instruction) => ({
   id: instruction._id.toString(),
   title: instruction.title,
   description: instruction.description,
-  badge1: String(index++).padStart(2, "0"),
 }));
 ---
 
@@ -73,9 +70,9 @@ const instructionsEnriched: CardItem[] = instructions.map((instruction) => ({
   </div>
 
   <Card
-    enriched={instructionsEnriched}
+    title={t("prompt-library.instructions.all")}
+    items={instructionsEnriched}
     type="instructions"
-    viewAllLabel={t("prompt-library.instructions.all")}
     viewLabel={t("prompt-library.instructions.view")}
     client:load
   />

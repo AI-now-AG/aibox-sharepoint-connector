@@ -29,12 +29,12 @@ const promptsEnriched: CardItem[] = prompts.map((prompt) => {
     (g) => g._id?.toString() === prompt.group.toString(),
   );
 
+  const tags = [category?.title, group?.title].filter(Boolean) as string[];
   return {
     title: prompt.title,
     description: prompt.description,
     id: prompt._id.toString(),
-    badge1: category?.title,
-    badge2: group?.title,
+    tags,
   };
 });
 ---
@@ -144,9 +144,9 @@ const promptsEnriched: CardItem[] = prompts.map((prompt) => {
   </div>
 
   <Card
-    enriched={promptsEnriched}
+    title={t("prompt-library.prompts.all")}
+    items={promptsEnriched}
     type="prompts"
-    viewAllLabel={t("prompt-library.prompts.all")}
     viewLabel={t("prompt-library.prompts.view")}
     client:load
   />

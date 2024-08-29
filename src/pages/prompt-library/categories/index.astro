@@ -9,11 +9,9 @@ const t = useTranslations(Astro.preferredLocale);
 const categoriesCursor = await CategoryModel.listByUser(Astro.locals.userId);
 const categories = await categoriesCursor.toArray();
 
-let index = 1;
 const categoriesEnriched: CardItem[] = categories.map((category) => ({
   id: category._id.toString(),
   title: category.title,
-  badge1: String(index++).padStart(2, "0"),
 }));
 ---
 
@@ -69,9 +67,9 @@ const categoriesEnriched: CardItem[] = categories.map((category) => ({
   </div>
 
   <Card
-    enriched={categoriesEnriched}
+    title={t("prompt-library.categories.all")}
+    items={categoriesEnriched}
     type="categories"
-    viewAllLabel={t("prompt-library.categories.all")}
     viewLabel={t("prompt-library.categories.view")}
     client:load
   />

@@ -81,7 +81,7 @@
       if (prompt) {
         prompt.instructions?.forEach((instructionObj) => {
           const instruction = instructionData.find(
-            (e: any) => e._id == instructionObj.toString(),
+            (e) => e._id == instructionObj.toString(),
           );
           if (instruction) {
             selectedInstructions.push(instruction);

@@ -11,13 +11,13 @@ const knowledgeBaseCursor = await KnowledgeBaseModel.listByUser(
 );
 const knowledgeBases = await knowledgeBaseCursor.toArray();
 
-let index = 1;
-const knowledgeBasesEnriched: CardItem[]  = knowledgeBases.map((knowledgeBase) => ({
-  id: knowledgeBase._id.toString(),
-  title: knowledgeBase.title,
-  description: knowledgeBase.description,
-  badge1: String(index++).padStart(2, "0"),
-}));
+const knowledgeBasesEnriched: CardItem[] = knowledgeBases.map(
+  (knowledgeBase) => ({
+    id: knowledgeBase._id.toString(),
+    title: knowledgeBase.title,
+    description: knowledgeBase.description,
+  }),
+);
 ---
 
 <Layout>
@@ -72,9 +72,9 @@ const knowledgeBasesEnriched: CardItem[]  = knowledgeBases.map((knowledgeBase) =
   </div>
 
   <Card
-    enriched={knowledgeBasesEnriched}
+    title={t("prompt-library.knowledgebase.all")}
+    items={knowledgeBasesEnriched}
     type="knowledge-base"
-    viewAllLabel={t("prompt-library.knowledgebase.all")}
     viewLabel={t("prompt-library.knowledgebase.view")}
     client:load
   />
