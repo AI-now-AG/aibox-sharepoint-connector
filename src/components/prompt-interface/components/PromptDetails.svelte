@@ -16,6 +16,9 @@
   let instructions: CreateInstructionParams[] = [];
   let knowledgebase: CreateKnowledgeBaseParams[] = [];
   let isSaving = false;
+
+  let dlgEl: HTMLDialogElement;
+
   const unsubscribe = storePromptId.subscribe((value) => {
     if (value) {
       selectedPromptId = value;
@@ -66,7 +69,7 @@
   <div class="mx-auto">
     <button
       class="btn btn-sm btn-neutral btn-2 border-0 bg-neutral-content text-neutral hover:text-neutral-content mb-4"
-      onclick="my_modal_3.showModal()"
+      on:click={() => dlgEl.showModal()}
     >
       <svg
         width="20"
@@ -128,7 +131,7 @@
   </div>
 {/if}
 
-<dialog id="my_modal_3" class="modal">
+<dialog class="modal" bind:this={dlgEl}>
   <div class="modal-box w-8/12 max-w-5xl">
     <h3 class="text-lg font-bold py-4">Prompt Configuration</h3>
     <form method="dialog">

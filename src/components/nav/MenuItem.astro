@@ -8,7 +8,7 @@ export type MenuItem = {
   icon?: Name | string;
 };
 
-interface Props extends MenuItem {}
+type Props = MenuItem;
 
 const { title, path } = Astro.props;
 ---

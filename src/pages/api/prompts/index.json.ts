@@ -185,23 +185,6 @@ export const PUT: APIRoute<CreatePromptParams> = async (ctx) => {
   }
 };
 
-const extractRequiredFields = (
-  prompt: Prompt,
-  instructions: Instruction[],
-  knowledgebase: KnowledgeBase[],
-) => ({
-  title: prompt.title,
-  prompt: prompt.prompt,
-  instructions: instructions.map((inst) => ({
-    title: inst.title,
-    instruction: inst.instruction,
-  })),
-  knowledgebase: knowledgebase.map((kb) => ({
-    title: kb.title,
-    knowledge_base: kb.knowledge_base,
-  })),
-});
-
 export const GET: APIRoute = async (ctx) => {
   try {
     const promptId = ctx.url.searchParams.get("_id");
