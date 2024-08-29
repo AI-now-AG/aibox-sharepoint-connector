@@ -77,4 +77,13 @@ export default {
     );
     return result;
   },
+
+  updatePromptField: async (id: string, newPrompt: string) => {
+    const _id = new ObjectId(id);
+    const result = await collection.updateOne(
+      { _id },
+      { $set: { prompt: newPrompt } },
+    );
+    return result;
+  },
 };

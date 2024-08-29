@@ -2,7 +2,7 @@
 import Layout from "$layouts/Layout.astro";
 import { useTranslations } from "$i18n/utils";
 import InstructionModel from "$data/models/instruction.model";
-import InstructionCard from "$components/InstructionCard.svelte";
+import Card, { type CardItem } from "$components/Card.svelte";
 
 const t = useTranslations(Astro.preferredLocale);
 
@@ -11,10 +11,8 @@ const instructionsCursor = await InstructionModel.listByUser(
 );
 const instructions = await instructionsCursor.toArray();
 
-let index = 1;
-const instructionsEnriched = instructions.map((instruction) => ({
-  number: String(index++).padStart(2, "0"),
-  _id: instruction._id.toString(),
+const instructionsEnriched: CardItem[] = instructions.map((instruction) => ({
+  id: instruction._id.toString(),
   title: instruction.title,
   description: instruction.description,
 }));
@@ -71,9 +69,11 @@ const instructionsEnriched = instructions.map((instruction) => ({
     </label>
   </div>
 
-  <InstructionCard
-    instructionEnriched={instructionsEnriched}
-    preferredLocale={Astro.preferredLocale}
+  <Card
+    title={t("prompt-library.instructions.all")}
+    items={instructionsEnriched}
+    type="instructions"
+    viewLabel={t("prompt-library.instructions.view")}
     client:load
   />
 </Layout>
