@@ -215,6 +215,7 @@
         {/if}
       </div>
     </div>
+    <!--
     <div class="modal-action">
       <form method="dialog">
         <button
@@ -231,5 +232,6 @@
         </button>
       </form>
     </div>
+    -->
   </div>
 </dialog>
