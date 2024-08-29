@@ -37,7 +37,7 @@
     {#each cards as card, index}
       {#if index < promptLimit || showMore}
         <button
-          class={`transition-all duration-500 ease-in-out transform scale-95 opacity-0 animate-slide-in card outline-base-300 p-6 ${selectedCardIndex === index ? "bg-primary text-base-100" : "outline outline-2 text-base-content"}`}
+          class={`btn rounded-xl h-auto p-6 ${selectedCardIndex === index ? "btn-primary " : "btn-outline border-base-300 border-2"}`}
           on:click={() => selectCard(index)}
         >
           <p class="card-title text-sm font-normal">{card.title}</p>
