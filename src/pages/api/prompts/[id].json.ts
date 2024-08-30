@@ -5,13 +5,15 @@ import {
   SystemMessage,
 } from "@langchain/core/messages";
 import { StringOutputParser } from "@langchain/core/output_parsers";
-import type { APIRoute } from "astro";
 import PromptModel from "$data/models/prompt.model";
 import InstructionModel from "$data/models/instruction.model";
 import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
+import { z } from "zod";
+import { fileLoader } from "$utils/document-loader";
+
+import type { APIRoute } from "astro";
 import type { CreateInstructionParams } from "../instructions.json";
 import type { CreateKnowledgeBaseParams } from "../knowledge-base.json";
-import { z } from "zod";
 
 export type PromptDetails = {
   title: string;
@@ -48,6 +50,7 @@ export const POST: APIRoute = async ({ params, request }) => {
     const encoder = new TextEncoder();
 
     const requestParams = await request.json();
+
     const data = RunPromptParamsSchema.parse({
       ...requestParams,
       ...{ _id: id },
@@ -114,26 +117,30 @@ export const POST: APIRoute = async ({ params, request }) => {
         }
       });
     }
+    //      type: 'application/pdf',
 
     // Handle file uploads
     if (data.files) {
-      data.files.forEach((object) => {
-        if (object.content) {
-          // const messageContent = object.type.startsWith("text/")
-          //   ? object.content
-          //   : `data:${object.type};base64,${object.content}`;
-          messages.push(
-            new HumanMessage({
-              content: [
-                {
-                  type: "text", // TODO: make this dynamically change as needed
-                  text: object.content,
-                },
-              ],
-            }),
-          );
+      for (const file of data.files) {
+        if (file.content) {
+          const docs = await fileLoader(file);
+
+          if (docs) {
+            const content = docs.map((doc) => doc.pageContent).join("\n");
+
+            messages.push(
+              new HumanMessage({
+                content: [
+                  {
+                    type: "text",
+                    text: "File content:\n------\n" + content + "------",
+                  },
+                ],
+              }),
+            );
+          }
         }
-      });
+      }
     }
 
     const parser = new StringOutputParser();
@@ -218,23 +225,28 @@ export const POST: APIRoute = async ({ params, request }) => {
 export const PUT: APIRoute<PromptDetails> = async (ctx) => {
   try {
     const promptId = ctx.url.searchParams.get("_id") as string;
-    const params = await ctx.request.json() as PromptDetails;
+    const params = (await ctx.request.json()) as PromptDetails;
 
     if (params) {
-      await PromptModel.updatePromptField(promptId, params.prompt)
+      await PromptModel.updatePromptField(promptId, params.prompt);
 
       const instructionCalls = params.instructions.map(async (inst) => {
-        const instruction = await InstructionModel.updateInstruction(inst._id!, inst.instruction)
+        const instruction = await InstructionModel.updateInstruction(
+          inst._id!,
+          inst.instruction,
+        );
         return instruction;
       });
       await Promise.all(instructionCalls);
 
       const kbCalls = params.knowledgebase.map(async (kb) => {
-        const instruction = await KnowledgeBaseModel.updateKnowledgeBase(kb._id!, kb.knowledge_base)
+        const instruction = await KnowledgeBaseModel.updateKnowledgeBase(
+          kb._id!,
+          kb.knowledge_base,
+        );
         return instruction;
       });
       await Promise.all(kbCalls);
-
 
       return new Response(
         JSON.stringify({
