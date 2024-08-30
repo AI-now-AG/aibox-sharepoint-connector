@@ -51,7 +51,7 @@
       reader.onloadend = () => {
         resolve(reader.result);
       };
-      reader.readAsText(file);
+      reader.readAsDataURL(file);
     });
   };
 
@@ -72,10 +72,9 @@
         const userInputFilesList: FileInput[] = [];
         await Promise.all(
           inputFiles.map(async (file) => {
-            const fileContent = await readFileContent(file);
             const userInputFile = {
               name: file.name,
-              content: fileContent,
+              content: await readFileContent(file),
               type: file.type,
             };
             userInputFilesList.push(userInputFile);
