@@ -145,7 +145,6 @@ export const POST: APIRoute = async ({ params, request }) => {
       }
     }
 
-    console.log("messages", messages);
     const parser = new StringOutputParser();
 
     // Set headers to enable chunked transfer
