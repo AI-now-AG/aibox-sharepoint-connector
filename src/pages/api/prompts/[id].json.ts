@@ -25,9 +25,7 @@ export type PromptDetails = {
 const AttachmentSchema = z.object({
   name: z.string(),
   type: z.string(),
-  content: z
-    .string()
-    .transform((val) => Buffer.from(val.split(",")[1], "base64")),
+  content: z.string(),
 });
 
 const RunPromptParamsSchema = z.object({
@@ -104,7 +102,7 @@ export const POST: APIRoute = async ({ params, request }) => {
       data.images.forEach((object) => {
         if (object.content) {
           messages.push(
-            new HumanMessage(object.content.toString()),
+            new HumanMessage(object.content),
             // new HumanMessage({
             //   content: [
             //     {

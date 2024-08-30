@@ -7,12 +7,13 @@ import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
 type FileInput = {
   name: string;
   type: string;
-  content: Buffer;
+  content: string;
 };
 
 export const fileLoader = async (file: FileInput) => {
   if (file.type.includes("pdf")) {
-    const pdf = new Blob([file.content], {
+    const buf = Buffer.from(file.content.split(",")[1], "base64");
+    const pdf = new Blob([buf], {
       type: "application/pdf",
     });
 
