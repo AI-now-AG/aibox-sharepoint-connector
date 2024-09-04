@@ -6,7 +6,7 @@ export const languages = {
 export const defaultLang = "en";
 
 const en = {
-  "site.title": "Welcome to aibox",
+  "site.title": "aibox",
   "site.description":
     "AI-powered solution for streamlining tasks and boosting productivity. Customizable for small to mid-sized companies. Enhance efficiency and drive innovation in your workflow.",
 
@@ -88,7 +88,7 @@ const en = {
 };
 
 const de = {
-  "site.title": "Willkommen bei der aibox",
+  "site.title": "aibox",
   "site.description":
     "KI-gestützte Lösung zur Optimierung von Aufgaben und Steigerung der Produktivität. Anpassbar für kleine bis mittlere Unternehmen. Verbessern Sie Effizienz und fördern Sie Innovation in Ihrem Arbeitsablauf.",
 
