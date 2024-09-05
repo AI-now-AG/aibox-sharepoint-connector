@@ -53,8 +53,8 @@
         on:click={() => (showMore = !showMore)}
       >
         {showMore
-          ? `${t("prompt-execution.card.showMore")} ↑`
-          : `${t("prompt-execution.card.showLess")} ↓`}
+          ? `${t("prompt-execution.card.showLess")} ↑`
+          : `${t("prompt-execution.card.showMore")} ↓`}
       </button>
     </div>
   {/if}

@@ -164,8 +164,8 @@ const de = {
   "prompt-library.categories.all": "Alle Kategorien",
   "prompt-library.categories.view": "View",
 
-  "prompt-execution.card.showMore": "weitere Anregungen",
-  "prompt-execution.card.showLess": "weniger Aufforderungen",
+  "prompt-execution.card.showMore": "weitere Varianten",
+  "prompt-execution.card.showLess": "weniger Varianten",
   "prompt-execution.showGlobal": "Save Global",
 };
 
