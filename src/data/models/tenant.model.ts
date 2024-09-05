@@ -4,6 +4,7 @@ import { z } from "zod";
 
 const TenantSchema = z.object({
   name: z.string(),
+  org_name: z.string(),
   created_at: z.date(),
   updated_at: z.date(),
 });
@@ -23,5 +24,9 @@ export default {
   get: async (id: string) => {
     const _id = new ObjectId(id);
     return collection.findOne<Document<Tenant>>({ _id });
+  },
+
+  getByName: async (org_name: string) => {
+    return collection.findOne<Document<Tenant>>({ org_name });
   },
 };

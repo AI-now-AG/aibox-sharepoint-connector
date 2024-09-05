@@ -22,7 +22,11 @@ const {
   isFooterVisible = false,
 } = Astro.props;
 
-const theme = Astro.locals.username === "Somedia" ? "somedia" : "light";
+// TODO: save theme settings in db
+const theme =
+  Astro.locals.user.tenant_id.toString() === "66aa21a3d40d0b194e280143"
+    ? "somedia"
+    : "light";
 ---
 
 <!doctype html>

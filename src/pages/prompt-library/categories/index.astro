@@ -6,7 +6,9 @@ import Card, { type CardItem } from "$components/Card.svelte";
 
 const t = useTranslations(Astro.preferredLocale);
 
-const categoriesCursor = await CategoryModel.listByUser(Astro.locals.userId);
+const categoriesCursor = await CategoryModel.listByTenant(
+  Astro.locals.user.tenant_id,
+);
 const categories = await categoriesCursor.toArray();
 
 const categoriesEnriched: CardItem[] = categories.map((category) => ({

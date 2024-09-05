@@ -6,8 +6,8 @@ import Card, { type CardItem } from "$components/Card.svelte";
 
 const t = useTranslations(Astro.preferredLocale);
 
-const knowledgeBaseCursor = await KnowledgeBaseModel.listByUser(
-  Astro.locals.userId,
+const knowledgeBaseCursor = await KnowledgeBaseModel.listByTenant(
+  Astro.locals.user.tenant_id,
 );
 const knowledgeBases = await knowledgeBaseCursor.toArray();
 

@@ -81,10 +81,8 @@ export const POST: APIRoute<CreatePromptParams> = async (ctx) => {
     ),
     documents: data.documents?.map((doc) => stringToObjectId.parse(doc)),
     description,
-    tenant_id: stringToObjectId.parse(ctx.locals.tenantId), // AI now AG
-    creator_id: stringToObjectId.parse(ctx.locals.userId), // admin@aibox.ch
-    //tenant_id: stringToObjectId.parse("66aa2169d40d0b194e280142"), // AI now AG
-    //creator_id: stringToObjectId.parse("669e044a6e55bbb8fe31a868"), // admin@aibox.ch
+    tenant_id: ctx.locals.user.tenant_id,
+    creator_id: ctx.locals.user.id,
     created_at: new Date(),
     updated_at: new Date(),
   };

@@ -6,7 +6,6 @@ import { z } from "zod";
 import { ChatOpenAI } from "@langchain/openai";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { StringOutputParser } from "@langchain/core/output_parsers";
-import { stringToObjectId } from "$utils/stringToObjectId";
 
 const CreateKnowledgeBaseParamsSchema = z.object({
   _id: z.string().optional(),
@@ -57,13 +56,17 @@ const generateKnowledgeBaseDescription = async (knowledgeBase: string) => {
 
 export const GET: APIRoute = async (ctx) => {
   try {
-    const result = await KnowledgeBaseModel.listByUser(ctx.locals.userId);
+    const result = await KnowledgeBaseModel.listByTenant(
+      ctx.locals.user.tenant_id,
+    );
     const documents = await result.toArray();
     return new Response(
-      JSON.stringify(documents.map((doc) => ({
-        _id: doc._id,
-        title: doc.title,
-      }))),
+      JSON.stringify(
+        documents.map((doc) => ({
+          _id: doc._id,
+          title: doc.title,
+        })),
+      ),
     );
   } catch (error) {
     console.error(error);
@@ -95,8 +98,8 @@ export const POST: APIRoute<CreateKnowledgeBaseParams> = async (ctx) => {
     title: data.title,
     knowledge_base: data.knowledge_base,
     description,
-    tenant_id: stringToObjectId.parse(ctx.locals.tenantId), // AI now AG
-    creator_id: stringToObjectId.parse(ctx.locals.userId), // admin@aibox.ch
+    tenant_id: ctx.locals.user.tenant_id,
+    creator_id: ctx.locals.user.id,
     created_at: new Date(),
     updated_at: new Date(),
   };
@@ -148,7 +151,6 @@ export const PUT: APIRoute<CreateKnowledgeBaseParams> = async (ctx) => {
   const knowledgeBase: KnowledgeBase = {
     title: data.title,
     knowledge_base: data.knowledge_base,
-    ...(data._id && { _id: stringToObjectId.parse(data._id) }),
     description,
     updated_at: new Date(),
   };

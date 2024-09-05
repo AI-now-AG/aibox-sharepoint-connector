@@ -36,10 +36,9 @@ export default {
   list: async () =>
     collection.find<Document<KnowledgeBase>>({}).sort({ created_at: 1 }),
 
-  listByUser: async (id: string) => {
-    const _id = new ObjectId(id);
+  listByTenant: async (id: ObjectId) => {
     return collection
-      .find<Document<KnowledgeBase>>({ creator_id: _id })
+      .find<Document<KnowledgeBase>>({ tenant_id: id })
       .sort({ created_at: 1 });
   },
 

@@ -8,6 +8,9 @@ export default defineConfig({
   output: "server",
   adapter: netlify(),
   integrations: [tailwind(), svelte()],
+  security: {
+    checkOrigin: true,
+  },
   devToolbar: {
     enabled: false,
   },
@@ -24,3 +27,4 @@ export default defineConfig({
     routing: "manual",
   },
 });
+

@@ -36,10 +36,9 @@ export default {
   list: async () =>
     collection.find<Document<Instruction>>({}).sort({ created_at: 1 }),
 
-  listByUser: async (id: string) => {
-    const _id = new ObjectId(id);
+  listByTenant: async (id: ObjectId) => {
     return collection
-      .find<Document<Instruction>>({ creator_id: _id })
+      .find<Document<Instruction>>({ tenant_id: id })
       .sort({ created_at: 1 });
   },
 

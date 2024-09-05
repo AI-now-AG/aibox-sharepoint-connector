@@ -1,8 +1,6 @@
-export const TOKEN = "token";
 export const PUBLIC_ROUTES = [
-  "/debug",
   "/login",
-  "/logout",
   "/api/login",
-  "/api/logout",
+  "/login/auth0",
+  "/login/auth0/callback",
 ];

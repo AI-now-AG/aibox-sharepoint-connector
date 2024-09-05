@@ -6,8 +6,8 @@ import Card, { type CardItem } from "$components/Card.svelte";
 
 const t = useTranslations(Astro.preferredLocale);
 
-const instructionsCursor = await InstructionModel.listByUser(
-  Astro.locals.userId,
+const instructionsCursor = await InstructionModel.listByTenant(
+  Astro.locals.user.tenant_id,
 );
 const instructions = await instructionsCursor.toArray();
 

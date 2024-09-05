@@ -6,7 +6,6 @@ import { z } from "zod";
 import { ChatOpenAI } from "@langchain/openai";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { StringOutputParser } from "@langchain/core/output_parsers";
-import { stringToObjectId } from "$utils/stringToObjectId";
 
 const CreateInstructionParamsSchema = z.object({
   _id: z.string().optional(),
@@ -57,7 +56,9 @@ const generateInstructionDescription = async (instruction: string) => {
 
 export const GET: APIRoute = async (ctx) => {
   try {
-    const result = await InstructionModel.listByUser(ctx.locals.userId);
+    const result = await InstructionModel.listByTenant(
+      ctx.locals.user.tenant_id,
+    );
     const instructions = await result.toArray();
     return new Response(
       JSON.stringify(
@@ -95,8 +96,8 @@ export const POST: APIRoute<CreateInstructionParams> = async (ctx) => {
     title: data.title,
     instruction: data.instruction,
     description,
-    tenant_id: stringToObjectId.parse(ctx.locals.tenantId), // AI now AG
-    creator_id: stringToObjectId.parse(ctx.locals.userId), // admin@aibox.ch
+    tenant_id: ctx.locals.user.tenant_id,
+    creator_id: ctx.locals.user.id,
     created_at: new Date(),
     updated_at: new Date(),
   };
@@ -149,7 +150,6 @@ export const PUT: APIRoute<CreateInstructionParams> = async (ctx) => {
   const instruction: Instruction = {
     title: data.title,
     instruction: data.instruction,
-    ...(data._id && { _id: stringToObjectId.parse(data._id) }),
     description,
     updated_at: new Date(),
   };
