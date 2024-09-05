@@ -15,7 +15,7 @@ const menuItems = categories.map((category) => ({
   icon: category.icon,
   items: category.groups?.map((group) => ({
     title: group.title,
-    path: `/prompts/${category.slug}/${group.slug}`,
+    path: `/prompts/${category._id}/${group._id}`,
   })),
 }));
 
