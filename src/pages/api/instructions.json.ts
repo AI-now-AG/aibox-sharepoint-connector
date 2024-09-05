@@ -150,7 +150,6 @@ export const PUT: APIRoute<CreateInstructionParams> = async (ctx) => {
   const instruction: Instruction = {
     title: data.title,
     instruction: data.instruction,
-    ...(data._id && { _id: stringToObjectId.parse(data._id) }),
     description,
     updated_at: new Date(),
   };

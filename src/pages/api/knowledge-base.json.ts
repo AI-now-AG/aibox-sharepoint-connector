@@ -151,7 +151,6 @@ export const PUT: APIRoute<CreateKnowledgeBaseParams> = async (ctx) => {
   const knowledgeBase: KnowledgeBase = {
     title: data.title,
     knowledge_base: data.knowledge_base,
-    ...(data._id && { _id: stringToObjectId.parse(data._id) }),
     description,
     updated_at: new Date(),
   };
