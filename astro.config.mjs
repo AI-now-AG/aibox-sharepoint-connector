@@ -26,5 +26,7 @@ export default defineConfig({
     ],
     routing: "manual",
   },
+  redirects: {
+    "/login": "/", // old login page
+  },
 });
-
