@@ -83,7 +83,7 @@ export const POST: APIRoute = async (ctx) => {
   };
 
   try {
-    await CategoryModel.upsert(newCategory);
+    await CategoryModel.add(newCategory);
 
     return new Response(
       JSON.stringify({
