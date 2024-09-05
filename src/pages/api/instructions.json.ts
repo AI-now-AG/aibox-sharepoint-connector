@@ -93,7 +93,8 @@ export const POST: APIRoute<CreateInstructionParams> = async (ctx) => {
   // feature to get these just based on the token for now. Wait until the Auth0 task is done. Until
   // then we use fixed values.
   const instruction: Instruction = {
-    ...data,
+    title: data.title,
+    instruction: data.instruction,
     description,
     tenant_id: ctx.locals.user.tenant_id,
     creator_id: ctx.locals.user.id,
@@ -147,7 +148,9 @@ export const PUT: APIRoute<CreateInstructionParams> = async (ctx) => {
   // feature to get these just based on the token for now. Wait until the Auth0 task is done. Until
   // then we use fixed values.
   const instruction: Instruction = {
-    ...data,
+    title: data.title,
+    instruction: data.instruction,
+    ...(data._id && { _id: stringToObjectId.parse(data._id) }),
     description,
     updated_at: new Date(),
   };

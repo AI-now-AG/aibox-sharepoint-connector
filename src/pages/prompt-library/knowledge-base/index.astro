@@ -2,7 +2,7 @@
 import Layout from "$layouts/Layout.astro";
 import { useTranslations } from "$i18n/utils";
 import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
-import KnowledgeBaseCard from "$components/KnowledgeBaseCard.svelte";
+import Card, { type CardItem } from "$components/Card.svelte";
 
 const t = useTranslations(Astro.preferredLocale);
 
@@ -11,13 +11,13 @@ const knowledgeBaseCursor = await KnowledgeBaseModel.listByTenant(
 );
 const knowledgeBases = await knowledgeBaseCursor.toArray();
 
-let index = 1;
-const knowledgeBasesEnriched = knowledgeBases.map((knowledgeBase) => ({
-  number: String(index++).padStart(2, "0"),
-  _id: knowledgeBase._id.toString(),
-  title: knowledgeBase.title,
-  description: knowledgeBase.description,
-}));
+const knowledgeBasesEnriched: CardItem[] = knowledgeBases.map(
+  (knowledgeBase) => ({
+    id: knowledgeBase._id.toString(),
+    title: knowledgeBase.title,
+    description: knowledgeBase.description,
+  }),
+);
 ---
 
 <Layout>
@@ -71,9 +71,11 @@ const knowledgeBasesEnriched = knowledgeBases.map((knowledgeBase) => ({
     </label>
   </div>
 
-  <KnowledgeBaseCard
-    knowledgeBasesEnriched={knowledgeBasesEnriched}
-    preferredLocale={Astro.preferredLocale}
+  <Card
+    title={t("prompt-library.knowledgebase.all")}
+    items={knowledgeBasesEnriched}
+    type="knowledge-base"
+    viewLabel={t("prompt-library.knowledgebase.view")}
     client:load
   />
 </Layout>

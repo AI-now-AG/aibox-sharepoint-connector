@@ -3,6 +3,7 @@ import { db, type Document } from "../mongodb";
 import { z } from "zod";
 
 const InstructionSchema = z.object({
+  _id: z.instanceof(ObjectId).optional(),
   tenant_id: z.instanceof(ObjectId).optional(),
   creator_id: z.instanceof(ObjectId).optional(),
   title: z.string(),
@@ -47,6 +48,15 @@ export default {
     const result = await collection.updateOne(
       { _id },
       { $set: { ...validated } },
+    );
+    return result;
+  },
+
+  updateInstruction: async (id: string, newInstruction: string) => {
+    const _id = new ObjectId(id);
+    const result = await collection.updateOne(
+      { _id },
+      { $set: { instruction: newInstruction } },
     );
     return result;
   },

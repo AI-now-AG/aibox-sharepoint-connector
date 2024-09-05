@@ -3,6 +3,7 @@ import { db, type Document } from "../mongodb";
 import { z } from "zod";
 
 const KnowledgeBaseSchema = z.object({
+  _id: z.instanceof(ObjectId).optional(),
   tenant_id: z.instanceof(ObjectId).optional(),
   creator_id: z.instanceof(ObjectId).optional(),
   title: z.string(),
@@ -47,6 +48,15 @@ export default {
     const result = await collection.updateOne(
       { _id },
       { $set: { ...validated } },
+    );
+    return result;
+  },
+
+  updateKnowledgeBase: async (id: string, newKnowledgeBase: string) => {
+    const _id = new ObjectId(id);
+    const result = await collection.updateOne(
+      { _id },
+      { $set: { knowledge_base: newKnowledgeBase } },
     );
     return result;
   },

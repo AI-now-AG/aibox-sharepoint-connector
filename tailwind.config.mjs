@@ -136,6 +136,6 @@ export default {
       },
     ],
   },
-  darkMode: ["class", '[data-theme="night"]'],
+  darkMode: "selector",
   plugins: [require("daisyui")],
 };

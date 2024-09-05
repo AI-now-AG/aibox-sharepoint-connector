@@ -9,6 +9,8 @@ const { title, description } = Astro.props;
   <title>{title}</title>
   <meta name="descrption" content={description} />
 
+  <link rel="icon" href="/favicon.svg" />
+
   <ViewTransitions />
 
   <link
@@ -17,9 +19,14 @@ const { title, description } = Astro.props;
   />
   <script is:inline>
     /* We set the theme in a render blocking script tag early to avoid flashing */
-    const theme = localStorage.getItem("theme");
-    if (theme) {
-      document.documentElement.setAttribute("data-theme", theme);
+    function setTheme() {
+      const theme = localStorage.getItem("theme");
+      if (theme) {
+        document.documentElement.setAttribute("data-theme", theme);
+      }
     }
+
+    setTheme();
+    document.addEventListener("astro:page-load", setTheme);
   </script>
 </head>

@@ -2,7 +2,7 @@
 import Layout from "$layouts/Layout.astro";
 import { useTranslations } from "$i18n/utils";
 import CategoryModel from "$data/models/category.model";
-import CategoryCard from "$components/CategoryCard.svelte";
+import Card, { type CardItem } from "$components/Card.svelte";
 
 const t = useTranslations(Astro.preferredLocale);
 
@@ -11,13 +11,9 @@ const categoriesCursor = await CategoryModel.listByTenant(
 );
 const categories = await categoriesCursor.toArray();
 
-let index = 1;
-const categoriesEnriched = categories.map((category) => ({
-  number: String(index++).padStart(2, "0"),
-  _id: category._id.toString(),
+const categoriesEnriched: CardItem[] = categories.map((category) => ({
+  id: category._id.toString(),
   title: category.title,
-  groups: category.groups,
-  icon: category.icon,
 }));
 ---
 
@@ -72,9 +68,11 @@ const categoriesEnriched = categories.map((category) => ({
     </label>
   </div>
 
-  <CategoryCard
-    categoryEnriched={categoriesEnriched}
-    preferredLocale={Astro.preferredLocale}
+  <Card
+    title={t("prompt-library.categories.all")}
+    items={categoriesEnriched}
+    type="categories"
+    viewLabel={t("prompt-library.categories.view")}
     client:load
   />
 </Layout>

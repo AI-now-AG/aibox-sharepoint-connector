@@ -92,9 +92,14 @@ const user = Astro.locals.user;
         </svg>
       </label>
     </div>
-    <a href="/" class="text-2xl font-semibold flex flex-col">
+    <a href="/" class="text-2xl font-semibold flex flex-col pl-4">
       <img src="/soki-somedia.png" alt="Somedia Logo" class="h-8 somedia" />
-      <span class="non-somedia">aibox</span>
+      <!-- light/dark mode doesn't work currently in the way themes are implemented. Currently only the light variant will be rendered -->
+      <img src="/aibox-logo.svg" class="non-somedia h-12 dark:hidden" />
+      <img
+        src="/aibox-logo-dark.svg"
+        class="non-somedia h-12 hidden dark:block"
+      />
     </a>
     <div class="hidden lg:flex">
       <ul class="menu menu-horizontal px-1">

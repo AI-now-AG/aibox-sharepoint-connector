@@ -95,7 +95,8 @@ export const POST: APIRoute<CreateKnowledgeBaseParams> = async (ctx) => {
   // feature to get these just based on the token for now. Wait until the Auth0 task is done. Until
   // then we use fixed values.
   const knowledgeBase: KnowledgeBase = {
-    ...data,
+    title: data.title,
+    knowledge_base: data.knowledge_base,
     description,
     tenant_id: ctx.locals.user.tenant_id,
     creator_id: ctx.locals.user.id,
@@ -148,7 +149,9 @@ export const PUT: APIRoute<CreateKnowledgeBaseParams> = async (ctx) => {
     data.knowledge_base,
   );
   const knowledgeBase: KnowledgeBase = {
-    ...data,
+    title: data.title,
+    knowledge_base: data.knowledge_base,
+    ...(data._id && { _id: stringToObjectId.parse(data._id) }),
     description,
     updated_at: new Date(),
   };

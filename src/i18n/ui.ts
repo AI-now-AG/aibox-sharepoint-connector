@@ -6,7 +6,7 @@ export const languages = {
 export const defaultLang = "en";
 
 const en = {
-  "site.title": "Welcome to aibox",
+  "site.title": "aibox",
   "site.description":
     "AI-powered solution for streamlining tasks and boosting productivity. Customizable for small to mid-sized companies. Enhance efficiency and drive innovation in your workflow.",
 
@@ -79,13 +79,16 @@ const en = {
   "prompt-library.categories.title": "Categories",
   "prompt-library.categories.add": "Add Category",
   "prompt-library.categories.edit": "Edit Category",
+  "prompt-library.categories.all": "All Categories",
+  "prompt-library.categories.view": "View",
 
   "prompt-execution.card.showMore": "more prompts",
   "prompt-execution.card.showLess": "less prompts",
+  "prompt-execution.showGlobal": "Save Global",
 };
 
 const de = {
-  "site.title": "Willkommen bei der aibox",
+  "site.title": "aibox",
   "site.description":
     "KI-gestützte Lösung zur Optimierung von Aufgaben und Steigerung der Produktivität. Anpassbar für kleine bis mittlere Unternehmen. Verbessern Sie Effizienz und fördern Sie Innovation in Ihrem Arbeitsablauf.",
 
@@ -120,11 +123,11 @@ const de = {
 
   "prompt-library.prompts.title": "Prompt Management",
   "prompt-library.prompts.add": "Neuer Prompt",
-  "prompt-library.prompts.edit": "Eingabeaufforderung bearbeiten",
+  "prompt-library.prompts.edit": "Bearbeiten",
   "prompt-library.prompts.search": "Geben Sie hier ein",
   "prompt-library.prompts.filter": "Filter",
   "prompt-library.prompts.all": "Alle Eingabeaufforderungen",
-  "prompt-library.prompts.view": "Eingabeaufforderung anzeigen",
+  "prompt-library.prompts.view": "Anzeigen",
 
   "prompt-library.add.prompts.title": "Titel",
   "prompt-library.add.prompts.category": "Kategorie",
@@ -158,9 +161,12 @@ const de = {
   "prompt-library.categories.title": "Kategorien",
   "prompt-library.categories.add": "Neue Kategorie",
   "prompt-library.categories.edit": "Kategorie bearbeiten",
+  "prompt-library.categories.all": "Alle Kategorien",
+  "prompt-library.categories.view": "View",
 
   "prompt-execution.card.showMore": "weitere Anregungen",
   "prompt-execution.card.showLess": "weniger Aufforderungen",
+  "prompt-execution.showGlobal": "Save Global",
 };
 
 export const ui = {
