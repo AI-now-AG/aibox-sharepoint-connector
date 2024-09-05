@@ -56,18 +56,6 @@ export default {
     return collection.deleteOne({ _id });
   },
 
-  upsert: async (category: Category) => {
-    const validated = CategoryGroupSchema.parse(category);
-
-    return collection.updateOne(
-      { title: validated.title },
-      { $set: validated },
-      {
-        upsert: true,
-      },
-    );
-  },
-
   list: async () =>
     collection
       .find<Document<Category>>({})
