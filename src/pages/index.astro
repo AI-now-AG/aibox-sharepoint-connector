@@ -1,24 +1,49 @@
 ---
 // Component
 import Layout from "$layouts/Layout.astro";
+import { Image } from "astro:assets";
 import Card from "$components/content/Card.astro";
-import { useTranslations } from "$i18n/utils";
+import { getCollection, getEntry } from "astro:content";
 
+import { useTranslations } from "$i18n/utils";
 const t = useTranslations(Astro.preferredLocale);
+
+const allContent = await getCollection("aibox");
+console.log("allContent", allContent);
 ---
 
 <Layout isFooterVisible={true}>
-  <div class="p-4 flex-1 flex-col w-100 h-100 mt-8 text-center space-y-16">
+  <div class="p-4 mt-8 text-center space-y-6 max-w-3xl mx-auto">
+    <img
+      src="/soki-somedia.png"
+      alt="Somedia Logo"
+      class="h-8 w-auto somedia mx-auto"
+    />
+    <!-- light/dark mode doesn't work currently in the way themes are implemented. Currently only the light variant will be rendered -->
+    <img
+      src="/aibox-logo-text.svg"
+      class="non-somedia h-8 w-auto dark:hidden mx-auto"
+    />
+    <img
+      src="/aibox-logo-text-dark.svg"
+      class="non-somedia h-12 hidden dark:block mx-auto"
+    />
+
     <h1 class="text-4xl font-bold mt-9 mb-4">{t("welcome.title")}</h1>
     <p class="text-xl">{t("welcome.text")}</p>
   </div>
 
-  <div>
-    <Card
-      title="foo"
-      lead="bar"
-      href="/content/onboarding"
-      image={{ src: "", alt: "tmp" }}
-    />
+  <div class="grid grid-cols-3 gap-6 max-w-6xl p-6 mt-10 mx-auto">
+    {
+      allContent.map((content) => (
+        <Card
+          title={content.data.title}
+          lead={content.data.lead}
+          href={`/content/${content.slug}`}
+        >
+          <Image src={content.data.image} alt={content.data.imageAlt} />
+        </Card>
+      ))
+    }
   </div>
 </Layout>

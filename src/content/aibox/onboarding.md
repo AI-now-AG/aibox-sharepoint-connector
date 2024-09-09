@@ -1,4 +1,8 @@
 ---
+title: "Onboarding"
+lead: "Dieser Onboarding-Leitfaden gibt einen umfassenden Überblick zur Struktur und Nutzung der aibox Plattform."
+image: "onboarding.png"
+imageAlt: "Onboarding-Leitfaden"
 ---
 
 # aibox Onboarding
