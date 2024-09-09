@@ -3,13 +3,12 @@
 import Layout from "$layouts/Layout.astro";
 import { Image } from "astro:assets";
 import Card from "$components/content/Card.astro";
-import { getCollection, getEntry } from "astro:content";
+import { getCollection } from "astro:content";
 
 import { useTranslations } from "$i18n/utils";
 const t = useTranslations(Astro.preferredLocale);
 
 const allContent = await getCollection("aibox");
-console.log("allContent", allContent);
 ---
 
 <Layout isFooterVisible={true}>
