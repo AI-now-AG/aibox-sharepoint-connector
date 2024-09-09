@@ -2,53 +2,31 @@
 // import local images
 import ThemeSwitcher from "$components/ThemeSwitcher.svelte";
 import { useTranslations } from "$i18n/utils";
-import { ObjectId } from "mongodb";
 
 const t = useTranslations(Astro.preferredLocale);
 
-let navItems = [
+const themes = [
   {
-    name: t("header.introduction"),
-    path: "/",
+    name: "Light",
+    theme: "light",
   },
   {
-    name: t("header.about"),
-    path: "/about",
+    name: "Dark",
+    theme: "dark",
   },
   {
-    name: t("header.theme"),
-    list: [
-      {
-        name: "Light",
-        theme: "light",
-      },
-      {
-        name: "Dark",
-        theme: "dark",
-      },
-      {
-        name: "Somedia",
-        theme: "somedia",
-      },
-      {
-        name: "Luxury",
-        theme: "luxury",
-      },
-      {
-        name: "Lemonade",
-        theme: "lemonade",
-      },
-    ],
+    name: "Somedia",
+    theme: "somedia",
+  },
+  {
+    name: "Luxury",
+    theme: "luxury",
+  },
+  {
+    name: "Lemonade",
+    theme: "lemonade",
   },
 ];
-
-if (Astro.locals.user.tenant_id !== new ObjectId("66aa21a3d40d0b194e280143")) {
-  let idx = navItems[2].list?.findIndex((e) => e.name == "Somedia");
-  if (idx && idx > -1) {
-    console.log(idx);
-    navItems[2].list?.splice(idx, 1);
-  }
-}
 
 const user = Astro.locals.user;
 ---
@@ -69,7 +47,7 @@ const user = Astro.locals.user;
   }
 </style>
 
-<header class="container-fluid mx-auto navbar">
+<header class="container-fluid mx-auto navbar bg-base-200">
   <div class="navbar-start">
     <div class="lg:hidden">
       <label
@@ -92,46 +70,29 @@ const user = Astro.locals.user;
         </svg>
       </label>
     </div>
-    <a href="/" class="text-2xl font-semibold flex flex-col pl-4">
-      <img src="/soki-somedia.png" alt="Somedia Logo" class="h-8 somedia" />
-      <!-- light/dark mode doesn't work currently in the way themes are implemented. Currently only the light variant will be rendered -->
-      <img src="/aibox-logo.svg" class="non-somedia h-12 dark:hidden" />
-      <img
-        src="/aibox-logo-dark.svg"
-        class="non-somedia h-12 hidden dark:block"
-      />
-    </a>
-    <div class="hidden lg:flex">
-      <ul class="menu menu-horizontal px-1">
-        {
-          navItems.map((item) => (
-            <li>
-              {item.list ? (
-                <details>
-                  <summary class:list={[]}>{item.name}</summary>
-                  <ul
-                    tabindex="0"
-                    class="menu menu-sm dropdown-content bg-base-100 rounded-box z-30 mt-3 w-52 p-2 shadow border border-base-content/20"
-                  >
-                    {item.list.map((subItem) => (
-                      <ThemeSwitcher
-                        message={subItem.theme}
-                        title={subItem.name}
-                        client:load
-                      />
-                    ))}
-                  </ul>
-                </details>
-              ) : (
-                <a href={item.path}>{item.name}</a>
-              )}
-            </li>
-          ))
-        }
-      </ul>
-    </div>
   </div>
   <div class="navbar-end">
+    <div class="hidden lg:flex">
+      <div class="dropdown dropdown-end">
+        <div tabindex="0" role="button" class="btn btn-ghost m-1">
+          {t("header.theme")}
+        </div>
+        <ul
+          tabindex="0"
+          class="dropdown-content menu bg-base-100 rounded-box z-30 w-52 p-2 shadow"
+        >
+          {
+            themes.map((theme) => (
+              <ThemeSwitcher
+                message={theme.theme}
+                title={theme.name}
+                client:load
+              />
+            ))
+          }
+        </ul>
+      </div>
+    </div>
     <div class="dropdown dropdown-end">
       <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
         <div class="w-10 rounded-full">
