@@ -107,7 +107,7 @@ const de = {
 
   "welcome.title": "Willkommen bei aibox!",
   "welcome.text":
-    "Legen Sie los und verbessern Sie Ihre Arbeitsabläufe mit ai. Erfahren Sie, wie Sie die Box verwenden und Ihre eigenen Prompts erstellen.",
+    "Legen Sie los und verbessern Sie Ihre Arbeitsabläufe mit KI. Erfahren Sie, wie Sie die Box verwenden und Ihre eigenen Prompts erstellen.",
 
   "prompt-library.prompts.title": "Prompt Management",
   "prompt-library.prompts.add": "Neuer Prompt",
