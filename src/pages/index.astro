@@ -32,7 +32,9 @@ const allContent = await getCollection("aibox");
     <p class="text-xl">{t("welcome.text")}</p>
   </div>
 
-  <div class="grid grid-cols-3 gap-6 max-w-6xl p-6 mt-12 mx-auto">
+  <div
+    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 max-w-6xl p-6 mt-12 mx-auto"
+  >
     {
       allContent.map((content) => (
         <Card
