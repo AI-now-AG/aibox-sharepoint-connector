@@ -70,6 +70,20 @@ const user = Astro.locals.user;
         </svg>
       </label>
     </div>
+    <div class="lg:hidden pl-2">
+      <a href="/">
+        <img src="/soki-somedia.png" alt="Somedia Logo" class="h-8 somedia" />
+        <!-- light/dark mode doesn't work currently in the way themes are implemented. Currently only the light variant will be rendered -->
+        <img
+          src="/aibox-logo-text.svg"
+          class="non-somedia h-8 w-auto dark:hidden"
+        />
+        <img
+          src="/aibox-logo-text-dark.svg"
+          class="non-somedia h-12 hidden dark:block"
+        />
+      </a>
+    </div>
   </div>
   <div class="navbar-end">
     <div class="hidden lg:flex">
