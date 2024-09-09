@@ -33,11 +33,9 @@ const en = {
   "login.password": "Password",
   "login.submit": "Sign in",
 
-  "welcome.title": "AI for easy and efficient business operations",
+  "welcome.title": "Welcome to aibox!",
   "welcome.text":
-    "aibox is designed to streamline internal tasks and enhance productivity in workflows. Perfect for small to mid-sized companies, our solution is customizable to meet your needs, driving efficiency and fostering innovation.",
-  "welcome.get-started": "Get started",
-  "welcome.explore": "Explore more widgets",
+    "Get started and improve your workflows with ai. Learn how to use the box and create your own prompts.",
 
   "prompt-library.prompts.title": "Prompt Management",
   "prompt-library.prompts.add": "Add Prompt",
@@ -115,11 +113,9 @@ const de = {
   "login.password": "Passwort",
   "login.submit": "Anmelden",
 
-  "welcome.title": "KI für einfache und effiziente Geschäftsabläufe",
+  "welcome.title": "Willkommen bei aibox!",
   "welcome.text":
-    "aibox wurde entwickelt, um interne Aufgaben zu optimieren und die Produktivität in Arbeitsabläufen zu steigern. Unsere Lösung ist perfekt für kleine bis mittelgroße Unternehmen und lässt sich an Ihre Bedürfnisse anpassen, um Effizienz voranzutreiben und Innovation zu fördern.",
-  "welcome.get-started": "Los geht's",
-  "welcome.explore": "Mehr Widgets entdecken",
+    "Legen Sie los und verbessern Sie Ihre Arbeitsabläufe mit ai. Erfahren Sie, wie Sie die Box verwenden und Ihre eigenen Prompts erstellen.",
 
   "prompt-library.prompts.title": "Prompt Management",
   "prompt-library.prompts.add": "Neuer Prompt",
