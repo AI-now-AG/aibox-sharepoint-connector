@@ -8,6 +8,7 @@ const aiboxCollection = defineCollection({
       lead: z.string(),
       image: image(),
       imageAlt: z.string(),
+      youtube: z.string().optional(),
       tags: z.array(z.string()).optional(),
     }),
 });

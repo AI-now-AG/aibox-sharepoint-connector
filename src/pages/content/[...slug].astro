@@ -17,8 +17,27 @@ const { Content } = await entry.render();
 ---
 
 <Layout>
-  <article class="prose mx-auto mb-32">
+  <div class="prose mx-auto">
     <h1>{entry.data.title}</h1>
+  </div>
+  {
+    entry.data.youtube && (
+      <div class="max-w-4xl w-full mx-auto m-6 aspect-video relative">
+        <iframe
+          width="560"
+          height="315"
+          src={entry.data.youtube}
+          title="YouTube video player"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerpolicy="strict-origin-when-cross-origin"
+          allowfullscreen
+          class="absolute top-2 right-2 bottom-2 left-2 w-full h-full"
+        />
+      </div>
+    )
+  }
+  <article class="prose mx-auto mb-32">
     <Content />
   </article>
   <style>

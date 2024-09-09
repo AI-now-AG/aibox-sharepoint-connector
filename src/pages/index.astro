@@ -9,6 +9,7 @@ import { useTranslations } from "$i18n/utils";
 const t = useTranslations(Astro.preferredLocale);
 
 const allContent = await getCollection("aibox");
+console.log(allContent);
 ---
 
 <Layout isFooterVisible={true}>
