@@ -15,10 +15,6 @@ const en = {
   "header.about": "About",
   "header.theme": "Theme",
 
-  "footer.how-it-works": "How it works",
-  "footer.privacy-policy": "Privacy Policy",
-  "footer.terms-of-service": "Terms of Service",
-
   "nav.all-widgets": "All AI Widgets",
   "nav.text-writing": "Text Writing",
   "nav.settings": "Settings",
@@ -94,10 +90,6 @@ const de = {
   "header.about": "Über",
   "header.theme": "Farben",
   "header.login": "Anmelden",
-
-  "footer.how-it-works": "Wie es funktioniert",
-  "footer.privacy-policy": "Datenschutz",
-  "footer.terms-of-service": "Nutzungsbedingungen",
 
   "nav.all-widgets": "Alle KI-Widgets",
   "nav.text-writing": "Redaktion",
