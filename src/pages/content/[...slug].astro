@@ -1,22 +1,29 @@
 ---
-import { getCollection } from "astro:content";
+import Layout from "$layouts/Layout.astro";
+import { getEntry } from "astro:content";
 
-export const prerender = true;
-
-// 1. Generate a new path for every collection entry
-export async function getStaticPaths() {
-  const aiboxEntries = await getCollection("aibox");
-  console.log("aiboxEntries", aiboxEntries);
-  return aiboxEntries.map((entry: any) => ({
-    params: { slug: entry.slug },
-    props: { entry },
-  }));
+const { slug } = Astro.params;
+if (slug === undefined) {
+  throw new Error("Slug is required");
 }
-// 2. For your template, you can get the entry directly from the prop
-const { entry } = Astro.props;
+
+const entry = await getEntry("aibox", slug);
+
+if (entry === undefined) {
+  return Astro.redirect("/404");
+}
+
 const { Content } = await entry.render();
 ---
 
-<h1>{entry.data.title}</h1>
-dafuq
-<Content />
+<Layout>
+  <article class="prose mx-auto mb-32">
+    <h1>{entry.data.title}</h1>
+    <Content />
+  </article>
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
+</Layout>

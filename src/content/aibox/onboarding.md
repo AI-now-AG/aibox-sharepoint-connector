@@ -1,43 +1,31 @@
 ---
 ---
 
-# aibox Onboarding {#aibox-onboarding}
+# aibox Onboarding
 
-**Inhaltsverzeichnis**
+- [Einführung](#einführung)
+- [Zugang](#zugang)
+- [Struktur](#struktur)
+- [Prompt Ausführung](#prompt-ausführung)
+- [Neue Use Cases erstellen](#neue-use-cases-erstellen)
+- [Neue Prompts erstellen](#neue-prompts-erstellen)
+- [Instructions erstellen (optional)](#instructions-erstellen-optional)
+- [Knowledge Base erstellen (optional)](#knowledge-base-erstellen-optional)
+- [Kategorie erstellen (optional)](#kategorie-erstellen-optional)
 
-[**aibox Onboarding 1**](#aibox-onboarding)
-
-[Einführung 1](#einführung)
-
-[Zugang 1](#zugang)
-
-[Struktur 2](#struktur)
-
-[Prompt Ausführung 2](#prompt-ausführung)
-
-[Neue Use Cases erstellen: 4](#neue-use-cases-erstellen:)
-
-[Neue Prompts erstellen: 4](#neue-prompts-erstellen:)
-
-[Instructions erstellen (optional): 6](<#instructions-erstellen-(optional):>)
-
-[Knowledge Base erstellen (optional): 6](<#knowledge-base-erstellen-(optional):>)
-
-[Kategorie erstellen (optional) 7](<#kategorie-erstellen-(optional)>)
-
-## Einführung {#einführung}
+## Einführung
 
 Wir freuen uns, euch den ersten MVP der aibox präsentieren zu dürfen. In diesem Dokument findet ihr neben dem Zugang zum Tool auch eine grobe Anleitung, wie die aibox am einfachsten zu nutzen ist und wie ihr am besten neue Use Cases erstellt. Der OpenAI Team Account von Somedia ist bereits angebunden, somit helfen alle Tests von eurer Seite, die Ergebnisse langfristig zu verbessern.
 
 Bitte bedenkt, dass dies nur der erste MVP ist. Im Laufe der nächsten Tage und Woche werden kleinere Rechtschreib- und Übersetzungsfehler korrigiert, die Funktionalität der Benutzeroberfläche verbessert, sowie vor allem die Qualität der Prompts und der damit verbundene Output gesteigert. Auch weitere Use Cases werden aktuell von uns erarbeitet und können in Kürze veröffentlicht werden.
 
-## Zugang {#zugang}
+## Zugang
 
 [https://ainow-aibox.netlify.app/](https://ainow-aibox.netlify.app/)
 
 Benutzername/Passwort: gemäss separater Kommunikation
 
-## Struktur {#struktur}
+## Struktur
 
 - Kategorie (z.B. Redaktion)
   - Anwendungsfall (z.B. Umschreiben)
@@ -48,7 +36,7 @@ Benutzername/Passwort: gemäss separater Kommunikation
       - Instructon (z.B. Umschreiben)
       - Knowledge Base (z.B. Somedia Writing Style)
 
-## Prompt Ausführung {#prompt-ausführung}
+## Prompt Ausführung
 
 In der Seitenleiste findet ihr die Navigation über die ihr zu den einzelnen Prompts / Anwendungsfällen gelangt:
 
@@ -82,7 +70,7 @@ Anschliessend öffnet sich ein Fenster, in dem der Prompt, die Anleitung und die
 
 **Achtung: Diese Änderungen überschreiben aktuell noch den bestehenden Prompt. Daher empfehlen wir die Erstellung von neuen Prompts. Wir arbeiten allerdings schon daran, dass hier neue Varianten des Prompts erstellt werden können.**
 
-## Neue Use Cases erstellen: {#neue-use-cases-erstellen:}
+## Neue Use Cases erstellen
 
 In der Navigation unter Einstellungen können neue Prompts, Anleitungen und Wissensdatenbanken angelegt werden.
 
@@ -92,7 +80,7 @@ Grundsätzlich: Jeder Anwendungsfall besteht aus diesen drei Elementen:
   - **Instruction:** Richtlinien, wie die Überschriften aussehen sollen und was beachtet werden muss.
   - **Knowledge Base:** Allgemeine Vorgaben, die spezifisch für Somedia sind.
 
-### Neue Prompts erstellen: {#neue-prompts-erstellen:}
+### Neue Prompts erstellen
 
 In der Prompt-Verwaltung werden alle erstellten Prompts abgebildet. Dies kann als Prompt-Bibliothek bezeichnet werden. Hier sind auch bereits die vordefinierten Prompts zu den besprochenen Anwendungsfällen vorhanden.
 
@@ -115,7 +103,7 @@ Für die Erstellung neuer Prompts müssen folgende Schritte befolgt werden:
 
 ![][image7]
 
-### Instructions erstellen (optional): {#instructions-erstellen-(optional):}
+### Instructions erstellen (optional)
 
 Für die definierten Use Cases wurden bereits detaillierte Instructions erstellt. Diese beinhalten alle Vorgaben für den Prompt. Wie bei der Knowledge Base, können hier eigene Instructions erstellt werden. So können neue Vorgaben für die bereits definierten Use Cases getestet werden oder für die Erstellung von ganz neuen Use Cases genutzt werden.
 
@@ -123,7 +111,7 @@ Die bereits erstellten Instructions können in dem Bereich eingesehen und bearbe
 
 ###
 
-### Knowledge Base erstellen (optional): {#knowledge-base-erstellen-(optional):}
+### Knowledge Base erstellen (optional)
 
 Die Somedia Knowledge Base wurde bereits angelegt und in der AIbox hinterlegt. Falls eine weitere Knowledge Base getestet werden soll, kann diese einfach als Text hinterlegt werden.
 
@@ -134,7 +122,7 @@ Die Somedia Knowledge Base wurde bereits angelegt und in der AIbox hinterlegt. F
 
 Die bereits erstellten Knowledge Base können in dem Bereich eingesehen und bearbeitet werden. Das Speichern führt zur Überschreibung der alten Instruction.
 
-### Kategorie erstellen (optional) {#kategorie-erstellen-(optional)}
+### Kategorie erstellen (optional)
 
 Im Bereich Kategorie unter den Settings findet ihr die bereits erstellten Kategorien und Prompt Gruppen für die Navigation. Hier können ganz neue Kategorien mit zugehörigen Gruppen erstellt und für die bestehenden Kategorien neue Gruppen hinzugefügt werden.
 
