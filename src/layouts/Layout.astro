@@ -24,7 +24,7 @@ const {
 
 // TODO: save theme settings in db
 const theme =
-  Astro.locals.user.tenant_id.toString() === "66aa21a3d40d0b194e280143"
+  Astro.locals.user?.tenant_id?.toString() === "66aa21a3d40d0b194e280143"
     ? "somedia"
     : "light";
 ---
@@ -33,22 +33,23 @@ const theme =
 <html lang="en" data-theme={theme}>
   <Head {title} {description} />
   <body class="min-h-screen grid grid-rows-[min-content_1fr]">
-    <Header />
     <div class="drawer lg:drawer-open">
       <input id="left-drawer-trigger" type="checkbox" class="drawer-toggle" />
       <div class="drawer-content grid grid-rows-[1fr_min-content]">
         <main
-          class="min-w-xs flex w-full flex-col lg:basis-2/3 bg-base-200 border-t border-l border-base-content/10"
+          class="min-w-xs min-h-screen flex w-full flex-col lg:basis-2/3 bg-base-200"
         >
+          <Header />
           <slot />
         </main>
         {isFooterVisible && <Footer />}
       </div>
-      <div class="drawer-side top-16 z-20 lg:h-auto">
+      <div class="drawer-side z-20 lg:h-auto">
         <label
           for="left-drawer-trigger"
           aria-label="close sidebar"
           class="drawer-overlay"></label>
+
         <Navigation />
       </div>
     </div>

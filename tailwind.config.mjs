@@ -137,5 +137,5 @@ export default {
     ],
   },
   darkMode: "selector",
-  plugins: [require("daisyui")],
+  plugins: [require("@tailwindcss/typography"), require("daisyui")],
 };

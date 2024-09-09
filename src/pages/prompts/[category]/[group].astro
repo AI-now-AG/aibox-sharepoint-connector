@@ -3,20 +3,32 @@
 import Layout from "$layouts/Layout.astro";
 import Content from "$components/prompt-interface/components/Content.astro";
 import History from "$components/prompt-interface/components/History.astro";
+
+import IconSettings from "$components/nav/icons/Settings.astro";
 ---
 
 <Layout>
+  <!-- <div
+    class="grid grid-cols-1 xl:grid-cols-[1fr_minmax(min-content,_420px)] bg-base-200 h-full"
+    > -->
   <div
-    class="grid grid-cols-1 md:grid-rows-[1fr_max-lg_minmax(min-content,_380px)] xl:grid-cols-[1fr_min-content_minmax(min-content,_420px)] bg-base-200 h-full"
+    class="grid grid-cols-1 grid-rows-[min-content-1fr] bg-base-200 h-full content-baseline gap-0 place-items-center"
   >
     <div class="p-6">
       <Content />
     </div>
 
-    <div class="divider xl:divider-horizontal"></div>
-
-    <div class="px-4 xl:px-0 xl:py-6 xl:pr-6 xl:block">
-      <History />
+    <div class="px-6 w-full">
+      <div class="collapse collapse-arrow bg-base-300 w-full max-w-6xl mx-auto">
+        <input type="checkbox" />
+        <div class="collapse-title font-medium">
+          <IconSettings class="w-5 h-5 inline -mt-1" />
+          Prompt
+        </div>
+        <div class="collapse-content">
+          <History />
+        </div>
+      </div>
     </div>
   </div>
 </Layout>

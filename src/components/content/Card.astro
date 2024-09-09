@@ -1,0 +1,19 @@
+---
+export interface Props {
+  title: string;
+  lead: string;
+  href: string;
+}
+
+const { title, lead, href } = Astro.props;
+---
+
+<a class="card bg-base-100 w-auto shadow-xl group" href={href}>
+  <figure>
+    <slot />
+  </figure>
+  <div class="card-body group-hover:underline">
+    <h2 class="card-title">{title}</h2>
+    <p>{lead}</p>
+  </div>
+</a>

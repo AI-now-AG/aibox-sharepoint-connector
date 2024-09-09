@@ -1,0 +1,29 @@
+---
+import Layout from "$layouts/Layout.astro";
+import { getEntry } from "astro:content";
+
+const { slug } = Astro.params;
+if (slug === undefined) {
+  throw new Error("Slug is required");
+}
+
+const entry = await getEntry("aibox", slug);
+
+if (entry === undefined) {
+  return Astro.redirect("/404");
+}
+
+const { Content } = await entry.render();
+---
+
+<Layout>
+  <article class="prose mx-auto mb-32">
+    <h1>{entry.data.title}</h1>
+    <Content />
+  </article>
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
+</Layout>

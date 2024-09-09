@@ -21,7 +21,7 @@
 </script>
 
 <li>
-  <button on:click={() => setTheme(message)}>
+  <a on:click={() => setTheme(message)}>
     {title}
-  </button>
+  </a>
 </li>
