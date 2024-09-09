@@ -5,8 +5,6 @@ image: "onboarding.png"
 imageAlt: "Onboarding-Leitfaden"
 ---
 
-# aibox Onboarding
-
 - [Einführung](#einführung)
 - [Zugang](#zugang)
 - [Struktur](#struktur)
