@@ -316,6 +316,7 @@ We're focused on the swiss market and target all browsers with a usage of >1% in
 - **Project Repository**: [https://github.com/AI-now-AG/ai-toolbox](https://github.com/AI-now-AG/ai-toolbox)
 - **Production Environment**: [https://ainow-aibox.netlify.app](https://ainow-aibox.netlify.app)
 - **Issue Tracker**: [https://ainow.atlassian.net/jira/software/c/projects/AINOW/boards/4](https://ainow.atlassian.net/jira/software/c/projects/AINOW/boards/4)
+- **Figma** [https://www.figma.com/design/fhxdRqUV2hI0QhdLCEAncF/daisyUI-AI-Toolbox?node-id=8446-3377&node-type=canvas&t=UaRorYtoT6J53Fhl-0](https://www.figma.com/design/fhxdRqUV2hI0QhdLCEAncF/daisyUI-AI-Toolbox?node-id=8446-3377&node-type=canvas&t=UaRorYtoT6J53Fhl-0)
 - **Netlify Dashboard**: [https://app.netlify.com/sites/ainow-aibox/overview](https://app.netlify.com/sites/ainow-aibox/overview)
 - **CI/CD Pipeline**: [https://app.netlify.com/sites/ainow-aibox/deploys](https://app.netlify.com/sites/ainow-aibox/deploys)
 
