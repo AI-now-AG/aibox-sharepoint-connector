@@ -54,12 +54,12 @@
   }
 
   function addGroup() {
-    if (groups && groups.length < 6) {
+    //if (groups && groups.length < 6) {
       const newGroup: GroupParam = {
         title: "",
       };
       groups = [...groups, newGroup];
-    }
+    //}
   }
 
   function removeGroup(index: number) {
