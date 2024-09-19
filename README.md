@@ -18,7 +18,7 @@ The application is built with a focus on simplicity and scalability, allowing co
 - Role-based access control for secure and organized usage
 - Integration of LLMs using LangChain, enabling simple implementations of advanced workflows and setups in the future
 - Scalable and serverless cloud-based infrastructure
-- Simple themeing to reflect the customer's corporate identity
+- Simple theming to reflect the customer's corporate identity
 
 ## Principles
 
@@ -130,7 +130,7 @@ For _aibox_, we follow these core principles and methodologies to guide our deve
 
    - Component library built on top of TailwindCSS
    - Provides pre-built components and themes
-   - Comes with themeing
+   - Comes with theming
 
 5. **TypeScript**
 
