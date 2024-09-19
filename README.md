@@ -268,7 +268,7 @@ To ensure a consistent development experience and maintain code quality, ensure 
 
 ## Multi-tenancy and Permissions
 
-- Tenants are user relations to them are managed in Auth0 while we keep the tenant config in our MongoDB.
+- Tenants are managed in Auth0 while we keep the tenant config in our MongoDB.
 - User roles are managed in Auth0. They are at the time of writing:
   - **User**: Reading rights
   - **Admin**: Can edit and add prompts and related objects
