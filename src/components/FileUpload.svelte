@@ -149,7 +149,7 @@
           >
             {#each files as file, index (file.name)}
               <div
-                class="relative flex flex-col items-center overflow-hidden text-center bg-base-100 border border-neutral-content rounded cursor-move select-none image-box pt-36"
+                class="relative flex flex-col items-center overflow-hidden text-center bg-base-100 border border-neutral-content rounded cursor-move select-none pt-36"
                 on:dragstart={(e) => dragstart(e, index)}
                 on:dragend={() => {
                   fileDragging = -1;
@@ -214,7 +214,7 @@
 
                 {#if file.type.includes("image/")}
                   <img
-                    class="absolute inset-0 z-0 object-cover w-full h-full preview bg-base-100"
+                    class="absolute inset-0 z-0 object-contain w-full h-full preview bg-base-100"
                     bind:this={imgElements[index]}
                   />
                 {/if}
