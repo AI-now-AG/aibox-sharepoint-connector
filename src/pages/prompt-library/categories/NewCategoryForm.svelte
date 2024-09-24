@@ -5,6 +5,7 @@
   } from "$pages/api/categories.json";
   import { onMount } from "svelte";
   import { useTranslations } from "$i18n/utils";
+
   export let preferredLocale;
   const t = useTranslations(preferredLocale);
 
@@ -18,6 +19,7 @@
 
   export let categoryId: string;
   export let category: CreateCategoryParams;
+  export let isEditable: boolean = false;
 
   onMount(async function () {
     if (category) {
@@ -54,12 +56,10 @@
   }
 
   function addGroup() {
-    //if (groups && groups.length < 6) {
-      const newGroup: GroupParam = {
-        title: "",
-      };
-      groups = [...groups, newGroup];
-    //}
+    const newGroup: GroupParam = {
+      title: "",
+    };
+    groups = [...groups, newGroup];
   }
 
   function removeGroup(index: number) {
@@ -152,14 +152,16 @@
         </div>
       </div>
 
-      <div class="flex items-center justify-between">
-        <button
-          class="btn btn-active btn-primary px-8 font-normal"
-          on:click|preventDefault={save}
-        >
-          Save Category
-        </button>
-      </div>
+      {#if isEditable}
+        <div class="flex items-center justify-between">
+          <button
+            class="btn btn-active btn-primary px-8 font-normal"
+            on:click|preventDefault={save}
+          >
+            Save Category
+          </button>
+        </div>
+      {/if}
     </form>
   </div>
 </div>

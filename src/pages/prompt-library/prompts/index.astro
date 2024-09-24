@@ -4,6 +4,7 @@ import { useTranslations } from "$i18n/utils";
 import PromptModel from "$data/models/prompt.model";
 import CategoryModel from "$data/models/category.model";
 import Card, { type CardItem } from "$components/Card.svelte";
+import { Permission } from "$data/models/user.model";
 
 const t = useTranslations(Astro.preferredLocale);
 
@@ -19,10 +20,6 @@ const calls = prompts.map(async (prompt) => {
 });
 
 const categories = await Promise.all(calls);
-
-const categoryAll = await CategoryModel.listByTenant(
-  Astro.locals.user.tenant_id,
-);
 
 const promptsEnriched: CardItem[] = prompts.map((prompt) => {
   const category = categories.find(
@@ -41,6 +38,7 @@ const promptsEnriched: CardItem[] = prompts.map((prompt) => {
     tags,
   };
 });
+let userPermissions = Astro.locals.user.permissions;
 ---
 
 <Layout>
@@ -51,30 +49,35 @@ const promptsEnriched: CardItem[] = prompts.map((prompt) => {
       {t("prompt-library.prompts.title")}
     </h1>
 
-    <a
-      href="prompts/add"
-      class="mt-2 lg:mt-8 btn btn-active btn-neutral font-normal grow-0"
-    >
-      <svg
-        width="13"
-        height="12"
-        viewBox="0 0 13 12"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M6.5 1V6M6.5 6V11M6.5 6H11.5M6.5 6L1.5 6"
-          stroke="white"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"></path>
-      </svg>
-      {t("prompt-library.prompts.add")}
-    </a>
+    {
+      userPermissions.includes(Permission.AdminAll) && (
+        <a
+          href="prompts/add"
+          class="mt-2 lg:mt-8 btn btn-active btn-neutral font-normal grow-0"
+        >
+          <svg
+            width="13"
+            height="12"
+            viewBox="0 0 13 12"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M6.5 1V6M6.5 6V11M6.5 6H11.5M6.5 6L1.5 6"
+              stroke="white"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          {t("prompt-library.prompts.add")}
+        </a>
+      )
+    }
   </div>
 
   <div class="container max-w-5xl mx-auto px-6">
-    <label class="input input-bordered flex items-center gap-2">
+    <!-- <label class="input input-bordered flex items-center gap-2">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 16 16"
@@ -144,14 +147,14 @@ const promptsEnriched: CardItem[] = prompts.map((prompt) => {
           }
         </ul>
       </div>
-    </div>
+    </div> -->
   </div>
-
   <Card
     title={t("prompt-library.prompts.all")}
     items={promptsEnriched}
     type="prompts"
     viewLabel={t("prompt-library.prompts.view")}
+    isEditable={userPermissions.includes(Permission.AdminAll)}
     client:load
   />
 </Layout>

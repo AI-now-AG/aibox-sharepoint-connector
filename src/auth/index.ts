@@ -25,6 +25,8 @@ export const lucia = new Lucia(adapter, {
       tenant_id: attributes.tenant_id,
       email: attributes.email,
       picture: attributes.picture,
+      roles: attributes.roles,
+      permissions: attributes.permissions,
     };
   },
 });

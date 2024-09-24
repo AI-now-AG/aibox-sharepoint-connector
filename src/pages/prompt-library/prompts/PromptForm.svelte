@@ -41,6 +41,8 @@
 
   export let promptId: string;
   export let prompt: Prompt;
+  export let isEditable: boolean = false;
+
   let isSaving = false;
 
   onMount(async function () {
@@ -211,22 +213,24 @@
         /> -->
       </div>
 
-      <div class="flex items-center justify-between">
-        <button
-          class={`btn btn-active btn-primary px-8 font-normal ${isSaving && "btn-disabled"}`}
-          on:click|preventDefault={savePrompt}
-        >
-          {#if isSaving}
-            <span class="loading loading-spinner"></span>
-            {t("prompt-library.add.prompts.saving")}
-          {:else}
-            {t("prompt-library.add.prompts.save")}
-          {/if}
-        </button>
-        <button class="btn btn-active btn-ghost px-8 font-normal">
-          Try It Out
-        </button>
-      </div>
+      {#if isEditable}
+        <div class="flex items-center justify-between">
+          <button
+            class={`btn btn-active btn-primary px-8 font-normal ${isSaving && "btn-disabled"}`}
+            on:click|preventDefault={savePrompt}
+          >
+            {#if isSaving}
+              <span class="loading loading-spinner"></span>
+              {t("prompt-library.add.prompts.saving")}
+            {:else}
+              {t("prompt-library.add.prompts.save")}
+            {/if}
+          </button>
+          <button class="btn btn-active btn-ghost px-8 font-normal">
+            Try It Out
+          </button>
+        </div>
+      {/if}
     </form>
   </div>
 </div>

@@ -147,23 +147,54 @@
     text = text.replace(/\n/g, "<br>");
     return text;
   }
+
+  function clearText() {
+    inputText = "";
+  }
 </script>
 
 <div
   class="rounded-xl bg-base-100 border border-base-content/20 focus:ring-base-200 has-[:focus]:ring-2 has-[:focus]:ring-base-primary has-[:focus]:ring-offset-2 has-[:focus]:ring-offset-base-200"
 >
-  <textarea
-    name="input"
-    id="input"
-    class="textarea textarea-ghost h-32 w-full focus:outline-none focus:border-base-100 text-base"
-    placeholder="Your input..."
-    bind:value={inputText}
-    on:keydown={onKeyDown}
-  ></textarea>
+  <div class="relative">
+    <textarea
+      name="input"
+      id="input"
+      class="textarea textarea-ghost h-32 w-full focus:outline-none focus:border-base-100 text-base"
+      placeholder="Your input..."
+      bind:value={inputText}
+      on:keydown={onKeyDown}
+    ></textarea>
+    <button
+      type="button"
+      on:click={clearText}
+      class="absolute top-2 right-2 text-base-content hover:text-base-content/60"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        ><path
+          fill="currentColor"
+          d="M14.952 3c-1.037 0-1.872.835-3.542 2.505l-4.91 4.91l7.085 7.085l4.91-4.91C20.165 10.92 21 10.085 21 9.048c0-1.038-.835-1.873-2.505-3.543S15.99 3 14.952 3"
+          opacity="0.5"
+        /><path
+          fill="currentColor"
+          d="M13.585 17.5L6.5 10.415l-.995.995C3.835 13.08 3 13.915 3 14.952c0 1.038.835 1.873 2.505 3.543S8.01 21 9.048 21c1.037 0 1.872-.835 3.542-2.505z"
+        /><path
+          fill="currentColor"
+          d="M9.033 21H9zm.03 0c.796-.006 1.476-.506 2.51-1.5H21a.75.75 0 0 1 0 1.5z"
+          opacity="0.5"
+        /></svg
+      >
+    </button>
+  </div>
+
   <div class="grid grid-cols-[1fr_min-content] gap-4">
     <div class="p-4 flex flex-row gap-2">
       <button
-        class="btn h-auto w-auto p-1 min-h-0 model-toggle"
+        class="btn h-auto w-auto p-1 min-h-0 model-toggle hover:text-base-content/60"
         disabled={!promptId}
         on:click={() => {
           isClickOnFile = false;
@@ -189,7 +220,7 @@
         {/if}
       </button>
       <button
-        class="btn h-auto w-auto p-1 min-h-0"
+        class="btn h-auto w-auto p-1 min-h-0 hover:text-base-content/60"
         disabled={!promptId}
         on:click={() => {
           isClickOnFile = true;

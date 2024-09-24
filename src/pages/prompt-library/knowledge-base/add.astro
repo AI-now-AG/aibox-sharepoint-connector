@@ -2,8 +2,15 @@
 // Component
 import Layout from "$layouts/Layout.astro";
 import KnowledgeBaseForm from "$pages/prompt-library/knowledge-base/KnowledgeBaseForm.svelte";
+import { Permission } from "$data/models/user.model";
+
+let userPermissions = Astro.locals.user.permissions;
 ---
 
 <Layout>
-  <KnowledgeBaseForm preferredLocale={Astro.preferredLocale} client:load />
+  <KnowledgeBaseForm
+    preferredLocale={Astro.preferredLocale}
+    isEditable={userPermissions.includes(Permission.AdminAll)}
+    client:load
+  />
 </Layout>

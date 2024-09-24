@@ -2,14 +2,17 @@ import { auth0, lucia } from "$auth";
 import { decodeJwt } from "jose";
 
 import type { APIContext } from "astro";
-import userModel from "$data/models/user.model";
+import userModel, {
+  assignPermissions,
+  UserRole,
+} from "$data/models/user.model";
 import { z } from "zod";
 import tenantModel from "$data/models/tenant.model";
 
 const Auth0JWTSchema = z.object({
   sub: z.string().min(24),
   org_name: z.string().min(2),
-  "ainow/roles": z.array(z.string().min(1)),
+  "ainow/roles": z.array(z.nativeEnum(UserRole)),
   email: z.string().email(),
   nickname: z.string(),
   picture: z.string().url(),
@@ -46,11 +49,13 @@ export async function GET(context: APIContext): Promise<Response> {
       status: 400,
     });
   }
+  const roles = userData.data["ainow/roles"];
 
   const existingUser = await userModel.getAuth0Sub(userData.data.sub);
   console.log("existingUser", existingUser);
 
   if (existingUser) {
+    await userModel.updateRole(userData.data.sub, roles);
     const session = await lucia.createSession(existingUser._id, {});
     const sessionCookie = lucia.createSessionCookie(session.id);
 
@@ -78,9 +83,10 @@ export async function GET(context: APIContext): Promise<Response> {
     username: userData.data.nickname,
     email: userData.data.email,
     picture: userData.data.picture,
-    roles: userData.data["ainow/roles"], // This is currently the role name, should be ID in the future
+    roles,
     created_at: new Date(),
     updated_at: new Date(),
+    permissions: assignPermissions(roles),
   });
 
   console.log("newUser", newUser);

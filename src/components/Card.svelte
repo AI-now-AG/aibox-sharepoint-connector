@@ -14,7 +14,8 @@
   export let type: string = "";
   export let title: string = "";
   export let viewLabel: string = "";
-
+  export let isEditable: boolean = false;
+  
   const showDeleteConfirmationDlg = (id: string) => {
     document
       .querySelector<HTMLDialogElement>(`#delete_confirmation_modal_${id}`)
@@ -82,25 +83,26 @@
                 {viewLabel}
               </a>
             </div>
-            <button
-              class="btn btn-sm btn-ghost text-error self-end"
-              on:click={() => {
-                showDeleteConfirmationDlg(card.id);
-              }}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="1em"
-                height="1em"
-                viewBox="0 0 24 24"
-                class="w-6 h-6"
-                ><path
-                  fill="currentColor"
-                  d="M7 21q-.825 0-1.412-.587T5 19V6H4V4h5V3h6v1h5v2h-1v13q0 .825-.587 1.413T17 21zm2-4h2V8H9zm4 0h2V8h-2z"
-                /></svg
+            {#if isEditable}
+              <button
+                class="btn btn-sm btn-ghost text-error self-end"
+                on:click={() => {
+                  showDeleteConfirmationDlg(card.id);
+                }}
               >
-              Delete
-            </button>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="1em"
+                  height="1em"
+                  viewBox="0 0 24 24"
+                  class="w-6 h-6"
+                  ><path
+                    fill="currentColor"
+                    d="M7 21q-.825 0-1.412-.587T5 19V6H4V4h5V3h6v1h5v2h-1v13q0 .825-.587 1.413T17 21zm2-4h2V8H9zm4 0h2V8h-2z"
+                  /></svg
+                >
+              </button>
+            {/if}
 
             <dialog id={`delete_confirmation_modal_${card.id}`} class="modal">
               <div class="modal-box">

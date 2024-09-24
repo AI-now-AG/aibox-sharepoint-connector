@@ -2,6 +2,7 @@
 import Layout from "$layouts/Layout.astro";
 import InstructionModel from "$data/models/instruction.model";
 import InstructionForm from "$pages/prompt-library/instructions/InstructionForm.svelte";
+import { Permission } from "$data/models/user.model";
 
 export interface Props {
   id: string;
@@ -10,6 +11,8 @@ export interface Props {
 const { id } = Astro.params;
 
 const instruction = id ? await InstructionModel.get(id) : undefined; // TODO: Render 404 if not found
+
+let userPermissions = Astro.locals.user.permissions;
 ---
 
 <Layout>
@@ -21,6 +24,7 @@ const instruction = id ? await InstructionModel.get(id) : undefined; // TODO: Re
       preferredLocale={Astro.preferredLocale}
       instructionId={id}
       instruction={instruction}
+      isEditable={userPermissions.includes(Permission.AdminAll)}
       client:load
     />
   </div>

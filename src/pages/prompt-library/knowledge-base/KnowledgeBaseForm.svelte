@@ -11,6 +11,8 @@
 
   export let knowledgeBaseId: string;
   export let knowledgeBase: KnowledgeBase;
+  export let isEditable: boolean = false;
+
   let isSaving = false;
 
   onMount(async function () {
@@ -71,19 +73,21 @@
         />
       </div>
 
-      <div class="flex items-center justify-between">
-        <button
-          class={`btn btn-active btn-primary px-8 font-normal ${isSaving && "btn-disabled"}`}
-          on:click|preventDefault={saveInstruction}
-        >
-          {#if isSaving}
-            <span class="loading loading-spinner"></span>
-            {t("prompt-library.add.prompts.saving")}
-          {:else}
-            {t("prompt-library.add.knowledgebase.save")}
-          {/if}
-        </button>
-      </div>
+      {#if isEditable}
+        <div class="flex items-center justify-between">
+          <button
+            class={`btn btn-active btn-primary px-8 font-normal ${isSaving && "btn-disabled"}`}
+            on:click|preventDefault={saveInstruction}
+          >
+            {#if isSaving}
+              <span class="loading loading-spinner"></span>
+              {t("prompt-library.add.prompts.saving")}
+            {:else}
+              {t("prompt-library.add.knowledgebase.save")}
+            {/if}
+          </button>
+        </div>
+      {/if}
     </form>
   </div>
 </div>
