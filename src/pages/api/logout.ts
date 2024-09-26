@@ -17,9 +17,9 @@ export const GET: APIRoute = async (context) => {
     sessionCookie.value,
     sessionCookie.attributes,
   );
-
+  const domain = import.meta.env.AUTH0_DOMAIN || "https://ainow.eu.auth0.com";
   return context.redirect(
     //"https://ainow.eu.auth0.com/v2/logout?returnTo=http://localhost:4321",
-    "https://ainow.eu.auth0.com/v2/logout",
+    domain + "/v2/logout",
   );
 };
