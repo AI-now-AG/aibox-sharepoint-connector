@@ -5,6 +5,29 @@ import Content from "$components/prompt-interface/components/Content.astro";
 import History from "$components/prompt-interface/components/History.astro";
 
 import IconSettings from "$components/nav/icons/Settings.astro";
+
+import CategoryModel from "$data/models/category.model";
+import PromptModel from "$data/models/prompt.model";
+
+const { category: categoryId, group: groupId } = Astro.params;
+
+const category = await CategoryModel.get(categoryId || "");
+const group = category?.groups.find((g) => g._id === groupId);
+
+const cursor = await PromptModel.listByTenant(Astro.locals.user.tenant_id);
+const prompts = await cursor.toArray();
+
+const categoryPrompt = prompts.filter(
+  (g) => g.category.toString() === category?._id.toString(),
+);
+const categoryGroupPrompt = categoryPrompt.filter(
+  (g) => g.group.toString() === group?._id?.toString(),
+);
+const promptItems = categoryGroupPrompt.map((prompt) => ({
+  _id: prompt._id.toString(),
+  title: prompt.title,
+  description: prompt.description,
+}));
 ---
 
 <Layout>
@@ -18,17 +41,21 @@ import IconSettings from "$components/nav/icons/Settings.astro";
       <Content />
     </div>
 
-    <div class="px-6 w-full">
-      <div class="collapse collapse-arrow bg-base-300 w-full max-w-6xl mx-auto">
-        <input type="checkbox" />
-        <div class="collapse-title font-medium">
-          <IconSettings class="w-5 h-5 inline -mt-1" />
-          Prompt
+    {
+      promptItems.length > 0 && (
+        <div class="px-6 w-full">
+          <div class="collapse collapse-arrow bg-base-300 w-full max-w-6xl mx-auto">
+            <input type="checkbox" />
+            <div class="collapse-title font-medium">
+              <IconSettings class="w-5 h-5 inline -mt-1" />
+              Prompt
+            </div>
+            <div class="collapse-content">
+              <History />
+            </div>
+          </div>
         </div>
-        <div class="collapse-content">
-          <History />
-        </div>
-      </div>
-    </div>
+      )
+    }
   </div>
 </Layout>
