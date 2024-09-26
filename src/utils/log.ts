@@ -1,43 +1,43 @@
 class Log {
-  static TAG = 'MURF_LOG - ' ;
+  static TAG = "AINOW - AIBOX - ";
   log = (type: string, what?: string, message?: unknown) => {
-    if (import.meta.env.MODE === 'development') {
-      what = what ?? 'GENERAL';
+    if (import.meta.env.MODE === "development") {
+      what = what ?? "GENERAL";
       switch (type) {
-        case 'DEBUG':
+        case "DEBUG":
           console.log(
-            '\x1b[33m' + Log.TAG + ' - ' + type + ' ::: ' + what + ' ::: ',
+            "\x1b[33m" + Log.TAG + " - " + type + " ::: " + what + " ::: ",
             JSON.stringify(message),
           );
           break;
-        case 'ERROR':
+        case "ERROR":
           console.log(
-            '\x1b[31m' + Log.TAG + ' - ' + type + ' ::: ' + what + ' ::: ',
+            "\x1b[31m" + Log.TAG + " - " + type + " ::: " + what + " ::: ",
             JSON.stringify(message),
           );
           break;
         default:
           console.log(
-            '\x1b[36m' + Log.TAG + ' - ' + type + ' ::: ' + what + ' ::: ',
+            "\x1b[36m" + Log.TAG + " - " + type + " ::: " + what + " ::: ",
             JSON.stringify(message),
           );
           break;
       }
       console.log(
-        '--------------------------------------------------------------------------------------------------------------',
+        "--------------------------------------------------------------------------------------------------------------",
       );
     }
   };
   i = (message: unknown, what?: string) => {
-    this.log('INFO', what, message);
+    this.log("INFO", what, message);
   };
 
   d = (message: unknown, what?: string) => {
-    this.log('DEBUG', what, message);
+    this.log("DEBUG", what, message);
   };
 
   e = (message: unknown, what?: string) => {
-    this.log('ERROR', what, message);
+    this.log("ERROR", what, message);
   };
 }
 
