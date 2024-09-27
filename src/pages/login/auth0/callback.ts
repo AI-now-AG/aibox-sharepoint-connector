@@ -8,10 +8,11 @@ import userModel, {
 } from "$data/models/user.model";
 import { z } from "zod";
 import tenantModel from "$data/models/tenant.model";
+import log from "$utils/log";
 
 const Auth0JWTSchema = z.object({
   sub: z.string().min(24),
-  org_name: z.string().min(2),
+  "ainow/org_name": z.string().min(2),
   "ainow/roles": z.array(z.nativeEnum(UserRole)),
   email: z.string().email(),
   nickname: z.string(),
@@ -19,15 +20,15 @@ const Auth0JWTSchema = z.object({
 });
 
 export async function GET(context: APIContext): Promise<Response> {
-  console.log("searchParams", context.url.searchParams);
-  console.log("state", context.cookies.get("auth0_state"));
+  log.d(context.url.searchParams, "searchParams");
+  log.d(context.cookies.get("auth0_state"), "state");
 
   const code = context.url.searchParams.get("code");
   const state = context.url.searchParams.get("state");
   const storedState = context.cookies.get("auth0_state")?.value ?? null;
 
   if (!code || !state || !storedState || state !== storedState) {
-    console.debug("missing required params");
+    log.e("missing required params");
     return new Response(null, {
       status: 400,
     });
@@ -37,13 +38,13 @@ export async function GET(context: APIContext): Promise<Response> {
     code,
   );
   const decoded = decodeJwt(tokens.idToken);
-  console.log("decoded", decoded);
+  log.d(decoded, "decoded");
 
   const userData = Auth0JWTSchema.safeParse(decoded);
   if (userData.error) {
-    console.debug(
-      "Decoded id token does not contain the required fields",
+    log.e(
       userData.error,
+      "Decoded id token does not contain the required fields",
     );
     return new Response(null, {
       status: 400,
@@ -52,7 +53,7 @@ export async function GET(context: APIContext): Promise<Response> {
   const roles = userData.data["ainow/roles"];
 
   const existingUser = await userModel.getAuth0Sub(userData.data.sub);
-  console.log("existingUser", existingUser);
+  log.d(existingUser, "existingUser");
 
   if (existingUser) {
     await userModel.updateRole(userData.data.sub, roles);
@@ -69,9 +70,10 @@ export async function GET(context: APIContext): Promise<Response> {
   }
 
   // TODO: fetch logo from auth0 org?
-  const tenant = await tenantModel.getByName(userData.data.org_name);
+  const orgName = userData.data["ainow/org_name"];
+  const tenant = await tenantModel.getByName(orgName);
   if (!tenant) {
-    console.debug("Tenant not found");
+    log.e("Tenant not found");
     return new Response(null, {
       status: 400,
     });
@@ -89,7 +91,7 @@ export async function GET(context: APIContext): Promise<Response> {
     permissions: assignPermissions(roles),
   });
 
-  console.log("newUser", newUser);
+  log.d(newUser, "newUser");
 
   const session = await lucia.createSession(newUser.insertedId, {});
   const sessionCookie = lucia.createSessionCookie(session.id);
