@@ -71,7 +71,7 @@ export async function GET(context: APIContext): Promise<Response> {
 
   // TODO: fetch logo from auth0 org?
   const orgName = userData.data["ainow/org_name"];
-  const tenant = await tenantModel.getByName(orgName);
+  const tenant = await tenantModel.findOne({org_name: orgName});
   if (!tenant) {
     log.e("Tenant not found");
     return new Response(null, {

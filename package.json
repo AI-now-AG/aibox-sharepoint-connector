@@ -31,6 +31,7 @@
     "langchain": "^0.2.16",
     "lucia": "^3.2.0",
     "mongodb": "^6.8.0",
+    "mongoose": "^8.7.0",
     "nanoid": "^5.0.7",
     "pdf-parse": "^1.1.1",
     "slug": "^9.1.0",

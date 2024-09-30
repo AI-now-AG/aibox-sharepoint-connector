@@ -1,32 +1,29 @@
-import { ObjectId } from "mongodb";
-import { db, type Document } from "../mongodb";
-import { z } from "zod";
+import mongoose, { Schema } from 'mongoose';
 
-const TenantSchema = z.object({
-  name: z.string(),
-  org_name: z.string(),
-  created_at: z.date(),
-  updated_at: z.date(),
+interface ITenant {
+  name: string;
+  org_name: string;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export const TenantSchema = new Schema<ITenant>({
+  name: {
+    type: String,
+    required: true,
+  },
+  org_name: {
+    type: String,
+    required: true,
+  },
+  created_at: {
+    type: Date,
+    default: new Date(),
+  },
+  updated_at: {
+    type: Date,
+    default: new Date(),
+  },
 });
 
-export type Tenant = z.infer<typeof TenantSchema>;
-
-const collection = db.collection("tenants");
-
-export default {
-  add: async (prompt: Tenant) => {
-    const validated = TenantSchema.parse(prompt);
-    return collection.insertOne(validated);
-  },
-
-  list: async () => collection.find<Document<Tenant>>({}),
-
-  get: async (id: string) => {
-    const _id = new ObjectId(id);
-    return collection.findOne<Document<Tenant>>({ _id });
-  },
-
-  getByName: async (org_name: string) => {
-    return collection.findOne<Document<Tenant>>({ org_name });
-  },
-};
+export default mongoose.model<ITenant>('Tenant', TenantSchema);
