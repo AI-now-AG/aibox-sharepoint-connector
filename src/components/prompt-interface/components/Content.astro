@@ -1,6 +1,7 @@
 ---
 import CategoryModel from "$data/models/category.model";
 import PromptModel from "$data/models/prompt.model";
+import EmptyPrompt from "./EmptyPrompt.astro";
 import PromptExecution from "./PromptExecution.svelte";
 
 const { category: categoryId, group: groupId } = Astro.params;
@@ -31,12 +32,14 @@ const promptItems = categoryGroupPrompt.map((prompt) => ({
     </h1>
   </div>
   {
-    promptItems.length > 0 && (
+    promptItems.length > 0 ? (
       <PromptExecution
         promptItems={promptItems}
         preferredLocale={Astro.preferredLocale}
         client:load
       />
+    ) : (
+      <EmptyPrompt />
     )
   }
 </div>

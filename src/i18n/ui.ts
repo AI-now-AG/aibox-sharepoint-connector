@@ -79,6 +79,11 @@ const en = {
   "prompt-execution.card.showMore": "more prompts",
   "prompt-execution.card.showLess": "less prompts",
   "prompt-execution.showGlobal": "Save Global",
+
+  "prompt-emptyscreen.description": "Get started with predefined use cases below.",
+  "prompt-emptyscreen.nousecase": "No use cases",
+  "prompt-emptyscreen.create.usecaseLbl": "Get started by creating a new use case for this group",
+  "prompt-emptyscreen.create.usecaseBtn": "Create Use Case",
 };
 
 const de = {
@@ -155,6 +160,12 @@ const de = {
   "prompt-execution.card.showMore": "weitere Varianten",
   "prompt-execution.card.showLess": "weniger Varianten",
   "prompt-execution.showGlobal": "Save Global",
+
+  "prompt-emptyscreen.description": "Beginnen Sie mit den vordefinierten Anwendungsfällen unten.",
+  "prompt-emptyscreen.nousecase": "Keine Anwendungsfälle",
+  "prompt-emptyscreen.create.usecaseLbl": "Beginnen Sie, indem Sie einen neuen Anwendungsfall für diese Gruppe erstellen.",
+  "prompt-emptyscreen.create.usecaseBtn": "Anwendungsfall erstellen",
+
 };
 
 export const ui = {
