@@ -23,6 +23,8 @@ const en = {
   "nav.settings.knowledge-base": "Knowledge Base",
   "nav.settings.categories": "Categories",
 
+  "nav.tenant-management": "Tenant management",
+
   "login.welcome": "Welcome to",
   "login.title": "Sign in to your account",
   "login.email": "Email",
@@ -80,10 +82,14 @@ const en = {
   "prompt-execution.card.showLess": "less prompts",
   "prompt-execution.showGlobal": "Save Global",
 
-  "prompt-emptyscreen.description": "Get started with predefined use cases below.",
+  "prompt-emptyscreen.description":
+    "Get started with predefined use cases below.",
   "prompt-emptyscreen.nousecase": "No use cases",
-  "prompt-emptyscreen.create.usecaseLbl": "Get started by creating a new use case for this group",
+  "prompt-emptyscreen.create.usecaseLbl":
+    "Get started by creating a new use case for this group",
   "prompt-emptyscreen.create.usecaseBtn": "Create Use Case",
+
+  "tenant.tenant": "Tenant",
 };
 
 const de = {
@@ -103,6 +109,8 @@ const de = {
   "nav.settings.instructions": "Instructions",
   "nav.settings.knowledge-base": "Knowledge Base",
   "nav.settings.categories": "Kategorien",
+
+  "nav.tenant-management": "Mieterverwaltung",
 
   "login.welcome": "Willkommen bei der",
   "login.title": "In Ihr Konto einloggen",
@@ -161,11 +169,14 @@ const de = {
   "prompt-execution.card.showLess": "weniger Varianten",
   "prompt-execution.showGlobal": "Save Global",
 
-  "prompt-emptyscreen.description": "Beginnen Sie mit den vordefinierten Anwendungsfällen unten.",
+  "prompt-emptyscreen.description":
+    "Beginnen Sie mit den vordefinierten Anwendungsfällen unten.",
   "prompt-emptyscreen.nousecase": "Keine Anwendungsfälle",
-  "prompt-emptyscreen.create.usecaseLbl": "Beginnen Sie, indem Sie einen neuen Anwendungsfall für diese Gruppe erstellen.",
+  "prompt-emptyscreen.create.usecaseLbl":
+    "Beginnen Sie, indem Sie einen neuen Anwendungsfall für diese Gruppe erstellen.",
   "prompt-emptyscreen.create.usecaseBtn": "Anwendungsfall erstellen",
 
+  "tenant.tenant": "Mieterin",
 };
 
 export const ui = {
