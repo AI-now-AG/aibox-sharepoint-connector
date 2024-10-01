@@ -2,6 +2,7 @@
 import { useTranslations } from "$i18n/utils";
 import MenuItem from "./MenuItem.astro";
 import Category from "$data/models/category.model";
+import { svgIcons } from "$assets/icons";
 
 const t = useTranslations(Astro.preferredLocale);
 
@@ -16,6 +17,15 @@ const menuItems = categories.map((category) => ({
     path: `/prompts/${category._id}/${group._id}`,
   })),
 }));
+
+// TODO: Check logic supper admin here
+const isSupperAdmin = true
+
+const tenantMenuItem = isSupperAdmin ? {
+    title: t("nav.tenant-management"),
+    icon: svgIcons["ic-tenant-management"],
+    path: "/tenant-management",
+} : undefined
 
 const modules = [
   /*{
@@ -125,6 +135,13 @@ const modules = [
             </details>
           </li>
         ))
+      }
+
+      {
+        tenantMenuItem ? <li class="pl-1">
+          <MenuItem title={tenantMenuItem.title}  path={tenantMenuItem.path} icon={tenantMenuItem.icon}/>
+        </li>
+        : null
       }
     </ul>
   </div>
