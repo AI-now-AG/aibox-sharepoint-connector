@@ -9,7 +9,7 @@ const TenantSchema = z.object({
   theme: z.string().nullish(),
   primary_color: z.string().nullish(),
   openai_api_key: z.string().nullish(),
-  active: z.boolean().default(true),
+  active: z.boolean().default(true).optional(),
   created_at: z.date().optional(),
   updated_at: z.date().optional(),
 });
