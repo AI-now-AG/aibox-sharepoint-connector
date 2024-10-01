@@ -89,7 +89,7 @@ const en = {
     "Get started by creating a new use case for this group",
   "prompt-emptyscreen.create.usecaseBtn": "Create Use Case",
 
-  "tenant.tenant": "Tenant",
+  "tenant.tenants": "Tenants",
 };
 
 const de = {
@@ -176,7 +176,7 @@ const de = {
     "Beginnen Sie, indem Sie einen neuen Anwendungsfall für diese Gruppe erstellen.",
   "prompt-emptyscreen.create.usecaseBtn": "Anwendungsfall erstellen",
 
-  "tenant.tenant": "Mieterin",
+  "tenant.tenants": "Mieterinnen",
 };
 
 export const ui = {
