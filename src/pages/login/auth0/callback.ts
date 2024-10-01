@@ -12,7 +12,7 @@ import log from "$utils/log";
 
 const Auth0JWTSchema = z.object({
   sub: z.string().min(24),
-  "ainow/org_name": z.string().min(2),
+  org_name: z.string().min(2),
   "ainow/roles": z.array(z.nativeEnum(UserRole)),
   email: z.string().email(),
   nickname: z.string(),
@@ -70,7 +70,7 @@ export async function GET(context: APIContext): Promise<Response> {
   }
 
   // TODO: fetch logo from auth0 org?
-  const orgName = userData.data["ainow/org_name"];
+  const orgName = userData.data.org_name;
   const tenant = await tenantModel.getByName(orgName);
   if (!tenant) {
     log.e("Tenant not found");

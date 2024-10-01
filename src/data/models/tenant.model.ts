@@ -5,7 +5,7 @@ import { z } from "zod";
 const TenantSchema = z.object({
   name: z.string().min(1),
   org_name: z.string().min(1),
-  auth0_id: z.string().nullish(),
+  org_id: z.string().nullish(),
   theme: z.string().nullish(),
   primary_color: z.string().nullish(),
   openai_api_key: z.string().nullish(),
