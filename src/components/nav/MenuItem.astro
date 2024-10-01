@@ -10,7 +10,7 @@ export type MenuItem = {
 
 type Props = MenuItem;
 
-const { title, path } = Astro.props;
+const { title, path, icon } = Astro.props;
 ---
 
 {
@@ -22,12 +22,17 @@ const { title, path } = Astro.props;
       </div>
     ))
     .with(Pattern.string, () => (
-      <a
-        href={path}
-        class:list={["font-semibold", { active: path === Astro.url.pathname }]}
-      >
-        {title}
-      </a>
+      <div  class:list={[{ active: path === Astro.url.pathname }]}>
+        {icon &&  <span slot="icon" class="[&>svg]:h-4 [&>svg]:w-4">
+          <Fragment set:html={icon} />
+        </span>}
+        <a
+          href={path}
+          class:list={["font-semibold"]}
+        >
+          {title}
+        </a>
+      </div>
     ))
     .exhaustive()
 }
