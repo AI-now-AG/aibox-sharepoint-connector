@@ -3,7 +3,7 @@ import {
   type PatchOrganizationsByIdRequest,
   type PostOrganizationsRequest,
 } from "auth0";
-import management from "./management-client";
+import management from "$data/auth0/management-client";
 
 export type {
   PostOrganizationsRequest,
