@@ -105,10 +105,10 @@
      
   </div>
 
-  <div class="flex justify-center mt-6 text-sm font-semibold">
-      <button class="px-3 py-1 rounded bg-white hover:bg-gray-200 h-12 w-10">1</button>
-      <button class="px-3 py-1 rounded bg-white hover:bg-gray-200 h-12 w-10">2</button>
-      <button class="px-3 py-1 rounded bg-white hover:bg-gray-200 h-12 w-10">3</button>
-      <button class="px-3 py-1 rounded bg-white hover:bg-gray-200 h-12 w-10">4</button>
+  <div class="flex join justify-center mt-6">
+    <button class="join-item btn">1</button>
+    <button class="join-item btn btn-active">2</button>
+    <button class="join-item btn">3</button>
+    <button class="join-item btn">4</button>
   </div>
 </div>
