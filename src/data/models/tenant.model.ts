@@ -6,6 +6,7 @@ const TenantSchema = z.object({
   name: z.string().min(1),
   org_name: z.string().min(1),
   org_id: z.string().nullish(),
+  default_language: z.string().nullish(),
   theme: z.string().nullish(),
   primary_color: z.string().nullish(),
   openai_api_key: z.string().nullish(),
