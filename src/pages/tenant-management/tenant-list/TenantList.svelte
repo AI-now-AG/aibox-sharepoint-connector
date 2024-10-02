@@ -12,6 +12,14 @@
 
   let showArchived = false;
 
+  const gotoDetail = (tenant) => {
+    alert(JSON.stringify(tenant))
+  }
+
+  const copyName = (name) => {
+    alert(name)
+  }
+
 </script>
 
 <style>
@@ -31,13 +39,10 @@
       box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   }
 
-  .dropdown-content.show {
-      display: block;
-  }
-
   .relative-dropdown:hover .dropdown-content {
     display: block;
   }
+
 </style>
 
 <div class="container max-w-5xl mx-auto p-6 space-y-4">
@@ -55,37 +60,37 @@
   </div>
 
   <div>
-      <h2 class="text-lg font-medium mb-4 text-gray-600">All tenants ({tenants.length})</h2>
-      <div class="bg-white shadow rounded-md overflow-visible">
-          <table class="min-w-full relative">
+      <h2 class="text-lg font-normal mb-4 text-gray-600">All tenants ({tenants.length})</h2>
+
+          <table class="min-w-full relative" style="font-family:Inter;">
+          
               <thead>
-                  <tr class="bg-gray-50 border-b">
-                      <th class="py-3 px-4 text-left font-medium text-gray-600">Display name</th>
-                      <th class="py-3 px-4 text-left font-medium text-gray-600">name</th>
-                      <th class="py-3 px-4 text-left font-medium text-gray-600">date added</th>
-                      <th class="py-3 px-4 text-left font-medium text-gray-600">status</th>
-                      <th class="py-3 px-4"></th>
-                  </tr>
-              </thead>
-              <tbody>
-                  {#each tenants as tenant, index}
-                      <tr class="border-b hover:bg-gray-50">
-                          <td class="py-3 px-4">{tenant.displayName}</td>
-                          <td class="py-3 px-4 text-gray-600 flex items-center">
+                <tr class="bg-gray-200 rounded">
+                    <th class="py-3 px-4 text-left font-normal text-xs">Display name</th>
+                    <th class="py-3 px-4 text-left font-normal text-xs">name</th>
+                    <th class="py-3 px-4 text-left font-normal text-xs">date added</th>
+                    <th class="py-3 px-4 text-left font-normal text-xs">status</th>
+                    <th class="py-3 px-4"></th>
+                </tr>
+                <tr class="header-spacing"></tr>
+            </thead>
+              <tbody style="margin-top: 20px;">
+                  {#each tenants as tenant}
+                      <tr class="bg-white hover:bg-gray-200 text-sm">
+                          <td class="py-3 px-4 text-sm font-medium text-gray-800"><button class="underline underline-offset-2" on:click={()=>gotoDetail(tenant)}>{tenant.displayName}</button></td>
+                          <td class="py-3 px-4 text-gray-600 flex items-center text-xs font-normal">
                               {tenant.name}
-                              <svg class="ml-2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                              </svg>
+                              <button class="mx-1" on:click={()=>copyName(tenant.name)}>{@html svgIcons.copy}</button>
                           </td>
-                          <td class="py-3 px-4 text-gray-600">{tenant.dateAdded}</td>
+                          <td class="py-3 px-4 text-sm font-medium text-gray-800">{tenant.dateAdded}</td>
                           <td class="py-3 px-4">
-                              <span class="text-green-600">{tenant.status}</span>
+                              <span class="text-emerald-600 text-sm font-medium">{tenant.status}</span>
                           </td>
                           <td class="py-3 px-4 text-right relative-dropdown">
                               <button class="text-gray-500 hover:text-gray-700 focus:outline-none">
                                   {@html svgIcons["three-dot"]}
                               </button>
-                              <div class="dropdown-content ">
+                              <div class="dropdown-content">
                                   <button class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">archive</button>
                                   <button class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">edit</button>
                               </div>
@@ -94,13 +99,13 @@
                   {/each}
               </tbody>
           </table>
-      </div>
+     
   </div>
 
-  <div class="flex justify-center mt-6 space-x-2">
-      <button class="px-3 py-1 border rounded">1</button>
-      <button class="px-3 py-1 border rounded">2</button>
-      <button class="px-3 py-1 border rounded">3</button>
-      <button class="px-3 py-1 border rounded">4</button>
+  <div class="flex justify-center mt-6 space-x-2 text-sm font-semibold">
+      <button class="px-3 py-1 border rounded bg-white">1</button>
+      <button class="px-3 py-1 border rounded bg-white">2</button>
+      <button class="px-3 py-1 border rounded bg-white">3</button>
+      <button class="px-3 py-1 border rounded bg-white">4</button>
   </div>
 </div>
