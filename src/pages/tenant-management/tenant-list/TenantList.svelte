@@ -35,7 +35,7 @@
       top: 40px;
       background: white;
       border: 1px solid #e2e8f0;
-      border-radius: 0.375rem;
+      border-radius: 1rem;
       box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   }
 
@@ -93,9 +93,15 @@
                               <button class="text-gray-500 hover:text-gray-700 focus:outline-none">
                                   {@html svgIcons["three-dot"]}
                               </button>
-                              <div class="dropdown-content">
-                                  <button class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">archive</button>
-                                  <button class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">edit</button>
+                              <div class="dropdown-content py-2">
+                                  <button class="flex block w-full text-left px-4 py-1 text-sm hover:underline">
+                                    {@html svgIcons.archive} 
+                                    <span class="ml-1">archive</span>
+                                  </button>
+                                  <button class="flex block w-full text-left px-4 py-1 text-sm hover:underline">
+                                    {@html svgIcons.edit}
+                                    <span class="ml-1">edit</span>
+                                  </button>
                               </div>
                           </td>
                       </tr>
