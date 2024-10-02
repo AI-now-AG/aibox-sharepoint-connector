@@ -17,8 +17,7 @@ let userPermissions = Astro.locals.user.permissions;
       {t("tenant.tenants")}
     </h1>
   </div>
-    <TenantList/>
+    
+  <TenantList client:load/>
   
- 
- 
 </Layout>
