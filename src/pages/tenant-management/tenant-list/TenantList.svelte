@@ -20,6 +20,10 @@
     alert(name)
   }
 
+  
+  const archiveTenant = (tenant) => {
+    alert(JSON.stringify(tenant))
+  }
 </script>
 
 <style>
@@ -56,7 +60,7 @@
       <div class="mt-4">
         <label class="flex items-center space-x-2">
           <input type="checkbox" class="checkbox border-gray-300 rounded focus:ring-indigo-500 w-5 h-5" bind:checked={showArchived} />
-          <span class="label-text" style="font-family: Inter;">show archived</span>
+          <span class="label-text">show archived</span>
         </label>
       </div>
       
@@ -80,7 +84,9 @@
               <tbody style="margin-top: 20px;">
                   {#each tenants as tenant}
                       <tr class="bg-white hover:bg-gray-200 text-sm">
-                          <td class="py-3 px-4 text-sm font-medium text-gray-800"><button class="underline underline-offset-2" on:click={()=>gotoDetail(tenant)}>{tenant.displayName}</button></td>
+                          <td class="py-3 px-4 text-sm font-medium text-gray-800">
+                            <button class="underline underline-offset-2" on:click={()=>gotoDetail(tenant)}>{tenant.displayName}</button>
+                          </td>
                           <td class="py-3 px-4 text-gray-600 flex items-center text-xs font-normal">
                               {tenant.name}
                               <button class="mx-1" on:click={()=>copyName(tenant.name)}>{@html svgIcons.copy}</button>
@@ -111,10 +117,11 @@
      
   </div>
 
-  <div class="flex justify-center mt-6 text-sm font-semibold">
-      <button class="px-3 py-1 rounded bg-white hover:bg-gray-200 h-12 w-10">1</button>
-      <button class="px-3 py-1 rounded bg-white hover:bg-gray-200 h-12 w-10">2</button>
-      <button class="px-3 py-1 rounded bg-white hover:bg-gray-200 h-12 w-10">3</button>
-      <button class="px-3 py-1 rounded bg-white hover:bg-gray-200 h-12 w-10">4</button>
+  <div class="flex justify-center join mt-6">
+    <button class="join-item btn btn-sm">1</button>
+    <button class="join-item btn btn-sm btn-active">2</button>
+    <button class="join-item btn btn-sm">3</button>
+    <button class="join-item btn btn-sm">4</button>
   </div>
+
 </div>
