@@ -176,7 +176,7 @@ const de = {
     "Beginnen Sie, indem Sie einen neuen Anwendungsfall für diese Gruppe erstellen.",
   "prompt-emptyscreen.create.usecaseBtn": "Anwendungsfall erstellen",
 
-  "tenant.tenants": "Mieterinnen",
+  "tenant.tenants": "Kundenverwaltung",
 };
 
 export const ui = {
