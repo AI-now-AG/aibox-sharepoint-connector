@@ -67,7 +67,7 @@
   </div>
 
   <div>
-      <h2 class="text-lg font-normal mb-4 text-gray-600">All tenants ({tenants.length})</h2>
+      <h2 class="text-lg font-normal mb-4">All tenants ({tenants.length})</h2>
 
           <table class="min-w-full relative" style="font-family:Inter;">
           
@@ -84,19 +84,19 @@
               <tbody style="margin-top: 20px;">
                   {#each tenants as tenant}
                       <tr class="bg-white hover:bg-gray-200 text-sm">
-                          <td class="py-3 px-4 text-sm font-medium text-gray-800">
+                          <td class="py-3 px-4 text-sm font-medium">
                             <button class="underline underline-offset-2" on:click={()=>gotoDetail(tenant)}>{tenant.displayName}</button>
                           </td>
                           <td class="py-3 px-4 text-gray-600 flex items-center text-xs font-normal">
                               {tenant.name}
                               <button class="mx-1" on:click={()=>copyName(tenant.name)}>{@html svgIcons.copy}</button>
                           </td>
-                          <td class="py-3 px-4 text-sm font-medium text-gray-800">{tenant.dateAdded}</td>
+                          <td class="py-3 px-4 text-sm font-medium">{tenant.dateAdded}</td>
                           <td class="py-3 px-4">
                               <span class="text-emerald-600 text-sm font-medium">{tenant.status}</span>
                           </td>
                           <td class="py-3 px-4 text-right relative-dropdown">
-                              <button class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                              <button class="focus:outline-none">
                                   {@html svgIcons["three-dot"]}
                               </button>
                               <div class="dropdown-content py-2">
