@@ -45,18 +45,21 @@
 
 </style>
 
-<div class="container max-w-5xl mx-auto p-6 space-y-4">
-  <div class="flex items-center mb-6 space-x-4">
+<div class="container max-w-5xl mx-auto p-6" style="font-family: Inter;">
+  <div class="items-center mb-10">
       <div class="relative w-full">
-          <input type="text" placeholder="Type here" class="p-3 pl-10 border rounded w-full bg-white" />
-          <svg class="absolute left-3 top-3 text-gray-500 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a4 4 0 10-8 0 4 4 0 008 0zM21 21l-6-6"></path>
-          </svg>
+        <label class="input input-bordered flex items-center gap-2">
+          {@html svgIcons.search}
+          <input type="text" class="grow text-sm" placeholder="Type here" />
+        </label>
       </div>
-      <label class="flex items-center space-x-2">
-          <input type="checkbox" class="border-gray-300 rounded focus:ring-indigo-500" bind:checked={showArchived} />
-          <span class="text-gray-600">show archived</span>
-      </label>
+      <div class="mt-4">
+        <label class="flex items-center space-x-2">
+          <input type="checkbox" class="checkbox border-gray-300 rounded focus:ring-indigo-500 w-5 h-5" bind:checked={showArchived} />
+          <span class="label-text" style="font-family: Inter;">show archived</span>
+        </label>
+      </div>
+      
   </div>
 
   <div>
@@ -102,10 +105,10 @@
      
   </div>
 
-  <div class="flex justify-center mt-6 space-x-2 text-sm font-semibold">
-      <button class="px-3 py-1 border rounded bg-white">1</button>
-      <button class="px-3 py-1 border rounded bg-white">2</button>
-      <button class="px-3 py-1 border rounded bg-white">3</button>
-      <button class="px-3 py-1 border rounded bg-white">4</button>
+  <div class="flex justify-center mt-6 text-sm font-semibold">
+      <button class="px-3 py-1 rounded bg-white hover:bg-gray-200 h-12 w-10">1</button>
+      <button class="px-3 py-1 rounded bg-white hover:bg-gray-200 h-12 w-10">2</button>
+      <button class="px-3 py-1 rounded bg-white hover:bg-gray-200 h-12 w-10">3</button>
+      <button class="px-3 py-1 rounded bg-white hover:bg-gray-200 h-12 w-10">4</button>
   </div>
 </div>
