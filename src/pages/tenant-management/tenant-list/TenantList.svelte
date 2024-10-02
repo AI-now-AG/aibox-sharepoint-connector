@@ -20,9 +20,12 @@
     alert(name)
   }
 
-  
   const archiveTenant = (tenant) => {
     alert(JSON.stringify(tenant))
+  }
+
+  const onSearchTenant = (keyword) => {
+    console.log(keyword)
   }
 </script>
 
@@ -54,7 +57,7 @@
       <div class="relative w-full">
         <label class="input input-bordered flex items-center gap-2">
           {@html svgIcons.search}
-          <input type="text" class="grow text-sm" placeholder="Type here" />
+          <input type="text" class="grow text-sm" placeholder="Type here" on:change={(keyword)=>onSearchTenant(keyword)}/>
         </label>
       </div>
       <div class="mt-4">
@@ -100,11 +103,11 @@
                                   {@html svgIcons["three-dot"]}
                               </button>
                               <div class="dropdown-content py-2">
-                                  <button class="flex block w-full text-left px-4 py-1 text-sm hover:underline">
+                                  <button class="flex block w-full text-left px-4 py-1 text-sm hover:underline"  on:click={()=>archiveTenant(tenant)}>
                                     {@html svgIcons.archive} 
                                     <span class="ml-1">archive</span>
                                   </button>
-                                  <button class="flex block w-full text-left px-4 py-1 text-sm hover:underline">
+                                  <button class="flex block w-full text-left px-4 py-1 text-sm hover:underline" on:click={()=>gotoDetail(tenant)}>
                                     {@html svgIcons.edit}
                                     <span class="ml-1">edit</span>
                                   </button>
