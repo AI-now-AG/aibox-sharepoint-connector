@@ -110,20 +110,20 @@ const onSearchTenant = (keyword) => {
         <table class="min-w-full relative" style="font-family:Inter;">
 
             <thead>
-                <tr class="bg-gray-200 rounded">
-                    <th class="py-3 px-4 text-left font-normal text-xs">{t("tenant.tenants.tenant.display-name")}</th>
+                <tr class="bg-gray-200 rounded-lg">
+                    <th class="py-3 px-4 text-left font-normal text-xs rounded-l-lg">{t("tenant.tenants.tenant.display-name")}</th>
                     <th class="py-3 px-4 text-left font-normal text-xs">{t("tenant.tenants.tenant.name")} name</th>
                     <th class="py-3 px-4 text-left font-normal text-xs">{t("tenant.tenants.tenant.date-added")}</th>
                     <th class="py-3 px-4 text-left font-normal text-xs">{t("tenant.tenants.tenant.status")}</th>
-                    <th class="py-3 px-4"></th>
+                    <th class="py-3 px-4 rounded-r-lg"></th>
                 </tr>
                 <tr class="header-spacing"></tr>
             </thead>
-            <tbody style="margin-top: 20px;">
+            <tbody>
                 {#each tenants as tenant}
-                <tr class=""><td></td><td></td><td></td><td></td></tr>
-                <tr class="bg-white hover:bg-gray-200 text-sm">
-                    <td class="py-3 px-4 text-sm font-medium">
+                <tr class="h-2"><td/><td/><td/><td/><td/></tr>
+                <tr class="h-16 bg-white hover:bg-gray-200 text-sm rounded-lg">
+                    <td class="py-3 px-4 text-sm font-medium rounded-l-lg">
                         <button class="underline underline-offset-2" on:click={()=>gotoDetail(tenant)}>{tenant.displayName}</button>
                     </td>
                     <td class="py-3 px-4 text-gray-600 flex items-center text-xs font-normal">
@@ -134,7 +134,7 @@ const onSearchTenant = (keyword) => {
                     <td class="py-3 px-4">
                         <span class={tenant.status == 1 ? "text-emerald-600 text-sm font-medium" : "text-grey-600 text-sm font-medium"}>{tenant.status == 1 ? t("tenant.tenants.tenant.active") : t("tenant.tenants.tenant.archived")}</span>
                     </td>
-                    <td class="py-3 px-4 text-right relative-dropdown">
+                    <td class="py-3 px-4 text-right relative-dropdown rounded-r-lg">
                         <button class="focus:outline-none">
                             {@html svgIcons["three-dot"]}
                         </button>
