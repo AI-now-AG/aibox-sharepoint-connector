@@ -41,7 +41,9 @@ export default {
         updated_at: new Date(),
       },
     };
-    return await collection.updateOne({ _id: new ObjectId(id) }, doc);
+    return await collection.findOneAndUpdate({ _id: new ObjectId(id) }, doc, {
+      returnDocument: "after",
+    });
   },
 
   archive: async (id: string) => {
