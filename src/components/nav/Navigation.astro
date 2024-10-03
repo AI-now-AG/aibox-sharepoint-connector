@@ -21,13 +21,11 @@ const menuItems = categories.map((category) => ({
 
 // TODO: Check logic supper admin here
 const isSupperAdmin = Astro.locals.user.roles.includes(UserRole.SuperAdmin);
-const tenantMenuItem = isSupperAdmin
-  ? {
-      title: t("nav.tenant-management"),
-      icon: svgIcons["ic-tenant-management"],
-      path: "/tenant-management/tenant-list",
-    }
-  : undefined;
+const tenantMenuItem = isSupperAdmin ? {
+    title: t("nav.tenant-management"),
+    icon: svgIcons["ic-tenant-management"],
+    path: "/tenant-management",
+} : undefined
 
 const modules = [
   /*{
