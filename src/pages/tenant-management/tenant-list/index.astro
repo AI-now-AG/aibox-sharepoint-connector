@@ -9,7 +9,7 @@ const t = useTranslations(Astro.preferredLocale);
 
 <Layout>
   <div
-    class="container max-w-5xl mx-auto p-6 grid grid-cols-1 md:grid-cols-[1fr_max-content] gap-8"
+    class="container max-w-full mx-auto  grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14"
   >
     <h1 class="pt-2 lg:pt-8 text-4xl font-bold">
       {t("tenant.tenants")}
@@ -23,6 +23,9 @@ const t = useTranslations(Astro.preferredLocale);
       {t("tenant.tenants.add-new-tenant")}
     </a>
   </div>
-
-  <TenantList client:load preferredLocale={Astro.preferredLocale} />
+  <div
+    class="px-8"
+  >
+    <TenantList client:load preferredLocale={Astro.preferredLocale} />
+  </div>
 </Layout>

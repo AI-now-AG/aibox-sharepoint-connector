@@ -87,7 +87,7 @@ const onSearchTenant = (keyword) => {
 }
 </style>
 
-<div class="container max-w-5xl mx-auto p-6" style="font-family: Inter;">
+<div class="container max-w-full mx-auto p-6" style="font-family: Inter;">
     <div class="items-center mb-10">
         <div class="relative w-full">
             <label class="input input-bordered flex items-center gap-2">
@@ -126,9 +126,9 @@ const onSearchTenant = (keyword) => {
                     <td class="py-3 px-4 text-sm font-medium rounded-l-lg">
                         <button class="underline underline-offset-2" on:click={()=>gotoDetail(tenant)}>{tenant.displayName}</button>
                     </td>
-                    <td class="py-3 px-4 text-gray-600 flex items-center text-xs font-normal">
+                    <td class="py-3 px-4 text-gray-600 flex items-center text-xs font-normal h-16" >
                         {tenant.name}
-                        <button class="mx-1" on:click={()=>copyName(tenant.name)}>{@html svgIcons.copy}</button>
+                        <button class="mx-1 self-center" on:click={()=>copyName(tenant.name)}>{@html svgIcons.copy}</button>
                     </td>
                     <td class="py-3 px-4 text-sm font-medium">{tenant.dateAdded}</td>
                     <td class="py-3 px-4">
