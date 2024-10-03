@@ -2,8 +2,8 @@
 import { useTranslations } from "$i18n/utils";
 import MenuItem from "./MenuItem.astro";
 import Category from "$data/models/category.model";
-import { UserRole } from "$data/models/user.model";
 import { svgIcons } from "$assets/icons";
+import auth from "$auth/auth";
 
 const t = useTranslations(Astro.preferredLocale);
 
@@ -20,8 +20,7 @@ const menuItems = categories.map((category) => ({
 }));
 
 // TODO: Check logic supper admin here
-const isSupperAdmin = Astro.locals.user.roles.includes(UserRole.SuperAdmin);
-const tenantMenuItem = isSupperAdmin
+const tenantMenuItem = auth.isSuperAdmin(Astro.locals)
   ? {
       title: t("nav.tenant-management"),
       icon: svgIcons["ic-tenant-management"],

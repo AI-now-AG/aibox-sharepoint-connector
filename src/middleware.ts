@@ -1,14 +1,11 @@
 import { lucia } from "$auth";
+import auth from "$auth/auth";
 import { verifyRequestOrigin } from "lucia";
-import { defineMiddleware } from "astro/middleware";
-import { PUBLIC_ROUTES } from "$constants";
+import { sequence } from "astro/middleware";
+import { PUBLIC_ROUTES, SUPER_ADMIN_ROUTES } from "$constants";
+import type { APIContext, MiddlewareNext } from "astro";
 
-export const onRequest = defineMiddleware(async (context, next) => {
-  // Ignore auth validation for public routes
-  if (PUBLIC_ROUTES.includes(context.url.pathname)) {
-    return next();
-  }
-
+async function requestOrigin(context: APIContext, next: MiddlewareNext) {
   // Basic CSRF protection
   if (context.request.method !== "GET") {
     const originHeader = context.request.headers.get("Origin");
@@ -22,6 +19,14 @@ export const onRequest = defineMiddleware(async (context, next) => {
         status: 403,
       });
     }
+  }
+  return next();
+}
+
+async function authenticate(context: APIContext, next: MiddlewareNext) {
+  // Ignore auth validation for public routes
+  if (PUBLIC_ROUTES.includes(context.url.pathname)) {
+    return next();
   }
 
   const sessionRequired = () => {
@@ -52,4 +57,17 @@ export const onRequest = defineMiddleware(async (context, next) => {
   context.locals.session = session;
   context.locals.user = user;
   return next();
-});
+}
+
+async function restrictAccess(context: APIContext, next: MiddlewareNext) {
+  if (
+    SUPER_ADMIN_ROUTES.includes(context.url.pathname) &&
+    !auth.isSuperAdmin(context.locals)
+  ) {
+    return context.redirect("/restricted");
+  }
+
+  return next();
+}
+
+export const onRequest = sequence(requestOrigin, authenticate, restrictAccess);
