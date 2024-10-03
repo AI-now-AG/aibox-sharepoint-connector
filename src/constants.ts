@@ -5,4 +5,7 @@ export const PUBLIC_ROUTES = [
   "/login/auth0/callback",
 ];
 
-export const SUPER_ADMIN_ROUTES = ["/tenant-management/tenant-list"];
+export const SUPER_ADMIN_ROUTES = [
+  "/tenant-management",
+  "/tenant-management/add",
+];
