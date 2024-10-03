@@ -90,6 +90,19 @@ const en = {
   "prompt-emptyscreen.create.usecaseBtn": "Create Use Case",
 
   "tenant.tenants": "Tenants",
+  "tenant.tenants.add-new-tenant": "New tenant",
+  "tenant.tenants.seach-place-holder": "Type here",
+  "tenant.tenants.show-archived": "Show archived",
+  "tenant.tenants.all-tenants": "All tenants (%amount)",
+  "tenant.tenants.tenant.display-name": "Display name",
+  "tenant.tenants.tenant.name": "Name",
+  "tenant.tenants.tenant.date-added": "Data added",
+  "tenant.tenants.tenant.status": "Status",
+  "tenant.tenants.tenant.active": "Active",
+  "tenant.tenants.tenant.archived": "Archived",
+  "tenant.tenants.tenant.action.active": "Active",
+  "tenant.tenants.tenant.action.archive": "Archive",
+  "tenant.tenants.tenant.action.edit": "Edit",
 };
 
 const de = {
@@ -176,7 +189,20 @@ const de = {
     "Beginnen Sie, indem Sie einen neuen Anwendungsfall für diese Gruppe erstellen.",
   "prompt-emptyscreen.create.usecaseBtn": "Anwendungsfall erstellen",
 
-  "tenant.tenants": "Kundenverwaltung",
+  "tenant.tenants": "Mieter",
+  "tenant.tenants.add-new-tenant": "Neuer Mieter",
+  "tenant.tenants.seach-place-holder": "Hier eingeben",
+  "tenant.tenants.show-archived": "Archivierte anzeigen",
+  "tenant.tenants.all-tenants": "Alle Mieter (%amount)",
+  "tenant.tenants.tenant.display-name": "Anzeigename",
+  "tenant.tenants.tenant.name": "Name",
+  "tenant.tenants.tenant.date-added": "Hinzugefügt am",
+  "tenant.tenants.tenant.status": "Status",
+  "tenant.tenants.tenant.active": "Aktiv",
+  "tenant.tenants.tenant.archived": "Archiviert",
+  "tenant.tenants.tenant.action.active": "Aktiv",
+  "tenant.tenants.tenant.action.archive": "Archivieren",
+  "tenant.tenants.tenant.action.edit": "Bearbeiten",
 };
 
 export const ui = {

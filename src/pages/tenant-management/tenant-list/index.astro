@@ -1,45 +1,28 @@
 ---
 import Layout from "$layouts/Layout.astro";
 import { useTranslations } from "$i18n/utils";
-
-import { Permission } from "$data/models/user.model";
 import TenantList from "./TenantList.svelte";
+import { svgIcons } from "$assets/icons";
 
 const t = useTranslations(Astro.preferredLocale);
-let userPermissions = Astro.locals.user.permissions;
 ---
 
 <Layout>
   <div
-  class="container max-w-5xl mx-auto p-6 grid grid-cols-1 md:grid-cols-[1fr_max-content] gap-8"
->
+    class="container max-w-5xl mx-auto p-6 grid grid-cols-1 md:grid-cols-[1fr_max-content] gap-8"
+  >
     <h1 class="pt-2 lg:pt-8 text-4xl font-bold">
       {t("tenant.tenants")}
     </h1>
 
     <a
-          href="#"
-          class="mt-2 lg:mt-8 btn btn-active btn-neutral font-normal grow-0"
-        >
-          <svg
-            width="13"
-            height="12"
-            viewBox="0 0 13 12"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M6.5 1V6M6.5 6V11M6.5 6H11.5M6.5 6L1.5 6"
-              stroke="white"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
-          new tenant
-        </a>
+      href="#"
+      class="mt-2 lg:mt-8 btn btn-active btn-neutral font-normal grow-0"
+    >
+      <span set:html={svgIcons.add} />
+      {t("tenant.tenants.add-new-tenant")}
+    </a>
   </div>
-    
-  <TenantList client:load/>
-  
+
+  <TenantList client:load preferredLocale={Astro.preferredLocale} />
 </Layout>
