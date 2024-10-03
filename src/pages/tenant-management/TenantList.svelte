@@ -9,36 +9,42 @@ export let preferredLocale;
 const t = useTranslations(preferredLocale);
 
 let tenants = [{
+        _id: 'Somedia',
         displayName: 'Somedia',
         name: 'Some',
         dateAdded: '17.02.2024',
         status: 1
     },
     {
+        _id: 'AI now',
         displayName: 'AI now',
         name: 'ai-now',
         dateAdded: '29.09.2024',
         status: 1
     },
     {
+        _id: 'Demo',
         displayName: 'Demo',
         name: 'demo',
         dateAdded: '01.05.2024',
         status: 0
     },
     {
+        _id: 'TwelveCapital',
         displayName: 'TwelveCapital',
         name: 'twelve-cap',
         dateAdded: '09.12.2023',
         status: 1
     },
     {
+        _id:  'Südkurier Zeitung',
         displayName: 'Südkurier Zeitung',
         name: 'suedkurier',
         dateAdded: '17.02.2024',
         status: 1
     },
     {
+        _id: 'Company xyz',
         displayName: 'Company xyz',
         name: 'company-x',
         dateAdded: '02.08.2024',
@@ -49,7 +55,7 @@ let tenants = [{
 let showArchived = false;
 
 const gotoDetail = (tenant) => {
-    alert(JSON.stringify(tenant))
+    window.location.href =`tenant-management/${tenant._id}`
 }
 
 const copyName = (name) => {
