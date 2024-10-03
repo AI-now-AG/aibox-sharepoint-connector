@@ -63,7 +63,7 @@
   </div>
 
   <div>
-      <h2 class="text-lg font-normal mb-4 text-gray-600">All tenants ({tenants.length})</h2>
+      <h2 class="text-lg font-normal mb-4">All tenants ({tenants.length})</h2>
 
           <table class="min-w-full relative" style="font-family:Inter;">
           
@@ -79,13 +79,13 @@
             </thead>
               <tbody style="margin-top: 20px;">
                   {#each tenants as tenant}
-                      <tr class="bg-white hover:bg-gray-200 text-sm">
-                          <td class="py-3 px-4 text-sm font-medium text-gray-800"><button class="underline underline-offset-2" on:click={()=>gotoDetail(tenant)}>{tenant.displayName}</button></td>
-                          <td class="py-3 px-4 text-gray-600 flex items-center text-xs font-normal">
+                      <tr class="text-sm bg-white hover:bg-gray-200">
+                          <td class="py-3 px-4 text-sm font-medium"><button class="underline underline-offset-2" on:click={()=>gotoDetail(tenant)}>{tenant.displayName}</button></td>
+                          <td class="py-3 px-4flex items-center text-xs font-normal">
                               {tenant.name}
                               <button class="mx-1" on:click={()=>copyName(tenant.name)}>{@html svgIcons.copy}</button>
                           </td>
-                          <td class="py-3 px-4 text-sm font-medium text-gray-800">{tenant.dateAdded}</td>
+                          <td class="py-3 px-4 text-sm font-medium">{tenant.dateAdded}</td>
                           <td class="py-3 px-4">
                               <span class="text-emerald-600 text-sm font-medium">{tenant.status}</span>
                           </td>
@@ -105,10 +105,10 @@
      
   </div>
 
-  <div class="flex justify-center mt-6 text-sm font-semibold">
-      <button class="px-3 py-1 rounded bg-white hover:bg-gray-200 h-12 w-10">1</button>
-      <button class="px-3 py-1 rounded bg-white hover:bg-gray-200 h-12 w-10">2</button>
-      <button class="px-3 py-1 rounded bg-white hover:bg-gray-200 h-12 w-10">3</button>
-      <button class="px-3 py-1 rounded bg-white hover:bg-gray-200 h-12 w-10">4</button>
+  <div class="flex join justify-center mt-6">
+    <button class="join-item btn btn-sm">1</button>
+    <button class="join-item btn btn-sm btn-active">2</button>
+    <button class="join-item btn btn-sm">3</button>
+    <button class="join-item btn btn-sm">4</button>
   </div>
 </div>

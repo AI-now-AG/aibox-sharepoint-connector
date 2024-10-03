@@ -2,6 +2,7 @@
 import { useTranslations } from "$i18n/utils";
 import MenuItem from "./MenuItem.astro";
 import Category from "$data/models/category.model";
+import { UserRole } from "$data/models/user.model";
 import { svgIcons } from "$assets/icons";
 import auth from "$auth/auth";
 
@@ -24,7 +25,7 @@ const tenantMenuItem = auth.isSuperAdmin(Astro.locals)
   ? {
       title: t("nav.tenant-management"),
       icon: svgIcons["ic-tenant-management"],
-      path: "/tenant-management/tenant-list",
+      path: "/tenant-management",
     }
   : undefined;
 
