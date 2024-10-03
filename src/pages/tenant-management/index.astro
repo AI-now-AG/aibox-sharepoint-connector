@@ -1,7 +1,7 @@
 ---
 import Layout from "$layouts/Layout.astro";
 import { useTranslations } from "$i18n/utils";
-import TenantList from "./TenantList.svelte";
+import TenantList from "$pages/tenant-management/TenantList.svelte";
 import { svgIcons } from "$assets/icons";
 
 const t = useTranslations(Astro.preferredLocale);
@@ -16,7 +16,7 @@ const t = useTranslations(Astro.preferredLocale);
     </h1>
 
     <a
-      href="#"
+      href="/tenant-management/add"
       class="mt-2 lg:mt-8 btn btn-active btn-neutral font-normal grow-0"
     >
       <span set:html={svgIcons.add} />
