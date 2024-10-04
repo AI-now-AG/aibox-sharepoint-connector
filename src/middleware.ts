@@ -4,6 +4,7 @@ import { verifyRequestOrigin } from "lucia";
 import { sequence } from "astro/middleware";
 import { PUBLIC_ROUTES, SUPER_ADMIN_ROUTES } from "$constants";
 import type { APIContext, MiddlewareNext } from "astro";
+import tenantModel from "$data/models/tenant.model";
 
 async function requestOrigin(context: APIContext, next: MiddlewareNext) {
   // Basic CSRF protection
@@ -56,6 +57,13 @@ async function authenticate(context: APIContext, next: MiddlewareNext) {
 
   context.locals.session = session;
   context.locals.user = user;
+
+  // fetch tenant
+  const tenant = await tenantModel.get(user.tenant_id.toString());
+  if (tenant) {
+    context.locals.tenant = tenant;
+  }
+
   return next();
 }
 

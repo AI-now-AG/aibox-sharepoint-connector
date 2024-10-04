@@ -2,12 +2,20 @@ import { ObjectId } from "mongodb";
 import { db, type Document } from "../mongodb";
 import { z } from "zod";
 
+export enum TenantTheme {
+  Light = "light",
+  Dark = "dark",
+  Luxury = "luxury",
+  Lemonade = "lemonade",
+}
+
 const TenantSchema = z.object({
+  _id: z.instanceof(ObjectId).optional(),
   name: z.string().min(1),
   org_name: z.string().min(1),
   org_id: z.string().nullish(),
   default_language: z.string().nullish(),
-  theme: z.string().nullish(),
+  theme: z.nativeEnum(TenantTheme),
   primary_color: z.string().nullish(),
   openai_api_key: z.string().nullish(),
   active: z.boolean().default(true).optional(),
@@ -29,7 +37,6 @@ export default {
         updated_at: new Date(),
       },
     };
-    console.log("doc", doc);
     return await collection.insertOne(doc);
   },
 
@@ -72,7 +79,7 @@ export default {
     return await collection.findOne<Document<Tenant>>({ org_name });
   },
 
-  getByAuth0Id: async (auth0_id: string) => {
-    return await collection.findOne<Document<Tenant>>({ auth0_id });
+  getById: async (org_id: string) => {
+    return await collection.findOne<Document<Tenant>>({ org_id });
   },
 };

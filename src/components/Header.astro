@@ -1,32 +1,9 @@
 ---
 // import local images
 import ThemeSwitcher from "$components/ThemeSwitcher.svelte";
+import SiteConfiguration from "$components/SiteConfiguration.astro";
 import { useTranslations } from "$i18n/utils";
-
 const t = useTranslations(Astro.preferredLocale);
-
-const themes = [
-  {
-    name: "Light",
-    theme: "light",
-  },
-  {
-    name: "Dark",
-    theme: "dark",
-  },
-  {
-    name: "Somedia",
-    theme: "somedia",
-  },
-  {
-    name: "Luxury",
-    theme: "luxury",
-  },
-  {
-    name: "Lemonade",
-    theme: "lemonade",
-  },
-];
 
 const user = Astro.locals.user;
 ---
@@ -46,6 +23,8 @@ const user = Astro.locals.user;
     display: block;
   }
 </style>
+
+<SiteConfiguration />
 
 <header class="container-fluid mx-auto navbar bg-base-200">
   <div class="navbar-start">
@@ -91,20 +70,7 @@ const user = Astro.locals.user;
         <div tabindex="0" role="button" class="btn btn-ghost m-1">
           {t("header.theme")}
         </div>
-        <ul
-          tabindex="0"
-          class="dropdown-content menu bg-base-100 rounded-box z-30 w-52 p-2 shadow"
-        >
-          {
-            themes.map((theme) => (
-              <ThemeSwitcher
-                message={theme.theme}
-                title={theme.name}
-                client:load
-              />
-            ))
-          }
-        </ul>
+        <ThemeSwitcher client:load />
       </div>
     </div>
     <div class="dropdown dropdown-end">

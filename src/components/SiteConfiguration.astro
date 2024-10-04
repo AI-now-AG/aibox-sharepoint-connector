@@ -1,0 +1,12 @@
+---
+const { tenant } = Astro.locals;
+const theme = tenant?.theme;
+---
+
+<script define:vars={{ theme }}>
+  // set default theme in storage
+  const savedTheme = localStorage.getItem("theme");
+  if (theme && !savedTheme) {
+    localStorage.setItem("theme", theme);
+  }
+</script>
