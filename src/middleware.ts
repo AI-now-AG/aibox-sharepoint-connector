@@ -62,6 +62,7 @@ async function authenticate(context: APIContext, next: MiddlewareNext) {
   const tenant = await tenantModel.get(user.tenant_id.toString());
   if (tenant) {
     context.locals.tenant = tenant;
+    context.locals.locale = tenant.default_language;
   }
 
   return next();

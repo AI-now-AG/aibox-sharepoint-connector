@@ -8,5 +8,6 @@ declare namespace App {
     session: import("lucia").Session; // lucia
     user: import("lucia").User; // lucia
     tenant: import("$data/models/tenant.model").Tenant; // custom
+    locale: string; // custom
   }
 }
