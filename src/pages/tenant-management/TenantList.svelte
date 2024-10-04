@@ -46,10 +46,6 @@ const onSearchTenant = (keyword) => {
 </script>
 
 <style>
-.relative-dropdown {
-    position: relative;
-}
-
 .dropdown-content {
     display: none;
     z-index: 1000;
@@ -94,7 +90,7 @@ const onSearchTenant = (keyword) => {
                     <th class="py-3 px-4 text-left font-normal text-xs rounded-l-lg">{t("tenant.tenants.tenant.display-name")}</th>
                     <th class="py-3 px-4 text-left font-normal text-xs">{t("tenant.tenants.tenant.name")}</th>
                     <th class="py-3 px-4 text-left font-normal text-xs">{t("tenant.tenants.tenant.date-added")}</th>
-                    <th class="py-3 px-4 text-left font-normal text-xs">{t("tenant.tenants.tenant.status")}</th>
+                    <th class="py-3 px-4 text-left font-normal text-xs">{t("tenant.tenants.tenant.active")}</th>
                     <th class="py-3 px-4 rounded-r-lg"></th>
                 </tr>
                 <tr class="header-spacing"></tr>
@@ -112,16 +108,16 @@ const onSearchTenant = (keyword) => {
                         </td>
                         <td class="py-3 px-4 text-sm font-medium">{tenant.created_at}</td>
                         <td class="py-3 px-4">
-                            <span class={tenant.status == 1 ? "text-emerald-600 text-sm font-medium" : "text-grey-600 text-sm font-medium"}>{tenant.status == 1 ? t("tenant.tenants.tenant.active") : t("tenant.tenants.tenant.archived")}</span>
+                            <span class={tenant.active == 1 ? "text-emerald-600 text-sm font-medium" : "text-grey-600 text-sm font-medium"}>{tenant.active == 1 ? t("tenant.tenants.tenant.active") : t("tenant.tenants.tenant.archived")}</span>
                         </td>
-                        <td class="py-3 px-4 text-right relative-dropdown rounded-r-lg">
+                        <td class="py-3 px-4 text-right relative relative-dropdown rounded-r-lg">
                             <button class="focus:outline-none">
                                 {@html svgIcons["three-dot"]}
                             </button>
                             <div class="dropdown-content py-2">
                                 <button class="flex block w-full text-left px-4 py-1 text-sm hover:underline"  on:click={()=>archiveTenant(tenant)}>
-                                    {@html tenant.status == 1 ?  svgIcons.archive : svgIcons.active}
-                                    <span class="ml-1">{tenant.status == 1 ? t("tenant.tenants.tenant.action.archive") :  t("tenant.tenants.tenant.action.active")}</span>
+                                    {@html tenant.active == 1 ?  svgIcons.archive : svgIcons.active}
+                                    <span class="ml-1">{tenant.active == 1 ? t("tenant.tenants.tenant.action.archive") :  t("tenant.tenants.tenant.action.active")}</span>
                                 </button>
                                 <button class="flex block w-full text-left px-4 py-1 text-sm hover:underline" on:click={()=>gotoDetail(tenant)}>
                                     {@html svgIcons.edit}
