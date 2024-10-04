@@ -1,6 +1,10 @@
 import { defineAction } from "astro:actions";
+import { ObjectId } from "mongodb";
 import { z } from "zod";
-import tenantModel, { type Tenant } from "$data/models/tenant.model";
+import tenantModel, {
+  TenantTheme,
+  type Tenant,
+} from "$data/models/tenant.model";
 import { transformDataToArray } from "$utils/transformDataToArray";
 import organizationsManagement, {
   type PostOrganizationsRequest,
@@ -11,8 +15,8 @@ import organizationsManagement, {
 const TenantInputParamsSchema = z.object({
   name: z.string(),
   org_name: z.string(),
-  default_language: z.string().optional(),
-  theme: z.string().optional(),
+  default_language: z.string(),
+  theme: z.nativeEnum(TenantTheme),
   primary_color: z.string().optional(),
   openai_api_key: z.string().optional(),
 });
@@ -61,7 +65,7 @@ export const tenant = {
     input: z.intersection(TenantInputParamsSchema, TenantInputIdentifierSchema),
     handler: async (input) => {
       // update tenant on mongodb
-      const tenant: Tenant = input;
+      const tenant: Tenant = { ...input, ...{ _id: new ObjectId(input._id) } };
       const updatedDocument = await tenantModel.update(input._id, tenant);
 
       // update existing organization on auth0
