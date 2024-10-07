@@ -6,6 +6,8 @@ export const languages = {
 export const defaultLang = "en";
 
 const en = {
+  "common.yes": "Yes",
+  "common.no": "No",
   "site.title": "aibox",
   "site.description":
     "AI-powered solution for streamlining tasks and boosting productivity. Customizable for small to mid-sized companies. Enhance efficiency and drive innovation in your workflow.",
@@ -103,9 +105,16 @@ const en = {
   "tenant.tenants.tenant.action.active": "Active",
   "tenant.tenants.tenant.action.archive": "Archive",
   "tenant.tenants.tenant.action.edit": "Edit",
+  "tenant.tenants.tenant.active-confirmation":
+    "Are you sure you want to active this tenant?",
+  "tenant.tenants.tenant.archive-confirmation":
+    "Are you sure you want to archive this tenant?",
 };
 
 const de = {
+  "common.yes": "Ja",
+  "common.no": "Nein",
+
   "site.title": "aibox",
   "site.description":
     "KI-gestützte Lösung zur Optimierung von Aufgaben und Steigerung der Produktivität. Anpassbar für kleine bis mittlere Unternehmen. Verbessern Sie Effizienz und fördern Sie Innovation in Ihrem Arbeitsablauf.",
@@ -203,6 +212,10 @@ const de = {
   "tenant.tenants.tenant.action.active": "Aktiv",
   "tenant.tenants.tenant.action.archive": "Archivieren",
   "tenant.tenants.tenant.action.edit": "Bearbeiten",
+  "tenant.tenants.tenant.active-confirmation":
+    "Sind Sie sicher, dass Sie diesen Mieter aktivieren möchten?",
+  "tenant.tenants.tenant.archive-confirmation":
+    "Sind Sie sicher, dass Sie diesen Mieter archivieren möchten?",
 };
 
 export const ui = {

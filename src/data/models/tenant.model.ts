@@ -57,10 +57,17 @@ export default {
     );
   },
 
+  active: async (id: string) => {
+    return await collection.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: { active: true } },
+    );
+  },
+
   archive: async (id: string) => {
     return await collection.updateOne(
       { _id: new ObjectId(id) },
-      { active: false },
+      { $set: { active: false } },
     );
   },
 

@@ -12,15 +12,25 @@ import {
 import {
     onMount
 } from "svelte";
+import log from '$utils/log';
 
 let tenants = []
-onMount(async () => {
+
+const fetchTenants = async () => {
     const {
         data,
         error
     } = await actions.tenant.list();
-    tenants = data
-    console.log("data in actions", data);
+    if (!error) {
+        tenants = data;
+    } else {
+        log.e(error, 'Error fetching tenants');
+    }
+    log.d(data, 'Tenant list');
+};
+
+onMount(async () => {
+    await fetchTenants();
 });
 
 export let preferredLocale;
@@ -36,8 +46,41 @@ const copyName = (name) => {
     alert(name)
 }
 
-const archiveTenant = (tenant) => {
-    alert(JSON.stringify(tenant))
+function showUpdateStatusConfirmationModal(tenant) {
+    document.getElementById('my_modal_3' + tenant._id).showModal();
+}
+
+function closeUpdateStatusConfirmationModal(tenant) {
+    document.getElementById('my_modal_3' + tenant._id).close();
+}
+
+const updateTenantStatus = async (tenant) => {
+    const {
+        active
+    } = tenant;
+    log.d(tenant, 'updateTenantStatus')
+    closeUpdateStatusConfirmationModal(tenant)
+    let result
+    if (active) {
+        result = await actions.tenant.archive({
+            _id: tenant._id
+        });
+    } else {
+        result = await actions.tenant.active({
+            _id: tenant._id
+        });
+    }
+    const {
+        data,
+        error
+    } = result
+    log.d(result, 'updateTenantStatus --> result')
+    if (!error) {
+        await fetchTenants(); 
+    } else {
+        log.e(error, 'Error updating tenant status');
+    }
+
 }
 
 const onSearchTenant = (keyword) => {
@@ -97,46 +140,61 @@ const onSearchTenant = (keyword) => {
             </thead>
             <tbody>
                 {#each tenants as tenant}
-                <tr class="h-2"><td/><td/><td/><td/><td/></tr>
-                    <tr class="h-16 bg-white hover:bg-gray-200 text-sm rounded-lg">
-                        <td class="py-3 px-4 text-sm font-medium rounded-l-lg">
-                            <button class="underline underline-offset-2" on:click={()=>gotoDetail(tenant)}>{tenant.name}</button>
-                        </td>
-                        <td class="py-3 px-4 text-gray-600 flex items-center text-xs font-normal h-16" >
-                            {tenant.org_name}
-                            <button class="mx-1 self-center" on:click={()=>copyName(tenant.org_name)}>{@html svgIcons.copy}</button>
-                        </td>
-                        <td class="py-3 px-4 text-sm font-medium">{tenant.created_at}</td>
-                        <td class="py-3 px-4">
-                            <span class={tenant.active == 1 ? "text-emerald-600 text-sm font-medium" : "text-grey-600 text-sm font-medium"}>{tenant.active == 1 ? t("tenant.tenants.tenant.active") : t("tenant.tenants.tenant.archived")}</span>
-                        </td>
-                        <td class="py-3 px-4 text-right relative relative-dropdown rounded-r-lg">
-                            <button class="focus:outline-none">
-                                {@html svgIcons["three-dot"]}
+
+                <tr class="h-2"><td/><td/><td/><td/><td>
+                    <dialog id={"my_modal_3"+tenant._id} class="modal">
+                        <div class="modal-box">
+                            <form method="dialog" id="modalForm">
+                                <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                                <h3 id="modal_title" class="text-lg font-bold">{tenant.active == 1 ? t("tenant.tenants.tenant.archive-confirmation") : t("tenant.tenants.tenant.active-confirmation")}</h3>
+                                <div class="flex justify-between gap-4 mt-6">
+                                    <button id="yes_button" class="btn btn-warning flex-1" on:click={()=>updateTenantStatus(tenant)}>{t("common.yes")}</button>
+                                    <button id="no_button" class="btn btn-success flex-1" on:click={()=>closeUpdateStatusConfirmationModal(tenant)}>{t("common.no")}</button>
+                                </div>
+                            </form>
+                        </div>
+                    </dialog>
+                </td></tr>
+
+                <tr class="h-16 bg-white hover:bg-gray-200 text-sm rounded-lg">
+                    <td class="py-3 px-4 text-sm font-medium rounded-l-lg">
+                        <button class="underline underline-offset-2" on:click={()=>gotoDetail(tenant)}>{tenant.name}</button>
+                    </td>
+                    <td class="py-3 px-4 text-gray-600 flex items-center text-xs font-normal h-16" >
+                        {tenant.org_name}
+                        <button class="mx-1 self-center" on:click={()=>copyName(tenant.org_name)}>{@html svgIcons.copy}</button>
+                    </td>
+                    <td class="py-3 px-4 text-sm font-medium">{tenant.created_at}</td>
+                    <td class="py-3 px-4">
+                        <span class={tenant.active == 1 ? "text-emerald-600 text-sm font-medium" : "text-grey-600 text-sm font-medium"}>{tenant.active == 1 ? t("tenant.tenants.tenant.active") : t("tenant.tenants.tenant.archived")}</span>
+                    </td>
+                    <td class="py-3 px-4 text-right relative relative-dropdown rounded-r-lg">
+                        <button class="focus:outline-none">
+                            {@html svgIcons["three-dot"]}
+                        </button>
+                        <div class="dropdown-content py-2">
+                            <button class="flex block w-full text-left px-4 py-1 text-sm hover:underline"  on:click={()=>showUpdateStatusConfirmationModal(tenant)}>
+                                {@html tenant.active == 1 ?  svgIcons.archive : svgIcons.active}
+                                <span class="ml-1">{tenant.active == 1 ? t("tenant.tenants.tenant.action.archive") :  t("tenant.tenants.tenant.action.active")}</span>
                             </button>
-                            <div class="dropdown-content py-2">
-                                <button class="flex block w-full text-left px-4 py-1 text-sm hover:underline"  on:click={()=>archiveTenant(tenant)}>
-                                    {@html tenant.active == 1 ?  svgIcons.archive : svgIcons.active}
-                                    <span class="ml-1">{tenant.active == 1 ? t("tenant.tenants.tenant.action.archive") :  t("tenant.tenants.tenant.action.active")}</span>
-                                </button>
-                                <button class="flex block w-full text-left px-4 py-1 text-sm hover:underline" on:click={()=>gotoDetail(tenant)}>
-                                    {@html svgIcons.edit}
-                                    <span class="ml-1">{t("tenant.tenants.tenant.action.edit")}</span>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    {/each}
-                    </tbody>
-                    </table>
+                            <button class="flex block w-full text-left px-4 py-1 text-sm hover:underline" on:click={()=>gotoDetail(tenant)}>
+                                {@html svgIcons.edit}
+                                <span class="ml-1">{t("tenant.tenants.tenant.action.edit")}</span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {/each}
+                </tbody>
+                </table>
 
-                    </div>
+                </div>
 
-                    <div class="flex justify-center join mt-6">
-                        <button class="join-item btn btn-sm">1</button>
-                        <button class="join-item btn btn-sm btn-active">2</button>
-                        <button class="join-item btn btn-sm">3</button>
-                        <button class="join-item btn btn-sm">4</button>
-                    </div>
+                <div class="flex justify-center join mt-6">
+                    <button class="join-item btn btn-sm">1</button>
+                    <button class="join-item btn btn-sm btn-active">2</button>
+                    <button class="join-item btn btn-sm">3</button>
+                    <button class="join-item btn btn-sm">4</button>
+                </div>
 
-                    </div>
+                </div>
