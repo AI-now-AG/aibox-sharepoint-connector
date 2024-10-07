@@ -82,6 +82,14 @@ export const tenant = {
     },
   }),
 
+  active: defineAction({
+    input: TenantInputIdentifierSchema,
+    handler: async (input) => {
+      const updateResult = await tenantModel.active(input._id);
+      return transformDataToArray(updateResult);
+    },
+  }),
+
   archive: defineAction({
     input: TenantInputIdentifierSchema,
     handler: async (input) => {
