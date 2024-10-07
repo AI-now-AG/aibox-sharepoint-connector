@@ -53,9 +53,9 @@ const updateTenantStatus = async (tenant) => {
     closeUpdateStatusConfirmationModal(tenant)
     let result
     if (active) {
-        result = await actions.tenant.archive(tenant);
+        result = await actions.tenant.archive({_id: tenant._id});
     } else {
-        result = await actions.tenant.active(tenant);
+        result = await actions.tenant.active({_id: tenant._id});
     }
     const {
         data,
