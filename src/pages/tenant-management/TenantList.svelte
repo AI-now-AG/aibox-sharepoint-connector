@@ -15,7 +15,6 @@ import log from '$utils/log';
 import Loading from '$components/Loading.svelte';
 import { loading, showLoading, hideLoading } from '$utils/common';
 
-let isLoading = false;
 let tenants = []
 
 const fetchTenants = async () => {
