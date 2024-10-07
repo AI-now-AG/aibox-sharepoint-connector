@@ -93,6 +93,7 @@ const en = {
 
   "tenant.tenants": "Tenants",
   "tenant.tenants.add-new-tenant": "New tenant",
+  "tenant.tenants.add-tenant": "Add tenant",
   "tenant.tenants.seach-place-holder": "Type here",
   "tenant.tenants.show-archived": "Show archived",
   "tenant.tenants.all-tenants": "All tenants (%amount)",
@@ -200,6 +201,7 @@ const de = {
 
   "tenant.tenants": "Mieter",
   "tenant.tenants.add-new-tenant": "Neuer Mieter",
+  "tenant.tenants.add-tenant": "Mieter hinzufügen",
   "tenant.tenants.seach-place-holder": "Hier eingeben",
   "tenant.tenants.show-archived": "Archivierte anzeigen",
   "tenant.tenants.all-tenants": "Alle Mieter (%amount)",
