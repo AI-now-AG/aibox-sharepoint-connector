@@ -1,12 +1,8 @@
 ---
-import i18n from "$utils/i18n";
-
 const { tenant } = Astro.locals;
 const theme = tenant?.theme;
 const primaryColor = "rgb(24 121 78)";
-const defaultLanguage = tenant?.default_language;
 
-i18n.setLocale("de");
 console.log("primaryColor", { primaryColor });
 ---
 

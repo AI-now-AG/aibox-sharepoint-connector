@@ -8,7 +8,6 @@ import tenantModel, {
 import { transformDataToArray } from "$utils/transformDataToArray";
 import organizationsManagement, {
   type PostOrganizationsRequest,
-  type PatchOrganizationsByIdOperationRequest,
   type PatchOrganizationsByIdRequest,
 } from "$data/auth0/organizations-manager";
 
@@ -52,6 +51,12 @@ export const tenant = {
       const organizationResult =
         await organizationsManagement.create(bodyParameters);
 
+      // add connection on auth0
+      await organizationsManagement.addEnabledConnection(
+        organizationResult.data.id,
+        import.meta.env.AUTH0_AUTH_CON_ID || "con_RXTD1LIbXJgceOUH",
+      );
+
       // store tenant on mongodb
       const { id: organizationId } = organizationResult.data;
       const tenant: Tenant = { ...input, ...{ org_id: organizationId } };
@@ -69,14 +74,14 @@ export const tenant = {
       const updatedDocument = await tenantModel.update(input._id, tenant);
 
       // update existing organization on auth0
-      const requestParameters: PatchOrganizationsByIdOperationRequest = {
-        id: updatedDocument?.org_id,
-      };
       const bodyParameters: PatchOrganizationsByIdRequest = {
         name: input.org_name,
         display_name: input.name,
       };
-      await organizationsManagement.update(requestParameters, bodyParameters);
+      await organizationsManagement.update(
+        updatedDocument?.org_id,
+        bodyParameters,
+      );
 
       return transformDataToArray(updatedDocument);
     },
