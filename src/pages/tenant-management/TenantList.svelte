@@ -13,17 +13,18 @@ import {
 } from "svelte";
 import log from '$utils/log';
 import Loading from '$components/Loading.svelte';
+import { loading, showLoading, hideLoading } from '$utils/common';
 
 let isLoading = false;
 let tenants = []
 
 const fetchTenants = async () => {
-    isLoading = true
+    showLoading();
     const {
         data,
         error
     } = await actions.tenant.list();
-    isLoading = false
+    hideLoading();
     if (!error) {
         tenants = data;
     } else {
@@ -63,7 +64,7 @@ const updateTenantStatus = async (tenant) => {
     } = tenant;
     log.d(tenant, 'updateTenantStatus')
     closeUpdateStatusConfirmationModal(tenant)
-    isLoading = true
+    showLoading();
     let result
     if (active) {
         result = await actions.tenant.archive({
@@ -74,7 +75,7 @@ const updateTenantStatus = async (tenant) => {
             _id: tenant._id
         });
     }
-    isLoading = false
+    hideLoading()
     const {
         data,
         error
@@ -111,9 +112,7 @@ const onSearchTenant = (keyword) => {
 }
 </style>
 
-{#if isLoading}
-<Loading />
-{/if}
+<Loading bind:show={$loading} />
 
 <div class="container max-w-full mx-auto p-6" style="font-family: Inter;">
     <div class="items-center mb-10">
