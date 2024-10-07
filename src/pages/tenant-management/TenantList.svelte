@@ -15,13 +15,22 @@ import {
 import log from '$utils/log';
 
 let tenants = []
-onMount(async () => {
+
+const fetchTenants = async () => {
     const {
         data,
         error
     } = await actions.tenant.list();
-    tenants = data
-    console.log("data in actions", data);
+    if (!error) {
+        tenants = data;
+    } else {
+        log.e(error, 'Error fetching tenants');
+    }
+    log.d(data, 'Tenant list');
+};
+
+onMount(async () => {
+    await fetchTenants();
 });
 
 export let preferredLocale;
@@ -53,15 +62,24 @@ const updateTenantStatus = async (tenant) => {
     closeUpdateStatusConfirmationModal(tenant)
     let result
     if (active) {
-        result = await actions.tenant.archive({_id: tenant._id});
+        result = await actions.tenant.archive({
+            _id: tenant._id
+        });
     } else {
-        result = await actions.tenant.active({_id: tenant._id});
+        result = await actions.tenant.active({
+            _id: tenant._id
+        });
     }
     const {
         data,
         error
     } = result
     log.d(result, 'updateTenantStatus --> result')
+    if (!error) {
+        await fetchTenants(); 
+    } else {
+        log.e(error, 'Error updating tenant status');
+    }
 
 }
 
