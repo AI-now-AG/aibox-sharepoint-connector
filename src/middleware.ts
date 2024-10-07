@@ -5,6 +5,7 @@ import { sequence } from "astro/middleware";
 import { PUBLIC_ROUTES, SUPER_ADMIN_ROUTES } from "$constants";
 import type { APIContext, MiddlewareNext } from "astro";
 import tenantModel from "$data/models/tenant.model";
+import i18n from "$i18n/i18n";
 
 async function requestOrigin(context: APIContext, next: MiddlewareNext) {
   // Basic CSRF protection
@@ -79,4 +80,25 @@ async function restrictAccess(context: APIContext, next: MiddlewareNext) {
   return next();
 }
 
-export const onRequest = sequence(requestOrigin, authenticate, restrictAccess);
+async function initI18n(context: APIContext, next: MiddlewareNext) {
+  // set locale from preferred locale of the user
+  const preferredLocale = context.preferredLocale;
+  if (preferredLocale) {
+    i18n.setLocale(preferredLocale);
+  }
+
+  // set locale from tenant settings
+  const tenantLocale = context.locals.tenant?.default_language;
+  if (tenantLocale) {
+    i18n.setLocale(tenantLocale);
+  }
+
+  return next();
+}
+
+export const onRequest = sequence(
+  requestOrigin,
+  authenticate,
+  restrictAccess,
+  initI18n,
+);

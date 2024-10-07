@@ -1,14 +1,19 @@
 import {
+  type DeleteEnabledConnectionsByConnectionIdRequest,
   type PatchOrganizationsByIdOperationRequest,
   type PatchOrganizationsByIdRequest,
+  type PostEnabledConnectionsOperationRequest,
+  type PostEnabledConnectionsRequest,
   type PostOrganizationsRequest,
 } from "auth0";
 import management from "$data/auth0/management-client";
 
 export type {
   PostOrganizationsRequest,
-  PatchOrganizationsByIdOperationRequest,
   PatchOrganizationsByIdRequest,
+  PostEnabledConnectionsOperationRequest,
+  PostEnabledConnectionsRequest,
+  DeleteEnabledConnectionsByConnectionIdRequest,
 } from "auth0";
 
 export const create = async (bodyParameters: PostOrganizationsRequest) => {
@@ -21,10 +26,13 @@ export const create = async (bodyParameters: PostOrganizationsRequest) => {
 };
 
 export const update = async (
-  requestParameters: PatchOrganizationsByIdOperationRequest,
+  organizationId: string,
   bodyParameters: PatchOrganizationsByIdRequest,
 ) => {
   try {
+    const requestParameters: PatchOrganizationsByIdOperationRequest = {
+      id: organizationId,
+    };
     return await management.organizations.update(
       requestParameters,
       bodyParameters,
@@ -35,7 +43,50 @@ export const update = async (
   }
 };
 
+export const addEnabledConnection = async (
+  organizationId: string,
+  connectionId: string,
+) => {
+  try {
+    const requestParameters: PostEnabledConnectionsOperationRequest = {
+      id: organizationId,
+    };
+    const bodyParameters: PostEnabledConnectionsRequest = {
+      connection_id: connectionId,
+    };
+
+    return await management.organizations.addEnabledConnection(
+      requestParameters,
+      bodyParameters,
+    );
+  } catch (err) {
+    console.log("auth0: add enabled connection error", err);
+    throw err;
+  }
+};
+
+export const deleteEnabledConnection = async (
+  organizationId: string,
+  connectionId: string,
+) => {
+  try {
+    const requestParameters: DeleteEnabledConnectionsByConnectionIdRequest = {
+      id: organizationId,
+      connectionId,
+    };
+
+    return await management.organizations.deleteEnabledConnection(
+      requestParameters,
+    );
+  } catch (err) {
+    console.log("auth0: delete enabled connection error", err);
+    throw err;
+  }
+};
+
 export default {
   create,
   update,
+  addEnabledConnection,
+  deleteEnabledConnection,
 };
