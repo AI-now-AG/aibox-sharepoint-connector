@@ -15,11 +15,9 @@ export interface Props {
 const { id = "" } = Astro.params;
 
 const fetchTenant = async () => {
-  showLoading();
   const { data, error } = await Astro.callAction(actions.tenant.get, {
     _id: id,
   });
-  hideLoading();
   return { data, error };
 };
 
@@ -45,5 +43,4 @@ const { data } = tenatData || {};
       client:load
     />
   </div>
-  <svelte:component this={Loading}></svelte:component>
 </Layout>
