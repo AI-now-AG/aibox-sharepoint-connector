@@ -1,19 +1,19 @@
 import Mustache, { type OpeningAndClosingTags } from "mustache";
 import { ui, defaultLang } from "./ui";
 
-let currentLang: string;
+export let currentLang: string;
 
 // custom tags
 const customTags: OpeningAndClosingTags = ["${", "}"];
 Mustache.tags = customTags;
 
-export function getLanguage(s?: string) {
-  if (s && s in ui) return s as keyof typeof ui;
+export function getLanguage(lang?: string) {
+  if (lang && lang in ui) return lang as keyof typeof ui;
   return defaultLang;
 }
 
-export function setLanguage(value: string) {
-  currentLang = value;
+export function setLanguage(lang: string) {
+  currentLang = lang;
 }
 
 export function useTranslations(requestedLang?: string) {

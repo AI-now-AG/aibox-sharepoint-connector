@@ -6,8 +6,9 @@
   import type { CreateInstructionParams } from "$pages/api/instructions.json";
   import type { CreateKnowledgeBaseParams } from "$pages/api/knowledge-base.json";
   import type { PromptDetails } from "$pages/api/prompts/[id].json";
+  import { getLocale } from "$stores/locale";
 
-  const t = useTranslations();
+  const t = useTranslations(getLocale());
 
   let selectedPromptId = "";
   let promptDetails: PromptDetails;
