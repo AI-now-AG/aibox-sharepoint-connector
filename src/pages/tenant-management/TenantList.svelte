@@ -12,6 +12,7 @@ import {
 import {
     onMount
 } from "svelte";
+import log from '$utils/log';
 
 let tenants = []
 onMount(async () => {
@@ -44,13 +45,24 @@ function closeUpdateStatusConfirmationModal(tenant) {
     document.getElementById('my_modal_3' + tenant._id).close();
 }
 
-const updateTenantStatus = (tenant) => {
+const updateTenantStatus = async (tenant) => {
     const {
         active
     } = tenant;
-    alert(JSON.stringify(tenant));
-    console.log(tenant)
+    log.d(tenant, 'updateTenantStatus')
     closeUpdateStatusConfirmationModal(tenant)
+    let result
+    if (active) {
+        result = await actions.tenant.archive(tenant);
+    } else {
+        result = await actions.tenant.active(tenant);
+    }
+    const {
+        data,
+        error
+    } = result
+    log.d(result, 'updateTenantStatus --> result')
+
 }
 
 const onSearchTenant = (keyword) => {
