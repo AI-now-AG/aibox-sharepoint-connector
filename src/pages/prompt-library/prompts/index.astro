@@ -6,7 +6,7 @@ import CategoryModel from "$data/models/category.model";
 import Card, { type CardItem } from "$components/Card.svelte";
 import { Permission } from "$data/models/user.model";
 
-const t = useTranslations(Astro.preferredLocale);
+const t = useTranslations();
 
 const promptsCursor = await PromptModel.listByTenant(
   Astro.locals.user.tenant_id,

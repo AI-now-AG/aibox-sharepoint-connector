@@ -5,7 +5,7 @@ import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
 import Card, { type CardItem } from "$components/Card.svelte";
 import { Permission } from "$data/models/user.model";
 
-const t = useTranslations(Astro.preferredLocale);
+const t = useTranslations();
 
 const knowledgeBaseCursor = await KnowledgeBaseModel.listByTenant(
   Astro.locals.user.tenant_id,

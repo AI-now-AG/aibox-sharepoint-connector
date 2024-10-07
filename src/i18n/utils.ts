@@ -1,12 +1,27 @@
+import Mustache, { type OpeningAndClosingTags } from "mustache";
 import { ui, defaultLang } from "./ui";
 
-const getLang = (s?: string) => {
+let currentLang: string;
+
+// custom tags
+const customTags: OpeningAndClosingTags = ["${", "}"];
+Mustache.tags = customTags;
+
+export function getLanguage(s?: string) {
   if (s && s in ui) return s as keyof typeof ui;
-};
+  return defaultLang;
+}
+
+export function setLanguage(value: string) {
+  currentLang = value;
+}
 
 export function useTranslations(requestedLang?: string) {
-  const lang = getLang(requestedLang);
-  return function t(key: keyof (typeof ui)[typeof defaultLang]) {
-    return (lang && ui[lang][key]) || ui[defaultLang][key] || "";
+  const value = requestedLang || currentLang;
+  const lang = getLanguage(value);
+
+  return function t(key: keyof (typeof ui)[typeof defaultLang], view?: object) {
+    const template = (lang && ui[lang][key]) || ui[defaultLang][key];
+    return Mustache.render(template, view);
   };
 }

@@ -5,8 +5,8 @@ import {
 import {
     useTranslations
 } from "$i18n/utils";
-export let preferredLocale;
-const t = useTranslations(preferredLocale);
+
+const t = useTranslations();
 </script>
 
 <style>

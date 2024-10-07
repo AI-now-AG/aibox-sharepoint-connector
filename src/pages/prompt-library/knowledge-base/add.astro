@@ -9,7 +9,6 @@ let userPermissions = Astro.locals.user.permissions;
 
 <Layout>
   <KnowledgeBaseForm
-    preferredLocale={Astro.preferredLocale}
     isEditable={userPermissions.includes(Permission.AdminAll)}
     client:load
   />

@@ -3,11 +3,10 @@
   import { useTranslations } from "$i18n/utils";
   import { storePromptId } from "$components/prompt-interface/components/Stores";
 
-  export let preferredLocale;
   export let cards;
   export let selectedPromptId;
 
-  const t = useTranslations(preferredLocale);
+  const t = useTranslations();
 
   let showMore = false;
   let selectedCardIndex = null;

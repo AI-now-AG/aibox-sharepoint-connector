@@ -21,7 +21,6 @@ let userPermissions = Astro.locals.user.permissions;
   > -->
   <div>
     <InstructionForm
-      preferredLocale={Astro.preferredLocale}
       instructionId={id}
       instruction={instruction}
       isEditable={userPermissions.includes(Permission.AdminAll)}

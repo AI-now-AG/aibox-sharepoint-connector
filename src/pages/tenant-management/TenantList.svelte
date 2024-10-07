@@ -33,8 +33,7 @@ onMount(async () => {
     await fetchTenants();
 });
 
-export let preferredLocale;
-const t = useTranslations(preferredLocale);
+const t = useTranslations();
 
 let showArchived = false;
 
@@ -124,7 +123,9 @@ const onSearchTenant = (keyword) => {
     </div>
 
     <div>
-        <h2 class="text-lg font-normal mb-4">{t("tenant.tenants.all-tenants")?.replace("%amount",tenants.length )}</h2>
+        <h2 class="text-lg font-normal mb-4">
+            {t("tenant.tenants.all-tenants", {amount: tenants.length})}
+        </h2>
 
         <table class="min-w-full relative" style="font-family:Inter;">
 

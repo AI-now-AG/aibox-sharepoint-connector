@@ -17,7 +17,6 @@ let userPermissions = Astro.locals.user.permissions;
 <Layout>
   <div>
     <PromptForm
-      preferredLocale={Astro.preferredLocale}
       promptId={id}
       prompt={prompt}
       isEditable={userPermissions.includes(Permission.AdminAll)}

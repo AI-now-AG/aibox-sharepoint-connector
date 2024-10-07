@@ -3,8 +3,8 @@
   import { useTranslations } from "$i18n/utils";
   import type { Instruction } from "$data/models/instruction.model";
   import { onMount } from "svelte";
-  export let preferredLocale;
-  const t = useTranslations(preferredLocale);
+
+  const t = useTranslations();
 
   let instructionTitle = "";
   let instructionText = "";
