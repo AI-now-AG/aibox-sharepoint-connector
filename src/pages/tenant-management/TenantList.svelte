@@ -8,19 +8,22 @@ import {
 import {
     useTranslations
 } from "$i18n/utils";
-
 import {
     onMount
 } from "svelte";
 import log from '$utils/log';
+import Loading from '$components/Loading.svelte';
 
+let isLoading = false;
 let tenants = []
 
 const fetchTenants = async () => {
+    isLoading = true
     const {
         data,
         error
     } = await actions.tenant.list();
+    isLoading = false
     if (!error) {
         tenants = data;
     } else {
@@ -60,6 +63,7 @@ const updateTenantStatus = async (tenant) => {
     } = tenant;
     log.d(tenant, 'updateTenantStatus')
     closeUpdateStatusConfirmationModal(tenant)
+    isLoading = true
     let result
     if (active) {
         result = await actions.tenant.archive({
@@ -70,13 +74,14 @@ const updateTenantStatus = async (tenant) => {
             _id: tenant._id
         });
     }
+    isLoading = false
     const {
         data,
         error
     } = result
     log.d(result, 'updateTenantStatus --> result')
     if (!error) {
-        await fetchTenants(); 
+        await fetchTenants();
     } else {
         log.e(error, 'Error updating tenant status');
     }
@@ -105,6 +110,10 @@ const onSearchTenant = (keyword) => {
     display: block;
 }
 </style>
+
+{#if isLoading}
+<Loading />
+{/if}
 
 <div class="container max-w-full mx-auto p-6" style="font-family: Inter;">
     <div class="items-center mb-10">
