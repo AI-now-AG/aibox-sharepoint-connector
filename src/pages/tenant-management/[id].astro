@@ -1,12 +1,8 @@
 ---
 import Layout from "$layouts/Layout.astro";
-import { useTranslations } from "$i18n/utils";
 import TenantFrom from "./TenantFrom.svelte";
 import { svgIcons } from "$assets/icons";
 import { actions } from "astro:actions";
-import Loading from "$components/Loading.svelte";
-import { loading, showLoading, hideLoading } from "$utils/common";
-const t = useTranslations(Astro.preferredLocale);
 
 export interface Props {
   id: string;
@@ -37,10 +33,6 @@ const { data } = tenatData || {};
     </div>
   </div>
   <div class="px-8">
-    <TenantFrom
-      preferredLocale={Astro.preferredLocale}
-      tenant={data}
-      client:load
-    />
+    <TenantFrom tenant={data} client:load />
   </div>
 </Layout>

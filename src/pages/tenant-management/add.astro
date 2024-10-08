@@ -20,6 +20,6 @@ const t = useTranslations(Astro.preferredLocale);
     </div>
   </div>
   <div class="px-8">
-    <TenantFrom preferredLocale={Astro.preferredLocale} client:load />
+    <TenantFrom client:load tenant />
   </div>
 </Layout>
