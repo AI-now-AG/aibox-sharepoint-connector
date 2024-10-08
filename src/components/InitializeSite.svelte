@@ -31,6 +31,6 @@
 <style>
   :root,
   [data-theme] {
-    --bc: var(--primaryColor);
+    --bc: $primaryColor;
   }
 </style>

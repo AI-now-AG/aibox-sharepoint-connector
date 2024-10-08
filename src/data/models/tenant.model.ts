@@ -1,7 +1,6 @@
 import { ObjectId } from "mongodb";
 import { db, type Document } from "../mongodb";
 import { z } from "zod";
-import { any } from "astro:schema";
 
 export enum TenantTheme {
   Light = "light",
