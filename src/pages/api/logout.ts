@@ -18,11 +18,10 @@ export const GET: APIRoute = async (context) => {
     sessionCookie.attributes,
   );
   const tenant = import.meta.env.AUTH0_TENANT || "ainow";
-  const clientId = import.meta.env.AUTH0_CLIENT_ID;
   const redirectUrl = context.url.origin;
 
   return context.redirect(
     //"https://ainow.eu.auth0.com/v2/logout?returnTo=http://localhost:4321",
-    `https://${tenant}.eu.auth0.com/v2/logout?client_id=${clientId}&returnTo=${redirectUrl}`,
+    `https://${tenant}.eu.auth0.com/v2/logout?returnTo=${redirectUrl}`,
   );
 };
