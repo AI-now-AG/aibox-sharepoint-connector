@@ -5,23 +5,9 @@
   export let tenant;
   const t = useTranslations();
 
-  let hex = "#12100a";
-
-  let rgb = {
-    r: 18,
-    g: 16,
-    b: 10,
-    a: 1,
-  };
-
-  let hsv = {
-    h: 46,
-    s: 45.38461538461539,
-    v: 6.9609375,
-    a: 1,
-  };
-
-  let color = "// instance of Colord";
+  let hex = "#491EFF";
+  let color = "#491EFF";
+  let selecteColor = "#491EFF";
 </script>
 
 <div class="container w-full mx-auto p-6" style="font-family: Inter;">
@@ -80,8 +66,6 @@
           <div class="bg-gray-500">
             <ColorPicker
               bind:hex
-              bind:rgb
-              bind:hsv
               bind:color
               components={ChromeVariant}
               position="responsive"
@@ -89,10 +73,15 @@
               name={"color-input"}
               sliderDirection="horizontal"
               textInputModes={["hex"]}
+              on:input={(event) => {
+                console.log(event.detail.hex);
+                selecteColor = event.detail.hex;
+              }}
             />
           </div>
           <input
             type="text"
+            value={selecteColor}
             placeholder={"Primary color"}
             class="input input-bordered flex-1"
             name="color-input"
