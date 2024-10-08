@@ -1,8 +1,27 @@
 <script>
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
+  import ColorPicker from "svelte-awesome-color-picker";
   export let tenant;
   const t = useTranslations();
+
+  let hex = "#12100a";
+
+  let rgb = {
+    r: 18,
+    g: 16,
+    b: 10,
+    a: 1,
+  };
+
+  let hsv = {
+    h: 46,
+    s: 45.38461538461539,
+    v: 6.9609375,
+    a: 1,
+  };
+
+  let color = "// instance of Colord";
 </script>
 
 <div class="container w-full mx-auto p-6" style="font-family: Inter;">
@@ -58,6 +77,16 @@
         type="text"
         placeholder={"Primary color"}
         class="input input-bordered w-full"
+        name="color-input"
+      />
+      <ColorPicker
+        bind:hex
+        bind:rgb
+        bind:hsv
+        bind:color
+        position="responsive"
+        label={"Primary color"}
+        name={"color-input"}
       />
     </div>
   </div>
