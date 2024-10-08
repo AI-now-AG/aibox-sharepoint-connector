@@ -28,7 +28,7 @@ export async function GET(context: APIContext): Promise<Response> {
   const storedState = context.cookies.get("auth0_state")?.value ?? null;
 
   if (!code || !state || !storedState || state !== storedState) {
-    log.e("missing required params");
+    log.e({ code, state, storedState }, "missing required params");
     return new Response(null, {
       status: 400,
     });
