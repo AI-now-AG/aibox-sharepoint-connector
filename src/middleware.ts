@@ -5,6 +5,7 @@ import { sequence } from "astro/middleware";
 import { PUBLIC_ROUTES, SUPER_ADMIN_ROUTES } from "$constants";
 import type { APIContext, MiddlewareNext } from "astro";
 import tenantModel from "$data/models/tenant.model";
+import { defaultLang } from "$i18n/ui";
 import { setLanguage } from "$i18n/utils";
 
 async function requestOrigin(context: APIContext, next: MiddlewareNext) {
@@ -63,7 +64,7 @@ async function authenticate(context: APIContext, next: MiddlewareNext) {
   const tenant = await tenantModel.get(user.tenant_id.toString());
   if (tenant) {
     context.locals.tenant = tenant;
-    context.locals.locale = tenant.default_language || "en";
+    context.locals.locale = tenant.default_language || defaultLang;
   }
 
   return next();

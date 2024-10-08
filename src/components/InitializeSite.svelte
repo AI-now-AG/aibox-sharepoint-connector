@@ -1,20 +1,23 @@
 <script>
   import { onMount } from "svelte";
-  import { getLanguage } from "$i18n/utils";
-  import { defaultLang } from "$i18n/ui";
-  import { locale as storeLocale } from "$stores/locale";
+  import { getLanguage, setLanguage } from "$i18n/utils";
+  import { user as userStore, tenant as tenantStore } from "$stores";
 
-  // Assuming `tenant` is passed as a prop or retrieved from a store
   export let tenant;
+  export let user;
   export let locale;
 
-  const theme = tenant?.theme;
-  const tenantLanguage = tenant?.default_language || defaultLang;
-  const language = getLanguage(tenantLanguage);
-  storeLocale.set(locale);
+  // update stores
+  userStore.set(user);
+  tenantStore.set(tenant);
 
+  // tenant settings
+  const theme = tenant?.theme;
   const primaryColor = "rgb(24 121 78)";
   console.log("primaryColor", { primaryColor });
+
+  // share language for all components
+  setLanguage(locale);
 
   onMount(() => {
     // set default theme in storage

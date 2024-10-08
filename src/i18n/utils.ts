@@ -1,7 +1,7 @@
 import Mustache, { type OpeningAndClosingTags } from "mustache";
 import { ui, defaultLang } from "./ui";
 
-export let currentLang: string;
+let currentLang: string;
 
 // custom tags
 const customTags: OpeningAndClosingTags = ["${", "}"];

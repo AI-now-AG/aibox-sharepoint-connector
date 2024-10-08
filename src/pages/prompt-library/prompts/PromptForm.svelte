@@ -6,9 +6,8 @@
   import { onMount } from "svelte";
   import MultiInput from "$pages/prompt-library/prompts/MultiInput.svelte";
   import type { Prompt } from "$data/models/prompt.model";
-  import { getLocale } from "$stores/locale";
 
-  const t = useTranslations(getLocale());
+  const t = useTranslations();
 
   type Group = { title: string; _id: string }; // TODO: Get the type from the API endpoint
   type Category = {

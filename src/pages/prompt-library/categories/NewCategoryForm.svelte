@@ -5,9 +5,8 @@
   } from "$pages/api/categories.json";
   import { onMount } from "svelte";
   import { useTranslations } from "$i18n/utils";
-  import { getLocale } from "$stores/locale";
 
-  const t = useTranslations(getLocale());
+  const t = useTranslations();
 
   /**
    * TODO: Please question the user flow of creating groups here. It will be more natural

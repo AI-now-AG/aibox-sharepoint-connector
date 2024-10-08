@@ -2,12 +2,11 @@
   import { onMount } from "svelte";
   import { useTranslations } from "$i18n/utils";
   import { storePromptId } from "$components/prompt-interface/components/Stores";
-  import { getLocale } from "$stores/locale";
 
   export let cards;
   export let selectedPromptId;
 
-  const t = useTranslations(getLocale());
+  const t = useTranslations();
 
   let showMore = false;
   let selectedCardIndex = null;

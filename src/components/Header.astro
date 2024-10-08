@@ -1,7 +1,7 @@
 ---
 // import local images
 import ThemeSwitcher from "$components/ThemeSwitcher.svelte";
-import SiteConfiguration from "$components/SiteConfiguration.svelte";
+import InitializeSite from "$components/InitializeSite.svelte";
 import { useTranslations } from "$i18n/utils";
 const t = useTranslations();
 
@@ -24,8 +24,9 @@ const user = Astro.locals.user;
   }
 </style>
 
-<SiteConfiguration
+<InitializeSite
   tenant={Astro.locals.tenant}
+  user={Astro.locals.user}
   locale={Astro.locals.locale}
   client:load
 />

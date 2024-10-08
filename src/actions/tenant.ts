@@ -3,6 +3,7 @@ import { ObjectId } from "mongodb";
 import { z } from "zod";
 import tenantModel, {
   TenantTheme,
+  TenantFilterParamsSchema,
   type Tenant,
 } from "$data/models/tenant.model";
 import { transformDataToArray } from "$utils/transformDataToArray";
@@ -34,8 +35,9 @@ export const tenant = {
   }),
 
   list: defineAction({
+    input: TenantFilterParamsSchema,
     handler: async (input) => {
-      const data = await tenantModel.list();
+      const data = await tenantModel.list(input);
       return transformDataToArray(data);
     },
   }),
