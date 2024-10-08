@@ -4,6 +4,7 @@
   import { useTranslations } from "$i18n/utils";
   import { onMount } from "svelte";
   import log from "$utils/log";
+  import { addToast } from "$stores/toast";
   import Loading from "$components/Loading.svelte";
   import { loading, showLoading, hideLoading } from "$stores";
 
@@ -22,7 +23,7 @@
     showLoading();
     const { data, error } = await actions.tenant.list({
       searchValue,
-      showArchived
+      showArchived,
     });
     hideLoading();
 
@@ -39,11 +40,17 @@
   };
 
   const copyName = (name) => {
-    navigator.clipboard.writeText(name).then(function() {
-        alert('Copied to clipboard: ' + name);
-    }, function(err) {
-        console.error('Could not copy text: ', err);
-    });
+    navigator.clipboard.writeText(name).then(
+      function () {
+        addToast({
+          message: "Copied to clipboard: " + name,
+          type: "success",
+        });
+      },
+      function (err) {
+        console.error("Could not copy text: ", err);
+      },
+    );
   };
 
   function showUpdateStatusConfirmationModal(tenant) {
@@ -91,7 +98,7 @@
 
   const onShowArchived = (event) => {
     showArchived = !showArchived;
-    setTimeout(() => event.target.checked = showArchived, 0);
+    setTimeout(() => (event.target.checked = showArchived), 0);
     fetchTenants();
   };
 </script>
@@ -126,7 +133,7 @@
 
   <div>
     <h2 class="text-lg font-normal mb-4">
-      {t("tenant.tenants.all-tenants", {amount: tenants.length})}
+      {t("tenant.tenants.all-tenants", { amount: tenants.length })}
     </h2>
 
     <div class="relative">
