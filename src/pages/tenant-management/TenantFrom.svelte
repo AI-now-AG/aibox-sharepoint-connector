@@ -62,8 +62,8 @@
     <div class="w-2/4 flex flex-col">
       <span class="mb-2 text-gray-400 font-medium text-sm">Primary color</span>
       <div class="w-full">
-        <div class="absolute top-0 left-0 relative flex">
-          <div class="bg-gray-500">
+        <div class="relative flex">
+          <div class="w-8 pt-2 mr-2">
             <ColorPicker
               bind:hex
               bind:color
@@ -74,7 +74,6 @@
               sliderDirection="horizontal"
               textInputModes={["hex"]}
               on:input={(event) => {
-                console.log(event.detail.hex);
                 selecteColor = event.detail.hex;
               }}
             />
