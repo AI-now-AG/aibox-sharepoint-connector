@@ -1,7 +1,7 @@
 <script>
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
-  import ColorPicker from "svelte-awesome-color-picker";
+  import ColorPicker, { ChromeVariant } from "svelte-awesome-color-picker";
   export let tenant;
   const t = useTranslations();
 
@@ -86,9 +86,12 @@
         bind:rgb
         bind:hsv
         bind:color
+        components={ChromeVariant}
         position="responsive"
         label={""}
         name={"color-input"}
+        sliderDirection="horizontal"
+        textInputModes={["hex"]}
       />
     </div>
   </div>
