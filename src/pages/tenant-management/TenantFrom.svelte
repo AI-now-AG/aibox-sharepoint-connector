@@ -75,24 +75,30 @@
   <div class="flex flex-row space-x-4">
     <div class="w-2/4 flex flex-col">
       <span class="mb-2 text-gray-400 font-medium text-sm">Primary color</span>
-      <input
-        type="text"
-        placeholder={"Primary color"}
-        class="input input-bordered w-full"
-        name="color-input"
-      />
-      <ColorPicker
-        bind:hex
-        bind:rgb
-        bind:hsv
-        bind:color
-        components={ChromeVariant}
-        position="responsive"
-        label={""}
-        name={"color-input"}
-        sliderDirection="horizontal"
-        textInputModes={["hex"]}
-      />
+      <div class="w-full">
+        <div class="absolute top-0 left-0 relative flex">
+          <div class="bg-gray-500">
+            <ColorPicker
+              bind:hex
+              bind:rgb
+              bind:hsv
+              bind:color
+              components={ChromeVariant}
+              position="responsive"
+              label={""}
+              name={"color-input"}
+              sliderDirection="horizontal"
+              textInputModes={["hex"]}
+            />
+          </div>
+          <input
+            type="text"
+            placeholder={"Primary color"}
+            class="input input-bordered flex-1"
+            name="color-input"
+          />
+        </div>
+      </div>
     </div>
   </div>
 
