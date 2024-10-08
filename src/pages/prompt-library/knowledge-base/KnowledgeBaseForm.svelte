@@ -3,8 +3,8 @@
   import { useTranslations } from "$i18n/utils";
   import { onMount } from "svelte";
   import type { KnowledgeBase } from "$data/models/knowledgeBase.model";
-  export let preferredLocale;
-  const t = useTranslations(preferredLocale);
+
+  const t = useTranslations();
 
   let knowledgeBaseTitle = "";
   let knowledgeBaseText = "";

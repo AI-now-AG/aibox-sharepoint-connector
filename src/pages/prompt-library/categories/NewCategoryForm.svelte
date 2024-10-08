@@ -6,8 +6,7 @@
   import { onMount } from "svelte";
   import { useTranslations } from "$i18n/utils";
 
-  export let preferredLocale;
-  const t = useTranslations(preferredLocale);
+  const t = useTranslations();
 
   /**
    * TODO: Please question the user flow of creating groups here. It will be more natural

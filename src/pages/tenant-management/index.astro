@@ -4,7 +4,7 @@ import { useTranslations } from "$i18n/utils";
 import TenantList from "$pages/tenant-management/TenantList.svelte";
 import { svgIcons } from "$assets/icons";
 
-const t = useTranslations(Astro.preferredLocale);
+const t = useTranslations();
 ---
 
 <Layout>
@@ -24,6 +24,6 @@ const t = useTranslations(Astro.preferredLocale);
     </a>
   </div>
   <div class="px-8">
-    <TenantList client:load preferredLocale={Astro.preferredLocale} />
+    <TenantList client:load />
   </div>
 </Layout>

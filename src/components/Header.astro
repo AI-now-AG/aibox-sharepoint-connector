@@ -1,9 +1,9 @@
 ---
 // import local images
 import ThemeSwitcher from "$components/ThemeSwitcher.svelte";
-import SiteConfiguration from "$components/SiteConfiguration.astro";
+import InitializeSite from "$components/InitializeSite.svelte";
 import { useTranslations } from "$i18n/utils";
-const t = useTranslations(Astro.preferredLocale);
+const t = useTranslations();
 
 const user = Astro.locals.user;
 ---
@@ -24,7 +24,12 @@ const user = Astro.locals.user;
   }
 </style>
 
-<SiteConfiguration />
+<InitializeSite
+  tenant={Astro.locals.tenant}
+  user={Astro.locals.user}
+  locale={Astro.locals.locale}
+  client:load
+/>
 
 <header class="container-fluid mx-auto navbar bg-base-200">
   <div class="navbar-start">

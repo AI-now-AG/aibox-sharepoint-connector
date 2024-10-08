@@ -1,6 +1,7 @@
 import { ObjectId } from "mongodb";
 import { db, type Document } from "../mongodb";
 import { z } from "zod";
+import { any } from "astro:schema";
 
 export enum TenantTheme {
   Light = "light",
@@ -8,6 +9,12 @@ export enum TenantTheme {
   Luxury = "luxury",
   Lemonade = "lemonade",
 }
+
+export const TenantFilterParamsSchema = z.object({
+  searchValue: z.string().nullish(),
+  showArchived: z.boolean(),
+});
+export type TenantFilterParams = z.infer<typeof TenantFilterParamsSchema>;
 
 const TenantSchema = z.object({
   _id: z.instanceof(ObjectId).optional(),
@@ -22,7 +29,6 @@ const TenantSchema = z.object({
   created_at: z.date().optional(),
   updated_at: z.date().optional(),
 });
-
 export type Tenant = z.infer<typeof TenantSchema>;
 
 const collection = db.collection("tenants");
@@ -71,8 +77,35 @@ export default {
     );
   },
 
-  list: async () => {
-    const data = collection.find<Document<Tenant>>({});
+  list: async (filterParams?: TenantFilterParams) => {
+    let filter = {};
+
+    if (filterParams) {
+      const { searchValue, showArchived } = filterParams;
+
+      if (searchValue) {
+        filter = {
+          ...filter,
+          ...{
+            name: {
+              $regex: searchValue,
+              $options: "i",
+            },
+          },
+        };
+      }
+
+      if (showArchived) {
+        filter = {
+          ...filter,
+          ...{
+            active: !showArchived,
+          },
+        };
+      }
+    }
+
+    const data = collection.find<Document<Tenant>>(filter);
     return await data.toArray();
   },
 

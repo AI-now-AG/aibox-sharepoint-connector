@@ -4,7 +4,7 @@
   import PromptResults from "./PromptResults.svelte";
 
   export let promptItems;
-  export let preferredLocale;
+  
   let selectedPromptId;
   let input = "";
   let output = "";
@@ -20,7 +20,6 @@
     <ExecutionCard
       cards={promptItems}
       bind:selectedPromptId
-      {preferredLocale}
     />
   </div>
   <InputArea bind:promptId={selectedPromptId} bind:input bind:output />

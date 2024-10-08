@@ -33,11 +33,7 @@ const promptItems = categoryGroupPrompt.map((prompt) => ({
   </div>
   {
     promptItems.length > 0 ? (
-      <PromptExecution
-        promptItems={promptItems}
-        preferredLocale={Astro.preferredLocale}
-        client:load
-      />
+      <PromptExecution promptItems={promptItems} client:load />
     ) : (
       <EmptyPrompt />
     )

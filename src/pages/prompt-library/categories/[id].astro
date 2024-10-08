@@ -19,7 +19,6 @@ let userPermissions = Astro.locals.user.permissions;
     <NewCategoryForm
       categoryId={id}
       category={instruction}
-      preferredLocale={Astro.preferredLocale}
       isEditable={userPermissions.includes(Permission.AdminAll)}
       client:load
     />

@@ -5,14 +5,23 @@
   import { onMount } from "svelte";
   import log from "$utils/log";
   import Loading from "$components/Loading.svelte";
-  import { loading, showLoading, hideLoading } from "$utils/common";
+  import { loading, showLoading, hideLoading } from "$stores";
+
+  const t = useTranslations();
 
   let tenants = [];
+  let showArchived = false;
+  let searchValue = null;
+  let timeout;
 
   const fetchTenants = async () => {
     showLoading();
-    const { data, error } = await actions.tenant.list();
+    const { data, error } = await actions.tenant.list({
+      searchValue,
+      showArchived
+    });
     hideLoading();
+
     if (!error) {
       tenants = data;
     } else {
@@ -24,11 +33,6 @@
   onMount(async () => {
     await fetchTenants();
   });
-
-  export let preferredLocale;
-  const t = useTranslations(preferredLocale);
-
-  let showArchived = false;
 
   const gotoDetail = (tenant) => {
     window.location.href = `tenant-management/${tenant._id}`;
@@ -50,6 +54,7 @@
     const { active } = tenant;
     log.d(tenant, "updateTenantStatus");
     closeUpdateStatusConfirmationModal(tenant);
+
     showLoading();
     let result;
     if (active) {
@@ -62,6 +67,7 @@
       });
     }
     hideLoading();
+
     const { data, error } = result;
     log.d(result, "updateTenantStatus --> result");
     if (!error) {
@@ -71,8 +77,18 @@
     }
   };
 
-  const onSearchTenant = (keyword) => {
-    console.log(keyword);
+  const onSearchTenant = ({ target: t }) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      searchValue = t.value;
+      fetchTenants();
+    }, 300);
+  };
+
+  const onShowArchived = (event) => {
+    showArchived = !showArchived;
+    setTimeout(() => event.target.checked = showArchived, 0);
+    fetchTenants();
   };
 </script>
 
@@ -87,7 +103,9 @@
           type="text"
           class="grow text-sm"
           placeholder={t("tenant.tenants.seach-place-holder")}
-          on:change={(keyword) => onSearchTenant(keyword)}
+          on:input={onSearchTenant}
+          on:input
+          on:blur
         />
       </label>
     </div>
@@ -96,7 +114,8 @@
         <input
           type="checkbox"
           class="checkbox border-gray-300 rounded focus:ring-indigo-500 w-5 h-5"
-          bind:checked={showArchived}
+          checked={showArchived}
+          on:click|preventDefault={onShowArchived}
         />
         <span class="label-text">{t("tenant.tenants.show-archived")}</span>
       </label>
@@ -105,7 +124,7 @@
 
   <div>
     <h2 class="text-lg font-normal mb-4">
-      {t("tenant.tenants.all-tenants")?.replace("%amount", tenants.length)}
+      {t("tenant.tenants.all-tenants", {amount: tenants.length})}
     </h2>
 
     <table class="min-w-full relative" style="font-family:Inter;">
