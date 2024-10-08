@@ -1,7 +1,43 @@
 ---
 import Layout from "$layouts/Layout.astro";
 import { useTranslations } from "$i18n/utils";
+import TenantFrom from "./TenantFrom.svelte";
+import { svgIcons } from "$assets/icons";
+import { actions } from "astro:actions";
+import Loading from "$components/Loading.svelte";
+import { loading, showLoading, hideLoading } from "$stores";
+
 const t = useTranslations();
+
+export interface Props {
+  id: string;
+}
+
+const { id = "" } = Astro.params;
+
+const fetchTenant = async () => {
+  const { data, error } = await Astro.callAction(actions.tenant.get, {
+    _id: id,
+  });
+  return { data, error };
+};
+
+const tenatData = await fetchTenant();
+const { data } = tenatData || {};
 ---
 
-<Layout />
+<Layout>
+  <div
+    class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14"
+  >
+    <div class="flex items-center pt-8">
+      <button class="mr-4" onclick="window.history.back();">
+        <span set:html={svgIcons.back} />
+      </button>
+      <h1 class="text-4xl font-bold">{data.name}</h1>
+    </div>
+  </div>
+  <div class="px-8">
+    <TenantFrom tenant={data} client:load />
+  </div>
+</Layout>
