@@ -30,6 +30,7 @@
       <span class="mb-2 text-gray-400 font-medium text-sm">Diplay name</span>
       <input
         type="text"
+        value={tenant?.name || ""}
         placeholder={"Display name"}
         class="input input-bordered w-full"
       />
@@ -39,6 +40,7 @@
       <span class="mb-2 text-gray-400 font-medium text-sm">Name</span>
       <input
         type="text"
+        value={tenant?.org_name || ""}
         placeholder={"Identification name"}
         class="input input-bordered w-full"
       />
@@ -85,7 +87,7 @@
         bind:hsv
         bind:color
         position="responsive"
-        label={"Primary color"}
+        label={""}
         name={"color-input"}
       />
     </div>
