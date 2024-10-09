@@ -17,6 +17,7 @@
 
   export let tenant;
   let mode = tenant == undefined ? MODE.Create : MODE.Edit;
+  let tenantData = tenant == undefined ? {} : tenant;
 
   let hex = "#491EFF";
   let color = "#491EFF";
@@ -41,12 +42,30 @@
     document.getElementById("modal_confirm_update").close();
   }
 
+  function validateForm() {
+    if (!tenantData?.name) {
+      alert("Please input display name");
+      return false;
+    }
+    if (!tenantData?.org_name) {
+      alert("Please input identification name");
+      return false;
+    }
+    return true;
+  }
+
   function createTenant() {
-    alert("createTenant");
+    if (validateForm()) {
+      alert("createTenant");
+    }
+    // TODO: Create tenant
   }
 
   function updateTenant() {
-    alert("updateTenant");
+    if (validateForm()) {
+      alert("updateTenant");
+    }
+    // TODO: Create tenant
   }
 </script>
 
@@ -79,6 +98,9 @@
         value={tenant?.name || ""}
         placeholder={t("tenant.tenants.tenant.display-name")}
         class="input input-bordered w-full"
+        on:change={(event) => {
+          tenantData.name = event.target.value;
+        }}
       />
     </div>
 
@@ -91,6 +113,9 @@
         value={tenant?.org_name || ""}
         placeholder={t("tenant.tenants.tenant.identification-name")}
         class="input input-bordered w-full"
+        on:change={(event) => {
+          tenantData.org_name = event.target.value;
+        }}
       />
     </div>
   </div>
@@ -100,7 +125,12 @@
       <span class="mb-2 text-gray-400 font-medium text-sm"
         >{t("tenant.defautlt-language")}</span
       >
-      <select class="select select-bordered w-full">
+      <select
+        class="select select-bordered w-full"
+        on:change={(event) => {
+          console.log(event.target.value);
+        }}
+      >
         <option disabled>{t("tenant.defautlt-language")}</option>
         <option value="de" selected>{t("tenant.german-language")}</option>
         <option value="en">{t("tenant.english-language")}</option>
@@ -111,7 +141,12 @@
       <span class="mb-2 text-gray-400 font-medium text-sm"
         >{t("tenant.default-theme")}</span
       >
-      <select class="select select-bordered w-full">
+      <select
+        class="select select-bordered w-full"
+        on:change={(event) => {
+          console.log(event.target.value);
+        }}
+      >
         <option disabled>{t("tenant.default-theme")}</option>
         <option value="dark" selected>Dark</option>
         <option value="light">Light</option>
@@ -167,6 +202,8 @@
                   textInputModes={["hex"]}
                   on:input={(event) => {
                     selecteColor = event.detail.hex;
+                    tenantData.primaryColor = selecteColor;
+                    console.log(tenantData.primaryColor);
                   }}
                 />
               </div>
