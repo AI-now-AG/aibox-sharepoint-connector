@@ -9,8 +9,8 @@
   let instructionTitle = "";
   let instructionText = "";
 
-  export let instructionId: string;
-  export let instruction: Instruction;
+  export let instructionId: string | undefined = undefined;
+  export let instruction: Instruction | undefined = undefined;
   export let isEditable: boolean = false;
 
   let isSaving = false;

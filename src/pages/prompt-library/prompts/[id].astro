@@ -9,8 +9,15 @@ export interface Props {
 }
 
 const { id } = Astro.params;
+if (id === undefined) {
+  throw new Error("Id is required");
+}
 
-const prompt = id ? await Prompts.getAsString(id) : undefined; // TODO: Render 404 if not found
+const prompt = await Prompts.get(id || ""); // TODO: Render 404 if not found
+if (prompt === null) {
+  throw new Error("Prompt not found");
+}
+
 let userPermissions = Astro.locals.user.permissions;
 ---
 

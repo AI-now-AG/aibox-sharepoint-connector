@@ -9,8 +9,16 @@ export interface Props {
 }
 
 const { id } = Astro.params;
+if (id === undefined) {
+  throw new Error("Id is required");
+}
 
-const instruction = id ? await CategoryModel.get(id) : undefined; // TODO: Render 404 if not found
+const instruction = await CategoryModel.get(id); // TODO: Render 404 if not found
+if (instruction === null) {
+  throw new Error("Instruction not found");
+}
+const formattedInstruction = { ...instruction, ...{ _id: id } };
+
 let userPermissions = Astro.locals.user.permissions;
 ---
 
@@ -18,7 +26,7 @@ let userPermissions = Astro.locals.user.permissions;
   <div>
     <NewCategoryForm
       categoryId={id}
-      category={instruction}
+      category={formattedInstruction}
       isEditable={userPermissions.includes(Permission.AdminAll)}
       client:load
     />
