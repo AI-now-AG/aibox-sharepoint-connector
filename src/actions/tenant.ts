@@ -19,6 +19,7 @@ const TenantInputParamsSchema = z.object({
   theme: z.nativeEnum(TenantTheme),
   primary_color: z.string().optional(),
   openai_api_key: z.string().optional(),
+  azure_openai_api_key: z.string().optional(),
 });
 
 const TenantInputIdentifierSchema = z.object({

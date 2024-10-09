@@ -24,6 +24,7 @@ const TenantSchema = z.object({
   theme: z.nativeEnum(TenantTheme),
   primary_color: z.string().nullish(),
   openai_api_key: z.string().nullish(),
+  azure_openai_api_key: z.string().nullish(),
   active: z.boolean().default(true).optional(),
   created_at: z.date().optional(),
   updated_at: z.date().optional(),
