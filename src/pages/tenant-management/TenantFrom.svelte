@@ -159,6 +159,8 @@
         type="text"
         placeholder={"API key"}
         class="input input-bordered w-full"
+        disabled={apiKeyProvider != API_KEY_PROVIDER.OpenAI}
+        style="background-color: white;"
       />
     </div>
 
@@ -178,9 +180,11 @@
         >
       </div>
       <input
-        type="text"
+        type="text bg-red"
         placeholder={"API key"}
         class="input input-bordered w-full"
+        disabled={apiKeyProvider != API_KEY_PROVIDER.AzureOpenAI}
+        style="background-color: white;"
       />
     </div>
   </div>
