@@ -5,6 +5,11 @@
   import { useTranslations } from "$i18n/utils";
   import ColorPicker, { ChromeVariant } from "svelte-awesome-color-picker";
 
+  const API_KEY_PROVIDER = {
+    OpenAI: "openai",
+    AzureOpenAI: "azure_open_ai",
+  };
+
   export let tenant;
   const t = useTranslations();
 
@@ -13,9 +18,14 @@
   let selecteColor = "#491EFF";
 
   let showPicker = false;
-
   function toggleColorPicker() {
     showPicker = !showPicker;
+  }
+
+  let apiKeyProvider = API_KEY_PROVIDER.AzureOpenAI;
+  function selectApiKeyProvider(event) {
+    apiKeyProvider = event.target.value;
+    console.log(apiKeyProvider, "apiKeyProvider");
   }
 </script>
 
@@ -128,11 +138,23 @@
 
   <div class="w-full h-0.5 mt-4 mb-6 bg-gray-400/20" />
 
-  <div class="mb-2"><span>API Keys</span></div>
+  <div class="mb-3"><span>API Keys</span></div>
 
   <div class="flex flex-row space-x-4">
     <div class="flex-1 flex flex-col">
-      <span class="mb-2 text-gray-400 font-medium text-sm"> Open AI</span>
+      <div class="flex items-center mb-2">
+        <input
+          type="radio"
+          name="radio-api-key"
+          class="radio radio-primary"
+          value={API_KEY_PROVIDER.OpenAI}
+          checked={apiKeyProvider == API_KEY_PROVIDER.OpenAI}
+          on:change={(event) => {
+            selectApiKeyProvider(event);
+          }}
+        />
+        <span class="ml-2 text-gray-400 font-medium text-sm"> Open AI</span>
+      </div>
       <input
         type="text"
         placeholder={"API key"}
@@ -141,7 +163,20 @@
     </div>
 
     <div class="flex-1 flex flex-col">
-      <span class="mb-2 text-gray-400 font-medium text-sm">Azure Open AI</span>
+      <div class="flex items-center mb-2">
+        <input
+          type="radio"
+          name="radio-api-key"
+          class="radio radio-primary"
+          value={API_KEY_PROVIDER.AzureOpenAI}
+          checked={apiKeyProvider == API_KEY_PROVIDER.AzureOpenAI}
+          on:change={(event) => {
+            selectApiKeyProvider(event);
+          }}
+        />
+        <span class="ml-2 text-gray-400 font-medium text-sm">Azure Open AI</span
+        >
+      </div>
       <input
         type="text"
         placeholder={"API key"}
