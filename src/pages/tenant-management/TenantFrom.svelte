@@ -1,13 +1,22 @@
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-no-static-element-interactions -->
 <script>
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
   import ColorPicker, { ChromeVariant } from "svelte-awesome-color-picker";
+  import ColorPickerInput from "./ColorPickerInput.svelte";
   export let tenant;
   const t = useTranslations();
 
   let hex = "#491EFF";
   let color = "#491EFF";
   let selecteColor = "#491EFF";
+
+  let showPicker = false;
+
+  function toggleColorPicker() {
+    showPicker = !showPicker;
+  }
 </script>
 
 <div class="container w-full mx-auto p-6" style="font-family: Inter;">
@@ -63,28 +72,55 @@
       <span class="mb-2 text-gray-400 font-medium text-sm">Primary color</span>
       <div class="w-full">
         <div class="relative flex">
-          <div class="w-8 pt-2 mr-2">
+          <!-- <div class="w-8 pt-2 mr-2">
             <ColorPicker
               bind:hex
               bind:color
-              components={ChromeVariant}
+              components={{
+                ...ChromeVariant,
+              }}
               position="responsive"
               label={""}
-              name={"color-input"}
               sliderDirection="horizontal"
               textInputModes={["hex"]}
               on:input={(event) => {
                 selecteColor = event.detail.hex;
               }}
             />
+          </div> -->
+          <div>
+            <div
+              class="color-preview"
+              style="background-color: {hex};"
+              on:click={toggleColorPicker}
+            />
+
+            {#if showPicker}
+              <div class="absolute picker-color">
+                <ColorPicker
+                  bind:hex
+                  bind:color
+                  isDialog={false}
+                  components={{
+                    ...ChromeVariant,
+                  }}
+                  position="responsive"
+                  label={""}
+                  sliderDirection="horizontal"
+                  textInputModes={["hex"]}
+                  on:input={(event) => {
+                    selecteColor = event.detail.hex;
+                  }}
+                />
+              </div>
+            {/if}
           </div>
-          <input
-            type="text"
-            value={selecteColor}
-            placeholder={"Primary color"}
-            class="input input-bordered flex-1"
-            name="color-input"
-          />
+          <div
+            class="flex flex-1 items-center input input-bordered color-input"
+            on:click={toggleColorPicker}
+          >
+            <span>{selecteColor}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -118,4 +154,20 @@
 </div>
 
 <style>
+  .color-preview {
+    width: 100px;
+    height: 50px;
+    display: inline-block;
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+  }
+  .color-input {
+    height: 50px;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+  }
+  .picker-color {
+    top: 54px;
+    left: 0px;
+  }
 </style>
