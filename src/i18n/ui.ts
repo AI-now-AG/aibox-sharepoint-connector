@@ -124,7 +124,7 @@ const en = {
   "tenant.api-key": "API Key",
   "tenant.open-ai-provider": "Open AI",
   "tenant.azure-open-ai-provider": "Azure Open AI",
-  "tenant.included-featured": "Azure Open AI",
+  "tenant.included-featured": "Included features",
   "tenant.audio-to-text": "Audio to text",
   "tenant.tenants.tenant.update-confirmation":
     " Are you sure you want to update the tenant information?",
@@ -249,7 +249,7 @@ const de = {
   "tenant.api-key": "API-Schlüssel",
   "tenant.open-ai-provider": "Open AI",
   "tenant.azure-open-ai-provider": "Azure Open AI",
-  "tenant.included-featured": "Azure Open AI",
+  "tenant.included-featured": "Enthaltene Funktione",
   "tenant.audio-to-text": "Audio zu Text",
   "tenant.tenants.tenant.update-confirmation":
     "Sind Sie sicher, dass Sie die Mieterinformationen aktualisieren möchten?",
