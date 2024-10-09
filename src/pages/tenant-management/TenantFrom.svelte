@@ -30,6 +30,19 @@
 </script>
 
 <div class="container w-full mx-auto p-6" style="font-family: Inter;">
+  <div class="flex space-x-2 fixed right-14 top-14 pt-2">
+    <button class=" lg:mt-8 btn btn-outline">
+      {@html svgIcons.edit}
+      <span>{t("common.edit")}</span>
+    </button>
+    <button class="mt-2 lg:mt-8 btn btn-primary">
+      {t("common.save")}
+    </button>
+    <button class="mt-2 lg:mt-8 btn">
+      {t("common.cancle")}
+    </button>
+  </div>
+
   <div class="flex flex-row space-x-4">
     <div class="flex-1 flex flex-col mb-4">
       <span class="mb-2 text-gray-400 font-medium text-sm">Diplay name</span>
@@ -190,6 +203,19 @@
   </div>
 
   <div class="w-full h-0.5 mt-4 mb-6 bg-gray-400/20" />
+
+  <div class="flex space-x-2">
+    <!-- <button class=" lg:mt-8 btn btn-outline">
+      {@html svgIcons.edit}
+      <span>{t("common.edit")}</span>
+    </button> -->
+    <button class="mt-2 lg:mt-8 btn btn-primary">
+      {t("common.save")}
+    </button>
+    <button class="mt-2 lg:mt-8 btn">
+      {t("common.cancle")}
+    </button>
+  </div>
 </div>
 
 <style>

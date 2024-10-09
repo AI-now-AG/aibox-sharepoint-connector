@@ -8,6 +8,10 @@ export const defaultLang = "en";
 const en = {
   "common.yes": "Yes",
   "common.no": "No",
+  "common.edit": "Edit",
+  "common.save": "Save",
+  "common.cancle": "Cancle",
+
   "site.title": "aibox",
   "site.description":
     "AI-powered solution for streamlining tasks and boosting productivity. Customizable for small to mid-sized companies. Enhance efficiency and drive innovation in your workflow.",
@@ -115,6 +119,9 @@ const en = {
 const de = {
   "common.yes": "Ja",
   "common.no": "Nein",
+  "common.edit": "Bearbeiten",
+  "common.save": "Speichern",
+  "common.cancle": "Abbrechen",
 
   "site.title": "aibox",
   "site.description":

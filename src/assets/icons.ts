@@ -10,7 +10,7 @@ export const svgIcons = {
 		<circle cx="11.5" cy="1.5" r="1.5" fill="currentColor"/>
 	</svg>`,
   copy: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="17" viewBox="0 0 16 17" fill="none">
-		<path d="M5.33335 5.16667V10.5C5.33335 11.2364 5.93031 11.8333 6.66669 11.8333H10.6667M5.33335 5.16667V3.83333C5.33335 3.09695 5.93031 2.5 6.66669 2.5H9.72388C9.90069 2.5 10.0703 2.57024 10.1953 2.69526L13.1381 5.63807C13.2631 5.7631 13.3334 5.93266 13.3334 6.10948V10.5C13.3334 11.2364 12.7364 11.8333 12 11.8333H10.6667M5.33335 5.16667H4.66669C3.56212 5.16667 2.66669 6.0621 2.66669 7.16667V13.1667C2.66669 13.903 3.26364 14.5 4.00002 14.5H8.66669C9.77126 14.5 10.6667 13.6046 10.6667 12.5V11.8333" stroke="#111827" stroke-linecap="round" stroke-linejoin="round"/>
+		<path d="M5.33335 5.16667V10.5C5.33335 11.2364 5.93031 11.8333 6.66669 11.8333H10.6667M5.33335 5.16667V3.83333C5.33335 3.09695 5.93031 2.5 6.66669 2.5H9.72388C9.90069 2.5 10.0703 2.57024 10.1953 2.69526L13.1381 5.63807C13.2631 5.7631 13.3334 5.93266 13.3334 6.10948V10.5C13.3334 11.2364 12.7364 11.8333 12 11.8333H10.6667M5.33335 5.16667H4.66669C3.56212 5.16667 2.66669 6.0621 2.66669 7.16667V13.1667C2.66669 13.903 3.26364 14.5 4.00002 14.5H8.66669C9.77126 14.5 10.6667 13.6046 10.6667 12.5V11.8333" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
 	</svg>`,
   search: `<svg
             xmlns="http://www.w3.org/2000/svg"
@@ -23,7 +23,7 @@ export const svgIcons = {
               clip-rule="evenodd" />
           </svg>`,
   archive: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
-<path d="M4.16667 6.66683H15.8333M4.16667 6.66683C3.24619 6.66683 2.5 5.92064 2.5 5.00016C2.5 4.07969 3.24619 3.3335 4.16667 3.3335H15.8333C16.7538 3.3335 17.5 4.07969 17.5 5.00016C17.5 5.92064 16.7538 6.66683 15.8333 6.66683M4.16667 6.66683L4.16667 15.0002C4.16667 15.9206 4.91286 16.6668 5.83333 16.6668H14.1667C15.0871 16.6668 15.8333 15.9206 15.8333 15.0002V6.66683M8.33333 10.0002H11.6667" stroke="#111827" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M4.16667 6.66683H15.8333M4.16667 6.66683C3.24619 6.66683 2.5 5.92064 2.5 5.00016C2.5 4.07969 3.24619 3.3335 4.16667 3.3335H15.8333C16.7538 3.3335 17.5 4.07969 17.5 5.00016C17.5 5.92064 16.7538 6.66683 15.8333 6.66683M4.16667 6.66683L4.16667 15.0002C4.16667 15.9206 4.91286 16.6668 5.83333 16.6668H14.1667C15.0871 16.6668 15.8333 15.9206 15.8333 15.0002V6.66683M8.33333 10.0002H11.6667" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>`,
   active: `<svg fill="currentColor" height="20" width="20" 
 	 xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 20 20"
@@ -33,7 +33,7 @@ export const svgIcons = {
 </g>
 </svg>`,
   edit: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
-<path d="M12.6935 4.36019L15.6398 7.30647M13.9435 3.11019C14.7571 2.2966 16.0762 2.2966 16.8898 3.11019C17.7034 3.92379 17.7034 5.24288 16.8898 6.05647L5.41667 17.5296H2.5V14.5537L13.9435 3.11019Z" stroke="#111827" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M12.6935 4.36019L15.6398 7.30647M13.9435 3.11019C14.7571 2.2966 16.0762 2.2966 16.8898 3.11019C17.7034 3.92379 17.7034 5.24288 16.8898 6.05647L5.41667 17.5296H2.5V14.5537L13.9435 3.11019Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>`,
   add: `<svg
             width="13"
@@ -44,13 +44,13 @@ export const svgIcons = {
           >
             <path
               d="M6.5 1V6M6.5 6V11M6.5 6H11.5M6.5 6L1.5 6"
-              stroke="white"
+              stroke="currentColor"
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
             />
           </svg>`,
   back: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-<path d="M10 19L3 12M3 12L10 5M3 12L21 12" stroke="#0F172A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M10 19L3 12M3 12L10 5M3 12L21 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>`,
 };
