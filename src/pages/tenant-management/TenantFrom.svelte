@@ -4,7 +4,7 @@
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
   import ColorPicker, { ChromeVariant } from "svelte-awesome-color-picker";
-  import ColorPickerInput from "./ColorPickerInput.svelte";
+
   export let tenant;
   const t = useTranslations();
 
