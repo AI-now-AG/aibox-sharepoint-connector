@@ -77,7 +77,9 @@ export default {
   },
 
   list: async (filterParams?: TenantFilterParams) => {
-    let filter = {};
+    let filter = {
+      active: true,
+    };
 
     if (filterParams) {
       const { searchValue, showArchived } = filterParams;
@@ -98,7 +100,7 @@ export default {
         filter = {
           ...filter,
           ...{
-            active: !showArchived,
+            active: false,
           },
         };
       }
