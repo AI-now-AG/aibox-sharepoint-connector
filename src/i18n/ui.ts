@@ -10,7 +10,7 @@ const en = {
   "common.no": "No",
   "common.edit": "Edit",
   "common.save": "Save",
-  "common.cancle": "Cancle",
+  "common.cancel": "Cancel",
 
   "site.title": "aibox",
   "site.description":
@@ -121,7 +121,7 @@ const de = {
   "common.no": "Nein",
   "common.edit": "Bearbeiten",
   "common.save": "Speichern",
-  "common.cancle": "Abbrechen",
+  "common.cancel": "Abbrechen",
 
   "site.title": "aibox",
   "site.description":

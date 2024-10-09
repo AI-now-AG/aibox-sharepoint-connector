@@ -9,9 +9,14 @@
     OpenAI: "openai",
     AzureOpenAI: "azure_open_ai",
   };
+  const MODE = {
+    Create: "create",
+    Edit: "edit",
+  };
+  const t = useTranslations();
 
   export let tenant;
-  const t = useTranslations();
+  let mode = tenant == undefined ? MODE.Create : MODE.Edit;
 
   let hex = "#491EFF";
   let color = "#491EFF";
@@ -27,19 +32,40 @@
     apiKeyProvider = event.target.value;
     console.log(apiKeyProvider, "apiKeyProvider");
   }
+
+  function showUpdateConfirmationModal() {
+    document.getElementById("modal_confirm_update").showModal();
+  }
+
+  function closeUpdateConfirmationModal() {
+    document.getElementById("modal_confirm_update").close();
+  }
+
+  function createTenant() {
+    alert("createTenant");
+  }
+
+  function updateTenant() {
+    alert("updateTenant");
+  }
 </script>
 
 <div class="container w-full mx-auto p-6" style="font-family: Inter;">
   <div class="flex space-x-2 fixed right-14 top-14 pt-2">
-    <button class=" lg:mt-8 btn btn-outline">
+    <!-- <button class=" lg:mt-8 btn btn-outline">
       {@html svgIcons.edit}
       <span>{t("common.edit")}</span>
-    </button>
-    <button class="mt-2 lg:mt-8 btn btn-primary">
+    </button> -->
+    <button
+      class="mt-2 lg:mt-8 btn btn-primary"
+      on:click={() => {
+        mode == MODE.Edit ? showUpdateConfirmationModal() : createTenant();
+      }}
+    >
       {t("common.save")}
     </button>
-    <button class="mt-2 lg:mt-8 btn">
-      {t("common.cancle")}
+    <button class="mt-2 lg:mt-8 btn" onclick="window.history.back();">
+      {t("common.cancel")}
     </button>
   </div>
 
@@ -204,18 +230,48 @@
 
   <div class="w-full h-0.5 mt-4 mb-6 bg-gray-400/20" />
 
-  <div class="flex space-x-2">
-    <!-- <button class=" lg:mt-8 btn btn-outline">
-      {@html svgIcons.edit}
-      <span>{t("common.edit")}</span>
-    </button> -->
-    <button class="mt-2 lg:mt-8 btn btn-primary">
-      {t("common.save")}
-    </button>
-    <button class="mt-2 lg:mt-8 btn">
-      {t("common.cancle")}
-    </button>
+  <div class="mb-3"><span>Included features</span></div>
+
+  <div class="w-full bg-white rounded px-0.5 py-0.5">
+    <div class="form-control">
+      <label class="label cursor-pointer">
+        <input
+          type="checkbox"
+          checked="checked"
+          class="checkbox checkbox-primary"
+        />
+      </label>
+    </div>
   </div>
+
+  <dialog id={"modal_confirm_update"} class="modal">
+    <div class="modal-box">
+      <form method="dialog" id="modalForm">
+        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+          >✕</button
+        >
+        <h3 id="modal_title" class="text-lg font-bold">
+          Are you sure you want to update the tenant information?
+        </h3>
+        <div class="flex justify-between gap-4 mt-6">
+          <button
+            id="yes_button"
+            class="btn btn-warning flex-1"
+            on:click={() => {
+              updateTenant();
+            }}>{t("common.yes")}</button
+          >
+          <button
+            id="no_button"
+            class="btn btn-success flex-1"
+            on:click={() => {
+              closeUpdateConfirmationModal();
+            }}>{t("common.no")}</button
+          >
+        </div>
+      </form>
+    </div>
+  </dialog>
 </div>
 
 <style>
