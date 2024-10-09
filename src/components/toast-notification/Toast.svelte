@@ -10,38 +10,73 @@
   const iconWidth = "1.2rem";
 </script>
 
-<article class={type} role="alert" transition:fade>
+<article class="rounded-lg {type}" role="alert" transition:fade>
   <span class="icon">
     {#if type === "success"}
       <svg
         width={iconWidth}
-        style="text-align: center; display: inline-block;"
-        aria-hidden="true"
-        focusable="false"
-        role="img"
+        viewBox="0 0 24 24"
+        fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 512 512"
       >
         <path
+          d="M12 22C14.7614 22 17.2614 20.8807 19.0711 19.0711C20.8807 17.2614 22 14.7614 22 12C22 9.2386 20.8807 6.7386 19.0711 4.92893C17.2614 3.11929 14.7614 2 12 2C9.2386 2 6.7386 3.11929 4.92893 4.92893C3.11929 6.7386 2 9.2386 2 12C2 14.7614 3.11929 17.2614 4.92893 19.0711C6.7386 20.8807 9.2386 22 12 22Z"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linejoin="round"
+        />
+        <path
+          fill-rule="evenodd"
+          clip-rule="evenodd"
+          d="M12 5.5C12.6904 5.5 13.25 6.05965 13.25 6.75C13.25 7.44035 12.6904 8 12 8C11.3097 8 10.75 7.44035 10.75 6.75C10.75 6.05965 11.3097 5.5 12 5.5Z"
           fill="currentColor"
-          d="M256 8C119.033 8 8 119.033 8 256s111.033 248 248 248 248-111.033 248-248S392.967 8 256 8zm0 464c-118.664 0-216-96.055-216-216 0-118.663 96.055-216 216-216 118.664 0 216 96.055 216 216 0 118.663-96.055 216-216 216zm141.63-274.961L217.15 376.071c-4.705 4.667-12.303 4.637-16.97-.068l-85.878-86.572c-4.667-4.705-4.637-12.303.068-16.97l8.52-8.451c4.705-4.667 12.303-4.637 16.97.068l68.976 69.533 163.441-162.13c4.705-4.667 12.303-4.637 16.97.068l8.451 8.52c4.668 4.705 4.637 12.303-.068 16.97z"
+        />
+        <path
+          d="M12.25 17V10H11.75H11.25"
+          stroke="black"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M10.5 17H14"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
         />
       </svg>
     {:else if type === "error"}
       <svg
         width={iconWidth}
-        style="text-align: center; display: inline-block;"
-        aria-hidden="true"
-        focusable="false"
-        role="img"
+        viewBox="0 0 24 24"
+        fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 512 512"
       >
         <path
+          d="M12 22C17.5229 22 22 17.5229 22 12C22 6.47715 17.5229 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5229 6.47715 22 12 22Z"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M14.8283 9.17139L9.17149 14.8282L14.8283 9.17139Z"
           fill="currentColor"
-          d="M256 40c118.621 0 216 96.075 216 216 0 119.291-96.61 216-216 216-119.244 0-216-96.562-216-216 0-119.203 96.602-216 216-216m0-32C119.043 8 8 119.083 8 256c0 136.997 111.043 248 248 248s248-111.003 248-248C504 119.083 392.957 8 256 8zm-11.49 120h22.979c6.823 0 12.274 5.682 11.99 12.5l-7 168c-.268 6.428-5.556 11.5-11.99 11.5h-8.979c-6.433 0-11.722-5.073-11.99-11.5l-7-168c-.283-6.818 5.167-12.5 11.99-12.5zM256 340c-15.464 0-28 12.536-28 28s12.536 28 28 28 28-12.536 28-28-12.536-28-28-28z"
-          class=""
-        ></path>
+        />
+        <path
+          d="M14.8283 9.17139L9.17149 14.8282"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M9.17165 9.17139L14.8285 14.8282"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
       </svg>
     {:else}
       <svg
@@ -68,7 +103,7 @@
   {#if dismissible}
     <button class="close" on:click={() => dispatch("dismiss")}>
       <svg
-        width="1em"
+        width="0.5em"
         style="text-align: center; display: inline-block;"
         aria-hidden="true"
         focusable="false"
@@ -87,33 +122,31 @@
 
 <style>
   article {
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 0.2rem;
+    color: #000;
+    padding: 1rem;
     display: flex;
     align-items: center;
     margin: 0 0.5rem 0.5rem auto;
-    width: 20rem;
+    min-width: 30rem;
   }
   .error {
-    background: IndianRed;
+    background: #ff6f70;
   }
   .success {
-    background: MediumSeaGreen;
+    background: #00ca92;
   }
   .info {
-    background: SkyBlue;
+    background: #00b3f0;
   }
   .icon {
     display: inline-flex;
     width: 1.5rem;
   }
   .text {
-    margin-left: 1rem;
+    margin-left: 0.5rem;
     margin-right: 0.5rem;
   }
   button {
-    color: white;
     background: transparent;
     border: 0 none;
     padding: 0;
