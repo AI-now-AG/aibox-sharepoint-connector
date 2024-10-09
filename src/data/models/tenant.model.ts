@@ -9,6 +9,10 @@ export enum TenantTheme {
   Lemonade = "lemonade",
 }
 
+export enum TenantFeatures {
+  AudioToText = "audio-to-text",
+}
+
 export const TenantFilterParamsSchema = z.object({
   searchValue: z.string().nullish(),
   showArchived: z.boolean(),
@@ -25,6 +29,7 @@ const TenantSchema = z.object({
   primary_color: z.string().nullish(),
   openai_api_key: z.string().nullish(),
   azure_openai_api_key: z.string().nullish(),
+  included_features: z.array(z.nativeEnum(TenantFeatures)).optional(),
   active: z.boolean().default(true).optional(),
   created_at: z.date().optional(),
   updated_at: z.date().optional(),

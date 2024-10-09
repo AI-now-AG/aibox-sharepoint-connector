@@ -35,10 +35,6 @@
     log.d(data, "Tenant list");
   };
 
-  const gotoDetail = (tenant) => {
-    window.location.href = `tenant-management/${tenant._id}`;
-  };
-
   const copyName = (name) => {
     navigator.clipboard.writeText(name).then(
       function () {
@@ -53,18 +49,18 @@
     );
   };
 
-  function showUpdateStatusConfirmationModal(tenant) {
-    document.getElementById("my_modal_3" + tenant._id).showModal();
+  function showUpdateStatusConfirmationModal(tenantId) {
+    document.getElementById(`confirm_dialog_${tenantId}`).showModal();
   }
 
-  function closeUpdateStatusConfirmationModal(tenant) {
-    document.getElementById("my_modal_3" + tenant._id).close();
+  function closeUpdateStatusConfirmationModal(tenantId) {
+    document.getElementById(`confirm_dialog_${tenantId}`).close();
   }
 
   const updateTenantStatus = async (tenant) => {
     const { active } = tenant;
     log.d(tenant, "updateTenantStatus");
-    closeUpdateStatusConfirmationModal(tenant);
+    closeUpdateStatusConfirmationModal(tenant._id);
 
     showLoading();
     let result;
@@ -160,7 +156,7 @@
           {#each tenants as tenant}
             <tr class="h-2"
               ><td /><td /><td /><td /><td>
-                <dialog id={"my_modal_3" + tenant._id} class="modal">
+                <dialog id={"confirm_dialog_" + tenant._id} class="modal">
                   <div class="modal-box">
                     <form method="dialog" id="modalForm">
                       <button
@@ -183,7 +179,7 @@
                           id="no_button"
                           class="btn btn-success flex-1"
                           on:click={() =>
-                            closeUpdateStatusConfirmationModal(tenant)}
+                            closeUpdateStatusConfirmationModal(tenant._id)}
                           >{t("common.no")}</button
                         >
                       </div>
@@ -195,9 +191,9 @@
 
             <tr class="h-16 bg-white hover:bg-gray-200 text-sm rounded-lg">
               <td class="py-3 px-4 text-sm font-medium rounded-l-lg">
-                <button
+                <a
                   class="underline underline-offset-2"
-                  on:click={() => gotoDetail(tenant)}>{tenant.name}</button
+                  href="/tenant-management/{tenant._id}">{tenant.name}</a
                 >
               </td>
               <td
@@ -230,7 +226,8 @@
                 <div class="dropdown-content py-2">
                   <button
                     class="flex block w-full text-left px-4 py-1 text-sm hover:underline"
-                    on:click={() => showUpdateStatusConfirmationModal(tenant)}
+                    on:click={() =>
+                      showUpdateStatusConfirmationModal(tenant._id)}
                   >
                     {@html tenant.active == 1
                       ? svgIcons.archive
@@ -241,15 +238,15 @@
                         : t("tenant.tenants.tenant.action.active")}</span
                     >
                   </button>
-                  <button
+                  <a
                     class="flex block w-full text-left px-4 py-1 text-sm hover:underline"
-                    on:click={() => gotoDetail(tenant)}
+                    href="/tenant-management/{tenant._id}"
                   >
                     {@html svgIcons.edit}
                     <span class="ml-1"
                       >{t("tenant.tenants.tenant.action.edit")}</span
                     >
-                  </button>
+                  </a>
                 </div>
               </td>
             </tr>

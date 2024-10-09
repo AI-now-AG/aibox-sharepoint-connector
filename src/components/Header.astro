@@ -1,12 +1,15 @@
 ---
-// import local images
+import InitializeTheme from "$components/theme/InitializeTheme.astro";
+import InitializeColor from "$components/theme/InitializeColor.astro";
+import SharedVariables from "$components/theme/SharedVariables.svelte";
 import ThemeSwitcher from "$components/ThemeSwitcher.svelte";
-import InitializeSite from "$components/InitializeSite.svelte";
 import Toasts from "$components/toast-notification/Toasts.svelte";
 import { useTranslations } from "$i18n/utils";
+
 const t = useTranslations();
 
 const user = Astro.locals.user;
+const primaryColor = Astro.locals.tenant.primary_color;
 ---
 
 <style is:global>
@@ -25,7 +28,14 @@ const user = Astro.locals.user;
   }
 </style>
 
-<InitializeSite
+<!-- Set default theme -->
+<InitializeTheme />
+
+<!-- Set primary color -->
+{primaryColor && <InitializeColor />}
+
+<!-- Shared variables for all .svelte components -->
+<SharedVariables
   tenant={Astro.locals.tenant}
   user={Astro.locals.user}
   locale={Astro.locals.locale}
@@ -75,6 +85,16 @@ const user = Astro.locals.user;
       <div class="dropdown dropdown-end">
         <div tabindex="0" role="button" class="btn btn-ghost m-1">
           {t("header.theme")}
+          <svg
+            width="12px"
+            height="12px"
+            class="hidden h-2 w-2 fill-current opacity-60 sm:inline-block"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 2048 2048"
+            ><path
+              d="M1799 349l242 241-1017 1017L7 590l242-241 775 775 775-775z"
+            ></path></svg
+          >
         </div>
         <ThemeSwitcher client:load />
       </div>

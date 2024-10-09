@@ -1,0 +1,10 @@
+---
+const { primary_color: primaryColor } = Astro.locals.tenant;
+---
+
+<style define:vars={{ primaryColor }} is:global>
+  /* Apply the primary color for tenant */
+  :root {
+    color: var(--primary-color);
+  }
+</style>
