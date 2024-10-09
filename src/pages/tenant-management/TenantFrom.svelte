@@ -177,7 +177,7 @@
 
   <div class="w-full h-0.5 mt-4 mb-6 bg-gray-400/20" />
 
-  <div class="mb-3"><span>API Keys</span></div>
+  <div class="mb-3"><b>API Keys</b></div>
 
   <div class="flex flex-row space-x-4">
     <div class="flex-1 flex flex-col">
@@ -230,18 +230,19 @@
 
   <div class="w-full h-0.5 mt-4 mb-6 bg-gray-400/20" />
 
-  <div class="mb-3"><span>Included features</span></div>
+  <div class="mb-3"><b>Included features</b></div>
 
-  <div class="w-full bg-white rounded px-0.5 py-0.5">
-    <div class="form-control">
-      <label class="label cursor-pointer">
-        <input
-          type="checkbox"
-          checked="checked"
-          class="checkbox checkbox-primary"
-        />
-      </label>
-    </div>
+  <div class="w-full bg-white rounded px-4 py-2 flex items-center">
+    <input
+      id="feature-audio-to-text"
+      type="checkbox"
+      checked="checked"
+      class="checkbox checkbox-primary"
+    />
+    <label class="label cursor-pointer ml-2" for="feature-audio-to-text">
+      {@html svgIcons["audio-to-text"]}
+      <span class="label-text ml-2">Audio to text</span>
+    </label>
   </div>
 
   <dialog id={"modal_confirm_update"} class="modal">
