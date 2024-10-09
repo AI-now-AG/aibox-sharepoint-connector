@@ -71,21 +71,25 @@
 
   <div class="flex flex-row space-x-4">
     <div class="flex-1 flex flex-col mb-4">
-      <span class="mb-2 text-gray-400 font-medium text-sm">Diplay name</span>
+      <span class="mb-2 text-gray-400 font-medium text-sm"
+        >{t("tenant.tenants.tenant.display-name")}</span
+      >
       <input
         type="text"
         value={tenant?.name || ""}
-        placeholder={"Display name"}
+        placeholder={t("tenant.tenants.tenant.display-name")}
         class="input input-bordered w-full"
       />
     </div>
 
     <div class="flex-1 flex flex-col mb-4">
-      <span class="mb-2 text-gray-400 font-medium text-sm">Name</span>
+      <span class="mb-2 text-gray-400 font-medium text-sm"
+        >{t("tenant.tenants.tenant.name")}</span
+      >
       <input
         type="text"
         value={tenant?.org_name || ""}
-        placeholder={"Identification name"}
+        placeholder={t("tenant.tenants.tenant.identification-name")}
         class="input input-bordered w-full"
       />
     </div>
@@ -94,31 +98,35 @@
   <div class="flex flex-row space-x-4">
     <div class="flex-1 flex flex-col mb-4">
       <span class="mb-2 text-gray-400 font-medium text-sm"
-        >Default language</span
+        >{t("tenant.defautlt-language")}</span
       >
       <select class="select select-bordered w-full">
-        <option disabled selected>Default language?</option>
-        <option selected>German</option>
-        <option>English</option>
+        <option disabled>{t("tenant.defautlt-language")}</option>
+        <option value="de" selected>{t("tenant.german-language")}</option>
+        <option value="en">{t("tenant.english-language")}</option>
       </select>
     </div>
 
     <div class="flex-1 flex flex-col mb-4">
-      <span class="mb-2 text-gray-400 font-medium text-sm">Default theme</span>
+      <span class="mb-2 text-gray-400 font-medium text-sm"
+        >{t("tenant.default-theme")}</span
+      >
       <select class="select select-bordered w-full">
-        <option disabled selected>Default language?</option>
-        <option selected>Dark</option>
-        <option>Light</option>
-        <option>Somedia</option>
-        <option>Luxury</option>
-        <option>Lemonade</option>
+        <option disabled>{t("tenant.default-theme")}</option>
+        <option value="dark" selected>Dark</option>
+        <option value="light">Light</option>
+        <option value="somedia">Somedia</option>
+        <option value="luxury">Luxury</option>
+        <option value="lemonade">Lemonade</option>
       </select>
     </div>
   </div>
 
   <div class="flex flex-row space-x-4">
     <div class="w-2/4 flex flex-col">
-      <span class="mb-2 text-gray-400 font-medium text-sm">Primary color</span>
+      <span class="mb-2 text-gray-400 font-medium text-sm"
+        >{t("tenant.primary-color")}</span
+      >
       <div class="w-full">
         <div class="relative flex">
           <!-- <div class="w-8 pt-2 mr-2">
@@ -177,7 +185,7 @@
 
   <div class="w-full h-0.5 mt-4 mb-6 bg-gray-400/20" />
 
-  <div class="mb-3"><b>API Keys</b></div>
+  <div class="mb-3"><b>{t("tenant.api-keys")}</b></div>
 
   <div class="flex flex-row space-x-4">
     <div class="flex-1 flex flex-col">
@@ -192,11 +200,13 @@
             selectApiKeyProvider(event);
           }}
         />
-        <span class="ml-2 text-gray-400 font-medium text-sm"> Open AI</span>
+        <span class="ml-2 text-gray-400 font-medium text-sm"
+          >{t("tenant.open-ai-provider")}</span
+        >
       </div>
       <input
         type="text"
-        placeholder={"API key"}
+        placeholder={t("tenant.api-key")}
         class="input input-bordered w-full"
         disabled={apiKeyProvider != API_KEY_PROVIDER.OpenAI}
         style="background-color: white;"
@@ -215,12 +225,13 @@
             selectApiKeyProvider(event);
           }}
         />
-        <span class="ml-2 text-gray-400 font-medium text-sm">Azure Open AI</span
+        <span class="ml-2 text-gray-400 font-medium text-sm"
+          >{t("tenant.azure-open-ai-provider")}</span
         >
       </div>
       <input
         type="text bg-red"
-        placeholder={"API key"}
+        placeholder={t("tenant.api-key")}
         class="input input-bordered w-full"
         disabled={apiKeyProvider != API_KEY_PROVIDER.AzureOpenAI}
         style="background-color: white;"
@@ -230,7 +241,7 @@
 
   <div class="w-full h-0.5 mt-4 mb-6 bg-gray-400/20" />
 
-  <div class="mb-3"><b>Included features</b></div>
+  <div class="mb-3"><b>{t("tenant.included-featured")}</b></div>
 
   <div class="w-full bg-white rounded px-4 py-2 flex items-center">
     <input
@@ -241,7 +252,7 @@
     />
     <label class="label cursor-pointer ml-2" for="feature-audio-to-text">
       {@html svgIcons["audio-to-text"]}
-      <span class="label-text ml-2">Audio to text</span>
+      <span class="label-text ml-2">{t("tenant.audio-to-text")}</span>
     </label>
   </div>
 
@@ -252,7 +263,7 @@
           >✕</button
         >
         <h3 id="modal_title" class="text-lg font-bold">
-          Are you sure you want to update the tenant information?
+          {t("tenant.tenants.tenant.update-confirmation")}
         </h3>
         <div class="flex justify-between gap-4 mt-6">
           <button

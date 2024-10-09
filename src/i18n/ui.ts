@@ -114,6 +114,20 @@ const en = {
     "Are you sure you want to active this tenant?",
   "tenant.tenants.tenant.archive-confirmation":
     "Are you sure you want to archive this tenant?",
+  "tenant.tenants.tenant.identification-name": "Identification name",
+  "tenant.defautlt-language": "Default language",
+  "tenant.english-language": "English",
+  "tenant.german-language": "German",
+  "tenant.default-theme": "Default theme",
+  "tenant.primary-color": "Primary color",
+  "tenant.api-keys": "API Keys",
+  "tenant.api-key": "API Key",
+  "tenant.open-ai-provider": "Open AI",
+  "tenant.azure-open-ai-provider": "Azure Open AI",
+  "tenant.included-featured": "Azure Open AI",
+  "tenant.audio-to-text": "Audio to text",
+  "tenant.tenants.tenant.update-confirmation":
+    " Are you sure you want to update the tenant information?",
 };
 
 const de = {
@@ -225,6 +239,20 @@ const de = {
     "Sind Sie sicher, dass Sie diesen Mieter aktivieren möchten?",
   "tenant.tenants.tenant.archive-confirmation":
     "Sind Sie sicher, dass Sie diesen Mieter archivieren möchten?",
+  "tenant.tenants.tenant.identification-name": "Identifikationsname",
+  "tenant.defautlt-language": "Standard Sprache",
+  "tenant.english-language": "Englisch",
+  "tenant.german-language": "Deutsch",
+  "tenant.default-theme": "Standard Design",
+  "tenant.primary-color": "Primärfarbe",
+  "tenant.api-keys": "API-Schlüssel",
+  "tenant.api-key": "API-Schlüssel",
+  "tenant.open-ai-provider": "Open AI",
+  "tenant.azure-open-ai-provider": "Azure Open AI",
+  "tenant.included-featured": "Azure Open AI",
+  "tenant.audio-to-text": "Audio zu Text",
+  "tenant.tenants.tenant.update-confirmation":
+    "Sind Sie sicher, dass Sie die Mieterinformationen aktualisieren möchten?",
 };
 
 export const ui = {
