@@ -9,8 +9,8 @@
   let knowledgeBaseTitle = "";
   let knowledgeBaseText = "";
 
-  export let knowledgeBaseId: string;
-  export let knowledgeBase: KnowledgeBase;
+  export let knowledgeBaseId: string | undefined = undefined;
+  export let knowledgeBase: KnowledgeBase | undefined = undefined;
   export let isEditable: boolean = false;
 
   let isSaving = false;

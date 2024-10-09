@@ -39,8 +39,8 @@
   let promptTitle = "";
   let promptText = "";
 
-  export let promptId: string;
-  export let prompt: Prompt;
+  export let promptId: string | undefined = undefined;
+  export let prompt: Prompt | undefined = undefined;
   export let isEditable: boolean = false;
 
   let isSaving = false;

@@ -16,8 +16,8 @@
   let title: string | undefined;
   let groups: GroupParam[] = [];
 
-  export let categoryId: string;
-  export let category: CreateCategoryParams;
+  export let categoryId: string | undefined = undefined;
+  export let category: CreateCategoryParams | undefined = undefined;
   export let isEditable: boolean = false;
 
   onMount(async function () {
