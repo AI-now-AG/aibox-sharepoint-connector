@@ -1,11 +1,11 @@
 export const PUBLIC_ROUTES = [
   "/login",
   "/api/login",
-  "/api/users/authorized.json",
   "/login/auth0",
   "/login/auth0/callback",
   "/logout/sucess",
   "/404",
+  "/500",
   "/restricted",
 ];
 

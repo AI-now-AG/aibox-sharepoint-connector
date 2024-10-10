@@ -27,6 +27,14 @@ export async function GET(context: APIContext): Promise<Response> {
   const state = context.url.searchParams.get("state");
   const storedState = context.cookies.get("auth0_state")?.value ?? null;
 
+  // Redirect to 500 error page if any error occur
+  if (context.url.searchParams.has("error")) {
+    const error = context.url.searchParams.get("error");
+    const description = context.url.searchParams.get("error_description");
+    return context.redirect(`/500?code=${error}&description=${description}`);
+  }
+
+  // Ensure the callback has code and valid state
   if (!code || !state || !storedState || state !== storedState) {
     log.e({ code, state, storedState }, "missing required params");
     return new Response(null, {
@@ -56,7 +64,18 @@ export async function GET(context: APIContext): Promise<Response> {
   log.d(existingUser, "existingUser");
 
   if (existingUser) {
+    // Prevent archived tenant member login
+    const tenant = await tenantModel.get(existingUser.tenant_id.toString());
+    if (tenant && tenant.active == false) {
+      return context.redirect(
+        `/500?code=tenant_inactive&description=Sorry, the tenant associated with your account is currently inactive. Please contact the tenant administrator or support for assistance.`,
+      );
+    }
+
+    // Update roles
     await userModel.updateRole(userData.data.sub, roles);
+
+    // Create session
     const session = await lucia.createSession(existingUser._id, {});
     const sessionCookie = lucia.createSessionCookie(session.id);
 
