@@ -10,8 +10,13 @@ export enum TenantTheme {
   Somedia = "somedia",
 }
 
-export enum TenantFeatures {
+export enum TenantFeature {
   AudioToText = "audio-to-text",
+}
+
+export enum ApiKeyProvider {
+  OpenAI = "openai",
+  AzureOpenAI = "azure_openai",
 }
 
 export const TenantFilterParamsSchema = z.object({
@@ -28,9 +33,10 @@ const TenantSchema = z.object({
   default_language: z.string().nullish(),
   theme: z.nativeEnum(TenantTheme),
   primary_color: z.string().nullish(),
+  api_key_provider: z.nativeEnum(ApiKeyProvider).optional(),
   openai_api_key: z.string().nullish(),
   azure_openai_api_key: z.string().nullish(),
-  included_features: z.array(z.nativeEnum(TenantFeatures)).optional(),
+  included_features: z.array(z.nativeEnum(TenantFeature)).optional(),
   active: z.boolean().default(true).optional(),
   created_at: z.date().optional(),
   updated_at: z.date().optional(),
