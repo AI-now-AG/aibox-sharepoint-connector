@@ -44,9 +44,10 @@
     showPicker = !showPicker;
   }
 
-  let apiKeyProvider = API_KEY_PROVIDER.OpenAI;
+  let apiKeyProvider = tenantData?.api_key_provider || API_KEY_PROVIDER.OpenAI;
   function selectApiKeyProvider(event) {
     apiKeyProvider = event.target.value?.trim();
+    tenantData.api_key_provider = apiKeyProvider;
   }
 
   function showUpdateConfirmationModal() {
