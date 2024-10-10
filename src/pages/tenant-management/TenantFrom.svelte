@@ -167,7 +167,7 @@
       {mode == MODE.Create ? t("tenant.tenants.add-tenant") : tenantData.name}
     </h1>
 
-    <div class="flex space-x-2 absolute right-14 top-14 pt-2">
+    <div class="flex space-x-2 fixed right-14 top-14 pt-2">
       <button
         class="mt-2 lg:mt-8 btn btn-primary"
         on:click={() => {
