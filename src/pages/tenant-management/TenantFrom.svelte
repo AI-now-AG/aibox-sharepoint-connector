@@ -55,21 +55,21 @@
 
   function validateForm() {
     if (!tenantData?.name) {
-      showAlert("Please input display name");
+      showAlert(t("tenant.validate-empty-display-name-message"));
       return false;
     }
     if (!tenantData?.org_name) {
-      showAlert("Please input identification name");
+      showAlert(t("tenant.validate-empty-identification-name-message"));
       return false;
     }
     if (apiKeyProvider == API_KEY_PROVIDER.OpenAI) {
       if (!tenantData?.openai_api_key) {
-        showAlert("Please input Open AI key");
+        showAlert(t("tenant.validate-open-ai-key-message"));
         return false;
       }
     } else {
       if (!tenantData?.azure_openai_api_key) {
-        showAlert("Please input Azure Open AI key");
+        showAlert(t("tenant.validate-azure-open-ai-key-message"));
         return false;
       }
     }
@@ -80,7 +80,7 @@
   function createTenant() {
     if (validateForm()) {
       showAlert(JSON.stringify(tenantData));
-    } 
+    }
   }
 
   function updateTenant() {

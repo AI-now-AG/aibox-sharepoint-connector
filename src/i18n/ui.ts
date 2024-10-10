@@ -127,7 +127,12 @@ const en = {
   "tenant.included-featured": "Included features",
   "tenant.audio-to-text": "Audio to text",
   "tenant.tenants.tenant.update-confirmation":
-    " Are you sure you want to update the tenant information?",
+    "Are you sure you want to update the tenant information?",
+  "tenant.validate-empty-display-name-message": "Please input display name",
+  "tenant.validate-empty-identification-name-message":
+    "Please input identification name",
+  "tenant.validate-open-ai-key-message": "Please input Open AI key",
+  "tenant.validate-azure-open-ai-key-message": "Please input Azure Open AI key",
 };
 
 const de = {
@@ -253,6 +258,12 @@ const de = {
   "tenant.audio-to-text": "Audio zu Text",
   "tenant.tenants.tenant.update-confirmation":
     "Sind Sie sicher, dass Sie die Mieterinformationen aktualisieren möchten?",
+  "tenant.validate-empty-display-name-message": "Bitte Anzeigename eingeben",
+  "tenant.validate-empty-identification-name-message":
+    "Bitte Identifikationsname eingeben",
+  "tenant.validate-open-ai-key-message": "Bitte Open AI Schlüssel eingeben",
+  "tenant.validate-azure-open-ai-key-message":
+    "Bitte Azure Open AI Schlüssel eingeben",
 };
 
 export const ui = {
