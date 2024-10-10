@@ -58,6 +58,33 @@
     document.getElementById("modal_confirm_update").close();
   }
 
+  let icon_open_ai = svgIcons.eye_close;
+  let icon_azure_open_ai = svgIcons.eye_close;
+  function togglePassword(_apiKeyProvider) {
+    let passwordField = document.getElementById("open_ai_key");
+    if (_apiKeyProvider == API_KEY_PROVIDER.AzureOpenAI) {
+      passwordField = document.getElementById("azure_open_ai_key");
+    }
+    if (passwordField.type === "password") {
+      passwordField.type = "text";
+
+      if (_apiKeyProvider == API_KEY_PROVIDER.OpenAI) {
+        icon_open_ai = svgIcons.eye;
+      }
+      if (_apiKeyProvider == API_KEY_PROVIDER.AzureOpenAI) {
+        icon_azure_open_ai = svgIcons.eye;
+      }
+    } else {
+      passwordField.type = "password";
+      if (_apiKeyProvider == API_KEY_PROVIDER.OpenAI) {
+        icon_open_ai = svgIcons.eye_close;
+      }
+      if (_apiKeyProvider == API_KEY_PROVIDER.AzureOpenAI) {
+        icon_azure_open_ai = svgIcons.eye_close;
+      }
+    }
+  }
+
   function validateForm() {
     if (!tenantData?.name) {
       showAlert(t("tenant.validate-empty-display-name-message"));
@@ -190,7 +217,7 @@
   <div class="flex flex-row space-x-4">
     <div class="flex-1 flex flex-col mb-4">
       <span class="mb-2 text-gray-400 font-medium text-sm"
-        >{t("tenant.defautlt-language")}</span
+        >{t("tenant.language")}</span
       >
       <select
         class="select select-bordered w-full"
@@ -201,7 +228,7 @@
           showPicker = false;
         }}
       >
-        <option disabled>{t("tenant.defautlt-language")}</option>
+        <option disabled>{t("tenant.language")}</option>
         <option value="de" selected={tenantData?.default_language == "de"}
           >{t("tenant.german-language")}</option
         >
@@ -213,7 +240,7 @@
 
     <div class="flex-1 flex flex-col mb-4">
       <span class="mb-2 text-gray-400 font-medium text-sm"
-        >{t("tenant.default-theme")}</span
+        >{t("tenant.theme")}</span
       >
       <select
         class="select select-bordered w-full"
@@ -224,7 +251,7 @@
           showPicker = false;
         }}
       >
-        <option disabled>{t("tenant.default-theme")}</option>
+        <option disabled>{t("tenant.theme")}</option>
         <option value="light" selected={tenantData?.theme == "light"}
           >Light</option
         >
@@ -333,20 +360,33 @@
           >{t("tenant.open-ai-provider")}</label
         >
       </div>
-      <input
-        type="text"
-        placeholder={t("tenant.api-key")}
-        class="input input-bordered w-full"
-        disabled={apiKeyProvider != API_KEY_PROVIDER.OpenAI}
+
+      <label
+        class="input input-bordered flex items-center gap-2"
         style="background-color: white;"
-        value={tenantData?.openai_api_key ?? ""}
-        on:change={(event) => {
-          tenantData.openai_api_key = event.target.value;
-        }}
-        on:focus={() => {
-          showPicker = false;
-        }}
-      />
+      >
+        <input
+          type="password"
+          class="grow"
+          id="open_ai_key"
+          placeholder={t("tenant.api-key")}
+          disabled={apiKeyProvider != API_KEY_PROVIDER.OpenAI}
+          value={tenantData?.openai_api_key ?? ""}
+          on:change={(event) => {
+            tenantData.openai_api_key = event.target.value;
+          }}
+          on:focus={() => {
+            showPicker = false;
+          }}
+        />
+        <button
+          on:click={() => {
+            togglePassword(API_KEY_PROVIDER.OpenAI);
+          }}
+        >
+          {@html icon_open_ai}
+        </button>
+      </label>
     </div>
 
     <div class="flex-1 flex flex-col">
@@ -371,20 +411,35 @@
           >{t("tenant.azure-open-ai-provider")}</label
         >
       </div>
-      <input
-        type="text"
-        placeholder={t("tenant.api-key")}
-        class="input input-bordered w-full"
-        disabled={apiKeyProvider != API_KEY_PROVIDER.AzureOpenAI}
+
+      <label
+        class="input input-bordered flex items-center gap-2"
         style="background-color: white;"
-        value={tenantData?.azure_openai_api_key ?? ""}
-        on:change={(event) => {
-          tenantData.azure_openai_api_key = event.target.value;
-        }}
-        on:focus={() => {
-          showPicker = false;
-        }}
-      />
+      >
+        <input
+          type="password"
+          class="grow"
+          id="azure_open_ai_key"
+          placeholder={t("tenant.api-key")}
+          disabled={apiKeyProvider != API_KEY_PROVIDER.AzureOpenAI}
+          style="background-color: white;"
+          value={tenantData?.azure_openai_api_key ?? ""}
+          on:change={(event) => {
+            tenantData.azure_openai_api_key = event.target.value;
+          }}
+          on:focus={() => {
+            showPicker = false;
+          }}
+        />
+        <button
+          on:click={() => {
+            togglePassword(API_KEY_PROVIDER.AzureOpenAI);
+          }}
+        >
+          {@html icon_azure_open_ai}
+        </button>
+      </label>
+
     </div>
   </div>
 

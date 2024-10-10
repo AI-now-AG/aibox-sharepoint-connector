@@ -22,14 +22,21 @@ const { title, path, icon } = Astro.props;
       </div>
     ))
     .with(Pattern.string, () => (
-      <div  class:list={[{ active: path === Astro.url.pathname }]}>
-        {icon &&  <span slot="icon" class="[&>svg]:h-4 [&>svg]:w-4">
-          <Fragment set:html={icon} />
-        </span>}
-        <a
-          href={path}
-          class:list={["font-semibold"]}
-        >
+      <div
+        class:list={[
+          {
+            active:
+              path === Astro.url.pathname ||
+              (path && Astro.url.pathname.includes(path)),
+          },
+        ]}
+      >
+        {icon && (
+          <span slot="icon" class="[&>svg]:h-4 [&>svg]:w-4">
+            <Fragment set:html={icon} />
+          </span>
+        )}
+        <a href={path} class:list={["font-semibold"]}>
           {title}
         </a>
       </div>
