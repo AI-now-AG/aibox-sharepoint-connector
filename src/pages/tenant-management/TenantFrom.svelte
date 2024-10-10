@@ -112,7 +112,7 @@
           showAlert(error);
         } else {
           addToast({
-            message: t("tenant.create-successful"),
+            message: t("tenant.update-successful"),
             type: "success",
           });
           window.history.back();
@@ -120,7 +120,6 @@
       } catch (error) {
         showAlert(error);
       }
-    }
     }
   }
 
