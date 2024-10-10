@@ -7,6 +7,7 @@ import type { APIContext, MiddlewareNext } from "astro";
 import tenantModel from "$data/models/tenant.model";
 import { defaultLang } from "$i18n/ui";
 import { setLanguage } from "$i18n/utils";
+import wildcardMatch from "$utils/wildcardMatch";
 
 async function requestOrigin(context: APIContext, next: MiddlewareNext) {
   // Basic CSRF protection
@@ -71,11 +72,11 @@ async function authenticate(context: APIContext, next: MiddlewareNext) {
 }
 
 async function restrictAccess(context: APIContext, next: MiddlewareNext) {
-  if (
-    SUPER_ADMIN_ROUTES.includes(context.url.pathname) &&
-    !auth.isSuperAdmin(context.locals)
-  ) {
-    return context.redirect("/restricted");
+  const matchPaths = SUPER_ADMIN_ROUTES.filter((path) => {
+    return wildcardMatch(context.url.pathname, path);
+  });
+  if (matchPaths.length && !auth.isSuperAdmin(context.locals)) {
+    return context.rewrite("/restricted");
   }
 
   return next();
