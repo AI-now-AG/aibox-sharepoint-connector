@@ -115,7 +115,6 @@
             message: t("tenant.update-successful"),
             type: "success",
           });
-          window.history.back();
         }
       } catch (error) {
         showAlert(error);
