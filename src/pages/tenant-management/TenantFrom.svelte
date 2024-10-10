@@ -46,7 +46,7 @@
 
   let apiKeyProvider = API_KEY_PROVIDER.OpenAI;
   function selectApiKeyProvider(event) {
-    apiKeyProvider = event.target.value;
+    apiKeyProvider = event.target.value?.trim();
   }
 
   function showUpdateConfirmationModal() {
@@ -159,7 +159,7 @@
         placeholder={t("tenant.tenants.tenant.display-name")}
         class="input input-bordered w-full"
         on:change={(event) => {
-          tenantData.name = event.target.value;
+          tenantData.name = event.target.value?.trim();
         }}
         on:focus={() => {
           showPicker = false;
@@ -177,7 +177,7 @@
         placeholder={t("tenant.tenants.tenant.identification-name")}
         class="input input-bordered w-full"
         on:change={(event) => {
-          tenantData.org_name = event.target.value;
+          tenantData.org_name = event.target.value?.trim();
         }}
         on:focus={() => {
           showPicker = false;
