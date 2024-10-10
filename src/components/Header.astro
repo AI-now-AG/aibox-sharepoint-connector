@@ -9,7 +9,7 @@ import { useTranslations } from "$i18n/utils";
 const t = useTranslations();
 
 const user = Astro.locals.user;
-const primaryColor = Astro.locals.tenant.primary_color;
+const primaryColor = Astro.locals.tenant?.primary_color;
 ---
 
 <style is:global>
