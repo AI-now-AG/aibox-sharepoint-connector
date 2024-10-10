@@ -19,7 +19,7 @@
   let mode = tenant == undefined ? MODE.Create : MODE.Edit;
   let tenantData = tenant == undefined ? {} : tenant;
 
-  let hex = tenantData?.primary_color ?? "#491EFF";
+  let hex = tenantData?.primary_color || "#491EFF";
   let color = hex;
   let selecteColor = hex;
 
