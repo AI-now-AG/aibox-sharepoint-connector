@@ -94,6 +94,7 @@
             message: t("tenant.create-successful"),
             type: "success",
           });
+          window.history.back();
         }
       } catch (error) {
         showAlert(error);
