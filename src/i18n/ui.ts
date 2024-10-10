@@ -133,6 +133,7 @@ const en = {
     "Please input identification name",
   "tenant.validate-open-ai-key-message": "Please input Open AI key",
   "tenant.validate-azure-open-ai-key-message": "Please input Azure Open AI key",
+  "tenant.create-successful": "Create tenant successful",
 };
 
 const de = {
@@ -264,6 +265,7 @@ const de = {
   "tenant.validate-open-ai-key-message": "Bitte Open AI Schlüssel eingeben",
   "tenant.validate-azure-open-ai-key-message":
     "Bitte Azure Open AI Schlüssel eingeben",
+  "tenant.create-successful": "Mieter erfolgreich erstellt",
 };
 
 export const ui = {

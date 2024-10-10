@@ -1,8 +1,12 @@
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <script>
+  import { actions } from "astro:actions";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
+  import { addToast } from "$stores/toast";
+  import Loading from "$components/Loading.svelte";
+  import { loading, showLoading, hideLoading } from "$stores";
   import ColorPicker, { ChromeVariant } from "svelte-awesome-color-picker";
 
   const API_KEY_PROVIDER = {
@@ -77,9 +81,23 @@
     return true;
   }
 
-  function createTenant() {
+  async function createTenant() {
     if (validateForm()) {
-      showAlert(JSON.stringify(tenantData));
+      try {
+        showLoading();
+        const { error } = await actions.tenant.create(tenantData);
+        hideLoading();
+        if (error) {
+          showAlert(error);
+        } else {
+          addToast({
+            message: t("tenant.create-successful"),
+            type: "success",
+          });
+        }
+      } catch (error) {
+        showAlert(error);
+      }
     }
   }
 
@@ -431,6 +449,8 @@
     </div>
   </dialog>
 </div>
+
+<Loading bind:show={$loading} />
 
 <style>
   .color-preview {
