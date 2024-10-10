@@ -1,8 +1,12 @@
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <script>
+  import { actions } from "astro:actions";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
+  import { addToast } from "$stores/toast";
+  import Loading from "$components/Loading.svelte";
+  import { loading, showLoading, hideLoading } from "$stores";
   import ColorPicker, { ChromeVariant } from "svelte-awesome-color-picker";
 
   const API_KEY_PROVIDER = {
@@ -19,19 +23,30 @@
   let mode = tenant == undefined ? MODE.Create : MODE.Edit;
   let tenantData = tenant == undefined ? {} : tenant;
 
-  let hex = "#491EFF";
-  let color = "#491EFF";
-  let selecteColor = "#491EFF";
+  let hex = tenantData?.primary_color || "#491EFF";
+  let color = hex;
+  let selecteColor = hex;
+
+  if (!tenantData.default_language) {
+    tenantData.default_language = "de";
+  }
+
+  if (!tenantData.theme) {
+    tenantData.theme = "dark";
+  }
+
+  if (!tenantData.primary_color) {
+    tenantData.primary_color = selecteColor;
+  }
 
   let showPicker = false;
   function toggleColorPicker() {
     showPicker = !showPicker;
   }
 
-  let apiKeyProvider = API_KEY_PROVIDER.AzureOpenAI;
+  let apiKeyProvider = API_KEY_PROVIDER.OpenAI;
   function selectApiKeyProvider(event) {
     apiKeyProvider = event.target.value;
-    console.log(apiKeyProvider, "apiKeyProvider");
   }
 
   function showUpdateConfirmationModal() {
@@ -44,28 +59,58 @@
 
   function validateForm() {
     if (!tenantData?.name) {
-      alert("Please input display name");
+      showAlert(t("tenant.validate-empty-display-name-message"));
       return false;
     }
     if (!tenantData?.org_name) {
-      alert("Please input identification name");
+      showAlert(t("tenant.validate-empty-identification-name-message"));
       return false;
     }
+    if (apiKeyProvider == API_KEY_PROVIDER.OpenAI) {
+      if (!tenantData?.openai_api_key) {
+        showAlert(t("tenant.validate-open-ai-key-message"));
+        return false;
+      }
+    } else {
+      if (!tenantData?.azure_openai_api_key) {
+        showAlert(t("tenant.validate-azure-open-ai-key-message"));
+        return false;
+      }
+    }
+
     return true;
   }
 
-  function createTenant() {
+  async function createTenant() {
     if (validateForm()) {
-      alert("createTenant");
+      try {
+        showLoading();
+        const { error } = await actions.tenant.create(tenantData);
+        hideLoading();
+        if (error) {
+          showAlert(error);
+        } else {
+          addToast({
+            message: t("tenant.create-successful"),
+            type: "success",
+          });
+          window.history.back();
+        }
+      } catch (error) {
+        showAlert(error);
+      }
     }
-    // TODO: Create tenant
   }
 
   function updateTenant() {
     if (validateForm()) {
-      alert("updateTenant");
+      showAlert(JSON.stringify(tenantData));
     }
-    // TODO: Create tenant
+  }
+
+  function showAlert(message) {
+    document.getElementById("alert_message").textContent = message;
+    document.getElementById("my_modal_3").showModal();
   }
 </script>
 
@@ -78,6 +123,7 @@
     <button
       class="mt-2 lg:mt-8 btn btn-primary"
       on:click={() => {
+        showPicker = false;
         mode == MODE.Edit ? showUpdateConfirmationModal() : createTenant();
       }}
     >
@@ -101,6 +147,9 @@
         on:change={(event) => {
           tenantData.name = event.target.value;
         }}
+        on:focus={() => {
+          showPicker = false;
+        }}
       />
     </div>
 
@@ -116,6 +165,9 @@
         on:change={(event) => {
           tenantData.org_name = event.target.value;
         }}
+        on:focus={() => {
+          showPicker = false;
+        }}
       />
     </div>
   </div>
@@ -128,12 +180,19 @@
       <select
         class="select select-bordered w-full"
         on:change={(event) => {
-          console.log(event.target.value);
+          tenantData.default_language = event.target.value;
+        }}
+        on:focus={() => {
+          showPicker = false;
         }}
       >
         <option disabled>{t("tenant.defautlt-language")}</option>
-        <option value="de" selected>{t("tenant.german-language")}</option>
-        <option value="en">{t("tenant.english-language")}</option>
+        <option value="de" selected={tenantData?.default_language == "de"}
+          >{t("tenant.german-language")}</option
+        >
+        <option value="en" selected={tenantData?.default_language == "en"}
+          >{t("tenant.english-language")}</option
+        >
       </select>
     </div>
 
@@ -144,15 +203,27 @@
       <select
         class="select select-bordered w-full"
         on:change={(event) => {
-          console.log(event.target.value);
+          tenantData.theme = event.target.value;
+        }}
+        on:focus={() => {
+          showPicker = false;
         }}
       >
         <option disabled>{t("tenant.default-theme")}</option>
-        <option value="dark" selected>Dark</option>
-        <option value="light">Light</option>
-        <option value="somedia">Somedia</option>
-        <option value="luxury">Luxury</option>
-        <option value="lemonade">Lemonade</option>
+        <option value="light" selected={tenantData?.theme == "light"}
+          >Light</option
+        >
+        <option value="dark" selected={tenantData?.theme == "dark"}>Dark</option
+        >
+        <option value="somedia" selected={tenantData?.theme == "somedia"}
+          >Somedia</option
+        >
+        <option value="luxury" selected={tenantData?.theme == "luxury"}
+          >Luxury</option
+        >
+        <option value="lemonade" selected={tenantData?.theme == "lemonade"}
+          >Lemonade</option
+        >
       </select>
     </div>
   </div>
@@ -177,6 +248,7 @@
               textInputModes={["hex"]}
               on:input={(event) => {
                 selecteColor = event.detail.hex;
+                tenantData.primary_color = selecteColor;
               }}
             />
           </div> -->
@@ -202,8 +274,7 @@
                   textInputModes={["hex"]}
                   on:input={(event) => {
                     selecteColor = event.detail.hex;
-                    tenantData.primaryColor = selecteColor;
-                    console.log(tenantData.primaryColor);
+                    tenantData.primary_color = selecteColor;
                   }}
                 />
               </div>
@@ -229,6 +300,7 @@
       <div class="flex items-center mb-2">
         <input
           type="radio"
+          id="radio-azure-open-api-key"
           name="radio-api-key"
           class="radio radio-primary"
           value={API_KEY_PROVIDER.OpenAI}
@@ -236,9 +308,14 @@
           on:change={(event) => {
             selectApiKeyProvider(event);
           }}
+          on:focus={() => {
+            showPicker = false;
+          }}
         />
-        <span class="ml-2 text-gray-400 font-medium text-sm"
-          >{t("tenant.open-ai-provider")}</span
+        <label
+          for="radio-azure-open-api-key"
+          class="ml-2 text-gray-400 font-medium text-sm"
+          >{t("tenant.open-ai-provider")}</label
         >
       </div>
       <input
@@ -247,6 +324,13 @@
         class="input input-bordered w-full"
         disabled={apiKeyProvider != API_KEY_PROVIDER.OpenAI}
         style="background-color: white;"
+        value={tenantData?.openai_api_key ?? ""}
+        on:change={(event) => {
+          tenantData.openai_api_key = event.target.value;
+        }}
+        on:focus={() => {
+          showPicker = false;
+        }}
       />
     </div>
 
@@ -254,6 +338,7 @@
       <div class="flex items-center mb-2">
         <input
           type="radio"
+          id="radio-open-api-key"
           name="radio-api-key"
           class="radio radio-primary"
           value={API_KEY_PROVIDER.AzureOpenAI}
@@ -261,17 +346,29 @@
           on:change={(event) => {
             selectApiKeyProvider(event);
           }}
+          on:focus={() => {
+            showPicker = false;
+          }}
         />
-        <span class="ml-2 text-gray-400 font-medium text-sm"
-          >{t("tenant.azure-open-ai-provider")}</span
+        <label
+          for="radio-open-api-key"
+          class="ml-2 text-gray-400 font-medium text-sm"
+          >{t("tenant.azure-open-ai-provider")}</label
         >
       </div>
       <input
-        type="text bg-red"
+        type="text"
         placeholder={t("tenant.api-key")}
         class="input input-bordered w-full"
         disabled={apiKeyProvider != API_KEY_PROVIDER.AzureOpenAI}
         style="background-color: white;"
+        value={tenantData?.azure_openai_api_key ?? ""}
+        on:change={(event) => {
+          tenantData.azure_openai_api_key = event.target.value;
+        }}
+        on:focus={() => {
+          showPicker = false;
+        }}
       />
     </div>
   </div>
@@ -280,12 +377,32 @@
 
   <div class="mb-3"><b>{t("tenant.included-featured")}</b></div>
 
-  <div class="w-full bg-white rounded px-4 py-2 flex items-center">
+  <div
+    class="w-full bg-white rounded px-4 py-2 flex items-center"
+    on:click={() => {
+      showPicker = false;
+    }}
+  >
     <input
       id="feature-audio-to-text"
       type="checkbox"
-      checked="checked"
+      checked={tenantData?.included_features != undefined &&
+        tenantData?.included_features?.indexOf("audio-to-text") != -1}
       class="checkbox checkbox-primary"
+      value="audio-to-text"
+      on:change={(event) => {
+        const feature = event.target.value;
+        const indexToRemove = (tenantData?.included_features || []).indexOf(
+          feature,
+        );
+        let newIncludedFeatures = tenantData?.included_features || [];
+        if (indexToRemove !== -1) {
+          newIncludedFeatures.splice(indexToRemove, 1);
+        } else {
+          newIncludedFeatures.push(feature);
+        }
+        tenantData.included_features = newIncludedFeatures;
+      }}
     />
     <label class="label cursor-pointer ml-2" for="feature-audio-to-text">
       {@html svgIcons["audio-to-text"]}
@@ -321,7 +438,20 @@
       </form>
     </div>
   </dialog>
+
+  <dialog id="my_modal_3" class="modal">
+    <div class="modal-box">
+      <form method="dialog">
+        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+          >✕</button
+        >
+      </form>
+      <p id="alert_message" style="color: rgb(159 18 57);"></p>
+    </div>
+  </dialog>
 </div>
+
+<Loading bind:show={$loading} />
 
 <style>
   .color-preview {

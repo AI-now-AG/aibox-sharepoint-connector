@@ -7,6 +7,7 @@ export enum TenantTheme {
   Dark = "dark",
   Luxury = "luxury",
   Lemonade = "lemonade",
+  Somedia = "somedia",
 }
 
 export enum TenantFeatures {

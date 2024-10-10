@@ -18,7 +18,21 @@ const fetchTenant = async () => {
 };
 
 const tenatData = await fetchTenant();
+// TODO: Clean up mocking data bellow 
+// const data = {
+//   _id: "66eac0936802b78d28a1e98d",
+//   org_name: "business4you 1",
+//   name: "Business4you 1",
+//   active: true,
+//   primary_color: 'pink',
+//   theme: 'somedia',
+//   default_language: 'de',
+//   openai_api_key: 'openai_api_key 123',
+//   azure_openai_api_key: 'azure_openai_api_key 456',
+//   included_features: ["audio-to-text"]
+// };
 const { data } = tenatData || {};
+
 ---
 
 <Layout>
