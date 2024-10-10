@@ -1,0 +1,30 @@
+---
+import BlankLayout from "$layouts/BlankLayout.astro";
+
+interface Props {
+  error: unknown;
+}
+
+export const prerender = true;
+
+const { error } = Astro.props;
+---
+
+<BlankLayout title="Internal server error">
+  <section class="flex items-center h-full p-16">
+    <div
+      class="container flex flex-col items-center justify-center px-5 mx-auto my-8"
+    >
+      <div class="max-w-lg text-center">
+        <h1 class="mb-8 text-4xl font-extrabold">Server error</h1>
+        <p class="text-1xl">
+          {
+            error instanceof Error
+              ? error.message
+              : "Sorry, something went wrong on our end. Please try refreshing the page or come back later."
+          }
+        </p>
+      </div>
+    </div>
+  </section>
+</BlankLayout>
