@@ -93,6 +93,7 @@
     <button
       class="mt-2 lg:mt-8 btn btn-primary"
       on:click={() => {
+        showPicker = false;
         mode == MODE.Edit ? showUpdateConfirmationModal() : createTenant();
       }}
     >
@@ -116,6 +117,9 @@
         on:change={(event) => {
           tenantData.name = event.target.value;
         }}
+        on:focus={() => {
+          showPicker = false;
+        }}
       />
     </div>
 
@@ -131,6 +135,9 @@
         on:change={(event) => {
           tenantData.org_name = event.target.value;
         }}
+        on:focus={() => {
+          showPicker = false;
+        }}
       />
     </div>
   </div>
@@ -144,6 +151,9 @@
         class="select select-bordered w-full"
         on:change={(event) => {
           tenantData.default_language = event.target.value;
+        }}
+        on:focus={() => {
+          showPicker = false;
         }}
       >
         <option disabled>{t("tenant.defautlt-language")}</option>
@@ -160,6 +170,9 @@
         class="select select-bordered w-full"
         on:change={(event) => {
           tenantData.theme = event.target.value;
+        }}
+        on:focus={() => {
+          showPicker = false;
         }}
       >
         <option disabled>{t("tenant.default-theme")}</option>
@@ -244,6 +257,7 @@
       <div class="flex items-center mb-2">
         <input
           type="radio"
+          id="radio-azure-open-api-key"
           name="radio-api-key"
           class="radio radio-primary"
           value={API_KEY_PROVIDER.OpenAI}
@@ -251,9 +265,14 @@
           on:change={(event) => {
             selectApiKeyProvider(event);
           }}
+          on:focus={() => {
+            showPicker = false;
+          }}
         />
-        <span class="ml-2 text-gray-400 font-medium text-sm"
-          >{t("tenant.open-ai-provider")}</span
+        <label
+          for="radio-azure-open-api-key"
+          class="ml-2 text-gray-400 font-medium text-sm"
+          >{t("tenant.open-ai-provider")}</label
         >
       </div>
       <input
@@ -265,6 +284,9 @@
         on:change={(event) => {
           tenantData.openai_api_key = event.target.value;
         }}
+        on:focus={() => {
+          showPicker = false;
+        }}
       />
     </div>
 
@@ -272,6 +294,7 @@
       <div class="flex items-center mb-2">
         <input
           type="radio"
+          id="radio-open-api-key"
           name="radio-api-key"
           class="radio radio-primary"
           value={API_KEY_PROVIDER.AzureOpenAI}
@@ -279,9 +302,14 @@
           on:change={(event) => {
             selectApiKeyProvider(event);
           }}
+          on:focus={() => {
+            showPicker = false;
+          }}
         />
-        <span class="ml-2 text-gray-400 font-medium text-sm"
-          >{t("tenant.azure-open-ai-provider")}</span
+        <label
+          for="radio-open-api-key"
+          class="ml-2 text-gray-400 font-medium text-sm"
+          >{t("tenant.azure-open-ai-provider")}</label
         >
       </div>
       <input
@@ -292,6 +320,9 @@
         style="background-color: white;"
         on:change={(event) => {
           tenantData.azure_openai_api_key = event.target.value;
+        }}
+        on:focus={() => {
+          showPicker = false;
         }}
       />
     </div>
@@ -306,9 +337,7 @@
       id="feature-audio-to-text"
       type="checkbox"
       checked={tenantData?.included_features != undefined &&
-        tenantData?.included_features?.indexOf(
-         "audio-to-text",
-        ) != -1}
+        tenantData?.included_features?.indexOf("audio-to-text") != -1}
       class="checkbox checkbox-primary"
       value="audio-to-text"
       on:change={(event) => {
