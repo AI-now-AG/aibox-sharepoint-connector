@@ -21,3 +21,10 @@ import BlankLayout from "$layouts/BlankLayout.astro";
     </div>
   </section>
 </BlankLayout>
+
+<script is:inline>
+  /* Remove all local storage items */
+  document.addEventListener("astro:page-load", function () {
+    localStorage.clear();
+  });
+</script>
