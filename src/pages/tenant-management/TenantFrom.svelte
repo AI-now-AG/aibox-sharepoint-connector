@@ -102,9 +102,25 @@
     }
   }
 
-  function updateTenant() {
+  async function updateTenant() {
     if (validateForm()) {
-      showAlert(JSON.stringify(tenantData));
+      try {
+        showLoading();
+        const { error } = await actions.tenant.update(tenantData);
+        hideLoading();
+        if (error) {
+          showAlert(error);
+        } else {
+          addToast({
+            message: t("tenant.create-successful"),
+            type: "success",
+          });
+          window.history.back();
+        }
+      } catch (error) {
+        showAlert(error);
+      }
+    }
     }
   }
 
