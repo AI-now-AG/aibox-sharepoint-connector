@@ -2,6 +2,7 @@
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <script>
   import { svgIcons } from "$assets/icons";
+  import { TenantFeatures } from "$data/models/tenant.model";
   import { useTranslations } from "$i18n/utils";
   import ColorPicker, { ChromeVariant } from "svelte-awesome-color-picker";
 
@@ -25,13 +26,13 @@
 
   let showPicker = false;
   function toggleColorPicker() {
+    alert(!showPicker)
     showPicker = !showPicker;
   }
 
   let apiKeyProvider = API_KEY_PROVIDER.AzureOpenAI;
   function selectApiKeyProvider(event) {
     apiKeyProvider = event.target.value;
-    console.log(apiKeyProvider, "apiKeyProvider");
   }
 
   function showUpdateConfirmationModal() {
@@ -44,12 +45,23 @@
 
   function validateForm() {
     if (!tenantData?.name) {
-      alert("Please input display name");
+      showAlert("Please input display name");
       return false;
     }
     if (!tenantData?.org_name) {
-      alert("Please input identification name");
+      showAlert("Please input identification name");
       return false;
+    }
+    if (apiKeyProvider == API_KEY_PROVIDER.OpenAI) {
+      if (!tenantData?.openai_api_key) {
+        showAlert("Please input Open AI key");
+        return false;
+      }
+    } else {
+      if (!tenantData?.azure_openai_api_key) {
+        showAlert("Please input Azure Open AI key");
+        return false;
+      }
     }
     return true;
   }
@@ -66,6 +78,11 @@
       alert("updateTenant");
     }
     // TODO: Create tenant
+  }
+
+  function showAlert(message) {
+    document.getElementById("alert_message").textContent = message;
+    document.getElementById("my_modal_3").showModal();
   }
 </script>
 
@@ -128,7 +145,7 @@
       <select
         class="select select-bordered w-full"
         on:change={(event) => {
-          console.log(event.target.value);
+          tenantData.default_language = event.target.value;
         }}
       >
         <option disabled>{t("tenant.defautlt-language")}</option>
@@ -144,7 +161,7 @@
       <select
         class="select select-bordered w-full"
         on:change={(event) => {
-          console.log(event.target.value);
+          tenantData.theme = event.target.value;
         }}
       >
         <option disabled>{t("tenant.default-theme")}</option>
@@ -247,6 +264,9 @@
         class="input input-bordered w-full"
         disabled={apiKeyProvider != API_KEY_PROVIDER.OpenAI}
         style="background-color: white;"
+        on:change={(event) => {
+          tenantData.openai_api_key = event.target.value;
+        }}
       />
     </div>
 
@@ -272,6 +292,9 @@
         class="input input-bordered w-full"
         disabled={apiKeyProvider != API_KEY_PROVIDER.AzureOpenAI}
         style="background-color: white;"
+        on:change={(event) => {
+          tenantData.azure_openai_api_key = event.target.value;
+        }}
       />
     </div>
   </div>
@@ -284,8 +307,25 @@
     <input
       id="feature-audio-to-text"
       type="checkbox"
-      checked="checked"
+      checked={tenantData?.included_features != undefined &&
+        tenantData?.included_features?.indexOf(
+          TenantFeatures.AudioToText.toString(),
+        ) != -1}
       class="checkbox checkbox-primary"
+      value={TenantFeatures.AudioToText.toString()}
+      on:change={(event) => {
+        const feature = event.target.value;
+        const indexToRemove = (tenantData?.included_features || []).indexOf(
+          feature,
+        );
+        let newIncludedFeatures = tenantData?.included_features || [];
+        if (indexToRemove !== -1) {
+          newIncludedFeatures.splice(indexToRemove, 1);
+        } else {
+          newIncludedFeatures.push(feature);
+        }
+        tenantData.included_features = newIncludedFeatures;
+      }}
     />
     <label class="label cursor-pointer ml-2" for="feature-audio-to-text">
       {@html svgIcons["audio-to-text"]}
@@ -319,6 +359,17 @@
           >
         </div>
       </form>
+    </div>
+  </dialog>
+
+  <dialog id="my_modal_3" class="modal">
+    <div class="modal-box">
+      <form method="dialog">
+        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+          >✕</button
+        >
+      </form>
+      <p id="alert_message" style="color: rgb(159 18 57);"></p>
     </div>
   </dialog>
 </div>
