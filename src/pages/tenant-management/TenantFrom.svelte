@@ -2,7 +2,6 @@
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <script>
   import { svgIcons } from "$assets/icons";
-  import { TenantFeatures } from "$data/models/tenant.model";
   import { useTranslations } from "$i18n/utils";
   import ColorPicker, { ChromeVariant } from "svelte-awesome-color-picker";
 
@@ -26,11 +25,10 @@
 
   let showPicker = false;
   function toggleColorPicker() {
-    alert(!showPicker)
     showPicker = !showPicker;
   }
 
-  let apiKeyProvider = API_KEY_PROVIDER.AzureOpenAI;
+  let apiKeyProvider = API_KEY_PROVIDER.OpenAI;
   function selectApiKeyProvider(event) {
     apiKeyProvider = event.target.value;
   }
@@ -309,10 +307,10 @@
       type="checkbox"
       checked={tenantData?.included_features != undefined &&
         tenantData?.included_features?.indexOf(
-          TenantFeatures.AudioToText.toString(),
+         "audio-to-text",
         ) != -1}
       class="checkbox checkbox-primary"
-      value={TenantFeatures.AudioToText.toString()}
+      value="audio-to-text"
       on:change={(event) => {
         const feature = event.target.value;
         const indexToRemove = (tenantData?.included_features || []).indexOf(
