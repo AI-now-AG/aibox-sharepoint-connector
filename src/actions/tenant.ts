@@ -3,7 +3,8 @@ import { ObjectId } from "mongodb";
 import { z } from "zod";
 import tenantModel, {
   TenantTheme,
-  TenantFeatures,
+  TenantFeature,
+  ApiKeyProvider,
   TenantFilterParamsSchema,
   type Tenant,
 } from "$data/models/tenant.model";
@@ -19,9 +20,10 @@ const TenantInputParamsSchema = z.object({
   default_language: z.string(),
   theme: z.nativeEnum(TenantTheme),
   primary_color: z.string().optional(),
+  api_key_provider: z.nativeEnum(ApiKeyProvider).optional(),
   openai_api_key: z.string().optional(),
   azure_openai_api_key: z.string().optional(),
-  included_features: z.array(z.nativeEnum(TenantFeatures)).optional(),
+  included_features: z.array(z.nativeEnum(TenantFeature)).optional(),
 });
 
 const TenantInputIdentifierSchema = z.object({

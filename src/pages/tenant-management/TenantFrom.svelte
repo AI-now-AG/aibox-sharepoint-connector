@@ -11,7 +11,7 @@
 
   const API_KEY_PROVIDER = {
     OpenAI: "openai",
-    AzureOpenAI: "azure_open_ai",
+    AzureOpenAI: "azure_openai",
   };
   const MODE = {
     Create: "create",
