@@ -19,9 +19,21 @@
   let mode = tenant == undefined ? MODE.Create : MODE.Edit;
   let tenantData = tenant == undefined ? {} : tenant;
 
-  let hex = "#491EFF";
-  let color = "#491EFF";
-  let selecteColor = "#491EFF";
+  let hex = tenantData?.primary_color ?? "#491EFF";
+  let color = hex;
+  let selecteColor = hex;
+
+  if (!tenantData.default_language) {
+    tenantData.default_language = "de";
+  }
+
+  if (!tenantData.theme) {
+    tenantData.theme = "dark";
+  }
+
+  if (!tenantData.primary_color) {
+    tenantData.primary_color = selecteColor;
+  }
 
   let showPicker = false;
   function toggleColorPicker() {
@@ -61,6 +73,7 @@
         return false;
       }
     }
+
     return true;
   }
 
@@ -157,8 +170,12 @@
         }}
       >
         <option disabled>{t("tenant.defautlt-language")}</option>
-        <option value="de" selected>{t("tenant.german-language")}</option>
-        <option value="en">{t("tenant.english-language")}</option>
+        <option value="de" selected={tenantData?.default_language == "de"}
+          >{t("tenant.german-language")}</option
+        >
+        <option value="en" selected={tenantData?.default_language == "en"}
+          >{t("tenant.english-language")}</option
+        >
       </select>
     </div>
 
@@ -176,11 +193,20 @@
         }}
       >
         <option disabled>{t("tenant.default-theme")}</option>
-        <option value="dark" selected>Dark</option>
-        <option value="light">Light</option>
-        <option value="somedia">Somedia</option>
-        <option value="luxury">Luxury</option>
-        <option value="lemonade">Lemonade</option>
+        <option value="light" selected={tenantData?.theme == "light"}
+          >Light</option
+        >
+        <option value="dark" selected={tenantData?.theme == "dark"}>Dark</option
+        >
+        <option value="somedia" selected={tenantData?.theme == "somedia"}
+          >Somedia</option
+        >
+        <option value="luxury" selected={tenantData?.theme == "luxury"}
+          >Luxury</option
+        >
+        <option value="lemonade" selected={tenantData?.theme == "lemonade"}
+          >Lemonade</option
+        >
       </select>
     </div>
   </div>
@@ -281,6 +307,7 @@
         class="input input-bordered w-full"
         disabled={apiKeyProvider != API_KEY_PROVIDER.OpenAI}
         style="background-color: white;"
+        value={tenantData?.openai_api_key ?? ""}
         on:change={(event) => {
           tenantData.openai_api_key = event.target.value;
         }}
@@ -313,11 +340,12 @@
         >
       </div>
       <input
-        type="text bg-red"
+        type="text"
         placeholder={t("tenant.api-key")}
         class="input input-bordered w-full"
         disabled={apiKeyProvider != API_KEY_PROVIDER.AzureOpenAI}
         style="background-color: white;"
+        value={tenantData?.azure_openai_api_key ?? ""}
         on:change={(event) => {
           tenantData.azure_openai_api_key = event.target.value;
         }}
@@ -332,7 +360,12 @@
 
   <div class="mb-3"><b>{t("tenant.included-featured")}</b></div>
 
-  <div class="w-full bg-white rounded px-4 py-2 flex items-center">
+  <div
+    class="w-full bg-white rounded px-4 py-2 flex items-center"
+    on:click={() => {
+      showPicker = false;
+    }}
+  >
     <input
       id="feature-audio-to-text"
       type="checkbox"
