@@ -95,16 +95,17 @@ const modules = [
 <nav class="flex flex-col bg-base-100 w-80 min-h-screen gap-6">
   <div class="mt-4 pl-6">
     <a href="/">
-      <img src="/soki-somedia.png" alt="Somedia Logo" class="h-8 somedia" />
+      <img
+        src="/soki-somedia.png"
+        alt="Somedia Logo"
+        class="h-8 logo-somedia"
+      />
       <!-- light/dark mode doesn't work currently in the way themes are implemented. Currently only the light variant will be rendered -->
       <img
         src="/aibox-logo-text.svg"
-        class="non-somedia h-8 w-auto dark:hidden"
+        class="logo-light h-8 w-auto dark:hidden"
       />
-      <img
-        src="/aibox-logo-text-dark.svg"
-        class="non-somedia h-12 hidden dark:block"
-      />
+      <img src="/aibox-logo-text-dark.svg" class="logo-dark h-8 dark:block" />
     </a>
   </div>
   <div>

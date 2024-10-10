@@ -14,17 +14,23 @@ const primaryColor = Astro.locals.tenant?.primary_color;
 
 <style is:global>
   /* TODO: Workaround for the demo. The logo has to be part of the theme. */
-  .non-somedia {
-    display: block;
-  }
-  [data-theme="somedia"] .non-somedia {
+  .logo-somedia {
     display: none;
   }
-  .somedia {
+  [data-theme="somedia"] .logo-somedia {
+    display: block;
+  }
+  [data-theme="somedia"] .logo-light,
+  [data-theme="somedia"] .logo-dark {
     display: none;
   }
-  [data-theme="somedia"] .somedia {
-    display: block;
+  [data-theme="dark"] .logo-light,
+  [data-theme="luxury"] .logo-light {
+    display: none;
+  }
+  [data-theme="light"] .logo-dark,
+  [data-theme="lemonade"] .logo-dark {
+    display: none;
   }
 </style>
 
@@ -67,15 +73,19 @@ const primaryColor = Astro.locals.tenant?.primary_color;
     </div>
     <div class="lg:hidden pl-2">
       <a href="/">
-        <img src="/soki-somedia.png" alt="Somedia Logo" class="h-8 somedia" />
+        <img
+          src="/soki-somedia.png"
+          alt="Somedia Logo"
+          class="h-8 logo-somedia"
+        />
         <!-- light/dark mode doesn't work currently in the way themes are implemented. Currently only the light variant will be rendered -->
         <img
           src="/aibox-logo-text.svg"
-          class="non-somedia h-8 w-auto dark:hidden"
+          class="logo-light h-8 w-auto dark:hidden"
         />
         <img
           src="/aibox-logo-text-dark.svg"
-          class="non-somedia h-12 hidden dark:block"
+          class="logo-dark h-12 hidden dark:block"
         />
       </a>
     </div>
