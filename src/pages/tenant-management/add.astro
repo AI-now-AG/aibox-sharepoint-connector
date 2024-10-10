@@ -2,25 +2,10 @@
 import Layout from "$layouts/Layout.astro";
 import { useTranslations } from "$i18n/utils";
 import TenantFrom from "./TenantFrom.svelte";
-import { svgIcons } from "$assets/icons";
 
 const t = useTranslations();
 ---
 
 <Layout>
-  <div
-    class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14"
-  >
-    <div class="flex items-center pt-8">
-      <button class="mr-4" onclick="window.history.back();">
-        <span set:html={svgIcons.back} />
-      </button>
-      <h1 class="text-4xl font-bold">
-        {t("tenant.tenants.add-tenant")}
-      </h1>
-    </div>
-  </div>
-  <div class="px-8">
-    <TenantFrom client:load tenant={undefined} />
-  </div>
+  <TenantFrom client:load tenant={undefined} />
 </Layout>
