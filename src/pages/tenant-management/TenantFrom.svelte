@@ -79,16 +79,14 @@
 
   function createTenant() {
     if (validateForm()) {
-      alert("createTenant");
-    }
-    // TODO: Create tenant
+      showAlert(JSON.stringify(tenantData));
+    } 
   }
 
   function updateTenant() {
     if (validateForm()) {
-      alert("updateTenant");
+      showAlert(JSON.stringify(tenantData));
     }
-    // TODO: Create tenant
   }
 
   function showAlert(message) {
@@ -231,6 +229,7 @@
               textInputModes={["hex"]}
               on:input={(event) => {
                 selecteColor = event.detail.hex;
+                tenantData.primary_color = selecteColor;
               }}
             />
           </div> -->
@@ -256,8 +255,7 @@
                   textInputModes={["hex"]}
                   on:input={(event) => {
                     selecteColor = event.detail.hex;
-                    tenantData.primaryColor = selecteColor;
-                    console.log(tenantData.primaryColor);
+                    tenantData.primary_color = selecteColor;
                   }}
                 />
               </div>
