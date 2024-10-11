@@ -10,4 +10,12 @@ export const wildcardMatch = (text: string, pattern: string) => {
   return regexPattern.test(text);
 };
 
+export const wildcardMatchInArray = (text: string, patterns: string[]) => {
+  const matchPaths = patterns.filter((pattern: string) => {
+    return wildcardMatch(text, pattern);
+  });
+
+  return matchPaths.length ? true : false;
+};
+
 export default wildcardMatch;
