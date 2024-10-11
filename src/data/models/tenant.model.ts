@@ -29,7 +29,7 @@ const TenantSchema = z.object({
   _id: z.instanceof(ObjectId).optional(),
   name: z.string().min(1),
   org_name: z.string().min(1),
-  org_id: z.string().optional(),
+  org_id: z.string(),
   default_language: z.string().nullish(),
   theme: z.nativeEnum(TenantTheme),
   primary_color: z.string().nullish(),
@@ -137,4 +137,17 @@ export default {
   getById: async (org_id: string) => {
     return await collection.findOne<Document<Tenant>>({ org_id });
   },
+
+  updateOrgName: async (org_id: string, newOrgName: string) => {
+    return collection.updateOne(
+      { org_id },
+      {
+        $set: {
+          name: newOrgName,
+          updated_at: new Date(),
+        },
+      }
+    );
+  },
+
 };
