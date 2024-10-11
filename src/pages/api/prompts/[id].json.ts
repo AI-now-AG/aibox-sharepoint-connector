@@ -14,6 +14,7 @@ import { fileLoader } from "$utils/document-loader";
 import type { APIRoute } from "astro";
 import type { CreateInstructionParams } from "../instructions.json";
 import type { CreateKnowledgeBaseParams } from "../knowledge-base.json";
+import initializeOpenAI from "$utils/chatModel";
 
 export type PromptDetails = {
   title: string;
@@ -43,7 +44,8 @@ export const model = new ChatOpenAI({
   model: import.meta.env.OPENAI_MODEL,
 });
 
-export const POST: APIRoute = async ({ params, request }) => {
+export const POST: APIRoute = async (ctx) => {
+  const { params, request } = ctx;
   const id = params.id;
 
   try {
@@ -143,6 +145,7 @@ export const POST: APIRoute = async ({ params, request }) => {
       }
     }
 
+    //const model = initializeOpenAI(ctx);
     const parser = new StringOutputParser();
 
     // Set headers to enable chunked transfer

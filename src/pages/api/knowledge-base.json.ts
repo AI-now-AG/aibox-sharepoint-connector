@@ -1,4 +1,4 @@
-import type { APIRoute } from "astro";
+import type { APIContext, APIRoute } from "astro";
 import KnowledgeBaseModel, {
   type KnowledgeBase,
 } from "$data/models/knowledgeBase.model";
@@ -6,6 +6,7 @@ import { z } from "zod";
 import { ChatOpenAI } from "@langchain/openai";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { StringOutputParser } from "@langchain/core/output_parsers";
+import initializeOpenAI from "$utils/chatModel";
 
 const CreateKnowledgeBaseParamsSchema = z.object({
   _id: z.string().optional(),
@@ -23,10 +24,10 @@ const KnowledgeBaseParamsSchema = z.object({
 
 export type KnowledgeBaseParams = z.infer<typeof KnowledgeBaseParamsSchema>;
 
-export const model = new ChatOpenAI({
-  apiKey: import.meta.env.OPENAI_API_KEY,
-  model: import.meta.env.OPENAI_MODEL,
-});
+// export const model = new ChatOpenAI({
+//   apiKey: import.meta.env.OPENAI_API_KEY,
+//   model: import.meta.env.OPENAI_MODEL,
+// });
 
 const knowledgeBaseInfo = `You are a helpful assistant who writes helpful descriptions of knowledge base for a UI:
 * You receive a knowledge base
@@ -42,7 +43,12 @@ Input: Erstelle eine Titel für einen Schweizer Presseartikel im Stil von "Knowl
 
 Output: Hier kannst du einen prägnanten Titel für einen Schweizer Presseartikel erstellen, der den spezifischen Anforderungen und dem gewünschten Stil entspricht. Die Überschrift wird an die Erwartungen der Schweizer Medien angepasst und berücksichtigt die vorhandene Knowledge Base.`;
 
-const generateKnowledgeBaseDescription = async (knowledgeBase: string) => {
+const generateKnowledgeBaseDescription = async (
+  ctx: APIContext,
+  knowledgeBase: string,
+) => {
+  const model = initializeOpenAI(ctx);
+
   const messages = [
     new SystemMessage(knowledgeBaseInfo),
     new HumanMessage(knowledgeBase),
@@ -89,6 +95,7 @@ export const POST: APIRoute<CreateKnowledgeBaseParams> = async (ctx) => {
 
   // We generate a description based on the KnowledgeBase
   const description = await generateKnowledgeBaseDescription(
+    ctx,
     data.knowledge_base,
   );
   // TODO: Here we would add user informations like the tenant and the user id. We don't have that
@@ -146,6 +153,7 @@ export const PUT: APIRoute<CreateKnowledgeBaseParams> = async (ctx) => {
 
   // We generate a description based on the KnowledgeBase
   const description = await generateKnowledgeBaseDescription(
+    ctx,
     data.knowledge_base,
   );
   const knowledgeBase: KnowledgeBase = {
