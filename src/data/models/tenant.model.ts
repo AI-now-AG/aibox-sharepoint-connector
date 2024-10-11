@@ -29,7 +29,7 @@ const TenantSchema = z.object({
   _id: z.instanceof(ObjectId).optional(),
   name: z.string().min(1),
   org_name: z.string().min(1),
-  org_id: z.string(),
+  org_id: z.string().optional(),
   default_language: z.string().nullish(),
   theme: z.nativeEnum(TenantTheme),
   primary_color: z.string().nullish(),
@@ -146,8 +146,7 @@ export default {
           name: newOrgName,
           updated_at: new Date(),
         },
-      }
+      },
     );
   },
-
 };
