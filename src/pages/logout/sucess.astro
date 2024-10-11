@@ -26,5 +26,6 @@ import BlankLayout from "$layouts/BlankLayout.astro";
   /* Remove all local storage items */
   document.addEventListener("astro:page-load", function () {
     localStorage.clear();
+    window.location.href = "/"
   });
 </script>
