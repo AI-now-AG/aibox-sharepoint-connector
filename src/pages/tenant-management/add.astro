@@ -1,9 +1,8 @@
 ---
 import Layout from "$layouts/Layout.astro";
-import TenantFrom from "./TenantFrom.svelte";
-
+import TenantForm from "./TenantForm.svelte";
 ---
 
 <Layout>
-  <TenantFrom client:load tenant={undefined} />
+  <TenantForm client:load tenant={undefined} />
 </Layout>
