@@ -39,10 +39,10 @@ const RunPromptParamsSchema = z.object({
 export type RunPromptParams = z.infer<typeof RunPromptParamsSchema>;
 export type Attachment = z.infer<typeof AttachmentSchema>;
 
-export const model = new ChatOpenAI({
-  apiKey: import.meta.env.OPENAI_API_KEY,
-  model: import.meta.env.OPENAI_MODEL,
-});
+// export const model = new ChatOpenAI({
+//   apiKey: import.meta.env.OPENAI_API_KEY,
+//   model: import.meta.env.OPENAI_MODEL,
+// });
 
 export const POST: APIRoute = async (ctx) => {
   const { params, request } = ctx;
