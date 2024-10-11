@@ -135,7 +135,7 @@
     <div class="relative">
       <table class="min-w-full relative" style="font-family:Inter;">
         <thead>
-          <tr class="bg-gray-200 rounded-lg">
+          <tr class="bg-base-300 rounded-lg">
             <th class="py-3 px-4 text-left font-normal text-xs rounded-l-lg"
               >{t("tenant.tenants.tenant.display-name")}</th
             >
@@ -189,7 +189,7 @@
               </td></tr
             >
 
-            <tr class="h-16 bg-white hover:bg-gray-200 text-sm rounded-lg">
+            <tr class="h-16 bg-base-100 hover:bg-base-300 text-sm rounded-lg">
               <td class="py-3 px-4 text-sm font-medium rounded-l-lg">
                 <a
                   class="underline underline-offset-2"
