@@ -63,6 +63,8 @@ export default {
   getAuth0Sub: async (auth0_sub: string) =>
     collection.findOne<User>({ auth0_sub }),
 
+  getByEmail: async (email: string) => collection.findOne<User>({ email }),
+
   updateRole: async (auth0_sub: string, newRoles: UserRole[]) => {
     const validRoles = z.array(z.nativeEnum(UserRole)).parse(newRoles);
     const newPermissions = assignPermissions(validRoles);

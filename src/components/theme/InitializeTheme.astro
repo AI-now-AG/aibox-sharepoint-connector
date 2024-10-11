@@ -4,8 +4,8 @@ const { theme } = Astro.locals.tenant;
 
 <script define:vars={{ theme }} is:inline>
   // set default theme in storage
-  const savedTheme = localStorage.getItem("theme");
-  if (theme && !savedTheme) {
+  if (theme) {
     document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
   }
 </script>

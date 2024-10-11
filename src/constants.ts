@@ -5,6 +5,7 @@ export const PUBLIC_ROUTES = [
   "/login/auth0/callback",
   "/logout/sucess",
   "/404",
+  "/500",
   "/restricted",
 ];
 

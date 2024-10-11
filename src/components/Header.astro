@@ -2,7 +2,6 @@
 import InitializeTheme from "$components/theme/InitializeTheme.astro";
 import InitializeColor from "$components/theme/InitializeColor.astro";
 import SharedVariables from "$components/theme/SharedVariables.svelte";
-import ThemeSwitcher from "$components/ThemeSwitcher.svelte";
 import Toasts from "$components/toast-notification/Toasts.svelte";
 import { useTranslations } from "$i18n/utils";
 
@@ -14,17 +13,23 @@ const primaryColor = Astro.locals.tenant?.primary_color;
 
 <style is:global>
   /* TODO: Workaround for the demo. The logo has to be part of the theme. */
-  .non-somedia {
-    display: block;
-  }
-  [data-theme="somedia"] .non-somedia {
+  .logo-somedia {
     display: none;
   }
-  .somedia {
+  [data-theme="somedia"] .logo-somedia {
+    display: block;
+  }
+  [data-theme="somedia"] .logo-light,
+  [data-theme="somedia"] .logo-dark {
     display: none;
   }
-  [data-theme="somedia"] .somedia {
-    display: block;
+  [data-theme="dark"] .logo-light,
+  [data-theme="luxury"] .logo-light {
+    display: none;
+  }
+  [data-theme="light"] .logo-dark,
+  [data-theme="lemonade"] .logo-dark {
+    display: none;
   }
 </style>
 
@@ -67,38 +72,21 @@ const primaryColor = Astro.locals.tenant?.primary_color;
     </div>
     <div class="lg:hidden pl-2">
       <a href="/">
-        <img src="/soki-somedia.png" alt="Somedia Logo" class="h-8 somedia" />
+        <img
+          src="/soki-somedia.png"
+          alt="Somedia Logo"
+          class="h-8 logo-somedia"
+        />
         <!-- light/dark mode doesn't work currently in the way themes are implemented. Currently only the light variant will be rendered -->
         <img
           src="/aibox-logo-text.svg"
-          class="non-somedia h-8 w-auto dark:hidden"
+          class="logo-light h-8 w-auto dark:hidden"
         />
-        <img
-          src="/aibox-logo-text-dark.svg"
-          class="non-somedia h-12 hidden dark:block"
-        />
+        <img src="/aibox-logo-text-dark.svg" class="logo-dark h-8 dark:block" />
       </a>
     </div>
   </div>
   <div class="navbar-end">
-    <div class="hidden lg:flex">
-      <div class="dropdown dropdown-end">
-        <div tabindex="0" role="button" class="btn btn-ghost m-1">
-          {t("header.theme")}
-          <svg
-            width="12px"
-            height="12px"
-            class="hidden h-2 w-2 fill-current opacity-60 sm:inline-block"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 2048 2048"
-            ><path
-              d="M1799 349l242 241-1017 1017L7 590l242-241 775 775 775-775z"
-            ></path></svg
-          >
-        </div>
-        <ThemeSwitcher client:load />
-      </div>
-    </div>
     <div class="dropdown dropdown-end">
       <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
         <div class="w-10 rounded-full">
