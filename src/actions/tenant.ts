@@ -66,7 +66,10 @@ export const tenant = {
 
       // store tenant on mongodb
       const { id: organizationId } = organizationResult.data;
-      const tenant: Tenant = { ...input, ...{ org_id: organizationId } };
+      const tenant: Omit<Tenant, "_id"> = {
+        ...input,
+        ...{ org_id: organizationId },
+      };
       const insertResult = await tenantModel.create(tenant);
 
       return transformDataToArray(insertResult);
@@ -77,7 +80,10 @@ export const tenant = {
     input: z.intersection(TenantInputParamsSchema, TenantInputIdentifierSchema),
     handler: async (input) => {
       // update tenant on mongodb
-      const tenant: Tenant = { ...input, ...{ _id: new ObjectId(input._id) } };
+      const tenant: Omit<Tenant, "org_id"> = {
+        ...input,
+        ...{ _id: new ObjectId(input._id) },
+      };
       const updatedDocument = await tenantModel.update(input._id, tenant);
 
       // update existing organization on auth0

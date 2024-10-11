@@ -13,7 +13,7 @@ import log from "$utils/log";
 const Auth0JWTSchema = z.object({
   sub: z.string().min(24),
   org_id: z.string().min(2),
-  "ainow/org_displayName": z.string(),
+  //"ainow/org_displayName": z.string(),
   org_name: z.string().min(2),
   "ainow/roles": z.array(z.nativeEnum(UserRole)),
   email: z.string().email(),
@@ -61,7 +61,7 @@ export async function GET(context: APIContext): Promise<Response> {
     });
   }
   const roles = userData.data["ainow/roles"];
-  const orgDisplayName = userData.data["ainow/org_displayName"];
+  //const orgDisplayName = userData.data["ainow/org_displayName"];
 
   const existingUser = await userModel.getAuth0Sub(userData.data.sub);
   log.d(existingUser, "existingUser");
@@ -80,12 +80,13 @@ export async function GET(context: APIContext): Promise<Response> {
       sessionCookie.attributes,
     );
 
-    const tenant = await tenantModel.getById(userData.data.org_id);
-    if (tenant) {
-      if (tenant.name != orgDisplayName) {
-        tenantModel.updateOrgName(tenant.org_id, orgDisplayName)
-      }
-    }
+    // Skip it for now. We will create new task for synchronize from Auth0 to aibox
+    // const tenant = await tenantModel.getById(userData.data.org_id);
+    // if (tenant) {
+    //   if (tenant.name != orgDisplayName) {
+    //     tenantModel.updateOrgName(tenant.org_id, orgDisplayName);
+    //   }
+    // }
 
     return context.redirect("/");
   }

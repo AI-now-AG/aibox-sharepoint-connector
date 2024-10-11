@@ -3,7 +3,7 @@ import InstructionModel, {
   type Instruction,
 } from "$data/models/instruction.model";
 import { z } from "zod";
-import { ChatOpenAI } from "@langchain/openai";
+//import { ChatOpenAI } from "@langchain/openai";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import initializeOpenAI from "$utils/chatModel";
