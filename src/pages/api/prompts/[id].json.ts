@@ -156,6 +156,8 @@ export const POST: APIRoute = async (ctx) => {
     const { readable, writable } = new TransformStream();
     const writer = writable.getWriter();
 
+    const model = initializeOpenAI(ctx);
+
     (async () => {
       try {
         const stream = await model.pipe(parser).stream(messages);
