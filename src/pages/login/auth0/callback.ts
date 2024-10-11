@@ -33,7 +33,7 @@ export async function GET(context: APIContext): Promise<Response> {
   if (context.url.searchParams.has("error")) {
     const error = context.url.searchParams.get("error");
     const description = context.url.searchParams.get("error_description");
-    return context.redirect(`/500?code=${error}&description=${description}`);
+    return context.redirect(`/error?code=${error}&message=${description}`);
   }
 
   // Ensure the callback has code and valid state

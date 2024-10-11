@@ -1,18 +1,11 @@
 ---
 import BlankLayout from "$layouts/BlankLayout.astro";
 
-interface Props {
-  error: unknown;
-}
-
-export const prerender = false;
-
-const { error } = Astro.props;
 const code = Astro.url.searchParams.get("code");
-const description = Astro.url.searchParams.get("description");
+const message = Astro.url.searchParams.get("message");
 ---
 
-<BlankLayout title="Internal server error">
+<BlankLayout title="Error">
   <section class="flex items-center h-full p-16">
     <div
       class="container flex flex-col items-center justify-center px-5 mx-auto my-8"
@@ -20,13 +13,12 @@ const description = Astro.url.searchParams.get("description");
       <div class="max-w-lg text-center">
         {/* Error exception throw from middlewares & pages  */}
         {
-          (error || !code) && (
+          !code && (
             <Fragment>
-              <h1 class="mb-5 text-4xl font-extrabold">Server error</h1>
+              <h1 class="mb-5 text-4xl font-extrabold">An error occurred</h1>
               <p class="mb-8 text-1xl">
-                {error instanceof Error
-                  ? error.message
-                  : "Sorry, something went wrong on our end. Please try refreshing the page or come back later."}
+                Sorry, something went wrong on our end. Please try refreshing
+                the page or come back later
               </p>
             </Fragment>
           )
@@ -34,12 +26,12 @@ const description = Astro.url.searchParams.get("description");
 
         {/* Error code & description from query string */}
         {
-          (code || description) && (
+          (code || message) && (
             <Fragment>
               <h1 class="mb-5 text-4xl font-extrabold">
                 {code?.toUpperCase()}
               </h1>
-              <p class="mb-8 text-1xl">{description}</p>
+              <p class="mb-8 text-1xl">{message}</p>
             </Fragment>
           )
         }
