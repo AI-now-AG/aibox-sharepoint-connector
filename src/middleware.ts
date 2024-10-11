@@ -7,7 +7,7 @@ import type { APIContext, MiddlewareNext } from "astro";
 import tenantModel from "$data/models/tenant.model";
 import { defaultLang } from "$i18n/ui";
 import { setLanguage } from "$i18n/utils";
-import wildcardMatch from "$utils/wildcardMatch";
+import { wildcardMatch, wildcardMatchInArray } from "$utils/wildcardMatch";
 
 async function requestOrigin(context: APIContext, next: MiddlewareNext) {
   // Basic CSRF protection
@@ -29,12 +29,12 @@ async function requestOrigin(context: APIContext, next: MiddlewareNext) {
 
 async function authenticate(context: APIContext, next: MiddlewareNext) {
   // Ignore auth validation for public routes
-  if (PUBLIC_ROUTES.includes(context.url.pathname)) {
+  if (wildcardMatchInArray(context.url.pathname, PUBLIC_ROUTES)) {
     return next();
   }
 
   const sessionRequired = () => {
-    if (context.url.pathname.startsWith("/api/")) {
+    if (wildcardMatch(context.url.pathname, "/api/*")) {
       return new Response(JSON.stringify({ message: "unauthorized" }), {
         status: 401,
       });
@@ -72,11 +72,20 @@ async function authenticate(context: APIContext, next: MiddlewareNext) {
 }
 
 async function restrictAccess(context: APIContext, next: MiddlewareNext) {
-  const matchPaths = SUPER_ADMIN_ROUTES.filter((path) => {
-    return wildcardMatch(context.url.pathname, path);
-  });
-  if (matchPaths.length && !auth.isSuperAdmin(context.locals)) {
+  // Restrict access for non-admin users
+  const matchPath = wildcardMatchInArray(
+    context.url.pathname,
+    SUPER_ADMIN_ROUTES,
+  );
+  if (matchPath && !auth.isSuperAdmin(context.locals)) {
     return context.rewrite("/restricted");
+  }
+
+  // Prevent archived tenant member login
+  if (context.locals.tenant?.active == false) {
+    return context.redirect(
+      `/500?code=tenant_inactive&description=Sorry, the tenant associated with your account is currently inactive. Please contact the tenant administrator or support for assistance.`,
+    );
   }
 
   return next();
