@@ -1,0 +1,8 @@
+[build]
+  functions = "functions"  # Directory where your functions are located
+  publish = "dist"         # Directory for your built site
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

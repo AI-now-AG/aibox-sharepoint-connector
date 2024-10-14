@@ -1,0 +1,194 @@
+---
+import Layout from "$layouts/Layout.astro";
+
+// import { useTranslations } from "$i18n/utils";
+// const t = useTranslations(Astro.preferredLocale);
+---
+
+<Layout>
+  <div class="grid grid-cols-1 gap-6 max-w-6xl p-6 mt-12 mx-auto">
+    <h1 class="text-4xl font-bold">Transcription</h1>
+
+    <div>
+      Find short test mp3 files here
+      <a
+        class="link link-primary"
+        href="https://drive.google.com/drive/u/1/folders/1aDlzKBTXqpd4ZYni6V2aFk1MypfVV77O"
+      >
+        https://drive.google.com/drive/u/1/folders/1aDlzKBTXqpd4ZYni6V2aFk1MypfVV77O</a
+      >
+    </div>
+
+    <a class="link link-primary" href="/somedia-transcription-demo/doc"
+      >Documentation</a
+    >
+
+    <div>
+      <form>
+        <label for="file">Upload MP3 File</label>
+        <br />
+        <input
+          type="file"
+          id="file"
+          name="file"
+          class="file-input file-input-bordered w-full max-w-xs"
+        />
+        <br />
+        <br />
+        <button class="btn btn-primary">Transcribe</button>
+      </form>
+    </div>
+
+    <div>
+      <button id="copy" class="btn btn-primary hidden">Copy to clipboard</button
+      >
+    </div>
+    <textarea
+      name="transcription-data"
+      id="transcription-data"
+      class="hidden textarea min-h-96"></textarea>
+
+    <script>
+      const $form = document.querySelector("form");
+      const $transcriptionData = document.querySelector<HTMLTextAreaElement>(
+        "#transcription-data",
+      );
+      let $taskId = "";
+      const $copyBtn = document.querySelector<HTMLTextAreaElement>("#copy");
+
+      if ($form) {
+        $form.addEventListener("submit", handleFileUpload);
+      }
+
+      if ($copyBtn) {
+        $copyBtn.addEventListener("click", function () {
+          if ($transcriptionData) {
+            navigator.clipboard.writeText($transcriptionData.value).then(
+              function () {
+                $copyBtn.textContent = "Copied!";
+              },
+              function (err) {
+                console.error("Async: Could not copy text: ", err);
+              },
+            );
+          }
+        });
+      }
+
+      async function handleSubmit(event: Event) {
+        event.preventDefault();
+
+        const form = event.target as HTMLFormElement;
+        const formData = new FormData(form);
+
+        try {
+          if ($transcriptionData) {
+            $transcriptionData.value = "Transcribing...";
+            $transcriptionData.classList.remove("hidden");
+          }
+
+          // Send the file to the backend using fetch to initiate the transcription
+          const response = await fetch(
+            "/somedia-transcription-demo/test-transcribe",
+            {
+              method: "POST",
+              body: formData,
+            },
+          );
+
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          const result = await response.json();
+          $taskId = result.taskId;
+
+          /*const reader = response.body?.getReader();
+          const decoder = new TextDecoder();
+          if (reader) {
+            if ($transcriptionData) {
+              $transcriptionData.value = "";
+            }
+            // Continuously read the stream
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) {
+                break; // Exit the loop if the stream is done
+              }
+
+              // Decode the chunk and update the transcription
+              const text = decoder.decode(value, { stream: true });
+              console.log("Received transcription chunk:", text);
+              if ($transcriptionData) {
+                $transcriptionData.value += text;
+              }
+            }
+          }*/
+        } catch (error) {
+          console.error("Error uploading file:", error);
+        }
+      }
+
+      async function handleFileUpload(event: Event) {
+        event.preventDefault();
+
+        const form = event.target as HTMLFormElement;
+        const fileInput = form.querySelector(
+          'input[type="file"]',
+        ) as HTMLInputElement;
+
+        const file = fileInput?.files?.[0];
+
+        if (!file) {
+          console.error("No file selected");
+          return;
+        }
+
+        // Convert the file to base64
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+
+        reader.onloadend = async function () {
+          const base64Data = (reader.result as string).split(",")[1]; // Cast result to string
+
+          if (!base64Data) {
+            console.error("Failed to encode file as base64");
+            return;
+          }
+
+          try {
+            if ($transcriptionData) {
+              $transcriptionData.value = "Transcribing...";
+              $transcriptionData.classList.remove("hidden");
+            }
+            const response = await fetch("/.netlify/functions/uploadAudio", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                fileName: file.name,
+                fileData: base64Data,
+                mimeType: file.type,
+              }),
+            });
+
+            if (response.ok) {
+              const result = await response.json();
+              if ($transcriptionData && result.transcription) {
+                $transcriptionData.value = result.transcription;
+              }
+            } else {
+              console.error("Error uploading audio:", response.statusText);
+            }
+          } catch (error) {
+            console.error("Fetch error:", error);
+          }
+        };
+
+        reader.onerror = function (error) {
+          console.error("Error reading file:", error);
+        };
+      }
+    </script>
+  </div>
+</Layout>
