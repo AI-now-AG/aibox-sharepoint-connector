@@ -101,7 +101,7 @@ export async function GET(context: APIContext): Promise<Response> {
     // Sync tenant
     if (tenant._id.toString() != existingUser.tenant_id.toString()) {
       const update: Partial<User> = { tenant_id: tenant._id };
-      userModel.update(existingUser.tenant_id, update);
+      userModel.update(existingUser._id, update);
     }
 
     return context.redirect("/");
