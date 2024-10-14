@@ -5,6 +5,7 @@ import type { APIContext } from "astro";
 import userModel, {
   assignPermissions,
   UserRole,
+  type User,
 } from "$data/models/user.model";
 import { z } from "zod";
 import tenantModel from "$data/models/tenant.model";
@@ -63,6 +64,15 @@ export async function GET(context: APIContext): Promise<Response> {
   const roles = userData.data["ainow/roles"];
   //const orgDisplayName = userData.data["ainow/org_displayName"];
 
+  // TODO: fetch logo from auth0 org?
+  const tenant = await tenantModel.getById(userData.data.org_id);
+  if (!tenant) {
+    log.e("Tenant not found");
+    return new Response(null, {
+      status: 400,
+    });
+  }
+
   const existingUser = await userModel.getAuth0Sub(userData.data.sub);
   log.d(existingUser, "existingUser");
 
@@ -88,16 +98,13 @@ export async function GET(context: APIContext): Promise<Response> {
     //   }
     // }
 
-    return context.redirect("/");
-  }
+    // Sync tenant
+    if (tenant._id.toString() != existingUser.tenant_id.toString()) {
+      const update: Partial<User> = { tenant_id: tenant._id };
+      userModel.update(existingUser.tenant_id, update);
+    }
 
-  // TODO: fetch logo from auth0 org?
-  const tenant = await tenantModel.getById(userData.data.org_id);
-  if (!tenant) {
-    log.e("Tenant not found");
-    return new Response(null, {
-      status: 400,
-    });
+    return context.redirect("/");
   }
 
   const newUser = await userModel.add({

@@ -59,7 +59,8 @@ export default {
     return await collection.insertOne(doc);
   },
 
-  update: async (id: string, tenant: Omit<Tenant, "_id" | "org_id">) => {
+  update: async (id: string | ObjectId, tenant: Partial<Tenant>) => {
+    const objectId = id instanceof ObjectId ? id : new ObjectId(id);
     const validated = TenantSchema.partial().parse(tenant);
     const doc = {
       ...validated,
@@ -68,7 +69,7 @@ export default {
       },
     };
     return await collection.findOneAndUpdate(
-      { _id: new ObjectId(id) },
+      { _id: objectId },
       { $set: doc },
       {
         returnDocument: "after",
