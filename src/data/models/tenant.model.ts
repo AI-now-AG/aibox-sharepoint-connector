@@ -26,10 +26,10 @@ export const TenantFilterParamsSchema = z.object({
 export type TenantFilterParams = z.infer<typeof TenantFilterParamsSchema>;
 
 const TenantSchema = z.object({
-  _id: z.instanceof(ObjectId).optional(),
+  _id: z.instanceof(ObjectId),
   name: z.string().min(1),
   org_name: z.string().min(1),
-  org_id: z.string().optional(),
+  org_id: z.string(),
   default_language: z.string().nullish(),
   theme: z.nativeEnum(TenantTheme),
   primary_color: z.string().nullish(),
@@ -46,8 +46,8 @@ export type Tenant = z.infer<typeof TenantSchema>;
 const collection = db.collection("tenants");
 
 export default {
-  create: async (tenant: Tenant) => {
-    const validated = TenantSchema.parse(tenant);
+  create: async (tenant: Omit<Tenant, "_id">) => {
+    const validated = TenantSchema.parse({ _id: new ObjectId(), ...tenant });
     const doc = {
       ...validated,
       ...{
@@ -59,7 +59,7 @@ export default {
     return await collection.insertOne(doc);
   },
 
-  update: async (id: string, tenant: Tenant) => {
+  update: async (id: string, tenant: Omit<Tenant, "_id" | "org_id">) => {
     const validated = TenantSchema.partial().parse(tenant);
     const doc = {
       ...validated,
@@ -136,5 +136,17 @@ export default {
 
   getById: async (org_id: string) => {
     return await collection.findOne<Document<Tenant>>({ org_id });
+  },
+
+  updateOrgName: async (org_id: string, newOrgName: string) => {
+    return collection.updateOne(
+      { org_id },
+      {
+        $set: {
+          name: newOrgName,
+          updated_at: new Date(),
+        },
+      },
+    );
   },
 };

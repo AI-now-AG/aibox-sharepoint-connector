@@ -1,11 +1,12 @@
-import type { APIRoute } from "astro";
+import type { APIContext, APIRoute } from "astro";
 import InstructionModel, {
   type Instruction,
 } from "$data/models/instruction.model";
 import { z } from "zod";
-import { ChatOpenAI } from "@langchain/openai";
+//import { ChatOpenAI } from "@langchain/openai";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { StringOutputParser } from "@langchain/core/output_parsers";
+import initializeOpenAI from "$utils/chatModel";
 
 const CreateInstructionParamsSchema = z.object({
   _id: z.string().optional(),
@@ -23,10 +24,10 @@ const InstructionParamsSchema = z.object({
 
 export type InstructionParams = z.infer<typeof InstructionParamsSchema>;
 
-export const model = new ChatOpenAI({
-  apiKey: import.meta.env.OPENAI_API_KEY,
-  model: import.meta.env.OPENAI_MODEL,
-});
+// export const model = new ChatOpenAI({
+//   apiKey: import.meta.env.OPENAI_API_KEY,
+//   model: import.meta.env.OPENAI_MODEL,
+// });
 
 const instructions = `You are a helpful assistant who writes helpful descriptions of instuctions for a UI:
 * You receive a instruction
@@ -42,7 +43,12 @@ Input: Erstelle eine Titel für einen Schweizer Presseartikel im Stil von "Knowl
 
 Output: Hier kannst du einen prägnanten Titel für einen Schweizer Presseartikel erstellen, der den spezifischen Anforderungen und dem gewünschten Stil entspricht. Die Überschrift wird an die Erwartungen der Schweizer Medien angepasst und berücksichtigt die vorhandene Knowledge Base.`;
 
-const generateInstructionDescription = async (instruction: string) => {
+const generateInstructionDescription = async (
+  ctx: APIContext,
+  instruction: string,
+) => {
+  const model = initializeOpenAI(ctx);
+
   const messages = [
     new SystemMessage(instructions),
     new HumanMessage(instruction),
@@ -88,7 +94,10 @@ export const POST: APIRoute<CreateInstructionParams> = async (ctx) => {
   const data = CreateInstructionParamsSchema.parse(params);
 
   // We generate a description based on the instruction
-  const description = await generateInstructionDescription(data.instruction);
+  const description = await generateInstructionDescription(
+    ctx,
+    data.instruction,
+  );
   // TODO: Here we would add user informations like the tenant and the user id. We don't have that
   // feature to get these just based on the token for now. Wait until the Auth0 task is done. Until
   // then we use fixed values.
@@ -143,7 +152,10 @@ export const PUT: APIRoute<CreateInstructionParams> = async (ctx) => {
   const data = CreateInstructionParamsSchema.parse(params);
 
   // We generate a description based on the instruction
-  const description = await generateInstructionDescription(data.instruction);
+  const description = await generateInstructionDescription(
+    ctx,
+    data.instruction,
+  );
   // TODO: Here we would add user informations like the tenant and the user id. We don't have that
   // feature to get these just based on the token for now. Wait until the Auth0 task is done. Until
   // then we use fixed values.

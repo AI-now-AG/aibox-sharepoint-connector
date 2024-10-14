@@ -1,13 +1,14 @@
-import { ChatOpenAI } from "@langchain/openai";
+//import { ChatOpenAI } from "@langchain/openai";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import somediaInstructions from "$data/somedia_instructions";
 import type { APIRoute } from "astro";
+import initializeOpenAI from "$utils/chatModel";
 
-export const model = new ChatOpenAI({
-  apiKey: import.meta.env.OPENAI_API_KEY,
-  model: import.meta.env.OPENAI_MODEL,
-});
+// export const model = new ChatOpenAI({
+//   apiKey: import.meta.env.OPENAI_API_KEY,
+//   model: import.meta.env.OPENAI_MODEL,
+// });
 
 const promptText = `Create three headlines for a Swiss press article in german language. The article covers the following topic. Ensure that the headlines align with the style and expectations of Swiss press articles and your knowledge base. Follow the specific instructions provided.
 
@@ -59,6 +60,8 @@ export const POST: APIRoute = async (ctx) => {
       }),
     );
   }
+
+  const model = initializeOpenAI(ctx);
 
   const messages = [
     new SystemMessage(promptText),

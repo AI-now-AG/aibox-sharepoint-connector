@@ -12,6 +12,8 @@ import log from "$utils/log";
 
 const Auth0JWTSchema = z.object({
   sub: z.string().min(24),
+  org_id: z.string().min(2),
+  //"ainow/org_displayName": z.string(),
   org_name: z.string().min(2),
   "ainow/roles": z.array(z.nativeEnum(UserRole)),
   email: z.string().email(),
@@ -31,7 +33,7 @@ export async function GET(context: APIContext): Promise<Response> {
   if (context.url.searchParams.has("error")) {
     const error = context.url.searchParams.get("error");
     const description = context.url.searchParams.get("error_description");
-    return context.redirect(`/500?code=${error}&description=${description}`);
+    return context.redirect(`/error?code=${error}&message=${description}`);
   }
 
   // Ensure the callback has code and valid state
@@ -59,6 +61,7 @@ export async function GET(context: APIContext): Promise<Response> {
     });
   }
   const roles = userData.data["ainow/roles"];
+  //const orgDisplayName = userData.data["ainow/org_displayName"];
 
   const existingUser = await userModel.getAuth0Sub(userData.data.sub);
   log.d(existingUser, "existingUser");
@@ -77,12 +80,19 @@ export async function GET(context: APIContext): Promise<Response> {
       sessionCookie.attributes,
     );
 
+    // Skip it for now. We will create new task for synchronize from Auth0 to aibox
+    // const tenant = await tenantModel.getById(userData.data.org_id);
+    // if (tenant) {
+    //   if (tenant.name != orgDisplayName) {
+    //     tenantModel.updateOrgName(tenant.org_id, orgDisplayName);
+    //   }
+    // }
+
     return context.redirect("/");
   }
 
   // TODO: fetch logo from auth0 org?
-  const orgName = userData.data.org_name;
-  const tenant = await tenantModel.getByName(orgName);
+  const tenant = await tenantModel.getById(userData.data.org_id);
   if (!tenant) {
     log.e("Tenant not found");
     return new Response(null, {

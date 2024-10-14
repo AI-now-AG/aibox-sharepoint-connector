@@ -1,7 +1,7 @@
-import type { APIRoute } from "astro";
+import type { APIContext, APIRoute } from "astro";
 import PromptModel, { type Prompt } from "$data/models/prompt.model";
 import { z } from "zod";
-import { ChatOpenAI } from "@langchain/openai";
+//import { ChatOpenAI } from "@langchain/openai";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import { stringToObjectId } from "$utils/stringToObjectId";
@@ -11,6 +11,7 @@ import InstructionModel, {
 import KnowledgeBaseModel, {
   type KnowledgeBase,
 } from "$data/models/knowledgeBase.model";
+import initializeOpenAI from "$utils/chatModel";
 
 const CreatePromptParamsSchema = z.object({
   _id: z.string().optional(),
@@ -25,10 +26,10 @@ const CreatePromptParamsSchema = z.object({
 
 export type CreatePromptParams = z.infer<typeof CreatePromptParamsSchema>;
 
-export const model = new ChatOpenAI({
-  apiKey: import.meta.env.OPENAI_API_KEY,
-  model: import.meta.env.OPENAI_MODEL,
-});
+// export const model = new ChatOpenAI({
+//   apiKey: import.meta.env.OPENAI_API_KEY,
+//   model: import.meta.env.OPENAI_MODEL,
+// });
 
 const PromptParamsSchema = z.object({
   _id: z.string(),
@@ -50,7 +51,9 @@ Input: Erstelle eine Titel für einen Schweizer Presseartikel im Stil von "Knowl
 
 Output: Hier kannst du einen prägnanten Titel für einen Schweizer Presseartikel erstellen, der den spezifischen Anforderungen und dem gewünschten Stil entspricht. Die Überschrift wird an die Erwartungen der Schweizer Medien angepasst und berücksichtigt die vorhandene Knowledge Base.`;
 
-const generatePromptDescription = async (prompt: string) => {
+const generatePromptDescription = async (ctx: APIContext, prompt: string) => {
+  const model = initializeOpenAI(ctx);
+
   const messages = [new SystemMessage(instructions), new HumanMessage(prompt)];
   const parser = new StringOutputParser();
   const result = await model.invoke(messages);
@@ -64,7 +67,7 @@ export const POST: APIRoute<CreatePromptParams> = async (ctx) => {
   const data = CreatePromptParamsSchema.parse(params);
 
   // We generate a description based on the prompt
-  const description = await generatePromptDescription(data.prompt);
+  const description = await generatePromptDescription(ctx, data.prompt);
 
   // TODO: Here we would add user informations like the tenant and the user id. We don't have that
   // feature to get these just based on the token for now. Wait until the Auth0 task is done. Until
@@ -129,7 +132,7 @@ export const PUT: APIRoute<CreatePromptParams> = async (ctx) => {
   const data = CreatePromptParamsSchema.parse(params);
 
   // We generate a description based on the prompt
-  const description = await generatePromptDescription(data.prompt);
+  const description = await generatePromptDescription(ctx, data.prompt);
 
   const prompt: Prompt = {
     ...data,
