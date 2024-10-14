@@ -61,20 +61,33 @@ export const POST: APIRoute = async (ctx) => {
     );
   }
 
-  const model = initializeOpenAI(ctx);
+  try {
+    const model = initializeOpenAI(ctx);
 
-  const messages = [
-    new SystemMessage(promptText),
-    new SystemMessage(somediaInstructions),
-    new HumanMessage(params.article),
-  ];
-  const parser = new StringOutputParser();
-  const result = await model.invoke(messages);
-  const headlines = await parser.invoke(result);
+    const messages = [
+      new SystemMessage(promptText),
+      new SystemMessage(somediaInstructions),
+      new HumanMessage(params.article),
+    ];
+    const parser = new StringOutputParser();
+    const result = await model.invoke(messages);
+    const headlines = await parser.invoke(result);
 
-  return new Response(
-    JSON.stringify({
-      headlines,
-    }),
-  );
+    return new Response(
+      JSON.stringify({
+        headlines,
+      }),
+    );
+  } catch (error: any) {
+    console.log(error);
+    return new Response(
+      JSON.stringify({
+        message: error.toString(),
+        error: error,
+      }),
+      {
+        status: 500,
+      },
+    );
+  }
 };
