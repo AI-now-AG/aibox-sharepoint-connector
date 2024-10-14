@@ -80,7 +80,7 @@ export const tenant = {
     input: z.intersection(TenantInputParamsSchema, TenantInputIdentifierSchema),
     handler: async (input) => {
       // update tenant on mongodb
-      const tenant: Omit<Tenant, "org_id"> = {
+      const tenant: Partial<Tenant> = {
         ...input,
         ...{ _id: new ObjectId(input._id) },
       };

@@ -56,6 +56,24 @@ export default {
     return collection.insertOne(validated);
   },
 
+  update: async (id: string | ObjectId, user: Partial<User>) => {
+    const objectId = id instanceof ObjectId ? id : new ObjectId(id);
+    const validated = UserSchema.partial().parse(user);
+    const doc = {
+      ...validated,
+      ...{
+        updated_at: new Date(),
+      },
+    };
+    return await collection.findOneAndUpdate(
+      { _id: objectId },
+      { $set: doc },
+      {
+        returnDocument: "after",
+      },
+    );
+  },
+
   list: async () => collection.find<User>({}),
 
   get: async (email: string) => collection.findOne<User>({ email }),
