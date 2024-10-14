@@ -1,0 +1,25 @@
+---
+import Layout from "$layouts/Layout.astro";
+import TenantForm from "./TenantForm.svelte";
+import { actions } from "astro:actions";
+
+export interface Props {
+  id: string;
+}
+
+const { id = "" } = Astro.params;
+
+const fetchTenant = async () => {
+  const { data, error } = await Astro.callAction(actions.tenant.get, {
+    _id: id,
+  });
+  return { data, error };
+};
+
+const tenatData = await fetchTenant();
+const { data } = tenatData || {};
+---
+
+<Layout>
+  <TenantForm tenant={data} client:load />
+</Layout>

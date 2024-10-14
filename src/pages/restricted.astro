@@ -1,0 +1,28 @@
+---
+import BlankLayout from "$layouts/BlankLayout.astro";
+---
+
+<BlankLayout title="Restricted access">
+  <section class="flex items-center h-full p-16">
+    <div
+      class="container flex flex-col items-center justify-center px-5 mx-auto my-8"
+    >
+      <div class="max-w-lg text-center">
+        <h1 class="mb-8 text-4xl font-extrabold">Restricted Access</h1>
+        <p class="text-1xl font-semibold md:text-2xl">
+          It looks like you don't have the necessary permissions to view this
+          content.
+        </p>
+        <p class="mt-4 mb-8">
+          If you think this is a mistake, please reach out to your
+          administrator.
+        </p>
+        <a
+          rel="noopener noreferrer"
+          href="/"
+          class="btn btn-outline btn-primary">Back to homepage</a
+        >
+      </div>
+    </div>
+  </section>
+</BlankLayout>

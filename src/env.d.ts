@@ -5,7 +5,9 @@
 
 declare namespace App {
   interface Locals {
-    session: import("lucia").Session;
-    user: import("lucia").User;
+    session: import("lucia").Session; // lucia
+    user: import("lucia").User; // lucia
+    tenant: import("$data/models/tenant.model").Tenant; // custom
+    locale: string; // custom
   }
 }

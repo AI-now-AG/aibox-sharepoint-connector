@@ -1,51 +1,51 @@
 ---
-// import local images
-import ThemeSwitcher from "$components/ThemeSwitcher.svelte";
+import InitializeTheme from "$components/theme/InitializeTheme.astro";
+import InitializeColor from "$components/theme/InitializeColor.astro";
+import SharedVariables from "$components/theme/SharedVariables.svelte";
+import Toasts from "$components/toast-notification/Toasts.svelte";
 import { useTranslations } from "$i18n/utils";
 
-const t = useTranslations(Astro.preferredLocale);
-
-const themes = [
-  {
-    name: "Light",
-    theme: "light",
-  },
-  {
-    name: "Dark",
-    theme: "dark",
-  },
-  {
-    name: "Somedia",
-    theme: "somedia",
-  },
-  {
-    name: "Luxury",
-    theme: "luxury",
-  },
-  {
-    name: "Lemonade",
-    theme: "lemonade",
-  },
-];
+const t = useTranslations();
 
 const user = Astro.locals.user;
+const primaryColor = Astro.locals.tenant?.primary_color;
 ---
 
 <style is:global>
   /* TODO: Workaround for the demo. The logo has to be part of the theme. */
-  .non-somedia {
-    display: block;
-  }
-  [data-theme="somedia"] .non-somedia {
+  .logo-somedia {
     display: none;
   }
-  .somedia {
+  [data-theme="somedia"] .logo-somedia {
+    display: block;
+  }
+  [data-theme="somedia"] .logo-light,
+  [data-theme="somedia"] .logo-dark {
     display: none;
   }
-  [data-theme="somedia"] .somedia {
-    display: block;
+  [data-theme="dark"] .logo-light,
+  [data-theme="luxury"] .logo-light {
+    display: none;
+  }
+  [data-theme="light"] .logo-dark,
+  [data-theme="lemonade"] .logo-dark {
+    display: none;
   }
 </style>
+
+<!-- Set default theme -->
+<InitializeTheme />
+
+<!-- Set primary color -->
+{primaryColor && <InitializeColor />}
+
+<!-- Shared variables for all .svelte components -->
+<SharedVariables
+  tenant={Astro.locals.tenant}
+  user={Astro.locals.user}
+  locale={Astro.locals.locale}
+  client:load
+/>
 
 <header class="container-fluid mx-auto navbar bg-base-200">
   <div class="navbar-start">
@@ -72,41 +72,21 @@ const user = Astro.locals.user;
     </div>
     <div class="lg:hidden pl-2">
       <a href="/">
-        <img src="/soki-somedia.png" alt="Somedia Logo" class="h-8 somedia" />
+        <img
+          src="/soki-somedia.png"
+          alt="Somedia Logo"
+          class="h-8 logo-somedia"
+        />
         <!-- light/dark mode doesn't work currently in the way themes are implemented. Currently only the light variant will be rendered -->
         <img
           src="/aibox-logo-text.svg"
-          class="non-somedia h-8 w-auto dark:hidden"
+          class="logo-light h-8 w-auto dark:hidden"
         />
-        <img
-          src="/aibox-logo-text-dark.svg"
-          class="non-somedia h-12 hidden dark:block"
-        />
+        <img src="/aibox-logo-text-dark.svg" class="logo-dark h-8 dark:block" />
       </a>
     </div>
   </div>
   <div class="navbar-end">
-    <div class="hidden lg:flex">
-      <div class="dropdown dropdown-end">
-        <div tabindex="0" role="button" class="btn btn-ghost m-1">
-          {t("header.theme")}
-        </div>
-        <ul
-          tabindex="0"
-          class="dropdown-content menu bg-base-100 rounded-box z-30 w-52 p-2 shadow"
-        >
-          {
-            themes.map((theme) => (
-              <ThemeSwitcher
-                message={theme.theme}
-                title={theme.name}
-                client:load
-              />
-            ))
-          }
-        </ul>
-      </div>
-    </div>
     <div class="dropdown dropdown-end">
       <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
         <div class="w-10 rounded-full">
@@ -129,3 +109,5 @@ const user = Astro.locals.user;
     </div>
   </div>
 </header>
+
+<Toasts client:load />

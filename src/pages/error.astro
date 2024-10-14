@@ -1,0 +1,46 @@
+---
+import BlankLayout from "$layouts/BlankLayout.astro";
+
+const code = Astro.url.searchParams.get("code");
+const message = Astro.url.searchParams.get("message");
+---
+
+<BlankLayout title="Error">
+  <section class="flex items-center h-full p-16">
+    <div
+      class="container flex flex-col items-center justify-center px-5 mx-auto my-8"
+    >
+      <div class="max-w-lg text-center">
+        {/* Error exception throw from middlewares & pages  */}
+        {
+          !code && (
+            <Fragment>
+              <h1 class="mb-5 text-4xl font-extrabold">An error occurred</h1>
+              <p class="mb-8 text-1xl">
+                Sorry, something went wrong on our end. Please try refreshing
+                the page or come back later
+              </p>
+            </Fragment>
+          )
+        }
+
+        {/* Error code & description from query string */}
+        {
+          (code || message) && (
+            <Fragment>
+              <h1 class="mb-5 text-4xl font-extrabold">
+                {code?.toUpperCase()}
+              </h1>
+              <p class="mb-8 text-1xl">{message}</p>
+            </Fragment>
+          )
+        }
+        <a
+          rel="noopener noreferrer"
+          href="/"
+          class="btn btn-outline btn-primary">Back to homepage</a
+        >
+      </div>
+    </div>
+  </section>
+</BlankLayout>

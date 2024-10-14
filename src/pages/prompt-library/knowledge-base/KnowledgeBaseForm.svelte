@@ -3,14 +3,14 @@
   import { useTranslations } from "$i18n/utils";
   import { onMount } from "svelte";
   import type { KnowledgeBase } from "$data/models/knowledgeBase.model";
-  export let preferredLocale;
-  const t = useTranslations(preferredLocale);
+
+  const t = useTranslations();
 
   let knowledgeBaseTitle = "";
   let knowledgeBaseText = "";
 
-  export let knowledgeBaseId: string;
-  export let knowledgeBase: KnowledgeBase;
+  export let knowledgeBaseId: string | undefined = undefined;
+  export let knowledgeBase: KnowledgeBase | undefined = undefined;
   export let isEditable: boolean = false;
 
   let isSaving = false;

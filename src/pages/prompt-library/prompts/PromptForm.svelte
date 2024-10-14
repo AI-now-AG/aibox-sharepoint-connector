@@ -6,8 +6,8 @@
   import { onMount } from "svelte";
   import MultiInput from "$pages/prompt-library/prompts/MultiInput.svelte";
   import type { Prompt } from "$data/models/prompt.model";
-  export let preferredLocale;
-  const t = useTranslations(preferredLocale);
+
+  const t = useTranslations();
 
   type Group = { title: string; _id: string }; // TODO: Get the type from the API endpoint
   type Category = {
@@ -39,8 +39,8 @@
   let promptTitle = "";
   let promptText = "";
 
-  export let promptId: string;
-  export let prompt: Prompt;
+  export let promptId: string | undefined = undefined;
+  export let prompt: Prompt | undefined = undefined;
   export let isEditable: boolean = false;
 
   let isSaving = false;

@@ -1,4 +1,4 @@
-import { ChatOpenAI } from "@langchain/openai";
+//import { ChatOpenAI } from "@langchain/openai";
 import {
   BaseMessage,
   HumanMessage,
@@ -14,6 +14,7 @@ import { fileLoader } from "$utils/document-loader";
 import type { APIRoute } from "astro";
 import type { CreateInstructionParams } from "../instructions.json";
 import type { CreateKnowledgeBaseParams } from "../knowledge-base.json";
+import initializeOpenAI from "$utils/chatModel";
 
 export type PromptDetails = {
   title: string;
@@ -38,12 +39,13 @@ const RunPromptParamsSchema = z.object({
 export type RunPromptParams = z.infer<typeof RunPromptParamsSchema>;
 export type Attachment = z.infer<typeof AttachmentSchema>;
 
-export const model = new ChatOpenAI({
-  apiKey: import.meta.env.OPENAI_API_KEY,
-  model: import.meta.env.OPENAI_MODEL,
-});
+// export const model = new ChatOpenAI({
+//   apiKey: import.meta.env.OPENAI_API_KEY,
+//   model: import.meta.env.OPENAI_MODEL,
+// });
 
-export const POST: APIRoute = async ({ params, request }) => {
+export const POST: APIRoute = async (ctx) => {
+  const { params, request } = ctx;
   const id = params.id;
 
   try {
@@ -143,6 +145,7 @@ export const POST: APIRoute = async ({ params, request }) => {
       }
     }
 
+    //const model = initializeOpenAI(ctx);
     const parser = new StringOutputParser();
 
     // Set headers to enable chunked transfer
@@ -152,6 +155,8 @@ export const POST: APIRoute = async ({ params, request }) => {
 
     const { readable, writable } = new TransformStream();
     const writer = writable.getWriter();
+
+    const model = initializeOpenAI(ctx);
 
     (async () => {
       try {

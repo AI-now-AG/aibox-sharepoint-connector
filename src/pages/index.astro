@@ -6,7 +6,7 @@ import Card from "$components/content/Card.astro";
 import { getCollection } from "astro:content";
 
 import { useTranslations } from "$i18n/utils";
-const t = useTranslations(Astro.preferredLocale);
+const t = useTranslations();
 
 const allContent = await getCollection("aibox");
 ---
@@ -16,16 +16,16 @@ const allContent = await getCollection("aibox");
     <img
       src="/soki-somedia.png"
       alt="Somedia Logo"
-      class="h-12 w-auto somedia mx-auto"
+      class="h-12 w-auto logo-somedia mx-auto"
     />
     <!-- light/dark mode doesn't work currently in the way themes are implemented. Currently only the light variant will be rendered -->
     <img
       src="/aibox-logo-text.svg"
-      class="non-somedia h-12 w-auto dark:hidden mx-auto"
+      class="logo-light h-12 w-auto dark:hidden mx-auto"
     />
     <img
       src="/aibox-logo-text-dark.svg"
-      class="non-somedia h-12 hidden dark:block mx-auto"
+      class="logo-dark h-12 dark:block mx-auto"
     />
 
     <h1 class="text-4xl font-bold mt-9 mb-4">{t("welcome.title")}</h1>

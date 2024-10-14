@@ -1,0 +1,33 @@
+---
+import Head from "./Head.astro";
+
+import "$styles/global.css";
+import { useTranslations } from "$i18n/utils";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const t = useTranslations();
+
+const { title = t("site.title"), description = t("site.description") } =
+  Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <Head {title} {description} />
+  <body class="min-h-screen grid grid-rows-[min-content_1fr]">
+    <div class="drawer lg:drawer-open">
+      <input id="left-drawer-trigger" type="checkbox" class="drawer-toggle" />
+      <div class="drawer-content grid grid-rows-[1fr_min-content]">
+        <main
+          class="min-w-xs min-h-screen flex w-full flex-col lg:basis-2/3 bg-base-200"
+        >
+          <slot />
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

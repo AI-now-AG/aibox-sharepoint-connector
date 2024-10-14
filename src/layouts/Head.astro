@@ -19,14 +19,11 @@ const { title, description } = Astro.props;
   />
   <script is:inline>
     /* We set the theme in a render blocking script tag early to avoid flashing */
-    function setTheme() {
+    document.addEventListener("astro:page-load", function () {
       const theme = localStorage.getItem("theme");
       if (theme) {
         document.documentElement.setAttribute("data-theme", theme);
       }
-    }
-
-    setTheme();
-    document.addEventListener("astro:page-load", setTheme);
+    });
   </script>
 </head>

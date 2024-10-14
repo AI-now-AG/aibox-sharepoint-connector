@@ -3,14 +3,14 @@
   import { useTranslations } from "$i18n/utils";
   import type { Instruction } from "$data/models/instruction.model";
   import { onMount } from "svelte";
-  export let preferredLocale;
-  const t = useTranslations(preferredLocale);
+
+  const t = useTranslations();
 
   let instructionTitle = "";
   let instructionText = "";
 
-  export let instructionId: string;
-  export let instruction: Instruction;
+  export let instructionId: string | undefined = undefined;
+  export let instruction: Instruction | undefined = undefined;
   export let isEditable: boolean = false;
 
   let isSaving = false;

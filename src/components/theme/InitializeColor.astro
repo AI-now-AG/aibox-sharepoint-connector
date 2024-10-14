@@ -1,0 +1,8 @@
+---
+const { primary_color: primaryColor } = Astro.locals.tenant;
+const rawStylesCSS = `:root {
+  color: ${primaryColor} !important;
+}`;
+---
+
+<style is:global set:html={rawStylesCSS}></style>

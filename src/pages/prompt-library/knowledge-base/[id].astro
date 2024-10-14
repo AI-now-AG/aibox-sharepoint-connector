@@ -9,15 +9,21 @@ export interface Props {
 }
 
 const { id } = Astro.params;
+if (id === undefined) {
+  throw new Error("Id is required");
+}
 
-const knowledgeBase = id ? await KnowledgeBaseModel.get(id) : undefined; // TODO: Render 404 if not found
+const knowledgeBase = await KnowledgeBaseModel.get(id || ""); // TODO: Render 404 if not found
+if (knowledgeBase === null) {
+  throw new Error("KnowledgeBase not found");
+}
+
 let userPermissions = Astro.locals.user.permissions;
 ---
 
 <Layout>
   <div>
     <KnowledgeBaseForm
-      preferredLocale={Astro.preferredLocale}
       knowledgeBaseId={id}
       knowledgeBase={knowledgeBase}
       isEditable={userPermissions.includes(Permission.AdminAll)}

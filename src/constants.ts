@@ -3,4 +3,13 @@ export const PUBLIC_ROUTES = [
   "/api/login",
   "/login/auth0",
   "/login/auth0/callback",
+  "/logout/sucess",
+  "/404",
+  "/error",
+  "/restricted",
+];
+
+export const SUPER_ADMIN_ROUTES = [
+  "/tenant-management",
+  "/tenant-management/*",
 ];

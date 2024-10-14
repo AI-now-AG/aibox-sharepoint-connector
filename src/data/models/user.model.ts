@@ -56,12 +56,32 @@ export default {
     return collection.insertOne(validated);
   },
 
+  update: async (id: string | ObjectId, user: Partial<User>) => {
+    const objectId = id instanceof ObjectId ? id : new ObjectId(id);
+    const validated = UserSchema.partial().parse(user);
+    const doc = {
+      ...validated,
+      ...{
+        updated_at: new Date(),
+      },
+    };
+    return await collection.findOneAndUpdate(
+      { _id: objectId },
+      { $set: doc },
+      {
+        returnDocument: "after",
+      },
+    );
+  },
+
   list: async () => collection.find<User>({}),
 
   get: async (email: string) => collection.findOne<User>({ email }),
 
   getAuth0Sub: async (auth0_sub: string) =>
     collection.findOne<User>({ auth0_sub }),
+
+  getByEmail: async (email: string) => collection.findOne<User>({ email }),
 
   updateRole: async (auth0_sub: string, newRoles: UserRole[]) => {
     const validRoles = z.array(z.nativeEnum(UserRole)).parse(newRoles);

@@ -1,5 +1,4 @@
 ---
-// Component
 import Layout from "$layouts/Layout.astro";
 import NewCategoryForm from "$pages/prompt-library/categories/NewCategoryForm.svelte";
 import { Permission } from "$data/models/user.model";
@@ -9,7 +8,6 @@ let userPermissions = Astro.locals.user.permissions;
 
 <Layout>
   <NewCategoryForm
-    preferredLocale={Astro.preferredLocale}
     isEditable={userPermissions.includes(Permission.AdminAll)}
     client:load
   />
