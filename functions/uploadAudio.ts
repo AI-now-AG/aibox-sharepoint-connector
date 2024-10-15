@@ -4,6 +4,7 @@ import { BlobServiceClient } from '@azure/storage-blob';
 import { transcribeUsingOpenAI } from './transcribeAudio';
 
 const uploadAudio: Handler = async (event, context) => {
+    console.log("upload-----1--");
     if (event.httpMethod !== 'POST') {
         return {
             statusCode: 405,
@@ -11,6 +12,7 @@ const uploadAudio: Handler = async (event, context) => {
         };
     }
     try {
+        console.log("upload-----2--");
         const { fileName, uploadUrl, mimeType } = JSON.parse(event.body || '{}');
         if (!fileName || !uploadUrl) {
             return {
@@ -21,8 +23,11 @@ const uploadAudio: Handler = async (event, context) => {
 
         //const fileBuffer = Buffer.from(fileData, 'base64');
         //const uploadURL = await uploadToBlobStorage(fileName, fileBuffer, mimeType);
+        console.log("upload-----3--");
         const fileBuffer = await downloadFileFromBlob(uploadUrl)
+        console.log("upload-----4--");
         const transcription = await transcribeUsingOpenAI(fileBuffer, fileName, mimeType, uploadUrl);
+        console.log("upload-----5--");
         return {
             statusCode: 200,
             body: JSON.stringify({
@@ -61,7 +66,7 @@ async function downloadFileFromBlob(blobUrl: string): Promise<Buffer> {
     console.log(storageURLString)
     const blobServiceClient = BlobServiceClient.fromConnectionString(storageURLString);
     
-    
+
     const url = new URL(blobUrl);
     const blobPath = url.pathname.split('/'); 
     const containerName = blobPath[1]; 

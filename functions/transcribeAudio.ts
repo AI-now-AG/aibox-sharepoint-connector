@@ -22,6 +22,8 @@ function getClient() {
 
 export async function transcribeUsingOpenAI(audioBuffer: Buffer, fileName: string, audioMimeType: string | null, uploadURL: string): Promise<string> {
     try {
+        console.log("Transcribe----");
+        console.log(uploadURL);
         const openaiClient = getClient()
         //const tempFilePath = join("/tmp", fileName);
         //writeFileSync(tempFilePath, audioBuffer);
@@ -37,14 +39,16 @@ export async function transcribeUsingOpenAI(audioBuffer: Buffer, fileName: strin
                 'Eine übliche Ausdrucksweise ist "ob ORTSNAME", bspw. "ob Schwanden". das ob bedeutet in diesem Fall "oberhalb von"',
             language: "de",
         });
+        console.log("Transcribe---1--");
         const fileNameWithExtension = uploadURL.split('/').pop()!.split('?')[0];
         const fileNameWithoutExtension = fileNameWithExtension.split('.').slice(0, -1).join('.');
-
+        console.log("Transcribe---2--");
         const outputFileName = `${fileNameWithoutExtension}_output.txt`;
         console.log("fileName-out-backend-:"+outputFileName);
         await uploadOutputToBlob(outputFileName, response.text);
         return response.text;
     } catch (error) {
+        console.log("Transcribe---4--");
         console.error('Error during transcription:', error);
         throw new Error('Transcription failed.');
     }
