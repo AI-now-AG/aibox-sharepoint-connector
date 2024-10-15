@@ -84,7 +84,7 @@ async function restrictAccess(context: APIContext, next: MiddlewareNext) {
   // Prevent archived tenant member login
   if (
     context.locals.tenant?.active == false &&
-    context.url.pathname !== "/api/logout"
+    context.url.pathname != "/api/logout"
   ) {
     return context.redirect(`/api/logout`);
   }
