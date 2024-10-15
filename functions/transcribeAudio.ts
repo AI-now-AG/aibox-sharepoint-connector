@@ -28,7 +28,9 @@ export async function transcribeUsingOpenAI(audioBuffer: Buffer, fileName: strin
         //const tempFilePath = join("/tmp", fileName);
         //writeFileSync(tempFilePath, audioBuffer);
         //const audioFileStream = createReadStream(tempFilePath);
+        console.log("Transcribe---a--");
         const audioFile = await toFile(audioBuffer, fileName)
+        console.log("Transcribe---b--"+MODEL_NAME);
         const response = await openaiClient.audio.transcriptions.create({
             file: audioFile,
             model: MODEL_NAME,
