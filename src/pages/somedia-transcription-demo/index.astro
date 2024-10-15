@@ -150,7 +150,7 @@ import Layout from "$layouts/Layout.astro";
         const { uploadUrl, outputFileName } = await sasResponse.json();
         console.log(uploadUrl);
         if ($transcriptionData) {
-          $transcriptionData.value = "Uploading.....";
+          $transcriptionData.value = "Uploading...";
           $transcriptionData.classList.remove("hidden");
         }
         // Upload the file directly to Azure Blob Storage
