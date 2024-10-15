@@ -1,8 +1,8 @@
 ---
 import BlankLayout from "$layouts/BlankLayout.astro";
 
-const code = Astro.url.searchParams.get("code");
-const message = Astro.url.searchParams.get("message");
+const errorCode = Astro.url.searchParams.get("error");
+const errorDescription = Astro.url.searchParams.get("error_description");
 ---
 
 <BlankLayout title="Error">
@@ -13,7 +13,7 @@ const message = Astro.url.searchParams.get("message");
       <div class="max-w-lg text-center">
         {/* Error exception throw from middlewares & pages  */}
         {
-          !code && (
+          !errorCode && (
             <Fragment>
               <h1 class="mb-5 text-4xl font-extrabold">An error occurred</h1>
               <p class="mb-8 text-1xl">
@@ -26,12 +26,12 @@ const message = Astro.url.searchParams.get("message");
 
         {/* Error code & description from query string */}
         {
-          (code || message) && (
+          (errorCode || errorDescription) && (
             <Fragment>
               <h1 class="mb-5 text-4xl font-extrabold">
-                {code?.toUpperCase()}
+                {errorCode?.toUpperCase()}
               </h1>
-              <p class="mb-8 text-1xl">{message}</p>
+              <p class="mb-8 text-1xl">{errorDescription}</p>
             </Fragment>
           )
         }
