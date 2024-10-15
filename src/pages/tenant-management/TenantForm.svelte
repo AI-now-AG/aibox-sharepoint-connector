@@ -58,8 +58,8 @@
     document.getElementById("modal_confirm_update").close();
   }
 
-  let icon_open_ai = svgIcons.eye_close;
-  let icon_azure_open_ai = svgIcons.eye_close;
+  let icon_open_ai = svgIcons.eyeClose;
+  let icon_azure_open_ai = svgIcons.eyeClose;
   function togglePassword(_apiKeyProvider) {
     let passwordField = document.getElementById("open_ai_key");
     if (_apiKeyProvider == API_KEY_PROVIDER.AzureOpenAI) {
@@ -77,10 +77,10 @@
     } else {
       passwordField.type = "password";
       if (_apiKeyProvider == API_KEY_PROVIDER.OpenAI) {
-        icon_open_ai = svgIcons.eye_close;
+        icon_open_ai = svgIcons.eyeClose;
       }
       if (_apiKeyProvider == API_KEY_PROVIDER.AzureOpenAI) {
-        icon_azure_open_ai = svgIcons.eye_close;
+        icon_azure_open_ai = svgIcons.eyeClose;
       }
     }
   }
@@ -181,13 +181,10 @@
         {t("common.cancel")}
       </button>
     </div>
-
   </div>
 </div>
 <div class="px-8">
   <div class="container w-full mx-auto p-6" style="font-family: Inter;">
-    
-
     <div class="flex flex-row space-x-4">
       <div class="flex-1 flex flex-col mb-4">
         <span class="mb-2 text-gray-400 font-medium text-sm"
@@ -476,7 +473,7 @@
         }}
       />
       <label class="label cursor-pointer ml-2" for="feature-audio-to-text">
-        {@html svgIcons["audio-to-text"]}
+        {@html svgIcons.audioToText}
         <span class="label-text ml-2">{t("tenant.audio-to-text")}</span>
       </label>
     </div>

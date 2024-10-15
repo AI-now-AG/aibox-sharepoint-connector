@@ -221,7 +221,7 @@
                 class="py-3 px-4 text-right relative relative-dropdown rounded-r-lg"
               >
                 <button class="focus:outline-none">
-                  {@html svgIcons["three-dot"]}
+                  {@html svgIcons.threeDot}
                 </button>
                 <div class="dropdown-content py-2">
                   <button
