@@ -183,7 +183,7 @@ import Layout from "$layouts/Layout.astro";
                 $transcriptionData.value = "Transcribing...";
                 $transcriptionData.classList.remove("hidden");
               }
-              const response = await fetch("/.netlify/functions/uploadAudio", {
+              const response = await fetch("/.netlify/functions/uploadAudio-background", {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",

@@ -10,5 +10,9 @@
 [functions]
   node_bundler = "esbuild"
 
+  [functions."uploadAudio-background"]
+    timeout = 900 
+    memory = 1024
+
   [functions.max_lambda_size]
     value = "50mb"
