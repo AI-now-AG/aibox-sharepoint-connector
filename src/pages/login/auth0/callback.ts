@@ -23,7 +23,7 @@ const Auth0JWTSchema = z.object({
 });
 
 export async function GET(context: APIContext): Promise<Response> {
-  log.d(context.url.searchParams, "searchParams");
+  log.d(context.url.searchParams.toString(), "searchParams");
   log.d(context.cookies.get("auth0_state"), "state");
 
   const code = context.url.searchParams.get("code");
@@ -34,7 +34,9 @@ export async function GET(context: APIContext): Promise<Response> {
   if (context.url.searchParams.has("error")) {
     const error = context.url.searchParams.get("error");
     const description = context.url.searchParams.get("error_description");
-    return context.redirect(`/error?code=${error}&message=${description}`);
+    return context.redirect(
+      `/error?error=${error}&error_description=${description}`,
+    );
   }
 
   // Ensure the callback has code and valid state
