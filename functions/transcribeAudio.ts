@@ -41,6 +41,7 @@ export async function transcribeUsingOpenAI(audioBuffer: Buffer, fileName: strin
         const fileNameWithoutExtension = fileNameWithExtension.split('.').slice(0, -1).join('.');
 
         const outputFileName = `${fileNameWithoutExtension}_output.txt`;
+        console.log("fileName-out-backend-:"+outputFileName);
         await uploadOutputToBlob(outputFileName, response.text);
         return response.text;
     } catch (error) {

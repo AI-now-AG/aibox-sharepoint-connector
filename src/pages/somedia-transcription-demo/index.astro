@@ -149,6 +149,10 @@ import Layout from "$layouts/Layout.astro";
         const sasResponse = await fetch("/.netlify/functions/getSASToken");
         const { uploadUrl, outputFileName } = await sasResponse.json();
         console.log(uploadUrl);
+        if ($transcriptionData) {
+          $transcriptionData.value = "Uploading...";
+          $transcriptionData.classList.remove("hidden");
+        }
         // Upload the file directly to Azure Blob Storage
         const uploadResponse = await fetch(uploadUrl, {
           method: "PUT",
@@ -191,6 +195,7 @@ import Layout from "$layouts/Layout.astro";
                 }),
               });
               tempOutputFileName = `${outputFileName}_output.txt`;
+              console.log("fileName-out-:" + tempOutputFileName);
               startPolling();
               if (response.ok) {
                 const result = await response.json();
