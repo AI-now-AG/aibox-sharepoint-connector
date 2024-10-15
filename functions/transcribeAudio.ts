@@ -1,6 +1,7 @@
 // functions/transcription.ts
 import { AzureOpenAI } from 'openai';
 import { OpenAIClient, toFile } from "@langchain/openai";
+import { BlobServiceClient } from '@azure/storage-blob';
 //import { createReadStream, writeFileSync } from "fs";
 //import { join } from "path";
 
@@ -36,9 +37,31 @@ export async function transcribeUsingOpenAI(audioBuffer: Buffer, fileName: strin
                 'Eine übliche Ausdrucksweise ist "ob ORTSNAME", bspw. "ob Schwanden". das ob bedeutet in diesem Fall "oberhalb von"',
             language: "de",
         });
+        const fileNameWithExtension = uploadURL.split('/').pop()!.split('?')[0];
+        const fileNameWithoutExtension = fileNameWithExtension.split('.').slice(0, -1).join('.');
+
+        const outputFileName = `${fileNameWithoutExtension}_output.txt`;
+        await uploadOutputToBlob(outputFileName, response.text);
         return response.text;
     } catch (error) {
         console.error('Error during transcription:', error);
         throw new Error('Transcription failed.');
     }
 };
+
+
+async function uploadOutputToBlob(blobName: string, transcription: string): Promise<string> {
+    let storageURLString: string = process.env.AZURE_BLOB_STORAGE_NAME || "";
+    console.log(storageURLString)
+    const blobServiceClient = BlobServiceClient.fromConnectionString(storageURLString);
+    const containerName = 'transcribecontainer';
+    const containerClient = blobServiceClient.getContainerClient(containerName);
+    const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+
+    const uploadResponse = await blockBlobClient.upload(transcription, transcription.length, {
+        blobHTTPHeaders: { blobContentType: 'text/plain' },
+    });
+    console.log(`Upload successful. Request ID: ${uploadResponse.requestId}`);
+    console.log(`Upload successful. URL: ${blockBlobClient.url}`);
+    return blockBlobClient.url;
+}

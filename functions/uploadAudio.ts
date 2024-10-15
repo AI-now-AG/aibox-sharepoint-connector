@@ -11,18 +11,18 @@ const uploadAudio: Handler = async (event, context) => {
         };
     }
     try {
-        const { fileName, fileData, mimeType } = JSON.parse(event.body || '{}');
-        if (!fileName || !fileData) {
+        const { fileName, uploadUrl, mimeType } = JSON.parse(event.body || '{}');
+        if (!fileName || !uploadUrl) {
             return {
                 statusCode: 400,
                 body: JSON.stringify({ message: 'Invalid file upload data' }),
             };
         }
 
-        const fileBuffer = Buffer.from(fileData, 'base64');
-        const uploadURL = await uploadToBlobStorage(fileName, fileBuffer, mimeType);
-        const transcription = await transcribeUsingOpenAI(fileBuffer, fileName, mimeType, uploadURL);
-
+        //const fileBuffer = Buffer.from(fileData, 'base64');
+        //const uploadURL = await uploadToBlobStorage(fileName, fileBuffer, mimeType);
+        const fileBuffer = await downloadFileFromBlob(uploadUrl)
+        const transcription = await transcribeUsingOpenAI(fileBuffer, fileName, mimeType, uploadUrl);
         return {
             statusCode: 200,
             body: JSON.stringify({
@@ -54,6 +54,39 @@ async function uploadToBlobStorage(audioFileName: string, fileBuffer: Buffer, mi
     console.log(`Upload successful. Request ID: ${uploadResponse.requestId}`);
     console.log(`Upload successful. URL: ${blockBlobClient.url}`);
     return blockBlobClient.url;
+}
+
+async function downloadFileFromBlob(blobUrl: string): Promise<Buffer> {
+    let storageURLString: string = process.env.AZURE_BLOB_STORAGE_NAME || "";
+    console.log(storageURLString)
+    const blobServiceClient = BlobServiceClient.fromConnectionString(storageURLString);
+    
+    
+    const url = new URL(blobUrl);
+    const blobPath = url.pathname.split('/'); 
+    const containerName = blobPath[1]; 
+    const blobName = blobPath.slice(2).join('/');
+    
+    const containerClient = blobServiceClient.getContainerClient(containerName);
+    const blobClient = containerClient.getBlobClient(blobName);
+    
+    const downloadBlockBlobResponse = await blobClient.download(0);
+    const downloaded = await streamToBuffer(downloadBlockBlobResponse.readableStreamBody!);
+    
+    return downloaded;
+}
+
+async function streamToBuffer(readableStream: NodeJS.ReadableStream): Promise<Buffer> {
+    return new Promise((resolve, reject) => {
+        const chunks: any[] = [];
+        readableStream.on("data", (data) => {
+            chunks.push(data instanceof Buffer ? data : Buffer.from(data));
+        });
+        readableStream.on("end", () => {
+            resolve(Buffer.concat(chunks));
+        });
+        readableStream.on("error", reject);
+    });
 }
 
 // function parseContentDisposition(header: Buffer): { filename: string; fileContentType: string | null } {
