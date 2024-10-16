@@ -107,5 +107,7 @@
   "tenant.create-successful": "Tenant erfolgreich erstellt",
   "tenant.update-successful": "Tenant erfolgreich aktualisiert",
   "transcription": "Transkription",
-  "transcription.page-description": "Verwandle Audioaufnahmen, gesprochenen Text oder Meetings in Textform, um diese sinnvoll weiterzuverwenden."
+  "transcription.page-description": "Verwandle Audioaufnahmen, gesprochenen Text oder Meetings in Textform, um diese sinnvoll weiterzuverwenden.",
+  "transcription.select-transcription-model": "Transkriptionsmodell auswählen",
+  "transcription.upload-video-or-audio-file": "Video- oder Audiodateien hochladen"
 }

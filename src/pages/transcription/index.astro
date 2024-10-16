@@ -6,114 +6,129 @@ const t = useTranslations();
 
 <Layout>
   <div style="font-family: Inter;">
-  <div
-    class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14"
-  >
-    <!-- <h1 class="text-4xl font-bold">Transcription</h1> -->
-    <h1 class="pt-2 lg:pt-8 text-4xl font-bold">
-      {t("transcription")}
-    </h1>
-  </div>
-  <div class="px-14">
-    <p>{t("transcription.page-description")}</p>
-  </div>
-
-  <!-- REMOVE - START -->
-  <div class="px-14">
-    <div class="mt-10">
-      Find short test mp3 files here
-      <a
-        class="link link-primary"
-        href="https://drive.google.com/drive/u/1/folders/1aDlzKBTXqpd4ZYni6V2aFk1MypfVV77O"
-      >
-        https://drive.google.com/drive/u/1/folders/1aDlzKBTXqpd4ZYni6V2aFk1MypfVV77O</a
-      >
+    <div
+      class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14"
+    >
+      <!-- <h1 class="text-4xl font-bold">Transcription</h1> -->
+      <h1 class="pt-2 lg:pt-8 text-4xl font-bold">
+        {t("transcription")}
+      </h1>
+    </div>
+    <div class="px-14">
+      <p>{t("transcription.page-description")}</p>
     </div>
 
-    <a class="link link-primary" href="/transcription/doc">Documentation</a>
+    <div class="px-14 mt-10">
+      <p>1. {t("transcription.select-transcription-model")}</p>
 
-    <div class="mt-10">
-      <form>
-        <label for="file">Upload MP3 File</label>
-        <br />
-        <input
-          type="file"
-          id="file"
-          name="file"
-          class="file-input file-input-bordered w-full max-w-xs"
-        />
-        <br />
-        <br />
-        <button class="btn btn-primary">Transcribe</button>
-      </form>
+      <p class="mt-16">2. {t("transcription.upload-video-or-audio-file")}</p>
     </div>
 
-    <div>
-      <button id="copy" class="btn btn-primary hidden">Copy to clipboard</button
-      >
-    </div>
-    <textarea
-      name="transcription-data"
-      id="transcription-data"
-      class="hidden textarea min-h-96"></textarea>
+    <!-- REMOVE - START -->
+    <div
+      class="px-14 mt-10"
+      style="background-color: beige; padding-top: 20px; padding-bottom:20px;"
+    >
+      <h4 class="mb-8">
+        <b
+          >THIS YELLOW SECTION TEMPORARY USED FOR DEMOSTRATION ONLY, WILL BE
+          REMOVE AFTER FEATURE COMPETE</b>
+      </h4>
+      <div class="">
+        Find short test mp3 files here
+        <a
+          class="link link-primary"
+          href="https://drive.google.com/drive/u/1/folders/1aDlzKBTXqpd4ZYni6V2aFk1MypfVV77O"
+        >
+          https://drive.google.com/drive/u/1/folders/1aDlzKBTXqpd4ZYni6V2aFk1MypfVV77O</a
+        >
+      </div>
 
-    <script>
-      let intervalId: NodeJS.Timeout;
-      let tempOutputFileName = "file_output.txt";
-      const $form = document.querySelector("form");
-      const $transcriptionData = document.querySelector<HTMLTextAreaElement>(
-        "#transcription-data",
-      );
-      let $taskId = "";
-      const $copyBtn = document.querySelector<HTMLTextAreaElement>("#copy");
+      <a class="link link-primary" href="/transcription/doc">Documentation</a>
 
-      if ($form) {
-        $form.addEventListener("submit", handleFileUpload);
-      }
+      <div class="mt-10">
+        <form>
+          <label for="file">Upload MP3 File</label>
+          <br />
+          <input
+            type="file"
+            id="file"
+            name="file"
+            class="file-input file-input-bordered w-full max-w-xs"
+          />
+          <br />
+          <br />
+          <button class="btn btn-primary">Transcribe</button>
+        </form>
+      </div>
 
-      if ($copyBtn) {
-        $copyBtn.addEventListener("click", function () {
-          if ($transcriptionData) {
-            navigator.clipboard.writeText($transcriptionData.value).then(
-              function () {
-                $copyBtn.textContent = "Copied!";
-              },
-              function (err) {
-                console.error("Async: Could not copy text: ", err);
+      <div>
+        <button id="copy" class="btn btn-primary hidden"
+          >Copy to clipboard</button
+        >
+      </div>
+      <textarea
+        name="transcription-data"
+        id="transcription-data"
+        class="hidden textarea min-h-96"></textarea>
+
+      <script>
+        let intervalId: NodeJS.Timeout;
+        let tempOutputFileName = "file_output.txt";
+        const $form = document.querySelector("form");
+        const $transcriptionData = document.querySelector<HTMLTextAreaElement>(
+          "#transcription-data",
+        );
+        let $taskId = "";
+        const $copyBtn = document.querySelector<HTMLTextAreaElement>("#copy");
+
+        if ($form) {
+          $form.addEventListener("submit", handleFileUpload);
+        }
+
+        if ($copyBtn) {
+          $copyBtn.addEventListener("click", function () {
+            if ($transcriptionData) {
+              navigator.clipboard.writeText($transcriptionData.value).then(
+                function () {
+                  $copyBtn.textContent = "Copied!";
+                },
+                function (err) {
+                  console.error("Async: Could not copy text: ", err);
+                },
+              );
+            }
+          });
+        }
+
+        async function handleSubmit(event: Event) {
+          event.preventDefault();
+
+          const form = event.target as HTMLFormElement;
+          const formData = new FormData(form);
+
+          try {
+            if ($transcriptionData) {
+              $transcriptionData.value = "Transcribing...";
+              $transcriptionData.classList.remove("hidden");
+            }
+
+            // Send the file to the backend using fetch to initiate the transcription
+            const response = await fetch(
+              "/somedia-transcription-demo/test-transcribe",
+              {
+                method: "POST",
+                body: formData,
               },
             );
-          }
-        });
-      }
 
-      async function handleSubmit(event: Event) {
-        event.preventDefault();
+            if (!response.ok) {
+              throw new Error("Network response was not ok");
+            }
+            const result = await response.json();
+            $taskId = result.taskId;
 
-        const form = event.target as HTMLFormElement;
-        const formData = new FormData(form);
-
-        try {
-          if ($transcriptionData) {
-            $transcriptionData.value = "Transcribing...";
-            $transcriptionData.classList.remove("hidden");
-          }
-
-          // Send the file to the backend using fetch to initiate the transcription
-          const response = await fetch(
-            "/somedia-transcription-demo/test-transcribe",
-            {
-              method: "POST",
-              body: formData,
-            },
-          );
-
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
-          const result = await response.json();
-          $taskId = result.taskId;
-
-          /*const reader = response.body?.getReader();
+            /*const reader = response.body?.getReader();
           const decoder = new TextDecoder();
           if (reader) {
             if ($transcriptionData) {
@@ -134,133 +149,131 @@ const t = useTranslations();
               }
             }
           }*/
-        } catch (error) {
-          console.error("Error uploading file:", error);
-        }
-      }
-
-      async function handleFileUpload(event: Event) {
-        event.preventDefault();
-
-        const form = event.target as HTMLFormElement;
-        const fileInput = form.querySelector(
-          'input[type="file"]',
-        ) as HTMLInputElement;
-
-        const file = fileInput?.files?.[0];
-
-        if (!file) {
-          console.error("No file selected");
-          return;
+          } catch (error) {
+            console.error("Error uploading file:", error);
+          }
         }
 
-        // Get a SAS token and upload URL from your server
-        const sasResponse = await fetch("/.netlify/functions/getSASToken");
-        const { uploadUrl, outputFileName } = await sasResponse.json();
-        console.log(uploadUrl);
-        if ($transcriptionData) {
-          $transcriptionData.value = "Uploading...";
-          $transcriptionData.classList.remove("hidden");
-        }
-        // Upload the file directly to Azure Blob Storage
-        const uploadResponse = await fetch(uploadUrl, {
-          method: "PUT",
-          body: file,
-          headers: {
-            "x-ms-blob-type": "BlockBlob",
-            "Content-Type": file.type,
-          },
-        });
+        async function handleFileUpload(event: Event) {
+          event.preventDefault();
 
-        if (uploadResponse.ok) {
-          console.log("File uploaded successfully.");
+          const form = event.target as HTMLFormElement;
+          const fileInput = form.querySelector(
+            'input[type="file"]',
+          ) as HTMLInputElement;
 
-          // Convert the file to base64
-          const reader = new FileReader();
-          reader.readAsDataURL(file);
+          const file = fileInput?.files?.[0];
 
-          reader.onloadend = async function () {
-            const base64Data = (reader.result as string).split(",")[1]; // Cast result to string
+          if (!file) {
+            console.error("No file selected");
+            return;
+          }
 
-            if (!base64Data) {
-              console.error("Failed to encode file as base64");
-              return;
-            }
-
-            try {
-              if ($transcriptionData) {
-                $transcriptionData.value = "Transcribing...";
-                $transcriptionData.classList.remove("hidden");
-              }
-              const response = await fetch(
-                "/.netlify/functions/uploadAudio-background",
-                {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({
-                    fileName: file.name,
-                    uploadUrl: uploadUrl,
-                    mimeType: file.type,
-                  }),
-                },
-              );
-              tempOutputFileName = `${outputFileName}_output.txt`;
-              console.log("fileName-out-:" + tempOutputFileName);
-              startPolling();
-              if (response.ok) {
-                const result = await response.json();
-                if ($transcriptionData && result.transcription) {
-                  $transcriptionData.value = result.transcription;
-                }
-              } else {
-                console.error("Error uploading audio:", response.statusText);
-              }
-            } catch (error) {
-              console.error("Fetch error:", error);
-            }
-          };
-
-          reader.onerror = function (error) {
-            console.error("Error reading file:", error);
-          };
-        }
-      }
-
-      async function checkFileExistence() {
-        try {
-          const response = await fetch("/.netlify/functions/checkFileExist", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ fileName: tempOutputFileName }),
+          // Get a SAS token and upload URL from your server
+          const sasResponse = await fetch("/.netlify/functions/getSASToken");
+          const { uploadUrl, outputFileName } = await sasResponse.json();
+          console.log(uploadUrl);
+          if ($transcriptionData) {
+            $transcriptionData.value = "Uploading...";
+            $transcriptionData.classList.remove("hidden");
+          }
+          // Upload the file directly to Azure Blob Storage
+          const uploadResponse = await fetch(uploadUrl, {
+            method: "PUT",
+            body: file,
+            headers: {
+              "x-ms-blob-type": "BlockBlob",
+              "Content-Type": file.type,
+            },
           });
 
-          if (response.ok) {
-            const result = await response.json();
-            if ($transcriptionData && result.transcription) {
-              $transcriptionData.value = result.transcription;
-            }
-            if (result.exists) {
-              clearInterval(intervalId); // Stop polling when file exists
-              console.log("File found! Fetching transcription...");
-              // Fetch and display the transcription result here
-            } else {
-              console.log("File not found yet, checking again...");
-            }
+          if (uploadResponse.ok) {
+            console.log("File uploaded successfully.");
+
+            // Convert the file to base64
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+
+            reader.onloadend = async function () {
+              const base64Data = (reader.result as string).split(",")[1]; // Cast result to string
+
+              if (!base64Data) {
+                console.error("Failed to encode file as base64");
+                return;
+              }
+
+              try {
+                if ($transcriptionData) {
+                  $transcriptionData.value = "Transcribing...";
+                  $transcriptionData.classList.remove("hidden");
+                }
+                const response = await fetch(
+                  "/.netlify/functions/uploadAudio-background",
+                  {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                      fileName: file.name,
+                      uploadUrl: uploadUrl,
+                      mimeType: file.type,
+                    }),
+                  },
+                );
+                tempOutputFileName = `${outputFileName}_output.txt`;
+                console.log("fileName-out-:" + tempOutputFileName);
+                startPolling();
+                if (response.ok) {
+                  const result = await response.json();
+                  if ($transcriptionData && result.transcription) {
+                    $transcriptionData.value = result.transcription;
+                  }
+                } else {
+                  console.error("Error uploading audio:", response.statusText);
+                }
+              } catch (error) {
+                console.error("Fetch error:", error);
+              }
+            };
+
+            reader.onerror = function (error) {
+              console.error("Error reading file:", error);
+            };
           }
-        } catch (error) {
-          console.error("Error checking file existence:", error);
         }
-      }
 
-      function startPolling() {
-        intervalId = setInterval(checkFileExistence, 5000); // Check every 5 seconds
-      }
-    </script>
-  </div>
-  <!-- REMOVE - END -->
+        async function checkFileExistence() {
+          try {
+            const response = await fetch("/.netlify/functions/checkFileExist", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ fileName: tempOutputFileName }),
+            });
 
-  <div class="px-14"></div>
+            if (response.ok) {
+              const result = await response.json();
+              if ($transcriptionData && result.transcription) {
+                $transcriptionData.value = result.transcription;
+              }
+              if (result.exists) {
+                clearInterval(intervalId); // Stop polling when file exists
+                console.log("File found! Fetching transcription...");
+                // Fetch and display the transcription result here
+              } else {
+                console.log("File not found yet, checking again...");
+              }
+            }
+          } catch (error) {
+            console.error("Error checking file existence:", error);
+          }
+        }
+
+        function startPolling() {
+          intervalId = setInterval(checkFileExistence, 5000); // Check every 5 seconds
+        }
+      </script>
+    </div>
+    <!-- REMOVE - END -->
   </div>
 </Layout>
