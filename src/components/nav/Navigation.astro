@@ -19,6 +19,15 @@ const menuItems = categories.map((category) => ({
   })),
 }));
 
+menuItems.push({
+  title: t("nav.transcription"),
+  icon: svgIcons.transcription,
+  items: [{
+    title: t("nav.transcription.audio-to-text"),
+    path: `/transcription`,
+  }]
+})
+
 // TODO: Check logic supper admin here
 const tenantMenuItem = auth.isSuperAdmin(Astro.locals)
   ? {
