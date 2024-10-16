@@ -13,12 +13,12 @@ if (id === undefined) {
   throw new Error("Id is required");
 }
 
-const prompt = await Prompts.get(id || ""); // TODO: Render 404 if not found
+const prompt = await Prompts.getAsString(id || ""); // TODO: Render 404 if not found
 if (prompt === null) {
   throw new Error("Prompt not found");
 }
 
-let userPermissions = Astro.locals.user.permissions;
+const userPermissions = Astro.locals.user.permissions;
 ---
 
 <Layout>
