@@ -10,6 +10,7 @@ import back from '$assets/icons/back.svg?raw';
 import audioToText from '$assets/icons/audio-to-text.svg?raw';
 import eye from '$assets/icons/eye.svg?raw';
 import eyeClose from '$assets/icons/eye-close.svg?raw';
+import transcription from '$assets/icons/transcription.svg?raw';
 
 export const svgIcons = {
   tenantManagement,
@@ -24,4 +25,5 @@ export const svgIcons = {
   audioToText,
   eye,
   eyeClose,
+  transcription
 };

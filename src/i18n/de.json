@@ -18,6 +18,8 @@
   "nav.settings.knowledge-base": "Knowledge Base",
   "nav.settings.categories": "Kategorien",
   "nav.tenant-management": "Tenant Verwaltung",
+  "nav.transcription": "Audio",
+  "nav.transcription.audio-to-text": "Audio zu Text",
   "login.welcome": "Willkommen bei",
   "login.title": "Melden Sie sich bei Ihrem Konto an",
   "login.email": "E-Mail",
