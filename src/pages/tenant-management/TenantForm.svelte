@@ -39,6 +39,10 @@
     tenantData.primary_color = selecteColor;
   }
 
+  if (!tenantData.api_key_provider) {
+    tenantData.api_key_provider = API_KEY_PROVIDER.OpenAI;
+  }
+
   let showPicker = false;
   function toggleColorPicker() {
     showPicker = !showPicker;
