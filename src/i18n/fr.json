@@ -109,5 +109,8 @@
   "transcription": "Transcription",
   "transcription.page-description": "Convert audio recordings, spoken text or meetings into text for further use.",
   "transcription.select-transcription-model": "Select transcription model",
-  "transcription.upload-video-or-audio-file": "Upload Videos / Sound files"
+  "transcription.upload-video-or-audio-file": "Upload Videos / Sound files",
+  "transcription.input-file-upload-description": "Drag & Drop or <span class=\"text-blue-500 cursor-pointer\">Choose file</span> to transcribe",
+  "transcription.supportted-file-extensions": "MP4, MP3, WAV, AVI, M4A, FLAC",
+  "transcription.maximum-capacity": "max. file size: 25 MB"
 }
