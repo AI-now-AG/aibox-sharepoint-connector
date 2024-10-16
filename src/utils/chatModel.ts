@@ -18,6 +18,11 @@ export const initializeOpenAI = (ctx: APIContext) => {
     apiKey = import.meta.env.OPENAI_API_KEY;
   }
 
+  console.log("initializeOpenAI config", {
+    tenant: ctx.locals.tenant,
+    apiKey,
+  });
+
   return new ChatOpenAI({
     apiKey: apiKey as string,
     model: import.meta.env.OPENAI_MODEL,
