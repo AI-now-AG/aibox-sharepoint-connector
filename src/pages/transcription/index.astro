@@ -5,6 +5,7 @@ const t = useTranslations();
 ---
 
 <Layout>
+  <div style="font-family: Inter;">
   <div
     class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14"
   >
@@ -13,7 +14,11 @@ const t = useTranslations();
       {t("transcription")}
     </h1>
   </div>
+  <div class="px-14">
+    <p>{t("transcription.page-description")}</p>
+  </div>
 
+  <!-- REMOVE - START -->
   <div class="px-14">
     <div class="mt-10">
       Find short test mp3 files here
@@ -25,9 +30,7 @@ const t = useTranslations();
       >
     </div>
 
-    <a class="link link-primary" href="/transcription/doc"
-      >Documentation</a
-    >
+    <a class="link link-primary" href="/transcription/doc">Documentation</a>
 
     <div class="mt-10">
       <form>
@@ -255,5 +258,9 @@ const t = useTranslations();
         intervalId = setInterval(checkFileExistence, 5000); // Check every 5 seconds
       }
     </script>
+  </div>
+  <!-- REMOVE - END -->
+
+  <div class="px-14"></div>
   </div>
 </Layout>

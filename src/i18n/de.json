@@ -106,5 +106,6 @@
   "tenant.validate-azure-open-ai-key-message": "Bitte Azure Open AI-Schlüssel erfassen",
   "tenant.create-successful": "Tenant erfolgreich erstellt",
   "tenant.update-successful": "Tenant erfolgreich aktualisiert",
-  "transcription": "Transkription"
+  "transcription": "Transkription",
+  "transcription.page-description": "Verwandle Audioaufnahmen, gesprochenen Text oder Meetings in Textform, um diese sinnvoll weiterzuverwenden."
 }
