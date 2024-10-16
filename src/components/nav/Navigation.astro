@@ -23,7 +23,7 @@ const menuItems = categories.map((category) => ({
 const tenantMenuItem = auth.isSuperAdmin(Astro.locals)
   ? {
       title: t("nav.tenant-management"),
-      icon: svgIcons["ic-tenant-management"],
+      icon: svgIcons.tenantManagement,
       path: "/tenant-management",
     }
   : undefined;

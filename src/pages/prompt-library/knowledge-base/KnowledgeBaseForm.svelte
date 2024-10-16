@@ -2,7 +2,6 @@
   import type { CreateKnowledgeBaseParams } from "$pages/api/knowledge-base.json";
   import { useTranslations } from "$i18n/utils";
   import { onMount } from "svelte";
-  import type { KnowledgeBase } from "$data/models/knowledgeBase.model";
 
   const t = useTranslations();
 
@@ -10,7 +9,7 @@
   let knowledgeBaseText = "";
 
   export let knowledgeBaseId: string | undefined = undefined;
-  export let knowledgeBase: KnowledgeBase | undefined = undefined;
+  export let knowledgeBase: any | undefined = undefined;
   export let isEditable: boolean = false;
 
   let isSaving = false;

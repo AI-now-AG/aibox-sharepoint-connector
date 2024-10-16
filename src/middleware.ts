@@ -82,9 +82,12 @@ async function restrictAccess(context: APIContext, next: MiddlewareNext) {
   }
 
   // Prevent archived tenant member login
-  if (context.locals.tenant?.active == false) {
+  if (
+    context.locals.tenant?.active == false &&
+    context.url.pathname !== "/api/logout"
+  ) {
     return context.redirect(
-      `/error?code=tenant_inactive&message=Sorry, the tenant associated with your account is currently inactive. Please contact the tenant administrator or support for assistance.`,
+      `/error?error=tenant_inactive&error_description=Sorry, the tenant associated with your account is currently inactive. Please contact the tenant administrator or support for assistance.`,
     );
   }
 

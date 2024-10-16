@@ -5,7 +5,6 @@
 
   import { onMount } from "svelte";
   import MultiInput from "$pages/prompt-library/prompts/MultiInput.svelte";
-  import type { Prompt } from "$data/models/prompt.model";
 
   const t = useTranslations();
 
@@ -40,7 +39,7 @@
   let promptText = "";
 
   export let promptId: string | undefined = undefined;
-  export let prompt: Prompt | undefined = undefined;
+  export let prompt: any | undefined = undefined;
   export let isEditable: boolean = false;
 
   let isSaving = false;
