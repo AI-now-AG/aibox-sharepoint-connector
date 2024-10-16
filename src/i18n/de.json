@@ -105,5 +105,6 @@
   "tenant.validate-open-ai-key-message": "Bitte Open AI-Schlüssel erfassen",
   "tenant.validate-azure-open-ai-key-message": "Bitte Azure Open AI-Schlüssel erfassen",
   "tenant.create-successful": "Tenant erfolgreich erstellt",
-  "tenant.update-successful": "Tenant erfolgreich aktualisiert"
+  "tenant.update-successful": "Tenant erfolgreich aktualisiert",
+  "transcription": "Transkription"
 }

@@ -1,15 +1,21 @@
 ---
 import Layout from "$layouts/Layout.astro";
-
-// import { useTranslations } from "$i18n/utils";
-// const t = useTranslations(Astro.preferredLocale);
+import { useTranslations } from "$i18n/utils";
+const t = useTranslations();
 ---
 
 <Layout>
-  <div class="grid grid-cols-1 gap-6 max-w-6xl p-6 mt-12 mx-auto">
-    <h1 class="text-4xl font-bold">Transcription</h1>
+  <div
+    class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14"
+  >
+    <!-- <h1 class="text-4xl font-bold">Transcription</h1> -->
+    <h1 class="pt-2 lg:pt-8 text-4xl font-bold">
+      {t("transcription")}
+    </h1>
+  </div>
 
-    <div>
+  <div class="px-14">
+    <div class="mt-10">
       Find short test mp3 files here
       <a
         class="link link-primary"
@@ -19,11 +25,11 @@ import Layout from "$layouts/Layout.astro";
       >
     </div>
 
-    <a class="link link-primary" href="/somedia-transcription-demo/doc"
+    <a class="link link-primary" href="/transcription/doc"
       >Documentation</a
     >
 
-    <div>
+    <div class="mt-10">
       <form>
         <label for="file">Upload MP3 File</label>
         <br />
@@ -183,17 +189,20 @@ import Layout from "$layouts/Layout.astro";
                 $transcriptionData.value = "Transcribing...";
                 $transcriptionData.classList.remove("hidden");
               }
-              const response = await fetch("/.netlify/functions/uploadAudio-background", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
+              const response = await fetch(
+                "/.netlify/functions/uploadAudio-background",
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    fileName: file.name,
+                    uploadUrl: uploadUrl,
+                    mimeType: file.type,
+                  }),
                 },
-                body: JSON.stringify({
-                  fileName: file.name,
-                  uploadUrl: uploadUrl,
-                  mimeType: file.type,
-                }),
-              });
+              );
               tempOutputFileName = `${outputFileName}_output.txt`;
               console.log("fileName-out-:" + tempOutputFileName);
               startPolling();

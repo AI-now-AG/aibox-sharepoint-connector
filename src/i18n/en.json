@@ -105,5 +105,6 @@
   "tenant.validate-open-ai-key-message": "Please input Open AI key",
   "tenant.validate-azure-open-ai-key-message": "Please input Azure Open AI key",
   "tenant.create-successful": "Create tenant successful",
-  "tenant.update-successful": "Update tenant successful"
+  "tenant.update-successful": "Update tenant successful",
+  "transcription": "Transcription"
 }
