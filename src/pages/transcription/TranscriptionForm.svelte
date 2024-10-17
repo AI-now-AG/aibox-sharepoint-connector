@@ -1,20 +1,30 @@
 <script lang="ts">
+  import StartNewConfirmDialog from "./StartNewConfirmDialog.svelte";
   import { useTranslations } from "$i18n/utils";
   import { svgIcons } from "$assets/icons";
+  import { transcription } from "$stores/transcription";
+  import { addToast } from "$stores/toast";
+
   const t = useTranslations();
 
-  let isSelectedAudio = false;
-  let isDragOver = false;
-
-  let isUploading = false;
-  let isUploaded = false;
-  let isTranscipted = false;
-
+  // general
+  let audioFile: File;
+  let isDragOver: boolean = false;
   let selectedModel = "large";
+  let output: string = "";
 
-  let fileName = "";
-  let fileSize = 0;
-  let fileType = "";
+  // states
+  let isUploading: boolean = false;
+  let isUploaded: boolean = false;
+  let isTranscribing: boolean = false;
+  let isTranscipted: boolean = false;
+
+  // API, polling
+  let intervalId;
+  let tempUploadUrl;
+  let tempOutputFileName;
+
+  let confirmModal: HTMLDialogElement;
 
   function isFileTypeValid(extension) {
     // TODO: check file type
@@ -36,22 +46,152 @@
     return megabytes.toFixed(1);
   }
 
-  function addFiles(
+  async function getSASToken() {
+    const response = await fetch("/.netlify/functions/getSASToken");
+    return await response.json();
+  }
+
+  async function uploadBlobFile(uploadUrl: string, file: File) {
+    return await fetch(uploadUrl, {
+      method: "PUT",
+      body: file,
+      headers: {
+        "x-ms-blob-type": "BlockBlob",
+        "Content-Type": file.type,
+      },
+    });
+  }
+
+  async function addFiles(
     event: Event & { currentTarget: EventTarget & HTMLInputElement },
   ) {
     const eventTarget = event.target as HTMLInputElement;
-    const attachedFile = eventTarget.files[0];
-    console.log(attachedFile);
-    const { name, size, type } = attachedFile;
+    audioFile = eventTarget.files[0];
+
+    console.log("Selected audio file", audioFile);
+
+    const { name, size, type } = audioFile;
     if (!isFileValid({ name, size, type })) {
       return;
     }
-    fileName = name;
-    fileType = type;
-    fileSize = size;
 
-    isSelectedAudio = true;
     isUploading = true;
+
+    // Get Azure Storage SAS tokens
+    const { uploadUrl, outputFileName } = await getSASToken();
+    console.log("Azue SAS tokens response", { uploadUrl, outputFileName });
+
+    // Upload the file to Azure Blob Storage
+    const response = await uploadBlobFile(uploadUrl, audioFile);
+
+    // Store temporary upload URL, filename for later
+    tempUploadUrl = uploadUrl;
+    tempOutputFileName = `${outputFileName}_output.txt`;
+    console.log("Temp output file name", tempOutputFileName);
+
+    if (response.ok) {
+      isUploading = false;
+      isUploaded = true;
+    }
+  }
+
+  async function transcribe() {
+    try {
+      isTranscribing = true;
+
+      const response = await fetch(
+        "/.netlify/functions/uploadAudio-background",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            fileName: audioFile.name,
+            uploadUrl: tempUploadUrl,
+            mimeType: audioFile.type,
+          }),
+        },
+      );
+
+      console.log("Upload audio background response", {
+        status: response.status,
+        statusText: response.statusText,
+      });
+
+      if (response.ok) {
+        startPolling();
+      }
+    } catch (error) {
+      console.error("Fetch error:", error);
+    }
+  }
+
+  async function checkOutputFileReady() {
+    try {
+      const response = await fetch("/.netlify/functions/checkFileExist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fileName: tempOutputFileName }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log("Check output file ready response", result);
+
+        if (result.exists) {
+          clearInterval(intervalId);
+
+          output = result.transcription;
+          addToast({
+            message:
+              '<a href="/transcription">Your transcription is ready. Tap to see.</a>',
+            type: "success",
+          });
+
+          isTranscribing = false;
+          isTranscipted = true;
+
+          console.log("File found!");
+        } else {
+          console.console.warn("File not found yet");
+        }
+      }
+    } catch (error) {
+      console.error("Check output file ready error", error);
+    }
+  }
+
+  function startPolling() {
+    intervalId = setInterval(checkOutputFileReady, 5000);
+  }
+
+  function confirmStartNew() {
+    confirmModal.showModal();
+  }
+
+  function startNew() {
+    reset();
+    confirmModal.close();
+  }
+
+  function downloadFile() {
+    console.log("Download file!");
+    confirmModal.close();
+  }
+
+  function removeFile() {
+    reset();
+  }
+
+  function reset() {
+    audioFile = null;
+    isUploading = false;
+    isUploaded = false;
+    isTranscribing = false;
+    isTranscipted = false;
+
+    output = "";
   }
 </script>
 
@@ -82,7 +222,7 @@
   </select>
 
   <p class="mt-16 mb-2">2. {t("transcription.upload-video-or-audio-file")}</p>
-  {#if !isSelectedAudio}
+  {#if !audioFile}
     <div class="relative flex flex-col mt-2">
       <label
         class={`py-6 relative flex flex-col text-base-content border border-dashed rounded cursor-pointer ${isDragOver ? "border-blue-500" : "border-neutral-content"}`}
@@ -98,7 +238,6 @@
       >
         <input
           type="file"
-          multiple
           class="absolute inset-0 z-50 w-full h-full p-0 m-0 outline-none opacity-0 cursor-pointer"
           on:change={addFiles}
         />
@@ -119,7 +258,7 @@
     </div>
   {/if}
 
-  {#if isSelectedAudio}
+  {#if audioFile}
     <div
       class={`flex items-center justify-between p-2 border rounded-lg shadow-sm mt-2 ${isUploading ? "bg-transparent" : "bg-cyan-100"}`}
     >
@@ -128,23 +267,21 @@
           {@html svgIcons.document}
         </div>
         <div class="ml-4">
-          <p class="font-medium">{fileName}</p>
+          <p class="font-medium">{audioFile.name}</p>
           <p class="text-sm text-gray-500">
-            {fileSize ? bytesToMegabytes(fileSize) + " MB" : ""}
+            {audioFile ? bytesToMegabytes(audioFile.size) + " MB" : ""}
           </p>
         </div>
         <p class="font-medium ml-16">{"00:00 min"}</p>
       </div>
       <div class="flex items-center space-x-6">
         <div class="flex items-center space-x-2">
-          {@html svgIcons.uploading}
-          <p class="font-medium">{t("transciption.uploading")}</p>
+          {#if !isUploaded}
+            {@html svgIcons.uploading}
+            <p class="font-medium">{"Uploading..."}</p>
+          {/if}
           <button
-            on:click={() => {
-              isSelectedAudio = false;
-              isUploading = false;
-              isUploaded = false;
-            }}
+            on:click|preventDefault={removeFile}
             class="text-gray-500 hover:text-gray-700"
           >
             {@html svgIcons.x}
@@ -155,56 +292,32 @@
   {/if}
 
   <div class="mt-8 flex items-center space-x-4">
-    <button
-      class={`btn btn-active btn-primary btn-sm text-white`}
-      disabled={!isUploaded}
-      >{t("transciption.model.cta.start-transcribing")}</button
-    >
-    {#if isTranscipted}
-      <button class="btn btn-success btn-sm text-white">
-        {@html svgIcons.download}
-        {t("transciption.model.cta.download-output")}</button
-      >
+    {#if !isTranscipted}
       <button
-        class="btn bg-black btn-sm text-white"
-        on:click={() => {
-          document.getElementById("modal_confirm_start_new").showModal();
-        }}>{t("transciption.model.cta.start-new-transciption")}</button
+        class={`btn btn-active btn-primary`}
+        disabled={!isUploaded || isTranscribing}
+        on:click={transcribe}
+        >{t("transciption.model.cta.start-transcribing")}</button
+      >
+    {/if}
+    {#if isTranscipted}
+      <button class="btn btn-success" on:click={downloadFile}
+        >{t("transciption.model.cta.download-output")}</button
+      >
+      <button class="btn btn-active" on:click={confirmStartNew}
+        >{t("transciption.model.cta.start-new-transciption")}</button
       >
     {/if}
   </div>
 
-  <dialog id={"modal_confirm_start_new"} class="modal">
-    <div class="modal-box">
-      <form method="dialog" id="modalForm">
-        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-          >✕</button
-        >
-        <h3 id="modal_title" class="text-base">
-          {t("transcription.start-new")}
-        </h3>
+  <!-- testing purpose -->
+  {#if output}
+    <div class="mt-5">{output}</div>
+  {/if}
 
-        <div class="mt-6 mb-8 flex flex-col justify-center items-center">
-          {@html svgIcons.startNew}
-          <p class="text-center mt-6 font-semibold text-lg">
-            {t("transcription.start-new-popup.title")}
-          </p>
-          <p class="text-center mt-4 text-gray-500">
-            {t("transcription.start-new-popup.sub-title")}
-          </p>
-        </div>
-
-        <div class="flex flex-row-reverse gap-4 mt-16">
-          <button
-            id="no_button"
-            class="btn btn-active btn-primary btn-sm text-white"
-            on:click={() => {}}>{t("transcription.dowload-files")}</button
-          >
-          <button id="yes_button" class="btn btn-sm" on:click={() => {}}
-            >{t("transcription.start-new")}</button
-          >
-        </div>
-      </form>
-    </div>
-  </dialog>
+  <StartNewConfirmDialog
+    bind:modal={confirmModal}
+    on:download={downloadFile}
+    on:confirm={startNew}
+  />
 </div>
