@@ -109,8 +109,17 @@
   "transcription": "Transkription",
   "transcription.page-description": "Verwandle Audioaufnahmen, gesprochenen Text oder Meetings in Textform, um diese sinnvoll weiterzuverwenden.",
   "transcription.select-transcription-model": "Transkriptionsmodell auswählen",
+  "transciption.model": "Model",
   "transcription.upload-video-or-audio-file": "Video- oder Audiodateien hochladen",
   "transcription.input-file-upload-description": "Datei per Drag & Drop verschieben oder <span class=\"text-blue-500 cursor-pointer\">Datei auswählen</span> um zu transkribieren",
   "transcription.supportted-file-extensions": "MP4, MP3, WAV, AVI, M4A, FLAC",
-  "transcription.maximum-capacity": "Maximale Dateigrösse: 25 MB"
+  "transcription.maximum-capacity": "Maximale Dateigrösse: 25 MB",
+  "transciption.model.size.large": "Large",
+  "transciption.model.size.medium": "Medium",
+  "transciption.model.size.small": "Small",
+  "transciption.model.size.base": "Base",
+  "transciption.model.size.tiny": "Tiny",
+  "transciption.model.cta.start-transcribing": "Start transcribing",
+  "transciption.model.cta.start-new-transciption": "Start new transciption",
+  "transciption.model.cta.download-output": "Download output"
 }
