@@ -10,6 +10,27 @@
   let fileType = "";
   let isDragOver = false;
   let isUploading = false;
+
+  function isFileTypeValid(extension) {
+    // TODO: check file type
+    return true;
+  }
+  function isFileSizeValid(size) {
+     // TODO: check file size
+    return true;
+  }
+  function isFileValid({ name, size, type }) {
+    if (isFileTypeValid(name) && isFileSizeValid(size)) {
+      return true;
+    }
+    return false;
+  }
+
+  function bytesToMegabytes(bytes) {
+    const megabytes = bytes / (1024 * 1024);
+    return megabytes.toFixed(1);
+  }
+
   function addFiles(
     event: Event & { currentTarget: EventTarget & HTMLInputElement },
   ) {
@@ -17,9 +38,13 @@
     const attachedFile = eventTarget.files[0];
     console.log(attachedFile);
     const { name, size, type } = attachedFile;
+    if (!isFileValid({ name, size, type })) {
+      return;
+    }
     fileName = name;
     fileType = type;
     fileSize = size;
+
     isSelectedAudio = true;
     isUploading = true;
   }
@@ -91,22 +116,24 @@
 
   {#if isSelectedAudio}
     <div
-      class={`flex items-center justify-between p-2 border rounded-lg shadow-sm mt-2 ${!isUploading ? "bg-transparent" : "bg-cyan-100"}`}
+      class={`flex items-center justify-between p-2 border rounded-lg shadow-sm mt-2 ${isUploading ? "bg-transparent" : "bg-cyan-100"}`}
     >
       <div class="flex items-center">
         <div class="flex-shrink-0 p-2 bg-gray-100 rounded-md">
           {@html svgIcons.document}
         </div>
         <div class="ml-4">
-          <p class="font-medium text-gray-900">{fileName}</p>
-          <p class="text-sm text-gray-500">{fileSize}</p>
+          <p class="font-medium">{fileName}</p>
+          <p class="text-sm text-gray-500">
+            {fileSize ? bytesToMegabytes(fileSize) + " MB" : ""}
+          </p>
         </div>
+        <p class="font-medium ml-16">{"00:00 min"}</p>
       </div>
       <div class="flex items-center space-x-6">
-        <p class="font-medium text-gray-900">{"00:00"}</p>
         <div class="flex items-center space-x-2">
           {@html svgIcons.uploading}
-          <p class="font-medium text-gray-900">{"Uploading..."}</p>
+          <p class="font-medium">{"Uploading..."}</p>
           <button
             on:click={() => {
               isSelectedAudio = false;
