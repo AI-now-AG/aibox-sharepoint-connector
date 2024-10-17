@@ -122,5 +122,9 @@
   "transciption.model.cta.start-transcribing": "Start transcribing",
   "transciption.model.cta.start-new-transciption": "Start new transciption",
   "transciption.model.cta.download-output": "Download output",
-  "transciption.uploading": "uploading..."
+  "transciption.uploading": "uploading...",
+  "transcription.start-new": "Start new",
+  "transcription.start-new-popup.title": "starting a new transcription will reload the page and the output files will be lost",
+  "transcription.start-new-popup.sub-title": "Make sure to download the transcriptions.",
+  "transcription.dowload-files": "Download files"
 }
