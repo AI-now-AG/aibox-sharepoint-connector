@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import Toast from "./Toast.svelte";
   import { dismissToast, toasts } from "$stores/toast";
 </script>

@@ -1,8 +1,9 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import StartNewConfirmDialog from "./StartNewConfirmDialog.svelte";
   import { useTranslations } from "$i18n/utils";
   import { svgIcons } from "$assets/icons";
-  import { transcription } from "$stores/transcription";
+  import { transcription, storeTranscribe } from "$stores/transcription";
   import { addToast } from "$stores/toast";
 
   const t = useTranslations();
@@ -26,14 +27,31 @@
 
   let confirmModal: HTMLDialogElement;
 
+  onMount(async () => {
+    console.log("OnMount transcription in store", $transcription);
+    if ($transcription) {
+      retrieveDataInStore();
+    }
+  });
+
+  function retrieveDataInStore() {
+    audioFile = $transcription.file;
+    output = $transcription.output;
+
+    isUploaded = true;
+    isTranscipted = true;
+  }
+
   function isFileTypeValid(extension) {
     // TODO: check file type
     return true;
   }
+
   function isFileSizeValid(size) {
     // TODO: check file size
     return true;
   }
+
   function isFileValid({ name, size, type }) {
     if (isFileTypeValid(name) && isFileSizeValid(size)) {
       return true;
@@ -143,6 +161,7 @@
           clearInterval(intervalId);
 
           output = result.transcription;
+          storeTranscribe({ file: audioFile, output });
           addToast({
             message:
               '<a href="/transcription">Your transcription is ready. Tap to see.</a>',
