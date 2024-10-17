@@ -8,7 +8,7 @@
 
   let isUploading = false;
   let isUploaded = false;
-  let isTranscipted = true;
+  let isTranscipted = false;
 
   let selectedModel = "large";
 
