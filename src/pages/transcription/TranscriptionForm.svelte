@@ -5,6 +5,7 @@
 
   let isSelectedAudio = false;
   let isDragOver = false;
+
   let isUploading = false;
   let isUploaded = false;
   let isTranscipted = false;
@@ -142,6 +143,7 @@
             on:click={() => {
               isSelectedAudio = false;
               isUploading = false;
+              isUploaded = false;
             }}
             class="text-gray-500 hover:text-gray-700"
           >
@@ -153,16 +155,16 @@
   {/if}
 
   <div class="mt-8 flex items-center space-x-4">
-    <button class={`btn btn-active btn-primary btn-sm`} disabled={!isUploaded}
+    <button class={`btn btn-active btn-primary btn-sm text-white`} disabled={!isUploaded}
       >{t("transciption.model.cta.start-transcribing")}</button
     >
     {#if isTranscipted}
-      <button class="btn btn-success btn-sm"
+      <button class="btn btn-success btn-sm text-white"
         >
         {@html svgIcons.download}
         {t("transciption.model.cta.download-output")}</button
       >
-      <button class="btn btn-active btn-sm"
+      <button class="btn bg-black btn-sm text-white"
         >{t("transciption.model.cta.start-new-transciption")}</button
       >
     {/if}
