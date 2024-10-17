@@ -21,7 +21,7 @@
   <p class="mt-16 mb-2">2. {t("transcription.upload-video-or-audio-file")}</p>
   <div class="relative flex flex-col">
     <label
-      class={`py-6 relative flex flex-col text-base-content border border-neutral-content border-dashed rounded cursor-pointer ${isDragOver && "border-primary ring-4 ring-inset"}`}
+      class={`py-6 relative flex flex-col text-base-content border  border-dashed rounded cursor-pointer ${isDragOver ? "border-blue-500" : "border-neutral-content"}`}
       on:dragover={() => {
         isDragOver = true;
       }}
