@@ -9,7 +9,7 @@ const MODEL_NAME = "whisper-1";
 
 function getClient() {
     const endpoint = process.env.AZURE_ENDPOINT;
-    const apiKey = process.env.AZURE_OPENAI_API_KEY2;
+    const apiKey = process.env.AZURE_OPENAI_API_KEY;
     const apiVersion = process.env.AZURE_OPENAI_API_VERSION;
     const deploymentName = process.env.AZURE_OPENAI_DEPLOYMENT_NAME;
     return new AzureOpenAI({
