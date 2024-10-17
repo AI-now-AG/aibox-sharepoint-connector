@@ -137,7 +137,7 @@
       <div class="flex items-center space-x-6">
         <div class="flex items-center space-x-2">
           {@html svgIcons.uploading}
-          <p class="font-medium">{"Uploading..."}</p>
+          <p class="font-medium">{t("transciption.uploading")}</p>
           <button
             on:click={() => {
               isSelectedAudio = false;
