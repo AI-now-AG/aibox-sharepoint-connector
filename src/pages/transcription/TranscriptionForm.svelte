@@ -153,14 +153,16 @@
   {/if}
 
   <div class="mt-8 flex items-center space-x-4">
-    <button class={`btn btn-active btn-primary`} disabled={!isUploaded}
+    <button class={`btn btn-active btn-primary btn-sm`} disabled={!isUploaded}
       >{t("transciption.model.cta.start-transcribing")}</button
     >
     {#if isTranscipted}
-      <button class="btn btn-success"
-        >{t("transciption.model.cta.download-output")}</button
+      <button class="btn btn-success btn-sm"
+        >
+        {@html svgIcons.download}
+        {t("transciption.model.cta.download-output")}</button
       >
-      <button class="btn btn-active"
+      <button class="btn btn-active btn-sm"
         >{t("transciption.model.cta.start-new-transciption")}</button
       >
     {/if}
