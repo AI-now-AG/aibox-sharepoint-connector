@@ -16,6 +16,7 @@ import uploading from "$assets/icons/uploading.svg?raw";
 import document from "$assets/icons/document.svg?raw";
 import x from "$assets/icons/x.svg?raw";
 import download from "$assets/icons/download.svg?raw";
+import startNew from "$assets/icons/start-new.svg?raw";
 
 export const svgIcons = {
   tenantManagement,
@@ -36,4 +37,5 @@ export const svgIcons = {
   document,
   x,
   download,
+  startNew,
 };

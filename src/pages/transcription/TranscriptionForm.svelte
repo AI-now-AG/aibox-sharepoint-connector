@@ -8,7 +8,7 @@
 
   let isUploading = false;
   let isUploaded = false;
-  let isTranscipted = false;
+  let isTranscipted = true;
 
   let selectedModel = "large";
 
@@ -155,18 +155,56 @@
   {/if}
 
   <div class="mt-8 flex items-center space-x-4">
-    <button class={`btn btn-active btn-primary btn-sm text-white`} disabled={!isUploaded}
+    <button
+      class={`btn btn-active btn-primary btn-sm text-white`}
+      disabled={!isUploaded}
       >{t("transciption.model.cta.start-transcribing")}</button
     >
     {#if isTranscipted}
-      <button class="btn btn-success btn-sm text-white"
-        >
+      <button class="btn btn-success btn-sm text-white">
         {@html svgIcons.download}
         {t("transciption.model.cta.download-output")}</button
       >
-      <button class="btn bg-black btn-sm text-white"
-        >{t("transciption.model.cta.start-new-transciption")}</button
+      <button
+        class="btn bg-black btn-sm text-white"
+        on:click={() => {
+          document.getElementById("modal_confirm_start_new").showModal();
+        }}>{t("transciption.model.cta.start-new-transciption")}</button
       >
     {/if}
   </div>
+
+  <dialog id={"modal_confirm_start_new"} class="modal">
+    <div class="modal-box">
+      <form method="dialog" id="modalForm">
+        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+          >✕</button
+        >
+        <h3 id="modal_title" class="text-base">
+          {t("transcription.start-new")}
+        </h3>
+
+        <div class="mt-6 mb-8 flex flex-col justify-center items-center">
+          {@html svgIcons.startNew}
+          <p class="text-center mt-6 font-semibold text-lg">
+            {t("transcription.start-new-popup.title")}
+          </p>
+          <p class="text-center mt-4 text-gray-500">
+            {t("transcription.start-new-popup.sub-title")}
+          </p>
+        </div>
+
+        <div class="flex flex-row-reverse gap-4 mt-16">
+          <button
+            id="no_button"
+            class="btn btn-active btn-primary btn-sm text-white"
+            on:click={() => {}}>{t("transcription.dowload-files")}</button
+          >
+          <button id="yes_button" class="btn btn-sm" on:click={() => {}}
+            >{t("transcription.start-new")}</button
+          >
+        </div>
+      </form>
+    </div>
+  </dialog>
 </div>
