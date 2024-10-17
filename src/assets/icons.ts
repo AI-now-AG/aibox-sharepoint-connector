@@ -12,6 +12,9 @@ import eye from '$assets/icons/eye.svg?raw';
 import eyeClose from '$assets/icons/eye-close.svg?raw';
 import transcription from '$assets/icons/transcription.svg?raw';
 import upload from "$assets/icons/upload.svg?raw";
+import uploading from "$assets/icons/uploading.svg?raw";
+import document from "$assets/icons/document.svg?raw";
+import x from "$assets/icons/x.svg?raw";
 
 export const svgIcons = {
   tenantManagement,
@@ -28,4 +31,7 @@ export const svgIcons = {
   eyeClose,
   transcription,
   upload,
+  uploading,
+  document,
+  x,
 };
