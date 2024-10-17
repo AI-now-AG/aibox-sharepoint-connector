@@ -118,5 +118,8 @@
   "transciption.model.size.medium": "Medium",
   "transciption.model.size.small": "Small",
   "transciption.model.size.base": "Base",
-  "transciption.model.size.tiny": "Tiny"
+  "transciption.model.size.tiny": "Tiny",
+  "transciption.model.cta.start-transcribing": "Start transcribing",
+  "transciption.model.cta.start-new-transciption": "Start new transciption",
+  "transciption.model.cta.download-output": "Download output"
 }

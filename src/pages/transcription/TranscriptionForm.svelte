@@ -3,20 +3,24 @@
   import { svgIcons } from "$assets/icons";
   const t = useTranslations();
 
-  let selectedModel = "large";
   let isSelectedAudio = false;
+  let isDragOver = false;
+  let isUploading = false;
+  let isUploaded = false;
+  let isTranscipted = false;
+
+  let selectedModel = "large";
+
   let fileName = "";
   let fileSize = 0;
   let fileType = "";
-  let isDragOver = false;
-  let isUploading = false;
 
   function isFileTypeValid(extension) {
     // TODO: check file type
     return true;
   }
   function isFileSizeValid(size) {
-     // TODO: check file size
+    // TODO: check file size
     return true;
   }
   function isFileValid({ name, size, type }) {
@@ -147,4 +151,18 @@
       </div>
     </div>
   {/if}
+
+  <div class="mt-8 flex items-center space-x-4">
+    <button class={`btn btn-active btn-primary`} disabled={!isUploaded}
+      >{t("transciption.model.cta.start-transcribing")}</button
+    >
+    {#if isTranscipted}
+      <button class="btn btn-success"
+        >{t("transciption.model.cta.download-output")}</button
+      >
+      <button class="btn btn-active"
+        >{t("transciption.model.cta.start-new-transciption")}</button
+      >
+    {/if}
+  </div>
 </div>
