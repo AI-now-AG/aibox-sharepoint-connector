@@ -282,7 +282,7 @@
       class={`flex items-center justify-between p-2 border rounded-lg shadow-sm mt-2 ${isUploading ? "bg-transparent" : "bg-cyan-100"}`}
     >
       <div class="flex items-center">
-        <div class="flex-shrink-0 p-2 bg-gray-100 rounded-md">
+        <div class="flex-shrink-0 p-2 rounded-md">
           {@html svgIcons.document}
         </div>
         <div class="ml-4">
@@ -294,11 +294,21 @@
         <p class="font-medium ml-16">{"00:00 min"}</p>
       </div>
       <div class="flex items-center space-x-6">
-        <div class="flex items-center space-x-2">
-          {#if !isUploaded}
-            {@html svgIcons.uploading}
-            <p class="font-medium">{"Uploading..."}</p>
-          {/if}
+        <div class="flex items-center space-x-4">
+          <div class="flex items-center space-x-2">
+            {#if !isUploaded}
+              {@html svgIcons.uploading}
+              <p class="font-medium">{"Uploading..."}</p>
+            {/if}
+            {#if isTranscribing}
+              <span class="loading loading-spinner loading-md"></span>
+              <p class="font-medium">{"transcribing"}</p>
+            {/if}
+            {#if isTranscipted}
+              {@html svgIcons.transcribed}
+              <p class="font-medium">{"transcribed"}</p>
+            {/if}
+          </div>
           <button
             on:click|preventDefault={removeFile}
             class="text-gray-500 hover:text-gray-700"
