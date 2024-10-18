@@ -4,7 +4,11 @@
   import StartNewConfirmDialog from "./StartNewConfirmDialog.svelte";
   import { useTranslations } from "$i18n/utils";
   import { svgIcons } from "$assets/icons";
-  import { transcription, storeTranscribe } from "$stores/transcription";
+  import {
+    transcription,
+    storeTranscribe,
+    resetTranscribe,
+  } from "$stores/transcription";
   import { addToast } from "$stores/toast";
 
   const t = useTranslations();
@@ -249,7 +253,9 @@
   }
 
   function startNew() {
+    resetTranscribe();
     reset();
+
     confirmModal.close();
   }
 
