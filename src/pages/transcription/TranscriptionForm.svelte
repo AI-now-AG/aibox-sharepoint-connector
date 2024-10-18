@@ -24,9 +24,9 @@
   let isTranscipted: boolean = false;
 
   // API, polling
-  let intervalId;
-  let tempUploadUrl;
-  let tempOutputFileName;
+  let intervalId: any;
+  let tempUploadUrl: string;
+  let tempOutputFileName: string;
 
   let confirmModal: HTMLDialogElement;
 
