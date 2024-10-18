@@ -11,6 +11,7 @@
   // general
   let audioFile: File;
   let audioDuration: string = "";
+  let acceptedTypes: Array<string> = ["audio/*", "video/*"];
   let isDragOver: boolean = false;
   let selectedModel = "large";
   let output: string = "";
@@ -43,9 +44,15 @@
     isTranscipted = true;
   }
 
-  function isFileTypeValid(extension) {
-    // TODO: check file type
-    return true;
+  function isFileTypeValid(type) {
+    for (let i = 0; i < acceptedTypes.length; i++) {
+      const acceptedType = acceptedTypes[i];
+      const typeCategory = type?.split("/")?.[0];
+      if (acceptedType.includes(typeCategory)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   function isFileSizeValid(size) {
@@ -54,7 +61,7 @@
   }
 
   function isFileValid({ name, size, type }) {
-    if (isFileTypeValid(name) && isFileSizeValid(size)) {
+    if (isFileTypeValid(type) && isFileSizeValid(size)) {
       return true;
     }
     return false;
@@ -88,23 +95,25 @@
     const eventTarget = event.target as HTMLInputElement;
     audioFile = eventTarget.files[0];
 
-    if (audioFile) {
-      const url = URL.createObjectURL(audioFile);
-      const audio = new Audio(url);
-      audio.addEventListener("loadedmetadata", () => {
-        const minutes = Math.floor(audio.duration / 60);
-        const seconds = Math.floor(audio.duration % 60);
-        audioDuration = `${minutes}:${seconds.toString().padStart(2, "0")} min`;
-        URL.revokeObjectURL(url);
-      });
+    if (!audioFile) {
+      return;
     }
 
     console.log("Selected audio file", audioFile);
-
     const { name, size, type } = audioFile;
     if (!isFileValid({ name, size, type })) {
       return;
     }
+
+    // Calculate duration for audio/video file
+    const url = URL.createObjectURL(audioFile);
+    const audio = new Audio(url);
+    audio.addEventListener("loadedmetadata", () => {
+      const minutes = Math.floor(audio.duration / 60);
+      const seconds = Math.floor(audio.duration % 60);
+      audioDuration = `${minutes}:${seconds.toString().padStart(2, "0")} min`;
+      URL.revokeObjectURL(url);
+    });
 
     isUploading = true;
 
@@ -271,6 +280,7 @@
         <input
           type="file"
           class="absolute inset-0 z-50 w-full h-full p-0 m-0 outline-none opacity-0 cursor-pointer"
+          accept="audio/*,video/*"
           on:change={addFiles}
         />
 
