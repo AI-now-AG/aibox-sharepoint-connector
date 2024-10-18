@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import ModelDropdown from "./ModelDropdown.svelte";
   import StartNewConfirmDialog from "./StartNewConfirmDialog.svelte";
   import { useTranslations } from "$i18n/utils";
   import { svgIcons } from "$assets/icons";
@@ -26,6 +27,13 @@
   let tempOutputFileName;
 
   let confirmModal: HTMLDialogElement;
+
+  // the `$:` means 're-run whenever these values change'
+  $: {
+    console.log("Selected model", {
+      selectedModel,
+    });
+  }
 
   onMount(async () => {
     console.log("OnMount transcription in store", $transcription);
@@ -216,29 +224,7 @@
 
 <div class="px-14 mt-10">
   <p>1. {t("transcription.select-transcription-model")}</p>
-  <select
-    class="bg-transparent mt-2 underline"
-    on:change={(event) => {
-      selectedModel = event.target.value;
-    }}
-  >
-    <option disabled>{t("transciption.model")}</option>
-    <option value="large" selected={selectedModel == "large"}
-      >{t("transciption.model.size.large")}</option
-    >
-    <option value="medium" selected={selectedModel == "medium"}
-      >{t("transciption.model.size.medium")}</option
-    >
-    <option value="small" selected={selectedModel == "small"}
-      >{t("transciption.model.size.small")}</option
-    >
-    <option value="base" selected={selectedModel == "base"}
-      >{t("transciption.model.size.base")}</option
-    >
-    <option value="tiny" selected={selectedModel == "tiny"}
-      >{t("transciption.model.size.tiny")}</option
-    >
-  </select>
+  <ModelDropdown bind:value={selectedModel} />
 
   <p class="mt-16 mb-2">2. {t("transcription.upload-video-or-audio-file")}</p>
   {#if !audioFile}
