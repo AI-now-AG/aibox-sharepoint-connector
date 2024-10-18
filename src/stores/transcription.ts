@@ -3,7 +3,7 @@ import { writable } from "svelte/store";
 type TranscribeOptions = {
   file: File;
   duration: string;
-  output: string;
+  outputFileUrl: string;
 };
 
 export const transcription = writable<TranscribeOptions | null>(null);

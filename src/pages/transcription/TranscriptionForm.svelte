@@ -15,7 +15,7 @@
   let acceptedTypes: Array<string> = ["audio/*", "video/*"];
   let isDragOver: boolean = false;
   let selectedModel = "large";
-  let output: string = "";
+  let outputFileUrl: string = "";
   let fileErrorMessage: string = "";
 
   // states
@@ -47,7 +47,7 @@
 
   function retrieveDataInStore() {
     audioFile = $transcription.file;
-    output = $transcription.output;
+    outputFileUrl = $transcription.outputFileUrl;
 
     isUploaded = true;
     isTranscipted = true;
@@ -210,8 +210,15 @@
         if (result.exists) {
           clearInterval(intervalId);
 
-          output = result.transcription;
-          storeTranscribe({ file: audioFile, duration: audioDuration, output });
+          // store data in store
+          outputFileUrl = result.url;
+          storeTranscribe({
+            file: audioFile,
+            duration: audioDuration,
+            outputFileUrl,
+          });
+
+          // show toast
           addToast({
             message:
               '<a href="/transcription">Your transcription is ready. Tap to see.</a>',
@@ -219,6 +226,7 @@
             timeout: 5000,
           });
 
+          // update states
           isTranscribing = false;
           isTranscipted = true;
 
@@ -246,8 +254,28 @@
   }
 
   function downloadFile() {
+    // Create a link element
+    const link = document.createElement("a");
+
+    // Set link's href to point to the Blob URL
+    link.href = outputFileUrl;
+    link.target = "_blank";
+    link.download = `${tempOutputFileName}`;
+
+    // Append link to the body
+    document.body.appendChild(link);
+
+    // Dispatch click event on the link
+    link.click();
+
+    // Remove link from body
+    document.body.removeChild(link);
+
+    // Clsoe dialog element
     console.log("Download file!");
-    confirmModal.close();
+    if (confirmModal.open) {
+      confirmModal.close();
+    }
   }
 
   function removeFile() {
@@ -261,17 +289,17 @@
     isTranscribing = false;
     isTranscipted = false;
 
-    output = "";
+    outputFileUrl = "";
   }
 </script>
 
 <div class="px-14 mt-10">
-  <div class="bg-base-100 p-4 rounded-lg">
+  <div class="bg-base-100 p-4 rounded-xl">
     <p>1. {t("transcription.select-transcription-model")}</p>
     <ModelDropdown bind:value={selectedModel} />
   </div>
 
-  <div class="bg-base-100 mt-8 p-4 rounded-lg">
+  <div class="bg-base-100 mt-8 p-4 rounded-xl">
     <p class="mb-2">2. {t("transcription.upload-video-or-audio-file")}</p>
     {#if !audioFile}
       <div class="relative flex flex-col mt-2">
@@ -381,11 +409,6 @@
       >
     {/if}
   </div>
-
-  <!-- testing purpose -->
-  {#if output}
-    <div class="mt-5">{output}</div>
-  {/if}
 
   <StartNewConfirmDialog
     bind:modal={confirmModal}
