@@ -16,6 +16,7 @@
   let isDragOver: boolean = false;
   let selectedModel = "large";
   let output: string = "";
+  let fileErrorMessage: string = "";
 
   // states
   let isUploading: boolean = false;
@@ -57,24 +58,24 @@
       const acceptedType = acceptedTypes[i];
       const typeCategory = type?.split("/")?.[0];
       if (acceptedType.includes(typeCategory)) {
+        fileErrorMessage = "";
         return true;
       }
     }
+    fileErrorMessage = t("transcription.file-validation.unsupported-type");
     return false;
   }
 
   function isFileSizeValid(size) {
-    console.log("isFileSizeValid", { size, default: 25 * 1024 * 1024 });
-    console.log("isFileSizeValid 1", size <= 25 * 1024 * 1024);
     if (size <= 25 * 1024 * 1024) {
+      fileErrorMessage = "";
       return true;
     }
+    fileErrorMessage = t("transcription.file-validation.exceed-size-limit");
     return false;
   }
 
   function isFileValid({ size, type }) {
-    console.log("isFileTypeValid(type)", isFileTypeValid(type));
-    console.log("isFileSizeValid(size)", isFileSizeValid(size));
     if (isFileTypeValid(type) && isFileSizeValid(size)) {
       return true;
     }
@@ -115,41 +116,38 @@
 
     console.log("Selected audio file", audioFile);
     const { name, size, type } = audioFile;
-    console.log(
-      "!isFileValid({ name, size, type }",
-      !isFileValid({ name, size, type }),
-    );
-    if (!isFileValid({ name, size, type })) {
-      return;
-    }
+    if (isFileValid({ name, size, type })) {
+      // Calculate duration for audio/video file
+      const url = URL.createObjectURL(audioFile);
+      const audio = new Audio(url);
+      audio.addEventListener("loadedmetadata", () => {
+        const minutes = Math.floor(audio.duration / 60);
+        const seconds = Math.floor(audio.duration % 60);
+        audioDuration = `${minutes}:${seconds.toString().padStart(2, "0")} min`;
+        URL.revokeObjectURL(url);
+      });
 
-    // Calculate duration for audio/video file
-    const url = URL.createObjectURL(audioFile);
-    const audio = new Audio(url);
-    audio.addEventListener("loadedmetadata", () => {
-      const minutes = Math.floor(audio.duration / 60);
-      const seconds = Math.floor(audio.duration % 60);
-      audioDuration = `${minutes}:${seconds.toString().padStart(2, "0")} min`;
-      URL.revokeObjectURL(url);
-    });
+      isUploading = true;
 
-    isUploading = true;
+      // Get Azure Storage SAS tokens
+      const { uploadUrl, outputFileName } = await getSASToken();
+      console.log("Azue SAS tokens response", { uploadUrl, outputFileName });
 
-    // Get Azure Storage SAS tokens
-    const { uploadUrl, outputFileName } = await getSASToken();
-    console.log("Azue SAS tokens response", { uploadUrl, outputFileName });
+      // Upload the file to Azure Blob Storage
+      const response = await uploadBlobFile(uploadUrl, audioFile);
 
-    // Upload the file to Azure Blob Storage
-    const response = await uploadBlobFile(uploadUrl, audioFile);
+      // Store temporary upload URL, filename for later
+      tempUploadUrl = uploadUrl;
+      tempOutputFileName = `${outputFileName}_output.txt`;
+      console.log("Temp output file name", tempOutputFileName);
 
-    // Store temporary upload URL, filename for later
-    tempUploadUrl = uploadUrl;
-    tempOutputFileName = `${outputFileName}_output.txt`;
-    console.log("Temp output file name", tempOutputFileName);
-
-    if (response.ok) {
+      if (response.ok) {
+        isUploading = false;
+        isUploaded = true;
+      }
+    } else {
       isUploading = false;
-      isUploaded = true;
+      audioFile = null;
     }
   }
 
@@ -262,7 +260,7 @@
   {#if !audioFile}
     <div class="relative flex flex-col mt-2">
       <label
-        class={`py-6 relative flex flex-col text-base-content border border-dashed rounded cursor-pointer ${isDragOver ? "border-blue-500" : "border-neutral-content"}`}
+        class={`py-6 relative flex flex-col text-base-content border border-dashed rounded cursor-pointer ${isDragOver ? "border-blue-500" : "border-neutral-content"} ${fileErrorMessage && "border-red-500 bg-red-100"}`}
         on:dragover={() => {
           isDragOver = true;
         }}
@@ -293,6 +291,8 @@
           </p>
         </div>
       </label>
+
+      <span class="mt-2 text-xs text-red-500">{fileErrorMessage}</span>
     </div>
   {/if}
 
