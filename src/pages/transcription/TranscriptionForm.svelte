@@ -272,89 +272,93 @@
 </script>
 
 <div class="px-14 mt-10">
-  <p>1. {t("transcription.select-transcription-model")}</p>
-  <ModelDropdown bind:value={selectedModel} />
+  <div class="bg-base-100 p-4 rounded-lg">
+    <p>1. {t("transcription.select-transcription-model")}</p>
+    <ModelDropdown bind:value={selectedModel} />
+  </div>
 
-  <p class="mt-16 mb-2">2. {t("transcription.upload-video-or-audio-file")}</p>
-  {#if !audioFile}
-    <div class="relative flex flex-col mt-2">
-      <label
-        class={`py-6 relative flex flex-col text-base-content border border-dashed rounded cursor-pointer ${isDragOver ? "border-blue-500" : "border-neutral-content"}`}
-        on:dragover={() => {
-          isDragOver = true;
-        }}
-        on:dragleave={() => {
-          isDragOver = false;
-        }}
-        on:drop={() => {
-          isDragOver = false;
-        }}
-      >
-        <input
-          type="file"
-          class="absolute inset-0 z-50 w-full h-full p-0 m-0 outline-none opacity-0 cursor-pointer"
-          accept="audio/*,video/*"
-          on:change={addFiles}
-        />
+  <div class="bg-base-100 mt-10 p-4 rounded-lg">
+    <p class="mb-2">2. {t("transcription.upload-video-or-audio-file")}</p>
+    {#if !audioFile}
+      <div class="relative flex flex-col mt-2">
+        <label
+          class={`py-6 relative flex flex-col text-base-content border border-dashed rounded cursor-pointer ${isDragOver ? "border-blue-500" : "border-neutral-content"}`}
+          on:dragover={() => {
+            isDragOver = true;
+          }}
+          on:dragleave={() => {
+            isDragOver = false;
+          }}
+          on:drop={() => {
+            isDragOver = false;
+          }}
+        >
+          <input
+            type="file"
+            class="absolute inset-0 z-50 w-full h-full p-0 m-0 outline-none opacity-0 cursor-pointer"
+            accept="audio/*,video/*"
+            on:change={addFiles}
+          />
 
-        <div class="flex flex-col items-center">
-          {@html svgIcons.upload}
-          <p class="text-base font-semibold">
-            {@html t("transcription.input-file-upload-description")}
-          </p>
-          <p class="text-sm text-gray-500 mt-1">
-            {t("transcription.supportted-file-extensions")}
-          </p>
-          <p class="text-xs text-gray-400 mt-8">
-            {t("transcription.maximum-capacity")}
-          </p>
-        </div>
-      </label>
-    </div>
-  {/if}
-
-  {#if audioFile}
-    <div
-      class={`flex items-center justify-between p-2 border rounded-lg shadow-sm mt-2 ${isUploading ? "bg-transparent" : "bg-cyan-100"}`}
-    >
-      <div class="flex items-center">
-        <div class="flex-shrink-0 p-2 rounded-md">
-          {@html svgIcons.document}
-        </div>
-        <div class="ml-4">
-          <p class="font-medium">{audioFile.name}</p>
-          <p class="text-sm text-gray-500">
-            {audioFile?.size ? bytesToMegabytes(audioFile?.size) + " MB" : ""}
-          </p>
-        </div>
-        <p class="font-medium ml-16">{audioDuration}</p>
-      </div>
-      <div class="flex items-center space-x-6">
-        <div class="flex items-center space-x-4">
-          <div class="flex items-center space-x-2">
-            {#if !isUploaded}
-              {@html svgIcons.uploading}
-              <p class="font-medium">{t("transciption.uploading")}</p>
-            {/if}
-            {#if isTranscribing}
-              <span class="loading loading-spinner loading-md"></span>
-              <p class="font-medium">{t("transciption.transcribing")}</p>
-            {/if}
-            {#if isTranscipted}
-              {@html svgIcons.transcribed}
-              <p class="font-medium">{t("transciption.transcribed")}</p>
-            {/if}
+          <div class="flex flex-col items-center">
+            {@html svgIcons.upload}
+            <p class="text-base font-semibold">
+              {@html t("transcription.input-file-upload-description")}
+            </p>
+            <p class="text-sm text-gray-500 mt-1">
+              {t("transcription.supportted-file-extensions")}
+            </p>
+            <p class="text-xs text-gray-400 mt-8">
+              {t("transcription.maximum-capacity")}
+            </p>
           </div>
-          <button
-            on:click|preventDefault={removeFile}
-            class="text-gray-500 hover:text-gray-700"
-          >
-            {@html svgIcons.x}
-          </button>
+        </label>
+      </div>
+    {/if}
+
+    {#if audioFile}
+      <div
+        class={`flex items-center justify-between p-2 border rounded-lg shadow-sm mt-2 ${isUploading ? "bg-transparent" : "bg-cyan-100"}`}
+      >
+        <div class="flex items-center">
+          <div class="flex-shrink-0 p-2 rounded-md">
+            {@html svgIcons.document}
+          </div>
+          <div class="ml-4">
+            <p class="font-medium">{audioFile.name}</p>
+            <p class="text-sm text-gray-500">
+              {audioFile?.size ? bytesToMegabytes(audioFile?.size) + " MB" : ""}
+            </p>
+          </div>
+          <p class="font-medium ml-16">{audioDuration}</p>
+        </div>
+        <div class="flex items-center space-x-6">
+          <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-2">
+              {#if !isUploaded}
+                {@html svgIcons.uploading}
+                <p class="font-medium">{t("transciption.uploading")}</p>
+              {/if}
+              {#if isTranscribing}
+                <span class="loading loading-spinner loading-md"></span>
+                <p class="font-medium">{t("transciption.transcribing")}</p>
+              {/if}
+              {#if isTranscipted}
+                {@html svgIcons.transcribed}
+                <p class="font-medium">{t("transciption.transcribed")}</p>
+              {/if}
+            </div>
+            <button
+              on:click|preventDefault={removeFile}
+              class="text-gray-500 hover:text-gray-700"
+            >
+              {@html svgIcons.x}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-  {/if}
+    {/if}
+  </div>
 
   <div class="mt-8 flex items-center space-x-4">
     {#if !isTranscipted}
