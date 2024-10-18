@@ -46,6 +46,7 @@
 
   function retrieveDataInStore() {
     audioFile = $transcription.file;
+    audioDuration = $transcription.duration;
     output = $transcription.output;
 
     isUploaded = true;
@@ -102,10 +103,32 @@
     });
   }
 
+  async function calculateDuration(file: File) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const url = URL.createObjectURL(file);
+        const audio = new Audio(url);
+
+        audio.addEventListener("loadedmetadata", () => {
+          const minutes = Math.floor(audio.duration / 60);
+          const seconds = Math.floor(audio.duration % 60);
+          const duration = `${minutes}:${seconds.toString().padStart(2, "0")} min`;
+          URL.revokeObjectURL(url);
+
+          resolve(duration);
+        });
+      } catch (error) {
+        console.error("Calculate duration error", error);
+        resolve("");
+      }
+    });
+  }
+
   async function addFiles(
     event: Event & { currentTarget: EventTarget & HTMLInputElement },
   ) {
     audioDuration = "";
+
     const eventTarget = event.target as HTMLInputElement;
     audioFile = eventTarget.files[0];
 
@@ -120,14 +143,8 @@
     }
 
     // Calculate duration for audio/video file
-    const url = URL.createObjectURL(audioFile);
-    const audio = new Audio(url);
-    audio.addEventListener("loadedmetadata", () => {
-      const minutes = Math.floor(audio.duration / 60);
-      const seconds = Math.floor(audio.duration % 60);
-      audioDuration = `${minutes}:${seconds.toString().padStart(2, "0")} min`;
-      URL.revokeObjectURL(url);
-    });
+    audioDuration = await calculateDuration(audioFile);
+    console.log("audioDuration", { audioDuration });
 
     isUploading = true;
 
@@ -197,7 +214,7 @@
           clearInterval(intervalId);
 
           output = result.transcription;
-          storeTranscribe({ file: audioFile, output });
+          storeTranscribe({ file: audioFile, duration: audioDuration, output });
           addToast({
             message:
               '<a href="/transcription">Your transcription is ready. Tap to see.</a>',

@@ -17,7 +17,7 @@
 </script>
 
 <select
-  class="select select-ghost bg-transparent mt-2 underline"
+  class="select select-ghost bg-transparent underline"
   bind:value
   on:change={() => dispatch("change", value)}
 >
