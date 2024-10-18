@@ -320,12 +320,17 @@
               <p class="font-medium">{t("transciption.uploading")}</p>
             {/if}
             {#if isTranscribing}
-              <span class="loading loading-spinner loading-md"></span>
-              <p class="font-medium">{t("transciption.transcribing")}</p>
+              <span class="loading loading-spinner loading-md text-primary"
+              ></span>
+              <p class="font-medium text-primary">
+                {t("transciption.transcribing")}
+              </p>
             {/if}
             {#if isTranscipted}
               {@html svgIcons.transcribed}
-              <p class="font-medium">{t("transciption.transcribed")}</p>
+              <p class="font-medium text-success">
+                {t("transciption.transcribed")}
+              </p>
             {/if}
           </div>
           <button
