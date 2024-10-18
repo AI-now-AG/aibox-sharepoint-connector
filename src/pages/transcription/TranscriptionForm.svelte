@@ -64,11 +64,17 @@
   }
 
   function isFileSizeValid(size) {
-    // TODO: check file size
-    return true;
+    console.log("isFileSizeValid", { size, default: 25 * 1024 * 1024 });
+    console.log("isFileSizeValid 1", size <= 25 * 1024 * 1024);
+    if (size <= 25 * 1024 * 1024) {
+      return true;
+    }
+    return false;
   }
 
-  function isFileValid({ name, size, type }) {
+  function isFileValid({ size, type }) {
+    console.log("isFileTypeValid(type)", isFileTypeValid(type));
+    console.log("isFileSizeValid(size)", isFileSizeValid(size));
     if (isFileTypeValid(type) && isFileSizeValid(size)) {
       return true;
     }
