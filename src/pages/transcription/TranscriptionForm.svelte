@@ -16,6 +16,7 @@
   let isDragOver: boolean = false;
   let selectedModel = "large";
   let output: string = "";
+  let fileErrorMessage: string = "";
 
   // states
   let isUploading: boolean = false;
@@ -57,16 +58,20 @@
       const acceptedType = acceptedTypes[i];
       const typeCategory = type?.split("/")?.[0];
       if (acceptedType.includes(typeCategory)) {
+        fileErrorMessage = "";
         return true;
       }
     }
+    fileErrorMessage = t("transcription.file-validation.unsupported-type");
     return false;
   }
 
   function isFileSizeValid(size) {
     if (size <= 25 * 1024 * 1024) {
+      fileErrorMessage = "";
       return true;
     }
+    fileErrorMessage = t("transcription.file-validation.exceed-size-limit");
     return false;
   }
 
@@ -255,7 +260,7 @@
   {#if !audioFile}
     <div class="relative flex flex-col mt-2">
       <label
-        class={`py-6 relative flex flex-col text-base-content border border-dashed rounded cursor-pointer ${isDragOver ? "border-blue-500" : "border-neutral-content"}`}
+        class={`py-6 relative flex flex-col text-base-content border border-dashed rounded cursor-pointer ${isDragOver ? "border-blue-500" : "border-neutral-content"} ${fileErrorMessage && "border-red-500 bg-red-100"}`}
         on:dragover={() => {
           isDragOver = true;
         }}
@@ -286,6 +291,8 @@
           </p>
         </div>
       </label>
+
+      <span class="mt-2 text-xs text-red-500">{fileErrorMessage}</span>
     </div>
   {/if}
 
