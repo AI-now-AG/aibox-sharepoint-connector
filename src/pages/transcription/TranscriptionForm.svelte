@@ -10,6 +10,7 @@
 
   // general
   let audioFile: File;
+  let audioDuration: string = "";
   let isDragOver: boolean = false;
   let selectedModel = "large";
   let output: string = "";
@@ -83,8 +84,20 @@
   async function addFiles(
     event: Event & { currentTarget: EventTarget & HTMLInputElement },
   ) {
+    audioDuration = "";
     const eventTarget = event.target as HTMLInputElement;
     audioFile = eventTarget.files[0];
+
+    if (audioFile) {
+      const url = URL.createObjectURL(audioFile);
+      const audio = new Audio(url);
+      audio.addEventListener("loadedmetadata", () => {
+        const minutes = Math.floor(audio.duration / 60);
+        const seconds = Math.floor(audio.duration % 60);
+        audioDuration = `${minutes}:${seconds.toString().padStart(2, "0")} min`;
+        URL.revokeObjectURL(url);
+      });
+    }
 
     console.log("Selected audio file", audioFile);
 
@@ -288,25 +301,25 @@
         <div class="ml-4">
           <p class="font-medium">{audioFile.name}</p>
           <p class="text-sm text-gray-500">
-            {audioFile ? bytesToMegabytes(audioFile.size) + " MB" : ""}
+            {audioFile?.size ? bytesToMegabytes(audioFile?.size) + " MB" : ""}
           </p>
         </div>
-        <p class="font-medium ml-16">{"00:00 min"}</p>
+        <p class="font-medium ml-16">{audioDuration}</p>
       </div>
       <div class="flex items-center space-x-6">
         <div class="flex items-center space-x-4">
           <div class="flex items-center space-x-2">
             {#if !isUploaded}
               {@html svgIcons.uploading}
-              <p class="font-medium">{"Uploading..."}</p>
+              <p class="font-medium">{t("transciption.uploading")}</p>
             {/if}
             {#if isTranscribing}
               <span class="loading loading-spinner loading-md"></span>
-              <p class="font-medium">{"transcribing"}</p>
+              <p class="font-medium">{t("transciption.transcribing")}</p>
             {/if}
             {#if isTranscipted}
               {@html svgIcons.transcribed}
-              <p class="font-medium">{"transcribed"}</p>
+              <p class="font-medium">{t("transciption.transcribed")}</p>
             {/if}
           </div>
           <button
