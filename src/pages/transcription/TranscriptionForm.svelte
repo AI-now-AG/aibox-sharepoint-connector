@@ -64,8 +64,6 @@
   }
 
   function isFileSizeValid(size) {
-    console.log("isFileSizeValid", { size, default: 25 * 1024 * 1024 });
-    console.log("isFileSizeValid 1", size <= 25 * 1024 * 1024);
     if (size <= 25 * 1024 * 1024) {
       return true;
     }
@@ -73,8 +71,6 @@
   }
 
   function isFileValid({ size, type }) {
-    console.log("isFileTypeValid(type)", isFileTypeValid(type));
-    console.log("isFileSizeValid(size)", isFileSizeValid(size));
     if (isFileTypeValid(type) && isFileSizeValid(size)) {
       return true;
     }
@@ -105,6 +101,7 @@
   async function addFiles(
     event: Event & { currentTarget: EventTarget & HTMLInputElement },
   ) {
+    event.preventDefault();
     audioDuration = "";
     const eventTarget = event.target as HTMLInputElement;
     audioFile = eventTarget.files[0];
@@ -115,41 +112,39 @@
 
     console.log("Selected audio file", audioFile);
     const { name, size, type } = audioFile;
-    console.log(
-      "!isFileValid({ name, size, type }",
-      !isFileValid({ name, size, type }),
-    );
-    if (!isFileValid({ name, size, type })) {
-      return;
-    }
+    if (isFileValid({ name, size, type })) {
+      // Calculate duration for audio/video file
+      const url = URL.createObjectURL(audioFile);
+      const audio = new Audio(url);
+      audio.addEventListener("loadedmetadata", () => {
+        const minutes = Math.floor(audio.duration / 60);
+        const seconds = Math.floor(audio.duration % 60);
+        audioDuration = `${minutes}:${seconds.toString().padStart(2, "0")} min`;
+        URL.revokeObjectURL(url);
+      });
 
-    // Calculate duration for audio/video file
-    const url = URL.createObjectURL(audioFile);
-    const audio = new Audio(url);
-    audio.addEventListener("loadedmetadata", () => {
-      const minutes = Math.floor(audio.duration / 60);
-      const seconds = Math.floor(audio.duration % 60);
-      audioDuration = `${minutes}:${seconds.toString().padStart(2, "0")} min`;
-      URL.revokeObjectURL(url);
-    });
+      isUploading = true;
 
-    isUploading = true;
+      // Get Azure Storage SAS tokens
+      const { uploadUrl, outputFileName } = await getSASToken();
+      console.log("Azue SAS tokens response", { uploadUrl, outputFileName });
 
-    // Get Azure Storage SAS tokens
-    const { uploadUrl, outputFileName } = await getSASToken();
-    console.log("Azue SAS tokens response", { uploadUrl, outputFileName });
+      // Upload the file to Azure Blob Storage
+      const response = await uploadBlobFile(uploadUrl, audioFile);
 
-    // Upload the file to Azure Blob Storage
-    const response = await uploadBlobFile(uploadUrl, audioFile);
+      // Store temporary upload URL, filename for later
+      tempUploadUrl = uploadUrl;
+      tempOutputFileName = `${outputFileName}_output.txt`;
+      console.log("Temp output file name", tempOutputFileName);
 
-    // Store temporary upload URL, filename for later
-    tempUploadUrl = uploadUrl;
-    tempOutputFileName = `${outputFileName}_output.txt`;
-    console.log("Temp output file name", tempOutputFileName);
-
-    if (response.ok) {
+      if (response.ok) {
+        isUploading = false;
+        isUploaded = true;
+      }
+    } else {
       isUploading = false;
-      isUploaded = true;
+      isUploaded = false;
+      audioFile = null;
     }
   }
 
