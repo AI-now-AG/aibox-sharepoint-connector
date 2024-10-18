@@ -216,6 +216,7 @@
             message:
               '<a href="/transcription">Your transcription is ready. Tap to see.</a>',
             type: "success",
+            timeout: 5000,
           });
 
           isTranscribing = false;
