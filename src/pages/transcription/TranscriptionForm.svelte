@@ -115,6 +115,10 @@
 
     console.log("Selected audio file", audioFile);
     const { name, size, type } = audioFile;
+    console.log(
+      "!isFileValid({ name, size, type }",
+      !isFileValid({ name, size, type }),
+    );
     if (!isFileValid({ name, size, type })) {
       return;
     }
@@ -338,17 +342,19 @@
   <div class="mt-8 flex items-center space-x-4">
     {#if !isTranscipted}
       <button
-        class={`btn btn-active btn-primary`}
+        class={`btn btn-active btn-primary btn-sm text-white`}
         disabled={!isUploaded || isTranscribing}
         on:click={transcribe}
         >{t("transciption.model.cta.start-transcribing")}</button
       >
     {/if}
     {#if isTranscipted}
-      <button class="btn btn-success" on:click={downloadFile}
-        >{t("transciption.model.cta.download-output")}</button
+      <button class="btn btn-success btn-sm text-white" on:click={downloadFile}
+        >{@html svgIcons.download}{t(
+          "transciption.model.cta.download-output",
+        )}</button
       >
-      <button class="btn btn-active" on:click={confirmStartNew}
+      <button class="btn bg-black btn-sm text-white" on:click={confirmStartNew}
         >{t("transciption.model.cta.start-new-transciption")}</button
       >
     {/if}
