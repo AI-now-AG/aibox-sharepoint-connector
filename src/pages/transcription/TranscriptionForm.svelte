@@ -364,13 +364,15 @@
         </div>
         <div class="flex items-center space-x-6">
           <div class="flex items-center space-x-4">
-            <div class="flex items-center space-x-2">
-              {#if !isUploaded}
+            {#if !isUploaded}
+              <div class="flex items-center space-x-2">
                 <span id="loading1" class="loading loading-spinner loading-md"
                 ></span>
                 <p class="font-medium">{t("transciption.uploading")}</p>
-              {/if}
-              {#if isTranscribing}
+              </div>
+            {/if}
+            {#if isTranscribing}
+              <div class="flex items-center space-x-2">
                 <span
                   id="loading2"
                   class="loading loading-spinner loading-md text-primary"
@@ -378,14 +380,16 @@
                 <p class="font-medium text-primary">
                   {t("transciption.transcribing")}
                 </p>
-              {/if}
-              {#if isTranscipted}
+              </div>
+            {/if}
+            {#if isTranscipted}
+              <div class="flex items-center space-x-2">
                 {@html svgIcons.transcribed}
                 <p class="font-medium text-success">
                   {t("transciption.transcribed")}
                 </p>
-              {/if}
-            </div>
+              </div>
+            {/if}
             <button
               on:click|preventDefault={removeFile}
               class="text-gray-500 hover:text-gray-700"
