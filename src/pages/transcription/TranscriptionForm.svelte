@@ -208,8 +208,8 @@
       });
 
       if (response.ok) {
-        //const result = await response.json();
-        //console.log("Check output file ready response", result);
+        const result = await response.json();
+        console.log("Check output file ready response", result);
 
         if (response.body) {
           clearInterval(intervalId);
