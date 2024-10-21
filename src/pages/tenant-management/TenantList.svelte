@@ -32,7 +32,6 @@
     } else {
       log.e(error, "Error fetching tenants");
     }
-    log.d(data, "Tenant list");
   };
 
   const copyName = (name) => {
