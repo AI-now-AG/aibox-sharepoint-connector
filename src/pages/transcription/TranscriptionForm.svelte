@@ -70,7 +70,7 @@
     return false;
   }
 
-  function isFileSizeValid(size: number) {
+  function isFileSizeValid(size) {
     if (size <= 25 * 1024 * 1024) {
       fileErrorMessage = "";
       return true;
@@ -86,7 +86,7 @@
     return false;
   }
 
-  function bytesToMegabytes(bytes: number) {
+  function bytesToMegabytes(bytes) {
     const megabytes = bytes / (1024 * 1024);
     return megabytes.toFixed(1);
   }
@@ -236,7 +236,7 @@
 
           console.log("File found!");
         } else {
-          console.warn("File not found yet");
+          console.console.warn("File not found yet");
         }
       }
     } catch (error) {
@@ -366,8 +366,7 @@
           <div class="flex items-center space-x-4">
             <div class="flex items-center space-x-2">
               {#if !isUploaded}
-                <span class="loading loading-spinner loading-md text-primary"
-                ></span>
+                {@html svgIcons.uploading}
                 <p class="font-medium">{t("transciption.uploading")}</p>
               {/if}
               {#if isTranscribing}
