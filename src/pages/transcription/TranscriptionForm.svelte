@@ -14,7 +14,7 @@
   const t = useTranslations();
 
   // general
-  let audioFile: any;
+  let audioFile: File;
   let audioDuration: string = "";
   let acceptedTypes: Array<string> = ["audio/*", "video/*"];
   let isDragOver: boolean = false;
@@ -50,14 +50,14 @@
   });
 
   function retrieveDataInStore() {
-    audioFile = $transcription?.file;
-    outputFileUrl = $transcription?.outputFileUrl || "";
+    audioFile = $transcription.file;
+    outputFileUrl = $transcription.outputFileUrl;
 
     isUploaded = true;
     isTranscipted = true;
   }
 
-  function isFileTypeValid(type: string) {
+  function isFileTypeValid(type) {
     for (let i = 0; i < acceptedTypes.length; i++) {
       const acceptedType = acceptedTypes[i];
       const typeCategory = type?.split("/")?.[0];
@@ -70,7 +70,7 @@
     return false;
   }
 
-  function isFileSizeValid(size: number) {
+  function isFileSizeValid(size) {
     if (size <= 25 * 1024 * 1024) {
       fileErrorMessage = "";
       return true;
@@ -79,14 +79,14 @@
     return false;
   }
 
-  function isFileValid({ size, type }: { size: number; type: string }) {
+  function isFileValid({ size, type }) {
     if (isFileTypeValid(type) && isFileSizeValid(size)) {
       return true;
     }
     return false;
   }
 
-  function bytesToMegabytes(bytes: number) {
+  function bytesToMegabytes(bytes) {
     const megabytes = bytes / (1024 * 1024);
     return megabytes.toFixed(1);
   }
@@ -107,8 +107,8 @@
     });
   }
 
-  function calculateDuration(file: File) {
-    return new Promise<string>((resolve) => {
+  async function calculateDuration(file: File) {
+    return new Promise(async (resolve, reject) => {
       try {
         const url = URL.createObjectURL(file);
         const audio = new Audio(url);
@@ -131,16 +131,15 @@
   ) {
     audioDuration = "";
     const eventTarget = event.target as HTMLInputElement;
-    audioFile = eventTarget?.files?.[0];
+    audioFile = eventTarget.files[0];
 
     if (!audioFile) {
       return;
     }
 
     console.log("Selected audio file", audioFile);
-    const { size, type }: { name: string; type: string; size: number } =
-      audioFile;
-    if (isFileValid({ size, type })) {
+    const { name, size, type } = audioFile;
+    if (isFileValid({ name, size, type })) {
       // Calculate duration for audio/video file
       audioDuration = await calculateDuration(audioFile);
 
@@ -237,7 +236,7 @@
 
           console.log("File found!");
         } else {
-          console.warn("File not found yet");
+          console.console.warn("File not found yet");
         }
       }
     } catch (error) {
@@ -368,14 +367,14 @@
             <div class="flex items-center space-x-2">
               {#if !isUploaded}
                 <span
-                  id="upload-spinner"
-                  class="loading loading-spinner loading-md text-primary"
+                  id="uploading-spinner"
+                  class="loading loading-spinner loading-md"
                 ></span>
                 <p class="font-medium">{t("transciption.uploading")}</p>
               {/if}
               {#if isTranscribing}
                 <span
-                  id="transcribe-spinner"
+                  id="transcribing-spinner"
                   class="loading loading-spinner loading-md text-primary"
                 ></span>
                 <p class="font-medium text-primary">
