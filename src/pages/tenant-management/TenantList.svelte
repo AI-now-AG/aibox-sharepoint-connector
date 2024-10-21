@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { actions } from "astro:actions";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
@@ -10,10 +10,10 @@
 
   const t = useTranslations();
 
-  let tenants = [];
-  let showArchived = false;
-  let searchValue = null;
-  let timeout;
+  let tenants: any[] = [];
+  let showArchived: boolean = false;
+  let searchValue: string = "";
+  let timeout: any;
 
   onMount(async () => {
     await fetchTenants();
