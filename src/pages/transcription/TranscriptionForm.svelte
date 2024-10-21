@@ -107,7 +107,7 @@
     });
   }
 
-  async function calculateDuration(file: File): Promise<string> {
+  async function calculateDuration(file: File) {
     return new Promise(async (resolve, reject) => {
       try {
         const url = URL.createObjectURL(file);
