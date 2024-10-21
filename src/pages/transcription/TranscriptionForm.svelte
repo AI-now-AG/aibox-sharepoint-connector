@@ -366,8 +366,7 @@
           <div class="flex items-center space-x-4">
             <div class="flex items-center space-x-2">
               {#if !isUploaded}
-                <span class="loading loading-spinner loading-md text-primary"
-                ></span>
+                {@html svgIcons.uploading}
                 <p class="font-medium">{t("transciption.uploading")}</p>
               {/if}
               {#if isTranscribing}
