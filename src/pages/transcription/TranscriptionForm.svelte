@@ -14,7 +14,7 @@
   const t = useTranslations();
 
   // general
-  let audioFile: File;
+  let audioFile: any;
   let audioDuration: string = "";
   let acceptedTypes: Array<string> = ["audio/*", "video/*"];
   let isDragOver: boolean = false;
@@ -50,14 +50,14 @@
   });
 
   function retrieveDataInStore() {
-    audioFile = $transcription.file;
-    outputFileUrl = $transcription.outputFileUrl;
+    audioFile = $transcription?.file;
+    outputFileUrl = $transcription?.outputFileUrl || "";
 
     isUploaded = true;
     isTranscipted = true;
   }
 
-  function isFileTypeValid(type) {
+  function isFileTypeValid(type: string) {
     for (let i = 0; i < acceptedTypes.length; i++) {
       const acceptedType = acceptedTypes[i];
       const typeCategory = type?.split("/")?.[0];
@@ -70,7 +70,7 @@
     return false;
   }
 
-  function isFileSizeValid(size) {
+  function isFileSizeValid(size: number) {
     if (size <= 25 * 1024 * 1024) {
       fileErrorMessage = "";
       return true;
@@ -79,14 +79,14 @@
     return false;
   }
 
-  function isFileValid({ size, type }) {
+  function isFileValid({ size, type }: { size: number; type: string }) {
     if (isFileTypeValid(type) && isFileSizeValid(size)) {
       return true;
     }
     return false;
   }
 
-  function bytesToMegabytes(bytes) {
+  function bytesToMegabytes(bytes: number) {
     const megabytes = bytes / (1024 * 1024);
     return megabytes.toFixed(1);
   }
@@ -107,8 +107,8 @@
     });
   }
 
-  async function calculateDuration(file: File) {
-    return new Promise(async (resolve, reject) => {
+  function calculateDuration(file: File) {
+    return new Promise<string>((resolve) => {
       try {
         const url = URL.createObjectURL(file);
         const audio = new Audio(url);
@@ -131,15 +131,16 @@
   ) {
     audioDuration = "";
     const eventTarget = event.target as HTMLInputElement;
-    audioFile = eventTarget.files[0];
+    audioFile = eventTarget?.files?.[0];
 
     if (!audioFile) {
       return;
     }
 
     console.log("Selected audio file", audioFile);
-    const { name, size, type } = audioFile;
-    if (isFileValid({ name, size, type })) {
+    const { size, type }: { name: string; type: string; size: number } =
+      audioFile;
+    if (isFileValid({ size, type })) {
       // Calculate duration for audio/video file
       audioDuration = await calculateDuration(audioFile);
 
@@ -236,7 +237,7 @@
 
           console.log("File found!");
         } else {
-          console.console.warn("File not found yet");
+          console.warn("File not found yet");
         }
       }
     } catch (error) {
