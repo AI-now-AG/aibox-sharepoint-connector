@@ -12,7 +12,9 @@ export default defineConfig({
     tailwind(),
     svelte(),
     sentry({
-      dsn: "https://3dd6d1e46e7ea1249f102712d6b7742b@o4508102990757888.ingest.de.sentry.io/4508160313983056",
+      dsn:
+        process.env.SENTRY_DSN ||
+        "https://3dd6d1e46e7ea1249f102712d6b7742b@o4508102990757888.ingest.de.sentry.io/4508160313983056",
       sourceMapsUploadOptions: {
         project: "aibox",
         authToken: process.env.SENTRY_AUTH_TOKEN,
