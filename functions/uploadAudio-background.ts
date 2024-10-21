@@ -2,13 +2,16 @@
 import { type Handler } from "@netlify/functions";
 import { BlobServiceClient } from "@azure/storage-blob";
 import { AzureOpenAI } from "openai";
-import { OpenAIClient, toFile } from "@langchain/openai";
+import { toFile } from "@langchain/openai";
+import { decrypt } from "../src/utils/secure";
 
 const MODEL_NAME = "whisper-1";
 
-function getClient() {
+function getClient(encryptedApiKey: string) {
+  console.log("encryptedApiKey", encryptedApiKey);
+  const apiKey = decrypt(encryptedApiKey);
+  console.log("apiKey", apiKey);
   const endpoint = process.env.AZURE_ENDPOINT;
-  const apiKey = process.env.AZURE_OPENAI_API_KEY2;
   const apiVersion = process.env.AZURE_OPENAI_API_VERSION;
   const deploymentName = process.env.AZURE_OPENAI_DEPLOYMENT_NAME;
   return new AzureOpenAI({
@@ -19,7 +22,7 @@ function getClient() {
   });
 }
 
-const uploadAudio: Handler = async (event, context) => {
+const uploadAudio: Handler = async (event) => {
   console.log("upload-----1--");
   if (event.httpMethod !== "POST") {
     return {
@@ -29,7 +32,9 @@ const uploadAudio: Handler = async (event, context) => {
   }
   try {
     console.log("upload-----2--");
-    const { fileName, uploadUrl, mimeType } = JSON.parse(event.body || "{}");
+    const { fileName, uploadUrl, mimeType, encryptedApiKey } = JSON.parse(
+      event.body || "{}",
+    );
     if (!fileName || !uploadUrl) {
       return {
         statusCode: 400,
@@ -47,6 +52,7 @@ const uploadAudio: Handler = async (event, context) => {
       fileName,
       mimeType,
       uploadUrl,
+      encryptedApiKey,
     );
     console.log("upload-----5--");
     return {
@@ -143,11 +149,12 @@ async function transcribeUsingOpenAI(
   fileName: string,
   audioMimeType: string | null,
   uploadURL: string,
+  encryptedApiKey: string = process.env.AZURE_OPENAI_API_KEY2 || "",
 ): Promise<string> {
   try {
     console.log("Transcribe----" + fileName);
     console.log(uploadURL);
-    const openaiClient = getClient();
+    const openaiClient = getClient(encryptedApiKey);
     //const tempFilePath = join("/tmp", fileName);
     //writeFileSync(tempFilePath, audioBuffer);
     //const audioFileStream = createReadStream(tempFilePath);
