@@ -366,16 +366,13 @@
           <div class="flex items-center space-x-4">
             {#if !isUploaded}
               <div class="flex items-center space-x-2">
-                <span id="loading1" class="loading loading-spinner loading-md"
-                ></span>
+                <span class="loading loading-spinner loading-md"></span>
                 <p class="font-medium">{t("transciption.uploading")}</p>
               </div>
             {/if}
             {#if isTranscribing}
               <div class="flex items-center space-x-2">
-                <span
-                  id="loading2"
-                  class="loading loading-spinner loading-md text-primary"
+                <span class="loading loading-spinner loading-md text-primary"
                 ></span>
                 <p class="font-medium text-primary">
                   {t("transciption.transcribing")}
