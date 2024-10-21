@@ -31,7 +31,7 @@
   // API, polling
   let intervalId: any;
   let tempUploadUrl: string;
-  let tempOutputFileName: string;
+  let tempOutputFileName: string[] = [];
 
   let confirmModal: HTMLDialogElement;
 
@@ -154,7 +154,7 @@
 
       // Store temporary upload URL, filename for later
       tempUploadUrl = uploadUrl;
-      tempOutputFileName = `${outputFileName}_output.txt`;
+      tempOutputFileName = [`${outputFileName}_output.txt`, `${outputFileName}_output.srt`];
       console.log("Temp output file name", tempOutputFileName);
 
       if (response.ok) {
@@ -204,18 +204,18 @@
       const response = await fetch("/.netlify/functions/checkFileExist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fileName: tempOutputFileName }),
+        body: JSON.stringify({ fileNames: tempOutputFileName }),
       });
 
       if (response.ok) {
-        const result = await response.json();
-        console.log("Check output file ready response", result);
+        //const result = await response.json();
+        //console.log("Check output file ready response", result);
 
-        if (result.exists) {
+        if (response.body) {
           clearInterval(intervalId);
 
           // store data in store
-          outputFileUrl = result.url;
+          outputFileUrl = response.url;
           storeTranscribe({
             file: audioFile,
             duration: audioDuration,
