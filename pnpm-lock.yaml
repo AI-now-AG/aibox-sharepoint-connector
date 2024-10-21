@@ -63,7 +63,7 @@ importers:
         specifier: ^1.9.2
         version: 1.9.2
       astro:
-        specifier: ^4.15.12
+        specifier: ^4.16.6
         version: 4.16.6(@types/node@22.4.1)(rollup@4.24.0)(typescript@5.5.4)
       astro-aws-amplify:
         specifier: ^0.1.0
@@ -439,11 +439,6 @@ packages:
 
   '@babel/parser@7.24.8':
     resolution: {integrity: sha512-WzfbgXOkGzZiXXCqk43kKwZjzwx4oulxZi3nq2TYL9mOjQv6kYwul9mz6ID36njuL7Xkp6nJEfok848Zj10j/w==}
-    engines: {node: '>=6.0.0'}
-    hasBin: true
-
-  '@babel/parser@7.25.7':
-    resolution: {integrity: sha512-aZn7ETtQsjjGG5HruveUK06cU3Hljuhd9Iojm4M8WWv3wLE6OkE5PWbDUkItmMgegmccaITudyuW5RPYrYlgWw==}
     engines: {node: '>=6.0.0'}
     hasBin: true
 
@@ -5457,10 +5452,6 @@ snapshots:
     dependencies:
       '@babel/types': 7.24.9
 
-  '@babel/parser@7.25.7':
-    dependencies:
-      '@babel/types': 7.25.8
-
   '@babel/parser@7.25.8':
     dependencies:
       '@babel/types': 7.25.8
@@ -6271,7 +6262,7 @@ snapshots:
 
   '@types/babel__core@7.20.5':
     dependencies:
-      '@babel/parser': 7.25.7
+      '@babel/parser': 7.25.8
       '@babel/types': 7.25.8
       '@types/babel__generator': 7.6.8
       '@types/babel__template': 7.4.4
@@ -6283,7 +6274,7 @@ snapshots:
 
   '@types/babel__template@7.4.4':
     dependencies:
-      '@babel/parser': 7.25.7
+      '@babel/parser': 7.25.8
       '@babel/types': 7.25.8
 
   '@types/babel__traverse@7.20.6':
@@ -7981,7 +7972,7 @@ snapshots:
 
   magicast@0.3.5:
     dependencies:
-      '@babel/parser': 7.25.7
+      '@babel/parser': 7.25.8
       '@babel/types': 7.25.8
       source-map-js: 1.2.1
 
