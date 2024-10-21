@@ -14,7 +14,7 @@
   const t = useTranslations();
 
   // general
-  let audioFile: File | undefined;
+  let audioFile: File;
   let audioDuration: string = "";
   let acceptedTypes: Array<string> = ["audio/*", "video/*"];
   let isDragOver: boolean = false;
@@ -131,7 +131,7 @@
   ) {
     audioDuration = "";
     const eventTarget = event.target as HTMLInputElement;
-    audioFile = eventTarget?.files[0];
+    audioFile = eventTarget.files[0];
 
     if (!audioFile) {
       return;
@@ -163,7 +163,7 @@
       }
     } else {
       isUploading = false;
-      audioFile = undefined;
+      audioFile = null;
     }
   }
 
@@ -289,7 +289,7 @@
   }
 
   function reset() {
-    audioFile = undefined;
+    audioFile = null;
     isUploading = false;
     isUploaded = false;
     isTranscribing = false;
