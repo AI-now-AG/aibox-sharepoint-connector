@@ -1,7 +1,7 @@
 import crypto from "crypto";
 
 // Ensure the ENCRYPTION_KEY is set and is a valid 32-byte hex string
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || "";
+const ENCRYPTION_KEY = import.meta.env.ENCRYPTION_KEY || "";
 
 const IV_LENGTH = 16; // AES block size in bytes
 const ALGORITHM = "aes-256-cbc";
