@@ -1,12 +1,15 @@
-import { ChatOpenAI } from "@langchain/openai";
+import { AzureChatOpenAI, ChatOpenAI } from "@langchain/openai";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { type Entry } from "./srt";
 
-const model = new ChatOpenAI({
-  model: "gpt-4o",
-  temperature: 0,
-  apiKey: import.meta.env.OPENAI_API_KEY,
-});
+const azureChatConfig = {
+  azureOpenAIApiKey: process.env.AZURE_OPENAI_API_KEY2,
+  azureOpenAIApiInstanceName: process.env.AZURE_OPENAI_API_INSTANCE_NAME,
+  azureOpenAIApiDeploymentName: process.env.AZURE_OPENAI_DEPLOYMENT_NAME2,
+  azureOpenAIApiVersion: process.env.AZURE_OPENAI_API_VERSION,
+};
+
+const model = new AzureChatOpenAI(azureChatConfig);
 
 const instructions = new SystemMessage(`
 You are a Swiss German language expert. Your task is to review German subtitles and identify potential misinterpretations of Swiss German words, particularly place names, with a focus on the canton Graubünden while fixing missing punctuation. You must correct these while maintaining the original format as much as possible.
