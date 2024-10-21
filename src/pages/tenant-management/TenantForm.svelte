@@ -8,6 +8,8 @@
   import Loading from "$components/Loading.svelte";
   import { loading, showLoading, hideLoading } from "$stores";
   import ColorPicker, { ChromeVariant } from "svelte-awesome-color-picker";
+  import { decrypt } from "$utils/secure";
+  import log from "$utils/log";
 
   const API_KEY_PROVIDER = {
     OpenAI: "openai",
@@ -53,6 +55,10 @@
     apiKeyProvider = event.target.value?.trim();
     tenantData.api_key_provider = apiKeyProvider;
   }
+
+  export let openAIKey = "";
+  export let azureOpenAIKey = "";
+
 
   function showUpdateConfirmationModal() {
     document.getElementById("modal_confirm_update").showModal();
@@ -372,9 +378,9 @@
             id="open_ai_key"
             placeholder={t("tenant.api-key")}
             disabled={apiKeyProvider != API_KEY_PROVIDER.OpenAI}
-            value={tenantData?.openai_api_key ?? ""}
+            value={openAIKey}
             on:change={(event) => {
-              tenantData.openai_api_key = event.target.value;
+              openAIKey = event.target.value;
             }}
             on:focus={() => {
               showPicker = false;
@@ -424,9 +430,9 @@
             placeholder={t("tenant.api-key")}
             disabled={apiKeyProvider != API_KEY_PROVIDER.AzureOpenAI}
             style="background-color: white;"
-            value={tenantData?.azure_openai_api_key ?? ""}
+            value={azureOpenAIKey}
             on:change={(event) => {
-              tenantData.azure_openai_api_key = event.target.value;
+              azureOpenAIKey = event.target.value;
             }}
             on:focus={() => {
               showPicker = false;
