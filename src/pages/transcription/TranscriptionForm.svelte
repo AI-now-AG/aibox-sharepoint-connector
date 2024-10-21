@@ -14,7 +14,7 @@
   const t = useTranslations();
 
   // general
-  let audioFile: File;
+  let audioFile: File | undefined;
   let audioDuration: string = "";
   let acceptedTypes: Array<string> = ["audio/*", "video/*"];
   let isDragOver: boolean = false;
@@ -50,14 +50,14 @@
   });
 
   function retrieveDataInStore() {
-    audioFile = $transcription.file;
-    outputFileUrl = $transcription.outputFileUrl;
+    audioFile = $transcription?.file;
+    outputFileUrl = $transcription?.outputFileUrl as string;
 
     isUploaded = true;
     isTranscipted = true;
   }
 
-  function isFileTypeValid(type) {
+  function isFileTypeValid(type: string) {
     for (let i = 0; i < acceptedTypes.length; i++) {
       const acceptedType = acceptedTypes[i];
       const typeCategory = type?.split("/")?.[0];
@@ -70,7 +70,7 @@
     return false;
   }
 
-  function isFileSizeValid(size) {
+  function isFileSizeValid(size: number) {
     if (size <= 25 * 1024 * 1024) {
       fileErrorMessage = "";
       return true;
@@ -79,14 +79,14 @@
     return false;
   }
 
-  function isFileValid({ size, type }) {
+  function isFileValid({ size, type }: any) {
     if (isFileTypeValid(type) && isFileSizeValid(size)) {
       return true;
     }
     return false;
   }
 
-  function bytesToMegabytes(bytes) {
+  function bytesToMegabytes(bytes: number) {
     const megabytes = bytes / (1024 * 1024);
     return megabytes.toFixed(1);
   }
@@ -107,7 +107,7 @@
     });
   }
 
-  async function calculateDuration(file: File) {
+  async function calculateDuration(file: File): Promise<string> {
     return new Promise(async (resolve, reject) => {
       try {
         const url = URL.createObjectURL(file);
@@ -131,7 +131,7 @@
   ) {
     audioDuration = "";
     const eventTarget = event.target as HTMLInputElement;
-    audioFile = eventTarget.files[0];
+    audioFile = eventTarget?.files?.[0];
 
     if (!audioFile) {
       return;
@@ -163,7 +163,7 @@
       }
     } else {
       isUploading = false;
-      audioFile = null;
+      audioFile = undefined;
     }
   }
 
@@ -179,9 +179,9 @@
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            fileName: audioFile.name,
+            fileName: audioFile?.name,
             uploadUrl: tempUploadUrl,
-            mimeType: audioFile.type,
+            mimeType: audioFile?.type,
           }),
         },
       );
@@ -289,7 +289,7 @@
   }
 
   function reset() {
-    audioFile = null;
+    audioFile = undefined;
     isUploading = false;
     isUploaded = false;
     isTranscribing = false;

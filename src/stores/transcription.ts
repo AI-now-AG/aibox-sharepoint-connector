@@ -1,7 +1,7 @@
 import { writable } from "svelte/store";
 
 type TranscribeOptions = {
-  file: File;
+  file: File | undefined;
   duration: string;
   outputFileUrl: string;
 };
