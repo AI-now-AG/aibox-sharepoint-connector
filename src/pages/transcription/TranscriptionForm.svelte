@@ -14,7 +14,7 @@
   const t = useTranslations();
 
   // general
-  let audioFile: File;
+  let audioFile: File | undefined;
   let audioDuration: string = "";
   let acceptedTypes: Array<string> = ["audio/*", "video/*"];
   let isDragOver: boolean = false;
@@ -70,7 +70,7 @@
     return false;
   }
 
-  function isFileSizeValid(size) {
+  function isFileSizeValid(size: number) {
     if (size <= 25 * 1024 * 1024) {
       fileErrorMessage = "";
       return true;
@@ -86,7 +86,7 @@
     return false;
   }
 
-  function bytesToMegabytes(bytes) {
+  function bytesToMegabytes(bytes: number) {
     const megabytes = bytes / (1024 * 1024);
     return megabytes.toFixed(1);
   }
@@ -107,7 +107,7 @@
     });
   }
 
-  async function calculateDuration(file: File) {
+  async function calculateDuration(file: File): Promise<string> {
     return new Promise(async (resolve, reject) => {
       try {
         const url = URL.createObjectURL(file);
@@ -131,7 +131,7 @@
   ) {
     audioDuration = "";
     const eventTarget = event.target as HTMLInputElement;
-    audioFile = eventTarget.files[0];
+    audioFile = eventTarget?.files[0];
 
     if (!audioFile) {
       return;
@@ -163,7 +163,7 @@
       }
     } else {
       isUploading = false;
-      audioFile = null;
+      audioFile = undefined;
     }
   }
 
@@ -236,7 +236,7 @@
 
           console.log("File found!");
         } else {
-          console.console.warn("File not found yet");
+          console.warn("File not found yet");
         }
       }
     } catch (error) {
@@ -289,7 +289,7 @@
   }
 
   function reset() {
-    audioFile = null;
+    audioFile = undefined;
     isUploading = false;
     isUploaded = false;
     isTranscribing = false;
@@ -366,7 +366,8 @@
           <div class="flex items-center space-x-4">
             <div class="flex items-center space-x-2">
               {#if !isUploaded}
-                {@html svgIcons.uploading}
+                <span class="loading loading-spinner loading-md text-primary"
+                ></span>
                 <p class="font-medium">{t("transciption.uploading")}</p>
               {/if}
               {#if isTranscribing}
