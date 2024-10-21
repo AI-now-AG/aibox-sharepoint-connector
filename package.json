@@ -32,7 +32,7 @@
     "@types/mustache": "^4.2.5",
     "adm-zip": "^0.5.16",
     "arctic": "^1.9.2",
-    "astro": "^4.15.10",
+    "astro": "^4.15.12",
     "astro-aws-amplify": "^0.1.0",
     "auth0": "^4.10.0",
     "dayjs": "^1.11.13",
