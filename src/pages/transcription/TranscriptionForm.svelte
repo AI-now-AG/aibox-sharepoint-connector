@@ -236,7 +236,7 @@
 
           console.log("File found!");
         } else {
-          console.console.warn("File not found yet");
+          console.warn("File not found yet");
         }
       }
     } catch (error) {
@@ -366,15 +366,13 @@
           <div class="flex items-center space-x-4">
             <div class="flex items-center space-x-2">
               {#if !isUploaded}
-                <span
-                  id="uploading-spinner"
-                  class="loading loading-spinner loading-md"
+                <span id="loading1" class="loading loading-spinner loading-md"
                 ></span>
                 <p class="font-medium">{t("transciption.uploading")}</p>
               {/if}
               {#if isTranscribing}
                 <span
-                  id="transcribing-spinner"
+                  id="loading2"
                   class="loading loading-spinner loading-md text-primary"
                 ></span>
                 <p class="font-medium text-primary">
