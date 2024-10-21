@@ -1,5 +1,5 @@
-import { BlobServiceClient } from '@azure/storage-blob';
-import { type Handler } from '@netlify/functions';
+import { BlobServiceClient } from "@azure/storage-blob";
+import { type Handler } from "@netlify/functions";
 import { join } from "path";
 import { tmpdir } from "os";
 import AdmZip from "adm-zip";
@@ -14,14 +14,15 @@ const checkFileExist: Handler = async (event, context) => {
     const tmpDir = tmpdir();
     let storageURLString: string = process.env.AZURE_BLOB_STORAGE_NAME || "";
 
-    const blobServiceClient = BlobServiceClient.fromConnectionString(storageURLString);
-    const containerName = 'transcribecontainer';
+    const blobServiceClient =
+      BlobServiceClient.fromConnectionString(storageURLString);
+    const containerName = "transcribecontainer";
     const containerClient = blobServiceClient.getContainerClient(containerName);
     const downloadedFiles: { name: string; path: string }[] = [];
     try {
-      let txtFileUrl = '';
-      let srtFileUrl = '';
-      let rawTxtContent = '';
+      let txtFileUrl = "";
+      let srtFileUrl = "";
+      let rawTxtContent = "";
 
       // Check if the file exists in Azure Blob Storage
       for (const fileName of fileNames) {
@@ -31,7 +32,10 @@ const checkFileExist: Handler = async (event, context) => {
         if (!exists) {
           return {
             statusCode: 404,
-            body: JSON.stringify({ exists: false, message: 'File does not exist' }),
+            body: JSON.stringify({
+              exists: false,
+              message: "File does not exist",
+            }),
           };
         }
 
@@ -40,27 +44,31 @@ const checkFileExist: Handler = async (event, context) => {
 
         // Ensure the file is written to the file system
         const fileStream = createWriteStream(filePath);
-        await streamPipeline(downloadBlockBlobResponse.readableStreamBody!, fileStream);
+        await streamPipeline(
+          downloadBlockBlobResponse.readableStreamBody!,
+          fileStream,
+        );
 
         const fileUrl = blobClient.url;
-        if (fileName.endsWith('.srt')) {
-          srtFileUrl = fileUrl;  // Store the URL for the .srt file
-        } else if (fileName.endsWith('.txt')) {
-          txtFileUrl = fileUrl;  // Store the URL for the .txt file
+        if (fileName.endsWith(".srt")) {
+          srtFileUrl = fileUrl; // Store the URL for the .srt file
+        } else if (fileName.endsWith(".txt")) {
+          txtFileUrl = fileUrl; // Store the URL for the .txt file
 
           // Download and read the raw text content of the .txt file
           const downloadBlockBlobResponse = await blobClient.download();
-          rawTxtContent = await streamToString(downloadBlockBlobResponse.readableStreamBody!);
+          rawTxtContent = await streamToString(
+            downloadBlockBlobResponse.readableStreamBody!,
+          );
         }
 
         downloadedFiles.push({ name: fileName, path: filePath });
 
-
         //const downloadBlockBlobResponse = await blobClient.download()
         //const downloadedContent = await streamToString(downloadBlockBlobResponse.readableStreamBody!);
       }
-      console.log(downloadedFiles)
-      const zipBuffer = await createZip(downloadedFiles)
+      console.log(downloadedFiles);
+      //const zipBuffer = await createZip(downloadedFiles)
       // return {
       //     statusCode: 200,
       //     body: JSON.stringify({ exists: true, transcriptionFile: zipBuffer }),
@@ -77,25 +85,31 @@ const checkFileExist: Handler = async (event, context) => {
           text_output: rawTxtContent,
           txt_file: txtFileUrl,
           srt_file: srtFileUrl,
-      }),
+        }),
       };
     } catch (error) {
-      console.error('Error checking file existence or downloading content:', error);
+      console.error(
+        "Error checking file existence or downloading content:",
+        error,
+      );
       return {
         statusCode: 500,
-        body: JSON.stringify({ error: 'Failed to check file existence or download content' }),
+        body: JSON.stringify({
+          error: "Failed to check file existence or download content",
+        }),
       };
     }
   } else {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Failed to get file list' }),
+      body: JSON.stringify({ error: "Failed to get file list" }),
     };
   }
-
 };
 
-async function createZip(downloadedFiles: { name: string; path: string }[]): Promise<Buffer> {
+async function createZip(
+  downloadedFiles: { name: string; path: string }[],
+): Promise<Buffer> {
   const zip = new AdmZip();
 
   // Add each file to the zip
@@ -126,7 +140,9 @@ async function createZip(downloadedFiles: { name: string; path: string }[]): Pro
 }
 
 // Helper function to convert readable stream to string
-async function streamToString(readableStream: NodeJS.ReadableStream | null): Promise<string> {
+async function streamToString(
+  readableStream: NodeJS.ReadableStream | null,
+): Promise<string> {
   return new Promise((resolve, reject) => {
     const chunks: Uint8Array[] = [];
     readableStream?.on("data", (data) => {

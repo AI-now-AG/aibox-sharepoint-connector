@@ -1,14 +1,9 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import ModelDropdown from "./ModelDropdown.svelte";
   import StartNewConfirmDialog from "./StartNewConfirmDialog.svelte";
   import { useTranslations } from "$i18n/utils";
   import { svgIcons } from "$assets/icons";
-  import {
-    transcription,
-    storeTranscribe,
-    resetTranscribe,
-  } from "$stores/transcription";
+  import transcript from "$stores/transcript";
   import { addToast } from "$stores/toast";
 
   const t = useTranslations();
@@ -18,7 +13,6 @@
   let audioDuration: string = "";
   let acceptedTypes: Array<string> = ["audio/*", "video/*"];
   let isDragOver: boolean = false;
-  let selectedModel = "large";
   let outputFileUrl: string = "";
   let fileErrorMessage: string = "";
 
@@ -31,27 +25,20 @@
   // API, polling
   let intervalId: any;
   let tempUploadUrl: string;
-  let tempOutputFileName: string[] = [];
+  let tempOutputFileNames: string[] = [];
 
   let confirmModal: HTMLDialogElement;
 
-  // the `$:` means 're-run whenever these values change'
-  $: {
-    console.log("Selected model", {
-      selectedModel,
-    });
-  }
-
   onMount(async () => {
-    console.log("OnMount transcription in store", $transcription);
-    if ($transcription) {
+    console.log("OnMount transcript in store", $transcript);
+    if ($transcript) {
       retrieveDataInStore();
     }
   });
 
   function retrieveDataInStore() {
-    audioFile = $transcription?.file;
-    outputFileUrl = $transcription?.outputFileUrl as string;
+    audioFile = $transcript?.file;
+    outputFileUrl = $transcript?.srtUrl as string;
 
     isUploaded = true;
     isTranscipted = true;
@@ -154,11 +141,11 @@
 
       // Store temporary upload URL, filename for later
       tempUploadUrl = uploadUrl;
-      tempOutputFileName = [
+      tempOutputFileNames = [
         `${outputFileName}_output.txt`,
         `${outputFileName}_output.srt`,
       ];
-      console.log("Temp output file name", tempOutputFileName);
+      console.log("Temp output file name", tempOutputFileNames);
 
       if (response.ok) {
         isUploading = false;
@@ -207,7 +194,7 @@
       const response = await fetch("/.netlify/functions/checkFileExist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fileNames: tempOutputFileName }),
+        body: JSON.stringify({ fileNames: tempOutputFileNames }),
       });
 
       if (response.ok) {
@@ -218,11 +205,13 @@
           clearInterval(intervalId);
 
           // store data in store
-          outputFileUrl = response.url;
-          storeTranscribe({
+          outputFileUrl = result.srt_file;
+          transcript.set({
             file: audioFile,
             duration: audioDuration,
-            outputFileUrl,
+            txtOuput: result.text_output,
+            txtUrl: result.txt_file,
+            srtUrl: result.srt_file,
           });
 
           // show toast
@@ -256,7 +245,7 @@
   }
 
   function startNew() {
-    resetTranscribe();
+    transcript.set(null);
     reset();
 
     confirmModal.close();
@@ -269,7 +258,7 @@
     // Set link's href to point to the Blob URL
     link.href = outputFileUrl;
     link.target = "_blank";
-    link.download = `${tempOutputFileName}`;
+    link.download = `transcribe`;
 
     // Append link to the body
     document.body.appendChild(link);
@@ -303,13 +292,8 @@
 </script>
 
 <div class="px-14 mt-10">
-  <div class="bg-base-100 p-4 rounded-xl">
-    <p>1. {t("transcription.select-transcription-model")}</p>
-    <ModelDropdown bind:value={selectedModel} />
-  </div>
-
-  <div class="bg-base-100 mt-8 p-4 rounded-xl">
-    <p class="mb-2">2. {t("transcription.upload-video-or-audio-file")}</p>
+  <div class="bg-base-100 mt-10 p-4 rounded-xl">
+    <p class="mb-2">{t("transcription.upload-video-or-audio-file")}</p>
     {#if !audioFile}
       <div class="relative flex flex-col mt-2">
         <label
