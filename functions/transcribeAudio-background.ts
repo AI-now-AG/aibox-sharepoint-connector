@@ -1,6 +1,7 @@
 import { type Handler } from "@netlify/functions";
 import { BlobServiceClient } from "@azure/storage-blob";
 import { transcribeUsingOpenAI } from "./utils/transcribe";
+import { decrypt } from "$utils/secure";
 
 const transcribeAudio: Handler = async (event, context) => {
   if (event.httpMethod !== "POST") {
@@ -23,12 +24,18 @@ const transcribeAudio: Handler = async (event, context) => {
     //const fileBuffer = Buffer.from(fileData, 'base64');
     //const uploadURL = await uploadToBlobStorage(fileName, fileBuffer, mimeType);
     const fileBuffer = await downloadFileFromBlob(uploadUrl);
+    const azureOpenAIApiKey = decrypt(
+      encryptedApiKey || process.env.AZURE_OPENAI_API_KEY2,
+    );
+    console.log("encryptedApiKey", encryptedApiKey);
+    console.log("decryptedApiKey", azureOpenAIApiKey);
+
     const transcription = await transcribeUsingOpenAI(
       fileBuffer,
       fileName,
       mimeType,
       uploadUrl,
-      encryptedApiKey,
+      azureOpenAIApiKey,
     );
     return {
       statusCode: 200,
