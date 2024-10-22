@@ -10,7 +10,6 @@ import {
   type Entry,
 } from "./srt";
 import { StringOutputParser } from "@langchain/core/output_parsers";
-import { decrypt } from "$utils/secure";
 
 const MODEL_NAME = "whisper-1";
 
@@ -73,12 +72,7 @@ const instructions = new SystemMessage(`
   output> die Ergebnisse präsentiert.
 `);
 
-function getClient(encryptedApiKey: string) {
-  const apiKey = decrypt(encryptedApiKey);
-
-  console.log("encryptedApiKey", encryptedApiKey);
-  console.log("apiKey", apiKey);
-
+function getClient(azureOpenAIApiKey: string) {
   const endpoint = process.env.AZURE_ENDPOINT;
   const apiVersion =
     process.env.AZURE_OPENAI_API_VERSION || "2024-08-01-preview";
@@ -87,17 +81,15 @@ function getClient(encryptedApiKey: string) {
 
   return new AzureOpenAI({
     endpoint,
-    apiKey,
+    apiKey: azureOpenAIApiKey,
     apiVersion,
     deployment: deploymentName,
   });
 }
 
-function getAzureChatModel(encryptedApiKey: string) {
-  const apiKey = decrypt(encryptedApiKey);
-
+function getAzureChatModel(azureOpenAIApiKey: string) {
   const azureChatConfig = {
-    azureOpenAIApiKey: apiKey,
+    azureOpenAIApiKey,
     azureOpenAIApiInstanceName: process.env.AZURE_OPENAI_API_INSTANCE_NAME,
     azureOpenAIApiDeploymentName:
       process.env.AZURE_CHAT_OPENAI_DEPLOYMENT_NAME || "gpt-4o",
@@ -108,9 +100,9 @@ function getAzureChatModel(encryptedApiKey: string) {
   return new AzureChatOpenAI(azureChatConfig);
 }
 
-async function getAzureResponse(encryptedApiKey: string, prompt: string) {
+async function getAzureResponse(azureOpenAIApiKey: string, prompt: string) {
   try {
-    const chat = getAzureChatModel(encryptedApiKey);
+    const chat = getAzureChatModel(azureOpenAIApiKey);
 
     const response = await chat.invoke(prompt);
     return response;
@@ -121,10 +113,10 @@ async function getAzureResponse(encryptedApiKey: string, prompt: string) {
 }
 
 export const improveTextQuality = async (
-  encryptedApiKey: string,
+  azureOpenAIApiKey: string,
   data: Entry[],
 ) => {
-  const model = getAzureChatModel(encryptedApiKey);
+  const model = getAzureChatModel(azureOpenAIApiKey);
   const flat = data
     .map(
       (entry) => `input> ${entry.text}
@@ -156,11 +148,11 @@ export async function transcribeUsingOpenAI(
   fileName: string,
   audioMimeType: string | null,
   uploadURL: string,
-  encryptedApiKey: string = process.env.AZURE_OPENAI_API_KEY2 || "",
+  azureOpenAIApiKey: string,
 ): Promise<string> {
   try {
     console.log(uploadURL);
-    const openaiClient = getClient(encryptedApiKey);
+    const openaiClient = getClient(azureOpenAIApiKey);
     //const tempFilePath = join("/tmp", fileName);
     //writeFileSync(tempFilePath, audioBuffer);
     //const audioFileStream = createReadStream(tempFilePath);
@@ -178,7 +170,7 @@ export async function transcribeUsingOpenAI(
       // language: "de",
     });
     const transcriptionResponse = await getAzureResponse(
-      encryptedApiKey,
+      azureOpenAIApiKey,
       response.text,
     );
     const parser = new StringOutputParser();
@@ -186,7 +178,12 @@ export async function transcribeUsingOpenAI(
     const srtData = createSRTData(
       (response as unknown as { words: InputEntry[] }).words,
     );
-    const improvedSrtData = await improveTextQuality(encryptedApiKey, srtData);
+    console.log("srtData", srtData);
+
+    const improvedSrtData = await improveTextQuality(
+      azureOpenAIApiKey,
+      srtData,
+    );
     const grouped = groupLines(improvedSrtData);
     const result = formatSRT(grouped);
     const fileNameWithExtension = uploadURL.split("/").pop()!.split("?")[0];
