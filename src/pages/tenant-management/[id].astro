@@ -26,11 +26,16 @@ try {
   if (openai_api_key) {
     openAIKey = decrypt(openai_api_key);
   }
+} catch (error) {
+  console.log("Decrypt openAIKey exception", error);
+}
+
+try {
   if (azure_openai_api_key) {
     azureOpenAIKey = decrypt(azure_openai_api_key);
   }
 } catch (error) {
-  console.log("Decrypt api key error", error);
+  console.log("Decrypt azureOpenAIKey exception", error);
 }
 ---
 
