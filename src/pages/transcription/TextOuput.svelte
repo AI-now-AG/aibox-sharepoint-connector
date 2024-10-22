@@ -34,7 +34,7 @@
     class="chat-bubble bg-base-100 text-base-content flex flex-row max-w-full"
   >
     {#if output}
-      <p class="py-2">{@html output}</p>
+      <p class="py-2 whitespace-pre-wrap">{@html output}</p>
       <div class="flex flex-col justify-items-end order-last">
         <button class="btn p-2 btn-ghost" on:click={copyToClipboard}>
           {#if isCopied}
