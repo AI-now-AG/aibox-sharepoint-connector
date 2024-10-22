@@ -121,8 +121,6 @@
     if (validateForm()) {
       try {
         showLoading();
-        tenantData.openai_api_key = openAIKey;
-        tenantData.azure_openai_api_key = azureOpenAIKey;
         const { error: decryptKeysError, data } =
           await actions.tenant.encryptApiKeys(tenantData);
         if (decryptKeysError) {
