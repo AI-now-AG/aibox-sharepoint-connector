@@ -121,10 +121,13 @@
     if (validateForm()) {
       try {
         showLoading();
-        const { error: decryptKeysError, data } =
-          await actions.tenant.encryptApiKeys(tenantData);
-        if (decryptKeysError) {
-          showAlert(decryptKeysError);
+        const { error: encryptKeysError, data } =
+          await actions.tenant.encryptApiKeys({
+            openai_api_key: openAIKey,
+            azure_openai_api_key: azureOpenAIKey,
+          });
+        if (encryptKeysError) {
+          showAlert(encryptKeysError);
           return;
         }
         log.d(data, "CREATE - encryptApiKeys data");
@@ -143,7 +146,7 @@
             message: t("tenant.create-successful"),
             type: "success",
           });
-          window.history.back();
+          window.location.href = "/tenant-management";
         }
       } catch (error) {
         showAlert(error);
@@ -155,13 +158,13 @@
     if (validateForm()) {
       try {
         showLoading();
-        const { error: decryptKeysError, data } =
+        const { error: encryptKeysError, data } =
           await actions.tenant.encryptApiKeys({
             openai_api_key: openAIKey,
             azure_openai_api_key: azureOpenAIKey,
           });
-        if (decryptKeysError) {
-          showAlert(decryptKeysError);
+        if (encryptKeysError) {
+          showAlert(encryptKeysError);
           return;
         }
         log.d(data, "UPDATE - encryptApiKeys data");
