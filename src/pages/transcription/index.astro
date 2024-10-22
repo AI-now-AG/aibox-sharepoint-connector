@@ -14,6 +14,6 @@ const t = useTranslations();
       <p>{t("transcription.page-description")}</p>
     </div>
 
-    <TranscriptionForm tenant={Astro.locals.tenant} client:load />
+    <TranscriptionForm client:load />
   </div>
 </Layout>

@@ -1,21 +1,22 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import TextOuput from "./TextOuput.svelte";
   import StartNewConfirmDialog from "./StartNewConfirmDialog.svelte";
   import { useTranslations } from "$i18n/utils";
   import { svgIcons } from "$assets/icons";
+  import { tenant } from "$stores";
   import transcript from "$stores/transcript";
   import { addToast } from "$stores/toast";
 
   const t = useTranslations();
-
-  export let tenant: any;
 
   // general
   let audioFile: File | undefined;
   let audioDuration: string = "";
   let acceptedTypes: Array<string> = ["audio/*", "video/*"];
   let isDragOver: boolean = false;
-  let outputFileUrl: string = "";
+  let textOuput: string = "";
+  let srtFileUrl: string = "";
   let fileErrorMessage: string = "";
 
   // states
@@ -40,6 +41,9 @@
     // subscribe values change
     transcript.subscribe((value) => {
       if (value?.srtUrl) {
+        srtFileUrl = value.srtUrl;
+        textOuput = value.txtOuput;
+
         isTranscribing = false;
         isTranscipted = true;
       }
@@ -48,9 +52,9 @@
 
   function retrieveDataInStore() {
     audioFile = $transcript?.file;
-    outputFileUrl = $transcript?.srtUrl as string;
+    srtFileUrl = $transcript?.srtUrl as string;
 
-    if (!outputFileUrl) {
+    if (!srtFileUrl) {
       isTranscribing = true;
     } else {
       isUploaded = true;
@@ -186,7 +190,7 @@
             fileName: audioFile?.name,
             uploadUrl: tempUploadUrl,
             mimeType: audioFile?.type,
-            encryptedApiKey: tenant?.azure_openai_api_key
+            encryptedApiKey: $tenant?.azure_openai_api_key,
           }),
         },
       );
@@ -228,7 +232,7 @@
           clearInterval(intervalId);
 
           // store data in store
-          outputFileUrl = result.srt_file;
+          srtFileUrl = result.srt_file;
           transcript.set({
             file: audioFile,
             duration: audioDuration,
@@ -279,7 +283,7 @@
     const link = document.createElement("a");
 
     // Set link's href to point to the Blob URL
-    link.href = outputFileUrl;
+    link.href = srtFileUrl;
     link.target = "_blank";
     link.download = `transcribe`;
 
@@ -310,7 +314,8 @@
     isTranscribing = false;
     isTranscipted = false;
 
-    outputFileUrl = "";
+    srtFileUrl = "";
+    textOuput = "";
   }
 </script>
 
@@ -404,6 +409,10 @@
       </div>
     {/if}
   </div>
+
+  {#if textOuput}
+    <TextOuput output={textOuput} />
+  {/if}
 
   <div class="mt-8 flex items-center space-x-4">
     {#if !isTranscipted}

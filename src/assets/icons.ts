@@ -1,6 +1,7 @@
 import tenantManagement from "$assets/icons/tenant-management.svg?raw";
 import threeDot from "$assets/icons/three-dot.svg?raw";
 import copy from "$assets/icons/copy.svg?raw";
+import copied from "$assets/icons/copied.svg?raw";
 import search from "$assets/icons/search.svg?raw";
 import archive from "$assets/icons/archive.svg?raw";
 import active from "$assets/icons/active.svg?raw";
@@ -23,6 +24,7 @@ export const svgIcons = {
   tenantManagement,
   threeDot,
   copy,
+  copied,
   search,
   archive,
   active,
