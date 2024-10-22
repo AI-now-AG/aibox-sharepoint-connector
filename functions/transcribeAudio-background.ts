@@ -1,205 +1,122 @@
+import { type Handler } from "@netlify/functions";
 import { BlobServiceClient } from "@azure/storage-blob";
-import { AzureChatOpenAI, OpenAIClient, toFile } from "@langchain/openai";
-import { AzureOpenAI } from "openai";
-import { groupLines, formatSRT, createSRTData, type InputEntry } from "./srt";
-import { improveTextQuality } from "./improve-text";
-import { StringOutputParser } from "@langchain/core/output_parsers";
-import { decrypt } from "$utils/secure";
+import { transcribeUsingOpenAI } from "./utils/transcribe";
 
-const MODEL_NAME = "whisper-1";
+const transcribeAudio: Handler = async (event, context) => {
+  if (event.httpMethod !== "POST") {
+    return {
+      statusCode: 405,
+      body: JSON.stringify({ message: "Method Not Allowed" }),
+    };
+  }
+  try {
+    const { fileName, uploadUrl, mimeType, encryptedApiKey } = JSON.parse(
+      event.body || "{}",
+    );
+    if (!fileName || !uploadUrl) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ message: "Invalid file upload data" }),
+      };
+    }
 
-const azureChatConfig = {
-  azureOpenAIApiKey: process.env.AZURE_OPENAI_API_KEY2,
-  azureOpenAIApiInstanceName: process.env.AZURE_OPENAI_API_INSTANCE_NAME,
-  azureOpenAIApiDeploymentName:
-    process.env.AZURE_CHAT_OPENAI_DEPLOYMENT_NAME || "gpt-4o",
-  azureOpenAIApiVersion:
-    process.env.AZURE_OPENAI_API_VERSION || "2024-08-01-preview",
+    //const fileBuffer = Buffer.from(fileData, 'base64');
+    //const uploadURL = await uploadToBlobStorage(fileName, fileBuffer, mimeType);
+    const fileBuffer = await downloadFileFromBlob(uploadUrl);
+    const transcription = await transcribeUsingOpenAI(
+      fileBuffer,
+      fileName,
+      mimeType,
+      uploadUrl,
+      encryptedApiKey,
+    );
+    return {
+      statusCode: 200,
+      body: JSON.stringify({
+        message: "File uploaded and transcribed successfully",
+        transcription,
+      }),
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        message: "Error during file processing or transcription",
+      }),
+    };
+  }
 };
 
-function getClient(encryptedApiKey: string) {
-  console.log("encryptedApiKey", encryptedApiKey);
-  const apiKey = decrypt(encryptedApiKey);
-  console.log("apiKey", apiKey);
-  const endpoint = process.env.AZURE_ENDPOINT;
-  const apiVersion =
-    process.env.AZURE_OPENAI_API_VERSION || "2024-08-01-preview";
-  const deploymentName =
-    process.env.AZURE_OPENAI_DEPLOYMENT_NAME || "whisper-1";
-  return new AzureOpenAI({
-    endpoint,
-    apiKey,
-    apiVersion,
-    deployment: deploymentName,
-  });
-}
-
-async function getAzureResponse(encryptedApiKey: string, prompt: string) {
-  try {
-    const apiKey = decrypt(encryptedApiKey);
-    const chat = new AzureChatOpenAI({
-      ...azureChatConfig,
-      azureOpenAIApiKey: apiKey || process.env.AZURE_OPENAI_API_KEY2,
-    });
-    const response = await chat.invoke(prompt);
-    return response;
-  } catch (error) {
-    console.error("Error communicating with Azure OpenAI:", error);
-    throw error;
-  }
-}
-
-export async function transcribeUsingOpenAI(
-  audioBuffer: Buffer,
-  fileName: string,
-  audioMimeType: string | null,
-  uploadURL: string,
-  encryptedApiKey: string = process.env.AZURE_OPENAI_API_KEY2 || "",
+async function uploadToBlobStorage(
+  audioFileName: string,
+  fileBuffer: Buffer,
+  mimeType: string,
 ): Promise<string> {
-  try {
-    console.log(uploadURL);
-    const openaiClient = getClient(encryptedApiKey);
-    //const tempFilePath = join("/tmp", fileName);
-    //writeFileSync(tempFilePath, audioBuffer);
-    //const audioFileStream = createReadStream(tempFilePath);
-
-    const audioFile = await toFile(audioBuffer, fileName);
-
-    const response = await openaiClient.audio.transcriptions.create({
-      file: audioFile,
-      model: MODEL_NAME,
-      temperature: 0,
-      timestamp_granularities: ["word"],
-      response_format: "verbose_json",
-      prompt:
-        'Eine übliche Ausdrucksweise ist "ob ORTSNAME", bspw. "ob Schwanden". das ob bedeutet in diesem Fall "oberhalb von"',
-      // language: "de",
-    });
-    const transcriptionResponse = await getAzureResponse(
-      encryptedApiKey,
-      response.text,
-    );
-    const parser = new StringOutputParser();
-    const description = await parser.invoke(transcriptionResponse);
-    const srtData = createSRTData(
-      (response as unknown as { words: InputEntry[] }).words,
-    );
-    const improvedSrtData = await improveTextQuality(srtData);
-    const grouped = groupLines(improvedSrtData);
-    const result = formatSRT(grouped);
-    const fileNameWithExtension = uploadURL.split("/").pop()!.split("?")[0];
-    const fileNameWithoutExtension = fileNameWithExtension
-      .split(".")
-      .slice(0, -1)
-      .join(".");
-    const outputURLs: { [key: string]: string } = {};
-    outputURLs["txt"] = await uploadOutputToBlob(
-      `${fileNameWithoutExtension}_output.txt`,
-      description,
-      "txt",
-    );
-    outputURLs["srt"] = await uploadOutputToBlob(
-      `${fileNameWithoutExtension}_output.srt`,
-      result,
-      "srt",
-    );
-
-    // Parse the JSON response once and convert to different formats
-    /*const transcriptionData = response;
-    const fileNameWithExtension = uploadURL.split('/').pop()!.split('?')[0];
-    const fileNameWithoutExtension = fileNameWithExtension.split('.').slice(0, -1).join('.');
-
-    const txtContent = convertToTXT(transcriptionData);
-    const jsonContent = JSON.stringify(transcriptionData, null, 2);
-    const srtContent = convertToSRT(transcriptionData);
-    const vttContent = convertToVTT(transcriptionData);
-    const tsvContent = convertToTSV(transcriptionData);
-
-    // Output URLs for all files
-    const outputURLs: { [key: string]: string } = {};
-
-    // Upload each file to Blob Storage
-    outputURLs["txt"] = await uploadOutputToBlob(`${fileNameWithoutExtension}_output.txt`, txtContent, "txt");
-    outputURLs["json"] = await uploadOutputToBlob(`${fileNameWithoutExtension}_output.json`, jsonContent, "json");
-    outputURLs["srt"] = await uploadOutputToBlob(`${fileNameWithoutExtension}_output.srt`, srtContent, "srt");
-    outputURLs["vtt"] = await uploadOutputToBlob(`${fileNameWithoutExtension}_output.vtt`, vttContent, "vtt");
-    outputURLs["tsv"] = await uploadOutputToBlob(`${fileNameWithoutExtension}_output.tsv`, tsvContent, "tsv");
-    //await uploadOutputToBlob(outputFileName, response.text);*/
-    return response.text;
-  } catch (error) {
-    console.error("Error during transcription::", error);
-    throw new Error("Transcription failed.");
-  }
-}
-
-async function uploadOutputToBlob(
-  blobName: string,
-  content: string,
-  format: string,
-): Promise<string> {
-  const storageURLString: string = process.env.AZURE_BLOB_STORAGE_NAME || "";
-
+  let storageURLString: string = process.env.AZURE_BLOB_STORAGE_NAME || "";
+  console.log(storageURLString);
   const blobServiceClient =
     BlobServiceClient.fromConnectionString(storageURLString);
-  const containerName =
-    process.env.AZURE_CONTAINER_NAME || "transcribecontainer";
+  const containerName = "transcribecontainer";
   const containerClient = blobServiceClient.getContainerClient(containerName);
-  const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+  const blockBlobClient = containerClient.getBlockBlobClient(audioFileName);
 
-  // Set content type based on the file format
-  const contentTypeMap: { [key: string]: string } = {
-    txt: "text/plain",
-    json: "application/json",
-    srt: "application/x-subrip",
-    vtt: "text/vtt",
-    tsv: "text/tab-separated-values",
-  };
-
-  const uploadResponse = await blockBlobClient.upload(content, content.length, {
-    blobHTTPHeaders: {
-      blobContentType: contentTypeMap[format] || "text/plain",
-    },
+  const uploadResponse = await blockBlobClient.uploadData(fileBuffer, {
+    blobHTTPHeaders: { blobContentType: mimeType || "audio/mpeg" },
   });
-
   console.log(`Upload successful. Request ID: ${uploadResponse.requestId}`);
   console.log(`Upload successful. URL: ${blockBlobClient.url}`);
   return blockBlobClient.url;
 }
 
-function convertToTXT(transcriptionData: any): string {
-  return transcriptionData.words.map((word: any) => word.word).join(" ");
+async function downloadFileFromBlob(blobUrl: string): Promise<Buffer> {
+  let storageURLString: string = process.env.AZURE_BLOB_STORAGE_NAME || "";
+  console.log(storageURLString);
+  const blobServiceClient =
+    BlobServiceClient.fromConnectionString(storageURLString);
+
+  const url = new URL(blobUrl);
+  const blobPath = url.pathname.split("/");
+  const containerName = blobPath[1];
+  const blobName = blobPath.slice(2).join("/");
+
+  const containerClient = blobServiceClient.getContainerClient(containerName);
+  const blobClient = containerClient.getBlobClient(blobName);
+
+  const downloadBlockBlobResponse = await blobClient.download(0);
+  const downloaded = await streamToBuffer(
+    downloadBlockBlobResponse.readableStreamBody!,
+  );
+
+  return downloaded;
 }
 
-function convertToSRT(transcriptionData: any): string {
-  let srtContent = "";
-  transcriptionData.words.forEach((word: any, index: number) => {
-    const startTime = formatTime(word.start);
-    const endTime = formatTime(word.end);
-    srtContent += `${index + 1}\n${startTime} --> ${endTime}\n${word.word}\n\n`;
+async function streamToBuffer(
+  readableStream: NodeJS.ReadableStream,
+): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    const chunks: any[] = [];
+    readableStream.on("data", (data) => {
+      chunks.push(data instanceof Buffer ? data : Buffer.from(data));
+    });
+    readableStream.on("end", () => {
+      resolve(Buffer.concat(chunks));
+    });
+    readableStream.on("error", reject);
   });
-  return srtContent;
 }
 
-function convertToVTT(transcriptionData: any): string {
-  let vttContent = "WEBVTT\n\n";
-  transcriptionData.words.forEach((word: any, index: number) => {
-    const startTime = formatTime(word.start);
-    const endTime = formatTime(word.end);
-    vttContent += `${index + 1}\n${startTime} --> ${endTime}\n${word.word}\n\n`;
-  });
-  return vttContent;
-}
+// function parseContentDisposition(header: Buffer): { filename: string; fileContentType: string | null } {
+//     const dispositionRegex = /filename="([^"]+)"/;
+//     const contentTypeRegex = /Content-Type:\s*(.+)/;
 
-function convertToTSV(transcriptionData: any): string {
-  let tsvContent = "Start Time\tEnd Time\tText\n";
-  transcriptionData.words.forEach((word: any) => {
-    tsvContent += `${word.start}\t${word.end}\t${word.word}\n`;
-  });
-  return tsvContent;
-}
+//     const filenameMatch = header.toString().match(dispositionRegex);
+//     const contentTypeMatch = header.toString().match(contentTypeRegex);
 
-function formatTime(timeInSeconds: number): string {
-  const date = new Date(0);
-  date.setSeconds(timeInSeconds);
-  return date.toISOString().substr(11, 12).replace(".", ","); // HH:MM:SS,MS
-}
+//     const filename = filenameMatch ? filenameMatch[1] : "uploaded-audio.wav";
+//     const fileContentType = contentTypeMatch ? contentTypeMatch[1].trim() : null;
+
+//     return { filename, fileContentType };
+// }
+
+export { transcribeAudio as handler };

@@ -180,7 +180,7 @@
       isTranscribing = true;
 
       const response = await fetch(
-        "/.netlify/functions/uploadAudio-background",
+        "/.netlify/functions/transcribeAudio-background",
         {
           method: "POST",
           headers: {
