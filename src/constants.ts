@@ -15,3 +15,7 @@ export const SUPER_ADMIN_ROUTES = [
   "/secure",
   "/secure/*",
 ];
+
+export const FEATURE_MAP_ROUTES = {
+  "audio-to-text": ["/transcription"],
+};
