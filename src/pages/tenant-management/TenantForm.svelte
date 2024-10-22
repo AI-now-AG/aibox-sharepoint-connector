@@ -8,6 +8,7 @@
   import Loading from "$components/Loading.svelte";
   import { loading, showLoading, hideLoading } from "$stores";
   import ColorPicker, { ChromeVariant } from "svelte-awesome-color-picker";
+  import log from "$utils/log";
 
   const API_KEY_PROVIDER = {
     OpenAI: "openai",
@@ -54,6 +55,9 @@
     tenantData.api_key_provider = apiKeyProvider;
   }
 
+  export let openAIKey = "";
+  export let azureOpenAIKey = "";
+
   function showUpdateConfirmationModal() {
     document.getElementById("modal_confirm_update").showModal();
   }
@@ -99,12 +103,12 @@
       return false;
     }
     if (apiKeyProvider == API_KEY_PROVIDER.OpenAI) {
-      if (!tenantData?.openai_api_key) {
+      if (!openAIKey) {
         showAlert(t("tenant.validate-open-ai-key-message"));
         return false;
       }
     } else {
-      if (!tenantData?.azure_openai_api_key) {
+      if (!azureOpenAIKey) {
         showAlert(t("tenant.validate-azure-open-ai-key-message"));
         return false;
       }
@@ -117,6 +121,22 @@
     if (validateForm()) {
       try {
         showLoading();
+        const { error: encryptKeysError, data } =
+          await actions.tenant.encryptApiKeys({
+            openai_api_key: openAIKey,
+            azure_openai_api_key: azureOpenAIKey,
+          });
+        if (encryptKeysError) {
+          showAlert(encryptKeysError);
+          return;
+        }
+        log.d(data, "CREATE - encryptApiKeys data");
+        const { openai_api_key, azure_openai_api_key } = data;
+
+        tenantData.openai_api_key = openai_api_key;
+        tenantData.azure_openai_api_key = azure_openai_api_key;
+        log.d(tenantData, "CREATE - tenantData");
+
         const { error } = await actions.tenant.create(tenantData);
         hideLoading();
         if (error) {
@@ -126,7 +146,7 @@
             message: t("tenant.create-successful"),
             type: "success",
           });
-          window.history.back();
+          window.location.href = "/tenant-management";
         }
       } catch (error) {
         showAlert(error);
@@ -138,6 +158,22 @@
     if (validateForm()) {
       try {
         showLoading();
+        const { error: encryptKeysError, data } =
+          await actions.tenant.encryptApiKeys({
+            openai_api_key: openAIKey,
+            azure_openai_api_key: azureOpenAIKey,
+          });
+        if (encryptKeysError) {
+          showAlert(encryptKeysError);
+          return;
+        }
+        log.d(data, "UPDATE - encryptApiKeys data");
+        const { openai_api_key, azure_openai_api_key } = data;
+
+        tenantData.openai_api_key = openai_api_key;
+        tenantData.azure_openai_api_key = azure_openai_api_key;
+        log.d(tenantData, "UPDATE - tenantData");
+
         const { error } = await actions.tenant.update(tenantData);
         hideLoading();
         if (error) {
@@ -372,9 +408,9 @@
             id="open_ai_key"
             placeholder={t("tenant.api-key")}
             disabled={apiKeyProvider != API_KEY_PROVIDER.OpenAI}
-            value={tenantData?.openai_api_key ?? ""}
+            value={openAIKey}
             on:change={(event) => {
-              tenantData.openai_api_key = event.target.value;
+              openAIKey = event.target.value;
             }}
             on:focus={() => {
               showPicker = false;
@@ -424,9 +460,9 @@
             placeholder={t("tenant.api-key")}
             disabled={apiKeyProvider != API_KEY_PROVIDER.AzureOpenAI}
             style="background-color: white;"
-            value={tenantData?.azure_openai_api_key ?? ""}
+            value={azureOpenAIKey}
             on:change={(event) => {
-              tenantData.azure_openai_api_key = event.target.value;
+              azureOpenAIKey = event.target.value;
             }}
             on:focus={() => {
               showPicker = false;

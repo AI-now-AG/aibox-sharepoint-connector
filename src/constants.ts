@@ -12,4 +12,6 @@ export const PUBLIC_ROUTES = [
 export const SUPER_ADMIN_ROUTES = [
   "/tenant-management",
   "/tenant-management/*",
+  "/secure",
+  "/secure/*",
 ];

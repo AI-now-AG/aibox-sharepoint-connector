@@ -4,6 +4,7 @@ import { AzureOpenAI } from "openai";
 import { groupLines, formatSRT, createSRTData, type InputEntry } from "./srt";
 import { improveTextQuality } from "./improve-text";
 import { StringOutputParser } from "@langchain/core/output_parsers";
+import { decrypt } from "$utils/secure";
 
 const MODEL_NAME = "whisper-1";
 
@@ -16,9 +17,11 @@ const azureChatConfig = {
     process.env.AZURE_OPENAI_API_VERSION || "2024-08-01-preview",
 };
 
-function getClient() {
+function getClient(encryptedApiKey: string) {
+  console.log("encryptedApiKey", encryptedApiKey);
+  const apiKey = decrypt(encryptedApiKey);
+  console.log("apiKey", apiKey);
   const endpoint = process.env.AZURE_ENDPOINT;
-  const apiKey = process.env.AZURE_OPENAI_API_KEY2;
   const apiVersion =
     process.env.AZURE_OPENAI_API_VERSION || "2024-08-01-preview";
   const deploymentName =
@@ -31,9 +34,13 @@ function getClient() {
   });
 }
 
-async function getAzureResponse(prompt: string) {
+async function getAzureResponse(encryptedApiKey: string, prompt: string) {
   try {
-    const chat = new AzureChatOpenAI(azureChatConfig);
+    const apiKey = decrypt(encryptedApiKey);
+    const chat = new AzureChatOpenAI({
+      ...azureChatConfig,
+      azureOpenAIApiKey: apiKey || process.env.AZURE_OPENAI_API_KEY2,
+    });
     const response = await chat.invoke(prompt);
     return response;
   } catch (error) {
@@ -47,10 +54,11 @@ export async function transcribeUsingOpenAI(
   fileName: string,
   audioMimeType: string | null,
   uploadURL: string,
+  encryptedApiKey: string = process.env.AZURE_OPENAI_API_KEY2 || "",
 ): Promise<string> {
   try {
     console.log(uploadURL);
-    const openaiClient = getClient();
+    const openaiClient = getClient(encryptedApiKey);
     //const tempFilePath = join("/tmp", fileName);
     //writeFileSync(tempFilePath, audioBuffer);
     //const audioFileStream = createReadStream(tempFilePath);
@@ -67,7 +75,10 @@ export async function transcribeUsingOpenAI(
         'Eine übliche Ausdrucksweise ist "ob ORTSNAME", bspw. "ob Schwanden". das ob bedeutet in diesem Fall "oberhalb von"',
       // language: "de",
     });
-    const transcriptionResponse = await getAzureResponse(response.text);
+    const transcriptionResponse = await getAzureResponse(
+      encryptedApiKey,
+      response.text,
+    );
     const parser = new StringOutputParser();
     const description = await parser.invoke(transcriptionResponse);
     const srtData = createSRTData(

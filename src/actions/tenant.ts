@@ -13,6 +13,8 @@ import organizationsManagement, {
   type PostOrganizationsRequest,
   type PatchOrganizationsByIdRequest,
 } from "$data/auth0/organizations-manager";
+import log from "$utils/log";
+import { encrypt, decrypt } from "$utils/secure";
 
 const TenantInputParamsSchema = z.object({
   name: z.string(),
@@ -24,6 +26,11 @@ const TenantInputParamsSchema = z.object({
   openai_api_key: z.string().optional(),
   azure_openai_api_key: z.string().optional(),
   included_features: z.array(z.nativeEnum(TenantFeature)).optional(),
+});
+
+const TenanKeyEncryptSchema = z.object({
+  openai_api_key: z.string().optional(),
+  azure_openai_api_key: z.string().optional(),
 });
 
 const TenantInputIdentifierSchema = z.object({
@@ -115,4 +122,41 @@ export const tenant = {
       return transformDataToArray(updateResult);
     },
   }),
+
+  encryptApiKeys: defineAction({
+    input: TenanKeyEncryptSchema,
+    handler: async (input) => {
+      try {
+        const { openai_api_key, azure_openai_api_key } = input;
+        if (openai_api_key) {
+          input.openai_api_key = encrypt(openai_api_key);
+        }
+        if (azure_openai_api_key) {
+          input.azure_openai_api_key = encrypt(azure_openai_api_key);
+        }
+      } catch (error) {
+        log.e(error, "Encrypt API Keys before saving error");
+      }
+      return input;
+    },
+  }),
+
+  decryptApiKeys: defineAction({
+    input: TenanKeyEncryptSchema,
+    handler: async (input) => {
+      try {
+        const { openai_api_key, azure_openai_api_key } = input;
+        if (openai_api_key) {
+          input.openai_api_key = decrypt(openai_api_key);
+        }
+        if (azure_openai_api_key) {
+          input.azure_openai_api_key = decrypt(azure_openai_api_key);
+        }
+      } catch (error) {
+        log.e(error, "Decrypt API Keys before saving error");
+      }
+      return input;
+    },
+  }),
 };
+

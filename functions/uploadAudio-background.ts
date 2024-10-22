@@ -11,18 +11,26 @@ const uploadAudio: Handler = async (event, context) => {
         };
     }
     try {
-        const { fileName, uploadUrl, mimeType } = JSON.parse(event.body || '{}');
+        const { fileName, uploadUrl, mimeType, encryptedApiKey } = JSON.parse(
+          event.body || "{}",
+        );
         if (!fileName || !uploadUrl) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({ message: 'Invalid file upload data' }),
-            };
+          return {
+            statusCode: 400,
+            body: JSON.stringify({ message: "Invalid file upload data" }),
+          };
         }
 
         //const fileBuffer = Buffer.from(fileData, 'base64');
         //const uploadURL = await uploadToBlobStorage(fileName, fileBuffer, mimeType);
-        const fileBuffer = await downloadFileFromBlob(uploadUrl)
-        const transcription = await transcribeUsingOpenAI(fileBuffer, fileName, mimeType, uploadUrl);
+        const fileBuffer = await downloadFileFromBlob(uploadUrl);
+        const transcription = await transcribeUsingOpenAI(
+          fileBuffer,
+          fileName,
+          mimeType,
+          uploadUrl,
+          encryptedApiKey,
+        );
         return {
             statusCode: 200,
             body: JSON.stringify({
