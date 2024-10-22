@@ -10,6 +10,10 @@
   import ColorPicker, { ChromeVariant } from "svelte-awesome-color-picker";
   import log from "$utils/log";
 
+  export let tenant;
+  export let openAIKey = "";
+  export let azureOpenAIKey = "";
+
   const API_KEY_PROVIDER = {
     OpenAI: "openai",
     AzureOpenAI: "azure_openai",
@@ -20,7 +24,6 @@
   };
   const t = useTranslations();
 
-  export let tenant;
   let mode = tenant == undefined ? MODE.Create : MODE.Edit;
   let tenantData = tenant == undefined ? {} : tenant;
 
@@ -54,9 +57,6 @@
     apiKeyProvider = event.target.value?.trim();
     tenantData.api_key_provider = apiKeyProvider;
   }
-
-  export let openAIKey = "";
-  export let azureOpenAIKey = "";
 
   function showUpdateConfirmationModal() {
     document.getElementById("modal_confirm_update").showModal();
