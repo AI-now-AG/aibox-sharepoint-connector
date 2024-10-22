@@ -30,18 +30,30 @@
   let confirmModal: HTMLDialogElement;
 
   onMount(async () => {
-    console.log("OnMount transcript in store", $transcript);
+    console.log("TranscriptionForm::onMount transcript in store", $transcript);
     if ($transcript) {
       retrieveDataInStore();
     }
+
+    // subscribe values change
+    transcript.subscribe((value) => {
+      if (value?.srtUrl) {
+        isTranscribing = false;
+        isTranscipted = true;
+      }
+    });
   });
 
   function retrieveDataInStore() {
     audioFile = $transcript?.file;
     outputFileUrl = $transcript?.srtUrl as string;
 
-    isUploaded = true;
-    isTranscipted = true;
+    if (!outputFileUrl) {
+      isTranscribing = true;
+    } else {
+      isUploaded = true;
+      isTranscipted = true;
+    }
   }
 
   function isFileTypeValid(type: string) {
@@ -183,6 +195,14 @@
 
       if (response.ok) {
         startPolling();
+
+        transcript.set({
+          file: audioFile,
+          duration: audioDuration,
+          txtOuput: "",
+          txtUrl: "",
+          srtUrl: "",
+        });
       }
     } catch (error) {
       console.error("Fetch error:", error);
@@ -223,8 +243,8 @@
           });
 
           // update states
-          isTranscribing = false;
-          isTranscipted = true;
+          //isTranscribing = false;
+          //isTranscipted = true;
 
           console.log("File found!");
         } else {
@@ -351,29 +371,25 @@
         </div>
         <div class="flex items-center space-x-6">
           <div class="flex items-center space-x-4">
-            {#if !isUploaded}
-              <div class="flex items-center space-x-2">
+            <div class="flex items-center space-x-2">
+              {#if isUploading && !isUploaded}
                 <span class="loading loading-spinner loading-md"></span>
                 <p class="font-medium">{t("transciption.uploading")}</p>
-              </div>
-            {/if}
-            {#if isTranscribing}
-              <div class="flex items-center space-x-2">
+              {/if}
+              {#if isTranscribing}
                 <span class="loading loading-spinner loading-md text-primary"
                 ></span>
                 <p class="font-medium text-primary">
                   {t("transciption.transcribing")}
                 </p>
-              </div>
-            {/if}
-            {#if isTranscipted}
-              <div class="flex items-center space-x-2">
+              {/if}
+              {#if isTranscipted}
                 {@html svgIcons.transcribed}
                 <p class="font-medium text-success">
                   {t("transciption.transcribed")}
                 </p>
-              </div>
-            {/if}
+              {/if}
+            </div>
             <button
               on:click|preventDefault={removeFile}
               class="text-gray-500 hover:text-gray-700"
