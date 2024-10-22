@@ -135,7 +135,7 @@ export const tenant = {
           input.azure_openai_api_key = encrypt(azure_openai_api_key);
         }
       } catch (error) {
-        log.e(error, "Descript API Keys before saving error");
+        log.e(error, "Encrypt API Keys before saving error");
       }
       return input;
     },
@@ -153,7 +153,7 @@ export const tenant = {
           input.azure_openai_api_key = decrypt(azure_openai_api_key);
         }
       } catch (error) {
-        log.e(error, "Descript API Keys before saving error");
+        log.e(error, "Decrypt API Keys before saving error");
       }
       return input;
     },
