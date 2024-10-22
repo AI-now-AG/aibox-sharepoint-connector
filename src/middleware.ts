@@ -102,7 +102,7 @@ async function restrictAccess(context: APIContext, next: MiddlewareNext) {
     //  paths,
     //});
     const matchPath = wildcardMatchInArray(context.url.pathname, paths);
-    const hasAccess = context.locals.tenant.included_features?.includes(
+    const hasAccess = context.locals.tenant?.included_features?.includes(
       key as TenantFeature,
     );
 
