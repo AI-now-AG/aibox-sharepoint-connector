@@ -8,6 +8,8 @@
 
   const t = useTranslations();
 
+  export let tenant: any;
+
   // general
   let audioFile: File | undefined;
   let audioDuration: string = "";
@@ -172,6 +174,7 @@
             fileName: audioFile?.name,
             uploadUrl: tempUploadUrl,
             mimeType: audioFile?.type,
+            encryptedApiKey: tenant?.azure_openai_api_key
           }),
         },
       );
