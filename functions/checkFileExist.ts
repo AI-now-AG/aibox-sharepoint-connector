@@ -83,6 +83,7 @@ const checkFileExist: Handler = async (event, context) => {
         body: zipBuffer.toString('base64'), // Convert the binary zip buffer to base64 for safe transmission
         isBase64Encoded: true, // Indicate the body is base64 encoded*/
         body: JSON.stringify({
+          exists: true,
           text_output: rawTxtContent,
           txt_file: txtFileUrl,
           srt_file: srtFileUrl,
@@ -96,14 +97,18 @@ const checkFileExist: Handler = async (event, context) => {
       return {
         statusCode: 500,
         body: JSON.stringify({
-          error: "Failed to check file existence or download content",
+          exists: false,
+          message: "Failed to check file existence or download content",
         }),
       };
     }
   } else {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Failed to get file list" }),
+      message: JSON.stringify({
+        exists: false,
+        message: "Failed to get file list"
+      }),
     };
   }
 };

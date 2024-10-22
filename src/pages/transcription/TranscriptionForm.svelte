@@ -209,6 +209,13 @@
           txtUrl: "",
           srtUrl: "",
         });
+      } else {
+        const result = await response.json();
+        addToast({
+          message: result.message,
+          type: "error",
+          timeout: 5000,
+        });
       }
     } catch (error) {
       console.error("Fetch error:", error);
@@ -227,7 +234,7 @@
         const result = await response.json();
         console.log("Check output file ready response", result);
 
-        if (response.body) {
+        if (response.exists) {
           clearInterval(intervalId);
 
           // store data in store
@@ -254,8 +261,15 @@
 
           console.log("File found!");
         } else {
-          console.warn("File not found yet");
+          console.warn("Still file is processing!");
         }
+      } else {
+        const result = await response.json();
+        addToast({
+          message: result.message,
+          type: "error",
+          timeout: 5000,
+        });
       }
     } catch (error) {
       console.error("Check output file ready error", error);
