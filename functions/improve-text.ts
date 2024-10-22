@@ -5,8 +5,10 @@ import { type Entry } from "./srt";
 const azureChatConfig = {
   azureOpenAIApiKey: process.env.AZURE_OPENAI_API_KEY2,
   azureOpenAIApiInstanceName: process.env.AZURE_OPENAI_API_INSTANCE_NAME,
-  azureOpenAIApiDeploymentName: process.env.AZURE_OPENAI_DEPLOYMENT_NAME2,
-  azureOpenAIApiVersion: process.env.AZURE_OPENAI_API_VERSION,
+  azureOpenAIApiDeploymentName:
+    process.env.AZURE_CHAT_OPENAI_DEPLOYMENT_NAME || "gpt-4o",
+  azureOpenAIApiVersion:
+    process.env.AZURE_OPENAI_API_VERSION || "2024-08-01-preview",
 };
 
 const model = new AzureChatOpenAI(azureChatConfig);

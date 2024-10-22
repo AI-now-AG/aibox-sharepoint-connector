@@ -11,7 +11,7 @@ type TranscribeOptions = {
 const transcript = writable<TranscribeOptions | null>(null);
 
 transcript.subscribe((value) => {
-  console.log("$stores/transcript subscribe value on change", value);
+  console.log("$stores/transcript subscribe values on change", value);
 });
 
 export default transcript;

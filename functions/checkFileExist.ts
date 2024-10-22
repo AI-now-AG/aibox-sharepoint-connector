@@ -16,7 +16,8 @@ const checkFileExist: Handler = async (event, context) => {
 
     const blobServiceClient =
       BlobServiceClient.fromConnectionString(storageURLString);
-    const containerName = "transcribecontainer";
+    const containerName =
+      process.env.AZURE_CONTAINER_NAME || "transcribecontainer";
     const containerClient = blobServiceClient.getContainerClient(containerName);
     const downloadedFiles: { name: string; path: string }[] = [];
     try {
