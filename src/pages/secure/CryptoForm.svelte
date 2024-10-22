@@ -56,7 +56,7 @@
       />
     </label>
     <div>
-      <textarea class="mt-2 text-xs text-grey-500" style="width: 100%;" rows="3"
+      <textarea class="mt-2 text-xs text-grey-500" style="width: 100%; color: red;" rows="3"
         >{encryptedKey}</textarea
       >
     </div>
@@ -87,7 +87,7 @@
       />
     </label>
     <div>
-      <textarea class="mt-2 text-xs text-grey-500" style="width: 100%;" rows="3"
+      <textarea class="mt-2 text-xs text-grey-500" style="width: 100%; color: green;" rows="3"
         >{decryptedKey}</textarea
       >
     </div>
