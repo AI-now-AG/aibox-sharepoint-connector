@@ -16,7 +16,7 @@ import upload from "$assets/icons/upload.svg?raw";
 import uploading from "$assets/icons/uploading.svg?raw";
 import document from "$assets/icons/document.svg?raw";
 import transcribed from "$assets/icons/transcribed.svg?raw";
-import x from "$assets/icons/x.svg?raw";
+import close from "$assets/icons/close.svg?raw";
 import download from "$assets/icons/download.svg?raw";
 import startNew from "$assets/icons/start-new.svg?raw";
 
@@ -39,7 +39,7 @@ export const svgIcons = {
   uploading,
   document,
   transcribed,
-  x,
+  close,
   download,
   startNew,
 };

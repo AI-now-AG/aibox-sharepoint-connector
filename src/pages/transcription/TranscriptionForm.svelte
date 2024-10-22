@@ -400,9 +400,9 @@
             </div>
             <button
               on:click|preventDefault={removeFile}
-              class="text-gray-500 hover:text-gray-700"
+              class="text-gray-700 hover:text-primary"
             >
-              {@html svgIcons.x}
+              {@html svgIcons.close}
             </button>
           </div>
         </div>
@@ -414,7 +414,7 @@
     <TextOuput output={textOuput} />
   {/if}
 
-  <div class="mt-8 flex items-center space-x-4">
+  <div class="mt-8 mb-5 flex items-center space-x-4">
     {#if !isTranscipted}
       <button
         class={`btn btn-active btn-primary btn-sm text-white`}
