@@ -3,7 +3,7 @@ export const PUBLIC_ROUTES = [
   "/api/login",
   "/login/auth0",
   "/login/auth0/callback",
-  "/logout/sucess",
+  "/logout/success",
   "/404",
   "/error",
   "/restricted",
