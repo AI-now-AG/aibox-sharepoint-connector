@@ -189,7 +189,6 @@
           body: JSON.stringify({
             fileName: audioFile?.name,
             uploadUrl: tempUploadUrl,
-            mimeType: audioFile?.type,
             encryptedApiKey: $tenant?.azure_openai_api_key,
           }),
         },

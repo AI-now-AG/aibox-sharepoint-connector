@@ -1,3 +1,4 @@
+import type { Tenant } from "$data/models/tenant.model";
 import { writable } from "svelte/store";
 
 /* commom */
@@ -12,7 +13,7 @@ export function hideLoading() {
 }
 
 /* tenant */
-export const tenant = writable(null);
+export const tenant = writable<Tenant | null>(null);
 
 /* user */
 export const user = writable(null);

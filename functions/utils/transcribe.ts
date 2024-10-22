@@ -146,17 +146,12 @@ output>
 export async function transcribeUsingOpenAI(
   audioBuffer: Buffer,
   fileName: string,
-  audioMimeType: string | null,
   uploadURL: string,
   azureOpenAIApiKey: string,
 ): Promise<string> {
   try {
     console.log(uploadURL);
     const openaiClient = getClient(azureOpenAIApiKey);
-    //const tempFilePath = join("/tmp", fileName);
-    //writeFileSync(tempFilePath, audioBuffer);
-    //const audioFileStream = createReadStream(tempFilePath);
-
     const audioFile = await toFile(audioBuffer, fileName);
 
     const response = await openaiClient.audio.transcriptions.create({
@@ -167,7 +162,6 @@ export async function transcribeUsingOpenAI(
       response_format: "verbose_json",
       prompt:
         'Eine übliche Ausdrucksweise ist "ob ORTSNAME", bspw. "ob Schwanden". das ob bedeutet in diesem Fall "oberhalb von"',
-      // language: "de",
     });
     const transcriptionResponse = await getAzureResponse(
       azureOpenAIApiKey,
@@ -203,27 +197,6 @@ export async function transcribeUsingOpenAI(
       "srt",
     );
 
-    // Parse the JSON response once and convert to different formats
-    /*const transcriptionData = response;
-    const fileNameWithExtension = uploadURL.split('/').pop()!.split('?')[0];
-    const fileNameWithoutExtension = fileNameWithExtension.split('.').slice(0, -1).join('.');
-
-    const txtContent = convertToTXT(transcriptionData);
-    const jsonContent = JSON.stringify(transcriptionData, null, 2);
-    const srtContent = convertToSRT(transcriptionData);
-    const vttContent = convertToVTT(transcriptionData);
-    const tsvContent = convertToTSV(transcriptionData);
-
-    // Output URLs for all files
-    const outputURLs: { [key: string]: string } = {};
-
-    // Upload each file to Blob Storage
-    outputURLs["txt"] = await uploadOutputToBlob(`${fileNameWithoutExtension}_output.txt`, txtContent, "txt");
-    outputURLs["json"] = await uploadOutputToBlob(`${fileNameWithoutExtension}_output.json`, jsonContent, "json");
-    outputURLs["srt"] = await uploadOutputToBlob(`${fileNameWithoutExtension}_output.srt`, srtContent, "srt");
-    outputURLs["vtt"] = await uploadOutputToBlob(`${fileNameWithoutExtension}_output.vtt`, vttContent, "vtt");
-    outputURLs["tsv"] = await uploadOutputToBlob(`${fileNameWithoutExtension}_output.tsv`, tsvContent, "tsv");
-    //await uploadOutputToBlob(outputFileName, response.text);*/
     return response.text;
   } catch (error) {
     console.error("Error during transcription::", error);
@@ -263,42 +236,4 @@ async function uploadOutputToBlob(
   console.log(`Upload successful. Request ID: ${uploadResponse.requestId}`);
   console.log(`Upload successful. URL: ${blockBlobClient.url}`);
   return blockBlobClient.url;
-}
-
-function convertToTXT(transcriptionData: any): string {
-  return transcriptionData.words.map((word: any) => word.word).join(" ");
-}
-
-function convertToSRT(transcriptionData: any): string {
-  let srtContent = "";
-  transcriptionData.words.forEach((word: any, index: number) => {
-    const startTime = formatTime(word.start);
-    const endTime = formatTime(word.end);
-    srtContent += `${index + 1}\n${startTime} --> ${endTime}\n${word.word}\n\n`;
-  });
-  return srtContent;
-}
-
-function convertToVTT(transcriptionData: any): string {
-  let vttContent = "WEBVTT\n\n";
-  transcriptionData.words.forEach((word: any, index: number) => {
-    const startTime = formatTime(word.start);
-    const endTime = formatTime(word.end);
-    vttContent += `${index + 1}\n${startTime} --> ${endTime}\n${word.word}\n\n`;
-  });
-  return vttContent;
-}
-
-function convertToTSV(transcriptionData: any): string {
-  let tsvContent = "Start Time\tEnd Time\tText\n";
-  transcriptionData.words.forEach((word: any) => {
-    tsvContent += `${word.start}\t${word.end}\t${word.word}\n`;
-  });
-  return tsvContent;
-}
-
-function formatTime(timeInSeconds: number): string {
-  const date = new Date(0);
-  date.setSeconds(timeInSeconds);
-  return date.toISOString().substr(11, 12).replace(".", ","); // HH:MM:SS,MS
 }

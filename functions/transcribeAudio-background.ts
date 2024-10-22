@@ -3,7 +3,7 @@ import { BlobServiceClient } from "@azure/storage-blob";
 import { transcribeUsingOpenAI } from "./utils/transcribe";
 import { decrypt } from "$utils/secure";
 
-const transcribeAudio: Handler = async (event, context) => {
+const transcribeAudio: Handler = async (event) => {
   if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
@@ -11,7 +11,7 @@ const transcribeAudio: Handler = async (event, context) => {
     };
   }
   try {
-    const { fileName, uploadUrl, mimeType, encryptedApiKey } = JSON.parse(
+    const { fileName, uploadUrl, encryptedApiKey } = JSON.parse(
       event.body || "{}",
     );
     if (!fileName || !uploadUrl) {
@@ -21,8 +21,6 @@ const transcribeAudio: Handler = async (event, context) => {
       };
     }
 
-    //const fileBuffer = Buffer.from(fileData, 'base64');
-    //const uploadURL = await uploadToBlobStorage(fileName, fileBuffer, mimeType);
     const fileBuffer = await downloadFileFromBlob(uploadUrl);
     const azureOpenAIApiKey = decrypt(
       encryptedApiKey || process.env.AZURE_OPENAI_API_KEY2,
@@ -33,7 +31,6 @@ const transcribeAudio: Handler = async (event, context) => {
     const transcription = await transcribeUsingOpenAI(
       fileBuffer,
       fileName,
-      mimeType,
       uploadUrl,
       azureOpenAIApiKey,
     );
@@ -55,29 +52,8 @@ const transcribeAudio: Handler = async (event, context) => {
   }
 };
 
-async function uploadToBlobStorage(
-  audioFileName: string,
-  fileBuffer: Buffer,
-  mimeType: string,
-): Promise<string> {
-  let storageURLString: string = process.env.AZURE_BLOB_STORAGE_NAME || "";
-  console.log(storageURLString);
-  const blobServiceClient =
-    BlobServiceClient.fromConnectionString(storageURLString);
-  const containerName = "transcribecontainer";
-  const containerClient = blobServiceClient.getContainerClient(containerName);
-  const blockBlobClient = containerClient.getBlockBlobClient(audioFileName);
-
-  const uploadResponse = await blockBlobClient.uploadData(fileBuffer, {
-    blobHTTPHeaders: { blobContentType: mimeType || "audio/mpeg" },
-  });
-  console.log(`Upload successful. Request ID: ${uploadResponse.requestId}`);
-  console.log(`Upload successful. URL: ${blockBlobClient.url}`);
-  return blockBlobClient.url;
-}
-
 async function downloadFileFromBlob(blobUrl: string): Promise<Buffer> {
-  let storageURLString: string = process.env.AZURE_BLOB_STORAGE_NAME || "";
+  const storageURLString: string = process.env.AZURE_BLOB_STORAGE_NAME || "";
   console.log(storageURLString);
   const blobServiceClient =
     BlobServiceClient.fromConnectionString(storageURLString);
@@ -102,7 +78,7 @@ async function streamToBuffer(
   readableStream: NodeJS.ReadableStream,
 ): Promise<Buffer> {
   return new Promise((resolve, reject) => {
-    const chunks: any[] = [];
+    const chunks: Buffer[] = [];
     readableStream.on("data", (data) => {
       chunks.push(data instanceof Buffer ? data : Buffer.from(data));
     });
