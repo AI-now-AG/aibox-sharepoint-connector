@@ -1,10 +1,10 @@
 import crypto from "crypto";
 
-// Ensure the ENCRYPTION_KEY is set and is a valid 32-byte hex string
-const ENCRYPTION_KEY = import.meta.env.ENCRYPTION_KEY || "";
-
 const IV_LENGTH = 16; // AES block size in bytes
 const ALGORITHM = "aes-256-cbc";
+// Ensure the ENCRYPTION_KEY is set and is a valid 32-byte hex string
+const ENCRYPTION_KEY =
+  "b23d8f13bf1e2cda7d3ca36645f62b61c6d01a5a745377e27291a1977bec2ab4";
 
 // Function to encrypt the API key
 export function encrypt(text: string): string {
