@@ -7,12 +7,15 @@
   import { addToast } from "$stores/toast";
   import Loading from "$components/Loading.svelte";
   import { loading, showLoading, hideLoading } from "$stores";
+  import ConfirmUpdateDialog from "./ConfirmUpdateDialog.svelte";
   import ColorPicker, { ChromeVariant } from "svelte-awesome-color-picker";
   import log from "$utils/log";
 
   export let tenant;
   export let openAIKey = "";
   export let azureOpenAIKey = "";
+
+  let confirmUpdateModal;
 
   const API_KEY_PROVIDER = {
     OpenAI: "openai",
@@ -56,14 +59,6 @@
   function selectApiKeyProvider(event) {
     apiKeyProvider = event.target.value?.trim();
     tenantData.api_key_provider = apiKeyProvider;
-  }
-
-  function showUpdateConfirmationModal() {
-    document.getElementById("modal_confirm_update").showModal();
-  }
-
-  function closeUpdateConfirmationModal() {
-    document.getElementById("modal_confirm_update").close();
   }
 
   let icon_open_ai = svgIcons.eyeClose;
@@ -212,7 +207,7 @@
         class="mt-2 lg:mt-8 btn btn-primary"
         on:click={() => {
           showPicker = false;
-          mode == MODE.Edit ? showUpdateConfirmationModal() : createTenant();
+          mode == MODE.Edit ? confirmUpdateModal.show() : createTenant();
         }}
       >
         {t("common.save")}
@@ -479,8 +474,25 @@
       </div>
     </div>
 
-    <div class="w-full h-0.5 mt-4 mb-6 bg-gray-400/20" />
+    <!-- Transcription instructions -->
+    {#if apiKeyProvider == API_KEY_PROVIDER.AzureOpenAI}
+      <div class="mt-3">
+        <span class="mb-2 text-gray-400 font-medium text-sm">
+          Transcription instructions
+        </span>
+        <textarea
+          value={tenant?.transcription_instructions || ""}
+          placeholder="e.g. type instruction details..."
+          class="input input-bordered min-w-xs shadow appearance-none min-h-40 w-full py-2 px-3"
+          on:change={(event) => {
+            tenantData.transcription_instructions = event.target.value;
+          }}
+        ></textarea>
+      </div>
+    {/if}
 
+    <!-- Included features -->
+    <div class="w-full h-0.5 mt-4 mb-6 bg-gray-400/20" />
     <div class="mb-3"><b>{t("tenant.included-featured")}</b></div>
 
     <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -518,34 +530,13 @@
       </label>
     </div>
 
-    <dialog id={"modal_confirm_update"} class="modal">
-      <div class="modal-box">
-        <form method="dialog" id="modalForm">
-          <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-            >✕</button
-          >
-          <h3 id="modal_title" class="text-lg font-bold">
-            {t("tenant.tenants.tenant.update-confirmation")}
-          </h3>
-          <div class="flex justify-between gap-4 mt-6">
-            <button
-              id="yes_button"
-              class="btn btn-warning flex-1"
-              on:click={() => {
-                updateTenant();
-              }}>{t("common.yes")}</button
-            >
-            <button
-              id="no_button"
-              class="btn btn-success flex-1"
-              on:click={() => {
-                closeUpdateConfirmationModal();
-              }}>{t("common.no")}</button
-            >
-          </div>
-        </form>
-      </div>
-    </dialog>
+    <ConfirmUpdateDialog
+      bind:modal={confirmUpdateModal}
+      on:confirm={updateTenant}
+      on:dismiss={() => {
+        confirmUpdateModal?.close();
+      }}
+    />
 
     <dialog id="my_modal_3" class="modal">
       <div class="modal-box">

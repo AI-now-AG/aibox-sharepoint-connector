@@ -37,6 +37,7 @@ const TenantSchema = z.object({
   openai_api_key: z.string().nullish(),
   azure_openai_api_key: z.string().nullish(),
   included_features: z.array(z.nativeEnum(TenantFeature)).optional(),
+  transcription_instructions: z.string().nullish(),
   active: z.boolean().default(true).optional(),
   created_at: z.date().optional(),
   updated_at: z.date().optional(),
