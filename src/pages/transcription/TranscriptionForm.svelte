@@ -235,7 +235,7 @@
 
   async function checkOutputFileReady() {
     try {
-      const response: any = await fetch("/.netlify/functions/checkFileExist", {
+      const response = await fetch("/.netlify/functions/checkFileExist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ fileNames: tempOutputFileNames }),
@@ -276,11 +276,13 @@
         }
       } else {
         const result = await response.json();
-        addToast({
-          message: result.message,
-          type: "error",
-          timeout: 5000,
-        });
+        if (response.status != 404) {
+          addToast({
+            message: result.message,
+            type: "error",
+            timeout: 5000,
+          });
+        }
       }
     } catch (error) {
       console.error("Check output file ready error", error);
