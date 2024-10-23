@@ -1,7 +1,7 @@
 ---
 import Layout from "$layouts/Layout.astro";
 import TenantForm from "./TenantForm.svelte";
-import { actions } from "astro:actions";
+// import { actions } from "astro:actions";
 import { decrypt } from "$utils/secure";
 import tenantModel from "$data/models/tenant.model";
 
@@ -11,13 +11,13 @@ export interface Props {
 
 const { id = "" } = Astro.params;
 
-const fetchTenant = async () => {
-  const { data, error } = await Astro.callAction(actions.tenant.get, {
-    _id: id,
-  });
-  console.log("1. { data, error }", { data, error });
-  return { data, error };
-};
+// const fetchTenant = async () => {
+//   const { data, error } = await Astro.callAction(actions.tenant.get, {
+//     _id: id,
+//   });
+//   console.log("1. { data, error }", { data, error });
+//   return { data, error };
+// };
 
 
 const tenatData = await tenantModel.get(id);
