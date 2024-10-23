@@ -34,7 +34,7 @@
           id="no_button"
           class="btn btn-active btn-primary btn-sm text-white"
           on:click={() => dispatch("download")}
-          >{t("transcription.dowload-files")}</button
+          >{t("transcription.dowload-srt-file")}</button
         >
         <button class="btn btn-sm" on:click={() => dispatch("confirm")}
           >{t("transcription.start-new")}</button
