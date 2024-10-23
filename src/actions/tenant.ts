@@ -41,7 +41,9 @@ export const tenant = {
   get: defineAction({
     input: TenantInputIdentifierSchema,
     handler: async (input) => {
+      console.log("8.1. input", input);
       const data = await tenantModel.get(input._id);
+      console.log("8.2. data", data);
       return transformDataToArray(data);
     },
   }),
