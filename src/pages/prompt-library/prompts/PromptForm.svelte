@@ -45,14 +45,15 @@
   let isSaving = false;
 
   onMount(async function () {
+    console.log("---Prompt-From----");
     const response = await fetch("/api/categories.json", { method: "GET" });
     const data = await response.json();
     if (data) {
       categories = data;
     }
-
+    console.log("---Prompt-From--2--");
     await fetchInstructionAndKB();
-
+    console.log("---Prompt-From--3--");
     if (prompt) {
       promptTitle = prompt.title;
       promptText = prompt.prompt;
@@ -71,6 +72,7 @@
         selectedGroup = group;
       }
     }
+    console.log("---Prompt-From--4--");
   });
 
   async function fetchInstructionAndKB() {
@@ -78,6 +80,7 @@
       method: "GET",
     });
     const instructionData = (await instructionResponse.json()) as Instruction[];
+    console.log("---Prompt-From--fetchInstructionAndKB--");
     if (instructionData) {
       if (prompt) {
         prompt.instructions?.forEach((instructionObj) => {
