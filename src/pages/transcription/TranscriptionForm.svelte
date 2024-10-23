@@ -224,7 +224,7 @@
 
   async function checkOutputFileReady() {
     try {
-      const response = await fetch("/.netlify/functions/checkFileExist", {
+      const response: any = await fetch("/.netlify/functions/checkFileExist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ fileNames: tempOutputFileNames }),
