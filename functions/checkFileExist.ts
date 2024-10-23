@@ -105,9 +105,9 @@ const checkFileExist: Handler = async (event, context) => {
   } else {
     return {
       statusCode: 500,
-      message: JSON.stringify({
+      body: JSON.stringify({
         exists: false,
-        message: "Failed to get file list"
+        message: "Failed to get file list",
       }),
     };
   }
