@@ -96,8 +96,14 @@
     return megabytes.toFixed(1);
   }
 
-  async function getSASToken() {
-    const response = await fetch("/.netlify/functions/getSASToken");
+  async function getSASToken(fileNameWithoutExtension: string) {
+    const response: any = await fetch("/.netlify/functions/getSASToken", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        fileNameWithoutExtension: fileNameWithoutExtension,
+      }),
+    });
     return await response.json();
   }
 
@@ -151,7 +157,15 @@
       isUploading = true;
 
       // Get Azure Storage SAS tokens
-      const { uploadUrl, outputFileName } = await getSASToken();
+      let fileNameWithoutExtension = audioFile.name || "";
+      const splitedFileName = fileNameWithoutExtension.split(".");
+      if (splitedFileName && splitedFileName?.[0]) {
+        fileNameWithoutExtension = splitedFileName?.[0];
+      }
+      console.log("fileNameWithoutExtension", fileNameWithoutExtension);
+      const { uploadUrl, outputFileName } = await getSASToken(
+        fileNameWithoutExtension,
+      );
       console.log("Azue SAS tokens response", { uploadUrl, outputFileName });
 
       // Upload the file to Azure Blob Storage
@@ -159,10 +173,7 @@
 
       // Store temporary upload URL, filename for later
       tempUploadUrl = uploadUrl;
-      tempOutputFileNames = [
-        `${outputFileName}_output.txt`,
-        `${outputFileName}_output.srt`,
-      ];
+      tempOutputFileNames = [`${outputFileName}.txt`, `${outputFileName}.srt`];
       console.log("Temp output file name", tempOutputFileNames);
 
       if (response.ok) {

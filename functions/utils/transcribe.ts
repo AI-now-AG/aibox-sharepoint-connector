@@ -150,7 +150,7 @@ export async function transcribeUsingOpenAI(
   azureOpenAIApiKey: string,
 ): Promise<string> {
   try {
-    console.log(uploadURL);
+    console.log("uploadURL", uploadURL);
     const openaiClient = getClient(azureOpenAIApiKey);
     const audioFile = await toFile(audioBuffer, fileName);
 
@@ -187,12 +187,12 @@ export async function transcribeUsingOpenAI(
       .join(".");
     const outputURLs: { [key: string]: string } = {};
     outputURLs["txt"] = await uploadOutputToBlob(
-      `${fileNameWithoutExtension}_output.txt`,
+      `${fileNameWithoutExtension}.txt`,
       description,
       "txt",
     );
     outputURLs["srt"] = await uploadOutputToBlob(
-      `${fileNameWithoutExtension}_output.srt`,
+      `${fileNameWithoutExtension}.srt`,
       result,
       "srt",
     );
