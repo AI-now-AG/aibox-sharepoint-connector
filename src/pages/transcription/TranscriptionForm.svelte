@@ -245,7 +245,7 @@
         const result = await response.json();
         console.log("Check output file ready response", result);
 
-        if (response.exists) {
+        if (result.exists) {
           clearInterval(intervalId);
 
           // store data in store
