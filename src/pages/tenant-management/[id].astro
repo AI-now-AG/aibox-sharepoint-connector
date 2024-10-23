@@ -1,9 +1,8 @@
 ---
 import Layout from "$layouts/Layout.astro";
 import TenantForm from "./TenantForm.svelte";
-// import { actions } from "astro:actions";
+import { actions } from "astro:actions";
 import { decrypt } from "$utils/secure";
-import tenantModel from "$data/models/tenant.model";
 
 export interface Props {
   id: string;
@@ -11,30 +10,21 @@ export interface Props {
 
 const { id = "" } = Astro.params;
 
-// const fetchTenant = async () => {
-//   const { data, error } = await Astro.callAction(actions.tenant.get, {
-//     _id: id,
-//   });
-//   console.log("1. { data, error }", { data, error });
-//   return { data, error };
-// };
+const fetchTenant = async () => {
+  const { data, error } = await Astro.callAction(actions.tenant.get, {
+    _id: id,
+  });
+  return { data, error };
+};
 
-
-const tenatData = await tenantModel.get(id);
-console.log("2. tenatData", tenatData);
-const { openai_api_key, azure_openai_api_key } = tenatData || {};
-console.log("4. { openai_api_key, azure_openai_api_key }", {
-  openai_api_key,
-  azure_openai_api_key,
-});
+const tenatData = await fetchTenant();
+const { data } = tenatData || {};
+const { openai_api_key, azure_openai_api_key } = data || {};
 let openAIKey = openai_api_key;
 let azureOpenAIKey = azure_openai_api_key;
-console.log("5. {openAIKey,azureOpenAIKey }", { openAIKey, azureOpenAIKey });
 try {
   if (openai_api_key) {
-    console.log("6.1. daopenai_api_keyta", openai_api_key);
     openAIKey = decrypt(openai_api_key);
-    console.log("6.2. daopenai_api_keyta", openai_api_key);
   }
 } catch (error) {
   console.log("Decrypt openAIKey exception", error);
@@ -42,9 +32,7 @@ try {
 
 try {
   if (azure_openai_api_key) {
-    console.log("7.1. azure_openai_api_key", azure_openai_api_key);
     azureOpenAIKey = decrypt(azure_openai_api_key);
-    console.log("7.2. azure_openai_api_key", azure_openai_api_key);
   }
 } catch (error) {
   console.log("Decrypt azureOpenAIKey exception", error);
@@ -53,7 +41,7 @@ try {
 
 <Layout>
   <TenantForm
-    tenant={tenatData}
+    tenant={data}
     openAIKey={openAIKey?.trim()}
     azureOpenAIKey={azureOpenAIKey?.trim()}
     client:load

@@ -14,8 +14,6 @@
   export let openAIKey = "";
   export let azureOpenAIKey = "";
 
-  console.log("1 azureOpenAIKey", azureOpenAIKey)
-
   const API_KEY_PROVIDER = {
     OpenAI: "openai",
     AzureOpenAI: "azure_openai",
@@ -196,7 +194,6 @@
     document.getElementById("alert_message").textContent = message;
     document.getElementById("my_modal_3").showModal();
   }
-  console.log("2 azureOpenAIKey", azureOpenAIKey)
 </script>
 
 <div
