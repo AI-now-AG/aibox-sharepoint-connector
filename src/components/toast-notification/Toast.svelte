@@ -1,11 +1,11 @@
-<script>
+<script lang="ts">
   import { createEventDispatcher } from "svelte";
   import { fade } from "svelte/transition";
 
   const dispatch = createEventDispatcher();
 
-  export let type = "error";
-  export let dismissible = true;
+  export let type: string = "error";
+  export let dismissible: boolean = true;
 
   const iconWidth = "1.2rem";
 </script>

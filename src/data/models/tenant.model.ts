@@ -49,12 +49,13 @@ export default {
   create: async (tenant: Omit<Tenant, "_id">) => {
     const validated = TenantSchema.parse({ _id: new ObjectId(), ...tenant });
     const doc = {
-      ...validated,
       ...{
         active: true,
+        included_features: [],
         created_at: new Date(),
         updated_at: new Date(),
       },
+      ...validated,
     };
     return await collection.insertOne(doc);
   },

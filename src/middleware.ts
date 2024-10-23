@@ -2,9 +2,13 @@ import { lucia } from "$auth";
 import auth from "$auth/auth";
 import { verifyRequestOrigin } from "lucia";
 import { sequence } from "astro/middleware";
-import { PUBLIC_ROUTES, SUPER_ADMIN_ROUTES } from "$constants";
+import {
+  PUBLIC_ROUTES,
+  SUPER_ADMIN_ROUTES,
+  FEATURE_MAP_ROUTES,
+} from "$constants";
 import type { APIContext, MiddlewareNext } from "astro";
-import tenantModel from "$data/models/tenant.model";
+import tenantModel, { TenantFeature } from "$data/models/tenant.model";
 import { defaultLang } from "$i18n/ui";
 import { setLanguage } from "$i18n/utils";
 import { wildcardMatch, wildcardMatchInArray } from "$utils/wildcardMatch";
@@ -89,6 +93,22 @@ async function restrictAccess(context: APIContext, next: MiddlewareNext) {
     return context.redirect(
       `/error?error=tenant_inactive&error_description=Sorry, the tenant associated with your account is currently inactive. Please contact the tenant administrator or support for assistance.`,
     );
+  }
+
+  // Check included features
+  for (const [key, paths] of Object.entries(FEATURE_MAP_ROUTES)) {
+    //console.log(`Checked feature: ${key}`, {
+    //  tenant: context.locals.tenant,
+    //  paths,
+    //});
+    const matchPath = wildcardMatchInArray(context.url.pathname, paths);
+    const hasAccess = context.locals.tenant?.included_features?.includes(
+      key as TenantFeature,
+    );
+
+    if (matchPath && !hasAccess) {
+      return context.rewrite("/restricted");
+    }
   }
 
   return next();

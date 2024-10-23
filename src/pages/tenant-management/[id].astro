@@ -2,6 +2,7 @@
 import Layout from "$layouts/Layout.astro";
 import TenantForm from "./TenantForm.svelte";
 import { actions } from "astro:actions";
+import { decrypt } from "$utils/secure";
 
 export interface Props {
   id: string;
@@ -18,8 +19,31 @@ const fetchTenant = async () => {
 
 const tenatData = await fetchTenant();
 const { data } = tenatData || {};
+const { openai_api_key, azure_openai_api_key } = data || {};
+let openAIKey = openai_api_key;
+let azureOpenAIKey = azure_openai_api_key;
+try {
+  if (openai_api_key) {
+    openAIKey = decrypt(openai_api_key);
+  }
+} catch (error) {
+  console.log("Decrypt openAIKey exception", error);
+}
+
+try {
+  if (azure_openai_api_key) {
+    azureOpenAIKey = decrypt(azure_openai_api_key);
+  }
+} catch (error) {
+  console.log("Decrypt azureOpenAIKey exception", error);
+}
 ---
 
 <Layout>
-  <TenantForm tenant={data} client:load />
+  <TenantForm
+    tenant={data}
+    openAIKey={openAIKey?.trim()}
+    azureOpenAIKey={azureOpenAIKey?.trim()}
+    client:load
+  />
 </Layout>

@@ -12,7 +12,7 @@
 
   let tenants = [];
   let showArchived = false;
-  let searchValue = null;
+  let searchValue = "";
   let timeout;
 
   onMount(async () => {
@@ -32,7 +32,6 @@
     } else {
       log.e(error, "Error fetching tenants");
     }
-    log.d(data, "Tenant list");
   };
 
   const copyName = (name) => {

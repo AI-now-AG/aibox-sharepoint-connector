@@ -1,0 +1,19 @@
+---
+import Layout from "$layouts/Layout.astro";
+import { useTranslations } from "$i18n/utils";
+import TranscriptionForm from "./TranscriptionForm.svelte";
+const t = useTranslations();
+---
+
+<Layout>
+  <div style="font-family: Inter;">
+    <div class="container max-w-full mx-auto grid grid-cols-1 px-14">
+      <h1 class="pt-2 mb-2 lg:pt-8 text-4xl font-bold">
+        {t("transcription")}
+      </h1>
+      <p>{t("transcription.page-description")}</p>
+    </div>
+
+    <TranscriptionForm client:load />
+  </div>
+</Layout>

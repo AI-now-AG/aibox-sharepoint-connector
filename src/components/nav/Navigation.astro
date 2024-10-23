@@ -2,6 +2,7 @@
 import { useTranslations } from "$i18n/utils";
 import MenuItem from "./MenuItem.astro";
 import Category from "$data/models/category.model";
+import { TenantFeature } from "$data/models/tenant.model";
 import { svgIcons } from "$assets/icons";
 import auth from "$auth/auth";
 
@@ -18,6 +19,19 @@ const menuItems = categories.map((category) => ({
     path: `/prompts/${category._id}/${group._id}`,
   })),
 }));
+
+if (auth.hasFeature(Astro.locals, TenantFeature.AudioToText)) {
+  menuItems.push({
+    title: t("nav.transcription"),
+    icon: svgIcons.transcription,
+    items: [
+      {
+        title: t("nav.transcription.audio-to-text"),
+        path: `/transcription`,
+      },
+    ],
+  });
+}
 
 // TODO: Check logic supper admin here
 const tenantMenuItem = auth.isSuperAdmin(Astro.locals)

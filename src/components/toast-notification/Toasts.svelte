@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import Toast from "./Toast.svelte";
   import { dismissToast, toasts } from "$stores/toast";
 </script>
@@ -9,7 +9,7 @@
       <Toast
         type={toast.type}
         dismissible={toast.dismissible}
-        on:dismiss={() => dismissToast(toast.id)}>{toast.message}</Toast
+        on:dismiss={() => dismissToast(toast.id)}>{@html toast.message}</Toast
       >
     {/each}
   </section>
