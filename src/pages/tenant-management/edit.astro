@@ -10,27 +10,17 @@ const fetchTenant = async () => {
   const { data, error } = await Astro.callAction(actions.tenant.get, {
     _id: id,
   });
-  console.log("1. { data, error }", { data, error });
   return { data, error };
 };
 
 const tenatData = await fetchTenant();
-console.log("2. tenatData", tenatData);
 const { data } = tenatData || {};
-console.log("3. data", data);
 const { openai_api_key, azure_openai_api_key } = data || {};
-console.log("4. { openai_api_key, azure_openai_api_key }", {
-  openai_api_key,
-  azure_openai_api_key,
-});
 let openAIKey = openai_api_key;
 let azureOpenAIKey = azure_openai_api_key;
-console.log("5. {openAIKey,azureOpenAIKey }", { openAIKey, azureOpenAIKey });
 try {
   if (openai_api_key) {
-    console.log("6.1. daopenai_api_keyta", openai_api_key);
     openAIKey = decrypt(openai_api_key);
-    console.log("6.2. daopenai_api_keyta", openai_api_key);
   }
 } catch (error) {
   console.log("Decrypt openAIKey exception", error);
@@ -38,9 +28,7 @@ try {
 
 try {
   if (azure_openai_api_key) {
-    console.log("7.1. azure_openai_api_key", azure_openai_api_key);
     azureOpenAIKey = decrypt(azure_openai_api_key);
-    console.log("7.2. azure_openai_api_key", azure_openai_api_key);
   }
 } catch (error) {
   console.log("Decrypt azureOpenAIKey exception", error);
