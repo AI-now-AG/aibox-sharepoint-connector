@@ -4,11 +4,7 @@ import TenantForm from "./TenantForm.svelte";
 import { actions } from "astro:actions";
 import { decrypt } from "$utils/secure";
 
-export interface Props {
-  id: string;
-}
-
-const { id = "" } = Astro.params;
+const id = Astro.url.searchParams.get("id") || "";
 
 const fetchTenant = async () => {
   const { data, error } = await Astro.callAction(actions.tenant.get, {
