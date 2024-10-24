@@ -1,6 +1,12 @@
 [build]
-  functions = "functions"  # Directory where your functions are located
-  publish = "dist"         # Directory for your built site
+  functions = "functions" 
+  publish = "dist"         
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  force = true
 
 [functions]
   node_bundler = "esbuild"
@@ -8,3 +14,6 @@
   [functions."transcribeAudio-background"]
     timeout = 900 
     memory = 1024
+
+  [functions.max_lambda_size]
+    value = "50mb"
