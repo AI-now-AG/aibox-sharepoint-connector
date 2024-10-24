@@ -2,12 +2,6 @@
   functions = "functions" 
   publish = "dist"         
 
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-  force = true
-
 [functions]
   node_bundler = "esbuild"
 
@@ -16,4 +10,4 @@
     memory = 1024
 
   [functions.max_lambda_size]
-    value = "1024mb"
+    value = "50mb"
