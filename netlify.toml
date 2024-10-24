@@ -16,4 +16,4 @@
     memory = 1024
 
   [functions.max_lambda_size]
-    value = "50mb"
+    value = "1024mb"
