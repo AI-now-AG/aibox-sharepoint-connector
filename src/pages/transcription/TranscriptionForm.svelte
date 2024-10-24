@@ -24,6 +24,7 @@
   let isUploaded: boolean = false;
   let isTranscribing: boolean = false;
   let isTranscipted: boolean = false;
+  let isTranscriptionFailed: boolean = false;
 
   // API, polling
   let intervalId: any;
@@ -189,6 +190,7 @@
   async function transcribe() {
     try {
       isTranscribing = true;
+      isTranscriptionFailed = false;
 
       const response = await fetch(
         "/.netlify/functions/transcribeAudio-background",
