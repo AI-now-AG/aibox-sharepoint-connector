@@ -10,8 +10,9 @@ const transcribeAudio: Handler = async (event) => {
       body: JSON.stringify({ message: "Method Not Allowed" }),
     };
   }
+
   try {
-    const { fileName, uploadUrl, encryptedApiKey } = JSON.parse(
+    const { fileName, uploadUrl, encryptedApiKey, instructions } = JSON.parse(
       event.body || "{}",
     );
     if (!fileName || !uploadUrl) {
@@ -33,6 +34,7 @@ const transcribeAudio: Handler = async (event) => {
       fileName,
       uploadUrl,
       azureOpenAIApiKey,
+      instructions,
     );
     return {
       statusCode: 200,

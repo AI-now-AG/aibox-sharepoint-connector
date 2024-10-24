@@ -13,7 +13,7 @@ import { StringOutputParser } from "@langchain/core/output_parsers";
 
 const MODEL_NAME = "whisper-1";
 
-const instructions = new SystemMessage(`
+const DEFAULT_INSTRUCTIONS = `
   You are a Swiss German language expert. Your task is to review German subtitles and identify potential misinterpretations of Swiss German words, particularly place names, with a focus on the canton Graubünden while fixing missing punctuation. You must correct these while maintaining the original format as much as possible.
   Important guidelines:
   
@@ -70,7 +70,7 @@ const instructions = new SystemMessage(`
   
   input> die Ergebnisse präsentiert
   output> die Ergebnisse präsentiert.
-`);
+`;
 
 function getClient(azureOpenAIApiKey: string) {
   const endpoint = process.env.AZURE_ENDPOINT;
@@ -114,6 +114,7 @@ async function getAzureResponse(azureOpenAIApiKey: string, prompt: string) {
 
 export const improveTextQuality = async (
   azureOpenAIApiKey: string,
+  instructions: string,
   data: Entry[],
 ) => {
   const model = getAzureChatModel(azureOpenAIApiKey);
@@ -125,8 +126,10 @@ output>
     )
     .join("\n");
 
+  const finalInstructions = instructions || DEFAULT_INSTRUCTIONS;
+  console.log("finalInstructions", finalInstructions);
   const response = await model.invoke(
-    [instructions, new HumanMessage(flat)],
+    [new SystemMessage(finalInstructions), new HumanMessage(flat)],
     {},
   );
 
@@ -148,6 +151,7 @@ export async function transcribeUsingOpenAI(
   fileName: string,
   uploadURL: string,
   azureOpenAIApiKey: string,
+  instructions: string,
 ): Promise<string> {
   try {
     console.log("uploadURL", uploadURL);
@@ -172,10 +176,11 @@ export async function transcribeUsingOpenAI(
     const srtData = createSRTData(
       (response as unknown as { words: InputEntry[] }).words,
     );
-    console.log("srtData", srtData);
+    //console.log("srtData", srtData);
 
     const improvedSrtData = await improveTextQuality(
       azureOpenAIApiKey,
+      instructions,
       srtData,
     );
     const grouped = groupLines(improvedSrtData);

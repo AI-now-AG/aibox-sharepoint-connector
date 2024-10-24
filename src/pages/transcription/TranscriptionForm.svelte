@@ -201,6 +201,7 @@
             fileName: audioFile?.name,
             uploadUrl: tempUploadUrl,
             encryptedApiKey: $tenant?.azure_openai_api_key,
+            instructions: $tenant?.transcription_instructions,
           }),
         },
       );
