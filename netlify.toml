@@ -5,6 +5,6 @@
 [functions]
   node_bundler = "esbuild"
 
-  [functions."uploadAudio-background"]
+  [functions."transcribeAudio-background"]
     timeout = 900 
     memory = 1024
