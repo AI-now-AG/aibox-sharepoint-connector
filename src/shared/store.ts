@@ -1,14 +1,14 @@
 import fs from "fs/promises";
 import path from "path";
 
-const TASKS_DIR = path.resolve("src/share/tasks");
+const TASKS_DIR = path.resolve("/tmp/tasks");
 
 const ensureTasksDir = async () => {
     try {
         await fs.mkdir(TASKS_DIR, { recursive: true });
     } catch (error) {
         if (error instanceof Error && (error as NodeJS.ErrnoException).code !== "EEXIST") {
-            console.error("Error updating task:", error);
+            console.error("Error while create directory:", error);
         }
     }
 };
