@@ -3,7 +3,7 @@ import Layout from "$layouts/Layout.astro";
 import TenantForm from "./TenantForm.svelte";
 import tenantModel from "$data/models/tenant.model";
 import { decrypt } from "$utils/secure";
-import { transformDataToArray } from "$utils/transformDataToArray";
+import { transformRawData } from "$utils/transformRawData";
 
 export interface Props {
   id: string;
@@ -21,7 +21,7 @@ if (tenant === null) {
   return Astro.redirect('/404');
 }
 
-const data = transformDataToArray(tenant);
+const data = transformRawData(tenant);
 const { openai_api_key, azure_openai_api_key } = data || {};
 let openAIKey = openai_api_key;
 let azureOpenAIKey = azure_openai_api_key;

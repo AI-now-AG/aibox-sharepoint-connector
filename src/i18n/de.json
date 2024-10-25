@@ -17,6 +17,7 @@
   "nav.settings.instructions": "Instruktionen",
   "nav.settings.knowledge-base": "Knowledge Base",
   "nav.settings.categories": "Kategorien",
+  "nav.settings.transcription": "Audio to text",
   "nav.tenant-management": "Tenant Verwaltung",
   "nav.transcription": "Audio",
   "nav.transcription.audio-to-text": "Audio zu Text (Beta)",
@@ -106,7 +107,6 @@
   "tenant.validate-azure-open-ai-key-message": "Bitte Azure Open AI-Schlüssel erfassen",
   "tenant.create-successful": "Tenant erfolgreich erstellt",
   "tenant.update-successful": "Tenant erfolgreich aktualisiert",
-  "tenant.transcription-instructions": "Transcription instructions",
   "transcription": "Audio zu Text",
   "transcription.page-description": "Verwandle Audioaufnahmen, gesprochenen Text oder Meetings in Textform.",
   "transcription.select-transcription-model": "Modell auswählen",
@@ -127,5 +127,8 @@
   "transcription.dowload-files": "Dateien herunterladen",
   "transcription.dowload-srt-file": "SRT-Datei herunterladen",
   "transcription.file-validation.unsupported-type": "Dieses Format wird nicht unterstützt.",
-  "transcription.file-validation.exceed-size-limit": "Datei darf nicht grösser sein als 25 MB, bitte Dateigrösse reduzieren und neu hochladen"
+  "transcription.file-validation.exceed-size-limit": "Datei darf nicht grösser sein als 25 MB, bitte Dateigrösse reduzieren und neu hochladen",
+  "transciption.transcription.failed": "Transcription failed",
+  "settings.transcription.instructions": "Transcription instructions",
+  "settings.transcription.instructions-placeholder": "e.g. type instruction details..."
 }

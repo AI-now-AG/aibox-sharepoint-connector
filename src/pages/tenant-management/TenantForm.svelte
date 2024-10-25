@@ -455,20 +455,10 @@
       </div>
     </div>
 
-    <!-- Transcription instructions -->
+    <!-- Extend Azure config -->
     {#if apiKeyProvider == API_KEY_PROVIDER.AzureOpenAI}
       <div class="mt-3">
-        <span class="mb-2 text-gray-400 font-medium text-sm">
-          {t("tenant.transcription-instructions")}
-        </span>
-        <textarea
-          value={tenant?.transcription_instructions || ""}
-          placeholder="e.g. type instruction details..."
-          class="input input-bordered min-w-xs shadow appearance-none min-h-40 w-full py-2 px-3"
-          on:change={(event) => {
-            tenantData.transcription_instructions = event.target.value;
-          }}
-        ></textarea>
+        <!-- Moved instructions to navigation -->
       </div>
     {/if}
 

@@ -28,6 +28,7 @@ const transcribeAudio: Handler = async (event) => {
     );
     console.log("encryptedApiKey", encryptedApiKey);
     console.log("decryptedApiKey", azureOpenAIApiKey);
+    console.log("newInstructions", instructions);
 
     const transcription = await transcribeUsingOpenAI(
       fileBuffer,
