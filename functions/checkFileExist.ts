@@ -6,6 +6,7 @@ import AdmZip from "adm-zip";
 import { createWriteStream, unlinkSync, existsSync } from "fs";
 import { promisify } from "util";
 import { pipeline } from "stream";
+import { getTask } from "$shared/store";
 
 const checkFileExist: Handler = async (event, context) => {
   const { fileNames } = JSON.parse(event.body!);
@@ -29,15 +30,22 @@ const checkFileExist: Handler = async (event, context) => {
       for (const fileName of fileNames) {
         const blobClient = containerClient.getBlobClient(fileName);
         const exists = await blobClient.exists();
-
         if (!exists) {
-          return {
-            statusCode: 404,
-            body: JSON.stringify({
-              exists: false,
-              message: "File does not exist",
-            }),
-          };
+          const task = await getTask(fileName);
+          if (!task) {
+            return {
+              statusCode: 404,
+              body: JSON.stringify({
+                exists: false,
+                message: "File does not exist",
+              }),
+            };
+          } else {
+            return {
+              statusCode: 200,
+              body: JSON.stringify(task),
+            };
+          }
         }
 
         const filePath = join(tmpDir, fileName);

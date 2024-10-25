@@ -1,7 +1,8 @@
 import { BlobServiceClient } from "@azure/storage-blob";
 import { AzureChatOpenAI, toFile } from "@langchain/openai";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
-import { AzureOpenAI } from "openai";
+import { AzureOpenAI, RateLimitError } from "openai";
+
 import {
   groupLines,
   formatSRT,
@@ -136,7 +137,13 @@ export async function transcribeUsingOpenAI(
   fileName: string,
   uploadURL: string,
   azureOpenAIApiKey: string,
-): Promise<string> {
+): Promise<{
+  success: boolean; data: {
+    text: string, urls: {
+      [key: string]: string;
+    }
+  } | null; error: string | null
+}> {
   try {
     const openaiClient = getClient(azureOpenAIApiKey);
     const audioFile = await toFile(audioBuffer, fileName);
@@ -180,11 +187,17 @@ export async function transcribeUsingOpenAI(
       result,
       "srt",
     );
-
-    return response.text;
+    return { success: true, data: { text: response.text, urls: outputURLs }, error: null };
   } catch (error) {
     console.error("Error during transcription::", error);
-    throw new Error("Transcription failed.");
+    let errorMessage = "Transcription failed.";
+    if (error instanceof RateLimitError) {
+      errorMessage = "Rate limit exceeded. Please try again later or upgrade your plan.";
+    } else if (typeof error === "object" && error !== null && "message" in error) {
+      errorMessage = error.message as string;
+    }
+
+    return { success: false, data: null, error: errorMessage };
   }
 }
 

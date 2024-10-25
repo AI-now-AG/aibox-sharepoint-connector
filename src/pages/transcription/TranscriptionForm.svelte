@@ -47,6 +47,7 @@
 
         isTranscribing = false;
         isTranscipted = true;
+        isTranscriptionFailed = false;
       }
     });
   });
@@ -57,9 +58,11 @@
 
     if (!srtFileUrl) {
       isTranscribing = true;
+      isTranscriptionFailed = false;
     } else {
       isUploaded = true;
       isTranscipted = true;
+      isTranscriptionFailed = false;
     }
   }
 
@@ -201,6 +204,7 @@
           },
           body: JSON.stringify({
             fileName: audioFile?.name,
+            uniqueName: tempOutputFileNames[0],
             uploadUrl: tempUploadUrl,
             encryptedApiKey: $tenant?.azure_openai_api_key,
           }),
@@ -222,16 +226,27 @@
           txtUrl: "",
           srtUrl: "",
         });
+        addToast({
+          message: "File uploaded and transcription started successfully.",
+          type: "success",
+          timeout: 5000,
+        });
       } else {
         const result = await response.json();
         addToast({
-          message: result.message,
+          message: result.message || "An error occurred during transcription.",
           type: "error",
           timeout: 5000,
         });
       }
     } catch (error) {
       console.error("Fetch error:", error);
+      addToast({
+        message:
+          "Failed to upload the file. Please check your network connection.",
+        type: "error",
+        timeout: 5000,
+      });
     }
   }
 
@@ -242,15 +257,11 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ fileNames: tempOutputFileNames }),
       });
-
       if (response.ok) {
         const result = await response.json();
         console.log("Check output file ready response", result);
-
-        if (result.exists) {
+        if (result.status === "completed") {
           clearInterval(intervalId);
-
-          // store data in store
           srtFileUrl = result.srt_file;
           transcript.set({
             file: audioFile,
@@ -260,18 +271,26 @@
             srtUrl: result.srt_file,
           });
 
-          // show toast
           addToast({
             message:
               '<a href="/transcription">Your transcription is ready. Tap to see.</a>',
             type: "success",
             timeout: 5000,
           });
-
-          // update states
-          //isTranscribing = false;
-          //isTranscipted = true;
-
+        } else if (result.status === "failed") {
+          clearInterval(intervalId);
+          addToast({
+            message:
+            result.error || "An error occurred during transcription.",
+            type: "error",
+            timeout: 5000,
+          });
+          isTranscribing = false;
+          isTranscipted = false;
+          isTranscriptionFailed = true;
+        }
+        if (result.exists) {
+          clearInterval(intervalId);
           console.log("File found!");
         } else {
           console.warn("Still file is processing!");
@@ -341,6 +360,7 @@
     isUploaded = false;
     isTranscribing = false;
     isTranscipted = false;
+    isTranscriptionFailed = false;
 
     srtFileUrl = "";
     textOuput = "";
@@ -423,6 +443,11 @@
                 {@html svgIcons.transcribed}
                 <p class="font-medium text-success">
                   {t("transciption.transcribed")}
+                </p>
+              {/if}
+              {#if isTranscriptionFailed}
+                <p class="font-medium text-error">
+                  {t("transciption.transcription.failed")}
                 </p>
               {/if}
             </div>
