@@ -1,10 +1,10 @@
-import { type Handler } from "@netlify/functions";
+import { type Handler, type HandlerEvent, type HandlerResponse } from "@netlify/functions";
 import { BlobServiceClient } from "@azure/storage-blob";
 import { transcribeUsingOpenAI } from "./utils/transcribe";
 import { decrypt } from "$utils/secure";
 import { createTask, updateTask } from "$shared/store";
 
-const transcribeAudio: Handler = async (event) => {
+const transcribeAudio: Handler = async (event: HandlerEvent): Promise<HandlerResponse> => {
   if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
@@ -27,7 +27,7 @@ const transcribeAudio: Handler = async (event) => {
 
     console.log("encryptedApiKey", encryptedApiKey);
     console.log("decryptedApiKey", azureOpenAIApiKey);
-    
+
     createTask(uniqueName, { status: "processing", error: null });
     const transcriptionResult = await transcribeUsingOpenAI(
       fileBuffer,
@@ -47,7 +47,7 @@ const transcribeAudio: Handler = async (event) => {
         }),
       };
     }
-    
+
     updateTask(uniqueName, {
       status: "completed",
       txtUrl: transcriptionResult.data?.urls["txt"],
@@ -65,10 +65,12 @@ const transcribeAudio: Handler = async (event) => {
     const { uniqueName } = JSON.parse(
       event.body || "{}",
     );
-    updateTask(uniqueName, {
-      status: "failed",
-      error: error.message || "Unknown error during transcription.",
-    });
+    if (error instanceof Error) {
+      updateTask(uniqueName, {
+        status: "failed",
+        error: error.message,
+      });
+    }
   }
 };
 
