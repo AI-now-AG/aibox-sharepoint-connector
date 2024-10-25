@@ -61,16 +61,27 @@ const transcribeAudio: Handler = async (event: HandlerEvent): Promise<HandlerRes
       }),
     };
   } catch (error) {
-    console.log(error);
-    const { uniqueName } = JSON.parse(
-      event.body || "{}",
-    );
+    console.error(error);
+    const { uniqueName } = JSON.parse(event.body || "{}");
+
     if (error instanceof Error) {
       updateTask(uniqueName, {
         status: "failed",
         error: error.message,
       });
+    } else {
+      updateTask(uniqueName, {
+        status: "failed",
+        error: "Unknown error during transcription.",
+      });
     }
+
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        message: error instanceof Error ? error.message : "Unknown error during transcription",
+      }),
+    };
   }
 };
 

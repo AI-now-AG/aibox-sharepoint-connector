@@ -7,7 +7,7 @@ const ensureTasksDir = async () => {
     try {
         await fs.mkdir(TASKS_DIR, { recursive: true });
     } catch (error) {
-        if (error.code !== "EEXIST") {
+        if (error instanceof Error && (error as NodeJS.ErrnoException).code !== "EEXIST") {
             console.error("Error updating task:", error);
         }
     }
