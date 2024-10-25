@@ -459,7 +459,7 @@
     {#if apiKeyProvider == API_KEY_PROVIDER.AzureOpenAI}
       <div class="mt-3">
         <span class="mb-2 text-gray-400 font-medium text-sm">
-          Transcription instructions
+          {t("tenant.transcription-instructions")}
         </span>
         <textarea
           value={tenant?.transcription_instructions || ""}
@@ -514,9 +514,6 @@
     <ConfirmUpdateDialog
       bind:modal={confirmUpdateModal}
       on:confirm={updateTenant}
-      on:dismiss={() => {
-        confirmUpdateModal?.close();
-      }}
     />
 
     <AlertDialog bind:modal={alertModal} message={alertMessage} />

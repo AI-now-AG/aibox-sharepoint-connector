@@ -106,6 +106,7 @@
   "tenant.validate-azure-open-ai-key-message": "Please input Azure Open AI key",
   "tenant.create-successful": "Create tenant successful",
   "tenant.update-successful": "Update tenant successful",
+  "tenant.transcription-instructions": "Transcription instructions",
   "transcription": "Audio to text",
   "transcription.page-description": "Convert audio recordings, spoken text or meetings into text for further use.",
   "transcription.select-transcription-model": "Select transcription model",
