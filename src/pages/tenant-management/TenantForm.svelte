@@ -6,8 +6,10 @@
   import { useTranslations } from "$i18n/utils";
   import { addToast } from "$stores/toast";
   import Loading from "$components/Loading.svelte";
-  import { loading, showLoading, hideLoading } from "$stores";
+  import TogglePasswordIcon from "./TogglePasswordIcon.svelte";
   import ConfirmUpdateDialog from "./ConfirmUpdateDialog.svelte";
+  import AlertDialog from "./AlertDialog.svelte";
+  import { loading, showLoading, hideLoading } from "$stores";
   import ColorPicker, { ChromeVariant } from "svelte-awesome-color-picker";
   import log from "$utils/log";
 
@@ -16,6 +18,8 @@
   export let azureOpenAIKey = "";
 
   let confirmUpdateModal;
+  let alertModal;
+  let alertMessage = "";
 
   const API_KEY_PROVIDER = {
     OpenAI: "openai",
@@ -61,8 +65,6 @@
     tenantData.api_key_provider = apiKeyProvider;
   }
 
-  let icon_open_ai = svgIcons.eyeClose;
-  let icon_azure_open_ai = svgIcons.eyeClose;
   function togglePassword(_apiKeyProvider) {
     let passwordField = document.getElementById("open_ai_key");
     if (_apiKeyProvider == API_KEY_PROVIDER.AzureOpenAI) {
@@ -70,21 +72,8 @@
     }
     if (passwordField.type === "password") {
       passwordField.type = "text";
-
-      if (_apiKeyProvider == API_KEY_PROVIDER.OpenAI) {
-        icon_open_ai = svgIcons.eye;
-      }
-      if (_apiKeyProvider == API_KEY_PROVIDER.AzureOpenAI) {
-        icon_azure_open_ai = svgIcons.eye;
-      }
     } else {
       passwordField.type = "password";
-      if (_apiKeyProvider == API_KEY_PROVIDER.OpenAI) {
-        icon_open_ai = svgIcons.eyeClose;
-      }
-      if (_apiKeyProvider == API_KEY_PROVIDER.AzureOpenAI) {
-        icon_azure_open_ai = svgIcons.eyeClose;
-      }
     }
   }
 
@@ -186,8 +175,8 @@
   }
 
   function showAlert(message) {
-    document.getElementById("alert_message").textContent = message;
-    document.getElementById("my_modal_3").showModal();
+    alertMessage = message;
+    alertModal.show();
   }
 </script>
 
@@ -411,13 +400,9 @@
               showPicker = false;
             }}
           />
-          <button
-            on:click={() => {
-              togglePassword(API_KEY_PROVIDER.OpenAI);
-            }}
-          >
-            {@html icon_open_ai}
-          </button>
+          <TogglePasswordIcon
+            on:change={() => togglePassword(API_KEY_PROVIDER.OpenAI)}
+          />
         </label>
       </div>
 
@@ -463,13 +448,9 @@
               showPicker = false;
             }}
           />
-          <button
-            on:click={() => {
-              togglePassword(API_KEY_PROVIDER.AzureOpenAI);
-            }}
-          >
-            {@html icon_azure_open_ai}
-          </button>
+          <TogglePasswordIcon
+            on:change={() => togglePassword(API_KEY_PROVIDER.AzureOpenAI)}
+          />
         </label>
       </div>
     </div>
@@ -538,16 +519,7 @@
       }}
     />
 
-    <dialog id="my_modal_3" class="modal">
-      <div class="modal-box">
-        <form method="dialog">
-          <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-            >✕</button
-          >
-        </form>
-        <p id="alert_message" style="color: rgb(159 18 57);"></p>
-      </div>
-    </dialog>
+    <AlertDialog bind:modal={alertModal} message={alertMessage} />
   </div>
 </div>
 
