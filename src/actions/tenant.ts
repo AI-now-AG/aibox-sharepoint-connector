@@ -25,8 +25,12 @@ const TenantInputParamsSchema = z.object({
   api_key_provider: z.nativeEnum(ApiKeyProvider).optional(),
   openai_api_key: z.string().optional(),
   azure_openai_api_key: z.string().optional(),
-  included_features: z.array(z.nativeEnum(TenantFeature)).optional(),
+  azure_openai_endpoint: z.string().optional(),
+  azure_openai_instance_name: z.string().optional(),
+  azure_openai_whisper_model: z.string().optional(),
+  azure_openai_chat_model: z.string().optional(),
   transcription_instructions: z.string().optional(),
+  included_features: z.array(z.nativeEnum(TenantFeature)).optional(),
 });
 
 const TenanKeyEncryptSchema = z.object({
