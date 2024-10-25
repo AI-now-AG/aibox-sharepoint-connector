@@ -38,7 +38,7 @@
   "prompt-library.add.prompts.category": "Category",
   "prompt-library.add.prompts.group": "Use Case",
   "prompt-library.add.prompts.prompt": "Prompt",
-  "prompt-library.add.prompts.instructions": "Instructions",
+  "prompt-library.add.prompts.instructions": "Instruction",
   "prompt-library.add.prompts.knowledge-base": "Knowledge Base",
   "prompt-library.add.prompts.save": "Save Prompt",
   "prompt-library.add.prompts.saving": "Saving...",
