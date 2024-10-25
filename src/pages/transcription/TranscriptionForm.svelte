@@ -261,6 +261,20 @@
         const result = await response.json();
         console.log("Check output file ready response", result);
         if (result.status === "completed") {
+          // Note: Handle complete status later on
+        } else if (result.status === "failed") {
+          clearInterval(intervalId);
+          addToast({
+            message:
+            result.error || "An error occurred during transcription.",
+            type: "error",
+            timeout: 5000,
+          });
+          isTranscribing = false;
+          isTranscipted = false;
+          isTranscriptionFailed = true;
+        }
+        if (result.exists) {
           clearInterval(intervalId);
           srtFileUrl = result.srt_file;
           transcript.set({
@@ -277,20 +291,6 @@
             type: "success",
             timeout: 5000,
           });
-        } else if (result.status === "failed") {
-          clearInterval(intervalId);
-          addToast({
-            message:
-            result.error || "An error occurred during transcription.",
-            type: "error",
-            timeout: 5000,
-          });
-          isTranscribing = false;
-          isTranscipted = false;
-          isTranscriptionFailed = true;
-        }
-        if (result.exists) {
-          clearInterval(intervalId);
           console.log("File found!");
         } else {
           console.warn("Still file is processing!");
