@@ -100,18 +100,6 @@ function getAzureChatModel(azureOpenAIApiKey: string) {
   return new AzureChatOpenAI(azureChatConfig);
 }
 
-async function getAzureResponse(azureOpenAIApiKey: string, prompt: string) {
-  try {
-    const chat = getAzureChatModel(azureOpenAIApiKey);
-
-    const response = await chat.invoke(prompt);
-    return response;
-  } catch (error) {
-    console.error("Error communicating with Azure OpenAI:", error);
-    throw error;
-  }
-}
-
 export const improveTextQuality = async (
   azureOpenAIApiKey: string,
   data: Entry[],
@@ -150,7 +138,6 @@ export async function transcribeUsingOpenAI(
   azureOpenAIApiKey: string,
 ): Promise<string> {
   try {
-    console.log("uploadURL", uploadURL);
     const openaiClient = getClient(azureOpenAIApiKey);
     const audioFile = await toFile(audioBuffer, fileName);
 
@@ -163,16 +150,13 @@ export async function transcribeUsingOpenAI(
       prompt:
         'Eine übliche Ausdrucksweise ist "ob ORTSNAME", bspw. "ob Schwanden". das ob bedeutet in diesem Fall "oberhalb von"',
     });
-    const transcriptionResponse = await getAzureResponse(
-      azureOpenAIApiKey,
-      response.text,
-    );
+    const transcriptionText = response.text;
     const parser = new StringOutputParser();
-    const description = await parser.invoke(transcriptionResponse);
+    const description = await parser.invoke(transcriptionText);
+
     const srtData = createSRTData(
       (response as unknown as { words: InputEntry[] }).words,
     );
-    console.log("srtData", srtData);
 
     const improvedSrtData = await improveTextQuality(
       azureOpenAIApiKey,
