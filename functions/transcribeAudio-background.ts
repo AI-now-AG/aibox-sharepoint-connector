@@ -37,6 +37,7 @@ const transcribeAudio: Handler = async (event: HandlerEvent): Promise<HandlerRes
       uploadUrl,
       azureOpenAIApiKey,
     );
+    console.log("--Status--" + transcriptionResult.success)
     if (!transcriptionResult.success) {
       updateTask(uniqueName, {
         status: "failed",
@@ -49,19 +50,20 @@ const transcribeAudio: Handler = async (event: HandlerEvent): Promise<HandlerRes
         }),
       };
     }
-
-    updateTask(uniqueName, {
-      status: "completed",
-      txtUrl: transcriptionResult.data?.urls["txt"],
-      srtUrl: transcriptionResult.data?.urls["srt"],
-    });
-    return {
-      statusCode: 200,
-      body: JSON.stringify({
-        message: "File uploaded and transcribed successfully",
-        transcription: transcriptionResult.data,
-      }),
-    };
+    else {
+      updateTask(uniqueName, {
+        status: "completed",
+        txtUrl: transcriptionResult.data?.urls["txt"],
+        srtUrl: transcriptionResult.data?.urls["srt"],
+      });
+      return {
+        statusCode: 200,
+        body: JSON.stringify({
+          message: "File uploaded and transcribed successfully",
+          transcription: transcriptionResult.data,
+        }),
+      };
+    }
   } catch (error) {
     console.error(error);
     const { uniqueName } = JSON.parse(event.body || "{}");
