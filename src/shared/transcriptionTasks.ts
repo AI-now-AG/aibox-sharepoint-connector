@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { MongoClient, Db, Collection } from "mongodb";
 
-const MONGO_URI = process.env.MONGODB_URI;
+const MONGO_URI = process.env.MONGODB_URI || "";
 const DB_NAME = process.env.MONGODB_DATABASE;
 
 const TaskSchema = z.object({

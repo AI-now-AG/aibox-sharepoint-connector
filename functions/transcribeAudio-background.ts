@@ -30,7 +30,7 @@ const transcribeAudio: Handler = async (event: HandlerEvent): Promise<HandlerRes
     console.log("encryptedApiKey", encryptedApiKey);
     console.log("decryptedApiKey", azureOpenAIApiKey);
 
-    createTask(uniqueName, { status: "processing", error: null });
+    createTask(uniqueName, { status: "processing"});
     const transcriptionResult = await transcribeUsingOpenAI(
       fileBuffer,
       fileName,
