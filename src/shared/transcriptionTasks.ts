@@ -6,13 +6,14 @@ const DB_NAME = process.env.MONGODB_DATABASE;
 
 const TaskSchema = z.object({
   taskId: z.string(),
-  status: z.string().optional(), // Example field, could be "pending", "completed", "error", etc.
-  prompt: z.string().optional(),
-  instruction: z.string().optional(),
-  result: z.any().optional(),
+  status: z.string().optional(),
   createdAt: z.string().optional(),
   updatedAt: z.string().optional(),
+  error: z.string().optional(),
+  txtUrl: z.string().optional(),
+  srtUrl: z.string().optional(),
 });
+
 
 type Task = z.infer<typeof TaskSchema>;
 let db: Db | null = null;
