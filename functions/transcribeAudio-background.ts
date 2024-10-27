@@ -2,7 +2,7 @@ import { type Handler, type HandlerEvent, type HandlerResponse } from "@netlify/
 import { BlobServiceClient } from "@azure/storage-blob";
 import { transcribeUsingOpenAI } from "./utils/transcribe";
 import { decrypt } from "$utils/secure";
-import { createTask, updateTask } from "$shared/store";
+import { createTask, updateTask } from "$shared/transcriptionTasks";
 
 const transcribeAudio: Handler = async (event: HandlerEvent): Promise<HandlerResponse> => {
   if (event.httpMethod !== "POST") {
@@ -37,7 +37,7 @@ const transcribeAudio: Handler = async (event: HandlerEvent): Promise<HandlerRes
       uploadUrl,
       azureOpenAIApiKey,
     );
-    console.log("--Status--" + transcriptionResult.success)
+
     if (!transcriptionResult.success) {
       updateTask(uniqueName, {
         status: "failed",
@@ -65,7 +65,7 @@ const transcribeAudio: Handler = async (event: HandlerEvent): Promise<HandlerRes
       };
     }
   } catch (error) {
-    console.error(error);
+    console.error("Error while transcribing:" + error);
     const { uniqueName } = JSON.parse(event.body || "{}");
 
     if (error instanceof Error) {
@@ -91,7 +91,6 @@ const transcribeAudio: Handler = async (event: HandlerEvent): Promise<HandlerRes
 
 async function downloadFileFromBlob(blobUrl: string): Promise<Buffer> {
   const storageURLString: string = process.env.AZURE_BLOB_STORAGE_NAME || "";
-  console.log(storageURLString);
   const blobServiceClient =
     BlobServiceClient.fromConnectionString(storageURLString);
 

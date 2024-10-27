@@ -6,7 +6,7 @@ import AdmZip from "adm-zip";
 import { createWriteStream, unlinkSync, existsSync } from "fs";
 import { promisify } from "util";
 import { pipeline } from "stream";
-import { getTask } from "$shared/store";
+import { getTask } from "$shared/transcriptionTasks";
 
 const checkFileExist: Handler = async (event, context) => {
   const { fileNames } = JSON.parse(event.body!);
