@@ -388,6 +388,7 @@
 
           <label class="input input-bordered flex items-center gap-2 mt-2">
             <input
+              id="open_ai_key"
               type="password"
               class="grow"
               placeholder={t("tenant.api-key")}
@@ -414,6 +415,7 @@
 
           <label class="input input-bordered flex items-center gap-2 mt-2">
             <input
+              id="azure_open_ai_key"
               type="password"
               class="grow"
               placeholder={t("tenant.api-key")}
