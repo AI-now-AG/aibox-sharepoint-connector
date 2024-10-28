@@ -12,9 +12,10 @@ const transcribeAudio: Handler = async (event) => {
   }
 
   try {
-    const { fileName, uploadUrl, encryptedApiKey, instructions } = JSON.parse(
-      event.body || "{}",
-    );
+    const requestParams = JSON.parse(event.body || "{}");
+
+    const { fileName, uploadUrl, encryptedApiKey } = requestParams;
+
     if (!fileName || !uploadUrl) {
       return {
         statusCode: 400,
@@ -23,20 +24,18 @@ const transcribeAudio: Handler = async (event) => {
     }
 
     const fileBuffer = await downloadFileFromBlob(uploadUrl);
+    requestParams.fileBuffer = fileBuffer;
+
     const azureOpenAIApiKey = decrypt(
       encryptedApiKey || process.env.AZURE_OPENAI_API_KEY2,
     );
+    requestParams.azureOpenAIApiKey = azureOpenAIApiKey;
+
     console.log("encryptedApiKey", encryptedApiKey);
     console.log("decryptedApiKey", azureOpenAIApiKey);
-    console.log("newInstructions", instructions);
+    console.log("requestParams", requestParams);
 
-    const transcription = await transcribeUsingOpenAI(
-      fileBuffer,
-      fileName,
-      uploadUrl,
-      azureOpenAIApiKey,
-      instructions,
-    );
+    const transcription = await transcribeUsingOpenAI(requestParams);
     return {
       statusCode: 200,
       body: JSON.stringify({

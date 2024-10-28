@@ -200,8 +200,12 @@
           body: JSON.stringify({
             fileName: audioFile?.name,
             uploadUrl: tempUploadUrl,
-            encryptedApiKey: $tenant?.azure_openai_api_key,
             instructions: $tenant?.transcription_instructions,
+            encryptedApiKey: $tenant?.azure_openai_api_key,
+            azureOpenAIInstanceName: $tenant?.azure_openai_instance_name,
+            azureOpenAIEndpoint: $tenant?.azure_openai_endpoint,
+            azureOpenAIWhisperModel:$tenant?.azure_openai_whisper_model
+            azureOpenAIChatModel: $tenant?.azure_openai_chat_model
           }),
         },
       );
