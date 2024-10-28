@@ -50,19 +50,9 @@
     tenantData.primary_color = selecteColor;
   }
 
-  if (!tenantData.api_key_provider) {
-    tenantData.api_key_provider = API_KEY_PROVIDER.OpenAI;
-  }
-
   let showPicker = false;
   function toggleColorPicker() {
     showPicker = !showPicker;
-  }
-
-  let apiKeyProvider = tenantData?.api_key_provider || API_KEY_PROVIDER.OpenAI;
-  function selectApiKeyProvider(event) {
-    apiKeyProvider = event.target.value?.trim();
-    tenantData.api_key_provider = apiKeyProvider;
   }
 
   function togglePassword(_apiKeyProvider) {
@@ -86,16 +76,15 @@
       showAlert(t("tenant.validate-empty-identification-name-message"));
       return false;
     }
-    if (apiKeyProvider == API_KEY_PROVIDER.OpenAI) {
-      if (!openAIKey) {
-        showAlert(t("tenant.validate-open-ai-key-message"));
-        return false;
-      }
-    } else {
-      if (!azureOpenAIKey) {
-        showAlert(t("tenant.validate-azure-open-ai-key-message"));
-        return false;
-      }
+
+    if (!openAIKey) {
+      showAlert(t("tenant.validate-open-ai-key-message"));
+      return false;
+    }
+
+    if (!azureOpenAIKey) {
+      showAlert(t("tenant.validate-azure-open-ai-key-message"));
+      return false;
     }
 
     return true;
@@ -361,20 +350,6 @@
     <div class="flex flex-row space-x-4">
       <div class="flex-1 flex flex-col">
         <div class="flex items-center mb-2">
-          <input
-            type="radio"
-            id="radio-azure-open-api-key"
-            name="radio-api-key"
-            class="radio radio-primary"
-            value={API_KEY_PROVIDER.OpenAI}
-            checked={apiKeyProvider == API_KEY_PROVIDER.OpenAI}
-            on:change={(event) => {
-              selectApiKeyProvider(event);
-            }}
-            on:focus={() => {
-              showPicker = false;
-            }}
-          />
           <label
             for="radio-azure-open-api-key"
             class="ml-2 text-gray-400 font-medium text-sm"
@@ -382,16 +357,12 @@
           >
         </div>
 
-        <label
-          class="input input-bordered flex items-center gap-2"
-          style="background-color: white;"
-        >
+        <label class="input input-bordered flex items-center gap-2">
           <input
             type="password"
             class="grow"
             id="open_ai_key"
             placeholder={t("tenant.api-key")}
-            disabled={apiKeyProvider != API_KEY_PROVIDER.OpenAI}
             value={openAIKey}
             on:change={(event) => {
               openAIKey = event.target.value;
@@ -408,20 +379,6 @@
 
       <div class="flex-1 flex flex-col">
         <div class="flex items-center mb-2">
-          <input
-            type="radio"
-            id="radio-open-api-key"
-            name="radio-api-key"
-            class="radio radio-primary"
-            value={API_KEY_PROVIDER.AzureOpenAI}
-            checked={apiKeyProvider == API_KEY_PROVIDER.AzureOpenAI}
-            on:change={(event) => {
-              selectApiKeyProvider(event);
-            }}
-            on:focus={() => {
-              showPicker = false;
-            }}
-          />
           <label
             for="radio-open-api-key"
             class="ml-2 text-gray-400 font-medium text-sm"
@@ -429,17 +386,12 @@
           >
         </div>
 
-        <label
-          class="input input-bordered flex items-center gap-2"
-          style="background-color: white;"
-        >
+        <label class="input input-bordered flex items-center gap-2">
           <input
             type="password"
             class="grow"
             id="azure_open_ai_key"
             placeholder={t("tenant.api-key")}
-            disabled={apiKeyProvider != API_KEY_PROVIDER.AzureOpenAI}
-            style="background-color: white;"
             value={azureOpenAIKey}
             on:change={(event) => {
               azureOpenAIKey = event.target.value;
@@ -454,13 +406,6 @@
         </label>
       </div>
     </div>
-
-    <!-- Extend Azure config -->
-    {#if apiKeyProvider == API_KEY_PROVIDER.AzureOpenAI}
-      <div class="mt-3">
-        <!-- Moved instructions to navigation -->
-      </div>
-    {/if}
 
     <!-- Included features -->
     <div class="w-full h-0.5 mt-4 mb-6 bg-gray-400/20" />
