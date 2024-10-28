@@ -14,7 +14,7 @@ import { StringOutputParser } from "@langchain/core/output_parsers";
 const MODEL_NAME = "whisper-1";
 
 const instructions = new SystemMessage(`
-  You are a Swiss German language expert. Your task is to review German subtitles and identify potential misinterpretations of Swiss German words, particularly place names, with a focus on the canton Graubünden while fixing missing punctuation. You must correct these while maintaining the original format as much as possible.
+  You are a Swiss German language expert. Your task is to review German subtitles and identify potential misinterpretations of Swiss German words, particularly place names, with a focus on the canton Graubünden while fixing missing punctuation. Improve all obvious errors in the following transcription, make illogical sentences logical. You must correct these while maintaining the original format as much as possible.
   Important guidelines:
   
   - Maintain the exact word count and line count of the original subtitle.
@@ -131,6 +131,13 @@ output>
   return out;
 };
 
+function formatDescription(description: string): string {
+  // Example formatting: Adding line breaks and indentation for readability
+  return description
+    .replace(/\. /g, '.\n') // Add line breaks after each sentence
+    .replace(/(?:\n)([a-z])/g, '\n  $1'); // Indent lines starting with lowercase letters for continuity
+}
+
 export async function transcribeUsingOpenAI(
   audioBuffer: Buffer,
   fileName: string,
@@ -153,7 +160,7 @@ export async function transcribeUsingOpenAI(
     const transcriptionText = response.text;
     const parser = new StringOutputParser();
     const description = await parser.invoke(transcriptionText);
-
+    const description2 = formatDescription(description)
     const srtData = createSRTData(
       (response as unknown as { words: InputEntry[] }).words,
     );
@@ -172,7 +179,7 @@ export async function transcribeUsingOpenAI(
     const outputURLs: { [key: string]: string } = {};
     outputURLs["txt"] = await uploadOutputToBlob(
       `${fileNameWithoutExtension}.txt`,
-      description,
+      description2,
       "txt",
     );
     outputURLs["srt"] = await uploadOutputToBlob(
@@ -181,7 +188,7 @@ export async function transcribeUsingOpenAI(
       "srt",
     );
 
-    return response.text;
+    return description2;
   } catch (error) {
     console.error("Error during transcription::", error);
     throw new Error("Transcription failed.");
