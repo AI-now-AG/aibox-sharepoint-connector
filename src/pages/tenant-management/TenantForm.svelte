@@ -72,6 +72,10 @@
     }
   }
 
+  function hasFeatureAudioToText() {
+    return tenantData?.included_features?.indexOf("audio-to-text") != -1;
+  }
+
   function validateForm() {
     if (!tenantData?.name) {
       showAlert(t("tenant.validate-empty-display-name-message"));
@@ -87,9 +91,32 @@
       return false;
     }
 
-    if (!azureOpenAIKey) {
+    if (hasFeatureAudioToText() && !azureOpenAIKey) {
       showAlert(t("tenant.validate-azure-open-ai-key-message"));
       return false;
+    }
+
+    if (azureOpenAIKey) {
+      if (!azureOpenAIApiInstanceName) {
+        showAlert(
+          t("tenant.validate-azure-open-ai-instance-name-empty-message"),
+        );
+        return false;
+      }
+      if (!azureOpenAIEndpoint) {
+        showAlert(t("tenant.validate-azure-open-ai-enpoint-empty-message"));
+        return false;
+      }
+      if (!azureOpenAIWhisperModelName) {
+        showAlert(
+          t("tenant.validate-azure-open-ai-transciption-model-empty-message"),
+        );
+        return false;
+      }
+      if (!azureOpenAITextModelName) {
+        showAlert(t("tenant.validate-azure-open-ai-text-model-empty-message"));
+        return false;
+      }
     }
 
     return true;
@@ -494,7 +521,7 @@
         id="feature-audio-to-text"
         type="checkbox"
         checked={tenantData?.included_features != undefined &&
-          tenantData?.included_features?.indexOf("audio-to-text") != -1}
+          hasFeatureAudioToText()}
         class="checkbox checkbox-primary"
         value="audio-to-text"
         on:change={(event) => {
