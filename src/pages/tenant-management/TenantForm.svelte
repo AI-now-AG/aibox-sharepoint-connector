@@ -17,6 +17,11 @@
   export let openAIKey = "";
   export let azureOpenAIKey = "";
 
+  let azureOpenAIEndpoint = "";
+  let azureOpenAIApiInstanceName = "";
+  let azureOpenAIWhisperModelName = "";
+  let azureOpenAITextModelName = "";
+
   let confirmUpdateModal;
   let alertModal;
   let alertMessage = "";
@@ -399,7 +404,77 @@
           </label>
         </div>
 
-        <div class="w-full"></div>
+        <div class="w-full mt-4">
+          <span class="mb-2 text-gray-400 font-medium text-sm"
+            >{t("tenant.azure-open-ai-instance-name")}</span
+          >
+          <input
+            type="text"
+            class="input input-bordered mt-2 w-full"
+            placeholder={""}
+            value={""}
+            on:change={(event) => {
+              azureOpenAIApiInstanceName = event.target.value;
+            }}
+            on:focus={() => {
+              showPicker = false;
+            }}
+          />
+        </div>
+
+        <div class="w-full mt-4">
+          <span class="mb-2 text-gray-400 font-medium text-sm"
+            >{t("tenant.azure-open-ai-enpoint")}</span
+          >
+          <input
+            type="text"
+            class="input input-bordered mt-2 w-full"
+            placeholder={""}
+            value={""}
+            on:change={(event) => {
+              azureOpenAIEndpoint = event.target.value;
+            }}
+            on:focus={() => {
+              showPicker = false;
+            }}
+          />
+        </div>
+
+        <div class="w-full mt-4">
+          <span class="mb-2 text-gray-400 font-medium text-sm"
+            >{t("tenant.azure-open-ai-transciption-model")}</span
+          >
+          <input
+            type="text"
+            class="input input-bordered mt-2 w-full"
+            placeholder={""}
+            value={""}
+            on:change={(event) => {
+              azureOpenAIWhisperModelName = event.target.value;
+            }}
+            on:focus={() => {
+              showPicker = false;
+            }}
+          />
+        </div>
+
+        <div class="w-full mt-4">
+          <span class="mb-2 text-gray-400 font-medium text-sm"
+            >{t("tenant.azure-open-ai-text-model")}</span
+          >
+          <input
+            type="text"
+            class="input input-bordered mt-2 w-full"
+            placeholder={""}
+            value={""}
+            on:change={(event) => {
+              azureOpenAITextModelName = event.target.value;
+            }}
+            on:focus={() => {
+              showPicker = false;
+            }}
+          />
+        </div>
       </div>
     </div>
 
