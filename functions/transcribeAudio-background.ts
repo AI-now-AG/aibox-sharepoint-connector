@@ -24,7 +24,7 @@ const transcribeAudio: Handler = async (event) => {
     }
 
     const fileBuffer = await downloadFileFromBlob(uploadUrl);
-    requestParams.fileBuffer = fileBuffer;
+    requestParams.audioBuffer = fileBuffer;
 
     const azureOpenAIApiKey = decrypt(
       encryptedApiKey || process.env.AZURE_OPENAI_API_KEY2,
