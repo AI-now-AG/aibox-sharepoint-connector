@@ -17,11 +17,6 @@
   export let openAIKey = "";
   export let azureOpenAIKey = "";
 
-  let azureOpenAIEndpoint = "";
-  let azureOpenAIApiInstanceName = "";
-  let azureOpenAIWhisperModelName = "";
-  let azureOpenAITextModelName = "";
-
   let confirmUpdateModal;
   let alertModal;
   let alertMessage = "";
@@ -97,23 +92,23 @@
     }
 
     if (azureOpenAIKey) {
-      if (!azureOpenAIApiInstanceName) {
+      if (!tenantData?.azure_openai_instance_name) {
         showAlert(
           t("tenant.validate-azure-open-ai-instance-name-empty-message"),
         );
         return false;
       }
-      if (!azureOpenAIEndpoint) {
+      if (!tenantData?.azure_openai_endpoint) {
         showAlert(t("tenant.validate-azure-open-ai-enpoint-empty-message"));
         return false;
       }
-      if (!azureOpenAIWhisperModelName) {
+      if (!tenantData?.azure_openai_whisper_model) {
         showAlert(
           t("tenant.validate-azure-open-ai-transciption-model-empty-message"),
         );
         return false;
       }
-      if (!azureOpenAITextModelName) {
+      if (!tenantData?.azure_openai_chat_model) {
         showAlert(t("tenant.validate-azure-open-ai-text-model-empty-message"));
         return false;
       }
@@ -237,7 +232,7 @@
         >
         <input
           type="text"
-          value={tenant?.name || ""}
+          value={tenantData?.name || ""}
           placeholder={t("tenant.tenants.tenant.display-name")}
           class="input input-bordered w-full"
           on:change={(event) => {
@@ -255,7 +250,7 @@
         >
         <input
           type="text"
-          value={tenant?.org_name || ""}
+          value={tenantData?.org_name || ""}
           placeholder={t("tenant.tenants.tenant.identification-name")}
           class="input input-bordered w-full"
           on:change={(event) => {
@@ -441,9 +436,9 @@
             type="text"
             class="input input-bordered mt-2 w-full"
             placeholder={""}
-            value={""}
+            value={tenantData?.azure_openai_instance_name || ""}
             on:change={(event) => {
-              azureOpenAIApiInstanceName = event.target.value;
+              tenantData.azure_openai_instance_name = event.target.value;
             }}
             on:focus={() => {
               showPicker = false;
@@ -459,9 +454,9 @@
             type="text"
             class="input input-bordered mt-2 w-full"
             placeholder={""}
-            value={""}
+            value={tenantData?.azure_openai_endpoint || ""}
             on:change={(event) => {
-              azureOpenAIEndpoint = event.target.value;
+              tenantData.azure_openai_endpoint = event.target.value;
             }}
             on:focus={() => {
               showPicker = false;
@@ -477,9 +472,9 @@
             type="text"
             class="input input-bordered mt-2 w-full"
             placeholder={""}
-            value={""}
+            value={tenantData?.azure_openai_whisper_model || ""}
             on:change={(event) => {
-              azureOpenAIWhisperModelName = event.target.value;
+              tenantData.azure_openai_whisper_model = event.target.value;
             }}
             on:focus={() => {
               showPicker = false;
@@ -495,9 +490,9 @@
             type="text"
             class="input input-bordered mt-2 w-full"
             placeholder={""}
-            value={""}
+            value={tenantData?.azure_openai_chat_model || ""}
             on:change={(event) => {
-              azureOpenAITextModelName = event.target.value;
+              tenantData.azure_openai_chat_model = event.target.value;
             }}
             on:focus={() => {
               showPicker = false;
