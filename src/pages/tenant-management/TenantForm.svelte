@@ -349,61 +349,57 @@
 
     <div class="flex flex-row space-x-4">
       <div class="flex-1 flex flex-col">
-        <div class="flex items-center mb-2">
-          <label
-            for="radio-azure-open-api-key"
-            class="ml-2 text-gray-400 font-medium text-sm"
-            >{t("tenant.open-ai-provider")}</label
+        <div class="w-full">
+          <span class="mb-2 text-gray-400 font-medium text-sm"
+            >{t("tenant.open-ai-provider")}</span
           >
-        </div>
 
-        <label class="input input-bordered flex items-center gap-2">
-          <input
-            type="password"
-            class="grow"
-            id="open_ai_key"
-            placeholder={t("tenant.api-key")}
-            value={openAIKey}
-            on:change={(event) => {
-              openAIKey = event.target.value;
-            }}
-            on:focus={() => {
-              showPicker = false;
-            }}
-          />
-          <TogglePasswordIcon
-            on:change={() => togglePassword(API_KEY_PROVIDER.OpenAI)}
-          />
-        </label>
+          <label class="input input-bordered flex items-center gap-2 mt-2">
+            <input
+              type="password"
+              class="grow"
+              placeholder={t("tenant.api-key")}
+              value={openAIKey}
+              on:change={(event) => {
+                openAIKey = event.target.value;
+              }}
+              on:focus={() => {
+                showPicker = false;
+              }}
+            />
+            <TogglePasswordIcon
+              on:change={() => togglePassword(API_KEY_PROVIDER.OpenAI)}
+            />
+          </label>
+        </div>
       </div>
 
       <div class="flex-1 flex flex-col">
-        <div class="flex items-center mb-2">
-          <label
-            for="radio-open-api-key"
-            class="ml-2 text-gray-400 font-medium text-sm"
-            >{t("tenant.azure-open-ai-provider")}</label
+        <div class="w-full">
+          <span class="mb-2 text-gray-400 font-medium text-sm"
+            >{t("tenant.azure-open-ai-provider")}</span
           >
+
+          <label class="input input-bordered flex items-center gap-2 mt-2">
+            <input
+              type="password"
+              class="grow"
+              placeholder={t("tenant.api-key")}
+              value={azureOpenAIKey}
+              on:change={(event) => {
+                azureOpenAIKey = event.target.value;
+              }}
+              on:focus={() => {
+                showPicker = false;
+              }}
+            />
+            <TogglePasswordIcon
+              on:change={() => togglePassword(API_KEY_PROVIDER.AzureOpenAI)}
+            />
+          </label>
         </div>
 
-        <label class="input input-bordered flex items-center gap-2">
-          <input
-            type="password"
-            class="grow"
-            id="azure_open_ai_key"
-            placeholder={t("tenant.api-key")}
-            value={azureOpenAIKey}
-            on:change={(event) => {
-              azureOpenAIKey = event.target.value;
-            }}
-            on:focus={() => {
-              showPicker = false;
-            }}
-          />
-          <TogglePasswordIcon
-            on:change={() => togglePassword(API_KEY_PROVIDER.AzureOpenAI)}
-          />
-        </label>
+        <div class="w-full"></div>
       </div>
     </div>
 
