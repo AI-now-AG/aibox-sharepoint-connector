@@ -449,7 +449,7 @@
 
         <div class="w-full mt-4">
           <span class="mb-2 text-gray-400 font-medium text-sm"
-            >{t("tenant.azure-open-ai-enpoint")}</span
+            >{t("tenant.azure-open-ai-endpoint")}</span
           >
           <input
             type="text"
