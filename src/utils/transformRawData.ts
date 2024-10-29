@@ -8,8 +8,8 @@ const replacer = function (this: any, key: any, value: any) {
   return value;
 };
 
-export const transformDataToArray = (data: any) => {
+export const transformRawData = (data: any) => {
   return JSON.parse(JSON.stringify(data, replacer));
 };
 
-export default transformDataToArray;
+export default transformRawData;

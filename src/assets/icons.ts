@@ -1,4 +1,5 @@
-import tenantManagement from "$assets/icons/tenant-management.svg?raw";
+import menuSettings from "$assets/icons/menu-settings.svg?raw";
+import menuTenant from "$assets/icons/menu-tenant.svg?raw";
 import threeDot from "$assets/icons/three-dot.svg?raw";
 import copy from "$assets/icons/copy.svg?raw";
 import copied from "$assets/icons/copied.svg?raw";
@@ -21,7 +22,8 @@ import download from "$assets/icons/download.svg?raw";
 import startNew from "$assets/icons/start-new.svg?raw";
 
 export const svgIcons = {
-  tenantManagement,
+  menuSettings,
+  menuTenant,
   threeDot,
   copy,
   copied,

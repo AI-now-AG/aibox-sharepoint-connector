@@ -1,19 +1,28 @@
-import { type Handler } from "@netlify/functions";
+import {
+  type Handler,
+  type HandlerEvent,
+  type HandlerResponse,
+} from "@netlify/functions";
 import { BlobServiceClient } from "@azure/storage-blob";
 import { transcribeUsingOpenAI } from "./utils/transcribe";
 import { decrypt } from "$utils/secure";
+import { createTask, updateTask } from "$shared/transcriptionTasks";
+import { TranscribeRequest } from "$utils/TranscribeRequest";
 
-const transcribeAudio: Handler = async (event) => {
+const transcribeAudio: Handler = async (
+  event: HandlerEvent,
+): Promise<HandlerResponse> => {
   if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
       body: JSON.stringify({ message: "Method Not Allowed" }),
     };
   }
+
   try {
-    const { fileName, uploadUrl, encryptedApiKey } = JSON.parse(
-      event.body || "{}",
-    );
+    const transcribeParams: TranscribeRequest = JSON.parse(event.body || "{}");
+    const { fileName, uniqueName, uploadUrl, encryptedApiKey } = transcribeParams;
+
     if (!fileName || !uploadUrl) {
       return {
         statusCode: 400,
@@ -22,31 +31,68 @@ const transcribeAudio: Handler = async (event) => {
     }
 
     const fileBuffer = await downloadFileFromBlob(uploadUrl);
+    transcribeParams.audioBuffer = fileBuffer;
+
     const azureOpenAIApiKey = decrypt(
-      encryptedApiKey || process.env.AZURE_OPENAI_API_KEY2,
+      encryptedApiKey || process.env.AZURE_OPENAI_API_KEY2!,
     );
+    transcribeParams.azureOpenAIApiKey = azureOpenAIApiKey;
+
     console.log("encryptedApiKey", encryptedApiKey);
     console.log("decryptedApiKey", azureOpenAIApiKey);
 
-    const transcription = await transcribeUsingOpenAI(
-      fileBuffer,
-      fileName,
-      uploadUrl,
-      azureOpenAIApiKey,
-    );
-    return {
-      statusCode: 200,
-      body: JSON.stringify({
-        message: "File uploaded and transcribed successfully",
-        transcription,
-      }),
-    };
+    createTask(uniqueName, { status: "processing" });
+    const transcriptionResult = await transcribeUsingOpenAI(transcribeParams);
+
+    if (!transcriptionResult.success) {
+      updateTask(uniqueName, {
+        status: "failed",
+        error:
+          transcriptionResult.error || "Unknown error during transcription.",
+      });
+      return {
+        statusCode: 500,
+        body: JSON.stringify({
+          message: transcriptionResult.error,
+        }),
+      };
+    } else {
+      updateTask(uniqueName, {
+        status: "completed",
+        txtUrl: transcriptionResult.data?.urls["txt"],
+        srtUrl: transcriptionResult.data?.urls["srt"],
+      });
+      return {
+        statusCode: 200,
+        body: JSON.stringify({
+          message: "File uploaded and transcribed successfully",
+          transcription: transcriptionResult.data,
+        }),
+      };
+    }
   } catch (error) {
-    console.log(error);
+    console.error("Error while transcribing:" + error);
+    const { uniqueName } = JSON.parse(event.body || "{}");
+
+    if (error instanceof Error) {
+      updateTask(uniqueName, {
+        status: "failed",
+        error: error.message,
+      });
+    } else {
+      updateTask(uniqueName, {
+        status: "failed",
+        error: "Unknown error during transcription.",
+      });
+    }
+
     return {
       statusCode: 500,
       body: JSON.stringify({
-        message: "Error during file processing or transcription",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Unknown error during transcription",
       }),
     };
   }
@@ -54,7 +100,6 @@ const transcribeAudio: Handler = async (event) => {
 
 async function downloadFileFromBlob(blobUrl: string): Promise<Buffer> {
   const storageURLString: string = process.env.AZURE_BLOB_STORAGE_NAME || "";
-  console.log(storageURLString);
   const blobServiceClient =
     BlobServiceClient.fromConnectionString(storageURLString);
 
@@ -88,18 +133,5 @@ async function streamToBuffer(
     readableStream.on("error", reject);
   });
 }
-
-// function parseContentDisposition(header: Buffer): { filename: string; fileContentType: string | null } {
-//     const dispositionRegex = /filename="([^"]+)"/;
-//     const contentTypeRegex = /Content-Type:\s*(.+)/;
-
-//     const filenameMatch = header.toString().match(dispositionRegex);
-//     const contentTypeMatch = header.toString().match(contentTypeRegex);
-
-//     const filename = filenameMatch ? filenameMatch[1] : "uploaded-audio.wav";
-//     const fileContentType = contentTypeMatch ? contentTypeMatch[1].trim() : null;
-
-//     return { filename, fileContentType };
-// }
 
 export { transcribeAudio as handler };

@@ -7,9 +7,6 @@ import { Permission } from "$data/models/user.model";
 export interface Props {
   id: string;
 }
-console.log("---1----");
-console.log(Astro.params);
-console.log("---2----");
 const { id } = Astro.params;
 if (id === undefined) {
   throw new Error("Id is required");
@@ -17,9 +14,6 @@ if (id === undefined) {
 
 const prompt = await Prompts.getAsString(id || ""); // TODO: Render 404 if not found
 
-console.log("---Prompt----");
-console.log(prompt);
-console.log("---Prompt-End----");
 if (prompt === null) {
   throw new Error("Prompt not found");
 }

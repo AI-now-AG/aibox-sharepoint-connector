@@ -25,6 +25,11 @@ export const TenantFilterParamsSchema = z.object({
 });
 export type TenantFilterParams = z.infer<typeof TenantFilterParamsSchema>;
 
+export const InstructionsSchema = z.object({
+  transcription_subtitle: z.string(),
+  transcription_plaintext: z.string(),
+});
+
 const TenantSchema = z.object({
   _id: z.instanceof(ObjectId),
   name: z.string().min(1),
@@ -36,12 +41,18 @@ const TenantSchema = z.object({
   api_key_provider: z.nativeEnum(ApiKeyProvider).optional(),
   openai_api_key: z.string().nullish(),
   azure_openai_api_key: z.string().nullish(),
+  azure_openai_endpoint: z.string().nullish(),
+  azure_openai_instance_name: z.string().nullish(),
+  azure_openai_whisper_model: z.string().nullish(),
+  azure_openai_chat_model: z.string().nullish(),
   included_features: z.array(z.nativeEnum(TenantFeature)).optional(),
+  instructions: InstructionsSchema.nullish(),
   active: z.boolean().default(true).optional(),
   created_at: z.date().optional(),
   updated_at: z.date().optional(),
 });
 export type Tenant = z.infer<typeof TenantSchema>;
+export type Instructions = z.infer<typeof InstructionsSchema>;
 
 const collection = db.collection("tenants");
 
@@ -52,6 +63,7 @@ export default {
       ...{
         active: true,
         included_features: [],
+        instructions: null,
         created_at: new Date(),
         updated_at: new Date(),
       },
