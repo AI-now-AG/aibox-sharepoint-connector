@@ -28,3 +28,6 @@ yarn.lock
 
 # jetbrains setting folder
 .idea/
+
+# logs files
+src/shared/tasks/*

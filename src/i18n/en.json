@@ -120,6 +120,7 @@
   "transciption.uploading": "uploading...",
   "transciption.transcribing": "transcribing...",
   "transciption.transcribed": "transcribed",
+  "transciption.transcription.failed": "transcription failed",
   "transcription.start-new": "Start new transciption",
   "transcription.start-new-popup.title": "Starting a new transcription will reload the page and the output files will be lost",
   "transcription.start-new-popup.sub-title": "Make sure to download the transcriptions.",
