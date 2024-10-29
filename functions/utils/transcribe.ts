@@ -207,7 +207,7 @@ export async function transcribeUsingOpenAI(transcribeParams: TranscribeRequest)
     const outputURLs: { [key: string]: string } = {};
     outputURLs["json"] = await uploadOutputToBlob(
       `${fileNameWithoutExtension}.json`,
-      response,
+      JSON.stringify(response),
       "json",
     );
     outputURLs["txt"] = await uploadOutputToBlob(
