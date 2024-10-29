@@ -7,7 +7,7 @@ import { BlobServiceClient } from "@azure/storage-blob";
 import { transcribeUsingOpenAI } from "./utils/transcribe";
 import { decrypt } from "$utils/secure";
 import { createTask, updateTask } from "$shared/transcriptionTasks";
-import { TranscribeRequest } from "$utils/TranscribeRequest";
+import type { TranscribeRequest } from "$utils/TranscribeRequest";
 
 const transcribeAudio: Handler = async (
   event: HandlerEvent,

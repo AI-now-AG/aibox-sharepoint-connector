@@ -7,7 +7,7 @@
   import { tenant } from "$stores";
   import transcript from "$stores/transcript";
   import { addToast } from "$stores/toast";
-
+  import { TranscriptionForm } from "$utils/TranscribeRequest";
   const t = useTranslations();
 
   // general
@@ -195,7 +195,7 @@
       isTranscribing = true;
       isTranscriptionFailed = false;
 
-      const params: RequestParams = createRequestParams(
+      const params: TranscribeRequest = createTranscribeRequest(
         audioFile,
         tempOutputFileNames,
         tempUploadUrl,
@@ -264,12 +264,12 @@
     }
   }
 
-  function createRequestParams(
+  function createTranscribeRequest(
     audioFile: File | undefined,
     tempOutputFileNames: string[],
     tempUploadUrl: string,
     tenant: any,
-  ): RequestParams {
+  ): TranscriptionForm {
     return {
       fileName: audioFile?.name || "",
       uniqueName: tempOutputFileNames[0],

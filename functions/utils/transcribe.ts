@@ -11,7 +11,7 @@ import {
   type Entry,
 } from "./srt";
 import { StringOutputParser } from "@langchain/core/output_parsers";
-import { TranscribeRequest } from "$utils/TranscribeRequest";
+import type { TranscribeRequest } from "$utils/TranscribeRequest";
 
 const DEFAULT_WHISPER_MODEL_NAME = "whisper-1";
 const DEFAULT_API_VERSION = "2024-08-01-preview";
@@ -172,7 +172,10 @@ export async function transcribeUsingOpenAI(transcribeParams: TranscribeRequest)
     const { audioBuffer, fileName } = transcribeParams;
 
     const openaiClient = getClient(transcribeParams);
-    const audioFile = await toFile(audioBuffer, fileName);
+    if (!audioBuffer) {
+      throw new Error("Audio buffer is missing or undefined.");
+    }
+    const audioFile = await toFile(audioBuffer, fileName);    
 
     const response = await openaiClient.audio.transcriptions.create({
       file: audioFile,
