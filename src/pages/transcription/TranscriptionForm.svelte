@@ -200,7 +200,9 @@
           body: JSON.stringify({
             fileName: audioFile?.name,
             uploadUrl: tempUploadUrl,
-            instructions: $tenant?.transcription_instructions,
+            instructionSubtitle: $tenant?.instructions?.transcription_subtitle,
+            instructionPlaintext:
+              $tenant?.instructions?.transcription_plaintext,
             encryptedApiKey: $tenant?.azure_openai_api_key,
             azureOpenAIInstanceName: $tenant?.azure_openai_instance_name,
             azureOpenAIEndpoint: $tenant?.azure_openai_endpoint,

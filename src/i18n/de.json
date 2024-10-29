@@ -138,6 +138,7 @@
   "transcription.file-validation.exceed-size-limit": "Datei darf nicht grösser sein als 25 MB, bitte Dateigrösse reduzieren und neu hochladen",
   "transcription.transcription-is-ready": "Your transcription is ready. Tap to see.",
   "transciption.transcription.failed": "Transcription failed",
-  "settings.transcription.instructions": "Transcription instructions",
+  "settings.transcription.instructions-subtitle": "Instructions for subtitle",
+  "settings.transcription.instructions-plaintext": "Instructions for plaintext",
   "settings.transcription.instructions-placeholder": "e.g. type instruction details..."
 }

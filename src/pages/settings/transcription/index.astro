@@ -5,7 +5,9 @@ import SettingForm from "./SettingForm.svelte";
 
 const t = useTranslations();
 
-const instructions = Astro.locals.tenant.transcription_instructions || "";
+const instructions = Astro.locals.tenant?.instructions || "";
+const transcriptionSubtitle = instructions ? instructions.transcription_subtitle : "";
+const transcriptionPlaintext = instructions ? instructions.transcription_plaintext : "";
 ---
 
 <Layout>
@@ -17,6 +19,9 @@ const instructions = Astro.locals.tenant.transcription_instructions || "";
     </h1>
   </div>
   <div class="px-8">
-    <SettingForm instructions={instructions} client:load />
+    <SettingForm 
+      instructionSubtitle={transcriptionSubtitle} 
+      instructionPlaintext={transcriptionPlaintext} 
+      client:load />
   </div>
 </Layout>
