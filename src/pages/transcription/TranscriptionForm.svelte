@@ -234,7 +234,7 @@
           srtUrl: "",
         });
         addToast({
-          message: "File uploaded and transcription started successfully.",
+          message: `${t("transcription.file-uploaded-success")}`,
           type: "success",
           timeout: 5000,
         });
@@ -272,8 +272,7 @@
         } else if (result.status === "failed") {
           clearInterval(intervalId);
           addToast({
-            message:
-            result.error || "An error occurred during transcription.",
+            message: result.error || "An error occurred during transcription.",
             type: "error",
             timeout: 5000,
           });
