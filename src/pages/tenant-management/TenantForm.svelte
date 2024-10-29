@@ -389,7 +389,7 @@
               placeholder={t("tenant.api-key")}
               value={openAIKey}
               on:change={(event) => {
-                openAIKey = event.target.value;
+                openAIKey = event?.target?.value?.trim();
               }}
               on:focus={() => {
                 showPicker = false;
@@ -416,7 +416,7 @@
               placeholder={t("tenant.api-key")}
               value={azureOpenAIKey}
               on:change={(event) => {
-                azureOpenAIKey = event.target.value;
+                azureOpenAIKey = event?.target?.value?.trim();
               }}
               on:focus={() => {
                 showPicker = false;
@@ -438,7 +438,8 @@
             placeholder={""}
             value={tenantData?.azure_openai_instance_name || ""}
             on:change={(event) => {
-              tenantData.azure_openai_instance_name = event.target.value;
+              tenantData.azure_openai_instance_name =
+                event?.target?.value?.trim();
             }}
             on:focus={() => {
               showPicker = false;
@@ -456,7 +457,7 @@
             placeholder={""}
             value={tenantData?.azure_openai_endpoint || ""}
             on:change={(event) => {
-              tenantData.azure_openai_endpoint = event.target.value;
+              tenantData.azure_openai_endpoint = event?.target?.value?.trim();
             }}
             on:focus={() => {
               showPicker = false;
@@ -474,7 +475,8 @@
             placeholder={""}
             value={tenantData?.azure_openai_whisper_model || ""}
             on:change={(event) => {
-              tenantData.azure_openai_whisper_model = event.target.value;
+              tenantData.azure_openai_whisper_model =
+                event?.target?.value?.trim();
             }}
             on:focus={() => {
               showPicker = false;
@@ -492,7 +494,7 @@
             placeholder={""}
             value={tenantData?.azure_openai_chat_model || ""}
             on:change={(event) => {
-              tenantData.azure_openai_chat_model = event.target.value;
+              tenantData.azure_openai_chat_model = event?.target?.value?.trim();
             }}
             on:focus={() => {
               showPicker = false;
