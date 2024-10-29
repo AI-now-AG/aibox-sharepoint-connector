@@ -7,7 +7,8 @@
 
   const t = useTranslations();
 
-  export let instructions: string = "";
+  export let instructionSubtitle: string = "";
+  export let instructionPlaintext: string = "";
 
   let isSaving = false;
 
@@ -17,7 +18,8 @@
 
     const { error } = await actions.transcription_settings.update({
       _id: $tenant._id,
-      instructions,
+      transcription_subtitle: instructionSubtitle,
+      transcription_plaintext: instructionPlaintext,
     });
     $loading = false;
     isSaving = false;
@@ -38,12 +40,21 @@
 
 <div class="container max-w-full mx-auto p-6" style="font-family: Inter;">
   <div class="max-w-full">
-    <p class="mb-2">{t("settings.transcription.instructions")}</p>
+    <p class="mb-2">{t("settings.transcription.instructions-subtitle")}</p>
     <div class="mb-4">
       <textarea
         placeholder={t("settings.transcription.instructions-placeholder")}
         class="input input-bordered min-w-xs shadow appearance-none min-h-80 w-full py-2 px-3"
-        bind:value={instructions}
+        bind:value={instructionSubtitle}
+      ></textarea>
+    </div>
+
+    <p class="mb-2">{t("settings.transcription.instructions-plaintext")}</p>
+    <div class="mb-4">
+      <textarea
+        placeholder={t("settings.transcription.instructions-placeholder")}
+        class="input input-bordered min-w-xs shadow appearance-none min-h-80 w-full py-2 px-3"
+        bind:value={instructionPlaintext}
       ></textarea>
     </div>
 

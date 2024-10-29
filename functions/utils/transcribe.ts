@@ -15,7 +15,7 @@ const DEFAULT_WHISPER_MODEL_NAME = "whisper-1";
 const DEFAULT_API_VERSION = "2024-08-01-preview";
 const DEFAULT_CHAT_MODE_NAME = "gpt-4o";
 
-const DEFAULT_INSTRUCTIONS = `
+const DEFAULT_INSTRUCTION = `
   You are a Swiss German language expert. Your task is to review German subtitles and identify potential misinterpretations of Swiss German words, particularly place names, with a focus on the canton Graubünden while fixing missing punctuation. You must correct these while maintaining the original format as much as possible.
   Important guidelines:
   
@@ -125,7 +125,7 @@ async function getAzureResponse(requestParams: any, prompt: string) {
 }
 
 export const improveTextQuality = async (requestParams: any, data: Entry[]) => {
-  const { instructions } = requestParams;
+  const { instructionSubtitle } = requestParams;
 
   const model = getAzureChatModel(requestParams);
   const flat = data
@@ -136,7 +136,7 @@ output>
     )
     .join("\n");
 
-  const finalInstructions = instructions || DEFAULT_INSTRUCTIONS;
+  const finalInstructions = instructionSubtitle || DEFAULT_INSTRUCTION;
   console.log("finalInstructions", finalInstructions);
   const response = await model.invoke(
     [new SystemMessage(finalInstructions), new HumanMessage(flat)],
