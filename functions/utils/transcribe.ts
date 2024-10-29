@@ -172,8 +172,6 @@ export async function transcribeUsingOpenAI(
       temperature: 0,
       timestamp_granularities: ["word"],
       response_format: "verbose_json",
-      prompt:
-        'Eine übliche Ausdrucksweise ist "ob ORTSNAME", bspw. "ob Schwanden". das ob bedeutet in diesem Fall "oberhalb von"',
     });
     const transcriptionResponse = await getAzureResponse(
       requestParams,
