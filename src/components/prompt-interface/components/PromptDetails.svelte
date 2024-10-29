@@ -3,7 +3,7 @@
   import { useTranslations } from "$i18n/utils";
   import { storePromptId } from "$components/prompt-interface/components/Stores";
   import InputArea from "$components/PromptConfiguration/InputArea.svelte";
-  import type { CreateInstructionParams } from "$pages/api/instructions.json";
+  // import type { CreateInstructionParams } from "$pages/api/instructions.json";
   import type { CreateKnowledgeBaseParams } from "$pages/api/knowledge-base.json";
   import type { PromptDetails } from "$pages/api/prompts/[id].json";
   
@@ -12,7 +12,7 @@
   let selectedPromptId = "";
   let promptDetails: PromptDetails;
   let promptText = "";
-  let instructions: CreateInstructionParams[] = [];
+  //let instructions: CreateInstructionParams[] = [];
   let knowledgebase: CreateKnowledgeBaseParams[] = [];
   let isSaving = false;
 
@@ -37,7 +37,7 @@
     if (response.ok) {
       promptDetails = (await response.json()) as PromptDetails;
       promptText = promptDetails.prompt;
-      instructions = promptDetails.instructions;
+      //instructions = promptDetails.instructions;
       knowledgebase = promptDetails.knowledgebase;
     } else {
       console.error("API call failed");
@@ -57,7 +57,7 @@
     alert(data.message);
     if (response.ok) {
       promptText = promptDetails.prompt;
-      instructions = promptDetails.instructions;
+      //instructions = promptDetails.instructions;
       knowledgebase = promptDetails.knowledgebase;
       isSaving = false;
     }
@@ -88,7 +88,7 @@
     </button>
 
     {#if promptText}
-      <h2 class="pb-2">Prompt</h2>
+      <h2 class="pb-2">Instruction</h2>
       <div class="card border-2 border-base-300 border-2 bg-base-100 p-4 mb-4">
         <div>
           <p class="line-clamp-5">
@@ -98,7 +98,7 @@
       </div>
     {/if}
 
-    {#if instructions}
+    <!-- {#if instructions}
       <h2 class="pb-2">Instruction</h2>
       {#each instructions as instruction}
         <div
@@ -111,7 +111,7 @@
           </div>
         </div>
       {/each}
-    {/if}
+    {/if} -->
 
     {#if knowledgebase}
       <h2 class="pb-2">Knowledge base</h2>

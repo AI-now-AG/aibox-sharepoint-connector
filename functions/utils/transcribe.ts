@@ -1,7 +1,8 @@
 import { BlobServiceClient } from "@azure/storage-blob";
 import { AzureChatOpenAI, toFile } from "@langchain/openai";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
-import { AzureOpenAI } from "openai";
+import { AzureOpenAI, RateLimitError } from "openai";
+
 import {
   groupLines,
   formatSRT,
@@ -113,17 +114,6 @@ function getAzureChatModel(requestParams: any) {
   return new AzureChatOpenAI(azureChatConfig);
 }
 
-async function getAzureResponse(requestParams: any, prompt: string) {
-  try {
-    const chat = getAzureChatModel(requestParams);
-    const response = await chat.invoke(prompt);
-    return response;
-  } catch (error) {
-    console.error("Error communicating with Azure OpenAI:", error);
-    throw error;
-  }
-}
-
 export const improveTextQuality = async (requestParams: any, data: Entry[]) => {
   const { instructionSubtitle } = requestParams;
 
@@ -156,13 +146,19 @@ output>
   return out;
 };
 
-export async function transcribeUsingOpenAI(
-  requestParams: any,
-): Promise<string> {
+export async function transcribeUsingOpenAI(requestParams: any): Promise<{
+  success: boolean;
+  data: {
+    text: string;
+    urls: {
+      [key: string]: string;
+    };
+  } | null;
+  error: string | null;
+}> {
   try {
     const { audioBuffer, fileName, uploadUrl } = requestParams;
 
-    console.log("uploadUrl", uploadUrl);
     const openaiClient = getClient(requestParams);
     const audioFile = await toFile(audioBuffer, fileName);
 
@@ -173,12 +169,11 @@ export async function transcribeUsingOpenAI(
       timestamp_granularities: ["word"],
       response_format: "verbose_json",
     });
-    const transcriptionResponse = await getAzureResponse(
-      requestParams,
-      response.text,
-    );
+
+    const transcriptionText = response.text;
     const parser = new StringOutputParser();
-    const description = await parser.invoke(transcriptionResponse);
+    const description = await parser.invoke(transcriptionText);
+
     const srtData = createSRTData(
       (response as unknown as { words: InputEntry[] }).words,
     );
@@ -202,11 +197,26 @@ export async function transcribeUsingOpenAI(
       result,
       "srt",
     );
-
-    return response.text;
+    return {
+      success: true,
+      data: { text: response.text, urls: outputURLs },
+      error: null,
+    };
   } catch (error) {
     console.error("Error during transcription::", error);
-    throw new Error("Transcription failed.");
+    let errorMessage = "Transcription failed.";
+    if (error instanceof RateLimitError) {
+      errorMessage =
+        "Rate limit exceeded. Please try again later or upgrade your plan.";
+    } else if (
+      typeof error === "object" &&
+      error !== null &&
+      "message" in error
+    ) {
+      errorMessage = error.message as string;
+    }
+
+    return { success: false, data: null, error: errorMessage };
   }
 }
 

@@ -1,9 +1,16 @@
-import { type Handler } from "@netlify/functions";
+import {
+  type Handler,
+  type HandlerEvent,
+  type HandlerResponse,
+} from "@netlify/functions";
 import { BlobServiceClient } from "@azure/storage-blob";
 import { transcribeUsingOpenAI } from "./utils/transcribe";
 import { decrypt } from "$utils/secure";
+import { createTask, updateTask } from "$shared/transcriptionTasks";
 
-const transcribeAudio: Handler = async (event) => {
+const transcribeAudio: Handler = async (
+  event: HandlerEvent,
+): Promise<HandlerResponse> => {
   if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
@@ -13,8 +20,7 @@ const transcribeAudio: Handler = async (event) => {
 
   try {
     const requestParams = JSON.parse(event.body || "{}");
-
-    const { fileName, uploadUrl, encryptedApiKey } = requestParams;
+    const { fileName, uniqueName, uploadUrl, encryptedApiKey } = requestParams;
 
     if (!fileName || !uploadUrl) {
       return {
@@ -35,20 +41,58 @@ const transcribeAudio: Handler = async (event) => {
     console.log("decryptedApiKey", azureOpenAIApiKey);
     console.log("requestParams", requestParams);
 
-    const transcription = await transcribeUsingOpenAI(requestParams);
-    return {
-      statusCode: 200,
-      body: JSON.stringify({
-        message: "File uploaded and transcribed successfully",
-        transcription,
-      }),
-    };
+    createTask(uniqueName, { status: "processing" });
+    const transcriptionResult = await transcribeUsingOpenAI(requestParams);
+
+    if (!transcriptionResult.success) {
+      updateTask(uniqueName, {
+        status: "failed",
+        error:
+          transcriptionResult.error || "Unknown error during transcription.",
+      });
+      return {
+        statusCode: 500,
+        body: JSON.stringify({
+          message: transcriptionResult.error,
+        }),
+      };
+    } else {
+      updateTask(uniqueName, {
+        status: "completed",
+        txtUrl: transcriptionResult.data?.urls["txt"],
+        srtUrl: transcriptionResult.data?.urls["srt"],
+      });
+      return {
+        statusCode: 200,
+        body: JSON.stringify({
+          message: "File uploaded and transcribed successfully",
+          transcription: transcriptionResult.data,
+        }),
+      };
+    }
   } catch (error) {
-    console.log(error);
+    console.error("Error while transcribing:" + error);
+    const { uniqueName } = JSON.parse(event.body || "{}");
+
+    if (error instanceof Error) {
+      updateTask(uniqueName, {
+        status: "failed",
+        error: error.message,
+      });
+    } else {
+      updateTask(uniqueName, {
+        status: "failed",
+        error: "Unknown error during transcription.",
+      });
+    }
+
     return {
       statusCode: 500,
       body: JSON.stringify({
-        message: "Error during file processing or transcription",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Unknown error during transcription",
       }),
     };
   }
@@ -56,7 +100,6 @@ const transcribeAudio: Handler = async (event) => {
 
 async function downloadFileFromBlob(blobUrl: string): Promise<Buffer> {
   const storageURLString: string = process.env.AZURE_BLOB_STORAGE_NAME || "";
-  console.log(storageURLString);
   const blobServiceClient =
     BlobServiceClient.fromConnectionString(storageURLString);
 
@@ -90,18 +133,5 @@ async function streamToBuffer(
     readableStream.on("error", reject);
   });
 }
-
-// function parseContentDisposition(header: Buffer): { filename: string; fileContentType: string | null } {
-//     const dispositionRegex = /filename="([^"]+)"/;
-//     const contentTypeRegex = /Content-Type:\s*(.+)/;
-
-//     const filenameMatch = header.toString().match(dispositionRegex);
-//     const contentTypeMatch = header.toString().match(contentTypeRegex);
-
-//     const filename = filenameMatch ? filenameMatch[1] : "uploaded-audio.wav";
-//     const fileContentType = contentTypeMatch ? contentTypeMatch[1].trim() : null;
-
-//     return { filename, fileContentType };
-// }
 
 export { transcribeAudio as handler };
