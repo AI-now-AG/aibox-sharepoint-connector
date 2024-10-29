@@ -129,6 +129,7 @@
   "transciption.uploading": "hochladen...",
   "transciption.transcribing": "transkribieren...",
   "transciption.transcribed": "transkribiert",
+  "transciption.transcription.failed": "transkription fehlgeschlagen",
   "transcription.start-new": "Neu starten",
   "transcription.start-new-popup.title": "Mit dem Neustart wird die Seite neu geladen und die Output Daten werden gelöscht.",
   "transcription.start-new-popup.sub-title": "Neu starten oder zuerst Dateien herunterladen?",

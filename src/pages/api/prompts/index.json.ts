@@ -18,7 +18,7 @@ const CreatePromptParamsSchema = z.object({
   title: z.string(),
   category: z.string(),
   group: z.string(),
-  instructions: z.array(z.string().optional()),
+  instructions: z.array(z.string().optional()).optional(),
   knowledgebase: z.array(z.string().optional()),
   prompt: z.string(),
   documents: z.array(z.string()).optional(),

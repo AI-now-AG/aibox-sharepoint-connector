@@ -15,10 +15,10 @@
     groups: Group[];
   };
 
-  type Instruction = {
+  /*type Instruction = {
     title: string;
     _id: string;
-  };
+  };*/
 
   type KnowledgeBase = {
     title: string;
@@ -29,8 +29,8 @@
   let selectedCategory: Category;
   let selectedGroup: Group;
 
-  let instructions: Instruction[] = [];
-  let selectedInstructions: Instruction[] = [];
+  //let instructions: Instruction[] = [];
+  //let selectedInstructions: Instruction[] = [];
 
   let knowledgeBases: KnowledgeBase[] = [];
   let selectedKnowledgeBases: KnowledgeBase[] = [];
@@ -72,7 +72,7 @@
   });
 
   async function fetchInstructionAndKB() {
-    const instructionResponse = await fetch("/api/instructions.json", {
+    /*const instructionResponse = await fetch("/api/instructions.json", {
       method: "GET",
     });
     const instructionData = (await instructionResponse.json()) as Instruction[];
@@ -88,7 +88,7 @@
         });
       }
       instructions = instructionData;
-    }
+    }*/
 
     const knowledgeBaseResponse = await fetch("/api/knowledge-base.json", {
       method: "GET",
@@ -115,7 +115,7 @@
       category: selectedCategory._id,
       group: selectedGroup._id,
       prompt: promptText,
-      instructions: selectedInstructions.map((inst) => inst._id),
+      //instructions: selectedInstructions.map((inst) => inst._id),
       knowledgebase: selectedKnowledgeBases.map((inst) => inst._id),
       ...(promptId && { _id: promptId }),
     };
@@ -176,7 +176,7 @@
       </div>
 
       <div class="mb-4">
-        <p class="mb-2">{t("prompt-library.add.prompts.prompt")}</p>
+        <p class="mb-2">{t("prompt-library.add.prompts.instructions")}</p>
         <textarea
           bind:value={promptText}
           placeholder="e.g. Create three headlines..."
@@ -187,12 +187,12 @@
       <div
         class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 justify-center"
       >
-        <MultiInput
+        <!-- <MultiInput
           title={t("prompt-library.add.prompts.instructions")}
           placeholder="e.g. Instruction"
           items={instructions}
           bind:selectedItems={selectedInstructions}
-        />
+        /> -->
 
         <MultiInput
           title={t("prompt-library.add.prompts.knowledge-base")}
@@ -223,9 +223,9 @@
               {t("prompt-library.add.prompts.save")}
             {/if}
           </button>
-          <button class="btn btn-active btn-ghost px-8 font-normal">
+          <!-- <button class="btn btn-active btn-ghost px-8 font-normal">
             Try It Out
-          </button>
+          </button> -->
         </div>
       {/if}
     </form>
