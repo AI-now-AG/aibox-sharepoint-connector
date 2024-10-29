@@ -99,7 +99,7 @@
   "tenant.open-ai-provider": "Open AI",
   "tenant.azure-open-ai-provider": "Azure Open AI",
   "tenant.azure-open-ai-instance-name": "Azure Instance Name",
-  "tenant.azure-open-ai-enpoint": "Azure Endpoint",
+  "tenant.azure-open-ai-endpoint": "Azure Endpoint",
   "tenant.azure-open-ai-transciption-model": "Azure Whisper model name",
   "tenant.azure-open-ai-text-model": "Azure Text model name",
   "tenant.included-featured": "Enthaltene Funktionen",
@@ -136,6 +136,7 @@
   "transcription.dowload-srt-file": "SRT-Datei herunterladen",
   "transcription.file-validation.unsupported-type": "Dieses Format wird nicht unterstützt.",
   "transcription.file-validation.exceed-size-limit": "Datei darf nicht grösser sein als 25 MB, bitte Dateigrösse reduzieren und neu hochladen",
+  "transcription.transcription-is-ready": "Your transcription is ready. Tap to see.",
   "transciption.transcription.failed": "Transcription failed",
   "settings.transcription.instructions": "Transcription instructions",
   "settings.transcription.instructions-placeholder": "e.g. type instruction details..."

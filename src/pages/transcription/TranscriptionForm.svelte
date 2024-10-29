@@ -265,8 +265,7 @@
 
           // show toast
           addToast({
-            message:
-              '<a href="/transcription">Your transcription is ready. Tap to see.</a>',
+            message: `<a href="/transcription">${t("transcription.transcription-is-ready")}</a>`,
             type: "success",
             timeout: 5000,
           });
