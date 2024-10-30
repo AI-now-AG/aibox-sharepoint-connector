@@ -197,9 +197,9 @@
 </script>
 
 <div
-  class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14"
+  class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14 sticky bg-base-200 top-0"
 >
-  <div class="flex items-center pt-8">
+  <div class="flex items-center pt-5 pb-2">
     <button class="mr-4" onclick="window.history.back();">
       {@html svgIcons.back}
     </button>
@@ -207,9 +207,9 @@
       {mode == MODE.Create ? t("tenant.tenants.add-tenant") : tenantData.name}
     </h1>
 
-    <div class="flex space-x-2 fixed right-14 top-14 pt-2">
+    <div class="flex space-x-2 ml-auto">
       <button
-        class="mt-2 lg:mt-8 btn btn-primary"
+        class="btn btn-primary"
         on:click={() => {
           showPicker = false;
           mode == MODE.Edit ? confirmUpdateModal.show() : createTenant();
@@ -217,7 +217,7 @@
       >
         {t("common.save")}
       </button>
-      <button class="mt-2 lg:mt-8 btn" onclick="window.history.back();">
+      <button class="btn" onclick="window.history.back();">
         {t("common.cancel")}
       </button>
     </div>
