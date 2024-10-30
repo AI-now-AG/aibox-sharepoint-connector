@@ -19,6 +19,10 @@ import transcribed from "$assets/icons/transcribed.svg?raw";
 import close from "$assets/icons/close.svg?raw";
 import download from "$assets/icons/download.svg?raw";
 import startNew from "$assets/icons/start-new.svg?raw";
+import settings from "$assets/icons/settings.svg?raw";
+import admin from "$assets/icons/admin.svg?raw";
+import audio from "$assets/icons/audio.svg?raw";
+import aitool from "$assets/icons/aitool.svg?raw";
 
 export const svgIcons = {
   tenantManagement,
@@ -42,4 +46,8 @@ export const svgIcons = {
   close,
   download,
   startNew,
+  settings,
+  admin,
+  audio,
+  aitool
 };

@@ -183,6 +183,7 @@
             message: t("tenant.update-successful"),
             type: "success",
           });
+          window.location.reload();
         }
       } catch (error) {
         showAlert(error);
