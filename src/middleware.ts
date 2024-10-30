@@ -102,9 +102,10 @@ async function restrictAccess(context: APIContext, next: MiddlewareNext) {
     //  paths,
     //});
     const matchPath = wildcardMatchInArray(context.url.pathname, paths);
-    const hasAccess = context.locals.tenant?.included_features?.includes(
-      key as FeatureName,
-    );
+    const hasAccess = true;
+    // const hasAccess = context.locals.tenant?.included_features?.includes(
+    //   key as FeatureName,
+    // );
 
     if (matchPath && !hasAccess) {
       return context.rewrite("/restricted");

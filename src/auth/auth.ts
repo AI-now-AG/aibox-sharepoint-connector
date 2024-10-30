@@ -33,7 +33,8 @@ export const hasFeature = (locals: App.Locals, feature: FeatureName) => {
   }
 
   const { included_features: features } = locals.tenant;
-  return features?.length && features?.includes(feature) ? true : false;
+  return true;
+  //return features?.length && features?.includes(feature) ? true : false;
 };
 
 export default {
