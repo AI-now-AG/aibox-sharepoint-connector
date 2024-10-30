@@ -12,6 +12,7 @@
   import { loading, showLoading, hideLoading } from "$stores";
   import ColorPicker, { ChromeVariant } from "svelte-awesome-color-picker";
   import log from "$utils/log";
+  import { ApiKeyProvider, FeatureName } from "$data/models/tenant.model";
 
   export let tenant;
   export let openAIKey = "";
@@ -21,10 +22,6 @@
   let alertModal;
   let alertMessage = "";
 
-  const API_KEY_PROVIDER = {
-    OpenAI: "openai",
-    AzureOpenAI: "azure_openai",
-  };
   const MODE = {
     Create: "create",
     Edit: "edit",
@@ -55,9 +52,13 @@
     showPicker = !showPicker;
   }
 
+  function selectFeatureApiKeyProvider(feature, provider) {
+    // TODO: Update API Key provider for  Feature
+  }
+
   function togglePassword(_apiKeyProvider) {
     let passwordField = document.getElementById("open_ai_key");
-    if (_apiKeyProvider == API_KEY_PROVIDER.AzureOpenAI) {
+    if (_apiKeyProvider == ApiKeyProvider.AzureOpenAI) {
       passwordField = document.getElementById("azure_open_ai_key");
     }
     if (passwordField.type === "password") {
@@ -396,7 +397,7 @@
               }}
             />
             <TogglePasswordIcon
-              on:change={() => togglePassword(API_KEY_PROVIDER.OpenAI)}
+              on:change={() => togglePassword(ApiKeyProvider.OpenAI)}
             />
           </label>
         </div>
@@ -423,7 +424,7 @@
               }}
             />
             <TogglePasswordIcon
-              on:change={() => togglePassword(API_KEY_PROVIDER.AzureOpenAI)}
+              on:change={() => togglePassword(ApiKeyProvider.AzureOpenAI)}
             />
           </label>
         </div>
@@ -511,7 +512,77 @@
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div
-      class="w-full bg-white rounded px-4 py-2 flex items-center"
+      class="w-full bg-white rounded px-4 py-2"
+      on:click={() => {
+        showPicker = false;
+      }}
+    >
+      <div class="flex items-center">
+        <input
+          id="feature-text-prompt"
+          type="checkbox"
+          checked={true}
+          class="checkbox checkbox-primary"
+          value="text-prompt"
+          disabled
+          on:change={(event) => {
+            // TODO: Disabled this by default / could be unselect this Text Prompt feature in the future
+          }}
+        />
+        <label class="label cursor-pointer ml-2" for="feature-text-prompt">
+          <span class="label-text">{t("tenant.text-prompt")}</span>
+        </label>
+      </div>
+      <div class="flex items-center mt-2 px-4">
+        <input
+          type="radio"
+          id="radio-open-api-key"
+          name="text-prompt-radio-api-key"
+          class="radio radio-primary"
+          value={ApiKeyProvider.OpenAI}
+          checked={true}
+          on:change={(event) => {
+            selectFeatureApiKeyProvider(
+              FeatureName.TextPrompt.toString(),
+              ApiKeyProvider.OpenAI.toString(),
+            );
+          }}
+          on:focus={() => {
+            showPicker = false;
+          }}
+        />
+        <label for="radio-open-api-key" class="ml-2 font-medium text-sm"
+          >{t("tenant.open-ai-model")}</label
+        >
+      </div>
+      <div class="flex items-center mt-2 px-4">
+        <input
+          type="radio"
+          id="radio-azure-open-api-key"
+          name="text-prompt-radio-api-key"
+          class="radio radio-primary"
+          value={ApiKeyProvider.AzureOpenAI}
+          checked={true}
+          on:change={(event) => {
+            selectFeatureApiKeyProvider(
+              FeatureName.TextPrompt.toString(),
+              ApiKeyProvider.AzureOpenAI.toString(),
+            );
+          }}
+          on:focus={() => {
+            showPicker = false;
+          }}
+        />
+        <label for="radio-azure-open-api-key" class="ml-2 font-medium text-sm"
+          >{t("tenant.azure-open-ai-model")}</label
+        >
+      </div>
+    </div>
+
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <div
+      class="w-full bg-white rounded px-4 py-2 flex items-center mt-4"
       on:click={() => {
         showPicker = false;
       }}
@@ -524,6 +595,7 @@
         class="checkbox checkbox-primary"
         value="audio-to-text"
         on:change={(event) => {
+          // TODO: Update handle feature selected here using new data structure
           const feature = event.target.value;
           const indexToRemove = (tenantData?.included_features || []).indexOf(
             feature,
