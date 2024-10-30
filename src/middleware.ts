@@ -97,15 +97,13 @@ async function restrictAccess(context: APIContext, next: MiddlewareNext) {
 
   // Check included features
   for (const [key, paths] of Object.entries(FEATURE_MAP_ROUTES)) {
-    //console.log(`Checked feature: ${key}`, {
-    //  tenant: context.locals.tenant,
-    //  paths,
-    //});
     const matchPath = wildcardMatchInArray(context.url.pathname, paths);
-    const hasAccess = true;
-    // const hasAccess = context.locals.tenant?.included_features?.includes(
-    //   key as FeatureName,
-    // );
+    let hasAccess = false;
+    if (context.locals.tenant?.included_features?.length) {
+      hasAccess = context.locals.tenant.included_features.some(
+        (item) => item.name == (key as FeatureName),
+      );
+    }
 
     if (matchPath && !hasAccess) {
       return context.rewrite("/restricted");

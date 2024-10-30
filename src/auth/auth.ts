@@ -28,13 +28,18 @@ export const hasRole = (locals: App.Locals, role: UserRole) => {
 };
 
 export const hasFeature = (locals: App.Locals, feature: FeatureName) => {
-  if (!locals.user) {
+  if (!locals.tenant) {
     return false;
   }
 
   const { included_features: features } = locals.tenant;
-  return true;
-  //return features?.length && features?.includes(feature) ? true : false;
+  let result = false;
+
+  if (features && features?.length) {
+    result = features.some((item) => item.name == feature);
+  }
+
+  return result;
 };
 
 export default {
