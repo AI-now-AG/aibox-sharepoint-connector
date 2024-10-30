@@ -17,5 +17,5 @@ export const SUPER_ADMIN_ROUTES = [
 ];
 
 export const FEATURE_MAP_ROUTES = {
-  "audio-to-text": ["/transcription"],
+  "audio-to-text": ["/transcription", "/settings/transcription"],
 };

@@ -6,6 +6,9 @@
   import { useTranslations } from "$i18n/utils";
   import { addToast } from "$stores/toast";
   import Loading from "$components/Loading.svelte";
+  import TogglePasswordIcon from "./TogglePasswordIcon.svelte";
+  import ConfirmUpdateDialog from "./ConfirmUpdateDialog.svelte";
+  import AlertDialog from "./AlertDialog.svelte";
   import { loading, showLoading, hideLoading } from "$stores";
   import ColorPicker, { ChromeVariant } from "svelte-awesome-color-picker";
   import log from "$utils/log";
@@ -13,6 +16,10 @@
   export let tenant;
   export let openAIKey = "";
   export let azureOpenAIKey = "";
+
+  let confirmUpdateModal;
+  let alertModal;
+  let alertMessage = "";
 
   const API_KEY_PROVIDER = {
     OpenAI: "openai",
@@ -43,31 +50,11 @@
     tenantData.primary_color = selecteColor;
   }
 
-  if (!tenantData.api_key_provider) {
-    tenantData.api_key_provider = API_KEY_PROVIDER.OpenAI;
-  }
-
   let showPicker = false;
   function toggleColorPicker() {
     showPicker = !showPicker;
   }
 
-  let apiKeyProvider = tenantData?.api_key_provider || API_KEY_PROVIDER.OpenAI;
-  function selectApiKeyProvider(event) {
-    apiKeyProvider = event.target.value?.trim();
-    tenantData.api_key_provider = apiKeyProvider;
-  }
-
-  function showUpdateConfirmationModal() {
-    document.getElementById("modal_confirm_update").showModal();
-  }
-
-  function closeUpdateConfirmationModal() {
-    document.getElementById("modal_confirm_update").close();
-  }
-
-  let icon_open_ai = svgIcons.eyeClose;
-  let icon_azure_open_ai = svgIcons.eyeClose;
   function togglePassword(_apiKeyProvider) {
     let passwordField = document.getElementById("open_ai_key");
     if (_apiKeyProvider == API_KEY_PROVIDER.AzureOpenAI) {
@@ -75,22 +62,13 @@
     }
     if (passwordField.type === "password") {
       passwordField.type = "text";
-
-      if (_apiKeyProvider == API_KEY_PROVIDER.OpenAI) {
-        icon_open_ai = svgIcons.eye;
-      }
-      if (_apiKeyProvider == API_KEY_PROVIDER.AzureOpenAI) {
-        icon_azure_open_ai = svgIcons.eye;
-      }
     } else {
       passwordField.type = "password";
-      if (_apiKeyProvider == API_KEY_PROVIDER.OpenAI) {
-        icon_open_ai = svgIcons.eyeClose;
-      }
-      if (_apiKeyProvider == API_KEY_PROVIDER.AzureOpenAI) {
-        icon_azure_open_ai = svgIcons.eyeClose;
-      }
     }
+  }
+
+  function hasFeatureAudioToText() {
+    return tenantData?.included_features?.indexOf("audio-to-text") != -1;
   }
 
   function validateForm() {
@@ -102,14 +80,36 @@
       showAlert(t("tenant.validate-empty-identification-name-message"));
       return false;
     }
-    if (apiKeyProvider == API_KEY_PROVIDER.OpenAI) {
-      if (!openAIKey) {
-        showAlert(t("tenant.validate-open-ai-key-message"));
+
+    if (!openAIKey) {
+      showAlert(t("tenant.validate-open-ai-key-message"));
+      return false;
+    }
+
+    if (hasFeatureAudioToText() && !azureOpenAIKey) {
+      showAlert(t("tenant.validate-azure-open-ai-key-message"));
+      return false;
+    }
+
+    if (azureOpenAIKey) {
+      if (!tenantData?.azure_openai_instance_name) {
+        showAlert(
+          t("tenant.validate-azure-open-ai-instance-name-empty-message"),
+        );
         return false;
       }
-    } else {
-      if (!azureOpenAIKey) {
-        showAlert(t("tenant.validate-azure-open-ai-key-message"));
+      if (!tenantData?.azure_openai_endpoint) {
+        showAlert(t("tenant.validate-azure-open-ai-endpoint-empty-message"));
+        return false;
+      }
+      if (!tenantData?.azure_openai_whisper_model) {
+        showAlert(
+          t("tenant.validate-azure-open-ai-transciption-model-empty-message"),
+        );
+        return false;
+      }
+      if (!tenantData?.azure_openai_chat_model) {
+        showAlert(t("tenant.validate-azure-open-ai-text-model-empty-message"));
         return false;
       }
     }
@@ -191,8 +191,8 @@
   }
 
   function showAlert(message) {
-    document.getElementById("alert_message").textContent = message;
-    document.getElementById("my_modal_3").showModal();
+    alertMessage = message;
+    alertModal.show();
   }
 </script>
 
@@ -212,7 +212,7 @@
         class="mt-2 lg:mt-8 btn btn-primary"
         on:click={() => {
           showPicker = false;
-          mode == MODE.Edit ? showUpdateConfirmationModal() : createTenant();
+          mode == MODE.Edit ? confirmUpdateModal.show() : createTenant();
         }}
       >
         {t("common.save")}
@@ -232,7 +232,7 @@
         >
         <input
           type="text"
-          value={tenant?.name || ""}
+          value={tenantData?.name || ""}
           placeholder={t("tenant.tenants.tenant.display-name")}
           class="input input-bordered w-full"
           on:change={(event) => {
@@ -250,7 +250,7 @@
         >
         <input
           type="text"
-          value={tenant?.org_name || ""}
+          value={tenantData?.org_name || ""}
           placeholder={t("tenant.tenants.tenant.identification-name")}
           class="input input-bordered w-full"
           on:change={(event) => {
@@ -376,111 +376,136 @@
 
     <div class="flex flex-row space-x-4">
       <div class="flex-1 flex flex-col">
-        <div class="flex items-center mb-2">
-          <input
-            type="radio"
-            id="radio-azure-open-api-key"
-            name="radio-api-key"
-            class="radio radio-primary"
-            value={API_KEY_PROVIDER.OpenAI}
-            checked={apiKeyProvider == API_KEY_PROVIDER.OpenAI}
-            on:change={(event) => {
-              selectApiKeyProvider(event);
-            }}
-            on:focus={() => {
-              showPicker = false;
-            }}
-          />
-          <label
-            for="radio-azure-open-api-key"
-            class="ml-2 text-gray-400 font-medium text-sm"
-            >{t("tenant.open-ai-provider")}</label
+        <div class="w-full">
+          <span class="mb-2 text-gray-400 font-medium text-sm"
+            >{t("tenant.open-ai-provider")}</span
           >
-        </div>
 
-        <label
-          class="input input-bordered flex items-center gap-2"
-          style="background-color: white;"
-        >
-          <input
-            type="password"
-            class="grow"
-            id="open_ai_key"
-            placeholder={t("tenant.api-key")}
-            disabled={apiKeyProvider != API_KEY_PROVIDER.OpenAI}
-            value={openAIKey}
-            on:change={(event) => {
-              openAIKey = event.target.value;
-            }}
-            on:focus={() => {
-              showPicker = false;
-            }}
-          />
-          <button
-            on:click={() => {
-              togglePassword(API_KEY_PROVIDER.OpenAI);
-            }}
-          >
-            {@html icon_open_ai}
-          </button>
-        </label>
+          <label class="input input-bordered flex items-center gap-2 mt-2">
+            <input
+              id="open_ai_key"
+              type="password"
+              class="grow"
+              placeholder={t("tenant.api-key")}
+              value={openAIKey}
+              on:change={(event) => {
+                openAIKey = event?.target?.value?.trim();
+              }}
+              on:focus={() => {
+                showPicker = false;
+              }}
+            />
+            <TogglePasswordIcon
+              on:change={() => togglePassword(API_KEY_PROVIDER.OpenAI)}
+            />
+          </label>
+        </div>
       </div>
 
       <div class="flex-1 flex flex-col">
-        <div class="flex items-center mb-2">
-          <input
-            type="radio"
-            id="radio-open-api-key"
-            name="radio-api-key"
-            class="radio radio-primary"
-            value={API_KEY_PROVIDER.AzureOpenAI}
-            checked={apiKeyProvider == API_KEY_PROVIDER.AzureOpenAI}
-            on:change={(event) => {
-              selectApiKeyProvider(event);
-            }}
-            on:focus={() => {
-              showPicker = false;
-            }}
-          />
-          <label
-            for="radio-open-api-key"
-            class="ml-2 text-gray-400 font-medium text-sm"
-            >{t("tenant.azure-open-ai-provider")}</label
+        <div class="w-full">
+          <span class="mb-2 text-gray-400 font-medium text-sm"
+            >{t("tenant.azure-open-ai-provider")}</span
           >
+
+          <label class="input input-bordered flex items-center gap-2 mt-2">
+            <input
+              id="azure_open_ai_key"
+              type="password"
+              class="grow"
+              placeholder={t("tenant.api-key")}
+              value={azureOpenAIKey}
+              on:change={(event) => {
+                azureOpenAIKey = event?.target?.value?.trim();
+              }}
+              on:focus={() => {
+                showPicker = false;
+              }}
+            />
+            <TogglePasswordIcon
+              on:change={() => togglePassword(API_KEY_PROVIDER.AzureOpenAI)}
+            />
+          </label>
         </div>
 
-        <label
-          class="input input-bordered flex items-center gap-2"
-          style="background-color: white;"
-        >
+        <div class="w-full mt-4">
+          <span class="mb-2 text-gray-400 font-medium text-sm"
+            >{t("tenant.azure-open-ai-instance-name")}</span
+          >
           <input
-            type="password"
-            class="grow"
-            id="azure_open_ai_key"
-            placeholder={t("tenant.api-key")}
-            disabled={apiKeyProvider != API_KEY_PROVIDER.AzureOpenAI}
-            style="background-color: white;"
-            value={azureOpenAIKey}
+            type="text"
+            class="input input-bordered mt-2 w-full"
+            placeholder={""}
+            value={tenantData?.azure_openai_instance_name || ""}
             on:change={(event) => {
-              azureOpenAIKey = event.target.value;
+              tenantData.azure_openai_instance_name =
+                event?.target?.value?.trim();
             }}
             on:focus={() => {
               showPicker = false;
             }}
           />
-          <button
-            on:click={() => {
-              togglePassword(API_KEY_PROVIDER.AzureOpenAI);
-            }}
+        </div>
+
+        <div class="w-full mt-4">
+          <span class="mb-2 text-gray-400 font-medium text-sm"
+            >{t("tenant.azure-open-ai-endpoint")}</span
           >
-            {@html icon_azure_open_ai}
-          </button>
-        </label>
+          <input
+            type="text"
+            class="input input-bordered mt-2 w-full"
+            placeholder={""}
+            value={tenantData?.azure_openai_endpoint || ""}
+            on:change={(event) => {
+              tenantData.azure_openai_endpoint = event?.target?.value?.trim();
+            }}
+            on:focus={() => {
+              showPicker = false;
+            }}
+          />
+        </div>
+
+        <div class="w-full mt-4">
+          <span class="mb-2 text-gray-400 font-medium text-sm"
+            >{t("tenant.azure-open-ai-transciption-model")}</span
+          >
+          <input
+            type="text"
+            class="input input-bordered mt-2 w-full"
+            placeholder={""}
+            value={tenantData?.azure_openai_whisper_model || ""}
+            on:change={(event) => {
+              tenantData.azure_openai_whisper_model =
+                event?.target?.value?.trim();
+            }}
+            on:focus={() => {
+              showPicker = false;
+            }}
+          />
+        </div>
+
+        <div class="w-full mt-4">
+          <span class="mb-2 text-gray-400 font-medium text-sm"
+            >{t("tenant.azure-open-ai-text-model")}</span
+          >
+          <input
+            type="text"
+            class="input input-bordered mt-2 w-full"
+            placeholder={""}
+            value={tenantData?.azure_openai_chat_model || ""}
+            on:change={(event) => {
+              tenantData.azure_openai_chat_model = event?.target?.value?.trim();
+            }}
+            on:focus={() => {
+              showPicker = false;
+            }}
+          />
+        </div>
       </div>
     </div>
 
+    <!-- Included features -->
     <div class="w-full h-0.5 mt-4 mb-6 bg-gray-400/20" />
-
     <div class="mb-3"><b>{t("tenant.included-featured")}</b></div>
 
     <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -495,7 +520,7 @@
         id="feature-audio-to-text"
         type="checkbox"
         checked={tenantData?.included_features != undefined &&
-          tenantData?.included_features?.indexOf("audio-to-text") != -1}
+          hasFeatureAudioToText()}
         class="checkbox checkbox-primary"
         value="audio-to-text"
         on:change={(event) => {
@@ -518,45 +543,12 @@
       </label>
     </div>
 
-    <dialog id={"modal_confirm_update"} class="modal">
-      <div class="modal-box">
-        <form method="dialog" id="modalForm">
-          <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-            >✕</button
-          >
-          <h3 id="modal_title" class="text-lg font-bold">
-            {t("tenant.tenants.tenant.update-confirmation")}
-          </h3>
-          <div class="flex justify-between gap-4 mt-6">
-            <button
-              id="yes_button"
-              class="btn btn-warning flex-1"
-              on:click={() => {
-                updateTenant();
-              }}>{t("common.yes")}</button
-            >
-            <button
-              id="no_button"
-              class="btn btn-success flex-1"
-              on:click={() => {
-                closeUpdateConfirmationModal();
-              }}>{t("common.no")}</button
-            >
-          </div>
-        </form>
-      </div>
-    </dialog>
+    <ConfirmUpdateDialog
+      bind:modal={confirmUpdateModal}
+      on:confirm={updateTenant}
+    />
 
-    <dialog id="my_modal_3" class="modal">
-      <div class="modal-box">
-        <form method="dialog">
-          <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-            >✕</button
-          >
-        </form>
-        <p id="alert_message" style="color: rgb(159 18 57);"></p>
-      </div>
-    </dialog>
+    <AlertDialog bind:modal={alertModal} message={alertMessage} />
   </div>
 </div>
 

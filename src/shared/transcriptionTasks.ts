@@ -14,7 +14,6 @@ const TaskSchema = z.object({
   srtUrl: z.string().optional(),
 });
 
-
 type Task = z.infer<typeof TaskSchema>;
 let db: Db | null = null;
 
@@ -29,7 +28,7 @@ const connectToDb = async () => {
 
 const getTasksCollection = async (): Promise<Collection> => {
   const db = await connectToDb();
-  return db.collection("transcriptionStatus");
+  return db.collection("transcription_status");
 };
 
 const ensureIndexes = async () => {
@@ -40,7 +39,10 @@ const ensureIndexes = async () => {
 export const createTask = async (taskId: string, taskData: Partial<Task>) => {
   const parsedData = TaskSchema.parse({ taskId, ...taskData });
   const collection = await getTasksCollection();
-  await collection.insertOne({ ...parsedData, createdAt: new Date().toISOString() });
+  await collection.insertOne({
+    ...parsedData,
+    createdAt: new Date().toISOString(),
+  });
 };
 
 export const updateTask = async (taskId: string, updates: Partial<Task>) => {
@@ -48,7 +50,7 @@ export const updateTask = async (taskId: string, updates: Partial<Task>) => {
   const collection = await getTasksCollection();
   await collection.updateOne(
     { taskId },
-    { $set: { ...parsedUpdates, updatedAt: new Date().toISOString() } }
+    { $set: { ...parsedUpdates, updatedAt: new Date().toISOString() } },
   );
 };
 

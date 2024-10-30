@@ -206,7 +206,14 @@
             fileName: audioFile?.name,
             uniqueName: tempOutputFileNames[0],
             uploadUrl: tempUploadUrl,
+            instructionSubtitle: $tenant?.instructions?.transcription_subtitle,
+            instructionPlaintext:
+              $tenant?.instructions?.transcription_plaintext,
             encryptedApiKey: $tenant?.azure_openai_api_key,
+            azureOpenAIInstanceName: $tenant?.azure_openai_instance_name,
+            azureOpenAIEndpoint: $tenant?.azure_openai_endpoint,
+            azureOpenAIWhisperModel: $tenant?.azure_openai_whisper_model,
+            azureOpenAIChatModel: $tenant?.azure_openai_chat_model,
           }),
         },
       );
@@ -227,7 +234,7 @@
           srtUrl: "",
         });
         addToast({
-          message: "File uploaded and transcription started successfully.",
+          message: `${t("transcription.file-uploaded-success")}`,
           type: "success",
           timeout: 5000,
         });
@@ -265,8 +272,7 @@
         } else if (result.status === "failed") {
           clearInterval(intervalId);
           addToast({
-            message:
-            result.error || "An error occurred during transcription.",
+            message: result.error || "An error occurred during transcription.",
             type: "error",
             timeout: 5000,
           });
@@ -286,8 +292,7 @@
           });
 
           addToast({
-            message:
-              '<a href="/transcription">Your transcription is ready. Tap to see.</a>',
+            message: `<a href="/transcription">${t("transcription.transcription-is-ready")}</a>`,
             type: "success",
             timeout: 5000,
           });

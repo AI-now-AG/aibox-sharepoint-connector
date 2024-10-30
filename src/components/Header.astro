@@ -3,6 +3,7 @@ import InitializeTheme from "$components/theme/InitializeTheme.astro";
 import InitializeColor from "$components/theme/InitializeColor.astro";
 import SharedVariables from "$components/theme/SharedVariables.svelte";
 import Toasts from "$components/toast-notification/Toasts.svelte";
+import { transformRawData } from "$utils/transformRawData";
 import { useTranslations } from "$i18n/utils";
 
 const t = useTranslations();
@@ -41,8 +42,8 @@ const primaryColor = Astro.locals.tenant?.primary_color;
 
 <!-- Shared variables for all .svelte components -->
 <SharedVariables
-  tenant={Astro.locals.tenant}
-  user={Astro.locals.user}
+  tenant={transformRawData(Astro.locals.tenant)}
+  user={transformRawData(Astro.locals.user)}
   locale={Astro.locals.locale}
   client:load
 />

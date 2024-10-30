@@ -1,24 +1,27 @@
 ---
 import Layout from "$layouts/Layout.astro";
 import TenantForm from "./TenantForm.svelte";
-import { actions } from "astro:actions";
+import tenantModel from "$data/models/tenant.model";
 import { decrypt } from "$utils/secure";
+import { transformRawData } from "$utils/transformRawData";
 
 export interface Props {
   id: string;
 }
 
-const { id = "" } = Astro.params;
+const { id } = Astro.params;
+console.log('id', id);
+if (id === undefined) {
+  throw new Error("Id is required");
+}
 
-const fetchTenant = async () => {
-  const { data, error } = await Astro.callAction(actions.tenant.get, {
-    _id: id,
-  });
-  return { data, error };
-};
+const tenant = await tenantModel.get(id);
+if (tenant === null) {
+  console.error('Tenant not found');
+  return Astro.redirect('/404');
+}
 
-const tenatData = await fetchTenant();
-const { data } = tenatData || {};
+const data = transformRawData(tenant);
 const { openai_api_key, azure_openai_api_key } = data || {};
 let openAIKey = openai_api_key;
 let azureOpenAIKey = azure_openai_api_key;

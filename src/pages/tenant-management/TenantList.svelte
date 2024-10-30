@@ -192,8 +192,7 @@
               <td class="py-3 px-4 text-sm font-medium rounded-l-lg">
                 <a
                   class="underline underline-offset-2"
-                  href="/tenant-management/edit?id={tenant._id}"
-                  >{tenant.name}</a
+                  href="/tenant-management/{tenant._id}">{tenant.name}</a
                 >
               </td>
               <td
@@ -240,7 +239,7 @@
                   </button>
                   <a
                     class="flex block w-full text-left px-4 py-1 text-sm hover:underline"
-                    href="/tenant-management/edit?id={tenant._id}"
+                    href="/tenant-management/{tenant._id}"
                   >
                     {@html svgIcons.edit}
                     <span class="ml-1"
