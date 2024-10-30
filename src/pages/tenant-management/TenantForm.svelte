@@ -291,7 +291,7 @@
   </div>
 </div>
 <div class="px-8">
-  <div class="container w-full mx-auto p-6" style="font-family: Inter;">
+  <div class="container w-full mx-auto p-6">
     <div class="flex flex-row space-x-4">
       <div class="flex-1 flex flex-col mb-4">
         <span class="mb-2 text-gray-400 font-medium text-sm"

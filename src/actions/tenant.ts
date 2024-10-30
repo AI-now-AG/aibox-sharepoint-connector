@@ -130,17 +130,14 @@ export const tenant = {
   encryptApiKeys: defineAction({
     input: TenanKeyEncryptSchema,
     handler: async (input) => {
-      try {
-        const { openai_api_key, azure_openai_api_key } = input;
-        if (openai_api_key) {
-          input.openai_api_key = encrypt(openai_api_key);
-        }
-        if (azure_openai_api_key) {
-          input.azure_openai_api_key = encrypt(azure_openai_api_key);
-        }
-      } catch (error) {
-        log.e(error, "Encrypt API Keys before saving error");
+      const { openai_api_key, azure_openai_api_key } = input;
+      if (openai_api_key) {
+        input.openai_api_key = encrypt(openai_api_key);
       }
+      if (azure_openai_api_key) {
+        input.azure_openai_api_key = encrypt(azure_openai_api_key);
+      }
+
       return input;
     },
   }),
@@ -148,17 +145,14 @@ export const tenant = {
   decryptApiKeys: defineAction({
     input: TenanKeyEncryptSchema,
     handler: async (input) => {
-      try {
-        const { openai_api_key, azure_openai_api_key } = input;
-        if (openai_api_key) {
-          input.openai_api_key = decrypt(openai_api_key);
-        }
-        if (azure_openai_api_key) {
-          input.azure_openai_api_key = decrypt(azure_openai_api_key);
-        }
-      } catch (error) {
-        log.e(error, "Decrypt API Keys before saving error");
+      const { openai_api_key, azure_openai_api_key } = input;
+      if (openai_api_key) {
+        input.openai_api_key = decrypt(openai_api_key);
       }
+      if (azure_openai_api_key) {
+        input.azure_openai_api_key = decrypt(azure_openai_api_key);
+      }
+
       return input;
     },
   }),
