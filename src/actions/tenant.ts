@@ -3,11 +3,10 @@ import { ObjectId } from "mongodb";
 import { z } from "zod";
 import tenantModel, {
   TenantTheme,
-  TenantFeature,
-  ApiKeyProvider,
   TenantFilterParamsSchema,
   type Tenant,
 } from "$data/models/tenant.model";
+import { TenantFeature, ApiKeyProvider } from "$constants";
 import { transformRawData } from "$utils/transformRawData";
 import organizationsManagement, {
   type PostOrganizationsRequest,
