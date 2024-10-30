@@ -19,3 +19,13 @@ export const SUPER_ADMIN_ROUTES = [
 export const FEATURE_MAP_ROUTES = {
   "audio-to-text": ["/transcription", "/settings/transcription"],
 };
+
+export enum TenantFeature {
+  AudioToText = "audio-to-text",
+  TextPrompt = "text-prompt",
+}
+
+export enum ApiKeyProvider {
+  OpenAI = "openai",
+  AzureOpenAI = "azure_openai",
+}

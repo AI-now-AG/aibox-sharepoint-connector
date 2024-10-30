@@ -8,7 +8,8 @@ import {
   FEATURE_MAP_ROUTES,
 } from "$constants";
 import type { APIContext, MiddlewareNext } from "astro";
-import tenantModel, { TenantFeature } from "$data/models/tenant.model";
+import tenantModel from "$data/models/tenant.model";
+import { TenantFeature } from "$constants";
 import { defaultLang } from "$i18n/ui";
 import { setLanguage } from "$i18n/utils";
 import { wildcardMatch, wildcardMatchInArray } from "$utils/wildcardMatch";
