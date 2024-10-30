@@ -3,9 +3,9 @@ import { ObjectId } from "mongodb";
 import { z } from "zod";
 import tenantModel, {
   TenantTheme,
-  TenantFeature,
   ApiKeyProvider,
   TenantFilterParamsSchema,
+  IncludedFeaturesSchema,
   type Tenant,
 } from "$data/models/tenant.model";
 import { transformRawData } from "$utils/transformRawData";
@@ -29,7 +29,7 @@ const TenantInputParamsSchema = z.object({
   azure_openai_instance_name: z.string().optional(),
   azure_openai_whisper_model: z.string().optional(),
   azure_openai_chat_model: z.string().optional(),
-  included_features: z.array(z.nativeEnum(TenantFeature)).optional(),
+  included_features: z.array(IncludedFeaturesSchema),
 });
 
 const TenanKeyEncryptSchema = z.object({

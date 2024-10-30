@@ -10,7 +10,8 @@ export enum TenantTheme {
   Somedia = "somedia",
 }
 
-export enum TenantFeature {
+export enum FeatureName {
+  TextPrommpts = "text-prommpts",
   AudioToText = "audio-to-text",
 }
 
@@ -24,6 +25,11 @@ export const TenantFilterParamsSchema = z.object({
   showArchived: z.boolean(),
 });
 export type TenantFilterParams = z.infer<typeof TenantFilterParamsSchema>;
+
+export const IncludedFeaturesSchema = z.object({
+  name: z.nativeEnum(FeatureName),
+  provider: z.nativeEnum(ApiKeyProvider),
+});
 
 export const InstructionsSchema = z.object({
   transcription_subtitle: z.string(),
@@ -45,7 +51,7 @@ const TenantSchema = z.object({
   azure_openai_instance_name: z.string().nullish(),
   azure_openai_whisper_model: z.string().nullish(),
   azure_openai_chat_model: z.string().nullish(),
-  included_features: z.array(z.nativeEnum(TenantFeature)).optional(),
+  included_features: z.array(IncludedFeaturesSchema),
   instructions: InstructionsSchema.nullish(),
   active: z.boolean().default(true).optional(),
   created_at: z.date().optional(),
@@ -53,6 +59,7 @@ const TenantSchema = z.object({
 });
 export type Tenant = z.infer<typeof TenantSchema>;
 export type Instructions = z.infer<typeof InstructionsSchema>;
+export type IncludedFeatures = z.infer<typeof IncludedFeaturesSchema>;
 
 const collection = db.collection("tenants");
 
@@ -62,7 +69,12 @@ export default {
     const doc = {
       ...{
         active: true,
-        included_features: [],
+        included_features: [
+          {
+            name: FeatureName.TextPrommpts,
+            provider: ApiKeyProvider.OpenAI,
+          },
+        ],
         instructions: null,
         created_at: new Date(),
         updated_at: new Date(),

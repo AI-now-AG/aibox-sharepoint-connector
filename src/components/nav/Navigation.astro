@@ -2,7 +2,7 @@
 import { useTranslations } from "$i18n/utils";
 import MenuItem from "./MenuItem.astro";
 import Category from "$data/models/category.model";
-import { TenantFeature } from "$data/models/tenant.model";
+import { FeatureName } from "$data/models/tenant.model";
 import { svgIcons } from "$assets/icons";
 import auth from "$auth/auth";
 
@@ -20,7 +20,7 @@ const menuItems = categories.map((category) => ({
   })),
 }));
 
-if (auth.hasFeature(Astro.locals, TenantFeature.AudioToText)) {
+if (auth.hasFeature(Astro.locals, FeatureName.AudioToText)) {
   menuItems.push({
     title: t("nav.transcription"),
     icon: svgIcons.transcription,
@@ -67,7 +67,7 @@ const settingItem =  {
   };
 
 // Settings > Transcription
-if (auth.hasFeature(Astro.locals, TenantFeature.AudioToText)) {
+if (auth.hasFeature(Astro.locals, FeatureName.AudioToText)) {
   settingItem['items'].push({
     title: t("nav.settings.transcription"),
     path: "/settings/transcription",
