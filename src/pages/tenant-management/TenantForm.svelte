@@ -99,7 +99,7 @@
         return false;
       }
       if (!tenantData?.azure_openai_endpoint) {
-        showAlert(t("tenant.validate-azure-open-ai-enpoint-empty-message"));
+        showAlert(t("tenant.validate-azure-open-ai-endpoint-empty-message"));
         return false;
       }
       if (!tenantData?.azure_openai_whisper_model) {
