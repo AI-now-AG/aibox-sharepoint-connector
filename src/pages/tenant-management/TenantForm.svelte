@@ -525,10 +525,12 @@
           class="checkbox checkbox-primary"
           value="text-prompt"
           disabled
-          on:change={(event) => {}}
+          on:change={(event) => {
+            // TODO: Disabled this by default / could be unselect this Text Prompt feature in the future
+          }}
         />
         <label class="label cursor-pointer ml-2" for="feature-text-prompt">
-          <span class="label-text">{"Text Prompt models"}</span>
+          <span class="label-text">{t("tenant.text-prompt")}</span>
         </label>
       </div>
       <div class="flex items-center mt-2 px-4">
@@ -550,7 +552,7 @@
           }}
         />
         <label for="radio-open-api-key" class="ml-2 font-medium text-sm"
-          >{"Open AI (gpt4o)"}</label
+          >{t("tenant.open-ai-model")}</label
         >
       </div>
       <div class="flex items-center mt-2 px-4">
@@ -572,7 +574,7 @@
           }}
         />
         <label for="radio-azure-open-api-key" class="ml-2 font-medium text-sm"
-          >{"Azure Open AI (gpt4o)"}</label
+          >{t("tenant.azure-open-ai-model")}</label
         >
       </div>
     </div>
@@ -593,6 +595,7 @@
         class="checkbox checkbox-primary"
         value="audio-to-text"
         on:change={(event) => {
+          // TODO: Update handle feature selected here using new data structure
           const feature = event.target.value;
           const indexToRemove = (tenantData?.included_features || []).indexOf(
             feature,
