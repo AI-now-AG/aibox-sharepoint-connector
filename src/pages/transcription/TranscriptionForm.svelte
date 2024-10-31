@@ -159,7 +159,7 @@
   ) {
     audioDuration = "";
     const eventTarget = event.target as HTMLInputElement;
-    audioFile = formatFilename(eventTarget?.files?.[0]);
+    audioFile = eventTarget?.files?.[0];
 
     if (!audioFile) {
       return;
@@ -177,7 +177,7 @@
       let fileNameWithoutExtension = audioFile.name || "";
       const splitedFileName = fileNameWithoutExtension.split(".");
       if (splitedFileName && splitedFileName?.[0]) {
-        fileNameWithoutExtension = splitedFileName?.[0];
+        fileNameWithoutExtension = formatFilename(splitedFileName?.[0]);
       }
       console.log("fileNameWithoutExtension", fileNameWithoutExtension);
       const { uploadUrl, outputFileName } = await getSASToken(
