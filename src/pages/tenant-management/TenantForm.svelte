@@ -45,8 +45,8 @@
 
   // API providers
   const providerValues = [
-    { label: "OpenAI", value: ApiKeyProvider.OpenAI },
-    { label: "Azure OpenAI", value: ApiKeyProvider.AzureOpenAI },
+    { label: t("tenant.open-ai-model"), value: ApiKeyProvider.OpenAI },
+    { label: t("tenant.azure-open-ai-model"), value: ApiKeyProvider.AzureOpenAI },
   ];
   let textSelectedProvider = providerValues[0];
   let isAudioToTextChecked = false;
