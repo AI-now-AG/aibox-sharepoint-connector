@@ -7,7 +7,7 @@
   import { tenant } from "$stores";
   import transcript from "$stores/transcript";
   import { addToast } from "$stores/toast";
-
+  import type { TranscribeRequest } from "$stores/TranscribeRequest";
   const t = useTranslations();
 
   // general
@@ -208,6 +208,13 @@
       isTranscribing = true;
       isTranscriptionFailed = false;
 
+      const params: TranscribeRequest = createTranscribeRequest(
+        audioFile,
+        tempOutputFileNames,
+        tempUploadUrl,
+        $tenant,
+      );
+
       const response = await fetch(
         "/.netlify/functions/transcribeAudio-background",
         {
@@ -268,6 +275,26 @@
         timeout: 5000,
       });
     }
+  }
+
+  function createTranscribeRequest(
+    audioFile: File | undefined,
+    tempOutputFileNames: string[],
+    tempUploadUrl: string,
+    tenant: any,
+  ): TranscriptionForm {
+    return {
+      fileName: audioFile?.name || "",
+      uniqueName: tempOutputFileNames[0],
+      uploadUrl: tempUploadUrl,
+      instructionSubtitle: tenant?.instructions?.transcription_subtitle,
+      instructionPlaintext: tenant?.instructions?.transcription_plaintext,
+      encryptedApiKey: tenant?.azure_openai_api_key,
+      azureOpenAIInstanceName: tenant?.azure_openai_instance_name,
+      azureOpenAIEndpoint: tenant?.azure_openai_endpoint,
+      azureOpenAIWhisperModel: tenant?.azure_openai_whisper_model,
+      azureOpenAIChatModel: tenant?.azure_openai_chat_model,
+    };
   }
 
   async function checkOutputFileReady() {

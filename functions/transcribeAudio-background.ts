@@ -7,6 +7,7 @@ import { BlobServiceClient } from "@azure/storage-blob";
 import { transcribeUsingOpenAI } from "./utils/transcribe";
 import { decrypt } from "$utils/secure";
 import { createTask, updateTask } from "$shared/transcriptionTasks";
+import type { TranscribeRequest } from "$utils/TranscribeRequest";
 
 const transcribeAudio: Handler = async (
   event: HandlerEvent,
@@ -19,8 +20,8 @@ const transcribeAudio: Handler = async (
   }
 
   try {
-    const requestParams = JSON.parse(event.body || "{}");
-    const { fileName, uniqueName, uploadUrl, encryptedApiKey } = requestParams;
+    const transcribeParams: TranscribeRequest = JSON.parse(event.body || "{}");
+    const { fileName, uniqueName, uploadUrl, encryptedApiKey } = transcribeParams;
 
     if (!fileName || !uploadUrl) {
       return {
@@ -30,19 +31,18 @@ const transcribeAudio: Handler = async (
     }
 
     const fileBuffer = await downloadFileFromBlob(uploadUrl);
-    requestParams.audioBuffer = fileBuffer;
+    transcribeParams.audioBuffer = fileBuffer;
 
     const azureOpenAIApiKey = decrypt(
-      encryptedApiKey || process.env.AZURE_OPENAI_API_KEY2,
+      encryptedApiKey || process.env.AZURE_OPENAI_API_KEY2!,
     );
-    requestParams.azureOpenAIApiKey = azureOpenAIApiKey;
+    transcribeParams.azureOpenAIApiKey = azureOpenAIApiKey;
 
     console.log("encryptedApiKey", encryptedApiKey);
     console.log("decryptedApiKey", azureOpenAIApiKey);
-    console.log("requestParams", requestParams);
 
     createTask(uniqueName, { status: "processing" });
-    const transcriptionResult = await transcribeUsingOpenAI(requestParams);
+    const transcriptionResult = await transcribeUsingOpenAI(transcribeParams);
 
     if (!transcriptionResult.success) {
       updateTask(uniqueName, {

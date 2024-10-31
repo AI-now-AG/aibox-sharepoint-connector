@@ -11,13 +11,15 @@ import {
   type Entry,
 } from "./srt";
 import { StringOutputParser } from "@langchain/core/output_parsers";
+import type { TranscribeRequest } from "$utils/TranscribeRequest";
 
 const DEFAULT_WHISPER_MODEL_NAME = "whisper-1";
 const DEFAULT_API_VERSION = "2024-08-01-preview";
 const DEFAULT_CHAT_MODE_NAME = "gpt-4o";
 
 const DEFAULT_INSTRUCTION = `
-  You are a Swiss German language expert. Your task is to review German subtitles and identify potential misinterpretations of Swiss German words, particularly place names, with a focus on the canton Graubünden while fixing missing punctuation. You must correct these while maintaining the original format as much as possible.
+  You are a Swiss German language expert. Your task is to review German subtitles and identify potential misinterpretations of Swiss German words, particularly place names, with a focus on the canton Graubünden while fixing missing punctuation. Improve all obvious errors in the following transcription, make illogical sentences logical. You must correct these while maintaining the original format as much as possible.
+  
   Important guidelines:
   
   - Maintain the exact word count and line count of the original subtitle.
@@ -75,49 +77,38 @@ const DEFAULT_INSTRUCTION = `
   output> die Ergebnisse präsentiert.
 `;
 
-function getClient(requestParams: any) {
-  const { azureOpenAIApiKey, azureOpenAIEndpoint, azureOpenAIWhisperModel } =
-    requestParams;
-
-  const endpoint = azureOpenAIEndpoint || process.env.AZURE_ENDPOINT;
+function getClient(transcribeParams: TranscribeRequest) {
+  const endpoint = transcribeParams.azureOpenAIEndpoint || process.env.AZURE_ENDPOINT;
   const apiVersion =
     process.env.AZURE_OPENAI_API_VERSION || DEFAULT_API_VERSION;
   const deploymentName =
-    azureOpenAIWhisperModel ||
+    transcribeParams.azureOpenAIWhisperModel ||
     process.env.AZURE_OPENAI_DEPLOYMENT_NAME ||
     DEFAULT_WHISPER_MODEL_NAME;
 
   return new AzureOpenAI({
     endpoint,
-    apiKey: azureOpenAIApiKey,
+    apiKey: transcribeParams.azureOpenAIApiKey,
     apiVersion,
     deployment: deploymentName,
   });
 }
 
-function getAzureChatModel(requestParams: any) {
-  const { azureOpenAIApiKey, azureOpenAIInstanceName, azureOpenAIChatModel } =
-    requestParams;
+function getAzureChatModel(transcribeParams: TranscribeRequest) {
+  const { azureOpenAIApiKey, azureOpenAIInstanceName, azureOpenAIChatModel } = transcribeParams;
 
   const azureChatConfig = {
     azureOpenAIApiKey,
-    azureOpenAIApiInstanceName:
-      azureOpenAIInstanceName || process.env.AZURE_OPENAI_API_INSTANCE_NAME,
-    azureOpenAIApiDeploymentName:
-      azureOpenAIChatModel ||
-      process.env.AZURE_CHAT_OPENAI_DEPLOYMENT_NAME ||
-      DEFAULT_CHAT_MODE_NAME,
-    azureOpenAIApiVersion:
-      process.env.AZURE_OPENAI_API_VERSION || DEFAULT_API_VERSION,
+    azureOpenAIApiInstanceName: azureOpenAIInstanceName || process.env.AZURE_OPENAI_API_INSTANCE_NAME,
+    azureOpenAIApiDeploymentName: azureOpenAIChatModel || process.env.AZURE_CHAT_OPENAI_DEPLOYMENT_NAME || DEFAULT_CHAT_MODE_NAME,
+    azureOpenAIApiVersion: process.env.AZURE_OPENAI_API_VERSION || DEFAULT_API_VERSION,
   };
 
   return new AzureChatOpenAI(azureChatConfig);
 }
 
-export const improveTextQuality = async (requestParams: any, data: Entry[]) => {
-  const { instructionSubtitle } = requestParams;
-
-  const model = getAzureChatModel(requestParams);
+export const improveSRTQuality = async (transcribeParams: TranscribeRequest, data: Entry[]) => {
+  const model = getAzureChatModel(transcribeParams);
   const flat = data
     .map(
       (entry) => `input> ${entry.text}
@@ -126,8 +117,7 @@ output>
     )
     .join("\n");
 
-  const finalInstructions = instructionSubtitle || DEFAULT_INSTRUCTION;
-  console.log("finalInstructions", finalInstructions);
+  const finalInstructions = transcribeParams.instructionSubtitle || DEFAULT_INSTRUCTION;
   const response = await model.invoke(
     [new SystemMessage(finalInstructions), new HumanMessage(flat)],
     {},
@@ -146,7 +136,27 @@ output>
   return out;
 };
 
-export async function transcribeUsingOpenAI(requestParams: any): Promise<{
+export const improveTextQuality = async (
+  transcribeParams: TranscribeRequest,
+  text: string
+) => {
+  const model = getAzureChatModel(transcribeParams);
+  const finalInstructions = transcribeParams.instructionPlaintext || DEFAULT_INSTRUCTION;
+  const response3 = await model.invoke(
+    [new SystemMessage(finalInstructions), new HumanMessage(text)],
+    {}
+  );
+
+  const parser = new StringOutputParser();
+  const correctedText = await parser.invoke(response3);
+  /*const correctedText = response3.content
+    .toString()
+    .split("\n")
+    .find((line) => line.startsWith("output>"))?.substring(8) || text;*/
+  return correctedText;
+};
+
+export async function transcribeUsingOpenAI(transcribeParams: TranscribeRequest): Promise<{
   success: boolean;
   data: {
     text: string;
@@ -157,9 +167,12 @@ export async function transcribeUsingOpenAI(requestParams: any): Promise<{
   error: string | null;
 }> {
   try {
-    const { audioBuffer, fileName, uploadUrl } = requestParams;
+    const { audioBuffer, fileName } = transcribeParams;
 
-    const openaiClient = getClient(requestParams);
+    const openaiClient = getClient(transcribeParams);
+    if (!audioBuffer) {
+      throw new Error("Audio buffer is missing or undefined.");
+    }
     const audioFile = await toFile(audioBuffer, fileName);
 
     const response = await openaiClient.audio.transcriptions.create({
@@ -177,19 +190,27 @@ export async function transcribeUsingOpenAI(requestParams: any): Promise<{
     const srtData = createSRTData(
       (response as unknown as { words: InputEntry[] }).words,
     );
-
-    const improvedSrtData = await improveTextQuality(requestParams, srtData);
+    let improvedText = description
+    if (transcribeParams.instructionPlaintext) {
+      improvedText = await improveTextQuality(transcribeParams, description);
+    }
+    const improvedSrtData = await improveSRTQuality(transcribeParams, srtData);
     const grouped = groupLines(improvedSrtData);
     const result = formatSRT(grouped);
-    const fileNameWithExtension = uploadUrl.split("/").pop()!.split("?")[0];
+    const fileNameWithExtension = transcribeParams.uploadUrl.split("/").pop()!.split("?")[0];
     const fileNameWithoutExtension = fileNameWithExtension
       .split(".")
       .slice(0, -1)
       .join(".");
     const outputURLs: { [key: string]: string } = {};
+    outputURLs["json"] = await uploadOutputToBlob(
+      `${fileNameWithoutExtension}.json`,
+      JSON.stringify(response),
+      "json",
+    );
     outputURLs["txt"] = await uploadOutputToBlob(
       `${fileNameWithoutExtension}.txt`,
-      description,
+      improvedText,
       "txt",
     );
     outputURLs["srt"] = await uploadOutputToBlob(
