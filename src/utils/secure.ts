@@ -8,27 +8,43 @@ const ENCRYPTION_KEY =
 
 // Function to encrypt the API key
 export function encrypt(text: string): string {
-  const iv = crypto.randomBytes(IV_LENGTH);
-  const cipher = crypto.createCipheriv(
-    ALGORITHM,
-    Buffer.from(ENCRYPTION_KEY, "hex"), // Specify 'hex' encoding here
-    iv,
-  );
-  let encrypted = cipher.update(text, "utf8", "hex");
-  encrypted += cipher.final("hex");
-  return iv.toString("hex") + ":" + encrypted;
+  try {
+    const iv = crypto.randomBytes(IV_LENGTH);
+    const cipher = crypto.createCipheriv(
+      ALGORITHM,
+      Buffer.from(ENCRYPTION_KEY, "hex"), // Specify 'hex' encoding here
+      iv,
+    );
+    let encrypted = cipher.update(text, "utf8", "hex");
+    encrypted += cipher.final("hex");
+    return iv.toString("hex") + ":" + encrypted;
+  } catch (error) {
+    console.error(
+      `Encrypt the text that ends with the ${text.substring(text.length - 10)} error`,
+      error,
+    );
+    return "";
+  }
 }
 
 export function decrypt(encryptedText: string): string {
-  const textParts = encryptedText.split(":");
-  const iv = Buffer.from(textParts.shift()!, "hex");
-  const encryptedTextBuffer = Buffer.from(textParts.join(""), "hex");
-  const decipher = crypto.createDecipheriv(
-    ALGORITHM,
-    Buffer.from(ENCRYPTION_KEY, "hex"), // Specify 'hex' encoding here
-    iv,
-  );
-  let decrypted = decipher.update(encryptedTextBuffer, undefined, "utf8");
-  decrypted += decipher.final("utf8");
-  return decrypted;
+  try {
+    const textParts = encryptedText.split(":");
+    const iv = Buffer.from(textParts.shift()!, "hex");
+    const encryptedTextBuffer = Buffer.from(textParts.join(""), "hex");
+    const decipher = crypto.createDecipheriv(
+      ALGORITHM,
+      Buffer.from(ENCRYPTION_KEY, "hex"), // Specify 'hex' encoding here
+      iv,
+    );
+    let decrypted = decipher.update(encryptedTextBuffer, undefined, "utf8");
+    decrypted += decipher.final("utf8");
+    return decrypted;
+  } catch (error) {
+    console.error(
+      `Decrypt the text that ends with the ${encryptedText.substring(encryptedText.length - 10)} error`,
+      error,
+    );
+    return "";
+  }
 }

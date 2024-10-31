@@ -98,7 +98,7 @@
   };
 </script>
 
-<div class="container max-w-full mx-auto p-6" style="font-family: Inter;">
+<div class="container max-w-full mx-auto p-6">
   <div class="items-center mb-10">
     <div class="relative w-full">
       <label class="input input-bordered flex items-center gap-2">

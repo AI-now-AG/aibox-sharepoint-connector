@@ -2,7 +2,7 @@
 import { useTranslations } from "$i18n/utils";
 import MenuItem from "./MenuItem.astro";
 import Category from "$data/models/category.model";
-import { TenantFeature } from "$data/models/tenant.model";
+import { FeatureName } from "$data/models/tenant.model";
 import { svgIcons } from "$assets/icons";
 import auth from "$auth/auth";
 
@@ -21,7 +21,7 @@ const menuItems = categories.map((category) => ({
 }));
 
 const restrictedMenus = [];
-if (auth.hasFeature(Astro.locals, TenantFeature.AudioToText)) {
+if (auth.hasFeature(Astro.locals, FeatureName.AudioToText)) {
   restrictedMenus.push({
     title: t("nav.audiotool"),
     icon: svgIcons.audio,
@@ -35,27 +35,26 @@ if (auth.hasFeature(Astro.locals, TenantFeature.AudioToText)) {
 }
 
 const settingsItems = [
-    {
-      title: t("nav.settings.prompts"),
-      path: "/prompt-library/prompts",
-    },
-    {
-      title: t("nav.settings.knowledge-base"),
-      path: "/prompt-library/knowledge-base",
-    },
-    {
-      title: t("nav.settings.categories"),
-      path: "/prompt-library/categories",
-    },
-  ];
+  {
+    title: t("nav.settings.prompts"),
+    path: "/prompt-library/prompts",
+  },
+  {
+    title: t("nav.settings.knowledge-base"),
+    path: "/prompt-library/knowledge-base",
+  },
+  {
+    title: t("nav.settings.categories"),
+    path: "/prompt-library/categories",
+  },
+];
 
-  // Add the Audio to Text menu item if the feature is enabled
-  if (auth.hasFeature(Astro.locals, TenantFeature.AudioToText)) {
-    settingsItems.push({
-      title: t("nav.audiotool.audio-to-text"),
-      path: "/settings/transcription",
-    });
-  }
+if (auth.hasFeature(Astro.locals, FeatureName.AudioToText)) {
+  settingsItems.push({
+    title: t("tenant.audio-to-text"),
+    path: "/settings/transcription",
+  });
+}
   
 if (auth.isAdmin(Astro.locals) || auth.isSuperAdmin(Astro.locals)) {
   restrictedMenus.push({
@@ -129,15 +128,19 @@ const modules = [
     <a href="/">
       <img
         src="/soki-somedia.png"
-        alt="Somedia Logo"
-        class="h-8 logo-somedia"
+        alt="somedia Logo"
+        class="h-8 hidden [[data-theme=somedia]_&]:block"
       />
-      <!-- light/dark mode doesn't work currently in the way themes are implemented. Currently only the light variant will be rendered -->
       <img
         src="/aibox-logo-text.svg"
-        class="logo-light h-8 w-auto dark:hidden"
+        alt="light logo"
+        class="logo-light h-8 w-auto hidden [[data-theme=light]_&]:block"
       />
-      <img src="/aibox-logo-text-dark.svg" class="logo-dark h-8 dark:block" />
+      <img
+        src="/aibox-logo-text-dark.svg"
+        alt="dark logo"
+        class="logo-dark h-8 hidden [[data-theme=dark]_&]:block"
+      />
     </a>
   </div>
   <div>
@@ -220,6 +223,7 @@ const modules = [
                     </ul>
                   )}
                 </details>
+                <div class="divider"></div>
               </li>
             ))
           }

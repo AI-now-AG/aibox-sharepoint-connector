@@ -38,7 +38,7 @@
   }
 </script>
 
-<div class="container max-w-full mx-auto p-6" style="font-family: Inter;">
+<div class="container max-w-full mx-auto p-6">
   <div class="max-w-full">
     <p class="mb-2">{t("settings.transcription.instructions-subtitle")}</p>
     <div class="mb-4">
