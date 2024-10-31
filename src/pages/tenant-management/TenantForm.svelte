@@ -9,7 +9,12 @@
   import TogglePasswordIcon from "./TogglePasswordIcon.svelte";
   import ConfirmUpdateDialog from "./ConfirmUpdateDialog.svelte";
   import AlertDialog from "./AlertDialog.svelte";
-  import { clickOutside } from "./actions.svelte.js";
+  import { clickOutside } from "$components/actions/ClickOutside.svelte";
+  import {
+    trimInput,
+    toLowerCase,
+    replaceSpecialChars,
+  } from "$components/actions/Input.svelte";
   import { loading, showLoading, hideLoading } from "$stores";
   import ColorPicker, { ChromeVariant } from "svelte-awesome-color-picker";
   import log from "$utils/log";
@@ -82,20 +87,15 @@
   }
 
   $: {
-    console.log("Tenant data", tenantData);
-    console.log("Audio to text checbox checked", isAudioToTextChecked);
-    console.log("Selected text provider", textSelectedProvider);
+    //console.log("Tenant data", tenantData);
+    //console.log("Audio to text checbox checked", isAudioToTextChecked);
+    //console.log("Selected text provider", textSelectedProvider);
   }
 
   let showPicker = false;
 
   function toggleColorPicker() {
     showPicker = !showPicker;
-  }
-
-  function handleClickOutside(event) {
-    console.log("Click outside!");
-    showPicker = false;
   }
 
   function togglePassword(_apiKeyProvider) {
@@ -313,6 +313,9 @@
           type="text"
           placeholder={t("tenant.tenants.tenant.identification-name")}
           class="input input-bordered w-full"
+          use:trimInput
+          use:toLowerCase
+          use:replaceSpecialChars
           bind:value={tenantData.org_name}
         />
       </div>
@@ -360,7 +363,9 @@
           <div
             class="relative flex"
             use:clickOutside
-            on:click_outside={handleClickOutside}
+            on:clickoutside={() => {
+              showPicker = false;
+            }}
           >
             <div>
               <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -459,6 +464,7 @@
             type="text"
             class="input input-bordered mt-2 w-full"
             placeholder={""}
+            use:trimInput
             bind:value={tenantData.azure_openai_instance_name}
           />
         </div>
@@ -483,6 +489,7 @@
             type="text"
             class="input input-bordered mt-2 w-full"
             placeholder={""}
+            use:trimInput
             bind:value={tenantData.azure_openai_whisper_model}
           />
         </div>
@@ -495,6 +502,7 @@
             type="text"
             class="input input-bordered mt-2 w-full"
             placeholder={""}
+            use:trimInput
             bind:value={tenantData.azure_openai_chat_model}
           />
         </div>
