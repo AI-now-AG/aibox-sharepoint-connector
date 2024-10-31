@@ -50,8 +50,14 @@
 
   // API providers
   const providerValues = [
-    { label: t("tenant.open-ai-model"), value: ApiKeyProvider.OpenAI },
-    { label: t("tenant.azure-open-ai-model"), value: ApiKeyProvider.AzureOpenAI },
+    {
+      label: t("tenant.open-ai-model"),
+      value: ApiKeyProvider.OpenAI,
+    },
+    {
+      label: t("tenant.azure-open-ai-model"),
+      value: ApiKeyProvider.AzureOpenAI,
+    },
   ];
   let textSelectedProvider = providerValues[0];
   let isAudioToTextChecked = false;
@@ -120,7 +126,7 @@
       return false;
     }
 
-    if (!openAIKey) {
+    if (textSelectedProvider.value == ApiKeyProvider.OpenAI && !openAIKey) {
       showAlert(t("tenant.validate-open-ai-key-message"));
       return false;
     }
@@ -290,7 +296,7 @@
     </div>
   </div>
 </div>
-<div class="px-8">
+<div class="px-8 mb-10">
   <div class="container w-full mx-auto p-6">
     <div class="flex flex-row space-x-4">
       <div class="flex-1 flex flex-col mb-4">
@@ -355,7 +361,7 @@
     </div>
 
     <div class="flex flex-row space-x-4">
-      <div class="w-2/4 flex flex-col">
+      <div class="flex-1 flex flex-col mb-4">
         <span class="mb-2 text-gray-400 font-medium text-sm"
           >{t("tenant.primary-color")}</span
         >
@@ -408,6 +414,7 @@
           </div>
         </div>
       </div>
+      <div class="flex-1 flex flex-col mb-4"></div>
     </div>
 
     <div class="w-full h-0.5 mt-4 mb-6 bg-gray-400/20" />
