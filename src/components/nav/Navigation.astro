@@ -2,7 +2,7 @@
 import { useTranslations } from "$i18n/utils";
 import MenuItem from "./MenuItem.astro";
 import Category from "$data/models/category.model";
-import { TenantFeature } from "$data/models/tenant.model";
+import { FeatureName } from "$data/models/tenant.model";
 import { svgIcons } from "$assets/icons";
 import auth from "$auth/auth";
 
@@ -20,7 +20,7 @@ const menuItems = categories.map((category) => ({
   })),
 }));
 
-if (auth.hasFeature(Astro.locals, TenantFeature.AudioToText)) {
+if (auth.hasFeature(Astro.locals, FeatureName.AudioToText)) {
   menuItems.push({
     title: t("nav.transcription"),
     icon: svgIcons.transcription,
@@ -43,41 +43,38 @@ const tenantMenuItem = auth.isSuperAdmin(Astro.locals)
   : undefined;
 
 // Settings area
-const settingItem =  {
-    title: t("nav.settings"),
-    icon: svgIcons.menuSettings,
-    items: [
-      {
-        title: t("nav.settings.prompts"),
-        path: "/prompt-library/prompts",
-      },
-      // {
-      //   title: t("nav.settings.instructions"),
-      //   path: "/prompt-library/instructions",
-      // },
-      {
-        title: t("nav.settings.knowledge-base"),
-        path: "/prompt-library/knowledge-base",
-      },
-      {
-        title: t("nav.settings.categories"),
-        path: "/prompt-library/categories",
-      },
-    ],
-  };
+const settingItem = {
+  title: t("nav.settings"),
+  icon: svgIcons.menuSettings,
+  items: [
+    {
+      title: t("nav.settings.prompts"),
+      path: "/prompt-library/prompts",
+    },
+    // {
+    //   title: t("nav.settings.instructions"),
+    //   path: "/prompt-library/instructions",
+    // },
+    {
+      title: t("nav.settings.knowledge-base"),
+      path: "/prompt-library/knowledge-base",
+    },
+    {
+      title: t("nav.settings.categories"),
+      path: "/prompt-library/categories",
+    },
+  ],
+};
 
 // Settings > Transcription
-if (auth.hasFeature(Astro.locals, TenantFeature.AudioToText)) {
-  settingItem['items'].push({
+if (auth.hasFeature(Astro.locals, FeatureName.AudioToText)) {
+  settingItem["items"].push({
     title: t("nav.settings.transcription"),
     path: "/settings/transcription",
   });
 }
 
-const modules = [
-  ...menuItems,
-  ...[settingItem],
-];
+const modules = [...menuItems, ...[settingItem]];
 ---
 
 <nav class="flex flex-col bg-base-100 w-80 min-h-screen gap-6">
@@ -85,15 +82,19 @@ const modules = [
     <a href="/">
       <img
         src="/soki-somedia.png"
-        alt="Somedia Logo"
-        class="h-8 logo-somedia"
+        alt="somedia Logo"
+        class="h-8 hidden [[data-theme=somedia]_&]:block"
       />
-      <!-- light/dark mode doesn't work currently in the way themes are implemented. Currently only the light variant will be rendered -->
       <img
         src="/aibox-logo-text.svg"
-        class="logo-light h-8 w-auto dark:hidden"
+        alt="light logo"
+        class="logo-light h-8 w-auto hidden [[data-theme=light]_&]:block"
       />
-      <img src="/aibox-logo-text-dark.svg" class="logo-dark h-8 dark:block" />
+      <img
+        src="/aibox-logo-text-dark.svg"
+        alt="dark logo"
+        class="logo-dark h-8 hidden [[data-theme=dark]_&]:block"
+      />
     </a>
   </div>
   <div>

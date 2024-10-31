@@ -38,7 +38,7 @@
   }
 </script>
 
-<div class="container max-w-full mx-auto p-6" style="font-family: Inter;">
+<div class="container max-w-full mx-auto p-6">
   <div class="max-w-full">
     <label
       class="input input-bordered flex items-center gap-2"
@@ -56,8 +56,10 @@
       />
     </label>
     <div>
-      <textarea class="mt-2 text-xs text-grey-500" style="width: 100%; color: red;" rows="3"
-        >{encryptedKey}</textarea
+      <textarea
+        class="mt-2 text-xs text-grey-500"
+        style="width: 100%; color: red;"
+        rows="3">{encryptedKey}</textarea
       >
     </div>
     <button
@@ -87,8 +89,10 @@
       />
     </label>
     <div>
-      <textarea class="mt-2 text-xs text-grey-500" style="width: 100%; color: green;" rows="3"
-        >{decryptedKey}</textarea
+      <textarea
+        class="mt-2 text-xs text-grey-500"
+        style="width: 100%; color: green;"
+        rows="3">{decryptedKey}</textarea
       >
     </div>
 
