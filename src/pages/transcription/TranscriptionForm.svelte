@@ -7,7 +7,7 @@
   import { tenant } from "$stores";
   import transcript from "$stores/transcript";
   import { addToast } from "$stores/toast";
-  import { TranscriptionForm } from "$utils/TranscribeRequest";
+  import type { TranscribeRequest } from "$stores/TranscribeRequest";
   const t = useTranslations();
 
   // general

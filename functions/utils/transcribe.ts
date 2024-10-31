@@ -142,19 +142,17 @@ export const improveTextQuality = async (
 ) => {
   const model = getAzureChatModel(transcribeParams);
   const finalInstructions = transcribeParams.instructionPlaintext || DEFAULT_INSTRUCTION;
-
-  const flatText = `input> ${text}\noutput> `;
-
-  const response = await model.invoke(
-    [new SystemMessage(finalInstructions), new HumanMessage(flatText)],
+  const response3 = await model.invoke(
+    [new SystemMessage(finalInstructions), new HumanMessage(text)],
     {}
   );
 
-  const correctedText = response.content
+  const parser = new StringOutputParser();
+  const correctedText = await parser.invoke(response3);
+  /*const correctedText = response3.content
     .toString()
     .split("\n")
-    .find((line) => line.startsWith("output>"))?.substring(8) || text;
-
+    .find((line) => line.startsWith("output>"))?.substring(8) || text;*/
   return correctedText;
 };
 
@@ -175,7 +173,7 @@ export async function transcribeUsingOpenAI(transcribeParams: TranscribeRequest)
     if (!audioBuffer) {
       throw new Error("Audio buffer is missing or undefined.");
     }
-    const audioFile = await toFile(audioBuffer, fileName);    
+    const audioFile = await toFile(audioBuffer, fileName);
 
     const response = await openaiClient.audio.transcriptions.create({
       file: audioFile,
