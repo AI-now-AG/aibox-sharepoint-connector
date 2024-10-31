@@ -9,9 +9,17 @@
   import TogglePasswordIcon from "./TogglePasswordIcon.svelte";
   import ConfirmUpdateDialog from "./ConfirmUpdateDialog.svelte";
   import AlertDialog from "./AlertDialog.svelte";
+  import { clickOutside } from "$components/actions/ClickOutside.svelte";
+  import {
+    trimInput,
+    toLowerCase,
+    replaceSpecialChars,
+  } from "$components/actions/Input.svelte";
   import { loading, showLoading, hideLoading } from "$stores";
   import ColorPicker, { ChromeVariant } from "svelte-awesome-color-picker";
   import log from "$utils/log";
+
+  const t = useTranslations();
 
   export let tenant;
   export let openAIKey = "";
@@ -21,43 +29,84 @@
   let alertModal;
   let alertMessage = "";
 
-  const API_KEY_PROVIDER = {
-    OpenAI: "openai",
-    AzureOpenAI: "azure_openai",
-  };
   const MODE = {
     Create: "create",
     Edit: "edit",
   };
-  const t = useTranslations();
 
+  const FeatureName = {
+    TextPrommpts: "text-prommpts",
+    AudioToText: "audio-to-text",
+  };
+
+  const ApiKeyProvider = {
+    OpenAI: "openai",
+    AzureOpenAI: "azure_openai",
+  };
+
+  // mode
   let mode = tenant == undefined ? MODE.Create : MODE.Edit;
   let tenantData = tenant == undefined ? {} : tenant;
 
+  // API providers
+  const providerValues = [
+    {
+      label: t("tenant.open-ai-model"),
+      value: ApiKeyProvider.OpenAI,
+    },
+    {
+      label: t("tenant.azure-open-ai-model"),
+      value: ApiKeyProvider.AzureOpenAI,
+    },
+  ];
+  let textSelectedProvider = providerValues[0];
+  let isAudioToTextChecked = false;
+  if (tenantData && tenantData?.included_features?.length) {
+    const findTextProvider = tenantData.included_features.find(
+      (item) => item.name == FeatureName.TextPrommpts,
+    );
+    if (findTextProvider) {
+      textSelectedProvider = providerValues.find(
+        (item) => item.value == findTextProvider.provider,
+      );
+    }
+
+    isAudioToTextChecked = tenantData.included_features.some(
+      (item) => item.name == FeatureName.AudioToText,
+    );
+  }
+
+  // color picker
   let hex = tenantData?.primary_color || "#491EFF";
   let color = hex;
   let selecteColor = hex;
 
+  // set default values
   if (!tenantData.default_language) {
     tenantData.default_language = "de";
   }
-
   if (!tenantData.theme) {
     tenantData.theme = "dark";
   }
-
   if (!tenantData.primary_color) {
     tenantData.primary_color = selecteColor;
   }
 
+  $: {
+    //console.log("Tenant data", tenantData);
+    //console.log("Audio to text checbox checked", isAudioToTextChecked);
+    //console.log("Selected text provider", textSelectedProvider);
+  }
+
   let showPicker = false;
+
   function toggleColorPicker() {
     showPicker = !showPicker;
   }
 
   function togglePassword(_apiKeyProvider) {
     let passwordField = document.getElementById("open_ai_key");
-    if (_apiKeyProvider == API_KEY_PROVIDER.AzureOpenAI) {
+    if (_apiKeyProvider == ApiKeyProvider.AzureOpenAI) {
       passwordField = document.getElementById("azure_open_ai_key");
     }
     if (passwordField.type === "password") {
@@ -65,10 +114,6 @@
     } else {
       passwordField.type = "password";
     }
-  }
-
-  function hasFeatureAudioToText() {
-    return tenantData?.included_features?.indexOf("audio-to-text") != -1;
   }
 
   function validateForm() {
@@ -81,12 +126,12 @@
       return false;
     }
 
-    if (!openAIKey) {
+    if (textSelectedProvider.value == ApiKeyProvider.OpenAI && !openAIKey) {
       showAlert(t("tenant.validate-open-ai-key-message"));
       return false;
     }
 
-    if (hasFeatureAudioToText() && !azureOpenAIKey) {
+    if (isAudioToTextChecked && !azureOpenAIKey) {
       showAlert(t("tenant.validate-azure-open-ai-key-message"));
       return false;
     }
@@ -99,7 +144,7 @@
         return false;
       }
       if (!tenantData?.azure_openai_endpoint) {
-        showAlert(t("tenant.validate-azure-open-ai-enpoint-empty-message"));
+        showAlert(t("tenant.validate-azure-open-ai-endpoint-empty-message"));
         return false;
       }
       if (!tenantData?.azure_openai_whisper_model) {
@@ -133,8 +178,22 @@
         log.d(data, "CREATE - encryptApiKeys data");
         const { openai_api_key, azure_openai_api_key } = data;
 
+        // API Keys
         tenantData.openai_api_key = openai_api_key;
         tenantData.azure_openai_api_key = azure_openai_api_key;
+
+        // update providers
+        tenantData.included_features = [];
+        tenantData.included_features.push({
+          name: FeatureName.TextPrommpts,
+          provider: textSelectedProvider.value,
+        });
+        if (isAudioToTextChecked) {
+          tenantData.included_features.push({
+            name: FeatureName.AudioToText,
+            provider: ApiKeyProvider.AzureOpenAI,
+          });
+        }
         log.d(tenantData, "CREATE - tenantData");
 
         const { error } = await actions.tenant.create(tenantData);
@@ -170,12 +229,27 @@
         log.d(data, "UPDATE - encryptApiKeys data");
         const { openai_api_key, azure_openai_api_key } = data;
 
+        // API Keys
         tenantData.openai_api_key = openai_api_key;
         tenantData.azure_openai_api_key = azure_openai_api_key;
+
+        // update providers
+        tenantData.included_features = [];
+        tenantData.included_features.push({
+          name: FeatureName.TextPrommpts,
+          provider: textSelectedProvider.value,
+        });
+        if (isAudioToTextChecked) {
+          tenantData.included_features.push({
+            name: FeatureName.AudioToText,
+            provider: ApiKeyProvider.AzureOpenAI,
+          });
+        }
         log.d(tenantData, "UPDATE - tenantData");
 
         const { error } = await actions.tenant.update(tenantData);
         hideLoading();
+
         if (error) {
           showAlert(error);
         } else {
@@ -197,9 +271,9 @@
 </script>
 
 <div
-  class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14"
+  class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14 sticky bg-base-200 top-0 z-10"
 >
-  <div class="flex items-center pt-8">
+  <div class="flex items-center pt-5 pb-2">
     <button class="mr-4" onclick="window.history.back();">
       {@html svgIcons.back}
     </button>
@@ -207,24 +281,23 @@
       {mode == MODE.Create ? t("tenant.tenants.add-tenant") : tenantData.name}
     </h1>
 
-    <div class="flex space-x-2 fixed right-14 top-14 pt-2">
+    <div class="flex space-x-2 ml-auto">
       <button
-        class="mt-2 lg:mt-8 btn btn-primary"
+        class="btn btn-primary"
         on:click={() => {
-          showPicker = false;
           mode == MODE.Edit ? confirmUpdateModal.show() : createTenant();
         }}
       >
         {t("common.save")}
       </button>
-      <button class="mt-2 lg:mt-8 btn" onclick="window.history.back();">
+      <button class="btn" onclick="window.history.back();">
         {t("common.cancel")}
       </button>
     </div>
   </div>
 </div>
-<div class="px-8">
-  <div class="container w-full mx-auto p-6" style="font-family: Inter;">
+<div class="px-8 mb-10">
+  <div class="container w-full mx-auto p-6">
     <div class="flex flex-row space-x-4">
       <div class="flex-1 flex flex-col mb-4">
         <span class="mb-2 text-gray-400 font-medium text-sm"
@@ -232,15 +305,9 @@
         >
         <input
           type="text"
-          value={tenantData?.name || ""}
           placeholder={t("tenant.tenants.tenant.display-name")}
           class="input input-bordered w-full"
-          on:change={(event) => {
-            tenantData.name = event.target.value?.trim();
-          }}
-          on:focus={() => {
-            showPicker = false;
-          }}
+          bind:value={tenantData.name}
         />
       </div>
 
@@ -250,15 +317,12 @@
         >
         <input
           type="text"
-          value={tenantData?.org_name || ""}
           placeholder={t("tenant.tenants.tenant.identification-name")}
           class="input input-bordered w-full"
-          on:change={(event) => {
-            tenantData.org_name = event.target.value?.trim();
-          }}
-          on:focus={() => {
-            showPicker = false;
-          }}
+          use:trimInput
+          use:toLowerCase
+          use:replaceSpecialChars
+          bind:value={tenantData.org_name}
         />
       </div>
     </div>
@@ -270,20 +334,11 @@
         >
         <select
           class="select select-bordered w-full"
-          on:change={(event) => {
-            tenantData.default_language = event.target.value;
-          }}
-          on:focus={() => {
-            showPicker = false;
-          }}
+          bind:value={tenantData.default_language}
         >
           <option disabled>{t("tenant.language")}</option>
-          <option value="de" selected={tenantData?.default_language == "de"}
-            >{t("tenant.german-language")}</option
-          >
-          <option value="en" selected={tenantData?.default_language == "en"}
-            >{t("tenant.english-language")}</option
-          >
+          <option value="de">{t("tenant.german-language")}</option>
+          <option value="en">{t("tenant.english-language")}</option>
         </select>
       </div>
 
@@ -293,40 +348,31 @@
         >
         <select
           class="select select-bordered w-full"
-          on:change={(event) => {
-            tenantData.theme = event.target.value;
-          }}
-          on:focus={() => {
-            showPicker = false;
-          }}
+          bind:value={tenantData.theme}
         >
           <option disabled>{t("tenant.theme")}</option>
-          <option value="light" selected={tenantData?.theme == "light"}
-            >Light</option
-          >
-          <option value="dark" selected={tenantData?.theme == "dark"}
-            >Dark</option
-          >
-          <option value="somedia" selected={tenantData?.theme == "somedia"}
-            >Somedia</option
-          >
-          <option value="luxury" selected={tenantData?.theme == "luxury"}
-            >Luxury</option
-          >
-          <option value="lemonade" selected={tenantData?.theme == "lemonade"}
-            >Lemonade</option
-          >
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+          <option value="somedia">Somedia</option>
+          <option value="luxury">Luxury</option>
+          <option value="lemonade">Lemonade</option>
         </select>
       </div>
     </div>
 
     <div class="flex flex-row space-x-4">
-      <div class="w-2/4 flex flex-col">
+      <div class="flex-1 flex flex-col mb-4">
         <span class="mb-2 text-gray-400 font-medium text-sm"
           >{t("tenant.primary-color")}</span
         >
         <div class="w-full">
-          <div class="relative flex">
+          <div
+            class="relative flex"
+            use:clickOutside
+            on:clickoutside={() => {
+              showPicker = false;
+            }}
+          >
             <div>
               <!-- svelte-ignore a11y-click-events-have-key-events -->
               <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -368,6 +414,7 @@
           </div>
         </div>
       </div>
+      <div class="flex-1 flex flex-col mb-4"></div>
     </div>
 
     <div class="w-full h-0.5 mt-4 mb-6 bg-gray-400/20" />
@@ -387,16 +434,10 @@
               type="password"
               class="grow"
               placeholder={t("tenant.api-key")}
-              value={openAIKey}
-              on:change={(event) => {
-                openAIKey = event?.target?.value?.trim();
-              }}
-              on:focus={() => {
-                showPicker = false;
-              }}
+              bind:value={openAIKey}
             />
             <TogglePasswordIcon
-              on:change={() => togglePassword(API_KEY_PROVIDER.OpenAI)}
+              on:change={() => togglePassword(ApiKeyProvider.OpenAI)}
             />
           </label>
         </div>
@@ -414,16 +455,10 @@
               type="password"
               class="grow"
               placeholder={t("tenant.api-key")}
-              value={azureOpenAIKey}
-              on:change={(event) => {
-                azureOpenAIKey = event?.target?.value?.trim();
-              }}
-              on:focus={() => {
-                showPicker = false;
-              }}
+              bind:value={azureOpenAIKey}
             />
             <TogglePasswordIcon
-              on:change={() => togglePassword(API_KEY_PROVIDER.AzureOpenAI)}
+              on:change={() => togglePassword(ApiKeyProvider.AzureOpenAI)}
             />
           </label>
         </div>
@@ -436,14 +471,8 @@
             type="text"
             class="input input-bordered mt-2 w-full"
             placeholder={""}
-            value={tenantData?.azure_openai_instance_name || ""}
-            on:change={(event) => {
-              tenantData.azure_openai_instance_name =
-                event?.target?.value?.trim();
-            }}
-            on:focus={() => {
-              showPicker = false;
-            }}
+            use:trimInput
+            bind:value={tenantData.azure_openai_instance_name}
           />
         </div>
 
@@ -455,13 +484,7 @@
             type="text"
             class="input input-bordered mt-2 w-full"
             placeholder={""}
-            value={tenantData?.azure_openai_endpoint || ""}
-            on:change={(event) => {
-              tenantData.azure_openai_endpoint = event?.target?.value?.trim();
-            }}
-            on:focus={() => {
-              showPicker = false;
-            }}
+            bind:value={tenantData.azure_openai_endpoint}
           />
         </div>
 
@@ -473,14 +496,8 @@
             type="text"
             class="input input-bordered mt-2 w-full"
             placeholder={""}
-            value={tenantData?.azure_openai_whisper_model || ""}
-            on:change={(event) => {
-              tenantData.azure_openai_whisper_model =
-                event?.target?.value?.trim();
-            }}
-            on:focus={() => {
-              showPicker = false;
-            }}
+            use:trimInput
+            bind:value={tenantData.azure_openai_whisper_model}
           />
         </div>
 
@@ -492,13 +509,8 @@
             type="text"
             class="input input-bordered mt-2 w-full"
             placeholder={""}
-            value={tenantData?.azure_openai_chat_model || ""}
-            on:change={(event) => {
-              tenantData.azure_openai_chat_model = event?.target?.value?.trim();
-            }}
-            on:focus={() => {
-              showPicker = false;
-            }}
+            use:trimInput
+            bind:value={tenantData.azure_openai_chat_model}
           />
         </div>
       </div>
@@ -508,39 +520,55 @@
     <div class="w-full h-0.5 mt-4 mb-6 bg-gray-400/20" />
     <div class="mb-3"><b>{t("tenant.included-featured")}</b></div>
 
-    <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
-    <div
-      class="w-full bg-white rounded px-4 py-2 flex items-center"
-      on:click={() => {
-        showPicker = false;
-      }}
-    >
-      <input
-        id="feature-audio-to-text"
-        type="checkbox"
-        checked={tenantData?.included_features != undefined &&
-          hasFeatureAudioToText()}
-        class="checkbox checkbox-primary"
-        value="audio-to-text"
-        on:change={(event) => {
-          const feature = event.target.value;
-          const indexToRemove = (tenantData?.included_features || []).indexOf(
-            feature,
-          );
-          let newIncludedFeatures = tenantData?.included_features || [];
-          if (indexToRemove !== -1) {
-            newIncludedFeatures.splice(indexToRemove, 1);
-          } else {
-            newIncludedFeatures.push(feature);
-          }
-          tenantData.included_features = newIncludedFeatures;
-        }}
-      />
-      <label class="label cursor-pointer ml-2" for="feature-audio-to-text">
-        {@html svgIcons.audioToText}
-        <span class="label-text ml-2">{t("tenant.audio-to-text")}</span>
-      </label>
+    <div class="w-full bg-white rounded px-4 py-2">
+      <div class="flex items-center">
+        <input
+          id="feature-text-prompt"
+          type="checkbox"
+          checked={true}
+          class="checkbox checkbox-primary"
+          value="text-prompt"
+          disabled
+        />
+        <label class="label cursor-pointer ml-2" for="feature-text-prompt">
+          <span class="label-text">{t("tenant.text-prompt")}</span>
+        </label>
+      </div>
+      {#each providerValues as option}
+        <div class="flex items-center mt-2 px-4">
+          <input
+            type="radio"
+            id="radio-text-{option.value}"
+            name="text-prompt-provider"
+            class="radio radio-primary"
+            value={option}
+            checked={true}
+            bind:group={textSelectedProvider}
+          />
+          <label
+            for="radio-text-{option.value}"
+            class="ml-2 font-medium text-sm">{option.label}</label
+          >
+        </div>
+      {/each}
+    </div>
+
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <div class="w-full bg-white rounded px-4 py-2 mt-4">
+      <div class="flex items-center">
+        <input
+          id="feature-audio-to-text"
+          type="checkbox"
+          class="checkbox checkbox-primary"
+          value="audio-to-text"
+          bind:checked={isAudioToTextChecked}
+        />
+        <label class="label cursor-pointer ml-2" for="feature-audio-to-text">
+          {@html svgIcons.audioToText}
+          <span class="label-text ml-2">{t("tenant.audio-to-text")}</span>
+        </label>
+      </div>
     </div>
 
     <ConfirmUpdateDialog

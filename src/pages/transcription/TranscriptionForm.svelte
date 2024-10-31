@@ -100,6 +100,19 @@
     return megabytes.toFixed(1);
   }
 
+  function formatFilename(name: string) {
+    // replace special characters
+    let str = name.replace(/[&\/\#\=\`!,+()$~%.'":@^*?<>{}]/g, "");
+
+    // replace whitespaces
+    str = str.replace(/\s/g, "-");
+
+    // replace multiple consecutive hyphens with one
+    str = str.replace(/-+/g, "-");
+
+    return str;
+  }
+
   async function getSASToken(fileNameWithoutExtension: string) {
     const response: any = await fetch("/.netlify/functions/getSASToken", {
       method: "POST",
@@ -164,7 +177,7 @@
       let fileNameWithoutExtension = audioFile.name || "";
       const splitedFileName = fileNameWithoutExtension.split(".");
       if (splitedFileName && splitedFileName?.[0]) {
-        fileNameWithoutExtension = splitedFileName?.[0];
+        fileNameWithoutExtension = formatFilename(splitedFileName?.[0]);
       }
       console.log("fileNameWithoutExtension", fileNameWithoutExtension);
       const { uploadUrl, outputFileName } = await getSASToken(

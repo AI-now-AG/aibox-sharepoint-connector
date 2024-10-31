@@ -3,9 +3,9 @@ import { ObjectId } from "mongodb";
 import { z } from "zod";
 import tenantModel, {
   TenantTheme,
-  TenantFeature,
   ApiKeyProvider,
   TenantFilterParamsSchema,
+  IncludedFeaturesSchema,
   type Tenant,
 } from "$data/models/tenant.model";
 import { transformRawData } from "$utils/transformRawData";
@@ -29,7 +29,7 @@ const TenantInputParamsSchema = z.object({
   azure_openai_instance_name: z.string().optional(),
   azure_openai_whisper_model: z.string().optional(),
   azure_openai_chat_model: z.string().optional(),
-  included_features: z.array(z.nativeEnum(TenantFeature)).optional(),
+  included_features: z.array(IncludedFeaturesSchema),
 });
 
 const TenanKeyEncryptSchema = z.object({
@@ -130,17 +130,14 @@ export const tenant = {
   encryptApiKeys: defineAction({
     input: TenanKeyEncryptSchema,
     handler: async (input) => {
-      try {
-        const { openai_api_key, azure_openai_api_key } = input;
-        if (openai_api_key) {
-          input.openai_api_key = encrypt(openai_api_key);
-        }
-        if (azure_openai_api_key) {
-          input.azure_openai_api_key = encrypt(azure_openai_api_key);
-        }
-      } catch (error) {
-        log.e(error, "Encrypt API Keys before saving error");
+      const { openai_api_key, azure_openai_api_key } = input;
+      if (openai_api_key) {
+        input.openai_api_key = encrypt(openai_api_key);
       }
+      if (azure_openai_api_key) {
+        input.azure_openai_api_key = encrypt(azure_openai_api_key);
+      }
+
       return input;
     },
   }),
@@ -148,17 +145,14 @@ export const tenant = {
   decryptApiKeys: defineAction({
     input: TenanKeyEncryptSchema,
     handler: async (input) => {
-      try {
-        const { openai_api_key, azure_openai_api_key } = input;
-        if (openai_api_key) {
-          input.openai_api_key = decrypt(openai_api_key);
-        }
-        if (azure_openai_api_key) {
-          input.azure_openai_api_key = decrypt(azure_openai_api_key);
-        }
-      } catch (error) {
-        log.e(error, "Decrypt API Keys before saving error");
+      const { openai_api_key, azure_openai_api_key } = input;
+      if (openai_api_key) {
+        input.openai_api_key = decrypt(openai_api_key);
       }
+      if (azure_openai_api_key) {
+        input.azure_openai_api_key = decrypt(azure_openai_api_key);
+      }
+
       return input;
     },
   }),

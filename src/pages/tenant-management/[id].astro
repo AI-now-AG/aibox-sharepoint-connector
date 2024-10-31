@@ -10,35 +10,28 @@ export interface Props {
 }
 
 const { id } = Astro.params;
-console.log('id', id);
+console.log("id", id);
 if (id === undefined) {
   throw new Error("Id is required");
 }
 
 const tenant = await tenantModel.get(id);
 if (tenant === null) {
-  console.error('Tenant not found');
-  return Astro.redirect('/404');
+  console.error("Tenant not found");
+  return Astro.redirect("/404");
 }
 
 const data = transformRawData(tenant);
 const { openai_api_key, azure_openai_api_key } = data || {};
-let openAIKey = openai_api_key;
-let azureOpenAIKey = azure_openai_api_key;
-try {
-  if (openai_api_key) {
-    openAIKey = decrypt(openai_api_key);
-  }
-} catch (error) {
-  console.log("Decrypt openAIKey exception", error);
+let openAIKey = "";
+let azureOpenAIKey = "";
+
+if (openai_api_key) {
+  openAIKey = decrypt(openai_api_key);
 }
 
-try {
-  if (azure_openai_api_key) {
-    azureOpenAIKey = decrypt(azure_openai_api_key);
-  }
-} catch (error) {
-  console.log("Decrypt azureOpenAIKey exception", error);
+if (azure_openai_api_key) {
+  azureOpenAIKey = decrypt(azure_openai_api_key);
 }
 ---
 
