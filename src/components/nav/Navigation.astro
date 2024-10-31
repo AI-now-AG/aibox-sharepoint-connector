@@ -34,35 +34,41 @@ if (auth.hasFeature(Astro.locals, TenantFeature.AudioToText)) {
   });
 }
 
+const settingsItems = [
+    {
+      title: t("nav.settings.prompts"),
+      path: "/prompt-library/prompts",
+    },
+    {
+      title: t("nav.settings.knowledge-base"),
+      path: "/prompt-library/knowledge-base",
+    },
+    {
+      title: t("nav.settings.categories"),
+      path: "/prompt-library/categories",
+    },
+  ];
+
+  // Add the Audio to Text menu item if the feature is enabled
+  if (auth.hasFeature(Astro.locals, TenantFeature.AudioToText)) {
+    settingsItems.push({
+      title: t("nav.audiotool.audio-to-text"),
+      path: "/settings/transcription",
+    });
+  }
+  
 if (auth.isAdmin(Astro.locals) || auth.isSuperAdmin(Astro.locals)) {
   restrictedMenus.push({
     title: t("nav.settings"),
-    icon: svgIcons.admin,
-    items: [
-      {
-        title: t("nav.settings.prompts"),
-        path: "/prompt-library/prompts",
-      },
-      // {
-      //   title: t("nav.settings.instructions"),
-      //   path: "/prompt-library/instructions",
-      // },
-      {
-        title: t("nav.settings.knowledge-base"),
-        path: "/prompt-library/knowledge-base",
-      },
-      {
-        title: t("nav.settings.categories"),
-        path: "/prompt-library/categories",
-      },
-    ],
-  })
+    icon: svgIcons.menuSettings,
+    items: settingsItems,
+  });
 }
 
 if (auth.isSuperAdmin(Astro.locals)) {
   restrictedMenus.push({
     title: t("nav.settings.admin"),
-    icon: svgIcons.tenantManagement,
+    icon: svgIcons.menuTenant,
     items: [
       {
         title: t("nav.tenant-management"),
@@ -115,7 +121,6 @@ const modules = [
     ],
   },*/
   ...menuItems,
-  
 ];
 ---
 

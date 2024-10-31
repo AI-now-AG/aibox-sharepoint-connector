@@ -1,0 +1,27 @@
+---
+import Layout from "$layouts/Layout.astro";
+import { useTranslations } from "$i18n/utils";
+import SettingForm from "./SettingForm.svelte";
+
+const t = useTranslations();
+
+const instructions = Astro.locals.tenant?.instructions || "";
+const transcriptionSubtitle = instructions ? instructions.transcription_subtitle : "";
+const transcriptionPlaintext = instructions ? instructions.transcription_plaintext : "";
+---
+
+<Layout>
+  <div
+    class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14"
+  >
+    <h1 class="pt-2 lg:pt-8 text-4xl font-bold">
+      {t("nav.audiotool.audio-to-text")}
+    </h1>
+  </div>
+  <div class="px-8">
+    <SettingForm 
+      instructionSubtitle={transcriptionSubtitle} 
+      instructionPlaintext={transcriptionPlaintext} 
+      client:load />
+  </div>
+</Layout>

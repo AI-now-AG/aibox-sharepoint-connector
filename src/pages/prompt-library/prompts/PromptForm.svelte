@@ -78,7 +78,7 @@
     const instructionData = (await instructionResponse.json()) as Instruction[];
     if (instructionData) {
       if (prompt) {
-        prompt.instructions?.forEach((instructionObj) => {
+        prompt.instructions?.forEach((instructionObj: any) => {
           const instruction = instructionData.find(
             (e) => e._id == instructionObj.toString(),
           );
@@ -97,7 +97,7 @@
       (await knowledgeBaseResponse.json()) as KnowledgeBase[];
     if (knowledgeBaseData) {
       if (prompt) {
-        prompt.knowledgebase?.forEach((kbObj) => {
+        prompt.knowledgebase?.forEach((kbObj: any) => {
           const kb = knowledgeBaseData.find((e) => e._id == kbObj.toString());
           if (kb) {
             selectedKnowledgeBases.push(kb);

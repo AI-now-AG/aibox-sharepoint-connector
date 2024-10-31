@@ -8,7 +8,7 @@ import tenantModel, {
   TenantFilterParamsSchema,
   type Tenant,
 } from "$data/models/tenant.model";
-import { transformDataToArray } from "$utils/transformDataToArray";
+import { transformRawData } from "$utils/transformRawData";
 import organizationsManagement, {
   type PostOrganizationsRequest,
   type PatchOrganizationsByIdRequest,
@@ -25,6 +25,10 @@ const TenantInputParamsSchema = z.object({
   api_key_provider: z.nativeEnum(ApiKeyProvider).optional(),
   openai_api_key: z.string().optional(),
   azure_openai_api_key: z.string().optional(),
+  azure_openai_endpoint: z.string().optional(),
+  azure_openai_instance_name: z.string().optional(),
+  azure_openai_whisper_model: z.string().optional(),
+  azure_openai_chat_model: z.string().optional(),
   included_features: z.array(z.nativeEnum(TenantFeature)).optional(),
 });
 
@@ -41,10 +45,8 @@ export const tenant = {
   get: defineAction({
     input: TenantInputIdentifierSchema,
     handler: async (input) => {
-      console.log("8.1. input", input);
       const data = await tenantModel.get(input._id);
-      console.log("8.2. data", data);
-      return transformDataToArray(data);
+      return transformRawData(data);
     },
   }),
 
@@ -52,7 +54,7 @@ export const tenant = {
     input: TenantFilterParamsSchema,
     handler: async (input) => {
       const data = await tenantModel.list(input);
-      return transformDataToArray(data);
+      return transformRawData(data);
     },
   }),
 
@@ -81,7 +83,7 @@ export const tenant = {
       };
       const insertResult = await tenantModel.create(tenant);
 
-      return transformDataToArray(insertResult);
+      return transformRawData(insertResult);
     },
   }),
 
@@ -105,7 +107,7 @@ export const tenant = {
         bodyParameters,
       );
 
-      return transformDataToArray(updatedDocument);
+      return transformRawData(updatedDocument);
     },
   }),
 
@@ -113,7 +115,7 @@ export const tenant = {
     input: TenantInputIdentifierSchema,
     handler: async (input) => {
       const updateResult = await tenantModel.active(input._id);
-      return transformDataToArray(updateResult);
+      return transformRawData(updateResult);
     },
   }),
 
@@ -121,7 +123,7 @@ export const tenant = {
     input: TenantInputIdentifierSchema,
     handler: async (input) => {
       const updateResult = await tenantModel.archive(input._id);
-      return transformDataToArray(updateResult);
+      return transformRawData(updateResult);
     },
   }),
 
@@ -161,4 +163,3 @@ export const tenant = {
     },
   }),
 };
-

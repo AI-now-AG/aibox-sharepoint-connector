@@ -1,7 +1,8 @@
 import { BlobServiceClient } from "@azure/storage-blob";
 import { AzureChatOpenAI, toFile } from "@langchain/openai";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
-import { AzureOpenAI } from "openai";
+import { AzureOpenAI, RateLimitError } from "openai";
+
 import {
   groupLines,
   formatSRT,
@@ -11,9 +12,11 @@ import {
 } from "./srt";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 
-const MODEL_NAME = "whisper-1";
+const DEFAULT_WHISPER_MODEL_NAME = "whisper-1";
+const DEFAULT_API_VERSION = "2024-08-01-preview";
+const DEFAULT_CHAT_MODE_NAME = "gpt-4o";
 
-const instructions = new SystemMessage(`
+const DEFAULT_INSTRUCTION = `
   You are a Swiss German language expert. Your task is to review German subtitles and identify potential misinterpretations of Swiss German words, particularly place names, with a focus on the canton Graubünden while fixing missing punctuation. You must correct these while maintaining the original format as much as possible.
   Important guidelines:
   
@@ -70,14 +73,19 @@ const instructions = new SystemMessage(`
   
   input> die Ergebnisse präsentiert
   output> die Ergebnisse präsentiert.
-`);
+`;
 
-function getClient(azureOpenAIApiKey: string) {
-  const endpoint = process.env.AZURE_ENDPOINT;
+function getClient(requestParams: any) {
+  const { azureOpenAIApiKey, azureOpenAIEndpoint, azureOpenAIWhisperModel } =
+    requestParams;
+
+  const endpoint = azureOpenAIEndpoint || process.env.AZURE_ENDPOINT;
   const apiVersion =
-    process.env.AZURE_OPENAI_API_VERSION || "2024-08-01-preview";
+    process.env.AZURE_OPENAI_API_VERSION || DEFAULT_API_VERSION;
   const deploymentName =
-    process.env.AZURE_OPENAI_DEPLOYMENT_NAME || "whisper-1";
+    azureOpenAIWhisperModel ||
+    process.env.AZURE_OPENAI_DEPLOYMENT_NAME ||
+    DEFAULT_WHISPER_MODEL_NAME;
 
   return new AzureOpenAI({
     endpoint,
@@ -87,24 +95,29 @@ function getClient(azureOpenAIApiKey: string) {
   });
 }
 
-function getAzureChatModel(azureOpenAIApiKey: string) {
+function getAzureChatModel(requestParams: any) {
+  const { azureOpenAIApiKey, azureOpenAIInstanceName, azureOpenAIChatModel } =
+    requestParams;
+
   const azureChatConfig = {
     azureOpenAIApiKey,
-    azureOpenAIApiInstanceName: process.env.AZURE_OPENAI_API_INSTANCE_NAME,
+    azureOpenAIApiInstanceName:
+      azureOpenAIInstanceName || process.env.AZURE_OPENAI_API_INSTANCE_NAME,
     azureOpenAIApiDeploymentName:
-      process.env.AZURE_CHAT_OPENAI_DEPLOYMENT_NAME || "gpt-4o",
+      azureOpenAIChatModel ||
+      process.env.AZURE_CHAT_OPENAI_DEPLOYMENT_NAME ||
+      DEFAULT_CHAT_MODE_NAME,
     azureOpenAIApiVersion:
-      process.env.AZURE_OPENAI_API_VERSION || "2024-08-01-preview",
+      process.env.AZURE_OPENAI_API_VERSION || DEFAULT_API_VERSION,
   };
 
   return new AzureChatOpenAI(azureChatConfig);
 }
 
-export const improveTextQuality = async (
-  azureOpenAIApiKey: string,
-  data: Entry[],
-) => {
-  const model = getAzureChatModel(azureOpenAIApiKey);
+export const improveTextQuality = async (requestParams: any, data: Entry[]) => {
+  const { instructionSubtitle } = requestParams;
+
+  const model = getAzureChatModel(requestParams);
   const flat = data
     .map(
       (entry) => `input> ${entry.text}
@@ -113,8 +126,10 @@ output>
     )
     .join("\n");
 
+  const finalInstructions = instructionSubtitle || DEFAULT_INSTRUCTION;
+  console.log("finalInstructions", finalInstructions);
   const response = await model.invoke(
-    [instructions, new HumanMessage(flat)],
+    [new SystemMessage(finalInstructions), new HumanMessage(flat)],
     {},
   );
 
@@ -131,25 +146,30 @@ output>
   return out;
 };
 
-export async function transcribeUsingOpenAI(
-  audioBuffer: Buffer,
-  fileName: string,
-  uploadURL: string,
-  azureOpenAIApiKey: string,
-): Promise<string> {
+export async function transcribeUsingOpenAI(requestParams: any): Promise<{
+  success: boolean;
+  data: {
+    text: string;
+    urls: {
+      [key: string]: string;
+    };
+  } | null;
+  error: string | null;
+}> {
   try {
-    const openaiClient = getClient(azureOpenAIApiKey);
+    const { audioBuffer, fileName, uploadUrl } = requestParams;
+
+    const openaiClient = getClient(requestParams);
     const audioFile = await toFile(audioBuffer, fileName);
 
     const response = await openaiClient.audio.transcriptions.create({
       file: audioFile,
-      model: MODEL_NAME,
+      model: DEFAULT_WHISPER_MODEL_NAME,
       temperature: 0,
       timestamp_granularities: ["word"],
       response_format: "verbose_json",
-      prompt:
-        'Eine übliche Ausdrucksweise ist "ob ORTSNAME", bspw. "ob Schwanden". das ob bedeutet in diesem Fall "oberhalb von"',
     });
+
     const transcriptionText = response.text;
     const parser = new StringOutputParser();
     const description = await parser.invoke(transcriptionText);
@@ -158,13 +178,10 @@ export async function transcribeUsingOpenAI(
       (response as unknown as { words: InputEntry[] }).words,
     );
 
-    const improvedSrtData = await improveTextQuality(
-      azureOpenAIApiKey,
-      srtData,
-    );
+    const improvedSrtData = await improveTextQuality(requestParams, srtData);
     const grouped = groupLines(improvedSrtData);
     const result = formatSRT(grouped);
-    const fileNameWithExtension = uploadURL.split("/").pop()!.split("?")[0];
+    const fileNameWithExtension = uploadUrl.split("/").pop()!.split("?")[0];
     const fileNameWithoutExtension = fileNameWithExtension
       .split(".")
       .slice(0, -1)
@@ -180,11 +197,26 @@ export async function transcribeUsingOpenAI(
       result,
       "srt",
     );
-
-    return response.text;
+    return {
+      success: true,
+      data: { text: response.text, urls: outputURLs },
+      error: null,
+    };
   } catch (error) {
     console.error("Error during transcription::", error);
-    throw new Error("Transcription failed.");
+    let errorMessage = "Transcription failed.";
+    if (error instanceof RateLimitError) {
+      errorMessage =
+        "Rate limit exceeded. Please try again later or upgrade your plan.";
+    } else if (
+      typeof error === "object" &&
+      error !== null &&
+      "message" in error
+    ) {
+      errorMessage = error.message as string;
+    }
+
+    return { success: false, data: null, error: errorMessage };
   }
 }
 
