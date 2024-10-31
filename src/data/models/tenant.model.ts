@@ -10,7 +10,7 @@ export enum TenantTheme {
   Somedia = "somedia",
 }
 
-export enum FeatureName {
+export enum TenantFeature {
   TextPrommpts = "text-prommpts",
   AudioToText = "audio-to-text",
 }
@@ -27,7 +27,7 @@ export const TenantFilterParamsSchema = z.object({
 export type TenantFilterParams = z.infer<typeof TenantFilterParamsSchema>;
 
 export const IncludedFeaturesSchema = z.object({
-  name: z.nativeEnum(FeatureName),
+  name: z.nativeEnum(TenantFeature),
   provider: z.nativeEnum(ApiKeyProvider),
 });
 
@@ -71,7 +71,7 @@ export default {
         active: true,
         included_features: [
           {
-            name: FeatureName.TextPrommpts,
+            name: TenantFeature.TextPrommpts,
             provider: ApiKeyProvider.OpenAI,
           },
         ],

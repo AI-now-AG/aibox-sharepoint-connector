@@ -2,7 +2,7 @@
 import { useTranslations } from "$i18n/utils";
 import MenuItem from "./MenuItem.astro";
 import Category from "$data/models/category.model";
-import { FeatureName } from "$data/models/tenant.model";
+import { TenantFeature } from "$data/models/tenant.model";
 import { svgIcons } from "$assets/icons";
 import auth from "$auth/auth";
 
@@ -20,9 +20,9 @@ const menuItems = categories.map((category) => ({
   })),
 }));
 
-const restrictedMenus = [];
-if (auth.hasFeature(Astro.locals, FeatureName.AudioToText)) {
-  restrictedMenus.push({
+const audioToTextMenus = [];
+if (auth.hasFeature(Astro.locals, TenantFeature.AudioToText)) {
+  audioToTextMenus.push({
     title: t("nav.audiotool"),
     icon: svgIcons.audio,
     items: [
@@ -34,6 +34,7 @@ if (auth.hasFeature(Astro.locals, FeatureName.AudioToText)) {
   });
 }
 
+const restrictedMenus = [];
 const settingsItems = [
   {
     title: t("nav.settings.prompts"),
@@ -49,7 +50,7 @@ const settingsItems = [
   },
 ];
 
-if (auth.hasFeature(Astro.locals, FeatureName.AudioToText)) {
+if (auth.hasFeature(Astro.locals, TenantFeature.AudioToText)) {
   settingsItems.push({
     title: t("tenant.audio-to-text"),
     path: "/settings/transcription",
@@ -143,13 +144,10 @@ const modules = [
       />
     </a>
   </div>
-  <div>
-    <!--<div class="text-sm pl-6 pt-5 flex flex-row items-center gap-2">
-      <Icon icon={Name.Apps} class="w-4 h-4" />
-      <span>{t("nav.all-widgets")}</span>
-    </div>-->
+
+  <div class="flex-grow">
     <ul class="menu w-full pr-6">
-        <li>
+      <li>
         <details open>
           <summary>
             <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
@@ -158,52 +156,7 @@ const modules = [
             KI ANWENDUNGEN
           </summary>
           <ul class="menu w-full pr-6">
-            {
-              modules.map((mod) => (
-                <li class="">
-                  <details open>
-                    <summary>
-                      <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
-                        {mod.icon && <Fragment set:html={mod.icon} />}
-                      </div>
-                      {mod.title}
-                    </summary>
-      
-                    {"items" in mod && (
-                      <ul>
-                        {mod.items?.map((sub) => (
-                          <li class="pl-1">
-                            <MenuItem {...sub} />
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </details>
-                </li>
-              ))
-            }
-      
-            <!-- {
-              tenantMenuItem ? (
-                <li class="pl-1">
-                  <MenuItem
-                    title={tenantMenuItem.title}
-                    path={tenantMenuItem.path}
-                    icon={tenantMenuItem.icon}
-                  />
-                </li>
-              ) : null
-            } -->
-          </ul>
-        </details>
-        <div class="divider"></div>
-      </li>
-    </ul>
-    <ul>
-      <li>
-        <ul class="menu w-full pr-6">
-          {
-            restrictedMenus.map((mod) => (
+            {modules.map((mod) => (
               <li class="">
                 <details open>
                   <summary>
@@ -212,7 +165,6 @@ const modules = [
                     </div>
                     {mod.title}
                   </summary>
-    
                   {"items" in mod && (
                     <ul>
                       {mod.items?.map((sub) => (
@@ -223,12 +175,63 @@ const modules = [
                     </ul>
                   )}
                 </details>
-                <div class="divider"></div>
               </li>
-            ))
-          }
-        </ul>
+            ))}
+          </ul>
+        </details>
       </li>
+    </ul>
+    <ul class="menu w-full pr-6">
+      {audioToTextMenus.map((mod) => (
+        <li class="">
+          <details open>
+            <summary>
+              <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
+                {mod.icon && <Fragment set:html={mod.icon} />}
+              </div>
+              {mod.title}
+            </summary>
+            {"items" in mod && (
+              <ul>
+                {mod.items?.map((sub) => (
+                  <li class="pl-1">
+                    <MenuItem {...sub} />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </details>
+        </li>
+      ))}
+    </ul>
+  </div>
+
+  <!-- Settings and Admin items aligned at the bottom -->
+  <div class="mt-auto">
+    <ul class="menu w-full pr-6">
+      {restrictedMenus.map((mod) => (
+        <li class="">
+          <details open>
+            <summary>
+              <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
+                {mod.icon && <Fragment set:html={mod.icon} />}
+              </div>
+              {mod.title}
+            </summary>
+            {"items" in mod && (
+              <ul>
+                {mod.items?.map((sub) => (
+                  <li class="pl-1">
+                    <MenuItem {...sub} />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </details>
+          <div class="divider"></div>
+        </li>
+      ))}
     </ul>
   </div>
 </nav>
+
