@@ -225,19 +225,7 @@
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            fileName: audioFile?.name,
-            uniqueName: tempOutputFileNames[0],
-            uploadUrl: tempUploadUrl,
-            instructionSubtitle: $tenant?.instructions?.transcription_subtitle,
-            instructionPlaintext:
-              $tenant?.instructions?.transcription_plaintext,
-            encryptedApiKey: $tenant?.azure_openai_api_key,
-            azureOpenAIInstanceName: $tenant?.azure_openai_instance_name,
-            azureOpenAIEndpoint: $tenant?.azure_openai_endpoint,
-            azureOpenAIWhisperModel: $tenant?.azure_openai_whisper_model,
-            azureOpenAIChatModel: $tenant?.azure_openai_chat_model,
-          }),
+          body: JSON.stringify(params),
         },
       );
 
