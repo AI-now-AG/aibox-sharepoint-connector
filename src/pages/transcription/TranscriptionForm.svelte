@@ -288,7 +288,7 @@
     tenant: any,
   ): TranscriptionForm {
     return {
-      folderName: folderName
+      folderName: folderName,
       fileName: audioFile?.name || "",
       uniqueName: tempOutputFileNames[0],
       uploadUrl: tempUploadUrl,
