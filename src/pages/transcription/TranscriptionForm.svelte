@@ -211,6 +211,7 @@
       isTranscriptionFailed = false;
 
       const params: TranscribeRequest = createTranscribeRequest(
+        folderName,
         audioFile,
         tempOutputFileNames,
         tempUploadUrl,
@@ -280,12 +281,14 @@
   }
 
   function createTranscribeRequest(
+    folderName: string,
     audioFile: File | undefined,
     tempOutputFileNames: string[],
     tempUploadUrl: string,
     tenant: any,
   ): TranscriptionForm {
     return {
+      folderName: folderName
       fileName: audioFile?.name || "",
       uniqueName: tempOutputFileNames[0],
       uploadUrl: tempUploadUrl,
