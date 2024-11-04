@@ -3,17 +3,18 @@ import { type Handler } from "@netlify/functions";
 import { v4 as uuidv4 } from "uuid"; // To generate unique file names
 
 const getSASToken: Handler = async (event) => {
-  const { fileNameWithoutExtension } = JSON.parse(event.body!);
+  const { fileNameWithoutExtension, folderName } = JSON.parse(event.body!);
   try {
-    let storageURLString: string = process.env.AZURE_BLOB_STORAGE_NAME || "";
+    const storageURLString: string = process.env.AZURE_BLOB_STORAGE_NAME || "";
     console.log(storageURLString);
-    const blobServiceClient =
-      BlobServiceClient.fromConnectionString(storageURLString);
-    const containerName = "transcribecontainer";
+    const blobServiceClient = BlobServiceClient.fromConnectionString(storageURLString);
+    const containerName = process.env.AZURE_CONTAINER_NAME || "transcribecontainer";
     const containerClient = blobServiceClient.getContainerClient(containerName);
+
+    await containerClient.createIfNotExists();
     const uniqueFilename = uuidv4();
     const fileName = `${fileNameWithoutExtension}_${uniqueFilename}`;
-    const blobName = `${fileName}.mp3`;
+    const blobName = `${folderName}/${fileName}.mp3`;
 
     const blobClient = containerClient.getBlockBlobClient(blobName);
 
@@ -39,6 +40,7 @@ const getSASToken: Handler = async (event) => {
       body: JSON.stringify({ uploadUrl: sasToken, outputFileName: fileName }),
     };
   } catch (error) {
+    console.error("Error during SAS token generation:", error);
     return {
       statusCode: 500,
       body: JSON.stringify({

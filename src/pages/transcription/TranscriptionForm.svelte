@@ -10,6 +10,7 @@
   import type { TranscribeRequest } from "$stores/TranscribeRequest";
   const t = useTranslations();
 
+  export let folderName = "";
   // general
   let audioFile: File | undefined;
   let audioDuration: string = "";
@@ -119,6 +120,7 @@
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         fileNameWithoutExtension: fileNameWithoutExtension,
+        folderName: folderName,
       }),
     });
     return await response.json();
@@ -302,7 +304,10 @@
       const response = await fetch("/.netlify/functions/checkFileExist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fileNames: tempOutputFileNames }),
+        body: JSON.stringify({
+          fileNames: tempOutputFileNames,
+          folderName: folderName,
+        }),
       });
       if (response.ok) {
         const result = await response.json();
