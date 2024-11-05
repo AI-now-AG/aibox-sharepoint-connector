@@ -28,6 +28,12 @@
   let selectedCategory: Category;
   let selectedGroup: Group;
 
+  let previousCategoryId: string | null = null;
+  $: if (selectedCategory && selectedCategory._id !== previousCategoryId) {
+    selectedGroup = null;
+    previousCategoryId = selectedCategory._id;
+  }
+
   let knowledgeBases: KnowledgeBase[] = [];
   let selectedKnowledgeBases: KnowledgeBase[] = [];
 
