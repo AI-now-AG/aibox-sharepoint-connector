@@ -7,6 +7,7 @@
   import type { CreatePromptParams } from "$pages/api/prompts/index.json";
   import { addToast } from "$stores/toast";
   import LoadingSpinner from "$components/prompt-interface/components/LoadingSpinner.svelte";
+  import { svgIcons } from "$assets/icons";
   const t = useTranslations();
   export let dlgEl: HTMLDialogElement;
 
@@ -178,7 +179,12 @@
 
 <dialog class="modal" bind:this={dlgEl}>
   <div class="modal-box w-8/12 max-w-5xl">
-    <h3 class="text-lg font-bold py-4">{t("prompt-library.edit.title")}</h3>
+    <div class="flex justify-between">
+      <h3 class="text-lg font-bold py-4">{t("prompt-library.edit.title")}</h3>
+      <button class="btn btn-sm btn-circle btn-ghost" on:click={cancelEdit}>
+        {@html svgIcons.closeMenu}
+      </button>
+    </div>
     <LoadingSpinner bind:isLoading />
     <form class="rounded pt-6 mb-4 space-y-6">
       <div class="grid grid-cols-1 gap-4 justify-center">
