@@ -204,16 +204,19 @@ export async function transcribeUsingOpenAI(transcribeParams: TranscribeRequest)
       .join(".");
     const outputURLs: { [key: string]: string } = {};
     outputURLs["json"] = await uploadOutputToBlob(
+      transcribeParams.folderName,
       `${fileNameWithoutExtension}.json`,
       JSON.stringify(response),
       "json",
     );
     outputURLs["txt"] = await uploadOutputToBlob(
+      transcribeParams.folderName,
       `${fileNameWithoutExtension}.txt`,
       improvedText,
       "txt",
     );
     outputURLs["srt"] = await uploadOutputToBlob(
+      transcribeParams.folderName,
       `${fileNameWithoutExtension}.srt`,
       result,
       "srt",
@@ -242,6 +245,7 @@ export async function transcribeUsingOpenAI(transcribeParams: TranscribeRequest)
 }
 
 async function uploadOutputToBlob(
+  folderName: string,
   blobName: string,
   content: string,
   format: string,
@@ -253,7 +257,8 @@ async function uploadOutputToBlob(
   const containerName =
     process.env.AZURE_CONTAINER_NAME || "transcribecontainer";
   const containerClient = blobServiceClient.getContainerClient(containerName);
-  const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+  const blobPath = `${folderName}/${blobName}`;
+  const blockBlobClient = containerClient.getBlockBlobClient(blobPath);
 
   // Set content type based on the file format
   const contentTypeMap: { [key: string]: string } = {
