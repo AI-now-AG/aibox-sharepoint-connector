@@ -3,6 +3,7 @@ import CategoryModel from "$data/models/category.model";
 import PromptModel from "$data/models/prompt.model";
 import EmptyPrompt from "./EmptyPrompt.astro";
 import PromptExecution from "./PromptExecution.svelte";
+import auth from "$auth/auth";
 
 const { category: categoryId, group: groupId } = Astro.params;
 
@@ -23,6 +24,11 @@ const promptItems = categoryGroupPrompt.map((prompt) => ({
   title: prompt.title,
   description: prompt.description,
 }));
+
+let isEditable = false;
+if (auth.isAdmin(Astro.locals) || auth.isSuperAdmin(Astro.locals)) {
+  isEditable = true;
+}
 ---
 
 <div class="flex flex-col h-full max-w-6xl mx-auto">
@@ -33,7 +39,7 @@ const promptItems = categoryGroupPrompt.map((prompt) => ({
   </div>
   {
     promptItems.length > 0 ? (
-      <PromptExecution promptItems={promptItems} client:load />
+      <PromptExecution promptItems={promptItems} isEditable={isEditable} client:load />
     ) : (
       <EmptyPrompt />
     )
