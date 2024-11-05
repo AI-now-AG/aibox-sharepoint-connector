@@ -67,6 +67,7 @@
       );
       if (category) {
         selectedCategory = category;
+        previousCategoryId = category._id;
       }
 
       const group = category?.groups.find(
