@@ -7,9 +7,10 @@
   import { tenant } from "$stores";
   import transcript from "$stores/transcript";
   import { addToast } from "$stores/toast";
-
+  import type { TranscribeRequest } from "$stores/TranscribeRequest";
   const t = useTranslations();
 
+  export let folderName = "";
   // general
   let audioFile: File | undefined;
   let audioDuration: string = "";
@@ -119,6 +120,7 @@
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         fileNameWithoutExtension: fileNameWithoutExtension,
+        folderName: folderName,
       }),
     });
     return await response.json();
@@ -208,6 +210,14 @@
       isTranscribing = true;
       isTranscriptionFailed = false;
 
+      const params: TranscribeRequest = createTranscribeRequest(
+        folderName,
+        audioFile,
+        tempOutputFileNames,
+        tempUploadUrl,
+        $tenant,
+      );
+
       const response = await fetch(
         "/.netlify/functions/transcribeAudio-background",
         {
@@ -215,19 +225,7 @@
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            fileName: audioFile?.name,
-            uniqueName: tempOutputFileNames[0],
-            uploadUrl: tempUploadUrl,
-            instructionSubtitle: $tenant?.instructions?.transcription_subtitle,
-            instructionPlaintext:
-              $tenant?.instructions?.transcription_plaintext,
-            encryptedApiKey: $tenant?.azure_openai_api_key,
-            azureOpenAIInstanceName: $tenant?.azure_openai_instance_name,
-            azureOpenAIEndpoint: $tenant?.azure_openai_endpoint,
-            azureOpenAIWhisperModel: $tenant?.azure_openai_whisper_model,
-            azureOpenAIChatModel: $tenant?.azure_openai_chat_model,
-          }),
+          body: JSON.stringify(params),
         },
       );
 
@@ -270,12 +268,37 @@
     }
   }
 
+  function createTranscribeRequest(
+    folderName: string,
+    audioFile: File | undefined,
+    tempOutputFileNames: string[],
+    tempUploadUrl: string,
+    tenant: any,
+  ): TranscriptionForm {
+    return {
+      folderName: folderName,
+      fileName: audioFile?.name || "",
+      uniqueName: tempOutputFileNames[0],
+      uploadUrl: tempUploadUrl,
+      instructionSubtitle: tenant?.instructions?.transcription_subtitle,
+      instructionPlaintext: tenant?.instructions?.transcription_plaintext,
+      encryptedApiKey: tenant?.azure_openai_api_key,
+      azureOpenAIInstanceName: tenant?.azure_openai_instance_name,
+      azureOpenAIEndpoint: tenant?.azure_openai_endpoint,
+      azureOpenAIWhisperModel: tenant?.azure_openai_whisper_model,
+      azureOpenAIChatModel: tenant?.azure_openai_chat_model,
+    };
+  }
+
   async function checkOutputFileReady() {
     try {
       const response = await fetch("/.netlify/functions/checkFileExist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fileNames: tempOutputFileNames }),
+        body: JSON.stringify({
+          fileNames: tempOutputFileNames,
+          folderName: folderName,
+        }),
       });
       if (response.ok) {
         const result = await response.json();

@@ -9,7 +9,7 @@ import { pipeline } from "stream";
 import { getTask } from "$shared/transcriptionTasks";
 
 const checkFileExist: Handler = async (event, context) => {
-  const { fileNames } = JSON.parse(event.body!);
+  const { fileNames, folderName } = JSON.parse(event.body!);
   if (fileNames) {
     const streamPipeline = promisify(pipeline);
     const tmpDir = tmpdir();
@@ -28,7 +28,8 @@ const checkFileExist: Handler = async (event, context) => {
 
       // Check if the file exists in Azure Blob Storage
       for (const fileName of fileNames) {
-        const blobClient = containerClient.getBlobClient(fileName);
+        const filePathInBlob = `${folderName}/${fileName}`;
+        const blobClient = containerClient.getBlobClient(filePathInBlob);
         const exists = await blobClient.exists();
         if (!exists) {
           const task = await getTask(fileName);
