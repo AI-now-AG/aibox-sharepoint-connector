@@ -125,11 +125,11 @@
     try {
       const newPrompt: CreatePromptParams = {
         title: promptTitle,
-        category: selectedCategory._id,
-        group: selectedGroup._id,
         prompt: promptText,
-        knowledgebase: selectedKnowledgeBases.map((kbObj) => kbObj._id),
-        ...(selectedEditPromptId && { _id: selectedEditPromptId }),
+        knowledgebase: selectedKnowledgeBases.map((inst) => inst._id),
+        ...(selectedCategory && { category: selectedCategory._id }),
+        ...(selectedGroup && { group: selectedGroup._id }),
+        ...(promptId && { _id: promptId }),
       };
       console.log(newPrompt);
       const response = await fetch("/api/prompts.json", {

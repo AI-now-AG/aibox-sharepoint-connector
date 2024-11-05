@@ -118,10 +118,10 @@
     try {
       const newPrompt: CreatePromptParams = {
         title: promptTitle,
-        category: selectedCategory._id,
-        group: selectedGroup._id,
         prompt: promptText,
         knowledgebase: selectedKnowledgeBases.map((inst) => inst._id),
+        ...(selectedCategory && { category: selectedCategory._id }),
+        ...(selectedGroup && { group: selectedGroup._id }),
         ...(promptId && { _id: promptId }),
       };
 
@@ -135,7 +135,9 @@
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to save prompt. Please try again.");
+        throw new Error(
+          errorData.message || "Failed to save prompt. Please try again.",
+        );
       }
 
       const data = await response.json();
@@ -145,7 +147,10 @@
       });
     } catch (error) {
       addToast({
-        message: error instanceof Error ? error.message : "An unexpected error occurred.",
+        message:
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred.",
         type: "error",
       });
     } finally {
@@ -155,17 +160,19 @@
 </script>
 
 <div class="container max-w-5xl mx-auto p-4">
-  <button class="mr-4" onclick="window.history.back();">
-    {@html svgIcons.back}
-  </button>
   <div class="w-full min-w-xs pt-2 lg:pt-6">
-    <h1 class="pt-2 text-4xl font-bold pb-6">
-      {#if prompt}
-        {t("prompt-library.prompts.edit")}
-      {:else}
-        {t("prompt-library.prompts.add")}
-      {/if}
-    </h1>
+    <div class="flex items-center pt-2 pb-6">
+      <button class="mr-4" onclick="window.history.back();">
+        {@html svgIcons.back}
+      </button>
+      <h1 class="text-4xl font-bold">
+        {#if prompt}
+          {t("prompt-library.prompts.edit")}
+        {:else}
+          {t("prompt-library.prompts.add")}
+        {/if}
+      </h1>
+    </div>
     <form class="rounded pt-6 mb-4 space-y-6">
       <div class="grid grid-cols-1 gap-4 justify-center">
         <div>
