@@ -178,7 +178,7 @@
 
 <dialog class="modal" bind:this={dlgEl}>
   <div class="modal-box w-8/12 max-w-5xl">
-    <h3 class="text-lg font-bold py-4">Prompt Configuration</h3>
+    <h3 class="text-lg font-bold py-4">{t("prompt-library.edit.title")}</h3>
     <LoadingSpinner bind:isLoading />
     <form class="rounded pt-6 mb-4 space-y-6">
       <div class="grid grid-cols-1 gap-4 justify-center">

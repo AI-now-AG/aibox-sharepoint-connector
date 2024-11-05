@@ -43,6 +43,7 @@
   "prompt-library.add.prompts.knowledge-base": "Knowledge Base",
   "prompt-library.add.prompts.save": "Save Prompt",
   "prompt-library.add.prompts.saving": "Saving...",
+  "prompt-library.edit.title": "Edit shortcut",
   "prompt-library.instructions.title": "Instruction Management",
   "prompt-library.instructions.add": "Add instruction",
   "prompt-library.instructions.edit": "Edit instruction",
