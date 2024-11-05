@@ -15,7 +15,7 @@
   let dlgEl: HTMLDialogElement;
   const promptLimit = 5;
   let selectedEditPromptId: any = null;
-  let isEditable = false;
+  export let isEditable = false;
 
   // TODO: Remove below function once default prompt functionality implemented
   onMount(async function () {
@@ -65,9 +65,7 @@
               {@html svgIcons.editPrompt}
             </button>
           {/if}
-          <p class="card-title text-sm font-normal text-left mt-4">
-            {card.title}
-          </p>
+          <p class="card-title text-sm font-normal">{card.title}</p>
         </button>
       {/if}
     {/each}

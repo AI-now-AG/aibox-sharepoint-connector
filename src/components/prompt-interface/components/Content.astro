@@ -3,7 +3,7 @@ import CategoryModel from "$data/models/category.model";
 import PromptModel from "$data/models/prompt.model";
 import EmptyPrompt from "./EmptyPrompt.astro";
 import PromptExecution from "./PromptExecution.svelte";
-import auth from "$auth/auth";
+import { Permission } from "$data/models/user.model";
 
 const { category: categoryId, group: groupId } = Astro.params;
 
@@ -25,10 +25,7 @@ const promptItems = categoryGroupPrompt.map((prompt) => ({
   description: prompt.description,
 }));
 
-let isEditable = false;
-if (auth.isAdmin(Astro.locals) || auth.isSuperAdmin(Astro.locals)) {
-  isEditable = true;
-}
+let userPermissions = Astro.locals.user.permissions;
 ---
 
 <div class="flex flex-col h-full max-w-6xl mx-auto">
@@ -39,7 +36,7 @@ if (auth.isAdmin(Astro.locals) || auth.isSuperAdmin(Astro.locals)) {
   </div>
   {
     promptItems.length > 0 ? (
-      <PromptExecution promptItems={promptItems} isEditable={isEditable} client:load />
+      <PromptExecution promptItems={promptItems} isEditable={userPermissions.includes(Permission.AdminAll)} client:load />
     ) : (
       <EmptyPrompt />
     )
