@@ -43,7 +43,7 @@
   let promptDetails: any | undefined = undefined;
   export let isEditable: boolean = true;
   let isSaving = false;
-  $: isFormValid = promptTitle.trim() !== "" && promptText.trim() !== "";
+  $: isFormValid = promptTitle.trim() !== "" && promptText.trim() !== "" && selectedCategory !== undefined && selectedGroup !== undefined;
   let isLoading = false;
 
   // Fetch prompt details when selectedEditPromptId changes
@@ -136,7 +136,7 @@
         knowledgebase: selectedKnowledgeBases.map((inst) => inst._id),
         ...(selectedCategory && { category: selectedCategory._id }),
         ...(selectedGroup && { group: selectedGroup._id }),
-        ...(promptId && { _id: promptId }),
+        ...(selectedEditPromptId && { _id: selectedEditPromptId }),
       };
       console.log(newPrompt);
       const response = await fetch("/api/prompts.json", {
@@ -237,7 +237,7 @@
         class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 justify-center"
       >
         <SingleInput
-          title={t("prompt-library.add.prompts.category")}
+          title={`${t("prompt-library.add.prompts.category")}*`}
           placeholder="e.g. Editing"
           items={categories}
           bind:selectedItem={selectedCategory}
@@ -245,7 +245,7 @@
 
         {#if selectedCategory}
           <SingleInput
-            title={t("prompt-library.add.prompts.group")}
+            title={`${t("prompt-library.add.prompts.group")}*`}
             placeholder="e.g. Headlines"
             items={selectedCategory.groups}
             bind:selectedItem={selectedGroup}

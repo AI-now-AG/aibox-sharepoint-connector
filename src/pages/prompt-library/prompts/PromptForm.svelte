@@ -116,7 +116,7 @@
     }
   }
 
-  $: isFormValid = promptTitle.trim() !== "" && promptText.trim() !== "";
+  $: isFormValid = promptTitle.trim() !== "" && promptText.trim() !== "" && selectedCategory !== undefined && selectedGroup !== undefined;
 
   async function savePrompt() {
     if (!isFormValid) return;
@@ -197,7 +197,7 @@
         class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 justify-center"
       >
         <SingleInput
-          title={t("prompt-library.add.prompts.category")}
+          title={`${t("prompt-library.add.prompts.category")}*`}
           placeholder="e.g. Editing"
           items={categories}
           bind:selectedItem={selectedCategory}
@@ -205,7 +205,7 @@
 
         {#if selectedCategory}
           <SingleInput
-            title={t("prompt-library.add.prompts.group")}
+            title={`${t("prompt-library.add.prompts.group")}*`}
             placeholder="e.g. Headlines"
             items={selectedCategory.groups}
             bind:selectedItem={selectedGroup}
