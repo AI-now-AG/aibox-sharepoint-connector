@@ -1,4 +1,5 @@
 export interface TranscribeRequest {
+  folderName: string;
   fileName: string;
   uniqueName: string;
   uploadUrl: string;

@@ -9,13 +9,12 @@ import { Permission } from "$data/models/user.model";
 const t = useTranslations();
 
 const promptsCursor = await PromptModel.listByTenant(
-  Astro.locals.user.tenant_id,
+  Astro.locals.user.tenant_id
 );
 const prompts = await promptsCursor.toArray();
 
 const calls = prompts.map(async (prompt) => {
-  if (!prompt.category) return null;
-  const category = await CategoryModel.get(prompt.category.toString());
+  const category = await CategoryModel.get(prompt.category?.toString());
 
   return category;
 });
@@ -24,11 +23,11 @@ const categories = await Promise.all(calls);
 
 const promptsEnriched: CardItem[] = prompts.map((prompt) => {
   const category = categories.find(
-    (category) => category?._id.toString() === prompt.category?.toString(),
+    (category) => category?._id.toString() === prompt.category?.toString()
   );
 
   const group = category?.groups.find(
-    (g) => g._id?.toString() === prompt.group?.toString(),
+    (g) => g._id?.toString() === prompt.group?.toString()
   );
 
   const tags = [category?.title, group?.title].filter(Boolean) as string[];
