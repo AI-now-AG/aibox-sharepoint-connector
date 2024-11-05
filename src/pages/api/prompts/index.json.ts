@@ -236,6 +236,8 @@ export const GET: APIRoute = async (ctx) => {
           title: kb.title,
           knowledge_base: kb.knowledge_base,
         })),
+        category: prompt.category,
+        group: prompt.group,
       };
 
       return new Response(JSON.stringify(promptData));

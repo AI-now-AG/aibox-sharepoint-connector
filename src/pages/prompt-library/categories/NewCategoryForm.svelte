@@ -5,7 +5,8 @@
   } from "$pages/api/categories.json";
   import { onMount } from "svelte";
   import { useTranslations } from "$i18n/utils";
-
+  import { addToast } from "$stores/toast";
+  import { svgIcons } from "$assets/icons";
   const t = useTranslations();
 
   /**
@@ -29,7 +30,10 @@
 
   async function save() {
     if (!title) {
-      alert("Please enter category title");
+      addToast({
+        message: "Please enter category title",
+        type: "error",
+      });
     } else if (groups && groups.length > 0) {
       const newCategory: CreateCategoryParams = {
         title,
@@ -37,20 +41,40 @@
         ...(categoryId && { _id: categoryId }),
       };
 
-      const response = await fetch("/api/categories.json", {
-        method: category ? "PUT" : "POST",
-        body: JSON.stringify(newCategory),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const data = await response.json();
+      try {
+        const response = await fetch("/api/categories.json", {
+          method: category ? "PUT" : "POST",
+          body: JSON.stringify(newCategory),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const data = await response.json();
 
-      groups = [];
-      title = undefined;
-      alert(data.message);
+        groups = [];
+        title = undefined;
+
+        addToast({
+          message: data.message || "Category saved successfully",
+          type: "success",
+        });
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      } catch (error) {
+        addToast({
+          message:
+            error instanceof Error
+              ? error.message
+              : "Failed to save category. Please try again.",
+          type: "error",
+        });
+      }
     } else {
-      alert("At lease one group must be created");
+      addToast({
+        message: "At least one group must be created",
+        type: "error",
+      });
     }
   }
 
@@ -67,6 +91,9 @@
 </script>
 
 <div class="container max-w-5xl p-6 mx-auto p-4">
+  <button class="mr-4" onclick="window.history.back();">
+    {@html svgIcons.back}
+  </button>
   <div class="w-full min-w-xs pt-2 lg:pt-6">
     <h1 class="pt-2 text-4xl font-bold pb-6">
       {#if category}
@@ -78,7 +105,7 @@
     <form class="rounded pt-6 mb-4 space-y-6">
       <div class="grid grid-cols-1 gap-4 justify-center">
         <div>
-          <p class="mb-2">Title</p>
+          <p class="mb-2">{t("prompt-library.add.categories.title")}*</p>
           <input
             type="text"
             bind:value={title}

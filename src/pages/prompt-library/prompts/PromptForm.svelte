@@ -2,9 +2,10 @@
   import SingleInput from "$pages/prompt-library/prompts/SingleInput.svelte";
   import type { CreatePromptParams } from "$pages/api/prompts/index.json";
   import { useTranslations } from "$i18n/utils";
-
+  import { svgIcons } from "$assets/icons";
   import { onMount } from "svelte";
   import MultiInput from "$pages/prompt-library/prompts/MultiInput.svelte";
+  import { addToast } from "$stores/toast";
 
   const t = useTranslations();
 
@@ -108,32 +109,55 @@
     }
   }
 
-  async function savePrompt() {
-    isSaving = true;
-    const newPrompt: CreatePromptParams = {
-      title: promptTitle,
-      category: selectedCategory._id,
-      group: selectedGroup._id,
-      prompt: promptText,
-      //instructions: selectedInstructions.map((inst) => inst._id),
-      knowledgebase: selectedKnowledgeBases.map((inst) => inst._id),
-      ...(promptId && { _id: promptId }),
-    };
+  $: isFormValid = promptTitle.trim() !== "" && promptText.trim() !== "";
 
-    const response = await fetch("/api/prompts.json", {
-      method: prompt ? "PUT" : "POST",
-      body: JSON.stringify(newPrompt),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const data = await response.json();
-    isSaving = false;
-    alert(data.message);
+  async function savePrompt() {
+    if (!isFormValid) return;
+
+    isSaving = true;
+    try {
+      const newPrompt: CreatePromptParams = {
+        title: promptTitle,
+        category: selectedCategory._id,
+        group: selectedGroup._id,
+        prompt: promptText,
+        knowledgebase: selectedKnowledgeBases.map((inst) => inst._id),
+        ...(promptId && { _id: promptId }),
+      };
+
+      const response = await fetch("/api/prompts.json", {
+        method: prompt ? "PUT" : "POST",
+        body: JSON.stringify(newPrompt),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to save prompt. Please try again.");
+      }
+
+      const data = await response.json();
+      addToast({
+        message: data.message,
+        type: "success",
+      });
+    } catch (error) {
+      addToast({
+        message: error instanceof Error ? error.message : "An unexpected error occurred.",
+        type: "error",
+      });
+    } finally {
+      isSaving = false;
+    }
   }
 </script>
 
 <div class="container max-w-5xl mx-auto p-4">
+  <button class="mr-4" onclick="window.history.back();">
+    {@html svgIcons.back}
+  </button>
   <div class="w-full min-w-xs pt-2 lg:pt-6">
     <h1 class="pt-2 text-4xl font-bold pb-6">
       {#if prompt}
@@ -145,7 +169,7 @@
     <form class="rounded pt-6 mb-4 space-y-6">
       <div class="grid grid-cols-1 gap-4 justify-center">
         <div>
-          <p class="mb-2">{t("prompt-library.add.prompts.title")}</p>
+          <p class="mb-2">{t("prompt-library.add.prompts.title")}*</p>
           <input
             type="text"
             bind:value={promptTitle}
@@ -176,7 +200,7 @@
       </div>
 
       <div class="mb-4">
-        <p class="mb-2">{t("prompt-library.add.prompts.instructions")}</p>
+        <p class="mb-2">{t("prompt-library.add.prompts.instructions")}*</p>
         <textarea
           bind:value={promptText}
           placeholder="e.g. Create three headlines..."
@@ -213,7 +237,7 @@
       {#if isEditable}
         <div class="flex items-center justify-between">
           <button
-            class={`btn btn-active btn-primary px-8 font-normal ${isSaving && "btn-disabled"}`}
+            class={`btn btn-active btn-primary px-8 font-normal ${(!isFormValid || isSaving) && "btn-disabled"}`}
             on:click|preventDefault={savePrompt}
           >
             {#if isSaving}
@@ -223,9 +247,6 @@
               {t("prompt-library.add.prompts.save")}
             {/if}
           </button>
-          <!-- <button class="btn btn-active btn-ghost px-8 font-normal">
-            Try It Out
-          </button> -->
         </div>
       {/if}
     </form>

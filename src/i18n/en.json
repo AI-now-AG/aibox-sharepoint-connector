@@ -64,6 +64,7 @@
   "prompt-library.categories.edit": "Edit Category",
   "prompt-library.categories.all": "All Categories",
   "prompt-library.categories.view": "View",
+  "prompt-library.add.categories.title": "Title",
   "prompt-execution.card.showMore": "more prompts",
   "prompt-execution.card.showLess": "less prompts",
   "prompt-execution.showGlobal": "Save Global",

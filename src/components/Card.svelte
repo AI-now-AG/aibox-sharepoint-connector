@@ -9,13 +9,14 @@
 
 <script lang="ts">
   import { fade } from "svelte/transition";
+  import { addToast } from "$stores/toast";
 
   export let items: CardItem[] = [];
   export let type: string = "";
   export let title: string = "";
   export let viewLabel: string = "";
   export let isEditable: boolean = false;
-  
+
   const showDeleteConfirmationDlg = (id: string) => {
     document
       .querySelector<HTMLDialogElement>(`#delete_confirmation_modal_${id}`)
@@ -23,18 +24,35 @@
   };
 
   async function deleteCard(id: string) {
-    const response = await fetch(`/api/${type}.json`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ _id: id }),
-    });
+    try {
+      const response = await fetch(`/api/${type}.json`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ _id: id }),
+      });
 
-    if (response.ok) {
-      items = items.filter((card) => card.id !== id);
-    } else {
-      console.error("API call failed");
+      if (response.ok) {
+        items = items.filter((card) => card.id !== id);
+
+        addToast({
+          message: `${type === "categories" ? "Category" : type === "knowledge-base" ? "Knowledge Base" : "Prompt"} deleted successfully.`,
+          type: "success",
+        });
+        if (type === "categories") {
+          setTimeout(() => {
+            window.location.reload();
+          }, 2000);
+        }
+      } else {
+        throw new Error("Failed to delete");
+      }
+    } catch (error) {
+      addToast({
+        message: `Error deleting ${type === "categories" ? "category" : type === "knowledge-base" ? "knowledge base" : "prompt"}. Please try again.`,
+        type: "error",
+      });
     }
   }
 </script>
