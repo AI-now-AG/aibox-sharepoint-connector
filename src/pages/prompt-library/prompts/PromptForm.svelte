@@ -142,7 +142,7 @@
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(
-          errorData.message || "Failed to save prompt. Please try again.",
+          errorData.message || t("prompt-library.add.prompt.failed"),
         );
       }
 
@@ -156,7 +156,7 @@
         message:
           error instanceof Error
             ? error.message
-            : "An unexpected error occurred.",
+            : t("common.unexpected.error"),
         type: "error",
       });
     } finally {

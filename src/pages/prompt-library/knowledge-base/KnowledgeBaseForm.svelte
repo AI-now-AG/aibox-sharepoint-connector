@@ -44,7 +44,7 @@
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(
-          errorData.message || "Failed to save knowledge base. Please try again.",
+          errorData.message || t("prompt-library.add.knowledgebase.failed"),
         );
       }
 
@@ -58,7 +58,7 @@
         message:
           error instanceof Error
             ? error.message
-            : "An unexpected error occurred.",
+            : t("common.unexpected.error"),
         type: "error",
       });
     } finally {

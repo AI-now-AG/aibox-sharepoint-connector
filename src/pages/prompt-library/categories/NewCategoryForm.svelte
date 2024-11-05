@@ -55,7 +55,7 @@
         title = undefined;
 
         addToast({
-          message: data.message || "Category saved successfully",
+          message: data.message || t("prompt-library.add.category.success"),
           type: "success",
         });
         setTimeout(() => {
@@ -66,13 +66,13 @@
           message:
             error instanceof Error
               ? error.message
-              : "Failed to save category. Please try again.",
+              : t("prompt-library.add.category.failed"),
           type: "error",
         });
       }
     } else {
       addToast({
-        message: "At least one group must be created",
+        message: t("prompt-library.add.category.group.one"),
         type: "error",
       });
     }

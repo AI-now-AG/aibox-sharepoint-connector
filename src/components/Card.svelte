@@ -16,12 +16,30 @@
   export let title: string = "";
   export let viewLabel: string = "";
   export let isEditable: boolean = false;
+  import { useTranslations } from "$i18n/utils";
+  const t = useTranslations();
 
   const showDeleteConfirmationDlg = (id: string) => {
     document
       .querySelector<HTMLDialogElement>(`#delete_confirmation_modal_${id}`)
       ?.showModal();
   };
+
+  function showSuccessToast(type) {
+    const translationKey = `prompt-library.delete.${type}.success`;
+    addToast({
+      message: t(translationKey),
+      type: "success",
+    });
+  }
+
+  function showErrorToast(type) {
+    const translationKey = `prompt-library.delete.${type}.failed`;
+    addToast({
+      message: t(translationKey),
+      type: "error",
+    });
+  }
 
   async function deleteCard(id: string) {
     try {
@@ -35,11 +53,7 @@
 
       if (response.ok) {
         items = items.filter((card) => card.id !== id);
-
-        addToast({
-          message: `${type === "categories" ? "Category" : type === "knowledge-base" ? "Knowledge Base" : "Prompt"} deleted successfully.`,
-          type: "success",
-        });
+        showSuccessToast(type);
         if (type === "categories") {
           setTimeout(() => {
             window.location.reload();
@@ -49,10 +63,8 @@
         throw new Error("Failed to delete");
       }
     } catch (error) {
-      addToast({
-        message: `Error deleting ${type === "categories" ? "category" : type === "knowledge-base" ? "knowledge base" : "prompt"}. Please try again.`,
-        type: "error",
-      });
+      console.log(error);
+      showErrorToast(type);
     }
   }
 </script>
