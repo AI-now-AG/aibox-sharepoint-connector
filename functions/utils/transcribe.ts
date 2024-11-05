@@ -109,30 +109,39 @@ function getAzureChatModel(transcribeParams: TranscribeRequest) {
 
 export const improveSRTQuality = async (transcribeParams: TranscribeRequest, data: Entry[]) => {
   const model = getAzureChatModel(transcribeParams);
-  const flat = data
-    .map(
-      (entry) => `input> ${entry.text}
-output> 
-`,
-    )
-    .join("\n");
-
-  const finalInstructions = transcribeParams.instructionSubtitle || DEFAULT_INSTRUCTION;
-  const response = await model.invoke(
-    [new SystemMessage(finalInstructions), new HumanMessage(flat)],
-    {},
+  const flatEntries = data.map(
+    (entry) => `input> ${entry.text}\noutput>\n`
   );
+  const chunks = [];
+  let currentChunk = "";
+  for (const entry of flatEntries) {
+    const tokenCount = (currentChunk.length + entry.length) / 4;
+    if (tokenCount >= 10000) {
+      chunks.push(currentChunk);
+      currentChunk = entry;
+    } else {
+      currentChunk += entry;
+    }
+  }
+  if (currentChunk) chunks.push(currentChunk);
 
-  const correctedLines = response.content
-    .toString()
-    .split("\n")
-    .filter((line) => line.startsWith("output>"))
-    .map((line) => line.substring(8));
-
-  const out = data.map((entry, i) =>
-    Object.assign({}, entry, { text: correctedLines[i] }),
-  );
-
+  let correctedLines = [];
+  for (const chunk of chunks) {
+    const response = await model.invoke([
+      new SystemMessage(transcribeParams.instructionSubtitle || DEFAULT_INSTRUCTION),
+      new HumanMessage(chunk)
+    ]);
+    correctedLines.push(
+      ...response.content.toString()
+        .split("\n")
+        .filter((line) => line.startsWith("output>"))
+        .map((line) => line.substring(8))
+    );
+  }
+  const out = data.map((entry, i) => ({
+    ...entry,
+    text: correctedLines[i] || entry.text,
+  }));
   return out;
 };
 
