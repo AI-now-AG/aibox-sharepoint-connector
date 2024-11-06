@@ -109,9 +109,13 @@ function getAzureChatModel(transcribeParams: TranscribeRequest) {
 
 export const improveSRTQuality = async (transcribeParams: TranscribeRequest, data: Entry[]) => {
   const model = getAzureChatModel(transcribeParams);
-  const flatEntries = data.map(
-    (entry) => `input> ${entry.text}\noutput>\n`
-  );
+  const flatEntries = data
+      .map(
+        (entry) => `input> ${entry.text}
+output> 
+`,
+      )
+      .join("\n");
   const chunks = [];
   let currentChunk = "";
   for (const entry of flatEntries) {
