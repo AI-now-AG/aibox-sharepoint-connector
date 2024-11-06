@@ -120,7 +120,7 @@ output>
   let currentChunk = "";
   for (const entry of flatEntries) {
     const tokenCount = (currentChunk.length + entry.length) / 4;
-    if (tokenCount >= 10000) {
+    if (tokenCount >= 25000) {
       chunks.push(currentChunk);
       currentChunk = entry;
     } else {
