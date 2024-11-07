@@ -24,6 +24,8 @@ import settings from "$assets/icons/settings.svg?raw";
 import admin from "$assets/icons/admin.svg?raw";
 import audio from "$assets/icons/audio.svg?raw";
 import aitool from "$assets/icons/aitool.svg?raw";
+import editPrompt from "$assets/icons/edit-prompt.svg?raw";
+import closeMenu from "$assets/icons/closeMenu.svg?raw";
 
 export const svgIcons = {
   menuSettings,
@@ -51,5 +53,7 @@ export const svgIcons = {
   settings,
   admin,
   audio,
-  aitool
+  aitool,
+  editPrompt,
+  closeMenu,
 };

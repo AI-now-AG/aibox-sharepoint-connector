@@ -1,25 +1,23 @@
 <script lang="ts">
-  import SingleInput from "$pages/prompt-library/prompts/SingleInput.svelte";
-  import type { CreatePromptParams } from "$pages/api/prompts/index.json";
-  import { useTranslations } from "$i18n/utils";
-  import { svgIcons } from "$assets/icons";
   import { onMount } from "svelte";
+  import { useTranslations } from "$i18n/utils";
+
+  import SingleInput from "$pages/prompt-library/prompts/SingleInput.svelte";
   import MultiInput from "$pages/prompt-library/prompts/MultiInput.svelte";
+  import type { CreatePromptParams } from "$pages/api/prompts/index.json";
   import { addToast } from "$stores/toast";
-
+  import LoadingSpinner from "$components/prompt-interface/components/LoadingSpinner.svelte";
+  import { svgIcons } from "$assets/icons";
   const t = useTranslations();
+  export let dlgEl: HTMLDialogElement;
 
+  export let selectedEditPromptId: any = null;
   type Group = { title: string; _id: string }; // TODO: Get the type from the API endpoint
   type Category = {
     title: string;
     _id: string;
     groups: Group[];
   };
-
-  /*type Instruction = {
-    title: string;
-    _id: string;
-  };*/
 
   type KnowledgeBase = {
     title: string;
@@ -36,20 +34,22 @@
     previousCategoryId = selectedCategory._id;
   }
 
-  //let instructions: Instruction[] = [];
-  //let selectedInstructions: Instruction[] = [];
-
   let knowledgeBases: KnowledgeBase[] = [];
   let selectedKnowledgeBases: KnowledgeBase[] = [];
 
   let promptTitle = "";
   let promptText = "";
 
-  export let promptId: string | undefined = undefined;
-  export let prompt: any | undefined = undefined;
-  export let isEditable: boolean = false;
-
+  let promptDetails: any | undefined = undefined;
+  export let isEditable: boolean = true;
   let isSaving = false;
+  $: isFormValid = promptTitle.trim() !== "" && promptText.trim() !== "" && selectedCategory !== undefined && selectedGroup !== undefined;
+  let isLoading = false;
+
+  // Fetch prompt details when selectedEditPromptId changes
+  $: if (selectedEditPromptId) {
+    getPromptDetail(selectedEditPromptId);
+  }
 
   onMount(async function () {
     const response = await fetch("/api/categories.json", { method: "GET" });
@@ -58,12 +58,43 @@
       categories = data;
     }
     await fetchInstructionAndKB();
-    if (prompt) {
-      promptTitle = prompt.title;
-      promptText = prompt.prompt;
+  });
+
+  async function fetchInstructionAndKB() {
+    const knowledgeBaseResponse = await fetch("/api/knowledge-base.json", {
+      method: "GET",
+    });
+    const knowledgeBaseData =
+      (await knowledgeBaseResponse.json()) as KnowledgeBase[];
+    if (knowledgeBaseData) {
+      knowledgeBases = knowledgeBaseData;
+    }
+  }
+
+  async function getPromptDetail(id: string) {
+    isLoading = true;
+    try {
+      const response = await fetch(`/api/prompts.json?_id=${id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.message ||
+            "Failed to get prompt details. Please try again.",
+        );
+      }
+
+      promptDetails = await response.json();
+      promptTitle = promptDetails.title;
+      promptText = promptDetails.prompt;
 
       const category = categories.find(
-        (e) => e._id == prompt.category.toString(),
+        (e) => e._id == promptDetails.category.toString(),
       );
       if (category) {
         selectedCategory = category;
@@ -71,56 +102,32 @@
       }
 
       const group = category?.groups.find(
-        (e) => e._id == prompt.group.toString(),
+        (e) => e._id == promptDetails.group.toString(),
       );
       if (group) {
         selectedGroup = group;
       }
-    }
-  });
-
-  async function fetchInstructionAndKB() {
-    /*const instructionResponse = await fetch("/api/instructions.json", {
-      method: "GET",
-    });
-    const instructionData = (await instructionResponse.json()) as Instruction[];
-    if (instructionData) {
-      if (prompt) {
-        prompt.instructions?.forEach((instructionObj: any) => {
-          const instruction = instructionData.find(
-            (e) => e._id == instructionObj.toString(),
-          );
-          if (instruction) {
-            selectedInstructions.push(instruction);
-          }
-        });
-      }
-      instructions = instructionData;
-    }*/
-
-    const knowledgeBaseResponse = await fetch("/api/knowledge-base.json", {
-      method: "GET",
-    });
-    const knowledgeBaseData =
-      (await knowledgeBaseResponse.json()) as KnowledgeBase[];
-    if (knowledgeBaseData) {
-      if (prompt) {
-        prompt.knowledgebase?.forEach((kbObj: any) => {
-          const kb = knowledgeBaseData.find((e) => e._id == kbObj.toString());
-          if (kb) {
-            selectedKnowledgeBases.push(kb);
-          }
-        });
-      }
-      knowledgeBases = knowledgeBaseData;
+      selectedKnowledgeBases = promptDetails.knowledgebase
+        .map((kbObj: any) =>
+          knowledgeBases.find((e) => e._id == kbObj._id.toString()),
+        )
+        .filter((kb: any) => kb !== undefined) as KnowledgeBase[];
+    } catch (error) {
+      dlgEl.close();
+      addToast({
+        message:
+          error instanceof Error
+            ? error.message
+            : t("common.unexpected.error"),
+        type: "error",
+      });
+    } finally {
+      isLoading = false;
     }
   }
 
-  $: isFormValid = promptTitle.trim() !== "" && promptText.trim() !== "" && selectedCategory !== undefined && selectedGroup !== undefined;
-
   async function savePrompt() {
     if (!isFormValid) return;
-
     isSaving = true;
     try {
       const newPrompt: CreatePromptParams = {
@@ -129,11 +136,11 @@
         knowledgebase: selectedKnowledgeBases.map((inst) => inst._id),
         ...(selectedCategory && { category: selectedCategory._id }),
         ...(selectedGroup && { group: selectedGroup._id }),
-        ...(promptId && { _id: promptId }),
+        ...(selectedEditPromptId && { _id: selectedEditPromptId }),
       };
-
+      console.log(newPrompt);
       const response = await fetch("/api/prompts.json", {
-        method: prompt ? "PUT" : "POST",
+        method: "PUT",
         body: JSON.stringify(newPrompt),
         headers: {
           "Content-Type": "application/json",
@@ -152,6 +159,9 @@
         message: data.message,
         type: "success",
       });
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
     } catch (error) {
       addToast({
         message:
@@ -164,22 +174,25 @@
       isSaving = false;
     }
   }
+
+  function cancelEdit() {
+    dlgEl.close();
+    promptTitle = "";
+    promptText = "";
+    selectedKnowledgeBases = [];
+    selectedEditPromptId = null;
+  }
 </script>
 
-<div class="container max-w-5xl mx-auto p-4">
-  <div class="w-full min-w-xs pt-2 lg:pt-6">
-    <div class="flex items-center pt-2 pb-6">
-      <button class="mr-4" onclick="window.history.back();">
-        {@html svgIcons.back}
+<dialog class="modal" bind:this={dlgEl}>
+  <div class="modal-box w-8/12 max-w-5xl">
+    <div class="flex justify-between">
+      <h3 class="text-lg font-bold py-4">{t("prompt-library.edit.title")}</h3>
+      <button class="btn btn-sm btn-circle btn-ghost" on:click={cancelEdit}>
+        {@html svgIcons.closeMenu}
       </button>
-      <h1 class="text-4xl font-bold">
-        {#if prompt}
-          {t("prompt-library.prompts.edit")}
-        {:else}
-          {t("prompt-library.prompts.add")}
-        {/if}
-      </h1>
     </div>
+    <LoadingSpinner bind:isLoading />
     <form class="rounded pt-6 mb-4 space-y-6">
       <div class="grid grid-cols-1 gap-4 justify-center">
         <div>
@@ -191,26 +204,6 @@
             class="input input-bordered w-full min-w-xs"
           />
         </div>
-      </div>
-
-      <div
-        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 justify-center"
-      >
-        <SingleInput
-          title={`${t("prompt-library.add.prompts.category")}*`}
-          placeholder="e.g. Editing"
-          items={categories}
-          bind:selectedItem={selectedCategory}
-        />
-
-        {#if selectedCategory}
-          <SingleInput
-            title={`${t("prompt-library.add.prompts.group")}*`}
-            placeholder="e.g. Headlines"
-            items={selectedCategory.groups}
-            bind:selectedItem={selectedGroup}
-          />
-        {/if}
       </div>
 
       <div class="mb-4">
@@ -238,18 +231,36 @@
           items={knowledgeBases}
           bind:selectedItems={selectedKnowledgeBases}
         />
+      </div>
 
-        <!-- <SingleInput
-          title="Documents"
-          placeholder="e.g. KB 1"
-          items={kbs}
-          bind:selectedItem={selectedKb}
-          onUpdate={handleUpdateKB}
-        /> -->
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 justify-center"
+      >
+        <SingleInput
+          title={`${t("prompt-library.add.prompts.category")}*`}
+          placeholder="e.g. Editing"
+          items={categories}
+          bind:selectedItem={selectedCategory}
+        />
+
+        {#if selectedCategory}
+          <SingleInput
+            title={`${t("prompt-library.add.prompts.group")}*`}
+            placeholder="e.g. Headlines"
+            items={selectedCategory.groups}
+            bind:selectedItem={selectedGroup}
+          />
+        {/if}
       </div>
 
       {#if isEditable}
-        <div class="flex items-center justify-between">
+        <div class="flex justify-end">
+          <button
+            class="btn btn-active btn-neutral-content px-8 font-normal mr-2"
+            on:click|preventDefault={cancelEdit}
+          >
+            {t("common.cancel")}
+          </button>
           <button
             class={`btn btn-active btn-primary px-8 font-normal ${(!isFormValid || isSaving) && "btn-disabled"}`}
             on:click|preventDefault={savePrompt}
@@ -265,4 +276,4 @@
       {/if}
     </form>
   </div>
-</div>
+</dialog>

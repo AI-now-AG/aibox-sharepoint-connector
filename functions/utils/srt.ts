@@ -36,8 +36,12 @@ export const groupLines = (data: Entry[]) => {
     const currentEntry = data[i];
     const nextEntry = i + 1 < data.length ? data[i + 1] : null;
 
+    // Ensure text values are defined or default to empty strings
+    const currentText = currentEntry?.text || "";
+    const nextText = nextEntry?.text || "";
+
     entries.push({
-      text: currentEntry.text + (nextEntry ? "\n" + nextEntry.text : ""),
+      text: currentText + (nextEntry ? "\n" + nextText : ""),
       start: currentEntry.start,
       end: nextEntry ? nextEntry.end : currentEntry.end,
     });
@@ -66,7 +70,6 @@ ${srtTimestamp(entry.start)} --> ${srtTimestamp(entry.end)}
 
 `;
   }
-
   return out;
 };
 
@@ -83,4 +86,5 @@ ${srtTimestamp(entry.start)} --> ${srtTimestamp(entry.end)}
 
 `);
   }
+  stream.end();
 };
