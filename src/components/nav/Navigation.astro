@@ -68,7 +68,7 @@ if (auth.isAdmin(Astro.locals) || auth.isSuperAdmin(Astro.locals)) {
 if (auth.isSuperAdmin(Astro.locals)) {
   restrictedMenus.push({
     title: t("nav.settings.admin"),
-    icon: svgIcons.menuTenant,
+    icon: svgIcons.admin,
     items: [
       {
         title: t("nav.tenant-management"),
@@ -156,83 +156,98 @@ const modules = [
             KI ANWENDUNGEN
           </summary>
           <ul class="menu w-full pr-6">
-            {modules.map((mod) => (
-              <li class="">
-                <details open>
-                  <summary>
-                    <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
-                      {mod.icon && <Fragment set:html={mod.icon} />}
-                    </div>
-                    {mod.title}
-                  </summary>
-                  {"items" in mod && (
-                    <ul>
-                      {mod.items?.map((sub) => (
-                        <li class="pl-1">
-                          <MenuItem {...sub} />
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </details>
-              </li>
-            ))}
+            {
+              modules.map((mod) => (
+                <li class="">
+                  <details open>
+                    <summary>
+                      {/* <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
+                        {mod.icon && <Fragment set:html={mod.icon} />}
+                      </div> */}
+                      {mod.title}
+                    </summary>
+                    {"items" in mod && (
+                      <ul>
+                        {mod.items?.map((sub) => (
+                          <li class="pl-1">
+                            <MenuItem {...sub} />
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </details>
+                </li>
+              ))
+            }
           </ul>
         </details>
       </li>
     </ul>
     <ul class="menu w-full pr-6">
-      {audioToTextMenus.map((mod) => (
-        <li class="">
-          <details open>
-            <summary>
-              <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
-                {mod.icon && <Fragment set:html={mod.icon} />}
-              </div>
-              {mod.title}
-            </summary>
-            {"items" in mod && (
-              <ul>
-                {mod.items?.map((sub) => (
-                  <li class="pl-1">
-                    <MenuItem {...sub} />
-                  </li>
-                ))}
-              </ul>
+      {
+        audioToTextMenus.length > 0 && (
+          <div class="divider mx-6 pointer-events-none" />
+        )
+      }
+      {
+        audioToTextMenus.map((mod) => (
+          <li class="">
+            <details open>
+              <summary>
+                <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
+                  {mod.icon && <Fragment set:html={mod.icon} />}
+                </div>
+                {mod.title}
+              </summary>
+              {"items" in mod && (
+                <ul>
+                  {mod.items?.map((sub) => (
+                    <li class="pl-1">
+                      <MenuItem {...sub} />
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </details>
+          </li>
+        ))
+      }
+      {
+        restrictedMenus.length > 0 && (
+          <div class="divider mx-6 pointer-events-none" />
+        )
+      }
+      {
+        restrictedMenus.map((mod, index) => (
+          <li>
+            <details open>
+              <summary>
+                <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
+                  {mod.icon && <Fragment set:html={mod.icon} />}
+                </div>
+                {mod.title}
+              </summary>
+              {"items" in mod && (
+                <ul>
+                  {mod.items?.map((sub) => (
+                    <li class="pl-1">
+                      <MenuItem {...sub} />
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </details>
+            {index < restrictedMenus.length - 1 && (
+              <div class="divider pointer-events-none" />
             )}
-          </details>
-        </li>
-        <div class="divider"></div>
-      ))}
+          </li>
+        ))
+      }
     </ul>
   </div>
-
   <!-- Settings and Admin items aligned at the bottom -->
-  <div class="mt-auto">
+  <!-- <div class="mt-auto">
     <ul class="menu w-full pr-6">
-      {restrictedMenus.map((mod) => (
-        <li class="">
-          <details open>
-            <summary>
-              <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
-                {mod.icon && <Fragment set:html={mod.icon} />}
-              </div>
-              {mod.title}
-            </summary>
-            {"items" in mod && (
-              <ul>
-                {mod.items?.map((sub) => (
-                  <li class="pl-1">
-                    <MenuItem {...sub} />
-                  </li>
-                ))}
-              </ul>
-            )}
-          </details>
-          <div class="divider"></div>
-        </li>
-      ))}
     </ul>
-  </div>
+  </div> -->
 </nav>
-
