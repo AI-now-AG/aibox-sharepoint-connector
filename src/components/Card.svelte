@@ -9,32 +9,62 @@
 
 <script lang="ts">
   import { fade } from "svelte/transition";
+  import { addToast } from "$stores/toast";
 
   export let items: CardItem[] = [];
   export let type: string = "";
   export let title: string = "";
   export let viewLabel: string = "";
   export let isEditable: boolean = false;
-  
+  import { useTranslations } from "$i18n/utils";
+  const t = useTranslations();
+
   const showDeleteConfirmationDlg = (id: string) => {
     document
       .querySelector<HTMLDialogElement>(`#delete_confirmation_modal_${id}`)
       ?.showModal();
   };
 
-  async function deleteCard(id: string) {
-    const response = await fetch(`/api/${type}.json`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ _id: id }),
+  function showSuccessToast(type) {
+    const translationKey = `prompt-library.delete.${type}.success`;
+    addToast({
+      message: t(translationKey),
+      type: "success",
     });
+  }
 
-    if (response.ok) {
-      items = items.filter((card) => card.id !== id);
-    } else {
-      console.error("API call failed");
+  function showErrorToast(type) {
+    const translationKey = `prompt-library.delete.${type}.failed`;
+    addToast({
+      message: t(translationKey),
+      type: "error",
+    });
+  }
+
+  async function deleteCard(id: string) {
+    try {
+      const response = await fetch(`/api/${type}.json`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ _id: id }),
+      });
+
+      if (response.ok) {
+        items = items.filter((card) => card.id !== id);
+        showSuccessToast(type);
+        if (type === "categories") {
+          setTimeout(() => {
+            window.location.reload();
+          }, 2000);
+        }
+      } else {
+        throw new Error("Failed to delete");
+      }
+    } catch (error) {
+      console.log(error);
+      showErrorToast(type);
     }
   }
 </script>

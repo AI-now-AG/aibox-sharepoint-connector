@@ -16,8 +16,8 @@ import initializeOpenAI from "$utils/chatModel";
 const CreatePromptParamsSchema = z.object({
   _id: z.string().optional(),
   title: z.string(),
-  category: z.string(),
-  group: z.string(),
+  category: z.string().optional(),
+  group: z.string().optional(),
   instructions: z.array(z.string().optional()).optional(),
   knowledgebase: z.array(z.string().optional()),
   prompt: z.string(),
@@ -74,8 +74,8 @@ export const POST: APIRoute<CreatePromptParams> = async (ctx) => {
   // then we use fixed values.
   const prompt: Prompt = {
     ...data,
-    category: stringToObjectId.parse(data.category),
-    group: stringToObjectId.parse(data.group),
+    category: data.category ? stringToObjectId.parse(data.category) : undefined,
+    group: data.group ? stringToObjectId.parse(data.group) : undefined,
     instructions: data.instructions?.map((inst) =>
       stringToObjectId.parse(inst),
     ),
@@ -136,8 +136,8 @@ export const PUT: APIRoute<CreatePromptParams> = async (ctx) => {
 
   const prompt: Prompt = {
     ...data,
-    category: stringToObjectId.parse(data.category),
-    group: stringToObjectId.parse(data.group),
+    category: data.category ? stringToObjectId.parse(data.category) : undefined,
+    group: data.group ? stringToObjectId.parse(data.group) : undefined,
     instructions: data.instructions?.map((inst) =>
       stringToObjectId.parse(inst),
     ),
@@ -236,6 +236,8 @@ export const GET: APIRoute = async (ctx) => {
           title: kb.title,
           knowledge_base: kb.knowledge_base,
         })),
+        category: prompt.category,
+        group: prompt.group,
       };
 
       return new Response(JSON.stringify(promptData));

@@ -14,8 +14,8 @@ const promptsCursor = await PromptModel.listByTenant(
 const prompts = await promptsCursor.toArray();
 
 const calls = prompts.map(async (prompt) => {
-  const category = await CategoryModel.get(prompt.category?.toString());
-
+  if (!prompt.category) return null;
+  const category = await CategoryModel.get(prompt.category.toString());
   return category;
 });
 

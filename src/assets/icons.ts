@@ -20,6 +20,8 @@ import transcribed from "$assets/icons/transcribed.svg?raw";
 import close from "$assets/icons/close.svg?raw";
 import download from "$assets/icons/download.svg?raw";
 import startNew from "$assets/icons/start-new.svg?raw";
+import editPrompt from "$assets/icons/edit-prompt.svg?raw";
+import closeMenu from "$assets/icons/closeMenu.svg?raw";
 
 export const svgIcons = {
   menuSettings,
@@ -44,4 +46,6 @@ export const svgIcons = {
   close,
   download,
   startNew,
+  editPrompt,
+  closeMenu,
 };

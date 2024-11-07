@@ -4,6 +4,7 @@
   import PromptResults from "./PromptResults.svelte";
 
   export let promptItems;
+  export let isEditable = false;
   
   let selectedPromptId;
   let input = "";
@@ -20,6 +21,7 @@
     <ExecutionCard
       cards={promptItems}
       bind:selectedPromptId
+      bind:isEditable
     />
   </div>
   <InputArea bind:promptId={selectedPromptId} bind:input bind:output />

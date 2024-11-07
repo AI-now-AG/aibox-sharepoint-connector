@@ -2,7 +2,8 @@
   import type { CreateKnowledgeBaseParams } from "$pages/api/knowledge-base.json";
   import { useTranslations } from "$i18n/utils";
   import { onMount } from "svelte";
-
+  import { addToast } from "$stores/toast";
+  import { svgIcons } from "$assets/icons";
   const t = useTranslations();
 
   let knowledgeBaseTitle = "";
@@ -13,6 +14,8 @@
   export let isEditable: boolean = false;
 
   let isSaving = false;
+  $: isFormValid =
+    knowledgeBaseTitle.trim() !== "" && knowledgeBaseText.trim() !== "";
 
   onMount(async function () {
     if (knowledgeBase) {
@@ -22,26 +25,52 @@
   });
 
   async function saveInstruction() {
+    if (!isFormValid) return;
     isSaving = true;
-    const newInstruction: CreateKnowledgeBaseParams = {
-      title: knowledgeBaseTitle,
-      knowledge_base: knowledgeBaseText,
-      ...(knowledgeBaseId && { _id: knowledgeBaseId }),
-    };
-    const response = await fetch("/api/knowledge-base.json", {
-      method: knowledgeBase ? "PUT" : "POST",
-      body: JSON.stringify(newInstruction),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const data = await response.json();
-    isSaving = false;
-    alert(data.message);
+    try {
+      const newInstruction: CreateKnowledgeBaseParams = {
+        title: knowledgeBaseTitle,
+        knowledge_base: knowledgeBaseText,
+        ...(knowledgeBaseId && { _id: knowledgeBaseId }),
+      };
+      const response = await fetch("/api/knowledge-base.json", {
+        method: knowledgeBase ? "PUT" : "POST",
+        body: JSON.stringify(newInstruction),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.message || t("prompt-library.add.knowledgebase.failed"),
+        );
+      }
+
+      const data = await response.json();
+      addToast({
+        message: data.message,
+        type: "success",
+      });
+    } catch (error) {
+      addToast({
+        message:
+          error instanceof Error
+            ? error.message
+            : t("common.unexpected.error"),
+        type: "error",
+      });
+    } finally {
+      isSaving = false;
+    }
   }
 </script>
 
 <div class="container max-w-5xl p-6 mx-auto p-4">
+  <button class="mr-4" onclick="window.history.back();">
+    {@html svgIcons.back}
+  </button>
   <div class="w-full min-w-xs pt-2 lg:pt-6">
     <h1 class="pt-2 text-4xl font-bold pb-6">
       {#if knowledgeBase}
@@ -53,7 +82,7 @@
     <form class="rounded pt-6 mb-4 space-y-6">
       <div class="grid grid-cols-1 gap-4 justify-center">
         <div>
-          <p class="mb-2">{t("prompt-library.add.knowledgebase.title")}</p>
+          <p class="mb-2">{t("prompt-library.add.knowledgebase.title")}*</p>
           <input
             type="text"
             bind:value={knowledgeBaseTitle}
@@ -64,7 +93,7 @@
       </div>
 
       <div class="mb-4">
-        <p class="mb-2">{t("prompt-library.add.knowledgebase.text")}</p>
+        <p class="mb-2">{t("prompt-library.add.knowledgebase.text")}*</p>
         <textarea
           bind:value={knowledgeBaseText}
           placeholder="e.g. type knowledge base details..."
@@ -75,7 +104,7 @@
       {#if isEditable}
         <div class="flex items-center justify-between">
           <button
-            class={`btn btn-active btn-primary px-8 font-normal ${isSaving && "btn-disabled"}`}
+            class={`btn btn-active btn-primary px-8 font-normal ${(!isFormValid || isSaving) && "btn-disabled"}`}
             on:click|preventDefault={saveInstruction}
           >
             {#if isSaving}

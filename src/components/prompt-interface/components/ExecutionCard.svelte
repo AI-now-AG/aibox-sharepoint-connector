@@ -1,31 +1,44 @@
-<script>
+<script lang="ts">
   import { onMount } from "svelte";
   import { useTranslations } from "$i18n/utils";
   import { storePromptId } from "$components/prompt-interface/components/Stores";
+  import { svgIcons } from "$assets/icons";
+  import EditPromptDetails from "./EditPromptDetails.svelte";
 
-  export let cards;
+  export let cards: any;
   export let selectedPromptId;
 
   const t = useTranslations();
 
   let showMore = false;
-  let selectedCardIndex = null;
-
+  let selectedCardIndex: number = -1;
+  let dlgEl: HTMLDialogElement;
   const promptLimit = 5;
+  let selectedEditPromptId: any = null;
+  export let isEditable = false;
 
   // TODO: Remove below function once default prompt functionality implemented
   onMount(async function () {
     selectedCardIndex = 0;
     selectedPromptId = cards[0]._id;
     storePromptId.set(selectedPromptId);
+    if (selectedEditPromptId) {
+      dlgEl.showModal();
+    }
   });
 
-  function selectCard(index) {
+  function selectCard(index: number) {
     const promptId = cards[index]._id;
     selectedCardIndex = index;
     // selectedCardIndex = index === selectedCardIndex ? null : index;
     selectedPromptId = promptId;
     storePromptId.set(selectedPromptId);
+  }
+
+  async function editCard(index: number) {
+    const promptId = cards[index]._id;
+    selectedEditPromptId = promptId;
+    dlgEl.showModal();
   }
 </script>
 
@@ -36,9 +49,22 @@
     {#each cards as card, index}
       {#if index < promptLimit || showMore}
         <button
-          class={`btn rounded-xl h-auto p-6 ${selectedCardIndex === index ? "btn-primary " : "btn-outline border-base-300 border-2"}`}
+          class={`relative btn w-full rounded-xl h-auto p-6 ${selectedCardIndex === index ? "btn-primary " : "btn-outline border-base-300 border-2"}`}
           on:click={() => selectCard(index)}
         >
+          {#if isEditable}
+            <button
+              class="absolute top-2 right-2 ${selectedCardIndex === index
+                ? 'text-white '
+                : 'text-neutral'}"
+              on:click={(event) => {
+                event.stopPropagation();
+                editCard(index);
+              }}
+            >
+              {@html svgIcons.editPrompt}
+            </button>
+          {/if}
           <p class="card-title text-sm font-normal">{card.title}</p>
         </button>
       {/if}
@@ -58,3 +84,5 @@
     </div>
   {/if}
 </div>
+
+<EditPromptDetails bind:dlgEl bind:selectedEditPromptId />
