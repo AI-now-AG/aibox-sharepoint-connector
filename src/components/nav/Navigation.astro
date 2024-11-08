@@ -192,7 +192,7 @@ const modules = [
       {
         audioToTextMenus.map((mod) => (
           <li class="">
-            <details open>
+            <details>
               <summary>
                 <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
                   {mod.icon && <Fragment set:html={mod.icon} />}
@@ -220,7 +220,7 @@ const modules = [
       {
         restrictedMenus.map((mod, index) => (
           <li>
-            <details open>
+            <details>
               <summary>
                 <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
                   {mod.icon && <Fragment set:html={mod.icon} />}
