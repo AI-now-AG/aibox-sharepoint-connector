@@ -146,6 +146,9 @@ const modules = [
   </div>
 
   <div class="flex-grow">
+    <!-- <ul class="menu w-full pr-6">
+      
+    </ul> -->
     <ul class="menu w-full pr-6">
       <li>
         <details data-id={`ai-tools`}>
@@ -182,8 +185,6 @@ const modules = [
           </ul>
         </details>
       </li>
-    </ul>
-    <ul class="menu w-full pr-6">
       {
         audioToTextMenus.length > 0 && (
           <div class="divider mx-6 pointer-events-none" />
@@ -191,7 +192,7 @@ const modules = [
       }
       {
         audioToTextMenus.map((mod) => (
-          <li class="">
+          <li>
             <details data-id={`audio-menu`}>
               <summary>
                 <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
@@ -259,7 +260,7 @@ const modules = [
       const details = element as HTMLDetailsElement; // Type casting to HTMLDetailsElement
       const state = localStorage.getItem(details.getAttribute("data-id") || "");
       details.open = state === "true";
-      
+
       details.addEventListener("toggle", () => {
         localStorage.setItem(
           details.getAttribute("data-id") || "",
