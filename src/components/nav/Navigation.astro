@@ -56,7 +56,7 @@ if (auth.hasFeature(Astro.locals, TenantFeature.AudioToText)) {
     path: "/settings/transcription",
   });
 }
-  
+
 if (auth.isAdmin(Astro.locals) || auth.isSuperAdmin(Astro.locals)) {
   restrictedMenus.push({
     title: t("nav.settings"),
@@ -148,7 +148,7 @@ const modules = [
   <div class="flex-grow">
     <ul class="menu w-full pr-6">
       <li>
-        <details open>
+        <details data-id={`ai-tools`}>
           <summary>
             <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
               {svgIcons.aitool && <Fragment set:html={svgIcons.aitool} />}
@@ -157,9 +157,9 @@ const modules = [
           </summary>
           <ul class="menu w-full pr-6">
             {
-              modules.map((mod) => (
+              modules.map((mod, index) => (
                 <li class="">
-                  <details open>
+                  <details data-id={`ai-tools-module-${index}`}>
                     <summary>
                       {/* <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
                         {mod.icon && <Fragment set:html={mod.icon} />}
@@ -192,7 +192,7 @@ const modules = [
       {
         audioToTextMenus.map((mod) => (
           <li class="">
-            <details>
+            <details data-id={`audio-menu`}>
               <summary>
                 <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
                   {mod.icon && <Fragment set:html={mod.icon} />}
@@ -220,7 +220,7 @@ const modules = [
       {
         restrictedMenus.map((mod, index) => (
           <li>
-            <details>
+            <details data-id={`restricted-menu-${index}`}>
               <summary>
                 <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
                   {mod.icon && <Fragment set:html={mod.icon} />}
@@ -251,3 +251,21 @@ const modules = [
     </ul>
   </div> -->
 </nav>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const detailsElements = document.querySelectorAll("details[data-id]");
+    detailsElements.forEach((element) => {
+      const details = element as HTMLDetailsElement; // Type casting to HTMLDetailsElement
+      const state = localStorage.getItem(details.getAttribute("data-id") || "");
+      details.open = state === "true";
+      
+      details.addEventListener("toggle", () => {
+        localStorage.setItem(
+          details.getAttribute("data-id") || "",
+          String(details.open),
+        );
+      });
+    });
+  });
+</script>
