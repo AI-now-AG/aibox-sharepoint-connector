@@ -258,7 +258,9 @@ const modules = [
     const detailsElements = document.querySelectorAll("details[data-id]");
     detailsElements.forEach((element) => {
       const details = element as HTMLDetailsElement;
-      const state = localStorage.getItem(details.getAttribute("data-id") || "");
+      const detailsId = details.getAttribute("data-id") || "";
+      const state = localStorage.getItem(detailsId);
+      
       details.open = state === "true";
 
       details.addEventListener("toggle", () => {
@@ -268,13 +270,13 @@ const modules = [
         );
       });
     });
+    //window.location.reload();
   }
   
   document.addEventListener("DOMContentLoaded", applyOpenStates);
   document.querySelectorAll("a[href]").forEach((link) => {
     link.addEventListener("click", (event) => {
-      window.location.reload();
-      //setTimeout(applyOpenStates, 2000);
+      //setTimeout(applyOpenStates, 500);
     });
   });
 </script>
