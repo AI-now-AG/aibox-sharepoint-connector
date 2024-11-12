@@ -260,23 +260,34 @@ const modules = [
       const details = element as HTMLDetailsElement;
       const detailsId = details.getAttribute("data-id") || "";
       const state = localStorage.getItem(detailsId);
-      
-      details.open = state === "true";
-
+      if (detailsId === "ai-tools" && state === null) {
+        details.open = true;
+      } else {
+        details.open = state === "true";
+      }
       details.addEventListener("toggle", () => {
         localStorage.setItem(
           details.getAttribute("data-id") || "",
-          String(details.open)
+          String(details.open),
         );
       });
     });
-    //window.location.reload();
   }
-  
-  document.addEventListener("DOMContentLoaded", applyOpenStates);
-  document.querySelectorAll("a[href]").forEach((link) => {
-    link.addEventListener("click", (event) => {
-      //setTimeout(applyOpenStates, 500);
+
+  // Ensure open states are applied after page load
+  document.addEventListener("DOMContentLoaded", () => {
+    applyOpenStates();
+
+    // Add event listener to links to store the open states before navigation
+    document.querySelectorAll("a[href]").forEach((link) => {
+      link.addEventListener("click", (event) => {
+        // Apply open states before navigating
+        reloadPage();
+      });
     });
   });
+
+  function reloadPage() {
+    window.location.reload();
+  }
 </script>
