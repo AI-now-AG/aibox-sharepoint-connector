@@ -254,19 +254,27 @@ const modules = [
 </nav>
 
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
+  function applyOpenStates() {
     const detailsElements = document.querySelectorAll("details[data-id]");
     detailsElements.forEach((element) => {
-      const details = element as HTMLDetailsElement; // Type casting to HTMLDetailsElement
+      const details = element as HTMLDetailsElement;
       const state = localStorage.getItem(details.getAttribute("data-id") || "");
       details.open = state === "true";
 
       details.addEventListener("toggle", () => {
         localStorage.setItem(
           details.getAttribute("data-id") || "",
-          String(details.open),
+          String(details.open)
         );
       });
+    });
+  }
+  
+  document.addEventListener("DOMContentLoaded", applyOpenStates);
+  document.querySelectorAll("a[href]").forEach((link) => {
+    link.addEventListener("click", (event) => {
+      window.location.reload();
+      //setTimeout(applyOpenStates, 2000);
     });
   });
 </script>
