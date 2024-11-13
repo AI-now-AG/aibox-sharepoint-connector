@@ -227,7 +227,7 @@ const modules = [
       {
         restrictedMenus.map((mod, index) => (
           <li>
-            <details data-id={`restricted-menu-${index}`}>
+            <details data-id={`restricted-menu-${index}`}  open={mod.isOpened}>
               <summary>
                 <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
                   {mod.icon && <Fragment set:html={mod.icon} />}
