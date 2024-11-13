@@ -157,7 +157,7 @@ const modules = [
     </ul> -->
     <ul class="menu w-full pr-6">
       <li>
-        <details data-id={`ai-tools`} open={navState["ai-tools"] ?? false}>
+        <details data-id={`ai-tools`} open={navState["ai-tools"] ?? true}>
           <summary>
             <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
               {svgIcons.aitool && <Fragment set:html={svgIcons.aitool} />}
