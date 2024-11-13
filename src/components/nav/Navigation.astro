@@ -282,7 +282,7 @@ const modules = [
     document.querySelectorAll("a[href]").forEach((link) => {
       link.addEventListener("click", (event) => {
         // Apply open states before navigating
-        reloadPage();
+        setTimeout(reloadPage, 1000);
       });
     });
   });
