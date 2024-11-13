@@ -27,6 +27,7 @@ export const lucia = new Lucia(adapter, {
       picture: attributes.picture,
       roles: attributes.roles,
       permissions: attributes.permissions,
+      navState: attributes.navState,
     };
   },
 });

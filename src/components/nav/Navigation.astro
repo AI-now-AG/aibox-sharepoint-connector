@@ -11,9 +11,12 @@ const t = useTranslations();
 const cursor = await Category.listByTenant(Astro.locals.user.tenant_id);
 const categories = await cursor.toArray();
 
-const menuItems = categories.map((category) => ({
+const navState = Astro.locals.user.navState || {};
+
+const menuItems = categories.map((category, index) => ({
   title: category.title,
   icon: category.icon,
+  isOpened: navState[`ai-tools-module-${index}`] ?? false,
   items: category.groups?.map((group) => ({
     title: group.title,
     path: `/prompts/${category._id}/${group._id}`,
@@ -25,6 +28,7 @@ if (auth.hasFeature(Astro.locals, TenantFeature.AudioToText)) {
   audioToTextMenus.push({
     title: t("nav.audiotool"),
     icon: svgIcons.audio,
+    isOpened: navState["audio-menu"] ?? false,
     items: [
       {
         title: t("nav.audiotool.audio-to-text"),
@@ -61,6 +65,7 @@ if (auth.isAdmin(Astro.locals) || auth.isSuperAdmin(Astro.locals)) {
   restrictedMenus.push({
     title: t("nav.settings"),
     icon: svgIcons.menuSettings,
+    isOpened: navState[`restricted-menu-0`] ?? false,
     items: settingsItems,
   });
 }
@@ -69,6 +74,7 @@ if (auth.isSuperAdmin(Astro.locals)) {
   restrictedMenus.push({
     title: t("nav.settings.admin"),
     icon: svgIcons.admin,
+    isOpened: navState[`restricted-menu-1`] ?? false,
     items: [
       {
         title: t("nav.tenant-management"),
@@ -151,7 +157,7 @@ const modules = [
     </ul> -->
     <ul class="menu w-full pr-6">
       <li>
-        <details data-id={`ai-tools`}>
+        <details data-id={`ai-tools`} open={navState["ai-tools"] ?? false}>
           <summary>
             <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
               {svgIcons.aitool && <Fragment set:html={svgIcons.aitool} />}
@@ -162,7 +168,7 @@ const modules = [
             {
               modules.map((mod, index) => (
                 <li class="">
-                  <details data-id={`ai-tools-module-${index}`}>
+                  <details data-id={`ai-tools-module-${index}`} open={mod.isOpened}>
                     <summary>
                       {/* <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
                         {mod.icon && <Fragment set:html={mod.icon} />}
@@ -193,7 +199,7 @@ const modules = [
       {
         audioToTextMenus.map((mod) => (
           <li>
-            <details data-id={`audio-menu`}>
+            <details data-id={`audio-menu`} open={mod.isOpened}>
               <summary>
                 <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
                   {mod.icon && <Fragment set:html={mod.icon} />}
@@ -259,18 +265,15 @@ const modules = [
     detailsElements.forEach((element) => {
       const details = element as HTMLDetailsElement;
       const detailsId = details.getAttribute("data-id") || "";
-      const state = localStorage.getItem(detailsId);
-      if (detailsId === "ai-tools" && state === null) {
-        details.open = true;
-      } else {
-        details.open = state === "true";
-      }
-      details.addEventListener("toggle", () => {
-        localStorage.setItem(
-          details.getAttribute("data-id") || "",
-          String(details.open),
-        );
-      });
+      details.addEventListener("toggle", () => updateNavState(detailsId, details.open));
+    });
+  }
+
+  async function updateNavState(detailsId: string, isOpen: boolean) {
+    await fetch('/api/user/update-nav-state.json', {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: detailsId, open: isOpen }),
     });
   }
 
@@ -281,13 +284,8 @@ const modules = [
     // Add event listener to links to store the open states before navigation
     document.querySelectorAll("a[href]").forEach((link) => {
       link.addEventListener("click", (event) => {
-        // Apply open states before navigating
-        setTimeout(reloadPage, 1000);
       });
     });
   });
 
-  function reloadPage() {
-    window.location.reload();
-  }
 </script>
