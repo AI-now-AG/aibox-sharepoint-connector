@@ -227,7 +227,7 @@ const modules = [
       {
         restrictedMenus.map((mod, index) => (
           <li>
-            <details data-id={`restricted-menu-${index}`}  open={mod.isOpened}>
+            <details data-id={`restricted-menu-${index}`} open={mod.isOpened}>
               <summary>
                 <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
                   {mod.icon && <Fragment set:html={mod.icon} />}
@@ -270,7 +270,7 @@ const modules = [
   }
 
   async function updateNavState(detailsId: string, isOpen: boolean) {
-    await fetch('/api/user/update-nav-state.json', {
+    await fetch("/api/user/update-nav-state.json", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: detailsId, open: isOpen }),
@@ -278,14 +278,14 @@ const modules = [
   }
 
   // Ensure open states are applied after page load
-  document.addEventListener("DOMContentLoaded", () => {
-    applyOpenStates();
+  document.addEventListener("DOMContentLoaded", async () => {
+    // await applyOpenStates();
+    // document.querySelectorAll("a[href]").forEach((link) => {
+    //   link.addEventListener("click", async (event) => {
+    //     await applyOpenStates();
+    //   });
+    // });
 
-    // Add event listener to links to store the open states before navigation
-    document.querySelectorAll("a[href]").forEach((link) => {
-      link.addEventListener("click", (event) => {
-      });
-    });
+    setInterval(applyOpenStates, 500);
   });
-
 </script>
