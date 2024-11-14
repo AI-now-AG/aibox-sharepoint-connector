@@ -408,10 +408,11 @@
           new Blob([blob], { type: "application/octet-stream" }),
         );
 
+        const fileName = assFileUrl.split('/').pop();
         const link = document.createElement("a");
         link.href = blobUrl;
         link.target = "_blank";
-        link.download = "transcribe.ass";
+        link.download = fileName;
 
         document.body.appendChild(link);
         link.click();
