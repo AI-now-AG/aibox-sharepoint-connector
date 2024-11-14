@@ -8,7 +8,7 @@ import {
   FEATURE_MAP_ROUTES,
 } from "$constants";
 import type { APIContext, MiddlewareNext } from "astro";
-import tenantModel, { FeatureName } from "$data/models/tenant.model";
+import tenantModel, { TenantFeature } from "$data/models/tenant.model";
 import { defaultLang } from "$i18n/ui";
 import { setLanguage } from "$i18n/utils";
 import { wildcardMatch, wildcardMatchInArray } from "$utils/wildcardMatch";
@@ -101,7 +101,7 @@ async function restrictAccess(context: APIContext, next: MiddlewareNext) {
     let hasAccess = false;
     if (context.locals.tenant?.included_features?.length) {
       hasAccess = context.locals.tenant.included_features.some(
-        (item) => item.name == (key as FeatureName),
+        (item) => item.name == (key as TenantFeature),
       );
     }
 

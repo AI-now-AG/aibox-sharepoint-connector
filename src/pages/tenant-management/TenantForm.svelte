@@ -34,7 +34,7 @@
     Edit: "edit",
   };
 
-  const FeatureName = {
+  const TenantFeature = {
     TextPrommpts: "text-prommpts",
     AudioToText: "audio-to-text",
   };
@@ -63,7 +63,7 @@
   let isAudioToTextChecked = false;
   if (tenantData && tenantData?.included_features?.length) {
     const findTextProvider = tenantData.included_features.find(
-      (item) => item.name == FeatureName.TextPrommpts,
+      (item) => item.name == TenantFeature.TextPrommpts,
     );
     if (findTextProvider) {
       textSelectedProvider = providerValues.find(
@@ -72,7 +72,7 @@
     }
 
     isAudioToTextChecked = tenantData.included_features.some(
-      (item) => item.name == FeatureName.AudioToText,
+      (item) => item.name == TenantFeature.AudioToText,
     );
   }
 
@@ -185,12 +185,12 @@
         // update providers
         tenantData.included_features = [];
         tenantData.included_features.push({
-          name: FeatureName.TextPrommpts,
+          name: TenantFeature.TextPrommpts,
           provider: textSelectedProvider.value,
         });
         if (isAudioToTextChecked) {
           tenantData.included_features.push({
-            name: FeatureName.AudioToText,
+            name: TenantFeature.AudioToText,
             provider: ApiKeyProvider.AzureOpenAI,
           });
         }
@@ -236,12 +236,12 @@
         // update providers
         tenantData.included_features = [];
         tenantData.included_features.push({
-          name: FeatureName.TextPrommpts,
+          name: TenantFeature.TextPrommpts,
           provider: textSelectedProvider.value,
         });
         if (isAudioToTextChecked) {
           tenantData.included_features.push({
-            name: FeatureName.AudioToText,
+            name: TenantFeature.AudioToText,
             provider: ApiKeyProvider.AzureOpenAI,
           });
         }
@@ -257,6 +257,9 @@
             message: t("tenant.update-successful"),
             type: "success",
           });
+          setTimeout(() => {
+            window.location.reload();
+          }, 2000);
         }
       } catch (error) {
         showAlert(error);

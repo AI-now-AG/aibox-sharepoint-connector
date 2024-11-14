@@ -1,6 +1,6 @@
 import type { User } from "lucia";
 import { UserRole } from "$data/models/user.model";
-import { FeatureName } from "$data/models/tenant.model";
+import { TenantFeature } from "$data/models/tenant.model";
 
 export const user = (locals: App.Locals): User => {
   return locals.user;
@@ -27,7 +27,7 @@ export const hasRole = (locals: App.Locals, role: UserRole) => {
   return roles.includes(role) ? true : false;
 };
 
-export const hasFeature = (locals: App.Locals, feature: FeatureName) => {
+export const hasFeature = (locals: App.Locals, feature: TenantFeature) => {
   if (!locals.tenant) {
     return false;
   }
