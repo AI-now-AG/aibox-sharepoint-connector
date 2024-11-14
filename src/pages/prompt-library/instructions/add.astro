@@ -1,8 +1,8 @@
 ---
 // Component
+import { Permission } from "$enums/role.enums";
 import Layout from "$layouts/Layout.astro";
 import InstructionForm from "$pages/prompt-library/instructions/InstructionForm.svelte";
-import { Permission } from "$data/models/user.model";
 
 let userPermissions = Astro.locals.user.permissions;
 ---

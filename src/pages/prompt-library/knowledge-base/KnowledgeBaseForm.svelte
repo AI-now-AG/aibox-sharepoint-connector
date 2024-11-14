@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { CreateKnowledgeBaseParams } from "$pages/api/knowledge-base.json";
-  import { useTranslations } from "$i18n/utils";
-  import { onMount } from "svelte";
-  import { addToast } from "$stores/toast";
   import { svgIcons } from "$assets/icons";
+  import { useTranslations } from "$i18n/utils";
+  import type { CreateKnowledgeBaseParams } from "$pages/api/knowledge-base.json";
+  import { addToast } from "$stores/toast";
+  import { onMount } from "svelte";
   const t = useTranslations();
 
   let knowledgeBaseTitle = "";
@@ -56,9 +56,7 @@
     } catch (error) {
       addToast({
         message:
-          error instanceof Error
-            ? error.message
-            : t("common.unexpected.error"),
+          error instanceof Error ? error.message : t("common.unexpected.error"),
         type: "error",
       });
     } finally {

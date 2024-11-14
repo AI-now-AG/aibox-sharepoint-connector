@@ -1,7 +1,7 @@
 ---
+import { Permission } from "$enums/role.enums";
 import Layout from "$layouts/Layout.astro";
 import NewCategoryForm from "$pages/prompt-library/categories/NewCategoryForm.svelte";
-import { Permission } from "$data/models/user.model";
 
 let userPermissions = Astro.locals.user.permissions;
 ---

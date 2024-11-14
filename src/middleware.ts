@@ -1,17 +1,17 @@
 import { lucia } from "$auth";
 import auth from "$auth/auth";
-import { verifyRequestOrigin } from "lucia";
-import { sequence } from "astro/middleware";
 import {
+  FEATURE_MAP_ROUTES,
   PUBLIC_ROUTES,
   SUPER_ADMIN_ROUTES,
-  FEATURE_MAP_ROUTES,
 } from "$constants";
-import type { APIContext, MiddlewareNext } from "astro";
 import tenantModel, { FeatureName } from "$data/models/tenant.model";
 import { defaultLang } from "$i18n/ui";
 import { setLanguage } from "$i18n/utils";
 import { wildcardMatch, wildcardMatchInArray } from "$utils/wildcardMatch";
+import type { APIContext, MiddlewareNext } from "astro";
+import { sequence } from "astro/middleware";
+import { verifyRequestOrigin } from "lucia";
 
 async function requestOrigin(context: APIContext, next: MiddlewareNext) {
   // Basic CSRF protection
@@ -53,7 +53,7 @@ async function authenticate(context: APIContext, next: MiddlewareNext) {
   const { session, user } = await lucia.validateSession(sessionId);
   if (!session) return sessionRequired();
 
-  if (session && session.fresh) {
+  if (session?.fresh) {
     const sessionCookie = lucia.createSessionCookie(session.id);
     context.cookies.set(
       sessionCookie.name,
@@ -65,7 +65,6 @@ async function authenticate(context: APIContext, next: MiddlewareNext) {
   context.locals.session = session;
   context.locals.user = user;
 
-  // fetch tenant
   const tenant = await tenantModel.get(user.tenant_id.toString());
   if (tenant) {
     context.locals.tenant = tenant;

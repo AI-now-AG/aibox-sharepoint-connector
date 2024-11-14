@@ -1,10 +1,10 @@
 ---
-import InitializeTheme from "$components/theme/InitializeTheme.astro";
 import InitializeColor from "$components/theme/InitializeColor.astro";
+import InitializeTheme from "$components/theme/InitializeTheme.astro";
 import SharedVariables from "$components/theme/SharedVariables.svelte";
 import Toasts from "$components/toast-notification/Toasts.svelte";
-import { transformRawData } from "$utils/transformRawData";
 import { useTranslations } from "$i18n/utils";
+import { transformRawData } from "$utils/transformRawData";
 
 const t = useTranslations();
 
@@ -81,12 +81,10 @@ const primaryColor = Astro.locals.tenant?.primary_color;
         class="menu menu-sm dropdown-content bg-base-100 rounded-box z-10 mt-3 w-52 p-2 shadow border"
       >
         <li>
-          <a class="justify-between">
-            Profile
-            <span class="badge">New</span>
+          <a class="justify-between" href="/profile">
+            Profile 
           </a>
         </li>
-        <li><a>Settings</a></li>
         <li id="logout"><a href="/api/logout" data-astro-reload>Logout</a></li>
       </ul>
     </div>

@@ -158,5 +158,6 @@
   "transciption.transcription.failed": "Transkription fehlgeschlagen",
   "settings.transcription.instructions-subtitle": "Instruktionen für Untertitel",
   "settings.transcription.instructions-plaintext": "Instruktionen für Textoutput",
-  "settings.transcription.instructions-placeholder": "hier Instruktion erfassen..."
+  "settings.transcription.instructions-placeholder": "hier Instruktion erfassen...",
+  "profile": ""
 }

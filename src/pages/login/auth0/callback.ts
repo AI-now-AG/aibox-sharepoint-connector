@@ -1,36 +1,31 @@
 import { auth0, lucia } from "$auth";
 import { decodeJwt } from "jose";
 
-import type { APIContext } from "astro";
-import userModel, {
-  assignPermissions,
-  UserRole,
-  type User,
-} from "$data/models/user.model";
-import { z } from "zod";
-import tenantModel from "$data/models/tenant.model";
+import TenantModel from "$data/models/tenant.model";
+import UserModel, { assignPermissions } from "$data/models/user.model";
+import { UserRole } from "$enums/role.enums";
 import log from "$utils/log";
+import type { APIContext } from "astro";
+import { z } from "zod";
 
 const Auth0JWTSchema = z.object({
   sub: z.string().min(24),
   org_id: z.string().min(2),
-  //"ainow/org_displayName": z.string(),
   org_name: z.string().min(2),
-  "ainow/roles": z.array(z.nativeEnum(UserRole)),
   email: z.string().email(),
   nickname: z.string(),
   picture: z.string().url(),
+  name: z.string(),
+  "ainow/roles": z.array(z.nativeEnum(UserRole)),
+  //"ainow/org_displayName": z.string(),
 });
 
 export async function GET(context: APIContext): Promise<Response> {
-  log.d(context.url.searchParams.toString(), "searchParams");
-  log.d(context.cookies.get("auth0_state"), "state");
-
   const code = context.url.searchParams.get("code");
   const state = context.url.searchParams.get("state");
   const storedState = context.cookies.get("auth0_state")?.value ?? null;
 
-  // Redirect to 500 error page if any error occur
+  // *INFO: Redirect to 500 error page if any error occur
   if (context.url.searchParams.has("error")) {
     const error = context.url.searchParams.get("error");
     const description = context.url.searchParams.get("error_description");
@@ -39,7 +34,7 @@ export async function GET(context: APIContext): Promise<Response> {
     );
   }
 
-  // Ensure the callback has code and valid state
+  // *INFO: Ensure the callback has code and valid state
   if (!code || !state || !storedState || state !== storedState) {
     log.e({ code, state, storedState }, "missing required params");
     return new Response(null, {
@@ -47,27 +42,21 @@ export async function GET(context: APIContext): Promise<Response> {
     });
   }
 
-  const tokens = await auth0(context.url.origin).validateAuthorizationCode(
-    code,
-  );
-  const decoded = decodeJwt(tokens.idToken);
-  log.d(decoded, "decoded");
-
-  const userData = Auth0JWTSchema.safeParse(decoded);
-  if (userData.error) {
+  const token = await auth0(context.url.origin).validateAuthorizationCode(code);
+  const decoded = decodeJwt(token.idToken);
+  const auth0User = Auth0JWTSchema.safeParse(decoded);
+  if (auth0User.error) {
     log.e(
-      userData.error,
+      auth0User.error,
       "Decoded id token does not contain the required fields",
     );
     return new Response(null, {
       status: 400,
     });
   }
-  const roles = userData.data["ainow/roles"];
-  //const orgDisplayName = userData.data["ainow/org_displayName"];
 
-  // TODO: fetch logo from auth0 org?
-  const tenant = await tenantModel.getById(userData.data.org_id);
+  // TODO: Fetch logo from auth0 org
+  const tenant = await TenantModel.getById(auth0User.data.org_id);
   if (!tenant) {
     log.e("Tenant not found");
     return new Response(null, {
@@ -75,55 +64,21 @@ export async function GET(context: APIContext): Promise<Response> {
     });
   }
 
-  const existingUser = await userModel.getAuth0Sub(userData.data.sub);
-  log.d(existingUser, "existingUser");
-
-  if (existingUser) {
-    // Update roles
-    await userModel.updateRole(userData.data.sub, roles);
-
-    // Create session
-    const session = await lucia.createSession(existingUser._id, {});
-    const sessionCookie = lucia.createSessionCookie(session.id);
-
-    context.cookies.set(
-      sessionCookie.name,
-      sessionCookie.value,
-      sessionCookie.attributes,
-    );
-
-    // Skip it for now. We will create new task for synchronize from Auth0 to aibox
-    // const tenant = await tenantModel.getById(userData.data.org_id);
-    // if (tenant) {
-    //   if (tenant.name != orgDisplayName) {
-    //     tenantModel.updateOrgName(tenant.org_id, orgDisplayName);
-    //   }
-    // }
-
-    // Sync tenant
-    if (tenant._id.toString() != existingUser.tenant_id.toString()) {
-      const update: Partial<User> = { tenant_id: tenant._id };
-      userModel.update(existingUser._id, update);
-    }
-
-    return context.redirect("/");
-  }
-
-  const newUser = await userModel.add({
+  const roles = auth0User.data["ainow/roles"];
+  //const orgDisplayName = auth0User.data["ainow/org_displayName"];
+  // TODO: Sync tenant from Auth0 to aibox
+  const userId = await UserModel.upsertByAuth0Sub(auth0User.data.sub, {
     tenant_id: tenant._id,
-    auth0_sub: userData.data.sub,
-    username: userData.data.nickname,
-    email: userData.data.email,
-    picture: userData.data.picture,
+    auth0_sub: auth0User.data.sub,
+    username: auth0User.data.nickname,
+    name: auth0User.data.name,
+    email: auth0User.data.email,
+    picture: auth0User.data.picture,
     roles,
-    created_at: new Date(),
-    updated_at: new Date(),
     permissions: assignPermissions(roles),
   });
 
-  log.d(newUser, "newUser");
-
-  const session = await lucia.createSession(newUser.insertedId, {});
+  const session = await lucia.createSession(userId, {});
   const sessionCookie = lucia.createSessionCookie(session.id);
 
   context.cookies.set(

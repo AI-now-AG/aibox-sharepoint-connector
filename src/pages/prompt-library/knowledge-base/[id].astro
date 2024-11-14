@@ -1,8 +1,8 @@
 ---
-import Layout from "$layouts/Layout.astro";
 import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
+import { Permission } from "$enums/role.enums";
+import Layout from "$layouts/Layout.astro";
 import KnowledgeBaseForm from "$pages/prompt-library/knowledge-base/KnowledgeBaseForm.svelte";
-import { Permission } from "$data/models/user.model";
 
 export interface Props {
   id: string;

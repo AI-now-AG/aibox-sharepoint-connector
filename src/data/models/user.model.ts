@@ -1,18 +1,8 @@
+import { ROLE_PERMISSIONS_MAP } from "$constants/role.constants";
+import { Permission, UserRole } from "$enums/role.enums";
 import { ObjectId } from "mongodb";
-import { db } from "../mongodb";
 import { z } from "zod";
-
-export enum UserRole {
-  Admin = "Admin",
-  SuperAdmin = "Super Admin",
-  User = "User",
-}
-
-export enum Permission {
-  UserAll = "user:all",
-  AdminAll = "admin:all",
-  SuperAll = "super:all",
-}
+import { db } from "../mongodb";
 
 const UserSchema = z.object({
   _id: z.instanceof(ObjectId),
@@ -22,29 +12,20 @@ const UserSchema = z.object({
   email: z.string(),
   picture: z.string().url().optional(),
   roles: z.array(z.nativeEnum(UserRole)),
-  created_at: z.date(),
-  updated_at: z.date(),
+  created_at: z.date().default(() => new Date()),
+  updated_at: z.date().default(() => new Date()),
   permissions: z.array(z.nativeEnum(Permission)),
+  name: z.string(),
 });
 
 export type User = z.infer<typeof UserSchema>;
 
 export const collection = db.collection<User>("oauth_users");
 
-export const rolePermissionsMap = {
-  [UserRole.User]: [Permission.UserAll],
-  [UserRole.Admin]: [Permission.UserAll, Permission.AdminAll],
-  [UserRole.SuperAdmin]: [
-    Permission.UserAll,
-    Permission.AdminAll,
-    Permission.SuperAll,
-  ],
-};
-
 export function assignPermissions(roles: UserRole[]): Permission[] {
   const permissionsSet = new Set<Permission>();
   roles.forEach((role) => {
-    const rolePermissions = rolePermissionsMap[role];
+    const rolePermissions = ROLE_PERMISSIONS_MAP[role];
     rolePermissions.forEach((permission) => permissionsSet.add(permission));
   });
   return Array.from(permissionsSet);
@@ -61,9 +42,7 @@ export default {
     const validated = UserSchema.partial().parse(user);
     const doc = {
       ...validated,
-      ...{
-        updated_at: new Date(),
-      },
+      updated_at: new Date(),
     };
     return await collection.findOneAndUpdate(
       { _id: objectId },
@@ -97,5 +76,31 @@ export default {
       },
     );
     return result;
+  },
+
+  upsertByAuth0Sub: async (auth0Sub: string, user: Partial<User>) => {
+    const existingUser = await collection.findOne<User>({
+      auth0_sub: auth0Sub,
+    });
+    if (existingUser) {
+      const validatedUser = UserSchema.partial().parse(user);
+      await collection.findOneAndUpdate(
+        { _id: existingUser._id },
+        {
+          $set: {
+            ...validatedUser,
+            updated_at: new Date(),
+          },
+        },
+      );
+      return existingUser._id;
+    }
+
+    const validatedUser = UserSchema.parse({
+      _id: new ObjectId(),
+      ...user,
+    });
+    const createdUser = await collection.insertOne(validatedUser);
+    return createdUser.insertedId;
   },
 };

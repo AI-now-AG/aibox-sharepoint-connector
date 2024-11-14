@@ -158,5 +158,6 @@
   "transciption.transcription.failed": "Transcription failed",
   "settings.transcription.instructions-subtitle": "Instructions for subtitle (SRT)",
   "settings.transcription.instructions-plaintext": "Instructions for plaintext",
-  "settings.transcription.instructions-placeholder": "e.g. type instruction details..."
+  "settings.transcription.instructions-placeholder": "e.g. type instruction details...",
+  "profile": "Profile"
 }

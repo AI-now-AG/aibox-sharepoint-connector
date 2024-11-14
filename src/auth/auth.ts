@@ -1,6 +1,6 @@
-import type { User } from "lucia";
-import { UserRole } from "$data/models/user.model";
 import { FeatureName } from "$data/models/tenant.model";
+import { UserRole } from "$enums/role.enums";
+import type { User } from "lucia";
 
 export const user = (locals: App.Locals): User => {
   return locals.user;

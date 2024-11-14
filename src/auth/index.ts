@@ -1,11 +1,11 @@
-import { Lucia } from "lucia";
-import { MongodbAdapter } from "@lucia-auth/adapter-mongodb";
+import { collection as sessionCollection } from "$data/models/session.model";
 import {
   collection as userCollection,
   type User,
 } from "$data/models/user.model";
-import { collection as sessionCollection } from "$data/models/session.model";
+import { MongodbAdapter } from "@lucia-auth/adapter-mongodb";
 import { Auth0 } from "arctic";
+import { Lucia } from "lucia";
 
 import type { ObjectId } from "mongodb";
 
@@ -21,7 +21,9 @@ export const lucia = new Lucia(adapter, {
     // This defines what values will be returned (and attached to the request context)
     // when validating a session
     return {
+      auth0_sub: attributes.auth0_sub,
       username: attributes.username,
+      name: attributes.name,
       tenant_id: attributes.tenant_id,
       email: attributes.email,
       picture: attributes.picture,
