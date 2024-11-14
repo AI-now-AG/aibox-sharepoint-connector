@@ -18,6 +18,7 @@
   let isDragOver: boolean = false;
   let textOuput: string = "";
   let srtFileUrl: string = "";
+  let assFileUrl: string = "";
   let fileErrorMessage: string = "";
 
   // states
@@ -42,8 +43,9 @@
 
     // subscribe values change
     transcript.subscribe((value) => {
-      if (value?.srtUrl) {
+      if (value?.srtUrl && value?.assUrl) {
         srtFileUrl = value.srtUrl;
+        assFileUrl = value.assUrl;
         textOuput = value.txtOuput;
 
         isTranscribing = false;
@@ -56,6 +58,7 @@
   function retrieveDataInStore() {
     audioFile = $transcript?.file;
     srtFileUrl = $transcript?.srtUrl as string;
+    assFileUrl = $transcript?.assFileUrl as string;
 
     if (!srtFileUrl) {
       isTranscribing = true;
@@ -192,7 +195,11 @@
 
       // Store temporary upload URL, filename for later
       tempUploadUrl = uploadUrl;
-      tempOutputFileNames = [`${outputFileName}.txt`, `${outputFileName}.srt`];
+      tempOutputFileNames = [
+        `${outputFileName}.txt`,
+        `${outputFileName}.srt`,
+        `${outputFileName}.ass`,
+      ];
       console.log("Temp output file name", tempOutputFileNames);
 
       if (response.ok) {
@@ -319,12 +326,14 @@
         if (result.exists) {
           clearInterval(intervalId);
           srtFileUrl = result.srt_file;
+          assFileUrl = result.ass_file;
           transcript.set({
             file: audioFile,
             duration: audioDuration,
             txtOuput: result.text_output,
             txtUrl: result.txt_file,
             srtUrl: result.srt_file,
+            assUrl: result.ass_file,
           });
 
           addToast({
@@ -366,14 +375,14 @@
     confirmModal.close();
   }
 
-  function downloadFile() {
+  function downloadFileSRT() {
     // Create a link element
     const link = document.createElement("a");
 
     // Set link's href to point to the Blob URL
     link.href = srtFileUrl;
     link.target = "_blank";
-    link.download = `transcribe`;
+    link.download = `transcribe.srt`;
 
     // Append link to the body
     document.body.appendChild(link);
@@ -391,6 +400,35 @@
     }
   }
 
+  function downloadFileASS() {
+    fetch(assFileUrl)
+      .then((response) => response.blob())
+      .then((blob) => {
+        const blobUrl = URL.createObjectURL(
+          new Blob([blob], { type: "application/octet-stream" }),
+        );
+
+        const link = document.createElement("a");
+        link.href = blobUrl;
+        link.target = "_blank";
+        link.download = "transcribe.ass";
+
+        document.body.appendChild(link);
+        link.click();
+
+        document.body.removeChild(link);
+        URL.revokeObjectURL(blobUrl);
+
+        console.log("Download file!");
+        if (confirmModal.open) {
+          confirmModal.close();
+        }
+      })
+      .catch((error) => {
+        console.error("Error downloading ASS file:", error);
+      });
+  }
+
   function removeFile() {
     reset();
   }
@@ -404,6 +442,7 @@
     isTranscriptionFailed = false;
 
     srtFileUrl = "";
+    assFileUrl = "";
     textOuput = "";
   }
 </script>
@@ -518,9 +557,18 @@
       >
     {/if}
     {#if isTranscipted}
-      <button class="btn btn-success btn-sm text-white" on:click={downloadFile}
+      <button
+        class="btn btn-success btn-sm text-white"
+        on:click={downloadFileSRT}
         >{@html svgIcons.download}{t(
-          "transciption.model.cta.download-output",
+          "transciption.model.cta.download-output.srt",
+        )}</button
+      >
+      <button
+        class="btn btn-success btn-sm text-white"
+        on:click={downloadFileASS}
+        >{@html svgIcons.download}{t(
+          "transciption.model.cta.download-output.ass",
         )}</button
       >
       <button class="btn bg-black btn-sm text-white" on:click={confirmStartNew}
@@ -531,7 +579,8 @@
 
   <StartNewConfirmDialog
     bind:modal={confirmModal}
-    on:download={downloadFile}
+    on:downloadSRT={downloadFileSRT}
+    on:downloadASS={downloadFileASS}
     on:confirm={startNew}
   />
 </div>

@@ -24,6 +24,7 @@ const checkFileExist: Handler = async (event, context) => {
     try {
       let txtFileUrl = "";
       let srtFileUrl = "";
+      let assFileUrl = "";
       let rawTxtContent = "";
 
       // Check if the file exists in Azure Blob Storage
@@ -62,6 +63,8 @@ const checkFileExist: Handler = async (event, context) => {
         const fileUrl = blobClient.url;
         if (fileName.endsWith(".srt")) {
           srtFileUrl = fileUrl; // Store the URL for the .srt file
+        } else if (fileName.endsWith(".ass")) {
+          assFileUrl = fileUrl; // Store the URL for the .ass file
         } else if (fileName.endsWith(".txt")) {
           txtFileUrl = fileUrl; // Store the URL for the .txt file
 
@@ -96,6 +99,7 @@ const checkFileExist: Handler = async (event, context) => {
           text_output: rawTxtContent,
           txt_file: txtFileUrl,
           srt_file: srtFileUrl,
+          ass_file: assFileUrl,
         }),
       };
     } catch (error) {
