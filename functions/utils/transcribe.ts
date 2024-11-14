@@ -6,6 +6,7 @@ import { AzureOpenAI, RateLimitError } from "openai";
 import {
   groupLines,
   formatSRT,
+  formatASS,
   createSRTData,
   type InputEntry,
   type Entry,
@@ -209,7 +210,9 @@ export async function transcribeUsingOpenAI(transcribeParams: TranscribeRequest)
     }
     const improvedSrtData = await improveSRTQuality(transcribeParams, srtData);
     const grouped = groupLines(improvedSrtData);
-    const result = formatSRT(grouped);
+    const srtResult = formatSRT(grouped);
+    const assResult = formatASS(improvedSrtData);
+
     const fileNameWithExtension = transcribeParams.uploadUrl.split("/").pop()!.split("?")[0];
     const fileNameWithoutExtension = fileNameWithExtension
       .split(".")
@@ -231,9 +234,16 @@ export async function transcribeUsingOpenAI(transcribeParams: TranscribeRequest)
     outputURLs["srt"] = await uploadOutputToBlob(
       transcribeParams.folderName,
       `${fileNameWithoutExtension}.srt`,
-      result,
+      srtResult,
       "srt",
     );
+    outputURLs["ass"] = await uploadOutputToBlob(
+      transcribeParams.folderName,
+      `${fileNameWithoutExtension}.ass`,
+      assResult,
+      "ass",
+    );
+
     return {
       success: true,
       data: { text: response.text, urls: outputURLs },

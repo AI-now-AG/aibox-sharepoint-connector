@@ -29,12 +29,18 @@
         </p>
       </div>
 
-      <div class="flex flex-row-reverse gap-4 mt-16">
+      <div class="flex flex-col-reverse gap-4 mt-16">
         <button
           id="no_button"
-          class="btn btn-active btn-primary btn-sm text-white"
-          on:click={() => dispatch("download")}
-          >{t("transcription.dowload-srt-file")}</button
+          class="btn btn-active btn-primary btn-sm text-base-100"
+          on:click={() => dispatch("downloadASS")}
+          >{t("transcription.dowload-srt-file.ass")}</button
+        >
+        <button
+          id="no_button"
+          class="btn btn-active btn-primary btn-sm text-base-100"
+          on:click={() => dispatch("downloadSRT")}
+          >{t("transcription.dowload-srt-file.srt")}</button
         >
         <button class="btn btn-sm" on:click={() => dispatch("confirm")}
           >{t("transcription.start-new")}</button
