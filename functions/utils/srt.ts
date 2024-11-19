@@ -50,7 +50,7 @@ export const groupLines = (data: Entry[]) => {
   return entries;
 };
 
-const srtTimestamp = (ms: number) => {
+const srtTimestamp = (ms: number, separator: string = ",") => {
   const date = new Date(ms * 1000);
 
   const hours = date.getHours().toString().padStart(2, "0");
@@ -58,7 +58,7 @@ const srtTimestamp = (ms: number) => {
   const seconds = date.getSeconds().toString().padStart(2, "0");
   const milliseconds = date.getMilliseconds().toString().padStart(3, "0");
 
-  return `${hours}:${minutes}:${seconds},${milliseconds}`;
+  return `${hours}:${minutes}:${seconds}${separator}${milliseconds}`;
 };
 
 export const formatSRT = (entries: Entry[]) => {
@@ -109,8 +109,8 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 `;
 
   for (const entry of entries) {
-    out += `Dialogue: 0,${srtTimestamp(entry.start)},${srtTimestamp(
-      entry.end
+    out += `Dialogue: 0,${srtTimestamp(entry.start, ".")},${srtTimestamp(
+      entry.end, "."
     )},Default,,0,0,0,,{\\c&HFFFFFF&}${entry.text.replace(/\n/g, "\\N")}\n`;
   }
 
