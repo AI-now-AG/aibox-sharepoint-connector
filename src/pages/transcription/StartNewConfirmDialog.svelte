@@ -33,7 +33,7 @@
         <button
           id="no_button"
           class="btn btn-active btn-primary btn-sm text-base-100"
-          on:click={() => dispatch("downloadASS")}
+          on:click={() => dispatch("downloadFile")}
           >{t("transcription.dowload-srt-file.ass")}</button
         >
         <button

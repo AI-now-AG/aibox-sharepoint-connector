@@ -10,7 +10,17 @@ import { getTask } from "$shared/transcriptionTasks";
 
 const checkFileExist: Handler = async (event, context) => {
   const { uniqueName, fileNames, folderName } = JSON.parse(event.body!);
-  if (fileNames && uniqueName) {
+
+  let requireFilesCount = fileNames.length || 0;
+  const tempFileNames: string[] = [];
+
+  const txtFileName = `${uniqueName}.txt`;
+  if (!fileNames.includes(txtFileName)) {
+    requireFilesCount += 1;
+    tempFileNames.push(txtFileName);
+  }
+
+  if ((fileNames?.length || tempFileNames.length) && uniqueName) {
     const streamPipeline = promisify(pipeline);
     const tmpDir = tmpdir();
     let storageURLString: string = process.env.AZURE_BLOB_STORAGE_NAME || "";
@@ -61,7 +71,6 @@ const checkFileExist: Handler = async (event, context) => {
           downloadBlockBlobResponse.readableStreamBody!,
           fileStream,
         );
-
         const fileUrl = blobClient.url;
         if (fileName.endsWith(".srt")) {
           srtFileUrl = fileUrl; // Store the URL for the .srt file
@@ -73,9 +82,9 @@ const checkFileExist: Handler = async (event, context) => {
           txtFileUrl = fileUrl; // Store the URL for the .txt file
 
           // Download and read the raw text content of the .txt file
-          const downloadBlockBlobResponse = await blobClient.download();
+          const downloadBlockBlobResponseStr = await blobClient.download();
           rawTxtContent = await streamToString(
-            downloadBlockBlobResponse.readableStreamBody!,
+            downloadBlockBlobResponseStr.readableStreamBody!,
           );
         }
 
@@ -86,12 +95,43 @@ const checkFileExist: Handler = async (event, context) => {
         //const downloadBlockBlobResponse = await blobClient.download()
         //const downloadedContent = await streamToString(downloadBlockBlobResponse.readableStreamBody!);
       }
+      for (const fileName of tempFileNames) {
+        const filePathInBlob = `${folderName}/${fileName}`;
+        const blobClient = containerClient.getBlobClient(filePathInBlob);
+        const exists = await blobClient.exists();
+        if (!exists) {
+          const task = await getTask(uniqueName);
+          if (!task) {
+            return {
+              statusCode: 404,
+              body: JSON.stringify({
+                exists: false,
+                message: "File does not exist",
+              }),
+            };
+          } else {
+            return {
+              statusCode: 200,
+              body: JSON.stringify(task),
+            };
+          }
+        }
+        availableFiles.push(fileName);
+
+        if (fileName.endsWith(".txt")) {
+          // Download and read the raw text content of the .txt file
+          const downloadBlockBlobResponse = await blobClient.download();
+          rawTxtContent = await streamToString(
+            downloadBlockBlobResponse.readableStreamBody!,
+          );
+        }
+      }
       //console.log(downloadedFiles);
       // return {
       //     statusCode: 200,
       //     body: JSON.stringify({ exists: true, transcriptionFile: zipBuffer }),
       // };
-      if (availableFiles.length >= fileNames.length) {
+      if (availableFiles.length >= requireFilesCount) {
         let zipBuffer: Buffer | null = null;
         if (fileNames.length > 1) {
           zipBuffer = await createZip(downloadedFiles)

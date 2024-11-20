@@ -276,15 +276,6 @@
             tempOutputFileNames.push(`${tempOutputFileName}.${format}`);
           });
         }
-        // tempOutputFileNames = tempOutputFileNames.filter((fileName) => {
-        //   const extension = fileName.split(".").pop(); // Get the file extension
-        //   return selectedFileFormat.includes(extension as FileFormat); // Check if it matches the selected formats
-        // });
-        const txtFileName = `${tempOutputFileName}.txt`;
-        if (!tempOutputFileNames.includes(txtFileName)) {
-          tempOutputFileNames.push(txtFileName);
-        }
-
         startPolling();
 
         transcript.set({
@@ -453,15 +444,21 @@
     }
   }
 
-  function downloadFileASS() {
-    fetch(assFileUrl)
+  function downloadFile() {
+    const fileUrl = assFileUrl ?? srtFileUrl ?? jsonFileUrl ?? txtFileUrl;
+    if (!fileUrl) {
+      console.error("No file available for download.");
+      return;
+    }
+
+    fetch(fileUrl)
       .then((response) => response.blob())
       .then((blob) => {
         const blobUrl = URL.createObjectURL(
           new Blob([blob], { type: "application/octet-stream" }),
         );
 
-        const fileName = assFileUrl.split("/").pop() ?? "";
+        const fileName = fileUrl.split("/").pop() ?? "";
         const link = document.createElement("a");
         link.href = blobUrl;
         link.target = "_blank";
@@ -479,11 +476,12 @@
         }
       })
       .catch((error) => {
-        console.error("Error downloading ASS file:", error);
+        console.error("Error downloading file:", error);
       });
   }
 
   async function downloadZip() {
+    const fileUrl = assFileUrl ?? srtFileUrl ?? jsonFileUrl ?? txtFileUrl;
     if (zipFileData) {
       // Decode the base64 string to binary data
       const zipBuffer = atob(zipFileData); // atob decodes the base64 string to binary string
@@ -805,25 +803,21 @@
     {/if}
     {#if isTranscipted}
       {#if zipFileData}
-        <button
-          class="btn btn-success btn-sm text-white"
-          on:click={downloadZip}
+        <button class="btn btn-success btn-sm text-white" on:click={downloadZip}
           >{@html svgIcons.download}{`Download Zip`}</button
         >
-      {:else}
-        <button
+      {:else if assFileUrl || srtFileUrl || jsonFileUrl || txtFileUrl}
+        <!-- <button
           class="btn btn-success btn-sm text-white"
           on:click={downloadFileSRT}
           >{@html svgIcons.download}{t(
             "transciption.model.cta.download-output.srt",
           )}</button
-        >
+        > -->
         <button
           class="btn btn-success btn-sm text-white"
-          on:click={downloadFileASS}
-          >{@html svgIcons.download}{t(
-            "transciption.model.cta.download-output.ass",
-          )}</button
+          on:click={downloadFile}
+          >{@html svgIcons.download}{`Download Output`}</button
         >
       {/if}
       <button class="btn bg-black btn-sm text-white" on:click={confirmStartNew}
@@ -835,7 +829,7 @@
   <StartNewConfirmDialog
     bind:modal={confirmModal}
     on:downloadSRT={downloadFileSRT}
-    on:downloadASS={downloadFileASS}
+    on:downloadFile={downloadFile}
     on:confirm={startNew}
   />
 </div>
