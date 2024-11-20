@@ -3,6 +3,7 @@ import { useTranslations } from "$i18n/utils";
 import MenuItem from "./MenuItem.astro";
 import Category from "$data/models/category.model";
 import { TenantFeature } from "$data/models/tenant.model";
+import { TranscriptionType } from "$utils/TranscribeRequest";
 import { svgIcons } from "$assets/icons";
 import auth from "$auth/auth";
 
@@ -24,17 +25,36 @@ const menuItems = categories.map((category, index) => ({
 }));
 
 const audioToTextMenus = [];
-if (auth.hasFeature(Astro.locals, TenantFeature.AudioToText)) {
+const audioFeatureItems = [];
+
+if (auth.hasAudioPlaintext(Astro.locals)) {
+  audioFeatureItems.push({
+    title: t("nav.audiotool.audio-to-text"),
+    path: `/transcription/${TranscriptionType.Plaintext}`,
+  });
+}
+if (auth.hasAudioSummary(Astro.locals)) {
+  audioFeatureItems.push({
+    title: t("nav.audiotool.summarize-audio"),
+    path: `/transcription/${TranscriptionType.Summarize}`,
+  });
+}
+if (auth.hasAudioSubtitles(Astro.locals)) {
+  audioFeatureItems.push({
+    title: t("nav.audiotool.audio-subtitles"),
+    path: `/transcription/${TranscriptionType.Subtitles}`,
+  });
+}
+
+if (
+  auth.hasFeature(Astro.locals, TenantFeature.AudioToText) &&
+  audioFeatureItems.length > 0
+) {
   audioToTextMenus.push({
     title: t("nav.audiotool"),
     icon: svgIcons.audio,
     isOpened: navState["audio-menu"] ?? false,
-    items: [
-      {
-        title: t("nav.audiotool.audio-to-text"),
-        path: `/transcription`,
-      },
-    ],
+    items: audioFeatureItems,
   });
 }
 
@@ -56,7 +76,7 @@ const settingsItems = [
 
 if (auth.hasFeature(Astro.locals, TenantFeature.AudioToText)) {
   settingsItems.push({
-    title: t("tenant.audio-to-text"),
+    title: t("nav.settings.audio"),
     path: "/settings/transcription",
   });
 }
@@ -168,7 +188,10 @@ const modules = [
             {
               modules.map((mod, index) => (
                 <li class="">
-                  <details data-id={`ai-tools-module-${index}`} open={mod.isOpened}>
+                  <details
+                    data-id={`ai-tools-module-${index}`}
+                    open={mod.isOpened}
+                  >
                     <summary>
                       {/* <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
                         {mod.icon && <Fragment set:html={mod.icon} />}
@@ -265,7 +288,9 @@ const modules = [
     detailsElements.forEach((element) => {
       const details = element as HTMLDetailsElement;
       const detailsId = details.getAttribute("data-id") || "";
-      details.addEventListener("toggle", () => updateNavState(detailsId, details.open));
+      details.addEventListener("toggle", () =>
+        updateNavState(detailsId, details.open),
+      );
     });
   }
 

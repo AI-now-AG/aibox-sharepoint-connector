@@ -18,10 +18,13 @@
   "nav.settings.instructions": "Instruktionen",
   "nav.settings.knowledge-base": "Knowledge Base",
   "nav.settings.categories": "Kategorien",
+  "nav.settings.audio": "Audio tools Instructions",
   "nav.settings.admin": "ADMIN",
   "nav.tenant-management": "Tenant Verwaltung",
   "nav.audiotool": "KI AUDIO TOOLS",
   "nav.audiotool.audio-to-text": "Audio zu Text",
+  "nav.audiotool.summarize-audio": "Summarize audio",
+  "nav.audiotool.audio-subtitles": "Create subtitles",
   "login.welcome": "Willkommen bei",
   "login.title": "Melden Sie sich bei Ihrem Konto an",
   "login.email": "E-Mail",
@@ -160,5 +163,10 @@
   "transciption.transcription.failed": "Transkription fehlgeschlagen",
   "settings.transcription.instructions-subtitle": "Instruktionen für Untertitel",
   "settings.transcription.instructions-plaintext": "Instruktionen für Textoutput",
-  "settings.transcription.instructions-placeholder": "hier Instruktion erfassen..."
+  "settings.transcription.instructions-placeholder": "hier Instruktion erfassen...",
+  "settings.transcription.plaintext-description": "Verwandle deine Audioaufnahmen eins zu eins in Textform. Das Resultat kann wiederum kopiert und in einem neuen Anwendungsfall weiterverarbeitet werden.",
+  "settings.transcription.summarize-title": "Audio zusammenfassen",
+  "settings.transcription.summarize-description": "Fasse deine Audiodateien, z. B. aus Meetings oder Interviews hier direkt zusammen.",
+  "settings.transcription.subtitles-title": "Untertitel erstellen",
+  "settings.transcription.subtitles-description": "Erstelle deine Untertitel für deine Videos und Fernsehsendungen und wähle die gewünschten Formate aus."
 }

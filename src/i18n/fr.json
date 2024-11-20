@@ -18,10 +18,13 @@
   "nav.settings.instructions": "Instructions",
   "nav.settings.knowledge-base": "Knowledge Base",
   "nav.settings.categories": "Categories",
+  "nav.settings.audio": "Audio tools Instructions",
   "nav.settings.admin": "ADMIN",
   "nav.tenant-management": "Tenant Management",
   "nav.audiotool": "AI AUDIO TOOLS",
   "nav.audiotool.audio-to-text": "Audio to text (Beta)",
+  "nav.audiotool.summarize-audio": "Summarize audio",
+  "nav.audiotool.audio-subtitles": "Create subtitles",
   "login.welcome": "Welcome to",
   "login.title": "Sign in to your account",
   "login.email": "Email",
@@ -160,5 +163,10 @@
   "transciption.transcription.failed": "Transcription failed",
   "settings.transcription.instructions-subtitle": "Instructions for subtitle (SRT)",
   "settings.transcription.instructions-plaintext": "Instructions for plaintext",
-  "settings.transcription.instructions-placeholder": "e.g. type instruction details..."
+  "settings.transcription.instructions-placeholder": "e.g. type instruction details...",
+  "settings.transcription.plaintext-description": "Convert your audio recordings seamlessly into text. The generated text can be copied and repurposed for other use cases with ease.",
+  "settings.transcription.summarize-title": "Summarize audio",
+  "settings.transcription.summarize-description": "Quickly summarize audio files, such as those from meetings or interviews, right here.",
+  "settings.transcription.subtitles-title": "Create subtitles",
+  "settings.transcription.subtitles-description": "Effortlessly create subtitles for your videos or TV shows and chose your preferred format."
 }

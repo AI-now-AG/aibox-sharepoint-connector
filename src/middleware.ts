@@ -6,6 +6,9 @@ import {
   PUBLIC_ROUTES,
   SUPER_ADMIN_ROUTES,
   FEATURE_MAP_ROUTES,
+  FEATURE_PLAINTEXT_ROUTE,
+  FEATURE_SUBTITLES_ROUTE,
+  FEATURE_SUMMARY_ROUTE,
 } from "$constants";
 import type { APIContext, MiddlewareNext } from "astro";
 import tenantModel, { TenantFeature } from "$data/models/tenant.model";
@@ -103,6 +106,15 @@ async function restrictAccess(context: APIContext, next: MiddlewareNext) {
       hasAccess = context.locals.tenant.included_features.some(
         (item) => item.name == (key as TenantFeature),
       );
+    }
+    if(context.url.pathname === FEATURE_PLAINTEXT_ROUTE) {
+      hasAccess = (context.locals.tenant.transcriptions?.plaintext?.enabled ?? true)
+    }
+    if(context.url.pathname === FEATURE_SUBTITLES_ROUTE) {
+      hasAccess = (context.locals.tenant.transcriptions?.subtitles?.enabled ?? true)
+    }
+    if(context.url.pathname === FEATURE_SUMMARY_ROUTE) {
+      hasAccess = (context.locals.tenant.transcriptions?.summary?.enabled ?? true)
     }
 
     if (matchPath && !hasAccess) {

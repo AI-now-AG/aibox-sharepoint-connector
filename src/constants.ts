@@ -16,6 +16,16 @@ export const SUPER_ADMIN_ROUTES = [
   "/secure/*",
 ];
 
+export const FEATURE_PLAINTEXT_ROUTE = "/transcription/plaintext";
+export const FEATURE_SUBTITLES_ROUTE = "/transcription/subtitles";
+export const FEATURE_SUMMARY_ROUTE = "/transcription/summary";
+
 export const FEATURE_MAP_ROUTES = {
-  "audio-to-text": ["/transcription", "/settings/transcription"],
+  "audio-to-text": [
+    "/transcription",
+    FEATURE_PLAINTEXT_ROUTE,
+    FEATURE_SUBTITLES_ROUTE,
+    FEATURE_SUMMARY_ROUTE,
+    "/settings/transcription"
+  ],
 };

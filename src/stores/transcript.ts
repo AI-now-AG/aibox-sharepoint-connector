@@ -6,6 +6,8 @@ type TranscribeOptions = {
   txtOuput: string;
   txtUrl: string;
   srtUrl: string;
+  assUrl: string;
+  jsonUrl: string;
 };
 
 const transcript = writable<TranscribeOptions | null>(null);

@@ -9,8 +9,8 @@ import { pipeline } from "stream";
 import { getTask } from "$shared/transcriptionTasks";
 
 const checkFileExist: Handler = async (event, context) => {
-  const { fileNames, folderName } = JSON.parse(event.body!);
-  if (fileNames) {
+  const { uniqueName, fileNames, folderName } = JSON.parse(event.body!);
+  if (fileNames && uniqueName) {
     const streamPipeline = promisify(pipeline);
     const tmpDir = tmpdir();
     let storageURLString: string = process.env.AZURE_BLOB_STORAGE_NAME || "";
@@ -20,11 +20,13 @@ const checkFileExist: Handler = async (event, context) => {
     const containerName =
       process.env.AZURE_CONTAINER_NAME || "transcribecontainer";
     const containerClient = blobServiceClient.getContainerClient(containerName);
+    const availableFiles: string[] = [];
     const downloadedFiles: { name: string; path: string }[] = [];
     try {
       let txtFileUrl = "";
       let srtFileUrl = "";
       let assFileUrl = "";
+      let jsonFileUrl = "";
       let rawTxtContent = "";
 
       // Check if the file exists in Azure Blob Storage
@@ -33,7 +35,7 @@ const checkFileExist: Handler = async (event, context) => {
         const blobClient = containerClient.getBlobClient(filePathInBlob);
         const exists = await blobClient.exists();
         if (!exists) {
-          const task = await getTask(fileName);
+          const task = await getTask(uniqueName);
           if (!task) {
             return {
               statusCode: 404,
@@ -49,7 +51,7 @@ const checkFileExist: Handler = async (event, context) => {
             };
           }
         }
-
+        availableFiles.push(fileName);
         const filePath = join(tmpDir, fileName);
         const downloadBlockBlobResponse = await blobClient.download();
 
@@ -65,6 +67,8 @@ const checkFileExist: Handler = async (event, context) => {
           srtFileUrl = fileUrl; // Store the URL for the .srt file
         } else if (fileName.endsWith(".ass")) {
           assFileUrl = fileUrl; // Store the URL for the .ass file
+        } else if (fileName.endsWith(".json")) {
+          jsonFileUrl = fileUrl; // Store the URL for the .ass file
         } else if (fileName.endsWith(".txt")) {
           txtFileUrl = fileUrl; // Store the URL for the .txt file
 
@@ -75,33 +79,49 @@ const checkFileExist: Handler = async (event, context) => {
           );
         }
 
-        downloadedFiles.push({ name: fileName, path: filePath });
+        if (!downloadedFiles.some((file) => file.name === fileName)) {
+          downloadedFiles.push({ name: fileName, path: filePath });
+        }
 
         //const downloadBlockBlobResponse = await blobClient.download()
         //const downloadedContent = await streamToString(downloadBlockBlobResponse.readableStreamBody!);
       }
-      console.log(downloadedFiles);
-      //const zipBuffer = await createZip(downloadedFiles)
+      //console.log(downloadedFiles);
       // return {
       //     statusCode: 200,
       //     body: JSON.stringify({ exists: true, transcriptionFile: zipBuffer }),
       // };
-      return {
-        statusCode: 200,
-        /*headers: {
-          'Content-Type': 'application/zip',
-          'Content-Disposition': 'attachment; filename="transcription_files.zip"',
-        },
-        body: zipBuffer.toString('base64'), // Convert the binary zip buffer to base64 for safe transmission
-        isBase64Encoded: true, // Indicate the body is base64 encoded*/
-        body: JSON.stringify({
-          exists: true,
-          text_output: rawTxtContent,
-          txt_file: txtFileUrl,
-          srt_file: srtFileUrl,
-          ass_file: assFileUrl,
-        }),
-      };
+      if (availableFiles.length >= fileNames.length) {
+        let zipBuffer: Buffer | null = null;
+        if (fileNames.length > 1) {
+          zipBuffer = await createZip(downloadedFiles)
+        }
+        return {
+          statusCode: 200,
+          /*headers: {
+            'Content-Type': 'application/zip',
+            'Content-Disposition': 'attachment; filename="transcription_files.zip"',
+          },
+          body: zipBuffer.toString('base64'), // Convert the binary zip buffer to base64 for safe transmission
+          isBase64Encoded: true, // Indicate the body is base64 encoded*/
+          body: JSON.stringify({
+            exists: true,
+            text_output: rawTxtContent,
+            txt_file: txtFileUrl,
+            srt_file: srtFileUrl,
+            ass_file: assFileUrl,
+            json_file: jsonFileUrl,
+            zip_file: zipBuffer?.toString('base64'),
+          }),
+        };
+      }
+      else {
+        const task = await getTask(uniqueName);
+        return {
+          statusCode: 200,
+          body: JSON.stringify(task),
+        };
+      }
     } catch (error) {
       console.error(
         "Error checking file existence or downloading content:",
