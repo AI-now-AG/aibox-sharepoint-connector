@@ -211,7 +211,7 @@ export async function transcribeUsingOpenAI(transcribeParams: TranscribeRequest)
     const improvedSrtData = await improveSRTQuality(transcribeParams, srtData);
     const grouped = groupLines(improvedSrtData);
     const srtResult = formatSRT(grouped);
-    const assResult = formatASS(improvedSrtData);
+    const assResult = formatASS(grouped);
 
     const fileNameWithExtension = transcribeParams.uploadUrl.split("/").pop()!.split("?")[0];
     const fileNameWithoutExtension = fileNameWithExtension
