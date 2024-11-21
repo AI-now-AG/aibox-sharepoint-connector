@@ -57,6 +57,13 @@
   $: toggleFileFormat(FileFormat.JSON, jsonFileChecked);
   $: toggleFileFormat(FileFormat.TXT, txtFileChecked);
 
+  $: isFormValid =
+    assFileChecked ||
+    srtFileChecked ||
+    jsonFileChecked ||
+    txtFileChecked ||
+    showTextPreviewChecked;
+
   onMount(async () => {
     console.log("TranscriptionForm::onMount transcript in store", $transcript);
 
@@ -796,7 +803,7 @@
     {#if !isTranscipted}
       <button
         class={`btn btn-active btn-primary btn-sm text-white`}
-        disabled={!isUploaded || isTranscribing}
+        disabled={!isUploaded || !isFormValid || isTranscribing}
         on:click={transcribe}
         >{t("transciption.model.cta.start-transcribing")}</button
       >
