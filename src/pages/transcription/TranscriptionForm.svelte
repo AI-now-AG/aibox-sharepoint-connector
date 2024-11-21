@@ -5,7 +5,7 @@
   import { useTranslations } from "$i18n/utils";
   import { svgIcons } from "$assets/icons";
   import { tenant } from "$stores";
-  import transcript from "$stores/transcript";
+  import transcriptStore from "$stores/transcript";
   import { addToast } from "$stores/toast";
   import { type TranscribeRequest, FileFormat } from "$utils/TranscribeRequest";
   import { TranscriptionType } from "$utils/TranscribeRequest";
@@ -65,30 +65,76 @@
     showTextPreviewChecked;
 
   onMount(async () => {
-    console.log("TranscriptionForm::onMount transcript in store", $transcript);
+    console.log("TranscriptionForm::onMount transcriptStore in store", $transcriptStore);
 
-    if ($transcript) {
-      retrieveDataInStore();
+    if ($transcriptStore && transcriptionType) {
+      retrieveDataInStore(transcriptionType);
     }
 
-    // subscribe values change
-    transcript.subscribe((value) => {
-      if (value?.txtOuput) {
-        txtFileUrl = value.txtUrl;
-        srtFileUrl = value.srtUrl;
-        assFileUrl = value.assUrl;
-        jsonFileUrl = value.jsonUrl;
-        zipFileData = value.zipFile;
-        textOuput = value.txtOuput;
+    transcriptStore.subscribe((value) => {
+      const entry = value.find((entry) => entry.type === transcriptionType);
+      if (entry) {
+        let options = entry.options;
+        if (options.txtOuput || options.txtUrl || options.srtUrl || options.assUrl || options.jsonUrl || options.zipFile) {
+          // Retrieve the specific entry based on transcriptionType
+          txtFileUrl = options.txtUrl;
+          srtFileUrl = options.srtUrl;
+          assFileUrl = options.assUrl;
+          jsonFileUrl = options.jsonUrl;
+          zipFileData = options.zipFile;
+          textOuput = options.txtOuput;
 
-        isTranscribing = false;
-        isTranscipted = true;
-        isTranscriptionFailed = false;
+          isTranscribing = false;
+          isTranscipted = true;
+          isTranscriptionFailed = false;
+        }
       }
     });
   });
 
-  function retrieveDataInStore() {
+  function retrieveDataInStore(transcriptionType: TranscriptionType) {
+    const entry = $transcriptStore.find((entry) => entry.type === transcriptionType);
+    if (entry) {
+      let options = entry.options;
+      audioFile = options.file;
+      if (options.txtOuput || options.txtUrl || options.srtUrl || options.assUrl || options.jsonUrl || options.zipFile) {
+        // Retrieve the specific entry based on transcriptionType
+        txtFileUrl = options.txtUrl;
+        srtFileUrl = options.srtUrl;
+        assFileUrl = options.assUrl;
+        jsonFileUrl = options.jsonUrl;
+        zipFileData = options.zipFile;
+        textOuput = options.txtOuput;
+      }
+
+      let isPresent = !txtFileUrl || !srtFileUrl || !assFileUrl || !jsonFileUrl || !zipFileData || !textOuput;
+      if (isPresent) {
+        isTranscribing = true;
+        isTranscriptionFailed = false;
+      } else {
+        isUploaded = true;
+        isTranscipted = true;
+        isTranscriptionFailed = false;
+      }
+      // audioFile = entry.options.file;
+      // txtFileUrl = entry.options.txtUrl;
+      // srtFileUrl = entry.options.srtUrl;
+      // assFileUrl = entry.options.assUrl;
+      // jsonFileUrl = entry.options.jsonUrl;
+      // zipFileData = entry.options.zipFile;
+
+      // if (!textOuput) {
+      //   isTranscribing = true;
+      //   isTranscriptionFailed = false;
+      // } else {
+      //   isUploaded = true;
+      //   isTranscipted = true;
+      //   isTranscriptionFailed = false;
+      // }
+    }
+  }
+
+  /*function retrieveDataInStore() {
     audioFile = $transcript?.file;
     txtFileUrl = $transcript?.txtUrl as string;
     srtFileUrl = $transcript?.srtUrl as string;
@@ -104,7 +150,7 @@
       isTranscipted = true;
       isTranscriptionFailed = false;
     }
-  }
+  }*/
 
   function isFileTypeValid(type: string) {
     for (let i = 0; i < acceptedTypes.length; i++) {
@@ -282,16 +328,22 @@
         }
         startPolling();
 
-        transcript.set({
-          file: audioFile,
-          duration: audioDuration,
-          txtOuput: "",
-          txtUrl: "",
-          srtUrl: "",
-          assUrl: "",
-          jsonUrl: "",
-          zipFile: "",
-        });
+        transcriptStore.update((current) => [
+          ...current.filter((entry) => entry.type !== transcriptionType), // Remove old entry if it exists
+          {
+            type: transcriptionType,
+            options: {
+              file: audioFile,
+              duration: audioDuration,
+              txtOuput: "",
+              txtUrl: "",
+              srtUrl: "",
+              assUrl: "",
+              jsonUrl: "",
+              zipFile: "",
+            },
+          },
+        ]);
         addToast({
           message: `${t("transcription.file-uploaded-success")}`,
           type: "success",
@@ -378,19 +430,25 @@
           assFileUrl = result.ass_file;
           jsonFileUrl = result.json_file;
           zipFileData = result.zip_file;
-          transcript.set({
-            file: audioFile,
-            duration: audioDuration,
-            txtOuput: result.text_output,
-            txtUrl: result.txt_file,
-            srtUrl: result.srt_file,
-            assUrl: result.ass_file,
-            jsonUrl: result.json_file,
-            zipFile: result.zip_file,
-          });
+          transcriptStore.update((current) => [
+            ...current.filter((entry) => entry.type !== transcriptionType), // Remove old entry if it exists
+            {
+              type: transcriptionType,
+              options: {
+                file: audioFile,
+                duration: audioDuration,
+                txtOuput: result.text_output,
+                txtUrl: result.txt_file,
+                srtUrl: result.srt_file,
+                assUrl: result.ass_file,
+                jsonUrl: result.json_file,
+                zipFile: result.zip_file,
+              },
+            },
+          ]);
 
           addToast({
-            message: `<a href="/transcription">${t("transcription.transcription-is-ready")}</a>`,
+            message: `<a href="/transcription/${transcriptionType}">${t("transcription.transcription-is-ready")}</a>`,
             type: "success",
             timeout: 5000,
           });
@@ -422,7 +480,11 @@
   }
 
   function startNew() {
-    transcript.set(null);
+    if (transcriptionType) {
+      transcriptStore.update((current) =>
+        current.filter((entry) => entry.type !== transcriptionType),
+      );
+    }
     reset();
 
     confirmModal.close();
