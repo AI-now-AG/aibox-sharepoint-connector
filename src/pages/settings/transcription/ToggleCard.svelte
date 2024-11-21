@@ -79,7 +79,8 @@
 <div class="card-body space-y-2 justify-between">
   <div>
     <div class="flex justify-between items-center mb-4">
-      <span class="badge badge-outline">{transcriptionCard.title}</span>
+      <!-- <span class="badge badge-outline">{transcriptionCard.title}</span> -->
+      <h2 class="font-semibold text-lg">{transcriptionCard.title}</h2>
       {#if isSaving}
         <span class="loading loading-dots loading-md"></span>
       {:else}
@@ -95,7 +96,6 @@
       {/if}
     </div>
     <div class="flex flex-col gap-8">
-      <h2 class="font-semibold text-lg">{transcriptionCard.title}</h2>
       <p class="text-base-content/60 line-clamp-2">
         {transcriptionCard.description}
       </p>
