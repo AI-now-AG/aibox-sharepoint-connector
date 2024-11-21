@@ -14,15 +14,25 @@ const selectedTranscriptionType =
 if (selectedTranscriptionType === undefined) {
     return Astro.redirect("/404");
 }
+
+let title = t("tenant.audio-to-text");
+let description = t("settings.transcription.plaintext-description");
+if (selectedTranscriptionType === TranscriptionType.Summarize) {
+    title = t("settings.transcription.summarize-title");
+    description = t("settings.transcription.summarize-description");
+} else if (selectedTranscriptionType === TranscriptionType.Subtitles) {
+    title = t("settings.transcription.subtitles-title");
+    description = t("settings.transcription.subtitles-description");
+}
 ---
 
 <Layout>
     <div>
         <div class="container max-w-full mx-auto grid grid-cols-1 px-14">
             <h1 class="pt-2 mb-2 lg:pt-8 text-4xl font-bold">
-                {t("transcription")}
+                {title}
             </h1>
-            <p>{t("transcription.page-description")}</p>
+            <p>{description}</p>
         </div>
 
         <TranscriptionForm
