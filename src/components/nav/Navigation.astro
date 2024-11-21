@@ -35,13 +35,13 @@ if (auth.hasAudioPlaintext(Astro.locals)) {
 }
 if (auth.hasAudioSummary(Astro.locals)) {
   audioFeatureItems.push({
-    title: t("nav.audiotool.summarize-audio"),
+    title: t("settings.transcription.summarize-title"),
     path: `/transcription/${TranscriptionType.Summarize}`,
   });
 }
 if (auth.hasAudioSubtitles(Astro.locals)) {
   audioFeatureItems.push({
-    title: t("nav.audiotool.audio-subtitles"),
+    title: t("settings.transcription.subtitles-title"),
     path: `/transcription/${TranscriptionType.Subtitles}`,
   });
 }
