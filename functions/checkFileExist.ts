@@ -9,13 +9,19 @@ import { pipeline } from "stream";
 import { getTask } from "$shared/transcriptionTasks";
 
 const checkFileExist: Handler = async (event, context) => {
-  const { uniqueName, fileNames, folderName } = JSON.parse(event.body!);
+  const { uniqueName, fileNames, folderName, isShowImprovedTextPreview } = JSON.parse(event.body!);
 
   let requireFilesCount = fileNames.length || 0;
   const tempFileNames: string[] = [];
 
+  const improvedTxtFileName = `${uniqueName}_improved.txt`;
+  if (isShowImprovedTextPreview) {
+    requireFilesCount += 1;
+    tempFileNames.push(improvedTxtFileName);
+  }
+
   const txtFileName = `${uniqueName}.txt`;
-  if (!fileNames.includes(txtFileName)) {
+  if (!fileNames.includes(txtFileName) && !isShowImprovedTextPreview) {
     requireFilesCount += 1;
     tempFileNames.push(txtFileName);
   }
@@ -80,7 +86,7 @@ const checkFileExist: Handler = async (event, context) => {
           jsonFileUrl = fileUrl; // Store the URL for the .ass file
         } else if (fileName.endsWith(".txt")) {
           txtFileUrl = fileUrl; // Store the URL for the .txt file
-
+        } else if (fileName.endsWith("_improved.txt")) {
           // Download and read the raw text content of the .txt file
           const downloadBlockBlobResponseStr = await blobClient.download();
           rawTxtContent = await streamToString(
@@ -123,6 +129,12 @@ const checkFileExist: Handler = async (event, context) => {
           const downloadBlockBlobResponse = await blobClient.download();
           rawTxtContent = await streamToString(
             downloadBlockBlobResponse.readableStreamBody!,
+          );
+        } else if (fileName.endsWith("_improved.txt")) {
+          // Download and read the raw text content of the .txt file
+          const downloadBlockBlobResponseStr = await blobClient.download();
+          rawTxtContent = await streamToString(
+            downloadBlockBlobResponseStr.readableStreamBody!,
           );
         }
       }

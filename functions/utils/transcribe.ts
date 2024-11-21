@@ -230,12 +230,21 @@ export async function transcribeUsingOpenAI(transcribeParams: TranscribeRequest)
     } else if (transcribeParams.transcriptionType === TranscriptionType.Subtitles) {
       let srtData: Entry[] = [], improvedSrtData: Entry[] = [], grouped: Entry[] = [];
       let fileFormats = transcribeParams.selectedFileFormat ?? [];
-      if (fileFormats.includes(FileFormat.SRT) || fileFormats.includes(FileFormat.ASS)) {
+      if (fileFormats.includes(FileFormat.SRT) || fileFormats.includes(FileFormat.ASS) || transcribeParams.isShowImprovedTextPreview) {
         srtData = createSRTData(
           (response as unknown as { words: InputEntry[] }).words,
         );
         improvedSrtData = await improveSRTQuality(transcribeParams, srtData);
         grouped = groupLines(improvedSrtData);
+        if (transcribeParams.isShowImprovedTextPreview) {
+          const improvedTextGroup = grouped.map(item => item.text).join('\n\n');
+          outputURLs["txt_improved"] = await uploadOutputToBlob(
+            transcribeParams.folderName,
+            `${fileNameWithoutExtension}_improved.txt`,
+            improvedTextGroup,
+            "txt",
+          );
+        }
       }
       if (transcribeParams.selectedFileFormat?.includes(FileFormat.SRT)) {
         const srtResult = formatSRT(grouped);

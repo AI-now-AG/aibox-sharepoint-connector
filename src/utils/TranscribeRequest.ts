@@ -8,6 +8,7 @@ export interface TranscribeRequest {
   transcriptions: Transcriptions,
   transcriptionType?: TranscriptionType;
   selectedFileFormat?: FileFormat[];
+  isShowImprovedTextPreview?: boolean,
   encryptedApiKey?: string;
   azureOpenAIInstanceName?: string;
   azureOpenAIEndpoint?: string;

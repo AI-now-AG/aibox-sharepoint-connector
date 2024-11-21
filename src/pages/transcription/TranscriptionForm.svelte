@@ -86,9 +86,6 @@
         isTranscriptionFailed = false;
       }
     });
-
-    if (transcriptionType) {
-    }
   });
 
   function retrieveDataInStore() {
@@ -334,6 +331,7 @@
       transcriptions: tenant?.transcriptions,
       transcriptionType: transcriptionType,
       selectedFileFormat: selectedFileFormat,
+      isShowImprovedTextPreview: showTextPreviewChecked,
       encryptedApiKey: tenant?.azure_openai_api_key,
       azureOpenAIInstanceName: tenant?.azure_openai_instance_name,
       azureOpenAIEndpoint: tenant?.azure_openai_endpoint,
@@ -351,6 +349,10 @@
           uniqueName: tempOutputFileName,
           fileNames: tempOutputFileNames,
           folderName: folderName,
+          isShowImprovedTextPreview:
+            transcriptionType === TranscriptionType.Subtitles
+              ? showTextPreviewChecked
+              : false,
         }),
       });
       if (response.ok) {
@@ -452,7 +454,7 @@
   }
 
   function downloadFile() {
-    const fileUrl = assFileUrl ?? srtFileUrl ?? jsonFileUrl ?? txtFileUrl;
+    const fileUrl = assFileUrl || srtFileUrl || jsonFileUrl || txtFileUrl;
     if (!fileUrl) {
       console.error("No file available for download.");
       return;
@@ -488,7 +490,7 @@
   }
 
   async function downloadZip() {
-    const fileUrl = assFileUrl ?? srtFileUrl ?? jsonFileUrl ?? txtFileUrl;
+    const fileUrl = assFileUrl || srtFileUrl || jsonFileUrl || txtFileUrl;
     if (zipFileData) {
       // Decode the base64 string to binary data
       const zipBuffer = atob(zipFileData); // atob decodes the base64 string to binary string
