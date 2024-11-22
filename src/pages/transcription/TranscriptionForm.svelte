@@ -24,6 +24,10 @@
   let assFileUrl: string = "";
   let jsonFileUrl: string = "";
   let zipFileData: string = "";
+
+  let isZipDataPresent: boolean = false;
+  let isFileDataPresent: boolean = false;
+
   let fileErrorMessage: string = "";
   let selectedFileFormat: FileFormat[] = [FileFormat.ASS];
 
@@ -65,7 +69,10 @@
     showTextPreviewChecked;
 
   onMount(async () => {
-    console.log("TranscriptionForm::onMount transcriptStore in store", $transcriptStore);
+    console.log(
+      "TranscriptionForm::onMount transcriptStore in store",
+      $transcriptStore,
+    );
 
     if ($transcriptStore && transcriptionType) {
       retrieveDataInStore(transcriptionType);
@@ -75,7 +82,14 @@
       const entry = value.find((entry) => entry.type === transcriptionType);
       if (entry) {
         let options = entry.options;
-        if (options.txtOuput || options.txtUrl || options.srtUrl || options.assUrl || options.jsonUrl || options.zipFile) {
+        if (
+          options.txtOuput ||
+          options.txtUrl ||
+          options.srtUrl ||
+          options.assUrl ||
+          options.jsonUrl ||
+          options.zipFile
+        ) {
           // Retrieve the specific entry based on transcriptionType
           txtFileUrl = options.txtUrl;
           srtFileUrl = options.srtUrl;
@@ -83,6 +97,8 @@
           jsonFileUrl = options.jsonUrl;
           zipFileData = options.zipFile;
           textOuput = options.txtOuput;
+
+          checkDataAvaibility();
 
           isTranscribing = false;
           isTranscipted = true;
@@ -92,12 +108,30 @@
     });
   });
 
+  function checkDataAvaibility() {
+    isZipDataPresent = zipFileData !== "";
+    isFileDataPresent =
+      txtFileUrl !== "" ||
+      srtFileUrl !== "" ||
+      assFileUrl !== "" ||
+      jsonFileUrl !== "";
+  }
+
   function retrieveDataInStore(transcriptionType: TranscriptionType) {
-    const entry = $transcriptStore.find((entry) => entry.type === transcriptionType);
+    const entry = $transcriptStore.find(
+      (entry) => entry.type === transcriptionType,
+    );
     if (entry) {
       let options = entry.options;
       audioFile = options.file;
-      if (options.txtOuput || options.txtUrl || options.srtUrl || options.assUrl || options.jsonUrl || options.zipFile) {
+      if (
+        options.txtOuput ||
+        options.txtUrl ||
+        options.srtUrl ||
+        options.assUrl ||
+        options.jsonUrl ||
+        options.zipFile
+      ) {
         // Retrieve the specific entry based on transcriptionType
         txtFileUrl = options.txtUrl;
         srtFileUrl = options.srtUrl;
@@ -105,9 +139,16 @@
         jsonFileUrl = options.jsonUrl;
         zipFileData = options.zipFile;
         textOuput = options.txtOuput;
+        checkDataAvaibility();
       }
 
-      let isPresent = !txtFileUrl || !srtFileUrl || !assFileUrl || !jsonFileUrl || !zipFileData || !textOuput;
+      let isPresent =
+        !txtFileUrl ||
+        !srtFileUrl ||
+        !assFileUrl ||
+        !jsonFileUrl ||
+        !zipFileData ||
+        !textOuput;
       if (isPresent) {
         isTranscribing = true;
         isTranscriptionFailed = false;
@@ -430,6 +471,7 @@
           assFileUrl = result.ass_file;
           jsonFileUrl = result.json_file;
           zipFileData = result.zip_file;
+          checkDataAvaibility();
           transcriptStore.update((current) => [
             ...current.filter((entry) => entry.type !== transcriptionType), // Remove old entry if it exists
             {
@@ -605,6 +647,9 @@
     jsonFileUrl = "";
     zipFileData = "";
     textOuput = "";
+
+    isZipDataPresent = false;
+    isFileDataPresent = false;
   }
 
   $: {
@@ -875,7 +920,9 @@
     {#if isTranscipted}
       {#if zipFileData}
         <button class="btn btn-success btn-sm text-white" on:click={downloadZip}
-          >{@html svgIcons.download}{`Download Zip`}</button
+          >{@html svgIcons.download}{t(
+            "transciption.model.cta.download-zip",
+          )}</button
         >
       {:else if assFileUrl || srtFileUrl || jsonFileUrl || txtFileUrl}
         <!-- <button
@@ -888,7 +935,9 @@
         <button
           class="btn btn-success btn-sm text-white"
           on:click={downloadFile}
-          >{@html svgIcons.download}{`Download Output`}</button
+          >{@html svgIcons.download}{t(
+            "transciption.model.cta.download-output",
+          )}</button
         >
       {/if}
       <button class="btn bg-black btn-sm text-white" on:click={confirmStartNew}
@@ -899,7 +948,9 @@
 
   <StartNewConfirmDialog
     bind:modal={confirmModal}
-    on:downloadSRT={downloadFileSRT}
+    bind:isZipDataPresent
+    bind:isFileDataPresent
+    on:downloadZip={downloadZip}
     on:downloadFile={downloadFile}
     on:confirm={startNew}
   />

@@ -163,7 +163,7 @@ const checkFileExist: Handler = async (event, context) => {
             srt_file: srtFileUrl,
             ass_file: assFileUrl,
             json_file: jsonFileUrl,
-            zip_file: zipBuffer?.toString('base64'),
+            zip_file: zipBuffer?.toString('base64') || "",
           }),
         };
       }
