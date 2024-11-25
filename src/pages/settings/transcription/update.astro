@@ -1,0 +1,65 @@
+---
+import Layout from "$layouts/Layout.astro";
+import { useTranslations } from "$i18n/utils";
+import SettingForm from "./SettingForm.svelte";
+import { Permission } from "$data/models/user.model";
+import { TranscriptionType } from "$utils/TranscribeRequest";
+import { type TranscriptionCard } from "$utils/TranscriptionCard";
+import UpdateForm from "$pages/settings/transcription/UpdateForm.svelte";
+
+const t = useTranslations();
+
+const { searchParams } = Astro.url;
+const typeParam = searchParams.get("type");
+const selectedTranscriptionType =
+    typeParam &&
+    Object.values(TranscriptionType).includes(typeParam as TranscriptionType)
+        ? (typeParam as TranscriptionType)
+        : undefined;
+if (selectedTranscriptionType === undefined) {
+    return Astro.redirect("/404");
+}
+
+const transcriptions = Astro.locals.tenant?.transcriptions;
+let card: TranscriptionCard | undefined = undefined;
+switch (selectedTranscriptionType) {
+    case TranscriptionType.Plaintext:
+        card = {
+            title: t("tenant.audio-to-text"),
+            description: transcriptions?.plaintext?.text ?? "",
+            toggle: transcriptions?.plaintext?.enabled ?? false,
+            type: TranscriptionType.Plaintext,
+        };
+        break;
+    case TranscriptionType.Summarize:
+        card = {
+            title: t("settings.transcription.summarize-title"),
+            description: transcriptions?.summary?.text ?? "",
+            toggle: transcriptions?.summary?.enabled ?? false,
+            type: TranscriptionType.Summarize,
+        };
+        break;
+    case TranscriptionType.Subtitles:
+        card = {
+            title: t("settings.transcription.subtitles-title"),
+            description: transcriptions?.subtitles?.text ?? "",
+            toggle: transcriptions?.subtitles?.enabled ?? false,
+            type: TranscriptionType.Subtitles,
+        };
+        break;
+    default:
+        break;
+}
+
+let userPermissions = Astro.locals.user.permissions;
+---
+
+<Layout>
+    <div>
+        <UpdateForm
+            transcriptionCard={card}
+            isEditable={userPermissions.includes(Permission.AdminAll)}
+            client:load
+        />
+    </div>
+</Layout>

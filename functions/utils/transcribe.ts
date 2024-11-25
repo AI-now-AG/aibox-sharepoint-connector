@@ -12,7 +12,7 @@ import {
   type Entry,
 } from "./srt";
 import { StringOutputParser } from "@langchain/core/output_parsers";
-import type { TranscribeRequest } from "$utils/TranscribeRequest";
+import { type TranscribeRequest, FileFormat, TranscriptionType } from "$utils/TranscribeRequest";
 
 const DEFAULT_WHISPER_MODEL_NAME = "whisper-1";
 const DEFAULT_API_VERSION = "2024-08-01-preview";
@@ -111,12 +111,12 @@ function getAzureChatModel(transcribeParams: TranscribeRequest) {
 export const improveSRTQuality = async (transcribeParams: TranscribeRequest, data: Entry[]) => {
   const model = getAzureChatModel(transcribeParams);
   const flatEntries = data
-      .map(
-        (entry) => `input> ${entry.text}
+    .map(
+      (entry) => `input> ${entry.text}
 output> 
 `,
-      )
-      .join("\n");
+    )
+    .join("\n");
   const chunks = [];
   let currentChunk = "";
   for (const entry of flatEntries) {
@@ -133,7 +133,7 @@ output>
   let correctedLines = [];
   for (const chunk of chunks) {
     const response = await model.invoke([
-      new SystemMessage(transcribeParams.instructionSubtitle || DEFAULT_INSTRUCTION),
+      new SystemMessage(transcribeParams.transcriptions.subtitles?.text || DEFAULT_INSTRUCTION),
       new HumanMessage(chunk)
     ]);
     correctedLines.push(
@@ -152,10 +152,11 @@ output>
 
 export const improveTextQuality = async (
   transcribeParams: TranscribeRequest,
-  text: string
+  text: string,
+  instruction?: string
 ) => {
   const model = getAzureChatModel(transcribeParams);
-  const finalInstructions = transcribeParams.instructionPlaintext || DEFAULT_INSTRUCTION;
+  const finalInstructions = instruction || DEFAULT_INSTRUCTION;
   const response3 = await model.invoke(
     [new SystemMessage(finalInstructions), new HumanMessage(text)],
     {}
@@ -201,17 +202,7 @@ export async function transcribeUsingOpenAI(transcribeParams: TranscribeRequest)
     const parser = new StringOutputParser();
     const description = await parser.invoke(transcriptionText);
 
-    const srtData = createSRTData(
-      (response as unknown as { words: InputEntry[] }).words,
-    );
     let improvedText = description
-    if (transcribeParams.instructionPlaintext) {
-      improvedText = await improveTextQuality(transcribeParams, description);
-    }
-    const improvedSrtData = await improveSRTQuality(transcribeParams, srtData);
-    const grouped = groupLines(improvedSrtData);
-    const srtResult = formatSRT(grouped);
-    const assResult = formatASS(grouped);
 
     const fileNameWithExtension = transcribeParams.uploadUrl.split("/").pop()!.split("?")[0];
     const fileNameWithoutExtension = fileNameWithExtension
@@ -225,23 +216,61 @@ export async function transcribeUsingOpenAI(transcribeParams: TranscribeRequest)
       JSON.stringify(response),
       "json",
     );
+
+    if (transcribeParams.transcriptionType === TranscriptionType.Plaintext) {
+      const instruction = transcribeParams.transcriptions.plaintext?.text
+      if (instruction) {
+        improvedText = await improveTextQuality(transcribeParams, description, instruction);
+      }
+    } else if (transcribeParams.transcriptionType === TranscriptionType.Summarize) {
+      const instruction = transcribeParams.transcriptions.summary?.text
+      if (instruction) {
+        improvedText = await improveTextQuality(transcribeParams, description, instruction);
+      }
+    } else if (transcribeParams.transcriptionType === TranscriptionType.Subtitles) {
+      let srtData: Entry[] = [], improvedSrtData: Entry[] = [], grouped: Entry[] = [];
+      let fileFormats = transcribeParams.selectedFileFormat ?? [];
+      if (fileFormats.includes(FileFormat.SRT) || fileFormats.includes(FileFormat.ASS) || transcribeParams.isShowImprovedTextPreview) {
+        srtData = createSRTData(
+          (response as unknown as { words: InputEntry[] }).words,
+        );
+        improvedSrtData = await improveSRTQuality(transcribeParams, srtData);
+        grouped = groupLines(improvedSrtData);
+        if (transcribeParams.isShowImprovedTextPreview) {
+          const improvedTextGroup = grouped.map(item => item.text).join('\n\n');
+          outputURLs["txt_improved"] = await uploadOutputToBlob(
+            transcribeParams.folderName,
+            `${fileNameWithoutExtension}_improved.txt`,
+            improvedTextGroup,
+            "txt",
+          );
+        }
+      }
+      if (transcribeParams.selectedFileFormat?.includes(FileFormat.SRT)) {
+        const srtResult = formatSRT(grouped);
+        outputURLs["srt"] = await uploadOutputToBlob(
+          transcribeParams.folderName,
+          `${fileNameWithoutExtension}.srt`,
+          srtResult,
+          "srt",
+        );
+      }
+      if (transcribeParams.selectedFileFormat?.includes(FileFormat.ASS)) {
+        const assResult = formatASS(grouped);
+        outputURLs["ass"] = await uploadOutputToBlob(
+          transcribeParams.folderName,
+          `${fileNameWithoutExtension}.ass`,
+          assResult,
+          "ass",
+        );
+      }
+    }
+
     outputURLs["txt"] = await uploadOutputToBlob(
       transcribeParams.folderName,
       `${fileNameWithoutExtension}.txt`,
       improvedText,
       "txt",
-    );
-    outputURLs["srt"] = await uploadOutputToBlob(
-      transcribeParams.folderName,
-      `${fileNameWithoutExtension}.srt`,
-      srtResult,
-      "srt",
-    );
-    outputURLs["ass"] = await uploadOutputToBlob(
-      transcribeParams.folderName,
-      `${fileNameWithoutExtension}.ass`,
-      assResult,
-      "ass",
     );
 
     return {

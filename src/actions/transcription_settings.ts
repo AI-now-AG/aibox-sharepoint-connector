@@ -3,30 +3,46 @@ import { ObjectId } from "mongodb";
 import { z } from "zod";
 import tenantModel, {
   type Tenant,
-  type Instructions,
+  type Transcriptions,
+  TranscriptionsSchema,
 } from "$data/models/tenant.model";
 import { transformRawData } from "$utils/transformRawData";
 
-const InputParamsSchema = z.object({
+export const InputParamsSchema = z.object({
   _id: z.string(),
-  transcription_subtitle: z.string(),
-  transcription_plaintext: z.string(),
+  transcriptions: TranscriptionsSchema
 });
 
 export const transcription_settings = {
   update: defineAction({
     input: InputParamsSchema,
     handler: async (input) => {
-      const { transcription_subtitle, transcription_plaintext } = input;
-      const instructions: Instructions = {
-        transcription_subtitle,
-        transcription_plaintext,
+      const { _id, transcriptions } = input;
+      if (!transcriptions) {
+        throw new Error("No transcription settings provided.");
+      }
+
+      const tenant = await tenantModel.get(_id);
+      if (!tenant) {
+        throw new Error("Tenant not found.");
+      }
+
+      const existingTranscriptions = tenant.transcriptions || {};
+
+      const transcriptionUpdate: Partial<Tenant["transcriptions"]> = {
+        ...existingTranscriptions,
+        ...transcriptions,
       };
+
+      if (!Object.keys(transcriptionUpdate).length) {
+        throw new Error("No valid transcription settings to update.");
+      }
+
       const update: Partial<Tenant> = {
-        ...{ instructions },
-        ...{ _id: new ObjectId(input._id) },
+        transcriptions: transcriptionUpdate,
+        updated_at: new Date(),
       };
-      const updatedDocument = await tenantModel.update(input._id, update);
+      const updatedDocument = await tenantModel.update(_id, update);
 
       return transformRawData(updatedDocument);
     },

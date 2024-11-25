@@ -2,26 +2,66 @@
 import Layout from "$layouts/Layout.astro";
 import { useTranslations } from "$i18n/utils";
 import SettingForm from "./SettingForm.svelte";
+import { Permission } from "$data/models/user.model";
+import { TranscriptionType } from "$utils/TranscribeRequest";
+import { type TranscriptionCard } from "$utils/TranscriptionCard";
+import ToggleCard from "$pages/settings/transcription/ToggleCard.svelte";
 
 const t = useTranslations();
 
-const instructions = Astro.locals.tenant?.instructions || "";
-const transcriptionSubtitle = instructions ? instructions.transcription_subtitle : "";
-const transcriptionPlaintext = instructions ? instructions.transcription_plaintext : "";
+const transcriptions = Astro.locals.tenant?.transcriptions;
+
+const cards: TranscriptionCard[] = [
+  {
+    title: t("tenant.audio-to-text"),
+    //description: t("settings.transcription.plaintext-description"),
+    description: transcriptions?.plaintext?.text ?? "",
+    toggle: transcriptions?.plaintext?.enabled ?? false,
+    type: TranscriptionType.Plaintext,
+  },
+  {
+    title: t("settings.transcription.summarize-title"),
+    //description: t("settings.transcription.summarize-description"),
+    description: transcriptions?.summary?.text ?? "",
+    toggle: transcriptions?.summary?.enabled ?? false,
+    type: TranscriptionType.Summarize,
+  },
+  {
+    title: t("settings.transcription.subtitles-title"),
+    //description: t("settings.transcription.subtitles-description"),
+    description: transcriptions?.subtitles?.text ?? "",
+    toggle: transcriptions?.subtitles?.enabled ?? false,
+    type: TranscriptionType.Subtitles,
+  },
+];
+let userPermissions = Astro.locals.user.permissions;
 ---
 
 <Layout>
   <div
-    class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14"
+    class="container max-w-5xl mx-auto p-6 grid grid-cols-3 md:grid-cols-[1fr_max-content] gap-8"
   >
     <h1 class="pt-2 lg:pt-8 text-4xl font-bold">
-      {t("nav.audiotool.audio-to-text")}
+      {t("nav.settings.audio")}
     </h1>
   </div>
-  <div class="px-8">
-    <SettingForm 
-      instructionSubtitle={transcriptionSubtitle} 
-      instructionPlaintext={transcriptionPlaintext} 
-      client:load />
+  <div class="container max-w-5xl mx-auto p-6 space-y-4 mt-2">
+    <h1 class="text-lg font-normal text-base-content/80">
+      {t("prompt-library.instructions.all")}
+    </h1>
+    <div
+      class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 justify-center"
+    >
+      {
+        userPermissions.includes(Permission.AdminAll) &&
+          cards.map((card) => (
+            <div
+              class={`card bg-base-100 shadow-xl flex flex-col justify-between`}
+            >
+              <ToggleCard transcriptionCard={card} client:load />
+            </div>
+          ))
+      }
+    </div>
   </div>
 </Layout>

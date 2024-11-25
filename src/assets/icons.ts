@@ -26,6 +26,10 @@ import audio from "$assets/icons/audio.svg?raw";
 import aitool from "$assets/icons/aitool.svg?raw";
 import editPrompt from "$assets/icons/edit-prompt.svg?raw";
 import closeMenu from "$assets/icons/closeMenu.svg?raw";
+import Lock from "$assets/icons/lock.svg?raw";
+import keyboard from "$assets/icons/keyboard.svg?raw";
+import textIcon from "$assets/icons/textIcon.svg?raw";
+import codeIcon from "$assets/icons/codeIcon.svg?raw";
 
 export const svgIcons = {
   menuSettings,
@@ -56,4 +60,8 @@ export const svgIcons = {
   aitool,
   editPrompt,
   closeMenu,
+  Lock,
+  keyboard,
+  textIcon,
+  codeIcon,
 };

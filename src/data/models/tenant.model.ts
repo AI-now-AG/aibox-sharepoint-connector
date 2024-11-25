@@ -31,9 +31,25 @@ export const IncludedFeaturesSchema = z.object({
   provider: z.nativeEnum(ApiKeyProvider),
 });
 
-export const InstructionsSchema = z.object({
-  transcription_subtitle: z.string(),
-  transcription_plaintext: z.string(),
+// export const InstructionsSchema = z.object({
+//   transcription_subtitle: z.string().optional(),
+//   transcription_plaintext: z.string().optional(),
+//   transcription_summary: z.string().optional(),
+// });
+
+export const TranscriptionsSchema = z.object({
+  plaintext: z.object({
+    enabled: z.boolean().default(false),
+    text: z.string().optional(),
+  }).optional(),
+  summary: z.object({
+    enabled: z.boolean().default(false),
+    text: z.string().optional(),
+  }).optional(),
+  subtitles: z.object({
+    enabled: z.boolean().default(false),
+    text: z.string().optional(),
+  }).optional(),
 });
 
 const TenantSchema = z.object({
@@ -52,13 +68,13 @@ const TenantSchema = z.object({
   azure_openai_whisper_model: z.string().nullish(),
   azure_openai_chat_model: z.string().nullish(),
   included_features: z.array(IncludedFeaturesSchema),
-  instructions: InstructionsSchema.nullish(),
+  transcriptions: TranscriptionsSchema.nullish(),
   active: z.boolean().default(true).optional(),
   created_at: z.date().optional(),
   updated_at: z.date().optional(),
 });
 export type Tenant = z.infer<typeof TenantSchema>;
-export type Instructions = z.infer<typeof InstructionsSchema>;
+export type Transcriptions = z.infer<typeof TranscriptionsSchema>;
 export type IncludedFeatures = z.infer<typeof IncludedFeaturesSchema>;
 
 const collection = db.collection("tenants");
@@ -75,7 +91,7 @@ export default {
             provider: ApiKeyProvider.OpenAI,
           },
         ],
-        instructions: null,
+        transcriptions: null,
         created_at: new Date(),
         updated_at: new Date(),
       },
@@ -84,9 +100,9 @@ export default {
     return await collection.insertOne(doc);
   },
 
-  update: async (id: string | ObjectId, tenant: Partial<Tenant>) => {
+  update: async (id: string | ObjectId, update: Partial<Tenant>) => {
     const objectId = id instanceof ObjectId ? id : new ObjectId(id);
-    const validated = TenantSchema.partial().parse(tenant);
+    const validated = TenantSchema.partial().parse(update);
     const doc = {
       ...validated,
       ...{

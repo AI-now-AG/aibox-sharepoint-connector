@@ -1,4 +1,5 @@
 import { writable } from "svelte/store";
+import { TranscriptionType } from "$utils/TranscribeRequest";
 
 type TranscribeOptions = {
   file: File | undefined;
@@ -6,12 +7,20 @@ type TranscribeOptions = {
   txtOuput: string;
   txtUrl: string;
   srtUrl: string;
+  assUrl: string;
+  jsonUrl: string;
+  zipFile: string,
 };
 
-const transcript = writable<TranscribeOptions | null>(null);
+type TranscriptEntry = {
+  type: TranscriptionType;
+  options: TranscribeOptions;
+};
 
-transcript.subscribe((value) => {
+const transcriptStore = writable<TranscriptEntry[]>([]);
+
+transcriptStore.subscribe((value) => {
   console.log("$stores/transcript subscribe values on change", value);
 });
 
-export default transcript;
+export default transcriptStore;

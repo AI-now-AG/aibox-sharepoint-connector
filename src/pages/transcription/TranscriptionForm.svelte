@@ -5,21 +5,35 @@
   import { useTranslations } from "$i18n/utils";
   import { svgIcons } from "$assets/icons";
   import { tenant } from "$stores";
-  import transcript from "$stores/transcript";
+  import transcriptStore from "$stores/transcript";
   import { addToast } from "$stores/toast";
-  import type { TranscribeRequest } from "$stores/TranscribeRequest";
+  import { type TranscribeRequest, FileFormat } from "$utils/TranscribeRequest";
+  import { TranscriptionType } from "$utils/TranscribeRequest";
   const t = useTranslations();
 
   export let folderName = "";
+  export let transcriptionType: TranscriptionType | undefined = undefined;
   // general
   let audioFile: File | undefined;
   let audioDuration: string = "";
   let acceptedTypes: Array<string> = ["audio/*", "video/*"];
   let isDragOver: boolean = false;
   let textOuput: string = "";
+  let txtFileUrl: string = "";
   let srtFileUrl: string = "";
   let assFileUrl: string = "";
+  let jsonFileUrl: string = "";
+  let zipFileData: string = "";
+
+  let isZipDataPresent: boolean = false;
+  let isFileDataPresent: boolean = false;
+
   let fileErrorMessage: string = "";
+  let selectedFileFormat: FileFormat[] = [FileFormat.ASS];
+
+  let standardSubtitlesChecked: boolean = true;
+  let showTextPreviewChecked: boolean = true;
+  let rawOutputChecked: boolean = false;
 
   // states
   let isUploading: boolean = false;
@@ -31,36 +45,145 @@
   // API, polling
   let intervalId: any;
   let tempUploadUrl: string;
+  let tempOutputFileName: string;
   let tempOutputFileNames: string[] = [];
 
   let confirmModal: HTMLDialogElement;
 
+  let assFileChecked = selectedFileFormat.includes(FileFormat.ASS);
+  let srtFileChecked = selectedFileFormat.includes(FileFormat.SRT);
+  let jsonFileChecked = selectedFileFormat.includes(FileFormat.JSON);
+  let txtFileChecked = selectedFileFormat.includes(FileFormat.TXT);
+
+  // Watch for changes in the checkbox state and update the `selectedFileFormat` array
+  $: toggleFileFormat(FileFormat.ASS, assFileChecked);
+  $: toggleFileFormat(FileFormat.SRT, srtFileChecked);
+  $: toggleFileFormat(FileFormat.JSON, jsonFileChecked);
+  $: toggleFileFormat(FileFormat.TXT, txtFileChecked);
+
+  $: isFormValid =
+    assFileChecked ||
+    srtFileChecked ||
+    jsonFileChecked ||
+    txtFileChecked ||
+    showTextPreviewChecked;
+
   onMount(async () => {
-    console.log("TranscriptionForm::onMount transcript in store", $transcript);
-    if ($transcript) {
-      retrieveDataInStore();
+    console.log(
+      "TranscriptionForm::onMount transcriptStore in store",
+      $transcriptStore,
+    );
+
+    if ($transcriptStore && transcriptionType) {
+      retrieveDataInStore(transcriptionType);
     }
 
-    // subscribe values change
-    transcript.subscribe((value) => {
-      if (value?.srtUrl && value?.assUrl) {
-        srtFileUrl = value.srtUrl;
-        assFileUrl = value.assUrl;
-        textOuput = value.txtOuput;
+    transcriptStore.subscribe((value) => {
+      const entry = value.find((entry) => entry.type === transcriptionType);
+      if (entry) {
+        let options = entry.options;
+        if (
+          options.txtOuput ||
+          options.txtUrl ||
+          options.srtUrl ||
+          options.assUrl ||
+          options.jsonUrl ||
+          options.zipFile
+        ) {
+          // Retrieve the specific entry based on transcriptionType
+          txtFileUrl = options.txtUrl;
+          srtFileUrl = options.srtUrl;
+          assFileUrl = options.assUrl;
+          jsonFileUrl = options.jsonUrl;
+          zipFileData = options.zipFile;
+          textOuput = options.txtOuput;
 
-        isTranscribing = false;
-        isTranscipted = true;
-        isTranscriptionFailed = false;
+          checkDataAvaibility();
+
+          isTranscribing = false;
+          isTranscipted = true;
+          isTranscriptionFailed = false;
+        }
       }
     });
   });
 
-  function retrieveDataInStore() {
-    audioFile = $transcript?.file;
-    srtFileUrl = $transcript?.srtUrl as string;
-    assFileUrl = $transcript?.assFileUrl as string;
+  function checkDataAvaibility() {
+    isZipDataPresent = zipFileData !== "";
+    isFileDataPresent =
+      txtFileUrl !== "" ||
+      srtFileUrl !== "" ||
+      assFileUrl !== "" ||
+      jsonFileUrl !== "";
+  }
 
-    if (!srtFileUrl) {
+  function retrieveDataInStore(transcriptionType: TranscriptionType) {
+    const entry = $transcriptStore.find(
+      (entry) => entry.type === transcriptionType,
+    );
+    if (entry) {
+      let options = entry.options;
+      audioFile = options.file;
+      if (
+        options.txtOuput ||
+        options.txtUrl ||
+        options.srtUrl ||
+        options.assUrl ||
+        options.jsonUrl ||
+        options.zipFile
+      ) {
+        // Retrieve the specific entry based on transcriptionType
+        txtFileUrl = options.txtUrl;
+        srtFileUrl = options.srtUrl;
+        assFileUrl = options.assUrl;
+        jsonFileUrl = options.jsonUrl;
+        zipFileData = options.zipFile;
+        textOuput = options.txtOuput;
+        checkDataAvaibility();
+      }
+
+      let isPresent =
+        !txtFileUrl ||
+        !srtFileUrl ||
+        !assFileUrl ||
+        !jsonFileUrl ||
+        !zipFileData ||
+        !textOuput;
+      if (isPresent) {
+        isTranscribing = true;
+        isTranscriptionFailed = false;
+      } else {
+        isUploaded = true;
+        isTranscipted = true;
+        isTranscriptionFailed = false;
+      }
+      // audioFile = entry.options.file;
+      // txtFileUrl = entry.options.txtUrl;
+      // srtFileUrl = entry.options.srtUrl;
+      // assFileUrl = entry.options.assUrl;
+      // jsonFileUrl = entry.options.jsonUrl;
+      // zipFileData = entry.options.zipFile;
+
+      // if (!textOuput) {
+      //   isTranscribing = true;
+      //   isTranscriptionFailed = false;
+      // } else {
+      //   isUploaded = true;
+      //   isTranscipted = true;
+      //   isTranscriptionFailed = false;
+      // }
+    }
+  }
+
+  /*function retrieveDataInStore() {
+    audioFile = $transcript?.file;
+    txtFileUrl = $transcript?.txtUrl as string;
+    srtFileUrl = $transcript?.srtUrl as string;
+    assFileUrl = $transcript?.assUrl as string;
+    jsonFileUrl = $transcript?.jsonUrl as string;
+    zipFileData = $transcript?.zipFile as string;
+
+    if (!textOuput) {
       isTranscribing = true;
       isTranscriptionFailed = false;
     } else {
@@ -68,7 +191,7 @@
       isTranscipted = true;
       isTranscriptionFailed = false;
     }
-  }
+  }*/
 
   function isFileTypeValid(type: string) {
     for (let i = 0; i < acceptedTypes.length; i++) {
@@ -195,12 +318,8 @@
 
       // Store temporary upload URL, filename for later
       tempUploadUrl = uploadUrl;
-      tempOutputFileNames = [
-        `${outputFileName}.txt`,
-        `${outputFileName}.srt`,
-        `${outputFileName}.ass`,
-      ];
-      console.log("Temp output file name", tempOutputFileNames);
+      tempOutputFileName = outputFileName;
+      console.log("Temp output file name", tempOutputFileName);
 
       if (response.ok) {
         isUploading = false;
@@ -220,7 +339,7 @@
       const params: TranscribeRequest = createTranscribeRequest(
         folderName,
         audioFile,
-        tempOutputFileNames,
+        tempOutputFileName,
         tempUploadUrl,
         $tenant,
       );
@@ -242,15 +361,30 @@
       });
 
       if (response.ok) {
+        tempOutputFileNames = [];
+        if (transcriptionType === TranscriptionType.Subtitles) {
+          selectedFileFormat.forEach((format) => {
+            tempOutputFileNames.push(`${tempOutputFileName}.${format}`);
+          });
+        }
         startPolling();
 
-        transcript.set({
-          file: audioFile,
-          duration: audioDuration,
-          txtOuput: "",
-          txtUrl: "",
-          srtUrl: "",
-        });
+        transcriptStore.update((current) => [
+          ...current.filter((entry) => entry.type !== transcriptionType), // Remove old entry if it exists
+          {
+            type: transcriptionType,
+            options: {
+              file: audioFile,
+              duration: audioDuration,
+              txtOuput: "",
+              txtUrl: "",
+              srtUrl: "",
+              assUrl: "",
+              jsonUrl: "",
+              zipFile: "",
+            },
+          },
+        ]);
         addToast({
           message: `${t("transcription.file-uploaded-success")}`,
           type: "success",
@@ -278,17 +412,19 @@
   function createTranscribeRequest(
     folderName: string,
     audioFile: File | undefined,
-    tempOutputFileNames: string[],
+    tempOutputFileName: string,
     tempUploadUrl: string,
     tenant: any,
-  ): TranscriptionForm {
+  ): TranscribeRequest {
     return {
       folderName: folderName,
       fileName: audioFile?.name || "",
-      uniqueName: tempOutputFileNames[0],
+      uniqueName: tempOutputFileName,
       uploadUrl: tempUploadUrl,
-      instructionSubtitle: tenant?.instructions?.transcription_subtitle,
-      instructionPlaintext: tenant?.instructions?.transcription_plaintext,
+      transcriptions: tenant?.transcriptions,
+      transcriptionType: transcriptionType,
+      selectedFileFormat: selectedFileFormat,
+      isShowImprovedTextPreview: showTextPreviewChecked,
       encryptedApiKey: tenant?.azure_openai_api_key,
       azureOpenAIInstanceName: tenant?.azure_openai_instance_name,
       azureOpenAIEndpoint: tenant?.azure_openai_endpoint,
@@ -303,8 +439,13 @@
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          uniqueName: tempOutputFileName,
           fileNames: tempOutputFileNames,
           folderName: folderName,
+          isShowImprovedTextPreview:
+            transcriptionType === TranscriptionType.Subtitles
+              ? showTextPreviewChecked
+              : false,
         }),
       });
       if (response.ok) {
@@ -325,19 +466,31 @@
         }
         if (result.exists) {
           clearInterval(intervalId);
+          txtFileUrl = result.txt_file;
           srtFileUrl = result.srt_file;
           assFileUrl = result.ass_file;
-          transcript.set({
-            file: audioFile,
-            duration: audioDuration,
-            txtOuput: result.text_output,
-            txtUrl: result.txt_file,
-            srtUrl: result.srt_file,
-            assUrl: result.ass_file,
-          });
+          jsonFileUrl = result.json_file;
+          zipFileData = result.zip_file;
+          checkDataAvaibility();
+          transcriptStore.update((current) => [
+            ...current.filter((entry) => entry.type !== transcriptionType), // Remove old entry if it exists
+            {
+              type: transcriptionType,
+              options: {
+                file: audioFile,
+                duration: audioDuration,
+                txtOuput: result.text_output,
+                txtUrl: result.txt_file,
+                srtUrl: result.srt_file,
+                assUrl: result.ass_file,
+                jsonUrl: result.json_file,
+                zipFile: result.zip_file,
+              },
+            },
+          ]);
 
           addToast({
-            message: `<a href="/transcription">${t("transcription.transcription-is-ready")}</a>`,
+            message: `<a href="/transcription/${transcriptionType}">${t("transcription.transcription-is-ready")}</a>`,
             type: "success",
             timeout: 5000,
           });
@@ -369,7 +522,11 @@
   }
 
   function startNew() {
-    transcript.set(null);
+    if (transcriptionType) {
+      transcriptStore.update((current) =>
+        current.filter((entry) => entry.type !== transcriptionType),
+      );
+    }
     reset();
 
     confirmModal.close();
@@ -400,15 +557,21 @@
     }
   }
 
-  function downloadFileASS() {
-    fetch(assFileUrl)
+  function downloadFile() {
+    const fileUrl = assFileUrl || srtFileUrl || jsonFileUrl || txtFileUrl;
+    if (!fileUrl) {
+      console.error("No file available for download.");
+      return;
+    }
+
+    fetch(fileUrl)
       .then((response) => response.blob())
       .then((blob) => {
         const blobUrl = URL.createObjectURL(
           new Blob([blob], { type: "application/octet-stream" }),
         );
 
-        const fileName = assFileUrl.split('/').pop();
+        const fileName = fileUrl.split("/").pop() ?? "";
         const link = document.createElement("a");
         link.href = blobUrl;
         link.target = "_blank";
@@ -426,8 +589,44 @@
         }
       })
       .catch((error) => {
-        console.error("Error downloading ASS file:", error);
+        console.error("Error downloading file:", error);
       });
+  }
+
+  async function downloadZip() {
+    const fileUrl = assFileUrl || srtFileUrl || jsonFileUrl || txtFileUrl;
+    if (zipFileData) {
+      // Decode the base64 string to binary data
+      const zipBuffer = atob(zipFileData); // atob decodes the base64 string to binary string
+      const byteArray = new Uint8Array(zipBuffer.length);
+
+      // Fill the byteArray with the binary data
+      for (let i = 0; i < zipBuffer.length; i++) {
+        byteArray[i] = zipBuffer.charCodeAt(i);
+      }
+
+      // Create a Blob from the binary data
+      const blob = new Blob([byteArray], { type: "application/zip" });
+
+      // Create a link element to download the Blob
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.target = "_blank";
+      link.download = `${tempOutputFileName}.zip`; // Specify the file name
+
+      // Append link to the body
+      document.body.appendChild(link);
+      link.click(); // Trigger the download
+
+      // Remove link from body
+      document.body.removeChild(link);
+
+      // Clsoe dialog element
+      console.log("Download file!");
+      if (confirmModal.open) {
+        confirmModal.close();
+      }
+    }
   }
 
   function removeFile() {
@@ -442,14 +641,49 @@
     isTranscipted = false;
     isTranscriptionFailed = false;
 
+    txtFileUrl = "";
     srtFileUrl = "";
     assFileUrl = "";
+    jsonFileUrl = "";
+    zipFileData = "";
     textOuput = "";
+
+    isZipDataPresent = false;
+    isFileDataPresent = false;
+  }
+
+  $: {
+    if (!standardSubtitlesChecked) {
+      selectedFileFormat = selectedFileFormat.filter(
+        (f) => f !== FileFormat.ASS && f !== FileFormat.SRT,
+      );
+      assFileChecked = false;
+      srtFileChecked = false;
+    }
+
+    if (!rawOutputChecked) {
+      selectedFileFormat = selectedFileFormat.filter(
+        (f) => f !== FileFormat.JSON && f !== FileFormat.TXT,
+      );
+      jsonFileChecked = false;
+      txtFileChecked = false;
+    }
+  }
+
+  // Handlers to update the array
+  function toggleFileFormat(format: FileFormat, checked: boolean) {
+    if (checked) {
+      if (!selectedFileFormat.includes(format)) {
+        selectedFileFormat = [...selectedFileFormat, format];
+      }
+    } else {
+      selectedFileFormat = selectedFileFormat.filter((f) => f !== format);
+    }
   }
 </script>
 
 <div class="px-14 mt-10">
-  <div class="bg-base-100 mt-10 p-4 rounded-xl">
+  <div class="bg-base-100 mt-10 p-4 px-6 rounded-xl">
     <p class="mb-2">{t("transcription.upload-video-or-audio-file")}</p>
     {#if !audioFile}
       <div class="relative flex flex-col mt-2">
@@ -544,7 +778,133 @@
     {/if}
   </div>
 
-  {#if textOuput}
+  {#if transcriptionType === TranscriptionType.Subtitles}
+    <div class="bg-base-100 mt-10 p-4 px-6 rounded-xl">
+      <div class="grid">
+        <h2>{t("audiotools.subtitles.what-output-do-you-need")}</h2>
+        <!-- Standard Subtitles -->
+        <div class="form-control py-2">
+          <div class="card rounded-box grid py-8">
+            <div class="flex flex-row place-items-center gap-8">
+              <input
+                type="checkbox"
+                bind:checked={standardSubtitlesChecked}
+                class="checkbox checked:checkbox-primary"
+              />
+              <div class="basis-1/3">
+                <div class="flex flex-row place-items-center gap-4">
+                  <div class="avatar placeholder">
+                    <div class="bg-base-200 text-neutral p-3 rounded-full">
+                      {@html svgIcons.keyboard}
+                    </div>
+                  </div>
+
+                  <div class="flex flex-col">
+                    <h2 class="font-semibold">{t("audiotools.subtitles.subtitle-files")}</h2>
+                    <p class="text-base-content/60">{t("audiotools.subtitles.with-text-improvement")}</p>
+                  </div>
+                </div>
+              </div>
+              <div class="basis-1/3">
+                <div class="flex flex-row place-items-center gap-8">
+                  <label class="cursor-pointer label">
+                    <input
+                      type="checkbox"
+                      bind:checked={assFileChecked}
+                      class="checkbox checked:checkbox-primary checkbox-xs"
+                    />
+                    <span class="label-text ml-2">.ass</span>
+                  </label>
+                  <label class="cursor-pointer label">
+                    <input
+                      type="checkbox"
+                      bind:checked={srtFileChecked}
+                      class="checkbox checked:checkbox-primary checkbox-xs"
+                    />
+                    <span class="label-text ml-2">.srt</span>
+                  </label>
+                </div>
+              </div>
+              <!-- <div class="basis-1/8">03</div> -->
+            </div>
+          </div>
+          <div><div class="bg-base-200 h-0.5"></div></div>
+          <div class="card rounded-box grid py-8">
+            <div class="flex flex-row place-items-center gap-8">
+              <input
+                type="checkbox"
+                bind:checked={showTextPreviewChecked}
+                class="checkbox checked:checkbox-primary"
+              />
+              <div class="basis-1/3">
+                <div class="flex flex-row place-items-center gap-4">
+                  <div class="avatar placeholder">
+                    <div class="bg-base-200 text-neutral p-3 rounded-full">
+                      {@html svgIcons.textIcon}
+                    </div>
+                  </div>
+
+                  <div class="flex flex-col">
+                    <h2 class="font-semibold">{t("audiotools.subtitles.show-text-preview")}</h2>
+                    <p class="text-base-content/60">{t("tenant.audio-to-text")}</p>
+                  </div>
+                </div>
+              </div>
+              <!-- <div class="basis-1/3">02</div>
+              <div class="basis-1/8">03</div> -->
+            </div>
+          </div>
+          <div><div class="bg-base-200 h-0.5"></div></div>
+          <div class="card rounded-box grid py-8">
+            <div class="flex flex-row place-items-center gap-8">
+              <input
+                type="checkbox"
+                bind:checked={rawOutputChecked}
+                class="checkbox checked:checkbox-primary"
+              />
+              <div class="basis-1/3">
+                <div class="flex flex-row place-items-center gap-4">
+                  <div class="avatar placeholder">
+                    <div class="bg-base-200 text-neutral p-3 rounded-full">
+                      {@html svgIcons.codeIcon}
+                    </div>
+                  </div>
+
+                  <div class="flex flex-col">
+                    <h2 class="font-semibold">{t("audiotools.subtitles.raw-output")}</h2>
+                    <p class="text-base-content/60">{t("audiotools.subtitles.no-text-improvement")}</p>
+                  </div>
+                </div>
+              </div>
+              <div class="basis-1/3">
+                <div class="flex flex-row place-items-center gap-8">
+                  <label class="cursor-pointer label">
+                    <input
+                      type="checkbox"
+                      bind:checked={jsonFileChecked}
+                      class="checkbox checked:checkbox-primary checkbox-xs"
+                    />
+                    <span class="label-text ml-2">.json</span>
+                  </label>
+                  <label class="cursor-pointer label">
+                    <input
+                      type="checkbox"
+                      bind:checked={txtFileChecked}
+                      class="checkbox checked:checkbox-primary checkbox-xs"
+                    />
+                    <span class="label-text ml-2">.txt</span>
+                  </label>
+                </div>
+              </div>
+              <!-- <div class="basis-1/8">03</div> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  {/if}
+
+  {#if textOuput && showTextPreviewChecked}
     <TextOuput output={textOuput} />
   {/if}
 
@@ -552,26 +912,34 @@
     {#if !isTranscipted}
       <button
         class={`btn btn-active btn-primary btn-sm text-white`}
-        disabled={!isUploaded || isTranscribing}
+        disabled={!isUploaded || !isFormValid || isTranscribing}
         on:click={transcribe}
         >{t("transciption.model.cta.start-transcribing")}</button
       >
     {/if}
     {#if isTranscipted}
-      <button
-        class="btn btn-success btn-sm text-white"
-        on:click={downloadFileSRT}
-        >{@html svgIcons.download}{t(
-          "transciption.model.cta.download-output.srt",
-        )}</button
-      >
-      <button
-        class="btn btn-success btn-sm text-white"
-        on:click={downloadFileASS}
-        >{@html svgIcons.download}{t(
-          "transciption.model.cta.download-output.ass",
-        )}</button
-      >
+      {#if zipFileData}
+        <button class="btn btn-success btn-sm text-white" on:click={downloadZip}
+          >{@html svgIcons.download}{t(
+            "transciption.model.cta.download-zip",
+          )}</button
+        >
+      {:else if assFileUrl || srtFileUrl || jsonFileUrl || txtFileUrl}
+        <!-- <button
+          class="btn btn-success btn-sm text-white"
+          on:click={downloadFileSRT}
+          >{@html svgIcons.download}{t(
+            "transciption.model.cta.download-output.srt",
+          )}</button
+        > -->
+        <button
+          class="btn btn-success btn-sm text-white"
+          on:click={downloadFile}
+          >{@html svgIcons.download}{t(
+            "transciption.model.cta.download-output",
+          )}</button
+        >
+      {/if}
       <button class="btn bg-black btn-sm text-white" on:click={confirmStartNew}
         >{t("transciption.model.cta.start-new-transciption")}</button
       >
@@ -580,8 +948,10 @@
 
   <StartNewConfirmDialog
     bind:modal={confirmModal}
-    on:downloadSRT={downloadFileSRT}
-    on:downloadASS={downloadFileASS}
+    bind:isZipDataPresent
+    bind:isFileDataPresent
+    on:downloadZip={downloadZip}
+    on:downloadFile={downloadFile}
     on:confirm={startNew}
   />
 </div>
