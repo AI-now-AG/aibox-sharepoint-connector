@@ -167,6 +167,7 @@
   "settings.transcription.summarize-description": "Quickly summarize audio files, such as those from meetings or interviews, right here.",
   "settings.transcription.subtitles-title": "Create subtitles",
   "settings.transcription.subtitles-description": "Effortlessly create subtitles for your videos or TV shows and chose your preferred format.",
+  "audiotools.subtitles.what-output-do-you-need": "What output do you need?",
   "audiotools.subtitles.subtitle-files": "Subtitle files",
   "audiotools.subtitles.with-text-improvement": "with text improvement",
   "audiotools.subtitles.show-text-preview": "Show text preview",
