@@ -23,8 +23,6 @@
   "nav.tenant-management": "Tenant Management",
   "nav.audiotool": "AI AUDIO TOOLS",
   "nav.audiotool.audio-to-text": "Audio to text (Beta)",
-  "nav.audiotool.summarize-audio": "Summarize audio",
-  "nav.audiotool.audio-subtitles": "Create subtitles",
   "login.welcome": "Welcome to",
   "login.title": "Sign in to your account",
   "login.email": "Email",
@@ -168,5 +166,11 @@
   "settings.transcription.summarize-title": "Summarize audio",
   "settings.transcription.summarize-description": "Quickly summarize audio files, such as those from meetings or interviews, right here.",
   "settings.transcription.subtitles-title": "Create subtitles",
-  "settings.transcription.subtitles-description": "Effortlessly create subtitles for your videos or TV shows and chose your preferred format."
+  "settings.transcription.subtitles-description": "Effortlessly create subtitles for your videos or TV shows and chose your preferred format.",
+  "audiotools.subtitles.what-output-do-you-need": "What output do you need?",
+  "audiotools.subtitles.subtitle-files": "Subtitle files",
+  "audiotools.subtitles.with-text-improvement": "with text improvement",
+  "audiotools.subtitles.show-text-preview": "Show text preview",
+  "audiotools.subtitles.raw-output": "Raw output",
+  "audiotools.subtitles.no-text-improvement": "no text improvement"
 }

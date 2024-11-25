@@ -18,13 +18,11 @@
   "nav.settings.instructions": "Instruktionen",
   "nav.settings.knowledge-base": "Knowledge Base",
   "nav.settings.categories": "Kategorien",
-  "nav.settings.audio": "Audio tools Instructions",
+  "nav.settings.audio": "Audio Tools Instruktionen",
   "nav.settings.admin": "ADMIN",
   "nav.tenant-management": "Tenant Verwaltung",
   "nav.audiotool": "KI AUDIO TOOLS",
   "nav.audiotool.audio-to-text": "Audio zu Text",
-  "nav.audiotool.summarize-audio": "Summarize audio",
-  "nav.audiotool.audio-subtitles": "Create subtitles",
   "login.welcome": "Willkommen bei",
   "login.title": "Melden Sie sich bei Ihrem Konto an",
   "login.email": "E-Mail",
@@ -168,5 +166,11 @@
   "settings.transcription.summarize-title": "Audio zusammenfassen",
   "settings.transcription.summarize-description": "Fasse deine Audiodateien, z. B. aus Meetings oder Interviews hier direkt zusammen.",
   "settings.transcription.subtitles-title": "Untertitel erstellen",
-  "settings.transcription.subtitles-description": "Erstelle deine Untertitel für deine Videos und Fernsehsendungen und wähle die gewünschten Formate aus."
+  "settings.transcription.subtitles-description": "Erstelle deine Untertitel für deine Videos und Fernsehsendungen und wähle die gewünschten Formate aus.",
+  "audiotools.subtitles.what-output-do-you-need": "Welchen Output benötigst du?",
+  "audiotools.subtitles.subtitle-files": "untertitel Dateien",
+  "audiotools.subtitles.with-text-improvement": "mit Textverbesserungen",
+  "audiotools.subtitles.show-text-preview": "Text Vorschau anzeigen",
+  "audiotools.subtitles.raw-output": "Unbearbeitete Output Dateien",
+  "audiotools.subtitles.no-text-improvement": "ohne Textverbesserungen"
 }

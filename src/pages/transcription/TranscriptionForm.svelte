@@ -781,7 +781,7 @@
   {#if transcriptionType === TranscriptionType.Subtitles}
     <div class="bg-base-100 mt-10 p-4 px-6 rounded-xl">
       <div class="grid">
-        <h2>Welchen Output benötigst du?</h2>
+        <h2>{t("audiotools.subtitles.what-output-do-you-need")}</h2>
         <!-- Standard Subtitles -->
         <div class="form-control py-2">
           <div class="card rounded-box grid py-8">
@@ -800,8 +800,8 @@
                   </div>
 
                   <div class="flex flex-col">
-                    <h2 class="font-semibold">Standard subtitles</h2>
-                    <p class="text-base-content/60">with text improvement</p>
+                    <h2 class="font-semibold">{t("audiotools.subtitles.subtitle-files")}</h2>
+                    <p class="text-base-content/60">{t("audiotools.subtitles.with-text-improvement")}</p>
                   </div>
                 </div>
               </div>
@@ -845,8 +845,8 @@
                   </div>
 
                   <div class="flex flex-col">
-                    <h2 class="font-semibold">Show text preview</h2>
-                    <p class="text-base-content/60">audio to text</p>
+                    <h2 class="font-semibold">{t("audiotools.subtitles.show-text-preview")}</h2>
+                    <p class="text-base-content/60">{t("tenant.audio-to-text")}</p>
                   </div>
                 </div>
               </div>
@@ -871,8 +871,8 @@
                   </div>
 
                   <div class="flex flex-col">
-                    <h2 class="font-semibold">Raw output</h2>
-                    <p class="text-base-content/60">no text improvement</p>
+                    <h2 class="font-semibold">{t("audiotools.subtitles.raw-output")}</h2>
+                    <p class="text-base-content/60">{t("audiotools.subtitles.no-text-improvement")}</p>
                   </div>
                 </div>
               </div>
