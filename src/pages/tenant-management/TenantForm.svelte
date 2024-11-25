@@ -357,6 +357,7 @@
           <option value="light">Light</option>
           <option value="dark">Dark</option>
           <option value="somedia">Somedia</option>
+          <option value="weihnachtsmann">Weihnachtsmann</option>
           <option value="luxury">Luxury</option>
           <option value="lemonade">Lemonade</option>
         </select>

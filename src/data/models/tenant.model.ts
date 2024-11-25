@@ -8,6 +8,7 @@ export enum TenantTheme {
   Luxury = "luxury",
   Lemonade = "lemonade",
   Somedia = "somedia",
+  Weihnachtsmann = "weihnachtsmann",
 }
 
 export enum TenantFeature {
