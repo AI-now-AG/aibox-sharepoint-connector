@@ -91,17 +91,19 @@
 </script>
 
 <div class="container max-w-5xl p-6 mx-auto p-4">
-  <button class="mr-4" onclick="window.history.back();">
-    {@html svgIcons.back}
-  </button>
   <div class="w-full min-w-xs pt-2 lg:pt-6">
-    <h1 class="pt-2 text-4xl font-bold pb-6">
-      {#if category}
-        {t("prompt-library.categories.edit")}
-      {:else}
-        {t("prompt-library.categories.add")}
-      {/if}
-    </h1>
+    <div class="flex items-center pt-2 pb-6">
+      <button class="mr-4" onclick="window.history.back();">
+        {@html svgIcons.back}
+      </button>
+      <h1 class="text-4xl font-bold">
+        {#if category}
+          {t("prompt-library.categories.edit")}
+        {:else}
+          {t("prompt-library.categories.add")}
+        {/if}
+      </h1>
+    </div>
     <form class="rounded pt-6 mb-4 space-y-6">
       <div class="grid grid-cols-1 gap-4 justify-center">
         <div>

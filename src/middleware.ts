@@ -4,8 +4,12 @@ import {
   FEATURE_MAP_ROUTES,
   PUBLIC_ROUTES,
   SUPER_ADMIN_ROUTES,
+  FEATURE_PLAINTEXT_ROUTE,
+  FEATURE_SUBTITLES_ROUTE,
+  FEATURE_SUMMARY_ROUTE,
 } from "$constants";
-import tenantModel, { FeatureName } from "$data/models/tenant.model";
+import type { APIContext, MiddlewareNext } from "astro";
+import tenantModel, { TenantFeature } from "$data/models/tenant.model";
 import { defaultLang } from "$i18n/ui";
 import { setLanguage } from "$i18n/utils";
 import { wildcardMatch, wildcardMatchInArray } from "$utils/wildcardMatch";
@@ -100,8 +104,17 @@ async function restrictAccess(context: APIContext, next: MiddlewareNext) {
     let hasAccess = false;
     if (context.locals.tenant?.included_features?.length) {
       hasAccess = context.locals.tenant.included_features.some(
-        (item) => item.name == (key as FeatureName),
+        (item) => item.name == (key as TenantFeature),
       );
+    }
+    if(context.url.pathname === FEATURE_PLAINTEXT_ROUTE) {
+      hasAccess = (context.locals.tenant.transcriptions?.plaintext?.enabled ?? true)
+    }
+    if(context.url.pathname === FEATURE_SUBTITLES_ROUTE) {
+      hasAccess = (context.locals.tenant.transcriptions?.subtitles?.enabled ?? true)
+    }
+    if(context.url.pathname === FEATURE_SUMMARY_ROUTE) {
+      hasAccess = (context.locals.tenant.transcriptions?.summary?.enabled ?? true)
     }
 
     if (matchPath && !hasAccess) {

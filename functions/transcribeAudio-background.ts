@@ -61,6 +61,7 @@ const transcribeAudio: Handler = async (
         status: "completed",
         txtUrl: transcriptionResult.data?.urls["txt"],
         srtUrl: transcriptionResult.data?.urls["srt"],
+        assUrl: transcriptionResult.data?.urls["ass"],
       });
       return {
         statusCode: 200,

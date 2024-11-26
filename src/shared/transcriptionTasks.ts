@@ -12,6 +12,7 @@ const TaskSchema = z.object({
   error: z.string().optional(),
   txtUrl: z.string().optional(),
   srtUrl: z.string().optional(),
+  assUrl: z.string().optional(),
 });
 
 type Task = z.infer<typeof TaskSchema>;

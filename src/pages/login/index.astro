@@ -5,10 +5,18 @@ import { useTranslations } from "$i18n/utils";
 const t = useTranslations();
 
 // TODO: save theme settings in db
-const theme =
-  Astro.locals.user.tenant_id.toString() === "66aa21a3d40d0b194e280143"
-    ? "somedia"
-    : "light";
+let theme = "light";
+
+switch (Astro.locals.user?.tenant_id?.toString()) {
+  case "66aa21a3d40d0b194e280143":
+    theme = "somedia";
+    break;
+  case "674347ba64f450769a147f6a":
+    theme = "weihnachtsmann";
+    break;
+  default:
+    theme = "light";
+}
 ---
 
 <html lang="en" data-theme={theme}>

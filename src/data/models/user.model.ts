@@ -16,6 +16,7 @@ const UserSchema = z.object({
   updated_at: z.date().default(() => new Date()),
   permissions: z.array(z.nativeEnum(Permission)),
   name: z.string(),
+  navState: z.record(z.string(), z.boolean()).optional(),
 });
 
 export type User = z.infer<typeof UserSchema>;
@@ -29,6 +30,21 @@ export function assignPermissions(roles: UserRole[]): Permission[] {
     rolePermissions.forEach((permission) => permissionsSet.add(permission));
   });
   return Array.from(permissionsSet);
+}
+
+export async function updateUserData(
+  userId: string | ObjectId,
+  detailsId: string,
+  isOpen: boolean
+) {
+  const objectId = userId instanceof ObjectId ? userId : new ObjectId(userId);
+  const updateField = { [`navState.${detailsId}`]: isOpen };
+
+  return await collection.findOneAndUpdate(
+    { _id: objectId },
+    { $set: updateField },
+    { returnDocument: "after" }
+  );
 }
 
 export default {

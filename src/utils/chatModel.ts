@@ -1,7 +1,7 @@
 import { ChatOpenAI, AzureChatOpenAI } from "@langchain/openai";
 import type { APIContext } from "astro";
 import { decrypt } from "./secure";
-import { FeatureName, ApiKeyProvider } from "$data/models/tenant.model";
+import { TenantFeature, ApiKeyProvider } from "$data/models/tenant.model";
 
 const initChatOpenAI = (apiKey: string, model: string) => {
   console.log("$utils:chatModel->initChatOpenAI", {
@@ -40,7 +40,7 @@ export const initializeOpenAI = (ctx: APIContext) => {
   const { included_features: features } = ctx.locals.tenant;
 
   const textPromptsProvider = features?.find(
-    (item) => item.name == FeatureName.TextPrommpts,
+    (item) => item.name == TenantFeature.TextPrommpts,
   );
   const provider = textPromptsProvider
     ? textPromptsProvider.provider

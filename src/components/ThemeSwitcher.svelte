@@ -15,6 +15,10 @@
       theme: "somedia",
     },
     {
+      name: "Weihnachtsmann",
+      theme: "weihnachtsmann",
+    },
+    {
       name: "Luxury",
       theme: "luxury",
     },

@@ -1,0 +1,44 @@
+---
+import Layout from "$layouts/Layout.astro";
+import { useTranslations } from "$i18n/utils";
+import TranscriptionForm from "./TranscriptionForm.svelte";
+import { TranscriptionType } from "$utils/TranscribeRequest";
+const t = useTranslations();
+
+const { id } = Astro.params;
+
+const selectedTranscriptionType =
+    id && Object.values(TranscriptionType).includes(id as TranscriptionType)
+        ? (id as TranscriptionType)
+        : undefined;
+if (selectedTranscriptionType === undefined) {
+    return Astro.redirect("/404");
+}
+
+let title = t("tenant.audio-to-text");
+let description = t("settings.transcription.plaintext-description");
+if (selectedTranscriptionType === TranscriptionType.Summarize) {
+    title = t("settings.transcription.summarize-title");
+    description = t("settings.transcription.summarize-description");
+} else if (selectedTranscriptionType === TranscriptionType.Subtitles) {
+    title = t("settings.transcription.subtitles-title");
+    description = t("settings.transcription.subtitles-description");
+}
+---
+
+<Layout>
+    <div>
+        <div class="container max-w-full mx-auto grid grid-cols-1 px-14">
+            <h1 class="pt-2 mb-2 lg:pt-8 text-4xl font-bold">
+                {title}
+            </h1>
+            <p>{description}</p>
+        </div>
+
+        <TranscriptionForm
+            transcriptionType={selectedTranscriptionType}
+            folderName={Astro.locals.tenant.org_name}
+            client:load
+        />
+    </div>
+</Layout>
