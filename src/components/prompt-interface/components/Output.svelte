@@ -52,7 +52,7 @@
             <p class="font-bold text-sm text-gray-800">
               {role == MessageRole.User ? username : `aibox`}
             </p>
-            <p class="mt-2 text-gray-600 text-sm">{content}</p>
+            <p class="mt-2 text-gray-600 text-sm">{@html content}</p>
           </div>
         {/if}
 
