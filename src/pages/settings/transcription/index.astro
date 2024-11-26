@@ -1,11 +1,10 @@
 ---
-import Layout from "$layouts/Layout.astro";
+import { Permission } from "$enums/role.enums";
 import { useTranslations } from "$i18n/utils";
-import SettingForm from "./SettingForm.svelte";
-import { Permission } from "$data/models/user.model";
+import Layout from "$layouts/Layout.astro";
+import ToggleCard from "$pages/settings/transcription/ToggleCard.svelte";
 import { TranscriptionType } from "$utils/TranscribeRequest";
 import { type TranscriptionCard } from "$utils/TranscriptionCard";
-import ToggleCard from "$pages/settings/transcription/ToggleCard.svelte";
 
 const t = useTranslations();
 

@@ -1,7 +1,6 @@
-import { FeatureName } from "$data/models/tenant.model";
+import { TenantFeature } from "$data/models/tenant.model";
 import { UserRole } from "$enums/role.enums";
 import type { User } from "lucia";
-import { TenantFeature } from "$data/models/tenant.model";
 
 export const user = (locals: App.Locals): User => {
   return locals.user;
@@ -50,8 +49,8 @@ export const hasAudioPlaintext = (locals: App.Locals) => {
 
   const { transcriptions } = locals.tenant;
   let result = false;
-  if(transcriptions?.plaintext?.enabled ?? false) {
-    result = true
+  if (transcriptions?.plaintext?.enabled ?? false) {
+    result = true;
   }
   return result;
 };
@@ -63,8 +62,8 @@ export const hasAudioSubtitles = (locals: App.Locals) => {
 
   const { transcriptions } = locals.tenant;
   let result = false;
-  if(transcriptions?.subtitles?.enabled ?? false) {
-    result = true
+  if (transcriptions?.subtitles?.enabled ?? false) {
+    result = true;
   }
   return result;
 };
@@ -76,8 +75,8 @@ export const hasAudioSummary = (locals: App.Locals) => {
 
   const { transcriptions } = locals.tenant;
   let result = false;
-  if(transcriptions?.summary?.enabled ?? false) {
-    result = true
+  if (transcriptions?.summary?.enabled ?? false) {
+    result = true;
   }
   return result;
 };
