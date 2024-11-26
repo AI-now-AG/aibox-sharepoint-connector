@@ -3,6 +3,7 @@ import {
   BaseMessage,
   HumanMessage,
   SystemMessage,
+  AIMessage
 } from "@langchain/core/messages";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import PromptModel from "$data/models/prompt.model";
@@ -15,6 +16,7 @@ import type { APIRoute } from "astro";
 import type { CreateInstructionParams } from "../instructions.json";
 import type { CreateKnowledgeBaseParams } from "../knowledge-base.json";
 import initializeOpenAI from "$utils/chatModel";
+import { MessageRole } from "$utils/MessageHistory";
 
 export type PromptDetails = {
   title: string;
@@ -29,11 +31,17 @@ const AttachmentSchema = z.object({
   content: z.string(),
 });
 
+const MessageSchema = z.object({
+  role: z.nativeEnum(MessageRole),
+  content: z.string(),
+});
+
 const RunPromptParamsSchema = z.object({
   _id: z.string(),
   article: z.string().min(1),
   images: z.array(AttachmentSchema).optional(),
   files: z.array(AttachmentSchema).optional(),
+  messageHistory: z.array(MessageSchema).optional(),
 });
 
 export type RunPromptParams = z.infer<typeof RunPromptParamsSchema>;
@@ -97,10 +105,17 @@ export const POST: APIRoute = async (ctx) => {
       });
     }
 
+    let hasMessageHistory = false;
+    if (data.messageHistory && data.messageHistory.length > 0) {
+      hasMessageHistory = true;
+      data.messageHistory?.forEach((message) => {
+        messages.push((message.role === MessageRole.User) ? (new HumanMessage(message.content)) : (new AIMessage(message.content)));
+      });
+    }
     messages.push(new HumanMessage(data.article));
 
     // Handle image uploads
-    if (data.images) {
+    if (data.images && !hasMessageHistory) {
       data.images.forEach((object) => {
         if (object.content) {
           messages.push(
@@ -122,7 +137,7 @@ export const POST: APIRoute = async (ctx) => {
     //      type: 'application/pdf',
 
     // Handle file uploads
-    if (data.files) {
+    if (data.files && !hasMessageHistory) {
       for (const file of data.files) {
         if (file.content) {
           const docs = await fileLoader(file);
