@@ -1,5 +1,5 @@
 import Mustache, { type OpeningAndClosingTags } from "mustache";
-import { ui, defaultLang } from "./ui";
+import { defaultLang, ui } from "./ui";
 
 let currentLang: string;
 
@@ -21,7 +21,9 @@ export function useTranslations(requestedLang?: string) {
   const lang = getLanguage(value);
 
   return function t(key: keyof (typeof ui)[typeof defaultLang], view?: object) {
-    const template = (lang && ui[lang][key]) || ui[defaultLang][key];
+    const template =
+      (lang && (ui[lang] as Record<string, string>)[key]) ||
+      (ui[defaultLang] as Record<string, string>)[key];
     return Mustache.render(template, view);
   };
 }
