@@ -7,6 +7,7 @@
   import { svgIcons } from "$assets/icons";
 
   export let output: string;
+  export let isProcessing: string;
   let element;
 
   let copyIndex: number = -1;
@@ -29,7 +30,7 @@
     if (
       ($sharedMessageHistory.length > 0 &&
         $sharedMessageHistory.length > totalMessages) ||
-      !output
+      isProcessing
     ) {
       scrollToBottom(element);
       totalMessages = $sharedMessageHistory.length;
@@ -146,7 +147,25 @@
       {/each}
     </div>
 
-    {#if !output}
+    {#if output}
+      <div class={`chat-bubble text-base-content bg-base-100`}>
+        <div class="flex items-start">
+          <!-- Avatar -->
+          <div class="avatar">
+            <div class="w-10 rounded-full">
+              <img src="/aibox-logo-dark.svg" alt="light Logo" />
+              {@html svgIcons.editPrompt}
+            </div>
+          </div>
+
+          <div class="flex-1 p-4 pt-2.5">
+            <p class="font-bold text-sm text-gray-800">aibox</p>
+            <p class="mt-2 text-gray-600 text-sm">{@html output}</p>
+          </div>
+        </div>
+      </div>
+    {/if}
+    {#if isProcessing}
       <div class="card mt-2 gap-4" transition:fade>
         <!-- Latest Output -->
         <div class="chat-bubble bg-base-100 text-base-content flex flex-row">

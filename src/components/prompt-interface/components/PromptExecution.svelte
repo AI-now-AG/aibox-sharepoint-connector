@@ -12,6 +12,7 @@
   let selectedPromptId;
   let input = "";
   let output = "";
+  let isProcessing = false;
   let isFixed = false;
 
   $: if (input && !isFixed) {
@@ -39,10 +40,10 @@
         in:slide={{ duration: 500, delay: 500 }}
         out:slide={{ duration: 500 }}
       >
-        <InputArea bind:promptId={selectedPromptId} bind:input bind:output />
+        <InputArea bind:promptId={selectedPromptId} bind:input bind:output bind:isProcessing />
       </div>
     {/if}
-    <PromptResults bind:input bind:output />
+    <PromptResults bind:input bind:output bind:isProcessing />
   </div>
   <!-- <InputArea bind:promptId={selectedPromptId} bind:input bind:output /> -->
 
@@ -64,7 +65,7 @@
           out:slide={{ duration: 500 }}
           in:slide={{ duration: 500, delay: 500 }}
         >
-          <InputArea bind:promptId={selectedPromptId} bind:input bind:output />
+          <InputArea bind:promptId={selectedPromptId} bind:input bind:output bind:isProcessing />
         </div>
       
     {/if}

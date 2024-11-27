@@ -3,6 +3,7 @@
   import Output from "./Output.svelte";
   export let input;
   export let output;
+  export let isProcessing;
 </script>
 
 {#if input}
@@ -10,7 +11,7 @@
     <div class="flex flex-wrap h-full">
       <div class="grow md:w-1/2 p-2 pb-4 h-full">
         <div class="grid space-y-6 h-full" transition:fade>
-          <Output bind:output />
+          <Output bind:output bind:isProcessing/>
         </div>
       </div>
     </div>

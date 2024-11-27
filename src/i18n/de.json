@@ -82,7 +82,7 @@
   "prompt-execution.card.showMore": "mehr Prompts",
   "prompt-execution.card.showLess": "weniger Prompts",
   "prompt-execution.showGlobal": "Global speichern",
-  "prompt-execution.historyRemove.info": "beim Verlassen dieser Seite, gehen alle bisher erstellte Daten verloren.",
+  "prompt-execution.historyRemove.info": "Beim Verlassen dieser Seite, gehen alle bisher erstellten Daten verloren.",
   "prompt-emptyscreen.description": "Starten Sie mit vordefinierten Use Case unten.",
   "prompt-emptyscreen.nousecase": "Keine Use Case",
   "prompt-emptyscreen.create.usecaseLbl": "Beginnen Sie mit der Erstellung eines neuen Use Case für diese Gruppe",
