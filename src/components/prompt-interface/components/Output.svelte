@@ -24,7 +24,7 @@
       });
   }
 
-  let username = $user?.username;
+  let username = $user?.name || $user?.username;
   let userPicture = $user?.picture;
 </script>
 

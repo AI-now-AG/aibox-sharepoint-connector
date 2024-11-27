@@ -21,6 +21,7 @@ export const lucia = new Lucia(adapter, {
     // This defines what values will be returned (and attached to the request context)
     // when validating a session
     return {
+      name: attributes.name,
       username: attributes.username,
       tenant_id: attributes.tenant_id,
       email: attributes.email,
