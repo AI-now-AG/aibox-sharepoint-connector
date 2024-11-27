@@ -11,6 +11,8 @@ const tenant = Astro.locals.tenant;
     class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14"
   >
     <Profile 
+      userId={user.id.toString()}
+      auth0Sub={user.auth0_sub}
       name={user.name}
       email={user.email}
       organization={tenant.name}

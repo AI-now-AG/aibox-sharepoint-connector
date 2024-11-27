@@ -9,6 +9,8 @@
   import * as yub from "yup";
   import type { ProfileUpdateFormData } from "./types";
 
+  export let userId: string = "";
+  export let auth0Sub: string = "";
   export let name: string = "";
   export let email: string = "";
   export let organization: string = "";
@@ -24,7 +26,11 @@
     }),
     onSubmit: async (values: ProfileUpdateFormData): Promise<void> => {
       try {
-        await actions.auth.updateProfile.orThrow(values);
+        await actions.auth.updateProfile.orThrow({
+          ...values,
+          id: userId,
+          auth0Sub,
+        });
         addToast({
           message: "Profile updated successfully",
           type: "success",
