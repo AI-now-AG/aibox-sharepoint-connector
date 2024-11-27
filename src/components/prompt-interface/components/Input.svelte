@@ -2,6 +2,9 @@
   import FileUpload from "$components/FileUpload.svelte";
   import { type MessageHistory, MessageRole } from "$utils/MessageHistory";
   import { sharedMessageHistory } from "$components/prompt-interface/components/Stores";
+  import { svgIcons } from "$assets/icons";
+  import { useTranslations } from "$i18n/utils";
+  const t = useTranslations();
 
   export let promptId = "";
   export let input = "";
@@ -307,3 +310,11 @@
     />
   </div>
 </div>
+{#if $sharedMessageHistory.length == 0}
+  <div class="container p-4 gap-2 items-center flex justify-center">
+    {@html svgIcons.warningIcon}
+    <p class="text-xs text-neutral">
+      {t("prompt-execution.historyRemove.info")}
+    </p>
+  </div>
+{/if}
