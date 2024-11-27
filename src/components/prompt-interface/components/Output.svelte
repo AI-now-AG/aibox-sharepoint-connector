@@ -1,14 +1,29 @@
 <script lang="ts">
   import { fade } from "svelte/transition";
+  import { afterUpdate, tick } from 'svelte';
   import { MessageRole, type MessageHistory } from "$utils/MessageHistory";
   import { sharedMessageHistory } from "$components/prompt-interface/components/Stores";
   import { tenant, user } from "$stores";
   import { svgIcons } from "$assets/icons";
 
   export let output: string;
+  let element;
 
   let copyIndex: number = -1;
   let timer: NodeJS.Timeout;
+
+  afterUpdate(() => {
+		if($sharedMessageHistory.length > 0) scrollToBottom(element);
+  });
+
+  $: if($sharedMessageHistory.length > 0 && element) {
+		scrollToBottom(element);
+	}
+
+  const scrollToBottom = async (node) => {
+    node.scroll({ top: node.scrollHeight, behavior: 'smooth' });
+  }; 
+
   function copyToClipboard(content: string, index: number) {
     navigator.clipboard
       .writeText(content)
@@ -28,7 +43,8 @@
   let userPicture = $user?.picture;
 </script>
 
-<div class="card mt-2 gap-4" transition:fade>
+<div bind:this={element} class="mt-2 overflow-y-scroll max-h-screen">
+<div class="card gap-4" transition:fade>
   {#each $sharedMessageHistory as { role, content }, index}
     <div
       class={`chat-bubble text-base-content ${role === MessageRole.User ? `bg-base-200` : `bg-base-100`}`}
@@ -155,7 +171,7 @@
   </div>
 {/if}
 
-
+</div>
 <!-- {#if !output}
       <p class="py-2">{@html output}</p>
       <div class="flex flex-col justify-items-end order-last">
