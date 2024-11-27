@@ -25,7 +25,7 @@
   });
 </script>
 
-<div class="grid grid-cols-1 grid-rows-[1fr_min-content] space-y-6">
+<div class="grid grid-cols-1 grid-rows-[1fr_min-content] space-y-6 h-full">
   <div class="flex flex-col space-y-6">
     <p class="text-base font-normal">
       {#if selectedPromptId}
@@ -33,15 +33,40 @@
       {/if}
     </p>
     <ExecutionCard cards={promptItems} bind:selectedPromptId bind:isEditable />
+    {#if $sharedMessageHistory.length == 0}
+      <div
+        class="min-w-full form-wrapper"
+        in:slide={{ duration: 500, delay: 500 }}
+        out:slide={{ duration: 500 }}
+      >
+        <InputArea bind:promptId={selectedPromptId} bind:input bind:output />
+      </div>
+    {/if}
+    <PromptResults bind:input bind:output />
   </div>
   <!-- <InputArea bind:promptId={selectedPromptId} bind:input bind:output /> -->
-  <PromptResults bind:input bind:output />
 
   <!-- {#if sharedMessageHistory.length > 0} -->
-  <div transition:fade={{ duration: 300 }}>
-    <InputArea bind:promptId={selectedPromptId} bind:input bind:output />
+  <!-- <div class="relative">
+    <div
+      transition:fade={{ duration: 300 }}
+      class="absolute inset-x-0 bottom-4"
+    >
+      <InputArea bind:promptId={selectedPromptId} bind:input bind:output />
+    </div>
+  </div> -->
+
+  <div class="h-full" transition:slide={{ duration: 500 }}>
+    {#if $sharedMessageHistory.length > 0}
+      <div class="relative">
+        <div
+          class="absolute inset-x-0 bottom-2 min-w-full form-wrapper bg-red-300"
+          out:slide={{ duration: 500 }}
+          in:slide={{ duration: 500, delay: 500 }}
+        >
+          <InputArea bind:promptId={selectedPromptId} bind:input bind:output />
+        </div>
+      </div>
+    {/if}
   </div>
-  <!-- {:else} -->
-  <!-- <InputArea bind:promptId={selectedPromptId} bind:input bind:output /> -->
-  <!-- {/if} -->
 </div>

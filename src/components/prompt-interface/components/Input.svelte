@@ -180,13 +180,13 @@
 </script>
 
 <div
-  class={`flex ${($sharedMessageHistory.length > 0) ? `flex-row` : `flex-col`} rounded-xl bg-base-100 border border-base-content/20 focus:ring-base-200 has-[:focus]:ring-2 has-[:focus]:ring-base-primary has-[:focus]:ring-offset-2 has-[:focus]:ring-offset-base-200`}
+  class={`flex ${$sharedMessageHistory.length > 0 ? `flex-row` : `flex-col`} rounded-xl bg-base-100 border border-base-content/20 focus:ring-base-200 has-[:focus]:ring-2 has-[:focus]:ring-base-primary has-[:focus]:ring-offset-2 has-[:focus]:ring-offset-base-200`}
 >
   <div class="flex-1 relative">
     <textarea
       name="input"
       id="input"
-      class="textarea textarea-ghost h-32 w-full focus:outline-none focus:border-base-100 text-base"
+      class="textarea textarea-ghost ${$sharedMessageHistory.length > 0 ? `h-22` : `h-32`} w-full focus:outline-none focus:border-base-100 text-base"
       placeholder="Your input..."
       bind:value={inputText}
       on:keydown={onKeyDown}
@@ -310,7 +310,7 @@
     />
   </div>
 </div>
-{#if $sharedMessageHistory.length == 0}
+{#if $sharedMessageHistory.length > 0}
   <div class="container p-4 gap-2 items-center flex justify-center">
     {@html svgIcons.warningIcon}
     <p class="text-xs text-neutral">
