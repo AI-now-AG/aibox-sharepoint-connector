@@ -58,15 +58,15 @@
 
   <div class="h-full" transition:slide={{ duration: 500 }}>
     {#if $sharedMessageHistory.length > 0}
-      <div class="relative">
+      
         <div
-          class="absolute inset-x-0 bottom-0 min-w-full form-wrapper"
+          class="inset-x-0 bottom-0 min-w-full form-wrapper"
           out:slide={{ duration: 500 }}
           in:slide={{ duration: 500, delay: 500 }}
         >
           <InputArea bind:promptId={selectedPromptId} bind:input bind:output />
         </div>
-      </div>
+      
     {/if}
   </div>
 </div>
