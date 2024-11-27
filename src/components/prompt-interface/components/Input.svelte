@@ -311,7 +311,7 @@
   </div>
 </div>
 {#if $sharedMessageHistory.length > 0}
-  <div class="container p-4 gap-2 items-center flex justify-center">
+  <div class="container p-3 gap-2 items-center flex justify-center">
     {@html svgIcons.warningIcon}
     <p class="text-xs text-neutral">
       {t("prompt-execution.historyRemove.info")}

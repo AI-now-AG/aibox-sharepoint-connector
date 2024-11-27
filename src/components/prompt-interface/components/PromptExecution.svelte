@@ -60,7 +60,7 @@
     {#if $sharedMessageHistory.length > 0}
       <div class="relative">
         <div
-          class="absolute inset-x-0 bottom-2 min-w-full form-wrapper"
+          class="absolute inset-x-0 bottom-0 min-w-full form-wrapper"
           out:slide={{ duration: 500 }}
           in:slide={{ duration: 500, delay: 500 }}
         >
