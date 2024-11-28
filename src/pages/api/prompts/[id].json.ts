@@ -38,7 +38,7 @@ const MessageSchema = z.object({
 
 const RunPromptParamsSchema = z.object({
   _id: z.string(),
-  article: z.string().min(1),
+  article: z.string().optional(),
   images: z.array(AttachmentSchema).optional(),
   files: z.array(AttachmentSchema).optional(),
   messageHistory: z.array(MessageSchema).optional(),
@@ -112,7 +112,9 @@ export const POST: APIRoute = async (ctx) => {
         messages.push((message.role === MessageRole.User) ? (new HumanMessage(message.content)) : (new AIMessage(message.content)));
       });
     }
-    messages.push(new HumanMessage(data.article));
+    if (data.article) {
+      messages.push(new HumanMessage(data.article));
+    }
 
     // Handle image uploads
     if (data.images && !hasMessageHistory) {
