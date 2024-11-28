@@ -21,6 +21,10 @@
     }, 500);
   }
 
+  $: if (selectedPromptId) {
+    sharedMessageHistory.set([]);
+  }
+  
   onDestroy(function () {
     sharedMessageHistory.set([]);
   });
@@ -43,7 +47,7 @@
         <InputArea bind:promptId={selectedPromptId} bind:input bind:output bind:isProcessing />
       </div>
     {/if}
-    <PromptResults bind:input bind:output bind:isProcessing />
+    <PromptResults bind:output bind:isProcessing />
   </div>
   <!-- <InputArea bind:promptId={selectedPromptId} bind:input bind:output /> -->
 

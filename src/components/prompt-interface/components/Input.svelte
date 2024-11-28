@@ -12,7 +12,6 @@
   export let isProcessing = false;
 
   let inputText = "";
-  $: length = inputText.length;
 
   const fileTypes = {
     "audio/*": ["audio/mp3"],
@@ -118,7 +117,7 @@
 
         const reader = response.body?.getReader();
         let partialData = "";
-        if (reader) {
+        if (inputText) {
           const newUserMessage = {
             role: MessageRole.User,
             content: inputText,
@@ -127,6 +126,8 @@
             ...messages,
             newUserMessage,
           ]);
+        }
+        if (reader) {
           isProcessing = false;
           const decoder = new TextDecoder();
           while (true) {
@@ -151,7 +152,7 @@
             ...messages,
             newAssistantMessage,
           ]);
-          output = ""
+          output = "";
           clearText();
         }
         isProcessing = false;
@@ -191,11 +192,10 @@
     <textarea
       name="input"
       id="input"
-      class={`textarea textarea-ghost ${$sharedMessageHistory.length > 0
-        ? `h-22`
-        : `h-32`} w-full focus:outline-none focus:border-base-100 text-base`}
+      class={`textarea textarea-ghost ${
+        $sharedMessageHistory.length > 0 ? `h-22` : `h-32`
+      } w-full focus:outline-none focus:border-base-100 text-base`}
       placeholder="Your input..."
-      maxlength="1000"
       bind:value={inputText}
       on:keydown={onKeyDown}
     ></textarea>
@@ -283,9 +283,6 @@
       {/if}
     </div>
     <div class="flex self-end">
-      <!-- <div class=" px-2">
-        <p class="text-sm text-base-content/80">{length}/1000</p>
-      </div> -->
       <button
         class="btn btn-ghost btn-md disabled:bg-base-100 disabled:text-slate-500 disabled:cursor-not-allowed"
         disabled={!promptId}
