@@ -18,6 +18,7 @@ const UserSchema = z.object({
   _id: z.instanceof(ObjectId),
   tenant_id: z.instanceof(ObjectId),
   auth0_sub: z.string().min(24),
+  name: z.string().min(2),
   username: z.string().min(2),
   email: z.string(),
   picture: z.string().url().optional(),

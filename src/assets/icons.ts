@@ -30,6 +30,8 @@ import Lock from "$assets/icons/lock.svg?raw";
 import keyboard from "$assets/icons/keyboard.svg?raw";
 import textIcon from "$assets/icons/textIcon.svg?raw";
 import codeIcon from "$assets/icons/codeIcon.svg?raw";
+import warningIcon from "$assets/icons/warning.svg?raw";
+import downIcon from "$assets/icons/down.svg?raw";
 
 export const svgIcons = {
   menuSettings,
@@ -64,4 +66,6 @@ export const svgIcons = {
   keyboard,
   textIcon,
   codeIcon,
+  warningIcon,
+  downIcon,
 };

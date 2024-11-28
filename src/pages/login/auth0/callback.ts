@@ -18,6 +18,7 @@ const Auth0JWTSchema = z.object({
   org_name: z.string().min(2),
   "ainow/roles": z.array(z.nativeEnum(UserRole)),
   email: z.string().email(),
+  name: z.string(),
   nickname: z.string(),
   picture: z.string().url(),
 });
@@ -112,6 +113,7 @@ export async function GET(context: APIContext): Promise<Response> {
   const newUser = await userModel.add({
     tenant_id: tenant._id,
     auth0_sub: userData.data.sub,
+    name: userData.data.name,
     username: userData.data.nickname,
     email: userData.data.email,
     picture: userData.data.picture,

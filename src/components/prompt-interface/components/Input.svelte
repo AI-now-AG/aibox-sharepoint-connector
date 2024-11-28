@@ -1,9 +1,15 @@
 <script lang="ts">
   import FileUpload from "$components/FileUpload.svelte";
+  import { type MessageHistory, MessageRole } from "$utils/MessageHistory";
+  import { sharedMessageHistory } from "$components/prompt-interface/components/Stores";
+  import { svgIcons } from "$assets/icons";
+  import { useTranslations } from "$i18n/utils";
+  const t = useTranslations();
 
   export let promptId = "";
   export let input = "";
   export let output = "";
+  export let isProcessing = false;
 
   let inputText = "";
 
@@ -61,7 +67,7 @@
     if (inputText) {
       input = inputText;
       output = "";
-
+      isProcessing = true;
       type FileInput = {
         name: string;
         content: unknown;
@@ -101,6 +107,7 @@
             promptId: promptId,
             files: userInputFilesList,
             images: userInputImagesList,
+            messageHistory: $sharedMessageHistory,
           }),
           credentials: "include",
           headers: {
@@ -110,7 +117,18 @@
 
         const reader = response.body?.getReader();
         let partialData = "";
+        if (inputText) {
+          const newUserMessage = {
+            role: MessageRole.User,
+            content: inputText,
+          };
+          sharedMessageHistory.update((messages) => [
+            ...messages,
+            newUserMessage,
+          ]);
+        }
         if (reader) {
+          isProcessing = false;
           const decoder = new TextDecoder();
           while (true) {
             const { done, value } = await reader.read();
@@ -125,7 +143,21 @@
             output = formattedChunk;
           }
         }
+        if (output) {
+          const newAssistantMessage = {
+            role: MessageRole.Assistant,
+            content: output,
+          };
+          sharedMessageHistory.update((messages) => [
+            ...messages,
+            newAssistantMessage,
+          ]);
+          output = "";
+          clearText();
+        }
+        isProcessing = false;
       } catch (error) {
+        isProcessing = false;
         console.error("Fetch headlines error:" + error);
       }
     }
@@ -154,13 +186,15 @@
 </script>
 
 <div
-  class="rounded-xl bg-base-100 border border-base-content/20 focus:ring-base-200 has-[:focus]:ring-2 has-[:focus]:ring-base-primary has-[:focus]:ring-offset-2 has-[:focus]:ring-offset-base-200"
+  class={`flex ${$sharedMessageHistory.length > 0 ? `flex-row` : `flex-col`} rounded-xl bg-base-100 border border-base-content/20 focus:ring-base-200 has-[:focus]:ring-2 has-[:focus]:ring-base-primary has-[:focus]:ring-offset-2 has-[:focus]:ring-offset-base-200`}
 >
-  <div class="relative">
+  <div class="flex-1 relative">
     <textarea
       name="input"
       id="input"
-      class="textarea textarea-ghost h-32 w-full focus:outline-none focus:border-base-100 text-base"
+      class={`textarea textarea-ghost ${
+        $sharedMessageHistory.length > 0 ? `h-22` : `h-32`
+      } w-full focus:outline-none focus:border-base-100 text-base`}
       placeholder="Your input..."
       bind:value={inputText}
       on:keydown={onKeyDown}
@@ -192,75 +226,83 @@
   </div>
 
   <div class="grid grid-cols-[1fr_min-content] gap-4">
-    <div class="p-4 flex flex-row gap-2">
+    <div class="p-2 flex flex-row gap-2">
+      {#if $sharedMessageHistory.length == 0}
+        <button
+          class="btn h-auto w-auto p-1 min-h-0 model-toggle hover:text-base-content/60"
+          disabled={!promptId}
+          on:click={() => {
+            isClickOnFile = false;
+            imageModal.showModal();
+          }}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="1em"
+            height="1em"
+            viewBox="0 0 24 24"
+            class="w-6 h-6"
+          >
+            <path
+              fill="currentColor"
+              d="M5 21q-.825 0-1.412-.587T3 19V5q0-.825.588-1.412T5 3h14q.825 0 1.413.588T21 5v14q0 .825-.587 1.413T19 21zm0-2h14V5H5zm1-2h12l-3.75-5l-3 4L9 13zm-1 2V5zm3.5-9q.625 0 1.063-.437T10 8.5t-.437-1.062T8.5 7t-1.062.438T7 8.5t.438 1.063T8.5 10"
+            ></path>
+          </svg>
+          {#if imageFiles.length > 0}
+            <div class="badge badge-sm badge-neutral font-normal">
+              {imageFiles.length}
+            </div>
+          {/if}
+        </button>
+        <button
+          class="btn h-auto w-auto p-1 min-h-0 hover:text-base-content/60"
+          disabled={!promptId}
+          on:click={() => {
+            isClickOnFile = true;
+            fileModal.showModal();
+          }}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="1em"
+            height="1em"
+            viewBox="0 0 24 24"
+            class="w-6 h-6"
+          >
+            <path
+              fill="currentColor"
+              d="M18.5 2h-13C3.6 2 2 3.6 2 5.5v13C2 20.4 3.6 22 5.5 22H16l6-6V5.5C22 3.6 20.4 2 18.5 2m1.6 13h-1.5c-1.9 0-3.5 1.6-3.5 3.5V20H5.8c-1 0-1.8-.8-1.8-1.8V5.8C4 4.8 4.8 4 5.8 4h12.5c1 0 1.8.8 1.8 1.8zM7 7h10v2H7zm0 4h10v2H7zm0 4h6v2H7z"
+            ></path>
+          </svg>
+          {#if inputFiles.length > 0}
+            <div class="badge badge-sm badge-neutral font-normal">
+              {inputFiles.length}
+            </div>
+          {/if}
+        </button>
+      {/if}
+    </div>
+    <div class="flex self-end">
       <button
-        class="btn h-auto w-auto p-1 min-h-0 model-toggle hover:text-base-content/60"
+        class="btn btn-ghost btn-md disabled:bg-base-100 disabled:text-slate-500 disabled:cursor-not-allowed"
         disabled={!promptId}
-        on:click={() => {
-          isClickOnFile = false;
-          imageModal.showModal();
-        }}
+        on:click|preventDefault={fetchHeadline}
       >
         <svg
-          xmlns="http://www.w3.org/2000/svg"
           width="1em"
           height="1em"
-          viewBox="0 0 24 24"
-          class="w-6 h-6"
-        >
-          <path
-            fill="currentColor"
-            d="M5 21q-.825 0-1.412-.587T3 19V5q0-.825.588-1.412T5 3h14q.825 0 1.413.588T21 5v14q0 .825-.587 1.413T19 21zm0-2h14V5H5zm1-2h12l-3.75-5l-3 4L9 13zm-1 2V5zm3.5-9q.625 0 1.063-.437T10 8.5t-.437-1.062T8.5 7t-1.062.438T7 8.5t.438 1.063T8.5 10"
-          ></path>
-        </svg>
-        {#if imageFiles.length > 0}
-          <div class="badge badge-sm badge-neutral font-normal">
-            {imageFiles.length}
-          </div>
-        {/if}
-      </button>
-      <button
-        class="btn h-auto w-auto p-1 min-h-0 hover:text-base-content/60"
-        disabled={!promptId}
-        on:click={() => {
-          isClickOnFile = true;
-          fileModal.showModal();
-        }}
-      >
-        <svg
+          viewBox="0 0 20 18"
+          fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          width="1em"
-          height="1em"
-          viewBox="0 0 24 24"
-          class="w-6 h-6"
+          class={`w-8 h-8 ${promptId ? "text-primary" : "text-base-300"}`}
         >
           <path
+            d="M1.40571 17.9141L19.4057 9.91413C19.5826 9.83562 19.7329 9.70747 19.8384 9.54524C19.9439 9.383 20 9.19365 20 9.00013C20 8.80662 19.9439 8.61726 19.8384 8.45502C19.7329 8.29279 19.5826 8.16464 19.4057 8.08613L1.40571 0.0861302C1.23443 0.0100342 1.04521 -0.016394 0.859632 0.00985962C0.674055 0.0361133 0.499592 0.113992 0.356138 0.234613C0.212685 0.355235 0.106018 0.513744 0.0483017 0.692062C-0.00941467 0.87038 -0.0158539 1.06133 0.0297146 1.24313L1.71871 8.00013L10.9997 8.00013C11.2649 8.00013 11.5193 8.10549 11.7068 8.29302C11.8944 8.48056 11.9997 8.73491 11.9997 9.00013C11.9997 9.26535 11.8944 9.5197 11.7068 9.70724C11.5193 9.89477 11.2649 10.0001 10.9997 10.0001L1.71871 10.0001L0.0297146 16.7581C-0.0156136 16.9399 -0.00899315 17.1307 0.0488262 17.3088C0.106646 17.487 0.213335 17.6453 0.356745 17.7658C0.500154 17.8863 0.674517 17.9641 0.859972 17.9903C1.04543 18.0165 1.23452 17.9901 1.40571 17.9141Z"
             fill="currentColor"
-            d="M18.5 2h-13C3.6 2 2 3.6 2 5.5v13C2 20.4 3.6 22 5.5 22H16l6-6V5.5C22 3.6 20.4 2 18.5 2m1.6 13h-1.5c-1.9 0-3.5 1.6-3.5 3.5V20H5.8c-1 0-1.8-.8-1.8-1.8V5.8C4 4.8 4.8 4 5.8 4h12.5c1 0 1.8.8 1.8 1.8zM7 7h10v2H7zm0 4h10v2H7zm0 4h6v2H7z"
-          ></path>
+          />
         </svg>
-        {#if inputFiles.length > 0}
-          <div class="badge badge-sm badge-neutral font-normal">
-            {inputFiles.length}
-          </div>
-        {/if}
       </button>
     </div>
-    <button
-      class="btn btn-ghost btn-md self-center disabled:bg-base-100 disabled:text-slate-500 disabled:cursor-not-allowed"
-      disabled={!promptId}
-      on:click|preventDefault={fetchHeadline}
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="1em"
-        height="1em"
-        viewBox="0 0 24 24"
-        class={`w-8 h-8 ${promptId ? "text-primary" : "text-base-300"}`}
-      >
-        <path fill="currentColor" d="M3 20v-6l8-2l-8-2V4l19 8z"></path>
-      </svg>
-    </button>
   </div>
   <div>
     <input type="checkbox" class="modal-toggle" />
@@ -278,3 +320,11 @@
     />
   </div>
 </div>
+{#if $sharedMessageHistory.length > 0}
+  <div class="container p-3 gap-2 items-center flex justify-center">
+    {@html svgIcons.warningIcon}
+    <p class="text-xs text-neutral">
+      {t("prompt-execution.historyRemove.info")}
+    </p>
+  </div>
+{/if}
