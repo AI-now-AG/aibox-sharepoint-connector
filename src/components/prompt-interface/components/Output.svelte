@@ -12,10 +12,28 @@
 
   let copyIndex: number = -1;
   let timer: NodeJS.Timeout;
-  let showButton = false;
   let totalMessages = 0;
 
-  onMount(() => {
+  afterUpdate(() => {
+    if (
+      ($sharedMessageHistory.length > 0 &&
+        $sharedMessageHistory.length > totalMessages) ||
+      isProcessing
+    ) {
+      scrollToBottom();
+      totalMessages = $sharedMessageHistory.length;
+    }
+  });
+
+  $: if ($sharedMessageHistory.length > 0 ) {
+    scrollToBottom();
+  }
+
+  const scrollToBottom = async () => {
+    window.scroll({ top: document.documentElement.scrollHeight, behavior: "smooth" });
+  };
+  
+  /*onMount(() => {
     element.addEventListener("scroll", function (e) {
       const { scrollHeight, scrollTop, clientHeight } = e.target;
       if (Math.abs(scrollHeight - clientHeight - scrollTop) > 20) {
@@ -43,7 +61,7 @@
 
   const scrollToBottom = async (node) => {
     node.scroll({ top: node.scrollHeight, behavior: "smooth" });
-  };
+  };*/
 
   function copyToClipboard(content: string, index: number) {
     navigator.clipboard
@@ -65,10 +83,7 @@
 </script>
 
 <div class="flex flex-col">
-  <div
-    bind:this={element}
-    class="mt-2 overflow-y-scroll max-h-[calc(100vh-300px)] min-h-12"
-  >
+  <div bind:this={element} class="mt-2 overflow-y-scroll h-full min-h-12">
     <div class="card gap-4" transition:fade>
       {#each $sharedMessageHistory as { role, content }, index}
         <div
@@ -148,19 +163,21 @@
     </div>
 
     {#if output}
-      <div class={`chat-bubble text-base-content bg-base-100`}>
-        <div class="flex items-start">
-          <!-- Avatar -->
-          <div class="avatar">
-            <div class="w-10 rounded-full">
-              <img src="/aibox-logo-dark.svg" alt="light Logo" />
-              {@html svgIcons.editPrompt}
+      <div class="pt-4">
+        <div class={`chat-bubble text-base-content bg-base-100`}>
+          <div class="flex items-start">
+            <!-- Avatar -->
+            <div class="avatar">
+              <div class="w-10 rounded-full">
+                <img src="/aibox-logo-dark.svg" alt="light Logo" />
+                {@html svgIcons.editPrompt}
+              </div>
             </div>
-          </div>
 
-          <div class="flex-1 p-4 pt-2.5">
-            <p class="font-bold text-sm text-gray-800">aibox</p>
-            <p class="mt-2 text-gray-600 text-sm">{@html output}</p>
+            <div class="flex-1 p-4 pt-2.5">
+              <p class="font-bold text-sm text-gray-800">aibox</p>
+              <p class="mt-2 text-gray-600 text-sm">{@html output}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -217,31 +234,6 @@
       </div>
     {/if}
   </div>
-  {#if showButton}
-    <div class="relative w-full flex justify-center">
-      <button
-        class="absolute shadow-md self-center bottom-0 btn btn-sm btn-circle"
-        on:click={() => {
-          scrollToBottom(element);
-        }}
-      >
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          class="icon-md text-token-text-primary"
-          ><path
-            fill-rule="evenodd"
-            clip-rule="evenodd"
-            d="M12 21C11.7348 21 11.4804 20.8946 11.2929 20.7071L4.29289 13.7071C3.90237 13.3166 3.90237 12.6834 4.29289 12.2929C4.68342 11.9024 5.31658 11.9024 5.70711 12.2929L11 17.5858V4C11 3.44772 11.4477 3 12 3C12.5523 3 13 3.44772 13 4V17.5858L18.2929 12.2929C18.6834 11.9024 19.3166 11.9024 19.7071 12.2929C20.0976 12.6834 20.0976 13.3166 19.7071 13.7071L12.7071 20.7071C12.5196 20.8946 12.2652 21 12 21Z"
-            fill="currentColor"
-          ></path></svg
-        >
-      </button>
-    </div>
-  {/if}
 </div>
 <!-- {#if !output}
       <p class="py-2">{@html output}</p>
