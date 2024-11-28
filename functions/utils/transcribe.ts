@@ -246,7 +246,7 @@ export async function transcribeUsingOpenAI(transcribeParams: TranscribeRequest)
           );
         }
       }
-      if (transcribeParams.selectedFileFormat?.includes(FileFormat.SRT)) {
+      if (transcribeParams.selectedFileFormat && transcribeParams.selectedFileFormat?.includes(FileFormat.SRT)) {
         const srtResult = formatSRT(grouped);
         outputURLs["srt"] = await uploadOutputToBlob(
           transcribeParams.folderName,
@@ -255,7 +255,7 @@ export async function transcribeUsingOpenAI(transcribeParams: TranscribeRequest)
           "srt",
         );
       }
-      if (transcribeParams.selectedFileFormat?.includes(FileFormat.ASS)) {
+      if (transcribeParams.selectedFileFormat && transcribeParams.selectedFileFormat?.includes(FileFormat.ASS)) {
         const assResult = formatASS(grouped);
         outputURLs["ass"] = await uploadOutputToBlob(
           transcribeParams.folderName,

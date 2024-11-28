@@ -174,7 +174,7 @@ const checkFileExist: Handler = async (event, context) => {
           body: JSON.stringify(task),
         };
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(
         "Error checking file existence or downloading content:",
         error,
@@ -184,6 +184,7 @@ const checkFileExist: Handler = async (event, context) => {
         body: JSON.stringify({
           exists: false,
           message: "Failed to check file existence or download content",
+          error: error.message, 
         }),
       };
     }
