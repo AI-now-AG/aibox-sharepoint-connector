@@ -121,17 +121,17 @@ export const POST: APIRoute = async (ctx) => {
       data.images.forEach((object) => {
         if (object.content) {
           messages.push(
-            new HumanMessage(object.content),
-            // new HumanMessage({
-            //   content: [
-            //     {
-            //       type: "image_url",
-            //       image_url: {
-            //         url: object.content,
-            //       },
-            //     },
-            //   ],
-            // }),
+            //new HumanMessage(object.content),
+            new HumanMessage({
+              content: [
+                {
+                  type: "image_url",
+                  image_url: {
+                    url: object.content,
+                  },
+                },
+              ],
+            }),
           );
         }
       });
