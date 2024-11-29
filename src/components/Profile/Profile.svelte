@@ -1,6 +1,5 @@
 <script lang="ts">
   import { svgIcons } from "$assets/icons";
-  import GlobalButton from "$components/GlobalButton/GlobalButton.svelte";
   import GlobalInput from "$components/GlobalInput/GlobalInput.svelte";
   import { useTranslations } from "$i18n/utils";
   import { addToast } from "$stores/toast";
@@ -55,18 +54,21 @@
     <div
       class="flex sm:flex-col md:flex-row items-center sm:space-y-2 md:space-y-0 md:space-x-2 sm:w-full md:w-auto"
     >
-      <GlobalButton
-        label="Save"
-        classes="save-button sm:w-full md:w-auto bg-indigo-600 text-white shadow-lg hover:bg-indigo-500"
+      <button
+        class="btn save-button sm:w-full md:w-auto bg-indigo-600 text-white shadow-lg hover:bg-indigo-500"
         type="submit"
-      />
-      <GlobalButton
-        label="Cancel"
-        classes="sm:w-full md:w-auto text-gray-800 hover:underline"
-        onClick={() => {
+      >
+        Save
+      </button>
+      <button
+        class="btn sm:w-full md:w-auto text-gray-800 hover:underline"
+        on:click={() => {
           window.history.back();
         }}
-      />
+        type="button"
+      >
+        Cancel
+      </button>
     </div>
   </div>
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

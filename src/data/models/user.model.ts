@@ -1,8 +1,28 @@
-import { ROLE_PERMISSIONS_MAP } from "$constants/role.constants";
-import { Permission, UserRole } from "$enums/role.enums";
 import { ObjectId } from "mongodb";
 import { z } from "zod";
 import { db } from "../mongodb";
+
+export enum UserRole {
+  Admin = "Admin",
+  SuperAdmin = "Super Admin",
+  User = "User",
+}
+
+export enum Permission {
+  UserAll = "user:all",
+  AdminAll = "admin:all",
+  SuperAll = "super:all",
+}
+
+export const ROLE_PERMISSIONS_MAP = {
+  [UserRole.User]: [Permission.UserAll],
+  [UserRole.Admin]: [Permission.UserAll, Permission.AdminAll],
+  [UserRole.SuperAdmin]: [
+    Permission.UserAll,
+    Permission.AdminAll,
+    Permission.SuperAll,
+  ],
+};
 
 const UserSchema = z.object({
   _id: z.instanceof(ObjectId),
@@ -35,7 +55,7 @@ export function assignPermissions(roles: UserRole[]): Permission[] {
 export async function updateUserData(
   userId: string | ObjectId,
   detailsId: string,
-  isOpen: boolean
+  isOpen: boolean,
 ) {
   const objectId = userId instanceof ObjectId ? userId : new ObjectId(userId);
   const updateField = { [`navState.${detailsId}`]: isOpen };
@@ -43,7 +63,7 @@ export async function updateUserData(
   return await collection.findOneAndUpdate(
     { _id: objectId },
     { $set: updateField },
-    { returnDocument: "after" }
+    { returnDocument: "after" },
   );
 }
 

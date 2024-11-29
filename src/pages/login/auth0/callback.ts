@@ -1,11 +1,12 @@
 import { auth0, lucia } from "$auth";
-import { decodeJwt } from "jose";
-
 import TenantModel from "$data/models/tenant.model";
-import UserModel, { assignPermissions } from "$data/models/user.model";
-import { UserRole } from "$enums/role.enums";
+import UserModel, {
+  assignPermissions,
+  UserRole,
+} from "$data/models/user.model";
 import log from "$utils/log";
 import type { APIContext } from "astro";
+import { decodeJwt } from "jose";
 import { z } from "zod";
 
 const Auth0JWTSchema = z.object({
@@ -21,6 +22,7 @@ const Auth0JWTSchema = z.object({
 });
 
 export async function GET(context: APIContext): Promise<Response> {
+  log.d(context.url.searchParams.toString(), "Callback search params");
   const code = context.url.searchParams.get("code");
   const state = context.url.searchParams.get("state");
   const storedState = context.cookies.get("auth0_state")?.value ?? null;
@@ -44,6 +46,7 @@ export async function GET(context: APIContext): Promise<Response> {
 
   const token = await auth0(context.url.origin).validateAuthorizationCode(code);
   const decoded = decodeJwt(token.idToken);
+  log.d(decoded, "Decoded JWT");
   const auth0User = Auth0JWTSchema.safeParse(decoded);
   if (auth0User.error) {
     log.e(
