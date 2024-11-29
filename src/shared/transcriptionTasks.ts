@@ -20,9 +20,14 @@ let db: Db | null = null;
 
 const connectToDb = async () => {
   if (!db) {
-    const client = new MongoClient(MONGO_URI);
-    await client.connect();
-    db = client.db(DB_NAME);
+    try {
+      const client = new MongoClient(MONGO_URI);
+      await client.connect();
+      db = client.db(DB_NAME);
+    } catch (err) {
+      console.error("Error connecting to MongoDB:", err);
+      throw err;
+    }
   }
   return db;
 };

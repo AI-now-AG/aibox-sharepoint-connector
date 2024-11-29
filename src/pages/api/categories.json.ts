@@ -38,18 +38,17 @@ export const GET: APIRoute = async (ctx) => {
           groups: category.groups,
         })),
       ),
+      { status: 200 }
     );
   } catch (error) {
-    console.error(error);
+    console.error("Error in GET category method:", error);
 
     return new Response(
       JSON.stringify({
         message: "Error while fetching categories",
-        error: error,
+        error: error instanceof Error ? error.message : "Unknown error",
       }),
-      {
-        status: 500,
-      },
+      { status: 500 }
     );
   }
 };
@@ -58,14 +57,18 @@ export const POST: APIRoute = async (ctx) => {
   const params = await ctx.request.json();
   const data = CreateCategoryParamsSchema.parse(params);
 
-  const groups = new Set<Group>(
-    data.groups.map((group) => ({
-      _id: new ObjectId(),
-      title: group.title,
-      slug: slug(group.title),
-    })),
-  );
+  const groups = data.groups.reduce<Group[]>((uniqueGroups, group) => {
+    if (!uniqueGroups.some((g) => g.title === group.title)) {
+      uniqueGroups.push({
+        _id: new ObjectId(),
+        title: group.title,
+        slug: slug(group.title),
+      });
+    }
+    return uniqueGroups;
+  }, []);
 
+  const now = new Date();
   const newCategory: Category = {
     ...data,
     title: data.title,
@@ -73,8 +76,8 @@ export const POST: APIRoute = async (ctx) => {
     slug: slug(data.title),
     tenant_id: ctx.locals.user.tenant_id,
     creator_id: ctx.locals.user.id,
-    created_at: new Date(),
-    updated_at: new Date(),
+    created_at: now,
+    updated_at: now,
     icon: z
       .string()
       .parse(
@@ -84,26 +87,19 @@ export const POST: APIRoute = async (ctx) => {
 
   try {
     await CategoryModel.add(newCategory);
-
     return new Response(
-      JSON.stringify({
-        message: "Category added",
-      }),
-      {
-        status: 200,
-      },
+      JSON.stringify({ message: "Category added" }),
+      { status: 200 }
     );
   } catch (error) {
-    console.debug(error);
+    console.error("Error in POST method:", error);
 
     return new Response(
       JSON.stringify({
-        message: "Add new category failed....",
-        error: error,
+        message: "Add new category failed",
+        error: error instanceof Error ? error.message : "Unknown error",
       }),
-      {
-        status: 500,
-      },
+      { status: 500 }
     );
   }
 };
@@ -111,13 +107,18 @@ export const POST: APIRoute = async (ctx) => {
 export const PUT: APIRoute = async (ctx) => {
   const params = await ctx.request.json();
   const data = CreateCategoryParamsSchema.parse(params);
-  const groups = new Set<Group>(
-    data.groups.map((group) => ({
-      _id: group._id ? stringToObjectId.parse(group._id) : new ObjectId(),
-      title: group.title,
-      slug: slug(group.title),
-    })),
-  );
+
+  const groups = data.groups.reduce<Group[]>((uniqueGroups, group) => {
+    if (!uniqueGroups.some((g) => g.title === group.title)) {
+      uniqueGroups.push({
+        _id: new ObjectId(),
+        title: group.title,
+        slug: slug(group.title),
+      });
+    }
+    return uniqueGroups;
+  }, []);
+
   const newCategory: Category = {
     ...data,
     title: data.title,
@@ -147,12 +148,10 @@ export const PUT: APIRoute = async (ctx) => {
 
     return new Response(
       JSON.stringify({
-        message: "Update new category failed....",
-        error: error,
+        message: "Update new category failed",
+        error: error instanceof Error ? error.message : "Unknown error",
       }),
-      {
-        status: 500,
-      },
+      { status: 500 }
     );
   }
 };
@@ -164,28 +163,22 @@ export const DELETE: APIRoute<CategoryParams> = async (ctx) => {
 
     if (data._id) {
       const result = await CategoryModel.remove(data._id.toString());
-      return new Response(JSON.stringify(result));
-    } else {
-      return new Response(
-        JSON.stringify({
-          message: "Id error while deleting the category",
-        }),
-        {
-          status: 400,
-        },
-      );
+      return new Response(JSON.stringify(result), { status: 200 });
     }
+
+    return new Response(
+      JSON.stringify({ message: "Id error while deleting the category" }),
+      { status: 400 }
+    );
   } catch (error) {
-    console.error(error);
+    console.error("Error in DELETE method:", error);
 
     return new Response(
       JSON.stringify({
         message: "Error while deleting category",
-        error: error,
+        error: error instanceof Error ? error.message : "Unknown error",
       }),
-      {
-        status: 500,
-      },
+      { status: 500 }
     );
   }
 };

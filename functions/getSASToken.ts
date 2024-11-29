@@ -4,6 +4,13 @@ import { v4 as uuidv4 } from "uuid"; // To generate unique file names
 
 const getSASToken: Handler = async (event) => {
   const { fileNameWithoutExtension, folderName } = JSON.parse(event.body!);
+
+  if (!fileNameWithoutExtension || !folderName) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ message: "Missing required fields: fileNameWithoutExtension or folderName" }),
+    };
+  }
   try {
     const storageURLString: string = process.env.AZURE_BLOB_STORAGE_NAME || "";
     console.log(storageURLString);

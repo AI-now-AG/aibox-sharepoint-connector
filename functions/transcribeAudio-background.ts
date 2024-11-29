@@ -73,7 +73,7 @@ const transcribeAudio: Handler = async (
     }
   } catch (error) {
     console.error("Error while transcribing:" + error);
-    const { uniqueName } = JSON.parse(event.body || "{}");
+    const { uniqueName = "unknown_task" } = JSON.parse(event.body || "{}");
 
     if (error instanceof Error) {
       updateTask(uniqueName, {
@@ -100,24 +100,28 @@ const transcribeAudio: Handler = async (
 };
 
 async function downloadFileFromBlob(blobUrl: string): Promise<Buffer> {
-  const storageURLString: string = process.env.AZURE_BLOB_STORAGE_NAME || "";
-  const blobServiceClient =
-    BlobServiceClient.fromConnectionString(storageURLString);
+  try {
+    const storageURLString: string = process.env.AZURE_BLOB_STORAGE_NAME || "";
+    const blobServiceClient = BlobServiceClient.fromConnectionString(storageURLString);
 
-  const url = new URL(blobUrl);
-  const blobPath = url.pathname.split("/");
-  const containerName = blobPath[1];
-  const blobName = blobPath.slice(2).join("/");
+    const url = new URL(blobUrl);
+    const blobPath = url.pathname.split("/");
+    const containerName = blobPath[1];
+    const blobName = blobPath.slice(2).join("/");
 
-  const containerClient = blobServiceClient.getContainerClient(containerName);
-  const blobClient = containerClient.getBlobClient(blobName);
+    const containerClient = blobServiceClient.getContainerClient(containerName);
+    const blobClient = containerClient.getBlobClient(blobName);
 
-  const downloadBlockBlobResponse = await blobClient.download(0);
-  const downloaded = await streamToBuffer(
-    downloadBlockBlobResponse.readableStreamBody!,
-  );
+    const downloadBlockBlobResponse = await blobClient.download(0);
+    const downloaded = await streamToBuffer(
+      downloadBlockBlobResponse.readableStreamBody!,
+    );
 
-  return downloaded;
+    return downloaded;
+  } catch (error) {
+    console.error("Error in downloadFileFromBlob:", error);
+    throw new Error("Failed to download file from Blob Storage.");
+  }
 }
 
 async function streamToBuffer(
