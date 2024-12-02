@@ -10,6 +10,7 @@
   export let disabled: boolean = false;
   export let icon: string | null = null;
   export let type: HTMLInputAttributes["type"] = "text";
+  export let required: boolean = false;
 
   const dispatch = createEventDispatcher();
 
@@ -31,9 +32,10 @@
       {placeholder}
       {disabled}
       {type}
+      {required}
+      {value}
       name={id}
       class={`w-full ${classes}`}
-      {value}
       on:input={handleChange}
     />
     {#if icon}

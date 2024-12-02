@@ -38,7 +38,7 @@
   }
 </script>
 
-<form on:submit={handleSubmit}>
+<form on:submit|preventDefault={handleSubmit}>
   <div
     class="flex sm:flex-col md:flex-row justify-between items-center pt-2 lg:pt-8 mb-5"
   >
@@ -71,6 +71,7 @@
       label={t("profile.name")}
       value={name}
       on:inputChange={handleNameChange}
+      required
     />
     <Input
       id="email"
