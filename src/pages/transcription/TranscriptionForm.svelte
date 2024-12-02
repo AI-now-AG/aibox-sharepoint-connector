@@ -492,7 +492,6 @@
               },
             ]);
           }
-
           addToast({
             message: `<a href="/transcription/${transcriptionType}">${t("transcription.transcription-is-ready")}</a>`,
             type: "success",
