@@ -315,7 +315,9 @@
           fill="currentColor"
           xmlns="http://www.w3.org/2000/svg"
           class={`w-8 h-8 ${
-            promptId && (inputText || inputFiles.length > 0) ? "text-primary" : "text-base-300"
+            promptId && (inputText || inputFiles.length > 0)
+              ? "text-primary"
+              : "text-base-300"
           }`}
         >
           <path

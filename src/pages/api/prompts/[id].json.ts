@@ -3,7 +3,7 @@ import {
   BaseMessage,
   HumanMessage,
   SystemMessage,
-  AIMessage
+  AIMessage,
 } from "@langchain/core/messages";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import PromptModel from "$data/models/prompt.model";
@@ -109,7 +109,11 @@ export const POST: APIRoute = async (ctx) => {
     if (data.messageHistory && data.messageHistory.length > 0) {
       hasMessageHistory = true;
       data.messageHistory?.forEach((message) => {
-        messages.push((message.role === MessageRole.User) ? (new HumanMessage(message.content)) : (new AIMessage(message.content)));
+        messages.push(
+          message.role === MessageRole.User
+            ? new HumanMessage(message.content)
+            : new AIMessage(message.content),
+        );
       });
     }
     if (data.article) {

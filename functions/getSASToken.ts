@@ -9,14 +9,19 @@ const getSASToken: Handler = async (event) => {
   if (!fileNameWithoutExtension || !folderName) {
     return {
       statusCode: 400,
-      body: JSON.stringify({ message: "Missing required fields: fileNameWithoutExtension or folderName" }),
+      body: JSON.stringify({
+        message:
+          "Missing required fields: fileNameWithoutExtension or folderName",
+      }),
     };
   }
   try {
     const storageURLString: string = process.env.AZURE_BLOB_STORAGE_NAME || "";
     console.log(storageURLString);
-    const blobServiceClient = BlobServiceClient.fromConnectionString(storageURLString);
-    const containerName = process.env.AZURE_CONTAINER_NAME || "transcribecontainer";
+    const blobServiceClient =
+      BlobServiceClient.fromConnectionString(storageURLString);
+    const containerName =
+      process.env.AZURE_CONTAINER_NAME || "transcribecontainer";
     const containerClient = blobServiceClient.getContainerClient(containerName);
 
     await containerClient.createIfNotExists();

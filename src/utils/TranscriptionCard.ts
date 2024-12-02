@@ -1,21 +1,21 @@
 import { TranscriptionType } from "$utils/TranscribeRequest";
 
 interface BaseCard {
-    title: string;
-    description: string;
-    toggle: boolean;
+  title: string;
+  description: string;
+  toggle: boolean;
 }
 
 interface PlaintextCard extends BaseCard {
-    type: TranscriptionType.Plaintext;
+  type: TranscriptionType.Plaintext;
 }
 
 interface SummarizeCard extends BaseCard {
-    type: TranscriptionType.Summarize;
+  type: TranscriptionType.Summarize;
 }
 
 interface SubtitlesCard extends BaseCard {
-    type: TranscriptionType.Subtitles;
+  type: TranscriptionType.Subtitles;
 }
 
 // Union Type for All Cards

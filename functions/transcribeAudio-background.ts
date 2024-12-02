@@ -21,7 +21,8 @@ const transcribeAudio: Handler = async (
 
   try {
     const transcribeParams: TranscribeRequest = JSON.parse(event.body || "{}");
-    const { fileName, uniqueName, uploadUrl, encryptedApiKey } = transcribeParams;
+    const { fileName, uniqueName, uploadUrl, encryptedApiKey } =
+      transcribeParams;
 
     if (!fileName || !uploadUrl) {
       return {
@@ -102,7 +103,8 @@ const transcribeAudio: Handler = async (
 async function downloadFileFromBlob(blobUrl: string): Promise<Buffer> {
   try {
     const storageURLString: string = process.env.AZURE_BLOB_STORAGE_NAME || "";
-    const blobServiceClient = BlobServiceClient.fromConnectionString(storageURLString);
+    const blobServiceClient =
+      BlobServiceClient.fromConnectionString(storageURLString);
 
     const url = new URL(blobUrl);
     const blobPath = url.pathname.split("/");

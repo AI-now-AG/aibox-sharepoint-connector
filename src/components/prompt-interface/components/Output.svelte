@@ -25,14 +25,17 @@
     }
   });
 
-  $: if ($sharedMessageHistory.length > 0 ) {
+  $: if ($sharedMessageHistory.length > 0) {
     scrollToBottom();
   }
 
   const scrollToBottom = async () => {
-    window.scroll({ top: document.documentElement.scrollHeight, behavior: "smooth" });
+    window.scroll({
+      top: document.documentElement.scrollHeight,
+      behavior: "smooth",
+    });
   };
-  
+
   /*onMount(() => {
     element.addEventListener("scroll", function (e) {
       const { scrollHeight, scrollTop, clientHeight } = e.target;

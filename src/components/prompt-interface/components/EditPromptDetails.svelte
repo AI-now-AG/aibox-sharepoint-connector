@@ -43,7 +43,11 @@
   let promptDetails: any | undefined = undefined;
   export let isEditable: boolean = true;
   let isSaving = false;
-  $: isFormValid = promptTitle.trim() !== "" && promptText.trim() !== "" && selectedCategory !== undefined && selectedGroup !== undefined;
+  $: isFormValid =
+    promptTitle.trim() !== "" &&
+    promptText.trim() !== "" &&
+    selectedCategory !== undefined &&
+    selectedGroup !== undefined;
   let isLoading = false;
 
   // Fetch prompt details when selectedEditPromptId changes
@@ -116,9 +120,7 @@
       dlgEl.close();
       addToast({
         message:
-          error instanceof Error
-            ? error.message
-            : t("common.unexpected.error"),
+          error instanceof Error ? error.message : t("common.unexpected.error"),
         type: "error",
       });
     } finally {
@@ -165,9 +167,7 @@
     } catch (error) {
       addToast({
         message:
-          error instanceof Error
-            ? error.message
-            : t("common.unexpected.error"),
+          error instanceof Error ? error.message : t("common.unexpected.error"),
         type: "error",
       });
     } finally {
