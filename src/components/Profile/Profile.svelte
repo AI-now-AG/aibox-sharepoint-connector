@@ -1,12 +1,9 @@
 <script lang="ts">
   import { svgIcons } from "$assets/icons";
-  import GlobalInput from "$components/GlobalInput/GlobalInput.svelte";
+  import Input from "$components/Input/Input.svelte";
   import { useTranslations } from "$i18n/utils";
   import { addToast } from "$stores/toast";
   import { actions } from "astro:actions";
-  import { Form } from "svelte-forms-lib";
-  import * as yub from "yup";
-  import type { ProfileUpdateFormData } from "./types";
 
   export let userId: string = "";
   export let auth0Sub: string = "";
@@ -16,35 +13,32 @@
   export let roles: string = "";
 
   const t = useTranslations();
-  const formProps = {
-    initialValues: {
-      name,
-    },
-    validationSchema: yub.object({
-      name: yub.string().required("Name is required"),
-    }),
-    onSubmit: async (values: ProfileUpdateFormData): Promise<void> => {
-      try {
-        await actions.auth.updateProfile.orThrow({
-          ...values,
-          id: userId,
-          auth0Sub,
-        });
-        addToast({
-          message: "Profile updated successfully",
-          type: "success",
-        });
-      } catch (error) {
-        addToast({
-          message: "Something went wrong",
-          type: "error",
-        });
-      }
-    },
-  };
+
+  function handleNameChange(event: Event) {
+    name = event.detail.value;
+  }
+
+  async function handleSubmit(event: Event): Promise<void> {
+    try {
+      await actions.auth.updateProfile.orThrow({
+        name,
+        id: userId,
+        auth0Sub,
+      });
+      addToast({
+        message: "Profile updated successfully",
+        type: "success",
+      });
+    } catch (error) {
+      addToast({
+        message: "Something went wrong",
+        type: "error",
+      });
+    }
+  }
 </script>
 
-<Form {...formProps}>
+<form on:submit={handleSubmit}>
   <div
     class="flex sm:flex-col md:flex-row justify-between items-center pt-2 lg:pt-8 mb-5"
   >
@@ -72,22 +66,27 @@
     </div>
   </div>
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <GlobalInput id="name" label={t("profile.name")} value={name} />
-    <GlobalInput
+    <Input
+      id="name"
+      label={t("profile.name")}
+      value={name}
+      on:inputChange={handleNameChange}
+    />
+    <Input
       id="email"
       label={t("profile.email")}
       value={email}
       disabled
       icon={svgIcons.lock}
     />
-    <GlobalInput
+    <Input
       id="organization"
       label={t("profile.organization")}
       value={organization}
       disabled
       icon={svgIcons.lock}
     />
-    <GlobalInput
+    <Input
       id="roles"
       label={t("profile.current-role")}
       value={roles}
@@ -95,4 +94,4 @@
       icon={svgIcons.lock}
     />
   </div>
-</Form>
+</form>

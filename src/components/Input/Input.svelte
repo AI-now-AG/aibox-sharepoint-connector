@@ -1,16 +1,21 @@
 <script lang="ts">
-  import { ErrorMessage, Field } from "svelte-forms-lib";
+  import { createEventDispatcher } from "svelte";
   import type { HTMLInputAttributes } from "svelte/elements";
 
   export let id: string = "";
   export let label: string = "";
   export let value: string = "";
-  export let type: HTMLInputAttributes["type"] = "text";
   export let placeholder: string = "";
   export let classes: string = "";
   export let disabled: boolean = false;
   export let icon: string | null = null;
-  export let onChange: (event: unknown) => void = () => {};
+  export let type: HTMLInputAttributes["type"] = "text";
+
+  const dispatch = createEventDispatcher();
+
+  function handleChange(event: Event) {
+    dispatch("inputChange", { value: event.target.value });
+  }
 </script>
 
 <div class="form-control">
@@ -21,19 +26,18 @@
     class="input input-bordered flex justify-between items-center gap-2 p-4"
     style={disabled ? "border: 1px solid #E5E6E6; color: #0F172A" : ""}
   >
-    <Field
+    <input
       {id}
       {placeholder}
       {disabled}
       {type}
       name={id}
       class={`w-full ${classes}`}
-      bind:value
-      on:change={onChange}
+      {value}
+      on:input={handleChange}
     />
     {#if icon}
       {@html icon}
     {/if}
   </div>
-  <ErrorMessage name={id} />
 </div>
