@@ -27,7 +27,7 @@
       theme: "lemonade",
     },
   ];
-  
+
   let theme = "light";
 
   const setTheme = (newTheme) => {
@@ -46,9 +46,12 @@
 </script>
 
 <ul class="dropdown-content menu bg-base-100 rounded-box z-30 w-52 p-2 shadow">
-	{#each themes as theme}
+  {#each themes as theme}
     <li>
-      <a href="#{theme.theme}" on:click|preventDefault={() => setTheme(theme.theme)}>
+      <a
+        href="#{theme.theme}"
+        on:click|preventDefault={() => setTheme(theme.theme)}
+      >
         {theme.name}
       </a>
     </li>

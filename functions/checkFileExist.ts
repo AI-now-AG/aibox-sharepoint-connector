@@ -9,7 +9,8 @@ import { pipeline } from "stream";
 import { getTask } from "$shared/transcriptionTasks";
 
 const checkFileExist: Handler = async (event, context) => {
-  const { uniqueName, fileNames, folderName, isShowImprovedTextPreview } = JSON.parse(event.body!);
+  const { uniqueName, fileNames, folderName, isShowImprovedTextPreview } =
+    JSON.parse(event.body!);
 
   let requireFilesCount = fileNames.length || 0;
   const tempFileNames: string[] = [];
@@ -146,7 +147,7 @@ const checkFileExist: Handler = async (event, context) => {
       if (availableFiles.length >= requireFilesCount) {
         let zipBuffer: Buffer | null = null;
         if (fileNames.length > 1) {
-          zipBuffer = await createZip(downloadedFiles)
+          zipBuffer = await createZip(downloadedFiles);
         }
         return {
           statusCode: 200,
@@ -163,18 +164,17 @@ const checkFileExist: Handler = async (event, context) => {
             srt_file: srtFileUrl,
             ass_file: assFileUrl,
             json_file: jsonFileUrl,
-            zip_file: zipBuffer?.toString('base64') || "",
+            zip_file: zipBuffer?.toString("base64") || "",
           }),
         };
-      }
-      else {
+      } else {
         const task = await getTask(uniqueName);
         return {
           statusCode: 200,
           body: JSON.stringify(task),
         };
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(
         "Error checking file existence or downloading content:",
         error,
@@ -184,6 +184,7 @@ const checkFileExist: Handler = async (event, context) => {
         body: JSON.stringify({
           exists: false,
           message: "Failed to check file existence or download content",
+          error: error.message,
         }),
       };
     }

@@ -7,7 +7,9 @@
 
   onMount(async function () {
     // TODO: That was a workaround for the demo. This components needs a context
-    const response = await fetch("/api/headlines.json?prompt=true", {method: 'POST'});
+    const response = await fetch("/api/headlines.json?prompt=true", {
+      method: "POST",
+    });
     const data = await response.json();
 
     if (data.prompt && data.instructions) {

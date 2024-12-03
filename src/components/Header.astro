@@ -86,11 +86,11 @@ const primaryColor = Astro.locals.tenant?.primary_color;
         class="menu menu-sm dropdown-content bg-base-100 rounded-box z-10 mt-3 w-52 p-2 shadow border"
       >
         <li>
-          <a class="justify-between" href="/profile">
-            Profile 
-          </a>
+          <a class="justify-between" href="/profile"> Profile </a>
         </li>
-        <li id="logout"><button onclick="window.location.href='/api/logout'">Logout</button></li>
+        <li id="logout">
+          <button onclick="window.location.href='/api/logout'">Logout</button>
+        </li>
       </ul>
     </div>
   </div>

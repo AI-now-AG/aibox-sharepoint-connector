@@ -369,22 +369,24 @@
         }
         startPolling();
 
-        transcriptStore.update((current) => [
-          ...current.filter((entry) => entry.type !== transcriptionType), // Remove old entry if it exists
-          {
-            type: transcriptionType,
-            options: {
-              file: audioFile,
-              duration: audioDuration,
-              txtOuput: "",
-              txtUrl: "",
-              srtUrl: "",
-              assUrl: "",
-              jsonUrl: "",
-              zipFile: "",
+        if (transcriptionType) {
+          transcriptStore.update((current) => [
+            ...current.filter((entry) => entry.type !== transcriptionType), // Remove old entry if it exists
+            {
+              type: transcriptionType,
+              options: {
+                file: audioFile,
+                duration: audioDuration,
+                txtOuput: "",
+                txtUrl: "",
+                srtUrl: "",
+                assUrl: "",
+                jsonUrl: "",
+                zipFile: "",
+              },
             },
-          },
-        ]);
+          ]);
+        }
         addToast({
           message: `${t("transcription.file-uploaded-success")}`,
           type: "success",
@@ -472,23 +474,24 @@
           jsonFileUrl = result.json_file;
           zipFileData = result.zip_file;
           checkDataAvaibility();
-          transcriptStore.update((current) => [
-            ...current.filter((entry) => entry.type !== transcriptionType), // Remove old entry if it exists
-            {
-              type: transcriptionType,
-              options: {
-                file: audioFile,
-                duration: audioDuration,
-                txtOuput: result.text_output,
-                txtUrl: result.txt_file,
-                srtUrl: result.srt_file,
-                assUrl: result.ass_file,
-                jsonUrl: result.json_file,
-                zipFile: result.zip_file,
+          if (transcriptionType) {
+            transcriptStore.update((current) => [
+              ...current.filter((entry) => entry.type !== transcriptionType), // Remove old entry if it exists
+              {
+                type: transcriptionType,
+                options: {
+                  file: audioFile,
+                  duration: audioDuration,
+                  txtOuput: result.text_output,
+                  txtUrl: result.txt_file,
+                  srtUrl: result.srt_file,
+                  assUrl: result.ass_file,
+                  jsonUrl: result.json_file,
+                  zipFile: result.zip_file,
+                },
               },
-            },
-          ]);
-
+            ]);
+          }
           addToast({
             message: `<a href="/transcription/${transcriptionType}">${t("transcription.transcription-is-ready")}</a>`,
             type: "success",
@@ -800,8 +803,12 @@
                   </div>
 
                   <div class="flex flex-col">
-                    <h2 class="font-semibold">{t("audiotools.subtitles.subtitle-files")}</h2>
-                    <p class="text-base-content/60">{t("audiotools.subtitles.with-text-improvement")}</p>
+                    <h2 class="font-semibold">
+                      {t("audiotools.subtitles.subtitle-files")}
+                    </h2>
+                    <p class="text-base-content/60">
+                      {t("audiotools.subtitles.with-text-improvement")}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -845,8 +852,12 @@
                   </div>
 
                   <div class="flex flex-col">
-                    <h2 class="font-semibold">{t("audiotools.subtitles.show-text-preview")}</h2>
-                    <p class="text-base-content/60">{t("tenant.audio-to-text")}</p>
+                    <h2 class="font-semibold">
+                      {t("audiotools.subtitles.show-text-preview")}
+                    </h2>
+                    <p class="text-base-content/60">
+                      {t("tenant.audio-to-text")}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -871,8 +882,12 @@
                   </div>
 
                   <div class="flex flex-col">
-                    <h2 class="font-semibold">{t("audiotools.subtitles.raw-output")}</h2>
-                    <p class="text-base-content/60">{t("audiotools.subtitles.no-text-improvement")}</p>
+                    <h2 class="font-semibold">
+                      {t("audiotools.subtitles.raw-output")}
+                    </h2>
+                    <p class="text-base-content/60">
+                      {t("audiotools.subtitles.no-text-improvement")}
+                    </p>
                   </div>
                 </div>
               </div>

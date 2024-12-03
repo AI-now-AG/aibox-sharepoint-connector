@@ -89,7 +89,6 @@ ${srtTimestamp(entry.start)} --> ${srtTimestamp(entry.end)}
   stream.end();
 };
 
-
 export const formatASS = (entries: Entry[]): string => {
   let out = `[Script Info]
 Title: Generated Subtitle
@@ -110,7 +109,8 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 
   for (const entry of entries) {
     out += `Dialogue: 0,${srtTimestamp(entry.start, ".")},${srtTimestamp(
-      entry.end, "."
+      entry.end,
+      ".",
     )},Default,,0,0,0,,{\\c&HFFFFFF&}${entry.text.replace(/\n/g, "\\N")}\n`;
   }
 

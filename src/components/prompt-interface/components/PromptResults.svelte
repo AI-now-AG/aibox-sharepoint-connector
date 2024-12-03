@@ -1,16 +1,18 @@
 <script>
   import { fade } from "svelte/transition";
   import Output from "./Output.svelte";
-  export let input;
+  import { sharedMessageHistory } from "$components/prompt-interface/components/Stores";
+  // export let input;
   export let output;
+  export let isProcessing;
 </script>
 
-{#if input}
-  <div class="flex-1">
-    <div class="flex flex-wrap">
-      <div class="grow md:w-1/2 p-2 pb-4">
-        <div class="grid space-y-6" transition:fade>
-          <Output bind:output />
+{#if output || $sharedMessageHistory.length > 0 || isProcessing}
+  <div class="flex-1 h-full">
+    <div class="flex flex-wrap h-full">
+      <div class="grow md:w-1/2 p-2 pb-4 h-full">
+        <div class="grid space-y-6 h-full" transition:fade>
+          <Output bind:output bind:isProcessing />
         </div>
       </div>
     </div>

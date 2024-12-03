@@ -18,10 +18,10 @@ const cursor = await PromptModel.listByTenant(Astro.locals.user.tenant_id);
 const prompts = await cursor.toArray();
 
 const categoryPrompt = prompts.filter(
-  (g) => g?.category?.toString() === category?._id?.toString()
+  (g) => g?.category?.toString() === category?._id?.toString(),
 );
 const categoryGroupPrompt = categoryPrompt.filter(
-  (g) => g?.group?.toString() === group?._id?.toString()
+  (g) => g?.group?.toString() === group?._id?.toString(),
 );
 const promptItems = categoryGroupPrompt.map((prompt) => ({
   _id: prompt?._id?.toString(),
@@ -34,14 +34,17 @@ const promptItems = categoryGroupPrompt.map((prompt) => ({
   <!-- <div
     class="grid grid-cols-1 xl:grid-cols-[1fr_minmax(min-content,_420px)] bg-base-200 h-full"
     > -->
-  <div
+  <!-- <div
     class="grid grid-cols-1 grid-rows-[min-content-1fr] bg-base-200 h-full content-baseline gap-0 place-items-center"
+  > -->
+  <div
+    class="flex flex-col bg-base-200 h-full content-baseline gap-0 place-items-center"
   >
-    <div class="p-6 w-full">
+    <div class="p-6 w-full h-full">
       <Content />
     </div>
 
-    {
+    <!-- {
       promptItems.length > 0 && (
         <div class="px-6 w-full">
           <div class="collapse collapse-arrow bg-base-300 w-full max-w-6xl mx-auto">
@@ -56,6 +59,6 @@ const promptItems = categoryGroupPrompt.map((prompt) => ({
           </div>
         </div>
       )
-    }
+    } -->
   </div>
 </Layout>

@@ -116,7 +116,11 @@
     }
   }
 
-  $: isFormValid = promptTitle.trim() !== "" && promptText.trim() !== "" && selectedCategory !== undefined && selectedGroup !== undefined;
+  $: isFormValid =
+    promptTitle.trim() !== "" &&
+    promptText.trim() !== "" &&
+    selectedCategory !== undefined &&
+    selectedGroup !== undefined;
 
   async function savePrompt() {
     if (!isFormValid) return;
@@ -155,9 +159,7 @@
     } catch (error) {
       addToast({
         message:
-          error instanceof Error
-            ? error.message
-            : t("common.unexpected.error"),
+          error instanceof Error ? error.message : t("common.unexpected.error"),
         type: "error",
       });
     } finally {
