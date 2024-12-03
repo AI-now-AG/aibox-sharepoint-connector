@@ -1,6 +1,6 @@
-import { TenantFeature } from "$data/models/tenant.model";
-import { UserRole } from "$data/models/user.model";
 import type { User } from "lucia";
+import { UserRole } from "$data/models/user.model";
+import { TenantFeature } from "$data/models/tenant.model";
 
 export const user = (locals: App.Locals): User => {
   return locals.user;
