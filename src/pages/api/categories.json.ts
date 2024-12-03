@@ -38,7 +38,7 @@ export const GET: APIRoute = async (ctx) => {
           groups: category.groups,
         })),
       ),
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("Error in GET category method:", error);
@@ -48,7 +48,7 @@ export const GET: APIRoute = async (ctx) => {
         message: "Error while fetching categories",
         error: error instanceof Error ? error.message : "Unknown error",
       }),
-      { status: 500 }
+      { status: 500 },
     );
   }
 };
@@ -87,10 +87,9 @@ export const POST: APIRoute = async (ctx) => {
 
   try {
     await CategoryModel.add(newCategory);
-    return new Response(
-      JSON.stringify({ message: "Category added" }),
-      { status: 200 }
-    );
+    return new Response(JSON.stringify({ message: "Category added" }), {
+      status: 200,
+    });
   } catch (error) {
     console.error("Error in POST method:", error);
 
@@ -99,7 +98,7 @@ export const POST: APIRoute = async (ctx) => {
         message: "Add new category failed",
         error: error instanceof Error ? error.message : "Unknown error",
       }),
-      { status: 500 }
+      { status: 500 },
     );
   }
 };
@@ -151,7 +150,7 @@ export const PUT: APIRoute = async (ctx) => {
         message: "Update new category failed",
         error: error instanceof Error ? error.message : "Unknown error",
       }),
-      { status: 500 }
+      { status: 500 },
     );
   }
 };
@@ -168,7 +167,7 @@ export const DELETE: APIRoute<CategoryParams> = async (ctx) => {
 
     return new Response(
       JSON.stringify({ message: "Id error while deleting the category" }),
-      { status: 400 }
+      { status: 400 },
     );
   } catch (error) {
     console.error("Error in DELETE method:", error);
@@ -178,7 +177,7 @@ export const DELETE: APIRoute<CategoryParams> = async (ctx) => {
         message: "Error while deleting category",
         error: error instanceof Error ? error.message : "Unknown error",
       }),
-      { status: 500 }
+      { status: 500 },
     );
   }
 };

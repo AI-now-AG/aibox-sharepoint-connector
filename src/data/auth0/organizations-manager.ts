@@ -1,3 +1,4 @@
+import management from "$data/auth0/management-client";
 import {
   type DeleteEnabledConnectionsByConnectionIdRequest,
   type PatchOrganizationsByIdOperationRequest,
@@ -5,15 +6,6 @@ import {
   type PostEnabledConnectionsOperationRequest,
   type PostEnabledConnectionsRequest,
   type PostOrganizationsRequest,
-} from "auth0";
-import management from "$data/auth0/management-client";
-
-export type {
-  PostOrganizationsRequest,
-  PatchOrganizationsByIdRequest,
-  PostEnabledConnectionsOperationRequest,
-  PostEnabledConnectionsRequest,
-  DeleteEnabledConnectionsByConnectionIdRequest,
 } from "auth0";
 
 export const create = async (bodyParameters: PostOrganizationsRequest) => {

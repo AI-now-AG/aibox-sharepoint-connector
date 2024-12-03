@@ -68,7 +68,6 @@ async function authenticate(context: APIContext, next: MiddlewareNext) {
   context.locals.session = session;
   context.locals.user = user;
 
-  // fetch tenant
   const tenant = await tenantModel.get(user.tenant_id.toString());
   if (tenant) {
     context.locals.tenant = tenant;

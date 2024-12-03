@@ -1,0 +1,23 @@
+---
+import Layout from "$layouts/Layout.astro";
+import Profile from "$components/Profile/Profile.svelte";
+
+const user = Astro.locals.user;
+const tenant = Astro.locals.tenant;
+---
+
+<Layout>
+  <div
+    class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14"
+  >
+    <Profile
+      userId={user.id.toString()}
+      auth0Sub={user.auth0_sub}
+      name={user.name}
+      email={user.email}
+      organization={tenant.name}
+      roles={user.roles.join(", ")}
+      client:load
+    />
+  </div>
+</Layout>
