@@ -3,7 +3,7 @@ import {
   BaseMessage,
   HumanMessage,
   SystemMessage,
-  AIMessage
+  AIMessage,
 } from "@langchain/core/messages";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import PromptModel from "$data/models/prompt.model";
@@ -38,7 +38,7 @@ const MessageSchema = z.object({
 
 const RunPromptParamsSchema = z.object({
   _id: z.string(),
-  article: z.string().min(1),
+  article: z.string().optional(),
   images: z.array(AttachmentSchema).optional(),
   files: z.array(AttachmentSchema).optional(),
   messageHistory: z.array(MessageSchema).optional(),
@@ -109,27 +109,33 @@ export const POST: APIRoute = async (ctx) => {
     if (data.messageHistory && data.messageHistory.length > 0) {
       hasMessageHistory = true;
       data.messageHistory?.forEach((message) => {
-        messages.push((message.role === MessageRole.User) ? (new HumanMessage(message.content)) : (new AIMessage(message.content)));
+        messages.push(
+          message.role === MessageRole.User
+            ? new HumanMessage(message.content)
+            : new AIMessage(message.content),
+        );
       });
     }
-    messages.push(new HumanMessage(data.article));
+    if (data.article) {
+      messages.push(new HumanMessage(data.article));
+    }
 
     // Handle image uploads
     if (data.images && !hasMessageHistory) {
       data.images.forEach((object) => {
         if (object.content) {
           messages.push(
-            new HumanMessage(object.content),
-            // new HumanMessage({
-            //   content: [
-            //     {
-            //       type: "image_url",
-            //       image_url: {
-            //         url: object.content,
-            //       },
-            //     },
-            //   ],
-            // }),
+            //new HumanMessage(object.content),
+            new HumanMessage({
+              content: [
+                {
+                  type: "image_url",
+                  image_url: {
+                    url: object.content,
+                  },
+                },
+              ],
+            }),
           );
         }
       });

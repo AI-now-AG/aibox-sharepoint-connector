@@ -55,7 +55,7 @@ export function assignPermissions(roles: UserRole[]): Permission[] {
 export async function updateUserData(
   userId: string | ObjectId,
   detailsId: string,
-  isOpen: boolean
+  isOpen: boolean,
 ) {
   const objectId = userId instanceof ObjectId ? userId : new ObjectId(userId);
   const updateField = { [`navState.${detailsId}`]: isOpen };
@@ -63,7 +63,7 @@ export async function updateUserData(
   return await collection.findOneAndUpdate(
     { _id: objectId },
     { $set: updateField },
-    { returnDocument: "after" }
+    { returnDocument: "after" },
   );
 }
 

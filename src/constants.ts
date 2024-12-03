@@ -26,6 +26,6 @@ export const FEATURE_MAP_ROUTES = {
     FEATURE_PLAINTEXT_ROUTE,
     FEATURE_SUBTITLES_ROUTE,
     FEATURE_SUMMARY_ROUTE,
-    "/settings/transcription"
+    "/settings/transcription",
   ],
 };

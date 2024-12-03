@@ -22,6 +22,7 @@
       "application/x-subrip",
       "text/tab-separated-values",
     ],
+    "image/*": ["image/svg+xml", "image/png", "image/jpeg"],
   };
 
   const imageTypes = {
@@ -64,7 +65,7 @@
   async function fetchHeadline() {
     input = "";
 
-    if (inputText) {
+    if (inputText || inputFiles.length > 0) {
       input = inputText;
       output = "";
       isProcessing = true;
@@ -76,7 +77,8 @@
 
       try {
         const userInputFilesList: FileInput[] = [];
-        await Promise.all(
+        const userInputImagesList: FileInput[] = [];
+        /*await Promise.all(
           inputFiles.map(async (file) => {
             const userInputFile = {
               name: file.name,
@@ -87,7 +89,6 @@
           }),
         );
 
-        const userInputImagesList: FileInput[] = [];
         await Promise.all(
           imageFiles.map(async (image) => {
             const imageContent = await readImageContent(image);
@@ -97,6 +98,21 @@
               type: image.type,
             };
             userInputImagesList.push(userInputImage);
+          }),
+        );*/
+
+        await Promise.all(
+          inputFiles.map(async (file) => {
+            const userInputFile = {
+              name: file.name,
+              content: await readFileContent(file),
+              type: file.type,
+            };
+            if (file.type.startsWith("image/")) {
+              userInputImagesList.push(userInputFile);
+            } else {
+              userInputFilesList.push(userInputFile);
+            }
           }),
         );
 
@@ -228,7 +244,7 @@
   <div class="grid grid-cols-[1fr_min-content] gap-4">
     <div class="p-2 flex flex-row gap-2">
       {#if $sharedMessageHistory.length == 0}
-        <button
+        <!-- <button
           class="btn h-auto w-auto p-1 min-h-0 model-toggle hover:text-base-content/60"
           disabled={!promptId}
           on:click={() => {
@@ -253,7 +269,7 @@
               {imageFiles.length}
             </div>
           {/if}
-        </button>
+        </button> -->
         <button
           class="btn h-auto w-auto p-1 min-h-0 hover:text-base-content/60"
           disabled={!promptId}
@@ -264,14 +280,18 @@
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            width="1em"
-            height="1em"
-            viewBox="0 0 24 24"
+            width="17"
+            height="18"
+            viewBox="0 0 17 18"
             class="w-6 h-6"
+            fill="none"
           >
             <path
-              fill="currentColor"
-              d="M18.5 2h-13C3.6 2 2 3.6 2 5.5v13C2 20.4 3.6 22 5.5 22H16l6-6V5.5C22 3.6 20.4 2 18.5 2m1.6 13h-1.5c-1.9 0-3.5 1.6-3.5 3.5V20H5.8c-1 0-1.8-.8-1.8-1.8V5.8C4 4.8 4.8 4 5.8 4h12.5c1 0 1.8.8 1.8 1.8zM7 7h10v2H7zm0 4h10v2H7zm0 4h6v2H7z"
+              d="M10.6431 4.83333L5.15499 10.3215C4.50411 10.9724 4.50411 12.0276 5.15499 12.6785C5.80586 13.3294 6.86113 13.3294 7.51201 12.6785L12.8572 7.19036C14.1589 5.88861 14.1589 3.77806 12.8572 2.47631C11.5554 1.17456 9.44489 1.17456 8.14314 2.47631L2.79796 7.96447C0.845341 9.91709 0.845341 13.0829 2.79796 15.0355C4.75058 16.9882 7.91641 16.9882 9.86903 15.0355L15.0835 9.83333"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
             ></path>
           </svg>
           {#if inputFiles.length > 0}
@@ -285,16 +305,20 @@
     <div class="flex self-end">
       <button
         class="btn btn-ghost btn-md disabled:bg-base-100 disabled:text-slate-500 disabled:cursor-not-allowed"
-        disabled={!promptId}
+        disabled={!promptId || (!inputText && inputFiles.length === 0)}
         on:click|preventDefault={fetchHeadline}
       >
         <svg
           width="1em"
           height="1em"
           viewBox="0 0 20 18"
-          fill="none"
+          fill="currentColor"
           xmlns="http://www.w3.org/2000/svg"
-          class={`w-8 h-8 ${promptId ? "text-primary" : "text-base-300"}`}
+          class={`w-8 h-8 ${
+            promptId && (inputText || inputFiles.length > 0)
+              ? "text-primary"
+              : "text-base-300"
+          }`}
         >
           <path
             d="M1.40571 17.9141L19.4057 9.91413C19.5826 9.83562 19.7329 9.70747 19.8384 9.54524C19.9439 9.383 20 9.19365 20 9.00013C20 8.80662 19.9439 8.61726 19.8384 8.45502C19.7329 8.29279 19.5826 8.16464 19.4057 8.08613L1.40571 0.0861302C1.23443 0.0100342 1.04521 -0.016394 0.859632 0.00985962C0.674055 0.0361133 0.499592 0.113992 0.356138 0.234613C0.212685 0.355235 0.106018 0.513744 0.0483017 0.692062C-0.00941467 0.87038 -0.0158539 1.06133 0.0297146 1.24313L1.71871 8.00013L10.9997 8.00013C11.2649 8.00013 11.5193 8.10549 11.7068 8.29302C11.8944 8.48056 11.9997 8.73491 11.9997 9.00013C11.9997 9.26535 11.8944 9.5197 11.7068 9.70724C11.5193 9.89477 11.2649 10.0001 10.9997 10.0001L1.71871 10.0001L0.0297146 16.7581C-0.0156136 16.9399 -0.00899315 17.1307 0.0488262 17.3088C0.106646 17.487 0.213335 17.6453 0.356745 17.7658C0.500154 17.8863 0.674517 17.9641 0.859972 17.9903C1.04543 18.0165 1.23452 17.9901 1.40571 17.9141Z"
@@ -306,12 +330,12 @@
   </div>
   <div>
     <input type="checkbox" class="modal-toggle" />
-    <FileUpload
+    <!-- <FileUpload
       bind:modal={imageModal}
       title="Upload Images"
       acceptedTypes={imageTypes}
       bind:files={imageFiles}
-    />
+    /> -->
     <FileUpload
       bind:modal={fileModal}
       title="Upload Files"

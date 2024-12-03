@@ -5,10 +5,10 @@ export interface TranscribeRequest {
   fileName: string;
   uniqueName: string;
   uploadUrl: string;
-  transcriptions: Transcriptions,
+  transcriptions: Transcriptions;
   transcriptionType?: TranscriptionType;
   selectedFileFormat?: FileFormat[];
-  isShowImprovedTextPreview?: boolean,
+  isShowImprovedTextPreview?: boolean;
   encryptedApiKey?: string;
   azureOpenAIInstanceName?: string;
   azureOpenAIEndpoint?: string;

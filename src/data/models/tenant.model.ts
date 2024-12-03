@@ -39,18 +39,24 @@ export const IncludedFeaturesSchema = z.object({
 // });
 
 export const TranscriptionsSchema = z.object({
-  plaintext: z.object({
-    enabled: z.boolean().default(false),
-    text: z.string().optional(),
-  }).optional(),
-  summary: z.object({
-    enabled: z.boolean().default(false),
-    text: z.string().optional(),
-  }).optional(),
-  subtitles: z.object({
-    enabled: z.boolean().default(false),
-    text: z.string().optional(),
-  }).optional(),
+  plaintext: z
+    .object({
+      enabled: z.boolean().default(false),
+      text: z.string().optional(),
+    })
+    .optional(),
+  summary: z
+    .object({
+      enabled: z.boolean().default(false),
+      text: z.string().optional(),
+    })
+    .optional(),
+  subtitles: z
+    .object({
+      enabled: z.boolean().default(false),
+      text: z.string().optional(),
+    })
+    .optional(),
 });
 
 const TenantSchema = z.object({

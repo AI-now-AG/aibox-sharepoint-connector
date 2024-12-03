@@ -10,7 +10,7 @@ import { transformRawData } from "$utils/transformRawData";
 
 export const InputParamsSchema = z.object({
   _id: z.string(),
-  transcriptions: TranscriptionsSchema
+  transcriptions: TranscriptionsSchema,
 });
 
 export const transcription_settings = {

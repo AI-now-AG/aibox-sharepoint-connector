@@ -9,7 +9,7 @@ type TranscribeOptions = {
   srtUrl: string;
   assUrl: string;
   jsonUrl: string;
-  zipFile: string,
+  zipFile: string;
 };
 
 type TranscriptEntry = {

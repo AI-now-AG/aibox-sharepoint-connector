@@ -83,6 +83,9 @@
   "prompt-execution.card.showLess": "less prompts",
   "prompt-execution.showGlobal": "Save Global",
   "prompt-execution.historyRemove.info": "When you leave this page, all data you have created so far will be lost.",
+  "prompt-execution.upload-file.drag": "Drag & Drop or <span style=\"color: #491EFF;\">Choose file</span>",
+  "prompt-execution.upload-file.supportted-files": "PDF, JSON, TXT, PNG, SVG, JPEG",
+  "prompt-execution.upload-file.maximum-size": "max. file size: 25 MB",
   "prompt-emptyscreen.description": "Get started with predefined use cases below.",
   "prompt-emptyscreen.nousecase": "No use cases",
   "prompt-emptyscreen.create.usecaseLbl": "Get started by creating a new use case for this group",
@@ -174,5 +177,4 @@
   "audiotools.subtitles.show-text-preview": "Show text preview",
   "audiotools.subtitles.raw-output": "Raw output",
   "audiotools.subtitles.no-text-improvement": "no text improvement"
-
 }

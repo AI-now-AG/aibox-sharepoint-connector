@@ -9,7 +9,6 @@
   export let modal;
   export let isZipDataPresent: boolean;
   export let isFileDataPresent: boolean;
-  
 </script>
 
 <dialog id={"modal_confirm_start_new"} bind:this={modal} class="modal">
@@ -36,9 +35,7 @@
         <button class="btn btn-sm" on:click={() => dispatch("confirm")}
           >{t("transcription.start-new")}</button
         >
-        <button
-          class="btn btn-active btn-primary btn-sm text-base-100"
-          
+        <button class="btn btn-active btn-primary btn-sm text-base-100"
           >{t("common.cancel")}</button
         >
         {#if isZipDataPresent}

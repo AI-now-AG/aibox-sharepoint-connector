@@ -107,14 +107,17 @@ async function restrictAccess(context: APIContext, next: MiddlewareNext) {
         (item) => item.name == (key as TenantFeature),
       );
     }
-    if(context.url.pathname === FEATURE_PLAINTEXT_ROUTE) {
-      hasAccess = (context.locals.tenant.transcriptions?.plaintext?.enabled ?? true)
+    if (context.url.pathname === FEATURE_PLAINTEXT_ROUTE) {
+      hasAccess =
+        context.locals.tenant.transcriptions?.plaintext?.enabled ?? true;
     }
-    if(context.url.pathname === FEATURE_SUBTITLES_ROUTE) {
-      hasAccess = (context.locals.tenant.transcriptions?.subtitles?.enabled ?? true)
+    if (context.url.pathname === FEATURE_SUBTITLES_ROUTE) {
+      hasAccess =
+        context.locals.tenant.transcriptions?.subtitles?.enabled ?? true;
     }
-    if(context.url.pathname === FEATURE_SUMMARY_ROUTE) {
-      hasAccess = (context.locals.tenant.transcriptions?.summary?.enabled ?? true)
+    if (context.url.pathname === FEATURE_SUMMARY_ROUTE) {
+      hasAccess =
+        context.locals.tenant.transcriptions?.summary?.enabled ?? true;
     }
 
     if (matchPath && !hasAccess) {

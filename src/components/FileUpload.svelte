@@ -1,4 +1,8 @@
 <script lang="ts">
+  import { useTranslations } from "$i18n/utils";
+  const t = useTranslations();
+  import { svgIcons } from "$assets/icons";
+
   export let title: string;
   export let acceptedTypes: Record<string, string[]>;
   export let modal;
@@ -7,6 +11,7 @@
   let isDragOver = false;
   let fileDragging = -1;
   let fileDropping = -1;
+  let fileErrorMessage: string = "";
 
   let imgElements: HTMLImageElement[] = [];
   let videoElements: HTMLSourceElement[] = [];
@@ -58,10 +63,25 @@
     event: Event & { currentTarget: EventTarget & HTMLInputElement },
   ) {
     const eventTarget = event.target as HTMLInputElement;
-    const attachedFiles = eventTarget.files;
-    if (attachedFiles) {
-      const newFiles = Array.from(attachedFiles).filter(isFileTypeAllowed);
-      files = [...files, ...newFiles];
+    const attachedFiles = eventTarget.files || [];
+    if (attachedFiles.length > 0) {
+      const file = attachedFiles[attachedFiles.length - 1];
+      console.log(file.size);
+      console.log(file.type);
+      console.log(acceptedTypes);
+      const isValid = isFileValid(file.size, file.type);
+      if (isValid) {
+        const newFiles = Array.from(attachedFiles).filter(
+          (file) =>
+            isFileTypeAllowed(file) &&
+            !files.some(
+              (existingFile) =>
+                existingFile.name === file.name &&
+                existingFile.lastModified === file.lastModified,
+            ),
+        );
+        files = [...files, ...newFiles];
+      }
     }
   }
 
@@ -82,6 +102,32 @@
       }
     });
   }
+
+  function isFileTypeValid(checkType: string) {
+    for (const type in acceptedTypes) {
+      if (acceptedTypes[type].includes(checkType)) {
+        return true;
+      }
+    }
+    fileErrorMessage = t("transcription.file-validation.unsupported-type");
+    return false;
+  }
+
+  function isFileSizeValid(size: number) {
+    if (size <= 25 * 1024 * 1024) {
+      fileErrorMessage = "";
+      return true;
+    }
+    fileErrorMessage = t("transcription.file-validation.exceed-size-limit");
+    return false;
+  }
+
+  function isFileValid(size: number, type: string) {
+    if (isFileTypeValid(type) && isFileSizeValid(size)) {
+      return true;
+    }
+    return false;
+  }
 </script>
 
 <dialog bind:this={modal} class="modal">
@@ -97,7 +143,7 @@
         class="relative flex flex-col p-4 border border-neutral-content rounded"
       >
         <label
-          class={`relative flex flex-col text-base-content border border-neutral-content border-dashed rounded cursor-pointer ${isDragOver && "border-primary ring-4 ring-inset"}`}
+          class={`py-6 relative flex flex-col text-base-content border border-dashed rounded cursor-pointer ${isDragOver ? "border-blue-500" : "border-neutral-content"} ${fileErrorMessage && "border-red-500 bg-red-100"}`}
           on:dragover={() => {
             isDragOver = true;
           }}
@@ -111,41 +157,29 @@
           <input
             type="file"
             accept={acceptedMimeTypes}
-            multiple
             class="absolute inset-0 z-50 w-full h-full p-0 m-0 outline-none opacity-0 cursor-pointer"
+            multiple
             on:change={addFiles}
           />
 
-          <div
-            class="flex flex-col items-center justify-center py-10 text-center"
-          >
-            <svg
-              class="w-6 h-6 mr-1 text-current-50"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-              />
-            </svg>
-            <p class="m-0">Drag your files here or click in this area.</p>
+          <div class="flex flex-col items-center">
+            {@html svgIcons.upload}
+            <p class="text-base font-semibold">
+              {@html t("prompt-execution.upload-file.drag")}
+            </p>
+            <p class="text-sm text-gray-500 mt-1">
+              {t("prompt-execution.upload-file.supportted-files")}
+            </p>
+            <p class="text-xs text-gray-400 mt-8">
+              {t("prompt-execution.upload-file.maximum-size")}
+            </p>
           </div>
         </label>
+        <span class="mt-2 text-xs text-red-500">{fileErrorMessage}</span>
 
         {#if files.length > 0}
           <div
-            class="grid grid-cols-2 gap-4 mt-4 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8"
-            on:drop={drop}
-            on:dragover={(e) => {
-              if (e.dataTransfer) {
-                e.dataTransfer.dropEffect = "move";
-              }
-            }}
+            class="grid grid-cols-2 gap-4 mt-4 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-6"
           >
             {#each files as file, index (file.name)}
               <div

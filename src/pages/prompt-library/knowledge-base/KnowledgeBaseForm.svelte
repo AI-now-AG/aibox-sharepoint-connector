@@ -56,9 +56,7 @@
     } catch (error) {
       addToast({
         message:
-          error instanceof Error
-            ? error.message
-            : t("common.unexpected.error"),
+          error instanceof Error ? error.message : t("common.unexpected.error"),
         type: "error",
       });
     } finally {

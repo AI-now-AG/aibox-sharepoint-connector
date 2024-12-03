@@ -1,12 +1,12 @@
 export enum MessageRole {
-    System = "system",
-    Assistant = "assistant",
-    User = "user",
+  System = "system",
+  Assistant = "assistant",
+  User = "user",
 }
 
 export interface Message {
-    role: MessageRole;
-    content: string;
+  role: MessageRole;
+  content: string;
 }
 
 export type MessageHistory = Message[];
