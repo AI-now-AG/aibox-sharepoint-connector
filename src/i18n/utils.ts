@@ -1,5 +1,5 @@
 import Mustache, { type OpeningAndClosingTags } from "mustache";
-import { defaultLang, ui } from "./ui";
+import { ui, defaultLang } from "./ui";
 
 let currentLang: string;
 

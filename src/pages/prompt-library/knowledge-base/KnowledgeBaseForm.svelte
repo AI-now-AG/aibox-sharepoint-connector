@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { svgIcons } from "$assets/icons";
-  import { useTranslations } from "$i18n/utils";
   import type { CreateKnowledgeBaseParams } from "$pages/api/knowledge-base.json";
-  import { addToast } from "$stores/toast";
+  import { useTranslations } from "$i18n/utils";
   import { onMount } from "svelte";
+  import { addToast } from "$stores/toast";
+  import { svgIcons } from "$assets/icons";
   const t = useTranslations();
 
   let knowledgeBaseTitle = "";

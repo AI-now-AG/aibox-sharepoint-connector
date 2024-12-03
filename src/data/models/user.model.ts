@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
-import { z } from "zod";
 import { db } from "../mongodb";
+import { z } from "zod";
 
 export enum UserRole {
   Admin = "Admin",

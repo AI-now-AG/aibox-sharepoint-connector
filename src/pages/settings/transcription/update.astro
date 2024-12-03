@@ -1,10 +1,11 @@
 ---
-import { Permission } from "$data/models/user.model";
-import { useTranslations } from "$i18n/utils";
 import Layout from "$layouts/Layout.astro";
-import UpdateForm from "$pages/settings/transcription/UpdateForm.svelte";
+import { useTranslations } from "$i18n/utils";
+import SettingForm from "./SettingForm.svelte";
+import { Permission } from "$data/models/user.model";
 import { TranscriptionType } from "$utils/TranscribeRequest";
 import { type TranscriptionCard } from "$utils/TranscriptionCard";
+import UpdateForm from "$pages/settings/transcription/UpdateForm.svelte";
 
 const t = useTranslations();
 
