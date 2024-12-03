@@ -1,9 +1,9 @@
 <script lang="ts">
+  import { actions } from "astro:actions";
   import { svgIcons } from "$assets/icons";
-  import Input from "$components/Input/Input.svelte";
   import { useTranslations } from "$i18n/utils";
   import { addToast } from "$stores/toast";
-  import { actions } from "astro:actions";
+  import Input from "$components/Input/Input.svelte";
 
   export let userId: string = "";
   export let auth0Sub: string = "";

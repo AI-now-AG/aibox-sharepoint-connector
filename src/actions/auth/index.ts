@@ -1,7 +1,7 @@
+import { defineAction } from "astro:actions";
 import management from "$data/auth0/management-client";
 import UserModel from "$data/models/user.model";
 import log from "$utils/log";
-import { defineAction } from "astro:actions";
 import { ProfileUpdateSchema } from "./schema/profile-update.schema";
 
 export const auth = {

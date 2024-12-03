@@ -1,13 +1,12 @@
-import { collection as sessionCollection } from "$data/models/session.model";
+import { Auth0 } from "arctic";
+import { MongodbAdapter } from "@lucia-auth/adapter-mongodb";
+import { Lucia } from "lucia";
 import {
   collection as userCollection,
   type User,
 } from "$data/models/user.model";
-import { MongodbAdapter } from "@lucia-auth/adapter-mongodb";
-import { Auth0 } from "arctic";
-import { Lucia } from "lucia";
-
 import type { ObjectId } from "mongodb";
+import { collection as sessionCollection } from "$data/models/session.model";
 
 export const adapter = new MongodbAdapter(sessionCollection, userCollection);
 

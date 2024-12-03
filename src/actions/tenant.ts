@@ -1,3 +1,13 @@
+import { defineAction } from "astro:actions";
+import {
+  type PatchOrganizationsByIdRequest,
+  type PostOrganizationsRequest,
+} from "auth0";
+import { ObjectId } from "mongodb";
+import { z } from "zod";
+import { decrypt, encrypt } from "$utils/secure";
+import { transformRawData } from "$utils/transformRawData";
+
 import organizationsManagement from "$data/auth0/organizations-manager";
 import tenantModel, {
   ApiKeyProvider,
@@ -6,15 +16,6 @@ import tenantModel, {
   TenantTheme,
   type Tenant,
 } from "$data/models/tenant.model";
-import { decrypt, encrypt } from "$utils/secure";
-import { transformRawData } from "$utils/transformRawData";
-import { defineAction } from "astro:actions";
-import {
-  type PatchOrganizationsByIdRequest,
-  type PostOrganizationsRequest,
-} from "auth0";
-import { ObjectId } from "mongodb";
-import { z } from "zod";
 
 const TenantInputParamsSchema = z.object({
   name: z.string(),
