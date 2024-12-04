@@ -56,6 +56,12 @@ importers:
       '@types/mustache':
         specifier: ^4.2.5
         version: 4.2.5
+      '@types/slug':
+        specifier: ^5.0.9
+        version: 5.0.9
+      '@types/uuid':
+        specifier: ^10.0.0
+        version: 10.0.0
       adm-zip:
         specifier: ^0.5.16
         version: 0.5.16
@@ -126,12 +132,6 @@ importers:
       '@eslint/js':
         specifier: ^9.13.0
         version: 9.13.0
-      '@types/slug':
-        specifier: ^5.0.9
-        version: 5.0.9
-      '@types/uuid':
-        specifier: ^10.0.0
-        version: 10.0.0
       daisyui:
         specifier: ^4.12.13
         version: 4.12.13(postcss@8.4.47)
