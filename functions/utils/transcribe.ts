@@ -290,7 +290,7 @@ export async function transcribeUsingOpenAI(
       }
       if (
         transcribeParams.selectedFileFormat &&
-        transcribeParams.selectedFileFormat.includes(FileFormat.SRT)
+        transcribeParams.selectedFileFormat?.includes(FileFormat.SRT)
       ) {
         const srtResult = formatSRT(grouped);
         outputURLs["srt"] = await uploadOutputToBlob(
@@ -302,7 +302,7 @@ export async function transcribeUsingOpenAI(
       }
       if (
         transcribeParams.selectedFileFormat &&
-        transcribeParams.selectedFileFormat.includes(FileFormat.ASS)
+        transcribeParams.selectedFileFormat?.includes(FileFormat.ASS)
       ) {
         const assResult = formatASS(grouped);
         outputURLs["ass"] = await uploadOutputToBlob(

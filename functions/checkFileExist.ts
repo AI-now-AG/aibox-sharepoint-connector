@@ -12,7 +12,7 @@ const checkFileExist: Handler = async (event, context) => {
   const { uniqueName, fileNames, folderName, isShowImprovedTextPreview } =
     JSON.parse(event.body!);
 
-  let requireFilesCount = Array.isArray(fileNames) ? fileNames.length : 0;
+  let requireFilesCount = fileNames.length || 0;
   const tempFileNames: string[] = [];
 
   const improvedTxtFileName = `${uniqueName}_improved.txt`;
@@ -22,11 +22,7 @@ const checkFileExist: Handler = async (event, context) => {
   }
 
   const txtFileName = `${uniqueName}.txt`;
-  if (
-    Array.isArray(fileNames) &&
-    !fileNames.includes(txtFileName) &&
-    !isShowImprovedTextPreview
-  ) {
+  if (!fileNames.includes(txtFileName) && !isShowImprovedTextPreview) {
     requireFilesCount += 1;
     tempFileNames.push(txtFileName);
   }
@@ -34,7 +30,7 @@ const checkFileExist: Handler = async (event, context) => {
   if ((fileNames?.length || tempFileNames.length) && uniqueName) {
     const streamPipeline = promisify(pipeline);
     const tmpDir = tmpdir();
-    const storageURLString: string = process.env.AZURE_BLOB_STORAGE_NAME || "";
+    let storageURLString: string = process.env.AZURE_BLOB_STORAGE_NAME || "";
 
     const blobServiceClient =
       BlobServiceClient.fromConnectionString(storageURLString);
