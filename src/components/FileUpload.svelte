@@ -40,7 +40,7 @@
   }
 
   function dragenter(_event: DragEvent, index: number) {
-    fileDropping = index;
+    fileDropping = index; 
   }
 
   function dragstart(event: DragEvent, index: number) {

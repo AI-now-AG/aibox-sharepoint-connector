@@ -1,50 +1,167 @@
 import fs from "fs";
 
 const MAX_LENGTH = 34; // from max-text-len.py News.srt max length was 38 character. We keep a bit of extra space for corrections
+const MAX_DIFFERENCE = 4;
+const NUMBER_OF_SECONDS = 2;
 
 export type InputEntry = { word: string; start: number; end: number };
-export type Entry = { text: string; start: number; end: number };
+export type Entry = {
+  text: string;
+  start: number;
+  end: number;
+  secondLastWordEnd?: number;
+  lastWordStart?: number;
+};
+
+// export const createSRTData = (words: InputEntry[]): Entry[] => {
+//   const result: Entry[] = [];
+//   let currentGroup: Entry | null = null;
+
+//   for (const word of words) {
+//     if (!currentGroup) {
+//       const { word: inputWord, start, end } = word;
+//       currentGroup = { text: inputWord, start, end };
+//     } else if (currentGroup.text.length + word.word.length + 1 <= MAX_LENGTH) {
+//       currentGroup.text += " " + word.word;
+//       currentGroup.end = word.end;
+//     } else {
+//       result.push(currentGroup);
+//       const { word: inputWord, start, end } = word;
+//       currentGroup = { text: inputWord, start, end };
+//     }
+//   }
+
+//   if (currentGroup) {
+//     result.push(currentGroup);
+//   }
+
+//   return result;
+// };
 
 export const createSRTData = (words: InputEntry[]): Entry[] => {
   const result: Entry[] = [];
   let currentGroup: Entry | null = null;
 
-  for (const word of words) {
+  for (const [index, container] of words.entries()) {
+    const nextContainer = index + 1 < words.length ? words[index + 1] : null;
+
     if (!currentGroup) {
-      const { word: inputWord, start, end } = word;
+      const { word: inputWord, start, end } = container;
       currentGroup = { text: inputWord, start, end };
-    } else if (currentGroup.text.length + word.word.length + 1 <= MAX_LENGTH) {
-      currentGroup.text += " " + word.word;
-      currentGroup.end = word.end;
+    } else if (
+      currentGroup.text.length + container.word.length + 1 <= MAX_LENGTH &&
+      (!nextContainer ||
+        nextContainer.start - container.end <= NUMBER_OF_SECONDS)
+    ) {
+      currentGroup.text += " " + container.word;
+      if (index > 0) currentGroup.secondLastWordEnd = words[index - 1].end;
+      currentGroup.lastWordStart = words[index].start;
+      currentGroup.end = container.end;
+    } else if (
+      nextContainer &&
+      nextContainer.start - container.end >= NUMBER_OF_SECONDS
+    ) {
+      currentGroup.text += " " + container.word;
+      result.push(currentGroup);
+      currentGroup = null;
     } else {
       result.push(currentGroup);
-      const { word: inputWord, start, end } = word;
+      const { word: inputWord, start, end } = container;
       currentGroup = { text: inputWord, start, end };
     }
   }
 
-  if (currentGroup) {
-    result.push(currentGroup);
-  }
+  if (currentGroup) result.push(currentGroup);
 
   return result;
 };
 
-export const groupLines = (data: Entry[]) => {
-  const entries: Entry[] = [];
-  for (let i = 0; i < data.length; i += 2) {
-    const currentEntry = data[i];
-    const nextEntry = i + 1 < data.length ? data[i + 1] : null;
+// export const groupLines = (data: Entry[]) => {
+//   const entries: Entry[] = [];
+//   for (let i = 0; i < data.length; i += 2) {
+//     const currentEntry = data[i];
+//     const nextEntry = i + 1 < data.length ? data[i + 1] : null;
 
-    // Ensure text values are defined or default to empty strings
-    const currentText = currentEntry?.text || "";
-    const nextText = nextEntry?.text || "";
+//     // Ensure text values are defined or default to empty strings
+//     const currentText = currentEntry?.text || "";
+//     const nextText = nextEntry?.text || "";
+
+//     entries.push({
+//       text: currentText + (nextEntry ? "\n" + nextText : ""),
+//       start: currentEntry.start,
+//       end: nextEntry ? nextEntry.end : currentEntry.end,
+//     });
+//   }
+
+//   return entries;
+// };
+
+export const groupLines = (data: Entry[]): Entry[] => {
+  const entries: Entry[] = [];
+  let carryOverGroup: Entry | null = null;
+
+  const adjustEntryEnd = (
+    entry: Entry,
+    nextEntry: Entry | null,
+    maxDifference: number,
+  ): boolean => {
+    if (!nextEntry) return false;
+    const difference = nextEntry.start - entry.end;
+
+    if (difference >= NUMBER_OF_SECONDS) {
+      entry.end += Math.min(difference, maxDifference);
+      return true;
+    } else {
+      entry.end = nextEntry.start;
+    }
+    return false;
+  };
+
+  const handleCarryOver = (entry: Entry): Entry | null => {
+    const words = entry.text.split(/\s+/);
+    if (words.length > 1 && /[.,!?;:]$/.test(words[words.length - 2])) {
+      const carryOverWord = words.pop()!;
+      const start = entry.lastWordStart || entry.end;
+      entry.text = words.join(" ");
+      entry.end = entry.secondLastWordEnd || entry.end;
+      return { text: carryOverWord, start, end: entry.end };
+    }
+    return null;
+  };
+
+  let i = 0;
+  while (i < data.length) {
+    const currentEntry = data[i];
+    let nextEntry = i + 1 < data.length ? data[i + 1] : null;
+    const nextToNextEntry = i + 2 < data.length ? data[i + 2] : null;
+
+    const currentText = carryOverGroup?.text
+      ? `${carryOverGroup.text} ${currentEntry.text || ""}`
+      : currentEntry.text || "";
+    const currentStart = carryOverGroup?.start || currentEntry.start;
+
+    carryOverGroup = null;
+    if (nextEntry) {
+      carryOverGroup = handleCarryOver(nextEntry);
+      const shouldNullifyNext = adjustEntryEnd(
+        currentEntry,
+        nextEntry,
+        MAX_DIFFERENCE,
+      );
+
+      if (shouldNullifyNext) {
+        nextEntry = null;
+      } else if (nextToNextEntry) {
+        adjustEntryEnd(nextEntry, nextToNextEntry, MAX_DIFFERENCE);
+      }
+    }
 
     entries.push({
-      text: currentText + (nextEntry ? "\n" + nextText : ""),
-      start: currentEntry.start,
+      text: currentText + (nextEntry ? "\n" + nextEntry.text : ""),
+      start: currentStart,
       end: nextEntry ? nextEntry.end : currentEntry.end,
     });
+    i += nextEntry ? 2 : 1;
   }
 
   return entries;
