@@ -1,0 +1,10 @@
+import * as Sentry from "@sentry/astro";
+
+Sentry.init({
+  dsn: import.meta.env.SENTRY_DSN,
+  environment: import.meta.env.NODE_ENV,
+  integrations: [
+    Sentry.browserTracingIntegration(),
+    Sentry.replayIntegration(),
+  ],
+});
