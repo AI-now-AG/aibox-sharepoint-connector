@@ -17,7 +17,10 @@
 
   $: {
     filteredPrompts = promptsEnriched.filter((prompt) => {
-      return prompt.title.toLowerCase().includes(searchQuery.toLowerCase());
+      return (
+        prompt.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        prompt.instruction.toLowerCase().includes(searchQuery.toLowerCase())
+      );
     });
   }
 
@@ -35,12 +38,18 @@
                 //group.title.toLowerCase().includes(tag.toLowerCase()),
                 group.title.toLowerCase() == tag.toLowerCase(),
             ),
-          ) && prompt.title.toLowerCase().includes(searchQuery.toLowerCase())
+          ) &&
+          (prompt.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            prompt.instruction
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase()))
         );
       });
     } else {
-      filteredPrompts = promptsEnriched.filter((prompt) =>
-        prompt.title.toLowerCase().includes(searchQuery.toLowerCase()),
+      filteredPrompts = promptsEnriched.filter(
+        (prompt) =>
+          prompt.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          prompt.instruction.toLowerCase().includes(searchQuery.toLowerCase()),
       );
     }
   }

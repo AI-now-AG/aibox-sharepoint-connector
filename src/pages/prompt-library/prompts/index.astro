@@ -54,6 +54,7 @@ const promptsEnriched: CardItem[] = prompts.map((prompt) => {
   return {
     title: prompt.title,
     description: prompt.description,
+    instruction: prompt.prompt,
     id: prompt._id.toString(),
     tags,
   };
