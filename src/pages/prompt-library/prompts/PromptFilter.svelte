@@ -12,7 +12,6 @@
   export let isEditable: boolean = false;
   let searchQuery = "";
   let filteredPrompts = promptsEnriched;
-  let filteredCategories = categoryList;
   let showCategoryFilter = false;
   let numberOfFilters = 0;
 
@@ -129,26 +128,26 @@
       </div>
       {#if showCategoryFilter}
         <ul
-          class="menu xl:menu-horizontal bg-base-100 rounded-box max-w-5xl z-50"
+          class="menu menu-horizontal bg-base-100 rounded-box max-w-5xl"
           out:slide
           in:slide
         >
           {#each categoryList as category, categoryIdx}
             <li>
-              <label class="flex items-center space-x-2">
+              <label class="flex items-center">
                 <input
                   type="checkbox"
-                  class="checkbox checkbox-neutral"
+                  class="checkbox checkbox-sm checkbox-neutral"
                   bind:checked={category.checked}
                   on:change={() => groupItemChanged()}
                 />
-                <h3 class="text-md font-bold">{category.title}</h3>
+                <h3 class="text-md font-semibold">{category.title}</h3>
               </label>
               {#each category.group as group, groupIdx}
-                <label class="flex items-center space-x-2">
+                <label class="flex items-center ml-3">
                   <input
                     type="checkbox"
-                    class="checkbox checkbox-neutral"
+                    class="checkbox checkbox-sm checkbox-neutral"
                     bind:checked={group.checked}
                     on:change={() => groupItemChanged()}
                   />
