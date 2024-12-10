@@ -21,7 +21,6 @@
   }
 
   function groupItemChanged() {
-    console.log("Asdf");
     const checkedCategories = categoryList.filter(
       (category) => category.checked,
     );
