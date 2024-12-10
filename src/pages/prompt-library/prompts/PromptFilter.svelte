@@ -14,30 +14,37 @@
   let filteredPrompts = promptsEnriched;
   let filteredCategories = categoryList;
   let showCategoryFilter = false;
+  let numberOfFilters = 0;
 
-  $: {
-    filteredPrompts = promptsEnriched.filter((prompt) => {
-      return (
-        prompt.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        prompt.instruction.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    });
+  $: if (searchQuery || searchQuery === "") {
+    groupItemChanged();
   }
 
   function groupItemChanged() {
+    console.log("Asdf");
+    const checkedCategories = categoryList.filter(
+      (category) => category.checked,
+    );
+
     const checkedGroups = categoryList
       .flatMap((category) => category.group)
       .filter((group) => group?.checked);
-    console.log(checkedGroups);
-    if (checkedGroups.length > 0) {
+
+    numberOfFilters = checkedCategories.length + checkedGroups.length;
+
+    if (checkedCategories.length > 0 || checkedGroups.length > 0) {
       filteredPrompts = promptsEnriched.filter((prompt) => {
         return (
-          prompt.tags?.some((tag) =>
-            checkedGroups.some(
-              (group) =>
-                //group.title.toLowerCase().includes(tag.toLowerCase()),
-                group.title.toLowerCase() == tag.toLowerCase(),
-            ),
+          prompt.tags?.some(
+            (tag) =>
+              checkedGroups.some(
+                (group) =>
+                  //group.title.toLowerCase().includes(tag.toLowerCase()),
+                  group.title.toLowerCase() == tag.toLowerCase(),
+              ) ||
+              checkedCategories.some(
+                (cateogry) => cateogry.title.toLowerCase() == tag.toLowerCase(),
+              ),
           ) &&
           (prompt.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
             prompt.instruction
@@ -46,11 +53,12 @@
         );
       });
     } else {
-      filteredPrompts = promptsEnriched.filter(
-        (prompt) =>
+      filteredPrompts = promptsEnriched.filter((prompt) => {
+        return (
           prompt.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          prompt.instruction.toLowerCase().includes(searchQuery.toLowerCase()),
-      );
+          prompt.instruction.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+      });
     }
   }
 </script>
@@ -100,6 +108,9 @@
             ></path>
           </svg>
           Filter
+          {#if numberOfFilters > 0}
+            <div class="badge badge-primary badge-md">{numberOfFilters}</div>
+          {/if}
           <svg
             width="8"
             height="9"
@@ -125,8 +136,15 @@
         >
           {#each categoryList as category, categoryIdx}
             <li>
-              <h3 class="text-md font-bold">{category.title}</h3>
-
+              <label class="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-neutral"
+                  bind:checked={category.checked}
+                  on:change={() => groupItemChanged()}
+                />
+                <h3 class="text-md font-bold">{category.title}</h3>
+              </label>
               {#each category.group as group, groupIdx}
                 <label class="flex items-center space-x-2">
                   <input
