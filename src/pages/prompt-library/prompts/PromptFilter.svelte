@@ -143,18 +143,23 @@
                 />
                 <h3 class="text-md font-semibold">{category.title}</h3>
               </label>
-              {#each category.group as group, groupIdx}
-                <label class="flex items-center ml-3">
-                  <input
-                    type="checkbox"
-                    class="checkbox checkbox-sm checkbox-neutral"
-                    bind:checked={group.checked}
-                    on:change={() => groupItemChanged()}
-                  />
-                  <span class="font-normal">{group.title}</span>
-                </label>
-              {/each}
+              <ul>
+                <li>
+                  {#each category.group as group, groupIdx}
+                    <label class="flex items-center">
+                      <input
+                        type="checkbox"
+                        class="checkbox checkbox-sm checkbox-neutral"
+                        bind:checked={group.checked}
+                        on:change={() => groupItemChanged()}
+                      />
+                      <span class="font-normal">{group.title}</span>
+                    </label>
+                  {/each}
+                </li>
+              </ul>
             </li>
+            
           {/each}
         </ul>
       {/if}
