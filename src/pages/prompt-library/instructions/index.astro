@@ -16,6 +16,7 @@ const instructionsEnriched: CardItem[] = instructions.map((instruction) => ({
   id: instruction._id.toString(),
   title: instruction.title,
   description: instruction.description,
+  instruction: instruction.instruction,
 }));
 
 let userPermissions = Astro.locals.user.permissions;

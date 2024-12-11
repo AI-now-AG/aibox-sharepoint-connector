@@ -15,6 +15,7 @@ const categories = await categoriesCursor.toArray();
 const categoriesEnriched: CardItem[] = categories.map((category) => ({
   id: category._id.toString(),
   title: category.title,
+  instruction: "",
 }));
 
 let userPermissions = Astro.locals.user.permissions;

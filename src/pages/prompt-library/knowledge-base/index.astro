@@ -17,6 +17,7 @@ const knowledgeBasesEnriched: CardItem[] = knowledgeBases.map(
     id: knowledgeBase._id.toString(),
     title: knowledgeBase.title,
     description: knowledgeBase.description,
+    instruction: knowledgeBase.knowledge_base,
   }),
 );
 let userPermissions = Astro.locals.user.permissions;
