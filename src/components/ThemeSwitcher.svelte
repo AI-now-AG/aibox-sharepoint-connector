@@ -45,7 +45,10 @@
   });
 </script>
 
-<ul class="dropdown-content menu bg-base-100 rounded-box z-30 w-52 p-2 shadow">
+<ul
+  tabindex="0"
+  class="dropdown-content menu bg-base-100 rounded-box z-30 w-52 p-2 shadow"
+>
   {#each themes as theme}
     <li>
       <a

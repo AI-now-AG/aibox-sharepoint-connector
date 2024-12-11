@@ -30,6 +30,7 @@
   "login.submit": "Login",
   "welcome.title": "Willkommen bei aibox!",
   "welcome.text": "Willkommen bei aibox – der smarten KI-Lösung für deine Business! Verbessere deine Arbeitsabläufe blitzschnell durch Automatisierung von Aufgaben im HR, Marketing oder beliebigen anderen Bereichen. Nutze vorgefertigte Prompt-Vorlagen oder nutze deine eigenen Prompts. Optimiere jetzt deine Workflows und repetetiven Aufgaben und erlebe eine sofortige Effizienzsteigerung.",
+  "prompt-library.add.category.save": "Category speichern",
   "prompt-library.prompts.title": "Prompts bearbeiten",
   "prompt-library.prompts.add": "Neuer Prompt",
   "prompt-library.prompts.edit": "Prompt ändern",

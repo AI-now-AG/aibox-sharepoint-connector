@@ -20,6 +20,7 @@
   export let categoryId: string | undefined = undefined;
   export let category: CreateCategoryParams | undefined = undefined;
   export let isEditable: boolean = false;
+  let isSaving = false;
 
   onMount(async function () {
     if (category) {
@@ -35,6 +36,7 @@
         type: "error",
       });
     } else if (groups && groups.length > 0) {
+      isSaving = true;
       const newCategory: CreateCategoryParams = {
         title,
         groups: groups.map((e) => ({ _id: e._id, title: e.title })),
@@ -69,6 +71,8 @@
               : t("prompt-library.add.category.failed"),
           type: "error",
         });
+      } finally {
+        isSaving = false;
       }
     } else {
       addToast({
@@ -183,10 +187,15 @@
       {#if isEditable}
         <div class="flex items-center justify-between">
           <button
-            class="btn btn-active btn-primary px-8 font-normal"
+            class={`btn btn-active btn-primary px-8 font-normal ${isSaving && "btn-disabled"}`}
             on:click|preventDefault={save}
           >
-            Save Category
+            {#if isSaving}
+              <span class="loading loading-spinner"></span>
+              {t("prompt-library.add.prompts.saving")}
+            {:else}
+              {t("prompt-library.add.category.save")}
+            {/if}
           </button>
         </div>
       {/if}
