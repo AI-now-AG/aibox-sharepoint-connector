@@ -55,17 +55,15 @@
 
         groups = [];
         title = undefined;
-
+        
+        window.history.back();
         addToast({
           message: data.message || t("prompt-library.add.category.success"),
           type: "success",
         });
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
-        setTimeout(() => {
-          window.history.back();
-        }, 2000);
+        // setTimeout(() => {
+        //   window.location.reload();
+        // }, 2000);
       } catch (error) {
         addToast({
           message:

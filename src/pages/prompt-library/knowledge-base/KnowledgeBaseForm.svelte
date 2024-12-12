@@ -49,13 +49,11 @@
       }
 
       const data = await response.json();
+      window.history.back();
       addToast({
         message: data.message,
         type: "success",
       });
-      setTimeout(() => {
-        window.history.back();
-      }, 2000);
     } catch (error) {
       addToast({
         message:
