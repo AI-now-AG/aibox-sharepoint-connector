@@ -156,6 +156,9 @@
         message: data.message,
         type: "success",
       });
+      setTimeout(() => {
+        window.history.back();
+      }, 2000);
     } catch (error) {
       addToast({
         message:

@@ -63,6 +63,9 @@
         setTimeout(() => {
           window.location.reload();
         }, 2000);
+        setTimeout(() => {
+          window.history.back();
+        }, 2000);
       } catch (error) {
         addToast({
           message:
