@@ -3,6 +3,7 @@
     id: string;
     title: string;
     description?: string;
+    instruction: string;
     tags?: string[];
   }
 </script>

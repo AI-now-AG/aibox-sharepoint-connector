@@ -152,6 +152,7 @@
       }
 
       const data = await response.json();
+      window.history.back();
       addToast({
         message: data.message,
         type: "success",
