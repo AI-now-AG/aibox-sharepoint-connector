@@ -1,0 +1,178 @@
+<script lang="ts" context="module">
+  export interface ListItem {
+    id: string;
+    title: string;
+    description?: string;
+    instruction: string;
+    tags?: string[];
+  }
+</script>
+
+<script lang="ts">
+  import { dndzone } from "svelte-dnd-action";
+  import { flip } from "svelte/animate";
+  import { addToast } from "$stores/toast";
+  import { useTranslations } from "$i18n/utils";
+
+  export let items: ListItem[] = [];
+  export let title: string = "";
+  export let viewLabel: string = "";
+  export let isEditable: boolean = false;
+
+  const flipDurationMs = 200;
+  const t = useTranslations();
+
+  function handleSort(e) {
+    items = e.detail.items;
+    console.log("finalize items", { items });
+  }
+
+  const showDeleteConfirmationDlg = (id: string) => {
+    document
+      .querySelector<HTMLDialogElement>(`#delete_confirmation_modal_${id}`)
+      ?.showModal();
+  };
+
+  function showSuccessToast(type) {
+    const translationKey = `prompt-library.delete.categories.success`;
+    addToast({
+      message: t(translationKey),
+      type: "success",
+    });
+  }
+
+  function showErrorToast(type) {
+    const translationKey = `prompt-library.delete.categories.failed`;
+    addToast({
+      message: t(translationKey),
+      type: "error",
+    });
+  }
+
+  async function deleteItem(id: string) {
+    try {
+      const response = await fetch(`/api/categories.json`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ _id: id }),
+      });
+
+      if (response.ok) {
+        items = items.filter((card) => item.id !== id);
+        showSuccessToast(type);
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      } else {
+        throw new Error("Failed to delete");
+      }
+    } catch (error) {
+      console.log(error);
+      showErrorToast(type);
+    }
+  }
+</script>
+
+<div class="container max-w-5xl mx-auto p-6 space-y-4">
+  <h1 class="text-lg font-normal text-base-content/80">
+    {title}
+  </h1>
+
+  <section
+    class="grid grid-cols-1 gap-4"
+    use:dndzone={{ items, flipDurationMs }}
+    on:consider={handleSort}
+    on:finalize={handleSort}
+  >
+    {#each items as item (item.id)}
+      <div
+        class="card bg-base-100 shadow-xl"
+        animate:flip={{ duration: flipDurationMs }}
+      >
+        <div class="card-body space-y-2 p-4 justify-between">
+          {#if item.tags}
+            <div class="card-actions justify-start">
+              {#each item.tags as tag}
+                <div class="badge px-2 border-base-300">
+                  {tag}
+                </div>
+              {/each}
+            </div>
+          {/if}
+          <h2 class="card-title">{item.title}</h2>
+          {#if item.description}
+            <p class="text-base-content/60 line-clamp-3">
+              {item.description}
+            </p>
+          {/if}
+          <div class="flex justify-between mt-4">
+            <div class="card-actions">
+              <a
+                href={`categories/${item.id}`}
+                class="btn btn-primary font-normal"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="1em"
+                  height="1em"
+                  viewBox="0 0 24 24"
+                  class="w-6 h-6"
+                  ><path
+                    fill="currentColor"
+                    d="M3 21v-4.25L16.2 3.575q.3-.275.663-.425t.762-.15t.775.15t.65.45L20.425 5q.3.275.438.65T21 6.4q0 .4-.137.763t-.438.662L7.25 21zM17.6 7.8L19 6.4L17.6 5l-1.4 1.4z"
+                  /></svg
+                >
+                {viewLabel}
+              </a>
+            </div>
+            {#if isEditable}
+              <button
+                class="btn btn-sm btn-ghost text-error self-end"
+                on:click={() => {
+                  showDeleteConfirmationDlg(item.id);
+                }}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="1em"
+                  height="1em"
+                  viewBox="0 0 24 24"
+                  class="w-6 h-6"
+                  ><path
+                    fill="currentColor"
+                    d="M7 21q-.825 0-1.412-.587T5 19V6H4V4h5V3h6v1h5v2h-1v13q0 .825-.587 1.413T17 21zm2-4h2V8H9zm4 0h2V8h-2z"
+                  /></svg
+                >
+              </button>
+            {/if}
+
+            <dialog id={`delete_confirmation_modal_${item.id}`} class="modal">
+              <div class="modal-box">
+                <h3 class="text-lg font-bold">Please confirm</h3>
+                <p class="py-4">
+                  Are you sure you want to delete <span class="font-bold"
+                    >{item.title}</span
+                  >?
+                </p>
+                <div class="modal-action">
+                  <form method="dialog">
+                    <!-- if there is a button in form, it will close the modal -->
+                    <button class="btn">Cancel</button>
+                    <button
+                      class="btn btn-sm btn-ghost text-error self-end"
+                      on:click={() => deleteItem(item.id)}
+                    >
+                      Delete</button
+                    >
+                  </form>
+                </div>
+              </div>
+            </dialog>
+          </div>
+        </div>
+      </div>
+    {/each}
+  </section>
+</div>
