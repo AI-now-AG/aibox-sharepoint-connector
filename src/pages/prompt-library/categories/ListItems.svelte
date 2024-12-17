@@ -12,6 +12,7 @@
   import { dndzone } from "svelte-dnd-action";
   import { flip } from "svelte/animate";
   import { addToast } from "$stores/toast";
+  import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
 
   export let items: ListItem[] = [];
@@ -80,99 +81,92 @@
     {title}
   </h1>
 
-  <section
-    class="grid grid-cols-1 gap-4"
-    use:dndzone={{ items, flipDurationMs }}
-    on:consider={handleSort}
-    on:finalize={handleSort}
-  >
-    {#each items as item (item.id)}
-      <div
-        class="card bg-base-100 shadow-xl"
-        animate:flip={{ duration: flipDurationMs }}
-      >
-        <div class="card-body space-y-2 p-4 justify-between">
-          {#if item.tags}
-            <div class="card-actions justify-start">
-              {#each item.tags as tag}
-                <div class="badge px-2 border-base-300">
-                  {tag}
-                </div>
-              {/each}
-            </div>
-          {/if}
-          <h2 class="card-title">{item.title}</h2>
-          {#if item.description}
-            <p class="text-base-content/60 line-clamp-3">
-              {item.description}
-            </p>
-          {/if}
-          <div class="flex justify-between mt-4">
-            <div class="card-actions">
-              <a
-                href={`categories/${item.id}`}
-                class="btn btn-primary font-normal"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="1em"
-                  height="1em"
-                  viewBox="0 0 24 24"
-                  class="w-6 h-6"
-                  ><path
-                    fill="currentColor"
-                    d="M3 21v-4.25L16.2 3.575q.3-.275.663-.425t.762-.15t.775.15t.65.45L20.425 5q.3.275.438.65T21 6.4q0 .4-.137.763t-.438.662L7.25 21zM17.6 7.8L19 6.4L17.6 5l-1.4 1.4z"
-                  /></svg
-                >
-                {viewLabel}
-              </a>
-            </div>
-            {#if isEditable}
-              <button
-                class="btn btn-sm btn-ghost text-error self-end"
-                on:click={() => {
-                  showDeleteConfirmationDlg(item.id);
-                }}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="1em"
-                  height="1em"
-                  viewBox="0 0 24 24"
-                  class="w-6 h-6"
-                  ><path
-                    fill="currentColor"
-                    d="M7 21q-.825 0-1.412-.587T5 19V6H4V4h5V3h6v1h5v2h-1v13q0 .825-.587 1.413T17 21zm2-4h2V8H9zm4 0h2V8h-2z"
-                  /></svg
-                >
-              </button>
-            {/if}
+  <div class="relative">
+    <div class="flex items-center bg-base-300 py-3 px-4 rounded-lg">
+      <div class="flex-none w-64 text-left font-normal text-xs rounded-l-lg">
+        Name
+      </div>
+      <div class="flex-1 w-auto text-left font-normal text-xs">&nbsp;</div>
+      <div class="flex-none w-20 text-left font-normal text-xs">Status</div>
+      <div class="flex-none w-20 rounded-r-lg"></div>
+    </div>
 
-            <dialog id={`delete_confirmation_modal_${item.id}`} class="modal">
-              <div class="modal-box">
-                <h3 class="text-lg font-bold">Please confirm</h3>
-                <p class="py-4">
-                  Are you sure you want to delete <span class="font-bold"
-                    >{item.title}</span
-                  >?
-                </p>
-                <div class="modal-action">
-                  <form method="dialog">
-                    <!-- if there is a button in form, it will close the modal -->
-                    <button class="btn">Cancel</button>
-                    <button
-                      class="btn btn-sm btn-ghost text-error self-end"
-                      on:click={() => deleteItem(item.id)}
-                    >
-                      Delete</button
-                    >
-                  </form>
-                </div>
+    <section
+      use:dndzone={{ items, flipDurationMs }}
+      on:consider={handleSort}
+      on:finalize={handleSort}
+    >
+      {#each items as item (item.id)}
+        <div
+          class="flex items-center h-16 bg-base-100 hover:bg-base-300 text-sm rounded-lg py-3 px-4 mt-3"
+        >
+          <div class="flex-none w-64 text-sm font-medium rounded-l-lg">
+            <a
+              href={`categories/${item.id}`}
+              class="underline underline-offset-2">{item.title}</a
+            >
+          </div>
+          <div
+            class="flex-1 w-auto text-gray-600 flex items-center text-xs font-normal h-16"
+          >
+            {#if item.tags}
+              <div class="card-actions justify-start">
+                {#each item.tags as tag}
+                  <div class="badge px-2 border-base-300">
+                    {tag}
+                  </div>
+                {/each}
               </div>
-            </dialog>
+            {/if}
+          </div>
+          <div class="flex-none w-20">
+            <span
+              class={item.active == 1
+                ? "text-emerald-600 text-sm font-medium"
+                : "text-grey-600 text-sm font-medium"}
+              >{item.active == 1 ? "active" : "inactive"}</span
+            >
+          </div>
+          <div
+            class="flex-none w-20 text-right relative relative-dropdown rounded-r-lg"
+          >
+            <div class="dropdown dropdown-hover dropdown-end">
+              <div tabindex="0" role="button" class="btn btn-ghost btn-sm">
+                {@html svgIcons.threeDot}
+              </div>
+              <ul
+                class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
+              >
+                <li>
+                  <a
+                    class="flex block w-full text-left px-4 py-1 text-sm hover:underline"
+                    href="categories/{item._id}"
+                    data-astro-prefetch="false"
+                  >
+                    {@html svgIcons.edit}
+                    <span class="ml-1">Edit</span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#state"
+                    class="flex block w-full text-left px-4 py-1 text-sm hover:underline"
+                    on:click={() => console.log("item")}
+                    data-astro-prefetch="false"
+                  >
+                    {@html item.active == 1
+                      ? svgIcons.archive
+                      : svgIcons.active}
+                    <span class="ml-1"
+                      >{item.active == 1 ? "deactivate" : "activate"}</span
+                    >
+                  </a>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
-      </div>
-    {/each}
-  </section>
+      {/each}
+    </section>
+  </div>
 </div>
