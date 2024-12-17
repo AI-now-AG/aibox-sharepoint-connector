@@ -28,9 +28,15 @@
   const flipDurationMs = 200;
   const t = useTranslations();
 
-  function handleSort(e) {
+  function handleDndConsider(e) {
     items = e.detail.items;
-    console.log("finalize items", { items });
+    console.log("consider dispatched", { items });
+  }
+
+  function handleDndFinalize(e) {
+    items = e.detail.items;
+    updatePosition(items);
+    console.log("finalize dispatched", { items });
   }
 
   async function handleDelete(categoryId) {
@@ -40,20 +46,36 @@
 
   async function updateStatus(id: string, active: boolean) {
     $loading = true;
-    const result =
-      active == true
-        ? await actions.category.activate({
-            _id: id,
-          })
-        : await actions.category.deactivate({
-            _id: id,
-          });
+
+    let result: any;
+    if (active == true) {
+      result = await actions.category.activate({
+        _id: id,
+      });
+    } else {
+      result = await actions.category.deactivate({
+        _id: id,
+      });
+    }
+
     items = items.map((item) => {
       if (item.id == id) {
         item.active = active;
       }
       return item;
     });
+
+    $loading = false;
+  }
+
+  async function updatePosition(items: ListItem[]) {
+    $loading = true;
+    const sortedIds = items.map((item) => {
+      return {
+        _id: item.id,
+      };
+    });
+    items = await actions.category.updatePosition(sortedIds);
     $loading = false;
   }
 
@@ -104,8 +126,8 @@
 
     <section
       use:dndzone={{ items, flipDurationMs }}
-      on:consider={handleSort}
-      on:finalize={handleSort}
+      on:consider={handleDndConsider}
+      on:finalize={handleDndFinalize}
     >
       {#each items as item (item.id)}
         <div
