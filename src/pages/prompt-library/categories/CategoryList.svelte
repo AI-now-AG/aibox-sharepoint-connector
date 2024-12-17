@@ -9,12 +9,15 @@
 </script>
 
 <script lang="ts">
+  import { actions } from "astro:actions";
   import { dndzone } from "svelte-dnd-action";
   import { flip } from "svelte/animate";
   import { addToast } from "$stores/toast";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
   import ConfirmDeleteDialog from "./ConfirmDeleteDialog.svelte";
+  import Loading from "$components/Loading.svelte";
+  import { loading } from "$stores";
 
   export let items: ListItem[] = [];
   export let title: string = "";
@@ -33,6 +36,25 @@
   async function handleDelete(categoryId) {
     categoryToDelete = categoryId;
     confirmDeleteModal.show();
+  }
+
+  async function updateStatus(id: string, active: boolean) {
+    $loading = true;
+    const result =
+      active == true
+        ? await actions.category.activate({
+            _id: id,
+          })
+        : await actions.category.deactivate({
+            _id: id,
+          });
+    items = items.map((item) => {
+      if (item.id == id) {
+        item.active = active;
+      }
+      return item;
+    });
+    $loading = false;
   }
 
   async function deleteCategory() {
@@ -141,7 +163,7 @@
                 <li>
                   <button
                     class="flex block w-full text-left px-4 py-1 text-sm hover:underline"
-                    on:click={() => console.log("touch status", item)}
+                    on:click={() => updateStatus(item.id, !item.active)}
                   >
                     {@html item.active == 1 ? svgIcons.eyeClose : svgIcons.eye}
                     <span class="ml-1"
@@ -164,6 +186,8 @@
         </div>
       {/each}
     </section>
+
+    <Loading partial={true} bind:show={$loading} />
   </div>
 
   <!-- confirm delete dialog -->
