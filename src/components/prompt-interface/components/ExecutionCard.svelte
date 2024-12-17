@@ -4,6 +4,7 @@
   import { storePromptId } from "$components/prompt-interface/components/Stores";
   import { svgIcons } from "$assets/icons";
   import EditPromptDetails from "./EditPromptDetails.svelte";
+  import ExecutionCardItem from "./ExecutionCardItem.svelte";
 
   export let cards: any;
   export let selectedPromptId;
@@ -30,7 +31,6 @@
   function selectCard(index: number) {
     const promptId = cards[index]._id;
     selectedCardIndex = index;
-    // selectedCardIndex = index === selectedCardIndex ? null : index;
     selectedPromptId = promptId;
     storePromptId.set(selectedPromptId);
   }
@@ -44,29 +44,28 @@
 
 <div class="flex flex-col">
   <div
-    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 py-2"
+    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-4 gap-4 py-2"
   >
     {#each cards as card, index}
       {#if index < promptLimit || showMore}
-        <button
-          class={`relative btn w-full rounded-xl h-auto p-6 ${selectedCardIndex === index ? "btn-primary " : "btn-outline border-base-300 border-2"}`}
-          on:click={() => selectCard(index)}
-        >
-          {#if isEditable}
-            <button
-              class="absolute top-2 right-2 ${selectedCardIndex === index
-                ? 'text-white '
-                : 'text-neutral'}"
-              on:click={(event) => {
-                event.stopPropagation();
-                editCard(index);
-              }}
-            >
-              {@html svgIcons.editPrompt}
-            </button>
-          {/if}
-          <p class="card-title text-sm font-normal">{card.title}</p>
-        </button>
+        <ExecutionCardItem
+          {isEditable}
+          data={card}
+          active={selectedCardIndex == index}
+          onSelectCart={(_data) => selectCard(index)}
+          onSelectEdit={(_data) => {
+            editCard(index);
+          }}
+          onSelectDuplicate={(_data) => {
+            // TODO: Handle copy
+          }}
+          onSelectReOder={(_data) => {
+            // TODO: Handle Order
+          }}
+          onSelectDelete={(_data) => {
+            // TODO: Handle Delete
+          }}
+        />
       {/if}
     {/each}
   </div>
