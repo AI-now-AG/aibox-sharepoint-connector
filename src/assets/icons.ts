@@ -32,6 +32,7 @@ import textIcon from "$assets/icons/textIcon.svg?raw";
 import codeIcon from "$assets/icons/codeIcon.svg?raw";
 import warningIcon from "$assets/icons/warning.svg?raw";
 import downIcon from "$assets/icons/down.svg?raw";
+import drag from "$assets/icons/drag.svg?raw";
 
 export const svgIcons = {
   menuSettings,
@@ -68,4 +69,5 @@ export const svgIcons = {
   codeIcon,
   warningIcon,
   downIcon,
+  drag,
 };

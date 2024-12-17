@@ -17,7 +17,6 @@
 
   export let items: ListItem[] = [];
   export let title: string = "";
-  export let viewLabel: string = "";
   export let isEditable: boolean = false;
 
   const flipDurationMs = 200;
@@ -98,9 +97,12 @@
     >
       {#each items as item (item.id)}
         <div
-          class="flex items-center h-16 bg-base-100 hover:bg-base-300 text-sm rounded-lg py-3 px-4 mt-3"
+          class="flex items-center h-16 bg-base-100 hover:bg-base-300 text-sm rounded-lg py-3 px-4 mt-3 dnd-item"
         >
-          <div class="flex-none w-64 text-sm font-medium rounded-l-lg">
+          <div class="flex-none w-64 flex text-sm font-medium rounded-l-lg">
+            <span class="inline-flex mr-3">
+              {@html svgIcons.drag}
+            </span>
             <a
               href={`categories/${item.id}`}
               class="underline underline-offset-2">{item.title}</a
@@ -140,8 +142,7 @@
                 <li>
                   <a
                     class="flex block w-full text-left px-4 py-1 text-sm hover:underline"
-                    href="categories/{item._id}"
-                    data-astro-prefetch="false"
+                    href="categories/{item.id}"
                   >
                     {@html svgIcons.edit}
                     <span class="ml-1">Edit</span>
@@ -152,7 +153,6 @@
                     href="#state"
                     class="flex block w-full text-left px-4 py-1 text-sm hover:underline"
                     on:click={() => console.log("item")}
-                    data-astro-prefetch="false"
                   >
                     {@html item.active == 1
                       ? svgIcons.archive

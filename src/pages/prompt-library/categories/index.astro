@@ -61,7 +61,6 @@ let userPermissions = Astro.locals.user.permissions;
   <ListItems
     title={t("prompt-library.categories.all")}
     items={categoriesEnriched}
-    viewLabel={t("prompt-library.categories.view")}
     isEditable={userPermissions.includes(Permission.AdminAll)}
     client:load
   />
