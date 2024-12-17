@@ -2,9 +2,9 @@
 import Layout from "$layouts/Layout.astro";
 import { useTranslations } from "$i18n/utils";
 import CategoryModel from "$data/models/category.model";
-import ListItems, {
+import CategoryList, {
   type ListItem,
-} from "$pages/prompt-library/categories/ListItems.svelte";
+} from "$pages/prompt-library/categories/CategoryList.svelte";
 import { Permission } from "$data/models/user.model";
 
 const t = useTranslations();
@@ -58,7 +58,7 @@ let userPermissions = Astro.locals.user.permissions;
     }
   </div>
 
-  <ListItems
+  <CategoryList
     title={t("prompt-library.categories.all")}
     items={categoriesEnriched}
     isEditable={userPermissions.includes(Permission.AdminAll)}
