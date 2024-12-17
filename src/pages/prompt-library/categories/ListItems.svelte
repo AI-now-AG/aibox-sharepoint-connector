@@ -1,0 +1,172 @@
+<script lang="ts" context="module">
+  export interface ListItem {
+    id: string;
+    title: string;
+    description?: string;
+    instruction: string;
+    tags?: string[];
+  }
+</script>
+
+<script lang="ts">
+  import { dndzone } from "svelte-dnd-action";
+  import { flip } from "svelte/animate";
+  import { addToast } from "$stores/toast";
+  import { svgIcons } from "$assets/icons";
+  import { useTranslations } from "$i18n/utils";
+
+  export let items: ListItem[] = [];
+  export let title: string = "";
+  export let viewLabel: string = "";
+  export let isEditable: boolean = false;
+
+  const flipDurationMs = 200;
+  const t = useTranslations();
+
+  function handleSort(e) {
+    items = e.detail.items;
+    console.log("finalize items", { items });
+  }
+
+  const showDeleteConfirmationDlg = (id: string) => {
+    document
+      .querySelector<HTMLDialogElement>(`#delete_confirmation_modal_${id}`)
+      ?.showModal();
+  };
+
+  function showSuccessToast(type) {
+    const translationKey = `prompt-library.delete.categories.success`;
+    addToast({
+      message: t(translationKey),
+      type: "success",
+    });
+  }
+
+  function showErrorToast(type) {
+    const translationKey = `prompt-library.delete.categories.failed`;
+    addToast({
+      message: t(translationKey),
+      type: "error",
+    });
+  }
+
+  async function deleteItem(id: string) {
+    try {
+      const response = await fetch(`/api/categories.json`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ _id: id }),
+      });
+
+      if (response.ok) {
+        items = items.filter((card) => item.id !== id);
+        showSuccessToast(type);
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      } else {
+        throw new Error("Failed to delete");
+      }
+    } catch (error) {
+      console.log(error);
+      showErrorToast(type);
+    }
+  }
+</script>
+
+<div class="container max-w-5xl mx-auto p-6 space-y-4">
+  <h1 class="text-lg font-normal text-base-content/80">
+    {title}
+  </h1>
+
+  <div class="relative">
+    <div class="flex items-center bg-base-300 py-3 px-4 rounded-lg">
+      <div class="flex-none w-64 text-left font-normal text-xs rounded-l-lg">
+        Name
+      </div>
+      <div class="flex-1 w-auto text-left font-normal text-xs">&nbsp;</div>
+      <div class="flex-none w-20 text-left font-normal text-xs">Status</div>
+      <div class="flex-none w-20 rounded-r-lg"></div>
+    </div>
+
+    <section
+      use:dndzone={{ items, flipDurationMs }}
+      on:consider={handleSort}
+      on:finalize={handleSort}
+    >
+      {#each items as item (item.id)}
+        <div
+          class="flex items-center h-16 bg-base-100 hover:bg-base-300 text-sm rounded-lg py-3 px-4 mt-3"
+        >
+          <div class="flex-none w-64 text-sm font-medium rounded-l-lg">
+            <a
+              href={`categories/${item.id}`}
+              class="underline underline-offset-2">{item.title}</a
+            >
+          </div>
+          <div
+            class="flex-1 w-auto text-gray-600 flex items-center text-xs font-normal h-16"
+          >
+            {#if item.tags}
+              <div class="card-actions justify-start">
+                {#each item.tags as tag}
+                  <div class="badge px-2 border-base-300">
+                    {tag}
+                  </div>
+                {/each}
+              </div>
+            {/if}
+          </div>
+          <div class="flex-none w-20">
+            <span
+              class={item.active == 1
+                ? "text-emerald-600 text-sm font-medium"
+                : "text-grey-600 text-sm font-medium"}
+              >{item.active == 1 ? "active" : "inactive"}</span
+            >
+          </div>
+          <div
+            class="flex-none w-20 text-right relative relative-dropdown rounded-r-lg"
+          >
+            <div class="dropdown dropdown-hover dropdown-end">
+              <div tabindex="0" role="button" class="btn btn-ghost btn-sm">
+                {@html svgIcons.threeDot}
+              </div>
+              <ul
+                class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
+              >
+                <li>
+                  <a
+                    class="flex block w-full text-left px-4 py-1 text-sm hover:underline"
+                    href="categories/{item._id}"
+                    data-astro-prefetch="false"
+                  >
+                    {@html svgIcons.edit}
+                    <span class="ml-1">Edit</span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#state"
+                    class="flex block w-full text-left px-4 py-1 text-sm hover:underline"
+                    on:click={() => console.log("item")}
+                    data-astro-prefetch="false"
+                  >
+                    {@html item.active == 1
+                      ? svgIcons.archive
+                      : svgIcons.active}
+                    <span class="ml-1"
+                      >{item.active == 1 ? "deactivate" : "activate"}</span
+                    >
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      {/each}
+    </section>
+  </div>
+</div>
