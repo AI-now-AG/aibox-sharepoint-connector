@@ -33,6 +33,13 @@ const cards: TranscriptionCard[] = [
     toggle: transcriptions?.subtitles?.enabled ?? false,
     type: TranscriptionType.Subtitles,
   },
+  {
+    title: t("settings.transcription.largefile-title"),
+    //description: t("settings.transcription.largefile-description"),
+    description: transcriptions?.largefile?.text ?? "",
+    toggle: transcriptions?.largefile?.enabled ?? false,
+    type: TranscriptionType.Largefile,
+  },
 ];
 let userPermissions = Astro.locals.user.permissions;
 ---

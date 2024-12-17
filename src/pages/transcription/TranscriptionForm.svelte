@@ -17,6 +17,7 @@
   let audioFile: File | undefined;
   let audioDuration: string = "";
   let acceptedTypes: Array<string> = ["audio/*", "video/*"];
+  let maxFileSize = 25;
   let isDragOver: boolean = false;
   let textOuput: string = "";
   let txtFileUrl: string = "";
@@ -37,6 +38,7 @@
 
   // states
   let isUploading: boolean = false;
+  let uploadingValue: number = 0;
   let isUploaded: boolean = false;
   let isTranscribing: boolean = false;
   let isTranscipted: boolean = false;
@@ -73,6 +75,11 @@
       "TranscriptionForm::onMount transcriptStore in store",
       $transcriptStore,
     );
+
+    if (transcriptionType == TranscriptionType.Largefile) {
+      maxFileSize = 1000;
+      //maxFileSize = 25; // this is for testing purpose
+    }
 
     if ($transcriptStore && transcriptionType) {
       retrieveDataInStore(transcriptionType);
@@ -207,7 +214,7 @@
   }
 
   function isFileSizeValid(size: number) {
-    if (size <= 25 * 1024 * 1024) {
+    if (size <= maxFileSize * 1024 * 1024) {
       fileErrorMessage = "";
       return true;
     }
@@ -247,9 +254,43 @@
       body: JSON.stringify({
         fileNameWithoutExtension: fileNameWithoutExtension,
         folderName: folderName,
+        transcriptionType: transcriptionType,
       }),
     });
     return await response.json();
+  }
+
+  async function uploadBlobFileWithProgress(
+    uploadUrl: string,
+    file: File,
+    onProgress: (percentage: number) => void,
+  ) {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+
+      xhr.open("PUT", uploadUrl, true);
+      xhr.setRequestHeader("x-ms-blob-type", "BlockBlob");
+      xhr.setRequestHeader("Content-Type", file.type);
+
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable) {
+          const percentage = (event.loaded / event.total) * 100;
+          onProgress(percentage);
+        }
+      };
+
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          resolve(xhr.response);
+        } else {
+          reject(new Error(`Failed to upload file. Status: ${xhr.status}`));
+        }
+      };
+
+      xhr.onerror = () =>
+        reject(new Error("An error occurred during the file upload."));
+      xhr.send(file);
+    });
   }
 
   async function uploadBlobFile(uploadUrl: string, file: File) {
@@ -313,17 +354,43 @@
       );
       console.log("Azue SAS tokens response", { uploadUrl, outputFileName });
 
-      // Upload the file to Azure Blob Storage
-      const response = await uploadBlobFile(uploadUrl, audioFile);
+      try {
+        // Store temporary upload URL, filename for later
+        console.log("Temp output file name", tempOutputFileName);
+        // Upload the file to Azure Blob Storage
+        //const response = await uploadBlobFile(uploadUrl, audioFile);
+        await uploadBlobFileWithProgress(uploadUrl, audioFile, (percentage) => {
+          uploadingValue = `${Math.round(percentage)}`;
+          console.log(`Upload progress: ${percentage.toFixed(2)}%`);
+        })
+          .then(() => {
+            // Store temporary upload URL, filename for later
+            tempUploadUrl = uploadUrl;
+            tempOutputFileName = outputFileName;
+            tempOutputFileNames = [
+              `${outputFileName}.txt`,
+              `${outputFileName}.srt`,
+            ];
+            console.log("Temp output file name", tempOutputFileNames);
 
-      // Store temporary upload URL, filename for later
-      tempUploadUrl = uploadUrl;
-      tempOutputFileName = outputFileName;
-      console.log("Temp output file name", tempOutputFileName);
-
-      if (response.ok) {
-        isUploading = false;
-        isUploaded = true;
+            isUploading = false;
+            isUploaded = true;
+          })
+          .catch((error) => {
+            console.error("Error uploading file:", error);
+            isUploading = false;
+            audioFile = undefined;
+          });
+      } catch (error) {
+        console.log(error);
+        addToast({
+          message:
+            error instanceof Error
+              ? error.message
+              : "An error occurred during upload.",
+          type: "error",
+          timeout: 5000,
+        });
       }
     } else {
       isUploading = false;
@@ -448,6 +515,7 @@
             transcriptionType === TranscriptionType.Subtitles
               ? showTextPreviewChecked
               : false,
+          typedTranscriptionType: transcriptionType,
         }),
       });
       if (response.ok) {
@@ -718,7 +786,11 @@
               {t("transcription.supportted-file-extensions")}
             </p>
             <p class="text-xs text-gray-400 mt-8">
-              {t("transcription.maximum-capacity")}
+              {#if transcriptionType === TranscriptionType.Largefile}
+                {t("transcription.maximum-capacity-1gb")}
+              {:else}
+                {t("transcription.maximum-capacity-25mb")}
+              {/if}
             </p>
           </div>
         </label>
@@ -747,7 +819,11 @@
           <div class="flex items-center space-x-4">
             <div class="flex items-center space-x-2">
               {#if isUploading && !isUploaded}
-                <span class="loading loading-spinner loading-md"></span>
+                <progress
+                  class="progress progress-primary w-56"
+                  value={uploadingValue}
+                  max="100"
+                ></progress>
                 <p class="font-medium">{t("transciption.uploading")}</p>
               {/if}
               {#if isTranscribing}

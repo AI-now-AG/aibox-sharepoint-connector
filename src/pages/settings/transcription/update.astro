@@ -47,6 +47,14 @@ switch (selectedTranscriptionType) {
       type: TranscriptionType.Subtitles,
     };
     break;
+  case TranscriptionType.Largefile:
+    card = {
+      title: t("settings.transcription.largefile-title"),
+      description: transcriptions?.largefile?.text ?? "",
+      toggle: transcriptions?.largefile?.enabled ?? false,
+      type: TranscriptionType.Largefile,
+    };
+    break;
   default:
     break;
 }

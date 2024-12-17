@@ -4,10 +4,17 @@ import {
   type HandlerResponse,
 } from "@netlify/functions";
 import { BlobServiceClient } from "@azure/storage-blob";
-import { transcribeUsingOpenAI } from "./utils/transcribe";
+import {
+  transcribeUsingOpenAI,
+  transcribeUsingAzureOpenAI,
+} from "./utils/transcribe";
 import { decrypt } from "$utils/secure";
 import { createTask, updateTask } from "$shared/transcriptionTasks";
-import type { TranscribeRequest } from "$utils/TranscribeRequest";
+import {
+  TranscriptionType,
+  type TranscribeRequest,
+  type TranscriptionResult,
+} from "$utils/TranscribeRequest";
 
 const transcribeAudio: Handler = async (
   event: HandlerEvent,
@@ -21,8 +28,13 @@ const transcribeAudio: Handler = async (
 
   try {
     const transcribeParams: TranscribeRequest = JSON.parse(event.body || "{}");
-    const { fileName, uniqueName, uploadUrl, encryptedApiKey } =
-      transcribeParams;
+    const {
+      fileName,
+      uniqueName,
+      uploadUrl,
+      transcriptionType,
+      encryptedApiKey,
+    } = transcribeParams;
 
     if (!fileName || !uploadUrl) {
       return {
@@ -30,9 +42,6 @@ const transcribeAudio: Handler = async (
         body: JSON.stringify({ message: "Invalid file upload data" }),
       };
     }
-
-    const fileBuffer = await downloadFileFromBlob(uploadUrl);
-    transcribeParams.audioBuffer = fileBuffer;
 
     const azureOpenAIApiKey = decrypt(
       encryptedApiKey || process.env.AZURE_OPENAI_API_KEY2!,
@@ -43,7 +52,18 @@ const transcribeAudio: Handler = async (
     console.log("decryptedApiKey", azureOpenAIApiKey);
 
     createTask(uniqueName, { status: "processing" });
-    const transcriptionResult = await transcribeUsingOpenAI(transcribeParams);
+    let transcriptionResult: TranscriptionResult = {
+      success: false,
+      data: null,
+      error: null,
+    };
+    if (transcriptionType === TranscriptionType.Largefile) {
+      transcriptionResult = await transcribeUsingAzureOpenAI(transcribeParams);
+    } else {
+      const fileBuffer = await downloadFileFromBlob(uploadUrl);
+      transcribeParams.audioBuffer = fileBuffer;
+      transcriptionResult = await transcribeUsingOpenAI(transcribeParams);
+    }
 
     if (!transcriptionResult.success) {
       updateTask(uniqueName, {

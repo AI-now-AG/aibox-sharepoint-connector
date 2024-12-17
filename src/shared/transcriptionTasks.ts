@@ -4,6 +4,15 @@ import { MongoClient, Db, Collection } from "mongodb";
 const MONGO_URI = process.env.MONGODB_URI || "";
 const DB_NAME = process.env.MONGODB_DATABASE;
 
+export const BatchSchema = z.object({
+  name: z.string(),
+  status: z.string().optional(),
+  taskUrl: z.string().optional(),
+  diarizationEnabled: z.boolean().optional(),
+  maxSpeakers: z.number().optional(),
+  error: z.string().optional(),
+});
+
 const TaskSchema = z.object({
   taskId: z.string(),
   status: z.string().optional(),
@@ -15,7 +24,11 @@ const TaskSchema = z.object({
   assUrl: z.string().optional(),
 });
 
-type Task = z.infer<typeof TaskSchema>;
+const TaskBatchSchema = TaskSchema.extend({
+  batchUpdate: z.array(BatchSchema).optional(),
+});
+
+type Task = z.infer<typeof TaskBatchSchema>;
 let db: Db | null = null;
 
 const connectToDb = async () => {
@@ -43,7 +56,7 @@ const ensureIndexes = async () => {
 };
 
 export const createTask = async (taskId: string, taskData: Partial<Task>) => {
-  const parsedData = TaskSchema.parse({ taskId, ...taskData });
+  const parsedData = TaskBatchSchema.parse({ taskId, ...taskData });
   const collection = await getTasksCollection();
   await collection.insertOne({
     ...parsedData,
@@ -52,7 +65,7 @@ export const createTask = async (taskId: string, taskData: Partial<Task>) => {
 };
 
 export const updateTask = async (taskId: string, updates: Partial<Task>) => {
-  const parsedUpdates = TaskSchema.partial().parse(updates);
+  const parsedUpdates = TaskBatchSchema.partial().parse(updates);
   const collection = await getTasksCollection();
   await collection.updateOne(
     { taskId },
@@ -60,10 +73,35 @@ export const updateTask = async (taskId: string, updates: Partial<Task>) => {
   );
 };
 
+// export const updateTask = async (
+//   taskId: string,
+//   updates: Partial<Task>,
+//   batchUpdateItem?: z.infer<typeof BatchSchema>,
+// ) => {
+//   const parsedUpdates = TaskBatchSchema.partial().parse(updates);
+
+//   // Parse batchUpdateItem if provided
+//   const parsedBatchUpdateItem = batchUpdateItem
+//     ? BatchSchema.parse(batchUpdateItem)
+//     : null;
+
+//   const updateQuery: Record<string, unknown> = {
+//     $set: { ...parsedUpdates, updatedAt: new Date().toISOString() },
+//   };
+
+//   // Add $push operation for batchUpdate if batchUpdateItem is provided
+//   if (parsedBatchUpdateItem) {
+//     updateQuery.$push = { batchUpdate: parsedBatchUpdateItem };
+//   }
+
+//   const collection = await getTasksCollection();
+//   await collection.updateOne({ taskId }, updateQuery);
+// };
+
 export const getTask = async (taskId: string): Promise<Task | null> => {
   const collection = await getTasksCollection();
   const taskData = await collection.findOne({ taskId });
-  return taskData ? TaskSchema.parse(taskData) : null;
+  return taskData ? TaskBatchSchema.parse(taskData) : null;
 };
 
 ensureIndexes().catch((err) => {

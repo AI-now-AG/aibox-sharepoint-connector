@@ -9,6 +9,7 @@ import {
   FEATURE_PLAINTEXT_ROUTE,
   FEATURE_SUBTITLES_ROUTE,
   FEATURE_SUMMARY_ROUTE,
+  FEATURE_LARGEFILE_ROUTE,
 } from "$constants";
 import type { APIContext, MiddlewareNext } from "astro";
 import tenantModel, { TenantFeature } from "$data/models/tenant.model";
@@ -110,13 +111,17 @@ async function restrictAccess(context: APIContext, next: MiddlewareNext) {
       hasAccess =
         context.locals.tenant.transcriptions?.plaintext?.enabled ?? true;
     }
-    if (context.url.pathname === FEATURE_SUBTITLES_ROUTE) {
+    else if (context.url.pathname === FEATURE_SUBTITLES_ROUTE) {
       hasAccess =
         context.locals.tenant.transcriptions?.subtitles?.enabled ?? true;
     }
-    if (context.url.pathname === FEATURE_SUMMARY_ROUTE) {
+    else if (context.url.pathname === FEATURE_SUMMARY_ROUTE) {
       hasAccess =
         context.locals.tenant.transcriptions?.summary?.enabled ?? true;
+    }
+    else if (context.url.pathname === FEATURE_LARGEFILE_ROUTE) {
+      hasAccess =
+        context.locals.tenant.transcriptions?.largefile?.enabled ?? true;
     }
 
     if (matchPath && !hasAccess) {

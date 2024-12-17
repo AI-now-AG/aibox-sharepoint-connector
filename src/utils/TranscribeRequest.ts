@@ -28,4 +28,16 @@ export enum TranscriptionType {
   Plaintext = "plaintext",
   Summarize = "summary",
   Subtitles = "subtitles",
+  Largefile = "largefile",
+}
+
+export interface TranscriptionResult {
+  success: boolean;
+  data: {
+    text: string;
+    urls: {
+      [key: string]: string;
+    };
+  } | null;
+  error: string | null;
 }

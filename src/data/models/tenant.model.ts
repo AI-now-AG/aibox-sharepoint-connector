@@ -57,6 +57,12 @@ export const TranscriptionsSchema = z.object({
       text: z.string().optional(),
     })
     .optional(),
+  largefile: z
+    .object({
+      enabled: z.boolean().default(false),
+      text: z.string().optional(),
+    })
+    .optional(),
 });
 
 const TenantSchema = z.object({

@@ -14,9 +14,11 @@ import {
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import {
   type TranscribeRequest,
+  type TranscriptionResult,
   FileFormat,
   TranscriptionType,
 } from "$utils/TranscribeRequest";
+import { processTranscription } from "./batchTranscription";
 
 const DEFAULT_WHISPER_MODEL_NAME = "whisper-1";
 const DEFAULT_API_VERSION = "2024-08-01-preview";
@@ -190,16 +192,7 @@ export const improveTextQuality = async (
 
 export async function transcribeUsingOpenAI(
   transcribeParams: TranscribeRequest,
-): Promise<{
-  success: boolean;
-  data: {
-    text: string;
-    urls: {
-      [key: string]: string;
-    };
-  } | null;
-  error: string | null;
-}> {
+): Promise<TranscriptionResult> {
   try {
     const { audioBuffer, fileName } = transcribeParams;
 
@@ -265,7 +258,7 @@ export async function transcribeUsingOpenAI(
       let srtData: Entry[] = [],
         improvedSrtData: Entry[] = [],
         grouped: Entry[] = [];
-      let fileFormats = transcribeParams.selectedFileFormat ?? [];
+      const fileFormats = transcribeParams.selectedFileFormat ?? [];
       if (
         fileFormats.includes(FileFormat.SRT) ||
         fileFormats.includes(FileFormat.ASS) ||
@@ -344,18 +337,80 @@ export async function transcribeUsingOpenAI(
   }
 }
 
+export async function transcribeUsingAzureOpenAI(
+  transcribeParams: TranscribeRequest,
+): Promise<TranscriptionResult> {
+  try {
+    const { jsonData, transcriptionText } = await processTranscription(
+      transcribeParams.uploadUrl,
+      transcribeParams.uniqueName,
+    );
+
+    const fileNameWithExtension = transcribeParams.uploadUrl
+      .split("/")
+      .pop()!
+      .split("?")[0];
+    const fileNameWithoutExtension = fileNameWithExtension
+      .split(".")
+      .slice(0, -1)
+      .join(".");
+    const outputURLs: { [key: string]: string } = {};
+    outputURLs["json"] = await uploadOutputToBlob(
+      transcribeParams.folderName,
+      `${fileNameWithoutExtension}.json`,
+      JSON.stringify(jsonData),
+      "json",
+      transcribeParams.transcriptionType,
+    );
+
+    outputURLs["txt"] = await uploadOutputToBlob(
+      transcribeParams.folderName,
+      `${fileNameWithoutExtension}.txt`,
+      transcriptionText,
+      "txt",
+      transcribeParams.transcriptionType,
+    );
+
+    return {
+      success: true,
+      data: { text: transcriptionText, urls: outputURLs },
+      error: null,
+    };
+  } catch (error) {
+    console.error("Error during batch transcription::", error);
+    let errorMessage = "Transcription failed.";
+    if (error instanceof RateLimitError) {
+      errorMessage =
+        "Rate limit exceeded. Please try again later or upgrade your plan.";
+    } else if (
+      typeof error === "object" &&
+      error !== null &&
+      "message" in error
+    ) {
+      errorMessage = error.message as string;
+    }
+
+    return { success: false, data: null, error: errorMessage };
+  }
+}
+
 async function uploadOutputToBlob(
   folderName: string,
   blobName: string,
   content: string,
   format: string,
+  typedTranscriptionType?: TranscriptionType,
 ): Promise<string> {
-  const storageURLString: string = process.env.AZURE_BLOB_STORAGE_NAME || "";
-
+  const storageURLString =
+    typedTranscriptionType === TranscriptionType.Largefile
+      ? process.env.AZURE_BLOB_LARGE_STORAGE_NAME || ""
+      : process.env.AZURE_BLOB_STORAGE_NAME || "";
   const blobServiceClient =
     BlobServiceClient.fromConnectionString(storageURLString);
   const containerName =
-    process.env.AZURE_CONTAINER_NAME || "transcribecontainer";
+    typedTranscriptionType === TranscriptionType.Largefile
+      ? process.env.AZURE_LARGE_CONTAINER_NAME || "transcribe-container"
+      : process.env.AZURE_CONTAINER_NAME || "transcribecontainer";
   const containerClient = blobServiceClient.getContainerClient(containerName);
   const blobPath = `${folderName}/${blobName}`;
   const blockBlobClient = containerClient.getBlockBlobClient(blobPath);

@@ -7,10 +7,16 @@ import { createWriteStream, unlinkSync, existsSync } from "fs";
 import { promisify } from "util";
 import { pipeline } from "stream";
 import { getTask } from "$shared/transcriptionTasks";
+import { TranscriptionType } from "$utils/TranscribeRequest";
 
 const checkFileExist: Handler = async (event, context) => {
-  const { uniqueName, fileNames, folderName, isShowImprovedTextPreview } =
-    JSON.parse(event.body!);
+  const {
+    uniqueName,
+    fileNames,
+    folderName,
+    isShowImprovedTextPreview,
+    typedTranscriptionType,
+  } = JSON.parse(event.body!);
 
   let requireFilesCount = fileNames.length || 0;
   const tempFileNames: string[] = [];
@@ -30,12 +36,16 @@ const checkFileExist: Handler = async (event, context) => {
   if ((fileNames?.length || tempFileNames.length) && uniqueName) {
     const streamPipeline = promisify(pipeline);
     const tmpDir = tmpdir();
-    let storageURLString: string = process.env.AZURE_BLOB_STORAGE_NAME || "";
-
+    const storageURLString =
+      typedTranscriptionType === TranscriptionType.Largefile
+        ? process.env.AZURE_BLOB_LARGE_STORAGE_NAME || ""
+        : process.env.AZURE_BLOB_STORAGE_NAME || "";
     const blobServiceClient =
       BlobServiceClient.fromConnectionString(storageURLString);
     const containerName =
-      process.env.AZURE_CONTAINER_NAME || "transcribecontainer";
+      typedTranscriptionType === TranscriptionType.Largefile
+        ? process.env.AZURE_LARGE_CONTAINER_NAME || "transcribe-container"
+        : process.env.AZURE_CONTAINER_NAME || "transcribecontainer";
     const containerClient = blobServiceClient.getContainerClient(containerName);
     const availableFiles: string[] = [];
     const downloadedFiles: { name: string; path: string }[] = [];
