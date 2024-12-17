@@ -52,17 +52,17 @@
           {isEditable}
           data={card}
           active={selectedCardIndex == index}
-          onSelectCart={(_data) => selectCard(index)}
-          onSelectEdit={(_data) => {
+          onSelectCart={() => selectCard(index)}
+          onSelectEdit={() => {
             editCard(index);
           }}
-          onSelectDuplicate={(_data) => {
+          onSelectDuplicate={() => {
             // TODO: Handle copy
           }}
-          onSelectReOder={(_data) => {
+          onSelectReOder={() => {
             // TODO: Handle Order
           }}
-          onSelectDelete={(_data) => {
+          onSelectDelete={() => {
             // TODO: Handle Delete
           }}
         />

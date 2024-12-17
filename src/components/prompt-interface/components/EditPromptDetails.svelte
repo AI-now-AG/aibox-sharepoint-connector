@@ -26,7 +26,7 @@
 
   let categories: Category[] = [];
   let selectedCategory: Category;
-  let selectedGroup: Group;
+  let selectedGroup: Group | any;
 
   let previousCategoryId: string | null = null;
   $: if (selectedCategory && selectedCategory._id !== previousCategoryId) {

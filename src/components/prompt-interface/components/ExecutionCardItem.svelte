@@ -47,15 +47,15 @@
             handleMouseLeave();
             onSelectEdit?.(data);
           }}
-          onSelectDuplicate={(_data) => {
+          onSelectDuplicate={() => {
             handleMouseLeave();
             onSelectDuplicate?.(data);
           }}
-          onSelectReOder={(_data) => {
+          onSelectReOder={() => {
             handleMouseLeave();
             onSelectReOder?.(data);
           }}
-          onSelectDelete={(_data) => {
+          onSelectDelete={() => {
             handleMouseLeave();
             onSelectDelete?.(data);
           }}
