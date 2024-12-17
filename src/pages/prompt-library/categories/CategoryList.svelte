@@ -20,6 +20,7 @@
   export let title: string = "";
   export let isEditable: boolean = false;
 
+  let categoryToDelete: string;
   let confirmDeleteModal: HTMLDialogElement;
   const flipDurationMs = 200;
   const t = useTranslations();
@@ -29,50 +30,36 @@
     console.log("finalize items", { items });
   }
 
-  const showDeleteConfirmationDlg = (id: string) => {
-    document
-      .querySelector<HTMLDialogElement>(`#delete_confirmation_modal_${id}`)
-      ?.showModal();
-  };
-
-  function showSuccessToast(type) {
-    const translationKey = `prompt-library.delete.categories.success`;
-    addToast({
-      message: t(translationKey),
-      type: "success",
-    });
+  async function handleDelete(categoryId) {
+    categoryToDelete = categoryId;
+    confirmDeleteModal.show();
   }
 
-  function showErrorToast(type) {
-    const translationKey = `prompt-library.delete.categories.failed`;
-    addToast({
-      message: t(translationKey),
-      type: "error",
-    });
-  }
-
-  async function deleteCategory(id: string) {
+  async function deleteCategory() {
     try {
       const response = await fetch(`/api/categories.json`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ _id: id }),
+        body: JSON.stringify({ _id: categoryToDelete }),
       });
 
       if (response.ok) {
-        items = items.filter((card) => item.id !== id);
-        showSuccessToast(type);
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
+        items = items.filter((item) => item.id !== categoryToDelete);
+        addToast({
+          message: t(`prompt-library.delete.categories.success`),
+          type: "success",
+        });
       } else {
         throw new Error("Failed to delete");
       }
     } catch (error) {
       console.log(error);
-      showErrorToast(type);
+      addToast({
+        message: t(`prompt-library.delete.categories.failed`),
+        type: "error",
+      });
     }
   }
 </script>
@@ -165,7 +152,7 @@
                 <li>
                   <button
                     class="flex block w-full text-left px-4 py-1 text-sm hover:underline"
-                    on:click={() => confirmDeleteModal.show()}
+                    on:click={() => handleDelete(item.id)}
                   >
                     {@html svgIcons.trash}
                     <span class="ml-1">Delete</span>
