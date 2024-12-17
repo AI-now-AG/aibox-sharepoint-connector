@@ -18,6 +18,8 @@ const categoriesEnriched: ListItem[] = categories.map((category) => ({
   id: category._id.toString(),
   title: category.title,
   instruction: "",
+  active: category.active,
+  postion: category.position,
 }));
 
 let userPermissions = Astro.locals.user.permissions;

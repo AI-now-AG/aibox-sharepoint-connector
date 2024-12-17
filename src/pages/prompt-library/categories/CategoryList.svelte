@@ -14,11 +14,13 @@
   import { addToast } from "$stores/toast";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
+  import ConfirmDeleteDialog from "./ConfirmDeleteDialog.svelte";
 
   export let items: ListItem[] = [];
   export let title: string = "";
   export let isEditable: boolean = false;
 
+  let confirmDeleteModal: HTMLDialogElement;
   const flipDurationMs = 200;
   const t = useTranslations();
 
@@ -49,7 +51,7 @@
     });
   }
 
-  async function deleteItem(id: string) {
+  async function deleteCategory(id: string) {
     try {
       const response = await fetch(`/api/categories.json`, {
         method: "DELETE",
@@ -80,6 +82,7 @@
     {title}
   </h1>
 
+  <!-- drag and drop list -->
   <div class="relative">
     <div class="flex items-center bg-base-300 py-3 px-4 rounded-lg">
       <div class="flex-none w-64 text-left font-normal text-xs rounded-l-lg">
@@ -149,18 +152,24 @@
                   </a>
                 </li>
                 <li>
-                  <a
-                    href="#state"
+                  <button
                     class="flex block w-full text-left px-4 py-1 text-sm hover:underline"
-                    on:click={() => console.log("item")}
+                    on:click={() => console.log("touch status", item)}
                   >
-                    {@html item.active == 1
-                      ? svgIcons.archive
-                      : svgIcons.active}
+                    {@html item.active == 1 ? svgIcons.eyeClose : svgIcons.eye}
                     <span class="ml-1"
                       >{item.active == 1 ? "deactivate" : "activate"}</span
                     >
-                  </a>
+                  </button>
+                </li>
+                <li>
+                  <button
+                    class="flex block w-full text-left px-4 py-1 text-sm hover:underline"
+                    on:click={() => confirmDeleteModal.show()}
+                  >
+                    {@html svgIcons.trash}
+                    <span class="ml-1">Delete</span>
+                  </button>
                 </li>
               </ul>
             </div>
@@ -169,4 +178,10 @@
       {/each}
     </section>
   </div>
+
+  <!-- confirm delete dialog -->
+  <ConfirmDeleteDialog
+    bind:modal={confirmDeleteModal}
+    on:confirm={deleteCategory}
+  />
 </div>

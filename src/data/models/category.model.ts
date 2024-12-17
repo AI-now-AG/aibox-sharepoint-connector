@@ -14,6 +14,8 @@ const CategorySchema = z.object({
   title: z.string(),
   slug: z.string(),
   icon: z.string().optional(),
+  active: z.boolean().default(true).optional(),
+  position: z.number().default(0).optional(),
   created_at: z.date().optional(),
   updated_at: z.date().optional(),
 });
@@ -47,8 +49,14 @@ const convertObjectIdToString = (category: Document<Category>) => {
 export default {
   add: async (category: Category) => {
     const validated = CategoryGroupSchema.parse(category);
-
-    return collection.insertOne(validated);
+    const doc = {
+      ...{
+        active: true,
+        position: 0,
+      },
+      ...validated,
+    };
+    return collection.insertOne(doc);
   },
 
   remove: async (id: string) => {
