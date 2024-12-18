@@ -2,9 +2,12 @@
 
 import type { PollStatusResponse } from "$utils/Speech/PollStatusResponse";
 import type { TranscriptionRequestBody } from "$utils/Speech/SpeechRequest";
-import type { TranscriptionResponse } from "$utils/Speech/SpeechResponse";
+import type {
+  RecognizedPhrase,
+  TranscriptionResponse,
+} from "$utils/Speech/SpeechResponse";
 import type { GetTranscriptionResultResponse } from "$utils/Speech/SpeechResultResponse";
-import { updateTask } from "$shared/transcriptionTasks";
+import { type BatchTask, updateTask } from "$shared/transcriptionTasks";
 
 const subscriptionKey = process.env.AZURE_LARGE_SPEECH_KEY || "";
 
@@ -16,8 +19,6 @@ export async function processTranscription(
   numberOfMaxSpeakers: number = 2,
 ): Promise<{ jsonData: TranscriptionResponse; transcriptionText: string }> {
   try {
-    console.log("unique name:")
-    console.log(uniqueName)
     // Step 1: Create transcription task
     updateStatus(
       uniqueName,
@@ -30,6 +31,7 @@ export async function processTranscription(
       blobUrl,
       enableDiarization,
       numberOfMaxSpeakers,
+      uniqueName,
     );
     updateStatus(
       uniqueName,
@@ -42,7 +44,10 @@ export async function processTranscription(
 
     // Step 2: Poll transcription task status
     updateStatus(uniqueName, "Polling initiated");
-    const pollResponse = await pollTranscriptionTask(taskResponse.self);
+    const pollResponse = await pollTranscriptionTask(
+      taskResponse.self,
+      uniqueName,
+    );
     updateStatus(
       uniqueName,
       "Polling completed",
@@ -68,7 +73,10 @@ export async function processTranscription(
 
     // Step 4: Fetch transcription data
     updateStatus(uniqueName, "Get file data");
-    const transcriptionData = await fetchTranscription(transcriptionUrl);
+    const transcriptionData = await fetchTranscription(
+      transcriptionUrl,
+      enableDiarization,
+    );
     updateStatus(uniqueName, "Fetch file data completed");
 
     return transcriptionData;
@@ -83,9 +91,11 @@ export async function createTranscriptionTask(
   blobUrl: string,
   enableDiarization: boolean = false,
   numberOfMaxSpeakers: number = 2,
+  uniqueName: string,
 ): Promise<PollStatusResponse> {
   const url = `https://${process.env.AZURE_LARGE_SPEECH_REGION}.api.cognitive.microsoft.com/speechtotext/v3.2/transcriptions`;
   const destinationContainerUrl = `${process.env.AZURE_LARGE_DESTINATION_URL}${process.env.AZURE_LARGE_CONTAINER_NAME}`;
+  //const destinationContainerUrl = "https://aiboxstore.blob.core.windows.net/transcription-container?sp=racwdli&st=2024-12-18T11:58:18Z&se=2024-12-18T19:58:18Z&sv=2022-11-02&sr=c&sig=94abClhrwhVX32lHdiS2%2B63mtoDHO5meHbNIVHFN8WQ%3D";
   const body: TranscriptionRequestBody = {
     displayName: "My Transcription",
     locale: "de-ch",
@@ -124,7 +134,15 @@ export async function createTranscriptionTask(
 
   if (!response.ok) {
     const errorDetails = await response.json();
-    console.log(errorDetails);
+    updateStatus(
+      uniqueName,
+      "Create Batch task failed",
+      "Failed",
+      undefined,
+      undefined,
+      undefined,
+      `${errorDetails}`,
+    );
     throw new Error(
       `Failed to create batch transcription: ${errorDetails.message}`,
     );
@@ -137,9 +155,9 @@ export async function createTranscriptionTask(
 // Step 3: Poll for Transcription Task Completion
 export async function pollTranscriptionTask(
   transcriptionIdUrl: string,
+  uniqueName: string,
 ): Promise<PollStatusResponse> {
   while (true) {
-    console.log(transcriptionIdUrl);
     const response = await fetch(transcriptionIdUrl, {
       method: "GET",
       headers: { "Ocp-Apim-Subscription-Key": subscriptionKey },
@@ -156,7 +174,18 @@ export async function pollTranscriptionTask(
     if (data.status === "Succeeded") {
       return data;
     } else if (data.status === "Failed") {
-      throw new Error("Poll batch transcription task failed.");
+      updateStatus(
+        uniqueName,
+        "Create Batch task failed",
+        "Failed",
+        undefined,
+        undefined,
+        undefined,
+        `${JSON.stringify(data)}`,
+      );
+      throw new Error(
+        `Poll transcription task failed: ${data.properties.error?.message}`,
+      );
     }
 
     // Wait 5 seconds before polling again
@@ -183,7 +212,6 @@ export async function getTranscriptionContentUrl(
   }
 
   const data: GetTranscriptionResultResponse = await response.json();
-  console.log(data);
   const transcriptionFile = data.values.find(
     (obj) => obj.kind === "Transcription",
   );
@@ -204,6 +232,7 @@ export async function getTranscriptionContentUrl(
 // Step 5: Fetch Transcription Results
 export async function fetchTranscription(
   filesUrl: string,
+  enableDiarization: boolean = false,
 ): Promise<{ jsonData: TranscriptionResponse; transcriptionText: string }> {
   const response = await fetch(filesUrl, {
     method: "GET",
@@ -223,11 +252,41 @@ export async function fetchTranscription(
     throw new Error("No transcription result found.");
   }
 
-  const transcriptionText = combinedPhrases
+  let transcriptionText = combinedPhrases
     .map((phrase) => phrase.display) // Extract 'display' from each phrase
     .join(" "); // Combine all phrases into a single string
-
+  if (enableDiarization) {
+    transcriptionText = formatTranscription(data);
+  }
   return { jsonData: data, transcriptionText };
+}
+
+function formatTranscription(response: TranscriptionResponse): string {
+  let result = "";
+  const speakerMap: Map<number, string> = new Map(); // To keep track of the speaker labels
+
+  // Loop through the recognized phrases and format them
+  response.recognizedPhrases.forEach((phrase: RecognizedPhrase) => {
+    const speakerId = phrase.speaker;
+    const bestMatch = phrase.nBest.reduce((best, current) => {
+      return current.confidence > best.confidence ? current : best;
+    });
+    const displayText = bestMatch.display;
+
+    let speakerLabel = undefined;
+    if (speakerId) {
+      // Check if this speaker has been assigned a label
+      if (!speakerMap.has(speakerId)) {
+        // Assign a new label for the speaker if not already assigned
+        speakerMap.set(speakerId, `Speaker ${speakerId}`);
+      }
+      speakerLabel = speakerMap.get(speakerId);
+    }
+
+    result += `${speakerLabel && `[${speakerLabel}]`}\n${displayText}\n\n`;
+  });
+
+  return result;
 }
 
 async function updateStatus(
@@ -239,16 +298,13 @@ async function updateStatus(
   taskUrl?: string,
   error?: string,
 ) {
-//   updateTask(
-//     uniqueName,
-//     { status: "processing" },
-//     {
-//       name: name,
-//       status: status,
-//       taskUrl: taskUrl,
-//       diarizationEnabled: diarizationEnabled,
-//       maxSpeakers: maxSpeakers,
-//       error: error,
-//     },
-//   );
+  const updates: Partial<BatchTask> = {
+    name,
+    ...(status !== undefined && { status }),
+    ...(diarizationEnabled !== undefined && { diarizationEnabled }),
+    ...(maxSpeakers !== undefined && { maxSpeakers }),
+    ...(taskUrl !== undefined && { taskUrl }),
+    ...(error !== undefined && { error }),
+  };
+  await updateTask(uniqueName, { status: "processing" }, updates);
 }

@@ -344,6 +344,8 @@ export async function transcribeUsingAzureOpenAI(
     const { jsonData, transcriptionText } = await processTranscription(
       transcribeParams.uploadUrl,
       transcribeParams.uniqueName,
+      transcribeParams.isDiarizationEnabled,
+      transcribeParams.maxSpeakers,
     );
 
     const fileNameWithExtension = transcribeParams.uploadUrl

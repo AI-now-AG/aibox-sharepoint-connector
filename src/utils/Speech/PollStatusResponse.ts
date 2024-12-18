@@ -15,10 +15,16 @@ export interface PollStatusResponse {
     languageIdentification: {
       candidateLocales: string[];
     };
+    error?: ErrorResponse;
   };
   lastActionDateTime: string;
   status: string; // "NotStarted" | "Running" | "Succeeded" | "Failed"
   createdDateTime: string;
   locale: string;
   displayName: string;
+}
+
+interface ErrorResponse {
+  code: string;
+  message: string;
 }

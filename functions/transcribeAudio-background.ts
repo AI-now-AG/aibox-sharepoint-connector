@@ -15,6 +15,7 @@ import {
   type TranscribeRequest,
   type TranscriptionResult,
 } from "$utils/TranscribeRequest";
+import { ObjectId } from "mongodb";
 
 const transcribeAudio: Handler = async (
   event: HandlerEvent,
@@ -51,7 +52,11 @@ const transcribeAudio: Handler = async (
     console.log("encryptedApiKey", encryptedApiKey);
     console.log("decryptedApiKey", azureOpenAIApiKey);
 
-    createTask(uniqueName, { status: "processing" });
+    createTask(uniqueName, {
+      tenant_id: new ObjectId(transcribeParams.tenantId),
+      creator_id: new ObjectId(transcribeParams.userId),
+      status: "processing",
+    });
     let transcriptionResult: TranscriptionResult = {
       success: false,
       data: null,

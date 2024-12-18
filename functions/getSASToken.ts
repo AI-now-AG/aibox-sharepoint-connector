@@ -4,9 +4,12 @@ import { type Handler } from "@netlify/functions";
 import { v4 as uuidv4 } from "uuid"; // To generate unique file names
 
 const getSASToken: Handler = async (event) => {
-  const { fileNameWithoutExtension, folderName, transcriptionType } =
-    JSON.parse(event.body!);
-
+  const {
+    fileNameWithoutExtension,
+    fileExtension,
+    folderName,
+    transcriptionType,
+  } = JSON.parse(event.body!);
   const typedTranscriptionType = transcriptionType as TranscriptionType;
 
   // Input validation
@@ -35,7 +38,7 @@ const getSASToken: Handler = async (event) => {
     await containerClient.createIfNotExists();
     const uniqueFilename = uuidv4();
     const fileName = `${fileNameWithoutExtension}_${uniqueFilename}`;
-    const blobName = `${folderName}/${fileName}.mp3`;
+    const blobName = `${folderName}/${fileName}.${fileExtension}`;
 
     const blobClient = containerClient.getBlockBlobClient(blobName);
 

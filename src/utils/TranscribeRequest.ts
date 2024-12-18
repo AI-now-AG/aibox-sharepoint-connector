@@ -6,6 +6,8 @@ export interface TranscribeRequest {
   uniqueName: string;
   uploadUrl: string;
   transcriptions: Transcriptions;
+  tenantId: string;
+  userId: string;
   transcriptionType?: TranscriptionType;
   selectedFileFormat?: FileFormat[];
   isShowImprovedTextPreview?: boolean;
@@ -16,6 +18,8 @@ export interface TranscribeRequest {
   azureOpenAIChatModel?: string;
   azureOpenAIApiKey?: string;
   audioBuffer?: Buffer;
+  isDiarizationEnabled?: boolean;
+  maxSpeakers?: number;
 }
 
 export enum FileFormat {

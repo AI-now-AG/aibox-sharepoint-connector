@@ -4,23 +4,30 @@ export type DisplayWord = {
   duration: string;
   offsetInTicks: number;
   durationInTicks: number;
+  durationMilliseconds?: number;
+  offsetMilliseconds?: number;
+};
+
+export type NBest = {
+  confidence: number;
+  lexical: string;
+  itn: string;
+  maskedITN: string;
+  display: string;
+  displayWords: DisplayWord[];
 };
 
 export type RecognizedPhrase = {
   recognitionStatus: string;
   channel: number;
+  speaker?: number;
   offset: string;
   duration: string;
   offsetInTicks: number;
   durationInTicks: number;
-  nBest: Array<{
-    confidence: number;
-    lexical: string;
-    itn: string;
-    maskedITN: string;
-    display: string;
-    displayWords: DisplayWord[];
-  }>;
+  durationMilliseconds?: number;
+  offsetMilliseconds?: number;
+  nBest: Array<NBest>;
 };
 
 export type CombinedRecognizedPhrase = {
