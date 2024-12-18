@@ -9,7 +9,7 @@ import auth from "$auth/auth";
 
 const t = useTranslations();
 
-const cursor = await Category.listByTenant(Astro.locals.user.tenant_id);
+const cursor = await Category.listActiveByTenant(Astro.locals.user.tenant_id);
 const categories = await cursor.toArray();
 
 const navState = Astro.locals.user.navState || {};
@@ -294,7 +294,7 @@ const modules = [
       const details = element as HTMLDetailsElement;
       const detailsId = details.getAttribute("data-id") || "";
       details.addEventListener("toggle", () =>
-        updateNavState(detailsId, details.open),
+        updateNavState(detailsId, details.open)
       );
     });
   }

@@ -73,7 +73,13 @@ export default {
   listByTenant: async (id: ObjectId) => {
     return collection
       .find<Document<Category>>({ tenant_id: id })
-      .sort({ position: 1 });
+      .sort({ position: 1, created_at: 1 });
+  },
+
+  listActiveByTenant: async (id: ObjectId) => {
+    return collection
+      .find<Document<Category>>({ tenant_id: id, active: true })
+      .sort({ position: 1, created_at: 1 });
   },
 
   get: async (id: string) => {
