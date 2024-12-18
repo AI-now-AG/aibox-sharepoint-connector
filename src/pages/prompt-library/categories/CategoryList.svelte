@@ -3,15 +3,14 @@
     id: string;
     title: string;
     description?: string;
-    instruction: string;
     tags?: string[];
+    active?: boolean;
   }
 </script>
 
 <script lang="ts">
   import { actions } from "astro:actions";
-  import { dndzone, type DndEvent } from "svelte-dnd-action";
-  import { flip } from "svelte/animate";
+  import { dndzone } from "svelte-dnd-action";
   import { addToast } from "$stores/toast";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
@@ -27,19 +26,19 @@
   let timeout: any;
   const t = useTranslations();
 
-  function handleDndConsider(e: DndEvent) {
+  function handleDndConsider(e: CustomEvent) {
     items = e.detail.items;
-    console.log("consider dispatched", { items });
+    //console.log("category list / consider dispatched", { items });
   }
 
-  function handleDndFinalize(e: DndEvent) {
+  function handleDndFinalize(e: CustomEvent) {
     items = e.detail.items;
 
     clearTimeout(timeout);
     timeout = setTimeout(() => {
       updatePosition(items);
     }, 300);
-    console.log("finalize dispatched", { items });
+    //console.log("category list / finalize dispatched", { items });
   }
 
   async function handleDelete(categoryId: string) {
@@ -136,7 +135,9 @@
         <div
           class="flex items-center h-16 bg-base-100 hover:bg-base-300 text-sm rounded-lg py-3 px-4 mt-3 dnd-item"
         >
-          <div class="flex-none w-64 flex text-sm font-medium rounded-l-lg">
+          <div
+            class="flex-none w-64 flex items-center text-sm font-medium rounded-l-lg"
+          >
             <span class="inline-flex mr-3">
               {@html svgIcons.drag}
             </span>

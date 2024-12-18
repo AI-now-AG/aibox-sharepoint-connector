@@ -1,12 +1,10 @@
 <script lang="ts">
-  import type {
-    CreateCategoryParams,
-    GroupParam,
-  } from "$pages/api/categories.json";
+  import type { CreateCategoryParams } from "$pages/api/categories.json";
   import { onMount } from "svelte";
   import { useTranslations } from "$i18n/utils";
   import { addToast } from "$stores/toast";
   import { svgIcons } from "$assets/icons";
+  import GroupList, { type GroupItem } from "./GroupList.svelte";
   const t = useTranslations();
 
   /**
@@ -15,7 +13,7 @@
    */
 
   let title: string | undefined;
-  let groups: GroupParam[] = [];
+  let groups: GroupItem[] = [];
 
   export let categoryId: string | undefined = undefined;
   export let category: CreateCategoryParams | undefined = undefined;
@@ -25,7 +23,11 @@
   onMount(async function () {
     if (category) {
       title = category.title;
-      groups = category.groups;
+      groups = category.groups.map((group) => ({
+        id: group?._id?.toString(),
+        title: group.title,
+        active: group?.active,
+      }));
     }
   });
 
@@ -82,17 +84,6 @@
       });
     }
   }
-
-  function addGroup() {
-    const newGroup: GroupParam = {
-      title: "",
-    };
-    groups = [...groups, newGroup];
-  }
-
-  function removeGroup(index: number) {
-    groups = groups.filter((_, i) => i !== index);
-  }
 </script>
 
 <div class="container max-w-5xl p-6 mx-auto p-4">
@@ -109,7 +100,7 @@
         {/if}
       </h1>
     </div>
-    <form class="rounded pt-6 mb-4 space-y-6">
+    <form class="rounded pt-6 mb-4">
       <div class="grid grid-cols-1 gap-4 justify-center">
         <div>
           <p class="mb-2">{t("prompt-library.add.categories.title")}*</p>
@@ -122,51 +113,8 @@
         </div>
       </div>
 
-      <div>
-        <div class="flex items-center mb-2 space-x-4">
-          <p class="text-xl">Add a new group by clicking on</p>
-
-          <button
-            class="btn btn-active btn-neutral font-normal grow-0"
-            on:click|preventDefault={addGroup}
-          >
-            {@html svgIcons.add}
-            Add a group
-          </button>
-        </div>
-        <div class="grid grid-cols-1 gap-4 justify-center">
-          {#each groups as _text, index (index)}
-            <div class="flex flex-row items-center gap-4">
-              <label class="input input-bordered flex items-center gap-2">
-                <input
-                  type="text"
-                  bind:value={groups[index].title}
-                  placeholder="e.g. Headline"
-                  class="grow w-full min-w-xs"
-                />
-              </label>
-              <button
-                class="btn btn-sm btn-circle btn-outline"
-                on:click|preventDefault={() => removeGroup(index)}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-            </div>
-          {/each}
-        </div>
+      <div class="mt-5 mb-20">
+        <GroupList bind:items={groups} />
       </div>
 
       {#if isEditable}

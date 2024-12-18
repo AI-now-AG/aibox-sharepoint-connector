@@ -6,6 +6,8 @@ export const GroupSchema = z.object({
   _id: z.instanceof(ObjectId).optional(),
   title: z.string(),
   slug: z.string().optional(),
+  active: z.boolean().default(true).optional(),
+  position: z.number().default(0).optional(),
 });
 
 const CategorySchema = z.object({

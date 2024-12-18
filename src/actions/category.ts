@@ -1,8 +1,7 @@
 import { defineAction } from "astro:actions";
 import { z } from "zod";
-import { ObjectId } from "mongodb";
 import { transformRawData } from "$utils/transformRawData";
-import categoryModel from "$data/models/category.model";
+import categoryModel, { type Category } from "$data/models/category.model";
 
 const CategoryInputIdentifierSchema = z.object({
   _id: z.string(),
@@ -38,7 +37,7 @@ export const category = {
   updatePosition: defineAction({
     input: CategoryInputListIdentifierSchema,
     handler: async (input) => {
-      const items: string[] = [];
+      const items: Category[] = [];
       for (const [index, item] of input.entries()) {
         const updateResult = await categoryModel.update(item._id, {
           position: index,

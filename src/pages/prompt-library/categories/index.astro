@@ -3,11 +3,9 @@ import Layout from "$layouts/Layout.astro";
 import { svgIcons } from "$assets/icons";
 import { useTranslations } from "$i18n/utils";
 import CategoryModel from "$data/models/category.model";
-import CategoryList, {
-  type ListItem,
-} from "$pages/prompt-library/categories/CategoryList.svelte";
+import CategoryList, { type ListItem } from "./CategoryList.svelte";
+
 import { Permission } from "$data/models/user.model";
-import { IterableReadableStream } from "node_modules/@langchain/core/dist/utils/stream";
 
 const t = useTranslations();
 
@@ -21,7 +19,6 @@ const categoriesEnriched: ListItem[] = categories.map((category) => ({
   title: category.title,
   instruction: "",
   active: category.active,
-  postion: category.position,
 }));
 
 let userPermissions = Astro.locals.user.permissions;
