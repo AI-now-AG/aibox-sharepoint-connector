@@ -28,6 +28,7 @@ export type RecognizedPhrase = {
   durationMilliseconds?: number;
   offsetMilliseconds?: number;
   nBest: Array<NBest>;
+  locale?: string;
 };
 
 export type CombinedRecognizedPhrase = {

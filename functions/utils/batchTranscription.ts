@@ -157,6 +157,7 @@ export async function pollTranscriptionTask(
   transcriptionIdUrl: string,
   uniqueName: string,
 ): Promise<PollStatusResponse> {
+  let isRunning = false;
   while (true) {
     const response = await fetch(transcriptionIdUrl, {
       method: "GET",
@@ -176,8 +177,8 @@ export async function pollTranscriptionTask(
     } else if (data.status === "Failed") {
       updateStatus(
         uniqueName,
-        "Create Batch task failed",
-        "Failed",
+        `Poll Batch task ${data.status}`,
+        data.status,
         undefined,
         undefined,
         undefined,
@@ -185,6 +186,17 @@ export async function pollTranscriptionTask(
       );
       throw new Error(
         `Poll transcription task failed: ${data.properties.error?.message}`,
+      );
+    } else if (data.status === "Running" && !isRunning) {
+      isRunning = true;
+      updateStatus(
+        uniqueName,
+        `Poll Batch task ${data.status}`,
+        data.status,
+        undefined,
+        undefined,
+        undefined,
+        `${JSON.stringify(data)}`,
       );
     }
 
@@ -252,39 +264,63 @@ export async function fetchTranscription(
     throw new Error("No transcription result found.");
   }
 
-  let transcriptionText = combinedPhrases
-    .map((phrase) => phrase.display) // Extract 'display' from each phrase
-    .join(" "); // Combine all phrases into a single string
-  if (enableDiarization) {
-    transcriptionText = formatTranscription(data);
-  }
+  const transcriptionText = enableDiarization
+    ? formatTranscription(data)
+    : combinedPhrases
+        .map((phrase) => phrase.display) // Extract 'display' from each phrase
+        .join(" ");
+
   return { jsonData: data, transcriptionText };
 }
 
 function formatTranscription(response: TranscriptionResponse): string {
   let result = "";
-  const speakerMap: Map<number, string> = new Map(); // To keep track of the speaker labels
+  const speakerMap: Map<number, string> = new Map(); // Map to assign speaker labels
+  let currentSpeakerId: number | undefined = undefined;
+  let currentSpeakerText: string = "";
+  let currentSpeakerStartTime: string | undefined = undefined;
+
+  const formatTimestamp = (milliseconds: number): string => {
+    const minutes = Math.floor(milliseconds / 60000);
+    const seconds = Math.floor((milliseconds % 60000) / 1000);
+    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+  };
 
   // Loop through the recognized phrases and format them
-  response.recognizedPhrases.forEach((phrase: RecognizedPhrase) => {
-    const speakerId = phrase.speaker;
-    const bestMatch = phrase.nBest.reduce((best, current) => {
-      return current.confidence > best.confidence ? current : best;
-    });
-    const displayText = bestMatch.display;
+  response.recognizedPhrases.forEach(
+    (phrase: RecognizedPhrase) => {
+      const speakerId = phrase.speaker;
+      const offsetMilliseconds = phrase.offsetMilliseconds;
 
-    let speakerLabel = undefined;
-    if (speakerId) {
-      // Check if this speaker has been assigned a label
-      if (!speakerMap.has(speakerId)) {
-        // Assign a new label for the speaker if not already assigned
-        speakerMap.set(speakerId, `Speaker ${speakerId}`);
+      const bestMatch = phrase.nBest.reduce((best, current) => {
+        return current.confidence > best.confidence ? current : best;
+      });
+      const displayText = bestMatch.display;
+
+      let timestamp = undefined;
+      if (offsetMilliseconds) {
+        timestamp = formatTimestamp(offsetMilliseconds);
       }
-      speakerLabel = speakerMap.get(speakerId);
-    }
 
-    result += `${speakerLabel && `[${speakerLabel}]`}\n${displayText}\n\n`;
-  });
+      if (speakerId && speakerId !== currentSpeakerId) {
+        if (currentSpeakerId) {
+          result += `[Speaker ${currentSpeakerId} ${currentSpeakerStartTime}]\n${currentSpeakerText}\n\n`;
+        }
+        currentSpeakerId = speakerId;
+        currentSpeakerText = displayText;
+        currentSpeakerStartTime = timestamp;
+
+        if (!speakerMap.has(speakerId)) {
+          speakerMap.set(speakerId, `Speaker ${speakerId}`);
+        }
+      } else {
+        currentSpeakerText += ` ${displayText}`;
+      }
+    },
+  );
+  if (currentSpeakerId) {
+    result += `[Speaker ${currentSpeakerId} ${currentSpeakerStartTime}]\n${currentSpeakerText}\n\n`;
+  }
 
   return result;
 }
