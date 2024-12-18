@@ -9,6 +9,7 @@ import type { Category, Group } from "$data/models/category.model";
 const GroupParamSchema = z.object({
   _id: z.string().optional(),
   title: z.string(),
+  active: z.boolean().optional(),
 });
 
 const CreateCategoryParamsSchema = z.object({
@@ -56,6 +57,14 @@ export const GET: APIRoute = async (ctx) => {
 export const POST: APIRoute = async (ctx) => {
   const params = await ctx.request.json();
   const data = CreateCategoryParamsSchema.parse(params);
+  const { tenant_id: tenantId } = ctx.locals.user;
+
+  // Determine the new position
+  const maxPositionCategory = await CategoryModel.getMaxPosition(tenantId);
+  console.log("maxPositionCategory", { maxPositionCategory, tenantId });
+  const newPosition = maxPositionCategory
+    ? (maxPositionCategory?.position || 0) + 1
+    : 1;
 
   const groups = data.groups.reduce<Group[]>((uniqueGroups, group) => {
     if (!uniqueGroups.some((g) => g.title === group.title)) {
@@ -68,14 +77,16 @@ export const POST: APIRoute = async (ctx) => {
     return uniqueGroups;
   }, []);
 
+  // Create the new category
   const now = new Date();
   const newCategory: Category = {
     ...data,
     title: data.title,
     groups: Array.from(groups),
     slug: slug(data.title),
-    tenant_id: ctx.locals.user.tenant_id,
+    tenant_id: tenantId,
     creator_id: ctx.locals.user.id,
+    position: newPosition,
     created_at: now,
     updated_at: now,
     icon: z

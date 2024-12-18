@@ -41,7 +41,11 @@
       isSaving = true;
       const newCategory: CreateCategoryParams = {
         title,
-        groups: groups.map((e) => ({ _id: e._id, title: e.title })),
+        groups: groups.map((item) => ({
+          _id: item.id,
+          title: item.title,
+          active: item.active,
+        })),
         ...(categoryId && { _id: categoryId }),
       };
 

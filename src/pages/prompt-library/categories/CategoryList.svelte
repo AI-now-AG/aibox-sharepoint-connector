@@ -26,6 +26,12 @@
   let timeout: any;
   const t = useTranslations();
 
+  function reloadPage(delay = 2000) {
+    setTimeout(() => {
+      window.location.reload();
+    }, delay);
+  }
+
   function handleDndConsider(e: CustomEvent) {
     items = e.detail.items;
     //console.log("category list / consider dispatched", { items });
@@ -60,14 +66,8 @@
       });
     }
 
-    items = items.map((item) => {
-      if (item.id == id) {
-        item.active = active;
-      }
-      return item;
-    });
-
     $loading = false;
+    reloadPage(1000);
   }
 
   async function updatePosition(items: ListItem[]) {
@@ -92,11 +92,12 @@
       });
 
       if (response.ok) {
-        items = items.filter((item) => item.id !== categoryToDelete);
         addToast({
           message: t(`prompt-library.delete.categories.success`),
           type: "success",
         });
+
+        reloadPage();
       } else {
         throw new Error("Failed to delete");
       }
@@ -189,7 +190,8 @@
                 <li>
                   <button
                     class="flex block w-full text-left px-4 py-1 text-sm hover:underline"
-                    on:click={() => updateStatus(item.id, !item.active)}
+                    on:click|preventDefault={() =>
+                      updateStatus(item.id, !item.active)}
                   >
                     {@html item.active == 1 ? svgIcons.eyeClose : svgIcons.eye}
                     <span class="ml-1"
@@ -200,7 +202,7 @@
                 <li>
                   <button
                     class="flex block w-full text-left px-4 py-1 text-sm hover:underline"
-                    on:click={() => handleDelete(item.id)}
+                    on:click|preventDefault={() => handleDelete(item.id)}
                   >
                     {@html svgIcons.trash}
                     <span class="ml-1">Delete</span>

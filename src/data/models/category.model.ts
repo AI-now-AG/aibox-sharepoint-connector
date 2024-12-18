@@ -72,15 +72,15 @@ export default {
       .sort({ created_at: 1 })
       .sort({ created_at: 1 }),
 
-  listByTenant: async (id: ObjectId) => {
+  listByTenant: async (tenantId: ObjectId) => {
     return collection
-      .find<Document<Category>>({ tenant_id: id })
+      .find<Document<Category>>({ tenant_id: tenantId })
       .sort({ position: 1, created_at: 1 });
   },
 
-  listActiveByTenant: async (id: ObjectId) => {
+  listActiveByTenant: async (tenantId: ObjectId) => {
     return collection
-      .find<Document<Category>>({ tenant_id: id, active: true })
+      .find<Document<Category>>({ tenant_id: tenantId, active: true })
       .sort({ position: 1, created_at: 1 });
   },
 
@@ -97,6 +97,14 @@ export default {
 
   getBySlug: async (slug: string) => {
     return collection.findOne<Document<Category>>({ slug });
+  },
+
+  getMaxPosition: async (tenantId: ObjectId) => {
+    return collection
+      .find<Document<Category>>({ tenant_id: tenantId })
+      .sort({ position: -1 })
+      .limit(1)
+      .next();
   },
 
   update: async (id: string, updatedInstruction: Partial<Category>) => {

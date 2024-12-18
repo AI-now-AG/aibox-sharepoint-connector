@@ -37,7 +37,14 @@
     confirmDeleteModal.show();
   }
 
-  async function updateStatus(id: string, active: boolean) {}
+  async function updateStatus(id: string, active: boolean) {
+    items = items.map((item) => {
+      if (item.id == id) {
+        item.active = active;
+      }
+      return item;
+    });
+  }
 
   function addGroup() {
     const newGroup: GroupItem = {
@@ -88,7 +95,7 @@
             type="text"
             bind:value={items[i].title}
             placeholder="e.g. Headline"
-            class="input input-bordered w-full max-w-xs"
+            class="input input-bordered w-full max-w-md"
           />
         </div>
         <div class="flex-none w-20">
@@ -112,7 +119,8 @@
               <li>
                 <button
                   class="flex block w-full text-left px-4 py-1 text-sm hover:underline"
-                  on:click={() => updateStatus(item.id, !item.active)}
+                  on:click|preventDefault={() =>
+                    updateStatus(item.id, !item.active)}
                 >
                   {@html item.active == 1 ? svgIcons.eyeClose : svgIcons.eye}
                   <span class="ml-1"
@@ -123,7 +131,7 @@
               <li>
                 <button
                   class="flex block w-full text-left px-4 py-1 text-sm hover:underline"
-                  on:click={() => handleDelete(item.id)}
+                  on:click|preventDefault={() => handleDelete(item.id)}
                 >
                   {@html svgIcons.trash}
                   <span class="ml-1">Delete</span>
