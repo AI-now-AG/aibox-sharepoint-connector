@@ -9,7 +9,7 @@
   export let modal;
 </script>
 
-<dialog id={"modal_confirm_update"} bind:this={modal} class="modal">
+<dialog bind:this={modal} class="modal">
   <div class="modal-box">
     <form method="dialog" id="modalForm">
       <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"

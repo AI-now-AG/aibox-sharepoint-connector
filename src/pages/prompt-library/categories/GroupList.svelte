@@ -19,7 +19,11 @@
 
   let groupToDelete: string;
   let confirmDeleteModal: HTMLDialogElement;
+
   const flipDurationMs: number = 200;
+  const dropTargetStyle: any = {
+    outline: "",
+  };
   const t = useTranslations();
 
   function handleDndConsider(e: CustomEvent) {
@@ -77,7 +81,7 @@
   </div>
 
   <section
-    use:dndzone={{ items, flipDurationMs }}
+    use:dndzone={{ items, flipDurationMs, dropTargetStyle }}
     on:consider={handleDndConsider}
     on:finalize={handleDndFinalize}
   >
