@@ -50,7 +50,6 @@ let userPermissions = Astro.locals.user.permissions;
   <CategoryList
     title={t("prompt-library.categories.all")}
     items={categoriesEnriched}
-    isEditable={userPermissions.includes(Permission.AdminAll)}
     client:load
   />
 </Layout>

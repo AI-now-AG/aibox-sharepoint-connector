@@ -55,7 +55,7 @@
 
         groups = [];
         title = undefined;
-        
+
         window.history.back();
         addToast({
           message: data.message || t("prompt-library.add.category.success"),
@@ -130,27 +130,11 @@
             class="btn btn-active btn-neutral font-normal grow-0"
             on:click|preventDefault={addGroup}
           >
-            <svg
-              width="13"
-              height="12"
-              viewBox="0 0 13 12"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M6.5 1V6M6.5 6V11M6.5 6H11.5M6.5 6L1.5 6"
-                stroke="white"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              ></path>
-            </svg>
+            {@html svgIcons.add}
             Add a group
           </button>
         </div>
-        <div
-          class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 justify-center"
-        >
+        <div class="grid grid-cols-1 gap-4 justify-center">
           {#each groups as _text, index (index)}
             <div class="flex flex-row items-center gap-4">
               <label class="input input-bordered flex items-center gap-2">

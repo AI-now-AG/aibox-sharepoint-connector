@@ -10,7 +10,7 @@
 
 <script lang="ts">
   import { actions } from "astro:actions";
-  import { dndzone } from "svelte-dnd-action";
+  import { dndzone, type DndEvent } from "svelte-dnd-action";
   import { flip } from "svelte/animate";
   import { addToast } from "$stores/toast";
   import { svgIcons } from "$assets/icons";
@@ -21,25 +21,29 @@
 
   export let items: ListItem[] = [];
   export let title: string = "";
-  export let isEditable: boolean = false;
 
   let categoryToDelete: string;
   let confirmDeleteModal: HTMLDialogElement;
-  const flipDurationMs = 200;
+  const flipDurationMs: number = 200;
+  let timeout: any;
   const t = useTranslations();
 
-  function handleDndConsider(e) {
+  function handleDndConsider(e: DndEvent) {
     items = e.detail.items;
     console.log("consider dispatched", { items });
   }
 
-  function handleDndFinalize(e) {
+  function handleDndFinalize(e: DndEvent) {
     items = e.detail.items;
-    updatePosition(items);
+
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      updatePosition(items);
+    }, 300);
     console.log("finalize dispatched", { items });
   }
 
-  async function handleDelete(categoryId) {
+  async function handleDelete(categoryId: string) {
     categoryToDelete = categoryId;
     confirmDeleteModal.show();
   }
