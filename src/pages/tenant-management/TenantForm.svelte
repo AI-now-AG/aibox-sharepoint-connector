@@ -7,8 +7,8 @@
   import { addToast } from "$stores/toast";
   import Loading from "$components/Loading.svelte";
   import TogglePasswordIcon from "./TogglePasswordIcon.svelte";
-  import ConfirmDialog from "../../components/ConfirmDialog.svelte";
-  import AlertDialog from "../../components/AlertDialog.svelte";
+  import ConfirmDialog from "$components/ConfirmDialog.svelte";
+  import AlertDialog from "$components/AlertDialog.svelte";
   import { clickOutside } from "$components/actions/ClickOutside.svelte";
   import {
     trimInput,
