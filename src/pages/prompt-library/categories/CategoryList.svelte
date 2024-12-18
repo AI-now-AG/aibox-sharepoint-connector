@@ -20,7 +20,6 @@
   import { loading } from "$stores";
 
   export let items: ListItem[] = [];
-  export let title: string = "";
 
   let categoryToDelete: string;
   let confirmDeleteModal: HTMLDialogElement;
@@ -114,7 +113,7 @@
 
 <div class="container max-w-5xl mx-auto p-6 space-y-4">
   <h1 class="text-lg font-normal text-base-content/80">
-    {title}
+    {t("prompt-library.categories.all")} ({items.length})
   </h1>
 
   <!-- drag and drop list -->

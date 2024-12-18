@@ -7,6 +7,7 @@ import CategoryList, {
   type ListItem,
 } from "$pages/prompt-library/categories/CategoryList.svelte";
 import { Permission } from "$data/models/user.model";
+import { IterableReadableStream } from "node_modules/@langchain/core/dist/utils/stream";
 
 const t = useTranslations();
 
@@ -47,9 +48,5 @@ let userPermissions = Astro.locals.user.permissions;
     }
   </div>
 
-  <CategoryList
-    title={t("prompt-library.categories.all")}
-    items={categoriesEnriched}
-    client:load
-  />
+  <CategoryList items={categoriesEnriched} client:load />
 </Layout>
