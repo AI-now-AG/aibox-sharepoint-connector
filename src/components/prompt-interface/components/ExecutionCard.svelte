@@ -2,21 +2,22 @@
   import { onMount } from "svelte";
   import { useTranslations } from "$i18n/utils";
   import { storePromptId } from "$components/prompt-interface/components/Stores";
-  import { svgIcons } from "$assets/icons";
   import EditPromptDetails from "./EditPromptDetails.svelte";
   import ExecutionCardItem from "./ExecutionCardItem.svelte";
+  import log from "$utils/log";
 
+  export let isEditable = false;
   export let cards: any;
   export let selectedPromptId;
 
   const t = useTranslations();
 
+  const promptLimit = 5;
   let showMore = false;
   let selectedCardIndex: number = -1;
-  let dlgEl: HTMLDialogElement;
-  const promptLimit = 5;
   let selectedEditPromptId: any = null;
-  export let isEditable = false;
+  let dlgEl: HTMLDialogElement;
+  let promptDialogMode: "update" | "clone" = "update";
 
   // TODO: Remove below function once default prompt functionality implemented
   onMount(async function () {
@@ -29,15 +30,22 @@
   });
 
   function selectCard(index: number) {
-    const promptId = cards[index]._id;
     selectedCardIndex = index;
-    selectedPromptId = promptId;
+    selectedPromptId = cards[index]?._id ?? "";
     storePromptId.set(selectedPromptId);
   }
 
   async function editCard(index: number) {
-    const promptId = cards[index]._id;
-    selectedEditPromptId = promptId;
+    promptDialogMode = "update";
+    selectedEditPromptId = cards[index]?._id ?? "";
+    log.i(promptDialogMode, "promptDialogMode");
+    dlgEl.showModal();
+  }
+
+  async function duplicateCard(index: number) {
+    promptDialogMode = "clone";
+    selectedEditPromptId = cards[index]?._id ?? "";
+    log.i(promptDialogMode, "promptDialogMode");
     dlgEl.showModal();
   }
 </script>
@@ -57,7 +65,7 @@
             editCard(index);
           }}
           onSelectDuplicate={() => {
-            // TODO: Handle copy
+            duplicateCard(index);
           }}
           onSelectReOder={() => {
             // TODO: Handle Order
@@ -84,4 +92,11 @@
   {/if}
 </div>
 
-<EditPromptDetails bind:dlgEl bind:selectedEditPromptId />
+<EditPromptDetails
+  bind:dlgEl
+  bind:selectedEditPromptId
+  dialogMode={promptDialogMode}
+  dialogTitle={promptDialogMode == "clone"
+    ? t("prompt-library.clone.title")
+    : t("prompt-library.edit.title")}
+/>
