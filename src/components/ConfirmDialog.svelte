@@ -1,12 +1,12 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import { useTranslations } from "$i18n/utils";
-  import { svgIcons } from "$assets/icons";
 
   const dispatch = createEventDispatcher();
   const t = useTranslations();
 
-  export let modal;
+  export let modal: any;
+  export let description: string = "";
 </script>
 
 <dialog id={"modal_confirm_update"} bind:this={modal} class="modal">
@@ -16,7 +16,7 @@
         >✕</button
       >
       <h3 id="modal_title" class="text-lg font-bold">
-        {t("tenant.tenants.tenant.update-confirmation")}
+        {description}
       </h3>
       <div class="flex justify-between gap-4 mt-6">
         <button
