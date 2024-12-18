@@ -14,7 +14,7 @@
 
   export let isEditable: boolean = true;
   export let selectedEditPromptId: any = null;
-  export let dlgEl: HTMLDialogElement;
+  export let promptDialog: HTMLDialogElement;
   export let dialogMode: "create" | "update" | "clone" = "update";
   export let dialogTitle: string = t("prompt-library.edit.title");
 
@@ -125,7 +125,7 @@
         )
         .filter((kb: any) => kb !== undefined) as KnowledgeBase[];
     } catch (error) {
-      dlgEl.close();
+      promptDialog.close();
       addToast({
         message:
           error instanceof Error ? error.message : t("common.unexpected.error"),
@@ -190,7 +190,7 @@
   }
 
   function cancelEdit() {
-    dlgEl.close();
+    promptDialog.close();
     promptTitle = "";
     promptText = "";
     selectedKnowledgeBases = [];
@@ -198,7 +198,7 @@
   }
 </script>
 
-<dialog class="modal" bind:this={dlgEl}>
+<dialog class="modal" bind:this={promptDialog}>
   <div class="modal-box w-8/12 max-w-5xl">
     <div class="flex justify-between">
       <h3 class="text-lg font-bold py-4">{dialogTitle}</h3>

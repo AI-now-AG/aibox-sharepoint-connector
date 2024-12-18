@@ -8,6 +8,7 @@
   import Loading from "$components/Loading.svelte";
   import { loading, showLoading, hideLoading } from "$stores";
   import log from "$utils/log";
+  import { addToast } from "$stores/toast";
 
   export let isEditable = false;
   export let cards: any;
@@ -20,9 +21,9 @@
   let selectedCardIndex: number = -1;
   let selectedEditPromptId: string = "";
   let selectedDeletePromptId: string = "";
-  let dlgEl: HTMLDialogElement;
+  let promptDialog: HTMLDialogElement;
   let promptDialogMode: "update" | "clone" = "update";
-  let confirmDeleteModal;
+  let confirmDeleteModal: HTMLDialogElement;
 
   // TODO: Remove below function once default prompt functionality implemented
   onMount(async function () {
@@ -30,7 +31,7 @@
     selectedPromptId = cards[0]._id;
     storePromptId.set(selectedPromptId);
     if (selectedEditPromptId) {
-      dlgEl.showModal();
+      promptDialog.showModal();
     }
   });
 
@@ -41,15 +42,15 @@
   }
 
   async function editCard(index: number) {
-    promptDialogMode = "update";
     selectedEditPromptId = cards[index]?._id ?? "";
-    dlgEl.showModal();
+    promptDialogMode = "update";
+    promptDialog.showModal();
   }
 
   async function duplicateCard(index: number) {
-    promptDialogMode = "clone";
     selectedEditPromptId = cards[index]?._id ?? "";
-    dlgEl.showModal();
+    promptDialogMode = "clone";
+    promptDialog.showModal();
   }
 
   function onDeleteCard(index: number) {
@@ -60,7 +61,7 @@
   async function deleteCard() {
     try {
       showLoading();
-      const deletedPrompt: DeletePromptParams = {
+      const deletedPrompt = {
         ...(selectedDeletePromptId && { _id: selectedDeletePromptId }),
       };
       log.d(deletedPrompt, "deletedPrompt");
@@ -83,7 +84,6 @@
         message: data.message,
         type: "success",
       });
-     
     } catch (error) {
       addToast({
         message:
@@ -101,7 +101,7 @@
 
 <div class="flex flex-col">
   <div
-    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-4 gap-4 py-2"
+    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-5 gap-4 py-2"
   >
     {#each cards as card, index}
       {#if index < promptLimit || showMore}
@@ -148,7 +148,7 @@
 />
 
 <EditPromptDetails
-  bind:dlgEl
+  bind:promptDialog
   bind:selectedEditPromptId
   dialogMode={promptDialogMode}
   dialogTitle={promptDialogMode == "clone"
