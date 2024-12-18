@@ -2,8 +2,11 @@
   import { onMount } from "svelte";
   import { useTranslations } from "$i18n/utils";
   import { storePromptId } from "$components/prompt-interface/components/Stores";
-  import EditPromptDetails from "./EditPromptDetails.svelte";
-  import ExecutionCardItem from "./ExecutionCardItem.svelte";
+  import EditPromptDetails from "$components/prompt-interface/components/EditPromptDetails.svelte";
+  import ExecutionCardItem from "$components/prompt-interface/components/ExecutionCardItem.svelte";
+  import ConfirmDialog from "$components/ConfirmDialog.svelte";
+  import Loading from "$components/Loading.svelte";
+  import { loading, showLoading, hideLoading } from "$stores";
   import log from "$utils/log";
 
   export let isEditable = false;
@@ -15,9 +18,11 @@
   const promptLimit = 5;
   let showMore = false;
   let selectedCardIndex: number = -1;
-  let selectedEditPromptId: any = null;
+  let selectedEditPromptId: string = "";
+  let selectedDeletePromptId: string = "";
   let dlgEl: HTMLDialogElement;
   let promptDialogMode: "update" | "clone" = "update";
+  let confirmDeleteModal;
 
   // TODO: Remove below function once default prompt functionality implemented
   onMount(async function () {
@@ -38,15 +43,59 @@
   async function editCard(index: number) {
     promptDialogMode = "update";
     selectedEditPromptId = cards[index]?._id ?? "";
-    log.i(promptDialogMode, "promptDialogMode");
     dlgEl.showModal();
   }
 
   async function duplicateCard(index: number) {
     promptDialogMode = "clone";
     selectedEditPromptId = cards[index]?._id ?? "";
-    log.i(promptDialogMode, "promptDialogMode");
     dlgEl.showModal();
+  }
+
+  function onDeleteCard(index: number) {
+    selectedDeletePromptId = cards[index]?._id ?? "";
+    confirmDeleteModal?.show();
+  }
+
+  async function deleteCard() {
+    try {
+      showLoading();
+      const deletedPrompt: DeletePromptParams = {
+        ...(selectedDeletePromptId && { _id: selectedDeletePromptId }),
+      };
+      log.d(deletedPrompt, "deletedPrompt");
+      const response = await fetch("/api/prompts.json", {
+        method: "DELETE",
+        body: JSON.stringify(deletedPrompt),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.message || t("prompt-library.delete.prompt.failed"),
+        );
+      }
+      const data = await response.json();
+      addToast({
+        message: data.message,
+        type: "success",
+      });
+     
+    } catch (error) {
+      addToast({
+        message:
+          error instanceof Error ? error.message : t("common.unexpected.error"),
+        type: "error",
+      });
+    } finally {
+      hideLoading();
+      setTimeout(() => {
+        window.location.reload();
+      }, 0);
+    }
   }
 </script>
 
@@ -71,7 +120,7 @@
             // TODO: Handle Order
           }}
           onSelectDelete={() => {
-            // TODO: Handle Delete
+            onDeleteCard(index);
           }}
         />
       {/if}
@@ -92,6 +141,12 @@
   {/if}
 </div>
 
+<ConfirmDialog
+  description={t("prompt-library.delete.prompt.confirm")}
+  bind:modal={confirmDeleteModal}
+  on:confirm={deleteCard}
+/>
+
 <EditPromptDetails
   bind:dlgEl
   bind:selectedEditPromptId
@@ -100,3 +155,5 @@
     ? t("prompt-library.clone.title")
     : t("prompt-library.edit.title")}
 />
+
+<Loading bind:show={$loading} />
