@@ -25,7 +25,7 @@
 </script>
 
 <button
-  class={`relative btn w-full rounded-xl h-32 p-6 ${active ? "btn-primary " : "btn-outline border-base-300 border-2"} flex`}
+  class={`relative btn w-full rounded-xl h-auto p-6 ${active ? "btn-primary " : "btn-outline border-base-300 border-2"} flex`}
   on:click={() => {
     onSelectCart?.(data);
   }}
@@ -63,5 +63,5 @@
       {/if}
     </section>
   {/if}
-  <p class="card-title text-sm font-normal self-end">{data?.title ?? ""}</p>
+  <p class="card-title text-sm font-normal">{data?.title ?? ""}</p>
 </button>

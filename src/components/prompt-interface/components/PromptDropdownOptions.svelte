@@ -11,7 +11,7 @@
 </script>
 
 <div
-  class="absolute right-0 mt-1 w-48 md:w-44 bg-white rounded-xl shadow-lg z-10"
+  class="absolute right-0 mt-1 w-48 md:w-44 bg-white rounded-xl shadow-xl z-10"
 >
   <ul class="py-2">
     <li class="hover:bg-gray-200 cursor-pointer">
