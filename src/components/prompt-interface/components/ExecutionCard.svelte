@@ -83,7 +83,7 @@
           errorData.message || t("prompt-library.delete.prompt.failed"),
         );
       }
-      removeDeletedItem(selectedDeletePromptId)
+      removeDeletedItem(selectedDeletePromptId);
       hideLoading();
       addToast({
         message: t("prompt-library.delete.prompt.success"),
@@ -96,7 +96,7 @@
           error instanceof Error ? error.message : t("common.unexpected.error"),
         type: "error",
       });
-    } 
+    }
   }
 </script>
 
