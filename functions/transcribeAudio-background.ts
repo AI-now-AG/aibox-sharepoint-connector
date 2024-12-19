@@ -33,11 +33,11 @@ const arch = os.arch();
 if (platform === "darwin" && arch === "arm64") {
   // Mac OS M1
   console.log("MacOS");
-  ffmpegPath = path.join(__dirname, "..", "bin", "osx", "ffmpeg");
+  ffmpegPath = path.join(process.cwd(), "bin", "osx", "ffmpeg");
 } else if (platform === "linux" && arch === "x64") {
   // Linux x64
   console.log("Linux");
-  ffmpegPath = path.join(__dirname, "..", "bin", "linux", "ffmpeg");
+  ffmpegPath = path.join(process.cwd(), "bin", "linux", "ffmpeg");
 } else {
   console.log("Unsupported OS: " + platform + "::" + arch);
   throw new Error(`Unsupported platform: ${platform} (${arch})`);
