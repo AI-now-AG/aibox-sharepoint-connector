@@ -1,65 +1,52 @@
 <script lang="ts">
-  import { onMount } from "svelte";
-  import { useTranslations } from "$i18n/utils";
-  import { storePromptId } from "$components/prompt-interface/components/Stores";
+  import PromptItem from "$components/prompt-interface/PromptItem.svelte";
   import EditPromptDetails from "$components/prompt-interface/components/EditPromptDetails.svelte";
-  import ExecutionCardItem from "$components/prompt-interface/components/ExecutionCardItem.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import Loading from "$components/Loading.svelte";
   import { loading, showLoading, hideLoading } from "$stores";
-  import log from "$utils/log";
   import { addToast } from "$stores/toast";
+  import { useTranslations } from "$i18n/utils";
+  import log from "$utils/log";
 
-  export let isEditable = false;
-  export let cards: any;
-  export let selectedPromptId;
+  interface CardItem {
+    id: string;
+    title: string;
+    description?: string;
+    instruction: string;
+    tags?: string[];
+  }
 
   const t = useTranslations();
 
-  const promptLimit = 5;
-  let showMore = false;
-  let selectedCardIndex: number = -1;
+  export let items: CardItem[] = [];
+  export let title: string = t("prompt-library.prompts.all");
+  export let isEditable: boolean = false;
+
   let selectedEditPromptId: string = "";
   let selectedDeletePromptId: string = "";
   let promptDialog: HTMLDialogElement;
   let promptDialogMode: "update" | "clone" = "update";
   let confirmDeleteModal: HTMLDialogElement;
 
-  // TODO: Remove below function once default prompt functionality implemented
-  onMount(async function () {
-    selectedCardIndex = 0;
-    selectedPromptId = cards[0]._id;
-    storePromptId.set(selectedPromptId);
-    if (selectedEditPromptId) {
-      promptDialog.showModal();
-    }
-  });
-
-  function selectCard(index: number) {
-    selectedCardIndex = index;
-    selectedPromptId = cards[index]?._id ?? "";
-    storePromptId.set(selectedPromptId);
-  }
-
   async function editCard(index: number) {
-    selectedEditPromptId = cards[index]?._id ?? "";
+    selectedEditPromptId = items[index]?.id ?? "";
     promptDialogMode = "update";
     promptDialog.showModal();
   }
 
   async function duplicateCard(index: number) {
-    selectedEditPromptId = cards[index]?._id ?? "";
+    selectedEditPromptId = items[index]?.id ?? "";
     promptDialogMode = "clone";
     promptDialog.showModal();
   }
 
   function onDeleteCard(index: number) {
-    selectedDeletePromptId = cards[index]?._id ?? "";
+    selectedDeletePromptId = items[index]?.id ?? "";
     confirmDeleteModal?.show();
   }
 
   function removeDeletedItem(deletedId: string) {
-    cards = cards?.filter((item: any) => item._id !== deletedId);
+    items = items?.filter((item: any) => item.id !== deletedId);
   }
 
   async function deleteCard() {
@@ -100,47 +87,31 @@
   }
 </script>
 
-<div class="flex flex-col">
-  <div
-    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-5 gap-4 py-2"
-  >
-    {#each cards as card, index}
-      {#if index < promptLimit || showMore}
-        <ExecutionCardItem
-          {isEditable}
-          data={card}
-          active={selectedCardIndex == index}
-          onSelectCart={() => selectCard(index)}
-          onSelectEdit={() => {
-            editCard(index);
-          }}
-          onSelectDuplicate={() => {
-            duplicateCard(index);
-          }}
-          onSelectReOder={() => {
-            // TODO: Handle Order
-          }}
-          onSelectDelete={() => {
-            onDeleteCard(index);
-          }}
-          zIndex={1000 - index}
-        />
-      {/if}
+<div class="container max-w-5xl mx-auto p-6 space-y-4">
+  <h1 class="text-lg font-normal text-base-content/80">
+    {title}
+  </h1>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+    {#each items as card, index}
+      <PromptItem
+        {isEditable}
+        data={card}
+        onSelectEdit={() => {
+          editCard(index);
+        }}
+        onSelectDuplicate={() => {
+          duplicateCard(index);
+        }}
+        onSelectReOder={() => {
+          // TODO: Handle Order
+        }}
+        onSelectDelete={() => {
+          onDeleteCard(index);
+        }}
+      />
     {/each}
   </div>
-
-  {#if cards.length > promptLimit}
-    <div class="flex">
-      <button
-        class="btn p-0 btn-link text-sm font-normal"
-        on:click={() => (showMore = !showMore)}
-      >
-        {showMore
-          ? `${t("prompt-execution.card.showLess")} ↑`
-          : `${t("prompt-execution.card.showMore")} ↓`}
-      </button>
-    </div>
-  {/if}
 </div>
 
 <ConfirmDialog

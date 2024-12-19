@@ -32,6 +32,9 @@ import textIcon from "$assets/icons/textIcon.svg?raw";
 import codeIcon from "$assets/icons/codeIcon.svg?raw";
 import warningIcon from "$assets/icons/warning.svg?raw";
 import downIcon from "$assets/icons/down.svg?raw";
+import duplicate from "$assets/icons/duplicate.svg?raw";
+import reOrder from "$assets/icons/re-order.svg?raw";
+import deleteIcon from "$assets/icons/delete.svg?raw";
 
 export const svgIcons = {
   menuSettings,
@@ -68,4 +71,7 @@ export const svgIcons = {
   codeIcon,
   warningIcon,
   downIcon,
+  duplicate,
+  reOrder,
+  deleteIcon,
 };
