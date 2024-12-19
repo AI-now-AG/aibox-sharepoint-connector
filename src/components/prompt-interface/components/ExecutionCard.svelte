@@ -58,6 +58,10 @@
     confirmDeleteModal?.show();
   }
 
+  function removeDeletedItem(deletedId: string) {
+    cards = cards?.filter((item: any) => item._id !== deletedId);
+  }
+
   async function deleteCard() {
     try {
       showLoading();
@@ -79,23 +83,20 @@
           errorData.message || t("prompt-library.delete.prompt.failed"),
         );
       }
-      const data = await response.json();
+      removeDeletedItem(selectedDeletePromptId)
+      hideLoading();
       addToast({
-        message: data.message,
+        message: t("prompt-library.delete.prompt.success"),
         type: "success",
       });
     } catch (error) {
+      hideLoading();
       addToast({
         message:
           error instanceof Error ? error.message : t("common.unexpected.error"),
         type: "error",
       });
-    } finally {
-      hideLoading();
-      setTimeout(() => {
-        window.location.reload();
-      }, 0);
-    }
+    } 
   }
 </script>
 
@@ -122,7 +123,7 @@
           onSelectDelete={() => {
             onDeleteCard(index);
           }}
-          zIndex={1000-index}
+          zIndex={1000 - index}
         />
       {/if}
     {/each}

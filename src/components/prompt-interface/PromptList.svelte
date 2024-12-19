@@ -29,7 +29,6 @@
   let confirmDeleteModal: HTMLDialogElement;
 
   async function editCard(index: number) {
-    log.i(items[index], "items[index]");
     selectedEditPromptId = items[index]?.id ?? "";
     promptDialogMode = "update";
     promptDialog.showModal();
@@ -44,6 +43,10 @@
   function onDeleteCard(index: number) {
     selectedDeletePromptId = items[index]?.id ?? "";
     confirmDeleteModal?.show();
+  }
+
+  function removeDeletedItem(deletedId: string) {
+    items = items?.filter((item: any) => item.id !== deletedId);
   }
 
   async function deleteCard() {
@@ -67,22 +70,19 @@
           errorData.message || t("prompt-library.delete.prompt.failed"),
         );
       }
-      const data = await response.json();
+      removeDeletedItem(selectedDeletePromptId);
+      hideLoading();
       addToast({
-        message: data.message,
+        message: t("prompt-library.delete.prompt.success"),
         type: "success",
       });
     } catch (error) {
+      hideLoading();
       addToast({
         message:
           error instanceof Error ? error.message : t("common.unexpected.error"),
         type: "error",
       });
-    } finally {
-      hideLoading();
-      setTimeout(() => {
-        window.location.reload();
-      }, 0);
     }
   }
 </script>
