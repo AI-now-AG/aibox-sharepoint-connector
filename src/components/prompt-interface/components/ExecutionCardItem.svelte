@@ -6,6 +6,7 @@
   export let active: boolean;
   export let isEditable: boolean;
   export let data: any;
+  export let zIndex: number = 10;
 
   export let onSelectCart: Function;
   export let onSelectEdit: Function;
@@ -14,7 +15,6 @@
   export let onSelectDelete: Function;
 
   const t = useTranslations();
-
   let isShowDropdownOption = false;
   const handleMouseEnter = () => {
     isShowDropdownOption = true;
@@ -29,6 +29,7 @@
   on:click={() => {
     onSelectCart?.(data);
   }}
+  style={`z-index: ${zIndex};`}
 >
   {#if isEditable}
     <!-- svelte-ignore a11y-no-static-element-interactions -->

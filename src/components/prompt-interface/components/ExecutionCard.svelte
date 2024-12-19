@@ -122,6 +122,7 @@
           onSelectDelete={() => {
             onDeleteCard(index);
           }}
+          zIndex={1000-index}
         />
       {/if}
     {/each}
