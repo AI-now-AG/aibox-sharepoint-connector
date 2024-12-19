@@ -4,6 +4,7 @@
   import { storePromptId } from "$components/prompt-interface/components/Stores";
   import EditPromptDetails from "$components/prompt-interface/components/EditPromptDetails.svelte";
   import ExecutionCardItem from "$components/prompt-interface/components/ExecutionCardItem.svelte";
+  import PromptDndChangeOrderDialog from "$components/prompt-interface/components/PromptDndChangeOrderDialog.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import Loading from "$components/Loading.svelte";
   import { loading, showLoading, hideLoading } from "$stores";
@@ -24,6 +25,7 @@
   let promptDialog: HTMLDialogElement;
   let promptDialogMode: "update" | "clone" = "update";
   let confirmDeleteModal: HTMLDialogElement;
+  let promptOrderDialog: HTMLDialogElement;
 
   // TODO: Remove below function once default prompt functionality implemented
   onMount(async function () {
@@ -98,6 +100,10 @@
       });
     }
   }
+
+  function orderPrompt() {
+    promptOrderDialog.show()
+  }
 </script>
 
 <div class="flex flex-col">
@@ -118,12 +124,12 @@
             duplicateCard(index);
           }}
           onSelectReOder={() => {
-            // TODO: Handle Order
+            orderPrompt()
           }}
           onSelectDelete={() => {
             onDeleteCard(index);
           }}
-          zIndex={1000 - index}
+          zIndex={100 - index}
         />
       {/if}
     {/each}
@@ -157,5 +163,7 @@
     ? t("prompt-library.clone.title")
     : t("prompt-library.edit.title")}
 />
+
+<PromptDndChangeOrderDialog bind:promptOrderDialog items={cards} />
 
 <Loading bind:show={$loading} />
