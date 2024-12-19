@@ -10,6 +10,7 @@ const GroupParamSchema = z.object({
   _id: z.string().optional(),
   title: z.string(),
   active: z.boolean().optional(),
+  position: z.number().optional(),
 });
 
 const CreateCategoryParamsSchema = z.object({
@@ -124,6 +125,8 @@ export const PUT: APIRoute = async (ctx) => {
         _id: new ObjectId(),
         title: group.title,
         slug: slug(group.title),
+        position: group?.position || 0,
+        active: group?.active,
       });
     }
     return uniqueGroups;
