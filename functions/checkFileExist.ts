@@ -28,7 +28,9 @@ const checkFileExist: Handler = async (event, context) => {
     tempFileNames.push(improvedTxtFileName);
   }
 
-  const txtFileName = isDiarizationEnabled ? `${uniqueName}-mono.txt`: `${uniqueName}.txt`;
+  const txtFileName = isDiarizationEnabled
+    ? `${uniqueName}-mono.txt`
+    : `${uniqueName}.txt`;
   if (!fileNames.includes(txtFileName) && !isShowImprovedTextPreview) {
     requireFilesCount += 1;
     tempFileNames.push(txtFileName);
@@ -128,10 +130,21 @@ const checkFileExist: Handler = async (event, context) => {
               }),
             };
           } else {
-            return {
-              statusCode: 200,
-              body: JSON.stringify(task),
-            };
+            if (task.error) {
+              return {
+                statusCode: 500,
+                body: JSON.stringify({
+                  exists: false,
+                  message: "Failed to check file existence or download content",
+                  error: task.error,
+                }),
+              };
+            } else {
+              return {
+                statusCode: 200,
+                body: JSON.stringify(task),
+              };
+            }
           }
         }
         availableFiles.push(fileName);

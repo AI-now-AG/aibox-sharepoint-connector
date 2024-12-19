@@ -92,9 +92,13 @@ const transcribeAudio: Handler = async (
         );
         if (newBlobFileUrl) {
           transcribeParams.uploadUrl = newBlobFileUrl;
+          transcriptionResult =
+            await transcribeUsingAzureOpenAI(transcribeParams);
         }
+      } else {
+        transcriptionResult =
+          await transcribeUsingAzureOpenAI(transcribeParams);
       }
-      transcriptionResult = await transcribeUsingAzureOpenAI(transcribeParams);
     } else {
       const fileBuffer = await downloadFileFromBlob(
         uploadUrl,
@@ -189,26 +193,43 @@ async function convertStereoToMono(
     const monoBlobClient =
       containerClient.getBlockBlobClient(convertedBlobName);
     const outputStream = new stream.PassThrough();
-    if (downloadBlockBlobResponse) {
-      ffmpeg()
-        .setFfmpegPath(ffmpegPath)
-        .input(downloadBlockBlobResponse)
-        .audioChannels(1)
-        .format(fileExtension)
-        .output(outputStream)
-        .on("error", (err) => {
-          console.error("FFmpeg error:", err);
-          updateTask(uniqueName, {
-            status: "failed to convert mono",
-            error: err.message,
-          });
-          throw err;
-        })
-        .on("progress", () => {})
-        .on("end", () => {})
-        .run();
-      await monoBlobClient.uploadStream(outputStream);
-      fileUrl = monoBlobClient.url;
+    try {
+      let isSuccess = false;
+      await new Promise<void>((resolve, reject) => {
+        ffmpeg()
+          .setFfmpegPath(ffmpegPath)
+          .input(downloadBlockBlobResponse)
+          .audioChannels(1)
+          .format(fileExtension)
+          .output(outputStream)
+          .on("error", (err) => {
+            console.error("FFmpeg error:", err);
+            updateTask(uniqueName, {
+              status: "failed",
+              error: err.message,
+            });
+            reject(err);
+          })
+          .on("end", () => {
+            isSuccess = true;
+            resolve();
+          })
+          .run();
+      });
+      if (isSuccess) {
+        await monoBlobClient.uploadStream(outputStream);
+        fileUrl = monoBlobClient.url;
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error("Catch Ffmpeg error:", error);
+        updateTask(uniqueName, {
+          status: "failed",
+          error: error.message,
+        });
+      } else {
+        console.error("Unknown error occurred:", error);
+      }
     }
   }
   return fileUrl;

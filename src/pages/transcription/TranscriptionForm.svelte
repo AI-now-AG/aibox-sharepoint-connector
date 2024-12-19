@@ -598,11 +598,15 @@
       } else {
         const result = await response.json();
         if (response.status != 404) {
+          clearInterval(intervalId);
           addToast({
-            message: result.message,
+            message: result.error,
             type: "error",
             timeout: 5000,
           });
+          isTranscribing = false;
+          isTranscipted = false;
+          isTranscriptionFailed = true;
         }
       }
     } catch (error) {
