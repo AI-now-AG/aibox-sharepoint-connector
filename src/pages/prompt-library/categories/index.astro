@@ -1,10 +1,10 @@
 ---
 import Layout from "$layouts/Layout.astro";
+import { svgIcons } from "$assets/icons";
 import { useTranslations } from "$i18n/utils";
 import CategoryModel from "$data/models/category.model";
-import ListItems, {
-  type ListItem,
-} from "$pages/prompt-library/categories/ListItems.svelte";
+import CategoryList, { type ListItem } from "./CategoryList.svelte";
+
 import { Permission } from "$data/models/user.model";
 
 const t = useTranslations();
@@ -18,6 +18,7 @@ const categoriesEnriched: ListItem[] = categories.map((category) => ({
   id: category._id.toString(),
   title: category.title,
   instruction: "",
+  active: category.active,
 }));
 
 let userPermissions = Astro.locals.user.permissions;
@@ -25,7 +26,7 @@ let userPermissions = Astro.locals.user.permissions;
 
 <Layout>
   <div
-    class="container max-w-5xl mx-auto p-6 grid grid-cols-1 md:grid-cols-[1fr_max-content] gap-8"
+    class="container max-w-full mx-auto p-6 px-14 grid grid-cols-1 md:grid-cols-[1fr_max-content] gap-8"
   >
     <h1 class="pt-2 lg:pt-8 text-4xl font-bold">
       {t("prompt-library.categories.title")}
@@ -37,32 +38,12 @@ let userPermissions = Astro.locals.user.permissions;
           href="categories/add"
           class="mt-2 lg:mt-8 btn btn-active btn-neutral font-normal grow-0"
         >
-          <svg
-            width="13"
-            height="12"
-            viewBox="0 0 13 12"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M6.5 1V6M6.5 6V11M6.5 6H11.5M6.5 6L1.5 6"
-              stroke="white"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
+          <span set:html={svgIcons.add} />
           {t("prompt-library.categories.add")}
         </a>
       )
     }
   </div>
 
-  <ListItems
-    title={t("prompt-library.categories.all")}
-    items={categoriesEnriched}
-    viewLabel={t("prompt-library.categories.view")}
-    isEditable={userPermissions.includes(Permission.AdminAll)}
-    client:load
-  />
+  <CategoryList items={categoriesEnriched} client:load />
 </Layout>

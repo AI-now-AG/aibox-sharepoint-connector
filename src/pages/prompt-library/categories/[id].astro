@@ -2,7 +2,7 @@
 import Layout from "$layouts/Layout.astro";
 import CategoryModel from "$data/models/category.model";
 import { Permission } from "$data/models/user.model";
-import NewCategoryForm from "$pages/prompt-library/categories/NewCategoryForm.svelte";
+import CategoryForm from "$pages/prompt-library/categories/CategoryForm.svelte";
 
 export interface Props {
   id: string;
@@ -24,7 +24,7 @@ let userPermissions = Astro.locals.user.permissions;
 
 <Layout>
   <div>
-    <NewCategoryForm
+    <CategoryForm
       categoryId={id}
       category={formattedInstruction}
       isEditable={userPermissions.includes(Permission.AdminAll)}

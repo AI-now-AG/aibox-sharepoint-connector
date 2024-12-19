@@ -60,7 +60,7 @@
           onSelectDelete?.();
         }}
       >
-        {@html svgIcons.deleteIcon}
+        {@html svgIcons.trash}
         <span class="text-sm font-semibold ml-2">{t("common.delete")}</span>
       </button>
     </li>

@@ -9,7 +9,7 @@ import auth from "$auth/auth";
 
 const t = useTranslations();
 
-const cursor = await Category.listByTenant(Astro.locals.user.tenant_id);
+const cursor = await Category.listActiveByTenant(Astro.locals.user.tenant_id);
 const categories = await cursor.toArray();
 
 const navState = Astro.locals.user.navState || {};
@@ -18,7 +18,9 @@ const menuItems = categories.map((category, index) => ({
   title: category.title,
   icon: category.icon,
   isOpened: navState[`ai-tools-module-${index}`] ?? false,
-  items: category.groups?.map((group) => ({
+  items: category.groups?.filter((group) => {
+    return group?.active &&  group.active == true;
+  }).map((group) => ({
     title: group.title,
     path: `/prompts/${category._id}/${group._id}`,
   })),
@@ -294,7 +296,7 @@ const modules = [
       const details = element as HTMLDetailsElement;
       const detailsId = details.getAttribute("data-id") || "";
       details.addEventListener("toggle", () =>
-        updateNavState(detailsId, details.open),
+        updateNavState(detailsId, details.open)
       );
     });
   }
