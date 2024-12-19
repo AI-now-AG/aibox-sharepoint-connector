@@ -4,7 +4,7 @@
 
 [functions]
   node_bundler = "esbuild"
-  included_files = ["bin/osx/**"]
+  included_files = ["bin/osx/**", "bin/linux/**"]
 
   [functions."transcribeAudio-background"]
     timeout = 900 
