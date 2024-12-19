@@ -201,7 +201,7 @@ async function convertStereoToMono(
       containerClient.getBlockBlobClient(convertedBlobName);
     const outputStream = new stream.PassThrough();
     try {
-      let isSuccess = false;
+      let isSuccess = true;
       console.log("Converting to mono");
       new Promise<void>((resolve, reject) => {
         ffmpeg()
@@ -216,10 +216,10 @@ async function convertStereoToMono(
               status: "failed",
               error: err.message,
             });
+            isSuccess = false;
             reject(err);
           })
           .on("end", () => {
-            isSuccess = true;
             resolve();
           })
           .run();
