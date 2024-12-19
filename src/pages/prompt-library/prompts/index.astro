@@ -27,7 +27,7 @@ const categoryList = await CategoryModel.listActiveByTenant(
 let categoryArray = await categoryList.toArray();
 const categoryListArray: CategoryItem[] = categoryArray.map((category) => {
   const group = category.groups?.filter((group) => {
-    return group?.active != false;
+    return group?.active &&  group.active == true;
   }).map((group) => {
     return {
       checked: false,

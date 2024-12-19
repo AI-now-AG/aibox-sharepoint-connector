@@ -19,7 +19,7 @@ const menuItems = categories.map((category, index) => ({
   icon: category.icon,
   isOpened: navState[`ai-tools-module-${index}`] ?? false,
   items: category.groups?.filter((group) => {
-    return group?.active != false;
+    return group?.active &&  group.active == true;
   }).map((group) => ({
     title: group.title,
     path: `/prompts/${category._id}/${group._id}`,
