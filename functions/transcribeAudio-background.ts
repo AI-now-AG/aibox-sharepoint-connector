@@ -94,6 +94,13 @@ const transcribeAudio: Handler = async (
           transcribeParams.uploadUrl = newBlobFileUrl;
           transcriptionResult =
             await transcribeUsingAzureOpenAI(transcribeParams);
+        } else {
+          return {
+            statusCode: 500,
+            body: JSON.stringify({
+              message: "Error in conversion of audio",
+            }),
+          };
         }
       } else {
         transcriptionResult =
@@ -195,6 +202,7 @@ async function convertStereoToMono(
     const outputStream = new stream.PassThrough();
     try {
       let isSuccess = false;
+      console.log("Converting to mono");
       await new Promise<void>((resolve, reject) => {
         ffmpeg()
           .setFfmpegPath(ffmpegPath)

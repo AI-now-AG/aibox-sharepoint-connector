@@ -33,6 +33,7 @@ export async function processTranscription(
       numberOfMaxSpeakers,
       uniqueName,
     );
+    console.log("Created trancription task:" + taskResponse.self);
     updateStatus(
       uniqueName,
       "Batch task created",
@@ -287,37 +288,35 @@ function formatTranscription(response: TranscriptionResponse): string {
   };
 
   // Loop through the recognized phrases and format them
-  response.recognizedPhrases.forEach(
-    (phrase: RecognizedPhrase) => {
-      const speakerId = phrase.speaker;
-      const offsetMilliseconds = phrase.offsetMilliseconds;
+  response.recognizedPhrases.forEach((phrase: RecognizedPhrase) => {
+    const speakerId = phrase.speaker;
+    const offsetMilliseconds = phrase.offsetMilliseconds;
 
-      const bestMatch = phrase.nBest.reduce((best, current) => {
-        return current.confidence > best.confidence ? current : best;
-      });
-      const displayText = bestMatch.display;
+    const bestMatch = phrase.nBest.reduce((best, current) => {
+      return current.confidence > best.confidence ? current : best;
+    });
+    const displayText = bestMatch.display;
 
-      let timestamp = undefined;
-      if (offsetMilliseconds) {
-        timestamp = formatTimestamp(offsetMilliseconds);
+    let timestamp = undefined;
+    if (offsetMilliseconds) {
+      timestamp = formatTimestamp(offsetMilliseconds);
+    }
+
+    if (speakerId && speakerId !== currentSpeakerId) {
+      if (currentSpeakerId) {
+        result += `[Speaker ${currentSpeakerId} ${currentSpeakerStartTime}]\n${currentSpeakerText}\n\n`;
       }
+      currentSpeakerId = speakerId;
+      currentSpeakerText = displayText;
+      currentSpeakerStartTime = timestamp;
 
-      if (speakerId && speakerId !== currentSpeakerId) {
-        if (currentSpeakerId) {
-          result += `[Speaker ${currentSpeakerId} ${currentSpeakerStartTime}]\n${currentSpeakerText}\n\n`;
-        }
-        currentSpeakerId = speakerId;
-        currentSpeakerText = displayText;
-        currentSpeakerStartTime = timestamp;
-
-        if (!speakerMap.has(speakerId)) {
-          speakerMap.set(speakerId, `Speaker ${speakerId}`);
-        }
-      } else {
-        currentSpeakerText += ` ${displayText}`;
+      if (!speakerMap.has(speakerId)) {
+        speakerMap.set(speakerId, `Speaker ${speakerId}`);
       }
-    },
-  );
+    } else {
+      currentSpeakerText += ` ${displayText}`;
+    }
+  });
   if (currentSpeakerId) {
     result += `[Speaker ${currentSpeakerId} ${currentSpeakerStartTime}]\n${currentSpeakerText}\n\n`;
   }
