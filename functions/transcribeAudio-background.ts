@@ -203,7 +203,7 @@ async function convertStereoToMono(
     try {
       let isSuccess = false;
       console.log("Converting to mono");
-      await new Promise<void>((resolve, reject) => {
+      new Promise<void>((resolve, reject) => {
         ffmpeg()
           .setFfmpegPath(ffmpegPath)
           .input(downloadBlockBlobResponse)
