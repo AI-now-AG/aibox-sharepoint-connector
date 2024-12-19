@@ -541,6 +541,7 @@
               ? showTextPreviewChecked
               : false,
           typedTranscriptionType: transcriptionType,
+          isDiarizationEnabled: isDiarizationEnabled,
         }),
       });
       if (response.ok) {

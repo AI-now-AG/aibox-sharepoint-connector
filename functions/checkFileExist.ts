@@ -16,6 +16,7 @@ const checkFileExist: Handler = async (event, context) => {
     folderName,
     isShowImprovedTextPreview,
     typedTranscriptionType,
+    isDiarizationEnabled,
   } = JSON.parse(event.body!);
 
   let requireFilesCount = fileNames.length || 0;
@@ -27,7 +28,7 @@ const checkFileExist: Handler = async (event, context) => {
     tempFileNames.push(improvedTxtFileName);
   }
 
-  const txtFileName = `${uniqueName}.txt`;
+  const txtFileName = isDiarizationEnabled ? `${uniqueName}-mono.txt`: `${uniqueName}.txt`;
   if (!fileNames.includes(txtFileName) && !isShowImprovedTextPreview) {
     requireFilesCount += 1;
     tempFileNames.push(txtFileName);
