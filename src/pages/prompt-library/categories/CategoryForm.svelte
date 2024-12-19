@@ -117,7 +117,7 @@
         </div>
       </div>
 
-      <div class="mt-5 mb-20">
+      <div class="mt-7 mb-20">
         <GroupList bind:items={groups} />
       </div>
 

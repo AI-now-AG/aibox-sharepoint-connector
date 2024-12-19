@@ -199,5 +199,7 @@
   "transcription.transcription-is-ready": "Your transcription is ready. Tap to see.",
   "transcription.upload-video-or-audio-file": "Upload Videos / Sound file",
   "welcome.text": "Welcome to aibox – your all-in-one AI solution for boosting productivity! Instantly improve your workflows by automating routine tasks in HR, marketing or other areas. Discover pre-defined prompt-templates to quickly create job descriptions, reports, and marketing content, and enjoy seamless integration for personalized AI-driven solutions. Start optimizing your business today and see how aibox can transform your daily operations in seconds. Get started now and create your custom prompts for a smarter, more efficient work experience.",
-  "welcome.title": "Welcome to aibox!"
+  "welcome.title": "Welcome to aibox!",
+  "confirmation.delete.title": "Please Confirm",
+  "confirmation.delete.description": "Are you sure you want to delete this item? This action cannot be undone."
 }

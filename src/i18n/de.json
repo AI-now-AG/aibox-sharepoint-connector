@@ -198,5 +198,7 @@
   "transcription.transcription-is-ready": "Deine Transkription ist fertig. Tippe, um sie zu sehen.",
   "transcription.upload-video-or-audio-file": "Video- oder Audiodateien hochladen",
   "welcome.text": "Willkommen bei aibox – der smarten KI-Lösung für deine Business! Verbessere deine Arbeitsabläufe blitzschnell durch Automatisierung von Aufgaben im HR, Marketing oder beliebigen anderen Bereichen. Nutze vorgefertigte Prompt-Vorlagen oder nutze deine eigenen Prompts. Optimiere jetzt deine Workflows und repetetiven Aufgaben und erlebe eine sofortige Effizienzsteigerung.",
-  "welcome.title": "Willkommen bei aibox!"
+  "welcome.title": "Willkommen bei aibox!",
+  "confirmation.delete.title": "Bitte bestätigen",
+  "confirmation.delete.description": "Sind Sie sicher, dass Sie dieses Element löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden."
 }

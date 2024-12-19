@@ -61,8 +61,8 @@
   }
 </script>
 
-<div class="w-100">
-  <div class="mt-2 mb-3">
+<div>
+  <div class="mb-3">
     <h1 class="text-lg font-normal text-base-content/80">
       {t("prompt-library.categories.all-group")} ({items.length})
     </h1>
@@ -71,6 +71,7 @@
   <!-- drag and drop list -->
   <div class="flex items-center bg-base-300 py-3 px-4 rounded-lg">
     <div class="flex-1 w-auto text-left font-normal text-xs rounded-l-lg">
+      <span class="inline-flex w-10"></span>
       {t("prompt-library.categories.list.name")}
     </div>
     <div class="flex-none w-20 text-left font-normal text-xs">
@@ -91,7 +92,7 @@
         <div
           class="flex-1 w-auto flex items-center text-sm font-medium rounded-l-lg"
         >
-          <span class="inline-flex mr-3">
+          <span class="inline-flex w-10">
             {@html svgIcons.drag}
           </span>
           <input
@@ -121,7 +122,7 @@
             >
               <li>
                 <button
-                  class="flex block w-full text-left px-4 py-1 text-sm hover:underline"
+                  class="flex block w-full text-left px-4 py-2 text-sm hover:underline"
                   on:click|preventDefault={() =>
                     updateStatus(item.id, !item.active)}
                 >
@@ -135,7 +136,7 @@
               </li>
               <li>
                 <button
-                  class="flex block w-full text-left px-4 py-1 text-sm hover:underline"
+                  class="flex block w-full text-left px-4 py-2 text-sm hover:underline"
                   on:click|preventDefault={() => handleDelete(item.id)}
                 >
                   {@html svgIcons.trash}
