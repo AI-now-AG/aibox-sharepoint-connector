@@ -86,6 +86,8 @@
   "prompt-library.add.categories.title": "Title",
   "prompt-library.delete.categories.success": "Kategorie erfolgreich gelöscht",
   "prompt-library.delete.categories.failed": "Fehler beim Löschen der Kategorie, bitte erneut versuchen",
+  "prompt-library.prompt.change-order": "Change order",
+  "prompt-library.prompt.prompt-order": "Prompt order",
   "prompt-execution.card.showMore": "mehr Prompts",
   "prompt-execution.card.showLess": "weniger Prompts",
   "prompt-execution.showGlobal": "Global speichern",

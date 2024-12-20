@@ -4,12 +4,13 @@
   import { storePromptId } from "$components/prompt-interface/components/Stores";
   import EditPromptDetails from "$components/prompt-interface/components/EditPromptDetails.svelte";
   import ExecutionCardItem from "$components/prompt-interface/components/ExecutionCardItem.svelte";
-  import PromptDndChangeOrderDialog from "$components/prompt-interface/components/PromptDndChangeOrderDialog.svelte";
+  import PromptOrderDialog from "$components/prompt-interface/components/PromptOrderDialog.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import Loading from "$components/Loading.svelte";
   import { loading, showLoading, hideLoading } from "$stores";
-  import log from "$utils/log";
   import { addToast } from "$stores/toast";
+  import { actions } from "astro:actions";
+  import log from "$utils/log";
 
   export let isEditable = false;
   export let cards: any;
@@ -22,12 +23,17 @@
   let selectedCardIndex: number = -1;
   let selectedEditPromptId: string = "";
   let selectedDeletePromptId: string = "";
-  let promptDialog: HTMLDialogElement;
+  let promptDialog: any;
   let promptDialogMode: "update" | "clone" = "update";
-  let confirmDeleteModal: HTMLDialogElement;
-  let promptOrderDialog: HTMLDialogElement;
+  let confirmDeleteModal: any;
+  let promptOrderDialog: any;
 
-  // TODO: Remove below function once default prompt functionality implemented
+  let timeout: any;
+  let orderCards = cards;
+  for (let i = 0; i < orderCards?.length; i++) {
+    orderCards[i] = { ...orderCards[i], id: i + 1 };
+  }
+
   onMount(async function () {
     selectedCardIndex = 0;
     selectedPromptId = cards[0]._id;
@@ -102,7 +108,24 @@
   }
 
   function orderPrompt() {
-    promptOrderDialog.show()
+    promptOrderDialog.show();
+  }
+
+  async function updatePosition(items: any[]) {
+    showLoading();
+    try {
+      const sortedIds = items.map((item) => {
+        return {
+          _id: item._id,
+        };
+      });
+      await actions.prompt.updatePosition(sortedIds);
+      cards = orderCards;
+    } catch (error) {
+      log.e(error, "Error happening during update position");
+    } finally {
+      hideLoading();
+    }
   }
 </script>
 
@@ -124,7 +147,7 @@
             duplicateCard(index);
           }}
           onSelectReOder={() => {
-            orderPrompt()
+            orderPrompt();
           }}
           onSelectDelete={() => {
             onDeleteCard(index);
@@ -149,12 +172,6 @@
   {/if}
 </div>
 
-<ConfirmDialog
-  description={t("prompt-library.delete.prompt.confirm")}
-  bind:modal={confirmDeleteModal}
-  on:confirm={deleteCard}
-/>
-
 <EditPromptDetails
   bind:promptDialog
   bind:selectedEditPromptId
@@ -164,6 +181,21 @@
     : t("prompt-library.edit.title")}
 />
 
-<PromptDndChangeOrderDialog bind:promptOrderDialog items={cards} />
+<PromptOrderDialog
+  bind:promptOrderDialog
+  bind:items={orderCards}
+  on:confirm={() => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      updatePosition(orderCards);
+    }, 100);
+  }}
+/>
+
+<ConfirmDialog
+  description={t("prompt-library.delete.prompt.confirm")}
+  bind:modal={confirmDeleteModal}
+  on:confirm={deleteCard}
+/>
 
 <Loading bind:show={$loading} />
