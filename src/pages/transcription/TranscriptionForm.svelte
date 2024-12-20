@@ -793,7 +793,7 @@
   }
 
   function checkNumberInput(value: number, increase?: number) {
-    let newValue = value;
+    let newValue = parseInt(value);
     if (increase) {
       newValue = parseInt(value) + parseInt(increase);
     }
@@ -806,7 +806,9 @@
         maxNumberOfSpeakers = maxSpeakers;
       }
     } else {
-      maxNumberOfSpeakers = minSpeakers;
+      if (value != "") {
+        maxNumberOfSpeakers = minSpeakers;
+      }
     }
   }
 </script>

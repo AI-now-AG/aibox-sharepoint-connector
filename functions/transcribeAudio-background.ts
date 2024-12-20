@@ -20,7 +20,7 @@ import {
 } from "$utils/TranscribeRequest";
 import { ObjectId } from "mongodb";
 import ffmpeg from "fluent-ffmpeg";
-import stream from "stream";
+import stream, { PassThrough } from "stream";
 import path from "path";
 import os from "os";
 import { Readable } from "stream";
@@ -115,7 +115,7 @@ const transcribeAudio: Handler = async (
       transcriptionResult = await transcribeUsingOpenAI(transcribeParams);
     }
     if (!transcriptionResult.success) {
-      updateTask(uniqueName, {
+      await updateTask(uniqueName, {
         status: "failed",
         error:
           transcriptionResult.error || "Unknown error during transcription.",
@@ -127,7 +127,7 @@ const transcribeAudio: Handler = async (
         }),
       };
     } else {
-      updateTask(uniqueName, {
+      await updateTask(uniqueName, {
         status: "completed",
         txtUrl: transcriptionResult.data?.urls["txt"],
         srtUrl: transcriptionResult.data?.urls["srt"] ?? "",
@@ -146,12 +146,12 @@ const transcribeAudio: Handler = async (
     const { uniqueName = "unknown_task" } = JSON.parse(event.body || "{}");
 
     if (error instanceof Error) {
-      updateTask(uniqueName, {
+      await updateTask(uniqueName, {
         status: "failed",
         error: error.message,
       });
     } else {
-      updateTask(uniqueName, {
+      await updateTask(uniqueName, {
         status: "failed",
         error: "Unknown error during transcription.",
       });
@@ -201,46 +201,52 @@ async function convertStereoToMono(
       containerClient.getBlockBlobClient(convertedBlobName);
     const outputStream = new stream.PassThrough();
     try {
-      let isSuccess = true;
       console.log("Converting to mono");
-      new Promise<void>((resolve, reject) => {
-        ffmpeg()
-          .setFfmpegPath(ffmpegPath)
-          .input(downloadBlockBlobResponse)
-          .audioChannels(1)
-          .format(fileExtension)
-          .output(outputStream)
-          .on("error", (err) => {
-            console.error("FFmpeg error:", err);
-            updateTask(uniqueName, {
-              status: "failed",
-              error: err.message,
-            });
-            isSuccess = false;
-            reject(err);
-          })
-          .on("end", () => {
-            resolve();
-          })
-          .run();
-      });
-      if (isSuccess) {
-        await monoBlobClient.uploadStream(outputStream);
-        fileUrl = monoBlobClient.url;
-      }
+      await processWithFFmpeg(
+        downloadBlockBlobResponse,
+        outputStream,
+        fileExtension,
+      );
+      await monoBlobClient.uploadStream(outputStream);
+      fileUrl = monoBlobClient.url;
     } catch (error) {
       if (error instanceof Error) {
-        console.error("Catch Ffmpeg error:", error);
-        updateTask(uniqueName, {
+        console.error("Ffmpeg error:", error);
+        await updateTask(uniqueName, {
           status: "failed",
           error: error.message,
         });
       } else {
         console.error("Unknown error occurred:", error);
       }
+    } finally {
+      outputStream.end();
     }
   }
+
   return fileUrl;
+}
+
+async function processWithFFmpeg(
+  inputStream: Readable,
+  outputStream: PassThrough,
+  format: string,
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    ffmpeg()
+      .setFfmpegPath(ffmpegPath)
+      .input(inputStream)
+      .audioChannels(1)
+      .format(format)
+      .output(outputStream)
+      .on("error", (err) => {
+        reject(err);
+      })
+      .on("end", () => {
+        resolve();
+      })
+      .run();
+  });
 }
 
 async function downloadFileFromBlob(

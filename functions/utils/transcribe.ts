@@ -341,11 +341,12 @@ export async function transcribeUsingAzureOpenAI(
   transcribeParams: TranscribeRequest,
 ): Promise<TranscriptionResult> {
   try {
+    const maxNumberOfSpeakers = transcribeParams.maxSpeakers ?? 2
     const { jsonData, transcriptionText } = await processTranscription(
       transcribeParams.uploadUrl,
       transcribeParams.uniqueName,
       transcribeParams.isDiarizationEnabled,
-      transcribeParams.maxSpeakers,
+      maxNumberOfSpeakers,
     );
 
     const fileNameWithExtension = transcribeParams.uploadUrl
