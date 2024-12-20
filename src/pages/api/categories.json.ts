@@ -119,10 +119,14 @@ export const PUT: APIRoute = async (ctx) => {
   const params = await ctx.request.json();
   const data = CreateCategoryParamsSchema.parse(params);
 
+  console.log("data", data);
   const groups = data.groups.reduce<Group[]>((uniqueGroups, group) => {
     if (!uniqueGroups.some((g) => g.title === group.title)) {
+      const groupId = ObjectId.isValid(group._id || "")
+        ? new ObjectId(group._id)
+        : new ObjectId();
       uniqueGroups.push({
-        _id: new ObjectId(),
+        _id: groupId,
         title: group.title,
         slug: slug(group.title),
         position: group?.position || 0,

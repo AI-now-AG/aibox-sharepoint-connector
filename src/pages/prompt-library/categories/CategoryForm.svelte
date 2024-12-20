@@ -62,14 +62,13 @@
         groups = [];
         title = undefined;
 
-        window.history.back();
         addToast({
           message: data.message || t("prompt-library.add.category.success"),
           type: "success",
         });
-        // setTimeout(() => {
-        //   window.location.reload();
-        // }, 2000);
+        setTimeout(() => {
+          window.history.back();
+        }, 1000);
       } catch (error) {
         addToast({
           message:
@@ -93,7 +92,7 @@
 <div class="container max-w-full p-6 px-14 mx-auto p-4">
   <div class="w-full min-w-xs pt-2 lg:pt-6">
     <div class="flex items-center pt-2 pb-6">
-      <button class="mr-4" onclick="window.history.back();">
+      <button class="mr-4" on:click|preventDefault={() => window.history.back()}>
         {@html svgIcons.back}
       </button>
       <h1 class="text-4xl font-bold">
@@ -117,12 +116,12 @@
         </div>
       </div>
 
-      <div class="mt-5 mb-20">
+      <div class="mt-7 mb-20">
         <GroupList bind:items={groups} />
       </div>
 
       {#if isEditable}
-        <div class="flex items-center justify-between">
+        <div class="flex items-center">
           <button
             class={`btn btn-active btn-primary px-8 font-normal ${isSaving && "btn-disabled"}`}
             on:click|preventDefault={save}
@@ -133,6 +132,9 @@
             {:else}
               {t("prompt-library.add.category.save")}
             {/if}
+          </button>
+          <button class="btn ml-5" on:click|preventDefault={() => window.history.back()}>
+            {t("common.cancel")}
           </button>
         </div>
       {/if}

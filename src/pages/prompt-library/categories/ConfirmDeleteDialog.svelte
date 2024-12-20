@@ -15,8 +15,8 @@
       <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
         >✕</button
       >
-      <h3 class="text-lg font-bold">Please confirm</h3>
-      <p class="mt-5 text-md">Are you sure you want to delete?</p>
+      <h3 class="text-lg font-bold">{t("confirmation.delete.title")}</h3>
+      <p class="mt-5 text-md">{t("confirmation.delete.description")}</p>
       <div class="flex justify-between gap-4 mt-6">
         <button
           class="btn btn-warning flex-1"

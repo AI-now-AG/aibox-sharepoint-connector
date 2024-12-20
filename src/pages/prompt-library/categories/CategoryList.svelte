@@ -125,10 +125,13 @@
   <div class="relative">
     <div class="flex items-center bg-base-300 py-3 px-4 rounded-lg">
       <div class="flex-none w-64 text-left font-normal text-xs rounded-l-lg">
-        Name
+        <span class="inline-flex w-10"></span>
+        {t("prompt-library.categories.list.name")}
       </div>
       <div class="flex-1 w-auto text-left font-normal text-xs">&nbsp;</div>
-      <div class="flex-none w-20 text-left font-normal text-xs">Status</div>
+      <div class="flex-none w-20 text-left font-normal text-xs">
+        {t("prompt-library.categories.list.status")}
+      </div>
       <div class="flex-none w-20 rounded-r-lg"></div>
     </div>
 
@@ -144,7 +147,7 @@
           <div
             class="flex-none w-64 flex items-center text-sm font-medium rounded-l-lg"
           >
-            <span class="inline-flex mr-3">
+            <span class="inline-flex w-10">
               {@html svgIcons.drag}
             </span>
             <a
@@ -185,32 +188,34 @@
               >
                 <li>
                   <a
-                    class="flex block w-full text-left px-4 py-1 text-sm hover:underline"
+                    class="flex block w-full text-left px-4 py-2 text-sm hover:underline"
                     href="categories/{item.id}"
                   >
                     {@html svgIcons.edit}
-                    <span class="ml-1">Edit</span>
+                    <span class="ml-1">{t("common.edit")}</span>
                   </a>
                 </li>
                 <li>
                   <button
-                    class="flex block w-full text-left px-4 py-1 text-sm hover:underline"
+                    class="flex block w-full text-left px-4 py-2 text-sm hover:underline"
                     on:click|preventDefault={() =>
                       updateStatus(item.id, !item.active)}
                   >
                     {@html item.active == 1 ? svgIcons.eyeClose : svgIcons.eye}
                     <span class="ml-1"
-                      >{item.active == 1 ? "deactivate" : "activate"}</span
+                      >{item.active == 1
+                        ? t("common.deactivate")
+                        : t("common.activate")}</span
                     >
                   </button>
                 </li>
                 <li>
                   <button
-                    class="flex block w-full text-left px-4 py-1 text-sm hover:underline"
+                    class="flex block w-full text-left px-4 py-2 text-sm hover:underline"
                     on:click|preventDefault={() => handleDelete(item.id)}
                   >
                     {@html svgIcons.trash}
-                    <span class="ml-1">Delete</span>
+                    <span class="ml-1">{t("common.delete")}</span>
                   </button>
                 </li>
               </ul>

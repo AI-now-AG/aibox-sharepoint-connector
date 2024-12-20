@@ -7,10 +7,7 @@
 </script>
 
 <script lang="ts">
-  import { actions } from "astro:actions";
   import { dndzone } from "svelte-dnd-action";
-  import { flip } from "svelte/animate";
-  import { addToast } from "$stores/toast";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
   import ConfirmDeleteDialog from "./ConfirmDeleteDialog.svelte";
@@ -64,19 +61,22 @@
   }
 </script>
 
-<div class="w-100">
-  <div class="mt-2 mb-3">
+<div>
+  <div class="mb-3">
     <h1 class="text-lg font-normal text-base-content/80">
-      Groups in this category ({items.length})
+      {t("prompt-library.categories.all-group")} ({items.length})
     </h1>
   </div>
 
   <!-- drag and drop list -->
   <div class="flex items-center bg-base-300 py-3 px-4 rounded-lg">
     <div class="flex-1 w-auto text-left font-normal text-xs rounded-l-lg">
-      Name
+      <span class="inline-flex w-10"></span>
+      {t("prompt-library.categories.list.name")}
     </div>
-    <div class="flex-none w-20 text-left font-normal text-xs">Status</div>
+    <div class="flex-none w-20 text-left font-normal text-xs">
+      {t("prompt-library.categories.list.status")}
+    </div>
     <div class="flex-none w-20 rounded-r-lg"></div>
   </div>
 
@@ -92,7 +92,7 @@
         <div
           class="flex-1 w-auto flex items-center text-sm font-medium rounded-l-lg"
         >
-          <span class="inline-flex mr-3">
+          <span class="inline-flex w-10">
             {@html svgIcons.drag}
           </span>
           <input
@@ -122,23 +122,25 @@
             >
               <li>
                 <button
-                  class="flex block w-full text-left px-4 py-1 text-sm hover:underline"
+                  class="flex block w-full text-left px-4 py-2 text-sm hover:underline"
                   on:click|preventDefault={() =>
                     updateStatus(item.id, !item.active)}
                 >
                   {@html item.active == 1 ? svgIcons.eyeClose : svgIcons.eye}
                   <span class="ml-1"
-                    >{item.active == 1 ? "deactivate" : "activate"}</span
+                    >{item.active == 1
+                      ? t("common.deactivate")
+                      : t("common.activate")}</span
                   >
                 </button>
               </li>
               <li>
                 <button
-                  class="flex block w-full text-left px-4 py-1 text-sm hover:underline"
+                  class="flex block w-full text-left px-4 py-2 text-sm hover:underline"
                   on:click|preventDefault={() => handleDelete(item.id)}
                 >
                   {@html svgIcons.trash}
-                  <span class="ml-1">Delete</span>
+                  <span class="ml-1">{t("common.delete")}</span>
                 </button>
               </li>
             </ul>
@@ -154,7 +156,7 @@
       on:click|preventDefault={addGroup}
     >
       {@html svgIcons.add}
-      Add a group
+      {t("prompt-library.categories.add-group")}
     </button>
   </div>
 
