@@ -12,7 +12,8 @@
     "check:eslint": "eslint 'src/**/*.{js,mjs,cjs,ts,astro,svelte}'",
     "check:svelte": "svelte-check",
     "astro": "astro",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "fetch-trans": "node scripts/i18n/fetchTranslations.js"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
