@@ -202,11 +202,12 @@ async function convertStereoToMono(
     const outputStream = new stream.PassThrough();
     try {
       console.log("Converting to mono");
-      await processWithFFmpeg(
+      processWithFFmpeg(
         downloadBlockBlobResponse,
         outputStream,
         fileExtension,
       );
+      console.log("File converted");
       await monoBlobClient.uploadStream(outputStream);
       fileUrl = monoBlobClient.url;
     } catch (error) {
