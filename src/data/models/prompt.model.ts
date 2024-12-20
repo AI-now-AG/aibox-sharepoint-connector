@@ -92,4 +92,12 @@ export default {
     );
     return result;
   },
+
+  getMaxPosition: async (groupId: ObjectId) => {
+    return collection
+      .find<Document<Prompt>>({ group: groupId })
+      .sort({ position: -1 })
+      .limit(1)
+      .next();
+  },
 };
