@@ -197,7 +197,6 @@ export async function pollTranscriptionTask(
         undefined,
         undefined,
         undefined,
-        `${JSON.stringify(data)}`,
       );
     }
 
