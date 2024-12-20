@@ -46,11 +46,11 @@
   {#if isEditable}
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <section
-      class="absolute top-5 right-2 w-5 h-5"
+      class="absolute top-2 right-2 w-5 h-5"
       on:mouseenter={handleMouseEnter}
       on:mouseleave={handleMouseLeave}
     >
-      <div class="text-neutral">
+      <div class="text-neutral hover:text-black flex items-center justify-center rounded hover:bg-[#BDC0C3] w-5 h-5">
         {@html svgIcons.threeDot}
       </div>
       {#if isShowDropdownOption}
