@@ -68,6 +68,7 @@
 
   function removeDeletedItem(deletedId: string) {
     cards = cards?.filter((item: any) => item._id !== deletedId);
+    orderCards = orderCards?.filter((item: any) => item._id !== deletedId);
   }
 
   async function deleteCard() {
