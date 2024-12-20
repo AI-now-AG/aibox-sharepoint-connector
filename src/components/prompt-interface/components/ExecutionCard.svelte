@@ -23,10 +23,10 @@
   let selectedCardIndex: number = -1;
   let selectedEditPromptId: string = "";
   let selectedDeletePromptId: string = "";
-  let promptDialog: any;
+  let promptDialog: HTMLDialogElement;
   let promptDialogMode: "update" | "clone" = "update";
-  let confirmDeleteModal: any;
-  let promptOrderDialog: any;
+  let confirmDeleteModal: HTMLDialogElement;
+  let promptOrderDialog: HTMLDialogElement;
 
   let timeout: any;
   let orderCards = cards;
@@ -121,8 +121,16 @@
       });
       await actions.prompt.updatePosition(sortedIds);
       cards = orderCards;
+      addToast({
+        message: t("prompt-library.prompt.order-success"),
+        type: "success",
+      });
     } catch (error) {
       log.e(error, "Error happening during update position");
+      addToast({
+        message: t("prompt-library.prompt.order-failed"),
+        type: "error",
+      });
     } finally {
       hideLoading();
     }

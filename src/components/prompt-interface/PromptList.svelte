@@ -1,11 +1,13 @@
 <script lang="ts">
   import PromptItem from "$components/prompt-interface/PromptItem.svelte";
   import EditPromptDetails from "$components/prompt-interface/components/EditPromptDetails.svelte";
+  import PromptOrderDialog from "$components/prompt-interface/components/PromptOrderDialog.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import Loading from "$components/Loading.svelte";
   import { loading, showLoading, hideLoading } from "$stores";
   import { addToast } from "$stores/toast";
   import { useTranslations } from "$i18n/utils";
+  import { actions } from "astro:actions";
   import log from "$utils/log";
 
   interface CardItem {
@@ -27,6 +29,8 @@
   let promptDialog: HTMLDialogElement;
   let promptDialogMode: "update" | "clone" = "update";
   let confirmDeleteModal: HTMLDialogElement;
+  let promptOrderDialog: HTMLDialogElement;
+  let timeout: any;
 
   async function editCard(index: number) {
     selectedEditPromptId = items[index]?.id ?? "";
@@ -85,6 +89,34 @@
       });
     }
   }
+
+  function orderPrompt() {
+    promptOrderDialog.show();
+  }
+
+  async function updatePosition(items: any[]) {
+    showLoading();
+    try {
+      const sortedIds = items.map((item) => {
+        return {
+          _id: item._id,
+        };
+      });
+      await actions.prompt.updatePosition(sortedIds);
+      addToast({
+        message: t("prompt-library.prompt.order-success"),
+        type: "success",
+      });
+    } catch (error) {
+      log.e(error, "Error happening during update position");
+      addToast({
+        message: t("prompt-library.prompt.order-failed"),
+        type: "error",
+      });
+    } finally {
+      hideLoading();
+    }
+  }
 </script>
 
 <div class="container max-w-5xl mx-auto p-6 space-y-4">
@@ -104,7 +136,7 @@
           duplicateCard(index);
         }}
         onSelectReOder={() => {
-          // TODO: Handle Order
+          orderPrompt();
         }}
         onSelectDelete={() => {
           onDeleteCard(index);
@@ -114,12 +146,6 @@
   </div>
 </div>
 
-<ConfirmDialog
-  description={t("prompt-library.delete.prompt.confirm")}
-  bind:modal={confirmDeleteModal}
-  on:confirm={deleteCard}
-/>
-
 <EditPromptDetails
   bind:promptDialog
   bind:selectedEditPromptId
@@ -127,6 +153,23 @@
   dialogTitle={promptDialogMode == "clone"
     ? t("prompt-library.clone.title")
     : t("prompt-library.edit.title")}
+/>
+
+<PromptOrderDialog
+  bind:promptOrderDialog
+  bind:items
+  on:confirm={() => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      updatePosition(items);
+    }, 100);
+  }}
+/>
+
+<ConfirmDialog
+  description={t("prompt-library.delete.prompt.confirm")}
+  bind:modal={confirmDeleteModal}
+  on:confirm={deleteCard}
 />
 
 <Loading bind:show={$loading} />

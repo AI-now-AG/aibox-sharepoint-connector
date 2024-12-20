@@ -119,6 +119,8 @@
   "prompt-library.prompt.change-order": "Change order",
   "prompt-library.prompt.prompt-order": "Prompt order",
   "prompt-library.clone.title": "Duplicate Prompt",
+  "prompt-library.prompt.order-success": "Change prompt order successfully",
+  "prompt-library.prompt.order-failed": "Change prompt order failed",
   "settings.transcription.instructions-placeholder": "e.g. type instruction details...",
   "settings.transcription.instructions-plaintext": "Instructions for plaintext",
   "settings.transcription.instructions-subtitle": "Instructions for subtitle (SRT)",
