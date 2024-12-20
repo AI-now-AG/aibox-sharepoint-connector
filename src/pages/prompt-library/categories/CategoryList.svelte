@@ -233,5 +233,6 @@
   <ConfirmDeleteDialog
     bind:modal={confirmDeleteModal}
     on:confirm={deleteCategory}
+    isCategory={true}
   />
 </div>

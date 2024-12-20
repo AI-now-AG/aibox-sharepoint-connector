@@ -7,6 +7,7 @@
   const t = useTranslations();
 
   export let modal;
+  export let isCategory = false;
 </script>
 
 <dialog bind:this={modal} class="modal">
@@ -16,7 +17,15 @@
         >✕</button
       >
       <h3 class="text-lg font-bold">{t("confirmation.delete.title")}</h3>
-      <p class="mt-5 text-md">{t("confirmation.delete.description")}</p>
+      {#if isCategory}
+        <p class="mt-5 text-md">
+          {t("prompt-library.delete.category.confirm")}
+        </p>
+      {:else}
+        <p class="mt-5 text-md">
+          {t("prompt-library.delete.group.confirm")}
+        </p>
+      {/if}
       <div class="flex justify-between gap-4 mt-6">
         <button
           class="btn btn-warning flex-1"
