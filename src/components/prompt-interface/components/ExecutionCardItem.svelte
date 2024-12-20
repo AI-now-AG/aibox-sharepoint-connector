@@ -34,7 +34,7 @@
   {#if isEditable}
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <section
-      class="absolute top-3 right-3"
+      class="absolute top-2 right-2"
       on:mouseenter={handleMouseEnter}
       on:mouseleave={handleMouseLeave}
     >
