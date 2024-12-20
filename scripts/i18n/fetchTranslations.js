@@ -32,19 +32,20 @@ const fetchTranslations = async () => {
     console.log("headers", headers);
     await Promise.all(
       headers.map(async (lang, index) => {
+        const locale = lang.split(" ")[0]?.toLowerCase();
         const translations = {};
 
         data.forEach((row) => {
           const key = row[2]; // Get the translation key from the 3rd column (KEY)
-          const translation = row[index + 3]; // Match the translation column index (starting at 3rd column)
+          const translation = row[index + 3] || row[3]; // Match the translation column index (starting at 3rd column)
 
           if (key && translation) {
             translations[key] = translation;
           }
         });
+        console.log("translation", { locale, translations });
 
         // Save to file
-        const locale = lang.split(" ")[0]?.toLowerCase();
         const filePath = `./src/i18n/${locale}.json`; // Use only the language code as file name (e.g., "EN.json")
         await fs.writeFile(
           filePath,

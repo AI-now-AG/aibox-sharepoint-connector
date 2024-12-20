@@ -31,7 +31,7 @@
   let timeout: any;
   const t = useTranslations();
 
-  function reloadPage(delay = 2000) {
+  function reloadPage(delay = 1500) {
     setTimeout(() => {
       window.location.reload();
     }, delay);
@@ -48,6 +48,7 @@
     clearTimeout(timeout);
     timeout = setTimeout(() => {
       updatePosition(items);
+      reloadPage();
     }, 300);
     //console.log("category list / finalize dispatched", { items });
   }
