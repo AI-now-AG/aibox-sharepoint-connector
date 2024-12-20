@@ -1,3 +1,14 @@
+<script lang="ts" context="module">
+  export interface CardItem {
+    id: string;
+    title: string;
+    description?: string;
+    instruction: string;
+    group: string;
+    tags?: string[];
+  }
+</script>
+
 <script lang="ts">
   import PromptItem from "$components/prompt-interface/PromptItem.svelte";
   import EditPromptDetails from "$components/prompt-interface/components/EditPromptDetails.svelte";
@@ -10,14 +21,6 @@
   import { actions } from "astro:actions";
   import log from "$utils/log";
 
-  interface CardItem {
-    id: string;
-    title: string;
-    description?: string;
-    instruction: string;
-    tags?: string[];
-  }
-
   const t = useTranslations();
 
   export let items: CardItem[] = [];
@@ -26,11 +29,18 @@
 
   let selectedEditPromptId: string = "";
   let selectedDeletePromptId: string = "";
+  let selectedOrderPromptId: string = "";
   let promptDialog: HTMLDialogElement;
   let promptDialogMode: "update" | "clone" = "update";
   let confirmDeleteModal: HTMLDialogElement;
   let promptOrderDialog: HTMLDialogElement;
+
   let timeout: any;
+  let orderCards = items;
+
+  function getItemsByGroupId(items: CardItem[], groupId: string): CardItem[] {
+    return items.filter((item) => item.group === groupId);
+  }
 
   async function editCard(index: number) {
     selectedEditPromptId = items[index]?.id ?? "";
@@ -90,7 +100,11 @@
     }
   }
 
-  function orderPrompt() {
+  function orderPrompt(index: number) {
+    selectedOrderPromptId = items[index]?.id ?? "";
+    const selectedItem = items[index];
+    const groupIdToSearch = selectedItem.group ?? "";
+    orderCards = getItemsByGroupId(items ?? [], groupIdToSearch);
     promptOrderDialog.show();
   }
 
@@ -99,7 +113,7 @@
     try {
       const sortedIds = items.map((item) => {
         return {
-          _id: item._id,
+          _id: item.id,
         };
       });
       await actions.prompt.updatePosition(sortedIds);
@@ -136,7 +150,7 @@
           duplicateCard(index);
         }}
         onSelectReOder={() => {
-          orderPrompt();
+          orderPrompt(index);
         }}
         onSelectDelete={() => {
           onDeleteCard(index);
@@ -157,11 +171,11 @@
 
 <PromptOrderDialog
   bind:promptOrderDialog
-  bind:items
+  bind:items={orderCards}
   on:confirm={() => {
     clearTimeout(timeout);
     timeout = setTimeout(() => {
-      updatePosition(items);
+      updatePosition(orderCards);
     }, 100);
   }}
 />

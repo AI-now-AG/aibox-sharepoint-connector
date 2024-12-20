@@ -31,7 +31,7 @@
   let timeout: any;
   let orderCards = cards;
   for (let i = 0; i < orderCards?.length; i++) {
-    orderCards[i] = { ...orderCards[i], id: i + 1 };
+    orderCards[i] = { ...orderCards[i], id: orderCards[i]._id };
   }
 
   onMount(async function () {

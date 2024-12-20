@@ -9,7 +9,7 @@
 
   export let promptOrderDialog: HTMLDialogElement;
   export let dialogTitle: string = t("prompt-library.prompt.change-order");
-  export let items: any;
+  export let items: any[];
 
   const flipDurationMs = 300;
   const dropTargetStyle: any = { outline: "" };
