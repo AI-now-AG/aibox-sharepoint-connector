@@ -41,7 +41,7 @@
       <div
         class="${active
           ? 'text-white hover:text-black'
-          : 'text-neutral hover:text-black'} flex items-center justify-center rounded hover:bg-[#BDC0C3] w-5 h-5"
+          : 'text-neutral hover:text-black'} flex items-center justify-center rounded hover:bg-[#BDC0C3] w-6 h-5"
       >
         {@html svgIcons.threeDot}
       </div>
