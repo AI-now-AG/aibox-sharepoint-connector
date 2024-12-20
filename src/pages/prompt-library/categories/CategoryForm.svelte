@@ -89,7 +89,7 @@
   }
 </script>
 
-<div class="container max-w-5xl p-6 py-14 mx-auto">
+<div class="container max-w-5xl p-6 mx-auto">
   <div class="w-full min-w-xs pt-2 lg:pt-6">
     <div class="flex items-center pt-2 pb-6">
       <button class="mr-4" on:click|preventDefault={() => window.history.back()}>

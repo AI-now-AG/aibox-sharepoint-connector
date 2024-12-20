@@ -117,7 +117,7 @@
   }
 </script>
 
-<div class="container max-w-5xl mx-auto p-6 py-14 space-y-4">
+<div class="container max-w-5xl mx-auto p-6 space-y-4">
   <h1 class="text-lg font-normal text-base-content/80">
     {t("prompt-library.categories.all")} ({items.length})
   </h1>
