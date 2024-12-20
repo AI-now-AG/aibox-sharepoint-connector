@@ -10,9 +10,7 @@
   const t = useTranslations();
 </script>
 
-<div
-  class="absolute right-0 mt-1 w-48 md:w-44 bg-white rounded-xl shadow-xl z-50"
->
+<div class="absolute right-0 w-48 md:w-44 bg-white rounded-xl shadow-xl z-50">
   <ul class="py-2">
     <li class="hover:bg-gray-200 cursor-pointer">
       <button
@@ -23,7 +21,9 @@
         }}
       >
         {@html svgIcons.edit}
-        <span class="text-sm font-semibold ml-2">{t("common.edit")}</span>
+        <span class="text-sm font-semibold ml-2 text-left"
+          >{t("common.edit")}</span
+        >
       </button>
     </li>
     <li class="hover:bg-gray-200 cursor-pointer">
@@ -35,7 +35,9 @@
         }}
       >
         {@html svgIcons.duplicate}
-        <span class="text-sm font-semibold ml-2">{t("common.duplicate")}</span>
+        <span class="text-sm font-semibold ml-2 text-left"
+          >{t("common.duplicate")}</span
+        >
       </button>
     </li>
     <li class="hover:bg-gray-200 cursor-pointer">
@@ -47,7 +49,7 @@
         }}
       >
         {@html svgIcons.reOrder}
-        <span class="text-sm font-semibold ml-2"
+        <span class="text-sm font-semibold ml-2 text-left"
           >{t("common.change-order")}</span
         >
       </button>
@@ -61,7 +63,9 @@
         }}
       >
         {@html svgIcons.trash}
-        <span class="text-sm font-semibold ml-2">{t("common.delete")}</span>
+        <span class="text-sm font-semibold ml-2 text-left"
+          >{t("common.delete")}</span
+        >
       </button>
     </li>
   </ul>
