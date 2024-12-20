@@ -523,7 +523,7 @@
       azureOpenAIWhisperModel: tenant?.azure_openai_whisper_model,
       azureOpenAIChatModel: tenant?.azure_openai_chat_model,
       isDiarizationEnabled: isDiarizationEnabled,
-      maxSpeakers: maxNumberOfSpeakers,
+      maxSpeakers: parseInt(maxNumberOfSpeakers),
     };
   }
 
