@@ -1,23 +1,30 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import { useTranslations } from "$i18n/utils";
-  import { svgIcons } from "$assets/icons";
 
   const dispatch = createEventDispatcher();
   const t = useTranslations();
 
-  export let modal;
+  export let modal: any;
+  export let title: string = "";
+  export let description: string = "";
 </script>
 
-<dialog id={"modal_confirm_update"} bind:this={modal} class="modal">
+<dialog bind:this={modal} class="modal">
   <div class="modal-box">
     <form method="dialog" id="modalForm">
       <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
         >✕</button
       >
-      <h3 id="modal_title" class="text-lg font-bold">
-        {t("tenant.tenants.tenant.update-confirmation")}
+
+      {#if title}
+      <h3 class="text-lg font-bold">
+        {title}
       </h3>
+      {/if}
+
+      <p class="mt-5 text-md">{description}</p>
+
       <div class="flex justify-between gap-4 mt-6">
         <button
           id="yes_button"

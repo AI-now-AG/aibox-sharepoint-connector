@@ -8,17 +8,22 @@
   import { addToast } from "$stores/toast";
   import LoadingSpinner from "$components/prompt-interface/components/LoadingSpinner.svelte";
   import { svgIcons } from "$assets/icons";
-  const t = useTranslations();
-  export let dlgEl: HTMLDialogElement;
+  import log from "$utils/log";
 
+  const t = useTranslations();
+
+  export let isEditable: boolean = true;
   export let selectedEditPromptId: any = null;
+  export let promptDialog: HTMLDialogElement;
+  export let dialogMode: "create" | "update" | "clone" = "update";
+  export let dialogTitle: string = t("prompt-library.edit.title");
+
   type Group = { title: string; _id: string }; // TODO: Get the type from the API endpoint
   type Category = {
     title: string;
     _id: string;
     groups: Group[];
   };
-
   type KnowledgeBase = {
     title: string;
     _id: string;
@@ -26,29 +31,30 @@
 
   let categories: Category[] = [];
   let selectedCategory: Category;
-  let selectedGroup: Group;
 
+  let knowledgeBases: KnowledgeBase[] = [];
+  let selectedKnowledgeBases: KnowledgeBase[] = [];
+
+  let selectedGroup: Group | any;
   let previousCategoryId: string | null = null;
+
+  let promptTitle = "";
+  let promptText = "";
+  let promptDetails: any | undefined = undefined;
+
+  let isSaving = false;
+  let isLoading = false;
+
   $: if (selectedCategory && selectedCategory._id !== previousCategoryId) {
     selectedGroup = null;
     previousCategoryId = selectedCategory._id;
   }
 
-  let knowledgeBases: KnowledgeBase[] = [];
-  let selectedKnowledgeBases: KnowledgeBase[] = [];
-
-  let promptTitle = "";
-  let promptText = "";
-
-  let promptDetails: any | undefined = undefined;
-  export let isEditable: boolean = true;
-  let isSaving = false;
   $: isFormValid =
     promptTitle.trim() !== "" &&
     promptText.trim() !== "" &&
     selectedCategory !== undefined &&
     selectedGroup !== undefined;
-  let isLoading = false;
 
   // Fetch prompt details when selectedEditPromptId changes
   $: if (selectedEditPromptId) {
@@ -56,15 +62,14 @@
   }
 
   onMount(async function () {
-    const response = await fetch("/api/categories.json", { method: "GET" });
-    const data = await response.json();
-    if (data) {
-      categories = data;
+    const categoryResponse = await fetch("/api/categories.json", {
+      method: "GET",
+    });
+    const categoryData = (await categoryResponse.json()) as Category[];
+    if (categoryData) {
+      categories = categoryData;
     }
-    await fetchInstructionAndKB();
-  });
 
-  async function fetchInstructionAndKB() {
     const knowledgeBaseResponse = await fetch("/api/knowledge-base.json", {
       method: "GET",
     });
@@ -73,7 +78,7 @@
     if (knowledgeBaseData) {
       knowledgeBases = knowledgeBaseData;
     }
-  }
+  });
 
   async function getPromptDetail(id: string) {
     isLoading = true;
@@ -95,6 +100,9 @@
 
       promptDetails = await response.json();
       promptTitle = promptDetails.title;
+      if (dialogMode == "clone") {
+        promptTitle = promptTitle?.trim() + " (" + t("common.copy") + ")";
+      }
       promptText = promptDetails.prompt;
 
       const category = categories.find(
@@ -117,7 +125,7 @@
         )
         .filter((kb: any) => kb !== undefined) as KnowledgeBase[];
     } catch (error) {
-      dlgEl.close();
+      promptDialog.close();
       addToast({
         message:
           error instanceof Error ? error.message : t("common.unexpected.error"),
@@ -140,9 +148,15 @@
         ...(selectedGroup && { group: selectedGroup._id }),
         ...(selectedEditPromptId && { _id: selectedEditPromptId }),
       };
-      console.log(newPrompt);
+      log.d(newPrompt, "newPrompt");
+
+      let httpMethod = "PUT"; // FOR UPDATING EXISING
+      if (dialogMode == "clone") {
+        httpMethod = "POST"; // FOR CREATING NEW
+      }
+      log.d(httpMethod, "httpMethod");
       const response = await fetch("/api/prompts.json", {
-        method: "PUT",
+        method: httpMethod,
         body: JSON.stringify(newPrompt),
         headers: {
           "Content-Type": "application/json",
@@ -163,7 +177,7 @@
       });
       setTimeout(() => {
         window.location.reload();
-      }, 2000);
+      }, 0);
     } catch (error) {
       addToast({
         message:
@@ -176,7 +190,7 @@
   }
 
   function cancelEdit() {
-    dlgEl.close();
+    promptDialog.close();
     promptTitle = "";
     promptText = "";
     selectedKnowledgeBases = [];
@@ -184,10 +198,10 @@
   }
 </script>
 
-<dialog class="modal" bind:this={dlgEl}>
+<dialog class="modal" bind:this={promptDialog}>
   <div class="modal-box w-8/12 max-w-5xl">
     <div class="flex justify-between">
-      <h3 class="text-lg font-bold py-4">{t("prompt-library.edit.title")}</h3>
+      <h3 class="text-lg font-bold py-4">{dialogTitle}</h3>
       <button class="btn btn-sm btn-circle btn-ghost" on:click={cancelEdit}>
         {@html svgIcons.closeMenu}
       </button>
@@ -218,13 +232,6 @@
       <div
         class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 justify-center"
       >
-        <!-- <MultiInput
-          title={t("prompt-library.add.prompts.instructions")}
-          placeholder="e.g. Instruction"
-          items={instructions}
-          bind:selectedItems={selectedInstructions}
-        /> -->
-
         <MultiInput
           title={t("prompt-library.add.prompts.knowledge-base")}
           placeholder="e.g. Knowledge base"

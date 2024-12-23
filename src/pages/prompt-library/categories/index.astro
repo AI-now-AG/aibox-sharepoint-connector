@@ -1,21 +1,24 @@
 ---
 import Layout from "$layouts/Layout.astro";
+import { svgIcons } from "$assets/icons";
 import { useTranslations } from "$i18n/utils";
 import CategoryModel from "$data/models/category.model";
-import Card, { type CardItem } from "$components/Card.svelte";
+import CategoryList, { type ListItem } from "./CategoryList.svelte";
+
 import { Permission } from "$data/models/user.model";
 
 const t = useTranslations();
 
 const categoriesCursor = await CategoryModel.listByTenant(
-  Astro.locals.user.tenant_id,
+  Astro.locals.user.tenant_id
 );
 const categories = await categoriesCursor.toArray();
 
-const categoriesEnriched: CardItem[] = categories.map((category) => ({
+const categoriesEnriched: ListItem[] = categories.map((category) => ({
   id: category._id.toString(),
   title: category.title,
   instruction: "",
+  active: category.active,
 }));
 
 let userPermissions = Astro.locals.user.permissions;
@@ -35,33 +38,12 @@ let userPermissions = Astro.locals.user.permissions;
           href="categories/add"
           class="mt-2 lg:mt-8 btn btn-active btn-neutral font-normal grow-0"
         >
-          <svg
-            width="13"
-            height="12"
-            viewBox="0 0 13 12"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M6.5 1V6M6.5 6V11M6.5 6H11.5M6.5 6L1.5 6"
-              stroke="white"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
+          <span set:html={svgIcons.add} />
           {t("prompt-library.categories.add")}
         </a>
       )
     }
   </div>
 
-  <Card
-    title={t("prompt-library.categories.all")}
-    items={categoriesEnriched}
-    type="categories"
-    viewLabel={t("prompt-library.categories.view")}
-    isEditable={userPermissions.includes(Permission.AdminAll)}
-    client:load
-  />
+  <CategoryList items={categoriesEnriched} client:load />
 </Layout>

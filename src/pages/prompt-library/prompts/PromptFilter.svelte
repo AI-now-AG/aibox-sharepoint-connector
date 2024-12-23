@@ -1,15 +1,18 @@
 <script lang="ts">
-  import { onMount } from "svelte";
   import { slide } from "svelte/transition";
-  import Card, { type CardItem } from "$components/Card.svelte";
-  import type { Category } from "$data/models/category.model";
+  import PromptList, {
+    type CardItem,
+  } from "$components/prompt-interface/PromptList.svelte";
   import type { CategoryItem } from "$utils/CategoryItem";
   import { useTranslations } from "$i18n/utils";
+  import { svgIcons } from "$assets/icons";
+
   const t = useTranslations();
 
   export let promptsEnriched: CardItem[] = [];
   export let categoryList: CategoryItem[] = [];
   export let isEditable: boolean = false;
+
   let searchQuery = "";
   let filteredPrompts = promptsEnriched;
   let showCategoryFilter = false;
@@ -64,18 +67,7 @@
 <div>
   <div class="container max-w-5xl mx-auto px-6">
     <label class="input input-bordered flex items-center gap-2">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 16 16"
-        fill="currentColor"
-        class="h-4 w-4 opacity-70"
-      >
-        <path
-          fill-rule="evenodd"
-          d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
-          clip-rule="evenodd"
-        ></path>
-      </svg>
+      {@html svgIcons.search}
       <input
         type="text"
         class="grow"
@@ -145,7 +137,7 @@
               </label>
               <ul>
                 <li>
-                  {#each category.group as group, groupIdx}
+                  {#each category.group as group}
                     <label class="flex items-center">
                       <input
                         type="checkbox"
@@ -159,17 +151,13 @@
                 </li>
               </ul>
             </li>
-            
           {/each}
         </ul>
       {/if}
     </div>
   </div>
-  <Card
-    title={t("prompt-library.prompts.all")}
-    bind:items={filteredPrompts}
-    type="prompts"
-    viewLabel={t("prompt-library.prompts.view")}
+  <PromptList
     {isEditable}
+    bind:items={filteredPrompts}
   />
 </div>

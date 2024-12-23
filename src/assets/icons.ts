@@ -8,6 +8,7 @@ import archive from "$assets/icons/archive.svg?raw";
 import active from "$assets/icons/active.svg?raw";
 import edit from "$assets/icons/edit.svg?raw";
 import add from "$assets/icons/add.svg?raw";
+import trash from "$assets/icons/trash.svg?raw";
 import back from "$assets/icons/back.svg?raw";
 import audioToText from "$assets/icons/audio-to-text.svg?raw";
 import eye from "$assets/icons/eye.svg?raw";
@@ -32,6 +33,9 @@ import textIcon from "$assets/icons/textIcon.svg?raw";
 import codeIcon from "$assets/icons/codeIcon.svg?raw";
 import warningIcon from "$assets/icons/warning.svg?raw";
 import downIcon from "$assets/icons/down.svg?raw";
+import duplicate from "$assets/icons/duplicate.svg?raw";
+import reOrder from "$assets/icons/re-order.svg?raw";
+import drag from "$assets/icons/drag.svg?raw";
 
 export const svgIcons = {
   menuSettings,
@@ -44,6 +48,7 @@ export const svgIcons = {
   active,
   edit,
   add,
+  trash,
   back,
   audioToText,
   eye,
@@ -68,4 +73,7 @@ export const svgIcons = {
   codeIcon,
   warningIcon,
   downIcon,
+  duplicate,
+  reOrder,
+  drag,
 };

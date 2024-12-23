@@ -13,6 +13,7 @@ const PromptSchema = z.object({
   knowledgebase: z.array(z.instanceof(ObjectId)).optional(),
   prompt: z.string(),
   documents: z.array(z.instanceof(ObjectId)).optional(),
+  position: z.number().default(0).optional(),
   created_at: z.date().optional(),
   updated_at: z.date(),
 });
@@ -38,7 +39,13 @@ const collection = db.collection("prompts");
 export default {
   add: async (prompt: Prompt) => {
     const validated = PromptSchema.parse(prompt);
-    return collection.insertOne(validated);
+    const doc = {
+      ...{
+        position: 0,
+      },
+      ...validated,
+    };
+    return collection.insertOne(doc);
   },
 
   remove: async (id: string) => {
@@ -64,7 +71,7 @@ export default {
   listByTenant: async (id: ObjectId) => {
     return collection
       .find<Document<Prompt>>({ tenant_id: id })
-      .sort({ created_at: 1 });
+      .sort({ position: 1, created_at: 1 });
   },
 
   update: async (id: string, updatedPrompt: Partial<Prompt>) => {
@@ -84,5 +91,13 @@ export default {
       { $set: { prompt: newPrompt } },
     );
     return result;
+  },
+
+  getMaxPosition: async (groupId: ObjectId) => {
+    return collection
+      .find<Document<Prompt>>({ group: groupId })
+      .sort({ position: -1 })
+      .limit(1)
+      .next();
   },
 };

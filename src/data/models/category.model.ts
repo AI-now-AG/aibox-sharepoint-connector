@@ -6,6 +6,8 @@ export const GroupSchema = z.object({
   _id: z.instanceof(ObjectId).optional(),
   title: z.string(),
   slug: z.string().optional(),
+  active: z.boolean().default(true).optional(),
+  position: z.number().default(0).optional(),
 });
 
 const CategorySchema = z.object({
@@ -14,6 +16,8 @@ const CategorySchema = z.object({
   title: z.string(),
   slug: z.string(),
   icon: z.string().optional(),
+  active: z.boolean().default(true).optional(),
+  position: z.number().default(0).optional(),
   created_at: z.date().optional(),
   updated_at: z.date().optional(),
 });
@@ -47,8 +51,14 @@ const convertObjectIdToString = (category: Document<Category>) => {
 export default {
   add: async (category: Category) => {
     const validated = CategoryGroupSchema.parse(category);
-
-    return collection.insertOne(validated);
+    const doc = {
+      ...{
+        active: true,
+        position: 0,
+      },
+      ...validated,
+    };
+    return collection.insertOne(doc);
   },
 
   remove: async (id: string) => {
@@ -62,10 +72,16 @@ export default {
       .sort({ created_at: 1 })
       .sort({ created_at: 1 }),
 
-  listByTenant: async (id: ObjectId) => {
+  listByTenant: async (tenantId: ObjectId) => {
     return collection
-      .find<Document<Category>>({ tenant_id: id })
-      .sort({ created_at: 1 });
+      .find<Document<Category>>({ tenant_id: tenantId })
+      .sort({ position: 1, created_at: 1 });
+  },
+
+  listActiveByTenant: async (tenantId: ObjectId) => {
+    return collection
+      .find<Document<Category>>({ tenant_id: tenantId, active: true })
+      .sort({ position: 1, created_at: 1 });
   },
 
   get: async (id: string) => {
@@ -81,6 +97,14 @@ export default {
 
   getBySlug: async (slug: string) => {
     return collection.findOne<Document<Category>>({ slug });
+  },
+
+  getMaxPosition: async (tenantId: ObjectId) => {
+    return collection
+      .find<Document<Category>>({ tenant_id: tenantId })
+      .sort({ position: -1 })
+      .limit(1)
+      .next();
   },
 
   update: async (id: string, updatedInstruction: Partial<Category>) => {
