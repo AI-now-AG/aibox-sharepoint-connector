@@ -124,16 +124,15 @@
 
   <!-- drag and drop list -->
   <div class="relative">
-    <div class="flex items-center bg-base-300 py-3 px-4 rounded-lg">
-      <div class="flex-none w-64 text-left font-normal text-xs rounded-l-lg">
+    <div class="flex items-center bg-base-300 py-3 px-4 space-x-3 rounded-lg">
+      <div class="flex-1 w-48 md:w-auto text-left font-normal text-xs space-x-2 rounded-l-lg">
         <span class="inline-flex w-10"></span>
         {t("prompt-library.categories.list.name")}
       </div>
-      <div class="flex-1 w-auto text-left font-normal text-xs">&nbsp;</div>
       <div class="flex-none w-20 text-left font-normal text-xs">
         {t("prompt-library.categories.list.status")}
       </div>
-      <div class="flex-none w-20 rounded-r-lg"></div>
+      <div class="flex-none w-10 rounded-r-lg"></div>
     </div>
 
     <section
@@ -143,31 +142,18 @@
     >
       {#each items as item (item.id)}
         <div
-          class="flex items-center h-16 bg-base-100 hover:bg-base-300 text-sm rounded-lg py-3 px-4 mt-3 dnd-item"
+          class="flex items-center h-16 bg-base-100 hover:bg-base-300 text-sm rounded-lg py-3 px-4 mt-3 space-x-3 dnd-item"
         >
           <div
-            class="flex-none w-64 flex items-center text-sm font-medium rounded-l-lg"
+            class="flex-1 w-48 md:w-auto flex items-center text-sm space-x-2 font-medium rounded-l-lg"
           >
             <span class="inline-flex w-10">
               {@html svgIcons.drag}
             </span>
             <a
               href={`categories/${item.id}`}
-              class="underline underline-offset-2">{item.title}</a
+              class="flex-1 underline underline-offset-2">{item.title}</a
             >
-          </div>
-          <div
-            class="flex-1 w-auto text-gray-600 flex items-center text-xs font-normal h-16"
-          >
-            {#if item.tags}
-              <div class="card-actions justify-start">
-                {#each item.tags as tag}
-                  <div class="badge px-2 border-base-300">
-                    {tag}
-                  </div>
-                {/each}
-              </div>
-            {/if}
           </div>
           <div class="flex-none w-20">
             <span
@@ -178,10 +164,13 @@
             >
           </div>
           <div
-            class="flex-none w-20 text-right relative relative-dropdown rounded-r-lg"
+            class="flex-none w-10 text-right relative relative-dropdown rounded-r-lg"
           >
             <div class="dropdown dropdown-hover dropdown-end">
-              <div tabindex="0" role="button" class="btn btn-ghost btn-sm">
+              <div tabindex="0" role="button" class="btn btn-ghost btn-sm" on:click={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+              }}>
                 {@html svgIcons.threeDot}
               </div>
               <ul
