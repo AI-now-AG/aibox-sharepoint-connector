@@ -32,7 +32,7 @@
   }
 </script>
 
-<dialog bind:this={promptOrderDialog} class="modal" style="z-index: 100;">
+<dialog bind:this={promptOrderDialog} class="modal">
   <div class="modal-box w-8/12 max-w-5xl">
     <div class="flex justify-between">
       <h3 class="text-lg font-bold py-4">{dialogTitle}</h3>

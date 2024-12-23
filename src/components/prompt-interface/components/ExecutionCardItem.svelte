@@ -10,7 +10,7 @@
   export let active: boolean;
   export let isEditable: boolean;
   export let data: any;
-  export let zIndex: number = 10;
+  export let zIndex: number = 1;
 
   export let onSelectCart: Function;
   export let onSelectEdit: Function;

@@ -11,10 +11,11 @@
   import { useTranslations } from "$i18n/utils";
   const t = useTranslations();
   export let options: Option[] = [];
+  export let widthClass = "w-48";
 </script>
 
 <ul
-  class="py-2 dropdown-content menu bg-base-100 rounded-xl z-[1] w-48 p-2 shadow"
+  class={`py-2 dropdown-content menu bg-base-100 rounded-xl z-[1] p-2 shadow ${widthClass} `}
 >
   {#each options as option}
     <li>

@@ -161,7 +161,7 @@
           onSelectDelete={() => {
             onDeleteCard(index);
           }}
-          zIndex={100 - index}
+          zIndex={50 - index}
         />
       {/if}
     {/each}
