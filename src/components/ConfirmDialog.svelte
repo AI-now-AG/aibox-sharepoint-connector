@@ -7,6 +7,7 @@
 
   export let modal: any;
   export let description: string = "";
+  export let subDescription: string = "";
 </script>
 
 <dialog id={"modal_confirm_update"} bind:this={modal} class="modal">
@@ -15,9 +16,13 @@
       <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
         >✕</button
       >
+   
       <h3 id="modal_title" class="text-lg font-bold">
         {description}
       </h3>
+
+      <p class="mt-5 text-md">{subDescription}</p>
+
       <div class="flex justify-between gap-4 mt-6">
         <button
           id="yes_button"
