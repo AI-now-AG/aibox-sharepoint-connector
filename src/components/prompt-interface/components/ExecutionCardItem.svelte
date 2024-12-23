@@ -1,7 +1,11 @@
 <script lang="ts">
   import { useTranslations } from "$i18n/utils";
   import { svgIcons } from "$assets/icons";
-  import PromptDropdownOptions from "./PromptDropdownOptions.svelte";
+  import DropdownOptions, {
+    type Option,
+  } from "$components/DropdownOptions.svelte";
+
+  const t = useTranslations();
 
   export let active: boolean;
   export let isEditable: boolean;
@@ -14,7 +18,41 @@
   export let onSelectReOder: Function;
   export let onSelectDelete: Function;
 
-  const t = useTranslations();
+  let options: Option[] = [
+    {
+      id: "1",
+      icon: svgIcons.edit,
+      text: t("common.edit"),
+      action: () => {
+        onSelectEdit?.();
+      },
+    },
+    {
+      id: "2",
+      icon: svgIcons.duplicate,
+      text: t("common.duplicate"),
+      action: () => {
+        onSelectDuplicate?.();
+      },
+    },
+    {
+      id: "3",
+      icon: svgIcons.reOrder,
+      text: t("common.change-order"),
+      action: () => {
+        onSelectReOder?.();
+      },
+    },
+    {
+      id: "4",
+      icon: svgIcons.trash,
+      text: t("common.delete"),
+      action: () => {
+        onSelectDelete?.();
+      },
+    },
+  ];
+
   let isShowDropdownOption = false;
   const handleMouseEnter = () => {
     isShowDropdownOption = true;
@@ -24,49 +62,34 @@
   };
 </script>
 
-<button
-  class={`relative btn w-full rounded-xl h-auto p-6 ${active ? "btn-primary " : "btn-outline border-base-300 border-2"} flex`}
-  on:click={() => {
-    onSelectCart?.(data);
-  }}
-  style={`z-index: ${zIndex};`}
->
-  {#if isEditable}
-    <!-- svelte-ignore a11y-no-static-element-interactions -->
-    <section
-      class="absolute top-2 right-2"
-      on:mouseenter={handleMouseEnter}
-      on:mouseleave={handleMouseLeave}
-    >
-      <div
-        class="${active
-          ? 'text-white hover:text-black'
-          : 'text-neutral hover:text-black'} flex items-center justify-center rounded hover:bg-gray-100 w-7 h-5"
+{#if options.length >= 1}
+  <button
+    class={`relative btn w-full rounded-xl h-auto p-6 ${active ? "btn-primary " : "btn-outline border-base-300 border-2"} flex`}
+    on:click={() => {
+      onSelectCart?.(data);
+    }}
+    style={`z-index: ${zIndex};`}
+  >
+    {#if isEditable}
+      <!-- svelte-ignore a11y-no-static-element-interactions -->
+      <section
+        class="absolute top-1 right-1 dropdown dropdown-hover dropdown-end"
+        on:mouseenter={handleMouseEnter}
+        on:mouseleave={handleMouseLeave}
       >
-        {@html svgIcons.threeDot}
-      </div>
+        <div
+          class="${active
+            ? 'text-white hover:text-black'
+            : 'text-neutral hover:text-black'} hover:bg-slate-200 btn btn-ghost btn-sm"
+        >
+          {@html svgIcons.threeDot}
+        </div>
 
-      {#if isShowDropdownOption}
-        <PromptDropdownOptions
-          onSelectEdit={() => {
-            handleMouseLeave();
-            onSelectEdit?.(data);
-          }}
-          onSelectDuplicate={() => {
-            handleMouseLeave();
-            onSelectDuplicate?.(data);
-          }}
-          onSelectReOder={() => {
-            handleMouseLeave();
-            onSelectReOder?.(data);
-          }}
-          onSelectDelete={() => {
-            handleMouseLeave();
-            onSelectDelete?.(data);
-          }}
-        />
-      {/if}
-    </section>
-  {/if}
-  <p class="card-title text-sm font-normal">{data?.title ?? ""}</p>
-</button>
+        {#if isShowDropdownOption}
+          <DropdownOptions {options} />
+        {/if}
+      </section>
+    {/if}
+    <p class="card-title text-sm font-normal">{data?.title ?? ""}</p>
+  </button>
+{/if}
