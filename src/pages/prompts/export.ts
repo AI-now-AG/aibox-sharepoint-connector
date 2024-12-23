@@ -1,17 +1,18 @@
 import type { APIContext, APIRoute } from "astro";
-import { writeToString } from "fast-csv";
-import CategoryModel from "$data/models/category.model";
+import { format, writeToString } from "fast-csv";
+import PromptModel from "$data/models/prompt.model";
 
 export const GET: APIRoute = async (ctx) => {
   const { tenant_id: tenantId } = ctx.locals.user;
 
   try {
     // Fetch your MongoDB data
-    const categoriesCursor = await CategoryModel.listByTenant(tenantId);
-    const categories = await categoriesCursor.toArray();
+    const promptsCursor = await PromptModel.listForExportByTenant(tenantId);
+    const prompts = await promptsCursor.toArray();
+    console.log("prompts", prompts);
 
     // Generate the CSV string using fast-csv
-    const csvString = await writeToString(categories, { headers: true });
+    const csvString = await writeToString(prompts, { headers: true });
 
     // Set the response headers to prompt a download
     return new Response(csvString, {

@@ -67,6 +67,35 @@ export default {
       .sort({ created_at: 1 });
   },
 
+  listForExportByTenant: async (id: ObjectId) => {
+    return collection.aggregate([
+      {
+        $match: {
+          tenant_id: id,
+        },
+      },
+      {
+        $lookup: {
+          from: "categories",
+          localField: "_id",
+          foreignField: "category",
+          as: "category",
+        },
+      },
+      {
+        $unwind: "$category",
+      },
+      {
+        $project: {
+          _id: 1,
+          title: 1,
+          description: 1,
+          category: 1,
+        },
+      },
+    ]);
+  },
+
   update: async (id: string, updatedPrompt: Partial<Prompt>) => {
     const _id = new ObjectId(id);
     const validated = PromptSchema.partial().parse(updatedPrompt);
