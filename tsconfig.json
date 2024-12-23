@@ -1,6 +1,8 @@
 {
   "extends": "astro/tsconfigs/strict",
   "compilerOptions": {
+    "jsx": "react",
+    "strict": true,
     "types": ["./src/env.d.ts"],
     "module": "ESNext",
     "strictNullChecks": true,

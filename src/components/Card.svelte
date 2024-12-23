@@ -4,6 +4,7 @@
     title: string;
     description?: string;
     instruction: string;
+    group?: string;
     tags?: string[];
   }
 </script>
