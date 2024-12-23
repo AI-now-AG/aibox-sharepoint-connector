@@ -10,16 +10,18 @@
   export let description: string = "";
 </script>
 
-<dialog id={"modal_confirm_update"} bind:this={modal} class="modal">
+<dialog bind:this={modal} class="modal">
   <div class="modal-box">
     <form method="dialog" id="modalForm">
       <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
         >✕</button
       >
 
-      <h3 id="modal_title" class="text-lg font-bold">
+      {#if title}
+      <h3 class="text-lg font-bold">
         {title}
       </h3>
+      {/if}
 
       <p class="mt-5 text-md">{description}</p>
 

@@ -10,7 +10,7 @@
   import { dndzone } from "svelte-dnd-action";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
-  import ConfirmDeleteDialog from "./ConfirmDeleteDialog.svelte";
+  import ConfirmDialog from "$components/ConfirmDialog.svelte";
 
   export let items: GroupItem[] = [];
 
@@ -163,8 +163,10 @@
   </div>
 
   <!-- confirm delete dialog -->
-  <ConfirmDeleteDialog
+  <ConfirmDialog
     bind:modal={confirmDeleteModal}
     on:confirm={deleteGroup}
+    title={t("confirmation.delete.title")}
+    description={t("prompt-library.delete.group.confirm")}
   />
 </div>

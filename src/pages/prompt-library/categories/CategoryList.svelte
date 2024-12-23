@@ -14,7 +14,7 @@
   import { addToast } from "$stores/toast";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
-  import ConfirmDeleteDialog from "./ConfirmDeleteDialog.svelte";
+  import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import Loading from "$components/Loading.svelte";
   import { loading } from "$stores";
 
@@ -218,9 +218,10 @@
   </div>
 
   <!-- confirm delete dialog -->
-  <ConfirmDeleteDialog
+  <ConfirmDialog
     bind:modal={confirmDeleteModal}
     on:confirm={deleteCategory}
-    isCategory={true}
+    title={t("confirmation.delete.title")}
+    description={t("prompt-library.delete.category.confirm")}
   />
 </div>
