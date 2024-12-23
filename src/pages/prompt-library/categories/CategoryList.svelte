@@ -125,7 +125,7 @@
   <!-- drag and drop list -->
   <div class="relative">
     <div class="flex items-center bg-base-300 py-3 px-4 space-x-3 rounded-lg">
-      <div class="flex-none w-48 md:w-auto text-left font-normal text-xs space-x-2 rounded-l-lg">
+      <div class="flex-1 w-48 md:w-auto text-left font-normal text-xs space-x-2 rounded-l-lg">
         <span class="inline-flex w-10"></span>
         {t("prompt-library.categories.list.name")}
       </div>
