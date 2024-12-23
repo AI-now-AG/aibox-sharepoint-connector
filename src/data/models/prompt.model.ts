@@ -77,21 +77,21 @@ export default {
       {
         $lookup: {
           from: "categories",
-          localField: "_id",
-          foreignField: "category",
+          localField: "category",
+          foreignField: "_id",
           as: "category",
         },
       },
       {
-        $unwind: "$category",
+        $lookup: {
+          from: "knowledgebase",
+          localField: "knowledgebase",
+          foreignField: "_id",
+          as: "knowledgebase",
+        },
       },
       {
-        $project: {
-          _id: 1,
-          title: 1,
-          description: 1,
-          category: 1,
-        },
+        $unwind: "$category",
       },
     ]);
   },
