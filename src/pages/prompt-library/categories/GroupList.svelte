@@ -114,9 +114,11 @@
           class="flex-none w-10 text-right relative relative-dropdown rounded-r-lg"
         >
           <div class="dropdown dropdown-hover dropdown-end">
-            <div tabindex="0" role="button" class="btn btn-ghost btn-sm">
-              {@html svgIcons.threeDot}
-            </div>
+            <button tabindex="0" class="btn btn-ghost btn-sm">
+              <span class="pointer-events-none">
+                {@html svgIcons.threeDot}
+              </span>
+            </button>
             <ul
               class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
             >

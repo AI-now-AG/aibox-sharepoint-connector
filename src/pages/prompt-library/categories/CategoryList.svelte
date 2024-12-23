@@ -125,7 +125,7 @@
   <!-- drag and drop list -->
   <div class="relative">
     <div class="flex items-center bg-base-300 py-3 px-4 space-x-3 rounded-lg">
-      <div class="flex-1 w-48 md:w-auto text-left font-normal text-xs space-x-2 rounded-l-lg">
+      <div class="flex-none w-48 md:w-auto text-left font-normal text-xs space-x-2 rounded-l-lg">
         <span class="inline-flex w-10"></span>
         {t("prompt-library.categories.list.name")}
       </div>
@@ -167,12 +167,11 @@
             class="flex-none w-10 text-right relative relative-dropdown rounded-r-lg"
           >
             <div class="dropdown dropdown-hover dropdown-end">
-              <div tabindex="0" role="button" class="btn btn-ghost btn-sm" on:click={(event) => {
-                event.preventDefault();
-                event.stopPropagation();
-              }}>
-                {@html svgIcons.threeDot}
-              </div>
+              <button tabindex="0" class="btn btn-ghost btn-sm z-50">
+                <span class="pointer-events-none">
+                  {@html svgIcons.threeDot}
+                </span>
+              </button>
               <ul
                 class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
               >
