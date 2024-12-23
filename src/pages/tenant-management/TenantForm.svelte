@@ -576,7 +576,7 @@
     </div>
 
     <ConfirmDialog
-      description={t("tenant.tenants.tenant.update-confirmation")}
+      title={t("tenant.tenants.tenant.update-confirmation")}
       bind:modal={confirmUpdateModal}
       on:confirm={updateTenant}
     />

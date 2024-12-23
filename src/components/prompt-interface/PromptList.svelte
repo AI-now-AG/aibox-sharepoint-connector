@@ -182,7 +182,7 @@
 />
 
 <ConfirmDialog
-  description={t("prompt-library.delete.prompt.confirm")}
+  title={t("prompt-library.delete.prompt.confirm")}
   bind:modal={confirmDeleteModal}
   on:confirm={deleteCard}
 />
