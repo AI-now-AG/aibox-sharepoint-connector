@@ -69,6 +69,14 @@ export const POST: APIRoute<CreatePromptParams> = async (ctx) => {
   // We generate a description based on the prompt
   const description = await generatePromptDescription(ctx, data.prompt);
 
+  // Determine the new position
+  const _group = stringToObjectId.parse(data.group ?? "");
+  const maxPositionPrompt = await PromptModel.getMaxPosition(_group);
+  console.log("maxPositionPrompt", { maxPositionPrompt, _group });
+  const newPosition = maxPositionPrompt
+    ? (maxPositionPrompt?.position || 0) + 1
+    : 1;
+
   // TODO: Here we would add user informations like the tenant and the user id. We don't have that
   // feature to get these just based on the token for now. Wait until the Auth0 task is done. Until
   // then we use fixed values.
@@ -84,6 +92,7 @@ export const POST: APIRoute<CreatePromptParams> = async (ctx) => {
     ),
     documents: data.documents?.map((doc) => stringToObjectId.parse(doc)),
     description,
+    position: newPosition,
     tenant_id: ctx.locals.user.tenant_id,
     creator_id: ctx.locals.user.id,
     created_at: new Date(),
