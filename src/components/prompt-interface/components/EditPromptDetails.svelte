@@ -196,6 +196,12 @@
     selectedKnowledgeBases = [];
     selectedEditPromptId = null;
   }
+
+  function handleKeyDown(event: any) {
+    if (event.key === "Enter") {
+      event.preventDefault()
+    }
+  }
 </script>
 
 <dialog class="modal" bind:this={promptDialog}>
@@ -216,6 +222,7 @@
             bind:value={promptTitle}
             placeholder="e.g. Create three sports headlines"
             class="input input-bordered w-full min-w-xs"
+            on:keydown={(handleKeyDown)} 
           />
         </div>
       </div>
