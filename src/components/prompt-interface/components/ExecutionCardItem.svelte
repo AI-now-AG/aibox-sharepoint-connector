@@ -73,16 +73,18 @@
     {#if isEditable}
       <!-- svelte-ignore a11y-no-static-element-interactions -->
       <section
-        class="absolute top-1 right-1 dropdown dropdown-hover dropdown-end"
+        class="absolute top-1 right-1 dropdown dropdown-hover dropdown-end z-50"
         on:mouseenter={handleMouseEnter}
         on:mouseleave={handleMouseLeave}
       >
         <button
           class="${active
             ? 'text-white hover:text-black'
-            : 'text-neutral hover:text-black'} hover:bg-slate-200 btn btn-ghost btn-sm"
+            : 'text-neutral hover:text-black'} hover:bg-slate-200 btn btn-ghost btn-sm z-50"
         >
-          {@html svgIcons.threeDot}
+          <span class="pointer-events-none">
+            {@html svgIcons.threeDot}
+          </span>
         </button>
 
         {#if isShowDropdownOption}

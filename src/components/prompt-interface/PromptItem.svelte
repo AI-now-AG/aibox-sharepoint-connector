@@ -81,12 +81,14 @@
   {#if isEditable}
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <section
-      class="absolute top-6 right-3 dropdown dropdown-hover dropdown-end"
+      class="absolute top-6 right-3 dropdown dropdown-hover dropdown-end z-50"
       on:mouseenter={handleMouseEnter}
       on:mouseleave={handleMouseLeave}
     >
-      <button class="text-neutral hover:bg-slate-200 btn btn-ghost btn-sm">
-        {@html svgIcons.threeDot}
+      <button class="text-neutral hover:bg-slate-200 btn btn-ghost btn-sm z-50">
+        <span class="pointer-events-none">
+          {@html svgIcons.threeDot}
+        </span>
       </button>
       {#if isShowDropdownOption}
         <DropdownOptions {options} />
