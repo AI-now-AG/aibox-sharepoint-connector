@@ -49,14 +49,6 @@
       },
     },
   ];
-
-  let isShowDropdownOption = false;
-  const handleMouseEnter = () => {
-    isShowDropdownOption = true;
-  };
-  const handleMouseLeave = () => {
-    isShowDropdownOption = false;
-  };
 </script>
 
 <div class="card bg-base-100 shadow-xl" out:fade>
@@ -78,12 +70,6 @@
     {/if}
   </div>
   {#if isEditable}
-    <DropdownSection
-      cssClasses={"absolute top-6 right-3"}
-      {options}
-      bind:isShowDropdownOption
-      {handleMouseEnter}
-      {handleMouseLeave}
-    />
+    <DropdownSection cssClasses={"absolute top-6 right-3"} {options} />
   {/if}
 </div>

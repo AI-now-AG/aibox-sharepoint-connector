@@ -51,14 +51,6 @@
       },
     },
   ];
-
-  let isShowDropdownOption = false;
-  const handleMouseEnter = () => {
-    isShowDropdownOption = true;
-  };
-  const handleMouseLeave = () => {
-    isShowDropdownOption = false;
-  };
 </script>
 
 {#if options.length >= 1}
@@ -70,13 +62,7 @@
     style={`z-index: ${zIndex};`}
   >
     {#if isEditable}
-      <DropdownSection
-        cssClasses={"absolute top-1 right-1"}
-        {options}
-        bind:isShowDropdownOption
-        {handleMouseEnter}
-        {handleMouseLeave}
-      />
+      <DropdownSection cssClasses={"absolute top-1 right-1"} {options} />
     {/if}
     <p class="card-title text-sm font-normal">{data?.title ?? ""}</p>
   </button>
