@@ -77,13 +77,13 @@
         on:mouseenter={handleMouseEnter}
         on:mouseleave={handleMouseLeave}
       >
-        <div
+        <button
           class="${active
             ? 'text-white hover:text-black'
             : 'text-neutral hover:text-black'} hover:bg-slate-200 btn btn-ghost btn-sm"
         >
           {@html svgIcons.threeDot}
-        </div>
+        </button>
 
         {#if isShowDropdownOption}
           <DropdownOptions {options} />
