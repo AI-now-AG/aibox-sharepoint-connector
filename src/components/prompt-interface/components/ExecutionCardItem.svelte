@@ -1,9 +1,8 @@
 <script lang="ts">
-  import { useTranslations } from "$i18n/utils";
+  import DropdownSection from "$components/DropdownSection.svelte";
+  import { type Option } from "$components/DropdownOptions.svelte";
   import { svgIcons } from "$assets/icons";
-  import DropdownOptions, {
-    type Option,
-  } from "$components/DropdownOptions.svelte";
+  import { useTranslations } from "$i18n/utils";
 
   const t = useTranslations();
 
@@ -71,26 +70,13 @@
     style={`z-index: ${zIndex};`}
   >
     {#if isEditable}
-      <!-- svelte-ignore a11y-no-static-element-interactions -->
-      <section
-        class="absolute top-1 right-1 dropdown dropdown-hover dropdown-end z-50"
-        on:mouseenter={handleMouseEnter}
-        on:mouseleave={handleMouseLeave}
-      >
-        <button
-          class="${active
-            ? 'text-white hover:text-black'
-            : 'text-neutral hover:text-black'} hover:bg-slate-200 btn btn-ghost btn-sm z-50"
-        >
-          <span class="pointer-events-none">
-            {@html svgIcons.threeDot}
-          </span>
-        </button>
-
-        {#if isShowDropdownOption}
-          <DropdownOptions {options} />
-        {/if}
-      </section>
+      <DropdownSection
+        cssClasses={"absolute top-1 right-1"}
+        {options}
+        bind:isShowDropdownOption
+        {handleMouseEnter}
+        {handleMouseLeave}
+      />
     {/if}
     <p class="card-title text-sm font-normal">{data?.title ?? ""}</p>
   </button>
