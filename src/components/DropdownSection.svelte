@@ -15,7 +15,7 @@
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <section
-  class={`dropdown dropdown-hover dropdown-end ${cssClasses}`}
+  class={`dropdown dropdown-hover dropdown-end z-50 ${cssClasses}`}
   on:mouseenter={handleMouseEnter}
   on:mouseleave={handleMouseLeave}
 >
