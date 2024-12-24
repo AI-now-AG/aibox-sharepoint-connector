@@ -19,7 +19,6 @@
   };
 </script>
 
-<!-- svelte-ignore a11y-no-static-element-interactions -->
 <button
   class={`dropdown dropdown-hover dropdown-end ${cssClasses}`}
   on:mouseenter={handleMouseEnter}

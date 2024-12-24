@@ -8,8 +8,6 @@
 </script>
 
 <script lang="ts">
-  import { useTranslations } from "$i18n/utils";
-  const t = useTranslations();
   export let options: Option[] = [];
   export let widthClass = "w-48";
   export let styleVisibility = "";
@@ -23,7 +21,6 @@
     <li>
       <button
         class="flex items-center px-4 py-2 text-gray-700 font-sans w-full"
-        style="z-index: 61;"
         on:click|stopPropagation={(e) => {
           option.action();
         }}
