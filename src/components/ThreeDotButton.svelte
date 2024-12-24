@@ -4,9 +4,11 @@
   export let action: Function = () => null;
 </script>
 
-<button
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<div
+  role="button"
   tabindex="0"
-  class="btn btn-ghost btn-sm hover:bg-slate-200 hover:text-black"
+  class="btn btn-ghost btn-sm"
   on:click|stopPropagation={() => {
     action();
   }}
@@ -14,4 +16,4 @@
   <span class="pointer-events-none">
     {@html svgIcons.threeDot}
   </span>
-</button>
+</div>

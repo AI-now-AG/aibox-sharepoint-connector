@@ -6,9 +6,28 @@
 
   export let options: Option[] = [];
   export let cssClasses: string = "";
+  let styleVisibility: string = "";
+
+  let isShowDropdownOption = false;
+  const handleMouseEnter = () => {
+    isShowDropdownOption = true;
+    styleVisibility = "visibility: visible;";
+  };
+  const handleMouseLeave = () => {
+    isShowDropdownOption = false;
+    styleVisibility = "";
+  };
 </script>
 
-<section class={`dropdown dropdown-hover dropdown-end ${cssClasses}`}>
+<!-- svelte-ignore a11y-no-static-element-interactions -->
+<button
+  class={`dropdown dropdown-hover dropdown-end ${cssClasses}`}
+  on:mouseenter={handleMouseEnter}
+  on:mouseleave={handleMouseLeave}
+  on:click|stopPropagation={handleMouseEnter}
+>
   <ThreeDotButton />
-  <DropdownOptions {options} />
-</section>
+  {#if isShowDropdownOption}
+    <DropdownOptions {options} bind:styleVisibility />
+  {/if}
+</button>
