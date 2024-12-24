@@ -20,9 +20,8 @@
   {#each options as option}
     <li>
       <button
-        class="flex items-center px-4 py-2 text-gray-700 font-sans w-full"
-        on:click={(e) => {
-          e.stopPropagation();
+        class="flex block items-center px-4 py-2 text-gray-700 font-sans w-full"
+        on:click|preventDefault|stopPropagation={(e) => {
           option.action();
         }}
       >
