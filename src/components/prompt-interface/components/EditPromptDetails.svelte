@@ -199,13 +199,15 @@
 
   function handleKeyDown(event: any) {
     if (event.key === "Enter") {
-      event.preventDefault()
+      event.preventDefault();
     }
   }
 </script>
 
 <dialog class="modal" bind:this={promptDialog}>
-  <div class="modal-box w-8/12 max-w-5xl">
+  <div
+    class="modal-box w-8/12 max-w-5xl lg:overflow-hidden sm:overflow-scroll md:overflow-scroll"
+  >
     <div class="flex justify-between">
       <h3 class="text-lg font-bold py-4">{dialogTitle}</h3>
       <button class="btn btn-sm btn-circle btn-ghost" on:click={cancelEdit}>
@@ -213,18 +215,16 @@
       </button>
     </div>
     <LoadingSpinner bind:isLoading />
-    <form class="rounded pt-6 mb-4 space-y-6">
+    <form class="rounded pt-6 space-y-6">
       <div class="grid grid-cols-1 gap-4 justify-center">
-        <div>
-          <p class="mb-2">{t("prompt-library.add.prompts.title")}*</p>
-          <input
-            type="text"
-            bind:value={promptTitle}
-            placeholder="e.g. Create three sports headlines"
-            class="input input-bordered w-full min-w-xs"
-            on:keydown={(handleKeyDown)} 
-          />
-        </div>
+        <p class="mb-2">{t("prompt-library.add.prompts.title")}*</p>
+        <input
+          type="text"
+          bind:value={promptTitle}
+          placeholder="e.g. Create three sports headlines"
+          class="input input-bordered w-full min-w-xs"
+          on:keydown={handleKeyDown}
+        />
       </div>
 
       <div class="mb-4">
