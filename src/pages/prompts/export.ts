@@ -2,8 +2,9 @@ import type { APIContext, APIRoute } from "astro";
 import dayjs from "dayjs";
 import { writeToString } from "fast-csv";
 import PromptModel, { type Prompt } from "$data/models/prompt.model";
+import { type KnowledgeBase } from "$data/models/knowledgeBase.model";
 
-export const GET: APIRoute = async (ctx) => {
+export const GET: APIRoute = async (ctx: APIContext) => {
   const { tenant_id: tenantId } = ctx.locals.user;
   const filename = `Prompts-Export-${dayjs().format("YYYY-MM-DD")}.csv`;
 
@@ -20,14 +21,29 @@ export const GET: APIRoute = async (ctx) => {
       });
       const group = findGroup ? findGroup.title : "";
 
+      const knowledgebase = prompt.knowledgebase
+        .map((kb: KnowledgeBase) => {
+          const { title, description, knowledge_base } = kb;
+          const obj = {
+            title,
+            description,
+            knowledge_base,
+          };
+
+          const item = [];
+          for (const [key, value] of Object.entries(obj)) {
+            item.push(`[${key}]: ${value}`);
+          }
+          return item.join(";\n");
+        })
+        .join("\n\n[break]\n\n");
+
       return {
         title: prompt.title,
         description: prompt.description,
         category,
         group,
-        knowledgebase: prompt.knowledgebase
-          ? prompt.knowledgebase.join("; ")
-          : "",
+        knowledgebase: knowledgebase,
         created_at: dayjs(prompt.created_at).format("YYYY-MM-DD HH:mm:ss"),
         updated_at: dayjs(prompt.updated_at).format("YYYY-MM-DD HH:mm:ss"),
       };

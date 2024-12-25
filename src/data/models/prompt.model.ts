@@ -91,7 +91,7 @@ export default {
       },
       {
         $lookup: {
-          from: "knowledgebase",
+          from: "knowlegebases",
           localField: "knowledgebase",
           foreignField: "_id",
           as: "knowledgebase",

@@ -27,14 +27,16 @@ const categoryList = await CategoryModel.listActiveByTenant(
 );
 let categoryArray = await categoryList.toArray();
 const categoryListArray: CategoryItem[] = categoryArray.map((category) => {
-  const group = category.groups?.filter((group) => {
-    return group?.active &&  group.active == true;
-  }).map((group) => {
-    return {
-      checked: false,
-      title: group.title,
-    };
-  });
+  const group = category.groups
+    ?.filter((group) => {
+      return group?.active && group.active == true;
+    })
+    .map((group) => {
+      return {
+        checked: false,
+        title: group.title,
+      };
+    });
   return {
     checked: false,
     title: category.title,
@@ -68,23 +70,45 @@ let userPermissions = Astro.locals.user.permissions;
 
 <Layout>
   <div
-    class="container max-w-5xl mx-auto p-6 grid grid-cols-1 md:grid-cols-[1fr_max-content] gap-8"
+    class="container max-w-5xl mx-auto p-6 py-8 grid grid-cols-1 md:grid-cols-[1fr_max-content] gap-8"
   >
-    <h1 class="pt-2 lg:pt-8 text-4xl font-bold">
+    <h1 class="text-4xl font-bold">
       {t("prompt-library.prompts.title")}
     </h1>
 
-    {
-      userPermissions.includes(Permission.AdminAll) && (
-        <a
-          href="prompts/add"
-          class="mt-2 lg:mt-8 btn btn-active btn-neutral font-normal grow-0"
-        >
-          <span set:html={svgIcons.add} />
-          {t("prompt-library.prompts.add")}
-        </a>
-      )
-    }
+    <div class="flex items-center space-x-2">
+      {
+        userPermissions.includes(Permission.SuperAll) && (
+          <a
+            href="prompts/#import"
+            class="btn btn-default btn-outline font-normal grow-0"
+          >
+            <span set:html={svgIcons.fileImport} />
+            import
+          </a>
+          <a
+            href="/prompts/export"
+            class="btn btn-default btn-outline font-normal grow-0"
+            data-astro-prefetch="false"
+          >
+            <span set:html={svgIcons.fileExport} />
+            export
+          </a>
+        )
+      }
+
+      {
+        userPermissions.includes(Permission.AdminAll) && (
+          <a
+            href="prompts/add"
+            class="btn btn-active btn-neutral font-normal grow-0"
+          >
+            <span set:html={svgIcons.add} />
+            {t("prompt-library.prompts.add")}
+          </a>
+        )
+      }
+    </div>
   </div>
 
   <PromptFilter
