@@ -1,7 +1,8 @@
 import type { APIContext, APIRoute } from "astro";
 import dayjs from "dayjs";
 import { writeToString } from "fast-csv";
-import PromptModel, { type Prompt } from "$data/models/prompt.model";
+import PromptModel from "$data/models/prompt.model";
+import { type Group } from "$data/models/category.model";
 import { type KnowledgeBase } from "$data/models/knowledgeBase.model";
 
 export const GET: APIRoute = async (ctx: APIContext) => {
@@ -16,7 +17,7 @@ export const GET: APIRoute = async (ctx: APIContext) => {
     // Prepare the CSV data with appropriate headers
     const csvData = prompts.map((prompt) => {
       const category = prompt.category?.title;
-      const findGroup = prompt.category?.groups?.find((item: any) => {
+      const findGroup = prompt.category?.groups?.find((item: Group) => {
         return item._id?.toString() == prompt.group?.toString();
       });
       const group = findGroup ? findGroup.title : "";
