@@ -132,7 +132,7 @@
     </h2>
 
     <div class="relative">
-      <table class="min-w-full relative" style="font-family:Inter;">
+      <table class="border-separate	border-spacing-x-0 border-spacing-y-3 min-w-full relative" style="font-family:Inter;">
         <thead>
           <tr class="bg-base-300 rounded-lg">
             <th class="py-3 px-4 text-left font-normal text-xs rounded-l-lg"
@@ -149,45 +149,9 @@
             >
             <th class="py-3 px-4 rounded-r-lg"></th>
           </tr>
-          <tr class="header-spacing"></tr>
         </thead>
         <tbody>
           {#each tenants as tenant}
-            <tr class="h-2"
-              ><td /><td /><td /><td /><td>
-                <dialog id={"confirm_dialog_" + tenant._id} class="modal">
-                  <div class="modal-box">
-                    <form method="dialog" id="modalForm">
-                      <button
-                        class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-                        >✕</button
-                      >
-                      <h3 id="modal_title" class="text-lg font-bold">
-                        {tenant.active == 1
-                          ? t("tenant.tenants.tenant.archive-confirmation")
-                          : t("tenant.tenants.tenant.active-confirmation")}
-                      </h3>
-                      <div class="flex justify-between gap-4 mt-6">
-                        <button
-                          id="yes_button"
-                          class="btn btn-warning flex-1"
-                          on:click={() => updateTenantStatus(tenant)}
-                          >{t("common.yes")}</button
-                        >
-                        <button
-                          id="no_button"
-                          class="btn btn-success flex-1"
-                          on:click={() =>
-                            closeUpdateStatusConfirmationModal(tenant._id)}
-                          >{t("common.no")}</button
-                        >
-                      </div>
-                    </form>
-                  </div>
-                </dialog>
-              </td></tr
-            >
-
             <tr class="h-16 bg-base-100 hover:bg-base-300 text-sm rounded-lg">
               <td class="py-3 px-4 text-sm font-medium rounded-l-lg">
                 <a
@@ -247,6 +211,36 @@
                     >
                   </a>
                 </div>
+                <dialog id={"confirm_dialog_" + tenant._id} class="modal">
+                  <div class="modal-box">
+                    <form method="dialog" id="modalForm">
+                      <button
+                        class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+                        >✕</button
+                      >
+                      <h3 id="modal_title" class="text-lg font-bold">
+                        {tenant.active == 1
+                          ? t("tenant.tenants.tenant.archive-confirmation")
+                          : t("tenant.tenants.tenant.active-confirmation")}
+                      </h3>
+                      <div class="flex justify-between gap-4 mt-6">
+                        <button
+                          id="yes_button"
+                          class="btn btn-warning flex-1"
+                          on:click={() => updateTenantStatus(tenant)}
+                          >{t("common.yes")}</button
+                        >
+                        <button
+                          id="no_button"
+                          class="btn btn-success flex-1"
+                          on:click={() =>
+                            closeUpdateStatusConfirmationModal(tenant._id)}
+                          >{t("common.no")}</button
+                        >
+                      </div>
+                    </form>
+                  </div>
+                </dialog>
               </td>
             </tr>
           {/each}
