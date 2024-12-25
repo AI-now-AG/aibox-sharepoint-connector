@@ -1,0 +1,28 @@
+---
+import Layout from "$layouts/Layout.astro";
+import UserForm from "./UserForm.svelte";
+import userModel from "$data/models/user.model";
+import { transformRawData } from "$utils/transformRawData";
+
+export interface Props {
+  id: string;
+}
+
+const { id } = Astro.params;
+console.log("id", id);
+if (id === undefined) {
+  throw new Error("Id is required");
+}
+
+const user = await userModel.getById(id);
+if (user === null) {
+  console.error("User not found");
+  return Astro.redirect("/404");
+}
+
+const data = transformRawData(user);
+---
+
+<Layout>
+  <UserForm user={data} client:load />
+</Layout>

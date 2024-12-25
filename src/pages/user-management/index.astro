@@ -1,0 +1,29 @@
+---
+import Layout from "$layouts/Layout.astro";
+import { useTranslations } from "$i18n/utils";
+import UserList from "$pages/user-management/UserList.svelte";
+import { svgIcons } from "$assets/icons";
+
+const t = useTranslations();
+---
+
+<Layout>
+  <div
+    class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14"
+  >
+    <h1 class="pt-2 lg:pt-8 text-4xl font-bold">
+      {"User Management"}
+    </h1>
+
+    <a
+      href="./user-management/add"
+      class="mt-2 lg:mt-8 btn btn-active btn-neutral font-normal grow-0"
+    >
+      <span set:html={svgIcons.add} />
+      {"Add New User"}
+    </a>
+  </div>
+  <div class="px-8">
+    <UserList client:load />
+  </div>
+</Layout>
