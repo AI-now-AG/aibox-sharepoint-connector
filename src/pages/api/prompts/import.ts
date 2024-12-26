@@ -1,6 +1,8 @@
 import type { APIContext, APIRoute } from "astro";
 import { parseString } from "fast-csv";
 import PromptModel from "$data/models/prompt.model";
+import CategoryModel from "$data/models/category.model";
+import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
 
 export const POST: APIRoute = async (ctx: APIContext) => {
   try {
@@ -16,7 +18,6 @@ export const POST: APIRoute = async (ctx: APIContext) => {
 
     // Read the file content into memory
     const fileContent = await file.text(); // This reads the entire file into a string
-    console.log('fileContent', fileContent);
 
     // Parse the CSV content
     const rows: Record<string, any>[] = []; // Array to store the parsed rows
