@@ -8,6 +8,7 @@ const t = useTranslations();
 
 const tenant = Astro.locals.tenant;
 const tenantId = tenant?._id?.toString() ?? "";
+const user = Astro.locals.user;
 ---
 
 <Layout>
@@ -27,6 +28,6 @@ const tenantId = tenant?._id?.toString() ?? "";
     </a>
   </div>
   <div class="px-8">
-    <UserList tenantId={tenantId} client:load />
+    <UserList tenantId={tenantId} currentLoggedInUser={user} client:load />
   </div>
 </Layout>

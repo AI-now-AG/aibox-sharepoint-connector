@@ -19,7 +19,6 @@ const Auth0JWTSchema = z.object({
   picture: z.string().url(),
   name: z.string(),
   "ainow/roles": z.array(z.nativeEnum(UserRole)),
-  "ainow/user_id": z.string(),
 });
 
 export async function GET(context: APIContext): Promise<Response> {
@@ -85,16 +84,15 @@ export async function GET(context: APIContext): Promise<Response> {
         q: `organization_id: ${auth0_tenant_id}`,
       });
       let users = data.data ?? [];
-      const auth0_user_id = auth0User.data["ainow/user_id"];
-      if (users && Array.isArray(users) && users.length > 0 && auth0_user_id) {
+      if (users && Array.isArray(users) && users.length > 0) {
         // Exclude current logged in user
         users = users.filter((_user) => {
-          return _user.user_id != auth0_user_id;
+          return _user.email != auth0User.data.email;
         });
         for (let i = 0; i < users.length; i++) {
           const _user = users[i];
           log.d(_user, "user at index " + i);
-          // TODO: Update list user into data base
+          // TODO: Update list user into database
         }
       }
     }

@@ -10,7 +10,8 @@
 
   const t = useTranslations();
 
-  export let tenantId: any = "";
+  export let tenantId: string = "";
+  export let currentLoggedInUser: any = "";
 
   let users: any = [];
   let searchValue: string = "";
@@ -30,6 +31,9 @@
 
     if (!error) {
       users = data;
+      users = users.filter((_user) => {
+        return _user.email != currentLoggedInUser.email;
+      });
       log.i(users, "USER DATA");
     } else {
       log.e(error, "Error fetching users");
