@@ -17,7 +17,7 @@
   let timeout;
 
   let tenantToUpdate = null;
-  let confirmDescription = '';
+  let confirmDescription = "";
   let confirmUpdateModal;
 
   onMount(async () => {
@@ -55,9 +55,10 @@
 
   function confirmUpdateStatus(tenant) {
     tenantToUpdate = tenant;
-    confirmDescription = tenant.active == 1 
-      ? t("tenant.tenants.tenant.archive-confirmation")
-      : t("tenant.tenants.tenant.active-confirmation");
+    confirmDescription =
+      tenant.active == 1
+        ? t("tenant.tenants.tenant.archive-confirmation")
+        : t("tenant.tenants.tenant.active-confirmation");
 
     confirmUpdateModal?.show();
   }
@@ -138,7 +139,17 @@
     </h2>
 
     <div class="relative">
-      <table class="border-separate	border-spacing-x-0 border-spacing-y-3 min-w-full relative" style="font-family:Inter;">
+      <table
+        class="border-separate border-spacing-x-0 border-spacing-y-3 min-w-full relative"
+        style="font-family:Inter;"
+      >
+        <colgroup>
+          <col class="w-auto" />
+          <col class="w-80" />
+          <col class="w-48" />
+          <col class="w-24" />
+          <col class="w-16" />
+        </colgroup>
         <thead>
           <tr class="bg-base-300 rounded-lg">
             <th class="py-3 px-4 text-left font-normal text-xs rounded-l-lg"
@@ -193,12 +204,13 @@
                   <button tabindex="0" class="btn btn-ghost btn-sm z-50">
                     {@html svgIcons.threeDot}
                   </button>
-                  <ul class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
+                  <ul
+                    class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
+                  >
                     <li>
                       <button
                         class="flex block w-full text-left px-4 py-2 text-sm hover:underline"
-                        on:click={() =>
-                          confirmUpdateStatus(tenant)}
+                        on:click={() => confirmUpdateStatus(tenant)}
                       >
                         {@html tenant.active == 1
                           ? svgIcons.archive
