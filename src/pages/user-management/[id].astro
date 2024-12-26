@@ -3,6 +3,7 @@ import Layout from "$layouts/Layout.astro";
 import UserForm from "./UserForm.svelte";
 import userModel from "$data/models/user.model";
 import { transformRawData } from "$utils/transformRawData";
+import log from "$utils/log";
 
 export interface Props {
   id: string;
@@ -14,11 +15,13 @@ if (id === undefined) {
   throw new Error("Id is required");
 }
 
-const user = await userModel.getById(id);
+const user = await userModel.getByEmail(id);
 if (user === null) {
   console.error("User not found");
   return Astro.redirect("/404");
 }
+
+log.i(user, "user");
 
 const data = transformRawData(user);
 ---

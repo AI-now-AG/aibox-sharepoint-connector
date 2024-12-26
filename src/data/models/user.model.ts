@@ -154,11 +154,6 @@ export default {
 
   get: async (email: string) => collection.findOne<User>({ email }),
 
-  getById: async (_id: string) => {
-    const validated = UserSchema.parse({ _id: new ObjectId(_id) });
-    collection.findOne<User>({ ...validated });
-  },
-
   getAuth0Sub: async (auth0_sub: string) =>
     collection.findOne<User>({ auth0_sub }),
 

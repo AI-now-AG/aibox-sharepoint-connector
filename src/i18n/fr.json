@@ -224,6 +224,7 @@
   "user.signed-up": "Signed up",
   "user.organization": "Organization",
   "user.edit-user": "Edit user",
+  "user.update-confirm-message": "Are you sure you want to update this user?",
   "user.block-user-account": "Block User Account",
   "user.block-confirm-message": "Are you sure you want to block this user?",
   "user.block-description-message": "Bloking this user will restrict their access to the account",
