@@ -7,6 +7,7 @@ import {
   Permission,
   UserFilterParamsSchema,
   UserRole,
+  UserTenantFilterParamsSchema,
 } from "$data/models/user.model";
 import userModel from "$data/models/user.model";
 
@@ -45,9 +46,17 @@ export const user = {
     },
   }),
 
+  listByTeant: defineAction({
+    input: UserTenantFilterParamsSchema,
+    handler: async (input) => {
+      const data = await userModel.listByTenant(input);
+      return transformRawData(data);
+    },
+  }),
+
   create: defineAction({
     input: UserInputParamsSchema,
-    handler: async (input) => {
+    handler: async () => {
       const insertResult = await userModel.add({
         auth0_sub: "",
         username: "",

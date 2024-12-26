@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { actions } from "astro:actions";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
@@ -10,9 +10,11 @@
 
   const t = useTranslations();
 
-  let users = [];
-  let searchValue = "";
-  let timeout;
+  export let tenantId: any = "";
+
+  let users: any = [];
+  let searchValue: string = "";
+  let timeout: any;
 
   onMount(async () => {
     await fetchUsers();
@@ -20,22 +22,24 @@
 
   const fetchUsers = async () => {
     showLoading();
-    const { data, error } = await actions.user.list({
+    const { data, error } = await actions.user.listByTeant({
+      tenantId,
       searchValue,
     });
     hideLoading();
 
     if (!error) {
       users = data;
+      log.i(users, "USER DATA");
     } else {
       log.e(error, "Error fetching users");
     }
   };
 
-  const onSearchTenant = ({ target: t }) => {
+  const onSearchUser = ({ target }: any) => {
     clearTimeout(timeout);
     timeout = setTimeout(() => {
-      searchValue = t.value;
+      searchValue = target.value;
       fetchUsers();
     }, 300);
   };
@@ -50,7 +54,7 @@
           type="text"
           class="grow text-sm"
           placeholder={t("user.search-for-users")}
-          on:input={onSearchTenant}
+          on:input={onSearchUser}
           on:input
           on:blur
         />

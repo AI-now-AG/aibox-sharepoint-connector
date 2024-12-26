@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { db } from "../mongodb";
+import { db, type Document } from "../mongodb";
 import { z } from "zod";
 
 export enum UserRole {
@@ -43,6 +43,14 @@ export const UserFilterParamsSchema = z.object({
   searchValue: z.string().nullish(),
 });
 
+export const UserTenantFilterParamsSchema = z.object({
+  tenantId: z.string(),
+  searchValue: z.string().nullish(),
+});
+export type UserFilterParams = z.infer<typeof UserFilterParamsSchema>;
+export type UserTenantFilterParams = z.infer<
+  typeof UserTenantFilterParamsSchema
+>;
 export type User = z.infer<typeof UserSchema>;
 
 export const collection = db.collection<User>("oauth_users");
@@ -93,13 +101,61 @@ export default {
     );
   },
 
-  list: async (input: { searchValue?: string | null | undefined }) =>
-    collection.find<User>({}),
+  list: async (filterParams?: UserFilterParams) => {
+    let filter = {};
+
+    if (filterParams) {
+      const { searchValue } = filterParams;
+
+      if (searchValue) {
+        filter = {
+          ...filter,
+          ...{
+            name: {
+              $regex: searchValue,
+              $options: "i",
+            },
+          },
+        };
+      }
+    }
+
+    const data = collection.find<Document<User>>(filter);
+    return await data.toArray();
+  },
+
+  listByTenant: async (filterParams?: UserTenantFilterParams) => {
+    let filter = {};
+    if (filterParams) {
+      const { searchValue, tenantId } = filterParams;
+
+      if (tenantId) {
+        filter = {
+          ...filter,
+          ...{ tenant_id: new ObjectId(tenantId) },
+        };
+      }
+      if (searchValue) {
+        filter = {
+          ...filter,
+          ...{
+            name: {
+              $regex: searchValue,
+              $options: "i",
+            },
+          },
+        };
+      }
+    }
+
+    const data = collection.find<Document<User>>(filter);
+    return await data.toArray();
+  },
 
   get: async (email: string) => collection.findOne<User>({ email }),
 
   getById: async (_id: string) => {
-    const validated = UserSchema.parse({ _id: new ObjectId() });
+    const validated = UserSchema.parse({ _id: new ObjectId(_id) });
     collection.findOne<User>({ ...validated });
   },
 
