@@ -59,7 +59,7 @@
 
 <dialog bind:this={modal} class="modal">
   <div class="modal-box px-4 py-5 rounded-lg mx-auto max-w-3xl">
-    <h3 class="text-lg font-bold pb-4">Upload Files</h3>
+    <h3 class="text-lg font-bold pb-4">{t("upload-file.popup.title")}</h3>
     <form method="dialog">
       <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
         >✕</button
@@ -88,12 +88,12 @@
         <div class="flex flex-col items-center">
           {@html svgIcons.upload}
           <p class="text-base font-semibold mt-1">
-            {@html t("prompt-execution.upload-file.drag")}
+            {@html t("upload-file.popup.drag-message")}
           </p>
           {#if file}
             <p class="text-sm text-gray-400 mt-1">{file.name}</p>
           {:else}
-            <p class="text-sm text-gray-400 mt-1">CSV</p>
+            <p class="text-sm text-gray-400 mt-1">{"CSV"}</p>
           {/if}
         </div>
       </label>
@@ -102,7 +102,7 @@
 
     <div class="modal-action">
       <form method="dialog">
-        <button class="btn">Close</button>
+        <button class="btn">{t("common.cancel")}</button>
         <button
           class="btn btn-primary {!isFormValid && 'btn-disabled'}"
           type="submit"
@@ -110,7 +110,7 @@
             dispatch("confirm");
           }}
         >
-          Upload
+          {t("common.upload")}
         </button>
       </form>
     </div>
