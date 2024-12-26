@@ -91,8 +91,33 @@ export async function GET(context: APIContext): Promise<Response> {
         });
         for (let i = 0; i < users.length; i++) {
           const _user = users[i];
-          log.d(_user, "user at index " + i);
+          // log.d(_user, "user at index " + i);
           // TODO: Update list user into database
+          log.d(_user.user_id, "_user.user_id at index " + i);
+          const rolesdata = await userManagement.getUserRole({
+            id: _user.user_id,
+          });
+          let _roles: any[] = rolesdata.data ?? [];
+          log.d(_roles, "BEFORE ::: _roles at index " + i);
+          _roles = _roles.map((_role) => {
+            return _role.name;
+          });
+          if (_roles.length == 0) {
+            _roles = ["User"];
+          }
+          log.d(_roles, "AFTER ::: _roles at index " + i);
+          log.i(_user.name, "_user.name at index " + i);
+
+          UserModel.upsertByAuth0Sub(_user.user_id, {
+            tenant_id: tenant._id,
+            auth0_sub: _user.user_id,
+            username: _user.nickname,
+            name: _user.name,
+            email: _user.email,
+            picture: _user.picture,
+            roles: _roles,
+            permissions: assignPermissions(_roles),
+          });
         }
       }
     }
