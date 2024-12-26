@@ -10,7 +10,7 @@
   let fileUploadModal: HTMLDialogElement;
   let inputFile: File;
 
-  const importUrl: string = "/prompts/export";
+  const importUrl: string = "/prompts/import";
   const exportUrl: string = "/prompts/export";
 
   function startImport() {
@@ -43,8 +43,8 @@
   function downloadExport() {
     $loading = true;
     fetch(exportUrl)
-      .then((response) => {
-        const blob = response.blob();
+      .then(async (response) => {
+        const blob = await response.blob();
         const blobUrl = URL.createObjectURL(
           new Blob([blob], { type: "text/csv;charset=utf-8" }),
         );
@@ -52,6 +52,8 @@
         const disposition = response.headers.get("Content-Disposition");
         const parts = disposition?.split(";");
         const fileName = parts[1].replace(/['"]/g, "").split("=")[1];
+
+        console.log("fileName", { disposition, parts, fileName });
 
         const link = document.createElement("a");
         link.href = blobUrl;
