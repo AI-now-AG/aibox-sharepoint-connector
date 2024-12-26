@@ -8,6 +8,7 @@ import UserModel, {
 import { z } from "zod";
 import log from "$utils/log";
 import TenantModel from "$data/models/tenant.model";
+import userManagement from "$data/auth0/user-manager";
 
 const Auth0JWTSchema = z.object({
   sub: z.string().min(24),
@@ -18,7 +19,7 @@ const Auth0JWTSchema = z.object({
   picture: z.string().url(),
   name: z.string(),
   "ainow/roles": z.array(z.nativeEnum(UserRole)),
-  //"ainow/org_displayName": z.string(),
+  "ainow/user_id": z.string(),
 });
 
 export async function GET(context: APIContext): Promise<Response> {
@@ -59,7 +60,8 @@ export async function GET(context: APIContext): Promise<Response> {
   }
 
   // TODO: Fetch logo from auth0 org
-  const tenant = await TenantModel.getById(auth0User.data.org_id);
+  const auth0_tenant_id = auth0User.data.org_id;
+  const tenant = await TenantModel.getById(auth0_tenant_id);
   if (!tenant) {
     log.e("Tenant not found");
     return new Response(null, {
@@ -68,7 +70,36 @@ export async function GET(context: APIContext): Promise<Response> {
   }
 
   const roles = auth0User.data["ainow/roles"];
-  //const orgDisplayName = auth0User.data["ainow/org_displayName"];
+  // Sync list Users of current Tenant, exlude current logged in user
+  if (roles && roles.length > 0) {
+    let isAdmin = false;
+    for (let i = 0; i < roles.length; i++) {
+      const role = roles[i];
+      if (role == UserRole.SuperAdmin || role == UserRole.Admin) {
+        isAdmin = true;
+        break;
+      }
+    }
+    if (isAdmin) {
+      const data = await userManagement.getAllUsers({
+        q: `organization_id: ${auth0_tenant_id}`,
+      });
+      let users = data.data ?? [];
+      const auth0_user_id = auth0User.data["ainow/user_id"];
+      if (users && Array.isArray(users) && users.length > 0 && auth0_user_id) {
+        // Exclude current logged in user
+        users = users.filter((_user) => {
+          return _user.user_id != auth0_user_id;
+        });
+        for (let i = 0; i < users.length; i++) {
+          const _user = users[i];
+          log.d(_user, "user at index " + i);
+          // TODO: Update list user into data base
+        }
+      }
+    }
+  }
+
   // TODO: Sync tenant from Auth0 to aibox
   const userId = await UserModel.upsertByAuth0Sub(auth0User.data.sub, {
     tenant_id: tenant._id,
