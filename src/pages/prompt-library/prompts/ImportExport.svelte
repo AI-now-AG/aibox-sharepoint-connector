@@ -10,8 +10,8 @@
   let fileUploadModal: HTMLDialogElement;
   let inputFile: File;
 
-  const importUrl: string = "/prompts/import";
-  const exportUrl: string = "/prompts/export";
+  const importUrl: string = "/api/prompts/import";
+  const exportUrl: string = "/api/prompts/export";
 
   function startImport() {
     console.log("file", inputFile);

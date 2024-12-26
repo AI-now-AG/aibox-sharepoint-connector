@@ -49,7 +49,7 @@ export const GET: APIRoute = async (ctx: APIContext) => {
         updated_at: dayjs(prompt.updated_at).format("YYYY-MM-DD HH:mm:ss"),
       };
     });
-    console.log("csvData", { prompts, csvData });
+    //console.log("csvData", { prompts, csvData });
 
     // Generate the CSV string using fast-csv
     const csvString = await writeToString(csvData, { headers: true });
