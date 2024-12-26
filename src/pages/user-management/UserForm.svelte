@@ -72,7 +72,7 @@
       {@html svgIcons.back}
     </button>
     <h1 class="text-4xl font-bold">
-      {mode == MODE.Create ? "Add User" : userData.name}
+      {mode == MODE.Create ? t("user.add-new-user") : userData.name}
     </h1>
 
     <div class="flex space-x-2 ml-auto">
@@ -93,7 +93,7 @@
 <div class="px-8 mb-10">
   <div class="container w-full mx-auto p-6">
     <ConfirmDialog
-      title={"Are you sure you want to update this user?"}
+      title={t("user.update-confirm-message")}
       bind:modal={confirmUpdateModal}
       on:confirm={updateUser}
     />

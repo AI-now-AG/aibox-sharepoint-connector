@@ -87,7 +87,7 @@ if (auth.hasFeature(Astro.locals, TenantFeature.AudioToText)) {
 
 if (auth.isAdmin(Astro.locals) || auth.isSuperAdmin(Astro.locals)) {
   settingsItems.push({
-    title: "User Management",
+    title: t("user.user-management"),
     path: "/user-management",
   });
   restrictedMenus.push({
@@ -246,7 +246,7 @@ const modules = [...menuItems];
       const details = element as HTMLDetailsElement;
       const detailsId = details.getAttribute("data-id") || "";
       details.addEventListener("toggle", () =>
-        updateNavState(detailsId, details.open),
+        updateNavState(detailsId, details.open)
       );
     });
   }

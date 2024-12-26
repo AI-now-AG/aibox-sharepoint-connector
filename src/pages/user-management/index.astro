@@ -12,7 +12,7 @@ const t = useTranslations();
     class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14"
   >
     <h1 class="pt-2 lg:pt-8 text-4xl font-bold">
-      {"User Management"}
+      {t("user.user-management")}
     </h1>
 
     <a
@@ -20,7 +20,7 @@ const t = useTranslations();
       class="mt-2 lg:mt-8 btn btn-active btn-neutral font-normal grow-0"
     >
       <span set:html={svgIcons.add} />
-      {"Add New User"}
+      {t("user.add-new-user")}
     </a>
   </div>
   <div class="px-8">
