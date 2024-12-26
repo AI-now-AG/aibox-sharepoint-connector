@@ -13,8 +13,31 @@
   const importUrl: string = "/prompts/export";
   const exportUrl: string = "/prompts/export";
 
-  function handleImport() {
+  function startImport() {
     console.log("file", inputFile);
+
+    const data = new FormData();
+    data.append("file", inputFile);
+
+    $loading = true;
+    fetch(importUrl, {
+      method: "POST",
+      body: data,
+    })
+      .then((response) => {
+        // start import process
+
+        // ensure the upload dialog is closed if it is currently open
+        if (fileUploadModal.open) {
+          fileUploadModal.close();
+        }
+
+        $loading = false;
+      })
+      .catch((error) => {
+        console.error("Error import file:", error);
+        $loading = false;
+      });
   }
 
   function downloadExport() {
@@ -73,7 +96,7 @@
 <ImportUploadDialog
   bind:modal={fileUploadModal}
   bind:file={inputFile}
-  on:upload={handleImport}
+  on:confirm={startImport}
 />
 
 <Loading bind:show={$loading} />

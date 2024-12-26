@@ -26,6 +26,8 @@
     }
   }
 
+  $: isFormValid = file && isFileValid(file);
+
   function addFiles(
     event: Event & { currentTarget: EventTarget & HTMLInputElement },
   ) {
@@ -35,8 +37,6 @@
     if (!file || !isFileValid(file)) {
       return;
     }
-
-    dispatch("upload");
   }
 
   function isFileTypeValid(checkType: string) {
@@ -99,7 +99,15 @@
     <div class="modal-action">
       <form method="dialog">
         <button class="btn">Close</button>
-        <button class="btn btn-primary" type="submit">Upload</button>
+        <button
+          class="btn btn-primary {!isFormValid && 'btn-disabled'}"
+          type="submit"
+          on:click={() => {
+            dispatch("confirm");
+          }}
+        >
+          Upload
+        </button>
       </form>
     </div>
   </div>
