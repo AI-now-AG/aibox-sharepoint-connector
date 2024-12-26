@@ -4,8 +4,7 @@ import { useTranslations } from "$i18n/utils";
 import PromptModel from "$data/models/prompt.model";
 import CategoryModel from "$data/models/category.model";
 import { type CardItem } from "$components/Card.svelte";
-import ExportButon from "./ExportButon.svelte";
-import ImportButon from "./ImportButon.svelte";
+import ImportExport from "./ImportExport.svelte";
 import PromptFilter from "./PromptFilter.svelte";
 import { Permission } from "$data/models/user.model";
 import type { CategoryItem } from "$utils/CategoryItem";
@@ -81,8 +80,7 @@ let userPermissions = Astro.locals.user.permissions;
     <div class="flex items-center space-x-2">
       {
         userPermissions.includes(Permission.SuperAll) && (
-          <ImportButon />
-          <ExportButon />
+          <ImportExport client:load />
         )
       }
 
