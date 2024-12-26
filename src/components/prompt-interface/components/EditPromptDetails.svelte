@@ -205,9 +205,7 @@
 </script>
 
 <dialog class="modal" bind:this={promptDialog}>
-  <div
-    class="modal-box w-8/12 max-w-5xl lg:overflow-hidden sm:overflow-scroll md:overflow-scroll"
-  >
+  <div class="modal-box w-8/12 max-w-5xl">
     <div class="flex justify-between">
       <h3 class="text-lg font-bold py-4">{dialogTitle}</h3>
       <button class="btn btn-sm btn-circle btn-ghost" on:click={cancelEdit}>
