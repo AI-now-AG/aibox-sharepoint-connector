@@ -49,8 +49,7 @@ export const GET: APIRoute = async (ctx: APIContext) => {
         updated_at: dayjs(prompt.updated_at).format("YYYY-MM-DD HH:mm:ss"),
       };
     });
-    console.log("prompts csvData", { prompts, csvData });
-
+    
     // Generate the CSV string using fast-csv
     const csvString = await writeToString(csvData, { headers: true });
 
@@ -62,7 +61,7 @@ export const GET: APIRoute = async (ctx: APIContext) => {
       },
     });
   } catch (error) {
-    console.error("Error fetching data:", error);
-    return new Response("Error fetching data", { status: 500 });
+    console.error("Error export data:", error);
+    return new Response("Error export data", { status: 500 });
   }
 };

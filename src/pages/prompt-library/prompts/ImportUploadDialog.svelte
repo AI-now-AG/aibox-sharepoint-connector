@@ -87,10 +87,14 @@
 
         <div class="flex flex-col items-center">
           {@html svgIcons.upload}
-          <p class="text-base font-semibold">
+          <p class="text-base font-semibold mt-1">
             {@html t("prompt-execution.upload-file.drag")}
           </p>
-          <p class="text-sm text-gray-400 mt-1">CSV</p>
+          {#if file}
+            <p class="text-sm text-gray-400 mt-1">{file.name}</p>
+          {:else}
+            <p class="text-sm text-gray-400 mt-1">CSV</p>
+          {/if}
         </div>
       </label>
       <span class="mt-2 text-xs text-red-500">{fileErrorMessage}</span>
