@@ -75,7 +75,7 @@
   }
 </script>
 
-<div class="space-x-2">
+<div class="flex space-x-2">
   <button
     class="btn btn-default btn-outline font-normal grow-0"
     on:click={() => {
