@@ -93,7 +93,7 @@ export async function GET(context: APIContext): Promise<Response> {
         if (users && Array.isArray(users) && users.length > 0) {
           for (let i = 0; i < users.length; i++) {
             const _user = users[i];
-            log.d(_user, "user at index " + i);
+            // log.d(_user, "user at index " + i);
             // log.d(_user.user_id, "_user.user_id at index " + i);
             // const rolesdata = await userManagement.getUserRole({
             //   id: _user.user_id,
@@ -108,9 +108,10 @@ export async function GET(context: APIContext): Promise<Response> {
             // }
             // log.d(_roles, "AFTER ::: _roles at index " + i);
 
-            log.i(_user.user_id, "_user.user_id at index " + i);
-            log.i(_user.email, "_user.email at index " + i);
-            log.i(tenant._id, "tenant._id");
+            // log.i(_user.user_id, "_user.user_id at index " + i);
+            // log.i(_user.email, "_user.email at index " + i);
+            // log.i(tenant._id, "tenant._id");
+
             if (_user.email != auth0User.data.email) {
               UserModel.upsertByAuth0Sub(_user.user_id, {
                 tenant_id: tenant._id,
