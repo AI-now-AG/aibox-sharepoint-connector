@@ -176,32 +176,53 @@ export default {
           },
         };
       }
-      if (isBlocked === true) {
-        filter = {
-          ...filter,
-          ...{
-            blocked: isBlocked,
-          },
-        };
-      }
-
-      if (isVerified === true && isUnVerified == true) {
-        filter = {
-          ...filter,
-          ...{
-            $or: [{ email_verified: true }, { email_verified: false }],
-          },
-        };
-      } else if (isVerified === true) {
-        filter = {
-          ...filter,
-          ...{ email_verified: true },
-        };
-      } else if (isUnVerified === true) {
-        filter = {
-          ...filter,
-          ...{ email_verified: false },
-        };
+      if (isBlocked && isVerified && isUnVerified) {
+        /* empty */
+      } else {
+        if (isBlocked === true) {
+          if (isVerified == true) {
+            filter = {
+              ...filter,
+              ...{
+                $or: [{ blocked: true }, { email_verified: true }],
+              },
+            };
+          } else if (isUnVerified == true) {
+            filter = {
+              ...filter,
+              ...{
+                $or: [
+                  { blocked: true },
+                  { email_verified: false },
+                  { email_verified: null },
+                ],
+              },
+            };
+          } else {
+            filter = {
+              ...filter,
+              ...{
+                blocked: true,
+              },
+            };
+          }
+        } else {
+          if (isVerified === true && isUnVerified == true) {
+            /* empty */
+          } else if (isVerified === true) {
+            filter = {
+              ...filter,
+              ...{ email_verified: true },
+            };
+          } else if (isUnVerified === true) {
+            filter = {
+              ...filter,
+              ...{
+                $or: [{ email_verified: false }, { email_verified: null }],
+              },
+            };
+          }
+        }
       }
     }
 
