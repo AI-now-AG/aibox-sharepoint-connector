@@ -7,6 +7,7 @@
   import { addToast } from "$stores/toast";
   import Loading from "$components/Loading.svelte";
   import { loading, showLoading, hideLoading } from "$stores";
+  import { formatDateToDDMMYYHHMMSS } from "$utils/common";
 
   const t = useTranslations();
 
@@ -62,6 +63,16 @@
     }
     return isAdmin ? t("user.admin") : t("user.user");
   }
+
+  function getUserStatus(isBlocked: boolean, isVerified: boolean) {
+    if (isBlocked) {
+      return { text: t("user.blocked"), color: "#FF6F70" };
+    } else if (!isVerified) {
+      return { text: t("user.un-veriried"), color: "rgba(43, 52, 64, 0.2)" };
+    } else {
+      return { text: t("user.veriried"), color: "#00CA92" };
+    }
+  }
 </script>
 
 <div class="container max-w-full mx-auto p-6">
@@ -82,20 +93,23 @@
   </div>
 
   <div>
-    <h2 class="text-lg font-normal mb-4">{t("user.all-users")}</h2>
+    <h2 class="text-lg font-normal mb-4">
+      {t("user.all-users") + ` (${users?.length ?? 0})`}
+    </h2>
 
     <div class="relative">
       <table
         class=" border-separate border-spacing-x-0 border-spacing-y-3 min-w-full relative"
         style="font-family:Inter;"
       >
-        <!-- <colgroup>
+        <colgroup>
           <col class="w-auto" />
-          <col class="w-80" />
-          <col class="w-48" />
-          <col class="w-24" />
-          <col class="w-16" />
-        </colgroup> -->
+          <col class="w-auto" />
+          <col class="w-28" />
+          <col class="w-28" />
+          <col class="w-auto" />
+          <col class="w-auto" />
+        </colgroup>
         <thead>
           <tr class="bg-base-300 rounded-lg">
             <th class="py-3 px-4 text-left font-normal text-xs rounded-l-lg"
@@ -113,6 +127,8 @@
             <th class="py-3 px-4 text-left font-normal text-xs"
               >{t("user.latest-login")}</th
             >
+            <th class="py-3 px-4 text-left font-normal text-xs rounded-r-lg"
+            ></th>
           </tr>
         </thead>
         <tbody>
@@ -125,18 +141,26 @@
                 >
               </td>
               <td
-                class="py-3 px-4 text-gray-600 flex items-center text-sm font-normal h-16"
+                class="py-3 px-4 text-gray-600 flex items-center text-sm font-medium h-16"
               >
                 {user.email}
               </td>
               <td class="py-3 px-4 text-sm font-medium"
                 >{getRoleString(user.roles)}</td
               >
-              <td class="py-3 px-4"> {user.logins_count ?? 0} </td>
+              <td class="py-3 px-4 text-sm font-medium">
+                {user.logins_count ?? 0}
+              </td>
+              <td class="py-3 px-4 text-sm font-medium">
+                {user.last_login
+                  ? formatDateToDDMMYYHHMMSS(user.last_login)
+                  : "-"}
+              </td>
               <td
-                class="py-3 px-4 text-right relative relative-dropdown rounded-r-lg"
+                class="py-3 px-4 text-sm font-medium relative relative-dropdown rounded-r-lg"
+                style={`color: ${getUserStatus(user.blocked, user.email_verified).color}`}
               >
-                {user.last_login ?? "-"}
+                {getUserStatus(user.blocked, user.email_verified).text}
               </td>
             </tr>
           {/each}
