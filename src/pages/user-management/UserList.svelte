@@ -8,6 +8,8 @@
   import Loading from "$components/Loading.svelte";
   import { loading, showLoading, hideLoading } from "$stores";
   import { formatDateToDDMMYYHHMMSS } from "$utils/common";
+  import DropdownSection from "$components/DropdownSection.svelte";
+  import { type Option } from "$components/DropdownOptions.svelte";
 
   const t = useTranslations();
 
@@ -73,6 +75,44 @@
       return { text: t("user.veriried"), color: "#00CA92" };
     }
   }
+
+  function onSelectBlock(user: any) {
+    // TODO: Handle block
+  }
+
+  function onSelectDelete(user: any) {
+    // TODO: Handle delete
+  }
+
+  function getOptions(user: any) {
+    let options: Option[] = [
+      {
+        id: "1",
+        icon: svgIcons.block,
+        text: t("common.block"),
+        action: () => {
+          onSelectBlock(user);
+        },
+      },
+      {
+        id: "2",
+        icon: svgIcons.trash,
+        text: t("common.delete"),
+        action: () => {
+          onSelectDelete(user);
+        },
+      },
+      {
+        id: "3",
+        icon: svgIcons.edit,
+        text: t("common.edit"),
+        action: () => {
+          window.location.href = `/user-management/${user._id}`;
+        },
+      },
+    ];
+    return options;
+  }
 </script>
 
 <div class="container max-w-full mx-auto p-6">
@@ -127,8 +167,8 @@
             <th class="py-3 px-4 text-left font-normal text-xs"
               >{t("user.latest-login")}</th
             >
-            <th class="py-3 px-4 text-left font-normal text-xs rounded-r-lg"
-            ></th>
+            <th class=""></th>
+            <th class="rounded-r-lg"></th>
           </tr>
         </thead>
         <tbody>
@@ -157,10 +197,16 @@
                   : "-"}
               </td>
               <td
-                class="py-3 px-4 text-sm font-medium relative relative-dropdown rounded-r-lg"
+                class="py-3 px-4 text-sm font-medium"
                 style={`color: ${getUserStatus(user.blocked, user.email_verified).color}`}
               >
                 {getUserStatus(user.blocked, user.email_verified).text}
+              </td>
+
+              <td
+                class="py-3 px-4 text-sm font-medium relative relative-dropdown rounded-r-lg"
+              >
+                <DropdownSection cssClasses="" options={getOptions(user)} />
               </td>
             </tr>
           {/each}

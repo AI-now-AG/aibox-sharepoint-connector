@@ -36,6 +36,7 @@ import downIcon from "$assets/icons/down.svg?raw";
 import duplicate from "$assets/icons/duplicate.svg?raw";
 import reOrder from "$assets/icons/re-order.svg?raw";
 import drag from "$assets/icons/drag.svg?raw";
+import block from "$assets/icons/block.svg?raw";
 
 export const svgIcons = {
   menuSettings,
@@ -76,4 +77,5 @@ export const svgIcons = {
   duplicate,
   reOrder,
   drag,
+  block,
 };

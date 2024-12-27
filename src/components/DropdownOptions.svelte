@@ -14,7 +14,7 @@
 </script>
 
 <ul
-  class={`py-2 dropdown-content menu bg-base-100 rounded-xl p-2 shadow ${widthClass}`}
+  class={`py-2 dropdown-content menu bg-base-100 rounded-xl z-[1] p-2 shadow ${widthClass}`}
   style={styleVisibility}
 >
   {#each options as option}
