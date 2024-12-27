@@ -16,7 +16,6 @@
   let fileErrorMessage: string = "";
 
   const acceptedMimeTypes = Object.values(acceptedTypes).flat().join(", ");
-  const units = ["B", "kB", "MB", "GB", "TB"];
 
   $: {
     if (file && !isFileValid(file)) {
