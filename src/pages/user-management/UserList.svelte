@@ -60,7 +60,7 @@
         break;
       }
     }
-    return isAdmin ? "Admin" : "User";
+    return isAdmin ? t("user.admin") : t("user.user");
   }
 </script>
 
@@ -82,7 +82,7 @@
   </div>
 
   <div>
-    <h2 class="text-lg font-normal mb-4">Title</h2>
+    <h2 class="text-lg font-normal mb-4">{t("user.all-users")}</h2>
 
     <div class="relative">
       <table class="min-w-full relative" style="font-family:Inter;">
@@ -123,11 +123,11 @@
               <td class="py-3 px-4 text-sm font-medium"
                 >{getRoleString(user.roles)}</td
               >
-              <td class="py-3 px-4"> _ </td>
+              <td class="py-3 px-4"> {user.logins_count ?? 0} </td>
               <td
                 class="py-3 px-4 text-right relative relative-dropdown rounded-r-lg"
               >
-                _
+                {user.last_login ?? "-"}
               </td>
             </tr>
           {/each}
