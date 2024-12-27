@@ -49,17 +49,18 @@
   };
 
   function getRoleString(roles: string[]) {
+    let isAdmin = false;
     for (let i = 0; i < roles?.length; i++) {
       const role = roles[i];
       if (role == "Super Admin") {
-        return "Super Admin";
+        isAdmin = true;
+        break;
       } else if (role == "Admin") {
-        return "Admin";
-      } else {
-        return "User";
+        isAdmin = true;
+        break;
       }
     }
-    return "User";
+    return isAdmin ? "Admin" : "User";
   }
 </script>
 
@@ -111,7 +112,7 @@
               <td class="py-3 px-4 text-sm font-medium rounded-l-lg">
                 <a
                   class="underline underline-offset-2"
-                  href="/user-management/{user.email}">{user.name}</a
+                  href="/user-management/{user._id}">{user.name}</a
                 >
               </td>
               <td

@@ -9,6 +9,7 @@ import { z } from "zod";
 import log from "$utils/log";
 import TenantModel from "$data/models/tenant.model";
 import userManagement from "$data/auth0/user-manager";
+import tenantManagement from "$data/auth0/organizations-manager";
 import { sendExceptionToSentry } from "$utils/send-exception-to-sentry";
 
 const Auth0JWTSchema = z.object({
@@ -83,32 +84,30 @@ export async function GET(context: APIContext): Promise<Response> {
     }
     if (isAdmin) {
       try {
+        log.i(auth0_tenant_id, "auth0_tenant_id");
         const data = await userManagement.getAllUsers({
           q: `organization_id: ${auth0_tenant_id}`,
         });
-        log.i(auth0_tenant_id, "auth0_tenant_id");
+
         const users = data.data ?? [];
         if (users && Array.isArray(users) && users.length > 0) {
           for (let i = 0; i < users.length; i++) {
             const _user = users[i];
             // log.d(_user, "user at index " + i);
-            // log.d(_user.user_id, "_user.user_id at index " + i);
-            // const rolesdata = await userManagement.getUserRole({
-            //   id: _user.user_id,
-            // });
-            // let _roles: any[] = rolesdata.data ?? [];
-            // log.d(_roles, "BEFORE ::: _roles at index " + i);
-            // _roles = _roles.map((_role) => {
-            //   return _role.name;
-            // });
-            // if (_roles.length == 0) {
-            //   _roles = ["User"];
-            // }
-            // log.d(_roles, "AFTER ::: _roles at index " + i);
 
-            // log.i(_user.user_id, "_user.user_id at index " + i);
-            // log.i(_user.email, "_user.email at index " + i);
-            // log.i(tenant._id, "tenant._id");
+            const rolesdata = await tenantManagement.getMemberRoles({
+              id: auth0_tenant_id,
+              user_id: _user.user_id,
+            });
+
+            let _roles: any[] = rolesdata.data ?? [];
+            _roles = _roles.map((_role) => {
+              return _role.name;
+            });
+            if (_roles.length == 0) {
+              _roles = [UserRole.User];
+            }
+            log.d(_roles, "_roles at index " + i);
 
             if (_user.email != auth0User.data.email) {
               UserModel.upsertByAuth0Sub(_user.user_id, {
@@ -118,6 +117,8 @@ export async function GET(context: APIContext): Promise<Response> {
                 name: _user.name,
                 email: _user.email,
                 picture: _user.picture,
+                roles: _roles,
+                permissions: assignPermissions(_roles),
                 last_login: _user.last_login?.toString(),
                 logins_count: _user.logins_count,
                 email_verified: _user.email_verified,

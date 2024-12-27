@@ -68,7 +68,7 @@ export const user = {
         created_at: new Date(),
         updated_at: new Date(),
         logins_count: 0,
-        last_login: new Date(),
+        last_login: "",
         email_verified: false,
         blocked: false,
       });

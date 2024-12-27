@@ -1,6 +1,8 @@
 import management from "$data/auth0/management-client";
 import {
   type DeleteEnabledConnectionsByConnectionIdRequest,
+  type GetMembersRequest,
+  type GetOrganizationMemberRolesRequest,
   type PatchOrganizationsByIdOperationRequest,
   type PatchOrganizationsByIdRequest,
   type PostEnabledConnectionsOperationRequest,
@@ -76,9 +78,21 @@ export const deleteEnabledConnection = async (
   }
 };
 
+export const getMemberRoles = async (
+  parameters: GetOrganizationMemberRolesRequest,
+) => {
+  try {
+    return await management.organizations.getMemberRoles(parameters);
+  } catch (err) {
+    console.log("auth0: get organization member's roles error", err);
+    throw err;
+  }
+};
+
 export default {
   create,
   update,
   addEnabledConnection,
   deleteEnabledConnection,
+  getMemberRoles,
 };
