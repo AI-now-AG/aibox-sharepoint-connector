@@ -72,7 +72,7 @@
       {@html svgIcons.back}
     </button>
     <h1 class="text-4xl font-bold">
-      {mode == MODE.Create ? t("user.add-new-user") : userData.name}
+      {mode == MODE.Create ? t("user.add-new-user") : userData?.name}
     </h1>
 
     <div class="flex space-x-2 ml-auto">

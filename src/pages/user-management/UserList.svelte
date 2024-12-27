@@ -85,7 +85,17 @@
     <h2 class="text-lg font-normal mb-4">{t("user.all-users")}</h2>
 
     <div class="relative">
-      <table class="min-w-full relative" style="font-family:Inter;">
+      <table
+        class=" border-separate border-spacing-x-0 border-spacing-y-3 min-w-full relative"
+        style="font-family:Inter;"
+      >
+        <!-- <colgroup>
+          <col class="w-auto" />
+          <col class="w-80" />
+          <col class="w-48" />
+          <col class="w-24" />
+          <col class="w-16" />
+        </colgroup> -->
         <thead>
           <tr class="bg-base-300 rounded-lg">
             <th class="py-3 px-4 text-left font-normal text-xs rounded-l-lg"
@@ -104,7 +114,6 @@
               >{t("user.latest-login")}</th
             >
           </tr>
-          <tr class="header-spacing"></tr>
         </thead>
         <tbody>
           {#each users as user}

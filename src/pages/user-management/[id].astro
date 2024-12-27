@@ -15,7 +15,7 @@ if (id === undefined) {
   throw new Error("Id is required");
 }
 
-const user = await userModel.getByEmail(id);
+const user = await userModel.getById(id);
 if (user === null) {
   console.error("User not found");
   return Astro.redirect("/404");

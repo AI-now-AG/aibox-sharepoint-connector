@@ -160,6 +160,9 @@ export default {
 
   get: async (email: string) => collection.findOne<User>({ email }),
 
+  getById: async (id: string) =>
+    collection.findOne<User>({ _id: new ObjectId(id) }),
+
   getAuth0Sub: async (auth0_sub: string) =>
     collection.findOne<User>({ auth0_sub }),
 
