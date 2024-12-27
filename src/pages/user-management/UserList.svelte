@@ -191,7 +191,7 @@
 
           <div class="w-full h-[1px] bg-slate-200 mt-2 mb-2"></div>
 
-          <div class="w-full">
+          <div class="w-full text-sm">
             <div class="w-full text-left">{t("user.role")}</div>
             <label
               class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
