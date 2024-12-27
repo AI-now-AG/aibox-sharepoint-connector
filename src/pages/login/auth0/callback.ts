@@ -94,7 +94,7 @@ export async function GET(context: APIContext): Promise<Response> {
           if (users && Array.isArray(users) && users.length > 0) {
             for (let i = 0; i < users.length; i++) {
               const _user = users[i];
-              // log.d(_user, "user at index " + i);
+              log.d(_user, "user at index " + i);
 
               const rolesdata = await tenantManagement.getMemberRoles({
                 id: auth0_tenant_id,
@@ -123,6 +123,7 @@ export async function GET(context: APIContext): Promise<Response> {
                   last_login: _user.last_login?.toString(),
                   logins_count: _user.logins_count,
                   email_verified: _user.email_verified,
+                  blocked: _user.blocked ? _user.blocked : false,
                 });
               } else {
                 extraUserData = {
@@ -130,6 +131,7 @@ export async function GET(context: APIContext): Promise<Response> {
                   last_login: _user.last_login?.toString(),
                   logins_count: _user.logins_count,
                   email_verified: _user.email_verified,
+                  blocked: _user.blocked ? _user.blocked : false,
                 };
               }
             }
