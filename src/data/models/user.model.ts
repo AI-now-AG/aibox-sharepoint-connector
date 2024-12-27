@@ -1,6 +1,7 @@
 import { ObjectId } from "mongodb";
 import { db, type Document } from "../mongodb";
 import { z } from "zod";
+import log from "$utils/log";
 
 export enum UserRole {
   Admin = "Admin",
@@ -52,6 +53,10 @@ export const UserFilterParamsSchema = z.object({
 export const UserTenantFilterParamsSchema = z.object({
   tenantId: z.string(),
   searchValue: z.string().nullish(),
+  roles: z.array(z.nativeEnum(UserRole)).optional(),
+  isBlocked: z.boolean().optional(),
+  isVerified: z.boolean().optional(),
+  isUnVerified: z.boolean().optional(),
 });
 export type UserFilterParams = z.infer<typeof UserFilterParamsSchema>;
 export type UserTenantFilterParams = z.infer<
@@ -133,7 +138,16 @@ export default {
   listByTenant: async (filterParams?: UserTenantFilterParams) => {
     let filter = {};
     if (filterParams) {
-      const { searchValue, tenantId } = filterParams;
+      const {
+        searchValue,
+        tenantId,
+        roles,
+        isBlocked,
+        isVerified,
+        isUnVerified,
+      } = filterParams;
+
+      log.i(filterParams, "filterParams");
 
       if (tenantId) {
         filter = {
@@ -150,6 +164,43 @@ export default {
               $options: "i",
             },
           },
+        };
+      }
+      if (roles && roles.length > 0) {
+        filter = {
+          ...filter,
+          ...{
+            roles: {
+              $in: roles.map((role) => new RegExp(role, "i")),
+            },
+          },
+        };
+      }
+      if (isBlocked === true) {
+        filter = {
+          ...filter,
+          ...{
+            blocked: isBlocked,
+          },
+        };
+      }
+
+      if (isVerified === true && isUnVerified == true) {
+        filter = {
+          ...filter,
+          ...{
+            $or: [{ email_verified: true }, { email_verified: false }],
+          },
+        };
+      } else if (isVerified === true) {
+        filter = {
+          ...filter,
+          ...{ email_verified: true },
+        };
+      } else if (isUnVerified === true) {
+        filter = {
+          ...filter,
+          ...{ email_verified: false },
         };
       }
     }

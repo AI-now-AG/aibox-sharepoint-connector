@@ -12,17 +12,86 @@
   import { type Option } from "$components/DropdownOptions.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import { clickOutside } from "$components/actions/ClickOutside.svelte";
+  import UserForm from "./UserForm.svelte";
 
   const t = useTranslations();
 
   export let tenantId: string = "";
   export let currentLoggedInUser: any = "";
 
+  const enum UserRole {
+    Admin = "Admin",
+    SuperAdmin = "Super Admin",
+    User = "User",
+  }
+
+  const enum Status {
+    Verified = "Verified",
+    UnVerified = "UnVerified",
+    Blocked = "Blocked",
+  }
+
   let users: any = [];
   let searchValue: string = "";
   let searchTypingTimeout: any;
   let showUserFilter = false;
   let numberOfFilters = 0;
+
+  let isFilterUser: boolean = false;
+  let isFilterAdmin: boolean = false;
+  let filterRolesParam: any[] = [];
+
+  let isFilterVerified: boolean = false;
+  let isFilterUnVerified: boolean = false;
+  let isFilterBlocked: boolean = false;
+  let filterStatusesParams: any = {};
+
+  $: if (isFilterUser) {
+    filterRolesParam.push(UserRole.User);
+  } else {
+    filterRolesParam = filterRolesParam.filter((_role) => {
+      return _role != UserRole.User;
+    });
+  }
+  $: if (isFilterAdmin) {
+    filterRolesParam.push(UserRole.SuperAdmin);
+    filterRolesParam.push(UserRole.Admin);
+  } else {
+    filterRolesParam = filterRolesParam.filter((_role) => {
+      return _role != UserRole.Admin && _role != UserRole.SuperAdmin;
+    });
+  }
+
+  $: if (isFilterVerified) {
+    filterStatusesParams = {
+      ...filterStatusesParams,
+      isVerified: isFilterVerified,
+    };
+  } else {
+    delete filterStatusesParams.isVerified;
+  }
+
+  $: if (isFilterUnVerified) {
+    filterStatusesParams = {
+      ...filterStatusesParams,
+      isUnVerified: isFilterUnVerified,
+    };
+  } else {
+    delete filterStatusesParams.isUnVerified;
+  }
+
+  $: if (isFilterBlocked) {
+    filterStatusesParams = {
+      ...filterStatusesParams,
+      isBlocked: isFilterBlocked,
+    };
+  } else {
+    delete filterStatusesParams.isBlocked;
+  }
+
+  $: if (filterStatusesParams) {
+    log.i(filterStatusesParams, "filterStatusesParams");
+  }
 
   let selectedUser: any;
   let confirmBlockModal: HTMLDialogElement;
@@ -44,6 +113,8 @@
     const { data, error } = await actions.user.listByTeant({
       tenantId,
       searchValue,
+      roles: filterRolesParam,
+      ...filterStatusesParams,
     });
     hideLoading();
 
@@ -52,7 +123,7 @@
       users = users.filter((_user: any) => {
         return _user.email != currentLoggedInUser.email;
       });
-      log.i(users, "USER DATA");
+      // log.i(users, "USER DATA");
     } else {
       log.e(error, "Error fetching users");
     }
@@ -70,10 +141,10 @@
     let isAdmin = false;
     for (let i = 0; i < roles?.length; i++) {
       const role = roles[i];
-      if (role == "Super Admin") {
+      if (role == UserRole.SuperAdmin) {
         isAdmin = true;
         break;
-      } else if (role == "Admin") {
+      } else if (role == UserRole.Admin) {
         isAdmin = true;
         break;
       }
@@ -199,8 +270,8 @@
               <input
                 type="checkbox"
                 class="checkbox checkbox-sm checkbox-neutral mr-2"
-                checked={true}
-                on:change={() => null}
+                bind:checked={isFilterUser}
+                on:change={fetchUsers}
               />
               <span class="font-normal">{t("user.user")}</span>
             </label>
@@ -211,8 +282,8 @@
               <input
                 type="checkbox"
                 class="checkbox checkbox-sm checkbox-neutral mr-2"
-                checked={true}
-                on:change={() => null}
+                bind:checked={isFilterAdmin}
+                on:change={fetchUsers}
               />
               <span class="font-normal">{t("user.admin")}</span>
             </label>
@@ -226,8 +297,8 @@
               <input
                 type="checkbox"
                 class="checkbox checkbox-sm checkbox-neutral mr-2"
-                checked={true}
-                on:change={() => null}
+                bind:checked={isFilterBlocked}
+                on:change={fetchUsers}
               />
               <span class="font-normal">{t("common.block")}</span>
             </label>
@@ -238,8 +309,8 @@
               <input
                 type="checkbox"
                 class="checkbox checkbox-sm checkbox-neutral mr-2"
-                checked={true}
-                on:change={() => null}
+                bind:checked={isFilterUnVerified}
+                on:change={fetchUsers}
               />
               <span class="font-normal">{t("user.un-veriried")}</span>
             </label>
@@ -250,8 +321,8 @@
               <input
                 type="checkbox"
                 class="checkbox checkbox-sm checkbox-neutral mr-2"
-                checked={true}
-                on:change={() => null}
+                bind:checked={isFilterVerified}
+                on:change={fetchUsers}
               />
               <span class="font-normal">{t("user.veriried")}</span>
             </label>
