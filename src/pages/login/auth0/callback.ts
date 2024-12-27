@@ -47,9 +47,7 @@ export async function GET(context: APIContext): Promise<Response> {
 
   const token = await auth0(context.url.origin).validateAuthorizationCode(code);
   const decoded = decodeJwt(token.idToken);
-  log.d(decoded, "Decoded JWT");
   const auth0User = Auth0JWTSchema.safeParse(decoded);
-  log.i(auth0User.data, "auth0User");
   if (auth0User.error) {
     log.e(
       auth0User.error,
