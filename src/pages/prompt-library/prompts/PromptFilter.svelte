@@ -82,40 +82,12 @@
           class="btn btn-sm btn-active font-normal bg-base-200"
           on:click={() => (showCategoryFilter = !showCategoryFilter)}
         >
-          <svg
-            width="18"
-            height="17"
-            viewBox="0 0 18 17"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M1.5 2C1.5 1.44771 1.94772 1 2.5 1H15.5C16.0523 1 16.5 1.44772 16.5 2V3.91912C16.5 4.18434 16.3946 4.43869 16.2071 4.62623L10.9596 9.87377C10.772 10.0613 10.6667 10.3157 10.6667 10.5809V12.6667L7.33333 16V10.5809C7.33333 10.3157 7.22798 10.0613 7.04044 9.87377L1.79289 4.62623C1.60536 4.43869 1.5 4.18434 1.5 3.91912V2Z"
-              stroke="#111827"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            ></path>
-          </svg>
-          Filter
+          {@html svgIcons.filter}
+          {t("common.filter")}
           {#if numberOfFilters > 0}
             <div class="badge badge-primary badge-md">{numberOfFilters}</div>
           {/if}
-          <svg
-            width="8"
-            height="9"
-            viewBox="0 0 8 9"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M6 3.66666L4 5.66666L2 3.66666H6Z"
-              fill="#1F2937"
-              stroke="#1F2937"
-              stroke-width="2"
-              stroke-linejoin="round"
-            ></path>
-          </svg>
+          {@html svgIcons.arrowDownFill}
         </button>
       </div>
       {#if showCategoryFilter}
@@ -156,8 +128,5 @@
       {/if}
     </div>
   </div>
-  <PromptList
-    {isEditable}
-    bind:items={filteredPrompts}
-  />
+  <PromptList {isEditable} bind:items={filteredPrompts} />
 </div>

@@ -10,6 +10,8 @@
   import { formatDateToDDMMYYHHMMSS } from "$utils/common";
   import DropdownSection from "$components/DropdownSection.svelte";
   import { type Option } from "$components/DropdownOptions.svelte";
+  import ConfirmDialog from "$components/ConfirmDialog.svelte";
+  import { clickOutside } from "$components/actions/ClickOutside.svelte";
 
   const t = useTranslations();
 
@@ -18,7 +20,20 @@
 
   let users: any = [];
   let searchValue: string = "";
-  let timeout: any;
+  let searchTypingTimeout: any;
+  let showUserFilter = false;
+  let numberOfFilters = 0;
+
+  let selectedUser: any;
+  let confirmBlockModal: HTMLDialogElement;
+  let confirmDeleteModal: HTMLDialogElement;
+
+  const handleFilterMouseEnter = () => {
+    showUserFilter = true;
+  };
+  const handleFilterMouseLeave = () => {
+    showUserFilter = false;
+  };
 
   onMount(async () => {
     await fetchUsers();
@@ -44,8 +59,8 @@
   };
 
   const onSearchUser = ({ target }: any) => {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => {
+    clearTimeout(searchTypingTimeout);
+    searchTypingTimeout = setTimeout(() => {
       searchValue = target.value;
       fetchUsers();
     }, 300);
@@ -76,12 +91,24 @@
     }
   }
 
-  function onSelectBlock(user: any) {
+  function blockUser() {
     // TODO: Handle block
+    const blockUserId = selectedUser._id ?? "";
+    alert(selectedUser.name + " - " + blockUserId);
+  }
+  function onSelectBlock(user: any) {
+    selectedUser = user;
+    confirmBlockModal?.show();
   }
 
-  function onSelectDelete(user: any) {
+  function deleteUser() {
     // TODO: Handle delete
+    const deleteUserId = selectedUser._id ?? "";
+    alert(selectedUser.name + " - " + deleteUserId);
+  }
+  function onSelectDelete(user: any) {
+    selectedUser = user;
+    confirmDeleteModal?.show();
   }
 
   function getOptions(user: any) {
@@ -116,7 +143,7 @@
 </script>
 
 <div class="container max-w-full mx-auto p-6">
-  <div class="items-center mb-10">
+  <div class="items-center mb-2">
     <div class="relative w-full">
       <label class="input input-bordered flex items-center gap-2">
         {@html svgIcons.search}
@@ -132,7 +159,109 @@
     </div>
   </div>
 
-  <div>
+  <div class="">
+    <button
+      class="dropdown dropdown-hover dropdown-start"
+      use:clickOutside
+      on:click={() => (showUserFilter = true)}
+      on:clickoutside={() => {
+        showUserFilter = false;
+      }}
+      on:mouseenter={handleFilterMouseEnter}
+      on:mouseleave={handleFilterMouseLeave}
+    >
+      <div class="btn btn-sm btn-active font-normal bg-base-200">
+        {@html svgIcons.filter}
+        {t("common.filter")}
+        {#if numberOfFilters > 0}
+          <div class="badge badge-primary badge-md">{numberOfFilters}</div>
+        {/if}
+        {@html svgIcons.arrowDownFill}
+      </div>
+      {#if showUserFilter}
+        <ul
+          class="dropdown-content menu bg-base-100 rounded-xl z-[1] p-3 shadow w-52"
+        >
+          <div class="flex justify-center items-center">
+            <span class="flex-1 text-left text-sm font-bold"
+              >{t("common.filter")}</span
+            >
+            <button class="text-xs font-bold">✕</button>
+          </div>
+
+          <div class="w-full h-[1px] bg-slate-200 mt-2 mb-2"></div>
+
+          <div class="w-full">
+            <div class="w-full text-left">{t("user.role")}</div>
+            <label
+              class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
+            >
+              <input
+                type="checkbox"
+                class="checkbox checkbox-sm checkbox-neutral mr-2"
+                checked={true}
+                on:change={() => null}
+              />
+              <span class="font-normal">{t("user.user")}</span>
+            </label>
+
+            <label
+              class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
+            >
+              <input
+                type="checkbox"
+                class="checkbox checkbox-sm checkbox-neutral mr-2"
+                checked={true}
+                on:change={() => null}
+              />
+              <span class="font-normal">{t("user.admin")}</span>
+            </label>
+          </div>
+
+          <div class="w-full mt-4">
+            <div class="w-full text-left">{t("user.status")}</div>
+            <label
+              class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
+            >
+              <input
+                type="checkbox"
+                class="checkbox checkbox-sm checkbox-neutral mr-2"
+                checked={true}
+                on:change={() => null}
+              />
+              <span class="font-normal">{t("common.block")}</span>
+            </label>
+
+            <label
+              class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
+            >
+              <input
+                type="checkbox"
+                class="checkbox checkbox-sm checkbox-neutral mr-2"
+                checked={true}
+                on:change={() => null}
+              />
+              <span class="font-normal">{t("user.un-veriried")}</span>
+            </label>
+
+            <label
+              class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
+            >
+              <input
+                type="checkbox"
+                class="checkbox checkbox-sm checkbox-neutral mr-2"
+                checked={true}
+                on:change={() => null}
+              />
+              <span class="font-normal">{t("user.veriried")}</span>
+            </label>
+          </div>
+        </ul>
+      {/if}
+    </button>
+  </div>
+
+  <div class="mt-10">
     <h2 class="text-lg font-normal mb-4">
       {t("user.all-users") + ` (${users?.length ?? 0})`}
     </h2>
@@ -212,8 +341,21 @@
           {/each}
         </tbody>
       </table>
-
-      <Loading partial={true} bind:show={$loading} />
     </div>
   </div>
 </div>
+
+<ConfirmDialog
+  title={t("user.block-confirm-message")}
+  description={t("user.block-description-message")}
+  bind:modal={confirmBlockModal}
+  on:confirm={blockUser}
+/>
+<ConfirmDialog
+  title={t("user.delete-confirm-message")}
+  description={t("user.delete-description-message")}
+  bind:modal={confirmDeleteModal}
+  on:confirm={deleteUser}
+/>
+
+<Loading partial={true} bind:show={$loading} />
