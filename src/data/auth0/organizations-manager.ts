@@ -1,7 +1,6 @@
 import management from "$data/auth0/management-client";
 import {
   type DeleteEnabledConnectionsByConnectionIdRequest,
-  type GetMembersRequest,
   type GetOrganizationMemberRolesRequest,
   type PatchOrganizationsByIdOperationRequest,
   type PatchOrganizationsByIdRequest,
@@ -78,6 +77,7 @@ export const deleteEnabledConnection = async (
   }
 };
 
+// This get Role which IS RELATED to Orgainziation (using organization id and user id)
 export const getMemberRoles = async (
   parameters: GetOrganizationMemberRolesRequest,
 ) => {

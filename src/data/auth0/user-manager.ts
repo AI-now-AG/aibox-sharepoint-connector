@@ -10,7 +10,8 @@ export const getAllUsers = async (parameters: GetUsersRequest) => {
   }
 };
 
-export const getUserRole = async (parameters: GetUserRolesRequest) => {
+// This get Role which NOT RELATED to Orgainziation (using user id)
+export const getUserRoles = async (parameters: GetUserRolesRequest) => {
   try {
     return await management.users.getRoles(parameters);
   } catch (error) {
@@ -21,5 +22,5 @@ export const getUserRole = async (parameters: GetUserRolesRequest) => {
 
 export default {
   getAllUsers,
-  getUserRole,
+  getUserRoles,
 };
