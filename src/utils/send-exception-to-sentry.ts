@@ -3,7 +3,7 @@ import log from "./log";
 
 export const sendExceptionToSentry = (
   error: unknown,
-  additionalContext?: Record<string, any>,
+  additionalContext?: Record<string, unknown>,
 ) => {
   Sentry.captureException(error, additionalContext);
   log.e(error, JSON.stringify(additionalContext));
