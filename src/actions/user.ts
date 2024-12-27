@@ -67,6 +67,10 @@ export const user = {
         tenant_id: new ObjectId(),
         created_at: new Date(),
         updated_at: new Date(),
+        logins_count: 0,
+        last_login: new Date(),
+        email_verified: false,
+        blocked: false,
       });
 
       return transformRawData(insertResult);

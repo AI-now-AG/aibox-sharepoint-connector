@@ -31,11 +31,17 @@ const UserSchema = z.object({
   username: z.string().min(2),
   email: z.string(),
   picture: z.string().url().optional(),
-  roles: z.array(z.nativeEnum(UserRole)),
+  roles: z.array(z.nativeEnum(UserRole)).default(() => [UserRole.User]),
   created_at: z.date().default(() => new Date()),
   updated_at: z.date().default(() => new Date()),
-  permissions: z.array(z.nativeEnum(Permission)),
+  permissions: z
+    .array(z.nativeEnum(Permission))
+    .default(() => [Permission.UserAll]),
   name: z.string(),
+  logins_count: z.number().default(() => 0),
+  last_login: z.string(),
+  email_verified: z.boolean().default(false),
+  blocked: z.boolean().default(false),
   navState: z.record(z.string(), z.boolean()).optional(),
 });
 

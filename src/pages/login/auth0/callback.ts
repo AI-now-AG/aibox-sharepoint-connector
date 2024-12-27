@@ -48,6 +48,7 @@ export async function GET(context: APIContext): Promise<Response> {
   const decoded = decodeJwt(token.idToken);
   log.d(decoded, "Decoded JWT");
   const auth0User = Auth0JWTSchema.safeParse(decoded);
+  log.i(auth0User.data, "auth0User");
   if (auth0User.error) {
     log.e(
       auth0User.error,
@@ -69,9 +70,11 @@ export async function GET(context: APIContext): Promise<Response> {
   }
 
   const roles = auth0User.data["ainow/roles"];
+
   // Sync list Users of current Tenant, exlude current logged in user
+  let extraUserData = {};
+  let isAdmin = false;
   if (roles && roles.length > 0) {
-    let isAdmin = false;
     for (let i = 0; i < roles.length; i++) {
       const role = roles[i];
       if (role == UserRole.SuperAdmin || role == UserRole.Admin) {
@@ -83,47 +86,55 @@ export async function GET(context: APIContext): Promise<Response> {
       const data = await userManagement.getAllUsers({
         q: `organization_id: ${auth0_tenant_id}`,
       });
-      let users = data.data ?? [];
+      log.i(auth0_tenant_id, "auth0_tenant_id");
+      const users = data.data ?? [];
       if (users && Array.isArray(users) && users.length > 0) {
-        // Exclude current logged in user
-        users = users.filter((_user) => {
-          return _user.email != auth0User.data.email;
-        });
         for (let i = 0; i < users.length; i++) {
           const _user = users[i];
-          // log.d(_user, "user at index " + i);
-          // TODO: Update list user into database
-          log.d(_user.user_id, "_user.user_id at index " + i);
-          const rolesdata = await userManagement.getUserRole({
-            id: _user.user_id,
-          });
-          let _roles: any[] = rolesdata.data ?? [];
-          log.d(_roles, "BEFORE ::: _roles at index " + i);
-          _roles = _roles.map((_role) => {
-            return _role.name;
-          });
-          if (_roles.length == 0) {
-            _roles = ["User"];
-          }
-          log.d(_roles, "AFTER ::: _roles at index " + i);
-          log.i(_user.name, "_user.name at index " + i);
+          log.d(_user, "user at index " + i);
+          // log.d(_user.user_id, "_user.user_id at index " + i);
+          // const rolesdata = await userManagement.getUserRole({
+          //   id: _user.user_id,
+          // });
+          // let _roles: any[] = rolesdata.data ?? [];
+          // log.d(_roles, "BEFORE ::: _roles at index " + i);
+          // _roles = _roles.map((_role) => {
+          //   return _role.name;
+          // });
+          // if (_roles.length == 0) {
+          //   _roles = ["User"];
+          // }
+          // log.d(_roles, "AFTER ::: _roles at index " + i);
 
-          UserModel.upsertByAuth0Sub(_user.user_id, {
-            tenant_id: tenant._id,
-            auth0_sub: _user.user_id,
-            username: _user.nickname,
-            name: _user.name,
-            email: _user.email,
-            picture: _user.picture,
-            roles: _roles,
-            permissions: assignPermissions(_roles),
-          });
+          log.i(_user.user_id, "_user.user_id at index " + i);
+          log.i(_user.email, "_user.email at index " + i);
+          log.i(tenant._id, "tenant._id");
+          if (_user.email != auth0User.data.email) {
+            UserModel.upsertByAuth0Sub(_user.user_id, {
+              tenant_id: tenant._id,
+              auth0_sub: _user.user_id,
+              username: _user.nickname,
+              name: _user.name,
+              email: _user.email,
+              picture: _user.picture,
+              last_login: _user.last_login?.toString(),
+              logins_count: _user.logins_count,
+              email_verified: _user.email_verified,
+            });
+          } else {
+            extraUserData = {
+              ...extraUserData,
+              last_login: _user.last_login?.toString(),
+              logins_count: _user.logins_count,
+              email_verified: _user.email_verified,
+            };
+          }
         }
       }
     }
   }
 
-  // TODO: Sync tenant from Auth0 to aibox
+  // TODO: Sync current user from Auth0 to aibox
   const userId = await UserModel.upsertByAuth0Sub(auth0User.data.sub, {
     tenant_id: tenant._id,
     auth0_sub: auth0User.data.sub,
@@ -133,6 +144,7 @@ export async function GET(context: APIContext): Promise<Response> {
     picture: auth0User.data.picture,
     roles,
     permissions: assignPermissions(roles),
+    ...extraUserData,
   });
 
   const session = await lucia.createSession(userId, {});
