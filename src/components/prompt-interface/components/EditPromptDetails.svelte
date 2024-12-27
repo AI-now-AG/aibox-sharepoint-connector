@@ -196,6 +196,12 @@
     selectedKnowledgeBases = [];
     selectedEditPromptId = null;
   }
+
+  function handleKeyDown(event: any) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+    }
+  }
 </script>
 
 <dialog class="modal" bind:this={promptDialog}>
@@ -207,17 +213,16 @@
       </button>
     </div>
     <LoadingSpinner bind:isLoading />
-    <form class="rounded pt-6 mb-4 space-y-6">
+    <form class="rounded pt-6 space-y-6">
       <div class="grid grid-cols-1 gap-4 justify-center">
-        <div>
-          <p class="mb-2">{t("prompt-library.add.prompts.title")}*</p>
-          <input
-            type="text"
-            bind:value={promptTitle}
-            placeholder="e.g. Create three sports headlines"
-            class="input input-bordered w-full min-w-xs"
-          />
-        </div>
+        <p class="mb-2">{t("prompt-library.add.prompts.title")}*</p>
+        <input
+          type="text"
+          bind:value={promptTitle}
+          placeholder="e.g. Create three sports headlines"
+          class="input input-bordered w-full min-w-xs"
+          on:keydown={handleKeyDown}
+        />
       </div>
 
       <div class="mb-4">
