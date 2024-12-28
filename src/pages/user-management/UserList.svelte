@@ -6,7 +6,7 @@
   import log from "$utils/log";
   import { addToast } from "$stores/toast";
   import Loading from "$components/Loading.svelte";
-  import { loading, showLoading, hideLoading } from "$stores";
+  import { loading, showLoading, hideLoading, user } from "$stores";
   import { formatDateToDDMMYYHHMMSS } from "$utils/common";
   import DropdownSection from "$components/DropdownSection.svelte";
   import { type Option } from "$components/DropdownOptions.svelte";
@@ -230,6 +230,26 @@
     ];
     return options;
   }
+
+  let sortColumn = "";
+  let sortDirection = "asc";
+
+  function sort(col: string) {
+    if (sortColumn === col) {
+      sortDirection = sortDirection === "asc" ? "desc" : "asc";
+    } else {
+      sortColumn = col;
+      sortDirection = "asc";
+    }
+
+    users = users.sort((a: any, b: any) => {
+      if (sortDirection === "asc") {
+        return a[col] > b[col] ? 1 : -1;
+      } else {
+        return a[col] < b[col] ? 1 : -1;
+      }
+    });
+  }
 </script>
 
 <div class="container max-w-full mx-auto p-6">
@@ -362,27 +382,68 @@
           <col class="w-auto" />
           <col class="w-auto" />
           <col class="w-28" />
+          <col class="w-40" />
+          <col class="w-56" />
+          <col class="w-auto" />
           <col class="w-28" />
-          <col class="w-auto" />
-          <col class="w-auto" />
         </colgroup>
         <thead>
           <tr class="bg-base-300 rounded-lg">
-            <th class="py-3 px-4 text-left font-normal text-xs rounded-l-lg"
-              >{t("common.name")}</th
+            <th
+              class="py-3 px-4 text-left font-normal text-xs rounded-l-lg"
+              on:click={() => sort("name")}
             >
-            <th class="py-3 px-4 text-left font-normal text-xs"
-              >{t("user.e-mail")}</th
+              {t("common.name")}
+              <span class="ml-2">
+                {sortColumn === "name"
+                  ? sortDirection === "asc"
+                    ? "▲"
+                    : "▼"
+                  : "☰"}
+              </span>
+            </th>
+            <th
+              class="py-3 px-4 text-left font-normal text-xs"
+              on:click={() => sort("email")}
             >
-            <th class="py-3 px-4 text-left font-normal text-xs"
-              >{t("user.role")}</th
+              {t("user.e-mail")}
+              <span class="ml-2">
+                {sortColumn === "email"
+                  ? sortDirection === "asc"
+                    ? "▲"
+                    : "▼"
+                  : "☰"}
+              </span></th
             >
-            <th class="py-3 px-4 text-left font-normal text-xs"
-              >{t("user.logins")}</th
+            <th class="py-3 px-4 text-left font-normal text-xs">
+              {t("user.role")}
+            </th>
+            <th
+              class="py-3 px-4 text-left font-normal text-xs"
+              on:click={() => sort("logins_count")}
             >
-            <th class="py-3 px-4 text-left font-normal text-xs"
-              >{t("user.latest-login")}</th
+              {t("user.logins")}
+              <span class="ml-2">
+                {sortColumn === "logins_count"
+                  ? sortDirection === "asc"
+                    ? "▲"
+                    : "▼"
+                  : "☰"}
+              </span>
+            </th>
+            <th
+              class="py-3 px-4 text-left font-normal text-xs"
+              on:click={() => sort("last_login")}
             >
+              {t("user.latest-login")}
+              <span class="ml-2">
+                {sortColumn === "last_login"
+                  ? sortDirection === "asc"
+                    ? "▲"
+                    : "▼"
+                  : "☰"}
+              </span>
+            </th>
             <th class=""></th>
             <th class="rounded-r-lg"></th>
           </tr>
