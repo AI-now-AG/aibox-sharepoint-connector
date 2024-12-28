@@ -12,7 +12,6 @@
   import { type Option } from "$components/DropdownOptions.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import { clickOutside } from "$components/actions/ClickOutside.svelte";
-  import UserForm from "./UserForm.svelte";
 
   const t = useTranslations();
 
@@ -39,7 +38,7 @@
 
   let isFilterUser: boolean = false;
   let isFilterAdmin: boolean = false;
-  let filterRolesParam: any[] = [];
+  let filterRolesParams: any[] = [];
 
   let isFilterVerified: boolean = false;
   let isFilterUnVerified: boolean = false;
@@ -47,17 +46,17 @@
   let filterStatusesParams: any = {};
 
   $: if (isFilterUser) {
-    filterRolesParam.push(UserRole.User);
+    filterRolesParams.push(UserRole.User);
   } else {
-    filterRolesParam = filterRolesParam.filter((_role) => {
+    filterRolesParams = filterRolesParams.filter((_role) => {
       return _role != UserRole.User;
     });
   }
   $: if (isFilterAdmin) {
-    filterRolesParam.push(UserRole.SuperAdmin);
-    filterRolesParam.push(UserRole.Admin);
+    filterRolesParams.push(UserRole.SuperAdmin);
+    filterRolesParams.push(UserRole.Admin);
   } else {
-    filterRolesParam = filterRolesParam.filter((_role) => {
+    filterRolesParams = filterRolesParams.filter((_role) => {
       return _role != UserRole.Admin && _role != UserRole.SuperAdmin;
     });
   }
@@ -89,10 +88,6 @@
     delete filterStatusesParams.isBlocked;
   }
 
-  $: if (filterStatusesParams) {
-    log.i(filterStatusesParams, "filterStatusesParams");
-  }
-
   let selectedUser: any;
   let confirmBlockModal: HTMLDialogElement;
   let confirmDeleteModal: HTMLDialogElement;
@@ -113,7 +108,7 @@
     const { data, error } = await actions.user.listByTeant({
       tenantId,
       searchValue,
-      roles: filterRolesParam,
+      roles: filterRolesParams,
       ...filterStatusesParams,
     });
     hideLoading();
@@ -257,7 +252,9 @@
             <span class="flex-1 text-left text-sm font-bold"
               >{t("common.filter")}</span
             >
-            <button class="text-xs font-bold">✕</button>
+            <button class="btn btn-ghost btn-sm" on:click={fetchUsers}>
+              {@html svgIcons.filter}</button
+            >
           </div>
 
           <div class="w-full h-[1px] bg-slate-200 mt-2 mb-2"></div>
@@ -271,7 +268,6 @@
                 type="checkbox"
                 class="checkbox checkbox-sm checkbox-neutral mr-2"
                 bind:checked={isFilterUser}
-                on:change={fetchUsers}
               />
               <span class="font-normal">{t("user.user")}</span>
             </label>
@@ -283,7 +279,6 @@
                 type="checkbox"
                 class="checkbox checkbox-sm checkbox-neutral mr-2"
                 bind:checked={isFilterAdmin}
-                on:change={fetchUsers}
               />
               <span class="font-normal">{t("user.admin")}</span>
             </label>
@@ -298,7 +293,6 @@
                 type="checkbox"
                 class="checkbox checkbox-sm checkbox-neutral mr-2"
                 bind:checked={isFilterBlocked}
-                on:change={fetchUsers}
               />
               <span class="font-normal">{t("common.block")}</span>
             </label>
@@ -310,7 +304,6 @@
                 type="checkbox"
                 class="checkbox checkbox-sm checkbox-neutral mr-2"
                 bind:checked={isFilterUnVerified}
-                on:change={fetchUsers}
               />
               <span class="font-normal">{t("user.un-veriried")}</span>
             </label>
@@ -322,7 +315,6 @@
                 type="checkbox"
                 class="checkbox checkbox-sm checkbox-neutral mr-2"
                 bind:checked={isFilterVerified}
-                on:change={fetchUsers}
               />
               <span class="font-normal">{t("user.veriried")}</span>
             </label>
