@@ -99,9 +99,29 @@
     showUserFilter = false;
   };
 
-  onMount(async () => {
-    await fetchUsers();
-  });
+  function calculateNumberOfFitler() {
+    numberOfFilters = 0;
+    const a: any = {};
+    for (let i = 0; i < filterRolesParams.length; i++) {
+      const role = filterRolesParams[i];
+      if (!a[role]) {
+        if (role == UserRole.SuperAdmin) {
+          continue;
+        }
+        numberOfFilters += 1;
+        a[role] = true;
+      }
+    }
+    if (filterStatusesParams.isBlocked) {
+      numberOfFilters += 1;
+    }
+    if (filterStatusesParams.isVerified) {
+      numberOfFilters += 1;
+    }
+    if (filterStatusesParams.isUnVerified) {
+      numberOfFilters += 1;
+    }
+  }
 
   const fetchUsers = async () => {
     showLoading();
@@ -118,11 +138,15 @@
       users = users.filter((_user: any) => {
         return _user.email != currentLoggedInUser.email;
       });
-      // log.i(users, "USER DATA");
+      calculateNumberOfFitler();
     } else {
       log.e(error, "Error fetching users");
     }
   };
+
+  onMount(async () => {
+    await fetchUsers();
+  });
 
   const onSearchUser = ({ target }: any) => {
     clearTimeout(searchTypingTimeout);
