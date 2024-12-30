@@ -15,6 +15,7 @@
   } from "$components/actions/Input.svelte";
   import { loading, showLoading, hideLoading } from "$stores";
   import { formatDateToDDMMYYHHMMSS } from "$utils/common";
+  import log from "$utils/log";
 
   const t = useTranslations();
 
@@ -28,6 +29,9 @@
   }
 
   let confirmUpdateModal: HTMLDialogElement;
+  let confirmBlockModal: HTMLDialogElement;
+  let confirmDeleteModal: HTMLDialogElement;
+
   let alertModal: HTMLDialogElement;
   let alertMessage: any = "";
 
@@ -80,6 +84,62 @@
   function showAlert(message: any) {
     alertMessage = message;
     alertModal.show();
+  }
+
+  async function handleBlockingUser() {
+    showLoading();
+    const { _id = "", blocked } = userData;
+    let result;
+    if (blocked) {
+      result = await actions.user.unblock({
+        _id,
+      });
+    } else {
+      result = await actions.user.block({
+        _id,
+      });
+    }
+    hideLoading();
+    const { error } = result;
+    log.d(result, "updateUserStatus result");
+    if (!error) {
+      userData.blocked = !blocked;
+      addToast({
+        message: blocked
+          ? t("user.un-block-successful")
+          : t("user.block-successful"),
+        type: "success",
+      });
+    } else {
+      log.e(error, "Error updating user status");
+      addToast({
+        message: blocked ? t("user.un-block-failed") : t("user.block-failed"),
+        type: "error",
+      });
+    }
+  }
+
+  async function deleteUser() {
+    const { _id = "" } = userData;
+    let result = await actions.user.delete({
+      _id,
+    });
+    hideLoading();
+    const { error } = result;
+    log.d(result, "delete user result");
+    if (!error) {
+      addToast({
+        message: t("user.delete-successful"),
+        type: "success",
+      });
+      window.history.back();
+    } else {
+      log.e(error, "Error deleting user");
+      addToast({
+        message: t("user.delete-failed"),
+        type: "error",
+      });
+    }
   }
 </script>
 
@@ -242,7 +302,9 @@
         <div class="flex items-center">
           <button
             class="flex items-centertext-gray-700 font-sans"
-            on:click={(e) => {}}
+            on:click={(e) => {
+              confirmBlockModal?.show();
+            }}
           >
             <span class="w-5 h-5 flex items-center">
               {@html svgIcons.block}</span
@@ -256,7 +318,9 @@
 
           <button
             class="flex items-center font-sans text-red-600 ml-8"
-            on:click={(e) => {}}
+            on:click={(e) => {
+              confirmDeleteModal?.show();
+            }}
           >
             <span class="w-5 h-5 flex items-center">
               {@html svgIcons.trash}</span
@@ -275,6 +339,23 @@
   title={t("user.update-confirm-message")}
   bind:modal={confirmUpdateModal}
   on:confirm={updateUser}
+/>
+
+<ConfirmDialog
+  title={userData?.blocked
+    ? t("user.un-block-confirm-message")
+    : t("user.block-confirm-message")}
+  description={userData?.blocked
+    ? t("user.un-block-description-message")
+    : t("user.block-description-message")}
+  bind:modal={confirmBlockModal}
+  on:confirm={handleBlockingUser}
+/>
+<ConfirmDialog
+  title={t("user.delete-confirm-message")}
+  description={t("user.delete-description-message")}
+  bind:modal={confirmDeleteModal}
+  on:confirm={deleteUser}
 />
 
 <AlertDialog bind:modal={alertModal} message={alertMessage} />
