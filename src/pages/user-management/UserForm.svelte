@@ -202,6 +202,7 @@
           id="name"
           label={t("common.name")}
           value={userData.name ?? ""}
+          placeholder={t("common.name")}
           on:inputChange={(event) => {
             userData.name = event.detail.value;
           }}
@@ -215,6 +216,7 @@
           id="email"
           label={t("user.e-mail")}
           value={userData.email ?? ""}
+          placeholder={t("user.e-mail")}
           on:inputChange={(event) => {
             userData.email = event.detail.value;
           }}
