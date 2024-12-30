@@ -59,6 +59,10 @@
     role = isAdmin ? UserRole.Admin : UserRole.User;
   }
 
+  $: if (role) {
+    userData.roles = [role];
+  }
+
   onMount(async () => {
     await getUserRole(userData.roles);
   });
