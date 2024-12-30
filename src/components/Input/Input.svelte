@@ -15,13 +15,13 @@
   const dispatch = createEventDispatcher();
 
   function handleChange(event: Event) {
-    dispatch("inputChange", { value: event.target.value });
+    dispatch("inputChange", { value: event.target?.value });
   }
 </script>
 
 <div class="form-control">
   <label for={id} class="label pl-0 pb-3">
-    <span class="label-text text-gray-500">{label}</span>
+    <span class="label-text text-gray-400 font-medium">{label}</span>
   </label>
   <div
     class="input input-bordered flex justify-between items-center gap-2 p-4"

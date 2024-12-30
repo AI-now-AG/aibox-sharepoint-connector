@@ -12,6 +12,7 @@
   import { loading, showLoading, hideLoading } from "$stores";
   import log from "$utils/log";
   import moment from "moment";
+  import Input from "$components/Input/Input.svelte";
 
   const t = useTranslations();
 
@@ -171,7 +172,7 @@
       {@html svgIcons.back}
     </button>
     <h1 class="text-4xl font-bold">
-      {mode == MODE.Create ? t("user.add-new-user") : userData?.name}
+      {mode == MODE.Create ? t("user.add-new-user") : user?.name}
     </h1>
 
     <div class="flex space-x-2 ml-auto">
@@ -193,28 +194,28 @@
   <div class="container w-full mx-auto p-6">
     <div class="flex flex-row space-x-4">
       <div class="flex-1 flex flex-col mb-4">
-        <span class="mb-2 text-gray-400 font-medium text-sm"
-          >{t("tenant.tenants.tenant.display-name")}</span
-        >
-        <input
-          type="text"
-          placeholder={t("common.name")}
-          class="input input-bordered w-full"
-          bind:value={userData.name}
+        <Input
+          id="name"
+          label={t("common.name")}
+          value={userData.name ?? ""}
+          on:inputChange={(event) => {
+            userData.name = event.detail.value;
+          }}
           disabled={isEnterpriseAuthentication}
+          required
         />
       </div>
 
       <div class="flex-1 flex flex-col mb-4">
-        <span class="mb-2 text-gray-400 font-medium text-sm"
-          >{t("user.e-mail")}</span
-        >
-        <input
-          type="text"
-          placeholder={t("tenant.tenants.tenant.identification-name")}
-          class="input input-bordered w-full"
-          bind:value={userData.email}
+        <Input
+          id="email"
+          label={t("user.e-mail")}
+          value={userData.email ?? ""}
+          on:inputChange={(event) => {
+            userData.email = event.detail.value;
+          }}
           disabled={isEnterpriseAuthentication}
+          required
         />
       </div>
     </div>
