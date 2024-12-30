@@ -1,6 +1,6 @@
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-<script>
+<script lang="ts">
   import { actions } from "astro:actions";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
@@ -8,21 +8,27 @@
   import Loading from "$components/Loading.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import AlertDialog from "$components/AlertDialog.svelte";
-  import { clickOutside } from "$components/actions/ClickOutside.svelte";
   import {
     trimInput,
     toLowerCase,
     replaceSpecialChars,
   } from "$components/actions/Input.svelte";
   import { loading, showLoading, hideLoading } from "$stores";
+  import { Admin } from "mongodb";
 
   const t = useTranslations();
 
   export let user;
 
-  let confirmUpdateModal;
-  let alertModal;
-  let alertMessage = "";
+  const enum UserRole {
+    Admin = "Admin",
+    SuperAdmin = "Super Admin",
+    User = "User",
+  }
+
+  let confirmUpdateModal: HTMLDialogElement;
+  let alertModal: HTMLDialogElement;
+  let alertMessage: any = "";
 
   const MODE = {
     Create: "create",
@@ -31,6 +37,8 @@
   // mode
   let mode = user == undefined ? MODE.Create : MODE.Edit;
   let userData = user == undefined ? {} : user;
+
+  let role = UserRole.User;
 
   function validateForm() {
     return true;
@@ -58,17 +66,22 @@
     }
   }
 
-  function showAlert(message) {
+  function showAlert(message: any) {
     alertMessage = message;
     alertModal.show();
   }
 </script>
 
 <div
-  class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14 sticky bg-base-200 top-0 z-10"
+  class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14 sticky bg-base-200 top-0 z-10 font-sans"
 >
   <div class="flex items-center pt-5 pb-2">
-    <button class="mr-4" onclick="window.history.back();">
+    <button
+      class="mr-4"
+      on:click={() => {
+        window.history.back();
+      }}
+    >
       {@html svgIcons.back}
     </button>
     <h1 class="text-4xl font-bold">
@@ -84,7 +97,12 @@
       >
         {t("common.save")}
       </button>
-      <button class="btn" onclick="window.history.back();">
+      <button
+        class="btn"
+        on:click={() => {
+          window.history.back();
+        }}
+      >
         {t("common.cancel")}
       </button>
     </div>
@@ -92,14 +110,129 @@
 </div>
 <div class="px-8 mb-10">
   <div class="container w-full mx-auto p-6">
-    <ConfirmDialog
-      title={t("user.update-confirm-message")}
-      bind:modal={confirmUpdateModal}
-      on:confirm={updateUser}
-    />
+    <div class="flex flex-row space-x-4">
+      <div class="flex-1 flex flex-col mb-4">
+        <span class="mb-2 text-gray-400 font-medium text-sm"
+          >{t("tenant.tenants.tenant.display-name")}</span
+        >
+        <input
+          type="text"
+          placeholder={t("common.name")}
+          class="input input-bordered w-full"
+          bind:value={userData.name}
+        />
+      </div>
 
-    <AlertDialog bind:modal={alertModal} message={alertMessage} />
+      <div class="flex-1 flex flex-col mb-4">
+        <span class="mb-2 text-gray-400 font-medium text-sm"
+          >{t("user.e-mail")}</span
+        >
+        <input
+          type="text"
+          placeholder={t("tenant.tenants.tenant.identification-name")}
+          class="input input-bordered w-full"
+          use:trimInput
+          use:toLowerCase
+          use:replaceSpecialChars
+          bind:value={userData.email}
+        />
+      </div>
+    </div>
+
+    <div class="">
+      <div class="mb-5 text-gray-400 font-medium text-sm">{t("user.role")}</div>
+
+      <div class="flex items-center">
+        <div class="flex items-center">
+          <input
+            type="radio"
+            id="role-admin"
+            name="role"
+            class="radio radio-primary"
+            value={UserRole.Admin}
+            checked={role == UserRole.Admin}
+            on:change={() => {
+              role = UserRole.Admin;
+            }}
+          />
+          <label for="role-admin" class="ml-2 font-medium text-sm"
+            >{t("user.admin")}</label
+          >
+        </div>
+        <div class="flex items-center ml-8">
+          <input
+            type="radio"
+            id="role-user"
+            name="role"
+            class="radio radio-primary"
+            value={UserRole.User}
+            checked={role == UserRole.User}
+            on:change={() => {
+              role = UserRole.User;
+            }}
+          />
+          <label for="role-user" class="ml-2 font-medium text-sm"
+            >{t("user.user")}</label
+          >
+        </div>
+      </div>
+
+      <div class="w-full h-[1px] bg-slate-200 mt-8 mb-8"></div>
+
+      <div class="w-full mb-4 font-medium text-base text-[#0F172A]">
+        {t("user.additional-infos")}
+      </div>
+      <div class="flex flex-row space-x-4 text-sm">
+        <div class="flex-1 flex flex-col mb-4">
+          <table class="border-separate border-spacing-x-0 border-spacing-y-3">
+            <colgroup>
+              <col class="w-48" />
+              <col class="w-auto" />
+            </colgroup>
+            <tr class="mb-4">
+              <td class="text-gray-400">{t("user.signed-up")}</td>
+              <td>signed-up</td>
+            </tr>
+            <tr class="mb-4">
+              <td class="text-gray-400">{t("user.logins")}</td>
+              <td>{userData.logins_count}</td>
+            </tr>
+            <tr class="mb-4">
+              <td class="text-gray-400">{t("user.organization")}</td>
+              <td>organization</td>
+            </tr>
+          </table>
+        </div>
+
+        <div class="flex-1 flex flex-col mb-4">
+          <table class="border-separate border-spacing-x-0 border-spacing-y-3">
+            <colgroup>
+              <col class="w-48" />
+              <col class="w-auto" />
+            </colgroup>
+            <tr class="mb-4">
+              <td class="text-gray-400">{t("user.last-login")}</td>
+              <td>{userData.last_login}</td>
+            </tr>
+            <tr class="mb-4">
+              <td class="text-gray-400">{t("user.status")}</td>
+              <td>status</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="w-full h-[1px] bg-slate-200 mt-8 mb-8"></div>
+    </div>
   </div>
 </div>
+
+<ConfirmDialog
+  title={t("user.update-confirm-message")}
+  bind:modal={confirmUpdateModal}
+  on:confirm={updateUser}
+/>
+
+<AlertDialog bind:modal={alertModal} message={alertMessage} />
 
 <Loading bind:show={$loading} />

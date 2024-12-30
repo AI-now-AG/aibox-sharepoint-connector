@@ -425,7 +425,7 @@
 
     <div class="relative">
       <table
-        class=" border-separate border-spacing-x-0 border-spacing-y-3 min-w-full relative"
+        class="border-separate border-spacing-x-0 border-spacing-y-3 min-w-full relative"
         style="font-family:Inter;"
       >
         <colgroup>
