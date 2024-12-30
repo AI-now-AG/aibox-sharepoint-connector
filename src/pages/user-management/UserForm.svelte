@@ -9,13 +9,7 @@
   import Loading from "$components/Loading.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import AlertDialog from "$components/AlertDialog.svelte";
-  import {
-    trimInput,
-    toLowerCase,
-    replaceSpecialChars,
-  } from "$components/actions/Input.svelte";
   import { loading, showLoading, hideLoading } from "$stores";
-  import { formatDateToDDMMYY } from "$utils/common";
   import log from "$utils/log";
   import moment from "moment";
 
@@ -36,6 +30,9 @@
 
   let alertModal: HTMLDialogElement;
   let alertMessage: any = "";
+
+  // TODO: Checking user has enterprise connection
+  let isEnterpriseAuthentication = false;
 
   const MODE = {
     Create: "create",
@@ -204,6 +201,7 @@
           placeholder={t("common.name")}
           class="input input-bordered w-full"
           bind:value={userData.name}
+          disabled={isEnterpriseAuthentication}
         />
       </div>
 
@@ -215,10 +213,8 @@
           type="text"
           placeholder={t("tenant.tenants.tenant.identification-name")}
           class="input input-bordered w-full"
-          use:trimInput
-          use:toLowerCase
-          use:replaceSpecialChars
           bind:value={userData.email}
+          disabled={isEnterpriseAuthentication}
         />
       </div>
     </div>
