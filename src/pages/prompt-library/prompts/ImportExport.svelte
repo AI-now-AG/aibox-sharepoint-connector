@@ -3,6 +3,7 @@
   import { svgIcons } from "$assets/icons";
   import Loading from "$components/Loading.svelte";
   import ImportUploadDialog from "./ImportUploadDialog.svelte";
+  import { addToast } from "$stores/toast";
   import { loading } from "$stores";
 
   const t = useTranslations();
@@ -33,6 +34,14 @@
         }
 
         $loading = false;
+
+        addToast({
+          message: t('prompt-library.prompts.import-success'),
+          type: "success",
+        });
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
       })
       .catch((error) => {
         console.error("Error import file:", error);
