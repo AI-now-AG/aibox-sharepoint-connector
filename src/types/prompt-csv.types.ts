@@ -1,5 +1,13 @@
 import { z } from "zod";
 
+export enum RequiredColumn {
+  Title = "title",
+  Description = "description",
+  Instruction = "instruction",
+  Category = "category",
+  Group = "group",
+}
+
 const CsvRowRawSchema = z.object({
   title: z.string(),
   description: z.string(),
