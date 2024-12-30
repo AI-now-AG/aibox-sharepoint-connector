@@ -195,11 +195,11 @@
   "prompt-library.prompt.order-failed": "Reihenfolge der Prompts konnte nicht geändert werden, bitte nochmals versuchen.",
   "prompt-library.categories.list.name": "Name",
   "prompt-library.categories.list.status": "Status",
-  "common.deactivate" : "Deaktivieren",
+  "common.deactivate": "Deaktivieren",
   "common.activate": "Aktiv",
   "confirmation.delete.title": "Löschen bestätigen",
   "prompt-library.delete.category.confirm": "Achtung! Durch Löschen der Kategorie werden alle Gruppen und Verknüpfungen zu Prompts gelöscht. Soll die Kategorie gelöscht werden?",
   "prompt-library.delete.group.confirm": "Achtung! Durch Löschen der Gruppe werden alle Verknüpfungen zu Prompts gelöscht. Soll die Gruppe gelöscht werden?",
-  "prompt-library.categories.all-group" : "Alle Gruppen",
-  "prompt-library.categories.add-group" : "Gruppe hinzufügen"
+  "prompt-library.categories.all-group": "Alle Gruppen",
+  "prompt-library.categories.add-group": "Gruppe hinzufügen"
 }
