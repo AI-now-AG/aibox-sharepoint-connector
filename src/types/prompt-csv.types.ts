@@ -11,7 +11,6 @@ const CsvRowRawSchema = z.object({
   updated_at: z.string(),
 });
 
-/* eslint-disable @typescript-eslint/no-unused-vars */
 const CsvRowParsedSchema = CsvRowRawSchema.extend({
   knowledgebase: z.array(
     z.object({

@@ -21,6 +21,29 @@ type KnowledgeBaseRawItem = {
   knowledge_base: string;
 } & Record<string, any>;
 
+const isValidRows = (rows: CsvRowRaw[]) => {
+  const requiredColumns = [
+    "title",
+    "description",
+    "prompt",
+    "category",
+    "group",
+    "knowledgebase",
+    "created_at",
+    "updated_at",
+  ];
+
+  for (let row of rows) {
+    for (let column of requiredColumns) {
+      if (!row.hasOwnProperty(column)) {
+        throw new Error(`Missing column name "${column}"`);
+      }
+    }
+  }
+
+  return true;
+};
+
 const parseCsvData = (rows: CsvRowRaw[]) => {
   const parsedRows: CsvRowParsed[] = rows.map((item: CsvRowRaw) => {
     const text = item.knowledgebase || "";
@@ -243,6 +266,21 @@ export const POST: APIRoute = async (ctx: APIContext) => {
         .on("end", () => resolve())
         .on("error", (error) => reject(error));
     });
+
+    // Validate CSV content
+    try {
+      isValidRows(rows);
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      return new Response(
+        JSON.stringify({
+          message: `Your CSV file contains errors. ${errorMessage}`,
+          error: errorMessage,
+        }),
+        { status: 500 },
+      );
+    }
 
     const session = client.startSession();
 

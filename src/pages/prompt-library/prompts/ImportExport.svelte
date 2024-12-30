@@ -14,39 +14,46 @@
   const importUrl: string = "/api/prompts/import";
   const exportUrl: string = "/api/prompts/export";
 
-  function startImport() {
+  async function startImport() {
     console.log("file", inputFile);
 
     const data = new FormData();
     data.append("file", inputFile);
 
     $loading = true;
-    fetch(importUrl, {
+    const response = await fetch(importUrl, {
       method: "POST",
       body: data,
-    })
-      .then((response) => {
-        // start import process
+    });
 
-        // ensure the upload dialog is closed if it is currently open
-        if (fileUploadModal.open) {
-          fileUploadModal.close();
-        }
+    // ensure the upload dialog is closed if it is currently open
+    if (fileUploadModal.open) {
+      fileUploadModal.close();
+    }
 
-        $loading = false;
+    try {
+      const data = await response.json();
 
+      $loading = false;
+      if (!response.ok) {
         addToast({
-          message: t('prompt-library.prompts.import-success'),
-          type: "success",
+          message: data.message,
+          type: "error",
         });
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
-      })
-      .catch((error) => {
-        console.error("Error import file:", error);
-        $loading = false;
+        return;
+      } 
+
+      addToast({
+        message: t('prompt-library.prompts.import-success'),
+        type: "success",
       });
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    } catch (error) {
+      console.error("Error import file:", error);
+      $loading = false;
+    }
   }
 
   function downloadExport() {
