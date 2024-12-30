@@ -15,7 +15,6 @@
 
   const t = useTranslations();
 
-  export let tenant: any;
   export let tenantId: string = "";
   export let currentLoggedInUser: any = "";
 

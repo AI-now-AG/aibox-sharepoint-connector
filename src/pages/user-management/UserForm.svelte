@@ -3,6 +3,7 @@
 <script lang="ts">
   import { actions } from "astro:actions";
   import { svgIcons } from "$assets/icons";
+  import { onMount } from "svelte";
   import { useTranslations } from "$i18n/utils";
   import { addToast } from "$stores/toast";
   import Loading from "$components/Loading.svelte";
@@ -39,11 +40,29 @@
     Create: "create",
     Edit: "edit",
   };
-  // mode
   let mode = user == undefined ? MODE.Create : MODE.Edit;
   let userData = user == undefined ? {} : user;
 
   let role = UserRole.User;
+  // Important note: User created on Auth0 with super admin , just the Admin on AI box when go into the detail screen
+  function getUserRole(roles: string[]) {
+    let isAdmin = false;
+    for (let i = 0; i < roles?.length; i++) {
+      const _role = roles[i];
+      if (_role == UserRole.SuperAdmin) {
+        isAdmin = true;
+        break;
+      } else if (_role == UserRole.Admin) {
+        isAdmin = true;
+        break;
+      }
+    }
+    role = isAdmin ? UserRole.Admin : UserRole.User;
+  }
+
+  onMount(async () => {
+    await getUserRole(userData.roles);
+  });
 
   function getUserStatus(isBlocked: boolean, isVerified: boolean) {
     if (isBlocked) {
@@ -56,6 +75,7 @@
   }
 
   function validateForm() {
+    // TODO: Handle validating user form data
     return true;
   }
 
@@ -63,6 +83,7 @@
     if (validateForm()) {
       try {
         showLoading();
+        // TODO: Integrate API Create User
         hideLoading();
       } catch (error) {
         showAlert(error);
@@ -74,6 +95,7 @@
     if (validateForm()) {
       try {
         showLoading();
+        // TODO: Integrate API Update User
         hideLoading();
       } catch (error) {
         showAlert(error);
@@ -250,20 +272,20 @@
               class="border-separate border-spacing-x-0 border-spacing-y-3"
             >
               <colgroup>
-                <col class="w-48" />
+                <col class="w-36" />
                 <col class="w-auto" />
               </colgroup>
               <tr class="mb-4">
                 <td class="text-gray-400">{t("user.signed-up")}</td>
-                <td>signed-up</td>
+                <td class="text-base">signed-up</td>
               </tr>
               <tr class="mb-4">
                 <td class="text-gray-400">{t("user.logins")}</td>
-                <td>{userData.logins_count ?? "-"}</td>
+                <td class="text-base">{userData.logins_count ?? "-"}</td>
               </tr>
               <tr class="">
                 <td class="text-gray-400">{t("user.organization")}</td>
-                <td>{tenant?.name ?? "-"}</td>
+                <td class="text-base">{tenant?.name ?? "-"}</td>
               </tr>
             </table>
           </div>
@@ -273,12 +295,12 @@
               class="border-separate border-spacing-x-0 border-spacing-y-3"
             >
               <colgroup>
-                <col class="w-48" />
+                <col class="w-36" />
                 <col class="w-auto" />
               </colgroup>
               <tr class="mb-4">
                 <td class="text-gray-400">{t("user.last-login")}</td>
-                <td>
+                <td class="text-base">
                   {userData.last_login
                     ? formatDateToDDMMYYHHMMSS(userData.last_login)
                     : "-"}
@@ -287,6 +309,7 @@
               <tr class="">
                 <td class="text-gray-400">{t("user.status")}</td>
                 <td
+                  class="text-base"
                   style={`color: ${getUserStatus(userData.blocked, userData.email_verified).color}`}
                 >
                   {getUserStatus(userData.blocked, userData.email_verified)
@@ -351,6 +374,7 @@
   bind:modal={confirmBlockModal}
   on:confirm={handleBlockingUser}
 />
+
 <ConfirmDialog
   title={t("user.delete-confirm-message")}
   description={t("user.delete-description-message")}
