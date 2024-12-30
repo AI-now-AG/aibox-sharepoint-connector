@@ -17,6 +17,7 @@
   import { loading, showLoading, hideLoading } from "$stores";
   import { formatDateToDDMMYY } from "$utils/common";
   import log from "$utils/log";
+  import moment from "moment";
 
   const t = useTranslations();
 
@@ -277,7 +278,11 @@
               </colgroup>
               <tr class="mb-4">
                 <td class="text-gray-400">{t("user.signed-up")}</td>
-                <td class="text-base"> {userData.created_at ?? "-"}</td>
+                <td class="text-base">
+                  {moment(userData.created_at, "DD.MM.YYYY").format(
+                    "dddd DD.MM.YYYY",
+                  )}</td
+                >
               </tr>
               <tr class="mb-4">
                 <td class="text-gray-400">{t("user.logins")}</td>
@@ -302,7 +307,7 @@
                 <td class="text-gray-400">{t("user.last-login")}</td>
                 <td class="text-base">
                   {userData.last_login
-                    ? formatDateToDDMMYY(userData.last_login)
+                    ? moment(userData.last_login).format("dddd DD.MM.YYYY")
                     : "-"}
                 </td>
               </tr>
