@@ -15,7 +15,7 @@
     replaceSpecialChars,
   } from "$components/actions/Input.svelte";
   import { loading, showLoading, hideLoading } from "$stores";
-  import { formatDateToDDMMYYHHMMSS } from "$utils/common";
+  import { formatDateToDDMMYY } from "$utils/common";
   import log from "$utils/log";
 
   const t = useTranslations();
@@ -277,7 +277,7 @@
               </colgroup>
               <tr class="mb-4">
                 <td class="text-gray-400">{t("user.signed-up")}</td>
-                <td class="text-base">signed-up</td>
+                <td class="text-base"> {userData.created_at ?? "-"}</td>
               </tr>
               <tr class="mb-4">
                 <td class="text-gray-400">{t("user.logins")}</td>
@@ -302,7 +302,7 @@
                 <td class="text-gray-400">{t("user.last-login")}</td>
                 <td class="text-base">
                   {userData.last_login
-                    ? formatDateToDDMMYYHHMMSS(userData.last_login)
+                    ? formatDateToDDMMYY(userData.last_login)
                     : "-"}
                 </td>
               </tr>
