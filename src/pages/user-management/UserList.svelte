@@ -6,7 +6,7 @@
   import log from "$utils/log";
   import { addToast } from "$stores/toast";
   import Loading from "$components/Loading.svelte";
-  import { loading, showLoading, hideLoading, user } from "$stores";
+  import { loading, showLoading, hideLoading } from "$stores";
   import { formatDateToDDMMYYHHMMSS } from "$utils/common";
   import DropdownSection from "$components/DropdownSection.svelte";
   import { type Option } from "$components/DropdownOptions.svelte";
@@ -181,20 +181,64 @@
     }
   }
 
-  function blockUser() {
-    // TODO: Handle block
-    const blockUserId = selectedUser._id ?? "";
-    alert(selectedUser.name + " - " + blockUserId);
+  async function handleBlockingUser() {
+    showLoading();
+    const { _id = "", blocked } = selectedUser;
+    let result;
+    if (blocked) {
+      result = await actions.user.unblock({
+        _id,
+      });
+    } else {
+      result = await actions.user.block({
+        _id,
+      });
+    }
+    hideLoading();
+    const { error } = result;
+    log.d(result, "updateUserStatus result");
+    if (!error) {
+      addToast({
+        message: blocked
+          ? t("user.un-block-successful")
+          : t("user.block-successful"),
+        type: "success",
+      });
+      await fetchUsers();
+    } else {
+      log.e(error, "Error updating user status");
+      addToast({
+        message: blocked ? t("user.un-block-failed") : t("user.block-failed"),
+        type: "error",
+      });
+    }
   }
   function onSelectBlock(user: any) {
     selectedUser = user;
     confirmBlockModal?.show();
   }
 
-  function deleteUser() {
-    // TODO: Handle delete
-    const deleteUserId = selectedUser._id ?? "";
-    alert(selectedUser.name + " - " + deleteUserId);
+  async function deleteUser() {
+    const { _id = "" } = selectedUser;
+    let result = await actions.user.delete({
+      _id,
+    });
+    hideLoading();
+    const { error } = result;
+    log.d(result, "delete user result");
+    if (!error) {
+      addToast({
+        message: t("user.delete-successful"),
+        type: "success",
+      });
+      await fetchUsers();
+    } else {
+      log.e(error, "Error deleting user");
+      addToast({
+        message: t("user.delete-failed"),
+        type: "error",
+      });
+    }
   }
   function onSelectDelete(user: any) {
     selectedUser = user;
@@ -206,7 +250,7 @@
       {
         id: "1",
         icon: svgIcons.block,
-        text: t("common.block"),
+        text: user.blocked ? t("common.un-block") : t("common.block"),
         action: () => {
           onSelectBlock(user);
         },
@@ -500,10 +544,14 @@
 </div>
 
 <ConfirmDialog
-  title={t("user.block-confirm-message")}
-  description={t("user.block-description-message")}
+  title={selectedUser?.blocked
+    ? t("user.un-block-confirm-message")
+    : t("user.block-confirm-message")}
+  description={selectedUser?.blocked
+    ? t("user.un-block-description-message")
+    : t("user.block-description-message")}
   bind:modal={confirmBlockModal}
-  on:confirm={blockUser}
+  on:confirm={handleBlockingUser}
 />
 <ConfirmDialog
   title={t("user.delete-confirm-message")}

@@ -95,4 +95,36 @@ export const user = {
       return transformRawData(updatedDocument);
     },
   }),
+
+  block: defineAction({
+    input: UserInputIdentifierSchema,
+    handler: async (input) => {
+      // TODO: Update status on Auth0
+      const updateResult = await userModel.block(input._id);
+      return transformRawData(updateResult);
+    },
+  }),
+
+  unblock: defineAction({
+    input: UserInputIdentifierSchema,
+    handler: async (input) => {
+      // TODO: Update status on Auth0
+      const updateResult = await userModel.unblock(input._id);
+      return transformRawData(updateResult);
+    },
+  }),
+
+  delete: defineAction({
+    input: UserInputIdentifierSchema,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    handler: async (input) => {
+      // TODO: Delete user on Auth0
+      // TODO: remove this line of code after compelte deleting user on Auth0
+      const updateResult = await userModel.delete(
+        "todo_replace_user_id_here_after_compelte_deleting_on_auth0",
+      );
+      // const updateResult = await userModel.delete(input._id);
+      return transformRawData(updateResult);
+    },
+  }),
 };

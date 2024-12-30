@@ -209,6 +209,7 @@
   "common.upload": "Upload",
   "common.filter": "Filter",
   "common.block": "Block",
+  "common.un-block": "Unblock",
   "common.name": "Name",
   "user.user-management": "User Management",
   "user.add-new-user": "Add New User",
@@ -233,10 +234,18 @@
   "user.block-user-account": "Block User Account",
   "user.block-confirm-message": "Are you sure you want to block this user?",
   "user.block-description-message": "Bloking this user will restrict their access to the account",
+  "user.un-block-confirm-message": "Are you sure you want to un-block this user?",
+  "user.un-block-description-message": "Unblock user",
   "user.block-user": "Block user",
   "user.delete-user-account": "Block User Account",
   "user.delete-confirm-message": "Are you sure you want to delete this user?",
   "user.delete-description-message": "This action is permanent and cannot be undone",
   "user.delete-user": "Delete user",
-  "user.all-users": "All User"
+  "user.all-users": "All User",
+  "user.block-failed": "Block user failed ",
+  "user.block-successful": "Block user successful",
+  "user.un-block-successful": "Unblock user successful",
+  "user.un-block-failed": "Unblock User faled",
+  "user.delete-successful": "Delete user successful",
+  "user.delete-failed": "Delete user failed"
 }

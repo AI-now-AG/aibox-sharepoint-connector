@@ -281,4 +281,22 @@ export default {
     const createdUser = await collection.insertOne(validatedUser);
     return createdUser.insertedId;
   },
+
+  block: async (id: string) => {
+    return await collection.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: { blocked: true } },
+    );
+  },
+
+  unblock: async (id: string) => {
+    return await collection.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: { blocked: false } },
+    );
+  },
+
+  delete: async (id: string) => {
+    return await collection.deleteOne({ _id: new ObjectId(id) });
+  },
 };
