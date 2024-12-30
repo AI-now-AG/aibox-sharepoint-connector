@@ -13,6 +13,7 @@
   import log from "$utils/log";
   import moment from "moment";
   import Input from "$components/Input/Input.svelte";
+  import { isValidEmail } from "$utils/common";
 
   const t = useTranslations();
 
@@ -78,7 +79,20 @@
   }
 
   function validateForm() {
-    // TODO: Handle validating user form data
+    if (!userData.name) {
+      showAlert(t("user.validate-empty-name-message"));
+      return false;
+    }
+
+    if (!userData.email) {
+      showAlert(t("user.validate-emapty-email-message"));
+      return false;
+    }
+
+    if (!isValidEmail(userData.email)) {
+      showAlert(t("user.validate-wrong-email-message"));
+      return false;
+    }
     return true;
   }
 

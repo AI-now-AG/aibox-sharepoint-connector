@@ -203,6 +203,7 @@
   "prompt-library.categories.list.status": "Status",
   "prompt-library.prompts.import": "Import",
   "prompt-library.prompts.export": "Export",
+  "prompt-library.prompts.import-success": "Your CSV has been imported successfully",
   "confirmation.delete.title": "Confirm deletion",
   "upload-file.popup.title": "Upload File",
   "upload-file.popup.drag-message": "Drag & Drop or <span style=\"color: #491EFF;\">Choose file</span>",
@@ -248,5 +249,8 @@
   "user.un-block-successful": "Unblock user successful",
   "user.un-block-failed": "Unblock User faled",
   "user.delete-successful": "Delete user successful",
-  "user.delete-failed": "Delete user failed"
+  "user.delete-failed": "Delete user failed",
+  "user.validate-empty-name-message": "Name could not be empty ",
+  "user.validate-emapty-email-message": "Email could not be empty",
+  "user.validate-wrong-email-message": "Email is invalid"
 }
