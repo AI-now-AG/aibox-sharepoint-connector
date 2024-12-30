@@ -66,7 +66,7 @@ export const user = {
         name: input.name,
         email: input.email,
         roles: input.roles,
-        permissions: assignPermissions[input.roles],
+        permissions: assignPermissions(input.roles),
         tenant_id: input.tenant_id,
 
         email_verified: false,
