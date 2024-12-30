@@ -5,6 +5,7 @@
   import { onMount } from "svelte";
   import log from "$utils/log";
   import { addToast } from "$stores/toast";
+  import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import Loading from "$components/Loading.svelte";
   import { loading, showLoading, hideLoading } from "$stores";
 
@@ -14,6 +15,10 @@
   let showArchived = false;
   let searchValue = "";
   let timeout;
+
+  let tenantToUpdate = null;
+  let confirmDescription = "";
+  let confirmUpdateModal;
 
   onMount(async () => {
     await fetchTenants();
@@ -48,28 +53,30 @@
     );
   };
 
-  function showUpdateStatusConfirmationModal(tenantId) {
-    document.getElementById(`confirm_dialog_${tenantId}`).showModal();
+  function confirmUpdateStatus(tenant) {
+    tenantToUpdate = tenant;
+    confirmDescription =
+      tenant.active == 1
+        ? t("tenant.tenants.tenant.archive-confirmation")
+        : t("tenant.tenants.tenant.active-confirmation");
+
+    confirmUpdateModal?.show();
   }
 
-  function closeUpdateStatusConfirmationModal(tenantId) {
-    document.getElementById(`confirm_dialog_${tenantId}`).close();
-  }
-
-  const updateTenantStatus = async (tenant) => {
-    const { active } = tenant;
-    log.d(tenant, "updateTenantStatus");
-    closeUpdateStatusConfirmationModal(tenant._id);
+  const updateTenantStatus = async () => {
+    const { active } = tenantToUpdate;
+    log.d(tenantToUpdate, "updateTenantStatus");
+    confirmUpdateModal?.close();
 
     showLoading();
     let result;
     if (active) {
       result = await actions.tenant.archive({
-        _id: tenant._id,
+        _id: tenantToUpdate._id,
       });
     } else {
       result = await actions.tenant.active({
-        _id: tenant._id,
+        _id: tenantToUpdate._id,
       });
     }
     hideLoading();
@@ -132,7 +139,17 @@
     </h2>
 
     <div class="relative">
-      <table class="min-w-full relative" style="font-family:Inter;">
+      <table
+        class="border-separate border-spacing-x-0 border-spacing-y-3 min-w-full relative"
+        style="font-family:Inter;"
+      >
+        <colgroup>
+          <col class="w-auto" />
+          <col class="w-80" />
+          <col class="w-48" />
+          <col class="w-24" />
+          <col class="w-16" />
+        </colgroup>
         <thead>
           <tr class="bg-base-300 rounded-lg">
             <th class="py-3 px-4 text-left font-normal text-xs rounded-l-lg"
@@ -149,45 +166,9 @@
             >
             <th class="py-3 px-4 rounded-r-lg"></th>
           </tr>
-          <tr class="header-spacing"></tr>
         </thead>
         <tbody>
           {#each tenants as tenant}
-            <tr class="h-2"
-              ><td /><td /><td /><td /><td>
-                <dialog id={"confirm_dialog_" + tenant._id} class="modal">
-                  <div class="modal-box">
-                    <form method="dialog" id="modalForm">
-                      <button
-                        class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-                        >✕</button
-                      >
-                      <h3 id="modal_title" class="text-lg font-bold">
-                        {tenant.active == 1
-                          ? t("tenant.tenants.tenant.archive-confirmation")
-                          : t("tenant.tenants.tenant.active-confirmation")}
-                      </h3>
-                      <div class="flex justify-between gap-4 mt-6">
-                        <button
-                          id="yes_button"
-                          class="btn btn-warning flex-1"
-                          on:click={() => updateTenantStatus(tenant)}
-                          >{t("common.yes")}</button
-                        >
-                        <button
-                          id="no_button"
-                          class="btn btn-success flex-1"
-                          on:click={() =>
-                            closeUpdateStatusConfirmationModal(tenant._id)}
-                          >{t("common.no")}</button
-                        >
-                      </div>
-                    </form>
-                  </div>
-                </dialog>
-              </td></tr
-            >
-
             <tr class="h-16 bg-base-100 hover:bg-base-300 text-sm rounded-lg">
               <td class="py-3 px-4 text-sm font-medium rounded-l-lg">
                 <a
@@ -219,33 +200,40 @@
               <td
                 class="py-3 px-4 text-right relative relative-dropdown rounded-r-lg"
               >
-                <button class="focus:outline-none">
-                  {@html svgIcons.threeDot}
-                </button>
-                <div class="dropdown-content py-2">
-                  <button
-                    class="flex block w-full text-left px-4 py-1 text-sm hover:underline"
-                    on:click={() =>
-                      showUpdateStatusConfirmationModal(tenant._id)}
-                  >
-                    {@html tenant.active == 1
-                      ? svgIcons.archive
-                      : svgIcons.active}
-                    <span class="ml-1"
-                      >{tenant.active == 1
-                        ? t("tenant.tenants.tenant.action.archive")
-                        : t("tenant.tenants.tenant.action.active")}</span
-                    >
+                <div class="dropdown dropdown-hover dropdown-end">
+                  <button tabindex="0" class="btn btn-ghost btn-sm z-50">
+                    {@html svgIcons.threeDot}
                   </button>
-                  <a
-                    class="flex block w-full text-left px-4 py-1 text-sm hover:underline"
-                    href="/tenant-management/{tenant._id}"
+                  <ul
+                    class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
                   >
-                    {@html svgIcons.edit}
-                    <span class="ml-1"
-                      >{t("tenant.tenants.tenant.action.edit")}</span
-                    >
-                  </a>
+                    <li>
+                      <button
+                        class="flex block w-full text-left px-4 py-2 text-sm hover:underline"
+                        on:click={() => confirmUpdateStatus(tenant)}
+                      >
+                        {@html tenant.active == 1
+                          ? svgIcons.archive
+                          : svgIcons.active}
+                        <span class="ml-1"
+                          >{tenant.active == 1
+                            ? t("tenant.tenants.tenant.action.archive")
+                            : t("tenant.tenants.tenant.action.active")}</span
+                        >
+                      </button>
+                    </li>
+                    <li>
+                      <a
+                        class="flex block w-full text-left px-4 py-1 text-sm hover:underline"
+                        href="/tenant-management/{tenant._id}"
+                      >
+                        {@html svgIcons.edit}
+                        <span class="ml-1"
+                          >{t("tenant.tenants.tenant.action.edit")}</span
+                        >
+                      </a>
+                    </li>
+                  </ul>
                 </div>
               </td>
             </tr>
@@ -256,24 +244,11 @@
       <Loading partial={true} bind:show={$loading} />
     </div>
   </div>
+
+  <!-- confirm update dialog -->
+  <ConfirmDialog
+    bind:modal={confirmUpdateModal}
+    on:confirm={updateTenantStatus}
+    description={confirmDescription}
+  />
 </div>
-
-<style>
-  .dropdown-content {
-    display: none;
-    z-index: 1000;
-    position: absolute;
-    right: 10px;
-    top: 40px;
-    background: white;
-    border: 1px solid #e2e8f0;
-    border-radius: 1rem;
-    box-shadow:
-      0 10px 15px -3px rgba(0, 0, 0, 0.1),
-      0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  }
-
-  .relative-dropdown:hover .dropdown-content {
-    display: block;
-  }
-</style>
