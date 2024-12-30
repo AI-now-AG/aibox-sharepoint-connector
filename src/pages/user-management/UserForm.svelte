@@ -76,12 +76,7 @@
   class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14 sticky bg-base-200 top-0 z-10 font-sans"
 >
   <div class="flex items-center pt-5 pb-2">
-    <button
-      class="mr-4"
-      on:click={() => {
-        window.history.back();
-      }}
-    >
+    <button class="mr-4" onclick="window.history.back();">
       {@html svgIcons.back}
     </button>
     <h1 class="text-4xl font-bold">
@@ -97,12 +92,7 @@
       >
         {t("common.save")}
       </button>
-      <button
-        class="btn"
-        on:click={() => {
-          window.history.back();
-        }}
-      >
+      <button class="btn" onclick="window.history.back();">
         {t("common.cancel")}
       </button>
     </div>
@@ -177,52 +167,86 @@
         </div>
       </div>
 
-      <div class="w-full h-[1px] bg-slate-200 mt-8 mb-8"></div>
+      {#if mode == MODE.Edit}
+        <div class="w-full h-[1px] bg-slate-200 mt-8 mb-8"></div>
 
-      <div class="w-full mb-4 font-medium text-base text-[#0F172A]">
-        {t("user.additional-infos")}
-      </div>
-      <div class="flex flex-row space-x-4 text-sm">
-        <div class="flex-1 flex flex-col mb-4">
-          <table class="border-separate border-spacing-x-0 border-spacing-y-3">
-            <colgroup>
-              <col class="w-48" />
-              <col class="w-auto" />
-            </colgroup>
-            <tr class="mb-4">
-              <td class="text-gray-400">{t("user.signed-up")}</td>
-              <td>signed-up</td>
-            </tr>
-            <tr class="mb-4">
-              <td class="text-gray-400">{t("user.logins")}</td>
-              <td>{userData.logins_count}</td>
-            </tr>
-            <tr class="mb-4">
-              <td class="text-gray-400">{t("user.organization")}</td>
-              <td>organization</td>
-            </tr>
-          </table>
+        <div class="w-full mb-4 font-medium text-base text-[#0F172A]">
+          {t("user.additional-infos")}
+        </div>
+        <div class="flex flex-row space-x-4 text-sm">
+          <div class="flex-1 flex flex-col mb-4">
+            <table
+              class="border-separate border-spacing-x-0 border-spacing-y-3"
+            >
+              <colgroup>
+                <col class="w-48" />
+                <col class="w-auto" />
+              </colgroup>
+              <tr class="mb-4">
+                <td class="text-gray-400">{t("user.signed-up")}</td>
+                <td>signed-up</td>
+              </tr>
+              <tr class="mb-4">
+                <td class="text-gray-400">{t("user.logins")}</td>
+                <td>{userData.logins_count}</td>
+              </tr>
+              <tr class="">
+                <td class="text-gray-400">{t("user.organization")}</td>
+                <td>organization</td>
+              </tr>
+            </table>
+          </div>
+
+          <div class="flex-1 flex flex-col mb-4">
+            <table
+              class="border-separate border-spacing-x-0 border-spacing-y-3"
+            >
+              <colgroup>
+                <col class="w-48" />
+                <col class="w-auto" />
+              </colgroup>
+              <tr class="mb-4">
+                <td class="text-gray-400">{t("user.last-login")}</td>
+                <td>{userData.last_login}</td>
+              </tr>
+              <tr class="">
+                <td class="text-gray-400">{t("user.status")}</td>
+                <td>status</td>
+              </tr>
+            </table>
+          </div>
         </div>
 
-        <div class="flex-1 flex flex-col mb-4">
-          <table class="border-separate border-spacing-x-0 border-spacing-y-3">
-            <colgroup>
-              <col class="w-48" />
-              <col class="w-auto" />
-            </colgroup>
-            <tr class="mb-4">
-              <td class="text-gray-400">{t("user.last-login")}</td>
-              <td>{userData.last_login}</td>
-            </tr>
-            <tr class="mb-4">
-              <td class="text-gray-400">{t("user.status")}</td>
-              <td>status</td>
-            </tr>
-          </table>
-        </div>
-      </div>
+        <div class="w-full h-[1px] bg-slate-200 mt-2 mb-8"></div>
 
-      <div class="w-full h-[1px] bg-slate-200 mt-8 mb-8"></div>
+        <div class="flex items-center">
+          <button
+            class="flex items-centertext-gray-700 font-sans"
+            on:click={(e) => {}}
+          >
+            <span class="w-5 h-5 flex items-center">
+              {@html svgIcons.block}</span
+            >
+            <span class="text-sm font-semibold ml-1 text-left"
+              >{userData.blocked
+                ? t("user.un-block-user")
+                : t("user.block-user")}</span
+            >
+          </button>
+
+          <button
+            class="flex items-center font-sans text-red-600 ml-8"
+            on:click={(e) => {}}
+          >
+            <span class="w-5 h-5 flex items-center">
+              {@html svgIcons.trash}</span
+            >
+            <span class="text-sm font-semibold ml-1 text-left text-red-600"
+              >{t("user.delete-user")}</span
+            >
+          </button>
+        </div>
+      {/if}
     </div>
   </div>
 </div>

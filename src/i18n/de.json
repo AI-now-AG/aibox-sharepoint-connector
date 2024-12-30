@@ -237,6 +237,7 @@
   "user.un-block-confirm-message": "Are you sure you want to un-block this user?",
   "user.un-block-description-message": "Unblock user",
   "user.block-user": "Block user",
+  "user.un-block-user": "Unblock user",
   "user.delete-user-account": "Block User Account",
   "user.delete-confirm-message": "Are you sure you want to delete this user?",
   "user.delete-description-message": "This action is permanent and cannot be undone",
