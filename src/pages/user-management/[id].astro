@@ -8,6 +8,7 @@ import log from "$utils/log";
 export interface Props {
   id: string;
 }
+const tenant = Astro.locals.tenant;
 
 const { id } = Astro.params;
 console.log("id", id);
@@ -27,5 +28,5 @@ const data = transformRawData(user);
 ---
 
 <Layout>
-  <UserForm user={data} client:load />
+  <UserForm user={data} tenant={tenant} client:load />
 </Layout>

@@ -1,8 +1,10 @@
 ---
 import Layout from "$layouts/Layout.astro";
 import UserForm from "./UserForm.svelte";
+
+const tenant = Astro.locals.tenant;
 ---
 
 <Layout>
-  <UserForm user={undefined} client:load />
+  <UserForm user={undefined} tenant={tenant} client:load />
 </Layout>

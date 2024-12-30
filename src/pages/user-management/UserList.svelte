@@ -15,6 +15,7 @@
 
   const t = useTranslations();
 
+  export let tenant: any;
   export let tenantId: string = "";
   export let currentLoggedInUser: any = "";
 
@@ -516,7 +517,7 @@
                 >{getRoleString(user.roles)}</td
               >
               <td class="py-3 px-4 text-sm font-medium">
-                {user.logins_count ?? 0}
+                {user.logins_count ?? "-"}
               </td>
               <td class="py-3 px-4 text-sm font-medium">
                 {user.last_login

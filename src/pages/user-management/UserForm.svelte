@@ -14,11 +14,12 @@
     replaceSpecialChars,
   } from "$components/actions/Input.svelte";
   import { loading, showLoading, hideLoading } from "$stores";
-  import { Admin } from "mongodb";
+  import { formatDateToDDMMYYHHMMSS } from "$utils/common";
 
   const t = useTranslations();
 
   export let user;
+  export let tenant;
 
   const enum UserRole {
     Admin = "Admin",
@@ -39,6 +40,16 @@
   let userData = user == undefined ? {} : user;
 
   let role = UserRole.User;
+
+  function getUserStatus(isBlocked: boolean, isVerified: boolean) {
+    if (isBlocked) {
+      return { text: t("user.blocked"), color: "#FF6F70" };
+    } else if (!isVerified) {
+      return { text: t("user.un-veriried"), color: "rgba(43, 52, 64, 0.2)" };
+    } else {
+      return { text: t("user.veriried"), color: "#00CA92" };
+    }
+  }
 
   function validateForm() {
     return true;
@@ -188,11 +199,11 @@
               </tr>
               <tr class="mb-4">
                 <td class="text-gray-400">{t("user.logins")}</td>
-                <td>{userData.logins_count}</td>
+                <td>{userData.logins_count ?? "-"}</td>
               </tr>
               <tr class="">
                 <td class="text-gray-400">{t("user.organization")}</td>
-                <td>organization</td>
+                <td>{tenant?.name ?? "-"}</td>
               </tr>
             </table>
           </div>
@@ -207,11 +218,20 @@
               </colgroup>
               <tr class="mb-4">
                 <td class="text-gray-400">{t("user.last-login")}</td>
-                <td>{userData.last_login}</td>
+                <td>
+                  {userData.last_login
+                    ? formatDateToDDMMYYHHMMSS(userData.last_login)
+                    : "-"}
+                </td>
               </tr>
               <tr class="">
                 <td class="text-gray-400">{t("user.status")}</td>
-                <td>status</td>
+                <td
+                  style={`color: ${getUserStatus(userData.blocked, userData.email_verified).color}`}
+                >
+                  {getUserStatus(userData.blocked, userData.email_verified)
+                    .text}</td
+                >
               </tr>
             </table>
           </div>
