@@ -244,8 +244,14 @@
 
     users = users.sort((a: any, b: any) => {
       if (sortDirection === "asc") {
+        if (col == "name" || col == "email") {
+          return a[col].localeCompare(b[col]);
+        }
         return a[col] > b[col] ? 1 : -1;
       } else {
+        if (col == "name" || col == "email") {
+          return b[col].localeCompare(a[col]);
+        }
         return a[col] < b[col] ? 1 : -1;
       }
     });
