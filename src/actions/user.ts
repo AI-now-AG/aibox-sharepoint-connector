@@ -4,6 +4,7 @@ import { ObjectId } from "mongodb";
 import { z } from "zod";
 import { transformRawData } from "$utils/transformRawData";
 import {
+  assignPermissions,
   Permission,
   UserFilterParamsSchema,
   UserRole,
@@ -12,7 +13,7 @@ import {
 import userModel from "$data/models/user.model";
 
 const UserInputParamsSchema = z.object({
-  user_id: z.instanceof(ObjectId),
+  tenant_id: z.instanceof(ObjectId),
   auth0_sub: z.string().min(24),
   username: z.string().min(2),
   email: z.string(),
@@ -56,21 +57,24 @@ export const user = {
 
   create: defineAction({
     input: UserInputParamsSchema,
-    handler: async () => {
+    handler: async (input) => {
+      // TODO: Create user on Auth0
       const insertResult = await userModel.add({
         auth0_sub: "",
-        username: "",
-        email: "",
-        roles: [],
-        permissions: [],
-        name: "",
-        tenant_id: new ObjectId(),
-        created_at: new Date(),
-        updated_at: new Date(),
-        logins_count: 0,
-        last_login: "",
+        username: input.email,
+
+        name: input.name,
+        email: input.email,
+        roles: input.roles,
+        permissions: assignPermissions[input.roles],
+        tenant_id: input.tenant_id,
+
         email_verified: false,
         blocked: false,
+        logins_count: 0,
+        last_login: "",
+        created_at: new Date(),
+        updated_at: new Date(),
       });
 
       return transformRawData(insertResult);
@@ -80,17 +84,8 @@ export const user = {
   update: defineAction({
     input: z.intersection(UserInputParamsSchema, UserInputIdentifierSchema),
     handler: async (input) => {
-      const updatedDocument = await userModel.update(input._id, {
-        auth0_sub: "",
-        username: "",
-        email: "",
-        roles: [],
-        permissions: [],
-        name: "",
-        tenant_id: new ObjectId(),
-        created_at: new Date(),
-        updated_at: new Date(),
-      });
+      // TODO: Update user on Auth0
+      const updatedDocument = await userModel.update(input._id, input);
 
       return transformRawData(updatedDocument);
     },

@@ -17,8 +17,8 @@
 
   const t = useTranslations();
 
-  export let user;
-  export let tenant;
+  export let user: any;
+  export let tenant: any;
 
   const enum UserRole {
     Admin = "Admin",
@@ -100,8 +100,17 @@
     if (validateForm()) {
       try {
         showLoading();
-        // TODO: Integrate API Create User
+        const { error } = await actions.user.create(userData);
         hideLoading();
+        if (error) {
+          showAlert(error);
+        } else {
+          addToast({
+            message: t("user.create-successful"),
+            type: "success",
+          });
+          window.location.href = "/user-management";
+        }
       } catch (error) {
         showAlert(error);
       }
@@ -112,8 +121,17 @@
     if (validateForm()) {
       try {
         showLoading();
-        // TODO: Integrate API Update User
+        const { error } = await actions.user.update(userData);
         hideLoading();
+        if (error) {
+          showAlert(error);
+        } else {
+          addToast({
+            message: t("user.update-successful"),
+            type: "success",
+          });
+          window.location.href = "/user-management";
+        }
       } catch (error) {
         showAlert(error);
       }

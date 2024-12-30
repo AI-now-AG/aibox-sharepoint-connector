@@ -252,5 +252,9 @@
   "user.delete-failed": "Delete user failed",
   "user.validate-empty-name-message": "Name could not be empty ",
   "user.validate-emapty-email-message": "Email could not be empty",
-  "user.validate-wrong-email-message": "Email is invalid"
+  "user.validate-wrong-email-message": "Email is invalid",
+  "user.create-successful": "Create user successful",
+  "user.create-failed": "Create user failed ",
+  "user.update-successful": "Update user successful",
+  "user.udpate-failed": "Update user failed "
 }

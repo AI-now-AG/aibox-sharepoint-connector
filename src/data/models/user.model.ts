@@ -40,7 +40,7 @@ const UserSchema = z.object({
     .default(() => [Permission.UserAll]),
   name: z.string(),
   logins_count: z.number().default(() => 0),
-  last_login: z.string(),
+  last_login: z.string().optional(),
   email_verified: z.boolean().default(false),
   blocked: z.boolean().default(false),
   navState: z.record(z.string(), z.boolean()).optional(),
