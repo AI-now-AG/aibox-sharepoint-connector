@@ -10,27 +10,15 @@ import CategoryModel, {
   type Category,
   type Group,
 } from "$data/models/category.model";
-import KnowledgeBaseModel, {
-  type KnowledgeBase,
-} from "$data/models/knowledgeBase.model";
-import type { CsvRowRaw, CsvRowParsed } from "$types/prompt-csv.types";
-
-type KnowledgeBaseRawItem = {
-  title: string;
-  description: string;
-  knowledge_base: string;
-} & Record<string, any>;
+import type { CsvRowRaw } from "$types/prompt-csv.types";
 
 const isValidRows = (rows: CsvRowRaw[]) => {
   const requiredColumns = [
     "title",
     "description",
-    "prompt",
+    "instruction",
     "category",
     "group",
-    "knowledgebase",
-    "created_at",
-    "updated_at",
   ];
 
   for (let row of rows) {
@@ -44,47 +32,10 @@ const isValidRows = (rows: CsvRowRaw[]) => {
   return true;
 };
 
-const parseCsvData = (rows: CsvRowRaw[]) => {
-  const parsedRows: CsvRowParsed[] = rows.map((item: CsvRowRaw) => {
-    const text = item.knowledgebase || "";
-    // Split sections by [break]
-    const sections = text
-      .split("[break]")
-      .map((section) => section.trim())
-      .filter(Boolean);
-
-    // Parse each section into an object
-    const result = sections.map((section) => {
-      const obj: KnowledgeBaseRawItem = {
-        title: "",
-        description: "",
-        knowledge_base: "",
-      };
-
-      // Extract each line (";") and parse key-value pairs
-      const lines = section.split(";").filter((line) => line.trim());
-      lines.forEach((line) => {
-        const match = line.replace(/\s/g, "").match(/^\[(.+?)\]:\s*(.+)$/); // Match [key]: value;
-        if (match) {
-          const key = match[1].trim();
-          const value = match[2].trim();
-          obj[key] = value;
-        }
-      });
-
-      return obj;
-    });
-
-    return { ...item, ...{ knowledgebase: result } };
-  });
-
-  return parsedRows;
-};
-
-const syncCategoriesWithGroups = async (rows: CsvRowParsed[], user: User) => {
+const syncCategoriesWithGroups = async (rows: CsvRowRaw[], user: User) => {
   // Group categories by their name and ensure uniqueness
   const categories = rows
-    .map((item: CsvRowParsed) => {
+    .map((item: CsvRowRaw) => {
       return {
         name: item.category,
         group: item.group,
@@ -154,88 +105,37 @@ const syncCategoriesWithGroups = async (rows: CsvRowParsed[], user: User) => {
   }
 };
 
-const syncKnowledgeBases = async (rows: CsvRowParsed[], user: User) => {
-  // Flatten and remove duplicates by title
-  const knowledgebases = rows.map((item: CsvRowParsed) => item.knowledgebase);
-  const uniqueKnowledgeBases = knowledgebases
-    .flat()
-    .reduce<KnowledgeBaseRawItem[]>((acc, item) => {
-      if (!acc.some((kb) => kb.title === item.title)) {
-        acc.push(item);
-      }
-      return acc;
-    }, []);
-
-  // Iterate through each category and execute the check & create/update process
-  for (const kb of uniqueKnowledgeBases) {
-    const knowledgebase = await KnowledgeBaseModel.getByTitleAndTenant(
-      kb.title,
-      user.tenant_id,
-    );
-    if (!knowledgebase) {
-      const newKnowledgeBase: KnowledgeBase = {
-        title: kb.title,
-        knowledge_base: kb.knowledge_base,
-        description: kb.description,
-        tenant_id: user.tenant_id,
-        creator_id: user.id,
-        created_at: new Date(),
-        updated_at: new Date(),
-      };
-      await KnowledgeBaseModel.add(newKnowledgeBase);
-    }
-  }
-};
-
-const syncPrompts = async (rows: CsvRowParsed[], user: User) => {
+const syncPrompts = async (rows: CsvRowRaw[], user: User) => {
   const categoriesCursor = await CategoryModel.listByTenant(user.tenant_id);
   const categories = await categoriesCursor.toArray();
 
   for (const item of rows) {
-    const prompt = await PromptModel.getByTitleAndTenant(
-      item.title,
-      user.tenant_id,
+    // Get the _id of the category that matches item.category, or undefined if not found.
+    const findCategory = categories.find(
+      (category) => category.title?.trim() == item.category?.trim(),
     );
-    if (!prompt) {
-      // Get the _id of the category that matches item.category, or undefined if not found.
-      const findCategory = categories.find(
-        (category) => category.title?.trim() == item.category?.trim(),
-      );
-      const promptCategory = findCategory ? findCategory._id : undefined;
+    const promptCategory = findCategory ? findCategory._id : undefined;
 
-      // Get the _id of the group that matches findCategory.groups, or undefined if not found.
-      const findGroup = findCategory?.groups?.find(
-        (group) => group.title?.trim() == item.group?.trim(),
-      );
-      const promptGroup = findGroup ? findGroup._id : undefined;
+    // Get the _id of the group that matches findCategory.groups, or undefined if not found.
+    const findGroup = findCategory?.groups?.find(
+      (group) => group.title?.trim() == item.group?.trim(),
+    );
+    const promptGroup = findGroup ? findGroup._id : undefined;
 
-      // Collect prompt knowledgebases
-      const promptKbs: ObjectId[] = [];
-      for (const kb of item.knowledgebase) {
-        const knowledgebase = await KnowledgeBaseModel.getByTitleAndTenant(
-          kb.title,
-          user.tenant_id,
-        );
-        if (knowledgebase) {
-          promptKbs.push(knowledgebase._id);
-        }
-      }
-
-      const newPrompt: Prompt = {
-        title: item.title,
-        description: item.description,
-        category: promptCategory,
-        group: promptGroup,
-        knowledgebase: promptKbs,
-        position: 0,
-        tenant_id: user.tenant_id,
-        creator_id: user.id,
-        created_at: new Date(),
-        updated_at: new Date(),
-        prompt: item.prompt,
-      };
-      await PromptModel.add(newPrompt);
-    }
+    const newPrompt: Prompt = {
+      title: item.title,
+      description: item.description,
+      category: promptCategory,
+      group: promptGroup,
+      knowledgebase: [],
+      position: 0,
+      tenant_id: user.tenant_id,
+      creator_id: user.id,
+      created_at: new Date(),
+      updated_at: new Date(),
+      prompt: item.instruction,
+    };
+    await PromptModel.add(newPrompt);
   }
 };
 
@@ -283,22 +183,17 @@ export const POST: APIRoute = async (ctx: APIContext) => {
     }
 
     const session = client.startSession();
+    console.log("csv rows", rows);
 
     try {
       // Start a transaction
       session.startTransaction();
 
-      // Parse all row data
-      const parsedRows = parseCsvData(rows);
-
       // Sync all categories
-      await syncCategoriesWithGroups(parsedRows, ctx.locals.user);
-
-      // Sync all knowledgeBase
-      await syncKnowledgeBases(parsedRows, ctx.locals.user);
+      await syncCategoriesWithGroups(rows, ctx.locals.user);
 
       // Sync all prompts
-      await syncPrompts(parsedRows, ctx.locals.user);
+      await syncPrompts(rows, ctx.locals.user);
 
       // If everything goes well, commit the transaction
       await session.commitTransaction();

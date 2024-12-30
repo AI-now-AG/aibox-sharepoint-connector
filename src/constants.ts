@@ -12,6 +12,8 @@ export const PUBLIC_ROUTES = [
 export const SUPER_ADMIN_ROUTES = [
   "/tenant-management",
   "/tenant-management/*",
+  "/api/prompts/export",
+  "/api/prompts/import",
   "/secure",
   "/secure/*",
 ];

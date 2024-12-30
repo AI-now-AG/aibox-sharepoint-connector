@@ -3,7 +3,6 @@ import dayjs from "dayjs";
 import { writeToString } from "fast-csv";
 import PromptModel from "$data/models/prompt.model";
 import type { Group } from "$data/models/category.model";
-import type { KnowledgeBase } from "$data/models/knowledgeBase.model";
 import type { CsvRowRaw } from "$types/prompt-csv.types";
 
 export const GET: APIRoute = async (ctx: APIContext) => {
@@ -23,37 +22,15 @@ export const GET: APIRoute = async (ctx: APIContext) => {
       });
       const group = findGroup ? findGroup.title : "";
 
-      // Prepare knowledgebase details
-      const knowledgebase = prompt.knowledgebase
-        .map((kb: KnowledgeBase) => {
-          const { title, description, knowledge_base } = kb;
-          const obj = {
-            title,
-            description,
-            knowledge_base,
-          };
-
-          const item = [];
-          for (const [key, value] of Object.entries(obj)) {
-            item.push(`[${key}]: ${value}`);
-          }
-          return item.join(";\n");
-        })
-        .join("\n\n[break]\n\n");
-
       // Returning the data formatted for CSV
       return {
         title: prompt.title,
         description: prompt.description,
-        prompt: prompt.prompt,
+        instruction: prompt.prompt,
         category,
         group,
-        knowledgebase: knowledgebase,
-        created_at: dayjs(prompt.created_at).format("YYYY-MM-DD HH:mm:ss"),
-        updated_at: dayjs(prompt.updated_at).format("YYYY-MM-DD HH:mm:ss"),
       };
     });
-    //console.log("csvData", { prompts, csvData });
 
     // Generate the CSV string using fast-csv
     const csvString = await writeToString(csvData, { headers: true });
