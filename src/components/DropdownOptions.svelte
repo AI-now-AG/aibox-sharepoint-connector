@@ -1,6 +1,5 @@
 <script lang="ts" context="module">
   export interface Option {
-    id: string;
     icon: any;
     text: string;
     action: Function;

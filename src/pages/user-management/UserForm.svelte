@@ -26,16 +26,8 @@
     User = "User",
   }
 
-  const IdentityProviders: any = {
-    saml: "saml",
-    oidc: "oidc",
-    okta: "okta",
-    google: "google",
-    waad: "waad",
-    ADFS: "adfs",
-    ad: "ad",
-    ping: "ping",
-  };
+  // List of enterprise providers
+  const enterpriseProviders = ['saml', 'oidc', 'okta', 'google', 'waad', 'adfs', 'ad', 'ping'];
 
   let confirmUpdateModal: HTMLDialogElement;
   let confirmBlockModal: HTMLDialogElement;
@@ -54,13 +46,9 @@
   let isEnterpriseAuthentication = false;
 
   function checkEnterpriseAuthentication() {
-    if (userData && userData.identities) {
-      return userData.identities.some((identity: any) => {
-        if (IdentityProviders[identity.provider] == identity.provider)
-          return true;
-      });
-    }
-    return false;
+    const parts = userData?.user_id.split('|');
+    const provider = parts[0];
+    return enterpriseProviders.includes(provider);
   }
 
   // Important note: User created on Auth0 with super admin , just the Admin on AI box when go into the detail screen

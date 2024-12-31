@@ -252,7 +252,6 @@
   function getOptions(user: any) {
     let options: Option[] = [
       {
-        id: "1",
         icon: svgIcons.block,
         text: user.blocked ? t("common.un-block") : t("common.block"),
         action: () => {
@@ -260,7 +259,6 @@
         },
       },
       {
-        id: "2",
         icon: svgIcons.trash,
         text: t("common.delete"),
         action: () => {
@@ -268,7 +266,6 @@
         },
       },
       {
-        id: "3",
         icon: svgIcons.edit,
         text: t("common.edit"),
         action: () => {
@@ -503,7 +500,7 @@
               <td class="py-3 px-4 text-sm font-medium rounded-l-lg">
                 <a
                   class="underline underline-offset-2"
-                  href="/user-management/{user._id}">{user.name}</a
+                  href="/user-management/{user._id}">{user.name || '-'}</a
                 >
               </td>
               <td
