@@ -65,27 +65,24 @@
 
   // Important note: User created on Auth0 with super admin , just the Admin on AI box when go into the detail screen
   let role = UserRole.User;
+  log.d(user, "user");
   function getUserRole(roles: string[]) {
-    let isAdmin = false;
     for (let i = 0; i < roles?.length; i++) {
       const _role = roles[i];
-      if (_role == UserRole.SuperAdmin) {
-        isAdmin = true;
-        break;
-      } else if (_role == UserRole.Admin) {
-        isAdmin = true;
-        break;
+      if (_role == UserRole.SuperAdmin || _role == UserRole.Admin) {
+        return UserRole.Admin;
       }
     }
-    role = isAdmin ? UserRole.Admin : UserRole.User;
+    return UserRole.User;
   }
 
   $: if (role) {
     userData.roles = [role];
+    log.d(userData.roles, "userData.roles");
   }
 
   onMount(() => {
-    getUserRole(userData.roles);
+    role = getUserRole(userData.roles);
     isEnterpriseAuthentication = checkEnterpriseAuthentication();
   });
 
