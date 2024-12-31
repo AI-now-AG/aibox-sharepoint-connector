@@ -23,12 +23,6 @@
     User = "User",
   }
 
-  const enum Status {
-    Verified = "Verified",
-    UnVerified = "UnVerified",
-    Blocked = "Blocked",
-  }
-
   let users: any = [];
   let searchValue: string = "";
   let searchTypingTimeout: any;
