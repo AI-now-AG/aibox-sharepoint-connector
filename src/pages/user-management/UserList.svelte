@@ -140,9 +140,6 @@
 
     if (!error) {
       users = data;
-      users = users.filter((_user: any) => {
-        return _user.email != currentLoggedInUser.email;
-      });
     } else {
       log.e(error, "Error fetching users");
     }
@@ -253,22 +250,6 @@
     let options: Option[] = [
       {
         id: "1",
-        icon: svgIcons.block,
-        text: user.blocked ? t("common.un-block") : t("common.block"),
-        action: () => {
-          onSelectBlock(user);
-        },
-      },
-      {
-        id: "2",
-        icon: svgIcons.trash,
-        text: t("common.delete"),
-        action: () => {
-          onSelectDelete(user);
-        },
-      },
-      {
-        id: "3",
         icon: svgIcons.edit,
         text: t("common.edit"),
         action: () => {
@@ -276,6 +257,25 @@
         },
       },
     ];
+    if (user.email != currentLoggedInUser.email) {
+      options.unshift({
+        id: "2",
+        icon: svgIcons.trash,
+        text: t("common.delete"),
+        action: () => {
+          onSelectDelete(user);
+        },
+      });
+      options.unshift({
+        id: "3",
+        icon: svgIcons.block,
+        text: user.blocked ? t("common.un-block") : t("common.block"),
+        action: () => {
+          onSelectBlock(user);
+        },
+      });
+    }
+
     return options;
   }
 
