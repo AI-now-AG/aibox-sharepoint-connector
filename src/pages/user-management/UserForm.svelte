@@ -19,6 +19,7 @@
 
   export let user: any;
   export let tenant: any;
+  export let currentLoggedInUser: any = "";
 
   const enum UserRole {
     Admin = "Admin",
@@ -383,37 +384,39 @@
 
         <div class="w-full h-[1px] bg-slate-200 mt-2 mb-8"></div>
 
-        <div class="flex items-center">
-          <button
-            class="flex items-centertext-gray-700 font-sans"
-            on:click={(e) => {
-              confirmBlockModal?.show();
-            }}
-          >
-            <span class="w-5 h-5 flex items-center">
-              {@html svgIcons.block}</span
+        {#if userData.email != currentLoggedInUser.email}
+          <div class="flex items-center">
+            <button
+              class="flex items-centertext-gray-700 font-sans"
+              on:click={(e) => {
+                confirmBlockModal?.show();
+              }}
             >
-            <span class="text-sm font-semibold ml-1 text-left"
-              >{userData.blocked
-                ? t("user.un-block-user")
-                : t("user.block-user")}</span
-            >
-          </button>
+              <span class="w-5 h-5 flex items-center">
+                {@html svgIcons.block}</span
+              >
+              <span class="text-sm font-semibold ml-1 text-left"
+                >{userData.blocked
+                  ? t("user.un-block-user")
+                  : t("user.block-user")}</span
+              >
+            </button>
 
-          <button
-            class="flex items-center font-sans text-red-600 ml-8"
-            on:click={(e) => {
-              confirmDeleteModal?.show();
-            }}
-          >
-            <span class="w-5 h-5 flex items-center">
-              {@html svgIcons.trash}</span
+            <button
+              class="flex items-center font-sans text-red-600 ml-8"
+              on:click={(e) => {
+                confirmDeleteModal?.show();
+              }}
             >
-            <span class="text-sm font-semibold ml-1 text-left text-red-600"
-              >{t("user.delete-user")}</span
-            >
-          </button>
-        </div>
+              <span class="w-5 h-5 flex items-center">
+                {@html svgIcons.trash}</span
+              >
+              <span class="text-sm font-semibold ml-1 text-left text-red-600"
+                >{t("user.delete-user")}</span
+              >
+            </button>
+          </div>
+        {/if}
       {/if}
     </div>
   </div>

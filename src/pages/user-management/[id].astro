@@ -23,11 +23,18 @@ if (user === null) {
   return Astro.redirect("/404");
 }
 
+const currentLoggedInUser = Astro.locals.user;
+
 log.i(user, "user");
 
 const data = transformRawData(user);
 ---
 
 <Layout>
-  <UserForm user={data} tenant={tenant} client:load />
+  <UserForm
+    user={data}
+    tenant={tenant}
+    currentLoggedInUser={currentLoggedInUser}
+    client:load
+  />
 </Layout>
