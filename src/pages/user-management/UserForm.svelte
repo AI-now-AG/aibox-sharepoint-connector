@@ -379,7 +379,7 @@
                 <col class="w-auto" />
               </colgroup>
               <tr class="mb-4">
-                <td class="text-gray-400">{t("user.last-login")}</td>
+                <td class="text-gray-400">{t("user.latest-login")}</td>
                 <td class="text-base">
                   {userData.last_login
                     ? moment(userData.last_login).format("dddd DD.MM.YYYY")
