@@ -144,7 +144,7 @@
             >{t("common.filter")}</span
           >
           <button
-            class="btn btn-ghost btn-sm"
+            class="btn btn-default btn-sm"
             on:click|stopPropagation={() => {
               showFilter = false;
               dispatch("filter");
