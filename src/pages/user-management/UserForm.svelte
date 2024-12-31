@@ -19,6 +19,7 @@
 
   export let user: any;
   export let tenant: any;
+  export let currentLoggedInUser: any = "";
 
   const enum UserRole {
     Admin = "Admin",
@@ -27,7 +28,16 @@
   }
 
   // List of enterprise providers
-  const enterpriseProviders = ['saml', 'oidc', 'okta', 'google', 'waad', 'adfs', 'ad', 'ping'];
+  const enterpriseProviders = [
+    "saml",
+    "oidc",
+    "okta",
+    "google",
+    "waad",
+    "adfs",
+    "ad",
+    "ping",
+  ];
 
   let confirmUpdateModal: HTMLDialogElement;
   let confirmBlockModal: HTMLDialogElement;
@@ -44,9 +54,10 @@
   let userData = user == undefined ? {} : user;
 
   let isEnterpriseAuthentication = false;
+  let isDisbaleUpdateRole = false;
 
   function checkEnterpriseAuthentication() {
-    const parts = userData?.user_id.split('|');
+    const parts = userData?.user_id.split("|");
     const provider = parts[0];
     return enterpriseProviders.includes(provider);
   }
@@ -63,8 +74,23 @@
     return UserRole.User;
   }
 
+  function isSuperAdmin(roles: string[]) {
+    for (let i = 0; i < roles?.length; i++) {
+      const _role = roles[i];
+      if (_role == UserRole.SuperAdmin) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   onMount(() => {
-    role = getUserRole(userData.roles);
+    if (isSuperAdmin(userData.roles)) {
+      isDisbaleUpdateRole = true;
+      role = UserRole.SuperAdmin;
+    } else {
+      role = getUserRole(userData.roles);
+    }
     isEnterpriseAuthentication = checkEnterpriseAuthentication();
   });
 
@@ -281,10 +307,11 @@
             name="role"
             class="radio radio-primary"
             value={UserRole.Admin}
-            checked={role == UserRole.Admin}
+            checked={role == UserRole.Admin || role == UserRole.SuperAdmin}
             on:change={() => {
               role = UserRole.Admin;
             }}
+            disabled={isDisbaleUpdateRole}
           />
           <label for="role-admin" class="ml-2 font-medium text-sm"
             >{t("user.admin")}</label
@@ -301,6 +328,7 @@
             on:change={() => {
               role = UserRole.User;
             }}
+            disabled={isDisbaleUpdateRole}
           />
           <label for="role-user" class="ml-2 font-medium text-sm"
             >{t("user.user")}</label
@@ -374,37 +402,39 @@
 
         <div class="w-full h-[1px] bg-slate-200 mt-2 mb-8"></div>
 
-        <div class="flex items-center">
-          <button
-            class="flex items-centertext-gray-700 font-sans"
-            on:click={(e) => {
-              confirmBlockModal?.show();
-            }}
-          >
-            <span class="w-5 h-5 flex items-center">
-              {@html svgIcons.block}</span
+        {#if userData.email != currentLoggedInUser.email}
+          <div class="flex items-center">
+            <button
+              class="flex items-centertext-gray-700 font-sans"
+              on:click={(e) => {
+                confirmBlockModal?.show();
+              }}
             >
-            <span class="text-sm font-semibold ml-1 text-left"
-              >{userData.blocked
-                ? t("user.un-block-user")
-                : t("user.block-user")}</span
-            >
-          </button>
+              <span class="w-5 h-5 flex items-center">
+                {@html svgIcons.block}</span
+              >
+              <span class="text-sm font-semibold ml-1 text-left"
+                >{userData.blocked
+                  ? t("user.un-block-user")
+                  : t("user.block-user")}</span
+              >
+            </button>
 
-          <button
-            class="flex items-center font-sans text-red-600 ml-8"
-            on:click={(e) => {
-              confirmDeleteModal?.show();
-            }}
-          >
-            <span class="w-5 h-5 flex items-center">
-              {@html svgIcons.trash}</span
+            <button
+              class="flex items-center font-sans text-red-600 ml-8"
+              on:click={(e) => {
+                confirmDeleteModal?.show();
+              }}
             >
-            <span class="text-sm font-semibold ml-1 text-left text-red-600"
-              >{t("user.delete-user")}</span
-            >
-          </button>
-        </div>
+              <span class="w-5 h-5 flex items-center">
+                {@html svgIcons.trash}</span
+              >
+              <span class="text-sm font-semibold ml-1 text-left text-red-600"
+                >{t("user.delete-user")}</span
+              >
+            </button>
+          </div>
+        {/if}
       {/if}
     </div>
   </div>

@@ -85,12 +85,14 @@
   let confirmBlockModal: HTMLDialogElement;
   let confirmDeleteModal: HTMLDialogElement;
 
-  const handleFilterMouseEnter = () => {
-    showUserFilter = true;
-  };
-  const handleFilterMouseLeave = () => {
-    showUserFilter = false;
-  };
+  function handleClickFilter() {
+    if (showUserFilter) {
+      showUserFilter = false;
+      fetchUsers();
+    } else {
+      showUserFilter = true;
+    }
+  }
 
   function calculateNumberOfFitler() {
     numberOfFilters = 0;
@@ -140,9 +142,6 @@
 
     if (!error) {
       users = data;
-      users = users.filter((_user: any) => {
-        return _user.email != currentLoggedInUser.email;
-      });
     } else {
       log.e(error, "Error fetching users");
     }
@@ -244,20 +243,6 @@
   function getOptions(user: any) {
     let options: Option[] = [
       {
-        icon: svgIcons.block,
-        text: user.blocked ? t("common.un-block") : t("common.block"),
-        action: () => {
-          onSelectBlock(user);
-        },
-      },
-      {
-        icon: svgIcons.trash,
-        text: t("common.delete"),
-        action: () => {
-          onSelectDelete(user);
-        },
-      },
-      {
         icon: svgIcons.edit,
         text: t("common.edit"),
         action: () => {
@@ -265,6 +250,23 @@
         },
       },
     ];
+    if (user.email != currentLoggedInUser.email) {
+      options.unshift({
+        icon: svgIcons.trash,
+        text: t("common.delete"),
+        action: () => {
+          onSelectDelete(user);
+        },
+      });
+      options.unshift({
+        icon: svgIcons.block,
+        text: user.blocked ? t("common.un-block") : t("common.block"),
+        action: () => {
+          onSelectBlock(user);
+        },
+      });
+    }
+
     return options;
   }
 
@@ -299,10 +301,13 @@
   <InputSearch bind:value={searchValue} on:search={fetchUsers}  />
 
   <div class="">
-    <button
-      class="dropdown dropdown-hover dropdown-start"
-      on:mouseenter={handleFilterMouseEnter}
-      on:mouseleave={handleFilterMouseLeave}
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <div
+      class=""
+      on:click={() => {
+        handleClickFilter();
+      }}
     >
       <div class="btn btn-sm btn-active font-normal bg-base-200">
         {@html svgIcons.filter}
@@ -312,15 +317,22 @@
         {/if}
         {@html svgIcons.arrowDownFill}
       </div>
+
       {#if showUserFilter}
         <div
-          class="dropdown-content menu bg-base-100 rounded-xl z-[1] p-3 shadow w-52"
+          class="menu bg-base-100 rounded-xl z-[1] p-3 shadow w-52 mt-1 absolute"
         >
           <div class="flex justify-center items-center">
             <span class="flex-1 text-left text-sm font-bold"
               >{t("common.filter")}</span
             >
-            <button class="btn btn-ghost btn-sm" on:click={fetchUsers}>
+            <button
+              class="btn btn-ghost btn-sm"
+              on:click|stopPropagation={() => {
+                showUserFilter = false;
+                fetchUsers();
+              }}
+            >
               {@html svgIcons.filter}</button
             >
           </div>
@@ -329,7 +341,9 @@
 
           <div class="w-full text-sm">
             <div class="w-full text-left">{t("user.role")}</div>
+            <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
             <label
+              on:click|stopPropagation={() => null}
               class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
             >
               <input
@@ -340,7 +354,9 @@
               <span class="font-normal">{t("user.user")}</span>
             </label>
 
+            <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
             <label
+              on:click|stopPropagation={() => null}
               class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
             >
               <input
@@ -354,7 +370,9 @@
 
           <div class="w-full mt-4">
             <div class="w-full text-left">{t("user.status")}</div>
+            <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
             <label
+              on:click|stopPropagation={() => null}
               class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
             >
               <input
@@ -365,7 +383,9 @@
               <span class="font-normal">{t("common.block")}</span>
             </label>
 
+            <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
             <label
+              on:click|stopPropagation={() => null}
               class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
             >
               <input
@@ -376,7 +396,9 @@
               <span class="font-normal">{t("user.un-veriried")}</span>
             </label>
 
+            <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
             <label
+              on:click|stopPropagation={() => null}
               class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
             >
               <input
@@ -389,7 +411,7 @@
           </div>
         </div>
       {/if}
-    </button>
+    </div>
   </div>
 
   <div class="mt-10">
@@ -478,7 +500,7 @@
               <td class="py-3 px-4 text-sm font-medium rounded-l-lg">
                 <a
                   class="underline underline-offset-2"
-                  href="/user-management/{user._id}">{user.name || '-'}</a
+                  href="/user-management/{user._id}">{user.name ?? "-"}</a
                 >
               </td>
               <td
