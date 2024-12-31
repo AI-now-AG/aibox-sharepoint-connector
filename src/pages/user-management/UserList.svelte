@@ -11,7 +11,6 @@
   import DropdownSection from "$components/DropdownSection.svelte";
   import { type Option } from "$components/DropdownOptions.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
-  import { clickOutside } from "$components/actions/ClickOutside.svelte";
 
   const t = useTranslations();
 
@@ -322,11 +321,6 @@
   <div class="">
     <button
       class="dropdown dropdown-hover dropdown-start"
-      use:clickOutside
-      on:click={() => (showUserFilter = true)}
-      on:clickoutside={() => {
-        showUserFilter = false;
-      }}
       on:mouseenter={handleFilterMouseEnter}
       on:mouseleave={handleFilterMouseLeave}
     >
@@ -339,7 +333,7 @@
         {@html svgIcons.arrowDownFill}
       </div>
       {#if showUserFilter}
-        <ul
+        <div
           class="dropdown-content menu bg-base-100 rounded-xl z-[1] p-3 shadow w-52"
         >
           <div class="flex justify-center items-center">
@@ -413,7 +407,7 @@
               <span class="font-normal">{t("user.veriried")}</span>
             </label>
           </div>
-        </ul>
+        </div>
       {/if}
     </button>
   </div>
