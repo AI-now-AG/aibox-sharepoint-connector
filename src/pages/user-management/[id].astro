@@ -17,6 +17,7 @@ if (id === undefined) {
 }
 
 const user = await userModel.getById(id);
+console.log("user", user);
 if (user === null) {
   console.error("User not found");
   return Astro.redirect("/404");

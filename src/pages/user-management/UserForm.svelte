@@ -65,7 +65,6 @@
 
   // Important note: User created on Auth0 with super admin , just the Admin on AI box when go into the detail screen
   let role = UserRole.User;
-  log.d(user, "user");
   function getUserRole(roles: string[]) {
     for (let i = 0; i < roles?.length; i++) {
       const _role = roles[i];
@@ -74,11 +73,6 @@
       }
     }
     return UserRole.User;
-  }
-
-  $: if (role) {
-    userData.roles = [role];
-    log.d(userData.roles, "userData.roles");
   }
 
   onMount(() => {
@@ -118,6 +112,7 @@
     if (validateForm()) {
       try {
         showLoading();
+        userData = { ...userData, roles: [role] };
         const { error } = await actions.user.create(userData);
         hideLoading();
         if (error) {
@@ -139,6 +134,7 @@
     if (validateForm()) {
       try {
         showLoading();
+        userData = { ...userData, roles: [role] };
         const { error } = await actions.user.update(userData);
         hideLoading();
         if (error) {
