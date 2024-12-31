@@ -85,7 +85,7 @@ export const user = {
     input: z.intersection(UserInputParamsSchema, UserInputIdentifierSchema),
     handler: async (input) => {
       // TODO: Update user on Auth0
-      const updatedDocument = await userModel.update(input._id, input);
+      const updatedDocument = await userModel.update(input._id, {});
 
       return transformRawData(updatedDocument);
     },

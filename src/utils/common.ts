@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 import type { ParsedAuth0UserSub } from "$types/auth0.types";
 import moment from "moment";
 

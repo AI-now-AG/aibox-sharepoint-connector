@@ -26,15 +26,23 @@
     User = "User",
   }
 
+  const IdentityProviders: any = {
+    saml: "saml",
+    oidc: "oidc",
+    okta: "okta",
+    google: "google",
+    waad: "waad",
+    ADFS: "adfs",
+    ad: "ad",
+    ping: "ping",
+  };
+
   let confirmUpdateModal: HTMLDialogElement;
   let confirmBlockModal: HTMLDialogElement;
   let confirmDeleteModal: HTMLDialogElement;
 
   let alertModal: HTMLDialogElement;
   let alertMessage: any = "";
-
-  // TODO: Checking user has enterprise connection
-  let isEnterpriseAuthentication = false;
 
   const MODE = {
     Create: "create",
@@ -43,29 +51,33 @@
   let mode = user == undefined ? MODE.Create : MODE.Edit;
   let userData = user == undefined ? {} : user;
 
-  let role = UserRole.User;
+  let isEnterpriseAuthentication = false;
+
+  function checkEnterpriseAuthentication() {
+    if (userData && userData.identities) {
+      return userData.identities.some((identity: any) => {
+        if (IdentityProviders[identity.provider] == identity.provider)
+          return true;
+      });
+    }
+    return false;
+  }
+
   // Important note: User created on Auth0 with super admin , just the Admin on AI box when go into the detail screen
+  let role = UserRole.User;
   function getUserRole(roles: string[]) {
-    let isAdmin = false;
     for (let i = 0; i < roles?.length; i++) {
       const _role = roles[i];
-      if (_role == UserRole.SuperAdmin) {
-        isAdmin = true;
-        break;
-      } else if (_role == UserRole.Admin) {
-        isAdmin = true;
-        break;
+      if (_role == UserRole.SuperAdmin || _role == UserRole.Admin) {
+        return UserRole.Admin;
       }
     }
-    role = isAdmin ? UserRole.Admin : UserRole.User;
+    return UserRole.User;
   }
 
-  $: if (role) {
-    userData.roles = [role];
-  }
-
-  onMount(async () => {
-    await getUserRole(userData.roles);
+  onMount(() => {
+    role = getUserRole(userData.roles);
+    isEnterpriseAuthentication = checkEnterpriseAuthentication();
   });
 
   function getUserStatus(isBlocked: boolean, isVerified: boolean) {
@@ -100,6 +112,7 @@
     if (validateForm()) {
       try {
         showLoading();
+        userData = { ...userData, roles: [role] };
         const { error } = await actions.user.create(userData);
         hideLoading();
         if (error) {
@@ -121,6 +134,7 @@
     if (validateForm()) {
       try {
         showLoading();
+        userData = { ...userData, roles: [role] };
         const { error } = await actions.user.update(userData);
         hideLoading();
         if (error) {
@@ -204,7 +218,12 @@
   class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14 sticky bg-base-200 top-0 z-10 font-sans"
 >
   <div class="flex items-center pt-5 pb-2">
-    <button class="mr-4" onclick="window.history.back();">
+    <button
+      class="mr-4"
+      on:click={() => {
+        window.history.back();
+      }}
+    >
       {@html svgIcons.back}
     </button>
     <h1 class="text-4xl font-bold">
@@ -220,7 +239,12 @@
       >
         {t("common.save")}
       </button>
-      <button class="btn" onclick="window.history.back();">
+      <button
+        class="btn"
+        on:click={() => {
+          window.history.back();
+        }}
+      >
         {t("common.cancel")}
       </button>
     </div>
@@ -346,7 +370,7 @@
                     : "-"}
                 </td>
               </tr>
-              <tr class="">
+              <tr class="mb-4">
                 <td class="text-gray-400">{t("user.status")}</td>
                 <td
                   class="text-base"

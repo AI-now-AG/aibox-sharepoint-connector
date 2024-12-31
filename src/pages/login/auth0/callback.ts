@@ -94,13 +94,14 @@ export async function GET(context: APIContext): Promise<Response> {
           if (users && Array.isArray(users) && users.length > 0) {
             for (let i = 0; i < users.length; i++) {
               const _user = users[i];
-              log.d(_user, "user at index " + i);
+              const { identities = [] } = _user;
 
               const rolesdata = await tenantManagement.getMemberRoles({
                 id: auth0_tenant_id,
                 user_id: _user.user_id,
               });
 
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               let _roles: any[] = rolesdata.data ?? [];
               _roles = _roles.map((_role) => {
                 return _role.name;
@@ -108,7 +109,6 @@ export async function GET(context: APIContext): Promise<Response> {
               if (_roles.length == 0) {
                 _roles = [UserRole.User];
               }
-              log.d(_roles, "_roles at index " + i);
 
               if (_user.email != auth0User.data.email) {
                 UserModel.upsertByAuth0Sub(_user.user_id, {
@@ -124,6 +124,7 @@ export async function GET(context: APIContext): Promise<Response> {
                   logins_count: _user.logins_count,
                   email_verified: _user.email_verified,
                   blocked: _user.blocked ? _user.blocked : false,
+                  identities,
                 });
               } else {
                 extraUserData = {
@@ -132,6 +133,7 @@ export async function GET(context: APIContext): Promise<Response> {
                   logins_count: _user.logins_count,
                   email_verified: _user.email_verified,
                   blocked: _user.blocked ? _user.blocked : false,
+                  identities,
                 };
               }
             }

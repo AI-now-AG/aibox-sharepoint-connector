@@ -43,6 +43,7 @@ const UserSchema = z.object({
   last_login: z.string().optional(),
   email_verified: z.boolean().default(false),
   blocked: z.boolean().default(false),
+  identities: z.array(z.any()).optional(),
   navState: z.record(z.string(), z.boolean()).optional(),
 });
 
