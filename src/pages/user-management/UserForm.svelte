@@ -54,6 +54,7 @@
   let userData = user == undefined ? {} : user;
 
   let isEnterpriseAuthentication = false;
+  let isDisbaleUpdateRole = false;
 
   function checkEnterpriseAuthentication() {
     const parts = userData?.user_id.split("|");
@@ -73,8 +74,23 @@
     return UserRole.User;
   }
 
+  function isSuperAdmin(roles: string[]) {
+    for (let i = 0; i < roles?.length; i++) {
+      const _role = roles[i];
+      if (_role == UserRole.SuperAdmin) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   onMount(() => {
-    role = getUserRole(userData.roles);
+    if (isSuperAdmin(userData.roles)) {
+      isDisbaleUpdateRole = true;
+      role = UserRole.SuperAdmin;
+    } else {
+      role = getUserRole(userData.roles);
+    }
     isEnterpriseAuthentication = checkEnterpriseAuthentication();
   });
 
@@ -291,10 +307,11 @@
             name="role"
             class="radio radio-primary"
             value={UserRole.Admin}
-            checked={role == UserRole.Admin}
+            checked={role == UserRole.Admin || role == UserRole.SuperAdmin}
             on:change={() => {
               role = UserRole.Admin;
             }}
+            disabled={isDisbaleUpdateRole}
           />
           <label for="role-admin" class="ml-2 font-medium text-sm"
             >{t("user.admin")}</label
@@ -311,6 +328,7 @@
             on:change={() => {
               role = UserRole.User;
             }}
+            disabled={isDisbaleUpdateRole}
           />
           <label for="role-user" class="ml-2 font-medium text-sm"
             >{t("user.user")}</label
