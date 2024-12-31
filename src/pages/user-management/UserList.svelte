@@ -11,6 +11,7 @@
   import DropdownSection from "$components/DropdownSection.svelte";
   import { type Option } from "$components/DropdownOptions.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
+  import InputSearch from "./InputSearch.svelte";
 
   const t = useTranslations();
 
@@ -25,7 +26,6 @@
 
   let users: any = [];
   let searchValue: string = "";
-  let searchTypingTimeout: any;
   let showUserFilter = false;
   let numberOfFilters = 0;
 
@@ -151,14 +151,6 @@
   onMount(async () => {
     await fetchUsers();
   });
-
-  const onSearchUser = ({ target }: any) => {
-    clearTimeout(searchTypingTimeout);
-    searchTypingTimeout = setTimeout(() => {
-      searchValue = target.value;
-      fetchUsers();
-    }, 300);
-  };
 
   function getRoleString(roles: string[]) {
     let isAdmin = false;
@@ -304,21 +296,7 @@
 </script>
 
 <div class="container max-w-full mx-auto p-6">
-  <div class="items-center mb-2">
-    <div class="relative w-full">
-      <label class="input input-bordered flex items-center gap-2">
-        {@html svgIcons.search}
-        <input
-          type="text"
-          class="grow text-sm"
-          placeholder={t("user.search-for-users")}
-          on:input={onSearchUser}
-          on:input
-          on:blur
-        />
-      </label>
-    </div>
-  </div>
+  <InputSearch bind:value={searchValue} on:search={fetchUsers}  />
 
   <div class="">
     <button
