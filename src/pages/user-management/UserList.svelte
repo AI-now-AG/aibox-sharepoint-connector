@@ -85,12 +85,14 @@
   let confirmBlockModal: HTMLDialogElement;
   let confirmDeleteModal: HTMLDialogElement;
 
-  const handleFilterMouseEnter = () => {
-    showUserFilter = true;
-  };
-  const handleFilterMouseLeave = () => {
-    showUserFilter = false;
-  };
+  function handleClickFilter() {
+    if (showUserFilter) {
+      showUserFilter = false;
+      fetchUsers();
+    } else {
+      showUserFilter = true;
+    }
+  }
 
   function calculateNumberOfFitler() {
     numberOfFilters = 0;
@@ -325,9 +327,10 @@
 
   <div class="">
     <button
-      class="dropdown dropdown-hover dropdown-start"
-      on:mouseenter={handleFilterMouseEnter}
-      on:mouseleave={handleFilterMouseLeave}
+      class=""
+      on:click={() => {
+        handleClickFilter();
+      }}
     >
       <div class="btn btn-sm btn-active font-normal bg-base-200">
         {@html svgIcons.filter}
@@ -337,84 +340,89 @@
         {/if}
         {@html svgIcons.arrowDownFill}
       </div>
-      {#if showUserFilter}
-        <div
-          class="dropdown-content menu bg-base-100 rounded-xl z-[1] p-3 shadow w-52"
-        >
-          <div class="flex justify-center items-center">
-            <span class="flex-1 text-left text-sm font-bold"
-              >{t("common.filter")}</span
-            >
-            <button class="btn btn-ghost btn-sm" on:click={fetchUsers}>
-              {@html svgIcons.filter}</button
-            >
-          </div>
-
-          <div class="w-full h-[1px] bg-slate-200 mt-2 mb-2"></div>
-
-          <div class="w-full text-sm">
-            <div class="w-full text-left">{t("user.role")}</div>
-            <label
-              class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
-            >
-              <input
-                type="checkbox"
-                class="checkbox checkbox-sm checkbox-neutral mr-2"
-                bind:checked={isFilterUser}
-              />
-              <span class="font-normal">{t("user.user")}</span>
-            </label>
-
-            <label
-              class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
-            >
-              <input
-                type="checkbox"
-                class="checkbox checkbox-sm checkbox-neutral mr-2"
-                bind:checked={isFilterAdmin}
-              />
-              <span class="font-normal">{t("user.admin")}</span>
-            </label>
-          </div>
-
-          <div class="w-full mt-4">
-            <div class="w-full text-left">{t("user.status")}</div>
-            <label
-              class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
-            >
-              <input
-                type="checkbox"
-                class="checkbox checkbox-sm checkbox-neutral mr-2"
-                bind:checked={isFilterBlocked}
-              />
-              <span class="font-normal">{t("common.block")}</span>
-            </label>
-
-            <label
-              class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
-            >
-              <input
-                type="checkbox"
-                class="checkbox checkbox-sm checkbox-neutral mr-2"
-                bind:checked={isFilterUnVerified}
-              />
-              <span class="font-normal">{t("user.un-veriried")}</span>
-            </label>
-
-            <label
-              class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
-            >
-              <input
-                type="checkbox"
-                class="checkbox checkbox-sm checkbox-neutral mr-2"
-                bind:checked={isFilterVerified}
-              />
-              <span class="font-normal">{t("user.veriried")}</span>
-            </label>
-          </div>
-        </div>
-      {/if}
     </button>
+
+    {#if showUserFilter}
+      <div class="bg-base-100 rounded-xl z-[1] p-3 shadow w-52 mt-2">
+        <div class="flex justify-center items-center">
+          <span class="flex-1 text-left text-sm font-bold"
+            >{t("common.filter")}</span
+          >
+          <button
+            class="btn btn-ghost btn-sm"
+            on:click={() => {
+              showUserFilter = false;
+              fetchUsers();
+            }}
+          >
+            {@html svgIcons.filter}</button
+          >
+        </div>
+
+        <div class="w-full h-[1px] bg-slate-200 mt-2 mb-2"></div>
+
+        <div class="w-full text-sm">
+          <div class="w-full text-left">{t("user.role")}</div>
+          <label
+            class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
+          >
+            <input
+              type="checkbox"
+              class="checkbox checkbox-sm checkbox-neutral mr-2"
+              bind:checked={isFilterUser}
+            />
+            <span class="font-normal">{t("user.user")}</span>
+          </label>
+
+          <label
+            class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
+          >
+            <input
+              type="checkbox"
+              class="checkbox checkbox-sm checkbox-neutral mr-2"
+              bind:checked={isFilterAdmin}
+            />
+            <span class="font-normal">{t("user.admin")}</span>
+          </label>
+        </div>
+
+        <div class="w-full mt-4">
+          <div class="w-full text-left">{t("user.status")}</div>
+          <label
+            class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
+          >
+            <input
+              type="checkbox"
+              class="checkbox checkbox-sm checkbox-neutral mr-2"
+              bind:checked={isFilterBlocked}
+            />
+            <span class="font-normal">{t("common.block")}</span>
+          </label>
+
+          <label
+            class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
+          >
+            <input
+              type="checkbox"
+              class="checkbox checkbox-sm checkbox-neutral mr-2"
+              bind:checked={isFilterUnVerified}
+            />
+            <span class="font-normal">{t("user.un-veriried")}</span>
+          </label>
+
+          <label
+            class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
+          >
+            <input
+              type="checkbox"
+              class="checkbox checkbox-sm checkbox-neutral mr-2"
+              bind:checked={isFilterVerified}
+            />
+            <span class="font-normal">{t("user.veriried")}</span>
+          </label>
+        </div>
+      </div>
+    {/if}
   </div>
 
   <div class="mt-10">
