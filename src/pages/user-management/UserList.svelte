@@ -12,6 +12,7 @@
   import { type Option } from "$components/DropdownOptions.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import InputSearch from "./InputSearch.svelte";
+  import DropdownFilter from "./DropdownFilter.svelte";
 
   const t = useTranslations();
 
@@ -25,110 +26,14 @@
   }
 
   let users: any = [];
+
   let searchValue: string = "";
-  let showUserFilter = false;
-  let numberOfFilters = 0;
-
-  let isFilterUser: boolean = false;
-  let isFilterAdmin: boolean = false;
   let filterRolesParams: any[] = [];
-
-  let isFilterVerified: boolean = false;
-  let isFilterUnVerified: boolean = false;
-  let isFilterBlocked: boolean = false;
   let filterStatusesParams: any = {};
-
-  $: if (isFilterUser) {
-    filterRolesParams.push(UserRole.User);
-  } else {
-    filterRolesParams = filterRolesParams.filter((_role) => {
-      return _role != UserRole.User;
-    });
-  }
-  $: if (isFilterAdmin) {
-    filterRolesParams.push(UserRole.SuperAdmin);
-    filterRolesParams.push(UserRole.Admin);
-  } else {
-    filterRolesParams = filterRolesParams.filter((_role) => {
-      return _role != UserRole.Admin && _role != UserRole.SuperAdmin;
-    });
-  }
-
-  $: if (isFilterVerified) {
-    filterStatusesParams = {
-      ...filterStatusesParams,
-      isVerified: isFilterVerified,
-    };
-  } else {
-    delete filterStatusesParams.isVerified;
-  }
-
-  $: if (isFilterUnVerified) {
-    filterStatusesParams = {
-      ...filterStatusesParams,
-      isUnVerified: isFilterUnVerified,
-    };
-  } else {
-    delete filterStatusesParams.isUnVerified;
-  }
-
-  $: if (isFilterBlocked) {
-    filterStatusesParams = {
-      ...filterStatusesParams,
-      isBlocked: isFilterBlocked,
-    };
-  } else {
-    delete filterStatusesParams.isBlocked;
-  }
 
   let selectedUser: any;
   let confirmBlockModal: HTMLDialogElement;
   let confirmDeleteModal: HTMLDialogElement;
-
-  function handleClickFilter() {
-    if (showUserFilter) {
-      showUserFilter = false;
-      fetchUsers();
-    } else {
-      showUserFilter = true;
-    }
-  }
-
-  function calculateNumberOfFitler() {
-    numberOfFilters = 0;
-    const a: any = {};
-    for (let i = 0; i < filterRolesParams.length; i++) {
-      const role = filterRolesParams[i];
-      if (!a[role]) {
-        if (role == UserRole.SuperAdmin) {
-          continue;
-        }
-        numberOfFilters += 1;
-        a[role] = true;
-      }
-    }
-    if (filterStatusesParams.isBlocked) {
-      numberOfFilters += 1;
-    }
-    if (filterStatusesParams.isVerified) {
-      numberOfFilters += 1;
-    }
-    if (filterStatusesParams.isUnVerified) {
-      numberOfFilters += 1;
-    }
-  }
-
-  $: if (
-    isFilterUser ||
-    isFilterAdmin ||
-    isFilterVerified ||
-    isFilterUnVerified ||
-    isFilterBlocked
-  ) {
-    calculateNumberOfFitler();
-  } else {
-    numberOfFilters = 0;
-  }
 
   const fetchUsers = async () => {
     showLoading();
@@ -208,6 +113,7 @@
       });
     }
   }
+
   function onSelectBlock(user: any) {
     selectedUser = user;
     confirmBlockModal?.show();
@@ -235,6 +141,7 @@
       });
     }
   }
+
   function onSelectDelete(user: any) {
     selectedUser = user;
     confirmDeleteModal?.show();
@@ -300,119 +207,7 @@
 <div class="container max-w-full mx-auto p-6">
   <InputSearch bind:value={searchValue} on:search={fetchUsers}  />
 
-  <div class="">
-    <!-- svelte-ignore a11y-click-events-have-key-events -->
-    <!-- svelte-ignore a11y-no-static-element-interactions -->
-    <div
-      class=""
-      on:click={() => {
-        handleClickFilter();
-      }}
-    >
-      <div class="btn btn-sm btn-active font-normal bg-base-200">
-        {@html svgIcons.filter}
-        {t("common.filter")}
-        {#if numberOfFilters > 0}
-          <div class="badge badge-primary badge-md">{numberOfFilters}</div>
-        {/if}
-        {@html svgIcons.arrowDownFill}
-      </div>
-
-      {#if showUserFilter}
-        <div
-          class="menu bg-base-100 rounded-xl z-[1] p-3 shadow w-52 mt-1 absolute"
-        >
-          <div class="flex justify-center items-center">
-            <span class="flex-1 text-left text-sm font-bold"
-              >{t("common.filter")}</span
-            >
-            <button
-              class="btn btn-ghost btn-sm"
-              on:click|stopPropagation={() => {
-                showUserFilter = false;
-                fetchUsers();
-              }}
-            >
-              {@html svgIcons.filter}</button
-            >
-          </div>
-
-          <div class="w-full h-[1px] bg-slate-200 mt-2 mb-2"></div>
-
-          <div class="w-full text-sm">
-            <div class="w-full text-left">{t("user.role")}</div>
-            <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-            <label
-              on:click|stopPropagation={() => null}
-              class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
-            >
-              <input
-                type="checkbox"
-                class="checkbox checkbox-sm checkbox-neutral mr-2"
-                bind:checked={isFilterUser}
-              />
-              <span class="font-normal">{t("user.user")}</span>
-            </label>
-
-            <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-            <label
-              on:click|stopPropagation={() => null}
-              class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
-            >
-              <input
-                type="checkbox"
-                class="checkbox checkbox-sm checkbox-neutral mr-2"
-                bind:checked={isFilterAdmin}
-              />
-              <span class="font-normal">{t("user.admin")}</span>
-            </label>
-          </div>
-
-          <div class="w-full mt-4">
-            <div class="w-full text-left">{t("user.status")}</div>
-            <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-            <label
-              on:click|stopPropagation={() => null}
-              class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
-            >
-              <input
-                type="checkbox"
-                class="checkbox checkbox-sm checkbox-neutral mr-2"
-                bind:checked={isFilterBlocked}
-              />
-              <span class="font-normal">{t("common.block")}</span>
-            </label>
-
-            <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-            <label
-              on:click|stopPropagation={() => null}
-              class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
-            >
-              <input
-                type="checkbox"
-                class="checkbox checkbox-sm checkbox-neutral mr-2"
-                bind:checked={isFilterUnVerified}
-              />
-              <span class="font-normal">{t("user.un-veriried")}</span>
-            </label>
-
-            <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-            <label
-              on:click|stopPropagation={() => null}
-              class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
-            >
-              <input
-                type="checkbox"
-                class="checkbox checkbox-sm checkbox-neutral mr-2"
-                bind:checked={isFilterVerified}
-              />
-              <span class="font-normal">{t("user.veriried")}</span>
-            </label>
-          </div>
-        </div>
-      {/if}
-    </div>
-  </div>
+  <DropdownFilter bind:rolesParams={filterRolesParams} bind:statusesParams={filterStatusesParams} on:filter={fetchUsers}  />
 
   <div class="mt-10">
     <h2 class="text-lg font-normal mb-4">
