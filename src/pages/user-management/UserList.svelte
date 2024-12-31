@@ -122,6 +122,18 @@
     }
   }
 
+  $: if (
+    isFilterUser ||
+    isFilterAdmin ||
+    isFilterVerified ||
+    isFilterUnVerified ||
+    isFilterBlocked
+  ) {
+    calculateNumberOfFitler();
+  } else {
+    numberOfFilters = 0;
+  }
+
   const fetchUsers = async () => {
     showLoading();
     const { data, error } = await actions.user.listByTeant({
@@ -137,7 +149,6 @@
       users = users.filter((_user: any) => {
         return _user.email != currentLoggedInUser.email;
       });
-      calculateNumberOfFitler();
     } else {
       log.e(error, "Error fetching users");
     }
