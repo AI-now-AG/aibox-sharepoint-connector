@@ -537,6 +537,7 @@
   </div>
 </div>
 
+<!-- confirm block dialog -->
 <ConfirmDialog
   title={selectedUser?.blocked
     ? t("user.un-block-confirm-message")
@@ -547,6 +548,8 @@
   bind:modal={confirmBlockModal}
   on:confirm={handleBlockingUser}
 />
+
+<!-- confirm delete dialog -->
 <ConfirmDialog
   title={t("user.delete-confirm-message")}
   description={t("user.delete-description-message")}
