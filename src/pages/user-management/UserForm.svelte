@@ -56,6 +56,7 @@
   function checkEnterpriseAuthentication() {
     if (userData && userData.identities) {
       return userData.identities.some((identity: any) => {
+        // TODO: change to use from Auth0 user_id  or AI box pub
         if (IdentityProviders[identity.provider] == identity.provider)
           return true;
       });
