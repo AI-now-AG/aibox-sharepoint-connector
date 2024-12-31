@@ -94,7 +94,6 @@ export async function GET(context: APIContext): Promise<Response> {
           if (users && Array.isArray(users) && users.length > 0) {
             for (let i = 0; i < users.length; i++) {
               const _user = users[i];
-              const { identities = [] } = _user;
 
               const rolesdata = await tenantManagement.getMemberRoles({
                 id: auth0_tenant_id,
@@ -124,7 +123,6 @@ export async function GET(context: APIContext): Promise<Response> {
                   logins_count: _user.logins_count,
                   email_verified: _user.email_verified,
                   blocked: _user.blocked ? _user.blocked : false,
-                  identities,
                 });
               } else {
                 extraUserData = {
@@ -133,7 +131,6 @@ export async function GET(context: APIContext): Promise<Response> {
                   logins_count: _user.logins_count,
                   email_verified: _user.email_verified,
                   blocked: _user.blocked ? _user.blocked : false,
-                  identities,
                 };
               }
             }

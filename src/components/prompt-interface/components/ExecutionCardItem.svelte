@@ -19,7 +19,6 @@
 
   let options: Option[] = [
     {
-      id: "1",
       icon: svgIcons.edit,
       text: t("common.edit"),
       action: () => {
@@ -27,7 +26,6 @@
       },
     },
     {
-      id: "2",
       icon: svgIcons.duplicate,
       text: t("common.duplicate"),
       action: () => {
@@ -35,7 +33,6 @@
       },
     },
     {
-      id: "3",
       icon: svgIcons.reOrder,
       text: t("common.change-order"),
       action: () => {
@@ -43,7 +40,6 @@
       },
     },
     {
-      id: "4",
       icon: svgIcons.trash,
       text: t("common.delete"),
       action: () => {
