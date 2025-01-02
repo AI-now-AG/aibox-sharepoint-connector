@@ -73,18 +73,8 @@
     await fetchUsers();
   });
 
-  function getRoleString(roles: string[]) {
-    let isAdmin = false;
-    for (let i = 0; i < roles?.length; i++) {
-      const role = roles[i];
-      if (role == UserRole.SuperAdmin) {
-        isAdmin = true;
-        break;
-      } else if (role == UserRole.Admin) {
-        isAdmin = true;
-        break;
-      }
-    }
+  function getRoleString(roles: string[] = []) {
+    const isAdmin = roles?.some(role => [UserRole.SuperAdmin, UserRole.Admin].includes(role));
     return isAdmin ? t("user.admin") : t("user.user");
   }
 
@@ -101,16 +91,11 @@
   async function handleBlockingUser() {
     showLoading();
     const { _id = "", blocked } = selectedUser;
-    let result;
-    if (blocked) {
-      result = await actions.user.unblock({
-        _id,
-      });
-    } else {
-      result = await actions.user.block({
-        _id,
-      });
-    }
+    const  result = await actions.user.updateBlocked({
+      _id,
+      blocked: !blocked
+    });
+
     hideLoading();
     const { error } = result;
     log.d(result, "updateUserStatus result");

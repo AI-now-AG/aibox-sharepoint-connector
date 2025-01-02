@@ -80,7 +80,7 @@ export const tenant = {
       const { id: organizationId } = organizationResult.data;
       const tenant: Partial<Omit<Tenant, "_id">> = {
         ...input,
-        ...{ org_id: organizationId },
+        org_id: organizationId,
       };
       const insertResult = await TenantModel.create(tenant);
 
@@ -91,14 +91,14 @@ export const tenant = {
   update: defineAction({
     input: z.intersection(TenantInputParamsSchema, TenantInputIdentifierSchema),
     handler: async (input) => {
-      // update tenant on mongodb
-      const tenant: Partial<Tenant> = {
+      // Update tenant in the local database.
+      const update: Partial<Tenant> = {
         ...input,
-        ...{ _id: new ObjectId(input._id) },
+        _id: new ObjectId(input._id),
       };
-      const updatedDocument = await TenantModel.update(input._id, tenant);
+      const updatedDocument = await TenantModel.update(input._id, update);
 
-      // update existing organization on auth0
+      // Update an existing organization in Auth0
       const bodyParameters: PatchOrganizationsByIdRequest = {
         name: input.org_name,
         display_name: input.name,

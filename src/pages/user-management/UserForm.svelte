@@ -47,45 +47,35 @@
   let mode = user == undefined ? MODE.Create : MODE.Edit;
   let userData = user == undefined ? {} : user;
 
-  let isEnterpriseAuthentication = false;
-  let isDisbaleUpdateRole = false;
+  let isEnterpriseAuth = false;
+  let isUpdateRoleDisabled = false;
 
-  function checkEnterpriseAuthentication() {
-    const parts = userData?.user_id.split("|");
+  function checkEnterpriseAuth() {
+    const parts = userData?.auth0_sub?.split("|");
     const provider = parts[0];
     return enterpriseProviders.includes(provider);
   }
 
   // Important note: User created on Auth0 with super admin , just the Admin on AI box when go into the detail screen
   let role = UserRole.User;
-  function getUserRole(roles: string[]) {
-    for (let i = 0; i < roles?.length; i++) {
-      const _role = roles[i];
-      if (_role == UserRole.SuperAdmin || _role == UserRole.Admin) {
-        return UserRole.Admin;
-      }
-    }
-    return UserRole.User;
+  function getUserRole(roles: string[] = []): string {
+    return roles?.some(role => role === UserRole.SuperAdmin || role === UserRole.Admin)
+      ? UserRole.Admin
+      : UserRole.User;
   }
 
-  function isSuperAdmin(roles: string[]) {
-    for (let i = 0; i < roles?.length; i++) {
-      const _role = roles[i];
-      if (_role == UserRole.SuperAdmin) {
-        return true;
-      }
-    }
-    return false;
+  function isSuperAdmin(roles: string[] = []): boolean {
+    return roles?.some(role => role === UserRole.SuperAdmin);
   }
 
   onMount(() => {
     if (isSuperAdmin(userData.roles)) {
-      isDisbaleUpdateRole = true;
+      isUpdateRoleDisabled = true;
       role = UserRole.SuperAdmin;
     } else {
       role = getUserRole(userData.roles);
     }
-    isEnterpriseAuthentication = checkEnterpriseAuthentication();
+    isEnterpriseAuth = checkEnterpriseAuth();
   });
 
   function getUserStatus(isBlocked: boolean, isVerified: boolean) {
@@ -168,16 +158,11 @@
   async function handleBlockingUser() {
     showLoading();
     const { _id = "", blocked } = userData;
-    let result;
-    if (blocked) {
-      result = await actions.user.unblock({
-        _id,
-      });
-    } else {
-      result = await actions.user.block({
-        _id,
-      });
-    }
+    const result = await actions.user.updateBlocked({
+      _id,
+      blocked: !blocked
+    });
+
     hideLoading();
     const { error } = result;
     log.d(result, "updateUserStatus result");
@@ -270,7 +255,7 @@
           on:inputChange={(event) => {
             userData.name = event.detail.value;
           }}
-          disabled={isEnterpriseAuthentication}
+          disabled={isEnterpriseAuth}
           required
         />
       </div>
@@ -284,7 +269,7 @@
           on:inputChange={(event) => {
             userData.email = event.detail.value;
           }}
-          disabled={isEnterpriseAuthentication}
+          disabled={isEnterpriseAuth}
           required
         />
       </div>
@@ -305,7 +290,7 @@
             on:change={() => {
               role = UserRole.Admin;
             }}
-            disabled={isDisbaleUpdateRole}
+            disabled={isUpdateRoleDisabled}
           />
           <label for="role-admin" class="ml-2 font-medium text-sm"
             >{t("user.admin")}</label
@@ -322,7 +307,7 @@
             on:change={() => {
               role = UserRole.User;
             }}
-            disabled={isDisbaleUpdateRole}
+            disabled={isUpdateRoleDisabled}
           />
           <label for="role-user" class="ml-2 font-medium text-sm"
             >{t("user.user")}</label

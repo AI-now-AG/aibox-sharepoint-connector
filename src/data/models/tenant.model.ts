@@ -114,9 +114,7 @@ export default {
     const validated = TenantSchema.partial().parse(update);
     const doc = {
       ...validated,
-      ...{
-        updated_at: new Date(),
-      },
+      updated_at: new Date(),
     };
     return await collection.findOneAndUpdate(
       { _id: objectId },

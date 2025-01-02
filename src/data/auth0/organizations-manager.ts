@@ -11,6 +11,8 @@ import type {
   PostMembersRequest,
   PostOrganizationMemberRolesOperationRequest,
   PostOrganizationMemberRolesRequest,
+  DeleteOrganizationMemberRolesOperationRequest,
+  DeleteOrganizationMemberRolesRequest,
 } from "auth0";
 
 export const create = async (bodyParameters: PostOrganizationsRequest) => {
@@ -136,6 +138,30 @@ export const addMemberRoles = async (
   }
 };
 
+export const deleteMemberRoles = async (
+  id: string,
+  userId: string,
+  roles: string[],
+) => {
+  try {
+    const requestParameters: DeleteOrganizationMemberRolesOperationRequest = {
+      id,
+      user_id: userId,
+    };
+    const bodyParameters: DeleteOrganizationMemberRolesRequest = {
+      roles,
+    };
+
+    return await management.organizations.deleteMemberRoles(
+      requestParameters,
+      bodyParameters,
+    );
+  } catch (err) {
+    console.log("auth0: organization add member roles error", err);
+    throw err;
+  }
+};
+
 export default {
   create,
   update,
@@ -144,4 +170,5 @@ export default {
   getMemberRoles,
   addMembers,
   addMemberRoles,
+  deleteMemberRoles,
 };
