@@ -381,7 +381,7 @@
 
         <div class="w-full h-[1px] bg-slate-200 mt-2 mb-8"></div>
 
-        {#if userData.email != currentUser.email}
+        {#if userData.email != $currentUser.email}
           <div class="flex items-center">
             <button
               class="flex items-centertext-gray-700 font-sans"

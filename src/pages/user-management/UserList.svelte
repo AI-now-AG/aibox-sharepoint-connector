@@ -6,7 +6,7 @@
   import log from "$utils/log";
   import { addToast } from "$stores/toast";
   import Loading from "$components/Loading.svelte";
-  import { loading, showLoading, hideLoading } from "$stores";
+  import { user as currentUser, loading, showLoading, hideLoading } from "$stores";
   import { formatDateToDDMMYY } from "$utils/common";
   import DropdownSection from "$components/DropdownSection.svelte";
   import { type Option } from "$components/DropdownOptions.svelte";
@@ -20,7 +20,6 @@
   const t = useTranslations();
 
   export let tenantId: string = "";
-  export let currentLoggedInUser: any = "";
 
   let colDatas: ColumnData[] = [
     { colId: "name", colName: t("common.name"), colCssClases: "w-auto" },
@@ -159,7 +158,7 @@
         },
       },
     ];
-    if (user.email != currentLoggedInUser.email) {
+    if (user.email != $currentUser.email) {
       options.unshift({
         icon: svgIcons.trash,
         text: t("common.delete"),

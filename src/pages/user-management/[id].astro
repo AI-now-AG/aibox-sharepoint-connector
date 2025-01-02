@@ -17,13 +17,10 @@ if (id === undefined) {
 }
 
 const user = await UserModel.get(id);
-console.log("user", user);
 if (user === null) {
   console.error("User not found");
   return Astro.redirect("/404");
 }
-
-const currentLoggedInUser = Astro.locals.user;
 
 log.i(user, "user");
 
