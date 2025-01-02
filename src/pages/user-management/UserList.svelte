@@ -40,6 +40,10 @@
   let searchValue: string = "";
   let filterRolesParams: any[] = [];
   let filterStatusesParams: any = {};
+  let previousFilterState: string = JSON.stringify({
+    ...filterRolesParams,
+    ...filterStatusesParams,
+  });
 
   let selectedUser: any;
   let confirmBlockModal: HTMLDialogElement;
@@ -54,7 +58,10 @@
       ...filterStatusesParams,
     });
     hideLoading();
-
+    previousFilterState = JSON.stringify({
+      ...filterRolesParams,
+      ...filterStatusesParams,
+    });
     if (!error) {
       users = data;
     } else {
@@ -194,7 +201,15 @@
   <DropdownFilter
     bind:rolesParams={filterRolesParams}
     bind:statusesParams={filterStatusesParams}
-    on:filter={fetchUsers}
+    on:filter={() => {
+      const currentFilterState = JSON.stringify({
+        ...filterRolesParams,
+        ...filterStatusesParams,
+      });
+      if (currentFilterState != previousFilterState) {
+        fetchUsers();
+      }
+    }}
   />
 
   <div class="mt-10">
