@@ -5,8 +5,6 @@
   import { addToast } from "$stores/toast";
   import Input from "$components/Input/Input.svelte";
 
-  export let userId: string = "";
-  export let auth0Sub: string = "";
   export let name: string = "";
   export let email: string = "";
   export let organization: string = "";
@@ -22,8 +20,6 @@
     try {
       await actions.auth.updateProfile.orThrow({
         name,
-        id: userId,
-        auth0Sub,
       });
       addToast({
         message: "Profile updated successfully",
