@@ -18,7 +18,7 @@
       return datas;
     }
 
-    datas = datas.sort((a: any, b: any) => {
+    datas = datas?.sort((a: any, b: any) => {
       if (sortDirection === "asc") {
         if (typeof a[col] === "string") {
           return a[col].localeCompare(b[col]);

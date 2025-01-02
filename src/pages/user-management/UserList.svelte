@@ -20,7 +20,6 @@
   export let tenantId: string = "";
   export let currentLoggedInUser: any = "";
 
-  let users: any = [];
   let colCssClasses: string[] = [
     "w-auto",
     "w-auto",
@@ -48,6 +47,7 @@
     "",
     "",
   ];
+  let users: any = [];
 
   let searchValue: string = "";
   let filterRolesParams: any[] = [];
