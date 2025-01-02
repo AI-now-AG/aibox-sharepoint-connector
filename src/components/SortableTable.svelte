@@ -1,8 +1,14 @@
+<script lang="ts" context="module">
+  export interface ColumnData {
+    colId?: string;
+    colName?: string;
+    colCssClases?: string;
+  }
+</script>
+
 <script lang="ts">
-  export let colCssClasses: string[] = [];
-  export let colIds: string[] = [];
-  export let colNames: string[] = [];
-  export let datas: any[] = [];
+  export let colDatas: ColumnData[] = [];
+  export let rowDatas: any[] = [];
 
   let sortColumn = "";
   let sortDirection = "asc";
@@ -15,10 +21,10 @@
       sortDirection = "asc";
     }
     if (col == undefined || col == "") {
-      return datas;
+      return rowDatas;
     }
 
-    datas = datas?.sort((a: any, b: any) => {
+    rowDatas = rowDatas?.sort((a: any, b: any) => {
       if (sortDirection === "asc") {
         if (typeof a[col] === "string") {
           return a[col].localeCompare(b[col]);
@@ -49,22 +55,22 @@
   style="font-family:Inter;"
 >
   <colgroup>
-    {#each colNames as _colName, colIndex}
-      <col class={colCssClasses[colIndex] ?? "w-auto"} />
+    {#each colDatas as data}
+      <col class={data.colCssClases ?? "w-auto"} />
     {/each}
   </colgroup>
   <thead>
     <tr class="bg-base-300 rounded-lg">
-      {#each colNames as colName, colIndex}
+      {#each colDatas as data, colIndex}
         <th
           class={"py-3 px-4 text-left font-normal text-xs" +
-            getFirstLastColCssClass(colIndex, colCssClasses.length)}
-          on:click={() => sort(colIds[colIndex] ?? "")}
+            getFirstLastColCssClass(colIndex, colDatas.length)}
+          on:click={() => sort(data.colId ?? "")}
         >
-          {colName}
+          {data.colName}
           <span class="ml-2">
-            {colIds[colIndex]
-              ? sortColumn === colIds[colIndex]
+            {data.colId
+              ? sortColumn === data.colId
                 ? sortDirection === "asc"
                   ? "▲"
                   : "▼"

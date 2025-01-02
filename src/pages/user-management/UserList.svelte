@@ -13,39 +13,27 @@
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import InputSearch from "./InputSearch.svelte";
   import DropdownFilter, { UserRole } from "./DropdownFilter.svelte";
-  import SortableTable from "$components/SortableTable.svelte";
+  import SortableTable, {
+    type ColumnData,
+  } from "$components/SortableTable.svelte";
 
   const t = useTranslations();
 
   export let tenantId: string = "";
   export let currentLoggedInUser: any = "";
 
-  let colCssClasses: string[] = [
-    "w-auto",
-    "w-auto",
-    "w-28",
-    "w-40",
-    "w-56",
-    "w-auto",
-    "w-28",
-  ];
-  let colIds: string[] = [
-    "name",
-    "email",
-    "",
-    "logins_count",
-    "last_login",
-    "",
-    "",
-  ];
-  let colNames: string[] = [
-    t("common.name"),
-    t("user.e-mail"),
-    t("user.role"),
-    t("user.logins"),
-    t("user.latest-login"),
-    "",
-    "",
+  let colDatas: ColumnData[] = [
+    { colId: "name", colName: t("common.name"), colCssClases: "w-auto" },
+    { colId: "email", colName: t("user.e-mail"), colCssClases: "w-auto" },
+    { colId: "", colName: t("user.role"), colCssClases: "w-28" },
+    { colId: "logins_count", colName: t("user.logins"), colCssClases: "w-40" },
+    {
+      colId: "last_login",
+      colName: t("user.latest-login"),
+      colCssClases: "w-56",
+    },
+    { colId: "", colName: "", colCssClases: "w-auto" },
+    { colId: "", colName: "", colCssClases: "w-28" },
   ];
   let users: any = [];
 
@@ -215,7 +203,7 @@
     </h2>
 
     <div class="relative">
-      <SortableTable {colCssClasses} {colIds} {colNames} bind:datas={users}>
+      <SortableTable {colDatas} bind:rowDatas={users}>
         {#each users as user}
           <tr class="h-16 bg-base-100 hover:bg-base-300 text-sm rounded-lg">
             <td class="py-3 px-4 text-sm font-medium rounded-l-lg">
