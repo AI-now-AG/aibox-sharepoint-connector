@@ -170,6 +170,7 @@ export const user = {
           name: input.name,
           email: input.email,
           roles: input.roles,
+          permissions: assignPermissions(input.roles),
         };
         const updatedDocument = await UserModel.update(input._id, update);
 
