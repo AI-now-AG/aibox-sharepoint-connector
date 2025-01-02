@@ -9,7 +9,7 @@
   import Loading from "$components/Loading.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import AlertDialog from "$components/AlertDialog.svelte";
-  import { user as currentUser } from "$stores";
+  import { tenant, user as currentUser } from "$stores";
   import { loading, showLoading, hideLoading } from "$stores";
   import log from "$utils/log";
   import moment from "moment";
@@ -359,7 +359,7 @@
               </tr>
               <tr class="">
                 <td class="text-gray-400">{t("user.organization")}</td>
-                <td class="text-base">{tenant?.name ?? "-"}</td>
+                <td class="text-base">{$tenant?.name ?? "-"}</td>
               </tr>
             </table>
           </div>
