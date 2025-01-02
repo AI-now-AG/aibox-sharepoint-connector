@@ -12,18 +12,12 @@
   import { type Option } from "$components/DropdownOptions.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import InputSearch from "./InputSearch.svelte";
-  import DropdownFilter from "./DropdownFilter.svelte";
+  import DropdownFilter, { UserRole } from "./DropdownFilter.svelte";
 
   const t = useTranslations();
 
   export let tenantId: string = "";
   export let currentLoggedInUser: any = "";
-
-  const enum UserRole {
-    Admin = "Admin",
-    SuperAdmin = "Super Admin",
-    User = "User",
-  }
 
   let users: any = [];
 
@@ -205,9 +199,13 @@
 </script>
 
 <div class="container max-w-full mx-auto p-6">
-  <InputSearch bind:value={searchValue} on:search={fetchUsers}  />
+  <InputSearch bind:value={searchValue} on:search={fetchUsers} />
 
-  <DropdownFilter bind:rolesParams={filterRolesParams} bind:statusesParams={filterStatusesParams} on:filter={fetchUsers}  />
+  <DropdownFilter
+    bind:rolesParams={filterRolesParams}
+    bind:statusesParams={filterStatusesParams}
+    on:filter={fetchUsers}
+  />
 
   <div class="mt-10">
     <h2 class="text-lg font-normal mb-4">

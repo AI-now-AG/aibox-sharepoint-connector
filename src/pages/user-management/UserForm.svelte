@@ -14,18 +14,13 @@
   import moment from "moment";
   import Input from "$components/Input/Input.svelte";
   import { isValidEmail } from "$utils/common";
+  import { UserRole } from "./DropdownFilter.svelte";
 
   const t = useTranslations();
 
   export let user: any;
   export let tenant: any;
   export let currentLoggedInUser: any = "";
-
-  const enum UserRole {
-    Admin = "Admin",
-    SuperAdmin = "Super Admin",
-    User = "User",
-  }
 
   // List of enterprise providers
   const enterpriseProviders = [

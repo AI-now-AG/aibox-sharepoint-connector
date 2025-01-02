@@ -1,3 +1,11 @@
+<script lang="ts" context="module">
+  export enum UserRole {
+    Admin = "Admin",
+    SuperAdmin = "Super Admin",
+    User = "User",
+  }
+</script>
+
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import { svgIcons } from "$assets/icons";
@@ -5,12 +13,6 @@
 
   const dispatch = createEventDispatcher();
   const t = useTranslations();
-
-  const enum UserRole {
-    Admin = "Admin",
-    SuperAdmin = "Super Admin",
-    User = "User",
-  }
 
   let showFilter = false;
   let numberOfFilters = 0;
@@ -21,12 +23,12 @@
   // roles
   let isUserChecked: boolean = false;
   let isAdminChecked: boolean = false;
-  
+
   // statuses
   let isVerifiedChecked: boolean = false;
   let isUnVerifiedChecked: boolean = false;
   let isBlockedChecked: boolean = false;
-  
+
   $: if (isUserChecked) {
     rolesParams.push(UserRole.User);
   } else {
@@ -117,116 +119,114 @@
   }
 </script>
 
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-no-static-element-interactions -->
 <div class="mt-3">
-  <!-- svelte-ignore a11y-click-events-have-key-events -->
-  <!-- svelte-ignore a11y-no-static-element-interactions -->
   <div
-    class=""
-    on:click={() => {
+    class="btn btn-sm btn-active font-normal bg-base-200"
+    on:click|stopPropagation={() => {
       handleClickFilter();
     }}
   >
-    <div class="btn btn-sm btn-active font-normal bg-base-200">
-      {@html svgIcons.filter}
-      {t("common.filter")}
-      {#if numberOfFilters > 0}
-        <div class="badge badge-primary badge-md">{numberOfFilters}</div>
-      {/if}
-      {@html svgIcons.arrowDownFill}
-    </div>
-
-    {#if showFilter}
-      <div
-        class="menu bg-base-100 rounded-xl z-[1] p-3 shadow w-52 mt-1 absolute"
-      >
-        <div class="flex justify-center items-center">
-          <span class="flex-1 text-left text-sm font-bold"
-            >{t("common.filter")}</span
-          >
-          <button
-            class="btn btn-default btn-sm"
-            on:click|stopPropagation={() => {
-              showFilter = false;
-              dispatch("filter");
-            }}
-          >
-            {@html svgIcons.filter}</button
-          >
-        </div>
-
-        <div class="w-full h-[1px] bg-slate-200 mt-2 mb-2"></div>
-
-        <div class="w-full text-sm">
-          <div class="w-full text-left">{t("user.role")}</div>
-          <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-          <label
-            on:click|stopPropagation={() => null}
-            class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
-          >
-            <input
-              type="checkbox"
-              class="checkbox checkbox-sm checkbox-neutral mr-2"
-              bind:checked={isUserChecked}
-            />
-            <span class="font-normal">{t("user.user")}</span>
-          </label>
-
-          <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-          <label
-            on:click|stopPropagation={() => null}
-            class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
-          >
-            <input
-              type="checkbox"
-              class="checkbox checkbox-sm checkbox-neutral mr-2"
-              bind:checked={isAdminChecked}
-            />
-            <span class="font-normal">{t("user.admin")}</span>
-          </label>
-        </div>
-
-        <div class="w-full mt-4">
-          <div class="w-full text-left">{t("user.status")}</div>
-          <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-          <label
-            on:click|stopPropagation={() => null}
-            class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
-          >
-            <input
-              type="checkbox"
-              class="checkbox checkbox-sm checkbox-neutral mr-2"
-              bind:checked={isBlockedChecked}
-            />
-            <span class="font-normal">{t("common.block")}</span>
-          </label>
-
-          <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-          <label
-            on:click|stopPropagation={() => null}
-            class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
-          >
-            <input
-              type="checkbox"
-              class="checkbox checkbox-sm checkbox-neutral mr-2"
-              bind:checked={isUnVerifiedChecked}
-            />
-            <span class="font-normal">{t("user.un-veriried")}</span>
-          </label>
-
-          <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-          <label
-            on:click|stopPropagation={() => null}
-            class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
-          >
-            <input
-              type="checkbox"
-              class="checkbox checkbox-sm checkbox-neutral mr-2"
-              bind:checked={isVerifiedChecked}
-            />
-            <span class="font-normal">{t("user.veriried")}</span>
-          </label>
-        </div>
-      </div>
+    {@html svgIcons.filter}
+    {t("common.filter")}
+    {#if numberOfFilters > 0}
+      <div class="badge badge-primary badge-md">{numberOfFilters}</div>
     {/if}
+    {@html svgIcons.arrowDownFill}
   </div>
+
+  {#if showFilter}
+    <div
+      class="menu bg-base-100 rounded-xl z-[1] p-3 shadow w-52 mt-1 absolute"
+    >
+      <div class="flex justify-center items-center">
+        <span class="flex-1 text-left text-sm font-bold"
+          >{t("common.filter")}</span
+        >
+        <button
+          class="btn btn-default btn-sm"
+          on:click|stopPropagation={() => {
+            showFilter = false;
+            dispatch("filter");
+          }}
+        >
+          {@html svgIcons.filter}</button
+        >
+      </div>
+
+      <div class="w-full h-[1px] bg-slate-200 mt-2 mb-2"></div>
+
+      <div class="w-full text-sm">
+        <div class="w-full text-left">{t("user.role")}</div>
+        <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+        <label
+          on:click|stopPropagation={() => null}
+          class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
+        >
+          <input
+            type="checkbox"
+            class="checkbox checkbox-sm checkbox-neutral mr-2"
+            bind:checked={isUserChecked}
+          />
+          <span class="font-normal">{t("user.user")}</span>
+        </label>
+
+        <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+        <label
+          on:click|stopPropagation={() => null}
+          class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
+        >
+          <input
+            type="checkbox"
+            class="checkbox checkbox-sm checkbox-neutral mr-2"
+            bind:checked={isAdminChecked}
+          />
+          <span class="font-normal">{t("user.admin")}</span>
+        </label>
+      </div>
+
+      <div class="w-full mt-4">
+        <div class="w-full text-left">{t("user.status")}</div>
+        <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+        <label
+          on:click|stopPropagation={() => null}
+          class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
+        >
+          <input
+            type="checkbox"
+            class="checkbox checkbox-sm checkbox-neutral mr-2"
+            bind:checked={isBlockedChecked}
+          />
+          <span class="font-normal">{t("common.block")}</span>
+        </label>
+
+        <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+        <label
+          on:click|stopPropagation={() => null}
+          class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
+        >
+          <input
+            type="checkbox"
+            class="checkbox checkbox-sm checkbox-neutral mr-2"
+            bind:checked={isUnVerifiedChecked}
+          />
+          <span class="font-normal">{t("user.un-veriried")}</span>
+        </label>
+
+        <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+        <label
+          on:click|stopPropagation={() => null}
+          class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
+        >
+          <input
+            type="checkbox"
+            class="checkbox checkbox-sm checkbox-neutral mr-2"
+            bind:checked={isVerifiedChecked}
+          />
+          <span class="font-normal">{t("user.veriried")}</span>
+        </label>
+      </div>
+    </div>
+  {/if}
 </div>
