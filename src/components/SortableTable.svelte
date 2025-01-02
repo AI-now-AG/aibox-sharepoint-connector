@@ -50,7 +50,7 @@
 >
   <colgroup>
     {#each colNames as _colName, colIndex}
-      <col class={colCssClasses[colIndex] ?? ""} />
+      <col class={colCssClasses[colIndex] ?? "w-auto"} />
     {/each}
   </colgroup>
   <thead>
