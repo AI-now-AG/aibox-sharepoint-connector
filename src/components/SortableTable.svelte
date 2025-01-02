@@ -49,8 +49,8 @@
   style="font-family:Inter;"
 >
   <colgroup>
-    {#each colCssClasses as cssClasses, colIndex}
-      <col class={cssClasses ?? ""} />
+    {#each colNames as _colName, colIndex}
+      <col class={colCssClasses[colIndex] ?? ""} />
     {/each}
   </colgroup>
   <thead>
