@@ -1,12 +1,16 @@
 import management from "$data/auth0/management-client";
-import {
-  type DeleteEnabledConnectionsByConnectionIdRequest,
-  type GetOrganizationMemberRolesRequest,
-  type PatchOrganizationsByIdOperationRequest,
-  type PatchOrganizationsByIdRequest,
-  type PostEnabledConnectionsOperationRequest,
-  type PostEnabledConnectionsRequest,
-  type PostOrganizationsRequest,
+import type {
+  DeleteEnabledConnectionsByConnectionIdRequest,
+  GetOrganizationMemberRolesRequest,
+  PatchOrganizationsByIdOperationRequest,
+  PatchOrganizationsByIdRequest,
+  PostEnabledConnectionsOperationRequest,
+  PostEnabledConnectionsRequest,
+  PostOrganizationsRequest,
+  PostMembersOperationRequest,
+  PostMembersRequest,
+  PostOrganizationMemberRolesOperationRequest,
+  PostOrganizationMemberRolesRequest,
 } from "auth0";
 
 export const create = async (bodyParameters: PostOrganizationsRequest) => {
@@ -89,10 +93,55 @@ export const getMemberRoles = async (
   }
 };
 
+export const addMembers = async (id: string, members: string[]) => {
+  try {
+    const requestParameters: PostMembersOperationRequest = {
+      id,
+    };
+    const bodyParameters: PostMembersRequest = {
+      members,
+    };
+
+    return await management.organizations.addMembers(
+      requestParameters,
+      bodyParameters,
+    );
+  } catch (err) {
+    console.log("auth0: organization add members error", err);
+    throw err;
+  }
+};
+
+export const addMemberRoles = async (
+  id: string,
+  userId: string,
+  roles: string[],
+) => {
+  try {
+    const requestParameters: PostOrganizationMemberRolesOperationRequest = {
+      id,
+      user_id: userId,
+    };
+    const bodyParameters: PostOrganizationMemberRolesRequest = {
+      roles,
+    };
+
+    return await management.organizations.addMemberRoles(
+      requestParameters,
+      bodyParameters,
+    );
+  } catch (err) {
+    console.log("auth0: organization add member roles error", err);
+    throw err;
+  }
+};
+
 export default {
   create,
   update,
   addEnabledConnection,
   deleteEnabledConnection,
   getMemberRoles,
+  addMembers,
+  addMemberRoles,
 };

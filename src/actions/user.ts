@@ -13,9 +13,10 @@ import {
 } from "$data/models/user.model";
 import UserModel from "$data/models/user.model";
 import usersManagement from "$data/auth0/users-manager";
+import organizationsManagement from "$data/auth0/organizations-manager";
+import rolesManagement from "$data/auth0/roles-manager";
 
 const UserInputParamsSchema = z.object({
-  tenant_id: z.string(),
   name: z.string(),
   email: z.string(),
   roles: z.array(z.nativeEnum(UserRole)),
@@ -28,6 +29,25 @@ const UserInputIdentifierSchema = z.object({
 const TenantInputIdentifierSchema = z.object({
   tenantId: z.string(),
 });
+
+const addMemberRoles = async (
+  organizationId: string,
+  userId: string,
+  roles: string[],
+) => {
+  const allRoles = await rolesManagement.getAll();
+  const selectedRoles = allRoles.data
+    .filter((role) => {
+      return roles.includes(role.name);
+    })
+    .map((role) => role.id);
+
+  await organizationsManagement.addMemberRoles(
+    organizationId,
+    userId,
+    selectedRoles,
+  );
+};
 
 export const user = {
   get: defineAction({
@@ -49,7 +69,9 @@ export const user = {
 
   create: defineAction({
     input: UserInputParamsSchema,
-    handler: async (input) => {
+    handler: async (input, context) => {
+      const { _id: tenantId, org_id: organizationId } = context.locals.tenant;
+
       // Create new user in Auth0.
       const bodyParameters: UserCreate = {
         email: input.email,
@@ -59,9 +81,17 @@ export const user = {
       };
       const userResult = await usersManagement.create(bodyParameters);
 
-      // Assign org
+      // Add members to an organization
+      await organizationsManagement.addMembers(organizationId, [
+        userResult.data.user_id,
+      ]);
 
-      // Org Roles?
+      // Add member roles
+      await addMemberRoles(
+        organizationId,
+        userResult.data.user_id,
+        input.roles,
+      );
 
       // Create new user in the local database.
       const user: Partial<Omit<User, "_id">> = {
@@ -71,7 +101,7 @@ export const user = {
         email: input.email,
         roles: input.roles,
         permissions: assignPermissions(input.roles),
-        tenant_id: new ObjectId(input.tenant_id),
+        tenant_id: tenantId,
       };
       const insertResult = await UserModel.add(user);
 

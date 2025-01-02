@@ -9,7 +9,7 @@
   import Loading from "$components/Loading.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import AlertDialog from "$components/AlertDialog.svelte";
-  import { tenant, user as currentUser } from "$stores";
+  import { user as currentUser } from "$stores";
   import { loading, showLoading, hideLoading } from "$stores";
   import log from "$utils/log";
   import moment from "moment";
@@ -120,7 +120,7 @@
     if (validateForm()) {
       try {
         showLoading();
-        userData = { ...userData, roles: [role], tenant_id: $tenant._id };
+        userData = { ...userData, roles: [role]};
         const { error } = await actions.user.create(userData);
         hideLoading();
         if (error) {
