@@ -1,7 +1,7 @@
 import { defineAction } from "astro:actions";
-import {
-  type PatchOrganizationsByIdRequest,
-  type PostOrganizationsRequest,
+import type {
+  PatchOrganizationsByIdRequest,
+  PostOrganizationsRequest,
 } from "auth0";
 import { ObjectId } from "mongodb";
 import { z } from "zod";
@@ -9,7 +9,7 @@ import { decrypt, encrypt } from "$utils/secure";
 import { transformRawData } from "$utils/transformRawData";
 
 import organizationsManagement from "$data/auth0/organizations-manager";
-import tenantModel, {
+import TenantModel, {
   ApiKeyProvider,
   IncludedFeaturesSchema,
   TenantFilterParamsSchema,
@@ -46,7 +46,7 @@ export const tenant = {
   get: defineAction({
     input: TenantInputIdentifierSchema,
     handler: async (input) => {
-      const data = await tenantModel.get(input._id);
+      const data = await TenantModel.get(input._id);
       return transformRawData(data);
     },
   }),
@@ -54,7 +54,7 @@ export const tenant = {
   list: defineAction({
     input: TenantFilterParamsSchema,
     handler: async (input) => {
-      const data = await tenantModel.list(input);
+      const data = await TenantModel.list(input);
       return transformRawData(data);
     },
   }),
@@ -78,11 +78,11 @@ export const tenant = {
 
       // store tenant on mongodb
       const { id: organizationId } = organizationResult.data;
-      const tenant: Omit<Tenant, "_id"> = {
+      const tenant: Partial<Omit<Tenant, "_id">> = {
         ...input,
         ...{ org_id: organizationId },
       };
-      const insertResult = await tenantModel.create(tenant);
+      const insertResult = await TenantModel.create(tenant);
 
       return transformRawData(insertResult);
     },
@@ -96,7 +96,7 @@ export const tenant = {
         ...input,
         ...{ _id: new ObjectId(input._id) },
       };
-      const updatedDocument = await tenantModel.update(input._id, tenant);
+      const updatedDocument = await TenantModel.update(input._id, tenant);
 
       // update existing organization on auth0
       const bodyParameters: PatchOrganizationsByIdRequest = {
@@ -115,7 +115,7 @@ export const tenant = {
   active: defineAction({
     input: TenantInputIdentifierSchema,
     handler: async (input) => {
-      const updateResult = await tenantModel.active(input._id);
+      const updateResult = await TenantModel.active(input._id);
       return transformRawData(updateResult);
     },
   }),
@@ -123,7 +123,7 @@ export const tenant = {
   archive: defineAction({
     input: TenantInputIdentifierSchema,
     handler: async (input) => {
-      const updateResult = await tenantModel.archive(input._id);
+      const updateResult = await TenantModel.archive(input._id);
       return transformRawData(updateResult);
     },
   }),

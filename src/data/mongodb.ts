@@ -10,5 +10,5 @@ export type Document<T> = T & {
 
 const options = {};
 
-const mongo = new MongoClient(import.meta.env.MONGODB_URI, options);
-export const db = mongo.db(import.meta.env.MONGODB_DATABASE);
+export const client = new MongoClient(import.meta.env.MONGODB_URI, options);
+export const db = client.db(import.meta.env.MONGODB_DATABASE);

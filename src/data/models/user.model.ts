@@ -33,14 +33,20 @@ const UserSchema = z.object({
   email: z.string(),
   picture: z.string().url().optional(),
   roles: z.array(z.nativeEnum(UserRole)).default(() => [UserRole.User]),
-  created_at: z.date().default(() => new Date()),
-  updated_at: z.date().default(() => new Date()),
+  created_at: z
+    .date()
+    .optional()
+    .default(() => new Date()),
+  updated_at: z
+    .date()
+    .optional()
+    .default(() => new Date()),
   permissions: z
     .array(z.nativeEnum(Permission))
     .default(() => [Permission.UserAll]),
   name: z.string(),
-  logins_count: z.number().default(() => 0),
-  last_login: z.string().optional(),
+  logins_count: z.number().default(0),
+  last_login: z.string().nullish().default(null),
   email_verified: z.boolean().default(false),
   blocked: z.boolean().default(false),
   navState: z.record(z.string(), z.boolean()).optional(),
@@ -48,20 +54,12 @@ const UserSchema = z.object({
 
 export const UserFilterParamsSchema = z.object({
   searchValue: z.string().nullish(),
-});
-
-export const UserTenantFilterParamsSchema = z.object({
-  tenantId: z.string(),
-  searchValue: z.string().nullish(),
   roles: z.array(z.nativeEnum(UserRole)).optional(),
   isBlocked: z.boolean().optional(),
   isVerified: z.boolean().optional(),
   isUnVerified: z.boolean().optional(),
 });
 export type UserFilterParams = z.infer<typeof UserFilterParamsSchema>;
-export type UserTenantFilterParams = z.infer<
-  typeof UserTenantFilterParamsSchema
->;
 export type User = z.infer<typeof UserSchema>;
 
 export const collection = db.collection<User>("oauth_users");
@@ -91,7 +89,7 @@ export async function updateUserData(
 }
 
 export default {
-  add: async (user: Omit<User, "_id">) => {
+  add: async (user: Partial<Omit<User, "_id">>) => {
     const validated = UserSchema.parse({ _id: new ObjectId(), ...user });
     return collection.insertOne(validated);
   },
@@ -112,116 +110,44 @@ export default {
     );
   },
 
-  list: async (filterParams?: UserFilterParams) => {
-    let filter = {};
+  listByTenant: async (tenantId: ObjectId, filterParams?: UserFilterParams) => {
+    const filter: any = {
+      tenant_id: tenantId,
+    };
 
     if (filterParams) {
-      const { searchValue } = filterParams;
-
-      if (searchValue) {
-        filter = {
-          ...filter,
-          ...{
-            name: {
-              $regex: searchValue,
-              $options: "i",
-            },
-          },
-        };
-      }
-    }
-
-    const data = collection.find<Document<User>>(filter);
-    return await data.toArray();
-  },
-
-  listByTenant: async (filterParams?: UserTenantFilterParams) => {
-    let filter = {};
-    if (filterParams) {
-      const {
-        searchValue,
-        tenantId,
-        roles,
-        isBlocked,
-        isVerified,
-        isUnVerified,
-      } = filterParams;
+      const { searchValue, roles, isBlocked, isVerified, isUnVerified } =
+        filterParams;
 
       log.i(filterParams, "filterParams");
 
-      if (tenantId) {
-        filter = {
-          ...filter,
-          ...{ tenant_id: new ObjectId(tenantId) },
-        };
-      }
+      // Add search filter
       if (searchValue) {
-        filter = {
-          ...filter,
-          ...{
-            name: {
-              $regex: searchValue,
-              $options: "i",
-            },
-          },
-        };
+        filter.name = { $regex: searchValue, $options: "i" };
       }
-      if (roles && roles.length > 0) {
-        filter = {
-          ...filter,
-          ...{
-            roles: {
-              $in: roles.map((role) => new RegExp(role, "i")),
-            },
-          },
-        };
+
+      // Add roles filter
+      if (roles && roles?.length > 0) {
+        filter.roles = { $in: roles.map((role) => new RegExp(role, "i")) };
       }
-      if (isBlocked && isVerified && isUnVerified) {
-        /* empty */
-      } else {
-        if (isBlocked === true) {
-          if (isVerified == true) {
-            filter = {
-              ...filter,
-              ...{
-                $or: [{ blocked: true }, { email_verified: true }],
-              },
-            };
-          } else if (isUnVerified == true) {
-            filter = {
-              ...filter,
-              ...{
-                $or: [
-                  { blocked: true },
-                  { email_verified: false },
-                  { email_verified: null },
-                ],
-              },
-            };
-          } else {
-            filter = {
-              ...filter,
-              ...{
-                blocked: true,
-              },
-            };
+
+      // Handle isBlocked, isVerified, and isUnVerified filters
+      const emailVerifiedFilter = [];
+      if (isVerified) {
+        emailVerifiedFilter.push({ email_verified: true });
+      }
+      if (isUnVerified) {
+        emailVerifiedFilter.push({ email_verified: { $in: [false, null] } });
+      }
+      if (isBlocked || isVerified || isUnVerified) {
+        if (isBlocked) {
+          filter.blocked = true;
+          if (emailVerifiedFilter.length > 0) {
+            delete filter.blocked;
+            filter.$or = [{ blocked: true }, ...emailVerifiedFilter];
           }
-        } else {
-          if (isVerified === true && isUnVerified == true) {
-            /* empty */
-          } else if (isVerified === true) {
-            filter = {
-              ...filter,
-              ...{ email_verified: true },
-            };
-          } else if (isUnVerified === true) {
-            filter = {
-              ...filter,
-              ...{
-                $or: [{ email_verified: false }, { email_verified: null }],
-              },
-            };
-          }
+        } else if (emailVerifiedFilter.length > 0) {
+          filter.$or = emailVerifiedFilter;
         }
       }
     }
@@ -230,9 +156,7 @@ export default {
     return await data.toArray();
   },
 
-  get: async (email: string) => collection.findOne<User>({ email }),
-
-  getById: async (id: string) =>
+  get: async (id: string) =>
     collection.findOne<User>({ _id: new ObjectId(id) }),
 
   getAuth0Sub: async (auth0_sub: string) =>

@@ -11,7 +11,7 @@ import {
   FEATURE_SUMMARY_ROUTE,
 } from "$constants";
 import type { APIContext, MiddlewareNext } from "astro";
-import tenantModel, { TenantFeature } from "$data/models/tenant.model";
+import TenantModel, { TenantFeature } from "$data/models/tenant.model";
 import { defaultLang } from "$i18n/ui";
 import { setLanguage } from "$i18n/utils";
 import { wildcardMatch, wildcardMatchInArray } from "$utils/wildcardMatch";
@@ -68,7 +68,7 @@ async function authenticate(context: APIContext, next: MiddlewareNext) {
   context.locals.session = session;
   context.locals.user = user;
 
-  const tenant = await tenantModel.get(user.tenant_id.toString());
+  const tenant = await TenantModel.get(user.tenant_id.toString());
   if (tenant) {
     context.locals.tenant = tenant;
     context.locals.locale = tenant.default_language || defaultLang;

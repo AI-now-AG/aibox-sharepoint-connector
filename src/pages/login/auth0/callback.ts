@@ -8,7 +8,7 @@ import UserModel, {
 import { z } from "zod";
 import log from "$utils/log";
 import TenantModel from "$data/models/tenant.model";
-import userManagement from "$data/auth0/user-manager";
+import usersManagement from "$data/auth0/users-manager";
 import tenantManagement from "$data/auth0/organizations-manager";
 import { sendExceptionToSentry } from "$utils/send-exception-to-sentry";
 
@@ -86,7 +86,7 @@ export async function GET(context: APIContext): Promise<Response> {
       setTimeout(async () => {
         try {
           log.i(auth0_tenant_id, "auth0_tenant_id");
-          const data = await userManagement.getAllUsers({
+          const data = await usersManagement.getAllUsers({
             q: `organization_id: ${auth0_tenant_id}`,
           });
 

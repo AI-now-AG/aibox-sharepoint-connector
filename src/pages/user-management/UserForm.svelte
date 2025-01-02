@@ -9,6 +9,7 @@
   import Loading from "$components/Loading.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import AlertDialog from "$components/AlertDialog.svelte";
+  import { tenant, user as currentUser } from "$stores";
   import { loading, showLoading, hideLoading } from "$stores";
   import log from "$utils/log";
   import moment from "moment";
@@ -18,8 +19,6 @@
   const t = useTranslations();
 
   export let user: any;
-  export let tenant: any;
-  export let currentLoggedInUser: any = "";
 
   const enum UserRole {
     Admin = "Admin",
@@ -126,7 +125,7 @@
     if (validateForm()) {
       try {
         showLoading();
-        userData = { ...userData, roles: [role] };
+        userData = { ...userData, roles: [role], tenant_id: $tenant._id };
         const { error } = await actions.user.create(userData);
         hideLoading();
         if (error) {
@@ -402,7 +401,7 @@
 
         <div class="w-full h-[1px] bg-slate-200 mt-2 mb-8"></div>
 
-        {#if userData.email != currentLoggedInUser.email}
+        {#if userData.email != currentUser.email}
           <div class="flex items-center">
             <button
               class="flex items-centertext-gray-700 font-sans"

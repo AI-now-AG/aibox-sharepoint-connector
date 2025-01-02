@@ -1,7 +1,7 @@
 ---
 import Layout from "$layouts/Layout.astro";
 import TenantForm from "./TenantForm.svelte";
-import tenantModel from "$data/models/tenant.model";
+import TenantModel from "$data/models/tenant.model";
 import { decrypt } from "$utils/secure";
 import { transformRawData } from "$utils/transformRawData";
 
@@ -15,7 +15,7 @@ if (id === undefined) {
   throw new Error("Id is required");
 }
 
-const tenant = await tenantModel.get(id);
+const tenant = await TenantModel.get(id);
 if (tenant === null) {
   console.error("Tenant not found");
   return Astro.redirect("/404");

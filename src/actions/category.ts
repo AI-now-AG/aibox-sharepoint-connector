@@ -1,7 +1,7 @@
 import { defineAction } from "astro:actions";
 import { z } from "zod";
 import { transformRawData } from "$utils/transformRawData";
-import categoryModel, { type Category } from "$data/models/category.model";
+import CategoryModel, { type Category } from "$data/models/category.model";
 
 const CategoryInputIdentifierSchema = z.object({
   _id: z.string(),
@@ -17,7 +17,7 @@ export const category = {
   activate: defineAction({
     input: CategoryInputIdentifierSchema,
     handler: async (input) => {
-      const updateResult = await categoryModel.update(input._id, {
+      const updateResult = await CategoryModel.update(input._id, {
         active: true,
       });
       return transformRawData(updateResult);
@@ -27,7 +27,7 @@ export const category = {
   deactivate: defineAction({
     input: CategoryInputIdentifierSchema,
     handler: async (input) => {
-      const updateResult = await categoryModel.update(input._id, {
+      const updateResult = await CategoryModel.update(input._id, {
         active: false,
       });
       return transformRawData(updateResult);
@@ -39,7 +39,7 @@ export const category = {
     handler: async (input) => {
       const items: Category[] = [];
       for (const [index, item] of input.entries()) {
-        const updateResult = await categoryModel.update(item._id, {
+        const updateResult = await CategoryModel.update(item._id, {
           position: index,
         });
         items.push(transformRawData(updateResult));

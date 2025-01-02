@@ -1,7 +1,7 @@
 ---
 import Layout from "$layouts/Layout.astro";
 import UserForm from "./UserForm.svelte";
-import userModel from "$data/models/user.model";
+import UserModel from "$data/models/user.model";
 import { transformRawData } from "$utils/transformRawData";
 import log from "$utils/log";
 
@@ -16,7 +16,7 @@ if (id === undefined) {
   throw new Error("Id is required");
 }
 
-const user = await userModel.getById(id);
+const user = await UserModel.get(id);
 console.log("user", user);
 if (user === null) {
   console.error("User not found");
@@ -33,8 +33,6 @@ const data = transformRawData(user);
 <Layout>
   <UserForm
     user={data}
-    tenant={tenant}
-    currentLoggedInUser={currentLoggedInUser}
     client:load
   />
 </Layout>
