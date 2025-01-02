@@ -77,10 +77,5 @@
   </thead>
   <tbody>
     <slot></slot>
-    <!-- {#each datas as item}
-      <tr class="h-16 bg-base-100 hover:bg-base-300 text-sm rounded-lg">
-        <slot {item}></slot>
-      </tr>
-    {/each} -->
   </tbody>
 </table>
