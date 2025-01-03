@@ -42,8 +42,10 @@ const syncAuth0Resources: Handler = async (
       const { data } = log;
       const { type: eventType, description } = data;
 
-      console.log(`Event log: ${eventType} / ${description}`);
-      console.dir(log, { depth: null, colors: true });
+      console.log(
+        `Event log: ${eventType} / ${description}`,
+        JSON.stringify(log),
+      );
 
       // Trigger user create
       if (eventType == "sapi" && description == "Create a User") {
