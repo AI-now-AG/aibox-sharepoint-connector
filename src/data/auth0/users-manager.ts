@@ -18,8 +18,12 @@ export const getAllUsers = async (parameters: GetUsersRequest) => {
   }
 };
 
-export const get = async (requestParameters: GetUsersByIdRequest) => {
+export const get = async (userId: string) => {
   try {
+    const requestParameters: GetUsersByIdRequest = {
+      id: userId,
+    };
+
     return await management.users.get(requestParameters);
   } catch (error) {
     console.error("auth0: get user error", error);

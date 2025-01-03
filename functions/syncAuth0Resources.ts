@@ -36,29 +36,33 @@ const syncAuth0Resources: Handler = async (
     const payload = JSON.parse(event.body || "{}");
     const { logs } = payload;
 
+    const createEvents = ["sapi"];
+    const updateEvents = ["sapi"];
+
     // Handle each event type
     for (const log of logs) {
-      console.log("log ----> ", JSON.stringify(log));
-      const { type: eventType } = log;
+      const { type: eventType, description } = log;
 
-      switch (eventType) {
-        case "user.created":
-          // Sync user to the local database
-          await createUserInDatabase(payload.user);
-          break;
+      console.log(`Event log: ${eventType} / ${description}`);
+      console.dir(log, { depth: null, colors: true });
 
-        case "sce": // Successfully changed user email
-        case "scu": // Successfully changed username
-        case "sv": // Successfully consumed email verification link
-          await updateUserInDatabase(payload.user);
-          break;
+      const createEvents = ["sapi"];
 
-        case "sdu": // User successfully deleted
-          await deleteUserFromDatabase(payload.user);
-          break;
+      // Event-type: "sapi" Successful Management API operation
 
-        default:
-          console.log("Unknown event type:", eventType);
+      // Trigger user create
+      if (eventType == "sapi" && description == "Create a User") {
+        await createUserInDatabase(log.user_id);
+      }
+
+      // Trigger user update
+      if (eventType == "sapi" && description == "Update a User") {
+        await updateUserInDatabase(log.user_id);
+      }
+
+      // Trigger user delete
+      if (eventType == "sapi" && description == "Delete a User") {
+        await deleteUserFromDatabase(log.user_id);
       }
     }
 
@@ -76,18 +80,35 @@ const syncAuth0Resources: Handler = async (
 };
 
 // Dummy functions for database sync
-const createUserInDatabase = async (user: any) => {
-  console.log("Creating user:", user);
-  // Add your logic to insert the user into the database
+const createUserInDatabase = async (userId: string) => {
+  console.log(`Creating user: ${userId}`);
 };
 
-const updateUserInDatabase = async (user: any) => {
-  console.log("Updating user:", user);
+const updateUserInDatabase = async (userId: string) => {
+  console.log(`Updating user: ${userId}`);
+  const auth0User = await usersManagement.get(userId);
+  const { data: userData } = auth0User;
+
+  await UserModel.upsertByAuth0Sub(userId, {
+    username: userData.nickname,
+    name: userData.name,
+    email: userData.email,
+    picture: userData.picture,
+    //roles: _roles,
+    //permissions: assignPermissions(_roles),
+    last_login: userData.last_login?.toString(),
+    logins_count: userData.logins_count,
+    email_verified: userData.email_verified,
+    blocked: userData.blocked,
+  });
 };
 
-const deleteUserFromDatabase = async (user: any) => {
-  console.log("Deleting user:", user);
-  await UserModel.delete(user._id);
+const deleteUserFromDatabase = async (userId: string) => {
+  console.log(`Deleting user: ${userId}`);
+  const localUser = await UserModel.getAuth0Sub(userId);
+  if (localUser) {
+    await UserModel.delete(localUser._id.toString());
+  }
 };
 
 export { syncAuth0Resources as handler };
