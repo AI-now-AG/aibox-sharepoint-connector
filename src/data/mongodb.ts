@@ -1,6 +1,9 @@
 import { MongoClient, ObjectId } from "mongodb";
 
-if (!import.meta.env.MONGODB_URI) {
+const url = import.meta.env.MONGODB_URI || process.env.MONGODB_URI;
+const dbName = import.meta.env.MONGODB_DATABASE || process.env.MONGODB_DATABASE;
+
+if (!url) {
   throw new Error('Invalid environment variable: "MONGODB_URI"');
 }
 
@@ -10,5 +13,5 @@ export type Document<T> = T & {
 
 const options = {};
 
-export const client = new MongoClient(import.meta.env.MONGODB_URI, options);
-export const db = client.db(import.meta.env.MONGODB_DATABASE);
+export const client = new MongoClient(url, options);
+export const db = client.db(dbName);
