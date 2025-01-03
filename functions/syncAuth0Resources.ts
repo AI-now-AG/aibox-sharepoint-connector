@@ -77,21 +77,18 @@ const syncAuth0Resources: Handler = async (
 };
 
 const createUserInDatabase = async (data: any) => {
-  const { user_id: userId } = data?.details?.response?.body;
-  console.log(`Creating user: ${userId}`);
+  console.log(`Creating user`, data?.details?.response);
 
   const { tenant_name: tenantName } = data;
-  const auth0User = await usersManagement.get(userId);
-  const { data: userData } = auth0User;
-
+  const auth0User = data?.details?.response?.body || {};
   const tenant = await TenantModel.getByName(tenantName);
 
   if (tenant) {
     const user: Partial<Omit<User, "_id">> = {
-      auth0_sub: userData.user_id,
-      username: userData.nickname,
-      name: userData.name,
-      email: userData.email,
+      auth0_sub: auth0User.user_id,
+      username: auth0User.nickname,
+      name: auth0User.name,
+      email: auth0User.email,
       roles: [],
       permissions: [],
       tenant_id: tenant._id,
@@ -101,31 +98,30 @@ const createUserInDatabase = async (data: any) => {
 };
 
 const updateUserInDatabase = async (data: any) => {
-  const { user_id: userId } = data?.details?.response?.body;
-  console.log(`Updating user: ${userId}`);
+  console.log(`Updating user`, data?.details?.response);
 
-  const auth0User = await usersManagement.get(userId);
-  const { data: userData } = auth0User;
+  //const { tenant_name: tenantName } = data;
+  const auth0User = data?.details?.response?.body || {};
 
-  await UserModel.upsertByAuth0Sub(userId, {
-    username: userData.nickname,
-    name: userData.name,
-    email: userData.email,
-    picture: userData.picture,
+  await UserModel.upsertByAuth0Sub(auth0User.user_id, {
+    username: auth0User.nickname,
+    name: auth0User.name,
+    email: auth0User.email,
+    picture: auth0User.picture,
     //roles: _roles,
     //permissions: assignPermissions(_roles),
-    last_login: userData.last_login?.toString(),
-    logins_count: userData.logins_count,
-    email_verified: userData.email_verified,
-    blocked: userData.blocked,
+    last_login: auth0User.last_login?.toString(),
+    logins_count: auth0User.logins_count,
+    email_verified: auth0User.email_verified,
+    blocked: auth0User.blocked,
   });
 };
 
 const deleteUserFromDatabase = async (data: any) => {
-  const { user_id: userId } = data?.details?.response?.body;
-  console.log(`Deleting user: ${userId}`);
+  console.log(`Deleting user`, data?.details?.response);
 
-  const localUser = await UserModel.getAuth0Sub(userId);
+  const auth0User = data?.details?.response?.body || {};
+  const localUser = await UserModel.getAuth0Sub(auth0User.user_id);
 
   if (localUser) {
     await UserModel.delete(localUser._id.toString());
