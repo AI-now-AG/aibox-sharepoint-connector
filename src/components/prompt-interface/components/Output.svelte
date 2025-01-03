@@ -1,7 +1,7 @@
 <script lang="ts">
   import { fade } from "svelte/transition";
   import { onMount, afterUpdate, tick } from "svelte";
-  import { MessageRole, type MessageHistory } from "$utils/MessageHistory";
+  import { MessageRole, type MessageHistory } from "$types/MessageHistory";
   import { sharedMessageHistory } from "$components/prompt-interface/components/Stores";
   import { tenant, user } from "$stores";
   import { svgIcons } from "$assets/icons";

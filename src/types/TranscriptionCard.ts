@@ -1,4 +1,4 @@
-import { TranscriptionType } from "$utils/TranscribeRequest";
+import { TranscriptionType } from "$types/TranscribeRequest";
 
 interface BaseCard {
   title: string;

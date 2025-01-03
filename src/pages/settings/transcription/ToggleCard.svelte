@@ -5,7 +5,7 @@
   import { tenant } from "$stores";
   import { addToast } from "$stores/toast";
   import { svgIcons } from "$assets/icons";
-  import { type TranscriptionCard } from "$utils/TranscriptionCard";
+  import { type TranscriptionCard } from "$types/TranscriptionCard";
   const t = useTranslations();
 
   let instructionTitle = "";

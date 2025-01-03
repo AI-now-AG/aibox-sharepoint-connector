@@ -1,5 +1,5 @@
 import { writable } from "svelte/store";
-import { TranscriptionType } from "$utils/TranscribeRequest";
+import { TranscriptionType } from "$types/TranscribeRequest";
 
 type TranscribeOptions = {
   file: File | undefined;

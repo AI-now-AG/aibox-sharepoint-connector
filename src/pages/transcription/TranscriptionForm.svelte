@@ -7,8 +7,8 @@
   import { tenant } from "$stores";
   import transcriptStore from "$stores/transcript";
   import { addToast } from "$stores/toast";
-  import { type TranscribeRequest, FileFormat } from "$utils/TranscribeRequest";
-  import { TranscriptionType } from "$utils/TranscribeRequest";
+  import { type TranscribeRequest, FileFormat } from "$types/TranscribeRequest";
+  import { TranscriptionType } from "$types/TranscribeRequest";
   const t = useTranslations();
 
   export let folderName = "";

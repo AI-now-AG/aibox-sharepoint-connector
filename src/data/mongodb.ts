@@ -1,8 +1,8 @@
 import { MongoClient, ObjectId } from "mongodb";
+import getEnvVar from "$utils/getEnvVar";
 
-const url = import.meta?.env?.MONGODB_URI || process.env.MONGODB_URI;
-const dbName =
-  import.meta?.env?.MONGODB_DATABASE || process.env.MONGODB_DATABASE;
+const url = getEnvVar("MONGODB_URI");
+const dbName = getEnvVar("MONGODB_DATABASE");
 
 if (!url) {
   throw new Error('Invalid environment variable: "MONGODB_URI"');

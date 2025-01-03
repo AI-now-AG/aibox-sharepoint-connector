@@ -3,7 +3,7 @@
   import PromptList, {
     type CardItem,
   } from "$components/prompt-interface/PromptList.svelte";
-  import type { CategoryItem } from "$utils/CategoryItem";
+  import type { CategoryItem } from "$types/CategoryItem";
   import { useTranslations } from "$i18n/utils";
   import { svgIcons } from "$assets/icons";
 
