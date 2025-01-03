@@ -51,6 +51,12 @@ const syncAuth0Resources: Handler = async (
       if (eventType == "sapi" && description == "Create a User") {
         await createUserInDatabase(data);
       }
+      if (
+        eventType == "sapi" &&
+        description == "Add members to an organization"
+      ) {
+        await addOrganizationMembers(data);
+      }
 
       // Trigger user update
       if (eventType == "sapi" && description == "Update a User") {
@@ -79,42 +85,53 @@ const syncAuth0Resources: Handler = async (
 const createUserInDatabase = async (data: any) => {
   console.log(`Creating user`, data?.details?.response);
 
-  const { tenant_name: tenantName } = data;
   const auth0User = data?.details?.response?.body || {};
-  const tenant = await TenantModel.getByName(tenantName);
-
-  if (tenant) {
+  if (Object.keys(auth0User).length > 0) {
     const user: Partial<Omit<User, "_id">> = {
       auth0_sub: auth0User.user_id,
       username: auth0User.nickname,
       name: auth0User.name,
       email: auth0User.email,
-      roles: [],
-      permissions: [],
-      tenant_id: tenant._id,
     };
-    await UserModel.add(user);
+    await auth0User.add(user);
+  }
+};
+
+const addOrganizationMembers = async (data: any) => {
+  console.log(`Add organization members`, data?.details?.request);
+
+  const path = data?.details?.request?.path || ""; // api/v2/organizations/org_jNS9by788jZfem2D/members
+  const memberIds = data?.details?.request?.body?.members || []; // ["auth0|6777fe2805771b8ae33c09e3"]
+  const orgId = path.match(/organizations\/([^/]+)/)[1];
+  const tenant = await TenantModel.getById(orgId);
+
+  for (const memberId of memberIds) {
+    if (tenant) {
+      await UserModel.upsertByAuth0Sub(memberId, {
+        tenant_id: tenant._id,
+      });
+    }
   }
 };
 
 const updateUserInDatabase = async (data: any) => {
   console.log(`Updating user`, data?.details?.response);
 
-  //const { tenant_name: tenantName } = data;
   const auth0User = data?.details?.response?.body || {};
-
-  await UserModel.upsertByAuth0Sub(auth0User.user_id, {
-    username: auth0User.nickname,
-    name: auth0User.name,
-    email: auth0User.email,
-    picture: auth0User.picture,
-    //roles: _roles,
-    //permissions: assignPermissions(_roles),
-    last_login: auth0User.last_login?.toString(),
-    logins_count: auth0User.logins_count,
-    email_verified: auth0User.email_verified,
-    blocked: auth0User.blocked,
-  });
+  if (Object.keys(auth0User).length > 0) {
+    await UserModel.upsertByAuth0Sub(auth0User.user_id, {
+      username: auth0User.nickname,
+      name: auth0User.name,
+      email: auth0User.email,
+      picture: auth0User.picture,
+      //roles: _roles,
+      //permissions: assignPermissions(_roles),
+      last_login: auth0User.last_login?.toString(),
+      logins_count: auth0User.logins_count,
+      email_verified: auth0User.email_verified,
+      blocked: auth0User.blocked,
+    });
+  }
 };
 
 const deleteUserFromDatabase = async (data: any) => {
