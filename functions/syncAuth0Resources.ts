@@ -39,7 +39,7 @@ const syncAuth0Resources: Handler = async (
 
     // Handle each event type
     for (const log of logs) {
-      const { type: eventType, description } = log;
+      const { type: eventType, description } = log.data;
 
       console.log(`Event log: ${eventType} / ${description}`);
       console.dir(log, { depth: null, colors: true });
