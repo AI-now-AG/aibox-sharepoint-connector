@@ -93,7 +93,7 @@ const createUserInDatabase = async (data: any) => {
       name: auth0User.name,
       email: auth0User.email,
     };
-    await auth0User.add(user);
+    await UserModel.add(user);
   }
 };
 
