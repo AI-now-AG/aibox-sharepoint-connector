@@ -3,10 +3,17 @@ import type {
   HandlerEvent,
   HandlerResponse,
 } from "@netlify/functions";
-//import usersManagement from "$data/auth0/users-manager";
-//import organizationsManagement from "$data/auth0/organizations-manager";
+import usersManagement from "$data/auth0/users-manager";
+import organizationsManagement from "$data/auth0/organizations-manager";
 
-const syncAuth0User: Handler = async (
+/**
+ * Handles Auth0 log stream events
+ * Reference: https://auth0.com/docs/customize/log-streams/event-filters#user-behavioral-success
+ *
+ * @param {Object} event - Incoming event payload from Auth0.
+ * @returns {Object} - HTTP response indicating success or failure.
+ */
+const syncAuth0Resources: Handler = async (
   event: HandlerEvent,
 ): Promise<HandlerResponse> => {
   try {
@@ -80,4 +87,4 @@ const deleteUserFromDatabase = async (user: any) => {
   // Add your logic to delete the user from the database
 };
 
-export { syncAuth0User as handler };
+export { syncAuth0Resources as handler };
