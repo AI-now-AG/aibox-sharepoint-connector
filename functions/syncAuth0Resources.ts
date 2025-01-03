@@ -71,11 +71,13 @@ const syncAuth0Resources: Handler = async (
       statusCode: 200,
       body: JSON.stringify({ message: "Success" }),
     };
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error handling webhook:", error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ message: "Server Error" }),
+      body: JSON.stringify({
+        message: error instanceof Error ? error.message : "Server Error",
+      }),
     };
   }
 };
