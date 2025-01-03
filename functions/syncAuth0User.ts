@@ -3,9 +3,8 @@ import type {
   HandlerEvent,
   HandlerResponse,
 } from "@netlify/functions";
-import usersManagement from "$data/auth0/users-manager";
-import organizationsManagement from "$data/auth0/organizations-manager";
-import { sendExceptionToSentry } from "$utils/send-exception-to-sentry";
+//import usersManagement from "$data/auth0/users-manager";
+//import organizationsManagement from "$data/auth0/organizations-manager";
 
 const syncAuth0User: Handler = async (
   event: HandlerEvent,
@@ -53,8 +52,6 @@ const syncAuth0User: Handler = async (
     };
   } catch (error) {
     console.error("Error handling webhook:", error);
-    sendExceptionToSentry(error);
-
     return {
       statusCode: 500,
       body: JSON.stringify({ message: "Server Error" }),
