@@ -1,7 +1,6 @@
 import type { APIContext, APIRoute } from "astro";
 import PromptModel, { type Prompt } from "$data/models/prompt.model";
 import { z } from "zod";
-//import { ChatOpenAI } from "@langchain/openai";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import { stringToObjectId } from "$utils/stringToObjectId";
@@ -25,12 +24,6 @@ const CreatePromptParamsSchema = z.object({
 });
 
 export type CreatePromptParams = z.infer<typeof CreatePromptParamsSchema>;
-
-// export const model = new ChatOpenAI({
-//   apiKey: import.meta.env.OPENAI_API_KEY,
-//   model: import.meta.env.OPENAI_MODEL,
-// });
-
 const PromptParamsSchema = z.object({
   _id: z.string(),
 });
