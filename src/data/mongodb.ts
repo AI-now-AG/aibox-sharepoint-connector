@@ -1,7 +1,8 @@
 import { MongoClient, ObjectId } from "mongodb";
 
-const url = import.meta.env.MONGODB_URI || process.env.MONGODB_URI;
-const dbName = import.meta.env.MONGODB_DATABASE || process.env.MONGODB_DATABASE;
+const url = import.meta?.env?.MONGODB_URI || process.env.MONGODB_URI;
+const dbName =
+  import.meta?.env?.MONGODB_DATABASE || process.env.MONGODB_DATABASE;
 
 if (!url) {
   throw new Error('Invalid environment variable: "MONGODB_URI"');
