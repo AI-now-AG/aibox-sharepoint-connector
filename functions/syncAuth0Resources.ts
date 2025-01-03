@@ -3,7 +3,8 @@ import type {
   HandlerEvent,
   HandlerResponse,
 } from "@netlify/functions";
-import UserModel from "$data/models/user.model";
+import UserModel, { type User } from "$data/models/user.model";
+import TenantModel from "$data/models/tenant.model";
 import usersManagement from "$data/auth0/users-manager";
 import organizationsManagement from "$data/auth0/organizations-manager";
 
@@ -36,9 +37,6 @@ const syncAuth0Resources: Handler = async (
     const payload = JSON.parse(event.body || "{}");
     const { logs } = payload;
 
-    const createEvents = ["sapi"];
-    const updateEvents = ["sapi"];
-
     // Handle each event type
     for (const log of logs) {
       const { type: eventType, description } = log;
@@ -52,17 +50,17 @@ const syncAuth0Resources: Handler = async (
 
       // Trigger user create
       if (eventType == "sapi" && description == "Create a User") {
-        await createUserInDatabase(log.user_id);
+        await createUserInDatabase(log);
       }
 
       // Trigger user update
       if (eventType == "sapi" && description == "Update a User") {
-        await updateUserInDatabase(log.user_id);
+        await updateUserInDatabase(log);
       }
 
       // Trigger user delete
       if (eventType == "sapi" && description == "Delete a User") {
-        await deleteUserFromDatabase(log.user_id);
+        await deleteUserFromDatabase(log);
       }
     }
 
@@ -79,13 +77,33 @@ const syncAuth0Resources: Handler = async (
   }
 };
 
-// Dummy functions for database sync
-const createUserInDatabase = async (userId: string) => {
-  console.log(`Creating user: ${userId}`);
+const createUserInDatabase = async (log: any) => {
+  console.log(`Creating user: ${log?.user_id}`);
+
+  const { user_id: userId, tenant_name: tenantName } = log;
+  const auth0User = await usersManagement.get(userId);
+  const { data: userData } = auth0User;
+
+  const tenant = await TenantModel.getByName(tenantName);
+
+  if (tenant) {
+    const user: Partial<Omit<User, "_id">> = {
+      auth0_sub: userData.user_id,
+      username: userData.nickname,
+      name: userData.name,
+      email: userData.email,
+      roles: [],
+      permissions: [],
+      tenant_id: tenant._id,
+    };
+    await UserModel.add(user);
+  }
 };
 
-const updateUserInDatabase = async (userId: string) => {
-  console.log(`Updating user: ${userId}`);
+const updateUserInDatabase = async (log: any) => {
+  console.log(`Updating user: ${log?.user_id}`);
+
+  const { user_id: userId } = log;
   const auth0User = await usersManagement.get(userId);
   const { data: userData } = auth0User;
 
@@ -103,9 +121,12 @@ const updateUserInDatabase = async (userId: string) => {
   });
 };
 
-const deleteUserFromDatabase = async (userId: string) => {
-  console.log(`Deleting user: ${userId}`);
+const deleteUserFromDatabase = async (log: any) => {
+  console.log(`Deleting user: ${log?.user_id}`);
+
+  const { user_id: userId } = log;
   const localUser = await UserModel.getAuth0Sub(userId);
+
   if (localUser) {
     await UserModel.delete(localUser._id.toString());
   }
