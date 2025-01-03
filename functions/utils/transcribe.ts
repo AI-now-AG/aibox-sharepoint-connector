@@ -16,7 +16,7 @@ import {
   type TranscribeRequest,
   FileFormat,
   TranscriptionType,
-} from "$utils/TranscribeRequest";
+} from "$types/TranscribeRequest";
 
 const DEFAULT_WHISPER_MODEL_NAME = "whisper-1";
 const DEFAULT_API_VERSION = "2024-08-01-preview";
