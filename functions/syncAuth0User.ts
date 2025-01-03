@@ -26,6 +26,7 @@ const syncAuth0User: Handler = async (
     // Parse the incoming Auth0 webhook data
     const payload = JSON.parse(event.body || "{}");
     const eventType = payload.type; // 'user.created', 'user.updated', 'user.deleted'
+    console.log("payload", { payload });
 
     // Handle each event type
     switch (eventType) {
