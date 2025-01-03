@@ -39,24 +39,25 @@ const syncAuth0Resources: Handler = async (
 
     // Handle each event type
     for (const log of logs) {
-      const { type: eventType, description } = log.data;
+      const { data } = log;
+      const { type: eventType, description } = data;
 
       console.log(`Event log: ${eventType} / ${description}`);
       console.dir(log, { depth: null, colors: true });
 
       // Trigger user create
       if (eventType == "sapi" && description == "Create a User") {
-        await createUserInDatabase(log);
+        await createUserInDatabase(data);
       }
 
       // Trigger user update
       if (eventType == "sapi" && description == "Update a User") {
-        await updateUserInDatabase(log);
+        await updateUserInDatabase(data);
       }
 
       // Trigger user delete
       if (eventType == "sapi" && description == "Delete a User") {
-        await deleteUserFromDatabase(log);
+        await deleteUserFromDatabase(data);
       }
     }
 
@@ -73,10 +74,10 @@ const syncAuth0Resources: Handler = async (
   }
 };
 
-const createUserInDatabase = async (log: any) => {
-  console.log(`Creating user: ${log?.user_id}`);
+const createUserInDatabase = async (data: any) => {
+  console.log(`Creating user: ${data?.user_id}`);
 
-  const { user_id: userId, tenant_name: tenantName } = log;
+  const { user_id: userId, tenant_name: tenantName } = data;
   const auth0User = await usersManagement.get(userId);
   const { data: userData } = auth0User;
 
@@ -96,10 +97,10 @@ const createUserInDatabase = async (log: any) => {
   }
 };
 
-const updateUserInDatabase = async (log: any) => {
-  console.log(`Updating user: ${log?.user_id}`);
+const updateUserInDatabase = async (data: any) => {
+  console.log(`Updating user: ${data?.user_id}`);
 
-  const { user_id: userId } = log;
+  const { user_id: userId } = data;
   const auth0User = await usersManagement.get(userId);
   const { data: userData } = auth0User;
 
@@ -117,10 +118,10 @@ const updateUserInDatabase = async (log: any) => {
   });
 };
 
-const deleteUserFromDatabase = async (log: any) => {
-  console.log(`Deleting user: ${log?.user_id}`);
+const deleteUserFromDatabase = async (data: any) => {
+  console.log(`Deleting user: ${data?.user_id}`);
 
-  const { user_id: userId } = log;
+  const { user_id: userId } = data;
   const localUser = await UserModel.getAuth0Sub(userId);
 
   if (localUser) {
