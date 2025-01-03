@@ -25,26 +25,30 @@ const syncAuth0User: Handler = async (
 
     // Parse the incoming Auth0 webhook data
     const payload = JSON.parse(event.body || "{}");
-    const eventType = payload.type; // 'user.created', 'user.updated', 'user.deleted'
-    console.log("payload", { payload });
+    const { logs } = payload;
 
     // Handle each event type
-    switch (eventType) {
-      case "user.created":
-        // Sync user to the local database
-        await createUserInDatabase(payload.user);
-        break;
+    for (const log of logs) {
+      console.log("log ----> ", log);
+      const { type: eventType } = log;
 
-      case "user.updated":
-        await updateUserInDatabase(payload.user);
-        break;
+      switch (eventType) {
+        case "user.created":
+          // Sync user to the local database
+          await createUserInDatabase(payload.user);
+          break;
 
-      case "user.deleted":
-        await deleteUserFromDatabase(payload.user);
-        break;
+        case "user.updated":
+          await updateUserInDatabase(payload.user);
+          break;
 
-      default:
-        console.log("Unknown event type:", eventType);
+        case "user.deleted":
+          await deleteUserFromDatabase(payload.user);
+          break;
+
+        default:
+          console.log("Unknown event type:", eventType);
+      }
     }
 
     return {
