@@ -77,9 +77,10 @@ const syncAuth0Resources: Handler = async (
 };
 
 const createUserInDatabase = async (data: any) => {
-  console.log(`Creating user: ${data?.user_id}`);
+  const { user_id: userId } = data?.details?.response?.body;
+  console.log(`Creating user: ${userId}`);
 
-  const { user_id: userId, tenant_name: tenantName } = data;
+  const { tenant_name: tenantName } = data;
   const auth0User = await usersManagement.get(userId);
   const { data: userData } = auth0User;
 
@@ -100,9 +101,9 @@ const createUserInDatabase = async (data: any) => {
 };
 
 const updateUserInDatabase = async (data: any) => {
-  console.log(`Updating user: ${data?.user_id}`);
+  const { user_id: userId } = data?.details?.response?.body;
+  console.log(`Updating user: ${userId}`);
 
-  const { user_id: userId } = data;
   const auth0User = await usersManagement.get(userId);
   const { data: userData } = auth0User;
 
@@ -121,9 +122,9 @@ const updateUserInDatabase = async (data: any) => {
 };
 
 const deleteUserFromDatabase = async (data: any) => {
-  console.log(`Deleting user: ${data?.user_id}`);
+  const { user_id: userId } = data?.details?.response?.body;
+  console.log(`Deleting user: ${userId}`);
 
-  const { user_id: userId } = data;
   const localUser = await UserModel.getAuth0Sub(userId);
 
   if (localUser) {
