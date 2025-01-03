@@ -3,6 +3,7 @@ import type {
   HandlerEvent,
   HandlerResponse,
 } from "@netlify/functions";
+import UserModel from "$data/models/user.model";
 import usersManagement from "$data/auth0/users-manager";
 import organizationsManagement from "$data/auth0/organizations-manager";
 
@@ -20,6 +21,7 @@ const syncAuth0Resources: Handler = async (
     // Ensure the request is from Auth0 (validate secret, IP, or header signature)
     const authHeader = event.headers["authorization"];
     console.log("authHeader", { authHeader });
+
     if (
       !authHeader ||
       authHeader !== `Bearer 6d3c5bc2-12d1-4d8c-b467-070c81f1adbc`
@@ -36,7 +38,7 @@ const syncAuth0Resources: Handler = async (
 
     // Handle each event type
     for (const log of logs) {
-      console.log("log ----> ", log);
+      console.log("log ----> ", JSON.stringify(log));
       const { type: eventType } = log;
 
       switch (eventType) {
@@ -45,11 +47,13 @@ const syncAuth0Resources: Handler = async (
           await createUserInDatabase(payload.user);
           break;
 
-        case "user.updated":
+        case "sce": // Successfully changed user email
+        case "scu": // Successfully changed username
+        case "sv": // Successfully consumed email verification link
           await updateUserInDatabase(payload.user);
           break;
 
-        case "user.deleted":
+        case "sdu": // User successfully deleted
           await deleteUserFromDatabase(payload.user);
           break;
 
@@ -79,12 +83,11 @@ const createUserInDatabase = async (user: any) => {
 
 const updateUserInDatabase = async (user: any) => {
   console.log("Updating user:", user);
-  // Add your logic to update the user in the database
 };
 
 const deleteUserFromDatabase = async (user: any) => {
   console.log("Deleting user:", user);
-  // Add your logic to delete the user from the database
+  await UserModel.delete(user._id);
 };
 
 export { syncAuth0Resources as handler };
