@@ -110,20 +110,22 @@ const updateUserInDatabase = async (data: any) => {
   console.log(`Updating user`, data?.details?.response);
 
   const auth0User = data?.details?.response?.body || {};
+  const localUser = await UserModel.getAuth0Sub(auth0User.user_id);
 
-  if (Object.keys(auth0User).length > 0) {
-    await UserModel.upsertByAuth0Sub(auth0User.user_id, {
+  if (localUser) {
+    const update: Partial<User> = {
       username: auth0User.nickname,
       name: auth0User.name,
       email: auth0User.email,
       picture: auth0User.picture,
-      //roles: _roles,
-      //permissions: assignPermissions(_roles),
+      //roles: [],
+      //permissions: [],
       last_login: auth0User.last_login?.toString(),
       logins_count: auth0User.logins_count,
       email_verified: auth0User.email_verified,
       blocked: auth0User.blocked,
-    });
+    };
+    await UserModel.update(localUser._id, update);
   }
 };
 
