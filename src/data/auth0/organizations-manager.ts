@@ -83,11 +83,12 @@ export const deleteEnabledConnection = async (
   }
 };
 
-// This get Role which IS RELATED to Orgainziation (using organization id and user id)
-export const getMemberRoles = async (
-  parameters: GetOrganizationMemberRolesRequest,
-) => {
+export const getMemberRoles = async (id: string, userId: string) => {
   try {
+    const parameters: GetOrganizationMemberRolesRequest = {
+      id,
+      user_id: userId,
+    };
     return await management.organizations.getMemberRoles(parameters);
   } catch (err) {
     console.log("auth0: get organization member's roles error", err);

@@ -3,7 +3,11 @@ import type {
   HandlerEvent,
   HandlerResponse,
 } from "@netlify/functions";
-import UserModel, { type User } from "$data/models/user.model";
+import UserModel, {
+  assignPermissions,
+  UserRole,
+  type User,
+} from "$data/models/user.model";
 import TenantModel from "$data/models/tenant.model";
 import usersManagement from "$data/auth0/users-manager";
 import organizationsManagement from "$data/auth0/organizations-manager";
@@ -47,8 +51,15 @@ const syncAuth0Resources: Handler = async (
         JSON.stringify(log),
       );
 
+      // Trigger successful login
+      // See: https://auth0.com/docs/customize/log-streams/event-filters#login-success
+      if (eventType == "s") {
+        await syncAuth0UserOnLogin(data);
+      }
+
       // Trigger user create
       // "Create a User" didn't work in this case because the organization could not be detected
+      // See: https://auth0.com/docs/customize/log-streams/event-filters#management-api-success
       if (
         eventType == "sapi" &&
         description == "Add members to an organization"
@@ -57,11 +68,13 @@ const syncAuth0Resources: Handler = async (
       }
 
       // Trigger user update
+      // See: https://auth0.com/docs/customize/log-streams/event-filters#management-api-success
       if (eventType == "sapi" && description == "Update a User") {
         await updateUserInDatabase(data);
       }
 
       // Trigger user delete
+      // See: https://auth0.com/docs/customize/log-streams/event-filters#management-api-success
       if (eventType == "sapi" && description == "Delete a User") {
         await deleteUserFromDatabase(data);
       }
@@ -137,6 +150,85 @@ const deleteUserFromDatabase = async (data: any) => {
 
   if (localUser) {
     await UserModel.delete(localUser._id.toString());
+  }
+};
+
+const syncAuth0UserOnLogin = async (data: any) => {
+  const { user_id: userId, organization_id: orgId } = data;
+  console.log(`Sync auth0 user on login`, { userId, orgId });
+
+  const memberRoles = await organizationsManagement.getMemberRoles(
+    orgId,
+    userId,
+  );
+  const roleNames = memberRoles.data.map((role) => role.name as UserRole);
+  const isAdmin = roleNames?.some((role) =>
+    [UserRole.SuperAdmin, UserRole.Admin].includes(role),
+  );
+
+  // If the user is an Admin, sync all organization members' data
+  if (isAdmin) {
+    await syncAllOrganizationUsers(orgId, userId);
+  }
+
+  // Sync last login and login count
+  const loginsCount = data.details?.stats?.loginsCount ?? 0;
+  const update: Partial<User> = {
+    last_login: new Date().toISOString(),
+    logins_count: loginsCount,
+  };
+  await UserModel.upsertByAuth0Sub(userId, update);
+};
+
+const syncAllOrganizationUsers = async (
+  orgId: string,
+  loggedInUserId?: string,
+) => {
+  const response = await usersManagement.getAllUsers({
+    q: `organization_id: ${orgId}`,
+  });
+  const users = response.data ?? [];
+  const tenant = await TenantModel.getById(orgId);
+
+  if (!tenant) {
+    console.error("No tenant is associated with this user..");
+    return;
+  }
+
+  for (const user of users) {
+    if (loggedInUserId && loggedInUserId == user.user_id) {
+      console.warn(
+        `Sync all organization users - user ${loggedInUserId} is excluded`,
+      );
+      continue; // Skip this iteration
+    }
+
+    const auth0UserRoles = await organizationsManagement.getMemberRoles(
+      orgId,
+      user.user_id,
+    );
+    const roleNames = auth0UserRoles.data.map((role) => role.name as UserRole);
+    const userRoles = roleNames.length ? roleNames : [UserRole.User];
+
+    console.log(
+      `Sync all organization users - user ${loggedInUserId} has been synced`,
+    );
+
+    // Upserts a user by their Auth0 subscription ID (sub).
+    await UserModel.upsertByAuth0Sub(user.user_id, {
+      tenant_id: tenant._id,
+      auth0_sub: user.user_id,
+      username: user.nickname,
+      name: user.name,
+      email: user.email,
+      picture: user.picture,
+      roles: userRoles,
+      permissions: assignPermissions(userRoles),
+      last_login: user.last_login?.toString(),
+      logins_count: user.logins_count,
+      email_verified: user.email_verified,
+      blocked: user.blocked,
+    });
   }
 };
 
