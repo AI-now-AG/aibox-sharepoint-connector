@@ -11,7 +11,6 @@ import UserModel, {
 import TenantModel from "$data/models/tenant.model";
 import usersManagement from "$data/auth0/users-manager";
 import organizationsManagement from "$data/auth0/organizations-manager";
-import rolesManager from "$data/auth0/roles-manager";
 
 /**
  * Handles Auth0 log stream events
@@ -205,19 +204,25 @@ const updateUserRolesInDatabase = async (data: any) => {
   // Take the "userId" from request path and "roles" from request body
   // Example path: api/v2/organizations/org_FpOtXZcZwVZc1unJ/members/auth0%7C66f3a9897dbebab8f2ae9cc0/roles
   const path = data?.details?.request?.path || "";
-  const userId = decodeURIComponent(path.split("/members/")[1].split("/")[0]);
-  const newRoles = data?.details?.request?.body?.roles || [];
-  const localUser = await UserModel.getAuth0Sub(userId);
 
-  const memberRoles = await rolesManager.getAll();
-  const userRoles = memberRoles.data
-    .map((role) => role.name as UserRole)
-    .filter((role) => newRoles.includes(role));
+  // Match the organization ID between "/organizations/" and "/members/"
+  const match = path.match(/\/organizations\/([^/]+)\//);
+  const orgId = match ? match[1] : "";
+
+  // Extract and decode the user ID from the URL path after "/members/"
+  const userId = decodeURIComponent(path.split("/members/")[1].split("/")[0]);
+
+  const memberRoles = await organizationsManagement.getMemberRoles(
+    orgId,
+    userId,
+  );
+  const roleNames = memberRoles.data.map((role) => role.name as UserRole);
+  const localUser = await UserModel.getAuth0Sub(userId);
 
   if (localUser) {
     const update: Partial<User> = {
-      roles: userRoles,
-      permissions: assignPermissions(userRoles),
+      roles: roleNames,
+      permissions: assignPermissions(roleNames),
     };
     await UserModel.update(localUser._id, update);
   }
