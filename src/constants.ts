@@ -9,6 +9,8 @@ export const PUBLIC_ROUTES = [
   "/restricted",
 ];
 
+export const ADMIN_ROUTES = ["/user-management", "/user-management/*"];
+
 export const SUPER_ADMIN_ROUTES = [
   "/tenant-management",
   "/tenant-management/*",
