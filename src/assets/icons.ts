@@ -41,6 +41,9 @@ import fileExport from "$assets/icons/file-export.svg?raw";
 import block from "$assets/icons/block.svg?raw";
 import filter from "$assets/icons/filter.svg?raw";
 import arrowDownFill from "$assets/icons/arrow-down-fill.svg?raw";
+import arrowUp from "$assets/icons/arrow-up.svg?raw";
+import arrowDown from "$assets/icons/arrow-down.svg?raw";
+import arrowUpDown from "$assets/icons/arrow-up-down.svg?raw";
 
 export const svgIcons = {
   menuSettings,
@@ -86,4 +89,7 @@ export const svgIcons = {
   block,
   filter,
   arrowDownFill,
+  arrowUp,
+  arrowDown,
+  arrowUpDown,
 };

@@ -26,18 +26,18 @@
 
   export let tenantId: string = "";
 
-  let colDatas: ColumnData[] = [
-    { colId: "name", colName: t("common.name"), colCssClases: "w-auto" },
-    { colId: "email", colName: t("user.e-mail"), colCssClases: "w-auto" },
-    { colId: "", colName: t("user.role"), colCssClases: "w-28" },
-    { colId: "logins_count", colName: t("user.logins"), colCssClases: "w-40" },
+  const columnData: ColumnData[] = [
+    { name: "name", text: t("common.name"), class: "w-auto" },
+    { name: "email", text: t("user.e-mail"), class: "w-auto" },
+    { name: "", text: t("user.role"), class: "w-28" },
+    { name: "logins_count", text: t("user.logins"), class: "w-40" },
     {
-      colId: "last_login",
-      colName: t("user.latest-login"),
-      colCssClases: "w-56",
+      name: "last_login",
+      text: t("user.latest-login"),
+      class: "w-56",
     },
-    { colId: "", colName: "", colCssClases: "w-auto" },
-    { colId: "", colName: "", colCssClases: "w-28" },
+    { name: "", text: "", class: "w-auto" },
+    { name: "", text: "", class: "w-28" },
   ];
   let users: any = [];
 
@@ -209,7 +209,7 @@
     </h2>
 
     <div class="relative">
-      <SortableTable {colDatas} bind:rowDatas={users}>
+      <SortableTable {columnData} bind:rowData={users}>
         {#each users as user}
           <tr class="h-16 bg-base-100 hover:bg-base-300 text-sm rounded-lg">
             <td class="py-3 px-4 text-sm font-medium rounded-l-lg">

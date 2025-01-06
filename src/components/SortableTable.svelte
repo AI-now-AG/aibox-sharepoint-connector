@@ -1,14 +1,16 @@
 <script lang="ts" context="module">
   export interface ColumnData {
-    colId?: string;
-    colName?: string;
-    colCssClases?: string;
+    name?: string;
+    text?: string;
+    class?: string;
   }
 </script>
 
 <script lang="ts">
-  export let colDatas: ColumnData[] = [];
-  export let rowDatas: any[] = [];
+  import { svgIcons } from "$assets/icons";
+
+  export let columnData: ColumnData[] = [];
+  export let rowData: any[] = [];
 
   let sortColumn = "";
   let sortDirection = "asc";
@@ -21,10 +23,10 @@
       sortDirection = "asc";
     }
     if (col == undefined || col == "") {
-      return rowDatas;
+      return rowData;
     }
 
-    rowDatas = rowDatas?.sort((a: any, b: any) => {
+    rowData = rowData?.sort((a: any, b: any) => {
       if (sortDirection === "asc") {
         if (typeof a[col] === "string") {
           return a[col].localeCompare(b[col]);
@@ -55,27 +57,29 @@
   style="font-family:Inter;"
 >
   <colgroup>
-    {#each colDatas as data}
-      <col class={data.colCssClases ?? "w-auto"} />
+    {#each columnData as data}
+      <col class={data.class ?? "w-auto"} />
     {/each}
   </colgroup>
   <thead>
     <tr class="bg-base-300 rounded-lg">
-      {#each colDatas as data, colIndex}
+      {#each columnData as data, colIndex}
         <th
           class={"py-3 px-4 text-left font-normal text-xs" +
-            getFirstLastColCssClass(colIndex, colDatas.length)}
-          on:click={() => sort(data.colId ?? "")}
+            getFirstLastColCssClass(colIndex, columnData.length)}
+          on:click={() => sort(data.name ?? "")}
         >
-          {data.colName}
-          <span class="ml-2">
-            {data.colId
-              ? sortColumn === data.colId
-                ? sortDirection === "asc"
-                  ? "▲"
-                  : "▼"
-                : "☰"
-              : ""}
+          <span class="inline-flex">
+            {data.text}
+            <span class="ml-2">
+              {@html data.name
+                ? sortColumn === data.name
+                  ? sortDirection === "asc"
+                    ? svgIcons.arrowUp
+                    : svgIcons.arrowDown
+                  : svgIcons.arrowUpDown
+                : ""}
+            </span>
           </span>
         </th>
       {/each}
