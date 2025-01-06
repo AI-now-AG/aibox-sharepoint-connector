@@ -36,6 +36,8 @@ import downIcon from "$assets/icons/down.svg?raw";
 import duplicate from "$assets/icons/duplicate.svg?raw";
 import reOrder from "$assets/icons/re-order.svg?raw";
 import drag from "$assets/icons/drag.svg?raw";
+import fileImport from "$assets/icons/file-import.svg?raw";
+import fileExport from "$assets/icons/file-export.svg?raw";
 import block from "$assets/icons/block.svg?raw";
 import filter from "$assets/icons/filter.svg?raw";
 import arrowDownFill from "$assets/icons/arrow-down-fill.svg?raw";
@@ -79,6 +81,8 @@ export const svgIcons = {
   duplicate,
   reOrder,
   drag,
+  fileImport,
+  fileExport,
   block,
   filter,
   arrowDownFill,
