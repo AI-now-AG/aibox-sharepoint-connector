@@ -85,7 +85,8 @@ const syncAuth0Resources: Handler = async (
       // See: https://auth0.com/docs/customize/log-streams/event-filters#management-api-success
       if (
         eventType == "sapi" &&
-        description == "Assign user roles to an Organization member"
+        (description == "Assign user roles to an Organization member" ||
+          description == "Delete user roles from an Organization member")
       ) {
         await updateUserRolesInDatabase(data);
       }
