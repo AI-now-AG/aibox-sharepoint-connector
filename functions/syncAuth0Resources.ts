@@ -95,8 +95,20 @@ const syncAuth0Resources: Handler = async (
   }
 };
 
+const isPermittedChannel = (data: any) => {
+  const requestChannel = data?.details?.request?.channel || "";
+  const permittedChannels = ["https://manage.auth0.com/"];
+  return permittedChannels.includes(requestChannel);
+};
+
 const createUserInDatabase = async (data: any) => {
   console.log(`Creating user`, data?.details?.request);
+
+  // Skip if the channel is not permitted.
+  if (!isPermittedChannel(data)) {
+    console.warn(`Creating user / channel is not permitted.`);
+    return;
+  }
 
   const path = data?.details?.request?.path || ""; // api/v2/organizations/org_jNS9by788jZfem2D/members
   const memberIds = data?.details?.request?.body?.members || []; // ["auth0|6777fe2805771b8ae33c09e3"]
@@ -125,6 +137,12 @@ const createUserInDatabase = async (data: any) => {
 const updateUserInDatabase = async (data: any) => {
   console.log(`Updating user`, data?.details?.response);
 
+  // Skip if the channel is not permitted.
+  if (!isPermittedChannel(data)) {
+    console.warn(`Updating user / channel is not permitted.`);
+    return;
+  }
+
   const auth0User = data?.details?.response?.body || {};
   const localUser = await UserModel.getAuth0Sub(auth0User.user_id);
 
@@ -147,6 +165,12 @@ const updateUserInDatabase = async (data: any) => {
 
 const deleteUserFromDatabase = async (data: any) => {
   console.log(`Deleting user`, data?.details?.response);
+
+  // Skip if the channel is not permitted.
+  if (!isPermittedChannel(data)) {
+    console.warn(`Deleting user / channel is not permitted.`);
+    return;
+  }
 
   const auth0User = data?.details?.response?.body || {};
   const localUser = await UserModel.getAuth0Sub(auth0User.user_id);
