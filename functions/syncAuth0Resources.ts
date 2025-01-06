@@ -201,6 +201,7 @@ const deleteUserFromDatabase = async (data: any) => {
 
   // Handle the 'Delete members from an organization' event
   if (description == "Delete members from an organization") {
+    // Take the "members[]" from request body
     const requestBody = data?.details?.request?.body;
     const members = requestBody?.members ?? [];
     for (const id of members) {
