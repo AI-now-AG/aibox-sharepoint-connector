@@ -114,7 +114,10 @@ const createUserInDatabase = async (data: any) => {
         email: userData.email,
         tenant_id: tenant._id,
       };
-      await UserModel.add(user);
+      const localUser = await UserModel.getAuth0Sub(auth0User.data.user_id);
+      if (!localUser) {
+        await UserModel.add(user);
+      }
     }
   }
 };
