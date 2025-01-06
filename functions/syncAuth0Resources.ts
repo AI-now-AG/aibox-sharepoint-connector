@@ -252,7 +252,7 @@ const syncAllOrganizationUsers = async (
       roles: userRoles,
       permissions: assignPermissions(userRoles),
       last_login: user.last_login?.toString(),
-      logins_count: user.logins_count,
+      logins_count: user.logins_count || 0,
       email_verified: user.email_verified,
       blocked: user.blocked,
     });
