@@ -65,6 +65,10 @@ export default {
     return convertObjectIdToString(doc);
   },
 
+  getByTitleAndTenant: async (title: string, tenantId: ObjectId) => {
+    return collection.findOne<Document<Prompt>>({ title, tenant_id: tenantId });
+  },
+
   list: async () =>
     collection.find<Document<Prompt>>({}).sort({ created_at: 1 }),
 
@@ -72,6 +76,36 @@ export default {
     return collection
       .find<Document<Prompt>>({ tenant_id: id })
       .sort({ position: 1, created_at: 1 });
+  },
+
+  listForExportByTenant: async (id: ObjectId) => {
+    // Execute the aggregation
+    return collection.aggregate([
+      {
+        $match: {
+          tenant_id: id,
+        },
+      },
+      {
+        $lookup: {
+          from: "categories",
+          localField: "category",
+          foreignField: "_id",
+          as: "category",
+        },
+      },
+      {
+        $lookup: {
+          from: "knowlegebases",
+          localField: "knowledgebase",
+          foreignField: "_id",
+          as: "knowledgebase",
+        },
+      },
+      {
+        $unwind: "$category",
+      },
+    ]);
   },
 
   update: async (id: string, updatedPrompt: Partial<Prompt>) => {
