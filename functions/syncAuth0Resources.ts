@@ -11,6 +11,7 @@ import UserModel, {
 import TenantModel from "$data/models/tenant.model";
 import usersManagement from "$data/auth0/users-manager";
 import organizationsManagement from "$data/auth0/organizations-manager";
+import rolesManager from "$data/auth0/roles-manager";
 
 /**
  * Handles Auth0 log stream events
@@ -57,7 +58,7 @@ const syncAuth0Resources: Handler = async (
         await syncAuth0UserOnLogin(data);
       }
 
-      // Trigger user create
+      // Trigger 'Add members to an organization'
       // "Create a User" didn't work in this case because the organization could not be detected
       // See: https://auth0.com/docs/customize/log-streams/event-filters#management-api-success
       if (
@@ -67,16 +68,26 @@ const syncAuth0Resources: Handler = async (
         await createUserInDatabase(data);
       }
 
-      // Trigger user update
+      // Trigger 'Update a User'
       // See: https://auth0.com/docs/customize/log-streams/event-filters#management-api-success
       if (eventType == "sapi" && description == "Update a User") {
         await updateUserInDatabase(data);
       }
 
-      // Trigger user delete
+      // Trigger 'Delete a User'
       // See: https://auth0.com/docs/customize/log-streams/event-filters#management-api-success
       if (eventType == "sapi" && description == "Delete a User") {
         await deleteUserFromDatabase(data);
+      }
+
+      // Trigger 'Assign user roles to an Organization member'
+      // "Create a User" didn't work in this case because the organization could not be detected
+      // See: https://auth0.com/docs/customize/log-streams/event-filters#management-api-success
+      if (
+        eventType == "sapi" &&
+        description == "Assign user roles to an Organization member"
+      ) {
+        await updateUserRolesInDatabase(data);
       }
     }
 
@@ -152,8 +163,6 @@ const updateUserInDatabase = async (data: any) => {
       name: auth0User.name,
       email: auth0User.email,
       picture: auth0User.picture,
-      //roles: [],
-      //permissions: [],
       last_login: auth0User.last_login?.toString(),
       logins_count: auth0User.logins_count,
       email_verified: auth0User.email_verified,
@@ -172,12 +181,44 @@ const deleteUserFromDatabase = async (data: any) => {
     return;
   }
 
-  const path = data?.details?.request?.path || ""; // api/v2/users/auth0%7C67766a5f7369b90287906204
+  // Take the "userId" from request
+  // Example path: api/v2/users/auth0%7C67766a5f7369b90287906204
+  const path = data?.details?.request?.path || "";
   const userId = decodeURIComponent(path.split("/").pop());
   const localUser = await UserModel.getAuth0Sub(userId);
 
   if (localUser) {
     await UserModel.delete(localUser._id.toString());
+  }
+};
+
+const updateUserRolesInDatabase = async (data: any) => {
+  console.log(`Updating user roles`, data?.details?.response);
+
+  // Skip if the channel is not permitted.
+  if (!isPermittedChannel(data)) {
+    console.warn(`Updating user roles / channel is not permitted.`);
+    return;
+  }
+
+  // Take the "userId" from request path and "roles" from request body
+  // Example path: api/v2/organizations/org_FpOtXZcZwVZc1unJ/members/auth0%7C66f3a9897dbebab8f2ae9cc0/roles
+  const path = data?.details?.request?.path || "";
+  const userId = decodeURIComponent(path.split("/members/")[1].split("/")[0]);
+  const newRoles = data?.details?.request?.body?.roles || [];
+  const localUser = await UserModel.getAuth0Sub(userId);
+
+  const memberRoles = await rolesManager.getAll();
+  const userRoles = memberRoles.data
+    .map((role) => role.name as UserRole)
+    .filter((role) => newRoles.includes(role));
+
+  if (localUser) {
+    const update: Partial<User> = {
+      roles: userRoles,
+      permissions: assignPermissions(userRoles),
+    };
+    await UserModel.update(localUser._id, update);
   }
 };
 
