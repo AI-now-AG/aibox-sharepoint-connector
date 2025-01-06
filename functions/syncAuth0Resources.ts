@@ -172,8 +172,9 @@ const deleteUserFromDatabase = async (data: any) => {
     return;
   }
 
-  const auth0User = data?.details?.response?.body || {};
-  const localUser = await UserModel.getAuth0Sub(auth0User.user_id);
+  const path = data?.details?.request?.path || ""; // api/v2/users/auth0%7C67766a5f7369b90287906204
+  const userId = decodeURIComponent(path.split("/").pop());
+  const localUser = await UserModel.getAuth0Sub(userId);
 
   if (localUser) {
     await UserModel.delete(localUser._id.toString());
