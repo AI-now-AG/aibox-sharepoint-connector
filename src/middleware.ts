@@ -88,12 +88,12 @@ async function restrictAccess(context: APIContext, next: MiddlewareNext) {
     return context.rewrite("/restricted");
   }
 
-  const matchAminPaths = wildcardMatchInArray(
+  const matchAdminPaths = wildcardMatchInArray(
     context.url.pathname,
     ADMIN_ROUTES,
   );
   if (
-    matchAminPaths &&
+    matchAdminPaths &&
     !auth.isSuperAdmin(context.locals) &&
     !auth.isAdmin(context.locals)
   ) {
@@ -107,6 +107,13 @@ async function restrictAccess(context: APIContext, next: MiddlewareNext) {
   ) {
     return context.redirect(
       `/error?error=tenant_inactive&error_description=Sorry, the tenant associated with your account is currently inactive. Please contact the tenant administrator or support for assistance.`,
+    );
+  }
+
+  // Ensure that blocked users are restricted from accessing the admin area
+  if (context.locals.user?.blocked && context.url.pathname !== "/api/logout") {
+    return context.redirect(
+      `/error?error=account_blocked&error_description=Your account has been temporarily blocked. Please contact support.`,
     );
   }
 
