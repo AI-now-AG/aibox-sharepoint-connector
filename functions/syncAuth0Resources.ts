@@ -238,7 +238,7 @@ const syncAllOrganizationUsers = async (
     const userRoles = roleNames.length ? roleNames : [UserRole.User];
 
     console.log(
-      `Sync all organization users - user ${loggedInUserId} has been synced`,
+      `Sync all organization users - user ${user.user_id} has been synced`,
     );
 
     // Upserts a user by their Auth0 subscription ID (sub).
