@@ -73,13 +73,17 @@ const syncAuth0Resources: Handler = async (
         await updateUserInDatabase(data);
       }
 
-      // Trigger 'Delete a User'
+      // Trigger 'Delete a User' or 'Delete members from an organization'
       // See: https://auth0.com/docs/customize/log-streams/event-filters#management-api-success
-      if (eventType == "sapi" && description == "Delete a User") {
+      if (
+        eventType == "sapi" &&
+        (description == "Delete a User" ||
+          description == "Delete members from an organization")
+      ) {
         await deleteUserFromDatabase(data);
       }
 
-      // Trigger 'Assign user roles to an Organization member'
+      // Trigger 'Assign user roles to an Organization member' or 'Delete user roles from an Organization member'
       // "Create a User" didn't work in this case because the organization could not be detected
       // See: https://auth0.com/docs/customize/log-streams/event-filters#management-api-success
       if (
@@ -181,14 +185,30 @@ const deleteUserFromDatabase = async (data: any) => {
     return;
   }
 
-  // Take the "userId" from request
-  // Example path: api/v2/users/auth0%7C67766a5f7369b90287906204
-  const path = data?.details?.request?.path || "";
-  const userId = decodeURIComponent(path.split("/").pop());
-  const localUser = await UserModel.getAuth0Sub(userId);
+  const { description } = data;
 
-  if (localUser) {
-    await UserModel.delete(localUser._id.toString());
+  // Handle the 'Delete a User' event
+  if (description == "Delete a User") {
+    // Take the "userId" from request
+    // Example path: api/v2/users/auth0%7C67766a5f7369b90287906204
+    const path = data?.details?.request?.path || "";
+    const userId = decodeURIComponent(path.split("/").pop());
+    const localUser = await UserModel.getAuth0Sub(userId);
+    if (localUser) {
+      await UserModel.delete(localUser._id.toString());
+    }
+  }
+
+  // Handle the 'Delete members from an organization' event
+  if (description == "Delete members from an organization") {
+    const requestBody = data?.details?.request?.body;
+    const members = requestBody?.members ?? [];
+    for (const id of members) {
+      const user = await UserModel.getAuth0Sub(id);
+      if (user) {
+        await UserModel.delete(user._id.toString());
+      }
+    }
   }
 };
 
