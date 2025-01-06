@@ -58,14 +58,16 @@
 
   // Important note: User created on Auth0 with super admin , just the Admin on AI box when go into the detail screen
   let role = UserRole.User;
-  function getUserRole(roles: string[] = []): string {
-    return roles?.some(role => role === UserRole.SuperAdmin || role === UserRole.Admin)
+  function getUserRole(roles: string[] = []) {
+    return roles?.some(
+      (role) => role === UserRole.SuperAdmin || role === UserRole.Admin,
+    )
       ? UserRole.Admin
       : UserRole.User;
   }
 
   function isSuperAdmin(roles: string[] = []): boolean {
-    return roles?.some(role => role === UserRole.SuperAdmin);
+    return roles?.some((role) => role === UserRole.SuperAdmin);
   }
 
   onMount(() => {
@@ -110,7 +112,7 @@
     if (validateForm()) {
       try {
         showLoading();
-        userData = { ...userData, roles: [role]};
+        userData = { ...userData, roles: [role] };
         const { error } = await actions.user.create(userData);
         hideLoading();
         if (error) {
@@ -160,7 +162,7 @@
     const { _id = "", blocked } = userData;
     const result = await actions.user.updateBlocked({
       _id,
-      blocked: !blocked
+      blocked: !blocked,
     });
 
     hideLoading();
@@ -381,7 +383,7 @@
 
         <div class="w-full h-[1px] bg-slate-200 mt-2 mb-8"></div>
 
-        {#if userData.email != $currentUser.email}
+        {#if userData.email != $currentUser?.email}
           <div class="flex items-center">
             <button
               class="flex items-centertext-gray-700 font-sans"

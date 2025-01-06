@@ -4,6 +4,7 @@ import { verifyRequestOrigin } from "lucia";
 import { sequence } from "astro/middleware";
 import {
   PUBLIC_ROUTES,
+  ADMIN_ROUTES,
   SUPER_ADMIN_ROUTES,
   FEATURE_MAP_ROUTES,
   FEATURE_PLAINTEXT_ROUTE,
@@ -79,11 +80,23 @@ async function authenticate(context: APIContext, next: MiddlewareNext) {
 
 async function restrictAccess(context: APIContext, next: MiddlewareNext) {
   // Restrict access for non-admin users
-  const matchPath = wildcardMatchInArray(
+  const matchSAPaths = wildcardMatchInArray(
     context.url.pathname,
     SUPER_ADMIN_ROUTES,
   );
-  if (matchPath && !auth.isSuperAdmin(context.locals)) {
+  if (matchSAPaths && !auth.isSuperAdmin(context.locals)) {
+    return context.rewrite("/restricted");
+  }
+
+  const matchAminPaths = wildcardMatchInArray(
+    context.url.pathname,
+    ADMIN_ROUTES,
+  );
+  if (
+    matchAminPaths &&
+    !auth.isSuperAdmin(context.locals) &&
+    !auth.isAdmin(context.locals)
+  ) {
     return context.rewrite("/restricted");
   }
 
@@ -99,7 +112,10 @@ async function restrictAccess(context: APIContext, next: MiddlewareNext) {
 
   // Check included features
   for (const [key, paths] of Object.entries(FEATURE_MAP_ROUTES)) {
-    const matchPath = wildcardMatchInArray(context.url.pathname, paths);
+    const matchAudioToTextPaths = wildcardMatchInArray(
+      context.url.pathname,
+      paths,
+    );
     let hasAccess = false;
     if (context.locals.tenant?.included_features?.length) {
       hasAccess = context.locals.tenant.included_features.some(
@@ -119,7 +135,7 @@ async function restrictAccess(context: APIContext, next: MiddlewareNext) {
         context.locals.tenant.transcriptions?.summary?.enabled ?? true;
     }
 
-    if (matchPath && !hasAccess) {
+    if (matchAudioToTextPaths && !hasAccess) {
       return context.rewrite("/restricted");
     }
   }

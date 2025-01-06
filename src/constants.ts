@@ -9,6 +9,19 @@ export const PUBLIC_ROUTES = [
   "/restricted",
 ];
 
+export const ADMIN_ROUTES = [
+  "/user-management",
+  "/user-management/*",
+  "/prompt-library/prompts",
+  "/prompt-library/prompts/*",
+  "/prompt-library/knowledge-base",
+  "/prompt-library/knowledge-base/*",
+  "/prompt-library/categories",
+  "/prompt-library/categories/*",
+  "/settings/transcription",
+  "/settings/transcription/*",
+];
+
 export const SUPER_ADMIN_ROUTES = [
   "/tenant-management",
   "/tenant-management/*",
