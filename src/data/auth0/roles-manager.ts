@@ -4,7 +4,7 @@ export const getAll = async () => {
   try {
     return await management.roles.getAll();
   } catch (err) {
-    console.log("auth0: get all roles error", err);
+    console.error("auth0: get all roles error", err);
     throw err;
   }
 };

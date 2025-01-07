@@ -64,7 +64,7 @@ const TenantSchema = z.object({
   name: z.string().min(1),
   org_name: z.string().min(1),
   org_id: z.string(),
-  default_language: z.string().nullish(),
+  default_language: z.string().nullish().default("en"),
   theme: z.nativeEnum(TenantTheme),
   primary_color: z.string().nullish(),
   api_key_provider: z.nativeEnum(ApiKeyProvider).optional(),
@@ -77,10 +77,7 @@ const TenantSchema = z.object({
   included_features: z.array(IncludedFeaturesSchema),
   transcriptions: TranscriptionsSchema.optional(),
   active: z.boolean().optional().default(true),
-  disbale_create_new_user: z
-    .boolean()
-    .optional()
-    .default(() => false),
+  disbale_create_new_user: z.boolean().optional().default(false),
   created_at: z
     .date()
     .optional()

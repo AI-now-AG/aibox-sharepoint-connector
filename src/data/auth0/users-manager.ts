@@ -27,7 +27,7 @@ export const get = async (userId: string) => {
     return await management.users.get(requestParameters);
   } catch (error) {
     console.error("auth0: get user error", error);
-    throw error;
+    throw err;
   }
 };
 

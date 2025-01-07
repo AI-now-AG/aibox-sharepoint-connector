@@ -23,7 +23,7 @@ export const get = async (id: string) => {
     };
     return await management.organizations.get(requestParameters);
   } catch (err) {
-    console.log("auth0: get organization error", err);
+    console.error("auth0: get organization error", err);
     throw err;
   }
 };
@@ -32,7 +32,7 @@ export const create = async (bodyParameters: PostOrganizationsRequest) => {
   try {
     return await management.organizations.create(bodyParameters);
   } catch (err) {
-    console.log("auth0: create organization error", err);
+    console.error("auth0: create organization error", err);
     throw err;
   }
 };
@@ -50,7 +50,7 @@ export const update = async (
       bodyParameters,
     );
   } catch (err) {
-    console.log("auth0: update organization error", err);
+    console.error("auth0: update organization error", err);
     throw err;
   }
 };
@@ -72,7 +72,7 @@ export const addEnabledConnection = async (
       bodyParameters,
     );
   } catch (err) {
-    console.log("auth0: add enabled connection error", err);
+    console.error("auth0: add enabled connection error", err);
     throw err;
   }
 };
@@ -91,7 +91,7 @@ export const deleteEnabledConnection = async (
       requestParameters,
     );
   } catch (err) {
-    console.log("auth0: delete enabled connection error", err);
+    console.error("auth0: delete enabled connection error", err);
     throw err;
   }
 };
@@ -104,7 +104,7 @@ export const getMemberRoles = async (id: string, userId: string) => {
     };
     return await management.organizations.getMemberRoles(parameters);
   } catch (err) {
-    console.log("auth0: get organization member's roles error", err);
+    console.error("auth0: get organization member's roles error", err);
     throw err;
   }
 };
@@ -123,7 +123,7 @@ export const addMembers = async (id: string, members: string[]) => {
       bodyParameters,
     );
   } catch (err) {
-    console.log("auth0: organization add members error", err);
+    console.error("auth0: organization add members error", err);
     throw err;
   }
 };
@@ -147,7 +147,7 @@ export const addMemberRoles = async (
       bodyParameters,
     );
   } catch (err) {
-    console.log("auth0: organization add member roles error", err);
+    console.error("auth0: organization add member roles error", err);
     throw err;
   }
 };
@@ -171,7 +171,7 @@ export const deleteMemberRoles = async (
       bodyParameters,
     );
   } catch (err) {
-    console.log("auth0: organization add member roles error", err);
+    console.error("auth0: organization add member roles error", err);
     throw err;
   }
 };

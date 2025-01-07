@@ -261,7 +261,27 @@ const updateUserRolesInDatabase = async (data: any) => {
   }
 };
 
-const createTenantInDatabase = async (data: any) => {};
+const createTenantInDatabase = async (data: any) => {
+  console.log(`Creating tenant`, data?.details?.response);
+
+  // Skip if the channel is not permitted.
+  if (!isPermittedChannel(data)) {
+    console.warn(`Creating tenant / channel is not permitted.`);
+    return;
+  }
+
+  // Take the "orgId" from response body
+  // Example: { id: "org_kxLHFC47tCHHOxsB" }
+  const orgId = data?.details?.response?.body?.id || "";
+  const auth0Tenant = await organizationsManagement.get(orgId);
+
+  const tenant: Partial<Omit<Tenant, "_id">> = {
+    org_id: auth0Tenant.data.id,
+    org_name: auth0Tenant.data.name,
+    name: auth0Tenant.data.display_name,
+  };
+  await TenantModel.create(tenant);
+};
 
 const updateTenantInDatabase = async (data: any) => {
   console.log(`Updating tenant`, data?.details?.response);
@@ -272,7 +292,7 @@ const updateTenantInDatabase = async (data: any) => {
     return;
   }
 
-  // Take the "orgId" from request
+  // Take the "orgId" from request path
   // Example path: api/v2/organizations/org_jNS9by788jZfem2D
   const path = data?.details?.request?.path || "";
   const orgId = decodeURIComponent(path.split("/").pop());
