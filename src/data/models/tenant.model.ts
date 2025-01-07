@@ -80,6 +80,8 @@ const TenantSchema = z.object({
   azure_openai_instance_name: z.string().nullish(),
   azure_openai_whisper_model: z.string().nullish(),
   azure_openai_chat_model: z.string().nullish(),
+  speech_api_key: z.string().nullish(),
+  speech_region: z.string().nullish(),
   included_features: z.array(IncludedFeaturesSchema),
   transcriptions: TranscriptionsSchema.nullish(),
   active: z.boolean().default(true).optional(),

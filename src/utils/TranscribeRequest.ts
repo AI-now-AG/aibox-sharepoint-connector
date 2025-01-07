@@ -17,6 +17,8 @@ export interface TranscribeRequest {
   azureOpenAIWhisperModel?: string;
   azureOpenAIChatModel?: string;
   azureOpenAIApiKey?: string;
+  speechKey?: string;
+  speechRegion?: string;
   audioBuffer?: Buffer;
   isDiarizationEnabled?: boolean;
   maxSpeakers?: number;

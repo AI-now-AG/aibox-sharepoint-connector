@@ -30,12 +30,15 @@ const TenantInputParamsSchema = z.object({
   azure_openai_instance_name: z.string().optional(),
   azure_openai_whisper_model: z.string().optional(),
   azure_openai_chat_model: z.string().optional(),
+  speech_api_key: z.string().optional(),
+  speech_region: z.string().optional(),
   included_features: z.array(IncludedFeaturesSchema),
 });
 
 const TenanKeyEncryptSchema = z.object({
   openai_api_key: z.string().optional(),
   azure_openai_api_key: z.string().optional(),
+  speech_api_key: z.string().optional(),
 });
 
 const TenantInputIdentifierSchema = z.object({
@@ -131,12 +134,15 @@ export const tenant = {
   encryptApiKeys: defineAction({
     input: TenanKeyEncryptSchema,
     handler: async (input) => {
-      const { openai_api_key, azure_openai_api_key } = input;
+      const { openai_api_key, azure_openai_api_key, speech_api_key } = input;
       if (openai_api_key) {
         input.openai_api_key = encrypt(openai_api_key);
       }
       if (azure_openai_api_key) {
         input.azure_openai_api_key = encrypt(azure_openai_api_key);
+      }
+      if (speech_api_key) {
+        input.speech_api_key = encrypt(speech_api_key);
       }
 
       return input;
@@ -146,12 +152,15 @@ export const tenant = {
   decryptApiKeys: defineAction({
     input: TenanKeyEncryptSchema,
     handler: async (input) => {
-      const { openai_api_key, azure_openai_api_key } = input;
+      const { openai_api_key, azure_openai_api_key, speech_api_key } = input;
       if (openai_api_key) {
         input.openai_api_key = decrypt(openai_api_key);
       }
       if (azure_openai_api_key) {
         input.azure_openai_api_key = decrypt(azure_openai_api_key);
+      }
+      if (speech_api_key) {
+        input.speech_api_key = decrypt(speech_api_key);
       }
 
       return input;

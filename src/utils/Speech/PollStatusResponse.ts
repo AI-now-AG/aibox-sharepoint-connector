@@ -1,3 +1,5 @@
+import type { BatchStatus } from "$shared/transcriptionTasks";
+
 export interface PollStatusResponse {
   self: string;
   model: {
@@ -12,13 +14,14 @@ export interface PollStatusResponse {
     channels: number[];
     punctuationMode: string;
     profanityFilterMode: string;
+    destinationContainerUrl: string;
     languageIdentification: {
       candidateLocales: string[];
     };
     error?: ErrorResponse;
   };
   lastActionDateTime: string;
-  status: string; // "NotStarted" | "Running" | "Succeeded" | "Failed"
+  status: BatchStatus; // "NotStarted" | "Running" | "Succeeded" | "Failed"
   createdDateTime: string;
   locale: string;
   displayName: string;

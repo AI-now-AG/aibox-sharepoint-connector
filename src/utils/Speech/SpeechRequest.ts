@@ -19,6 +19,7 @@ export interface TranscriptionProperties {
   languageIdentification: LanguageIdentification;
   punctuationMode: string;
   profanityFilterMode: string;
+  destinationContainerUrl: string;
 }
 
 // Define the structure for the entire body object
@@ -26,7 +27,6 @@ export interface TranscriptionRequestBody {
   displayName: string;
   locale: string;
   contentUrls: string[];
-  destinationContainerUrl: string;
   properties: TranscriptionProperties;
   customProperties: Record<string, unknown>;
 }

@@ -4,10 +4,18 @@ import { MongoClient, Db, Collection, ObjectId } from "mongodb";
 const MONGO_URI = process.env.MONGODB_URI || "";
 const DB_NAME = process.env.MONGODB_DATABASE;
 
+export enum BatchStatus {
+  Failed = "Failed",
+  NotStarted = "NotStarted",
+  Running = "Running",
+  Succeeded = "Succeeded",
+}
+
 export const BatchSchema = z.object({
   name: z.string(),
-  status: z.string().optional(),
+  status: z.enum([BatchStatus.Failed, BatchStatus.NotStarted, BatchStatus.Running, BatchStatus.Succeeded]).optional(),
   taskUrl: z.string().optional(),
+  destUrl: z.string().optional(),
   diarizationEnabled: z.boolean().optional(),
   maxSpeakers: z.number().optional(),
   error: z.string().optional(),
@@ -17,6 +25,7 @@ const TaskSchema = z.object({
   taskId: z.string(),
   tenant_id: z.instanceof(ObjectId).optional(),
   creator_id: z.instanceof(ObjectId).optional(),
+  audio_url: z.string().optional(),
   status: z.string().optional(),
   createdAt: z.string().optional(),
   updatedAt: z.string().optional(),

@@ -56,6 +56,7 @@ const transcribeAudio: Handler = async (
       uploadUrl,
       transcriptionType,
       encryptedApiKey,
+      speechKey,
     } = transcribeParams;
 
     if (!fileName || !uploadUrl || !transcriptionType) {
@@ -70,11 +71,15 @@ const transcribeAudio: Handler = async (
     );
     transcribeParams.azureOpenAIApiKey = azureOpenAIApiKey;
 
-    console.log("encryptedApiKey", encryptedApiKey);
-    console.log("decryptedApiKey", azureOpenAIApiKey);
+    const azureSpeechKey = decrypt(
+      speechKey || process.env.AZURE_LARGE_SPEECH_KEY!,
+    );
+    transcribeParams.speechKey = azureSpeechKey;
+
     createTask(uniqueName, {
       tenant_id: new ObjectId(transcribeParams.tenantId),
       creator_id: new ObjectId(transcribeParams.userId),
+      audio_url: transcribeParams.uploadUrl,
       status: "processing",
     });
     let transcriptionResult: TranscriptionResult = {
@@ -202,11 +207,7 @@ async function convertStereoToMono(
     const outputStream = new stream.PassThrough();
     try {
       console.log("Converting to mono");
-      processWithFFmpeg(
-        downloadBlockBlobResponse,
-        outputStream,
-        fileExtension,
-      );
+      processWithFFmpeg(downloadBlockBlobResponse, outputStream, fileExtension);
       console.log("File converted");
       await monoBlobClient.uploadStream(outputStream);
       fileUrl = monoBlobClient.url;

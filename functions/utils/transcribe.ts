@@ -19,6 +19,7 @@ import {
   TranscriptionType,
 } from "$utils/TranscribeRequest";
 import { processTranscription } from "./batchTranscription";
+import type { TranscriptionResponse } from "$utils/Speech/SpeechResponse";
 
 const DEFAULT_WHISPER_MODEL_NAME = "whisper-1";
 const DEFAULT_API_VERSION = "2024-08-01-preview";
@@ -341,37 +342,23 @@ export async function transcribeUsingAzureOpenAI(
   transcribeParams: TranscribeRequest,
 ): Promise<TranscriptionResult> {
   try {
-    const maxNumberOfSpeakers = transcribeParams.maxSpeakers ?? 2
+    const maxNumberOfSpeakers = transcribeParams.maxSpeakers ?? 2;
+    const speechKey = transcribeParams.speechKey ?? process.env.AZURE_LARGE_SPEECH_KEY!;
+    const speechRegion = transcribeParams.speechRegion ?? process.env.AZURE_LARGE_SPEECH_REGION!;
+    // const { jsonData, transcriptionText } = await processTranscription(
     const { jsonData, transcriptionText } = await processTranscription(
       transcribeParams.uploadUrl,
       transcribeParams.uniqueName,
+      speechKey,
+      speechRegion,
       transcribeParams.isDiarizationEnabled,
       maxNumberOfSpeakers,
     );
-
-    const fileNameWithExtension = transcribeParams.uploadUrl
-      .split("/")
-      .pop()!
-      .split("?")[0];
-    const fileNameWithoutExtension = fileNameWithExtension
-      .split(".")
-      .slice(0, -1)
-      .join(".");
-    const outputURLs: { [key: string]: string } = {};
-    outputURLs["json"] = await uploadOutputToBlob(
+    const outputURLs = await uploadLargeFile(
+      transcribeParams.uploadUrl,
       transcribeParams.folderName,
-      `${fileNameWithoutExtension}.json`,
-      JSON.stringify(jsonData),
-      "json",
-      transcribeParams.transcriptionType,
-    );
-
-    outputURLs["txt"] = await uploadOutputToBlob(
-      transcribeParams.folderName,
-      `${fileNameWithoutExtension}.txt`,
+      jsonData,
       transcriptionText,
-      "txt",
-      transcribeParams.transcriptionType,
     );
 
     return {
@@ -395,6 +382,39 @@ export async function transcribeUsingAzureOpenAI(
 
     return { success: false, data: null, error: errorMessage };
   }
+}
+
+export async function uploadLargeFile(
+  uploadUrl: string,
+  folderName: string,
+  jsonData: TranscriptionResponse,
+  transcriptionText: string,
+): Promise<{ [key: string]: string }> {
+  const fileNameWithExtension = uploadUrl
+    .split("/")
+    .pop()!
+    .split("?")[0];
+  const fileNameWithoutExtension = fileNameWithExtension
+    .split(".")
+    .slice(0, -1)
+    .join(".");
+  const outputURLs: { [key: string]: string } = {};
+  
+  outputURLs["json"] = await uploadOutputToBlob(
+    folderName,
+    `${fileNameWithoutExtension}.json`,
+    JSON.stringify(jsonData),
+    "json",
+    TranscriptionType.Largefile, // Static type
+  );
+  outputURLs["txt"] = await uploadOutputToBlob(
+    folderName,
+    `${fileNameWithoutExtension}.txt`,
+    transcriptionText,
+    "txt",
+    TranscriptionType.Largefile, // Static type
+  );
+  return outputURLs;
 }
 
 async function uploadOutputToBlob(

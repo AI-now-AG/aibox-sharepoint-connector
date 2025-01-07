@@ -522,6 +522,8 @@
       azureOpenAIEndpoint: tenant?.azure_openai_endpoint,
       azureOpenAIWhisperModel: tenant?.azure_openai_whisper_model,
       azureOpenAIChatModel: tenant?.azure_openai_chat_model,
+      speechKey: tenant?.speech_api_key,
+      speechRegion: tenant?.speech_region,
       isDiarizationEnabled: isDiarizationEnabled,
       maxSpeakers: parseInt(maxNumberOfSpeakers),
     };
@@ -614,8 +616,33 @@
     }
   }
 
+  function getPollingInterval(fileSizeBytes: number): number {
+    const fileSizeMB = fileSizeBytes / 1024 / 1024;
+    const timePerMB = 60 / 1.7;
+    const estimatedTime = timePerMB * fileSizeMB;
+
+    if (fileSizeMB <= 25) return Math.min(estimatedTime, 30) * 1000; // Poll at least every 30 seconds for smaller files
+    if (fileSizeMB <= 50) return Math.min(estimatedTime, 60) * 1000; // Poll every 1 minute for medium-smaller files
+    if (fileSizeMB <= 200) return Math.min(estimatedTime, 120) * 1000; // Poll every 2 minutes for medium files
+    if (fileSizeMB <= 500) return Math.min(estimatedTime, 300) * 1000; // Poll every 5 minutes for larger files
+    if (fileSizeMB <= 1000) return Math.min(estimatedTime, 600) * 1000; // Poll every 10 minutes for very large files
+    return Math.min(estimatedTime, 900) * 1000; // Poll every 15 minutes for extra-large files
+  }
+
   function startPolling() {
-    intervalId = setInterval(checkOutputFileReady, 5000);
+    if (transcriptionType === TranscriptionType.Largefile) {
+      let fileSize = audioFile?.size;
+      if (fileSize) {
+        intervalId = setInterval(
+          checkOutputFileReady,
+          getPollingInterval(fileSize),
+        );
+      } else {
+        intervalId = setInterval(checkOutputFileReady, getPollingInterval(200));
+      }
+    } else {
+      intervalId = setInterval(checkOutputFileReady, 5000);
+    }
   }
 
   function confirmStartNew() {

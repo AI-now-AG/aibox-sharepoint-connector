@@ -8,6 +8,11 @@ import { promisify } from "util";
 import { pipeline } from "stream";
 import { getTask } from "$shared/transcriptionTasks";
 import { TranscriptionType } from "$utils/TranscribeRequest";
+import {
+  pollTranscriptionTask,
+  processTranscriptionResult,
+} from "./utils/batchTranscription";
+import type { TranscriptionResponse } from "$utils/Speech/SpeechResponse";
 
 const checkFileExist: Handler = async (event, context) => {
   const {
@@ -269,6 +274,27 @@ async function streamToString(
     });
     readableStream?.on("error", reject);
   });
+}
+
+export async function pollingAndStatus(
+  taskUrl: string,
+  uniqueName: string,
+  enableDiarization: boolean = false,
+): Promise<{ jsonData: TranscriptionResponse; transcriptionText: string }> {
+  try {
+    console.log("Polling processing transcription");
+    const pollResponse = await pollTranscriptionTask(taskUrl, uniqueName);
+
+    const transcriptionData = await processTranscriptionResult(
+      uniqueName,
+      enableDiarization,
+      pollResponse.links.files,
+    );
+    return transcriptionData;
+  } catch (error) {
+    console.error("Error processing transcription:", error);
+    throw error;
+  }
 }
 
 export { checkFileExist as handler };
