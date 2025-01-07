@@ -280,15 +280,21 @@ export async function pollingAndStatus(
   taskUrl: string,
   uniqueName: string,
   enableDiarization: boolean = false,
+  subscriptionKey: string,
 ): Promise<{ jsonData: TranscriptionResponse; transcriptionText: string }> {
   try {
     console.log("Polling processing transcription");
-    const pollResponse = await pollTranscriptionTask(taskUrl, uniqueName);
+    const pollResponse = await pollTranscriptionTask(
+      taskUrl,
+      uniqueName,
+      subscriptionKey,
+    );
 
     const transcriptionData = await processTranscriptionResult(
       uniqueName,
       enableDiarization,
       pollResponse.links.files,
+      subscriptionKey,
     );
     return transcriptionData;
   } catch (error) {
