@@ -1,5 +1,6 @@
 import management from "$data/auth0/management-client";
 import type {
+  GetOrganizationsByIdRequest,
   DeleteEnabledConnectionsByConnectionIdRequest,
   GetOrganizationMemberRolesRequest,
   PatchOrganizationsByIdOperationRequest,
@@ -14,6 +15,18 @@ import type {
   DeleteOrganizationMemberRolesOperationRequest,
   DeleteOrganizationMemberRolesRequest,
 } from "auth0";
+
+export const get = async (id: string) => {
+  try {
+    const requestParameters: GetOrganizationsByIdRequest = {
+      id,
+    };
+    return await management.organizations.get(requestParameters);
+  } catch (err) {
+    console.log("auth0: get organization error", err);
+    throw err;
+  }
+};
 
 export const create = async (bodyParameters: PostOrganizationsRequest) => {
   try {
@@ -164,6 +177,7 @@ export const deleteMemberRoles = async (
 };
 
 export default {
+  get,
   create,
   update,
   addEnabledConnection,

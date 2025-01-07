@@ -8,7 +8,7 @@ import UserModel, {
   UserRole,
   type User,
 } from "$data/models/user.model";
-import TenantModel from "$data/models/tenant.model";
+import TenantModel, { type Tenant } from "$data/models/tenant.model";
 import usersManagement from "$data/auth0/users-manager";
 import organizationsManagement from "$data/auth0/organizations-manager";
 
@@ -92,6 +92,18 @@ const syncAuth0Resources: Handler = async (
           description == "Delete user roles from an Organization member")
       ) {
         await updateUserRolesInDatabase(data);
+      }
+
+      // Trigger 'Create an Organization'
+      // See: https://auth0.com/docs/customize/log-streams/event-filters#management-api-success
+      if (eventType == "sapi" && description == "Create an Organization") {
+        await createTenantInDatabase(data);
+      }
+
+      // Trigger 'Modify an Organization'
+      // See: https://auth0.com/docs/customize/log-streams/event-filters#management-api-success
+      if (eventType == "sapi" && description == "Modify an Organization") {
+        await updateTenantInDatabase(data);
       }
     }
 
@@ -246,6 +258,33 @@ const updateUserRolesInDatabase = async (data: any) => {
       permissions: assignPermissions(roleNames),
     };
     await UserModel.update(localUser._id, update);
+  }
+};
+
+const createTenantInDatabase = async (data: any) => {};
+
+const updateTenantInDatabase = async (data: any) => {
+  console.log(`Updating tenant`, data?.details?.response);
+
+  // Skip if the channel is not permitted.
+  if (!isPermittedChannel(data)) {
+    console.warn(`Updating tenant / channel is not permitted.`);
+    return;
+  }
+
+  // Take the "orgId" from request
+  // Example path: api/v2/organizations/org_jNS9by788jZfem2D
+  const path = data?.details?.request?.path || "";
+  const orgId = decodeURIComponent(path.split("/").pop());
+  const localTenant = await TenantModel.getById(orgId);
+  const auth0Tenant = await organizationsManagement.get(orgId);
+
+  if (localTenant) {
+    const update: Partial<Tenant> = {
+      org_name: auth0Tenant.data.name,
+      name: auth0Tenant.data.display_name,
+    };
+    await TenantModel.update(localTenant._id, update);
   }
 };
 
