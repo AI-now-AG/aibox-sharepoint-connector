@@ -2,6 +2,7 @@
 import Layout from "$layouts/Layout.astro";
 import { useTranslations } from "$i18n/utils";
 import SettingForm from "./SettingForm.svelte";
+import { transformRawData } from "$utils/transformRawData";
 import { Permission } from "$data/models/user.model";
 import { TranscriptionType } from "$utils/TranscribeRequest";
 import { type TranscriptionCard } from "$utils/TranscriptionCard";
@@ -33,14 +34,21 @@ const cards: TranscriptionCard[] = [
     toggle: transcriptions?.subtitles?.enabled ?? false,
     type: TranscriptionType.Subtitles,
   },
-  {
-    title: t("settings.transcription.largefile-title"),
-    //description: t("settings.transcription.largefile-description"),
-    description: transcriptions?.largefile?.text ?? "",
-    toggle: transcriptions?.largefile?.enabled ?? false,
-    type: TranscriptionType.Largefile,
-  },
 ];
+
+if (Astro.locals.tenant) {
+  const data = transformRawData(Astro.locals.tenant);
+  const { speech_api_key, speech_region } = data || {};
+  if (speech_api_key && speech_region) {
+    cards.push({
+      title: t("settings.transcription.largefile-title"),
+      //description: t("settings.transcription.largefile-description"),
+      description: transcriptions?.largefile?.text ?? "",
+      toggle: transcriptions?.largefile?.enabled ?? false,
+      type: TranscriptionType.Largefile,
+    });
+  }
+}
 let userPermissions = Astro.locals.user.permissions;
 ---
 
