@@ -23,7 +23,7 @@ export const get = async (id: string) => {
     };
     return await management.organizations.get(requestParameters);
   } catch (err) {
-    console.error("auth0: get organization error", err);
+    console.error(`auth0: get organization ${id} error`, err);
     throw err;
   }
 };
