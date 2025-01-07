@@ -575,6 +575,24 @@
       </div>
     </div>
 
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <div class="w-full bg-white rounded px-4 py-2 mt-4">
+      <div class="flex items-center">
+        <input
+          id="disable-create-user"
+          type="checkbox"
+          class="checkbox checkbox-primary"
+          value="disbale-create-user"
+          bind:checked={tenantData.disbale_create_new_user}
+        />
+        <label class="label cursor-pointer ml-2" for="disable-create-user">
+          <span class="label-text ml-2"
+            >{t("tenant.disable-create-new-user")}</span
+          >
+        </label>
+      </div>
+    </div>
+
     <ConfirmDialog
       title={t("tenant.tenants.tenant.update-confirmation")}
       bind:modal={confirmUpdateModal}

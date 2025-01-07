@@ -31,6 +31,10 @@ const TenantInputParamsSchema = z.object({
   azure_openai_whisper_model: z.string().optional(),
   azure_openai_chat_model: z.string().optional(),
   included_features: z.array(IncludedFeaturesSchema),
+  disbale_create_new_user: z
+    .boolean()
+    .optional()
+    .default(() => false),
 });
 
 const TenanKeyEncryptSchema = z.object({

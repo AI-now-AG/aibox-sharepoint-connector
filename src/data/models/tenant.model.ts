@@ -77,6 +77,10 @@ const TenantSchema = z.object({
   included_features: z.array(IncludedFeaturesSchema),
   transcriptions: TranscriptionsSchema.optional(),
   active: z.boolean().optional().default(true),
+  disbale_create_new_user: z
+    .boolean()
+    .optional()
+    .default(() => false),
   created_at: z
     .date()
     .optional()

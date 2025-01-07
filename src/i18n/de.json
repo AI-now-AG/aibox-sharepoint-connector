@@ -255,5 +255,7 @@
   "user.create-successful": "Benutzer erfolgreich erstellt",
   "user.create-failed": "Benutzererstellung fehlgeschlagen",
   "user.update-successful": "Benutzer erfolgreich aktualisiert",
-  "user.udpate-failed": "Benutzeraktualisierung fehlgeschlagen"
+  "user.udpate-failed": "Benutzeraktualisierung fehlgeschlagen",
+  "tenant.disable-create-new-user": "Not allow create new user ",
+  "user.not-allow-create-new-user": "This organization could create new user"
 }
