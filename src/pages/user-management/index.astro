@@ -8,7 +8,7 @@ const t = useTranslations();
 
 const tenant = Astro.locals.tenant;
 const tenantId = tenant?._id?.toString() ?? "";
-const user = Astro.locals.user;
+const isDisbaleCreateNewUser = tenant.disbale_create_new_user;
 ---
 
 <Layout>
@@ -18,14 +18,25 @@ const user = Astro.locals.user;
     <h1 class="pt-2 lg:pt-8 text-4xl font-bold">
       {t("user.user-management")}
     </h1>
-
-    <a
-      href="./user-management/add"
-      class="mt-2 lg:mt-8 btn btn-active btn-neutral font-normal grow-0"
-    >
-      <span set:html={svgIcons.add} />
-      {t("user.add-new-user")}
-    </a>
+    {
+      isDisbaleCreateNewUser ? (
+        <button
+          class={"mt-2 lg:mt-8 btn font-normal grow-0"}
+          onclick={`alert('${t("user.not-allow-create-new-user")}');`}
+        >
+          <span set:html={svgIcons.add} />
+          {t("user.add-new-user")}
+        </button>
+      ) : (
+        <a
+          href="./user-management/add"
+          class="mt-2 lg:mt-8 btn btn-active btn-neutral font-normal grow-0"
+        >
+          <span set:html={svgIcons.add} />
+          {t("user.add-new-user")}
+        </a>
+      )
+    }
   </div>
   <div class="px-8">
     <UserList tenantId={tenantId} client:load />

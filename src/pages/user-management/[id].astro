@@ -28,8 +28,5 @@ const data = transformRawData(user);
 ---
 
 <Layout>
-  <UserForm
-    user={data}
-    client:load
-  />
+  <UserForm user={data} tenant={tenant} client:load />
 </Layout>

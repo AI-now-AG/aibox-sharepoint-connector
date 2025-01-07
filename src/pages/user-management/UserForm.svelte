@@ -9,7 +9,7 @@
   import Loading from "$components/Loading.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import AlertDialog from "$components/AlertDialog.svelte";
-  import { tenant, user as currentUser } from "$stores";
+  import { user as currentUser } from "$stores";
   import { loading, showLoading, hideLoading } from "$stores";
   import log from "$utils/log";
   import moment from "moment";
@@ -20,6 +20,7 @@
   const t = useTranslations();
 
   export let user: any;
+  export let tenant: any;
 
   // List of enterprise providers
   const enterpriseProviders = [
@@ -71,6 +72,10 @@
   }
 
   onMount(() => {
+    if (mode == MODE.Create && tenant && tenant.disbale_create_new_user) {
+      window.history.back();
+      return;
+    }
     if (isSuperAdmin(userData.roles)) {
       isUpdateRoleDisabled = true;
       role = UserRole.SuperAdmin;
@@ -346,7 +351,7 @@
               </tr>
               <tr class="">
                 <td class="text-gray-400">{t("user.organization")}</td>
-                <td class="text-base">{$tenant?.name ?? "-"}</td>
+                <td class="text-base">{tenant?.name ?? "-"}</td>
               </tr>
             </table>
           </div>
