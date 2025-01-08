@@ -30,7 +30,7 @@ const syncAuth0Resources: Handler = async (
 
     if (
       !authHeader ||
-      authHeader !== `Bearer 6d3c5bc2-12d1-4d8c-b467-070c81f1adbc`
+      authHeader !== `Bearer ${process.env.AUTH0_LOG_SECRET}`
     ) {
       return {
         statusCode: 401,
