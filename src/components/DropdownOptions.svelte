@@ -8,21 +8,20 @@
 </script>
 
 <script lang="ts">
-  import { useTranslations } from "$i18n/utils";
-  const t = useTranslations();
   export let options: Option[] = [];
   export let widthClass = "w-48";
+  export let styleVisibility = "";
 </script>
 
 <ul
-  class={`py-2 dropdown-content menu bg-base-100 rounded-xl z-[1] p-2 shadow ${widthClass} `}
+  class={`py-2 dropdown-content menu bg-base-100 rounded-xl p-2 shadow ${widthClass}`}
+  style={styleVisibility}
 >
   {#each options as option}
     <li>
       <button
         class="flex items-center px-4 py-2 text-gray-700 font-sans w-full"
-        on:click={(e) => {
-          e.stopPropagation();
+        on:click|stopPropagation={(e) => {
           option.action();
         }}
       >

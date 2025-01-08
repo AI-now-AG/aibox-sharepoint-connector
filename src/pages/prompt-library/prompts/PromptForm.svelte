@@ -9,7 +9,7 @@
 
   const t = useTranslations();
 
-  type Group = { title: string; _id: string }; // TODO: Get the type from the API endpoint
+  type Group = { title: string; _id: string };
   type Category = {
     title: string;
     _id: string;
@@ -80,24 +80,6 @@
   });
 
   async function fetchInstructionAndKB() {
-    /*const instructionResponse = await fetch("/api/instructions.json", {
-      method: "GET",
-    });
-    const instructionData = (await instructionResponse.json()) as Instruction[];
-    if (instructionData) {
-      if (prompt) {
-        prompt.instructions?.forEach((instructionObj: any) => {
-          const instruction = instructionData.find(
-            (e) => e._id == instructionObj.toString(),
-          );
-          if (instruction) {
-            selectedInstructions.push(instruction);
-          }
-        });
-      }
-      instructions = instructionData;
-    }*/
-
     const knowledgeBaseResponse = await fetch("/api/knowledge-base.json", {
       method: "GET",
     });
@@ -167,6 +149,12 @@
       isSaving = false;
     }
   }
+
+  function handleKeyDown(event: any) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+    }
+  }
 </script>
 
 <div class="container max-w-5xl mx-auto p-4">
@@ -192,6 +180,7 @@
             bind:value={promptTitle}
             placeholder="e.g. Create three sports headlines"
             class="input input-bordered w-full min-w-xs"
+            on:keydown={handleKeyDown}
           />
         </div>
       </div>
@@ -228,27 +217,12 @@
       <div
         class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 justify-center"
       >
-        <!-- <MultiInput
-          title={t("prompt-library.add.prompts.instructions")}
-          placeholder="e.g. Instruction"
-          items={instructions}
-          bind:selectedItems={selectedInstructions}
-        /> -->
-
         <MultiInput
           title={t("prompt-library.add.prompts.knowledge-base")}
           placeholder="e.g. Knowledge base"
           items={knowledgeBases}
           bind:selectedItems={selectedKnowledgeBases}
         />
-
-        <!-- <SingleInput
-          title="Documents"
-          placeholder="e.g. KB 1"
-          items={kbs}
-          bind:selectedItem={selectedKb}
-          onUpdate={handleUpdateKB}
-        /> -->
       </div>
 
       {#if isEditable}

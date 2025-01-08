@@ -33,6 +33,10 @@ export default {
     return collection.findOne<Document<KnowledgeBase>>({ _id });
   },
 
+  getByTitleAndTenant: async (title: string, tenantId: ObjectId) => {
+    return collection.findOne<Document<KnowledgeBase>>({ title, tenant_id: tenantId });
+  },
+
   list: async () =>
     collection.find<Document<KnowledgeBase>>({}).sort({ created_at: 1 }),
 

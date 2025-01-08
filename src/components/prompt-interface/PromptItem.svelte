@@ -1,9 +1,8 @@
 <script lang="ts">
-  import DropdownOptions, {
-    type Option,
-  } from "$components/DropdownOptions.svelte";
-  import { svgIcons } from "$assets/icons";
+  import DropdownSection from "$components/DropdownSection.svelte";
+  import { type Option } from "$components/DropdownOptions.svelte";
   import { fade } from "svelte/transition";
+  import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
 
   const t = useTranslations();
@@ -50,14 +49,6 @@
       },
     },
   ];
-
-  let isShowDropdownOption = false;
-  const handleMouseEnter = () => {
-    isShowDropdownOption = true;
-  };
-  const handleMouseLeave = () => {
-    isShowDropdownOption = false;
-  };
 </script>
 
 <div class="card bg-base-100 shadow-xl" out:fade>
@@ -79,18 +70,6 @@
     {/if}
   </div>
   {#if isEditable}
-    <!-- svelte-ignore a11y-no-static-element-interactions -->
-    <section
-      class="absolute top-6 right-3 dropdown dropdown-hover dropdown-end"
-      on:mouseenter={handleMouseEnter}
-      on:mouseleave={handleMouseLeave}
-    >
-      <div class="text-neutral hover:bg-slate-200 btn btn-ghost btn-sm">
-        {@html svgIcons.threeDot}
-      </div>
-      {#if isShowDropdownOption}
-        <DropdownOptions {options} />
-      {/if}
-    </section>
+    <DropdownSection cssClasses={"absolute top-6 right-3"} {options} />
   {/if}
 </div>

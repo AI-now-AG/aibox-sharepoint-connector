@@ -95,6 +95,10 @@ export default {
     return collection.findOne<Document<Category>>({ title });
   },
 
+  getByTitleAndTenant: async (title: string, tenantId: ObjectId) => {
+    return collection.findOne<Document<Category>>({ title, tenant_id: tenantId });
+  },
+
   getBySlug: async (slug: string) => {
     return collection.findOne<Document<Category>>({ slug });
   },
