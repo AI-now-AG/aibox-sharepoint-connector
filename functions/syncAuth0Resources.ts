@@ -142,22 +142,27 @@ const createUserInDatabase = async (data: any) => {
   const orgId = path.match(/organizations\/([^/]+)/)[1];
   const tenant = await TenantModel.getById(orgId);
 
-  for (const memberId of memberIds) {
-    const auth0User = await usersManagement.get(memberId);
-    const { data: userData } = auth0User;
-    if (tenant) {
-      const user: Partial<Omit<User, "_id">> = {
-        auth0_sub: userData.user_id,
-        username: userData.nickname,
-        name: userData.name,
-        email: userData.email,
-        tenant_id: tenant._id,
-      };
-      const localUser = await UserModel.getAuth0Sub(auth0User.data.user_id);
-      if (!localUser) {
-        await UserModel.add(user);
+  try {
+    for (const memberId of memberIds) {
+      const auth0User = await usersManagement.get(memberId);
+      const { data: userData } = auth0User;
+
+      if (tenant) {
+        const user: Partial<Omit<User, "_id">> = {
+          auth0_sub: userData.user_id,
+          username: userData.nickname,
+          name: userData.name,
+          email: userData.email,
+          tenant_id: tenant._id,
+        };
+        const localUser = await UserModel.getAuth0Sub(auth0User.data.user_id);
+        if (!localUser) {
+          await UserModel.add(user);
+        }
       }
     }
+  } catch (error: any) {
+    console.warn(`Creating user error`, error);
   }
 };
 
@@ -173,18 +178,22 @@ const updateUserInDatabase = async (data: any) => {
   const auth0User = data?.details?.response?.body || {};
   const localUser = await UserModel.getAuth0Sub(auth0User.user_id);
 
-  if (localUser) {
-    const update: Partial<User> = {
-      username: auth0User.nickname,
-      name: auth0User.name,
-      email: auth0User.email,
-      picture: auth0User.picture,
-      last_login: auth0User.last_login?.toString(),
-      logins_count: auth0User.logins_count,
-      email_verified: auth0User.email_verified,
-      blocked: auth0User.blocked,
-    };
-    await UserModel.update(localUser._id, update);
+  try {
+    if (localUser) {
+      const update: Partial<User> = {
+        username: auth0User.nickname,
+        name: auth0User.name,
+        email: auth0User.email,
+        picture: auth0User.picture,
+        last_login: auth0User.last_login?.toString(),
+        logins_count: auth0User.logins_count,
+        email_verified: auth0User.email_verified,
+        blocked: auth0User.blocked,
+      };
+      await UserModel.update(localUser._id, update);
+    }
+  } catch (error: any) {
+    console.warn(`Updating user error`, error);
   }
 };
 
@@ -245,19 +254,23 @@ const updateUserRolesInDatabase = async (data: any) => {
   // Extract and decode the user ID from the URL path after "/members/"
   const userId = decodeURIComponent(path.split("/members/")[1].split("/")[0]);
 
-  const memberRoles = await organizationsManagement.getMemberRoles(
-    orgId,
-    userId,
-  );
-  const roleNames = memberRoles.data.map((role) => role.name as UserRole);
-  const localUser = await UserModel.getAuth0Sub(userId);
+  try {
+    const memberRoles = await organizationsManagement.getMemberRoles(
+      orgId,
+      userId,
+    );
+    const roleNames = memberRoles.data.map((role) => role.name as UserRole);
+    const localUser = await UserModel.getAuth0Sub(userId);
 
-  if (localUser) {
-    const update: Partial<User> = {
-      roles: roleNames,
-      permissions: assignPermissions(roleNames),
-    };
-    await UserModel.update(localUser._id, update);
+    if (localUser) {
+      const update: Partial<User> = {
+        roles: roleNames,
+        permissions: assignPermissions(roleNames),
+      };
+      await UserModel.update(localUser._id, update);
+    }
+  } catch (error: any) {
+    console.warn(`Updating user roles error`, error);
   }
 };
 
@@ -321,78 +334,16 @@ const syncAuth0UserOnLogin = async (data: any) => {
   const { user_id: userId, organization_id: orgId } = data;
   console.log(`Sync auth0 user on login`, { userId, orgId });
 
-  const memberRoles = await organizationsManagement.getMemberRoles(
-    orgId,
-    userId,
-  );
-  const roleNames = memberRoles.data.map((role) => role.name as UserRole);
-  const isAdmin = roleNames?.some((role) =>
-    [UserRole.SuperAdmin, UserRole.Admin].includes(role),
-  );
-
-  // If the user is an Admin, sync all organization members' data
-  if (isAdmin) {
-    await syncAllOrganizationUsers(orgId, userId);
-  }
-
   // Sync last login and login count
-  const loginsCount = data.details?.stats?.loginsCount ?? 0;
-  const update: Partial<User> = {
-    last_login: new Date().toISOString(),
-    logins_count: loginsCount,
-  };
-  await UserModel.upsertByAuth0Sub(userId, update);
-};
-
-const syncAllOrganizationUsers = async (
-  orgId: string,
-  loggedInUserId?: string,
-) => {
-  const response = await usersManagement.getAllUsers({
-    q: `organization_id: ${orgId}`,
-  });
-  const users = response.data ?? [];
-  const tenant = await TenantModel.getById(orgId);
-
-  if (!tenant) {
-    console.error("No tenant is associated with this user..");
-    return;
-  }
-
-  for (const user of users) {
-    if (loggedInUserId && loggedInUserId == user.user_id) {
-      console.warn(
-        `Sync all organization users - user ${loggedInUserId} is excluded`,
-      );
-      continue; // Skip this iteration
-    }
-
-    const auth0UserRoles = await organizationsManagement.getMemberRoles(
-      orgId,
-      user.user_id,
-    );
-    const roleNames = auth0UserRoles.data.map((role) => role.name as UserRole);
-    const userRoles = roleNames.length ? roleNames : [UserRole.User];
-
-    console.log(
-      `Sync all organization users - user ${user.user_id} has been synced`,
-    );
-
-    // Upserts a user by their Auth0 subscription ID (sub).
-    await UserModel.upsertByAuth0Sub(user.user_id, {
-      tenant_id: tenant._id,
-      auth0_sub: user.user_id,
-      username: user.nickname,
-      name: user.name,
-      email: user.email,
-      picture: user.picture,
-      roles: userRoles,
-      permissions: assignPermissions(userRoles),
-      last_login: user.last_login?.toString(),
-      logins_count: user.logins_count || 0,
-      email_verified: user.email_verified,
-      blocked: user.blocked,
-    });
+  try {
+    const loginsCount = data.details?.stats?.loginsCount ?? 0;
+    const update: Partial<User> = {
+      last_login: new Date().toISOString(),
+      logins_count: loginsCount,
+    };
+    await UserModel.upsertByAuth0Sub(userId, update);
+  } catch (error: any) {
+    console.warn(`Sync auth0 user on login error`, error);
   }
 };
 

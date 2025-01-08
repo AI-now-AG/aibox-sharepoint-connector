@@ -7,6 +7,7 @@ import UserModel, {
 } from "$data/models/user.model";
 import { z } from "zod";
 import log from "$utils/log";
+import { syncAllOrganizationUsers } from "$utils/auth0Sync";
 import TenantModel from "$data/models/tenant.model";
 
 const Auth0JWTSchema = z.object({
@@ -79,6 +80,16 @@ export async function GET(context: APIContext): Promise<Response> {
     roles,
     permissions: assignPermissions(roles),
   });
+
+  // TODO: If the user is an Admin, sync all organization members' data
+  const isModerator = roles?.some((role) =>
+    [UserRole.SuperAdmin, UserRole.Admin].includes(role),
+  );
+  if (isModerator) {
+    setImmediate(async () => {
+      await syncAllOrganizationUsers(auth0User.data.org_id, userId.toString());
+    });
+  }
 
   const session = await lucia.createSession(userId, {});
   const sessionCookie = lucia.createSessionCookie(session.id);
