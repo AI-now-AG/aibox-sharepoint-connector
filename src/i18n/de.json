@@ -256,6 +256,6 @@
   "user.create-failed": "Benutzererstellung fehlgeschlagen",
   "user.update-successful": "Benutzer erfolgreich aktualisiert",
   "user.udpate-failed": "Benutzeraktualisierung fehlgeschlagen",
-  "tenant.restrict-user-managment": "Restrict user management ",
-  "user.restrict-user-managment": "This organization is restricted for user management"
+  "tenant.restrict-user-managment": "Eingeschränkte Benutzerverwaltung",
+  "user.restrict-user-managment": "Die Benutzerverwaltung ist für diese Organisation eingeschränkt"
 }
