@@ -183,7 +183,7 @@
         // API Keys
         tenantData.openai_api_key = openai_api_key;
         tenantData.azure_openai_api_key = azure_openai_api_key;
-        tenantData.speech_api_key = speech_api_key
+        tenantData.speech_api_key = speech_api_key;
 
         // update providers
         tenantData.included_features = [];
@@ -236,7 +236,7 @@
         // API Keys
         tenantData.openai_api_key = openai_api_key;
         tenantData.azure_openai_api_key = azure_openai_api_key;
-        tenantData.speech_api_key = speech_api_key
+        tenantData.speech_api_key = speech_api_key;
 
         // update providers
         tenantData.included_features = [];
@@ -538,13 +538,15 @@
       <!-- Large File Azure Section -->
       <div class="collapse collapse-arrow bg-base-100 shadow rounded-lg">
         <input type="checkbox" />
-        <div class="collapse-title">Large File Azure</div>
+        <div class="collapse-title">
+          {t("tenant.settings.large-file-azure")}
+        </div>
         <div class="collapse-content">
           <div class="grid grid-cols-2 gap-4">
             <div class="w-full">
               <span class="mb-2 text-gray-400 font-medium text-sm"
-                >Speech API Key</span
-              >
+                >{t("tenant.settings.large-file-azure-apiKey")}
+              </span>
 
               <label class="input input-bordered flex items-center gap-2 mt-2">
                 <input
@@ -561,7 +563,7 @@
             </div>
             <div class="w-full">
               <span class="mb-2 text-gray-400 font-medium text-sm"
-                >Speech Region</span
+                >{t("tenant.settings.large-file-azure-region")}</span
               >
               <input
                 type="text"
