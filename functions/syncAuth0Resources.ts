@@ -295,9 +295,13 @@ const updateTenantInDatabase = async (data: any) => {
   // Take the "orgId" from request path
   // Example path: api/v2/organizations/org_jNS9by788jZfem2D
   const path = data?.details?.request?.path || "";
+  console.log("path", JSON.stringify(path));
   const orgId = decodeURIComponent(path.split("/").pop());
+  console.log("orgId", JSON.stringify(path));
   const localTenant = await TenantModel.getById(orgId);
+  console.log("localTenant", JSON.stringify(localTenant));
   const auth0Tenant = await organizationsManagement.get(orgId);
+  console.log("auth0Tenant", JSON.stringify(auth0Tenant));
 
   if (localTenant) {
     const update: Partial<Tenant> = {
