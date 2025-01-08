@@ -12,27 +12,25 @@ const isRestrictUserManagement = tenant.is_restrict_user_managment;
 ---
 
 <Layout>
-  <div
-    class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14"
-  >
-    <h1 class="pt-2 lg:pt-8 text-4xl font-bold">
-      {t("user.user-management")}
-    </h1>
-    {
-      isRestrictUserManagement ? (
-        <span />
-      ) : (
-        <a
-          href="./user-management/add"
-          class="mt-2 lg:mt-8 btn btn-active btn-neutral font-normal grow-0"
-        >
-          <span set:html={svgIcons.add} />
-          {t("user.add-new-user")}
-        </a>
-      )
-    }
-  </div>
-  <div class="px-8">
+  <div class="container max-w-7xl mx-auto px-6 justify-center py-6">
+    <div class="flex space-y-2 justify-between items-center">
+      <h1 class="text-4xl font-bold">
+        {t("user.user-management")}
+      </h1>
+      {
+        isRestrictUserManagement ? (
+          <span />
+        ) : (
+          <a
+            href="./user-management/add"
+            class="btn btn-active btn-neutral font-normal"
+          >
+            <span set:html={svgIcons.add} />
+            {t("user.add-new-user")}
+          </a>
+        )
+      }
+    </div>
     <UserList tenantId={tenantId} client:load />
   </div>
 </Layout>

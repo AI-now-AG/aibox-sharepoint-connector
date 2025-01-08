@@ -26,7 +26,7 @@
         <p class="text-center mt-6 font-semibold text-lg">
           {t("transcription.start-new-popup.title")}
         </p>
-        <p class="text-center mt-4 text-gray-500">
+        <p class="text-center mt-4 text-base-content/60">
           {t("transcription.start-new-popup.sub-title")}
         </p>
       </div>

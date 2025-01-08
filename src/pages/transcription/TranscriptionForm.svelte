@@ -882,7 +882,7 @@
           </div>
         </label>
 
-        <span class="mt-2 text-xs text-red-500">{fileErrorMessage}</span>
+        <span class="mt-2 text-xs text-error">{fileErrorMessage}</span>
       </div>
     {/if}
 
@@ -896,7 +896,7 @@
           </div>
           <div class="ml-4">
             <p class="font-medium">{audioFile.name}</p>
-            <p class="text-sm text-gray-500">
+            <p class="text-sm text-base-content/60">
               {audioFile?.size ? bytesToMegabytes(audioFile?.size) + " MB" : ""}
             </p>
           </div>
@@ -957,12 +957,16 @@
             class="checkbox checkbox-neutral"
             bind:checked={isDiarizationEnabled}
           />
-          <h3 class="text-sm font-medium">{t("settings.transcription.largefile-speaker.diarization")}</h3>
+          <h3 class="text-sm font-medium">
+            {t("settings.transcription.largefile-speaker.diarization")}
+          </h3>
         </label>
 
         {#if isDiarizationEnabled}
           <div out:slide in:slide>
-            <h2 class="text-base-content/40">{t("settings.transcription.largefile-speaker.number")}</h2>
+            <h2 class="text-base-content/40">
+              {t("settings.transcription.largefile-speaker.number")}
+            </h2>
             <label
               class="input input-bordered input-lg flex items-center gap-2"
             >
@@ -1172,7 +1176,7 @@
   <div class="mt-8 mb-5 flex items-center space-x-4">
     {#if !isTranscipted}
       <button
-        class={`btn btn-active btn-primary btn-sm text-white`}
+        class={`btn btn-active btn-primary btn-sm text-base-100`}
         disabled={!isUploaded || !isFormValid || isTranscribing}
         on:click={transcribe}
         >{t("transciption.model.cta.start-transcribing")}</button
@@ -1180,28 +1184,28 @@
     {/if}
     {#if isTranscipted}
       {#if zipFileData}
-        <button class="btn btn-success btn-sm text-white" on:click={downloadZip}
+        <button class="btn btn-success btn-sm text-base-100" on:click={downloadZip}
           >{@html svgIcons.download}{t(
             "transciption.model.cta.download-zip",
           )}</button
         >
       {:else if assFileUrl || srtFileUrl || jsonFileUrl || txtFileUrl}
         <!-- <button
-          class="btn btn-success btn-sm text-white"
+          class="btn btn-success btn-sm text-base-100"
           on:click={downloadFileSRT}
           >{@html svgIcons.download}{t(
             "transciption.model.cta.download-output.srt",
           )}</button
         > -->
         <button
-          class="btn btn-success btn-sm text-white"
+          class="btn btn-success btn-sm text-base-100"
           on:click={downloadFile}
           >{@html svgIcons.download}{t(
             "transciption.model.cta.download-output",
           )}</button
         >
       {/if}
-      <button class="btn bg-black btn-sm text-white" on:click={confirmStartNew}
+      <button class="btn bg-neutral btn-sm text-white" on:click={confirmStartNew}
         >{t("transciption.model.cta.start-new-transciption")}</button
       >
     {/if}
