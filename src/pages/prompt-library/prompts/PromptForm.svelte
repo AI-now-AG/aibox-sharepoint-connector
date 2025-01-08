@@ -80,6 +80,24 @@
   });
 
   async function fetchInstructionAndKB() {
+    /*const instructionResponse = await fetch("/api/instructions.json", {
+      method: "GET",
+    });
+    const instructionData = (await instructionResponse.json()) as Instruction[];
+    if (instructionData) {
+      if (prompt) {
+        prompt.instructions?.forEach((instructionObj: any) => {
+          const instruction = instructionData.find(
+            (e) => e._id == instructionObj.toString(),
+          );
+          if (instruction) {
+            selectedInstructions.push(instruction);
+          }
+        });
+      }
+      instructions = instructionData;
+    }*/
+
     const knowledgeBaseResponse = await fetch("/api/knowledge-base.json", {
       method: "GET",
     });
@@ -188,6 +206,13 @@
       <div
         class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 justify-center"
       >
+        <!-- <MultiInput
+          title={t("prompt-library.add.prompts.instructions")}
+          placeholder="e.g. Instruction"
+          items={instructions}
+          bind:selectedItems={selectedInstructions}
+        /> -->
+
         <SingleInput
           title={`${t("prompt-library.add.prompts.category")}*`}
           placeholder="e.g. Editing"
