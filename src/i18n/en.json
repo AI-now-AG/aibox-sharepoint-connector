@@ -256,6 +256,6 @@
   "user.create-failed": "Create user failed ",
   "user.update-successful": "Update user successful",
   "user.udpate-failed": "Update user failed ",
-  "tenant.disable-create-new-user": "Not allow create new user ",
-  "user.not-allow-create-new-user": "This organization could create new user"
+  "tenant.restrict-user-managment": "Restrict user management ",
+  "user.restrict-user-managment": "This organization is restricted for user management"
 }

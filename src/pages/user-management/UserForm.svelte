@@ -72,7 +72,7 @@
   }
 
   onMount(() => {
-    if (mode == MODE.Create && tenant && tenant.disbale_create_new_user) {
+    if (mode == MODE.Create && tenant && tenant.is_restrict_user_managment) {
       window.history.back();
       return;
     }

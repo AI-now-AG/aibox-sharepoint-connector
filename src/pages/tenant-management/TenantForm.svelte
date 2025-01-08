@@ -583,11 +583,11 @@
           type="checkbox"
           class="checkbox checkbox-primary"
           value="disbale-create-user"
-          bind:checked={tenantData.disbale_create_new_user}
+          bind:checked={tenantData.is_restrict_user_managment}
         />
         <label class="label cursor-pointer ml-2" for="disable-create-user">
           <span class="label-text ml-2"
-            >{t("tenant.disable-create-new-user")}</span
+            >{t("tenant.restrict-user-managment")}</span
           >
         </label>
       </div>
