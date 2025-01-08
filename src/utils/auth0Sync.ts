@@ -2,7 +2,7 @@ import UserModel, {
   assignPermissions,
   UserRole,
 } from "$data/models/user.model";
-import TenantModel, { type Tenant } from "$data/models/tenant.model";
+import TenantModel from "$data/models/tenant.model";
 import usersManagement from "$data/auth0/users-manager";
 import organizationsManagement from "$data/auth0/organizations-manager";
 

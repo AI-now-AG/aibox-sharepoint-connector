@@ -20,13 +20,7 @@ const isRestrictUserManagement = tenant.is_restrict_user_managment;
     </h1>
     {
       isRestrictUserManagement ? (
-        <button
-          class={"mt-2 lg:mt-8 btn font-normal grow-0"}
-          onclick={`alert('${t("user.restrict-user-managment")}');`}
-        >
-          <span set:html={svgIcons.add} />
-          {t("user.add-new-user")}
-        </button>
+        <span />
       ) : (
         <a
           href="./user-management/add"
