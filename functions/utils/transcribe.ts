@@ -18,6 +18,8 @@ import {
   FileFormat,
   TranscriptionType,
 } from "$types/TranscribeRequest";
+import { processTranscription } from "./batchTranscription";
+import type { TranscriptionResponse } from "$utils/Speech/SpeechResponse";
 
 const DEFAULT_WHISPER_MODEL_NAME = "whisper-1";
 const DEFAULT_API_VERSION = "2024-08-01-preview";
