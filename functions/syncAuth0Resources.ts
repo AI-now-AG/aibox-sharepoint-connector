@@ -273,14 +273,19 @@ const createTenantInDatabase = async (data: any) => {
   // Take the "orgId" from response body
   // Example: { id: "org_kxLHFC47tCHHOxsB" }
   const orgId = data?.details?.response?.body?.id || "";
-  const auth0Tenant = await organizationsManagement.get(orgId);
 
-  const tenant: Partial<Omit<Tenant, "_id">> = {
-    org_id: auth0Tenant.data.id,
-    org_name: auth0Tenant.data.name,
-    name: auth0Tenant.data.display_name,
-  };
-  await TenantModel.create(tenant);
+  try {
+    const auth0Tenant = await organizationsManagement.get(orgId);
+
+    const tenant: Partial<Omit<Tenant, "_id">> = {
+      org_id: auth0Tenant.data.id,
+      org_name: auth0Tenant.data.name,
+      name: auth0Tenant.data.display_name,
+    };
+    await TenantModel.create(tenant);
+  } catch (error: any) {
+    console.warn(`Creating tenant error`, error);
+  }
 };
 
 const updateTenantInDatabase = async (data: any) => {
@@ -295,15 +300,20 @@ const updateTenantInDatabase = async (data: any) => {
   // Take the "orgId" from response body
   // Example: { id: "org_kxLHFC47tCHHOxsB" }
   const orgId = data?.details?.response?.body?.id || "";
-  const localTenant = await TenantModel.getById(orgId);
-  const auth0Tenant = await organizationsManagement.get(orgId);
 
-  if (localTenant) {
-    const update: Partial<Tenant> = {
-      org_name: auth0Tenant.data.name,
-      name: auth0Tenant.data.display_name,
-    };
-    await TenantModel.update(localTenant._id, update);
+  try {
+    const localTenant = await TenantModel.getById(orgId);
+    const auth0Tenant = await organizationsManagement.get(orgId);
+
+    if (localTenant) {
+      const update: Partial<Tenant> = {
+        org_name: auth0Tenant.data.name,
+        name: auth0Tenant.data.display_name,
+      };
+      await TenantModel.update(localTenant._id, update);
+    }
+  } catch (error: any) {
+    console.warn(`Updating tenant error`, error);
   }
 };
 
