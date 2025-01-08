@@ -292,10 +292,9 @@ const updateTenantInDatabase = async (data: any) => {
     return;
   }
 
-  // Take the "orgId" from request path
-  // Example path: api/v2/organizations/org_jNS9by788jZfem2D
-  const path = data?.details?.request?.path || "";
-  const orgId = decodeURIComponent(path.split("/").pop());
+  // Take the "orgId" from response body
+  // Example: { id: "org_kxLHFC47tCHHOxsB" }
+  const orgId = data?.details?.response?.body?.id || "";
   const localTenant = await TenantModel.getById(orgId);
   const auth0Tenant = await organizationsManagement.get(orgId);
 
