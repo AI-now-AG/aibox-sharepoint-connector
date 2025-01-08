@@ -1,4 +1,4 @@
-import { TranscriptionType } from "$utils/TranscribeRequest";
+import { TranscriptionType } from "$types/TranscribeRequest";
 import { BlobServiceClient, BlobSASPermissions } from "@azure/storage-blob";
 import { type Handler } from "@netlify/functions";
 import { v4 as uuidv4 } from "uuid"; // To generate unique file names
