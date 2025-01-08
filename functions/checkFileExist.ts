@@ -7,7 +7,7 @@ import { createWriteStream, unlinkSync, existsSync } from "fs";
 import { promisify } from "util";
 import { pipeline } from "stream";
 import { getTask } from "$shared/transcriptionTasks";
-import { TranscriptionType } from "$utils/TranscribeRequest";
+import { TranscriptionType } from "$types/TranscribeRequest";
 import {
   pollTranscriptionTask,
   processTranscriptionResult,
