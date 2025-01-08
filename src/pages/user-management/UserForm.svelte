@@ -51,6 +51,8 @@
   let isEnterpriseAuth = false;
   let isUpdateRoleDisabled = false;
 
+  const isRestrictUserManagment = tenant.is_restrict_user_managment;
+
   function checkEnterpriseAuth() {
     const parts = userData?.auth0_sub?.split("|");
     const provider = parts[0];
@@ -72,7 +74,7 @@
   }
 
   onMount(() => {
-    if (mode == MODE.Create && tenant && tenant.is_restrict_user_managment) {
+    if (mode == MODE.Create && tenant && isRestrictUserManagment) {
       window.history.back();
       return;
     }
@@ -276,7 +278,7 @@
           on:inputChange={(event) => {
             userData.email = event.detail.value;
           }}
-          disabled={isEnterpriseAuth}
+          disabled={isEnterpriseAuth || isRestrictUserManagment}
           required
         />
       </div>
@@ -388,7 +390,7 @@
 
         <div class="w-full h-[1px] bg-slate-200 mt-2 mb-8"></div>
 
-        {#if userData.email != $currentUser?.email}
+        {#if userData.email != $currentUser?.email && !isRestrictUserManagment}
           <div class="flex items-center">
             <button
               class="flex items-centertext-gray-700 font-sans"
