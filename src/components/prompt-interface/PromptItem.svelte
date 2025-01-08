@@ -31,7 +31,7 @@
       },
     },
     {
-      icon: svgIcons.reOrder,
+      icon: svgIcons.reorder,
       text: t("common.change-order"),
       action: () => {
         onSelectReOder?.();

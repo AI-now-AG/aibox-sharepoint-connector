@@ -6,6 +6,8 @@ export interface TranscribeRequest {
   uniqueName: string;
   uploadUrl: string;
   transcriptions: Transcriptions;
+  tenantId: string;
+  userId: string;
   transcriptionType?: TranscriptionType;
   selectedFileFormat?: FileFormat[];
   isShowImprovedTextPreview?: boolean;
@@ -15,7 +17,11 @@ export interface TranscribeRequest {
   azureOpenAIWhisperModel?: string;
   azureOpenAIChatModel?: string;
   azureOpenAIApiKey?: string;
+  speechKey?: string;
+  speechRegion?: string;
   audioBuffer?: Buffer;
+  isDiarizationEnabled?: boolean;
+  maxSpeakers?: number;
 }
 
 export enum FileFormat {
@@ -28,4 +34,16 @@ export enum TranscriptionType {
   Plaintext = "plaintext",
   Summarize = "summary",
   Subtitles = "subtitles",
+  Largefile = "largefile",
+}
+
+export interface TranscriptionResult {
+  success: boolean;
+  data: {
+    text: string;
+    urls: {
+      [key: string]: string;
+    };
+  } | null;
+  error: string | null;
 }
