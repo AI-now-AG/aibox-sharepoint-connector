@@ -525,7 +525,7 @@
       speechKey: tenant?.speech_api_key,
       speechRegion: tenant?.speech_region,
       isDiarizationEnabled: isDiarizationEnabled,
-      maxSpeakers: parseInt(maxNumberOfSpeakers),
+      maxSpeakers: parseInt(maxNumberOfSpeakers.toString()),
     };
   }
 
@@ -820,9 +820,9 @@
   }
 
   function checkNumberInput(value: number, increase?: number) {
-    let newValue = parseInt(value);
+    let newValue = parseInt(value.toString());
     if (increase) {
-      newValue = parseInt(value) + parseInt(increase);
+      newValue = newValue + parseInt(increase);
     }
     if (isNumber(newValue)) {
       if (newValue <= minSpeakers) {
@@ -833,7 +833,7 @@
         maxNumberOfSpeakers = maxSpeakers;
       }
     } else {
-      if (value != "") {
+      if (value.toString() !== "") {
         maxNumberOfSpeakers = minSpeakers;
       }
     }
