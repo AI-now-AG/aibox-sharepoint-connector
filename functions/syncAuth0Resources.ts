@@ -125,6 +125,7 @@ const syncAuth0Resources: Handler = async (
 const isPermittedChannel = (data: any) => {
   const requestChannel = data?.details?.request?.channel || "";
   const permittedChannels = ["https://manage.auth0.com/"];
+  console.log(JSON.stringify({ requestChannel, permittedChannels }));
   return permittedChannels.includes(requestChannel);
 };
 
@@ -264,6 +265,7 @@ const updateUserRolesInDatabase = async (data: any) => {
 const createTenantInDatabase = async (data: any) => {
   console.log(`Creating tenant`, data?.details?.response);
 
+  console.log("create - data", JSON.stringify(data));
   // Skip if the channel is not permitted.
   if (!isPermittedChannel(data)) {
     console.warn(`Creating tenant / channel is not permitted.`);
@@ -274,6 +276,9 @@ const createTenantInDatabase = async (data: any) => {
   // Example: { id: "org_kxLHFC47tCHHOxsB" }
   const orgId = data?.details?.response?.body?.id || "";
   const auth0Tenant = await organizationsManagement.get(orgId);
+
+  console.log("create - orgId", JSON.stringify(orgId));
+  console.log("create -  auth0Tenant", JSON.stringify(auth0Tenant));
 
   const tenant: Partial<Omit<Tenant, "_id">> = {
     org_id: auth0Tenant.data.id,
