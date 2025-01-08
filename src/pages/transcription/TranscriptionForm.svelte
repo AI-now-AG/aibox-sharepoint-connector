@@ -947,7 +947,9 @@
   {#if transcriptionType === TranscriptionType.Largefile}
     <div class="bg-base-100 mt-10 p-4 px-6 rounded-xl">
       <div class="flex flex-col gap-4">
-        <h2 class="font-normal">Settings</h2>
+        <h2 class="font-normal">
+          {t("settings.transcription.largefile-settings")}
+        </h2>
         <label class="flex items-center gap-2">
           <input
             type="checkbox"
@@ -955,12 +957,12 @@
             class="checkbox checkbox-neutral"
             bind:checked={isDiarizationEnabled}
           />
-          <h3 class="text-sm font-medium">Speaker diarization</h3>
+          <h3 class="text-sm font-medium">{t("settings.transcription.largefile-speaker.diarization")}</h3>
         </label>
 
         {#if isDiarizationEnabled}
           <div out:slide in:slide>
-            <h2 class="text-base-content/40">Maximum numbers of speakers</h2>
+            <h2 class="text-base-content/40">{t("settings.transcription.largefile-speaker.number")}</h2>
             <label
               class="input input-bordered input-lg flex items-center gap-2"
             >
