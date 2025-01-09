@@ -1,7 +1,7 @@
 <script lang="ts" context="module">
   export interface ColumnData {
+    key?: string;
     name?: string;
-    text?: string;
     class?: string;
   }
 </script>
@@ -67,13 +67,13 @@
         <th
           class={"py-3 px-4 text-left font-normal text-xs" +
             getFirstLastColCssClass(colIndex, columnData.length)}
-          on:click={() => sort(data.name ?? "")}
+          on:click={() => sort(data.key ?? "")}
         >
-          <span class="inline-flex">
-            {data.text}
-            <span class="ml-2">
-              {@html data.name
-                ? sortColumn === data.name
+          <span class="inline-flex justify-center">
+            {data.name}
+            <span class="ml-1">
+              {@html data.key
+                ? sortColumn === data.key
                   ? sortDirection === "asc"
                     ? svgIcons.arrowUp
                     : svgIcons.arrowDown
