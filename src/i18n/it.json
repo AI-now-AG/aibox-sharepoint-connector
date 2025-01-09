@@ -145,7 +145,8 @@
   "transcription.upload-video-or-audio-file": "Upload Videos / Sound file",
   "transcription.input-file-upload-description": "Drag & Drop or <span style=\"color: #491EFF;\">Choose file</span> to transcribe",
   "transcription.supportted-file-extensions": "MP4, MP3, WAV, AVI, M4A, FLAC",
-  "transcription.maximum-capacity": "max. file size: 25 MB",
+  "transcription.maximum-capacity-25mb": "max. file size: 25 MB",
+  "transcription.maximum-capacity-1gb": "max. file size: 1 GB",
   "transciption.model.cta.start-transcribing": "Start transcribing",
   "transciption.model.cta.start-new-transciption": "Start new transciption",
   "transciption.model.cta.download-output": "Download output",
@@ -264,7 +265,7 @@
   "settings.transcription.largefile-speaker.diarization": "Speaker diarization",
   "settings.transcription.largefile-speaker.number": "Maximum numbers of speakers",
   "tenant.settings.large-file-azure": "Audio Pro (Azure Speech Service)",
-  "user.id": "User Id",
   "tenant.settings.large-file-azure-apiKey": "API Key",
-  "tenant.settings.large-file-azure-region": "Region"
+  "tenant.settings.large-file-azure-region": "Region",
+  "user.id": "User Id"
 }
