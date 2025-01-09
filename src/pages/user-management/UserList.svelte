@@ -204,7 +204,7 @@
       {t("user.all-users") + ` (${users?.length ?? 0})`}
     </h2>
 
-    <div class="relative">
+    <div class="overflow-x-auto">
       <SortableTable {columnData} bind:rowData={users}>
         {#each users as user}
           <tr class="h-16 bg-base-100 hover:bg-base-300 text-sm rounded-lg">
