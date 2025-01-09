@@ -12,7 +12,8 @@
     "check:eslint": "eslint 'src/**/*.{js,mjs,cjs,ts,astro,svelte}'",
     "check:svelte": "svelte-check",
     "astro": "astro",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "fetch-trans": "node scripts/i18n/fetchTranslations.js"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
@@ -80,7 +81,8 @@
     "stylelint": "^16.10.0",
     "stylelint-config-standard": "^36.0.1",
     "svelte-check": "^3.8.6",
-    "typescript-eslint": "^8.11.0"
+    "typescript-eslint": "^8.11.0",
+    "googleapis": "^144.0.0"
   },
   "packageManager": "pnpm@9.6.0+sha1.65cd48c20dd329b7f455088b6dd17d4d5b6d02e3"
 }
