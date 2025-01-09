@@ -7,9 +7,10 @@ import { ProfileUpdateSchema } from "./schema/profile-update.schema";
 export const auth = {
   updateProfile: defineAction({
     input: ProfileUpdateSchema,
-    handler: async (input): Promise<void> => {
+    handler: async (input, context): Promise<void> => {
       try {
-        const { id, auth0Sub, name } = input;
+        const { id, auth0_sub: auth0Sub } = context.locals.user;
+        const { name } = input;
         await Promise.all([
           UserModel.update(id, { name }),
           management.users.update({ id: auth0Sub }, { name }),

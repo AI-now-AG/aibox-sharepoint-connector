@@ -143,7 +143,7 @@
         class="relative flex flex-col p-4 border border-neutral-content rounded"
       >
         <label
-          class={`py-6 relative flex flex-col text-base-content border border-dashed rounded cursor-pointer ${isDragOver ? "border-blue-500" : "border-neutral-content"} ${fileErrorMessage && "border-red-500 bg-red-100"}`}
+          class={`py-6 relative flex flex-col text-base-content border border-dashed rounded cursor-pointer ${isDragOver ? "border-blue-500" : "border-neutral-content"} ${fileErrorMessage && "border-error bg-error"}`}
           on:dragover={() => {
             isDragOver = true;
           }}
@@ -167,15 +167,15 @@
             <p class="text-base font-semibold">
               {@html t("prompt-execution.upload-file.drag")}
             </p>
-            <p class="text-sm text-gray-500 mt-1">
+            <p class="text-sm text-base-content/60 mt-1">
               {t("prompt-execution.upload-file.supportted-files")}
             </p>
-            <p class="text-xs text-gray-400 mt-8">
+            <p class="text-xs text-base-content/60 mt-8">
               {t("prompt-execution.upload-file.maximum-size")}
             </p>
           </div>
         </label>
-        <span class="mt-2 text-xs text-red-500">{fileErrorMessage}</span>
+        <span class="mt-2 text-xs text-error">{fileErrorMessage}</span>
 
         {#if files.length > 0}
           <div

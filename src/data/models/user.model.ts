@@ -1,6 +1,7 @@
 import { ObjectId } from "mongodb";
-import { db } from "../mongodb";
+import { db, type Document } from "../mongodb";
 import { z } from "zod";
+import log from "$utils/log";
 
 export enum UserRole {
   Admin = "Admin",
@@ -31,14 +32,34 @@ const UserSchema = z.object({
   username: z.string().min(2),
   email: z.string(),
   picture: z.string().url().optional(),
-  roles: z.array(z.nativeEnum(UserRole)),
-  created_at: z.date().default(() => new Date()),
-  updated_at: z.date().default(() => new Date()),
-  permissions: z.array(z.nativeEnum(Permission)),
+  roles: z.array(z.nativeEnum(UserRole)).default(() => [UserRole.User]),
+  created_at: z
+    .date()
+    .optional()
+    .default(() => new Date()),
+  updated_at: z
+    .date()
+    .optional()
+    .default(() => new Date()),
+  permissions: z
+    .array(z.nativeEnum(Permission))
+    .default(() => [Permission.UserAll]),
   name: z.string(),
+  logins_count: z.number().default(0),
+  last_login: z.string().nullish().default(null),
+  email_verified: z.boolean().default(false),
+  blocked: z.boolean().default(false),
   navState: z.record(z.string(), z.boolean()).optional(),
 });
 
+export const UserFilterParamsSchema = z.object({
+  searchValue: z.string().nullish(),
+  roles: z.array(z.nativeEnum(UserRole)).optional(),
+  isBlocked: z.boolean().optional(),
+  isVerified: z.boolean().optional(),
+  isUnVerified: z.boolean().optional(),
+});
+export type UserFilterParams = z.infer<typeof UserFilterParamsSchema>;
 export type User = z.infer<typeof UserSchema>;
 
 export const collection = db.collection<User>("oauth_users");
@@ -68,7 +89,7 @@ export async function updateUserData(
 }
 
 export default {
-  add: async (user: Omit<User, "_id">) => {
+  add: async (user: Partial<Omit<User, "_id">>) => {
     const validated = UserSchema.parse({ _id: new ObjectId(), ...user });
     return collection.insertOne(validated);
   },
@@ -89,9 +110,54 @@ export default {
     );
   },
 
-  list: async () => collection.find<User>({}),
+  listByTenant: async (tenantId: ObjectId, filterParams?: UserFilterParams) => {
+    const filter: any = {
+      tenant_id: tenantId,
+    };
 
-  get: async (email: string) => collection.findOne<User>({ email }),
+    if (filterParams) {
+      const { searchValue, roles, isBlocked, isVerified, isUnVerified } =
+        filterParams;
+
+      log.i(filterParams, "filterParams");
+
+      // Add search filter
+      if (searchValue) {
+        filter.name = { $regex: searchValue, $options: "i" };
+      }
+
+      // Add roles filter
+      if (roles && roles?.length > 0) {
+        filter.roles = { $in: roles.map((role) => new RegExp(role, "i")) };
+      }
+
+      // Handle isBlocked, isVerified, and isUnVerified filters
+      const emailVerifiedFilter = [];
+      if (isVerified) {
+        emailVerifiedFilter.push({ email_verified: true });
+      }
+      if (isUnVerified) {
+        emailVerifiedFilter.push({ email_verified: { $in: [false, null] } });
+      }
+      if (isBlocked || isVerified || isUnVerified) {
+        if (isBlocked) {
+          filter.blocked = true;
+          if (emailVerifiedFilter.length > 0) {
+            delete filter.blocked;
+            filter.$or = [{ blocked: true }, ...emailVerifiedFilter];
+          }
+        } else if (emailVerifiedFilter.length > 0) {
+          filter.$or = emailVerifiedFilter;
+        }
+      }
+    }
+
+    const data = collection.find<Document<User>>(filter);
+    return await data.toArray();
+  },
+
+  get: async (id: string) =>
+    collection.findOne<User>({ _id: new ObjectId(id) }),
 
   getAuth0Sub: async (auth0_sub: string) =>
     collection.findOne<User>({ auth0_sub }),
@@ -138,5 +204,23 @@ export default {
     });
     const createdUser = await collection.insertOne(validatedUser);
     return createdUser.insertedId;
+  },
+
+  block: async (id: string) => {
+    return await collection.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: { blocked: true } },
+    );
+  },
+
+  unblock: async (id: string) => {
+    return await collection.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: { blocked: false } },
+    );
+  },
+
+  delete: async (id: string) => {
+    return await collection.deleteOne({ _id: new ObjectId(id) });
   },
 };

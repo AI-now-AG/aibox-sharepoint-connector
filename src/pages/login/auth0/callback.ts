@@ -7,6 +7,7 @@ import UserModel, {
 } from "$data/models/user.model";
 import { z } from "zod";
 import log from "$utils/log";
+import { syncAllOrganizationUsers } from "$utils/auth0Sync";
 import TenantModel from "$data/models/tenant.model";
 
 const Auth0JWTSchema = z.object({
@@ -18,7 +19,6 @@ const Auth0JWTSchema = z.object({
   picture: z.string().url(),
   name: z.string(),
   "ainow/roles": z.array(z.nativeEnum(UserRole)),
-  //"ainow/org_displayName": z.string(),
 });
 
 export async function GET(context: APIContext): Promise<Response> {
@@ -46,7 +46,6 @@ export async function GET(context: APIContext): Promise<Response> {
 
   const token = await auth0(context.url.origin).validateAuthorizationCode(code);
   const decoded = decodeJwt(token.idToken);
-  log.d(decoded, "Decoded JWT");
   const auth0User = Auth0JWTSchema.safeParse(decoded);
   if (auth0User.error) {
     log.e(
@@ -59,7 +58,8 @@ export async function GET(context: APIContext): Promise<Response> {
   }
 
   // TODO: Fetch logo from auth0 org
-  const tenant = await TenantModel.getById(auth0User.data.org_id);
+  const auth0_tenant_id = auth0User.data.org_id;
+  const tenant = await TenantModel.getById(auth0_tenant_id);
   if (!tenant) {
     log.e("Tenant not found");
     return new Response(null, {
@@ -68,8 +68,8 @@ export async function GET(context: APIContext): Promise<Response> {
   }
 
   const roles = auth0User.data["ainow/roles"];
-  //const orgDisplayName = auth0User.data["ainow/org_displayName"];
-  // TODO: Sync tenant from Auth0 to aibox
+
+  // TODO: Sync current user from Auth0 to aibox
   const userId = await UserModel.upsertByAuth0Sub(auth0User.data.sub, {
     tenant_id: tenant._id,
     auth0_sub: auth0User.data.sub,
@@ -80,6 +80,16 @@ export async function GET(context: APIContext): Promise<Response> {
     roles,
     permissions: assignPermissions(roles),
   });
+
+  // TODO: If the user is an Admin, sync all organization members' data
+  const isModerator = roles?.some((role) =>
+    [UserRole.SuperAdmin, UserRole.Admin].includes(role),
+  );
+  if (isModerator) {
+    setImmediate(async () => {
+      await syncAllOrganizationUsers(auth0User.data.org_id, userId.toString());
+    });
+  }
 
   const session = await lucia.createSession(userId, {});
   const sessionCookie = lucia.createSessionCookie(session.id);

@@ -3,11 +3,40 @@ import {
   type HandlerEvent,
   type HandlerResponse,
 } from "@netlify/functions";
-import { BlobServiceClient } from "@azure/storage-blob";
-import { transcribeUsingOpenAI } from "./utils/transcribe";
+import {
+  BlobServiceClient,
+  type BlobDownloadResponseParsed,
+} from "@azure/storage-blob";
+import {
+  transcribeUsingOpenAI,
+  transcribeUsingAzureOpenAI,
+} from "./utils/transcribe";
 import { decrypt } from "$utils/secure";
 import { createTask, updateTask } from "$shared/transcriptionTasks";
-import type { TranscribeRequest } from "$utils/TranscribeRequest";
+import {
+  TranscriptionType,
+  type TranscribeRequest,
+  type TranscriptionResult,
+} from "$types/TranscribeRequest";
+import { ObjectId } from "mongodb";
+import ffmpeg from "fluent-ffmpeg";
+import stream, { PassThrough } from "stream";
+import path from "path";
+import os from "os";
+import { Readable } from "stream";
+
+// const ffmpegPath = path.join(process.cwd(), 'bin', 'osx', 'ffmpeg');
+let ffmpegPath: string;
+const platform = os.platform();
+const arch = os.arch();
+
+if (platform === "darwin" && arch === "arm64") {
+  ffmpegPath = path.join(__dirname, "..", "bin", "osx", "ffmpeg");
+} else if (platform === "linux" && arch === "x64") {
+  ffmpegPath = path.join(__dirname, "..", "bin", "linux", "ffmpeg");
+} else {
+  throw new Error(`Unsupported platform: ${platform} (${arch})`);
+}
 
 const transcribeAudio: Handler = async (
   event: HandlerEvent,
@@ -21,32 +50,77 @@ const transcribeAudio: Handler = async (
 
   try {
     const transcribeParams: TranscribeRequest = JSON.parse(event.body || "{}");
-    const { fileName, uniqueName, uploadUrl, encryptedApiKey } =
-      transcribeParams;
+    const {
+      fileName,
+      uniqueName,
+      uploadUrl,
+      transcriptionType,
+      encryptedApiKey,
+      speechKey,
+    } = transcribeParams;
 
-    if (!fileName || !uploadUrl) {
+    if (!fileName || !uploadUrl || !transcriptionType) {
       return {
         statusCode: 400,
         body: JSON.stringify({ message: "Invalid file upload data" }),
       };
     }
 
-    const fileBuffer = await downloadFileFromBlob(uploadUrl);
-    transcribeParams.audioBuffer = fileBuffer;
-
     const azureOpenAIApiKey = decrypt(
       encryptedApiKey || process.env.AZURE_OPENAI_API_KEY2!,
     );
     transcribeParams.azureOpenAIApiKey = azureOpenAIApiKey;
 
-    console.log("encryptedApiKey", encryptedApiKey);
-    console.log("decryptedApiKey", azureOpenAIApiKey);
+    const azureSpeechKey = decrypt(
+      speechKey || process.env.AZURE_LARGE_SPEECH_KEY!,
+    );
+    transcribeParams.speechKey = azureSpeechKey;
 
-    createTask(uniqueName, { status: "processing" });
-    const transcriptionResult = await transcribeUsingOpenAI(transcribeParams);
-
+    createTask(uniqueName, {
+      tenant_id: new ObjectId(transcribeParams.tenantId),
+      creator_id: new ObjectId(transcribeParams.userId),
+      audio_url: transcribeParams.uploadUrl,
+      status: "processing",
+    });
+    let transcriptionResult: TranscriptionResult = {
+      success: false,
+      data: null,
+      error: null,
+    };
+    if (transcriptionType === TranscriptionType.Largefile) {
+      if (transcribeParams.isDiarizationEnabled) {
+        const newBlobFileUrl = await convertStereoToMono(
+          uploadUrl,
+          transcriptionType,
+          transcribeParams.folderName,
+          uniqueName,
+        );
+        if (newBlobFileUrl) {
+          transcribeParams.uploadUrl = newBlobFileUrl;
+          transcriptionResult =
+            await transcribeUsingAzureOpenAI(transcribeParams);
+        } else {
+          return {
+            statusCode: 500,
+            body: JSON.stringify({
+              message: "Error in conversion of audio",
+            }),
+          };
+        }
+      } else {
+        transcriptionResult =
+          await transcribeUsingAzureOpenAI(transcribeParams);
+      }
+    } else {
+      const fileBuffer = await downloadFileFromBlob(
+        uploadUrl,
+        transcriptionType,
+      );
+      transcribeParams.audioBuffer = fileBuffer;
+      transcriptionResult = await transcribeUsingOpenAI(transcribeParams);
+    }
     if (!transcriptionResult.success) {
-      updateTask(uniqueName, {
+      await updateTask(uniqueName, {
         status: "failed",
         error:
           transcriptionResult.error || "Unknown error during transcription.",
@@ -58,11 +132,11 @@ const transcribeAudio: Handler = async (
         }),
       };
     } else {
-      updateTask(uniqueName, {
+      await updateTask(uniqueName, {
         status: "completed",
         txtUrl: transcriptionResult.data?.urls["txt"],
-        srtUrl: transcriptionResult.data?.urls["srt"],
-        assUrl: transcriptionResult.data?.urls["ass"],
+        srtUrl: transcriptionResult.data?.urls["srt"] ?? "",
+        assUrl: transcriptionResult.data?.urls["ass"] ?? "",
       });
       return {
         statusCode: 200,
@@ -77,12 +151,12 @@ const transcribeAudio: Handler = async (
     const { uniqueName = "unknown_task" } = JSON.parse(event.body || "{}");
 
     if (error instanceof Error) {
-      updateTask(uniqueName, {
+      await updateTask(uniqueName, {
         status: "failed",
         error: error.message,
       });
     } else {
-      updateTask(uniqueName, {
+      await updateTask(uniqueName, {
         status: "failed",
         error: "Unknown error during transcription.",
       });
@@ -100,21 +174,92 @@ const transcribeAudio: Handler = async (
   }
 };
 
-async function downloadFileFromBlob(blobUrl: string): Promise<Buffer> {
+async function convertStereoToMono(
+  blobUrl: string,
+  typedTranscriptionType: TranscriptionType,
+  folderName: string,
+  uniqueName: string,
+): Promise<string | null> {
+  const storageURLString =
+    typedTranscriptionType === TranscriptionType.Largefile
+      ? process.env.AZURE_BLOB_LARGE_STORAGE_NAME || ""
+      : process.env.AZURE_BLOB_STORAGE_NAME || "";
+  const blobServiceClient =
+    BlobServiceClient.fromConnectionString(storageURLString);
+  const containerName =
+    typedTranscriptionType === TranscriptionType.Largefile
+      ? process.env.AZURE_LARGE_CONTAINER_NAME || "transcribe-container"
+      : process.env.AZURE_CONTAINER_NAME || "transcribecontainer";
+  const containerClient = blobServiceClient.getContainerClient(containerName);
+
+  const downloadBlockBlobResponse = (
+    await downloadFile(blobUrl, typedTranscriptionType)
+  ).readableStreamBody as Readable;
+
+  const filename = blobUrl.includes("?") ? blobUrl.split("?")[0] : blobUrl;
+  const fileExtension = filename.split(".").pop();
+
+  let fileUrl = null;
+  if (fileExtension) {
+    const convertedBlobName = `${folderName}/${uniqueName}-mono.${fileExtension}`;
+    const monoBlobClient =
+      containerClient.getBlockBlobClient(convertedBlobName);
+    const outputStream = new stream.PassThrough();
+    try {
+      console.log("Converting to mono");
+      processWithFFmpeg(downloadBlockBlobResponse, outputStream, fileExtension);
+      console.log("File converted");
+      await monoBlobClient.uploadStream(outputStream);
+      fileUrl = monoBlobClient.url;
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error("Ffmpeg error:", error);
+        await updateTask(uniqueName, {
+          status: "failed",
+          error: error.message,
+        });
+      } else {
+        console.error("Unknown error occurred:", error);
+      }
+    } finally {
+      outputStream.end();
+    }
+  }
+
+  return fileUrl;
+}
+
+async function processWithFFmpeg(
+  inputStream: Readable,
+  outputStream: PassThrough,
+  format: string,
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    ffmpeg()
+      .setFfmpegPath(ffmpegPath)
+      .input(inputStream)
+      .audioChannels(1)
+      .format(format)
+      .output(outputStream)
+      .on("error", (err: any) => {
+        reject(err);
+      })
+      .on("end", () => {
+        resolve();
+      })
+      .run();
+  });
+}
+
+async function downloadFileFromBlob(
+  blobUrl: string,
+  typedTranscriptionType: TranscriptionType,
+): Promise<Buffer> {
   try {
-    const storageURLString: string = process.env.AZURE_BLOB_STORAGE_NAME || "";
-    const blobServiceClient =
-      BlobServiceClient.fromConnectionString(storageURLString);
-
-    const url = new URL(blobUrl);
-    const blobPath = url.pathname.split("/");
-    const containerName = blobPath[1];
-    const blobName = blobPath.slice(2).join("/");
-
-    const containerClient = blobServiceClient.getContainerClient(containerName);
-    const blobClient = containerClient.getBlobClient(blobName);
-
-    const downloadBlockBlobResponse = await blobClient.download(0);
+    const downloadBlockBlobResponse = await downloadFile(
+      blobUrl,
+      typedTranscriptionType,
+    );
     const downloaded = await streamToBuffer(
       downloadBlockBlobResponse.readableStreamBody!,
     );
@@ -124,6 +269,28 @@ async function downloadFileFromBlob(blobUrl: string): Promise<Buffer> {
     console.error("Error in downloadFileFromBlob:", error);
     throw new Error("Failed to download file from Blob Storage.");
   }
+}
+
+async function downloadFile(
+  blobUrl: string,
+  typedTranscriptionType: TranscriptionType,
+): Promise<BlobDownloadResponseParsed> {
+  const storageURLString =
+    typedTranscriptionType === TranscriptionType.Largefile
+      ? process.env.AZURE_BLOB_LARGE_STORAGE_NAME || ""
+      : process.env.AZURE_BLOB_STORAGE_NAME || "";
+  const blobServiceClient =
+    BlobServiceClient.fromConnectionString(storageURLString);
+
+  const url = new URL(blobUrl);
+  const blobPath = url.pathname.split("/");
+  const containerName = blobPath[1];
+  const blobName = blobPath.slice(2).join("/");
+
+  const containerClient = blobServiceClient.getContainerClient(containerName);
+  const blobClient = containerClient.getBlobClient(blobName);
+
+  return await blobClient.download(0);
 }
 
 async function streamToBuffer(

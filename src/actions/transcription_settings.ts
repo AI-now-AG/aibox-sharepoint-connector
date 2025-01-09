@@ -1,6 +1,6 @@
 import { defineAction } from "astro:actions";
 import { z } from "zod";
-import tenantModel, {
+import TenantModel, {
   type Tenant,
   TranscriptionsSchema,
 } from "$data/models/tenant.model";
@@ -20,7 +20,7 @@ export const transcription_settings = {
         throw new Error("No transcription settings provided.");
       }
 
-      const tenant = await tenantModel.get(_id);
+      const tenant = await TenantModel.get(_id);
       if (!tenant) {
         throw new Error("Tenant not found.");
       }
@@ -40,7 +40,7 @@ export const transcription_settings = {
         transcriptions: transcriptionUpdate,
         updated_at: new Date(),
       };
-      const updatedDocument = await tenantModel.update(_id, update);
+      const updatedDocument = await TenantModel.update(_id, update);
 
       return transformRawData(updatedDocument);
     },

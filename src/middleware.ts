@@ -4,14 +4,16 @@ import { verifyRequestOrigin } from "lucia";
 import { sequence } from "astro/middleware";
 import {
   PUBLIC_ROUTES,
+  ADMIN_ROUTES,
   SUPER_ADMIN_ROUTES,
   FEATURE_MAP_ROUTES,
   FEATURE_PLAINTEXT_ROUTE,
   FEATURE_SUBTITLES_ROUTE,
   FEATURE_SUMMARY_ROUTE,
+  FEATURE_LARGEFILE_ROUTE,
 } from "$constants";
 import type { APIContext, MiddlewareNext } from "astro";
-import tenantModel, { TenantFeature } from "$data/models/tenant.model";
+import TenantModel, { TenantFeature } from "$data/models/tenant.model";
 import { defaultLang } from "$i18n/ui";
 import { setLanguage } from "$i18n/utils";
 import { wildcardMatch, wildcardMatchInArray } from "$utils/wildcardMatch";
@@ -68,7 +70,7 @@ async function authenticate(context: APIContext, next: MiddlewareNext) {
   context.locals.session = session;
   context.locals.user = user;
 
-  const tenant = await tenantModel.get(user.tenant_id.toString());
+  const tenant = await TenantModel.get(user.tenant_id.toString());
   if (tenant) {
     context.locals.tenant = tenant;
     context.locals.locale = tenant.default_language || defaultLang;
@@ -79,11 +81,23 @@ async function authenticate(context: APIContext, next: MiddlewareNext) {
 
 async function restrictAccess(context: APIContext, next: MiddlewareNext) {
   // Restrict access for non-admin users
-  const matchPath = wildcardMatchInArray(
+  const matchSAPaths = wildcardMatchInArray(
     context.url.pathname,
     SUPER_ADMIN_ROUTES,
   );
-  if (matchPath && !auth.isSuperAdmin(context.locals)) {
+  if (matchSAPaths && !auth.isSuperAdmin(context.locals)) {
+    return context.rewrite("/restricted");
+  }
+
+  const matchAdminPaths = wildcardMatchInArray(
+    context.url.pathname,
+    ADMIN_ROUTES,
+  );
+  if (
+    matchAdminPaths &&
+    !auth.isSuperAdmin(context.locals) &&
+    !auth.isAdmin(context.locals)
+  ) {
     return context.rewrite("/restricted");
   }
 
@@ -97,9 +111,19 @@ async function restrictAccess(context: APIContext, next: MiddlewareNext) {
     );
   }
 
+  // Ensure that blocked users are restricted from accessing the admin area
+  if (context.locals.user?.blocked && context.url.pathname !== "/api/logout") {
+    return context.redirect(
+      `/error?error=account_blocked&error_description=Your account has been temporarily blocked. Please contact support.`,
+    );
+  }
+
   // Check included features
   for (const [key, paths] of Object.entries(FEATURE_MAP_ROUTES)) {
-    const matchPath = wildcardMatchInArray(context.url.pathname, paths);
+    const matchAudioToTextPaths = wildcardMatchInArray(
+      context.url.pathname,
+      paths,
+    );
     let hasAccess = false;
     if (context.locals.tenant?.included_features?.length) {
       hasAccess = context.locals.tenant.included_features.some(
@@ -110,16 +134,20 @@ async function restrictAccess(context: APIContext, next: MiddlewareNext) {
       hasAccess =
         context.locals.tenant.transcriptions?.plaintext?.enabled ?? true;
     }
-    if (context.url.pathname === FEATURE_SUBTITLES_ROUTE) {
+    else if (context.url.pathname === FEATURE_SUBTITLES_ROUTE) {
       hasAccess =
         context.locals.tenant.transcriptions?.subtitles?.enabled ?? true;
     }
-    if (context.url.pathname === FEATURE_SUMMARY_ROUTE) {
+    else if (context.url.pathname === FEATURE_SUMMARY_ROUTE) {
       hasAccess =
         context.locals.tenant.transcriptions?.summary?.enabled ?? true;
     }
+    else if (context.url.pathname === FEATURE_LARGEFILE_ROUTE) {
+      hasAccess =
+        context.locals.tenant.transcriptions?.largefile?.enabled ?? true;
+    }
 
-    if (matchPath && !hasAccess) {
+    if (matchAudioToTextPaths && !hasAccess) {
       return context.rewrite("/restricted");
     }
   }

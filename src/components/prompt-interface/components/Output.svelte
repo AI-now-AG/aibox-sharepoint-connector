@@ -1,7 +1,7 @@
 <script lang="ts">
   import { fade } from "svelte/transition";
   import { onMount, afterUpdate, tick } from "svelte";
-  import { MessageRole, type MessageHistory } from "$utils/MessageHistory";
+  import { MessageRole, type MessageHistory } from "$types/MessageHistory";
   import { sharedMessageHistory } from "$components/prompt-interface/components/Stores";
   import { tenant, user } from "$stores";
   import { svgIcons } from "$assets/icons";
@@ -108,10 +108,10 @@
 
             {#if content}
               <div class="flex-1 p-4 pt-2.5">
-                <p class="font-bold text-sm text-gray-800">
+                <p class="font-bold text-sm">
                   {role == MessageRole.User ? username : `aibox`}
                 </p>
-                <p class="mt-2 text-gray-600 text-sm">{@html content}</p>
+                <p class="mt-2 text-sm">{@html content}</p>
               </div>
             {/if}
 
@@ -178,8 +178,8 @@
             </div>
 
             <div class="flex-1 p-4 pt-2.5">
-              <p class="font-bold text-sm text-gray-800">aibox</p>
-              <p class="mt-2 text-gray-600 text-sm">{@html output}</p>
+              <p class="font-bold text-sm">aibox</p>
+              <p class="mt-2 text-sm">{@html output}</p>
             </div>
           </div>
         </div>

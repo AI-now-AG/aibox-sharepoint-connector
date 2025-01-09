@@ -57,6 +57,12 @@ export const TranscriptionsSchema = z.object({
       text: z.string().optional(),
     })
     .optional(),
+  largefile: z
+    .object({
+      enabled: z.boolean().default(false),
+      text: z.string().optional(),
+    })
+    .optional(),
 });
 
 const TenantSchema = z.object({
@@ -64,21 +70,30 @@ const TenantSchema = z.object({
   name: z.string().min(1),
   org_name: z.string().min(1),
   org_id: z.string(),
-  default_language: z.string().nullish(),
-  theme: z.nativeEnum(TenantTheme),
+  default_language: z.string().nullish().default("en"),
+  theme: z.nativeEnum(TenantTheme).default(TenantTheme.Light),
   primary_color: z.string().nullish(),
   api_key_provider: z.nativeEnum(ApiKeyProvider).optional(),
-  openai_api_key: z.string().nullish(),
-  azure_openai_api_key: z.string().nullish(),
-  azure_openai_endpoint: z.string().nullish(),
-  azure_openai_instance_name: z.string().nullish(),
-  azure_openai_whisper_model: z.string().nullish(),
-  azure_openai_chat_model: z.string().nullish(),
-  included_features: z.array(IncludedFeaturesSchema),
-  transcriptions: TranscriptionsSchema.nullish(),
-  active: z.boolean().default(true).optional(),
-  created_at: z.date().optional(),
-  updated_at: z.date().optional(),
+  openai_api_key: z.string().nullish().default(null),
+  azure_openai_api_key: z.string().nullish().default(null),
+  azure_openai_endpoint: z.string().nullish().default(null),
+  azure_openai_instance_name: z.string().nullish().default(null),
+  azure_openai_whisper_model: z.string().nullish().default(null),
+  azure_openai_chat_model: z.string().nullish().default(null),
+  included_features: z.array(IncludedFeaturesSchema).optional(),
+  transcriptions: TranscriptionsSchema.optional(),
+  speech_api_key: z.string().nullish(),
+  speech_region: z.string().nullish(),
+  active: z.boolean().optional().default(true),
+  is_restrict_user_managment: z.boolean().optional().default(false),
+  created_at: z
+    .date()
+    .optional()
+    .default(() => new Date()),
+  updated_at: z
+    .date()
+    .optional()
+    .default(() => new Date()),
 });
 export type Tenant = z.infer<typeof TenantSchema>;
 export type Transcriptions = z.infer<typeof TranscriptionsSchema>;
@@ -87,20 +102,16 @@ export type IncludedFeatures = z.infer<typeof IncludedFeaturesSchema>;
 const collection = db.collection("tenants");
 
 export default {
-  create: async (tenant: Omit<Tenant, "_id">) => {
+  create: async (tenant: Partial<Omit<Tenant, "_id">>) => {
     const validated = TenantSchema.parse({ _id: new ObjectId(), ...tenant });
     const doc = {
       ...{
-        active: true,
         included_features: [
           {
             name: TenantFeature.TextPrommpts,
             provider: ApiKeyProvider.OpenAI,
           },
         ],
-        transcriptions: null,
-        created_at: new Date(),
-        updated_at: new Date(),
       },
       ...validated,
     };
@@ -112,9 +123,7 @@ export default {
     const validated = TenantSchema.partial().parse(update);
     const doc = {
       ...validated,
-      ...{
-        updated_at: new Date(),
-      },
+      updated_at: new Date(),
     };
     return await collection.findOneAndUpdate(
       { _id: objectId },
@@ -140,32 +149,26 @@ export default {
   },
 
   list: async (filterParams?: TenantFilterParams) => {
-    let filter = {
+    // Start with a default filter for active tenants
+    const filter: any = {
       active: true,
     };
 
+    // If filterParams are provided, adjust the filter accordingly
     if (filterParams) {
       const { searchValue, showArchived } = filterParams;
 
+      // Add search filter if there's a search value
       if (searchValue) {
-        filter = {
-          ...filter,
-          ...{
-            name: {
-              $regex: searchValue,
-              $options: "i",
-            },
-          },
+        filter.name = {
+          $regex: searchValue,
+          $options: "i",
         };
       }
 
+      // Adjust filter to include archived tenants if requested
       if (showArchived) {
-        filter = {
-          ...filter,
-          ...{
-            active: false,
-          },
-        };
+        filter.active = false; // Overwrites active to false for archived tenants
       }
     }
 

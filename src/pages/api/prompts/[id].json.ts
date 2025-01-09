@@ -16,7 +16,7 @@ import type { APIRoute } from "astro";
 import type { CreateInstructionParams } from "../instructions.json";
 import type { CreateKnowledgeBaseParams } from "../knowledge-base.json";
 import initializeOpenAI from "$utils/chatModel";
-import { MessageRole } from "$utils/MessageHistory";
+import { MessageRole } from "$types/MessageHistory";
 
 export type PromptDetails = {
   title: string;

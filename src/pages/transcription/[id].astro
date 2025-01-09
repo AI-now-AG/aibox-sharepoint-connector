@@ -2,7 +2,7 @@
 import Layout from "$layouts/Layout.astro";
 import { useTranslations } from "$i18n/utils";
 import TranscriptionForm from "./TranscriptionForm.svelte";
-import { TranscriptionType } from "$utils/TranscribeRequest";
+import { TranscriptionType } from "$types/TranscribeRequest";
 const t = useTranslations();
 
 const { id } = Astro.params;
@@ -23,6 +23,9 @@ if (selectedTranscriptionType === TranscriptionType.Summarize) {
 } else if (selectedTranscriptionType === TranscriptionType.Subtitles) {
   title = t("settings.transcription.subtitles-title");
   description = t("settings.transcription.subtitles-description");
+} else if (selectedTranscriptionType === TranscriptionType.Largefile) {
+  title = t("settings.transcription.largefile-title");
+  description = t("settings.transcription.largefile-description");
 }
 ---
 

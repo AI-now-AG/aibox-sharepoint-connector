@@ -145,7 +145,8 @@
   "transcription.upload-video-or-audio-file": "Video- oder Audiodateien hochladen",
   "transcription.input-file-upload-description": "Datei per Drag & Drop verschieben oder <span style=\"color: #491EFF;\">Datei auswählen</span> um zu starten",
   "transcription.supportted-file-extensions": "MP4, MP3, WAV, AVI, M4A, FLAC",
-  "transcription.maximum-capacity": "Maximale Dateigrösse: 25 MB",
+  "transcription.maximum-capacity-25mb": "Maximale Dateigrösse: 25 MB",
+  "transcription.maximum-capacity-1gb": "Maximale Dateigrösse: 1 GB",
   "transciption.model.cta.start-transcribing": "Audio zu Text starten",
   "transciption.model.cta.start-new-transciption": "Neu starten",
   "transciption.model.cta.download-output": "Output herunterladen",
@@ -177,6 +178,14 @@
   "settings.transcription.summarize-description": "Fasse deine Audiodateien, z. B. aus Meetings oder Interviews hier direkt zusammen.",
   "settings.transcription.subtitles-title": "Untertitel erstellen",
   "settings.transcription.subtitles-description": "Erstelle deine Untertitel für deine Videos und Fernsehsendungen und wähle die gewünschten Formate aus.",
+  "settings.transcription.largefile-title": "Audio Pro",
+  "settings.transcription.largefile-description": "Erweiterte Transkription für grosse Audiodateien. Enthält Sprechertrennung, die unterschiedliche Sprecher in der Aufnahme unterscheidet.",
+  "settings.transcription.largefile-settings": "Einstellungen",
+  "settings.transcription.largefile-speaker.diarization": "Sprechertrennung",
+  "settings.transcription.largefile-speaker.number": "Maximale Anzahl Sprecher",
+  "tenant.settings.large-file-azure": "Audio Pro (Azure Speech Service)",
+  "tenant.settings.large-file-azure-apiKey": "API Key",
+  "tenant.settings.large-file-azure-region": "Region",
   "audiotools.subtitles.what-output-do-you-need": "Welchen Output benötigst du?",
   "audiotools.subtitles.subtitle-files": "untertitel Dateien",
   "audiotools.subtitles.with-text-improvement": "mit Textverbesserungen",
@@ -255,5 +264,7 @@
   "user.create-successful": "Benutzer erfolgreich erstellt",
   "user.create-failed": "Benutzererstellung fehlgeschlagen",
   "user.update-successful": "Benutzer erfolgreich aktualisiert",
-  "user.udpate-failed": "Benutzeraktualisierung fehlgeschlagen"
+  "user.udpate-failed": "Benutzeraktualisierung fehlgeschlagen",
+  "tenant.restrict-user-managment": "Eingeschränkte Benutzerverwaltung",
+  "user.restrict-user-managment": "Die Benutzerverwaltung ist für diese Organisation eingeschränkt"
 }

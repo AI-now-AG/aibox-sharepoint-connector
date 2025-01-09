@@ -1,7 +1,7 @@
 import { defineAction } from "astro:actions";
-import {
-  type PatchOrganizationsByIdRequest,
-  type PostOrganizationsRequest,
+import type {
+  PatchOrganizationsByIdRequest,
+  PostOrganizationsRequest,
 } from "auth0";
 import { ObjectId } from "mongodb";
 import { z } from "zod";
@@ -9,7 +9,7 @@ import { decrypt, encrypt } from "$utils/secure";
 import { transformRawData } from "$utils/transformRawData";
 
 import organizationsManagement from "$data/auth0/organizations-manager";
-import tenantModel, {
+import TenantModel, {
   ApiKeyProvider,
   IncludedFeaturesSchema,
   TenantFilterParamsSchema,
@@ -30,12 +30,19 @@ const TenantInputParamsSchema = z.object({
   azure_openai_instance_name: z.string().optional(),
   azure_openai_whisper_model: z.string().optional(),
   azure_openai_chat_model: z.string().optional(),
+  speech_api_key: z.string().optional(),
+  speech_region: z.string().optional(),
   included_features: z.array(IncludedFeaturesSchema),
+  is_restrict_user_managment: z
+    .boolean()
+    .optional()
+    .default(() => false),
 });
 
 const TenanKeyEncryptSchema = z.object({
   openai_api_key: z.string().optional(),
   azure_openai_api_key: z.string().optional(),
+  speech_api_key: z.string().optional(),
 });
 
 const TenantInputIdentifierSchema = z.object({
@@ -46,7 +53,7 @@ export const tenant = {
   get: defineAction({
     input: TenantInputIdentifierSchema,
     handler: async (input) => {
-      const data = await tenantModel.get(input._id);
+      const data = await TenantModel.get(input._id);
       return transformRawData(data);
     },
   }),
@@ -54,7 +61,7 @@ export const tenant = {
   list: defineAction({
     input: TenantFilterParamsSchema,
     handler: async (input) => {
-      const data = await tenantModel.list(input);
+      const data = await TenantModel.list(input);
       return transformRawData(data);
     },
   }),
@@ -78,11 +85,11 @@ export const tenant = {
 
       // store tenant on mongodb
       const { id: organizationId } = organizationResult.data;
-      const tenant: Omit<Tenant, "_id"> = {
+      const tenant: Partial<Omit<Tenant, "_id">> = {
         ...input,
-        ...{ org_id: organizationId },
+        org_id: organizationId,
       };
-      const insertResult = await tenantModel.create(tenant);
+      const insertResult = await TenantModel.create(tenant);
 
       return transformRawData(insertResult);
     },
@@ -91,14 +98,14 @@ export const tenant = {
   update: defineAction({
     input: z.intersection(TenantInputParamsSchema, TenantInputIdentifierSchema),
     handler: async (input) => {
-      // update tenant on mongodb
-      const tenant: Partial<Tenant> = {
+      // Update tenant in the local database.
+      const update: Partial<Tenant> = {
         ...input,
-        ...{ _id: new ObjectId(input._id) },
+        _id: new ObjectId(input._id),
       };
-      const updatedDocument = await tenantModel.update(input._id, tenant);
+      const updatedDocument = await TenantModel.update(input._id, update);
 
-      // update existing organization on auth0
+      // Update an existing organization in Auth0
       const bodyParameters: PatchOrganizationsByIdRequest = {
         name: input.org_name,
         display_name: input.name,
@@ -115,7 +122,7 @@ export const tenant = {
   active: defineAction({
     input: TenantInputIdentifierSchema,
     handler: async (input) => {
-      const updateResult = await tenantModel.active(input._id);
+      const updateResult = await TenantModel.active(input._id);
       return transformRawData(updateResult);
     },
   }),
@@ -123,7 +130,7 @@ export const tenant = {
   archive: defineAction({
     input: TenantInputIdentifierSchema,
     handler: async (input) => {
-      const updateResult = await tenantModel.archive(input._id);
+      const updateResult = await TenantModel.archive(input._id);
       return transformRawData(updateResult);
     },
   }),
@@ -131,12 +138,15 @@ export const tenant = {
   encryptApiKeys: defineAction({
     input: TenanKeyEncryptSchema,
     handler: async (input) => {
-      const { openai_api_key, azure_openai_api_key } = input;
+      const { openai_api_key, azure_openai_api_key, speech_api_key } = input;
       if (openai_api_key) {
         input.openai_api_key = encrypt(openai_api_key);
       }
       if (azure_openai_api_key) {
         input.azure_openai_api_key = encrypt(azure_openai_api_key);
+      }
+      if (speech_api_key) {
+        input.speech_api_key = encrypt(speech_api_key);
       }
 
       return input;
@@ -146,12 +156,15 @@ export const tenant = {
   decryptApiKeys: defineAction({
     input: TenanKeyEncryptSchema,
     handler: async (input) => {
-      const { openai_api_key, azure_openai_api_key } = input;
+      const { openai_api_key, azure_openai_api_key, speech_api_key } = input;
       if (openai_api_key) {
         input.openai_api_key = decrypt(openai_api_key);
       }
       if (azure_openai_api_key) {
         input.azure_openai_api_key = decrypt(azure_openai_api_key);
+      }
+      if (speech_api_key) {
+        input.speech_api_key = decrypt(speech_api_key);
       }
 
       return input;

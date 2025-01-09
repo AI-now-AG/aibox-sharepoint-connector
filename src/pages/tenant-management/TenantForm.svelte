@@ -24,6 +24,7 @@
   export let tenant;
   export let openAIKey = "";
   export let azureOpenAIKey = "";
+  export let azureSpeechKey = "";
 
   let confirmUpdateModal;
   let alertModal;
@@ -170,17 +171,19 @@
           await actions.tenant.encryptApiKeys({
             openai_api_key: openAIKey,
             azure_openai_api_key: azureOpenAIKey,
+            speech_api_key: azureSpeechKey,
           });
         if (encryptKeysError) {
           showAlert(encryptKeysError);
           return;
         }
         log.d(data, "CREATE - encryptApiKeys data");
-        const { openai_api_key, azure_openai_api_key } = data;
+        const { openai_api_key, azure_openai_api_key, speech_api_key } = data;
 
         // API Keys
         tenantData.openai_api_key = openai_api_key;
         tenantData.azure_openai_api_key = azure_openai_api_key;
+        tenantData.speech_api_key = speech_api_key;
 
         // update providers
         tenantData.included_features = [];
@@ -221,17 +224,19 @@
           await actions.tenant.encryptApiKeys({
             openai_api_key: openAIKey,
             azure_openai_api_key: azureOpenAIKey,
+            speech_api_key: azureSpeechKey,
           });
         if (encryptKeysError) {
           showAlert(encryptKeysError);
           return;
         }
         log.d(data, "UPDATE - encryptApiKeys data");
-        const { openai_api_key, azure_openai_api_key } = data;
+        const { openai_api_key, azure_openai_api_key, speech_api_key } = data;
 
         // API Keys
         tenantData.openai_api_key = openai_api_key;
         tenantData.azure_openai_api_key = azure_openai_api_key;
+        tenantData.speech_api_key = speech_api_key;
 
         // update providers
         tenantData.included_features = [];
@@ -425,97 +430,150 @@
 
     <div class="mb-3"><b>{t("tenant.api-keys")}</b></div>
 
-    <div class="flex flex-row space-x-4">
-      <div class="flex-1 flex flex-col">
-        <div class="w-full">
-          <span class="mb-2 text-gray-400 font-medium text-sm"
-            >{t("tenant.open-ai-provider")}</span
-          >
+    <div class="container mx-auto">
+      <!-- Open AI Section -->
+      <div class="collapse collapse-arrow bg-base-100 shadow rounded-lg mb-4">
+        <input type="checkbox" />
+        <div class="collapse-title">Open AI</div>
+        <div class="collapse-content">
+          <div class="flex flex-row space-x-4">
+            <div class="flex-1 flex flex-col">
+              <span class="mb-2 text-gray-400 font-medium text-sm"
+                >{t("tenant.open-ai-provider")}</span
+              >
 
-          <label class="input input-bordered flex items-center gap-2 mt-2">
-            <input
-              id="open_ai_key"
-              type="password"
-              class="grow"
-              placeholder={t("tenant.api-key")}
-              bind:value={openAIKey}
-            />
-            <TogglePasswordIcon
-              on:change={() => togglePassword(ApiKeyProvider.OpenAI)}
-            />
-          </label>
+              <label class="input input-bordered flex items-center gap-2 mt-2">
+                <input
+                  id="open_ai_key"
+                  type="password"
+                  class="grow"
+                  placeholder={t("tenant.api-key")}
+                  bind:value={openAIKey}
+                />
+                <TogglePasswordIcon
+                  on:change={() => togglePassword(ApiKeyProvider.OpenAI)}
+                />
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Azure Section -->
+      <div class="collapse collapse-arrow bg-base-100 shadow rounded-lg mb-4">
+        <input type="checkbox" />
+        <div class="collapse-title">Azure</div>
+        <div class="collapse-content">
+          <div class="grid grid-cols-2 gap-4">
+            <div class="w-full">
+              <span class="mb-2 text-gray-400 font-medium text-sm"
+                >{t("tenant.azure-open-ai-provider")}</span
+              >
+
+              <label class="input input-bordered flex items-center gap-2 mt-2">
+                <input
+                  id="azure_open_ai_key"
+                  type="password"
+                  class="grow"
+                  placeholder={t("tenant.api-key")}
+                  bind:value={azureOpenAIKey}
+                />
+                <TogglePasswordIcon
+                  on:change={() => togglePassword(ApiKeyProvider.AzureOpenAI)}
+                />
+              </label>
+            </div>
+            <div class="w-full">
+              <span class="mb-2 text-gray-400 font-medium text-sm"
+                >{t("tenant.azure-open-ai-instance-name")}</span
+              >
+              <input
+                type="text"
+                class="input input-bordered mt-2 w-full"
+                placeholder={""}
+                use:trimInput
+                bind:value={tenantData.azure_openai_instance_name}
+              />
+            </div>
+
+            <div class="w-full">
+              <span class="mb-2 text-gray-400 font-medium text-sm"
+                >{t("tenant.azure-open-ai-endpoint")}</span
+              >
+              <input
+                type="text"
+                class="input input-bordered mt-2 w-full"
+                placeholder={""}
+                bind:value={tenantData.azure_openai_endpoint}
+              />
+            </div>
+            <div class="w-full">
+              <span class="mb-2 text-gray-400 font-medium text-sm"
+                >{t("tenant.azure-open-ai-transciption-model")}</span
+              >
+              <input
+                type="text"
+                class="input input-bordered mt-2 w-full"
+                placeholder={""}
+                use:trimInput
+                bind:value={tenantData.azure_openai_whisper_model}
+              />
+            </div>
+
+            <div class="w-full">
+              <span class="mb-2 text-gray-400 font-medium text-sm"
+                >{t("tenant.azure-open-ai-text-model")}</span
+              >
+              <input
+                type="text"
+                class="input input-bordered mt-2 w-full"
+                placeholder={""}
+                use:trimInput
+                bind:value={tenantData.azure_openai_chat_model}
+              />
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="flex-1 flex flex-col">
-        <div class="w-full">
-          <span class="mb-2 text-gray-400 font-medium text-sm"
-            >{t("tenant.azure-open-ai-provider")}</span
-          >
-
-          <label class="input input-bordered flex items-center gap-2 mt-2">
-            <input
-              id="azure_open_ai_key"
-              type="password"
-              class="grow"
-              placeholder={t("tenant.api-key")}
-              bind:value={azureOpenAIKey}
-            />
-            <TogglePasswordIcon
-              on:change={() => togglePassword(ApiKeyProvider.AzureOpenAI)}
-            />
-          </label>
+      <!-- Large File Azure Section -->
+      <div class="collapse collapse-arrow bg-base-100 shadow rounded-lg">
+        <input type="checkbox" />
+        <div class="collapse-title">
+          {t("tenant.settings.large-file-azure")}
         </div>
+        <div class="collapse-content">
+          <div class="grid grid-cols-2 gap-4">
+            <div class="w-full">
+              <span class="mb-2 text-gray-400 font-medium text-sm"
+                >{t("tenant.settings.large-file-azure-apiKey")}
+              </span>
 
-        <div class="w-full mt-4">
-          <span class="mb-2 text-gray-400 font-medium text-sm"
-            >{t("tenant.azure-open-ai-instance-name")}</span
-          >
-          <input
-            type="text"
-            class="input input-bordered mt-2 w-full"
-            placeholder={""}
-            use:trimInput
-            bind:value={tenantData.azure_openai_instance_name}
-          />
-        </div>
-
-        <div class="w-full mt-4">
-          <span class="mb-2 text-gray-400 font-medium text-sm"
-            >{t("tenant.azure-open-ai-endpoint")}</span
-          >
-          <input
-            type="text"
-            class="input input-bordered mt-2 w-full"
-            placeholder={""}
-            bind:value={tenantData.azure_openai_endpoint}
-          />
-        </div>
-
-        <div class="w-full mt-4">
-          <span class="mb-2 text-gray-400 font-medium text-sm"
-            >{t("tenant.azure-open-ai-transciption-model")}</span
-          >
-          <input
-            type="text"
-            class="input input-bordered mt-2 w-full"
-            placeholder={""}
-            use:trimInput
-            bind:value={tenantData.azure_openai_whisper_model}
-          />
-        </div>
-
-        <div class="w-full mt-4">
-          <span class="mb-2 text-gray-400 font-medium text-sm"
-            >{t("tenant.azure-open-ai-text-model")}</span
-          >
-          <input
-            type="text"
-            class="input input-bordered mt-2 w-full"
-            placeholder={""}
-            use:trimInput
-            bind:value={tenantData.azure_openai_chat_model}
-          />
+              <label class="input input-bordered flex items-center gap-2 mt-2">
+                <input
+                  id="azure_open_ai_key"
+                  type="password"
+                  class="grow"
+                  placeholder={t("tenant.api-key")}
+                  bind:value={azureSpeechKey}
+                />
+                <TogglePasswordIcon
+                  on:change={() => togglePassword(ApiKeyProvider.AzureOpenAI)}
+                />
+              </label>
+            </div>
+            <div class="w-full">
+              <span class="mb-2 text-gray-400 font-medium text-sm"
+                >{t("tenant.settings.large-file-azure-region")}</span
+              >
+              <input
+                type="text"
+                class="input input-bordered mt-2 w-full"
+                placeholder={""}
+                use:trimInput
+                bind:value={tenantData.speech_region}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -571,6 +629,24 @@
         <label class="label cursor-pointer ml-2" for="feature-audio-to-text">
           {@html svgIcons.audioToText}
           <span class="label-text ml-2">{t("tenant.audio-to-text")}</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <div class="w-full bg-white rounded px-4 py-2 mt-4">
+      <div class="flex items-center">
+        <input
+          id="disable-create-user"
+          type="checkbox"
+          class="checkbox checkbox-primary"
+          value="disbale-create-user"
+          bind:checked={tenantData.is_restrict_user_managment}
+        />
+        <label class="label cursor-pointer ml-2" for="disable-create-user">
+          <span class="label-text ml-2"
+            >{t("tenant.restrict-user-managment")}</span
+          >
         </label>
       </div>
     </div>

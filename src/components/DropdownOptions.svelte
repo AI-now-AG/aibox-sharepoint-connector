@@ -1,6 +1,5 @@
 <script lang="ts" context="module">
   export interface Option {
-    id: string;
     icon: any;
     text: string;
     action: Function;
@@ -14,13 +13,13 @@
 </script>
 
 <ul
-  class={`py-2 dropdown-content menu bg-base-100 rounded-xl p-2 shadow ${widthClass}`}
+  class={`py-2 dropdown-content menu bg-base-100 rounded-xl z-[1] p-2 shadow ${widthClass}`}
   style={styleVisibility}
 >
   {#each options as option}
     <li>
       <button
-        class="flex items-center px-4 py-2 text-gray-700 font-sans w-full"
+        class="flex items-center px-4 py-2 text-base-content font-sans w-full"
         on:click|stopPropagation={(e) => {
           option.action();
         }}

@@ -3,7 +3,7 @@ import { useTranslations } from "$i18n/utils";
 import MenuItem from "./MenuItem.astro";
 import Category from "$data/models/category.model";
 import { TenantFeature } from "$data/models/tenant.model";
-import { TranscriptionType } from "$utils/TranscribeRequest";
+import { TranscriptionType } from "$types/TranscribeRequest";
 import { svgIcons } from "$assets/icons";
 import auth from "$auth/auth";
 
@@ -18,12 +18,14 @@ const menuItems = categories.map((category, index) => ({
   title: category.title,
   icon: category.icon,
   isOpened: navState[`ai-tools-module-${index}`] ?? false,
-  items: category.groups?.filter((group) => {
-    return group?.active &&  group.active == true;
-  }).map((group) => ({
-    title: group.title,
-    path: `/prompts/${category._id}/${group._id}`,
-  })),
+  items: category.groups
+    ?.filter((group) => {
+      return group?.active && group.active == true;
+    })
+    .map((group) => ({
+      title: group.title,
+      path: `/prompts/${category._id}/${group._id}`,
+    })),
 }));
 
 const audioToTextMenus = [];
@@ -45,6 +47,12 @@ if (auth.hasAudioSubtitles(Astro.locals)) {
   audioFeatureItems.push({
     title: t("settings.transcription.subtitles-title"),
     path: `/transcription/${TranscriptionType.Subtitles}`,
+  });
+}
+if (auth.hasAudioLargefile(Astro.locals)) {
+  audioFeatureItems.push({
+    title: t("settings.transcription.largefile-title"),
+    path: `/transcription/${TranscriptionType.Largefile}`,
   });
 }
 
@@ -84,6 +92,10 @@ if (auth.hasFeature(Astro.locals, TenantFeature.AudioToText)) {
 }
 
 if (auth.isAdmin(Astro.locals) || auth.isSuperAdmin(Astro.locals)) {
+  settingsItems.push({
+    title: t("user.user-management"),
+    path: "/user-management",
+  });
   restrictedMenus.push({
     title: t("nav.settings"),
     icon: svgIcons.menuSettings,
@@ -106,50 +118,7 @@ if (auth.isSuperAdmin(Astro.locals)) {
   });
 }
 
-// // TODO: Check logic supper admin here
-// const tenantMenuItem = auth.isSuperAdmin(Astro.locals)
-//   ? {
-//       title: t("nav.tenant-management"),
-//       icon: svgIcons.tenantManagement,
-//       path: "/tenant-management",
-//     }
-//   : undefined;
-
-const modules = [
-  /*{
-    title: t("nav.text-writing"),
-    icon: `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
-	<g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" color="currentColor">
-		<path d="M10.55 3c-3.852.007-5.87.102-7.159 1.39C2 5.783 2 8.022 2 12.5s0 6.717 1.391 8.109C4.783 22 7.021 22 11.501 22c4.478 0 6.717 0 8.108-1.391c1.29-1.29 1.384-3.307 1.391-7.16" />
-		<path d="M11.056 13C10.332 3.866 16.802 1.276 21.98 2.164c.209 3.027-1.273 4.16-4.093 4.684c.545.57 1.507 1.286 1.403 2.18c-.074.638-.506.95-1.372 1.576c-1.896 1.37-4.093 2.234-6.863 2.396" />
-		<path d="M9 17c2-5.5 3.96-7.364 6-9" />
-	</g>
-</svg>`,
-    items: [
-      {
-        title: "Headline",
-        path: "/headlines",
-      },
-      {
-        title: "Headline UI Demo",
-        path: "/headlines/demo",
-      },
-      {
-        title: "Summarize",
-        path: "/summarize",
-      },
-      {
-        title: "Shorten test",
-        path: "/shorten-text",
-      },
-      {
-        title: "Police Report",
-        path: "/police-report",
-      },
-    ],
-  },*/
-  ...menuItems,
-];
+const modules = [...menuItems];
 ---
 
 <nav class="flex flex-col bg-base-100 w-80 min-h-screen gap-6">
@@ -179,9 +148,6 @@ const modules = [
   </div>
 
   <div class="flex-grow">
-    <!-- <ul class="menu w-full pr-6">
-      
-    </ul> -->
     <ul class="menu w-full pr-6">
       <li>
         <details data-id={`ai-tools`} open={navState["ai-tools"] ?? true}>
@@ -199,12 +165,7 @@ const modules = [
                     data-id={`ai-tools-module-${index}`}
                     open={mod.isOpened}
                   >
-                    <summary>
-                      {/* <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
-                        {mod.icon && <Fragment set:html={mod.icon} />}
-                      </div> */}
-                      {mod.title}
-                    </summary>
+                    <summary>{mod.title}</summary>
                     {"items" in mod && (
                       <ul>
                         {mod.items?.map((sub) => (
@@ -282,11 +243,6 @@ const modules = [
       }
     </ul>
   </div>
-  <!-- Settings and Admin items aligned at the bottom -->
-  <!-- <div class="mt-auto">
-    <ul class="menu w-full pr-6">
-    </ul>
-  </div> -->
 </nav>
 
 <script>
@@ -311,13 +267,6 @@ const modules = [
 
   // Ensure open states are applied after page load
   document.addEventListener("DOMContentLoaded", async () => {
-    // await applyOpenStates();
-    // document.querySelectorAll("a[href]").forEach((link) => {
-    //   link.addEventListener("click", async (event) => {
-    //     await applyOpenStates();
-    //   });
-    // });
-
     setInterval(applyOpenStates, 500);
   });
 </script>

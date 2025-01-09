@@ -34,10 +34,16 @@ import codeIcon from "$assets/icons/codeIcon.svg?raw";
 import warningIcon from "$assets/icons/warning.svg?raw";
 import downIcon from "$assets/icons/down.svg?raw";
 import duplicate from "$assets/icons/duplicate.svg?raw";
-import reOrder from "$assets/icons/re-order.svg?raw";
+import reorder from "$assets/icons/re-order.svg?raw";
 import drag from "$assets/icons/drag.svg?raw";
 import fileImport from "$assets/icons/file-import.svg?raw";
 import fileExport from "$assets/icons/file-export.svg?raw";
+import block from "$assets/icons/block.svg?raw";
+import filter from "$assets/icons/filter.svg?raw";
+import arrowDownFill from "$assets/icons/arrow-down-fill.svg?raw";
+import arrowUp from "$assets/icons/arrow-up.svg?raw";
+import arrowDown from "$assets/icons/arrow-down.svg?raw";
+import arrowUpDown from "$assets/icons/arrow-up-down.svg?raw";
 
 export const svgIcons = {
   menuSettings,
@@ -76,8 +82,14 @@ export const svgIcons = {
   warningIcon,
   downIcon,
   duplicate,
-  reOrder,
+  reorder,
   drag,
   fileImport,
   fileExport,
+  block,
+  filter,
+  arrowDownFill,
+  arrowUp,
+  arrowDown,
+  arrowUpDown,
 };

@@ -1,0 +1,36 @@
+---
+import Layout from "$layouts/Layout.astro";
+import { useTranslations } from "$i18n/utils";
+import UserList from "$pages/user-management/UserList.svelte";
+import { svgIcons } from "$assets/icons";
+
+const t = useTranslations();
+
+const tenant = Astro.locals.tenant;
+const tenantId = tenant?._id?.toString() ?? "";
+const isRestrictUserManagement = tenant.is_restrict_user_managment;
+---
+
+<Layout>
+  <div class="container max-w-7xl mx-auto px-6 justify-center py-6">
+    <div class="flex space-y-2 justify-between items-center">
+      <h1 class="text-4xl font-bold">
+        {t("user.user-management")}
+      </h1>
+      {
+        isRestrictUserManagement ? (
+          <span />
+        ) : (
+          <a
+            href="./user-management/add"
+            class="btn btn-active btn-neutral font-normal"
+          >
+            <span set:html={svgIcons.add} />
+            {t("user.add-new-user")}
+          </a>
+        )
+      }
+    </div>
+    <UserList tenantId={tenantId} client:load />
+  </div>
+</Layout>

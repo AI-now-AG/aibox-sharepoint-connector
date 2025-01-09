@@ -1,6 +1,6 @@
 <script lang="ts">
   import FileUpload from "$components/FileUpload.svelte";
-  import { type MessageHistory, MessageRole } from "$utils/MessageHistory";
+  import { type MessageHistory, MessageRole } from "$types/MessageHistory";
   import { sharedMessageHistory } from "$components/prompt-interface/components/Stores";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";

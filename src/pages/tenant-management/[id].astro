@@ -1,7 +1,7 @@
 ---
 import Layout from "$layouts/Layout.astro";
 import TenantForm from "./TenantForm.svelte";
-import tenantModel from "$data/models/tenant.model";
+import TenantModel from "$data/models/tenant.model";
 import { decrypt } from "$utils/secure";
 import { transformRawData } from "$utils/transformRawData";
 
@@ -15,16 +15,17 @@ if (id === undefined) {
   throw new Error("Id is required");
 }
 
-const tenant = await tenantModel.get(id);
+const tenant = await TenantModel.get(id);
 if (tenant === null) {
   console.error("Tenant not found");
   return Astro.redirect("/404");
 }
 
 const data = transformRawData(tenant);
-const { openai_api_key, azure_openai_api_key } = data || {};
+const { openai_api_key, azure_openai_api_key, speech_api_key } = data || {};
 let openAIKey = "";
 let azureOpenAIKey = "";
+let azureSpeechKey = "";
 
 if (openai_api_key) {
   openAIKey = decrypt(openai_api_key);
@@ -33,6 +34,10 @@ if (openai_api_key) {
 if (azure_openai_api_key) {
   azureOpenAIKey = decrypt(azure_openai_api_key);
 }
+
+if (speech_api_key) {
+  azureSpeechKey = decrypt(speech_api_key);
+}
 ---
 
 <Layout>
@@ -40,6 +45,7 @@ if (azure_openai_api_key) {
     tenant={data}
     openAIKey={openAIKey?.trim()}
     azureOpenAIKey={azureOpenAIKey?.trim()}
+    azureSpeechKey={azureSpeechKey?.trim()}
     client:load
   />
 </Layout>
