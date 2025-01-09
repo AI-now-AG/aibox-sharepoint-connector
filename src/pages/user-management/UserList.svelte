@@ -27,17 +27,13 @@
   export let tenantId: string = "";
 
   const columnData: ColumnData[] = [
-    { key: "name", name: t("common.name"), class: "w-auto" },
-    { key: "email", name: t("user.e-mail"), class: "w-auto" },
-    { key: "", name: t("user.role"), class: "w-28" },
-    { key: "logins_count", name: t("user.logins"), class: "w-40" },
-    {
-      key: "last_login",
-      name: t("user.latest-login"),
-      class: "w-56",
-    },
-    { key: "", name: "", class: "w-auto" },
-    { key: "", name: "", class: "w-28" },
+    { key: "name", name: t("common.name") },
+    { key: "email", name: t("user.e-mail") },
+    { key: "", name: t("user.role") },
+    { key: "logins_count", name: t("user.logins") },
+    { key: "last_login", name: t("user.latest-login") },
+    { key: "", name: "" },
+    { key: "", name: "" },
   ];
   let users: any = [];
 

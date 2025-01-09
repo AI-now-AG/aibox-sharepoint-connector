@@ -69,7 +69,7 @@
             getFirstLastColCssClass(colIndex, columnData.length)}
           on:click={() => sort(data.key ?? "")}
         >
-          <span class="inline-flex justify-center">
+          <span class="inline-flex justify-center items-center">
             {data.name}
             <span class="ml-1">
               {@html data.key
