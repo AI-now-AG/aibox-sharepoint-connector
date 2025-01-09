@@ -137,6 +137,7 @@
           const newUserMessage = {
             role: MessageRole.User,
             content: inputText,
+            rawData: inputText,
           };
           sharedMessageHistory.update((messages) => [
             ...messages,
@@ -163,6 +164,7 @@
           const newAssistantMessage = {
             role: MessageRole.Assistant,
             content: output,
+            rawData: partialData,
           };
           sharedMessageHistory.update((messages) => [
             ...messages,

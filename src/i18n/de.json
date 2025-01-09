@@ -264,7 +264,7 @@
   "settings.transcription.largefile-speaker.diarization": "Sprechertrennung",
   "settings.transcription.largefile-speaker.number": "Maximale Anzahl Sprecher",
   "tenant.settings.large-file-azure": "Audio Pro (Azure Speech Service)",
-  "user.id": "Benutzer-ID",
   "tenant.settings.large-file-azure-apiKey": "API Key",
-  "tenant.settings.large-file-azure-region": "Region"
+  "tenant.settings.large-file-azure-region": "Region",
+  "user.id": "Benutzer-ID"
 }
