@@ -2,9 +2,24 @@
 import type { ParsedAuth0UserSub } from "$types/auth0.types";
 import moment from "moment";
 
-export const parseAuth0UserSub = (sub: string): ParsedAuth0UserSub => {
-  const [provider, id] = sub?.split("|") ?? [];
+export const parseAuth0UserSub = (auth0Sub: string): ParsedAuth0UserSub => {
+  const [provider, id] = auth0Sub?.split("|") ?? [];
   return { provider, id };
+};
+
+export const isEnterpriseConnection = (auth0Sub: string): boolean => {
+  const [provider] = auth0Sub?.split("|") ?? [];
+  const enterpriseProviders = [
+    "saml",
+    "oidc",
+    "okta",
+    "google",
+    "waad",
+    "adfs",
+    "ad",
+    "ping",
+  ];
+  return enterpriseProviders.includes(provider);
 };
 
 export function formatDateToDDMMYY(date: string | Date): string {
