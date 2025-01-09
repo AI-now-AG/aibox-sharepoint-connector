@@ -179,7 +179,7 @@ export const user = {
         // For enterprise connections, Auth0 does not allow updating a user's name by default
         const bodyParameters: UserUpdate = wildcardMatch(
           user.auth0_sub,
-          "auth0|",
+          "auth0|*",
         )
           ? {
               name: input.name,
