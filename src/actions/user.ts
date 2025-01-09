@@ -14,6 +14,7 @@ import UserModel from "$data/models/user.model";
 import usersManagement from "$data/auth0/users-manager";
 import organizationsManagement from "$data/auth0/organizations-manager";
 import rolesManagement from "$data/auth0/roles-manager";
+import { wildcardMatch } from "$utils/wildcardMatch";
 
 const UserInputParamsSchema = z.object({
   name: z.string(),
@@ -175,10 +176,18 @@ export const user = {
         const updatedDocument = await UserModel.update(input._id, update);
 
         // Update an existing user in Auth0
-        const bodyParameters: UserUpdate = {
-          name: input.name,
-          email: input.email,
-        };
+        // For enterprise connections, Auth0 does not allow updating a user's name by default
+        const bodyParameters: UserUpdate = wildcardMatch(
+          user.auth0_sub,
+          "auth0|",
+        )
+          ? {
+              name: input.name,
+              email: input.email,
+            }
+          : {
+              email: input.email,
+            };
         await usersManagement.update(user.auth0_sub, bodyParameters);
 
         // Add member roles
