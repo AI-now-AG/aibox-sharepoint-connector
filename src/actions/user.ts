@@ -180,17 +180,13 @@ export const user = {
 
         // Update an existing user in Auth0
         // For enterprise connections, Auth0 does not allow updating a user's name by default
-        const bodyParameters: UserUpdate = isEnterpriseConnection(
-          user.auth0_sub,
-        )
-          ? {
-              email: input.email,
-            }
-          : {
-              name: input.name,
-              email: input.email,
-            };
-        await usersManagement.update(user.auth0_sub, bodyParameters);
+        if (!isEnterpriseConnection(user.auth0_sub)) {
+          const bodyParameters: UserUpdate = {
+            name: input.name,
+            email: input.email,
+          };
+          await usersManagement.update(user.auth0_sub, bodyParameters);
+        }
 
         // Add member roles
         await assignMemberRoles(
