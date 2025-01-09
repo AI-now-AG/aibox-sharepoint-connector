@@ -7,10 +7,22 @@ import { createWriteStream, unlinkSync, existsSync } from "fs";
 import { promisify } from "util";
 import { pipeline } from "stream";
 import { getTask } from "$shared/transcriptionTasks";
+import { TranscriptionType } from "$types/TranscribeRequest";
+import {
+  pollTranscriptionTask,
+  processTranscriptionResult,
+} from "./utils/batchTranscription";
+import type { TranscriptionResponse } from "$utils/Speech/SpeechResponse";
 
 const checkFileExist: Handler = async (event, context) => {
-  const { uniqueName, fileNames, folderName, isShowImprovedTextPreview } =
-    JSON.parse(event.body!);
+  const {
+    uniqueName,
+    fileNames,
+    folderName,
+    isShowImprovedTextPreview,
+    typedTranscriptionType,
+    isDiarizationEnabled,
+  } = JSON.parse(event.body!);
 
   let requireFilesCount = fileNames.length || 0;
   const tempFileNames: string[] = [];
@@ -21,7 +33,9 @@ const checkFileExist: Handler = async (event, context) => {
     tempFileNames.push(improvedTxtFileName);
   }
 
-  const txtFileName = `${uniqueName}.txt`;
+  const txtFileName = isDiarizationEnabled
+    ? `${uniqueName}-mono.txt`
+    : `${uniqueName}.txt`;
   if (!fileNames.includes(txtFileName) && !isShowImprovedTextPreview) {
     requireFilesCount += 1;
     tempFileNames.push(txtFileName);
@@ -30,12 +44,16 @@ const checkFileExist: Handler = async (event, context) => {
   if ((fileNames?.length || tempFileNames.length) && uniqueName) {
     const streamPipeline = promisify(pipeline);
     const tmpDir = tmpdir();
-    let storageURLString: string = process.env.AZURE_BLOB_STORAGE_NAME || "";
-
+    const storageURLString =
+      typedTranscriptionType === TranscriptionType.Largefile
+        ? process.env.AZURE_BLOB_LARGE_STORAGE_NAME || ""
+        : process.env.AZURE_BLOB_STORAGE_NAME || "";
     const blobServiceClient =
       BlobServiceClient.fromConnectionString(storageURLString);
     const containerName =
-      process.env.AZURE_CONTAINER_NAME || "transcribecontainer";
+      typedTranscriptionType === TranscriptionType.Largefile
+        ? process.env.AZURE_LARGE_CONTAINER_NAME || "transcribe-container"
+        : process.env.AZURE_CONTAINER_NAME || "transcribecontainer";
     const containerClient = blobServiceClient.getContainerClient(containerName);
     const availableFiles: string[] = [];
     const downloadedFiles: { name: string; path: string }[] = [];
@@ -117,10 +135,21 @@ const checkFileExist: Handler = async (event, context) => {
               }),
             };
           } else {
-            return {
-              statusCode: 200,
-              body: JSON.stringify(task),
-            };
+            if (task.error) {
+              return {
+                statusCode: 500,
+                body: JSON.stringify({
+                  exists: false,
+                  message: "Failed to check file existence or download content",
+                  error: task.error,
+                }),
+              };
+            } else {
+              return {
+                statusCode: 200,
+                body: JSON.stringify(task),
+              };
+            }
           }
         }
         availableFiles.push(fileName);
@@ -245,6 +274,33 @@ async function streamToString(
     });
     readableStream?.on("error", reject);
   });
+}
+
+export async function pollingAndStatus(
+  taskUrl: string,
+  uniqueName: string,
+  enableDiarization: boolean = false,
+  subscriptionKey: string,
+): Promise<{ jsonData: TranscriptionResponse; transcriptionText: string }> {
+  try {
+    console.log("Polling processing transcription");
+    const pollResponse = await pollTranscriptionTask(
+      taskUrl,
+      uniqueName,
+      subscriptionKey,
+    );
+
+    const transcriptionData = await processTranscriptionResult(
+      uniqueName,
+      enableDiarization,
+      pollResponse.links.files,
+      subscriptionKey,
+    );
+    return transcriptionData;
+  } catch (error) {
+    console.error("Error processing transcription:", error);
+    throw error;
+  }
 }
 
 export { checkFileExist as handler };

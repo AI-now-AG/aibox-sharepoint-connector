@@ -158,8 +158,8 @@
           <div class="flex-none w-20">
             <span
               class={item.active == 1
-                ? "text-emerald-600 text-sm font-medium"
-                : "text-grey-600 text-sm font-medium"}
+                ? "text-success text-sm font-medium"
+                : "text-sm font-medium"}
               >{item.active == 1 ? "active" : "inactive"}</span
             >
           </div>

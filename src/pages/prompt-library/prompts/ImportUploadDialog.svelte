@@ -90,9 +90,9 @@
             {@html t("upload-file.popup.drag-message")}
           </p>
           {#if file}
-            <p class="text-sm text-gray-400 mt-1">{file.name}</p>
+            <p class="text-sm text-base-content/80 mt-1">{file.name}</p>
           {:else}
-            <p class="text-sm text-gray-400 mt-1">{"CSV"}</p>
+            <p class="text-sm text-base-content/80 mt-1">{"CSV"}</p>
           {/if}
         </div>
       </label>

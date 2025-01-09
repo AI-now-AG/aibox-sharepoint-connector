@@ -57,6 +57,12 @@ export const TranscriptionsSchema = z.object({
       text: z.string().optional(),
     })
     .optional(),
+  largefile: z
+    .object({
+      enabled: z.boolean().default(false),
+      text: z.string().optional(),
+    })
+    .optional(),
 });
 
 const TenantSchema = z.object({
@@ -76,6 +82,8 @@ const TenantSchema = z.object({
   azure_openai_chat_model: z.string().nullish().default(null),
   included_features: z.array(IncludedFeaturesSchema).optional(),
   transcriptions: TranscriptionsSchema.optional(),
+  speech_api_key: z.string().nullish(),
+  speech_region: z.string().nullish(),
   active: z.boolean().optional().default(true),
   is_restrict_user_managment: z.boolean().optional().default(false),
   created_at: z

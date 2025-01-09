@@ -186,7 +186,7 @@
   }
 </script>
 
-<div class="container max-w-full mx-auto p-6">
+<div class="container max-w-7xl mx-auto py-6">
   <InputSearch bind:value={searchValue} on:search={fetchUsers} />
 
   <DropdownFilter

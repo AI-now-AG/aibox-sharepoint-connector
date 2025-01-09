@@ -57,7 +57,7 @@
     </label>
     <div>
       <textarea
-        class="mt-2 text-xs text-grey-500"
+        class="mt-2 text-xs"
         style="width: 100%; color: red;"
         rows="3">{encryptedKey}</textarea
       >
@@ -90,7 +90,7 @@
     </label>
     <div>
       <textarea
-        class="mt-2 text-xs text-grey-500"
+        class="mt-2 text-xs"
         style="width: 100%; color: green;"
         rows="3">{decryptedKey}</textarea
       >

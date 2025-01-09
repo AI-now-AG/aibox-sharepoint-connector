@@ -1,10 +1,11 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import { slide } from "svelte/transition";
   import TextOuput from "./TextOuput.svelte";
   import StartNewConfirmDialog from "./StartNewConfirmDialog.svelte";
   import { useTranslations } from "$i18n/utils";
   import { svgIcons } from "$assets/icons";
-  import { tenant } from "$stores";
+  import { tenant, user } from "$stores";
   import transcriptStore from "$stores/transcript";
   import { addToast } from "$stores/toast";
   import { type TranscribeRequest, FileFormat } from "$types/TranscribeRequest";
@@ -17,6 +18,7 @@
   let audioFile: File | undefined;
   let audioDuration: string = "";
   let acceptedTypes: Array<string> = ["audio/*", "video/*"];
+  let maxFileSize = 25;
   let isDragOver: boolean = false;
   let textOuput: string = "";
   let txtFileUrl: string = "";
@@ -37,6 +39,7 @@
 
   // states
   let isUploading: boolean = false;
+  let uploadingValue: number = 0;
   let isUploaded: boolean = false;
   let isTranscribing: boolean = false;
   let isTranscipted: boolean = false;
@@ -47,6 +50,11 @@
   let tempUploadUrl: string;
   let tempOutputFileName: string;
   let tempOutputFileNames: string[] = [];
+
+  let maxNumberOfSpeakers = 2;
+  let isDiarizationEnabled = false;
+  let minSpeakers = 2;
+  let maxSpeakers = 99;
 
   let confirmModal: HTMLDialogElement;
 
@@ -73,6 +81,11 @@
       "TranscriptionForm::onMount transcriptStore in store",
       $transcriptStore,
     );
+
+    if (transcriptionType == TranscriptionType.Largefile) {
+      maxFileSize = 1000;
+      //maxFileSize = 25; // this is for testing purpose
+    }
 
     if ($transcriptStore && transcriptionType) {
       retrieveDataInStore(transcriptionType);
@@ -207,7 +220,7 @@
   }
 
   function isFileSizeValid(size: number) {
-    if (size <= 25 * 1024 * 1024) {
+    if (size <= maxFileSize * 1024 * 1024) {
       fileErrorMessage = "";
       return true;
     }
@@ -240,16 +253,54 @@
     return str;
   }
 
-  async function getSASToken(fileNameWithoutExtension: string) {
+  async function getSASToken(
+    fileNameWithoutExtension: string,
+    fileExtension: string,
+  ) {
     const response: any = await fetch("/.netlify/functions/getSASToken", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         fileNameWithoutExtension: fileNameWithoutExtension,
+        fileExtension: fileExtension,
         folderName: folderName,
+        transcriptionType: transcriptionType,
       }),
     });
     return await response.json();
+  }
+
+  async function uploadBlobFileWithProgress(
+    uploadUrl: string,
+    file: File,
+    onProgress: (percentage: number) => void,
+  ) {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+
+      xhr.open("PUT", uploadUrl, true);
+      xhr.setRequestHeader("x-ms-blob-type", "BlockBlob");
+      xhr.setRequestHeader("Content-Type", file.type);
+
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable) {
+          const percentage = (event.loaded / event.total) * 100;
+          onProgress(percentage);
+        }
+      };
+
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          resolve(xhr.response);
+        } else {
+          reject(new Error(`Failed to upload file. Status: ${xhr.status}`));
+        }
+      };
+
+      xhr.onerror = () =>
+        reject(new Error("An error occurred during the file upload."));
+      xhr.send(file);
+    });
   }
 
   async function uploadBlobFile(uploadUrl: string, file: File) {
@@ -303,27 +354,60 @@
 
       // Get Azure Storage SAS tokens
       let fileNameWithoutExtension = audioFile.name || "";
+      let fileExtension = audioFile.name || "";
       const splitedFileName = fileNameWithoutExtension.split(".");
-      if (splitedFileName && splitedFileName?.[0]) {
-        fileNameWithoutExtension = formatFilename(splitedFileName?.[0]);
+      console.log("fileNameWithoutExtension---", splitedFileName);
+      if (splitedFileName) {
+        if (splitedFileName?.[0]) {
+          fileNameWithoutExtension = formatFilename(splitedFileName?.[0]);
+        }
+        if (splitedFileName?.[1]) {
+          fileExtension = splitedFileName?.[splitedFileName?.length - 1];
+        }
       }
       console.log("fileNameWithoutExtension", fileNameWithoutExtension);
       const { uploadUrl, outputFileName } = await getSASToken(
         fileNameWithoutExtension,
+        fileExtension,
       );
       console.log("Azue SAS tokens response", { uploadUrl, outputFileName });
 
-      // Upload the file to Azure Blob Storage
-      const response = await uploadBlobFile(uploadUrl, audioFile);
+      try {
+        // Store temporary upload URL, filename for later
+        console.log("Temp output file name", tempOutputFileName);
+        // Upload the file to Azure Blob Storage
+        //const response = await uploadBlobFile(uploadUrl, audioFile);
+        await uploadBlobFileWithProgress(uploadUrl, audioFile, (percentage) => {
+          uploadingValue = parseInt(`${Math.round(percentage)}`);
+        })
+          .then(() => {
+            // Store temporary upload URL, filename for later
+            tempUploadUrl = uploadUrl;
+            tempOutputFileName = outputFileName;
+            tempOutputFileNames = [
+              `${outputFileName}.txt`,
+              `${outputFileName}.srt`,
+            ];
+            console.log("Temp output file name", tempOutputFileNames);
 
-      // Store temporary upload URL, filename for later
-      tempUploadUrl = uploadUrl;
-      tempOutputFileName = outputFileName;
-      console.log("Temp output file name", tempOutputFileName);
-
-      if (response.ok) {
-        isUploading = false;
-        isUploaded = true;
+            isUploading = false;
+            isUploaded = true;
+          })
+          .catch((error) => {
+            console.error("Error uploading file:", error);
+            isUploading = false;
+            audioFile = undefined;
+          });
+      } catch (error) {
+        console.log(error);
+        addToast({
+          message:
+            error instanceof Error
+              ? error.message
+              : "An error occurred during upload.",
+          type: "error",
+          timeout: 5000,
+        });
       }
     } else {
       isUploading = false;
@@ -342,7 +426,10 @@
         tempOutputFileName,
         tempUploadUrl,
         $tenant,
+        $user,
       );
+      console.log(params);
+      console.log($user);
 
       const response = await fetch(
         "/.netlify/functions/transcribeAudio-background",
@@ -417,6 +504,7 @@
     tempOutputFileName: string,
     tempUploadUrl: string,
     tenant: any,
+    user: any,
   ): TranscribeRequest {
     return {
       folderName: folderName,
@@ -424,6 +512,8 @@
       uniqueName: tempOutputFileName,
       uploadUrl: tempUploadUrl,
       transcriptions: tenant?.transcriptions,
+      tenantId: tenant?._id,
+      userId: user?.id,
       transcriptionType: transcriptionType,
       selectedFileFormat: selectedFileFormat,
       isShowImprovedTextPreview: showTextPreviewChecked,
@@ -432,6 +522,10 @@
       azureOpenAIEndpoint: tenant?.azure_openai_endpoint,
       azureOpenAIWhisperModel: tenant?.azure_openai_whisper_model,
       azureOpenAIChatModel: tenant?.azure_openai_chat_model,
+      speechKey: tenant?.speech_api_key,
+      speechRegion: tenant?.speech_region,
+      isDiarizationEnabled: isDiarizationEnabled,
+      maxSpeakers: parseInt(maxNumberOfSpeakers.toString()),
     };
   }
 
@@ -448,6 +542,8 @@
             transcriptionType === TranscriptionType.Subtitles
               ? showTextPreviewChecked
               : false,
+          typedTranscriptionType: transcriptionType,
+          isDiarizationEnabled: isDiarizationEnabled,
         }),
       });
       if (response.ok) {
@@ -504,11 +600,15 @@
       } else {
         const result = await response.json();
         if (response.status != 404) {
+          clearInterval(intervalId);
           addToast({
-            message: result.message,
+            message: result.error,
             type: "error",
             timeout: 5000,
           });
+          isTranscribing = false;
+          isTranscipted = false;
+          isTranscriptionFailed = true;
         }
       }
     } catch (error) {
@@ -516,8 +616,33 @@
     }
   }
 
+  function getPollingInterval(fileSizeBytes: number): number {
+    const fileSizeMB = fileSizeBytes / 1024 / 1024;
+    const timePerMB = 60 / 1.7;
+    const estimatedTime = timePerMB * fileSizeMB;
+
+    if (fileSizeMB <= 25) return Math.min(estimatedTime, 30) * 1000; // Poll at least every 30 seconds for smaller files
+    if (fileSizeMB <= 50) return Math.min(estimatedTime, 60) * 1000; // Poll every 1 minute for medium-smaller files
+    if (fileSizeMB <= 200) return Math.min(estimatedTime, 120) * 1000; // Poll every 2 minutes for medium files
+    if (fileSizeMB <= 500) return Math.min(estimatedTime, 300) * 1000; // Poll every 5 minutes for larger files
+    if (fileSizeMB <= 1000) return Math.min(estimatedTime, 600) * 1000; // Poll every 10 minutes for very large files
+    return Math.min(estimatedTime, 900) * 1000; // Poll every 15 minutes for extra-large files
+  }
+
   function startPolling() {
-    intervalId = setInterval(checkOutputFileReady, 5000);
+    if (transcriptionType === TranscriptionType.Largefile) {
+      let fileSize = audioFile?.size;
+      if (fileSize) {
+        intervalId = setInterval(
+          checkOutputFileReady,
+          getPollingInterval(fileSize),
+        );
+      } else {
+        intervalId = setInterval(checkOutputFileReady, getPollingInterval(200));
+      }
+    } else {
+      intervalId = setInterval(checkOutputFileReady, 5000);
+    }
   }
 
   function confirmStartNew() {
@@ -683,6 +808,36 @@
       selectedFileFormat = selectedFileFormat.filter((f) => f !== format);
     }
   }
+
+  function isNumber(value: number) {
+    return !isNaN(value);
+  }
+
+  function handleInput(e) {
+    let oldValue = maxNumberOfSpeakers;
+    let newValue = e.target.value;
+    checkNumberInput(newValue);
+  }
+
+  function checkNumberInput(value: number, increase?: number) {
+    let newValue = parseInt(value.toString());
+    if (increase) {
+      newValue = newValue + parseInt(increase);
+    }
+    if (isNumber(newValue)) {
+      if (newValue <= minSpeakers) {
+        maxNumberOfSpeakers = minSpeakers;
+      } else if (newValue <= maxSpeakers) {
+        maxNumberOfSpeakers = newValue;
+      } else {
+        maxNumberOfSpeakers = maxSpeakers;
+      }
+    } else {
+      if (value.toString() !== "") {
+        maxNumberOfSpeakers = minSpeakers;
+      }
+    }
+  }
 </script>
 
 <div class="px-14 mt-10">
@@ -709,21 +864,25 @@
             on:change={addFiles}
           />
 
-          <div class="flex flex-col items-center">
+          <div class="flex flex-col items-center px-4">
             {@html svgIcons.upload}
-            <p class="text-base font-semibold">
+            <p class="text-base font-semibold text-center">
               {@html t("transcription.input-file-upload-description")}
             </p>
-            <p class="text-sm text-gray-500 mt-1">
+            <p class="text-sm text-base-content/40 mt-1">
               {t("transcription.supportted-file-extensions")}
             </p>
-            <p class="text-xs text-gray-400 mt-8">
-              {t("transcription.maximum-capacity")}
+            <p class="text-xs text-base-content/40 mt-8">
+              {#if transcriptionType === TranscriptionType.Largefile}
+                {t("transcription.maximum-capacity-1gb")}
+              {:else}
+                {t("transcription.maximum-capacity-25mb")}
+              {/if}
             </p>
           </div>
         </label>
 
-        <span class="mt-2 text-xs text-red-500">{fileErrorMessage}</span>
+        <span class="mt-2 text-xs text-error">{fileErrorMessage}</span>
       </div>
     {/if}
 
@@ -737,7 +896,7 @@
           </div>
           <div class="ml-4">
             <p class="font-medium">{audioFile.name}</p>
-            <p class="text-sm text-gray-500">
+            <p class="text-sm text-base-content/60">
               {audioFile?.size ? bytesToMegabytes(audioFile?.size) + " MB" : ""}
             </p>
           </div>
@@ -747,7 +906,11 @@
           <div class="flex items-center space-x-4">
             <div class="flex items-center space-x-2">
               {#if isUploading && !isUploaded}
-                <span class="loading loading-spinner loading-md"></span>
+                <progress
+                  class="progress progress-primary w-56"
+                  value={uploadingValue}
+                  max="100"
+                ></progress>
                 <p class="font-medium">{t("transciption.uploading")}</p>
               {/if}
               {#if isTranscribing}
@@ -780,6 +943,93 @@
       </div>
     {/if}
   </div>
+
+  {#if transcriptionType === TranscriptionType.Largefile}
+    <div class="bg-base-100 mt-10 p-4 px-6 rounded-xl">
+      <div class="flex flex-col gap-4">
+        <h2 class="font-normal">
+          {t("settings.transcription.largefile-settings")}
+        </h2>
+        <label class="flex items-center gap-2">
+          <input
+            type="checkbox"
+            pattern="[0-9]+"
+            class="checkbox checkbox-neutral"
+            bind:checked={isDiarizationEnabled}
+          />
+          <h3 class="text-sm font-medium">
+            {t("settings.transcription.largefile-speaker.diarization")}
+          </h3>
+        </label>
+
+        {#if isDiarizationEnabled}
+          <div out:slide in:slide>
+            <h2 class="text-base-content/40">
+              {t("settings.transcription.largefile-speaker.number")}
+            </h2>
+            <label
+              class="input input-bordered input-lg flex items-center gap-2"
+            >
+              <input
+                type="text"
+                class="grow"
+                placeholder="Speakers"
+                bind:value={maxNumberOfSpeakers}
+                on:input={handleInput}
+              />
+              <div class="flex flex-col">
+                <button
+                  class="btn btn-xs btn-ghost"
+                  on:click={() => {
+                    checkNumberInput(maxNumberOfSpeakers, 1);
+                  }}
+                >
+                  <svg
+                    width="12"
+                    height="7"
+                    viewBox="0 0 12 7"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    stroke="currentColor"
+                  >
+                    <path
+                      d="M1.33341 6L6.00008 1.33333L10.6667 6"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </button>
+                <button
+                  class="btn btn-xs btn-ghost"
+                  on:click={() => {
+                    checkNumberInput(maxNumberOfSpeakers, -1);
+                  }}
+                >
+                  <svg
+                    width="12"
+                    height="7"
+                    viewBox="0 0 12 7"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M10.6666 1L5.99992 5.66667L1.33325 1"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </label>
+          </div>
+        {/if}
+      </div>
+    </div>
+  {/if}
 
   {#if transcriptionType === TranscriptionType.Subtitles}
     <div class="bg-base-100 mt-10 p-4 px-6 rounded-xl">
@@ -926,7 +1176,7 @@
   <div class="mt-8 mb-5 flex items-center space-x-4">
     {#if !isTranscipted}
       <button
-        class={`btn btn-active btn-primary btn-sm text-white`}
+        class={`btn btn-active btn-primary btn-sm text-base-100`}
         disabled={!isUploaded || !isFormValid || isTranscribing}
         on:click={transcribe}
         >{t("transciption.model.cta.start-transcribing")}</button
@@ -934,28 +1184,28 @@
     {/if}
     {#if isTranscipted}
       {#if zipFileData}
-        <button class="btn btn-success btn-sm text-white" on:click={downloadZip}
+        <button class="btn btn-success btn-sm text-base-100" on:click={downloadZip}
           >{@html svgIcons.download}{t(
             "transciption.model.cta.download-zip",
           )}</button
         >
       {:else if assFileUrl || srtFileUrl || jsonFileUrl || txtFileUrl}
         <!-- <button
-          class="btn btn-success btn-sm text-white"
+          class="btn btn-success btn-sm text-base-100"
           on:click={downloadFileSRT}
           >{@html svgIcons.download}{t(
             "transciption.model.cta.download-output.srt",
           )}</button
         > -->
         <button
-          class="btn btn-success btn-sm text-white"
+          class="btn btn-success btn-sm text-base-100"
           on:click={downloadFile}
           >{@html svgIcons.download}{t(
             "transciption.model.cta.download-output",
           )}</button
         >
       {/if}
-      <button class="btn bg-black btn-sm text-white" on:click={confirmStartNew}
+      <button class="btn bg-neutral btn-sm text-white" on:click={confirmStartNew}
         >{t("transciption.model.cta.start-new-transciption")}</button
       >
     {/if}
