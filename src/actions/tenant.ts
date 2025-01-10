@@ -10,12 +10,12 @@ import { transformRawData } from "$utils/transformRawData";
 
 import organizationsManagement from "$data/auth0/organizations-manager";
 import TenantModel, {
-  ApiKeyProvider,
   IncludedFeaturesSchema,
   TenantFilterParamsSchema,
   TenantTheme,
   type Tenant,
 } from "$data/models/tenant.model";
+import { ApiKeyProvider } from "$types/TenantFeature";
 
 const TenantInputParamsSchema = z.object({
   name: z.string(),

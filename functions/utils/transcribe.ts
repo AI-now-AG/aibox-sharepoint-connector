@@ -1,5 +1,5 @@
 import { BlobServiceClient } from "@azure/storage-blob";
-import { AzureChatOpenAI, toFile } from "@langchain/openai";
+import { AzureChatOpenAI, ChatOpenAI, toFile } from "@langchain/openai";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { AzureOpenAI, RateLimitError } from "openai";
 
@@ -20,6 +20,7 @@ import {
 } from "$types/TranscribeRequest";
 import { processTranscription } from "./batchTranscription";
 import type { TranscriptionResponse } from "$utils/Speech/SpeechResponse";
+import { ApiKeyProvider } from "$types/TenantFeature";
 
 const DEFAULT_WHISPER_MODEL_NAME = "whisper-1";
 const DEFAULT_API_VERSION = "2024-08-01-preview";
@@ -103,6 +104,15 @@ function getClient(transcribeParams: TranscribeRequest) {
   });
 }
 
+function getOpenAIChatModel(transcribeParams: TranscribeRequest) {
+  const { openAIApiKey } = transcribeParams;
+  const openaiChatConfig = {
+    openAIApiKey,
+    model: process.env.OPENAI_MODEL,
+  };
+  return new ChatOpenAI(openaiChatConfig);
+}
+
 function getAzureChatModel(transcribeParams: TranscribeRequest) {
   const { azureOpenAIApiKey, azureOpenAIInstanceName, azureOpenAIChatModel } =
     transcribeParams;
@@ -126,7 +136,10 @@ export const improveSRTQuality = async (
   transcribeParams: TranscribeRequest,
   data: Entry[],
 ) => {
-  const model = getAzureChatModel(transcribeParams);
+  let model = getOpenAIChatModel(transcribeParams);
+  if (transcribeParams.apiKeyProvider === ApiKeyProvider.AzureOpenAI) {
+    model = getAzureChatModel(transcribeParams);  
+  }
   const flatEntries = data
     .map(
       (entry) => `input> ${entry.text}
@@ -175,7 +188,10 @@ export const improveTextQuality = async (
   text: string,
   instruction?: string,
 ) => {
-  const model = getAzureChatModel(transcribeParams);
+  let model = getOpenAIChatModel(transcribeParams);
+  if (transcribeParams.apiKeyProvider === ApiKeyProvider.AzureOpenAI) {
+    model = getAzureChatModel(transcribeParams);
+  }
   const finalInstructions = instruction || DEFAULT_INSTRUCTION;
   const response3 = await model.invoke(
     [new SystemMessage(finalInstructions), new HumanMessage(text)],

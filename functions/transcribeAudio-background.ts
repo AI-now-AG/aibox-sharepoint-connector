@@ -55,6 +55,7 @@ const transcribeAudio: Handler = async (
       uniqueName,
       uploadUrl,
       transcriptionType,
+      openaiEncryptedApiKey,
       encryptedApiKey,
       speechKey,
     } = transcribeParams;
@@ -66,6 +67,11 @@ const transcribeAudio: Handler = async (
       };
     }
 
+    const openAIApiKey = decrypt(
+      openaiEncryptedApiKey || process.env.OPENAI_API_KEY!,
+    );
+    transcribeParams.openAIApiKey = openAIApiKey;
+    
     const azureOpenAIApiKey = decrypt(
       encryptedApiKey || process.env.AZURE_OPENAI_API_KEY2!,
     );

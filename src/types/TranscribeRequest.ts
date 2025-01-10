@@ -1,4 +1,5 @@
 import type { Transcriptions } from "$data/models/tenant.model";
+import { ApiKeyProvider } from "$types/TenantFeature";
 
 export interface TranscribeRequest {
   folderName: string;
@@ -11,12 +12,15 @@ export interface TranscribeRequest {
   transcriptionType?: TranscriptionType;
   selectedFileFormat?: FileFormat[];
   isShowImprovedTextPreview?: boolean;
+  apiKeyProvider?: ApiKeyProvider;
+  openaiEncryptedApiKey?: string;
   encryptedApiKey?: string;
   azureOpenAIInstanceName?: string;
   azureOpenAIEndpoint?: string;
   azureOpenAIWhisperModel?: string;
   azureOpenAIChatModel?: string;
   azureOpenAIApiKey?: string;
+  openAIApiKey?: string;
   speechKey?: string;
   speechRegion?: string;
   audioBuffer?: Buffer;

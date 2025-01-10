@@ -1,7 +1,7 @@
 import { ChatOpenAI, AzureChatOpenAI } from "@langchain/openai";
 import type { APIContext } from "astro";
 import { decrypt } from "./secure";
-import { TenantFeature, ApiKeyProvider } from "$data/models/tenant.model";
+import { TenantFeature, ApiKeyProvider } from "$types/TenantFeature";
 
 const initChatOpenAI = (apiKey: string, model: string) => {
   console.log("$utils:chatModel->initChatOpenAI", {
