@@ -88,7 +88,7 @@
 <div class="flex flex-col">
   <div bind:this={element} class="mt-2 overflow-y-scroll h-full min-h-12">
     <div class="card gap-4" transition:fade>
-      {#each $sharedMessageHistory as { role, content }, index}
+      {#each $sharedMessageHistory as { role, content, rawData }, index}
         <div
           class={`chat-bubble text-base-content ${role === MessageRole.User ? `bg-base-200` : `bg-base-100`}`}
         >
@@ -120,7 +120,7 @@
                 <div class="flex flex-col justify-items-end order-last">
                   <button
                     class="btn p-2 btn-ghost"
-                    on:click={() => copyToClipboard(content, index)}
+                    on:click={() => copyToClipboard(rawData, index)}
                   >
                     {#if index == copyIndex}
                       <svg
