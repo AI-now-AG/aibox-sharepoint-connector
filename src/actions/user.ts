@@ -14,6 +14,7 @@ import UserModel from "$data/models/user.model";
 import usersManagement from "$data/auth0/users-manager";
 import organizationsManagement from "$data/auth0/organizations-manager";
 import rolesManagement from "$data/auth0/roles-manager";
+import { isEnterpriseConnection } from "$utils/common";
 
 const UserInputParamsSchema = z.object({
   name: z.string(),
@@ -135,6 +136,9 @@ export const user = {
         };
         const insertResult = await UserModel.add(user);
 
+        // If everything goes well, commit the transaction
+        await session.commitTransaction();
+
         return transformRawData(insertResult);
       } catch (error) {
         // If an error occurs, abort the transaction and log the error
@@ -175,11 +179,14 @@ export const user = {
         const updatedDocument = await UserModel.update(input._id, update);
 
         // Update an existing user in Auth0
-        const bodyParameters: UserUpdate = {
-          name: input.name,
-          email: input.email,
-        };
-        await usersManagement.update(user.auth0_sub, bodyParameters);
+        // For enterprise connections, Auth0 does not allow updating a user's name by default
+        if (!isEnterpriseConnection(user.auth0_sub)) {
+          const bodyParameters: UserUpdate = {
+            name: input.name,
+            email: input.email,
+          };
+          await usersManagement.update(user.auth0_sub, bodyParameters);
+        }
 
         // Add member roles
         await assignMemberRoles(
@@ -188,6 +195,9 @@ export const user = {
           user.roles,
           input.roles,
         );
+
+        // If everything goes well, commit the transaction
+        await session.commitTransaction();
 
         return transformRawData(updatedDocument);
       } catch (error) {

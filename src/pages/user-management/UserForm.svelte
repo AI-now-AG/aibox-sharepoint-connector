@@ -14,25 +14,13 @@
   import log from "$utils/log";
   import moment from "moment";
   import Input from "$components/Input/Input.svelte";
-  import { isValidEmail } from "$utils/common";
+  import { isEnterpriseConnection, isValidEmail } from "$utils/common";
   import { UserRole } from "./DropdownFilter.svelte";
 
   const t = useTranslations();
 
   export let user: any;
   export let tenant: any;
-
-  // List of enterprise providers
-  const enterpriseProviders = [
-    "saml",
-    "oidc",
-    "okta",
-    "google",
-    "waad",
-    "adfs",
-    "ad",
-    "ping",
-  ];
 
   let confirmUpdateModal: HTMLDialogElement;
   let confirmBlockModal: HTMLDialogElement;
@@ -52,12 +40,6 @@
   let isUpdateRoleDisabled = false;
 
   const isRestrictUserManagment = tenant.is_restrict_user_managment;
-
-  function checkEnterpriseAuth() {
-    const parts = userData?.auth0_sub?.split("|");
-    const provider = parts[0];
-    return enterpriseProviders.includes(provider);
-  }
 
   // Important note: User created on Auth0 with super admin , just the Admin on AI box when go into the detail screen
   let role = UserRole.User;
@@ -84,7 +66,7 @@
     } else {
       role = getUserRole(userData.roles);
     }
-    isEnterpriseAuth = checkEnterpriseAuth();
+    isEnterpriseAuth = isEnterpriseConnection(userData?.auth0_sub);
   });
 
   function getUserStatus(isBlocked: boolean, isVerified: boolean) {
