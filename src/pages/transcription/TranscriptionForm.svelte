@@ -10,6 +10,7 @@
   import { addToast } from "$stores/toast";
   import { type TranscribeRequest, FileFormat } from "$types/TranscribeRequest";
   import { TranscriptionType } from "$types/TranscribeRequest";
+  import { TenantFeature } from "$types/TenantFeature";
   const t = useTranslations();
 
   export let folderName = "";
@@ -506,6 +507,10 @@
     tenant: any,
     user: any,
   ): TranscribeRequest {
+    const textPromptsProvider = tenant?.included_features?.find(
+      (item: { name: any }) => item.name == TenantFeature.AudioToText,
+    );
+    const provider = textPromptsProvider?.provider;
     return {
       folderName: folderName,
       fileName: audioFile?.name || "",
@@ -517,6 +522,8 @@
       transcriptionType: transcriptionType,
       selectedFileFormat: selectedFileFormat,
       isShowImprovedTextPreview: showTextPreviewChecked,
+      apiKeyProvider: provider,
+      openaiEncryptedApiKey: tenant?.openai_api_key,
       encryptedApiKey: tenant?.azure_openai_api_key,
       azureOpenAIInstanceName: tenant?.azure_openai_instance_name,
       azureOpenAIEndpoint: tenant?.azure_openai_endpoint,
@@ -1184,7 +1191,9 @@
     {/if}
     {#if isTranscipted}
       {#if zipFileData}
-        <button class="btn btn-success btn-sm text-base-100" on:click={downloadZip}
+        <button
+          class="btn btn-success btn-sm text-base-100"
+          on:click={downloadZip}
           >{@html svgIcons.download}{t(
             "transciption.model.cta.download-zip",
           )}</button
@@ -1205,7 +1214,9 @@
           )}</button
         >
       {/if}
-      <button class="btn bg-neutral btn-sm text-white" on:click={confirmStartNew}
+      <button
+        class="btn bg-neutral btn-sm text-white"
+        on:click={confirmStartNew}
         >{t("transciption.model.cta.start-new-transciption")}</button
       >
     {/if}

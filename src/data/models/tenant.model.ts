@@ -1,6 +1,7 @@
 import { ObjectId } from "mongodb";
 import { db, type Document } from "../mongodb";
 import { z } from "zod";
+import { TenantFeature, ApiKeyProvider } from "$types/TenantFeature";
 
 export enum TenantTheme {
   Light = "light",
@@ -9,16 +10,6 @@ export enum TenantTheme {
   Lemonade = "lemonade",
   Somedia = "somedia",
   Weihnachtsmann = "weihnachtsmann",
-}
-
-export enum TenantFeature {
-  TextPrommpts = "text-prommpts",
-  AudioToText = "audio-to-text",
-}
-
-export enum ApiKeyProvider {
-  OpenAI = "openai",
-  AzureOpenAI = "azure_openai",
 }
 
 export const TenantFilterParamsSchema = z.object({

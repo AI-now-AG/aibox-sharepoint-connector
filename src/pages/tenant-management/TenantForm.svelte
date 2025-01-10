@@ -43,6 +43,7 @@
   const ApiKeyProvider = {
     OpenAI: "openai",
     AzureOpenAI: "azure_openai",
+    AzureOpenAIPro: "azure_openai_pro",
   };
 
   // mode
@@ -109,6 +110,9 @@
     let passwordField = document.getElementById("open_ai_key");
     if (_apiKeyProvider == ApiKeyProvider.AzureOpenAI) {
       passwordField = document.getElementById("azure_open_ai_key");
+    }
+    else if (_apiKeyProvider == ApiKeyProvider.AzureOpenAIPro) {
+      passwordField = document.getElementById("azure_open_ai_key_pro");
     }
     if (passwordField.type === "password") {
       passwordField.type = "text";
@@ -194,7 +198,8 @@
         if (isAudioToTextChecked) {
           tenantData.included_features.push({
             name: TenantFeature.AudioToText,
-            provider: ApiKeyProvider.AzureOpenAI,
+            //provider: ApiKeyProvider.AzureOpenAI,
+            provider: textSelectedProvider.value
           });
         }
         log.d(tenantData, "CREATE - tenantData");
@@ -247,7 +252,8 @@
         if (isAudioToTextChecked) {
           tenantData.included_features.push({
             name: TenantFeature.AudioToText,
-            provider: ApiKeyProvider.AzureOpenAI,
+            //provider: ApiKeyProvider.AzureOpenAI,
+            provider: textSelectedProvider.value
           });
         }
         log.d(tenantData, "UPDATE - tenantData");
@@ -550,14 +556,14 @@
 
               <label class="input input-bordered flex items-center gap-2 mt-2">
                 <input
-                  id="azure_open_ai_key"
+                  id="azure_open_ai_key_pro"
                   type="password"
                   class="grow"
                   placeholder={t("tenant.api-key")}
                   bind:value={azureSpeechKey}
                 />
                 <TogglePasswordIcon
-                  on:change={() => togglePassword(ApiKeyProvider.AzureOpenAI)}
+                  on:change={() => togglePassword(ApiKeyProvider.AzureOpenAIPro)}
                 />
               </label>
             </div>
