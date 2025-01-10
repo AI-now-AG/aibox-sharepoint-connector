@@ -12,7 +12,7 @@ const t = useTranslations();
 const allContent = await getCollection("aibox");
 
 Sentry.setUser({
-  id: Astro.locals.user.id,
+  id: Astro.locals.user.id.toString(),
   username: Astro.locals.user.name,
   tenant_id: Astro.locals.tenant._id,
 });
