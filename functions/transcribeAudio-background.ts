@@ -268,7 +268,7 @@ async function processWithFFmpeg(
   format: string,
 ): Promise<void> {
   const newFormat = format === "m4a" ? "mp3" : format;
-  const tempDir = path.join(__dirname, "temp");
+  const tempDir = path.join("/tmp", "temp");
   if (!existsSync(tempDir)) {
     mkdirSync(tempDir, { recursive: true });
     console.log("Created directory:", tempDir);
