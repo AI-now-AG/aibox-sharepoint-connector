@@ -55,7 +55,7 @@
   let maxNumberOfSpeakers = 2;
   let isDiarizationEnabled = false;
   let minSpeakers = 2;
-  let maxSpeakers = 99;
+  let maxSpeakers = 20;
 
   let confirmModal: HTMLDialogElement;
 
