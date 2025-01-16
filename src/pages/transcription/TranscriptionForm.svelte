@@ -321,11 +321,26 @@
         const url = URL.createObjectURL(file);
         const audio = new Audio(url);
         audio.addEventListener("loadedmetadata", () => {
+          if (isNaN(audio.duration)) {
+            reject(new Error("Could not determine audio duration."));
+            return;
+          }
+
           const minutes = Math.floor(audio.duration / 60);
           const seconds = Math.floor(audio.duration % 60);
           const duration = `${minutes}:${seconds.toString().padStart(2, "0")} min`;
           URL.revokeObjectURL(url);
           resolve(duration);
+        });
+
+        audio.addEventListener("error", () => {
+          URL.revokeObjectURL(url);
+          addToast({
+            message: "Failed to load audio metadata.",
+            type: "error",
+            timeout: 5000,
+          });
+          reject(new Error("Failed to load audio metadata."));
         });
       } catch (error) {
         console.error("Calculate duration error", error);
