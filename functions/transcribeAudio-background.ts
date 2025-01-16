@@ -268,7 +268,7 @@ async function processWithFFmpeg(
   format: string,
 ): Promise<void> {
   const newFormat = format === "m4a" ? "mp3" : format;
-  const tempDir = path.join("/tmp", "temp");
+  const tempDir = path.join("/tmp", "audio");
   if (!existsSync(tempDir)) {
     mkdirSync(tempDir, { recursive: true });
     console.log("Created directory:", tempDir);
@@ -283,17 +283,17 @@ async function processWithFFmpeg(
     //.audioBitrate("192k")
     .audioCodec("libmp3lame")
     .format(newFormat)
-    .output(outputStream)
-    // .on("start", (commandLine) => {
-    //   console.log("FFmpeg command:", commandLine);
-    // })
-    .on("stderr", (stderrLine) => {
-      console.error("FFmpeg stderr:", stderrLine);
-    })
-    // .on("progress", (progress) => {
-    //   console.log("Processing:");
-    //   console.log(progress);
-    // });
+    .output(outputStream);
+  // .on("start", (commandLine) => {
+  //   console.log("FFmpeg command:", commandLine);
+  // })
+  // .on("stderr", (stderrLine) => {
+  //   console.error("FFmpeg stderr:", stderrLine);
+  // })
+  // .on("progress", (progress) => {
+  //   console.log("Processing:");
+  //   console.log(progress);
+  // });
 
   ffmpegProcess.run();
 
