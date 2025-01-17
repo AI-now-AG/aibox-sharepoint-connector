@@ -27,6 +27,7 @@
   let assFileUrl: string = "";
   let jsonFileUrl: string = "";
   let zipFileData: string = "";
+  let usedModel: string = "";
 
   let isZipDataPresent: boolean = false;
   let isFileDataPresent: boolean = false;
@@ -526,6 +527,7 @@
       (item: { name: any }) => item.name == TenantFeature.AudioToText,
     );
     const provider = textPromptsProvider?.provider;
+    usedModel = provider;
     return {
       folderName: folderName,
       fileName: audioFile?.name || "",
@@ -965,7 +967,7 @@
       </div>
     {/if}
   </div>
-
+  <p class="p-2 font-bold flex justify-end">{usedModel}</p>
   {#if transcriptionType === TranscriptionType.Largefile}
     <div class="bg-base-100 mt-10 p-4 px-6 rounded-xl">
       <div class="flex flex-col gap-4">
