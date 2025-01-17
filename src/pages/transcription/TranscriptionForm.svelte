@@ -341,7 +341,8 @@
             type: "error",
             timeout: 5000,
           });
-          reject(new Error("Failed to load audio metadata."));
+          resolve("unknown");
+          //reject(new Error("Failed to load audio metadata."));
         });
       } catch (error) {
         console.error("Calculate duration error", error);
