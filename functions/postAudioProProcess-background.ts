@@ -6,6 +6,8 @@ import {
 import { uploadLargeFile } from "./utils/transcribe";
 import { updateTask } from "$shared/transcriptionTasks";
 import type { TranscriptionResponse } from "$utils/Speech/SpeechResponse";
+import { processTranscriptionResult } from "./utils/batchTranscription";
+import { decrypt } from "$utils/secure";
 
 const postAudioProProcess: Handler = async (
   event: HandlerEvent,
@@ -22,25 +24,44 @@ const postAudioProProcess: Handler = async (
       uniqueName: string;
       uploadUrl: string;
       folderName: string;
-      jsonData: TranscriptionResponse;
-      transcriptionText: string;
+      enableDiarization: boolean;
+      fileURL: string;
+      encryptedSpeechKey: string;
     };
     console.log("postAudioProProcess body", body);
-    const { uniqueName, uploadUrl, folderName, jsonData, transcriptionText } =
-      body;
+    const {
+      uniqueName,
+      uploadUrl,
+      folderName,
+      enableDiarization,
+      fileURL,
+      encryptedSpeechKey,
+    } = body;
 
-    if (!uniqueName || !folderName || !uploadUrl || !jsonData) {
+    if (!uniqueName || !folderName || !uploadUrl || !fileURL || !encryptedSpeechKey) {
       return {
         statusCode: 400,
         body: JSON.stringify({ message: "Invalid file upload data" }),
       };
     }
+
+    const subscriptionKey = decrypt(
+      encryptedSpeechKey || process.env.AZURE_LARGE_SPEECH_KEY!,
+    );
+    console.log("postAudioProProcess subscriptionKey", subscriptionKey);
+    const transcriptionData = await processTranscriptionResult(
+      uniqueName,
+      enableDiarization,
+      fileURL,
+      subscriptionKey,
+    );
+
     console.log("postAudioProProcess uniqueName", uniqueName);
     const outputURLs = await uploadLargeFile(
       uploadUrl,
       folderName,
-      jsonData,
-      transcriptionText,
+      transcriptionData.jsonData,
+      transcriptionData.transcriptionText,
     );
     console.log("postAudioProProcess outputURLs", outputURLs);
     await updateTask(uniqueName, {
@@ -54,7 +75,7 @@ const postAudioProProcess: Handler = async (
       statusCode: 200,
       body: JSON.stringify({
         message: "File uploaded successfully",
-        transcription: transcriptionText,
+        transcription: transcriptionData.transcriptionText,
       }),
     };
   } catch (error) {

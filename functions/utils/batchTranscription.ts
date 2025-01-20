@@ -362,7 +362,7 @@ export async function processTranscriptionResult(
 
     const trancriptionSASUrl = await generatePostFileSASToken(
       trancriptionResult.transcriptionUrl,
-      30,
+      60,
     );
 
     // Step 4: Fetch transcription data

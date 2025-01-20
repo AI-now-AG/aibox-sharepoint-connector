@@ -279,17 +279,18 @@ const checkAndUploadLargeFile = async (
     const response = await pollingAndStatus(
       taskURL,
       uniqueName,
-      isDiarizationEnabled,
       subscriptionKey,
     );
-    if (response.jsonData && response.transcriptionText) {
+    if (!response.isRunning && response.fileURL) {
+    //if (response.jsonData && response.transcriptionText) {
       console.log("Transcription completed. Uploading files...");
       await postAudioProProcess(
         uniqueName,
         outputURL,
         folderName,
-        response.jsonData,
-        response.transcriptionText,
+        isDiarizationEnabled,
+        response.fileURL,
+        encryptedSpeechKey,
       );
     }
   } catch (error) {
@@ -348,12 +349,10 @@ async function streamToString(
 export async function pollingAndStatus(
   taskUrl: string,
   uniqueName: string,
-  enableDiarization: boolean = false,
   subscriptionKey: string,
 ): Promise<{
   isRunning: boolean;
-  jsonData?: TranscriptionResponse;
-  transcriptionText?: string;
+  fileURL?: string;
   error?: Error;
 }> {
   try {
@@ -363,13 +362,14 @@ export async function pollingAndStatus(
       subscriptionKey,
     );
     if (pollResponse.status === BatchStatus.Succeeded) {
-      const transcriptionData = await processTranscriptionResult(
+      /*const transcriptionData = await processTranscriptionResult(
         uniqueName,
         enableDiarization,
         pollResponse.links.files,
         subscriptionKey,
       );
-      return { isRunning: false, ...transcriptionData };
+      return { isRunning: false, ...transcriptionData };*/
+      return { isRunning: false, fileURL: pollResponse.links.files };
     } else if (pollResponse.status === BatchStatus.Failed) {
       console.error(
         `Transcription failed: ${pollResponse.properties.error?.message}`,
@@ -397,8 +397,9 @@ async function postAudioProProcess(
   uniqueName: string,
   uploadUrl: string,
   folderName: string,
-  jsonData: TranscriptionResponse,
-  transcriptionText: string,
+  enableDiarization: boolean = false,
+  fileURL: string,
+  encryptedSpeechKey: string,
 ): Promise<void> {
   try {
     console.log("Triggering background function...");
@@ -423,8 +424,9 @@ async function postAudioProProcess(
           uniqueName,
           uploadUrl,
           folderName,
-          jsonData,
-          transcriptionText,
+          enableDiarization,
+          fileURL,
+          encryptedSpeechKey,
         }),
       },
     );
