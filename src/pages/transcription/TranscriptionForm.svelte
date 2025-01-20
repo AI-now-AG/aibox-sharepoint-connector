@@ -544,7 +544,7 @@
       azureOpenAIEndpoint: tenant?.azure_openai_endpoint,
       azureOpenAIWhisperModel: tenant?.azure_openai_whisper_model,
       azureOpenAIChatModel: tenant?.azure_openai_chat_model,
-      speechKey: tenant?.speech_api_key,
+      encryptedSpeechKey: tenant?.speech_api_key,
       speechRegion: tenant?.speech_region,
       isDiarizationEnabled: isDiarizationEnabled,
       maxSpeakers: parseInt(maxNumberOfSpeakers.toString()),
@@ -566,6 +566,7 @@
               : false,
           typedTranscriptionType: transcriptionType,
           isDiarizationEnabled: isDiarizationEnabled,
+          encryptedSpeechKey: $tenant?.speech_api_key,
         }),
       });
       if (response.ok) {

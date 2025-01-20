@@ -60,7 +60,7 @@ const transcribeAudio: Handler = async (
       transcriptionType,
       openaiEncryptedApiKey,
       encryptedApiKey,
-      speechKey,
+      encryptedSpeechKey,
     } = transcribeParams;
 
     if (!fileName || !uploadUrl || !transcriptionType) {
@@ -81,7 +81,7 @@ const transcribeAudio: Handler = async (
     transcribeParams.azureOpenAIApiKey = azureOpenAIApiKey;
 
     const azureSpeechKey = decrypt(
-      speechKey || process.env.AZURE_LARGE_SPEECH_KEY!,
+      encryptedSpeechKey || process.env.AZURE_LARGE_SPEECH_KEY!,
     );
     transcribeParams.speechKey = azureSpeechKey;
 
@@ -105,6 +105,10 @@ const transcribeAudio: Handler = async (
           uniqueName,
         );
         if (newBlobFileUrl) {
+          await updateTask(uniqueName, {
+            status: "processing",
+            output_url: newBlobFileUrl,
+          });
           transcribeParams.uploadUrl = newBlobFileUrl;
           transcriptionResult =
             await transcribeUsingAzureOpenAI(transcribeParams);
@@ -117,6 +121,10 @@ const transcribeAudio: Handler = async (
           };
         }
       } else {
+        await updateTask(uniqueName, {
+          status: "processing",
+          output_url: transcribeParams.uploadUrl,
+        });
         transcriptionResult =
           await transcribeUsingAzureOpenAI(transcribeParams);
       }
@@ -141,12 +149,14 @@ const transcribeAudio: Handler = async (
         }),
       };
     } else {
-      await updateTask(uniqueName, {
-        status: "completed",
-        txtUrl: transcriptionResult.data?.urls["txt"],
-        srtUrl: transcriptionResult.data?.urls["srt"] ?? "",
-        assUrl: transcriptionResult.data?.urls["ass"] ?? "",
-      });
+      if (transcriptionType !== TranscriptionType.Largefile) {
+        await updateTask(uniqueName, {
+          status: "completed",
+          txtUrl: transcriptionResult.data?.urls["txt"],
+          srtUrl: transcriptionResult.data?.urls["srt"] ?? "",
+          assUrl: transcriptionResult.data?.urls["ass"] ?? "",
+        });
+      }
       return {
         statusCode: 200,
         body: JSON.stringify({

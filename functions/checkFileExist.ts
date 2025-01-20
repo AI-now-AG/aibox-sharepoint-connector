@@ -6,13 +6,19 @@ import AdmZip from "adm-zip";
 import { createWriteStream, unlinkSync, existsSync } from "fs";
 import { promisify } from "util";
 import { pipeline } from "stream";
-import { getTask } from "$shared/transcriptionTasks";
+import {
+  BatchStatus,
+  getCurrentBatchStatus,
+  getTask,
+} from "$shared/transcriptionTasks";
 import { TranscriptionType } from "$types/TranscribeRequest";
 import {
-  pollTranscriptionTask,
+  pollTranscriptionTask1,
   processTranscriptionResult,
+  updateStatus,
 } from "./utils/batchTranscription";
 import type { TranscriptionResponse } from "$utils/Speech/SpeechResponse";
+import { decrypt } from "$utils/secure";
 
 const checkFileExist: Handler = async (event, context) => {
   const {
@@ -22,6 +28,7 @@ const checkFileExist: Handler = async (event, context) => {
     isShowImprovedTextPreview,
     typedTranscriptionType,
     isDiarizationEnabled,
+    encryptedSpeechKey,
   } = JSON.parse(event.body!);
 
   let requireFilesCount = fileNames.length || 0;
@@ -63,6 +70,13 @@ const checkFileExist: Handler = async (event, context) => {
       let assFileUrl = "";
       let jsonFileUrl = "";
       let rawTxtContent = "";
+      await checkAndUploadLargeFile(
+        uniqueName,
+        typedTranscriptionType,
+        isDiarizationEnabled,
+        encryptedSpeechKey,
+        folderName,
+      );
 
       // Check if the file exists in Azure Blob Storage
       for (const fileName of fileNames) {
@@ -228,6 +242,60 @@ const checkFileExist: Handler = async (event, context) => {
   }
 };
 
+const checkAndUploadLargeFile = async (
+  uniqueName: string,
+  typedTranscriptionType: TranscriptionType,
+  isDiarizationEnabled: boolean,
+  encryptedSpeechKey: string,
+  folderName: string,
+): Promise<void> => {
+  if (typedTranscriptionType !== TranscriptionType.Largefile) return;
+
+  const task = await getTask(uniqueName);
+  if (!task || !task.status || !task.batchUpdate) {
+    console.log("Task not found or incomplete.");
+    return;
+  }
+
+  const currentBatch = getCurrentBatchStatus(task.batchUpdate);
+  if (currentBatch.succeeded || currentBatch.failed) {
+    console.log("Batch processing completed.");
+    return;
+  }
+
+  const taskURL = task.batchUpdate.find((batch) => batch.taskUrl)?.taskUrl;
+  if (!taskURL) {
+    console.log("No task URL found.");
+    return;
+  }
+
+  const outputURL = task.output_url ?? taskURL;
+  const azureSpeechKey = decrypt(
+    encryptedSpeechKey || process.env.AZURE_LARGE_SPEECH_KEY!,
+  );
+  const subscriptionKey = azureSpeechKey ?? process.env.AZURE_LARGE_SPEECH_KEY!;
+
+  try {
+    const response = await pollingAndStatus(
+      taskURL,
+      uniqueName,
+      isDiarizationEnabled,
+      subscriptionKey,
+    );
+    if (response.jsonData && response.transcriptionText) {
+      await postAudioProProcess(
+        uniqueName,
+        outputURL,
+        folderName,
+        response.jsonData,
+        response.transcriptionText,
+      );
+    }
+  } catch (error) {
+    console.error("Error during polling or file upload:", error);
+  }
+};
+
 async function createZip(
   downloadedFiles: { name: string; path: string }[],
 ): Promise<Buffer> {
@@ -281,26 +349,84 @@ export async function pollingAndStatus(
   uniqueName: string,
   enableDiarization: boolean = false,
   subscriptionKey: string,
-): Promise<{ jsonData: TranscriptionResponse; transcriptionText: string }> {
+): Promise<{
+  isRunning: boolean;
+  jsonData?: TranscriptionResponse;
+  transcriptionText?: string;
+  error?: Error;
+}> {
   try {
-    console.log("Polling processing transcription");
-    const pollResponse = await pollTranscriptionTask(
+    const pollResponse = await pollTranscriptionTask1(
       taskUrl,
       uniqueName,
       subscriptionKey,
     );
-
-    const transcriptionData = await processTranscriptionResult(
-      uniqueName,
-      enableDiarization,
-      pollResponse.links.files,
-      subscriptionKey,
-    );
-    return transcriptionData;
+    if (pollResponse.status === BatchStatus.Succeeded) {
+      const transcriptionData = await processTranscriptionResult(
+        uniqueName,
+        enableDiarization,
+        pollResponse.links.files,
+        subscriptionKey,
+      );
+      return { isRunning: false, ...transcriptionData };
+    } else if (pollResponse.status === BatchStatus.Failed) {
+      console.error(
+        `Transcription failed: ${pollResponse.properties.error?.message}`,
+      );
+      throw new Error(
+        `Transcription failed: ${pollResponse.properties.error?.message}`,
+      );
+      return { isRunning: false };
+    } else {
+      return { isRunning: true };
+    }
   } catch (error) {
+    updateStatus({
+      uniqueName,
+      name: "Batch task failed",
+      status: "Failed",
+      error: `${error}`,
+    });
     console.error("Error processing transcription:", error);
     throw error;
   }
 }
 
+async function postAudioProProcess(
+  uniqueName: string,
+  uploadUrl: string,
+  folderName: string,
+  jsonData: TranscriptionResponse,
+  transcriptionText: string,
+): Promise<void> {
+  try {
+    const response = await fetch(
+      `${process.env.URL}/.netlify/functions/postAudioProProcess-background`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          uniqueName,
+          uploadUrl,
+          folderName,
+          jsonData,
+          transcriptionText,
+        }),
+      },
+    );
+
+    if (response.status === 202) {
+      console.log("Background function triggered successfully.");
+    } else {
+      const errorText = await response.text();
+      console.error(
+        "Failed to trigger background function:",
+        response.status,
+        errorText,
+      );
+    }
+  } catch (error) {
+    console.error("Error triggering background function:", error);
+  }
+}
 export { checkFileExist as handler };
