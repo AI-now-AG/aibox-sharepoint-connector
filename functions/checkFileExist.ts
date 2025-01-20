@@ -283,6 +283,7 @@ const checkAndUploadLargeFile = async (
       subscriptionKey,
     );
     if (response.jsonData && response.transcriptionText) {
+      console.log("Transcription completed. Uploading files...");
       await postAudioProProcess(
         uniqueName,
         outputURL,
@@ -400,8 +401,9 @@ async function postAudioProProcess(
   transcriptionText: string,
 ): Promise<void> {
   try {
+    console.log("Triggering background function...");
     const response = await fetch(
-      `${process.env.URL}/.netlify/functions/postAudioProProcess-background`,
+      `/.netlify/functions/postAudioProProcess-background`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -414,7 +416,7 @@ async function postAudioProProcess(
         }),
       },
     );
-
+    console.log("Response:", response);
     if (response.status === 202) {
       console.log("Background function triggered successfully.");
     } else {
