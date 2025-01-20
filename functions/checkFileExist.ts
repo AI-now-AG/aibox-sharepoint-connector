@@ -403,6 +403,12 @@ async function postAudioProProcess(
   try {
     console.log("Triggering background function...");
     console.log(process.env.URL);
+    console.log(process.env.DEPLOY_URL);
+    console.log(process.env.DEPLOY_PRIME_URL);
+    console.log(process.env.DEPLOY_ID);
+    console.log(process.env.SITE_NAME);
+    console.log(process.env.SITE_ID);
+    console.log("Triggering background function...END");
     const response = await fetch(
       `${process.env.URL}/.netlify/functions/postAudioProProcess-background`,
       {
