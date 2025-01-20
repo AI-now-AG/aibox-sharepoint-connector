@@ -402,8 +402,9 @@ async function postAudioProProcess(
 ): Promise<void> {
   try {
     console.log("Triggering background function...");
+    console.log(process.env.URL);
     const response = await fetch(
-      `/.netlify/functions/postAudioProProcess-background`,
+      `${process.env.URL}/.netlify/functions/postAudioProProcess-background`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
