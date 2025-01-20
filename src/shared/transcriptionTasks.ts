@@ -13,12 +13,22 @@ export enum BatchStatus {
 
 export const BatchSchema = z.object({
   name: z.string(),
-  status: z.enum([BatchStatus.Failed, BatchStatus.NotStarted, BatchStatus.Running, BatchStatus.Succeeded]).optional(),
+  status: z
+    .enum([
+      BatchStatus.Failed,
+      BatchStatus.NotStarted,
+      BatchStatus.Running,
+      BatchStatus.Succeeded,
+    ])
+    .optional(),
   taskUrl: z.string().optional(),
   destUrl: z.string().optional(),
   diarizationEnabled: z.boolean().optional(),
   maxSpeakers: z.number().optional(),
   error: z.string().optional(),
+  report: z
+    .record(z.any())
+    .optional(),
 });
 
 const TaskSchema = z.object({
@@ -26,6 +36,7 @@ const TaskSchema = z.object({
   tenant_id: z.instanceof(ObjectId).optional(),
   creator_id: z.instanceof(ObjectId).optional(),
   audio_url: z.string().optional(),
+  output_url: z.string().optional(),
   status: z.string().optional(),
   createdAt: z.string().optional(),
   updatedAt: z.string().optional(),
@@ -70,6 +81,10 @@ const ensureIndexes = async () => {
 export const createTask = async (taskId: string, taskData: Partial<Task>) => {
   const parsedData = TaskBatchSchema.parse({ taskId, ...taskData });
   const collection = await getTasksCollection();
+  const existingTaskData = await collection.findOne({ taskId });
+  if (existingTaskData) {
+    await collection.deleteOne({ taskId });
+  }
   await collection.insertOne({
     ...parsedData,
     createdAt: new Date().toISOString(),
@@ -114,6 +129,19 @@ export const getTask = async (taskId: string): Promise<Task | null> => {
   const taskData = await collection.findOne({ taskId });
   return taskData ? TaskBatchSchema.parse(taskData) : null;
 };
+
+export function getCurrentBatchStatus(batchUpdate: BatchTask[] = []) {
+  return {
+    running: batchUpdate.some((batch) => batch.status === BatchStatus.Running),
+    succeeded: batchUpdate.some(
+      (batch) => batch.status === BatchStatus.Succeeded,
+    ),
+    failed: batchUpdate.some((batch) => batch.status === BatchStatus.Failed),
+    notStarted: batchUpdate.some(
+      (batch) => batch.status === BatchStatus.NotStarted,
+    ),
+  };
+}
 
 ensureIndexes().catch((err) => {
   console.error("Error ensuring MongoDB indexes:", err);

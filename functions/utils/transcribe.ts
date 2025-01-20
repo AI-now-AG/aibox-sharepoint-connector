@@ -364,7 +364,7 @@ export async function transcribeUsingAzureOpenAI(
     const speechRegion =
       transcribeParams.speechRegion ?? process.env.AZURE_LARGE_SPEECH_REGION!;
     // const { jsonData, transcriptionText } = await processTranscription(
-    const { jsonData, transcriptionText } = await processTranscription(
+    const { transcriptionText } = await processTranscription(
       transcribeParams.uploadUrl,
       transcribeParams.uniqueName,
       speechKey,
@@ -372,12 +372,13 @@ export async function transcribeUsingAzureOpenAI(
       transcribeParams.isDiarizationEnabled,
       maxNumberOfSpeakers,
     );
-    const outputURLs = await uploadLargeFile(
+    const outputURLs: { [key: string]: string } = {};
+    /*const outputURLs = await uploadLargeFile(
       transcribeParams.uploadUrl,
       transcribeParams.folderName,
       jsonData,
       transcriptionText,
-    );
+    );*/
 
     return {
       success: true,
