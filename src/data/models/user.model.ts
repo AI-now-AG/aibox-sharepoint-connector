@@ -2,7 +2,6 @@ import { ObjectId } from "mongodb";
 import { db, type Document } from "../mongodb";
 import { z } from "zod";
 import log from "$utils/log";
-import { isValidMongoDbObjectId } from "$utils/common";
 
 export enum UserRole {
   Admin = "Admin",
@@ -158,7 +157,7 @@ export default {
   },
 
   get: async (id: string) => {
-    if (!isValidMongoDbObjectId(id)) {
+    if (!ObjectId.isValid(id)) {
       return Promise.resolve({});
     }
     return collection.findOne<User>({ _id: new ObjectId(id) });
