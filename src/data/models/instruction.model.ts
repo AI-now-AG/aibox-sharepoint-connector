@@ -1,6 +1,7 @@
 import { ObjectId } from "mongodb";
 import { db, type Document } from "../mongodb";
 import { z } from "zod";
+import { isValidMongoDbObjectId } from "$utils/common";
 
 const InstructionSchema = z.object({
   _id: z.instanceof(ObjectId).optional(),
@@ -29,6 +30,9 @@ export default {
   },
 
   get: async (id: string) => {
+    if (!isValidMongoDbObjectId(id)) {
+      return Promise.resolve({});
+    }
     const _id = new ObjectId(id);
     return collection.findOne<Document<Instruction>>({ _id });
   },

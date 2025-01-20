@@ -1,6 +1,7 @@
 import { ObjectId } from "mongodb";
 import { db, type Document } from "../mongodb";
 import { z } from "zod";
+import { isValidMongoDbObjectId } from "$utils/common";
 
 const KnowledgeBaseSchema = z.object({
   _id: z.instanceof(ObjectId).optional(),
@@ -29,12 +30,18 @@ export default {
   },
 
   get: async (id: string) => {
+    if (!isValidMongoDbObjectId(id)) {
+      return Promise.resolve({});
+    }
     const _id = new ObjectId(id);
     return collection.findOne<Document<KnowledgeBase>>({ _id });
   },
 
   getByTitleAndTenant: async (title: string, tenantId: ObjectId) => {
-    return collection.findOne<Document<KnowledgeBase>>({ title, tenant_id: tenantId });
+    return collection.findOne<Document<KnowledgeBase>>({
+      title,
+      tenant_id: tenantId,
+    });
   },
 
   list: async () =>

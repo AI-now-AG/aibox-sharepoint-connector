@@ -30,3 +30,6 @@ export const isValidEmail = (email: string) => {
   const emailRegex = /^[\w.+-]+@[\w.-]+\.\w{2,3}$/;
   return emailRegex.test(email);
 };
+
+export const isValidMongoDbObjectId = (id: string) =>
+  /^[0-9a-fA-F]{24}$/.test(id);

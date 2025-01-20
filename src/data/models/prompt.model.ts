@@ -1,6 +1,7 @@
 import { ObjectId } from "mongodb";
 import { db, type Document } from "../mongodb";
 import { z } from "zod";
+import { isValidMongoDbObjectId } from "$utils/common";
 
 const PromptSchema = z.object({
   tenant_id: z.instanceof(ObjectId).optional(),
@@ -54,6 +55,9 @@ export default {
   },
 
   get: async (id: string) => {
+    if (!isValidMongoDbObjectId(id)) {
+      return Promise.resolve({});
+    }
     const _id = new ObjectId(id);
     return collection.findOne<Document<Prompt>>({ _id });
   },

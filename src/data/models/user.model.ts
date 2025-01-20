@@ -2,6 +2,7 @@ import { ObjectId } from "mongodb";
 import { db, type Document } from "../mongodb";
 import { z } from "zod";
 import log from "$utils/log";
+import { isValidMongoDbObjectId } from "$utils/common";
 
 export enum UserRole {
   Admin = "Admin",
@@ -156,8 +157,12 @@ export default {
     return await data.toArray();
   },
 
-  get: async (id: string) =>
-    collection.findOne<User>({ _id: new ObjectId(id) }),
+  get: async (id: string) => {
+    if (!isValidMongoDbObjectId(id)) {
+      return Promise.resolve({});
+    }
+    return collection.findOne<User>({ _id: new ObjectId(id) });
+  },
 
   getAuth0Sub: async (auth0_sub: string) =>
     collection.findOne<User>({ auth0_sub }),

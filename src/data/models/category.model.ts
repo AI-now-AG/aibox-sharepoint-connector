@@ -1,6 +1,7 @@
 import { ObjectId } from "mongodb";
 import { db, type Document } from "../mongodb";
 import { z } from "zod";
+import { isValidMongoDbObjectId } from "$utils/common";
 
 export const GroupSchema = z.object({
   _id: z.instanceof(ObjectId).optional(),
@@ -85,6 +86,9 @@ export default {
   },
 
   get: async (id: string) => {
+    if (!isValidMongoDbObjectId(id)) {
+      return Promise.resolve({});
+    }
     const _id = new ObjectId(id);
     const doc = await collection.findOne<Document<Category>>({ _id });
     if (!doc) return null;
@@ -96,7 +100,10 @@ export default {
   },
 
   getByTitleAndTenant: async (title: string, tenantId: ObjectId) => {
-    return collection.findOne<Document<Category>>({ title, tenant_id: tenantId });
+    return collection.findOne<Document<Category>>({
+      title,
+      tenant_id: tenantId,
+    });
   },
 
   getBySlug: async (slug: string) => {

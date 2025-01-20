@@ -110,8 +110,7 @@
     let passwordField = document.getElementById("open_ai_key");
     if (_apiKeyProvider == ApiKeyProvider.AzureOpenAI) {
       passwordField = document.getElementById("azure_open_ai_key");
-    }
-    else if (_apiKeyProvider == ApiKeyProvider.AzureOpenAIPro) {
+    } else if (_apiKeyProvider == ApiKeyProvider.AzureOpenAIPro) {
       passwordField = document.getElementById("azure_open_ai_key_pro");
     }
     if (passwordField.type === "password") {
@@ -199,7 +198,7 @@
           tenantData.included_features.push({
             name: TenantFeature.AudioToText,
             //provider: ApiKeyProvider.AzureOpenAI,
-            provider: textSelectedProvider.value
+            provider: textSelectedProvider.value,
           });
         }
         log.d(tenantData, "CREATE - tenantData");
@@ -253,7 +252,7 @@
           tenantData.included_features.push({
             name: TenantFeature.AudioToText,
             //provider: ApiKeyProvider.AzureOpenAI,
-            provider: textSelectedProvider.value
+            provider: textSelectedProvider.value,
           });
         }
         log.d(tenantData, "UPDATE - tenantData");
@@ -292,7 +291,9 @@
       {@html svgIcons.back}
     </button>
     <h1 class="text-4xl font-bold">
-      {mode == MODE.Create ? t("tenant.tenants.add-tenant") : tenantData.name}
+      {mode == MODE.Create
+        ? t("tenant.tenants.add-tenant")
+        : (tenantData.name ?? t("common.edit"))}
     </h1>
 
     <div class="flex space-x-2 ml-auto">
@@ -563,7 +564,8 @@
                   bind:value={azureSpeechKey}
                 />
                 <TogglePasswordIcon
-                  on:change={() => togglePassword(ApiKeyProvider.AzureOpenAIPro)}
+                  on:change={() =>
+                    togglePassword(ApiKeyProvider.AzureOpenAIPro)}
                 />
               </label>
             </div>

@@ -2,6 +2,7 @@ import { ObjectId } from "mongodb";
 import { db, type Document } from "../mongodb";
 import { z } from "zod";
 import { TenantFeature, ApiKeyProvider } from "$types/TenantFeature";
+import { isValidMongoDbObjectId } from "$utils/common";
 
 export enum TenantTheme {
   Light = "light",
@@ -168,8 +169,12 @@ export default {
   },
 
   get: async (id: string) => {
-    return await collection.findOne<Document<Tenant>>({
-      _id: new ObjectId(id),
+    if (!isValidMongoDbObjectId(id)) {
+      return Promise.resolve({});
+    }
+    const _id = new ObjectId(id);
+    return collection.findOne<Document<Tenant>>({
+      _id,
     });
   },
 
