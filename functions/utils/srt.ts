@@ -183,7 +183,7 @@ export const formatSRT = (entries: Entry[]) => {
   for (const [index, entry] of entries.entries()) {
     out += `${index}
 ${srtTimestamp(entry.start)} --> ${srtTimestamp(entry.end)}
-<font color=#ffffff>${entry.text}</font>
+${entry.text}
 
 `;
   }
@@ -199,7 +199,7 @@ export const createSRTFile = async (filepath: string, entries: Entry[]) => {
   for (const [index, entry] of entries.entries()) {
     stream.write(`${index}
 ${srtTimestamp(entry.start)} --> ${srtTimestamp(entry.end)}
-<font color=#ffffff>${entry.text}</font>
+${entry.text}
 
 `);
   }

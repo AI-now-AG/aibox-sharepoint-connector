@@ -21,6 +21,7 @@ import {
 import { processTranscription } from "./batchTranscription";
 import type { TranscriptionResponse } from "$utils/Speech/SpeechResponse";
 import { ApiKeyProvider } from "$types/TenantFeature";
+import { LoggingCallbackHandler } from "$callbackLLM/LoggingCallbackHandler";
 
 const DEFAULT_WHISPER_MODEL_NAME = "whisper-1";
 const DEFAULT_API_VERSION = "2024-08-01-preview";
@@ -109,6 +110,8 @@ function getOpenAIChatModel(transcribeParams: TranscribeRequest) {
   const openaiChatConfig = {
     openAIApiKey,
     model: process.env.OPENAI_MODEL,
+    callbacks: [new LoggingCallbackHandler(transcribeParams.tenantId, transcribeParams.userId)],
+    tags: ["transcribe", "improve", "text", "quality", "openai"],
   };
   return new ChatOpenAI(openaiChatConfig);
 }
@@ -127,6 +130,8 @@ function getAzureChatModel(transcribeParams: TranscribeRequest) {
       DEFAULT_CHAT_MODE_NAME,
     azureOpenAIApiVersion:
       process.env.AZURE_OPENAI_API_VERSION || DEFAULT_API_VERSION,
+    callbacks: [new LoggingCallbackHandler(transcribeParams.tenantId, transcribeParams.userId)],
+    tags: ["transcribe", "improve", "text", "quality", "azure"],
   };
 
   return new AzureChatOpenAI(azureChatConfig);
@@ -138,7 +143,7 @@ export const improveSRTQuality = async (
 ) => {
   let model = getOpenAIChatModel(transcribeParams);
   if (transcribeParams.apiKeyProvider === ApiKeyProvider.AzureOpenAI) {
-    model = getAzureChatModel(transcribeParams);  
+    model = getAzureChatModel(transcribeParams);
   }
   const flatEntries = data
     .map(

@@ -62,6 +62,9 @@ export default {
   },
 
   getAsString: async (id: string) => {
+    if (!ObjectId.isValid(id)) {
+      return null;
+    }
     const _id = new ObjectId(id);
     const doc = await collection.findOne<Document<Prompt>>({ _id });
     if (!doc) return null;
