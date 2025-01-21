@@ -18,9 +18,9 @@
       >
 
       {#if title}
-      <h3 class="text-lg font-bold">
-        {title}
-      </h3>
+        <h3 class="text-lg font-bold">
+          {title}
+        </h3>
       {/if}
 
       <p class="mt-5 text-md">{description}</p>

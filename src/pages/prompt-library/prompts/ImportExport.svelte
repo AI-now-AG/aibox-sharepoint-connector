@@ -41,10 +41,10 @@
           type: "error",
         });
         return;
-      } 
+      }
 
       addToast({
-        message: t('prompt-library.prompts.import-success'),
+        message: t("prompt-library.prompts.import-success"),
         type: "success",
       });
       setTimeout(() => {

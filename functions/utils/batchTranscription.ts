@@ -149,9 +149,10 @@ export async function createTranscriptionTask(
 
 async function createDestinationContainerUrl() {
   const storageAccountName =
-    process.env.AZURE_LARGE_STORAGE_ACCOUNT_NAME || "aiboxstore"; // Add your storage account name
-  const storageAccountKey = process.env.AZURE_LARGE_STORAGE_ACCOUNT_KEY || ""; // Add your storage account key
-  const containerName = "transcription-jobs";
+    process.env.AZURE_LARGE_STORAGE_ACCOUNT_NAME || "aiboxlarge";
+  const storageAccountKey = process.env.AZURE_LARGE_STORAGE_ACCOUNT_KEY || "";
+  const containerName =
+    process.env.AZURE_LARGE_CONTAINER_JOB_NAME || "transcription-jobs";
 
   const credential = new StorageSharedKeyCredential(
     storageAccountName,
@@ -164,17 +165,6 @@ async function createDestinationContainerUrl() {
 
   const containerClient = blobServiceClient.getContainerClient(containerName);
   await containerClient.createIfNotExists();
-
-  //const folderName = "TranscribeData";
-  // const placeholderBlobName = `${folderName}/.placeholder`; // Placeholder file in folder
-  // const placeholderBlobClient =
-  //   containerClient.getBlockBlobClient(placeholderBlobName);
-
-  // // Check if the folder (placeholder blob) exists, if not, create it
-  // const exists = await placeholderBlobClient.exists();
-  // if (!exists) {
-  //   await placeholderBlobClient.upload("", 0); // Upload an empty file
-  // }
 
   const expiryDate = new Date();
   expiryDate.setDate(expiryDate.getDate() + 1); // SAS token valid for a day
@@ -191,9 +181,7 @@ async function createDestinationContainerUrl() {
     credential,
   ).toString();
 
-  // const folderSasUrl = `${containerClient.url}/${folderName}?${sasToken}`;
   const folderSasUrl = `${containerClient.url}?${sasToken}`;
-
   return folderSasUrl;
 }
 

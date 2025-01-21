@@ -172,9 +172,7 @@ export default {
       return Promise.resolve({});
     }
     const _id = new ObjectId(id);
-    return collection.findOne<Document<Tenant>>({
-      _id,
-    });
+    return collection.findOne<Document<Tenant>>({ _id });
   },
 
   getByName: async (org_name: string) => {

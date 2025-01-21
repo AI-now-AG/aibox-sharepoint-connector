@@ -26,9 +26,7 @@ export const BatchSchema = z.object({
   diarizationEnabled: z.boolean().optional(),
   maxSpeakers: z.number().optional(),
   error: z.string().optional(),
-  report: z
-    .record(z.any())
-    .optional(),
+  report: z.record(z.any()).optional(),
 });
 
 const TaskSchema = z.object({

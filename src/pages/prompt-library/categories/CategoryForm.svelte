@@ -92,7 +92,10 @@
 <div class="container max-w-5xl p-6 mx-auto">
   <div class="w-full min-w-xs pt-2 lg:pt-6">
     <div class="flex items-center pt-2 pb-6">
-      <button class="mr-4" on:click|preventDefault={() => window.history.back()}>
+      <button
+        class="mr-4"
+        on:click|preventDefault={() => window.history.back()}
+      >
         {@html svgIcons.back}
       </button>
       <h1 class="text-4xl font-bold">
@@ -133,7 +136,10 @@
               {t("prompt-library.add.category.save")}
             {/if}
           </button>
-          <button class="btn ml-5" on:click|preventDefault={() => window.history.back()}>
+          <button
+            class="btn ml-5"
+            on:click|preventDefault={() => window.history.back()}
+          >
             {t("common.cancel")}
           </button>
         </div>

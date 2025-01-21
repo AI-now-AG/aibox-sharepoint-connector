@@ -282,7 +282,7 @@ const checkAndUploadLargeFile = async (
       subscriptionKey,
     );
     if (!response.isRunning && response.fileURL) {
-    //if (response.jsonData && response.transcriptionText) {
+      //if (response.jsonData && response.transcriptionText) {
       console.log("Transcription completed. Uploading files...");
       await postAudioProProcess(
         uniqueName,
@@ -404,7 +404,10 @@ async function postAudioProProcess(
   try {
     console.log("Triggering background function...");
     console.log(process.env.context);
-    const baseUrl = (process.env.context === 'production' ? process.env.URL : process.env.DEPLOY_PRIME_URL) || 'http://localhost:8888';
+    const baseUrl =
+      (process.env.context === "production"
+        ? process.env.URL
+        : process.env.DEPLOY_PRIME_URL) || "http://localhost:8888";
     console.log(baseUrl);
     console.log(process.env.URL);
     console.log(process.env.DEPLOY_URL);

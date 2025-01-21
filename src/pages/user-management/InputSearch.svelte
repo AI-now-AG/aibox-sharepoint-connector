@@ -14,7 +14,7 @@
     typingTimeout = setTimeout(() => {
       value = target.value;
       dispatch("search");
-      console.log('dispatch', {value});
+      console.log("dispatch", { value });
     }, 300);
   };
 </script>

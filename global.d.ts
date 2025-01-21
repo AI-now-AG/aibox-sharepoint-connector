@@ -1,4 +1,3 @@
 declare namespace JSX {
-    type IntrinsicElements = object
-  }
-  
+  type IntrinsicElements = object;
+}

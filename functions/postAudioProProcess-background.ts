@@ -38,7 +38,13 @@ const postAudioProProcess: Handler = async (
       encryptedSpeechKey,
     } = body;
 
-    if (!uniqueName || !folderName || !uploadUrl || !fileURL || !encryptedSpeechKey) {
+    if (
+      !uniqueName ||
+      !folderName ||
+      !uploadUrl ||
+      !fileURL ||
+      !encryptedSpeechKey
+    ) {
       return {
         statusCode: 400,
         body: JSON.stringify({ message: "Invalid file upload data" }),

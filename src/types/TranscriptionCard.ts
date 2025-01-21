@@ -23,4 +23,8 @@ interface LargefileCard extends BaseCard {
 }
 
 // Union Type for All Cards
-export type TranscriptionCard = PlaintextCard | SummarizeCard | SubtitlesCard | LargefileCard;
+export type TranscriptionCard =
+  | PlaintextCard
+  | SummarizeCard
+  | SubtitlesCard
+  | LargefileCard;

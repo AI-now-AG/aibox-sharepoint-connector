@@ -34,20 +34,16 @@
   }
 </script>
 
-<form on:submit|preventDefault={handleSubmit} class="container max-w-5xl mx-auto">
-  <div
-    class="flex flex-row justify-between items-center mb-5"
-  >
-    <h1 class="text-4xl font-bold w-full text-left ">
+<form
+  on:submit|preventDefault={handleSubmit}
+  class="container max-w-5xl mx-auto"
+>
+  <div class="flex flex-row justify-between items-center mb-5">
+    <h1 class="text-4xl font-bold w-full text-left">
       {t("profile")}
     </h1>
-    <div
-      class="flex flex-row space-x-2"
-    >
-      <button
-        class="btn btn-primary save-button shadow-lg"
-        type="submit"
-      >
+    <div class="flex flex-row space-x-2">
+      <button class="btn btn-primary save-button shadow-lg" type="submit">
         Save
       </button>
       <button

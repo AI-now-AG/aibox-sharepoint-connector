@@ -41,7 +41,9 @@
       </button>
     </div>
 
-    <p class="mb-2 text-sm font-sans font-medium text-neutral-500">{t("prompt-library.prompt.prompt-order")}</p>
+    <p class="mb-2 text-sm font-sans font-medium text-neutral-500">
+      {t("prompt-library.prompt.prompt-order")}
+    </p>
 
     <section
       use:dndzone={{ items, flipDurationMs, dropTargetStyle }}

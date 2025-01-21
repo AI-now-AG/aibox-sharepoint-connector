@@ -7,7 +7,7 @@ if (slug === undefined) {
   throw new Error("Slug is required");
 }
 
-const entry = (await getEntry("aibox", slug)) as any;
+const entry = await getEntry("aibox", slug);
 
 if (entry === undefined) {
   return Astro.redirect("/404");

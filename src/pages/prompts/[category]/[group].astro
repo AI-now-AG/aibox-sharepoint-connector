@@ -7,7 +7,7 @@ import PromptModel from "$data/models/prompt.model";
 
 const { category: categoryId, group: groupId } = Astro.params;
 
-const category = (await CategoryModel.get(categoryId || "")) as any;
+const category = await CategoryModel.get(categoryId || "");
 const group: any = category?.groups.find((g: any) => g._id === groupId);
 
 const cursor = await PromptModel.listByTenant(Astro.locals.user.tenant_id);
@@ -27,11 +27,33 @@ const promptItems = categoryGroupPrompt.map((prompt) => ({
 ---
 
 <Layout>
+  <!-- <div
+    class="grid grid-cols-1 xl:grid-cols-[1fr_minmax(min-content,_420px)] bg-base-200 h-full"
+    > -->
+  <!-- <div
+    class="grid grid-cols-1 grid-rows-[min-content-1fr] bg-base-200 h-full content-baseline gap-0 place-items-center"
+  > -->
   <div
     class="flex flex-col bg-base-200 h-full content-baseline gap-0 place-items-center"
   >
     <div class="p-6 w-full h-full">
       <Content />
     </div>
+    <!-- {
+      promptItems.length > 0 && (
+        <div class="px-6 w-full">
+          <div class="collapse collapse-arrow bg-base-300 w-full max-w-6xl mx-auto">
+            <input type="checkbox" />
+            <div class="collapse-title font-medium">
+              <IconSettings class="w-5 h-5 inline -mt-1" />
+              Prompt
+            </div>
+            <div class="collapse-content">
+              <History />
+            </div>
+          </div>
+        </div>
+      )
+    } -->
   </div>
 </Layout>
