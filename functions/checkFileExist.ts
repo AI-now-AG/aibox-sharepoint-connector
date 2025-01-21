@@ -142,7 +142,9 @@ const checkFileExist: Handler = async (event, context) => {
         }
 
         if (!downloadedFiles.some((file) => file.name === fileName)) {
-          downloadedFiles.push({ name: fileName, path: filePath });
+          if(!fileName.endsWith("_improved.txt")) {
+            downloadedFiles.push({ name: fileName, path: filePath });
+          }
         }
       }
       if (availableFiles.length >= requireFilesCount) {
