@@ -204,46 +204,44 @@
       {t("user.all-users") + ` (${users?.length ?? 0})`}
     </h2>
 
-    <div class="overflow-x-auto">
-      <SortableTable {columnData} bind:rowData={users}>
-        {#each users as user}
-          <tr class="h-16 bg-base-100 hover:bg-base-300 text-sm rounded-lg">
-            <td class="py-3 px-4 text-sm font-medium rounded-l-lg">
-              <a
-                class="underline underline-offset-2"
-                href="/user-management/{user._id}">{user.name ?? "-"}</a
-              >
-            </td>
-            <td
-              class="py-3 px-4 text-gray-600 flex items-center text-sm font-medium h-16"
+    <SortableTable {columnData} bind:rowData={users}>
+      {#each users as user}
+        <tr class="h-16 bg-base-100 hover:bg-base-300 text-sm rounded-lg">
+          <td class="py-3 px-4 text-sm font-medium rounded-l-lg">
+            <a
+              class="underline underline-offset-2"
+              href="/user-management/{user._id}">{user.name ?? "-"}</a
             >
-              {user.email}
-            </td>
-            <td class="py-3 px-4 text-sm font-medium"
-              >{getRoleString(user.roles)}</td
-            >
-            <td class="py-3 px-4 text-sm font-medium">
-              {user.logins_count ?? "-"}
-            </td>
-            <td class="py-3 px-4 text-sm font-medium">
-              {user.last_login ? formatDateToDDMMYY(user.last_login) : "-"}
-            </td>
-            <td
-              class="py-3 px-4 text-sm font-medium"
-              style={`color: ${getUserStatus(user.blocked, user.email_verified).color}`}
-            >
-              {getUserStatus(user.blocked, user.email_verified).text}
-            </td>
+          </td>
+          <td
+            class="py-3 px-4 text-gray-600 flex items-center text-sm font-medium h-16"
+          >
+            {user.email}
+          </td>
+          <td class="py-3 px-4 text-sm font-medium"
+            >{getRoleString(user.roles)}</td
+          >
+          <td class="py-3 px-4 text-sm font-medium">
+            {user.logins_count ?? "-"}
+          </td>
+          <td class="py-3 px-4 text-sm font-medium">
+            {user.last_login ? formatDateToDDMMYY(user.last_login) : "-"}
+          </td>
+          <td
+            class="py-3 px-4 text-sm font-medium"
+            style={`color: ${getUserStatus(user.blocked, user.email_verified).color}`}
+          >
+            {getUserStatus(user.blocked, user.email_verified).text}
+          </td>
 
-            <td
-              class="py-3 px-4 text-sm font-medium relative relative-dropdown rounded-r-lg"
-            >
-              <DropdownSection cssClasses="" options={getOptions(user)} />
-            </td>
-          </tr>
-        {/each}
-      </SortableTable>
-    </div>
+          <td
+            class="py-3 px-4 text-sm font-medium relative relative-dropdown rounded-r-lg"
+          >
+            <DropdownSection cssClasses="" options={getOptions(user)} />
+          </td>
+        </tr>
+      {/each}
+    </SortableTable>
   </div>
 </div>
 

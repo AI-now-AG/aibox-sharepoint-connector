@@ -85,6 +85,9 @@ export default {
   },
 
   get: async (id: string) => {
+    if (!ObjectId.isValid(id)) {
+      return Promise.resolve({});
+    }
     const _id = new ObjectId(id);
     const doc = await collection.findOne<Document<Category>>({ _id });
     if (!doc) return null;
@@ -96,7 +99,10 @@ export default {
   },
 
   getByTitleAndTenant: async (title: string, tenantId: ObjectId) => {
-    return collection.findOne<Document<Category>>({ title, tenant_id: tenantId });
+    return collection.findOne<Document<Category>>({
+      title,
+      tenant_id: tenantId,
+    });
   },
 
   getBySlug: async (slug: string) => {

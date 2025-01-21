@@ -156,8 +156,12 @@ export default {
     return await data.toArray();
   },
 
-  get: async (id: string) =>
-    collection.findOne<User>({ _id: new ObjectId(id) }),
+  get: async (id: string) => {
+    if (!ObjectId.isValid(id)) {
+      return Promise.resolve({});
+    }
+    return collection.findOne<User>({ _id: new ObjectId(id) });
+  },
 
   getAuth0Sub: async (auth0_sub: string) =>
     collection.findOne<User>({ auth0_sub }),
