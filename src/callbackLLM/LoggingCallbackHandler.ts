@@ -1,4 +1,5 @@
 import { BaseCallbackHandler } from "@langchain/core/callbacks/base";
+import type { BaseMessage } from "@langchain/core/messages";
 import type { LLMResult } from "@langchain/core/outputs";
 import { MongoClient, Db, Collection, ObjectId } from "mongodb";
 import type { Serialized } from "node_modules/@langchain/core/dist/load/serializable";
@@ -53,6 +54,24 @@ export class LoggingCallbackHandler extends BaseCallbackHandler {
       type: "user",
       model: llm.name,
       prompts,
+      runId,
+      parentRunId,
+      extraParams,
+      tags,
+      metadata,
+      runName,
+      timestamp: new Date(),
+    });
+  }
+
+  async handleChatModelStart(llm: Serialized, messages: BaseMessage[][], runId: string, parentRunId?: string, extraParams?: Record<string, unknown>, tags?: string[], metadata?: Record<string, unknown>, runName?: string) {
+    const collection = await getLogsCollection();
+    await collection.insertOne({
+      tenant_id: new ObjectId(this.tenantId),
+      creator_id: new ObjectId(this.userId),
+      type: "userchat",
+      model: llm.name,
+      messages,
       runId,
       parentRunId,
       extraParams,
