@@ -7,7 +7,7 @@ import PromptModel from "$data/models/prompt.model";
 
 const { category: categoryId, group: groupId } = Astro.params;
 
-const category = await CategoryModel.get(categoryId || "") as any;
+const category = (await CategoryModel.get(categoryId || "")) as any;
 const group: any = category?.groups.find((g: any) => g._id === groupId);
 
 const cursor = await PromptModel.listByTenant(Astro.locals.user.tenant_id);
