@@ -167,9 +167,9 @@ export default {
     return await data.toArray();
   },
 
-  get: async (id: string) => {
+  get: async (id: string): Promise<Tenant | null> => {
     if (!ObjectId.isValid(id)) {
-      return Promise.resolve({});
+      return null;
     }
     const _id = new ObjectId(id);
     return collection.findOne<Document<Tenant>>({ _id });

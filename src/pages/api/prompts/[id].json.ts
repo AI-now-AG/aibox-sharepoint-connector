@@ -98,7 +98,7 @@ export const POST: APIRoute = async (ctx) => {
         return instruction;
       });
       const knowledgebases = await Promise.all(calls);
-      knowledgebases.forEach((knowledgebase: any) => {
+      knowledgebases.forEach((knowledgebase) => {
         if (knowledgebase?.knowledge_base) {
           messages.push(new SystemMessage(knowledgebase.knowledge_base));
         }

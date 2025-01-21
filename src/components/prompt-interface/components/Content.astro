@@ -7,8 +7,8 @@ import { Permission } from "$data/models/user.model";
 
 const { category: categoryId, group: groupId } = Astro.params;
 
-const category = await CategoryModel.get(categoryId || "");
-const group = category?.groups.find((g) => g._id === groupId);
+const category = await CategoryModel.get(categoryId || "") as any;
+const group = category?.groups.find((g: any) => g._id === groupId);
 
 const cursor = await PromptModel.listByTenant(Astro.locals.user.tenant_id);
 const prompts = await cursor.toArray();

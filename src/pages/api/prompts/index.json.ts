@@ -212,7 +212,7 @@ export const GET: APIRoute = async (ctx) => {
           return instruction;
         });
         instructions = (await Promise.all(calls)).filter(
-          (instr: any) => instr !== null,
+          (instr) => instr !== null,
         );
       }
 
