@@ -14,10 +14,8 @@ import {
 import { TranscriptionType } from "$types/TranscribeRequest";
 import {
   pollTranscriptionTask1,
-  processTranscriptionResult,
   updateStatus,
 } from "./utils/batchTranscription";
-import type { TranscriptionResponse } from "$utils/Speech/SpeechResponse";
 import { decrypt } from "$utils/secure";
 
 const checkFileExist: Handler = async (event, context) => {
@@ -30,7 +28,7 @@ const checkFileExist: Handler = async (event, context) => {
     isDiarizationEnabled,
     encryptedSpeechKey,
   } = JSON.parse(event.body!);
-
+  console.log("fileNames", fileNames);
   let requireFilesCount = fileNames.length || 0;
   const tempFileNames: string[] = [];
 
@@ -39,7 +37,8 @@ const checkFileExist: Handler = async (event, context) => {
     requireFilesCount += 1;
     tempFileNames.push(improvedTxtFileName);
   }
-
+  console.log("isShowImprovedTextPreview", isShowImprovedTextPreview);
+  console.log("tempFileNames--1", tempFileNames);
   const txtFileName = isDiarizationEnabled
     ? `${uniqueName}-mono.txt`
     : `${uniqueName}.txt`;
@@ -47,7 +46,7 @@ const checkFileExist: Handler = async (event, context) => {
     requireFilesCount += 1;
     tempFileNames.push(txtFileName);
   }
-
+  console.log("tempFileNames--2", tempFileNames);
   if ((fileNames?.length || tempFileNames.length) && uniqueName) {
     const streamPipeline = promisify(pipeline);
     const tmpDir = tmpdir();
@@ -79,62 +78,8 @@ const checkFileExist: Handler = async (event, context) => {
       );
 
       // Check if the file exists in Azure Blob Storage
-      for (const fileName of fileNames) {
-        const filePathInBlob = `${folderName}/${fileName}`;
-        const blobClient = containerClient.getBlobClient(filePathInBlob);
-        const exists = await blobClient.exists();
-        if (!exists) {
-          const task = await getTask(uniqueName);
-          if (!task) {
-            return {
-              statusCode: 404,
-              body: JSON.stringify({
-                exists: false,
-                message: "File does not exist",
-              }),
-            };
-          } else {
-            return {
-              statusCode: 200,
-              body: JSON.stringify(task),
-            };
-          }
-        }
-        availableFiles.push(fileName);
-        const filePath = join(tmpDir, fileName);
-        const downloadBlockBlobResponse = await blobClient.download();
-
-        // Ensure the file is written to the file system
-        const fileStream = createWriteStream(filePath);
-        await streamPipeline(
-          downloadBlockBlobResponse.readableStreamBody!,
-          fileStream,
-        );
-        const fileUrl = blobClient.url;
-        if (fileName.endsWith(".srt")) {
-          srtFileUrl = fileUrl; // Store the URL for the .srt file
-        } else if (fileName.endsWith(".ass")) {
-          assFileUrl = fileUrl; // Store the URL for the .ass file
-        } else if (fileName.endsWith(".json")) {
-          jsonFileUrl = fileUrl; // Store the URL for the .ass file
-        } else if (fileName.endsWith(".txt")) {
-          txtFileUrl = fileUrl; // Store the URL for the .txt file
-        } else if (fileName.endsWith("_improved.txt")) {
-          // Download and read the raw text content of the .txt file
-          const downloadBlockBlobResponseStr = await blobClient.download();
-          rawTxtContent = await streamToString(
-            downloadBlockBlobResponseStr.readableStreamBody!,
-          );
-        }
-
-        if (!downloadedFiles.some((file) => file.name === fileName)) {
-          downloadedFiles.push({ name: fileName, path: filePath });
-        }
-
-        //const downloadBlockBlobResponse = await blobClient.download()
-        //const downloadedContent = await streamToString(downloadBlockBlobResponse.readableStreamBody!);
-      }
-      for (const fileName of tempFileNames) {
+      const allFileNames = [...fileNames, ...tempFileNames];
+      for (const fileName of allFileNames) {
         const filePathInBlob = `${folderName}/${fileName}`;
         const blobClient = containerClient.getBlobClient(filePathInBlob);
         const exists = await blobClient.exists();
@@ -167,26 +112,39 @@ const checkFileExist: Handler = async (event, context) => {
           }
         }
         availableFiles.push(fileName);
+        const filePath = join(tmpDir, fileName);
+        const downloadBlockBlobResponse = await blobClient.download();
 
-        if (fileName.endsWith(".txt")) {
-          // Download and read the raw text content of the .txt file
+        // Ensure the file is written to the file system
+        const fileStream = createWriteStream(filePath);
+        await streamPipeline(
+          downloadBlockBlobResponse.readableStreamBody!,
+          fileStream,
+        );
+        const fileUrl = blobClient.url;
+        if (fileName.endsWith(".srt")) {
+          srtFileUrl = fileUrl; // Store the URL for the .srt file
+        } else if (fileName.endsWith(".ass")) {
+          assFileUrl = fileUrl; // Store the URL for the .ass file
+        } else if (fileName.endsWith(".json")) {
+          jsonFileUrl = fileUrl; // Store the URL for the .ass file
+        } else if (fileName.endsWith(".txt")) {
+          if (typedTranscriptionType === TranscriptionType.Subtitles) {
+            txtFileUrl = fileUrl; // Store the URL for the .txt file
+          }
+        }
+
+        if (fileName.endsWith(".txt") || fileName.endsWith("_improved.txt")) {
           const downloadBlockBlobResponse = await blobClient.download();
           rawTxtContent = await streamToString(
             downloadBlockBlobResponse.readableStreamBody!,
           );
-        } else if (fileName.endsWith("_improved.txt")) {
-          // Download and read the raw text content of the .txt file
-          const downloadBlockBlobResponseStr = await blobClient.download();
-          rawTxtContent = await streamToString(
-            downloadBlockBlobResponseStr.readableStreamBody!,
-          );
+        }
+
+        if (!downloadedFiles.some((file) => file.name === fileName)) {
+          downloadedFiles.push({ name: fileName, path: filePath });
         }
       }
-      //console.log(downloadedFiles);
-      // return {
-      //     statusCode: 200,
-      //     body: JSON.stringify({ exists: true, transcriptionFile: zipBuffer }),
-      // };
       if (availableFiles.length >= requireFilesCount) {
         let zipBuffer: Buffer | null = null;
         if (fileNames.length > 1) {
@@ -194,12 +152,6 @@ const checkFileExist: Handler = async (event, context) => {
         }
         return {
           statusCode: 200,
-          /*headers: {
-            'Content-Type': 'application/zip',
-            'Content-Disposition': 'attachment; filename="transcription_files.zip"',
-          },
-          body: zipBuffer.toString('base64'), // Convert the binary zip buffer to base64 for safe transmission
-          isBase64Encoded: true, // Indicate the body is base64 encoded*/
           body: JSON.stringify({
             exists: true,
             text_output: rawTxtContent,
@@ -273,17 +225,14 @@ const checkAndUploadLargeFile = async (
   const azureSpeechKey = decrypt(
     encryptedSpeechKey || process.env.AZURE_LARGE_SPEECH_KEY!,
   );
-  const subscriptionKey = azureSpeechKey ?? process.env.AZURE_LARGE_SPEECH_KEY!;
 
   try {
     const response = await pollingAndStatus(
       taskURL,
       uniqueName,
-      subscriptionKey,
+      azureSpeechKey,
     );
     if (!response.isRunning && response.fileURL) {
-      //if (response.jsonData && response.transcriptionText) {
-      console.log("Transcription completed. Uploading files...");
       await postAudioProProcess(
         uniqueName,
         outputURL,
@@ -303,45 +252,33 @@ async function createZip(
 ): Promise<Buffer> {
   const zip = new AdmZip();
 
-  // Add each file to the zip
   downloadedFiles.forEach((file) => {
-    console.log(`Adding file to zip: ${file.path}`);
     zip.addLocalFile(file.path);
   });
 
-  // Generate a buffer of the zip content
   const zipBuffer = zip.toBuffer();
 
-  // Clean up: delete the downloaded files after zipping
   downloadedFiles.forEach((file) => {
-    console.log(`Attempting to delete file: ${file.path}`);
     if (existsSync(file.path)) {
       try {
-        unlinkSync(file.path); // Ensure file exists before deletion
-        console.log(`File deleted: ${file.path}`);
+        unlinkSync(file.path);
       } catch (err) {
         console.error(`Failed to delete file: ${file.path}`, err);
       }
-    } else {
-      console.warn(`File not found during deletion: ${file.path}`);
     }
   });
-
   return zipBuffer;
 }
 
-// Helper function to convert readable stream to string
 async function streamToString(
   readableStream: NodeJS.ReadableStream | null,
 ): Promise<string> {
   return new Promise((resolve, reject) => {
     const chunks: Uint8Array[] = [];
-    readableStream?.on("data", (data) => {
-      chunks.push(data);
-    });
-    readableStream?.on("end", () => {
-      resolve(Buffer.concat(chunks).toString("utf-8"));
-    });
+    readableStream?.on("data", (data) => chunks.push(data));
+    readableStream?.on("end", () =>
+      resolve(Buffer.concat(chunks).toString("utf-8")),
+    );
     readableStream?.on("error", reject);
   });
 }
@@ -350,11 +287,7 @@ export async function pollingAndStatus(
   taskUrl: string,
   uniqueName: string,
   subscriptionKey: string,
-): Promise<{
-  isRunning: boolean;
-  fileURL?: string;
-  error?: Error;
-}> {
+): Promise<{ isRunning: boolean; fileURL?: string; error?: Error }> {
   try {
     const pollResponse = await pollTranscriptionTask1(
       taskUrl,
@@ -362,25 +295,13 @@ export async function pollingAndStatus(
       subscriptionKey,
     );
     if (pollResponse.status === BatchStatus.Succeeded) {
-      /*const transcriptionData = await processTranscriptionResult(
-        uniqueName,
-        enableDiarization,
-        pollResponse.links.files,
-        subscriptionKey,
-      );
-      return { isRunning: false, ...transcriptionData };*/
       return { isRunning: false, fileURL: pollResponse.links.files };
     } else if (pollResponse.status === BatchStatus.Failed) {
-      console.error(
-        `Transcription failed: ${pollResponse.properties.error?.message}`,
-      );
       throw new Error(
         `Transcription failed: ${pollResponse.properties.error?.message}`,
       );
-      return { isRunning: false };
-    } else {
-      return { isRunning: true };
     }
+    return { isRunning: true };
   } catch (error) {
     updateStatus({
       uniqueName,
@@ -388,7 +309,6 @@ export async function pollingAndStatus(
       status: "Failed",
       error: `${error}`,
     });
-    console.error("Error processing transcription:", error);
     throw error;
   }
 }
