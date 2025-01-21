@@ -29,6 +29,9 @@ export default {
   },
 
   get: async (id: string) => {
+    if (!ObjectId.isValid(id)) {
+      return Promise.resolve({});
+    }
     const _id = new ObjectId(id);
     return collection.findOne<Document<Instruction>>({ _id });
   },

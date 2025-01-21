@@ -29,12 +29,18 @@ export default {
   },
 
   get: async (id: string) => {
+    if (!ObjectId.isValid(id)) {
+      return Promise.resolve({});
+    }
     const _id = new ObjectId(id);
     return collection.findOne<Document<KnowledgeBase>>({ _id });
   },
 
   getByTitleAndTenant: async (title: string, tenantId: ObjectId) => {
-    return collection.findOne<Document<KnowledgeBase>>({ title, tenant_id: tenantId });
+    return collection.findOne<Document<KnowledgeBase>>({
+      title,
+      tenant_id: tenantId,
+    });
   },
 
   list: async () =>

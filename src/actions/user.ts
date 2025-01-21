@@ -157,7 +157,7 @@ export const user = {
       const { org_id: organizationId } = context.locals.tenant;
 
       // Retrieve the user details from the database.
-      const user = await UserModel.get(input._id);
+      const user = (await UserModel.get(input._id)) as User;
       if (!user) {
         throw new Error("User does not exists.");
       }
@@ -217,7 +217,7 @@ export const user = {
       const { _id: userId, blocked } = input;
 
       // Retrieve the user details from the database.
-      const user = await UserModel.get(userId);
+      const user = (await UserModel.get(userId)) as User;
       if (!user) {
         throw new Error("User does not exists.");
       }
@@ -263,7 +263,7 @@ export const user = {
     input: UserInputIdentifierSchema,
     handler: async (input) => {
       // Retrieve the user details from the database.
-      const user = await UserModel.get(input._id);
+      const user = (await UserModel.get(input._id)) as User;
       if (!user) {
         throw new Error("User does not exists.");
       }

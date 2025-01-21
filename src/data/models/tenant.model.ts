@@ -168,8 +168,12 @@ export default {
   },
 
   get: async (id: string) => {
-    return await collection.findOne<Document<Tenant>>({
-      _id: new ObjectId(id),
+    if (!ObjectId.isValid(id)) {
+      return Promise.resolve({});
+    }
+    const _id = new ObjectId(id);
+    return collection.findOne<Document<Tenant>>({
+      _id,
     });
   },
 

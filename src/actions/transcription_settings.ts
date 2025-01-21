@@ -20,7 +20,7 @@ export const transcription_settings = {
         throw new Error("No transcription settings provided.");
       }
 
-      const tenant = await TenantModel.get(_id);
+      const tenant = await TenantModel.get(_id) as Tenant;
       if (!tenant) {
         throw new Error("Tenant not found.");
       }

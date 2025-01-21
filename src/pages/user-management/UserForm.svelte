@@ -211,7 +211,9 @@
       {@html svgIcons.back}
     </button>
     <h1 class="text-4xl font-bold">
-      {mode == MODE.Create ? t("user.add-new-user") : user?.name}
+      {mode == MODE.Create
+        ? t("user.add-new-user")
+        : (user?.name ?? t("common.edit"))}
     </h1>
 
     <div class="flex space-x-2 ml-auto">
@@ -368,9 +370,7 @@
               </tr>
               <tr class="mb-4">
                 <td class="text-gray-400">{t("user.id")}</td>
-                <td class="text-base">
-                  {userData.auth0_sub}</td
-                >
+                <td class="text-base"> {userData.auth0_sub}</td>
               </tr>
             </table>
           </div>
