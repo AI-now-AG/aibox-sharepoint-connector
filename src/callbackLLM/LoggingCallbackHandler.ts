@@ -126,7 +126,7 @@ export class LoggingCallbackHandler extends BaseCallbackHandler {
       creator_id: new ObjectId(this.userId),
       creator_name: this.user?.name,
       filename: this.filename,
-      type: "system",
+      type: "assistant",
       response: output.generations,
       runId,
       parentRunId,
