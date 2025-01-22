@@ -80,7 +80,7 @@
     const { data, error } = result;
     log.d(result, "updateStatus --> result");
     if (!error) {
-      await fetchTenants();
+      fetchTenants();
     } else {
       log.e(error, "Error updating tenant status");
     }
@@ -103,7 +103,7 @@
         message: t("user.delete-successful"),
         type: "success",
       });
-      await fetchUsers();
+      await fetchTenants();
     } else {
       addToast({
         message: t("user.delete-failed"),
