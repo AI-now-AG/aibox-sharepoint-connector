@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { actions } from "astro:actions";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
@@ -7,18 +7,20 @@
   import { addToast } from "$stores/toast";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import Loading from "$components/Loading.svelte";
+  import InputSearchFilter from "./InputSearchFilter.svelte";
   import { loading, showLoading, hideLoading } from "$stores";
 
   const t = useTranslations();
 
-  let tenants = [];
-  let showArchived = false;
-  let searchValue = "";
-  let timeout;
+  let tenants: any = [];
+  let showArchived: boolean = false;
+  let searchValue: string = "";
+  let timeout: any;
 
-  let tenantToUpdate = null;
-  let confirmDescription = "";
-  let confirmUpdateModal;
+  let selectedTenant:any = null;
+  let confirmDescription:string = "";
+  let confirmUpdateModal: HTMLDialogElement;
+  let confirmDeleteModal: HTMLDialogElement;
 
   onMount(async () => {
     await fetchTenants();
@@ -39,7 +41,7 @@
     }
   };
 
-  const copyName = (name) => {
+  const copyName = (name:string) => {
     navigator.clipboard.writeText(name).then(
       function () {
         addToast({
@@ -53,8 +55,8 @@
     );
   };
 
-  function confirmUpdateStatus(tenant) {
-    tenantToUpdate = tenant;
+  function confirmUpdateStatus(tenant:any) {
+    selectedTenant = tenant;
     confirmDescription =
       tenant.active == 1
         ? t("tenant.tenants.tenant.archive-confirmation")
@@ -63,26 +65,26 @@
     confirmUpdateModal?.show();
   }
 
-  const updateTenantStatus = async () => {
-    const { active } = tenantToUpdate;
-    log.d(tenantToUpdate, "updateTenantStatus");
+  const updateStatus = async () => {
+    const { active } = selectedTenant;
+    log.d(selectedTenant, "updateStatus");
     confirmUpdateModal?.close();
 
     showLoading();
     let result;
     if (active) {
       result = await actions.tenant.archive({
-        _id: tenantToUpdate._id,
+        _id: selectedTenant._id,
       });
     } else {
       result = await actions.tenant.active({
-        _id: tenantToUpdate._id,
+        _id: selectedTenant._id,
       });
     }
     hideLoading();
 
     const { data, error } = result;
-    log.d(result, "updateTenantStatus --> result");
+    log.d(result, "updateStatus --> result");
     if (!error) {
       await fetchTenants();
     } else {
@@ -90,48 +92,35 @@
     }
   };
 
-  const onSearchTenant = ({ target: t }) => {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => {
-      searchValue = t.value;
-      fetchTenants();
-    }, 300);
-  };
+  function confirmDelete(tenant:any) {
+    selectedTenant = tenant;
+    confirmUpdateModal?.show();
+  }
 
-  const onShowArchived = (event) => {
-    showArchived = !showArchived;
-    setTimeout(() => (event.target.checked = showArchived), 0);
-    fetchTenants();
-  };
+  async function deleteTenant() {
+    const { _id = "" } = selectedTenant;
+    let result = await actions.tenant.delete({
+      _id,
+    });
+    hideLoading();
+    const { error } = result;
+    if (!error) {
+      addToast({
+        message: t("user.delete-successful"),
+        type: "success",
+      });
+      await fetchUsers();
+    } else {
+      addToast({
+        message: t("user.delete-failed"),
+        type: "error",
+      });
+    }
+  }
 </script>
 
 <div class="container max-w-full mx-auto p-6">
-  <div class="items-center mb-10">
-    <div class="relative w-full">
-      <label class="input input-bordered flex items-center gap-2">
-        {@html svgIcons.search}
-        <input
-          type="text"
-          class="grow text-sm"
-          placeholder={t("tenant.tenants.seach-place-holder")}
-          on:input={onSearchTenant}
-          on:input
-          on:blur
-        />
-      </label>
-    </div>
-    <div class="mt-4">
-      <label class="flex items-center space-x-2">
-        <input
-          type="checkbox"
-          class="checkbox border-gray-300 rounded focus:ring-indigo-500 w-5 h-5"
-          checked={showArchived}
-          on:click|preventDefault={onShowArchived}
-        />
-        <span class="label-text">{t("tenant.tenants.show-archived")}</span>
-      </label>
-    </div>
-  </div>
+  <InputSearchFilter bind:value={searchValue} on:search={fetchTenants} bind:showArchived={showArchived} on:filter={fetchTenants} />
 
   <div>
     <h2 class="text-lg font-normal mb-4">
@@ -223,6 +212,17 @@
                       </button>
                     </li>
                     <li>
+                      <button
+                        class="flex block w-full text-left px-4 py-1 text-sm hover:underline"
+                        on:click={() => confirmDelete(tenant)}
+                      >
+                        {@html svgIcons.trash}
+                        <span class="ml-1"
+                          >{t("common.delete")}</span
+                        >
+                      </button>
+                    </li>
+                    <li>
                       <a
                         class="flex block w-full text-left px-4 py-1 text-sm hover:underline"
                         href="/tenant-management/{tenant._id}"
@@ -248,7 +248,14 @@
   <!-- confirm update dialog -->
   <ConfirmDialog
     bind:modal={confirmUpdateModal}
-    on:confirm={updateTenantStatus}
+    on:confirm={updateStatus}
     description={confirmDescription}
+  />
+
+  <!-- confirm delete dialog -->
+  <ConfirmDialog
+    bind:modal={confirmDeleteModal}
+    on:confirm={deleteTenant}
+    description={t('user.delete-description-message')}
   />
 </div>

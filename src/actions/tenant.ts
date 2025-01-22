@@ -135,6 +135,19 @@ export const tenant = {
     },
   }),
 
+  delete: defineAction({
+    input: TenantInputIdentifierSchema,
+    handler: async (input) => {
+      // Retrieve the user details from the database.
+      const user = await TenantModel.get(input._id);
+      if (!user || Object.keys(user).length == 0) {
+        throw new Error("User does not exists.");
+      }
+
+      return transformRawData({});
+    },
+  }),
+
   encryptApiKeys: defineAction({
     input: TenanKeyEncryptSchema,
     handler: async (input) => {
