@@ -337,8 +337,8 @@ async function postAudioProProcess(
     console.log(process.env.REVIEW_ID);
     console.log("Triggering background function...END");
     const response = await fetch(
-      // `${process.env.URL}/.netlify/functions/postAudioProProcess-background`,
-      `https://deploy-preview-153.test.aibox-app.com/.netlify/functions/postAudioProProcess-background`,
+      `${process.env.URL}/.netlify/functions/postAudioProProcess-background`,
+      //`https://deploy-preview-153.test.aibox-app.com/.netlify/functions/postAudioProProcess-background`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
