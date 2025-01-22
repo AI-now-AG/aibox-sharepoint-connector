@@ -194,6 +194,7 @@ export default {
   get,
   create,
   update,
+  deleteTenant,
   addEnabledConnection,
   deleteEnabledConnection,
   getMemberRoles,

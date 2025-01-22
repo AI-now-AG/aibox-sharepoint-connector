@@ -194,6 +194,12 @@ export const tenant = {
       const session = client.startSession();
 
       try {
+        await organizationsManagement.deleteTenant(input._id);
+      } catch (err) {
+        console.error("delete tenant on Auth0 error", err);
+      }
+
+      try {
         // Start a transaction to ensure atomicity.
         session.startTransaction();
 
