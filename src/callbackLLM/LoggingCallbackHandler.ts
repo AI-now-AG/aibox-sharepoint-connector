@@ -16,6 +16,7 @@ const connectToDb = async () => {
       const client = new MongoClient(MONGO_URI);
       await client.connect();
       db = client.db(DB_NAME);
+      await createTTLIndex();
     } catch (err) {
       console.error("Error connecting to MongoDB:", err);
       throw err;
@@ -27,6 +28,11 @@ const connectToDb = async () => {
 const getLogsCollection = async (): Promise<Collection> => {
   const db = await connectToDb();
   return db.collection("llm_logs");
+};
+
+const createTTLIndex = async () => {
+  const collection = await getLogsCollection();
+  await collection.createIndex({ expireAt: 1 }, { expireAfterSeconds: 0 });
 };
 
 export class LoggingCallbackHandler extends BaseCallbackHandler {
@@ -78,6 +84,7 @@ export class LoggingCallbackHandler extends BaseCallbackHandler {
       metadata,
       runName,
       timestamp: new Date(),
+      expireAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
     });
   }
 
@@ -110,6 +117,7 @@ export class LoggingCallbackHandler extends BaseCallbackHandler {
       metadata,
       runName,
       timestamp: new Date(),
+      expireAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
     });
   }
 
@@ -132,6 +140,7 @@ export class LoggingCallbackHandler extends BaseCallbackHandler {
       parentRunId,
       tags,
       timestamp: new Date(),
+      expireAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
     });
   }
 
@@ -153,6 +162,7 @@ export class LoggingCallbackHandler extends BaseCallbackHandler {
       parentRunId,
       tags,
       timestamp: new Date(),
+      expireAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
     });
   }
 }
