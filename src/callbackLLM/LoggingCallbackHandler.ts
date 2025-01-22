@@ -59,6 +59,8 @@ export class LoggingCallbackHandler extends BaseCallbackHandler {
     metadata?: Record<string, unknown>,
     runName?: string,
   ) {
+    this.tenant = await TenantModel.get(this.tenantId);
+    this.user = await UserModel.get(this.userId);
     const collection = await getLogsCollection();
     await collection.insertOne({
       tenant_id: new ObjectId(this.tenantId),
@@ -89,6 +91,8 @@ export class LoggingCallbackHandler extends BaseCallbackHandler {
     metadata?: Record<string, unknown>,
     runName?: string,
   ) {
+    this.tenant = await TenantModel.get(this.tenantId);
+    this.user = await UserModel.get(this.userId);
     const collection = await getLogsCollection();
     await collection.insertOne({
       tenant_id: new ObjectId(this.tenantId),
