@@ -53,6 +53,12 @@ export default {
     return collection.deleteOne({ _id });
   },
 
+  removeByTenant: async (tenantId: string | ObjectId) => {
+    const objectId =
+      tenantId instanceof ObjectId ? tenantId : new ObjectId(tenantId);
+    return collection.deleteMany({ tenant_id: tenantId });
+  },
+
   get: async (id: string) => {
     if (!ObjectId.isValid(id)) {
       return Promise.resolve({});
