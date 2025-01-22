@@ -18,7 +18,6 @@
   let timeout: any;
 
   let selectedTenant:any = null;
-  let confirmDescription:string = "";
   let confirmUpdateModal: HTMLDialogElement;
   let confirmDeleteModal: HTMLDialogElement;
 
@@ -57,11 +56,6 @@
 
   function confirmUpdateStatus(tenant:any) {
     selectedTenant = tenant;
-    confirmDescription =
-      tenant.active == 1
-        ? t("tenant.tenants.tenant.archive-confirmation")
-        : t("tenant.tenants.tenant.active-confirmation");
-
     confirmUpdateModal?.show();
   }
 
@@ -94,7 +88,7 @@
 
   function confirmDelete(tenant:any) {
     selectedTenant = tenant;
-    confirmUpdateModal?.show();
+    confirmDeleteModal?.show();
   }
 
   async function deleteTenant() {
@@ -249,13 +243,16 @@
   <ConfirmDialog
     bind:modal={confirmUpdateModal}
     on:confirm={updateStatus}
-    description={confirmDescription}
+    description={selectedTenant?.active
+      ? t("tenant.tenants.tenant.archive-confirmation")
+      : t("tenant.tenants.tenant.active-confirmation")}
   />
 
   <!-- confirm delete dialog -->
   <ConfirmDialog
     bind:modal={confirmDeleteModal}
     on:confirm={deleteTenant}
+    title={t("user.delete-confirm-message")}
     description={t('user.delete-description-message')}
   />
 </div>
