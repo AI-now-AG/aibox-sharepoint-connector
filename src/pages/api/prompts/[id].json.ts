@@ -66,7 +66,7 @@ export const POST: APIRoute = async (ctx) => {
       ...{ _id: id },
     });
 
-    const prompt = (await PromptModel.get(data._id)) as any;
+    const prompt = await PromptModel.get(data._id);
     if (!prompt?.prompt) {
       return new Response(
         JSON.stringify({
@@ -80,12 +80,12 @@ export const POST: APIRoute = async (ctx) => {
     messages.push(new SystemMessage(prompt.prompt));
 
     if (prompt?.instructions) {
-      const calls = prompt.instructions.map(async (inst: any) => {
+      const calls = prompt.instructions.map(async (inst) => {
         const instruction = await InstructionModel.get(inst.toString());
         return instruction;
       });
       const instructions = await Promise.all(calls);
-      instructions.forEach((instruction: any) => {
+      instructions.forEach((instruction) => {
         if (instruction?.instruction) {
           messages.push(new SystemMessage(instruction.instruction));
         }
@@ -93,12 +93,12 @@ export const POST: APIRoute = async (ctx) => {
     }
 
     if (prompt?.knowledgebase) {
-      const calls = prompt.knowledgebase.map(async (kb: any) => {
+      const calls = prompt.knowledgebase.map(async (kb) => {
         const instruction = await KnowledgeBaseModel.get(kb.toString());
         return instruction;
       });
       const knowledgebases = await Promise.all(calls);
-      knowledgebases.forEach((knowledgebase: any) => {
+      knowledgebases.forEach((knowledgebase) => {
         if (knowledgebase?.knowledge_base) {
           messages.push(new SystemMessage(knowledgebase.knowledge_base));
         }

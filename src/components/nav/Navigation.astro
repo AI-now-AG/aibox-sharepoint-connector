@@ -252,7 +252,7 @@ const modules = [...menuItems];
       const details = element as HTMLDetailsElement;
       const detailsId = details.getAttribute("data-id") || "";
       details.addEventListener("toggle", () =>
-        updateNavState(detailsId, details.open)
+        updateNavState(detailsId, details.open),
       );
     });
   }

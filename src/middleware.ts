@@ -71,7 +71,7 @@ async function authenticate(context: APIContext, next: MiddlewareNext) {
   context.locals.session = session;
   context.locals.user = user;
 
-  const tenant = await TenantModel.get(user.tenant_id.toString()) as Tenant;
+  const tenant = await TenantModel.get(user.tenant_id.toString());
   if (tenant) {
     context.locals.tenant = tenant;
     context.locals.locale = tenant.default_language || defaultLang;
@@ -134,16 +134,13 @@ async function restrictAccess(context: APIContext, next: MiddlewareNext) {
     if (context.url.pathname === FEATURE_PLAINTEXT_ROUTE) {
       hasAccess =
         context.locals.tenant.transcriptions?.plaintext?.enabled ?? true;
-    }
-    else if (context.url.pathname === FEATURE_SUBTITLES_ROUTE) {
+    } else if (context.url.pathname === FEATURE_SUBTITLES_ROUTE) {
       hasAccess =
         context.locals.tenant.transcriptions?.subtitles?.enabled ?? true;
-    }
-    else if (context.url.pathname === FEATURE_SUMMARY_ROUTE) {
+    } else if (context.url.pathname === FEATURE_SUMMARY_ROUTE) {
       hasAccess =
         context.locals.tenant.transcriptions?.summary?.enabled ?? true;
-    }
-    else if (context.url.pathname === FEATURE_LARGEFILE_ROUTE) {
+    } else if (context.url.pathname === FEATURE_LARGEFILE_ROUTE) {
       hasAccess =
         context.locals.tenant.transcriptions?.largefile?.enabled ?? true;
     }

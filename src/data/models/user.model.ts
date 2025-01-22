@@ -156,9 +156,9 @@ export default {
     return await data.toArray();
   },
 
-  get: async (id: string) => {
+  get: async (id: string): Promise<User | null> => {
     if (!ObjectId.isValid(id)) {
-      return Promise.resolve({});
+      return null;
     }
     return collection.findOne<User>({ _id: new ObjectId(id) });
   },

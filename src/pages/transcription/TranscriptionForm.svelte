@@ -55,7 +55,7 @@
   let maxNumberOfSpeakers = 2;
   let isDiarizationEnabled = false;
   let minSpeakers = 2;
-  let maxSpeakers = 99;
+  let maxSpeakers = 20;
 
   let confirmModal: HTMLDialogElement;
 
@@ -321,11 +321,27 @@
         const url = URL.createObjectURL(file);
         const audio = new Audio(url);
         audio.addEventListener("loadedmetadata", () => {
+          if (isNaN(audio.duration)) {
+            reject(new Error("Could not determine audio duration."));
+            return;
+          }
+
           const minutes = Math.floor(audio.duration / 60);
           const seconds = Math.floor(audio.duration % 60);
           const duration = `${minutes}:${seconds.toString().padStart(2, "0")} min`;
           URL.revokeObjectURL(url);
           resolve(duration);
+        });
+
+        audio.addEventListener("error", () => {
+          URL.revokeObjectURL(url);
+          addToast({
+            message: "Failed to load audio metadata.",
+            type: "error",
+            timeout: 5000,
+          });
+          resolve("unknown");
+          //reject(new Error("Failed to load audio metadata."));
         });
       } catch (error) {
         console.error("Calculate duration error", error);
@@ -529,7 +545,7 @@
       azureOpenAIEndpoint: tenant?.azure_openai_endpoint,
       azureOpenAIWhisperModel: tenant?.azure_openai_whisper_model,
       azureOpenAIChatModel: tenant?.azure_openai_chat_model,
-      speechKey: tenant?.speech_api_key,
+      encryptedSpeechKey: tenant?.speech_api_key,
       speechRegion: tenant?.speech_region,
       isDiarizationEnabled: isDiarizationEnabled,
       maxSpeakers: parseInt(maxNumberOfSpeakers.toString()),
@@ -551,6 +567,7 @@
               : false,
           typedTranscriptionType: transcriptionType,
           isDiarizationEnabled: isDiarizationEnabled,
+          encryptedSpeechKey: $tenant?.speech_api_key,
         }),
       });
       if (response.ok) {
@@ -950,7 +967,6 @@
       </div>
     {/if}
   </div>
-
   {#if transcriptionType === TranscriptionType.Largefile}
     <div class="bg-base-100 mt-10 p-4 px-6 rounded-xl">
       <div class="flex flex-col gap-4">

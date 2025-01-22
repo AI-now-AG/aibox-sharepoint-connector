@@ -12,6 +12,7 @@ import {
   updateTask,
   getTask,
   BatchStatus,
+  getCurrentBatchStatus,
 } from "$shared/transcriptionTasks";
 import {
   BlobSASPermissions,
@@ -21,6 +22,7 @@ import {
   SASProtocol,
   StorageSharedKeyCredential,
 } from "@azure/storage-blob";
+import type { UpdateStatusParams } from "$types/TranscribeStatusDB";
 
 //const subscriptionKey = process.env.AZURE_LARGE_SPEECH_KEY || "";
 
@@ -32,17 +34,16 @@ export async function processTranscription(
   speechRegion: string,
   enableDiarization: boolean = false,
   numberOfMaxSpeakers: number = 2,
-  //): Promise<{ transcriptionText: string }> {
-): Promise<{ jsonData: TranscriptionResponse; transcriptionText: string }> {
+): Promise<{ transcriptionText: string }> {
+  //): Promise<{ jsonData: TranscriptionResponse; transcriptionText: string }> {
   try {
     // Step 1: Create transcription task
-    updateStatus(
+    updateStatus({
       uniqueName,
-      "Batch task initiated",
-      undefined,
-      enableDiarization,
-      numberOfMaxSpeakers,
-    );
+      name: "Batch task initiated",
+      diarizationEnabled: enableDiarization,
+      maxSpeakers: numberOfMaxSpeakers,
+    });
     const taskResponse = await createTranscriptionTask(
       blobUrl,
       enableDiarization,
@@ -52,36 +53,31 @@ export async function processTranscription(
       speechRegion,
     );
     console.log("Created trancription task:" + taskResponse.self);
-    updateStatus(
+    updateStatus({
       uniqueName,
-      "Batch task created",
-      taskResponse.status,
-      enableDiarization,
-      numberOfMaxSpeakers,
-      taskResponse.self,
-      taskResponse.properties.destinationContainerUrl,
-    );
+      name: "Batch task created",
+      status: taskResponse.status,
+      diarizationEnabled: enableDiarization,
+      maxSpeakers: numberOfMaxSpeakers,
+      taskUrl: taskResponse.self,
+      destUrl: taskResponse.properties.destinationContainerUrl,
+    });
 
-    const transcriptionData = await pollingAndStatus(
-      taskResponse.self,
-      uniqueName,
-      enableDiarization,
-      subscriptionKey,
-    );
-
-    //return { transcriptionText: "" };
-    return transcriptionData;
+    // const transcriptionData = await pollingAndStatus(
+    //   taskResponse.self,
+    //   uniqueName,
+    //   enableDiarization,
+    //   subscriptionKey,
+    // );
+    // return transcriptionData;
+    return { transcriptionText: "" };
   } catch (error) {
-    updateStatus(
+    updateStatus({
       uniqueName,
-      "Batch task failed",
-      "Failed",
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      `${error}`,
-    );
+      name: "Batch task failed",
+      status: "Failed",
+      error: `${error}`,
+    });
     console.error("Error processing transcription:", error);
     throw error;
   }
@@ -136,16 +132,12 @@ export async function createTranscriptionTask(
 
   if (!response.ok) {
     const errorDetails = await response.json();
-    updateStatus(
+    updateStatus({
       uniqueName,
-      "Create Batch task failed",
-      "Failed",
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      `${errorDetails}`,
-    );
+      name: "Create Batch task failed",
+      status: "Failed",
+      error: `${errorDetails}`,
+    });
     throw new Error(
       `Failed to create batch transcription: ${errorDetails.message}`,
     );
@@ -157,9 +149,10 @@ export async function createTranscriptionTask(
 
 async function createDestinationContainerUrl() {
   const storageAccountName =
-    process.env.AZURE_LARGE_STORAGE_ACCOUNT_NAME || "aiboxstore"; // Add your storage account name
-  const storageAccountKey = process.env.AZURE_LARGE_STORAGE_ACCOUNT_KEY || ""; // Add your storage account key
-  const containerName = "transcription-jobs";
+    process.env.AZURE_LARGE_STORAGE_ACCOUNT_NAME || "aiboxlarge";
+  const storageAccountKey = process.env.AZURE_LARGE_STORAGE_ACCOUNT_KEY || "";
+  const containerName =
+    process.env.AZURE_LARGE_CONTAINER_JOB_NAME || "transcription-jobs";
 
   const credential = new StorageSharedKeyCredential(
     storageAccountName,
@@ -172,17 +165,6 @@ async function createDestinationContainerUrl() {
 
   const containerClient = blobServiceClient.getContainerClient(containerName);
   await containerClient.createIfNotExists();
-
-  //const folderName = "TranscribeData";
-  // const placeholderBlobName = `${folderName}/.placeholder`; // Placeholder file in folder
-  // const placeholderBlobClient =
-  //   containerClient.getBlockBlobClient(placeholderBlobName);
-
-  // // Check if the folder (placeholder blob) exists, if not, create it
-  // const exists = await placeholderBlobClient.exists();
-  // if (!exists) {
-  //   await placeholderBlobClient.upload("", 0); // Upload an empty file
-  // }
 
   const expiryDate = new Date();
   expiryDate.setDate(expiryDate.getDate() + 1); // SAS token valid for a day
@@ -199,9 +181,7 @@ async function createDestinationContainerUrl() {
     credential,
   ).toString();
 
-  // const folderSasUrl = `${containerClient.url}/${folderName}?${sasToken}`;
   const folderSasUrl = `${containerClient.url}?${sasToken}`;
-
   return folderSasUrl;
 }
 
@@ -213,7 +193,7 @@ export async function pollingAndStatus(
 ): Promise<{ jsonData: TranscriptionResponse; transcriptionText: string }> {
   try {
     // Step 2: Poll transcription task status
-    updateStatus(uniqueName, "Polling initiated");
+    updateStatus({ uniqueName, name: "Polling initiated" });
     const pollResponse = await pollTranscriptionTask(
       taskUrl,
       uniqueName,
@@ -228,16 +208,12 @@ export async function pollingAndStatus(
     );
     return transcriptionData;
   } catch (error) {
-    updateStatus(
+    updateStatus({
       uniqueName,
-      "Batch task failed",
-      "Failed",
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      `${error}`,
-    );
+      name: "Batch task failed",
+      status: "Failed",
+      error: `${error}`,
+    });
     console.error("Error processing transcription:", error);
     throw error;
   }
@@ -252,59 +228,70 @@ export async function pollTranscriptionTask(
   while (true) {
     const task = await getTask(uniqueName);
     const currentBatch = getCurrentBatchStatus(task?.batchUpdate);
-
     const data = await fetchTranscriptionStatus(
       transcriptionIdUrl,
       subscriptionKey,
     );
 
-    switch (data.status) {
-      case BatchStatus.Succeeded:
-        if (!currentBatch.succeeded) {
-          await updateTaskStatus(uniqueName, data, "Polling completed.");
-        }
-        return data;
-
-      case BatchStatus.Failed:
-        if (!currentBatch.failed) {
-          await updateTaskStatus(
-            uniqueName,
-            data,
-            `Poll Batch task ${data.status}`,
-          );
-        }
-        throw new Error(
-          `Poll transcription task failed: ${data.properties.error?.message}`,
-        );
-
-      case BatchStatus.Running:
-        if (!currentBatch.running) {
-          await updateTaskStatus(
-            uniqueName,
-            data,
-            `Poll Batch task ${data.status}`,
-          );
-        }
-        //return data; // End the function after processing the running state
-        break;
-      default:
-        console.warn(`Unexpected batch status: ${data.status}`);
-        //return data; // Handle unexpected status
-        break;
+    if (!currentBatch[data.status.toLowerCase() as keyof typeof currentBatch]) {
+      await updateTaskStatus(uniqueName, data, getStatusMessage(data.status));
     }
-    // Wait 5 seconds before polling again
+
+    if (data.status === BatchStatus.Failed) {
+      throw new Error(
+        `Poll transcription task failed: ${data.properties.error?.message}`,
+      );
+    }
+
+    if (data.status === BatchStatus.Succeeded) {
+      return data;
+    }
+
+    if (![BatchStatus.Succeeded, BatchStatus.Running].includes(data.status)) {
+      console.warn(`Unexpected batch status: ${data.status}`);
+    }
+
     await new Promise((resolve) => setTimeout(resolve, 5000));
   }
 }
 
-function getCurrentBatchStatus(batchUpdate: BatchTask[] = []) {
-  return {
-    running: batchUpdate.find((batch) => batch.status === BatchStatus.Running),
-    succeeded: batchUpdate.find(
-      (batch) => batch.status === BatchStatus.Succeeded,
-    ),
-    failed: batchUpdate.find((batch) => batch.status === BatchStatus.Failed),
+export async function pollTranscriptionTask1(
+  transcriptionIdUrl: string,
+  uniqueName: string,
+  subscriptionKey: string,
+): Promise<PollStatusResponse> {
+  const task = await getTask(uniqueName);
+  const currentBatch = getCurrentBatchStatus(task?.batchUpdate);
+  const data = await fetchTranscriptionStatus(
+    transcriptionIdUrl,
+    subscriptionKey,
+  );
+
+  if (!currentBatch[data.status.toLowerCase() as keyof typeof currentBatch]) {
+    await updateTaskStatus(uniqueName, data, getStatusMessage(data.status));
+  }
+
+  if (data.status === BatchStatus.Failed) {
+    throw new Error(
+      `Poll transcription task failed: ${data.properties.error?.message}`,
+    );
+  }
+
+  if (![BatchStatus.Succeeded, BatchStatus.Running].includes(data.status)) {
+    console.warn(`Unexpected batch status: ${data.status}`);
+  }
+
+  return data;
+}
+
+function getStatusMessage(status: BatchStatus): string {
+  const messages: Record<BatchStatus, string> = {
+    [BatchStatus.Succeeded]: "Polling completed.",
+    [BatchStatus.Failed]: "Poll Batch task failed.",
+    [BatchStatus.Running]: "Poll Batch task running.",
+    [BatchStatus.NotStarted]: "Poll Batch task not started.",
   };
+  return messages[status] || `Unknown status: ${status}`;
 }
 
 async function fetchTranscriptionStatus(
@@ -331,16 +318,14 @@ async function updateTaskStatus(
   data: PollStatusResponse,
   message: string,
 ) {
-  await updateStatus(
+  await updateStatus({
     uniqueName,
-    message,
-    data.status,
-    undefined,
-    undefined,
-    data.links.files || undefined,
-    data.properties.destinationContainerUrl,
-    JSON.stringify(data),
-  );
+    name: message,
+    status: data.status,
+    taskUrl: data.links.files || undefined,
+    destUrl: data.properties.destinationContainerUrl,
+    report: JSON.parse(JSON.stringify(data)),
+  });
 }
 
 // Step 3-B: Process Transcription Results
@@ -352,22 +337,20 @@ export async function processTranscriptionResult(
 ): Promise<{ jsonData: TranscriptionResponse; transcriptionText: string }> {
   try {
     // Step 3: Get transcription content URLs
-    const { transcriptionUrl, reportUrl } = await getTranscriptionContentUrl(
+    const trancriptionResult = await getTranscriptionContentUrl(
       files,
       subscriptionKey,
     );
-    updateStatus(
+    updateStatus({
       uniqueName,
-      "Fetch trancrption report and file completed. Next, Get actual file data",
-      undefined,
-      undefined,
-      undefined,
-      `{transcriptionUrl: ${transcriptionUrl}, reportUrl: ${reportUrl}}`,
-    );
+      name: "Fetch trancrption report and file completed. Next, Get actual file data",
+      status: "Completed",
+      report: trancriptionResult,
+    });
 
     const trancriptionSASUrl = await generatePostFileSASToken(
-      transcriptionUrl,
-      30,
+      trancriptionResult.transcriptionUrl,
+      60,
     );
 
     // Step 4: Fetch transcription data
@@ -376,19 +359,15 @@ export async function processTranscriptionResult(
       enableDiarization,
       subscriptionKey,
     );
-    updateStatus(uniqueName, "Fetch file data completed");
+    updateStatus({ uniqueName, name: "Fetch file data completed" });
     return transcriptionData;
   } catch (error) {
-    updateStatus(
+    updateStatus({
       uniqueName,
-      "Batch task failed",
-      "Failed",
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      `${error}`,
-    );
+      name: "Batch task failed",
+      status: "Failed",
+      error: `${error}`,
+    });
     console.error("Error processing transcription:", error);
     throw error;
   }
@@ -561,16 +540,17 @@ function formatTranscription(response: TranscriptionResponse): string {
   return result;
 }
 
-async function updateStatus(
-  uniqueName: string,
-  name: string,
-  status?: string,
-  diarizationEnabled?: boolean,
-  maxSpeakers?: number,
-  taskUrl?: string,
-  destUrl?: string,
-  error?: string,
-) {
+export async function updateStatus({
+  uniqueName,
+  name,
+  status,
+  diarizationEnabled,
+  maxSpeakers,
+  taskUrl,
+  destUrl,
+  error,
+  report,
+}: UpdateStatusParams) {
   try {
     const batchStatus = status
       ? BatchStatus[status as keyof typeof BatchStatus]
@@ -584,6 +564,7 @@ async function updateStatus(
       ...(taskUrl && { taskUrl }),
       ...(destUrl && { destUrl }),
       ...(error && { error }),
+      ...(report && { report }),
     };
 
     console.log(`Status log: ${uniqueName} : ${status} : ${batchStatus}`);
@@ -591,6 +572,6 @@ async function updateStatus(
     await updateTask(uniqueName, { status: "processing" }, updates);
   } catch (err) {
     console.error(`Error updating status for ${uniqueName}:`, err);
-    throw err; // Optionally rethrow the error
+    throw err;
   }
 }

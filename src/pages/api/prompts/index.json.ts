@@ -193,7 +193,7 @@ export const GET: APIRoute = async (ctx) => {
     const promptId = ctx.url.searchParams.get("_id");
 
     if (promptId) {
-      const prompt = (await PromptModel.get(promptId)) as any;
+      const prompt = await PromptModel.get(promptId);
       if (!prompt) {
         return new Response(
           JSON.stringify({
@@ -207,18 +207,18 @@ export const GET: APIRoute = async (ctx) => {
 
       let instructions: Instruction[] = [];
       if (prompt?.instructions) {
-        const calls = prompt.instructions.map(async (inst: any) => {
+        const calls = prompt.instructions.map(async (inst) => {
           const instruction = await InstructionModel.get(inst.toString());
           return instruction;
         });
         instructions = (await Promise.all(calls)).filter(
-          (instr: any) => instr !== null,
+          (instr) => instr !== null,
         );
       }
 
       let knowledgebases: KnowledgeBase[] = [];
       if (prompt?.knowledgebase) {
-        const calls = prompt.knowledgebase.map(async (kb: any) => {
+        const calls = prompt.knowledgebase.map(async (kb) => {
           const instruction = await KnowledgeBaseModel.get(kb.toString());
           return instruction;
         });
