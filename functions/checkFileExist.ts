@@ -28,7 +28,6 @@ const checkFileExist: Handler = async (event, context) => {
     isDiarizationEnabled,
     encryptedSpeechKey,
   } = JSON.parse(event.body!);
-  console.log("fileNames", fileNames);
   let requireFilesCount = fileNames.length || 0;
   const tempFileNames: string[] = [];
 
@@ -37,8 +36,7 @@ const checkFileExist: Handler = async (event, context) => {
     requireFilesCount += 1;
     tempFileNames.push(improvedTxtFileName);
   }
-  console.log("isShowImprovedTextPreview", isShowImprovedTextPreview);
-  console.log("tempFileNames--1", tempFileNames);
+  
   const txtFileName = isDiarizationEnabled
     ? `${uniqueName}-mono.txt`
     : `${uniqueName}.txt`;
@@ -46,7 +44,6 @@ const checkFileExist: Handler = async (event, context) => {
     requireFilesCount += 1;
     tempFileNames.push(txtFileName);
   }
-  console.log("tempFileNames--2", tempFileNames);
   if ((fileNames?.length || tempFileNames.length) && uniqueName) {
     const streamPipeline = promisify(pipeline);
     const tmpDir = tmpdir();
