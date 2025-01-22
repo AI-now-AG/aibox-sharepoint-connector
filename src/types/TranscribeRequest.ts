@@ -21,6 +21,7 @@ export interface TranscribeRequest {
   azureOpenAIChatModel?: string;
   azureOpenAIApiKey?: string;
   openAIApiKey?: string;
+  encryptedSpeechKey?: string;
   speechKey?: string;
   speechRegion?: string;
   audioBuffer?: Buffer;
