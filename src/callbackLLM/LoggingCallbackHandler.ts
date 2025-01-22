@@ -1,3 +1,5 @@
+import TenantModel, { type Tenant } from "$data/models/tenant.model";
+import UserModel, { type User} from "$data/models/user.model";
 import { BaseCallbackHandler } from "@langchain/core/callbacks/base";
 import type { BaseMessage } from "@langchain/core/messages";
 import type { LLMResult } from "@langchain/core/outputs";
@@ -30,11 +32,21 @@ const getLogsCollection = async (): Promise<Collection> => {
 export class LoggingCallbackHandler extends BaseCallbackHandler {
   name = "logging_callback_handler";
 
+  private tenant: Tenant | null = null;
+  private user: User | null = null; 
+
   constructor(
     private tenantId: string,
     private userId: string,
+    private filename: string,
   ) {
     super();
+    this.initialize();
+  }
+
+  private async initialize() {
+    this.tenant = await TenantModel.get(this.tenantId);
+    this.user = await UserModel.get(this.userId);
   }
 
   async handleLLMStart(
@@ -50,7 +62,10 @@ export class LoggingCallbackHandler extends BaseCallbackHandler {
     const collection = await getLogsCollection();
     await collection.insertOne({
       tenant_id: new ObjectId(this.tenantId),
+      tenant_name: this.tenant?.name,
       creator_id: new ObjectId(this.userId),
+      creator_name: this.user?.name,
+      filename: this.filename,
       type: "user",
       model: llm.name,
       prompts,
@@ -64,11 +79,23 @@ export class LoggingCallbackHandler extends BaseCallbackHandler {
     });
   }
 
-  async handleChatModelStart(llm: Serialized, messages: BaseMessage[][], runId: string, parentRunId?: string, extraParams?: Record<string, unknown>, tags?: string[], metadata?: Record<string, unknown>, runName?: string) {
+  async handleChatModelStart(
+    llm: Serialized,
+    messages: BaseMessage[][],
+    runId: string,
+    parentRunId?: string,
+    extraParams?: Record<string, unknown>,
+    tags?: string[],
+    metadata?: Record<string, unknown>,
+    runName?: string,
+  ) {
     const collection = await getLogsCollection();
     await collection.insertOne({
       tenant_id: new ObjectId(this.tenantId),
+      tenant_name: this.tenant?.name,
       creator_id: new ObjectId(this.userId),
+      creator_name: this.user?.name,
+      filename: this.filename,
       type: "userchat",
       model: llm.name,
       messages,
@@ -91,7 +118,10 @@ export class LoggingCallbackHandler extends BaseCallbackHandler {
     const collection = await getLogsCollection();
     await collection.insertOne({
       tenant_id: new ObjectId(this.tenantId),
+      tenant_name: this.tenant?.name,
       creator_id: new ObjectId(this.userId),
+      creator_name: this.user?.name,
+      filename: this.filename,
       type: "system",
       response: output.generations,
       runId,
@@ -110,7 +140,9 @@ export class LoggingCallbackHandler extends BaseCallbackHandler {
     const collection = await getLogsCollection();
     await collection.insertOne({
       tenant_id: new ObjectId(this.tenantId),
+      tenant_name: this.tenant?.name,
       creator_id: new ObjectId(this.userId),
+      creator_name: this.user?.name,
       type: "error",
       error: err.message,
       runId,

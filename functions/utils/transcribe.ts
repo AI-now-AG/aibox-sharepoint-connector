@@ -110,7 +110,7 @@ function getOpenAIChatModel(transcribeParams: TranscribeRequest) {
   const openaiChatConfig = {
     openAIApiKey,
     model: process.env.OPENAI_MODEL,
-    callbacks: [new LoggingCallbackHandler(transcribeParams.tenantId, transcribeParams.userId)],
+    callbacks: [new LoggingCallbackHandler(transcribeParams.tenantId, transcribeParams.userId, transcribeParams.fileName)],
     tags: ["transcribe", "improve", "text", "quality", "openai"],
   };
   return new ChatOpenAI(openaiChatConfig);
@@ -130,7 +130,7 @@ function getAzureChatModel(transcribeParams: TranscribeRequest) {
       DEFAULT_CHAT_MODE_NAME,
     azureOpenAIApiVersion:
       process.env.AZURE_OPENAI_API_VERSION || DEFAULT_API_VERSION,
-    callbacks: [new LoggingCallbackHandler(transcribeParams.tenantId, transcribeParams.userId)],
+    callbacks: [new LoggingCallbackHandler(transcribeParams.tenantId, transcribeParams.userId, transcribeParams.fileName)],
     tags: ["transcribe", "improve", "text", "quality", "azure"],
   };
 
