@@ -193,6 +193,7 @@ export const tenant = {
       // Start a new client session for MongoDB operations.
       const session = client.startSession();
 
+      // Delete organization in Auth0; log error and continue if it fails.
       try {
         await organizationsManagement.deleteTenant(input._id);
       } catch (err) {
