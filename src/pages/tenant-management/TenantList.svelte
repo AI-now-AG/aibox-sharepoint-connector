@@ -100,13 +100,13 @@
     const { error } = result;
     if (!error) {
       addToast({
-        message: t("user.delete-successful"),
+        message: t("tenant.delete-successful"),
         type: "success",
       });
       await fetchTenants();
     } else {
       addToast({
-        message: t("user.delete-failed"),
+        message: t("tenant.delete-failed"),
         type: "error",
       });
     }
@@ -252,7 +252,7 @@
   <ConfirmDialog
     bind:modal={confirmDeleteModal}
     on:confirm={deleteTenant}
-    title={t("user.delete-confirm-message")}
-    description={t('user.delete-description-message')}
+    title={t("tenant.delete-confirm-message")}
+    description={t('tenant.delete-description-message')}
   />
 </div>
