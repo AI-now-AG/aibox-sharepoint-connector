@@ -164,7 +164,7 @@
           const newAssistantMessage = {
             role: MessageRole.Assistant,
             content: output,
-            rawData: partialData,
+            rawData: stripHtmlFormatting(output),
           };
           sharedMessageHistory.update((messages) => [
             ...messages,
@@ -196,6 +196,13 @@
     text = text.replace(/^# (.*)$/gm, "<h1 class='text-2xl'>$1</h1>");
     text = text.replace(/\n/g, "<br>");
     return text;
+  }
+
+  function stripHtmlFormatting(text: string): string {
+    text = text.replace(/<\/?(strong|em|u|del|code|pre|h[1-6][^>]*)>/gi, "");
+    text = text.replace(/<br>/gi, "\n");
+    text = text.replace(/<[^>]+>/g, "");
+    return text.trim();
   }
 
   function clearText() {
