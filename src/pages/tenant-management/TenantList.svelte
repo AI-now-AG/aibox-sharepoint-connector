@@ -93,7 +93,7 @@
   }
 
   async function deleteTenant() {
-    const { _id = "" } = selectedTenant;
+    const { _id } = selectedTenant;
     let result = await actions.tenant.delete({
       _id,
     });
