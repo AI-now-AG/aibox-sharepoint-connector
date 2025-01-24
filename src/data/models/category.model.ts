@@ -66,6 +66,12 @@ export default {
     return collection.deleteOne({ _id });
   },
 
+  removeByTenant: async (tenantId: string | ObjectId) => {
+    const objectId =
+      tenantId instanceof ObjectId ? tenantId : new ObjectId(tenantId);
+    return collection.deleteMany({ tenant_id: objectId });
+  },
+
   list: async () =>
     collection
       .find<Document<Category>>({})

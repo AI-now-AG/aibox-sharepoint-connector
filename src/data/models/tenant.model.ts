@@ -125,17 +125,15 @@ export default {
     );
   },
 
-  active: async (id: string) => {
-    return await collection.updateOne(
-      { _id: new ObjectId(id) },
-      { $set: { active: true } },
-    );
+  remove: async (id: string) => {
+    const _id = new ObjectId(id);
+    return collection.deleteOne({ _id });
   },
 
-  archive: async (id: string) => {
+  updateActiveStatus: async (id: string, isActive: boolean) => {
     return await collection.updateOne(
       { _id: new ObjectId(id) },
-      { $set: { active: false } },
+      { $set: { active: isActive } },
     );
   },
 

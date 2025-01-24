@@ -4,6 +4,7 @@ import type {
   PostOrganizationsRequest,
 } from "auth0";
 import { ObjectId } from "mongodb";
+import { client } from "$data/mongodb";
 import { z } from "zod";
 import { decrypt, encrypt } from "$utils/secure";
 import { transformRawData } from "$utils/transformRawData";
@@ -15,6 +16,9 @@ import TenantModel, {
   TenantTheme,
   type Tenant,
 } from "$data/models/tenant.model";
+import PromptModel from "$data/models/prompt.model";
+import CategoryModel from "$data/models/category.model";
+import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
 import { ApiKeyProvider } from "$types/TenantFeature";
 
 const TenantInputParamsSchema = z.object({
@@ -69,60 +73,99 @@ export const tenant = {
   create: defineAction({
     input: TenantInputParamsSchema,
     handler: async (input) => {
-      // create new organization on auth0
-      const bodyParameters: PostOrganizationsRequest = {
-        name: input.org_name,
-        display_name: input.name,
-      };
-      const organizationResult =
-        await organizationsManagement.create(bodyParameters);
+      // Start a new client session for MongoDB operations.
+      const session = client.startSession();
 
-      // add connection on auth0
-      await organizationsManagement.addEnabledConnection(
-        organizationResult.data.id,
-        import.meta.env.AUTH0_AUTH_CON_ID || "con_RXTD1LIbXJgceOUH",
-      );
+      try {
+        // Start a transaction to ensure atomicity.
+        session.startTransaction();
 
-      // store tenant on mongodb
-      const { id: organizationId } = organizationResult.data;
-      const tenant: Partial<Omit<Tenant, "_id">> = {
-        ...input,
-        org_id: organizationId,
-      };
-      const insertResult = await TenantModel.create(tenant);
+        // create new organization on auth0
+        const bodyParameters: PostOrganizationsRequest = {
+          name: input.org_name,
+          display_name: input.name,
+        };
+        const organizationResult =
+          await organizationsManagement.create(bodyParameters);
 
-      return transformRawData(insertResult);
+        // add connection on auth0
+        await organizationsManagement.addEnabledConnection(
+          organizationResult.data.id,
+          import.meta.env.AUTH0_AUTH_CON_ID || "con_RXTD1LIbXJgceOUH",
+        );
+
+        // store tenant on mongodb
+        const { id: organizationId } = organizationResult.data;
+        const tenant: Partial<Omit<Tenant, "_id">> = {
+          ...input,
+          org_id: organizationId,
+        };
+        const insertResult = await TenantModel.create(tenant);
+
+        // If everything goes well, commit the transaction
+        await session.commitTransaction();
+
+        return transformRawData(insertResult);
+      } catch (error) {
+        // If an error occurs, abort the transaction and log the error
+        await session.abortTransaction();
+        throw error;
+      } finally {
+        // End the session after the transaction
+        session.endSession();
+      }
     },
   }),
 
   update: defineAction({
     input: z.intersection(TenantInputParamsSchema, TenantInputIdentifierSchema),
     handler: async (input) => {
-      // Update tenant in the local database.
-      const update: Partial<Tenant> = {
-        ...input,
-        _id: new ObjectId(input._id),
-      };
-      const updatedDocument = await TenantModel.update(input._id, update);
+      // Start a new client session for MongoDB operations.
+      const session = client.startSession();
 
-      // Update an existing organization in Auth0
-      const bodyParameters: PatchOrganizationsByIdRequest = {
-        name: input.org_name,
-        display_name: input.name,
-      };
-      await organizationsManagement.update(
-        updatedDocument?.org_id,
-        bodyParameters,
-      );
+      try {
+        // Start a transaction to ensure atomicity.
+        session.startTransaction();
 
-      return transformRawData(updatedDocument);
+        // Update tenant in the local database.
+        const update: Partial<Tenant> = {
+          ...input,
+          _id: new ObjectId(input._id),
+        };
+        const updatedDocument = await TenantModel.update(input._id, update);
+
+        // Update an existing organization in Auth0
+        const bodyParameters: PatchOrganizationsByIdRequest = {
+          name: input.org_name,
+          display_name: input.name,
+        };
+        await organizationsManagement.update(
+          updatedDocument?.org_id,
+          bodyParameters,
+        );
+
+        // If everything goes well, commit the transaction
+        await session.commitTransaction();
+
+        return transformRawData(updatedDocument);
+      } catch (error) {
+        // If an error occurs, abort the transaction and log the error
+        await session.abortTransaction();
+        throw error;
+      } finally {
+        // End the session after the transaction
+        session.endSession();
+      }
     },
   }),
 
   active: defineAction({
     input: TenantInputIdentifierSchema,
     handler: async (input) => {
-      const updateResult = await TenantModel.active(input._id);
+      const updateResult = await TenantModel.updateActiveStatus(
+        input._id,
+        true,
+      );
       return transformRawData(updateResult);
     },
   }),
@@ -130,8 +173,58 @@ export const tenant = {
   archive: defineAction({
     input: TenantInputIdentifierSchema,
     handler: async (input) => {
-      const updateResult = await TenantModel.archive(input._id);
+      const updateResult = await TenantModel.updateActiveStatus(
+        input._id,
+        false,
+      );
       return transformRawData(updateResult);
+    },
+  }),
+
+  delete: defineAction({
+    input: TenantInputIdentifierSchema,
+    handler: async (input) => {
+      // Retrieve the user details from the database.
+      const user = await TenantModel.get(input._id);
+      if (!user || Object.keys(user).length == 0) {
+        throw new Error("User does not exists.");
+      }
+
+      // Start a new client session for MongoDB operations.
+      const session = client.startSession();
+
+      // Delete organization in Auth0; log error and continue if it fails.
+      try {
+        const tenant = await TenantModel.get(input._id);
+        if (tenant) {
+          await organizationsManagement.deleteTenant(tenant.org_id);
+        }
+      } catch (err) {
+        console.error("delete tenant on Auth0 error", err);
+      }
+
+      try {
+        // Start a transaction to ensure atomicity.
+        session.startTransaction();
+
+        // Delete all prompts, categories, groups and knowledge bases
+        await CategoryModel.removeByTenant(input._id);
+        await KnowledgeBaseModel.removeByTenant(input._id);
+        await PromptModel.removeByTenant(input._id);
+        await TenantModel.remove(input._id);
+
+        // If everything goes well, commit the transaction
+        await session.commitTransaction();
+
+        return transformRawData({});
+      } catch (error) {
+        // If an error occurs, abort the transaction and log the error
+        await session.abortTransaction();
+        throw error;
+      } finally {
+        // End the session after the transaction
+        session.endSession();
+      }
     },
   }),
 

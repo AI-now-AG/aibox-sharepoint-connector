@@ -12,6 +12,7 @@ import type {
   PostMembersRequest,
   PostOrganizationMemberRolesOperationRequest,
   PostOrganizationMemberRolesRequest,
+  DeleteOrganizationsByIdRequest,
   DeleteOrganizationMemberRolesOperationRequest,
   DeleteOrganizationMemberRolesRequest,
 } from "auth0";
@@ -52,6 +53,19 @@ export const update = async (
   } catch (err) {
     console.error("auth0: update organization error", err);
     throw err;
+  }
+};
+
+export const deleteTenant = async (userId: string) => {
+  try {
+    const requestParameters: DeleteOrganizationsByIdRequest = {
+      id: userId,
+    };
+
+    return await management.organizations.delete(requestParameters);
+  } catch (error) {
+    console.error("auth0: delete organization error", error);
+    throw error;
   }
 };
 
@@ -180,6 +194,7 @@ export default {
   get,
   create,
   update,
+  deleteTenant,
   addEnabledConnection,
   deleteEnabledConnection,
   getMemberRoles,

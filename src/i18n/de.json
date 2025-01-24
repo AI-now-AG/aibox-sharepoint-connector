@@ -267,5 +267,8 @@
   "tenant.settings.large-file-azure": "Audio Pro (Azure Speech Service)",
   "tenant.settings.large-file-azure-apiKey": "API Key",
   "tenant.settings.large-file-azure-region": "Region",
+  "tenant.delete-confirm-message": "Wollen sie alle Daten dieses Tenants unwiederruflich Löschen? Die Aktion kann nicht rückgängig gemacht werden. ",
+  "tenant.delete-successful": "Tenant erfolgreich gelöscht",
+  "tenant.delete-failed": "Löschen des Tenants fehlgeschlagen",
   "user.id": "Benutzer-ID"
 }
