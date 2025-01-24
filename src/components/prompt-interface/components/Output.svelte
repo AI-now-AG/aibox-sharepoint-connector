@@ -36,6 +36,33 @@
     });
   };
 
+  const handleCopy = (event) => {
+    const selection = window.getSelection();
+    const range = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+
+    if (!range) {
+      return;
+    }
+    event.preventDefault();
+
+    const container = document.createElement("div");
+    container.appendChild(range.cloneContents());
+
+    const richText = container.innerHTML;
+    const plainText = selection.toString();
+
+    event.clipboardData.setData("text/html", richText);
+    event.clipboardData.setData("text/plain", plainText);
+  };
+
+  onMount(() => {
+    document.addEventListener("copy", handleCopy);
+
+    return () => {
+      document.removeEventListener("copy", handleCopy);
+    };
+  });
+
   /*onMount(() => {
     element.addEventListener("scroll", function (e) {
       const { scrollHeight, scrollTop, clientHeight } = e.target;
