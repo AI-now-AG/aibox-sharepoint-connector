@@ -267,8 +267,7 @@
   "tenant.settings.large-file-azure": "Audio Pro (Azure Speech Service)",
   "tenant.settings.large-file-azure-apiKey": "API Key",
   "tenant.settings.large-file-azure-region": "Region",
-  "tenant.delete-confirm-message": "Sind Sie sicher, dass Sie diesen Mieter löschen möchten?",
-  "tenant.delete-description-message": "Diese Aktion ist dauerhaft und kann nicht rückgängig gemacht werden",
+  "tenant.delete-confirm-message": "Wenn Sie den Mieter löschen, werden alle Daten, Benutzer und Eingabeaufforderungen gelöscht. Dies kann nicht rückgängig gemacht werden. Sind Sie sicher?",
   "tenant.delete-successful": "Mieter erfolgreich gelöscht",
   "tenant.delete-failed": "Löschen des Mieters fehlgeschlagen",
   "user.id": "Benutzer-ID"

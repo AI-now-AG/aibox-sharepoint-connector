@@ -267,8 +267,7 @@
   "tenant.settings.large-file-azure": "Audio Pro (Azure Speech Service)",
   "tenant.settings.large-file-azure-apiKey": "API Key",
   "tenant.settings.large-file-azure-region": "Region",
-  "tenant.delete-confirm-message": "Are you sure you want to delete this tenant?",
-  "tenant.delete-description-message": "This action is permanent and cannot be undone",
+  "tenant.delete-confirm-message": "If you delete the tenant, all data, users and prompts are going to be deleted. This cannot be undone. Are you sure?",
   "tenant.delete-successful": "Delete tenant successful",
   "tenant.delete-failed": "Delete tenant failed",
   "user.id": "User Id"
