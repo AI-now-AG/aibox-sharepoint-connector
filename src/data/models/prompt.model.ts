@@ -56,7 +56,7 @@ export default {
   removeByTenant: async (tenantId: string | ObjectId) => {
     const objectId =
       tenantId instanceof ObjectId ? tenantId : new ObjectId(tenantId);
-    return collection.deleteMany({ tenant_id: tenantId });
+    return collection.deleteMany({ tenant_id: objectId });
   },
 
   get: async (id: string): Promise<Prompt | null> => {
