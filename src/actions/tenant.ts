@@ -195,7 +195,10 @@ export const tenant = {
 
       // Delete organization in Auth0; log error and continue if it fails.
       try {
-        await organizationsManagement.deleteTenant(input._id);
+        const tenant = await TenantModel.get(input._id);
+        if (tenant) {
+          await organizationsManagement.deleteTenant(tenant.org_id);
+        }
       } catch (err) {
         console.error("delete tenant on Auth0 error", err);
       }
