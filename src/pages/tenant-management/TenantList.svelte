@@ -4,6 +4,7 @@
   import { useTranslations } from "$i18n/utils";
   import { onMount } from "svelte";
   import log from "$utils/log";
+  import { tenant as currentTenant } from "$stores";
   import { addToast } from "$stores/toast";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import Loading from "$components/Loading.svelte";
@@ -104,6 +105,11 @@
         type: "success",
       });
       await fetchTenants();
+
+      // Log out the user if the current tenant being deleted matches the current tenant
+      if (selectedTenant._id == currentTenant._id) {
+        window.location.href = "/api/logout";
+      }
     } else {
       addToast({
         message: t("tenant.delete-failed"),
