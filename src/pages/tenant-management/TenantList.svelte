@@ -211,6 +211,7 @@
                         >
                       </button>
                     </li>
+                    {#if !tenant.active}
                     <li>
                       <button
                         class="flex block w-full text-left px-4 py-1 text-sm hover:underline"
@@ -222,6 +223,7 @@
                         >
                       </button>
                     </li>
+                    {/if}
                     <li>
                       <a
                         class="flex block w-full text-left px-4 py-1 text-sm hover:underline"
