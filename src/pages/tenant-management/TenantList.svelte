@@ -107,7 +107,6 @@
       await fetchTenants();
 
       // Log out the user if the current tenant being deleted matches the current tenant
-      console.log('deleteTenant', {selectedTenant, $currentTenant});
       if (selectedTenant._id == $currentTenant._id) {
         window.location.href = "/api/logout";
       }
