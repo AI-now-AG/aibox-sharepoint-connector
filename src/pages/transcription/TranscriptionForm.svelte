@@ -209,7 +209,7 @@
   }*/
 
   function isFileTypeValid(type: string): boolean {
-    if(!type) {
+    if (!type) {
       fileErrorMessage = t("transcription.file-validation.unsupported-type");
       return false;
     }
@@ -375,7 +375,7 @@
     const { name, size, type } = audioFile;
     if (isFileValid({ name, size, type })) {
       // Calculate duration for audio/video file
-      if(transcriptionType !== TranscriptionType.Subtitlesjson) {
+      if (transcriptionType !== TranscriptionType.Subtitlesjson) {
         audioDuration = await calculateDuration(audioFile);
       }
 
@@ -478,7 +478,10 @@
 
       if (response.ok) {
         tempOutputFileNames = [];
-        if (transcriptionType === TranscriptionType.Subtitles || transcriptionType === TranscriptionType.Subtitlesjson) {
+        if (
+          transcriptionType === TranscriptionType.Subtitles ||
+          transcriptionType === TranscriptionType.Subtitlesjson
+        ) {
           selectedFileFormat.forEach((format) => {
             tempOutputFileNames.push(`${tempOutputFileName}.${format}`);
           });
@@ -574,8 +577,8 @@
           fileNames: tempOutputFileNames,
           folderName: folderName,
           isShowImprovedTextPreview:
-          transcriptionType === TranscriptionType.Subtitles ||
-          transcriptionType === TranscriptionType.Subtitlesjson
+            transcriptionType === TranscriptionType.Subtitles ||
+            transcriptionType === TranscriptionType.Subtitlesjson
               ? showTextPreviewChecked
               : false,
           typedTranscriptionType: transcriptionType,
@@ -1155,55 +1158,57 @@
               <div class="basis-1/8">03</div> -->
             </div>
           </div>
-          <div><div class="bg-base-200 h-0.5"></div></div>
-          <div class="card rounded-box grid py-8">
-            <div class="flex flex-row place-items-center gap-8">
-              <input
-                type="checkbox"
-                bind:checked={rawOutputChecked}
-                class="checkbox checked:checkbox-primary"
-              />
-              <div class="basis-1/3">
-                <div class="flex flex-row place-items-center gap-4">
-                  <div class="avatar placeholder">
-                    <div class="bg-base-200 text-neutral p-3 rounded-full">
-                      {@html svgIcons.codeIcon}
+          {#if transcriptionType === TranscriptionType.Subtitles}
+            <div><div class="bg-base-200 h-0.5"></div></div>
+            <div class="card rounded-box grid py-8">
+              <div class="flex flex-row place-items-center gap-8">
+                <input
+                  type="checkbox"
+                  bind:checked={rawOutputChecked}
+                  class="checkbox checked:checkbox-primary"
+                />
+                <div class="basis-1/3">
+                  <div class="flex flex-row place-items-center gap-4">
+                    <div class="avatar placeholder">
+                      <div class="bg-base-200 text-neutral p-3 rounded-full">
+                        {@html svgIcons.codeIcon}
+                      </div>
+                    </div>
+
+                    <div class="flex flex-col">
+                      <h2 class="font-semibold">
+                        {t("audiotools.subtitles.raw-output")}
+                      </h2>
+                      <p class="text-base-content/60">
+                        {t("audiotools.subtitles.no-text-improvement")}
+                      </p>
                     </div>
                   </div>
-
-                  <div class="flex flex-col">
-                    <h2 class="font-semibold">
-                      {t("audiotools.subtitles.raw-output")}
-                    </h2>
-                    <p class="text-base-content/60">
-                      {t("audiotools.subtitles.no-text-improvement")}
-                    </p>
+                </div>
+                <div class="basis-1/3">
+                  <div class="flex flex-row place-items-center gap-8">
+                    <label class="cursor-pointer label">
+                      <input
+                        type="checkbox"
+                        bind:checked={jsonFileChecked}
+                        class="checkbox checked:checkbox-primary checkbox-xs"
+                      />
+                      <span class="label-text ml-2">.json</span>
+                    </label>
+                    <label class="cursor-pointer label">
+                      <input
+                        type="checkbox"
+                        bind:checked={txtFileChecked}
+                        class="checkbox checked:checkbox-primary checkbox-xs"
+                      />
+                      <span class="label-text ml-2">.txt</span>
+                    </label>
                   </div>
                 </div>
+                <!-- <div class="basis-1/8">03</div> -->
               </div>
-              <div class="basis-1/3">
-                <div class="flex flex-row place-items-center gap-8">
-                  <label class="cursor-pointer label">
-                    <input
-                      type="checkbox"
-                      bind:checked={jsonFileChecked}
-                      class="checkbox checked:checkbox-primary checkbox-xs"
-                    />
-                    <span class="label-text ml-2">.json</span>
-                  </label>
-                  <label class="cursor-pointer label">
-                    <input
-                      type="checkbox"
-                      bind:checked={txtFileChecked}
-                      class="checkbox checked:checkbox-primary checkbox-xs"
-                    />
-                    <span class="label-text ml-2">.txt</span>
-                  </label>
-                </div>
-              </div>
-              <!-- <div class="basis-1/8">03</div> -->
             </div>
-          </div>
+          {/if}
         </div>
       </div>
     </div>
