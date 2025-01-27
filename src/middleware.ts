@@ -9,6 +9,7 @@ import {
   FEATURE_MAP_ROUTES,
   FEATURE_PLAINTEXT_ROUTE,
   FEATURE_SUBTITLES_ROUTE,
+  FEATURE_SUBTITLESJSON_ROUTE,
   FEATURE_SUMMARY_ROUTE,
   FEATURE_LARGEFILE_ROUTE,
 } from "$constants";
@@ -137,6 +138,9 @@ async function restrictAccess(context: APIContext, next: MiddlewareNext) {
     } else if (context.url.pathname === FEATURE_SUBTITLES_ROUTE) {
       hasAccess =
         context.locals.tenant.transcriptions?.subtitles?.enabled ?? true;
+    } else if (context.url.pathname === FEATURE_SUBTITLESJSON_ROUTE) {
+      hasAccess =
+        context.locals.tenant.transcriptions?.subtitlesjson?.enabled ?? true;
     } else if (context.url.pathname === FEATURE_SUMMARY_ROUTE) {
       hasAccess =
         context.locals.tenant.transcriptions?.summary?.enabled ?? true;

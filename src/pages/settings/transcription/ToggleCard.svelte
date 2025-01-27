@@ -16,7 +16,7 @@
     isMounted = true;
   });
 
-  export let transcriptionCard: TranscriptionCard | undefined = undefined;
+  export let transcriptionCard: TranscriptionCard;
 
   $: if (transcriptionCard) {
     instructionTitle = transcriptionCard.title || "";
@@ -43,6 +43,7 @@
       {
         plaintext: { field: "plaintext", text: instructionText },
         subtitles: { field: "subtitles", text: instructionText },
+        subtitlesjson: { field: "subtitlesjson", text: instructionText },
         summary: { field: "summary", text: instructionText },
         largefile: { field: "largefile", text: instructionText },
       };
@@ -91,7 +92,7 @@
             class="toggle toggle-primary"
             bind:checked={transcriptionCard.toggle}
             on:change={(event) =>
-              updateTranscriptionSetting(event.target.checked)}
+              updateTranscriptionSetting(event.target?.checked)}
           />
         </label>
       {/if}

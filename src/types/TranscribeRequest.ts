@@ -39,6 +39,7 @@ export enum TranscriptionType {
   Plaintext = "plaintext",
   Summarize = "summary",
   Subtitles = "subtitles",
+  Subtitlesjson = "subtitlesjson",
   Largefile = "largefile",
 }
 
@@ -51,4 +52,18 @@ export interface TranscriptionResult {
     };
   } | null;
   error: string | null;
+}
+
+export interface TranscribeResponse {
+  task: string;
+  language: string;
+  duration: number;
+  text: string;
+  words: Word[];
+}
+
+export interface Word {
+  word: string;
+  start: number;
+  end: number;
 }

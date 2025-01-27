@@ -33,6 +33,7 @@ export const SUPER_ADMIN_ROUTES = [
 
 export const FEATURE_PLAINTEXT_ROUTE = "/transcription/plaintext";
 export const FEATURE_SUBTITLES_ROUTE = "/transcription/subtitles";
+export const FEATURE_SUBTITLESJSON_ROUTE = "/transcription/subtitlesjson";
 export const FEATURE_SUMMARY_ROUTE = "/transcription/summary";
 export const FEATURE_LARGEFILE_ROUTE = "/transcription/largefile";
 
