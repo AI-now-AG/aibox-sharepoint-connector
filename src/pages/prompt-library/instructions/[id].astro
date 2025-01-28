@@ -14,8 +14,8 @@ if (id === undefined) {
 }
 
 const instruction = await InstructionModel.get(id || ""); // TODO: Render 404 if not found
-if (instruction === null) {
-  throw new Error("Instruction not found");
+if (!instruction) {
+  return Astro.redirect("/404");
 }
 
 let userPermissions = Astro.locals.user.permissions;

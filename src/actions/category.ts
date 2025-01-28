@@ -13,6 +13,19 @@ const CategoryInputListIdentifierSchema = z.array(
   }),
 );
 
+const CategoryItemSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  active: z.boolean().optional(),
+});
+
+export const ViewCategorySchema = z.object({
+  updated: z.boolean(),
+  items: z.array(CategoryItemSchema),
+});
+
+export type ViewCategory = z.infer<typeof CategoryItemSchema>;
+
 export const category = {
   activate: defineAction({
     input: CategoryInputIdentifierSchema,
@@ -37,14 +50,23 @@ export const category = {
   updatePosition: defineAction({
     input: CategoryInputListIdentifierSchema,
     handler: async (input) => {
+      let updated = false;
       const items: Category[] = [];
+
       for (const [index, item] of input.entries()) {
-        const updateResult = await CategoryModel.update(item._id, {
-          position: index,
-        });
-        items.push(transformRawData(updateResult));
+        const currentItem = await CategoryModel.get(item._id);
+
+        if (currentItem && currentItem.position !== index) {
+          const updateResult = await CategoryModel.findAndUpdate(item._id, {
+            position: index,
+          });
+          items.push(transformRawData(updateResult));
+          updated = true;
+        } else {
+          items.push(transformRawData(currentItem));
+        }
       }
-      return items;
+      return { updated, items };
     },
   }),
 };

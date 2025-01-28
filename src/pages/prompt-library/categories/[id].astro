@@ -13,11 +13,12 @@ if (id === undefined) {
   throw new Error("Id is required");
 }
 
-const instruction = await CategoryModel.get(id); // TODO: Render 404 if not found
-if (instruction === null) {
-  throw new Error("Instruction not found");
+const category = await CategoryModel.getConvertedObj(id);
+if (!category || category.tenant_id !== Astro.locals.tenant._id.toString()) {
+  return Astro.redirect("/404");
 }
-const formattedInstruction: any = { ...instruction, ...{ _id: id } };
+
+const formattedCategory = { ...category, ...{ _id: id } };
 
 let userPermissions = Astro.locals.user.permissions;
 ---
@@ -25,8 +26,7 @@ let userPermissions = Astro.locals.user.permissions;
 <Layout>
   <div>
     <CategoryForm
-      categoryId={id}
-      category={formattedInstruction}
+      category={formattedCategory}
       isEditable={userPermissions.includes(Permission.AdminAll)}
       client:load
     />

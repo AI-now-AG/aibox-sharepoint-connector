@@ -16,8 +16,7 @@ if (id === undefined) {
 }
 
 const tenant = await TenantModel.get(id);
-if (tenant === null) {
-  console.error("Tenant not found");
+if (!tenant) {
   return Astro.redirect("/404");
 }
 

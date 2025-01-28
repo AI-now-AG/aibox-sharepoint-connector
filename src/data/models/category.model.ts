@@ -7,7 +7,6 @@ export const GroupSchema = z.object({
   title: z.string(),
   slug: z.string().optional(),
   active: z.boolean().default(true).optional(),
-  position: z.number().default(0).optional(),
 });
 
 const CategorySchema = z.object({
@@ -90,9 +89,19 @@ export default {
       .sort({ position: 1, created_at: 1 });
   },
 
-  get: async (id: string) => {
+  get: async (id: string): Promise<Category | null> => {
     if (!ObjectId.isValid(id)) {
-      return Promise.resolve({});
+      return null;
+    }
+    const _id = new ObjectId(id);
+    const doc = await collection.findOne<Document<Category>>({ _id });
+    if (!doc) return null;
+    return doc;
+  },
+
+  getConvertedObj: async (id: string) => {
+    if (!ObjectId.isValid(id)) {
+      return null;
     }
     const _id = new ObjectId(id);
     const doc = await collection.findOne<Document<Category>>({ _id });
@@ -129,6 +138,17 @@ export default {
     const result = await collection.updateOne(
       { _id },
       { $set: { ...validated } },
+    );
+    return result;
+  },
+
+  findAndUpdate: async (id: string, updatedInstruction: Partial<Category>) => {
+    const _id = new ObjectId(id);
+    const validated = CategoryGroupSchema.partial().parse(updatedInstruction);
+    const result = await collection.findOneAndUpdate(
+      { _id },
+      { $set: { ...validated } },
+      { returnDocument: "after" },
     );
     return result;
   },

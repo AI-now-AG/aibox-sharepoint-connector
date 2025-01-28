@@ -18,7 +18,7 @@
   let searchValue: string = "";
   let timeout: any;
 
-  let selectedTenant:any = null;
+  let selectedTenant: any = null;
   let confirmUpdateModal: HTMLDialogElement;
   let confirmDeleteModal: HTMLDialogElement;
 
@@ -41,7 +41,7 @@
     }
   };
 
-  const copyName = (name:string) => {
+  const copyName = (name: string) => {
     navigator.clipboard.writeText(name).then(
       function () {
         addToast({
@@ -55,7 +55,7 @@
     );
   };
 
-  function confirmUpdateStatus(tenant:any) {
+  function confirmUpdateStatus(tenant: any) {
     selectedTenant = tenant;
     confirmUpdateModal?.show();
   }
@@ -87,7 +87,7 @@
     }
   };
 
-  function confirmDelete(tenant:any) {
+  function confirmDelete(tenant: any) {
     selectedTenant = tenant;
     confirmDeleteModal?.show();
   }
@@ -120,7 +120,12 @@
 </script>
 
 <div class="container max-w-full mx-auto p-6">
-  <InputSearchFilter bind:value={searchValue} on:search={fetchTenants} bind:showArchived={showArchived} on:filter={fetchTenants} />
+  <InputSearchFilter
+    bind:value={searchValue}
+    on:search={fetchTenants}
+    bind:showArchived
+    on:filter={fetchTenants}
+  />
 
   <div>
     <h2 class="text-lg font-normal mb-4">
@@ -212,17 +217,15 @@
                       </button>
                     </li>
                     {#if !tenant.active}
-                    <li>
-                      <button
-                        class="flex block w-full text-left px-4 py-1 text-sm hover:underline"
-                        on:click={() => confirmDelete(tenant)}
-                      >
-                        {@html svgIcons.trash}
-                        <span class="ml-1"
-                          >{t("common.delete")}</span
+                      <li>
+                        <button
+                          class="flex block w-full text-left px-4 py-1 text-sm hover:underline"
+                          on:click={() => confirmDelete(tenant)}
                         >
-                      </button>
-                    </li>
+                          {@html svgIcons.trash}
+                          <span class="ml-1">{t("common.delete")}</span>
+                        </button>
+                      </li>
                     {/if}
                     <li>
                       <a
@@ -260,6 +263,6 @@
   <ConfirmDialog
     bind:modal={confirmDeleteModal}
     on:confirm={deleteTenant}
-    description={t('tenant.delete-confirm-message')}
+    description={t("tenant.delete-confirm-message")}
   />
 </div>

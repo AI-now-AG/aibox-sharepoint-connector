@@ -14,8 +14,8 @@ if (id === undefined) {
 
 const prompt = await Prompts.getAsString(id || ""); // TODO: Render 404 if not found
 
-if (prompt === null) {
-  throw new Error("Prompt not found");
+if (!prompt || prompt.tenant_id !== Astro.locals.tenant._id.toString()) {
+  return Astro.redirect("/404");
 }
 
 const userPermissions = Astro.locals.user.permissions;

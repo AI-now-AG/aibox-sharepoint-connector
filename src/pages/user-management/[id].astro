@@ -3,7 +3,6 @@ import Layout from "$layouts/Layout.astro";
 import UserForm from "./UserForm.svelte";
 import UserModel from "$data/models/user.model";
 import { transformRawData } from "$utils/transformRawData";
-import log from "$utils/log";
 
 export interface Props {
   id: string;
@@ -17,12 +16,9 @@ if (id === undefined) {
 }
 
 const user = await UserModel.get(id);
-if (user === null) {
-  console.error("User not found");
+if (!user || user.tenant_id !== Astro.locals.tenant._id) {
   return Astro.redirect("/404");
 }
-
-log.i(user, "user");
 
 const data = transformRawData(user);
 ---

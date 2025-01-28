@@ -13,9 +13,9 @@ if (id === undefined) {
   throw new Error("Id is required");
 }
 
-const knowledgeBase = await KnowledgeBaseModel.get(id || ""); // TODO: Render 404 if not found
-if (knowledgeBase === null) {
-  throw new Error("KnowledgeBase not found");
+const knowledgeBase = await KnowledgeBaseModel.get(id || "");
+if (!knowledgeBase || knowledgeBase.tenant_id !== Astro.locals.tenant._id) {
+  return Astro.redirect("/404");
 }
 
 let userPermissions = Astro.locals.user.permissions;

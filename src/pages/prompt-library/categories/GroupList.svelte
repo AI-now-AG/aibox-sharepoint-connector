@@ -25,7 +25,6 @@
 
   function handleDndConsider(e: CustomEvent) {
     items = e.detail.items;
-    console.log("group list / consider dispatched", { items });
   }
 
   function handleDndFinalize(e: CustomEvent) {
