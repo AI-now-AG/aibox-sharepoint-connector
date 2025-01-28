@@ -129,7 +129,6 @@ export const PUT: APIRoute = async (ctx) => {
         _id: groupId,
         title: group.title,
         slug: slug(group.title),
-        position: group?.position || 0,
         active: group?.active,
       });
     }
