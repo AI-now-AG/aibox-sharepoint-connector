@@ -26,7 +26,6 @@ const syncAuth0Resources: Handler = async (
   try {
     // Ensure the request is from Auth0 (validate secret, IP, or header signature)
     const authHeader = event.headers["authorization"];
-    console.log("authHeader", { authHeader });
 
     if (
       !authHeader ||

@@ -321,21 +321,6 @@ async function postAudioProProcess(
   encryptedSpeechKey: string,
 ): Promise<void> {
   try {
-    console.log("Triggering background function...");
-    console.log(process.env.context);
-    const baseUrl =
-      (process.env.context === "production"
-        ? process.env.URL
-        : process.env.DEPLOY_PRIME_URL) || "http://localhost:8888";
-    console.log(baseUrl);
-    console.log(process.env.URL);
-    console.log(process.env.DEPLOY_URL);
-    console.log(process.env.DEPLOY_PRIME_URL);
-    console.log(process.env.DEPLOY_ID);
-    console.log(process.env.SITE_NAME);
-    console.log(process.env.SITE_ID);
-    console.log(process.env.REVIEW_ID);
-    console.log("Triggering background function...END");
     const response = await fetch(
       `${process.env.URL}/.netlify/functions/postAudioProProcess-background`,
       //`https://deploy-preview-153.test.aibox-app.com/.netlify/functions/postAudioProProcess-background`,
@@ -352,7 +337,6 @@ async function postAudioProProcess(
         }),
       },
     );
-    console.log("Response:", response);
     if (response.status === 202) {
       console.log("Background function triggered successfully.");
     } else {
