@@ -181,10 +181,13 @@ output>
 
   let correctedLines = [];
   for (const chunk of chunks) {
+    const { transcriptionType, transcriptions } = transcribeParams;
+    const instruction =
+      transcriptionType === TranscriptionType.Subtitlesjson
+        ? transcriptions.subtitles?.text
+        : transcriptions.subtitlesjson?.text;
     const response = await model.invoke([
-      new SystemMessage(
-        transcribeParams.transcriptions.subtitles?.text || DEFAULT_INSTRUCTION,
-      ),
+      new SystemMessage(instruction || DEFAULT_INSTRUCTION),
       new HumanMessage(chunk),
     ]);
     correctedLines.push(
