@@ -7,58 +7,33 @@ import { type TranscriptionCard } from "$types/TranscriptionCard";
 import UpdateForm from "$pages/settings/transcription/UpdateForm.svelte";
 
 const t = useTranslations();
-
 const { searchParams } = Astro.url;
-const typeParam = searchParams.get("type");
-const selectedTranscriptionType =
-  typeParam &&
-  Object.values(TranscriptionType).includes(typeParam as TranscriptionType)
-    ? (typeParam as TranscriptionType)
-    : undefined;
-if (selectedTranscriptionType === undefined) {
+const typeParam = searchParams.get("type") as TranscriptionType;
+
+if (!Object.values(TranscriptionType).includes(typeParam)) {
   return Astro.redirect("/404");
 }
 
-const transcriptions = Astro.locals.tenant?.transcriptions;
-let card: TranscriptionCard | undefined = undefined;
-switch (selectedTranscriptionType) {
-  case TranscriptionType.Plaintext:
-    card = {
-      title: t("tenant.audio-to-text"),
-      description: transcriptions?.plaintext?.text ?? "",
-      toggle: transcriptions?.plaintext?.enabled ?? false,
-      type: TranscriptionType.Plaintext,
-    };
-    break;
-  case TranscriptionType.Summarize:
-    card = {
-      title: t("settings.transcription.summarize-title"),
-      description: transcriptions?.summary?.text ?? "",
-      toggle: transcriptions?.summary?.enabled ?? false,
-      type: TranscriptionType.Summarize,
-    };
-    break;
-  case TranscriptionType.Subtitles:
-    card = {
-      title: t("settings.transcription.subtitles-title"),
-      description: transcriptions?.subtitles?.text ?? "",
-      toggle: transcriptions?.subtitles?.enabled ?? false,
-      type: TranscriptionType.Subtitles,
-    };
-    break;
-  case TranscriptionType.Largefile:
-    card = {
-      title: t("settings.transcription.largefile-title"),
-      description: transcriptions?.largefile?.text ?? "",
-      toggle: transcriptions?.largefile?.enabled ?? false,
-      type: TranscriptionType.Largefile,
-    };
-    break;
-  default:
-    break;
-}
+const transcriptions = Astro.locals.tenant?.transcriptions ?? {};
+const userPermissions = Astro.locals.user.permissions;
 
-let userPermissions = Astro.locals.user.permissions;
+const transcriptionMap: Partial<Record<TranscriptionType, string>> = {
+  [TranscriptionType.Plaintext]: t("tenant.audio-to-text"),
+  [TranscriptionType.Summarize]: t("settings.transcription.summarize-title"),
+  [TranscriptionType.Subtitles]: t("settings.transcription.subtitles-title"),
+  [TranscriptionType.Largefile]: t("settings.transcription.largefile-title"),
+  [TranscriptionType.Subtitlesjson]: t("settings.transcription.subtitles-title-json"),
+};
+
+const card: TranscriptionCard | undefined = transcriptionMap[typeParam]
+  ? {
+      title: transcriptionMap[typeParam]!,
+      description: transcriptions[typeParam]?.text ?? "",
+      toggle: transcriptions[typeParam]?.enabled ?? false,
+      type: typeParam,
+    }
+  : undefined;
+
 ---
 
 <Layout>

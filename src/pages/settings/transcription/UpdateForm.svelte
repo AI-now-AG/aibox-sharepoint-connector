@@ -34,29 +34,15 @@
   async function saveInstruction() {
     isSaving = true;
 
-    const transcriptionUpdate: any = {
+    const transcriptionUpdate = {
       _id: $tenant!._id.toString(),
-      transcriptions: {} as Record<string, any>,
+      transcriptions: {
+        [transcriptionCard?.type]: {
+          enabled: transcriptionCard?.toggle ?? false,
+          text: instructionText,
+        },
+      },
     };
-
-    // Map transcription types to their corresponding properties
-    const transcriptionFields: Record<string, { field: string; text: string }> =
-      {
-        plaintext: { field: "plaintext", text: instructionText },
-        subtitles: { field: "subtitles", text: instructionText },
-        subtitlesjson: { field: "subtitlesjson", text: instructionText },
-        summary: { field: "summary", text: instructionText },
-        largefile: { field: "largefile", text: instructionText },
-      };
-
-    // Check if transcriptionCard type exists in the map
-    if (transcriptionCard && transcriptionFields[transcriptionCard.type]) {
-      const { field, text } = transcriptionFields[transcriptionCard.type];
-      transcriptionUpdate.transcriptions[field] = {
-        enabled: transcriptionCard?.toggle ?? false,
-        text,
-      };
-    }
 
     const { error } =
       await actions.transcription_settings.update(transcriptionUpdate);
@@ -80,7 +66,9 @@
   }
 </script>
 
-<div class="container max-w-5xl p-6 mx-auto p-4">
+<div
+    class="container max-w-5xl mx-auto p-6 grid grid-cols-3 md:grid-cols-[1fr_max-content] gap-8"
+  >
   <div class="w-full min-w-xs pt-2 lg:pt-6">
     <div class="flex items-center pt-2 pb-6">
       <button class="mr-4" on:click={goback}>
