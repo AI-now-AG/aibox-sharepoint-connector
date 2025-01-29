@@ -44,7 +44,9 @@
       {
         plaintext: { field: "plaintext", text: instructionText },
         subtitles: { field: "subtitles", text: instructionText },
+        subtitlesjson: { field: "subtitlesjson", text: instructionText },
         summary: { field: "summary", text: instructionText },
+        largefile: { field: "largefile", text: instructionText },
       };
 
     // Check if transcriptionCard type exists in the map
