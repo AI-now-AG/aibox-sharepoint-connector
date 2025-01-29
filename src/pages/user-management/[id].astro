@@ -3,6 +3,7 @@ import Layout from "$layouts/Layout.astro";
 import UserForm from "./UserForm.svelte";
 import UserModel from "$data/models/user.model";
 import { transformRawData } from "$utils/transformRawData";
+import { ObjectId } from "mongodb";
 
 export interface Props {
   id: string;
@@ -16,7 +17,7 @@ if (id === undefined) {
 }
 
 const user = await UserModel.get(id);
-if (!user || user.tenant_id !== Astro.locals.tenant._id) {
+if (!user || !new ObjectId(user.tenant_id).equals(Astro.locals.tenant._id)) {
   return Astro.redirect("/404");
 }
 

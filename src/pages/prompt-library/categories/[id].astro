@@ -3,6 +3,7 @@ import Layout from "$layouts/Layout.astro";
 import CategoryModel from "$data/models/category.model";
 import { Permission } from "$data/models/user.model";
 import CategoryForm from "$pages/prompt-library/categories/CategoryForm.svelte";
+import { ObjectId } from "mongodb";
 
 export interface Props {
   id: string;
@@ -14,7 +15,7 @@ if (id === undefined) {
 }
 
 const category = await CategoryModel.getConvertedObj(id);
-if (!category || category.tenant_id !== Astro.locals.tenant._id.toString()) {
+if (!category || !new ObjectId(category.tenant_id).equals(Astro.locals.tenant._id)) {
   return Astro.redirect("/404");
 }
 
