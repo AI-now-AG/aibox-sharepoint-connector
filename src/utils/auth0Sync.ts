@@ -2,7 +2,7 @@ import UserModel, { assignPermissions } from "$data/models/user.model";
 import TenantModel from "$data/models/tenant.model";
 import usersManagement from "$data/auth0/users-manager";
 import organizationsManagement from "$data/auth0/organizations-manager";
-import type { UserRole } from "$enums/Users";
+import { UserRole } from "$enums/Users";
 
 export const syncAllOrganizationUsers = async (
   orgId: string,
