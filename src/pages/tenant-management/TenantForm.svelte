@@ -287,7 +287,7 @@
   class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14 sticky bg-base-200 top-0 z-10"
 >
   <div class="flex items-center pt-5 pb-2">
-    <button class="mr-4" onclick="window.history.back();">
+    <button class="mr-4" on:click={() => window.history.back()}>
       {@html svgIcons.back}
     </button>
     <h1 class="text-4xl font-bold">
@@ -305,7 +305,7 @@
       >
         {t("common.save")}
       </button>
-      <button class="btn" onclick="window.history.back();">
+      <button class="btn" on:click={() => window.history.back()}>
         {t("common.cancel")}
       </button>
     </div>

@@ -178,7 +178,7 @@
 <div class="container max-w-5xl mx-auto p-4">
   <div class="w-full min-w-xs pt-2 lg:pt-6">
     <div class="flex items-center pt-2 pb-6">
-      <button class="mr-4" onclick="window.history.back();">
+      <button class="mr-4" on:click={() => window.history.back()}>
         {@html svgIcons.back}
       </button>
       <h1 class="text-4xl font-bold">
