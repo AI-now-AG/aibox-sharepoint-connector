@@ -20,10 +20,7 @@
   let audioDuration: string = "";
   let acceptedTypes: Array<string> = ["audio/*", "video/*"];
   let acceptedTypesJSON: Array<string> = ["application/json"];
-  $: acceptTypes =
-    transcriptionType === TranscriptionType.Subtitlesjson
-      ? acceptedTypesJSON.join(",")
-      : acceptedTypes.join(",");
+  let acceptTypes: string = "";
   let maxFileSize = 25;
   let isDragOver: boolean = false;
   let textOuput: string = "";
@@ -125,6 +122,10 @@
         }
       }
     });
+    acceptTypes =
+      transcriptionType === TranscriptionType.Subtitlesjson
+        ? acceptedTypesJSON.join(",")
+        : acceptedTypes.join(",");
   });
 
   function checkDataAvaibility() {
