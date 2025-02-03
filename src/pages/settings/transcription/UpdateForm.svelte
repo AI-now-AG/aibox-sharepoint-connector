@@ -67,8 +67,8 @@
 </script>
 
 <div
-    class="container max-w-5xl mx-auto p-6 grid grid-cols-3 md:grid-cols-[1fr_max-content] gap-8"
-  >
+  class="container max-w-5xl mx-auto p-6 grid grid-cols-3 md:grid-cols-[1fr_max-content] gap-8"
+>
   <div class="w-full min-w-xs pt-2 lg:pt-6">
     <div class="flex items-center pt-2 pb-6">
       <button class="mr-4" on:click={goback}>

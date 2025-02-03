@@ -6,12 +6,12 @@ import type {
 } from "@netlify/functions";
 import UserModel, {
   assignPermissions,
-  UserRole,
   type User,
 } from "$data/models/user.model";
 import TenantModel, { type Tenant } from "$data/models/tenant.model";
 import usersManagement from "$data/auth0/users-manager";
 import organizationsManagement from "$data/auth0/organizations-manager";
+import type { UserRole } from "$enums/Users";
 
 /**
  * Handles Auth0 log stream events

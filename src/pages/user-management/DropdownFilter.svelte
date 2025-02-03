@@ -1,15 +1,8 @@
-<script lang="ts" context="module">
-  export enum UserRole {
-    Admin = "Admin",
-    SuperAdmin = "Super Admin",
-    User = "User",
-  }
-</script>
-
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
+  import { UserRole } from "$enums/Users";
 
   const dispatch = createEventDispatcher();
   const t = useTranslations();

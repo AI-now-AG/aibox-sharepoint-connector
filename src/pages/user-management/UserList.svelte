@@ -17,10 +17,11 @@
   import { type Option } from "$components/DropdownOptions.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import InputSearch from "./InputSearch.svelte";
-  import DropdownFilter, { UserRole } from "./DropdownFilter.svelte";
+  import DropdownFilter from "./DropdownFilter.svelte";
   import SortableTable, {
     type ColumnData,
   } from "$components/SortableTable.svelte";
+  import { UserRole } from "$enums/Users";
 
   const t = useTranslations();
 

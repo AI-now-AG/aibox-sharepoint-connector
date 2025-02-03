@@ -1,32 +1,32 @@
 <script lang="ts">
-    import { createEventDispatcher } from "svelte";
-    import { svgIcons } from "$assets/icons";
-    import { useTranslations } from "$i18n/utils";
-  
-    const dispatch = createEventDispatcher();
-    const t = useTranslations();
-  
-    export let value: string = "";
-    export let showArchived: boolean = false;
-    let typingTimeout: any;
-  
-    const onSearch = ({ target }: any) => {
-      clearTimeout(typingTimeout);
-      typingTimeout = setTimeout(() => {
-        value = target.value;
-        dispatch("search");
-        console.log('dispatch search', {value});
-      }, 300);
-    };
+  import { createEventDispatcher } from "svelte";
+  import { svgIcons } from "$assets/icons";
+  import { useTranslations } from "$i18n/utils";
 
-    const onFilter = ({ target }: any) => {
-      showArchived = !showArchived;
-      setTimeout(() => (target.checked = showArchived), 0);
-      dispatch("filter");
-      console.log('dispatch filter', {value});
-    };
+  const dispatch = createEventDispatcher();
+  const t = useTranslations();
+
+  export let value: string = "";
+  export let showArchived: boolean = false;
+  let typingTimeout: any;
+
+  const onSearch = ({ target }: any) => {
+    clearTimeout(typingTimeout);
+    typingTimeout = setTimeout(() => {
+      value = target.value;
+      dispatch("search");
+      console.log("dispatch search", { value });
+    }, 300);
+  };
+
+  const onFilter = ({ target }: any) => {
+    showArchived = !showArchived;
+    setTimeout(() => (target.checked = showArchived), 0);
+    dispatch("filter");
+    console.log("dispatch filter", { value });
+  };
 </script>
-  
+
 <div class="items-center mb-10">
   <div class="relative w-full">
     <label class="input input-bordered flex items-center gap-2">

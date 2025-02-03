@@ -2,7 +2,7 @@
 // Component
 import Layout from "$layouts/Layout.astro";
 import PromptForm from "$pages/prompt-library/prompts/PromptForm.svelte";
-import { Permission } from "$data/models/user.model";
+import { Permission } from "$enums/Users";
 
 let userPermissions = Astro.locals.user.permissions;
 ---

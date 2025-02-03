@@ -15,7 +15,7 @@
   import moment from "moment";
   import Input from "$components/Input/Input.svelte";
   import { isEnterpriseConnection, isValidEmail } from "$utils/common";
-  import { UserRole } from "./DropdownFilter.svelte";
+  import { UserRole } from "$enums/Users";
 
   const t = useTranslations();
 

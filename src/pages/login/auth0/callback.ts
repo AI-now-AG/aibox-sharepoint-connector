@@ -1,14 +1,12 @@
 import { auth0, lucia } from "$auth";
 import { decodeJwt } from "jose";
 import type { APIContext } from "astro";
-import UserModel, {
-  assignPermissions,
-  UserRole,
-} from "$data/models/user.model";
+import UserModel, { assignPermissions } from "$data/models/user.model";
 import { z } from "zod";
 import log from "$utils/log";
 import { syncAllOrganizationUsers } from "$utils/auth0Sync";
 import TenantModel from "$data/models/tenant.model";
+import { UserRole } from "$enums/Users";
 
 const Auth0JWTSchema = z.object({
   sub: z.string().min(24),
