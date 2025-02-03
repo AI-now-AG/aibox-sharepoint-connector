@@ -16,7 +16,7 @@
     isMounted = true;
   });
 
-  export let transcriptionCard: TranscriptionCard | undefined = undefined;
+  export let transcriptionCard: TranscriptionCard;
 
   $: if (transcriptionCard) {
     instructionTitle = transcriptionCard.title || "";
@@ -33,28 +33,15 @@
   const updateTranscriptionSetting = async (enabled: boolean) => {
     isSaving = true;
 
-    const transcriptionUpdate: any = {
+    const transcriptionUpdate = {
       _id: $tenant!._id.toString(),
-      transcriptions: {} as Record<string, any>,
+      transcriptions: {
+        [transcriptionCard?.type]: {
+          enabled: transcriptionCard?.toggle ?? false,
+          text: instructionText,
+        },
+      },
     };
-
-    // Map transcription types to their corresponding properties
-    const transcriptionFields: Record<string, { field: string; text: string }> =
-      {
-        plaintext: { field: "plaintext", text: instructionText },
-        subtitles: { field: "subtitles", text: instructionText },
-        summary: { field: "summary", text: instructionText },
-        largefile: { field: "largefile", text: instructionText },
-      };
-
-    // Check if transcriptionCard type exists in the map
-    if (transcriptionCard && transcriptionFields[transcriptionCard.type]) {
-      const { field, text } = transcriptionFields[transcriptionCard.type];
-      transcriptionUpdate.transcriptions[field] = {
-        enabled: enabled,
-        text,
-      };
-    }
 
     const { error } =
       await actions.transcription_settings.update(transcriptionUpdate);
@@ -91,7 +78,7 @@
             class="toggle toggle-primary"
             bind:checked={transcriptionCard.toggle}
             on:change={(event) =>
-              updateTranscriptionSetting(event.target.checked)}
+              updateTranscriptionSetting(event.target?.checked)}
           />
         </label>
       {/if}

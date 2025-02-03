@@ -19,6 +19,7 @@
   let audioFile: File | undefined;
   let audioDuration: string = "";
   let acceptedTypes: Array<string> = ["audio/*", "video/*"];
+  let acceptedTypesJSON: Array<string> = ["application/json"];
   let maxFileSize = 25;
   let isDragOver: boolean = false;
   let textOuput: string = "";
@@ -207,17 +208,26 @@
     }
   }*/
 
-  function isFileTypeValid(type: string) {
-    for (let i = 0; i < acceptedTypes.length; i++) {
-      const acceptedType = acceptedTypes[i];
-      const typeCategory = type?.split("/")?.[0];
-      if (acceptedType.includes(typeCategory)) {
-        fileErrorMessage = "";
-        return true;
-      }
+  function isFileTypeValid(type: string): boolean {
+    if (!type) {
+      fileErrorMessage = t("transcription.file-validation.unsupported-type");
+      return false;
     }
-    fileErrorMessage = t("transcription.file-validation.unsupported-type");
-    return false;
+    const acceptedFileTypes =
+      transcriptionType === TranscriptionType.Subtitlesjson
+        ? acceptedTypesJSON
+        : acceptedTypes;
+
+    const typeCategory = type?.split("/")?.[0];
+    const isValid = acceptedFileTypes.some((acceptedType) =>
+      acceptedType.includes(typeCategory),
+    );
+
+    fileErrorMessage = isValid
+      ? ""
+      : t("transcription.file-validation.unsupported-type");
+
+    return isValid;
   }
 
   function isFileSizeValid(size: number) {
@@ -365,7 +375,9 @@
     const { name, size, type } = audioFile;
     if (isFileValid({ name, size, type })) {
       // Calculate duration for audio/video file
-      audioDuration = await calculateDuration(audioFile);
+      if (transcriptionType !== TranscriptionType.Subtitlesjson) {
+        audioDuration = await calculateDuration(audioFile);
+      }
 
       isUploading = true;
 
@@ -466,7 +478,10 @@
 
       if (response.ok) {
         tempOutputFileNames = [];
-        if (transcriptionType === TranscriptionType.Subtitles) {
+        if (
+          transcriptionType === TranscriptionType.Subtitles ||
+          transcriptionType === TranscriptionType.Subtitlesjson
+        ) {
           selectedFileFormat.forEach((format) => {
             tempOutputFileNames.push(`${tempOutputFileName}.${format}`);
           });
@@ -562,7 +577,8 @@
           fileNames: tempOutputFileNames,
           folderName: folderName,
           isShowImprovedTextPreview:
-            transcriptionType === TranscriptionType.Subtitles
+            transcriptionType === TranscriptionType.Subtitles ||
+            transcriptionType === TranscriptionType.Subtitlesjson
               ? showTextPreviewChecked
               : false,
           typedTranscriptionType: transcriptionType,
@@ -894,7 +910,11 @@
               {@html t("transcription.input-file-upload-description")}
             </p>
             <p class="text-sm text-base-content/40 mt-1">
-              {t("transcription.supportted-file-extensions")}
+              {#if transcriptionType === TranscriptionType.Subtitlesjson}
+                {t("transcription.supportted-file-extensions-json")}
+              {:else}
+                {t("transcription.supportted-file-extensions")}
+              {/if}
             </p>
             <p class="text-xs text-base-content/40 mt-8">
               {#if transcriptionType === TranscriptionType.Largefile}
@@ -1054,7 +1074,7 @@
     </div>
   {/if}
 
-  {#if transcriptionType === TranscriptionType.Subtitles}
+  {#if transcriptionType === TranscriptionType.Subtitles || transcriptionType === TranscriptionType.Subtitlesjson}
     <div class="bg-base-100 mt-10 p-4 px-6 rounded-xl">
       <div class="grid">
         <h2>{t("audiotools.subtitles.what-output-do-you-need")}</h2>
@@ -1138,55 +1158,57 @@
               <div class="basis-1/8">03</div> -->
             </div>
           </div>
-          <div><div class="bg-base-200 h-0.5"></div></div>
-          <div class="card rounded-box grid py-8">
-            <div class="flex flex-row place-items-center gap-8">
-              <input
-                type="checkbox"
-                bind:checked={rawOutputChecked}
-                class="checkbox checked:checkbox-primary"
-              />
-              <div class="basis-1/3">
-                <div class="flex flex-row place-items-center gap-4">
-                  <div class="avatar placeholder">
-                    <div class="bg-base-200 text-neutral p-3 rounded-full">
-                      {@html svgIcons.codeIcon}
+          {#if transcriptionType === TranscriptionType.Subtitles}
+            <div><div class="bg-base-200 h-0.5"></div></div>
+            <div class="card rounded-box grid py-8">
+              <div class="flex flex-row place-items-center gap-8">
+                <input
+                  type="checkbox"
+                  bind:checked={rawOutputChecked}
+                  class="checkbox checked:checkbox-primary"
+                />
+                <div class="basis-1/3">
+                  <div class="flex flex-row place-items-center gap-4">
+                    <div class="avatar placeholder">
+                      <div class="bg-base-200 text-neutral p-3 rounded-full">
+                        {@html svgIcons.codeIcon}
+                      </div>
+                    </div>
+
+                    <div class="flex flex-col">
+                      <h2 class="font-semibold">
+                        {t("audiotools.subtitles.raw-output")}
+                      </h2>
+                      <p class="text-base-content/60">
+                        {t("audiotools.subtitles.no-text-improvement")}
+                      </p>
                     </div>
                   </div>
-
-                  <div class="flex flex-col">
-                    <h2 class="font-semibold">
-                      {t("audiotools.subtitles.raw-output")}
-                    </h2>
-                    <p class="text-base-content/60">
-                      {t("audiotools.subtitles.no-text-improvement")}
-                    </p>
+                </div>
+                <div class="basis-1/3">
+                  <div class="flex flex-row place-items-center gap-8">
+                    <label class="cursor-pointer label">
+                      <input
+                        type="checkbox"
+                        bind:checked={jsonFileChecked}
+                        class="checkbox checked:checkbox-primary checkbox-xs"
+                      />
+                      <span class="label-text ml-2">.json</span>
+                    </label>
+                    <label class="cursor-pointer label">
+                      <input
+                        type="checkbox"
+                        bind:checked={txtFileChecked}
+                        class="checkbox checked:checkbox-primary checkbox-xs"
+                      />
+                      <span class="label-text ml-2">.txt</span>
+                    </label>
                   </div>
                 </div>
+                <!-- <div class="basis-1/8">03</div> -->
               </div>
-              <div class="basis-1/3">
-                <div class="flex flex-row place-items-center gap-8">
-                  <label class="cursor-pointer label">
-                    <input
-                      type="checkbox"
-                      bind:checked={jsonFileChecked}
-                      class="checkbox checked:checkbox-primary checkbox-xs"
-                    />
-                    <span class="label-text ml-2">.json</span>
-                  </label>
-                  <label class="cursor-pointer label">
-                    <input
-                      type="checkbox"
-                      bind:checked={txtFileChecked}
-                      class="checkbox checked:checkbox-primary checkbox-xs"
-                    />
-                    <span class="label-text ml-2">.txt</span>
-                  </label>
-                </div>
-              </div>
-              <!-- <div class="basis-1/8">03</div> -->
             </div>
-          </div>
+          {/if}
         </div>
       </div>
     </div>

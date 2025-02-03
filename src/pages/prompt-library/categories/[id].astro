@@ -3,6 +3,7 @@ import Layout from "$layouts/Layout.astro";
 import CategoryModel from "$data/models/category.model";
 import { Permission } from "$data/models/user.model";
 import CategoryForm from "$pages/prompt-library/categories/CategoryForm.svelte";
+import { ObjectId } from "mongodb";
 
 export interface Props {
   id: string;
@@ -13,11 +14,12 @@ if (id === undefined) {
   throw new Error("Id is required");
 }
 
-const instruction = await CategoryModel.get(id); // TODO: Render 404 if not found
-if (instruction === null) {
-  throw new Error("Instruction not found");
+const category = await CategoryModel.getConvertedObj(id);
+if (!category || !new ObjectId(category.tenant_id).equals(Astro.locals.tenant._id)) {
+  return Astro.redirect("/404");
 }
-const formattedInstruction: any = { ...instruction, ...{ _id: id } };
+
+const formattedCategory = { ...category, ...{ _id: id } };
 
 let userPermissions = Astro.locals.user.permissions;
 ---
@@ -25,8 +27,7 @@ let userPermissions = Astro.locals.user.permissions;
 <Layout>
   <div>
     <CategoryForm
-      categoryId={id}
-      category={formattedInstruction}
+      category={formattedCategory}
       isEditable={userPermissions.includes(Permission.AdminAll)}
       client:load
     />

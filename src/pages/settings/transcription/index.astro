@@ -33,6 +33,13 @@ const cards: TranscriptionCard[] = [
     toggle: transcriptions?.subtitles?.enabled ?? false,
     type: TranscriptionType.Subtitles,
   },
+  {
+    title: t("settings.transcription.subtitles-title-json"),
+    //description: t("settings.transcription.subtitles-description"),
+    description: transcriptions?.subtitlesjson?.text ?? "",
+    toggle: transcriptions?.subtitlesjson?.enabled ?? false,
+    type: TranscriptionType.Subtitlesjson,
+  },
 ];
 
 if (Astro.locals.tenant) {

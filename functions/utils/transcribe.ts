@@ -15,6 +15,7 @@ import { StringOutputParser } from "@langchain/core/output_parsers";
 import {
   type TranscribeRequest,
   type TranscriptionResult,
+  type TranscribeResponse,
   FileFormat,
   TranscriptionType,
 } from "$types/TranscribeRequest";
@@ -22,6 +23,7 @@ import { processTranscription } from "./batchTranscription";
 import type { TranscriptionResponse } from "$utils/Speech/SpeechResponse";
 import { ApiKeyProvider } from "$types/TenantFeature";
 import { LoggingCallbackHandler } from "$callbackLLM/LoggingCallbackHandler";
+import type { TranscriptionVerbose } from "openai/resources/audio/transcriptions.mjs";
 
 const DEFAULT_WHISPER_MODEL_NAME = "whisper-1";
 const DEFAULT_API_VERSION = "2024-08-01-preview";
@@ -110,7 +112,13 @@ function getOpenAIChatModel(transcribeParams: TranscribeRequest) {
   const openaiChatConfig = {
     openAIApiKey,
     model: process.env.OPENAI_MODEL,
-    callbacks: [new LoggingCallbackHandler(transcribeParams.tenantId, transcribeParams.userId, transcribeParams.fileName)],
+    callbacks: [
+      new LoggingCallbackHandler(
+        transcribeParams.tenantId,
+        transcribeParams.userId,
+        transcribeParams.fileName,
+      ),
+    ],
     tags: ["transcribe", "improve", "text", "quality", "openai"],
   };
   return new ChatOpenAI(openaiChatConfig);
@@ -130,7 +138,13 @@ function getAzureChatModel(transcribeParams: TranscribeRequest) {
       DEFAULT_CHAT_MODE_NAME,
     azureOpenAIApiVersion:
       process.env.AZURE_OPENAI_API_VERSION || DEFAULT_API_VERSION,
-    callbacks: [new LoggingCallbackHandler(transcribeParams.tenantId, transcribeParams.userId, transcribeParams.fileName)],
+    callbacks: [
+      new LoggingCallbackHandler(
+        transcribeParams.tenantId,
+        transcribeParams.userId,
+        transcribeParams.fileName,
+      ),
+    ],
     tags: ["transcribe", "improve", "text", "quality", "azure"],
   };
 
@@ -167,10 +181,13 @@ output>
 
   let correctedLines = [];
   for (const chunk of chunks) {
+    const { transcriptionType, transcriptions } = transcribeParams;
+    const instruction =
+      transcriptionType === TranscriptionType.Subtitlesjson
+        ? transcriptions.subtitles?.text
+        : transcriptions.subtitlesjson?.text;
     const response = await model.invoke([
-      new SystemMessage(
-        transcribeParams.transcriptions.subtitles?.text || DEFAULT_INSTRUCTION,
-      ),
+      new SystemMessage(instruction || DEFAULT_INSTRUCTION),
       new HumanMessage(chunk),
     ]);
     correctedLines.push(
@@ -212,6 +229,27 @@ export const improveTextQuality = async (
   return correctedText;
 };
 
+function bufferToTranscribeResponse(buffer: Buffer): TranscribeResponse {
+  try {
+    const jsonString = buffer.toString("utf-8");
+    const parsedData: TranscribeResponse = JSON.parse(jsonString);
+    if (
+      !parsedData.task ||
+      !parsedData.language ||
+      !parsedData.duration ||
+      !parsedData.text ||
+      !Array.isArray(parsedData.words)
+    ) {
+      throw new Error("Invalid TranscribeResponse structure");
+    }
+
+    return parsedData;
+  } catch (error) {
+    console.error("Error converting buffer to TranscribeResponse:", error);
+    throw new Error("Failed to parse buffer into TranscribeResponse");
+  }
+}
+
 export async function transcribeUsingOpenAI(
   transcribeParams: TranscribeRequest,
 ): Promise<TranscriptionResult> {
@@ -222,17 +260,25 @@ export async function transcribeUsingOpenAI(
     if (!audioBuffer) {
       throw new Error("Audio buffer is missing or undefined.");
     }
-    const audioFile = await toFile(audioBuffer, fileName);
 
-    const response = await openaiClient.audio.transcriptions.create({
-      file: audioFile,
-      model: DEFAULT_WHISPER_MODEL_NAME,
-      temperature: 0,
-      timestamp_granularities: ["word"],
-      response_format: "verbose_json",
-    });
+    let response: TranscriptionVerbose | TranscribeResponse | null = null;
+    if (
+      transcribeParams.transcriptionType === TranscriptionType.Subtitlesjson
+    ) {
+      const jsonResponse = bufferToTranscribeResponse(audioBuffer);
+      response = jsonResponse;
+    } else {
+      const audioFile = await toFile(audioBuffer, fileName);
+      response = await openaiClient.audio.transcriptions.create({
+        file: audioFile,
+        model: DEFAULT_WHISPER_MODEL_NAME,
+        temperature: 0,
+        timestamp_granularities: ["word"],
+        response_format: "verbose_json",
+      });
+    }
 
-    const transcriptionText = response.text;
+    const transcriptionText = response?.text ?? "";
     const parser = new StringOutputParser();
     const description = await parser.invoke(transcriptionText);
 
@@ -247,13 +293,16 @@ export async function transcribeUsingOpenAI(
       .slice(0, -1)
       .join(".");
     const outputURLs: { [key: string]: string } = {};
-    outputURLs["json"] = await uploadOutputToBlob(
-      transcribeParams.folderName,
-      `${fileNameWithoutExtension}.json`,
-      JSON.stringify(response),
-      "json",
-    );
-
+    if (
+      transcribeParams.transcriptionType !== TranscriptionType.Subtitlesjson
+    ) {
+      outputURLs["json"] = await uploadOutputToBlob(
+        transcribeParams.folderName,
+        `${fileNameWithoutExtension}.json`,
+        JSON.stringify(response),
+        "json",
+      );
+    }
     if (transcribeParams.transcriptionType === TranscriptionType.Plaintext) {
       const instruction = transcribeParams.transcriptions.plaintext?.text;
       if (instruction) {
@@ -275,7 +324,8 @@ export async function transcribeUsingOpenAI(
         );
       }
     } else if (
-      transcribeParams.transcriptionType === TranscriptionType.Subtitles
+      transcribeParams.transcriptionType === TranscriptionType.Subtitles ||
+      transcribeParams.transcriptionType === TranscriptionType.Subtitlesjson
     ) {
       let srtData: Entry[] = [],
         improvedSrtData: Entry[] = [],
@@ -338,7 +388,7 @@ export async function transcribeUsingOpenAI(
 
     return {
       success: true,
-      data: { text: response.text, urls: outputURLs },
+      data: { text: transcriptionText, urls: outputURLs },
       error: null,
     };
   } catch (error) {

@@ -3,9 +3,10 @@ import Layout from "$layouts/Layout.astro";
 import { svgIcons } from "$assets/icons";
 import { useTranslations } from "$i18n/utils";
 import CategoryModel from "$data/models/category.model";
-import CategoryList, { type ListItem } from "./CategoryList.svelte";
+import CategoryList from "./CategoryList.svelte";
 
 import { Permission } from "$data/models/user.model";
+import type { ViewCategory } from "$actions/category";
 
 const t = useTranslations();
 
@@ -14,10 +15,9 @@ const categoriesCursor = await CategoryModel.listByTenant(
 );
 const categories = await categoriesCursor.toArray();
 
-const categoriesEnriched: ListItem[] = categories.map((category) => ({
+const categoriesEnriched: ViewCategory[] = categories.map((category) => ({
   id: category._id.toString(),
   title: category.title,
-  instruction: "",
   active: category.active,
 }));
 

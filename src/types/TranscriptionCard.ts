@@ -18,6 +18,10 @@ interface SubtitlesCard extends BaseCard {
   type: TranscriptionType.Subtitles;
 }
 
+interface SubtitlesjsonCard extends BaseCard {
+  type: TranscriptionType.Subtitlesjson;
+}
+
 interface LargefileCard extends BaseCard {
   type: TranscriptionType.Largefile;
 }
@@ -27,4 +31,5 @@ export type TranscriptionCard =
   | PlaintextCard
   | SummarizeCard
   | SubtitlesCard
+  | SubtitlesjsonCard
   | LargefileCard;

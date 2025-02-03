@@ -15,7 +15,6 @@
   let title: string | undefined;
   let groups: GroupItem[] = [];
 
-  export let categoryId: string | undefined = undefined;
   export let category: CreateCategoryParams | undefined = undefined;
   export let isEditable: boolean = false;
   let isSaving = false;
@@ -46,7 +45,7 @@
           title: item.title,
           active: item.active,
         })),
-        ...(categoryId && { _id: categoryId }),
+        ...(category?._id && { _id: category._id }),
       };
 
       try {

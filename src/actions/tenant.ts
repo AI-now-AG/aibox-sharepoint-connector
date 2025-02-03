@@ -1,8 +1,5 @@
 import { defineAction } from "astro:actions";
-import type {
-  PatchOrganizationsByIdRequest,
-  PostOrganizationsRequest,
-} from "auth0";
+import type { PatchOrganizationsByIdRequest } from "auth0";
 import { ObjectId } from "mongodb";
 import { client } from "$data/mongodb";
 import { z } from "zod";
@@ -73,45 +70,31 @@ export const tenant = {
   create: defineAction({
     input: TenantInputParamsSchema,
     handler: async (input) => {
-      // Start a new client session for MongoDB operations.
       const session = client.startSession();
-
+      session.startTransaction();
       try {
-        // Start a transaction to ensure atomicity.
-        session.startTransaction();
-
-        // create new organization on auth0
-        const bodyParameters: PostOrganizationsRequest = {
+        const organizationResult = await organizationsManagement.create({
           name: input.org_name,
           display_name: input.name,
-        };
-        const organizationResult =
-          await organizationsManagement.create(bodyParameters);
+        });
 
-        // add connection on auth0
         await organizationsManagement.addEnabledConnection(
           organizationResult.data.id,
           import.meta.env.AUTH0_AUTH_CON_ID || "con_RXTD1LIbXJgceOUH",
         );
 
-        // store tenant on mongodb
-        const { id: organizationId } = organizationResult.data;
         const tenant: Partial<Omit<Tenant, "_id">> = {
           ...input,
-          org_id: organizationId,
+          org_id: organizationResult.data.id,
         };
         const insertResult = await TenantModel.create(tenant);
 
-        // If everything goes well, commit the transaction
         await session.commitTransaction();
-
         return transformRawData(insertResult);
       } catch (error) {
-        // If an error occurs, abort the transaction and log the error
         await session.abortTransaction();
         throw error;
       } finally {
-        // End the session after the transaction
         session.endSession();
       }
     },
@@ -120,21 +103,15 @@ export const tenant = {
   update: defineAction({
     input: z.intersection(TenantInputParamsSchema, TenantInputIdentifierSchema),
     handler: async (input) => {
-      // Start a new client session for MongoDB operations.
       const session = client.startSession();
-
+      session.startTransaction();
       try {
-        // Start a transaction to ensure atomicity.
-        session.startTransaction();
-
-        // Update tenant in the local database.
         const update: Partial<Tenant> = {
           ...input,
           _id: new ObjectId(input._id),
         };
         const updatedDocument = await TenantModel.update(input._id, update);
 
-        // Update an existing organization in Auth0
         const bodyParameters: PatchOrganizationsByIdRequest = {
           name: input.org_name,
           display_name: input.name,
@@ -144,16 +121,12 @@ export const tenant = {
           bodyParameters,
         );
 
-        // If everything goes well, commit the transaction
         await session.commitTransaction();
-
         return transformRawData(updatedDocument);
       } catch (error) {
-        // If an error occurs, abort the transaction and log the error
         await session.abortTransaction();
         throw error;
       } finally {
-        // End the session after the transaction
         session.endSession();
       }
     },
@@ -184,45 +157,28 @@ export const tenant = {
   delete: defineAction({
     input: TenantInputIdentifierSchema,
     handler: async (input) => {
-      // Retrieve the user details from the database.
-      const user = await TenantModel.get(input._id);
-      if (!user || Object.keys(user).length == 0) {
-        throw new Error("User does not exists.");
-      }
+      const tenant = await TenantModel.get(input._id);
+      if (!tenant) throw new Error("Tenant does not exist.");
 
-      // Start a new client session for MongoDB operations.
       const session = client.startSession();
 
-      // Delete organization in Auth0; log error and continue if it fails.
       try {
-        const tenant = await TenantModel.get(input._id);
-        if (tenant) {
-          await organizationsManagement.deleteTenant(tenant.org_id);
-        }
-      } catch (err) {
-        console.error("delete tenant on Auth0 error", err);
-      }
-
-      try {
-        // Start a transaction to ensure atomicity.
+        await organizationsManagement.deleteTenant(tenant.org_id);
         session.startTransaction();
 
-        // Delete all prompts, categories, groups and knowledge bases
-        await CategoryModel.removeByTenant(input._id);
-        await KnowledgeBaseModel.removeByTenant(input._id);
-        await PromptModel.removeByTenant(input._id);
+        await Promise.all([
+          CategoryModel.removeByTenant(input._id),
+          KnowledgeBaseModel.removeByTenant(input._id),
+          PromptModel.removeByTenant(input._id),
+        ]);
         await TenantModel.remove(input._id);
 
-        // If everything goes well, commit the transaction
         await session.commitTransaction();
-
         return transformRawData({});
       } catch (error) {
-        // If an error occurs, abort the transaction and log the error
         await session.abortTransaction();
         throw error;
       } finally {
-        // End the session after the transaction
         session.endSession();
       }
     },

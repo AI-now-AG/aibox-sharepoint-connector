@@ -3,6 +3,7 @@ import Layout from "$layouts/Layout.astro";
 import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
 import KnowledgeBaseForm from "$pages/prompt-library/knowledge-base/KnowledgeBaseForm.svelte";
 import { Permission } from "$data/models/user.model";
+import { ObjectId } from "mongodb";
 
 export interface Props {
   id: string;
@@ -13,9 +14,9 @@ if (id === undefined) {
   throw new Error("Id is required");
 }
 
-const knowledgeBase = await KnowledgeBaseModel.get(id || ""); // TODO: Render 404 if not found
-if (knowledgeBase === null) {
-  throw new Error("KnowledgeBase not found");
+const knowledgeBase = await KnowledgeBaseModel.get(id || "");
+if (!knowledgeBase || !new ObjectId(knowledgeBase.tenant_id).equals(Astro.locals.tenant._id)) {
+  return Astro.redirect("/404");
 }
 
 let userPermissions = Astro.locals.user.permissions;

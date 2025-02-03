@@ -95,38 +95,27 @@ export const user = {
     handler: async (input, context) => {
       const { _id: tenantId, org_id: organizationId } = context.locals.tenant;
 
-      // Start a new client session for MongoDB operations.
       const session = client.startSession();
+      session.startTransaction();
 
       try {
-        // Start a transaction to ensure atomicity.
-        session.startTransaction();
-
-        // Create new user in Auth0.
-        const bodyParameters: UserCreate = {
+        const userResult = await usersManagement.create({
           email: input.email,
           name: input.name,
           connection: "Username-Password-Authentication",
           password: "@AInow$aibox*6340",
-        };
-        const userResult = await usersManagement.create(bodyParameters);
+        });
 
-        // Add members to an organization
-        await organizationsManagement.addMembers(organizationId, [
-          userResult.data.user_id,
+        const userId = userResult.data.user_id;
+
+        // Add user to Auth0 organization and assign roles
+        await Promise.all([
+          organizationsManagement.addMembers(organizationId, [userId]),
+          assignMemberRoles(organizationId, userId, [], input.roles),
         ]);
 
-        // Add member roles
-        await assignMemberRoles(
-          organizationId,
-          userResult.data.user_id,
-          [],
-          input.roles,
-        );
-
-        // Create new user in the local database.
-        const user: Partial<Omit<User, "_id">> = {
-          auth0_sub: userResult.data.user_id,
+        const newUser = {
+          auth0_sub: userId,
           username: userResult.data.nickname,
           name: input.name,
           email: input.email,
@@ -134,18 +123,14 @@ export const user = {
           permissions: assignPermissions(input.roles),
           tenant_id: tenantId,
         };
-        const insertResult = await UserModel.add(user);
+        const result = await UserModel.add(newUser);
 
-        // If everything goes well, commit the transaction
         await session.commitTransaction();
-
-        return transformRawData(insertResult);
+        return transformRawData(result);
       } catch (error) {
-        // If an error occurs, abort the transaction and log the error
         await session.abortTransaction();
         throw error;
       } finally {
-        // End the session after the transaction
         session.endSession();
       }
     },
@@ -155,40 +140,30 @@ export const user = {
     input: z.intersection(UserInputParamsSchema, UserInputIdentifierSchema),
     handler: async (input, context) => {
       const { org_id: organizationId } = context.locals.tenant;
-
-      // Retrieve the user details from the database.
       const user = await UserModel.get(input._id);
       if (!user) {
         throw new Error("User does not exists.");
       }
 
-      // Start a new client session for MongoDB operations.
       const session = client.startSession();
-
+      session.startTransaction();
       try {
-        // Start a transaction to ensure atomicity.
-        session.startTransaction();
-
-        // Update user in the local database.
-        const update: Partial<User> = {
+        const updatedData: Partial<User> = {
           name: input.name,
           email: input.email,
           roles: input.roles,
           permissions: assignPermissions(input.roles),
         };
-        const updatedDocument = await UserModel.update(input._id, update);
+        const updatedUser = await UserModel.update(input._id, updatedData);
 
-        // Update an existing user in Auth0
-        // For enterprise connections, Auth0 does not allow updating a user's name by default
+        // Update user in Auth0 if not an enterprise connection
         if (!isEnterpriseConnection(user.auth0_sub)) {
-          const bodyParameters: UserUpdate = {
+          await usersManagement.update(user.auth0_sub, {
             name: input.name,
             email: input.email,
-          };
-          await usersManagement.update(user.auth0_sub, bodyParameters);
+          });
         }
 
-        // Add member roles
         await assignMemberRoles(
           organizationId,
           user.auth0_sub,
@@ -196,16 +171,12 @@ export const user = {
           input.roles,
         );
 
-        // If everything goes well, commit the transaction
         await session.commitTransaction();
-
-        return transformRawData(updatedDocument);
+        return transformRawData(updatedUser);
       } catch (error) {
-        // If an error occurs, abort the transaction and log the error
         await session.abortTransaction();
         throw error;
       } finally {
-        // End the session after the transaction
         session.endSession();
       }
     },
@@ -215,45 +186,31 @@ export const user = {
     input: z.intersection(UserInputIdentifierSchema, UserBlockedSchema),
     handler: async (input) => {
       const { _id: userId, blocked } = input;
-
-      // Retrieve the user details from the database.
       const user = await UserModel.get(userId);
       if (!user) {
         throw new Error("User does not exists.");
       }
 
-      // Start a new client session for MongoDB operations.
       const session = client.startSession();
+      session.startTransaction();
 
       try {
-        // Start a transaction to ensure atomicity.
-        session.startTransaction();
+        const auth0Action = blocked
+          ? usersManagement.block(user.auth0_sub)
+          : usersManagement.unblock(user.auth0_sub);
+        await auth0Action;
 
-        // Block/Un-Block the user in Auth0.
-        if (blocked) {
-          await usersManagement.block(user?.auth0_sub);
-        } else {
-          await usersManagement.unblock(user?.auth0_sub);
-        }
+        // Update block status in the local database
+        const updateResult = blocked
+          ? await UserModel.block(userId)
+          : await UserModel.unblock(userId);
 
-        // Update the user's status in the local database.
-        let updateResult;
-        if (blocked) {
-          updateResult = await UserModel.block(input._id);
-        } else {
-          updateResult = await UserModel.unblock(input._id);
-        }
-
-        // If everything goes well, commit the transaction
         await session.commitTransaction();
-
         return transformRawData(updateResult);
       } catch (error) {
-        // If an error occurs, abort the transaction and log the error
         await session.abortTransaction();
         throw error;
       } finally {
-        // End the session after the transaction
         session.endSession();
       }
     },
@@ -262,35 +219,23 @@ export const user = {
   delete: defineAction({
     input: UserInputIdentifierSchema,
     handler: async (input) => {
-      // Retrieve the user details from the database.
       const user = await UserModel.get(input._id);
       if (!user) {
         throw new Error("User does not exists.");
       }
 
-      // Start a new client session for MongoDB operations.
       const session = client.startSession();
-
+      session.startTransaction();
       try {
-        // Start a transaction to ensure atomicity.
-        session.startTransaction();
-
-        // Un-block the user in Auth0.
         await usersManagement.deleteUser(user?.auth0_sub);
-
-        // Remove the user record from the local database.
         const updateResult = await UserModel.delete(input._id);
 
-        // If everything goes well, commit the transaction
         await session.commitTransaction();
-
         return transformRawData(updateResult);
       } catch (error) {
-        // If an error occurs, abort the transaction and log the error
         await session.abortTransaction();
         throw error;
       } finally {
-        // End the session after the transaction
         session.endSession();
       }
     },

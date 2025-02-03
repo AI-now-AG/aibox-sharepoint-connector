@@ -68,6 +68,19 @@ export const hasAudioSubtitles = (locals: App.Locals) => {
   return result;
 };
 
+export const hasAudioSubtitlesjson = (locals: App.Locals) => {
+  if (!locals.tenant) {
+    return false;
+  }
+
+  const { transcriptions } = locals.tenant;
+  let result = false;
+  if (transcriptions?.subtitlesjson?.enabled ?? false) {
+    result = true;
+  }
+  return result;
+};
+
 export const hasAudioSummary = (locals: App.Locals) => {
   if (!locals.tenant) {
     return false;
@@ -103,6 +116,7 @@ export default {
   hasFeature,
   hasAudioPlaintext,
   hasAudioSubtitles,
+  hasAudioSubtitlesjson,
   hasAudioSummary,
   hasAudioLargefile,
 };

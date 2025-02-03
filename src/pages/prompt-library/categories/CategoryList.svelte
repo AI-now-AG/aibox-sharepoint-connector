@@ -1,13 +1,3 @@
-<script lang="ts" context="module">
-  export interface ListItem {
-    id: string;
-    title: string;
-    description?: string;
-    tags?: string[];
-    active?: boolean;
-  }
-</script>
-
 <script lang="ts">
   import { actions } from "astro:actions";
   import { dndzone } from "svelte-dnd-action";
@@ -17,8 +7,9 @@
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import Loading from "$components/Loading.svelte";
   import { loading } from "$stores";
+  import type { ViewCategory } from "$actions/category";
 
-  export let items: ListItem[] = [];
+  export let items: ViewCategory[] = [];
 
   let categoryToDelete: string;
   let confirmDeleteModal: HTMLDialogElement;
@@ -39,7 +30,7 @@
 
   function handleDndConsider(e: CustomEvent) {
     items = e.detail.items;
-    //console.log("category list / consider dispatched", { items });
+    console.log("category list / consider dispatched", { items });
   }
 
   function handleDndFinalize(e: CustomEvent) {
@@ -50,7 +41,7 @@
       updatePosition(items);
       reloadPage();
     }, 300);
-    //console.log("category list / finalize dispatched", { items });
+    console.log("category list / finalize dispatched", { items });
   }
 
   async function handleDelete(categoryId: string) {
@@ -76,14 +67,16 @@
     reloadPage(1000);
   }
 
-  async function updatePosition(items: ListItem[]) {
+  async function updatePosition(items: ViewCategory[]) {
     $loading = true;
     const sortedIds = items.map((item) => {
       return {
         _id: item.id,
       };
     });
-    items = await actions.category.updatePosition(sortedIds);
+    const newItems = await actions.category.updatePosition(sortedIds);
+    items = newItems.data?.items ?? items;
+    console.log("updated: newItesm", newItems);
     $loading = false;
   }
 
@@ -159,10 +152,10 @@
           </div>
           <div class="flex-none w-20">
             <span
-              class={item.active == 1
+              class={item.active === true
                 ? "text-success text-sm font-medium"
                 : "text-sm font-medium"}
-              >{item.active == 1 ? "active" : "inactive"}</span
+              >{item.active === true ? "active" : "inactive"}</span
             >
           </div>
           <div
@@ -192,9 +185,11 @@
                     on:click|preventDefault={() =>
                       updateStatus(item.id, !item.active)}
                   >
-                    {@html item.active == 1 ? svgIcons.eyeClose : svgIcons.eye}
+                    {@html item.active === true
+                      ? svgIcons.eyeClose
+                      : svgIcons.eye}
                     <span class="ml-1"
-                      >{item.active == 1
+                      >{item.active === true
                         ? t("common.deactivate")
                         : t("common.activate")}</span
                     >

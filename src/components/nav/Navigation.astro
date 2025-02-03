@@ -49,6 +49,12 @@ if (auth.hasAudioSubtitles(Astro.locals)) {
     path: `/transcription/${TranscriptionType.Subtitles}`,
   });
 }
+if (auth.hasAudioSubtitlesjson(Astro.locals)) {
+  audioFeatureItems.push({
+    title: t("settings.transcription.subtitles-title-json"),
+    path: `/transcription/${TranscriptionType.Subtitlesjson}`,
+  });
+} 
 if (auth.hasAudioLargefile(Astro.locals)) {
   audioFeatureItems.push({
     title: t("settings.transcription.largefile-title"),

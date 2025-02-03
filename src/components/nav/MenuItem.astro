@@ -28,7 +28,7 @@ const { title, path, icon } = Astro.props;
           {
             active:
               path === Astro.url.pathname ||
-              wildcardMatch(Astro.url.pathname, `${path}*`),
+              wildcardMatch(Astro.url.pathname, `${path}`),
           },
           "font-semibold",
         ]}

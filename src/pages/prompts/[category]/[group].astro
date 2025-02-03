@@ -4,26 +4,35 @@ import Layout from "$layouts/Layout.astro";
 import Content from "$components/prompt-interface/components/Content.astro";
 import CategoryModel from "$data/models/category.model";
 import PromptModel from "$data/models/prompt.model";
+import { ObjectId } from "mongodb";
 
 const { category: categoryId, group: groupId } = Astro.params;
 
-const category = (await CategoryModel.get(categoryId || "")) as any;
-const group: any = category?.groups.find((g: any) => g._id === groupId);
+const category = await CategoryModel.get(categoryId || "");
+if (!category || !new ObjectId(category.tenant_id).equals(Astro.locals.tenant._id)) {
+  return Astro.redirect("/404");
+}
+const group = category?.groups.find((g: any) => g._id.toString() === groupId);
+if (!group) {
+  return Astro.redirect("/404");
+}
 
 const cursor = await PromptModel.listByTenant(Astro.locals.user.tenant_id);
 const prompts = await cursor.toArray();
 
 const categoryPrompt = prompts.filter(
-  (g: any) => g?.category?.toString() === category?._id?.toString(),
+  (g) => g.category?.toString() === categoryId,
 );
 const categoryGroupPrompt = categoryPrompt.filter(
-  (g: any) => g?.group?.toString() === group?._id?.toString(),
+  (g) => g.group?.toString() === group?._id?.toString(),
 );
 const promptItems = categoryGroupPrompt.map((prompt) => ({
-  _id: prompt?._id?.toString(),
+  _id: prompt._id?.toString(),
   title: prompt.title,
   description: prompt.description,
 }));
+
+let userPermissions = Astro.locals.user.permissions;
 ---
 
 <Layout>
