@@ -323,22 +323,24 @@
                 <col class="w-36" />
                 <col class="w-auto" />
               </colgroup>
-              <tr class="mb-4">
-                <td class="text-gray-400">{t("user.signed-up")}</td>
-                <td class="text-base">
-                  {moment(userData.created_at, "DD.MM.YYYY").format(
-                    "dddd DD.MM.YYYY",
-                  )}</td
-                >
-              </tr>
-              <tr class="mb-4">
-                <td class="text-gray-400">{t("user.logins")}</td>
-                <td class="text-base">{userData.logins_count ?? "-"}</td>
-              </tr>
-              <tr class="">
-                <td class="text-gray-400">{t("user.organization")}</td>
-                <td class="text-base">{tenant?.name ?? "-"}</td>
-              </tr>
+              <tbody>
+                <tr class="mb-4">
+                  <td class="text-gray-400">{t("user.signed-up")}</td>
+                  <td class="text-base">
+                    {moment(userData.created_at, "DD.MM.YYYY").format(
+                      "dddd DD.MM.YYYY",
+                    )}</td
+                  >
+                </tr>
+                <tr class="mb-4">
+                  <td class="text-gray-400">{t("user.logins")}</td>
+                  <td class="text-base">{userData.logins_count ?? "-"}</td>
+                </tr>
+                <tr class="">
+                  <td class="text-gray-400">{t("user.organization")}</td>
+                  <td class="text-base">{tenant?.name ?? "-"}</td>
+                </tr>
+              </tbody>
             </table>
           </div>
 
@@ -350,28 +352,30 @@
                 <col class="w-36" />
                 <col class="w-auto" />
               </colgroup>
-              <tr class="mb-4">
-                <td class="text-gray-400">{t("user.latest-login")}</td>
-                <td class="text-base">
-                  {userData.last_login
-                    ? moment(userData.last_login).format("dddd DD.MM.YYYY")
-                    : "-"}
-                </td>
-              </tr>
-              <tr class="mb-4">
-                <td class="text-gray-400">{t("user.status")}</td>
-                <td
-                  class="text-base"
-                  style={`color: ${getUserStatus(userData.blocked, userData.email_verified).color}`}
-                >
-                  {getUserStatus(userData.blocked, userData.email_verified)
-                    .text}</td
-                >
-              </tr>
-              <tr class="mb-4">
-                <td class="text-gray-400">{t("user.id")}</td>
-                <td class="text-base"> {userData.auth0_sub}</td>
-              </tr>
+              <tbody>
+                <tr class="mb-4">
+                  <td class="text-gray-400">{t("user.latest-login")}</td>
+                  <td class="text-base">
+                    {userData.last_login
+                      ? moment(userData.last_login).format("dddd DD.MM.YYYY")
+                      : "-"}
+                  </td>
+                </tr>
+                <tr class="mb-4">
+                  <td class="text-gray-400">{t("user.status")}</td>
+                  <td
+                    class="text-base"
+                    style={`color: ${getUserStatus(userData.blocked, userData.email_verified).color}`}
+                  >
+                    {getUserStatus(userData.blocked, userData.email_verified)
+                      .text}</td
+                  >
+                </tr>
+                <tr class="mb-4">
+                  <td class="text-gray-400">{t("user.id")}</td>
+                  <td class="text-base"> {userData.auth0_sub}</td>
+                </tr>
+              </tbody>
             </table>
           </div>
         </div>
