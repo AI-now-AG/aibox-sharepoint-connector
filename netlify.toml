@@ -7,7 +7,6 @@
 
 [functions]
   node_bundler = "esbuild"
-  directory = "netlify/functions"
   included_files = ["bin/osx/**", "bin/linux/**"]
 
   [functions."transcribeAudio-background"]
