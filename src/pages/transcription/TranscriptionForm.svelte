@@ -20,6 +20,7 @@
   let audioDuration: string = "";
   let acceptedTypes: Array<string> = ["audio/*", "video/*"];
   let acceptedTypesJSON: Array<string> = ["application/json"];
+  let acceptTypes: string = "";
   let maxFileSize = 25;
   let isDragOver: boolean = false;
   let textOuput: string = "";
@@ -121,6 +122,10 @@
         }
       }
     });
+    acceptTypes =
+      transcriptionType === TranscriptionType.Subtitlesjson
+        ? acceptedTypesJSON.join(",")
+        : acceptedTypes.join(",");
   });
 
   function checkDataAvaibility() {
@@ -900,7 +905,7 @@
           <input
             type="file"
             class="absolute inset-0 z-50 w-full h-full p-0 m-0 outline-none opacity-0 cursor-pointer"
-            accept="audio/*,video/*"
+            accept={acceptTypes}
             on:change={addFiles}
           />
 

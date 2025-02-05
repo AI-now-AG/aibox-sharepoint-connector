@@ -184,8 +184,8 @@ output>
     const { transcriptionType, transcriptions } = transcribeParams;
     const instruction =
       transcriptionType === TranscriptionType.Subtitlesjson
-        ? transcriptions.subtitles?.text
-        : transcriptions.subtitlesjson?.text;
+        ? transcriptions.subtitlesjson?.text
+        : transcriptions.subtitles?.text;
     const response = await model.invoke([
       new SystemMessage(instruction || DEFAULT_INSTRUCTION),
       new HumanMessage(chunk),
