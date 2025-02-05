@@ -32,26 +32,20 @@
   });
 
   const addOrRemoveInputType = (array: Item[], item: Item) => {
-    const exists = array.includes(item);
-
-    if (exists) {
-      return array.filter((c) => {
-        return c !== item;
-      });
-    } else {
-      const result = array;
-      result.push(item);
-      return result;
-    }
+    return array.includes(item)
+      ? array.filter((c) => c !== item)
+      : [...array, item];
   };
 
   const resetSelection = () => {
-    selectedItems = [];
-    setInputValue();
+    if (selectedItems.length !== 0) {
+      selectedItems = [];
+      setInputValue();
+    }
   };
 
   function handleSelectedItems(selected: Item) {
-    selectedItems = addOrRemoveInputType(selectedItems!, selected);
+    selectedItems = [...addOrRemoveInputType(selectedItems!, selected)];
     setInputValue();
   }
 
@@ -60,11 +54,11 @@
   }
 
   function preventDefault(fn) {
-		return function (event) {
-			event.preventDefault();
-			fn.call(this, event);
-		};
-	}
+    return function (event) {
+      event.preventDefault();
+      fn.call(this, event);
+    };
+  }
 </script>
 
 <div>

@@ -14,7 +14,7 @@
 
   let { promptItems, isEditable = $bindable(false) }: Props = $props();
 
-  let selectedPromptId = $state();
+  let selectedPromptId = $state("");
   let input = $state("");
   let output = $state("");
   let isProcessing = $state(false);

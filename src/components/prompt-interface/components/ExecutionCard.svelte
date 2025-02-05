@@ -19,7 +19,7 @@
   }
 
   let {
-    isEditable = false,
+    isEditable = $bindable(false),
     cards = $bindable(),
     selectedPromptId = $bindable(),
   }: Props = $props();

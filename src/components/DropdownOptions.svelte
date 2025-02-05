@@ -16,7 +16,7 @@
   let {
     options = [],
     widthClass = "w-48",
-    styleVisibility = "",
+    styleVisibility = $bindable(""),
   }: Props = $props();
 </script>
 

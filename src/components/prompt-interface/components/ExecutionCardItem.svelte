@@ -5,8 +5,7 @@
   import { useTranslations } from "$i18n/utils";
 
   const t = useTranslations();
-
-
+  
   interface Props {
     active: boolean;
     isEditable: boolean;

@@ -14,7 +14,7 @@
   }
 
   let {
-    promptId = "",
+    promptId = $bindable(""),
     input = $bindable(""),
     output = $bindable(""),
     isProcessing = $bindable(false)
