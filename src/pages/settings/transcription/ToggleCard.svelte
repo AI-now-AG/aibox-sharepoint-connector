@@ -8,27 +8,35 @@
   import { type TranscriptionCard } from "$types/TranscriptionCard";
   const t = useTranslations();
 
-  let instructionTitle = "";
-  let instructionText = "";
-  let isMounted = false;
+  let instructionTitle = $state("");
+  let instructionText = $state("");
+  let isMounted = $state(false);
 
   onMount(() => {
     isMounted = true;
   });
 
-  export let transcriptionCard: TranscriptionCard;
-
-  $: if (transcriptionCard) {
-    instructionTitle = transcriptionCard.title || "";
+  interface Props {
+    transcriptionCard: TranscriptionCard;
   }
 
-  $: if (transcriptionCard && !isMounted) {
-    instructionText = transcriptionCard.description || "";
-  }
+  let { transcriptionCard = $bindable() }: Props = $props();
 
-  let isSaving = false;
-  $: isFormValid =
-    instructionTitle.trim() !== "" && instructionText.trim() !== "";
+  $effect(() => {
+    if (transcriptionCard) {
+      instructionTitle = transcriptionCard.title || "";
+    }
+  });
+
+  $effect(() => {
+    if (transcriptionCard && !isMounted) {
+      instructionText = transcriptionCard.description || "";
+    }
+  });
+
+  let isSaving = $state(false);
+  let isFormValid =
+    $derived(instructionTitle.trim() !== "" && instructionText.trim() !== "");
 
   const updateTranscriptionSetting = async (enabled: boolean) => {
     isSaving = true;
@@ -77,7 +85,7 @@
             type="checkbox"
             class="toggle toggle-primary"
             bind:checked={transcriptionCard.toggle}
-            on:change={(event) =>
+            onchange={(event) =>
               updateTranscriptionSetting(event.target?.checked)}
           />
         </label>

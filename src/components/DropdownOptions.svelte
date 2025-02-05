@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export interface Option {
     icon: any;
     text: string;
@@ -7,9 +7,17 @@
 </script>
 
 <script lang="ts">
-  export let options: Option[] = [];
-  export let widthClass = "w-48";
-  export let styleVisibility = "";
+  interface Props {
+    options?: Option[];
+    widthClass?: string;
+    styleVisibility?: string;
+  }
+
+  let {
+    options = [],
+    widthClass = "w-48",
+    styleVisibility = "",
+  }: Props = $props();
 </script>
 
 <ul
@@ -20,7 +28,7 @@
     <li>
       <button
         class="flex items-center px-4 py-2 text-base-content font-sans w-full"
-        on:click|stopPropagation={(e) => {
+        onclick={(e) => {
           option.action();
         }}
       >

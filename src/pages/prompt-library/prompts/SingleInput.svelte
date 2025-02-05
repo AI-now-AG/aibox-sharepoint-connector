@@ -2,25 +2,34 @@
   import { clickOutside } from "$components/actions/ClickOutside.svelte";
   type Item = { title: string } | string;
 
-  export let title;
-  export let placeholder;
-  export let items: Item[];
-  export let selectedItem: Item | undefined;
-  let isShowDropdownOption = false;
-  let inputValue = "";
-
-  $: {
-    if (selectedItem) {
-      setInputValue();
-    } else if (items) {
-      resetSelection();
-    }
+  interface Props {
+    title: any;
+    placeholder: any;
+    items: Item[];
+    selectedItem: Item | undefined;
   }
+
+  let {
+    title,
+    placeholder,
+    items,
+    selectedItem = $bindable()
+  }: Props = $props();
+  let isShowDropdownOption = $state(false);
+  let inputValue = $state("");
+
 
   const resetSelection = () => {
     selectedItem = undefined;
     setInputValue();
   };
+
+  function preventDefault(fn) {
+		return function (event) {
+			event.preventDefault();
+			fn.call(this, event);
+		};
+	}
 
   function handleSelectedItems(selected: Item) {
     if (selectedItem === selected) {
@@ -39,13 +48,20 @@
           : selectedItem.title)) ||
       "";
   }
+  $effect(() => {
+    if (selectedItem) {
+      setInputValue();
+    } else if (items) {
+      resetSelection();
+    }
+  });
 </script>
 
 <div>
   <p class="mb-2">{title}</p>
   <div
     use:clickOutside
-    on:clickoutside={() => {
+    onclickoutside={() => {
       isShowDropdownOption = false;
     }}
     class="dropdown dropdown-bottom w-full min-w-xs"
@@ -56,20 +72,20 @@
       role="button"
       class="input input-bordered font-medium w-full min-w-xs"
       readonly
-      on:click={() => {
+      onclick={() => {
         isShowDropdownOption = true;
       }}
     />
     {#if items}
       {#if isShowDropdownOption}
-        <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
+        <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
         <ul
           class="dropdown-content menu bg-base-100 space-y-2 rounded-box z-[1] w-52 p-2 shadow"
         >
           {#each items as item}
             <li>
               <button
-                on:click|preventDefault={() => handleSelectedItems(item)}
+                onclick={preventDefault(() => handleSelectedItems(item))}
                 class={`${selectedItem == item ? "bg-primary text-base-100 hover:bg-primary" : "hover:text-neutral"}`}
                 >{typeof item === "string" ? item : item.title}
               </button>

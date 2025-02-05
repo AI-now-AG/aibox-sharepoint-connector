@@ -1,10 +1,15 @@
-<script>
+<script lang="ts">
   import { fade } from "svelte/transition";
   import Output from "./Output.svelte";
   import { sharedMessageHistory } from "$components/prompt-interface/components/Stores";
-  // export let input;
-  export let output;
-  export let isProcessing;
+  
+  interface Props {
+    // export let input;
+    output: any;
+    isProcessing: any;
+  }
+
+  let { output = $bindable(), isProcessing = $bindable() }: Props = $props();
 </script>
 
 {#if output || $sharedMessageHistory.length > 0 || isProcessing}

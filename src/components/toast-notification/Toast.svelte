@@ -4,8 +4,13 @@
 
   const dispatch = createEventDispatcher();
 
-  export let type: string = "error";
-  export let dismissible: boolean = true;
+  interface Props {
+    type?: string;
+    dismissible?: boolean;
+    children?: import('svelte').Snippet;
+  }
+
+  let { type = "error", dismissible = true, children }: Props = $props();
 
   const iconWidth = "1.2rem";
 </script>
@@ -97,11 +102,11 @@
   </span>
 
   <div class="text">
-    <slot />
+    {@render children?.()}
   </div>
 
   {#if dismissible}
-    <button class="close" on:click={() => dispatch("dismiss")}>
+    <button class="close" onclick={() => dispatch("dismiss")}>
       <svg
         width="0.5em"
         style="text-align: center; display: inline-block;"

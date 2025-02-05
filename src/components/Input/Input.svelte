@@ -2,15 +2,29 @@
   import { createEventDispatcher } from "svelte";
   import type { HTMLInputAttributes } from "svelte/elements";
 
-  export let id: string = "";
-  export let label: string = "";
-  export let value: string = "";
-  export let placeholder: string = "";
-  export let classes: string = "";
-  export let disabled: boolean = false;
-  export let icon: string | null = null;
-  export let type: HTMLInputAttributes["type"] = "text";
-  export let required: boolean = false;
+  interface Props {
+    id?: string;
+    label?: string;
+    value?: string;
+    placeholder?: string;
+    classes?: string;
+    disabled?: boolean;
+    icon?: string | null;
+    type?: HTMLInputAttributes["type"];
+    required?: boolean;
+  }
+
+  let {
+    id = "",
+    label = "",
+    value = "",
+    placeholder = "",
+    classes = "",
+    disabled = false,
+    icon = null,
+    type = "text",
+    required = false
+  }: Props = $props();
 
   const dispatch = createEventDispatcher();
 
@@ -36,7 +50,7 @@
       {value}
       name={id}
       class={`w-full ${classes}`}
-      on:input={handleChange}
+      oninput={handleChange}
     />
     {#if icon}
       {@html icon}

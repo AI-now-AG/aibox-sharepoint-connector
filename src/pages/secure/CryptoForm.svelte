@@ -2,12 +2,12 @@
   import { actions } from "astro:actions";
 
   //   Used for Encryption
-  let orginalEncryptKey = "";
-  let encryptedKey = "";
+  let orginalEncryptKey = $state("");
+  let encryptedKey = $state("");
 
   //   Used for Decryption
-  let originalDecryptKey = "";
-  let decryptedKey = "";
+  let originalDecryptKey = $state("");
+  let decryptedKey = $state("");
 
   async function encryptKey() {
     try {
@@ -50,7 +50,7 @@
         id="raw_key"
         placeholder={"Enter Raw API key you would like to Encrypt"}
         value={orginalEncryptKey}
-        on:change={(event) => {
+        onchange={(event) => {
           orginalEncryptKey = event.target.value;
         }}
       />
@@ -62,7 +62,7 @@
     </div>
     <button
       class="btn btn-active btn-success mt-4"
-      on:click={() => {
+      onclick={() => {
         encryptKey();
       }}
     >
@@ -81,7 +81,7 @@
         id="encrypt_key"
         placeholder={"Enter Encrypted Key you would like to Decrypt"}
         value={originalDecryptKey}
-        on:change={(event) => {
+        onchange={(event) => {
           originalDecryptKey = event.target.value;
         }}
       />
@@ -94,7 +94,7 @@
 
     <button
       class="btn btn-active btn-warning mt-4"
-      on:click={() => {
+      onclick={() => {
         decryptKey();
       }}
     >

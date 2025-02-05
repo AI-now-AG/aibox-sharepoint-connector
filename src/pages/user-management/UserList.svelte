@@ -25,7 +25,11 @@
 
   const t = useTranslations();
 
-  export let tenantId: string = "";
+  interface Props {
+    tenantId?: string;
+  }
+
+  let { tenantId = "" }: Props = $props();
 
   const columnData: ColumnData[] = [
     { key: "name", name: t("common.name") },
@@ -36,19 +40,19 @@
     { key: "", name: "" },
     { key: "", name: "" },
   ];
-  let users: any = [];
+  let users: any = $state([]);
 
-  let searchValue: string = "";
-  let filterRolesParams: any[] = [];
-  let filterStatusesParams: any = {};
-  let previousFilterState: string = JSON.stringify({
+  let searchValue: string = $state("");
+  let filterRolesParams: any[] = $state([]);
+  let filterStatusesParams: any = $state({});
+  let previousFilterState: string = $state(JSON.stringify({
     ...filterRolesParams,
     ...filterStatusesParams,
-  });
+  }));
 
-  let selectedUser: any;
-  let confirmBlockModal: HTMLDialogElement;
-  let confirmDeleteModal: HTMLDialogElement;
+  let selectedUser: any = $state();
+  let confirmBlockModal: HTMLDialogElement = $state();
+  let confirmDeleteModal: HTMLDialogElement = $state();
 
   const fetchUsers = async () => {
     showLoading();

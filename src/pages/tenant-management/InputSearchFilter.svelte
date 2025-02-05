@@ -1,4 +1,7 @@
 <script lang="ts">
+  import { createBubbler, handlers } from 'svelte/legacy';
+
+  const bubble = createBubbler();
   import { createEventDispatcher } from "svelte";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
@@ -6,8 +9,12 @@
   const dispatch = createEventDispatcher();
   const t = useTranslations();
 
-  export let value: string = "";
-  export let showArchived: boolean = false;
+  interface Props {
+    value?: string;
+    showArchived?: boolean;
+  }
+
+  let { value = $bindable(""), showArchived = $bindable(false) }: Props = $props();
   let typingTimeout: any;
 
   const onSearch = ({ target }: any) => {
@@ -25,6 +32,13 @@
     dispatch("filter");
     console.log("dispatch filter", { value });
   };
+
+  function preventDefault(fn) {
+		return function (event) {
+			event.preventDefault();
+			fn.call(this, event);
+		};
+	}
 </script>
 
 <div class="items-center mb-10">
@@ -35,9 +49,8 @@
         type="text"
         class="grow text-sm"
         placeholder={t("tenant.tenants.seach-place-holder")}
-        on:input={onSearch}
-        on:input
-        on:blur
+        oninput={handlers(onSearch, bubble('input'))}
+        onblur={bubble('blur')}
       />
     </label>
   </div>
@@ -47,7 +60,7 @@
         type="checkbox"
         class="checkbox border-gray-300 rounded focus:ring-indigo-500 w-5 h-5"
         checked={showArchived}
-        on:click|preventDefault={onFilter}
+        onclick={preventDefault(onFilter)}
       />
       <span class="label-text">{t("tenant.tenants.show-archived")}</span>
     </label>

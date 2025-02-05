@@ -8,8 +8,8 @@
 
   const t = useTranslations();
 
-  let fileUploadModal: HTMLDialogElement;
-  let inputFile: File;
+  let fileUploadModal: HTMLDialogElement = $state();
+  let inputFile: File = $state();
 
   const importUrl: string = "/api/prompts/import";
   const exportUrl: string = "/api/prompts/export";
@@ -94,7 +94,7 @@
 <div class="flex space-x-2">
   <button
     class="btn btn-default btn-outline font-normal grow-0"
-    on:click={() => {
+    onclick={() => {
       fileUploadModal.showModal();
     }}
   >
@@ -104,7 +104,7 @@
   <button
     class="btn btn-default btn-outline font-normal grow-0"
     data-astro-prefetch="false"
-    on:click={downloadExport}
+    onclick={downloadExport}
   >
     {@html svgIcons.fileExport}
     {t("prompt-library.prompts.export")}

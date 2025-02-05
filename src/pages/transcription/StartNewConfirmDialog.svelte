@@ -6,9 +6,13 @@
   const dispatch = createEventDispatcher();
   const t = useTranslations();
 
-  export let modal;
-  export let isZipDataPresent: boolean;
-  export let isFileDataPresent: boolean;
+  interface Props {
+    modal: any;
+    isZipDataPresent: boolean;
+    isFileDataPresent: boolean;
+  }
+
+  let { modal = $bindable(), isZipDataPresent, isFileDataPresent }: Props = $props();
 </script>
 
 <dialog id={"modal_confirm_start_new"} bind:this={modal} class="modal">
@@ -32,7 +36,7 @@
       </div>
 
       <div class="flex flex-col gap-4 mt-16">
-        <button class="btn btn-sm" on:click={() => dispatch("confirm")}
+        <button class="btn btn-sm" onclick={() => dispatch("confirm")}
           >{t("transcription.start-new")}</button
         >
         <button class="btn btn-active btn-primary btn-sm text-base-100"
@@ -42,14 +46,14 @@
           <button
             id="no_button"
             class="btn btn-active btn-primary btn-sm text-base-100"
-            on:click={() => dispatch("downloadZip")}
+            onclick={() => dispatch("downloadZip")}
             >{t("transciption.model.cta.download-zip")}</button
           >
         {:else if isFileDataPresent}
           <button
             id="no_button"
             class="btn btn-active btn-primary btn-sm text-base-100"
-            on:click={() => dispatch("downloadFile")}
+            onclick={() => dispatch("downloadFile")}
             >{t("transciption.model.cta.download-output")}</button
           >
         {/if}

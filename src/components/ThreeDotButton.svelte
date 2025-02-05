@@ -1,15 +1,20 @@
 <script lang="ts">
   import { svgIcons } from "$assets/icons";
 
-  export let action: Function = () => null;
+  interface Props {
+    action?: Function;
+  }
+
+  let { action = () => null }: Props = $props();
 </script>
 
-<!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y_click_events_have_key_events -->
 <div
   role="button"
   tabindex="0"
   class="btn btn-ghost btn-sm"
-  on:click|stopPropagation={() => {
+  onclick={(e) => {
+    e.stopPropagation();
     action();
   }}
 >

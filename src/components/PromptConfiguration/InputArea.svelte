@@ -1,6 +1,5 @@
-<script>
-  export let placeholder;
-  export let promptText;
+<script lang="ts">
+  let { placeholder, promptText = $bindable() } = $props();
 </script>
 
 <div class="flex space-y-2">

@@ -9,10 +9,14 @@
   import { loading } from "$stores";
   import type { ViewCategory } from "$actions/category";
 
-  export let items: ViewCategory[] = [];
+  interface Props {
+    items?: ViewCategory[];
+  }
+
+  let { items = $bindable([]) }: Props = $props();
 
   let categoryToDelete: string;
-  let confirmDeleteModal: HTMLDialogElement;
+  let confirmDeleteModal: HTMLDialogElement = $state();
 
   const flipDurationMs: number = 200;
   const dropTargetStyle: any = {
@@ -21,6 +25,13 @@
 
   let timeout: any;
   const t = useTranslations();
+
+  function preventDefault(fn) {
+		return function (event) {
+			event.preventDefault();
+			fn.call(this, event);
+		};
+	}
 
   function reloadPage(delay = 1500) {
     setTimeout(() => {
@@ -132,8 +143,8 @@
 
     <section
       use:dndzone={{ items, flipDurationMs, dropTargetStyle }}
-      on:consider={handleDndConsider}
-      on:finalize={handleDndFinalize}
+      onconsider={handleDndConsider}
+      onfinalize={handleDndFinalize}
     >
       {#each items as item (item.id)}
         <div
@@ -182,8 +193,8 @@
                 <li>
                   <button
                     class="flex block w-full text-left px-4 py-2 text-sm hover:underline"
-                    on:click|preventDefault={() =>
-                      updateStatus(item.id, !item.active)}
+                    onclick={preventDefault(() =>
+                      updateStatus(item.id, !item.active))}
                   >
                     {@html item.active === true
                       ? svgIcons.eyeClose
@@ -198,7 +209,7 @@
                 <li>
                   <button
                     class="flex block w-full text-left px-4 py-2 text-sm hover:underline"
-                    on:click|preventDefault={() => handleDelete(item.id)}
+                    onclick={preventDefault(() => handleDelete(item.id))}
                   >
                     {@html svgIcons.trash}
                     <span class="ml-1">{t("common.delete")}</span>

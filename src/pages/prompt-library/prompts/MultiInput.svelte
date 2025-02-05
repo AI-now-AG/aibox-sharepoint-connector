@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: Can't migrate code with afterUpdate. Please migrate by hand. -->
 <script lang="ts">
   // TODO: Us checkboxes instead of anchors, it's what they are used for. That
   // way we don't have to manage selected state ourselves.

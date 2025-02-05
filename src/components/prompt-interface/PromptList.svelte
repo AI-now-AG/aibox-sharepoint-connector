@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export interface CardItem {
     id: string;
     title: string;
@@ -23,20 +23,24 @@
 
   const t = useTranslations();
 
-  export let items: CardItem[] = [];
-  export let title: string = t("prompt-library.prompts.all");
-  export let isEditable: boolean = false;
+  interface Props {
+    items?: CardItem[];
+    title?: string;
+    isEditable?: boolean;
+  }
 
-  let selectedEditPromptId: string = "";
+  let { items = $bindable([]), title = t("prompt-library.prompts.all"), isEditable = false }: Props = $props();
+
+  let selectedEditPromptId: string = $state("");
   let selectedDeletePromptId: string = "";
   let selectedOrderPromptId: string = "";
-  let promptDialog: HTMLDialogElement;
-  let promptDialogMode: "update" | "clone" = "update";
-  let confirmDeleteModal: HTMLDialogElement;
-  let promptOrderDialog: HTMLDialogElement;
+  let promptDialog: HTMLDialogElement = $state();
+  let promptDialogMode: "update" | "clone" = $state("update");
+  let confirmDeleteModal: HTMLDialogElement = $state();
+  let promptOrderDialog: HTMLDialogElement = $state();
 
-  let timeout: any;
-  let orderCards = items;
+  let timeout: any = $state();
+  let orderCards = $state(items);
 
   function getItemsByGroupId(items: CardItem[], groupId: string): CardItem[] {
     return items.filter((item) => item.group === groupId);

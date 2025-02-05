@@ -4,7 +4,11 @@
 
   const dispatch = createEventDispatcher();
 
-  export let show: boolean = false;
+  interface Props {
+    show?: boolean;
+  }
+
+  let { show = $bindable(false) }: Props = $props();
 
   function toggle() {
     show = !show;
@@ -13,7 +17,7 @@
   }
 </script>
 
-<button on:click={toggle}>
+<button onclick={toggle}>
   {#if show}
     {@html svgIcons.eye}
   {:else}

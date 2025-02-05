@@ -7,13 +7,24 @@
 
   const t = useTranslations();
 
-  export let isEditable: boolean;
-  export let data: any;
 
-  export let onSelectEdit: Function;
-  export let onSelectDuplicate: Function;
-  export let onSelectReOder: Function;
-  export let onSelectDelete: Function;
+  interface Props {
+    isEditable: boolean;
+    data: any;
+    onSelectEdit: Function;
+    onSelectDuplicate: Function;
+    onSelectReOder: Function;
+    onSelectDelete: Function;
+  }
+
+  let {
+    isEditable,
+    data,
+    onSelectEdit,
+    onSelectDuplicate,
+    onSelectReOder,
+    onSelectDelete
+  }: Props = $props();
 
   let options: Option[] = [
     {

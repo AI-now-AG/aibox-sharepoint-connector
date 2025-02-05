@@ -1,6 +1,10 @@
 <script lang="ts">
-  export let modal: any;
-  export let message: string = "";
+  interface Props {
+    modal: any;
+    message?: string;
+  }
+
+  let { modal = $bindable(), message = "" }: Props = $props();
 </script>
 
 <dialog id="alert_dialog" bind:this={modal} class="modal">

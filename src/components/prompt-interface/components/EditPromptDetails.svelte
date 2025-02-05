@@ -12,11 +12,21 @@
 
   const t = useTranslations();
 
-  export let isEditable: boolean = true;
-  export let selectedEditPromptId: any = null;
-  export let promptDialog: HTMLDialogElement;
-  export let dialogMode: "create" | "update" | "clone" = "update";
-  export let dialogTitle: string = t("prompt-library.edit.title");
+  interface Props {
+    isEditable?: boolean;
+    selectedEditPromptId?: any;
+    promptDialog: HTMLDialogElement;
+    dialogMode?: "create" | "update" | "clone";
+    dialogTitle?: string;
+  }
+
+  let {
+    isEditable = true,
+    selectedEditPromptId = $bindable(null),
+    promptDialog = $bindable(),
+    dialogMode = "update",
+    dialogTitle = t("prompt-library.edit.title")
+  }: Props = $props();
 
   type Group = { title: string; _id: string }; // TODO: Get the type from the API endpoint
   type Category = {
@@ -29,37 +39,29 @@
     _id: string;
   };
 
-  let categories: Category[] = [];
-  let selectedCategory: Category;
+  let categories: Category[] = $state([]);
+  let selectedCategory: Category = $state();
 
-  let knowledgeBases: KnowledgeBase[] = [];
-  let selectedKnowledgeBases: KnowledgeBase[] = [];
+  let knowledgeBases: KnowledgeBase[] = $state([]);
+  let selectedKnowledgeBases: KnowledgeBase[] = $state([]);
 
-  let selectedGroup: Group | any;
-  let previousCategoryId: string | null = null;
+  let selectedGroup: Group | any = $state();
+  let previousCategoryId: string | null = $state(null);
 
-  let promptTitle = "";
-  let promptText = "";
+  let promptTitle = $state("");
+  let promptText = $state("");
   let promptDetails: any | undefined = undefined;
 
-  let isSaving = false;
-  let isLoading = false;
+  let isSaving = $state(false);
+  let isLoading = $state(false);
 
-  $: if (selectedCategory && selectedCategory._id !== previousCategoryId) {
-    selectedGroup = null;
-    previousCategoryId = selectedCategory._id;
-  }
+  function preventDefault(fn) {
+		return function (event) {
+			event.preventDefault();
+			fn.call(this, event);
+		};
+	}
 
-  $: isFormValid =
-    promptTitle.trim() !== "" &&
-    promptText.trim() !== "" &&
-    selectedCategory !== undefined &&
-    selectedGroup !== undefined;
-
-  // Fetch prompt details when selectedEditPromptId changes
-  $: if (selectedEditPromptId) {
-    getPromptDetail(selectedEditPromptId);
-  }
 
   onMount(async function () {
     const categoryResponse = await fetch("/api/categories.json", {
@@ -202,13 +204,30 @@
       event.preventDefault();
     }
   }
+  $effect(() => {
+    if (selectedCategory && selectedCategory._id !== previousCategoryId) {
+      selectedGroup = null;
+      previousCategoryId = selectedCategory._id;
+    }
+  });
+  let isFormValid =
+    $derived(promptTitle.trim() !== "" &&
+    promptText.trim() !== "" &&
+    selectedCategory !== undefined &&
+    selectedGroup !== undefined);
+  // Fetch prompt details when selectedEditPromptId changes
+  $effect(() => {
+    if (selectedEditPromptId) {
+      getPromptDetail(selectedEditPromptId);
+    }
+  });
 </script>
 
 <dialog class="modal" bind:this={promptDialog}>
   <div class="modal-box w-8/12 max-w-5xl">
     <div class="flex justify-between">
       <h3 class="text-lg font-bold py-4">{dialogTitle}</h3>
-      <button class="btn btn-sm btn-circle btn-ghost" on:click={cancelEdit}>
+      <button class="btn btn-sm btn-circle btn-ghost" onclick={cancelEdit}>
         {@html svgIcons.closeMenu}
       </button>
     </div>
@@ -221,7 +240,7 @@
           bind:value={promptTitle}
           placeholder="e.g. Create three sports headlines"
           class="input input-bordered w-full min-w-xs"
-          on:keydown={handleKeyDown}
+          onkeydown={handleKeyDown}
         />
       </div>
 
@@ -231,7 +250,7 @@
           bind:value={promptText}
           placeholder="e.g. Create three headlines..."
           class="input input-bordered min-w-xs shadow appearance-none min-h-32 w-full py-2 px-3"
-        />
+></textarea>
       </div>
 
       <div
@@ -269,13 +288,13 @@
         <div class="flex justify-end">
           <button
             class="btn btn-active btn-neutral-content px-8 font-normal mr-2"
-            on:click|preventDefault={cancelEdit}
+            onclick={preventDefault(cancelEdit)}
           >
             {t("common.cancel")}
           </button>
           <button
             class={`btn btn-active btn-primary px-8 font-normal ${(!isFormValid || isSaving) && "btn-disabled"}`}
-            on:click|preventDefault={savePrompt}
+            onclick={preventDefault(savePrompt)}
           >
             {#if isSaving}
               <span class="loading loading-spinner"></span>

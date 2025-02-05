@@ -12,24 +12,28 @@
   import { actions } from "astro:actions";
   import log from "$utils/log";
 
-  export let isEditable = false;
-  export let cards: any;
-  export let selectedPromptId;
+  interface Props {
+    isEditable?: boolean;
+    cards: any;
+    selectedPromptId: any;
+  }
+
+  let { isEditable = false, cards = $bindable(), selectedPromptId = $bindable() }: Props = $props();
 
   const t = useTranslations();
 
   const promptLimit = 5;
-  let showMore = false;
-  let selectedCardIndex: number = -1;
-  let selectedEditPromptId: string = "";
+  let showMore = $state(false);
+  let selectedCardIndex: number = $state(-1);
+  let selectedEditPromptId: string = $state("");
   let selectedDeletePromptId: string = "";
-  let promptDialog: HTMLDialogElement;
-  let promptDialogMode: "update" | "clone" = "update";
-  let confirmDeleteModal: HTMLDialogElement;
-  let promptOrderDialog: HTMLDialogElement;
+  let promptDialog: HTMLDialogElement = $state();
+  let promptDialogMode: "update" | "clone" = $state("update");
+  let confirmDeleteModal: HTMLDialogElement = $state();
+  let promptOrderDialog: HTMLDialogElement = $state();
 
-  let timeout: any;
-  let orderCards = cards;
+  let timeout: any = $state();
+  let orderCards = $state(cards);
   for (let i = 0; i < orderCards?.length; i++) {
     orderCards[i] = { ...orderCards[i], id: orderCards[i]._id };
   }
@@ -171,7 +175,7 @@
     <div class="flex">
       <button
         class="btn p-0 btn-link text-sm font-normal"
-        on:click={() => (showMore = !showMore)}
+        onclick={() => (showMore = !showMore)}
       >
         {showMore
           ? `${t("prompt-execution.card.showLess")} ↑`

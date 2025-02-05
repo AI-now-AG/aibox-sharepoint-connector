@@ -6,16 +6,20 @@
   import { svgIcons } from "$assets/icons";
   const t = useTranslations();
 
-  let knowledgeBaseTitle = "";
-  let knowledgeBaseText = "";
+  let knowledgeBaseTitle = $state("");
+  let knowledgeBaseText = $state("");
 
-  export let knowledgeBaseId: string | undefined = undefined;
-  export let knowledgeBase: any | undefined = undefined;
-  export let isEditable: boolean = false;
+  interface Props {
+    knowledgeBaseId?: string | undefined;
+    knowledgeBase?: any | undefined;
+    isEditable?: boolean;
+  }
 
-  let isSaving = false;
-  $: isFormValid =
-    knowledgeBaseTitle.trim() !== "" && knowledgeBaseText.trim() !== "";
+  let { knowledgeBaseId = undefined, knowledgeBase = undefined, isEditable = false }: Props = $props();
+
+  let isSaving = $state(false);
+  let isFormValid =
+    $derived(knowledgeBaseTitle.trim() !== "" && knowledgeBaseText.trim() !== "");
 
   onMount(async function () {
     if (knowledgeBase) {
@@ -23,6 +27,13 @@
       knowledgeBaseText = knowledgeBase.knowledge_base;
     }
   });
+
+  function preventDefault(fn) {
+		return function (event) {
+			event.preventDefault();
+			fn.call(this, event);
+		};
+	}
 
   async function saveInstruction() {
     if (!isFormValid) return;
@@ -69,7 +80,7 @@
 <div class="container max-w-5xl p-6 mx-auto p-4">
   <div class="w-full min-w-xs pt-2 lg:pt-6">
     <div class="flex items-center pt-2 pb-6">
-      <button class="mr-4" on:click={() => window.history.back()}>
+      <button class="mr-4" onclick={() => window.history.back()}>
         {@html svgIcons.back}
       </button>
       <h1 class="text-4xl font-bold">
@@ -99,14 +110,14 @@
           bind:value={knowledgeBaseText}
           placeholder="e.g. type knowledge base details..."
           class="input input-bordered min-w-xs shadow appearance-none min-h-96 w-full py-2 px-3"
-        />
+></textarea>
       </div>
 
       {#if isEditable}
         <div class="flex items-center justify-between">
           <button
             class={`btn btn-active btn-primary px-8 font-normal ${(!isFormValid || isSaving) && "btn-disabled"}`}
-            on:click|preventDefault={saveInstruction}
+            onclick={preventDefault(saveInstruction)}
           >
             {#if isSaving}
               <span class="loading loading-spinner"></span>

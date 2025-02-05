@@ -4,16 +4,21 @@
   } from "$components/DropdownOptions.svelte";
   import ThreeDotButton from "$components/ThreeDotButton.svelte";
 
-  export let options: Option[] = [];
-  export let cssClasses: string = "";
-  let styleVisibility: string = "";
+  interface Props {
+    options?: Option[];
+    cssClasses?: string;
+  }
 
-  let isShowDropdownOption = false;
+  let { options = [], cssClasses = "" }: Props = $props();
+  let styleVisibility: string = $state("");
+
+  let isShowDropdownOption = $state(false);
   const handleMouseEnter = () => {
     isShowDropdownOption = true;
     styleVisibility = "visibility: visible;";
   };
-  const handleMouseLeave = () => {
+  const handleMouseLeave = (event) => {
+    event.stopPropagation();
     isShowDropdownOption = false;
     styleVisibility = "";
   };
@@ -21,9 +26,9 @@
 
 <button
   class={`dropdown dropdown-hover dropdown-end ${cssClasses}`}
-  on:mouseenter={handleMouseEnter}
-  on:mouseleave={handleMouseLeave}
-  on:click|stopPropagation={handleMouseEnter}
+  onmouseenter={handleMouseEnter}
+  onmouseleave={handleMouseLeave}
+  onclick={handleMouseEnter}
 >
   <ThreeDotButton />
   {#if isShowDropdownOption}

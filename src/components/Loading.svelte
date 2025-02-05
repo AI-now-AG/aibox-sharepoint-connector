@@ -1,6 +1,10 @@
-<script>
-  export let show = false;
-  export let partial = false;
+<script lang="ts">
+  interface Props {
+    show?: boolean;
+    partial?: boolean;
+  }
+
+  let { show = false, partial = false }: Props = $props();
 </script>
 
 {#if show}

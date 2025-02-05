@@ -7,64 +7,79 @@
   const dispatch = createEventDispatcher();
   const t = useTranslations();
 
-  let showFilter = false;
-  let numberOfFilters = 0;
+  let showFilter = $state(false);
+  let numberOfFilters = $state(0);
 
-  export let rolesParams: any[] = [];
-  export let statusesParams: any = {};
+  interface Props {
+    rolesParams?: any[];
+    statusesParams?: any;
+  }
+
+  let { rolesParams = $bindable([]), statusesParams = $bindable({}) }: Props =
+    $props();
 
   // roles
-  let isUserChecked: boolean = false;
-  let isAdminChecked: boolean = false;
+  let isUserChecked: boolean = $state(false);
+  let isAdminChecked: boolean = $state(false);
 
   // statuses
-  let isVerifiedChecked: boolean = false;
-  let isUnVerifiedChecked: boolean = false;
-  let isBlockedChecked: boolean = false;
+  let isVerifiedChecked: boolean = $state(false);
+  let isUnVerifiedChecked: boolean = $state(false);
+  let isBlockedChecked: boolean = $state(false);
 
-  $: if (isUserChecked) {
-    rolesParams.push(UserRole.User);
-  } else {
-    rolesParams = rolesParams.filter((_role) => {
-      return _role != UserRole.User;
-    });
-  }
+  $effect(() => {
+    if (isUserChecked) {
+      rolesParams.push(UserRole.User);
+    } else {
+      rolesParams = rolesParams.filter((_role) => {
+        return _role != UserRole.User;
+      });
+    }
+  });
 
-  $: if (isAdminChecked) {
-    rolesParams.push(UserRole.SuperAdmin);
-    rolesParams.push(UserRole.Admin);
-  } else {
-    rolesParams = rolesParams.filter((_role) => {
-      return _role != UserRole.Admin && _role != UserRole.SuperAdmin;
-    });
-  }
+  $effect(() => {
+    if (isAdminChecked) {
+      rolesParams.push(UserRole.SuperAdmin);
+      rolesParams.push(UserRole.Admin);
+    } else {
+      rolesParams = rolesParams.filter((_role) => {
+        return _role != UserRole.Admin && _role != UserRole.SuperAdmin;
+      });
+    }
+  });
 
-  $: if (isVerifiedChecked) {
-    statusesParams = {
-      ...statusesParams,
-      isVerified: isVerifiedChecked,
-    };
-  } else {
-    delete statusesParams.isVerified;
-  }
+  $effect(() => {
+    if (isVerifiedChecked) {
+      statusesParams = {
+        ...statusesParams,
+        isVerified: isVerifiedChecked,
+      };
+    } else {
+      delete statusesParams.isVerified;
+    }
+  });
 
-  $: if (isUnVerifiedChecked) {
-    statusesParams = {
-      ...statusesParams,
-      isUnVerified: isUnVerifiedChecked,
-    };
-  } else {
-    delete statusesParams.isUnVerified;
-  }
+  $effect(() => {
+    if (isUnVerifiedChecked) {
+      statusesParams = {
+        ...statusesParams,
+        isUnVerified: isUnVerifiedChecked,
+      };
+    } else {
+      delete statusesParams.isUnVerified;
+    }
+  });
 
-  $: if (isBlockedChecked) {
-    statusesParams = {
-      ...statusesParams,
-      isBlocked: isBlockedChecked,
-    };
-  } else {
-    delete statusesParams.isBlocked;
-  }
+  $effect(() => {
+    if (isBlockedChecked) {
+      statusesParams = {
+        ...statusesParams,
+        isBlocked: isBlockedChecked,
+      };
+    } else {
+      delete statusesParams.isBlocked;
+    }
+  });
 
   function handleClickFilter() {
     if (showFilter) {
@@ -99,25 +114,28 @@
     }
   }
 
-  $: if (
-    isUserChecked ||
-    isAdminChecked ||
-    isVerifiedChecked ||
-    isUnVerifiedChecked ||
-    isBlockedChecked
-  ) {
-    calculateNumberOfFitler();
-  } else {
-    numberOfFilters = 0;
-  }
+  $effect(() => {
+    if (
+      isUserChecked ||
+      isAdminChecked ||
+      isVerifiedChecked ||
+      isUnVerifiedChecked ||
+      isBlockedChecked
+    ) {
+      calculateNumberOfFitler();
+    } else {
+      numberOfFilters = 0;
+    }
+  });
 </script>
 
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<!-- svelte-ignore a11y-no-static-element-interactions -->
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
 <div class="mt-3">
   <div
     class="btn btn-sm btn-active font-normal bg-base-200"
-    on:click|stopPropagation={() => {
+    onclick={(e) => {
+      e.stopPropagation();
       handleClickFilter();
     }}
   >
@@ -139,7 +157,8 @@
         >
         <button
           class="btn btn-default btn-sm"
-          on:click|stopPropagation={() => {
+          onclick={(e) => {
+            e.stopPropagation();
             showFilter = false;
             dispatch("filter");
           }}
@@ -152,9 +171,12 @@
 
       <div class="w-full text-sm">
         <div class="w-full text-left">{t("user.role")}</div>
-        <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+        <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
         <label
-          on:click|stopPropagation={() => null}
+          onclick={(e) => {
+            e.stopPropagation();
+            null;
+          }}
           class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
         >
           <input
@@ -165,9 +187,12 @@
           <span class="font-normal">{t("user.user")}</span>
         </label>
 
-        <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+        <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
         <label
-          on:click|stopPropagation={() => null}
+          onclick={(e) => {
+            e.stopPropagation();
+            null;
+          }}
           class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
         >
           <input
@@ -181,9 +206,12 @@
 
       <div class="w-full mt-4">
         <div class="w-full text-left">{t("user.status")}</div>
-        <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+        <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
         <label
-          on:click|stopPropagation={() => null}
+          onclick={(e) => {
+            e.stopPropagation();
+            null;
+          }}
           class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
         >
           <input
@@ -194,9 +222,12 @@
           <span class="font-normal">{t("common.block")}</span>
         </label>
 
-        <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+        <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
         <label
-          on:click|stopPropagation={() => null}
+          onclick={(e) => {
+            e.stopPropagation();
+            null;
+          }}
           class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
         >
           <input
@@ -207,9 +238,12 @@
           <span class="font-normal">{t("user.un-veriried")}</span>
         </label>
 
-        <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+        <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
         <label
-          on:click|stopPropagation={() => null}
+          onclick={(e) => {
+            e.stopPropagation();
+            null;
+          }}
           class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
         >
           <input

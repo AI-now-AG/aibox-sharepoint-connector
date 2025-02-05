@@ -13,14 +13,14 @@
 
   const t = useTranslations();
 
-  let tenants: any = [];
-  let showArchived: boolean = false;
-  let searchValue: string = "";
+  let tenants: any = $state([]);
+  let showArchived: boolean = $state(false);
+  let searchValue: string = $state("");
   let timeout: any;
 
-  let selectedTenant: any = null;
-  let confirmUpdateModal: HTMLDialogElement;
-  let confirmDeleteModal: HTMLDialogElement;
+  let selectedTenant: any = $state(null);
+  let confirmUpdateModal: HTMLDialogElement = $state();
+  let confirmDeleteModal: HTMLDialogElement = $state();
 
   onMount(async () => {
     await fetchTenants();
@@ -176,7 +176,7 @@
                 {tenant.org_name}
                 <button
                   class="mx-1 self-center"
-                  on:click={() => copyName(tenant.org_name)}
+                  onclick={() => copyName(tenant.org_name)}
                   >{@html svgIcons.copy}</button
                 >
               </td>
@@ -204,7 +204,7 @@
                     <li>
                       <button
                         class="flex block w-full text-left px-4 py-2 text-sm hover:underline"
-                        on:click={() => confirmUpdateStatus(tenant)}
+                        onclick={() => confirmUpdateStatus(tenant)}
                       >
                         {@html tenant.active == 1
                           ? svgIcons.archive
@@ -220,7 +220,7 @@
                       <li>
                         <button
                           class="flex block w-full text-left px-4 py-1 text-sm hover:underline"
-                          on:click={() => confirmDelete(tenant)}
+                          onclick={() => confirmDelete(tenant)}
                         >
                           {@html svgIcons.trash}
                           <span class="ml-1">{t("common.delete")}</span>

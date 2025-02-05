@@ -6,16 +6,30 @@
 
   const t = useTranslations();
 
-  export let active: boolean;
-  export let isEditable: boolean;
-  export let data: any;
-  export let zIndex: number = 1;
 
-  export let onSelectCart: Function;
-  export let onSelectEdit: Function;
-  export let onSelectDuplicate: Function;
-  export let onSelectReOder: Function;
-  export let onSelectDelete: Function;
+  interface Props {
+    active: boolean;
+    isEditable: boolean;
+    data: any;
+    zIndex?: number;
+    onSelectCart: Function;
+    onSelectEdit: Function;
+    onSelectDuplicate: Function;
+    onSelectReOder: Function;
+    onSelectDelete: Function;
+  }
+
+  let {
+    active,
+    isEditable,
+    data,
+    zIndex = 1,
+    onSelectCart,
+    onSelectEdit,
+    onSelectDuplicate,
+    onSelectReOder,
+    onSelectDelete
+  }: Props = $props();
 
   let options: Option[] = [
     {
@@ -52,7 +66,7 @@
 {#if options.length >= 1}
   <button
     class={`relative btn w-full rounded-xl h-auto p-6 ${active ? "btn-primary " : "btn-outline border-base-300 border-2"} flex`}
-    on:click={() => {
+    onclick={() => {
       onSelectCart?.(data);
     }}
     style={`z-index: ${zIndex};`}

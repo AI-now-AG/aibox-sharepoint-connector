@@ -10,13 +10,13 @@
   const t = useTranslations();
 
   let selectedPromptId = "";
-  let promptDetails: PromptDetails;
-  let promptText = "";
+  let promptDetails: PromptDetails = $state();
+  let promptText = $state("");
   //let instructions: CreateInstructionParams[] = [];
-  let knowledgebase: CreateKnowledgeBaseParams[] = [];
+  let knowledgebase: CreateKnowledgeBaseParams[] = $state([]);
   let isSaving = false;
 
-  let dlgEl: HTMLDialogElement;
+  let dlgEl: HTMLDialogElement = $state();
 
   const unsubscribe = storePromptId.subscribe((value) => {
     if (value) {
@@ -68,7 +68,7 @@
   <div class="mx-auto">
     <button
       class="btn btn-sm btn-neutral btn-2 border-0 bg-neutral-content text-neutral hover:text-neutral-content mb-4"
-      on:click={() => dlgEl.showModal()}
+      onclick={() => dlgEl.showModal()}
     >
       <svg
         width="20"

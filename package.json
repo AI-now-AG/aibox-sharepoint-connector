@@ -82,7 +82,7 @@
     "prettier-plugin-tailwindcss": "^0.6.11",
     "stylelint": "^16.14.1",
     "stylelint-config-standard": "^36.0.1",
-    "svelte-check": "^3.8.6",
+    "svelte-check": "^4.0.0",
     "typescript-eslint": "^8.22.0"
   },
   "pnpm": {

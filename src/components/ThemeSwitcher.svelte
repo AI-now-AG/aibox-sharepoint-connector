@@ -43,6 +43,13 @@
       document.documentElement.setAttribute("data-theme", theme);
     }
   });
+
+  function preventDefault(fn) {
+    return function (event) {
+      event.preventDefault();
+      fn.call(this, event);
+    };
+  }
 </script>
 
 <ul
@@ -53,7 +60,7 @@
     <li>
       <a
         href="#{theme.theme}"
-        on:click|preventDefault={() => setTheme(theme.theme)}
+        onclick={preventDefault(() => setTheme(theme.theme))}
       >
         {theme.name}
       </a>

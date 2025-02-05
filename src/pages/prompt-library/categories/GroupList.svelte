@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export interface GroupItem {
     id?: string;
     title: string;
@@ -12,10 +12,14 @@
   import { useTranslations } from "$i18n/utils";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
 
-  export let items: GroupItem[] = [];
+  interface Props {
+    items?: GroupItem[];
+  }
+
+  let { items = $bindable([]) }: Props = $props();
 
   let groupToDelete: string;
-  let confirmDeleteModal: HTMLDialogElement;
+  let confirmDeleteModal: HTMLDialogElement = $state();
 
   const flipDurationMs: number = 200;
   const dropTargetStyle: any = {
@@ -23,6 +27,13 @@
   };
   const t = useTranslations();
 
+  function preventDefault(fn) {
+		return function (event) {
+			event.preventDefault();
+			fn.call(this, event);
+		};
+	}
+  
   function handleDndConsider(e: CustomEvent) {
     items = e.detail.items;
   }
@@ -83,8 +94,8 @@
 
   <section
     use:dndzone={{ items, flipDurationMs, dropTargetStyle }}
-    on:consider={handleDndConsider}
-    on:finalize={handleDndFinalize}
+    onconsider={handleDndConsider}
+    onfinalize={handleDndFinalize}
   >
     {#each items as item, i (item.id)}
       <div
@@ -126,8 +137,8 @@
               <li>
                 <button
                   class="flex block w-full text-left px-4 py-2 text-sm hover:underline"
-                  on:click|preventDefault={() =>
-                    updateStatus(item.id, !item.active)}
+                  onclick={preventDefault(() =>
+                    updateStatus(item.id, !item.active))}
                 >
                   {@html item.active == 1 ? svgIcons.eyeClose : svgIcons.eye}
                   <span class="ml-1"
@@ -140,7 +151,7 @@
               <li>
                 <button
                   class="flex block w-full text-left px-4 py-2 text-sm hover:underline"
-                  on:click|preventDefault={() => handleDelete(item.id)}
+                  onclick={preventDefault(() => handleDelete(item.id))}
                 >
                   {@html svgIcons.trash}
                   <span class="ml-1">{t("common.delete")}</span>
@@ -156,7 +167,7 @@
   <div class="flex items-center mt-5">
     <button
       class="btn btn-active btn-neutral font-normal grow-0"
-      on:click|preventDefault={addGroup}
+      onclick={preventDefault(addGroup)}
     >
       {@html svgIcons.add}
       {t("prompt-library.categories.add-group")}
@@ -166,7 +177,7 @@
   <!-- confirm delete dialog -->
   <ConfirmDialog
     bind:modal={confirmDeleteModal}
-    on:confirm={deleteGroup}
+    confirm={deleteGroup}
     title={t("confirmation.delete.title")}
     description={t("prompt-library.delete.group.confirm")}
   />

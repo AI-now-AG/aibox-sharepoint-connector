@@ -2,8 +2,8 @@
   import { onMount } from "svelte";
   import InputArea from "$components/PromptConfiguration/InputArea.svelte";
 
-  let prompt;
-  let instructions;
+  let prompt = $state();
+  let instructions = $state();
 
   onMount(async function () {
     // TODO: That was a workaround for the demo. This components needs a context

@@ -4,8 +4,8 @@
   import PromptConfiguration from "$components/PromptConfiguration.svelte";
   import { fade } from "svelte/transition";
 
-  let input = "";
-  let output = "";
+  let input = $state("");
+  let output = $state("");
 
   async function fetchHeadline(e) {
     e.preventDefault();
@@ -43,7 +43,7 @@
   <div class="grid justify-items-end">
     <button
       class="btn btn-square bg-base-100 grid justify-items"
-      on:click={() => configuration_dialog.showModal()}
+      onclick={() => configuration_dialog.showModal()}
     >
       <svg
         class="fill-neutral-content stroke-1"
