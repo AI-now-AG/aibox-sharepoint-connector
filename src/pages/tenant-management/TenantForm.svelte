@@ -1,7 +1,4 @@
-<!-- @migration-task Error while migrating Svelte code: Cannot set properties of undefined (setting 'next') -->
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<!-- svelte-ignore a11y-no-static-element-interactions -->
-<script>
+<script lang="ts">
   import { actions } from "astro:actions";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
@@ -19,16 +16,26 @@
   import { loading, showLoading, hideLoading } from "$stores";
   import ColorPicker, { ChromeVariant } from "svelte-awesome-color-picker";
   import log from "$utils/log";
+  import { TenantTheme } from "$data/models/tenant.model";
 
   const t = useTranslations();
 
-  export let tenant;
-  export let openAIKey = "";
-  export let azureOpenAIKey = "";
-  export let azureSpeechKey = "";
+  interface Props {
+    tenant: any;
+    openAIKey: string;
+    azureOpenAIKey: string;
+    azureSpeechKey: string;
+  }
 
-  let confirmUpdateModal;
-  let alertModal;
+  let {
+    tenant = $bindable(),
+    openAIKey,
+    azureOpenAIKey,
+    azureSpeechKey,
+  }: Props = $props();
+
+  let confirmUpdateModal: HTMLDialogElement | undefined = $state();
+  let alertModal: HTMLDialogElement | undefined = $state();
   let alertMessage = "";
 
   const MODE = {
@@ -48,8 +55,8 @@
   };
 
   // mode
-  let mode = tenant == undefined ? MODE.Create : MODE.Edit;
-  let tenantData = tenant == undefined ? {} : tenant;
+  let mode = tenant ? MODE.Edit : MODE.Create;
+  let tenantData = tenant ?? {};
 
   // API providers
   const providerValues = [
@@ -64,14 +71,15 @@
   ];
   let textSelectedProvider = providerValues[0];
   let isAudioToTextChecked = false;
-  if (tenantData && tenantData?.included_features?.length) {
+  if (tenantData && tenantData.included_features?.length) {
     const findTextProvider = tenantData.included_features.find(
       (item) => item.name == TenantFeature.TextPrommpts,
     );
     if (findTextProvider) {
-      textSelectedProvider = providerValues.find(
-        (item) => item.value == findTextProvider.provider,
-      );
+      textSelectedProvider =
+        providerValues.find(
+          (item) => item.value == findTextProvider.provider,
+        ) || providerValues[0];
     }
 
     isAudioToTextChecked = tenantData.included_features.some(
@@ -89,16 +97,10 @@
     tenantData.default_language = "de";
   }
   if (!tenantData.theme) {
-    tenantData.theme = "dark";
+    tenantData.theme = "dark" as TenantTheme;
   }
   if (!tenantData.primary_color) {
     tenantData.primary_color = selecteColor;
-  }
-
-  $: {
-    //console.log("Tenant data", tenantData);
-    //console.log("Audio to text checbox checked", isAudioToTextChecked);
-    //console.log("Selected text provider", textSelectedProvider);
   }
 
   let showPicker = false;
@@ -107,12 +109,18 @@
     showPicker = !showPicker;
   }
 
-  function togglePassword(_apiKeyProvider) {
-    let passwordField = document.getElementById("open_ai_key");
+  function togglePassword(_apiKeyProvider: string) {
+    let passwordField = document.getElementById(
+      "open_ai_key",
+    ) as HTMLInputElement;
     if (_apiKeyProvider == ApiKeyProvider.AzureOpenAI) {
-      passwordField = document.getElementById("azure_open_ai_key");
+      passwordField = document.getElementById(
+        "azure_open_ai_key",
+      ) as HTMLInputElement;
     } else if (_apiKeyProvider == ApiKeyProvider.AzureOpenAIPro) {
-      passwordField = document.getElementById("azure_open_ai_key_pro");
+      passwordField = document.getElementById(
+        "azure_open_ai_key_pro",
+      ) as HTMLInputElement;
     }
     if (passwordField.type === "password") {
       passwordField.type = "text";
@@ -280,7 +288,7 @@
 
   function showAlert(message) {
     alertMessage = message;
-    alertModal.show();
+    alertModal?.show();
   }
 </script>
 
@@ -288,7 +296,7 @@
   class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14 sticky bg-base-200 top-0 z-10"
 >
   <div class="flex items-center pt-5 pb-2">
-    <button class="mr-4" on:click={() => window.history.back()}>
+    <button class="mr-4" onclick={() => window.history.back()}>
       {@html svgIcons.back}
     </button>
     <h1 class="text-4xl font-bold">
@@ -300,13 +308,13 @@
     <div class="flex space-x-2 ml-auto">
       <button
         class="btn btn-primary"
-        on:click={() => {
-          mode == MODE.Edit ? confirmUpdateModal.show() : createTenant();
+        onclick={() => {
+          mode == MODE.Edit ? confirmUpdateModal?.show() : createTenant();
         }}
       >
         {t("common.save")}
       </button>
-      <button class="btn" on:click={() => window.history.back()}>
+      <button class="btn" onclick={() => window.history.back()}>
         {t("common.cancel")}
       </button>
     </div>
@@ -385,19 +393,18 @@
         <div class="w-full">
           <div
             class="relative flex"
-            use:clickOutside
-            on:clickoutside={() => {
+            use:clickOutside={() => {
               showPicker = false;
             }}
           >
             <div class="z-[10]">
-              <!-- svelte-ignore a11y-click-events-have-key-events -->
-              <!-- svelte-ignore a11y-no-static-element-interactions -->
+              <!-- svelte-ignore a11y_click_events_have_key_events -->
+              <!-- svelte-ignore a11y_no_static_element_interactions -->
               <div
                 class="color-preview"
                 style="background-color: {hex};"
-                on:click={toggleColorPicker}
-              />
+                onclick={toggleColorPicker}
+></div>
 
               {#if showPicker}
                 <div class="absolute picker-color">
@@ -420,11 +427,11 @@
                 </div>
               {/if}
             </div>
-            <!-- svelte-ignore a11y-click-events-have-key-events -->
-            <!-- svelte-ignore a11y-no-static-element-interactions -->
+            <!-- svelte-ignore a11y_click_events_have_key_events -->
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
             <div
               class="flex flex-1 items-center input input-bordered color-input"
-              on:click={toggleColorPicker}
+              onclick={toggleColorPicker}
             >
               <span>{selecteColor}</span>
             </div>
@@ -434,7 +441,7 @@
       <div class="flex-1 flex flex-col mb-4"></div>
     </div>
 
-    <div class="w-full h-0.5 mt-4 mb-6 bg-gray-400/20" />
+    <div class="w-full h-0.5 mt-4 mb-6 bg-gray-400/20"></div>
 
     <div class="mb-3"><b>{t("tenant.api-keys")}</b></div>
 
@@ -588,10 +595,10 @@
     </div>
 
     <!-- Included features -->
-    <div class="w-full h-0.5 mt-4 mb-6 bg-gray-400/20" />
+    <div class="w-full h-0.5 mt-4 mb-6 bg-gray-400/20"></div>
     <div class="mb-3"><b>{t("tenant.included-featured")}</b></div>
 
-    <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div class="w-full bg-white rounded px-4 py-2">
       <div class="flex items-center">
         <input
@@ -625,7 +632,7 @@
       {/each}
     </div>
 
-    <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div class="w-full bg-white rounded px-4 py-2 mt-4">
       <div class="flex items-center">
         <input
@@ -642,7 +649,7 @@
       </div>
     </div>
 
-    <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div class="w-full bg-white rounded px-4 py-2 mt-4">
       <div class="flex items-center">
         <input
@@ -661,9 +668,9 @@
     </div>
 
     <ConfirmDialog
-      title={t("tenant.tenants.tenant.update-confirmation")}
       bind:modal={confirmUpdateModal}
-      on:confirm={updateTenant}
+      confirm={updateTenant}
+      title={t("tenant.tenants.tenant.update-confirmation")}
     />
 
     <AlertDialog bind:modal={alertModal} message={alertMessage} />

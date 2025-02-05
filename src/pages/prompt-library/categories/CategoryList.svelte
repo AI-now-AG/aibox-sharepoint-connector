@@ -27,11 +27,11 @@
   const t = useTranslations();
 
   function preventDefault(fn) {
-		return function (event) {
-			event.preventDefault();
-			fn.call(this, event);
-		};
-	}
+    return function (event) {
+      event.preventDefault();
+      fn.call(this, event);
+    };
+  }
 
   function reloadPage(delay = 1500) {
     setTimeout(() => {
@@ -194,7 +194,8 @@
                   <button
                     class="flex block w-full text-left px-4 py-2 text-sm hover:underline"
                     onclick={preventDefault(() =>
-                      updateStatus(item.id, !item.active))}
+                      updateStatus(item.id, !item.active),
+                    )}
                   >
                     {@html item.active === true
                       ? svgIcons.eyeClose
@@ -222,13 +223,13 @@
       {/each}
     </section>
 
-    <Loading partial={true} bind:show={$loading} />
+    <Loading bind:show={$loading} partial={true} />
   </div>
 
   <!-- confirm delete dialog -->
   <ConfirmDialog
     bind:modal={confirmDeleteModal}
-    on:confirm={deleteCategory}
+    confirm={deleteCategory}
     title={t("confirmation.delete.title")}
     description={t("prompt-library.delete.category.confirm")}
   />

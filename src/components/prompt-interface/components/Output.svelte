@@ -1,21 +1,25 @@
-<!-- @migration-task Error while migrating Svelte code: Can't migrate code with afterUpdate. Please migrate by hand. -->
 <script lang="ts">
   import { fade } from "svelte/transition";
-  import { onMount, afterUpdate, tick } from "svelte";
+  import { onMount, tick } from "svelte";
   import { MessageRole, type MessageHistory } from "$types/MessageHistory";
   import { sharedMessageHistory } from "$components/prompt-interface/components/Stores";
   import { tenant, user } from "$stores";
   import { svgIcons } from "$assets/icons";
 
-  export let output: string;
-  export let isProcessing: string;
+  interface Props {
+    output: any;
+    isProcessing: string;
+  }
+
+  let { output = $bindable(), isProcessing }: Props = $props();
+
   let element;
 
   let copyIndex: number = -1;
   let timer: NodeJS.Timeout;
   let totalMessages = 0;
 
-  afterUpdate(() => {
+  $effect.pre(() => {
     if (
       ($sharedMessageHistory.length > 0 &&
         $sharedMessageHistory.length > totalMessages) ||
@@ -26,9 +30,11 @@
     }
   });
 
-  $: if ($sharedMessageHistory.length > 0) {
-    scrollToBottom();
-  }
+  $effect(() => {
+    if ($sharedMessageHistory.length > 0) {
+      scrollToBottom();
+    }
+  });
 
   const scrollToBottom = async () => {
     window.scroll({
@@ -125,7 +131,7 @@
             <div class="avatar">
               <div class="w-10 rounded-full">
                 {#if role === MessageRole.User}
-                  <!-- svelte-ignore a11y-img-redundant-alt -->
+                  <!-- svelte-ignore a11y_img_redundant_alt -->
                   <img alt="Avatar Image" src={userPicture} />
                 {:else}
                   <img src="/aibox-logo-dark.svg" alt="light Logo" />
@@ -148,7 +154,7 @@
                 <div class="flex flex-col justify-items-end order-last">
                   <button
                     class="btn p-2 btn-ghost"
-                    on:click={() => copyToClipboard(rawData, index)}
+                    onclick={() => copyToClipboard(rawData, index)}
                   >
                     {#if index == copyIndex}
                       <svg

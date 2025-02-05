@@ -1,28 +1,33 @@
-<!-- @migration-task Error while migrating Svelte code: Can't migrate code with afterUpdate. Please migrate by hand. -->
 <script lang="ts">
   // TODO: Us checkboxes instead of anchors, it's what they are used for. That
   // way we don't have to manage selected state ourselves.
 
-  import { afterUpdate } from "svelte";
-
   type Item = { title: string };
+  interface Props {
+    title: string;
+    placeholder: string;
+    items: Item[];
+    selectedItems: Item[];
+  }
 
-  export let title;
-  export let placeholder;
-  export let items: Item[];
-  export let selectedItems: Item[];
+  let {
+    title,
+    placeholder,
+    items = $bindable(),
+    selectedItems = $bindable(),
+  }: Props = $props();
 
   let inputValue = "";
 
-  $: {
+  $effect(() => {
     if (selectedItems.length > 0) {
       setInputValue();
     } else if (items) {
       resetSelection();
     }
-  }
+  });
 
-  afterUpdate(() => {
+  $effect.pre(() => {
     inputValue = selectedItems?.map((e) => e.title).join(", ");
   });
 
@@ -53,6 +58,13 @@
   function setInputValue() {
     inputValue = selectedItems?.map((e) => e.title).join(", ");
   }
+
+  function preventDefault(fn) {
+		return function (event) {
+			event.preventDefault();
+			fn.call(this, event);
+		};
+	}
 </script>
 
 <div>
@@ -101,7 +113,7 @@
       </svg>
     </label>
     {#if items}
-      <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
+      <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
       <ul
         tabindex="0"
         class="dropdown-content menu bg-base-100 space-y-2 rounded-box z-[1] w-52 p-2 shadow"
@@ -109,7 +121,7 @@
         {#each items as item}
           <li>
             <button
-              on:click|preventDefault={() => handleSelectedItems(item)}
+              onclick={preventDefault(() => handleSelectedItems(item))}
               class={`${selectedItems?.includes(item) ? "bg-primary text-base-100 hover:bg-primary" : "hover:text-neutral"}`}
             >
               {item.title}

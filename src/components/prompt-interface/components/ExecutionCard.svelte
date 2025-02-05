@@ -18,7 +18,11 @@
     selectedPromptId: any;
   }
 
-  let { isEditable = false, cards = $bindable(), selectedPromptId = $bindable() }: Props = $props();
+  let {
+    isEditable = false,
+    cards = $bindable(),
+    selectedPromptId = $bindable(),
+  }: Props = $props();
 
   const t = useTranslations();
 
@@ -206,9 +210,9 @@
 />
 
 <ConfirmDialog
-  title={t("prompt-library.delete.prompt.confirm")}
   bind:modal={confirmDeleteModal}
-  on:confirm={deleteCard}
+  confirm={deleteCard}
+  title={t("prompt-library.delete.prompt.confirm")}
 />
 
 <Loading bind:show={$loading} />

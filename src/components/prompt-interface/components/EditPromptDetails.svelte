@@ -25,7 +25,7 @@
     selectedEditPromptId = $bindable(null),
     promptDialog = $bindable(),
     dialogMode = "update",
-    dialogTitle = t("prompt-library.edit.title")
+    dialogTitle = t("prompt-library.edit.title"),
   }: Props = $props();
 
   type Group = { title: string; _id: string }; // TODO: Get the type from the API endpoint
@@ -56,12 +56,11 @@
   let isLoading = $state(false);
 
   function preventDefault(fn) {
-		return function (event) {
-			event.preventDefault();
-			fn.call(this, event);
-		};
-	}
-
+    return function (event) {
+      event.preventDefault();
+      fn.call(this, event);
+    };
+  }
 
   onMount(async function () {
     const categoryResponse = await fetch("/api/categories.json", {
@@ -210,11 +209,12 @@
       previousCategoryId = selectedCategory._id;
     }
   });
-  let isFormValid =
-    $derived(promptTitle.trim() !== "" &&
-    promptText.trim() !== "" &&
-    selectedCategory !== undefined &&
-    selectedGroup !== undefined);
+  let isFormValid = $derived(
+    promptTitle.trim() !== "" &&
+      promptText.trim() !== "" &&
+      selectedCategory !== undefined &&
+      selectedGroup !== undefined,
+  );
   // Fetch prompt details when selectedEditPromptId changes
   $effect(() => {
     if (selectedEditPromptId) {
@@ -250,7 +250,7 @@
           bind:value={promptText}
           placeholder="e.g. Create three headlines..."
           class="input input-bordered min-w-xs shadow appearance-none min-h-32 w-full py-2 px-3"
-></textarea>
+        ></textarea>
       </div>
 
       <div

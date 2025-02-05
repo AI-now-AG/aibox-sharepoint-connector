@@ -19,8 +19,8 @@
   let timeout: any;
 
   let selectedTenant: any = $state(null);
-  let confirmUpdateModal: HTMLDialogElement = $state();
-  let confirmDeleteModal: HTMLDialogElement = $state();
+  let confirmUpdateModal: HTMLDialogElement | undefined = $state();
+  let confirmDeleteModal: HTMLDialogElement | undefined = $state();
 
   onMount(async () => {
     await fetchTenants();
@@ -246,14 +246,14 @@
         </tbody>
       </table>
 
-      <Loading partial={true} bind:show={$loading} />
+      <Loading bind:show={$loading} partial={true} />
     </div>
   </div>
 
   <!-- confirm update dialog -->
   <ConfirmDialog
     bind:modal={confirmUpdateModal}
-    on:confirm={updateStatus}
+    confirm={updateStatus}
     description={selectedTenant?.active
       ? t("tenant.tenants.tenant.archive-confirmation")
       : t("tenant.tenants.tenant.active-confirmation")}
@@ -262,7 +262,7 @@
   <!-- confirm delete dialog -->
   <ConfirmDialog
     bind:modal={confirmDeleteModal}
-    on:confirm={deleteTenant}
+    confirm={deleteTenant}
     description={t("tenant.delete-confirm-message")}
   />
 </div>

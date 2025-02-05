@@ -1,6 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: Cannot set properties of undefined (setting 'next') -->
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<!-- svelte-ignore a11y-no-static-element-interactions -->
 <script lang="ts">
   import { actions } from "astro:actions";
   import { svgIcons } from "$assets/icons";
@@ -19,23 +16,26 @@
   import { UserRole } from "$enums/Users";
 
   const t = useTranslations();
+  interface Props {
+    user: any;
+    tenant: any;
+  }
 
-  export let user: any;
-  export let tenant: any;
+  let { user = $bindable(), tenant = $bindable() }: Props = $props();
 
-  let confirmUpdateModal: HTMLDialogElement;
-  let confirmBlockModal: HTMLDialogElement;
-  let confirmDeleteModal: HTMLDialogElement;
+  let confirmUpdateModal: HTMLDialogElement | undefined = $state();
+  let confirmBlockModal: HTMLDialogElement | undefined = $state();
+  let confirmDeleteModal: HTMLDialogElement | undefined = $state();
 
-  let alertModal: HTMLDialogElement;
+  let alertModal: HTMLDialogElement | undefined = $state();
   let alertMessage: any = "";
 
   const MODE = {
     Create: "create",
     Edit: "edit",
   };
-  let mode = user == undefined ? MODE.Create : MODE.Edit;
-  let userData = user == undefined ? {} : user;
+  let mode = user ? MODE.Edit : MODE.Create;
+  let userData = user ?? {};
 
   let isEnterpriseAuth = false;
   let isUpdateRoleDisabled = false;
@@ -144,7 +144,7 @@
 
   function showAlert(message: any) {
     alertMessage = message;
-    alertModal.show();
+    alertModal?.show();
   }
 
   async function handleBlockingUser() {
@@ -205,7 +205,7 @@
   <div class="flex items-center pt-5 pb-2">
     <button
       class="mr-4"
-      on:click={() => {
+      onclick={() => {
         window.history.back();
       }}
     >
@@ -220,15 +220,15 @@
     <div class="flex space-x-2 ml-auto">
       <button
         class="btn btn-primary"
-        on:click={() => {
-          mode == MODE.Edit ? confirmUpdateModal.show() : createUser();
+        onclick={() => {
+          mode == MODE.Edit ? confirmUpdateModal?.show() : createUser();
         }}
       >
         {t("common.save")}
       </button>
       <button
         class="btn"
-        on:click={() => {
+        onclick={() => {
           window.history.back();
         }}
       >
@@ -281,7 +281,7 @@
             class="radio radio-primary"
             value={UserRole.Admin}
             checked={role == UserRole.Admin || role == UserRole.SuperAdmin}
-            on:change={() => {
+            onchange={() => {
               role = UserRole.Admin;
             }}
             disabled={isUpdateRoleDisabled}
@@ -298,7 +298,7 @@
             class="radio radio-primary"
             value={UserRole.User}
             checked={role == UserRole.User}
-            on:change={() => {
+            onchange={() => {
               role = UserRole.User;
             }}
             disabled={isUpdateRoleDisabled}
@@ -387,7 +387,7 @@
           <div class="flex items-center">
             <button
               class="flex items-centertext-gray-700 font-sans"
-              on:click={(e) => {
+              onclick={(e) => {
                 confirmBlockModal?.show();
               }}
             >
@@ -403,7 +403,7 @@
 
             <button
               class="flex items-center font-sans text-red-600 ml-8"
-              on:click={(e) => {
+              onclick={(e) => {
                 confirmDeleteModal?.show();
               }}
             >
@@ -423,29 +423,29 @@
 
 <!-- confirm update dialog -->
 <ConfirmDialog
-  title={t("user.update-confirm-message")}
   bind:modal={confirmUpdateModal}
-  on:confirm={updateUser}
+  confirm={updateUser}
+  title={t("user.update-confirm-message")}
 />
 
 <!-- confirm block dialog -->
 <ConfirmDialog
+  bind:modal={confirmBlockModal}
+  confirm={handleBlockingUser}
   title={userData?.blocked
     ? t("user.un-block-confirm-message")
     : t("user.block-confirm-message")}
   description={userData?.blocked
     ? t("user.un-block-description-message")
     : t("user.block-description-message")}
-  bind:modal={confirmBlockModal}
-  on:confirm={handleBlockingUser}
 />
 
 <!-- confirm delete dialog -->
 <ConfirmDialog
+  bind:modal={confirmDeleteModal}
+  confirm={deleteUser}
   title={t("user.delete-confirm-message")}
   description={t("user.delete-description-message")}
-  bind:modal={confirmDeleteModal}
-  on:confirm={deleteUser}
 />
 
 <AlertDialog bind:modal={alertModal} message={alertMessage} />

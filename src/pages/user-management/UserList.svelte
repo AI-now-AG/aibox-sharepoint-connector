@@ -45,28 +45,27 @@
   let searchValue: string = $state("");
   let filterRolesParams: any[] = $state([]);
   let filterStatusesParams: any = $state({});
-  let previousFilterState: string = $state(JSON.stringify({
-    ...filterRolesParams,
-    ...filterStatusesParams,
-  }));
+
+  const previousFilterState = $derived(
+    JSON.stringify({
+      roles: [...filterRolesParams],
+      statuses: { ...filterStatusesParams },
+    }),
+  );
 
   let selectedUser: any = $state();
-  let confirmBlockModal: HTMLDialogElement = $state();
-  let confirmDeleteModal: HTMLDialogElement = $state();
+  let confirmBlockModal: HTMLDialogElement | undefined = $state();
+  let confirmDeleteModal: HTMLDialogElement | undefined = $state();
 
   const fetchUsers = async () => {
     showLoading();
-    const { data, error } = await actions.user.listByTeant({
+    const { data, error } = await actions.user.listByTenant({
       tenantId,
       searchValue,
       roles: filterRolesParams,
       ...filterStatusesParams,
     });
     hideLoading();
-    previousFilterState = JSON.stringify({
-      ...filterRolesParams,
-      ...filterStatusesParams,
-    });
     if (!error) {
       users = data;
     } else {
@@ -193,7 +192,7 @@
   <DropdownFilter
     bind:rolesParams={filterRolesParams}
     bind:statusesParams={filterStatusesParams}
-    on:filter={() => {
+    filter={() => {
       const currentFilterState = JSON.stringify({
         ...filterRolesParams,
         ...filterStatusesParams,
@@ -252,22 +251,22 @@
 
 <!-- confirm block dialog -->
 <ConfirmDialog
+  bind:modal={confirmBlockModal}
+  confirm={handleBlockingUser}
   title={selectedUser?.blocked
     ? t("user.un-block-confirm-message")
     : t("user.block-confirm-message")}
   description={selectedUser?.blocked
     ? t("user.un-block-description-message")
     : t("user.block-description-message")}
-  bind:modal={confirmBlockModal}
-  on:confirm={handleBlockingUser}
 />
 
 <!-- confirm delete dialog -->
 <ConfirmDialog
+  bind:modal={confirmDeleteModal}
+  confirm={deleteUser}
   title={t("user.delete-confirm-message")}
   description={t("user.delete-description-message")}
-  bind:modal={confirmDeleteModal}
-  on:confirm={deleteUser}
 />
 
-<Loading partial={true} bind:show={$loading} />
+<Loading bind:show={$loading} partial={true} />

@@ -4,7 +4,7 @@
     partial?: boolean;
   }
 
-  let { show = false, partial = false }: Props = $props();
+  let { show = $bindable(false), partial = false }: Props = $props();
 </script>
 
 {#if show}

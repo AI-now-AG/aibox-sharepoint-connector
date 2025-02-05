@@ -29,7 +29,11 @@
     isEditable?: boolean;
   }
 
-  let { items = $bindable([]), title = t("prompt-library.prompts.all"), isEditable = false }: Props = $props();
+  let {
+    items = $bindable([]),
+    title = t("prompt-library.prompts.all"),
+    isEditable = false,
+  }: Props = $props();
 
   let selectedEditPromptId: string = $state("");
   let selectedDeletePromptId: string = "";
@@ -186,9 +190,9 @@
 />
 
 <ConfirmDialog
-  title={t("prompt-library.delete.prompt.confirm")}
   bind:modal={confirmDeleteModal}
-  on:confirm={deleteCard}
+  confirm={deleteCard}
+  title={t("prompt-library.delete.prompt.confirm")}
 />
 
 <Loading bind:show={$loading} />

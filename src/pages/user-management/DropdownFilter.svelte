@@ -1,10 +1,8 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
   import { UserRole } from "$enums/Users";
 
-  const dispatch = createEventDispatcher();
   const t = useTranslations();
 
   let showFilter = $state(false);
@@ -13,10 +11,14 @@
   interface Props {
     rolesParams?: any[];
     statusesParams?: any;
+    filter: any;
   }
 
-  let { rolesParams = $bindable([]), statusesParams = $bindable({}) }: Props =
-    $props();
+  let {
+    rolesParams = $bindable([]),
+    statusesParams = $bindable({}),
+    filter,
+  }: Props = $props();
 
   // roles
   let isUserChecked: boolean = $state(false);
@@ -29,22 +31,33 @@
 
   $effect(() => {
     if (isUserChecked) {
-      rolesParams.push(UserRole.User);
+      if (!rolesParams.includes(UserRole.User)) {
+        rolesParams = [...rolesParams, UserRole.User];
+      }
     } else {
-      rolesParams = rolesParams.filter((_role) => {
-        return _role != UserRole.User;
-      });
+      if (rolesParams.includes(UserRole.User)) {
+        rolesParams = rolesParams.filter((_role) => _role !== UserRole.User);
+      }
     }
   });
 
   $effect(() => {
     if (isAdminChecked) {
-      rolesParams.push(UserRole.SuperAdmin);
-      rolesParams.push(UserRole.Admin);
+      const newRoles = [UserRole.SuperAdmin, UserRole.Admin].filter(
+        (role) => !rolesParams.includes(role),
+      );
+      if (newRoles.length > 0) {
+        rolesParams = [...rolesParams, ...newRoles];
+      }
     } else {
-      rolesParams = rolesParams.filter((_role) => {
-        return _role != UserRole.Admin && _role != UserRole.SuperAdmin;
-      });
+      if (
+        rolesParams.includes(UserRole.Admin) ||
+        rolesParams.includes(UserRole.SuperAdmin)
+      ) {
+        rolesParams = rolesParams.filter(
+          (_role) => _role !== UserRole.Admin && _role !== UserRole.SuperAdmin,
+        );
+      }
     }
   });
 
@@ -84,53 +97,51 @@
   function handleClickFilter() {
     if (showFilter) {
       showFilter = false;
-      dispatch("filter");
+      filter();
     } else {
       showFilter = true;
     }
   }
 
   function calculateNumberOfFitler() {
-    numberOfFilters = 0;
-    const a: any = {};
-    for (let i = 0; i < rolesParams.length; i++) {
-      const role = rolesParams[i];
-      if (!a[role]) {
-        if (role == UserRole.SuperAdmin) {
-          continue;
-        }
-        numberOfFilters += 1;
-        a[role] = true;
+    let count = 0;
+    const uniqueRoles = new Set();
+
+    for (const role of rolesParams) {
+      if (role !== UserRole.SuperAdmin) {
+        uniqueRoles.add(role);
       }
     }
-    if (statusesParams.isBlocked) {
-      numberOfFilters += 1;
-    }
-    if (statusesParams.isVerified) {
-      numberOfFilters += 1;
-    }
-    if (statusesParams.isUnVerified) {
-      numberOfFilters += 1;
-    }
+
+    count += uniqueRoles.size;
+    if (statusesParams.isBlocked) count++;
+    if (statusesParams.isVerified) count++;
+    if (statusesParams.isUnVerified) count++;
+
+    return count;
   }
 
   $effect(() => {
-    if (
+    const prevCount = numberOfFilters;
+
+    const anyChecked =
       isUserChecked ||
       isAdminChecked ||
       isVerifiedChecked ||
       isUnVerifiedChecked ||
-      isBlockedChecked
-    ) {
-      calculateNumberOfFitler();
-    } else {
+      isBlockedChecked;
+
+    if (anyChecked) {
+      const newFilterCount = calculateNumberOfFitler();
+      if (prevCount !== newFilterCount) {
+        numberOfFilters = newFilterCount;
+      }
+    } else if (prevCount !== 0) {
       numberOfFilters = 0;
     }
   });
 </script>
 
-<!-- svelte-ignore a11y_click_events_have_key_events -->
-<!-- svelte-ignore a11y_no_static_element_interactions -->
 <div class="mt-3">
   <div
     class="btn btn-sm btn-active font-normal bg-base-200"
@@ -160,7 +171,7 @@
           onclick={(e) => {
             e.stopPropagation();
             showFilter = false;
-            dispatch("filter");
+            filter();
           }}
         >
           {@html svgIcons.filter}</button

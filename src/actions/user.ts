@@ -80,7 +80,7 @@ export const user = {
     },
   }),
 
-  listByTeant: defineAction({
+  listByTenant: defineAction({
     input: z.intersection(UserFilterParamsSchema, TenantInputIdentifierSchema),
     handler: async (input) => {
       const tenantId = new ObjectId(input.tenantId);
