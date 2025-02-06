@@ -73,6 +73,7 @@ export const POST: APIRoute = async (ctx) => {
         _id: new ObjectId(),
         title: group.title,
         slug: slug(group.title),
+        active: group?.active,
       });
     }
     return uniqueGroups;
