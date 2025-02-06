@@ -4,11 +4,5 @@ import TenantForm from "./TenantForm.svelte";
 ---
 
 <Layout>
-  <TenantForm
-    tenant={undefined}
-    openAIKey={""}
-    azureOpenAIKey={""}
-    azureSpeechKey={""}
-    client:load
-  />
+  <TenantForm client:load />
 </Layout>

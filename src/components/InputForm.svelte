@@ -1,18 +1,17 @@
 <script>
-  import { createEventDispatcher } from "svelte";
+  let { message } = $props();
 
   let userInputText = $state();
-  const dispatch = createEventDispatcher();
 
   function preventDefault(fn) {
-		return function (event) {
-			event.preventDefault();
-			fn.call(this, event);
-		};
-	}
-  
+    return function (event) {
+      event.preventDefault();
+      fn.call(this, event);
+    };
+  }
+
   function submitAction() {
-    dispatch("message", {
+    message({
       text: userInputText,
     });
   }

@@ -1,27 +1,32 @@
 <script lang="ts">
-  import { createBubbler, handlers } from 'svelte/legacy';
+  import { createBubbler, handlers } from "svelte/legacy";
 
   const bubble = createBubbler();
-  import { createEventDispatcher } from "svelte";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
 
-  const dispatch = createEventDispatcher();
   const t = useTranslations();
 
   interface Props {
     value?: string;
     showArchived?: boolean;
+    search?: any;
+    filter?: any;
   }
 
-  let { value = $bindable(""), showArchived = $bindable(false) }: Props = $props();
+  let {
+    value = $bindable(""),
+    showArchived = $bindable(false),
+    search,
+    filter,
+  }: Props = $props();
   let typingTimeout: any;
 
   const onSearch = ({ target }: any) => {
     clearTimeout(typingTimeout);
     typingTimeout = setTimeout(() => {
       value = target.value;
-      dispatch("search");
+      search();
       console.log("dispatch search", { value });
     }, 300);
   };
@@ -29,16 +34,16 @@
   const onFilter = ({ target }: any) => {
     showArchived = !showArchived;
     setTimeout(() => (target.checked = showArchived), 0);
-    dispatch("filter");
+    filter();
     console.log("dispatch filter", { value });
   };
 
   function preventDefault(fn) {
-		return function (event) {
-			event.preventDefault();
-			fn.call(this, event);
-		};
-	}
+    return function (event) {
+      event.preventDefault();
+      fn.call(this, event);
+    };
+  }
 </script>
 
 <div class="items-center mb-10">
@@ -49,8 +54,8 @@
         type="text"
         class="grow text-sm"
         placeholder={t("tenant.tenants.seach-place-holder")}
-        oninput={handlers(onSearch, bubble('input'))}
-        onblur={bubble('blur')}
+        oninput={handlers(onSearch, bubble("input"))}
+        onblur={bubble("blur")}
       />
     </label>
   </div>

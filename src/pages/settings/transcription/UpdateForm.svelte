@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onMount } from "svelte";
   import { actions } from "astro:actions";
   import { useTranslations } from "$i18n/utils";
   import { tenant } from "$stores";
@@ -10,27 +9,17 @@
 
   let instructionTitle = $state("");
   let instructionText = $state("");
-  let isMounted = $state(false);
-
-  onMount(() => {
-    isMounted = true;
-  });
 
   interface Props {
     transcriptionCard?: TranscriptionCard | undefined;
     isEditable?: boolean;
   }
 
-  let { transcriptionCard = undefined, isEditable = false }: Props = $props();
+  let { transcriptionCard = $bindable(), isEditable = false }: Props = $props();
 
   $effect(() => {
     if (transcriptionCard) {
       instructionTitle = transcriptionCard.title || "";
-    }
-  });
-
-  $effect(() => {
-    if (transcriptionCard && !isMounted) {
       instructionText = transcriptionCard.description || "";
     }
   });

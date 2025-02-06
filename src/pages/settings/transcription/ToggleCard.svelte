@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onMount } from "svelte";
   import { actions } from "astro:actions";
   import { useTranslations } from "$i18n/utils";
   import { tenant } from "$stores";
@@ -10,11 +9,6 @@
 
   let instructionTitle = $state("");
   let instructionText = $state("");
-  let isMounted = $state(false);
-
-  onMount(() => {
-    isMounted = true;
-  });
 
   interface Props {
     transcriptionCard: TranscriptionCard;
@@ -25,18 +19,14 @@
   $effect(() => {
     if (transcriptionCard) {
       instructionTitle = transcriptionCard.title || "";
-    }
-  });
-
-  $effect(() => {
-    if (transcriptionCard && !isMounted) {
       instructionText = transcriptionCard.description || "";
     }
   });
 
   let isSaving = $state(false);
-  let isFormValid =
-    $derived(instructionTitle.trim() !== "" && instructionText.trim() !== "");
+  let isFormValid = $derived(
+    instructionTitle.trim() !== "" && instructionText.trim() !== "",
+  );
 
   const updateTranscriptionSetting = async (enabled: boolean) => {
     isSaving = true;
@@ -86,7 +76,9 @@
             class="toggle toggle-primary"
             bind:checked={transcriptionCard.toggle}
             onchange={(event) =>
-              updateTranscriptionSetting(event.target?.checked)}
+              updateTranscriptionSetting(
+                (event.target as HTMLInputElement)?.checked,
+              )}
           />
         </label>
       {/if}

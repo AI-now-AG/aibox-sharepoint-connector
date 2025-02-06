@@ -4,7 +4,7 @@
     message?: string;
   }
 
-  let { modal = $bindable(), message = "" }: Props = $props();
+  let { modal = $bindable(), message = $bindable("") }: Props = $props();
 </script>
 
 <dialog id="alert_dialog" bind:this={modal} class="modal">

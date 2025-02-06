@@ -16,27 +16,27 @@
   import { loading, showLoading, hideLoading } from "$stores";
   import ColorPicker, { ChromeVariant } from "svelte-awesome-color-picker";
   import log from "$utils/log";
-  import { TenantTheme } from "$data/models/tenant.model";
+  import { type TenantTheme } from "$data/models/tenant.model";
 
   const t = useTranslations();
 
   interface Props {
-    tenant: any;
-    openAIKey: string;
-    azureOpenAIKey: string;
-    azureSpeechKey: string;
+    tenant?: any;
+    openAIKey?: string;
+    azureOpenAIKey?: string;
+    azureSpeechKey?: string;
   }
 
   let {
     tenant = $bindable(),
-    openAIKey,
-    azureOpenAIKey,
-    azureSpeechKey,
+    openAIKey = "",
+    azureOpenAIKey = "",
+    azureSpeechKey = "",
   }: Props = $props();
 
   let confirmUpdateModal: HTMLDialogElement | undefined = $state();
   let alertModal: HTMLDialogElement | undefined = $state();
-  let alertMessage = "";
+  let alertMessage = $state("");
 
   const MODE = {
     Create: "create",
@@ -56,7 +56,25 @@
 
   // mode
   let mode = tenant ? MODE.Edit : MODE.Create;
-  let tenantData = tenant ?? {};
+  let tenantData = $derived(tenant ?? {});
+
+  $effect(() => {
+    tenantData.name = tenantData.name ?? "";
+    tenantData.org_name = tenantData.org_name ?? "";
+    tenantData.default_language = tenantData.default_language ?? "";
+    tenantData.theme = tenantData.theme ?? "";
+    tenantData.azure_openai_instance_name =
+      tenantData.azure_openai_instance_name ?? "";
+    tenantData.azure_openai_endpoint = tenantData.azure_openai_endpoint ?? "";
+    tenantData.azure_openai_whisper_model =
+      tenantData.azure_openai_whisper_model ?? "";
+    tenantData.azure_openai_chat_model =
+      tenantData.azure_openai_chat_model ?? "";
+    tenantData.speech_region = tenantData.speech_region ?? "";
+    tenantData.is_restrict_user_managment =
+      tenantData.is_restrict_user_managment ?? false;
+    console.log(tenantData);
+  });
 
   // API providers
   const providerValues = [
@@ -93,13 +111,13 @@
   let selecteColor = hex;
 
   // set default values
-  if (!tenantData.default_language) {
+  if (tenantData && !tenantData.default_language) {
     tenantData.default_language = "de";
   }
-  if (!tenantData.theme) {
+  if (tenantData && !tenantData.theme) {
     tenantData.theme = "dark" as TenantTheme;
   }
-  if (!tenantData.primary_color) {
+  if (tenantData && !tenantData.primary_color) {
     tenantData.primary_color = selecteColor;
   }
 
@@ -176,6 +194,7 @@
   }
 
   async function createTenant() {
+    console.log("--a--", tenantData);
     if (validateForm()) {
       try {
         showLoading();
@@ -286,7 +305,7 @@
     }
   }
 
-  function showAlert(message) {
+  function showAlert(message: string) {
     alertMessage = message;
     alertModal?.show();
   }
@@ -404,7 +423,7 @@
                 class="color-preview"
                 style="background-color: {hex};"
                 onclick={toggleColorPicker}
-></div>
+              ></div>
 
               {#if showPicker}
                 <div class="absolute picker-color">
@@ -466,7 +485,7 @@
                   bind:value={openAIKey}
                 />
                 <TogglePasswordIcon
-                  on:change={() => togglePassword(ApiKeyProvider.OpenAI)}
+                  change={() => togglePassword(ApiKeyProvider.OpenAI)}
                 />
               </label>
             </div>
@@ -673,7 +692,7 @@
       title={t("tenant.tenants.tenant.update-confirmation")}
     />
 
-    <AlertDialog bind:modal={alertModal} message={alertMessage} />
+    <AlertDialog bind:modal={alertModal} bind:message={alertMessage} />
   </div>
 </div>
 

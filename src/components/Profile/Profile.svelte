@@ -28,8 +28,8 @@
 		};
 	}
 
-  function handleNameChange(event: Event) {
-    name = event.detail.value;
+  function handleNameChange(event: any) {
+    name = event.value;
   }
 
   async function handleSubmit(event: Event): Promise<void> {
@@ -78,7 +78,7 @@
       id="name"
       label={t("profile.name")}
       value={name}
-      on:inputChange={handleNameChange}
+      inputChange={handleNameChange}
       required
     />
     <Input
@@ -86,21 +86,21 @@
       label={t("profile.email")}
       value={email}
       disabled
-      icon={svgIcons.lock}
+      icon={svgIcons.Lock}
     />
     <Input
       id="organization"
       label={t("profile.organization")}
       value={organization}
       disabled
-      icon={svgIcons.lock}
+      icon={svgIcons.Lock}
     />
     <Input
       id="roles"
       label={t("profile.current-role")}
       value={roles}
       disabled
-      icon={svgIcons.lock}
+      icon={svgIcons.Lock}
     />
   </div>
 </form>

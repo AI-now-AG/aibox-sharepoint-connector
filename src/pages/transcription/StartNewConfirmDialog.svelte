@@ -1,18 +1,25 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
   import { useTranslations } from "$i18n/utils";
   import { svgIcons } from "$assets/icons";
-
-  const dispatch = createEventDispatcher();
   const t = useTranslations();
 
   interface Props {
-    modal: any;
+    modal?: HTMLDialogElement;
     isZipDataPresent: boolean;
     isFileDataPresent: boolean;
+    downloadZip: any;
+    downloadFile: any;
+    confirm: any;
   }
 
-  let { modal = $bindable(), isZipDataPresent, isFileDataPresent }: Props = $props();
+  let {
+    modal = $bindable(),
+    isZipDataPresent = $bindable(),
+    isFileDataPresent = $bindable(),
+    downloadZip,
+    downloadFile,
+    confirm,
+  }: Props = $props();
 </script>
 
 <dialog id={"modal_confirm_start_new"} bind:this={modal} class="modal">
@@ -36,7 +43,7 @@
       </div>
 
       <div class="flex flex-col gap-4 mt-16">
-        <button class="btn btn-sm" onclick={() => dispatch("confirm")}
+        <button class="btn btn-sm" onclick={() => confirm()}
           >{t("transcription.start-new")}</button
         >
         <button class="btn btn-active btn-primary btn-sm text-base-100"
@@ -46,14 +53,14 @@
           <button
             id="no_button"
             class="btn btn-active btn-primary btn-sm text-base-100"
-            onclick={() => dispatch("downloadZip")}
+            onclick={() => downloadZip()}
             >{t("transciption.model.cta.download-zip")}</button
           >
         {:else if isFileDataPresent}
           <button
             id="no_button"
             class="btn btn-active btn-primary btn-sm text-base-100"
-            onclick={() => dispatch("downloadFile")}
+            onclick={() => downloadFile()}
             >{t("transciption.model.cta.download-output")}</button
           >
         {/if}

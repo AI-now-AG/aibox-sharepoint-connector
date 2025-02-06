@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
   import type { HTMLInputAttributes } from "svelte/elements";
 
   interface Props {
@@ -12,6 +11,7 @@
     icon?: string | null;
     type?: HTMLInputAttributes["type"];
     required?: boolean;
+    inputChange?: any;
   }
 
   let {
@@ -23,13 +23,12 @@
     disabled = false,
     icon = null,
     type = "text",
-    required = false
+    required = false,
+    inputChange,
   }: Props = $props();
 
-  const dispatch = createEventDispatcher();
-
   function handleChange(event: Event) {
-    dispatch("inputChange", { value: event.target?.value });
+    inputChange({ value: (event.target as HTMLInputElement)?.value })
   }
 </script>
 

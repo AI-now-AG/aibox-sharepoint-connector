@@ -1,16 +1,19 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
   import { fade } from "svelte/transition";
-
-  const dispatch = createEventDispatcher();
 
   interface Props {
     type?: string;
     dismissible?: boolean;
-    children?: import('svelte').Snippet;
+    dismiss?: any;
+    children?: import("svelte").Snippet;
   }
 
-  let { type = "error", dismissible = true, children }: Props = $props();
+  let {
+    type = "error",
+    dismissible = true,
+    dismiss,
+    children,
+  }: Props = $props();
 
   const iconWidth = "1.2rem";
 </script>
@@ -106,7 +109,7 @@
   </div>
 
   {#if dismissible}
-    <button class="close" onclick={() => dispatch("dismiss")}>
+    <button class="close" onclick={() => dismiss()}>
       <svg
         width="0.5em"
         style="text-align: center; display: inline-block;"

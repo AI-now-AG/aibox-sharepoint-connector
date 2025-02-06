@@ -38,7 +38,7 @@
   let isFileDataPresent: boolean = $state(false);
 
   let fileErrorMessage: string = $state("");
-  let selectedFileFormat: FileFormat[] = $state([FileFormat.ASS]);
+  let selectedFileFormat: FileFormat[] = [FileFormat.ASS];
 
   let standardSubtitlesChecked: boolean = $state(true);
   let showTextPreviewChecked: boolean = $state(true);
@@ -63,14 +63,12 @@
   let minSpeakers = 2;
   let maxSpeakers = 20;
 
-  let confirmModal: HTMLDialogElement = $state();
+  let confirmModal: HTMLDialogElement | undefined = $state();
 
   let assFileChecked = $state(selectedFileFormat.includes(FileFormat.ASS));
   let srtFileChecked = $state(selectedFileFormat.includes(FileFormat.SRT));
   let jsonFileChecked = $state(selectedFileFormat.includes(FileFormat.JSON));
   let txtFileChecked = $state(selectedFileFormat.includes(FileFormat.TXT));
-
-
 
   onMount(async () => {
     console.log(
@@ -407,9 +405,6 @@
       console.log("Azue SAS tokens response", { uploadUrl, outputFileName });
 
       try {
-        // Store temporary upload URL, filename for later
-        console.log("Temp output file name", tempOutputFileName);
-        // Upload the file to Azure Blob Storage
         //const response = await uploadBlobFile(uploadUrl, audioFile);
         await uploadBlobFileWithProgress(uploadUrl, audioFile, (percentage) => {
           uploadingValue = parseInt(`${Math.round(percentage)}`);
@@ -462,8 +457,6 @@
         $tenant,
         $user,
       );
-      console.log(params);
-      console.log($user);
 
       const response = await fetch(
         "/.netlify/functions/transcribeAudio-background",
@@ -691,7 +684,7 @@
   }
 
   function confirmStartNew() {
-    confirmModal.showModal();
+    confirmModal?.showModal();
   }
 
   function startNew() {
@@ -702,7 +695,7 @@
     }
     reset();
 
-    confirmModal.close();
+    confirmModal?.close();
   }
 
   function downloadFileSRT() {
@@ -725,8 +718,8 @@
 
     // Clsoe dialog element
     console.log("Download file!");
-    if (confirmModal.open) {
-      confirmModal.close();
+    if (confirmModal?.open) {
+      confirmModal?.close();
     }
   }
 
@@ -757,8 +750,8 @@
         URL.revokeObjectURL(blobUrl);
 
         console.log("Download file!");
-        if (confirmModal.open) {
-          confirmModal.close();
+        if (confirmModal?.open) {
+          confirmModal?.close();
         }
       })
       .catch((error) => {
@@ -796,8 +789,8 @@
 
       // Clsoe dialog element
       console.log("Download file!");
-      if (confirmModal.open) {
-        confirmModal.close();
+      if (confirmModal?.open) {
+        confirmModal?.close();
       }
     }
   }
@@ -1288,8 +1281,8 @@
     bind:modal={confirmModal}
     bind:isZipDataPresent
     bind:isFileDataPresent
-    on:downloadZip={downloadZip}
-    on:downloadFile={downloadFile}
-    on:confirm={startNew}
+    downloadZip={downloadZip}
+    downloadFile={downloadFile}
+    confirm={startNew}
   />
 </div>

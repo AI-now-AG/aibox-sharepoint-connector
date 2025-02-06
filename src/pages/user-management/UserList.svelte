@@ -187,7 +187,7 @@
 </script>
 
 <div class="container max-w-7xl mx-auto py-6">
-  <InputSearch bind:value={searchValue} on:search={fetchUsers} />
+  <InputSearch bind:value={searchValue} search={fetchUsers} />
 
   <DropdownFilter
     bind:rolesParams={filterRolesParams}

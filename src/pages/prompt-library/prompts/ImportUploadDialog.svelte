@@ -1,16 +1,15 @@
 <script lang="ts">
   import { useTranslations } from "$i18n/utils";
-  import { createEventDispatcher } from "svelte";
   import { svgIcons } from "$assets/icons";
 
   interface Props {
     modal: any;
     file: File | undefined;
+    confirm: any;
   }
 
-  let { modal = $bindable(), file = $bindable() }: Props = $props();
+  let { modal = $bindable(), file = $bindable(), confirm }: Props = $props();
 
-  const dispatch = createEventDispatcher();
   const t = useTranslations();
 
   const acceptedTypes: Record<string, string[]> = {
@@ -110,7 +109,7 @@
           class="btn btn-primary {!isFormValid && 'btn-disabled'}"
           type="submit"
           onclick={() => {
-            dispatch("confirm");
+            confirm();
           }}
         >
           {t("common.upload")}

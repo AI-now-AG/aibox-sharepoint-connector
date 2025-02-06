@@ -114,7 +114,7 @@
 <ImportUploadDialog
   bind:modal={fileUploadModal}
   bind:file={inputFile}
-  on:confirm={startImport}
+  confirm={startImport}
 />
 
 <Loading bind:show={$loading} />

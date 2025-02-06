@@ -122,9 +122,9 @@
 <div class="container max-w-full mx-auto p-6">
   <InputSearchFilter
     bind:value={searchValue}
-    on:search={fetchTenants}
+    search={fetchTenants}
     bind:showArchived
-    on:filter={fetchTenants}
+    filter={fetchTenants}
   />
 
   <div>

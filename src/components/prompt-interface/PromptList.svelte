@@ -38,10 +38,10 @@
   let selectedEditPromptId: string = $state("");
   let selectedDeletePromptId: string = "";
   let selectedOrderPromptId: string = "";
-  let promptDialog: HTMLDialogElement = $state();
+  let promptDialog: HTMLDialogElement | undefined = $state();
   let promptDialogMode: "update" | "clone" = $state("update");
-  let confirmDeleteModal: HTMLDialogElement = $state();
-  let promptOrderDialog: HTMLDialogElement = $state();
+  let confirmDeleteModal: HTMLDialogElement | undefined = $state();
+  let promptOrderDialog: HTMLDialogElement | undefined = $state();
 
   let timeout: any = $state();
   let orderCards = $state(items);
@@ -53,13 +53,13 @@
   async function editCard(index: number) {
     selectedEditPromptId = items[index]?.id ?? "";
     promptDialogMode = "update";
-    promptDialog.showModal();
+    promptDialog?.showModal();
   }
 
   async function duplicateCard(index: number) {
     selectedEditPromptId = items[index]?.id ?? "";
     promptDialogMode = "clone";
-    promptDialog.showModal();
+    promptDialog?.showModal();
   }
 
   function onDeleteCard(index: number) {
@@ -114,7 +114,7 @@
     const selectedItem = items[index];
     const groupIdToSearch = selectedItem.group ?? "";
     orderCards = getItemsByGroupId(items ?? [], groupIdToSearch);
-    promptOrderDialog.show();
+    promptOrderDialog?.show();
   }
 
   async function updatePosition(items: any[]) {
@@ -181,7 +181,7 @@
 <PromptOrderDialog
   bind:promptOrderDialog
   bind:items={orderCards}
-  on:confirm={() => {
+  confirm={() => {
     clearTimeout(timeout);
     timeout = setTimeout(() => {
       updatePosition(orderCards);

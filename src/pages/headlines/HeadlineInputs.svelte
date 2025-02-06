@@ -10,7 +10,7 @@
   async function fetchHeadline(e) {
     e.preventDefault();
 
-    const userInputText = e.detail.text;
+    const userInputText = e.text;
     input = "";
     let body = {
       article: userInputText,
@@ -69,7 +69,7 @@
       <h1 class="text-3xl pb-4">
         Hello Somedia, I help you with writing a headline
       </h1>
-      <InputForm on:message={fetchHeadline} />
+      <InputForm message={fetchHeadline} />
       {#if input}
         <div transition:fade>
           <div class="chat chat-start mt-2" transition:fade>

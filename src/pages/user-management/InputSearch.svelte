@@ -1,26 +1,25 @@
 <script lang="ts">
-  import { createBubbler, handlers } from 'svelte/legacy';
+  import { createBubbler, handlers } from "svelte/legacy";
 
   const bubble = createBubbler();
-  import { createEventDispatcher } from "svelte";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
 
-  const dispatch = createEventDispatcher();
   const t = useTranslations();
 
   interface Props {
     value?: string;
+    search?: any;
   }
 
-  let { value = $bindable("") }: Props = $props();
+  let { value = $bindable(""), search }: Props = $props();
   let typingTimeout: any;
 
   const onSearch = ({ target }: any) => {
     clearTimeout(typingTimeout);
     typingTimeout = setTimeout(() => {
       value = target.value;
-      dispatch("search");
+      search();
       console.log("dispatch", { value });
     }, 300);
   };
@@ -34,8 +33,8 @@
         type="text"
         class="grow text-sm"
         placeholder={t("user.search-for-users")}
-        oninput={handlers(onSearch, bubble('input'))}
-        onblur={bubble('blur')}
+        oninput={handlers(onSearch, bubble("input"))}
+        onblur={bubble("blur")}
       />
     </label>
   </div>

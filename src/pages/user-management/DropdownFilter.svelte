@@ -62,36 +62,11 @@
   });
 
   $effect(() => {
-    if (isVerifiedChecked) {
-      statusesParams = {
-        ...statusesParams,
-        isVerified: isVerifiedChecked,
-      };
-    } else {
-      delete statusesParams.isVerified;
-    }
-  });
-
-  $effect(() => {
-    if (isUnVerifiedChecked) {
-      statusesParams = {
-        ...statusesParams,
-        isUnVerified: isUnVerifiedChecked,
-      };
-    } else {
-      delete statusesParams.isUnVerified;
-    }
-  });
-
-  $effect(() => {
-    if (isBlockedChecked) {
-      statusesParams = {
-        ...statusesParams,
-        isBlocked: isBlockedChecked,
-      };
-    } else {
-      delete statusesParams.isBlocked;
-    }
+    statusesParams = {
+      ...(isVerifiedChecked && { isVerified: true }),
+      ...(isUnVerifiedChecked && { isUnVerified: true }),
+      ...(isBlockedChecked && { isBlocked: true }),
+    };
   });
 
   function handleClickFilter() {

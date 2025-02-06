@@ -15,7 +15,7 @@
   interface Props {
     isEditable?: boolean;
     selectedEditPromptId?: any;
-    promptDialog: HTMLDialogElement;
+    promptDialog?: HTMLDialogElement;
     dialogMode?: "create" | "update" | "clone";
     dialogTitle?: string;
   }
@@ -126,7 +126,7 @@
         )
         .filter((kb: any) => kb !== undefined) as KnowledgeBase[];
     } catch (error) {
-      promptDialog.close();
+      promptDialog?.close();
       addToast({
         message:
           error instanceof Error ? error.message : t("common.unexpected.error"),
@@ -191,7 +191,7 @@
   }
 
   function cancelEdit() {
-    promptDialog.close();
+    promptDialog?.close();
     promptTitle = "";
     promptText = "";
     selectedKnowledgeBases = [];

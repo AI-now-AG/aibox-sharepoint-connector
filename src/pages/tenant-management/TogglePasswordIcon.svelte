@@ -1,19 +1,16 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
   import { svgIcons } from "$assets/icons";
-
-  const dispatch = createEventDispatcher();
 
   interface Props {
     show?: boolean;
+    change: any;
   }
 
-  let { show = $bindable(false) }: Props = $props();
+  let { show = $bindable(false), change }: Props = $props();
 
   function toggle() {
     show = !show;
-
-    dispatch("change", { show });
+    change();
   }
 </script>
 

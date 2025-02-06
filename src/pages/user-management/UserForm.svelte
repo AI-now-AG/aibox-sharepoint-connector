@@ -28,7 +28,7 @@
   let confirmDeleteModal: HTMLDialogElement | undefined = $state();
 
   let alertModal: HTMLDialogElement | undefined = $state();
-  let alertMessage: any = "";
+  let alertMessage = $state("");
 
   const MODE = {
     Create: "create",
@@ -246,8 +246,8 @@
           label={t("common.name")}
           value={userData.name ?? ""}
           placeholder={t("common.name")}
-          on:inputChange={(event) => {
-            userData.name = event.detail.value;
+          inputChange={(event: any) => {
+            userData.name = event.value;
           }}
           disabled={isEnterpriseAuth}
           required
@@ -260,8 +260,8 @@
           label={t("user.e-mail")}
           value={userData.email ?? ""}
           placeholder={t("user.e-mail")}
-          on:inputChange={(event) => {
-            userData.email = event.detail.value;
+          inputChange={(event: any) => {
+            userData.email = event.value;
           }}
           disabled={isEnterpriseAuth || isRestrictUserManagment}
           required
@@ -448,6 +448,6 @@
   description={t("user.delete-description-message")}
 />
 
-<AlertDialog bind:modal={alertModal} message={alertMessage} />
+<AlertDialog bind:modal={alertModal} bind:message={alertMessage} />
 
 <Loading bind:show={$loading} />
