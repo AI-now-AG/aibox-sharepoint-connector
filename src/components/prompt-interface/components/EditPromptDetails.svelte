@@ -210,8 +210,8 @@
     }
   });
   let isFormValid = $derived(
-    promptTitle.trim() !== "" &&
-      promptText.trim() !== "" &&
+    promptTitle?.trim() !== "" &&
+      promptText?.trim() !== "" &&
       selectedCategory !== undefined &&
       selectedGroup !== undefined,
   );
