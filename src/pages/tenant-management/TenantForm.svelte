@@ -87,8 +87,8 @@
       value: ApiKeyProvider.AzureOpenAI,
     },
   ];
-  let textSelectedProvider = providerValues[0];
-  let isAudioToTextChecked = false;
+  let textSelectedProvider = $state(providerValues[0]);
+  let isAudioToTextChecked = $state(false);
   if (tenantData && tenantData.included_features?.length) {
     const findTextProvider = tenantData.included_features.find(
       (item) => item.name == TenantFeature.TextPrommpts,
@@ -107,8 +107,8 @@
 
   // color picker
   let hex = tenantData?.primary_color || "#491EFF";
-  let color = hex;
-  let selecteColor = hex;
+  let selecteColor = $state(hex);
+  let showPicker = $state(false);
 
   // set default values
   if (tenantData && !tenantData.default_language) {
@@ -120,8 +120,6 @@
   if (tenantData && !tenantData.primary_color) {
     tenantData.primary_color = selecteColor;
   }
-
-  let showPicker = false;
 
   function toggleColorPicker() {
     showPicker = !showPicker;
@@ -428,8 +426,7 @@
               {#if showPicker}
                 <div class="absolute picker-color">
                   <ColorPicker
-                    bind:hex
-                    bind:color
+                    hex={hex}
                     isDialog={false}
                     components={{
                       ...ChromeVariant,
