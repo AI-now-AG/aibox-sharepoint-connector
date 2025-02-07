@@ -29,6 +29,7 @@
       <button
         class="flex items-center px-4 py-2 text-base-content font-sans w-full"
         onclick={(e) => {
+          e.stopPropagation();
           option.action();
         }}
       >
