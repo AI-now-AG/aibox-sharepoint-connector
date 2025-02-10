@@ -73,8 +73,9 @@
     tenantData.speech_region = tenantData.speech_region ?? "";
     tenantData.is_restrict_user_managment =
       tenantData.is_restrict_user_managment ?? false;
-    console.log(tenantData);
   });
+
+  $inspect(tenantData);
 
   // API providers
   const providerValues = [
@@ -89,9 +90,10 @@
   ];
   let textSelectedProvider = $state(providerValues[0]);
   let isAudioToTextChecked = $state(false);
+  // svelte-ignore state_referenced_locally
   if (tenantData && tenantData.included_features?.length) {
     const findTextProvider = tenantData.included_features.find(
-      (item) => item.name == TenantFeature.TextPrommpts,
+      (item: any) => item.name == TenantFeature.TextPrommpts,
     );
     if (findTextProvider) {
       textSelectedProvider =
@@ -101,22 +103,26 @@
     }
 
     isAudioToTextChecked = tenantData.included_features.some(
-      (item) => item.name == TenantFeature.AudioToText,
+      (item: any) => item.name == TenantFeature.AudioToText,
     );
   }
 
   // color picker
+  // svelte-ignore state_referenced_locally
   let hex = tenantData?.primary_color || "#491EFF";
   let selecteColor = $state(hex);
   let showPicker = $state(false);
 
   // set default values
+  // svelte-ignore state_referenced_locally
   if (tenantData && !tenantData.default_language) {
     tenantData.default_language = "de";
   }
+  // svelte-ignore state_referenced_locally
   if (tenantData && !tenantData.theme) {
     tenantData.theme = "dark" as TenantTheme;
   }
+  // svelte-ignore state_referenced_locally
   if (tenantData && !tenantData.primary_color) {
     tenantData.primary_color = selecteColor;
   }
@@ -192,7 +198,6 @@
   }
 
   async function createTenant() {
-    console.log("--a--", tenantData);
     if (validateForm()) {
       try {
         showLoading();
@@ -203,7 +208,7 @@
             speech_api_key: azureSpeechKey,
           });
         if (encryptKeysError) {
-          showAlert(encryptKeysError);
+          showAlert(encryptKeysError?.toString());
           return;
         }
         log.d(data, "CREATE - encryptApiKeys data");
@@ -232,7 +237,7 @@
         const { error } = await actions.tenant.create(tenantData);
         hideLoading();
         if (error) {
-          showAlert(error);
+          showAlert(error?.toString());
         } else {
           addToast({
             message: t("tenant.create-successful"),
@@ -240,8 +245,8 @@
           });
           window.location.href = "/tenant-management";
         }
-      } catch (error) {
-        showAlert(error);
+      } catch (error: any) {
+        showAlert(error?.toString());
       }
     }
   }
@@ -257,7 +262,7 @@
             speech_api_key: azureSpeechKey,
           });
         if (encryptKeysError) {
-          showAlert(encryptKeysError);
+          showAlert(encryptKeysError?.toString());
           return;
         }
         log.d(data, "UPDATE - encryptApiKeys data");
@@ -287,7 +292,7 @@
         hideLoading();
 
         if (error) {
-          showAlert(error);
+          showAlert(error?.toString());
         } else {
           addToast({
             message: t("tenant.update-successful"),
@@ -297,8 +302,8 @@
             window.location.reload();
           }, 2000);
         }
-      } catch (error) {
-        showAlert(error);
+      } catch (error: any) {
+        showAlert(error?.toString());
       }
     }
   }
@@ -421,13 +426,13 @@
               <!-- svelte-ignore a11y_click_events_have_key_events -->
               <!-- svelte-ignore a11y_no_static_element_interactions -->
               <div
-                class="color-preview"
-                style="background-color: {hex};"
+                class="color-preview inline-block w-[100px] h-[50px] rounded-tl-[8px] rounded-bl-[8px]"
+                style="background-color: {selecteColor};"
                 onclick={toggleColorPicker}
               ></div>
 
               {#if showPicker}
-                <div class="absolute picker-color">
+                <div class="absolute picker-color top-[54px] left-[0]">
                   <ColorPicker
                     {hex}
                     isDialog={false}
@@ -449,7 +454,7 @@
             <!-- svelte-ignore a11y_click_events_have_key_events -->
             <!-- svelte-ignore a11y_no_static_element_interactions -->
             <div
-              class="flex flex-1 items-center input input-bordered color-input"
+              class="flex flex-1 items-center input input-bordered color-input h-[50px] rounded-tl-none rounded-bl-none"
               onclick={toggleColorPicker}
             >
               <span>{selecteColor}</span>
@@ -697,22 +702,3 @@
 </div>
 
 <Loading bind:show={$loading} />
-
-<style>
-  .color-preview {
-    width: 100px;
-    height: 50px;
-    display: inline-block;
-    border-top-left-radius: 8px;
-    border-bottom-left-radius: 8px;
-  }
-  .color-input {
-    height: 50px;
-    border-top-left-radius: 0px;
-    border-bottom-left-radius: 0px;
-  }
-  .picker-color {
-    top: 54px;
-    left: 0px;
-  }
-</style>
