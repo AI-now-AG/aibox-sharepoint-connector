@@ -149,7 +149,7 @@
         ...(promptId && { _id: promptId }),
       };
 
-      const response = await fetch("/api/prompts.json", {
+      const response = await fetch("/api/prompts/index.json", {
         method: prompt ? "PUT" : "POST",
         body: JSON.stringify(newPrompt),
         headers: {

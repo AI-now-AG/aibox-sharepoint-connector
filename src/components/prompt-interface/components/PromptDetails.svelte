@@ -27,7 +27,7 @@
   onDestroy(unsubscribe);
 
   async function getPromptDetail(id: string) {
-    const response = await fetch(`/api/prompts.json?_id=${id}`, {
+    const response = await fetch(`/api/prompts/index.json?_id=${id}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

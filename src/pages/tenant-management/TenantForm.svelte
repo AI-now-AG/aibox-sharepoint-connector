@@ -75,8 +75,6 @@
       tenantData.is_restrict_user_managment ?? false;
   });
 
-  $inspect(tenantData);
-
   // API providers
   const providerValues = [
     {
@@ -90,7 +88,6 @@
   ];
   let textSelectedProvider = $state(providerValues[0]);
   let isAudioToTextChecked = $state(false);
-  // svelte-ignore state_referenced_locally
   if (tenantData && tenantData.included_features?.length) {
     const findTextProvider = tenantData.included_features.find(
       (item: any) => item.name == TenantFeature.TextPrommpts,
@@ -107,22 +104,17 @@
     );
   }
 
-  // color picker
-  // svelte-ignore state_referenced_locally
   let hex = tenantData?.primary_color || "#491EFF";
   let selecteColor = $state(hex);
   let showPicker = $state(false);
 
   // set default values
-  // svelte-ignore state_referenced_locally
   if (tenantData && !tenantData.default_language) {
     tenantData.default_language = "de";
   }
-  // svelte-ignore state_referenced_locally
   if (tenantData && !tenantData.theme) {
     tenantData.theme = "dark" as TenantTheme;
   }
-  // svelte-ignore state_referenced_locally
   if (tenantData && !tenantData.primary_color) {
     tenantData.primary_color = selecteColor;
   }

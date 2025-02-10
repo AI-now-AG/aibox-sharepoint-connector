@@ -86,7 +86,7 @@
         ...(selectedDeletePromptId && { _id: selectedDeletePromptId }),
       };
       log.d(deletedPrompt, "deletedPrompt");
-      const response = await fetch("/api/prompts.json", {
+      const response = await fetch("/api/prompts/index.json", {
         method: "DELETE",
         body: JSON.stringify(deletedPrompt),
         headers: {

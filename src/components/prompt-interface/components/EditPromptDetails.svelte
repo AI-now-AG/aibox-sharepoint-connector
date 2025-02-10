@@ -84,7 +84,7 @@
   async function getPromptDetail(id: string) {
     isLoading = true;
     try {
-      const response = await fetch(`/api/prompts.json?_id=${id}`, {
+      const response = await fetch(`/api/prompts/index.json?_id=${id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -156,7 +156,7 @@
         httpMethod = "POST"; // FOR CREATING NEW
       }
       log.d(httpMethod, "httpMethod");
-      const response = await fetch("/api/prompts.json", {
+      const response = await fetch("/api/prompts/index.json", {
         method: httpMethod,
         body: JSON.stringify(newPrompt),
         headers: {
