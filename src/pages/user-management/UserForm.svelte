@@ -20,8 +20,17 @@
     user: any;
     tenant: any;
   }
+  let { user, tenant }: Props = $props();
 
-  let { user = $bindable(), tenant = $bindable() }: Props = $props();
+  const MODE = {
+    Create: "create",
+    Edit: "edit",
+  };
+  let mode = user ? MODE.Edit : MODE.Create;
+  const headerTitle =
+    mode == MODE.Create
+      ? t("user.add-new-user")
+      : (user?.name ?? t("common.edit"));
 
   let confirmUpdateModal: HTMLDialogElement | undefined = $state();
   let confirmBlockModal: HTMLDialogElement | undefined = $state();
@@ -30,20 +39,15 @@
   let alertModal: HTMLDialogElement | undefined = $state();
   let alertMessage = $state("");
 
-  const MODE = {
-    Create: "create",
-    Edit: "edit",
-  };
-  let mode = user ? MODE.Edit : MODE.Create;
-  let userData = user ?? {};
+  let userData = $state(user ?? {});
 
-  let isEnterpriseAuth = false;
-  let isUpdateRoleDisabled = false;
+  let isEnterpriseAuth = $state(false);
+  let isUpdateRoleDisabled = $state(false);
 
   const isRestrictUserManagment = tenant.is_restrict_user_managment;
 
   // Important note: User created on Auth0 with super admin , just the Admin on AI box when go into the detail screen
-  let role = UserRole.User;
+  let role = $state(UserRole.User);
   function getUserRole(roles: string[] = []) {
     return roles?.some(
       (role) => role === UserRole.SuperAdmin || role === UserRole.Admin,
@@ -212,9 +216,7 @@
       {@html svgIcons.back}
     </button>
     <h1 class="text-4xl font-bold">
-      {mode == MODE.Create
-        ? t("user.add-new-user")
-        : (user?.name ?? t("common.edit"))}
+      {headerTitle}
     </h1>
 
     <div class="flex space-x-2 ml-auto">
