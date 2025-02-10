@@ -73,8 +73,9 @@
     tenantData.speech_region = tenantData.speech_region ?? "";
     tenantData.is_restrict_user_managment =
       tenantData.is_restrict_user_managment ?? false;
-    console.log(tenantData);
   });
+
+  $inspect(tenantData);
 
   // API providers
   const providerValues = [
@@ -89,9 +90,10 @@
   ];
   let textSelectedProvider = $state(providerValues[0]);
   let isAudioToTextChecked = $state(false);
+  // svelte-ignore state_referenced_locally
   if (tenantData && tenantData.included_features?.length) {
     const findTextProvider = tenantData.included_features.find(
-      (item) => item.name == TenantFeature.TextPrommpts,
+      (item: any) => item.name == TenantFeature.TextPrommpts,
     );
     if (findTextProvider) {
       textSelectedProvider =
@@ -101,22 +103,26 @@
     }
 
     isAudioToTextChecked = tenantData.included_features.some(
-      (item) => item.name == TenantFeature.AudioToText,
+      (item: any) => item.name == TenantFeature.AudioToText,
     );
   }
 
   // color picker
+  // svelte-ignore state_referenced_locally
   let hex = tenantData?.primary_color || "#491EFF";
   let selecteColor = $state(hex);
   let showPicker = $state(false);
 
   // set default values
+  // svelte-ignore state_referenced_locally
   if (tenantData && !tenantData.default_language) {
     tenantData.default_language = "de";
   }
+  // svelte-ignore state_referenced_locally
   if (tenantData && !tenantData.theme) {
     tenantData.theme = "dark" as TenantTheme;
   }
+  // svelte-ignore state_referenced_locally
   if (tenantData && !tenantData.primary_color) {
     tenantData.primary_color = selecteColor;
   }
@@ -192,7 +198,6 @@
   }
 
   async function createTenant() {
-    console.log("--a--", tenantData);
     if (validateForm()) {
       try {
         showLoading();
@@ -203,7 +208,7 @@
             speech_api_key: azureSpeechKey,
           });
         if (encryptKeysError) {
-          showAlert(encryptKeysError);
+          showAlert(encryptKeysError?.toString());
           return;
         }
         log.d(data, "CREATE - encryptApiKeys data");
@@ -232,7 +237,7 @@
         const { error } = await actions.tenant.create(tenantData);
         hideLoading();
         if (error) {
-          showAlert(error);
+          showAlert(error?.toString());
         } else {
           addToast({
             message: t("tenant.create-successful"),
@@ -240,8 +245,8 @@
           });
           window.location.href = "/tenant-management";
         }
-      } catch (error) {
-        showAlert(error);
+      } catch (error: any) {
+        showAlert(error?.toString());
       }
     }
   }
@@ -257,7 +262,7 @@
             speech_api_key: azureSpeechKey,
           });
         if (encryptKeysError) {
-          showAlert(encryptKeysError);
+          showAlert(encryptKeysError?.toString());
           return;
         }
         log.d(data, "UPDATE - encryptApiKeys data");
@@ -287,7 +292,7 @@
         hideLoading();
 
         if (error) {
-          showAlert(error);
+          showAlert(error?.toString());
         } else {
           addToast({
             message: t("tenant.update-successful"),
@@ -297,8 +302,8 @@
             window.location.reload();
           }, 2000);
         }
-      } catch (error) {
-        showAlert(error);
+      } catch (error: any) {
+        showAlert(error?.toString());
       }
     }
   }
