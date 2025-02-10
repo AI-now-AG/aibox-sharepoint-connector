@@ -120,11 +120,11 @@
   });
 
   function preventDefault(fn) {
-		return function (event) {
-			event.preventDefault();
-			fn.call(this, event);
-		};
-	}
+    return function (event) {
+      event.preventDefault();
+      fn.call(this, event);
+    };
+  }
 
   function checkDataAvaibility() {
     isZipDataPresent = zipFileData !== "";
@@ -818,7 +818,6 @@
     isFileDataPresent = false;
   }
 
-
   // Handlers to update the array
   function toggleFileFormat(format: FileFormat, checked: boolean) {
     if (checked) {
@@ -889,12 +888,13 @@
   $effect(() => {
     toggleFileFormat(FileFormat.TXT, txtFileChecked);
   });
-  let isFormValid =
-    $derived(assFileChecked ||
-    srtFileChecked ||
-    jsonFileChecked ||
-    txtFileChecked ||
-    showTextPreviewChecked);
+  let isFormValid = $derived(
+    assFileChecked ||
+      srtFileChecked ||
+      jsonFileChecked ||
+      txtFileChecked ||
+      showTextPreviewChecked,
+  );
 </script>
 
 <div class="px-14 mt-10">
@@ -1269,9 +1269,7 @@
           )}</button
         >
       {/if}
-      <button
-        class="btn bg-neutral btn-sm text-white"
-        onclick={confirmStartNew}
+      <button class="btn bg-neutral btn-sm text-white" onclick={confirmStartNew}
         >{t("transciption.model.cta.start-new-transciption")}</button
       >
     {/if}
@@ -1281,8 +1279,8 @@
     bind:modal={confirmModal}
     bind:isZipDataPresent
     bind:isFileDataPresent
-    downloadZip={downloadZip}
-    downloadFile={downloadFile}
+    {downloadZip}
+    {downloadFile}
     confirm={startNew}
   />
 </div>
