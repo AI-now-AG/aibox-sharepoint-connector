@@ -7,7 +7,7 @@
   import TogglePasswordIcon from "./TogglePasswordIcon.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import AlertDialog from "$components/AlertDialog.svelte";
-  import { clickOutside } from "$components/actions/ClickOutside.svelte";
+  import { clickOutside } from "$components/actions/ClickOutside";
   import {
     trimInput,
     toLowerCase,
@@ -413,6 +413,9 @@
             use:clickOutside={() => {
               showPicker = false;
             }}
+            onclickoutside={() => {
+              showPicker = false;
+            }}
           >
             <div class="z-[10]">
               <!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -426,7 +429,7 @@
               {#if showPicker}
                 <div class="absolute picker-color">
                   <ColorPicker
-                    hex={hex}
+                    {hex}
                     isDialog={false}
                     components={{
                       ...ChromeVariant,

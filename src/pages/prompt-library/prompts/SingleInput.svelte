@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { clickOutside } from "$components/actions/ClickOutside.svelte";
+  import { clickOutside } from "$components/actions/ClickOutside";
   type Item = { title: string } | string;
 
   interface Props {
@@ -13,11 +13,10 @@
     title,
     placeholder,
     items,
-    selectedItem = $bindable()
+    selectedItem = $bindable(),
   }: Props = $props();
   let isShowDropdownOption = $state(false);
   let inputValue = $state("");
-
 
   const resetSelection = () => {
     selectedItem = undefined;
@@ -25,11 +24,11 @@
   };
 
   function preventDefault(fn) {
-		return function (event) {
-			event.preventDefault();
-			fn.call(this, event);
-		};
-	}
+    return function (event) {
+      event.preventDefault();
+      fn.call(this, event);
+    };
+  }
 
   function handleSelectedItems(selected: Item) {
     if (selectedItem === selected) {
@@ -60,8 +59,7 @@
 <div>
   <p class="mb-2">{title}</p>
   <div
-    use:clickOutside
-    onclickoutside={() => {
+    use:clickOutside={() => {
       isShowDropdownOption = false;
     }}
     class="dropdown dropdown-bottom w-full min-w-xs"
