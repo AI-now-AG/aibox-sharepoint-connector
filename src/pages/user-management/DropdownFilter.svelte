@@ -8,6 +8,10 @@
   let showFilter = $state(false);
   let numberOfFilters = $state(0);
 
+  export function hideDropdownFilter() {
+    showFilter = false;
+  }
+
   interface Props {
     rolesParams?: any[];
     statusesParams?: any;

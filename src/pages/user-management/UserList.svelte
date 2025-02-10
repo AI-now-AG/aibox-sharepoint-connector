@@ -55,6 +55,17 @@
   let confirmBlockModal: HTMLDialogElement | undefined = $state();
   let confirmDeleteModal: HTMLDialogElement | undefined = $state();
 
+  let childRefDropdownFilter: any;
+  function hideDropdownFilter() {
+    childRefDropdownFilter?.hideDropdownFilter();
+  }
+
+  $effect(() => {
+    if (searchValue == "" || searchValue) {
+      hideDropdownFilter();
+    }
+  });
+
   const fetchUsers = async () => {
     showLoading();
     const { data, error } = await actions.user.listByTenant({
@@ -192,6 +203,7 @@
   <InputSearch bind:value={searchValue} search={fetchUsers} />
 
   <DropdownFilter
+    bind:this={childRefDropdownFilter}
     bind:rolesParams={filterRolesParams}
     bind:statusesParams={filterStatusesParams}
     filter={() => {
