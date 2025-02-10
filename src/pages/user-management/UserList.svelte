@@ -46,12 +46,10 @@
   let filterRolesParams: any[] = $state([]);
   let filterStatusesParams: any = $state({});
 
-  const previousFilterState = $derived(
-    JSON.stringify({
-      roles: [...filterRolesParams],
-      statuses: { ...filterStatusesParams },
-    }),
-  );
+  let previousFilterState: string = JSON.stringify({
+    ...[],
+    ...{},
+  });
 
   let selectedUser: any = $state();
   let confirmBlockModal: HTMLDialogElement | undefined = $state();
@@ -66,6 +64,10 @@
       ...filterStatusesParams,
     });
     hideLoading();
+    previousFilterState = JSON.stringify({
+      ...filterRolesParams,
+      ...filterStatusesParams,
+    });
     if (!error) {
       users = data;
     } else {
