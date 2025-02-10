@@ -4,11 +4,6 @@ import { decrypt } from "./secure";
 import { TenantFeature, ApiKeyProvider } from "$types/TenantFeature";
 
 const initChatOpenAI = (apiKey: string, model: string) => {
-  console.log("$utils:chatModel->initChatOpenAI", {
-    apiKey,
-    model,
-  });
-
   return new ChatOpenAI({
     apiKey,
     model,
@@ -21,13 +16,6 @@ const initAzureChatOpenAI = (
   azureOpenAIApiDeploymentName: string,
   azureOpenAIApiVersion: string,
 ) => {
-  console.log("$utils:chatModel->initAzureChatOpenAI", {
-    azureOpenAIApiKey,
-    azureOpenAIApiInstanceName,
-    azureOpenAIApiDeploymentName,
-    azureOpenAIApiVersion,
-  });
-
   return new AzureChatOpenAI({
     azureOpenAIApiKey,
     azureOpenAIApiInstanceName,
