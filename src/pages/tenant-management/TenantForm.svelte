@@ -426,13 +426,13 @@
               <!-- svelte-ignore a11y_click_events_have_key_events -->
               <!-- svelte-ignore a11y_no_static_element_interactions -->
               <div
-                class="color-preview"
+                class="color-preview inline-block w-[100px] h-[50px] rounded-tl-[8px] rounded-bl-[8px]"
                 style="background-color: {selecteColor};"
                 onclick={toggleColorPicker}
               ></div>
 
               {#if showPicker}
-                <div class="absolute picker-color">
+                <div class="absolute picker-color top-[54px] left-[0]">
                   <ColorPicker
                     {hex}
                     isDialog={false}
@@ -454,7 +454,7 @@
             <!-- svelte-ignore a11y_click_events_have_key_events -->
             <!-- svelte-ignore a11y_no_static_element_interactions -->
             <div
-              class="flex flex-1 items-center input input-bordered color-input"
+              class="flex flex-1 items-center input input-bordered color-input h-[50px] rounded-tl-none rounded-bl-none"
               onclick={toggleColorPicker}
             >
               <span>{selecteColor}</span>
@@ -702,22 +702,3 @@
 </div>
 
 <Loading bind:show={$loading} />
-
-<style>
-  .color-preview {
-    width: 100px;
-    height: 50px;
-    display: inline-block;
-    border-top-left-radius: 8px;
-    border-bottom-left-radius: 8px;
-  }
-  .color-input {
-    height: 50px;
-    border-top-left-radius: 0px;
-    border-bottom-left-radius: 0px;
-  }
-  .picker-color {
-    top: 54px;
-    left: 0px;
-  }
-</style>
