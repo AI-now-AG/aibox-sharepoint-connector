@@ -416,9 +416,6 @@
             use:clickOutside={() => {
               showPicker = false;
             }}
-            onclickoutside={() => {
-              showPicker = false;
-            }}
           >
             <div class="z-[10]">
               <!-- svelte-ignore a11y_click_events_have_key_events -->
