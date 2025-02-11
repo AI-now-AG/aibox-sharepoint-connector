@@ -1,7 +1,4 @@
 <script lang="ts">
-  import { createBubbler, handlers } from "svelte/legacy";
-
-  const bubble = createBubbler();
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
 
@@ -10,15 +7,15 @@
   interface Props {
     value?: string;
     showArchived?: boolean;
-    search?: any;
-    filter?: any;
+    onsearch: () => void;
+    onfilter: () => void;
   }
 
   let {
     value = $bindable(""),
     showArchived = $bindable(false),
-    search,
-    filter,
+    onsearch,
+    onfilter,
   }: Props = $props();
   let typingTimeout: any;
 
@@ -26,15 +23,14 @@
     clearTimeout(typingTimeout);
     typingTimeout = setTimeout(() => {
       value = target.value;
-      search();
-      console.log("dispatch search", { value });
+      onsearch();
     }, 300);
   };
 
   const onFilter = ({ target }: any) => {
     showArchived = !showArchived;
     setTimeout(() => (target.checked = showArchived), 0);
-    filter();
+    onfilter();
     console.log("dispatch filter", { value });
   };
 
@@ -54,8 +50,7 @@
         type="text"
         class="grow text-sm"
         placeholder={t("tenant.tenants.seach-place-holder")}
-        oninput={handlers(onSearch, bubble("input"))}
-        onblur={bubble("blur")}
+        oninput={preventDefault(onSearch)}
       />
     </label>
   </div>

@@ -200,13 +200,13 @@
 </script>
 
 <div class="container max-w-7xl mx-auto py-6">
-  <InputSearch bind:value={searchValue} search={fetchUsers} />
+  <InputSearch bind:value={searchValue} onsearch={fetchUsers} />
 
   <DropdownFilter
     bind:this={childRefDropdownFilter}
     bind:rolesParams={filterRolesParams}
     bind:statusesParams={filterStatusesParams}
-    filter={() => {
+    onfilter={() => {
       const currentFilterState = JSON.stringify({
         ...filterRolesParams,
         ...filterStatusesParams,

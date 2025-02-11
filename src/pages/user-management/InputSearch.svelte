@@ -6,27 +6,18 @@
 
   interface Props {
     value?: string;
-    search?: Function;
-    blur?: Function;
+    onsearch: () => void;
   }
 
-  let {
-    value = $bindable(""),
-    search = () => null,
-    blur = () => null,
-  }: Props = $props();
+  let { value = $bindable(""), onsearch }: Props = $props();
   let typingTimeout: any;
 
   const onSearch = ({ target }: any) => {
     clearTimeout(typingTimeout);
     typingTimeout = setTimeout(() => {
       value = target.value;
-      search();
+      onsearch();
     }, 300);
-  };
-
-  const onBlur = () => {
-    blur();
   };
 </script>
 
@@ -39,7 +30,6 @@
         class="grow text-sm"
         placeholder={t("user.search-for-users")}
         oninput={onSearch}
-        onblur={onBlur}
       />
     </label>
   </div>

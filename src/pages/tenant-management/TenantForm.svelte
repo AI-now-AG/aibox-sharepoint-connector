@@ -55,8 +55,12 @@
   };
 
   // mode
-  let mode = tenant ? MODE.Edit : MODE.Create;
-  let tenantData = $derived(tenant ?? {});
+  const mode = tenant ? MODE.Edit : MODE.Create;
+  const headerTitle =
+    mode == MODE.Create
+      ? t("tenant.tenants.add-tenant")
+      : tenant.name || t("common.edit");
+  let tenantData = $state(tenant ?? {});
 
   $effect(() => {
     tenantData.name = tenantData.name ?? "";
@@ -105,7 +109,7 @@
     );
   }
 
-  $inspect(tenantData, textSelectedProvider);
+  $inspect(tenant, tenantData, textSelectedProvider);
 
   // color picker
   // svelte-ignore state_referenced_locally
@@ -320,9 +324,7 @@
       {@html svgIcons.back}
     </button>
     <h1 class="text-4xl font-bold">
-      {mode == MODE.Create
-        ? t("tenant.tenants.add-tenant")
-        : (tenantData.name ?? t("common.edit"))}
+      {headerTitle}
     </h1>
 
     <div class="flex space-x-2 ml-auto">

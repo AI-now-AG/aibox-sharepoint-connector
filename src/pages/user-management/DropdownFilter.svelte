@@ -15,13 +15,13 @@
   interface Props {
     rolesParams?: any[];
     statusesParams?: any;
-    filter: any;
+    onfilter: () => void;
   }
 
   let {
     rolesParams = $bindable([]),
     statusesParams = $bindable({}),
-    filter,
+    onfilter,
   }: Props = $props();
 
   // roles
@@ -76,7 +76,7 @@
   function handleClickFilter() {
     if (showFilter) {
       showFilter = false;
-      filter();
+      onfilter();
     } else {
       showFilter = true;
     }
@@ -152,7 +152,7 @@
           onclick={(e) => {
             e.stopPropagation();
             showFilter = false;
-            filter();
+            onfilter();
           }}
         >
           {@html svgIcons.filter}</button
