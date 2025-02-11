@@ -56,7 +56,7 @@
 
   // mode
   let mode = tenant ? MODE.Edit : MODE.Create;
-  let tenantData = $derived(tenant ?? {});
+  let tenantData = $state(tenant ?? {});
 
   $effect(() => {
     tenantData.name = tenantData.name ?? "";
@@ -509,7 +509,7 @@
                   bind:value={azureOpenAIKey}
                 />
                 <TogglePasswordIcon
-                  on:change={() => togglePassword(ApiKeyProvider.AzureOpenAI)}
+                  change={() => togglePassword(ApiKeyProvider.AzureOpenAI)}
                 />
               </label>
             </div>
@@ -588,8 +588,7 @@
                   bind:value={azureSpeechKey}
                 />
                 <TogglePasswordIcon
-                  on:change={() =>
-                    togglePassword(ApiKeyProvider.AzureOpenAIPro)}
+                  change={() => togglePassword(ApiKeyProvider.AzureOpenAIPro)}
                 />
               </label>
             </div>
