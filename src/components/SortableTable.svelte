@@ -12,7 +12,7 @@
   interface Props {
     columnData?: ColumnData[];
     rowData?: any[];
-    children?: import('svelte').Snippet;
+    children?: import("svelte").Snippet;
   }
 
   let { columnData = [], rowData = $bindable([]), children }: Props = $props();

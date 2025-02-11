@@ -17,7 +17,7 @@
     isShowDropdownOption = true;
     styleVisibility = "visibility: visible;";
   };
-  const handleMouseLeave = (event) => {
+  const handleMouseLeave = (event: { stopPropagation: () => void }) => {
     event.stopPropagation();
     isShowDropdownOption = false;
     styleVisibility = "";
