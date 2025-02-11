@@ -122,6 +122,8 @@
 </script>
 
 <div class="mt-3">
+  <!-- svelte-ignore a11y_click_events_have_key_events -->
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
     class="btn btn-sm btn-active font-normal bg-base-200"
     onclick={(e) => {
@@ -161,6 +163,8 @@
 
       <div class="w-full text-sm">
         <div class="w-full text-left">{t("user.role")}</div>
+        <!-- svelte-ignore a11y_click_events_have_key_events -->
+        <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
         <label
           onclick={(e) => {
             e.stopPropagation();
@@ -175,6 +179,8 @@
           />
           <span class="font-normal">{t("user.user")}</span>
         </label>
+        <!-- svelte-ignore a11y_click_events_have_key_events -->
+        <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
         <label
           onclick={(e) => {
             e.stopPropagation();
@@ -193,6 +199,8 @@
 
       <div class="w-full mt-4">
         <div class="w-full text-left">{t("user.status")}</div>
+        <!-- svelte-ignore a11y_click_events_have_key_events -->
+        <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
         <label
           onclick={(e) => {
             e.stopPropagation();
@@ -207,6 +215,8 @@
           />
           <span class="font-normal">{t("common.block")}</span>
         </label>
+        <!-- svelte-ignore a11y_click_events_have_key_events -->
+        <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
         <label
           onclick={(e) => {
             e.stopPropagation();
@@ -221,6 +231,8 @@
           />
           <span class="font-normal">{t("user.un-veriried")}</span>
         </label>
+        <!-- svelte-ignore a11y_click_events_have_key_events -->
+        <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
         <label
           onclick={(e) => {
             e.stopPropagation();
