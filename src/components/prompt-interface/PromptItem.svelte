@@ -7,14 +7,13 @@
 
   const t = useTranslations();
 
-
   interface Props {
     isEditable: boolean;
     data: any;
-    onSelectEdit: Function;
-    onSelectDuplicate: Function;
-    onSelectReOder: Function;
-    onSelectDelete: Function;
+    onSelectEdit: () => void;
+    onSelectDuplicate: () => void;
+    onSelectReOder: () => void;
+    onSelectDelete: () => void;
   }
 
   let {
@@ -23,7 +22,7 @@
     onSelectEdit,
     onSelectDuplicate,
     onSelectReOder,
-    onSelectDelete
+    onSelectDelete,
   }: Props = $props();
 
   let options: Option[] = [

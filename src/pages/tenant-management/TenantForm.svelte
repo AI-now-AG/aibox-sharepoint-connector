@@ -75,8 +75,6 @@
       tenantData.is_restrict_user_managment ?? false;
   });
 
-  $inspect(tenantData);
-
   // API providers
   const providerValues = [
     {
@@ -106,6 +104,8 @@
       (item: any) => item.name == TenantFeature.AudioToText,
     );
   }
+
+  $inspect(tenantData, textSelectedProvider);
 
   // color picker
   // svelte-ignore state_referenced_locally
@@ -228,7 +228,6 @@
         if (isAudioToTextChecked) {
           tenantData.included_features.push({
             name: TenantFeature.AudioToText,
-            //provider: ApiKeyProvider.AzureOpenAI,
             provider: textSelectedProvider.value,
           });
         }
@@ -282,7 +281,6 @@
         if (isAudioToTextChecked) {
           tenantData.included_features.push({
             name: TenantFeature.AudioToText,
-            //provider: ApiKeyProvider.AzureOpenAI,
             provider: textSelectedProvider.value,
           });
         }
@@ -315,7 +313,7 @@
 </script>
 
 <div
-  class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14 sticky bg-base-200 top-0 z-10"
+  class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14 sticky bg-base-200 top-0 z-20"
 >
   <div class="flex items-center pt-5 pb-2">
     <button class="mr-4" onclick={() => window.history.back()}>
@@ -517,7 +515,7 @@
                   bind:value={azureOpenAIKey}
                 />
                 <TogglePasswordIcon
-                  on:change={() => togglePassword(ApiKeyProvider.AzureOpenAI)}
+                  change={() => togglePassword(ApiKeyProvider.AzureOpenAI)}
                 />
               </label>
             </div>
@@ -596,8 +594,7 @@
                   bind:value={azureSpeechKey}
                 />
                 <TogglePasswordIcon
-                  on:change={() =>
-                    togglePassword(ApiKeyProvider.AzureOpenAIPro)}
+                  change={() => togglePassword(ApiKeyProvider.AzureOpenAIPro)}
                 />
               </label>
             </div>
@@ -645,7 +642,6 @@
             name="text-prompt-provider"
             class="radio radio-primary"
             value={option}
-            checked={true}
             bind:group={textSelectedProvider}
           />
           <label

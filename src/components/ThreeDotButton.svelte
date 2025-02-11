@@ -2,7 +2,7 @@
   import { svgIcons } from "$assets/icons";
 
   interface Props {
-    action?: Function;
+    action?: () => void;
   }
 
   let { action = () => null }: Props = $props();

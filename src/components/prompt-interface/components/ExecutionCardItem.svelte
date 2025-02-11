@@ -5,17 +5,17 @@
   import { useTranslations } from "$i18n/utils";
 
   const t = useTranslations();
-  
+
   interface Props {
     active: boolean;
     isEditable: boolean;
     data: any;
     zIndex?: number;
-    onSelectCart: Function;
-    onSelectEdit: Function;
-    onSelectDuplicate: Function;
-    onSelectReOder: Function;
-    onSelectDelete: Function;
+    onSelectCart: (data: any) => void;
+    onSelectEdit: () => void;
+    onSelectDuplicate: () => void;
+    onSelectReOder: () => void;
+    onSelectDelete: () => void;
   }
 
   let {
@@ -27,7 +27,7 @@
     onSelectEdit,
     onSelectDuplicate,
     onSelectReOder,
-    onSelectDelete
+    onSelectDelete,
   }: Props = $props();
 
   let options: Option[] = [
