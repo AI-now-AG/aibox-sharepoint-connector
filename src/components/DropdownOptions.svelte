@@ -2,7 +2,7 @@
   export interface Option {
     icon: any;
     text: string;
-    action: Function;
+    action: () => void;
   }
 </script>
 

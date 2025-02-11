@@ -56,7 +56,7 @@
 
   // mode
   let mode = tenant ? MODE.Edit : MODE.Create;
-  let tenantData = $state(tenant ?? {});
+  let tenantData = $derived(tenant ?? {});
 
   $effect(() => {
     tenantData.name = tenantData.name ?? "";
@@ -88,6 +88,7 @@
   ];
   let textSelectedProvider = $state(providerValues[0]);
   let isAudioToTextChecked = $state(false);
+  // svelte-ignore state_referenced_locally
   if (tenantData && tenantData.included_features?.length) {
     const findTextProvider = tenantData.included_features.find(
       (item: any) => item.name == TenantFeature.TextPrommpts,
@@ -104,17 +105,24 @@
     );
   }
 
+  $inspect(tenantData, textSelectedProvider);
+
+  // color picker
+  // svelte-ignore state_referenced_locally
   let hex = tenantData?.primary_color || "#491EFF";
   let selecteColor = $state(hex);
   let showPicker = $state(false);
 
   // set default values
+  // svelte-ignore state_referenced_locally
   if (tenantData && !tenantData.default_language) {
     tenantData.default_language = "de";
   }
+  // svelte-ignore state_referenced_locally
   if (tenantData && !tenantData.theme) {
     tenantData.theme = "dark" as TenantTheme;
   }
+  // svelte-ignore state_referenced_locally
   if (tenantData && !tenantData.primary_color) {
     tenantData.primary_color = selecteColor;
   }
@@ -220,7 +228,6 @@
         if (isAudioToTextChecked) {
           tenantData.included_features.push({
             name: TenantFeature.AudioToText,
-            //provider: ApiKeyProvider.AzureOpenAI,
             provider: textSelectedProvider.value,
           });
         }
@@ -274,7 +281,6 @@
         if (isAudioToTextChecked) {
           tenantData.included_features.push({
             name: TenantFeature.AudioToText,
-            //provider: ApiKeyProvider.AzureOpenAI,
             provider: textSelectedProvider.value,
           });
         }
@@ -307,7 +313,7 @@
 </script>
 
 <div
-  class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14 sticky bg-base-200 top-0 z-10"
+  class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14 sticky bg-base-200 top-0 z-20"
 >
   <div class="flex items-center pt-5 pb-2">
     <button class="mr-4" onclick={() => window.history.back()}>
@@ -636,7 +642,6 @@
             name="text-prompt-provider"
             class="radio radio-primary"
             value={option}
-            checked={true}
             bind:group={textSelectedProvider}
           />
           <label
