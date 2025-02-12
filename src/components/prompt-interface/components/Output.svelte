@@ -19,7 +19,7 @@
   let totalMessages = 0;
 
   const scrollToBottom = async () => {
-    window.scroll({
+    window?.scroll({
       top: document.documentElement.scrollHeight,
       behavior: "smooth",
     });
