@@ -1,7 +1,6 @@
 import netlify from "@astrojs/netlify";
 import svelte from "@astrojs/svelte";
 import tailwind from "@astrojs/tailwind";
-import sentry from "@sentry/astro";
 import { defineConfig } from "astro/config";
 
 // https://astro.build/config
@@ -11,12 +10,6 @@ export default defineConfig({
   integrations: [
     tailwind(),
     svelte(),
-    sentry({
-      sourceMapsUploadOptions: {
-        project: import.meta.env.SENTRY_PROJECT,
-        authToken: import.meta.env.SENTRY_AUTH_TOKEN,
-      },
-    }),
   ],
   security: {
     checkOrigin: true,
