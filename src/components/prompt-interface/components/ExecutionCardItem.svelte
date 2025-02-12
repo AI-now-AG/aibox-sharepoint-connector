@@ -71,7 +71,7 @@
     style={`z-index: ${zIndex};`}
   >
     {#if isEditable}
-      <DropdownSection cssClasses={"absolute top-1 right-1"} {options} />
+      <DropdownSection class={"absolute top-1 right-1"} {options} />
     {/if}
     <p class="card-title text-sm font-normal">{data?.title ?? ""}</p>
   </button>

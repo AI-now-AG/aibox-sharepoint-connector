@@ -17,7 +17,7 @@
     promptId = $bindable(""),
     input = $bindable(""),
     output = $bindable(""),
-    isProcessing = $bindable(false)
+    isProcessing = $bindable(false),
   }: Props = $props();
 
   let inputText = $state("");
@@ -43,7 +43,8 @@
   let isClickOnFile = $state(false);
 
   type ModalTrigger = { showModal: () => void };
-  let imageModal: ModalTrigger, fileModal: ModalTrigger = $state();
+  let imageModal: ModalTrigger,
+    fileModal: ModalTrigger = $state();
 
   function onKeyDown(e: KeyboardEvent) {
     if (e.key === "Enter" && e.ctrlKey) {
@@ -52,12 +53,12 @@
   }
 
   function preventDefault(fn) {
-		return function (event) {
-			event.preventDefault();
-			fn.call(this, event);
-		};
-	}
-  
+    return function (event) {
+      event.preventDefault();
+      fn.call(this, event);
+    };
+  }
+
   const readImageContent = (image: File) => {
     return new Promise((resolve) => {
       const reader = new FileReader();
@@ -306,6 +307,7 @@
         class="btn btn-ghost btn-md disabled:bg-base-100 disabled:text-slate-500 disabled:cursor-not-allowed"
         disabled={!promptId || (!inputText && inputFiles.length === 0)}
         onclick={preventDefault(fetchHeadline)}
+        aria-label="Fetch"
       >
         <svg
           width="1em"

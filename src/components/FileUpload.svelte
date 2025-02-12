@@ -14,7 +14,7 @@
     title,
     acceptedTypes,
     modal = $bindable(),
-    files = $bindable([])
+    files = $bindable([]),
   }: Props = $props();
 
   let isDragOver = $state(false);
@@ -191,6 +191,7 @@
             class="grid grid-cols-2 gap-4 mt-4 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-6"
           >
             {#each files as file, index (file.name)}
+              <!-- svelte-ignore a11y_no_static_element_interactions -->
               <div
                 class="relative flex flex-col items-center overflow-hidden text-center bg-base-100 border border-neutral-content rounded cursor-move select-none pt-36"
                 ondragstart={(e) => dragstart(e, index)}
@@ -204,6 +205,7 @@
                   class="absolute top-0 right-0 z-50 p-1 bg-neutral rounded-bl focus:outline-none"
                   type="button"
                   onclick={() => remove(index)}
+                  aria-label="Remove"
                 >
                   <svg
                     class="w-4 h-4 text-neutral-content"
@@ -256,6 +258,7 @@
                 {/if}
 
                 {#if file.type.includes("image/")}
+                  <!-- svelte-ignore a11y_missing_attribute -->
                   <img
                     class="absolute inset-0 z-0 object-contain w-full h-full preview bg-base-100"
                     bind:this={imgElements[index]}
@@ -263,6 +266,7 @@
                 {/if}
 
                 {#if file.type.includes("video/")}
+                  <!-- svelte-ignore a11y_media_has_caption -->
                   <video
                     class="absolute inset-0 object-cover w-full h-full pointer-events-none preview"
                   >

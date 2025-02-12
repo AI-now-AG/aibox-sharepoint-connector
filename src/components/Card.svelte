@@ -27,7 +27,7 @@
     type = "",
     title = "",
     viewLabel = "",
-    isEditable = false
+    isEditable = false,
   }: Props = $props();
   const t = useTranslations();
 
@@ -131,6 +131,7 @@
                 onclick={() => {
                   showDeleteConfirmationDlg(card.id);
                 }}
+                aria-label="Delete"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

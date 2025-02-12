@@ -255,7 +255,7 @@
           <td
             class="py-3 px-4 text-sm font-medium relative relative-dropdown rounded-r-lg"
           >
-            <DropdownSection cssClasses="" options={getOptions(user)} />
+            <DropdownSection options={getOptions(user)} />
           </td>
         </tr>
       {/each}
