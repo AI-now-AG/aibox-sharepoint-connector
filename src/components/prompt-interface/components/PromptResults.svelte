@@ -5,11 +5,11 @@
   
   interface Props {
     // export let input;
-    output: any;
-    isProcessing: any;
+    output: string;
+    isProcessing: boolean;
   }
 
-  let { output = $bindable(), isProcessing = $bindable() }: Props = $props();
+  let { output = $bindable(""), isProcessing = $bindable(false) }: Props = $props();
 </script>
 
 {#if output || $sharedMessageHistory.length > 0 || isProcessing}

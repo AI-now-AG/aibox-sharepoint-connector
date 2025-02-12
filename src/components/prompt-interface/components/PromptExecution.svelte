@@ -9,7 +9,7 @@
 
   interface Props {
     promptItems: any;
-  isEditable?: boolean;
+    isEditable?: boolean;
   }
 
   let { promptItems, isEditable = $bindable(false) }: Props = $props();

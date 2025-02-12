@@ -6,11 +6,11 @@
   import { tenant, user } from "$stores";
   import { svgIcons } from "$assets/icons";
   interface Props {
-    output: any;
-    isProcessing: string;
+    output: string;
+    isProcessing: boolean;
   }
 
-  let { output = $bindable(), isProcessing }: Props = $props();
+  let { output = $bindable(""), isProcessing }: Props = $props();
 
   let element;
 
@@ -18,18 +18,23 @@
   let timer: NodeJS.Timeout;
   let totalMessages = 0;
 
+  $effect(() => {
+    if (
+      ($sharedMessageHistory.length > 0 &&
+        $sharedMessageHistory.length > totalMessages) ||
+      isProcessing
+    ) {
+      scrollToBottom();
+      totalMessages = $sharedMessageHistory.length;
+    }
+  });
+
   const scrollToBottom = async () => {
     window?.scroll({
       top: document.documentElement.scrollHeight,
       behavior: "smooth",
     });
   };
-
-  $effect(() => {
-    if ($sharedMessageHistory.length > 0) {
-      scrollToBottom();
-    }
-  });
 
   const handleCopy = (event) => {
     const selection = window.getSelection();

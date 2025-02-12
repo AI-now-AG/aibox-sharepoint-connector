@@ -269,32 +269,6 @@
   <div class="grid grid-cols-[1fr_min-content] gap-4">
     <div class="p-2 flex flex-row gap-2">
       {#if $sharedMessageHistory.length == 0}
-        <!-- <button
-          class="btn h-auto w-auto p-1 min-h-0 model-toggle hover:text-base-content/60"
-          disabled={!promptId}
-          on:click={() => {
-            isClickOnFile = false;
-            imageModal.showModal();
-          }}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="1em"
-            height="1em"
-            viewBox="0 0 24 24"
-            class="w-6 h-6"
-          >
-            <path
-              fill="currentColor"
-              d="M5 21q-.825 0-1.412-.587T3 19V5q0-.825.588-1.412T5 3h14q.825 0 1.413.588T21 5v14q0 .825-.587 1.413T19 21zm0-2h14V5H5zm1-2h12l-3.75-5l-3 4L9 13zm-1 2V5zm3.5-9q.625 0 1.063-.437T10 8.5t-.437-1.062T8.5 7t-1.062.438T7 8.5t.438 1.063T8.5 10"
-            ></path>
-          </svg>
-          {#if imageFiles.length > 0}
-            <div class="badge badge-sm badge-neutral font-normal">
-              {imageFiles.length}
-            </div>
-          {/if}
-        </button> -->
         <button
           class="btn h-auto w-auto p-1 min-h-0 hover:text-base-content/60"
           disabled={!promptId}
