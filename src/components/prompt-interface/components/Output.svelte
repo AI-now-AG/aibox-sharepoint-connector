@@ -5,7 +5,6 @@
   import { sharedMessageHistory } from "$components/prompt-interface/components/Stores";
   import { tenant, user } from "$stores";
   import { svgIcons } from "$assets/icons";
-
   interface Props {
     output: any;
     isProcessing: string;
@@ -19,29 +18,18 @@
   let timer: NodeJS.Timeout;
   let totalMessages = 0;
 
-  $effect.pre(() => {
-    if (
-      ($sharedMessageHistory.length > 0 &&
-        $sharedMessageHistory.length > totalMessages) ||
-      isProcessing
-    ) {
-      scrollToBottom();
-      totalMessages = $sharedMessageHistory.length;
-    }
-  });
-
-  $effect(() => {
-    if ($sharedMessageHistory.length > 0) {
-      scrollToBottom();
-    }
-  });
-
   const scrollToBottom = async () => {
     window.scroll({
       top: document.documentElement.scrollHeight,
       behavior: "smooth",
     });
   };
+
+  $effect(() => {
+    if ($sharedMessageHistory.length > 0) {
+      scrollToBottom();
+    }
+  });
 
   const handleCopy = (event) => {
     const selection = window.getSelection();
@@ -69,36 +57,6 @@
       document.removeEventListener("copy", handleCopy);
     };
   });
-
-  /*onMount(() => {
-    element.addEventListener("scroll", function (e) {
-      const { scrollHeight, scrollTop, clientHeight } = e.target;
-      if (Math.abs(scrollHeight - clientHeight - scrollTop) > 20) {
-        if (!showButton) showButton = true;
-      } else {
-        if (showButton) showButton = false;
-      }
-    });
-  });
-
-  afterUpdate(() => {
-    if (
-      ($sharedMessageHistory.length > 0 &&
-        $sharedMessageHistory.length > totalMessages) ||
-      isProcessing
-    ) {
-      scrollToBottom(element);
-      totalMessages = $sharedMessageHistory.length;
-    }
-  });
-
-  $: if ($sharedMessageHistory.length > 0 && element) {
-    scrollToBottom(element);
-  }
-
-  const scrollToBottom = async (node) => {
-    node.scroll({ top: node.scrollHeight, behavior: "smooth" });
-  };*/
 
   function copyToClipboard(content: string, index: number) {
     navigator.clipboard
