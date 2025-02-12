@@ -42,8 +42,11 @@ export async function GET(context: APIContext): Promise<Response> {
     });
   }
 
-  const token = await auth0(context.url.origin).validateAuthorizationCode(code);
-  const decoded = decodeJwt(token.idToken);
+  const token = await auth0(context.url.origin).validateAuthorizationCode(
+    code,
+    null,
+  );
+  const decoded = decodeJwt(token.idToken());
   const auth0User = Auth0JWTSchema.safeParse(decoded);
   if (auth0User.error) {
     log.e(
