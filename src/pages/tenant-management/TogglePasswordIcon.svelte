@@ -3,7 +3,7 @@
 
   interface Props {
     show?: boolean;
-    change: () => void;
+    change: Function;
   }
 
   let { show = $bindable(false), change }: Props = $props();

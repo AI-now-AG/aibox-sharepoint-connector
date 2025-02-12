@@ -10,10 +10,10 @@
   interface Props {
     isEditable: boolean;
     data: any;
-    onSelectEdit: () => void;
-    onSelectDuplicate: () => void;
-    onSelectReOder: () => void;
-    onSelectDelete: () => void;
+    onSelectEdit?: Function;
+    onSelectDuplicate?: Function;
+    onSelectReorder?: Function;
+    onSelectDelete?: Function;
   }
 
   let {
@@ -21,7 +21,7 @@
     data,
     onSelectEdit,
     onSelectDuplicate,
-    onSelectReOder,
+    onSelectReorder,
     onSelectDelete,
   }: Props = $props();
 
@@ -44,7 +44,7 @@
       icon: svgIcons.reorder,
       text: t("common.change-order"),
       action: () => {
-        onSelectReOder?.();
+        onSelectReorder?.();
       },
     },
     {

@@ -17,7 +17,7 @@
     selectedItems = $bindable(),
   }: Props = $props();
 
-  let inputValue = "";
+  let inputValue = $state("");
 
   $effect(() => {
     if (selectedItems.length > 0) {
@@ -27,7 +27,7 @@
     }
   });
 
-  $effect.pre(() => {
+  $effect(() => {
     inputValue = selectedItems?.map((e) => e.title).join(", ");
   });
 

@@ -122,7 +122,6 @@
                     {#if index == copyIndex}
                       <svg
                         class="w-3.5 h-3.5 text-primary"
-                        aria-hidden="true"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 16 12"

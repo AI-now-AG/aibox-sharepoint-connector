@@ -191,8 +191,8 @@
             class="grid grid-cols-2 gap-4 mt-4 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-6"
           >
             {#each files as file, index (file.name)}
-              <!-- svelte-ignore a11y_no_static_element_interactions -->
               <div
+                role="listitem"
                 class="relative flex flex-col items-center overflow-hidden text-center bg-base-100 border border-neutral-content rounded cursor-move select-none pt-36"
                 ondragstart={(e) => dragstart(e, index)}
                 ondragend={() => {
@@ -258,17 +258,17 @@
                 {/if}
 
                 {#if file.type.includes("image/")}
-                  <!-- svelte-ignore a11y_missing_attribute -->
                   <img
                     class="absolute inset-0 z-0 object-contain w-full h-full preview bg-base-100"
                     bind:this={imgElements[index]}
+                    alt="Preview"
                   />
                 {/if}
 
                 {#if file.type.includes("video/")}
-                  <!-- svelte-ignore a11y_media_has_caption -->
                   <video
                     class="absolute inset-0 object-cover w-full h-full pointer-events-none preview"
+                    aria-hidden="true"
                   >
                     <source bind:this={videoElements[index]} type="video/mp4" />
                   </video>
@@ -286,6 +286,7 @@
                 </div>
 
                 <div
+                  role="listitem"
                   class="absolute inset-0 z-40 transition-colors duration-300"
                   ondragenter={(e) => dragenter(e, index)}
                   ondragleave={() => {

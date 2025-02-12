@@ -78,7 +78,6 @@
       const deletedPrompt = {
         ...(selectedDeletePromptId && { _id: selectedDeletePromptId }),
       };
-      log.d(deletedPrompt, "deletedPrompt");
       const response = await fetch("/api/prompts/index.json", {
         method: "DELETE",
         body: JSON.stringify(deletedPrompt),
@@ -117,15 +116,16 @@
     promptOrderDialog?.show();
   }
 
-  async function updatePosition(items: any[]) {
+  async function updatePosition(orderItems: CardItem[]) {
     showLoading();
     try {
-      const sortedIds = items.map((item) => {
+      const sortedIds = orderItems.map((item) => {
         return {
           _id: item.id,
         };
       });
-      await actions.prompt.updatePosition(sortedIds);
+      const newItems = await actions.prompt.updatePosition(sortedIds);
+      items = newItems.data ?? orderItems;
       addToast({
         message: t("prompt-library.prompt.order-success"),
         type: "success",
@@ -158,7 +158,7 @@
         onSelectDuplicate={() => {
           duplicateCard(index);
         }}
-        onSelectReOder={() => {
+        onSelectReorder={() => {
           orderPrompt(index);
         }}
         onSelectDelete={() => {

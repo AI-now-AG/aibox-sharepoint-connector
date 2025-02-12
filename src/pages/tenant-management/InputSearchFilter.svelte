@@ -7,8 +7,8 @@
   interface Props {
     value?: string;
     showArchived?: boolean;
-    onsearch: () => void;
-    onfilter: () => void;
+    onsearch: Function;
+    onfilter: Function;
   }
 
   let {

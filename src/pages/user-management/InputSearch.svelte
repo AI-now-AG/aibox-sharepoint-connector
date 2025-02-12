@@ -6,7 +6,7 @@
 
   interface Props {
     value?: string;
-    onsearch: () => void;
+    onsearch: Function;
   }
 
   let { value = $bindable(""), onsearch }: Props = $props();

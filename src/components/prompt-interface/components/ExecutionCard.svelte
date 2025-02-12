@@ -85,7 +85,6 @@
       const deletedPrompt = {
         ...(selectedDeletePromptId && { _id: selectedDeletePromptId }),
       };
-      log.d(deletedPrompt, "deletedPrompt");
       const response = await fetch("/api/prompts/index.json", {
         method: "DELETE",
         body: JSON.stringify(deletedPrompt),
@@ -163,7 +162,7 @@
           onSelectDuplicate={() => {
             duplicateCard(index);
           }}
-          onSelectReOder={() => {
+          onSelectReorder={() => {
             orderPrompt();
           }}
           onSelectDelete={() => {

@@ -2,7 +2,7 @@
   export interface Option {
     icon: any;
     text: string;
-    action: () => void;
+    action: Function;
   }
 </script>
 
@@ -24,9 +24,12 @@
   class={`py-2 dropdown-content menu bg-base-100 rounded-xl z-[1] p-2 shadow ${widthClass}`}
   style={styleVisibility}
 >
+<!-- <ul
+  class={`py-2 dropdown-content menu bg-base-100 rounded-xl z-[1] p-2 shadow ${widthClass}`}
+> -->
   {#each options as option}
     <li>
-      <button
+      <div
         class="flex items-center px-4 py-2 text-base-content font-sans w-full"
         onclick={(e) => {
           e.stopPropagation();
@@ -35,7 +38,7 @@
       >
         <span class="w-5 h-5 flex items-center"> {@html option.icon}</span>
         <span class="text-sm font-semibold ml-1 text-left">{option.text}</span>
-      </button>
+      </div>
     </li>
   {/each}
 </ul>

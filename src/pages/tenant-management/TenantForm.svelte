@@ -92,7 +92,7 @@
   ];
   let textSelectedProvider = $state(providerValues[0]);
   let isAudioToTextChecked = $state(false);
-  // svelte-ignore state_referenced_locally
+
   if (tenantData && tenantData.included_features?.length) {
     const findTextProvider = tenantData.included_features.find(
       (item: any) => item.name == TenantFeature.TextPrommpts,
@@ -112,21 +112,18 @@
   $inspect(tenant, tenantData, textSelectedProvider);
 
   // color picker
-  // svelte-ignore state_referenced_locally
+
   let hex = tenantData?.primary_color || "#491EFF";
   let selecteColor = $state(hex);
   let showPicker = $state(false);
 
   // set default values
-  // svelte-ignore state_referenced_locally
   if (tenantData && !tenantData.default_language) {
     tenantData.default_language = "de";
   }
-  // svelte-ignore state_referenced_locally
   if (tenantData && !tenantData.theme) {
     tenantData.theme = "dark" as TenantTheme;
   }
-  // svelte-ignore state_referenced_locally
   if (tenantData && !tenantData.primary_color) {
     tenantData.primary_color = selecteColor;
   }
@@ -215,7 +212,6 @@
           showAlert(encryptKeysError?.toString());
           return;
         }
-        log.d(data, "CREATE - encryptApiKeys data");
         const { openai_api_key, azure_openai_api_key, speech_api_key } = data;
 
         // API Keys
@@ -235,7 +231,6 @@
             provider: textSelectedProvider.value,
           });
         }
-        log.d(tenantData, "CREATE - tenantData");
 
         const { error } = await actions.tenant.create(tenantData);
         hideLoading();
@@ -268,7 +263,6 @@
           showAlert(encryptKeysError?.toString());
           return;
         }
-        log.d(data, "UPDATE - encryptApiKeys data");
         const { openai_api_key, azure_openai_api_key, speech_api_key } = data;
 
         // API Keys
@@ -288,7 +282,6 @@
             provider: textSelectedProvider.value,
           });
         }
-        log.d(tenantData, "UPDATE - tenantData");
 
         const { error } = await actions.tenant.update(tenantData);
         hideLoading();
@@ -420,13 +413,12 @@
             }}
           >
             <div class="z-[10]">
-              <!-- svelte-ignore a11y_click_events_have_key_events -->
-              <!-- svelte-ignore a11y_no_static_element_interactions -->
-              <div
+              <button
                 class="color-preview inline-block w-[100px] h-[50px] rounded-tl-[8px] rounded-bl-[8px]"
                 style="background-color: {selecteColor};"
                 onclick={toggleColorPicker}
-              ></div>
+                aria-label="Select color"
+              ></button>
 
               {#if showPicker}
                 <div class="absolute picker-color top-[54px] left-[0]">
@@ -448,14 +440,12 @@
                 </div>
               {/if}
             </div>
-            <!-- svelte-ignore a11y_click_events_have_key_events -->
-            <!-- svelte-ignore a11y_no_static_element_interactions -->
-            <div
+            <button
               class="flex flex-1 items-center input input-bordered color-input h-[50px] rounded-tl-none rounded-bl-none"
               onclick={toggleColorPicker}
             >
               <span>{selecteColor}</span>
-            </div>
+            </button>
           </div>
         </div>
       </div>

@@ -27,21 +27,24 @@
       sortColumn = col;
       sortDirection = "asc";
     }
-    if (col == undefined || col == "") {
+    if (!col) {
       return rowData;
     }
 
     rowData = rowData?.sort((a: any, b: any) => {
+      const aValue = a[col] ?? "";
+      const bValue = b[col] ?? "";
+
       if (sortDirection === "asc") {
-        if (typeof a[col] === "string") {
-          return a[col].localeCompare(b[col]);
+        if (typeof aValue === "string" && typeof bValue === "string") {
+          return aValue.localeCompare(bValue);
         }
-        return a[col] > b[col] ? 1 : -1;
+        return aValue > bValue ? 1 : -1;
       } else {
-        if (typeof a[col] === "string") {
-          return b[col].localeCompare(a[col]);
+        if (typeof aValue === "string" && typeof bValue === "string") {
+          return bValue.localeCompare(aValue);
         }
-        return a[col] < b[col] ? 1 : -1;
+        return aValue < bValue ? 1 : -1;
       }
     });
   }

@@ -149,13 +149,11 @@
         ...(selectedGroup && { group: selectedGroup._id }),
         ...(selectedEditPromptId && { _id: selectedEditPromptId }),
       };
-      log.d(newPrompt, "newPrompt");
 
       let httpMethod = "PUT"; // FOR UPDATING EXISING
       if (dialogMode == "clone") {
         httpMethod = "POST"; // FOR CREATING NEW
       }
-      log.d(httpMethod, "httpMethod");
       const response = await fetch("/api/prompts/index.json", {
         method: httpMethod,
         body: JSON.stringify(newPrompt),

@@ -12,10 +12,10 @@
     data: any;
     zIndex?: number;
     onSelectCart: (data: any) => void;
-    onSelectEdit: () => void;
-    onSelectDuplicate: () => void;
-    onSelectReOder: () => void;
-    onSelectDelete: () => void;
+    onSelectEdit?: Function;
+    onSelectDuplicate?: Function;
+    onSelectReorder?: Function;
+    onSelectDelete?: Function;
   }
 
   let {
@@ -26,7 +26,7 @@
     onSelectCart,
     onSelectEdit,
     onSelectDuplicate,
-    onSelectReOder,
+    onSelectReorder,
     onSelectDelete,
   }: Props = $props();
 
@@ -49,7 +49,7 @@
       icon: svgIcons.reorder,
       text: t("common.change-order"),
       action: () => {
-        onSelectReOder?.();
+        onSelectReorder?.();
       },
     },
     {

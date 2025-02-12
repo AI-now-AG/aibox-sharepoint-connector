@@ -161,7 +161,6 @@
 
     hideLoading();
     const { error } = result;
-    log.d(result, "updateUserStatus result");
     if (!error) {
       userData.blocked = !blocked;
       addToast({
@@ -186,7 +185,6 @@
     });
     hideLoading();
     const { error } = result;
-    log.d(result, "delete user result");
     if (!error) {
       addToast({
         message: t("user.delete-successful"),

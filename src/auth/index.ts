@@ -45,7 +45,7 @@ declare module "lucia" {
 export const auth0 = (basepath: string) => {
   const tenant = import.meta.env.AUTH0_TENANT || "ainow";
   return new Auth0(
-    `https://${tenant}.eu.auth0.com`,
+    `${tenant}.eu.auth0.com`,
     import.meta.env.AUTH0_CLIENT_ID,
     import.meta.env.AUTH0_CLIENT_SECRET,
     `${basepath}/login/auth0/callback`,

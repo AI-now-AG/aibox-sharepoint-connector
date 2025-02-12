@@ -10,21 +10,21 @@
 
   let props: any = $props();
   let { options = [] }: Props = props;
-  let styleVisibility: string = $state("");
+  /* let styleVisibility: string = $state("");
 
-  let isShowDropdownOption = $state(false);
+   let isShowDropdownOption = $state(false);
   const handleMouseEnter = () => {
-    isShowDropdownOption = true;
-    styleVisibility = "visibility: visible;";
+    // isShowDropdownOption = true;
+    // styleVisibility = "visibility: visible;";
   };
   const handleMouseLeave = (event: { stopPropagation: () => void }) => {
     event.stopPropagation();
     isShowDropdownOption = false;
     styleVisibility = "";
-  };
+  };*/
 </script>
 
-<button
+<!-- <div
   class={`dropdown dropdown-hover dropdown-end ${props.class ?? ""}`}
   onmouseenter={handleMouseEnter}
   onmouseleave={handleMouseLeave}
@@ -34,4 +34,8 @@
   {#if isShowDropdownOption}
     <DropdownOptions {options} bind:styleVisibility />
   {/if}
-</button>
+</div> -->
+<div class={`dropdown dropdown-hover ${props.class ?? ""}`}>
+  <ThreeDotButton />
+  <DropdownOptions {options} />
+</div>

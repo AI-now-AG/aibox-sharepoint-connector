@@ -15,7 +15,7 @@
   interface Props {
     rolesParams?: any[];
     statusesParams?: any;
-    onfilter: () => void;
+    onfilter: Function;
   }
 
   let {
@@ -122,9 +122,7 @@
 </script>
 
 <div class="mt-3">
-  <!-- svelte-ignore a11y_click_events_have_key_events -->
-  <!-- svelte-ignore a11y_no_static_element_interactions -->
-  <div
+  <button
     class="btn btn-sm btn-active font-normal bg-base-200"
     onclick={(e) => {
       e.stopPropagation();
@@ -137,7 +135,7 @@
       <div class="badge badge-primary badge-md">{numberOfFilters}</div>
     {/if}
     {@html svgIcons.arrowDownFill}
-  </div>
+  </button>
 
   {#if showFilter}
     <div
@@ -163,9 +161,7 @@
 
       <div class="w-full text-sm">
         <div class="w-full text-left">{t("user.role")}</div>
-        <!-- svelte-ignore a11y_click_events_have_key_events -->
-        <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-        <label
+        <button
           onclick={(e) => {
             e.stopPropagation();
             null;
@@ -178,10 +174,8 @@
             bind:checked={isUserChecked}
           />
           <span class="font-normal">{t("user.user")}</span>
-        </label>
-        <!-- svelte-ignore a11y_click_events_have_key_events -->
-        <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-        <label
+        </button>
+        <button
           onclick={(e) => {
             e.stopPropagation();
             null;
@@ -194,14 +188,12 @@
             bind:checked={isAdminChecked}
           />
           <span class="font-normal">{t("user.admin")}</span>
-        </label>
+        </button>
       </div>
 
       <div class="w-full mt-4">
         <div class="w-full text-left">{t("user.status")}</div>
-        <!-- svelte-ignore a11y_click_events_have_key_events -->
-        <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-        <label
+        <button
           onclick={(e) => {
             e.stopPropagation();
             null;
@@ -214,10 +206,8 @@
             bind:checked={isBlockedChecked}
           />
           <span class="font-normal">{t("common.block")}</span>
-        </label>
-        <!-- svelte-ignore a11y_click_events_have_key_events -->
-        <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-        <label
+        </button>
+        <button
           onclick={(e) => {
             e.stopPropagation();
             null;
@@ -230,10 +220,8 @@
             bind:checked={isUnVerifiedChecked}
           />
           <span class="font-normal">{t("user.un-veriried")}</span>
-        </label>
-        <!-- svelte-ignore a11y_click_events_have_key_events -->
-        <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-        <label
+        </button>
+        <button
           onclick={(e) => {
             e.stopPropagation();
             null;
@@ -246,7 +234,7 @@
             bind:checked={isVerifiedChecked}
           />
           <span class="font-normal">{t("user.veriried")}</span>
-        </label>
+        </button>
       </div>
     </div>
   {/if}

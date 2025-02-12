@@ -2,20 +2,19 @@
   import { svgIcons } from "$assets/icons";
 
   interface Props {
-    action?: () => void;
+    action?: Function;
   }
 
-  let { action = () => null }: Props = $props();
+  let { action }: Props = $props();
 </script>
 
-<!-- svelte-ignore a11y_click_events_have_key_events -->
 <div
   role="button"
   tabindex="0"
   class="btn btn-ghost btn-sm"
   onclick={(e) => {
     e.stopPropagation();
-    action();
+    action?.();
   }}
 >
   <span class="pointer-events-none">

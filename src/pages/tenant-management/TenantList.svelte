@@ -62,7 +62,6 @@
 
   const updateStatus = async () => {
     const { active } = selectedTenant;
-    log.d(selectedTenant, "updateStatus");
     confirmUpdateModal?.close();
 
     showLoading();
@@ -79,7 +78,6 @@
     hideLoading();
 
     const { data, error } = result;
-    log.d(result, "updateStatus --> result");
     if (!error) {
       fetchTenants();
     } else {

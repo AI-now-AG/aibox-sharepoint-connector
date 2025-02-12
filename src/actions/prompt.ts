@@ -15,7 +15,7 @@ export const prompt = {
     handler: async (input) => {
       const items: Prompt[] = [];
       for (const [index, item] of input.entries()) {
-        const updateResult = await promptModel.update(item._id, {
+        const updateResult = await promptModel.findAndUpdate(item._id, {
           position: index,
         });
         items.push(transformRawData(updateResult));
