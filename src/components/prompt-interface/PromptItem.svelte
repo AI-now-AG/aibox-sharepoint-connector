@@ -76,6 +76,6 @@
     {/if}
   </div>
   {#if isEditable}
-    <DropdownSection cssClasses={"absolute top-6 right-3"} {options} />
+    <DropdownSection class={"absolute top-6 right-3"} {options} />
   {/if}
 </div>

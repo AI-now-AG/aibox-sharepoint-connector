@@ -6,10 +6,10 @@
 
   interface Props {
     options?: Option[];
-    cssClasses?: string;
   }
 
-  let { options = [], cssClasses = "" }: Props = $props();
+  let props: any = $props();
+  let { options = [] }: Props = props;
   let styleVisibility: string = $state("");
 
   let isShowDropdownOption = $state(false);
@@ -25,7 +25,7 @@
 </script>
 
 <button
-  class={`dropdown dropdown-hover dropdown-end ${cssClasses}`}
+  class={`dropdown dropdown-hover dropdown-end ${props.class ?? ""}`}
   onmouseenter={handleMouseEnter}
   onmouseleave={handleMouseLeave}
   onclick={handleMouseEnter}
