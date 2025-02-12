@@ -102,7 +102,7 @@ export const user = {
           email: input.email,
           name: input.name,
           connection: "Username-Password-Authentication",
-          password: "@AInow$aibox*6340",
+          password: "dea510d6a7e4e4c0e5f81ce9a8c9eb4c:43bb938b99ae20bceb3641bccb9c663a7d602db3a189a11e8e3228eb63ce1bc3",
         });
 
         const userId = userResult.data.user_id;
