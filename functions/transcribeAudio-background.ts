@@ -92,13 +92,17 @@ const transcribeAudio: Handler = async (
       creator_id: new ObjectId(transcribeParams.userId),
       audio_url: transcribeParams.uploadUrl,
       status: "processing",
+      selectedFileFormat: transcribeParams.selectedFileFormat,
     });
     let transcriptionResult: TranscriptionResult = {
       success: false,
       data: null,
       error: null,
     };
-    if (transcriptionType === TranscriptionType.Largefile) {
+    if (
+      transcriptionType === TranscriptionType.Largefile ||
+      transcriptionType === TranscriptionType.SubtitleLarge
+    ) {
       if (transcribeParams.isDiarizationEnabled) {
         const newBlobFileUrl = await convertStereoToMono(
           uploadUrl,
@@ -151,7 +155,7 @@ const transcribeAudio: Handler = async (
         }),
       };
     } else {
-      if (transcriptionType !== TranscriptionType.Largefile) {
+      if (transcriptionType !== TranscriptionType.Largefile && transcriptionType !== TranscriptionType.SubtitleLarge) {
         await updateTask(uniqueName, {
           status: "completed",
           txtUrl: transcriptionResult.data?.urls["txt"],

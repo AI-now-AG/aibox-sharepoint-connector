@@ -23,6 +23,7 @@ import {
   StorageSharedKeyCredential,
 } from "@azure/storage-blob";
 import type { UpdateStatusParams } from "$types/TranscribeStatusDB";
+import { TranscriptionType } from "$types/TranscribeRequest";
 
 //const subscriptionKey = process.env.AZURE_LARGE_SPEECH_KEY || "";
 
@@ -34,6 +35,7 @@ export async function processTranscription(
   speechRegion: string,
   enableDiarization: boolean = false,
   numberOfMaxSpeakers: number = 2,
+  transcriptionType: TranscriptionType = TranscriptionType.Largefile,
 ): Promise<{ transcriptionText: string }> {
   //): Promise<{ jsonData: TranscriptionResponse; transcriptionText: string }> {
   try {
@@ -51,6 +53,7 @@ export async function processTranscription(
       uniqueName,
       subscriptionKey,
       speechRegion,
+      transcriptionType,
     );
     console.log("Created trancription task:" + taskResponse.self);
     updateStatus({
@@ -91,6 +94,7 @@ export async function createTranscriptionTask(
   uniqueName: string,
   subscriptionKey: string,
   speechRegion: string,
+  transcriptionType: TranscriptionType = TranscriptionType.Largefile,
 ): Promise<PollStatusResponse> {
   const url = `https://${speechRegion}.api.cognitive.microsoft.com/speechtotext/v3.2/transcriptions`;
   const destinationContainerUrl = await createDestinationContainerUrl();
@@ -99,8 +103,10 @@ export async function createTranscriptionTask(
     locale: "de-ch",
     contentUrls: [blobUrl],
     properties: {
-      wordLevelTimestampsEnabled: false,
-      displayFormWordLevelTimestampsEnabled: true,
+      wordLevelTimestampsEnabled:
+        transcriptionType === TranscriptionType.SubtitleLarge ? true : false,
+      displayFormWordLevelTimestampsEnabled:
+        transcriptionType === TranscriptionType.SubtitleLarge ? false : true,
       diarizationEnabled: enableDiarization,
       languageIdentification: {
         candidateLocales: ["fr-ch", "it-ch", "en-us", "en-gb", "de-ch"],

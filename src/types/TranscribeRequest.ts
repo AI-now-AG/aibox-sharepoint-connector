@@ -41,6 +41,7 @@ export enum TranscriptionType {
   Subtitles = "subtitles",
   Subtitlesjson = "subtitlesjson",
   Largefile = "largefile",
+  SubtitleLarge = "subtitlelarge",
 }
 
 export interface TranscriptionResult {

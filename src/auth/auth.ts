@@ -107,6 +107,19 @@ export const hasAudioLargefile = (locals: App.Locals) => {
   return result;
 };
 
+export const hasAudioSubtitleLarge = (locals: App.Locals) => {
+  if (!locals.tenant) {
+    return false;
+  }
+
+  const { transcriptions } = locals.tenant;
+  let result = false;
+  if (transcriptions?.subtitlelarge?.enabled ?? false) {
+    result = true;
+  }
+  return result;
+};
+
 export default {
   user,
   check,
@@ -119,4 +132,5 @@ export default {
   hasAudioSubtitlesjson,
   hasAudioSummary,
   hasAudioLargefile,
+  hasAudioSubtitleLarge,
 };

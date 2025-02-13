@@ -8,13 +8,25 @@ export type DisplayWord = {
   offsetMilliseconds?: number;
 };
 
+export type Word = {
+  word: string;
+  offset: string;
+  duration: string;
+  offsetInTicks: number;
+  durationInTicks: number;
+  durationMilliseconds?: number;
+  offsetMilliseconds?: number;
+  confidence?: number;
+};
+
 export type NBest = {
   confidence: number;
   lexical: string;
   itn: string;
   maskedITN: string;
   display: string;
-  displayWords: DisplayWord[];
+  displayWords?: DisplayWord[];
+  words?: Word[];
 };
 
 export type RecognizedPhrase = {

@@ -11,7 +11,7 @@ import {
   getCurrentBatchStatus,
   getTask,
 } from "$shared/transcriptionTasks";
-import { TranscriptionType } from "$types/TranscribeRequest";
+import { FileFormat, TranscriptionType } from "$types/TranscribeRequest";
 import {
   pollTranscriptionTask1,
   updateStatus,
@@ -20,6 +20,8 @@ import { decrypt } from "$utils/secure";
 
 const checkFileExist: Handler = async (event, context) => {
   const {
+    tenantId,
+    userId,
     uniqueName,
     fileNames,
     folderName,
@@ -48,13 +50,15 @@ const checkFileExist: Handler = async (event, context) => {
     const streamPipeline = promisify(pipeline);
     const tmpDir = tmpdir();
     const storageURLString =
-      typedTranscriptionType === TranscriptionType.Largefile
+      typedTranscriptionType === TranscriptionType.Largefile ||
+      typedTranscriptionType === TranscriptionType.SubtitleLarge
         ? process.env.AZURE_BLOB_LARGE_STORAGE_NAME || ""
         : process.env.AZURE_BLOB_STORAGE_NAME || "";
     const blobServiceClient =
       BlobServiceClient.fromConnectionString(storageURLString);
     const containerName =
-      typedTranscriptionType === TranscriptionType.Largefile
+      typedTranscriptionType === TranscriptionType.Largefile ||
+      typedTranscriptionType === TranscriptionType.SubtitleLarge
         ? process.env.AZURE_LARGE_CONTAINER_NAME || "transcribe-container"
         : process.env.AZURE_CONTAINER_NAME || "transcribecontainer";
     const containerClient = blobServiceClient.getContainerClient(containerName);
@@ -67,11 +71,14 @@ const checkFileExist: Handler = async (event, context) => {
       let jsonFileUrl = "";
       let rawTxtContent = "";
       await checkAndUploadLargeFile(
+        tenantId,
+        userId,
         uniqueName,
         typedTranscriptionType,
         isDiarizationEnabled,
         encryptedSpeechKey,
         folderName,
+        isShowImprovedTextPreview,
       );
 
       // Check if the file exists in Azure Blob Storage
@@ -194,14 +201,20 @@ const checkFileExist: Handler = async (event, context) => {
 };
 
 const checkAndUploadLargeFile = async (
+  tenantId: string,
+  userId: string,
   uniqueName: string,
   typedTranscriptionType: TranscriptionType,
   isDiarizationEnabled: boolean,
   encryptedSpeechKey: string,
   folderName: string,
+  isShowImprovedTextPreview: boolean,
 ): Promise<void> => {
-  if (typedTranscriptionType !== TranscriptionType.Largefile) return;
-
+  if (
+    typedTranscriptionType !== TranscriptionType.Largefile &&
+    typedTranscriptionType !== TranscriptionType.SubtitleLarge
+  )
+    return;
   const task = await getTask(uniqueName);
   if (!task || !task.status || !task.batchUpdate) {
     console.log("Task not found or incomplete.");
@@ -233,12 +246,17 @@ const checkAndUploadLargeFile = async (
     );
     if (!response.isRunning && response.fileURL) {
       await postAudioProProcess(
+        tenantId,
+        userId,
         uniqueName,
         outputURL,
         folderName,
         isDiarizationEnabled,
         response.fileURL,
         encryptedSpeechKey,
+        typedTranscriptionType,
+        task.selectedFileFormat,
+        isShowImprovedTextPreview,
       );
     }
   } catch (error) {
@@ -313,12 +331,17 @@ export async function pollingAndStatus(
 }
 
 async function postAudioProProcess(
+  tenantId: string,
+  userId: string,
   uniqueName: string,
   uploadUrl: string,
   folderName: string,
   enableDiarization: boolean = false,
   fileURL: string,
   encryptedSpeechKey: string,
+  typedTranscriptionType: TranscriptionType,
+  selectedFileFormat?: FileFormat[],
+  isShowImprovedTextPreview: boolean = false,
 ): Promise<void> {
   try {
     const response = await fetch(
@@ -328,12 +351,17 @@ async function postAudioProProcess(
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          tenantId,
+          userId,
           uniqueName,
           uploadUrl,
           folderName,
           enableDiarization,
           fileURL,
           encryptedSpeechKey,
+          typedTranscriptionType,
+          selectedFileFormat,
+          isShowImprovedTextPreview,
         }),
       },
     );

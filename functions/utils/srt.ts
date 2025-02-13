@@ -1,3 +1,4 @@
+import type { Word } from "$utils/Speech/SpeechResponse";
 import fs from "fs";
 
 const MAX_LENGTH = 34; // from max-text-len.py News.srt max length was 38 character. We keep a bit of extra space for corrections
@@ -74,6 +75,15 @@ export const createSRTData = (words: InputEntry[]): Entry[] => {
   if (currentGroup) result.push(currentGroup);
 
   return result;
+};
+
+export const createSRTDataLarge = (words: Word[]): { words: InputEntry[] } => {
+  const finalWords = words.map((word) => ({
+    word: word.word,
+    start: word.offsetInTicks / 10000000,
+    end: (word.offsetInTicks + word.durationInTicks) / 10000000,
+  }));
+  return { words: finalWords };
 };
 
 // export const groupLines = (data: Entry[]) => {

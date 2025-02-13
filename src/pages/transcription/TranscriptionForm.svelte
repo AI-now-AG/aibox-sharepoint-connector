@@ -13,6 +13,7 @@
   import { TenantFeature } from "$types/TenantFeature";
   const t = useTranslations();
 
+  type Item = { title: string; checked: boolean };
   interface Props {
     folderName?: string;
     transcriptionType?: TranscriptionType | undefined;
@@ -69,6 +70,26 @@
   let srtFileChecked = $state(selectedFileFormat.includes(FileFormat.SRT));
   let jsonFileChecked = $state(selectedFileFormat.includes(FileFormat.JSON));
   let txtFileChecked = $state(selectedFileFormat.includes(FileFormat.TXT));
+
+  let items: Item[] = $state([
+    { title: "Deutsch (Schweiz)", checked: false, locales: "de-ch" },
+    { title: "Französisch (Schweiz)", checked: false, locales: "fr-ch" },
+    { title: "Italienisch (Schweiz)", checked: false, locales: "it-ch" },
+    { title: "Englisch (UK)", checked: false, locales: "en-gb" },
+  ]);
+  const inputValue = $derived(
+    items
+      .filter((e) => e.checked === true)
+      .map((e) => e.title)
+      .join(", "),
+  );
+
+  function handleSelectedItems(selected: Item) {
+    const idx = items.indexOf(selected);
+    if (idx !== -1) {
+      items[idx].checked = !items[idx].checked;
+    }
+  }
 
   onMount(async () => {
     console.log(
@@ -478,7 +499,8 @@
         tempOutputFileNames = [];
         if (
           transcriptionType === TranscriptionType.Subtitles ||
-          transcriptionType === TranscriptionType.Subtitlesjson
+          transcriptionType === TranscriptionType.Subtitlesjson ||
+          transcriptionType === TranscriptionType.SubtitleLarge
         ) {
           selectedFileFormat.forEach((format) => {
             tempOutputFileNames.push(`${tempOutputFileName}.${format}`);
@@ -571,12 +593,15 @@
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          tenantId: $tenant?._id,
+          userId: $user?.id,
           uniqueName: tempOutputFileName,
           fileNames: tempOutputFileNames,
           folderName: folderName,
           isShowImprovedTextPreview:
             transcriptionType === TranscriptionType.Subtitles ||
-            transcriptionType === TranscriptionType.Subtitlesjson
+            transcriptionType === TranscriptionType.Subtitlesjson ||
+            transcriptionType === TranscriptionType.SubtitleLarge
               ? showTextPreviewChecked
               : false,
           typedTranscriptionType: transcriptionType,
@@ -659,12 +684,12 @@
     const timePerMB = 60 / 1.7;
     const estimatedTime = timePerMB * fileSizeMB;
 
-    if (fileSizeMB <= 25) return Math.min(estimatedTime, 30) * 1000; // Poll at least every 30 seconds for smaller files
-    if (fileSizeMB <= 50) return Math.min(estimatedTime, 60) * 1000; // Poll every 1 minute for medium-smaller files
-    if (fileSizeMB <= 200) return Math.min(estimatedTime, 120) * 1000; // Poll every 2 minutes for medium files
-    if (fileSizeMB <= 500) return Math.min(estimatedTime, 300) * 1000; // Poll every 5 minutes for larger files
-    if (fileSizeMB <= 1000) return Math.min(estimatedTime, 600) * 1000; // Poll every 10 minutes for very large files
-    return Math.min(estimatedTime, 900) * 1000; // Poll every 15 minutes for extra-large files
+    if (fileSizeMB <= 25) return Math.min(estimatedTime, 30) * 1000;
+    if (fileSizeMB <= 50) return Math.min(estimatedTime, 60) * 1000;
+    if (fileSizeMB <= 200) return Math.min(estimatedTime, 120) * 1000;
+    if (fileSizeMB <= 500) return Math.min(estimatedTime, 300) * 1000;
+    if (fileSizeMB <= 1000) return Math.min(estimatedTime, 600) * 1000;
+    return Math.min(estimatedTime, 900) * 1000;
   }
 
   function startPolling() {
@@ -1043,6 +1068,7 @@
                   onclick={() => {
                     checkNumberInput(maxNumberOfSpeakers, 1);
                   }}
+                  aria-label="Speakers Number Increment"
                 >
                   <svg
                     width="12"
@@ -1066,6 +1092,7 @@
                   onclick={() => {
                     checkNumberInput(maxNumberOfSpeakers, -1);
                   }}
+                  aria-label="Speakers Number Decrement"
                 >
                   <svg
                     width="12"
@@ -1091,7 +1118,7 @@
     </div>
   {/if}
 
-  {#if transcriptionType === TranscriptionType.Subtitles || transcriptionType === TranscriptionType.Subtitlesjson}
+  {#if transcriptionType === TranscriptionType.Subtitles || transcriptionType === TranscriptionType.Subtitlesjson || transcriptionType === TranscriptionType.SubtitleLarge}
     <div class="bg-base-100 mt-10 p-4 px-6 rounded-xl">
       <div class="grid">
         <h2>{t("audiotools.subtitles.what-output-do-you-need")}</h2>
@@ -1175,7 +1202,7 @@
               <div class="basis-1/8">03</div> -->
             </div>
           </div>
-          {#if transcriptionType === TranscriptionType.Subtitles}
+          {#if transcriptionType === TranscriptionType.Subtitles || transcriptionType === TranscriptionType.SubtitleLarge}
             <div><div class="bg-base-200 h-0.5"></div></div>
             <div class="card rounded-box grid py-8">
               <div class="flex flex-row place-items-center gap-8">
@@ -1225,6 +1252,87 @@
                 <!-- <div class="basis-1/8">03</div> -->
               </div>
             </div>
+          {/if}
+        </div>
+      </div>
+    </div>
+  {/if}
+
+  {#if transcriptionType === TranscriptionType.SubtitleLarge}
+    <div class="bg-base-100 mt-10 p-4 px-6 rounded-xl">
+      <p class="mb-2">{t("audiotools.subtitles.languageSettings")}</p>
+      <div class="relative flex flex-col mt-4 max-w-96">
+        <div class="dropdown dropdown-bottom min-w-xs">
+          <label class="input input-bordered flex flex-row items-center gap-2">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 14 14"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              class="mr-2"
+            >
+              <path
+                d="M13 13L9 9M10.3333 5.66667C10.3333 8.244 8.244 10.3333 5.66667 10.3333C3.08934 10.3333 1 8.244 1 5.66667C1 3.08934 3.08934 1 5.66667 1C8.244 1 10.3333 3.08934 10.3333 5.66667Z"
+                stroke="#111827"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+
+            <input
+              type="text"
+              placeholder={t(
+                "audiotools.subtitles.select.languageTranscription",
+              )}
+              value={inputValue}
+              role="button"
+              class="grow font-medium min-w-xs bg-red-300"
+              readonly
+            />
+            <svg
+              width="12"
+              height="7"
+              viewBox="0 0 12 7"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M10.6663 1L5.99967 5.66667L1.33301 1"
+                stroke="#111827"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </label>
+          {#if items}
+            <ul
+              tabindex="-1"
+              class="dropdown-content menu bg-base-100 space-y-2 rounded-box z-[1] w-52 p-2 shadow"
+            >
+              {#each items as item}
+                <li>
+                  <button
+                    onclick={preventDefault(() => handleSelectedItems(item))}
+                    class={`${item.checked === true ? "bg-primary text-base-100 hover:bg-primary" : "hover:text-neutral"}`}
+                  >
+                    {item.title}
+                  </button>
+
+                  <!-- <label class="flex items-center">
+                    <input
+                      type="checkbox"
+                      class="checkbox checkbox-sm checkbox-neutral"
+                      bind:checked={item.checked}
+                      onchange={() => handleSelectedItems(item)}
+                    />
+                    <span class="font-normal">{item.title}</span>
+                  </label> -->
+                </li>
+              {/each}
+            </ul>
           {/if}
         </div>
       </div>

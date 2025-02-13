@@ -1,5 +1,7 @@
 import { z } from "zod";
 import { MongoClient, Db, Collection, ObjectId } from "mongodb";
+import { FileFormat } from "$types/TranscribeRequest";
+import { client } from "$data/mongodb";
 
 const MONGO_URI = process.env.MONGODB_URI || "";
 const DB_NAME = process.env.MONGODB_DATABASE;
@@ -42,6 +44,7 @@ const TaskSchema = z.object({
   txtUrl: z.string().optional(),
   srtUrl: z.string().optional(),
   assUrl: z.string().optional(),
+  selectedFileFormat: z.array(z.nativeEnum(FileFormat)).optional(),
 });
 
 export const TaskBatchSchema = TaskSchema.extend({
