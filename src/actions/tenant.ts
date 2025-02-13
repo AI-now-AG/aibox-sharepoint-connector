@@ -96,15 +96,26 @@ const setupTenantAdmin = async (
   email: string,
   name?: string,
 ) => {
-  const userResult = await usersManagement.create({
-    email: email,
-    name: name ?? "Admin",
-    connection: "Username-Password-Authentication",
-    password:
-      "dea510d6a7e4e4c0e5f81ce9a8c9eb4c:43bb938b99ae20bceb3641bccb9c663a7d602db3a189a11e8e3228eb63ce1bc3",
-  });
-
-  const userId = userResult.data.user_id;
+  let userId;
+  let existingUsers = await usersManagement.getByEmail(email?.trim());
+  if (
+    existingUsers &&
+    Array.isArray(existingUsers) &&
+    existingUsers.length > 0
+  ) {
+    userId = existingUsers.data[0].user_id;
+    console.log("Assign existing user to Admin", existingUsers.data[0]);
+  } else {
+    const newUser = await usersManagement.create({
+      email: email,
+      name: name ?? "Admin",
+      connection: "Username-Password-Authentication",
+      password:
+        "dea510d6a7e4e4c0e5f81ce9a8c9eb4c:43bb938b99ae20bceb3641bccb9c663a7d602db3a189a11e8e3228eb63ce1bc3",
+    });
+    userId = newUser.data.user_id;
+    console.log("Create new Amin user", newUser.data);
+  }
 
   // Add user to Auth0 organization and assign roles
   await Promise.all([
@@ -154,7 +165,11 @@ export const tenant = {
         };
         const insertResult = await TenantModel.create(tenant);
         if (input.tenant_admin_email) {
-          setupTenantAdmin(organizationId, input.tenant_admin_email, "Admin");
+          await setupTenantAdmin(
+            organizationId,
+            input.tenant_admin_email,
+            "Admin",
+          );
         }
         await session.commitTransaction();
         return transformRawData(insertResult);
@@ -187,7 +202,11 @@ export const tenant = {
         await organizationsManagement.update(organizationId, bodyParameters);
 
         if (input.tenant_admin_email) {
-          setupTenantAdmin(organizationId, input.tenant_admin_email, "Admin");
+          await setupTenantAdmin(
+            organizationId,
+            input.tenant_admin_email,
+            "Admin",
+          );
         }
 
         await session.commitTransaction();
