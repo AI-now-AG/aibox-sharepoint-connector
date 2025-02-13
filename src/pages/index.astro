@@ -1,8 +1,9 @@
 ---
 // Component
 import Layout from "$layouts/Layout.astro";
-import { Image } from "astro:assets";
-import Card from "$components/content/Card.astro";
+//import { Image } from "astro:assets";
+//import Card from "$components/content/Card.astro";
+import PromptInput from "$pages/home/PromptInput.svelte";
 import { getCollection } from "astro:content";
 
 import { useTranslations } from "$i18n/utils";
@@ -34,23 +35,36 @@ const allContent = await getCollection("aibox");
       class="w-auto h-12 hidden [[data-theme=dark]_&]:inline"
     />
 
+    <h1 class="text-4xl font-bold mt-9 mb-4">
+      Welcome, {Astro.locals.user.name}
+    </h1>
+    <!--
     <h1 class="text-4xl font-bold mt-9 mb-4">{t("welcome.title")}</h1>
     <p class="text-xl text-base-content/60">{t("welcome.text")}</p>
+     -->
   </div>
 
   <div
-    class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 max-w-6xl p-6 mt-12 mx-auto"
+    class="flex flex-wrap max-w-6xl items-center justify-center gap-4 p-4 my-8 mx-auto"
   >
+    <a href="/" class="btn btn-ghost">Quick Links</a>
     {
       allContent.map((content) => (
-        <Card
-          title={content.data.title}
-          lead={content.data.lead}
-          href={`/content/${content.slug}`}
-        >
-          <Image src={content.data.image} alt={content.data.imageAlt} />
-        </Card>
+        // <Card
+        //   title={content.data.title}
+        //   lead={content.data.lead}
+        //   href={`/content/${content.slug}`}
+        // >
+        //   <Image src={content.data.image} alt={content.data.imageAlt} />
+        // </Card>
+        <a href={`/content/${content.slug}`} class="btn btn-ghost">
+          {content.data.title}
+        </a>
       ))
     }
+  </div>
+
+  <div class="container max-w-5xl mx-auto px-6 justify-center py-6">
+    <PromptInput client:load />
   </div>
 </Layout>
