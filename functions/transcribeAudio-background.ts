@@ -6,6 +6,8 @@ import {
 import {
   BlobSASPermissions,
   BlobServiceClient,
+  BlockBlobClient,
+  ContainerClient,
   type BlobDownloadResponseParsed,
 } from "@azure/storage-blob";
 import {
@@ -85,7 +87,7 @@ const transcribeAudio: Handler = async (
     );
     transcribeParams.speechKey = azureSpeechKey;
 
-    createTask(uniqueName, {
+    await createTask(uniqueName, {
       tenant_id: new ObjectId(transcribeParams.tenantId),
       creator_id: new ObjectId(transcribeParams.userId),
       audio_url: transcribeParams.uploadUrl,
@@ -193,30 +195,60 @@ const transcribeAudio: Handler = async (
   }
 };
 
+async function getBlobServiceClient(typedTranscriptionType: TranscriptionType) {
+  const storageURLString =
+    typedTranscriptionType === TranscriptionType.Largefile
+      ? process.env.AZURE_BLOB_LARGE_STORAGE_NAME || ""
+      : process.env.AZURE_BLOB_STORAGE_NAME || "";
+
+  if (!storageURLString) {
+    throw new Error("Azure storage configuration is missing.");
+  }
+  return BlobServiceClient.fromConnectionString(storageURLString);
+}
+
+async function getContainerClient(
+  blobServiceClient: BlobServiceClient,
+  typedTranscriptionType: TranscriptionType,
+): Promise<ContainerClient> {
+  const containerName =
+    typedTranscriptionType === TranscriptionType.Largefile
+      ? process.env.AZURE_LARGE_CONTAINER_NAME || "transcribe-container"
+      : process.env.AZURE_CONTAINER_NAME || "transcribecontainer";
+
+  if (!containerName) {
+    throw new Error("Azure container configuration is missing.");
+  }
+
+  return blobServiceClient.getContainerClient(containerName);
+}
+
+async function uploadToBlobStorage(
+  containerClient: ContainerClient,
+  convertedBlobName: string,
+  outputStream: stream.PassThrough,
+): Promise<BlockBlobClient> {
+  const monoBlobClient = containerClient.getBlockBlobClient(convertedBlobName);
+  const uploadPromise = monoBlobClient.uploadStream(
+    outputStream,
+    4 * 1024 * 1024,
+    5,
+  );
+  await uploadPromise;
+  return monoBlobClient;
+}
+
 async function convertStereoToMono(
   blobUrl: string,
   typedTranscriptionType: TranscriptionType,
   folderName: string,
   uniqueName: string,
 ): Promise<string | null> {
-  const storageURLString =
-    typedTranscriptionType === TranscriptionType.Largefile
-      ? process.env.AZURE_BLOB_LARGE_STORAGE_NAME || ""
-      : process.env.AZURE_BLOB_STORAGE_NAME || "";
-
-  const containerName =
-    typedTranscriptionType === TranscriptionType.Largefile
-      ? process.env.AZURE_LARGE_CONTAINER_NAME || "transcribe-container"
-      : process.env.AZURE_CONTAINER_NAME || "transcribecontainer";
-
-  if (!storageURLString || !containerName) {
-    console.error("Azure storage configuration is missing.");
-    return null;
-  }
-
-  const blobServiceClient =
-    BlobServiceClient.fromConnectionString(storageURLString);
-  const containerClient = blobServiceClient.getContainerClient(containerName);
+  const blobServiceClient = await getBlobServiceClient(typedTranscriptionType);
+  const containerClient = await getContainerClient(
+    blobServiceClient,
+    typedTranscriptionType,
+  );
 
   const downloadBlockBlob = await downloadFile(blobUrl, typedTranscriptionType);
   const downloadBlockBlobResponse =
@@ -235,14 +267,7 @@ async function convertStereoToMono(
 
   const newFormat = fileExtension === "m4a" ? "mp3" : fileExtension;
   const convertedBlobName = `${folderName}/${uniqueName}-mono.${newFormat}`;
-  const monoBlobClient = containerClient.getBlockBlobClient(convertedBlobName);
   const outputStream = new stream.PassThrough();
-  // downloadBlockBlobResponse.pipe(outputStream);
-  const uploadPromise = monoBlobClient.uploadStream(
-    outputStream,
-    4 * 1024 * 1024,
-    5,
-  );
 
   try {
     console.log("Starting FFmpeg processing and upload...");
@@ -251,7 +276,14 @@ async function convertStereoToMono(
       outputStream,
       fileExtension,
     );
-    await Promise.all([processingPromise, uploadPromise]);
+
+    const monoBlobClient = await uploadToBlobStorage(
+      containerClient,
+      convertedBlobName,
+      outputStream,
+    );
+    await processingPromise;
+
     return monoBlobClient.generateSasUrl({
       permissions: BlobSASPermissions.parse("r"),
       expiresOn: new Date(new Date().getTime() + 6 * 60 * 60 * 1000), // Expire in 6 hours
@@ -269,6 +301,25 @@ async function convertStereoToMono(
     return null;
   } finally {
     outputStream.end();
+  }
+}
+
+export async function generateSasUrlFromBlobUrl(blobUrl: string, typedTranscriptionType: TranscriptionType): Promise<string | null> {
+  try {
+    const blobServiceClient = await getBlobServiceClient(typedTranscriptionType);
+    const containerClient = await getContainerClient(blobServiceClient, typedTranscriptionType);
+
+    const url = new URL(blobUrl);
+    const blobName = decodeURIComponent(url.pathname.substring(1));
+
+    const blobClient = containerClient.getBlockBlobClient(blobName);
+    return blobClient.generateSasUrl({
+      permissions: BlobSASPermissions.parse("rw"),
+      expiresOn: new Date(new Date().getTime() + 6 * 60 * 60 * 1000),
+    });
+  } catch (error) {
+    console.error("Error generating SAS URL:", error);
+    return null;
   }
 }
 
