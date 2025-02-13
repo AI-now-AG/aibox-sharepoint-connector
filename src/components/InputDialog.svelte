@@ -8,6 +8,7 @@
     label?: string;
     placeholder?: string;
     value?: string;
+    errorMessage?: string;
     save?: Function;
   }
 
@@ -17,13 +18,20 @@
     label = "",
     placeholder = label,
     value = $bindable(""),
+    errorMessage = $bindable(""),
     save = () => null,
   }: Props = $props();
 
+  $effect(() => {
+    if (value) {
+      errorMessage = "";
+    }
+  });
+
   function clear() {
     value = "";
+    errorMessage = "";
   }
-  
 </script>
 
 <dialog
@@ -48,9 +56,13 @@
       <input
         type="text"
         {placeholder}
-        class="input input-bordered w-full"
+        class={`input input-bordered w-full` +
+          ` ${errorMessage ? "border-red-400 " : ""}`}
         bind:value
       />
+      {#if errorMessage}
+        <span class="mt-1 text-red-400 text-sm">{errorMessage}</span>
+      {/if}
     </div>
 
     <div class="flex space-x-2 ml-auto mt-4 justify-end">
@@ -58,7 +70,6 @@
         class="btn btn-primary"
         onclick={() => {
           save?.(value);
-          modal.close();
         }}
       >
         {t("common.save")}
