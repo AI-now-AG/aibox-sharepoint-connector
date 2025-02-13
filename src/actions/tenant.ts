@@ -5,7 +5,8 @@ import { client } from "$data/mongodb";
 import { z } from "zod";
 import { decrypt, encrypt } from "$utils/secure";
 import { transformRawData } from "$utils/transformRawData";
-
+import usersManagement from "$data/auth0/users-manager";
+import rolesManagement from "$data/auth0/roles-manager";
 import organizationsManagement from "$data/auth0/organizations-manager";
 import TenantModel, {
   IncludedFeaturesSchema,
@@ -17,6 +18,7 @@ import PromptModel from "$data/models/prompt.model";
 import CategoryModel from "$data/models/category.model";
 import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
 import { ApiKeyProvider } from "$types/TenantFeature";
+import { UserRole } from "$enums/Users";
 
 const TenantInputParamsSchema = z.object({
   name: z.string(),
@@ -38,6 +40,7 @@ const TenantInputParamsSchema = z.object({
     .boolean()
     .optional()
     .default(() => false),
+  tenant_admin_email: z.string().optional(),
 });
 
 const TenanKeyEncryptSchema = z.object({
@@ -49,6 +52,66 @@ const TenanKeyEncryptSchema = z.object({
 const TenantInputIdentifierSchema = z.object({
   _id: z.string(),
 });
+
+const assignMemberRoles = async (
+  organizationId: string,
+  userId: string,
+  oldRoles: string[],
+  newRoles: string[],
+) => {
+  // Get all roles from Auth0
+  const allRoles = await rolesManagement.getAll();
+
+  // Detach old member roles
+  if (oldRoles.length > 0) {
+    const rolesToDetach = allRoles.data
+      .filter((role) => {
+        return oldRoles.includes(role.name);
+      })
+      .map((role) => role.id);
+    await organizationsManagement.deleteMemberRoles(
+      organizationId,
+      userId,
+      rolesToDetach,
+    );
+  }
+
+  // Attach new member roles
+  if (newRoles.length > 0) {
+    const rolesToAttach = allRoles.data
+      .filter((role) => {
+        return newRoles.includes(role.name);
+      })
+      .map((role) => role.id);
+    await organizationsManagement.addMemberRoles(
+      organizationId,
+      userId,
+      rolesToAttach,
+    );
+  }
+};
+
+const setupTenantAdmin = async (
+  organizationId: string,
+  email: string,
+  name?: string,
+) => {
+  const userResult = await usersManagement.create({
+    email: email,
+    name: name ?? "Admin",
+    connection: "Username-Password-Authentication",
+    password:
+      "dea510d6a7e4e4c0e5f81ce9a8c9eb4c:43bb938b99ae20bceb3641bccb9c663a7d602db3a189a11e8e3228eb63ce1bc3",
+  });
+
+  const userId = userResult.data.user_id;
+
+  // Add user to Auth0 organization and assign roles
+  await Promise.all([
+    organizationsManagement.addMembers(organizationId, [userId]),
+    assignMemberRoles(organizationId, userId, [], [UserRole.Admin]),
+  ]);
+};
 
 export const tenant = {
   get: defineAction({
@@ -78,17 +141,21 @@ export const tenant = {
           display_name: input.name,
         });
 
+        const organizationId = organizationResult.data.id;
+
         await organizationsManagement.addEnabledConnection(
-          organizationResult.data.id,
+          organizationId,
           import.meta.env.AUTH0_AUTH_CON_ID || "con_RXTD1LIbXJgceOUH",
         );
 
         const tenant: Partial<Omit<Tenant, "_id">> = {
           ...input,
-          org_id: organizationResult.data.id,
+          org_id: organizationId,
         };
         const insertResult = await TenantModel.create(tenant);
-
+        if (input.tenant_admin_email) {
+          setupTenantAdmin(organizationId, input.tenant_admin_email, "Admin");
+        }
         await session.commitTransaction();
         return transformRawData(insertResult);
       } catch (error) {
@@ -111,15 +178,17 @@ export const tenant = {
           _id: new ObjectId(input._id),
         };
         const updatedDocument = await TenantModel.update(input._id, update);
+        const organizationId = updatedDocument?.org_id;
 
         const bodyParameters: PatchOrganizationsByIdRequest = {
           name: input.org_name,
           display_name: input.name,
         };
-        await organizationsManagement.update(
-          updatedDocument?.org_id,
-          bodyParameters,
-        );
+        await organizationsManagement.update(organizationId, bodyParameters);
+
+        if (input.tenant_admin_email) {
+          setupTenantAdmin(organizationId, input.tenant_admin_email, "Admin");
+        }
 
         await session.commitTransaction();
         return transformRawData(updatedDocument);

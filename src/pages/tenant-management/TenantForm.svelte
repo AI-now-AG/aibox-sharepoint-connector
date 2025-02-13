@@ -219,6 +219,10 @@
           });
         }
 
+        if (tenantAdminEmail && isValidEmail(tenantAdminEmail)) {
+          tenantData.tenant_admin_email = tenantAdminEmail;
+        }
+
         const { error } = await actions.tenant.create(tenantData);
         hideLoading();
         if (error) {
@@ -268,6 +272,10 @@
             name: TenantFeature.AudioToText,
             provider: textSelectedProvider.value,
           });
+        }
+
+        if (tenantAdminEmail && isValidEmail(tenantAdminEmail)) {
+          tenantData.tenant_admin_email = tenantAdminEmail;
         }
 
         const { error } = await actions.tenant.update(tenantData);
