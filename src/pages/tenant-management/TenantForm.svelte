@@ -17,6 +17,7 @@
   import ColorPicker, { ChromeVariant } from "svelte-awesome-color-picker";
   import log from "$utils/log";
   import { type TenantTheme } from "$data/models/tenant.model";
+  import InputDialog from "$components/InputDialog.svelte";
 
   const t = useTranslations();
 
@@ -34,6 +35,7 @@
     azureSpeechKey = "",
   }: Props = $props();
 
+  let addTanantAdminModal: HTMLDialogElement | undefined = $state();
   let confirmUpdateModal: HTMLDialogElement | undefined = $state();
   let alertModal: HTMLDialogElement | undefined = $state();
   let alertMessage = $state("");
@@ -61,23 +63,6 @@
       ? t("tenant.tenants.add-tenant")
       : tenant.name || t("common.edit");
   let tenantData = $state(tenant ?? {});
-
-  $effect(() => {
-    tenantData.name = tenantData.name ?? "";
-    tenantData.org_name = tenantData.org_name ?? "";
-    tenantData.default_language = tenantData.default_language ?? "";
-    tenantData.theme = tenantData.theme ?? "";
-    tenantData.azure_openai_instance_name =
-      tenantData.azure_openai_instance_name ?? "";
-    tenantData.azure_openai_endpoint = tenantData.azure_openai_endpoint ?? "";
-    tenantData.azure_openai_whisper_model =
-      tenantData.azure_openai_whisper_model ?? "";
-    tenantData.azure_openai_chat_model =
-      tenantData.azure_openai_chat_model ?? "";
-    tenantData.speech_region = tenantData.speech_region ?? "";
-    tenantData.is_restrict_user_managment =
-      tenantData.is_restrict_user_managment ?? false;
-  });
 
   // API providers
   const providerValues = [
@@ -109,13 +94,12 @@
     );
   }
 
-  $inspect(tenant, tenantData, textSelectedProvider);
-
-  // color picker
-
   let hex = tenantData?.primary_color || "#491EFF";
   let selecteColor = $state(hex);
   let showPicker = $state(false);
+  let tenantAdminEmail = $state("");
+
+  $inspect(tenant, tenantData, textSelectedProvider, tenantAdminEmail);
 
   // set default values
   if (tenantData && !tenantData.default_language) {
@@ -125,6 +109,7 @@
     tenantData.theme = "dark" as TenantTheme;
   }
   if (tenantData && !tenantData.primary_color) {
+    // svelte-ignore state_referenced_locally
     tenantData.primary_color = selecteColor;
   }
 
@@ -675,15 +660,34 @@
         </label>
       </div>
     </div>
-
-    <ConfirmDialog
-      bind:modal={confirmUpdateModal}
-      confirm={updateTenant}
-      title={t("tenant.tenants.tenant.update-confirmation")}
-    />
-
-    <AlertDialog bind:modal={alertModal} bind:message={alertMessage} />
   </div>
 </div>
 
+<div
+  class="container max-w-full mx-auto px-14 sticky bg-base-200 bottom-0 z-20"
+>
+  <div class="flex items-center pt-2 pb-2">
+    <button
+      class="btn btn-primary"
+      onclick={() => {
+        addTanantAdminModal?.show();
+      }}
+    >
+      {t("tenant.add-tenant-admin")}
+    </button>
+  </div>
+</div>
+
+<ConfirmDialog
+  bind:modal={confirmUpdateModal}
+  confirm={updateTenant}
+  title={t("tenant.tenants.tenant.update-confirmation")}
+/>
+<InputDialog
+  bind:modal={addTanantAdminModal}
+  bind:value={tenantAdminEmail}
+  title={t("tenant.add-tenant-admin")}
+  label={t("login.email")}
+/>
+<AlertDialog bind:modal={alertModal} bind:message={alertMessage} />
 <Loading bind:show={$loading} />

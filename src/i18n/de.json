@@ -145,7 +145,6 @@
   "transcription.upload-video-or-audio-file": "Video- oder Audiodateien hochladen",
   "transcription.input-file-upload-description": "Datei per Drag & Drop verschieben oder <span style=\"color: #491EFF;\">Datei auswählen</span> um zu starten",
   "transcription.supportted-file-extensions": "MP4, MP3, WAV, AVI, M4A, FLAC",
-  "transcription.supportted-file-extensions-json": "JSON",
   "transcription.maximum-capacity-25mb": "Maximale Dateigrösse: 25 MB",
   "transcription.maximum-capacity-1gb": "Maximale Dateigrösse: 1 GB",
   "transciption.model.cta.start-transcribing": "Audio zu Text starten",
@@ -177,10 +176,8 @@
   "settings.transcription.plaintext-description": "Verwandle deine Audioaufnahmen eins zu eins in Textform. Das Resultat kann wiederum kopiert und in einem neuen Anwendungsfall weiterverarbeitet werden.",
   "settings.transcription.summarize-title": "Audio zusammenfassen",
   "settings.transcription.summarize-description": "Fasse deine Audiodateien, z. B. aus Meetings oder Interviews hier direkt zusammen.",
-  "settings.transcription.subtitles-title": "Untertitel erstellen",
+  "settings.transcription.subtitles-title": "Untertitel aus Audio",
   "settings.transcription.subtitles-description": "Erstelle deine Untertitel für deine Videos und Fernsehsendungen und wähle die gewünschten Formate aus.",
-  "settings.transcription.subtitles-title-json": "Untertitel aus JSON",
-  "settings.transcription.subtitles-description-json": "Verwandeln Sie Ihre JSON-Dateien mit nur wenigen Klicks in Untertitel. Unser Tool extrahiert Dialoge, synchronisiert Zeitstempel und formatiert sie in SRT- oder ASS-Dateien. Ideal für Videos, Präsentationen und mehr.",
   "audiotools.subtitles.what-output-do-you-need": "Welchen Output benötigst du?",
   "audiotools.subtitles.subtitle-files": "untertitel Dateien",
   "audiotools.subtitles.with-text-improvement": "mit Textverbesserungen",
@@ -273,5 +270,11 @@
   "tenant.delete-confirm-message": "Wollen sie alle Daten dieses Tenants unwiederruflich Löschen? Die Aktion kann nicht rückgängig gemacht werden. ",
   "tenant.delete-successful": "Tenant erfolgreich gelöscht",
   "tenant.delete-failed": "Löschen des Tenants fehlgeschlagen",
-  "user.id": "Benutzer-ID"
+  "user.id": "Benutzer-ID",
+  "transcription.supportted-file-extensions-json\n": "JSON",
+  "settings.transcription.subtitles-title-json": "Untertitel aus JSON",
+  "settings.transcription.subtitles-description-json": "Verwandeln Sie Ihre JSON-Dateien mit nur wenigen Klicks in Untertitel. Unser Tool extrahiert Dialoge, synchronisiert Zeitstempel und formatiert sie in SRT- oder ASS-Dateien. Ideal für Videos, Präsentationen und mehr.",
+  "settings.transcription.subtitle.largefile-title": "Subtitle audio large",
+  "settings.transcription.subtitle.largefile-description": "Effortlessly create subtitles for your videos or TV shows and chose your preferred format.",
+  "tenant.add-tenant-admin": "Add Tenant Admin"
 }
