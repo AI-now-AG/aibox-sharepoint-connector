@@ -24,11 +24,13 @@
   class={`py-2 dropdown-content menu bg-base-100 rounded-xl z-[1] p-2 shadow ${widthClass}`}
   style={styleVisibility}
 >
-<!-- <ul
+  <!-- <ul
   class={`py-2 dropdown-content menu bg-base-100 rounded-xl z-[1] p-2 shadow ${widthClass}`}
 > -->
   {#each options as option}
     <li>
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
+      <!-- svelte-ignore a11y_click_events_have_key_events -->
       <div
         class="flex items-center px-4 py-2 text-base-content font-sans w-full"
         onclick={(e) => {
