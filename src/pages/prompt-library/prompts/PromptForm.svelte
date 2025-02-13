@@ -26,30 +26,36 @@
     _id: string;
   };
 
-  let categories: Category[] = [];
-  let selectedCategory: Category;
-  let selectedGroup: Group;
+  let categories: Category[] = $state([]);
+  let selectedCategory: Category = $state();
+  let selectedGroup: Group = $state();
 
-  let previousCategoryId: string | null = null;
-  $: if (selectedCategory && selectedCategory._id !== previousCategoryId) {
-    selectedGroup = null;
-    previousCategoryId = selectedCategory._id;
-  }
+  let previousCategoryId: string | null = $state(null);
+  $effect(() => {
+    if (selectedCategory && selectedCategory._id !== previousCategoryId) {
+      selectedGroup = null;
+      previousCategoryId = selectedCategory._id;
+    }
+  });
 
   //let instructions: Instruction[] = [];
   //let selectedInstructions: Instruction[] = [];
 
-  let knowledgeBases: KnowledgeBase[] = [];
-  let selectedKnowledgeBases: KnowledgeBase[] = [];
+  let knowledgeBases: KnowledgeBase[] = $state([]);
+  let selectedKnowledgeBases: KnowledgeBase[] = $state([]);
 
-  let promptTitle = "";
-  let promptText = "";
+  let promptTitle = $state("");
+  let promptText = $state("");
 
-  export let promptId: string | undefined = undefined;
-  export let prompt: any | undefined = undefined;
-  export let isEditable: boolean = false;
+  interface Props {
+    promptId?: string | undefined;
+    prompt?: any | undefined;
+    isEditable?: boolean;
+  }
 
-  let isSaving = false;
+  let { promptId = undefined, prompt = undefined, isEditable = false }: Props = $props();
+
+  let isSaving = $state(false);
 
   onMount(async function () {
     const response = await fetch("/api/categories.json", { method: "GET" });
@@ -78,6 +84,13 @@
       }
     }
   });
+
+  function preventDefault(fn) {
+		return function (event) {
+			event.preventDefault();
+			fn.call(this, event);
+		};
+	}
 
   async function fetchInstructionAndKB() {
     /*const instructionResponse = await fetch("/api/instructions.json", {
@@ -116,11 +129,11 @@
     }
   }
 
-  $: isFormValid =
-    promptTitle.trim() !== "" &&
+  let isFormValid =
+    $derived(promptTitle.trim() !== "" &&
     promptText.trim() !== "" &&
     selectedCategory !== undefined &&
-    selectedGroup !== undefined;
+    selectedGroup !== undefined);
 
   async function savePrompt() {
     if (!isFormValid) return;
@@ -136,7 +149,7 @@
         ...(promptId && { _id: promptId }),
       };
 
-      const response = await fetch("/api/prompts.json", {
+      const response = await fetch("/api/prompts/index.json", {
         method: prompt ? "PUT" : "POST",
         body: JSON.stringify(newPrompt),
         headers: {
@@ -178,7 +191,7 @@
 <div class="container max-w-5xl mx-auto p-4">
   <div class="w-full min-w-xs pt-2 lg:pt-6">
     <div class="flex items-center pt-2 pb-6">
-      <button class="mr-4" onclick="window.history.back();">
+      <button class="mr-4" onclick={() => window.history.back()}>
         {@html svgIcons.back}
       </button>
       <h1 class="text-4xl font-bold">
@@ -198,7 +211,7 @@
             bind:value={promptTitle}
             placeholder="e.g. Create three sports headlines"
             class="input input-bordered w-full min-w-xs"
-            on:keydown={handleKeyDown}
+            onkeydown={handleKeyDown}
           />
         </div>
       </div>
@@ -236,7 +249,7 @@
           bind:value={promptText}
           placeholder="e.g. Create three headlines..."
           class="input input-bordered min-w-xs shadow appearance-none min-h-32 w-full py-2 px-3"
-        />
+></textarea>
       </div>
 
       <div
@@ -254,7 +267,7 @@
         <div class="flex items-center justify-between">
           <button
             class={`btn btn-active btn-primary px-8 font-normal ${(!isFormValid || isSaving) && "btn-disabled"}`}
-            on:click|preventDefault={savePrompt}
+            onclick={preventDefault(savePrompt)}
           >
             {#if isSaving}
               <span class="loading loading-spinner"></span>

@@ -5,15 +5,31 @@
   import { addToast } from "$stores/toast";
   import Input from "$components/Input/Input.svelte";
 
-  export let name: string = "";
-  export let email: string = "";
-  export let organization: string = "";
-  export let roles: string = "";
+  interface Props {
+    name?: string;
+    email?: string;
+    organization?: string;
+    roles?: string;
+  }
+
+  let {
+    name = $bindable(""),
+    email = "",
+    organization = "",
+    roles = ""
+  }: Props = $props();
 
   const t = useTranslations();
 
-  function handleNameChange(event: Event) {
-    name = event.detail.value;
+  function preventDefault(fn) {
+		return function (event) {
+			event.preventDefault();
+			fn.call(this, event);
+		};
+	}
+
+  function handleNameChange(event: any) {
+    name = event.value;
   }
 
   async function handleSubmit(event: Event): Promise<void> {
@@ -35,7 +51,7 @@
 </script>
 
 <form
-  on:submit|preventDefault={handleSubmit}
+  onsubmit={preventDefault(handleSubmit)}
   class="container max-w-5xl mx-auto"
 >
   <div class="flex flex-row justify-between items-center mb-5">
@@ -48,7 +64,7 @@
       </button>
       <button
         class="btn sm:w-full md:w-auto"
-        on:click={() => {
+        onclick={() => {
           window.history.back();
         }}
         type="button"
@@ -62,7 +78,7 @@
       id="name"
       label={t("profile.name")}
       value={name}
-      on:inputChange={handleNameChange}
+      inputChange={handleNameChange}
       required
     />
     <Input
@@ -70,21 +86,21 @@
       label={t("profile.email")}
       value={email}
       disabled
-      icon={svgIcons.lock}
+      icon={svgIcons.Lock}
     />
     <Input
       id="organization"
       label={t("profile.organization")}
       value={organization}
       disabled
-      icon={svgIcons.lock}
+      icon={svgIcons.Lock}
     />
     <Input
       id="roles"
       label={t("profile.current-role")}
       value={roles}
       disabled
-      icon={svgIcons.lock}
+      icon={svgIcons.Lock}
     />
   </div>
 </form>

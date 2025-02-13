@@ -17,14 +17,19 @@
   import { type Option } from "$components/DropdownOptions.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import InputSearch from "./InputSearch.svelte";
-  import DropdownFilter, { UserRole } from "./DropdownFilter.svelte";
+  import DropdownFilter from "./DropdownFilter.svelte";
   import SortableTable, {
     type ColumnData,
   } from "$components/SortableTable.svelte";
+  import { UserRole } from "$enums/Users";
 
   const t = useTranslations();
 
-  export let tenantId: string = "";
+  interface Props {
+    tenantId?: string;
+  }
+
+  let { tenantId = "" }: Props = $props();
 
   const columnData: ColumnData[] = [
     { key: "name", name: t("common.name") },
@@ -35,23 +40,35 @@
     { key: "", name: "" },
     { key: "", name: "" },
   ];
-  let users: any = [];
+  let users: any = $state([]);
 
-  let searchValue: string = "";
-  let filterRolesParams: any[] = [];
-  let filterStatusesParams: any = {};
+  let searchValue: string = $state("");
+  let filterRolesParams: any[] = $state([]);
+  let filterStatusesParams: any = $state({});
+
   let previousFilterState: string = JSON.stringify({
-    ...filterRolesParams,
-    ...filterStatusesParams,
+    ...[],
+    ...{},
   });
 
-  let selectedUser: any;
-  let confirmBlockModal: HTMLDialogElement;
-  let confirmDeleteModal: HTMLDialogElement;
+  let selectedUser: any = $state();
+  let confirmBlockModal: HTMLDialogElement | undefined = $state();
+  let confirmDeleteModal: HTMLDialogElement | undefined = $state();
+
+  let childRefDropdownFilter: any;
+  function hideDropdownFilter() {
+    childRefDropdownFilter?.hideDropdownFilter();
+  }
+
+  $effect(() => {
+    if (searchValue == "" || searchValue) {
+      hideDropdownFilter();
+    }
+  });
 
   const fetchUsers = async () => {
     showLoading();
-    const { data, error } = await actions.user.listByTeant({
+    const { data, error } = await actions.user.listByTenant({
       tenantId,
       searchValue,
       roles: filterRolesParams,
@@ -100,7 +117,6 @@
 
     hideLoading();
     const { error } = result;
-    log.d(result, "updateUserStatus result");
     if (!error) {
       addToast({
         message: blocked
@@ -130,7 +146,6 @@
     });
     hideLoading();
     const { error } = result;
-    log.d(result, "delete user result");
     if (!error) {
       addToast({
         message: t("user.delete-successful"),
@@ -183,12 +198,13 @@
 </script>
 
 <div class="container max-w-7xl mx-auto py-6">
-  <InputSearch bind:value={searchValue} on:search={fetchUsers} />
+  <InputSearch bind:value={searchValue} onsearch={fetchUsers} />
 
   <DropdownFilter
+    bind:this={childRefDropdownFilter}
     bind:rolesParams={filterRolesParams}
     bind:statusesParams={filterStatusesParams}
-    on:filter={() => {
+    onfilter={() => {
       const currentFilterState = JSON.stringify({
         ...filterRolesParams,
         ...filterStatusesParams,
@@ -237,7 +253,7 @@
           <td
             class="py-3 px-4 text-sm font-medium relative relative-dropdown rounded-r-lg"
           >
-            <DropdownSection cssClasses="" options={getOptions(user)} />
+            <DropdownSection options={getOptions(user)} />
           </td>
         </tr>
       {/each}
@@ -247,22 +263,22 @@
 
 <!-- confirm block dialog -->
 <ConfirmDialog
+  bind:modal={confirmBlockModal}
+  confirm={handleBlockingUser}
   title={selectedUser?.blocked
     ? t("user.un-block-confirm-message")
     : t("user.block-confirm-message")}
   description={selectedUser?.blocked
     ? t("user.un-block-description-message")
     : t("user.block-description-message")}
-  bind:modal={confirmBlockModal}
-  on:confirm={handleBlockingUser}
 />
 
 <!-- confirm delete dialog -->
 <ConfirmDialog
+  bind:modal={confirmDeleteModal}
+  confirm={deleteUser}
   title={t("user.delete-confirm-message")}
   description={t("user.delete-description-message")}
-  bind:modal={confirmDeleteModal}
-  on:confirm={deleteUser}
 />
 
-<Loading partial={true} bind:show={$loading} />
+<Loading bind:show={$loading} partial={true} />

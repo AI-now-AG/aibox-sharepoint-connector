@@ -1,20 +1,24 @@
 <script lang="ts">
   import { fade } from "svelte/transition";
-  import { onMount, afterUpdate, tick } from "svelte";
+  import { onMount, tick } from "svelte";
   import { MessageRole, type MessageHistory } from "$types/MessageHistory";
   import { sharedMessageHistory } from "$components/prompt-interface/components/Stores";
   import { tenant, user } from "$stores";
   import { svgIcons } from "$assets/icons";
+  interface Props {
+    output: string;
+    isProcessing: boolean;
+  }
 
-  export let output: string;
-  export let isProcessing: string;
+  let { output = $bindable(""), isProcessing }: Props = $props();
+
   let element;
 
   let copyIndex: number = -1;
   let timer: NodeJS.Timeout;
   let totalMessages = 0;
 
-  afterUpdate(() => {
+  $effect(() => {
     if (
       ($sharedMessageHistory.length > 0 &&
         $sharedMessageHistory.length > totalMessages) ||
@@ -25,12 +29,8 @@
     }
   });
 
-  $: if ($sharedMessageHistory.length > 0) {
-    scrollToBottom();
-  }
-
   const scrollToBottom = async () => {
-    window.scroll({
+    window?.scroll({
       top: document.documentElement.scrollHeight,
       behavior: "smooth",
     });
@@ -63,36 +63,6 @@
     };
   });
 
-  /*onMount(() => {
-    element.addEventListener("scroll", function (e) {
-      const { scrollHeight, scrollTop, clientHeight } = e.target;
-      if (Math.abs(scrollHeight - clientHeight - scrollTop) > 20) {
-        if (!showButton) showButton = true;
-      } else {
-        if (showButton) showButton = false;
-      }
-    });
-  });
-
-  afterUpdate(() => {
-    if (
-      ($sharedMessageHistory.length > 0 &&
-        $sharedMessageHistory.length > totalMessages) ||
-      isProcessing
-    ) {
-      scrollToBottom(element);
-      totalMessages = $sharedMessageHistory.length;
-    }
-  });
-
-  $: if ($sharedMessageHistory.length > 0 && element) {
-    scrollToBottom(element);
-  }
-
-  const scrollToBottom = async (node) => {
-    node.scroll({ top: node.scrollHeight, behavior: "smooth" });
-  };*/
-
   function copyToClipboard(content: string, index: number) {
     navigator.clipboard
       .writeText(content)
@@ -124,7 +94,7 @@
             <div class="avatar">
               <div class="w-10 rounded-full">
                 {#if role === MessageRole.User}
-                  <!-- svelte-ignore a11y-img-redundant-alt -->
+                  <!-- svelte-ignore a11y_img_redundant_alt -->
                   <img alt="Avatar Image" src={userPicture} />
                 {:else}
                   <img src="/aibox-logo-dark.svg" alt="light Logo" />
@@ -147,12 +117,11 @@
                 <div class="flex flex-col justify-items-end order-last">
                   <button
                     class="btn p-2 btn-ghost"
-                    on:click={() => copyToClipboard(rawData, index)}
+                    onclick={() => copyToClipboard(rawData, index)}
                   >
                     {#if index == copyIndex}
                       <svg
                         class="w-3.5 h-3.5 text-primary"
-                        aria-hidden="true"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 16 12"

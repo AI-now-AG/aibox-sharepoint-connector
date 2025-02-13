@@ -1,7 +1,7 @@
 ---
 import Layout from "$layouts/Layout.astro";
 import CategoryForm from "$pages/prompt-library/categories/CategoryForm.svelte";
-import { Permission } from "$data/models/user.model";
+import { Permission } from "$enums/Users";
 
 let userPermissions = Astro.locals.user.permissions;
 ---

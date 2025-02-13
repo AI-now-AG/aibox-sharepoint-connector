@@ -1,5 +1,5 @@
 import TenantModel, { type Tenant } from "$data/models/tenant.model";
-import UserModel, { type User} from "$data/models/user.model";
+import UserModel, { type User } from "$data/models/user.model";
 import { BaseCallbackHandler } from "@langchain/core/callbacks/base";
 import type { BaseMessage } from "@langchain/core/messages";
 import type { LLMResult } from "@langchain/core/outputs";
@@ -39,7 +39,7 @@ export class LoggingCallbackHandler extends BaseCallbackHandler {
   name = "logging_callback_handler";
 
   private tenant: Tenant | null = null;
-  private user: User | null = null; 
+  private user: User | null = null;
 
   constructor(
     private tenantId: string,
@@ -84,7 +84,7 @@ export class LoggingCallbackHandler extends BaseCallbackHandler {
       metadata,
       runName,
       timestamp: new Date(),
-      expireAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+      expireAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     });
   }
 
@@ -117,7 +117,7 @@ export class LoggingCallbackHandler extends BaseCallbackHandler {
       metadata,
       runName,
       timestamp: new Date(),
-      expireAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+      expireAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     });
   }
 
@@ -140,7 +140,7 @@ export class LoggingCallbackHandler extends BaseCallbackHandler {
       parentRunId,
       tags,
       timestamp: new Date(),
-      expireAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+      expireAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     });
   }
 
@@ -162,7 +162,7 @@ export class LoggingCallbackHandler extends BaseCallbackHandler {
       parentRunId,
       tags,
       timestamp: new Date(),
-      expireAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+      expireAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     });
   }
 }

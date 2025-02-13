@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onMount } from "svelte";
   import { actions } from "astro:actions";
   import { useTranslations } from "$i18n/utils";
   import { tenant } from "$stores";
@@ -8,28 +7,34 @@
   import { type TranscriptionCard } from "$types/TranscriptionCard";
   const t = useTranslations();
 
-  let instructionTitle = "";
-  let instructionText = "";
-  let isMounted = false;
+  let instructionTitle = $state("");
+  let instructionText = $state("");
 
-  onMount(() => {
-    isMounted = true;
+  interface Props {
+    transcriptionCard?: TranscriptionCard | undefined;
+    isEditable?: boolean;
+  }
+
+  let { transcriptionCard = $bindable(), isEditable = false }: Props = $props();
+
+  $effect(() => {
+    if (transcriptionCard) {
+      instructionTitle = transcriptionCard.title || "";
+      instructionText = transcriptionCard.description || "";
+    }
   });
 
-  export let transcriptionCard: TranscriptionCard | undefined = undefined;
-  export let isEditable: boolean = false;
+  let isSaving = $state(false);
+  let isFormValid = $derived(
+    instructionTitle.trim() !== "" && instructionText.trim() !== "",
+  );
 
-  $: if (transcriptionCard) {
-    instructionTitle = transcriptionCard.title || "";
+  function preventDefault(fn) {
+    return function (event) {
+      event.preventDefault();
+      fn.call(this, event);
+    };
   }
-
-  $: if (transcriptionCard && !isMounted) {
-    instructionText = transcriptionCard.description || "";
-  }
-
-  let isSaving = false;
-  $: isFormValid =
-    instructionTitle.trim() !== "" && instructionText.trim() !== "";
 
   async function saveInstruction() {
     isSaving = true;
@@ -67,11 +72,11 @@
 </script>
 
 <div
-    class="container max-w-5xl mx-auto p-6 grid grid-cols-3 md:grid-cols-[1fr_max-content] gap-8"
-  >
+  class="container max-w-5xl mx-auto p-6 grid grid-cols-3 md:grid-cols-[1fr_max-content] gap-8"
+>
   <div class="w-full min-w-xs pt-2 lg:pt-6">
     <div class="flex items-center pt-2 pb-6">
-      <button class="mr-4" on:click={goback}>
+      <button class="mr-4" onclick={goback}>
         {@html svgIcons.back}
       </button>
       <h1 class="text-4xl font-bold">
@@ -100,14 +105,14 @@
           bind:value={instructionText}
           placeholder="e.g. type knowledge base details..."
           class="input input-bordered min-w-xs shadow appearance-none min-h-96 w-full py-2 px-3"
-        />
+        ></textarea>
       </div>
 
       {#if isEditable}
         <div class="flex items-center justify-between">
           <button
             class={`btn btn-active btn-primary px-8 font-normal ${(!isFormValid || isSaving) && "btn-disabled"}`}
-            on:click|preventDefault={saveInstruction}
+            onclick={preventDefault(saveInstruction)}
           >
             {#if isSaving}
               <span class="loading loading-spinner"></span>

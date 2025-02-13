@@ -2,17 +2,31 @@
   import { dndzone } from "svelte-dnd-action";
   import { useTranslations } from "$i18n/utils";
   import { svgIcons } from "$assets/icons";
-  import { createEventDispatcher } from "svelte";
-
-  const dispatch = createEventDispatcher();
   const t = useTranslations();
 
-  export let promptOrderDialog: HTMLDialogElement;
-  export let dialogTitle: string = t("prompt-library.prompt.change-order");
-  export let items: any[];
+  interface Props {
+    promptOrderDialog?: HTMLDialogElement;
+    dialogTitle?: string;
+    items: any[];
+    confirm: any;
+  }
+
+  let {
+    promptOrderDialog = $bindable(),
+    dialogTitle = t("prompt-library.prompt.change-order"),
+    items = $bindable(),
+    confirm,
+  }: Props = $props();
 
   const flipDurationMs = 300;
   const dropTargetStyle: any = { outline: "" };
+
+  function preventDefault(fn) {
+    return function (event) {
+      event.preventDefault();
+      fn.call(this, event);
+    };
+  }
 
   function handleDndConsider(e: { detail: { items: any[] } }) {
     items = e.detail.items;
@@ -23,12 +37,12 @@
   }
 
   function savePromptOrder() {
-    promptOrderDialog.close();
-    dispatch("confirm");
+    promptOrderDialog?.close();
+    confirm();
   }
 
   function cancelEdit() {
-    promptOrderDialog.close();
+    promptOrderDialog?.close();
   }
 </script>
 
@@ -36,7 +50,7 @@
   <div class="modal-box w-8/12 max-w-5xl">
     <div class="flex justify-between">
       <h3 class="text-lg font-bold py-4">{dialogTitle}</h3>
-      <button class="btn btn-sm btn-circle btn-ghost" on:click={cancelEdit}>
+      <button class="btn btn-sm btn-circle btn-ghost" onclick={cancelEdit}>
         {@html svgIcons.closeMenu}
       </button>
     </div>
@@ -47,8 +61,8 @@
 
     <section
       use:dndzone={{ items, flipDurationMs, dropTargetStyle }}
-      on:consider={handleDndConsider}
-      on:finalize={handleDndFinalize}
+      onconsider={handleDndConsider}
+      onfinalize={handleDndFinalize}
     >
       {#each items as item (item.id)}
         <div
@@ -65,13 +79,13 @@
     <div class="flex justify-end">
       <button
         class="btn btn-active btn-neutral-content px-8 font-normal mr-2"
-        on:click|preventDefault={cancelEdit}
+        onclick={preventDefault(cancelEdit)}
       >
         {t("common.cancel")}
       </button>
       <button
         class={`btn btn-active btn-primary px-8 font-normal`}
-        on:click|preventDefault={savePromptOrder}
+        onclick={preventDefault(savePromptOrder)}
       >
         {t("common.save")}
       </button>

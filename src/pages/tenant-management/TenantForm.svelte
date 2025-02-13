@@ -1,6 +1,4 @@
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<!-- svelte-ignore a11y-no-static-element-interactions -->
-<script>
+<script lang="ts">
   import { actions } from "astro:actions";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
@@ -9,7 +7,7 @@
   import TogglePasswordIcon from "./TogglePasswordIcon.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import AlertDialog from "$components/AlertDialog.svelte";
-  import { clickOutside } from "$components/actions/ClickOutside.svelte";
+  import { clickOutside } from "$components/actions/ClickOutside";
   import {
     trimInput,
     toLowerCase,
@@ -18,17 +16,27 @@
   import { loading, showLoading, hideLoading } from "$stores";
   import ColorPicker, { ChromeVariant } from "svelte-awesome-color-picker";
   import log from "$utils/log";
+  import { type TenantTheme } from "$data/models/tenant.model";
 
   const t = useTranslations();
 
-  export let tenant;
-  export let openAIKey = "";
-  export let azureOpenAIKey = "";
-  export let azureSpeechKey = "";
+  interface Props {
+    tenant?: any;
+    openAIKey?: string;
+    azureOpenAIKey?: string;
+    azureSpeechKey?: string;
+  }
 
-  let confirmUpdateModal;
-  let alertModal;
-  let alertMessage = "";
+  let {
+    tenant = $bindable(),
+    openAIKey = "",
+    azureOpenAIKey = "",
+    azureSpeechKey = "",
+  }: Props = $props();
+
+  let confirmUpdateModal: HTMLDialogElement | undefined = $state();
+  let alertModal: HTMLDialogElement | undefined = $state();
+  let alertMessage = $state("");
 
   const MODE = {
     Create: "create",
@@ -47,8 +55,29 @@
   };
 
   // mode
-  let mode = tenant == undefined ? MODE.Create : MODE.Edit;
-  let tenantData = tenant == undefined ? {} : tenant;
+  const mode = tenant ? MODE.Edit : MODE.Create;
+  const headerTitle =
+    mode == MODE.Create
+      ? t("tenant.tenants.add-tenant")
+      : tenant.name || t("common.edit");
+  let tenantData = $state(tenant ?? {});
+
+  $effect(() => {
+    tenantData.name = tenantData.name ?? "";
+    tenantData.org_name = tenantData.org_name ?? "";
+    tenantData.default_language = tenantData.default_language ?? "";
+    tenantData.theme = tenantData.theme ?? "";
+    tenantData.azure_openai_instance_name =
+      tenantData.azure_openai_instance_name ?? "";
+    tenantData.azure_openai_endpoint = tenantData.azure_openai_endpoint ?? "";
+    tenantData.azure_openai_whisper_model =
+      tenantData.azure_openai_whisper_model ?? "";
+    tenantData.azure_openai_chat_model =
+      tenantData.azure_openai_chat_model ?? "";
+    tenantData.speech_region = tenantData.speech_region ?? "";
+    tenantData.is_restrict_user_managment =
+      tenantData.is_restrict_user_managment ?? false;
+  });
 
   // API providers
   const providerValues = [
@@ -61,57 +90,60 @@
       value: ApiKeyProvider.AzureOpenAI,
     },
   ];
-  let textSelectedProvider = providerValues[0];
-  let isAudioToTextChecked = false;
-  if (tenantData && tenantData?.included_features?.length) {
+  let textSelectedProvider = $state(providerValues[0]);
+  let isAudioToTextChecked = $state(false);
+
+  if (tenantData && tenantData.included_features?.length) {
     const findTextProvider = tenantData.included_features.find(
-      (item) => item.name == TenantFeature.TextPrommpts,
+      (item: any) => item.name == TenantFeature.TextPrommpts,
     );
     if (findTextProvider) {
-      textSelectedProvider = providerValues.find(
-        (item) => item.value == findTextProvider.provider,
-      );
+      textSelectedProvider =
+        providerValues.find(
+          (item) => item.value == findTextProvider.provider,
+        ) || providerValues[0];
     }
 
     isAudioToTextChecked = tenantData.included_features.some(
-      (item) => item.name == TenantFeature.AudioToText,
+      (item: any) => item.name == TenantFeature.AudioToText,
     );
   }
 
+  $inspect(tenant, tenantData, textSelectedProvider);
+
   // color picker
+
   let hex = tenantData?.primary_color || "#491EFF";
-  let color = hex;
-  let selecteColor = hex;
+  let selecteColor = $state(hex);
+  let showPicker = $state(false);
 
   // set default values
-  if (!tenantData.default_language) {
+  if (tenantData && !tenantData.default_language) {
     tenantData.default_language = "de";
   }
-  if (!tenantData.theme) {
-    tenantData.theme = "dark";
+  if (tenantData && !tenantData.theme) {
+    tenantData.theme = "dark" as TenantTheme;
   }
-  if (!tenantData.primary_color) {
+  if (tenantData && !tenantData.primary_color) {
     tenantData.primary_color = selecteColor;
   }
-
-  $: {
-    //console.log("Tenant data", tenantData);
-    //console.log("Audio to text checbox checked", isAudioToTextChecked);
-    //console.log("Selected text provider", textSelectedProvider);
-  }
-
-  let showPicker = false;
 
   function toggleColorPicker() {
     showPicker = !showPicker;
   }
 
-  function togglePassword(_apiKeyProvider) {
-    let passwordField = document.getElementById("open_ai_key");
+  function togglePassword(_apiKeyProvider: string) {
+    let passwordField = document.getElementById(
+      "open_ai_key",
+    ) as HTMLInputElement;
     if (_apiKeyProvider == ApiKeyProvider.AzureOpenAI) {
-      passwordField = document.getElementById("azure_open_ai_key");
+      passwordField = document.getElementById(
+        "azure_open_ai_key",
+      ) as HTMLInputElement;
     } else if (_apiKeyProvider == ApiKeyProvider.AzureOpenAIPro) {
-      passwordField = document.getElementById("azure_open_ai_key_pro");
+      passwordField = document.getElementById(
+        "azure_open_ai_key_pro",
+      ) as HTMLInputElement;
     }
     if (passwordField.type === "password") {
       passwordField.type = "text";
@@ -177,10 +209,9 @@
             speech_api_key: azureSpeechKey,
           });
         if (encryptKeysError) {
-          showAlert(encryptKeysError);
+          showAlert(encryptKeysError?.toString());
           return;
         }
-        log.d(data, "CREATE - encryptApiKeys data");
         const { openai_api_key, azure_openai_api_key, speech_api_key } = data;
 
         // API Keys
@@ -197,16 +228,14 @@
         if (isAudioToTextChecked) {
           tenantData.included_features.push({
             name: TenantFeature.AudioToText,
-            //provider: ApiKeyProvider.AzureOpenAI,
             provider: textSelectedProvider.value,
           });
         }
-        log.d(tenantData, "CREATE - tenantData");
 
         const { error } = await actions.tenant.create(tenantData);
         hideLoading();
         if (error) {
-          showAlert(error);
+          showAlert(error?.toString());
         } else {
           addToast({
             message: t("tenant.create-successful"),
@@ -214,8 +243,8 @@
           });
           window.location.href = "/tenant-management";
         }
-      } catch (error) {
-        showAlert(error);
+      } catch (error: any) {
+        showAlert(error?.toString());
       }
     }
   }
@@ -231,10 +260,9 @@
             speech_api_key: azureSpeechKey,
           });
         if (encryptKeysError) {
-          showAlert(encryptKeysError);
+          showAlert(encryptKeysError?.toString());
           return;
         }
-        log.d(data, "UPDATE - encryptApiKeys data");
         const { openai_api_key, azure_openai_api_key, speech_api_key } = data;
 
         // API Keys
@@ -251,17 +279,15 @@
         if (isAudioToTextChecked) {
           tenantData.included_features.push({
             name: TenantFeature.AudioToText,
-            //provider: ApiKeyProvider.AzureOpenAI,
             provider: textSelectedProvider.value,
           });
         }
-        log.d(tenantData, "UPDATE - tenantData");
 
         const { error } = await actions.tenant.update(tenantData);
         hideLoading();
 
         if (error) {
-          showAlert(error);
+          showAlert(error?.toString());
         } else {
           addToast({
             message: t("tenant.update-successful"),
@@ -271,41 +297,39 @@
             window.location.reload();
           }, 2000);
         }
-      } catch (error) {
-        showAlert(error);
+      } catch (error: any) {
+        showAlert(error?.toString());
       }
     }
   }
 
-  function showAlert(message) {
+  function showAlert(message: string) {
     alertMessage = message;
-    alertModal.show();
+    alertModal?.show();
   }
 </script>
 
 <div
-  class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14 sticky bg-base-200 top-0 z-10"
+  class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14 sticky bg-base-200 top-0 z-20"
 >
   <div class="flex items-center pt-5 pb-2">
-    <button class="mr-4" onclick="window.history.back();">
+    <button class="mr-4" onclick={() => window.history.back()}>
       {@html svgIcons.back}
     </button>
     <h1 class="text-4xl font-bold">
-      {mode == MODE.Create
-        ? t("tenant.tenants.add-tenant")
-        : (tenantData.name ?? t("common.edit"))}
+      {headerTitle}
     </h1>
 
     <div class="flex space-x-2 ml-auto">
       <button
         class="btn btn-primary"
-        on:click={() => {
-          mode == MODE.Edit ? confirmUpdateModal.show() : createTenant();
+        onclick={() => {
+          mode == MODE.Edit ? confirmUpdateModal?.show() : createTenant();
         }}
       >
         {t("common.save")}
       </button>
-      <button class="btn" onclick="window.history.back();">
+      <button class="btn" onclick={() => window.history.back()}>
         {t("common.cancel")}
       </button>
     </div>
@@ -384,25 +408,22 @@
         <div class="w-full">
           <div
             class="relative flex"
-            use:clickOutside
-            on:clickoutside={() => {
+            use:clickOutside={() => {
               showPicker = false;
             }}
           >
             <div class="z-[10]">
-              <!-- svelte-ignore a11y-click-events-have-key-events -->
-              <!-- svelte-ignore a11y-no-static-element-interactions -->
-              <div
-                class="color-preview"
-                style="background-color: {hex};"
-                on:click={toggleColorPicker}
-              />
+              <button
+                class="color-preview inline-block w-[100px] h-[50px] rounded-tl-[8px] rounded-bl-[8px]"
+                style="background-color: {selecteColor};"
+                onclick={toggleColorPicker}
+                aria-label="Select color"
+              ></button>
 
               {#if showPicker}
-                <div class="absolute picker-color">
+                <div class="absolute picker-color top-[54px] left-[0]">
                   <ColorPicker
-                    bind:hex
-                    bind:color
+                    {hex}
                     isDialog={false}
                     components={{
                       ...ChromeVariant,
@@ -419,21 +440,19 @@
                 </div>
               {/if}
             </div>
-            <!-- svelte-ignore a11y-click-events-have-key-events -->
-            <!-- svelte-ignore a11y-no-static-element-interactions -->
-            <div
-              class="flex flex-1 items-center input input-bordered color-input"
-              on:click={toggleColorPicker}
+            <button
+              class="flex flex-1 items-center input input-bordered color-input h-[50px] rounded-tl-none rounded-bl-none"
+              onclick={toggleColorPicker}
             >
               <span>{selecteColor}</span>
-            </div>
+            </button>
           </div>
         </div>
       </div>
       <div class="flex-1 flex flex-col mb-4"></div>
     </div>
 
-    <div class="w-full h-0.5 mt-4 mb-6 bg-gray-400/20" />
+    <div class="w-full h-0.5 mt-4 mb-6 bg-gray-400/20"></div>
 
     <div class="mb-3"><b>{t("tenant.api-keys")}</b></div>
 
@@ -458,7 +477,7 @@
                   bind:value={openAIKey}
                 />
                 <TogglePasswordIcon
-                  on:change={() => togglePassword(ApiKeyProvider.OpenAI)}
+                  change={() => togglePassword(ApiKeyProvider.OpenAI)}
                 />
               </label>
             </div>
@@ -485,7 +504,7 @@
                   bind:value={azureOpenAIKey}
                 />
                 <TogglePasswordIcon
-                  on:change={() => togglePassword(ApiKeyProvider.AzureOpenAI)}
+                  change={() => togglePassword(ApiKeyProvider.AzureOpenAI)}
                 />
               </label>
             </div>
@@ -564,8 +583,7 @@
                   bind:value={azureSpeechKey}
                 />
                 <TogglePasswordIcon
-                  on:change={() =>
-                    togglePassword(ApiKeyProvider.AzureOpenAIPro)}
+                  change={() => togglePassword(ApiKeyProvider.AzureOpenAIPro)}
                 />
               </label>
             </div>
@@ -587,10 +605,10 @@
     </div>
 
     <!-- Included features -->
-    <div class="w-full h-0.5 mt-4 mb-6 bg-gray-400/20" />
+    <div class="w-full h-0.5 mt-4 mb-6 bg-gray-400/20"></div>
     <div class="mb-3"><b>{t("tenant.included-featured")}</b></div>
 
-    <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div class="w-full bg-white rounded px-4 py-2">
       <div class="flex items-center">
         <input
@@ -613,7 +631,6 @@
             name="text-prompt-provider"
             class="radio radio-primary"
             value={option}
-            checked={true}
             bind:group={textSelectedProvider}
           />
           <label
@@ -624,7 +641,7 @@
       {/each}
     </div>
 
-    <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div class="w-full bg-white rounded px-4 py-2 mt-4">
       <div class="flex items-center">
         <input
@@ -641,7 +658,7 @@
       </div>
     </div>
 
-    <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div class="w-full bg-white rounded px-4 py-2 mt-4">
       <div class="flex items-center">
         <input
@@ -660,32 +677,13 @@
     </div>
 
     <ConfirmDialog
-      title={t("tenant.tenants.tenant.update-confirmation")}
       bind:modal={confirmUpdateModal}
-      on:confirm={updateTenant}
+      confirm={updateTenant}
+      title={t("tenant.tenants.tenant.update-confirmation")}
     />
 
-    <AlertDialog bind:modal={alertModal} message={alertMessage} />
+    <AlertDialog bind:modal={alertModal} bind:message={alertMessage} />
   </div>
 </div>
 
 <Loading bind:show={$loading} />
-
-<style>
-  .color-preview {
-    width: 100px;
-    height: 50px;
-    display: inline-block;
-    border-top-left-radius: 8px;
-    border-bottom-left-radius: 8px;
-  }
-  .color-input {
-    height: 50px;
-    border-top-left-radius: 0px;
-    border-bottom-left-radius: 0px;
-  }
-  .picker-color {
-    top: 54px;
-    left: 0px;
-  }
-</style>

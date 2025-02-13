@@ -1,130 +1,131 @@
-<script lang="ts" context="module">
-  export enum UserRole {
-    Admin = "Admin",
-    SuperAdmin = "Super Admin",
-    User = "User",
-  }
-</script>
-
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
+  import { UserRole } from "$enums/Users";
 
-  const dispatch = createEventDispatcher();
   const t = useTranslations();
 
-  let showFilter = false;
-  let numberOfFilters = 0;
+  let showFilter = $state(false);
+  let numberOfFilters = $state(0);
 
-  export let rolesParams: any[] = [];
-  export let statusesParams: any = {};
+  export function hideDropdownFilter() {
+    showFilter = false;
+  }
+
+  interface Props {
+    rolesParams?: any[];
+    statusesParams?: any;
+    onfilter: Function;
+  }
+
+  let {
+    rolesParams = $bindable([]),
+    statusesParams = $bindable({}),
+    onfilter,
+  }: Props = $props();
 
   // roles
-  let isUserChecked: boolean = false;
-  let isAdminChecked: boolean = false;
+  let isUserChecked: boolean = $state(false);
+  let isAdminChecked: boolean = $state(false);
 
   // statuses
-  let isVerifiedChecked: boolean = false;
-  let isUnVerifiedChecked: boolean = false;
-  let isBlockedChecked: boolean = false;
+  let isVerifiedChecked: boolean = $state(false);
+  let isUnVerifiedChecked: boolean = $state(false);
+  let isBlockedChecked: boolean = $state(false);
 
-  $: if (isUserChecked) {
-    rolesParams.push(UserRole.User);
-  } else {
-    rolesParams = rolesParams.filter((_role) => {
-      return _role != UserRole.User;
-    });
-  }
+  $effect(() => {
+    if (isUserChecked) {
+      if (!rolesParams.includes(UserRole.User)) {
+        rolesParams = [...rolesParams, UserRole.User];
+      }
+    } else {
+      if (rolesParams.includes(UserRole.User)) {
+        rolesParams = rolesParams.filter((_role) => _role !== UserRole.User);
+      }
+    }
+  });
 
-  $: if (isAdminChecked) {
-    rolesParams.push(UserRole.SuperAdmin);
-    rolesParams.push(UserRole.Admin);
-  } else {
-    rolesParams = rolesParams.filter((_role) => {
-      return _role != UserRole.Admin && _role != UserRole.SuperAdmin;
-    });
-  }
+  $effect(() => {
+    if (isAdminChecked) {
+      const newRoles = [UserRole.SuperAdmin, UserRole.Admin].filter(
+        (role) => !rolesParams.includes(role),
+      );
+      if (newRoles.length > 0) {
+        rolesParams = [...rolesParams, ...newRoles];
+      }
+    } else {
+      if (
+        rolesParams.includes(UserRole.Admin) ||
+        rolesParams.includes(UserRole.SuperAdmin)
+      ) {
+        rolesParams = rolesParams.filter(
+          (_role) => _role !== UserRole.Admin && _role !== UserRole.SuperAdmin,
+        );
+      }
+    }
+  });
 
-  $: if (isVerifiedChecked) {
+  $effect(() => {
     statusesParams = {
-      ...statusesParams,
-      isVerified: isVerifiedChecked,
+      ...(isVerifiedChecked && { isVerified: true }),
+      ...(isUnVerifiedChecked && { isUnVerified: true }),
+      ...(isBlockedChecked && { isBlocked: true }),
     };
-  } else {
-    delete statusesParams.isVerified;
-  }
-
-  $: if (isUnVerifiedChecked) {
-    statusesParams = {
-      ...statusesParams,
-      isUnVerified: isUnVerifiedChecked,
-    };
-  } else {
-    delete statusesParams.isUnVerified;
-  }
-
-  $: if (isBlockedChecked) {
-    statusesParams = {
-      ...statusesParams,
-      isBlocked: isBlockedChecked,
-    };
-  } else {
-    delete statusesParams.isBlocked;
-  }
+  });
 
   function handleClickFilter() {
     if (showFilter) {
       showFilter = false;
-      dispatch("filter");
+      onfilter();
     } else {
       showFilter = true;
     }
   }
 
   function calculateNumberOfFitler() {
-    numberOfFilters = 0;
-    const a: any = {};
-    for (let i = 0; i < rolesParams.length; i++) {
-      const role = rolesParams[i];
-      if (!a[role]) {
-        if (role == UserRole.SuperAdmin) {
-          continue;
-        }
-        numberOfFilters += 1;
-        a[role] = true;
+    let count = 0;
+    const uniqueRoles = new Set();
+
+    for (const role of rolesParams) {
+      if (role !== UserRole.SuperAdmin) {
+        uniqueRoles.add(role);
       }
     }
-    if (statusesParams.isBlocked) {
-      numberOfFilters += 1;
-    }
-    if (statusesParams.isVerified) {
-      numberOfFilters += 1;
-    }
-    if (statusesParams.isUnVerified) {
-      numberOfFilters += 1;
-    }
+
+    count += uniqueRoles.size;
+    if (statusesParams.isBlocked) count++;
+    if (statusesParams.isVerified) count++;
+    if (statusesParams.isUnVerified) count++;
+
+    return count;
   }
 
-  $: if (
-    isUserChecked ||
-    isAdminChecked ||
-    isVerifiedChecked ||
-    isUnVerifiedChecked ||
-    isBlockedChecked
-  ) {
-    calculateNumberOfFitler();
-  } else {
-    numberOfFilters = 0;
-  }
+  $effect(() => {
+    const prevCount = numberOfFilters;
+
+    const anyChecked =
+      isUserChecked ||
+      isAdminChecked ||
+      isVerifiedChecked ||
+      isUnVerifiedChecked ||
+      isBlockedChecked;
+
+    if (anyChecked) {
+      const newFilterCount = calculateNumberOfFitler();
+      if (prevCount !== newFilterCount) {
+        numberOfFilters = newFilterCount;
+      }
+    } else if (prevCount !== 0) {
+      numberOfFilters = 0;
+    }
+  });
 </script>
 
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<!-- svelte-ignore a11y-no-static-element-interactions -->
 <div class="mt-3">
-  <div
+  <button
     class="btn btn-sm btn-active font-normal bg-base-200"
-    on:click|stopPropagation={() => {
+    onclick={(e) => {
+      e.stopPropagation();
       handleClickFilter();
     }}
   >
@@ -134,7 +135,7 @@
       <div class="badge badge-primary badge-md">{numberOfFilters}</div>
     {/if}
     {@html svgIcons.arrowDownFill}
-  </div>
+  </button>
 
   {#if showFilter}
     <div
@@ -146,9 +147,10 @@
         >
         <button
           class="btn btn-default btn-sm"
-          on:click|stopPropagation={() => {
+          onclick={(e) => {
+            e.stopPropagation();
             showFilter = false;
-            dispatch("filter");
+            onfilter();
           }}
         >
           {@html svgIcons.filter}</button
@@ -159,9 +161,11 @@
 
       <div class="w-full text-sm">
         <div class="w-full text-left">{t("user.role")}</div>
-        <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-        <label
-          on:click|stopPropagation={() => null}
+        <button
+          onclick={(e) => {
+            e.stopPropagation();
+            null;
+          }}
           class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
         >
           <input
@@ -170,11 +174,12 @@
             bind:checked={isUserChecked}
           />
           <span class="font-normal">{t("user.user")}</span>
-        </label>
-
-        <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-        <label
-          on:click|stopPropagation={() => null}
+        </button>
+        <button
+          onclick={(e) => {
+            e.stopPropagation();
+            null;
+          }}
           class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
         >
           <input
@@ -183,14 +188,16 @@
             bind:checked={isAdminChecked}
           />
           <span class="font-normal">{t("user.admin")}</span>
-        </label>
+        </button>
       </div>
 
       <div class="w-full mt-4">
         <div class="w-full text-left">{t("user.status")}</div>
-        <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-        <label
-          on:click|stopPropagation={() => null}
+        <button
+          onclick={(e) => {
+            e.stopPropagation();
+            null;
+          }}
           class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
         >
           <input
@@ -199,11 +206,12 @@
             bind:checked={isBlockedChecked}
           />
           <span class="font-normal">{t("common.block")}</span>
-        </label>
-
-        <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-        <label
-          on:click|stopPropagation={() => null}
+        </button>
+        <button
+          onclick={(e) => {
+            e.stopPropagation();
+            null;
+          }}
           class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
         >
           <input
@@ -212,11 +220,12 @@
             bind:checked={isUnVerifiedChecked}
           />
           <span class="font-normal">{t("user.un-veriried")}</span>
-        </label>
-
-        <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-        <label
-          on:click|stopPropagation={() => null}
+        </button>
+        <button
+          onclick={(e) => {
+            e.stopPropagation();
+            null;
+          }}
           class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
         >
           <input
@@ -225,7 +234,7 @@
             bind:checked={isVerifiedChecked}
           />
           <span class="font-normal">{t("user.veriried")}</span>
-        </label>
+        </button>
       </div>
     </div>
   {/if}

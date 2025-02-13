@@ -1,14 +1,12 @@
 import { auth0, lucia } from "$auth";
 import { decodeJwt } from "jose";
 import type { APIContext } from "astro";
-import UserModel, {
-  assignPermissions,
-  UserRole,
-} from "$data/models/user.model";
+import UserModel, { assignPermissions } from "$data/models/user.model";
 import { z } from "zod";
 import log from "$utils/log";
 import { syncAllOrganizationUsers } from "$utils/auth0Sync";
 import TenantModel from "$data/models/tenant.model";
+import { UserRole } from "$enums/Users";
 
 const Auth0JWTSchema = z.object({
   sub: z.string().min(24),
@@ -44,8 +42,11 @@ export async function GET(context: APIContext): Promise<Response> {
     });
   }
 
-  const token = await auth0(context.url.origin).validateAuthorizationCode(code);
-  const decoded = decodeJwt(token.idToken);
+  const token = await auth0(context.url.origin).validateAuthorizationCode(
+    code,
+    null,
+  );
+  const decoded = decodeJwt(token.idToken());
   const auth0User = Auth0JWTSchema.safeParse(decoded);
   if (auth0User.error) {
     log.e(

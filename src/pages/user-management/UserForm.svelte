@@ -1,5 +1,3 @@
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<!-- svelte-ignore a11y-no-static-element-interactions -->
 <script lang="ts">
   import { actions } from "astro:actions";
   import { svgIcons } from "$assets/icons";
@@ -15,34 +13,41 @@
   import moment from "moment";
   import Input from "$components/Input/Input.svelte";
   import { isEnterpriseConnection, isValidEmail } from "$utils/common";
-  import { UserRole } from "./DropdownFilter.svelte";
+  import { UserRole } from "$enums/Users";
 
   const t = useTranslations();
-
-  export let user: any;
-  export let tenant: any;
-
-  let confirmUpdateModal: HTMLDialogElement;
-  let confirmBlockModal: HTMLDialogElement;
-  let confirmDeleteModal: HTMLDialogElement;
-
-  let alertModal: HTMLDialogElement;
-  let alertMessage: any = "";
+  interface Props {
+    user: any;
+    tenant: any;
+  }
+  let { user, tenant }: Props = $props();
 
   const MODE = {
     Create: "create",
     Edit: "edit",
   };
-  let mode = user == undefined ? MODE.Create : MODE.Edit;
-  let userData = user == undefined ? {} : user;
+  let mode = user ? MODE.Edit : MODE.Create;
+  const headerTitle =
+    mode == MODE.Create
+      ? t("user.add-new-user")
+      : (user?.name ?? t("common.edit"));
 
-  let isEnterpriseAuth = false;
-  let isUpdateRoleDisabled = false;
+  let confirmUpdateModal: HTMLDialogElement | undefined = $state();
+  let confirmBlockModal: HTMLDialogElement | undefined = $state();
+  let confirmDeleteModal: HTMLDialogElement | undefined = $state();
+
+  let alertModal: HTMLDialogElement | undefined = $state();
+  let alertMessage = $state("");
+
+  let userData = $state(user ?? {});
+
+  let isEnterpriseAuth = $state(false);
+  let isUpdateRoleDisabled = $state(false);
 
   const isRestrictUserManagment = tenant.is_restrict_user_managment;
 
   // Important note: User created on Auth0 with super admin , just the Admin on AI box when go into the detail screen
-  let role = UserRole.User;
+  let role = $state(UserRole.User);
   function getUserRole(roles: string[] = []) {
     return roles?.some(
       (role) => role === UserRole.SuperAdmin || role === UserRole.Admin,
@@ -143,7 +148,7 @@
 
   function showAlert(message: any) {
     alertMessage = message;
-    alertModal.show();
+    alertModal?.show();
   }
 
   async function handleBlockingUser() {
@@ -156,7 +161,6 @@
 
     hideLoading();
     const { error } = result;
-    log.d(result, "updateUserStatus result");
     if (!error) {
       userData.blocked = !blocked;
       addToast({
@@ -181,7 +185,6 @@
     });
     hideLoading();
     const { error } = result;
-    log.d(result, "delete user result");
     if (!error) {
       addToast({
         message: t("user.delete-successful"),
@@ -204,30 +207,28 @@
   <div class="flex items-center pt-5 pb-2">
     <button
       class="mr-4"
-      on:click={() => {
+      onclick={() => {
         window.history.back();
       }}
     >
       {@html svgIcons.back}
     </button>
     <h1 class="text-4xl font-bold">
-      {mode == MODE.Create
-        ? t("user.add-new-user")
-        : (user?.name ?? t("common.edit"))}
+      {headerTitle}
     </h1>
 
     <div class="flex space-x-2 ml-auto">
       <button
         class="btn btn-primary"
-        on:click={() => {
-          mode == MODE.Edit ? confirmUpdateModal.show() : createUser();
+        onclick={() => {
+          mode == MODE.Edit ? confirmUpdateModal?.show() : createUser();
         }}
       >
         {t("common.save")}
       </button>
       <button
         class="btn"
-        on:click={() => {
+        onclick={() => {
           window.history.back();
         }}
       >
@@ -245,8 +246,8 @@
           label={t("common.name")}
           value={userData.name ?? ""}
           placeholder={t("common.name")}
-          on:inputChange={(event) => {
-            userData.name = event.detail.value;
+          inputChange={(event: any) => {
+            userData.name = event.value;
           }}
           disabled={isEnterpriseAuth}
           required
@@ -259,8 +260,8 @@
           label={t("user.e-mail")}
           value={userData.email ?? ""}
           placeholder={t("user.e-mail")}
-          on:inputChange={(event) => {
-            userData.email = event.detail.value;
+          inputChange={(event: any) => {
+            userData.email = event.value;
           }}
           disabled={isEnterpriseAuth || isRestrictUserManagment}
           required
@@ -280,7 +281,7 @@
             class="radio radio-primary"
             value={UserRole.Admin}
             checked={role == UserRole.Admin || role == UserRole.SuperAdmin}
-            on:change={() => {
+            onchange={() => {
               role = UserRole.Admin;
             }}
             disabled={isUpdateRoleDisabled}
@@ -297,7 +298,7 @@
             class="radio radio-primary"
             value={UserRole.User}
             checked={role == UserRole.User}
-            on:change={() => {
+            onchange={() => {
               role = UserRole.User;
             }}
             disabled={isUpdateRoleDisabled}
@@ -323,22 +324,24 @@
                 <col class="w-36" />
                 <col class="w-auto" />
               </colgroup>
-              <tr class="mb-4">
-                <td class="text-gray-400">{t("user.signed-up")}</td>
-                <td class="text-base">
-                  {moment(userData.created_at, "DD.MM.YYYY").format(
-                    "dddd DD.MM.YYYY",
-                  )}</td
-                >
-              </tr>
-              <tr class="mb-4">
-                <td class="text-gray-400">{t("user.logins")}</td>
-                <td class="text-base">{userData.logins_count ?? "-"}</td>
-              </tr>
-              <tr class="">
-                <td class="text-gray-400">{t("user.organization")}</td>
-                <td class="text-base">{tenant?.name ?? "-"}</td>
-              </tr>
+              <tbody>
+                <tr class="mb-4">
+                  <td class="text-gray-400">{t("user.signed-up")}</td>
+                  <td class="text-base">
+                    {moment(userData.created_at, "DD.MM.YYYY").format(
+                      "dddd DD.MM.YYYY",
+                    )}</td
+                  >
+                </tr>
+                <tr class="mb-4">
+                  <td class="text-gray-400">{t("user.logins")}</td>
+                  <td class="text-base">{userData.logins_count ?? "-"}</td>
+                </tr>
+                <tr class="">
+                  <td class="text-gray-400">{t("user.organization")}</td>
+                  <td class="text-base">{tenant?.name ?? "-"}</td>
+                </tr>
+              </tbody>
             </table>
           </div>
 
@@ -350,28 +353,30 @@
                 <col class="w-36" />
                 <col class="w-auto" />
               </colgroup>
-              <tr class="mb-4">
-                <td class="text-gray-400">{t("user.latest-login")}</td>
-                <td class="text-base">
-                  {userData.last_login
-                    ? moment(userData.last_login).format("dddd DD.MM.YYYY")
-                    : "-"}
-                </td>
-              </tr>
-              <tr class="mb-4">
-                <td class="text-gray-400">{t("user.status")}</td>
-                <td
-                  class="text-base"
-                  style={`color: ${getUserStatus(userData.blocked, userData.email_verified).color}`}
-                >
-                  {getUserStatus(userData.blocked, userData.email_verified)
-                    .text}</td
-                >
-              </tr>
-              <tr class="mb-4">
-                <td class="text-gray-400">{t("user.id")}</td>
-                <td class="text-base"> {userData.auth0_sub}</td>
-              </tr>
+              <tbody>
+                <tr class="mb-4">
+                  <td class="text-gray-400">{t("user.latest-login")}</td>
+                  <td class="text-base">
+                    {userData.last_login
+                      ? moment(userData.last_login).format("dddd DD.MM.YYYY")
+                      : "-"}
+                  </td>
+                </tr>
+                <tr class="mb-4">
+                  <td class="text-gray-400">{t("user.status")}</td>
+                  <td
+                    class="text-base"
+                    style={`color: ${getUserStatus(userData.blocked, userData.email_verified).color}`}
+                  >
+                    {getUserStatus(userData.blocked, userData.email_verified)
+                      .text}</td
+                  >
+                </tr>
+                <tr class="mb-4">
+                  <td class="text-gray-400">{t("user.id")}</td>
+                  <td class="text-base"> {userData.auth0_sub}</td>
+                </tr>
+              </tbody>
             </table>
           </div>
         </div>
@@ -382,7 +387,7 @@
           <div class="flex items-center">
             <button
               class="flex items-centertext-gray-700 font-sans"
-              on:click={(e) => {
+              onclick={(e) => {
                 confirmBlockModal?.show();
               }}
             >
@@ -398,7 +403,7 @@
 
             <button
               class="flex items-center font-sans text-red-600 ml-8"
-              on:click={(e) => {
+              onclick={(e) => {
                 confirmDeleteModal?.show();
               }}
             >
@@ -418,31 +423,31 @@
 
 <!-- confirm update dialog -->
 <ConfirmDialog
-  title={t("user.update-confirm-message")}
   bind:modal={confirmUpdateModal}
-  on:confirm={updateUser}
+  confirm={updateUser}
+  title={t("user.update-confirm-message")}
 />
 
 <!-- confirm block dialog -->
 <ConfirmDialog
+  bind:modal={confirmBlockModal}
+  confirm={handleBlockingUser}
   title={userData?.blocked
     ? t("user.un-block-confirm-message")
     : t("user.block-confirm-message")}
   description={userData?.blocked
     ? t("user.un-block-description-message")
     : t("user.block-description-message")}
-  bind:modal={confirmBlockModal}
-  on:confirm={handleBlockingUser}
 />
 
 <!-- confirm delete dialog -->
 <ConfirmDialog
+  bind:modal={confirmDeleteModal}
+  confirm={deleteUser}
   title={t("user.delete-confirm-message")}
   description={t("user.delete-description-message")}
-  bind:modal={confirmDeleteModal}
-  on:confirm={deleteUser}
 />
 
-<AlertDialog bind:modal={alertModal} message={alertMessage} />
+<AlertDialog bind:modal={alertModal} bind:message={alertMessage} />
 
 <Loading bind:show={$loading} />

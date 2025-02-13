@@ -9,7 +9,10 @@ import { ObjectId } from "mongodb";
 const { category: categoryId, group: groupId } = Astro.params;
 
 const category = await CategoryModel.get(categoryId || "");
-if (!category || !new ObjectId(category.tenant_id).equals(Astro.locals.tenant._id)) {
+if (
+  !category ||
+  !new ObjectId(category.tenant_id).equals(Astro.locals.tenant._id)
+) {
   return Astro.redirect("/404");
 }
 const group = category?.groups.find((g: any) => g._id.toString() === groupId);

@@ -9,18 +9,19 @@
 
   const t = useTranslations();
 
-  export let promptsEnriched: CardItem[] = [];
-  export let categoryList: CategoryItem[] = [];
-  export let isEditable: boolean = false;
-
-  let searchQuery = "";
-  let filteredPrompts = promptsEnriched;
-  let showCategoryFilter = false;
-  let numberOfFilters = 0;
-
-  $: if (searchQuery || searchQuery === "") {
-    groupItemChanged();
+  interface Props {
+    promptsEnriched?: CardItem[];
+    categoryList?: CategoryItem[];
+    isEditable?: boolean;
   }
+
+  let { promptsEnriched = [], categoryList = [], isEditable = false }: Props = $props();
+
+  let searchQuery = $state("");
+  let filteredPrompts = $state(promptsEnriched);
+  let showCategoryFilter = $state(false);
+  let numberOfFilters = $state(0);
+
 
   function groupItemChanged() {
     const checkedCategories = categoryList.filter(
@@ -62,6 +63,11 @@
       });
     }
   }
+  $effect(() => {
+    if (searchQuery || searchQuery === "") {
+      groupItemChanged();
+    }
+  });
 </script>
 
 <div>
@@ -80,7 +86,7 @@
       <div>
         <button
           class="btn btn-sm btn-active font-normal bg-base-200"
-          on:click={() => (showCategoryFilter = !showCategoryFilter)}
+          onclick={() => (showCategoryFilter = !showCategoryFilter)}
         >
           {@html svgIcons.filter}
           {t("common.filter")}
@@ -103,7 +109,7 @@
                   type="checkbox"
                   class="checkbox checkbox-sm checkbox-neutral"
                   bind:checked={category.checked}
-                  on:change={() => groupItemChanged()}
+                  onchange={() => groupItemChanged()}
                 />
                 <h3 class="text-md font-semibold">{category.title}</h3>
               </label>
@@ -115,7 +121,7 @@
                         type="checkbox"
                         class="checkbox checkbox-sm checkbox-neutral"
                         bind:checked={group.checked}
-                        on:change={() => groupItemChanged()}
+                        onchange={() => groupItemChanged()}
                       />
                       <span class="font-normal">{group.title}</span>
                     </label>

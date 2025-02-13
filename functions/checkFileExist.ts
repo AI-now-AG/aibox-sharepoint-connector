@@ -36,7 +36,7 @@ const checkFileExist: Handler = async (event, context) => {
     requireFilesCount += 1;
     tempFileNames.push(improvedTxtFileName);
   }
-  
+
   const txtFileName = isDiarizationEnabled
     ? `${uniqueName}-mono.txt`
     : `${uniqueName}.txt`;
@@ -139,7 +139,7 @@ const checkFileExist: Handler = async (event, context) => {
         }
 
         if (!downloadedFiles.some((file) => file.name === fileName)) {
-          if(!fileName.endsWith("_improved.txt")) {
+          if (!fileName.endsWith("_improved.txt")) {
             downloadedFiles.push({ name: fileName, path: filePath });
           }
         }

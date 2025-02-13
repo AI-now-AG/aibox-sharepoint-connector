@@ -1,12 +1,10 @@
 import { defineAction } from "astro:actions";
-import type { UserCreate, UserUpdate } from "auth0";
 import { ObjectId } from "mongodb";
 import { client } from "$data/mongodb";
 import { z } from "zod";
 import { transformRawData } from "$utils/transformRawData";
 import {
   assignPermissions,
-  UserRole,
   UserFilterParamsSchema,
   type User,
 } from "$data/models/user.model";
@@ -15,6 +13,7 @@ import usersManagement from "$data/auth0/users-manager";
 import organizationsManagement from "$data/auth0/organizations-manager";
 import rolesManagement from "$data/auth0/roles-manager";
 import { isEnterpriseConnection } from "$utils/common";
+import { UserRole } from "$enums/Users";
 
 const UserInputParamsSchema = z.object({
   name: z.string(),
@@ -81,7 +80,7 @@ export const user = {
     },
   }),
 
-  listByTeant: defineAction({
+  listByTenant: defineAction({
     input: z.intersection(UserFilterParamsSchema, TenantInputIdentifierSchema),
     handler: async (input) => {
       const tenantId = new ObjectId(input.tenantId);

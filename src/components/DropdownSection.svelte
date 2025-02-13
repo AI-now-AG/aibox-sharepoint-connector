@@ -4,29 +4,38 @@
   } from "$components/DropdownOptions.svelte";
   import ThreeDotButton from "$components/ThreeDotButton.svelte";
 
-  export let options: Option[] = [];
-  export let cssClasses: string = "";
-  let styleVisibility: string = "";
+  interface Props {
+    options?: Option[];
+  }
 
-  let isShowDropdownOption = false;
+  let props: any = $props();
+  let { options = [] }: Props = props;
+  /* let styleVisibility: string = $state("");
+
+   let isShowDropdownOption = $state(false);
   const handleMouseEnter = () => {
-    isShowDropdownOption = true;
-    styleVisibility = "visibility: visible;";
+    // isShowDropdownOption = true;
+    // styleVisibility = "visibility: visible;";
   };
-  const handleMouseLeave = () => {
+  const handleMouseLeave = (event: { stopPropagation: () => void }) => {
+    event.stopPropagation();
     isShowDropdownOption = false;
     styleVisibility = "";
-  };
+  };*/
 </script>
 
-<button
-  class={`dropdown dropdown-hover dropdown-end ${cssClasses}`}
-  on:mouseenter={handleMouseEnter}
-  on:mouseleave={handleMouseLeave}
-  on:click|stopPropagation={handleMouseEnter}
+<!-- <div
+  class={`dropdown dropdown-hover dropdown-end ${props.class ?? ""}`}
+  onmouseenter={handleMouseEnter}
+  onmouseleave={handleMouseLeave}
+  onclick={handleMouseEnter}
 >
   <ThreeDotButton />
   {#if isShowDropdownOption}
     <DropdownOptions {options} bind:styleVisibility />
   {/if}
-</button>
+</div> -->
+<div class={`dropdown dropdown-hover ${props.class ?? ""}`}>
+  <ThreeDotButton />
+  <DropdownOptions {options} />
+</div>

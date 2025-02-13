@@ -3,9 +3,13 @@
   import { addToast } from "$stores/toast";
   import { svgIcons } from "$assets/icons";
 
-  export let output: string = "";
+  interface Props {
+    output?: string;
+  }
 
-  let isCopied: boolean = false;
+  let { output = "" }: Props = $props();
+
+  let isCopied: boolean = $state(false);
   let timer: any;
 
   function copyToClipboard() {
@@ -36,7 +40,7 @@
     {#if output}
       <p class="py-2 whitespace-pre-wrap">{@html output}</p>
       <div class="flex flex-col justify-items-end order-last">
-        <button class="btn p-2 btn-ghost" on:click={copyToClipboard}>
+        <button class="btn p-2 btn-ghost" onclick={copyToClipboard}>
           {#if isCopied}
             {@html svgIcons.copied}
           {:else}

@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export interface CardItem {
     id: string;
     title: string;
@@ -13,12 +13,22 @@
   import { fade } from "svelte/transition";
   import { addToast } from "$stores/toast";
 
-  export let items: CardItem[] = [];
-  export let type: string = "";
-  export let title: string = "";
-  export let viewLabel: string = "";
-  export let isEditable: boolean = false;
   import { useTranslations } from "$i18n/utils";
+  interface Props {
+    items?: CardItem[];
+    type?: string;
+    title?: string;
+    viewLabel?: string;
+    isEditable?: boolean;
+  }
+
+  let {
+    items = $bindable([]),
+    type = "",
+    title = "",
+    viewLabel = "",
+    isEditable = false,
+  }: Props = $props();
   const t = useTranslations();
 
   const showDeleteConfirmationDlg = (id: string) => {
@@ -118,9 +128,10 @@
             {#if isEditable}
               <button
                 class="btn btn-sm btn-ghost text-error self-end"
-                on:click={() => {
+                onclick={() => {
                   showDeleteConfirmationDlg(card.id);
                 }}
+                aria-label="Delete"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -150,7 +161,7 @@
                     <button class="btn">Cancel</button>
                     <button
                       class="btn btn-sm btn-ghost text-error self-end"
-                      on:click={() => deleteCard(card.id)}
+                      onclick={() => deleteCard(card.id)}
                     >
                       Delete</button
                     >

@@ -6,12 +6,21 @@
   import { useTranslations } from "$i18n/utils";
   const t = useTranslations();
 
-  export let promptId = "";
-  export let input = "";
-  export let output = "";
-  export let isProcessing = false;
+  interface Props {
+    promptId?: string;
+    input?: string;
+    output?: string;
+    isProcessing?: boolean;
+  }
 
-  let inputText = "";
+  let {
+    promptId = $bindable(""),
+    input = $bindable(""),
+    output = $bindable(""),
+    isProcessing = $bindable(false),
+  }: Props = $props();
+
+  let inputText = $state("");
 
   const fileTypes = {
     "audio/*": ["audio/mp3"],
@@ -29,17 +38,25 @@
     "image/*": ["image/svg+xml", "image/png", "image/jpeg"],
   };
 
-  let inputFiles: File[] = [];
+  let inputFiles: File[] = $state([]);
   let imageFiles: File[] = [];
-  let isClickOnFile = false;
+  let isClickOnFile = $state(false);
 
   type ModalTrigger = { showModal: () => void };
-  let imageModal: ModalTrigger, fileModal: ModalTrigger;
+  let imageModal: ModalTrigger,
+    fileModal: ModalTrigger = $state();
 
   function onKeyDown(e: KeyboardEvent) {
     if (e.key === "Enter" && e.ctrlKey) {
       fetchHeadline();
     }
+  }
+
+  function preventDefault(fn) {
+    return function (event) {
+      event.preventDefault();
+      fn.call(this, event);
+    };
   }
 
   const readImageContent = (image: File) => {
@@ -222,11 +239,11 @@
       } w-full focus:outline-none focus:border-base-100 text-base`}
       placeholder="Your input..."
       bind:value={inputText}
-      on:keydown={onKeyDown}
+      onkeydown={onKeyDown}
     ></textarea>
     <button
       type="button"
-      on:click={clearText}
+      onclick={clearText}
       class="absolute top-2 right-2 text-base-content hover:text-base-content/60"
     >
       <svg
@@ -253,36 +270,10 @@
   <div class="grid grid-cols-[1fr_min-content] gap-4">
     <div class="p-2 flex flex-row gap-2">
       {#if $sharedMessageHistory.length == 0}
-        <!-- <button
-          class="btn h-auto w-auto p-1 min-h-0 model-toggle hover:text-base-content/60"
-          disabled={!promptId}
-          on:click={() => {
-            isClickOnFile = false;
-            imageModal.showModal();
-          }}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="1em"
-            height="1em"
-            viewBox="0 0 24 24"
-            class="w-6 h-6"
-          >
-            <path
-              fill="currentColor"
-              d="M5 21q-.825 0-1.412-.587T3 19V5q0-.825.588-1.412T5 3h14q.825 0 1.413.588T21 5v14q0 .825-.587 1.413T19 21zm0-2h14V5H5zm1-2h12l-3.75-5l-3 4L9 13zm-1 2V5zm3.5-9q.625 0 1.063-.437T10 8.5t-.437-1.062T8.5 7t-1.062.438T7 8.5t.438 1.063T8.5 10"
-            ></path>
-          </svg>
-          {#if imageFiles.length > 0}
-            <div class="badge badge-sm badge-neutral font-normal">
-              {imageFiles.length}
-            </div>
-          {/if}
-        </button> -->
         <button
           class="btn h-auto w-auto p-1 min-h-0 hover:text-base-content/60"
           disabled={!promptId}
-          on:click={() => {
+          onclick={() => {
             isClickOnFile = true;
             fileModal.showModal();
           }}
@@ -315,7 +306,8 @@
       <button
         class="btn btn-ghost btn-md disabled:bg-base-100 disabled:text-slate-500 disabled:cursor-not-allowed"
         disabled={!promptId || (!inputText && inputFiles.length === 0)}
-        on:click|preventDefault={fetchHeadline}
+        onclick={preventDefault(fetchHeadline)}
+        aria-label="Fetch"
       >
         <svg
           width="1em"

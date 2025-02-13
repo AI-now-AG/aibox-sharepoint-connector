@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onMount } from "svelte";
   import { actions } from "astro:actions";
   import { useTranslations } from "$i18n/utils";
   import { tenant } from "$stores";
@@ -8,27 +7,26 @@
   import { type TranscriptionCard } from "$types/TranscriptionCard";
   const t = useTranslations();
 
-  let instructionTitle = "";
-  let instructionText = "";
-  let isMounted = false;
+  let instructionTitle = $state("");
+  let instructionText = $state("");
 
-  onMount(() => {
-    isMounted = true;
+  interface Props {
+    transcriptionCard: TranscriptionCard;
+  }
+
+  let { transcriptionCard = $bindable() }: Props = $props();
+
+  $effect(() => {
+    if (transcriptionCard) {
+      instructionTitle = transcriptionCard.title || "";
+      instructionText = transcriptionCard.description || "";
+    }
   });
 
-  export let transcriptionCard: TranscriptionCard;
-
-  $: if (transcriptionCard) {
-    instructionTitle = transcriptionCard.title || "";
-  }
-
-  $: if (transcriptionCard && !isMounted) {
-    instructionText = transcriptionCard.description || "";
-  }
-
-  let isSaving = false;
-  $: isFormValid =
-    instructionTitle.trim() !== "" && instructionText.trim() !== "";
+  let isSaving = $state(false);
+  let isFormValid = $derived(
+    instructionTitle.trim() !== "" && instructionText.trim() !== "",
+  );
 
   const updateTranscriptionSetting = async (enabled: boolean) => {
     isSaving = true;
@@ -77,8 +75,10 @@
             type="checkbox"
             class="toggle toggle-primary"
             bind:checked={transcriptionCard.toggle}
-            on:change={(event) =>
-              updateTranscriptionSetting(event.target?.checked)}
+            onchange={(event) =>
+              updateTranscriptionSetting(
+                (event.target as HTMLInputElement)?.checked,
+              )}
           />
         </label>
       {/if}

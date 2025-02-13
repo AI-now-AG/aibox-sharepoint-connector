@@ -1,7 +1,7 @@
 ---
 import Layout from "$layouts/Layout.astro";
 import { useTranslations } from "$i18n/utils";
-import { Permission } from "$data/models/user.model";
+import { Permission } from "$enums/Users";
 import { TranscriptionType } from "$types/TranscribeRequest";
 import { type TranscriptionCard } from "$types/TranscriptionCard";
 import UpdateForm from "$pages/settings/transcription/UpdateForm.svelte";
@@ -22,7 +22,9 @@ const transcriptionMap: Partial<Record<TranscriptionType, string>> = {
   [TranscriptionType.Summarize]: t("settings.transcription.summarize-title"),
   [TranscriptionType.Subtitles]: t("settings.transcription.subtitles-title"),
   [TranscriptionType.Largefile]: t("settings.transcription.largefile-title"),
-  [TranscriptionType.Subtitlesjson]: t("settings.transcription.subtitles-title-json"),
+  [TranscriptionType.Subtitlesjson]: t(
+    "settings.transcription.subtitles-title-json",
+  ),
 };
 
 const card: TranscriptionCard | undefined = transcriptionMap[typeParam]
@@ -33,7 +35,6 @@ const card: TranscriptionCard | undefined = transcriptionMap[typeParam]
       type: typeParam,
     }
   : undefined;
-
 ---
 
 <Layout>

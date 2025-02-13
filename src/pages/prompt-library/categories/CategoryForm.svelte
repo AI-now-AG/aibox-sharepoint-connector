@@ -12,12 +12,16 @@
    * to create groups on demand when creating prompts.
    */
 
-  let title: string | undefined;
-  let groups: GroupItem[] = [];
+  let title: string | undefined = $state();
+  let groups: GroupItem[] = $state([]);
 
-  export let category: CreateCategoryParams | undefined = undefined;
-  export let isEditable: boolean = false;
-  let isSaving = false;
+  interface Props {
+    category?: CreateCategoryParams | undefined;
+    isEditable?: boolean;
+  }
+
+  let { category = undefined, isEditable = false }: Props = $props();
+  let isSaving = $state(false);
 
   onMount(async function () {
     if (category) {
@@ -29,6 +33,13 @@
       }));
     }
   });
+
+  function preventDefault(fn) {
+    return function (event) {
+      event.preventDefault();
+      fn.call(this, event);
+    };
+  }
 
   async function save() {
     if (!title) {
@@ -93,7 +104,7 @@
     <div class="flex items-center pt-2 pb-6">
       <button
         class="mr-4"
-        on:click|preventDefault={() => window.history.back()}
+        onclick={preventDefault(() => window.history.back())}
       >
         {@html svgIcons.back}
       </button>
@@ -105,7 +116,7 @@
         {/if}
       </h1>
     </div>
-    <form class="rounded pt-6 mb-4">
+    <div class="rounded pt-6 mb-4">
       <div class="grid grid-cols-1 gap-4 justify-center">
         <div>
           <p class="mb-2">{t("prompt-library.add.categories.title")}*</p>
@@ -126,7 +137,7 @@
         <div class="flex items-center">
           <button
             class={`btn btn-active btn-primary px-8 font-normal ${isSaving && "btn-disabled"}`}
-            on:click|preventDefault={save}
+            onclick={preventDefault(save)}
           >
             {#if isSaving}
               <span class="loading loading-spinner"></span>
@@ -137,12 +148,12 @@
           </button>
           <button
             class="btn ml-5"
-            on:click|preventDefault={() => window.history.back()}
+            onclick={preventDefault(() => window.history.back())}
           >
             {t("common.cancel")}
           </button>
         </div>
       {/if}
-    </form>
+    </div>
   </div>
 </div>

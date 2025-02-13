@@ -1,32 +1,47 @@
 <script lang="ts">
-    import { createEventDispatcher } from "svelte";
-    import { svgIcons } from "$assets/icons";
-    import { useTranslations } from "$i18n/utils";
-  
-    const dispatch = createEventDispatcher();
-    const t = useTranslations();
-  
-    export let value: string = "";
-    export let showArchived: boolean = false;
-    let typingTimeout: any;
-  
-    const onSearch = ({ target }: any) => {
-      clearTimeout(typingTimeout);
-      typingTimeout = setTimeout(() => {
-        value = target.value;
-        dispatch("search");
-        console.log('dispatch search', {value});
-      }, 300);
-    };
+  import { svgIcons } from "$assets/icons";
+  import { useTranslations } from "$i18n/utils";
 
-    const onFilter = ({ target }: any) => {
-      showArchived = !showArchived;
-      setTimeout(() => (target.checked = showArchived), 0);
-      dispatch("filter");
-      console.log('dispatch filter', {value});
+  const t = useTranslations();
+
+  interface Props {
+    value?: string;
+    showArchived?: boolean;
+    onsearch: Function;
+    onfilter: Function;
+  }
+
+  let {
+    value = $bindable(""),
+    showArchived = $bindable(false),
+    onsearch,
+    onfilter,
+  }: Props = $props();
+  let typingTimeout: any;
+
+  const onSearch = ({ target }: any) => {
+    clearTimeout(typingTimeout);
+    typingTimeout = setTimeout(() => {
+      value = target.value;
+      onsearch();
+    }, 300);
+  };
+
+  const onFilter = ({ target }: any) => {
+    showArchived = !showArchived;
+    setTimeout(() => (target.checked = showArchived), 0);
+    onfilter();
+    console.log("dispatch filter", { value });
+  };
+
+  function preventDefault(fn) {
+    return function (event) {
+      event.preventDefault();
+      fn.call(this, event);
     };
+  }
 </script>
-  
+
 <div class="items-center mb-10">
   <div class="relative w-full">
     <label class="input input-bordered flex items-center gap-2">
@@ -35,9 +50,7 @@
         type="text"
         class="grow text-sm"
         placeholder={t("tenant.tenants.seach-place-holder")}
-        on:input={onSearch}
-        on:input
-        on:blur
+        oninput={preventDefault(onSearch)}
       />
     </label>
   </div>
@@ -47,7 +60,7 @@
         type="checkbox"
         class="checkbox border-gray-300 rounded focus:ring-indigo-500 w-5 h-5"
         checked={showArchived}
-        on:click|preventDefault={onFilter}
+        onclick={preventDefault(onFilter)}
       />
       <span class="label-text">{t("tenant.tenants.show-archived")}</span>
     </label>

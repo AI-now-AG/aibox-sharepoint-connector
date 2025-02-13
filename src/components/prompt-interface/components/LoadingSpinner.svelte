@@ -1,6 +1,10 @@
 <!-- LoadingSpinner.svelte -->
-<script>
-  export let isLoading = false;
+<script lang="ts">
+  interface Props {
+    isLoading?: boolean;
+  }
+
+  let { isLoading = $bindable(false) }: Props = $props();
 </script>
 
 {#if isLoading}

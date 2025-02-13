@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export interface ColumnData {
     key?: string;
     name?: string;
@@ -9,11 +9,16 @@
 <script lang="ts">
   import { svgIcons } from "$assets/icons";
 
-  export let columnData: ColumnData[] = [];
-  export let rowData: any[] = [];
+  interface Props {
+    columnData?: ColumnData[];
+    rowData?: any[];
+    children?: import("svelte").Snippet;
+  }
 
-  let sortColumn = "";
-  let sortDirection = "asc";
+  let { columnData = [], rowData = $bindable([]), children }: Props = $props();
+
+  let sortColumn = $state("");
+  let sortDirection = $state("asc");
 
   function sort(col: string) {
     if (sortColumn === col) {
@@ -22,21 +27,24 @@
       sortColumn = col;
       sortDirection = "asc";
     }
-    if (col == undefined || col == "") {
+    if (!col) {
       return rowData;
     }
 
     rowData = rowData?.sort((a: any, b: any) => {
+      const aValue = a[col] ?? "";
+      const bValue = b[col] ?? "";
+
       if (sortDirection === "asc") {
-        if (typeof a[col] === "string") {
-          return a[col].localeCompare(b[col]);
+        if (typeof aValue === "string" && typeof bValue === "string") {
+          return aValue.localeCompare(bValue);
         }
-        return a[col] > b[col] ? 1 : -1;
+        return aValue > bValue ? 1 : -1;
       } else {
-        if (typeof a[col] === "string") {
-          return b[col].localeCompare(a[col]);
+        if (typeof aValue === "string" && typeof bValue === "string") {
+          return bValue.localeCompare(aValue);
         }
-        return a[col] < b[col] ? 1 : -1;
+        return aValue < bValue ? 1 : -1;
       }
     });
   }
@@ -67,7 +75,7 @@
         <th
           class={"py-3 px-4 text-left font-normal text-xs" +
             getFirstLastColCssClass(colIndex, columnData.length)}
-          on:click={() => sort(data.key ?? "")}
+          onclick={() => sort(data.key ?? "")}
         >
           <span class="inline-flex justify-center items-center">
             {data.name}
@@ -86,6 +94,6 @@
     </tr>
   </thead>
   <tbody>
-    <slot></slot>
+    {@render children?.()}
   </tbody>
 </table>

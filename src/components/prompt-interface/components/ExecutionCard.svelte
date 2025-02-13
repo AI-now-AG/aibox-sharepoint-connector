@@ -12,24 +12,32 @@
   import { actions } from "astro:actions";
   import log from "$utils/log";
 
-  export let isEditable = false;
-  export let cards: any;
-  export let selectedPromptId;
+  interface Props {
+    isEditable?: boolean;
+    cards: any;
+    selectedPromptId: any;
+  }
+
+  let {
+    isEditable = $bindable(false),
+    cards = $bindable(),
+    selectedPromptId = $bindable(),
+  }: Props = $props();
 
   const t = useTranslations();
 
   const promptLimit = 5;
-  let showMore = false;
-  let selectedCardIndex: number = -1;
-  let selectedEditPromptId: string = "";
+  let showMore = $state(false);
+  let selectedCardIndex: number = $state(-1);
+  let selectedEditPromptId: string = $state("");
   let selectedDeletePromptId: string = "";
-  let promptDialog: HTMLDialogElement;
-  let promptDialogMode: "update" | "clone" = "update";
-  let confirmDeleteModal: HTMLDialogElement;
-  let promptOrderDialog: HTMLDialogElement;
+  let promptDialog: HTMLDialogElement | undefined = $state();
+  let promptDialogMode: "update" | "clone" = $state("update");
+  let confirmDeleteModal: HTMLDialogElement | undefined = $state();
+  let promptOrderDialog: HTMLDialogElement | undefined = $state();
 
-  let timeout: any;
-  let orderCards = cards;
+  let timeout: any = $state();
+  let orderCards = $state(cards);
   for (let i = 0; i < orderCards?.length; i++) {
     orderCards[i] = { ...orderCards[i], id: orderCards[i]._id };
   }
@@ -39,7 +47,7 @@
     selectedPromptId = cards[0]._id;
     storePromptId.set(selectedPromptId);
     if (selectedEditPromptId) {
-      promptDialog.showModal();
+      promptDialog?.showModal();
     }
   });
 
@@ -52,13 +60,13 @@
   async function editCard(index: number) {
     selectedEditPromptId = cards[index]?._id ?? "";
     promptDialogMode = "update";
-    promptDialog.showModal();
+    promptDialog?.showModal();
   }
 
   async function duplicateCard(index: number) {
     selectedEditPromptId = cards[index]?._id ?? "";
     promptDialogMode = "clone";
-    promptDialog.showModal();
+    promptDialog?.showModal();
   }
 
   function onDeleteCard(index: number) {
@@ -77,8 +85,7 @@
       const deletedPrompt = {
         ...(selectedDeletePromptId && { _id: selectedDeletePromptId }),
       };
-      log.d(deletedPrompt, "deletedPrompt");
-      const response = await fetch("/api/prompts.json", {
+      const response = await fetch("/api/prompts/index.json", {
         method: "DELETE",
         body: JSON.stringify(deletedPrompt),
         headers: {
@@ -109,7 +116,7 @@
   }
 
   function orderPrompt() {
-    promptOrderDialog.show();
+    promptOrderDialog?.show();
   }
 
   async function updatePosition(items: any[]) {
@@ -155,7 +162,7 @@
           onSelectDuplicate={() => {
             duplicateCard(index);
           }}
-          onSelectReOder={() => {
+          onSelectReorder={() => {
             orderPrompt();
           }}
           onSelectDelete={() => {
@@ -171,7 +178,7 @@
     <div class="flex">
       <button
         class="btn p-0 btn-link text-sm font-normal"
-        on:click={() => (showMore = !showMore)}
+        onclick={() => (showMore = !showMore)}
       >
         {showMore
           ? `${t("prompt-execution.card.showLess")} ↑`
@@ -193,7 +200,7 @@
 <PromptOrderDialog
   bind:promptOrderDialog
   bind:items={orderCards}
-  on:confirm={() => {
+  confirm={() => {
     clearTimeout(timeout);
     timeout = setTimeout(() => {
       updatePosition(orderCards);
@@ -202,9 +209,9 @@
 />
 
 <ConfirmDialog
-  title={t("prompt-library.delete.prompt.confirm")}
   bind:modal={confirmDeleteModal}
-  on:confirm={deleteCard}
+  confirm={deleteCard}
+  title={t("prompt-library.delete.prompt.confirm")}
 />
 
 <Loading bind:show={$loading} />

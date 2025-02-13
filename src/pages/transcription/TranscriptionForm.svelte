@@ -13,40 +13,44 @@
   import { TenantFeature } from "$types/TenantFeature";
   const t = useTranslations();
 
-  export let folderName = "";
-  export let transcriptionType: TranscriptionType | undefined = undefined;
+  interface Props {
+    folderName?: string;
+    transcriptionType?: TranscriptionType | undefined;
+  }
+
+  let { folderName = "", transcriptionType = undefined }: Props = $props();
   // general
-  let audioFile: File | undefined;
-  let audioDuration: string = "";
+  let audioFile: File | undefined = $state();
+  let audioDuration: string = $state("");
   let acceptedTypes: Array<string> = ["audio/*", "video/*"];
   let acceptedTypesJSON: Array<string> = ["application/json"];
-  let acceptTypes: string = "";
+  let acceptTypes: string = $state("");
   let maxFileSize = 25;
-  let isDragOver: boolean = false;
-  let textOuput: string = "";
-  let txtFileUrl: string = "";
-  let srtFileUrl: string = "";
-  let assFileUrl: string = "";
-  let jsonFileUrl: string = "";
-  let zipFileData: string = "";
+  let isDragOver: boolean = $state(false);
+  let textOuput: string = $state("");
+  let txtFileUrl: string = $state("");
+  let srtFileUrl: string = $state("");
+  let assFileUrl: string = $state("");
+  let jsonFileUrl: string = $state("");
+  let zipFileData: string = $state("");
 
-  let isZipDataPresent: boolean = false;
-  let isFileDataPresent: boolean = false;
+  let isZipDataPresent: boolean = $state(false);
+  let isFileDataPresent: boolean = $state(false);
 
-  let fileErrorMessage: string = "";
+  let fileErrorMessage: string = $state("");
   let selectedFileFormat: FileFormat[] = [FileFormat.ASS];
 
-  let standardSubtitlesChecked: boolean = true;
-  let showTextPreviewChecked: boolean = true;
-  let rawOutputChecked: boolean = false;
+  let standardSubtitlesChecked: boolean = $state(true);
+  let showTextPreviewChecked: boolean = $state(true);
+  let rawOutputChecked: boolean = $state(false);
 
   // states
-  let isUploading: boolean = false;
-  let uploadingValue: number = 0;
-  let isUploaded: boolean = false;
-  let isTranscribing: boolean = false;
-  let isTranscipted: boolean = false;
-  let isTranscriptionFailed: boolean = false;
+  let isUploading: boolean = $state(false);
+  let uploadingValue: number = $state(0);
+  let isUploaded: boolean = $state(false);
+  let isTranscribing: boolean = $state(false);
+  let isTranscipted: boolean = $state(false);
+  let isTranscriptionFailed: boolean = $state(false);
 
   // API, polling
   let intervalId: any;
@@ -54,30 +58,17 @@
   let tempOutputFileName: string;
   let tempOutputFileNames: string[] = [];
 
-  let maxNumberOfSpeakers = 2;
-  let isDiarizationEnabled = false;
+  let maxNumberOfSpeakers = $state(2);
+  let isDiarizationEnabled = $state(false);
   let minSpeakers = 2;
   let maxSpeakers = 20;
 
-  let confirmModal: HTMLDialogElement;
+  let confirmModal: HTMLDialogElement | undefined = $state();
 
-  let assFileChecked = selectedFileFormat.includes(FileFormat.ASS);
-  let srtFileChecked = selectedFileFormat.includes(FileFormat.SRT);
-  let jsonFileChecked = selectedFileFormat.includes(FileFormat.JSON);
-  let txtFileChecked = selectedFileFormat.includes(FileFormat.TXT);
-
-  // Watch for changes in the checkbox state and update the `selectedFileFormat` array
-  $: toggleFileFormat(FileFormat.ASS, assFileChecked);
-  $: toggleFileFormat(FileFormat.SRT, srtFileChecked);
-  $: toggleFileFormat(FileFormat.JSON, jsonFileChecked);
-  $: toggleFileFormat(FileFormat.TXT, txtFileChecked);
-
-  $: isFormValid =
-    assFileChecked ||
-    srtFileChecked ||
-    jsonFileChecked ||
-    txtFileChecked ||
-    showTextPreviewChecked;
+  let assFileChecked = $state(selectedFileFormat.includes(FileFormat.ASS));
+  let srtFileChecked = $state(selectedFileFormat.includes(FileFormat.SRT));
+  let jsonFileChecked = $state(selectedFileFormat.includes(FileFormat.JSON));
+  let txtFileChecked = $state(selectedFileFormat.includes(FileFormat.TXT));
 
   onMount(async () => {
     console.log(
@@ -127,6 +118,13 @@
         ? acceptedTypesJSON.join(",")
         : acceptedTypes.join(",");
   });
+
+  function preventDefault(fn) {
+    return function (event) {
+      event.preventDefault();
+      fn.call(this, event);
+    };
+  }
 
   function checkDataAvaibility() {
     isZipDataPresent = zipFileData !== "";
@@ -407,9 +405,6 @@
       console.log("Azue SAS tokens response", { uploadUrl, outputFileName });
 
       try {
-        // Store temporary upload URL, filename for later
-        console.log("Temp output file name", tempOutputFileName);
-        // Upload the file to Azure Blob Storage
         //const response = await uploadBlobFile(uploadUrl, audioFile);
         await uploadBlobFileWithProgress(uploadUrl, audioFile, (percentage) => {
           uploadingValue = parseInt(`${Math.round(percentage)}`);
@@ -462,8 +457,6 @@
         $tenant,
         $user,
       );
-      console.log(params);
-      console.log($user);
 
       const response = await fetch(
         "/.netlify/functions/transcribeAudio-background",
@@ -691,7 +684,7 @@
   }
 
   function confirmStartNew() {
-    confirmModal.showModal();
+    confirmModal?.showModal();
   }
 
   function startNew() {
@@ -702,7 +695,7 @@
     }
     reset();
 
-    confirmModal.close();
+    confirmModal?.close();
   }
 
   function downloadFileSRT() {
@@ -725,8 +718,8 @@
 
     // Clsoe dialog element
     console.log("Download file!");
-    if (confirmModal.open) {
-      confirmModal.close();
+    if (confirmModal?.open) {
+      confirmModal?.close();
     }
   }
 
@@ -757,8 +750,8 @@
         URL.revokeObjectURL(blobUrl);
 
         console.log("Download file!");
-        if (confirmModal.open) {
-          confirmModal.close();
+        if (confirmModal?.open) {
+          confirmModal?.close();
         }
       })
       .catch((error) => {
@@ -796,8 +789,8 @@
 
       // Clsoe dialog element
       console.log("Download file!");
-      if (confirmModal.open) {
-        confirmModal.close();
+      if (confirmModal?.open) {
+        confirmModal?.close();
       }
     }
   }
@@ -823,24 +816,6 @@
 
     isZipDataPresent = false;
     isFileDataPresent = false;
-  }
-
-  $: {
-    if (!standardSubtitlesChecked) {
-      selectedFileFormat = selectedFileFormat.filter(
-        (f) => f !== FileFormat.ASS && f !== FileFormat.SRT,
-      );
-      assFileChecked = false;
-      srtFileChecked = false;
-    }
-
-    if (!rawOutputChecked) {
-      selectedFileFormat = selectedFileFormat.filter(
-        (f) => f !== FileFormat.JSON && f !== FileFormat.TXT,
-      );
-      jsonFileChecked = false;
-      txtFileChecked = false;
-    }
   }
 
   // Handlers to update the array
@@ -883,6 +858,43 @@
       }
     }
   }
+  $effect(() => {
+    if (!standardSubtitlesChecked) {
+      selectedFileFormat = selectedFileFormat.filter(
+        (f) => f !== FileFormat.ASS && f !== FileFormat.SRT,
+      );
+      assFileChecked = false;
+      srtFileChecked = false;
+    }
+
+    if (!rawOutputChecked) {
+      selectedFileFormat = selectedFileFormat.filter(
+        (f) => f !== FileFormat.JSON && f !== FileFormat.TXT,
+      );
+      jsonFileChecked = false;
+      txtFileChecked = false;
+    }
+  });
+  // Watch for changes in the checkbox state and update the `selectedFileFormat` array
+  $effect(() => {
+    toggleFileFormat(FileFormat.ASS, assFileChecked);
+  });
+  $effect(() => {
+    toggleFileFormat(FileFormat.SRT, srtFileChecked);
+  });
+  $effect(() => {
+    toggleFileFormat(FileFormat.JSON, jsonFileChecked);
+  });
+  $effect(() => {
+    toggleFileFormat(FileFormat.TXT, txtFileChecked);
+  });
+  let isFormValid = $derived(
+    assFileChecked ||
+      srtFileChecked ||
+      jsonFileChecked ||
+      txtFileChecked ||
+      showTextPreviewChecked,
+  );
 </script>
 
 <div class="px-14 mt-10">
@@ -892,13 +904,13 @@
       <div class="relative flex flex-col mt-2">
         <label
           class={`py-6 relative flex flex-col text-base-content border border-dashed rounded cursor-pointer ${isDragOver ? "border-blue-500" : "border-neutral-content"} ${fileErrorMessage && "border-red-500 bg-red-100"}`}
-          on:dragover={() => {
+          ondragover={() => {
             isDragOver = true;
           }}
-          on:dragleave={() => {
+          ondragleave={() => {
             isDragOver = false;
           }}
-          on:drop={() => {
+          ondrop={() => {
             isDragOver = false;
           }}
         >
@@ -906,7 +918,7 @@
             type="file"
             class="absolute inset-0 z-50 w-full h-full p-0 m-0 outline-none opacity-0 cursor-pointer"
             accept={acceptTypes}
-            on:change={addFiles}
+            onchange={addFiles}
           />
 
           <div class="flex flex-col items-center px-4">
@@ -982,7 +994,7 @@
               {/if}
             </div>
             <button
-              on:click|preventDefault={removeFile}
+              onclick={preventDefault(removeFile)}
               class="text-gray-700 hover:text-primary"
             >
               {@html svgIcons.close}
@@ -1023,12 +1035,12 @@
                 class="grow"
                 placeholder="Speakers"
                 bind:value={maxNumberOfSpeakers}
-                on:input={handleInput}
+                oninput={handleInput}
               />
               <div class="flex flex-col">
                 <button
                   class="btn btn-xs btn-ghost"
-                  on:click={() => {
+                  onclick={() => {
                     checkNumberInput(maxNumberOfSpeakers, 1);
                   }}
                 >
@@ -1051,7 +1063,7 @@
                 </button>
                 <button
                   class="btn btn-xs btn-ghost"
-                  on:click={() => {
+                  onclick={() => {
                     checkNumberInput(maxNumberOfSpeakers, -1);
                   }}
                 >
@@ -1228,7 +1240,7 @@
       <button
         class={`btn btn-active btn-primary btn-sm text-base-100`}
         disabled={!isUploaded || !isFormValid || isTranscribing}
-        on:click={transcribe}
+        onclick={transcribe}
         >{t("transciption.model.cta.start-transcribing")}</button
       >
     {/if}
@@ -1236,7 +1248,7 @@
       {#if zipFileData}
         <button
           class="btn btn-success btn-sm text-base-100"
-          on:click={downloadZip}
+          onclick={downloadZip}
           >{@html svgIcons.download}{t(
             "transciption.model.cta.download-zip",
           )}</button
@@ -1251,15 +1263,13 @@
         > -->
         <button
           class="btn btn-success btn-sm text-base-100"
-          on:click={downloadFile}
+          onclick={downloadFile}
           >{@html svgIcons.download}{t(
             "transciption.model.cta.download-output",
           )}</button
         >
       {/if}
-      <button
-        class="btn bg-neutral btn-sm text-white"
-        on:click={confirmStartNew}
+      <button class="btn bg-neutral btn-sm text-white" onclick={confirmStartNew}
         >{t("transciption.model.cta.start-new-transciption")}</button
       >
     {/if}
@@ -1269,8 +1279,8 @@
     bind:modal={confirmModal}
     bind:isZipDataPresent
     bind:isFileDataPresent
-    on:downloadZip={downloadZip}
-    on:downloadFile={downloadFile}
-    on:confirm={startNew}
+    {downloadZip}
+    {downloadFile}
+    confirm={startNew}
   />
 </div>

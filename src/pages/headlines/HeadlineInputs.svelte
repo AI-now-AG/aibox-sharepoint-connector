@@ -4,13 +4,13 @@
   import PromptConfiguration from "$components/PromptConfiguration.svelte";
   import { fade } from "svelte/transition";
 
-  let input = "";
-  let output = "";
+  let input = $state("");
+  let output = $state("");
 
   async function fetchHeadline(e) {
     e.preventDefault();
 
-    const userInputText = e.detail.text;
+    const userInputText = e.text;
     input = "";
     let body = {
       article: userInputText,
@@ -43,7 +43,7 @@
   <div class="grid justify-items-end">
     <button
       class="btn btn-square bg-base-100 grid justify-items"
-      onclick="configuration_dialog.showModal()"
+      onclick={() => configuration_dialog.showModal()}
     >
       <svg
         class="fill-neutral-content stroke-1"
@@ -69,7 +69,7 @@
       <h1 class="text-3xl pb-4">
         Hello Somedia, I help you with writing a headline
       </h1>
-      <InputForm on:message={fetchHeadline} />
+      <InputForm message={fetchHeadline} />
       {#if input}
         <div transition:fade>
           <div class="chat chat-start mt-2" transition:fade>

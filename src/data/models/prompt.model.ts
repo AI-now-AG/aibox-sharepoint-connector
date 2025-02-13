@@ -130,6 +130,17 @@ export default {
     return result;
   },
 
+  findAndUpdate: async (id: string, updatedPrompt: Partial<Prompt>) => {
+    const _id = new ObjectId(id);
+    const validated = PromptSchema.partial().parse(updatedPrompt);
+    const result = await collection.findOneAndUpdate(
+      { _id },
+      { $set: { ...validated } },
+      { returnDocument: "after" },
+    );
+    return result;
+  },
+
   updatePromptField: async (id: string, newPrompt: string) => {
     const _id = new ObjectId(id);
     const result = await collection.updateOne(

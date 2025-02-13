@@ -228,7 +228,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
     out += `Dialogue: 0,${srtTimestamp(entry.start, ".")},${srtTimestamp(
       entry.end,
       ".",
-    // )},Default,,0,0,0,,{\\c&HFFFFFF&}${entry.text.replace(/\n/g, "\\N")}\n`;
+      // )},Default,,0,0,0,,{\\c&HFFFFFF&}${entry.text.replace(/\n/g, "\\N")}\n`;
     )},Default,,0,0,0,,${entry.text.replace(/\n/g, "\\N")}\n`;
   }
 

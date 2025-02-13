@@ -5,14 +5,18 @@
 
   const t = useTranslations();
 
-  let instructionTitle = "";
-  let instructionText = "";
+  let instructionTitle = $state("");
+  let instructionText = $state("");
 
-  export let instructionId: string | undefined = undefined;
-  export let instruction: any | undefined = undefined;
-  export let isEditable: boolean = false;
+  interface Props {
+    instructionId?: string | undefined;
+    instruction?: any | undefined;
+    isEditable?: boolean;
+  }
 
-  let isSaving = false;
+  let { instructionId = undefined, instruction = undefined, isEditable = false }: Props = $props();
+
+  let isSaving = $state(false);
 
   onMount(async function () {
     if (instruction) {
@@ -20,6 +24,13 @@
       instructionText = instruction.instruction;
     }
   });
+
+  function preventDefault(fn) {
+		return function (event) {
+			event.preventDefault();
+			fn.call(this, event);
+		};
+	}
 
   async function saveInstruction() {
     isSaving = true;
@@ -70,14 +81,14 @@
           bind:value={instructionText}
           placeholder="e.g. type instruction details..."
           class="input input-bordered min-w-xs shadow appearance-none min-h-96 w-full py-2 px-3"
-        />
+></textarea>
       </div>
 
       {#if isEditable}
         <div class="flex items-center justify-between">
           <button
             class={`btn btn-active btn-primary px-8 font-normal ${isSaving && "btn-disabled"}`}
-            on:click|preventDefault={saveInstruction}
+            onclick={preventDefault(saveInstruction)}
           >
             {#if isSaving}
               <span class="loading loading-spinner"></span>

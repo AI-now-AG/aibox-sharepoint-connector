@@ -1,11 +1,17 @@
 <script>
-  import { createEventDispatcher } from "svelte";
+  let { message } = $props();
 
-  let userInputText;
-  const dispatch = createEventDispatcher();
+  let userInputText = $state();
+
+  function preventDefault(fn) {
+    return function (event) {
+      event.preventDefault();
+      fn.call(this, event);
+    };
+  }
 
   function submitAction() {
-    dispatch("message", {
+    message({
       text: userInputText,
     });
   }
@@ -14,7 +20,7 @@
 <div class="w-full shadow-md border border-base-300 rounded bg-base-100">
   <form
     class="p-4 flex space-x-4 items-center justify-between"
-    on:submit|preventDefault={submitAction}
+    onsubmit={preventDefault(submitAction)}
   >
     <div class="flex-1 space-y-2">
       <div class="flex space-y-2">

@@ -1,11 +1,19 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
   import { fade } from "svelte/transition";
 
-  const dispatch = createEventDispatcher();
+  interface Props {
+    type?: string;
+    dismissible?: boolean;
+    dismiss?: any;
+    children?: import("svelte").Snippet;
+  }
 
-  export let type: string = "error";
-  export let dismissible: boolean = true;
+  let {
+    type = "error",
+    dismissible = true,
+    dismiss,
+    children,
+  }: Props = $props();
 
   const iconWidth = "1.2rem";
 </script>
@@ -97,11 +105,11 @@
   </span>
 
   <div class="text">
-    <slot />
+    {@render children?.()}
   </div>
 
   {#if dismissible}
-    <button class="close" on:click={() => dispatch("dismiss")}>
+    <button class="close" onclick={() => dismiss()} aria-label="Close">
       <svg
         width="0.5em"
         style="text-align: center; display: inline-block;"

@@ -13,14 +13,14 @@
 
   const t = useTranslations();
 
-  let tenants: any = [];
-  let showArchived: boolean = false;
-  let searchValue: string = "";
+  let tenants: any = $state([]);
+  let showArchived: boolean = $state(false);
+  let searchValue: string = $state("");
   let timeout: any;
 
-  let selectedTenant: any = null;
-  let confirmUpdateModal: HTMLDialogElement;
-  let confirmDeleteModal: HTMLDialogElement;
+  let selectedTenant: any = $state(null);
+  let confirmUpdateModal: HTMLDialogElement | undefined = $state();
+  let confirmDeleteModal: HTMLDialogElement | undefined = $state();
 
   onMount(async () => {
     await fetchTenants();
@@ -62,7 +62,6 @@
 
   const updateStatus = async () => {
     const { active } = selectedTenant;
-    log.d(selectedTenant, "updateStatus");
     confirmUpdateModal?.close();
 
     showLoading();
@@ -79,7 +78,6 @@
     hideLoading();
 
     const { data, error } = result;
-    log.d(result, "updateStatus --> result");
     if (!error) {
       fetchTenants();
     } else {
@@ -107,7 +105,7 @@
       await fetchTenants();
 
       // Log out the user if the current tenant being deleted matches the current tenant
-      if (selectedTenant._id == $currentTenant._id) {
+      if (selectedTenant._id == $currentTenant?._id) {
         window.location.href = "/api/logout";
       }
     } else {
@@ -122,9 +120,9 @@
 <div class="container max-w-full mx-auto p-6">
   <InputSearchFilter
     bind:value={searchValue}
-    on:search={fetchTenants}
     bind:showArchived
-    on:filter={fetchTenants}
+    onsearch={fetchTenants}
+    onfilter={fetchTenants}
   />
 
   <div>
@@ -176,7 +174,7 @@
                 {tenant.org_name}
                 <button
                   class="mx-1 self-center"
-                  on:click={() => copyName(tenant.org_name)}
+                  onclick={() => copyName(tenant.org_name)}
                   >{@html svgIcons.copy}</button
                 >
               </td>
@@ -204,7 +202,7 @@
                     <li>
                       <button
                         class="flex block w-full text-left px-4 py-2 text-sm hover:underline"
-                        on:click={() => confirmUpdateStatus(tenant)}
+                        onclick={() => confirmUpdateStatus(tenant)}
                       >
                         {@html tenant.active == 1
                           ? svgIcons.archive
@@ -220,7 +218,7 @@
                       <li>
                         <button
                           class="flex block w-full text-left px-4 py-1 text-sm hover:underline"
-                          on:click={() => confirmDelete(tenant)}
+                          onclick={() => confirmDelete(tenant)}
                         >
                           {@html svgIcons.trash}
                           <span class="ml-1">{t("common.delete")}</span>
@@ -246,14 +244,14 @@
         </tbody>
       </table>
 
-      <Loading partial={true} bind:show={$loading} />
+      <Loading bind:show={$loading} partial={true} />
     </div>
   </div>
 
   <!-- confirm update dialog -->
   <ConfirmDialog
     bind:modal={confirmUpdateModal}
-    on:confirm={updateStatus}
+    confirm={updateStatus}
     description={selectedTenant?.active
       ? t("tenant.tenants.tenant.archive-confirmation")
       : t("tenant.tenants.tenant.active-confirmation")}
@@ -262,7 +260,7 @@
   <!-- confirm delete dialog -->
   <ConfirmDialog
     bind:modal={confirmDeleteModal}
-    on:confirm={deleteTenant}
+    confirm={deleteTenant}
     description={t("tenant.delete-confirm-message")}
   />
 </div>

@@ -4,18 +4,11 @@ import Layout from "$layouts/Layout.astro";
 import { Image } from "astro:assets";
 import Card from "$components/content/Card.astro";
 import { getCollection } from "astro:content";
-import * as Sentry from "@sentry/astro";
 
 import { useTranslations } from "$i18n/utils";
 const t = useTranslations();
 
 const allContent = await getCollection("aibox");
-
-Sentry.setUser({
-  id: Astro.locals.user.id.toString(),
-  username: Astro.locals.user.name,
-  tenant_id: Astro.locals.tenant._id,
-});
 ---
 
 <Layout isFooterVisible={true}>

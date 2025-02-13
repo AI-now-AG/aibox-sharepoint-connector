@@ -179,7 +179,7 @@ output>
   }
   if (currentChunk) chunks.push(currentChunk);
 
-  let correctedLines = [];
+  const correctedLines: string[] = [];
   for (const chunk of chunks) {
     const { transcriptionType, transcriptions } = transcribeParams;
     const instruction =
@@ -198,7 +198,7 @@ output>
         .map((line) => line.substring(8)),
     );
   }
-  const out = data.map((entry, i) => ({
+  const out: Entry[] = data.map((entry, i) => ({
     ...entry,
     text: correctedLines[i] || entry.text,
   }));

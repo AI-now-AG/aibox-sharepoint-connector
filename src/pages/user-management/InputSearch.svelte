@@ -1,20 +1,22 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
 
-  const dispatch = createEventDispatcher();
   const t = useTranslations();
 
-  export let value: string = "";
+  interface Props {
+    value?: string;
+    onsearch: Function;
+  }
+
+  let { value = $bindable(""), onsearch }: Props = $props();
   let typingTimeout: any;
 
   const onSearch = ({ target }: any) => {
     clearTimeout(typingTimeout);
     typingTimeout = setTimeout(() => {
       value = target.value;
-      dispatch("search");
-      console.log("dispatch", { value });
+      onsearch();
     }, 300);
   };
 </script>
@@ -27,9 +29,7 @@
         type="text"
         class="grow text-sm"
         placeholder={t("user.search-for-users")}
-        on:input={onSearch}
-        on:input
-        on:blur
+        oninput={onSearch}
       />
     </label>
   </div>

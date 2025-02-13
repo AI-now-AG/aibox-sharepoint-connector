@@ -54,7 +54,7 @@ if (auth.hasAudioSubtitlesjson(Astro.locals)) {
     title: t("settings.transcription.subtitles-title-json"),
     path: `/transcription/${TranscriptionType.Subtitlesjson}`,
   });
-} 
+}
 if (auth.hasAudioLargefile(Astro.locals)) {
   audioFeatureItems.push({
     title: t("settings.transcription.largefile-title"),
@@ -257,9 +257,9 @@ const modules = [...menuItems];
     detailsElements.forEach((element) => {
       const details = element as HTMLDetailsElement;
       const detailsId = details.getAttribute("data-id") || "";
-      details.addEventListener("toggle", () =>
-        updateNavState(detailsId, details.open),
-      );
+      details.addEventListener("toggle", () => {
+        updateNavState(detailsId, details.open);
+      });
     });
   }
 
@@ -272,7 +272,7 @@ const modules = [...menuItems];
   }
 
   // Ensure open states are applied after page load
-  document.addEventListener("DOMContentLoaded", async () => {
-    setInterval(applyOpenStates, 500);
+  document.addEventListener("astro:page-load", () => {
+    applyOpenStates();
   });
 </script>

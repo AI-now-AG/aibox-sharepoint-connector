@@ -2,7 +2,7 @@
 import Layout from "$layouts/Layout.astro";
 import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
 import KnowledgeBaseForm from "$pages/prompt-library/knowledge-base/KnowledgeBaseForm.svelte";
-import { Permission } from "$data/models/user.model";
+import { Permission } from "$enums/Users";
 import { ObjectId } from "mongodb";
 
 export interface Props {
@@ -15,7 +15,10 @@ if (id === undefined) {
 }
 
 const knowledgeBase = await KnowledgeBaseModel.get(id || "");
-if (!knowledgeBase || !new ObjectId(knowledgeBase.tenant_id).equals(Astro.locals.tenant._id)) {
+if (
+  !knowledgeBase ||
+  !new ObjectId(knowledgeBase.tenant_id).equals(Astro.locals.tenant._id)
+) {
   return Astro.redirect("/404");
 }
 

@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export interface CardItem {
     id: string;
     title: string;
@@ -23,20 +23,28 @@
 
   const t = useTranslations();
 
-  export let items: CardItem[] = [];
-  export let title: string = t("prompt-library.prompts.all");
-  export let isEditable: boolean = false;
+  interface Props {
+    items?: CardItem[];
+    title?: string;
+    isEditable?: boolean;
+  }
 
-  let selectedEditPromptId: string = "";
+  let {
+    items = $bindable([]),
+    title = t("prompt-library.prompts.all"),
+    isEditable = false,
+  }: Props = $props();
+
+  let selectedEditPromptId: string = $state("");
   let selectedDeletePromptId: string = "";
   let selectedOrderPromptId: string = "";
-  let promptDialog: HTMLDialogElement;
-  let promptDialogMode: "update" | "clone" = "update";
-  let confirmDeleteModal: HTMLDialogElement;
-  let promptOrderDialog: HTMLDialogElement;
+  let promptDialog: HTMLDialogElement | undefined = $state();
+  let promptDialogMode: "update" | "clone" = $state("update");
+  let confirmDeleteModal: HTMLDialogElement | undefined = $state();
+  let promptOrderDialog: HTMLDialogElement | undefined = $state();
 
-  let timeout: any;
-  let orderCards = items;
+  let timeout: any = $state();
+  let orderCards = $state(items);
 
   function getItemsByGroupId(items: CardItem[], groupId: string): CardItem[] {
     return items.filter((item) => item.group === groupId);
@@ -45,13 +53,13 @@
   async function editCard(index: number) {
     selectedEditPromptId = items[index]?.id ?? "";
     promptDialogMode = "update";
-    promptDialog.showModal();
+    promptDialog?.showModal();
   }
 
   async function duplicateCard(index: number) {
     selectedEditPromptId = items[index]?.id ?? "";
     promptDialogMode = "clone";
-    promptDialog.showModal();
+    promptDialog?.showModal();
   }
 
   function onDeleteCard(index: number) {
@@ -70,8 +78,7 @@
       const deletedPrompt = {
         ...(selectedDeletePromptId && { _id: selectedDeletePromptId }),
       };
-      log.d(deletedPrompt, "deletedPrompt");
-      const response = await fetch("/api/prompts.json", {
+      const response = await fetch("/api/prompts/index.json", {
         method: "DELETE",
         body: JSON.stringify(deletedPrompt),
         headers: {
@@ -106,18 +113,19 @@
     const selectedItem = items[index];
     const groupIdToSearch = selectedItem.group ?? "";
     orderCards = getItemsByGroupId(items ?? [], groupIdToSearch);
-    promptOrderDialog.show();
+    promptOrderDialog?.show();
   }
 
-  async function updatePosition(items: any[]) {
+  async function updatePosition(orderItems: CardItem[]) {
     showLoading();
     try {
-      const sortedIds = items.map((item) => {
+      const sortedIds = orderItems.map((item) => {
         return {
           _id: item.id,
         };
       });
-      await actions.prompt.updatePosition(sortedIds);
+      const newItems = await actions.prompt.updatePosition(sortedIds);
+      items = newItems.data ?? orderItems;
       addToast({
         message: t("prompt-library.prompt.order-success"),
         type: "success",
@@ -150,7 +158,7 @@
         onSelectDuplicate={() => {
           duplicateCard(index);
         }}
-        onSelectReOder={() => {
+        onSelectReorder={() => {
           orderPrompt(index);
         }}
         onSelectDelete={() => {
@@ -173,7 +181,7 @@
 <PromptOrderDialog
   bind:promptOrderDialog
   bind:items={orderCards}
-  on:confirm={() => {
+  confirm={() => {
     clearTimeout(timeout);
     timeout = setTimeout(() => {
       updatePosition(orderCards);
@@ -182,9 +190,9 @@
 />
 
 <ConfirmDialog
-  title={t("prompt-library.delete.prompt.confirm")}
   bind:modal={confirmDeleteModal}
-  on:confirm={deleteCard}
+  confirm={deleteCard}
+  title={t("prompt-library.delete.prompt.confirm")}
 />
 
 <Loading bind:show={$loading} />

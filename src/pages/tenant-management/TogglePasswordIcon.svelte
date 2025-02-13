@@ -1,19 +1,20 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
   import { svgIcons } from "$assets/icons";
 
-  const dispatch = createEventDispatcher();
+  interface Props {
+    show?: boolean;
+    change: Function;
+  }
 
-  export let show: boolean = false;
+  let { show = $bindable(false), change }: Props = $props();
 
   function toggle() {
     show = !show;
-
-    dispatch("change", { show });
+    change();
   }
 </script>
 
-<button on:click={toggle}>
+<button onclick={toggle}>
   {#if show}
     {@html svgIcons.eye}
   {:else}

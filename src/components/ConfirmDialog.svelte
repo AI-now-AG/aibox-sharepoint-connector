@@ -1,13 +1,21 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
   import { useTranslations } from "$i18n/utils";
 
-  const dispatch = createEventDispatcher();
   const t = useTranslations();
 
-  export let modal: any;
-  export let title: string = "";
-  export let description: string = "";
+  interface Props {
+    modal: any;
+    confirm: any;
+    title?: string;
+    description?: string;
+  }
+
+  let {
+    modal = $bindable(),
+    confirm,
+    title = "",
+    description = "",
+  }: Props = $props();
 </script>
 
 <dialog bind:this={modal} class="modal">
@@ -29,12 +37,10 @@
         <button
           id="yes_button"
           class="btn btn-warning flex-1"
-          on:click={() => dispatch("confirm")}>{t("common.yes")}</button
+          onclick={() => confirm()}>{t("common.yes")}</button
         >
-        <button
-          id="no_button"
-          class="btn btn-success flex-1"
-          on:click={() => dispatch("dismiss")}>{t("common.no")}</button
+        <button id="no_button" class="btn btn-success flex-1" onclick={() => {}}
+          >{t("common.no")}</button
         >
       </div>
     </form>

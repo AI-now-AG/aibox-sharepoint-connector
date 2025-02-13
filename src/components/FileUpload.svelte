@@ -3,18 +3,27 @@
   const t = useTranslations();
   import { svgIcons } from "$assets/icons";
 
-  export let title: string;
-  export let acceptedTypes: Record<string, string[]>;
-  export let modal;
-  export let files: File[] = [];
+  interface Props {
+    title: string;
+    acceptedTypes: Record<string, string[]>;
+    modal: any;
+    files?: File[];
+  }
 
-  let isDragOver = false;
-  let fileDragging = -1;
-  let fileDropping = -1;
-  let fileErrorMessage: string = "";
+  let {
+    title,
+    acceptedTypes,
+    modal = $bindable(),
+    files = $bindable([]),
+  }: Props = $props();
 
-  let imgElements: HTMLImageElement[] = [];
-  let videoElements: HTMLSourceElement[] = [];
+  let isDragOver = $state(false);
+  let fileDragging = $state(-1);
+  let fileDropping = $state(-1);
+  let fileErrorMessage: string = $state("");
+
+  let imgElements: HTMLImageElement[] = $state([]);
+  let videoElements: HTMLSourceElement[] = $state([]);
 
   const acceptedMimeTypes = Object.values(acceptedTypes).flat().join(", ");
   const units = ["B", "kB", "MB", "GB", "TB"];
@@ -85,7 +94,7 @@
     }
   }
 
-  $: {
+  $effect(() => {
     imgElements.forEach((imgElement, index) => {
       if (imgElement && files[index]) {
         const blobUrl = loadFile(files[index]);
@@ -101,7 +110,7 @@
         videoElement.onload = () => URL.revokeObjectURL(blobUrl);
       }
     });
-  }
+  });
 
   function isFileTypeValid(checkType: string) {
     for (const type in acceptedTypes) {
@@ -144,13 +153,13 @@
       >
         <label
           class={`py-6 relative flex flex-col text-base-content border border-dashed rounded cursor-pointer ${isDragOver ? "border-blue-500" : "border-neutral-content"} ${fileErrorMessage && "border-error bg-error"}`}
-          on:dragover={() => {
+          ondragover={() => {
             isDragOver = true;
           }}
-          on:dragleave={() => {
+          ondragleave={() => {
             isDragOver = false;
           }}
-          on:drop={() => {
+          ondrop={() => {
             isDragOver = false;
           }}
         >
@@ -159,7 +168,7 @@
             accept={acceptedMimeTypes}
             class="absolute inset-0 z-50 w-full h-full p-0 m-0 outline-none opacity-0 cursor-pointer"
             multiple
-            on:change={addFiles}
+            onchange={addFiles}
           />
 
           <div class="flex flex-col items-center">
@@ -183,9 +192,10 @@
           >
             {#each files as file, index (file.name)}
               <div
+                role="listitem"
                 class="relative flex flex-col items-center overflow-hidden text-center bg-base-100 border border-neutral-content rounded cursor-move select-none pt-36"
-                on:dragstart={(e) => dragstart(e, index)}
-                on:dragend={() => {
+                ondragstart={(e) => dragstart(e, index)}
+                ondragend={() => {
                   fileDragging = -1;
                 }}
                 draggable="true"
@@ -194,7 +204,8 @@
                 <button
                   class="absolute top-0 right-0 z-50 p-1 bg-neutral rounded-bl focus:outline-none"
                   type="button"
-                  on:click={() => remove(index)}
+                  onclick={() => remove(index)}
+                  aria-label="Remove"
                 >
                   <svg
                     class="w-4 h-4 text-neutral-content"
@@ -250,12 +261,14 @@
                   <img
                     class="absolute inset-0 z-0 object-contain w-full h-full preview bg-base-100"
                     bind:this={imgElements[index]}
+                    alt="Preview"
                   />
                 {/if}
 
                 {#if file.type.includes("video/")}
                   <video
                     class="absolute inset-0 object-cover w-full h-full pointer-events-none preview"
+                    aria-hidden="true"
                   >
                     <source bind:this={videoElements[index]} type="video/mp4" />
                   </video>
@@ -273,9 +286,10 @@
                 </div>
 
                 <div
+                  role="listitem"
                   class="absolute inset-0 z-40 transition-colors duration-300"
-                  on:dragenter={(e) => dragenter(e, index)}
-                  on:dragleave={() => {
+                  ondragenter={(e) => dragenter(e, index)}
+                  ondragleave={() => {
                     fileDropping = -1;
                   }}
                   class:bg-primary={fileDropping == index &&

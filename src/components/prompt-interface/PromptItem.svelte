@@ -7,13 +7,23 @@
 
   const t = useTranslations();
 
-  export let isEditable: boolean;
-  export let data: any;
+  interface Props {
+    isEditable: boolean;
+    data: any;
+    onSelectEdit?: Function;
+    onSelectDuplicate?: Function;
+    onSelectReorder?: Function;
+    onSelectDelete?: Function;
+  }
 
-  export let onSelectEdit: Function;
-  export let onSelectDuplicate: Function;
-  export let onSelectReOder: Function;
-  export let onSelectDelete: Function;
+  let {
+    isEditable,
+    data,
+    onSelectEdit,
+    onSelectDuplicate,
+    onSelectReorder,
+    onSelectDelete,
+  }: Props = $props();
 
   let options: Option[] = [
     {
@@ -34,7 +44,7 @@
       icon: svgIcons.reorder,
       text: t("common.change-order"),
       action: () => {
-        onSelectReOder?.();
+        onSelectReorder?.();
       },
     },
     {
@@ -66,6 +76,6 @@
     {/if}
   </div>
   {#if isEditable}
-    <DropdownSection cssClasses={"absolute top-6 right-3"} {options} />
+    <DropdownSection class={"absolute top-6 right-3"} {options} />
   {/if}
 </div>

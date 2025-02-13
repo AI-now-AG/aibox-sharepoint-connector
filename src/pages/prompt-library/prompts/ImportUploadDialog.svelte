@@ -1,31 +1,26 @@
 <script lang="ts">
   import { useTranslations } from "$i18n/utils";
-  import { createEventDispatcher } from "svelte";
   import { svgIcons } from "$assets/icons";
 
-  export let modal;
-  export let file: File | undefined;
+  interface Props {
+    modal: any;
+    file: File | undefined;
+    confirm: any;
+  }
 
-  const dispatch = createEventDispatcher();
+  let { modal = $bindable(), file = $bindable(), confirm }: Props = $props();
+
   const t = useTranslations();
 
   const acceptedTypes: Record<string, string[]> = {
     "text/csv": ["text/csv"],
   };
-  let isDragOver = false;
-  let fileErrorMessage: string = "";
+  let isDragOver = $state(false);
+  let fileErrorMessage: string = $state("");
 
   const acceptedMimeTypes = Object.values(acceptedTypes).flat().join(", ");
 
-  $: {
-    if (file && !isFileValid(file)) {
-      fileErrorMessage = "unsupported-type";
-    } else {
-      fileErrorMessage = "";
-    }
-  }
 
-  $: isFormValid = file && isFileValid(file);
 
   function addFiles(
     event: Event & { currentTarget: EventTarget & HTMLInputElement },
@@ -54,6 +49,14 @@
     }
     return false;
   }
+  $effect(() => {
+    if (file && !isFileValid(file)) {
+      fileErrorMessage = "unsupported-type";
+    } else {
+      fileErrorMessage = "";
+    }
+  });
+  let isFormValid = $derived(file && isFileValid(file));
 </script>
 
 <dialog bind:this={modal} class="modal">
@@ -67,13 +70,13 @@
     <div class="relative flex flex-col py-4">
       <label
         class={`py-16 relative flex flex-col text-base-content border border-dashed rounded cursor-pointer ${isDragOver ? "border-blue-500" : "border-neutral-content"} ${fileErrorMessage && "border-red-500 bg-red-100"}`}
-        on:dragover={() => {
+        ondragover={() => {
           isDragOver = true;
         }}
-        on:dragleave={() => {
+        ondragleave={() => {
           isDragOver = false;
         }}
-        on:drop={() => {
+        ondrop={() => {
           isDragOver = false;
         }}
       >
@@ -81,7 +84,7 @@
           type="file"
           accept={acceptedMimeTypes}
           class="absolute inset-0 z-50 w-full h-full p-0 m-0 outline-none opacity-0 cursor-pointer"
-          on:change={addFiles}
+          onchange={addFiles}
         />
 
         <div class="flex flex-col items-center">
@@ -105,8 +108,8 @@
         <button
           class="btn btn-primary {!isFormValid && 'btn-disabled'}"
           type="submit"
-          on:click={() => {
-            dispatch("confirm");
+          onclick={() => {
+            confirm();
           }}
         >
           {t("common.upload")}

@@ -6,16 +6,29 @@
 
   const t = useTranslations();
 
-  export let active: boolean;
-  export let isEditable: boolean;
-  export let data: any;
-  export let zIndex: number = 1;
+  interface Props {
+    active: boolean;
+    isEditable: boolean;
+    data: any;
+    zIndex?: number;
+    onSelectCart: (data: any) => void;
+    onSelectEdit?: Function;
+    onSelectDuplicate?: Function;
+    onSelectReorder?: Function;
+    onSelectDelete?: Function;
+  }
 
-  export let onSelectCart: Function;
-  export let onSelectEdit: Function;
-  export let onSelectDuplicate: Function;
-  export let onSelectReOder: Function;
-  export let onSelectDelete: Function;
+  let {
+    active,
+    isEditable,
+    data,
+    zIndex = 1,
+    onSelectCart,
+    onSelectEdit,
+    onSelectDuplicate,
+    onSelectReorder,
+    onSelectDelete,
+  }: Props = $props();
 
   let options: Option[] = [
     {
@@ -36,7 +49,7 @@
       icon: svgIcons.reorder,
       text: t("common.change-order"),
       action: () => {
-        onSelectReOder?.();
+        onSelectReorder?.();
       },
     },
     {
@@ -52,13 +65,13 @@
 {#if options.length >= 1}
   <button
     class={`relative btn w-full rounded-xl h-auto p-6 ${active ? "btn-primary " : "btn-outline border-base-300 border-2"} flex`}
-    on:click={() => {
+    onclick={() => {
       onSelectCart?.(data);
     }}
     style={`z-index: ${zIndex};`}
   >
     {#if isEditable}
-      <DropdownSection cssClasses={"absolute top-1 right-1"} {options} />
+      <DropdownSection class={"absolute top-1 right-1"} {options} />
     {/if}
     <p class="card-title text-sm font-normal">{data?.title ?? ""}</p>
   </button>

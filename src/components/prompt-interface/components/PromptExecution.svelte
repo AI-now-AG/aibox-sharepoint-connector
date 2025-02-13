@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { onMount, onDestroy } from "svelte";
   import { slide, fade } from "svelte/transition";
   import ExecutionCard from "$components/prompt-interface/components/ExecutionCard.svelte";
@@ -7,15 +7,19 @@
   import PromptResults from "./PromptResults.svelte";
   import { svgIcons } from "$assets/icons";
 
-  export let promptItems;
-  export let isEditable = false;
+  interface Props {
+    promptItems: any;
+    isEditable?: boolean;
+  }
 
-  let selectedPromptId;
-  let input = "";
-  let output = "";
-  let isProcessing = false;
-  let showButton = false;
-  let isFixed = false;
+  let { promptItems, isEditable = $bindable(false) }: Props = $props();
+
+  let selectedPromptId = $state("");
+  let input = $state("");
+  let output = $state("");
+  let isProcessing = $state(false);
+  let showButton = $state(false);
+  let isFixed = $state(false);
 
   onMount(() => {
     const handleScroll = () => {
@@ -38,15 +42,19 @@
     });
   };
 
-  $: if (input && !isFixed) {
-    setTimeout(() => {
-      isFixed = true;
-    }, 500);
-  }
+  $effect(() => {
+    if (input && !isFixed) {
+      setTimeout(() => {
+        isFixed = true;
+      }, 500);
+    }
+  });
 
-  $: if (selectedPromptId) {
-    sharedMessageHistory.set([]);
-  }
+  $effect(() => {
+    if (selectedPromptId) {
+      sharedMessageHistory.set([]);
+    }
+  });
 
   onDestroy(function () {
     sharedMessageHistory.set([]);
@@ -85,7 +93,7 @@
         <div class="relative w-full flex justify-center">
           <button
             class="absolute shadow-lg hover:shadow-2xl self-center bottom-2 btn btn-sm btn-circle"
-            on:click={() => {
+            onclick={() => {
               scrollToBottom();
             }}
           >
