@@ -662,21 +662,19 @@
         </label>
       </div>
     </div>
-  </div>
-</div>
 
-<div
-  class="container max-w-full mx-auto px-14 sticky bg-base-200 bottom-0 z-20"
->
-  <div class="flex items-center pt-2 pb-2">
-    <button
-      class="btn btn-primary"
-      onclick={() => {
-        addTanantAdminModal?.show();
-      }}
-    >
-      {t("tenant.add-tenant-admin")}
-    </button>
+    <div class="max-w-full mt-6">
+      <div class="flex items-center pt-2 pb-2">
+        <button
+          class="btn btn-primary"
+          onclick={() => {
+            addTanantAdminModal?.show();
+          }}
+        >
+          {t("tenant.add-tenant-admin")}
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 
