@@ -18,6 +18,7 @@
   import log from "$utils/log";
   import { type TenantTheme } from "$data/models/tenant.model";
   import InputDialog from "$components/InputDialog.svelte";
+  import { isValidEmail } from "$utils/common";
 
   const t = useTranslations();
 
@@ -98,6 +99,7 @@
   let selecteColor = $state(hex);
   let showPicker = $state(false);
   let tenantAdminEmail = $state("");
+  let tenantAdminEmailErrorMessage = $state("");
 
   $inspect(tenant, tenantData, textSelectedProvider, tenantAdminEmail);
 
@@ -686,8 +688,17 @@
 <InputDialog
   bind:modal={addTanantAdminModal}
   bind:value={tenantAdminEmail}
+  bind:errorMessage={tenantAdminEmailErrorMessage}
   title={t("tenant.add-tenant-admin")}
   label={t("login.email")}
+  save={(value: string) => {
+    if (!isValidEmail(value)) {
+      tenantAdminEmailErrorMessage = "Email is not valid";
+    } else {
+      tenantAdminEmailErrorMessage = "";
+      addTanantAdminModal?.close();
+    }
+  }}
 />
 <AlertDialog bind:modal={alertModal} bind:message={alertMessage} />
 <Loading bind:show={$loading} />
