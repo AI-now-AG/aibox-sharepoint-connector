@@ -1,6 +1,6 @@
 <script lang="ts">
   import FileUpload from "$components/FileUpload.svelte";
-  import { type MessageHistory, MessageRole } from "$types/MessageHistory";
+  import { MessageRole } from "$types/MessageHistory";
   import { sharedMessageHistory } from "$components/prompt-interface/components/Stores";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
@@ -39,12 +39,10 @@
   };
 
   let inputFiles: File[] = $state([]);
-  let imageFiles: File[] = [];
   let isClickOnFile = $state(false);
 
   type ModalTrigger = { showModal: () => void };
-  let imageModal: ModalTrigger,
-    fileModal: ModalTrigger = $state();
+  let fileModal: ModalTrigger | undefined = $state();
 
   function onKeyDown(e: KeyboardEvent) {
     if (e.key === "Enter" && e.ctrlKey) {
@@ -52,22 +50,12 @@
     }
   }
 
-  function preventDefault(fn) {
-    return function (event) {
+  function preventDefault(fn: { (): Promise<void>; call?: any }) {
+    return function (this: unknown, event: { preventDefault: () => void }) {
       event.preventDefault();
       fn.call(this, event);
     };
   }
-
-  const readImageContent = (image: File) => {
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        resolve(reader.result);
-      };
-      reader.readAsDataURL(image);
-    });
-  };
 
   const readFileContent = (file: File) => {
     return new Promise((resolve) => {
@@ -95,28 +83,6 @@
       try {
         const userInputFilesList: FileInput[] = [];
         const userInputImagesList: FileInput[] = [];
-        /*await Promise.all(
-          inputFiles.map(async (file) => {
-            const userInputFile = {
-              name: file.name,
-              content: await readFileContent(file),
-              type: file.type,
-            };
-            userInputFilesList.push(userInputFile);
-          }),
-        );
-
-        await Promise.all(
-          imageFiles.map(async (image) => {
-            const imageContent = await readImageContent(image);
-            const userInputImage = {
-              name: image.name,
-              content: imageContent,
-              type: image.type,
-            };
-            userInputImagesList.push(userInputImage);
-          }),
-        );*/
 
         await Promise.all(
           inputFiles.map(async (file) => {
@@ -241,6 +207,7 @@
       bind:value={inputText}
       onkeydown={onKeyDown}
     ></textarea>
+    <!-- svelte-ignore a11y_consider_explicit_label -->
     <button
       type="button"
       onclick={clearText}
@@ -275,7 +242,7 @@
           disabled={!promptId}
           onclick={() => {
             isClickOnFile = true;
-            fileModal.showModal();
+            fileModal?.showModal();
           }}
         >
           <svg
@@ -331,12 +298,6 @@
   </div>
   <div>
     <input type="checkbox" class="modal-toggle" />
-    <!-- <FileUpload
-      bind:modal={imageModal}
-      title="Upload Images"
-      acceptedTypes={imageTypes}
-      bind:files={imageFiles}
-    /> -->
     <FileUpload
       bind:modal={fileModal}
       title="Upload Files"
@@ -345,6 +306,7 @@
     />
   </div>
 </div>
+
 {#if $sharedMessageHistory.length > 0}
   <div class="container p-3 gap-2 items-center flex justify-center">
     {@html svgIcons.warningIcon}
