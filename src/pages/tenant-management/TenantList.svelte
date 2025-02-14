@@ -193,7 +193,7 @@
                 class="py-3 px-4 text-right relative relative-dropdown rounded-r-lg"
               >
                 <div class="dropdown dropdown-hover dropdown-end">
-                  <button tabindex="0" class="btn btn-ghost btn-sm z-50">
+                  <button class="btn btn-ghost btn-sm z-50">
                     {@html svgIcons.threeDot}
                   </button>
                   <ul

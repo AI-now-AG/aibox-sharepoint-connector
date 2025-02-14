@@ -107,9 +107,8 @@
       </svg>
     </label>
     {#if items}
-      <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
       <ul
-        tabindex="0"
+        tabindex="-1"
         class="dropdown-content menu bg-base-100 space-y-2 rounded-box z-[1] w-52 p-2 shadow"
       >
         {#each items as item}

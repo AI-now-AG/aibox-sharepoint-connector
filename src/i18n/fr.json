@@ -22,7 +22,7 @@
   "nav.settings.admin": "ADMIN",
   "nav.tenant-management": "Tenant Management",
   "nav.audiotool": "AI AUDIO TOOLS",
-  "nav.audiotool.audio-to-text": "Audio to text (Beta)",
+  "nav.audiotool.audio-to-text": "Audio to text",
   "login.welcome": "Welcome to",
   "login.title": "Sign in to your account",
   "login.email": "Email",
