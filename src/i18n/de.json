@@ -274,9 +274,9 @@
   "transcription.supportted-file-extensions-json": "JSON",
   "settings.transcription.subtitles-title-json": "Untertitel aus JSON",
   "settings.transcription.subtitles-description-json": "Verwandeln Sie Ihre JSON-Dateien mit nur wenigen Klicks in Untertitel. Unser Tool extrahiert Dialoge, synchronisiert Zeitstempel und formatiert sie in SRT- oder ASS-Dateien. Ideal für Videos, Präsentationen und mehr.",
-  "settings.transcription.subtitle.largefile-title": "Subtitle audio large",
-  "settings.transcription.subtitle.largefile-description": "Effortlessly create subtitles for your videos or TV shows and chose your preferred format.",
-  "audiotools.subtitles.select.languageTranscription": "Select language for transcription",
-  "audiotools.subtitles.languageSettings": "Language Settings",
-  "tenant.add-tenant-admin": "Add Tenant Admin"
+  "settings.transcription.subtitle.largefile-title": "Untertitel Audio Plus",
+  "settings.transcription.subtitle.largefile-description": "Erstelle deine Untertitel für deine Videos und Fernsehsendungen und wähle die gewünschten Formate aus.",
+  "audiotools.subtitles.select.languageTranscription": "Welche Sprachen kommen in der Aufnahme vor?",
+  "audiotools.subtitles.languageSettings": "Spracheinstellungen",
+  "tenant.add-tenant-admin": "Tenant Admin hinzufügen"
 }
