@@ -4,6 +4,7 @@
   import { sharedMessageHistory } from "$components/prompt-interface/components/Stores";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
+  import { preventDefault } from "$utils/common";
   const t = useTranslations();
 
   interface Props {
@@ -48,13 +49,6 @@
     if (e.key === "Enter" && e.ctrlKey) {
       fetchHeadline();
     }
-  }
-
-  function preventDefault(fn: { (): Promise<void>; call?: any }) {
-    return function (this: unknown, event: { preventDefault: () => void }) {
-      event.preventDefault();
-      fn.call(this, event);
-    };
   }
 
   const readFileContent = (file: File) => {

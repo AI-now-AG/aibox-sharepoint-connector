@@ -2,6 +2,7 @@
   import type { CreateInstructionParams } from "$pages/api/instructions.json";
   import { useTranslations } from "$i18n/utils";
   import { onMount } from "svelte";
+  import { preventDefault } from "$utils/common";
 
   const t = useTranslations();
 
@@ -24,13 +25,6 @@
       instructionText = instruction.instruction;
     }
   });
-
-  function preventDefault(fn) {
-		return function (event) {
-			event.preventDefault();
-			fn.call(this, event);
-		};
-	}
 
   async function saveInstruction() {
     isSaving = true;

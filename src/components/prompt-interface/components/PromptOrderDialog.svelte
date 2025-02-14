@@ -2,6 +2,7 @@
   import { dndzone } from "svelte-dnd-action";
   import { useTranslations } from "$i18n/utils";
   import { svgIcons } from "$assets/icons";
+  import { preventDefault } from "$utils/common";
   const t = useTranslations();
 
   interface Props {
@@ -20,13 +21,6 @@
 
   const flipDurationMs = 300;
   const dropTargetStyle: any = { outline: "" };
-
-  function preventDefault(fn) {
-    return function (event) {
-      event.preventDefault();
-      fn.call(this, event);
-    };
-  }
 
   function handleDndConsider(e: { detail: { items: any[] } }) {
     items = e.detail.items;

@@ -4,6 +4,8 @@
   import { onMount } from "svelte";
   import { addToast } from "$stores/toast";
   import { svgIcons } from "$assets/icons";
+  import { preventDefault } from "$utils/common";
+  
   const t = useTranslations();
 
   let knowledgeBaseTitle = $state("");
@@ -27,13 +29,6 @@
       knowledgeBaseText = knowledgeBase.knowledge_base;
     }
   });
-
-  function preventDefault(fn) {
-		return function (event) {
-			event.preventDefault();
-			fn.call(this, event);
-		};
-	}
 
   async function saveInstruction() {
     if (!isFormValid) return;

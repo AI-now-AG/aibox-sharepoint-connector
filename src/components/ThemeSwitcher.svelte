@@ -1,5 +1,6 @@
 <script>
   import { onMount } from "svelte";
+  import { preventDefault } from "$utils/common";
 
   const themes = [
     {
@@ -43,13 +44,6 @@
       document.documentElement.setAttribute("data-theme", theme);
     }
   });
-
-  function preventDefault(fn) {
-    return function (event) {
-      event.preventDefault();
-      fn.call(this, event);
-    };
-  }
 </script>
 
 <ul

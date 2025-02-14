@@ -4,6 +4,7 @@
   import { useTranslations } from "$i18n/utils";
   import { addToast } from "$stores/toast";
   import Input from "$components/Input/Input.svelte";
+  import { preventDefault } from "$utils/common";
 
   interface Props {
     name?: string;
@@ -16,17 +17,10 @@
     name = $bindable(""),
     email = "",
     organization = "",
-    roles = ""
+    roles = "",
   }: Props = $props();
 
   const t = useTranslations();
-
-  function preventDefault(fn) {
-		return function (event) {
-			event.preventDefault();
-			fn.call(this, event);
-		};
-	}
 
   function handleNameChange(event: any) {
     name = event.value;
