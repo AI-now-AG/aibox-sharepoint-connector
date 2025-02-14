@@ -499,8 +499,10 @@ export async function fetchTranscription(
   const transcriptionText = enableDiarization
     ? formatTranscription(data)
     : combinedPhrases
-        .map((phrase) => phrase.display) // Extract 'display' from each phrase
-        .join(" ");
+        // .filter((pharse) => pharse.channel === 0)
+        // .map((phrase) => phrase.display)
+        .map((phrase) => `Channel ${phrase.channel}:\n\n${phrase.display}`)
+        .join("\n\n\n");
 
   return { jsonData: data, transcriptionText };
 }
