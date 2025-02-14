@@ -65,7 +65,9 @@
   <div class="flex flex-col space-y-6">
     <p class="text-base font-normal">
       {#if selectedPromptId}
-        {promptItems.filter((e) => e._id === selectedPromptId)[0].description}
+        {promptItems.filter(
+          (e: { _id: string }) => e._id === selectedPromptId,
+        )[0].description}
       {/if}
     </p>
     <ExecutionCard cards={promptItems} bind:selectedPromptId bind:isEditable />
