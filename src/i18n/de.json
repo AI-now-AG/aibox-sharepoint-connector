@@ -271,7 +271,7 @@
   "tenant.delete-successful": "Tenant erfolgreich gelöscht",
   "tenant.delete-failed": "Löschen des Tenants fehlgeschlagen",
   "user.id": "Benutzer-ID",
-  "transcription.supportted-file-extensions-json\n": "JSON",
+  "transcription.supportted-file-extensions-json": "JSON",
   "settings.transcription.subtitles-title-json": "Untertitel aus JSON",
   "settings.transcription.subtitles-description-json": "Verwandeln Sie Ihre JSON-Dateien mit nur wenigen Klicks in Untertitel. Unser Tool extrahiert Dialoge, synchronisiert Zeitstempel und formatiert sie in SRT- oder ASS-Dateien. Ideal für Videos, Präsentationen und mehr.",
   "settings.transcription.subtitle.largefile-title": "Subtitle audio large",
