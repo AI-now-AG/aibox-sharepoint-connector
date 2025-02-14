@@ -234,9 +234,7 @@
     <textarea
       name="input"
       id="input"
-      class={`textarea textarea-ghost ${
-        $sharedMessageHistory.length > 0 ? `h-18` : `h-25`
-      } w-full focus:outline-none focus:border-base-100 text-base`}
+      class={`textarea textarea-ghost h-30 w-full focus:outline-none focus:border-base-100 text-base`}
       placeholder="Your input..."
       bind:value={inputText}
       onkeydown={onKeyDown}

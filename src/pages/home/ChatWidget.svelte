@@ -13,6 +13,8 @@
   onDestroy(function () {
     sharedMessageHistory.set([]);
   });
+
+  $inspect(input, output);
 </script>
 
 <div class="grid grid-cols-1 grid-rows-[1fr_min-content] space-y-6 h-full">
