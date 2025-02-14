@@ -14,11 +14,12 @@ import TenantModel, {
   TenantTheme,
   type Tenant,
 } from "$data/models/tenant.model";
+import UserModel, { assignPermissions } from "$data/models/user.model";
 import PromptModel from "$data/models/prompt.model";
 import CategoryModel from "$data/models/category.model";
 import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
 import { ApiKeyProvider } from "$types/TenantFeature";
-import { UserRole } from "$enums/Users";
+import { EncryptedUserPassword, UserRole } from "$enums/Users";
 
 const TenantInputParamsSchema = z.object({
   name: z.string(),
@@ -92,35 +93,57 @@ const assignMemberRoles = async (
 };
 
 const setupTenantAdmin = async (
+  dbOrgId: string,
   organizationId: string,
   email: string,
   name?: string,
 ) => {
+  let user;
   let userId;
+
+  let oldRoles: string[] = [];
+  let newRoles: UserRole[] = [UserRole.User, UserRole.Admin];
+
   let existingUsers = await usersManagement.getByEmail(email?.trim());
   if (
     existingUsers &&
-    Array.isArray(existingUsers) &&
-    existingUsers.length > 0
+    Array.isArray(existingUsers.data) &&
+    existingUsers.data.length > 0
   ) {
-    userId = existingUsers.data[0].user_id;
-    console.log("Assign existing user to Admin", existingUsers.data[0]);
+    user = existingUsers.data[0];
+    userId = user.user_id;
+    console.log("Assign existing user to Admin", user);
   } else {
-    const newUser = await usersManagement.create({
+    const newUserResult = await usersManagement.create({
       email: email,
       name: name ?? "Admin",
       connection: "Username-Password-Authentication",
-      password:
-        "dea510d6a7e4e4c0e5f81ce9a8c9eb4c:43bb938b99ae20bceb3641bccb9c663a7d602db3a189a11e8e3228eb63ce1bc3",
+      password: EncryptedUserPassword,
     });
-    userId = newUser.data.user_id;
-    console.log("Create new Amin user", newUser.data);
+    user = newUserResult.data;
+    userId = user.user_id;
+    console.log("Create new Amin user", user);
   }
+
+  await UserModel.upsertByAuth0Sub(userId, {
+    tenant_id: new ObjectId(dbOrgId),
+    auth0_sub: user.user_id,
+    username: user.nickname,
+    name: user.name,
+    email: user.email,
+    picture: user.picture,
+    roles: newRoles,
+    permissions: assignPermissions(newRoles),
+    last_login: user.last_login?.toString(),
+    logins_count: user.logins_count || 0,
+    email_verified: user.email_verified,
+    blocked: user.blocked,
+  });
 
   // Add user to Auth0 organization and assign roles
   await Promise.all([
     organizationsManagement.addMembers(organizationId, [userId]),
-    assignMemberRoles(organizationId, userId, [], [UserRole.Admin]),
+    assignMemberRoles(organizationId, userId, oldRoles, newRoles),
   ]);
 };
 
@@ -164,12 +187,14 @@ export const tenant = {
           org_id: organizationId,
         };
         const insertResult = await TenantModel.create(tenant);
+        console.log("insertResult.insertedId", insertResult.insertedId);
         if (input.tenant_admin_email) {
-          await setupTenantAdmin(
-            organizationId,
-            input.tenant_admin_email,
-            "Admin",
-          );
+          insertResult.insertedId,
+            await setupTenantAdmin(
+              organizationId,
+              input.tenant_admin_email,
+              "Admin",
+            );
         }
         await session.commitTransaction();
         return transformRawData(insertResult);
@@ -203,6 +228,7 @@ export const tenant = {
 
         if (input.tenant_admin_email) {
           await setupTenantAdmin(
+            input._id,
             organizationId,
             input.tenant_admin_email,
             "Admin",
