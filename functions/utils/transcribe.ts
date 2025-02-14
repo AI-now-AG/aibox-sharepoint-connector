@@ -387,6 +387,7 @@ export async function transcribeUsingAzureOpenAI(
       transcribeParams.isDiarizationEnabled,
       maxNumberOfSpeakers,
       transcribeParams.transcriptionType,
+      transcribeParams.languageLocales,
     );
     const outputURLs: { [key: string]: string } = {};
     /*const outputURLs = await uploadLargeFile(

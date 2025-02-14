@@ -71,23 +71,23 @@
   let jsonFileChecked = $state(selectedFileFormat.includes(FileFormat.JSON));
   let txtFileChecked = $state(selectedFileFormat.includes(FileFormat.TXT));
 
-  let items: Item[] = $state([
+  let languageLocales: Item[] = $state([
     { title: "Deutsch (Schweiz)", checked: false, locales: "de-ch" },
     { title: "Französisch (Schweiz)", checked: false, locales: "fr-ch" },
     { title: "Italienisch (Schweiz)", checked: false, locales: "it-ch" },
     { title: "Englisch (UK)", checked: false, locales: "en-gb" },
   ]);
   const inputValue = $derived(
-    items
+    languageLocales
       .filter((e) => e.checked === true)
       .map((e) => e.title)
       .join(", "),
   );
 
   function handleSelectedItems(selected: Item) {
-    const idx = items.indexOf(selected);
+    const idx = languageLocales.indexOf(selected);
     if (idx !== -1) {
-      items[idx].checked = !items[idx].checked;
+      languageLocales[idx].checked = !languageLocales[idx].checked;
     }
   }
 
@@ -584,6 +584,9 @@
       speechRegion: tenant?.speech_region,
       isDiarizationEnabled: isDiarizationEnabled,
       maxSpeakers: parseInt(maxNumberOfSpeakers.toString()),
+      languageLocales: languageLocales
+        .filter((item) => item.checked)
+        .map((item) => item.locales),
     };
   }
 
@@ -1307,12 +1310,12 @@
               />
             </svg>
           </label>
-          {#if items}
+          {#if languageLocales}
             <ul
               tabindex="-1"
               class="dropdown-content menu bg-base-100 space-y-2 rounded-box z-[1] w-52 p-2 shadow"
             >
-              {#each items as item}
+              {#each languageLocales as item}
                 <li>
                   <button
                     onclick={preventDefault(() => handleSelectedItems(item))}

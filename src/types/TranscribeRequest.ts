@@ -27,6 +27,7 @@ export interface TranscribeRequest {
   audioBuffer?: Buffer;
   isDiarizationEnabled?: boolean;
   maxSpeakers?: number;
+  languageLocales?: string[];
 }
 
 export enum FileFormat {

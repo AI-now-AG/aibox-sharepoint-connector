@@ -36,6 +36,7 @@ export async function processTranscription(
   enableDiarization: boolean = false,
   numberOfMaxSpeakers: number = 2,
   transcriptionType: TranscriptionType = TranscriptionType.Largefile,
+  languageLocales?: string[],
 ): Promise<{ transcriptionText: string }> {
   //): Promise<{ jsonData: TranscriptionResponse; transcriptionText: string }> {
   try {
@@ -54,6 +55,7 @@ export async function processTranscription(
       subscriptionKey,
       speechRegion,
       transcriptionType,
+      languageLocales,
     );
     console.log("Created trancription task:" + taskResponse.self);
     updateStatus({
@@ -95,6 +97,7 @@ export async function createTranscriptionTask(
   subscriptionKey: string,
   speechRegion: string,
   transcriptionType: TranscriptionType = TranscriptionType.Largefile,
+  languageLocales?: string[],
 ): Promise<PollStatusResponse> {
   const url = `https://${speechRegion}.api.cognitive.microsoft.com/speechtotext/v3.2/transcriptions`;
   const destinationContainerUrl = await createDestinationContainerUrl();
@@ -109,7 +112,13 @@ export async function createTranscriptionTask(
         transcriptionType === TranscriptionType.SubtitleLarge ? false : true,
       diarizationEnabled: enableDiarization,
       languageIdentification: {
-        candidateLocales: ["fr-ch", "it-ch", "en-us", "en-gb", "de-ch"],
+        candidateLocales: languageLocales || [
+          "fr-ch",
+          "it-ch",
+          "en-us",
+          "en-gb",
+          "de-ch",
+        ],
       },
       punctuationMode: "DictatedAndAutomatic",
       profanityFilterMode: "None",
