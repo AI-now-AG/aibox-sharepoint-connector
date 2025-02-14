@@ -3,7 +3,7 @@
 import Layout from "$layouts/Layout.astro";
 //import { Image } from "astro:assets";
 //import Card from "$components/content/Card.astro";
-import PromptInput from "$pages/home/PromptInput.svelte";
+import ChatInput from "$pages/home/ChatInput.svelte";
 import { getCollection } from "astro:content";
 
 import { useTranslations } from "$i18n/utils";
@@ -65,6 +65,6 @@ const allContent = await getCollection("aibox");
   </div>
 
   <div class="container max-w-5xl mx-auto px-6 justify-center py-6">
-    <PromptInput client:load />
+    <ChatInput client:load />
   </div>
 </Layout>
