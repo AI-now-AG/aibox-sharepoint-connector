@@ -101,7 +101,10 @@
   let tenantAdminEmail = $state("");
   let tenantAdminEmailErrorMessage = $state("");
 
-  $inspect(tenant, tenantData, textSelectedProvider, tenantAdminEmail);
+  $inspect(tenant);
+  $inspect(tenantData);
+  $inspect(textSelectedProvider);
+  $inspect(tenantAdminEmail);
 
   // set default values
   if (tenantData && !tenantData.default_language) {
