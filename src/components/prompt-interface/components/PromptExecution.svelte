@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
-  import { slide, fade } from "svelte/transition";
+  import { slide } from "svelte/transition";
   import ExecutionCard from "$components/prompt-interface/components/ExecutionCard.svelte";
   import { sharedMessageHistory } from "$components/prompt-interface/components/Stores";
   import InputArea from "./Input.svelte";
@@ -87,7 +87,6 @@
     {/if}
     <PromptResults bind:output bind:isProcessing />
   </div>
-  <!-- <InputArea bind:promptId={selectedPromptId} bind:input bind:output /> -->
 
   <div class="sticky bottom-0 bg-base-200" transition:slide={{ duration: 500 }}>
     {#if $sharedMessageHistory.length > 0}
