@@ -5,7 +5,7 @@ import {
 } from "@netlify/functions";
 import { uploadLargeFile, uploadSubtitleLargeFiles } from "./utils/transcribe";
 import { updateTask } from "$shared/transcriptionTasks";
-import { processTranscriptionResult } from "./utils/batchTranscription";
+import { processTranscriptionResult, updateStatus } from "./utils/batchTranscription";
 import { decrypt } from "$utils/secure";
 import {
   FileFormat,
@@ -92,6 +92,7 @@ const postAudioProProcess: Handler = async (
 
     let outputURLs: { [key: string]: string } = {};
     if (typedTranscriptionType === TranscriptionType.SubtitleLarge) {
+      updateStatus({ uniqueName, name: "Creating Subtitle files" });
       const tenant = await TenantModel.get(tenantId);
       const user = await UserModel.get(userId);
 
@@ -132,6 +133,7 @@ const postAudioProProcess: Handler = async (
         isShowImprovedTextPreview,
         transcribeParams,
       );
+      updateStatus({ uniqueName, name: "Subtitle files created" });
     } else {
       outputURLs = await uploadLargeFile(
         uploadUrl,

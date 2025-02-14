@@ -102,6 +102,10 @@
       //maxFileSize = 25; // this is for testing purpose
     }
 
+    if (transcriptionType == TranscriptionType.SubtitleLarge) {
+      maxFileSize = 50;
+    }
+
     if ($transcriptStore && transcriptionType) {
       retrieveDataInStore(transcriptionType);
     }
@@ -964,6 +968,8 @@
             <p class="text-xs text-base-content/40 mt-8">
               {#if transcriptionType === TranscriptionType.Largefile}
                 {t("transcription.maximum-capacity-1gb")}
+              {:else if transcriptionType === TranscriptionType.SubtitleLarge}
+                {t("transcription.maximum-capacity-50mb")}
               {:else}
                 {t("transcription.maximum-capacity-25mb")}
               {/if}
@@ -1273,7 +1279,7 @@
               viewBox="0 0 14 14"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
-              class="mr-2"
+              class="mr-2 flex-none"
             >
               <path
                 d="M13 13L9 9M10.3333 5.66667C10.3333 8.244 8.244 10.3333 5.66667 10.3333C3.08934 10.3333 1 8.244 1 5.66667C1 3.08934 3.08934 1 5.66667 1C8.244 1 10.3333 3.08934 10.3333 5.66667Z"
@@ -1291,7 +1297,7 @@
               )}
               value={inputValue}
               role="button"
-              class="grow font-medium min-w-xs bg-red-300"
+              class="w-auto min-w-0 font-medium grow"
               readonly
             />
             <svg
@@ -1300,6 +1306,7 @@
               viewBox="0 0 12 7"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
+              class="flex-none"
             >
               <path
                 d="M10.6663 1L5.99967 5.66667L1.33301 1"

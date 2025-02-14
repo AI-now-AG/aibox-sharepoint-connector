@@ -525,9 +525,12 @@ export async function uploadSubtitleLargeFiles(
     .slice(0, -1)
     .join(".");
 
-  const displayWords = jsonData.recognizedPhrases
-    .flatMap((phrase) => phrase.nBest)
-    .flatMap((n) => n.words ?? []);
+  const displayWords = jsonData.recognizedPhrases.map((phrase) => {
+    const bestMatch = phrase.nBest.reduce((best, current) => {
+      return current.confidence > best.confidence ? current : best;
+    });
+    return bestMatch;
+  }).flatMap((n) => n.words ?? []);
   const formattedWords = createSRTDataLarge(displayWords);
   await uploadSubtitleFiles(
     selectedFileFormat,

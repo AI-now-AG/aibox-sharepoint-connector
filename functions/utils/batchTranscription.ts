@@ -113,11 +113,11 @@ export async function createTranscriptionTask(
       diarizationEnabled: enableDiarization,
       languageIdentification: {
         candidateLocales: languageLocales || [
+          "de-ch",
           "fr-ch",
           "it-ch",
-          "en-us",
           "en-gb",
-          "de-ch",
+          "en-us",
         ],
       },
       punctuationMode: "DictatedAndAutomatic",
