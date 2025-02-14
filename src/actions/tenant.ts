@@ -189,12 +189,12 @@ export const tenant = {
         const insertResult = await TenantModel.create(tenant);
         console.log("insertResult.insertedId", insertResult.insertedId);
         if (input.tenant_admin_email) {
-          insertResult.insertedId,
-            await setupTenantAdmin(
-              organizationId,
-              input.tenant_admin_email,
-              "Admin",
-            );
+          await setupTenantAdmin(
+            insertResult.insertedId.toString(),
+            organizationId,
+            input.tenant_admin_email,
+            "Admin",
+          );
         }
         await session.commitTransaction();
         return transformRawData(insertResult);
