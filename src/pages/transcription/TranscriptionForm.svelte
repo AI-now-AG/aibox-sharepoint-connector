@@ -72,8 +72,8 @@
   let txtFileChecked = $state(selectedFileFormat.includes(FileFormat.TXT));
 
   let languageLocales: Item[] = $state([
-    { title: "Deutsch (Schweiz)", checked: false, locales: "de-ch" },
-    { title: "Französisch (Schweiz)", checked: false, locales: "fr-ch" },
+    { title: "Deutsch (Schweiz)", checked: true, locales: "de-ch" },
+    { title: "Französisch (Schweiz)", checked: true, locales: "fr-ch" },
     { title: "Italienisch (Schweiz)", checked: false, locales: "it-ch" },
     { title: "Englisch (UK)", checked: false, locales: "en-gb" },
   ]);
@@ -82,6 +82,10 @@
       .filter((e) => e.checked === true)
       .map((e) => e.title)
       .join(", "),
+  );
+
+  const selectedLangLength = $derived(
+    languageLocales.filter((e) => e.checked === true).length,
   );
 
   function handleSelectedItems(selected: Item) {
@@ -1270,68 +1274,71 @@
   {#if transcriptionType === TranscriptionType.SubtitleLarge}
     <div class="bg-base-100 mt-10 p-4 px-6 rounded-xl">
       <p class="mb-2">{t("audiotools.subtitles.languageSettings")}</p>
-      <div class="relative flex flex-col mt-4 max-w-96">
-        <div class="dropdown dropdown-bottom min-w-xs">
-          <label class="input input-bordered flex flex-row items-center gap-2">
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 14 14"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              class="mr-2 flex-none"
+      <div class="flex flex-row items-center mt-4 space-x-4">
+        <div class="relative flex flex-col max-w-96">
+          <div class="dropdown dropdown-bottom min-w-xs">
+            <label
+              class="input input-bordered flex flex-row items-center gap-2"
             >
-              <path
-                d="M13 13L9 9M10.3333 5.66667C10.3333 8.244 8.244 10.3333 5.66667 10.3333C3.08934 10.3333 1 8.244 1 5.66667C1 3.08934 3.08934 1 5.66667 1C8.244 1 10.3333 3.08934 10.3333 5.66667Z"
-                stroke="#111827"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 14 14"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                class="mr-2 flex-none"
+              >
+                <path
+                  d="M13 13L9 9M10.3333 5.66667C10.3333 8.244 8.244 10.3333 5.66667 10.3333C3.08934 10.3333 1 8.244 1 5.66667C1 3.08934 3.08934 1 5.66667 1C8.244 1 10.3333 3.08934 10.3333 5.66667Z"
+                  stroke="#111827"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
 
-            <input
-              type="text"
-              placeholder={t(
-                "audiotools.subtitles.select.languageTranscription",
-              )}
-              value={inputValue}
-              role="button"
-              class="w-auto min-w-0 font-medium grow"
-              readonly
-            />
-            <svg
-              width="12"
-              height="7"
-              viewBox="0 0 12 7"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              class="flex-none"
-            >
-              <path
-                d="M10.6663 1L5.99967 5.66667L1.33301 1"
-                stroke="#111827"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+              <input
+                type="text"
+                placeholder={t(
+                  "audiotools.subtitles.select.languageTranscription",
+                )}
+                value={inputValue}
+                role="button"
+                class="w-auto min-w-0 font-medium grow"
+                readonly
               />
-            </svg>
-          </label>
-          {#if languageLocales}
-            <ul
-              tabindex="-1"
-              class="dropdown-content menu bg-base-100 space-y-2 rounded-box z-[1] w-52 p-2 shadow"
-            >
-              {#each languageLocales as item}
-                <li>
-                  <button
-                    onclick={preventDefault(() => handleSelectedItems(item))}
-                    class={`${item.checked === true ? "bg-primary text-base-100 hover:bg-primary" : "hover:text-neutral"}`}
-                  >
-                    {item.title}
-                  </button>
+              <svg
+                width="12"
+                height="7"
+                viewBox="0 0 12 7"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                class="flex-none"
+              >
+                <path
+                  d="M10.6663 1L5.99967 5.66667L1.33301 1"
+                  stroke="#111827"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </label>
+            {#if languageLocales}
+              <ul
+                tabindex="-1"
+                class="dropdown-content menu bg-base-100 space-y-2 rounded-box z-[1] w-52 p-2 shadow"
+              >
+                {#each languageLocales as item}
+                  <li>
+                    <button
+                      onclick={preventDefault(() => handleSelectedItems(item))}
+                      class={`${item.checked === true ? "bg-primary text-base-100 hover:bg-primary" : "hover:text-neutral"}`}
+                    >
+                      {item.title}
+                    </button>
 
-                  <!-- <label class="flex items-center">
+                    <!-- <label class="flex items-center">
                     <input
                       type="checkbox"
                       class="checkbox checkbox-sm checkbox-neutral"
@@ -1340,11 +1347,30 @@
                     />
                     <span class="font-normal">{item.title}</span>
                   </label> -->
-                </li>
-              {/each}
-            </ul>
-          {/if}
+                  </li>
+                {/each}
+              </ul>
+            {/if}
+          </div>
         </div>
+        {#if selectedLangLength < 2}
+          <div transition:slide role="alert" class="alert alert-warning">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6 shrink-0 stroke-current"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              />
+            </svg>
+            <span>Wählen Sie mindestens 2 Sprachen aus!</span>
+          </div>
+        {/if}
       </div>
     </div>
   {/if}
@@ -1357,7 +1383,7 @@
     {#if !isTranscipted}
       <button
         class={`btn btn-active btn-primary btn-sm text-base-100`}
-        disabled={!isUploaded || !isFormValid || isTranscribing}
+        disabled={!isUploaded || !isFormValid || isTranscribing || (transcriptionType === TranscriptionType.SubtitleLarge && selectedLangLength < 2)}
         onclick={transcribe}
         >{t("transciption.model.cta.start-transcribing")}</button
       >
