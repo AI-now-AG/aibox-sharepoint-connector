@@ -276,5 +276,7 @@
   "settings.transcription.subtitles-description-json": "Transform your JSON files into subtitles with just a few clicks. Our tool extracts dialogue, syncs timestamps, and formats them into SRT or ASS files. Ideal for videos, presentations, and more.",
   "settings.transcription.subtitle.largefile-title": "Subtitle audio large",
   "settings.transcription.subtitle.largefile-description": "Effortlessly create subtitles for your videos or TV shows and chose your preferred format.",
+  "audiotools.subtitles.select.languageTranscription": "Select language for transcription",
+  "audiotools.subtitles.languageSettings": "Language Settings",
   "tenant.add-tenant-admin": "Add Tenant Admin"
 }
