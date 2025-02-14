@@ -6,14 +6,12 @@
   const t = useTranslations();
 
   interface Props {
-    promptId?: string;
     input?: string;
     output?: string;
     isProcessing?: boolean;
   }
 
   let {
-    promptId = $bindable(""),
     input = $bindable(""),
     output = $bindable(""),
     isProcessing = $bindable(false),
@@ -132,20 +130,23 @@
           }),
         );
 
-        const response = await fetch(`/api/prompts/${promptId}.json`, {
-          method: "POST",
-          body: JSON.stringify({
-            article: inputText,
-            promptId: promptId,
-            files: userInputFilesList,
-            images: userInputImagesList,
-            messageHistory: $sharedMessageHistory,
-          }),
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
+        const response = await fetch(
+          `/api/prompts/67ac68aa229a55b7ea8ab56b.json`,
+          {
+            method: "POST",
+            body: JSON.stringify({
+              article: inputText,
+              promptId: "67ac68aa229a55b7ea8ab56b",
+              files: userInputFilesList,
+              images: userInputImagesList,
+              messageHistory: $sharedMessageHistory,
+            }),
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
           },
-        });
+        );
 
         const reader = response.body?.getReader();
         let partialData = "";
@@ -272,7 +273,6 @@
       {#if $sharedMessageHistory.length == 0}
         <button
           class="btn h-auto w-auto p-1 min-h-0 hover:text-base-content/60"
-          disabled={!promptId}
           onclick={() => {
             isClickOnFile = true;
             fileModal.showModal();
@@ -305,7 +305,7 @@
     <div class="flex self-end">
       <button
         class="btn btn-ghost btn-md disabled:bg-base-100 disabled:text-slate-500 disabled:cursor-not-allowed"
-        disabled={!promptId || (!inputText && inputFiles.length === 0)}
+        disabled={!inputText && inputFiles.length === 0}
         onclick={preventDefault(fetchHeadline)}
         aria-label="Fetch"
       >
@@ -316,7 +316,7 @@
           fill="currentColor"
           xmlns="http://www.w3.org/2000/svg"
           class={`w-8 h-8 ${
-            promptId && (inputText || inputFiles.length > 0)
+            inputText || inputFiles.length > 0
               ? "text-primary"
               : "text-base-300"
           }`}
@@ -331,19 +331,5 @@
   </div>
   <div>
     <input type="checkbox" class="modal-toggle" />
-    <!-- <FileUpload
-      bind:modal={fileModal}
-      title="Upload Files"
-      acceptedTypes={fileTypes}
-      bind:files={inputFiles}
-    /> -->
   </div>
 </div>
-{#if $sharedMessageHistory.length > 0}
-  <div class="container p-3 gap-2 items-center flex justify-center">
-    {@html svgIcons.warningIcon}
-    <p class="text-xs text-neutral">
-      {t("prompt-execution.historyRemove.info")}
-    </p>
-  </div>
-{/if}
