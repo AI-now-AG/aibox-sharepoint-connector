@@ -1,6 +1,7 @@
 ---
 import Layout from "$layouts/Layout.astro";
 import { getEntry } from "astro:content";
+import { svgIcons } from "$assets/icons";
 
 const { slug } = Astro.params;
 if (slug === undefined) {
@@ -17,6 +18,12 @@ const { Content } = await entry.render();
 ---
 
 <Layout>
+  <div class="container max-w-5xl mx-auto px-6 justify-center py-6">
+    <a href="/" class="btn btn-outline btn-sm">
+      <span set:html={svgIcons.back} />
+    </a>
+  </div>
+
   <div class="prose mx-auto mb-12 px-6">
     <h1>{entry.data.title}</h1>
   </div>

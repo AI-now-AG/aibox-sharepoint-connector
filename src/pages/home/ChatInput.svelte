@@ -92,28 +92,6 @@
       try {
         const userInputFilesList: FileInput[] = [];
         const userInputImagesList: FileInput[] = [];
-        /*await Promise.all(
-          inputFiles.map(async (file) => {
-            const userInputFile = {
-              name: file.name,
-              content: await readFileContent(file),
-              type: file.type,
-            };
-            userInputFilesList.push(userInputFile);
-          }),
-        );
-
-        await Promise.all(
-          imageFiles.map(async (image) => {
-            const imageContent = await readImageContent(image);
-            const userInputImage = {
-              name: image.name,
-              content: imageContent,
-              type: image.type,
-            };
-            userInputImagesList.push(userInputImage);
-          }),
-        );*/
 
         await Promise.all(
           inputFiles.map(async (file) => {
