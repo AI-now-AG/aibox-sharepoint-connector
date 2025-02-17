@@ -280,7 +280,7 @@
   "audiotools.subtitles.select.languageTranscription": "Welche Sprachen kommen in der Aufnahme vor?",
   "audiotools.subtitles.languageSettings": "Spracheinstellungen",
   "tenant.add-tenant-admin": "Tenant Admin hinzufügen",
-  "tenant.email-invalid": "Email is not valid",
-  "tenant.create-tenant-admin-successful": "Create tenant admin successfully",
-  "tenant.create-tenant-admin-failed": "Create tenant admin failed"
+  "tenant.email-invalid": "Keine gültige E-Mail Adresse",
+  "tenant.create-tenant-admin-successful": "Tenant Admin wurde erfolgreich hinzugefügt",
+  "tenant.create-tenant-admin-failed": "Fehler beim hinzufügen des Tenant Admin"
 }
