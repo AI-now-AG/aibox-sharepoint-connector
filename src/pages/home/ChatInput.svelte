@@ -1,4 +1,5 @@
 <script lang="ts">
+  import FileUpload from "$components/FileUpload.svelte";
   import { type MessageHistory, MessageRole } from "$types/MessageHistory";
   import { sharedMessageHistory } from "$components/prompt-interface/components/Stores";
   import { svgIcons } from "$assets/icons";
@@ -39,9 +40,8 @@
   let imageFiles: File[] = [];
   let isClickOnFile = $state(false);
 
-  type ModalTrigger = { showModal: () => void };
-  let imageModal: ModalTrigger,
-    fileModal: ModalTrigger = $state();
+  let imageModal: HTMLDialogElement | undefined = $state();
+  let fileModal: HTMLDialogElement | undefined = $state();
 
   function onKeyDown(e: KeyboardEvent) {
     if (e.key === "Enter" && e.ctrlKey) {
@@ -329,5 +329,11 @@
   </div>
   <div>
     <input type="checkbox" class="modal-toggle" />
+    <FileUpload
+      bind:modal={fileModal}
+      title="Upload Files"
+      acceptedTypes={fileTypes}
+      bind:files={inputFiles}
+    />
   </div>
 </div>
