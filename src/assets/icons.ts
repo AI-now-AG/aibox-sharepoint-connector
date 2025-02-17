@@ -46,6 +46,8 @@ import arrowDown from "$assets/icons/arrow-down.svg?raw";
 import arrowUpDown from "$assets/icons/arrow-up-down.svg?raw";
 import sendActive from "$assets/icons/send-active.svg?raw";
 import sendInActive from "$assets/icons/send-inactive.svg?raw";
+import attachment from "$assets/icons/attachment.svg?raw";
+import erase from "$assets/icons/erase.svg?raw";
 
 export const svgIcons = {
   menuSettings,
@@ -96,4 +98,6 @@ export const svgIcons = {
   arrowUpDown,
   sendActive,
   sendInActive,
+  attachment,
+  erase
 };
