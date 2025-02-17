@@ -55,6 +55,12 @@ const TenantInputIdentifierSchema = z.object({
   _id: z.string(),
 });
 
+const CreateTenantAdminSchema = z.object({
+  _id: z.string(),
+  org_id: z.string().optional(),
+  tenant_admin_email: z.string().optional(),
+});
+
 const assignMemberRoles = async (
   organizationId: string,
   userId: string,
@@ -166,7 +172,7 @@ export const tenant = {
   }),
 
   createAdminUser: defineAction({
-    input: z.intersection(TenantInputParamsSchema, TenantInputIdentifierSchema),
+    input: CreateTenantAdminSchema,
     handler: async (input) => {
       const session = client.startSession();
       session.startTransaction();

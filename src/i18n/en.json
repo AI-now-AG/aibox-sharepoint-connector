@@ -146,6 +146,7 @@
   "transcription.input-file-upload-description": "Drag & Drop or <span style=\"color: #491EFF;\">Choose file</span> to transcribe",
   "transcription.supportted-file-extensions": "MP4, MP3, WAV, AVI, M4A, FLAC",
   "transcription.maximum-capacity-25mb": "max. file size: 25 MB",
+  "transcription.maximum-capacity-50mb": "max. file size: 50 MB",
   "transcription.maximum-capacity-1gb": "max. file size: 1 GB",
   "transciption.model.cta.start-transcribing": "Start transcribing",
   "transciption.model.cta.start-new-transciption": "Start new transciption",
@@ -278,5 +279,8 @@
   "settings.transcription.subtitle.largefile-description": "Effortlessly create subtitles for your videos or TV shows and chose your preferred format.",
   "audiotools.subtitles.select.languageTranscription": "Select language for transcription",
   "audiotools.subtitles.languageSettings": "Language Settings",
-  "tenant.add-tenant-admin": "Add Tenant Admin"
+  "tenant.add-tenant-admin": "Add Tenant Admin",
+  "tenant.email-invalid": "Email is not valid",
+  "tenant.create-tenant-admin-successful": "Create tenant admin successfully",
+  "tenant.create-tenant-admin-failed": "Create tenant admin failed"
 }

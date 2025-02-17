@@ -303,6 +303,39 @@
     }
   }
 
+  async function createTenantAdmin() {
+    try {
+      showLoading();
+      const { error } = await actions.tenant.createAdminUser({
+        _id: tenantData._id,
+        org_id: tenantData.org_id,
+        tenant_admin_email: tenantAdminEmail,
+      });
+
+      hideLoading();
+      if (error) {
+        addToast({
+          message:
+            t("tenant.create-tenant-admin-failed") + " - " + error.toString(),
+          type: "success",
+        });
+      } else {
+        addToast({
+          message: t("tenant.create-tenant-admin-successful"),
+          type: "success",
+        });
+      }
+    } catch (error: any) {
+      addToast({
+        message:
+          t("tenant.create-tenant-admin-failed") + " - " + error.toString(),
+        type: "success",
+      });
+    } finally {
+      tenantAdminEmail = "";
+    }
+  }
+
   function showAlert(message: string) {
     alertMessage = message;
     alertModal?.show();
@@ -710,10 +743,11 @@
   label={t("login.email")}
   save={(value: string) => {
     if (!isValidEmail(value)) {
-      tenantAdminEmailErrorMessage = "Email is not valid";
+      tenantAdminEmailErrorMessage = t("tenant.email-invalid");
     } else {
       tenantAdminEmailErrorMessage = "";
       addTanantAdminModal?.close();
+      createTenantAdmin();
     }
   }}
 />
