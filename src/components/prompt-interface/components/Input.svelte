@@ -66,6 +66,7 @@
 
     if (inputText || inputFiles.length > 0) {
       input = inputText;
+      clearText();
       output = "";
       isProcessing = true;
       type FileInput = {
@@ -96,7 +97,7 @@
         const response = await fetch(`/api/prompts/${promptId}.json`, {
           method: "POST",
           body: JSON.stringify({
-            article: inputText,
+            article: input,
             promptId: promptId,
             files: userInputFilesList,
             images: userInputImagesList,
@@ -110,11 +111,11 @@
 
         const reader = response.body?.getReader();
         let partialData = "";
-        if (inputText) {
+        if (input) {
           const newUserMessage = {
             role: MessageRole.User,
-            content: inputText,
-            rawData: inputText,
+            content: input,
+            rawData: input,
           };
           sharedMessageHistory.update((messages) => [
             ...messages,
@@ -148,7 +149,6 @@
             newAssistantMessage,
           ]);
           output = "";
-          clearText();
         }
         isProcessing = false;
       } catch (error) {
