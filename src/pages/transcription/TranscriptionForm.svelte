@@ -704,7 +704,10 @@
   }
 
   function startPolling() {
-    if (transcriptionType === TranscriptionType.Largefile) {
+    if (
+      transcriptionType === TranscriptionType.Largefile ||
+      transcriptionType === TranscriptionType.SubtitleLarge
+    ) {
       let fileSize = audioFile?.size;
       if (fileSize) {
         intervalId = setInterval(
@@ -1383,7 +1386,11 @@
     {#if !isTranscipted}
       <button
         class={`btn btn-active btn-primary btn-sm text-base-100`}
-        disabled={!isUploaded || !isFormValid || isTranscribing || (transcriptionType === TranscriptionType.SubtitleLarge && selectedLangLength < 2)}
+        disabled={!isUploaded ||
+          !isFormValid ||
+          isTranscribing ||
+          (transcriptionType === TranscriptionType.SubtitleLarge &&
+            selectedLangLength < 2)}
         onclick={transcribe}
         >{t("transciption.model.cta.start-transcribing")}</button
       >
