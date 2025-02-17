@@ -123,7 +123,7 @@
           ]);
         }
         if (reader) {
-          isProcessing = false;
+          // isProcessing = false;
           const decoder = new TextDecoder();
           while (true) {
             const { done, value } = await reader.read();
@@ -190,6 +190,7 @@
 <div
   class={`flex ${$sharedMessageHistory.length > 0 ? `flex-row` : `flex-col`} rounded-xl bg-base-100 border border-base-content/20 focus:ring-base-200 has-[:focus]:ring-2 has-[:focus]:ring-base-primary has-[:focus]:ring-offset-2 has-[:focus]:ring-offset-base-200`}
 >
+  {isProcessing}
   <div class="flex-1 relative">
     <textarea
       name="input"
@@ -234,11 +235,15 @@
     <div class="flex self-end">
       <button
         class="btn btn-ghost btn-md disabled:bg-base-100 disabled:text-slate-500 disabled:cursor-not-allowed"
-        disabled={!promptId || (!inputText && inputFiles.length === 0)}
-        onclick={preventDefault(fetchHeadline)}
+        disabled={!promptId ||
+          (!inputText && inputFiles.length === 0) ||
+          isProcessing}
+        onclick={preventDefault(() => {
+          fetchHeadline();
+        })}
         aria-label="Fetch"
       >
-        {#if promptId && (inputText || inputFiles.length > 0)}
+        {#if promptId && (inputText || inputFiles.length > 0) && !isProcessing}
           {@html svgIcons.sendActive}
         {:else}
           {@html svgIcons.sendInActive}
