@@ -3,14 +3,15 @@
   import { onMount } from "svelte";
   import { MessageRole } from "$types/MessageHistory";
   import { sharedMessageHistory } from "$components/prompt-interface/components/Stores";
-  import { tenant, user } from "$stores";
+  import { user } from "$stores";
   import { svgIcons } from "$assets/icons";
   interface Props {
     output: string;
     isProcessing: boolean;
   }
 
-  let { output = $bindable(""), isProcessing }: Props = $props();
+  let { output = $bindable(""), isProcessing = $bindable(false) }: Props =
+    $props();
 
   let element;
 
