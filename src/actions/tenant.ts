@@ -24,6 +24,7 @@ import { EncryptedUserPassword, UserRole } from "$enums/Users";
 const TenantInputParamsSchema = z.object({
   name: z.string(),
   org_name: z.string(),
+  org_id: z.string().optional(),
   default_language: z.string(),
   theme: z.nativeEnum(TenantTheme),
   primary_color: z.string().optional(),
@@ -164,6 +165,34 @@ export const tenant = {
     },
   }),
 
+  createAdminUser: defineAction({
+    input: z.intersection(TenantInputParamsSchema, TenantInputIdentifierSchema),
+    handler: async (input) => {
+      const session = client.startSession();
+      session.startTransaction();
+      try {
+        const dbOrgId = input._id;
+        const organizationId = input.org_id ?? "";
+
+        if (input.tenant_admin_email) {
+          await setupTenantAdmin(
+            dbOrgId,
+            organizationId,
+            input.tenant_admin_email,
+            "Admin",
+          );
+        }
+        await session.commitTransaction();
+        return {};
+      } catch (error) {
+        await session.abortTransaction();
+        throw error;
+      } finally {
+        session.endSession();
+      }
+    },
+  }),
+
   create: defineAction({
     input: TenantInputParamsSchema,
     handler: async (input) => {
@@ -187,15 +216,6 @@ export const tenant = {
           org_id: organizationId,
         };
         const insertResult = await TenantModel.create(tenant);
-        console.log("insertResult.insertedId", insertResult.insertedId);
-        if (input.tenant_admin_email) {
-          await setupTenantAdmin(
-            insertResult.insertedId.toString(),
-            organizationId,
-            input.tenant_admin_email,
-            "Admin",
-          );
-        }
         await session.commitTransaction();
         return transformRawData(insertResult);
       } catch (error) {
@@ -225,15 +245,6 @@ export const tenant = {
           display_name: input.name,
         };
         await organizationsManagement.update(organizationId, bodyParameters);
-
-        if (input.tenant_admin_email) {
-          await setupTenantAdmin(
-            input._id,
-            organizationId,
-            input.tenant_admin_email,
-            "Admin",
-          );
-        }
 
         await session.commitTransaction();
         return transformRawData(updatedDocument);

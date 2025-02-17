@@ -456,14 +456,6 @@
         </div>
       </div>
       <div class="flex-1 flex flex-col mb-4">
-        <!-- <button
-            class="btn btn-primary"
-            onclick={() => {
-              addTanantAdminModal?.show();
-            }}
-          >
-            {t("tenant.add-tenant-admin")}
-          </button> -->
         <div class="flex justify-end">
           <button
             class={"mt-7 btn btn-active btn-neutral font-normal grow-0 w-auto " +
