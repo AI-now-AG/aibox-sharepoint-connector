@@ -70,7 +70,15 @@
         )[0].description}
       {/if}
     </p>
-    <ExecutionCard cards={promptItems} bind:selectedPromptId bind:isEditable />
+    <ExecutionCard
+      cards={promptItems}
+      bind:selectedPromptId
+      bind:isEditable
+      bind:isDisabling={isProcessing}
+      onSelectCard={() => {
+        sharedMessageHistory.set([]);
+      }}
+    />
     {#if $sharedMessageHistory.length == 0}
       <div
         class="min-w-full form-wrapper"
