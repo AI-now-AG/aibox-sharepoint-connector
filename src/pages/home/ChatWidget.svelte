@@ -19,6 +19,8 @@
 
 <div class="grid grid-cols-1 grid-rows-[1fr_min-content] space-y-6 h-full">
   <div class="flex flex-col space-y-6">
+    <ChatResults bind:output bind:isProcessing />
+
     <div
       class="min-w-full form-wrapper"
       in:slide={{ duration: 500, delay: 500 }}
@@ -26,6 +28,5 @@
     >
       <ChatInput bind:input bind:output bind:isProcessing />
     </div>
-    <ChatResults bind:output bind:isProcessing />
   </div>
 </div>
