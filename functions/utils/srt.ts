@@ -116,7 +116,7 @@ export const groupLines = (data: Entry[]): Entry[] => {
 
     if (shouldUpdateEnd) {
       entry.end = nextEntry.start;
-      return true;
+      return false;
     }
     return false;
 
