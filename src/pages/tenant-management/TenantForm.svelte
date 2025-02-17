@@ -226,7 +226,9 @@
           tenantData.tenant_admin_email = tenantAdminEmail;
         }
 
-        const { error } = await actions.tenant.create(tenantData);
+        const createTanentResult = await actions.tenant.create(tenantData);
+        const { error, data: createdTenant } = createTanentResult;
+
         hideLoading();
         if (error) {
           showAlert(error?.toString());
@@ -235,7 +237,8 @@
             message: t("tenant.create-successful"),
             type: "success",
           });
-          window.location.href = "/tenant-management";
+          const { insertedId = "" } = createdTenant;
+          window.location.href = "/tenant-management/" + insertedId;
         }
       } catch (error: any) {
         showAlert(error?.toString());
@@ -311,7 +314,10 @@
   class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14 sticky bg-base-200 top-0 z-20"
 >
   <div class="flex items-center pt-5 pb-2">
-    <button class="mr-4" onclick={() => window.history.back()}>
+    <button
+      class="mr-4"
+      onclick={() => (window.location.href = "/tenant-management")}
+    >
       {@html svgIcons.back}
     </button>
     <h1 class="text-4xl font-bold">
@@ -327,7 +333,10 @@
       >
         {t("common.save")}
       </button>
-      <button class="btn" onclick={() => window.history.back()}>
+      <button
+        class="btn"
+        onclick={() => (window.location.href = "/tenant-management")}
+      >
         {t("common.cancel")}
       </button>
     </div>
