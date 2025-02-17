@@ -190,7 +190,6 @@
 <div
   class={`flex ${$sharedMessageHistory.length > 0 ? `flex-row` : `flex-col`} rounded-xl bg-base-100 border border-base-content/20 focus:ring-base-200 has-[:focus]:ring-2 has-[:focus]:ring-base-primary has-[:focus]:ring-offset-2 has-[:focus]:ring-offset-base-200`}
 >
-  {isProcessing}
   <div class="flex-1 relative">
     <textarea
       name="input"
@@ -242,9 +241,12 @@
           fetchHeadline();
         })}
         aria-label="Fetch"
-      >
-        {#if promptId && (inputText || inputFiles.length > 0) && !isProcessing}
-          {@html svgIcons.sendActive}
+        >{#if !isProcessing}
+          {#if promptId && (inputText || inputFiles.length > 0)}
+            {@html svgIcons.sendActive}
+          {:else}
+            {@html svgIcons.sendInActive}
+          {/if}
         {:else}
           {@html svgIcons.sendInActive}
         {/if}

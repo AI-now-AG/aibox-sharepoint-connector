@@ -58,9 +58,13 @@
 
   function selectCard(index: number) {
     if (isDisabling) {
+      addToast({
+        message: t("prompt-execution.a-prompt-is-being-executed-please-wait"),
+        type: "info",
+      });
       return;
     }
-    onSelectCard?.()
+    onSelectCard?.();
     selectedCardIndex = index;
     selectedPromptId = cards[index]?._id ?? "";
     storePromptId.set(selectedPromptId);
