@@ -9,6 +9,7 @@
   interface Props {
     input?: string;
     output?: string;
+    inputFiles?: string;
     isProcessing?: boolean;
   }
 
@@ -37,15 +38,11 @@
   };
 
   let inputFiles: File[] = $state([]);
-  let imageFiles: File[] = [];
-  let isClickOnFile = $state(false);
-
-  let imageModal: HTMLDialogElement | undefined = $state();
   let fileModal: HTMLDialogElement | undefined = $state();
 
   function onKeyDown(e: KeyboardEvent) {
     if (e.key === "Enter" && e.ctrlKey) {
-      fetchHeadline();
+      fetchMessage();
     }
   }
 
@@ -76,7 +73,7 @@
     });
   };
 
-  async function fetchHeadline() {
+  async function fetchMessage() {
     input = "";
 
     if (inputText || inputFiles.length > 0) {
@@ -112,7 +109,6 @@
           method: "POST",
           body: JSON.stringify({
             article: inputText,
-            promptId: "67ac68aa229a55b7ea8ab56b",
             files: userInputFilesList,
             images: userInputImagesList,
             messageHistory: $sharedMessageHistory,
@@ -209,7 +205,7 @@
     <textarea
       name="input"
       id="input"
-      class={`textarea textarea-ghost h-30 w-full focus:outline-none focus:border-base-100 text-base`}
+      class={`textarea textarea-ghost h-25 w-full focus:outline-none focus:border-base-100 text-base`}
       placeholder="Your input..."
       bind:value={inputText}
       onkeydown={onKeyDown}
@@ -230,7 +226,6 @@
         <button
           class="btn h-auto w-auto p-1 min-h-0 hover:text-base-content/60"
           onclick={() => {
-            isClickOnFile = true;
             fileModal.showModal();
           }}
         >
@@ -247,7 +242,7 @@
       <button
         class="btn btn-ghost btn-md disabled:bg-base-100 disabled:text-slate-500 disabled:cursor-not-allowed"
         disabled={!inputText && inputFiles.length === 0}
-        onclick={preventDefault(fetchHeadline)}
+        onclick={preventDefault(fetchMessage)}
         aria-label="Fetch"
       >
         <svg

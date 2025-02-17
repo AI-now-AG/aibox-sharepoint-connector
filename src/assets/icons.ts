@@ -46,6 +46,8 @@ import arrowDown from "$assets/icons/arrow-down.svg?raw";
 import arrowUpDown from "$assets/icons/arrow-up-down.svg?raw";
 import attachment from "$assets/icons/attachment.svg?raw";
 import eraser from "$assets/icons/eraser.svg?raw";
+import copyClipboard from "$assets/icons/copy-clipboard.svg?raw";
+import checkMark from "$assets/icons/check-mark.svg?raw";
 
 export const svgIcons = {
   menuSettings,
@@ -96,4 +98,6 @@ export const svgIcons = {
   arrowUpDown,
   attachment,
   eraser,
+  copyClipboard,
+  checkMark,
 };
