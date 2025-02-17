@@ -15,7 +15,6 @@
   } from "$components/actions/Input.svelte";
   import { loading, showLoading, hideLoading } from "$stores";
   import ColorPicker, { ChromeVariant } from "svelte-awesome-color-picker";
-  import log from "$utils/log";
   import { type TenantTheme } from "$data/models/tenant.model";
   import InputDialog from "$components/InputDialog.svelte";
   import { isValidEmail } from "$utils/common";
@@ -456,7 +455,28 @@
           </div>
         </div>
       </div>
-      <div class="flex-1 flex flex-col mb-4"></div>
+      <div class="flex-1 flex flex-col mb-4">
+        <!-- <button
+            class="btn btn-primary"
+            onclick={() => {
+              addTanantAdminModal?.show();
+            }}
+          >
+            {t("tenant.add-tenant-admin")}
+          </button> -->
+        <div class="flex justify-end">
+          <button
+            class={"mt-7 btn btn-active btn-neutral font-normal grow-0 w-auto " +
+              `${mode == MODE.Edit ? "" : "btn-disabled"}`}
+            onclick={() => {
+              addTanantAdminModal?.show();
+            }}
+          >
+            {@html svgIcons.add}
+            {t("tenant.add-tenant-admin")}
+          </button>
+        </div>
+      </div>
     </div>
 
     <div class="w-full h-0.5 mt-4 mb-6 bg-gray-400/20"></div>
@@ -680,19 +700,6 @@
             >{t("tenant.restrict-user-managment")}</span
           >
         </label>
-      </div>
-    </div>
-
-    <div class="max-w-full mt-6">
-      <div class="flex items-center pt-2 pb-2">
-        <button
-          class="btn btn-primary"
-          onclick={() => {
-            addTanantAdminModal?.show();
-          }}
-        >
-          {t("tenant.add-tenant-admin")}
-        </button>
       </div>
     </div>
   </div>
