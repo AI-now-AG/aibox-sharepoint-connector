@@ -108,23 +108,20 @@
           }),
         );
 
-        const response = await fetch(
-          `/api/prompts/67ac68aa229a55b7ea8ab56b.json`,
-          {
-            method: "POST",
-            body: JSON.stringify({
-              article: inputText,
-              promptId: "67ac68aa229a55b7ea8ab56b",
-              files: userInputFilesList,
-              images: userInputImagesList,
-              messageHistory: $sharedMessageHistory,
-            }),
-            credentials: "include",
-            headers: {
-              "Content-Type": "application/json",
-            },
+        const response = await fetch(`/api/chat.json`, {
+          method: "POST",
+          body: JSON.stringify({
+            article: inputText,
+            promptId: "67ac68aa229a55b7ea8ab56b",
+            files: userInputFilesList,
+            images: userInputImagesList,
+            messageHistory: $sharedMessageHistory,
+          }),
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
           },
-        );
+        });
 
         const reader = response.body?.getReader();
         let partialData = "";
