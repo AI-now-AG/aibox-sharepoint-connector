@@ -36,7 +36,7 @@ const allContent = await getCollection("aibox");
     />
 
     <h1 class="text-4xl font-bold mt-9 mb-4">
-      Welcome, {Astro.locals.user.name}
+      {t("home.welcome", { name: Astro.locals.user.name })}
     </h1>
     <!--
     <h1 class="text-4xl font-bold mt-9 mb-4">{t("welcome.title")}</h1>
@@ -47,7 +47,9 @@ const allContent = await getCollection("aibox");
   <div
     class="flex flex-wrap max-w-6xl items-center justify-center gap-4 my-8 mx-auto"
   >
-    <a href="/" class="btn btn-ghost btn-sm btn-active">Quick Links</a>
+    <a href="/" class="btn btn-ghost btn-sm btn-active"
+      >{t("home.quick-links")}</a
+    >
     {
       allContent.map((content) => (
         // <Card
