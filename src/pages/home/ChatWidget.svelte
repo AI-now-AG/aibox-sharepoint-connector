@@ -4,7 +4,6 @@
   import { sharedMessageHistory } from "$components/prompt-interface/components/Stores";
   import ChatInput from "./ChatInput.svelte";
   import ChatResults from "./ChatResults.svelte";
-  import { svgIcons } from "$assets/icons";
 
   let input = $state("");
   let output = $state("");

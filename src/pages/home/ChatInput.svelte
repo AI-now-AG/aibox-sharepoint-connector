@@ -223,24 +223,7 @@
       onclick={clearText}
       class="absolute top-2 right-2 text-base-content hover:text-base-content/60"
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        ><path
-          fill="currentColor"
-          d="M14.952 3c-1.037 0-1.872.835-3.542 2.505l-4.91 4.91l7.085 7.085l4.91-4.91C20.165 10.92 21 10.085 21 9.048c0-1.038-.835-1.873-2.505-3.543S15.99 3 14.952 3"
-          opacity="0.5"
-        /><path
-          fill="currentColor"
-          d="M13.585 17.5L6.5 10.415l-.995.995C3.835 13.08 3 13.915 3 14.952c0 1.038.835 1.873 2.505 3.543S8.01 21 9.048 21c1.037 0 1.872-.835 3.542-2.505z"
-        /><path
-          fill="currentColor"
-          d="M9.033 21H9zm.03 0c.796-.006 1.476-.506 2.51-1.5H21a.75.75 0 0 1 0 1.5z"
-          opacity="0.5"
-        /></svg
-      >
+      {@html svgIcons.eraser}
     </button>
   </div>
 
@@ -254,22 +237,7 @@
             fileModal.showModal();
           }}
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="17"
-            height="18"
-            viewBox="0 0 17 18"
-            class="w-6 h-6"
-            fill="none"
-          >
-            <path
-              d="M10.6431 4.83333L5.15499 10.3215C4.50411 10.9724 4.50411 12.0276 5.15499 12.6785C5.80586 13.3294 6.86113 13.3294 7.51201 12.6785L12.8572 7.19036C14.1589 5.88861 14.1589 3.77806 12.8572 2.47631C11.5554 1.17456 9.44489 1.17456 8.14314 2.47631L2.79796 7.96447C0.845341 9.91709 0.845341 13.0829 2.79796 15.0355C4.75058 16.9882 7.91641 16.9882 9.86903 15.0355L15.0835 9.83333"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            ></path>
-          </svg>
+          {@html svgIcons.attachment}
           {#if inputFiles.length > 0}
             <div class="badge badge-sm badge-neutral font-normal">
               {inputFiles.length}

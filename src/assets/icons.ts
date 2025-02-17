@@ -44,6 +44,8 @@ import arrowDownFill from "$assets/icons/arrow-down-fill.svg?raw";
 import arrowUp from "$assets/icons/arrow-up.svg?raw";
 import arrowDown from "$assets/icons/arrow-down.svg?raw";
 import arrowUpDown from "$assets/icons/arrow-up-down.svg?raw";
+import attachment from "$assets/icons/attachment.svg?raw";
+import eraser from "$assets/icons/attachment.svg?raw";
 
 export const svgIcons = {
   menuSettings,
@@ -92,4 +94,6 @@ export const svgIcons = {
   arrowUp,
   arrowDown,
   arrowUpDown,
+  attachment,
+  eraser,
 };
