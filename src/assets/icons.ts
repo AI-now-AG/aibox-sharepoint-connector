@@ -48,6 +48,7 @@ import attachment from "$assets/icons/attachment.svg?raw";
 import eraser from "$assets/icons/eraser.svg?raw";
 import copyClipboard from "$assets/icons/copy-clipboard.svg?raw";
 import checkMark from "$assets/icons/check-mark.svg?raw";
+import paperPlane from "$assets/icons/paper-plane.svg?raw";
 
 export const svgIcons = {
   menuSettings,
@@ -100,4 +101,5 @@ export const svgIcons = {
   eraser,
   copyClipboard,
   checkMark,
+  paperPlane,
 };
