@@ -156,15 +156,35 @@ export const improveSRTQuality = async (
   if (transcribeParams.apiKeyProvider === ApiKeyProvider.AzureOpenAI) {
     model = getAzureChatModel(transcribeParams);
   }
-  const flatEntries = data
+  /*const flatEntries = data
     .map(
       (entry) => `input> ${entry.text}
 output> 
 `,
     )
-    .join("\n");
-  const chunks = [];
-  let currentChunk = "";
+    .join("\n");*/
+
+  const textChunks = [];
+  let currentTextChunk = "";
+  for (const [index, entry] of data.entries()) {
+    let formattedText = `input> ${entry.text}\noutput> \n`;
+
+    if (index < data.length - 1) {
+      formattedText += "\n";
+    }
+
+    const currentTokenCount =
+      (currentTextChunk.length + formattedText.length) / 4;
+
+    if (currentTokenCount >= 9000) {
+      textChunks.push(currentTextChunk);
+      currentTextChunk = formattedText;
+    } else {
+      currentTextChunk += formattedText;
+    }
+  }
+
+  /*let currentChunk = "";
   for (const entry of flatEntries) {
     const tokenCount = (currentChunk.length + entry.length) / 4;
     if (tokenCount >= 25000) {
@@ -173,30 +193,38 @@ output>
     } else {
       currentChunk += entry;
     }
-  }
-  if (currentChunk) chunks.push(currentChunk);
+  }*/
+  if (currentTextChunk) textChunks.push(currentTextChunk);
 
   const correctedLines: string[] = [];
-  for (const chunk of chunks) {
-    const { transcriptionType, transcriptions } = transcribeParams;
-    const instruction =
-      transcriptionType === TranscriptionType.Subtitlesjson
-        ? transcriptions.subtitlesjson?.text
-        : transcriptionType === TranscriptionType.SubtitleLarge
-          ? transcriptions.subtitlelarge?.text
-          : transcriptions.subtitles?.text;
-    const response = await model.invoke([
-      new SystemMessage(instruction || DEFAULT_INSTRUCTION),
-      new HumanMessage(chunk),
-    ]);
-    correctedLines.push(
-      ...response.content
-        .toString()
-        .split("\n")
-        .filter((line) => line.startsWith("output>"))
-        .map((line) => line.substring(8)),
-    );
-  }
+  const results = await Promise.all(
+    textChunks.map(async (chunk, index) => {
+      const { transcriptionType, transcriptions } = transcribeParams;
+      const instruction =
+        transcriptionType === TranscriptionType.Subtitlesjson
+          ? transcriptions.subtitlesjson?.text
+          : transcriptionType === TranscriptionType.SubtitleLarge
+            ? transcriptions.subtitlelarge?.text
+            : transcriptions.subtitles?.text;
+
+      const response = await model.invoke([
+        new SystemMessage(instruction || DEFAULT_INSTRUCTION),
+        new HumanMessage(chunk),
+      ]);
+      return {
+        index,
+        lines: response.content
+          .toString()
+          .split("\n")
+          .filter((line) => line.startsWith("output>"))
+          .map((line) => line.substring(8)),
+      };
+    }),
+  );
+
+  results.sort((a, b) => a.index - b.index);
+  results.forEach((result) => correctedLines.push(...result.lines));
+
   const out: Entry[] = data.map((entry, i) => ({
     ...entry,
     text: correctedLines[i] || entry.text,
