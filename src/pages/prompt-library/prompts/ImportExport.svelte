@@ -8,7 +8,7 @@
 
   const t = useTranslations();
 
-  let fileUploadModal: HTMLDialogElement = $state();
+  let fileUploadModal: HTMLDialogElement | undefined = $state();
   let inputFile: File = $state();
 
   const importUrl: string = "/api/prompts/import";
