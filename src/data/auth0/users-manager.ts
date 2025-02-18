@@ -7,6 +7,7 @@ import type {
   PatchUsersByIdRequest,
   UserUpdate,
   DeleteUsersByIdRequest,
+  GetUsersByEmailRequest,
 } from "auth0";
 
 export const getAllUsers = async (parameters: GetUsersRequest) => {
@@ -25,6 +26,19 @@ export const get = async (userId: string) => {
     };
 
     return await management.users.get(requestParameters);
+  } catch (error) {
+    console.error("auth0: get user error", error);
+    throw error;
+  }
+};
+
+export const getByEmail = async (email: string) => {
+  try {
+    const requestParameters: GetUsersByEmailRequest = {
+      email: email,
+    };
+
+    return management.usersByEmail.getByEmail(requestParameters);
   } catch (error) {
     console.error("auth0: get user error", error);
     throw error;
@@ -93,6 +107,7 @@ export const unblock = async (userId: string) => {
 export default {
   getAllUsers,
   get,
+  getByEmail,
   getUserRoles,
   create,
   update,

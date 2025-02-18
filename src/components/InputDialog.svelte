@@ -1,0 +1,88 @@
+<script lang="ts">
+  import { useTranslations } from "$i18n/utils";
+
+  const t = useTranslations();
+  interface Props {
+    modal: any;
+    title?: string;
+    label?: string;
+    placeholder?: string;
+    value?: string;
+    errorMessage?: string;
+    save?: Function;
+  }
+
+  let {
+    modal = $bindable(),
+    title = "",
+    label = "",
+    placeholder = label,
+    value = $bindable(""),
+    errorMessage = $bindable(""),
+    save = () => null,
+  }: Props = $props();
+
+  $effect(() => {
+    if (value) {
+      errorMessage = "";
+    }
+  });
+
+  function clear() {
+    value = "";
+    errorMessage = "";
+  }
+</script>
+
+<dialog
+  id="alert_dialog"
+  bind:this={modal}
+  class="modal"
+  style="background-color: rgba(0,0,0,0.5);"
+>
+  <div class="modal-box">
+    <form method="dialog">
+      <span class=" absolute left-6 top-4 mb-2">{title}</span>
+      <button
+        class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+        onclick={() => {
+          clear();
+        }}>✕</button
+      >
+    </form>
+
+    <div class="flex-1 flex flex-col mt-8">
+      <span class="mb-2 text-gray-400 font-medium text-sm">{label}</span>
+      <input
+        type="text"
+        {placeholder}
+        class={`input input-bordered w-full` +
+          ` ${errorMessage ? "border-red-400 " : ""}`}
+        bind:value
+      />
+      {#if errorMessage}
+        <span class="mt-1 text-red-400 text-sm">{errorMessage}</span>
+      {/if}
+    </div>
+
+    <div class="flex space-x-2 ml-auto mt-4 justify-end">
+      <button
+        class="btn btn-primary"
+        onclick={() => {
+          save?.(value);
+        }}
+      >
+        {t("common.save")}
+      </button>
+      <button
+        class="btn"
+        onclick={() => {
+          clear();
+          modal.close();
+        }}
+      >
+        {t("common.cancel")}
+      </button>
+    </div>
+  </div>
+</dialog>

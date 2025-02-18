@@ -13,7 +13,7 @@ import usersManagement from "$data/auth0/users-manager";
 import organizationsManagement from "$data/auth0/organizations-manager";
 import rolesManagement from "$data/auth0/roles-manager";
 import { isEnterpriseConnection } from "$utils/common";
-import { UserRole } from "$enums/Users";
+import { EncryptedUserPassword, UserRole } from "$enums/Users";
 
 const UserInputParamsSchema = z.object({
   name: z.string(),
@@ -102,7 +102,7 @@ export const user = {
           email: input.email,
           name: input.name,
           connection: "Username-Password-Authentication",
-          password: "dea510d6a7e4e4c0e5f81ce9a8c9eb4c:43bb938b99ae20bceb3641bccb9c663a7d602db3a189a11e8e3228eb63ce1bc3",
+          password: EncryptedUserPassword,
         });
 
         const userId = userResult.data.user_id;
