@@ -36,7 +36,7 @@ const fetchTranslations = async () => {
         const translations = {};
 
         data.forEach((row) => {
-          const key = row[2]; // Get the translation key from the 3rd column (KEY)
+          const key = row[2]?.replace("\n", "")?.trim(); // Get the translation key from the 3rd column (KEY)
           const translation = row[index + 3] || row[3]; // Match the translation column index (starting at 3rd column)
 
           if (key && translation) {

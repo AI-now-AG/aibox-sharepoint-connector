@@ -114,17 +114,34 @@ export const groupLines = (data: Entry[]): Entry[] => {
     entry: Entry,
     nextEntry: Entry | null,
     maxDifference: number,
+    shouldUpdateEnd: boolean = false,
   ): boolean => {
     if (!nextEntry) return false;
-    const difference = nextEntry.start - entry.end;
 
-    if (difference >= NUMBER_OF_SECONDS) {
-      entry.end += Math.min(difference, maxDifference);
+    const gap = nextEntry.start - entry.end;
+    if (gap >= NUMBER_OF_SECONDS) {
+      entry.end += Math.min(gap, maxDifference);
       return true;
-    } else {
+    }
+
+    if (shouldUpdateEnd) {
       entry.end = nextEntry.start;
+      return false;
     }
     return false;
+
+    // if (!nextEntry) return false;
+    // const difference = nextEntry.start - entry.end;
+
+    // if (difference >= NUMBER_OF_SECONDS) {
+    //   entry.end += Math.min(difference, maxDifference);
+    //   return true;
+    // } else {
+    //   if (isNeedToUpdateEnd) {
+    //     entry.end = nextEntry.start;
+    //   }
+    // }
+    // return false;
   };
 
   const handleCarryOver = (entry: Entry): Entry | null => {
@@ -150,13 +167,13 @@ export const groupLines = (data: Entry[]): Entry[] => {
       : currentEntry.text || "";
     const currentStart = carryOverGroup?.start || currentEntry.start;
 
-    carryOverGroup = null;
+    carryOverGroup = nextEntry ? handleCarryOver(nextEntry) : null;
     if (nextEntry) {
-      carryOverGroup = handleCarryOver(nextEntry);
       const shouldNullifyNext = adjustEntryEnd(
         currentEntry,
         nextEntry,
         MAX_DIFFERENCE,
+        true,
       );
 
       if (shouldNullifyNext) {
