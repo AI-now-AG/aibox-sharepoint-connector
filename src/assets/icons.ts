@@ -49,6 +49,7 @@ import eraser from "$assets/icons/eraser.svg?raw";
 import copyClipboard from "$assets/icons/copy-clipboard.svg?raw";
 import checkMark from "$assets/icons/check-mark.svg?raw";
 import paperPlane from "$assets/icons/paper-plane.svg?raw";
+import spinner from "$assets/icons/spinner.svg?raw";
 
 export const svgIcons = {
   menuSettings,
@@ -102,4 +103,5 @@ export const svgIcons = {
   copyClipboard,
   checkMark,
   paperPlane,
+  spinner,
 };
