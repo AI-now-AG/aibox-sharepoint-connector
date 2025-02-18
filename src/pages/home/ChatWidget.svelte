@@ -58,9 +58,6 @@
           }),
         );
 
-        console.log("userInputImagesList", userInputImagesList);
-        console.log("userInputFilesList", userInputFilesList);
-
         const response = await fetch(`/api/chat.json`, {
           method: "POST",
           body: JSON.stringify({
