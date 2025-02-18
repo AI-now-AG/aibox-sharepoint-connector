@@ -125,6 +125,7 @@
     tenantData.theme = "dark" as TenantTheme;
   }
   if (tenantData && !tenantData.primary_color) {
+    // svelte-ignore state_referenced_locally
     tenantData.primary_color = selecteColor;
   }
 

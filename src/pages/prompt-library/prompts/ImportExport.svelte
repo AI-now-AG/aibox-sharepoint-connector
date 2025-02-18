@@ -66,7 +66,7 @@
         );
 
         const disposition = response.headers.get("Content-Disposition");
-        const parts = disposition?.split(";");
+        const parts = disposition?.split(";") || "";
         const fileName = parts[1].replace(/['"]/g, "").split("=")[1];
 
         console.log("fileName", { disposition, parts, fileName });

@@ -241,6 +241,7 @@
       bind:value={inputText}
       onkeydown={onKeyDown}
     ></textarea>
+    <!-- svelte-ignore a11y_consider_explicit_label -->
     <button
       type="button"
       onclick={clearText}

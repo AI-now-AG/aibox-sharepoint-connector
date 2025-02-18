@@ -41,6 +41,7 @@
 
 <div class="flex-1">
   <div class="grid justify-items-end">
+    <!-- svelte-ignore a11y_consider_explicit_label -->
     <button
       class="btn btn-square bg-base-100 grid justify-items"
       onclick={() => configuration_dialog.showModal()}

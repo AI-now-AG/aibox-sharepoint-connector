@@ -31,6 +31,7 @@
         ></textarea>
       </div>
     </div>
+    <!-- svelte-ignore a11y_consider_explicit_label -->
     <button
       class="btn btn-square fill-current bg-base-content grid justify-items"
       type="submit"
