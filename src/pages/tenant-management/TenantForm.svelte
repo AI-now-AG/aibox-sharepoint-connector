@@ -15,8 +15,9 @@
   } from "$components/actions/Input.svelte";
   import { loading, showLoading, hideLoading } from "$stores";
   import ColorPicker, { ChromeVariant } from "svelte-awesome-color-picker";
-  import log from "$utils/log";
   import { type TenantTheme } from "$data/models/tenant.model";
+  import InputDialog from "$components/InputDialog.svelte";
+  import { isValidEmail } from "$utils/common";
 
   const t = useTranslations();
 
@@ -34,6 +35,7 @@
     azureSpeechKey = "",
   }: Props = $props();
 
+  let addTanantAdminModal: HTMLDialogElement | undefined = $state();
   let confirmUpdateModal: HTMLDialogElement | undefined = $state();
   let alertModal: HTMLDialogElement | undefined = $state();
   let alertMessage = $state("");
@@ -61,23 +63,6 @@
       ? t("tenant.tenants.add-tenant")
       : tenant.name || t("common.edit");
   let tenantData = $state(tenant ?? {});
-
-  $effect(() => {
-    tenantData.name = tenantData.name ?? "";
-    tenantData.org_name = tenantData.org_name ?? "";
-    tenantData.default_language = tenantData.default_language ?? "";
-    tenantData.theme = tenantData.theme ?? "";
-    tenantData.azure_openai_instance_name =
-      tenantData.azure_openai_instance_name ?? "";
-    tenantData.azure_openai_endpoint = tenantData.azure_openai_endpoint ?? "";
-    tenantData.azure_openai_whisper_model =
-      tenantData.azure_openai_whisper_model ?? "";
-    tenantData.azure_openai_chat_model =
-      tenantData.azure_openai_chat_model ?? "";
-    tenantData.speech_region = tenantData.speech_region ?? "";
-    tenantData.is_restrict_user_managment =
-      tenantData.is_restrict_user_managment ?? false;
-  });
 
   // API providers
   const providerValues = [
@@ -109,13 +94,16 @@
     );
   }
 
-  $inspect(tenant, tenantData, textSelectedProvider);
-
-  // color picker
-
   let hex = tenantData?.primary_color || "#491EFF";
   let selecteColor = $state(hex);
   let showPicker = $state(false);
+  let tenantAdminEmail = $state("");
+  let tenantAdminEmailErrorMessage = $state("");
+
+  $inspect(tenant);
+  $inspect(tenantData);
+  $inspect(textSelectedProvider);
+  $inspect(tenantAdminEmail);
 
   // set default values
   if (tenantData && !tenantData.default_language) {
@@ -233,7 +221,13 @@
           });
         }
 
-        const { error } = await actions.tenant.create(tenantData);
+        if (tenantAdminEmail && isValidEmail(tenantAdminEmail)) {
+          tenantData.tenant_admin_email = tenantAdminEmail;
+        }
+
+        const createTanentResult = await actions.tenant.create(tenantData);
+        const { error, data: createdTenant } = createTanentResult;
+
         hideLoading();
         if (error) {
           showAlert(error?.toString());
@@ -242,7 +236,8 @@
             message: t("tenant.create-successful"),
             type: "success",
           });
-          window.location.href = "/tenant-management";
+          const { insertedId = "" } = createdTenant;
+          window.location.href = "/tenant-management/" + insertedId;
         }
       } catch (error: any) {
         showAlert(error?.toString());
@@ -284,6 +279,10 @@
           });
         }
 
+        if (tenantAdminEmail && isValidEmail(tenantAdminEmail)) {
+          tenantData.tenant_admin_email = tenantAdminEmail;
+        }
+
         const { error } = await actions.tenant.update(tenantData);
         hideLoading();
 
@@ -304,6 +303,39 @@
     }
   }
 
+  async function createTenantAdmin() {
+    try {
+      showLoading();
+      const { error } = await actions.tenant.createAdminUser({
+        _id: tenantData._id,
+        org_id: tenantData.org_id,
+        tenant_admin_email: tenantAdminEmail,
+      });
+
+      hideLoading();
+      if (error) {
+        addToast({
+          message:
+            t("tenant.create-tenant-admin-failed") + " - " + error.toString(),
+          type: "success",
+        });
+      } else {
+        addToast({
+          message: t("tenant.create-tenant-admin-successful"),
+          type: "success",
+        });
+      }
+    } catch (error: any) {
+      addToast({
+        message:
+          t("tenant.create-tenant-admin-failed") + " - " + error.toString(),
+        type: "success",
+      });
+    } finally {
+      tenantAdminEmail = "";
+    }
+  }
+
   function showAlert(message: string) {
     alertMessage = message;
     alertModal?.show();
@@ -314,7 +346,10 @@
   class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14 sticky bg-base-200 top-0 z-20"
 >
   <div class="flex items-center pt-5 pb-2">
-    <button class="mr-4" onclick={() => window.history.back()}>
+    <button
+      class="mr-4"
+      onclick={() => (window.location.href = "/tenant-management")}
+    >
       {@html svgIcons.back}
     </button>
     <h1 class="text-4xl font-bold">
@@ -330,7 +365,10 @@
       >
         {t("common.save")}
       </button>
-      <button class="btn" onclick={() => window.history.back()}>
+      <button
+        class="btn"
+        onclick={() => (window.location.href = "/tenant-management")}
+      >
         {t("common.cancel")}
       </button>
     </div>
@@ -450,7 +488,20 @@
           </div>
         </div>
       </div>
-      <div class="flex-1 flex flex-col mb-4"></div>
+      <div class="flex-1 flex flex-col mb-4">
+        <div class="flex justify-end">
+          <button
+            class={"mt-7 btn btn-active btn-neutral font-normal grow-0 w-auto " +
+              `${mode == MODE.Edit ? "" : "btn-disabled"}`}
+            onclick={() => {
+              addTanantAdminModal?.show();
+            }}
+          >
+            {@html svgIcons.add}
+            {t("tenant.add-tenant-admin")}
+          </button>
+        </div>
+      </div>
     </div>
 
     <div class="w-full h-0.5 mt-4 mb-6 bg-gray-400/20"></div>
@@ -676,15 +727,29 @@
         </label>
       </div>
     </div>
-
-    <ConfirmDialog
-      bind:modal={confirmUpdateModal}
-      confirm={updateTenant}
-      title={t("tenant.tenants.tenant.update-confirmation")}
-    />
-
-    <AlertDialog bind:modal={alertModal} bind:message={alertMessage} />
   </div>
 </div>
 
+<ConfirmDialog
+  bind:modal={confirmUpdateModal}
+  confirm={updateTenant}
+  title={t("tenant.tenants.tenant.update-confirmation")}
+/>
+<InputDialog
+  bind:modal={addTanantAdminModal}
+  bind:value={tenantAdminEmail}
+  bind:errorMessage={tenantAdminEmailErrorMessage}
+  title={t("tenant.add-tenant-admin")}
+  label={t("login.email")}
+  save={(value: string) => {
+    if (!isValidEmail(value)) {
+      tenantAdminEmailErrorMessage = t("tenant.email-invalid");
+    } else {
+      tenantAdminEmailErrorMessage = "";
+      addTanantAdminModal?.close();
+      createTenantAdmin();
+    }
+  }}
+/>
+<AlertDialog bind:modal={alertModal} bind:message={alertMessage} />
 <Loading bind:show={$loading} />

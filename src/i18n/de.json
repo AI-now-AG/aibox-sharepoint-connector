@@ -283,7 +283,7 @@
   "tenant.email-invalid": "Keine gültige E-Mail Adresse",
   "tenant.create-tenant-admin-successful": "Tenant Admin wurde erfolgreich hinzugefügt",
   "tenant.create-tenant-admin-failed": "Fehler beim hinzufügen des Tenant Admin",
-  "prompt-execution.a-prompt-is-being-executed-please-wait": "A prompt is being executed. Please wait for while! Thank you!",
-  "home.quick-links": "Quick Links",
-  "home.welcome": "Welcome, ${name}"
+  "prompt-execution.a-prompt-is-being-executed-please-wait": "Bitte warten bis Prompt ausgeführt wurde",
+  "home.quick-links": "Schnellzugriff",
+  "home.welcome": "Willkommen ${name}"
 }

@@ -5,7 +5,8 @@ import { client } from "$data/mongodb";
 import { z } from "zod";
 import { decrypt, encrypt } from "$utils/secure";
 import { transformRawData } from "$utils/transformRawData";
-
+import usersManagement from "$data/auth0/users-manager";
+import rolesManagement from "$data/auth0/roles-manager";
 import organizationsManagement from "$data/auth0/organizations-manager";
 import TenantModel, {
   IncludedFeaturesSchema,
@@ -13,14 +14,17 @@ import TenantModel, {
   TenantTheme,
   type Tenant,
 } from "$data/models/tenant.model";
+import UserModel, { assignPermissions } from "$data/models/user.model";
 import PromptModel from "$data/models/prompt.model";
 import CategoryModel from "$data/models/category.model";
 import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
 import { ApiKeyProvider } from "$types/TenantFeature";
+import { EncryptedUserPassword, UserRole } from "$enums/Users";
 
 const TenantInputParamsSchema = z.object({
   name: z.string(),
   org_name: z.string(),
+  org_id: z.string().optional(),
   default_language: z.string(),
   theme: z.nativeEnum(TenantTheme),
   primary_color: z.string().optional(),
@@ -38,6 +42,7 @@ const TenantInputParamsSchema = z.object({
     .boolean()
     .optional()
     .default(() => false),
+  tenant_admin_email: z.string().optional(),
 });
 
 const TenanKeyEncryptSchema = z.object({
@@ -49,6 +54,105 @@ const TenanKeyEncryptSchema = z.object({
 const TenantInputIdentifierSchema = z.object({
   _id: z.string(),
 });
+
+const CreateTenantAdminSchema = z.object({
+  _id: z.string(),
+  org_id: z.string().optional(),
+  tenant_admin_email: z.string().optional(),
+});
+
+const assignMemberRoles = async (
+  organizationId: string,
+  userId: string,
+  oldRoles: string[],
+  newRoles: string[],
+) => {
+  // Get all roles from Auth0
+  const allRoles = await rolesManagement.getAll();
+
+  // Detach old member roles
+  if (oldRoles.length > 0) {
+    const rolesToDetach = allRoles.data
+      .filter((role) => {
+        return oldRoles.includes(role.name);
+      })
+      .map((role) => role.id);
+    await organizationsManagement.deleteMemberRoles(
+      organizationId,
+      userId,
+      rolesToDetach,
+    );
+  }
+
+  // Attach new member roles
+  if (newRoles.length > 0) {
+    const rolesToAttach = allRoles.data
+      .filter((role) => {
+        return newRoles.includes(role.name);
+      })
+      .map((role) => role.id);
+    await organizationsManagement.addMemberRoles(
+      organizationId,
+      userId,
+      rolesToAttach,
+    );
+  }
+};
+
+const setupTenantAdmin = async (
+  dbOrgId: string,
+  organizationId: string,
+  email: string,
+  name?: string,
+) => {
+  let user;
+  let userId;
+
+  let oldRoles: string[] = [];
+  let newRoles: UserRole[] = [UserRole.User, UserRole.Admin];
+
+  let existingUsers = await usersManagement.getByEmail(email?.trim());
+  if (
+    existingUsers &&
+    Array.isArray(existingUsers.data) &&
+    existingUsers.data.length > 0
+  ) {
+    user = existingUsers.data[0];
+    userId = user.user_id;
+    console.log("Assign existing user to Admin", user);
+  } else {
+    const newUserResult = await usersManagement.create({
+      email: email,
+      name: name ?? "Admin",
+      connection: "Username-Password-Authentication",
+      password: EncryptedUserPassword,
+    });
+    user = newUserResult.data;
+    userId = user.user_id;
+    console.log("Create new Amin user", user);
+  }
+
+  await UserModel.upsertByAuth0Sub(userId, {
+    tenant_id: new ObjectId(dbOrgId),
+    auth0_sub: user.user_id,
+    username: user.nickname,
+    name: user.name,
+    email: user.email,
+    picture: user.picture,
+    roles: newRoles,
+    permissions: assignPermissions(newRoles),
+    last_login: user.last_login?.toString(),
+    logins_count: user.logins_count || 0,
+    email_verified: user.email_verified,
+    blocked: user.blocked,
+  });
+
+  // Add user to Auth0 organization and assign roles
+  await Promise.all([
+    organizationsManagement.addMembers(organizationId, [userId]),
+    assignMemberRoles(organizationId, userId, oldRoles, newRoles),
+  ]);
+};
 
 export const tenant = {
   get: defineAction({
@@ -67,6 +171,34 @@ export const tenant = {
     },
   }),
 
+  createAdminUser: defineAction({
+    input: CreateTenantAdminSchema,
+    handler: async (input) => {
+      const session = client.startSession();
+      session.startTransaction();
+      try {
+        const dbOrgId = input._id;
+        const organizationId = input.org_id ?? "";
+
+        if (input.tenant_admin_email) {
+          await setupTenantAdmin(
+            dbOrgId,
+            organizationId,
+            input.tenant_admin_email,
+            "Admin",
+          );
+        }
+        await session.commitTransaction();
+        return {};
+      } catch (error) {
+        await session.abortTransaction();
+        throw error;
+      } finally {
+        session.endSession();
+      }
+    },
+  }),
+
   create: defineAction({
     input: TenantInputParamsSchema,
     handler: async (input) => {
@@ -78,17 +210,18 @@ export const tenant = {
           display_name: input.name,
         });
 
+        const organizationId = organizationResult.data.id;
+
         await organizationsManagement.addEnabledConnection(
-          organizationResult.data.id,
+          organizationId,
           import.meta.env.AUTH0_AUTH_CON_ID || "con_RXTD1LIbXJgceOUH",
         );
 
         const tenant: Partial<Omit<Tenant, "_id">> = {
           ...input,
-          org_id: organizationResult.data.id,
+          org_id: organizationId,
         };
         const insertResult = await TenantModel.create(tenant);
-
         await session.commitTransaction();
         return transformRawData(insertResult);
       } catch (error) {
@@ -111,15 +244,13 @@ export const tenant = {
           _id: new ObjectId(input._id),
         };
         const updatedDocument = await TenantModel.update(input._id, update);
+        const organizationId = updatedDocument?.org_id;
 
         const bodyParameters: PatchOrganizationsByIdRequest = {
           name: input.org_name,
           display_name: input.name,
         };
-        await organizationsManagement.update(
-          updatedDocument?.org_id,
-          bodyParameters,
-        );
+        await organizationsManagement.update(organizationId, bodyParameters);
 
         await session.commitTransaction();
         return transformRawData(updatedDocument);
