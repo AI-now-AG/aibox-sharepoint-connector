@@ -26,7 +26,14 @@
     outline: "",
   };
   const t = useTranslations();
-  
+
+  function preventDefault(fn) {
+    return function (event) {
+      event.preventDefault();
+      fn.call(this, event);
+    };
+  }
+
   function handleDndConsider(e: CustomEvent) {
     items = e.detail.items;
   }
@@ -131,7 +138,8 @@
                 <button
                   class="flex block w-full text-left px-4 py-2 text-sm hover:underline"
                   onclick={preventDefault(() =>
-                    updateStatus(item.id, !item.active))}
+                    updateStatus(item.id, !item.active),
+                  )}
                 >
                   {@html item.active == 1 ? svgIcons.eyeClose : svgIcons.eye}
                   <span class="ml-1"

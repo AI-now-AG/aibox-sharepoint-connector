@@ -15,7 +15,11 @@
     isEditable?: boolean;
   }
 
-  let { instructionId = undefined, instruction = undefined, isEditable = false }: Props = $props();
+  let {
+    instructionId = undefined,
+    instruction = undefined,
+    isEditable = false,
+  }: Props = $props();
 
   let isSaving = $state(false);
 
@@ -75,7 +79,7 @@
           bind:value={instructionText}
           placeholder="e.g. type instruction details..."
           class="input input-bordered min-w-xs shadow appearance-none min-h-96 w-full py-2 px-3"
-></textarea>
+        ></textarea>
       </div>
 
       {#if isEditable}
