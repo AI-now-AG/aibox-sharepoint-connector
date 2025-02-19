@@ -95,7 +95,6 @@
                             <img alt="Avatar Image" src={userPicture} />
                           {:else}
                             <img src="/aibox-logo-dark.svg" alt="dark logo" />
-                            {@html svgIcons.editPrompt}
                           {/if}
                         </div>
                       </div>
@@ -140,7 +139,6 @@
                       <div class="avatar">
                         <div class="w-10 rounded-full">
                           <img src="/aibox-logo-dark.svg" alt="light Logo" />
-                          {@html svgIcons.editPrompt}
                         </div>
                       </div>
 
