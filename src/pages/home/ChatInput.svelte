@@ -59,7 +59,7 @@
     <textarea
       name="input"
       id="input"
-      class={`textarea textarea-ghost h-25 w-full focus:outline-none focus:border-base-100 text-base`}
+      class={`textarea textarea-ghost h-22 w-full focus:outline-none focus:border-base-100 text-base`}
       placeholder="Your input..."
       bind:value={input}
       onkeydown={onKeyDown}
@@ -119,3 +119,12 @@
     />
   </div>
 </div>
+
+{#if $sharedMessageHistory.length > 0}
+  <div class="container p-3 gap-2 items-center flex justify-center">
+    {@html svgIcons.warningIcon}
+    <p class="text-xs text-neutral">
+      {t("prompt-execution.historyRemove.info")}
+    </p>
+  </div>
+{/if}

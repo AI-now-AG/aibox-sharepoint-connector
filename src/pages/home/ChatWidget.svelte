@@ -5,11 +5,34 @@
   import { sharedMessageHistory } from "$components/prompt-interface/components/Stores";
   import ChatInput from "./ChatInput.svelte";
   import ChatResults from "./ChatResults.svelte";
+  import { svgIcons } from "$assets/icons";
 
   let input = $state("");
   let output = $state("");
   let files: File[] = $state([]);
   let isProcessing = $state(false);
+  let showButton = $state(false);
+
+  onMount(() => {
+    const handleScroll = () => {
+      const { scrollHeight, scrollTop, clientHeight } =
+        document.documentElement;
+
+      if (Math.abs(scrollHeight - clientHeight - scrollTop) > 100) {
+        if (!showButton) showButton = true;
+      } else {
+        if (showButton) showButton = false;
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+  });
+
+  const scrollToBottom = async () => {
+    window.scroll({
+      top: document.documentElement.scrollHeight,
+      behavior: "smooth",
+    });
+  };
 
   onDestroy(function () {
     sharedMessageHistory.set([]);
@@ -149,14 +172,43 @@
 
 <div class="grid grid-cols-1 grid-rows-[1fr_min-content] space-y-6 h-full">
   <div class="flex flex-col space-y-6">
+    {#if $sharedMessageHistory.length == 0}
+      <div
+        class="min-w-full form-wrapper"
+        in:slide={{ duration: 500, delay: 500 }}
+        out:slide={{ duration: 500 }}
+      >
+        <ChatInput bind:input bind:output bind:files onsend={fetchMessage} />
+      </div>
+    {/if}
+
     <ChatResults bind:output bind:isProcessing />
 
-    <div
-      class="min-w-full form-wrapper"
-      in:slide={{ duration: 500, delay: 500 }}
-      out:slide={{ duration: 500 }}
-    >
-      <ChatInput bind:input bind:output bind:files onsend={fetchMessage} />
-    </div>
+    {#if $sharedMessageHistory.length > 0}
+      <div
+        class="sticky bottom-0 bg-base-200"
+        transition:slide={{ duration: 500 }}
+      >
+        {#if showButton}
+          <div class="relative w-full flex justify-center">
+            <button
+              class="absolute shadow-lg hover:shadow-2xl self-center bottom-2 btn btn-sm btn-circle"
+              onclick={() => {
+                scrollToBottom();
+              }}
+            >
+              {@html svgIcons.downIcon}
+            </button>
+          </div>
+        {/if}
+        <div
+          class="min-w-full form-wrapper"
+          in:slide={{ duration: 500, delay: 500 }}
+          out:slide={{ duration: 500 }}
+        >
+          <ChatInput bind:input bind:output bind:files onsend={fetchMessage} />
+        </div>
+      </div>
+    {/if}
   </div>
 </div>

@@ -3,7 +3,7 @@
   import { onMount, tick } from "svelte";
   import { MessageRole, type MessageHistory } from "$types/MessageHistory";
   import { sharedMessageHistory } from "$components/prompt-interface/components/Stores";
-  import { tenant, user } from "$stores";
+  import { user } from "$stores";
   import { svgIcons } from "$assets/icons";
 
   interface Props {
@@ -24,9 +24,17 @@
         $sharedMessageHistory.length > totalMessages) ||
       isProcessing
     ) {
+      scrollToBottom();
       totalMessages = $sharedMessageHistory.length;
     }
   });
+
+  const scrollToBottom = async () => {
+    window?.scroll({
+      top: document.documentElement.scrollHeight,
+      behavior: "smooth",
+    });
+  };
 
   const handleCopy = (event) => {
     const selection = window.getSelection();
