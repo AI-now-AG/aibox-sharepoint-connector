@@ -53,7 +53,6 @@
   function setInputValue() {
     inputValue = selectedItems?.map((e) => e.title).join(", ");
   }
-
 </script>
 
 <div>
