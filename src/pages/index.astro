@@ -47,9 +47,6 @@ const allContent = await getCollection("aibox");
   <div
     class="flex flex-wrap max-w-6xl items-center justify-center gap-4 my-8 mx-auto"
   >
-    <a href="/" class="btn btn-ghost btn-sm btn-active"
-      >{t("home.quick-links")}</a
-    >
     {
       allContent.map((content) => (
         // <Card
@@ -59,7 +56,7 @@ const allContent = await getCollection("aibox");
         // >
         //   <Image src={content.data.image} alt={content.data.imageAlt} />
         // </Card>
-        <a href={`/content/${content.slug}`} class="btn btn-ghost btn-sm">
+        <a href={`/content/${content.slug}`} class="btn btn-primary btn-sm">
           {content.data.title}
         </a>
       ))
