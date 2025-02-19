@@ -86,7 +86,7 @@
           ]);
         }
         if (reader) {
-          isProcessing = false;
+          //isProcessing = false;
           const decoder = new TextDecoder();
           while (true) {
             const { done, value } = await reader.read();
