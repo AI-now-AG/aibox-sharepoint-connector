@@ -39,7 +39,6 @@
   });
 
   $inspect(input, output);
-  $inspect(files);
 
   const readFileContent = (file: File) => {
     return new Promise((resolve) => {
