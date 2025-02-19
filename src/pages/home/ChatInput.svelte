@@ -3,6 +3,8 @@
   import { sharedMessageHistory } from "$components/prompt-interface/components/Stores";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
+  import { preventDefault } from "$utils/common";
+
   const t = useTranslations();
 
   interface Props {
@@ -43,13 +45,6 @@
     if (e.key === "Enter" && e.ctrlKey) {
       onsend();
     }
-  }
-
-  function preventDefault(fn) {
-    return function (event) {
-      event.preventDefault();
-      fn.call(this, event);
-    };
   }
 
   function clearText() {
@@ -101,7 +96,9 @@
       <button
         class="btn btn-ghost btn-md disabled:bg-base-100 disabled:text-slate-500 disabled:cursor-not-allowed"
         disabled={!input && files.length === 0}
-        onclick={preventDefault(onsend)}
+        onclick={preventDefault(() => {
+          onsend();
+        })}
         aria-label="Fetch"
       >
         <span
