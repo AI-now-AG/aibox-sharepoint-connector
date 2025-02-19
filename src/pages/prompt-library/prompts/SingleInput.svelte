@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { clickOutside } from "$components/actions/ClickOutside";
+  import { preventDefault } from "$utils/common";
   type Item = { title: string } | string;
 
   interface Props {
@@ -22,13 +22,6 @@
     selectedItem = undefined;
     setInputValue();
   };
-
-  function preventDefault(fn) {
-    return function (event) {
-      event.preventDefault();
-      fn.call(this, event);
-    };
-  }
 
   function handleSelectedItems(selected: Item) {
     if (selectedItem === selected) {

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
-  import { slide, fade } from "svelte/transition";
+  import { slide } from "svelte/transition";
   import ExecutionCard from "$components/prompt-interface/components/ExecutionCard.svelte";
   import { sharedMessageHistory } from "$components/prompt-interface/components/Stores";
   import InputArea from "./Input.svelte";
@@ -65,10 +65,20 @@
   <div class="flex flex-col space-y-6">
     <p class="text-base font-normal">
       {#if selectedPromptId}
-        {promptItems.filter((e) => e._id === selectedPromptId)[0].description}
+        {promptItems.filter(
+          (e: { _id: string }) => e._id === selectedPromptId,
+        )[0].description}
       {/if}
     </p>
-    <ExecutionCard cards={promptItems} bind:selectedPromptId bind:isEditable />
+    <ExecutionCard
+      cards={promptItems}
+      bind:selectedPromptId
+      bind:isEditable
+      bind:isDisabling={isProcessing}
+      onSelectCard={() => {
+        sharedMessageHistory.set([]);
+      }}
+    />
     {#if $sharedMessageHistory.length == 0}
       <div
         class="min-w-full form-wrapper"
@@ -85,7 +95,6 @@
     {/if}
     <PromptResults bind:output bind:isProcessing />
   </div>
-  <!-- <InputArea bind:promptId={selectedPromptId} bind:input bind:output /> -->
 
   <div class="sticky bottom-0 bg-base-200" transition:slide={{ duration: 500 }}>
     {#if $sharedMessageHistory.length > 0}

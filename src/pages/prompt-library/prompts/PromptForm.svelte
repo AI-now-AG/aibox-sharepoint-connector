@@ -6,6 +6,7 @@
   import { onMount } from "svelte";
   import MultiInput from "$pages/prompt-library/prompts/MultiInput.svelte";
   import { addToast } from "$stores/toast";
+  import { preventDefault } from "$utils/common";
 
   const t = useTranslations();
 
@@ -84,13 +85,6 @@
       }
     }
   });
-
-  function preventDefault(fn) {
-		return function (event) {
-			event.preventDefault();
-			fn.call(this, event);
-		};
-	}
 
   async function fetchInstructionAndKB() {
     /*const instructionResponse = await fetch("/api/instructions.json", {

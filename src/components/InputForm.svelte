@@ -1,14 +1,9 @@
 <script>
+  import { preventDefault } from "$utils/common";
+
   let { message } = $props();
 
   let userInputText = $state();
-
-  function preventDefault(fn) {
-    return function (event) {
-      event.preventDefault();
-      fn.call(this, event);
-    };
-  }
 
   function submitAction() {
     message({
@@ -31,6 +26,7 @@
         ></textarea>
       </div>
     </div>
+    <!-- svelte-ignore a11y_consider_explicit_label -->
     <button
       class="btn btn-square fill-current bg-base-content grid justify-items"
       type="submit"

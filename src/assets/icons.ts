@@ -44,6 +44,13 @@ import arrowDownFill from "$assets/icons/arrow-down-fill.svg?raw";
 import arrowUp from "$assets/icons/arrow-up.svg?raw";
 import arrowDown from "$assets/icons/arrow-down.svg?raw";
 import arrowUpDown from "$assets/icons/arrow-up-down.svg?raw";
+import sendActive from "$assets/icons/send-active.svg?raw";
+import sendInActive from "$assets/icons/send-inactive.svg?raw";
+import attachment from "$assets/icons/attachment.svg?raw";
+import erase from "$assets/icons/erase.svg?raw";
+import toastSuccess from "$assets/icons/toast-success.svg?raw";
+import toastError from "$assets/icons/toast-error.svg?raw";
+import toastInfo from "$assets/icons/toast-info.svg?raw";
 
 export const svgIcons = {
   menuSettings,
@@ -92,4 +99,11 @@ export const svgIcons = {
   arrowUp,
   arrowDown,
   arrowUpDown,
+  sendActive,
+  sendInActive,
+  attachment,
+  erase,
+  toastSuccess,
+  toastError,
+  toastInfo,
 };

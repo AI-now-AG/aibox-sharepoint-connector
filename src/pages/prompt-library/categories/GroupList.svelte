@@ -19,20 +19,13 @@
   let { items = $bindable([]) }: Props = $props();
 
   let groupToDelete: string;
-  let confirmDeleteModal: HTMLDialogElement = $state();
+  let confirmDeleteModal: HTMLDialogElement | undefined = $state();
 
   const flipDurationMs: number = 200;
   const dropTargetStyle: any = {
     outline: "",
   };
   const t = useTranslations();
-
-  function preventDefault(fn) {
-		return function (event) {
-			event.preventDefault();
-			fn.call(this, event);
-		};
-	}
   
   function handleDndConsider(e: CustomEvent) {
     items = e.detail.items;
@@ -45,7 +38,7 @@
 
   async function handleDelete(categoryId: string) {
     groupToDelete = categoryId;
-    confirmDeleteModal.show();
+    confirmDeleteModal?.show();
   }
 
   async function updateStatus(id: string, active: boolean) {

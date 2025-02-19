@@ -14,14 +14,18 @@
 
   interface Props {
     isEditable?: boolean;
+    isDisabling?: boolean;
     cards: any;
     selectedPromptId: any;
+    onSelectCard?: Function;
   }
 
   let {
     isEditable = $bindable(false),
+    isDisabling = $bindable(false),
     cards = $bindable(),
     selectedPromptId = $bindable(),
+    onSelectCard = () => null,
   }: Props = $props();
 
   const t = useTranslations();
@@ -38,6 +42,7 @@
 
   let timeout: any = $state();
   let orderCards = $state(cards);
+  // svelte-ignore state_referenced_locally
   for (let i = 0; i < orderCards?.length; i++) {
     orderCards[i] = { ...orderCards[i], id: orderCards[i]._id };
   }
@@ -52,6 +57,14 @@
   });
 
   function selectCard(index: number) {
+    if (isDisabling) {
+      addToast({
+        message: t("prompt-execution.a-prompt-is-being-executed-please-wait"),
+        type: "info",
+      });
+      return;
+    }
+    onSelectCard?.();
     selectedCardIndex = index;
     selectedPromptId = cards[index]?._id ?? "";
     storePromptId.set(selectedPromptId);

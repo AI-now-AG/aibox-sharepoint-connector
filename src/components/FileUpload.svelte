@@ -39,15 +39,6 @@
     files = files.slice(0, index).concat(files.slice(index + 1));
   }
 
-  function drop(event: DragEvent) {
-    event.preventDefault();
-    let removed = files.splice(fileDragging, 1);
-    files.splice(fileDropping, 0, ...removed);
-
-    fileDropping = -1;
-    fileDragging = -1;
-  }
-
   function dragenter(_event: DragEvent, index: number) {
     fileDropping = index;
   }

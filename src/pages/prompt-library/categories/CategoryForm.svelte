@@ -5,6 +5,7 @@
   import { addToast } from "$stores/toast";
   import { svgIcons } from "$assets/icons";
   import GroupList, { type GroupItem } from "./GroupList.svelte";
+  import { preventDefault } from "$utils/common";
   const t = useTranslations();
 
   /**
@@ -33,13 +34,6 @@
       }));
     }
   });
-
-  function preventDefault(fn) {
-    return function (event) {
-      event.preventDefault();
-      fn.call(this, event);
-    };
-  }
 
   async function save() {
     if (!title) {
