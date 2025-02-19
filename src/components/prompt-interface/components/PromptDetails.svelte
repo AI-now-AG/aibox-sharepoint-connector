@@ -216,23 +216,5 @@
         {/if}
       </div>
     </div>
-    <!--
-    <div class="modal-action">
-      <form method="dialog">
-        <button
-          class="btn btn-lg btn-primary font-normal"
-          class:btn-disable={isSaving}
-          on:click|preventDefault={savePromptGlobal}
-        >
-          {#if isSaving}
-            <span class="loading loading-spinner"></span>
-            {t("prompt-library.add.prompts.saving")}
-          {:else}
-            {t("prompt-execution.showGlobal")}
-          {/if}
-        </button>
-      </form>
-    </div>
-    -->
   </div>
 </dialog>

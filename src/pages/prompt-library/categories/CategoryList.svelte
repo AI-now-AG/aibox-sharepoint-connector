@@ -8,6 +8,7 @@
   import Loading from "$components/Loading.svelte";
   import { loading } from "$stores";
   import type { ViewCategory } from "$actions/category";
+  import { preventDefault } from "$utils/common";
 
   interface Props {
     items?: ViewCategory[];
@@ -16,7 +17,7 @@
   let { items = $bindable([]) }: Props = $props();
 
   let categoryToDelete: string;
-  let confirmDeleteModal: HTMLDialogElement = $state();
+  let confirmDeleteModal: HTMLDialogElement | undefined = $state();
 
   const flipDurationMs: number = 200;
   const dropTargetStyle: any = {
@@ -25,13 +26,6 @@
 
   let timeout: any;
   const t = useTranslations();
-
-  function preventDefault(fn) {
-    return function (event) {
-      event.preventDefault();
-      fn.call(this, event);
-    };
-  }
 
   function reloadPage(delay = 1500) {
     setTimeout(() => {
@@ -57,7 +51,7 @@
 
   async function handleDelete(categoryId: string) {
     categoryToDelete = categoryId;
-    confirmDeleteModal.show();
+    confirmDeleteModal?.show();
   }
 
   async function updateStatus(id: string, active: boolean) {

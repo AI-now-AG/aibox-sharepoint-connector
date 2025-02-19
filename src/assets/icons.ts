@@ -50,6 +50,9 @@ import copyClipboard from "$assets/icons/copy-clipboard.svg?raw";
 import checkMark from "$assets/icons/check-mark.svg?raw";
 import paperPlane from "$assets/icons/paper-plane.svg?raw";
 import spinner from "$assets/icons/spinner.svg?raw";
+import toastSuccess from "$assets/icons/toast-success.svg?raw";
+import toastError from "$assets/icons/toast-error.svg?raw";
+import toastInfo from "$assets/icons/toast-info.svg?raw";
 
 export const svgIcons = {
   menuSettings,
@@ -104,4 +107,7 @@ export const svgIcons = {
   checkMark,
   paperPlane,
   spinner,
+  toastSuccess,
+  toastError,
+  toastInfo,
 };

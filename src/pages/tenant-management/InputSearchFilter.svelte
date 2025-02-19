@@ -1,6 +1,7 @@
 <script lang="ts">
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
+  import { preventDefault } from "$utils/common";
 
   const t = useTranslations();
 
@@ -33,13 +34,6 @@
     onfilter();
     console.log("dispatch filter", { value });
   };
-
-  function preventDefault(fn) {
-    return function (event) {
-      event.preventDefault();
-      fn.call(this, event);
-    };
-  }
 </script>
 
 <div class="items-center mb-10">

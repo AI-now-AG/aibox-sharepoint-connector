@@ -1,14 +1,9 @@
 <script>
+  import { preventDefault } from "$utils/common";
+
   let { message } = $props();
 
   let userInputText = $state();
-
-  function preventDefault(fn) {
-    return function (event) {
-      event.preventDefault();
-      fn.call(this, event);
-    };
-  }
 
   function submitAction() {
     message({

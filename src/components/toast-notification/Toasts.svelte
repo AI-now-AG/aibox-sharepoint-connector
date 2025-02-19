@@ -9,7 +9,7 @@
       <Toast
         type={toast.type}
         dismissible={toast.dismissible}
-        dismiss={() => dismissToast(toast.id)}>{@html toast.message}</Toast
+        dismiss={() => dismissToast(toast.id ?? 0)}>{@html toast.message}</Toast
       >
     {/each}
   </section>
