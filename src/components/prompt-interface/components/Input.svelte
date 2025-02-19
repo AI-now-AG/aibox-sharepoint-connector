@@ -194,7 +194,7 @@
       name="input"
       id="input"
       class={`textarea textarea-ghost ${
-        $sharedMessageHistory.length > 0 ? `h-22` : `h-32`
+        $sharedMessageHistory.length > 0 ? `h-[70px]` : `h-24`
       } w-full focus:outline-none focus:border-base-100 text-base`}
       placeholder="Your input..."
       bind:value={inputText}

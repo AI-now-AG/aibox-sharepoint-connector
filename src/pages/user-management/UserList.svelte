@@ -253,7 +253,10 @@
           <td
             class="py-3 px-4 text-sm font-medium relative relative-dropdown rounded-r-lg"
           >
-            <DropdownSection options={getOptions(user)} />
+            <DropdownSection
+              options={getOptions(user)}
+              class={"dropdown-end"}
+            />
           </td>
         </tr>
       {/each}

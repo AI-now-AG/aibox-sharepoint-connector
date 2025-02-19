@@ -12,58 +12,72 @@ const t = useTranslations();
 const allContent = await getCollection("aibox");
 ---
 
-<Layout isFooterVisible={true}>
-  <div class="p-4 mt-8 text-center space-y-8 max-w-3xl mx-auto">
-    <img
-      src="/logo-aibox-christmasedition.svg"
-      alt="Weihnachtsmann Logo"
-      class="h-8 hidden [[data-theme=weihnachtsmann]_&]:inline"
-    />
-    <img
-      src="/soki-somedia.png"
-      alt="somedia logo"
-      class="h-12 hidden [[data-theme=somedia]_&]:inline"
-    />
-    <img
-      src="/aibox-logo-text.svg"
-      alt="light logo"
-      class="w-auto h-12 w-auto hidden [[data-theme=light]_&]:inline"
-    />
-    <img
-      src="/aibox-logo-text-dark.svg"
-      alt="dark logo"
-      class="w-auto h-12 hidden [[data-theme=dark]_&]:inline"
-    />
+<Layout>
+  <div
+    class="flex flex-col bg-base-200 content-baseline gap-0 place-items-center"
+  >
+    <div class="px-16 py-6">
+      <div class="p-4 mt-8 text-center space-y-8 max-w-3xl mx-auto">
+        <img
+          src="/logo-aibox-christmasedition.svg"
+          alt="Weihnachtsmann Logo"
+          class="h-8 hidden [[data-theme=weihnachtsmann]_&]:inline"
+        />
+        <img
+          src="/soki-somedia.png"
+          alt="somedia logo"
+          class="h-12 hidden [[data-theme=somedia]_&]:inline"
+        />
+        <img
+          src="/aibox-logo-text.svg"
+          alt="light logo"
+          class="w-auto h-12 w-auto hidden [[data-theme=light]_&]:inline"
+        />
+        <img
+          src="/aibox-logo-text-dark.svg"
+          alt="dark logo"
+          class="w-auto h-12 hidden [[data-theme=dark]_&]:inline"
+        />
 
-    <h1 class="text-4xl font-bold mt-9 mb-4">
-      {t("home.welcome", { name: Astro.locals.user.name })}
-    </h1>
-    <!--
-    <h1 class="text-4xl font-bold mt-9 mb-4">{t("welcome.title")}</h1>
-    <p class="text-xl text-base-content/60">{t("welcome.text")}</p>
-     -->
+        <h1 class="text-4xl font-bold mt-9 mb-4">
+          {t("home.welcome", { name: Astro.locals.user.name })}
+        </h1>
+        <!--
+        <h1 class="text-4xl font-bold mt-9 mb-4">{t("welcome.title")}</h1>
+        <p class="text-xl text-base-content/60">{t("welcome.text")}</p>
+         -->
+      </div>
+
+      <div
+        class="flex flex-wrap max-w-6xl items-center justify-center gap-4 my-8 mx-auto"
+      >
+        {
+          allContent.map((content) => (
+            // <Card
+            //   title={content.data.title}
+            //   lead={content.data.lead}
+            //   href={`/content/${content.slug}`}
+            // >
+            //   <Image src={content.data.image} alt={content.data.imageAlt} />
+            // </Card>
+            <a href={`/content/${content.slug}`} class="btn btn-primary btn-sm">
+              {content.data.title}
+            </a>
+          ))
+        }
+      </div>
+    </div>
   </div>
 
   <div
-    class="flex flex-wrap max-w-6xl items-center justify-center gap-4 my-8 mx-auto"
+    class="flex flex-col bg-base-200 h-full content-baseline gap-0 place-items-center"
   >
-    {
-      allContent.map((content) => (
-        // <Card
-        //   title={content.data.title}
-        //   lead={content.data.lead}
-        //   href={`/content/${content.slug}`}
-        // >
-        //   <Image src={content.data.image} alt={content.data.imageAlt} />
-        // </Card>
-        <a href={`/content/${content.slug}`} class="btn btn-primary btn-sm">
-          {content.data.title}
-        </a>
-      ))
-    }
-  </div>
-
-  <div class="container max-w-5xl mx-auto px-6 justify-center py-6">
-    <ChatWidget client:load />
+    <div class="px-16 py-6 w-full h-full">
+      <div class="flex flex-col h-full max-w-6xl mx-auto">
+        <div class="space-y-6 mb-6 mt-4">
+          <ChatWidget client:load />
+        </div>
+      </div>
+    </div>
   </div>
 </Layout>
