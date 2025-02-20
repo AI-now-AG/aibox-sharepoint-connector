@@ -8,7 +8,7 @@
 
   const t = useTranslations();
 
-  let fileUploadModal: HTMLDialogElement = $state();
+  let fileUploadModal: HTMLDialogElement | undefined = $state();
   let inputFile: File = $state();
 
   const importUrl: string = "/api/prompts/import";
@@ -66,7 +66,7 @@
         );
 
         const disposition = response.headers.get("Content-Disposition");
-        const parts = disposition?.split(";");
+        const parts = disposition?.split(";") || "";
         const fileName = parts[1].replace(/['"]/g, "").split("=")[1];
 
         console.log("fileName", { disposition, parts, fileName });

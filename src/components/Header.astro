@@ -4,9 +4,6 @@ import InitializeColor from "$components/theme/InitializeColor.astro";
 import SharedVariables from "$components/theme/SharedVariables.svelte";
 import Toasts from "$components/toast-notification/Toasts.svelte";
 import { transformRawData } from "$utils/transformRawData";
-import { useTranslations } from "$i18n/utils";
-
-const t = useTranslations();
 
 const user = Astro.locals.user;
 const primaryColor = Astro.locals.tenant?.primary_color;

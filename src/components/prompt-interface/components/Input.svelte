@@ -187,14 +187,14 @@
 </script>
 
 <div
-  class={`flex  flex-col rounded-xl bg-base-100 border border-base-content/20 focus:ring-base-200 has-[:focus]:ring-2 has-[:focus]:ring-base-primary has-[:focus]:ring-offset-2 has-[:focus]:ring-offset-base-200`}
+  class={`flex flex-col rounded-xl bg-base-100 border border-base-content/20 focus:ring-base-200 has-[:focus]:ring-2 has-[:focus]:ring-base-primary has-[:focus]:ring-offset-2 has-[:focus]:ring-offset-base-200`}
 >
   <div class="flex-1 relative">
     <textarea
       name="input"
       id="input"
       class={`textarea textarea-ghost ${
-        $sharedMessageHistory.length > 0 ? `h-22` : `h-32`
+        $sharedMessageHistory.length > 0 ? `h-[70px]` : `h-24`
       } w-full focus:outline-none focus:border-base-100 text-base`}
       placeholder="Your input..."
       bind:value={inputText}
@@ -206,7 +206,7 @@
       onclick={clearText}
       class="absolute top-2 right-2 text-base-content hover:text-base-content/60"
     >
-      {@html svgIcons.erase}
+      {@html svgIcons.eraser}
     </button>
   </div>
 
@@ -241,13 +241,15 @@
         })}
         aria-label="Fetch"
         >{#if !isProcessing}
-          {#if promptId && (inputText || inputFiles.length > 0)}
-            {@html svgIcons.sendActive}
-          {:else}
-            {@html svgIcons.sendInActive}
-          {/if}
+          <span
+            class={`${
+              promptId && (inputText || inputFiles.length > 0)
+                ? "text-primary"
+                : "text-base-300"
+            }`}>{@html svgIcons.paperPlane}</span
+          >
         {:else}
-          {@html svgIcons.sendInActive}
+          <span class={`text-base-300`}>{@html svgIcons.paperPlane}</span>
         {/if}
       </button>
     </div>

@@ -14,7 +14,7 @@ import {
   FEATURE_LARGEFILE_ROUTE,
 } from "$constants";
 import type { APIContext, MiddlewareNext } from "astro";
-import TenantModel, { type Tenant } from "$data/models/tenant.model";
+import TenantModel from "$data/models/tenant.model";
 import { TenantFeature } from "$types/TenantFeature";
 import { defaultLang } from "$i18n/ui";
 import { setLanguage } from "$i18n/utils";

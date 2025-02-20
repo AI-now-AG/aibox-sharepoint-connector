@@ -13,6 +13,7 @@ import convertIT from "../i18n/support/convert-it.json";
  */
 export const IS_SUPPORTING_TRANSLATION_INTEGRATION = false;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const translationGetters: any = {
   de: de,
   en: en,
@@ -21,6 +22,7 @@ const translationGetters: any = {
 };
 const DEFAULT_LANGUAGE = "en";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type PrimitiveJsonValue = string | number | boolean | any;
 type JsonValue =
   | PrimitiveJsonValue
@@ -35,7 +37,7 @@ export function flattenJson(
   parentKey: string = "",
   separator: string = ".",
 ): FlattenedJson {
-  let flattened: FlattenedJson = {};
+  const flattened: FlattenedJson = {};
 
   if (typeof obj === "object" && obj !== null && !Array.isArray(obj)) {
     for (const [key, value] of Object.entries(obj)) {

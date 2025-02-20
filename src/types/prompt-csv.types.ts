@@ -8,6 +8,7 @@ export enum RequiredColumn {
   Group = "group",
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const CsvRowRawSchema = z.object({
   title: z.string(),
   description: z.string(),

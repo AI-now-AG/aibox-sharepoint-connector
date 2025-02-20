@@ -29,6 +29,7 @@ export function toLowerCase(node: HTMLInputElement) {
 /** Replace special characters */
 export function replaceSpecialChars(node: HTMLInputElement) {
   const updateVal = () => {
+    // eslint-disable-next-line no-useless-escape
     node.value = node.value?.replace(/[&\/\#\=, +()$~%.'":@^*?<>{}]/g, "");
   };
 

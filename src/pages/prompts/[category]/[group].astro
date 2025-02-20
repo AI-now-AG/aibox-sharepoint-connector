@@ -24,10 +24,10 @@ const cursor = await PromptModel.listByTenant(Astro.locals.user.tenant_id);
 const prompts = await cursor.toArray();
 
 const categoryPrompt = prompts.filter(
-  (g) => g.category?.toString() === categoryId,
+  (g) => g.category?.toString() === categoryId
 );
 const categoryGroupPrompt = categoryPrompt.filter(
-  (g) => g.group?.toString() === group?._id?.toString(),
+  (g) => g.group?.toString() === group?._id?.toString()
 );
 const promptItems = categoryGroupPrompt.map((prompt) => ({
   _id: prompt._id?.toString(),
