@@ -166,6 +166,7 @@ export const groupLines = (data: Entry[]): Entry[] => {
         nextEntry,
         MAX_DIFFERENCE,
         true,
+        null,
       );
 
       if (shouldNullifyNext) {
