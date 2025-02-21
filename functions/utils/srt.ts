@@ -105,10 +105,12 @@ export const groupLines = (data: Entry[]): Entry[] => {
     nextEntry: Entry | null,
     maxDifference: number,
     shouldUpdateEnd: boolean = false,
+    carryOverGroup: Entry | null,
   ): boolean => {
     if (!nextEntry) return false;
 
-    const gap = nextEntry.start - entry.end;
+    const gap =
+      (carryOverGroup ? carryOverGroup.start : nextEntry.start) - entry.end;
     if (gap >= NUMBER_OF_SECONDS) {
       entry.end += Math.min(gap, maxDifference);
       return true;
@@ -164,12 +166,19 @@ export const groupLines = (data: Entry[]): Entry[] => {
         nextEntry,
         MAX_DIFFERENCE,
         true,
+        null,
       );
 
       if (shouldNullifyNext) {
         nextEntry = null;
       } else if (nextToNextEntry) {
-        adjustEntryEnd(nextEntry, nextToNextEntry, MAX_DIFFERENCE);
+        adjustEntryEnd(
+          nextEntry,
+          nextToNextEntry,
+          MAX_DIFFERENCE,
+          false,
+          carryOverGroup,
+        );
       }
     }
 
