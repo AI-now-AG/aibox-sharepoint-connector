@@ -66,6 +66,7 @@
 
 {#if promptDetails}
   <div class="mx-auto">
+    <!-- svelte-ignore a11y_consider_explicit_label -->
     <button
       class="btn btn-sm btn-neutral btn-2 border-0 bg-neutral-content text-neutral hover:text-neutral-content mb-4"
       onclick={() => dlgEl.showModal()}
@@ -134,6 +135,7 @@
   <div class="modal-box w-8/12 max-w-5xl">
     <h3 class="text-lg font-bold py-4">Prompt Configuration</h3>
     <form method="dialog">
+      <!-- svelte-ignore a11y_consider_explicit_label -->
       <button class="btn btn-sm btn-ghost absolute right-2 top-2">
         <svg
           width="20"
@@ -214,23 +216,5 @@
         {/if}
       </div>
     </div>
-    <!--
-    <div class="modal-action">
-      <form method="dialog">
-        <button
-          class="btn btn-lg btn-primary font-normal"
-          class:btn-disable={isSaving}
-          on:click|preventDefault={savePromptGlobal}
-        >
-          {#if isSaving}
-            <span class="loading loading-spinner"></span>
-            {t("prompt-library.add.prompts.saving")}
-          {:else}
-            {t("prompt-execution.showGlobal")}
-          {/if}
-        </button>
-      </form>
-    </div>
-    -->
   </div>
 </dialog>

@@ -1,6 +1,7 @@
 <script lang="ts">
   // TODO: Us checkboxes instead of anchors, it's what they are used for. That
   // way we don't have to manage selected state ourselves.
+  import { preventDefault } from "$utils/common";
 
   type Item = { title: string };
   interface Props {
@@ -51,13 +52,6 @@
 
   function setInputValue() {
     inputValue = selectedItems?.map((e) => e.title).join(", ");
-  }
-
-  function preventDefault(fn) {
-    return function (event) {
-      event.preventDefault();
-      fn.call(this, event);
-    };
   }
 </script>
 

@@ -15,13 +15,16 @@
     isEditable?: boolean;
   }
 
-  let { promptsEnriched = [], categoryList = [], isEditable = false }: Props = $props();
+  let {
+    promptsEnriched = [],
+    categoryList = [],
+    isEditable = false,
+  }: Props = $props();
 
   let searchQuery = $state("");
   let filteredPrompts = $state(promptsEnriched);
   let showCategoryFilter = $state(false);
   let numberOfFilters = $state(0);
-
 
   function groupItemChanged() {
     const checkedCategories = categoryList.filter(

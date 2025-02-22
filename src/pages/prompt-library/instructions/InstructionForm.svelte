@@ -2,6 +2,7 @@
   import type { CreateInstructionParams } from "$pages/api/instructions.json";
   import { useTranslations } from "$i18n/utils";
   import { onMount } from "svelte";
+  import { preventDefault } from "$utils/common";
 
   const t = useTranslations();
 
@@ -14,7 +15,11 @@
     isEditable?: boolean;
   }
 
-  let { instructionId = undefined, instruction = undefined, isEditable = false }: Props = $props();
+  let {
+    instructionId = undefined,
+    instruction = undefined,
+    isEditable = false,
+  }: Props = $props();
 
   let isSaving = $state(false);
 
@@ -24,13 +29,6 @@
       instructionText = instruction.instruction;
     }
   });
-
-  function preventDefault(fn) {
-		return function (event) {
-			event.preventDefault();
-			fn.call(this, event);
-		};
-	}
 
   async function saveInstruction() {
     isSaving = true;
@@ -81,7 +79,7 @@
           bind:value={instructionText}
           placeholder="e.g. type instruction details..."
           class="input input-bordered min-w-xs shadow appearance-none min-h-96 w-full py-2 px-3"
-></textarea>
+        ></textarea>
       </div>
 
       {#if isEditable}

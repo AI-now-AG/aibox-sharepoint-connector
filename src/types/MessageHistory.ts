@@ -7,6 +7,7 @@ export enum MessageRole {
 export interface Message {
   role: MessageRole;
   content: string;
+  rawData?: any;
 }
 
 export type MessageHistory = Message[];

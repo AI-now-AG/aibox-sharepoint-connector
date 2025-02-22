@@ -286,5 +286,8 @@
   "tenant.add-tenant-admin": "Tenant Admin hinzufügen",
   "tenant.email-invalid": "Keine gültige E-Mail Adresse",
   "tenant.create-tenant-admin-successful": "Tenant Admin wurde erfolgreich hinzugefügt",
-  "tenant.create-tenant-admin-failed": "Fehler beim hinzufügen des Tenant Admin"
+  "tenant.create-tenant-admin-failed": "Fehler beim hinzufügen des Tenant Admin",
+  "prompt-execution.a-prompt-is-being-executed-please-wait": "Bitte warten bis Prompt ausgeführt wurde",
+  "home.quick-links": "Schnellzugriff",
+  "home.welcome": "Willkommen ${name}"
 }

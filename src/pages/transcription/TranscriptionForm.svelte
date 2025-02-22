@@ -11,6 +11,7 @@
   import { type TranscribeRequest, FileFormat } from "$types/TranscribeRequest";
   import { TranscriptionType } from "$types/TranscribeRequest";
   import { TenantFeature } from "$types/TenantFeature";
+  import { preventDefault } from "$utils/common";
   const t = useTranslations();
 
   type Item = { title: string; checked: boolean };
@@ -147,13 +148,6 @@
         ? acceptedTypesJSON.join(",")
         : acceptedTypes.join(",");
   });
-
-  function preventDefault(fn) {
-    return function (event) {
-      event.preventDefault();
-      fn.call(this, event);
-    };
-  }
 
   function checkDataAvaibility() {
     isZipDataPresent = zipFileData !== "";
@@ -1103,6 +1097,7 @@
                     />
                   </svg>
                 </button>
+                <!-- svelte-ignore a11y_consider_explicit_label -->
                 <button
                   class="btn btn-xs btn-ghost"
                   onclick={() => {

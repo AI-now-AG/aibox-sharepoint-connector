@@ -19,7 +19,7 @@
   let { items = $bindable([]) }: Props = $props();
 
   let groupToDelete: string;
-  let confirmDeleteModal: HTMLDialogElement = $state();
+  let confirmDeleteModal: HTMLDialogElement | undefined = $state();
 
   const flipDurationMs: number = 200;
   const dropTargetStyle: any = {
@@ -28,12 +28,12 @@
   const t = useTranslations();
 
   function preventDefault(fn) {
-		return function (event) {
-			event.preventDefault();
-			fn.call(this, event);
-		};
-	}
-  
+    return function (event) {
+      event.preventDefault();
+      fn.call(this, event);
+    };
+  }
+
   function handleDndConsider(e: CustomEvent) {
     items = e.detail.items;
   }
@@ -45,7 +45,7 @@
 
   async function handleDelete(categoryId: string) {
     groupToDelete = categoryId;
-    confirmDeleteModal.show();
+    confirmDeleteModal?.show();
   }
 
   async function updateStatus(id: string, active: boolean) {
@@ -138,7 +138,8 @@
                 <button
                   class="flex block w-full text-left px-4 py-2 text-sm hover:underline"
                   onclick={preventDefault(() =>
-                    updateStatus(item.id, !item.active))}
+                    updateStatus(item.id, !item.active),
+                  )}
                 >
                   {@html item.active == 1 ? svgIcons.eyeClose : svgIcons.eye}
                   <span class="ml-1"

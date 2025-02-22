@@ -286,5 +286,8 @@
   "tenant.add-tenant-admin": "Add Tenant Admin",
   "tenant.email-invalid": "Email is not valid",
   "tenant.create-tenant-admin-successful": "Create tenant admin successfully",
-  "tenant.create-tenant-admin-failed": "Create tenant admin failed"
+  "tenant.create-tenant-admin-failed": "Create tenant admin failed",
+  "prompt-execution.a-prompt-is-being-executed-please-wait": "A prompt is being executed. Please wait for while! Thank you!",
+  "home.quick-links": "Quick Links",
+  "home.welcome": "Welcome ${name}"
 }

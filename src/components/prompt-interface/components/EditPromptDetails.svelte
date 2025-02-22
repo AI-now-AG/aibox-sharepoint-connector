@@ -8,7 +8,7 @@
   import { addToast } from "$stores/toast";
   import LoadingSpinner from "$components/prompt-interface/components/LoadingSpinner.svelte";
   import { svgIcons } from "$assets/icons";
-  import log from "$utils/log";
+  import { preventDefault } from "$utils/common";
 
   const t = useTranslations();
 
@@ -40,7 +40,7 @@
   };
 
   let categories: Category[] = $state([]);
-  let selectedCategory: Category = $state();
+  let selectedCategory: Category | undefined = $state();
 
   let knowledgeBases: KnowledgeBase[] = $state([]);
   let selectedKnowledgeBases: KnowledgeBase[] = $state([]);
@@ -54,13 +54,6 @@
 
   let isSaving = $state(false);
   let isLoading = $state(false);
-
-  function preventDefault(fn) {
-    return function (event) {
-      event.preventDefault();
-      fn.call(this, event);
-    };
-  }
 
   onMount(async function () {
     const categoryResponse = await fetch("/api/categories.json", {

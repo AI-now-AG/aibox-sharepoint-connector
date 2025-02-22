@@ -6,6 +6,7 @@
   import { onMount } from "svelte";
   import MultiInput from "$pages/prompt-library/prompts/MultiInput.svelte";
   import { addToast } from "$stores/toast";
+  import { preventDefault } from "$utils/common";
 
   const t = useTranslations();
 
@@ -53,7 +54,11 @@
     isEditable?: boolean;
   }
 
-  let { promptId = undefined, prompt = undefined, isEditable = false }: Props = $props();
+  let {
+    promptId = undefined,
+    prompt = undefined,
+    isEditable = false,
+  }: Props = $props();
 
   let isSaving = $state(false);
 
@@ -84,13 +89,6 @@
       }
     }
   });
-
-  function preventDefault(fn) {
-		return function (event) {
-			event.preventDefault();
-			fn.call(this, event);
-		};
-	}
 
   async function fetchInstructionAndKB() {
     /*const instructionResponse = await fetch("/api/instructions.json", {
@@ -129,11 +127,12 @@
     }
   }
 
-  let isFormValid =
-    $derived(promptTitle.trim() !== "" &&
-    promptText.trim() !== "" &&
-    selectedCategory !== undefined &&
-    selectedGroup !== undefined);
+  let isFormValid = $derived(
+    promptTitle.trim() !== "" &&
+      promptText.trim() !== "" &&
+      selectedCategory !== undefined &&
+      selectedGroup !== undefined,
+  );
 
   async function savePrompt() {
     if (!isFormValid) return;
@@ -249,7 +248,7 @@
           bind:value={promptText}
           placeholder="e.g. Create three headlines..."
           class="input input-bordered min-w-xs shadow appearance-none min-h-32 w-full py-2 px-3"
-></textarea>
+        ></textarea>
       </div>
 
       <div

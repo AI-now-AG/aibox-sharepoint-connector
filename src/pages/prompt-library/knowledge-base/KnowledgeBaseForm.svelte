@@ -4,6 +4,8 @@
   import { onMount } from "svelte";
   import { addToast } from "$stores/toast";
   import { svgIcons } from "$assets/icons";
+  import { preventDefault } from "$utils/common";
+
   const t = useTranslations();
 
   let knowledgeBaseTitle = $state("");
@@ -15,11 +17,16 @@
     isEditable?: boolean;
   }
 
-  let { knowledgeBaseId = undefined, knowledgeBase = undefined, isEditable = false }: Props = $props();
+  let {
+    knowledgeBaseId = undefined,
+    knowledgeBase = undefined,
+    isEditable = false,
+  }: Props = $props();
 
   let isSaving = $state(false);
-  let isFormValid =
-    $derived(knowledgeBaseTitle.trim() !== "" && knowledgeBaseText.trim() !== "");
+  let isFormValid = $derived(
+    knowledgeBaseTitle.trim() !== "" && knowledgeBaseText.trim() !== "",
+  );
 
   onMount(async function () {
     if (knowledgeBase) {
@@ -27,13 +34,6 @@
       knowledgeBaseText = knowledgeBase.knowledge_base;
     }
   });
-
-  function preventDefault(fn) {
-		return function (event) {
-			event.preventDefault();
-			fn.call(this, event);
-		};
-	}
 
   async function saveInstruction() {
     if (!isFormValid) return;
@@ -110,7 +110,7 @@
           bind:value={knowledgeBaseText}
           placeholder="e.g. type knowledge base details..."
           class="input input-bordered min-w-xs shadow appearance-none min-h-96 w-full py-2 px-3"
-></textarea>
+        ></textarea>
       </div>
 
       {#if isEditable}

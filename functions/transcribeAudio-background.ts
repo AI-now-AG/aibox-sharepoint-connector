@@ -308,10 +308,18 @@ async function convertStereoToMono(
   }
 }
 
-export async function generateSasUrlFromBlobUrl(blobUrl: string, typedTranscriptionType: TranscriptionType): Promise<string | null> {
+export async function generateSasUrlFromBlobUrl(
+  blobUrl: string,
+  typedTranscriptionType: TranscriptionType,
+): Promise<string | null> {
   try {
-    const blobServiceClient = await getBlobServiceClient(typedTranscriptionType);
-    const containerClient = await getContainerClient(blobServiceClient, typedTranscriptionType);
+    const blobServiceClient = await getBlobServiceClient(
+      typedTranscriptionType,
+    );
+    const containerClient = await getContainerClient(
+      blobServiceClient,
+      typedTranscriptionType,
+    );
 
     const url = new URL(blobUrl);
     const blobName = decodeURIComponent(url.pathname.substring(1));

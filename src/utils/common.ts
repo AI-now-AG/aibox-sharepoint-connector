@@ -30,3 +30,10 @@ export const isValidEmail = (email: string) => {
   const emailRegex = /^[\w.+-]+@[\w.-]+\.\w{2,3}$/;
   return emailRegex.test(email);
 };
+
+export const preventDefault = (fn: any) => {
+  return function (this: any, event: any) {
+    event.preventDefault();
+    fn.call(this, event);
+  };
+};

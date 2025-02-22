@@ -2,19 +2,6 @@ import type { APIRoute } from "astro";
 import { updateUserData } from "$data/models/user.model";
 import { z } from "zod";
 
-const CreatePromptParamsSchema = z.object({
-  _id: z.string().optional(),
-  title: z.string(),
-  category: z.string().optional(),
-  group: z.string().optional(),
-  instructions: z.array(z.string().optional()).optional(),
-  knowledgebase: z.array(z.string().optional()),
-  prompt: z.string(),
-  documents: z.array(z.string()).optional(),
-});
-
-export type CreatePromptParams = z.infer<typeof CreatePromptParamsSchema>;
-
 const UpdateNavStateSchema = z.object({
   id: z.string(),
   open: z.boolean(),

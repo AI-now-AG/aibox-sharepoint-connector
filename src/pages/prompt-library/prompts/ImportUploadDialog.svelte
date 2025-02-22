@@ -20,8 +20,6 @@
 
   const acceptedMimeTypes = Object.values(acceptedTypes).flat().join(", ");
 
-
-
   function addFiles(
     event: Event & { currentTarget: EventTarget & HTMLInputElement },
   ) {
