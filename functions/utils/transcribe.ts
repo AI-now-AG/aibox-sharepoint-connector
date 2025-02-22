@@ -156,6 +156,7 @@ export const improveSRTQuality = async (
   if (transcribeParams.apiKeyProvider === ApiKeyProvider.AzureOpenAI) {
     model = getAzureChatModel(transcribeParams);
   }
+
   /*const flatEntries = data
     .map(
       (entry) => `input> ${entry.text}
@@ -164,72 +165,69 @@ output>
     )
     .join("\n");*/
 
-  const textChunks = [];
-  let currentTextChunk = "";
-  for (const [index, entry] of data.entries()) {
-    let formattedText = `input> ${entry.text}\noutput> \n`;
+  const instruction =
+    transcribeParams.transcriptionType === TranscriptionType.Subtitlesjson
+      ? transcribeParams.transcriptions.subtitlesjson?.text
+      : transcribeParams.transcriptionType === TranscriptionType.SubtitleLarge
+        ? transcribeParams.transcriptions.subtitlelarge?.text
+        : transcribeParams.transcriptions.subtitles?.text ||
+          DEFAULT_INSTRUCTION;
 
-    if (index < data.length - 1) {
-      formattedText += "\n";
+  const CHUNK_SIZE_TOKENS = 9000;
+
+  const textChunks: string[] = [];
+  let currentChunk = "";
+  let currentTokenCount = 0;
+
+  for (const entry of data) {
+    const formattedText = `input> ${entry.text}\noutput> \n\n`;
+    const tokens = formattedText.length / 4;
+
+    if (
+      currentTokenCount + tokens > CHUNK_SIZE_TOKENS &&
+      currentChunk.length > 0
+    ) {
+      textChunks.push(currentChunk);
+      currentChunk = "";
+      currentTokenCount = 0;
     }
 
-    const currentTokenCount =
-      (currentTextChunk.length + formattedText.length) / 4;
-
-    if (currentTokenCount >= 9000) {
-      textChunks.push(currentTextChunk);
-      currentTextChunk = formattedText;
-    } else {
-      currentTextChunk += formattedText;
-    }
+    currentChunk += formattedText;
+    currentTokenCount += tokens;
   }
 
-  /*let currentChunk = "";
-  for (const entry of flatEntries) {
-    const tokenCount = (currentChunk.length + entry.length) / 4;
-    if (tokenCount >= 25000) {
-      chunks.push(currentChunk);
-      currentChunk = entry;
-    } else {
-      currentChunk += entry;
-    }
-  }*/
-  if (currentTextChunk) textChunks.push(currentTextChunk);
+  if (currentChunk.length > 0) {
+    textChunks.push(currentChunk);
+  }
 
   const correctedLines: string[] = [];
-  const results = await Promise.all(
-    textChunks.map(async (chunk, index) => {
-      const { transcriptionType, transcriptions } = transcribeParams;
-      const instruction =
-        transcriptionType === TranscriptionType.Subtitlesjson
-          ? transcriptions.subtitlesjson?.text
-          : transcriptionType === TranscriptionType.SubtitleLarge
-            ? transcriptions.subtitlelarge?.text
-            : transcriptions.subtitles?.text;
+  let previousResponse = "";
 
-      const response = await model.invoke([
-        new SystemMessage(instruction || DEFAULT_INSTRUCTION),
-        new HumanMessage(chunk),
-      ]);
-      return {
-        index,
-        lines: response.content
-          .toString()
-          .split("\n")
-          .filter((line) => line.startsWith("output>"))
-          .map((line) => line.substring(8)),
-      };
-    }),
-  );
+  for (const chunk of textChunks) {
+    const response = await model.invoke([
+      new SystemMessage(instruction || DEFAULT_INSTRUCTION),
+      new HumanMessage(
+        (previousResponse
+          ? previousResponse +
+            `\n\n[Continue improving from where you left off. Do not repeat previous outputs.]\n\n`
+          : "") + chunk,
+      ),
+    ]);
 
-  results.sort((a, b) => a.index - b.index);
-  results.forEach((result) => correctedLines.push(...result.lines));
+    const chunkResult = response.content
+      .toString()
+      .split("\n")
+      .filter((line) => line.startsWith("output>"))
+      .map((line) => line.substring(8));
 
-  const out: Entry[] = data.map((entry, i) => ({
+    correctedLines.push(...chunkResult);
+    previousResponse += chunkResult.join("\n") + "\n";
+  }
+
+  return data.map((entry, i) => ({
     ...entry,
     text: correctedLines[i] || entry.text,
   }));
-  return out;
 };
 
 export const improveTextQuality = async (
