@@ -3,6 +3,7 @@ import type { APIContext } from "astro";
 import { decrypt } from "./secure";
 import { TenantFeature, ApiKeyProvider } from "$types/TenantFeature";
 import ChatPerplexity, { PerplexityModel } from "$llm/Perplexity";
+import log from "./log";
 
 export const initPerplexityOpenAI = (
   apiKey: string,
@@ -47,6 +48,7 @@ export const initializeOpenAI = (ctx: APIContext) => {
     ? textPromptsProvider.provider
     : ApiKeyProvider.OpenAI;
 
+  log.i(provider, "API PROVIDER");
   // Perplexity
   if (provider == ApiKeyProvider.Perplexity) {
     const perplexityApiKey = decrypt(

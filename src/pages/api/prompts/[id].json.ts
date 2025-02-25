@@ -11,12 +11,12 @@ import InstructionModel from "$data/models/instruction.model";
 import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
 import { z } from "zod";
 import { fileLoader } from "$utils/document-loader";
-
 import type { APIRoute } from "astro";
 import type { CreateInstructionParams } from "../instructions.json";
 import type { CreateKnowledgeBaseParams } from "../knowledge-base.json";
 import initializeOpenAI from "$utils/chatModel";
 import { MessageRole } from "$types/MessageHistory";
+import ChatPerplexity from "$llm/Perplexity";
 
 export type PromptDetails = {
   title: string;
@@ -185,7 +185,11 @@ export const POST: APIRoute = async (ctx) => {
 
         let partialChunk = "";
         for await (const chunk of stream) {
-          partialChunk += chunk;
+          if (model instanceof ChatPerplexity) {
+            partialChunk = chunk.choices[0]?.delta?.content;
+          } else {
+            partialChunk += chunk;
+          }
 
           // Try to process and send the complete part of the chunk
           let lastCompleteCharIndex = partialChunk.length;
