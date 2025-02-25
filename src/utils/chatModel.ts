@@ -2,6 +2,19 @@ import { ChatOpenAI, AzureChatOpenAI } from "@langchain/openai";
 import type { APIContext } from "astro";
 import { decrypt } from "./secure";
 import { TenantFeature, ApiKeyProvider } from "$types/TenantFeature";
+import ChatPerplexity, { PerplexityModel } from "$llm/Perplexity";
+
+export const initPerplexityOpenAI = (
+  apiKey: string,
+  model?: PerplexityModel,
+  maxToken?: number,
+) => {
+  return new ChatPerplexity({
+    api_key: apiKey,
+    model: model ?? PerplexityModel.SONAR,
+    max_tokens: maxToken || 400,
+  });
+};
 
 const initChatOpenAI = (apiKey: string, model: string) => {
   return new ChatOpenAI({
@@ -33,6 +46,18 @@ export const initializeOpenAI = (ctx: APIContext) => {
   const provider = textPromptsProvider
     ? textPromptsProvider.provider
     : ApiKeyProvider.OpenAI;
+
+  // Perplexity
+  if (provider == ApiKeyProvider.Perplexity) {
+    const perplexityApiKey = decrypt(
+      ctx.locals.tenant?.perplexity_api_key || "",
+    );
+    const perplexityModel: any =
+      ctx.locals.tenant?.perplexity_model || PerplexityModel.SONAR;
+    const maxToken = import.meta.env.CHAT_PERPLEXITY_MAX_TOKEN || 400;
+
+    return initPerplexityOpenAI(perplexityApiKey, perplexityModel, maxToken);
+  }
 
   // Azure OpenAI
   if (provider == ApiKeyProvider.AzureOpenAI) {
