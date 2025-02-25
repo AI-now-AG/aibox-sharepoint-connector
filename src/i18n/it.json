@@ -285,5 +285,15 @@
   "tenant.create-tenant-admin-failed": "Create tenant admin failed",
   "prompt-execution.a-prompt-is-being-executed-please-wait": "A prompt is being executed. Please wait for while! Thank you!",
   "home.quick-links": "Quick Links",
-  "home.welcome": "Welcome ${name}"
+  "home.welcome": "Welcome ${name}",
+  "tenant.perplexity.name": "Perplexity",
+  "tenant.model.name": "Model Name",
+  "tenant.validate-atleast-one-select": "Please select at least one of the model",
+  "tenant.validate-default-should-be-select": "Please select any default model",
+  "tenant.text.prompt.features": "Text Prompt Features",
+  "tenant.audio-to-text-subtitles": "Audio to Text, Subtitles",
+  "tenant.subtitle-large-audio-pro": "Subtitle Large, Audio Pro",
+  "tenant.mark-as-default": "Mark as default",
+  "tenant.audio.whisper.model.title": "Open AI/Azure Open AI (Whisper)",
+  "tenant.default": "default"
 }

@@ -12,6 +12,7 @@ import TenantModel, {
   IncludedFeaturesSchema,
   TenantFilterParamsSchema,
   TenantTheme,
+  TextFeatureSchema,
   type Tenant,
 } from "$data/models/tenant.model";
 import UserModel, { assignPermissions } from "$data/models/user.model";
@@ -28,7 +29,7 @@ const TenantInputParamsSchema = z.object({
   default_language: z.string(),
   theme: z.nativeEnum(TenantTheme),
   primary_color: z.string().optional(),
-  api_key_provider: z.nativeEnum(ApiKeyProvider).optional(),
+  api_key_providers: z.array(TextFeatureSchema).optional(),
   openai_api_key: z.string().optional(),
   azure_openai_api_key: z.string().optional(),
   azure_openai_endpoint: z.string().optional(),
@@ -37,6 +38,8 @@ const TenantInputParamsSchema = z.object({
   azure_openai_chat_model: z.string().optional(),
   speech_api_key: z.string().optional(),
   speech_region: z.string().optional(),
+  perplexity_api_key: z.string().optional(),
+  perplexity_chat_model: z.string().optional(),
   included_features: z.array(IncludedFeaturesSchema),
   is_restrict_user_managment: z
     .boolean()
@@ -48,6 +51,7 @@ const TenantInputParamsSchema = z.object({
 const TenanKeyEncryptSchema = z.object({
   openai_api_key: z.string().optional(),
   azure_openai_api_key: z.string().optional(),
+  perplexity_api_key: z.string().optional(),
   speech_api_key: z.string().optional(),
 });
 
@@ -318,12 +322,15 @@ export const tenant = {
   encryptApiKeys: defineAction({
     input: TenanKeyEncryptSchema,
     handler: async (input) => {
-      const { openai_api_key, azure_openai_api_key, speech_api_key } = input;
+      const { openai_api_key, azure_openai_api_key, perplexity_api_key, speech_api_key } = input;
       if (openai_api_key) {
         input.openai_api_key = encrypt(openai_api_key);
       }
       if (azure_openai_api_key) {
         input.azure_openai_api_key = encrypt(azure_openai_api_key);
+      }
+      if (perplexity_api_key) {
+        input.perplexity_api_key = encrypt(perplexity_api_key);
       }
       if (speech_api_key) {
         input.speech_api_key = encrypt(speech_api_key);

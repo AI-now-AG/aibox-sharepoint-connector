@@ -53,6 +53,8 @@ import spinner from "$assets/icons/spinner.svg?raw";
 import toastSuccess from "$assets/icons/toast-success.svg?raw";
 import toastError from "$assets/icons/toast-error.svg?raw";
 import toastInfo from "$assets/icons/toast-info.svg?raw";
+import textPrompt from "$assets/icons/textPrompt.svg?raw";
+import userGroup from "$assets/icons/user-group.svg?raw";
 
 export const svgIcons = {
   menuSettings,
@@ -110,4 +112,6 @@ export const svgIcons = {
   toastSuccess,
   toastError,
   toastInfo,
+  textPrompt,
+  userGroup,
 };
