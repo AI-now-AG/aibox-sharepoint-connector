@@ -8,6 +8,7 @@ import {
   formatSRT,
   formatASS,
   createSRTData,
+  createSRTDataLarge,
   type InputEntry,
   type Entry,
 } from "./srt";
@@ -155,50 +156,78 @@ export const improveSRTQuality = async (
   if (transcribeParams.apiKeyProvider === ApiKeyProvider.AzureOpenAI) {
     model = getAzureChatModel(transcribeParams);
   }
-  const flatEntries = data
+
+  /*const flatEntries = data
     .map(
       (entry) => `input> ${entry.text}
 output> 
 `,
     )
-    .join("\n");
-  const chunks = [];
+    .join("\n");*/
+
+  const instruction =
+    transcribeParams.transcriptionType === TranscriptionType.Subtitlesjson
+      ? transcribeParams.transcriptions.subtitlesjson?.text
+      : transcribeParams.transcriptionType === TranscriptionType.SubtitleLarge
+        ? transcribeParams.transcriptions.subtitlelarge?.text
+        : transcribeParams.transcriptions.subtitles?.text ||
+          DEFAULT_INSTRUCTION;
+
+  const CHUNK_SIZE_TOKENS = 9000;
+
+  const textChunks: string[] = [];
   let currentChunk = "";
-  for (const entry of flatEntries) {
-    const tokenCount = (currentChunk.length + entry.length) / 4;
-    if (tokenCount >= 25000) {
-      chunks.push(currentChunk);
-      currentChunk = entry;
-    } else {
-      currentChunk += entry;
+  let currentTokenCount = 0;
+
+  for (const entry of data) {
+    const formattedText = `input> ${entry.text}\noutput> \n\n`;
+    const tokens = formattedText.length / 4;
+
+    if (
+      currentTokenCount + tokens > CHUNK_SIZE_TOKENS &&
+      currentChunk.length > 0
+    ) {
+      textChunks.push(currentChunk);
+      currentChunk = "";
+      currentTokenCount = 0;
     }
+
+    currentChunk += formattedText;
+    currentTokenCount += tokens;
   }
-  if (currentChunk) chunks.push(currentChunk);
+
+  if (currentChunk.length > 0) {
+    textChunks.push(currentChunk);
+  }
 
   const correctedLines: string[] = [];
-  for (const chunk of chunks) {
-    const { transcriptionType, transcriptions } = transcribeParams;
-    const instruction =
-      transcriptionType === TranscriptionType.Subtitlesjson
-        ? transcriptions.subtitlesjson?.text
-        : transcriptions.subtitles?.text;
+  let previousResponse = "";
+
+  for (const chunk of textChunks) {
     const response = await model.invoke([
       new SystemMessage(instruction || DEFAULT_INSTRUCTION),
-      new HumanMessage(chunk),
+      new HumanMessage(
+        (previousResponse
+          ? previousResponse +
+            `\n\n[Continue improving from where you left off. Do not repeat previous outputs.]\n\n`
+          : "") + chunk,
+      ),
     ]);
-    correctedLines.push(
-      ...response.content
-        .toString()
-        .split("\n")
-        .filter((line) => line.startsWith("output>"))
-        .map((line) => line.substring(8)),
-    );
+
+    const chunkResult = response.content
+      .toString()
+      .split("\n")
+      .filter((line) => line.startsWith("output>"))
+      .map((line) => line.substring(8));
+
+    correctedLines.push(...chunkResult);
+    previousResponse += chunkResult.join("\n") + "\n";
   }
-  const out: Entry[] = data.map((entry, i) => ({
+
+  return data.map((entry, i) => ({
     ...entry,
     text: correctedLines[i] || entry.text,
   }));
-  return out;
 };
 
 export const improveTextQuality = async (
@@ -323,56 +352,17 @@ export async function transcribeUsingOpenAI(
       transcribeParams.transcriptionType === TranscriptionType.Subtitles ||
       transcribeParams.transcriptionType === TranscriptionType.Subtitlesjson
     ) {
-      let srtData: Entry[] = [],
-        improvedSrtData: Entry[] = [],
-        grouped: Entry[] = [];
-      const fileFormats = transcribeParams.selectedFileFormat ?? [];
-      if (
-        fileFormats.includes(FileFormat.SRT) ||
-        fileFormats.includes(FileFormat.ASS) ||
-        transcribeParams.isShowImprovedTextPreview
-      ) {
-        srtData = createSRTData(
-          (response as unknown as { words: InputEntry[] }).words,
-        );
-        improvedSrtData = await improveSRTQuality(transcribeParams, srtData);
-        grouped = groupLines(improvedSrtData);
-        if (transcribeParams.isShowImprovedTextPreview) {
-          const improvedTextGroup = grouped
-            .map((item) => item.text)
-            .join("\n\n");
-          outputURLs["txt_improved"] = await uploadOutputToBlob(
-            transcribeParams.folderName,
-            `${fileNameWithoutExtension}_improved.txt`,
-            improvedTextGroup,
-            "txt",
-          );
-        }
-      }
-      if (
-        transcribeParams.selectedFileFormat &&
-        transcribeParams.selectedFileFormat?.includes(FileFormat.SRT)
-      ) {
-        const srtResult = formatSRT(grouped);
-        outputURLs["srt"] = await uploadOutputToBlob(
-          transcribeParams.folderName,
-          `${fileNameWithoutExtension}.srt`,
-          srtResult,
-          "srt",
-        );
-      }
-      if (
-        transcribeParams.selectedFileFormat &&
-        transcribeParams.selectedFileFormat?.includes(FileFormat.ASS)
-      ) {
-        const assResult = formatASS(grouped);
-        outputURLs["ass"] = await uploadOutputToBlob(
-          transcribeParams.folderName,
-          `${fileNameWithoutExtension}.ass`,
-          assResult,
-          "ass",
-        );
-      }
+      const jsonData = response as unknown as { words: InputEntry[] };
+      await uploadSubtitleFiles(
+        transcribeParams.selectedFileFormat,
+        transcribeParams.isShowImprovedTextPreview,
+        transcribeParams.folderName,
+        fileNameWithoutExtension,
+        jsonData,
+        outputURLs,
+        transcribeParams.transcriptionType,
+        transcribeParams,
+      );
     }
 
     outputURLs["txt"] = await uploadOutputToBlob(
@@ -422,6 +412,8 @@ export async function transcribeUsingAzureOpenAI(
       speechRegion,
       transcribeParams.isDiarizationEnabled,
       maxNumberOfSpeakers,
+      transcribeParams.transcriptionType,
+      transcribeParams.languageLocales,
     );
     const outputURLs: { [key: string]: string } = {};
     /*const outputURLs = await uploadLargeFile(
@@ -472,14 +464,128 @@ export async function uploadLargeFile(
     `${fileNameWithoutExtension}.json`,
     JSON.stringify(jsonData),
     "json",
-    TranscriptionType.Largefile, // Static type
+    TranscriptionType.Largefile,
   );
   outputURLs["txt"] = await uploadOutputToBlob(
     folderName,
     `${fileNameWithoutExtension}.txt`,
     transcriptionText,
     "txt",
-    TranscriptionType.Largefile, // Static type
+    TranscriptionType.Largefile,
+  );
+  return outputURLs;
+}
+
+async function uploadSubtitleFiles(
+  selectedFileFormat: FileFormat[] | undefined,
+  isShowImprovedTextPreview: boolean = false,
+  folderName: string,
+  fileNameWithoutExtension: string,
+  jsonData: { words: InputEntry[] },
+  outputURLs: { [key: string]: string },
+  transcriptionType?: TranscriptionType,
+  transcribeParams?: TranscribeRequest,
+) {
+  let srtData: Entry[] = [],
+    improvedSrtData: Entry[] = [],
+    grouped: Entry[] = [];
+  const fileFormats = selectedFileFormat ?? [];
+
+  if (
+    fileFormats.includes(FileFormat.SRT) ||
+    fileFormats.includes(FileFormat.ASS) ||
+    isShowImprovedTextPreview
+  ) {
+    srtData = createSRTData(jsonData.words);
+    improvedSrtData = srtData;
+    if (transcribeParams) {
+      improvedSrtData = await improveSRTQuality(transcribeParams!, srtData);
+    }
+    grouped = groupLines(improvedSrtData);
+    if (isShowImprovedTextPreview) {
+      const improvedTextGroup = grouped.map((item) => item.text).join("\n\n");
+      outputURLs["txt_improved"] = await uploadOutputToBlob(
+        folderName,
+        `${fileNameWithoutExtension}_improved.txt`,
+        improvedTextGroup,
+        "txt",
+        transcriptionType,
+      );
+    }
+  }
+  if (selectedFileFormat && selectedFileFormat?.includes(FileFormat.SRT)) {
+    const srtResult = formatSRT(grouped);
+    outputURLs["srt"] = await uploadOutputToBlob(
+      folderName,
+      `${fileNameWithoutExtension}.srt`,
+      srtResult,
+      "srt",
+      transcriptionType,
+    );
+  }
+  if (selectedFileFormat && selectedFileFormat?.includes(FileFormat.ASS)) {
+    const assResult = formatASS(grouped);
+    outputURLs["ass"] = await uploadOutputToBlob(
+      folderName,
+      `${fileNameWithoutExtension}.ass`,
+      assResult,
+      "ass",
+      transcriptionType,
+    );
+  }
+}
+
+export async function uploadSubtitleLargeFiles(
+  uploadUrl: string,
+  folderName: string,
+  jsonData: TranscriptionResponse,
+  transcriptionText: string,
+  selectedFileFormat: FileFormat[] | undefined,
+  isShowImprovedTextPreview: boolean = false,
+  transcribeParams: TranscribeRequest,
+): Promise<{ [key: string]: string }> {
+  const outputURLs: { [key: string]: string } = {};
+  const fileNameWithExtension = uploadUrl.split("/").pop()!.split("?")[0];
+  const fileNameWithoutExtension = fileNameWithExtension
+    .split(".")
+    .slice(0, -1)
+    .join(".");
+
+  const displayWords = jsonData.recognizedPhrases
+    .filter((phrase) => phrase.channel === 0)
+    .map((phrase) => {
+      const bestMatch = phrase.nBest.reduce((best, current) => {
+        return current.confidence > best.confidence ? current : best;
+      });
+      return bestMatch;
+    })
+    .flatMap((n) => n.words ?? []);
+  const formattedWords = createSRTDataLarge(displayWords);
+  await uploadSubtitleFiles(
+    selectedFileFormat,
+    isShowImprovedTextPreview,
+    folderName,
+    fileNameWithoutExtension,
+    formattedWords,
+    outputURLs,
+    TranscriptionType.SubtitleLarge,
+    transcribeParams,
+  );
+
+  outputURLs["json"] = await uploadOutputToBlob(
+    folderName,
+    `${fileNameWithoutExtension}.json`,
+    JSON.stringify(jsonData),
+    "json",
+    TranscriptionType.SubtitleLarge,
+  );
+
+  outputURLs["txt"] = await uploadOutputToBlob(
+    folderName,
+    `${fileNameWithoutExtension}.txt`,
+    transcriptionText,
+    "txt",
+    TranscriptionType.SubtitleLarge,
   );
   return outputURLs;
 }
@@ -492,13 +598,15 @@ async function uploadOutputToBlob(
   typedTranscriptionType?: TranscriptionType,
 ): Promise<string> {
   const storageURLString =
-    typedTranscriptionType === TranscriptionType.Largefile
+    typedTranscriptionType === TranscriptionType.Largefile ||
+    typedTranscriptionType === TranscriptionType.SubtitleLarge
       ? process.env.AZURE_BLOB_LARGE_STORAGE_NAME || ""
       : process.env.AZURE_BLOB_STORAGE_NAME || "";
   const blobServiceClient =
     BlobServiceClient.fromConnectionString(storageURLString);
   const containerName =
-    typedTranscriptionType === TranscriptionType.Largefile
+    typedTranscriptionType === TranscriptionType.Largefile ||
+    typedTranscriptionType === TranscriptionType.SubtitleLarge
       ? process.env.AZURE_LARGE_CONTAINER_NAME || "transcribe-container"
       : process.env.AZURE_CONTAINER_NAME || "transcribecontainer";
   const containerClient = blobServiceClient.getContainerClient(containerName);

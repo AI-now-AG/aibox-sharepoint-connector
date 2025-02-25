@@ -24,13 +24,15 @@ const getSASToken: Handler = async (event) => {
   }
   try {
     const storageURLString =
-      typedTranscriptionType === TranscriptionType.Largefile
+      typedTranscriptionType === TranscriptionType.Largefile ||
+      typedTranscriptionType === TranscriptionType.SubtitleLarge
         ? process.env.AZURE_BLOB_LARGE_STORAGE_NAME || ""
         : process.env.AZURE_BLOB_STORAGE_NAME || "";
     const blobServiceClient =
       BlobServiceClient.fromConnectionString(storageURLString);
     const containerName =
-      typedTranscriptionType === TranscriptionType.Largefile
+      typedTranscriptionType === TranscriptionType.Largefile ||
+      typedTranscriptionType === TranscriptionType.SubtitleLarge
         ? process.env.AZURE_LARGE_CONTAINER_NAME || "transcribe-container"
         : process.env.AZURE_CONTAINER_NAME || "transcribecontainer";
     const containerClient = blobServiceClient.getContainerClient(containerName);

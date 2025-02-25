@@ -26,10 +26,15 @@ interface LargefileCard extends BaseCard {
   type: TranscriptionType.Largefile;
 }
 
+interface SubtitleLargeCard extends BaseCard {
+  type: TranscriptionType.SubtitleLarge;
+}
+
 // Union Type for All Cards
 export type TranscriptionCard =
   | PlaintextCard
   | SummarizeCard
   | SubtitlesCard
   | SubtitlesjsonCard
-  | LargefileCard;
+  | LargefileCard
+  | SubtitleLargeCard;
