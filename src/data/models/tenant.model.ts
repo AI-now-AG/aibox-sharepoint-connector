@@ -60,6 +60,12 @@ export const TranscriptionsSchema = z.object({
       text: z.string().optional(),
     })
     .optional(),
+  subtitlelarge: z
+    .object({
+      enabled: z.boolean().default(false),
+      text: z.string().optional(),
+    })
+    .optional(),
 });
 
 const TenantSchema = z.object({

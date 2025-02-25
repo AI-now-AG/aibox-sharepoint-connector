@@ -27,6 +27,7 @@ export interface TranscribeRequest {
   audioBuffer?: Buffer;
   isDiarizationEnabled?: boolean;
   maxSpeakers?: number;
+  languageLocales?: string[];
 }
 
 export enum FileFormat {
@@ -41,6 +42,7 @@ export enum TranscriptionType {
   Subtitles = "subtitles",
   Subtitlesjson = "subtitlesjson",
   Largefile = "largefile",
+  SubtitleLarge = "subtitlelarge",
 }
 
 export interface TranscriptionResult {

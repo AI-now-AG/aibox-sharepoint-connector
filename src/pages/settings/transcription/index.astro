@@ -53,6 +53,13 @@ if (Astro.locals.tenant) {
       toggle: transcriptions?.largefile?.enabled ?? false,
       type: TranscriptionType.Largefile,
     });
+    cards.push({
+      title: t("settings.transcription.subtitle.largefile-title"),
+      //description: t("settings.transcription.subtitle.largefile-description"),
+      description: transcriptions?.subtitlelarge?.text ?? "",
+      toggle: transcriptions?.subtitlelarge?.enabled ?? false,
+      type: TranscriptionType.SubtitleLarge,
+    });
   }
 }
 let userPermissions = Astro.locals.user.permissions;
