@@ -25,6 +25,9 @@ const transcriptionMap: Partial<Record<TranscriptionType, string>> = {
   [TranscriptionType.Subtitlesjson]: t(
     "settings.transcription.subtitles-title-json",
   ),
+  [TranscriptionType.SubtitleLarge]: t(
+    "settings.transcription.subtitle.largefile-title",
+  ),
 };
 
 const card: TranscriptionCard | undefined = transcriptionMap[typeParam]

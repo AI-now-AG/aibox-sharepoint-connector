@@ -23,6 +23,7 @@ import {
   StorageSharedKeyCredential,
 } from "@azure/storage-blob";
 import type { UpdateStatusParams } from "$types/TranscribeStatusDB";
+import { TranscriptionType } from "$types/TranscribeRequest";
 
 //const subscriptionKey = process.env.AZURE_LARGE_SPEECH_KEY || "";
 
@@ -34,6 +35,8 @@ export async function processTranscription(
   speechRegion: string,
   enableDiarization: boolean = false,
   numberOfMaxSpeakers: number = 2,
+  transcriptionType: TranscriptionType = TranscriptionType.Largefile,
+  languageLocales?: string[],
 ): Promise<{ transcriptionText: string }> {
   //): Promise<{ jsonData: TranscriptionResponse; transcriptionText: string }> {
   try {
@@ -51,6 +54,8 @@ export async function processTranscription(
       uniqueName,
       subscriptionKey,
       speechRegion,
+      transcriptionType,
+      languageLocales,
     );
     console.log("Created trancription task:" + taskResponse.self);
     updateStatus({
@@ -91,6 +96,8 @@ export async function createTranscriptionTask(
   uniqueName: string,
   subscriptionKey: string,
   speechRegion: string,
+  transcriptionType: TranscriptionType = TranscriptionType.Largefile,
+  languageLocales?: string[],
 ): Promise<PollStatusResponse> {
   const url = `https://${speechRegion}.api.cognitive.microsoft.com/speechtotext/v3.2/transcriptions`;
   const destinationContainerUrl = await createDestinationContainerUrl();
@@ -99,11 +106,19 @@ export async function createTranscriptionTask(
     locale: "de-ch",
     contentUrls: [blobUrl],
     properties: {
-      wordLevelTimestampsEnabled: false,
-      displayFormWordLevelTimestampsEnabled: true,
+      wordLevelTimestampsEnabled:
+        transcriptionType === TranscriptionType.SubtitleLarge ? true : false,
+      displayFormWordLevelTimestampsEnabled:
+        transcriptionType === TranscriptionType.SubtitleLarge ? false : true,
       diarizationEnabled: enableDiarization,
       languageIdentification: {
-        candidateLocales: ["fr-ch", "it-ch", "en-us", "en-gb", "de-ch"],
+        candidateLocales: languageLocales || [
+          "de-ch",
+          "fr-ch",
+          "it-ch",
+          "en-gb",
+          "en-us",
+        ],
       },
       punctuationMode: "DictatedAndAutomatic",
       profanityFilterMode: "None",
@@ -484,8 +499,10 @@ export async function fetchTranscription(
   const transcriptionText = enableDiarization
     ? formatTranscription(data)
     : combinedPhrases
-        .map((phrase) => phrase.display) // Extract 'display' from each phrase
-        .join(" ");
+        // .filter((pharse) => pharse.channel === 0)
+        // .map((phrase) => phrase.display)
+        .map((phrase) => `Channel ${phrase.channel}:\n\n${phrase.display}`)
+        .join("\n\n\n");
 
   return { jsonData: data, transcriptionText };
 }
