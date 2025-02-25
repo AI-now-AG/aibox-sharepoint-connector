@@ -53,7 +53,7 @@ export const initializeOpenAI = (ctx: APIContext) => {
       ctx.locals.tenant?.perplexity_api_key || "",
     );
     const perplexityModel: any =
-      ctx.locals.tenant?.perplexity_model || PerplexityModel.SONAR;
+      ctx.locals.tenant?.perplexity_chat_model || PerplexityModel.SONAR;
     const maxToken = import.meta.env.CHAT_PERPLEXITY_MAX_TOKEN || 400;
 
     return initPerplexityOpenAI(perplexityApiKey, perplexityModel, maxToken);
