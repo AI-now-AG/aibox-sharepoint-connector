@@ -5,6 +5,7 @@
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
   import { preventDefault } from "$utils/common";
+  import type { boolean } from "astro:schema";
   const t = useTranslations();
 
   interface Props {
@@ -12,6 +13,7 @@
     input?: string;
     output?: string;
     isProcessing?: boolean;
+    isDisableFileInput?: boolean;
   }
 
   let {
@@ -19,6 +21,7 @@
     input = $bindable(""),
     output = $bindable(""),
     isProcessing = $bindable(false),
+    isDisableFileInput = $bindable(false),
   }: Props = $props();
 
   let inputText = $state("");
@@ -254,6 +257,7 @@
       </button>
     </div>
   </div>
+
   <div>
     <input type="checkbox" class="modal-toggle" />
     <FileUpload

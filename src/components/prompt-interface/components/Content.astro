@@ -33,6 +33,7 @@ const promptItems = categoryGroupPrompt.map((prompt) => ({
 }));
 
 let userPermissions = Astro.locals.user.permissions;
+const tenant = Astro.locals.tenant;
 ---
 
 <div class="flex flex-col h-full max-w-6xl mx-auto">
@@ -46,6 +47,7 @@ let userPermissions = Astro.locals.user.permissions;
       <PromptExecution
         promptItems={promptItems}
         isEditable={userPermissions.includes(Permission.AdminAll)}
+        tenant={tenant}
         client:load
       />
     ) : (
