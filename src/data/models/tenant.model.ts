@@ -41,10 +41,49 @@ export const TranscriptionUsecaseSchema = z.object({
   instruction: z.string().optional(),
 });
 
+// export const TranscriptionsSchema = z.object({
+//   enabled: z.boolean().default(false),
+//   cateogry: z.nativeEnum(AudioCategory),
+//   usecases: z.array(TranscriptionUsecaseSchema),
+// });
+
 export const TranscriptionsSchema = z.object({
-  enabled: z.boolean().default(false),
-  cateogry: z.nativeEnum(AudioCategory),
-  usecases: z.array(TranscriptionUsecaseSchema),
+  plaintext: z
+    .object({
+      enabled: z.boolean().default(false),
+      text: z.string().optional(),
+    })
+    .optional(),
+  summary: z
+    .object({
+      enabled: z.boolean().default(false),
+      text: z.string().optional(),
+    })
+    .optional(),
+  subtitles: z
+    .object({
+      enabled: z.boolean().default(false),
+      text: z.string().optional(),
+    })
+    .optional(),
+  subtitlesjson: z
+    .object({
+      enabled: z.boolean().default(false),
+      text: z.string().optional(),
+    })
+    .optional(),
+  largefile: z
+    .object({
+      enabled: z.boolean().default(false),
+      text: z.string().optional(),
+    })
+    .optional(),
+  subtitlelarge: z
+    .object({
+      enabled: z.boolean().default(false),
+      text: z.string().optional(),
+    })
+    .optional(),
 });
 
 const TenantSchema = z.object({
@@ -63,7 +102,7 @@ const TenantSchema = z.object({
   azure_openai_whisper_model: z.string().nullish().default(null),
   azure_openai_chat_model: z.string().nullish().default(null),
   included_features: z.array(IncludedFeaturesSchema).optional(),
-  transcriptions: z.array(TranscriptionsSchema).optional(),
+  transcriptions: TranscriptionsSchema.optional(),
   speech_api_key: z.string().nullish(),
   speech_region: z.string().nullish(),
   perplexity_api_key: z.string().nullish(),
