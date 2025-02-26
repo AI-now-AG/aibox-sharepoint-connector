@@ -197,9 +197,15 @@
       (item: any) => item.name == ApiKeyProvider.Perplexity && item.active,
     );
 
-    defaultTextFeature = tenantData.api_key_providers.find(
-      (item: any) => item.default,
-    )?.name;
+    if (tenantData && tenantData.api_key_providers) {
+      defaultTextFeature = tenantData.api_key_providers.find(
+        (item: any) => item.default,
+      )?.name;
+    } else if (tenantData && tenantData.included_features?.length) {
+      defaultTextFeature = tenantData.included_features.some(
+        (item: any) => item.name == TenantFeature.AudioToText,
+      );
+    }
   }
 
   // set default values
