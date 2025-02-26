@@ -104,8 +104,8 @@
   };
 
   function getActiveModels() {
-    const activeModel = $tenant.api_key_providers.find(
-      (provider) => provider.active,
+    const defaultModel = $tenant.api_key_providers.find(
+      (provider) => provider.default,
     );
 
     const models = $tenant.api_key_providers
@@ -120,7 +120,7 @@
       });
     models.unshift({
       _id: null,
-      title: `Default (${getProviderName(activeModel)} ${getModelName(activeModel)})`,
+      title: `Default (${getProviderName(defaultModel)} ${getModelName(defaultModel)})`,
     });
     return models;
   }
