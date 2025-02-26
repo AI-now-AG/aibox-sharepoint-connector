@@ -5,6 +5,10 @@ import { TenantFeature, ApiKeyProvider } from "$types/TenantFeature";
 import ChatPerplexity, { PerplexityModel } from "$llm/Perplexity";
 import log from "./log";
 
+export interface InitChatOptions {
+  perplexity_chat_model?: PerplexityModel;
+}
+
 export const initPerplexityOpenAI = (
   apiKey: string,
   model?: PerplexityModel,
@@ -38,8 +42,12 @@ const initAzureChatOpenAI = (
   });
 };
 
-export const initializeOpenAI = (ctx: APIContext) => {
+export const initializeOpenAI = (
+  ctx: APIContext,
+  options?: InitChatOptions,
+) => {
   const { included_features: features } = ctx.locals.tenant;
+  const { perplexity_chat_model } = options || {};
 
   const textPromptsProvider = features?.find(
     (item) => item.name == TenantFeature.TextPrommpts,
@@ -55,7 +63,9 @@ export const initializeOpenAI = (ctx: APIContext) => {
       ctx.locals.tenant?.perplexity_api_key || "",
     );
     const perplexityModel: any =
-      ctx.locals.tenant?.perplexity_chat_model || PerplexityModel.SONAR;
+      perplexity_chat_model ||
+      ctx.locals.tenant?.perplexity_chat_model ||
+      PerplexityModel.SONAR;
     const maxToken = import.meta.env.CHAT_PERPLEXITY_MAX_TOKEN || 400;
 
     return initPerplexityOpenAI(perplexityApiKey, perplexityModel, maxToken);
