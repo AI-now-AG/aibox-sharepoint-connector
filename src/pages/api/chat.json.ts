@@ -10,7 +10,7 @@ import { StringOutputParser } from "@langchain/core/output_parsers";
 import { fileLoader } from "$utils/document-loader";
 import initializeOpenAI from "$utils/chatModel";
 import { MessageRole } from "$types/MessageHistory";
-import ChatPerplexity from "$llm/Perplexity";
+//import ChatPerplexity from "$llm/Perplexity";
 
 const AttachmentSchema = z.object({
   name: z.string(),
@@ -122,11 +122,12 @@ export const POST: APIRoute = async (ctx) => {
 
         let partialChunk = "";
         for await (const chunk of stream) {
-          if (model instanceof ChatPerplexity) {
-            partialChunk = chunk.choices[0]?.delta?.content;
-          } else {
-            partialChunk += chunk;
-          }
+          // if (model instanceof ChatPerplexity) {
+          //   partialChunk = chunk.choices[0]?.delta?.content;
+          // } else {
+          //   partialChunk += chunk;
+          // }
+          partialChunk += chunk;
 
           // Try to process and send the complete part of the chunk
           let lastCompleteCharIndex = partialChunk.length;
