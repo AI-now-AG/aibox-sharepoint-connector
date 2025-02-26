@@ -1,11 +1,11 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { useTranslations } from "$i18n/utils";
-
   import SingleInput from "$pages/prompt-library/prompts/SingleInput.svelte";
   import MultiInput from "$pages/prompt-library/prompts/MultiInput.svelte";
   import type { CreatePromptParams } from "$pages/api/prompts/index.json";
   import { addToast } from "$stores/toast";
+  import { tenant } from "$stores";
   import LoadingSpinner from "$components/prompt-interface/components/LoadingSpinner.svelte";
   import { svgIcons } from "$assets/icons";
   import { preventDefault } from "$utils/common";
@@ -28,19 +28,26 @@
     dialogTitle = t("prompt-library.edit.title"),
   }: Props = $props();
 
-  type Group = { title: string; _id: string }; // TODO: Get the type from the API endpoint
+  type Group = { _id: string; title: string }; // TODO: Get the type from the API endpoint
   type Category = {
-    title: string;
     _id: string;
+    title: string;
     groups: Group[];
   };
-  type KnowledgeBase = {
-    title: string;
+  type Model = {
     _id: string;
+    title: string;
+  };
+  type KnowledgeBase = {
+    _id: string;
+    title: string;
   };
 
   let categories: Category[] = $state([]);
   let selectedCategory: Category | undefined = $state();
+
+  let models: Model[] = $state([]);
+  let selectedModel: Model | undefined = $state();
 
   let knowledgeBases: KnowledgeBase[] = $state([]);
   let selectedKnowledgeBases: KnowledgeBase[] = $state([]);
@@ -72,6 +79,16 @@
     if (knowledgeBaseData) {
       knowledgeBases = knowledgeBaseData;
     }
+
+    models = $tenant.api_key_providers
+      .filter((provider) => provider.active)
+      .map((provider) => {
+        const model = $tenant[`${provider.name}__chat_model`] || "gtp-4o";
+        return {
+          _id: `${provider.name}`,
+          title: `${provider.name} ${model}`,
+        };
+      });
   });
 
   async function getPromptDetail(id: string) {
@@ -100,15 +117,22 @@
       promptText = promptDetails.prompt;
 
       const category = categories.find(
-        (e) => e._id == promptDetails.category.toString(),
+        (e) => e._id == promptDetails.category?.toString(),
       );
       if (category) {
         selectedCategory = category;
         previousCategoryId = category._id;
       }
 
+      const model = models.find(
+        (e) => e._id == promptDetails.model?.toString(),
+      );
+      if (model) {
+        selectedModel = model;
+      }
+
       const group = category?.groups.find(
-        (e) => e._id == promptDetails.group.toString(),
+        (e) => e._id == promptDetails.group?.toString(),
       );
       if (group) {
         selectedGroup = group;
@@ -252,6 +276,12 @@
           placeholder="e.g. Knowledge base"
           items={knowledgeBases}
           bind:selectedItems={selectedKnowledgeBases}
+        />
+        <SingleInput
+          title={`Language Model`}
+          placeholder="OpenAI gtp-4o"
+          items={models}
+          bind:selectedItem={selectedModel}
         />
       </div>
 

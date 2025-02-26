@@ -21,7 +21,6 @@
   let output = $state("");
   let isProcessing = $state(false);
   let showButton = $state(false);
-  let isFixed = $state(false);
 
   const apiProvider = tenant.api_key_providers.find((item: any) => {
     return item.default && item.active;
@@ -52,14 +51,6 @@
       behavior: "smooth",
     });
   };
-
-  $effect(() => {
-    if (input && !isFixed) {
-      setTimeout(() => {
-        isFixed = true;
-      }, 500);
-    }
-  });
 
   $effect(() => {
     if (selectedPromptId) {
