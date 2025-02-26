@@ -8,6 +8,7 @@
   import { tenant } from "$stores";
   import LoadingSpinner from "$components/prompt-interface/components/LoadingSpinner.svelte";
   import { svgIcons } from "$assets/icons";
+  import { ApiKeyProvider } from "$types/TenantFeature";
   import { preventDefault } from "$utils/common";
 
   const t = useTranslations();
@@ -83,24 +84,44 @@
     models = getActiveModels();
   });
 
+  const getModelName = (provider) => {
+    return $tenant[`${provider.name}_chat_model`] || "gpt-4o";
+  };
+
+  const getProviderName = (provider) => {
+    let title;
+    switch (provider.name) {
+      case ApiKeyProvider.AzureOpenAI:
+        title = t("tenant.azure-open-ai-provider");
+        break;
+      case ApiKeyProvider.Perplexity:
+        title = t("tenant.perplexity-provider");
+        break;
+      default:
+        title = t("tenant.open-ai-provider");
+    }
+    return title;
+  };
+
   function getActiveModels() {
     const activeModel = $tenant.api_key_providers.find(
       (provider) => provider.active,
     );
-    let models = $tenant.api_key_providers
+
+    const models = $tenant.api_key_providers
       .filter((provider) => provider.active)
       .map((provider) => {
-        const model = $tenant[`${provider.name}_chat_model`] || "gpt-4o";
+        const providerName = getProviderName(provider);
+        const modelName = getModelName(provider);
         return {
           _id: `${provider.name}`,
-          title: `${provider.name} ${model}`,
+          title: `${providerName} ${modelName}`,
         };
       });
     models.unshift({
       _id: null,
-      title: `default (${activeModel.name || ""})`,
+      title: `Default (${getProviderName(activeModel)} ${getModelName(activeModel)})`,
     });
-
     return models;
   }
 
@@ -297,7 +318,7 @@
           bind:selectedItems={selectedKnowledgeBases}
         />
         <SingleInput
-          title={`Language Model`}
+          title={t("prompt-library.add.prompts.language-model")}
           placeholder="OpenAI gtp-4o"
           items={models}
           bind:selectedItem={selectedModel}
