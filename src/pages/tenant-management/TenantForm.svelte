@@ -62,6 +62,16 @@
       : tenant.name || t("common.edit");
   let tenantData = $state(tenant ?? {});
 
+  let openAIEnabled: boolean = $state(false);
+  let azureOpenAIEnabled: boolean = $state(false);
+  let perplexityEnabled: boolean = $state(false);
+
+  let openAIKeyField: HTMLInputElement;
+  let azureOpenAIKeyField: HTMLInputElement;
+  let perplexityKeyField: HTMLInputElement;
+  let azureOpenAIKeyProField: HTMLInputElement;
+  let defaultTextFeature = $state("");
+
   // API providers
   const providerValues = [
     {
@@ -96,16 +106,6 @@
   let showPicker = $state(false);
   let tenantAdminEmail = $state("");
   let tenantAdminEmailErrorMessage = $state("");
-
-  let openAIEnabled: boolean = $state(false);
-  let azureOpenAIEnabled: boolean = $state(false);
-  let perplexityEnabled: boolean = $state(false);
-
-  let openAIKeyField: HTMLInputElement;
-  let azureOpenAIKeyField: HTMLInputElement;
-  let perplexityKeyField: HTMLInputElement;
-  let azureOpenAIKeyProField: HTMLInputElement;
-  let defaultTextFeature = $state("");
 
   const audioStandardArray = $state([
     {
@@ -176,7 +176,7 @@
     //   );
   }
 
-  if (tenantData && tenantData.api_key_providers?.length) {
+  if (tenantData) {
     // const findTextProvider = tenantData.api_key_providers.find(
     //   (item: any) => item.name == ApiKeyProvider.OpenAI,
     // );
@@ -187,24 +187,26 @@
     //     ) || providerValues[0];
     // }
 
-    openAIEnabled = tenantData.api_key_providers.some(
-      (item: any) => item.name === ApiKeyProvider.OpenAI && item.active,
-    );
-    azureOpenAIEnabled = tenantData.api_key_providers.some(
-      (item: any) => item.name == ApiKeyProvider.AzureOpenAI && item.active,
-    );
-    perplexityEnabled = tenantData.api_key_providers.some(
-      (item: any) => item.name == ApiKeyProvider.Perplexity && item.active,
-    );
+    const { api_key_providers = [], included_features = [] } = tenantData;
 
-    if (tenantData && tenantData.api_key_providers) {
-      defaultTextFeature = tenantData.api_key_providers.find(
-        (item: any) => item.default,
-      )?.name;
-    } else if (tenantData && tenantData.included_features?.length) {
-      defaultTextFeature = tenantData.included_features.some(
-        (item: any) => item.name == TenantFeature.AudioToText,
+    const findProvider = (provider: ApiKeyProvider) =>
+      api_key_providers.some(
+        (item: any) => item.name === provider && item.active,
       );
+
+    openAIEnabled = findProvider(ApiKeyProvider.OpenAI);
+    azureOpenAIEnabled = findProvider(ApiKeyProvider.AzureOpenAI);
+    perplexityEnabled = findProvider(ApiKeyProvider.Perplexity);
+
+    defaultTextFeature =
+      api_key_providers.find((item: any) => item.default)?.name ||
+      included_features.find(
+        (item: any) => item.name === TenantFeature.AudioToText,
+      )?.provider;
+
+    if (defaultTextFeature) {
+      openAIEnabled ||= defaultTextFeature === ApiKeyProvider.OpenAI;
+      azureOpenAIEnabled ||= defaultTextFeature === ApiKeyProvider.AzureOpenAI;
     }
   }
 
