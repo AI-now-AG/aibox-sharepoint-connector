@@ -80,7 +80,14 @@
       knowledgeBases = knowledgeBaseData;
     }
 
-    models = $tenant.api_key_providers
+    models = getActiveModels();
+  });
+
+  function getActiveModels() {
+    const activeModel = $tenant.api_key_providers.find(
+      (provider) => provider.active,
+    );
+    let models = $tenant.api_key_providers
       .filter((provider) => provider.active)
       .map((provider) => {
         const model = $tenant[`${provider.name}_chat_model`] || "gpt-4o";
@@ -89,7 +96,13 @@
           title: `${provider.name} ${model}`,
         };
       });
-  });
+    models.unshift({
+      _id: null,
+      title: `default (${activeModel.name || ""})`,
+    });
+
+    return models;
+  }
 
   async function getPromptDetail(id: string) {
     isLoading = true;
@@ -129,6 +142,8 @@
       );
       if (model) {
         selectedModel = model;
+      } else {
+        selectedModel = null;
       }
 
       const group = category?.groups.find(
@@ -165,7 +180,7 @@
         ...(selectedCategory && { category: selectedCategory._id }),
         ...(selectedGroup && { group: selectedGroup._id }),
         ...(selectedEditPromptId && { _id: selectedEditPromptId }),
-        ...(selectedModel && { model: selectedModel._id?.toString() }),
+        ...(selectedModel && { model: selectedModel._id }),
       };
 
       let httpMethod = "PUT"; // FOR UPDATING EXISING
@@ -219,18 +234,21 @@
       event.preventDefault();
     }
   }
+
   $effect(() => {
     if (selectedCategory && selectedCategory._id !== previousCategoryId) {
       selectedGroup = null;
       previousCategoryId = selectedCategory._id;
     }
   });
+
   let isFormValid = $derived(
     promptTitle?.trim() !== "" &&
       promptText?.trim() !== "" &&
       selectedCategory !== undefined &&
       selectedGroup !== undefined,
   );
+
   // Fetch prompt details when selectedEditPromptId changes
   $effect(() => {
     if (selectedEditPromptId) {
