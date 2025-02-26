@@ -109,17 +109,16 @@ class Perplexity {
 
   async invoke(
     messages: Array<PerplexityMessage>,
-    options: PerplexityOptions = {},
+    options?: PerplexityOptions,
   ) {
     const extractedMessages = this.extractMessages(messages);
     const data: any = {
       ...this.opions,
-      ...options,
+      ...(options ?? {}),
       messages: extractedMessages,
     };
     try {
       this.response = await this.perplexity.chat.completions.create(data);
-      return this.response;
     } catch (error) {
       console.error("Error calling Perplexity API:", error);
       throw error;
@@ -132,17 +131,20 @@ class Perplexity {
     return this;
   }
 
-  async stream(messages: Array<PerplexityMessage>) {
+  async stream(
+    messages: Array<PerplexityMessage>,
+    options?: PerplexityOptions,
+  ) {
     const extractedMessages = this.extractMessages(messages);
     const data: any = {
       ...this.opions,
+      ...(options ?? {}),
       stream: true,
       messages: extractedMessages,
     };
 
     try {
       this.response = await this.perplexity.chat.completions.create(data);
-      return this.response;
     } catch (error) {
       console.error("Error stream Perplexity API:", error);
       throw error;
