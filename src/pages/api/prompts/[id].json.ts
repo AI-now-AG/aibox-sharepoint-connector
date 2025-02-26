@@ -16,7 +16,7 @@ import type { CreateInstructionParams } from "../instructions.json";
 import type { CreateKnowledgeBaseParams } from "../knowledge-base.json";
 import initializeOpenAI from "$utils/chatModel";
 import { MessageRole } from "$types/MessageHistory";
-import ChatPerplexity from "$llm/Perplexity";
+//import ChatPerplexity from "$llm/Perplexity";
 
 export type PromptDetails = {
   title: string;
@@ -46,11 +46,6 @@ const RunPromptParamsSchema = z.object({
 
 export type RunPromptParams = z.infer<typeof RunPromptParamsSchema>;
 export type Attachment = z.infer<typeof AttachmentSchema>;
-
-// export const model = new ChatOpenAI({
-//   apiKey: import.meta.env.OPENAI_API_KEY,
-//   model: import.meta.env.OPENAI_MODEL,
-// });
 
 export const POST: APIRoute = async (ctx) => {
   const { params, request } = ctx;
@@ -227,21 +222,6 @@ export const POST: APIRoute = async (ctx) => {
     return new Response(readable, {
       headers,
     });
-
-    // const stream = await model.pipe(parser).stream(messages);
-    // //const result = await model.invoke(messages);
-    // //const headlines = await parser.stream(result);
-    // let data = "";
-    // for await (const chunk of stream) {
-    //   console.log("-----"+chunk);
-    //   data += chunk;
-    // }
-    // console.log("Response", result);
-    // return new Response(
-    //   JSON.stringify({
-    //     data,
-    //   }),
-    // );
   } catch (error) {
     console.error("Error processing request:", error);
     return new Response(
