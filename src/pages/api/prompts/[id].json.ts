@@ -161,7 +161,6 @@ export const POST: APIRoute = async (ctx) => {
       }
     }
 
-    //const model = initializeOpenAI(ctx);
     const parser = new StringOutputParser();
 
     // Set headers to enable chunked transfer
@@ -172,7 +171,8 @@ export const POST: APIRoute = async (ctx) => {
     const { readable, writable } = new TransformStream();
     const writer = writable.getWriter();
 
-    const model = initializeOpenAI(ctx);
+    const overrides = prompt.model ? { customModel: prompt.model } : {};
+    const model = initializeOpenAI(ctx, overrides);
 
     (async () => {
       try {
