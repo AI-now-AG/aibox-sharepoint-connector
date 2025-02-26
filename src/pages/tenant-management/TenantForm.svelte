@@ -1048,42 +1048,17 @@
               </div>
             </div>
 
-            <!-- Model Selection -->
-            <div class="bg-base-100">
-              <span class="text-sm font-semibold"
-                >{t("tenant.text.improvement.llm")}</span
+            <div class="alert">
+              <span class="text-sm"
+                >{t("tenant.whisper.model.configured.for.azure.openai")}</span
               >
-              <div class="flex gap-4 mt-2">
-                {#each providerValues as option}
-                  <div class="flex items-center mt-2">
-                    <input
-                      type="radio"
-                      id="radio-text-{option.value}"
-                      name="text-prompt-provider"
-                      class="radio radio-sm radio-primary"
-                      value={option}
-                      bind:group={audioSelectedProvider}
-                    />
-                    <label
-                      for="radio-text-{option.value}"
-                      class="ml-2 font-medium text-sm">{option.label}</label
-                    >
-                  </div>
-                {/each}
-              </div>
-
-              <div class="alert mt-4">
-                <span class="text-sm"
-                  >{t("tenant.whisper.model.configured.for.azure.openai")}</span
-                >
-              </div>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Large File Azure Section -->
-      <div class="collapse collapse-arrow bg-base-100 shadow rounded-lg">
+      <div class="collapse collapse-arrow bg-base-100 shadow rounded-lg mb-4">
         <input type="checkbox" />
         <div class="collapse-title flex items-center justify-between">
           <div class="flex items-center">
@@ -1163,6 +1138,42 @@
                 use:trimInput
                 bind:value={tenantData.speech_region}
               />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Model Selection -->
+      <div class="container mx-auto">
+        <div class="bg-base-100 shadow rounded-lg my-4">
+          <div class="flex p-4 items-center justify-between">
+            <div class="flex items-center justify-between">
+              <label class="label cursor-pointer" for="disable-create-user">
+                <span class="label-text"
+                  >{t("tenant.text.improvement.llm")}</span
+                >
+                <!-- <span class="text-sm font-semibold"
+                >{t("tenant.text.improvement.llm")}</span
+              > -->
+              </label>
+            </div>
+            <div class="flex gap-4">
+              {#each providerValues as option}
+                <div class="flex items-center">
+                  <input
+                    type="radio"
+                    id="radio-text-{option.value}"
+                    name="text-prompt-provider"
+                    class="radio radio-sm radio-primary"
+                    value={option}
+                    bind:group={audioSelectedProvider}
+                  />
+                  <label
+                    for="radio-text-{option.value}"
+                    class="ml-2 font-medium text-sm">{option.label}</label
+                  >
+                </div>
+              {/each}
             </div>
           </div>
         </div>
