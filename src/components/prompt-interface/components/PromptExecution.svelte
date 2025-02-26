@@ -55,6 +55,12 @@
   $effect(() => {
     if (selectedPromptId) {
       sharedMessageHistory.set([]);
+
+      const currentPrompt = promptItems.find(
+        (e: { _id: string }) => e._id === selectedPromptId,
+      );
+      const promptModel = currentPrompt.model ?? apiProvider.name;
+      isDisableFileInput = promptModel == ApiKeyProvider.Perplexity;
     }
   });
 
@@ -92,7 +98,7 @@
           bind:input
           bind:output
           bind:isProcessing
-          bind:isDisableFileInput
+          {isDisableFileInput}
         />
       </div>
     {/if}
@@ -123,7 +129,7 @@
           bind:input
           bind:output
           bind:isProcessing
-          bind:isDisableFileInput
+          {isDisableFileInput}
         />
       </div>
     {/if}

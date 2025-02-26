@@ -20,7 +20,7 @@
     output = $bindable(""),
     files = $bindable([]),
     onsend,
-    isDisableFileInput = $bindable(false),
+    isDisableFileInput = false,
   }: Props = $props();
 
   $inspect(files);

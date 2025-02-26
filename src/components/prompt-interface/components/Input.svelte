@@ -21,7 +21,7 @@
     input = $bindable(""),
     output = $bindable(""),
     isProcessing = $bindable(false),
-    isDisableFileInput = $bindable(false),
+    isDisableFileInput = false,
   }: Props = $props();
 
   let inputText = $state("");

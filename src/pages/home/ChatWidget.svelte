@@ -197,7 +197,7 @@
           bind:output
           bind:files
           onsend={fetchMessage}
-          bind:isDisableFileInput
+          {isDisableFileInput}
         />
       </div>
     {/if}
@@ -231,7 +231,7 @@
             bind:output
             bind:files
             onsend={fetchMessage}
-            bind:isDisableFileInput
+            {isDisableFileInput}
           />
         </div>
       </div>
