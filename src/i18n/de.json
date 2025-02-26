@@ -286,6 +286,8 @@
   "prompt-execution.a-prompt-is-being-executed-please-wait": "Bitte warten bis Prompt ausgeführt wurde",
   "home.quick-links": "Schnellzugriff",
   "home.welcome": "Willkommen ${name}",
+  "tenant.validate-azure-speech-service-key": "Please input Azure Speech Service key",
+  "tenant.validate-azure-speech-service-region": "Please input Azure Speech Service region",
   "tenant.perplexity.name": "Perplexity",
   "tenant.model.name": "Model Name",
   "tenant.validate-atleast-one-select": "Please select at least one of the model",

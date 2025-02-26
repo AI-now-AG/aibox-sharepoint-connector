@@ -158,7 +158,7 @@
         ) || false,
     },
   ]);
-  let azureAudioProEnabled: boolean = $derived(
+  let isAzureAudioProEnabled: boolean = $derived(
     audioProArray.some((item: any) => item.checked),
   );
 
@@ -170,7 +170,7 @@
   );
 
   if (tenantData && tenantData.transcription_types?.length) {
-    //   azureAudioProEnabled = tenantData.transcription_types.some(
+    //   isAzureAudioProEnabled = tenantData.transcription_types.some(
     //     (item: any) =>
     //       item === AudioCategory.AudioPro || item === AudioCategory.SubtitleLarge,
     //   );
@@ -303,6 +303,25 @@
       }
     }
 
+    if (isAudioToTextChecked) {
+      if (audioSelectedProvider.value === ApiKeyProvider.OpenAI && !openAIKey) {
+        showAlert(t("tenant.validate-open-ai-key-message"));
+        return false;
+      }
+    }
+
+    if (isAzureAudioProEnabled && !azureSpeechKey) {
+      showAlert(t("tenant.validate-azure-speech-service-key"));
+      return false;
+    }
+
+    if (azureSpeechKey) {
+      if (!tenantData?.speech_region) {
+        showAlert(t("tenant.validate-azure-speech-service-region"));
+        return false;
+      }
+    }
+
     return true;
   }
 
@@ -377,7 +396,7 @@
             .filter((item) => item.checked)
             .map((item) => item.type);
         }
-        if (azureAudioProEnabled) {
+        if (isAzureAudioProEnabled) {
           tenantData.transcription_types = audioProArray
             .filter((item) => item.checked)
             .map((item) => item.type);
@@ -465,7 +484,7 @@
             .filter((item) => item.checked)
             .map((item) => item.type),
         ];
-        if (azureAudioProEnabled) {
+        if (isAzureAudioProEnabled) {
         }
         tenantData.transcription_types = updatedTranscriptionTypes;
 
@@ -998,7 +1017,6 @@
 
         <div class="collapse-content space-y-6">
           <div class="flex flex-col gap-4 mx-8">
-
             <!-- Checkboxes for Audio to Text & Subtitles -->
             <div class="rounded-lg border-1">
               <span class="text-sm font-semibold">{t("tenant.features")}</span>
@@ -1064,7 +1082,7 @@
             <input
               id="audio-pro-model"
               type="checkbox"
-              checked={azureAudioProEnabled}
+              checked={isAzureAudioProEnabled}
               class="checkbox checkbox-primary z-[10]"
               value="text-prompt"
               disabled
@@ -1106,7 +1124,7 @@
               </div>
             </div>
           </div>
-          
+
           <div class="grid grid-cols-2 gap-4 mx-8">
             <div class="w-full">
               <span class="mb-2 text-gray-400 font-medium text-sm"
