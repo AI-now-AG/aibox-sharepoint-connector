@@ -443,7 +443,7 @@
         if (!tenantData.transcription_types) {
           tenantData.transcription_types = [];
         }
-        let updatedTranscriptionTypes = tenantData.transcription_types ?? [];
+        let updatedTranscriptionTypes = [];
         // update providers
         tenantData.included_features = [];
         tenantData.included_features.push({
@@ -455,24 +455,19 @@
             name: TenantFeature.AudioToText,
             provider: audioSelectedProvider.value,
           });
-          updatedTranscriptionTypes = audioStandardArray
-            .filter((item) => item.checked)
-            .map((item) => item.type);
         }
-        if (azureAudioProEnabled) {
-          tenantData.transcription_types = audioProArray
+        updatedTranscriptionTypes = audioStandardArray
+          .filter((item) => item.checked)
+          .map((item) => item.type);
+        updatedTranscriptionTypes = [
+          ...updatedTranscriptionTypes,
+          ...audioProArray
             .filter((item) => item.checked)
-            .map((item) => item.type);
-          updatedTranscriptionTypes = [
-            ...updatedTranscriptionTypes,
-            ...audioProArray
-              .filter((item) => item.checked)
-              .map((item) => item.type),
-          ];
-        }
-        tenantData.transcription_types = [
-          ...new Set(updatedTranscriptionTypes),
+            .map((item) => item.type),
         ];
+        if (azureAudioProEnabled) {
+        }
+        tenantData.transcription_types = updatedTranscriptionTypes;
 
         if (tenantAdminEmail && isValidEmail(tenantAdminEmail)) {
           tenantData.tenant_admin_email = tenantAdminEmail;
@@ -719,6 +714,7 @@
                 bind:checked={openAIEnabled}
                 class="checkbox checkbox-primary z-[10]"
                 value="text-prompt"
+                disabled={defaultTextFeature === ApiKeyProvider.OpenAI}
               />
               <label
                 class="label cursor-pointer ml-2"
@@ -793,6 +789,7 @@
                 bind:checked={azureOpenAIEnabled}
                 class="checkbox checkbox-primary z-[10]"
                 value="text-prompt"
+                disabled={defaultTextFeature === ApiKeyProvider.AzureOpenAI}
               />
               <label
                 class="label cursor-pointer ml-2"
@@ -907,6 +904,7 @@
                 bind:checked={perplexityEnabled}
                 class="checkbox checkbox-primary z-[10]"
                 value="text-prompt"
+                disabled={defaultTextFeature === ApiKeyProvider.Perplexity}
               />
               <label
                 class="label cursor-pointer ml-2"
@@ -983,6 +981,7 @@
               checked={isAudioToTextChecked}
               class="checkbox checkbox-primary z-[10]"
               value="text-prompt"
+              disabled
             />
             <label class="label cursor-pointer ml-2" for="audio-whisper-model">
               <span class="label-text"
@@ -1068,6 +1067,7 @@
               checked={azureAudioProEnabled}
               class="checkbox checkbox-primary z-[10]"
               value="text-prompt"
+              disabled
             />
             <label class="label cursor-pointer ml-2" for="audio-pro-model">
               <span class="label-text"
