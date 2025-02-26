@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import { db, type Document } from "../mongodb";
 import { z } from "zod";
-import { TenantFeature, ApiKeyProvider } from "$types/TenantFeature";
+import { TenantFeature, ApiKeyProvider, AudioCategory } from "$types/TenantFeature";
 
 export enum TenantTheme {
   Light = "light",
@@ -28,12 +28,6 @@ export const TextFeatureSchema = z.object({
   active: z.boolean().default(false),
   default: z.boolean().default(false),
 });
-
-export enum AudioCategory {
-  AudioToText = "audio-to-text",
-  Subtitle = "subtitle",
-  AudioPro = "audio-pro",
-}
 
 export const TranscriptionUsecaseSchema = z.object({
   enabled: z.boolean().default(false),
