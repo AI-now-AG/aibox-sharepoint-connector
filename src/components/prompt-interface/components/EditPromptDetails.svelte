@@ -83,7 +83,7 @@
     models = $tenant.api_key_providers
       .filter((provider) => provider.active)
       .map((provider) => {
-        const model = $tenant[`${provider.name}__chat_model`] || "gtp-4o";
+        const model = $tenant[`${provider.name}_chat_model`] || "gpt-4o";
         return {
           _id: `${provider.name}`,
           title: `${provider.name} ${model}`,
@@ -165,6 +165,7 @@
         ...(selectedCategory && { category: selectedCategory._id }),
         ...(selectedGroup && { group: selectedGroup._id }),
         ...(selectedEditPromptId && { _id: selectedEditPromptId }),
+        ...(selectedModel && { model: selectedModel._id?.toString() }),
       };
 
       let httpMethod = "PUT"; // FOR UPDATING EXISING
