@@ -19,7 +19,7 @@ import UserModel, { assignPermissions } from "$data/models/user.model";
 import PromptModel from "$data/models/prompt.model";
 import CategoryModel from "$data/models/category.model";
 import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
-import { ApiKeyProvider } from "$types/TenantFeature";
+import { ApiKeyProvider, AudioCategory } from "$types/TenantFeature";
 import { EncryptedUserPassword, UserRole } from "$enums/Users";
 
 const TenantInputParamsSchema = z.object({
@@ -41,6 +41,7 @@ const TenantInputParamsSchema = z.object({
   perplexity_api_key: z.string().optional(),
   perplexity_chat_model: z.string().optional(),
   included_features: z.array(IncludedFeaturesSchema),
+  transcription_types: z.array(z.nativeEnum(AudioCategory)).optional(),
   is_restrict_user_managment: z
     .boolean()
     .optional()
