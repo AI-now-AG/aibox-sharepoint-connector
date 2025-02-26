@@ -965,9 +965,9 @@
         <div class="flex p-4 items-center justify-between">
           <div class="flex items-center">
             <!-- <label class="label cursor-pointer" for="audio-default-section"> -->
-              <span class="label-text"
-                >{t("tenant.audio.whisper.model.title")}</span
-              >
+            <span class="label-text"
+              >{t("tenant.audio.whisper.model.title")}</span
+            >
             <!-- </label> -->
           </div>
           <div class="flex mb-2 mr-4">
