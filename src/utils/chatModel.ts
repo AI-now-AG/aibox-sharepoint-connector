@@ -10,16 +10,12 @@ interface ChatConfigOverrides {
 }
 
 // Initialize Perplexity AI's Chat API with OpenAI-like interface
-export const initPerplexityOpenAI = (
-  apiKey: string,
-  model: string,
-  maxTokens: number,
-) => {
+export const initPerplexityOpenAI = (apiKey: string, model: string) => {
   return new ChatOpenAI({
     openAIApiKey: apiKey, // Set API key for authentication
     configuration: { baseURL: "https://api.perplexity.ai" }, // Use Perplexity's API endpoint
     modelName: model, // Specify model (if provided)
-    maxTokens, // Define max token limit (if provided)
+    //maxTokens: 400, // Define max token limit (if provided)
   });
 };
 
@@ -76,9 +72,7 @@ export const initializeOpenAI = (
     );
     const perplexityModel: string =
       ctx.locals.tenant?.perplexity_chat_model || "sonar";
-    const maxTokens = import.meta.env.CHAT_PERPLEXITY_MAX_TOKEN || 400;
-
-    return initPerplexityOpenAI(perplexityApiKey, perplexityModel, maxTokens);
+    return initPerplexityOpenAI(perplexityApiKey, perplexityModel);
   }
 
   // Azure OpenAI
