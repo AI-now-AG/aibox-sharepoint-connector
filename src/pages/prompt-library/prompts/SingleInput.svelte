@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { clickOutside } from "$components/actions/ClickOutside";
   import { preventDefault } from "$utils/common";
   type Item = { title: string } | string;
 
@@ -16,6 +17,7 @@
     selectedItem = $bindable(),
   }: Props = $props();
 
+  let isShowDropdownOption = $state(false);
   let inputValue = $state("");
 
   const resetSelection = () => {
@@ -40,6 +42,7 @@
           : selectedItem.title)) ||
       "";
   }
+
   $effect(() => {
     if (selectedItem) {
       setInputValue();
@@ -51,29 +54,39 @@
 
 <div>
   <p class="mb-2">{title}</p>
-  <div class="dropdown dropdown-bottom w-full min-w-xs">
+  <div
+    use:clickOutside={() => {
+      isShowDropdownOption = false;
+    }}
+    class="dropdown dropdown-bottom w-full min-w-xs"
+  >
     <input
       {placeholder}
       bind:value={inputValue}
       role="button"
       class="input input-bordered font-medium w-full min-w-xs"
       readonly
+      onclick={() => {
+        isShowDropdownOption = true;
+      }}
     />
     {#if items}
-      <ul
-        tabindex="-1"
-        class="dropdown-content menu bg-base-100 space-y-2 rounded-box z-[1] w-52 p-2 shadow"
-      >
-        {#each items as item}
-          <li>
-            <button
-              onclick={preventDefault(() => handleSelectedItems(item))}
-              class={`${selectedItem == item ? "bg-primary text-base-100 hover:bg-primary" : "hover:text-neutral"}`}
-              >{typeof item === "string" ? item : item.title}
-            </button>
-          </li>
-        {/each}
-      </ul>
+      {#if isShowDropdownOption}
+        <ul
+          tabindex="-1"
+          class="dropdown-content menu bg-base-100 space-y-2 rounded-box z-[1] w-52 p-2 shadow"
+        >
+          {#each items as item}
+            <li>
+              <button
+                onclick={preventDefault(() => handleSelectedItems(item))}
+                class={`${selectedItem == item ? "bg-primary text-base-100 hover:bg-primary" : "hover:text-neutral"}`}
+                >{typeof item === "string" ? item : item.title}
+              </button>
+            </li>
+          {/each}
+        </ul>
+      {/if}
     {/if}
   </div>
 </div>

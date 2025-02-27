@@ -48,7 +48,7 @@
   let selectedCategory: Category | undefined = $state();
 
   let models: Model[] = $state([]);
-  let selectedModel: Model | undefined = $state();
+  let selectedModel: Model | null | undefined = $state();
 
   let knowledgeBases: KnowledgeBase[] = $state([]);
   let selectedKnowledgeBases: KnowledgeBase[] = $state([]);
