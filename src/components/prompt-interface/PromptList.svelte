@@ -125,7 +125,7 @@
         };
       });
       const newItems = await actions.prompt.updatePosition(sortedIds);
-      items = newItems.data ?? orderItems;
+      items = (newItems.data ?? orderItems) as CardItem[];
       addToast({
         message: t("prompt-library.prompt.order-success"),
         type: "success",

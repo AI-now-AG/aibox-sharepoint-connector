@@ -45,7 +45,7 @@
               checkedGroups.some(
                 (group) =>
                   //group.title.toLowerCase().includes(tag.toLowerCase()),
-                  group.title.toLowerCase() == tag.toLowerCase(),
+                  group?.title.toLowerCase() == tag.toLowerCase(),
               ) ||
               checkedCategories.some(
                 (cateogry) => cateogry.title.toLowerCase() == tag.toLowerCase(),
@@ -105,7 +105,7 @@
           out:slide
           in:slide
         >
-          {#each categoryList as category, categoryIdx}
+          {#each categoryList as category}
             <li>
               <label class="flex items-center">
                 <input
@@ -118,7 +118,7 @@
               </label>
               <ul>
                 <li>
-                  {#each category.group as group}
+                  {#each category.group as any as group}
                     <label class="flex items-center">
                       <input
                         type="checkbox"
