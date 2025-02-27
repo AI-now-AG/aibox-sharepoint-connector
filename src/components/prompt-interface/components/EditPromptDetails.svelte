@@ -3,12 +3,12 @@
   import { useTranslations } from "$i18n/utils";
   import SingleInput from "$pages/prompt-library/prompts/SingleInput.svelte";
   import MultiInput from "$pages/prompt-library/prompts/MultiInput.svelte";
+  import ModelInput from "$pages/prompt-library/prompts/ModelInput.svelte";
   import type { CreatePromptParams } from "$pages/api/prompts/index.json";
   import { addToast } from "$stores/toast";
   import { tenant } from "$stores";
   import LoadingSpinner from "$components/prompt-interface/components/LoadingSpinner.svelte";
   import { svgIcons } from "$assets/icons";
-  import { ApiKeyProvider } from "$types/TenantFeature";
   import { preventDefault } from "$utils/common";
 
   const t = useTranslations();
@@ -80,50 +80,7 @@
     if (knowledgeBaseData) {
       knowledgeBases = knowledgeBaseData;
     }
-
-    models = getActiveModels();
   });
-
-  const getModelName = (provider) => {
-    return $tenant[`${provider.name}_chat_model`] || "gpt-4o";
-  };
-
-  const getProviderName = (provider) => {
-    let title;
-    switch (provider.name) {
-      case ApiKeyProvider.AzureOpenAI:
-        title = t("tenant.azure-open-ai-provider");
-        break;
-      case ApiKeyProvider.Perplexity:
-        title = t("tenant.perplexity-provider");
-        break;
-      default:
-        title = t("tenant.open-ai-provider");
-    }
-    return title;
-  };
-
-  function getActiveModels() {
-    const defaultModel = $tenant.api_key_providers.find(
-      (provider) => provider.default,
-    );
-
-    const models = $tenant.api_key_providers
-      .filter((provider) => provider.active)
-      .map((provider) => {
-        const providerName = getProviderName(provider);
-        const modelName = getModelName(provider);
-        return {
-          _id: `${provider.name}`,
-          title: `${providerName} ${modelName}`,
-        };
-      });
-    models.unshift({
-      _id: null,
-      title: `Default (${getProviderName(defaultModel)} ${getModelName(defaultModel)})`,
-    });
-    return models;
-  }
 
   async function getPromptDetail(id: string) {
     isLoading = true;
@@ -161,11 +118,7 @@
       const model = models.find(
         (e) => e._id == promptDetails.model?.toString(),
       );
-      if (model) {
-        selectedModel = model;
-      } else {
-        selectedModel = null;
-      }
+      selectedModel = model ?? null;
 
       const group = category?.groups.find(
         (e) => e._id == promptDetails.group?.toString(),
@@ -197,11 +150,11 @@
       const newPrompt: CreatePromptParams = {
         title: promptTitle,
         prompt: promptText,
+        model: selectedModel ? selectedModel._id : null,
         knowledgebase: selectedKnowledgeBases.map((inst) => inst._id),
         ...(selectedCategory && { category: selectedCategory._id }),
         ...(selectedGroup && { group: selectedGroup._id }),
         ...(selectedEditPromptId && { _id: selectedEditPromptId }),
-        ...(selectedModel && { model: selectedModel._id }),
       };
 
       let httpMethod = "PUT"; // FOR UPDATING EXISING
@@ -317,12 +270,7 @@
           items={knowledgeBases}
           bind:selectedItems={selectedKnowledgeBases}
         />
-        <SingleInput
-          title={t("prompt-library.add.prompts.language-model")}
-          placeholder="OpenAI gtp-4o"
-          items={models}
-          bind:selectedItem={selectedModel}
-        />
+        <ModelInput bind:models bind:selectedModel />
       </div>
 
       <div
