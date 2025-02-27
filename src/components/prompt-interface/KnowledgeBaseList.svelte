@@ -38,6 +38,7 @@
 
   async function editCard(index: number) {
     selectedEditKnowledgeBaseId = items[index]?.id ?? "";
+    window.location.href = "/prompt-library/knowledge-base/" + selectedEditKnowledgeBaseId;
   }
 
   async function duplicateCard(index: number) {
