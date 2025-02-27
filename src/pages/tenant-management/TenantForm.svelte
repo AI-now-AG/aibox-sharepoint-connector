@@ -62,6 +62,16 @@
       : tenant.name || t("common.edit");
   let tenantData = $state(tenant ?? {});
 
+  let openAIEnabled: boolean = $state(false);
+  let azureOpenAIEnabled: boolean = $state(false);
+  let perplexityEnabled: boolean = $state(false);
+
+  let openAIKeyField: HTMLInputElement;
+  let azureOpenAIKeyField: HTMLInputElement;
+  let perplexityKeyField: HTMLInputElement;
+  let azureOpenAIKeyProField: HTMLInputElement;
+  let defaultTextFeature = $state("");
+
   // API providers
   const providerValues = [
     {
@@ -96,16 +106,6 @@
   let showPicker = $state(false);
   let tenantAdminEmail = $state("");
   let tenantAdminEmailErrorMessage = $state("");
-
-  let openAIEnabled: boolean = $state(false);
-  let azureOpenAIEnabled: boolean = $state(false);
-  let perplexityEnabled: boolean = $state(false);
-
-  let openAIKeyField: HTMLInputElement;
-  let azureOpenAIKeyField: HTMLInputElement;
-  let perplexityKeyField: HTMLInputElement;
-  let azureOpenAIKeyProField: HTMLInputElement;
-  let defaultTextFeature = $state("");
 
   const audioStandardArray = $state([
     {
@@ -158,7 +158,7 @@
         ) || false,
     },
   ]);
-  let azureAudioProEnabled: boolean = $derived(
+  let isAzureAudioProEnabled: boolean = $derived(
     audioProArray.some((item: any) => item.checked),
   );
 
@@ -170,13 +170,13 @@
   );
 
   if (tenantData && tenantData.transcription_types?.length) {
-    //   azureAudioProEnabled = tenantData.transcription_types.some(
+    //   isAzureAudioProEnabled = tenantData.transcription_types.some(
     //     (item: any) =>
     //       item === AudioCategory.AudioPro || item === AudioCategory.SubtitleLarge,
     //   );
   }
 
-  if (tenantData && tenantData.api_key_providers?.length) {
+  if (tenantData) {
     // const findTextProvider = tenantData.api_key_providers.find(
     //   (item: any) => item.name == ApiKeyProvider.OpenAI,
     // );
@@ -187,19 +187,27 @@
     //     ) || providerValues[0];
     // }
 
-    openAIEnabled = tenantData.api_key_providers.some(
-      (item: any) => item.name === ApiKeyProvider.OpenAI && item.active,
-    );
-    azureOpenAIEnabled = tenantData.api_key_providers.some(
-      (item: any) => item.name == ApiKeyProvider.AzureOpenAI && item.active,
-    );
-    perplexityEnabled = tenantData.api_key_providers.some(
-      (item: any) => item.name == ApiKeyProvider.Perplexity && item.active,
-    );
+    const { api_key_providers = [], included_features = [] } = tenantData;
 
-    defaultTextFeature = tenantData.api_key_providers.find(
-      (item: any) => item.default,
-    )?.name;
+    const findProvider = (provider: ApiKeyProvider) =>
+      api_key_providers.some(
+        (item: any) => item.name === provider && item.active,
+      );
+
+    openAIEnabled = findProvider(ApiKeyProvider.OpenAI);
+    azureOpenAIEnabled = findProvider(ApiKeyProvider.AzureOpenAI);
+    perplexityEnabled = findProvider(ApiKeyProvider.Perplexity);
+
+    defaultTextFeature =
+      api_key_providers.find((item: any) => item.default)?.name ||
+      included_features.find(
+        (item: any) => item.name === TenantFeature.AudioToText,
+      )?.provider;
+
+    if (defaultTextFeature) {
+      openAIEnabled ||= defaultTextFeature === ApiKeyProvider.OpenAI;
+      azureOpenAIEnabled ||= defaultTextFeature === ApiKeyProvider.AzureOpenAI;
+    }
   }
 
   // set default values
@@ -303,6 +311,25 @@
       }
     }
 
+    if (isAudioToTextChecked) {
+      if (audioSelectedProvider.value === ApiKeyProvider.OpenAI && !openAIKey) {
+        showAlert(t("tenant.validate-open-ai-key-message"));
+        return false;
+      }
+    }
+
+    if (isAzureAudioProEnabled && !azureSpeechKey) {
+      showAlert(t("tenant.validate-azure-speech-service-key"));
+      return false;
+    }
+
+    if (azureSpeechKey) {
+      if (!tenantData?.speech_region) {
+        showAlert(t("tenant.validate-azure-speech-service-region"));
+        return false;
+      }
+    }
+
     return true;
   }
 
@@ -377,7 +404,7 @@
             .filter((item) => item.checked)
             .map((item) => item.type);
         }
-        if (azureAudioProEnabled) {
+        if (isAzureAudioProEnabled) {
           tenantData.transcription_types = audioProArray
             .filter((item) => item.checked)
             .map((item) => item.type);
@@ -465,7 +492,7 @@
             .filter((item) => item.checked)
             .map((item) => item.type),
         ];
-        if (azureAudioProEnabled) {
+        if (isAzureAudioProEnabled) {
         }
         tenantData.transcription_types = updatedTranscriptionTypes;
 
@@ -998,7 +1025,6 @@
 
         <div class="collapse-content space-y-6">
           <div class="flex flex-col gap-4 mx-8">
-
             <!-- Checkboxes for Audio to Text & Subtitles -->
             <div class="rounded-lg border-1">
               <span class="text-sm font-semibold">{t("tenant.features")}</span>
@@ -1022,49 +1048,24 @@
               </div>
             </div>
 
-            <!-- Model Selection -->
-            <div class="bg-base-100">
-              <span class="text-sm font-semibold"
-                >{t("tenant.text.improvement.llm")}</span
+            <div class="alert">
+              <span class="text-sm"
+                >{t("tenant.whisper.model.configured.for.azure.openai")}</span
               >
-              <div class="flex gap-4 mt-2">
-                {#each providerValues as option}
-                  <div class="flex items-center mt-2">
-                    <input
-                      type="radio"
-                      id="radio-text-{option.value}"
-                      name="text-prompt-provider"
-                      class="radio radio-sm radio-primary"
-                      value={option}
-                      bind:group={audioSelectedProvider}
-                    />
-                    <label
-                      for="radio-text-{option.value}"
-                      class="ml-2 font-medium text-sm">{option.label}</label
-                    >
-                  </div>
-                {/each}
-              </div>
-
-              <div class="alert mt-4">
-                <span class="text-sm"
-                  >{t("tenant.whisper.model.configured.for.azure.openai")}</span
-                >
-              </div>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Large File Azure Section -->
-      <div class="collapse collapse-arrow bg-base-100 shadow rounded-lg">
+      <div class="collapse collapse-arrow bg-base-100 shadow rounded-lg mb-4">
         <input type="checkbox" />
         <div class="collapse-title flex items-center justify-between">
           <div class="flex items-center">
             <input
               id="audio-pro-model"
               type="checkbox"
-              checked={azureAudioProEnabled}
+              checked={isAzureAudioProEnabled}
               class="checkbox checkbox-primary z-[10]"
               value="text-prompt"
               disabled
@@ -1106,7 +1107,7 @@
               </div>
             </div>
           </div>
-          
+
           <div class="grid grid-cols-2 gap-4 mx-8">
             <div class="w-full">
               <span class="mb-2 text-gray-400 font-medium text-sm"
@@ -1137,6 +1138,42 @@
                 use:trimInput
                 bind:value={tenantData.speech_region}
               />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Model Selection -->
+      <div class="container mx-auto">
+        <div class="bg-base-100 shadow rounded-lg my-4">
+          <div class="flex p-4 items-center justify-between">
+            <div class="flex items-center justify-between">
+              <label class="label cursor-pointer" for="disable-create-user">
+                <span class="label-text"
+                  >{t("tenant.text.improvement.llm")}</span
+                >
+                <!-- <span class="text-sm font-semibold"
+                >{t("tenant.text.improvement.llm")}</span
+              > -->
+              </label>
+            </div>
+            <div class="flex gap-4">
+              {#each providerValues as option}
+                <div class="flex items-center">
+                  <input
+                    type="radio"
+                    id="radio-text-{option.value}"
+                    name="text-prompt-provider"
+                    class="radio radio-sm radio-primary"
+                    value={option}
+                    bind:group={audioSelectedProvider}
+                  />
+                  <label
+                    for="radio-text-{option.value}"
+                    class="ml-2 font-medium text-sm">{option.label}</label
+                  >
+                </div>
+              {/each}
             </div>
           </div>
         </div>
