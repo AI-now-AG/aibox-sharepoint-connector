@@ -1,5 +1,5 @@
 <script lang="ts" module>
-  export interface CardItem {
+  export interface PromptCartItem {
     id: string;
     title: string;
     description?: string;
@@ -24,7 +24,7 @@
   const t = useTranslations();
 
   interface Props {
-    items?: CardItem[];
+    items?: PromptCartItem[];
     title?: string;
     isEditable?: boolean;
   }
@@ -46,7 +46,7 @@
   let timeout: any = $state();
   let orderCards = $state(items);
 
-  function getItemsByGroupId(items: CardItem[], groupId: string): CardItem[] {
+  function getItemsByGroupId(items: PromptCartItem[], groupId: string): PromptCartItem[] {
     return items.filter((item) => item.group === groupId);
   }
 
@@ -116,7 +116,7 @@
     promptOrderDialog?.show();
   }
 
-  async function updatePosition(orderItems: CardItem[]) {
+  async function updatePosition(orderItems: PromptCartItem[]) {
     showLoading();
     try {
       const sortedIds = orderItems.map((item) => {
@@ -125,7 +125,7 @@
         };
       });
       const newItems = await actions.prompt.updatePosition(sortedIds);
-      items = (newItems.data ?? orderItems) as CardItem[];
+      items = (newItems.data ?? orderItems) as PromptCartItem[];
       addToast({
         message: t("prompt-library.prompt.order-success"),
         type: "success",

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { slide } from "svelte/transition";
   import PromptList, {
-    type CardItem,
+    type PromptCartItem,
   } from "$components/prompt-interface/PromptList.svelte";
   import type { CategoryItem } from "$types/CategoryItem";
   import { useTranslations } from "$i18n/utils";
@@ -10,7 +10,7 @@
   const t = useTranslations();
 
   interface Props {
-    promptsEnriched?: CardItem[];
+    promptsEnriched?: PromptCartItem[];
     categoryList?: CategoryItem[];
     isEditable?: boolean;
   }
