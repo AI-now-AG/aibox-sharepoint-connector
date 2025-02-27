@@ -2,8 +2,10 @@
 import Layout from "$layouts/Layout.astro";
 import { useTranslations } from "$i18n/utils";
 import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
-import Card, { type CardItem } from "$components/Card.svelte";
 import { Permission } from "$enums/Users";
+import KnowledgeBaseList, {
+  type KnowledgeBaseCardItem,
+} from "$components/prompt-interface/KnowledgeBaseList.svelte";
 
 const t = useTranslations();
 
@@ -12,7 +14,7 @@ const knowledgeBaseCursor = await KnowledgeBaseModel.listByTenant(
 );
 const knowledgeBases = await knowledgeBaseCursor.toArray();
 
-const knowledgeBasesEnriched: CardItem[] = knowledgeBases.map(
+const knowledgeBasesEnriched: KnowledgeBaseCardItem[] = knowledgeBases.map(
   (knowledgeBase) => ({
     id: knowledgeBase._id.toString(),
     title: knowledgeBase.title,
@@ -20,6 +22,7 @@ const knowledgeBasesEnriched: CardItem[] = knowledgeBases.map(
     instruction: knowledgeBase.knowledge_base,
   }),
 );
+
 let userPermissions = Astro.locals.user.permissions;
 ---
 
@@ -58,12 +61,9 @@ let userPermissions = Astro.locals.user.permissions;
     }
   </div>
 
-  <Card
-    title={t("prompt-library.knowledgebase.all")}
-    items={knowledgeBasesEnriched}
-    type="knowledge-base"
-    viewLabel={t("prompt-library.knowledgebase.view")}
+  <KnowledgeBaseList
     isEditable={userPermissions.includes(Permission.AdminAll)}
+    items={knowledgeBasesEnriched}
     client:load
   />
 </Layout>
