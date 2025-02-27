@@ -1,10 +1,11 @@
 <script lang="ts">
-  import SingleInput from "$pages/prompt-library/prompts/SingleInput.svelte";
   import type { CreatePromptParams } from "$pages/api/prompts/index.json";
   import { useTranslations } from "$i18n/utils";
   import { svgIcons } from "$assets/icons";
   import { onMount } from "svelte";
+  import SingleInput from "$pages/prompt-library/prompts/SingleInput.svelte";
   import MultiInput from "$pages/prompt-library/prompts/MultiInput.svelte";
+  import ModelInput from "$pages/prompt-library/prompts/ModelInput.svelte";
   import { addToast } from "$stores/toast";
   import { preventDefault } from "$utils/common";
 
@@ -22,6 +23,10 @@
     _id: string;
   };*/
 
+  type Model = {
+    _id: string;
+    title: string;
+  };
   type KnowledgeBase = {
     title: string;
     _id: string;
@@ -41,6 +46,9 @@
 
   //let instructions: Instruction[] = [];
   //let selectedInstructions: Instruction[] = [];
+
+  let models: Model[] = $state([]);
+  let selectedModel: Model | undefined = $state();
 
   let knowledgeBases: KnowledgeBase[] = $state([]);
   let selectedKnowledgeBases: KnowledgeBase[] = $state([]);
@@ -142,6 +150,7 @@
       const newPrompt: CreatePromptParams = {
         title: promptTitle,
         prompt: promptText,
+        model: selectedModel ? selectedModel._id : null,
         knowledgebase: selectedKnowledgeBases.map((inst) => inst._id),
         ...(selectedCategory && { category: selectedCategory._id }),
         ...(selectedGroup && { group: selectedGroup._id }),
@@ -260,6 +269,7 @@
           items={knowledgeBases}
           bind:selectedItems={selectedKnowledgeBases}
         />
+        <ModelInput bind:models bind:selectedModel />
       </div>
 
       {#if isEditable}

@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import { db, type Document } from "../mongodb";
 import { z } from "zod";
-import { TenantFeature, ApiKeyProvider } from "$types/TenantFeature";
+import { TenantFeature, ApiKeyProvider, AudioCategory } from "$types/TenantFeature";
 
 export enum TenantTheme {
   Light = "light",
@@ -23,10 +23,22 @@ export const IncludedFeaturesSchema = z.object({
   provider: z.nativeEnum(ApiKeyProvider),
 });
 
-// export const InstructionsSchema = z.object({
-//   transcription_subtitle: z.string().optional(),
-//   transcription_plaintext: z.string().optional(),
-//   transcription_summary: z.string().optional(),
+export const TextFeatureSchema = z.object({
+  name: z.nativeEnum(ApiKeyProvider),
+  active: z.boolean().default(false),
+  default: z.boolean().default(false),
+});
+
+export const TranscriptionUsecaseSchema = z.object({
+  enabled: z.boolean().default(false),
+  title: z.string().optional(),
+  instruction: z.string().optional(),
+});
+
+// export const TranscriptionsSchema = z.object({
+//   enabled: z.boolean().default(false),
+//   cateogry: z.nativeEnum(AudioCategory),
+//   usecases: z.array(TranscriptionUsecaseSchema),
 // });
 
 export const TranscriptionsSchema = z.object({
@@ -76,7 +88,7 @@ const TenantSchema = z.object({
   default_language: z.string().nullish().default("en"),
   theme: z.nativeEnum(TenantTheme).default(TenantTheme.Light),
   primary_color: z.string().nullish(),
-  api_key_provider: z.nativeEnum(ApiKeyProvider).optional(),
+  api_key_providers: z.array(TextFeatureSchema).optional(),
   openai_api_key: z.string().nullish().default(null),
   azure_openai_api_key: z.string().nullish().default(null),
   azure_openai_endpoint: z.string().nullish().default(null),
@@ -87,6 +99,8 @@ const TenantSchema = z.object({
   transcriptions: TranscriptionsSchema.optional(),
   speech_api_key: z.string().nullish(),
   speech_region: z.string().nullish(),
+  perplexity_api_key: z.string().nullish(),
+  perplexity_chat_model: z.string().nullish(),
   active: z.boolean().optional().default(true),
   is_restrict_user_managment: z.boolean().optional().default(false),
   created_at: z

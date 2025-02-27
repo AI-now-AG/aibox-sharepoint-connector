@@ -11,12 +11,12 @@ import InstructionModel from "$data/models/instruction.model";
 import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
 import { z } from "zod";
 import { fileLoader } from "$utils/document-loader";
-
 import type { APIRoute } from "astro";
 import type { CreateInstructionParams } from "../instructions.json";
 import type { CreateKnowledgeBaseParams } from "../knowledge-base.json";
 import initializeOpenAI from "$utils/chatModel";
 import { MessageRole } from "$types/MessageHistory";
+//import ChatPerplexity from "$llm/Perplexity";
 
 export type PromptDetails = {
   title: string;
@@ -46,11 +46,6 @@ const RunPromptParamsSchema = z.object({
 
 export type RunPromptParams = z.infer<typeof RunPromptParamsSchema>;
 export type Attachment = z.infer<typeof AttachmentSchema>;
-
-// export const model = new ChatOpenAI({
-//   apiKey: import.meta.env.OPENAI_API_KEY,
-//   model: import.meta.env.OPENAI_MODEL,
-// });
 
 export const POST: APIRoute = async (ctx) => {
   const { params, request } = ctx;
@@ -166,7 +161,6 @@ export const POST: APIRoute = async (ctx) => {
       }
     }
 
-    //const model = initializeOpenAI(ctx);
     const parser = new StringOutputParser();
 
     // Set headers to enable chunked transfer
@@ -177,7 +171,8 @@ export const POST: APIRoute = async (ctx) => {
     const { readable, writable } = new TransformStream();
     const writer = writable.getWriter();
 
-    const model = initializeOpenAI(ctx);
+    const overrides = prompt.model ? { customModel: prompt.model } : {};
+    const model = initializeOpenAI(ctx, overrides);
 
     (async () => {
       try {
@@ -185,6 +180,11 @@ export const POST: APIRoute = async (ctx) => {
 
         let partialChunk = "";
         for await (const chunk of stream) {
+          // if (model instanceof ChatPerplexity) {
+          //   partialChunk = chunk.choices[0]?.delta?.content;
+          // } else {
+          //   partialChunk += chunk;
+          // }
           partialChunk += chunk;
 
           // Try to process and send the complete part of the chunk
@@ -222,21 +222,6 @@ export const POST: APIRoute = async (ctx) => {
     return new Response(readable, {
       headers,
     });
-
-    // const stream = await model.pipe(parser).stream(messages);
-    // //const result = await model.invoke(messages);
-    // //const headlines = await parser.stream(result);
-    // let data = "";
-    // for await (const chunk of stream) {
-    //   console.log("-----"+chunk);
-    //   data += chunk;
-    // }
-    // console.log("Response", result);
-    // return new Response(
-    //   JSON.stringify({
-    //     data,
-    //   }),
-    // );
   } catch (error) {
     console.error("Error processing request:", error);
     return new Response(

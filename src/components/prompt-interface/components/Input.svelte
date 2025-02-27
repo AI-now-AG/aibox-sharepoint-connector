@@ -5,6 +5,7 @@
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
   import { preventDefault } from "$utils/common";
+
   const t = useTranslations();
 
   interface Props {
@@ -12,6 +13,7 @@
     input?: string;
     output?: string;
     isProcessing?: boolean;
+    isDisableFileInput?: boolean;
   }
 
   let {
@@ -19,6 +21,7 @@
     input = $bindable(""),
     output = $bindable(""),
     isProcessing = $bindable(false),
+    isDisableFileInput = false,
   }: Props = $props();
 
   let inputText = $state("");
@@ -212,7 +215,7 @@
 
   <div class="grid grid-cols-[1fr_min-content] gap-4">
     <div class="p-2 flex flex-row gap-2">
-      {#if $sharedMessageHistory.length == 0}
+      {#if $sharedMessageHistory.length == 0 && !isDisableFileInput}
         <button
           class="btn h-auto w-auto p-1 min-h-0 hover:text-base-content/60"
           disabled={!promptId}
@@ -222,6 +225,7 @@
           }}
         >
           {@html svgIcons.attachment}
+
           {#if inputFiles.length > 0}
             <div class="badge badge-sm badge-neutral font-normal">
               {inputFiles.length}
@@ -254,6 +258,7 @@
       </button>
     </div>
   </div>
+
   <div>
     <input type="checkbox" class="modal-toggle" />
     <FileUpload

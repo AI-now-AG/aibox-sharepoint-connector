@@ -24,6 +24,12 @@ export function useTranslations(requestedLang?: string) {
     const template =
       (lang && (ui[lang] as Record<string, string>)[key]) ||
       (ui[defaultLang] as Record<string, string>)[key];
+
+    if (typeof template === "undefined") {
+      console.warn(`i18n missing translation key: ${key}`);
+      return `[missing key: ${key}]`;
+    }
+
     return Mustache.render(template, view);
   };
 }

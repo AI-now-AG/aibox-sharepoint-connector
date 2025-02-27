@@ -20,6 +20,7 @@ const CreatePromptParamsSchema = z.object({
   instructions: z.array(z.string().optional()).optional(),
   knowledgebase: z.array(z.string().optional()),
   prompt: z.string(),
+  model: z.string().nullish(),
   documents: z.array(z.string()).optional(),
 });
 
@@ -65,7 +66,6 @@ export const POST: APIRoute<CreatePromptParams> = async (ctx) => {
   // Determine the new position
   const _group = stringToObjectId.parse(data.group ?? "");
   const maxPositionPrompt = await PromptModel.getMaxPosition(_group);
-  console.log("maxPositionPrompt", { maxPositionPrompt, _group });
   const newPosition = maxPositionPrompt
     ? (maxPositionPrompt?.position || 0) + 1
     : 1;
@@ -228,6 +228,7 @@ export const GET: APIRoute = async (ctx) => {
       const promptData = {
         title: prompt.title,
         prompt: prompt.prompt,
+        model: prompt.model,
         instructions: instructions.map((inst) => ({
           _id: inst._id,
           title: inst.title,

@@ -12,6 +12,7 @@
     output?: string;
     files?: File[];
     onsend: Function;
+    isDisableFileInput?: boolean;
   }
 
   let {
@@ -19,6 +20,7 @@
     output = $bindable(""),
     files = $bindable([]),
     onsend,
+    isDisableFileInput = false,
   }: Props = $props();
 
   $inspect(files);
@@ -78,11 +80,11 @@
 
   <div class="grid grid-cols-[1fr_min-content] gap-4">
     <div class="p-2 flex flex-row gap-2">
-      {#if $sharedMessageHistory.length == 0}
+      {#if $sharedMessageHistory.length == 0 && !isDisableFileInput}
         <button
           class="btn h-auto w-auto p-1 min-h-0 hover:text-base-content/60"
           onclick={() => {
-            fileModal.showModal();
+            fileModal?.showModal();
           }}
         >
           {@html svgIcons.attachment}

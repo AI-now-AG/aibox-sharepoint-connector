@@ -1,11 +1,12 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { useTranslations } from "$i18n/utils";
-
   import SingleInput from "$pages/prompt-library/prompts/SingleInput.svelte";
   import MultiInput from "$pages/prompt-library/prompts/MultiInput.svelte";
+  import ModelInput from "$pages/prompt-library/prompts/ModelInput.svelte";
   import type { CreatePromptParams } from "$pages/api/prompts/index.json";
   import { addToast } from "$stores/toast";
+  import { tenant } from "$stores";
   import LoadingSpinner from "$components/prompt-interface/components/LoadingSpinner.svelte";
   import { svgIcons } from "$assets/icons";
   import { preventDefault } from "$utils/common";
@@ -28,19 +29,26 @@
     dialogTitle = t("prompt-library.edit.title"),
   }: Props = $props();
 
-  type Group = { title: string; _id: string }; // TODO: Get the type from the API endpoint
+  type Group = { _id: string; title: string }; // TODO: Get the type from the API endpoint
   type Category = {
-    title: string;
     _id: string;
+    title: string;
     groups: Group[];
   };
-  type KnowledgeBase = {
-    title: string;
+  type Model = {
     _id: string;
+    title: string;
+  };
+  type KnowledgeBase = {
+    _id: string;
+    title: string;
   };
 
   let categories: Category[] = $state([]);
   let selectedCategory: Category | undefined = $state();
+
+  let models: Model[] = $state([]);
+  let selectedModel: Model | null | undefined = $state();
 
   let knowledgeBases: KnowledgeBase[] = $state([]);
   let selectedKnowledgeBases: KnowledgeBase[] = $state([]);
@@ -100,15 +108,20 @@
       promptText = promptDetails.prompt;
 
       const category = categories.find(
-        (e) => e._id == promptDetails.category.toString(),
+        (e) => e._id == promptDetails.category?.toString(),
       );
       if (category) {
         selectedCategory = category;
         previousCategoryId = category._id;
       }
 
+      const model = models.find(
+        (e) => e._id == promptDetails.model?.toString(),
+      );
+      selectedModel = model ?? null;
+
       const group = category?.groups.find(
-        (e) => e._id == promptDetails.group.toString(),
+        (e) => e._id == promptDetails.group?.toString(),
       );
       if (group) {
         selectedGroup = group;
@@ -137,6 +150,7 @@
       const newPrompt: CreatePromptParams = {
         title: promptTitle,
         prompt: promptText,
+        model: selectedModel ? selectedModel._id : null,
         knowledgebase: selectedKnowledgeBases.map((inst) => inst._id),
         ...(selectedCategory && { category: selectedCategory._id }),
         ...(selectedGroup && { group: selectedGroup._id }),
@@ -194,18 +208,21 @@
       event.preventDefault();
     }
   }
+
   $effect(() => {
     if (selectedCategory && selectedCategory._id !== previousCategoryId) {
       selectedGroup = null;
       previousCategoryId = selectedCategory._id;
     }
   });
+
   let isFormValid = $derived(
     promptTitle?.trim() !== "" &&
       promptText?.trim() !== "" &&
       selectedCategory !== undefined &&
       selectedGroup !== undefined,
   );
+
   // Fetch prompt details when selectedEditPromptId changes
   $effect(() => {
     if (selectedEditPromptId) {
@@ -253,6 +270,7 @@
           items={knowledgeBases}
           bind:selectedItems={selectedKnowledgeBases}
         />
+        <ModelInput bind:models bind:selectedModel />
       </div>
 
       <div

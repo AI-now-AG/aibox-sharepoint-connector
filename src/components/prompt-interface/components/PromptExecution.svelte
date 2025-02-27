@@ -6,20 +6,30 @@
   import InputArea from "./Input.svelte";
   import PromptResults from "./PromptResults.svelte";
   import { svgIcons } from "$assets/icons";
+  import { ApiKeyProvider } from "$types/TenantFeature";
 
   interface Props {
     promptItems: any;
     isEditable?: boolean;
+    tenant?: any;
   }
 
-  let { promptItems, isEditable = $bindable(false) }: Props = $props();
+  let { promptItems, isEditable = $bindable(false), tenant }: Props = $props();
 
   let selectedPromptId = $state("");
   let input = $state("");
   let output = $state("");
   let isProcessing = $state(false);
   let showButton = $state(false);
-  let isFixed = $state(false);
+
+  const apiProvider = tenant.api_key_providers.find((item: any) => {
+    return item.default && item.active;
+  });
+  let isDisableFileInput = $state(
+    apiProvider.name == ApiKeyProvider.Perplexity,
+  );
+
+  $inspect(apiProvider, isDisableFileInput);
 
   onMount(() => {
     const handleScroll = () => {
@@ -43,16 +53,14 @@
   };
 
   $effect(() => {
-    if (input && !isFixed) {
-      setTimeout(() => {
-        isFixed = true;
-      }, 500);
-    }
-  });
-
-  $effect(() => {
     if (selectedPromptId) {
       sharedMessageHistory.set([]);
+
+      const currentPrompt = promptItems.find(
+        (e: { _id: string }) => e._id === selectedPromptId,
+      );
+      const promptModel = currentPrompt.model ?? apiProvider.name;
+      isDisableFileInput = promptModel == ApiKeyProvider.Perplexity;
     }
   });
 
@@ -90,6 +98,7 @@
           bind:input
           bind:output
           bind:isProcessing
+          {isDisableFileInput}
         />
       </div>
     {/if}
@@ -120,6 +129,7 @@
           bind:input
           bind:output
           bind:isProcessing
+          {isDisableFileInput}
         />
       </div>
     {/if}

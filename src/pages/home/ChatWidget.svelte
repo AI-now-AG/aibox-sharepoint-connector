@@ -1,17 +1,32 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
   import { slide, fade } from "svelte/transition";
-  import { type MessageHistory, MessageRole } from "$types/MessageHistory";
+  import { MessageRole } from "$types/MessageHistory";
   import { sharedMessageHistory } from "$components/prompt-interface/components/Stores";
   import ChatInput from "./ChatInput.svelte";
   import ChatResults from "./ChatResults.svelte";
   import { svgIcons } from "$assets/icons";
+  import { ApiKeyProvider } from "$types/TenantFeature";
 
+  interface Props {
+    tenant?: any;
+  }
+
+  let { tenant }: Props = $props();
   let input = $state("");
   let output = $state("");
   let files: File[] = $state([]);
   let isProcessing = $state(false);
   let showButton = $state(false);
+
+  const apiProvider = tenant.api_key_providers.find((item: any) => {
+    return item.default && item.active;
+  });
+  let isDisableFileInput = $state(
+    apiProvider.name == ApiKeyProvider.Perplexity,
+  );
+
+  $inspect(apiProvider, isDisableFileInput);
 
   onMount(() => {
     const handleScroll = () => {
@@ -177,7 +192,13 @@
         in:slide={{ duration: 500, delay: 500 }}
         out:slide={{ duration: 500 }}
       >
-        <ChatInput bind:input bind:output bind:files onsend={fetchMessage} />
+        <ChatInput
+          bind:input
+          bind:output
+          bind:files
+          onsend={fetchMessage}
+          {isDisableFileInput}
+        />
       </div>
     {/if}
 
@@ -205,7 +226,13 @@
           in:slide={{ duration: 500, delay: 500 }}
           out:slide={{ duration: 500 }}
         >
-          <ChatInput bind:input bind:output bind:files onsend={fetchMessage} />
+          <ChatInput
+            bind:input
+            bind:output
+            bind:files
+            onsend={fetchMessage}
+            {isDisableFileInput}
+          />
         </div>
       </div>
     {/if}
