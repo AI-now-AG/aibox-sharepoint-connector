@@ -4,6 +4,8 @@
     title: string;
     description?: string;
     instruction?: string;
+    modifiedBy?: string;
+    modifiedAt?: Date | string;
   }
 </script>
 

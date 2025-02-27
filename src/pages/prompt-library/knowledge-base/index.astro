@@ -20,6 +20,8 @@ const knowledgeBasesEnriched: KnowledgeBaseCardItem[] = knowledgeBases.map(
     title: knowledgeBase.title,
     description: knowledgeBase.description,
     instruction: knowledgeBase.knowledge_base,
+    modifiedAt: knowledgeBase.updated_at,
+    modifiedBy: knowledgeBase.modified_by,
   }),
 );
 

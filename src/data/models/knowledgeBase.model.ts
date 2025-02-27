@@ -11,6 +11,7 @@ const KnowledgeBaseSchema = z.object({
   knowledge_base: z.string(),
   created_at: z.date().optional(),
   updated_at: z.date(),
+  modified_by: z.string().optional(),
 });
 
 export type KnowledgeBase = z.infer<typeof KnowledgeBaseSchema>;

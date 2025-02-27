@@ -4,12 +4,14 @@
   import { fade } from "svelte/transition";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
+  import type { KnowledgeBaseCardItem } from "./KnowledgeBaseList.svelte";
+  import moment from "moment";
 
   const t = useTranslations();
 
   interface Props {
     isEditable: boolean;
-    data: any;
+    data: KnowledgeBaseCardItem;
     onSelectEdit?: Function;
     onSelectDuplicate?: Function;
     onSelectDelete?: Function;
@@ -50,15 +52,6 @@
 
 <div class="card bg-base-100 shadow-xl" out:fade>
   <div class="card-body space-y-2 justify-between">
-    {#if data?.tags}
-      <div class="card-actions justify-start">
-        {#each data?.tags as tag}
-          <div class="badge px-2 border-base-300">
-            {tag}
-          </div>
-        {/each}
-      </div>
-    {/if}
     <h2 class="card-title">{data?.title}</h2>
     {#if data?.description}
       <p class="text-base-content/60 line-clamp-3">
@@ -69,4 +62,15 @@
   {#if isEditable}
     <DropdownSection class={"absolute top-6 right-3"} {options} />
   {/if}
+  <div class="px-8 pb-4">
+    <p class="text-xs font-medium">
+      {t("common.edited-by")}
+      {data?.modifiedBy}
+    </p>
+    <p class="text-xs font-medium">
+      {data?.modifiedAt
+        ? moment(data?.modifiedAt).format("DD.MM.YYYY, HH:mm")
+        : "-"}
+    </p>
+  </div>
 </div>
