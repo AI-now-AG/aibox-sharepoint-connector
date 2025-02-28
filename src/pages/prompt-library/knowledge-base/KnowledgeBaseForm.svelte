@@ -5,7 +5,7 @@
   import { addToast } from "$stores/toast";
   import { svgIcons } from "$assets/icons";
   import { preventDefault } from "$utils/common";
-  import TextEditor from "./TextEditor.svelte";
+  import TextEditor from "$components/TextEditor.svelte";
 
   const t = useTranslations();
 
