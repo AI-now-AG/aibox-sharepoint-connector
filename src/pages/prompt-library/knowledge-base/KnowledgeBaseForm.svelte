@@ -31,7 +31,8 @@
 
   let isSaving = $state(false);
   let isFormValid = $derived(
-    edittedKnowledgeBase.trim() !== "" &&
+    knowledgeBaseTitle !== "" &&
+      edittedKnowledgeBase.trim() !== "" &&
       edittedKnowledgeBase.trim() !== "<p></p>",
   );
 
