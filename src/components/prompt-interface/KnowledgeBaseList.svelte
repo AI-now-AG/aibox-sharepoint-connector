@@ -40,11 +40,16 @@
 
   async function editCard(index: number) {
     selectedEditKnowledgeBaseId = items[index]?.id ?? "";
-    window.location.href = "/prompt-library/knowledge-base/" + selectedEditKnowledgeBaseId;
+    window.location.href =
+      "/prompt-library/knowledge-base/" + selectedEditKnowledgeBaseId;
   }
 
   async function duplicateCard(index: number) {
     selectedEditKnowledgeBaseId = items[index]?.id ?? "";
+    window.location.href =
+      "/prompt-library/knowledge-base/" +
+      selectedEditKnowledgeBaseId +
+      "?mode=clone";
   }
 
   function onDeleteCard(index: number) {

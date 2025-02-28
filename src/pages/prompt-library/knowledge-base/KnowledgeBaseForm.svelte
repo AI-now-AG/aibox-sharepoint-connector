@@ -15,13 +15,18 @@
     knowledgeBaseId?: string | undefined;
     knowledgeBase?: any | undefined;
     isEditable?: boolean;
+    mode?: "create" | "update" | "clone";
   }
 
   let {
     knowledgeBaseId = undefined,
     knowledgeBase = undefined,
     isEditable = false,
+    mode: screenMode,
   }: Props = $props();
+
+  let mode = $state(screenMode ?? (knowledgeBase ? "update" : "create"));
+  $inspect(mode);
 
   let isSaving = $state(false);
   let isFormValid = $derived(
@@ -31,6 +36,10 @@
   onMount(async function () {
     if (knowledgeBase) {
       knowledgeBaseTitle = knowledgeBase.title;
+      if (mode == "clone") {
+        knowledgeBaseTitle =
+          knowledgeBaseTitle?.trim() + " (" + t("common.copy") + ")";
+      }
       knowledgeBaseText = knowledgeBase.knowledge_base;
     }
   });
@@ -44,8 +53,10 @@
         knowledge_base: knowledgeBaseText,
         ...(knowledgeBaseId && { _id: knowledgeBaseId }),
       };
+
+      let httpMethod = mode == "update" ? "PUT" : "POST";
       const response = await fetch("/api/knowledge-base.json", {
-        method: knowledgeBase ? "PUT" : "POST",
+        method: httpMethod,
         body: JSON.stringify(newInstruction),
         headers: {
           "Content-Type": "application/json",
@@ -61,6 +72,7 @@
 
       const data = await response.json();
       window.history.back();
+
       addToast({
         message: data.message,
         type: "success",
