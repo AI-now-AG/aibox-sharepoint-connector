@@ -65,7 +65,7 @@
   <div class="px-8 pb-4">
     <p class="text-xs font-medium">
       {t("common.edited-by")}
-      {data?.modifiedBy}
+      {data?.modifiedBy ?? "-"}
     </p>
     <p class="text-xs font-medium">
       {data?.modifiedAt

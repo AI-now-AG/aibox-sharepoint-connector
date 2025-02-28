@@ -107,6 +107,7 @@ export const POST: APIRoute<CreateKnowledgeBaseParams> = async (ctx) => {
     description,
     tenant_id: ctx.locals.user.tenant_id,
     creator_id: ctx.locals.user.id,
+    modified_by: ctx.locals.user.email,
     created_at: new Date(),
     updated_at: new Date(),
   };
@@ -161,6 +162,7 @@ export const PUT: APIRoute<CreateKnowledgeBaseParams> = async (ctx) => {
     knowledge_base: data.knowledge_base,
     description,
     updated_at: new Date(),
+    modified_by: ctx.locals.user.email,
   };
   try {
     if (knowledgeBase && data._id) {
