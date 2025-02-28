@@ -49,19 +49,14 @@
     hideLoading();
 
     if (!error) {
-      const knowledgeBasesEnriched: KnowledgeBaseCardItem[] = data.map(
-        (knowledgeBase: any) => ({
-          id: knowledgeBase._id?.toString(),
-          title: knowledgeBase?.title,
-          description: knowledgeBase.description,
-          instruction: knowledgeBase.knowledge_base,
-          modifiedAt: knowledgeBase.updated_at,
-          modifiedBy: knowledgeBase.modified_by,
-        }),
-      );
-
-      items = knowledgeBasesEnriched;
-      log.i(items, "Knowledge fetch data");
+      items = data.map((knowledgeBase: any) => ({
+        id: knowledgeBase._id?.toString(),
+        title: knowledgeBase?.title,
+        description: knowledgeBase.description,
+        instruction: knowledgeBase.knowledge_base,
+        modifiedAt: knowledgeBase.updated_at,
+        modifiedBy: knowledgeBase.modified_by,
+      }));
     } else {
       log.e(error, "Error fetching knowledgebase");
     }
