@@ -1,30 +1,13 @@
 ---
 import Layout from "$layouts/Layout.astro";
 import { useTranslations } from "$i18n/utils";
-import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
 import { Permission } from "$enums/Users";
-import KnowledgeBaseList, {
-  type KnowledgeBaseCardItem,
-} from "$components/prompt-interface/KnowledgeBaseList.svelte";
+import KnowledgeBaseList from "$components/prompt-interface/KnowledgeBaseList.svelte";
+import { svgIcons } from "$assets/icons";
 
 const t = useTranslations();
-
-const knowledgeBaseCursor = await KnowledgeBaseModel.listByTenant(
-  Astro.locals.user.tenant_id,
-);
-const knowledgeBases = await knowledgeBaseCursor.toArray();
-
-const knowledgeBasesEnriched: KnowledgeBaseCardItem[] = knowledgeBases.map(
-  (knowledgeBase) => ({
-    id: knowledgeBase._id.toString(),
-    title: knowledgeBase.title,
-    description: knowledgeBase.description,
-    instruction: knowledgeBase.knowledge_base,
-    modifiedAt: knowledgeBase.updated_at,
-    modifiedBy: knowledgeBase.modified_by,
-  }),
-);
-
+const tenant = Astro.locals.tenant;
+const tenantId = tenant?._id?.toString() ?? "";
 let userPermissions = Astro.locals.user.permissions;
 ---
 
@@ -39,24 +22,10 @@ let userPermissions = Astro.locals.user.permissions;
     {
       userPermissions.includes(Permission.AdminAll) && (
         <a
-          href="knowledge-base/add"
+          href="/prompt-library/knowledge-base/add"
           class="mt-2 lg:mt-8 btn btn-active btn-neutral font-normal grow-0"
         >
-          <svg
-            width="13"
-            height="12"
-            viewBox="0 0 13 12"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M6.5 1V6M6.5 6V11M6.5 6H11.5M6.5 6L1.5 6"
-              stroke="white"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
+          <span set:html={svgIcons.add} />
           {t("prompt-library.knowledgebase.add")}
         </a>
       )
@@ -65,7 +34,7 @@ let userPermissions = Astro.locals.user.permissions;
 
   <KnowledgeBaseList
     isEditable={userPermissions.includes(Permission.AdminAll)}
-    items={knowledgeBasesEnriched}
+    tenantId={tenantId}
     client:load
   />
 </Layout>

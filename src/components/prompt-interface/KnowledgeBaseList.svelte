@@ -13,30 +13,63 @@
   import KnowledgeBaseItem from "./KnowledgeBaseItem.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import Loading from "$components/Loading.svelte";
-  import { loading, showLoading, hideLoading } from "$stores";
+  import { loading, showLoading, hideLoading, tenant } from "$stores";
   import { addToast } from "$stores/toast";
   import { useTranslations } from "$i18n/utils";
+  import { onMount } from "svelte";
+  import { actions } from "astro:actions";
+  import log from "$utils/log";
 
   const t = useTranslations();
 
   interface Props {
-    items?: KnowledgeBaseCardItem[];
+    tenantId?: any;
     title?: string;
     isEditable?: boolean;
   }
 
   let {
-    items = $bindable([]),
+    tenantId,
     title = t("prompt-library.knowledgebase.all"),
     isEditable = false,
   }: Props = $props();
 
-  $inspect(items);
+  let items: KnowledgeBaseCardItem[] = $state([]);
 
   let selectedEditKnowledgeBaseId: string = $state("");
   let selectedDeletePKnowledgeBaseId: string = "";
 
   let confirmDeleteModal: HTMLDialogElement | undefined = $state();
+
+  const fetchKnowledgeBase = async () => {
+    showLoading();
+    const { data, error } = await actions.knowledgebase.listByTenant({
+      tenant_id: tenantId,
+    });
+    hideLoading();
+
+    if (!error) {
+      const knowledgeBasesEnriched: KnowledgeBaseCardItem[] = data.map(
+        (knowledgeBase: any) => ({
+          id: knowledgeBase._id?.toString(),
+          title: knowledgeBase?.title,
+          description: knowledgeBase.description,
+          instruction: knowledgeBase.knowledge_base,
+          modifiedAt: knowledgeBase.updated_at,
+          modifiedBy: knowledgeBase.modified_by,
+        }),
+      );
+
+      items = knowledgeBasesEnriched;
+      log.i(items, "Knowledge fetch data");
+    } else {
+      log.e(error, "Error fetching knowledgebase");
+    }
+  };
+
+  onMount(() => {
+    fetchKnowledgeBase();
+  });
 
   async function editCard(index: number) {
     selectedEditKnowledgeBaseId = items[index]?.id ?? "";
