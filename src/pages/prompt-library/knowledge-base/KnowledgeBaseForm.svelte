@@ -9,6 +9,7 @@
   import TextEditor from "$components/TextEditor.svelte";
   import ImportFileDialog from "./ImportFileDialog.svelte";
   import { loading } from "$stores";
+  import Loading from "$components/Loading.svelte";
 
   const t = useTranslations();
 
@@ -190,6 +191,8 @@
     </form>
   </div>
 </div>
+
+<Loading bind:show={$loading} />
 
 <ImportFileDialog
   bind:modal={fileUploadModal}
