@@ -93,7 +93,7 @@
           {#if file}
             <p class="text-sm text-base-content/80 mt-1">{file.name}</p>
           {:else}
-            <p class="text-sm text-base-content/80 mt-1">{"CSV"}</p>
+            <p class="text-sm text-base-content/80 mt-1">{"PDF, DOCX, TXT"}</p>
           {/if}
         </div>
       </label>

@@ -6,9 +6,13 @@
   import { svgIcons } from "$assets/icons";
   import { preventDefault } from "$utils/common";
   import TextEditor from "$components/TextEditor.svelte";
+  import ImportFileDialog from "./ImportFileDialog.svelte";
   import { refreshTrigger } from "$stores";
 
   const t = useTranslations();
+
+  let fileUploadModal: HTMLDialogElement | undefined = $state();
+  let inputFile: File = $state();
 
   let knowledgeBaseTitle = $state("");
   let knowledgeBaseText = $state("");
@@ -49,7 +53,9 @@
     }
   });
 
-  async function saveInstruction() {
+  async function extractFileContent() {}
+
+  async function saveKnowledgeBase() {
     if (!isFormValid) return;
     isSaving = true;
     try {
@@ -102,13 +108,23 @@
       <button class="mr-4" onclick={() => window.history.back()}>
         {@html svgIcons.back}
       </button>
-      <h1 class="text-4xl font-bold">
-        {#if knowledgeBase}
-          {t("prompt-library.knowledgebase.edit")}
-        {:else}
-          {t("prompt-library.knowledgebase.add")}
-        {/if}
-      </h1>
+      <div class="w-full grid grid-cols-1 md:grid-cols-[1fr_max-content] gap-8">
+        <h1 class="text-4xl font-bold">
+          {#if knowledgeBase}
+            {t("prompt-library.knowledgebase.edit")}
+          {:else}
+            {t("prompt-library.knowledgebase.add")}
+          {/if}
+        </h1>
+        <button
+          class="btn btn-neutral font-normal grow-0"
+          onclick={() => {
+            fileUploadModal.showModal();
+          }}
+        >
+          Import from file
+        </button>
+      </div>
     </div>
     <form class="rounded pt-6 mb-4 space-y-6">
       <div class="grid grid-cols-1 gap-4 justify-center">
@@ -138,7 +154,7 @@
         <div class="flex items-center justify-between">
           <button
             class={`btn btn-active btn-primary px-8 font-normal ${(!isFormValid || isSaving) && "btn-disabled"}`}
-            onclick={preventDefault(saveInstruction)}
+            onclick={preventDefault(saveKnowledgeBase)}
           >
             {#if isSaving}
               <span class="loading loading-spinner"></span>
@@ -152,3 +168,9 @@
     </form>
   </div>
 </div>
+
+<ImportFileDialog
+  bind:modal={fileUploadModal}
+  bind:file={inputFile}
+  confirm={extractFileContent}
+/>
