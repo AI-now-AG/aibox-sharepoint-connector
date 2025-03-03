@@ -1,31 +1,31 @@
 import { defineAction } from "astro:actions";
 import { z } from "zod";
-import pdf from "pdf-parse";
+//import pdf from "pdf-parse";
 import mammoth from "mammoth";
 import { ObjectId } from "mongodb";
 import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
 import { transformRawDataWithoutReplacer } from "$utils/transformRawData";
 
 // Function to extract text from PDF
-const extractTextFromPDF = async (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
+// const extractTextFromPDF = async (file: File): Promise<string> => {
+//   return new Promise((resolve, reject) => {
+//     const reader = new FileReader();
 
-    reader.onload = async () => {
-      try {
-        const buffer = Buffer.from(reader.result as ArrayBuffer);
-        const data = await pdf(buffer);
-        resolve(data.text);
-      } catch (error) {
-        reject(error);
-      }
-    };
+//     reader.onload = async () => {
+//       try {
+//         const buffer = Buffer.from(reader.result as ArrayBuffer);
+//         const data = await pdf(buffer);
+//         resolve(data.text);
+//       } catch (error) {
+//         reject(error);
+//       }
+//     };
 
-    reader.onerror = () => reject(new Error("Failed to read PDF file."));
+//     reader.onerror = () => reject(new Error("Failed to read PDF file."));
 
-    reader.readAsArrayBuffer(file);
-  });
-};
+//     reader.readAsArrayBuffer(file);
+//   });
+// };
 
 // Function to extract text from DOCX
 const extractTextFromDocx = async (file: File): Promise<string> => {
@@ -66,7 +66,7 @@ export const knowledgebase = {
         // Extract text based on file type
         let text = "";
         if (file.type === "application/pdf") {
-          text = await extractTextFromPDF(file);
+          //text = await extractTextFromPDF(file);
         } else if (
           file.type ===
           "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
