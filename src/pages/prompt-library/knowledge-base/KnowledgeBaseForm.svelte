@@ -116,7 +116,7 @@
         <button
           class="btn btn-neutral font-normal grow-0"
           onclick={() => {
-            fileUploadModal.showModal();
+            fileUploadModal?.showModal();
           }}
         >
           Import from file
