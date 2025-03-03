@@ -45,5 +45,6 @@ export const extractTextFromDocx = async (file: File): Promise<string> => {
 
 // Function to extract text from TXT
 export const extractTextFromTxt = async (file: File): Promise<string> => {
-  return await file.text();
+  const text = await file.text();
+  return text.replace(/\n/g, "<br>"); // Convert line breaks to <br> for HTML
 };
