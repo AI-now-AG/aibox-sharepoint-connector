@@ -306,5 +306,6 @@
   "tenant.perplexity-provider": "Perplexity",
   "prompt-library.add.prompts.language-model": "Language Model",
   "prompt-library.delete.knowledge-base.confirm": "Are you sure you want to delete this knowledge base?",
-  "common.edited-by": "Edited by"
+  "common.edited-by": "Edited by",
+  "prompt-library.knowledgebase.file-import": "Import from file"
 }

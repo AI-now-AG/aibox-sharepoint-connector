@@ -145,7 +145,7 @@
             fileUploadModal?.showModal();
           }}
         >
-          Import from file
+          {t("prompt-library.knowledgebase.file-import")}
         </button>
       </div>
     </div>
