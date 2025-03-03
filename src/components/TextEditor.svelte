@@ -1,7 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { TextSelection } from "prosemirror-state";
-
   import { Tipex, type TipexEditor } from "@friendofsvelte/tipex";
   import "@friendofsvelte/tipex/styles/Tipex.css";
   import "@friendofsvelte/tipex/styles/ProseMirror.css";
@@ -13,20 +12,20 @@
 
   interface Props {
     initContent?: string;
-    htlm?: string;
+    html?: string;
     text?: string;
   }
 
   let {
     initContent,
-    htlm = $bindable(""),
+    html = $bindable(""),
     text = $bindable(""),
   }: Props = $props();
 
   let body = $state(initContent);
 
   function onEditorUpdate(e: any) {
-    htlm = e.editor.getHTML();
+    html = e.editor.getHTML();
     text = e.editor.getText();
   }
 

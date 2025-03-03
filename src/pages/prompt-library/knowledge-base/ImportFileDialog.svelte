@@ -12,13 +12,15 @@
 
   const t = useTranslations();
 
-  const acceptedTypes: Record<string, string[]> = {
-    "text/csv": ["text/csv"],
-  };
+  const acceptedTypes: string[] = [
+    "application/pdf",
+    "text/plain",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  ];
   let isDragOver = $state(false);
   let fileErrorMessage: string = $state("");
 
-  const acceptedMimeTypes = Object.values(acceptedTypes).flat().join(", ");
+  const acceptedMimeTypes = acceptedTypes.flat().join(", ");
 
   function addFiles(
     event: Event & { currentTarget: EventTarget & HTMLInputElement },
@@ -47,6 +49,7 @@
     }
     return false;
   }
+
   $effect(() => {
     if (file && !isFileValid(file)) {
       fileErrorMessage = "unsupported-type";

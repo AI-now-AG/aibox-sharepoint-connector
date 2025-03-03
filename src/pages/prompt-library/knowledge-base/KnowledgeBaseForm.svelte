@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { actions } from "astro:actions";
   import type { CreateKnowledgeBaseParams } from "$pages/api/knowledge-base.json";
   import { useTranslations } from "$i18n/utils";
   import { onMount } from "svelte";
@@ -7,6 +8,7 @@
   import { preventDefault } from "$utils/common";
   import TextEditor from "$components/TextEditor.svelte";
   import ImportFileDialog from "./ImportFileDialog.svelte";
+  import { loading } from "$stores";
 
   const t = useTranslations();
 
@@ -40,6 +42,9 @@
       edittedKnowledgeBase.trim() !== "<p></p>",
   );
 
+  $inspect(inputFile);
+  $inspect(edittedKnowledgeBase);
+
   onMount(async function () {
     if (knowledgeBase) {
       knowledgeBaseTitle = knowledgeBase.title;
@@ -52,13 +57,33 @@
     }
   });
 
-  async function extractFileContent() {}
+  async function extractFileContent() {
+    const formData = new FormData();
+    formData.append("file", inputFile as File);
+
+    $loading = true;
+    const { data, error } =
+      await actions.knowledgebase.extractFileContent(formData);
+
+    console.log("data", data);
+    if (error) {
+      addToast({
+        message: "Something went wrong",
+        type: "error",
+      });
+    } else {
+      edittedKnowledgeBase = data.text;
+      knowledgeBaseText = data.text;
+    }
+
+    $loading = false;
+  }
 
   async function saveKnowledgeBase() {
     if (!isFormValid) return;
     isSaving = true;
     try {
-      const newInstruction: CreateKnowledgeBaseParams = {
+      const newKnowledgeBase: CreateKnowledgeBaseParams = {
         title: knowledgeBaseTitle,
         knowledge_base: edittedKnowledgeBase,
         ...(knowledgeBaseId && { _id: knowledgeBaseId }),
@@ -67,7 +92,7 @@
       let httpMethod = mode == "update" ? "PUT" : "POST";
       const response = await fetch("/api/knowledge-base.json", {
         method: httpMethod,
-        body: JSON.stringify(newInstruction),
+        body: JSON.stringify(newKnowledgeBase),
         headers: {
           "Content-Type": "application/json",
         },
@@ -141,7 +166,7 @@
 
         {#key knowledgeBaseText}
           <TextEditor
-            bind:htlm={edittedKnowledgeBase}
+            bind:html={edittedKnowledgeBase}
             initContent={knowledgeBaseText}
           />
         {/key}
