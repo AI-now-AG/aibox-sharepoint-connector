@@ -13,7 +13,7 @@
   import KnowledgeBaseItem from "./KnowledgeBaseItem.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import Loading from "$components/Loading.svelte";
-  import { loading, showLoading, hideLoading, refreshTrigger } from "$stores";
+  import { loading, showLoading, hideLoading } from "$stores";
   import { addToast } from "$stores/toast";
   import { useTranslations } from "$i18n/utils";
   import { onMount } from "svelte";
@@ -26,17 +26,15 @@
     tenantId?: any;
     title?: string;
     isEditable?: boolean;
-    items?: KnowledgeBaseCardItem[];
   }
 
   let {
     tenantId,
     title = t("prompt-library.knowledgebase.all"),
     isEditable = false,
-    items = $bindable([]),
   }: Props = $props();
 
-  // let items: KnowledgeBaseCardItem[] = $state([]);
+  let items: KnowledgeBaseCardItem[] = $state([]);
 
   let selectedEditKnowledgeBaseId: string = $state("");
   let selectedDeletePKnowledgeBaseId: string = "";
@@ -65,7 +63,7 @@
   };
 
   onMount(() => {
-    // fetchKnowledgeBase();
+    fetchKnowledgeBase();
   });
 
   async function editCard(index: number) {

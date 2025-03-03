@@ -6,7 +6,6 @@
   import { svgIcons } from "$assets/icons";
   import { preventDefault } from "$utils/common";
   import TextEditor from "$components/TextEditor.svelte";
-  import { refreshTrigger } from "$stores";
 
   const t = useTranslations();
 
@@ -76,10 +75,7 @@
       }
 
       const data = await response.json();
-      setTimeout(() => {
-        window.history.back();
-      }, 0);
-
+      window.location.replace("/prompt-library/knowledge-base");
       addToast({
         message: data.message,
         type: "success",

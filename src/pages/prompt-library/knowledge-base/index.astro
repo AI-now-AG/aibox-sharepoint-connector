@@ -4,26 +4,11 @@ import { useTranslations } from "$i18n/utils";
 import { Permission } from "$enums/Users";
 import KnowledgeBaseList from "$components/prompt-interface/KnowledgeBaseList.svelte";
 import { svgIcons } from "$assets/icons";
-import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
-import type { KnowledgeBaseCardItem } from "$components/prompt-interface/KnowledgeBaseList.svelte";
 
 const t = useTranslations();
 const tenant = Astro.locals.tenant;
 const tenantId = tenant?._id?.toString() ?? "";
 let userPermissions = Astro.locals.user.permissions;
-
-const knowledgeBaseCursor = await KnowledgeBaseModel.listByTenant(
-  Astro.locals.user.tenant_id,
-);
-const knowledgeBases = await knowledgeBaseCursor.toArray();
-const knowledgeBasesEnriched: KnowledgeBaseCardItem[] = knowledgeBases.map(
-  (knowledgeBase) => ({
-    id: knowledgeBase._id.toString(),
-    title: knowledgeBase.title,
-    description: knowledgeBase.description,
-    instruction: knowledgeBase.knowledge_base,
-  }),
-);
 ---
 
 <Layout>
@@ -50,7 +35,6 @@ const knowledgeBasesEnriched: KnowledgeBaseCardItem[] = knowledgeBases.map(
   <KnowledgeBaseList
     isEditable={userPermissions.includes(Permission.AdminAll)}
     tenantId={tenantId}
-    items={knowledgeBasesEnriched}
     client:load
   />
 </Layout>
