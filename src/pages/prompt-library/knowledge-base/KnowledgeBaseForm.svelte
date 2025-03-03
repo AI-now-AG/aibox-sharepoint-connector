@@ -6,7 +6,7 @@
   import { svgIcons } from "$assets/icons";
   import { preventDefault } from "$utils/common";
   import TextEditor from "$components/TextEditor.svelte";
-  import { refreshTrigger } from '$stores';
+  import { refreshTrigger } from "$stores";
 
   const t = useTranslations();
 
@@ -77,7 +77,7 @@
 
       const data = await response.json();
       window.history.back();
-      refreshTrigger.update(n => n + 1);
+      refreshTrigger.update((n) => n + 1);
 
       addToast({
         message: data.message,
