@@ -5,11 +5,14 @@
   import { addToast } from "$stores/toast";
   import { svgIcons } from "$assets/icons";
   import { preventDefault } from "$utils/common";
+  import TextEditor from "$components/TextEditor.svelte";
+  import { refreshTrigger } from "$stores";
 
   const t = useTranslations();
 
   let knowledgeBaseTitle = $state("");
   let knowledgeBaseText = $state("");
+  let edittedKnowledgeBase = $state("");
 
   interface Props {
     knowledgeBaseId?: string | undefined;
@@ -26,11 +29,12 @@
   }: Props = $props();
 
   let mode = $state(screenMode ?? (knowledgeBase ? "update" : "create"));
-  $inspect(mode);
 
   let isSaving = $state(false);
   let isFormValid = $derived(
-    knowledgeBaseTitle.trim() !== "" && knowledgeBaseText.trim() !== "",
+    knowledgeBaseTitle !== "" &&
+      edittedKnowledgeBase.trim() !== "" &&
+      edittedKnowledgeBase.trim() !== "<p></p>",
   );
 
   onMount(async function () {
@@ -41,6 +45,7 @@
           knowledgeBaseTitle?.trim() + " (" + t("common.copy") + ")";
       }
       knowledgeBaseText = knowledgeBase.knowledge_base;
+      edittedKnowledgeBase = knowledgeBase.knowledge_base;
     }
   });
 
@@ -50,7 +55,7 @@
     try {
       const newInstruction: CreateKnowledgeBaseParams = {
         title: knowledgeBaseTitle,
-        knowledge_base: knowledgeBaseText,
+        knowledge_base: edittedKnowledgeBase,
         ...(knowledgeBaseId && { _id: knowledgeBaseId }),
       };
 
@@ -71,7 +76,9 @@
       }
 
       const data = await response.json();
-      window.history.back();
+      setTimeout(() => {
+        window.history.back();
+      }, 0);
 
       addToast({
         message: data.message,
@@ -118,11 +125,13 @@
 
       <div class="mb-4">
         <p class="mb-2">{t("prompt-library.add.knowledgebase.text")}*</p>
-        <textarea
-          bind:value={knowledgeBaseText}
-          placeholder="e.g. type knowledge base details..."
-          class="input input-bordered min-w-xs shadow appearance-none min-h-96 w-full py-2 px-3"
-        ></textarea>
+
+        {#key knowledgeBaseText}
+          <TextEditor
+            bind:htlm={edittedKnowledgeBase}
+            initContent={knowledgeBaseText}
+          />
+        {/key}
       </div>
 
       {#if isEditable}

@@ -13,7 +13,7 @@
   import KnowledgeBaseItem from "./KnowledgeBaseItem.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import Loading from "$components/Loading.svelte";
-  import { loading, showLoading, hideLoading, tenant } from "$stores";
+  import { loading, showLoading, hideLoading, refreshTrigger } from "$stores";
   import { addToast } from "$stores/toast";
   import { useTranslations } from "$i18n/utils";
   import { onMount } from "svelte";
@@ -26,15 +26,17 @@
     tenantId?: any;
     title?: string;
     isEditable?: boolean;
+    items?: KnowledgeBaseCardItem[];
   }
 
   let {
     tenantId,
     title = t("prompt-library.knowledgebase.all"),
     isEditable = false,
+    items = $bindable([]),
   }: Props = $props();
 
-  let items: KnowledgeBaseCardItem[] = $state([]);
+  // let items: KnowledgeBaseCardItem[] = $state([]);
 
   let selectedEditKnowledgeBaseId: string = $state("");
   let selectedDeletePKnowledgeBaseId: string = "";
@@ -49,26 +51,21 @@
     hideLoading();
 
     if (!error) {
-      const knowledgeBasesEnriched: KnowledgeBaseCardItem[] = data.map(
-        (knowledgeBase: any) => ({
-          id: knowledgeBase._id?.toString(),
-          title: knowledgeBase?.title,
-          description: knowledgeBase.description,
-          instruction: knowledgeBase.knowledge_base,
-          modifiedAt: knowledgeBase.updated_at,
-          modifiedBy: knowledgeBase.modified_by,
-        }),
-      );
-
-      items = knowledgeBasesEnriched;
-      log.i(items, "Knowledge fetch data");
+      items = data.map((knowledgeBase: any) => ({
+        id: knowledgeBase._id?.toString(),
+        title: knowledgeBase?.title,
+        description: knowledgeBase.description,
+        instruction: knowledgeBase.knowledge_base,
+        modifiedAt: knowledgeBase.updated_at,
+        modifiedBy: knowledgeBase.modified_by,
+      }));
     } else {
       log.e(error, "Error fetching knowledgebase");
     }
   };
 
   onMount(() => {
-    fetchKnowledgeBase();
+    // fetchKnowledgeBase();
   });
 
   async function editCard(index: number) {
