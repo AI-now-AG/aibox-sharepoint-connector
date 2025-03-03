@@ -7,12 +7,11 @@
   import { preventDefault } from "$utils/common";
   import TextEditor from "$components/TextEditor.svelte";
   import ImportFileDialog from "./ImportFileDialog.svelte";
-  import { refreshTrigger } from "$stores";
 
   const t = useTranslations();
 
   let fileUploadModal: HTMLDialogElement | undefined = $state();
-  let inputFile: File = $state();
+  let inputFile: File | undefined = $state();
 
   let knowledgeBaseTitle = $state("");
   let knowledgeBaseText = $state("");
@@ -82,9 +81,7 @@
       }
 
       const data = await response.json();
-      setTimeout(() => {
-        window.history.back();
-      }, 0);
+      window.location.replace("/prompt-library/knowledge-base");
 
       addToast({
         message: data.message,
