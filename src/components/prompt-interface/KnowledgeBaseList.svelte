@@ -57,12 +57,14 @@
         modifiedAt: knowledgeBase.updated_at,
         modifiedBy: knowledgeBase.modified_by,
       }));
+      console.log("Knowledgebase", items);
     } else {
       log.e(error, "Error fetching knowledgebase");
     }
   };
 
   onMount(() => {
+    console.log("onMount fetchKnowledgeBase", items);
     fetchKnowledgeBase();
   });
 
