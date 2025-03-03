@@ -13,7 +13,7 @@
   import KnowledgeBaseItem from "./KnowledgeBaseItem.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import Loading from "$components/Loading.svelte";
-  import { loading, showLoading, hideLoading, tenant } from "$stores";
+  import { loading, showLoading, hideLoading, refreshTrigger } from "$stores";
   import { addToast } from "$stores/toast";
   import { useTranslations } from "$i18n/utils";
   import { onMount } from "svelte";
@@ -57,15 +57,19 @@
         modifiedAt: knowledgeBase.updated_at,
         modifiedBy: knowledgeBase.modified_by,
       }));
-      console.log("Knowledgebase", items);
     } else {
       log.e(error, "Error fetching knowledgebase");
     }
   };
 
   onMount(() => {
-    console.log("onMount fetchKnowledgeBase", items);
-    fetchKnowledgeBase();
+    let unsubscribe = refreshTrigger.subscribe(() => {
+      fetchKnowledgeBase();
+    });
+
+    return () => {
+      unsubscribe();
+    };
   });
 
   async function editCard(index: number) {

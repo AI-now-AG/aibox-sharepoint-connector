@@ -18,3 +18,6 @@ export const tenant = writable<Tenant | null>(null);
 
 /* user */
 export const user = writable<User | null>(null);
+
+/* trigger refresh the page*/
+export const refreshTrigger = writable<number>(0);
