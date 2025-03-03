@@ -26,15 +26,17 @@
     tenantId?: any;
     title?: string;
     isEditable?: boolean;
+    items?: KnowledgeBaseCardItem[];
   }
 
   let {
     tenantId,
     title = t("prompt-library.knowledgebase.all"),
     isEditable = false,
+    items = $bindable([]),
   }: Props = $props();
 
-  let items: KnowledgeBaseCardItem[] = $state([]);
+  // let items: KnowledgeBaseCardItem[] = $state([]);
 
   let selectedEditKnowledgeBaseId: string = $state("");
   let selectedDeletePKnowledgeBaseId: string = "";
@@ -63,13 +65,7 @@
   };
 
   onMount(() => {
-    let unsubscribe = refreshTrigger.subscribe(() => {
-      fetchKnowledgeBase();
-    });
-
-    return () => {
-      unsubscribe();
-    };
+    // fetchKnowledgeBase();
   });
 
   async function editCard(index: number) {

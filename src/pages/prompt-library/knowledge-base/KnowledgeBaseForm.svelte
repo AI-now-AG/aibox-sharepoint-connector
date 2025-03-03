@@ -76,8 +76,9 @@
       }
 
       const data = await response.json();
-      window.history.back();
-      refreshTrigger.update((n) => n + 1);
+      setTimeout(() => {
+        window.history.back();
+      }, 0);
 
       addToast({
         message: data.message,
