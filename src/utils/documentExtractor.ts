@@ -14,16 +14,19 @@ export const extractTextFromPDF = async (file: File): Promise<string> => {
     // Process Extracted Text
     pdfParser.on("pdfParser_dataReady", (pdfData) => {
       let text = "";
-      const lines: { [key: number]: string[] } = {};
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       pdfData.Pages.forEach((page: any) => {
+        const lines: { [key: number]: string[] } = {};
+
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         page.Texts.forEach((textObj: any) => {
           const y = Math.round(textObj.y); // Use Y-coordinate for line detection
           const extractedText = decodeURIComponent(
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            textObj.R.map((r: any) => r.T).join(" "),
+            textObj.R.map((r: any) => r.T)
+              .join("")
+              .replace(/%20(.)%20/g, "$1"),
           );
 
           if (!lines[y]) {
@@ -31,15 +34,15 @@ export const extractTextFromPDF = async (file: File): Promise<string> => {
           }
           lines[y].push(extractedText);
         });
-      });
 
-      // Sort by Y-position and reconstruct lines
-      Object.keys(lines)
-        .sort((a, b) => Number(a) - Number(b))
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .forEach((y: any) => {
-          text += lines[y].join(" ") + "\n"; // Preserve line breaks
-        });
+        // Sort by Y-position and reconstruct lines
+        Object.keys(lines)
+          .sort((a, b) => Number(a) - Number(b))
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .forEach((y: any) => {
+            text += lines[y].join("") + "\n"; // Preserve line breaks
+          });
+      });
 
       // Convert newlines to <br> for HTML
       resolve(text.trim().replace(/\n/g, "<br>"));
