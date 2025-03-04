@@ -55,4 +55,9 @@
   onupdate={(e) => {
     onEditorUpdate(e);
   }}
-/>
+  focused={false}
+>
+  {#snippet utilities(_tipex)}
+    <div></div>
+  {/snippet}
+</Tipex>
