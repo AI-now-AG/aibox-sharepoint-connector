@@ -6,24 +6,45 @@ export const extractTextFromPDF = async (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const pdfParser = new PDFParser();
 
-    // Error Handling
+    // Handle Errors
     pdfParser.on("pdfParser_dataError", (errData) =>
       reject(errData.parserError),
     );
 
-    // Data Parsing
+    // Process Extracted Text
     pdfParser.on("pdfParser_dataReady", (pdfData) => {
-      // Extract text from each page
-      const text = pdfData.Pages.map((page: any) =>
-        page.Texts.map((textObj: any) =>
-          decodeURIComponent(textObj.R[0].T),
-        ).join(" "),
-      ).join("\n");
+      let text = "";
+      const lines: { [key: number]: string[] } = {};
 
-      resolve(text);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      pdfData.Pages.forEach((page: any) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        page.Texts.forEach((textObj: any) => {
+          const y = Math.round(textObj.y); // Use Y-coordinate for line detection
+          const extractedText = decodeURIComponent(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            textObj.R.map((r: any) => r.T).join(" "),
+          );
+
+          if (!lines[y]) {
+            lines[y] = [];
+          }
+          lines[y].push(extractedText);
+        });
+      });
+
+      // Sort by Y-position and reconstruct lines
+      Object.keys(lines)
+        .sort((a, b) => Number(a) - Number(b))
+        .forEach((y) => {
+          text += lines[y].join(" ") + "\n"; // Preserve line breaks
+        });
+
+      // Convert newlines to <br> for HTML
+      resolve(text.trim().replace(/\n/g, "<br>"));
     });
 
-    // Convert File object to Buffer (Node.js way)
+    // Convert File to Buffer
     file
       .arrayBuffer()
       .then((arrayBuffer) => {
