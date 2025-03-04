@@ -106,7 +106,6 @@ export const POST: APIRoute = async (ctx) => {
 
     const parser = new StringOutputParser();
 
-    // Set headers to enable chunked transfer
     const headers = new Headers();
     headers.set("Content-Type", "text/plain; charset=UTF-8");
     headers.set("Transfer-Encoding", "chunked");
@@ -115,11 +114,11 @@ export const POST: APIRoute = async (ctx) => {
     const writer = writable.getWriter();
 
     const model = initializeOpenAI(ctx);
-    let citations = [];
-
+   
     (async () => {
       try {
         let isSentCitations = false;
+        let citations = [];
         let partialChunk = "";
 
         const stream: any = await model.pipe(parser).stream(messages);

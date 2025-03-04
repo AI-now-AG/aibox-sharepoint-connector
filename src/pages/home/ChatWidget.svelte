@@ -133,7 +133,6 @@
             const chunk = decoder.decode(value, { stream: true });
 
             const parsedChunk: any = parseChunkCitations(chunk);
-            console.log("parsedChunk", parsedChunk);
             if (parsedChunk.citations) {
               citations = parsedChunk.citations;
             }
