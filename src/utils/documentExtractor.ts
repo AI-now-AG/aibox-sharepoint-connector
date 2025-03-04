@@ -62,7 +62,11 @@ export const extractTextFromDocx = async (file: File): Promise<string> => {
   const result = await mammoth.convertToHtml({
     buffer: Buffer.from(arrayBuffer),
   });
-  return result.value || "No text found in DOCX.";
+
+  // **Explicitly remove any remaining <img> tags**
+  const extractedText = result.value.replace(/<img[^>]*>/g, "");
+
+  return extractedText || "No text found in DOCX.";
 };
 
 // Function to extract text from TXT
