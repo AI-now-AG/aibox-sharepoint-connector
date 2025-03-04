@@ -1,12 +1,13 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
-  import { slide, fade } from "svelte/transition";
+  import { slide } from "svelte/transition";
   import { MessageRole } from "$types/MessageHistory";
   import { sharedMessageHistory } from "$components/prompt-interface/components/Stores";
   import ChatInput from "./ChatInput.svelte";
   import ChatResults from "./ChatResults.svelte";
   import { svgIcons } from "$assets/icons";
   import { ApiKeyProvider } from "$types/TenantFeature";
+  import { parseChunkCitations, replaceCitations } from "$utils/common";
 
   interface Props {
     tenant?: any;
@@ -53,7 +54,7 @@
     sharedMessageHistory.set([]);
   });
 
-  $inspect(input, output);
+  // $inspect(input, output);
 
   const readFileContent = (file: File) => {
     return new Promise((resolve) => {
@@ -122,20 +123,28 @@
             newUserMessage,
           ]);
         }
+        let citations = [];
         if (reader) {
-          //isProcessing = false;
           const decoder = new TextDecoder();
           while (true) {
             const { done, value } = await reader.read();
             if (done) break;
 
             const chunk = decoder.decode(value, { stream: true });
-            partialData += chunk;
+
+            const parsedChunk: any = parseChunkCitations(chunk);
+            console.log("parsedChunk", parsedChunk);
+            if (parsedChunk.citations) {
+              citations = parsedChunk.citations;
+            }
+
+            partialData += parsedChunk.content ?? parsedChunk;
+
             const formattedChunk = formatMarkdown(partialData)
               .split("\n")
               .map((line) => formatMarkdown(line))
               .join("\n");
-            output = formattedChunk;
+            output = replaceCitations(formattedChunk, citations);
           }
         }
         if (output) {
@@ -194,7 +203,6 @@
       >
         <ChatInput
           bind:input
-          bind:output
           bind:files
           onsend={fetchMessage}
           {isDisableFileInput}
@@ -228,7 +236,6 @@
         >
           <ChatInput
             bind:input
-            bind:output
             bind:files
             onsend={fetchMessage}
             {isDisableFileInput}

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { fade } from "svelte/transition";
-  import { onMount, tick } from "svelte";
-  import { MessageRole, type MessageHistory } from "$types/MessageHistory";
+  import { onMount } from "svelte";
+  import { MessageRole } from "$types/MessageHistory";
   import { sharedMessageHistory } from "$components/prompt-interface/components/Stores";
   import { user } from "$stores";
   import { svgIcons } from "$assets/icons";
@@ -38,9 +38,10 @@
     });
   };
 
-  const handleCopy = (event) => {
+  const handleCopy = (event: any) => {
     const selection = window.getSelection();
-    const range = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+    const range =
+      selection && selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
 
     if (!range) {
       return;
@@ -51,7 +52,7 @@
     container.appendChild(range.cloneContents());
 
     const richText = container.innerHTML;
-    const plainText = selection.toString();
+    const plainText = (selection ?? "").toString();
 
     event.clipboardData.setData("text/html", richText);
     event.clipboardData.setData("text/plain", plainText);

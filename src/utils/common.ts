@@ -37,3 +37,53 @@ export const preventDefault = (fn: any) => {
     fn.call(this, event);
   };
 };
+
+export function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export function tryParse(input: string): Object | string {
+  let result;
+  try {
+    result = JSON.parse(input);
+  } catch (error) {
+    result = input;
+  } finally {
+    return result;
+  }
+}
+
+export function parseChunkCitations(inputString: string): Object | string {
+  const unescapedString = inputString.replace(/\\\"/g, '"');
+  const jsonMatch = unescapedString.match(/{.*?}/s);
+  if (jsonMatch) {
+    const jsonString = jsonMatch[0];
+    try {
+      const jsonObject = JSON.parse(jsonString);
+      const citations = jsonObject.citations;
+      const remainingText = unescapedString.slice(jsonString.length);
+      const result = {
+        citations,
+        content: remainingText.trim(),
+      };
+      return result;
+    } catch (error) {
+      console.error("Error parsing JSON:", error);
+    }
+  }
+  return inputString;
+}
+
+export function replaceCitations(
+  inputString: string,
+  citations: Array<string>,
+): string {
+  const updatedString = inputString.replace(/\[(\d+)\]/g, (match, p1) => {
+    const index = parseInt(p1, 10) - 1;
+    if (index >= 0 && index < citations.length) {
+      return `<a href='${citations[index]}' target='_blank' class='bg-gray-100 hover:bg-blue-600 text-blue-600 hover:text-white text-xs font-normal ml-1 rounded justify-center items-center'>[${p1}]</a>`;
+    }
+    return match;
+  });
+  return updatedString;
+}
