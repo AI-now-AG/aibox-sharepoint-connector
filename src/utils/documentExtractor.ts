@@ -36,7 +36,8 @@ export const extractTextFromPDF = async (file: File): Promise<string> => {
       // Sort by Y-position and reconstruct lines
       Object.keys(lines)
         .sort((a, b) => Number(a) - Number(b))
-        .forEach((y) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .forEach((y: any) => {
           text += lines[y].join(" ") + "\n"; // Preserve line breaks
         });
 
