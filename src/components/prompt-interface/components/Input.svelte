@@ -4,7 +4,11 @@
   import { sharedMessageHistory } from "$components/prompt-interface/components/Stores";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
-  import { preventDefault } from "$utils/common";
+  import {
+    parseChunkCitations,
+    preventDefault,
+    replaceCitations,
+  } from "$utils/common";
 
   const t = useTranslations();
 
@@ -125,6 +129,7 @@
             newUserMessage,
           ]);
         }
+        let citations = [];
         if (reader) {
           const decoder = new TextDecoder();
           while (true) {
@@ -132,12 +137,17 @@
             if (done) break;
 
             const chunk = decoder.decode(value, { stream: true });
-            partialData += chunk;
+            const parsedChunk: any = parseChunkCitations(chunk);
+            if (parsedChunk.citations) {
+              citations = parsedChunk.citations;
+            }
+            partialData += parsedChunk.content ?? parsedChunk;
+
             const formattedChunk = formatMarkdown(partialData)
               .split("\n")
               .map((line) => formatMarkdown(line))
               .join("\n");
-            output = formattedChunk;
+            output = replaceCitations(formattedChunk, citations);
           }
         }
         if (output) {
