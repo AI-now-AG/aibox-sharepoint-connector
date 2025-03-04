@@ -48,7 +48,7 @@
   {body}
   controls
   floating
-  class="h-[46vh] border border-neutral-200"
+  class="h-[46vh] border border-neutral-200 resize-y"
   oncreate={(e) => {
     setFocusAtTheEnd(e.editor);
   }}
