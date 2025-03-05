@@ -3,20 +3,18 @@
   import { useTranslations } from "$i18n/utils";
   import { storePromptId } from "$components/prompt-interface/components/Stores";
   import InputArea from "$components/PromptConfiguration/InputArea.svelte";
-  // import type { CreateInstructionParams } from "$pages/api/instructions.json";
   import type { CreateKnowledgeBaseParams } from "$pages/api/knowledge-base.json";
   import type { PromptDetails } from "$pages/api/prompts/[id].json";
 
   const t = useTranslations();
 
   let selectedPromptId = "";
-  let promptDetails: PromptDetails = $state();
+  let promptDetails: PromptDetails | undefined = $state();
   let promptText = $state("");
-  //let instructions: CreateInstructionParams[] = [];
-  let knowledgebase: CreateKnowledgeBaseParams[] = $state([]);
+  let knowledgebase: CreateKnowledgeBaseParams[] | undefined = $state([]);
   let isSaving = false;
 
-  let dlgEl: HTMLDialogElement = $state();
+  let dlgEl: HTMLDialogElement | undefined = $state();
 
   const unsubscribe = storePromptId.subscribe((value) => {
     if (value) {
@@ -37,7 +35,6 @@
     if (response.ok) {
       promptDetails = (await response.json()) as PromptDetails;
       promptText = promptDetails.prompt;
-      //instructions = promptDetails.instructions;
       knowledgebase = promptDetails.knowledgebase;
     } else {
       console.error("API call failed");
@@ -56,9 +53,8 @@
     const data = await response.json();
     alert(data.message);
     if (response.ok) {
-      promptText = promptDetails.prompt;
-      //instructions = promptDetails.instructions;
-      knowledgebase = promptDetails.knowledgebase;
+      promptText = promptDetails?.prompt ?? "";
+      knowledgebase = promptDetails?.knowledgebase;
       isSaving = false;
     }
   }
@@ -69,7 +65,7 @@
     <!-- svelte-ignore a11y_consider_explicit_label -->
     <button
       class="btn btn-sm btn-neutral btn-2 border-0 bg-neutral-content text-neutral hover:text-neutral-content mb-4"
-      onclick={() => dlgEl.showModal()}
+      onclick={() => dlgEl?.showModal()}
     >
       <svg
         width="20"
