@@ -11,8 +11,11 @@ import UserModel, {
 import TenantModel, { type Tenant } from "$data/models/tenant.model";
 import usersManagement from "$data/auth0/users-manager";
 import organizationsManagement from "$data/auth0/organizations-manager";
+import {
+  sendVerificationEmail,
+  sendPasswordResetEmail,
+} from "$utils/auth0Auth";
 import type { UserRole } from "$enums/Users";
-
 /**
  * Handles Auth0 log stream events
  * Reference: https://auth0.com/docs/customize/log-streams/event-filters#user-behavioral-success
@@ -20,7 +23,7 @@ import type { UserRole } from "$enums/Users";
  * @param {Object} event - Incoming event payload from Auth0.
  * @returns {Object} - HTTP response indicating success or failure.
  */
-const syncAuth0Resources: Handler = async (
+const auth0Webhook: Handler = async (
   event: HandlerEvent,
 ): Promise<HandlerResponse> => {
   try {
@@ -55,6 +58,12 @@ const syncAuth0Resources: Handler = async (
       // See: https://auth0.com/docs/customize/log-streams/event-filters#login-success
       if (eventType == "s") {
         await syncAuth0UserOnLogin(data);
+      }
+
+      // Trigger successful signup
+      // See: https://auth0.com/docs/customize/log-streams/event-filters#signup-success
+      if (eventType == "ss") {
+        await triggerRegistrationEmail(data);
       }
 
       // Trigger 'Add members to an organization'
@@ -126,6 +135,17 @@ const isPermittedChannel = (data: any) => {
   const requestChannel = data?.details?.request?.channel || "";
   const permittedChannels = ["https://manage.auth0.com/"];
   return permittedChannels.includes(requestChannel);
+};
+
+const triggerRegistrationEmail = async (data: any) => {
+  console.log(`Trigger registration email`, data.details);
+
+  const { user_id: userId, email, connection } = data.details.body;
+  if (data?.details?.body?.is_signup == true) {
+    sendVerificationEmail(userId);
+  } else {
+    sendPasswordResetEmail(email, connection);
+  }
 };
 
 const createUserInDatabase = async (data: any) => {
@@ -347,4 +367,4 @@ const syncAuth0UserOnLogin = async (data: any) => {
   }
 };
 
-export { syncAuth0Resources as handler };
+export { auth0Webhook as handler };
