@@ -44,8 +44,8 @@ export const sendPasswordResetEmail = async (
 export const sendVerificationEmail = async (userId: string) => {
   try {
     const AUTH0_TENANT = getEnvVar("AUTH0_TENANT");
-    const CLIENT_ID = getEnvVar("AUTH0_MNGT_CLIENT_ID");
-    const CLIENT_SECRET = getEnvVar("AUTH0_MNGT_CLIENT_SECRET");
+    const MNGT_CLIENT_ID = getEnvVar("AUTH0_MNGT_CLIENT_ID");
+    const MNGT_CLIENT_SECRET = getEnvVar("AUTH0_MNGT_CLIENT_SECRET");
     const API_AUDIENCE = `https://${AUTH0_TENANT}.eu.auth0.com/api/v2/`;
 
     // Step 1: Get Auth0 Management API Token
@@ -55,8 +55,8 @@ export const sendVerificationEmail = async (userId: string) => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          client_id: CLIENT_ID,
-          client_secret: CLIENT_SECRET,
+          client_id: MNGT_CLIENT_ID,
+          client_secret: MNGT_CLIENT_SECRET,
           audience: API_AUDIENCE,
           grant_type: "client_credentials",
         }),
@@ -71,7 +71,8 @@ export const sendVerificationEmail = async (userId: string) => {
 
     // Step 2: Generate Email Verification Link
     const verificationResponse = await fetch(
-      `https://${AUTH0_TENANT}.eu.auth0.com/api/v2/tickets/email-verification`,
+      //`https://${AUTH0_TENANT}.eu.auth0.com/api/v2/tickets/email-verification`,
+      "https://login.auth0.com/api/v2/tickets/email-verification",
       {
         method: "POST",
         headers: {
