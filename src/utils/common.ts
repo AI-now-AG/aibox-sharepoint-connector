@@ -37,3 +37,77 @@ export const preventDefault = (fn: any) => {
     fn.call(this, event);
   };
 };
+
+export function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export function tryParse(input: string): Object | string {
+  let result;
+  try {
+    result = JSON.parse(input);
+  } catch (error) {
+    result = input;
+  } finally {
+    return result;
+  }
+}
+
+export function parseChunkCitations(inputString: string): Object | string {
+  const unescapedString = inputString.replace(/\\\"/g, '"');
+  const jsonMatch = unescapedString.match(/{.*?}/s);
+  if (jsonMatch) {
+    const jsonString = jsonMatch[0];
+    try {
+      const jsonObject = JSON.parse(jsonString);
+      const citations = jsonObject.citations;
+      const remainingText = unescapedString.slice(jsonString.length);
+      const result = {
+        citations,
+        content: remainingText.trim(),
+      };
+      return result;
+    } catch (error) {
+      console.error("Error parsing JSON:", error);
+    }
+  }
+  return inputString;
+}
+
+export function formatCitations(
+  inputString: string,
+  citations: Array<string>,
+): string {
+  const updatedString = inputString.replace(/\[(\d+)\]/g, (match, p1) => {
+    const index = parseInt(p1, 10) - 1;
+    if (index >= 0 && index < citations.length) {
+      return `<a href='${citations[index]}' target='_blank' class='bg-gray-100 hover:bg-blue-600 text-blue-600 hover:text-white text-xs font-normal ml-1 rounded justify-center items-center'>[${p1}]</a>`;
+    }
+    return match;
+  });
+  return updatedString;
+}
+
+export function formatMarkdown(text: string) {
+  text = text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+  text = text.replace(/(\*|_)(.*?)\1/g, "<em>$2</em>");
+  text = text.replace(/__(.*?)__/g, "<u>$1</u>");
+  text = text.replace(/~~(.*?)~~/g, "<del>$1</del>");
+  text = text.replace(/`(.*?)`/g, "<code>$1</code>");
+  text = text.replace(/```([\s\S]*?)```/g, "<pre><code>$1</code></pre>");
+  text = text.replace(/^###### (.*)$/gm, "<h6 class='text-xs'>$1</h6>");
+  text = text.replace(/^##### (.*)$/gm, "<h5 class='text-sm'>$1</h5>");
+  text = text.replace(/^#### (.*)$/gm, "<h4 class='text-base'>$1</h4>");
+  text = text.replace(/^### (.*)$/gm, "<h3 class='text-lg'>$1</h3>");
+  text = text.replace(/^## (.*)$/gm, "<h2 class='text-xl'>$1</h2>");
+  text = text.replace(/^# (.*)$/gm, "<h1 class='text-2xl'>$1</h1>");
+  text = text.replace(/\n/g, "<br>");
+  return text;
+}
+
+export function stripHtmlFormatting(text: string): string {
+  text = text.replace(/<\/?(strong|em|u|del|code|pre|h[1-6][^>]*)>/gi, "");
+  text = text.replace(/<br>/gi, "\n");
+  text = text.replace(/<[^>]+>/g, "");
+  return text.trim();
+}

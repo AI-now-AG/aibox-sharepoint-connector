@@ -4,7 +4,13 @@
   import { sharedMessageHistory } from "$components/prompt-interface/components/Stores";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
-  import { preventDefault } from "$utils/common";
+  import {
+    formatMarkdown,
+    parseChunkCitations,
+    preventDefault,
+    formatCitations,
+    stripHtmlFormatting,
+  } from "$utils/common";
 
   const t = useTranslations();
 
@@ -125,6 +131,7 @@
             newUserMessage,
           ]);
         }
+        let citations = [];
         if (reader) {
           const decoder = new TextDecoder();
           while (true) {
@@ -132,12 +139,17 @@
             if (done) break;
 
             const chunk = decoder.decode(value, { stream: true });
-            partialData += chunk;
+            const parsedChunk: any = parseChunkCitations(chunk);
+            if (parsedChunk.citations) {
+              citations = parsedChunk.citations;
+            }
+            partialData += parsedChunk.content ?? parsedChunk;
+
             const formattedChunk = formatMarkdown(partialData)
               .split("\n")
               .map((line) => formatMarkdown(line))
               .join("\n");
-            output = formattedChunk;
+            output = formatCitations(formattedChunk, citations);
           }
         }
         if (output) {
@@ -158,30 +170,6 @@
         console.error("Fetch headlines error:" + error);
       }
     }
-  }
-
-  function formatMarkdown(text: string) {
-    text = text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
-    text = text.replace(/(\*|_)(.*?)\1/g, "<em>$2</em>");
-    text = text.replace(/__(.*?)__/g, "<u>$1</u>");
-    text = text.replace(/~~(.*?)~~/g, "<del>$1</del>");
-    text = text.replace(/`(.*?)`/g, "<code>$1</code>");
-    text = text.replace(/```([\s\S]*?)```/g, "<pre><code>$1</code></pre>");
-    text = text.replace(/^###### (.*)$/gm, "<h6 class='text-xs'>$1</h6>");
-    text = text.replace(/^##### (.*)$/gm, "<h5 class='text-sm'>$1</h5>");
-    text = text.replace(/^#### (.*)$/gm, "<h4 class='text-base'>$1</h4>");
-    text = text.replace(/^### (.*)$/gm, "<h3 class='text-lg'>$1</h3>");
-    text = text.replace(/^## (.*)$/gm, "<h2 class='text-xl'>$1</h2>");
-    text = text.replace(/^# (.*)$/gm, "<h1 class='text-2xl'>$1</h1>");
-    text = text.replace(/\n/g, "<br>");
-    return text;
-  }
-
-  function stripHtmlFormatting(text: string): string {
-    text = text.replace(/<\/?(strong|em|u|del|code|pre|h[1-6][^>]*)>/gi, "");
-    text = text.replace(/<br>/gi, "\n");
-    text = text.replace(/<[^>]+>/g, "");
-    return text.trim();
   }
 
   function clearText() {

@@ -5,6 +5,7 @@ import {
   SystemMessage,
   type BaseMessage,
 } from "@langchain/core/messages";
+import type { BaseOutputParser } from "@langchain/core/output_parsers";
 import OpenAI from "openai";
 
 export const enum PerplexityRole {
@@ -127,7 +128,7 @@ class Perplexity {
     }
   }
 
-  pipe(paser: any) {
+  pipe(paser: BaseOutputParser) {
     return this;
   }
 
