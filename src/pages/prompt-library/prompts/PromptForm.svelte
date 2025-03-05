@@ -17,12 +17,6 @@
     _id: string;
     groups: Group[];
   };
-
-  /*type Instruction = {
-    title: string;
-    _id: string;
-  };*/
-
   type Model = {
     _id: string;
     title: string;
@@ -33,19 +27,16 @@
   };
 
   let categories: Category[] = $state([]);
-  let selectedCategory: Category = $state();
-  let selectedGroup: Group = $state();
+  let selectedCategory: Category | undefined = $state();
+  let selectedGroup: Group | undefined = $state();
 
   let previousCategoryId: string | null = $state(null);
   $effect(() => {
     if (selectedCategory && selectedCategory._id !== previousCategoryId) {
-      selectedGroup = null;
+      selectedGroup = undefined;
       previousCategoryId = selectedCategory._id;
     }
   });
-
-  //let instructions: Instruction[] = [];
-  //let selectedInstructions: Instruction[] = [];
 
   let models: Model[] = $state([]);
   let selectedModel: Model | undefined = $state();
