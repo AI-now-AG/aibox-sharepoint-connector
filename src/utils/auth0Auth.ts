@@ -29,13 +29,15 @@ export const sendPasswordResetEmail = async (
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(
-        `Error sending password reset email: ${errorData.error || "Unknown error"}`,
+        `Error sending password reset email: ${errorData.error_description || response.statusText}`,
       );
     }
 
     console.log(`Password reset email sent to ${email}`);
+    return await response.text();
   } catch (error) {
     console.error("Failed to send password reset email:", error);
+    throw new Error("Failed to send password reset email.");
   }
 };
 
@@ -91,5 +93,6 @@ export const sendVerificationEmail = async (userId: string) => {
     console.log(`Verification email sent successfully: ${ticket}`);
   } catch (error) {
     console.error("Error sending verification email:", error);
+    throw new Error("Failed to send verification email.");
   }
 };
