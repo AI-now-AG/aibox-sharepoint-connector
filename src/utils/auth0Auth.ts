@@ -92,7 +92,7 @@ export const sendVerificationEmail = async (userId: string) => {
       );
     }
 
-    console.log(`✅ Standard verification email sent to user ${userId}`);
+    console.log(`Standard verification email sent to user ${userId}`);
   } catch (error) {
     console.error("Error sending verification email:", error);
     //throw new Error("Failed to send verification email.");
