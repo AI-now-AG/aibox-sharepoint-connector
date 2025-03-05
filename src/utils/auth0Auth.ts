@@ -37,7 +37,7 @@ export const sendPasswordResetEmail = async (
     return await response.text();
   } catch (error) {
     console.error("Failed to send password reset email:", error);
-    throw new Error("Failed to send password reset email.");
+    //throw new Error("Failed to send password reset email.");
   }
 };
 
@@ -94,6 +94,6 @@ export const sendVerificationEmail = async (userId: string) => {
     console.log(`Verification email sent successfully: ${ticket}`);
   } catch (error) {
     console.error("Error sending verification email:", error);
-    throw new Error("Failed to send verification email.");
+    //throw new Error("Failed to send verification email.");
   }
 };
