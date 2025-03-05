@@ -70,28 +70,28 @@ export const sendVerificationEmail = async (userId: string) => {
     const { access_token: accessToken } = await tokenResponse.json();
     console.log(`Response access token`, accessToken);
 
-    // Step 2: Generate Email Verification Link
+    // Step 2: Trigger Auth0's Standard Email Verification
+    console.log(`Sending verification email via Auth0 for user: ${userId}`);
+
     const verificationResponse = await fetch(
-      `https://${AUTH0_TENANT}.eu.auth0.com/api/v2/tickets/email-verification`,
+      `https://${AUTH0_TENANT}.eu.auth0.com/api/v2/users/${encodeURIComponent(userId)}/send_verification_email`,
       {
         method: "POST",
         headers: {
           Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ user_id: userId }),
       },
     );
 
     if (!verificationResponse.ok) {
+      const errorText = await verificationResponse.text();
       throw new Error(
-        `Error creating verification ticket: ${verificationResponse.statusText}`,
+        `Error sending verification email: ${verificationResponse.statusText} - ${errorText}`,
       );
     }
 
-    const { ticket } = await verificationResponse.json();
-
-    console.log(`Verification email sent successfully: ${ticket}`);
+    console.log(`✅ Standard verification email sent to user ${userId}`);
   } catch (error) {
     console.error("Error sending verification email:", error);
     //throw new Error("Failed to send verification email.");
