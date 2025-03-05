@@ -140,10 +140,11 @@ const isPermittedChannel = (data: any) => {
 const triggerRegistrationEmail = async (data: any) => {
   console.log(`Trigger registration email`, data.details);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { user_id: userId } = data;
   const { email, connection, is_signup: isSignup } = data.details.body;
   if (isSignup == true) {
-    await sendVerificationEmail(userId);
+    //await sendVerificationEmail(userId);
   } else {
     await sendPasswordResetEmail(email, connection);
   }
