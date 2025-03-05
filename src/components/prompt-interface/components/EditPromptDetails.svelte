@@ -6,7 +6,6 @@
   import ModelInput from "$pages/prompt-library/prompts/ModelInput.svelte";
   import type { CreatePromptParams } from "$pages/api/prompts/index.json";
   import { addToast } from "$stores/toast";
-  import { tenant } from "$stores";
   import LoadingSpinner from "$components/prompt-interface/components/LoadingSpinner.svelte";
   import { svgIcons } from "$assets/icons";
   import { preventDefault } from "$utils/common";
@@ -48,7 +47,7 @@
   let selectedCategory: Category | undefined = $state();
 
   let models: Model[] = $state([]);
-  let selectedModel: Model | null | undefined = $state();
+  let selectedModel: Model | undefined = $state();
 
   let knowledgeBases: KnowledgeBase[] = $state([]);
   let selectedKnowledgeBases: KnowledgeBase[] = $state([]);
@@ -118,7 +117,7 @@
       const model = models.find(
         (e) => e._id == promptDetails.model?.toString(),
       );
-      selectedModel = model ?? null;
+      selectedModel = model;
 
       const group = category?.groups.find(
         (e) => e._id == promptDetails.group?.toString(),
