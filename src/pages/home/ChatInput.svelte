@@ -9,7 +9,6 @@
 
   interface Props {
     input?: string;
-    output?: string;
     files?: File[];
     onsend: Function;
     isDisableFileInput?: boolean;
@@ -17,7 +16,6 @@
 
   let {
     input = $bindable(""),
-    output = $bindable(""),
     files = $bindable([]),
     onsend,
     isDisableFileInput = false,

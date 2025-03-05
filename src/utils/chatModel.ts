@@ -2,8 +2,8 @@ import { ChatOpenAI, AzureChatOpenAI } from "@langchain/openai";
 import type { APIContext } from "astro";
 import { decrypt } from "./secure";
 import { TenantFeature, ApiKeyProvider } from "$types/TenantFeature";
-//import ChatPerplexity, { PerplexityModel } from "$llm/Perplexity";
 import log from "./log";
+import Perplexity from "$llm/Perplexity";
 
 interface ChatConfigOverrides {
   customModel?: string;
@@ -11,19 +11,20 @@ interface ChatConfigOverrides {
 
 // Initialize Perplexity AI's Chat API with OpenAI-like interface
 export const initPerplexityOpenAI = (apiKey: string, model: string) => {
-  return new ChatOpenAI({
-    openAIApiKey: apiKey, // Set API key for authentication
-    configuration: { baseURL: "https://api.perplexity.ai" }, // Use Perplexity's API endpoint
-    modelName: model, // Specify model (if provided)
-    //maxTokens: 400, // Define max token limit (if provided)
-  });
+  return new Perplexity({ api_key: apiKey, model: model });
+  // return new ChatOpenAI({
+  //   openAIApiKey: apiKey, // Set API key for authentication
+  //   configuration: { baseURL: "https://api.perplexity.ai" }, // Use Perplexity's API endpoint
+  //   modelName: model, // Specify model (if provided)
+  //   //maxTokens: 400, // Define max token limit (if provided)
+  // });
 };
 
 // Initialize OpenAI's Chat API
 const initChatOpenAI = (apiKey: string, model: string) => {
   return new ChatOpenAI({
-    apiKey, // OpenAI API key
-    model, // Model name
+    apiKey, 
+    model,
   });
 };
 
@@ -35,10 +36,10 @@ const initAzureChatOpenAI = (
   azureOpenAIApiVersion: string,
 ) => {
   return new AzureChatOpenAI({
-    azureOpenAIApiKey, // Set API key for Azure authentication
-    azureOpenAIApiInstanceName, // Set Azure instance name
-    azureOpenAIApiDeploymentName, // Specify deployment name
-    azureOpenAIApiVersion, // Define API version
+    azureOpenAIApiKey, 
+    azureOpenAIApiInstanceName,
+    azureOpenAIApiDeploymentName, 
+    azureOpenAIApiVersion,
   });
 };
 
