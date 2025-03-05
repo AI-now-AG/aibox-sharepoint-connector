@@ -68,11 +68,11 @@ export const sendVerificationEmail = async (userId: string) => {
     }
 
     const { access_token: accessToken } = await tokenResponse.json();
+    console.log(`Response access token`, accessToken);
 
     // Step 2: Generate Email Verification Link
     const verificationResponse = await fetch(
-      //`https://${AUTH0_TENANT}.eu.auth0.com/api/v2/tickets/email-verification`,
-      "https://login.auth0.com/api/v2/tickets/email-verification",
+      `https://${AUTH0_TENANT}.eu.auth0.com/api/v2/tickets/email-verification`,
       {
         method: "POST",
         headers: {
