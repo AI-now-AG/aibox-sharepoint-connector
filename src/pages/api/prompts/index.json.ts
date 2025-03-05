@@ -242,6 +242,7 @@ export const GET: APIRoute = async (ctx) => {
         })),
         category: prompt.category,
         group: prompt.group,
+        predefined_input: prompt.predefined_input,
       };
 
       return new Response(JSON.stringify(promptData));
