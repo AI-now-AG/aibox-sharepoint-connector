@@ -140,11 +140,16 @@ const isPermittedChannel = (data: any) => {
 const triggerRegistrationEmail = async (data: any) => {
   console.log(`Trigger registration email`, data.details);
 
-  const { user_id: userId, email, connection } = data.details.body;
-  if (data?.details?.body?.is_signup == true) {
-    sendVerificationEmail(userId);
+  const {
+    user_id: userId,
+    email,
+    connection,
+    is_signup: isSignup,
+  } = data.details.body;
+  if (isSignup == true) {
+    await sendVerificationEmail(userId);
   } else {
-    sendPasswordResetEmail(email, connection);
+    await sendPasswordResetEmail(email, connection);
   }
 };
 
