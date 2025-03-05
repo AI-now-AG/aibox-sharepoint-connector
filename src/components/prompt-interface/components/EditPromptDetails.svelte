@@ -57,6 +57,7 @@
 
   let promptTitle = $state("");
   let promptText = $state("");
+  let promptPredefinedInput = $state("");
   let promptDetails: any | undefined = undefined;
 
   let isSaving = $state(false);
@@ -256,6 +257,15 @@
         <textarea
           bind:value={promptText}
           placeholder="e.g. Create three headlines..."
+          class="input input-bordered min-w-xs shadow appearance-none min-h-32 w-full py-2 px-3"
+        ></textarea>
+      </div>
+
+      <div class="mb-4">
+        <p class="mb-2">{t("prompt-library.add.promptss.predefined-input")}*</p>
+        <textarea
+          bind:value={promptPredefinedInput}
+          placeholder=""
           class="input input-bordered min-w-xs shadow appearance-none min-h-32 w-full py-2 px-3"
         ></textarea>
       </div>
