@@ -46,7 +46,7 @@ export const sendVerificationEmail = async (userId: string) => {
     const AUTH0_TENANT = getEnvVar("AUTH0_TENANT");
     const CLIENT_ID = getEnvVar("AUTH0_CLIENT_ID");
     const CLIENT_SECRET = getEnvVar("AUTH0_CLIENT_SECRET");
-    const API_AUDIENCE = `https://${AUTH0_DOMAIN}.eu.auth0.com/api/v2/`;
+    const API_AUDIENCE = `https://${AUTH0_TENANT}.eu.auth0.com/api/v2/`;
 
     // Step 1: Get Auth0 Management API Token
     const tokenResponse = await fetch(
