@@ -74,13 +74,14 @@ export const sendVerificationEmail = async (userId: string) => {
     console.log(`Sending verification email via Auth0 for user: ${userId}`);
 
     const verificationResponse = await fetch(
-      `https://${AUTH0_TENANT}.eu.auth0.com/api/v2/users/${encodeURIComponent(userId)}/send_verification_email`,
+      `https://${AUTH0_TENANT}.eu.auth0.com/api/v2/jobs/verification-email`,
       {
         method: "POST",
         headers: {
           Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
+        body: JSON.stringify({ user_id: userId }),
       },
     );
 
