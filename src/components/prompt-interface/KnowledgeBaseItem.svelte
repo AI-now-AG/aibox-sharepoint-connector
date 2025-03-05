@@ -54,7 +54,7 @@
   <div class="card-body space-y-2 justify-between">
     <h2 class="card-title">{data?.title}</h2>
     {#if data?.description}
-      <p class="text-base-content/60 line-clamp-3">
+      <p class="text-base-content/60 line-clamp-4">
         {data?.description}
       </p>
     {/if}
