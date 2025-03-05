@@ -48,16 +48,26 @@
   {body}
   controls
   floating
-  class="h-[46vh] border border-neutral-200 resize-y"
+  class="h-[46vh] border border-neutral-300 resize-y"
+  style="transition-duration: 0ms !important;"
   oncreate={(e) => {
     setFocusAtTheEnd(e.editor);
   }}
   onupdate={(e) => {
     onEditorUpdate(e);
   }}
-  focused={false}
+  focal={true}
 >
   {#snippet utilities(_tipex)}
     <div></div>
   {/snippet}
 </Tipex>
+
+<style>
+  :global(.tipex-editor.focused.focal) {
+    border-color: rgb(212 212 212 / var(--tw-border-opacity, 1)) !important;
+    outline: 2px solid rgb(212 212 212 / var(--tw-border-opacity, 1)) !important;
+    --tw-ring-shadow: none !important;
+    box-shadow: none !important;
+  }
+</style>
