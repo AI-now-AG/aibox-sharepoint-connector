@@ -5,7 +5,7 @@
   import { onMount } from "svelte";
   import { addToast } from "$stores/toast";
   import { svgIcons } from "$assets/icons";
-  import { preventDefault } from "$utils/common";
+  import { formatMarkdown, preventDefault } from "$utils/common";
   import TextEditor from "$components/TextEditor.svelte";
   import ImportFileDialog from "./ImportFileDialog.svelte";
   import { loading } from "$stores";
@@ -53,8 +53,8 @@
         knowledgeBaseTitle =
           knowledgeBaseTitle?.trim() + " (" + t("common.copy") + ")";
       }
-      knowledgeBaseText = knowledgeBase.knowledge_base;
-      edittedKnowledgeBase = knowledgeBase.knowledge_base;
+      knowledgeBaseText = formatMarkdown(knowledgeBase.knowledge_base);
+      edittedKnowledgeBase = formatMarkdown(knowledgeBase.knowledge_base);
     }
   });
 
@@ -164,7 +164,6 @@
 
       <div class="mb-4">
         <p class="mb-2">{t("prompt-library.add.knowledgebase.text")}*</p>
-
         {#key knowledgeBaseText}
           <TextEditor
             bind:html={edittedKnowledgeBase}
