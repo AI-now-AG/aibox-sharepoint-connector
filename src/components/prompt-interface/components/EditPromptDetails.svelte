@@ -106,6 +106,7 @@
         promptTitle = promptTitle?.trim() + " (" + t("common.copy") + ")";
       }
       promptText = promptDetails.prompt;
+      promptPredefinedInput = promptDetails.predefined_input;
 
       const category = categories.find(
         (e) => e._id == promptDetails.category?.toString(),
@@ -150,6 +151,7 @@
       const newPrompt: CreatePromptParams = {
         title: promptTitle,
         prompt: promptText,
+        predefined_input: promptPredefinedInput,
         model: selectedModel ? selectedModel._id : null,
         knowledgebase: selectedKnowledgeBases.map((inst) => inst._id),
         ...(selectedCategory && { category: selectedCategory._id }),

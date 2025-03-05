@@ -20,6 +20,7 @@ const CreatePromptParamsSchema = z.object({
   instructions: z.array(z.string().optional()).optional(),
   knowledgebase: z.array(z.string().optional()),
   prompt: z.string(),
+  predefined_input: z.string().optional(),
   model: z.string().nullish(),
   documents: z.array(z.string()).optional(),
 });

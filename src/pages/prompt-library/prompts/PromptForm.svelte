@@ -72,6 +72,7 @@
     if (prompt) {
       promptTitle = prompt.title;
       promptText = prompt.prompt;
+      promptPredefinedInput = prompt.predefined_input;
 
       const category = categories.find(
         (e) => e._id == prompt.category.toString(),
@@ -124,6 +125,7 @@
       const newPrompt: CreatePromptParams = {
         title: promptTitle,
         prompt: promptText,
+        predefined_input: promptPredefinedInput,
         model: selectedModel ? selectedModel._id : null,
         knowledgebase: selectedKnowledgeBases.map((inst) => inst._id),
         ...(selectedCategory && { category: selectedCategory._id }),
