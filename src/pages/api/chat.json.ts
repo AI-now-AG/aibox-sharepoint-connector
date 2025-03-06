@@ -10,7 +10,7 @@ import { StringOutputParser } from "@langchain/core/output_parsers";
 import { fileLoader } from "$utils/document-loader";
 import initializeOpenAI from "$utils/chatModel";
 import { MessageRole } from "$types/MessageHistory";
-//import ChatPerplexity from "$llm/Perplexity";
+import ChatPerplexity from "$llm/Perplexity";
 
 const AttachmentSchema = z.object({
   name: z.string(),
@@ -106,7 +106,6 @@ export const POST: APIRoute = async (ctx) => {
 
     const parser = new StringOutputParser();
 
-    // Set headers to enable chunked transfer
     const headers = new Headers();
     headers.set("Content-Type", "text/plain; charset=UTF-8");
     headers.set("Transfer-Encoding", "chunked");
@@ -115,33 +114,36 @@ export const POST: APIRoute = async (ctx) => {
     const writer = writable.getWriter();
 
     const model = initializeOpenAI(ctx);
-
+   
     (async () => {
       try {
-        const stream = await model.pipe(parser).stream(messages);
-
+        let isSentCitations = false;
+        let citations = [];
         let partialChunk = "";
-        for await (const chunk of stream) {
-          // if (model instanceof ChatPerplexity) {
-          //   partialChunk = chunk.choices[0]?.delta?.content;
-          // } else {
-          //   partialChunk += chunk;
-          // }
-          partialChunk += chunk;
 
-          // Try to process and send the complete part of the chunk
+        const stream: any = await model.pipe(parser).stream(messages);
+        for await (const chunk of stream) {
+          if (model instanceof ChatPerplexity) {
+            citations = chunk.citations ?? [];
+            if (!isSentCitations) {
+              isSentCitations = true;
+              await writer.write(encoder.encode(JSON.stringify({ citations })));
+            }
+            partialChunk = chunk.choices[0]?.delta?.content;
+          } else {
+            partialChunk += chunk;
+          }
+
           let lastCompleteCharIndex = partialChunk.length;
           try {
-            encoder.encode(partialChunk); // Attempt to encode the whole string
+            encoder.encode(partialChunk);
           } catch {
-            // If encoding fails, determine the last valid character
             lastCompleteCharIndex = Buffer.byteLength(partialChunk) - 1;
           }
 
           const validChunk = partialChunk.slice(0, lastCompleteCharIndex);
-          partialChunk = partialChunk.slice(lastCompleteCharIndex); // Save the incomplete part for the next iteration
+          partialChunk = partialChunk.slice(lastCompleteCharIndex);
 
-          // Send the valid part of the chunk
           if (validChunk) {
             await writer.write(encoder.encode(validChunk));
           }
