@@ -230,7 +230,7 @@
       </div>
 
       <div class="mb-4">
-        <p class="mb-2">{t("prompt-library.add.promptss.predefined-input")}</p>
+        <p class="mb-2">{t("prompt-library.add.prompts.predefined-input")}</p>
         <textarea
           bind:value={promptPredefinedInput}
           placeholder=""

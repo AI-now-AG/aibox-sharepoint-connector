@@ -17,6 +17,7 @@
   let { promptItems, isEditable = $bindable(false), tenant }: Props = $props();
 
   let selectedPromptId = $state("");
+  let selectPromptPredefinedInput = $state("");
   let input = $state("");
   let output = $state("");
   let isProcessing = $state(false);
@@ -28,8 +29,6 @@
   let isDisableFileInput = $state(
     apiProvider.name == ApiKeyProvider.Perplexity,
   );
-
-  $inspect(apiProvider, isDisableFileInput);
 
   onMount(() => {
     const handleScroll = () => {
@@ -55,10 +54,11 @@
   $effect(() => {
     if (selectedPromptId) {
       sharedMessageHistory.set([]);
-
+     
       const currentPrompt = promptItems.find(
         (e: { _id: string }) => e._id === selectedPromptId,
       );
+      selectPromptPredefinedInput = currentPrompt.predefined_input ?? "";
       const promptModel = currentPrompt.model ?? apiProvider.name;
       isDisableFileInput = promptModel == ApiKeyProvider.Perplexity;
     }
@@ -98,6 +98,7 @@
           bind:input
           bind:output
           bind:isProcessing
+          inputText={selectPromptPredefinedInput}
           {isDisableFileInput}
         />
       </div>

@@ -20,6 +20,7 @@
     output?: string;
     isProcessing?: boolean;
     isDisableFileInput?: boolean;
+    inputText?: string;
   }
 
   let {
@@ -28,9 +29,14 @@
     output = $bindable(""),
     isProcessing = $bindable(false),
     isDisableFileInput = false,
+    inputText: initText = "",
   }: Props = $props();
 
   let inputText = $state("");
+
+  $effect(() => {
+    inputText = initText;
+  });
 
   const fileTypes = {
     "audio/*": ["audio/mp3"],
@@ -41,10 +47,6 @@
       "application/x-subrip",
       "text/tab-separated-values",
     ],
-    "image/*": ["image/svg+xml", "image/png", "image/jpeg"],
-  };
-
-  const imageTypes = {
     "image/*": ["image/svg+xml", "image/png", "image/jpeg"],
   };
 
@@ -187,7 +189,7 @@
       class={`textarea textarea-ghost ${
         $sharedMessageHistory.length > 0 ? `h-[70px]` : `h-24`
       } w-full focus:outline-none focus:border-base-100 text-base`}
-      placeholder="Your input..."
+      placeholder={t("prompt-library.input-placeholder")}
       bind:value={inputText}
       onkeydown={onKeyDown}
     ></textarea>
