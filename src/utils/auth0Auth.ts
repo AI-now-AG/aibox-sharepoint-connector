@@ -1,4 +1,4 @@
-import sgMail from "@sendgrid/mail";
+import sgMail, { type MailDataRequired } from "@sendgrid/mail";
 import { authenticationClient, managementClient } from "$data/auth0/client";
 import getEnvVar from "$utils/getEnvVar";
 
@@ -17,22 +17,11 @@ const getAccessToken = async () => {
   }
 };
 
-const sendMail = async (
-  from: string,
-  to: string,
-  templateId: string,
-  templateData: object,
-) => {
+const sendMail = async (data: MailDataRequired) => {
   const apiKey = getEnvVar("SENDGRID_API_KEY");
   sgMail.setApiKey(apiKey);
 
   try {
-    const data = {
-      from,
-      to,
-      templateId,
-      dynamicTemplateData: templateData,
-    };
     return await sgMail.send(data);
   } catch (error) {
     console.error("Error sending sendgrid email", error);
@@ -95,15 +84,18 @@ export const sendVerificationEmail = async (userId: string, email: string) => {
     console.log(`Email verification ticket URL: ${ticket}`);
 
     // Step 3: Send verification email via SendGrid
-    await sendMail(
-      "no-reply@ainow.ch",
-      email,
-      "d-69ed72334042458783f985ada5dbe61d",
-      {
+    await sendMail({
+      from: {
+        name: "AI now AG",
+        email: "no-reply@ainow.ch",
+      },
+      to: email,
+      templateId: "d-69ed72334042458783f985ada5dbe61d",
+      dynamicTemplateData: {
         email,
         url: ticket,
       },
-    );
+    });
   } catch (error) {
     console.error("Error sending verification email:", error);
     //throw new Error("Failed to send verification email.");
