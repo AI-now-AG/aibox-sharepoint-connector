@@ -13,11 +13,13 @@
   interface Props {
     html?: string;
     text?: string;
+    cssClass?: string;
   }
 
   let {
     html = $bindable(""),
     text = $bindable(""),
+    cssClass = "",
   }: Props = $props();
 
   let body: any = $state("");
@@ -51,7 +53,7 @@
     {body}
     controls
     floating
-    class="h-[46vh] border border-neutral-300 resize-y"
+    class={"h-[46vh] border border-neutral-300 resize-y " + cssClass}
     style="transition-duration: 0ms !important;"
     oncreate={(e: any) => {
       setFocusAtTheEnd(e.editor);
