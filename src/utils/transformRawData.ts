@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import dayjs from "dayjs";
 
 const replacer = function (this: any, key: any, value: any) {
@@ -10,6 +11,10 @@ const replacer = function (this: any, key: any, value: any) {
 
 export const transformRawData = (data: any) => {
   return JSON.parse(JSON.stringify(data, replacer));
+};
+
+export const transformRawDataWithoutReplacer = (data: any) => {
+  return JSON.parse(JSON.stringify(data));
 };
 
 export default transformRawData;

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { slide } from "svelte/transition";
   import PromptList, {
-    type CardItem,
+    type PromptCartItem,
   } from "$components/prompt-interface/PromptList.svelte";
   import type { CategoryItem } from "$types/CategoryItem";
   import { useTranslations } from "$i18n/utils";
@@ -10,7 +10,7 @@
   const t = useTranslations();
 
   interface Props {
-    promptsEnriched?: CardItem[];
+    promptsEnriched?: PromptCartItem[];
     categoryList?: CategoryItem[];
     isEditable?: boolean;
   }
@@ -45,7 +45,7 @@
               checkedGroups.some(
                 (group) =>
                   //group.title.toLowerCase().includes(tag.toLowerCase()),
-                  group.title.toLowerCase() == tag.toLowerCase(),
+                  group?.title.toLowerCase() == tag.toLowerCase(),
               ) ||
               checkedCategories.some(
                 (cateogry) => cateogry.title.toLowerCase() == tag.toLowerCase(),
@@ -105,7 +105,7 @@
           out:slide
           in:slide
         >
-          {#each categoryList as category, categoryIdx}
+          {#each categoryList as category}
             <li>
               <label class="flex items-center">
                 <input
@@ -118,7 +118,7 @@
               </label>
               <ul>
                 <li>
-                  {#each category.group as group}
+                  {#each category.group as any as group}
                     <label class="flex items-center">
                       <input
                         type="checkbox"

@@ -37,6 +37,7 @@ const knowledgeBaseInfo = `You are a helpful assistant who writes helpful descri
 * The description must be german and target a swiss audience
 * Use a friendly and personal tone
 * Only describe what the knowledge base does, do not add a call to action
+* Die Antwort darf maximal 100 Zeichen lang sein. Kürze den Text, falls nötig
 
 Example:
 Input: Erstelle eine Titel für einen Schweizer Presseartikel im Stil von "Knowledge Base Somedia-Schlagzeilen" und "knowledge base Headline" auf Basis der folgenden Texteingabe. Stelle sicher, dass die Schlagzeilen dem Stil und den Erwartungen der Schweizer Presseartikel und sowie der vorhandenen Knowledge Base entsprechen. Befolge die angegebenen spezifischen Instruktionen.
@@ -107,6 +108,7 @@ export const POST: APIRoute<CreateKnowledgeBaseParams> = async (ctx) => {
     description,
     tenant_id: ctx.locals.user.tenant_id,
     creator_id: ctx.locals.user.id,
+    modified_by: ctx.locals.user.email,
     created_at: new Date(),
     updated_at: new Date(),
   };
@@ -161,6 +163,7 @@ export const PUT: APIRoute<CreateKnowledgeBaseParams> = async (ctx) => {
     knowledge_base: data.knowledge_base,
     description,
     updated_at: new Date(),
+    modified_by: ctx.locals.user.email,
   };
   try {
     if (knowledgeBase && data._id) {
