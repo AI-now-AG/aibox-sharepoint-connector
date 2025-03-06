@@ -1,4 +1,4 @@
-import management from "$data/auth0/management-client";
+import { managementClient } from "$data/auth0/client";
 import type {
   GetOrganizationsByIdRequest,
   DeleteEnabledConnectionsByConnectionIdRequest,
@@ -22,7 +22,7 @@ export const get = async (id: string) => {
     const requestParameters: GetOrganizationsByIdRequest = {
       id,
     };
-    return await management.organizations.get(requestParameters);
+    return await managementClient.organizations.get(requestParameters);
   } catch (err) {
     console.error(`auth0: get organization ${id} error`, err);
     throw err;
@@ -31,7 +31,7 @@ export const get = async (id: string) => {
 
 export const create = async (bodyParameters: PostOrganizationsRequest) => {
   try {
-    return await management.organizations.create(bodyParameters);
+    return await managementClient.organizations.create(bodyParameters);
   } catch (err) {
     console.error("auth0: create organization error", err);
     throw err;
@@ -46,7 +46,7 @@ export const update = async (
     const requestParameters: PatchOrganizationsByIdOperationRequest = {
       id: organizationId,
     };
-    return await management.organizations.update(
+    return await managementClient.organizations.update(
       requestParameters,
       bodyParameters,
     );
@@ -62,7 +62,7 @@ export const deleteTenant = async (userId: string) => {
       id: userId,
     };
 
-    return await management.organizations.delete(requestParameters);
+    return await managementClient.organizations.delete(requestParameters);
   } catch (error) {
     console.error("auth0: delete organization error", error);
     throw error;
@@ -81,7 +81,7 @@ export const addEnabledConnection = async (
       connection_id: connectionId,
     };
 
-    return await management.organizations.addEnabledConnection(
+    return await managementClient.organizations.addEnabledConnection(
       requestParameters,
       bodyParameters,
     );
@@ -101,7 +101,7 @@ export const deleteEnabledConnection = async (
       connectionId,
     };
 
-    return await management.organizations.deleteEnabledConnection(
+    return await managementClient.organizations.deleteEnabledConnection(
       requestParameters,
     );
   } catch (err) {
@@ -116,7 +116,7 @@ export const getMemberRoles = async (id: string, userId: string) => {
       id,
       user_id: userId,
     };
-    return await management.organizations.getMemberRoles(parameters);
+    return await managementClient.organizations.getMemberRoles(parameters);
   } catch (err) {
     console.error("auth0: get organization member's roles error", err);
     throw err;
@@ -132,7 +132,7 @@ export const addMembers = async (id: string, members: string[]) => {
       members,
     };
 
-    return await management.organizations.addMembers(
+    return await managementClient.organizations.addMembers(
       requestParameters,
       bodyParameters,
     );
@@ -156,7 +156,7 @@ export const addMemberRoles = async (
       roles,
     };
 
-    return await management.organizations.addMemberRoles(
+    return await managementClient.organizations.addMemberRoles(
       requestParameters,
       bodyParameters,
     );
@@ -180,7 +180,7 @@ export const deleteMemberRoles = async (
       roles,
     };
 
-    return await management.organizations.deleteMemberRoles(
+    return await managementClient.organizations.deleteMemberRoles(
       requestParameters,
       bodyParameters,
     );

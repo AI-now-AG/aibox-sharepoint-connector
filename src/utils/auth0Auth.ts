@@ -1,4 +1,41 @@
+import sgMail from "@sendgrid/mail";
+import { authenticationClient, managementClient } from "$data/auth0/client";
 import getEnvVar from "$utils/getEnvVar";
+
+const getAccessToken = async () => {
+  const AUTH0_TENANT = getEnvVar("AUTH0_TENANT");
+  const API_AUDIENCE = `https://${AUTH0_TENANT}.eu.auth0.com/api/v2/`;
+
+  try {
+    const response = await authenticationClient.oauth.clientCredentialsGrant({
+      audience: API_AUDIENCE,
+    });
+    return response.data.access_token;
+  } catch (error) {
+    console.error("Error getting Auth0 token:", error);
+    throw error;
+  }
+};
+
+const sendMail = async (
+  from: string,
+  to: string,
+  templateId: string,
+  templateData: object,
+) => {
+  try {
+    const data = {
+      from,
+      to,
+      templateId,
+      dynamicTemplateData: templateData,
+    };
+    return await sgMail.send(data);
+  } catch (error) {
+    console.error("Error sending sendgrid email", error);
+    throw error;
+  }
+};
 
 export const sendPasswordResetEmail = async (
   email: string,
@@ -41,58 +78,29 @@ export const sendPasswordResetEmail = async (
   }
 };
 
-export const sendVerificationEmail = async (userId: string) => {
+export const sendVerificationEmail = async (userId: string, email: string) => {
   try {
-    const AUTH0_TENANT = getEnvVar("AUTH0_TENANT");
-    const MNGT_CLIENT_ID = getEnvVar("AUTH0_MNGT_CLIENT_ID");
-    const MNGT_CLIENT_SECRET = getEnvVar("AUTH0_MNGT_CLIENT_SECRET");
-    const API_AUDIENCE = `https://${AUTH0_TENANT}.eu.auth0.com/api/v2/`;
-
     // Step 1: Get Auth0 Management API Token
-    const tokenResponse = await fetch(
-      `https://${AUTH0_TENANT}.eu.auth0.com/oauth/token`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          client_id: MNGT_CLIENT_ID,
-          client_secret: MNGT_CLIENT_SECRET,
-          audience: API_AUDIENCE,
-          grant_type: "client_credentials",
-        }),
-      },
-    );
-
-    if (!tokenResponse.ok) {
-      throw new Error(`Error getting Auth0 token: ${tokenResponse.statusText}`);
-    }
-
-    const { access_token: accessToken } = await tokenResponse.json();
+    const accessToken = await getAccessToken();
     console.log(`Response access token`, accessToken);
 
     // Step 2: Trigger Auth0's Standard Email Verification
-    console.log(`Sending verification email via Auth0 for user: ${userId}`);
+    const ticketResponse = await managementClient.tickets.verifyEmail({
+      user_id: userId,
+    });
+    const { ticket } = ticketResponse.data;
+    console.log(`Email verification ticket URL: ${ticket}`);
 
-    const verificationResponse = await fetch(
-      `https://${AUTH0_TENANT}.eu.auth0.com/api/v2/jobs/verification-email`,
+    // Step 3: Send verification email via SendGrid
+    await sendMail(
+      "no-reply@ainow.ch",
+      email,
+      "d-69ed72334042458783f985ada5dbe61d",
       {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ user_id: userId }),
+        email,
+        url: ticket,
       },
     );
-
-    if (!verificationResponse.ok) {
-      const errorText = await verificationResponse.text();
-      throw new Error(
-        `Error sending verification email: ${verificationResponse.statusText} - ${errorText}`,
-      );
-    }
-
-    console.log(`Standard verification email sent to user ${userId}`);
   } catch (error) {
     console.error("Error sending verification email:", error);
     //throw new Error("Failed to send verification email.");

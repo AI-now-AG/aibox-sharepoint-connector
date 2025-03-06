@@ -144,7 +144,7 @@ const triggerRegistrationEmail = async (data: any) => {
   const { user_id: userId } = data;
   const { email, connection, is_signup: isSignup } = data.details.body;
   if (isSignup == true) {
-    //await sendVerificationEmail(userId);
+    await sendVerificationEmail(userId, email);
   } else {
     await sendPasswordResetEmail(email, connection);
   }
