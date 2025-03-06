@@ -23,6 +23,9 @@ const sendMail = async (
   templateId: string,
   templateData: object,
 ) => {
+  const apiKey = getEnvVar("SENDGRID_API_KEY");
+  sgMail.setApiKey(apiKey);
+
   try {
     const data = {
       from,
