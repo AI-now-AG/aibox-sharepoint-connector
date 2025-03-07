@@ -65,7 +65,6 @@
       selectPromptPredefinedInput = currentPrompt.predefined_input ?? "";
       const promptModel = currentPrompt.model ?? apiProvider.name;
       isDisableFileInput = promptModel == ApiKeyProvider.Perplexity;
-      adjustHeightByContent();
     }
   });
 
@@ -90,6 +89,9 @@
       bind:isDisabling={isProcessing}
       onSelectCard={() => {
         sharedMessageHistory.set([]);
+        setTimeout(() => {
+          adjustHeightByContent();
+        }, 0);
       }}
     />
     {#if $sharedMessageHistory.length == 0}
