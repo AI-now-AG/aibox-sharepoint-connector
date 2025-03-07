@@ -23,6 +23,7 @@ if (
 }
 
 let userPermissions = Astro.locals.user.permissions;
+const mode = Astro.url?.searchParams?.get?.("mode") ?? "update";
 ---
 
 <Layout>
@@ -31,6 +32,7 @@ let userPermissions = Astro.locals.user.permissions;
       knowledgeBaseId={id}
       knowledgeBase={knowledgeBase}
       isEditable={userPermissions.includes(Permission.AdminAll)}
+      mode={mode}
       client:load
     />
   </div>
