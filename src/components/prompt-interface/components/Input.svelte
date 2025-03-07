@@ -11,7 +11,6 @@
     formatCitations,
     stripHtmlFormatting,
   } from "$utils/common";
-
   const t = useTranslations();
 
   interface Props {
@@ -177,6 +176,16 @@
   function clearText() {
     inputText = "";
   }
+
+  let textarea: HTMLTextAreaElement;
+  export function adjustHeightByContent() {
+    setTimeout(() => {
+      if (textarea) {
+        textarea.style.height = "auto";
+        textarea.style.height = `${textarea.scrollHeight}px`;
+      }
+    }, 0);
+  }
 </script>
 
 <div
@@ -190,9 +199,11 @@
         $sharedMessageHistory.length > 0 ? `h-[70px]` : `h-24`
       } w-full focus:outline-none focus:border-base-100 text-base`}
       placeholder={t("prompt-library.input-placeholder")}
-      bind:value={inputText}
       onkeydown={onKeyDown}
+      bind:this={textarea}
+      bind:value={inputText}
     ></textarea>
+
     <!-- svelte-ignore a11y_consider_explicit_label -->
     <button
       type="button"

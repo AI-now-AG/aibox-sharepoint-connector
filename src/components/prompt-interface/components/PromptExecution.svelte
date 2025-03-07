@@ -51,16 +51,21 @@
     });
   };
 
+  let textInputComponent: any;
+  function adjustHeightByContent() {
+    textInputComponent?.adjustHeightByContent();
+  }
+
   $effect(() => {
     if (selectedPromptId) {
       sharedMessageHistory.set([]);
-     
       const currentPrompt = promptItems.find(
         (e: { _id: string }) => e._id === selectedPromptId,
       );
       selectPromptPredefinedInput = currentPrompt.predefined_input ?? "";
       const promptModel = currentPrompt.model ?? apiProvider.name;
       isDisableFileInput = promptModel == ApiKeyProvider.Perplexity;
+      adjustHeightByContent();
     }
   });
 
@@ -98,6 +103,7 @@
           bind:input
           bind:output
           bind:isProcessing
+          bind:this={textInputComponent}
           inputText={selectPromptPredefinedInput}
           {isDisableFileInput}
         />
