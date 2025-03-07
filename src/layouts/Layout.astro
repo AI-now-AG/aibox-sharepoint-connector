@@ -3,7 +3,7 @@ import Header from "$components/Header.astro";
 import Footer from "$components/Footer.astro";
 import Head from "./Head.astro";
 import Navigation from "$components/nav/Navigation.astro";
-
+import OnboardingTour from '$components/OnboardingTour.svelte';
 import "$styles/global.css";
 
 import { useTranslations } from "$i18n/utils";
@@ -61,5 +61,6 @@ switch (Astro.locals.user?.tenant_id?.toString()) {
         <Navigation />
       </div>
     </div>
+    <OnboardingTour client:load />
   </body>
 </html>
