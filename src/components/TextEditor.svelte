@@ -11,18 +11,22 @@
   let editor: TipexEditor | undefined = $state();
 
   interface Props {
-    initContent?: string;
     html?: string;
     text?: string;
+    cssClass?: string;
   }
 
   let {
-    initContent,
     html = $bindable(""),
     text = $bindable(""),
+    cssClass = "",
   }: Props = $props();
 
-  let body = $state(initContent);
+  let body: any = $state("");
+
+  $effect(() => {
+    body = html;
+  });
 
   function onEditorUpdate(e: any) {
     html = e.editor.getHTML();
@@ -43,25 +47,26 @@
   onMount(() => {});
 </script>
 
-<Tipex
-  bind:tipex={editor}
-  {body}
-  controls
-  floating
-  class="h-[46vh] border border-neutral-300 resize-y"
-  style="transition-duration: 0ms !important;"
-  oncreate={(e) => {
-    setFocusAtTheEnd(e.editor);
-  }}
-  onupdate={(e) => {
-    onEditorUpdate(e);
-  }}
-  focal={true}
->
-  {#snippet utilities(_tipex)}
-    <div></div>
-  {/snippet}
-</Tipex>
+{#key body}
+  <Tipex
+    bind:tipex={editor}
+    {body}
+    controls
+    floating
+    class={"h-[46vh] border border-neutral-300 resize-y " + cssClass}
+    style="transition-duration: 0ms !important;"
+    oncreate={(e: any) => {
+      setFocusAtTheEnd(e.editor);
+    }}
+    onupdate={(e: any) => {
+      onEditorUpdate(e);
+    }}
+    focal={true}
+  >
+    {#snippet utilities(_tipex: any)}
+      <div></div>
+    {/snippet}
+  </Tipex>{/key}
 
 <style>
   :global(.tipex-editor.focused.focal) {

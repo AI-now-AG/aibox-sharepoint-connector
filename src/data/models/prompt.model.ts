@@ -12,6 +12,7 @@ const PromptSchema = z.object({
   instructions: z.array(z.instanceof(ObjectId)).optional(),
   knowledgebase: z.array(z.instanceof(ObjectId)).optional(),
   prompt: z.string(),
+  predefined_input: z.string().optional(),
   model: z.string().nullish(),
   documents: z.array(z.instanceof(ObjectId)).optional(),
   position: z.number().default(0).optional(),

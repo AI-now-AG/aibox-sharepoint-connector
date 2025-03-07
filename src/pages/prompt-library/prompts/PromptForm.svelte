@@ -17,12 +17,6 @@
     _id: string;
     groups: Group[];
   };
-
-  /*type Instruction = {
-    title: string;
-    _id: string;
-  };*/
-
   type Model = {
     _id: string;
     title: string;
@@ -33,19 +27,16 @@
   };
 
   let categories: Category[] = $state([]);
-  let selectedCategory: Category = $state();
-  let selectedGroup: Group = $state();
+  let selectedCategory: Category | undefined = $state();
+  let selectedGroup: Group | undefined = $state();
 
   let previousCategoryId: string | null = $state(null);
   $effect(() => {
     if (selectedCategory && selectedCategory._id !== previousCategoryId) {
-      selectedGroup = null;
+      selectedGroup = undefined;
       previousCategoryId = selectedCategory._id;
     }
   });
-
-  //let instructions: Instruction[] = [];
-  //let selectedInstructions: Instruction[] = [];
 
   let models: Model[] = $state([]);
   let selectedModel: Model | undefined = $state();
@@ -55,6 +46,7 @@
 
   let promptTitle = $state("");
   let promptText = $state("");
+  let promptPredefinedInput = $state("");
 
   interface Props {
     promptId?: string | undefined;
@@ -80,6 +72,7 @@
     if (prompt) {
       promptTitle = prompt.title;
       promptText = prompt.prompt;
+      promptPredefinedInput = prompt.predefined_input;
 
       const category = categories.find(
         (e) => e._id == prompt.category.toString(),
@@ -99,24 +92,6 @@
   });
 
   async function fetchInstructionAndKB() {
-    /*const instructionResponse = await fetch("/api/instructions.json", {
-      method: "GET",
-    });
-    const instructionData = (await instructionResponse.json()) as Instruction[];
-    if (instructionData) {
-      if (prompt) {
-        prompt.instructions?.forEach((instructionObj: any) => {
-          const instruction = instructionData.find(
-            (e) => e._id == instructionObj.toString(),
-          );
-          if (instruction) {
-            selectedInstructions.push(instruction);
-          }
-        });
-      }
-      instructions = instructionData;
-    }*/
-
     const knowledgeBaseResponse = await fetch("/api/knowledge-base.json", {
       method: "GET",
     });
@@ -150,6 +125,7 @@
       const newPrompt: CreatePromptParams = {
         title: promptTitle,
         prompt: promptText,
+        predefined_input: promptPredefinedInput,
         model: selectedModel ? selectedModel._id : null,
         knowledgebase: selectedKnowledgeBases.map((inst) => inst._id),
         ...(selectedCategory && { category: selectedCategory._id }),
@@ -227,13 +203,6 @@
       <div
         class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 justify-center"
       >
-        <!-- <MultiInput
-          title={t("prompt-library.add.prompts.instructions")}
-          placeholder="e.g. Instruction"
-          items={instructions}
-          bind:selectedItems={selectedInstructions}
-        /> -->
-
         <SingleInput
           title={`${t("prompt-library.add.prompts.category")}*`}
           placeholder="e.g. Editing"
@@ -256,6 +225,15 @@
         <textarea
           bind:value={promptText}
           placeholder="e.g. Create three headlines..."
+          class="input input-bordered min-w-xs shadow appearance-none min-h-32 w-full py-2 px-3"
+        ></textarea>
+      </div>
+
+      <div class="mb-4">
+        <p class="mb-2">{t("prompt-library.add.prompts.predefined-input")}</p>
+        <textarea
+          bind:value={promptPredefinedInput}
+          placeholder=""
           class="input input-bordered min-w-xs shadow appearance-none min-h-32 w-full py-2 px-3"
         ></textarea>
       </div>

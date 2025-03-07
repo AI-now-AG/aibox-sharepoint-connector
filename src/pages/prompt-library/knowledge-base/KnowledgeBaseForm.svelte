@@ -18,7 +18,6 @@
 
   let knowledgeBaseTitle = $state("");
   let knowledgeBaseText = $state("");
-  let edittedKnowledgeBase = $state("");
 
   interface Props {
     knowledgeBaseId?: string | undefined;
@@ -39,12 +38,9 @@
   let isSaving = $state(false);
   let isFormValid = $derived(
     knowledgeBaseTitle !== "" &&
-      edittedKnowledgeBase.trim() !== "" &&
-      edittedKnowledgeBase.trim() !== "<p></p>",
+      knowledgeBaseText.trim() !== "" &&
+      knowledgeBaseText.trim() !== "<p></p>",
   );
-
-  $inspect(inputFile);
-  $inspect(edittedKnowledgeBase);
 
   onMount(async function () {
     if (knowledgeBase) {
@@ -54,7 +50,6 @@
           knowledgeBaseTitle?.trim() + " (" + t("common.copy") + ")";
       }
       knowledgeBaseText = formatMarkdown(knowledgeBase.knowledge_base);
-      edittedKnowledgeBase = formatMarkdown(knowledgeBase.knowledge_base);
     }
   });
 
@@ -65,15 +60,12 @@
     $loading = true;
     const { data, error } =
       await actions.knowledgebase.extractFileContent(formData);
-
-    console.log("data", data);
     if (error) {
       addToast({
         message: "Something went wrong",
         type: "error",
       });
     } else {
-      edittedKnowledgeBase = data.text;
       knowledgeBaseText = data.text;
     }
 
@@ -86,7 +78,7 @@
     try {
       const newKnowledgeBase: CreateKnowledgeBaseParams = {
         title: knowledgeBaseTitle,
-        knowledge_base: edittedKnowledgeBase,
+        knowledge_base: knowledgeBaseText,
         ...(knowledgeBaseId && { _id: knowledgeBaseId }),
       };
 
@@ -164,12 +156,7 @@
 
       <div class="mb-4">
         <p class="mb-2">{t("prompt-library.add.knowledgebase.text")}*</p>
-        {#key knowledgeBaseText}
-          <TextEditor
-            bind:html={edittedKnowledgeBase}
-            initContent={knowledgeBaseText}
-          />
-        {/key}
+        <TextEditor bind:html={knowledgeBaseText} />
       </div>
 
       {#if isEditable}

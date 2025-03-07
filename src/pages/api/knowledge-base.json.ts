@@ -7,6 +7,7 @@ import { z } from "zod";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import initializeOpenAI from "$utils/chatModel";
+import Perplexity from "$llm/Perplexity";
 
 const CreateKnowledgeBaseParamsSchema = z.object({
   _id: z.string().optional(),
@@ -29,20 +30,7 @@ export type KnowledgeBaseParams = z.infer<typeof KnowledgeBaseParamsSchema>;
 //   model: import.meta.env.OPENAI_MODEL,
 // });
 
-const knowledgeBaseInfo = `You are a helpful assistant who writes helpful descriptions of knowledge base for a UI:
-* You receive a knowledge base
-* You create a friendly description of the knowledge base, describing what it does and what it is about
-* Use at most 2 sentences
-* Return just the description, without any formatting or the knowledge base
-* The description must be german and target a swiss audience
-* Use a friendly and personal tone
-* Only describe what the knowledge base does, do not add a call to action
-* Die Antwort darf maximal 100 Zeichen lang sein. Kürze den Text, falls nötig
-
-Example:
-Input: Erstelle eine Titel für einen Schweizer Presseartikel im Stil von "Knowledge Base Somedia-Schlagzeilen" und "knowledge base Headline" auf Basis der folgenden Texteingabe. Stelle sicher, dass die Schlagzeilen dem Stil und den Erwartungen der Schweizer Presseartikel und sowie der vorhandenen Knowledge Base entsprechen. Befolge die angegebenen spezifischen Instruktionen.
-
-Output: Hier kannst du einen prägnanten Titel für einen Schweizer Presseartikel erstellen, der den spezifischen Anforderungen und dem gewünschten Stil entspricht. Die Überschrift wird an die Erwartungen der Schweizer Medien angepasst und berücksichtigt die vorhandene Knowledge Base.`;
+const knowledgeBaseInfo = `Write me a short summary that will be shown in the UI to describe the provided knowledge base. The output should contain not more than 100 characters. Also it should be created in the language provided in the knowledge base. If it’s unclear, always provide a German summary.`;
 
 const generateKnowledgeBaseDescription = async (
   ctx: APIContext,
@@ -55,7 +43,13 @@ const generateKnowledgeBaseDescription = async (
     new HumanMessage(knowledgeBase),
   ];
   const parser = new StringOutputParser();
-  const result = await model.invoke(messages);
+  let result;
+  if (model instanceof Perplexity) {
+    const res = await model.invoke(messages);
+    result = res.choices?.[0]?.message?.content ?? "";
+  } else {
+    result = await model.invoke(messages);
+  }
   const description = await parser.invoke(result);
 
   return description;

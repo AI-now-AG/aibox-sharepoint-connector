@@ -308,5 +308,6 @@
   "prompt-library.delete.knowledge-base.confirm": "Möchten Sie diese Knowledge wirklich löschen?",
   "common.edited-by": "Zuetzt geändert",
   "prompt-library.knowledgebase.file-import": "Aus Datei importieren",
-  "prompt-library.add.promptss.predefined-input": "Vordefinierter Input"
+  "prompt-library.add.prompts.predefined-input": "Vordefinierter Input",
+  "prompt-library.input-placeholder": "Your input..."
 }
