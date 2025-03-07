@@ -160,10 +160,10 @@ const modules = [...menuItems];
   </div>
 
   <div class="flex-grow">
-    <ul class="menu w-full pr-6">
+    <ul class="menu w-full pr-6"  >
       <li>
-        <details data-id={`ai-tools`} open={navState["ai-tools"] ?? true}>
-          <summary  id="onboardingId1">
+        <details data-id={`ai-tools`} open={navState["ai-tools"] ?? true} id="onboardingId1">
+          <summary>
             <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
               {svgIcons.aitool && <Fragment set:html={svgIcons.aitool} />}
             </div>
@@ -202,7 +202,7 @@ const modules = [...menuItems];
       {
         audioToTextMenus.map((mod) => (
           <li>
-            <details data-id={`audio-menu`} open={mod.isOpened}>
+            <details data-id={`audio-menu`} open={mod.isOpened}  id="onboardingId3">
               <summary>
                 <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
                   {mod.icon && <Fragment set:html={mod.icon} />}
