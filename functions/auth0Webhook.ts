@@ -66,6 +66,7 @@ const auth0Webhook: Handler = async (
       // See: https://auth0.com/docs/customize/log-streams/event-filters#signup-success
       if (eventType == "ss") {
         await triggerRegistrationEmail(data);
+        await updateUserMetadata(data, { signup: true });
       }
 
       // Trigger successful called verification email endpoint
@@ -334,6 +335,18 @@ const updateUserRolesInDatabase = async (data: any) => {
     }
   } catch (error: any) {
     console.warn(`Updating user roles error`, error);
+  }
+};
+
+const updateUserMetadata = async (data: any, update: any) => {
+  const { user_id: userId } = data;
+
+  try {
+    await usersManagement.update(userId, {
+      user_metadata: update,
+    });
+  } catch (error: any) {
+    console.warn(`Updating user metadata error`, error);
   }
 };
 
