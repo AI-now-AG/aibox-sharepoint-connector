@@ -308,5 +308,17 @@
   "prompt-library.delete.knowledge-base.confirm": "Möchten Sie diese Knowledge wirklich löschen?",
   "common.edited-by": "Zuetzt geändert",
   "prompt-library.knowledgebase.file-import": "Aus Datei importieren",
-  "prompt-library.add.promptss.predefined-input": "Vordefinierter Input"
+  "prompt-library.add.prompts.predefined-input": "Vordefinierter Input",
+  "prompt-library.input-placeholder": "Dein Input...",
+  "onboarding.skip": "Überspringen",
+  "onboarding.next": "Weiter",
+  "onboarding.step-0.title": "Willkommen in der aibox",
+  "onboarding.step-0.description": "Gerne zeigen wir dir wie du erste KI Ergebnisse für dein Unternehmen erzeugst.<br/><br/> Viel Erfolg.",
+  "onboarding.step-0.next-btn-text": "Los gehts!",
+  "onboarding.step-1.title": "Alle Anwendungen auf einen Blick",
+  "onboarding.step-1.description": "Hier findest du erste Beispiel Anwendungen für KI Uses Cases, die du direkt starten kannst. .<br/><br/>In unserer Bezahlversion kannst du individuelle Use Cases anlegen sowie auch die Struktur jederzeit anpassen. Auch kannst du Anwendungen auf Basis deiner firmenspezifischen Wissenbasis aufbauen und dein Team dazu einladen.",
+  "onboarding.step-2.title": "Führe direkt deine Anwendungen aus",
+  "onboarding.step-2.description": "Wie bei ChatGPT, aber mit besseren und konsistenten Resultaten durch vorgegebene Informationen in deinen Anwendungen!",
+  "onboarding.step-3.title": "Erstelle Text aus deinem Audio",
+  "onboarding.step-3.description": "Ganz einfach Audio-Datei hochladen und daraus den Text erhalten. Klapp auch mit schweizerdeutschen Texten!<br/><br/>In der bezahlten Version kannst du auch hier die Qualität der Texte auf deine Bedürfnisse weiter verbessern."
 }
