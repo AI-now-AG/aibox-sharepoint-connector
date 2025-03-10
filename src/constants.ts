@@ -47,3 +47,6 @@ export const FEATURE_MAP_ROUTES = {
     "/settings/transcription",
   ],
 };
+
+export const SG_VERIFICATION_TEMPLATE = "d-69ed72334042458783f985ada5dbe61d";
+export const SG_WELCOME_TEMPLATE = "d-79e6332e21d14ff792ba9d995127abb7";

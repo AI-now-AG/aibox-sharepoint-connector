@@ -14,6 +14,8 @@ import organizationsManagement from "$data/auth0/organizations-manager";
 import {
   sendVerificationEmail,
   sendPasswordResetEmail,
+  sendWelcomeEmail,
+  sendNotificationEmail,
 } from "$utils/auth0Auth";
 import type { UserRole } from "$enums/Users";
 /**
@@ -64,6 +66,12 @@ const auth0Webhook: Handler = async (
       // See: https://auth0.com/docs/customize/log-streams/event-filters#signup-success
       if (eventType == "ss") {
         await triggerRegistrationEmail(data);
+      }
+
+      // Trigger successful called verification email endpoint
+      // See: https://auth0.com/docs/customize/log-streams/event-filters#user-behavioral-success
+      if (eventType == "sv") {
+        await triggerWelcomeEmail(data);
       }
 
       // Trigger 'Add members to an organization'
@@ -144,10 +152,43 @@ const triggerRegistrationEmail = async (data: any) => {
   const { user_id: userId } = data;
   const { email, connection, is_signup: isSignup } = data.details.body;
   if (isSignup == true) {
+    // Send user verification email
     await sendVerificationEmail(userId, email);
+
+    // Send admin notification email
+    const emailSubject = "aibox - New User Signup Alert";
+    const emailContent = `
+      <div style="font-family: Arial, sans-serif; padding: 20px;">
+        <h1><b>New User Signup Notification</b></h1>
+        <p><b>User ID:</b> ${userId}</p>
+        <p><b>Email:</b> ${email}</p>
+        <p><b>Signup Date:</b> ${new Date().toLocaleDateString()}</p>
+      </div>
+    `;
+    await sendNotificationEmail(emailSubject, emailContent);
   } else {
     await sendPasswordResetEmail(email, connection);
   }
+};
+
+const triggerWelcomeEmail = async (data: any) => {
+  console.log(`Trigger welcome email`, data.details);
+  const { email, user_id: userId } = data.details.query;
+
+  // Send user welcome email
+  await sendWelcomeEmail(email);
+
+  // Send admin notification email
+  const emailSubject = "aibox - New User Verified Alert";
+  const emailContent = `
+    <div style="font-family: Arial, sans-serif; padding: 20px;">
+      <h1><b>New User Verified Notification</b></h1>
+      <p><b>User ID:</b> ${userId}</p>
+      <p><b>Email:</b> ${email}</p>
+      <p><b>Verified Date:</b> ${new Date().toLocaleDateString()}</p>
+    </div>
+  `;
+  await sendNotificationEmail(emailSubject, emailContent);
 };
 
 const createUserInDatabase = async (data: any) => {

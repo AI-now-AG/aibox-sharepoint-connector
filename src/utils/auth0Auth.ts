@@ -1,5 +1,6 @@
 import sgMail, { type MailDataRequired } from "@sendgrid/mail";
 import { authenticationClient, managementClient } from "$data/auth0/client";
+import { SG_VERIFICATION_TEMPLATE, SG_WELCOME_TEMPLATE } from "$constants";
 import getEnvVar from "$utils/getEnvVar";
 
 const getAccessToken = async () => {
@@ -66,7 +67,7 @@ export const sendPasswordResetEmail = async (
     return await response.text();
   } catch (error) {
     console.error("Failed to send password reset email:", error);
-    //throw new Error("Failed to send password reset email.");
+    throw new Error("Failed to send password reset email.");
   }
 };
 
@@ -90,7 +91,7 @@ export const sendVerificationEmail = async (userId: string, email: string) => {
         email: "no-reply@ainow.ch",
       },
       to: email,
-      templateId: "d-69ed72334042458783f985ada5dbe61d",
+      templateId: SG_VERIFICATION_TEMPLATE,
       dynamicTemplateData: {
         email,
         url: ticket,
@@ -98,6 +99,41 @@ export const sendVerificationEmail = async (userId: string, email: string) => {
     });
   } catch (error) {
     console.error("Error sending verification email:", error);
-    //throw new Error("Failed to send verification email.");
+    throw new Error("Failed to send verification email.");
+  }
+};
+
+export const sendWelcomeEmail = async (email: string) => {
+  try {
+    // Send welcome email via SendGrid
+    await sendMail({
+      from: {
+        name: "AI now AG",
+        email: "no-reply@ainow.ch",
+      },
+      to: email,
+      templateId: SG_WELCOME_TEMPLATE,
+    });
+  } catch (error) {
+    console.error("Error sending welcome email:", error);
+    throw new Error("Failed to send welcome email.");
+  }
+};
+
+export const sendNotificationEmail = async (subject: string, html: string) => {
+  try {
+    // Send notification email via SendGrid
+    await sendMail({
+      from: {
+        name: "AI now AG",
+        email: "no-reply@ainow.ch",
+      },
+      to: "devlin.nguyen@business4you.ch",
+      subject,
+      html,
+    });
+  } catch (error) {
+    console.error("Error sending notification email:", error);
+    throw new Error("Failed to send notification email.");
   }
 };
