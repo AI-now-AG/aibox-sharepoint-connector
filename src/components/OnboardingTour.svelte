@@ -10,7 +10,7 @@
       smoothScroll: true,
       popoverClass: "driverjs-theme",
       overlayClickBehavior: "nextStep",
-      showButtons: ['next', 'previous'],
+      showButtons: ["next", "previous"],
       nextBtnText: "Next →",
       prevBtnText: "Skip",
       onPrevClick: () => {
@@ -90,31 +90,20 @@
     color: #000;
   } */
 
-  /* :global(.driver-popover.driverjs-theme .driver-popover-title) {
-    font-size: 20px;
-  } */
+  :global(.driver-popover.driverjs-theme .driver-popover-title) {
+    color: #491eff;
+    margin-bottom: 2vh;
+  }
 
-  /* :global(
-    .driver-popover.driverjs-theme .driver-popover-title,
-    .driver-popover.driverjs-theme .driver-popover-description,
-    .driver-popover.driverjs-theme .driver-popover-progress-text
-  ) {
-    color: #000;
-  } */
-
-  /* :global(.driver-popover.driverjs-theme button) {
-  } */
-
-  /* :global(.driver-popover.driverjs-theme button:hover) {
-  } */
+  :global(.driver-popover.driverjs-theme .driver-popover-description) {
+    margin-bottom: 2vh;
+  }
 
   :global(.driver-popover.driverjs-theme .driver-popover-navigation-btns) {
     justify-content: space-between;
   }
 
-  :global(
-    .driver-popover.driverjs-theme .driver-popover-navigation-btns button
-  ) {
+  :global(.driver-popover.driverjs-theme button) {
     border-radius: 8px;
     padding: 16px;
     padding-top: 6px;
@@ -122,6 +111,9 @@
     border: none;
     font-weight: 700;
   }
+
+  /* :global(.driver-popover.driverjs-theme button:hover) {
+  } */
 
   :global(.driver-popover.driverjs-theme .driver-popover-next-btn) {
     background-color: #4338ca;
