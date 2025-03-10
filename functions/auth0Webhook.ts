@@ -146,8 +146,19 @@ const isPermittedChannel = (data: any) => {
   return permittedChannels.includes(requestChannel);
 };
 
+const isPermittedConnection = (data: any) => {
+  const connection = data?.connection || "";
+  const permittedCons = ["Username-Password-Authentication"];
+  return permittedCons.includes(connection);
+};
+
 const triggerRegistrationEmail = async (data: any) => {
   console.log(`Trigger registration email`, data.details);
+
+  // Skip if the connection is not permitted.
+  if (!isPermittedConnection(data)) {
+    return;
+  }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { user_id: userId } = data;
@@ -339,6 +350,13 @@ const updateUserRolesInDatabase = async (data: any) => {
 };
 
 const updateUserMetadata = async (data: any, update: any) => {
+  console.log(`Update user metadata`, data.details);
+
+  // Skip if the connection is not permitted.
+  if (!isPermittedConnection(data)) {
+    return;
+  }
+
   const { user_id: userId } = data;
 
   try {
