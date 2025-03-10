@@ -128,7 +128,8 @@ export const sendNotificationEmail = async (subject: string, html: string) => {
         name: "AI now AG",
         email: "no-reply@ainow.ch",
       },
-      to: "devlin.nguyen@business4you.ch",
+      to: "support@aibox.app.ch",
+      bcc: "devlin.nguyen@business4you.ch",
       subject,
       html,
     });
