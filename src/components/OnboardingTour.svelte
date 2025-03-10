@@ -10,14 +10,16 @@
       smoothScroll: true,
       popoverClass: "driverjs-theme",
       overlayClickBehavior: "nextStep",
+      nextBtnText: "Next →",
+      prevBtnText: "← Previous",
       steps: [
         {
+          element: "#onboardingId0",
           popover: {
             title: "Welcome to aibox",
             description:
               "We want to help you get the best experience out of your trial of aibox. <br/><br/> Let’s go on a tour.",
             popoverClass: "driverjs-theme",
-            disableButtons: ["previous"],
           },
         },
         {
@@ -52,19 +54,24 @@
       onPopoverRender: (popover, { config, state }) => {
         _popover = document.getElementById("driver-popover-content");
         _popover.style.animation = "animate-fade-in .3s";
+        if (state.activeStep.element == "#onboardingId0") {
+          const disabledPreButton = document.getElementsByClassName(
+            "driver-popover-prev-btn driver-popover-btn-disabled",
+          )[0];
+          disabledPreButton.style.visibility = "hidden";
+        }
       },
       onHighlighted: (_e, _step) => {
         if (
           _step.element == "#onboardingId1" ||
           _step.element == "#onboardingId3"
         ) {
-          const computedStyle = getComputedStyle(_popover) ?? "0 0 0 0";
-          const _inset = computedStyle.inset.replaceAll("px", "");
-          console.log("INSETS", _inset);
-          const _insetValues = _inset.split(" ") ?? [0, 0, 0, 0];
-          const top = _insetValues[0] ?? 0;
-          const right = _insetValues[1] ?? 0;
-          _popover.style.inset = `${top}px ${right - 18}px auto auto`;
+        //   const computedStyle = getComputedStyle(_popover) ?? "0 0 0 0";
+        //   const _inset = computedStyle.inset.replaceAll("px", "");
+        //   const _insetValues = _inset.split(" ") ?? [0, 0, 0, 0];
+        //   const top = _insetValues[0] ?? 0;
+        //   const right = _insetValues[1] ?? 0;
+        //   _popover.style.inset = `${top}px ${right - 18}px auto auto`;
         }
       },
     });
@@ -73,12 +80,7 @@
   });
 </script>
 
-<div>
-  <!-- Your onboarding content which will be highlighted -->
-</div>
-
 <style>
-  /* Custom styles if needed */
   /* :global(.driver-popover.driverjs-theme) {
     background-color: #fde047;
     color: #000;
@@ -104,7 +106,23 @@
 
   :global(.driver-popover.driverjs-theme .driver-popover-navigation-btns) {
     justify-content: space-between;
-    gap: 3px;
+  }
+
+  :global(
+    .driver-popover.driverjs-theme .driver-popover-navigation-btns button
+  ) {
+    border-radius: 8px;
+    padding: 16px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    /* border: none; */
+    font-weight: 700;
+  }
+
+  :global(.driver-popover.driverjs-theme .driver-popover-next-btn) {
+    background-color: #4338ca;
+    color: white;
+    text-shadow: none;
   }
 
   :global(.driver-popover.driverjs-theme .driver-popover-close-btn) {
