@@ -10,8 +10,12 @@
       smoothScroll: true,
       popoverClass: "driverjs-theme",
       overlayClickBehavior: "nextStep",
+      showButtons: ['next', 'previous'],
       nextBtnText: "Next →",
-      prevBtnText: "← Previous",
+      prevBtnText: "Skip",
+      onPrevClick: () => {
+        driverObj.destroy();
+      },
       steps: [
         {
           element: "#onboardingId0",
@@ -66,12 +70,12 @@
           _step.element == "#onboardingId1" ||
           _step.element == "#onboardingId3"
         ) {
-        //   const computedStyle = getComputedStyle(_popover) ?? "0 0 0 0";
-        //   const _inset = computedStyle.inset.replaceAll("px", "");
-        //   const _insetValues = _inset.split(" ") ?? [0, 0, 0, 0];
-        //   const top = _insetValues[0] ?? 0;
-        //   const right = _insetValues[1] ?? 0;
-        //   _popover.style.inset = `${top}px ${right - 18}px auto auto`;
+          const computedStyle = getComputedStyle(_popover) ?? "0 0 0 0";
+          const _inset = computedStyle.inset.replaceAll("px", "");
+          const _insetValues = _inset.split(" ") ?? [0, 0, 0, 0];
+          const top = _insetValues[0] ?? 0;
+          const right = _insetValues[1] ?? 0;
+          _popover.style.inset = `${top}px ${right - 18}px auto auto`;
         }
       },
     });
@@ -115,7 +119,7 @@
     padding: 16px;
     padding-top: 6px;
     padding-bottom: 6px;
-    /* border: none; */
+    border: none;
     font-weight: 700;
   }
 
