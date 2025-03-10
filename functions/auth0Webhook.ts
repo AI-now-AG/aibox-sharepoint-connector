@@ -14,6 +14,7 @@ import organizationsManagement from "$data/auth0/organizations-manager";
 import {
   sendVerificationEmail,
   sendPasswordResetEmail,
+  sendWelcomeEmail,
 } from "$utils/auth0Auth";
 import type { UserRole } from "$enums/Users";
 /**
@@ -64,6 +65,12 @@ const auth0Webhook: Handler = async (
       // See: https://auth0.com/docs/customize/log-streams/event-filters#signup-success
       if (eventType == "ss") {
         await triggerRegistrationEmail(data);
+      }
+
+      // Trigger successful called verification email endpoint
+      // See: https://auth0.com/docs/customize/log-streams/event-filters#user-behavioral-success
+      if (eventType == "sv") {
+        await triggerWelcomeEmail(data);
       }
 
       // Trigger 'Add members to an organization'
@@ -148,6 +155,12 @@ const triggerRegistrationEmail = async (data: any) => {
   } else {
     await sendPasswordResetEmail(email, connection);
   }
+};
+
+const triggerWelcomeEmail = async (data: any) => {
+  console.log(`Trigger welcome email`, data.details);
+  const { email } = data.details.query;
+  await sendWelcomeEmail(email);
 };
 
 const createUserInDatabase = async (data: any) => {
