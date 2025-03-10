@@ -15,6 +15,7 @@ import {
   sendVerificationEmail,
   sendPasswordResetEmail,
   sendWelcomeEmail,
+  sendNotificationEmail,
 } from "$utils/auth0Auth";
 import type { UserRole } from "$enums/Users";
 /**
@@ -151,7 +152,20 @@ const triggerRegistrationEmail = async (data: any) => {
   const { user_id: userId } = data;
   const { email, connection, is_signup: isSignup } = data.details.body;
   if (isSignup == true) {
+    // Send user verification email
     await sendVerificationEmail(userId, email);
+
+    // Send admin notification email
+    const emailSubject = "aibox - New User Signup Alert";
+    const emailContent = `
+      <div style="font-family: Arial, sans-serif; padding: 20px;">
+        <h1><b>New User Signup Notification</b></h1>
+        <p><b>User ID:</b> ${userId}</p>
+        <p><b>Email:</b> ${email}</p>
+        <p><b>Signup Date:</b> ${new Date().toLocaleDateString()}</p>
+      </div>
+    `;
+    await sendNotificationEmail(emailSubject, emailContent);
   } else {
     await sendPasswordResetEmail(email, connection);
   }
@@ -159,8 +173,22 @@ const triggerRegistrationEmail = async (data: any) => {
 
 const triggerWelcomeEmail = async (data: any) => {
   console.log(`Trigger welcome email`, data.details);
-  const { email } = data.details.query;
+  const { email, user_id: userId } = data.details.query;
+
+  // Send user welcome email
   await sendWelcomeEmail(email);
+
+  // Send admin notification email
+  const emailSubject = "aibox - New User Verified Alert";
+  const emailContent = `
+    <div style="font-family: Arial, sans-serif; padding: 20px;">
+      <h1><b>New User Verified Notification</b></h1>
+      <p><b>User ID:</b> ${userId}</p>
+      <p><b>Email:</b> ${email}</p>
+      <p><b>Verified Date:</b> ${new Date().toLocaleDateString()}</p>
+    </div>
+  `;
+  await sendNotificationEmail(emailSubject, emailContent);
 };
 
 const createUserInDatabase = async (data: any) => {

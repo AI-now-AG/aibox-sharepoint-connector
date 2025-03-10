@@ -119,3 +119,21 @@ export const sendWelcomeEmail = async (email: string) => {
     throw new Error("Failed to send welcome email.");
   }
 };
+
+export const sendNotificationEmail = async (subject: string, html: string) => {
+  try {
+    // Send notification email via SendGrid
+    await sendMail({
+      from: {
+        name: "AI now AG",
+        email: "no-reply@ainow.ch",
+      },
+      to: "devlin.nguyen@business4you.ch",
+      subject,
+      html,
+    });
+  } catch (error) {
+    console.error("Error sending notification email:", error);
+    throw new Error("Failed to send notification email.");
+  }
+};
