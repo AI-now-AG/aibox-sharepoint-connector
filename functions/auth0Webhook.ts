@@ -210,17 +210,18 @@ const triggerWelcomeEmail = async (
   await sendWelcomeEmail(email);
 
   // Send admin notification email
-  const emailSubject = "aibox - New User Verified Alert";
-  const emailContent = `
-    <div style="font-family: Arial, sans-serif; padding: 20px;">
-      <h1><b>New User Verified Notification</b></h1>
-      <p><b>User ID:</b> ${userId}</p>
-      <p><b>Email:</b> ${email}</p>
-      <p><b>Connection:</b> ${connection}</p>
-      <p><b>Verified Date:</b> ${new Date().toLocaleDateString()}</p>
-    </div>
-  `;
-  await sendNotificationEmail(emailSubject, emailContent);
+  if (connection == "Username-Password-Authentication") {
+    const emailSubject = "aibox - New User Verified Alert";
+    const emailContent = `
+      <div style="font-family: Arial, sans-serif; padding: 20px;">
+        <h1><b>New User Verified Notification</b></h1>
+        <p><b>User ID:</b> ${userId}</p>
+        <p><b>Email:</b> ${email}</p>
+        <p><b>Verified Date:</b> ${new Date().toLocaleDateString()}</p>
+      </div>
+    `;
+    await sendNotificationEmail(emailSubject, emailContent);
+  }
 };
 
 const createUserInDatabase = async (data: any) => {
