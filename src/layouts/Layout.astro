@@ -37,7 +37,7 @@ switch (Astro.locals.user?.tenant_id?.toString()) {
 }
 
 const user = Astro.locals.user;
-const userId = user?.id?.toString();
+const userInfo = { ...user, id: user.id.toString() };
 ---
 
 <!doctype html>
@@ -64,6 +64,6 @@ const userId = user?.id?.toString();
         <Navigation />
       </div>
     </div>
-    <OnboardingTour {userId} client:load />
+    <OnboardingTour user={userInfo} client:load />
   </body>
 </html>
