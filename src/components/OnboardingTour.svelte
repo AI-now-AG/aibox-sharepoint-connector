@@ -10,22 +10,21 @@
   const t = useTranslations();
 
   interface Props {
-    userId: string;
+    user: any;
   }
-  let { userId } = $props() as Props;
+  let { user } = $props() as Props;
 
   let _popover: HTMLElement | null = null;
 
   async function markAsOnboarded() {
     await actions.user.deactiveTour({
-      _id: userId.toString(),
+      _id: user.id,
       type: TourType.Onboarding,
     });
   }
 
   async function checkOnboarding() {
-    const user = await actions.user.get({ _id: userId });
-    const { logins_count = 0, tours } = user.data || {};
+    const { logins_count = 0, tours } = user || {};
     if (logins_count <= 1) {
       if (tours) {
         for (let i = 0; i < tours.length; i++) {

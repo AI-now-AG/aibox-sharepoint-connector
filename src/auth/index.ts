@@ -30,6 +30,8 @@ export const lucia = new Lucia(adapter, {
       permissions: attributes.permissions,
       navState: attributes.navState,
       blocked: attributes.blocked,
+      logins_count: attributes.logins_count,
+      tours: attributes.tours,
     };
   },
 });
