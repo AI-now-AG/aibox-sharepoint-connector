@@ -133,7 +133,7 @@ export const sendNotificationEmail = async (subject: string, html: string) => {
       },
       to: "support@aibox-app.ch",
       bcc: "devlin.nguyen@business4you.ch",
-      subject: `${subjectPrefix} - subject`,
+      subject: `${subjectPrefix} - ${subject}`,
       html,
     });
   } catch (error) {
