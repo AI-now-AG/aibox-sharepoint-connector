@@ -30,9 +30,12 @@
     apiProvider.name == ApiKeyProvider.Perplexity,
   );
 
-  let textInputComponent: any;
+  // svelte-ignore non_reactive_update
+    let textInputComponent: any;
   function adjustHeightByContent() {
-    textInputComponent?.adjustHeightByContent();
+    setTimeout(() => {
+      textInputComponent?.adjustHeightByContent();
+    }, 0);
   }
 
   onMount(() => {
@@ -47,9 +50,7 @@
       }
     };
     window.addEventListener("scroll", handleScroll);
-    setTimeout(() => {
-      adjustHeightByContent();
-    }, 0);
+    adjustHeightByContent();
   });
 
   const scrollToBottom = async () => {
@@ -92,9 +93,7 @@
       bind:isDisabling={isProcessing}
       onSelectCard={() => {
         sharedMessageHistory.set([]);
-        setTimeout(() => {
-          adjustHeightByContent();
-        }, 0);
+        adjustHeightByContent();
       }}
     />
     {#if $sharedMessageHistory.length == 0}
