@@ -1,3 +1,4 @@
+// App
 export const PUBLIC_ROUTES = [
   "/login",
   "/api/login",
@@ -7,6 +8,7 @@ export const PUBLIC_ROUTES = [
   "/404",
   "/error",
   "/restricted",
+  "/signup",
 ];
 
 export const ADMIN_ROUTES = [
@@ -48,5 +50,15 @@ export const FEATURE_MAP_ROUTES = {
   ],
 };
 
+// Auth0
+export const AUTH0_SESSION_STATE = "auth0_state";
+export const AUTH_AUTHORIZE_SCOPES = [
+  "openid",
+  "profile",
+  "email",
+  "ainow/roles",
+];
+
+// SendGrid
 export const SG_VERIFICATION_TEMPLATE = "d-69ed72334042458783f985ada5dbe61d";
 export const SG_WELCOME_TEMPLATE = "d-79e6332e21d14ff792ba9d995127abb7";

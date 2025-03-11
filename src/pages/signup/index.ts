@@ -19,5 +19,7 @@ export async function GET(context: APIContext): Promise<Response> {
     sameSite: "lax",
   });
 
-  return context.redirect(url.toString());
+  const signupUrl = `${url.toString()}&screen_hint=signup`;
+  console.log("signupUrl", { signupUrl });
+  return context.redirect(signupUrl);
 }
