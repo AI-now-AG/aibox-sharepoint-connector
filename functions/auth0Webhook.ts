@@ -18,6 +18,7 @@ import {
   sendNotificationEmail,
 } from "$utils/auth0Auth";
 import type { UserRole } from "$enums/Users";
+
 /**
  * Handles Auth0 log stream events
  * Reference: https://auth0.com/docs/customize/log-streams/event-filters#user-behavioral-success
@@ -65,14 +66,23 @@ const auth0Webhook: Handler = async (
       // Trigger successful signup
       // See: https://auth0.com/docs/customize/log-streams/event-filters#signup-success
       if (eventType == "ss") {
-        await triggerRegistrationEmail(data);
-        await updateUserMetadata(data, { signup: true });
+        if (isPermittedConnection(data)) {
+          await triggerRegistrationEmail(data);
+          await updateUserMetadata(data.user_id, { signup: true });
+        }
+
+        // Send welcome email for social login
+        if (["windowslive", "google-oauth2"].includes(data.connection)) {
+          const { user_name: email, user_id: userId } = data.details.prompts[1];
+          await triggerWelcomeEmail(userId, email, data.connection);
+        }
       }
 
       // Trigger successful called verification email endpoint
       // See: https://auth0.com/docs/customize/log-streams/event-filters#user-behavioral-success
       if (eventType == "sv") {
-        await triggerWelcomeEmail(data);
+        const { email, user_id: userId } = data.details.query;
+        await triggerWelcomeEmail(userId, email, data.connection);
       }
 
       // Trigger 'Add members to an organization'
@@ -155,11 +165,6 @@ const isPermittedConnection = (data: any) => {
 const triggerRegistrationEmail = async (data: any) => {
   console.log(`Trigger registration email`, data.details);
 
-  // Skip if the connection is not permitted.
-  if (!isPermittedConnection(data)) {
-    return;
-  }
-
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { user_id: userId } = data;
   const { email, connection, is_signup: isSignup } = data.details.body;
@@ -183,10 +188,12 @@ const triggerRegistrationEmail = async (data: any) => {
   }
 };
 
-const triggerWelcomeEmail = async (data: any) => {
-  console.log(`Trigger welcome email`, data.details);
-  const { email, user_id: userId } = data.details.query;
-
+const triggerWelcomeEmail = async (
+  userId: string,
+  email: string,
+  connection: string,
+) => {
+  console.log(`Trigger welcome email`, { userId, email, connection });
   // Send user welcome email
   await sendWelcomeEmail(email);
 
@@ -197,6 +204,7 @@ const triggerWelcomeEmail = async (data: any) => {
       <h1><b>New User Verified Notification</b></h1>
       <p><b>User ID:</b> ${userId}</p>
       <p><b>Email:</b> ${email}</p>
+      <p><b>Connection:</b> ${connection}</p>
       <p><b>Verified Date:</b> ${new Date().toLocaleDateString()}</p>
     </div>
   `;
@@ -349,15 +357,8 @@ const updateUserRolesInDatabase = async (data: any) => {
   }
 };
 
-const updateUserMetadata = async (data: any, update: any) => {
-  console.log(`Update user metadata`, data.details);
-
-  // Skip if the connection is not permitted.
-  if (!isPermittedConnection(data)) {
-    return;
-  }
-
-  const { user_id: userId } = data;
+const updateUserMetadata = async (userId: string, update: any) => {
+  console.log(`Update user metadata`, { userId, update });
 
   try {
     await usersManagement.update(userId, {
