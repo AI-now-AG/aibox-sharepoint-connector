@@ -9,7 +9,7 @@ import {
   TourType,
 } from "$enums/Users";
 
-const UserTour = z.object({
+export const UserTour = z.object({
   type: z.nativeEnum(TourType).default(TourType.Onboarding),
   active: z.boolean().default(true),
 });
@@ -211,6 +211,13 @@ export default {
     return await collection.updateOne(
       { _id: new ObjectId(id) },
       { $set: { blocked: false } },
+    );
+  },
+
+  updateTour: async (id: string, tours: z.infer<typeof UserTour>[]) => {
+    return await collection.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: { tours: tours } },
     );
   },
 

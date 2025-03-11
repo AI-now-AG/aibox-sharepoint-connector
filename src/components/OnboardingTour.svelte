@@ -1,24 +1,49 @@
-<script>
+<script lang="ts">
   import { onMount } from "svelte";
+  import { actions } from "astro:actions";
   import { driver } from "driver.js";
   import "driver.js/dist/driver.css";
 
   import { useTranslations } from "$i18n/utils";
+  import { TourType } from "$enums/Users";
+
   const t = useTranslations();
 
-  let _popover;
+  interface Props {
+    userId: string;
+  }
+  let { userId } = $props() as Props;
 
-  function markAsOnboarded() {
-    // TODO: Se onboarding to false
+  let _popover: HTMLElement | null = null;
+
+  async function markAsOnboarded() {
+    await actions.user.deactiveTour({
+      _id: userId.toString(),
+      type: TourType.Onboarding,
+    });
   }
 
-  function isOnboarding() {
-    // TODO: Check onboarding
+  async function checkOnboarding() {
+    const user = await actions.user.get({ _id: userId });
+    const { logins_count = 0, tours } = user.data || {};
+    if (logins_count <= 1) {
+      if (tours) {
+        for (let i = 0; i < tours.length; i++) {
+          const tour = tours[i];
+          if (tour.type === TourType.Onboarding && tour.active) {
+            return true;
+          }
+        }
+      } else {
+        return true;
+      }
+    }
     return false;
   }
 
-  onMount(() => {
-    if (isOnboarding()) {
+  onMount(async () => {
+    const isOnboarding = await checkOnboarding();
+    if (isOnboarding) {
       const driverObj = driver({
         popoverClass: "driverjs-theme",
         overlayClickBehavior: "nextStep",
@@ -27,6 +52,8 @@
         nextBtnText: t("onboarding.next"),
         onPrevClick: () => {
           driverObj.destroy();
+        },
+        onDestroyed: () => {
           markAsOnboarded();
         },
         steps: [
@@ -67,16 +94,26 @@
         ],
         onPopoverRender: (popover, { config, state }) => {
           _popover = document.getElementById("driver-popover-content");
-          _popover.style.animation = "animate-fade-in .3s";
-          if (state.activeStep.element == "#onboardingId0") {
-            document.getElementsByClassName(
-              "driver-popover-navigation-btns",
-            )[0].style.justifyContent = "center";
-            document.getElementById("driver-popover-title").style.textAlign =
-              "center";
-            document.getElementById(
+          if (state?.activeStep?.element == "#onboardingId0") {
+            (
+              document.getElementsByClassName(
+                "driver-popover-navigation-btns",
+              )[0] as HTMLElement
+            ).style.justifyContent = "center";
+
+            const titleElement = document.getElementById(
+              "driver-popover-title",
+            );
+            if (titleElement) {
+              titleElement.style.textAlign = "center";
+            }
+
+            const descriptionElement = document.getElementById(
               "driver-popover-description",
-            ).style.textAlign = "center";
+            );
+            if (descriptionElement) {
+              descriptionElement.style.textAlign = "center";
+            }
           }
         },
         onHighlighted: (_e, _step) => {
@@ -84,12 +121,16 @@
             _step.element == "#onboardingId1" ||
             _step.element == "#onboardingId3"
           ) {
-            const computedStyle = getComputedStyle(_popover) ?? "0 0 0 0";
+            const computedStyle = _popover
+              ? getComputedStyle(_popover)
+              : { inset: "0 0 0 0" };
             const _inset = computedStyle.inset.replaceAll("px", "");
             const _insetValues = _inset.split(" ") ?? [0, 0, 0, 0];
             const top = _insetValues[0] ?? 0;
             const right = _insetValues[1] ?? 0;
-            _popover.style.inset = `${top}px ${right - 18}px auto auto`;
+            if (_popover) {
+              _popover.style.inset = `${top}px ${Number(right) - 18}px auto auto`;
+            }
           }
         },
       });
