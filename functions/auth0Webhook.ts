@@ -185,7 +185,7 @@ const triggerRegistrationEmail = async (data: any) => {
     await sendVerificationEmail(userId, email);
 
     // Send admin notification email
-    const emailSubject = "aibox - New User Signup Alert";
+    const emailSubject = "New User Signup Alert";
     const emailContent = `
       <div style="font-family: Arial, sans-serif; padding: 20px;">
         <h1><b>New User Signup Notification</b></h1>
@@ -211,7 +211,7 @@ const triggerWelcomeEmail = async (
 
   // Send admin notification email
   if (connection == "Username-Password-Authentication") {
-    const emailSubject = "aibox - New User Verified Alert";
+    const emailSubject = "New User Verified Alert";
     const emailContent = `
       <div style="font-family: Arial, sans-serif; padding: 20px;">
         <h1><b>New User Verified Notification</b></h1>

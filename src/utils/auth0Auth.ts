@@ -121,6 +121,9 @@ export const sendWelcomeEmail = async (email: string) => {
 };
 
 export const sendNotificationEmail = async (subject: string, html: string) => {
+  const env = getEnvVar("NODE_ENV") || "development";
+  const subjectPrefix = env == "production" ? "aibox" : "aibox-dev";
+
   try {
     // Send notification email via SendGrid
     await sendMail({
@@ -130,7 +133,7 @@ export const sendNotificationEmail = async (subject: string, html: string) => {
       },
       to: "support@aibox-app.ch",
       bcc: "devlin.nguyen@business4you.ch",
-      subject,
+      subject: `${subjectPrefix} - subject`,
       html,
     });
   } catch (error) {
