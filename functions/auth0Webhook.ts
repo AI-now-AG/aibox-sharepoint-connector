@@ -92,13 +92,17 @@ const auth0Webhook: Handler = async (
         eventType == "sapi" &&
         description == "Add members to an organization"
       ) {
-        await createUserInDatabase(data);
+        if (isPermittedChannel(data)) {
+          await createUserInDatabase(data);
+        }
       }
 
       // Trigger 'Update a User'
       // See: https://auth0.com/docs/customize/log-streams/event-filters#management-api-success
       if (eventType == "sapi" && description == "Update a User") {
-        await updateUserInDatabase(data);
+        if (isPermittedChannel(data)) {
+          await updateUserInDatabase(data);
+        }
       }
 
       // Trigger 'Delete a User' or 'Delete members from an organization'
@@ -108,7 +112,9 @@ const auth0Webhook: Handler = async (
         (description == "Delete a User" ||
           description == "Delete members from an organization")
       ) {
-        await deleteUserFromDatabase(data);
+        if (isPermittedChannel(data)) {
+          await deleteUserFromDatabase(data);
+        }
       }
 
       // Trigger 'Assign user roles to an Organization member' or 'Delete user roles from an Organization member'
@@ -119,19 +125,25 @@ const auth0Webhook: Handler = async (
         (description == "Assign user roles to an Organization member" ||
           description == "Delete user roles from an Organization member")
       ) {
-        await updateUserRolesInDatabase(data);
+        if (isPermittedChannel(data)) {
+          await updateUserRolesInDatabase(data);
+        }
       }
 
       // Trigger 'Create an Organization'
       // See: https://auth0.com/docs/customize/log-streams/event-filters#management-api-success
       if (eventType == "sapi" && description == "Create an Organization") {
-        await createTenantInDatabase(data);
+        if (isPermittedChannel(data)) {
+          await createTenantInDatabase(data);
+        }
       }
 
       // Trigger 'Modify an Organization'
       // See: https://auth0.com/docs/customize/log-streams/event-filters#management-api-success
       if (eventType == "sapi" && description == "Modify an Organization") {
-        await updateTenantInDatabase(data);
+        if (isPermittedChannel(data)) {
+          await updateTenantInDatabase(data);
+        }
       }
     }
 
@@ -214,12 +226,6 @@ const triggerWelcomeEmail = async (
 const createUserInDatabase = async (data: any) => {
   console.log(`Creating user`, data?.details?.request);
 
-  // Skip if the channel is not permitted.
-  if (!isPermittedChannel(data)) {
-    console.warn(`Creating user / channel is not permitted.`);
-    return;
-  }
-
   const path = data?.details?.request?.path || ""; // api/v2/organizations/org_jNS9by788jZfem2D/members
   const memberIds = data?.details?.request?.body?.members || []; // ["auth0|6777fe2805771b8ae33c09e3"]
   const orgId = path.match(/organizations\/([^/]+)/)[1];
@@ -252,12 +258,6 @@ const createUserInDatabase = async (data: any) => {
 const updateUserInDatabase = async (data: any) => {
   console.log(`Updating user`, data?.details?.response);
 
-  // Skip if the channel is not permitted.
-  if (!isPermittedChannel(data)) {
-    console.warn(`Updating user / channel is not permitted.`);
-    return;
-  }
-
   const auth0User = data?.details?.response?.body || {};
   const localUser = await UserModel.getAuth0Sub(auth0User.user_id);
 
@@ -282,12 +282,6 @@ const updateUserInDatabase = async (data: any) => {
 
 const deleteUserFromDatabase = async (data: any) => {
   console.log(`Deleting user`, data?.details?.response);
-
-  // Skip if the channel is not permitted.
-  if (!isPermittedChannel(data)) {
-    console.warn(`Deleting user / channel is not permitted.`);
-    return;
-  }
 
   const { description } = data;
 
@@ -319,12 +313,6 @@ const deleteUserFromDatabase = async (data: any) => {
 
 const updateUserRolesInDatabase = async (data: any) => {
   console.log(`Updating user roles`, data?.details?.response);
-
-  // Skip if the channel is not permitted.
-  if (!isPermittedChannel(data)) {
-    console.warn(`Updating user roles / channel is not permitted.`);
-    return;
-  }
 
   // Take the "userId" from request path and "roles" from request body
   // Example path: api/v2/organizations/org_FpOtXZcZwVZc1unJ/members/auth0%7C66f3a9897dbebab8f2ae9cc0/roles
@@ -372,12 +360,6 @@ const updateUserMetadata = async (userId: string, update: any) => {
 const createTenantInDatabase = async (data: any) => {
   console.log(`Creating tenant`, data?.details?.response);
 
-  // Skip if the channel is not permitted.
-  if (!isPermittedChannel(data)) {
-    console.warn(`Creating tenant / channel is not permitted.`);
-    return;
-  }
-
   // Take the "orgId" from response body
   // Example: { id: "org_kxLHFC47tCHHOxsB" }
   const orgId = data?.details?.response?.body?.id || "";
@@ -398,12 +380,6 @@ const createTenantInDatabase = async (data: any) => {
 
 const updateTenantInDatabase = async (data: any) => {
   console.log(`Updating tenant`, data?.details?.response);
-
-  // Skip if the channel is not permitted.
-  if (!isPermittedChannel(data)) {
-    console.warn(`Updating tenant / channel is not permitted.`);
-    return;
-  }
 
   // Take the "orgId" from response body
   // Example: { id: "org_kxLHFC47tCHHOxsB" }
