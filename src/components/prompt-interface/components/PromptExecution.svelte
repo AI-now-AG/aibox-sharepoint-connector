@@ -31,7 +31,7 @@
   );
 
   // svelte-ignore non_reactive_update
-    let textInputComponent: any;
+  let textInputComponent: any;
   function adjustHeightByContent() {
     setTimeout(() => {
       textInputComponent?.adjustHeightByContent();
