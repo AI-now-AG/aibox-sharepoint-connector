@@ -132,7 +132,6 @@ export const sendNotificationEmail = async (subject: string, html: string) => {
         email: "no-reply@ainow.ch",
       },
       to: "support@aibox-app.ch",
-      bcc: "devlin.nguyen@business4you.ch",
       subject: `${subjectPrefix} - ${subject}`,
       html,
     });
