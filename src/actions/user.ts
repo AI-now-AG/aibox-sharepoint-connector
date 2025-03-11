@@ -262,6 +262,70 @@ export const user = {
     },
   }),
 
+  activeOboarding: defineAction({
+    input: UserInputIdentifierSchema,
+    handler: async (input) => {
+      const { _id: userId } = input;
+      const user = await UserModel.get(userId);
+      if (!user) {
+        throw new Error("User does not exists.");
+      }
+
+      const session = client.startSession();
+      session.startTransaction();
+
+      try {
+        let userTours = user.tours ?? [
+          { type: TourType.Onboarding, active: true },
+        ];
+
+        userTours = userTours.map((tour) => {
+          if (tour.type == TourType.Onboarding) {
+            return { ...tour, active: true };
+          }
+          return tour;
+        });
+
+        await UserModel.updateTour(userId, userTours);
+        await session.commitTransaction();
+
+        return { success: true };
+      } catch (error) {
+        await session.abortTransaction();
+        throw error;
+      } finally {
+        session.endSession();
+      }
+    },
+  }),
+
+  resetLoginCount: defineAction({
+    input: UserInputIdentifierSchema,
+    handler: async (input) => {
+      const { _id: userId } = input;
+      const user = await UserModel.get(userId);
+      if (!user) {
+        throw new Error("User does not exists.");
+      }
+
+      const session = client.startSession();
+      session.startTransaction();
+
+      try {
+        await UserModel.update(userId, { logins_count: 0 });
+        console.log("User logins count reset successfully.");
+        await session.commitTransaction();
+
+        return { success: true };
+      } catch (error) {
+        await session.abortTransaction();
+        throw error;
+      } finally {
+        session.endSession();
+      }
+    },
+  }),
+
   delete: defineAction({
     input: UserInputIdentifierSchema,
     handler: async (input) => {

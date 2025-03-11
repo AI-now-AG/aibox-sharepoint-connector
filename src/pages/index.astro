@@ -3,6 +3,7 @@
 import Layout from "$layouts/Layout.astro";
 //import { Image } from "astro:assets";
 //import Card from "$components/content/Card.astro";
+import { actions } from "astro:actions";
 import ChatWidget from "$pages/home/ChatWidget.svelte";
 import { getCollection } from "astro:content";
 
@@ -11,6 +12,16 @@ const t = useTranslations();
 
 const allContent = await getCollection("aibox");
 const tenant = Astro.locals.tenant;
+const onboarding = Astro.url?.searchParams?.get?.("onboarding");
+if (onboarding) {
+  const user = Astro.locals.user;
+  await Astro.callAction(actions.user.resetLoginCount, {
+    _id: user.id.toString(),
+  });
+  await Astro.callAction(actions.user.activeOboarding, {
+    _id: user.id.toString(),
+  });
+}
 ---
 
 <Layout>
