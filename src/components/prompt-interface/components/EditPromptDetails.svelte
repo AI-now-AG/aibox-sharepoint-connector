@@ -6,7 +6,6 @@
   import ModelInput from "$pages/prompt-library/prompts/ModelInput.svelte";
   import type { CreatePromptParams } from "$pages/api/prompts/index.json";
   import { addToast } from "$stores/toast";
-  import { tenant } from "$stores";
   import LoadingSpinner from "$components/prompt-interface/components/LoadingSpinner.svelte";
   import { svgIcons } from "$assets/icons";
   import { preventDefault } from "$utils/common";
@@ -48,7 +47,7 @@
   let selectedCategory: Category | undefined = $state();
 
   let models: Model[] = $state([]);
-  let selectedModel: Model | null | undefined = $state();
+  let selectedModel: Model | undefined = $state();
 
   let knowledgeBases: KnowledgeBase[] = $state([]);
   let selectedKnowledgeBases: KnowledgeBase[] = $state([]);
@@ -58,6 +57,7 @@
 
   let promptTitle = $state("");
   let promptText = $state("");
+  let promptPredefinedInput = $state("");
   let promptDetails: any | undefined = undefined;
 
   let isSaving = $state(false);
@@ -106,6 +106,7 @@
         promptTitle = promptTitle?.trim() + " (" + t("common.copy") + ")";
       }
       promptText = promptDetails.prompt;
+      promptPredefinedInput = promptDetails.predefined_input;
 
       const category = categories.find(
         (e) => e._id == promptDetails.category?.toString(),
@@ -118,7 +119,7 @@
       const model = models.find(
         (e) => e._id == promptDetails.model?.toString(),
       );
-      selectedModel = model ?? null;
+      selectedModel = model;
 
       const group = category?.groups.find(
         (e) => e._id == promptDetails.group?.toString(),
@@ -150,6 +151,7 @@
       const newPrompt: CreatePromptParams = {
         title: promptTitle,
         prompt: promptText,
+        predefined_input: promptPredefinedInput,
         model: selectedModel ? selectedModel._id : null,
         knowledgebase: selectedKnowledgeBases.map((inst) => inst._id),
         ...(selectedCategory && { category: selectedCategory._id }),
@@ -257,6 +259,15 @@
         <textarea
           bind:value={promptText}
           placeholder="e.g. Create three headlines..."
+          class="input input-bordered min-w-xs shadow appearance-none min-h-32 w-full py-2 px-3"
+        ></textarea>
+      </div>
+
+      <div class="mb-4">
+        <p class="mb-2">{t("prompt-library.add.prompts.predefined-input")}</p>
+        <textarea
+          bind:value={promptPredefinedInput}
+          placeholder=""
           class="input input-bordered min-w-xs shadow appearance-none min-h-32 w-full py-2 px-3"
         ></textarea>
       </div>

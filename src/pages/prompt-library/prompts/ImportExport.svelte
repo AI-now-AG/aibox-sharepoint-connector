@@ -9,7 +9,7 @@
   const t = useTranslations();
 
   let fileUploadModal: HTMLDialogElement | undefined = $state();
-  let inputFile: File = $state();
+  let inputFile: File | undefined = $state();
 
   const importUrl: string = "/api/prompts/import";
   const exportUrl: string = "/api/prompts/export";

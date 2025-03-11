@@ -1,12 +1,20 @@
 <script lang="ts">
+  import { actions } from "astro:actions";
   import type { CreateKnowledgeBaseParams } from "$pages/api/knowledge-base.json";
   import { useTranslations } from "$i18n/utils";
   import { onMount } from "svelte";
   import { addToast } from "$stores/toast";
   import { svgIcons } from "$assets/icons";
-  import { preventDefault } from "$utils/common";
+  import { formatMarkdown, preventDefault } from "$utils/common";
+  import TextEditor from "$components/TextEditor.svelte";
+  import ImportFileDialog from "./ImportFileDialog.svelte";
+  import { loading } from "$stores";
+  import Loading from "$components/Loading.svelte";
 
   const t = useTranslations();
+
+  let fileUploadModal: HTMLDialogElement | undefined = $state();
+  let inputFile: File | undefined = $state();
 
   let knowledgeBaseTitle = $state("");
   let knowledgeBaseText = $state("");
@@ -15,38 +23,69 @@
     knowledgeBaseId?: string | undefined;
     knowledgeBase?: any | undefined;
     isEditable?: boolean;
+    mode?: "create" | "update" | "clone";
   }
 
   let {
     knowledgeBaseId = undefined,
     knowledgeBase = undefined,
     isEditable = false,
+    mode: screenMode,
   }: Props = $props();
+
+  let mode = $state(screenMode ?? (knowledgeBase ? "update" : "create"));
 
   let isSaving = $state(false);
   let isFormValid = $derived(
-    knowledgeBaseTitle.trim() !== "" && knowledgeBaseText.trim() !== "",
+    knowledgeBaseTitle !== "" &&
+      knowledgeBaseText.trim() !== "" &&
+      knowledgeBaseText.trim() !== "<p></p>",
   );
 
   onMount(async function () {
     if (knowledgeBase) {
       knowledgeBaseTitle = knowledgeBase.title;
-      knowledgeBaseText = knowledgeBase.knowledge_base;
+      if (mode == "clone") {
+        knowledgeBaseTitle =
+          knowledgeBaseTitle?.trim() + " (" + t("common.copy") + ")";
+      }
+      knowledgeBaseText = formatMarkdown(knowledgeBase.knowledge_base);
     }
   });
 
-  async function saveInstruction() {
+  async function extractFileContent() {
+    const formData = new FormData();
+    formData.append("file", inputFile as File);
+
+    $loading = true;
+    const { data, error } =
+      await actions.knowledgebase.extractFileContent(formData);
+    if (error) {
+      addToast({
+        message: "Something went wrong",
+        type: "error",
+      });
+    } else {
+      knowledgeBaseText = data.text;
+    }
+
+    $loading = false;
+  }
+
+  async function saveKnowledgeBase() {
     if (!isFormValid) return;
     isSaving = true;
     try {
-      const newInstruction: CreateKnowledgeBaseParams = {
+      const newKnowledgeBase: CreateKnowledgeBaseParams = {
         title: knowledgeBaseTitle,
         knowledge_base: knowledgeBaseText,
         ...(knowledgeBaseId && { _id: knowledgeBaseId }),
       };
+
+      let httpMethod = mode == "update" ? "PUT" : "POST";
       const response = await fetch("/api/knowledge-base.json", {
-        method: knowledgeBase ? "PUT" : "POST",
-        body: JSON.stringify(newInstruction),
+        method: httpMethod,
+        body: JSON.stringify(newKnowledgeBase),
         headers: {
           "Content-Type": "application/json",
         },
@@ -60,7 +99,8 @@
       }
 
       const data = await response.json();
-      window.history.back();
+      window.location.replace("/prompt-library/knowledge-base");
+
       addToast({
         message: data.message,
         type: "success",
@@ -83,13 +123,23 @@
       <button class="mr-4" onclick={() => window.history.back()}>
         {@html svgIcons.back}
       </button>
-      <h1 class="text-4xl font-bold">
-        {#if knowledgeBase}
-          {t("prompt-library.knowledgebase.edit")}
-        {:else}
-          {t("prompt-library.knowledgebase.add")}
-        {/if}
-      </h1>
+      <div class="w-full grid grid-cols-1 md:grid-cols-[1fr_max-content] gap-8">
+        <h1 class="text-4xl font-bold">
+          {#if knowledgeBase}
+            {t("prompt-library.knowledgebase.edit")}
+          {:else}
+            {t("prompt-library.knowledgebase.add")}
+          {/if}
+        </h1>
+        <button
+          class="btn btn-neutral font-normal grow-0"
+          onclick={() => {
+            fileUploadModal?.showModal();
+          }}
+        >
+          {t("prompt-library.knowledgebase.file-import")}
+        </button>
+      </div>
     </div>
     <form class="rounded pt-6 mb-4 space-y-6">
       <div class="grid grid-cols-1 gap-4 justify-center">
@@ -106,18 +156,14 @@
 
       <div class="mb-4">
         <p class="mb-2">{t("prompt-library.add.knowledgebase.text")}*</p>
-        <textarea
-          bind:value={knowledgeBaseText}
-          placeholder="e.g. type knowledge base details..."
-          class="input input-bordered min-w-xs shadow appearance-none min-h-96 w-full py-2 px-3"
-        ></textarea>
+        <TextEditor bind:html={knowledgeBaseText} />
       </div>
 
       {#if isEditable}
         <div class="flex items-center justify-between">
           <button
             class={`btn btn-active btn-primary px-8 font-normal ${(!isFormValid || isSaving) && "btn-disabled"}`}
-            onclick={preventDefault(saveInstruction)}
+            onclick={preventDefault(saveKnowledgeBase)}
           >
             {#if isSaving}
               <span class="loading loading-spinner"></span>
@@ -131,3 +177,11 @@
     </form>
   </div>
 </div>
+
+<Loading bind:show={$loading} />
+
+<ImportFileDialog
+  bind:modal={fileUploadModal}
+  bind:file={inputFile}
+  confirm={extractFileContent}
+/>

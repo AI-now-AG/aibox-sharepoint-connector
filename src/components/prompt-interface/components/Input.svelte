@@ -11,7 +11,6 @@
     formatCitations,
     stripHtmlFormatting,
   } from "$utils/common";
-
   const t = useTranslations();
 
   interface Props {
@@ -20,6 +19,7 @@
     output?: string;
     isProcessing?: boolean;
     isDisableFileInput?: boolean;
+    inputText?: string;
   }
 
   let {
@@ -28,9 +28,14 @@
     output = $bindable(""),
     isProcessing = $bindable(false),
     isDisableFileInput = false,
+    inputText: initText = "",
   }: Props = $props();
 
   let inputText = $state("");
+
+  $effect(() => {
+    inputText = initText;
+  });
 
   const fileTypes = {
     "audio/*": ["audio/mp3"],
@@ -41,10 +46,6 @@
       "application/x-subrip",
       "text/tab-separated-values",
     ],
-    "image/*": ["image/svg+xml", "image/png", "image/jpeg"],
-  };
-
-  const imageTypes = {
     "image/*": ["image/svg+xml", "image/png", "image/jpeg"],
   };
 
@@ -175,6 +176,16 @@
   function clearText() {
     inputText = "";
   }
+
+  let textarea: HTMLTextAreaElement;
+  export function adjustHeightByContent() {
+    setTimeout(() => {
+      if (textarea) {
+        textarea.style.height = "auto";
+        textarea.style.height = `${textarea.scrollHeight}px`;
+      }
+    }, 0);
+  }
 </script>
 
 <div
@@ -187,10 +198,12 @@
       class={`textarea textarea-ghost ${
         $sharedMessageHistory.length > 0 ? `h-[70px]` : `h-24`
       } w-full focus:outline-none focus:border-base-100 text-base`}
-      placeholder="Your input..."
-      bind:value={inputText}
+      placeholder={t("prompt-library.input-placeholder")}
       onkeydown={onKeyDown}
+      bind:this={textarea}
+      bind:value={inputText}
     ></textarea>
+
     <!-- svelte-ignore a11y_consider_explicit_label -->
     <button
       type="button"

@@ -11,6 +11,7 @@ import KnowledgeBaseModel, {
   type KnowledgeBase,
 } from "$data/models/knowledgeBase.model";
 import initializeOpenAI from "$utils/chatModel";
+import Perplexity from "$llm/Perplexity";
 
 const CreatePromptParamsSchema = z.object({
   _id: z.string().optional(),
@@ -20,6 +21,7 @@ const CreatePromptParamsSchema = z.object({
   instructions: z.array(z.string().optional()).optional(),
   knowledgebase: z.array(z.string().optional()),
   prompt: z.string(),
+  predefined_input: z.string().optional(),
   model: z.string().nullish(),
   documents: z.array(z.string()).optional(),
 });
@@ -50,7 +52,14 @@ const generatePromptDescription = async (ctx: APIContext, prompt: string) => {
 
   const messages = [new SystemMessage(instructions), new HumanMessage(prompt)];
   const parser = new StringOutputParser();
-  const result = await model.invoke(messages);
+  let result;
+  if (model instanceof Perplexity) {
+    const res = await model.invoke(messages);
+    result = res.choices?.[0]?.message?.content ?? "";
+  } else {
+    result = await model.invoke(messages);
+  }
+
   const description = await parser.invoke(result);
 
   return description;
@@ -241,6 +250,7 @@ export const GET: APIRoute = async (ctx) => {
         })),
         category: prompt.category,
         group: prompt.group,
+        predefined_input: prompt.predefined_input,
       };
 
       return new Response(JSON.stringify(promptData));
