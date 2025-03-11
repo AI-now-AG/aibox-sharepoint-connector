@@ -30,6 +30,11 @@
     apiProvider.name == ApiKeyProvider.Perplexity,
   );
 
+  let textInputComponent: any;
+  function adjustHeightByContent() {
+    textInputComponent?.adjustHeightByContent();
+  }
+
   onMount(() => {
     const handleScroll = () => {
       const { scrollHeight, scrollTop, clientHeight } =
@@ -42,6 +47,9 @@
       }
     };
     window.addEventListener("scroll", handleScroll);
+    setTimeout(() => {
+      adjustHeightByContent();
+    }, 0);
   });
 
   const scrollToBottom = async () => {
@@ -50,11 +58,6 @@
       behavior: "smooth",
     });
   };
-
-  let textInputComponent: any;
-  function adjustHeightByContent() {
-    textInputComponent?.adjustHeightByContent();
-  }
 
   $effect(() => {
     if (selectedPromptId) {
