@@ -73,8 +73,8 @@ const auth0Webhook: Handler = async (
 
         // Send welcome email for social login
         if (["windowslive", "google-oauth2"].includes(data.connection)) {
-          const { user_name: email, user_id: userId } = data.details.prompts[1];
-          await triggerWelcomeEmail(userId, email, data.connection);
+          const { user_name: email, user_id: userId, connection } = data;
+          await triggerWelcomeEmail(userId, email, connection);
         }
       }
 
