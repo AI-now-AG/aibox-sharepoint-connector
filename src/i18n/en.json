@@ -323,7 +323,5 @@
   "onboarding.step-3.title": "Transcribe your audio",
   "onboarding.step-3.description": "Simply upload an audio file and get the text extracted – works even with Swiss German!<br/><br/>\nIn the paid version, you can further enhance the text quality to meet your specific needs.",
   "tenant.trial": "Trial tenant",
-  "tenant.this-is-free-trial-version": "This is a free trial version,",
-  "tenant.contact-us": "contact us",
-  "tenant.to-upgrade": "to upgrade"
+  "tenant.trial-message": " This is a free trial version, <a href=\"/\" target=\"_blank\" class=\"font-normal text-blue-600 hover:underline\">contact us</a> to upgrade."
 }
