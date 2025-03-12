@@ -86,9 +86,15 @@ const transcriptionsEnriched: AudioCardItem[] = transcriptionsFiltered.map(
   <div
     class="container max-w-5xl mx-auto p-6 grid grid-cols-3 md:grid-cols-[1fr_max-content] items-center gap-8"
   >
-    <h1 class="text-4xl font-bold">
-      {t("nav.settings.audio")}
-    </h1>
+    <div class="flex items-center pt-2 pb-6">
+      <button class="mr-4" onclick="history.back()">
+        <img src="/src/assets/icons/back.svg" alt="Back" class="w-6 h-6" />
+      </button>
+
+      <h1 class="text-4xl font-bold">
+        {t("nav.settings.audio")}
+      </h1>
+    </div>
     <div class="flex items-center space-x-2">
       {
         userPermissions.includes(Permission.AdminAll) && (

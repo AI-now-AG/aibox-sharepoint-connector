@@ -81,7 +81,8 @@
 
   let languageLocales: Item[] = $state([
     { title: "Deutsch (Schweiz)", checked: true, locales: "de-ch" },
-    { title: "Französisch (Schweiz)", checked: true, locales: "fr-ch" },
+    { title: "Deutsch (Deutschland)", checked: true, locales: "de-de" },
+    { title: "Französisch (Schweiz)", checked: false, locales: "fr-ch" },
     { title: "Italienisch (Schweiz)", checked: false, locales: "it-ch" },
     { title: "Englisch (UK)", checked: false, locales: "en-gb" },
   ]);

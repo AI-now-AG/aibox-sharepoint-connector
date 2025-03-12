@@ -65,7 +65,7 @@
   class:pointer-events-none={!isEditable}
   out:fade
 >
-  <div class="card-body space-y-2 justify-between">
+  <div class="card-body space-y-2">
     <div class="flex justify-between">
       {#if item.tags}
         <div class="card-actions justify-start">

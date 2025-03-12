@@ -35,7 +35,9 @@ if (typeParam === TranscriptionType.Plaintext) {
   defaultCategory = AudioCategory.AudioPro;
 }
 
-const predefinedCategory = selectedTranType.filter((tran) => transcriptionTypes?.includes(tran))
+const predefinedCategory = selectedTranType.filter((tran) =>
+  transcriptionTypes?.includes(tran),
+);
 
 if (selectedUsecase) {
   defaultCategory = selectedUsecase.category;
@@ -45,17 +47,15 @@ let userPermissions = Astro.locals.user.permissions;
 ---
 
 <Layout>
-  <div>
-    <UpdateForm
-      preDefineCategory={predefinedCategory}
-      instructionTitle={selectedUsecase?.name}
-      instructionText={selectedUsecase?.text}
-      category={defaultCategory}
-      isEnabled={selectedUsecase?.enabled}
-      isNew={!selectedUsecase}
-      selectedUsecaseId={selectedUsecase?._id.toString()}
-      isEditable={userPermissions.includes(Permission.AdminAll)}
-      client:load
-    />
-  </div>
+  <UpdateForm
+    preDefineCategory={predefinedCategory}
+    instructionTitle={selectedUsecase?.name}
+    instructionText={selectedUsecase?.text}
+    category={defaultCategory}
+    isEnabled={selectedUsecase?.enabled}
+    isNew={!selectedUsecase}
+    selectedUsecaseId={selectedUsecase?._id.toString()}
+    isEditable={userPermissions.includes(Permission.AdminAll)}
+    client:load
+  />
 </Layout>

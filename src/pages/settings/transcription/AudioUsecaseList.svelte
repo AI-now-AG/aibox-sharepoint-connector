@@ -32,12 +32,14 @@
   let timeout: any = $state();
 
   async function editCard(index: number) {
-    const selectedEditPromptId = items[index]?.id ?? "";
     const params = new URLSearchParams({
       type: typeParam,
-      id: selectedEditPromptId,
+      id: items[index]?.id || "",
     });
-    window.location.href = `/settings/transcription/UsecaseForm?${params.toString()}`;
+
+    window.location.assign(
+      `/settings/transcription/UsecaseForm?${params.toString()}`,
+    );
   }
   function onDeleteCard(index: number) {
     selectedDeletePromptId = items[index]?.id ?? "";
@@ -62,6 +64,7 @@
         message: t("settings.transcription.delete.success"),
         type: "success",
       });
+      reloadPage();
     } catch (error) {
       hideLoading();
       addToast({
