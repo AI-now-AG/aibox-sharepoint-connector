@@ -25,6 +25,7 @@ export const lucia = new Lucia(adapter, {
       name: attributes.name,
       tenant_id: attributes.tenant_id,
       email: attributes.email,
+      email_verified: attributes.email_verified,
       picture: attributes.picture,
       roles: attributes.roles,
       permissions: attributes.permissions,

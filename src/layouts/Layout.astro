@@ -5,6 +5,7 @@ import Head from "./Head.astro";
 import Navigation from "$components/nav/Navigation.astro";
 import OnboardingTour from "$components/OnboardingTour.svelte";
 import TrialComponent from "$components/TrialComponent.svelte";
+import RestrictUnverifiedUser from "$components/RestrictUnverifiedUser.svelte";
 import "$styles/global.css";
 
 import { useTranslations } from "$i18n/utils";
@@ -67,6 +68,7 @@ const tenant = Astro.locals.tenant;
       </div>
     </div>
     <OnboardingTour user={userInfo} client:load />
+    <RestrictUnverifiedUser user={userInfo} client:load />
     <TrialComponent {tenant} client:load />
   </body>
 </html>
