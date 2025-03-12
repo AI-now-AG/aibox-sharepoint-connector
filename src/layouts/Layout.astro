@@ -4,6 +4,7 @@ import Footer from "$components/Footer.astro";
 import Head from "./Head.astro";
 import Navigation from "$components/nav/Navigation.astro";
 import OnboardingTour from "$components/OnboardingTour.svelte";
+import TrialComponent from "$components/TrialComponent.svelte"
 import "$styles/global.css";
 
 import { useTranslations } from "$i18n/utils";
@@ -65,5 +66,6 @@ const userInfo = { ...user, id: user.id.toString() };
       </div>
     </div>
     <OnboardingTour user={userInfo} client:load />
+    <TrialComponent user={userInfo} client:load />
   </body>
 </html>
