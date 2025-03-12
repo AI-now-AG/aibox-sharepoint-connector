@@ -15,7 +15,7 @@
 
 {#if tenant?.is_trial}
   <div
-    class="fixed bottom-4 right-4 bg-green-300 text-sm text-gray-800 p-2 pl-4 pr-4 rounded-md shadow-lg"
+    class="fixed bottom-4 right-4 bg-green-300 text-sm text-gray-800 max-w-lg p-2 pl-4 pr-4 rounded-md shadow-lg"
   >
     {@html t("tenant.trial-message")}
   </div>

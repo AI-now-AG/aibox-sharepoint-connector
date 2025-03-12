@@ -327,5 +327,5 @@
   "tenant.contact-us": "contact us",
   "tenant.to-upgrade": "to upgrade",
   "tenant.trial-message": " This is a free trial version, <a href=\"/\" target=\"_blank\" class=\"font-normal text-blue-600 hover:underline\">contact us</a> to upgrade.",
-  "user.trial": "Please verify your email address. Unverified emails will be deleted within 24 hours.  <a href=\"/verify-email\" class=\"font-normal text-blue-600 underline\">Click here</a> o resend email verification links"
+  "user.unverified-email-message": "Please verify your email address. Unverified emails will be deleted within 24 hours.  <a href=\"${url}\" class=\"font-normal text-blue-600 underline\">Click here</a> o resend email verification links"
 }
