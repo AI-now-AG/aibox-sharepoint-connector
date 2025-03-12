@@ -356,6 +356,7 @@ const updateUserAttributesInDatabase = async (
   userId: string,
   attributes: any,
 ) => {
+  console.log(`Update user attributes`, { userId, attributes });
   const localUser = await UserModel.getAuth0Sub(userId);
 
   try {
