@@ -16,7 +16,6 @@
   let tenants: any = $state([]);
   let showArchived: boolean = $state(false);
   let searchValue: string = $state("");
-  let timeout: any;
 
   let selectedTenant: any = $state(null);
   let confirmUpdateModal: HTMLDialogElement | undefined = $state();
@@ -151,6 +150,9 @@
               >{t("tenant.tenants.tenant.name")}</th
             >
             <th class="py-3 px-4 text-left font-normal text-xs"
+              >{t("tenant.trial")}</th
+            >
+            <th class="py-3 px-4 text-left font-normal text-xs"
               >{t("tenant.tenants.tenant.date-added")}</th
             >
             <th class="py-3 px-4 text-left font-normal text-xs"
@@ -176,6 +178,11 @@
                   class="mx-1 self-center"
                   onclick={() => copyName(tenant.org_name)}
                   >{@html svgIcons.copy}</button
+                >
+              </td>
+              <td class="py-3 px-4">
+                <span class="text-red-600 text-sm font-medium"
+                  >{tenant.is_trial ? t("common.yes") : ""}</span
                 >
               </td>
               <td class="py-3 px-4 text-sm font-medium">{tenant.created_at}</td>
