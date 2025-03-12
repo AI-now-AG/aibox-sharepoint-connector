@@ -140,6 +140,13 @@
 </script>
 
 <style>
+  :global(.driver-popover.driverjs-theme .driver-popover-description ul) {
+    list-style-type: disc;
+  }
+
+  :global(.driver-popover.driverjs-theme .driver-popover-description ul li) {
+    margin-left: 2vw;
+  }
   :global(.driver-popover.driverjs-theme .driver-popover-title) {
     color: #491eff;
     margin-bottom: 2vh;
