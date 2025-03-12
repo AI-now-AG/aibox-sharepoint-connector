@@ -19,7 +19,7 @@ import UserModel, { assignPermissions } from "$data/models/user.model";
 import PromptModel from "$data/models/prompt.model";
 import CategoryModel from "$data/models/category.model";
 import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
-import { ApiKeyProvider, AudioCategory } from "$types/TenantFeature";
+import { AudioCategory } from "$types/TenantFeature";
 import { EncryptedUserPassword, UserRole } from "$enums/Users";
 
 const TenantInputParamsSchema = z.object({
@@ -46,6 +46,7 @@ const TenantInputParamsSchema = z.object({
     .boolean()
     .optional()
     .default(() => false),
+  is_trial: z.boolean().optional().default(false),
   tenant_admin_email: z.string().optional(),
 });
 
@@ -323,7 +324,12 @@ export const tenant = {
   encryptApiKeys: defineAction({
     input: TenanKeyEncryptSchema,
     handler: async (input) => {
-      const { openai_api_key, azure_openai_api_key, perplexity_api_key, speech_api_key } = input;
+      const {
+        openai_api_key,
+        azure_openai_api_key,
+        perplexity_api_key,
+        speech_api_key,
+      } = input;
       if (openai_api_key) {
         input.openai_api_key = encrypt(openai_api_key);
       }

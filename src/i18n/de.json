@@ -321,5 +321,6 @@
   "onboarding.step-2.title": "Führe direkt deine Anwendungen aus",
   "onboarding.step-2.description": "Wie bei ChatGPT, aber mit besseren und konsistenten Resultaten durch vorgegebene Informationen in deinen Anwendungen!",
   "onboarding.step-3.title": "Erstelle Text aus deinem Audio",
-  "onboarding.step-3.description": "Ganz einfach Audio-Datei hochladen und daraus den Text erhalten. Klappt auch mit schweizerdeutschen Texten!<br/><br/>In der bezahlten Version kannst du auch hier die Qualität der Texte auf deine Bedürfnisse weiter verbessern."
+  "onboarding.step-3.description": "Ganz einfach Audio-Datei hochladen und daraus den Text erhalten. Klappt auch mit schweizerdeutschen Texten!<br/><br/>In der bezahlten Version kannst du auch hier die Qualität der Texte auf deine Bedürfnisse weiter verbessern.",
+  "tenant.trial": "Trial tenant"
 }

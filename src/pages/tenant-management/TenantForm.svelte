@@ -39,6 +39,8 @@
     azureSpeechKey = "",
   }: Props = $props();
 
+  console.log("tenant", tenant);
+
   let addTanantAdminModal: HTMLDialogElement | undefined = $state();
   let confirmUpdateModal: HTMLDialogElement | undefined = $state();
   let alertModal: HTMLDialogElement | undefined = $state();
@@ -95,10 +97,6 @@
           (item) => item.value == findTextProvider.provider,
         ) || providerValues[0];
     }
-
-    // isAudioToTextChecked = tenantData.included_features.some(
-    //   (item: any) => item.name == TenantFeature.AudioToText,
-    // );
   }
 
   let hex = tenantData?.primary_color || "#491EFF";
@@ -169,26 +167,8 @@
       .join(", "),
   );
 
-  if (tenantData && tenantData.transcription_types?.length) {
-    //   isAzureAudioProEnabled = tenantData.transcription_types.some(
-    //     (item: any) =>
-    //       item === AudioCategory.AudioPro || item === AudioCategory.SubtitleLarge,
-    //   );
-  }
-
   if (tenantData) {
-    // const findTextProvider = tenantData.api_key_providers.find(
-    //   (item: any) => item.name == ApiKeyProvider.OpenAI,
-    // );
-    // if (findTextProvider) {
-    //   textSelectedProvider =
-    //     providerValues.find(
-    //       (item) => item.value == findTextProvider.provider,
-    //     ) || providerValues[0];
-    // }
-
     const { api_key_providers = [], included_features = [] } = tenantData;
-
     const findProvider = (provider: ApiKeyProvider) =>
       api_key_providers.some(
         (item: any) => item.name === provider && item.active,
@@ -204,6 +184,7 @@
         (item: any) => item.name === TenantFeature.AudioToText,
       )?.provider;
 
+    // svelte-ignore state_referenced_locally
     if (defaultTextFeature) {
       openAIEnabled ||= defaultTextFeature === ApiKeyProvider.OpenAI;
       azureOpenAIEnabled ||= defaultTextFeature === ApiKeyProvider.AzureOpenAI;
@@ -1148,13 +1129,10 @@
         <div class="bg-base-100 shadow rounded-lg my-4">
           <div class="flex p-4 items-center justify-between">
             <div class="flex items-center justify-between">
-              <label class="label cursor-pointer" for="disable-create-user">
+              <label class="label cursor-pointer" for="">
                 <span class="label-text"
                   >{t("tenant.text.improvement.llm")}</span
                 >
-                <!-- <span class="text-sm font-semibold"
-                >{t("tenant.text.improvement.llm")}</span
-              > -->
               </label>
             </div>
             <div class="flex gap-4">
@@ -1180,59 +1158,6 @@
       </div>
     </div>
 
-    <!-- Included features -->
-    <!-- <div class="mb-3 mt-4"><b>{t("tenant.included-featured")}</b></div> -->
-
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <!-- <div class="w-full bg-white rounded px-4 py-2">
-      <div class="flex items-center">
-        <input
-          id="feature-text-prompt"
-          type="checkbox"
-          checked={true}
-          class="checkbox checkbox-primary"
-          value="text-prompt"
-          disabled
-        />
-        <label class="label cursor-pointer ml-2" for="feature-text-prompt">
-          <span class="label-text">{t("tenant.text-prompt")}</span>
-        </label>
-      </div>
-      {#each providerValues as option}
-        <div class="flex items-center mt-2 px-4">
-          <input
-            type="radio"
-            id="radio-text-{option.value}"
-            name="text-prompt-provider"
-            class="radio radio-primary"
-            value={option}
-            bind:group={textSelectedProvider}
-          />
-          <label
-            for="radio-text-{option.value}"
-            class="ml-2 font-medium text-sm">{option.label}</label
-          >
-        </div>
-      {/each}
-    </div> -->
-
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <!-- <div class="w-full bg-white rounded px-4 py-2 mt-4">
-      <div class="flex items-center">
-        <input
-          id="feature-audio-to-text"
-          type="checkbox"
-          class="checkbox checkbox-primary"
-          value="audio-to-text"
-          bind:checked={isAudioToTextChecked}
-        />
-        <label class="label cursor-pointer ml-2" for="feature-audio-to-text">
-          {@html svgIcons.audioToText}
-          <span class="label-text ml-2">{t("tenant.audio-to-text")}</span>
-        </label>
-      </div>
-    </div> -->
-
     <div class="w-full h-0.5 mt-4 mb-6 bg-gray-400/20"></div>
 
     <div class="mb-3 flex flex-row items-center gap-2">
@@ -1241,7 +1166,6 @@
     </div>
 
     <div class="container mx-auto">
-      <!-- User Managment Section -->
       <div class="bg-base-100 shadow rounded-lg my-4">
         <div class="flex p-4 items-center justify-between">
           <div class="flex items-center">
@@ -1249,13 +1173,32 @@
               id="disable-create-user"
               type="checkbox"
               class="checkbox checkbox-primary"
-              value="disbale-create-user"
+              value="disable-create-user"
               bind:checked={tenantData.is_restrict_user_managment}
             />
             <label class="label cursor-pointer ml-2" for="disable-create-user">
               <span class="label-text ml-2"
                 >{t("tenant.restrict-user-managment")}</span
               >
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container mx-auto">
+      <div class="bg-base-100 shadow rounded-lg my-4">
+        <div class="flex p-4 items-center justify-between">
+          <div class="flex items-center">
+            <input
+              id="is-trial-tenant"
+              type="checkbox"
+              class="checkbox checkbox-primary"
+              value="is-trial-tenant"
+              bind:checked={tenantData.is_trial}
+            />
+            <label class="label cursor-pointer ml-2" for="is-trial-tenant">
+              <span class="label-text ml-2">{t("tenant.trial")}</span>
             </label>
           </div>
         </div>

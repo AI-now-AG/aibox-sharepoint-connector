@@ -321,5 +321,6 @@
   "onboarding.step-2.title": "Execute your use cases",
   "onboarding.step-2.description": "Like ChatGPT, but with better and more consistent results thanks to predefined information in your applications!",
   "onboarding.step-3.title": "Transcribe your audio",
-  "onboarding.step-3.description": "Simply upload an audio file and get the text extracted – works even with Swiss German!<br/><br/>\nIn the paid version, you can further enhance the text quality to meet your specific needs."
+  "onboarding.step-3.description": "Simply upload an audio file and get the text extracted – works even with Swiss German!<br/><br/>\nIn the paid version, you can further enhance the text quality to meet your specific needs.",
+  "tenant.trial": "Trial tenant"
 }
