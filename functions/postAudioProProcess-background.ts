@@ -9,12 +9,11 @@ import { processTranscriptionResult, updateStatus } from "./utils/batchTranscrip
 import { decrypt } from "$utils/secure";
 import {
   FileFormat,
-  TranscriptionType,
   type TranscribeRequest,
 } from "$types/TranscribeRequest";
 import TenantModel, { type Tenant } from "$data/models/tenant.model";
 import UserModel, { type User } from "$data/models/user.model";
-import { TenantFeature } from "$types/TenantFeature";
+import { AudioCategory, TenantFeature } from "$types/TenantFeature";
 
 const postAudioProProcess: Handler = async (
   event: HandlerEvent,
@@ -35,7 +34,7 @@ const postAudioProProcess: Handler = async (
       enableDiarization?: boolean;
       fileURL?: string;
       encryptedSpeechKey?: string;
-      typedTranscriptionType?: TranscriptionType;
+      typedCategory?: AudioCategory;
       selectedFileFormat?: FileFormat[];
       isShowImprovedTextPreview?: boolean;
     };
@@ -49,7 +48,7 @@ const postAudioProProcess: Handler = async (
       enableDiarization,
       fileURL,
       encryptedSpeechKey,
-      typedTranscriptionType,
+      typedCategory,
       selectedFileFormat,
       isShowImprovedTextPreview,
     } = body;
@@ -62,7 +61,7 @@ const postAudioProProcess: Handler = async (
       !uploadUrl ||
       !fileURL ||
       !encryptedSpeechKey ||
-      !typedTranscriptionType
+      !typedCategory
     ) {
       return {
         statusCode: 400,
@@ -70,7 +69,7 @@ const postAudioProProcess: Handler = async (
       };
     }
     if (
-      typedTranscriptionType === TranscriptionType.SubtitleLarge &&
+      typedCategory === AudioCategory.SubtitleLarge &&
       !selectedFileFormat
     ) {
       return {
@@ -91,7 +90,7 @@ const postAudioProProcess: Handler = async (
     );
 
     let outputURLs: { [key: string]: string } = {};
-    if (typedTranscriptionType === TranscriptionType.SubtitleLarge) {
+    if (typedCategory === AudioCategory.SubtitleLarge) {
       updateStatus({ uniqueName, name: "Creating Subtitle files" });
       const tenant = await TenantModel.get(tenantId);
       const user = await UserModel.get(userId);
@@ -102,7 +101,7 @@ const postAudioProProcess: Handler = async (
         uploadUrl,
         tenant || undefined,
         user || undefined,
-        typedTranscriptionType,
+        typedCategory,
         selectedFileFormat,
         isShowImprovedTextPreview,
         enableDiarization,
@@ -189,7 +188,7 @@ function createTranscribeRequest(
   tempUploadUrl: string,
   tenant?: Tenant,
   user?: User,
-  transcriptionType?: TranscriptionType,
+  typedCategory?: AudioCategory,
   selectedFileFormat?: FileFormat[],
   showTextPreviewChecked: boolean = false,
   isDiarizationEnabled?: boolean,
@@ -203,10 +202,9 @@ function createTranscribeRequest(
     fileName: uniqueName,
     uniqueName: uniqueName,
     uploadUrl: tempUploadUrl,
-    transcriptions: tenant?.transcriptions || {},
     tenantId: tenant?._id.toString() || "",
     userId: user?._id.toString() || "",
-    transcriptionType: transcriptionType,
+    category: typedCategory,
     selectedFileFormat: selectedFileFormat,
     isShowImprovedTextPreview: showTextPreviewChecked,
     apiKeyProvider: provider,

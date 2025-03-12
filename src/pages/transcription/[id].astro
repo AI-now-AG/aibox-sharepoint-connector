@@ -3,36 +3,52 @@ import Layout from "$layouts/Layout.astro";
 import { useTranslations } from "$i18n/utils";
 import TranscriptionForm from "./TranscriptionForm.svelte";
 import { TranscriptionType } from "$types/TranscribeRequest";
+import TranscriptionModel from "$data/models/transcription.model";
+import { AudioCategory } from "$types/TenantFeature";
 const t = useTranslations();
 
 const { id } = Astro.params;
 
-const selectedTranscriptionType =
+let selectedTranscriptionType =
   id && Object.values(TranscriptionType).includes(id as TranscriptionType)
     ? (id as TranscriptionType)
     : undefined;
-if (selectedTranscriptionType === undefined) {
+if (!id && selectedTranscriptionType === undefined) {
+  return Astro.redirect("/404");
+}
+
+const transcriptions = await TranscriptionModel.get(id);
+if (!transcriptions && selectedTranscriptionType === undefined) {
   return Astro.redirect("/404");
 }
 
 let title = t("tenant.audio-to-text");
 let description = t("settings.transcription.plaintext-description");
-if (selectedTranscriptionType === TranscriptionType.Summarize) {
+
+if (transcriptions?.category === AudioCategory.AudioToText) {
   title = t("settings.transcription.summarize-title");
   description = t("settings.transcription.summarize-description");
-} else if (selectedTranscriptionType === TranscriptionType.Subtitles) {
+  selectedTranscriptionType = TranscriptionType.Plaintext;
+} else if (
+  transcriptions?.category === AudioCategory.Subtitle ||
+  transcriptions?.category === AudioCategory.SubtitleJson ||
+  transcriptions?.category === AudioCategory.SubtitleLarge
+) {
   title = t("settings.transcription.subtitles-title");
   description = t("settings.transcription.subtitles-description");
-} else if (selectedTranscriptionType === TranscriptionType.Subtitlesjson) {
-  title = t("settings.transcription.subtitles-title-json");
-  description = t("settings.transcription.subtitles-description-json");
-} else if (selectedTranscriptionType === TranscriptionType.Largefile) {
+  // } else if (transcriptions.category === TranscriptionType.Subtitlesjson) {
+  //   title = t("settings.transcription.subtitles-title-json");
+  //   description = t("settings.transcription.subtitles-description-json");
+  selectedTranscriptionType = TranscriptionType.Subtitles;
+} else if (transcriptions?.category === AudioCategory.AudioPro) {
   title = t("settings.transcription.largefile-title");
   description = t("settings.transcription.largefile-description");
-} else if (selectedTranscriptionType === TranscriptionType.SubtitleLarge) {
-  title = t("settings.transcription.subtitle.largefile-title");
-  description = t("settings.transcription.subtitle.largefile-description");
+  selectedTranscriptionType = TranscriptionType.Largefile;
 }
+// else if (transcriptions.category === TranscriptionType.SubtitleLarge) {
+//   title = t("settings.transcription.subtitle.largefile-title");
+//   description = t("settings.transcription.subtitle.largefile-description");
+// }
 ---
 
 <Layout>
@@ -47,6 +63,8 @@ if (selectedTranscriptionType === TranscriptionType.Summarize) {
     <TranscriptionForm
       transcriptionType={selectedTranscriptionType}
       folderName={Astro.locals.tenant.org_name}
+      usecaseId={transcriptions?._id.toString()}
+      category={transcriptions?.category ?? AudioCategory.AudioPro}
       client:load
     />
   </div>

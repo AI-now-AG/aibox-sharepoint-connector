@@ -2,10 +2,11 @@
 import { useTranslations } from "$i18n/utils";
 import MenuItem from "./MenuItem.astro";
 import Category from "$data/models/category.model";
-import { TenantFeature } from "$types/TenantFeature";
+import { AudioCategory, TenantFeature } from "$types/TenantFeature";
 import { TranscriptionType } from "$types/TranscribeRequest";
 import { svgIcons } from "$assets/icons";
 import auth from "$auth/auth";
+import TranscriptionModel from "$data/models/transcription.model";
 
 const t = useTranslations();
 
@@ -31,37 +32,80 @@ const menuItems = categories.map((category, index) => ({
 const audioToTextMenus = [];
 const audioFeatureItems = [];
 
-if (auth.hasAudioPlaintext(Astro.locals)) {
+const transcriptions = await TranscriptionModel.listByTenant(
+  Astro.locals.user.tenant_id,
+);
+
+const transcriptionTypes = Astro.locals.tenant.transcription_types ?? [];
+
+const activeTranscriptions =
+  transcriptions?.filter(
+    (tran) =>
+      transcriptionTypes.includes(tran.category) && tran.enabled === true,
+  ) ?? [];
+
+const audioToTextTranscriptions = activeTranscriptions
+  .filter((tran) => tran.category == AudioCategory.AudioToText)
+  .map((tran) => ({
+    title: tran.name,
+    path: `/transcription/${tran._id.toString()}`,
+  }));
+
+const subtitleTranscriptions = activeTranscriptions
+  .filter(
+    (tran) =>
+      tran.category == AudioCategory.Subtitle ||
+      tran.category == AudioCategory.SubtitleJson ||
+      tran.category == AudioCategory.SubtitleLarge,
+  )
+  .map((tran) => ({
+    title: tran.name,
+    path: `/transcription/${tran._id.toString()}`,
+  }));
+
+if (audioToTextTranscriptions.length > 0) {
+  // audioFeatureItems.push({
+  //   title: t("nav.audiotool.audio-to-text"),
+  //   path: `/transcription/${TranscriptionType.Plaintext}`,
+  // });
   audioFeatureItems.push({
     title: t("nav.audiotool.audio-to-text"),
-    path: `/transcription/${TranscriptionType.Plaintext}`,
+    isOpened: navState["audio-menu-id-0"] ?? false,
+    items: audioToTextTranscriptions,
   });
 }
-if (auth.hasAudioSummary(Astro.locals)) {
-  audioFeatureItems.push({
-    title: t("settings.transcription.summarize-title"),
-    path: `/transcription/${TranscriptionType.Summarize}`,
-  });
-}
-if (auth.hasAudioSubtitles(Astro.locals)) {
+// if (auth.hasAudioSummary(Astro.locals)) {
+//   audioFeatureItems.push({
+//     title: t("settings.transcription.summarize-title"),
+//     path: `/transcription/${TranscriptionType.Summarize}`,
+//   });
+// }
+if (subtitleTranscriptions.length > 0) {
+  // audioFeatureItems.push({
+  //   title: t("settings.transcription.subtitles-title"),
+  //   path: `/transcription/${TranscriptionType.Subtitles}`,
+  // });
+
   audioFeatureItems.push({
     title: t("settings.transcription.subtitles-title"),
-    path: `/transcription/${TranscriptionType.Subtitles}`,
+    isOpened: navState["audio-menu-id-1"] ?? false,
+    items: subtitleTranscriptions,
   });
 }
-if (auth.hasAudioSubtitleLarge(Astro.locals)) {
-  audioFeatureItems.push({
-    title: t("settings.transcription.subtitle.largefile-title"),
-    path: `/transcription/${TranscriptionType.SubtitleLarge}`,
-  });
-}
-if (auth.hasAudioSubtitlesjson(Astro.locals)) {
-  audioFeatureItems.push({
-    title: t("settings.transcription.subtitles-title-json"),
-    path: `/transcription/${TranscriptionType.Subtitlesjson}`,
-  });
-}
-if (auth.hasAudioLargefile(Astro.locals)) {
+// if (auth.hasAudioSubtitleLarge(Astro.locals)) {
+//   audioFeatureItems.push({
+//     title: t("settings.transcription.subtitle.largefile-title"),
+//     path: `/transcription/${TranscriptionType.SubtitleLarge}`,
+//   });
+// }
+// if (auth.hasAudioSubtitlesjson(Astro.locals)) {
+//   audioFeatureItems.push({
+//     title: t("settings.transcription.subtitles-title-json"),
+//     path: `/transcription/${TranscriptionType.Subtitlesjson}`,
+//   });
+// }
+// if (auth.hasAudioLargefile(Astro.locals)) {
+if (transcriptionTypes.includes(AudioCategory.AudioPro)) {
   audioFeatureItems.push({
     title: t("settings.transcription.largefile-title"),
     path: `/transcription/${TranscriptionType.Largefile}`,
@@ -211,9 +255,27 @@ const modules = [...menuItems];
               </summary>
               {"items" in mod && (
                 <ul>
-                  {mod.items?.map((sub) => (
+                  {mod.items?.map((sub, id) => (
                     <li class="pl-1">
-                      <MenuItem {...sub} />
+                      {sub.items ? (
+                        <details
+                          data-id={`audio-menu-id-${id}`}
+                          open={sub.isOpened}
+                        >
+                          <summary>{sub.title}</summary>
+                          {sub.items.length > 0 && (
+                            <ul>
+                              {sub.items.map((sub1) => (
+                                <li class="pl-1">
+                                  <MenuItem {...sub1} />
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </details>
+                      ) : (
+                        <MenuItem {...sub} />
+                      )}
                     </li>
                   ))}
                 </ul>

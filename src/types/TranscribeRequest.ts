@@ -1,15 +1,13 @@
-import type { Transcriptions } from "$data/models/tenant.model";
-import { ApiKeyProvider } from "$types/TenantFeature";
+import { ApiKeyProvider, AudioCategory } from "$types/TenantFeature";
 
 export interface TranscribeRequest {
   folderName: string;
   fileName: string;
   uniqueName: string;
   uploadUrl: string;
-  transcriptions: Transcriptions;
   tenantId: string;
   userId: string;
-  transcriptionType?: TranscriptionType;
+  category?: AudioCategory;
   selectedFileFormat?: FileFormat[];
   isShowImprovedTextPreview?: boolean;
   apiKeyProvider?: ApiKeyProvider;
@@ -28,6 +26,7 @@ export interface TranscribeRequest {
   isDiarizationEnabled?: boolean;
   maxSpeakers?: number;
   languageLocales?: string[];
+  usecaseId?: string;
 }
 
 export enum FileFormat {
@@ -38,11 +37,11 @@ export enum FileFormat {
 }
 export enum TranscriptionType {
   Plaintext = "plaintext",
-  Summarize = "summary",
+  // Summarize = "summary",
   Subtitles = "subtitles",
-  Subtitlesjson = "subtitlesjson",
+  // Subtitlesjson = "subtitlesjson",
   Largefile = "largefile",
-  SubtitleLarge = "subtitlelarge",
+  // SubtitleLarge = "subtitlelarge",
 }
 
 export interface TranscriptionResult {

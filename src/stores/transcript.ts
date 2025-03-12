@@ -15,6 +15,7 @@ type TranscribeOptions = {
 type TranscriptEntry = {
   type: TranscriptionType;
   options: TranscribeOptions;
+  usecaseId: string;
 };
 
 const transcriptStore = writable<TranscriptEntry[]>([]);

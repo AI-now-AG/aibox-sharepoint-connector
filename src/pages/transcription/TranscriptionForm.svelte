@@ -10,17 +10,24 @@
   import { addToast } from "$stores/toast";
   import { type TranscribeRequest, FileFormat } from "$types/TranscribeRequest";
   import { TranscriptionType } from "$types/TranscribeRequest";
-  import { TenantFeature } from "$types/TenantFeature";
+  import { AudioCategory, TenantFeature } from "$types/TenantFeature";
   import { preventDefault } from "$utils/common";
   const t = useTranslations();
 
   type Item = { title: string; checked: boolean };
   interface Props {
-    folderName?: string;
     transcriptionType?: TranscriptionType | undefined;
+    folderName?: string;
+    usecaseId?: string;
+    category: AudioCategory;
   }
 
-  let { folderName = "", transcriptionType = undefined }: Props = $props();
+  let {
+    transcriptionType = undefined,
+    folderName = "",
+    usecaseId,
+    category,
+  }: Props = $props();
   // general
   let audioFile: File | undefined = $state();
   let audioDuration: string = $state("");
@@ -102,12 +109,12 @@
       $transcriptStore,
     );
 
-    if (transcriptionType == TranscriptionType.Largefile) {
+    if (category === AudioCategory.AudioPro) {
       maxFileSize = 1000;
       //maxFileSize = 25; // this is for testing purpose
     }
 
-    if (transcriptionType == TranscriptionType.SubtitleLarge) {
+    if (category === AudioCategory.SubtitleLarge) {
       maxFileSize = 50;
     }
 
@@ -116,7 +123,11 @@
     }
 
     transcriptStore.subscribe((value) => {
-      const entry = value.find((entry) => entry.type === transcriptionType);
+      const entry = value.find((entry) =>
+        usecaseId
+          ? entry.usecaseId === usecaseId
+          : entry.type === transcriptionType,
+      );
       if (entry) {
         let options = entry.options;
         if (
@@ -144,7 +155,7 @@
       }
     });
     acceptTypes =
-      transcriptionType === TranscriptionType.Subtitlesjson
+      category === AudioCategory.SubtitleJson
         ? acceptedTypesJSON.join(",")
         : acceptedTypes.join(",");
   });
@@ -159,9 +170,12 @@
   }
 
   function retrieveDataInStore(transcriptionType: TranscriptionType) {
-    const entry = $transcriptStore.find(
-      (entry) => entry.type === transcriptionType,
+    const entry = $transcriptStore.find((entry) =>
+      usecaseId
+        ? entry.usecaseId === usecaseId
+        : entry.type === transcriptionType,
     );
+
     if (entry) {
       let options = entry.options;
       audioFile = options.file;
@@ -240,7 +254,7 @@
       return false;
     }
     const acceptedFileTypes =
-      transcriptionType === TranscriptionType.Subtitlesjson
+      category === AudioCategory.SubtitleJson
         ? acceptedTypesJSON
         : acceptedTypes;
 
@@ -301,7 +315,7 @@
         fileNameWithoutExtension: fileNameWithoutExtension,
         fileExtension: fileExtension,
         folderName: folderName,
-        transcriptionType: transcriptionType,
+        category: category,
       }),
     });
     return await response.json();
@@ -401,7 +415,7 @@
     const { name, size, type } = audioFile;
     if (isFileValid({ name, size, type })) {
       // Calculate duration for audio/video file
-      if (transcriptionType !== TranscriptionType.Subtitlesjson) {
+      if (category !== AudioCategory.SubtitleJson) {
         audioDuration = await calculateDuration(audioFile);
       }
 
@@ -500,9 +514,9 @@
       if (response.ok) {
         tempOutputFileNames = [];
         if (
-          transcriptionType === TranscriptionType.Subtitles ||
-          transcriptionType === TranscriptionType.Subtitlesjson ||
-          transcriptionType === TranscriptionType.SubtitleLarge
+          category === AudioCategory.Subtitle ||
+          category === AudioCategory.SubtitleJson ||
+          category === AudioCategory.SubtitleLarge
         ) {
           selectedFileFormat.forEach((format) => {
             tempOutputFileNames.push(`${tempOutputFileName}.${format}`);
@@ -512,7 +526,11 @@
 
         if (transcriptionType) {
           transcriptStore.update((current) => [
-            ...current.filter((entry) => entry.type !== transcriptionType), // Remove old entry if it exists
+            ...current.filter((entry) =>
+              usecaseId
+                ? entry.usecaseId !== usecaseId
+                : entry.type !== transcriptionType,
+            ), // Remove old entry based on condition
             {
               type: transcriptionType,
               options: {
@@ -525,6 +543,7 @@
                 jsonUrl: "",
                 zipFile: "",
               },
+              usecaseId: usecaseId ?? "",
             },
           ]);
         }
@@ -569,10 +588,9 @@
       fileName: audioFile?.name || "",
       uniqueName: tempOutputFileName,
       uploadUrl: tempUploadUrl,
-      transcriptions: tenant?.transcriptions,
       tenantId: tenant?._id,
       userId: user?.id,
-      transcriptionType: transcriptionType,
+      category: category,
       selectedFileFormat: selectedFileFormat,
       isShowImprovedTextPreview: showTextPreviewChecked,
       apiKeyProvider: provider,
@@ -589,6 +607,7 @@
       languageLocales: languageLocales
         .filter((item) => item.checked)
         .map((item) => item.locales),
+      usecaseId: usecaseId,
     };
   }
 
@@ -604,12 +623,12 @@
           fileNames: tempOutputFileNames,
           folderName: folderName,
           isShowImprovedTextPreview:
-            transcriptionType === TranscriptionType.Subtitles ||
-            transcriptionType === TranscriptionType.Subtitlesjson ||
-            transcriptionType === TranscriptionType.SubtitleLarge
+            category === AudioCategory.Subtitle ||
+            category === AudioCategory.SubtitleJson ||
+            category === AudioCategory.SubtitleLarge
               ? showTextPreviewChecked
               : false,
-          typedTranscriptionType: transcriptionType,
+          typedCategory: category,
           isDiarizationEnabled: isDiarizationEnabled,
           encryptedSpeechKey: $tenant?.speech_api_key,
         }),
@@ -640,7 +659,11 @@
           checkDataAvaibility();
           if (transcriptionType) {
             transcriptStore.update((current) => [
-              ...current.filter((entry) => entry.type !== transcriptionType), // Remove old entry if it exists
+              ...current.filter((entry) =>
+                usecaseId
+                  ? entry.usecaseId !== usecaseId
+                  : entry.type !== transcriptionType,
+              ), // Remove old entry if it exists
               {
                 type: transcriptionType,
                 options: {
@@ -653,11 +676,15 @@
                   jsonUrl: result.json_file,
                   zipFile: result.zip_file,
                 },
+                usecaseId: usecaseId ?? "",
               },
             ]);
           }
           addToast({
-            message: `<a href="/transcription/${transcriptionType}">${t("transcription.transcription-is-ready")}</a>`,
+            message:
+              category === AudioCategory.AudioPro
+                ? `<a href="/transcription/${transcriptionType}">${t("transcription.transcription-is-ready")}</a>`
+                : `<a href="/transcription/${usecaseId}">${t("transcription.transcription-is-ready")}</a>`,
             type: "success",
             timeout: 5000,
           });
@@ -699,8 +726,8 @@
 
   function startPolling() {
     if (
-      transcriptionType === TranscriptionType.Largefile ||
-      transcriptionType === TranscriptionType.SubtitleLarge
+      category === AudioCategory.AudioPro ||
+      category === AudioCategory.SubtitleLarge
     ) {
       let fileSize = audioFile?.size;
       if (fileSize) {
@@ -723,7 +750,11 @@
   function startNew() {
     if (transcriptionType) {
       transcriptStore.update((current) =>
-        current.filter((entry) => entry.type !== transcriptionType),
+        current.filter((entry) =>
+          usecaseId
+            ? entry.usecaseId !== usecaseId
+            : entry.type !== transcriptionType,
+        ),
       );
     }
     reset();
@@ -960,16 +991,16 @@
               {@html t("transcription.input-file-upload-description")}
             </p>
             <p class="text-sm text-base-content/40 mt-1">
-              {#if transcriptionType === TranscriptionType.Subtitlesjson}
+              {#if category === AudioCategory.SubtitleJson}
                 {t("transcription.supportted-file-extensions-json")}
               {:else}
                 {t("transcription.supportted-file-extensions")}
               {/if}
             </p>
             <p class="text-xs text-base-content/40 mt-8">
-              {#if transcriptionType === TranscriptionType.Largefile}
+              {#if category === AudioCategory.AudioPro}
                 {t("transcription.maximum-capacity-1gb")}
-              {:else if transcriptionType === TranscriptionType.SubtitleLarge}
+              {:else if category === AudioCategory.SubtitleLarge}
                 {t("transcription.maximum-capacity-50mb")}
               {:else}
                 {t("transcription.maximum-capacity-25mb")}
@@ -1039,7 +1070,7 @@
       </div>
     {/if}
   </div>
-  {#if transcriptionType === TranscriptionType.Largefile}
+  {#if category === AudioCategory.AudioPro}
     <div class="bg-base-100 mt-10 p-4 px-6 rounded-xl">
       <div class="flex flex-col gap-4">
         <h2 class="font-normal">
@@ -1129,7 +1160,7 @@
     </div>
   {/if}
 
-  {#if transcriptionType === TranscriptionType.Subtitles || transcriptionType === TranscriptionType.Subtitlesjson || transcriptionType === TranscriptionType.SubtitleLarge}
+  {#if category === AudioCategory.Subtitle || category === AudioCategory.SubtitleJson || category === AudioCategory.SubtitleLarge}
     <div class="bg-base-100 mt-10 p-4 px-6 rounded-xl">
       <div class="grid">
         <h2>{t("audiotools.subtitles.what-output-do-you-need")}</h2>
@@ -1213,7 +1244,7 @@
               <div class="basis-1/8">03</div> -->
             </div>
           </div>
-          {#if transcriptionType === TranscriptionType.Subtitles || transcriptionType === TranscriptionType.SubtitleLarge}
+          {#if category === AudioCategory.Subtitle || category === AudioCategory.SubtitleLarge}
             <div><div class="bg-base-200 h-0.5"></div></div>
             <div class="card rounded-box grid py-8">
               <div class="flex flex-row place-items-center gap-8">
@@ -1269,7 +1300,7 @@
     </div>
   {/if}
 
-  {#if transcriptionType === TranscriptionType.SubtitleLarge}
+  {#if category === AudioCategory.SubtitleLarge}
     <div class="bg-base-100 mt-10 p-4 px-6 rounded-xl">
       <p class="mb-2">{t("audiotools.subtitles.languageSettings")}</p>
       <div class="flex flex-row items-center mt-4 space-x-4">
@@ -1384,8 +1415,7 @@
         disabled={!isUploaded ||
           !isFormValid ||
           isTranscribing ||
-          (transcriptionType === TranscriptionType.SubtitleLarge &&
-            selectedLangLength < 2)}
+          (category === AudioCategory.SubtitleLarge && selectedLangLength < 2)}
         onclick={transcribe}
         >{t("transciption.model.cta.start-transcribing")}</button
       >

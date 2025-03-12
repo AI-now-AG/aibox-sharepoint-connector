@@ -1,0 +1,61 @@
+---
+import Layout from "$layouts/Layout.astro";
+import { Permission } from "$enums/Users";
+import { TranscriptionType } from "$types/TranscribeRequest";
+import { AudioCategory } from "$types/TenantFeature";
+import UpdateForm from "$pages/settings/transcription/UpdateForm.svelte";
+import transcriptionModel from "$data/models/transcription.model";
+
+const { searchParams } = Astro.url;
+const typeParam = searchParams.get("type") as TranscriptionType;
+const selectedUsecaseId = searchParams.get("id") as string;
+
+if (!Object.values(TranscriptionType).includes(typeParam)) {
+  return Astro.redirect("/404");
+}
+const transcriptionTypes = Astro.locals.tenant?.transcription_types;
+
+const selectedUsecase = await transcriptionModel.get(selectedUsecaseId);
+
+let selectedTranType: AudioCategory[] = [];
+let defaultCategory: AudioCategory | undefined;
+
+if (typeParam === TranscriptionType.Plaintext) {
+  selectedTranType = [AudioCategory.AudioToText];
+  defaultCategory = AudioCategory.AudioToText;
+} else if (typeParam === TranscriptionType.Subtitles) {
+  selectedTranType = [
+    AudioCategory.Subtitle,
+    AudioCategory.SubtitleJson,
+    AudioCategory.SubtitleLarge,
+  ];
+  defaultCategory = AudioCategory.Subtitle;
+} else if (typeParam === TranscriptionType.Largefile) {
+  selectedTranType = [AudioCategory.AudioPro];
+  defaultCategory = AudioCategory.AudioPro;
+}
+
+const predefinedCategory = selectedTranType.filter((tran) => transcriptionTypes?.includes(tran))
+
+if (selectedUsecase) {
+  defaultCategory = selectedUsecase.category;
+}
+
+let userPermissions = Astro.locals.user.permissions;
+---
+
+<Layout>
+  <div>
+    <UpdateForm
+      preDefineCategory={predefinedCategory}
+      instructionTitle={selectedUsecase?.name}
+      instructionText={selectedUsecase?.text}
+      category={defaultCategory}
+      isEnabled={selectedUsecase?.enabled}
+      isNew={!selectedUsecase}
+      selectedUsecaseId={selectedUsecase?._id.toString()}
+      isEditable={userPermissions.includes(Permission.AdminAll)}
+      client:load
+    />
+  </div>
+</Layout>

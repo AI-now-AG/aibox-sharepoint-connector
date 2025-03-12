@@ -23,7 +23,7 @@ import {
   StorageSharedKeyCredential,
 } from "@azure/storage-blob";
 import type { UpdateStatusParams } from "$types/TranscribeStatusDB";
-import { TranscriptionType } from "$types/TranscribeRequest";
+import { AudioCategory } from "$types/TenantFeature";
 
 //const subscriptionKey = process.env.AZURE_LARGE_SPEECH_KEY || "";
 
@@ -35,7 +35,7 @@ export async function processTranscription(
   speechRegion: string,
   enableDiarization: boolean = false,
   numberOfMaxSpeakers: number = 2,
-  transcriptionType: TranscriptionType = TranscriptionType.Largefile,
+  category: AudioCategory = AudioCategory.AudioPro,
   languageLocales?: string[],
 ): Promise<{ transcriptionText: string }> {
   //): Promise<{ jsonData: TranscriptionResponse; transcriptionText: string }> {
@@ -54,7 +54,7 @@ export async function processTranscription(
       uniqueName,
       subscriptionKey,
       speechRegion,
-      transcriptionType,
+      category,
       languageLocales,
     );
     console.log("Created trancription task:" + taskResponse.self);
@@ -96,7 +96,7 @@ export async function createTranscriptionTask(
   uniqueName: string,
   subscriptionKey: string,
   speechRegion: string,
-  transcriptionType: TranscriptionType = TranscriptionType.Largefile,
+  category: AudioCategory = AudioCategory.AudioPro,
   languageLocales?: string[],
 ): Promise<PollStatusResponse> {
   const url = `https://${speechRegion}.api.cognitive.microsoft.com/speechtotext/v3.2/transcriptions`;
@@ -107,9 +107,9 @@ export async function createTranscriptionTask(
     contentUrls: [blobUrl],
     properties: {
       wordLevelTimestampsEnabled:
-        transcriptionType === TranscriptionType.SubtitleLarge ? true : false,
+        category === AudioCategory.SubtitleLarge ? true : false,
       displayFormWordLevelTimestampsEnabled:
-        transcriptionType === TranscriptionType.SubtitleLarge ? false : true,
+        category === AudioCategory.SubtitleLarge ? false : true,
       diarizationEnabled: enableDiarization,
       languageIdentification: {
         candidateLocales: languageLocales || [
