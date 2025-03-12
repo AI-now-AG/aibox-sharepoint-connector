@@ -20,6 +20,5 @@ export async function GET(context: APIContext): Promise<Response> {
   });
 
   const signupUrl = `${url.toString()}&screen_hint=signup`;
-  console.log("signupUrl", { signupUrl });
   return context.redirect(signupUrl);
 }

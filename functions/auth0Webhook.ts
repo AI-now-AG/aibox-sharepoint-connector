@@ -68,7 +68,7 @@ const auth0Webhook: Handler = async (
       if (eventType == "ss") {
         if (isPermittedConnection(data)) {
           await triggerRegistrationEmail(data);
-          await updateUserMetadata(data.user_id, { signup: true });
+          await updateAuth0UserMetadata(data.user_id, { signup: true });
         }
 
         // Send welcome email for social login
@@ -83,6 +83,12 @@ const auth0Webhook: Handler = async (
       if (eventType == "sv") {
         const { email, user_id: userId } = data.details.query;
         await triggerWelcomeEmail(userId, email, data.connection);
+
+        if (isPermittedChannel(data)) {
+          await updateUserAttributesInDatabase(userId, {
+            email_verified: true,
+          });
+        }
       }
 
       // Trigger 'Add members to an organization'
@@ -346,7 +352,23 @@ const updateUserRolesInDatabase = async (data: any) => {
   }
 };
 
-const updateUserMetadata = async (userId: string, update: any) => {
+const updateUserAttributesInDatabase = async (
+  userId: string,
+  attributes: any,
+) => {
+  const localUser = await UserModel.getAuth0Sub(userId);
+
+  try {
+    if (localUser) {
+      const update: Partial<User> = attributes;
+      await UserModel.update(localUser._id, update);
+    }
+  } catch (error: any) {
+    console.warn(`Updating user attributes error`, error);
+  }
+};
+
+const updateAuth0UserMetadata = async (userId: string, update: any) => {
   console.log(`Update user metadata`, { userId, update });
 
   try {
