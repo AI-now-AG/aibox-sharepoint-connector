@@ -49,6 +49,7 @@
         showButtons: ["next", "previous"],
         prevBtnText: t("onboarding.skip"),
         nextBtnText: t("onboarding.next"),
+        doneBtnText: t("onboarding.done"),
         onPrevClick: () => {
           driverObj.destroy();
         },
