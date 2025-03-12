@@ -84,11 +84,9 @@ const auth0Webhook: Handler = async (
         const { email, user_id: userId } = data.details.query;
         await triggerWelcomeEmail(userId, email, data.connection);
 
-        if (isPermittedChannel(data)) {
-          await updateUserAttributesInDatabase(userId, {
-            email_verified: true,
-          });
-        }
+        await updateUserAttributesInDatabase(userId, {
+          email_verified: true,
+        });
       }
 
       // Trigger 'Add members to an organization'
