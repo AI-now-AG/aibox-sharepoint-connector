@@ -1,8 +1,5 @@
 ---
-// Component
 import Layout from "$layouts/Layout.astro";
-//import { Image } from "astro:assets";
-//import Card from "$components/content/Card.astro";
 import { actions } from "astro:actions";
 import ChatWidget from "$pages/home/ChatWidget.svelte";
 import { getCollection } from "astro:content";
@@ -54,10 +51,6 @@ if (onboarding) {
         <h1 class="text-4xl font-bold mt-9 mb-4">
           {t("home.welcome", { name: Astro.locals.user.name })}
         </h1>
-        <!--
-        <h1 class="text-4xl font-bold mt-9 mb-4">{t("welcome.title")}</h1>
-        <p class="text-xl text-base-content/60">{t("welcome.text")}</p>
-         -->
       </div>
 
       <div
@@ -65,13 +58,6 @@ if (onboarding) {
       >
         {
           allContent.map((content) => (
-            // <Card
-            //   title={content.data.title}
-            //   lead={content.data.lead}
-            //   href={`/content/${content.slug}`}
-            // >
-            //   <Image src={content.data.image} alt={content.data.imageAlt} />
-            // </Card>
             <a href={`/content/${content.slug}`} class="btn btn-primary btn-sm">
               {content.data.title}
             </a>
