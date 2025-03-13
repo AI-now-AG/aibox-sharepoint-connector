@@ -378,6 +378,7 @@
           speech_api_key,
         } = data;
 
+        cleanupValues();
         // API Keys
         tenantData.openai_api_key = openai_api_key;
         tenantData.azure_openai_api_key = azure_openai_api_key;
@@ -456,6 +457,7 @@
           speech_api_key,
         } = data;
 
+        cleanupValues();
         // API Keys
         tenantData.openai_api_key = openai_api_key;
         tenantData.azure_openai_api_key = azure_openai_api_key;
@@ -517,6 +519,21 @@
       } catch (error: any) {
         showAlert(error?.toString());
       }
+    }
+  }
+
+  function cleanupValues() {
+    if (!tenantData.azure_openai_endpoint) {
+      delete tenantData.azure_openai_endpoint;
+    }
+    if (!tenantData.azure_openai_instance_name) {
+      delete tenantData.azure_openai_instance_name;
+    }
+    if (!tenantData.azure_openai_whisper_model) {
+      delete tenantData.azure_openai_whisper_model;
+    }
+    if (!tenantData.azure_openai_chat_model) {
+      delete tenantData.azure_openai_chat_model;
     }
   }
 
