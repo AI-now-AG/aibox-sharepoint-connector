@@ -95,7 +95,9 @@ export async function GET(context: APIContext): Promise<Response> {
       await syncAllOrganizationUsers(auth0User.data.org_id, userId.toString());
     });
   } else {
-    await syncOrganizationUser(auth0User.data.sub);
+    setImmediate(async () => {
+      await syncOrganizationUser(auth0User.data.sub);
+    });
   }
 
   const session = await lucia.createSession(userId, {});
