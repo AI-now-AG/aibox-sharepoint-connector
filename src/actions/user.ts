@@ -13,7 +13,7 @@ import usersManagement from "$data/auth0/users-manager";
 import organizationsManagement from "$data/auth0/organizations-manager";
 import rolesManagement from "$data/auth0/roles-manager";
 import { isEnterpriseConnection } from "$utils/common";
-import { EncryptedUserPassword, UserRole } from "$enums/Users";
+import { EncryptedUserPassword, TourType, UserRole } from "$enums/Users";
 
 const UserInputParamsSchema = z.object({
   name: z.string(),
@@ -206,6 +206,117 @@ export const user = {
 
         await session.commitTransaction();
         return transformRawData(updateResult);
+      } catch (error) {
+        await session.abortTransaction();
+        throw error;
+      } finally {
+        session.endSession();
+      }
+    },
+  }),
+
+  deactiveTour: defineAction({
+    input: z.intersection(
+      UserInputIdentifierSchema,
+      z.object({ type: z.nativeEnum(TourType).default(TourType.Onboarding) }),
+    ),
+    handler: async (input) => {
+      const { _id: userId, type } = input;
+      const user = await UserModel.get(userId);
+      if (!user) {
+        throw new Error("User does not exists.");
+      }
+
+      if (!Object.values(TourType).includes(type)) {
+        throw new Error("Invalid tour type.");
+      }
+
+      const session = client.startSession();
+      session.startTransaction();
+
+      try {
+        let userTours = user.tours ?? [
+          { type: TourType.Onboarding, active: false },
+        ];
+
+        if (!userTours.some((tour) => tour.type == type)) {
+          userTours.push({ type, active: false });
+        } else {
+          userTours = userTours.map((tour) => {
+            if (tour.type == type) {
+              return { ...tour, active: false };
+            }
+            return tour;
+          });
+        }
+        await UserModel.updateTour(userId, userTours);
+        await session.commitTransaction();
+
+        return { success: true };
+      } catch (error) {
+        await session.abortTransaction();
+        throw error;
+      } finally {
+        session.endSession();
+      }
+    },
+  }),
+
+  activeOboarding: defineAction({
+    input: UserInputIdentifierSchema,
+    handler: async (input) => {
+      const { _id: userId } = input;
+      const user = await UserModel.get(userId);
+      if (!user) {
+        throw new Error("User does not exists.");
+      }
+
+      const session = client.startSession();
+      session.startTransaction();
+
+      try {
+        let userTours = user.tours ?? [
+          { type: TourType.Onboarding, active: true },
+        ];
+
+        userTours = userTours.map((tour) => {
+          if (tour.type == TourType.Onboarding) {
+            return { ...tour, active: true };
+          }
+          return tour;
+        });
+
+        await UserModel.updateTour(userId, userTours);
+        await session.commitTransaction();
+
+        return { success: true };
+      } catch (error) {
+        await session.abortTransaction();
+        throw error;
+      } finally {
+        session.endSession();
+      }
+    },
+  }),
+
+  resetLoginCount: defineAction({
+    input: UserInputIdentifierSchema,
+    handler: async (input) => {
+      const { _id: userId } = input;
+      const user = await UserModel.get(userId);
+      if (!user) {
+        throw new Error("User does not exists.");
+      }
+
+      const session = client.startSession();
+      session.startTransaction();
+
+      try {
+        await UserModel.update(userId, { logins_count: 0 });
+        console.log("User logins count reset successfully.");
+        await session.commitTransaction();
+
+        return { success: true };
       } catch (error) {
         await session.abortTransaction();
         throw error;

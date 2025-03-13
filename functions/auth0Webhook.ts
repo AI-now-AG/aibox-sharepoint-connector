@@ -11,6 +11,12 @@ import UserModel, {
 import TenantModel, { type Tenant } from "$data/models/tenant.model";
 import usersManagement from "$data/auth0/users-manager";
 import organizationsManagement from "$data/auth0/organizations-manager";
+import {
+  sendVerificationEmail,
+  sendPasswordResetEmail,
+  sendWelcomeEmail,
+  sendNotificationEmail,
+} from "$utils/auth0Auth";
 import type { UserRole } from "$enums/Users";
 
 /**
@@ -20,7 +26,7 @@ import type { UserRole } from "$enums/Users";
  * @param {Object} event - Incoming event payload from Auth0.
  * @returns {Object} - HTTP response indicating success or failure.
  */
-const syncAuth0Resources: Handler = async (
+const auth0Webhook: Handler = async (
   event: HandlerEvent,
 ): Promise<HandlerResponse> => {
   try {
@@ -57,6 +63,32 @@ const syncAuth0Resources: Handler = async (
         await syncAuth0UserOnLogin(data);
       }
 
+      // Trigger successful signup
+      // See: https://auth0.com/docs/customize/log-streams/event-filters#signup-success
+      if (eventType == "ss") {
+        if (isPermittedConnection(data)) {
+          await triggerRegistrationEmail(data);
+          await updateAuth0UserMetadata(data.user_id, { signup: true });
+        }
+
+        // Send welcome email for social login
+        if (["windowslive", "google-oauth2"].includes(data.connection)) {
+          const { user_name: email, user_id: userId, connection } = data;
+          await triggerWelcomeEmail(userId, email, connection);
+        }
+      }
+
+      // Trigger successful called verification email endpoint
+      // See: https://auth0.com/docs/customize/log-streams/event-filters#user-behavioral-success
+      if (eventType == "sv") {
+        const { email, user_id: userId } = data.details.query;
+        await triggerWelcomeEmail(userId, email, data.connection);
+
+        await updateUserAttributesInDatabase(userId, {
+          email_verified: true,
+        });
+      }
+
       // Trigger 'Add members to an organization'
       // "Create a User" didn't work in this case because the organization could not be detected
       // See: https://auth0.com/docs/customize/log-streams/event-filters#management-api-success
@@ -64,13 +96,17 @@ const syncAuth0Resources: Handler = async (
         eventType == "sapi" &&
         description == "Add members to an organization"
       ) {
-        await createUserInDatabase(data);
+        if (isPermittedChannel(data)) {
+          await createUserInDatabase(data);
+        }
       }
 
       // Trigger 'Update a User'
       // See: https://auth0.com/docs/customize/log-streams/event-filters#management-api-success
       if (eventType == "sapi" && description == "Update a User") {
-        await updateUserInDatabase(data);
+        if (isPermittedChannel(data)) {
+          await updateUserInDatabase(data);
+        }
       }
 
       // Trigger 'Delete a User' or 'Delete members from an organization'
@@ -80,7 +116,9 @@ const syncAuth0Resources: Handler = async (
         (description == "Delete a User" ||
           description == "Delete members from an organization")
       ) {
-        await deleteUserFromDatabase(data);
+        if (isPermittedChannel(data)) {
+          await deleteUserFromDatabase(data);
+        }
       }
 
       // Trigger 'Assign user roles to an Organization member' or 'Delete user roles from an Organization member'
@@ -91,19 +129,25 @@ const syncAuth0Resources: Handler = async (
         (description == "Assign user roles to an Organization member" ||
           description == "Delete user roles from an Organization member")
       ) {
-        await updateUserRolesInDatabase(data);
+        if (isPermittedChannel(data)) {
+          await updateUserRolesInDatabase(data);
+        }
       }
 
       // Trigger 'Create an Organization'
       // See: https://auth0.com/docs/customize/log-streams/event-filters#management-api-success
       if (eventType == "sapi" && description == "Create an Organization") {
-        await createTenantInDatabase(data);
+        if (isPermittedChannel(data)) {
+          await createTenantInDatabase(data);
+        }
       }
 
       // Trigger 'Modify an Organization'
       // See: https://auth0.com/docs/customize/log-streams/event-filters#management-api-success
       if (eventType == "sapi" && description == "Modify an Organization") {
-        await updateTenantInDatabase(data);
+        if (isPermittedChannel(data)) {
+          await updateTenantInDatabase(data);
+        }
       }
     }
 
@@ -128,14 +172,64 @@ const isPermittedChannel = (data: any) => {
   return permittedChannels.includes(requestChannel);
 };
 
+const isPermittedConnection = (data: any) => {
+  const connection = data?.connection || "";
+  const permittedCons = ["Username-Password-Authentication"];
+  return permittedCons.includes(connection);
+};
+
+const triggerRegistrationEmail = async (data: any) => {
+  console.log(`Trigger registration email`, data.details);
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { user_id: userId } = data;
+  const { email, connection, is_signup: isSignup } = data.details.body;
+  if (isSignup == true) {
+    // Send user verification email
+    await sendVerificationEmail(userId, email);
+
+    // Send admin notification email
+    const emailSubject = "New User Signup Alert";
+    const emailContent = `
+      <div style="font-family: Arial, sans-serif; padding: 20px;">
+        <h1><b>New User Signup Notification</b></h1>
+        <p><b>User ID:</b> ${userId}</p>
+        <p><b>Email:</b> ${email}</p>
+        <p><b>Signup Date:</b> ${new Date().toLocaleDateString()}</p>
+      </div>
+    `;
+    await sendNotificationEmail(emailSubject, emailContent);
+  } else {
+    await sendPasswordResetEmail(email, connection);
+  }
+};
+
+const triggerWelcomeEmail = async (
+  userId: string,
+  email: string,
+  connection: string,
+) => {
+  console.log(`Trigger welcome email`, { userId, email, connection });
+  // Send user welcome email
+  await sendWelcomeEmail(email);
+
+  // Send admin notification email
+  if (connection == "Username-Password-Authentication") {
+    const emailSubject = "New User Verified Alert";
+    const emailContent = `
+      <div style="font-family: Arial, sans-serif; padding: 20px;">
+        <h1><b>New User Verified Notification</b></h1>
+        <p><b>User ID:</b> ${userId}</p>
+        <p><b>Email:</b> ${email}</p>
+        <p><b>Verified Date:</b> ${new Date().toLocaleDateString()}</p>
+      </div>
+    `;
+    await sendNotificationEmail(emailSubject, emailContent);
+  }
+};
+
 const createUserInDatabase = async (data: any) => {
   console.log(`Creating user`, data?.details?.request);
-
-  // Skip if the channel is not permitted.
-  if (!isPermittedChannel(data)) {
-    console.warn(`Creating user / channel is not permitted.`);
-    return;
-  }
 
   const path = data?.details?.request?.path || ""; // api/v2/organizations/org_jNS9by788jZfem2D/members
   const memberIds = data?.details?.request?.body?.members || []; // ["auth0|6777fe2805771b8ae33c09e3"]
@@ -169,12 +263,6 @@ const createUserInDatabase = async (data: any) => {
 const updateUserInDatabase = async (data: any) => {
   console.log(`Updating user`, data?.details?.response);
 
-  // Skip if the channel is not permitted.
-  if (!isPermittedChannel(data)) {
-    console.warn(`Updating user / channel is not permitted.`);
-    return;
-  }
-
   const auth0User = data?.details?.response?.body || {};
   const localUser = await UserModel.getAuth0Sub(auth0User.user_id);
 
@@ -199,12 +287,6 @@ const updateUserInDatabase = async (data: any) => {
 
 const deleteUserFromDatabase = async (data: any) => {
   console.log(`Deleting user`, data?.details?.response);
-
-  // Skip if the channel is not permitted.
-  if (!isPermittedChannel(data)) {
-    console.warn(`Deleting user / channel is not permitted.`);
-    return;
-  }
 
   const { description } = data;
 
@@ -237,12 +319,6 @@ const deleteUserFromDatabase = async (data: any) => {
 const updateUserRolesInDatabase = async (data: any) => {
   console.log(`Updating user roles`, data?.details?.response);
 
-  // Skip if the channel is not permitted.
-  if (!isPermittedChannel(data)) {
-    console.warn(`Updating user roles / channel is not permitted.`);
-    return;
-  }
-
   // Take the "userId" from request path and "roles" from request body
   // Example path: api/v2/organizations/org_FpOtXZcZwVZc1unJ/members/auth0%7C66f3a9897dbebab8f2ae9cc0/roles
   const path = data?.details?.request?.path || "";
@@ -274,14 +350,37 @@ const updateUserRolesInDatabase = async (data: any) => {
   }
 };
 
+const updateUserAttributesInDatabase = async (
+  userId: string,
+  attributes: any,
+) => {
+  console.log(`Update user attributes`, { userId, attributes });
+  const localUser = await UserModel.getAuth0Sub(userId);
+
+  try {
+    if (localUser) {
+      const update: Partial<User> = attributes;
+      await UserModel.update(localUser._id, update);
+    }
+  } catch (error: any) {
+    console.warn(`Updating user attributes error`, error);
+  }
+};
+
+const updateAuth0UserMetadata = async (userId: string, update: any) => {
+  console.log(`Update user metadata`, { userId, update });
+
+  try {
+    await usersManagement.update(userId, {
+      user_metadata: update,
+    });
+  } catch (error: any) {
+    console.warn(`Updating user metadata error`, error);
+  }
+};
+
 const createTenantInDatabase = async (data: any) => {
   console.log(`Creating tenant`, data?.details?.response);
-
-  // Skip if the channel is not permitted.
-  if (!isPermittedChannel(data)) {
-    console.warn(`Creating tenant / channel is not permitted.`);
-    return;
-  }
 
   // Take the "orgId" from response body
   // Example: { id: "org_kxLHFC47tCHHOxsB" }
@@ -303,12 +402,6 @@ const createTenantInDatabase = async (data: any) => {
 
 const updateTenantInDatabase = async (data: any) => {
   console.log(`Updating tenant`, data?.details?.response);
-
-  // Skip if the channel is not permitted.
-  if (!isPermittedChannel(data)) {
-    console.warn(`Updating tenant / channel is not permitted.`);
-    return;
-  }
 
   // Take the "orgId" from response body
   // Example: { id: "org_kxLHFC47tCHHOxsB" }
@@ -347,4 +440,4 @@ const syncAuth0UserOnLogin = async (data: any) => {
   }
 };
 
-export { syncAuth0Resources as handler };
+export { auth0Webhook as handler };

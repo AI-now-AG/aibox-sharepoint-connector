@@ -4,9 +4,13 @@ import type { APIContext } from "astro";
 import UserModel, { assignPermissions } from "$data/models/user.model";
 import { z } from "zod";
 import log from "$utils/log";
-import { syncAllOrganizationUsers } from "$utils/auth0Sync";
+import {
+  syncAllOrganizationUsers,
+  syncOrganizationUser,
+} from "$utils/auth0Sync";
 import TenantModel from "$data/models/tenant.model";
 import { UserRole } from "$enums/Users";
+import { AUTH0_SESSION_STATE } from "$constants";
 
 const Auth0JWTSchema = z.object({
   sub: z.string().min(24),
@@ -23,7 +27,7 @@ export async function GET(context: APIContext): Promise<Response> {
   log.d(context.url.searchParams.toString(), "Callback search params");
   const code = context.url.searchParams.get("code");
   const state = context.url.searchParams.get("state");
-  const storedState = context.cookies.get("auth0_state")?.value ?? null;
+  const storedState = context.cookies.get(AUTH0_SESSION_STATE)?.value ?? null;
 
   // *INFO: Redirect to 500 error page if any error occur
   if (context.url.searchParams.has("error")) {
@@ -89,6 +93,10 @@ export async function GET(context: APIContext): Promise<Response> {
   if (isModerator) {
     setImmediate(async () => {
       await syncAllOrganizationUsers(auth0User.data.org_id, userId.toString());
+    });
+  } else {
+    setImmediate(async () => {
+      await syncOrganizationUser(auth0User.data.sub);
     });
   }
 

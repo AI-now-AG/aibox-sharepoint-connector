@@ -2,7 +2,17 @@ import { ObjectId } from "mongodb";
 import { db, type Document } from "../mongodb";
 import { z } from "zod";
 import log from "$utils/log";
-import { Permission, ROLE_PERMISSIONS_MAP, UserRole } from "$enums/Users";
+import {
+  Permission,
+  ROLE_PERMISSIONS_MAP,
+  UserRole,
+  TourType,
+} from "$enums/Users";
+
+export const UserTour = z.object({
+  type: z.nativeEnum(TourType).default(TourType.Onboarding),
+  active: z.boolean().default(true),
+});
 
 const UserSchema = z.object({
   _id: z.instanceof(ObjectId),
@@ -29,6 +39,7 @@ const UserSchema = z.object({
   email_verified: z.boolean().default(false),
   blocked: z.boolean().default(false),
   navState: z.record(z.string(), z.boolean()).optional(),
+  tours: z.array(UserTour).optional(),
 });
 
 export const UserFilterParamsSchema = z.object({
@@ -200,6 +211,13 @@ export default {
     return await collection.updateOne(
       { _id: new ObjectId(id) },
       { $set: { blocked: false } },
+    );
+  },
+
+  updateTour: async (id: string, tours: z.infer<typeof UserTour>[]) => {
+    return await collection.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: { tours: tours } },
     );
   },
 

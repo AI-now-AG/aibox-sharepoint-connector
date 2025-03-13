@@ -1148,7 +1148,7 @@
         <div class="bg-base-100 shadow rounded-lg my-4">
           <div class="flex p-4 items-center justify-between">
             <div class="flex items-center justify-between">
-              <label class="label cursor-pointer" for="disable-create-user">
+              <label class="label cursor-pointer" for="">
                 <span class="label-text"
                   >{t("tenant.text.improvement.llm")}</span
                 >
@@ -1249,13 +1249,32 @@
               id="disable-create-user"
               type="checkbox"
               class="checkbox checkbox-primary"
-              value="disbale-create-user"
+              value="disable-create-user"
               bind:checked={tenantData.is_restrict_user_managment}
             />
             <label class="label cursor-pointer ml-2" for="disable-create-user">
               <span class="label-text ml-2"
                 >{t("tenant.restrict-user-managment")}</span
               >
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container mx-auto">
+      <div class="bg-base-100 shadow rounded-lg my-4">
+        <div class="flex p-4 items-center justify-between">
+          <div class="flex items-center">
+            <input
+              id="is-trial-tenant"
+              type="checkbox"
+              class="checkbox checkbox-primary"
+              value="is-trial-tenant"
+              bind:checked={tenantData.is_trial}
+            />
+            <label class="label cursor-pointer ml-2" for="is-trial-tenant">
+              <span class="label-text ml-2">{t("tenant.trial")}</span>
             </label>
           </div>
         </div>

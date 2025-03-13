@@ -34,11 +34,6 @@ export const syncAllOrganizationUsers = async (
     const roleNames = auth0UserRoles.data.map((role) => role.name as UserRole);
     const userRoles = roleNames.length ? roleNames : [UserRole.User];
 
-    console.log(
-      `Sync all organization users - user ${user.user_id} has been synced`,
-    );
-
-    // Upserts a user by their Auth0 subscription ID (sub).
     await UserModel.upsertByAuth0Sub(user.user_id, {
       tenant_id: tenant._id,
       auth0_sub: user.user_id,
@@ -53,5 +48,20 @@ export const syncAllOrganizationUsers = async (
       email_verified: user.email_verified,
       blocked: user.blocked,
     });
+    console.log(
+      `Sync all organization users - user ${user.user_id} has been synced`,
+    );
   }
+};
+
+export const syncOrganizationUser = async (auth0sub: string) => {
+  const response = await usersManagement.get(auth0sub);
+  const user = response.data ?? [];
+  await UserModel.upsertByAuth0Sub(user.user_id, {
+    last_login: user.last_login?.toString(),
+    logins_count: user.logins_count || 0,
+    email_verified: user.email_verified,
+    blocked: user.blocked,
+  });
+  console.log(`syncOrganizationUser - user ${user.user_id} has been synced`);
 };

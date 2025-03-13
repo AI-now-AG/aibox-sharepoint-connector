@@ -19,5 +19,6 @@ export async function GET(context: APIContext): Promise<Response> {
     sameSite: "lax",
   });
 
-  return context.redirect(url.toString());
+  const signupUrl = `${url.toString()}&screen_hint=signup`;
+  return context.redirect(signupUrl);
 }
