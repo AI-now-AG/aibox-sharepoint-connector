@@ -4,7 +4,10 @@ import type { APIContext } from "astro";
 import UserModel, { assignPermissions } from "$data/models/user.model";
 import { z } from "zod";
 import log from "$utils/log";
-import { syncAllOrganizationUsers } from "$utils/auth0Sync";
+import {
+  syncAllOrganizationUsers,
+  syncOrganizationUser,
+} from "$utils/auth0Sync";
 import TenantModel from "$data/models/tenant.model";
 import { UserRole } from "$enums/Users";
 import { AUTH0_SESSION_STATE } from "$constants";
@@ -91,6 +94,8 @@ export async function GET(context: APIContext): Promise<Response> {
     setImmediate(async () => {
       await syncAllOrganizationUsers(auth0User.data.org_id, userId.toString());
     });
+  } else {
+    await syncOrganizationUser(auth0User.data.sub);
   }
 
   const session = await lucia.createSession(userId, {});
