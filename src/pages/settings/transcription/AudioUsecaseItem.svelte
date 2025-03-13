@@ -93,7 +93,7 @@
         class={item.enabled === true
           ? "text-success text-sm font-medium"
           : "text-sm font-medium text-neutral/70"}
-        >{item.enabled === true ? "active" : "inactive"}</span
+        >{item.enabled === true ? t("settings.transcription.usecase.active") : t("settings.transcription.usecase.inactive")}</span
       >
     </div>
     {#if item.instruction}

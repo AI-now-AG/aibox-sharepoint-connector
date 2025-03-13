@@ -119,7 +119,7 @@
             class={item.active == 1
               ? "text-emerald-600 text-sm font-medium"
               : "text-grey-600 text-sm font-medium"}
-            >{item.active == 1 ? "active" : "inactive"}</span
+            >{item.active == 1 ? t("settings.transcription.usecase.active") : t("settings.transcription.usecase.inactive")}</span
           >
         </div>
         <div
