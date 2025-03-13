@@ -48,7 +48,7 @@
 
 <ul
   tabindex="-1"
-  class="dropdown-content menu bg-base-100 rounded-box z-30 w-52 p-2 shadow"
+  class="dropdown-content menu bg-base-100 rounded-box z-30 w-52 p-2 shadow-sm"
 >
   {#each themes as theme}
     <li>

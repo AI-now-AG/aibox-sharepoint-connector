@@ -138,12 +138,12 @@
         >✕</button
       >
     </form>
-    <div class="p7 rounded w-9/12 mx-auto">
+    <div class="p7 rounded-sm w-9/12 mx-auto">
       <div
-        class="relative flex flex-col p-4 border border-neutral-content rounded"
+        class="relative flex flex-col p-4 border border-neutral-content rounded-sm"
       >
         <label
-          class={`py-6 relative flex flex-col text-base-content border border-dashed rounded cursor-pointer ${isDragOver ? "border-blue-500" : "border-neutral-content"} ${fileErrorMessage && "border-error bg-error"}`}
+          class={`py-6 relative flex flex-col text-base-content border border-dashed rounded-sm cursor-pointer ${isDragOver ? "border-blue-500" : "border-neutral-content"} ${fileErrorMessage && "border-error bg-error"}`}
           ondragover={() => {
             isDragOver = true;
           }}
@@ -157,7 +157,7 @@
           <input
             type="file"
             accept={acceptedMimeTypes}
-            class="absolute inset-0 z-50 w-full h-full p-0 m-0 outline-none opacity-0 cursor-pointer"
+            class="absolute inset-0 z-50 w-full h-full p-0 m-0 outline-hidden opacity-0 cursor-pointer"
             multiple
             onchange={addFiles}
           />
@@ -184,7 +184,7 @@
             {#each files as file, index (file.name)}
               <div
                 role="listitem"
-                class="relative flex flex-col items-center overflow-hidden text-center bg-base-100 border border-neutral-content rounded cursor-move select-none pt-36"
+                class="relative flex flex-col items-center overflow-hidden text-center bg-base-100 border border-neutral-content rounded-sm cursor-move select-none pt-36"
                 ondragstart={(e) => dragstart(e, index)}
                 ondragend={() => {
                   fileDragging = -1;
@@ -193,7 +193,7 @@
                 data-index={index}
               >
                 <button
-                  class="absolute top-0 right-0 z-50 p-1 bg-neutral rounded-bl focus:outline-none"
+                  class="absolute top-0 right-0 z-50 p-1 bg-neutral rounded-bl focus:outline-hidden"
                   type="button"
                   onclick={() => remove(index)}
                   aria-label="Remove"
@@ -266,7 +266,7 @@
                 {/if}
 
                 <div
-                  class="absolute bottom-0 left-0 right-0 flex flex-col p-2 text-xs bg-base-content bg-opacity-60"
+                  class="absolute bottom-0 left-0 right-0 flex flex-col p-2 text-xs bg-base-content/60"
                 >
                   <span class="w-full font-bold text-base-100 truncate"
                     >{file.name}</span

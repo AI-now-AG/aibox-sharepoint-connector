@@ -173,7 +173,7 @@
                 </span>
               </button>
               <ul
-                class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
+                class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
               >
                 <li>
                   <a

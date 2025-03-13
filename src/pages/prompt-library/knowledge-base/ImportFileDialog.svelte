@@ -70,7 +70,7 @@
     </form>
     <div class="relative flex flex-col py-4">
       <label
-        class={`py-16 relative flex flex-col text-base-content border border-dashed rounded cursor-pointer ${isDragOver ? "border-blue-500" : "border-neutral-content"} ${fileErrorMessage && "border-red-500 bg-red-100"}`}
+        class={`py-16 relative flex flex-col text-base-content border border-dashed rounded-sm cursor-pointer ${isDragOver ? "border-blue-500" : "border-neutral-content"} ${fileErrorMessage && "border-red-500 bg-red-100"}`}
         ondragover={() => {
           isDragOver = true;
         }}
@@ -84,7 +84,7 @@
         <input
           type="file"
           accept={acceptedMimeTypes}
-          class="absolute inset-0 z-50 w-full h-full p-0 m-0 outline-none opacity-0 cursor-pointer"
+          class="absolute inset-0 z-50 w-full h-full p-0 m-0 outline-hidden opacity-0 cursor-pointer"
           onchange={addFiles}
         />
 

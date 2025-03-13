@@ -21,11 +21,11 @@
 </script>
 
 <ul
-  class={`py-2 dropdown-content menu bg-base-100 rounded-xl z-[1] p-2 shadow ${widthClass}`}
+  class={`py-2 dropdown-content menu bg-base-100 rounded-xl z-1 p-2 shadow-sm ${widthClass}`}
   style={styleVisibility}
 >
   <!-- <ul
-  class={`py-2 dropdown-content menu bg-base-100 rounded-xl z-[1] p-2 shadow ${widthClass}`}
+  class={`py-2 dropdown-content menu bg-base-100 rounded-xl z-1 p-2 shadow-sm ${widthClass}`}
 > -->
   {#each options as option}
     <li>

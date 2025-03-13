@@ -110,7 +110,7 @@
         {/if}
       </h1>
     </div>
-    <div class="rounded pt-6 mb-4">
+    <div class="rounded-sm pt-6 mb-4">
       <div class="grid grid-cols-1 gap-4 justify-center">
         <div>
           <p class="mb-2">{t("prompt-library.add.categories.title")}*</p>

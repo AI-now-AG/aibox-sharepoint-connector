@@ -174,14 +174,13 @@
         {t("prompt-library.instructions.edit")}
       </h1>
     </div>
-    <form class="rounded pt-6 mb-4 space-y-6">
+    <form class="pt-6 mb-4 space-y-6">
       <div class="grid grid-cols-1 gap-4 justify-center">
         <div>
           <p class="mb-2">{t("prompt-library.add.knowledgebase.title")}</p>
-          <label class="input input-bordered flex items-center gap-2">
+          <label class="input input-bordered flex items-center gap-2 w-full">
             <input
               type="text"
-              class="grow"
               bind:value={instructionTitle}
               placeholder="title"
             />
@@ -243,7 +242,7 @@
             {#if subtitleList}
               <ul
                 tabindex="-1"
-                class="dropdown-content menu bg-base-100 space-y-2 rounded-box z-[1] w-52 p-2 shadow"
+                class="dropdown-content menu bg-base-100 space-y-2 rounded-box z-1 w-52 p-2 shadow-sm"
               >
                 {#each subtitleList as item}
                   <li>
@@ -265,7 +264,7 @@
         <textarea
           bind:value={instructionText}
           placeholder="e.g. type knowledge base details..."
-          class="input input-bordered min-w-xs shadow appearance-none min-h-96 w-full py-2 px-3"
+          class="input input-bordered min-w-xs shadow-sm appearance-none min-h-96 w-full py-2 px-3"
         ></textarea>
       </div>
 

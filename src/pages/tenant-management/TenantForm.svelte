@@ -685,7 +685,7 @@
               showPicker = false;
             }}
           >
-            <div class="z-[10]">
+            <div class="z-10">
               <button
                 class="color-preview inline-block w-[100px] h-[50px] rounded-tl-[8px] rounded-bl-[8px]"
                 style="background-color: {selecteColor};"
@@ -694,7 +694,7 @@
               ></button>
 
               {#if showPicker}
-                <div class="absolute picker-color top-[54px] left-[0]">
+                <div class="absolute picker-color top-[54px] left-0">
                   <ColorPicker
                     {hex}
                     isDialog={false}
@@ -747,7 +747,7 @@
 
     <div class="container mx-auto">
       <!-- Open AI Section -->
-      <div class="collapse collapse-arrow bg-base-100 shadow rounded-lg mb-4">
+      <div class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4">
         <input type="checkbox" />
         <div class="collapse-title">
           <div class="flex items-center justify-between">
@@ -756,7 +756,7 @@
                 id="feature-text-prompt"
                 type="checkbox"
                 bind:checked={openAIEnabled}
-                class="checkbox checkbox-primary z-[10]"
+                class="checkbox checkbox-primary z-10"
                 value="text-prompt"
                 disabled={defaultTextFeature === ApiKeyProvider.OpenAI}
               />
@@ -794,7 +794,7 @@
                 >{t("tenant.api-key")}</span
               >
 
-              <label class="input input-bordered flex items-center gap-2 mt-2">
+              <label class="input input-bordered flex items-center gap-2 mt-2 w-full">
                 <input
                   bind:this={openAIKeyField}
                   type="password"
@@ -822,7 +822,7 @@
         </div>
       </div>
       <!-- Azure Section -->
-      <div class="collapse collapse-arrow bg-base-100 shadow rounded-lg mb-4">
+      <div class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4">
         <input type="checkbox" />
         <div class="collapse-title">
           <div class="flex items-center justify-between">
@@ -831,7 +831,7 @@
                 id="feature-azure-section"
                 type="checkbox"
                 bind:checked={azureOpenAIEnabled}
-                class="checkbox checkbox-primary z-[10]"
+                class="checkbox checkbox-primary z-10"
                 value="text-prompt"
                 disabled={defaultTextFeature === ApiKeyProvider.AzureOpenAI}
               />
@@ -858,7 +858,7 @@
                 >{t("tenant.azure-open-ai-provider")}</span
               >
 
-              <label class="input input-bordered flex items-center gap-2 mt-2">
+              <label class="input input-bordered flex items-center gap-2 mt-2 w-full">
                 <input
                   bind:this={azureOpenAIKeyField}
                   type="password"
@@ -937,7 +937,7 @@
       </div>
 
       <!-- Perplexity Section -->
-      <div class="collapse collapse-arrow bg-base-100 shadow rounded-lg mb-4">
+      <div class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4">
         <input type="checkbox" />
         <div class="collapse-title">
           <div class="flex items-center justify-between">
@@ -946,7 +946,7 @@
                 id="feature-perplexity-section"
                 type="checkbox"
                 bind:checked={perplexityEnabled}
-                class="checkbox checkbox-primary z-[10]"
+                class="checkbox checkbox-primary z-10"
                 value="text-prompt"
                 disabled={defaultTextFeature === ApiKeyProvider.Perplexity}
               />
@@ -966,7 +966,7 @@
         </div>
         <div class="collapse-content">
           <div class="grid grid-cols-2 gap-4 mx-8">
-            <div class="w-full z-[20]">
+            <div class="w-full z-20">
               <SelectionInput
                 title={`${t("tenant.model.name")}*`}
                 placeholder="e.g. sonar"
@@ -979,7 +979,7 @@
                 >{t("tenant.api-key")}</span
               >
 
-              <label class="input input-bordered flex items-center gap-2 mt-1">
+              <label class="input input-bordered flex items-center gap-2 mt-1 w-full">
                 <input
                   bind:this={perplexityKeyField}
                   type="password"
@@ -1015,15 +1015,15 @@
     </div>
     <div class="container mx-auto">
       <!-- Audio Whisper Section -->
-      <div class="collapse collapse-arrow bg-base-100 shadow rounded-lg mb-4">
+      <div class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4">
         <input type="checkbox" />
-        <div class="collapse-title flex items-center justify-between">
+        <div class="collapse-title flex items-center justify-between gap-4">
           <div class="flex items-center">
             <input
               id="audio-whisper-model"
               type="checkbox"
               checked={isAudioToTextChecked}
-              class="checkbox checkbox-primary z-[10]"
+              class="checkbox checkbox-primary z-10"
               value="text-prompt"
               disabled
             />
@@ -1043,7 +1043,7 @@
         <div class="collapse-content space-y-6">
           <div class="flex flex-col gap-4 mx-8">
             <!-- Checkboxes for Audio to Text & Subtitles -->
-            <div class="rounded-lg border-1">
+            <div class="rounded-lg">
               <span class="text-sm font-semibold">{t("tenant.features")}</span>
               <div class="flex flex-wrap gap-4 mt-2">
                 {#each audioStandardArray as item, index}
@@ -1052,7 +1052,7 @@
                       id="audio-standard-{item.type}"
                       type="checkbox"
                       bind:checked={audioStandardArray[index].checked}
-                      class="checkbox checkbox-primary checkbox-sm z-[10]"
+                      class="checkbox checkbox-primary checkbox-sm z-10"
                     />
                     <label
                       class="label cursor-pointer ml-2"
@@ -1075,15 +1075,15 @@
       </div>
 
       <!-- Large File Azure Section -->
-      <div class="collapse collapse-arrow bg-base-100 shadow rounded-lg mb-4">
+      <div class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4">
         <input type="checkbox" />
-        <div class="collapse-title flex items-center justify-between">
+        <div class="collapse-title flex items-center justify-between gap-4">
           <div class="flex items-center">
             <input
               id="audio-pro-model"
               type="checkbox"
               checked={isAzureAudioProEnabled}
-              class="checkbox checkbox-primary z-[10]"
+              class="checkbox checkbox-primary z-10"
               value="text-prompt"
               disabled
             />
@@ -1102,7 +1102,7 @@
         <div class="collapse-content space-y-4">
           <div class="grid grid-cols-2 gap-4 mx-8">
             <!-- Checkboxes for Audio Pro & Subtitles Large -->
-            <div class="rounded-lg border-1">
+            <div class="rounded-lg">
               <span class="text-sm font-semibold">{t("tenant.features")}</span>
               <div class="flex flex-wrap gap-4 mt-2">
                 {#each audioProArray as item, index}
@@ -1111,7 +1111,7 @@
                       id="audio-pro-{item.type}"
                       type="checkbox"
                       bind:checked={audioProArray[index].checked}
-                      class="checkbox checkbox-primary checkbox-sm z-[10]"
+                      class="checkbox checkbox-primary checkbox-sm z-10"
                     />
                     <label
                       class="label cursor-pointer ml-2"
@@ -1131,7 +1131,7 @@
                 >{t("tenant.settings.large-file-azure-apiKey")}
               </span>
 
-              <label class="input input-bordered flex items-center gap-2 mt-2">
+              <label class="input input-bordered flex items-center gap-2 mt-2 w-full">
                 <input
                   bind:this={azureOpenAIKeyProField}
                   type="password"
@@ -1162,7 +1162,7 @@
 
       <!-- Model Selection -->
       <div class="container mx-auto">
-        <div class="bg-base-100 shadow rounded-lg my-4">
+        <div class="bg-base-100 shadow-sm rounded-lg my-4">
           <div class="flex p-4 items-center justify-between">
             <div class="flex items-center justify-between">
               <label class="label cursor-pointer" for="">
@@ -1201,7 +1201,7 @@
     <!-- <div class="mb-3 mt-4"><b>{t("tenant.included-featured")}</b></div> -->
 
     <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <!-- <div class="w-full bg-white rounded px-4 py-2">
+    <!-- <div class="w-full bg-white rounded-sm px-4 py-2">
       <div class="flex items-center">
         <input
           id="feature-text-prompt"
@@ -1234,7 +1234,7 @@
     </div> -->
 
     <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <!-- <div class="w-full bg-white rounded px-4 py-2 mt-4">
+    <!-- <div class="w-full bg-white rounded-sm px-4 py-2 mt-4">
       <div class="flex items-center">
         <input
           id="feature-audio-to-text"
@@ -1259,7 +1259,7 @@
 
     <div class="container mx-auto">
       <!-- User Managment Section -->
-      <div class="bg-base-100 shadow rounded-lg my-4">
+      <div class="bg-base-100 shadow-sm rounded-lg my-4">
         <div class="flex p-4 items-center justify-between">
           <div class="flex items-center">
             <input
@@ -1280,7 +1280,7 @@
     </div>
 
     <div class="container mx-auto">
-      <div class="bg-base-100 shadow rounded-lg my-4">
+      <div class="bg-base-100 shadow-sm rounded-lg my-4">
         <div class="flex p-4 items-center justify-between">
           <div class="flex items-center">
             <input

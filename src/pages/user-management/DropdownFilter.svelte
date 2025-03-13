@@ -139,7 +139,7 @@
 
   {#if showFilter}
     <div
-      class="menu bg-base-100 rounded-xl z-[1] p-3 shadow w-52 mt-1 absolute"
+      class="menu bg-base-100 rounded-xl z-1 p-3 shadow-sm w-52 mt-1 absolute"
     >
       <div class="flex justify-center items-center">
         <span class="flex-1 text-left text-sm font-bold"

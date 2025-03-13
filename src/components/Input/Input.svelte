@@ -37,7 +37,7 @@
     <span class="label-text text-base-content/40">{label}</span>
   </label>
   <div
-    class="input input-bordered flex justify-between items-center gap-2 p-4"
+    class="input input-bordered flex justify-between items-center gap-2 w-full"
     style={disabled ? "border: 1px solid #E5E6E6; color: #0F172A" : ""}
   >
     <input
@@ -48,7 +48,7 @@
       {required}
       {value}
       name={id}
-      class={`w-full ${classes}`}
+      class={`${classes}`}
       oninput={handleChange}
     />
     {#if icon}
