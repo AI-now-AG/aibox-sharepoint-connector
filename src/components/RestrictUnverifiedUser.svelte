@@ -4,7 +4,7 @@
   import { useTranslations } from "$i18n/utils";
   import { addToast } from "$stores/toast";
   import Loading from "$components/Loading.svelte";
-  import { loading, showLoading, hideLoading } from "$stores";
+  import { loading, showLoading, hideLoading, isOnboarding } from "$stores";
 
   const t = useTranslations();
 
@@ -50,12 +50,14 @@
   });
 </script>
 
-<div
-  class="fixed bottom-16 right-4 bg-warning text-sm text-gray-800 max-w-lg p-2 pl-4 pr-4 rounded-md shadow-lg"
->
-  {@html t("user.unverified-email-message", {
-    url: currentUrl,
-  })}
-</div>
+{#if !$isOnboarding}
+  <div
+    class="fixed bottom-16 right-4 bg-warning text-sm text-gray-800 max-w-lg p-2 pl-4 pr-4 rounded-md shadow-lg"
+  >
+    {@html t("user.unverified-email-message", {
+      url: currentUrl,
+    })}
+  </div>
 
-<Loading bind:show={$loading} />
+  <Loading bind:show={$loading} />
+{/if}

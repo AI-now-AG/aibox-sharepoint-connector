@@ -6,6 +6,7 @@
 
   import { useTranslations } from "$i18n/utils";
   import { TourType } from "$enums/Users";
+  import { isOnboarding, setOnboarding } from "$stores";
 
   const t = useTranslations();
 
@@ -41,8 +42,9 @@
   }
 
   onMount(async () => {
-    const isOnboarding = await checkOnboarding();
-    if (isOnboarding) {
+    const shouldOnboarding = await checkOnboarding();
+    if (shouldOnboarding) {
+      setOnboarding(true);
       const driverObj = driver({
         popoverClass: "driverjs-theme",
         overlayClickBehavior: "nextStep",
@@ -55,6 +57,7 @@
         },
         onDestroyed: () => {
           markAsOnboarded();
+          setOnboarding(false);
         },
         steps: [
           {
