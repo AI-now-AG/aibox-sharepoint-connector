@@ -39,8 +39,6 @@
     azureSpeechKey = "",
   }: Props = $props();
 
-  console.log("tenant", tenant);
-
   let addTanantAdminModal: HTMLDialogElement | undefined = $state();
   let confirmUpdateModal: HTMLDialogElement | undefined = $state();
   let alertModal: HTMLDialogElement | undefined = $state();
