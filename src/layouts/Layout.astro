@@ -67,7 +67,7 @@ const tenant = Astro.locals.tenant;
         <Navigation />
       </div>
     </div>
-    <OnboardingTour user={userInfo} client:load />
+    {tenant?.is_trial && <OnboardingTour user={userInfo} client:load />}
     {tenant?.is_trial && <TrialComponent {tenant} client:load />}
     {
       tenant?.is_trial &&
