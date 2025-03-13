@@ -88,6 +88,8 @@ const transcribeAudio: Handler = async (
     transcribeParams.speechKey = azureSpeechKey;
 
     await createTask(uniqueName, {
+      usecaseId: new ObjectId(transcribeParams.usecaseId),
+      category: transcribeParams.category,
       tenant_id: new ObjectId(transcribeParams.tenantId),
       creator_id: new ObjectId(transcribeParams.userId),
       audio_url: transcribeParams.uploadUrl,

@@ -49,6 +49,7 @@ const audioToTextTranscriptions = activeTranscriptions
   .map((tran) => ({
     title: tran.name,
     path: `/transcription/${tran._id.toString()}`,
+    usecaseId: tran._id.toString(),
   }));
 
 const subtitleTranscriptions = activeTranscriptions
@@ -61,61 +62,34 @@ const subtitleTranscriptions = activeTranscriptions
   .map((tran) => ({
     title: tran.name,
     path: `/transcription/${tran._id.toString()}`,
+    usecaseId: tran._id.toString(),
   }));
 
 if (audioToTextTranscriptions.length > 0) {
-  // audioFeatureItems.push({
-  //   title: t("nav.audiotool.audio-to-text"),
-  //   path: `/transcription/${TranscriptionType.Plaintext}`,
-  // });
   audioFeatureItems.push({
     title: t("nav.audiotool.audio-to-text"),
     isOpened: navState["audio-menu-id-0"] ?? false,
     items: audioToTextTranscriptions,
   });
 }
-// if (auth.hasAudioSummary(Astro.locals)) {
-//   audioFeatureItems.push({
-//     title: t("settings.transcription.summarize-title"),
-//     path: `/transcription/${TranscriptionType.Summarize}`,
-//   });
-// }
-if (subtitleTranscriptions.length > 0) {
-  // audioFeatureItems.push({
-  //   title: t("settings.transcription.subtitles-title"),
-  //   path: `/transcription/${TranscriptionType.Subtitles}`,
-  // });
 
+if (subtitleTranscriptions.length > 0) {
   audioFeatureItems.push({
     title: t("settings.transcription.subtitles-title"),
     isOpened: navState["audio-menu-id-1"] ?? false,
     items: subtitleTranscriptions,
   });
 }
-// if (auth.hasAudioSubtitleLarge(Astro.locals)) {
-//   audioFeatureItems.push({
-//     title: t("settings.transcription.subtitle.largefile-title"),
-//     path: `/transcription/${TranscriptionType.SubtitleLarge}`,
-//   });
-// }
-// if (auth.hasAudioSubtitlesjson(Astro.locals)) {
-//   audioFeatureItems.push({
-//     title: t("settings.transcription.subtitles-title-json"),
-//     path: `/transcription/${TranscriptionType.Subtitlesjson}`,
-//   });
-// }
-// if (auth.hasAudioLargefile(Astro.locals)) {
+
 if (transcriptionTypes.includes(AudioCategory.AudioPro)) {
   audioFeatureItems.push({
     title: t("settings.transcription.largefile-title"),
     path: `/transcription/${TranscriptionType.Largefile}`,
+    transcriptionType: TranscriptionType.Largefile,
   });
 }
 
-if (
-  auth.hasFeature(Astro.locals, TenantFeature.AudioToText) &&
-  audioFeatureItems.length > 0
-) {
+if (audioFeatureItems.length > 0) {
   audioToTextMenus.push({
     title: t("nav.audiotool"),
     icon: svgIcons.audio,
@@ -206,7 +180,11 @@ const modules = [...menuItems];
   <div class="flex-grow">
     <ul class="menu w-full pr-6">
       <li>
-        <details data-id={`ai-tools`} open={navState["ai-tools"] ?? true} id="onboardingId1">
+        <details
+          data-id={`ai-tools`}
+          open={navState["ai-tools"] ?? true}
+          id="onboardingId1"
+        >
           <summary>
             <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
               {svgIcons.aitool && <Fragment set:html={svgIcons.aitool} />}
@@ -246,7 +224,11 @@ const modules = [...menuItems];
       {
         audioToTextMenus.map((mod) => (
           <li>
-            <details data-id={`audio-menu`} open={mod.isOpened}  id="onboardingId3">
+            <details
+              data-id={`audio-menu`}
+              open={mod.isOpened}
+              id="onboardingId3"
+            >
               <summary>
                 <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
                   {mod.icon && <Fragment set:html={mod.icon} />}

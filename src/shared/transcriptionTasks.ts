@@ -2,6 +2,7 @@ import { z } from "zod";
 import { MongoClient, Db, Collection, ObjectId } from "mongodb";
 import { FileFormat } from "$types/TranscribeRequest";
 import { client } from "$data/mongodb";
+import { AudioCategory } from "$types/TenantFeature";
 
 const MONGO_URI = process.env.MONGODB_URI || "";
 const DB_NAME = process.env.MONGODB_DATABASE;
@@ -33,6 +34,8 @@ export const BatchSchema = z.object({
 
 const TaskSchema = z.object({
   taskId: z.string(),
+  usecaseId: z.instanceof(ObjectId).optional(),
+  category: z.nativeEnum(AudioCategory),
   tenant_id: z.instanceof(ObjectId).optional(),
   creator_id: z.instanceof(ObjectId).optional(),
   audio_url: z.string().optional(),
