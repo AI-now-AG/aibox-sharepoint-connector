@@ -13,6 +13,7 @@
   }
   let { user } = $props() as Props;
 
+  let isShow = $state(false);
   let currentUrl = $state("javascript:void(0)");
 
   const handleClick = async (event: MouseEvent) => {
@@ -43,14 +44,19 @@
 
   onMount(() => {
     currentUrl = window.location.href;
+
     window.addEventListener("click", handleClick);
     return () => {
       window.removeEventListener("click", handleClick);
     };
   });
+
+  $effect(() => {
+    isShow = !$isOnboarding;
+  });
 </script>
 
-{#if !$isOnboarding}
+{#if isShow}
   <div
     class="fixed bottom-16 right-4 bg-warning text-sm text-gray-800 max-w-lg p-2 pl-4 pr-4 rounded-md shadow-lg"
   >
