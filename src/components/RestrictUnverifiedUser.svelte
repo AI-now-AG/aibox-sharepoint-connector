@@ -50,14 +50,12 @@
   });
 </script>
 
-{#if user && user.email_verified != undefined && !user.email_verified}
-  <div
-    class="fixed bottom-16 right-4 bg-warning text-sm text-gray-800 max-w-lg p-2 pl-4 pr-4 rounded-md shadow-lg"
-  >
-    {@html t("user.unverified-email-message", {
-      url: currentUrl,
-    })}
-  </div>
-{/if}
+<div
+  class="fixed bottom-16 right-4 bg-warning text-sm text-gray-800 max-w-lg p-2 pl-4 pr-4 rounded-md shadow-lg"
+>
+  {@html t("user.unverified-email-message", {
+    url: currentUrl,
+  })}
+</div>
 
 <Loading bind:show={$loading} />

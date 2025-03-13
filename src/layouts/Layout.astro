@@ -68,7 +68,13 @@ const tenant = Astro.locals.tenant;
       </div>
     </div>
     <OnboardingTour user={userInfo} client:load />
-    <RestrictUnverifiedUser user={userInfo} client:load />
-    <TrialComponent {tenant} client:load />
+    {tenant?.is_trial && <TrialComponent {tenant} client:load />}
+    {
+      tenant?.is_trial &&
+        user?.email_verified != undefined &&
+        !user.email_verified && (
+          <RestrictUnverifiedUser user={userInfo} client:load />
+        )
+    }
   </body>
 </html>
