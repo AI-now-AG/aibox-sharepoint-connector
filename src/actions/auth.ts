@@ -11,10 +11,11 @@ const ProfileUpdateSchema = z.object({
 
 export const auth = {
   emailVerification: defineAction({
-    handler: async (input, context): Promise<void> => {
+    handler: async (input, context): Promise<any> => {
       try {
         const { auth0_sub: userId, email } = context.locals.user;
         await sendVerificationEmail(userId, email);
+        return { success: true };
       } catch (error) {
         log.e(error, "Failed to send verification email");
         throw error;

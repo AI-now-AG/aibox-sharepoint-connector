@@ -309,6 +309,11 @@
   "common.edited-by": "Zuetzt geändert",
   "prompt-library.knowledgebase.file-import": "Aus Datei importieren",
   "prompt-library.add.prompts.predefined-input": "Vordefinierter Input",
+  "settings.transcription.all.usecases": "All Usecase",
+  "settings.transcription.delete.confirm": "Are you sure you want to delete this usecase?",
+  "settings.transcription.delete.success": "Usecase deleted successfully.",
+  "settings.transcription.updated.success": "Usecase Updated successfully.",
+  "settings.transcription.addUsecase": "add use case",
   "prompt-library.input-placeholder": "Dein Input...",
   "onboarding.skip": "Überspringen",
   "onboarding.next": "Weiter",
@@ -327,5 +332,7 @@
   "tenant.contact-us": "contact us",
   "tenant.to-upgrade": "to upgrade",
   "tenant.trial-message": " This is a free trial version, <a href=\"/\" target=\"_blank\" class=\"font-normal text-blue-600 hover:underline\">contact us</a> to upgrade.",
-  "user.unverified-email-message": "Please verify your email address. Unverified emails will be deleted within 24 hours.  <a href=\"${url}\" class=\"font-normal text-blue-600 underline\" data-astro-prefetch=\"false\">Click here</a> o resend email verification links"
+  "user.unverified-email-message": "Please verify your email address. Unverified emails will be deleted within 24 hours. <a href=\"${url}\" data-verified=\"true\"  class=\"font-normal text-blue-600 underline\" data-astro-prefetch=\"false\">Click here</a> to resend email verification links",
+  "user.send-verify-email-success": "Email verify sent to your email. Please check and verify your account, thank you!",
+  "user.send-verify-email-failed": "Email verify is NOT sent to your email. Please try again!"
 }
