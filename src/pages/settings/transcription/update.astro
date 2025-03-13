@@ -88,7 +88,8 @@ const transcriptionsEnriched: AudioCardItem[] = transcriptionsFiltered.map(
   >
     <div class="flex items-center pt-2 pb-6">
       <button class="mr-4" onclick="history.back()">
-        <img src="/src/assets/icons/back.svg" alt="Back" class="w-6 h-6" />
+        <Fragment set:html={svgIcons.back} />
+        
       </button>
 
       <h1 class="text-4xl font-bold">
