@@ -1,7 +1,11 @@
 import { ObjectId } from "mongodb";
 import { db, type Document } from "../mongodb";
 import { z } from "zod";
-import { TenantFeature, ApiKeyProvider, AudioCategory } from "$types/TenantFeature";
+import {
+  TenantFeature,
+  ApiKeyProvider,
+  AudioCategory,
+} from "$types/TenantFeature";
 
 export enum TenantTheme {
   Light = "light",
@@ -103,6 +107,7 @@ const TenantSchema = z.object({
   perplexity_chat_model: z.string().nullish(),
   active: z.boolean().optional().default(true),
   is_restrict_user_managment: z.boolean().optional().default(false),
+  is_trial: z.boolean().optional().default(false),
   created_at: z
     .date()
     .optional()

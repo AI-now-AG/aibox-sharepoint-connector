@@ -25,11 +25,14 @@ export const lucia = new Lucia(adapter, {
       name: attributes.name,
       tenant_id: attributes.tenant_id,
       email: attributes.email,
+      email_verified: attributes.email_verified,
       picture: attributes.picture,
       roles: attributes.roles,
       permissions: attributes.permissions,
       navState: attributes.navState,
       blocked: attributes.blocked,
+      logins_count: attributes.logins_count,
+      tours: attributes.tours,
     };
   },
 });

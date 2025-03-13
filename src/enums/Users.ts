@@ -20,5 +20,9 @@ export const ROLE_PERMISSIONS_MAP = {
   ],
 };
 
+export enum TourType {
+  Onboarding = "Onboarding",
+}
+
 export const EncryptedUserPassword =
   "dea510d6a7e4e4c0e5f81ce9a8c9eb4c:43bb938b99ae20bceb3641bccb9c663a7d602db3a189a11e8e3228eb63ce1bc3";

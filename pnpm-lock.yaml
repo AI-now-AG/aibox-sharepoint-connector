@@ -53,6 +53,9 @@ importers:
       '@netlify/functions':
         specifier: ^3.0.0
         version: 3.0.0
+      '@sendgrid/mail':
+        specifier: ^8.1.4
+        version: 8.1.4
       '@sentry/astro':
         specifier: ^9.0.1
         version: 9.0.1(astro@5.2.5(@azure/identity@4.6.0)(@azure/storage-blob@12.26.0)(@netlify/blobs@8.1.0)(@types/node@22.13.1)(jiti@2.4.2)(rollup@4.34.6)(typescript@5.7.3)(yaml@2.7.0))
@@ -98,6 +101,9 @@ importers:
       dayjs:
         specifier: ^1.11.13
         version: 1.11.13
+      driver.js:
+        specifier: ^1.3.5
+        version: 1.3.5
       fast-csv:
         specifier: ^5.0.2
         version: 5.0.2
@@ -2533,6 +2539,18 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@sendgrid/client@8.1.4':
+    resolution: {integrity: sha512-VxZoQ82MpxmjSXLR3ZAE2OWxvQIW2k2G24UeRPr/SYX8HqWLV/8UBN15T2WmjjnEb5XSmFImTJOKDzzSeKr9YQ==}
+    engines: {node: '>=12.*'}
+
+  '@sendgrid/helpers@8.0.0':
+    resolution: {integrity: sha512-Ze7WuW2Xzy5GT5WRx+yEv89fsg/pgy3T1E3FS0QEx0/VvRmigMZ5qyVGhJz4SxomegDkzXv/i0aFPpHKN8qdAA==}
+    engines: {node: '>= 12.0.0'}
+
+  '@sendgrid/mail@8.1.4':
+    resolution: {integrity: sha512-MUpIZykD9ARie8LElYCqbcBhGGMaA/E6I7fEcG7Hc2An26QJyLtwOaKQ3taGp8xO8BICPJrSKuYV4bDeAJKFGQ==}
+    engines: {node: '>=12.*'}
+
   '@sentry-internal/browser-utils@9.0.1':
     resolution: {integrity: sha512-/2karfYpQFtnkFrWxQgi/DuOf83OGhIdJcEmRDYDZKvj3mGHQ6n7fzIFD8fc0hPupBA/xi2kHVu7DX7scx5Fbw==}
     engines: {node: '>=18'}
@@ -4159,6 +4177,9 @@ packages:
   dotenv@16.4.7:
     resolution: {integrity: sha512-47qPchRCykZC03FhkYAhrvwU4xDBFIj1QPqaarj6mdM/hgUzfPHcpkHJOn3mJAufFeeAxAzeGsr5X0M4k6fLZQ==}
     engines: {node: '>=12'}
+
+  driver.js@1.3.5:
+    resolution: {integrity: sha512-exkp49hXuujvTOZ3zYgySWRlEAa8/3nA8glYjtuZjmkTdsQITXivBsW1ytyhKQx3WkeYaovlnvVcLbtTaN86kA==}
 
   dset@3.1.4:
     resolution: {integrity: sha512-2QF/g9/zTaPDc3BjNcVTGoBbXBgYfMTTceLaYcFJ/W9kggFUkhxD/hMEeuLKbugyef9SqAx8cpgwlIP/jinUTA==}
@@ -10849,6 +10870,24 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.34.6':
     optional: true
 
+  '@sendgrid/client@8.1.4':
+    dependencies:
+      '@sendgrid/helpers': 8.0.0
+      axios: 1.7.9(debug@4.4.0)
+    transitivePeerDependencies:
+      - debug
+
+  '@sendgrid/helpers@8.0.0':
+    dependencies:
+      deepmerge: 4.3.1
+
+  '@sendgrid/mail@8.1.4':
+    dependencies:
+      '@sendgrid/client': 8.1.4
+      '@sendgrid/helpers': 8.0.0
+    transitivePeerDependencies:
+      - debug
+
   '@sentry-internal/browser-utils@9.0.1':
     dependencies:
       '@sentry/core': 9.0.1
@@ -12835,6 +12874,8 @@ snapshots:
       type-fest: 4.34.1
 
   dotenv@16.4.7: {}
+
+  driver.js@1.3.5: {}
 
   dset@3.1.4: {}
 

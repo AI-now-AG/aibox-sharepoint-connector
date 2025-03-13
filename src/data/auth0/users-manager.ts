@@ -1,4 +1,4 @@
-import management from "$data/auth0/management-client";
+import { managementClient } from "$data/auth0/client";
 import type {
   GetUsersByIdRequest,
   GetUsersRequest,
@@ -12,7 +12,7 @@ import type {
 
 export const getAllUsers = async (parameters: GetUsersRequest) => {
   try {
-    return await management.users.getAll(parameters);
+    return await managementClient.users.getAll(parameters);
   } catch (error) {
     console.error("auth0: get all user error", error);
     throw error;
@@ -25,7 +25,7 @@ export const get = async (userId: string) => {
       id: userId,
     };
 
-    return await management.users.get(requestParameters);
+    return await managementClient.users.get(requestParameters);
   } catch (error) {
     console.error("auth0: get user error", error);
     throw error;
@@ -38,7 +38,7 @@ export const getByEmail = async (email: string) => {
       email: email,
     };
 
-    return management.usersByEmail.getByEmail(requestParameters);
+    return managementClient.usersByEmail.getByEmail(requestParameters);
   } catch (error) {
     console.error("auth0: get user error", error);
     throw error;
@@ -48,7 +48,7 @@ export const getByEmail = async (email: string) => {
 // This get Role which NOT RELATED to Orgainziation (using user id)
 export const getUserRoles = async (parameters: GetUserRolesRequest) => {
   try {
-    return await management.users.getRoles(parameters);
+    return await managementClient.users.getRoles(parameters);
   } catch (error) {
     console.error("auth0: get user role error", error);
     throw error;
@@ -57,7 +57,7 @@ export const getUserRoles = async (parameters: GetUserRolesRequest) => {
 
 export const create = async (bodyParameters: UserCreate) => {
   try {
-    return await management.users.create(bodyParameters);
+    return await managementClient.users.create(bodyParameters);
   } catch (error) {
     console.error("auth0: create user error", error);
     throw error;
@@ -70,7 +70,10 @@ export const update = async (userId: string, bodyParameters: UserUpdate) => {
       id: userId,
     };
 
-    return await management.users.update(requestParameters, bodyParameters);
+    return await managementClient.users.update(
+      requestParameters,
+      bodyParameters,
+    );
   } catch (error) {
     console.error("auth0: update user error", error);
     throw error;
@@ -83,7 +86,7 @@ export const deleteUser = async (userId: string) => {
       id: userId,
     };
 
-    return await management.users.delete(requestParameters);
+    return await managementClient.users.delete(requestParameters);
   } catch (error) {
     console.error("auth0: delete user error", error);
     throw error;
