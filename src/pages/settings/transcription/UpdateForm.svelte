@@ -43,17 +43,17 @@
   let subtitleList = $state(
     [
       preDefineCategory.includes(AudioCategory.Subtitle) && {
-        title: "Subtitle Standard",
+        title: t("settings.transcription.subtitle-standard"),
         checked: category === AudioCategory.Subtitle,
         category: AudioCategory.Subtitle,
       },
       preDefineCategory.includes(AudioCategory.SubtitleLarge) && {
-        title: "Subtitle Large",
+        title: t("settings.transcription.subtitle-large"),
         checked: category === AudioCategory.SubtitleLarge,
         category: AudioCategory.SubtitleLarge,
       },
       preDefineCategory.includes(AudioCategory.SubtitleJson) && {
-        title: "Subtitle From JSON",
+        title: t("settings.transcription.subtitles-title-json"),
         checked: category === AudioCategory.SubtitleJson,
         category: AudioCategory.SubtitleJson,
       },
