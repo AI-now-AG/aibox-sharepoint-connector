@@ -50,7 +50,7 @@
     }
   });
 
-  const setTheme = (item) => {
+  const setTheme = (item: Item) => {
     document.documentElement.setAttribute("data-theme", item.value);
     handleSelectedItems(item);
   };
