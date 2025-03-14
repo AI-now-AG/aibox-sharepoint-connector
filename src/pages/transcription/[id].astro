@@ -26,8 +26,8 @@ let title = t("tenant.audio-to-text");
 let description = t("settings.transcription.plaintext-description");
 
 if (transcriptions?.category === AudioCategory.AudioToText) {
-  title = t("settings.transcription.summarize-title");
-  description = t("settings.transcription.summarize-description");
+  title = t("tenant.audio-to-text");
+  description = t("settings.transcription.plaintext-description");
   selectedTranscriptionType = TranscriptionType.Plaintext;
 } else if (
   transcriptions?.category === AudioCategory.Subtitle ||
