@@ -70,7 +70,7 @@
     </form>
     <div class="relative flex flex-col py-4">
       <label
-        class={`py-16 relative flex flex-col text-base-content border border-dashed rounded-sm cursor-pointer ${isDragOver ? "border-blue-500" : "border-neutral-content"} ${fileErrorMessage && "border-red-500 bg-red-100"}`}
+        class={`py-16 relative flex flex-col text-base-content border border-dashed rounded-sm cursor-pointer ${isDragOver ? "border-info" : "border-neutral-content"} ${fileErrorMessage && "border-error/70 bg-error/30"}`}
         ondragover={() => {
           isDragOver = true;
         }}
@@ -100,12 +100,12 @@
           {/if}
         </div>
       </label>
-      <span class="mt-2 text-xs text-red-500">{fileErrorMessage}</span>
+      <span class="mt-2 text-xs text-error/60">{fileErrorMessage}</span>
     </div>
 
     <div class="modal-action">
       <form method="dialog">
-        <button class="btn">{t("common.cancel")}</button>
+        <button class="btn btn-outline">{t("common.cancel")}</button>
         <button
           class="btn btn-primary {!isFormValid && 'btn-disabled'}"
           type="submit"

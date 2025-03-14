@@ -218,7 +218,7 @@
     <div class="p-2 flex flex-row gap-2">
       {#if $sharedMessageHistory.length == 0 && !isDisableFileInput}
         <button
-          class="btn h-auto w-auto p-1 min-h-0 hover:text-base-content/60"
+          class="btn btn-outline h-auto w-auto p-1 min-h-0 hover:text-base-content/60"
           disabled={!promptId}
           onclick={() => {
             isClickOnFile = true;
@@ -237,7 +237,7 @@
     </div>
     <div class="flex self-end">
       <button
-        class="btn btn-ghost btn-md disabled:bg-base-100 disabled:text-slate-500 disabled:cursor-not-allowed"
+        class="btn btn-ghost btn-md disabled:bg-base-100 disabled:cursor-not-allowed"
         disabled={!promptId ||
           (!inputText && inputFiles.length === 0) ||
           isProcessing}

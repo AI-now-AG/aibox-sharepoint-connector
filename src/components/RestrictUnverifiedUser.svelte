@@ -58,7 +58,7 @@
 
 {#if isShow}
   <div
-    class="fixed bottom-20 right-4 bg-warning text-sm text-gray-800 max-w-lg p-2 pl-4 pr-4 rounded-md shadow-lg"
+    class="fixed bottom-20 right-4 bg-warning text-sm text-base-content max-w-lg p-2 pl-4 pr-4 rounded-md shadow-lg"
   >
     {@html t("user.unverified-email-message", {
       url: currentUrl,

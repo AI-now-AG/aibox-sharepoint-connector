@@ -34,11 +34,11 @@
 
 <div class="form-control">
   <label for={id} class="label pl-0 pb-3">
-    <span class="label-text text-base-content/40">{label}</span>
+    <span class="label-text text-base-content">{label}</span>
   </label>
   <div
-    class="input input-bordered flex justify-between items-center gap-2 w-full"
-    style={disabled ? "border: 1px solid #E5E6E6; color: #0F172A" : ""}
+    class="input flex justify-between items-center gap-2 w-full"
+    style={disabled ? "border: 1px solid" : ""}
   >
     <input
       {id}

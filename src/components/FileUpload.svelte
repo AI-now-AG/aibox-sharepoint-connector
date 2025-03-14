@@ -143,7 +143,7 @@
         class="relative flex flex-col p-4 border border-neutral-content rounded-sm"
       >
         <label
-          class={`py-6 relative flex flex-col text-base-content border border-dashed rounded-sm cursor-pointer ${isDragOver ? "border-blue-500" : "border-neutral-content"} ${fileErrorMessage && "border-error bg-error"}`}
+          class={`py-6 relative flex flex-col text-base-content border border-dashed rounded-sm cursor-pointer ${isDragOver ? "border-info" : "border-neutral-content"} ${fileErrorMessage && "border-error bg-error"}`}
           ondragover={() => {
             isDragOver = true;
           }}

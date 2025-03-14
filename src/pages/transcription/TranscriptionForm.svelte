@@ -968,7 +968,7 @@
     {#if !audioFile}
       <div class="relative flex flex-col mt-2">
         <label
-          class={`py-6 relative flex flex-col text-base-content border border-dashed rounded-sm cursor-pointer ${isDragOver ? "border-blue-500" : "border-neutral-content"} ${fileErrorMessage && "border-red-500 bg-red-100"}`}
+          class={`py-6 relative flex flex-col text-base-content border border-dashed rounded-sm cursor-pointer ${isDragOver ? "border-info" : "border-neutral-content"} ${fileErrorMessage && "border-error/70 bg-error/30"}`}
           ondragover={() => {
             isDragOver = true;
           }}
@@ -1016,7 +1016,7 @@
 
     {#if audioFile}
       <div
-        class={`flex items-center justify-between p-2 border rounded-lg shadow-xs mt-2 ${isUploading ? "bg-transparent" : "bg-cyan-100"}`}
+        class={`flex items-center justify-between p-2 border rounded-lg shadow-sm mt-2 ${isUploading ? "bg-transparent" : "bg-accent/30"}`}
       >
         <div class="flex items-center">
           <div class="shrink-0 p-2 rounded-md">
@@ -1062,7 +1062,7 @@
             </div>
             <button
               onclick={preventDefault(removeFile)}
-              class="text-gray-700 hover:text-primary"
+              class="text-base-content hover:text-primary"
             >
               {@html svgIcons.close}
             </button>
@@ -1363,7 +1363,7 @@
                   <li>
                     <button
                       onclick={preventDefault(() => handleSelectedItems(item))}
-                      class={`${item.checked === true ? "bg-primary text-base-100 hover:bg-primary" : "hover:text-neutral"}`}
+                      class={`${item.checked === true ? "bg-primary text-primary-content hover:bg-primary" : "hover:text-neutral"}`}
                     >
                       {item.title}
                     </button>
@@ -1412,7 +1412,7 @@
   <div class="mt-8 mb-5 flex items-center space-x-4">
     {#if !isTranscipted}
       <button
-        class={`btn btn-active btn-primary btn-sm text-base-100`}
+        class={`btn btn-active btn-primary`}
         disabled={!isUploaded ||
           !isFormValid ||
           isTranscribing ||
@@ -1424,7 +1424,7 @@
     {#if isTranscipted}
       {#if zipFileData}
         <button
-          class="btn btn-success btn-sm text-base-100"
+          class="btn btn-success"
           onclick={downloadZip}
           >{@html svgIcons.download}{t(
             "transciption.model.cta.download-zip",

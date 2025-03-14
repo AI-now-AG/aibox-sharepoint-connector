@@ -46,20 +46,20 @@
         <button class="btn btn-sm" onclick={() => confirm()}
           >{t("transcription.start-new")}</button
         >
-        <button class="btn btn-active btn-primary btn-sm text-base-100"
+        <button class="btn btn-active btn-primary btn-sm"
           >{t("common.cancel")}</button
         >
         {#if isZipDataPresent}
           <button
             id="no_button"
-            class="btn btn-active btn-primary btn-sm text-base-100"
+            class="btn btn-active btn-primary btn-sm"
             onclick={() => downloadZip()}
             >{t("transciption.model.cta.download-zip")}</button
           >
         {:else if isFileDataPresent}
           <button
             id="no_button"
-            class="btn btn-active btn-primary btn-sm text-base-100"
+            class="btn btn-active btn-primary btn-sm"
             onclick={() => downloadFile()}
             >{t("transciption.model.cta.download-output")}</button
           >

@@ -69,7 +69,7 @@
       >
         <path
           d="M13 13L9 9M10.3333 5.66667C10.3333 8.244 8.244 10.3333 5.66667 10.3333C3.08934 10.3333 1 8.244 1 5.66667C1 3.08934 3.08934 1 5.66667 1C8.244 1 10.3333 3.08934 10.3333 5.66667Z"
-          stroke="#111827"
+          stroke="currentColor"
           stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
@@ -93,7 +93,7 @@
       >
         <path
           d="M10.6663 1L5.99967 5.66667L1.33301 1"
-          stroke="#111827"
+          stroke="currentColor"
           stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
@@ -109,7 +109,7 @@
           <li>
             <button
               onclick={preventDefault(() => handleSelectedItems(item))}
-              class={`${selectedItems?.includes(item) ? "bg-primary text-base-100 hover:bg-primary" : "hover:text-neutral"}`}
+              class={`${selectedItems?.includes(item) ? "bg-primary text-primary-content hover:bg-primary" : "hover:text-neutral"}`}
             >
               {item.title}
             </button>

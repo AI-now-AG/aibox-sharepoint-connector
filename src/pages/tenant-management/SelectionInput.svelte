@@ -50,7 +50,7 @@
   </script>
   
   <div>
-    <p class="mb-2 text-base-content/50 font-medium text-sm">{title}</p>
+    <p class="mb-2 text-base-content font-medium text-sm">{title}</p>
     <div class="dropdown dropdown-top w-full min-w-xs">
       <input
         {placeholder}
@@ -68,7 +68,7 @@
             <li>
               <button
                 onclick={preventDefault(() => handleSelectedItems(item))}
-                class={`${selectedItem == item ? "bg-primary text-base-100 hover:bg-primary" : "hover:text-neutral"}`}
+                class={`${selectedItem == item ? "bg-primary text-primary-content hover:bg-primary" : "hover:text-neutral"}`}
                 >{typeof item === "string" ? item : item.title}
               </button>
             </li>

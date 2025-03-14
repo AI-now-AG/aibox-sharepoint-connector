@@ -14,7 +14,33 @@ export enum TenantTheme {
   Lemonade = "lemonade",
   Somedia = "somedia",
   Weihnachtsmann = "weihnachtsmann",
+  Cupcake = "cupcake",
+  Bumblebee = "bumblebee",
+  Emerald = "emerald",
+  Corporate = "corporate",
+  Retro = "retro",
+  Halloween = "halloween",
+  Garden = "garden",
+  Forest = "forest",
+  Lofi = "lofi",
+  Pastel = "pastel",
+  Fantasy = "fantasy",
+  Wireframe = "wireframe",
+  Black = "black",
+  Dracula = "dracula",
+  Cmyk = "cmyk",
+  Autumn = "autumn",
+  Business = "business",
+  Acid = "acid",
+  Night = "night",
+  Winter = "winter",
+  Dim = "dim",
+  Nord = "nord",
+  Sunset = "sunset",
+  Abyss = "abyss",
+  Silk = "silk"
 }
+
 
 export const TenantFilterParamsSchema = z.object({
   searchValue: z.string().nullish(),

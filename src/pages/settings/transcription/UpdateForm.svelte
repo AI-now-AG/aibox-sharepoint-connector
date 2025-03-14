@@ -248,7 +248,7 @@
                   <li>
                     <button
                       onclick={preventDefault(() => handleSelectedItems(item))}
-                      class={`${item.checked === true ? "bg-primary text-base-100 hover:bg-primary" : "hover:text-neutral"}`}
+                      class={`${item.checked === true ? "bg-primary text-primary-content hover:bg-primary" : "hover:text-neutral"}`}
                     >
                       {item.title}
                     </button>

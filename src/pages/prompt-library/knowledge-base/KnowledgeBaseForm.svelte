@@ -132,7 +132,7 @@
           {/if}
         </h1>
         <button
-          class="btn btn-neutral font-normal grow-0"
+          class="btn btn-outline font-normal grow-0"
           onclick={() => {
             fileUploadModal?.showModal();
           }}

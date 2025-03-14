@@ -32,7 +32,7 @@
       <!-- svelte-ignore a11y_no_static_element_interactions -->
       <!-- svelte-ignore a11y_click_events_have_key_events -->
       <div
-        class="flex items-center px-4 py-2 text-base-content font-sans w-full"
+        class="flex items-center px-4 py-2 text-base-content w-full"
         onclick={(e) => {
           e.stopPropagation();
           option.action();

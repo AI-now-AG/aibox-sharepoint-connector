@@ -73,15 +73,6 @@
     };
   });
 
-  function handleClickFilter() {
-    if (showFilter) {
-      showFilter = false;
-      onfilter();
-    } else {
-      showFilter = true;
-    }
-  }
-
   function calculateNumberOfFitler() {
     let count = 0;
     const uniqueRoles = new Set();
@@ -122,120 +113,120 @@
 </script>
 
 <div class="mt-3">
-  <button
-    class="btn btn-sm btn-active font-normal bg-base-200"
-    onclick={(e) => {
-      e.stopPropagation();
-      handleClickFilter();
-    }}
-  >
-    {@html svgIcons.filter}
-    {t("common.filter")}
-    {#if numberOfFilters > 0}
-      <div class="badge badge-primary badge-md">{numberOfFilters}</div>
-    {/if}
-    {@html svgIcons.arrowDownFill}
-  </button>
-
-  {#if showFilter}
+  <div class="dropdown">
     <div
-      class="menu bg-base-100 rounded-xl z-1 p-3 shadow-sm w-52 mt-1 absolute"
+      tabindex="0"
+      role="button"
+      class="btn font-normal btn-sm btn-outline m-1"
     >
-      <div class="flex justify-center items-center">
-        <span class="flex-1 text-left text-sm font-bold"
-          >{t("common.filter")}</span
-        >
-        <button
-          class="btn btn-default btn-sm"
-          onclick={(e) => {
-            e.stopPropagation();
-            showFilter = false;
-            onfilter();
-          }}
-        >
-          {@html svgIcons.filter}</button
-        >
-      </div>
+      {@html svgIcons.filter}
+      {t("common.filter")}
+      {#if numberOfFilters > 0}
+        <div class="badge badge-primary badge-md">{numberOfFilters}</div>
+      {/if}
+      {@html svgIcons.arrowDownFill}
+    </div>
+    <div
+      tabindex="-1"
+      class="dropdown-content card card-sm bg-base-100 z-1 w-64 shadow-md"
+    >
+      <div class="bg-base-100 rounded-xl z-1 p-3 shadow-sm w-52 mt-1 absolute">
+        <div class="flex justify-center items-center">
+          <span class="flex-1 text-left text-sm font-bold"
+            >{t("common.filter")}</span
+          >
+          <button
+            class="btn btn-outline btn-sm"
+            onclick={(e) => {
+              const elem = document.activeElement;
+              if (elem) {
+                elem?.blur();
+              }
+              e.stopPropagation();
+              onfilter();
+            }}
+          >
+            {@html svgIcons.filter}</button
+          >
+        </div>
 
-      <div class="w-full h-[1px] bg-slate-200 mt-2 mb-2"></div>
+        <div class="divider"></div>
 
-      <div class="w-full text-sm">
-        <div class="w-full text-left">{t("user.role")}</div>
-        <button
-          onclick={(e) => {
-            e.stopPropagation();
-            null;
-          }}
-          class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
-        >
-          <input
-            type="checkbox"
-            class="checkbox checkbox-sm checkbox-neutral mr-2"
-            bind:checked={isUserChecked}
-          />
-          <span class="font-normal">{t("user.user")}</span>
-        </button>
-        <button
-          onclick={(e) => {
-            e.stopPropagation();
-            null;
-          }}
-          class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
-        >
-          <input
-            type="checkbox"
-            class="checkbox checkbox-sm checkbox-neutral mr-2"
-            bind:checked={isAdminChecked}
-          />
-          <span class="font-normal">{t("user.admin")}</span>
-        </button>
-      </div>
+        <div class="w-full text-sm">
+          <div class="w-full text-left">{t("user.role")}</div>
+          <div
+            class="flex-1 items-center ml-4 p-2 rounded-lg hover:bg-base-300"
+          >
+            <label class="fieldset-label">
+              <input
+                type="checkbox"
+                bind:checked={isUserChecked}
+                class="checkbox checkbox-sm mr-2"
+              />
+              <span class="font-normal text-base-content">{t("user.user")}</span
+              >
+            </label>
+          </div>
+          <div
+            class="flex-1 items-center ml-4 p-2 rounded-lg hover:bg-base-300"
+          >
+            <label class="fieldset-label">
+              <input
+                type="checkbox"
+                bind:checked={isAdminChecked}
+                class="checkbox checkbox-sm mr-2"
+              />
+              <span class="font-normal text-base-content"
+                >{t("user.admin")}</span
+              >
+            </label>
+          </div>
+        </div>
 
-      <div class="w-full mt-4">
-        <div class="w-full text-left">{t("user.status")}</div>
-        <button
-          onclick={(e) => {
-            e.stopPropagation();
-            null;
-          }}
-          class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
-        >
-          <input
-            type="checkbox"
-            class="checkbox checkbox-sm checkbox-neutral mr-2"
-            bind:checked={isBlockedChecked}
-          />
-          <span class="font-normal">{t("common.block")}</span>
-        </button>
-        <button
-          onclick={(e) => {
-            e.stopPropagation();
-            null;
-          }}
-          class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
-        >
-          <input
-            type="checkbox"
-            class="checkbox checkbox-sm checkbox-neutral mr-2"
-            bind:checked={isUnVerifiedChecked}
-          />
-          <span class="font-normal">{t("user.un-veriried")}</span>
-        </button>
-        <button
-          onclick={(e) => {
-            e.stopPropagation();
-            null;
-          }}
-          class="flex items-center ml-4 p-2 rounded-lg hover:bg-gray-200"
-        >
-          <input
-            type="checkbox"
-            class="checkbox checkbox-sm checkbox-neutral mr-2"
-            bind:checked={isVerifiedChecked}
-          />
-          <span class="font-normal">{t("user.veriried")}</span>
-        </button>
+        <div class="w-full mt-2 text-sm">
+          <div class="w-full text-left">{t("user.status")}</div>
+          <div
+            class="flex-1 items-center ml-4 p-2 rounded-lg hover:bg-base-300"
+          >
+            <label class="fieldset-label">
+              <input
+                type="checkbox"
+                bind:checked={isBlockedChecked}
+                class="checkbox checkbox-sm mr-2"
+              />
+              <span class="font-normal text-base-content"
+                >{t("common.block")}</span
+              >
+            </label>
+          </div>
+          <div
+            class="flex-1 items-center ml-4 p-2 rounded-lg hover:bg-base-300"
+          >
+            <label class="fieldset-label">
+              <input
+                type="checkbox"
+                bind:checked={isUnVerifiedChecked}
+                class="checkbox checkbox-sm mr-2"
+              />
+              <span class="font-normal text-base-content"
+                >{t("user.un-veriried")}</span
+              >
+            </label>
+          </div>
+          <div class="flex items-center ml-4 p-2 rounded-lg hover:bg-base-300">
+            <label class="fieldset-label">
+              <input
+                type="checkbox"
+                bind:checked={isVerifiedChecked}
+                class="checkbox checkbox-sm mr-2"
+              />
+              <span class="font-normal text-base-content"
+                >{t("user.veriried")}</span
+              >
+            </label>
+          </div>
+        </div>
       </div>
     </div>
-  {/if}
+  </div>
 </div>

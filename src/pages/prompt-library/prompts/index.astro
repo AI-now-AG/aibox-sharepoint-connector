@@ -88,7 +88,7 @@ let userPermissions = Astro.locals.user.permissions;
         userPermissions.includes(Permission.AdminAll) && (
           <a
             href="prompts/add"
-            class="btn btn-active btn-neutral font-normal grow-0"
+            class="btn btn-outline font-normal grow-0"
           >
             <span set:html={svgIcons.add} />
             {t("prompt-library.prompts.add")}

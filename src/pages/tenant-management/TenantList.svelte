@@ -172,7 +172,7 @@
                 >
               </td>
               <td
-                class="py-3 px-4 text-gray-600 flex items-center text-xs font-normal h-16"
+                class="py-3 px-4 text-base-content flex items-center text-xs font-normal h-16"
               >
                 {tenant.org_name}
                 <button
@@ -182,7 +182,7 @@
                 >
               </td>
               <td class="py-3 px-4">
-                <span class="text-red-600 text-sm font-medium"
+                <span class="text-warning text-sm font-medium"
                   >{tenant.is_trial ? t("common.yes") : ""}</span
                 >
               </td>
@@ -190,8 +190,8 @@
               <td class="py-3 px-4">
                 <span
                   class={tenant.active == 1
-                    ? "text-emerald-600 text-sm font-medium"
-                    : "text-grey-600 text-sm font-medium"}
+                    ? "text-success text-sm font-medium"
+                    : "text-sm font-medium text-neutral/70"}
                   >{tenant.active == 1
                     ? t("tenant.tenants.tenant.active")
                     : t("tenant.tenants.tenant.archived")}</span

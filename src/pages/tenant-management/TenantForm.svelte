@@ -20,6 +20,8 @@
   import { isValidEmail } from "$utils/common";
   import { ApiKeyProvider, AudioCategory } from "$types/TenantFeature";
   import SelectionInput from "./SelectionInput.svelte";
+  import SingleInput from "$pages/prompt-library/prompts/SingleInput.svelte";
+  import ThemeItem from "./ThemeItem.svelte";
 
   const t = useTranslations();
 
@@ -169,6 +171,48 @@
       .join(", "),
   );
 
+  const languages = [
+    { title: "Deutsch", value: "de" },
+    { title: "English", value: "en" },
+  ];
+  let selectedLanguage: { title: string; value: string } | undefined = $state();
+
+  const themes = [
+    { title: "Light", value: "light" },
+    { title: "Dark", value: "dark" },
+    { title: "Somedia", value: "somedia" },
+    { title: "Weihnachtsmann", value: "weihnachtsmann" },
+    { title: "Luxury", value: "luxury" },
+    { title: "Lemonade", value: "lemonade" },
+    { title: "Cupcake", value: "cupcake" },
+    { title: "Bumblebee", value: "bumblebee" },
+    { title: "Emerald", value: "emerald" },
+    { title: "Corporate", value: "corporate" },
+    { title: "Retro", value: "retro" },
+    { title: "Halloween", value: "halloween" },
+    { title: "Garden", value: "garden" },
+    { title: "Forest", value: "forest" },
+    { title: "Lofi", value: "lofi" },
+    { title: "Pastel", value: "pastel" },
+    { title: "Fantasy", value: "fantasy" },
+    { title: "Wireframe", value: "wireframe" },
+    { title: "Black", value: "black" },
+    { title: "Dracula", value: "dracula" },
+    { title: "Cmyk", value: "cmyk" },
+    { title: "Autumn", value: "autumn" },
+    { title: "Business", value: "business" },
+    { title: "Acid", value: "acid" },
+    { title: "Night", value: "night" },
+    { title: "Winter", value: "winter" },
+    { title: "Dim", value: "dim" },
+    { title: "Nord", value: "nord" },
+    { title: "Sunset", value: "sunset" },
+    { title: "Abyss", value: "abyss" },
+    { title: "Silk", value: "silk" },
+  ];
+
+  let selectedThemes: { title: string; value: string } | undefined = $state();
+
   if (tenantData && tenantData.transcription_types?.length) {
     //   isAzureAudioProEnabled = tenantData.transcription_types.some(
     //     (item: any) =>
@@ -211,12 +255,25 @@
   }
 
   // set default values
-  if (tenantData && !tenantData.default_language) {
-    tenantData.default_language = "de";
+  if (!tenantData.default_language) {
+    // tenantData.default_language = "de";
+    selectedLanguage = languages.find(
+      (item) => item.value === tenantData.default_language,
+    );
+  }
+  if (tenantData.default_language) {
+    selectedLanguage = languages.find(
+      (item) => item.value === tenantData.default_language,
+    ) ?? { title: "Deutsch", value: "de" };
   }
   if (tenantData && !tenantData.theme) {
     tenantData.theme = "dark" as TenantTheme;
+    selectedThemes = themes.find((item) => item.value === tenantData.theme);
   }
+  if (tenantData.theme) {
+    selectedThemes = themes.find((item) => item.value === tenantData.theme);
+  }
+
   if (tenantData && !tenantData.primary_color) {
     // svelte-ignore state_referenced_locally
     tenantData.primary_color = selecteColor;
@@ -360,6 +417,8 @@
     if (validateForm()) {
       try {
         showLoading();
+        tenantData.default_language = selectedLanguage?.value;
+        tenantData.theme = selectedThemes?.value;
         const { error: encryptKeysError, data } =
           await actions.tenant.encryptApiKeys({
             openai_api_key: openAIKey,
@@ -439,6 +498,8 @@
     if (validateForm()) {
       try {
         showLoading();
+        tenantData.default_language = selectedLanguage?.value;
+        tenantData.theme = selectedThemes?.value;
         const { error: encryptKeysError, data } =
           await actions.tenant.encryptApiKeys({
             openai_api_key: openAIKey,
@@ -612,7 +673,7 @@
   <div class="container w-full mx-auto p-6">
     <div class="flex flex-row space-x-4">
       <div class="flex-1 flex flex-col mb-4">
-        <span class="mb-2 text-gray-400 font-medium text-sm"
+        <span class="mb-2 text-base-content font-medium text-sm"
           >{t("tenant.tenants.tenant.display-name")}</span
         >
         <input
@@ -624,7 +685,7 @@
       </div>
 
       <div class="flex-1 flex flex-col mb-4">
-        <span class="mb-2 text-gray-400 font-medium text-sm"
+        <span class="mb-2 text-base-content font-medium text-sm"
           >{t("tenant.tenants.tenant.name")}</span
         >
         <input
@@ -641,41 +702,32 @@
 
     <div class="flex flex-row space-x-4">
       <div class="flex-1 flex flex-col mb-4">
-        <span class="mb-2 text-gray-400 font-medium text-sm"
-          >{t("tenant.language")}</span
-        >
-        <select
-          class="select select-bordered w-full"
-          bind:value={tenantData.default_language}
-        >
-          <option disabled>{t("tenant.language")}</option>
-          <option value="de">{t("tenant.german-language")}</option>
-          <option value="en">{t("tenant.english-language")}</option>
-        </select>
+        <SingleInput
+          title={`${t("tenant.language")}*`}
+          placeholder={t("tenant.german-language")}
+          items={languages}
+          bind:selectedItem={selectedLanguage}
+        />
       </div>
 
       <div class="flex-1 flex flex-col mb-4">
-        <span class="mb-2 text-gray-400 font-medium text-sm"
-          >{t("tenant.theme")}</span
-        >
-        <select
-          class="select select-bordered w-full"
-          bind:value={tenantData.theme}
-        >
-          <option disabled>{t("tenant.theme")}</option>
-          <option value="light">Light</option>
-          <option value="dark">Dark</option>
-          <option value="somedia">Somedia</option>
-          <option value="weihnachtsmann">Weihnachtsmann</option>
-          <option value="luxury">Luxury</option>
-          <option value="lemonade">Lemonade</option>
-        </select>
+        <ThemeItem
+          title={`${t("tenant.theme")}*`}
+          placeholder="e.g Light"
+          items={themes}
+          bind:selectedItem={selectedThemes}
+        />
       </div>
     </div>
 
     <div class="flex flex-row space-x-4">
-      <div class="flex-1 flex flex-col mb-4">
-        <span class="mb-2 text-gray-400 font-medium text-sm"
+      <div
+        class="flex-1 flex flex-col"
+        aria-disabled={true}
+        class:opacity-30={true}
+        class:pointer-events-none={true}
+      >
+        <span class="mb-2 text-base-content font-medium text-sm"
           >{t("tenant.primary-color")}</span
         >
         <div class="w-full">
@@ -722,10 +774,10 @@
           </div>
         </div>
       </div>
-      <div class="flex-1 flex flex-col mb-4">
+      <div class="flex-1 flex flex-col">
         <div class="flex justify-end">
           <button
-            class={"mt-7 btn btn-active btn-neutral font-normal grow-0 w-auto " +
+            class={"mt-7 btn btn-outline font-normal grow-0 w-auto " +
               `${mode == MODE.Edit ? "" : "btn-disabled"}`}
             onclick={() => {
               addTanantAdminModal?.show();
@@ -738,7 +790,7 @@
       </div>
     </div>
 
-    <div class="w-full h-0.5 mt-4 mb-6 bg-gray-400/20"></div>
+    <div class="divider"></div>
 
     <div class="mb-3 flex flex-row items-center gap-2">
       {@html svgIcons.textPrompt}
@@ -747,7 +799,9 @@
 
     <div class="container mx-auto">
       <!-- Open AI Section -->
-      <div class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4">
+      <div
+        class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
+      >
         <input type="checkbox" />
         <div class="collapse-title">
           <div class="flex items-center justify-between">
@@ -764,7 +818,9 @@
                 class="label cursor-pointer ml-2"
                 for="feature-text-prompt"
               >
-                <span class="label-text">{t("tenant.open-ai-provider")}</span>
+                <span class="label-text text-base-content"
+                  >{t("tenant.open-ai-provider")}</span
+                >
               </label>
             </div>
             {#if defaultTextFeature === ApiKeyProvider.OpenAI}
@@ -777,7 +833,7 @@
         <div class="collapse-content">
           <div class="grid grid-cols-2 gap-4 mx-8">
             <div class="w-full">
-              <span class="mb-2 text-gray-400 font-medium text-sm"
+              <span class="mb-2 text-base-content font-medium text-sm"
                 >{t("tenant.model.name")}</span
               >
               <input
@@ -790,11 +846,13 @@
               />
             </div>
             <div class="w-full">
-              <span class="mb-2 text-gray-400 font-medium text-sm"
+              <span class="mb-2 text-base-content font-medium text-sm"
                 >{t("tenant.api-key")}</span
               >
 
-              <label class="input input-bordered flex items-center gap-2 mt-2 w-full">
+              <label
+                class="input input-bordered flex items-center gap-2 mt-2 w-full"
+              >
                 <input
                   bind:this={openAIKeyField}
                   type="password"
@@ -822,7 +880,9 @@
         </div>
       </div>
       <!-- Azure Section -->
-      <div class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4">
+      <div
+        class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
+      >
         <input type="checkbox" />
         <div class="collapse-title">
           <div class="flex items-center justify-between">
@@ -839,7 +899,7 @@
                 class="label cursor-pointer ml-2"
                 for="feature-azure-section"
               >
-                <span class="label-text"
+                <span class="label-text text-base-content"
                   >{t("tenant.azure-open-ai-provider")}</span
                 >
               </label>
@@ -854,11 +914,13 @@
         <div class="collapse-content">
           <div class="grid grid-cols-2 gap-4 mx-8">
             <div class="w-full">
-              <span class="mb-2 text-gray-400 font-medium text-sm"
+              <span class="mb-2 text-base-content font-medium text-sm"
                 >{t("tenant.azure-open-ai-provider")}</span
               >
 
-              <label class="input input-bordered flex items-center gap-2 mt-2 w-full">
+              <label
+                class="input input-bordered flex items-center gap-2 mt-2 w-full"
+              >
                 <input
                   bind:this={azureOpenAIKeyField}
                   type="password"
@@ -872,7 +934,7 @@
               </label>
             </div>
             <div class="w-full">
-              <span class="mb-2 text-gray-400 font-medium text-sm"
+              <span class="mb-2 text-base-content font-medium text-sm"
                 >{t("tenant.azure-open-ai-instance-name")}</span
               >
               <input
@@ -885,7 +947,7 @@
             </div>
 
             <div class="w-full">
-              <span class="mb-2 text-gray-400 font-medium text-sm"
+              <span class="mb-2 ttext-base-content font-medium text-sm"
                 >{t("tenant.azure-open-ai-endpoint")}</span
               >
               <input
@@ -896,7 +958,7 @@
               />
             </div>
             <div class="w-full">
-              <span class="mb-2 text-gray-400 font-medium text-sm"
+              <span class="mb-2 text-base-content font-medium text-sm"
                 >{t("tenant.azure-open-ai-transciption-model")}</span
               >
               <input
@@ -909,7 +971,7 @@
             </div>
 
             <div class="w-full">
-              <span class="mb-2 text-gray-400 font-medium text-sm"
+              <span class="mb-2 text-base-content font-medium text-sm"
                 >{t("tenant.azure-open-ai-text-model")}</span
               >
               <input
@@ -937,7 +999,9 @@
       </div>
 
       <!-- Perplexity Section -->
-      <div class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4">
+      <div
+        class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
+      >
         <input type="checkbox" />
         <div class="collapse-title">
           <div class="flex items-center justify-between">
@@ -954,7 +1018,9 @@
                 class="label cursor-pointer ml-2"
                 for="feature-perplexity-section"
               >
-                <span class="label-text">{t("tenant.perplexity.name")}</span>
+                <span class="label-text text-base-content"
+                  >{t("tenant.perplexity.name")}</span
+                >
               </label>
             </div>
             {#if defaultTextFeature === ApiKeyProvider.Perplexity}
@@ -975,11 +1041,13 @@
               />
             </div>
             <div class="w-full">
-              <span class="mb-2 text-base-content/50 font-medium text-sm"
+              <span class="mb-2 text-base-content font-medium text-sm"
                 >{t("tenant.api-key")}</span
               >
 
-              <label class="input input-bordered flex items-center gap-2 mt-1 w-full">
+              <label
+                class="input input-bordered flex items-center gap-2 mt-1 w-full"
+              >
                 <input
                   bind:this={perplexityKeyField}
                   type="password"
@@ -1008,14 +1076,17 @@
       </div>
     </div>
 
-    <div class="w-full h-0.5 mt-4 mb-6 bg-gray-400/20"></div>
+    <div class="divider"></div>
+
     <div class="mb-3 flex flex-row items-center gap-2">
       {@html svgIcons.audioToText}
       <p class="font-medium text-md">{t("nav.audiotool")}</p>
     </div>
     <div class="container mx-auto">
       <!-- Audio Whisper Section -->
-      <div class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4">
+      <div
+        class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
+      >
         <input type="checkbox" />
         <div class="collapse-title flex items-center justify-between gap-4">
           <div class="flex items-center">
@@ -1028,7 +1099,7 @@
               disabled
             />
             <label class="label cursor-pointer ml-2" for="audio-whisper-model">
-              <span class="label-text"
+              <span class="label-text text-base-content"
                 >{t("tenant.audio.whisper.model.title")}</span
               >
             </label>
@@ -1058,7 +1129,9 @@
                       class="label cursor-pointer ml-2"
                       for="audio-standard-{item.type}"
                     >
-                      <span class="label-text">{item.title}</span>
+                      <span class="label-text text-base-content"
+                        >{item.title}</span
+                      >
                     </label>
                   </div>
                 {/each}
@@ -1075,7 +1148,9 @@
       </div>
 
       <!-- Large File Azure Section -->
-      <div class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4">
+      <div
+        class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
+      >
         <input type="checkbox" />
         <div class="collapse-title flex items-center justify-between gap-4">
           <div class="flex items-center">
@@ -1088,7 +1163,7 @@
               disabled
             />
             <label class="label cursor-pointer ml-2" for="audio-pro-model">
-              <span class="label-text"
+              <span class="label-text text-base-content"
                 >{t("tenant.settings.large-file-azure")}</span
               >
             </label>
@@ -1117,7 +1192,9 @@
                       class="label cursor-pointer ml-2"
                       for="audio-pro-{item.type}"
                     >
-                      <span class="label-text">{item.title}</span>
+                      <span class="label-text text-base-content"
+                        >{item.title}</span
+                      >
                     </label>
                   </div>
                 {/each}
@@ -1127,11 +1204,13 @@
 
           <div class="grid grid-cols-2 gap-4 mx-8">
             <div class="w-full">
-              <span class="mb-2 text-gray-400 font-medium text-sm"
+              <span class="mb-2 text-base-content font-medium text-sm"
                 >{t("tenant.settings.large-file-azure-apiKey")}
               </span>
 
-              <label class="input input-bordered flex items-center gap-2 mt-2 w-full">
+              <label
+                class="input input-bordered flex items-center gap-2 mt-2 w-full"
+              >
                 <input
                   bind:this={azureOpenAIKeyProField}
                   type="password"
@@ -1145,7 +1224,7 @@
               </label>
             </div>
             <div class="w-full">
-              <span class="mb-2 text-gray-400 font-medium text-sm"
+              <span class="mb-2 text-base-content font-medium text-sm"
                 >{t("tenant.settings.large-file-azure-region")}</span
               >
               <input
@@ -1166,7 +1245,7 @@
           <div class="flex p-4 items-center justify-between">
             <div class="flex items-center justify-between">
               <label class="label cursor-pointer" for="">
-                <span class="label-text"
+                <span class="label-text text-base-content"
                   >{t("tenant.text.improvement.llm")}</span
                 >
                 <!-- <span class="text-sm font-semibold"
@@ -1197,60 +1276,7 @@
       </div>
     </div>
 
-    <!-- Included features -->
-    <!-- <div class="mb-3 mt-4"><b>{t("tenant.included-featured")}</b></div> -->
-
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <!-- <div class="w-full bg-white rounded-sm px-4 py-2">
-      <div class="flex items-center">
-        <input
-          id="feature-text-prompt"
-          type="checkbox"
-          checked={true}
-          class="checkbox checkbox-primary"
-          value="text-prompt"
-          disabled
-        />
-        <label class="label cursor-pointer ml-2" for="feature-text-prompt">
-          <span class="label-text">{t("tenant.text-prompt")}</span>
-        </label>
-      </div>
-      {#each providerValues as option}
-        <div class="flex items-center mt-2 px-4">
-          <input
-            type="radio"
-            id="radio-text-{option.value}"
-            name="text-prompt-provider"
-            class="radio radio-primary"
-            value={option}
-            bind:group={textSelectedProvider}
-          />
-          <label
-            for="radio-text-{option.value}"
-            class="ml-2 font-medium text-sm">{option.label}</label
-          >
-        </div>
-      {/each}
-    </div> -->
-
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <!-- <div class="w-full bg-white rounded-sm px-4 py-2 mt-4">
-      <div class="flex items-center">
-        <input
-          id="feature-audio-to-text"
-          type="checkbox"
-          class="checkbox checkbox-primary"
-          value="audio-to-text"
-          bind:checked={isAudioToTextChecked}
-        />
-        <label class="label cursor-pointer ml-2" for="feature-audio-to-text">
-          {@html svgIcons.audioToText}
-          <span class="label-text ml-2">{t("tenant.audio-to-text")}</span>
-        </label>
-      </div>
-    </div> -->
-
-    <div class="w-full h-0.5 mt-4 mb-6 bg-gray-400/20"></div>
+    <div class="divider"></div>
 
     <div class="mb-3 flex flex-row items-center gap-2">
       {@html svgIcons.userGroup}
@@ -1270,7 +1296,7 @@
               bind:checked={tenantData.is_restrict_user_managment}
             />
             <label class="label cursor-pointer ml-2" for="disable-create-user">
-              <span class="label-text ml-2"
+              <span class="label-text text-base-content ml-2"
                 >{t("tenant.restrict-user-managment")}</span
               >
             </label>
@@ -1291,7 +1317,9 @@
               bind:checked={tenantData.is_trial}
             />
             <label class="label cursor-pointer ml-2" for="is-trial-tenant">
-              <span class="label-text ml-2">{t("tenant.trial")}</span>
+              <span class="label-text text-base-content ml-2"
+                >{t("tenant.trial")}</span
+              >
             </label>
           </div>
         </div>

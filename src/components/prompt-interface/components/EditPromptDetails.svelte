@@ -307,7 +307,7 @@
       {#if isEditable}
         <div class="flex justify-end">
           <button
-            class="btn btn-active btn-neutral-content px-8 font-normal mr-2"
+            class="btn btn-outline px-8 font-normal mr-2"
             onclick={preventDefault(cancelEdit)}
           >
             {t("common.cancel")}

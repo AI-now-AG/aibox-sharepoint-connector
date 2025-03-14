@@ -52,16 +52,15 @@
     </form>
 
     <div class="flex-1 flex flex-col mt-8">
-      <span class="mb-2 text-gray-400 font-medium text-sm">{label}</span>
+      <span class="mb-2 text-base-content font-medium text-sm">{label}</span>
       <input
         type="text"
         {placeholder}
-        class={`input input-bordered w-full` +
-          ` ${errorMessage ? "border-red-400 " : ""}`}
+        class={`input input-bordered w-full${errorMessage ? " border-error/60" : ""}`}
         bind:value
       />
       {#if errorMessage}
-        <span class="mt-1 text-red-400 text-sm">{errorMessage}</span>
+        <span class="mt-1 text-error/60 text-sm">{errorMessage}</span>
       {/if}
     </div>
 
