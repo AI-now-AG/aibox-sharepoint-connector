@@ -54,8 +54,6 @@
     document.documentElement.setAttribute("data-theme", item.value);
     handleSelectedItems(item);
   };
-
-  $inspect(selectedItem);
 </script>
 
 <div>

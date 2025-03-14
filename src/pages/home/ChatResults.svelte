@@ -29,8 +29,6 @@
     }
   });
 
-  $inspect(totalMessages);
-
   const scrollToBottom = async () => {
     window?.scroll({
       top: document.documentElement.scrollHeight,

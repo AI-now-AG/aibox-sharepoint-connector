@@ -48,8 +48,6 @@
       resetSelection();
     }
   });
-
-  $inspect(selectedItem);
 </script>
 
 <div>

@@ -21,8 +21,6 @@
     isDisableFileInput = false,
   }: Props = $props();
 
-  $inspect(files);
-
   const fileTypes = {
     "audio/*": ["audio/mp3"],
     "video/*": ["video/mp4", "video/quicktime"],

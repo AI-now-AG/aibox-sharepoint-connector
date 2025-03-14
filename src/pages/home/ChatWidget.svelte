@@ -32,8 +32,6 @@
     apiProvider.name == ApiKeyProvider.Perplexity,
   );
 
-  $inspect(apiProvider, isDisableFileInput);
-
   onMount(() => {
     const handleScroll = () => {
       const { scrollHeight, scrollTop, clientHeight } =
@@ -58,8 +56,6 @@
   onDestroy(function () {
     sharedMessageHistory.set([]);
   });
-
-  // $inspect(input, output);
 
   const readFileContent = (file: File) => {
     return new Promise((resolve) => {
