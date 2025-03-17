@@ -1,19 +1,15 @@
-import { TranscriptionType } from "$types/TranscribeRequest";
+import { AudioCategory } from "$types/TenantFeature";
 import { BlobServiceClient, BlobSASPermissions } from "@azure/storage-blob";
 import { type Handler } from "@netlify/functions";
 import { v4 as uuidv4 } from "uuid"; // To generate unique file names
 
 const getSASToken: Handler = async (event) => {
-  const {
-    fileNameWithoutExtension,
-    fileExtension,
-    folderName,
-    transcriptionType,
-  } = JSON.parse(event.body!);
-  const typedTranscriptionType = transcriptionType as TranscriptionType;
+  const { fileNameWithoutExtension, fileExtension, folderName, category } =
+    JSON.parse(event.body!);
+  const typedCategory = category as AudioCategory;
 
   // Input validation
-  if (!fileNameWithoutExtension || !folderName || !transcriptionType) {
+  if (!fileNameWithoutExtension || !folderName || !typedCategory) {
     return {
       statusCode: 400,
       body: JSON.stringify({
@@ -24,15 +20,15 @@ const getSASToken: Handler = async (event) => {
   }
   try {
     const storageURLString =
-      typedTranscriptionType === TranscriptionType.Largefile ||
-      typedTranscriptionType === TranscriptionType.SubtitleLarge
+      typedCategory === AudioCategory.AudioPro ||
+      typedCategory === AudioCategory.SubtitleLarge
         ? process.env.AZURE_BLOB_LARGE_STORAGE_NAME || ""
         : process.env.AZURE_BLOB_STORAGE_NAME || "";
     const blobServiceClient =
       BlobServiceClient.fromConnectionString(storageURLString);
     const containerName =
-      typedTranscriptionType === TranscriptionType.Largefile ||
-      typedTranscriptionType === TranscriptionType.SubtitleLarge
+      typedCategory === AudioCategory.AudioPro ||
+      typedCategory === AudioCategory.SubtitleLarge
         ? process.env.AZURE_LARGE_CONTAINER_NAME || "transcribe-container"
         : process.env.AZURE_CONTAINER_NAME || "transcribecontainer";
     const containerClient = blobServiceClient.getContainerClient(containerName);

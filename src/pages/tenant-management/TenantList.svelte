@@ -16,6 +16,7 @@
   let tenants: any = $state([]);
   let showArchived: boolean = $state(false);
   let searchValue: string = $state("");
+  let timeout: any;
 
   let selectedTenant: any = $state(null);
   let confirmUpdateModal: HTMLDialogElement | undefined = $state();

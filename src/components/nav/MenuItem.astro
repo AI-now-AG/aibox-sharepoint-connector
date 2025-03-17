@@ -2,16 +2,20 @@
 import { match, Pattern } from "ts-pattern";
 import { wildcardMatch } from "$utils/wildcardMatch";
 import { Name } from "./icons/Icon.astro";
+import LoadingWrapper from "./LoadingWrapper.svelte";
+import type { TranscriptionType } from "$types/TranscribeRequest";
 
 export type MenuItem = {
   title: string;
   path?: string;
   icon?: Name | string;
+  usecaseId?: string;
+  transcriptionType?: TranscriptionType;
 };
 
 type Props = MenuItem;
 
-const { title, path, icon } = Astro.props;
+const { title, path, icon, usecaseId, transcriptionType } = Astro.props;
 ---
 
 {
@@ -30,7 +34,7 @@ const { title, path, icon } = Astro.props;
               path === Astro.url.pathname ||
               wildcardMatch(Astro.url.pathname, `${path}`),
           },
-          "font-semibold",
+          "font-semibold flex justify-between",
         ]}
         href={path}
       >
@@ -40,6 +44,17 @@ const { title, path, icon } = Astro.props;
           </span>
         )}
         <span>{title}</span>
+        {usecaseId && (
+          <LoadingWrapper
+            usecaseId={usecaseId}
+            transcriptionType={transcriptionType}
+            isSelected={
+              path === Astro.url.pathname ||
+              wildcardMatch(Astro.url.pathname, `${path}`)
+            }
+            client:load
+          />
+        )}
       </a>
     ))
     .exhaustive()

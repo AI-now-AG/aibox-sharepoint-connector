@@ -18,13 +18,13 @@ import {
   type TranscriptionResult,
   type TranscribeResponse,
   FileFormat,
-  TranscriptionType,
 } from "$types/TranscribeRequest";
 import { processTranscription } from "./batchTranscription";
 import type { TranscriptionResponse } from "$utils/Speech/SpeechResponse";
-import { ApiKeyProvider } from "$types/TenantFeature";
+import { ApiKeyProvider, AudioCategory } from "$types/TenantFeature";
 import { LoggingCallbackHandler } from "$callbackLLM/LoggingCallbackHandler";
 import type { TranscriptionVerbose } from "openai/resources/audio/transcriptions.mjs";
+import TranscriptionModel from "$data/models/transcription.model";
 
 const DEFAULT_WHISPER_MODEL_NAME = "whisper-1";
 const DEFAULT_API_VERSION = "2024-08-01-preview";
@@ -165,13 +165,13 @@ output>
     )
     .join("\n");*/
 
-  const instruction =
-    transcribeParams.transcriptionType === TranscriptionType.Subtitlesjson
-      ? transcribeParams.transcriptions.subtitlesjson?.text
-      : transcribeParams.transcriptionType === TranscriptionType.SubtitleLarge
-        ? transcribeParams.transcriptions.subtitlelarge?.text
-        : transcribeParams.transcriptions.subtitles?.text ||
-          DEFAULT_INSTRUCTION;
+  let instruction = DEFAULT_INSTRUCTION;
+  if (transcribeParams.usecaseId) {
+    const transcription = await TranscriptionModel.get(
+      transcribeParams.usecaseId,
+    );
+    instruction = transcription?.text ?? DEFAULT_INSTRUCTION;
+  }
 
   const CHUNK_SIZE_TOKENS = 9000;
 
@@ -287,9 +287,7 @@ export async function transcribeUsingOpenAI(
     }
 
     let response: TranscriptionVerbose | TranscribeResponse | null = null;
-    if (
-      transcribeParams.transcriptionType === TranscriptionType.Subtitlesjson
-    ) {
+    if (transcribeParams.category === AudioCategory.SubtitleJson) {
       const jsonResponse = bufferToTranscribeResponse(audioBuffer);
       response = jsonResponse;
     } else {
@@ -318,9 +316,7 @@ export async function transcribeUsingOpenAI(
       .slice(0, -1)
       .join(".");
     const outputURLs: { [key: string]: string } = {};
-    if (
-      transcribeParams.transcriptionType !== TranscriptionType.Subtitlesjson
-    ) {
+    if (transcribeParams.category !== AudioCategory.SubtitleJson) {
       outputURLs["json"] = await uploadOutputToBlob(
         transcribeParams.folderName,
         `${fileNameWithoutExtension}.json`,
@@ -328,29 +324,23 @@ export async function transcribeUsingOpenAI(
         "json",
       );
     }
-    if (transcribeParams.transcriptionType === TranscriptionType.Plaintext) {
-      const instruction = transcribeParams.transcriptions.plaintext?.text;
-      if (instruction) {
-        improvedText = await improveTextQuality(
-          transcribeParams,
-          description,
-          instruction,
+    if (transcribeParams.category === AudioCategory.AudioToText) {
+      if (transcribeParams.usecaseId) {
+        const transcription = await TranscriptionModel.get(
+          transcribeParams.usecaseId,
         );
+        const instruction = transcription?.text;
+        if (instruction) {
+          improvedText = await improveTextQuality(
+            transcribeParams,
+            description,
+            instruction,
+          );
+        }
       }
     } else if (
-      transcribeParams.transcriptionType === TranscriptionType.Summarize
-    ) {
-      const instruction = transcribeParams.transcriptions.summary?.text;
-      if (instruction) {
-        improvedText = await improveTextQuality(
-          transcribeParams,
-          description,
-          instruction,
-        );
-      }
-    } else if (
-      transcribeParams.transcriptionType === TranscriptionType.Subtitles ||
-      transcribeParams.transcriptionType === TranscriptionType.Subtitlesjson
+      transcribeParams.category === AudioCategory.Subtitle ||
+      transcribeParams.category === AudioCategory.SubtitleJson
     ) {
       const jsonData = response as unknown as { words: InputEntry[] };
       await uploadSubtitleFiles(
@@ -360,7 +350,7 @@ export async function transcribeUsingOpenAI(
         fileNameWithoutExtension,
         jsonData,
         outputURLs,
-        transcribeParams.transcriptionType,
+        transcribeParams.category,
         transcribeParams,
       );
     }
@@ -412,7 +402,7 @@ export async function transcribeUsingAzureOpenAI(
       speechRegion,
       transcribeParams.isDiarizationEnabled,
       maxNumberOfSpeakers,
-      transcribeParams.transcriptionType,
+      transcribeParams.category,
       transcribeParams.languageLocales,
     );
     const outputURLs: { [key: string]: string } = {};
@@ -464,14 +454,14 @@ export async function uploadLargeFile(
     `${fileNameWithoutExtension}.json`,
     JSON.stringify(jsonData),
     "json",
-    TranscriptionType.Largefile,
+    AudioCategory.AudioPro,
   );
   outputURLs["txt"] = await uploadOutputToBlob(
     folderName,
     `${fileNameWithoutExtension}.txt`,
     transcriptionText,
     "txt",
-    TranscriptionType.Largefile,
+    AudioCategory.AudioPro,
   );
   return outputURLs;
 }
@@ -483,7 +473,7 @@ async function uploadSubtitleFiles(
   fileNameWithoutExtension: string,
   jsonData: { words: InputEntry[] },
   outputURLs: { [key: string]: string },
-  transcriptionType?: TranscriptionType,
+  category?: AudioCategory,
   transcribeParams?: TranscribeRequest,
 ) {
   let srtData: Entry[] = [],
@@ -509,7 +499,7 @@ async function uploadSubtitleFiles(
         `${fileNameWithoutExtension}_improved.txt`,
         improvedTextGroup,
         "txt",
-        transcriptionType,
+        category,
       );
     }
   }
@@ -520,7 +510,7 @@ async function uploadSubtitleFiles(
       `${fileNameWithoutExtension}.srt`,
       srtResult,
       "srt",
-      transcriptionType,
+      category,
     );
   }
   if (selectedFileFormat && selectedFileFormat?.includes(FileFormat.ASS)) {
@@ -530,7 +520,7 @@ async function uploadSubtitleFiles(
       `${fileNameWithoutExtension}.ass`,
       assResult,
       "ass",
-      transcriptionType,
+      category,
     );
   }
 }
@@ -568,7 +558,7 @@ export async function uploadSubtitleLargeFiles(
     fileNameWithoutExtension,
     formattedWords,
     outputURLs,
-    TranscriptionType.SubtitleLarge,
+    AudioCategory.SubtitleLarge,
     transcribeParams,
   );
 
@@ -577,7 +567,7 @@ export async function uploadSubtitleLargeFiles(
     `${fileNameWithoutExtension}.json`,
     JSON.stringify(jsonData),
     "json",
-    TranscriptionType.SubtitleLarge,
+    AudioCategory.SubtitleLarge,
   );
 
   outputURLs["txt"] = await uploadOutputToBlob(
@@ -585,7 +575,7 @@ export async function uploadSubtitleLargeFiles(
     `${fileNameWithoutExtension}.txt`,
     transcriptionText,
     "txt",
-    TranscriptionType.SubtitleLarge,
+    AudioCategory.SubtitleLarge,
   );
   return outputURLs;
 }
@@ -595,18 +585,18 @@ async function uploadOutputToBlob(
   blobName: string,
   content: string,
   format: string,
-  typedTranscriptionType?: TranscriptionType,
+  category?: AudioCategory,
 ): Promise<string> {
   const storageURLString =
-    typedTranscriptionType === TranscriptionType.Largefile ||
-    typedTranscriptionType === TranscriptionType.SubtitleLarge
+    category === AudioCategory.AudioPro ||
+    category === AudioCategory.SubtitleLarge
       ? process.env.AZURE_BLOB_LARGE_STORAGE_NAME || ""
       : process.env.AZURE_BLOB_STORAGE_NAME || "";
   const blobServiceClient =
     BlobServiceClient.fromConnectionString(storageURLString);
   const containerName =
-    typedTranscriptionType === TranscriptionType.Largefile ||
-    typedTranscriptionType === TranscriptionType.SubtitleLarge
+    category === AudioCategory.AudioPro ||
+    category === AudioCategory.SubtitleLarge
       ? process.env.AZURE_LARGE_CONTAINER_NAME || "transcribe-container"
       : process.env.AZURE_CONTAINER_NAME || "transcribecontainer";
   const containerClient = blobServiceClient.getContainerClient(containerName);

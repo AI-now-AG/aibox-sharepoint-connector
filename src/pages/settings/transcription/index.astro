@@ -6,70 +6,76 @@ import { Permission } from "$enums/Users";
 import { TranscriptionType } from "$types/TranscribeRequest";
 import { type TranscriptionCard } from "$types/TranscriptionCard";
 import ToggleCard from "$pages/settings/transcription/ToggleCard.svelte";
+import { AudioCategory } from "$types/TenantFeature";
 
 const t = useTranslations();
 
-const transcriptions = Astro.locals.tenant?.transcriptions;
+const transcriptionTypes = Astro.locals.tenant?.transcription_types;
 
-const cards: TranscriptionCard[] = [
-  {
-    title: t("tenant.audio-to-text"),
-    //description: t("settings.transcription.plaintext-description"),
-    description: transcriptions?.plaintext?.text ?? "",
-    toggle: transcriptions?.plaintext?.enabled ?? false,
-    type: TranscriptionType.Plaintext,
-  },
-  {
-    title: t("settings.transcription.summarize-title"),
-    //description: t("settings.transcription.summarize-description"),
-    description: transcriptions?.summary?.text ?? "",
-    toggle: transcriptions?.summary?.enabled ?? false,
-    type: TranscriptionType.Summarize,
-  },
-  {
-    title: t("settings.transcription.subtitles-title"),
-    //description: t("settings.transcription.subtitles-description"),
-    description: transcriptions?.subtitles?.text ?? "",
-    toggle: transcriptions?.subtitles?.enabled ?? false,
-    type: TranscriptionType.Subtitles,
-  },
-  {
-    title: t("settings.transcription.subtitles-title-json"),
-    //description: t("settings.transcription.subtitles-description"),
-    description: transcriptions?.subtitlesjson?.text ?? "",
-    toggle: transcriptions?.subtitlesjson?.enabled ?? false,
-    type: TranscriptionType.Subtitlesjson,
-  },
-];
+const hasSubtitle = [
+  AudioCategory.Subtitle,
+  AudioCategory.SubtitleJson,
+  AudioCategory.SubtitleLarge,
+].some((type) => transcriptionTypes?.includes(type));
+
+const cards: TranscriptionCard[] = [];
 
 if (Astro.locals.tenant) {
   const data = transformRawData(Astro.locals.tenant);
-  const { speech_api_key, speech_region } = data || {};
+  const {
+    azure_openai_api_key,
+    azure_openai_endpoint,
+    azure_openai_instance_name,
+    azure_openai_whisper_model,
+    azure_openai_chat_model,
+    speech_api_key,
+    speech_region,
+  } = data || {};
+  if (
+    azure_openai_api_key &&
+    azure_openai_endpoint &&
+    azure_openai_instance_name &&
+    azure_openai_whisper_model &&
+    azure_openai_chat_model
+  ) {
+    cards.push({
+      title: t("tenant.audio-to-text"),
+      category: [AudioCategory.AudioToText],
+      toggle: transcriptionTypes?.includes(AudioCategory.AudioToText) ?? false,
+      type: TranscriptionType.Plaintext,
+    });
+    cards.push({
+      title: t("settings.transcription.subtitles-title"),
+      category: [
+        AudioCategory.Subtitle,
+        AudioCategory.SubtitleJson,
+        ...(speech_api_key && speech_region
+          ? [AudioCategory.SubtitleLarge]
+          : []),
+      ],
+      toggle: hasSubtitle,
+      type: TranscriptionType.Subtitles,
+    });
+  }
+
   if (speech_api_key && speech_region) {
     cards.push({
       title: t("settings.transcription.largefile-title"),
-      //description: t("settings.transcription.largefile-description"),
-      description: transcriptions?.largefile?.text ?? "",
-      toggle: transcriptions?.largefile?.enabled ?? false,
+      category: [AudioCategory.AudioPro],
+      toggle: transcriptionTypes?.includes(AudioCategory.AudioPro) ?? false,
       type: TranscriptionType.Largefile,
-    });
-    cards.push({
-      title: t("settings.transcription.subtitle.largefile-title"),
-      //description: t("settings.transcription.subtitle.largefile-description"),
-      description: transcriptions?.subtitlelarge?.text ?? "",
-      toggle: transcriptions?.subtitlelarge?.enabled ?? false,
-      type: TranscriptionType.SubtitleLarge,
     });
   }
 }
+
 let userPermissions = Astro.locals.user.permissions;
 ---
 
 <Layout>
   <div
-    class="container max-w-5xl mx-auto p-6 grid grid-cols-3 md:grid-cols-[1fr_max-content] gap-8"
+    class="container max-w-5xl mx-auto p-6 grid grid-cols-3 md:grid-cols-[1fr_max-content] items-center gap-8"
   >
-    <h1 class="pt-2 lg:pt-8 text-4xl font-bold">
+    <h1 class="text-4xl font-bold">
       {t("nav.settings.audio")}
     </h1>
   </div>

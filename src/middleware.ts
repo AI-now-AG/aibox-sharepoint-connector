@@ -7,11 +7,11 @@ import {
   ADMIN_ROUTES,
   SUPER_ADMIN_ROUTES,
   FEATURE_MAP_ROUTES,
-  FEATURE_PLAINTEXT_ROUTE,
-  FEATURE_SUBTITLES_ROUTE,
-  FEATURE_SUBTITLESJSON_ROUTE,
-  FEATURE_SUMMARY_ROUTE,
-  FEATURE_LARGEFILE_ROUTE,
+  // FEATURE_PLAINTEXT_ROUTE,
+  // FEATURE_SUBTITLES_ROUTE,
+  // FEATURE_SUBTITLESJSON_ROUTE,
+  // FEATURE_SUMMARY_ROUTE,
+  // FEATURE_LARGEFILE_ROUTE,
 } from "$constants";
 import type { APIContext, MiddlewareNext } from "astro";
 import TenantModel from "$data/models/tenant.model";
@@ -132,22 +132,22 @@ async function restrictAccess(context: APIContext, next: MiddlewareNext) {
         (item) => item.name == (key as TenantFeature),
       );
     }
-    if (context.url.pathname === FEATURE_PLAINTEXT_ROUTE) {
-      hasAccess =
-        context.locals.tenant.transcriptions?.plaintext?.enabled ?? true;
-    } else if (context.url.pathname === FEATURE_SUBTITLES_ROUTE) {
-      hasAccess =
-        context.locals.tenant.transcriptions?.subtitles?.enabled ?? true;
-    } else if (context.url.pathname === FEATURE_SUBTITLESJSON_ROUTE) {
-      hasAccess =
-        context.locals.tenant.transcriptions?.subtitlesjson?.enabled ?? true;
-    } else if (context.url.pathname === FEATURE_SUMMARY_ROUTE) {
-      hasAccess =
-        context.locals.tenant.transcriptions?.summary?.enabled ?? true;
-    } else if (context.url.pathname === FEATURE_LARGEFILE_ROUTE) {
-      hasAccess =
-        context.locals.tenant.transcriptions?.largefile?.enabled ?? true;
-    }
+    // if (context.url.pathname === FEATURE_PLAINTEXT_ROUTE) {
+    //   hasAccess =
+    //     context.locals.tenant.transcriptions?.plaintext?.enabled ?? true;
+    // } else if (context.url.pathname === FEATURE_SUBTITLES_ROUTE) {
+    //   hasAccess =
+    //     context.locals.tenant.transcriptions?.subtitles?.enabled ?? true;
+    // } else if (context.url.pathname === FEATURE_SUBTITLESJSON_ROUTE) {
+    //   hasAccess =
+    //     context.locals.tenant.transcriptions?.subtitlesjson?.enabled ?? true;
+    // } else if (context.url.pathname === FEATURE_SUMMARY_ROUTE) {
+    //   hasAccess =
+    //     context.locals.tenant.transcriptions?.summary?.enabled ?? true;
+    // } else if (context.url.pathname === FEATURE_LARGEFILE_ROUTE) {
+    //   hasAccess =
+    //     context.locals.tenant.transcriptions?.largefile?.enabled ?? true;
+    // }
 
     if (matchAudioToTextPaths && !hasAccess) {
       return context.rewrite("/restricted");

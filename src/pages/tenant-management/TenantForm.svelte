@@ -95,6 +95,10 @@
           (item) => item.value == findTextProvider.provider,
         ) || providerValues[0];
     }
+
+    // isAudioToTextChecked = tenantData.included_features.some(
+    //   (item: any) => item.name == TenantFeature.AudioToText,
+    // );
   }
 
   let hex = tenantData?.primary_color || "#491EFF";
@@ -165,8 +169,26 @@
       .join(", "),
   );
 
+  if (tenantData && tenantData.transcription_types?.length) {
+    //   isAzureAudioProEnabled = tenantData.transcription_types.some(
+    //     (item: any) =>
+    //       item === AudioCategory.AudioPro || item === AudioCategory.SubtitleLarge,
+    //   );
+  }
+
   if (tenantData) {
+    // const findTextProvider = tenantData.api_key_providers.find(
+    //   (item: any) => item.name == ApiKeyProvider.OpenAI,
+    // );
+    // if (findTextProvider) {
+    //   textSelectedProvider =
+    //     providerValues.find(
+    //       (item) => item.value == findTextProvider.provider,
+    //     ) || providerValues[0];
+    // }
+
     const { api_key_providers = [], included_features = [] } = tenantData;
+
     const findProvider = (provider: ApiKeyProvider) =>
       api_key_providers.some(
         (item: any) => item.name === provider && item.active,
@@ -182,7 +204,6 @@
         (item: any) => item.name === TenantFeature.AudioToText,
       )?.provider;
 
-    // svelte-ignore state_referenced_locally
     if (defaultTextFeature) {
       openAIEnabled ||= defaultTextFeature === ApiKeyProvider.OpenAI;
       azureOpenAIEnabled ||= defaultTextFeature === ApiKeyProvider.AzureOpenAI;
@@ -357,6 +378,7 @@
           speech_api_key,
         } = data;
 
+        cleanupValues();
         // API Keys
         tenantData.openai_api_key = openai_api_key;
         tenantData.azure_openai_api_key = azure_openai_api_key;
@@ -435,6 +457,7 @@
           speech_api_key,
         } = data;
 
+        cleanupValues();
         // API Keys
         tenantData.openai_api_key = openai_api_key;
         tenantData.azure_openai_api_key = azure_openai_api_key;
@@ -496,6 +519,21 @@
       } catch (error: any) {
         showAlert(error?.toString());
       }
+    }
+  }
+
+  function cleanupValues() {
+    if (!tenantData.azure_openai_endpoint) {
+      delete tenantData.azure_openai_endpoint;
+    }
+    if (!tenantData.azure_openai_instance_name) {
+      delete tenantData.azure_openai_instance_name;
+    }
+    if (!tenantData.azure_openai_whisper_model) {
+      delete tenantData.azure_openai_whisper_model;
+    }
+    if (!tenantData.azure_openai_chat_model) {
+      delete tenantData.azure_openai_chat_model;
     }
   }
 
@@ -1131,6 +1169,9 @@
                 <span class="label-text"
                   >{t("tenant.text.improvement.llm")}</span
                 >
+                <!-- <span class="text-sm font-semibold"
+                >{t("tenant.text.improvement.llm")}</span
+              > -->
               </label>
             </div>
             <div class="flex gap-4">
@@ -1156,6 +1197,59 @@
       </div>
     </div>
 
+    <!-- Included features -->
+    <!-- <div class="mb-3 mt-4"><b>{t("tenant.included-featured")}</b></div> -->
+
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <!-- <div class="w-full bg-white rounded px-4 py-2">
+      <div class="flex items-center">
+        <input
+          id="feature-text-prompt"
+          type="checkbox"
+          checked={true}
+          class="checkbox checkbox-primary"
+          value="text-prompt"
+          disabled
+        />
+        <label class="label cursor-pointer ml-2" for="feature-text-prompt">
+          <span class="label-text">{t("tenant.text-prompt")}</span>
+        </label>
+      </div>
+      {#each providerValues as option}
+        <div class="flex items-center mt-2 px-4">
+          <input
+            type="radio"
+            id="radio-text-{option.value}"
+            name="text-prompt-provider"
+            class="radio radio-primary"
+            value={option}
+            bind:group={textSelectedProvider}
+          />
+          <label
+            for="radio-text-{option.value}"
+            class="ml-2 font-medium text-sm">{option.label}</label
+          >
+        </div>
+      {/each}
+    </div> -->
+
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <!-- <div class="w-full bg-white rounded px-4 py-2 mt-4">
+      <div class="flex items-center">
+        <input
+          id="feature-audio-to-text"
+          type="checkbox"
+          class="checkbox checkbox-primary"
+          value="audio-to-text"
+          bind:checked={isAudioToTextChecked}
+        />
+        <label class="label cursor-pointer ml-2" for="feature-audio-to-text">
+          {@html svgIcons.audioToText}
+          <span class="label-text ml-2">{t("tenant.audio-to-text")}</span>
+        </label>
+      </div>
+    </div> -->
+
     <div class="w-full h-0.5 mt-4 mb-6 bg-gray-400/20"></div>
 
     <div class="mb-3 flex flex-row items-center gap-2">
@@ -1164,6 +1258,7 @@
     </div>
 
     <div class="container mx-auto">
+      <!-- User Managment Section -->
       <div class="bg-base-100 shadow rounded-lg my-4">
         <div class="flex p-4 items-center justify-between">
           <div class="flex items-center">

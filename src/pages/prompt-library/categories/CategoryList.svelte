@@ -160,7 +160,7 @@
               class={item.active === true
                 ? "text-success text-sm font-medium"
                 : "text-sm font-medium"}
-              >{item.active === true ? "active" : "inactive"}</span
+              >{item.active === true ? t("settings.transcription.usecase.active") : t("settings.transcription.usecase.inactive")}</span
             >
           </div>
           <div

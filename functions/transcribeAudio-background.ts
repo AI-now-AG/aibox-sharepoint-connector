@@ -17,7 +17,6 @@ import {
 import { decrypt } from "$utils/secure";
 import { createTask, updateTask } from "$shared/transcriptionTasks";
 import {
-  TranscriptionType,
   type TranscribeRequest,
   type TranscriptionResult,
 } from "$types/TranscribeRequest";
@@ -29,6 +28,7 @@ import os from "os";
 import { Readable } from "stream";
 import { createWriteStream, unlink, existsSync, mkdirSync } from "fs";
 import { v4 as uuidv4 } from "uuid";
+import { AudioCategory } from "$types/TenantFeature";
 
 // const ffmpegPath = path.join(process.cwd(), 'bin', 'osx', 'ffmpeg');
 let ffmpegPath: string;
@@ -59,13 +59,13 @@ const transcribeAudio: Handler = async (
       fileName,
       uniqueName,
       uploadUrl,
-      transcriptionType,
+      category,
       openaiEncryptedApiKey,
       encryptedApiKey,
       encryptedSpeechKey,
     } = transcribeParams;
 
-    if (!fileName || !uploadUrl || !transcriptionType) {
+    if (!fileName || !uploadUrl || !category) {
       return {
         statusCode: 400,
         body: JSON.stringify({ message: "Invalid file upload data" }),
@@ -88,6 +88,8 @@ const transcribeAudio: Handler = async (
     transcribeParams.speechKey = azureSpeechKey;
 
     await createTask(uniqueName, {
+      usecaseId: new ObjectId(transcribeParams.usecaseId),
+      category: transcribeParams.category,
       tenant_id: new ObjectId(transcribeParams.tenantId),
       creator_id: new ObjectId(transcribeParams.userId),
       audio_url: transcribeParams.uploadUrl,
@@ -100,13 +102,13 @@ const transcribeAudio: Handler = async (
       error: null,
     };
     if (
-      transcriptionType === TranscriptionType.Largefile ||
-      transcriptionType === TranscriptionType.SubtitleLarge
+      category === AudioCategory.AudioPro ||
+      category === AudioCategory.SubtitleLarge
     ) {
       if (transcribeParams.isDiarizationEnabled) {
         const newBlobFileUrl = await convertStereoToMono(
           uploadUrl,
-          transcriptionType,
+          category,
           transcribeParams.folderName,
           uniqueName,
         );
@@ -135,10 +137,7 @@ const transcribeAudio: Handler = async (
           await transcribeUsingAzureOpenAI(transcribeParams);
       }
     } else {
-      const fileBuffer = await downloadFileFromBlob(
-        uploadUrl,
-        transcriptionType,
-      );
+      const fileBuffer = await downloadFileFromBlob(uploadUrl, category);
       transcribeParams.audioBuffer = fileBuffer;
       transcriptionResult = await transcribeUsingOpenAI(transcribeParams);
     }
@@ -155,7 +154,10 @@ const transcribeAudio: Handler = async (
         }),
       };
     } else {
-      if (transcriptionType !== TranscriptionType.Largefile && transcriptionType !== TranscriptionType.SubtitleLarge) {
+      if (
+        category !== AudioCategory.AudioPro &&
+        category !== AudioCategory.SubtitleLarge
+      ) {
         await updateTask(uniqueName, {
           status: "completed",
           txtUrl: transcriptionResult.data?.urls["txt"],
@@ -199,9 +201,9 @@ const transcribeAudio: Handler = async (
   }
 };
 
-async function getBlobServiceClient(typedTranscriptionType: TranscriptionType) {
+async function getBlobServiceClient(category: AudioCategory) {
   const storageURLString =
-    typedTranscriptionType === TranscriptionType.Largefile
+    category === AudioCategory.AudioPro
       ? process.env.AZURE_BLOB_LARGE_STORAGE_NAME || ""
       : process.env.AZURE_BLOB_STORAGE_NAME || "";
 
@@ -213,10 +215,10 @@ async function getBlobServiceClient(typedTranscriptionType: TranscriptionType) {
 
 async function getContainerClient(
   blobServiceClient: BlobServiceClient,
-  typedTranscriptionType: TranscriptionType,
+  category: AudioCategory,
 ): Promise<ContainerClient> {
   const containerName =
-    typedTranscriptionType === TranscriptionType.Largefile
+    category === AudioCategory.AudioPro
       ? process.env.AZURE_LARGE_CONTAINER_NAME || "transcribe-container"
       : process.env.AZURE_CONTAINER_NAME || "transcribecontainer";
 
@@ -244,17 +246,14 @@ async function uploadToBlobStorage(
 
 async function convertStereoToMono(
   blobUrl: string,
-  typedTranscriptionType: TranscriptionType,
+  category: AudioCategory,
   folderName: string,
   uniqueName: string,
 ): Promise<string | null> {
-  const blobServiceClient = await getBlobServiceClient(typedTranscriptionType);
-  const containerClient = await getContainerClient(
-    blobServiceClient,
-    typedTranscriptionType,
-  );
+  const blobServiceClient = await getBlobServiceClient(category);
+  const containerClient = await getContainerClient(blobServiceClient, category);
 
-  const downloadBlockBlob = await downloadFile(blobUrl, typedTranscriptionType);
+  const downloadBlockBlob = await downloadFile(blobUrl, category);
   const downloadBlockBlobResponse =
     (await downloadBlockBlob.readableStreamBody) as Readable;
   if (!downloadBlockBlobResponse) {
@@ -310,15 +309,13 @@ async function convertStereoToMono(
 
 export async function generateSasUrlFromBlobUrl(
   blobUrl: string,
-  typedTranscriptionType: TranscriptionType,
+  category: AudioCategory,
 ): Promise<string | null> {
   try {
-    const blobServiceClient = await getBlobServiceClient(
-      typedTranscriptionType,
-    );
+    const blobServiceClient = await getBlobServiceClient(category);
     const containerClient = await getContainerClient(
       blobServiceClient,
-      typedTranscriptionType,
+      category,
     );
 
     const url = new URL(blobUrl);
@@ -420,13 +417,10 @@ async function saveStreamToFile(
 
 async function downloadFileFromBlob(
   blobUrl: string,
-  typedTranscriptionType: TranscriptionType,
+  category: AudioCategory,
 ): Promise<Buffer> {
   try {
-    const downloadBlockBlobResponse = await downloadFile(
-      blobUrl,
-      typedTranscriptionType,
-    );
+    const downloadBlockBlobResponse = await downloadFile(blobUrl, category);
     const downloaded = await streamToBuffer(
       downloadBlockBlobResponse.readableStreamBody!,
     );
@@ -440,10 +434,10 @@ async function downloadFileFromBlob(
 
 async function downloadFile(
   blobUrl: string,
-  typedTranscriptionType: TranscriptionType,
+  category: AudioCategory,
 ): Promise<BlobDownloadResponseParsed> {
   const storageURLString =
-    typedTranscriptionType === TranscriptionType.Largefile
+    category === AudioCategory.AudioPro
       ? process.env.AZURE_BLOB_LARGE_STORAGE_NAME || ""
       : process.env.AZURE_BLOB_STORAGE_NAME || "";
   const blobServiceClient =
