@@ -135,13 +135,13 @@
         class="border-separate border-spacing-x-0 border-spacing-y-3 min-w-full relative"
         style="font-family:Inter;"
       >
-        <colgroup>
+        <!-- <colgroup>
           <col class="w-auto" />
           <col class="w-80" />
           <col class="w-48" />
           <col class="w-24" />
           <col class="w-16" />
-        </colgroup>
+        </colgroup> -->
         <thead>
           <tr class="bg-base-300 rounded-lg">
             <th class="py-3 px-4 text-left font-normal text-xs rounded-l-lg"
