@@ -64,7 +64,7 @@
 
 {#if options.length >= 1}
   <button
-    class={`relative btn w-full rounded-xl h-auto p-6 ${active ? "btn-primary " : "btn-outline border-1"} flex`}
+    class={`relative btn w-full rounded-xl h-auto p-6 ${active ? "btn-primary " : "btn-outline border-1 border-base-content/30"} flex`}
     onclick={() => {
       onSelectCart?.(data);
     }}
