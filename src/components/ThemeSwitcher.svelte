@@ -12,20 +12,16 @@
       theme: "dark",
     },
     {
+      name: "aibox",
+      theme: "aibox",
+    },
+    {
       name: "Somedia",
       theme: "somedia",
     },
     {
       name: "Weihnachtsmann",
       theme: "weihnachtsmann",
-    },
-    {
-      name: "Luxury",
-      theme: "luxury",
-    },
-    {
-      name: "Lemonade",
-      theme: "lemonade",
     },
   ];
 

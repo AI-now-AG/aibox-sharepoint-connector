@@ -189,7 +189,7 @@
 </script>
 
 <div
-  class={`flex flex-col rounded-xl bg-base-100 border border-base-content/20 focus:ring-base-200 has-focus:ring-2 has-focus:ring-base-primary has-focus:ring-offset-2 has-focus:ring-offset-base-200`}
+  class={`flex flex-col p-1 rounded-xl bg-base-100 border border-base-content/20 has-focus:ring-2 has-focus:ring-base-primary has-focus:ring-offset-2 has-focus:ring-offset-base-200`}
 >
   <div class="flex-1 relative">
     <textarea
@@ -197,7 +197,7 @@
       id="input"
       class={`textarea textarea-ghost ${
         $sharedMessageHistory.length > 0 ? `h-[70px]` : `h-24`
-      } w-full focus:outline-hidden focus:border-base-100 text-base`}
+      } w-full focus:outline-hidden focus:border-hidden text-base`}
       placeholder={t("prompt-library.input-placeholder")}
       onkeydown={onKeyDown}
       bind:this={textarea}

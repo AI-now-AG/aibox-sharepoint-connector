@@ -5,33 +5,14 @@
 @plugin "daisyui" {
   themes:
     light --default,
-    dark --prefersdark,
-    cupcake,
-    bumblebee,
-    emerald,
-    corporate,
-    retro,
-    halloween,
-    garden,
-    forest,
-    lofi,
-    pastel,
-    fantasy,
-    wireframe,
-    black,
-    luxury,
-    dracula,
-    cmyk,
-    autumn,
-    business,
-    acid,
-    night,
-    winter,
-    dim,
-    nord,
-    sunset,
-    abyss,
-    silk;
+    dark --prefersdark;
+}
+
+@plugin "daisyui/theme" {
+  name: "light";
+  default: true;
+  --radius-field: 0.5rem;
+  --radius-box: 1rem;
 }
 
 @plugin "daisyui/theme" {
@@ -118,6 +99,41 @@
   --border: 1.5px;
 
   /* effects */
+  --depth: 1;
+  --noise: 0;
+}
+
+@plugin "daisyui/theme" {
+  name: "aibox";
+  default: false;
+  prefersdark: false;
+  color-scheme: "light";
+  --color-base-100: oklch(100% 0 0);
+  --color-base-200: oklch(98% 0 0);
+  --color-base-300: oklch(95% 0 0);
+  --color-base-content: oklch(39% 0.195 277.366);
+  --color-primary: oklch(49.17% 0.2899 275.84);
+  --color-primary-content: oklch(98% 0 0);
+  --color-secondary: oklch(55% 0.288 302.321);
+  --color-secondary-content: oklch(94% 0.028 342.258);
+  --color-accent: oklch(67% 0.182 276.935);
+  --color-accent-content: oklch(98% 0 0);
+  --color-neutral: oklch(14% 0.005 285.823);
+  --color-neutral-content: oklch(92% 0.004 286.32);
+  --color-info: oklch(82% 0.111 230.318);
+  --color-info-content: oklch(29% 0.066 243.157);
+  --color-success: oklch(50% 0.118 165.612);
+  --color-success-content: oklch(98% 0 0);
+  --color-warning: oklch(75% 0.183 55.934);
+  --color-warning-content: oklch(41% 0.112 45.904);
+  --color-error: oklch(50% 0.213 27.518);
+  --color-error-content: oklch(98% 0 0);
+  --radius-selector: 0.5rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.5rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
   --depth: 1;
   --noise: 0;
 }

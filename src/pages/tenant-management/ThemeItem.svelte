@@ -90,7 +90,7 @@
         class="dropdown-content list bg-base-100 space-y-2 rounded-box z-1 shadow-md max-h-52 overflow-y-auto"
       >
         {#each items as item}
-          <li class="list p-2" data-theme={item.value}>
+          <li class="list p-2 rounded-md" data-theme={item.value}>
             <button
               class="border-base-content/20 hover:border-base-content/40 overflow-hidden rounded-lg border outline-2 outline-offset-2 outline-transparent"
               onclick={preventDefault(() => setTheme(item))}

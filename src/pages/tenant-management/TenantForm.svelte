@@ -7,14 +7,12 @@
   import TogglePasswordIcon from "./TogglePasswordIcon.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import AlertDialog from "$components/AlertDialog.svelte";
-  import { clickOutside } from "$components/actions/ClickOutside";
   import {
     trimInput,
     toLowerCase,
     replaceSpecialChars,
   } from "$components/actions/Input.svelte";
   import { loading, showLoading, hideLoading } from "$stores";
-  import ColorPicker, { ChromeVariant } from "svelte-awesome-color-picker";
   import { type TenantTheme } from "$data/models/tenant.model";
   import InputDialog from "$components/InputDialog.svelte";
   import { isValidEmail } from "$utils/common";
@@ -180,36 +178,15 @@
   const themes = [
     { title: "Light", value: "light" },
     { title: "Dark", value: "dark" },
-    { title: "Somedia", value: "somedia" },
-    { title: "Weihnachtsmann", value: "weihnachtsmann" },
-    { title: "Luxury", value: "luxury" },
-    { title: "Lemonade", value: "lemonade" },
-    { title: "Cupcake", value: "cupcake" },
-    { title: "Bumblebee", value: "bumblebee" },
-    { title: "Emerald", value: "emerald" },
-    { title: "Corporate", value: "corporate" },
-    { title: "Retro", value: "retro" },
-    { title: "Halloween", value: "halloween" },
-    { title: "Garden", value: "garden" },
-    { title: "Forest", value: "forest" },
-    { title: "Lofi", value: "lofi" },
-    { title: "Pastel", value: "pastel" },
-    { title: "Fantasy", value: "fantasy" },
-    { title: "Wireframe", value: "wireframe" },
-    { title: "Black", value: "black" },
-    { title: "Dracula", value: "dracula" },
-    { title: "Cmyk", value: "cmyk" },
-    { title: "Autumn", value: "autumn" },
-    { title: "Business", value: "business" },
-    { title: "Acid", value: "acid" },
-    { title: "Night", value: "night" },
-    { title: "Winter", value: "winter" },
-    { title: "Dim", value: "dim" },
-    { title: "Nord", value: "nord" },
-    { title: "Sunset", value: "sunset" },
-    { title: "Abyss", value: "abyss" },
-    { title: "Silk", value: "silk" },
-  ];
+    { title: "aibox", value: "aibox" },
+  ].concat(
+    tenant._id === "66aa21a3d40d0b194e280143"
+      ? [{ title: "Somedia", value: "somedia" }]
+      : [],
+    tenant._id === "674347ba64f450769a147f6a"
+      ? [{ title: "Weihnachtsmann", value: "weihnachtsmann" }]
+      : [],
+  );
 
   let selectedThemes: { title: string; value: string } | undefined = $state();
 
@@ -418,7 +395,7 @@
       try {
         showLoading();
         tenantData.default_language = selectedLanguage?.value;
-        tenantData.theme = selectedThemes?.value;
+        tenantData.theme = selectedThemes?.value as TenantTheme;
         const { error: encryptKeysError, data } =
           await actions.tenant.encryptApiKeys({
             openai_api_key: openAIKey,
@@ -494,12 +471,15 @@
     }
   }
 
+  $inspect(selectedThemes);
+
   async function updateTenant() {
     if (validateForm()) {
       try {
+        console.log("tenantData", tenantData);
         showLoading();
         tenantData.default_language = selectedLanguage?.value;
-        tenantData.theme = selectedThemes?.value;
+        tenantData.theme = selectedThemes?.value as TenantTheme;
         const { error: encryptKeysError, data } =
           await actions.tenant.encryptApiKeys({
             openai_api_key: openAIKey,
@@ -661,7 +641,7 @@
         {t("common.save")}
       </button>
       <button
-        class="btn"
+        class="btn btn-outline"
         onclick={() => (window.location.href = "/tenant-management")}
       >
         {t("common.cancel")}
@@ -717,76 +697,6 @@
           items={themes}
           bind:selectedItem={selectedThemes}
         />
-      </div>
-    </div>
-
-    <div class="flex flex-row space-x-4">
-      <div
-        class="flex-1 flex flex-col"
-        aria-disabled={true}
-        class:opacity-30={true}
-        class:pointer-events-none={true}
-      >
-        <span class="mb-2 text-base-content font-medium text-sm"
-          >{t("tenant.primary-color")}</span
-        >
-        <div class="w-full">
-          <div
-            class="relative flex"
-            use:clickOutside={() => {
-              showPicker = false;
-            }}
-          >
-            <div class="z-10">
-              <button
-                class="color-preview inline-block w-[100px] h-[50px] rounded-tl-[8px] rounded-bl-[8px]"
-                style="background-color: {selecteColor};"
-                onclick={toggleColorPicker}
-                aria-label="Select color"
-              ></button>
-
-              {#if showPicker}
-                <div class="absolute picker-color top-[54px] left-0">
-                  <ColorPicker
-                    {hex}
-                    isDialog={false}
-                    components={{
-                      ...ChromeVariant,
-                    }}
-                    position="responsive"
-                    label={""}
-                    sliderDirection="horizontal"
-                    textInputModes={["hex"]}
-                    on:input={(event) => {
-                      selecteColor = event.detail.hex;
-                      tenantData.primary_color = selecteColor;
-                    }}
-                  />
-                </div>
-              {/if}
-            </div>
-            <button
-              class="flex flex-1 items-center input input-bordered color-input h-[50px] rounded-tl-none rounded-bl-none"
-              onclick={toggleColorPicker}
-            >
-              <span>{selecteColor}</span>
-            </button>
-          </div>
-        </div>
-      </div>
-      <div class="flex-1 flex flex-col">
-        <div class="flex justify-end">
-          <button
-            class={"mt-7 btn btn-outline font-normal grow-0 w-auto " +
-              `${mode == MODE.Edit ? "" : "btn-disabled"}`}
-            onclick={() => {
-              addTanantAdminModal?.show();
-            }}
-          >
-            {@html svgIcons.add}
-            {t("tenant.add-tenant-admin")}
-          </button>
-        </div>
       </div>
     </div>
 
