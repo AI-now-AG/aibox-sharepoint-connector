@@ -5,6 +5,7 @@
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
   import type { AudioCardItem } from "$types/AudioCardItem";
+  import { AudioCategoryLabels } from "$types/TenantFeature";
 
   const t = useTranslations();
 
@@ -67,15 +68,11 @@
 >
   <div class="card-body space-y-2">
     <div class="flex justify-between">
-      {#if item.tags}
-        <div class="card-actions justify-start">
-          {#each item.tags as tag}
-            <div class="badge px-2 border-base-300">
-              {tag}
-            </div>
-          {/each}
+      <div class="card-actions justify-start">
+        <div class="badge px-2 border-base-300">
+          {AudioCategoryLabels[item.category]}
         </div>
-      {/if}
+      </div>
       {#if isEditable}
         <DropdownSection {options} />
       {/if}
@@ -93,7 +90,9 @@
         class={item.enabled === true
           ? "text-success text-sm font-medium"
           : "text-sm font-medium text-neutral/70"}
-        >{item.enabled === true ? t("settings.transcription.usecase.active") : t("settings.transcription.usecase.inactive")}</span
+        >{item.enabled === true
+          ? t("settings.transcription.usecase.active")
+          : t("settings.transcription.usecase.inactive")}</span
       >
     </div>
     {#if item.instruction}

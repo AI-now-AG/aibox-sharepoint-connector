@@ -4,7 +4,7 @@ import { useTranslations } from "$i18n/utils";
 import TranscriptionForm from "./TranscriptionForm.svelte";
 import { TranscriptionType } from "$types/TranscribeRequest";
 import TranscriptionModel from "$data/models/transcription.model";
-import { AudioCategory } from "$types/TenantFeature";
+import { AudioCategory, AudioCategoryLabels } from "$types/TenantFeature";
 const t = useTranslations();
 
 const { id } = Astro.params;
@@ -26,8 +26,8 @@ let title = t("tenant.audio-to-text");
 let description = t("settings.transcription.plaintext-description");
 
 if (transcriptions?.category === AudioCategory.AudioToText) {
-  title = t("settings.transcription.summarize-title");
-  description = t("settings.transcription.summarize-description");
+  title = t("tenant.audio-to-text");
+  description = t("settings.transcription.plaintext-description");
   selectedTranscriptionType = TranscriptionType.Plaintext;
 } else if (
   transcriptions?.category === AudioCategory.Subtitle ||
@@ -54,9 +54,21 @@ if (transcriptions?.category === AudioCategory.AudioToText) {
 <Layout>
   <div>
     <div class="container max-w-full mx-auto grid grid-cols-1 px-14">
-      <h1 class="pt-2 mb-2 lg:pt-8 text-4xl font-bold">
-        {title}
-      </h1>
+      <div class="pt-2 mb-2 lg:pt-8 flex justify-between items-center">
+        <h1 class="text-4xl font-bold">
+          {title}
+        </h1>
+        {
+          selectedTranscriptionType == TranscriptionType.Subtitles && (
+            <div class="card-actions justify-start ">
+              <div class="badge px-2 border-neutral">
+                {}
+                {AudioCategoryLabels[transcriptions?.category ??AudioCategory.AudioToText]}
+              </div>
+            </div>
+          )
+        }
+      </div>
       <p>{description}</p>
     </div>
 

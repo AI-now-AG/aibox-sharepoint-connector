@@ -316,6 +316,8 @@
   "settings.transcription.addUsecase": "Anwendung hinzufügen",
   "settings.transcription.usecase.active": "Aktiv",
   "settings.transcription.usecase.inactive": "Inaktiv",
+  "settings.transcription.subtitle-standard": "Untertitel Standard",
+  "settings.transcription.subtitle-large": "Untertitel Audio Pro",
   "prompt-library.input-placeholder": "Dein Input...",
   "onboarding.skip": "Überspringen",
   "onboarding.next": "Weiter",

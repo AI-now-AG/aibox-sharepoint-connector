@@ -316,6 +316,8 @@
   "settings.transcription.addUsecase": "add use case",
   "settings.transcription.usecase.active": "Active",
   "settings.transcription.usecase.inactive": "Inactive",
+  "settings.transcription.subtitle-standard": "Subtitle standard",
+  "settings.transcription.subtitle-large": "Subtitle Audio Pro",
   "prompt-library.input-placeholder": "Your input...",
   "onboarding.skip": "Skip",
   "onboarding.next": "Next",
