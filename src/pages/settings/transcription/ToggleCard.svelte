@@ -61,7 +61,7 @@
       {#if isSaving}
         <span class="loading loading-dots loading-md"></span>
       {:else}
-        <label class="swap swap-rotate self-start">
+        <!-- <label class="swap swap-rotate self-start"> -->
           <input
             type="checkbox"
             class="toggle toggle-primary"
@@ -71,7 +71,7 @@
                 (event.target as HTMLInputElement)?.checked,
               )}
           />
-        </label>
+        <!-- </label> -->
       {/if}
     </div>
   </div>

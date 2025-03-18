@@ -45,6 +45,6 @@
 
 {#if loading}
   <span
-    class={`loading loading-dots loading-sm ${isSelected ? "text-base-100" : "text-success"}`}
+    class={`loading loading-dots loading-sm ${isSelected ? "text-base-100" : "text-primary"}`}
   ></span>
 {/if}

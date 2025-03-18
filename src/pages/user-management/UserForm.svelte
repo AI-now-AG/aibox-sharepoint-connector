@@ -202,7 +202,7 @@
 </script>
 
 <div
-  class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14 sticky bg-base-200 top-0 z-10 font-sans"
+  class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14 sticky bg-base-200 top-0 z-10"
 >
   <div class="flex items-center pt-5 pb-2">
     <button
@@ -227,7 +227,7 @@
         {t("common.save")}
       </button>
       <button
-        class="btn"
+        class="btn btn-outline"
         onclick={() => {
           window.history.back();
         }}
@@ -270,7 +270,9 @@
     </div>
 
     <div class="">
-      <div class="mb-5 text-gray-400 font-medium text-sm">{t("user.role")}</div>
+      <div class="mb-5 text-base-content font-medium text-sm">
+        {t("user.role")}
+      </div>
 
       <div class="flex items-center">
         <div class="flex items-center">
@@ -278,7 +280,7 @@
             type="radio"
             id="role-admin"
             name="role"
-            class="radio radio-primary"
+            class="radio"
             value={UserRole.Admin}
             checked={role == UserRole.Admin || role == UserRole.SuperAdmin}
             onchange={() => {
@@ -295,7 +297,7 @@
             type="radio"
             id="role-user"
             name="role"
-            class="radio radio-primary"
+            class="radio"
             value={UserRole.User}
             checked={role == UserRole.User}
             onchange={() => {
@@ -310,9 +312,9 @@
       </div>
 
       {#if mode == MODE.Edit}
-        <div class="w-full h-[1px] bg-slate-200 mt-8 mb-8"></div>
+        <div class="divider"></div>
 
-        <div class="w-full mb-4 font-medium text-base text-[#0F172A]">
+        <div class="w-full mb-4 font-medium">
           {t("user.additional-infos")}
         </div>
         <div class="flex flex-row space-x-4 text-sm">
@@ -326,7 +328,7 @@
               </colgroup>
               <tbody>
                 <tr class="mb-4">
-                  <td class="text-gray-400">{t("user.signed-up")}</td>
+                  <td class="text-base-content/80">{t("user.signed-up")}</td>
                   <td class="text-base">
                     {moment(userData.created_at, "DD.MM.YYYY").format(
                       "dddd DD.MM.YYYY",
@@ -334,11 +336,13 @@
                   >
                 </tr>
                 <tr class="mb-4">
-                  <td class="text-gray-400">{t("user.logins")}</td>
-                  <td class="text-base">{userData.logins_count ?? "-"}</td>
+                  <td class="text-base-content/80">{t("user.logins")}</td>
+                  <td class="text-base-content/80"
+                    >{userData.logins_count ?? "-"}</td
+                  >
                 </tr>
                 <tr class="">
-                  <td class="text-gray-400">{t("user.organization")}</td>
+                  <td class="text-base-content/80">{t("user.organization")}</td>
                   <td class="text-base">{tenant?.name ?? "-"}</td>
                 </tr>
               </tbody>
@@ -355,7 +359,7 @@
               </colgroup>
               <tbody>
                 <tr class="mb-4">
-                  <td class="text-gray-400">{t("user.latest-login")}</td>
+                  <td class="text-base-content/80">{t("user.latest-login")}</td>
                   <td class="text-base">
                     {userData.last_login
                       ? moment(userData.last_login).format("dddd DD.MM.YYYY")
@@ -363,7 +367,7 @@
                   </td>
                 </tr>
                 <tr class="mb-4">
-                  <td class="text-gray-400">{t("user.status")}</td>
+                  <td class="text-base-content/80">{t("user.status")}</td>
                   <td
                     class="text-base"
                     style={`color: ${getUserStatus(userData.blocked, userData.email_verified).color}`}
@@ -373,7 +377,7 @@
                   >
                 </tr>
                 <tr class="mb-4">
-                  <td class="text-gray-400">{t("user.id")}</td>
+                  <td class="text-base-content/80">{t("user.id")}</td>
                   <td class="text-base"> {userData.auth0_sub}</td>
                 </tr>
               </tbody>
@@ -381,12 +385,12 @@
           </div>
         </div>
 
-        <div class="w-full h-[1px] bg-slate-200 mt-2 mb-8"></div>
+        <div class="divider"></div>
 
         {#if userData.email != $currentUser?.email && !isRestrictUserManagment}
           <div class="flex items-center">
             <button
-              class="flex items-centertext-gray-700 font-sans"
+              class="flex items-center text-base-content/80"
               onclick={(e) => {
                 confirmBlockModal?.show();
               }}
@@ -402,7 +406,7 @@
             </button>
 
             <button
-              class="flex items-center font-sans text-red-600 ml-8"
+              class="flex items-center text-error/60 ml-8"
               onclick={(e) => {
                 confirmDeleteModal?.show();
               }}
@@ -410,7 +414,7 @@
               <span class="w-5 h-5 flex items-center">
                 {@html svgIcons.trash}</span
               >
-              <span class="text-sm font-semibold ml-1 text-left text-red-600"
+              <span class="text-sm font-semibold ml-1 text-left text-error/60"
                 >{t("user.delete-user")}</span
               >
             </button>

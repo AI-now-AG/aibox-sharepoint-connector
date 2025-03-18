@@ -41,12 +41,12 @@
   };
 
   const getActiveModels = () => {
-    const defaultModel = $tenant.api_key_providers.find(
+    const defaultModel = $tenant?.api_key_providers?.find(
       (provider) => provider.default,
     );
 
-    const models = $tenant.api_key_providers
-      .filter((provider) => provider.active)
+    const models = $tenant?.api_key_providers
+      ?.filter((provider) => provider.active)
       .map((provider) => {
         const providerName = getProviderName(provider);
         const modelName = getModelName(provider);
@@ -57,7 +57,7 @@
       });
     const defaultText = t("tenant.default");
     const defaultName = defaultText.replace(/^./, defaultText[0].toUpperCase());
-    const defaultOptionTitle = models.unshift({
+    const defaultOptionTitle = models?.unshift({
       _id: null,
       title: `${defaultName} (${getProviderName(defaultModel)} ${getModelName(defaultModel)})`,
     });

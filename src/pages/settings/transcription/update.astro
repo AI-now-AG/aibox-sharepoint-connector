@@ -105,7 +105,7 @@ const transcriptionsEnriched: AudioCardItem[] = transcriptionsFiltered.map(
         userPermissions.includes(Permission.AdminAll) && (
           <a
             href={`/settings/transcription/UsecaseForm?type=${encodeURIComponent(typeParam)}`}
-            class="btn btn-active btn-neutral font-normal grow-0"
+            class="btn btn-outline font-normal grow-0"
           >
             <span set:html={svgIcons.add} />
             {t("settings.transcription.addUsecase")}

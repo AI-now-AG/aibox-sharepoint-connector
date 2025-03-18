@@ -50,7 +50,7 @@
   </script>
   
   <div>
-    <p class="mb-2 text-base-content/50 font-medium text-sm">{title}</p>
+    <p class="mb-2 text-base-content font-medium text-sm">{title}</p>
     <div class="dropdown dropdown-top w-full min-w-xs">
       <input
         {placeholder}
@@ -62,13 +62,13 @@
       {#if items}
         <ul
           tabindex="-1"
-          class="dropdown-content menu bg-base-100 space-y-2 rounded-box z-[1] w-52 p-2 shadow"
+          class="dropdown-content menu bg-base-100 space-y-2 rounded-box z-1 w-52 p-2 shadow-sm"
         >
           {#each items as item}
             <li>
               <button
                 onclick={preventDefault(() => handleSelectedItems(item))}
-                class={`${selectedItem == item ? "bg-primary text-base-100 hover:bg-primary" : "hover:text-neutral"}`}
+                class={`${selectedItem == item ? "bg-primary text-primary-content hover:bg-primary" : "hover:text-neutral"}`}
                 >{typeof item === "string" ? item : item.title}
               </button>
             </li>

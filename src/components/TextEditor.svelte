@@ -7,6 +7,7 @@
   import "@friendofsvelte/tipex/styles/Controls.css";
   import "@friendofsvelte/tipex/styles/EditLink.css";
   import "@friendofsvelte/tipex/styles/CodeBlock.css";
+  import "$styles/editor.css";
 
   let editor: TipexEditor | undefined = $state();
 
@@ -53,7 +54,7 @@
     {body}
     controls
     floating
-    class={"h-[46vh] border border-neutral-300 resize-y " + cssClass}
+    class={"h-[46vh] border border-neutral resize-y " + cssClass}
     style="transition-duration: 0ms !important;"
     oncreate={(e: any) => {
       setFocusAtTheEnd(e.editor);
@@ -66,13 +67,5 @@
     {#snippet utilities(_tipex: any)}
       <div></div>
     {/snippet}
-  </Tipex>{/key}
-
-<style>
-  :global(.tipex-editor.focused.focal) {
-    border-color: rgb(212 212 212 / var(--tw-border-opacity, 1)) !important;
-    outline: 2px solid rgb(212 212 212 / var(--tw-border-opacity, 1)) !important;
-    --tw-ring-shadow: none !important;
-    box-shadow: none !important;
-  }
-</style>
+  </Tipex>
+{/key}

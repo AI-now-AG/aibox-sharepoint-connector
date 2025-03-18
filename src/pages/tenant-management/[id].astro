@@ -10,7 +10,6 @@ export interface Props {
 }
 
 const { id } = Astro.params;
-console.log("id", id);
 if (id === undefined) {
   throw new Error("Id is required");
 }

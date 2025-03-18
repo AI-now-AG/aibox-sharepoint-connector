@@ -64,7 +64,7 @@
   <div class="mx-auto">
     <!-- svelte-ignore a11y_consider_explicit_label -->
     <button
-      class="btn btn-sm btn-neutral btn-2 border-0 bg-neutral-content text-neutral hover:text-neutral-content mb-4"
+      class="btn btn-sm btn-outline btn-2 border-0 bg-neutral-content text-neutral hover:text-neutral-content mb-4"
       onclick={() => dlgEl?.showModal()}
     >
       <svg

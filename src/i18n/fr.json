@@ -335,8 +335,8 @@
   "tenant.this-is-free-trial-version": "This is a free trial version,",
   "tenant.contact-us": "contact us",
   "tenant.to-upgrade": "to upgrade",
-  "tenant.trial-message": "This is a free trial version, <a href=\"https://ainow.ch/aibox/upgrade-aibox\" target=\"_blank\" class=\"font-normal text-blue-600 hover:underline\" data-astro-prefetch=\"false\">contact us</a> to upgrade.",
-  "user.unverified-email-message": "Please verify your email address. Unverified emails will be blocked within 24 hours. <a href=\"${url}\" data-verified=\"true\"  class=\"font-normal text-blue-600 underline\" data-astro-prefetch=\"false\">Click here</a> to resend email verification links",
+  "tenant.trial-message": "This is a free trial version, <a href=\"https://ainow.ch/aibox/upgrade-aibox\" target=\"_blank\" class=\"font-semibold text-info-content hover:underline\" data-astro-prefetch=\"false\">contact us</a> to upgrade.",
+  "user.unverified-email-message": "Please verify your email address. Unverified emails will be blocked within 24 hours. <a href=\"${url}\" data-verified=\"true\"  class=\"font-semibold text-warning-content underline\" data-astro-prefetch=\"false\">Click here</a> to resend email verification links",
   "user.send-verify-email-success": "The verification email has been sent to your address. Please check your inbox and verify your account. Thank you!",
   "user.send-verify-email-failed": "The verification email could not be sent. Please try again!"
 }

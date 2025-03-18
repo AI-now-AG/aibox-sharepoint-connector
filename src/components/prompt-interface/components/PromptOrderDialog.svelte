@@ -48,8 +48,8 @@
         {@html svgIcons.closeMenu}
       </button>
     </div>
-
-    <p class="mb-2 text-sm font-sans font-medium text-neutral-500">
+    
+    <p class="mb-2 text-sm font-medium text-neutral">
       {t("prompt-library.prompt.prompt-order")}
     </p>
 
@@ -72,7 +72,7 @@
 
     <div class="flex justify-end">
       <button
-        class="btn btn-active btn-neutral-content px-8 font-normal mr-2"
+        class="btn btn-outline px-8 font-normal mr-2"
         onclick={preventDefault(cancelEdit)}
       >
         {t("common.cancel")}
