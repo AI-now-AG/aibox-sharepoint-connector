@@ -69,6 +69,7 @@ const auth0Webhook: Handler = async (
         if (isPermittedConnection(data)) {
           await triggerRegistrationEmail(data);
           await updateAuth0UserMetadata(data.user_id, { signup: true });
+          await createAuth0AuthMethod(data.user_id, data.user_name);
         }
 
         // Send welcome email for social login
@@ -364,6 +365,19 @@ const updateUserAttributesInDatabase = async (
     }
   } catch (error: any) {
     console.warn(`Updating user attributes error`, error);
+  }
+};
+
+const createAuth0AuthMethod = async (userId: string, email: string) => {
+  console.log(`Create user auth methods`, { userId });
+
+  try {
+    await usersManagement.createAuthenticationMethod(userId, {
+      type: "email",
+      email,
+    });
+  } catch (error: any) {
+    console.warn(`Updating user metadata error`, error);
   }
 };
 
