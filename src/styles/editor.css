@@ -32,6 +32,6 @@
 
 .tipex-edit-button:hover {
   background-color: var(--color-base-300);
-  border-color: color-mix(in srgb, var(--color-neutral) 30%, transparent);
+  border-color: color-mix(in srgb, var(--color-neutral) 20%, transparent);
   
 }
