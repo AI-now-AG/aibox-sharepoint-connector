@@ -3,6 +3,7 @@
   import { actions } from "astro:actions";
   import { driver } from "driver.js";
   import "driver.js/dist/driver.css";
+  import "$styles/driverjs.css";
 
   import { useTranslations } from "$i18n/utils";
   import { TourType } from "$enums/Users";
@@ -141,48 +142,3 @@
     }
   });
 </script>
-
-<style>
-  :global(.driver-popover.driverjs-theme .driver-popover-description ul) {
-    list-style-type: disc;
-  }
-
-  :global(.driver-popover.driverjs-theme .driver-popover-description ul li) {
-    margin-left: 2vw;
-  }
-  :global(.driver-popover.driverjs-theme .driver-popover-title) {
-    color: #491eff;
-    margin-bottom: 2vh;
-  }
-
-  :global(.driver-popover.driverjs-theme .driver-popover-description) {
-    margin-bottom: 2vh;
-  }
-
-  :global(.driver-popover.driverjs-theme .driver-popover-navigation-btns) {
-    justify-content: space-between;
-  }
-
-  :global(.driver-popover.driverjs-theme button) {
-    border-radius: 8px;
-    padding: 16px;
-    padding-top: 6px;
-    padding-bottom: 6px;
-    border: none;
-    font-weight: 700;
-  }
-
-  :global(.driver-popover.driverjs-theme .driver-popover-next-btn) {
-    background-color: #4338ca;
-    color: white;
-    text-shadow: none;
-  }
-
-  :global(.driver-popover.driverjs-theme .driver-popover-close-btn) {
-    color: #9b9b9b;
-  }
-
-  :global(.driver-popover.driverjs-theme .driver-popover-close-btn:hover) {
-    color: #000;
-  }
-</style>

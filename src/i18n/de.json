@@ -336,7 +336,7 @@
   "tenant.contact-us": "contact us",
   "tenant.to-upgrade": "to upgrade",
   "tenant.trial-message": "Dies ist eine kostenlose Testversion, <a href=\"https://ainow.ch/aibox/upgrade-aibox\" target=\"_blank\" class=\"font-semibold text-info-content hover:underline\" data-astro-prefetch=\"false\">kontaktiere uns</a>, um ein Upgrade durchzuführen.",
-  "user.unverified-email-message": "Bitte bestätige deine E-Mail-Adresse. Nicht verifizierte E-Mails werden innerhalb von 24 Stunden blockiert. <a href=\"${url}\" data-verified=\"true\" class=\"font-semibold text-info-content underline\" data-astro-prefetch=\"false\">Klicke hier</a>, um den Bestätigungslink erneut zu senden",
+  "user.unverified-email-message": "Bitte bestätige deine E-Mail-Adresse. Nicht verifizierte E-Mails werden innerhalb von 24 Stunden blockiert. <a href=\"${url}\" data-verified=\"true\" class=\"font-semibold text-warning-content underline\" data-astro-prefetch=\"false\">Klicke hier</a>, um den Bestätigungslink erneut zu senden",
   "user.send-verify-email-success": "Die Bestätigungs-E-Mail wurde an deine Adresse gesendet. Bitte überprüfe dein Postfach und verifiziere dein Konto. Vielen Dank!",
   "user.send-verify-email-failed": "Die Bestätigungs-E-Mail konnte nicht gesendet werden. Bitte versuche es erneut!"
 }

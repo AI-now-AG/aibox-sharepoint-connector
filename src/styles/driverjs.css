@@ -1,0 +1,31 @@
+.driver-popover.driverjs-theme {
+  background: var(--color-base-100);
+}
+
+.driver-popover.driverjs-theme .driver-popover-title {
+  color: var(--color-primary);
+  /* padding-bottom: 2vh; */
+}
+
+.driver-popover.driverjs-theme .driver-popover-description {
+  padding-block: 2vh;
+  color: var(--color-base-content);
+}
+
+.driver-popover.driverjs-theme .driver-popover-navigation-btns {
+  justify-content: space-between;
+}
+
+.driver-popover.driverjs-theme button {
+  border-radius: 1vh;
+  padding: 2vh;
+  padding-block: 1vh;
+  border: none;
+  font-weight: 700;
+}
+
+.driver-popover.driverjs-theme .driver-popover-next-btn {
+  background-color: var(--color-primary);
+  color: var(--color-primary-content);
+  text-shadow: none;
+}
