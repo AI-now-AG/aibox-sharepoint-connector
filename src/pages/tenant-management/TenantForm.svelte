@@ -179,10 +179,11 @@
     { title: "Light", value: "light" },
     { title: "Dark", value: "dark" },
     { title: "aibox", value: "aibox" },
+    { title: "Somedia", value: "somedia" },
   ].concat(
     tenant._id === "66aa21a3d40d0b194e280143" ||
       tenant._id === "671f3f4c44d9f6336b4cdd6a"
-      ? [{ title: "Somedia", value: "somedia" }]
+      ? []
       : [],
     tenant._id === "674347ba64f450769a147f6a"
       ? [{ title: "Weihnachtsmann", value: "weihnachtsmann" }]

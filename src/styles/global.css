@@ -49,7 +49,6 @@
   --color-error-content: oklch(39.58% 0.1331 25.72);
 
   /* border radius */
-  --radius-selector: 1rem;
   --radius-field: 0.5rem;
   --radius-box: 1rem;
 
@@ -134,14 +133,13 @@
   --color-warning-content: oklch(41% 0.112 45.904);
   --color-error: oklch(50% 0.213 27.518);
   --color-error-content: oklch(98% 0 0);
-  --radius-selector: 1rem;
-  --radius-field: 1rem;
+  --radius-field: 0.5rem;
   --radius-box: 1rem;
-  --size-selector: 0.25rem;
+  /* --size-selector: 0.25rem;
   --size-field: 0.25rem;
   --border: 1px;
   --depth: 1;
-  --noise: 0;
+  --noise: 0; */
 }
 
 @custom-variant dark (&:where(.dark, .dark *));
