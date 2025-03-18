@@ -1,3 +1,11 @@
+.driver-popover.driverjs-theme .driver-popover-description ul {
+  list-style-type: disc;
+}
+
+.driver-popover.driverjs-theme .driver-popover-description ul li {
+  margin-left: 2vw;
+}
+
 .driver-popover.driverjs-theme {
   background: var(--color-base-100);
 }
