@@ -4,9 +4,12 @@ import InitializeColor from "$components/theme/InitializeColor.astro";
 import SharedVariables from "$components/theme/SharedVariables.svelte";
 import Toasts from "$components/toast-notification/Toasts.svelte";
 import { transformRawData } from "$utils/transformRawData";
+import { svgIcons } from "$assets/icons";
+import { useTranslations } from "$i18n/utils";
 
 const user = Astro.locals.user;
 const primaryColor = Astro.locals.tenant?.primary_color;
+const t = useTranslations();
 ---
 
 <!-- Set default theme -->
@@ -31,19 +34,7 @@ const primaryColor = Astro.locals.tenant?.primary_color;
         aria-label="open sidebar"
         class="btn btn-square btn-ghost"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-5 w-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M4 6h16M4 12h8m-8 6h16"></path>
-        </svg>
+        <span set:html={svgIcons.hamburger} />
       </label>
     </div>
     <div class="lg:hidden pl-2">
@@ -74,6 +65,37 @@ const primaryColor = Astro.locals.tenant?.primary_color;
   <div class="navbar-end">
     <div class="dropdown dropdown-end z-30">
       <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
+        <div class="w-8 rounded-full">
+          <span set:html={svgIcons.questionMark} style="color:#4a20ff;" />
+        </div>
+      </div>
+      <ul
+        tabindex="0"
+        class="menu menu-sm dropdown-content bg-base-100 rounded-box z-10 mt-3 w-52 p-2 shadow border"
+      >
+        <li>
+          <a
+            class="justify-between"
+            href="https://ainow.ch/aibox/how-to"
+            target="_blank"
+          >
+            {t("guideline.aibox-how-to")}
+          </a>
+        </li>
+        <li>
+          <a
+            class="justify-between"
+            href="https://ainow.ch/aibox/support"
+            target="_blank"
+          >
+            {t("guideline.support")}
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="dropdown dropdown-end z-30">
+      <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
         <div class="w-10 rounded-full">
           <img alt="Avatar Image" src={user.picture} />
         </div>
@@ -83,10 +105,12 @@ const primaryColor = Astro.locals.tenant?.primary_color;
         class="menu menu-sm dropdown-content bg-base-100 rounded-box z-10 mt-3 w-52 p-2 shadow border"
       >
         <li>
-          <a class="justify-between" href="/profile"> Profile </a>
+          <a class="justify-between" href="/profile">{t("profile")}</a>
         </li>
         <li id="logout">
-          <button onclick="window.location.href='/api/logout'">Logout</button>
+          <button onclick="window.location.href='/api/logout'"
+            >{t("logout")}</button
+          >
         </li>
       </ul>
     </div>
