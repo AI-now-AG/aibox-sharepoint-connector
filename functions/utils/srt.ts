@@ -39,16 +39,29 @@ export type Entry = {
 //   return result;
 // };
 
+const shouldPushGroup = (
+  nextContainer: InputEntry | null,
+  container: InputEntry,
+): boolean => {
+  return (
+    nextContainer !== null &&
+    nextContainer.start - container.end >= NUMBER_OF_SECONDS
+  );
+};
+
 export const createSRTData = (words: InputEntry[]): Entry[] => {
   const result: Entry[] = [];
   let currentGroup: Entry | null = null;
 
   for (const [index, container] of words.entries()) {
     const nextContainer = index + 1 < words.length ? words[index + 1] : null;
-
     if (!currentGroup) {
       const { word: inputWord, start, end } = container;
       currentGroup = { text: inputWord, start, end };
+      if (shouldPushGroup(nextContainer, container)) {
+        result.push(currentGroup);
+        currentGroup = null;
+      }
     } else if (
       currentGroup.text.length + container.word.length + 1 <= MAX_LENGTH &&
       (!nextContainer ||
@@ -58,10 +71,7 @@ export const createSRTData = (words: InputEntry[]): Entry[] => {
       if (index > 0) currentGroup.secondLastWordEnd = words[index - 1].end;
       currentGroup.lastWordStart = words[index].start;
       currentGroup.end = container.end;
-    } else if (
-      nextContainer &&
-      nextContainer.start - container.end >= NUMBER_OF_SECONDS
-    ) {
+    } else if (shouldPushGroup(nextContainer, container)) {
       currentGroup.text += " " + container.word;
       result.push(currentGroup);
       currentGroup = null;
