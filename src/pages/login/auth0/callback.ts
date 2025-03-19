@@ -37,7 +37,12 @@ export async function GET(context: APIContext): Promise<Response> {
   }
 
   // *INFO: Ensure the callback has code and valid state
-  if (!code || !state || !storedState || state !== storedState) {
+  // if (!code || !state || !storedState || state !== storedState) {
+  if (
+    !code ||
+    (!state && !storedState) ||
+    (state && storedState && state !== storedState)
+  ) {
     log.e({ code, state, storedState }, "missing required params");
     return new Response(null, {
       status: 400,
