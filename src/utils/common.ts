@@ -18,6 +18,8 @@ export const isEnterpriseConnection = (auth0Sub: string): boolean => {
     "adfs",
     "ad",
     "ping",
+    "google-oauth2",
+    "windowslive",
   ];
   return enterpriseProviders.includes(provider);
 };
