@@ -1,3 +1,218 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@plugin '@tailwindcss/typography';
+
+@plugin "daisyui" {
+  themes:
+    light --default,
+    dark --prefersdark;
+}
+
+@plugin "daisyui/theme" {
+  name: "light";
+  default: true;
+  --radius-field: 0.5rem;
+  --radius-box: 1rem;
+}
+
+@plugin "daisyui/theme" {
+  name: "dark";
+  --radius-field: 0.5rem;
+  --radius-box: 1rem;
+}
+
+@plugin "daisyui/theme" {
+  name: "somedia";
+  default: false; /* set as default */
+  prefersdark: false; /* set as default dark mode (prefers-color-scheme:dark) */
+  color-scheme: light; /* color of browser-provided UI */
+
+  --color-base-100: oklch(96.7% 0.0029 264.54);
+  --color-base-200: oklch(92.76% 0.0058 264.53);
+  --color-base-300: oklch(87.17% 0.0093 258.34);
+  --color-base-content: oklch(27.81% 0.0296 256.85);
+  --color-primary: oklch(49.97% 0.1254 244.88);
+  --color-primary-content: oklch(86.99% 0.0622 274.04);
+  --color-secondary: oklch(65.59% 0.2118 354.31);
+  --color-secondary-content: oklch(89.94% 0.0589 343.23);
+  --color-accent: oklch(78.45% 0.1325 181.91);
+  --color-accent-content: oklch(38.61% 0.059 188.42);
+  --color-neutral: oklch(37.29% 0.0306 259.73);
+  --color-neutral-content: oklch(89.5% 0.0116 252.1);
+  --color-info: oklch(71.48% 0.1257 215.22);
+  --color-info-content: oklch(39.82% 0.0664 227.39);
+  --color-success: oklch(80.03% 0.1821 151.71);
+  --color-success-content: oklch(39.25% 0.0896 152.54);
+  --color-warning: oklch(79.52% 0.1617 86.05);
+  --color-warning-content: oklch(42.1% 0.0897 57.71);
+  --color-error: oklch(71.06% 0.1661 22.22);
+  --color-error-content: oklch(39.58% 0.1331 25.72);
+
+  /* border radius */
+  --radius-field: 0.5rem;
+  --radius-box: 1rem;
+
+  /* base sizes */
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+
+  /* border size */
+  --border: 1.5px;
+
+  /* effects */
+  --depth: 1;
+  --noise: 0;
+}
+
+@plugin "daisyui/theme" {
+  name: "weihnachtsmann";
+  default: false; /* set as default */
+  prefersdark: false; /* set as default dark mode (prefers-color-scheme:dark) */
+  color-scheme: light; /* color of browser-provided UI */
+
+  --color-base-100: oklch(98.47% 0.0061 137.77);
+  --color-base-200: oklch(92.76% 0.0058 264.53);
+  --color-base-300: oklch(87.17% 0.0093 258.34);
+  --color-base-content: oklch(27.81% 0.0296 256.85);
+  --color-primary: oklch(59.44% 0.2434 28.58);
+  --color-primary-content: oklch(86.99% 0.0622 274.04);
+  --color-secondary: oklch(52.13% 0.213381 28.4651);
+  --color-secondary-content: oklch(89.94% 0.0589 343.23);
+  --color-accent: oklch(78.45% 0.1325 181.91);
+  --color-accent-content: oklch(38.61% 0.059 188.42);
+  --color-neutral: oklch(37.29% 0.0306 259.73);
+  --color-neutral-content: oklch(89.5% 0.0116 252.1);
+  --color-info: oklch(71.48% 0.1257 215.22);
+  --color-info-content: oklch(39.82% 0.0664 227.39);
+  --color-success: oklch(80.03% 0.1821 151.71);
+  --color-success-content: oklch(39.25% 0.0896 152.54);
+  --color-warning: oklch(79.52% 0.1617 86.05);
+  --color-warning-content: oklch(42.1% 0.0897 57.71);
+  --color-error: oklch(71.06% 0.1661 22.22);
+  --color-error-content: oklch(39.58% 0.1331 25.72);
+
+  /* border radius */
+  --radius-selector: 1rem;
+  --radius-field: 0.5rem;
+  --radius-box: 1rem;
+
+  /* base sizes */
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+
+  /* border size */
+  --border: 1.5px;
+
+  /* effects */
+  --depth: 1;
+  --noise: 0;
+}
+
+@plugin "daisyui/theme" {
+  name: "aibox";
+  default: false;
+  prefersdark: false;
+  color-scheme: "light";
+  --color-base-100: oklch(100% 0 0);
+  --color-base-200: oklch(98% 0 0);
+  --color-base-300: oklch(95% 0 0);
+  --color-base-content: oklch(39% 0.195 277.366);
+  --color-primary: oklch(49.17% 0.2899 275.84);
+  --color-primary-content: oklch(98% 0 0);
+  --color-secondary: oklch(55% 0.288 302.321);
+  --color-secondary-content: oklch(94% 0.028 342.258);
+  --color-accent: oklch(67% 0.182 276.935);
+  --color-accent-content: oklch(98% 0 0);
+  --color-neutral: oklch(14% 0.005 285.823);
+  --color-neutral-content: oklch(92% 0.004 286.32);
+  --color-info: oklch(82% 0.111 230.318);
+  --color-info-content: oklch(29% 0.066 243.157);
+  --color-success: oklch(50% 0.118 165.612);
+  --color-success-content: oklch(98% 0 0);
+  --color-warning: oklch(75% 0.183 55.934);
+  --color-warning-content: oklch(41% 0.112 45.904);
+  --color-error: oklch(50% 0.213 27.518);
+  --color-error-content: oklch(98% 0 0);
+  --radius-field: 0.5rem;
+  --radius-box: 1rem;
+  /* --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 0; */
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-*: initial;
+  --font-sans:
+    Inter, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-mono:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+
+  --background-image-blue-design: url("/img/aibox-login-background.svg");
+
+  --animate-slide-in: slide-in 0.5s ease-in-out forwards;
+  --animate-slide-out: slide-out 0.5s ease-in-out forwards;
+  --animate-typing: typing 2s steps(10) infinite alternate, blink 0.7s infinite;
+
+  @keyframes slide-in {
+    0% {
+      transform: scale(0.95);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  @keyframes slide-out {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(0.95);
+      opacity: 0;
+    }
+  }
+  @keyframes typing {
+    0% {
+      width: 0%;
+      visibility: hidden;
+    }
+    50% {
+      width: 100%;
+    }
+  }
+  @keyframes blink {
+    0% {
+      border-color: transparent;
+    }
+    50% {
+      border-color: white;
+    }
+  }
+}
+
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+}

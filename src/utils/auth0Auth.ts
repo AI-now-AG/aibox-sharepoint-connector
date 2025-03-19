@@ -109,7 +109,7 @@ export const sendWelcomeEmail = async (email: string) => {
     await sendMail({
       from: {
         name: "AI now AG",
-        email: "no-reply@ainow.ch",
+        email: "info@ainow.ch",
       },
       to: email,
       templateId: SG_WELCOME_TEMPLATE,

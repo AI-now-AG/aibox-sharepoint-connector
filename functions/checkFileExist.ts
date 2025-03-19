@@ -11,12 +11,13 @@ import {
   getCurrentBatchStatus,
   getTask,
 } from "$shared/transcriptionTasks";
-import { FileFormat, TranscriptionType } from "$types/TranscribeRequest";
+import { FileFormat } from "$types/TranscribeRequest";
 import {
   pollTranscriptionTask1,
   updateStatus,
 } from "./utils/batchTranscription";
 import { decrypt } from "$utils/secure";
+import { AudioCategory } from "$types/TenantFeature";
 
 const checkFileExist: Handler = async (event, context) => {
   const {
@@ -26,7 +27,7 @@ const checkFileExist: Handler = async (event, context) => {
     fileNames,
     folderName,
     isShowImprovedTextPreview,
-    typedTranscriptionType,
+    typedCategory,
     isDiarizationEnabled,
     encryptedSpeechKey,
   } = JSON.parse(event.body!);
@@ -50,15 +51,15 @@ const checkFileExist: Handler = async (event, context) => {
     const streamPipeline = promisify(pipeline);
     const tmpDir = tmpdir();
     const storageURLString =
-      typedTranscriptionType === TranscriptionType.Largefile ||
-      typedTranscriptionType === TranscriptionType.SubtitleLarge
+      typedCategory === AudioCategory.AudioPro ||
+      typedCategory === AudioCategory.SubtitleLarge
         ? process.env.AZURE_BLOB_LARGE_STORAGE_NAME || ""
         : process.env.AZURE_BLOB_STORAGE_NAME || "";
     const blobServiceClient =
       BlobServiceClient.fromConnectionString(storageURLString);
     const containerName =
-      typedTranscriptionType === TranscriptionType.Largefile ||
-      typedTranscriptionType === TranscriptionType.SubtitleLarge
+      typedCategory === AudioCategory.AudioPro ||
+      typedCategory === AudioCategory.SubtitleLarge
         ? process.env.AZURE_LARGE_CONTAINER_NAME || "transcribe-container"
         : process.env.AZURE_CONTAINER_NAME || "transcribecontainer";
     const containerClient = blobServiceClient.getContainerClient(containerName);
@@ -74,7 +75,7 @@ const checkFileExist: Handler = async (event, context) => {
         tenantId,
         userId,
         uniqueName,
-        typedTranscriptionType,
+        typedCategory,
         isDiarizationEnabled,
         encryptedSpeechKey,
         folderName,
@@ -133,7 +134,7 @@ const checkFileExist: Handler = async (event, context) => {
         } else if (fileName.endsWith(".json")) {
           jsonFileUrl = fileUrl; // Store the URL for the .ass file
         } else if (fileName.endsWith(".txt")) {
-          if (typedTranscriptionType === TranscriptionType.Subtitles) {
+          if (typedCategory === AudioCategory.Subtitle) {
             txtFileUrl = fileUrl; // Store the URL for the .txt file
           }
         }
@@ -204,15 +205,15 @@ const checkAndUploadLargeFile = async (
   tenantId: string,
   userId: string,
   uniqueName: string,
-  typedTranscriptionType: TranscriptionType,
+  typedCategory: AudioCategory,
   isDiarizationEnabled: boolean,
   encryptedSpeechKey: string,
   folderName: string,
   isShowImprovedTextPreview: boolean,
 ): Promise<void> => {
   if (
-    typedTranscriptionType !== TranscriptionType.Largefile &&
-    typedTranscriptionType !== TranscriptionType.SubtitleLarge
+    typedCategory !== AudioCategory.AudioPro &&
+    typedCategory !== AudioCategory.SubtitleLarge
   )
     return;
   const task = await getTask(uniqueName);
@@ -254,7 +255,7 @@ const checkAndUploadLargeFile = async (
         isDiarizationEnabled,
         response.fileURL,
         encryptedSpeechKey,
-        typedTranscriptionType,
+        typedCategory,
         task.selectedFileFormat,
         isShowImprovedTextPreview,
       );
@@ -339,14 +340,14 @@ async function postAudioProProcess(
   enableDiarization: boolean = false,
   fileURL: string,
   encryptedSpeechKey: string,
-  typedTranscriptionType: TranscriptionType,
+  typedCategory: AudioCategory,
   selectedFileFormat?: FileFormat[],
   isShowImprovedTextPreview: boolean = false,
 ): Promise<void> {
   try {
     const response = await fetch(
       `${process.env.URL}/.netlify/functions/postAudioProProcess-background`,
-      //`https://deploy-preview-177.test.aibox-app.com/.netlify/functions/postAudioProProcess-background`,
+      //`https://deploy-preview-197.test.aibox-app.com/.netlify/functions/postAudioProProcess-background`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -359,7 +360,7 @@ async function postAudioProProcess(
           enableDiarization,
           fileURL,
           encryptedSpeechKey,
-          typedTranscriptionType,
+          typedCategory,
           selectedFileFormat,
           isShowImprovedTextPreview,
         }),

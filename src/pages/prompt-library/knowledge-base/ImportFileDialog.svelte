@@ -70,7 +70,7 @@
     </form>
     <div class="relative flex flex-col py-4">
       <label
-        class={`py-16 relative flex flex-col text-base-content border border-dashed rounded cursor-pointer ${isDragOver ? "border-blue-500" : "border-neutral-content"} ${fileErrorMessage && "border-red-500 bg-red-100"}`}
+        class={`py-16 relative flex flex-col text-base-content border border-dashed rounded-sm cursor-pointer ${isDragOver ? "border-info" : "border-neutral-content"} ${fileErrorMessage && "border-error/70 bg-error/30"}`}
         ondragover={() => {
           isDragOver = true;
         }}
@@ -84,7 +84,7 @@
         <input
           type="file"
           accept={acceptedMimeTypes}
-          class="absolute inset-0 z-50 w-full h-full p-0 m-0 outline-none opacity-0 cursor-pointer"
+          class="absolute inset-0 z-50 w-full h-full p-0 m-0 outline-hidden opacity-0 cursor-pointer"
           onchange={addFiles}
         />
 
@@ -100,12 +100,12 @@
           {/if}
         </div>
       </label>
-      <span class="mt-2 text-xs text-red-500">{fileErrorMessage}</span>
+      <span class="mt-2 text-xs text-error/60">{fileErrorMessage}</span>
     </div>
 
     <div class="modal-action">
       <form method="dialog">
-        <button class="btn">{t("common.cancel")}</button>
+        <button class="btn btn-outline">{t("common.cancel")}</button>
         <button
           class="btn btn-primary {!isFormValid && 'btn-disabled'}"
           type="submit"

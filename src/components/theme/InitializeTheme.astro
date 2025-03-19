@@ -7,5 +7,8 @@ const { theme } = Astro.locals.tenant;
   if (theme) {
     document.documentElement.setAttribute("data-theme", theme);
     localStorage.setItem("theme", theme);
+  } else {
+    document.documentElement.setAttribute("data-theme", "light");
+    localStorage.setItem("theme", "light");
   }
 </script>

@@ -1,3 +1,5 @@
+import { useTranslations } from "$i18n/utils";
+const t = useTranslations();
 export enum TenantFeature {
   TextPrommpts = "text-prommpts",
   AudioToText = "audio-to-text",
@@ -16,3 +18,11 @@ export enum AudioCategory {
   SubtitleLarge = "subtitle-large",
   AudioPro = "audio-pro",
 }
+
+export const AudioCategoryLabels: Record<AudioCategory, string> = {
+  [AudioCategory.AudioToText]: t("nav.audiotool.audio-to-text"),
+  [AudioCategory.Subtitle]: t("tenant.subtitles"),
+  [AudioCategory.SubtitleJson]: t("tenant.subtitles-json"),
+  [AudioCategory.SubtitleLarge]: t("tenant.subtitle-large"),
+  [AudioCategory.AudioPro]: t("tenant.audio-pro"),
+};

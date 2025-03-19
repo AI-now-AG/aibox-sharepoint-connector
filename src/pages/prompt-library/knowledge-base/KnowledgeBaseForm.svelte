@@ -132,7 +132,7 @@
           {/if}
         </h1>
         <button
-          class="btn btn-neutral font-normal grow-0"
+          class="btn btn-outline font-normal grow-0"
           onclick={() => {
             fileUploadModal?.showModal();
           }}
@@ -141,7 +141,7 @@
         </button>
       </div>
     </div>
-    <form class="rounded pt-6 mb-4 space-y-6">
+    <form class="rounded-sm pt-6 mb-4 space-y-6">
       <div class="grid grid-cols-1 gap-4 justify-center">
         <div>
           <p class="mb-2">{t("prompt-library.add.knowledgebase.title")}*</p>

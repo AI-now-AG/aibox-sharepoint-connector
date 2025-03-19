@@ -38,7 +38,7 @@
 
 <div class="items-center mb-10">
   <div class="relative w-full">
-    <label class="input input-bordered flex items-center gap-2">
+    <label class="input input-bordered flex items-center gap-2 w-full">
       {@html svgIcons.search}
       <input
         type="text"
@@ -52,7 +52,7 @@
     <label class="flex items-center space-x-2">
       <input
         type="checkbox"
-        class="checkbox border-gray-300 rounded focus:ring-indigo-500 w-5 h-5"
+        class="checkbox border-base-content rounded-sm w-5 h-5"
         checked={showArchived}
         onclick={preventDefault(onFilter)}
       />

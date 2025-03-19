@@ -4,7 +4,7 @@
 </script>
 
 {#if $toasts}
-  <section>
+  <div class="flex flex-col fixed justify-center right-0 bottom-0 w-full z-1000">
     {#each $toasts as toast (toast.id)}
       <Toast
         type={toast.type}
@@ -12,20 +12,5 @@
         dismiss={() => dismissToast(toast.id ?? 0)}>{@html toast.message}</Toast
       >
     {/each}
-  </section>
+  </div>
 {/if}
-
-<style>
-  section {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
-    display: flex;
-    margin-top: 1rem;
-    justify-content: center;
-    flex-direction: column;
-    z-index: 1000;
-  }
-</style>

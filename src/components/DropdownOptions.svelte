@@ -21,18 +21,18 @@
 </script>
 
 <ul
-  class={`py-2 dropdown-content menu bg-base-100 rounded-xl z-[1] p-2 shadow ${widthClass}`}
+  class={`py-2 dropdown-content menu bg-base-100 rounded-xl z-1 p-2 shadow-sm ${widthClass}`}
   style={styleVisibility}
 >
   <!-- <ul
-  class={`py-2 dropdown-content menu bg-base-100 rounded-xl z-[1] p-2 shadow ${widthClass}`}
+  class={`py-2 dropdown-content menu bg-base-100 rounded-xl z-1 p-2 shadow-sm ${widthClass}`}
 > -->
   {#each options as option}
     <li>
       <!-- svelte-ignore a11y_no_static_element_interactions -->
       <!-- svelte-ignore a11y_click_events_have_key_events -->
       <div
-        class="flex items-center px-4 py-2 text-base-content font-sans w-full"
+        class="flex items-center px-4 py-2 text-base-content w-full"
         onclick={(e) => {
           e.stopPropagation();
           option.action();

@@ -16,6 +16,7 @@
   let tenants: any = $state([]);
   let showArchived: boolean = $state(false);
   let searchValue: string = $state("");
+  let timeout: any;
 
   let selectedTenant: any = $state(null);
   let confirmUpdateModal: HTMLDialogElement | undefined = $state();
@@ -134,13 +135,13 @@
         class="border-separate border-spacing-x-0 border-spacing-y-3 min-w-full relative"
         style="font-family:Inter;"
       >
-        <colgroup>
+        <!-- <colgroup>
           <col class="w-auto" />
           <col class="w-80" />
           <col class="w-48" />
           <col class="w-24" />
           <col class="w-16" />
-        </colgroup>
+        </colgroup> -->
         <thead>
           <tr class="bg-base-300 rounded-lg">
             <th class="py-3 px-4 text-left font-normal text-xs rounded-l-lg"
@@ -171,7 +172,7 @@
                 >
               </td>
               <td
-                class="py-3 px-4 text-gray-600 flex items-center text-xs font-normal h-16"
+                class="py-3 px-4 text-base-content flex items-center text-xs font-normal h-16"
               >
                 {tenant.org_name}
                 <button
@@ -181,7 +182,7 @@
                 >
               </td>
               <td class="py-3 px-4">
-                <span class="text-red-600 text-sm font-medium"
+                <span class="text-warning text-sm font-medium"
                   >{tenant.is_trial ? t("common.yes") : ""}</span
                 >
               </td>
@@ -189,8 +190,8 @@
               <td class="py-3 px-4">
                 <span
                   class={tenant.active == 1
-                    ? "text-emerald-600 text-sm font-medium"
-                    : "text-grey-600 text-sm font-medium"}
+                    ? "text-success text-sm font-medium"
+                    : "text-sm font-medium text-neutral/70"}
                   >{tenant.active == 1
                     ? t("tenant.tenants.tenant.active")
                     : t("tenant.tenants.tenant.archived")}</span
@@ -204,7 +205,7 @@
                     {@html svgIcons.threeDot}
                   </button>
                   <ul
-                    class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
+                    class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
                   >
                     <li>
                       <button

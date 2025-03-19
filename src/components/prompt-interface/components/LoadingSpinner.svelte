@@ -9,10 +9,10 @@
 
 {#if isLoading}
   <div
-    class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50"
+    class="fixed inset-0 bg-base-content/80 flex items-center justify-center z-50"
   >
     <svg
-      class="animate-spin h-10 w-10 text-white"
+      class="animate-spin h-10 w-10 text-neutral"
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"

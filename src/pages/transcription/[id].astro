@@ -3,50 +3,80 @@ import Layout from "$layouts/Layout.astro";
 import { useTranslations } from "$i18n/utils";
 import TranscriptionForm from "./TranscriptionForm.svelte";
 import { TranscriptionType } from "$types/TranscribeRequest";
+import TranscriptionModel from "$data/models/transcription.model";
+import { AudioCategory, AudioCategoryLabels } from "$types/TenantFeature";
 const t = useTranslations();
 
 const { id } = Astro.params;
 
-const selectedTranscriptionType =
+let selectedTranscriptionType =
   id && Object.values(TranscriptionType).includes(id as TranscriptionType)
     ? (id as TranscriptionType)
     : undefined;
-if (selectedTranscriptionType === undefined) {
+if (!id && selectedTranscriptionType === undefined) {
+  return Astro.redirect("/404");
+}
+
+const transcriptions = id ? await TranscriptionModel.get(id) : null;
+if (!transcriptions && selectedTranscriptionType === undefined) {
   return Astro.redirect("/404");
 }
 
 let title = t("tenant.audio-to-text");
 let description = t("settings.transcription.plaintext-description");
-if (selectedTranscriptionType === TranscriptionType.Summarize) {
-  title = t("settings.transcription.summarize-title");
-  description = t("settings.transcription.summarize-description");
-} else if (selectedTranscriptionType === TranscriptionType.Subtitles) {
+
+if (transcriptions?.category === AudioCategory.AudioToText) {
+  title = t("tenant.audio-to-text");
+  description = t("settings.transcription.plaintext-description");
+  selectedTranscriptionType = TranscriptionType.Plaintext;
+} else if (
+  transcriptions?.category === AudioCategory.Subtitle ||
+  transcriptions?.category === AudioCategory.SubtitleJson ||
+  transcriptions?.category === AudioCategory.SubtitleLarge
+) {
   title = t("settings.transcription.subtitles-title");
   description = t("settings.transcription.subtitles-description");
-} else if (selectedTranscriptionType === TranscriptionType.Subtitlesjson) {
-  title = t("settings.transcription.subtitles-title-json");
-  description = t("settings.transcription.subtitles-description-json");
-} else if (selectedTranscriptionType === TranscriptionType.Largefile) {
+  // } else if (transcriptions.category === TranscriptionType.Subtitlesjson) {
+  //   title = t("settings.transcription.subtitles-title-json");
+  //   description = t("settings.transcription.subtitles-description-json");
+  selectedTranscriptionType = TranscriptionType.Subtitles;
+} else if (transcriptions?.category === AudioCategory.AudioPro) {
   title = t("settings.transcription.largefile-title");
   description = t("settings.transcription.largefile-description");
-} else if (selectedTranscriptionType === TranscriptionType.SubtitleLarge) {
-  title = t("settings.transcription.subtitle.largefile-title");
-  description = t("settings.transcription.subtitle.largefile-description");
+  selectedTranscriptionType = TranscriptionType.Largefile;
 }
+// else if (transcriptions.category === TranscriptionType.SubtitleLarge) {
+//   title = t("settings.transcription.subtitle.largefile-title");
+//   description = t("settings.transcription.subtitle.largefile-description");
+// }
 ---
 
 <Layout>
   <div>
     <div class="container max-w-full mx-auto grid grid-cols-1 px-14">
-      <h1 class="pt-2 mb-2 lg:pt-8 text-4xl font-bold">
-        {title}
-      </h1>
+      <div class="pt-2 mb-2 lg:pt-8 flex justify-between items-center">
+        <h1 class="text-4xl font-bold">
+          {title}
+        </h1>
+        {
+          selectedTranscriptionType == TranscriptionType.Subtitles && (
+            <div class="card-actions justify-start ">
+              <div class="badge px-2 border-neutral">
+                {}
+                {AudioCategoryLabels[transcriptions?.category ??AudioCategory.AudioToText]}
+              </div>
+            </div>
+          )
+        }
+      </div>
       <p>{description}</p>
     </div>
 
     <TranscriptionForm
       transcriptionType={selectedTranscriptionType}
       folderName={Astro.locals.tenant.org_name}
+      usecaseId={transcriptions?._id.toString()}
+      category={transcriptions?.category ?? AudioCategory.AudioPro}
       client:load
     />
   </div>

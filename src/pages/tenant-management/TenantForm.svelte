@@ -7,19 +7,19 @@
   import TogglePasswordIcon from "./TogglePasswordIcon.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import AlertDialog from "$components/AlertDialog.svelte";
-  import { clickOutside } from "$components/actions/ClickOutside";
   import {
     trimInput,
     toLowerCase,
     replaceSpecialChars,
   } from "$components/actions/Input.svelte";
   import { loading, showLoading, hideLoading } from "$stores";
-  import ColorPicker, { ChromeVariant } from "svelte-awesome-color-picker";
   import { type TenantTheme } from "$data/models/tenant.model";
   import InputDialog from "$components/InputDialog.svelte";
   import { isValidEmail } from "$utils/common";
   import { ApiKeyProvider, AudioCategory } from "$types/TenantFeature";
   import SelectionInput from "./SelectionInput.svelte";
+  import SingleInput from "$pages/prompt-library/prompts/SingleInput.svelte";
+  import ThemeItem from "./ThemeItem.svelte";
 
   const t = useTranslations();
 
@@ -95,6 +95,10 @@
           (item) => item.value == findTextProvider.provider,
         ) || providerValues[0];
     }
+
+    // isAudioToTextChecked = tenantData.included_features.some(
+    //   (item: any) => item.name == TenantFeature.AudioToText,
+    // );
   }
 
   let hex = tenantData?.primary_color || "#491EFF";
@@ -165,8 +169,49 @@
       .join(", "),
   );
 
+  const languages = [
+    { title: "Deutsch", value: "de" },
+    { title: "English", value: "en" },
+  ];
+  let selectedLanguage: { title: string; value: string } | undefined = $state();
+
+  const themes = [
+    { title: "Light", value: "light" },
+    { title: "Dark", value: "dark" },
+    { title: "aibox", value: "aibox" },
+    { title: "Somedia", value: "somedia" },
+  ].concat(
+    tenant._id === "66aa21a3d40d0b194e280143" ||
+      tenant._id === "671f3f4c44d9f6336b4cdd6a"
+      ? []
+      : [],
+    tenant._id === "674347ba64f450769a147f6a"
+      ? [{ title: "Weihnachtsmann", value: "weihnachtsmann" }]
+      : [],
+  );
+
+  let selectedThemes: { title: string; value: string } | undefined = $state();
+
+  if (tenantData && tenantData.transcription_types?.length) {
+    //   isAzureAudioProEnabled = tenantData.transcription_types.some(
+    //     (item: any) =>
+    //       item === AudioCategory.AudioPro || item === AudioCategory.SubtitleLarge,
+    //   );
+  }
+
   if (tenantData) {
+    // const findTextProvider = tenantData.api_key_providers.find(
+    //   (item: any) => item.name == ApiKeyProvider.OpenAI,
+    // );
+    // if (findTextProvider) {
+    //   textSelectedProvider =
+    //     providerValues.find(
+    //       (item) => item.value == findTextProvider.provider,
+    //     ) || providerValues[0];
+    // }
+
     const { api_key_providers = [], included_features = [] } = tenantData;
+
     const findProvider = (provider: ApiKeyProvider) =>
       api_key_providers.some(
         (item: any) => item.name === provider && item.active,
@@ -182,7 +227,6 @@
         (item: any) => item.name === TenantFeature.AudioToText,
       )?.provider;
 
-    // svelte-ignore state_referenced_locally
     if (defaultTextFeature) {
       openAIEnabled ||= defaultTextFeature === ApiKeyProvider.OpenAI;
       azureOpenAIEnabled ||= defaultTextFeature === ApiKeyProvider.AzureOpenAI;
@@ -190,12 +234,25 @@
   }
 
   // set default values
-  if (tenantData && !tenantData.default_language) {
-    tenantData.default_language = "de";
+  if (!tenantData.default_language) {
+    // tenantData.default_language = "de";
+    selectedLanguage = languages.find(
+      (item) => item.value === tenantData.default_language,
+    );
+  }
+  if (tenantData.default_language) {
+    selectedLanguage = languages.find(
+      (item) => item.value === tenantData.default_language,
+    ) ?? { title: "Deutsch", value: "de" };
   }
   if (tenantData && !tenantData.theme) {
     tenantData.theme = "dark" as TenantTheme;
+    selectedThemes = themes.find((item) => item.value === tenantData.theme);
   }
+  if (tenantData.theme) {
+    selectedThemes = themes.find((item) => item.value === tenantData.theme);
+  }
+
   if (tenantData && !tenantData.primary_color) {
     // svelte-ignore state_referenced_locally
     tenantData.primary_color = selecteColor;
@@ -339,6 +396,8 @@
     if (validateForm()) {
       try {
         showLoading();
+        tenantData.default_language = selectedLanguage?.value;
+        tenantData.theme = selectedThemes?.value as TenantTheme;
         const { error: encryptKeysError, data } =
           await actions.tenant.encryptApiKeys({
             openai_api_key: openAIKey,
@@ -357,6 +416,7 @@
           speech_api_key,
         } = data;
 
+        cleanupValues();
         // API Keys
         tenantData.openai_api_key = openai_api_key;
         tenantData.azure_openai_api_key = azure_openai_api_key;
@@ -413,10 +473,15 @@
     }
   }
 
+  $inspect(selectedThemes);
+
   async function updateTenant() {
     if (validateForm()) {
       try {
+        console.log("tenantData", tenantData);
         showLoading();
+        tenantData.default_language = selectedLanguage?.value;
+        tenantData.theme = selectedThemes?.value as TenantTheme;
         const { error: encryptKeysError, data } =
           await actions.tenant.encryptApiKeys({
             openai_api_key: openAIKey,
@@ -435,6 +500,7 @@
           speech_api_key,
         } = data;
 
+        cleanupValues();
         // API Keys
         tenantData.openai_api_key = openai_api_key;
         tenantData.azure_openai_api_key = azure_openai_api_key;
@@ -496,6 +562,21 @@
       } catch (error: any) {
         showAlert(error?.toString());
       }
+    }
+  }
+
+  function cleanupValues() {
+    if (!tenantData.azure_openai_endpoint) {
+      delete tenantData.azure_openai_endpoint;
+    }
+    if (!tenantData.azure_openai_instance_name) {
+      delete tenantData.azure_openai_instance_name;
+    }
+    if (!tenantData.azure_openai_whisper_model) {
+      delete tenantData.azure_openai_whisper_model;
+    }
+    if (!tenantData.azure_openai_chat_model) {
+      delete tenantData.azure_openai_chat_model;
     }
   }
 
@@ -562,7 +643,7 @@
         {t("common.save")}
       </button>
       <button
-        class="btn"
+        class="btn btn-outline"
         onclick={() => (window.location.href = "/tenant-management")}
       >
         {t("common.cancel")}
@@ -574,7 +655,7 @@
   <div class="container w-full mx-auto p-6">
     <div class="flex flex-row space-x-4">
       <div class="flex-1 flex flex-col mb-4">
-        <span class="mb-2 text-gray-400 font-medium text-sm"
+        <span class="mb-2 text-base-content font-medium text-sm"
           >{t("tenant.tenants.tenant.display-name")}</span
         >
         <input
@@ -586,7 +667,7 @@
       </div>
 
       <div class="flex-1 flex flex-col mb-4">
-        <span class="mb-2 text-gray-400 font-medium text-sm"
+        <span class="mb-2 text-base-content font-medium text-sm"
           >{t("tenant.tenants.tenant.name")}</span
         >
         <input
@@ -603,104 +684,25 @@
 
     <div class="flex flex-row space-x-4">
       <div class="flex-1 flex flex-col mb-4">
-        <span class="mb-2 text-gray-400 font-medium text-sm"
-          >{t("tenant.language")}</span
-        >
-        <select
-          class="select select-bordered w-full"
-          bind:value={tenantData.default_language}
-        >
-          <option disabled>{t("tenant.language")}</option>
-          <option value="de">{t("tenant.german-language")}</option>
-          <option value="en">{t("tenant.english-language")}</option>
-        </select>
+        <SingleInput
+          title={`${t("tenant.language")}*`}
+          placeholder={t("tenant.german-language")}
+          items={languages}
+          bind:selectedItem={selectedLanguage}
+        />
       </div>
 
       <div class="flex-1 flex flex-col mb-4">
-        <span class="mb-2 text-gray-400 font-medium text-sm"
-          >{t("tenant.theme")}</span
-        >
-        <select
-          class="select select-bordered w-full"
-          bind:value={tenantData.theme}
-        >
-          <option disabled>{t("tenant.theme")}</option>
-          <option value="light">Light</option>
-          <option value="dark">Dark</option>
-          <option value="somedia">Somedia</option>
-          <option value="weihnachtsmann">Weihnachtsmann</option>
-          <option value="luxury">Luxury</option>
-          <option value="lemonade">Lemonade</option>
-        </select>
+        <ThemeItem
+          title={`${t("tenant.theme")}*`}
+          placeholder="e.g Light"
+          items={themes}
+          bind:selectedItem={selectedThemes}
+        />
       </div>
     </div>
 
-    <div class="flex flex-row space-x-4">
-      <div class="flex-1 flex flex-col mb-4">
-        <span class="mb-2 text-gray-400 font-medium text-sm"
-          >{t("tenant.primary-color")}</span
-        >
-        <div class="w-full">
-          <div
-            class="relative flex"
-            use:clickOutside={() => {
-              showPicker = false;
-            }}
-          >
-            <div class="z-[10]">
-              <button
-                class="color-preview inline-block w-[100px] h-[50px] rounded-tl-[8px] rounded-bl-[8px]"
-                style="background-color: {selecteColor};"
-                onclick={toggleColorPicker}
-                aria-label="Select color"
-              ></button>
-
-              {#if showPicker}
-                <div class="absolute picker-color top-[54px] left-[0]">
-                  <ColorPicker
-                    {hex}
-                    isDialog={false}
-                    components={{
-                      ...ChromeVariant,
-                    }}
-                    position="responsive"
-                    label={""}
-                    sliderDirection="horizontal"
-                    textInputModes={["hex"]}
-                    on:input={(event) => {
-                      selecteColor = event.detail.hex;
-                      tenantData.primary_color = selecteColor;
-                    }}
-                  />
-                </div>
-              {/if}
-            </div>
-            <button
-              class="flex flex-1 items-center input input-bordered color-input h-[50px] rounded-tl-none rounded-bl-none"
-              onclick={toggleColorPicker}
-            >
-              <span>{selecteColor}</span>
-            </button>
-          </div>
-        </div>
-      </div>
-      <div class="flex-1 flex flex-col mb-4">
-        <div class="flex justify-end">
-          <button
-            class={"mt-7 btn btn-active btn-neutral font-normal grow-0 w-auto " +
-              `${mode == MODE.Edit ? "" : "btn-disabled"}`}
-            onclick={() => {
-              addTanantAdminModal?.show();
-            }}
-          >
-            {@html svgIcons.add}
-            {t("tenant.add-tenant-admin")}
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div class="w-full h-0.5 mt-4 mb-6 bg-gray-400/20"></div>
+    <div class="divider"></div>
 
     <div class="mb-3 flex flex-row items-center gap-2">
       {@html svgIcons.textPrompt}
@@ -709,7 +711,9 @@
 
     <div class="container mx-auto">
       <!-- Open AI Section -->
-      <div class="collapse collapse-arrow bg-base-100 shadow rounded-lg mb-4">
+      <div
+        class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
+      >
         <input type="checkbox" />
         <div class="collapse-title">
           <div class="flex items-center justify-between">
@@ -718,7 +722,7 @@
                 id="feature-text-prompt"
                 type="checkbox"
                 bind:checked={openAIEnabled}
-                class="checkbox checkbox-primary z-[10]"
+                class="checkbox checkbox-primary z-10"
                 value="text-prompt"
                 disabled={defaultTextFeature === ApiKeyProvider.OpenAI}
               />
@@ -726,7 +730,9 @@
                 class="label cursor-pointer ml-2"
                 for="feature-text-prompt"
               >
-                <span class="label-text">{t("tenant.open-ai-provider")}</span>
+                <span class="label-text text-base-content"
+                  >{t("tenant.open-ai-provider")}</span
+                >
               </label>
             </div>
             {#if defaultTextFeature === ApiKeyProvider.OpenAI}
@@ -739,7 +745,7 @@
         <div class="collapse-content">
           <div class="grid grid-cols-2 gap-4 mx-8">
             <div class="w-full">
-              <span class="mb-2 text-gray-400 font-medium text-sm"
+              <span class="mb-2 text-base-content font-medium text-sm"
                 >{t("tenant.model.name")}</span
               >
               <input
@@ -752,11 +758,13 @@
               />
             </div>
             <div class="w-full">
-              <span class="mb-2 text-gray-400 font-medium text-sm"
+              <span class="mb-2 text-base-content font-medium text-sm"
                 >{t("tenant.api-key")}</span
               >
 
-              <label class="input input-bordered flex items-center gap-2 mt-2">
+              <label
+                class="input input-bordered flex items-center gap-2 mt-2 w-full"
+              >
                 <input
                   bind:this={openAIKeyField}
                   type="password"
@@ -784,7 +792,9 @@
         </div>
       </div>
       <!-- Azure Section -->
-      <div class="collapse collapse-arrow bg-base-100 shadow rounded-lg mb-4">
+      <div
+        class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
+      >
         <input type="checkbox" />
         <div class="collapse-title">
           <div class="flex items-center justify-between">
@@ -793,7 +803,7 @@
                 id="feature-azure-section"
                 type="checkbox"
                 bind:checked={azureOpenAIEnabled}
-                class="checkbox checkbox-primary z-[10]"
+                class="checkbox checkbox-primary z-10"
                 value="text-prompt"
                 disabled={defaultTextFeature === ApiKeyProvider.AzureOpenAI}
               />
@@ -801,7 +811,7 @@
                 class="label cursor-pointer ml-2"
                 for="feature-azure-section"
               >
-                <span class="label-text"
+                <span class="label-text text-base-content"
                   >{t("tenant.azure-open-ai-provider")}</span
                 >
               </label>
@@ -816,11 +826,13 @@
         <div class="collapse-content">
           <div class="grid grid-cols-2 gap-4 mx-8">
             <div class="w-full">
-              <span class="mb-2 text-gray-400 font-medium text-sm"
+              <span class="mb-2 text-base-content font-medium text-sm"
                 >{t("tenant.azure-open-ai-provider")}</span
               >
 
-              <label class="input input-bordered flex items-center gap-2 mt-2">
+              <label
+                class="input input-bordered flex items-center gap-2 mt-2 w-full"
+              >
                 <input
                   bind:this={azureOpenAIKeyField}
                   type="password"
@@ -834,7 +846,7 @@
               </label>
             </div>
             <div class="w-full">
-              <span class="mb-2 text-gray-400 font-medium text-sm"
+              <span class="mb-2 text-base-content font-medium text-sm"
                 >{t("tenant.azure-open-ai-instance-name")}</span
               >
               <input
@@ -847,7 +859,7 @@
             </div>
 
             <div class="w-full">
-              <span class="mb-2 text-gray-400 font-medium text-sm"
+              <span class="mb-2 ttext-base-content font-medium text-sm"
                 >{t("tenant.azure-open-ai-endpoint")}</span
               >
               <input
@@ -858,7 +870,7 @@
               />
             </div>
             <div class="w-full">
-              <span class="mb-2 text-gray-400 font-medium text-sm"
+              <span class="mb-2 text-base-content font-medium text-sm"
                 >{t("tenant.azure-open-ai-transciption-model")}</span
               >
               <input
@@ -871,7 +883,7 @@
             </div>
 
             <div class="w-full">
-              <span class="mb-2 text-gray-400 font-medium text-sm"
+              <span class="mb-2 text-base-content font-medium text-sm"
                 >{t("tenant.azure-open-ai-text-model")}</span
               >
               <input
@@ -899,7 +911,9 @@
       </div>
 
       <!-- Perplexity Section -->
-      <div class="collapse collapse-arrow bg-base-100 shadow rounded-lg mb-4">
+      <div
+        class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
+      >
         <input type="checkbox" />
         <div class="collapse-title">
           <div class="flex items-center justify-between">
@@ -908,7 +922,7 @@
                 id="feature-perplexity-section"
                 type="checkbox"
                 bind:checked={perplexityEnabled}
-                class="checkbox checkbox-primary z-[10]"
+                class="checkbox checkbox-primary z-10"
                 value="text-prompt"
                 disabled={defaultTextFeature === ApiKeyProvider.Perplexity}
               />
@@ -916,7 +930,9 @@
                 class="label cursor-pointer ml-2"
                 for="feature-perplexity-section"
               >
-                <span class="label-text">{t("tenant.perplexity.name")}</span>
+                <span class="label-text text-base-content"
+                  >{t("tenant.perplexity.name")}</span
+                >
               </label>
             </div>
             {#if defaultTextFeature === ApiKeyProvider.Perplexity}
@@ -928,7 +944,7 @@
         </div>
         <div class="collapse-content">
           <div class="grid grid-cols-2 gap-4 mx-8">
-            <div class="w-full z-[20]">
+            <div class="w-full z-20">
               <SelectionInput
                 title={`${t("tenant.model.name")}*`}
                 placeholder="e.g. sonar"
@@ -937,11 +953,13 @@
               />
             </div>
             <div class="w-full">
-              <span class="mb-2 text-base-content/50 font-medium text-sm"
+              <span class="mb-2 text-base-content font-medium text-sm"
                 >{t("tenant.api-key")}</span
               >
 
-              <label class="input input-bordered flex items-center gap-2 mt-1">
+              <label
+                class="input input-bordered flex items-center gap-2 mt-1 w-full"
+              >
                 <input
                   bind:this={perplexityKeyField}
                   type="password"
@@ -970,27 +988,30 @@
       </div>
     </div>
 
-    <div class="w-full h-0.5 mt-4 mb-6 bg-gray-400/20"></div>
+    <div class="divider"></div>
+
     <div class="mb-3 flex flex-row items-center gap-2">
       {@html svgIcons.audioToText}
       <p class="font-medium text-md">{t("nav.audiotool")}</p>
     </div>
     <div class="container mx-auto">
       <!-- Audio Whisper Section -->
-      <div class="collapse collapse-arrow bg-base-100 shadow rounded-lg mb-4">
+      <div
+        class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
+      >
         <input type="checkbox" />
-        <div class="collapse-title flex items-center justify-between">
+        <div class="collapse-title flex items-center justify-between gap-4">
           <div class="flex items-center">
             <input
               id="audio-whisper-model"
               type="checkbox"
               checked={isAudioToTextChecked}
-              class="checkbox checkbox-primary z-[10]"
+              class="checkbox checkbox-primary z-10"
               value="text-prompt"
               disabled
             />
             <label class="label cursor-pointer ml-2" for="audio-whisper-model">
-              <span class="label-text"
+              <span class="label-text text-base-content"
                 >{t("tenant.audio.whisper.model.title")}</span
               >
             </label>
@@ -1005,7 +1026,7 @@
         <div class="collapse-content space-y-6">
           <div class="flex flex-col gap-4 mx-8">
             <!-- Checkboxes for Audio to Text & Subtitles -->
-            <div class="rounded-lg border-1">
+            <div class="rounded-lg">
               <span class="text-sm font-semibold">{t("tenant.features")}</span>
               <div class="flex flex-wrap gap-4 mt-2">
                 {#each audioStandardArray as item, index}
@@ -1014,13 +1035,15 @@
                       id="audio-standard-{item.type}"
                       type="checkbox"
                       bind:checked={audioStandardArray[index].checked}
-                      class="checkbox checkbox-primary checkbox-sm z-[10]"
+                      class="checkbox checkbox-primary checkbox-sm z-10"
                     />
                     <label
                       class="label cursor-pointer ml-2"
                       for="audio-standard-{item.type}"
                     >
-                      <span class="label-text">{item.title}</span>
+                      <span class="label-text text-base-content"
+                        >{item.title}</span
+                      >
                     </label>
                   </div>
                 {/each}
@@ -1037,20 +1060,22 @@
       </div>
 
       <!-- Large File Azure Section -->
-      <div class="collapse collapse-arrow bg-base-100 shadow rounded-lg mb-4">
+      <div
+        class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
+      >
         <input type="checkbox" />
-        <div class="collapse-title flex items-center justify-between">
+        <div class="collapse-title flex items-center justify-between gap-4">
           <div class="flex items-center">
             <input
               id="audio-pro-model"
               type="checkbox"
               checked={isAzureAudioProEnabled}
-              class="checkbox checkbox-primary z-[10]"
+              class="checkbox checkbox-primary z-10"
               value="text-prompt"
               disabled
             />
             <label class="label cursor-pointer ml-2" for="audio-pro-model">
-              <span class="label-text"
+              <span class="label-text text-base-content"
                 >{t("tenant.settings.large-file-azure")}</span
               >
             </label>
@@ -1064,7 +1089,7 @@
         <div class="collapse-content space-y-4">
           <div class="grid grid-cols-2 gap-4 mx-8">
             <!-- Checkboxes for Audio Pro & Subtitles Large -->
-            <div class="rounded-lg border-1">
+            <div class="rounded-lg">
               <span class="text-sm font-semibold">{t("tenant.features")}</span>
               <div class="flex flex-wrap gap-4 mt-2">
                 {#each audioProArray as item, index}
@@ -1073,13 +1098,15 @@
                       id="audio-pro-{item.type}"
                       type="checkbox"
                       bind:checked={audioProArray[index].checked}
-                      class="checkbox checkbox-primary checkbox-sm z-[10]"
+                      class="checkbox checkbox-primary checkbox-sm z-10"
                     />
                     <label
                       class="label cursor-pointer ml-2"
                       for="audio-pro-{item.type}"
                     >
-                      <span class="label-text">{item.title}</span>
+                      <span class="label-text text-base-content"
+                        >{item.title}</span
+                      >
                     </label>
                   </div>
                 {/each}
@@ -1089,11 +1116,13 @@
 
           <div class="grid grid-cols-2 gap-4 mx-8">
             <div class="w-full">
-              <span class="mb-2 text-gray-400 font-medium text-sm"
+              <span class="mb-2 text-base-content font-medium text-sm"
                 >{t("tenant.settings.large-file-azure-apiKey")}
               </span>
 
-              <label class="input input-bordered flex items-center gap-2 mt-2">
+              <label
+                class="input input-bordered flex items-center gap-2 mt-2 w-full"
+              >
                 <input
                   bind:this={azureOpenAIKeyProField}
                   type="password"
@@ -1107,7 +1136,7 @@
               </label>
             </div>
             <div class="w-full">
-              <span class="mb-2 text-gray-400 font-medium text-sm"
+              <span class="mb-2 text-base-content font-medium text-sm"
                 >{t("tenant.settings.large-file-azure-region")}</span
               >
               <input
@@ -1124,13 +1153,16 @@
 
       <!-- Model Selection -->
       <div class="container mx-auto">
-        <div class="bg-base-100 shadow rounded-lg my-4">
+        <div class="bg-base-100 shadow-sm rounded-lg my-4">
           <div class="flex p-4 items-center justify-between">
             <div class="flex items-center justify-between">
               <label class="label cursor-pointer" for="">
-                <span class="label-text"
+                <span class="label-text text-base-content"
                   >{t("tenant.text.improvement.llm")}</span
                 >
+                <!-- <span class="text-sm font-semibold"
+                >{t("tenant.text.improvement.llm")}</span
+              > -->
               </label>
             </div>
             <div class="flex gap-4">
@@ -1156,7 +1188,7 @@
       </div>
     </div>
 
-    <div class="w-full h-0.5 mt-4 mb-6 bg-gray-400/20"></div>
+    <div class="divider"></div>
 
     <div class="mb-3 flex flex-row items-center gap-2">
       {@html svgIcons.userGroup}
@@ -1164,7 +1196,8 @@
     </div>
 
     <div class="container mx-auto">
-      <div class="bg-base-100 shadow rounded-lg my-4">
+      <!-- User Managment Section -->
+      <div class="bg-base-100 shadow-sm rounded-lg my-4">
         <div class="flex p-4 items-center justify-between">
           <div class="flex items-center">
             <input
@@ -1175,7 +1208,7 @@
               bind:checked={tenantData.is_restrict_user_managment}
             />
             <label class="label cursor-pointer ml-2" for="disable-create-user">
-              <span class="label-text ml-2"
+              <span class="label-text text-base-content ml-2"
                 >{t("tenant.restrict-user-managment")}</span
               >
             </label>
@@ -1185,7 +1218,7 @@
     </div>
 
     <div class="container mx-auto">
-      <div class="bg-base-100 shadow rounded-lg my-4">
+      <div class="bg-base-100 shadow-sm rounded-lg my-4">
         <div class="flex p-4 items-center justify-between">
           <div class="flex items-center">
             <input
@@ -1196,7 +1229,9 @@
               bind:checked={tenantData.is_trial}
             />
             <label class="label cursor-pointer ml-2" for="is-trial-tenant">
-              <span class="label-text ml-2">{t("tenant.trial")}</span>
+              <span class="label-text text-base-content ml-2"
+                >{t("tenant.trial")}</span
+              >
             </label>
           </div>
         </div>

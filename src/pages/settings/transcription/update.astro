@@ -3,8 +3,11 @@ import Layout from "$layouts/Layout.astro";
 import { useTranslations } from "$i18n/utils";
 import { Permission } from "$enums/Users";
 import { TranscriptionType } from "$types/TranscribeRequest";
-import { type TranscriptionCard } from "$types/TranscriptionCard";
-import UpdateForm from "$pages/settings/transcription/UpdateForm.svelte";
+import { AudioCategory } from "$types/TenantFeature";
+import TranscriptionModel from "$data/models/transcription.model";
+import { svgIcons } from "$assets/icons";
+import AudioUsecaseList from "./AudioUsecaseList.svelte";
+import type { AudioCardItem } from "$types/AudioCardItem";
 
 const t = useTranslations();
 const { searchParams } = Astro.url;
@@ -14,38 +17,107 @@ if (!Object.values(TranscriptionType).includes(typeParam)) {
   return Astro.redirect("/404");
 }
 
-const transcriptions = Astro.locals.tenant?.transcriptions ?? {};
+const transcriptionTypes = Astro.locals.tenant?.transcription_types ?? [];
 const userPermissions = Astro.locals.user.permissions;
 
-const transcriptionMap: Partial<Record<TranscriptionType, string>> = {
-  [TranscriptionType.Plaintext]: t("tenant.audio-to-text"),
-  [TranscriptionType.Summarize]: t("settings.transcription.summarize-title"),
-  [TranscriptionType.Subtitles]: t("settings.transcription.subtitles-title"),
-  [TranscriptionType.Largefile]: t("settings.transcription.largefile-title"),
-  [TranscriptionType.Subtitlesjson]: t(
-    "settings.transcription.subtitles-title-json",
-  ),
-  [TranscriptionType.SubtitleLarge]: t(
-    "settings.transcription.subtitle.largefile-title",
-  ),
-};
+let selectedTranType: AudioCategory[] = [];
 
-const card: TranscriptionCard | undefined = transcriptionMap[typeParam]
-  ? {
-      title: transcriptionMap[typeParam]!,
-      description: transcriptions[typeParam]?.text ?? "",
-      toggle: transcriptions[typeParam]?.enabled ?? false,
-      type: typeParam,
-    }
-  : undefined;
+if (typeParam === TranscriptionType.Plaintext) {
+  selectedTranType = [AudioCategory.AudioToText];
+} else if (typeParam === TranscriptionType.Subtitles) {
+  selectedTranType = [
+    AudioCategory.Subtitle,
+    AudioCategory.SubtitleJson,
+    AudioCategory.SubtitleLarge,
+  ];
+} else if (typeParam === TranscriptionType.Largefile) {
+  selectedTranType = [AudioCategory.AudioPro];
+}
+
+const transcriptions = await TranscriptionModel.listByTenant(
+  Astro.locals.user.tenant_id,
+);
+
+// const transcriptionsFilterd =
+//   transcriptions?.filter((transcription) =>
+//     selectedTranType.includes(transcription.category),
+//   ) ?? [];
+
+const transcriptionsFiltered =
+  transcriptions
+    ?.filter((transcription) =>
+      selectedTranType.includes(transcription.category),
+    )
+    ?.sort((a, b) => {
+      const indexA = transcriptionTypes.indexOf(a.category);
+      const indexB = transcriptionTypes.indexOf(b.category);
+
+      if (indexA === -1) return 1;
+      if (indexB === -1) return -1;
+
+      return indexA - indexB;
+    }) ?? [];
+
+// const transcriptionsFilterd =
+//   (
+//     transcriptions?.filter((transcription) =>
+//       selectedTranType.includes(transcription.category),
+//     ) ?? []
+//   ).filter((transcription) =>
+//     transcriptionTypes.includes(transcription.category),
+//   ) ?? [];
+
+const transcriptionsEnriched: AudioCardItem[] = transcriptionsFiltered.map(
+  (tran) => {
+    const tags = [tran.category].filter(Boolean) as string[];
+    return {
+      id: tran._id.toString(),
+      title: tran.name,
+      instruction: tran.text ?? "",
+      category: tran.category,
+      enabled: tran.enabled,
+      tags,
+    };
+  },
+);
 ---
 
 <Layout>
-  <div>
-    <UpdateForm
-      transcriptionCard={card}
-      isEditable={userPermissions.includes(Permission.AdminAll)}
-      client:load
-    />
+  <div
+    class="container max-w-5xl mx-auto p-6 grid grid-cols-3 md:grid-cols-[1fr_max-content] items-center gap-8"
+  >
+    <div class="flex items-center pt-2 pb-6">
+      <button class="mr-4" onclick="history.back()">
+        <Fragment set:html={svgIcons.back} />
+        
+      </button>
+
+      <h1 class="text-4xl font-bold">
+        {
+          typeParam === TranscriptionType.Plaintext
+            ? t("tenant.audio-to-text")
+            : t("settings.transcription.subtitles-title")
+        }
+      </h1>
+    </div>
+    <div class="flex items-center space-x-2">
+      {
+        userPermissions.includes(Permission.AdminAll) && (
+          <a
+            href={`/settings/transcription/UsecaseForm?type=${encodeURIComponent(typeParam)}`}
+            class="btn btn-outline font-normal grow-0"
+          >
+            <span set:html={svgIcons.add} />
+            {t("settings.transcription.addUsecase")}
+          </a>
+        )
+      }
+    </div>
   </div>
+  <AudioUsecaseList
+    items={transcriptionsEnriched}
+    typeParam={typeParam}
+    isEditable={userPermissions.includes(Permission.AdminAll)}
+    client:load
+  />
 </Layout>
