@@ -7,7 +7,6 @@
   import { loading, showLoading, hideLoading, isOnboarding } from "$stores";
 
   const t = useTranslations();
-
   interface Props {
     user: any;
   }
@@ -20,39 +19,50 @@
     const target = event.target as HTMLElement;
     if (target.tagName === "A" && target.dataset.verified === "true") {
       event.preventDefault();
-      if (!user.email_verified) {
-        try {
-          showLoading();
-          const result = await actions.auth.emailVerification({});
-          if (result?.data?.success) {
-            addToast({
-              type: "success",
-              message: t("user.send-verify-email-success"),
-            });
-          }
-        } catch {
+
+      try {
+        showLoading();
+        const result = await actions.auth.emailVerification({});
+        if (result?.data?.success) {
           addToast({
-            type: "error",
-            message: t("user.send-verify-email-failed"),
+            type: "success",
+            message: t("user.send-verify-email-success"),
           });
-        } finally {
-          hideLoading();
         }
+      } catch {
+        addToast({
+          type: "error",
+          message: t("user.send-verify-email-failed"),
+        });
+      } finally {
+        hideLoading();
       }
     }
   };
 
   onMount(() => {
     currentUrl = window.location.href;
-
     window.addEventListener("click", handleClick);
+
     return () => {
       window.removeEventListener("click", handleClick);
     };
   });
 
   $effect(() => {
-    isShow = !$isOnboarding;
+    if (!$isOnboarding) {
+      setTimeout(async () => {
+        try {
+          const result = await actions.user.get({ _id: user.id });
+          if (result.data && !result.data.email_verified) {
+            isShow = true;
+            console.log("show email verification message");
+          }
+        } catch (error) {
+          console.log("error", error);
+        }
+      }, 6000);
+    }
   });
 </script>
 
