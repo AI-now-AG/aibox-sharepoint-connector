@@ -438,7 +438,7 @@ const fetchAndSyncOrgUsersForModerator = async (data: any) => {
     const localUser = await UserModel.getAuth0Sub(userId);
     const roles = localUser?.roles || [];
 
-    const isModerator = roles?.some((role) =>
+    const isModerator = roles?.some((role: UserRole) =>
       [UserRole.SuperAdmin, UserRole.Admin].includes(role),
     );
 
@@ -446,7 +446,10 @@ const fetchAndSyncOrgUsersForModerator = async (data: any) => {
       await syncAllOrganizationUsers(orgId, userId);
     }
   } catch (error: any) {
-    console.warn(`Sync auth0 user on login error`, error);
+    console.warn(
+      `Sync auth0 organization users on moderator login error`,
+      error,
+    );
   }
 };
 
