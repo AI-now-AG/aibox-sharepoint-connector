@@ -4,10 +4,6 @@ import type { APIContext } from "astro";
 import UserModel, { assignPermissions } from "$data/models/user.model";
 import { z } from "zod";
 import log from "$utils/log";
-import {
-  syncAllOrganizationUsers,
-  syncOrganizationUser,
-} from "$utils/auth0Sync";
 import TenantModel from "$data/models/tenant.model";
 import { UserRole } from "$enums/Users";
 import { AUTH0_SESSION_STATE } from "$constants";
@@ -21,6 +17,8 @@ const Auth0JWTSchema = z.object({
   picture: z.string().url(),
   name: z.string(),
   "ainow/roles": z.array(z.nativeEnum(UserRole)),
+  email_verified: z.boolean(),
+  logins_count: z.number(),
 });
 
 export async function GET(context: APIContext): Promise<Response> {
@@ -72,6 +70,7 @@ export async function GET(context: APIContext): Promise<Response> {
     });
   }
 
+  // Get the user's roles
   const roles = auth0User.data["ainow/roles"];
 
   // TODO: Sync current user from Auth0 to aibox
@@ -84,21 +83,10 @@ export async function GET(context: APIContext): Promise<Response> {
     picture: auth0User.data.picture,
     roles,
     permissions: assignPermissions(roles),
+    logins_count: auth0User.data.logins_count,
+    email_verified: auth0User.data.email_verified,
+    last_login: new Date().toISOString(),
   });
-
-  // TODO: If the user is an Admin, sync all organization members' data
-  const isModerator = roles?.some((role) =>
-    [UserRole.SuperAdmin, UserRole.Admin].includes(role),
-  );
-  if (isModerator) {
-    setImmediate(async () => {
-      await syncAllOrganizationUsers(auth0User.data.org_id, userId.toString());
-    });
-  } else {
-    setImmediate(async () => {
-      await syncOrganizationUser(auth0User.data.sub);
-    });
-  }
 
   const session = await lucia.createSession(userId, {});
   const sessionCookie = lucia.createSessionCookie(session.id);

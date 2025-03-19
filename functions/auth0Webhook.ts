@@ -17,7 +17,8 @@ import {
   sendWelcomeEmail,
   sendNotificationEmail,
 } from "$utils/auth0Auth";
-import type { UserRole } from "$enums/Users";
+import { syncAllOrganizationUsers } from "$utils/auth0Sync";
+import { UserRole } from "$enums/Users";
 
 /**
  * Handles Auth0 log stream events
@@ -60,7 +61,7 @@ const auth0Webhook: Handler = async (
       // Trigger successful login
       // See: https://auth0.com/docs/customize/log-streams/event-filters#login-success
       if (eventType == "s") {
-        await syncAuth0UserOnLogin(data);
+        await fetchAndSyncOrgUsersForModerator(data);
       }
 
       // Trigger successful signup
@@ -69,7 +70,6 @@ const auth0Webhook: Handler = async (
         if (isPermittedConnection(data)) {
           await triggerRegistrationEmail(data);
           await updateAuth0UserMetadata(data.user_id, { signup: true });
-          //await createAuth0AuthMethod(data.user_id, data.user_name);
         }
 
         // Send welcome email for social login
@@ -368,19 +368,6 @@ const updateUserAttributesInDatabase = async (
   }
 };
 
-const createAuth0AuthMethod = async (userId: string, email: string) => {
-  console.log(`Create user auth methods`, { userId });
-
-  try {
-    await usersManagement.createAuthenticationMethod(userId, {
-      type: "email",
-      email,
-    });
-  } catch (error: any) {
-    console.warn(`Updating user metadata error`, error);
-  }
-};
-
 const updateAuth0UserMetadata = async (userId: string, update: any) => {
   console.log(`Update user metadata`, { userId, update });
 
@@ -437,18 +424,27 @@ const updateTenantInDatabase = async (data: any) => {
   }
 };
 
-const syncAuth0UserOnLogin = async (data: any) => {
+const fetchAndSyncOrgUsersForModerator = async (data: any) => {
   const { user_id: userId, organization_id: orgId } = data;
-  console.log(`Sync auth0 user on login`, { userId, orgId });
+  console.log(
+    `Fetching and syncing all Auth0 organization users on moderator login`,
+    {
+      userId,
+      orgId,
+    },
+  );
 
-  // Sync last login and login count
   try {
-    const loginsCount = data.details?.stats?.loginsCount ?? 0;
-    const update: Partial<User> = {
-      last_login: new Date().toISOString(),
-      logins_count: loginsCount,
-    };
-    await UserModel.upsertByAuth0Sub(userId, update);
+    const localUser = await UserModel.getAuth0Sub(userId);
+    const roles = localUser?.roles || [];
+
+    const isModerator = roles?.some((role) =>
+      [UserRole.SuperAdmin, UserRole.Admin].includes(role),
+    );
+
+    if (localUser && isModerator) {
+      await syncAllOrganizationUsers(orgId, userId);
+    }
   } catch (error: any) {
     console.warn(`Sync auth0 user on login error`, error);
   }
