@@ -25,14 +25,12 @@
   let isProcessing = $state(false);
   let showButton = $state(false);
 
-  const apiProvider = tenant.api_key_providers.find((item: any) => {
+  const apiProvider = tenant.api_key_providers?.find((item: any) => {
     return item.default && item.active;
   });
   let isDisableFileInput = $state(
-    apiProvider.name == ApiKeyProvider.Perplexity,
+    apiProvider?.name == ApiKeyProvider.Perplexity,
   );
-
-  $inspect(apiProvider, isDisableFileInput);
 
   onMount(() => {
     const handleScroll = () => {
@@ -58,8 +56,6 @@
   onDestroy(function () {
     sharedMessageHistory.set([]);
   });
-
-  // $inspect(input, output);
 
   const readFileContent = (file: File) => {
     return new Promise((resolve) => {

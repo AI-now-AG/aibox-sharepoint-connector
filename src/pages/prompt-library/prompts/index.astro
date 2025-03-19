@@ -13,7 +13,7 @@ import { svgIcons } from "$assets/icons";
 const t = useTranslations();
 
 const promptsCursor = await PromptModel.listByTenant(
-  Astro.locals.user.tenant_id
+  Astro.locals.user.tenant_id,
 );
 const prompts = await promptsCursor.toArray();
 
@@ -24,7 +24,7 @@ const calls = prompts.map(async (prompt) => {
 });
 
 const categoryList = await CategoryModel.listActiveByTenant(
-  Astro.locals.user.tenant_id
+  Astro.locals.user.tenant_id,
 );
 let categoryArray = await categoryList.toArray();
 const categoryListArray: CategoryItem[] = categoryArray.map((category) => {
@@ -49,11 +49,11 @@ const categories = (await Promise.all(calls)) as any;
 
 const promptsEnriched: CardItem[] = prompts.map((prompt) => {
   const category = categories.find(
-    (category: any) => category?._id.toString() === prompt.category?.toString()
+    (category: any) => category?._id.toString() === prompt.category?.toString(),
   );
 
   const group = category?.groups.find(
-    (g: any) => g._id?.toString() === prompt.group?.toString()
+    (g: any) => g._id?.toString() === prompt.group?.toString(),
   );
 
   const tags = [category?.title, group?.title].filter(Boolean) as string[];
@@ -77,7 +77,7 @@ let userPermissions = Astro.locals.user.permissions;
       {t("prompt-library.prompts.title")}
     </h1>
 
-    <div class="flex items-center space-x-2">
+    <div class="flex gap-2">
       {
         userPermissions.includes(Permission.SuperAll) && (
           <ImportExport client:load />
@@ -88,7 +88,7 @@ let userPermissions = Astro.locals.user.permissions;
         userPermissions.includes(Permission.AdminAll) && (
           <a
             href="prompts/add"
-            class="btn btn-active btn-neutral font-normal grow-0"
+            class="btn btn-outline font-normal grow-0"
           >
             <span set:html={svgIcons.add} />
             {t("prompt-library.prompts.add")}

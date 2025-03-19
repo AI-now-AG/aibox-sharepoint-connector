@@ -10,11 +10,11 @@ import {
 export enum TenantTheme {
   Light = "light",
   Dark = "dark",
-  Luxury = "luxury",
-  Lemonade = "lemonade",
+  AIBox = "aibox",
   Somedia = "somedia",
   Weihnachtsmann = "weihnachtsmann",
 }
+
 
 export const TenantFilterParamsSchema = z.object({
   searchValue: z.string().nullish(),

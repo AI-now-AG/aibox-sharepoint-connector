@@ -155,35 +155,42 @@ const modules = [...menuItems];
   <div class="mt-4 pl-6">
     <a href="/">
       <img
+          src="/aibox-logo-text.svg"
+          alt="Aibox Default Logo"
+          class="h-8 block in-data-[theme=weihnachtsmann]:hidden in-data-[theme=somedia]:hidden in-data-[theme=light]:hidden in-data-[theme=dark]:hidden"
+        />
+
+      <img
         src="/logo-aibox-christmasedition.svg"
         alt="Weihnachtsmann Logo"
-        class="h-8 hidden [[data-theme=weihnachtsmann]_&]:block"
+        class="h-8 hidden in-data-[theme=weihnachtsmann]:block"
       />
       <img
         src="/soki-somedia.png"
         alt="somedia Logo"
-        class="h-8 hidden [[data-theme=somedia]_&]:block"
+        class="h-8 hidden in-data-[theme=somedia]:block"
       />
       <img
         src="/aibox-logo-text.svg"
         alt="light logo"
-        class="logo-light h-8 w-auto hidden [[data-theme=light]_&]:block"
+        class="logo-light h-8 w-auto hidden in-data-[theme=light]:block"
       />
       <img
         src="/aibox-logo-text-dark.svg"
         alt="dark logo"
-        class="logo-dark h-8 hidden [[data-theme=dark]_&]:block"
+        class="logo-dark h-8 hidden in-data-[theme=dark]:block"
       />
     </a>
   </div>
 
-  <div class="flex-grow">
+  <div class="grow">
     <ul class="menu w-full pr-6">
-      <li>
+      <li class="active:bg-transparent">
         <details
           data-id={`ai-tools`}
           open={navState["ai-tools"] ?? true}
           id="onboardingId1"
+          class="active:bg-transparent"
         >
           <summary>
             <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
@@ -191,19 +198,20 @@ const modules = [...menuItems];
             </div>
             KI ANWENDUNGEN
           </summary>
-          <ul class="menu w-full pr-6">
+          <ul class="w-full pr-6 active:bg-transparent">
             {
               modules.map((mod, index) => (
-                <li class="">
+                <li class="active:bg-transparent">
                   <details
                     data-id={`ai-tools-module-${index}`}
                     open={mod.isOpened}
+                    class="active:bg-transparent"
                   >
                     <summary>{mod.title}</summary>
                     {"items" in mod && (
-                      <ul>
+                      <ul class="active:bg-transparent">
                         {mod.items?.map((sub) => (
-                          <li class="pl-1">
+                          <li class="pl-1 active:bg-transparent">
                             <MenuItem {...sub} />
                           </li>
                         ))}
@@ -223,11 +231,12 @@ const modules = [...menuItems];
       }
       {
         audioToTextMenus.map((mod) => (
-          <li>
+          <li class="active:bg-transparent">
             <details
               data-id={`audio-menu`}
               open={mod.isOpened}
               id="onboardingId3"
+              class="active:bg-transparent"
             >
               <summary>
                 <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
@@ -236,19 +245,20 @@ const modules = [...menuItems];
                 {mod.title}
               </summary>
               {"items" in mod && (
-                <ul>
+                <ul class="active:bg-transparent">
                   {mod.items?.map((sub, id) => (
-                    <li class="pl-1">
+                    <li class="pl-1 active:bg-transparent">
                       {sub.items ? (
                         <details
                           data-id={`audio-menu-id-${id}`}
                           open={sub.isOpened}
+                          class="active:bg-transparent"
                         >
                           <summary>{sub.title}</summary>
                           {sub.items.length > 0 && (
-                            <ul>
+                            <ul class="active:bg-transparent">
                               {sub.items.map((sub1) => (
-                                <li class="pl-1">
+                                <li class="pl-1 active:bg-transparent">
                                   <MenuItem {...sub1} />
                                 </li>
                               ))}
@@ -273,8 +283,8 @@ const modules = [...menuItems];
       }
       {
         restrictedMenus.map((mod, index) => (
-          <li>
-            <details data-id={`restricted-menu-${index}`} open={mod.isOpened}>
+          <li class="active:bg-transparent">
+            <details data-id={`restricted-menu-${index}`} open={mod.isOpened} class="active:bg-transparent">
               <summary>
                 <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
                   {mod.icon && <Fragment set:html={mod.icon} />}
@@ -282,9 +292,9 @@ const modules = [...menuItems];
                 {mod.title}
               </summary>
               {"items" in mod && (
-                <ul>
+                <ul class="active:bg-transparent">
                   {mod.items?.map((sub) => (
-                    <li class="pl-1">
+                    <li class="pl-1 active:bg-transparent">
                       <MenuItem {...sub} />
                     </li>
                   ))}

@@ -159,7 +159,7 @@
             <span
               class={item.active === true
                 ? "text-success text-sm font-medium"
-                : "text-sm font-medium"}
+                : "text-sm font-medium text-neutral/70"}
               >{item.active === true ? t("settings.transcription.usecase.active") : t("settings.transcription.usecase.inactive")}</span
             >
           </div>
@@ -173,7 +173,7 @@
                 </span>
               </button>
               <ul
-                class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
+                class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
               >
                 <li>
                   <a

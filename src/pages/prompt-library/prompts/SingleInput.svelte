@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { clickOutside } from "$components/actions/ClickOutside";
   import { preventDefault } from "$utils/common";
   type Item = { title: string } | string;
 
@@ -17,7 +16,6 @@
     selectedItem = $bindable(),
   }: Props = $props();
 
-  let isShowDropdownOption = $state(false);
   let inputValue = $state("");
 
   const resetSelection = () => {
@@ -54,39 +52,47 @@
 
 <div>
   <p class="mb-2">{title}</p>
-  <div
-    use:clickOutside={() => {
-      isShowDropdownOption = false;
-    }}
-    class="dropdown dropdown-bottom w-full min-w-xs"
-  >
-    <input
-      {placeholder}
-      bind:value={inputValue}
-      role="button"
-      class="input input-bordered font-medium w-full min-w-xs"
-      readonly
-      onclick={() => {
-        isShowDropdownOption = true;
-      }}
-    />
+  <div class="dropdown dropdown-bottom w-full min-w-xs">
+    <label class="input input-bordered flex items-center gap-2 w-full">
+      <input
+        type="text"
+        {placeholder}
+        bind:value={inputValue}
+        role="button"
+        class="font-medium w-full min-w-xs"
+        readonly
+      />
+      <svg
+        width="12"
+        height="7"
+        viewBox="0 0 12 7"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M10.6663 1L5.99967 5.66667L1.33301 1"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </label>
     {#if items}
-      {#if isShowDropdownOption}
-        <ul
-          tabindex="-1"
-          class="dropdown-content menu bg-base-100 space-y-2 rounded-box z-[1] w-52 p-2 shadow"
-        >
-          {#each items as item}
-            <li>
-              <button
-                onclick={preventDefault(() => handleSelectedItems(item))}
-                class={`${selectedItem == item ? "bg-primary text-base-100 hover:bg-primary" : "hover:text-neutral"}`}
-                >{typeof item === "string" ? item : item.title}
-              </button>
-            </li>
-          {/each}
-        </ul>
-      {/if}
+      <ul
+        tabindex="-1"
+        class="dropdown-content menu bg-base-100 space-y-2 rounded-box z-1 w-52 p-2 shadow-sm max-h-52 overflow-y-auto"
+      >
+        {#each items as item}
+          <li>
+            <button
+              onclick={preventDefault(() => handleSelectedItems(item))}
+              class={`${(typeof selectedItem === "string" ? selectedItem : selectedItem?.title) === (typeof item === "string" ? item : item.title) ? "bg-primary text-primary-content hover:bg-primary" : "hover:text-neutral"}`}
+              >{typeof item === "string" ? item : item.title}
+            </button>
+          </li>
+        {/each}
+      </ul>
     {/if}
   </div>
 </div>

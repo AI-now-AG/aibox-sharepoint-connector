@@ -75,7 +75,7 @@
 
 <div>
   <div class="container max-w-5xl mx-auto px-6">
-    <label class="input input-bordered flex items-center gap-2">
+    <label class="input input-bordered flex items-center gap-2 w-full">
       {@html svgIcons.search}
       <input
         type="text"

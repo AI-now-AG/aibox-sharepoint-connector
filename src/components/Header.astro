@@ -1,6 +1,5 @@
 ---
 import InitializeTheme from "$components/theme/InitializeTheme.astro";
-import InitializeColor from "$components/theme/InitializeColor.astro";
 import SharedVariables from "$components/theme/SharedVariables.svelte";
 import Toasts from "$components/toast-notification/Toasts.svelte";
 import { transformRawData } from "$utils/transformRawData";
@@ -8,15 +7,11 @@ import { svgIcons } from "$assets/icons";
 import { useTranslations } from "$i18n/utils";
 
 const user = Astro.locals.user;
-const primaryColor = Astro.locals.tenant?.primary_color;
 const t = useTranslations();
 ---
 
 <!-- Set default theme -->
 <InitializeTheme />
-
-<!-- Set primary color -->
-{primaryColor && <InitializeColor />}
 
 <!-- Shared variables for all .svelte components -->
 <SharedVariables
@@ -40,30 +35,36 @@ const t = useTranslations();
     <div class="lg:hidden pl-2">
       <a href="/">
         <img
+          src="/aibox-logo-text.svg"
+          alt="Aibox Default Logo"
+          class="h-8 block in-data-[theme=weihnachtsmann]:hidden in-data-[theme=somedia]:hidden in-data-[theme=light]:hidden in-data-[theme=dark]:hidden"
+        />
+
+        <img
           src="/logo-aibox-christmasedition.svg"
           alt="Weihnachtsmann Logo"
-          class="h-8 hidden [[data-theme=weihnachtsmann]_&]:block"
+          class="h-8 hidden in-data-[theme=weihnachtsmann]:block"
         />
         <img
           src="/soki-somedia.png"
           alt="Somedia Logo"
-          class="h-8 hidden [[data-theme=somedia]_&]:block"
+          class="h-8 hidden in-data-[theme=somedia]:block"
         />
         <img
           src="/aibox-logo-text.svg"
           alt="light Logo"
-          class="logo-light h-8 w-auto hidden [[data-theme=light]_&]:block"
+          class="logo-light h-8 w-auto hidden in-data-[theme=light]:block"
         />
         <img
           src="/aibox-logo-text-dark.svg"
           alt="dark Logo"
-          class="logo-dark h-8 hidden [[data-theme=dark]_&]:block"
+          class="logo-dark h-8 hidden in-data-[theme=dark]:block"
         />
       </a>
     </div>
   </div>
   <div class="navbar-end">
-    <div class="dropdown dropdown-end z-30">
+    <div class="dropdown dropdown-end z-30 mr-2">
       <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
         <div class="w-8 rounded-full">
           <span set:html={svgIcons.questionMark} style="color:#4a20ff;" />
@@ -102,7 +103,7 @@ const t = useTranslations();
       </div>
       <ul
         tabindex="0"
-        class="menu menu-sm dropdown-content bg-base-100 rounded-box z-10 mt-3 w-52 p-2 shadow border"
+        class="menu menu-sm dropdown-content bg-base-100 rounded-box z-10 mt-3 w-52 p-2 shadow-sm border"
       >
         <li>
           <a class="justify-between" href="/profile">{t("profile")}</a>

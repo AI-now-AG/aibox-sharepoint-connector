@@ -81,7 +81,7 @@ export function formatCitations(
   const updatedString = inputString.replace(/\[(\d+)\]/g, (match, p1) => {
     const index = parseInt(p1, 10) - 1;
     if (index >= 0 && index < citations.length) {
-      return `<a href='${citations[index]}' target='_blank' class='bg-gray-100 hover:bg-blue-600 text-blue-600 hover:text-white text-xs font-normal ml-1 rounded justify-center items-center'>[${p1}]</a>`;
+      return `<a href='${citations[index]}' target='_blank' class='bg-base-200 hover:bg-info text-info hover:text-base-200 text-xs font-normal ml-1 rounded-sm justify-center items-center'>[${p1}]</a>`;
     }
     return match;
   });

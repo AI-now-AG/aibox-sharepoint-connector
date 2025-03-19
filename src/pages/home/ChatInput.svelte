@@ -21,8 +21,6 @@
     isDisableFileInput = false,
   }: Props = $props();
 
-  $inspect(files);
-
   const fileTypes = {
     "audio/*": ["audio/mp3"],
     "video/*": ["video/mp4", "video/quicktime"],
@@ -54,7 +52,7 @@
 
 <div
   id="onboardingId2"
-  class={`flex flex-col rounded-xl bg-base-100 border border-base-content/20 focus:ring-base-200 has-[:focus]:ring-2 has-[:focus]:ring-base-primary has-[:focus]:ring-offset-2 has-[:focus]:ring-offset-base-200`}
+  class={`flex flex-col rounded-xl bg-base-100 border border-base-content/20 focus:ring-base-200 has-focus:ring-2 has-focus:ring-base-primary has-focus:ring-offset-2 has-focus:ring-offset-base-200`}
 >
   <div class="flex-1 relative">
     <textarea
@@ -62,7 +60,7 @@
       id="input"
       class={`textarea textarea-ghost ${
         $sharedMessageHistory.length > 0 ? `h-[70px]` : `h-24`
-      } w-full focus:outline-none focus:border-base-100 text-base`}
+      } w-full focus:outline-hidden focus:border-base-100 text-base`}
       placeholder="Your input..."
       bind:value={input}
       onkeydown={onKeyDown}
@@ -97,7 +95,7 @@
     </div>
     <div class="flex self-end">
       <button
-        class="btn btn-ghost btn-md disabled:bg-base-100 disabled:text-slate-500 disabled:cursor-not-allowed"
+        class="btn btn-ghost btn-md disabled:bg-base-100 disabled:cursor-not-allowed"
         disabled={!input && files.length === 0}
         onclick={preventDefault(() => {
           onsend();

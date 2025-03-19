@@ -60,7 +60,7 @@
         {t("prompt-library.instructions.add")}
       {/if}
     </h1>
-    <form class="rounded pt-6 mb-4 space-y-6">
+    <form class="rounded-sm pt-6 mb-4 space-y-6">
       <div class="grid grid-cols-1 gap-4 justify-center">
         <div>
           <p class="mb-2">{t("prompt-library.add.instructions.title")}</p>
@@ -78,7 +78,7 @@
         <textarea
           bind:value={instructionText}
           placeholder="e.g. type instruction details..."
-          class="input input-bordered min-w-xs shadow appearance-none min-h-96 w-full py-2 px-3"
+          class="input input-bordered min-w-xs shadow-sm appearance-none min-h-96 w-full py-2 px-3"
         ></textarea>
       </div>
 

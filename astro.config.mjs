@@ -1,15 +1,15 @@
 import netlify from "@astrojs/netlify";
 import svelte from "@astrojs/svelte";
-import tailwind from "@astrojs/tailwind";
 import sentry from "@sentry/astro";
 import { defineConfig } from "astro/config";
+
+import tailwindcss from "@tailwindcss/vite";
 
 // https://astro.build/config
 export default defineConfig({
   output: "server",
   adapter: netlify(),
   integrations: [
-    tailwind(),
     svelte(),
     sentry({
       sourceMapsUploadOptions: {
@@ -38,5 +38,12 @@ export default defineConfig({
   },
   redirects: {
     "/login": "/", // old login page
+  },
+  vite: {
+    css: {
+      transformer: "lightningcss",
+    },
+
+    plugins: [tailwindcss()],
   },
 });

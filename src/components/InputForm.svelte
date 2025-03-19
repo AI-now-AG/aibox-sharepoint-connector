@@ -12,7 +12,7 @@
   }
 </script>
 
-<div class="w-full shadow-md border border-base-300 rounded bg-base-100">
+<div class="w-full shadow-md border border-base-300 rounded-sm bg-base-100">
   <form
     class="p-4 flex space-x-4 items-center justify-between"
     onsubmit={preventDefault(submitAction)}

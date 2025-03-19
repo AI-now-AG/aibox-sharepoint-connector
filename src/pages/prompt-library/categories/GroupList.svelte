@@ -117,9 +117,11 @@
         <div class="flex-none w-20">
           <span
             class={item.active == 1
-              ? "text-emerald-600 text-sm font-medium"
-              : "text-grey-600 text-sm font-medium"}
-            >{item.active == 1 ? t("settings.transcription.usecase.active") : t("settings.transcription.usecase.inactive")}</span
+              ? "text-success text-sm font-medium"
+              : "text-sm font-medium text-neutral/70"}
+            >{item.active == 1
+              ? t("settings.transcription.usecase.active")
+              : t("settings.transcription.usecase.inactive")}</span
           >
         </div>
         <div
@@ -132,7 +134,7 @@
               </span>
             </button>
             <ul
-              class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
+              class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
             >
               <li>
                 <button
@@ -167,7 +169,7 @@
 
   <div class="flex items-center mt-5">
     <button
-      class="btn btn-active btn-neutral font-normal grow-0"
+      class="btn btn-outline font-normal grow-0"
       onclick={preventDefault(addGroup)}
     >
       {@html svgIcons.add}
