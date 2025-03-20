@@ -5,8 +5,8 @@
   let { tenant, user, locale } = $props();
 
   // update global stores
-  userStore.set(user);
-  tenantStore.set(tenant);
+  $userStore = user;
+  $tenantStore = tenant;
 
   // share language for all components
   setLanguage(locale);
