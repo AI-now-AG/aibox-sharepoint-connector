@@ -1,14 +1,23 @@
 <script lang="ts">
+  import { setLanguage } from "$i18n/utils";
   import { useTranslations } from "$i18n/utils";
   import { isOnboarding } from "$stores";
 
-  const t = useTranslations();
+  interface Props {
+    locale: string;
+  }
 
+  let { locale }: Props = $props();
   let isShow = $state(false);
+
+  const t = useTranslations();
 
   $effect(() => {
     isShow = !$isOnboarding;
   });
+
+  // set language
+  setLanguage(locale);
 </script>
 
 {#if isShow}
