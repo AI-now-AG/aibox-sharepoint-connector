@@ -10,14 +10,14 @@
   let { locale }: Props = $props();
   let isShow = $state(false);
 
+  // set language
+  setLanguage(locale);
+
   const t = useTranslations();
 
   $effect(() => {
     isShow = !$isOnboarding;
   });
-
-  // set language
-  setLanguage(locale);
 </script>
 
 {#if isShow}
