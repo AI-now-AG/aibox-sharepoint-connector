@@ -12,7 +12,6 @@
     toLowerCase,
     replaceSpecialChars,
   } from "$components/actions/Input.svelte";
-  import { loading, showLoading, hideLoading } from "$stores";
   import { type TenantTheme } from "$data/models/tenant.model";
   import InputDialog from "$components/InputDialog.svelte";
   import { isValidEmail } from "$utils/common";
@@ -22,6 +21,7 @@
   import ThemeItem from "./ThemeItem.svelte";
 
   const t = useTranslations();
+  let loading = $state(false);
 
   interface Props {
     tenant?: any;
@@ -395,7 +395,7 @@
   async function createTenant() {
     if (validateForm()) {
       try {
-        showLoading();
+        loading = true;
         tenantData.default_language = selectedLanguage?.value;
         tenantData.theme = selectedThemes?.value as TenantTheme;
         const { error: encryptKeysError, data } =
@@ -456,7 +456,7 @@
         const createTanentResult = await actions.tenant.create(tenantData);
         const { error, data: createdTenant } = createTanentResult;
 
-        hideLoading();
+        loading = false;
         if (error) {
           showAlert(error?.toString());
         } else {
@@ -479,7 +479,7 @@
     if (validateForm()) {
       try {
         console.log("tenantData", tenantData);
-        showLoading();
+        loading = true;
         tenantData.default_language = selectedLanguage?.value;
         tenantData.theme = selectedThemes?.value as TenantTheme;
         const { error: encryptKeysError, data } =
@@ -546,7 +546,7 @@
         }
 
         const { error } = await actions.tenant.update(tenantData);
-        hideLoading();
+        loading = false;
 
         if (error) {
           showAlert(error?.toString());
@@ -582,14 +582,14 @@
 
   async function createTenantAdmin() {
     try {
-      showLoading();
+      loading = true;
       const { error } = await actions.tenant.createAdminUser({
         _id: tenantData._id,
         org_id: tenantData.org_id,
         tenant_admin_email: tenantAdminEmail,
       });
 
-      hideLoading();
+      loading = false;
       if (error) {
         addToast({
           message:
@@ -1262,4 +1262,4 @@
   }}
 />
 <AlertDialog bind:modal={alertModal} bind:message={alertMessage} />
-<Loading bind:show={$loading} />
+<Loading show={loading} />

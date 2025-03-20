@@ -8,10 +8,10 @@
   import { formatMarkdown, preventDefault } from "$utils/common";
   import TextEditor from "$components/TextEditor.svelte";
   import ImportFileDialog from "./ImportFileDialog.svelte";
-  import { loading } from "$stores";
   import Loading from "$components/Loading.svelte";
 
   const t = useTranslations();
+  let loading = $state(false);
 
   let fileUploadModal: HTMLDialogElement | undefined = $state();
   let inputFile: File | undefined = $state();
@@ -57,7 +57,7 @@
     const formData = new FormData();
     formData.append("file", inputFile as File);
 
-    $loading = true;
+    loading = true;
     const { data, error } =
       await actions.knowledgebase.extractFileContent(formData);
     if (error) {
@@ -69,7 +69,7 @@
       knowledgeBaseText = data.text;
     }
 
-    $loading = false;
+    loading = false;
   }
 
   async function saveKnowledgeBase() {
@@ -178,7 +178,7 @@
   </div>
 </div>
 
-<Loading bind:show={$loading} />
+<Loading show={loading} />
 
 <ImportFileDialog
   bind:modal={fileUploadModal}

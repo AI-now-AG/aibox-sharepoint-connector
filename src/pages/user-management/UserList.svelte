@@ -6,12 +6,7 @@
   import log from "$utils/log";
   import { addToast } from "$stores/toast";
   import Loading from "$components/Loading.svelte";
-  import {
-    user as currentUser,
-    loading,
-    showLoading,
-    hideLoading,
-  } from "$stores";
+  import { user as currentUser } from "$stores";
   import { formatDateToDDMMYY } from "$utils/common";
   import DropdownSection from "$components/DropdownSection.svelte";
   import { type Option } from "$components/DropdownOptions.svelte";
@@ -24,6 +19,7 @@
   import { UserRole } from "$enums/Users";
 
   const t = useTranslations();
+  let loading = $state(false);
 
   interface Props {
     tenantId?: string;
@@ -67,14 +63,14 @@
   });
 
   const fetchUsers = async () => {
-    showLoading();
+    loading = true;
     const { data, error } = await actions.user.listByTenant({
       tenantId,
       searchValue,
       roles: filterRolesParams,
       ...filterStatusesParams,
     });
-    hideLoading();
+    loading = false;
     previousFilterState = JSON.stringify({
       ...filterRolesParams,
       ...filterStatusesParams,
@@ -108,14 +104,14 @@
   }
 
   async function handleBlockingUser() {
-    showLoading();
+    loading = true;
     const { _id = "", blocked } = selectedUser;
     const result = await actions.user.updateBlocked({
       _id,
       blocked: !blocked,
     });
 
-    hideLoading();
+    loading = false;
     const { error } = result;
     if (!error) {
       addToast({
@@ -144,7 +140,7 @@
     let result = await actions.user.delete({
       _id,
     });
-    hideLoading();
+    loading = false;
     const { error } = result;
     if (!error) {
       addToast({
@@ -284,4 +280,4 @@
   description={t("user.delete-description-message")}
 />
 
-<Loading bind:show={$loading} partial={true} />
+<Loading show={loading} partial={true} />

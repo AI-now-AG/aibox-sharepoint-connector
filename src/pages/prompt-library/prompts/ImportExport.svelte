@@ -4,9 +4,9 @@
   import Loading from "$components/Loading.svelte";
   import ImportUploadDialog from "./ImportUploadDialog.svelte";
   import { addToast } from "$stores/toast";
-  import { loading } from "$stores";
 
   const t = useTranslations();
+  let loading = $state(false);
 
   let fileUploadModal: HTMLDialogElement | undefined = $state();
   let inputFile: File | undefined = $state();
@@ -20,7 +20,7 @@
     const data = new FormData();
     data.append("file", inputFile);
 
-    $loading = true;
+    loading = true;
     const response = await fetch(importUrl, {
       method: "POST",
       body: data,
@@ -34,7 +34,7 @@
     try {
       const data = await response.json();
 
-      $loading = false;
+      loading = false;
       if (!response.ok) {
         addToast({
           message: data.message,
@@ -52,12 +52,12 @@
       }, 2000);
     } catch (error) {
       console.error("Error import file:", error);
-      $loading = false;
+      loading = false;
     }
   }
 
   function downloadExport() {
-    $loading = true;
+    loading = true;
     fetch(exportUrl)
       .then(async (response) => {
         const blob = await response.blob();
@@ -82,11 +82,11 @@
         document.body.removeChild(link);
         URL.revokeObjectURL(blobUrl);
 
-        $loading = false;
+        loading = false;
       })
       .catch((error) => {
         console.error("Error downloading file:", error);
-        $loading = false;
+        loading = false;
       });
   }
 </script>
@@ -117,4 +117,4 @@
   confirm={startImport}
 />
 
-<Loading bind:show={$loading} />
+<Loading show={loading} />

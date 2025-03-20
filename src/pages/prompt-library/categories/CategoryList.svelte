@@ -6,7 +6,6 @@
   import { useTranslations } from "$i18n/utils";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import Loading from "$components/Loading.svelte";
-  import { loading } from "$stores";
   import type { ViewCategory } from "$actions/category";
   import { preventDefault } from "$utils/common";
 
@@ -26,6 +25,7 @@
 
   let timeout: any;
   const t = useTranslations();
+  let loading = $state(false);
 
   function reloadPage(delay = 1500) {
     setTimeout(() => {
@@ -55,7 +55,7 @@
   }
 
   async function updateStatus(id: string, active: boolean) {
-    $loading = true;
+    loading = true;
 
     let result: any;
     if (active == true) {
@@ -68,12 +68,12 @@
       });
     }
 
-    $loading = false;
+    loading = false;
     reloadPage(1000);
   }
 
   async function updatePosition(items: ViewCategory[]) {
-    $loading = true;
+    loading = true;
     const sortedIds = items.map((item) => {
       return {
         _id: item.id,
@@ -82,7 +82,7 @@
     const newItems = await actions.category.updatePosition(sortedIds);
     items = newItems.data?.items ?? items;
     console.log("updated: newItesm", newItems);
-    $loading = false;
+    loading = false;
   }
 
   async function deleteCategory() {
@@ -160,7 +160,9 @@
               class={item.active === true
                 ? "text-success text-sm font-medium"
                 : "text-sm font-medium text-neutral/70"}
-              >{item.active === true ? t("settings.transcription.usecase.active") : t("settings.transcription.usecase.inactive")}</span
+              >{item.active === true
+                ? t("settings.transcription.usecase.active")
+                : t("settings.transcription.usecase.inactive")}</span
             >
           </div>
           <div
@@ -217,7 +219,7 @@
       {/each}
     </section>
 
-    <Loading bind:show={$loading} partial={true} />
+    <Loading show={loading} partial={true} />
   </div>
 
   <!-- confirm delete dialog -->

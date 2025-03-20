@@ -9,9 +9,9 @@
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import Loading from "$components/Loading.svelte";
   import InputSearchFilter from "./InputSearchFilter.svelte";
-  import { loading, showLoading, hideLoading } from "$stores";
 
   const t = useTranslations();
+  let loading = $state(false);
 
   let tenants: any = $state([]);
   let showArchived: boolean = $state(false);
@@ -27,12 +27,12 @@
   });
 
   const fetchTenants = async () => {
-    showLoading();
+    loading = true;
     const { data, error } = await actions.tenant.list({
       searchValue,
       showArchived,
     });
-    hideLoading();
+    loading = false;
 
     if (!error) {
       tenants = data;
@@ -64,7 +64,7 @@
     const { active } = selectedTenant;
     confirmUpdateModal?.close();
 
-    showLoading();
+    loading = true;
     let result;
     if (active) {
       result = await actions.tenant.archive({
@@ -75,7 +75,7 @@
         _id: selectedTenant._id,
       });
     }
-    hideLoading();
+    loading = false;
 
     const { data, error } = result;
     if (!error) {
@@ -95,7 +95,7 @@
     let result = await actions.tenant.delete({
       _id,
     });
-    hideLoading();
+    loading = false;
     const { error } = result;
     if (!error) {
       addToast({
@@ -252,7 +252,7 @@
         </tbody>
       </table>
 
-      <Loading bind:show={$loading} partial={true} />
+      <Loading show={loading} partial={true} />
     </div>
   </div>
 
