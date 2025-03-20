@@ -8,7 +8,6 @@
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import AlertDialog from "$components/AlertDialog.svelte";
   import { user as currentUser } from "$stores";
-  import { loading, showLoading, hideLoading } from "$stores";
   import log from "$utils/log";
   import moment from "moment";
   import Input from "$components/Input/Input.svelte";
@@ -16,6 +15,8 @@
   import { UserRole } from "$enums/Users";
 
   const t = useTranslations();
+  let loading = $state(false);
+
   interface Props {
     user: any;
     tenant: any;
@@ -105,10 +106,10 @@
   async function createUser() {
     if (validateForm()) {
       try {
-        showLoading();
+        loading = true;
         userData = { ...userData, roles: [role] };
         const { error } = await actions.user.create(userData);
-        hideLoading();
+        loading = false;
         if (error) {
           showAlert(error);
         } else {
@@ -127,10 +128,10 @@
   async function updateUser() {
     if (validateForm()) {
       try {
-        showLoading();
+        loading = true;
         userData = { ...userData, roles: [role] };
         const { error } = await actions.user.update(userData);
-        hideLoading();
+        loading = false;
         if (error) {
           showAlert(error);
         } else {
@@ -152,14 +153,14 @@
   }
 
   async function handleBlockingUser() {
-    showLoading();
+    loading = true;
     const { _id = "", blocked } = userData;
     const result = await actions.user.updateBlocked({
       _id,
       blocked: !blocked,
     });
 
-    hideLoading();
+    loading = false;
     const { error } = result;
     if (!error) {
       userData.blocked = !blocked;
@@ -183,7 +184,7 @@
     let result = await actions.user.delete({
       _id,
     });
-    hideLoading();
+    loading = false;
     const { error } = result;
     if (!error) {
       addToast({
@@ -454,4 +455,4 @@
 
 <AlertDialog bind:modal={alertModal} bind:message={alertMessage} />
 
-<Loading bind:show={$loading} />
+<Loading show={loading} />

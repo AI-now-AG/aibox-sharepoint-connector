@@ -4,9 +4,11 @@
   import { useTranslations } from "$i18n/utils";
   import { addToast } from "$stores/toast";
   import Loading from "$components/Loading.svelte";
-  import { loading, showLoading, hideLoading, isOnboarding } from "$stores";
+  import { isOnboarding } from "$stores";
 
   const t = useTranslations();
+  let loading = $state(false);
+
   interface Props {
     user: any;
   }
@@ -21,7 +23,7 @@
       event.preventDefault();
 
       try {
-        showLoading();
+        loading = true;
         const result = await actions.auth.emailVerification({});
         if (result?.data?.success) {
           addToast({
@@ -35,7 +37,7 @@
           message: t("user.send-verify-email-failed"),
         });
       } finally {
-        hideLoading();
+        loading = false;
       }
     }
   };
@@ -75,5 +77,5 @@
     })}
   </div>
 
-  <Loading bind:show={$loading} />
+  <Loading show={loading} />
 {/if}
