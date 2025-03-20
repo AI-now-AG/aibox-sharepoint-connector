@@ -43,7 +43,7 @@
   };
 
   onMount(() => {
-    currentUrl = window.location.href;
+    currentUrl = "#verification";
     window.addEventListener("click", handleClick);
 
     return () => {
