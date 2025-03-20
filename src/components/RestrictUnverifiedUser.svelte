@@ -15,7 +15,6 @@
   let { user } = $props() as Props;
 
   let isShow = $state(false);
-  let currentUrl = $state("javascript:void(0)");
 
   const handleClick = async (event: MouseEvent) => {
     const target = event.target as HTMLElement;
@@ -43,7 +42,6 @@
   };
 
   onMount(() => {
-    currentUrl = "#verification";
     window.addEventListener("click", handleClick);
 
     return () => {
@@ -73,7 +71,7 @@
     class="fixed bottom-20 right-4 bg-warning text-sm text-warning-content max-w-lg p-2 pl-4 pr-4 rounded-md shadow-lg"
   >
     {@html t("user.unverified-email-message", {
-      url: currentUrl,
+      url: "#verification",
     })}
   </div>
 
