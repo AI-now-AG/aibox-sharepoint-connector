@@ -13,7 +13,6 @@
   import KnowledgeBaseItem from "./KnowledgeBaseItem.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import Loading from "$components/Loading.svelte";
-  import { loading, showLoading, hideLoading } from "$stores";
   import { addToast } from "$stores/toast";
   import { useTranslations } from "$i18n/utils";
   import { onMount } from "svelte";
@@ -21,6 +20,7 @@
   import log from "$utils/log";
 
   const t = useTranslations();
+  let loading = $state(false);
 
   interface Props {
     tenantId?: any;
@@ -42,11 +42,11 @@
   let confirmDeleteModal: HTMLDialogElement | undefined = $state();
 
   const fetchKnowledgeBase = async () => {
-    showLoading();
+    loading = true;
     const { data, error } = await actions.knowledgebase.listByTenant({
       tenant_id: tenantId,
     });
-    hideLoading();
+    loading = false;
 
     if (!error) {
       items = data.map((knowledgeBase: any) => ({
@@ -91,7 +91,7 @@
 
   async function deleteCard() {
     try {
-      showLoading();
+      loading = true;
       const deletedKnowledgeBase = {
         ...(selectedDeletePKnowledgeBaseId && {
           _id: selectedDeletePKnowledgeBaseId,
@@ -112,13 +112,13 @@
         );
       }
       removeDeletedItem(selectedDeletePKnowledgeBaseId);
-      hideLoading();
+      loading = false;
       addToast({
         message: t("prompt-library.delete.knowledge-base.success"),
         type: "success",
       });
     } catch (error) {
-      hideLoading();
+      loading = false;
       addToast({
         message:
           error instanceof Error ? error.message : t("common.unexpected.error"),
@@ -158,4 +158,4 @@
   title={t("prompt-library.delete.knowledge-base.confirm")}
 />
 
-<Loading bind:show={$loading} />
+<Loading show={loading} />

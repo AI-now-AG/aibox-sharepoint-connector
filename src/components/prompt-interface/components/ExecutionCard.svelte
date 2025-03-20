@@ -7,7 +7,6 @@
   import PromptOrderDialog from "$components/prompt-interface/components/PromptOrderDialog.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import Loading from "$components/Loading.svelte";
-  import { loading, showLoading, hideLoading } from "$stores";
   import { addToast } from "$stores/toast";
   import { actions } from "astro:actions";
   import log from "$utils/log";
@@ -29,6 +28,7 @@
   }: Props = $props();
 
   const t = useTranslations();
+  let loading = $state(false);
 
   const promptLimit = 5;
   let showMore = $state(false);
@@ -94,7 +94,7 @@
 
   async function deleteCard() {
     try {
-      showLoading();
+      loading = true;
       const deletedPrompt = {
         ...(selectedDeletePromptId && { _id: selectedDeletePromptId }),
       };
@@ -113,13 +113,13 @@
         );
       }
       removeDeletedItem(selectedDeletePromptId);
-      hideLoading();
+      loading = false;
       addToast({
         message: t("prompt-library.delete.prompt.success"),
         type: "success",
       });
     } catch (error) {
-      hideLoading();
+      loading = false;
       addToast({
         message:
           error instanceof Error ? error.message : t("common.unexpected.error"),
@@ -133,7 +133,7 @@
   }
 
   async function updatePosition(items: any[]) {
-    showLoading();
+    loading = true;
     try {
       const sortedIds = items.map((item) => {
         return {
@@ -153,7 +153,7 @@
         type: "error",
       });
     } finally {
-      hideLoading();
+      loading = false;
     }
   }
 </script>
@@ -227,4 +227,4 @@
   title={t("prompt-library.delete.prompt.confirm")}
 />
 
-<Loading bind:show={$loading} />
+<Loading show={loading} />

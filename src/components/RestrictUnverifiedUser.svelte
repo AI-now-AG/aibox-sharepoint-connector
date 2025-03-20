@@ -4,16 +4,17 @@
   import { useTranslations } from "$i18n/utils";
   import { addToast } from "$stores/toast";
   import Loading from "$components/Loading.svelte";
-  import { loading, showLoading, hideLoading, isOnboarding } from "$stores";
+  import { isOnboarding } from "$stores";
 
   const t = useTranslations();
+  let loading = $state(false);
+
   interface Props {
     user: any;
   }
   let { user } = $props() as Props;
 
   let isShow = $state(false);
-  let currentUrl = $state("javascript:void(0)");
 
   const handleClick = async (event: MouseEvent) => {
     const target = event.target as HTMLElement;
@@ -21,7 +22,7 @@
       event.preventDefault();
 
       try {
-        showLoading();
+        loading = true;
         const result = await actions.auth.emailVerification({});
         if (result?.data?.success) {
           addToast({
@@ -35,13 +36,12 @@
           message: t("user.send-verify-email-failed"),
         });
       } finally {
-        hideLoading();
+        loading = false;
       }
     }
   };
 
   onMount(() => {
-    currentUrl = window.location.href;
     window.addEventListener("click", handleClick);
 
     return () => {
@@ -71,9 +71,9 @@
     class="fixed bottom-20 right-4 bg-warning text-sm text-warning-content max-w-lg p-2 pl-4 pr-4 rounded-md shadow-lg"
   >
     {@html t("user.unverified-email-message", {
-      url: currentUrl,
+      url: "#verification",
     })}
   </div>
 
-  <Loading bind:show={$loading} />
+  <Loading show={loading} />
 {/if}
