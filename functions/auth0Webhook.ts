@@ -72,8 +72,10 @@ const auth0Webhook: Handler = async (
           const { email, connection, is_signup: isSignup } = data.details.body;
 
           await triggerRegistrationEmail(userId, email, connection, isSignup);
-          await triggerSignupAlertEmail(userId, email, connection);
-          await updateAuth0UserMetadata(data.user_id, { signup: true });
+          if (isSignup) {
+            await triggerSignupAlertEmail(userId, email, connection);
+            await updateAuth0UserMetadata(userId, { signup: true });
+          }
         }
 
         // Send welcome email for social login
