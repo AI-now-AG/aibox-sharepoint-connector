@@ -1,8 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { useTranslations } from "$i18n/utils";
-
-  const t = useTranslations();
+  import { getLanguageData, setLanguage, useTranslations } from "$i18n/utils";
 
   interface Props {
     errorCode?: string;
@@ -13,12 +11,24 @@
   let { errorCode, errorTitle, errorDescription, params } = $props() as Props;
   let errorParams: any = $state({});
 
+  const t = useTranslations();
+  let logoutText = $state(t("common.logout"));
+  let refreshText = $state(t("common.refresh"));
+  let backToHomText = $state(t("common.back-to-home"));
+
   onMount(() => {
+    let browserLanguage = navigator.language || navigator.languages[0];
+    console.log("browserLanguage", browserLanguage);
+    const translate = getLanguageData(browserLanguage);
+
     if (errorCode) {
       switch (errorCode) {
         case "422":
-          errorTitle = t("existing-email.error-title");
-          errorDescription = t("existing-email-description");
+          errorTitle = translate["existing-email.error-title"];
+          errorDescription = translate["existing-email.error-description"];
+          logoutText = translate["common.logout"];
+          refreshText = translate["common.refresh"];
+          backToHomText = translate["common.back-to-home"];
           break;
         default:
           break;
@@ -78,14 +88,14 @@
           href="/api/logout"
           class="btn btn-outline btn-primary px-6 py-3 text-lg font-semibold rounded-lg shadow-lg hover:bg-primary-focus transition-all duration-300"
         >
-          {t("common.logout")}
+          {logoutText}
         </a>
         <a
           data-astro-reload
           href="/"
           class="btn btn-primary ml-2 px-6 py-3 text-lg font-semibold rounded-lg shadow-lg hover:bg-primary-focus transition-all duration-300"
         >
-          {t("common.refresh")}
+          {refreshText}
         </a>
       {:else}
         <a
@@ -93,7 +103,7 @@
           href="/"
           class="btn btn-primary px-6 py-3 text-lg font-semibold rounded-lg shadow-lg hover:bg-primary-focus transition-all duration-300"
         >
-          {t("common.back-to-home")}
+          {backToHomText}
         </a>
       {/if}
     </div>
