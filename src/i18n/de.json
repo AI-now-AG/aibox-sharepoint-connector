@@ -339,13 +339,13 @@
   "user.unverified-email-message": "Bitte bestätige deine E-Mail-Adresse. Nicht verifizierte E-Mails werden innerhalb von 24 Stunden blockiert. <a href=\"${url}\" data-verified=\"true\" class=\"font-semibold text-warning-content underline\" data-astro-prefetch=\"false\">Klicke hier</a>, um den Bestätigungslink erneut zu senden",
   "user.send-verify-email-success": "Die Bestätigungs-E-Mail wurde an deine Adresse gesendet. Bitte überprüfe dein Postfach und verifiziere dein Konto. Vielen Dank!",
   "user.send-verify-email-failed": "Die Bestätigungs-E-Mail konnte nicht gesendet werden. Bitte versuche es erneut!",
-  "guideline.aibox-how-to": "Aibox how-to",
-  "guideline.support": "Unterstützung ",
+  "guideline.aibox-how-to": "aibox Bedienungsanleitung",
+  "guideline.support": "Hilfe & Support",
   "common.logout": "Abmelden",
   "common.refresh": "Aktualisieren",
   "common.back-to-home": "Zurück zur Startseite",
   "common.error-title": "Ein Fehler ist aufgetreten",
-  "common.error-description": "Entschuldigung, etwas ist bei uns schiefgelaufen. Bitte versuchen Sie, die Seite zu aktualisieren, oder kommen Sie später wieder.",
+  "common.error-description": "Entschuldigung, etwas ist schiefgelaufen. Bitte versuchen Sie, die Seite zu aktualisieren, oder kommen Sie später wieder.",
   "existing-email.error-title": "Konto bereits mit einem anderen Benutzer verknüpft",
-  "existing-email.error-description": "Für dieses Konto wird eine andere Authentifizierungsmethode verwendet"
+  "existing-email.error-description": "Für dieses Konto wird bereits eine andere Authentifizierungsmethode verwendet"
 }
