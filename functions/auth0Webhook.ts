@@ -215,18 +215,17 @@ const triggerWelcomeEmail = async (
   await sendWelcomeEmail(email);
 
   // Send admin notification email
-  if (connection == "Username-Password-Authentication") {
-    const emailSubject = "New User Verified Alert";
-    const emailContent = `
+  const emailSubject = "New User Verified Alert";
+  const emailContent = `
       <div style="font-family: Arial, sans-serif; padding: 20px;">
         <h1><b>New User Verified Notification</b></h1>
         <p><b>User ID:</b> ${userId}</p>
         <p><b>Email:</b> ${email}</p>
         <p><b>Verified Date:</b> ${new Date().toLocaleDateString()}</p>
+        <p><b>Connection:</b> ${connection}</p>
       </div>
     `;
-    await sendNotificationEmail(emailSubject, emailContent);
-  }
+  await sendNotificationEmail(emailSubject, emailContent);
 };
 
 const createUserInDatabase = async (data: any) => {

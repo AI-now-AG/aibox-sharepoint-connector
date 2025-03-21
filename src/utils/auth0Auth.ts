@@ -97,6 +97,7 @@ export const sendVerificationEmail = async (userId: string, email: string) => {
         url: ticket,
       },
     });
+    console.log(`Verification email sent successfully: ${email}`);
   } catch (error) {
     console.error("Error sending verification email:", error);
     //throw new Error("Failed to send verification email.");
@@ -114,6 +115,8 @@ export const sendWelcomeEmail = async (email: string) => {
       to: email,
       templateId: SG_WELCOME_TEMPLATE,
     });
+
+    console.log(`Welcome email sent successfully: ${email}`);
   } catch (error) {
     console.error("Error sending welcome email:", error);
     //throw new Error("Failed to send welcome email.");
@@ -123,6 +126,7 @@ export const sendWelcomeEmail = async (email: string) => {
 export const sendNotificationEmail = async (subject: string, html: string) => {
   const env = getEnvVar("NODE_ENV") || "development";
   const subjectPrefix = env == "production" ? "aibox" : "aibox-dev";
+  const subjectStr = `${subjectPrefix} - ${subject}`;
 
   try {
     // Send notification email via SendGrid
@@ -132,9 +136,11 @@ export const sendNotificationEmail = async (subject: string, html: string) => {
         email: "no-reply@ainow.ch",
       },
       to: "support@aibox-app.ch",
-      subject: `${subjectPrefix} - ${subject}`,
+      subject: subjectStr,
       html,
     });
+
+    console.log(`Notification email sent successfully: ${subjectStr}`);
   } catch (error) {
     console.error("Error sending notification email:", error);
     //throw new Error("Failed to send notification email.");

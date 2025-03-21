@@ -9,7 +9,7 @@ import RestrictUnverifiedUser from "$components/RestrictUnverifiedUser.svelte";
 import "$styles/global.css";
 
 import { useTranslations } from "$i18n/utils";
-import { isEnterpriseConnection } from "$utils/common";
+import { isSocialConnection } from "$utils/common";
 
 interface Props {
   title?: string;
@@ -39,10 +39,9 @@ switch (Astro.locals.user?.tenant_id?.toString()) {
     theme = "light";
 }
 
-const user = Astro.locals.user;
+const { user, tenant, locale } = Astro.locals;
 const userInfo = { ...user, id: user.id.toString() };
-const tenant = Astro.locals.tenant;
-const isEnterpriseAuth = isEnterpriseConnection(userInfo?.auth0_sub);
+const isSocialAuth = isSocialConnection(userInfo?.auth0_sub);
 ---
 
 <!doctype html>
@@ -69,19 +68,11 @@ const isEnterpriseAuth = isEnterpriseConnection(userInfo?.auth0_sub);
         <Navigation />
       </div>
     </div>
-    {
-      tenant?.is_trial && !isEnterpriseAuth && (
-        <OnboardingTour user={userInfo} client:load />
-      )
-    }
-    {
-      tenant?.is_trial && !isEnterpriseAuth && (
-        <TrialComponent {tenant} client:load />
-      )
-    }
+    {tenant?.is_trial && <OnboardingTour user={userInfo} client:load />}
+    {tenant?.is_trial && <TrialComponent {locale} client:load />}
     {
       tenant?.is_trial &&
-        !isEnterpriseAuth &&
+        !isSocialAuth &&
         user?.email_verified != undefined &&
         !user.email_verified && (
           <RestrictUnverifiedUser user={userInfo} client:load />

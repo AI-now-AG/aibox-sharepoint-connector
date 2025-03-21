@@ -9,7 +9,7 @@ export const parseAuth0UserSub = (auth0Sub: string): ParsedAuth0UserSub => {
 
 export const isEnterpriseConnection = (auth0Sub: string): boolean => {
   const [provider] = auth0Sub?.split("|") ?? [];
-  const enterpriseProviders = [
+  const enterpriseConnections = [
     "saml",
     "oidc",
     "okta",
@@ -18,10 +18,14 @@ export const isEnterpriseConnection = (auth0Sub: string): boolean => {
     "adfs",
     "ad",
     "ping",
-    "google-oauth2",
-    "windowslive",
   ];
-  return enterpriseProviders.includes(provider);
+  return enterpriseConnections.includes(provider);
+};
+
+export const isSocialConnection = (auth0Sub: string): boolean => {
+  const [provider] = auth0Sub?.split("|") ?? [];
+  const socialConnections = ["google-oauth2", "windowslive"];
+  return socialConnections.includes(provider);
 };
 
 export function formatDateToDDMMYY(date: string | Date): string {
