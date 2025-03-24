@@ -53,15 +53,3 @@ export const syncAllOrganizationUsers = async (
     );
   }
 };
-
-export const syncOrganizationUser = async (auth0sub: string) => {
-  const response = await usersManagement.get(auth0sub);
-  const user = response.data ?? [];
-  await UserModel.upsertByAuth0Sub(user.user_id, {
-    last_login: user.last_login?.toString(),
-    logins_count: user.logins_count || 0,
-    email_verified: user.email_verified,
-    blocked: user.blocked,
-  });
-  console.log(`syncOrganizationUser - user ${user.user_id} has been synced`);
-};

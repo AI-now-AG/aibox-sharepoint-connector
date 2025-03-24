@@ -2,7 +2,6 @@
   import AudioUsecaseItem from "./AudioUsecaseItem.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import Loading from "$components/Loading.svelte";
-  import { loading, showLoading, hideLoading } from "$stores";
   import { addToast } from "$stores/toast";
   import { useTranslations } from "$i18n/utils";
   import { actions } from "astro:actions";
@@ -11,6 +10,7 @@
   import { tenant } from "$stores";
 
   const t = useTranslations();
+  let loading = $state(false);
 
   interface Props {
     items?: AudioCardItem[];
@@ -52,21 +52,21 @@
 
   async function deleteCard() {
     try {
-      showLoading();
+      loading = true;
       const deletedUsecase = {
         _id: selectedDeletePromptId,
       };
       await actions.transcription.delete(deletedUsecase);
 
       removeDeletedItem(selectedDeletePromptId);
-      hideLoading();
+      loading = false;
       addToast({
         message: t("settings.transcription.delete.success"),
         type: "success",
       });
       reloadPage();
     } catch (error) {
-      hideLoading();
+      loading = false;
       addToast({
         message:
           error instanceof Error ? error.message : t("common.unexpected.error"),
@@ -78,7 +78,7 @@
   async function updateCardStatus(index: number) {
     const selectedItem = items[index];
     try {
-      showLoading();
+      loading = true;
       const updateUsecase = {
         _id: selectedItem.id,
       };
@@ -88,14 +88,14 @@
         await actions.transcription.deactive(updateUsecase);
       }
 
-      hideLoading();
+      loading = false;
       addToast({
         message: t("settings.transcription.updated.success"),
         type: "success",
       });
       reloadPage();
     } catch (error) {
-      hideLoading();
+      loading = false;
       addToast({
         message:
           error instanceof Error ? error.message : t("common.unexpected.error"),
@@ -142,4 +142,4 @@
   title={t("settings.transcription.delete.confirm")}
 />
 
-<Loading bind:show={$loading} />
+<Loading show={loading} />

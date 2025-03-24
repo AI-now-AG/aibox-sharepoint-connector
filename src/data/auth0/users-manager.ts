@@ -8,6 +8,8 @@ import type {
   UserUpdate,
   DeleteUsersByIdRequest,
   GetUsersByEmailRequest,
+  PostAuthenticationMethodsOperationRequest,
+  PostAuthenticationMethodsRequest,
 } from "auth0";
 
 export const getAllUsers = async (parameters: GetUsersRequest) => {
@@ -107,6 +109,25 @@ export const unblock = async (userId: string) => {
   return update(userId, bodyParameters);
 };
 
+export const createAuthenticationMethod = async (
+  userId: string,
+  bodyParameters: PostAuthenticationMethodsRequest,
+) => {
+  try {
+    const requestParameters: PostAuthenticationMethodsOperationRequest = {
+      id: userId,
+    };
+
+    return await managementClient.users.createAuthenticationMethod(
+      requestParameters,
+      bodyParameters,
+    );
+  } catch (error) {
+    console.error("auth0: create authentication method error", error);
+    throw error;
+  }
+};
+
 export default {
   getAllUsers,
   get,
@@ -117,4 +138,5 @@ export default {
   deleteUser,
   block,
   unblock,
+  createAuthenticationMethod,
 };

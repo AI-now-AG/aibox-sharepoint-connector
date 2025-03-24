@@ -15,13 +15,13 @@
   import PromptOrderDialog from "$components/prompt-interface/components/PromptOrderDialog.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import Loading from "$components/Loading.svelte";
-  import { loading, showLoading, hideLoading } from "$stores";
   import { addToast } from "$stores/toast";
   import { useTranslations } from "$i18n/utils";
   import { actions } from "astro:actions";
   import log from "$utils/log";
 
   const t = useTranslations();
+  let loading = $state(false);
 
   interface Props {
     items?: PromptCartItem[];
@@ -46,7 +46,10 @@
   let timeout: any = $state();
   let orderCards = $state(items);
 
-  function getItemsByGroupId(items: PromptCartItem[], groupId: string): PromptCartItem[] {
+  function getItemsByGroupId(
+    items: PromptCartItem[],
+    groupId: string,
+  ): PromptCartItem[] {
     return items.filter((item) => item.group === groupId);
   }
 
@@ -74,7 +77,7 @@
 
   async function deleteCard() {
     try {
-      showLoading();
+      loading = true;
       const deletedPrompt = {
         ...(selectedDeletePromptId && { _id: selectedDeletePromptId }),
       };
@@ -93,13 +96,13 @@
         );
       }
       removeDeletedItem(selectedDeletePromptId);
-      hideLoading();
+      loading = false;
       addToast({
         message: t("prompt-library.delete.prompt.success"),
         type: "success",
       });
     } catch (error) {
-      hideLoading();
+      loading = false;
       addToast({
         message:
           error instanceof Error ? error.message : t("common.unexpected.error"),
@@ -117,7 +120,7 @@
   }
 
   async function updatePosition(orderItems: PromptCartItem[]) {
-    showLoading();
+    loading = true;
     try {
       const sortedIds = orderItems.map((item) => {
         return {
@@ -137,7 +140,7 @@
         type: "error",
       });
     } finally {
-      hideLoading();
+      loading = false;
     }
   }
 </script>
@@ -195,4 +198,4 @@
   title={t("prompt-library.delete.prompt.confirm")}
 />
 
-<Loading bind:show={$loading} />
+<Loading show={loading} />

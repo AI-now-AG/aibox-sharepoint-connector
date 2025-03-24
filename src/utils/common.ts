@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-useless-escape */
 import type { ParsedAuth0UserSub } from "$types/auth0.types";
 import moment from "moment";
@@ -9,7 +10,7 @@ export const parseAuth0UserSub = (auth0Sub: string): ParsedAuth0UserSub => {
 
 export const isEnterpriseConnection = (auth0Sub: string): boolean => {
   const [provider] = auth0Sub?.split("|") ?? [];
-  const enterpriseProviders = [
+  const enterpriseConnections = [
     "saml",
     "oidc",
     "okta",
@@ -19,7 +20,13 @@ export const isEnterpriseConnection = (auth0Sub: string): boolean => {
     "ad",
     "ping",
   ];
-  return enterpriseProviders.includes(provider);
+  return enterpriseConnections.includes(provider);
+};
+
+export const isSocialConnection = (auth0Sub: string): boolean => {
+  const [provider] = auth0Sub?.split("|") ?? [];
+  const socialConnections = ["google-oauth2", "windowslive"];
+  return socialConnections.includes(provider);
 };
 
 export function formatDateToDDMMYY(date: string | Date): string {
@@ -42,18 +49,17 @@ export function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export function tryParse(input: string): Object | string {
+export function tryParse(input: string): object | string {
   let result;
   try {
     result = JSON.parse(input);
-  } catch (error) {
+  } catch {
     result = input;
-  } finally {
-    return result;
   }
+  return result;
 }
 
-export function parseChunkCitations(inputString: string): Object | string {
+export function parseChunkCitations(inputString: string): object | string {
   const unescapedString = inputString.replace(/\\\"/g, '"');
   const jsonMatch = unescapedString.match(/{.*?}/s);
   if (jsonMatch) {
