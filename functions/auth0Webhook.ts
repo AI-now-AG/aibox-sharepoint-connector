@@ -54,7 +54,7 @@ const auth0Webhook: Handler = async (
       const { type: eventType, description } = data;
 
       console.log(
-        `Event log: ${eventType} / ${description}`,
+        `Event log: ${eventType} / ${description || "-"}`,
         JSON.stringify(log),
       );
 
@@ -272,7 +272,8 @@ const triggerSignupAlertEmailForPairedUser = async (
       await triggerSignupAlertEmail(userId, email, connection);
     }
   } catch (error: any) {
-    console.warn(`Signup alert email for paired user error`, error);
+    console.error(`Signup alert email for paired user error`, error);
+    throw error;
   }
 };
 
