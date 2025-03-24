@@ -55,10 +55,7 @@
         <h1
           class="mb-6 text-4xl md:text-5xl font-bold text-white tracking-tight"
         >
-          {errorTitle
-            ?.replace(/_/g, " ")
-            .toLowerCase()
-            .replace(/\b\w/g, (l) => l.toUpperCase())}
+          {errorTitle}
         </h1>
         <p class="mb-8 text-lg md:text-xl text-gray-300 mx-auto">
           {errorDescription}
@@ -72,10 +69,7 @@
         <h1
           class="mb-6 text-4xl md:text-5xl font-bold text-white tracking-tight"
         >
-          {errorTitle
-            ?.replace(/_/g, " ")
-            .toLowerCase()
-            .replace(/\b\w/g, (l) => l.toUpperCase())}
+          {errorTitle}
         </h1>
         <p class="mb-8 text-lg md:text-xl text-gray-300 mx-auto">
           {errorDescription}
