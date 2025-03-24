@@ -64,35 +64,19 @@ const t = useTranslations();
     </div>
   </div>
   <div class="navbar-end">
-    <div class="dropdown dropdown-end z-30 mr-2">
-      <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
-        <div class="w-8 rounded-full">
-          <span set:html={svgIcons.questionMark} style="color:#4a20ff;" />
-        </div>
-      </div>
-      <ul
-        tabindex="0"
-        class="menu menu-sm dropdown-content bg-base-100 rounded-box z-10 mt-3 w-52 p-2 shadow border"
+    <div class="z-30 mr-2">
+      <a
+        class="btn btn-ghost btn-circle"
+        href="https://support.aibox-app.ch/"
+        target="_blank"
       >
-        <li>
-          <a
-            class="justify-between"
-            href="https://ainow.ch/aibox/how-to"
-            target="_blank"
-          >
-            {t("guideline.aibox-how-to")}
-          </a>
-        </li>
-        <li>
-          <a
-            class="justify-between"
-            href="https://ainow.ch/aibox/support"
-            target="_blank"
-          >
-            {t("guideline.support")}
-          </a>
-        </li>
-      </ul>
+        <div
+          class="flex items-center justify-center w-8 h-8 rounded-full border-3 border-indigo-600"
+   
+        >
+          <p class="text-lg text-indigo-600">?</p>
+        </div>
+      </a>
     </div>
 
     <div class="dropdown dropdown-end z-30">
