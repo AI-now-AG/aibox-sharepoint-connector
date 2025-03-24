@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-useless-escape */
 import type { ParsedAuth0UserSub } from "$types/auth0.types";
 import moment from "moment";
@@ -48,18 +49,17 @@ export function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export function tryParse(input: string): Object | string {
+export function tryParse(input: string): object | string {
   let result;
   try {
     result = JSON.parse(input);
-  } catch (error) {
+  } catch {
     result = input;
-  } finally {
-    return result;
   }
+  return result;
 }
 
-export function parseChunkCitations(inputString: string): Object | string {
+export function parseChunkCitations(inputString: string): object | string {
   const unescapedString = inputString.replace(/\\\"/g, '"');
   const jsonMatch = unescapedString.match(/{.*?}/s);
   if (jsonMatch) {
