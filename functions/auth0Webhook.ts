@@ -68,14 +68,21 @@ const auth0Webhook: Handler = async (
       // See: https://auth0.com/docs/customize/log-streams/event-filters#signup-success
       if (eventType == "ss") {
         if (isPermittedConnection(data)) {
-          await triggerRegistrationEmail(data);
-          await updateAuth0UserMetadata(data.user_id, { signup: true });
+          const { user_id: userId } = data;
+          const { email, connection, is_signup: isSignup } = data.details.body;
+
+          await triggerRegistrationEmail(userId, email, connection, isSignup);
+          if (isSignup) {
+            await triggerSignupAlertEmail(userId, email, connection);
+            await updateAuth0UserMetadata(userId, { signup: true });
+          }
         }
 
         // Send welcome email for social login
         if (["windowslive", "google-oauth2"].includes(data.connection)) {
           const { user_name: email, user_id: userId, connection } = data;
-          await triggerWelcomeEmail(userId, email, connection);
+          await triggerWelcomeEmail(email);
+          await triggerSignupAlertEmail(userId, email, connection);
         }
       }
 
@@ -83,11 +90,24 @@ const auth0Webhook: Handler = async (
       // See: https://auth0.com/docs/customize/log-streams/event-filters#user-behavioral-success
       if (eventType == "sv") {
         const { email, user_id: userId } = data.details.query;
-        await triggerWelcomeEmail(userId, email, data.connection);
-
+        await triggerWelcomeEmail(email);
+        await triggerVerifiedAlertEmail(userId, email, data.connection);
         await updateUserAttributesInDatabase(userId, {
           email_verified: true,
         });
+      }
+
+      // Trigger successful logout
+      // See: https://auth0.com/docs/customize/log-streams/event-filters#logout-success
+      if (eventType == "slo") {
+        const { return_to: returnTo } = data.details;
+        const { user_name: email, user_id: userId, connection } = data;
+        if (
+          ["windowslive", "google-oauth2"].includes(connection) &&
+          returnTo?.includes("code=422")
+        ) {
+          triggerSignupAlertEmailForPairedUser(userId, email, connection);
+        }
       }
 
       // Trigger 'Add members to an organization'
@@ -179,41 +199,54 @@ const isPermittedConnection = (data: any) => {
   return permittedCons.includes(connection);
 };
 
-const triggerRegistrationEmail = async (data: any) => {
-  console.log(`Trigger registration email`, data.details);
+const triggerRegistrationEmail = async (
+  userId: string,
+  email: string,
+  connection: string,
+  isSignup: boolean,
+) => {
+  console.log(`Trigger registration email`, { email, connection, isSignup });
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { user_id: userId } = data;
-  const { email, connection, is_signup: isSignup } = data.details.body;
   if (isSignup == true) {
     // Send user verification email
     await sendVerificationEmail(userId, email);
-
-    // Send admin notification email
-    const emailSubject = "New User Signup Alert";
-    const emailContent = `
-      <div style="font-family: Arial, sans-serif; padding: 20px;">
-        <h1><b>New User Signup Notification</b></h1>
-        <p><b>User ID:</b> ${userId}</p>
-        <p><b>Email:</b> ${email}</p>
-        <p><b>Signup Date:</b> ${new Date().toLocaleDateString()}</p>
-      </div>
-    `;
-    await sendNotificationEmail(emailSubject, emailContent);
   } else {
     await sendPasswordResetEmail(email, connection);
   }
 };
 
-const triggerWelcomeEmail = async (
+const triggerWelcomeEmail = async (email: string) => {
+  console.log(`Trigger welcome email`, { email });
+  // Send user welcome email
+  await sendWelcomeEmail(email);
+};
+
+const triggerSignupAlertEmail = async (
   userId: string,
   email: string,
   connection: string,
 ) => {
-  console.log(`Trigger welcome email`, { userId, email, connection });
-  // Send user welcome email
-  await sendWelcomeEmail(email);
+  console.log(`Trigger signup alert email`, { userId, email, connection });
 
+  // Send admin notification email
+  const emailSubject = "New User Signup Alert";
+  const emailContent = `
+        <div style="font-family: Arial, sans-serif; padding: 20px;">
+          <h1><b>New User Signup Notification</b></h1>
+          <p><b>User ID:</b> ${userId}</p>
+          <p><b>Email:</b> ${email}</p>
+          <p><b>Signup Date:</b> ${new Date().toLocaleDateString()}</p>
+          <p><b>Connection:</b> ${connection}</p>
+        </div>
+      `;
+  await sendNotificationEmail(emailSubject, emailContent);
+};
+
+const triggerVerifiedAlertEmail = async (
+  userId: string,
+  email: string,
+  connection: string,
+) => {
   // Send admin notification email
   const emailSubject = "New User Verified Alert";
   const emailContent = `
@@ -226,6 +259,21 @@ const triggerWelcomeEmail = async (
       </div>
     `;
   await sendNotificationEmail(emailSubject, emailContent);
+};
+
+const triggerSignupAlertEmailForPairedUser = async (
+  userId: string,
+  email: string,
+  connection: string,
+) => {
+  try {
+    const auth0User = await usersManagement.get(userId);
+    if (auth0User && auth0User?.data?.logins_count == 1) {
+      await triggerSignupAlertEmail(userId, email, connection);
+    }
+  } catch (error: any) {
+    console.warn(`Signup alert email for paired user error`, error);
+  }
 };
 
 const createUserInDatabase = async (data: any) => {
