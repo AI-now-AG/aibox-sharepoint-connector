@@ -339,7 +339,14 @@
   "user.unverified-email-message": "Please verify your email address. Unverified emails will be blocked within 24 hours. <a href=\"${url}\" data-verified=\"true\"  class=\"font-semibold text-warning-content underline\" data-astro-prefetch=\"false\">Click here</a> to resend email verification links",
   "user.send-verify-email-success": "The verification email has been sent to your address. Please check your inbox and verify your account. Thank you!",
   "user.send-verify-email-failed": "The verification email could not be sent. Please try again!",
-  "guideline.aibox-how-to": "Aibox how-to",
-  "guideline.support": "Suport ",
-  "logout": "Logout"
+  "guideline.aibox-how-to": "aibox User Guide",
+  "guideline.support": "Help & Support",
+  "common.logout": "Logout",
+  "common.refresh": "Refresh",
+  "common.back-to-home": "Back to Home",
+  "common.error-title": " An Error Occurred",
+  "common.error-description": "Sorry, something went wrong on our end. Please try refreshing the page or come back later.",
+  "existing-email.error-title": "Account already paired with different user",
+  "existing-email.error-description": "A different authentication method is used for this account",
+  "common.support": "Support"
 }

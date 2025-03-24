@@ -71,8 +71,8 @@ const t = useTranslations();
         target="_blank"
       >
         <div
-          class="flex items-center justify-center w-8 h-8 rounded-full border-3 border-indigo-600"
-   
+          class="flex items-center justify-center w-8 h-8 rounded-full border-3 border-indigo-600 tooltip tooltip-bottom"
+          data-tip={t("common.support")}
         >
           <p class="text-lg text-indigo-600">?</p>
         </div>
@@ -94,7 +94,7 @@ const t = useTranslations();
         </li>
         <li id="logout">
           <button onclick="window.location.href='/api/logout'"
-            >{t("logout")}</button
+            >{t("common.logout")}</button
           >
         </li>
       </ul>
