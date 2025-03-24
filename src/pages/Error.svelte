@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { getLanguageData, setLanguage, useTranslations } from "$i18n/utils";
+  import { getLanguageData, useTranslations } from "$i18n/utils";
 
   interface Props {
     errorCode?: string;
