@@ -694,6 +694,23 @@
       </div>
     </div>
 
+    <div class="flex flex-row space-x-4">
+      <div class="flex-1 flex flex-col mb-4">
+        <div class="flex justify-end">
+          <button
+            class={"mt-7 btn btn-outline font-normal grow-0 w-auto " +
+              `${mode == MODE.Edit ? "" : "btn-disabled"}`}
+            onclick={() => {
+              addTanantAdminModal?.show();
+            }}
+          >
+            {@html svgIcons.add}
+            {t("tenant.add-tenant-admin")}
+          </button>
+        </div>
+      </div>
+    </div>
+
     <div class="divider"></div>
 
     <div class="mb-3 flex flex-row items-center gap-2">
