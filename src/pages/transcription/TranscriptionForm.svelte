@@ -82,8 +82,9 @@
   let languageLocales: Item[] = $state([
     { title: "Deutsch (Schweiz)", checked: true, locales: "de-ch" },
     { title: "Deutsch (Deutschland)", checked: true, locales: "de-de" },
-    { title: "Französisch (Schweiz)", checked: false, locales: "fr-ch" },
-    { title: "Italienisch (Schweiz)", checked: false, locales: "it-ch" },
+    { title: "Italienisch (Italien)", checked: false, locales: "it-it" },
+    { title: "Französisch (Frankreich)", checked: false, locales: "fr-fr" },
+    { title: "Englisch (US)", checked: false, locales: "en-us" },
     { title: "Englisch (UK)", checked: false, locales: "en-gb" },
   ]);
   const inputValue = $derived(
@@ -1423,9 +1424,7 @@
     {/if}
     {#if isTranscipted}
       {#if zipFileData}
-        <button
-          class="btn btn-success"
-          onclick={downloadZip}
+        <button class="btn btn-success" onclick={downloadZip}
           >{@html svgIcons.download}{t(
             "transciption.model.cta.download-zip",
           )}</button
