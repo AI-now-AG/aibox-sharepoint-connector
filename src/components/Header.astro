@@ -3,8 +3,11 @@ import InitializeTheme from "$components/theme/InitializeTheme.astro";
 import SharedVariables from "$components/theme/SharedVariables.svelte";
 import Toasts from "$components/toast-notification/Toasts.svelte";
 import { transformRawData } from "$utils/transformRawData";
+import { svgIcons } from "$assets/icons";
+import { useTranslations } from "$i18n/utils";
 
 const user = Astro.locals.user;
+const t = useTranslations();
 ---
 
 <!-- Set default theme -->
@@ -26,19 +29,7 @@ const user = Astro.locals.user;
         aria-label="open sidebar"
         class="btn btn-square btn-ghost"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-5 w-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M4 6h16M4 12h8m-8 6h16"></path>
-        </svg>
+        <span set:html={svgIcons.hamburger} />
       </label>
     </div>
     <div class="lg:hidden pl-2">
@@ -73,6 +64,21 @@ const user = Astro.locals.user;
     </div>
   </div>
   <div class="navbar-end">
+    <div class="z-30 mr-2">
+      <a
+        class="btn btn-ghost btn-circle"
+        href="https://support.aibox-app.ch/"
+        target="_blank"
+      >
+        <div
+          class="flex items-center justify-center w-8 h-8 rounded-full border-3 border-indigo-600 tooltip tooltip-bottom"
+          data-tip={t("common.support")}
+        >
+          <p class="text-lg text-indigo-600">?</p>
+        </div>
+      </a>
+    </div>
+
     <div class="dropdown dropdown-end z-30">
       <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
         <div class="w-10 rounded-full">
@@ -84,10 +90,12 @@ const user = Astro.locals.user;
         class="menu menu-sm dropdown-content bg-base-100 rounded-box z-10 mt-3 w-52 p-2 shadow-sm border"
       >
         <li>
-          <a class="justify-between" href="/profile"> Profile </a>
+          <a class="justify-between" href="/profile">{t("profile")}</a>
         </li>
         <li id="logout">
-          <button onclick="window.location.href='/api/logout'">Logout</button>
+          <button onclick="window.location.href='/api/logout'"
+            >{t("common.logout")}</button
+          >
         </li>
       </ul>
     </div>

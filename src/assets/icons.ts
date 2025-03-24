@@ -55,6 +55,8 @@ import toastError from "$assets/icons/toast-error.svg?raw";
 import toastInfo from "$assets/icons/toast-info.svg?raw";
 import textPrompt from "$assets/icons/textPrompt.svg?raw";
 import userGroup from "$assets/icons/user-group.svg?raw";
+import questionMark from "$assets/icons/question.svg?raw";
+import hamburger from "$assets/icons/hamburger.svg?raw";
 
 export const svgIcons = {
   menuSettings,
@@ -114,4 +116,6 @@ export const svgIcons = {
   toastInfo,
   textPrompt,
   userGroup,
+  questionMark,
+  hamburger,
 };

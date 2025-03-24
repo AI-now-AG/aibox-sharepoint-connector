@@ -347,5 +347,6 @@
   "common.error-title": " An Error Occurred",
   "common.error-description": "Sorry, something went wrong on our end. Please try refreshing the page or come back later.",
   "existing-email.error-title": "Account already paired with different user",
-  "existing-email.error-description": "A different authentication method is used for this account"
+  "existing-email.error-description": "A different authentication method is used for this account",
+  "common.support": "Support"
 }

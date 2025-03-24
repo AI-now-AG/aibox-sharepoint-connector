@@ -347,5 +347,6 @@
   "common.error-title": "Ein Fehler ist aufgetreten",
   "common.error-description": "Entschuldigung, etwas ist schiefgelaufen. Bitte versuchen Sie, die Seite zu aktualisieren, oder kommen Sie später wieder.",
   "existing-email.error-title": "Konto bereits mit einem anderen Benutzer verknüpft",
-  "existing-email.error-description": "Für dieses Konto wird bereits eine andere Authentifizierungsmethode verwendet"
+  "existing-email.error-description": "Für dieses Konto wird bereits eine andere Authentifizierungsmethode verwendet",
+  "common.support": "Unterstützung"
 }
