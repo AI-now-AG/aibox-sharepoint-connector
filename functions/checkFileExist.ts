@@ -38,24 +38,6 @@ const checkFileExist: Handler = async (event, context) => {
   const protocol = event.headers["x-forwarded-proto"] || "https";
   const previewUrl = `${protocol}://${host}`;
 
-  console.log("-------START---------", previewUrl);
-  console.log("Headers:", event.headers);
-  console.log("URL:", `${process.env.URL}`);
-  console.log("DEPLOY_URL:", `${process.env.DEPLOY_URL}`);
-  console.log("DEPLOY_PRIME_URL:", `${process.env.DEPLOY_PRIME_URL}`);
-  console.log("DEPLOY_ID:", `${process.env.DEPLOY_ID}`);
-  console.log("BUILD_ID:", `${process.env.BUILD_ID}`);
-  console.log("CONTEXT:", `${process.env.CONTEXT}`);
-  console.log("REPOSITORY_URL:", `${process.env.REPOSITORY_URL}`);
-  console.log("BRANCH:", `${process.env.BRANCH}`);
-  console.log("HEAD:", `${process.env.HEAD}`);
-  console.log("REVIEW_ID:", `${process.env.REVIEW_ID}`);
-  console.log("SITE_ID:", `${process.env.SITE_ID}`);
-  console.log("ACCOUNT_ID:", `${process.env.ACCOUNT_ID}`);
-  console.log("Object: ", JSON.stringify(process.env, null, 2));
-  console.log("Object 2: ", JSON.stringify(process.env));
-  console.log("-------END---------");
-
   const improvedTxtFileName = `${uniqueName}_improved.txt`;
   if (isShowImprovedTextPreview) {
     requireFilesCount += 1;

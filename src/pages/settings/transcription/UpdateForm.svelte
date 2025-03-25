@@ -38,8 +38,6 @@
       isEnabled !== undefined,
   );
 
-  console.log("isnew:", isNew);
-
   let subtitleList = $state(
     [
       preDefineCategory.includes(AudioCategory.Subtitle) && {

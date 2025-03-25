@@ -412,7 +412,6 @@
       return;
     }
 
-    console.log("Selected audio file", audioFile);
     const { name, size, type } = audioFile;
     if (isFileValid({ name, size, type })) {
       // Calculate duration for audio/video file
@@ -426,7 +425,6 @@
       let fileNameWithoutExtension = audioFile.name || "";
       let fileExtension = audioFile.name || "";
       const splitedFileName = fileNameWithoutExtension.split(".");
-      console.log("fileNameWithoutExtension---", splitedFileName);
       if (splitedFileName) {
         if (splitedFileName?.[0]) {
           fileNameWithoutExtension = formatFilename(splitedFileName?.[0]);
@@ -435,7 +433,6 @@
           fileExtension = splitedFileName?.[splitedFileName?.length - 1];
         }
       }
-      console.log("fileNameWithoutExtension", fileNameWithoutExtension);
       const { uploadUrl, outputFileName } = await getSASToken(
         fileNameWithoutExtension,
         fileExtension,
@@ -455,7 +452,6 @@
               `${outputFileName}.txt`,
               `${outputFileName}.srt`,
             ];
-            console.log("Temp output file name", tempOutputFileNames);
 
             isUploading = false;
             isUploaded = true;
@@ -614,22 +610,6 @@
 
   async function checkOutputFileReady() {
     try {
-      console.log("-------INIT---------");
-      console.log("URL:", `${process.env.URL}`);
-      console.log("DEPLOY_URL:", `${process.env.DEPLOY_URL}`);
-      console.log("DEPLOY_PRIME_URL:", `${process.env.DEPLOY_PRIME_URL}`);
-      console.log("DEPLOY_ID:", `${process.env.DEPLOY_ID}`);
-      console.log("BUILD_ID:", `${process.env.BUILD_ID}`);
-      console.log("CONTEXT:", `${process.env.CONTEXT}`);
-      console.log("REPOSITORY_URL:", `${process.env.REPOSITORY_URL}`);
-      console.log("BRANCH:", `${process.env.BRANCH}`);
-      console.log("HEAD:", `${process.env.HEAD}`);
-      console.log("REVIEW_ID:", `${process.env.REVIEW_ID}`);
-      console.log("SITE_ID:", `${process.env.SITE_ID}`);
-      console.log("ACCOUNT_ID:", `${process.env.ACCOUNT_ID}`);
-      console.log("Object: ", JSON.stringify(process.env, null, 2));
-      console.log("Object 2: ", JSON.stringify(process.env));
-      console.log("-------DEST---------");
       const response = await fetch("/.netlify/functions/checkFileExist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -830,7 +810,6 @@
         document.body.removeChild(link);
         URL.revokeObjectURL(blobUrl);
 
-        console.log("Download file!");
         if (confirmModal?.open) {
           confirmModal?.close();
         }
@@ -868,8 +847,6 @@
       // Remove link from body
       document.body.removeChild(link);
 
-      // Clsoe dialog element
-      console.log("Download file!");
       if (confirmModal?.open) {
         confirmModal?.close();
       }
