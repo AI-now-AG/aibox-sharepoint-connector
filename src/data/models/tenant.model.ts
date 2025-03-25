@@ -15,7 +15,6 @@ export enum TenantTheme {
   Weihnachtsmann = "weihnachtsmann",
 }
 
-
 export const TenantFilterParamsSchema = z.object({
   searchValue: z.string().nullish(),
   showArchived: z.boolean(),

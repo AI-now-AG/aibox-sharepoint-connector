@@ -3,6 +3,7 @@ import type { APIContext } from "astro";
 import { decrypt } from "./secure";
 import { TenantFeature, ApiKeyProvider } from "$types/TenantFeature";
 import log from "./log";
+import { UsageTrackerCallbackHandler } from "$llm/UsageTrackerCallbackHandler";
 import Perplexity from "$llm/Perplexity";
 
 interface ChatConfigOverrides {
@@ -21,10 +22,13 @@ export const initPerplexityOpenAI = (apiKey: string, model: string) => {
 };
 
 // Initialize OpenAI's Chat API
-const initChatOpenAI = (apiKey: string, model: string) => {
+const initChatOpenAI = (apiKey: string, model: string, tenantId: string) => {
   return new ChatOpenAI({
-    apiKey, 
+    apiKey,
     model,
+    callbacks: [
+      new UsageTrackerCallbackHandler(ApiKeyProvider.OpenAI, tenantId),
+    ],
   });
 };
 
@@ -36,9 +40,9 @@ const initAzureChatOpenAI = (
   azureOpenAIApiVersion: string,
 ) => {
   return new AzureChatOpenAI({
-    azureOpenAIApiKey, 
+    azureOpenAIApiKey,
     azureOpenAIApiInstanceName,
-    azureOpenAIApiDeploymentName, 
+    azureOpenAIApiDeploymentName,
     azureOpenAIApiVersion,
   });
 };
@@ -98,7 +102,11 @@ export const initializeOpenAI = (
 
   // OpenAI
   const apiKey = decrypt(ctx.locals.tenant?.openai_api_key || "");
-  return initChatOpenAI(apiKey, import.meta.env.OPENAI_MODEL);
+  return initChatOpenAI(
+    apiKey,
+    import.meta.env.OPENAI_MODEL,
+    ctx.locals?.tenant?._id?.toString(),
+  );
 };
 
 export default initializeOpenAI;
