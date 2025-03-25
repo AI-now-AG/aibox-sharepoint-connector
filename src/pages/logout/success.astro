@@ -1,8 +1,11 @@
 ---
 import BlankLayout from "$layouts/BlankLayout.astro";
-import { useTranslations } from "$i18n/utils";
+import { setLanguage, useTranslations } from "$i18n/utils";
 
 const t = useTranslations();
+
+const locals = Astro.url.searchParams.get("lang") || "de";
+setLanguage(locals);
 ---
 
 <BlankLayout title="Log out sucess">
