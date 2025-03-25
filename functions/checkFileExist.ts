@@ -34,6 +34,7 @@ const checkFileExist: Handler = async (event, context) => {
   let requireFilesCount = fileNames.length || 0;
   const tempFileNames: string[] = [];
   
+  
   console.log("-------START---------");
   console.log("URL:",`${process.env.URL}`);
   console.log("DEPLOY_URL:",`${process.env.DEPLOY_URL}`);
@@ -47,6 +48,8 @@ const checkFileExist: Handler = async (event, context) => {
   console.log("REVIEW_ID:",`${process.env.REVIEW_ID}`);
   console.log("SITE_ID:",`${process.env.SITE_ID}`);
   console.log("ACCOUNT_ID:",`${process.env.ACCOUNT_ID}`);
+  console.log("Object: ", JSON.stringify(process.env, null, 2));
+  console.log("Object 2: ", JSON.stringify(process.env));
   console.log("-------END---------");
 
   const improvedTxtFileName = `${uniqueName}_improved.txt`;
