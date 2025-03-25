@@ -34,8 +34,10 @@ const checkFileExist: Handler = async (event, context) => {
   let requireFilesCount = fileNames.length || 0;
   const tempFileNames: string[] = [];
   
-  
-  console.log("-------START---------");
+  const previewUrl = event.headers["x-netlify-original-url"] || "Not available";
+
+  console.log("-------START---------", previewUrl);
+  console.log("Headers:", event.headers);
   console.log("URL:",`${process.env.URL}`);
   console.log("DEPLOY_URL:",`${process.env.DEPLOY_URL}`);
   console.log("DEPLOY_PRIME_URL:",`${process.env.DEPLOY_PRIME_URL}`);
