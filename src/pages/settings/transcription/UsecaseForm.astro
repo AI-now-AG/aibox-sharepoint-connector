@@ -9,6 +9,7 @@ import transcriptionModel from "$data/models/transcription.model";
 const { searchParams } = Astro.url;
 const typeParam = searchParams.get("type") as TranscriptionType;
 const selectedUsecaseId = searchParams.get("id") as string;
+const mode = searchParams.get("mode") ?? "update";
 
 if (!Object.values(TranscriptionType).includes(typeParam)) {
   return Astro.redirect("/404");
@@ -56,6 +57,7 @@ let userPermissions = Astro.locals.user.permissions;
     isNew={!selectedUsecase}
     selectedUsecaseId={selectedUsecase?._id.toString()}
     isEditable={userPermissions.includes(Permission.AdminAll)}
+    mode={mode}
     client:load
   />
 </Layout>
