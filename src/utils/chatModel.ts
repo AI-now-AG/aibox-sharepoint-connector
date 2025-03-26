@@ -4,7 +4,6 @@ import { decrypt } from "./secure";
 import { TenantFeature, ApiKeyProvider } from "$types/TenantFeature";
 import log from "./log";
 import { UsageTrackerCallbackHandler } from "$llm/UsageTrackerCallbackHandler";
-//import Perplexity from "$llm/Perplexity";
 import { UsageType } from "$types/UsageTracking";
 
 interface ChatConfigOverrides {
