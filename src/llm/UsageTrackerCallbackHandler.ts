@@ -1,25 +1,29 @@
 import { BaseCallbackHandler } from "@langchain/core/callbacks/base";
 import type { LLMResult } from "@langchain/core/outputs";
 import type { Serialized } from "@langchain/core/load/serializable";
+import { ObjectId } from "mongodb";
 import { ApiKeyProvider } from "$types/TenantFeature";
-import TenantModel, { type Tenant } from "$data/models/tenant.model";
 import UsageModel, { type Usage } from "$data/models/usage.model";
 
 export class UsageTrackerCallbackHandler extends BaseCallbackHandler {
   name = "usage_tracker_callback_handler";
 
-  private tenant: Tenant | null = null;
+  private tenantId: ObjectId | undefined;
   private provider: ApiKeyProvider | undefined;
+  private model: string | undefined;
 
   constructor(
-    private providerName: ApiKeyProvider,
-    private tenantId: string,
+    tenantId: ObjectId | string,
+    provider: ApiKeyProvider,
+    model: string,
   ) {
     super();
 
     (async () => {
-      this.provider = providerName;
-      this.tenant = await TenantModel.get(tenantId);
+      this.tenantId =
+        tenantId instanceof ObjectId ? tenantId : new ObjectId(tenantId);
+      this.provider = provider;
+      this.model = model;
     })();
   }
 
@@ -38,9 +42,9 @@ export class UsageTrackerCallbackHandler extends BaseCallbackHandler {
     console.log("Run ID:", runId);
 
     const usage: Partial<Omit<Usage, "_id">> = {
-      tenant_id: this.tenant?._id,
+      tenant_id: this.tenantId,
       provider: this.provider,
-      model: output.generations?.[0]?.[0]?.generationInfo?.model_name,
+      model: this.model,
       input_tokens: output.llmOutput?.tokenUsage?.promptTokens,
       output_tokens: output.llmOutput?.tokenUsage?.completionTokens,
     };

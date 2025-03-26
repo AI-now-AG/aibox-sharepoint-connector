@@ -27,7 +27,7 @@ const initChatOpenAI = (apiKey: string, model: string, tenantId: string) => {
     apiKey,
     model,
     callbacks: [
-      new UsageTrackerCallbackHandler(ApiKeyProvider.OpenAI, tenantId),
+      new UsageTrackerCallbackHandler(tenantId, ApiKeyProvider.OpenAI, model),
     ],
   });
 };
@@ -38,12 +38,20 @@ const initAzureChatOpenAI = (
   azureOpenAIApiInstanceName: string,
   azureOpenAIApiDeploymentName: string,
   azureOpenAIApiVersion: string,
+  tenantId: string,
 ) => {
   return new AzureChatOpenAI({
     azureOpenAIApiKey,
     azureOpenAIApiInstanceName,
     azureOpenAIApiDeploymentName,
     azureOpenAIApiVersion,
+    callbacks: [
+      new UsageTrackerCallbackHandler(
+        tenantId,
+        ApiKeyProvider.AzureOpenAI,
+        azureOpenAIApiDeploymentName,
+      ),
+    ],
   });
 };
 
@@ -51,6 +59,7 @@ export const initializeOpenAI = (
   ctx: APIContext,
   overrides?: ChatConfigOverrides,
 ) => {
+  const { tenant } = ctx.locals;
   const { included_features: features } = ctx.locals.tenant;
   const { customModel } = overrides || {};
 
@@ -72,23 +81,16 @@ export const initializeOpenAI = (
 
   // Perplexity AI
   if (provider == ApiKeyProvider.Perplexity) {
-    const perplexityApiKey = decrypt(
-      ctx.locals.tenant?.perplexity_api_key || "",
-    );
-    const perplexityModel: string =
-      ctx.locals.tenant?.perplexity_chat_model || "sonar";
+    const perplexityApiKey = decrypt(tenant?.perplexity_api_key || "");
+    const perplexityModel: string = tenant?.perplexity_chat_model || "sonar";
     return initPerplexityOpenAI(perplexityApiKey, perplexityModel);
   }
 
   // Azure OpenAI
   if (provider == ApiKeyProvider.AzureOpenAI) {
-    const azureOpenAIApiKey = decrypt(
-      ctx.locals.tenant?.azure_openai_api_key || "",
-    );
-    const azureOpenAIApiInstanceName =
-      ctx.locals.tenant?.azure_openai_instance_name || "";
-    const azureOpenAIApiDeploymentName =
-      ctx.locals.tenant?.azure_openai_chat_model || "";
+    const azureOpenAIApiKey = decrypt(tenant?.azure_openai_api_key || "");
+    const azureOpenAIApiInstanceName = tenant?.azure_openai_instance_name || "";
+    const azureOpenAIApiDeploymentName = tenant?.azure_openai_chat_model || "";
     const azureOpenAIApiVersion =
       import.meta.env.AZURE_OPENAI_API_VERSION || "2024-08-01-preview";
 
@@ -97,15 +99,16 @@ export const initializeOpenAI = (
       azureOpenAIApiInstanceName,
       azureOpenAIApiDeploymentName,
       azureOpenAIApiVersion,
+      tenant?._id?.toString(),
     );
   }
 
   // OpenAI
-  const apiKey = decrypt(ctx.locals.tenant?.openai_api_key || "");
+  const apiKey = decrypt(tenant?.openai_api_key || "");
   return initChatOpenAI(
     apiKey,
     import.meta.env.OPENAI_MODEL,
-    ctx.locals?.tenant?._id?.toString(),
+    tenant?._id?.toString(),
   );
 };
 
