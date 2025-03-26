@@ -5,6 +5,7 @@ import { TenantFeature, ApiKeyProvider } from "$types/TenantFeature";
 import log from "./log";
 import { UsageTrackerCallbackHandler } from "$llm/UsageTrackerCallbackHandler";
 import Perplexity from "$llm/Perplexity";
+import { UsageType } from "$types/UsageTracking";
 
 interface ChatConfigOverrides {
   customModel?: string;
@@ -27,7 +28,12 @@ const initChatOpenAI = (apiKey: string, model: string, tenantId: string) => {
     apiKey,
     model,
     callbacks: [
-      new UsageTrackerCallbackHandler(tenantId, ApiKeyProvider.OpenAI, model),
+      new UsageTrackerCallbackHandler(
+        tenantId,
+        ApiKeyProvider.OpenAI,
+        model,
+        UsageType.Text,
+      ),
     ],
   });
 };
@@ -50,6 +56,7 @@ const initAzureChatOpenAI = (
         tenantId,
         ApiKeyProvider.AzureOpenAI,
         azureOpenAIApiDeploymentName,
+        UsageType.Text,
       ),
     ],
   });

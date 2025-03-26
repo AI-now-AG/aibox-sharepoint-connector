@@ -1,6 +1,7 @@
 import { ObjectId } from "mongodb";
 import { db, type Document } from "../mongodb";
 import { ApiKeyProvider } from "$types/TenantFeature";
+import { UsageType } from "$types/UsageTracking";
 import { z } from "zod";
 
 const UsageSchema = z.object({
@@ -10,6 +11,7 @@ const UsageSchema = z.object({
   model: z.string().min(1),
   input_tokens: z.number(),
   output_tokens: z.number(),
+  type: z.nativeEnum(UsageType),
   metadata: z.record(z.any()).nullish(),
   created_at: z
     .date()
