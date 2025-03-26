@@ -114,10 +114,13 @@ export async function createTranscriptionTask(
       languageIdentification: {
         candidateLocales: languageLocales || [
           "de-ch",
-          "fr-ch",
+          "de-de",
           "it-ch",
-          "en-gb",
+          "it-it",
+          "fr-ch",
+          "fr-fr",
           "en-us",
+          "en-gb",
         ],
       },
       punctuationMode: "DictatedAndAutomatic",
