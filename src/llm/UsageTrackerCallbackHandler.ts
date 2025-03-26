@@ -56,7 +56,7 @@ export class UsageTrackerCallbackHandler extends BaseCallbackHandler {
       metadata: {
         cached_tokens:
           respone?.[0]?.[0]?.message?.kwargs?.response_metadata?.usage
-            ?.prompt_tokens_details?.cached_tokens,
+            ?.prompt_tokens_details?.cached_tokens || 0,
       },
     };
 

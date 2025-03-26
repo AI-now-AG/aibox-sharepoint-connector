@@ -4,7 +4,7 @@ import { decrypt } from "./secure";
 import { TenantFeature, ApiKeyProvider } from "$types/TenantFeature";
 import log from "./log";
 import { UsageTrackerCallbackHandler } from "$llm/UsageTrackerCallbackHandler";
-import Perplexity from "$llm/Perplexity";
+//import Perplexity from "$llm/Perplexity";
 import { UsageType } from "$types/UsageTracking";
 
 interface ChatConfigOverrides {
@@ -12,14 +12,26 @@ interface ChatConfigOverrides {
 }
 
 // Initialize Perplexity AI's Chat API with OpenAI-like interface
-export const initPerplexityOpenAI = (apiKey: string, model: string) => {
-  return new Perplexity({ api_key: apiKey, model: model });
-  // return new ChatOpenAI({
-  //   openAIApiKey: apiKey, // Set API key for authentication
-  //   configuration: { baseURL: "https://api.perplexity.ai" }, // Use Perplexity's API endpoint
-  //   modelName: model, // Specify model (if provided)
-  //   //maxTokens: 400, // Define max token limit (if provided)
-  // });
+export const initPerplexityOpenAI = (
+  apiKey: string,
+  model: string,
+  tenantId: string,
+) => {
+  //return new Perplexity({ api_key: apiKey, model: model });
+  return new ChatOpenAI({
+    openAIApiKey: apiKey, // Set API key for authentication
+    configuration: { baseURL: "https://api.perplexity.ai" }, // Use Perplexity's API endpoint
+    modelName: model, // Specify model (if provided)
+    callbacks: [
+      new UsageTrackerCallbackHandler(
+        tenantId,
+        ApiKeyProvider.Perplexity,
+        model,
+        UsageType.Text,
+      ),
+    ],
+    __includeRawResponse: true,
+  });
 };
 
 // Initialize OpenAI's Chat API
@@ -90,7 +102,11 @@ export const initializeOpenAI = (
   if (provider == ApiKeyProvider.Perplexity) {
     const perplexityApiKey = decrypt(tenant?.perplexity_api_key || "");
     const perplexityModel: string = tenant?.perplexity_chat_model || "sonar";
-    return initPerplexityOpenAI(perplexityApiKey, perplexityModel);
+    return initPerplexityOpenAI(
+      perplexityApiKey,
+      perplexityModel,
+      tenant?._id?.toString(),
+    );
   }
 
   // Azure OpenAI
