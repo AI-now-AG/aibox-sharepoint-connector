@@ -114,7 +114,10 @@ export async function createTranscriptionTask(
       languageIdentification: {
         candidateLocales: languageLocales || [
           "de-ch",
+          "de-de",
+          "it-ch",
           "it-it",
+          "fr-ch",
           "fr-fr",
           "en-us",
           "en-gb",
