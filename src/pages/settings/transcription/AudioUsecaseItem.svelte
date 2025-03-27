@@ -35,13 +35,13 @@
         onSelectEdit?.();
       },
     },
-    // {
-    //   icon: svgIcons.duplicate,
-    //   text: t("common.duplicate"),
-    //   action: () => {
-    //     onSelectDuplicate?.();
-    //   },
-    // },
+    {
+      icon: svgIcons.duplicate,
+      text: t("common.duplicate"),
+      action: () => {
+        onSelectDuplicate?.();
+      },
+    },
     {
       icon: item.enabled ? svgIcons.eyeClose : svgIcons.eye,
       text: item.enabled ? t("common.deactivate") : t("common.activate"),

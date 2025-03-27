@@ -121,3 +121,11 @@ const transcriptionsEnriched: AudioCardItem[] = transcriptionsFiltered.map(
     client:load
   />
 </Layout>
+
+<script>
+  window.addEventListener("pageshow", (event) => {
+    if (event.persisted) {
+      window.location.reload();
+    }
+  });
+</script>
