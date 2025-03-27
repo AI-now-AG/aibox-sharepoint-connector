@@ -29,6 +29,7 @@
     azureOpenAIKey?: string;
     perplexityKey?: string;
     azureSpeechKey?: string;
+    falAiKey?: string;
   }
 
   let {
@@ -37,12 +38,18 @@
     azureOpenAIKey = "",
     perplexityKey = "",
     azureSpeechKey = "",
+    falAiKey = "",
   }: Props = $props();
 
-  let addTanantAdminModal: HTMLDialogElement | undefined = $state();
+  let addTenantAdminModal: HTMLDialogElement | undefined = $state();
   let confirmUpdateModal: HTMLDialogElement | undefined = $state();
   let alertModal: HTMLDialogElement | undefined = $state();
   let alertMessage = $state("");
+
+  // demo***
+  let count1 = 50;
+  let count2 = 20;
+  let count3 = 25;
 
   const MODE = {
     Create: "create",
@@ -70,6 +77,7 @@
   let azureOpenAIKeyField: HTMLInputElement;
   let perplexityKeyField: HTMLInputElement;
   let azureOpenAIKeyProField: HTMLInputElement;
+  let falOpenAIKeyField: HTMLInputElement;
   let defaultTextFeature = $state("");
 
   // API providers
@@ -396,6 +404,7 @@
             azure_openai_api_key: azureOpenAIKey,
             perplexity_api_key: perplexityKey,
             speech_api_key: azureSpeechKey,
+            fal_ai_api_key: falAiKey,
           });
         if (encryptKeysError) {
           showAlert(encryptKeysError?.toString());
@@ -406,6 +415,7 @@
           azure_openai_api_key,
           perplexity_api_key,
           speech_api_key,
+          fal_ai_api_key,
         } = data;
 
         cleanupValues();
@@ -414,6 +424,7 @@
         tenantData.azure_openai_api_key = azure_openai_api_key;
         tenantData.speech_api_key = speech_api_key;
         tenantData.perplexity_api_key = perplexity_api_key;
+        tenantData.fal_ai_api_key = fal_ai_api_key;
 
         tenantData.perplexity_chat_model = selectedPerplexityModel;
         updateTextFeature(ApiKeyProvider.OpenAI, openAIEnabled);
@@ -480,6 +491,7 @@
             azure_openai_api_key: azureOpenAIKey,
             perplexity_api_key: perplexityKey,
             speech_api_key: azureSpeechKey,
+            fal_ai_api_key: falAiKey,
           });
         if (encryptKeysError) {
           showAlert(encryptKeysError?.toString());
@@ -701,7 +713,7 @@
             class={"mt-7 btn btn-outline font-normal grow-0 w-auto " +
               `${mode == MODE.Edit ? "" : "btn-disabled"}`}
             onclick={() => {
-              addTanantAdminModal?.show();
+              addTenantAdminModal?.show();
             }}
           >
             {@html svgIcons.add}
@@ -713,6 +725,7 @@
 
     <div class="divider"></div>
 
+    <!-- Features -->
     <div class="mb-3 flex flex-row items-center gap-2">
       {@html svgIcons.textPrompt}
       <p class="font-medium text-md">{t("tenant.text.prompt.features")}</p>
@@ -999,6 +1012,7 @@
 
     <div class="divider"></div>
 
+    <!-- Audio tools -->
     <div class="mb-3 flex flex-row items-center gap-2">
       {@html svgIcons.audioToText}
       <p class="font-medium text-md">{t("nav.audiotool")}</p>
@@ -1199,13 +1213,173 @@
 
     <div class="divider"></div>
 
+    <!-- Image creation -->
+    <div class="mb-3 flex flex-row items-center gap-2">
+      {@html svgIcons.image}
+      <p class="font-medium text-md">{t("nav.create-image")}</p>
+    </div>
+
+    <div class="container mx-auto">
+      <!-- DALL-E (Open AI) Section -->
+      <div
+        class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
+      >
+        <input type="checkbox" />
+        <div class="collapse-title flex items-center justify-between gap-4">
+          <div class="flex items-center">
+            <input
+              id="image-dalle-model"
+              type="checkbox"
+              checked={true}
+              class="checkbox checkbox-primary z-10"
+              value="text-prompt"
+            />
+            <label class="label cursor-pointer ml-2" for="image-dalle-model">
+              <span class="label-text text-base-content"
+                >{"DALL-E (Open AI)"}</span
+              >
+            </label>
+          </div>
+        </div>
+
+        <div class="collapse-content space-y-6">
+          <div class="grid grid-cols-3 gap-4 mx-8">
+            <div class="w-full">
+              <span class="mb-2 text-base-content/50 font-medium text-sm"
+                >{"Images per month"}
+              </span>
+
+              <input
+                type="number"
+                class="input input-bordered mt-2 w-full"
+                placeholder={""}
+                use:trimInput
+                bind:value={count1}
+              />
+            </div>
+            <div class="w-full">
+              <span class="mb-2 text-base-content/50 font-medium text-sm"
+                >{"Images created this month"}</span
+              >
+              <input
+                type="number"
+                class="input input-bordered mt-2 w-full"
+                placeholder={""}
+                use:trimInput
+                disabled={true}
+                bind:value={count2}
+              />
+            </div>
+            <div class="w-full">
+              <span class="mb-2 text-base-content/50 font-medium text-sm"
+                >{"Add Images for this month"}</span
+              >
+              <input
+                type="number"
+                class="input input-bordered mt-2 w-full"
+                placeholder={""}
+                use:trimInput
+                bind:value={count3}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Flux -->
+      <div
+        class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
+      >
+        <input type="checkbox" />
+        <div class="collapse-title flex items-center justify-between gap-4">
+          <div class="flex items-center">
+            <input
+              id="image-flux-model"
+              type="checkbox"
+              checked={true}
+              class="checkbox checkbox-primary z-10"
+              value="text-prompt"
+            />
+            <label class="label cursor-pointer ml-2" for="image-flux-model">
+              <span class="label-text text-base-content">{"Flux"}</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="collapse-content space-y-6">
+          <div class="grid grid-cols-2 gap-4 mx-8">
+            <div class="w-full">
+              <span class="mb-2 text-base-content/50 font-medium text-sm"
+                >{"API Key"}</span
+              >
+              <label
+                class="input input-bordered flex items-center gap-2 mt-2 w-full"
+              >
+                <input
+                  bind:this={falOpenAIKeyField}
+                  type="password"
+                  class="grow"
+                  placeholder={t("tenant.api-key")}
+                  bind:value={azureSpeechKey}
+                />
+                <TogglePasswordIcon
+                  change={() => togglePassword(falOpenAIKeyField)}
+                />
+              </label>
+            </div>
+          </div>
+          <div class="grid grid-cols-3 gap-4 mx-8">
+            <div class="w-full">
+              <span class="mb-2 text-base-content/50 font-medium text-sm"
+                >{"Images per month"}
+              </span>
+
+              <input
+                type="number"
+                class="input input-bordered mt-2 w-full"
+                placeholder={""}
+                use:trimInput
+                bind:value={count1}
+              />
+            </div>
+            <div class="w-full">
+              <span class="mb-2 text-base-content/50 font-medium text-sm"
+                >{"Images created this month"}</span
+              >
+              <input
+                type="number"
+                class="input input-bordered mt-2 w-full"
+                placeholder={""}
+                use:trimInput
+                disabled={true}
+                bind:value={count2}
+              />
+            </div>
+            <div class="w-full">
+              <span class="mb-2 text-base-content/50 font-medium text-sm"
+                >{"Add Images for this month"}</span
+              >
+              <input
+                type="number"
+                class="input input-bordered mt-2 w-full"
+                placeholder={""}
+                use:trimInput
+                bind:value={count3}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- User Managment -->
     <div class="mb-3 flex flex-row items-center gap-2">
       {@html svgIcons.userGroup}
       <p class="font-medium text-md">{t("user.user-management")}</p>
     </div>
 
     <div class="container mx-auto">
-      <!-- User Managment Section -->
       <div class="bg-base-100 shadow-sm rounded-lg my-4">
         <div class="flex p-4 items-center justify-between">
           <div class="flex items-center">
@@ -1255,7 +1429,7 @@
   title={t("tenant.tenants.tenant.update-confirmation")}
 />
 <InputDialog
-  bind:modal={addTanantAdminModal}
+  bind:modal={addTenantAdminModal}
   bind:value={tenantAdminEmail}
   bind:errorMessage={tenantAdminEmailErrorMessage}
   title={t("tenant.add-tenant-admin")}
@@ -1265,7 +1439,7 @@
       tenantAdminEmailErrorMessage = t("tenant.email-invalid");
     } else {
       tenantAdminEmailErrorMessage = "";
-      addTanantAdminModal?.close();
+      addTenantAdminModal?.close();
       createTenantAdmin();
     }
   }}

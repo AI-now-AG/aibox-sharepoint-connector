@@ -20,11 +20,18 @@ if (!tenant) {
 }
 
 const data = transformRawData(tenant);
-const { openai_api_key, azure_openai_api_key, speech_api_key, perplexity_api_key } = data || {};
+const {
+  openai_api_key,
+  azure_openai_api_key,
+  speech_api_key,
+  perplexity_api_key,
+  fal_ai_api_key,
+} = data || {};
 let openAIKey = "";
 let azureOpenAIKey = "";
 let perplexityKey = "";
 let azureSpeechKey = "";
+let falAiKey = "";
 
 if (openai_api_key) {
   openAIKey = decrypt(openai_api_key);
@@ -41,6 +48,10 @@ if (speech_api_key) {
 if (perplexity_api_key) {
   perplexityKey = decrypt(perplexity_api_key);
 }
+
+if (fal_ai_api_key) {
+  falAiKey = decrypt(fal_ai_api_key);
+}
 ---
 
 <Layout>
@@ -50,6 +61,7 @@ if (perplexity_api_key) {
     azureOpenAIKey={azureOpenAIKey?.trim()}
     perplexityKey={perplexityKey?.trim()}
     azureSpeechKey={azureSpeechKey?.trim()}
+    falAiKey={falAiKey?.trim()}
     client:load
   />
 </Layout>

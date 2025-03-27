@@ -40,6 +40,7 @@ const TenantInputParamsSchema = z.object({
   speech_region: z.string().optional(),
   perplexity_api_key: z.string().optional(),
   perplexity_chat_model: z.string().optional(),
+  fal_ai_api_key: z.string().optional(),
   included_features: z.array(IncludedFeaturesSchema),
   transcription_types: z.array(z.nativeEnum(AudioCategory)).optional(),
   is_restrict_user_managment: z
@@ -55,6 +56,7 @@ const TenanKeyEncryptSchema = z.object({
   azure_openai_api_key: z.string().optional(),
   perplexity_api_key: z.string().optional(),
   speech_api_key: z.string().optional(),
+  fal_ai_api_key: z.string().optional(),
 });
 
 const TenantInputIdentifierSchema = z.object({
@@ -329,6 +331,7 @@ export const tenant = {
         azure_openai_api_key,
         perplexity_api_key,
         speech_api_key,
+        fal_ai_api_key,
       } = input;
       if (openai_api_key) {
         input.openai_api_key = encrypt(openai_api_key);
@@ -341,6 +344,9 @@ export const tenant = {
       }
       if (speech_api_key) {
         input.speech_api_key = encrypt(speech_api_key);
+      }
+      if (fal_ai_api_key) {
+        input.fal_ai_api_key = encrypt(fal_ai_api_key);
       }
 
       return input;
