@@ -66,9 +66,6 @@
     const attachedFiles = eventTarget.files || [];
     if (attachedFiles.length > 0) {
       const file = attachedFiles[attachedFiles.length - 1];
-      console.log(file.size);
-      console.log(file.type);
-      console.log(acceptedTypes);
       const isValid = isFileValid(file.size, file.type);
       if (isValid) {
         const newFiles = Array.from(attachedFiles).filter(

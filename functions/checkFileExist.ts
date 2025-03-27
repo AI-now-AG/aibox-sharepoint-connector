@@ -34,6 +34,10 @@ const checkFileExist: Handler = async (event, context) => {
   let requireFilesCount = fileNames.length || 0;
   const tempFileNames: string[] = [];
 
+  const host = event.headers["host"] || "Not available";
+  const protocol = event.headers["x-forwarded-proto"] || "https";
+  const previewUrl = `${protocol}://${host}`;
+
   const improvedTxtFileName = `${uniqueName}_improved.txt`;
   if (isShowImprovedTextPreview) {
     requireFilesCount += 1;
@@ -72,6 +76,7 @@ const checkFileExist: Handler = async (event, context) => {
       let jsonFileUrl = "";
       let rawTxtContent = "";
       await checkAndUploadLargeFile(
+        previewUrl,
         tenantId,
         userId,
         uniqueName,
@@ -202,6 +207,7 @@ const checkFileExist: Handler = async (event, context) => {
 };
 
 const checkAndUploadLargeFile = async (
+  baseUrl: string,
   tenantId: string,
   userId: string,
   uniqueName: string,
@@ -247,6 +253,7 @@ const checkAndUploadLargeFile = async (
     );
     if (!response.isRunning && response.fileURL) {
       await postAudioProProcess(
+        baseUrl,
         tenantId,
         userId,
         uniqueName,
@@ -332,6 +339,7 @@ export async function pollingAndStatus(
 }
 
 async function postAudioProProcess(
+  baseUrl: string,
   tenantId: string,
   userId: string,
   uniqueName: string,
@@ -346,7 +354,8 @@ async function postAudioProProcess(
 ): Promise<void> {
   try {
     const response = await fetch(
-      `${process.env.URL}/.netlify/functions/postAudioProProcess-background`,
+      `${baseUrl}/.netlify/functions/postAudioProProcess-background`,
+      // `${process.env.URL}/.netlify/functions/postAudioProProcess-background`,
       //`https://deploy-preview-207.test.aibox-app.com/.netlify/functions/postAudioProProcess-background`,
       {
         method: "POST",

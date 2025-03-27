@@ -35,7 +35,6 @@
 
   function handleDndConsider(e: CustomEvent) {
     items = e.detail.items;
-    console.log("category list / consider dispatched", { items });
   }
 
   function handleDndFinalize(e: CustomEvent) {
@@ -46,7 +45,6 @@
       updatePosition(items);
       reloadPage();
     }, 300);
-    console.log("category list / finalize dispatched", { items });
   }
 
   async function handleDelete(categoryId: string) {
