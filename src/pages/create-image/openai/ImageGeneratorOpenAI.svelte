@@ -2,6 +2,7 @@
 <!-- svelte-ignore a11y_label_has_associated_control -->
 <script>
   import { useTranslations } from "$i18n/utils";
+  import ImageCreationUsage from "../ImageCreationUsage.svelte";
   const t = useTranslations();
 
   let prompt = "";
@@ -239,25 +240,10 @@
       </div>
     {/if}
 
-    <div
-      class="mt-6 card bg-base-100 shadow-lg p-4 w-64 ml-auto fixed bottom-10 right-4"
-    >
-      <h3 class="text-sm font-semibold text-gray-700">
-        {t("create-image.usage.current-usage")}
-      </h3>
-      <p class="text-sm text-gray-600 mt-2">
-        {t("create-image.usage.today-usage", { amount: usageStats.today })}
-      </p>
-      <p class="text-sm text-gray-600">
-        {t("create-image.usage.this-month-usage", {
-          amount: usageStats.thisMonth,
-        })}
-      </p>
-      <p class="text-sm text-gray-600">
-        {t("create-image.usage.available-images", {
-          amount: usageStats.available,
-        })}
-      </p>
-    </div>
+    <ImageCreationUsage
+      todayAmount={usageStats.today}
+      thisMonthAmount={usageStats.thisMonth}
+      availableAmount={usageStats.available}
+    />
   </div>
 </div>
