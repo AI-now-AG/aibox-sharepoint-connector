@@ -1,5 +1,6 @@
 import { useTranslations } from "$i18n/utils";
 const t = useTranslations();
+
 export enum TenantFeature {
   TextPrommpts = "text-prommpts",
   AudioToText = "audio-to-text",

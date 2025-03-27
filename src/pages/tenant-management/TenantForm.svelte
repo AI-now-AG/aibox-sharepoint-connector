@@ -15,7 +15,11 @@
   import { type TenantTheme } from "$data/models/tenant.model";
   import InputDialog from "$components/InputDialog.svelte";
   import { isValidEmail } from "$utils/common";
-  import { ApiKeyProvider, AudioCategory } from "$types/TenantFeature";
+  import {
+    TenantFeature,
+    ApiKeyProvider,
+    AudioCategory,
+  } from "$types/TenantFeature";
   import SelectionInput from "./SelectionInput.svelte";
   import SingleInput from "$pages/prompt-library/prompts/SingleInput.svelte";
   import ThemeItem from "./ThemeItem.svelte";
@@ -56,11 +60,6 @@
     Edit: "edit",
   };
 
-  const TenantFeature = {
-    TextPrommpts: "text-prommpts",
-    AudioToText: "audio-to-text",
-  };
-
   // mode
   const mode = tenant ? MODE.Edit : MODE.Create;
   const headerTitle =
@@ -72,6 +71,8 @@
   let openAIEnabled: boolean = $state(false);
   let azureOpenAIEnabled: boolean = $state(false);
   let perplexityEnabled: boolean = $state(false);
+  let dalleEnabled: boolean = $state(false);
+  let fluxEnabled: boolean = $state(false);
 
   let openAIKeyField: HTMLInputElement;
   let azureOpenAIKeyField: HTMLInputElement;
@@ -220,6 +221,15 @@
     openAIEnabled = findProvider(ApiKeyProvider.OpenAI);
     azureOpenAIEnabled = findProvider(ApiKeyProvider.AzureOpenAI);
     perplexityEnabled = findProvider(ApiKeyProvider.Perplexity);
+
+    dalleEnabled = tenantData.included_features.some(
+      (item: any) =>
+        item.name == TenantFeature.CreateImage &&
+        item.provider == ApiKeyProvider.OpenAI,
+    );
+    fluxEnabled = tenantData.included_features.some(
+      (item: any) => item.provider == ApiKeyProvider.Flux,
+    );
 
     defaultTextFeature =
       api_key_providers.find((item: any) => item.default)?.name ||
@@ -452,6 +462,20 @@
             .map((item) => item.type);
         }
 
+        if (dalleEnabled) {
+          tenantData.included_features.push({
+            name: TenantFeature.CreateImage,
+            provider: ApiKeyProvider.OpenAI,
+          });
+        }
+
+        if (fluxEnabled) {
+          tenantData.included_features.push({
+            name: TenantFeature.CreateImage,
+            provider: ApiKeyProvider.Flux,
+          });
+        }
+
         if (tenantAdminEmail && isValidEmail(tenantAdminEmail)) {
           tenantData.tenant_admin_email = tenantAdminEmail;
         }
@@ -544,6 +568,20 @@
         if (isAzureAudioProEnabled) {
         }
         tenantData.transcription_types = updatedTranscriptionTypes;
+
+        if (dalleEnabled) {
+          tenantData.included_features.push({
+            name: TenantFeature.CreateImage,
+            provider: ApiKeyProvider.OpenAI,
+          });
+        }
+
+        if (fluxEnabled) {
+          tenantData.included_features.push({
+            name: TenantFeature.CreateImage,
+            provider: ApiKeyProvider.Flux,
+          });
+        }
 
         if (tenantAdminEmail && isValidEmail(tenantAdminEmail)) {
           tenantData.tenant_admin_email = tenantAdminEmail;
@@ -1230,7 +1268,7 @@
             <input
               id="image-dalle-model"
               type="checkbox"
-              checked={true}
+              bind:checked={dalleEnabled}
               class="checkbox checkbox-primary z-10"
               value="text-prompt"
             />
@@ -1295,7 +1333,7 @@
             <input
               id="image-flux-model"
               type="checkbox"
-              checked={true}
+              bind:checked={fluxEnabled}
               class="checkbox checkbox-primary z-10"
               value="text-prompt"
             />
