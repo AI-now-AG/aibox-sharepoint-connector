@@ -41,6 +41,19 @@
       `/settings/transcription/UsecaseForm?${params.toString()}`,
     );
   }
+
+  async function duplicateCard(index: number) {
+    const params = new URLSearchParams({
+      type: typeParam,
+      id: items[index]?.id || "",
+      mode: "clone",
+    });
+
+    window.location.assign(
+      `/settings/transcription/UsecaseForm?${params.toString()}`,
+    );
+  }
+
   function onDeleteCard(index: number) {
     selectedDeletePromptId = items[index]?.id ?? "";
     confirmDeleteModal?.show();
@@ -127,6 +140,9 @@
         }}
         onSelectDelete={() => {
           onDeleteCard(index);
+        }}
+        onSelectDuplicate={() => {
+          duplicateCard(index);
         }}
         onSelecteEnabled={() => {
           updateCardStatus(index);
