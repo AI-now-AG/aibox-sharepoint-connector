@@ -6,6 +6,7 @@
   import { svgIcons } from "$assets/icons";
   import { type TranscriptionCard } from "$types/TranscriptionCard";
   import { AudioCategory } from "$types/TenantFeature";
+  import { onMount } from "svelte";
   const t = useTranslations();
 
   interface Props {
@@ -17,6 +18,7 @@
     isNew?: boolean;
     selectedUsecaseId?: string | undefined;
     isEditable: boolean;
+    mode?: "create" | "update" | "clone";
   }
 
   let {
@@ -28,6 +30,7 @@
     isNew = true,
     selectedUsecaseId,
     isEditable = false,
+    mode: screenMode,
   }: Props = $props();
 
   let isSaving = $state(false);
@@ -37,8 +40,7 @@
       category !== undefined &&
       isEnabled !== undefined,
   );
-
-  console.log("isnew:", isNew);
+  let mode = $state(screenMode ?? (isNew ? "create" : "update"));
 
   let subtitleList = $state(
     [
@@ -66,6 +68,14 @@
       .map((e) => e.title)
       .join(", "),
   );
+
+  onMount(() => {
+    if (mode == "clone") {
+      isNew = true
+      instructionTitle =
+        instructionTitle?.trim() + " (" + t("common.copy") + ")";
+    }
+  });
 
   function preventDefault(fn) {
     return function (event) {
