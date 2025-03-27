@@ -7,6 +7,7 @@ import { transcription } from "./transcription";
 import { user } from "./user";
 import { perplexity } from "./perplexity";
 import { knowledgebase } from "./knowledgebase";
+import { usage } from "./usage";
 
 export const server = {
   tenant,
@@ -18,4 +19,5 @@ export const server = {
   user,
   perplexity,
   knowledgebase,
+  usage,
 };
