@@ -6,11 +6,10 @@ import {
   SystemMessage,
   AIMessage,
 } from "@langchain/core/messages";
-import { StringOutputParser } from "@langchain/core/output_parsers";
+import { AIMessageChunk } from "@langchain/core/messages";
 import { fileLoader } from "$utils/document-loader";
 import initializeOpenAI from "$utils/chatModel";
 import { MessageRole } from "$types/MessageHistory";
-import ChatPerplexity from "$llm/Perplexity";
 
 const AttachmentSchema = z.object({
   name: z.string(),
@@ -104,8 +103,6 @@ export const POST: APIRoute = async (ctx) => {
       }
     }
 
-    const parser = new StringOutputParser();
-
     const headers = new Headers();
     headers.set("Content-Type", "text/plain; charset=UTF-8");
     headers.set("Transfer-Encoding", "chunked");
@@ -114,26 +111,25 @@ export const POST: APIRoute = async (ctx) => {
     const writer = writable.getWriter();
 
     const model = initializeOpenAI(ctx);
-   
+
     (async () => {
       try {
         let isSentCitations = false;
-        let citations = [];
         let partialChunk = "";
-
-        const stream: any = await model.pipe(parser).stream(messages);
+        const stream: AsyncIterable<AIMessageChunk> =
+          await model.stream(messages);
         for await (const chunk of stream) {
-          if (model instanceof ChatPerplexity) {
-            citations = chunk.citations ?? [];
-            if (!isSentCitations) {
-              isSentCitations = true;
-              await writer.write(encoder.encode(JSON.stringify({ citations })));
-            }
-            partialChunk = chunk.choices[0]?.delta?.content;
-          } else {
-            partialChunk += chunk;
+          //console.log("chunk ==> ", chunk);
+
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const rawResponse = chunk?.additional_kwargs?.__raw_response as any;
+          const citations = rawResponse.citations ?? [];
+          if (citations.length > 0 && !isSentCitations) {
+            isSentCitations = true;
+            await writer.write(encoder.encode(JSON.stringify({ citations })));
           }
 
+          partialChunk += chunk.content;
           let lastCompleteCharIndex = partialChunk.length;
           try {
             encoder.encode(partialChunk);
