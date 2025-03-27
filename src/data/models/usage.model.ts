@@ -9,8 +9,8 @@ const UsageSchema = z.object({
   tenant_id: z.instanceof(ObjectId).optional(),
   provider: z.nativeEnum(ApiKeyProvider),
   model: z.string().min(1),
-  input_tokens: z.number(),
-  output_tokens: z.number(),
+  input_tokens: z.number().default(0),
+  output_tokens: z.number().default(0),
   type: z.nativeEnum(UsageType),
   metadata: z.record(z.any()).nullish(),
   created_at: z

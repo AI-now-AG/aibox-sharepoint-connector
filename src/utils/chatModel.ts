@@ -16,7 +16,6 @@ export const initPerplexityOpenAI = (
   model: string,
   tenantId: string,
 ) => {
-  //return new Perplexity({ api_key: apiKey, model: model });
   return new ChatOpenAI({
     openAIApiKey: apiKey, // Set API key for authentication
     configuration: { baseURL: "https://api.perplexity.ai" }, // Use Perplexity's API endpoint
