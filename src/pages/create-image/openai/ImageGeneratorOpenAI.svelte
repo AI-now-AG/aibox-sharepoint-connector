@@ -1,6 +1,9 @@
 <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 <!-- svelte-ignore a11y_label_has_associated_control -->
 <script>
+  import { useTranslations } from "$i18n/utils";
+  const t = useTranslations();
+
   let prompt = "";
   let imageUrl = "";
   let loading = false;
@@ -52,7 +55,7 @@
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Something went wrong");
+        throw new Error(data.error || t("common.unexpected.error"));
       }
 
       imageUrl = data.imageUrl;
@@ -78,16 +81,18 @@
 
 <div class="flex items-center justify-center p-8">
   <div class="w-full">
-    <h1 class="text-2xl font-bold text-gray-900 mb-2">Create DALL-E Image</h1>
+    <h1 class="text-2xl font-bold text-gray-900 mb-2">
+      {t("create-image.create-dalle-image-title")}
+    </h1>
     <p class="text-sm text-gray-600 mb-4">
-      Create images from the latest DALL-E 3 Model
+      {t("create-image.create-dalle-image-description")}
     </p>
 
     <form on:submit|preventDefault={generateImage} class="space-y-4">
       <div>
         <textarea
           bind:value={prompt}
-          placeholder="Describe your picture"
+          placeholder={t("create-image.create-image-place-holder")}
           class="textarea textarea-bordered w-full h-24 rounded-lg"
         ></textarea>
       </div>
@@ -95,7 +100,7 @@
       <div class="flex space-x-4">
         <div class="flex-1">
           <label class="block text-sm font-medium text-gray-700 mb-1"
-            >Image Size</label
+            >{t("create-image.image-size-label")}</label
           >
           <div class="dropdown w-full">
             <label
@@ -103,7 +108,7 @@
               class="select select-bordered w-full rounded-lg"
             >
               {sizeOptions.find((opt) => opt.value === size)?.label ||
-                "Select Size"}
+                t("create-image.select-image-size-label")}
             </label>
             <ul
               tabindex="0"
@@ -122,7 +127,7 @@
 
         <div class="flex-1">
           <label class="block text-sm font-medium text-gray-700 mb-1"
-            >Image Quality</label
+            >{t("create-image.image-quality-label")}</label
           >
           <div class="dropdown w-full">
             <label
@@ -130,7 +135,7 @@
               class="select select-bordered w-full rounded-lg"
             >
               {qualityOptions.find((opt) => opt.value === quality)?.label ||
-                "Select Quality"}
+                t("create-image.select-image-quality-label")}
             </label>
             <ul
               tabindex="0"
@@ -152,7 +157,7 @@
 
         <div class="flex-1">
           <label class="block text-sm font-medium text-gray-700 mb-1"
-            >Output format</label
+            >{t("create-image.image-format-label")}</label
           >
           <div class="dropdown w-full">
             <label
@@ -160,7 +165,7 @@
               class="select select-bordered w-full rounded-lg"
             >
               {outputOptions.find((opt) => opt.value === outputFormat)?.label ||
-                "Select Output format"}
+                t("create-image.select-image-format-label")}
             </label>
             <ul
               tabindex="0"
@@ -186,7 +191,9 @@
         disabled={loading}
         class="btn btn-primary w-40 rounded-lg"
       >
-        {loading ? "Generating..." : "Generate Image"}
+        {loading
+          ? t("create-image.image-generatiing")
+          : t("create-image.generate-image")}
       </button>
     </form>
 
@@ -205,7 +212,7 @@
           on:click={downloadImage}
           class="btn btn-primary w-40 rounded-lg mt-4"
         >
-          Download
+          {t("create-image.download")}
         </button>
       </div>
     {/if}
@@ -213,13 +220,21 @@
     <div
       class="mt-6 card bg-base-100 shadow-lg p-4 w-64 ml-auto fixed bottom-10 right-4"
     >
-      <h3 class="text-sm font-semibold text-gray-700">Current Usage</h3>
-      <p class="text-sm text-gray-600 mt-2">Today: {usageStats.today} images</p>
-      <p class="text-sm text-gray-600">
-        This month: {usageStats.thisMonth} images
+      <h3 class="text-sm font-semibold text-gray-700">
+        {t("create-image.usage.current-usage")}
+      </h3>
+      <p class="text-sm text-gray-600 mt-2">
+        {t("create-image.usage.today-usage", { amount: usageStats.today })}
       </p>
       <p class="text-sm text-gray-600">
-        Available: {usageStats.available} images
+        {t("create-image.usage.this-month-usage", {
+          amount: usageStats.thisMonth,
+        })}
+      </p>
+      <p class="text-sm text-gray-600">
+        {t("create-image.usage.availble-images", {
+          amount: usageStats.available,
+        })}
       </p>
     </div>
   </div>
