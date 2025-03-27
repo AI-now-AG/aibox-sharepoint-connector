@@ -37,12 +37,14 @@ export const POST: APIRoute = async (ctx) => {
       n: 1,
       size,
       quality,
-      response_format: "url",
+      response_format: "b64_json",
     });
 
-    const imageUrl = response.data[0].url;
+    console.log("Generated image with DALL-E 3 RESPONSE:", response.data[0]);
 
-    return new Response(JSON.stringify({ imageUrl }), {
+    const image = response.data[0].b64_json;
+
+    return new Response(JSON.stringify({ image }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
