@@ -13,21 +13,48 @@ const t = useTranslations();
 
 const { title = t("site.title"), description = t("site.description") } =
   Astro.props;
+
+let theme = "light";
+
+switch (Astro.locals.user?.tenant_id?.toString()) {
+  case "66aa21a3d40d0b194e280143":
+    theme = "somedia";
+    break;
+  case "674347ba64f450769a147f6a":
+    theme = "weihnachtsmann";
+    break;
+  default:
+    theme = "light";
+}
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme={theme}>
   <Head {title} {description} />
   <body class="min-h-screen grid grid-rows-[min-content_1fr]">
     <div class="drawer lg:drawer-open">
       <input id="left-drawer-trigger" type="checkbox" class="drawer-toggle" />
       <div class="drawer-content grid grid-rows-[1fr_min-content]">
-        <main
-          class="min-h-screen flex w-full flex-col lg:basis-2/3 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900"
-        >
+        <main class="min-w-xs min-h-screen flex w-full flex-col">
           <slot />
         </main>
       </div>
     </div>
   </body>
 </html>
+
+<script define:vars={{ theme }} is:inline>
+
+  // set default theme in storage
+  if (theme) {
+    const data = localStorage.getItem("theme");
+    if (data) {
+      document.documentElement.setAttribute("data-theme", data);
+    }
+  } else {
+    const data = localStorage.getItem("theme");
+    if (data) {
+      document.documentElement.setAttribute("data-theme", data);
+    }
+  }
+</script>

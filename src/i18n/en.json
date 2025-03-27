@@ -344,9 +344,12 @@
   "common.logout": "Logout",
   "common.refresh": "Refresh",
   "common.back-to-home": "Back to Home",
-  "common.error-title": " An Error Occurred",
+  "common.error-title": "An Error Occurred",
   "common.error-description": "Sorry, something went wrong on our end. Please try refreshing the page or come back later.",
   "existing-email.error-title": "Account already paired with different user",
   "existing-email.error-description": "A different authentication method is used for this account",
-  "common.support": "Support"
+  "common.support": "Support",
+  "user.logout.title": "Log out",
+  "user.logout.message": "You have successfully logged out of the application.",
+  "user.logout.button": "Back to homepage"
 }
