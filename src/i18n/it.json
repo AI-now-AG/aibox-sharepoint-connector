@@ -371,5 +371,10 @@
   "create-image.usage.this-month-usage": "This month: ${amount} images",
   "create-image.usage.available-images": "Available: ${amount} images",
   "create-image.prompt-required-error": "Please describe your image ",
-  "create-image.invalid-custom-size-error": "Please input correct custom size"
+  "create-image.invalid-custom-size-error": "Please input correct custom size",
+  "create-image.width": "Width",
+  "create-image.height": "Heigh",
+  "nav.create-image": "IMGAE CREATION",
+  "nav.create-image.dall-e": "DALL-E",
+  "nav.create-image.flux": "Flux"
 }

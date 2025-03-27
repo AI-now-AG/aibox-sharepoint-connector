@@ -57,6 +57,7 @@ import textPrompt from "$assets/icons/textPrompt.svg?raw";
 import userGroup from "$assets/icons/user-group.svg?raw";
 import questionMark from "$assets/icons/question.svg?raw";
 import hamburger from "$assets/icons/hamburger.svg?raw";
+import image from "$assets/icons/image.svg?raw";
 
 export const svgIcons = {
   menuSettings,
@@ -118,4 +119,5 @@ export const svgIcons = {
   userGroup,
   questionMark,
   hamburger,
+  image,
 };

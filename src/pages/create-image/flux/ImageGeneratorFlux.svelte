@@ -168,7 +168,7 @@
             <div class="flex space-x-2 mt-2">
               <div class="flex-1">
                 <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Width
+                  {t("create-image.width")}
                 </label>
                 <input
                   type="number"
@@ -180,7 +180,7 @@
               </div>
               <div class="flex-1">
                 <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Height
+                  {t("create-image.height")}
                 </label>
                 <input
                   type="number"
