@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { slide } from "svelte/transition";
+  import { slide, fly } from "svelte/transition";
   import TextOuput from "./TextOuput.svelte";
   import StartNewConfirmDialog from "./StartNewConfirmDialog.svelte";
   import { useTranslations } from "$i18n/utils";
@@ -79,9 +79,13 @@
   let jsonFileChecked = $state(selectedFileFormat.includes(FileFormat.JSON));
   let txtFileChecked = $state(selectedFileFormat.includes(FileFormat.TXT));
 
-  let languageLocales: Item[] = $state([
+  let languageLocales = $state([
     { title: "Deutsch (Schweiz)", checked: true, locales: "de-ch" },
-    { title: "Deutsch (Deutschland)", checked: true, locales: "de-de" },
+    {
+      title: "Deutsch (Deutschland)",
+      checked: category === AudioCategory.AudioPro ? false : true,
+      locales: "de-de",
+    },
     { title: "Italienisch (Schweiz)", checked: false, locales: "it-ch" },
     { title: "Italienisch (Italien)", checked: false, locales: "it-it" },
     { title: "Französisch (Schweiz)", checked: false, locales: "fr-ch" },
@@ -89,7 +93,7 @@
     { title: "Englisch (US)", checked: false, locales: "en-us" },
     { title: "Englisch (UK)", checked: false, locales: "en-gb" },
   ]);
-  const inputValue = $derived(
+  const langSelectionValue = $derived(
     languageLocales
       .filter((e) => e.checked === true)
       .map((e) => e.title)
@@ -100,11 +104,17 @@
     languageLocales.filter((e) => e.checked === true).length,
   );
 
-  function handleSelectedItems(selected: Item) {
+  function handleSelectedItems(selected: any) {
     const idx = languageLocales.indexOf(selected);
     if (idx !== -1) {
+      if (category === AudioCategory.AudioPro) {
+        languageLocales.forEach((item) => (item.checked = false));
+      }
       languageLocales[idx].checked = !languageLocales[idx].checked;
     }
+    languageLocales = [...languageLocales].sort(
+      (a, b) => Number(b.checked) - Number(a.checked),
+    );
   }
 
   onMount(async () => {
@@ -1297,7 +1307,7 @@
     </div>
   {/if}
 
-  {#if category === AudioCategory.SubtitleLarge}
+  {#if category === AudioCategory.SubtitleLarge || category === AudioCategory.AudioPro}
     <div class="bg-base-100 mt-10 p-4 px-6 rounded-xl">
       <p class="mb-2">{t("audiotools.subtitles.languageSettings")}</p>
       <div class="flex flex-row items-center mt-4 space-x-4">
@@ -1328,7 +1338,7 @@
                 placeholder={t(
                   "audiotools.subtitles.select.languageTranscription",
                 )}
-                value={inputValue}
+                value={langSelectionValue}
                 role="button"
                 class="w-auto min-w-0 font-medium grow"
                 readonly
@@ -1353,10 +1363,10 @@
             {#if languageLocales}
               <ul
                 tabindex="-1"
-                class="dropdown-content menu bg-base-100 space-y-2 rounded-box z-1 w-52 p-2 shadow-sm"
+                class="dropdown-content menu bg-base-100 space-y-2 rounded-box z-1 p-2 shadow-sm"
               >
                 {#each languageLocales as item}
-                  <li>
+                  <li transition:slide>
                     <button
                       onclick={preventDefault(() => handleSelectedItems(item))}
                       class={`${item.checked === true ? "bg-primary text-primary-content hover:bg-primary" : "hover:text-neutral"}`}
@@ -1379,7 +1389,7 @@
             {/if}
           </div>
         </div>
-        {#if selectedLangLength < 2}
+        {#if (category === AudioCategory.SubtitleLarge && selectedLangLength < 2) || (category === AudioCategory.AudioPro && selectedLangLength < 1)}
           <div transition:slide role="alert" class="alert alert-warning">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -1394,7 +1404,11 @@
                 d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
               />
             </svg>
-            <span>Wählen Sie mindestens 2 Sprachen aus!</span>
+            <span>
+              {category === AudioCategory.SubtitleLarge
+                ? "Wählen Sie mindestens 2 Sprachen aus!"
+                : "Wählen Sie mindestens 1 Sprache aus!"}
+            </span>
           </div>
         {/if}
       </div>
