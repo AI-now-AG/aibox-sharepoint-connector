@@ -123,7 +123,7 @@ export const POST: APIRoute = async (ctx) => {
 
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const rawResponse = chunk?.additional_kwargs?.__raw_response as any;
-          const citations = rawResponse.citations ?? [];
+          const citations = rawResponse?.citations ?? [];
           if (citations.length > 0 && !isSentCitations) {
             isSentCitations = true;
             await writer.write(encoder.encode(JSON.stringify({ citations })));

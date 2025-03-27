@@ -56,4 +56,22 @@ export default {
   listByTenant: async (tenantId: string) => {
     return collection.find<Document<Usage>>({ tenant_id: tenantId });
   },
+
+  listUsageSummary: async () => {
+    // Execute the aggregation
+    return collection.aggregate([
+      {
+        $group: {
+          _id: {
+            tenant_id: "$tenant_id",
+            provider: "$provider",
+            model: "$model",
+            type: "$type",
+          },
+          total_input: { $sum: "$input_tokens" },
+          total_output: { $sum: "$output_tokens" },
+        },
+      },
+    ]);
+  },
 };
