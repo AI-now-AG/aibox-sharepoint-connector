@@ -1,9 +1,27 @@
 import { decrypt } from "$utils/secure";
-import type { APIRoute } from "astro";
+import type { APIContext, APIRoute } from "astro";
 import { fal } from "@fal-ai/client";
 import type { ImageSize } from "@fal-ai/client/endpoints";
+import { ApiKeyProvider } from "$types/TenantFeature";
+import { UsageType } from "$types/UsageTracking";
+import UsageModel, { type Usage } from "$data/models/usage.model";
 
-export const POST: APIRoute = async (ctx) => {
+const recordImageUsage = async (ctx: APIContext) => {
+  try {
+    const usage: Partial<Omit<Usage, "_id">> = {
+      tenant_id: ctx.locals.tenant._id,
+      provider: ApiKeyProvider.Flux,
+      model: "fal-ai/flux/dev",
+      type: UsageType.Image,
+    };
+
+    await UsageModel.create(usage);
+  } catch (error) {
+    console.error("Error recording image usage:", error);
+  }
+};
+
+export const POST: APIRoute = async (ctx: APIContext) => {
   const { request } = ctx;
   try {
     if (!ctx.locals.tenant?.fal_ai_api_key) {
@@ -50,6 +68,8 @@ export const POST: APIRoute = async (ctx) => {
     const imageResponse = await fetch(imageUrl);
     const imageBuffer = await imageResponse.arrayBuffer();
     const base64Image = Buffer.from(imageBuffer).toString("base64");
+
+    recordImageUsage(ctx);
 
     return new Response(JSON.stringify({ image: base64Image }), {
       status: 200,

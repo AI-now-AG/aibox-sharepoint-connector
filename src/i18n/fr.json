@@ -374,7 +374,7 @@
   "create-image.invalid-custom-size-error": "Please input correct custom size",
   "create-image.width": "Width",
   "create-image.height": "Heigh",
-  "nav.create-image": "IMGAE CREATION",
+  "nav.create-image": "IMAGE CREATION",
   "nav.create-image.dall-e": "DALL-E",
   "nav.create-image.flux": "Flux"
 }

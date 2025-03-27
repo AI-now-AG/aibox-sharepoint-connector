@@ -1,8 +1,26 @@
 import { decrypt } from "$utils/secure";
-import type { APIRoute } from "astro";
+import type { APIContext, APIRoute } from "astro";
 import { OpenAI } from "openai";
+import { ApiKeyProvider } from "$types/TenantFeature";
+import { UsageType } from "$types/UsageTracking";
+import UsageModel, { type Usage } from "$data/models/usage.model";
 
-export const POST: APIRoute = async (ctx) => {
+const recordImageUsage = async (ctx: APIContext) => {
+  try {
+    const usage: Partial<Omit<Usage, "_id">> = {
+      tenant_id: ctx.locals.tenant._id,
+      provider: ApiKeyProvider.OpenAI,
+      model: "dall-e-3",
+      type: UsageType.Image,
+    };
+
+    await UsageModel.create(usage);
+  } catch (error) {
+    console.error("Error recording image usage:", error);
+  }
+};
+
+export const POST: APIRoute = async (ctx: APIContext) => {
   const { request } = ctx;
 
   try {
@@ -42,6 +60,8 @@ export const POST: APIRoute = async (ctx) => {
     console.log("Generated image with DALL-E 3 RESPONSE:", response.data[0]);
 
     const image = response.data[0].b64_json;
+
+    recordImageUsage(ctx);
 
     return new Response(JSON.stringify({ image }), {
       status: 200,

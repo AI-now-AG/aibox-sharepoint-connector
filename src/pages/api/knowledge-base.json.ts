@@ -48,7 +48,7 @@ const generateKnowledgeBaseDescription = async (
   return description;
 };
 
-export const GET: APIRoute = async (ctx) => {
+export const GET: APIRoute = async (ctx: APIContext) => {
   try {
     const result = await KnowledgeBaseModel.listByTenant(
       ctx.locals.user.tenant_id,
