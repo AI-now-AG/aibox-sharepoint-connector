@@ -8,19 +8,20 @@
   let base64Image = "";
   let loading = false;
   let error = "";
-  let size = "1024x1024";
-  let quality = "standard";
+  let size = "square";
   let selectedFormat = "png";
+  let customWidth = 768;
+  let customHeight = 1024;
+  let showCustomSizeInputs = false;
 
   const sizeOptions = [
-    { value: "1024x1024", label: "1024x1024" },
-    { value: "1792x1024", label: "1792x1024" },
-    { value: "1024x1792", label: "1024x1792" },
-  ];
-
-  const qualityOptions = [
-    { value: "standard", label: "Standard" },
-    { value: "hd", label: "HD" },
+    { value: "square", label: "Square (512x512)" },
+    { value: "square_hd", label: "Square HD (1024x1024)" },
+    { value: "portrait_3_4", label: "Portrait 3:4 (768x1024)" },
+    { value: "portrait_16_9", label: "Portrait 16:9 (576x1024)" },
+    { value: "landscape_4_3", label: "Landscape 4:3 (1024x768)" },
+    { value: "landscape_16_9", label: "Landscape 16:9 (1024x576)" },
+    { value: "custom", label: "Custom" },
   ];
 
   const outputOptions = [
@@ -35,19 +36,37 @@
     available: 3,
   };
 
+  // Show/hide custom size inputs based on selected size
+  $: showCustomSizeInputs = size === "custom";
+
   async function generateImage() {
+    if (!prompt.trim()) {
+      error = t("create-image.prompt-required");
+      return;
+    }
+
+    if (size === "custom" && (customWidth <= 0 || customHeight <= 0)) {
+      error = t("create-image.invalid-custom-size");
+      return;
+    }
+
     loading = true;
     error = "";
     base64Image = "";
 
     const formData = new FormData();
     formData.append("prompt", prompt);
-    formData.append("size", size);
-    formData.append("quality", quality);
-    formData.append("output_format", selectedFormat);
+
+    if (size === "custom") {
+      formData.append("custom_width", customWidth.toString());
+      formData.append("custom_height", customHeight.toString());
+      formData.append("image_size", "custom"); // Use a default size for generation, then resize
+    } else {
+      formData.append("image_size", size);
+    }
 
     try {
-      const response = await fetch("/api/generate-image-openai", {
+      const response = await fetch("/api/generate-image-flux", {
         method: "POST",
         body: formData,
       });
@@ -58,7 +77,7 @@
         throw new Error(data.error || t("common.unexpected.error"));
       }
 
-      base64Image = "data:image/png;base64," + data.image;
+      base64Image = `data:image/${selectedFormat};base64,${data.image}`;
       console.log("base64Image", base64Image);
     } catch (err) {
       error = err.message;
@@ -70,10 +89,7 @@
   function downloadImage() {
     if (base64Image) {
       try {
-        const base64String = base64Image.startsWith("data:image")
-          ? base64Image.split(",")[1]
-          : base64Image;
-
+        const base64String = base64Image.split(",")[1];
         const binaryString = atob(base64String);
         const len = binaryString.length;
         const bytes = new Uint8Array(len);
@@ -104,10 +120,10 @@
 <div class="flex items-center justify-center p-8">
   <div class="w-full">
     <h1 class="text-2xl font-bold text-gray-900 mb-2">
-      {t("create-image.create-dalle-image-title")}
+      {t("create-image.create-flux-dev-image-title")}
     </h1>
     <p class="text-sm text-gray-600 mb-4">
-      {t("create-image.create-dalle-image-description")}
+      {t("create-image.create-flux-dev-image-description")}
     </p>
 
     <form on:submit|preventDefault={generateImage} class="space-y-4">
@@ -116,18 +132,20 @@
           bind:value={prompt}
           placeholder={t("create-image.create-image-place-holder")}
           class="textarea textarea-bordered w-full h-24 rounded-lg"
+          aria-label={t("create-image.create-image-place-holder")}
         ></textarea>
       </div>
 
       <div class="flex space-x-4">
         <div class="flex-1">
-          <label class="block text-sm font-medium text-gray-700 mb-1"
-            >{t("create-image.image-size-label")}</label
-          >
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            {t("create-image.image-size-label")}
+          </label>
           <div class="dropdown w-full">
             <label
               tabindex="0"
               class="select select-bordered w-full rounded-lg"
+              aria-label={t("create-image.select-image-size-label")}
             >
               {sizeOptions.find((opt) => opt.value === size)?.label ||
                 t("create-image.select-image-size-label")}
@@ -145,46 +163,45 @@
               {/each}
             </ul>
           </div>
+          {#if showCustomSizeInputs}
+            <div class="flex space-x-2 mt-2">
+              <div class="flex-1">
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  Width
+                </label>
+                <input
+                  type="number"
+                  bind:value={customWidth}
+                  min="1"
+                  class="input input-bordered w-full rounded-lg"
+                  aria-label="Custom width"
+                />
+              </div>
+              <div class="flex-1">
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  Height
+                </label>
+                <input
+                  type="number"
+                  bind:value={customHeight}
+                  min="1"
+                  class="input input-bordered w-full rounded-lg"
+                  aria-label="Custom height"
+                />
+              </div>
+            </div>
+          {/if}
         </div>
 
         <div class="flex-1">
-          <label class="block text-sm font-medium text-gray-700 mb-1"
-            >{t("create-image.image-quality-label")}</label
-          >
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            {t("create-image.image-format-label")}
+          </label>
           <div class="dropdown w-full">
             <label
               tabindex="0"
               class="select select-bordered w-full rounded-lg"
-            >
-              {qualityOptions.find((opt) => opt.value === quality)?.label ||
-                t("create-image.select-image-quality-label")}
-            </label>
-            <ul
-              tabindex="0"
-              class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-full"
-            >
-              {#each qualityOptions as option}
-                <li>
-                  <button
-                    type="button"
-                    on:click={() => (quality = option.value)}
-                  >
-                    {option.label}
-                  </button>
-                </li>
-              {/each}
-            </ul>
-          </div>
-        </div>
-
-        <div class="flex-1">
-          <label class="block text-sm font-medium text-gray-700 mb-1"
-            >{t("create-image.image-format-label")}</label
-          >
-          <div class="dropdown w-full">
-            <label
-              tabindex="0"
-              class="select select-bordered w-full rounded-lg"
+              aria-label={t("create-image.select-image-format-label")}
             >
               {outputOptions.find((opt) => opt.value === selectedFormat)
                 ?.label || t("create-image.select-image-format-label")}
@@ -227,7 +244,7 @@
       <div class="mt-6 flex flex-col">
         <img
           src={base64Image}
-          alt="Generated by DALL-E 3"
+          alt="Generated by FLUX.1 [dev]"
           class="max-w-[514px] w-full h-auto rounded-lg shadow-lg"
         />
         <button

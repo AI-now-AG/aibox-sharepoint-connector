@@ -22,7 +22,6 @@ export const POST: APIRoute = async (ctx) => {
         | "1024x1792") || "1024x1024";
     const quality =
       (formData.get("quality") as "standard" | "hd") || "standard";
-    const mode = formData.get("mode") || "generate";
 
     if (!prompt) {
       return new Response(JSON.stringify({ error: "Prompt is required" }), {

@@ -107,6 +107,7 @@ const TenantSchema = z.object({
   speech_region: z.string().nullish(),
   perplexity_api_key: z.string().nullish(),
   perplexity_chat_model: z.string().nullish(),
+  fal_ai_api_key: z.string().nullish(),
   active: z.boolean().optional().default(true),
   is_restrict_user_managment: z.boolean().optional().default(false),
   is_trial: z.boolean().optional().default(false),
