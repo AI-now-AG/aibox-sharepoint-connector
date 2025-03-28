@@ -3,33 +3,28 @@ import { db, type Document } from "../mongodb";
 import { UsageType } from "$types/UsageTracking";
 import { z } from "zod";
 
-export const TopUpSchema = z.object({
-  type: z.enum(["text", "imageDalle", "imageFlux", "audio"]),
-  amount: z.number(),
-  unit: z.enum(["tokens", "seconds"]),
-  reason: z.string().optional(),
-  addedBy: z.instanceof(ObjectId).optional(),
-  date: z.date(),
-});
-
 export const ServiceSchema = z.object({
   text: z.object({
     limitTokens: z.number().default(0),
+    extraAmount: z.number().default(0),
     usedTokens: z.number().default(0),
   }),
 
   imageDalle: z.object({
     limitRequests: z.number().default(0),
+    extraAmount: z.number().default(0),
     usedRequests: z.number().default(0),
   }),
 
   imageFlux: z.object({
     limitRequests: z.number().default(0),
+    extraAmount: z.number().default(0),
     usedRequests: z.number().default(0),
   }),
 
   audio: z.object({
     limitSeconds: z.number().default(0),
+    extraAmount: z.number().default(0),
     usedSeconds: z.number().default(0),
   }),
 });
@@ -39,7 +34,6 @@ const MonthlyUsageSchema = z.object({
   tenant_id: z.instanceof(ObjectId).optional(),
   month: z.string().regex(/^\d{4}-\d{2}$/, "Invalid YYYY-MM format"),
   services: ServiceSchema,
-  topUps: z.array(TopUpSchema).default([]),
   created_at: z
     .date()
     .optional()
@@ -90,27 +84,29 @@ export default {
         services: {
           text: {
             limitTokens: 0,
+            extraAmount: 0,
             usedTokens: 0,
           },
           imageDalle: {
             limitRequests: 0,
+            extraAmount: 0,
             usedRequests: 0,
           },
           imageFlux: {
             limitRequests: 0,
+            extraAmount: 0,
             usedRequests: 0,
           },
           audio: {
             limitSeconds: 0,
+            extraAmount: 0,
             usedSeconds: 0,
           },
         },
-        topUps: [],
-        created_at: new Date(),
-        updated_at: new Date(),
       };
 
-      await collection.insertOne(newDoc);
+      const validated = MonthlyUsageSchema.parse(newDoc);
+      await collection.insertOne(validated);
       existing = newDoc;
     }
 
