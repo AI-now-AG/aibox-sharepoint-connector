@@ -3,7 +3,7 @@ import type { LLMResult } from "@langchain/core/outputs";
 import type { Serialized } from "@langchain/core/load/serializable";
 import { ObjectId } from "mongodb";
 import { ApiKeyProvider } from "$types/TenantFeature";
-import { UsageType } from "$types/UsageTracking";
+import { UsageType, UsageService } from "$types/UsageTracking";
 import MonthlyUsageModel from "$data/models/monthlyUsage.model";
 import UsageLogModel, { type UsageLog } from "$data/models/usageLog.model";
 
@@ -63,8 +63,8 @@ export class UsageTrackerCallbackHandler extends BaseCallbackHandler {
 
     await UsageLogModel.create(usage);
     await MonthlyUsageModel.upsertAndIncrementUsage({
-      tenantId: this.tenantId,
-      service: "text",
+      tenantId: this.tenantId!,
+      service: UsageService.Text,
       usage: { tokens: output.llmOutput?.tokenUsage?.totalTokens },
     });
   }

@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 import { db, type Document } from "../mongodb";
-import { UsageType } from "$types/UsageTracking";
+import { UsageService } from "$types/UsageTracking";
 import { z } from "zod";
 
 export const ServiceSchema = z.object({
@@ -22,7 +22,7 @@ export const ServiceSchema = z.object({
     usedRequests: z.number().default(0),
   }),
 
-  audio: z.object({
+  transcription: z.object({
     limitSeconds: z.number().default(0),
     extraAmount: z.number().default(0),
     usedSeconds: z.number().default(0),
@@ -63,13 +63,13 @@ export default {
   }: {
     tenantId: ObjectId;
     month?: string;
-    service: "text" | "imageDalle" | "imageFlux" | "audio";
+    service: UsageService;
     usage: {
       tokens?: number;
       seconds?: number;
       requests?: number;
     };
-  }): Promise<MonthlyUsage> => {
+  }) => {
     const filter = { tenant_id: tenantId, month };
 
     // Try to find existing doc
@@ -82,22 +82,22 @@ export default {
         tenant_id: tenantId,
         month,
         services: {
-          text: {
+          [UsageService.Text]: {
             limitTokens: 0,
             extraAmount: 0,
             usedTokens: 0,
           },
-          imageDalle: {
+          [UsageService.ImageDalle]: {
             limitRequests: 0,
             extraAmount: 0,
             usedRequests: 0,
           },
-          imageFlux: {
+          [UsageService.ImageFlux]: {
             limitRequests: 0,
             extraAmount: 0,
             usedRequests: 0,
           },
-          audio: {
+          [UsageService.Transcription]: {
             limitSeconds: 0,
             extraAmount: 0,
             usedSeconds: 0,
@@ -118,26 +118,26 @@ export default {
       $inc: {},
     };
 
-    if (service === "text" && usage.tokens) {
+    if (service === UsageService.Text && usage.tokens) {
       update.$inc["services.text.usedTokens"] = usage.tokens;
     }
 
-    if (service === "imageDalle" && usage.requests) {
+    if (service === UsageService.ImageDalle && usage.requests) {
       update.$inc["services.imageDalle.usedRequests"] = usage.requests;
     }
 
-    if (service === "imageFlux" && usage.requests) {
+    if (service === UsageService.ImageFlux && usage.requests) {
       update.$inc["services.imageFlux.usedRequests"] = usage.requests;
     }
 
-    if (service === "audio" && usage.seconds) {
-      update.$inc["services.audio.usedSeconds"] = usage.seconds;
+    if (service === UsageService.Transcription && usage.seconds) {
+      update.$inc["services.transcription.usedSeconds"] = usage.seconds;
     }
 
     const result = await collection.findOneAndUpdate(filter, update, {
       returnDocument: "after",
     });
 
-    return result.value as MonthlyUsage;
+    return result;
   },
 };

@@ -3,7 +3,7 @@ import type { APIContext, APIRoute } from "astro";
 import { fal } from "@fal-ai/client";
 import type { ImageSize } from "@fal-ai/client/endpoints";
 import { ApiKeyProvider } from "$types/TenantFeature";
-import { UsageType } from "$types/UsageTracking";
+import { UsageType, UsageService } from "$types/UsageTracking";
 import MonthlyUsageModel from "$data/models/monthlyUsage.model";
 import UsageLogModel, { type UsageLog } from "$data/models/usageLog.model";
 
@@ -19,7 +19,7 @@ const recordImageUsage = async (ctx: APIContext) => {
     await UsageLogModel.create(usage);
     await MonthlyUsageModel.upsertAndIncrementUsage({
       tenantId: ctx.locals.tenant._id,
-      service: "imageFlux",
+      service: UsageService.ImageFlux,
       usage: { requests: 1 },
     });
   } catch (error) {
