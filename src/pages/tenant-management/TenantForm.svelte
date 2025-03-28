@@ -16,7 +16,6 @@
   import InputDialog from "$components/InputDialog.svelte";
   import { isValidEmail } from "$utils/common";
   import { ApiKeyProvider, AudioCategory } from "$types/TenantFeature";
-  import SelectionInput from "./SelectionInput.svelte";
   import SingleInput from "$pages/prompt-library/prompts/SingleInput.svelte";
   import ThemeItem from "./ThemeItem.svelte";
 
