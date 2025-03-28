@@ -16,7 +16,6 @@
   import InputDialog from "$components/InputDialog.svelte";
   import { isValidEmail } from "$utils/common";
   import { ApiKeyProvider, AudioCategory } from "$types/TenantFeature";
-  import SelectionInput from "./SelectionInput.svelte";
   import SingleInput from "$pages/prompt-library/prompts/SingleInput.svelte";
   import ThemeItem from "./ThemeItem.svelte";
 
@@ -953,11 +952,12 @@
         <div class="collapse-content">
           <div class="grid grid-cols-2 gap-4 mx-8">
             <div class="w-full z-20">
-              <SelectionInput
+              <SingleInput
                 title={`${t("tenant.model.name")}*`}
                 placeholder="e.g. sonar"
                 items={listOfPerplexityModel}
                 bind:selectedItem={selectedPerplexityModel}
+                displayTop={true}
               />
             </div>
             <div class="w-full">

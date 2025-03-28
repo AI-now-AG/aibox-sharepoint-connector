@@ -7,6 +7,7 @@
     placeholder: any;
     items: Item[];
     selectedItem: Item | undefined;
+    displayTop?: boolean;
   }
 
   let {
@@ -14,6 +15,7 @@
     placeholder,
     items,
     selectedItem = $bindable(),
+    displayTop = false
   }: Props = $props();
 
   let inputValue = $state("");
@@ -24,6 +26,10 @@
   };
 
   function handleSelectedItems(selected: Item) {
+    const elem = document.activeElement;
+    if (elem) {
+      elem?.blur();
+    }
     if (selectedItem === selected) {
       resetSelection();
     } else {
@@ -52,7 +58,7 @@
 
 <div>
   <p class="mb-2">{title}</p>
-  <div class="dropdown dropdown-bottom w-full min-w-xs">
+  <div class={`dropdown ${displayTop ? 'dropdown-top': 'dropdown-bottom'} w-full min-w-xs`}>
     <label class="input input-bordered flex items-center gap-2 w-full">
       <input
         type="text"
