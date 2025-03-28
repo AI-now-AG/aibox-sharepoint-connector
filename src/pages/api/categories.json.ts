@@ -62,7 +62,6 @@ export const POST: APIRoute = async (ctx) => {
 
   // Determine the new position
   const maxPositionCategory = await CategoryModel.getMaxPosition(tenantId);
-  console.log("maxPositionCategory", { maxPositionCategory, tenantId });
   const newPosition = maxPositionCategory
     ? (maxPositionCategory?.position || 0) + 1
     : 1;

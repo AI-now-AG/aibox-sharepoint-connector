@@ -1,5 +1,9 @@
 ---
 import BlankLayout from "$layouts/BlankLayout.astro";
+import { useTranslations } from "$i18n/utils";
+
+const locals = Astro.url.searchParams.get("lang") || "de";
+const t = useTranslations(locals);
 ---
 
 <BlankLayout title="Log out sucess">
@@ -8,14 +12,14 @@ import BlankLayout from "$layouts/BlankLayout.astro";
       class="container flex flex-col items-center justify-center px-5 mx-auto my-8"
     >
       <div class="max-w-lg text-center">
-        <h1 class="mb-8 text-4xl font-extrabold">Log out</h1>
+        <h1 class="mb-8 text-4xl font-extrabold">{t("user.logout.title")}</h1>
         <p class="mt-4 mb-8">
-          You have successfully logged out of the application.
+          {t("user.logout.message")}
         </p>
         <a
           rel="noopener noreferrer"
           href="/"
-          class="btn btn-outline btn-primary">Back to homepage</a
+          class="btn btn-outline btn-primary">{t("user.logout.button")}</a
         >
       </div>
     </div>

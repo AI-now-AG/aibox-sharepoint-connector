@@ -45,33 +45,33 @@
 
 <section class="flex items-center h-full p-16">
   <div
-    class="container flex flex-col items-center justify-center px-5 mx-auto my-8 bg-gray-800 bg-opacity-50 rounded-xl shadow-xl p-8 border border-gray-700"
+    class="container flex flex-col items-center justify-center px-5 mx-auto my-8 bg-base-300 bg-opacity-50 rounded-xl shadow-xl p-8 border border-base-300"
   >
     <div class="text-center">
       {#if !errorTitle}
         <div class="mb-6">
-          <span class="fas fa-exclamation-circle text-6xl text-red-500"></span>
+          <span class="fas fa-exclamation-circle text-6xl text-waring"></span>
         </div>
         <h1
           class="mb-6 text-4xl md:text-5xl font-bold text-white tracking-tight"
         >
           {errorTitle}
         </h1>
-        <p class="mb-8 text-lg md:text-xl text-gray-300 mx-auto">
+        <p class="mb-8 text-lg md:text-xl text-base-300 mx-auto">
           {errorDescription}
         </p>
       {/if}
 
       {#if errorTitle || errorDescription}
         <div class="mb-6">
-          <span class="fas fa-exclamation-circle text-6xl text-red-500"> </span>
+          <span class="fas fa-exclamation-circle text-6xl text-warning"> </span>
         </div>
         <h1
           class="mb-6 text-4xl md:text-5xl font-bold text-white tracking-tight"
         >
           {errorTitle}
         </h1>
-        <p class="mb-8 text-lg md:text-xl text-gray-300 mx-auto">
+        <p class="mb-8 text-lg md:text-xl text-base-300 mx-auto">
           {errorDescription}
         </p>
       {/if}

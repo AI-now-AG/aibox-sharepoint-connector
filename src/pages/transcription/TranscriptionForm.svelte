@@ -415,7 +415,6 @@
       return;
     }
 
-    console.log("Selected audio file", audioFile);
     const { name, size, type } = audioFile;
     if (isFileValid({ name, size, type })) {
       // Calculate duration for audio/video file
@@ -429,7 +428,6 @@
       let fileNameWithoutExtension = audioFile.name || "";
       let fileExtension = audioFile.name || "";
       const splitedFileName = fileNameWithoutExtension.split(".");
-      console.log("fileNameWithoutExtension---", splitedFileName);
       if (splitedFileName) {
         if (splitedFileName?.[0]) {
           fileNameWithoutExtension = formatFilename(splitedFileName?.[0]);
@@ -438,7 +436,6 @@
           fileExtension = splitedFileName?.[splitedFileName?.length - 1];
         }
       }
-      console.log("fileNameWithoutExtension", fileNameWithoutExtension);
       const { uploadUrl, outputFileName } = await getSASToken(
         fileNameWithoutExtension,
         fileExtension,
@@ -458,7 +455,6 @@
               `${outputFileName}.txt`,
               `${outputFileName}.srt`,
             ];
-            console.log("Temp output file name", tempOutputFileNames);
 
             isUploading = false;
             isUploaded = true;
@@ -817,7 +813,6 @@
         document.body.removeChild(link);
         URL.revokeObjectURL(blobUrl);
 
-        console.log("Download file!");
         if (confirmModal?.open) {
           confirmModal?.close();
         }
@@ -855,8 +850,6 @@
       // Remove link from body
       document.body.removeChild(link);
 
-      // Clsoe dialog element
-      console.log("Download file!");
       if (confirmModal?.open) {
         confirmModal?.close();
       }

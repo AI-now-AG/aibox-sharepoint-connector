@@ -505,7 +505,6 @@
   async function updateTenant() {
     if (validateForm()) {
       try {
-        console.log("tenantData", tenantData);
         loading = true;
         tenantData.default_language = selectedLanguage?.value;
         tenantData.theme = selectedThemes?.value as TenantTheme;
