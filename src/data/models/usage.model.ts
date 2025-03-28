@@ -74,4 +74,33 @@ export default {
       },
     ]);
   },
+
+  countDocuments: async (query: {
+    tenant_id: string;
+    provider: string;
+    model: string;
+    type: string;
+    dateRange?: { start: Date; end: Date };
+  }): Promise<number> => {
+    const { tenant_id, provider, model, type, dateRange } = query;
+
+    // Construct the MongoDB query
+    const mongoQuery: any = {
+      tenant_id: new ObjectId(tenant_id), // Convert tenant_id to ObjectId
+      provider,
+      model,
+      type,
+    };
+
+    // Add date range filter if provided
+    if (dateRange) {
+      mongoQuery.created_at = {
+        $gte: dateRange.start,
+        $lte: dateRange.end,
+      };
+    }
+
+    // Count the matching documents
+    return await collection.countDocuments(mongoQuery);
+  },
 };
