@@ -105,6 +105,12 @@
   );
 
   function handleSelectedItems(selected: any) {
+    if (category === AudioCategory.AudioPro) {
+      const elem = document.activeElement;
+      if (elem) {
+        elem?.blur();
+      }
+    }
     const idx = languageLocales.indexOf(selected);
     if (idx !== -1) {
       if (category === AudioCategory.AudioPro) {

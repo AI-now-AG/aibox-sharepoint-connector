@@ -51,6 +51,10 @@
   });
 
   const setTheme = (item: Item) => {
+    const elem = document.activeElement;
+    if (elem) {
+      elem?.blur();
+    }
     document.documentElement.setAttribute("data-theme", item.value);
     handleSelectedItems(item);
   };
