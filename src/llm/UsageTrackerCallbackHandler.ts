@@ -4,6 +4,7 @@ import type { Serialized } from "@langchain/core/load/serializable";
 import { ObjectId } from "mongodb";
 import { ApiKeyProvider } from "$types/TenantFeature";
 import { UsageType } from "$types/UsageTracking";
+import MonthlyUsageModel from "$data/models/monthlyUsage.model";
 import UsageLogModel, { type UsageLog } from "$data/models/usageLog.model";
 
 export class UsageTrackerCallbackHandler extends BaseCallbackHandler {
@@ -61,6 +62,11 @@ export class UsageTrackerCallbackHandler extends BaseCallbackHandler {
     };
 
     await UsageLogModel.create(usage);
+    await MonthlyUsageModel.upsertAndIncrementUsage({
+      tenantId: this.tenantId,
+      service: "text",
+      usage: { tokens: output.llmOutput?.tokenUsage?.totalTokens },
+    });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
