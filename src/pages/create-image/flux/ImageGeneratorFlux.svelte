@@ -34,7 +34,8 @@
   let usageStats = {
     today: 22,
     thisMonth: 30,
-    available: 3,
+    available: 0,
+    monthlyLimit: 30,
   };
 
   // Show/hide custom size inputs based on selected size
@@ -118,149 +119,146 @@
   }
 </script>
 
-<div class="flex items-center justify-center p-8">
-  <div class="w-full">
-    <h1 class="text-2xl font-bold text-gray-900 mb-2">
-      {t("create-image.create-flux-dev-image-title")}
-    </h1>
-    <p class="text-sm text-gray-600 mb-4">
-      {t("create-image.create-flux-dev-image-description")}
-    </p>
+<div class="container max-w-full mx-auto grid grid-cols-1 px-14">
+  <h1 class="pt-2 mb-2 lg:pt-8 text-4xl font-bold">
+    {t("create-image.create-flux-dev-image-title")}
+  </h1>
+  {t("create-image.create-flux-dev-image-description")}
 
-    <form on:submit|preventDefault={generateImage} class="space-y-4">
-      <div>
-        <textarea
-          bind:value={prompt}
-          placeholder={t("create-image.create-image-place-holder")}
-          class="textarea textarea-bordered w-full h-24 rounded-lg"
-          aria-label={t("create-image.create-image-place-holder")}
-        ></textarea>
-      </div>
+  <form on:submit|preventDefault={generateImage} class="space-y-4 mt-4">
+    <div>
+      <textarea
+        bind:value={prompt}
+        placeholder={t("create-image.create-image-place-holder")}
+        class="textarea textarea-bordered w-full h-24 rounded-lg text-base"
+        aria-label={t("create-image.create-image-place-holder")}
+      ></textarea>
+    </div>
 
-      <div class="flex space-x-4">
-        <div class="flex-1">
-          <label class="block text-sm font-medium text-gray-700 mb-1">
-            {t("create-image.image-size-label")}
+    <div class="flex space-x-4">
+      <div class="flex-1">
+        <label class="block mb-1">
+          {t("create-image.image-size-label")}
+        </label>
+        <div class="dropdown w-full">
+          <label
+            tabindex="0"
+            class="select select-bordered w-full rounded-lg"
+            aria-label={t("create-image.select-image-size-label")}
+          >
+            {sizeOptions.find((opt) => opt.value === size)?.label ||
+              t("create-image.select-image-size-label")}
           </label>
-          <div class="dropdown w-full">
-            <label
-              tabindex="0"
-              class="select select-bordered w-full rounded-lg"
-              aria-label={t("create-image.select-image-size-label")}
-            >
-              {sizeOptions.find((opt) => opt.value === size)?.label ||
-                t("create-image.select-image-size-label")}
-            </label>
-            <ul
-              tabindex="0"
-              class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-full"
-            >
-              {#each sizeOptions as option}
-                <li>
-                  <button type="button" on:click={() => (size = option.value)}>
-                    {option.label}
-                  </button>
-                </li>
-              {/each}
-            </ul>
-          </div>
-          {#if showCustomSizeInputs}
-            <div class="flex space-x-2 mt-2">
-              <div class="flex-1">
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  {t("create-image.width")}
-                </label>
-                <input
-                  type="number"
-                  bind:value={customWidth}
-                  min="1"
-                  class="input input-bordered w-full rounded-lg"
-                  aria-label="Custom width"
-                />
-              </div>
-              <div class="flex-1">
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                  {t("create-image.height")}
-                </label>
-                <input
-                  type="number"
-                  bind:value={customHeight}
-                  min="1"
-                  class="input input-bordered w-full rounded-lg"
-                  aria-label="Custom height"
-                />
-              </div>
+          <ul
+            tabindex="0"
+            class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-full"
+          >
+            {#each sizeOptions as option}
+              <li>
+                <button type="button" on:click={() => (size = option.value)}>
+                  {option.label}
+                </button>
+              </li>
+            {/each}
+          </ul>
+        </div>
+        {#if showCustomSizeInputs}
+          <div class="flex space-x-2 mt-2">
+            <div class="flex-1">
+              <label class="block mb-1">
+                {t("create-image.width")}
+              </label>
+              <input
+                type="number"
+                bind:value={customWidth}
+                min="1"
+                class="input input-bordered w-full rounded-lg"
+                aria-label="Custom width"
+              />
             </div>
-          {/if}
-        </div>
-
-        <div class="flex-1">
-          <label class="block text-sm font-medium text-gray-700 mb-1">
-            {t("create-image.image-format-label")}
-          </label>
-          <div class="dropdown w-full">
-            <label
-              tabindex="0"
-              class="select select-bordered w-full rounded-lg"
-              aria-label={t("create-image.select-image-format-label")}
-            >
-              {outputOptions.find((opt) => opt.value === selectedFormat)
-                ?.label || t("create-image.select-image-format-label")}
-            </label>
-            <ul
-              tabindex="0"
-              class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-full"
-            >
-              {#each outputOptions as option}
-                <li>
-                  <button
-                    type="button"
-                    on:click={() => (selectedFormat = option.value)}
-                  >
-                    {option.label}
-                  </button>
-                </li>
-              {/each}
-            </ul>
+            <div class="flex-1">
+              <label class="block mb-1">
+                {t("create-image.height")}
+              </label>
+              <input
+                type="number"
+                bind:value={customHeight}
+                min="1"
+                class="input input-bordered w-full rounded-lg"
+                aria-label="Custom height"
+              />
+            </div>
           </div>
+        {/if}
+      </div>
+
+      <div class="flex-1">
+        <label class="block mb-1">
+          {t("create-image.image-format-label")}
+        </label>
+        <div class="dropdown w-full">
+          <label
+            tabindex="0"
+            class="select select-bordered w-full rounded-lg"
+            aria-label={t("create-image.select-image-format-label")}
+          >
+            {outputOptions.find((opt) => opt.value === selectedFormat)?.label ||
+              t("create-image.select-image-format-label")}
+          </label>
+          <ul
+            tabindex="0"
+            class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-full"
+          >
+            {#each outputOptions as option}
+              <li>
+                <button
+                  type="button"
+                  on:click={() => (selectedFormat = option.value)}
+                >
+                  {option.label}
+                </button>
+              </li>
+            {/each}
+          </ul>
         </div>
       </div>
+    </div>
 
+    <button
+      type="submit"
+      disabled={loading}
+      class="btn btn-primary w-40 rounded-lg"
+    >
+      {loading
+        ? t("create-image.image-generating")
+        : t("create-image.generate-image")}
+    </button>
+  </form>
+
+  {#if error}
+    <p class="text-error text-center mt-4">{error}</p>
+  {/if}
+
+  {#if base64Image}
+    <div class="mt-6 flex flex-col">
+      <img
+        src={base64Image}
+        alt="Generated by FLUX.1 [dev]"
+        class="max-w-[514px] w-full h-auto rounded-lg shadow-lg"
+      />
       <button
-        type="submit"
-        disabled={loading}
-        class="btn btn-primary w-40 rounded-lg"
+        on:click={downloadImage}
+        class="btn btn-primary w-40 rounded-lg mt-4"
       >
-        {loading
-          ? t("create-image.image-generating")
-          : t("create-image.generate-image")}
+        {t("create-image.download")}
       </button>
-    </form>
+    </div>
+  {/if}
 
-    {#if error}
-      <p class="text-error text-center mt-4">{error}</p>
-    {/if}
-
-    {#if base64Image}
-      <div class="mt-6 flex flex-col">
-        <img
-          src={base64Image}
-          alt="Generated by FLUX.1 [dev]"
-          class="max-w-[514px] w-full h-auto rounded-lg shadow-lg"
-        />
-        <button
-          on:click={downloadImage}
-          class="btn btn-primary w-40 rounded-lg mt-4"
-        >
-          {t("create-image.download")}
-        </button>
-      </div>
-    {/if}
-
-    <ImageCreationUsage
-      todayAmount={usageStats.today}
-      thisMonthAmount={usageStats.thisMonth}
-      availableAmount={usageStats.available}
-    />
-  </div>
+  <ImageCreationUsage
+    todayAmount={usageStats.today}
+    thisMonthAmount={usageStats.thisMonth}
+    availableAmount={usageStats.available}
+    monthlyLimit={usageStats.monthlyLimit}
+  />
 </div>

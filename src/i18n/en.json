@@ -353,9 +353,9 @@
   "user.logout.message": "You have successfully logged out of the application.",
   "user.logout.button": "Back to homepage",
   "create-image.create-flux-dev-image-title": "Create Flux Image",
-  "create-image.create-flux-dev-image-description": "Create images from the latest Flux-Dev Model",
+  "create-image.create-flux-dev-image-description": "Flux enables creative, experimental image generation with high flexibility and fast execution.",
   "create-image.create-dalle-image-title": "Create DALL-E Image",
-  "create-image.create-dalle-image-description": "Create images from the latest DALL-E 3 Model",
+  "create-image.create-dalle-image-description": "DALL·E 3 delivers precise, realistic results with strong text comprehension – ideal for detailed scenes.",
   "create-image.create-image-place-holder": "Decribe your image",
   "create-image.image-size-label": "Image Size",
   "create-image.select-image-size-label": "Select Size",
@@ -370,11 +370,12 @@
   "create-image.usage.today-usage": "Today: ${amount} images",
   "create-image.usage.this-month-usage": "This month: ${amount} images",
   "create-image.usage.available-images": "Available: ${amount} images",
-  "create-image.prompt-required-error": "Please describe your image ",
+  "create-image.prompt-required-error": "Decribe your image",
   "create-image.invalid-custom-size-error": "Please input correct custom size",
   "create-image.width": "Width",
   "create-image.height": "Heigh",
-  "nav.create-image": "IMAGE CREATION",
+  "nav.create-image": "Generate Image",
   "nav.create-image.dall-e": "DALL-E",
-  "nav.create-image.flux": "Flux"
+  "nav.create-image.flux": "Flux",
+  "create-image.usage.reach-limitation-message": "You already created ${amount} included images for this month, you can contact us to upgrade for more"
 }
