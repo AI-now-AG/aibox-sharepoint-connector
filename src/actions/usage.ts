@@ -104,7 +104,7 @@ export const usage = {
         },
       };
 
-      const totalRequestsMonth = await UsageModel.countDocuments(monthQuery);
+      const totalRequestsMonth = await UsageLogModel.countDocuments(monthQuery);
 
       // Query for today
       const todayQuery = {
@@ -118,7 +118,7 @@ export const usage = {
         },
       };
 
-      const totalRequestsToday = await UsageModel.countDocuments(todayQuery);
+      const totalRequestsToday = await UsageLogModel.countDocuments(todayQuery);
 
       // Return the results
       return {
