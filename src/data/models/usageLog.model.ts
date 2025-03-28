@@ -4,7 +4,7 @@ import { ApiKeyProvider } from "$types/TenantFeature";
 import { UsageType } from "$types/UsageTracking";
 import { z } from "zod";
 
-const UsageSchema = z.object({
+const UsageLogSchema = z.object({
   _id: z.instanceof(ObjectId),
   tenant_id: z.instanceof(ObjectId).optional(),
   provider: z.nativeEnum(ApiKeyProvider),
@@ -22,19 +22,19 @@ const UsageSchema = z.object({
     .optional()
     .default(() => new Date()),
 });
-export type Usage = z.infer<typeof UsageSchema>;
+export type UsageLog = z.infer<typeof UsageLogSchema>;
 
-const collection = db.collection("usages");
+const collection = db.collection("usage_logs");
 
 export default {
-  create: async (tenant: Partial<Omit<Usage, "_id">>) => {
-    const validated = UsageSchema.parse({ _id: new ObjectId(), ...tenant });
+  create: async (tenant: Partial<Omit<UsageLog, "_id">>) => {
+    const validated = UsageLogSchema.parse({ _id: new ObjectId(), ...tenant });
     return await collection.insertOne(validated);
   },
 
-  update: async (id: string | ObjectId, update: Partial<Usage>) => {
+  update: async (id: string | ObjectId, update: Partial<UsageLog>) => {
     const objectId = id instanceof ObjectId ? id : new ObjectId(id);
-    const validated = UsageSchema.partial().parse(update);
+    const validated = UsageLogSchema.partial().parse(update);
     const doc = {
       ...validated,
       updated_at: new Date(),
@@ -54,7 +54,7 @@ export default {
   },
 
   listByTenant: async (tenantId: string) => {
-    return collection.find<Document<Usage>>({ tenant_id: tenantId });
+    return collection.find<Document<UsageLog>>({ tenant_id: tenantId });
   },
 
   listUsageSummary: async () => {

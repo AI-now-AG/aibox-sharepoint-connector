@@ -4,7 +4,7 @@ import type { Serialized } from "@langchain/core/load/serializable";
 import { ObjectId } from "mongodb";
 import { ApiKeyProvider } from "$types/TenantFeature";
 import { UsageType } from "$types/UsageTracking";
-import UsageModel, { type Usage } from "$data/models/usage.model";
+import UsageLogModel, { type UsageLog } from "$data/models/usageLog.model";
 
 export class UsageTrackerCallbackHandler extends BaseCallbackHandler {
   name = "usage_tracker_callback_handler";
@@ -46,7 +46,7 @@ export class UsageTrackerCallbackHandler extends BaseCallbackHandler {
     console.log("Token Usage:", output.llmOutput?.tokenUsage);
 
     const respone = JSON.parse(JSON.stringify(output.generations));
-    const usage: Partial<Omit<Usage, "_id">> = {
+    const usage: Partial<Omit<UsageLog, "_id">> = {
       tenant_id: this.tenantId,
       provider: this.provider,
       model: this.model,
@@ -60,7 +60,7 @@ export class UsageTrackerCallbackHandler extends BaseCallbackHandler {
       },
     };
 
-    await UsageModel.create(usage);
+    await UsageLogModel.create(usage);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars

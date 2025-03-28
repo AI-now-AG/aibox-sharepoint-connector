@@ -2,7 +2,7 @@ import { defineAction } from "astro:actions";
 import { z } from "zod";
 import { transformRawData } from "$utils/transformRawData";
 import TenantModel, { type Tenant } from "$data/models/tenant.model";
-import UsageModel from "$data/models/usage.model";
+import UsageLogModel from "$data/models/usageLog.model";
 
 const PRICING: Record<string, { input: number; output: number }> = {
   "openai:gpt-4o": { input: 0.00001, output: 0.00003 },
@@ -37,7 +37,7 @@ export const usage = {
       );
 
       // Step 2: Aggregate usage
-      const usageCursor = await UsageModel.listUsageSummary();
+      const usageCursor = await UsageLogModel.listUsageSummary();
       const usages = await usageCursor.toArray();
 
       // Step 3: Transform + enrich with cost + tenant name

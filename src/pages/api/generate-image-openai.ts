@@ -3,18 +3,18 @@ import type { APIContext, APIRoute } from "astro";
 import { OpenAI } from "openai";
 import { ApiKeyProvider } from "$types/TenantFeature";
 import { UsageType } from "$types/UsageTracking";
-import UsageModel, { type Usage } from "$data/models/usage.model";
+import UsageLogModel, { type UsageLog } from "$data/models/usageLog.model";
 
 const recordImageUsage = async (ctx: APIContext) => {
   try {
-    const usage: Partial<Omit<Usage, "_id">> = {
+    const usage: Partial<Omit<UsageLog, "_id">> = {
       tenant_id: ctx.locals.tenant._id,
       provider: ApiKeyProvider.OpenAI,
       model: "dall-e-3",
       type: UsageType.Image,
     };
 
-    await UsageModel.create(usage);
+    await UsageLogModel.create(usage);
   } catch (error) {
     console.error("Error recording image usage:", error);
   }
