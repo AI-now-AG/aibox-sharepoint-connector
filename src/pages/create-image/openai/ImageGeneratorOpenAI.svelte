@@ -103,7 +103,7 @@
   }
 </script>
 
-<div class="container max-w-full mx-auto grid grid-cols-1 px-14">
+<div class="container max-w-6xl mx-auto grid grid-cols-1 px-14">
   <h1 class="pt-2 mb-2 lg:pt-8 text-4xl font-bold">
     {t("create-image.create-dalle-image-title")}
   </h1>

@@ -84,17 +84,18 @@
         .description}
     </p>
   {/if}
-
-  <ExecutionCard
-    cards={promptItems}
-    bind:selectedPromptId
-    bind:isEditable
-    bind:isDisabling={isProcessing}
-    onSelectCard={() => {
-      sharedMessageHistory.set([]);
-      adjustHeightByContent();
-    }}
-  />
+  <div class="mb-6 mt-6">
+    <ExecutionCard
+      cards={promptItems}
+      bind:selectedPromptId
+      bind:isEditable
+      bind:isDisabling={isProcessing}
+      onSelectCard={() => {
+        sharedMessageHistory.set([]);
+        adjustHeightByContent();
+      }}
+    />
+  </div>
   {#if $sharedMessageHistory.length == 0}
     <div
       class="min-w-full form-wrapper"

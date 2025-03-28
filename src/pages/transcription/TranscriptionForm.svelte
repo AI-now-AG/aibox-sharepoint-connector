@@ -958,7 +958,7 @@
   );
 </script>
 
-<div class="px-14 mt-10">
+<div class="container max-w-6xl mx-auto px-14 mt-10 max-w-6xl">
   <div class="bg-base-100 mt-10 p-4 px-6 rounded-xl">
     <p class="mb-2">{t("transcription.upload-video-or-audio-file")}</p>
     {#if !audioFile}
