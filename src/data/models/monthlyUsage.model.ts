@@ -73,11 +73,11 @@ export default {
     const filter = { tenant_id: tenantId, month };
 
     // Try to find existing doc
-    let existing = await collection.findOne(filter);
+    const existing = await collection.findOne(filter);
 
     if (!existing) {
       // Create a new usage doc with default limits
-      const newDoc: MonthlyUsage = {
+      const newDoc: Partial<MonthlyUsage> = {
         _id: new ObjectId(),
         tenant_id: tenantId,
         month,
@@ -107,10 +107,10 @@ export default {
 
       const validated = MonthlyUsageSchema.parse(newDoc);
       await collection.insertOne(validated);
-      existing = newDoc;
     }
 
     // Prepare update object
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const update: any = {
       $set: {
         updated_at: new Date(),
