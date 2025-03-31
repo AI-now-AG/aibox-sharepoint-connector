@@ -1,8 +1,11 @@
 ---
 import Layout from "$layouts/Layout.astro";
 import ImageGenerator from "./ImageGeneratorFlux.svelte";
+
+const tenant = Astro.locals.tenant;
+const tenantId = tenant?._id?.toString() ?? "";
 ---
 
 <Layout>
-  <ImageGenerator client:load />
+  <ImageGenerator tenantId={tenantId} client:load />
 </Layout>
