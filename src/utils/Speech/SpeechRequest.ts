@@ -16,10 +16,14 @@ export interface TranscriptionProperties {
   displayFormWordLevelTimestampsEnabled: boolean;
   diarizationEnabled: boolean;
   diarization?: DiarizationProperties; // Diarization is optional and will be added conditionally
-  languageIdentification: LanguageIdentification;
+  languageIdentification?: LanguageIdentification;
   punctuationMode: string;
   profanityFilterMode: string;
   destinationContainerUrl: string;
+}
+
+export interface ModelSelection {
+  self: string;
 }
 
 // Define the structure for the entire body object
@@ -27,6 +31,7 @@ export interface TranscriptionRequestBody {
   displayName: string;
   locale: string;
   contentUrls: string[];
+  model?: ModelSelection;
   properties: TranscriptionProperties;
   customProperties: Record<string, unknown>;
 }
