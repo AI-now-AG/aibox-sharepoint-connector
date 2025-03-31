@@ -1,6 +1,7 @@
 <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 <!-- svelte-ignore a11y_label_has_associated_control -->
 <script>
+  import SelectOptions from "$components/SelectOptions.svelte";
   import { useTranslations } from "$i18n/utils";
   import ImageCreationUsage from "../ImageCreationUsage.svelte";
   const t = useTranslations();
@@ -101,13 +102,6 @@
       }
     }
   }
-
-  function blur() {
-    const elem = document.activeElement;
-    if (elem) {
-      elem?.blur();
-    }
-  }
 </script>
 
 <div class="container max-w-6xl mx-auto grid grid-cols-1 px-14">
@@ -126,90 +120,26 @@
     </div>
 
     <div class="flex space-x-4">
-      <div class="flex-1">
-        <label class="block mb-1">{t("create-image.image-size-label")}</label>
-        <div class="dropdown w-full">
-          <label tabindex="0" class="select select-bordered w-full rounded-lg">
-            {sizeOptions.find((opt) => opt.value === size)?.label ||
-              t("create-image.select-image-size-label")}
-          </label>
-          <ul
-            tabindex="0"
-            class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-full"
-          >
-            {#each sizeOptions as option}
-              <li>
-                <button
-                  type="button"
-                  on:click={() => {
-                    size = option.value;
-                    blur();
-                  }}
-                >
-                  {option.label}
-                </button>
-              </li>
-            {/each}
-          </ul>
-        </div>
-      </div>
+      <SelectOptions
+        classes="flex-1"
+        label={t("create-image.image-size-label")}
+        options={sizeOptions}
+        bind:value={size}
+      />
 
-      <div class="flex-1">
-        <label class="block mb-1">{t("create-image.image-quality-label")}</label
-        >
-        <div class="dropdown w-full">
-          <label tabindex="0" class="select select-bordered w-full rounded-lg">
-            {qualityOptions.find((opt) => opt.value === quality)?.label ||
-              t("create-image.select-image-quality-label")}
-          </label>
-          <ul
-            tabindex="0"
-            class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-full"
-          >
-            {#each qualityOptions as option}
-              <li>
-                <button
-                  type="button"
-                  on:click={() => {
-                    quality = option.value;
-                    blur();
-                  }}
-                >
-                  {option.label}
-                </button>
-              </li>
-            {/each}
-          </ul>
-        </div>
-      </div>
+      <SelectOptions
+        classes="flex-1"
+        label={t("create-image.select-image-quality-label")}
+        options={qualityOptions}
+        bind:value={quality}
+      />
 
-      <div class="flex-1">
-        <label class="block mb-1">{t("create-image.image-format-label")}</label>
-        <div class="dropdown w-full">
-          <label tabindex="0" class="select select-bordered w-full rounded-lg">
-            {outputOptions.find((opt) => opt.value === selectedFormat)?.label ||
-              t("create-image.select-image-format-label")}
-          </label>
-          <ul
-            tabindex="0"
-            class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-full"
-          >
-            {#each outputOptions as option}
-              <li>
-                <button
-                  type="button"
-                  on:click={() => {
-                    selectedFormat = option.value;
-                    blur();
-                  }}
-                >
-                  {option.label}
-                </button>
-              </li>
-            {/each}
-          </ul>
-        </div>
-      </div>
+      <SelectOptions
+        classes="flex-1"
+        label={t("create-image.image-format-label")}
+        options={outputOptions}
+        bind:value={selectedFormat}
+      />
     </div>
 
     <button
