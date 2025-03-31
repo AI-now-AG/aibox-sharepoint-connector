@@ -4,7 +4,6 @@
   import SingleInput from "./SingleInput.svelte";
   import { tenant } from "$stores";
   import { ApiKeyProvider } from "$types/TenantFeature";
-  import { preventDefault } from "$utils/common";
 
   const t = useTranslations();
 
@@ -18,14 +17,15 @@
   let { models = $bindable([]), selectedModel = $bindable() }: Props = $props();
 
   onMount(async function () {
-    models = getActiveModels();
+    models = getActiveModels() || [];
   });
 
-  const getModelName = (provider) => {
-    return $tenant[`${provider.name}_chat_model`] || "gpt-4o";
+  const getModelName = (provider: { name: string }) => {
+    const key = `${provider.name}_chat_model` as keyof typeof $tenant;
+    return $tenant?.[key] || "gpt-4o";
   };
 
-  const getProviderName = (provider) => {
+  const getProviderName = (provider: any) => {
     let title;
     switch (provider.name) {
       case ApiKeyProvider.AzureOpenAI:
@@ -40,26 +40,27 @@
     return title;
   };
 
-  const getActiveModels = () => {
+  const getActiveModels = (): Item[] => {
     const defaultModel = $tenant?.api_key_providers?.find(
       (provider) => provider.default,
     );
 
-    const models = $tenant?.api_key_providers
-      ?.filter((provider) => provider.active)
-      .map((provider) => {
-        const providerName = getProviderName(provider);
-        const modelName = getModelName(provider);
-        return {
-          _id: `${provider.name}`,
-          title: `${providerName} ${modelName}`,
-        };
-      });
+    const models =
+      $tenant?.api_key_providers
+        ?.filter((provider) => provider.active)
+        .map((provider) => {
+          const providerName = getProviderName(provider);
+          const modelName = getModelName(provider);
+          return {
+            _id: `${provider.name}`,
+            title: `${providerName} ${modelName}`,
+          };
+        }) || [];
     const defaultText = t("tenant.default");
     const defaultName = defaultText.replace(/^./, defaultText[0].toUpperCase());
-    const defaultOptionTitle = models?.unshift({
-      _id: null,
-      title: `${defaultName} (${getProviderName(defaultModel)} ${getModelName(defaultModel)})`,
+    models.unshift({
+      _id: "default",
+      title: `${defaultName} (${getProviderName(defaultModel ?? { name: "" })} ${getModelName(defaultModel ?? { name: "" })})`,
     });
     return models;
   };
