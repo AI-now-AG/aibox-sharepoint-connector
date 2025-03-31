@@ -62,7 +62,7 @@ export class UsageTrackerCallbackHandler extends BaseCallbackHandler {
     };
 
     await UsageLogModel.create(usage);
-    await MonthlyUsageModel.upsertAndIncrementUsage({
+    await MonthlyUsageModel.upsertAndIncrementUsageMetrics({
       tenantId: this.tenantId!,
       service: UsageService.Text,
       usage: { tokens: output.llmOutput?.tokenUsage?.totalTokens },

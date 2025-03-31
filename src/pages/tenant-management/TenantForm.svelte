@@ -28,31 +28,16 @@
 
   interface Props {
     tenant?: any;
-    openAIKey?: string;
-    azureOpenAIKey?: string;
-    perplexityKey?: string;
-    azureSpeechKey?: string;
-    falAiKey?: string;
+    usageSettings?: any;
   }
 
-  let {
-    tenant = $bindable(),
-    openAIKey = "",
-    azureOpenAIKey = "",
-    perplexityKey = "",
-    azureSpeechKey = "",
-    falAiKey = "",
-  }: Props = $props();
+  let { tenant, usageSettings }: Props = $props();
+  $inspect(usageSettings);
 
   let addTenantAdminModal: HTMLDialogElement | undefined = $state();
   let confirmUpdateModal: HTMLDialogElement | undefined = $state();
   let alertModal: HTMLDialogElement | undefined = $state();
   let alertMessage = $state("");
-
-  // demo***
-  let count1 = 50;
-  let count2 = 20;
-  let count3 = 25;
 
   const MODE = {
     Create: "create",
@@ -94,7 +79,7 @@
   let audioSelectedProvider = $state(providerValues[0]);
 
   if (tenantData && tenantData.included_features?.length) {
-    const findTextProvider = tenantData.included_features.find(
+    const findTextProvider = tenantData.included_features?.find(
       (item: any) => item.name == TenantFeature.AudioToText,
     );
     if (findTextProvider) {
@@ -109,9 +94,6 @@
     // );
   }
 
-  let hex = tenantData?.primary_color || "#491EFF";
-  let selecteColor = $state(hex);
-  let showPicker = $state(false);
   let tenantAdminEmail = $state("");
   let tenantAdminEmailErrorMessage = $state("");
 
@@ -221,12 +203,12 @@
     azureOpenAIEnabled = findProvider(ApiKeyProvider.AzureOpenAI);
     perplexityEnabled = findProvider(ApiKeyProvider.Perplexity);
 
-    dalleEnabled = tenantData.included_features.some(
+    dalleEnabled = tenantData.included_features?.some(
       (item: any) =>
         item.name == TenantFeature.CreateImage &&
         item.provider == ApiKeyProvider.OpenAI,
     );
-    fluxEnabled = tenantData.included_features.some(
+    fluxEnabled = tenantData.included_features?.some(
       (item: any) => item.provider == ApiKeyProvider.Flux,
     );
 
@@ -236,6 +218,7 @@
         (item: any) => item.name === TenantFeature.AudioToText,
       )?.provider;
 
+    // svelte-ignore state_referenced_locally
     if (defaultTextFeature) {
       openAIEnabled ||= defaultTextFeature === ApiKeyProvider.OpenAI;
       azureOpenAIEnabled ||= defaultTextFeature === ApiKeyProvider.AzureOpenAI;
@@ -260,15 +243,6 @@
   }
   if (tenantData.theme) {
     selectedThemes = themes.find((item) => item.value === tenantData.theme);
-  }
-
-  if (tenantData && !tenantData.primary_color) {
-    // svelte-ignore state_referenced_locally
-    tenantData.primary_color = selecteColor;
-  }
-
-  function toggleColorPicker() {
-    showPicker = !showPicker;
   }
 
   function togglePassword(field: HTMLInputElement) {
@@ -316,7 +290,10 @@
       return false;
     }
 
-    if (defaultTextFeature == ApiKeyProvider.OpenAI && !openAIKey) {
+    if (
+      defaultTextFeature == ApiKeyProvider.OpenAI &&
+      !tenantData.openai_api_key
+    ) {
       showAlert(t("tenant.validate-open-ai-key-message"));
       return false;
     }
@@ -328,12 +305,12 @@
       return false;
     }
 
-    if (isAudioToTextChecked && !azureOpenAIKey) {
+    if (isAudioToTextChecked && !tenantData.azure_openai_api_key) {
       showAlert(t("tenant.validate-azure-open-ai-key-message"));
       return false;
     }
 
-    if (azureOpenAIKey) {
+    if (tenantData.azure_openai_api_key) {
       if (!tenantData?.azure_openai_instance_name) {
         showAlert(
           t("tenant.validate-azure-open-ai-instance-name-empty-message"),
@@ -357,18 +334,21 @@
     }
 
     if (isAudioToTextChecked) {
-      if (audioSelectedProvider.value === ApiKeyProvider.OpenAI && !openAIKey) {
+      if (
+        audioSelectedProvider.value === ApiKeyProvider.OpenAI &&
+        !tenantData.openai_api_key
+      ) {
         showAlert(t("tenant.validate-open-ai-key-message"));
         return false;
       }
     }
 
-    if (isAzureAudioProEnabled && !azureSpeechKey) {
+    if (isAzureAudioProEnabled && !tenantData.speech_api_key) {
       showAlert(t("tenant.validate-azure-speech-service-key"));
       return false;
     }
 
-    if (azureSpeechKey) {
+    if (tenantData.speech_api_key) {
       if (!tenantData?.speech_region) {
         showAlert(t("tenant.validate-azure-speech-service-region"));
         return false;
@@ -409,11 +389,11 @@
         tenantData.theme = selectedThemes?.value as TenantTheme;
         const { error: encryptKeysError, data } =
           await actions.tenant.encryptApiKeys({
-            openai_api_key: openAIKey,
-            azure_openai_api_key: azureOpenAIKey,
-            perplexity_api_key: perplexityKey,
-            speech_api_key: azureSpeechKey,
-            fal_ai_api_key: falAiKey,
+            openai_api_key: tenantData.openai_api_key,
+            azure_openai_api_key: tenantData.azure_openai_api_key,
+            perplexity_api_key: tenantData.perplexity_api_key,
+            speech_api_key: tenantData.speech_api_key,
+            fal_ai_api_key: tenantData.fal_ai_api_key,
           });
         if (encryptKeysError) {
           showAlert(encryptKeysError?.toString());
@@ -479,7 +459,10 @@
           tenantData.tenant_admin_email = tenantAdminEmail;
         }
 
-        const createTanentResult = await actions.tenant.create(tenantData);
+        const createTanentResult = await actions.tenant.create({
+          tenant: tenantData,
+          usageSettings,
+        });
         const { error, data: createdTenant } = createTanentResult;
 
         loading = false;
@@ -509,11 +492,11 @@
         tenantData.theme = selectedThemes?.value as TenantTheme;
         const { error: encryptKeysError, data } =
           await actions.tenant.encryptApiKeys({
-            openai_api_key: openAIKey,
-            azure_openai_api_key: azureOpenAIKey,
-            perplexity_api_key: perplexityKey,
-            speech_api_key: azureSpeechKey,
-            fal_ai_api_key: falAiKey,
+            openai_api_key: tenantData.openai_api_key,
+            azure_openai_api_key: tenantData.azure_openai_api_key,
+            perplexity_api_key: tenantData.perplexity_api_key,
+            speech_api_key: tenantData.speech_api_key,
+            fal_ai_api_key: tenantData.fal_ai_api_key,
           });
         if (encryptKeysError) {
           showAlert(encryptKeysError?.toString());
@@ -524,6 +507,7 @@
           azure_openai_api_key,
           perplexity_api_key,
           speech_api_key,
+          fal_ai_api_key,
         } = data;
 
         cleanupValues();
@@ -532,6 +516,7 @@
         tenantData.azure_openai_api_key = azure_openai_api_key;
         tenantData.speech_api_key = speech_api_key;
         tenantData.perplexity_api_key = perplexity_api_key;
+        tenantData.fal_ai_api_key = fal_ai_api_key;
 
         tenantData.perplexity_chat_model = selectedPerplexityModel;
         updateTextFeature(ApiKeyProvider.OpenAI, openAIEnabled);
@@ -585,7 +570,10 @@
           tenantData.tenant_admin_email = tenantAdminEmail;
         }
 
-        const { error } = await actions.tenant.update(tenantData);
+        const { error } = await actions.tenant.update({
+          tenant: tenantData,
+          usageSettings,
+        });
         loading = false;
 
         if (error) {
@@ -828,7 +816,7 @@
                   type="password"
                   class="grow"
                   placeholder={t("tenant.api-key")}
-                  bind:value={openAIKey}
+                  bind:value={tenantData.openai_api_key}
                 />
                 <TogglePasswordIcon
                   change={() => togglePassword(openAIKeyField)}
@@ -896,7 +884,7 @@
                   type="password"
                   class="grow"
                   placeholder={t("tenant.api-key")}
-                  bind:value={azureOpenAIKey}
+                  bind:value={tenantData.azure_openai_api_key}
                 />
                 <TogglePasswordIcon
                   change={() => togglePassword(azureOpenAIKeyField)}
@@ -1024,7 +1012,7 @@
                   type="password"
                   class="grow"
                   placeholder={t("tenant.api-key")}
-                  bind:value={perplexityKey}
+                  bind:value={tenantData.perplexity_api_key}
                 />
                 <TogglePasswordIcon
                   change={() => togglePassword(perplexityKeyField)}
@@ -1188,7 +1176,7 @@
                   type="password"
                   class="grow"
                   placeholder={t("tenant.api-key")}
-                  bind:value={azureSpeechKey}
+                  bind:value={tenantData.speech_api_key}
                 />
                 <TogglePasswordIcon
                   change={() => togglePassword(azureOpenAIKeyProField)}
@@ -1291,7 +1279,7 @@
                 class="input input-bordered mt-2 w-full"
                 placeholder={""}
                 use:trimInput
-                bind:value={count1}
+                bind:value={usageSettings.imageDalle.limitRequests}
               />
             </div>
             <div class="w-full">
@@ -1304,7 +1292,7 @@
                 placeholder={""}
                 use:trimInput
                 disabled={true}
-                bind:value={count2}
+                bind:value={usageSettings.imageDalle.usedRequests}
               />
             </div>
             <div class="w-full">
@@ -1316,7 +1304,7 @@
                 class="input input-bordered mt-2 w-full"
                 placeholder={""}
                 use:trimInput
-                bind:value={count3}
+                bind:value={usageSettings.imageDalle.extraAmount}
               />
             </div>
           </div>
@@ -1356,7 +1344,7 @@
                   type="password"
                   class="grow"
                   placeholder={t("tenant.api-key")}
-                  bind:value={azureSpeechKey}
+                  bind:value={tenantData.fal_ai_api_key}
                 />
                 <TogglePasswordIcon
                   change={() => togglePassword(falOpenAIKeyField)}
@@ -1375,7 +1363,7 @@
                 class="input input-bordered mt-2 w-full"
                 placeholder={""}
                 use:trimInput
-                bind:value={count1}
+                bind:value={usageSettings.imageFlux.limitRequests}
               />
             </div>
             <div class="w-full">
@@ -1388,7 +1376,7 @@
                 placeholder={""}
                 use:trimInput
                 disabled={true}
-                bind:value={count2}
+                bind:value={usageSettings.imageFlux.usedRequests}
               />
             </div>
             <div class="w-full">
@@ -1400,7 +1388,7 @@
                 class="input input-bordered mt-2 w-full"
                 placeholder={""}
                 use:trimInput
-                bind:value={count3}
+                bind:value={usageSettings.imageFlux.extraAmount}
               />
             </div>
           </div>

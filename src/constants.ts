@@ -59,6 +59,12 @@ export const AUTH_AUTHORIZE_SCOPES = [
   "ainow/roles",
 ];
 
+// Usages
+export const MONTHLY_USAGES = {
+  IMAGE_DALLE_LIMIT_REQUEST: 10,
+  IMAGE_FLUX_LIMIT_REQUEST: 20,
+};
+
 // SendGrid
 export const SG_VERIFICATION_TEMPLATE = "d-69ed72334042458783f985ada5dbe61d";
 export const SG_WELCOME_TEMPLATE = "d-79e6332e21d14ff792ba9d995127abb7";

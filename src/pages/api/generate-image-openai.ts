@@ -16,7 +16,7 @@ const recordImageUsage = async (ctx: APIContext) => {
     };
 
     await UsageLogModel.create(usage);
-    await MonthlyUsageModel.upsertAndIncrementUsage({
+    await MonthlyUsageModel.upsertAndIncrementUsageMetrics({
       tenantId: ctx.locals.tenant._id,
       service: UsageService.ImageDalle,
       usage: { requests: 1 },
