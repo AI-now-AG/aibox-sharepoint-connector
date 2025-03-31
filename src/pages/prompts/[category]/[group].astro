@@ -3,7 +3,6 @@
 import Layout from "$layouts/Layout.astro";
 import Content from "$components/prompt-interface/components/Content.astro";
 import CategoryModel from "$data/models/category.model";
-import PromptModel from "$data/models/prompt.model";
 import { ObjectId } from "mongodb";
 
 const { category: categoryId, group: groupId } = Astro.params;
@@ -15,27 +14,11 @@ if (
 ) {
   return Astro.redirect("/404");
 }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const group = category?.groups.find((g: any) => g._id.toString() === groupId);
 if (!group) {
   return Astro.redirect("/404");
 }
-
-const cursor = await PromptModel.listByTenant(Astro.locals.user.tenant_id);
-const prompts = await cursor.toArray();
-
-const categoryPrompt = prompts.filter(
-  (g) => g.category?.toString() === categoryId
-);
-const categoryGroupPrompt = categoryPrompt.filter(
-  (g) => g.group?.toString() === group?._id?.toString()
-);
-const promptItems = categoryGroupPrompt.map((prompt) => ({
-  _id: prompt._id?.toString(),
-  title: prompt.title,
-  description: prompt.description,
-}));
-
-let userPermissions = Astro.locals.user.permissions;
 ---
 
 <Layout>
@@ -51,21 +34,5 @@ let userPermissions = Astro.locals.user.permissions;
     <div class="w-full h-full">
       <Content />
     </div>
-    <!-- {
-      promptItems.length > 0 && (
-        <div class="px-6 w-full">
-          <div class="collapse collapse-arrow bg-base-300 w-full max-w-6xl mx-auto">
-            <input type="checkbox" />
-            <div class="collapse-title font-medium">
-              <IconSettings class="w-5 h-5 inline -mt-1" />
-              Prompt
-            </div>
-            <div class="collapse-content">
-              <History />
-            </div>
-          </div>
-        </div>
-      )
-    } -->
   </div>
 </Layout>

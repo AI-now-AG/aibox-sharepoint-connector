@@ -1,6 +1,6 @@
 import { BaseCallbackHandler } from "@langchain/core/callbacks/base";
 import type { LLMResult } from "@langchain/core/outputs";
-import type { Serialized } from "@langchain/core/load/serializable";
+//import type { Serialized } from "@langchain/core/load/serializable";
 import { ObjectId } from "mongodb";
 import { ApiKeyProvider } from "$types/TenantFeature";
 import { UsageType, UsageService } from "$types/UsageTracking";
@@ -33,15 +33,15 @@ export class UsageTrackerCallbackHandler extends BaseCallbackHandler {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async handleLLMStart(llm: Serialized, prompts: string[], runId: string) {
-    // console.log("🟡 LLM START");
-    // console.log("Model:", llm.name);
-    // console.log("Prompts:", prompts);
-    // console.log("Run ID:", runId);
-  }
+  //async handleLLMStart(llm: Serialized, prompts: string[], runId: string) {
+  // console.log("🟡 LLM START");
+  // console.log("Model:", llm.name);
+  // console.log("Prompts:", prompts);
+  // console.log("Run ID:", runId);
+  //}
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async handleLLMEnd(output: LLMResult, runId: string) {
+  async handleLLMEnd(output: LLMResult, _runId: string) {
     console.log("🟢 LLM END");
     console.log("Output:", JSON.stringify(output.generations));
     console.log("Token Usage:", output.llmOutput?.tokenUsage);
@@ -70,8 +70,8 @@ export class UsageTrackerCallbackHandler extends BaseCallbackHandler {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
-  async handleLLMError(error: any, runId: string) {
-    //console.error("🔴 LLM ERROR:", error);
-    //console.error("Run ID:", runId);
-  }
+  //async handleLLMError(error: any, runId: string) {
+  //console.error("🔴 LLM ERROR:", error);
+  //console.error("Run ID:", runId);
+  //}
 }
