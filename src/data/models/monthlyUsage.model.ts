@@ -3,6 +3,7 @@ import { db, type Document } from "../mongodb";
 import { UsageService } from "$types/UsageTracking";
 import { MONTHLY_USAGES } from "$constants";
 import { z } from "zod";
+import moment from "moment";
 
 export const ServiceSchema = z.object({
   text: z
@@ -54,10 +55,7 @@ export type MonthlyUsage = z.infer<typeof MonthlyUsageSchema>;
 const collection = db.collection("monthly_usages");
 
 const getCurrentMonthFormatted = (): string => {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = (now.getMonth() + 1).toString().padStart(2, "0");
-  return `${year}-${month}`;
+  return moment(Date.now()).format("YYYY-MM");
 };
 
 export const createDefaultMonthlyUsage = async (tenantId: ObjectId) => {
