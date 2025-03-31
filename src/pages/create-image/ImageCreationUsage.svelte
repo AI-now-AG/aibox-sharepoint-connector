@@ -18,7 +18,7 @@
 </script>
 
 <div
-  class="bottom-10 right-4 card shadow-lg p-8 w-xs ml-auto fixed"
+  class="bottom-10 right-4 card shadow-lg p-4 w-2xs ml-auto fixed"
   class:bg-base-100={available > 0}
   class:bg-yellow-400={available === 0}
   role="region"

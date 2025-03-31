@@ -235,15 +235,4 @@ export default {
       },
     );
   },
-  findByTenantIdandMonth: async (
-    tenantId: ObjectId | string,
-    month: string,
-  ) => {
-    const _tenantId =
-      tenantId instanceof ObjectId ? tenantId : new ObjectId(tenantId);
-    return await collection.findOne<Document<MonthlyUsage>>({
-      tenant_id: _tenantId,
-      month,
-    });
-  },
 };

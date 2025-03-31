@@ -9,7 +9,6 @@
   import { onMount } from "svelte";
   import log from "$utils/log";
   import { addToast } from "$stores/toast";
-  import moment from "moment";
   import Loading from "$components/Loading.svelte";
   const t = useTranslations();
 
@@ -52,10 +51,8 @@
   async function checkUsage() {
     try {
       loading = true;
-      const month = moment(Date.now()).format("YYYY-MM");
       const result = await actions.usage.getMonthlyImageUsage({
         tenant_id: tenantId,
-        month: month,
       });
 
       log.d(result?.data?.imageDalle, "RESULT USAGE DALL-E 3");

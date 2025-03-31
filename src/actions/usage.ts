@@ -4,7 +4,6 @@ import { transformRawData } from "$utils/transformRawData";
 import TenantModel, { type Tenant } from "$data/models/tenant.model";
 import UsageLogModel from "$data/models/usageLog.model";
 import MonthlyUsageModel from "$data/models/monthlyUsage.model";
-import { ObjectId } from "mongodb";
 
 const PRICING: Record<string, { input: number; output: number }> = {
   "openai:gpt-4o": { input: 0.00001, output: 0.00003 },
@@ -25,9 +24,8 @@ interface CountImageRequestsOutput {
   total_requests_today: number;
 }
 
-const getMonthlyUsageInputSchema = z.object({
-  tenant_id: z.string(), // We'll convert this to ObjectId in the handler
-  month: z.string().regex(/^\d{4}-\d{2}$/, "Month must be in YYYY-MM format"), // e.g., "2025-03"
+const MonthlyUsageInputSchema = z.object({
+  tenant_id: z.string(),
 });
 
 interface GetMonthlyUsageOutput {
@@ -153,25 +151,15 @@ export const usage = {
   }),
 
   getMonthlyImageUsage: defineAction({
-    input: getMonthlyUsageInputSchema,
+    input: MonthlyUsageInputSchema,
     handler: async (
-      input: z.infer<typeof getMonthlyUsageInputSchema>,
+      input: z.infer<typeof MonthlyUsageInputSchema>,
     ): Promise<GetMonthlyUsageOutput> => {
-      const { tenant_id, month } = input;
-
-      // Convert tenant_id to ObjectId
-      let tenantIdObj: ObjectId;
-      try {
-        tenantIdObj = new ObjectId(tenant_id);
-      } catch {
-        throw new Error("Invalid tenant_id format. Must be a valid ObjectId.");
-      }
+      const { tenant_id: tenantId } = input;
 
       // Query the monthly_usages collection for the specified tenant_id and month
-      const monthlyUsage = await MonthlyUsageModel.findByTenantIdandMonth(
-        tenantIdObj,
-        month,
-      );
+      const monthlyUsage =
+        await MonthlyUsageModel.findOrCreateMonthlyUsage(tenantId);
 
       if (!monthlyUsage) {
         // If no record is found, return default values
@@ -215,7 +203,7 @@ export const usage = {
 
       // Query Dalle 3 for today
       const todayQueryDalle3 = {
-        tenant_id: tenant_id,
+        tenant_id: tenantId,
         provider: "openai",
         model: "dall-e-3",
         type: "image",
@@ -230,7 +218,7 @@ export const usage = {
 
       // Query Flux Dev for today
       const todayQueryFluxDev = {
-        tenant_id: tenant_id,
+        tenant_id: tenantId,
         provider: "flux",
         model: "fal-ai/flux/dev",
         type: "image",
