@@ -24,26 +24,29 @@
   role="region"
   aria-label="Image usage statistics"
 >
-  <h3 class="text-xl font-semibold text-gray-700">
+  <h3 class="text-lg font-semibold text-gray-700">
     {t("create-image.usage.current-usage")}
   </h3>
 
   {#if available === 0}
-    <p class="text-base text-gray-600 mt-2">
+    <p class="text-base text-sm text-gray-600 mt-2">
       {t("create-image.usage.reach-limitation-message", {
         amount: monthlyLimit,
       })}
     </p>
   {:else}
-    <p class="text-base text-gray-600 mt-2">
+    <p class="text-base text-sm text-gray-600 mt-2">
       {t("create-image.usage.today-usage", { amount: today }) ??
         `Today: ${today} images`}
     </p>
-    <p class="text-base text-gray-600">
+    <p class="text-base text-sm text-gray-600">
       {t("create-image.usage.this-month-usage", { amount: thisMonth }) ??
         `This month: ${thisMonth} images`}
     </p>
-    <p class="text-base text-gray-600" class:text-red-600={available <= 0}>
+    <p
+      class="text-base text-sm text-gray-600"
+      class:text-red-600={available <= 0}
+    >
       {t("create-image.usage.available-images", { amount: available }) ??
         `Available: ${available} images`}
     </p>
