@@ -2,8 +2,9 @@
 import Layout from "$layouts/Layout.astro";
 import TenantForm from "./TenantForm.svelte";
 import TenantModel from "$data/models/tenant.model";
-import { decrypt } from "$utils/secure";
+import MonthlyUsageModel from "$data/models/monthlyUsage.model";
 import { transformRawData } from "$utils/transformRawData";
+import { decrypt } from "$utils/secure";
 
 export interface Props {
   id: string;
@@ -18,50 +19,23 @@ const tenant = await TenantModel.get(id);
 if (!tenant) {
   return Astro.redirect("/404");
 }
+const monthlyUsage = await MonthlyUsageModel.findOrCreateMonthlyUsage(id);
 
-const data = transformRawData(tenant);
-const {
-  openai_api_key,
-  azure_openai_api_key,
-  speech_api_key,
-  perplexity_api_key,
-  fal_ai_api_key,
-} = data || {};
-let openAIKey = "";
-let azureOpenAIKey = "";
-let perplexityKey = "";
-let azureSpeechKey = "";
-let falAiKey = "";
+const tenantData = transformRawData(tenant);
+const monthlyUsageData = transformRawData(monthlyUsage);
+const usageSettings = monthlyUsageData.services;
 
-if (openai_api_key) {
-  openAIKey = decrypt(openai_api_key);
-}
-
-if (azure_openai_api_key) {
-  azureOpenAIKey = decrypt(azure_openai_api_key);
-}
-
-if (speech_api_key) {
-  azureSpeechKey = decrypt(speech_api_key);
-}
-
-if (perplexity_api_key) {
-  perplexityKey = decrypt(perplexity_api_key);
-}
-
-if (fal_ai_api_key) {
-  falAiKey = decrypt(fal_ai_api_key);
-}
+[
+  "openai_api_key",
+  "azure_openai_api_key",
+  "speech_api_key",
+  "perplexity_api_key",
+  "fal_ai_api_key",
+].forEach((key) => {
+  tenantData[key] = tenantData[key] ? decrypt(tenantData[key]) : "";
+});
 ---
 
 <Layout>
-  <TenantForm
-    tenant={data}
-    openAIKey={openAIKey?.trim()}
-    azureOpenAIKey={azureOpenAIKey?.trim()}
-    perplexityKey={perplexityKey?.trim()}
-    azureSpeechKey={azureSpeechKey?.trim()}
-    falAiKey={falAiKey?.trim()}
-    client:load
-  />
+  <TenantForm tenant={tenantData} usageSettings={usageSettings} client:load />
 </Layout>
