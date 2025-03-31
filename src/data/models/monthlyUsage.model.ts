@@ -93,7 +93,9 @@ export const createDefaultMonthlyUsage = async (tenantId: ObjectId) => {
   };
 
   const validated = MonthlyUsageSchema.parse(newDoc);
-  await collection.insertOne(validated);
+  const result = await collection.insertOne(validated);
+
+  return { ...validated, _id: result.insertedId } as MonthlyUsage;
 };
 
 export const getDefaultUsageSettings = () => {
@@ -125,7 +127,7 @@ export default {
   findOrCreateMonthlyUsage: async (tenantId: ObjectId | string) => {
     const _tenantId =
       tenantId instanceof ObjectId ? tenantId : new ObjectId(tenantId);
-    const doc = collection.findOne<Document<MonthlyUsage>>({
+    const doc = await collection.findOne<Document<MonthlyUsage>>({
       tenant_id: _tenantId,
       month: getCurrentMonthFormatted(),
     });
