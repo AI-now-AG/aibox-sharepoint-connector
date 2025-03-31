@@ -1241,7 +1241,7 @@
     <!-- Image creation -->
     <div class="mb-3 flex flex-row items-center gap-2">
       {@html svgIcons.image}
-      <p class="font-medium text-md">{t("nav.create-image")}</p>
+      <p class="font-medium text-md">{t("tenant.image-creation")}</p>
     </div>
 
     <div class="container mx-auto">
@@ -1261,7 +1261,7 @@
             />
             <label class="label cursor-pointer ml-2" for="image-dalle-model">
               <span class="label-text text-base-content"
-                >{"DALL-E (Open AI)"}</span
+                >{t("tenant.image-creation.dalle")}</span
               >
             </label>
           </div>
@@ -1271,7 +1271,7 @@
           <div class="grid grid-cols-3 gap-4 mx-8">
             <div class="w-full">
               <span class="mb-2 text-base-content/50 font-medium text-sm"
-                >{"Images per month"}
+                >{t("tenant.image-creation.usage.request-per-month")}
               </span>
 
               <input
@@ -1284,7 +1284,7 @@
             </div>
             <div class="w-full">
               <span class="mb-2 text-base-content/50 font-medium text-sm"
-                >{"Images created this month"}</span
+                >{t("tenant.image-creation.usage.created-this-month")}</span
               >
               <input
                 type="number"
@@ -1297,7 +1297,7 @@
             </div>
             <div class="w-full">
               <span class="mb-2 text-base-content/50 font-medium text-sm"
-                >{"Add Images for this month"}</span
+                >{t("tenant.image-creation.usage.extra-image-this-month")}</span
               >
               <input
                 type="number"
@@ -1325,7 +1325,9 @@
               value="text-prompt"
             />
             <label class="label cursor-pointer ml-2" for="image-flux-model">
-              <span class="label-text text-base-content">{"Flux"}</span>
+              <span class="label-text text-base-content"
+                >{t("tenant.image-creation.flux")}</span
+              >
             </label>
           </div>
         </div>
@@ -1334,7 +1336,7 @@
           <div class="grid grid-cols-2 gap-4 mx-8">
             <div class="w-full">
               <span class="mb-2 text-base-content/50 font-medium text-sm"
-                >{"API Key"}</span
+                >{t("tenant.image-creation.flux.api-key")}</span
               >
               <label
                 class="input input-bordered flex items-center gap-2 mt-2 w-full"
@@ -1355,7 +1357,7 @@
           <div class="grid grid-cols-3 gap-4 mx-8">
             <div class="w-full">
               <span class="mb-2 text-base-content/50 font-medium text-sm"
-                >{"Images per month"}
+                >{t("tenant.image-creation.usage.request-per-month")}
               </span>
 
               <input
@@ -1368,7 +1370,7 @@
             </div>
             <div class="w-full">
               <span class="mb-2 text-base-content/50 font-medium text-sm"
-                >{"Images created this month"}</span
+                >{t("tenant.image-creation.usage.created-this-month")}</span
               >
               <input
                 type="number"
@@ -1381,7 +1383,7 @@
             </div>
             <div class="w-full">
               <span class="mb-2 text-base-content/50 font-medium text-sm"
-                >{"Add Images for this month"}</span
+                >{t("tenant.image-creation.usage.extra-image-this-month")}</span
               >
               <input
                 type="number"
