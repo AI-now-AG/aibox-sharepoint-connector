@@ -8,8 +8,9 @@
   import ImageCreationUsage from "../ImageCreationUsage.svelte";
   import { onMount } from "svelte";
   import log from "$utils/log";
-  import { ApiKeyProvider } from "$types/TenantFeature";
   import { addToast } from "$stores/toast";
+  import moment from "moment";
+  import Loading from "$components/Loading.svelte";
   const t = useTranslations();
 
   interface Props {
@@ -45,24 +46,27 @@
     today: 0,
     thisMonth: 0,
     available: 0,
-    monthlyLimit: 3,
+    monthlyLimit: 0,
   });
 
   async function checkUsage() {
     try {
       loading = true;
-      const result = await actions.usage.countImageGenerationRequests({
+      const month = moment(Date.now()).format("YYYY-MM");
+      const result = await actions.usage.getMonthlyImageUsage({
         tenant_id: tenantId,
-        provider: ApiKeyProvider.OpenAI.toString(),
-        model: "dall-e-3",
+        month: month,
       });
+
       log.d(result, "RESULT USAGE");
       if (result?.data) {
-        const { total_requests_this_month, total_requests_today } = result.data;
+        const { imageDalle } = result.data;
         usageStats = {
           ...usageStats,
-          today: total_requests_today,
-          thisMonth: total_requests_this_month,
+          today: imageDalle.todayAmount || 0,
+          thisMonth: imageDalle.thisMonthAmount || 0,
+          monthlyLimit: imageDalle.limitRequests || 0,
+          available: imageDalle.availableAmount || 0,
         };
       }
     } catch (error) {
@@ -110,7 +114,12 @@
       }
 
       base64Image = "data:image/png;base64," + data.image;
-      console.log("base64Image", base64Image);
+      usageStats = {
+        ...usageStats,
+        today: usageStats.today + 1,
+        thisMonth: usageStats.thisMonth + 1,
+        available: usageStats.available - 1,
+      };
     } catch (err) {
       error = err;
     } finally {
@@ -220,11 +229,14 @@
       </button>
     </div>
   {/if}
-
-  <ImageCreationUsage
-    todayAmount={usageStats.today}
-    thisMonthAmount={usageStats.thisMonth}
-    availableAmount={usageStats.available}
-    monthlyLimit={usageStats.monthlyLimit}
-  />
+  {#if !loading}
+    <ImageCreationUsage
+      todayAmount={usageStats.today}
+      thisMonthAmount={usageStats.thisMonth}
+      availableAmount={usageStats.available}
+      monthlyLimit={usageStats.monthlyLimit}
+    />
+  {/if}
 </div>
+
+<Loading show={loading} />
