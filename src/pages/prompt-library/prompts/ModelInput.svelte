@@ -10,11 +10,16 @@
   type Item = { title: string } | string;
 
   interface Props {
+    label?: string;
     models: Item[];
     selectedModel: Item | undefined;
   }
 
-  let { models = $bindable([]), selectedModel = $bindable() }: Props = $props();
+  let {
+    label,
+    models = $bindable([]),
+    selectedModel = $bindable(),
+  }: Props = $props();
 
   onMount(async function () {
     models = getActiveModels() || [];
@@ -67,7 +72,7 @@
 </script>
 
 <SingleInput
-  title={t("prompt-library.add.prompts.language-model")}
+  title={label ?? t("prompt-library.add.prompts.language-model")}
   placeholder="OpenAI gtp-4o"
   items={models}
   bind:selectedItem={selectedModel}

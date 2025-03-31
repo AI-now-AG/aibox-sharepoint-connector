@@ -13,6 +13,15 @@
     formatCitations,
     stripHtmlFormatting,
   } from "$utils/common";
+  import ModelInput from "$pages/prompt-library/prompts/ModelInput.svelte";
+
+  type Model = {
+    _id: string;
+    title: string;
+  };
+
+  let models: Model[] = $state([]);
+  let selectedModel: Model | undefined = $state();
 
   interface Props {
     tenant?: any;
@@ -183,6 +192,11 @@
           onsend={fetchMessage}
           {isDisableFileInput}
         />
+        <div class="flex items-end justify-end mt-2 z-10">
+          <div class="">
+            <ModelInput label="Text Model" bind:models bind:selectedModel />
+          </div>
+        </div>
       </div>
     {/if}
 
