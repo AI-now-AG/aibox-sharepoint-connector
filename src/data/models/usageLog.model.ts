@@ -85,6 +85,7 @@ export default {
     const { tenant_id, provider, model, type, dateRange } = query;
 
     // Construct the MongoDB query
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const mongoQuery: any = {
       tenant_id: new ObjectId(tenant_id), // Convert tenant_id to ObjectId
       provider,
