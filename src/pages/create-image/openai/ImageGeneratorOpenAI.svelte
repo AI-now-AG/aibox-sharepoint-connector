@@ -1,18 +1,29 @@
 <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 <!-- svelte-ignore a11y_label_has_associated_control -->
-<script>
+<!-- svelte-ignore event_directive_deprecated -->
+<script lang="ts">
+  import { actions } from "astro:actions";
   import SelectOptions from "$components/SelectOptions.svelte";
   import { useTranslations } from "$i18n/utils";
   import ImageCreationUsage from "../ImageCreationUsage.svelte";
+  import { onMount } from "svelte";
+  import log from "$utils/log";
+  import { ApiKeyProvider } from "$types/TenantFeature";
+  import { addToast } from "$stores/toast";
   const t = useTranslations();
 
-  let prompt = "";
-  let base64Image = "";
-  let loading = false;
-  let error = "";
-  let size = "1024x1024";
-  let quality = "standard";
-  let selectedFormat = "png";
+  interface Props {
+    tenantId: string;
+  }
+  let { tenantId } = $props() as Props;
+
+  let prompt = $state("");
+  let base64Image = $state("");
+  let loading = $state(false);
+  let error: any = $state("");
+  let size = $state("1024x1024");
+  let quality = $state("standard");
+  let selectedFormat = $state("png");
 
   const sizeOptions = [
     { value: "1024x1024", label: "1024x1024" },
@@ -30,15 +41,52 @@
     { value: "jpeg", label: "JPEG" },
   ];
 
-  // TODO: Handle usage and prevent user from generating more than the limit
-  let usageStats = {
-    today: 22,
-    thisMonth: 30,
-    available: 3,
-    monthlyLimit: 30,
-  };
+  let usageStats = $state({
+    today: 0,
+    thisMonth: 0,
+    available: 0,
+    monthlyLimit: 3,
+  });
+
+  async function checkUsage() {
+    try {
+      loading = true;
+      const result = await actions.usage.countImageGenerationRequests({
+        tenant_id: tenantId,
+        provider: ApiKeyProvider.OpenAI.toString(),
+        model: "dall-e-3",
+      });
+      log.d(result, "RESULT USAGE");
+      if (result?.data) {
+        const { total_requests_this_month, total_requests_today } = result.data;
+        usageStats = {
+          ...usageStats,
+          today: total_requests_today,
+          thisMonth: total_requests_this_month,
+        };
+      }
+    } catch (error) {
+      log.e(error, "Check Usage error");
+    } finally {
+      loading = false;
+    }
+  }
+
+  onMount(() => {
+    checkUsage();
+    return () => {};
+  });
 
   async function generateImage() {
+    if (usageStats.available <= 0) {
+      addToast({
+        type: "error",
+        message: t("create-image.usage.reach-limitation-message", {
+          amount: usageStats.monthlyLimit,
+        }),
+      });
+      return;
+    }
     loading = true;
     error = "";
     base64Image = "";
@@ -64,7 +112,7 @@
       base64Image = "data:image/png;base64," + data.image;
       console.log("base64Image", base64Image);
     } catch (err) {
-      error = err.message;
+      error = err;
     } finally {
       loading = false;
     }
@@ -144,7 +192,7 @@
 
     <button
       type="submit"
-      disabled={loading}
+      disabled={loading || usageStats.available <= 0}
       class="btn btn-active btn-primary min-w-[154px]"
     >
       {loading

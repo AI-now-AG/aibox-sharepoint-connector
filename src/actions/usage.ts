@@ -25,7 +25,7 @@ interface CountImageRequestsOutput {
 
 export const usage = {
   usageSummary: defineAction({
-    handler: async (input) => {
+    handler: async () => {
       // Step 1: Build tenant_id -> name map
       const tenants = await TenantModel.list();
       const tenantMap = tenants.reduce(

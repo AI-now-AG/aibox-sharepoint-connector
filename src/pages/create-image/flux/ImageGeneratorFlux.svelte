@@ -1,9 +1,11 @@
 <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 <!-- svelte-ignore a11y_label_has_associated_control -->
 <script>
+  import { actions } from "astro:actions";
   import SelectOptions from "$components/SelectOptions.svelte";
   import { useTranslations } from "$i18n/utils";
   import ImageCreationUsage from "../ImageCreationUsage.svelte";
+  import { onMount } from "svelte";
   const t = useTranslations();
 
   let prompt = "";
@@ -41,6 +43,10 @@
 
   // Show/hide custom size inputs based on selected size
   $: showCustomSizeInputs = size === "custom";
+
+  onMount(() => {
+    return () => {};
+  });
 
   async function generateImage() {
     if (!prompt.trim()) {
