@@ -101,6 +101,13 @@
       }
     }
   }
+
+  function blur() {
+    const elem = document.activeElement;
+    if (elem) {
+      elem?.blur();
+    }
+  }
 </script>
 
 <div class="container max-w-6xl mx-auto grid grid-cols-1 px-14">
@@ -132,7 +139,13 @@
           >
             {#each sizeOptions as option}
               <li>
-                <button type="button" on:click={() => (size = option.value)}>
+                <button
+                  type="button"
+                  on:click={() => {
+                    size = option.value;
+                    blur();
+                  }}
+                >
                   {option.label}
                 </button>
               </li>
@@ -155,7 +168,13 @@
           >
             {#each qualityOptions as option}
               <li>
-                <button type="button" on:click={() => (quality = option.value)}>
+                <button
+                  type="button"
+                  on:click={() => {
+                    quality = option.value;
+                    blur();
+                  }}
+                >
                   {option.label}
                 </button>
               </li>
@@ -179,7 +198,10 @@
               <li>
                 <button
                   type="button"
-                  on:click={() => (selectedFormat = option.value)}
+                  on:click={() => {
+                    selectedFormat = option.value;
+                    blur();
+                  }}
                 >
                   {option.label}
                 </button>

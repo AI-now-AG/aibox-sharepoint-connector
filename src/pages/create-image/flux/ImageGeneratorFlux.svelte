@@ -117,6 +117,13 @@
       }
     }
   }
+
+  function blur() {
+    const elem = document.activeElement;
+    if (elem) {
+      elem?.blur();
+    }
+  }
 </script>
 
 <div class="container max-w-6xl mx-auto grid grid-cols-1 px-14">
@@ -155,7 +162,13 @@
           >
             {#each sizeOptions as option}
               <li>
-                <button type="button" on:click={() => (size = option.value)}>
+                <button
+                  type="button"
+                  on:click={() => {
+                    size = option.value;
+                    blur();
+                  }}
+                >
                   {option.label}
                 </button>
               </li>
@@ -171,7 +184,7 @@
               <input
                 type="number"
                 bind:value={customWidth}
-                min="1"
+                min="100"
                 class="input input-bordered w-full rounded-lg"
                 aria-label="Custom width"
               />
@@ -183,7 +196,7 @@
               <input
                 type="number"
                 bind:value={customHeight}
-                min="1"
+                min="100"
                 class="input input-bordered w-full rounded-lg"
                 aria-label="Custom height"
               />
@@ -213,7 +226,10 @@
               <li>
                 <button
                   type="button"
-                  on:click={() => (selectedFormat = option.value)}
+                  on:click={() => {
+                    selectedFormat = option.value;
+                    blur();
+                  }}
                 >
                   {option.label}
                 </button>
