@@ -2,13 +2,9 @@
 <!-- svelte-ignore a11y_label_has_associated_control -->
 <!-- svelte-ignore event_directive_deprecated -->
 <script lang="ts">
-  import { actions } from "astro:actions";
   import SelectOptions from "$components/SelectOptions.svelte";
   import { useTranslations } from "$i18n/utils";
-  import ImageCreationUsage from "../ImageCreationUsage.svelte";
   import { onMount } from "svelte";
-  import log from "$utils/log";
-  import { addToast } from "$stores/toast";
   import Loading from "$components/Loading.svelte";
   const t = useTranslations();
 
@@ -41,54 +37,11 @@
     { value: "jpeg", label: "JPEG" },
   ];
 
-  let usageStats = $state({
-    today: 0,
-    thisMonth: 0,
-    available: 0,
-    monthlyLimit: 0,
-  });
-
-  async function checkUsage() {
-    try {
-      loading = true;
-      const result = await actions.usage.getMonthlyImageUsage({
-        tenant_id: tenantId,
-      });
-
-      log.d(result?.data?.imageDalle, "RESULT USAGE DALL-E 3");
-      if (result?.data) {
-        const { imageDalle } = result.data;
-        usageStats = {
-          ...usageStats,
-          today: imageDalle.todayAmount || 0,
-          thisMonth: imageDalle.thisMonthAmount || 0,
-          monthlyLimit: imageDalle.limitRequests || 0,
-          available: imageDalle.availableAmount || 0,
-        };
-      }
-    } catch (error) {
-      log.e(error, "Check Usage error");
-    } finally {
-      loading = false;
-    }
-  }
-
   onMount(() => {
-    checkUsage();
     return () => {};
   });
 
   async function generateImage() {
-    if (usageStats.available <= 0) {
-      addToast({
-        type: "error",
-        message: t("create-image.usage.reach-limitation-message", {
-          amount: usageStats.monthlyLimit,
-        }),
-      });
-      return;
-    }
-
     if (!prompt.trim()) {
       error = t("create-image.prompt-required-error");
       return;
@@ -117,12 +70,6 @@
       }
 
       base64Image = "data:image/png;base64," + data.image;
-      usageStats = {
-        ...usageStats,
-        today: usageStats.today + 1,
-        thisMonth: usageStats.thisMonth + 1,
-        available: usageStats.available - 1,
-      };
     } catch (err) {
       error = err;
     } finally {
@@ -204,7 +151,7 @@
 
     <button
       type="submit"
-      disabled={loading || usageStats.available <= 0}
+      disabled={loading}
       class="btn btn-active btn-primary min-w-[154px]"
     >
       {loading
@@ -231,14 +178,6 @@
         {t("create-image.download")}
       </button>
     </div>
-  {/if}
-  {#if !loading}
-    <ImageCreationUsage
-      todayAmount={usageStats.today}
-      thisMonthAmount={usageStats.thisMonth}
-      availableAmount={usageStats.available}
-      monthlyLimit={usageStats.monthlyLimit}
-    />
   {/if}
 </div>
 

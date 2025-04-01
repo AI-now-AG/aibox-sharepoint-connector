@@ -363,7 +363,7 @@
   "create-image.select-image-quality-label": "Qualität auswählen",
   "create-image.image-format-label": "Ausgabeformat",
   "create-image.select-image-format-label": "Format auswählen",
-  "create-image.generate-image": "Bild generieren",
+  "create-image.generate-image": "BILDER ERSTELLEN",
   "create-image.image-generating": "Bild wird erstellt...",
   "create-image.download": "Herunterladen",
   "create-image.usage.current-usage": "Aktuelle Nutzung",
@@ -384,5 +384,7 @@
   "tenant.image-creation.usage.request-per-month": "Images per month",
   "tenant.image-creation.usage.created-this-month": "Images created this month",
   "tenant.image-creation.usage.extra-image-this-month": "Add Images for this month",
-  "tenant.image-creation.flux.api-key": "API Key"
+  "tenant.image-creation.flux.api-key": "API Key",
+  "onboarding.step-4.title": "Bilder Erstellen",
+  "onboarding.step-4.description": "rstelle ganz einfach Bilder in verschiedenen Grössen und Formaten."
 }
