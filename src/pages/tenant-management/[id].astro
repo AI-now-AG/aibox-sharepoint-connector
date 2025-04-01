@@ -2,7 +2,6 @@
 import Layout from "$layouts/Layout.astro";
 import TenantForm from "./TenantForm.svelte";
 import TenantModel from "$data/models/tenant.model";
-import MonthlyUsageModel from "$data/models/monthlyUsage.model";
 import { transformRawData } from "$utils/transformRawData";
 import { decrypt } from "$utils/secure";
 
@@ -19,11 +18,7 @@ const tenant = await TenantModel.get(id);
 if (!tenant) {
   return Astro.redirect("/404");
 }
-const monthlyUsage = await MonthlyUsageModel.findOrCreateMonthlyUsage(id);
-
 const tenantData = transformRawData(tenant);
-const monthlyUsageData = transformRawData(monthlyUsage);
-const usageSettings = monthlyUsageData.services;
 
 [
   "openai_api_key",
@@ -37,5 +32,5 @@ const usageSettings = monthlyUsageData.services;
 ---
 
 <Layout>
-  <TenantForm tenant={tenantData} usageSettings={usageSettings} client:load />
+  <TenantForm tenant={tenantData} client:load />
 </Layout>
