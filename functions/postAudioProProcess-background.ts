@@ -5,12 +5,12 @@ import {
 } from "@netlify/functions";
 import { uploadLargeFile, uploadSubtitleLargeFiles } from "./utils/transcribe";
 import { updateTask } from "$shared/transcriptionTasks";
-import { processTranscriptionResult, updateStatus } from "./utils/batchTranscription";
-import { decrypt } from "$utils/secure";
 import {
-  FileFormat,
-  type TranscribeRequest,
-} from "$types/TranscribeRequest";
+  processTranscriptionResult,
+  updateStatus,
+} from "./utils/batchTranscription";
+import { decrypt } from "$utils/secure";
+import { FileFormat, type TranscribeRequest } from "$types/TranscribeRequest";
 import TenantModel, { type Tenant } from "$data/models/tenant.model";
 import UserModel, { type User } from "$data/models/user.model";
 import { AudioCategory, TenantFeature } from "$types/TenantFeature";
@@ -68,10 +68,7 @@ const postAudioProProcess: Handler = async (
         body: JSON.stringify({ message: "Invalid file upload data" }),
       };
     }
-    if (
-      typedCategory === AudioCategory.SubtitleLarge &&
-      !selectedFileFormat
-    ) {
+    if (typedCategory === AudioCategory.SubtitleLarge && !selectedFileFormat) {
       return {
         statusCode: 400,
         body: JSON.stringify({ message: "Invalid file upload data" }),
@@ -139,6 +136,7 @@ const postAudioProProcess: Handler = async (
         folderName,
         transcriptionData.jsonData,
         transcriptionData.transcriptionText,
+        tenantId,
       );
     }
 

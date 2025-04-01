@@ -1,16 +1,18 @@
 import { ObjectId } from "mongodb";
 import { db, type Document } from "../mongodb";
-import { ApiKeyProvider } from "$types/TenantFeature";
+import { ApiKeyProvider, AudioCategory } from "$types/TenantFeature";
 import { UsageType } from "$types/UsageTracking";
 import { z } from "zod";
 
 const UsageLogSchema = z.object({
   _id: z.instanceof(ObjectId),
   tenant_id: z.instanceof(ObjectId).optional(),
-  provider: z.nativeEnum(ApiKeyProvider),
+  provider: z.nativeEnum(ApiKeyProvider).optional(),
+  category: z.nativeEnum(AudioCategory).optional(),
   model: z.string().min(1),
-  input_tokens: z.number().default(0),
-  output_tokens: z.number().default(0),
+  input_tokens: z.number().default(0).optional(),
+  output_tokens: z.number().default(0).optional(),
+  duration: z.number().optional(),
   type: z.nativeEnum(UsageType),
   metadata: z.record(z.any()).nullish(),
   created_at: z

@@ -3,7 +3,7 @@ import type { APIContext } from "astro";
 import { decrypt } from "./secure";
 import { TenantFeature, ApiKeyProvider } from "$types/TenantFeature";
 import log from "./log";
-import { UsageTrackerCallbackHandler } from "$llm/UsageTrackerCallbackHandler";
+import { UsageTrackerCallbackHandler } from "$callbackLLM/UsageTrackerCallbackHandler";
 import { UsageType } from "$types/UsageTracking";
 
 interface ChatConfigOverrides {

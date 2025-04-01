@@ -33,19 +33,7 @@ export class UsageTrackerCallbackHandler extends BaseCallbackHandler {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  //async handleLLMStart(llm: Serialized, prompts: string[], runId: string) {
-  // console.log("🟡 LLM START");
-  // console.log("Model:", llm.name);
-  // console.log("Prompts:", prompts);
-  // console.log("Run ID:", runId);
-  //}
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async handleLLMEnd(output: LLMResult, _runId: string) {
-    console.log("🟢 LLM END");
-    console.log("Output:", JSON.stringify(output.generations));
-    console.log("Token Usage:", output.llmOutput?.tokenUsage);
-
     const respone = JSON.parse(JSON.stringify(output.generations));
     const usage: Partial<Omit<UsageLog, "_id">> = {
       tenant_id: this.tenantId,
@@ -69,9 +57,4 @@ export class UsageTrackerCallbackHandler extends BaseCallbackHandler {
     });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
-  //async handleLLMError(error: any, runId: string) {
-  //console.error("🔴 LLM ERROR:", error);
-  //console.error("Run ID:", runId);
-  //}
 }
