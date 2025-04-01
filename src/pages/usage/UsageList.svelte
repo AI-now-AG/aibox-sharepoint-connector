@@ -1,7 +1,13 @@
 <script lang="ts">
   import { actions } from "astro:actions";
-  import { onMount } from "svelte";
   import { addToast } from "$stores/toast";
+  import UsageFilter from "./UsageFilter.svelte";
+
+  interface Props {
+    tenants?: any;
+  }
+
+  let { tenants = [] }: Props = $props();
 
   interface UsageRow {
     tenant: string;
@@ -10,22 +16,23 @@
     model: string;
     total_input: number;
     total_output: number;
-    cost: number;
   }
 
   let loading: boolean = $state(false);
   let usageData: UsageRow[] = $state([]);
-
-  onMount(async () => {
-    fetchUsages();
-  });
+  let selectedTenant: string = $state("");
+  let selectedMonth: string = $state("");
 
   const fetchUsages = async () => {
     loading = true;
-    const { data, error } = await actions.usage.usageSummary();
+    const { data, error } = await actions.usage.usageSummary({
+      tenant_id: selectedTenant,
+      month: selectedMonth,
+    });
     loading = false;
 
     if (error) {
+      console.error(error);
       addToast({
         message: "Something went wrong",
         type: "error",
@@ -34,9 +41,19 @@
       usageData = data;
     }
   };
+
+  $inspect(selectedTenant);
+  $inspect(selectedMonth);
 </script>
 
 <div class="container max-w-full mx-auto p-6 overflow-x-auto mt-4">
+  <UsageFilter
+    {tenants}
+    bind:selectedTenant
+    bind:selectedMonth
+    onsearch={fetchUsages}
+  />
+
   {#if loading}
     <div class="flex justify-center items-center gap-2 text-primary">
       <span class="loading loading-spinner"></span>
@@ -56,8 +73,6 @@
           <th class="py-3 px-4 text-left font-normal text-xs">Type</th>
           <th class="py-3 px-4 text-left font-normal text-xs">Input Tokens</th>
           <th class="py-3 px-4 text-left font-normal text-xs">Output Tokens</th>
-          <th class="py-3 px-4 text-left font-normal text-xs">Total Cost ($)</th
-          >
         </tr>
       </thead>
       <tbody>
@@ -80,9 +95,6 @@
             >
             <td class="py-3 px-4 text-sm font-medium rounded-l-lg"
               >{row.total_output}</td
-            >
-            <td class="py-3 px-4 text-sm font-medium rounded-l-lg"
-              >{row.cost.toFixed(4)}</td
             >
           </tr>
         {/each}
