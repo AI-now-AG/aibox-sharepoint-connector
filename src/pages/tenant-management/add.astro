@@ -1,9 +1,8 @@
 ---
 import Layout from "$layouts/Layout.astro";
 import TenantForm from "./TenantForm.svelte";
-import { getDefaultUsageSettings } from "$data/models/monthlyUsage.model";
 ---
 
 <Layout>
-  <TenantForm usageSettings={getDefaultUsageSettings()} client:load />
+  <TenantForm client:load />
 </Layout>

@@ -19,9 +19,6 @@ import UserModel, { assignPermissions } from "$data/models/user.model";
 import PromptModel from "$data/models/prompt.model";
 import CategoryModel from "$data/models/category.model";
 import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
-import MonthlyUsageModel, {
-  ServiceSchema,
-} from "$data/models/monthlyUsage.model";
 import { AudioCategory } from "$types/TenantFeature";
 import { EncryptedUserPassword, UserRole } from "$enums/Users";
 
@@ -213,13 +210,12 @@ export const tenant = {
   create: defineAction({
     input: z.object({
       tenant: TenantInputParamsSchema,
-      usageSettings: ServiceSchema,
     }),
     handler: async (input) => {
       const session = client.startSession();
       session.startTransaction();
 
-      const { tenant: tenantInput, usageSettings } = input;
+      const { tenant: tenantInput } = input;
 
       try {
         // create new Auth0 organization
@@ -242,12 +238,6 @@ export const tenant = {
         };
         const insertResult = await TenantModel.create(tenant);
 
-        // create monthly usage
-        await MonthlyUsageModel.createMonthlyUsage(
-          insertResult.insertedId,
-          usageSettings,
-        );
-
         await session.commitTransaction();
         return transformRawData(insertResult);
       } catch (error) {
@@ -265,13 +255,12 @@ export const tenant = {
         TenantInputParamsSchema,
         TenantInputIdentifierSchema,
       ),
-      usageSettings: ServiceSchema,
     }),
     handler: async (input) => {
       const session = client.startSession();
       session.startTransaction();
 
-      const { tenant: tenantInput, usageSettings } = input;
+      const { tenant: tenantInput } = input;
       try {
         // update tenant
         const update: Partial<Tenant> = {
@@ -283,13 +272,6 @@ export const tenant = {
           update,
         );
         const organizationId = updatedDocument?.org_id;
-
-        // update monthly usage
-        console.log("usageSettings", usageSettings);
-        await MonthlyUsageModel.updateMonthlyUsage(
-          tenantInput._id,
-          usageSettings,
-        );
 
         // sync Auth0 organization
         const bodyParameters: PatchOrganizationsByIdRequest = {
