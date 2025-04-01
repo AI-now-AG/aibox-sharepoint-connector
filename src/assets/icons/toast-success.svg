@@ -18,7 +18,7 @@
         />
         <path
           d="M12.25 17V10H11.75H11.25"
-          stroke="black"
+          stroke="currentColor"
           stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
