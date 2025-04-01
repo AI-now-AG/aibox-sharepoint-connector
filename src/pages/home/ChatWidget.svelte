@@ -14,14 +14,15 @@
     stripHtmlFormatting,
   } from "$utils/common";
   import ModelInput from "$pages/prompt-library/prompts/ModelInput.svelte";
+  import type { Option } from "$components/SelectOptions.svelte";
 
   type Model = {
     _id: string;
     title: string;
   };
 
-  let models: Model[] = $state([]);
-  let selectedModel: Model | undefined = $state();
+  let models: Option[] = $state([]);
+  let selectedModel: string = $state("");
 
   interface Props {
     tenant?: any;

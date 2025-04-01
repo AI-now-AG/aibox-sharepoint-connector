@@ -19,6 +19,7 @@
     options?: Option[];
     label?: string;
     value?: string;
+    placeholder?: string;
     classes?: string;
     children?: import("svelte").Snippet;
   }
@@ -27,6 +28,7 @@
     options = [],
     label,
     value = $bindable(""),
+    placeholder = "",
     classes,
     children,
   }: Props = $props();
@@ -41,12 +43,12 @@
 
 <div class={classes}>
   {#if label}
-    <label class="block mb-1">{label}</label>
+    <label class="block mb-2">{label}</label>
   {/if}
 
   <div class="dropdown w-full">
     <label tabindex="0" class="select select-bordered w-full rounded-lg">
-      {options.find((opt) => opt.value === value)?.label || ""}
+      {options.find((opt) => opt.value === value)?.label || placeholder}
     </label>
     <ul
       tabindex="0"

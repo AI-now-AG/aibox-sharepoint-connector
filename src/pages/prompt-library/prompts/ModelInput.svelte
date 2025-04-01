@@ -1,18 +1,17 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { useTranslations } from "$i18n/utils";
-  import SingleInput from "./SingleInput.svelte";
   import { tenant } from "$stores";
   import { ApiKeyProvider } from "$types/TenantFeature";
+  import type { Option } from "$components/SelectOptions.svelte";
+  import SelectOptions from "$components/SelectOptions.svelte";
 
   const t = useTranslations();
 
-  type Item = { title: string } | string;
-
   interface Props {
     label?: string;
-    models: Item[];
-    selectedModel: Item | undefined;
+    models: Option[];
+    selectedModel: string;
   }
 
   let {
@@ -45,7 +44,7 @@
     return title;
   };
 
-  const getActiveModels = (): Item[] => {
+  const getActiveModels = (): Option[] => {
     const defaultModel = $tenant?.api_key_providers?.find(
       (provider) => provider.default,
     );
@@ -57,23 +56,24 @@
           const providerName = getProviderName(provider);
           const modelName = getModelName(provider);
           return {
-            _id: `${provider.name}`,
-            title: `${providerName} ${modelName}`,
+            value: `${provider.name}`,
+            label: `${providerName} ${modelName}`,
           };
         }) || [];
     const defaultText = t("tenant.default");
     const defaultName = defaultText.replace(/^./, defaultText[0].toUpperCase());
     models.unshift({
-      _id: "default",
-      title: `${defaultName} (${getProviderName(defaultModel ?? { name: "" })} ${getModelName(defaultModel ?? { name: "" })})`,
+      value: getModelName(defaultModel ?? { name: "" }),
+      label: `${defaultName} (${getProviderName(defaultModel ?? { name: "" })} ${getModelName(defaultModel ?? { name: "" })})`,
     });
     return models;
   };
 </script>
 
-<SingleInput
-  title={label ?? t("prompt-library.add.prompts.language-model")}
+<SelectOptions
+  classes="flex-1 min-w-3xs"
+  label={label ?? t("prompt-library.add.prompts.language-model")}
   placeholder="OpenAI gtp-4o"
-  items={models}
-  bind:selectedItem={selectedModel}
-/>
+  options={models}
+  bind:value={selectedModel}
+></SelectOptions>
