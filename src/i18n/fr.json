@@ -373,14 +373,10 @@
   "nav.create-image": "Generate Image",
   "nav.create-image.dall-e": "DALL-E",
   "nav.create-image.flux": "Flux",
-  "create-image.usage.reach-limitation-message": "You already created ${amount} included images for this month, you can contact us to upgrade for more",
   "tenant.image-creation": "Image creation",
   "tenant.image-creation.dalle": "DALL-E (Open AI)",
   "tenant.image-creation.flux": "Flux",
-  "tenant.image-creation.usage.request-per-month": "Images per month",
-  "tenant.image-creation.usage.created-this-month": "Images created this month",
-  "tenant.image-creation.usage.extra-image-this-month": "Add Images for this month",
   "tenant.image-creation.flux.api-key": "API Key",
-  "onboarding.step-4.title": "Create Image",
+  "onboarding.step-4.title": "Create Images",
   "onboarding.step-4.description": "Easily create images in different sizes and formats."
 }

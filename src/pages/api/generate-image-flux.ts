@@ -4,7 +4,6 @@ import { fal } from "@fal-ai/client";
 import type { ImageSize } from "@fal-ai/client/endpoints";
 import { ApiKeyProvider } from "$types/TenantFeature";
 import { UsageType, UsageService } from "$types/UsageTracking";
-import MonthlyUsageModel from "$data/models/monthlyUsage.model";
 import UsageLogModel, { type UsageLog } from "$data/models/usageLog.model";
 
 const recordImageUsage = async (ctx: APIContext) => {
@@ -17,11 +16,6 @@ const recordImageUsage = async (ctx: APIContext) => {
     };
 
     await UsageLogModel.create(usage);
-    await MonthlyUsageModel.upsertAndIncrementUsageMetrics({
-      tenantId: ctx.locals.tenant._id,
-      service: UsageService.ImageFlux,
-      usage: { requests: 1 },
-    });
   } catch (error) {
     console.error("Error recording image usage:", error);
   }
