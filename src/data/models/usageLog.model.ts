@@ -26,6 +26,13 @@ export type UsageLog = z.infer<typeof UsageLogSchema>;
 
 const collection = db.collection("usage_logs");
 
+const getMonthRange = (month: string): { start: Date; end: Date } => {
+  const [mm, yyyy] = month.split("-");
+  const start = new Date(Number(yyyy), Number(mm) - 1, 1); // Start of the month
+  const end = new Date(Number(yyyy), Number(mm), 1); // Start of the next month
+  return { start, end };
+};
+
 export default {
   create: async (tenant: Partial<Omit<UsageLog, "_id">>) => {
     const validated = UsageLogSchema.parse({ _id: new ObjectId(), ...tenant });
@@ -57,9 +64,20 @@ export default {
     return collection.find<Document<UsageLog>>({ tenant_id: tenantId });
   },
 
-  listUsageSummary: async () => {
-    // Execute the aggregation
+  listUsageSummary: async (tenantId: string, month: string) => {
+    // Get date range for the month
+    const { start, end } = getMonthRange(month);
+
+    console.log("listUsageSummary", { tenantId, start, end });
+
+    // Execute the aggregation pipeline
     return collection.aggregate([
+      {
+        $match: {
+          tenant_id: new ObjectId(tenantId), // Filter by tenant ID
+          created_at: { $gte: start, $lt: end }, // Filter by date range for the month
+        },
+      },
       {
         $group: {
           _id: {
@@ -68,8 +86,8 @@ export default {
             model: "$model",
             type: "$type",
           },
-          total_input: { $sum: "$input_tokens" },
-          total_output: { $sum: "$output_tokens" },
+          total_input: { $sum: "$input_tokens" }, // Sum of input tokens
+          total_output: { $sum: "$output_tokens" }, // Sum of output tokens
         },
       },
     ]);

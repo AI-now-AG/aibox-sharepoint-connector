@@ -103,12 +103,11 @@ if (audioFeatureItems.length > 0) {
 }
 
 if (
-  Astro.locals.tenant.included_features?.some((item) => {
-    return (
-      item.name == TenantFeature.CreateImage &&
-      item.provider == ApiKeyProvider.OpenAI
-    );
-  })
+  auth.hasFeatureWithProvider(
+    Astro.locals,
+    TenantFeature.CreateImage,
+    ApiKeyProvider.OpenAI
+  )
 ) {
   createImageItems.push({
     title: t("nav.create-image.dall-e"),
@@ -116,12 +115,11 @@ if (
   });
 }
 if (
-  Astro.locals.tenant.included_features?.some((item) => {
-    return (
-      item.name == TenantFeature.CreateImage &&
-      item.provider == ApiKeyProvider.Flux
-    );
-  })
+  auth.hasFeatureWithProvider(
+    Astro.locals,
+    TenantFeature.CreateImage,
+    ApiKeyProvider.Flux
+  )
 ) {
   createImageItems.push({
     title: t("nav.create-image.flux"),
@@ -183,6 +181,10 @@ if (auth.isSuperAdmin(Astro.locals)) {
       {
         title: t("nav.tenant-management"),
         path: `/tenant-management`,
+      },
+      {
+        title: "Usage",
+        path: `/usage`,
       },
     ],
   });

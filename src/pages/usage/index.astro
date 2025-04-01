@@ -1,9 +1,14 @@
 ---
 import Layout from "$layouts/Layout.astro";
 //import { useTranslations } from "$i18n/utils";
-import UsageTable from "./UsageTable.svelte";
+import UsageList from "./UsageList.svelte";
+import TenantModel from "$data/models/tenant.model";
+import { transformRawData } from "$utils/transformRawData";
 
 //const t = useTranslations();
+
+const tenants = await TenantModel.list();
+const tenantList = transformRawData(tenants);
 ---
 
 <Layout>
@@ -15,6 +20,6 @@ import UsageTable from "./UsageTable.svelte";
     </h1>
   </div>
   <div class="px-8">
-    <UsageTable client:load />
+    <UsageList tenants={tenantList} client:load />
   </div>
 </Layout>

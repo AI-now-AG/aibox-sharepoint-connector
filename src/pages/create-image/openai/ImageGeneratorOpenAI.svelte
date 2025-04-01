@@ -10,8 +10,9 @@
 
   interface Props {
     tenantId: string;
+    hasPermission: boolean;
   }
-  let { tenantId } = $props() as Props;
+  let { tenantId, hasPermission = false } = $props() as Props;
 
   let prompt = $state("");
   let base64Image = $state("");
@@ -38,6 +39,9 @@
   ];
 
   onMount(() => {
+    if (!hasPermission) {
+      window.history.back();
+    }
     return () => {};
   });
 
@@ -129,23 +133,23 @@
     <div class="flex space-x-4">
       <SelectOptions
         classes="flex-1"
-        label={t("create-image.image-size-label")}
         options={sizeOptions}
         bind:value={size}
+        label={t("create-image.image-size-label")}
       />
 
       <SelectOptions
         classes="flex-1"
-        label={t("create-image.select-image-quality-label")}
         options={qualityOptions}
         bind:value={quality}
+        label={t("create-image.select-image-quality-label")}
       />
 
       <SelectOptions
         classes="flex-1"
-        label={t("create-image.image-format-label")}
         options={outputOptions}
         bind:value={selectedFormat}
+        label={t("create-image.image-format-label")}
       />
     </div>
 
