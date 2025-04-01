@@ -197,12 +197,8 @@
     </div>
 
     <div class="flex space-x-4">
-      <SelectOptions
-        classes="flex-1"
-        label={t("create-image.image-size-label")}
-        options={sizeOptions}
-        bind:value={size}
-      >
+      <label class="block mb-1">{t("create-image.image-size-label")}</label>
+      <SelectOptions classes="flex-1" options={sizeOptions} bind:value={size}>
         {#if showCustomSizeInputs}
           <div class="flex space-x-2 mt-2">
             <div class="flex-1">
@@ -233,6 +229,7 @@
         {/if}
       </SelectOptions>
 
+      <label class="block mb-1">{t("create-image.image-format-label")}</label>
       <SelectOptions
         classes="flex-1"
         label={t("create-image.image-format-label")}
