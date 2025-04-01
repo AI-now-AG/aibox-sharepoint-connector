@@ -1,0 +1,24 @@
+---
+import Layout from "$layouts/Layout.astro";
+import ImageGenerator from "./ImageGeneratorFlux.svelte";
+import auth from "$auth/auth";
+import { ApiKeyProvider, TenantFeature } from "$types/TenantFeature";
+
+const tenant = Astro.locals.tenant;
+const tenantId = tenant?._id?.toString() ?? "";
+let hasPermission = false;
+
+if (
+  auth.hasFeatureWithProvider(
+    Astro.locals,
+    TenantFeature.CreateImage,
+    ApiKeyProvider.Flux
+  )
+) {
+  hasPermission = true;
+}
+---
+
+<Layout>
+  <ImageGenerator tenantId={tenantId} {hasPermission} client:load />
+</Layout>

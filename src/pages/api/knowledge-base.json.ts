@@ -7,7 +7,6 @@ import { z } from "zod";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import initializeOpenAI from "$utils/chatModel";
-import Perplexity from "$llm/Perplexity";
 
 const CreateKnowledgeBaseParamsSchema = z.object({
   _id: z.string().optional(),
@@ -43,19 +42,13 @@ const generateKnowledgeBaseDescription = async (
     new HumanMessage(knowledgeBase),
   ];
   const parser = new StringOutputParser();
-  let result;
-  if (model instanceof Perplexity) {
-    const res = await model.invoke(messages);
-    result = res.choices?.[0]?.message?.content ?? "";
-  } else {
-    result = await model.invoke(messages);
-  }
+  const result = await model.invoke(messages);
   const description = await parser.invoke(result);
 
   return description;
 };
 
-export const GET: APIRoute = async (ctx) => {
+export const GET: APIRoute = async (ctx: APIContext) => {
   try {
     const result = await KnowledgeBaseModel.listByTenant(
       ctx.locals.user.tenant_id,

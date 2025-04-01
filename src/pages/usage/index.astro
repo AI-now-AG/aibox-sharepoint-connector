@@ -1,0 +1,25 @@
+---
+import Layout from "$layouts/Layout.astro";
+//import { useTranslations } from "$i18n/utils";
+import UsageList from "./UsageList.svelte";
+import TenantModel from "$data/models/tenant.model";
+import { transformRawData } from "$utils/transformRawData";
+
+//const t = useTranslations();
+
+const tenants = await TenantModel.list();
+const tenantList = transformRawData(tenants);
+---
+
+<Layout>
+  <div
+    class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14"
+  >
+    <h1 class="pt-2 lg:pt-8 text-4xl font-bold">
+      {"Usage"}
+    </h1>
+  </div>
+  <div class="px-8">
+    <UsageList tenants={tenantList} client:load />
+  </div>
+</Layout>

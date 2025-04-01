@@ -2,7 +2,6 @@ import type { APIRoute } from "astro";
 import { ObjectId } from "mongodb";
 import { z } from "zod";
 import slug from "slug";
-import { stringToObjectId } from "$utils/stringToObjectId";
 import CategoryModel from "$data/models/category.model";
 import type { Category, Group } from "$data/models/category.model";
 

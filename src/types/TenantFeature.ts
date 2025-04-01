@@ -1,14 +1,17 @@
 import { useTranslations } from "$i18n/utils";
 const t = useTranslations();
+
 export enum TenantFeature {
   TextPrommpts = "text-prommpts",
   AudioToText = "audio-to-text",
+  CreateImage = "create-image",
 }
 
 export enum ApiKeyProvider {
   OpenAI = "openai",
   AzureOpenAI = "azure_openai",
   Perplexity = "perplexity",
+  Flux = "flux",
 }
 
 export enum AudioCategory {

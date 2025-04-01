@@ -3,7 +3,7 @@ import { writable } from "svelte/store";
 type ToastOptions = {
   id?: number;
   message: string;
-  type?: string;
+  type?: "success" | "error" | "info";
   dismissible?: boolean;
   timeout?: number;
 };

@@ -19,6 +19,9 @@ import UserModel, { assignPermissions } from "$data/models/user.model";
 import PromptModel from "$data/models/prompt.model";
 import CategoryModel from "$data/models/category.model";
 import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
+import MonthlyUsageModel, {
+  ServiceSchema,
+} from "$data/models/monthlyUsage.model";
 import { AudioCategory } from "$types/TenantFeature";
 import { EncryptedUserPassword, UserRole } from "$enums/Users";
 
@@ -40,6 +43,7 @@ const TenantInputParamsSchema = z.object({
   speech_region: z.string().optional(),
   perplexity_api_key: z.string().optional(),
   perplexity_chat_model: z.string().optional(),
+  fal_ai_api_key: z.string().optional(),
   included_features: z.array(IncludedFeaturesSchema),
   transcription_types: z.array(z.nativeEnum(AudioCategory)).optional(),
   is_restrict_user_managment: z
@@ -55,6 +59,7 @@ const TenanKeyEncryptSchema = z.object({
   azure_openai_api_key: z.string().optional(),
   perplexity_api_key: z.string().optional(),
   speech_api_key: z.string().optional(),
+  fal_ai_api_key: z.string().optional(),
 });
 
 const TenantInputIdentifierSchema = z.object({
@@ -114,10 +119,10 @@ const setupTenantAdmin = async (
   let user;
   let userId;
 
-  let oldRoles: string[] = [];
-  let newRoles: UserRole[] = [UserRole.User, UserRole.Admin];
+  const oldRoles: string[] = [];
+  const newRoles: UserRole[] = [UserRole.User, UserRole.Admin];
 
-  let existingUsers = await usersManagement.getByEmail(email?.trim());
+  const existingUsers = await usersManagement.getByEmail(email?.trim());
   if (
     existingUsers &&
     Array.isArray(existingUsers.data) &&
@@ -206,14 +211,21 @@ export const tenant = {
   }),
 
   create: defineAction({
-    input: TenantInputParamsSchema,
+    input: z.object({
+      tenant: TenantInputParamsSchema,
+      usageSettings: ServiceSchema,
+    }),
     handler: async (input) => {
       const session = client.startSession();
       session.startTransaction();
+
+      const { tenant: tenantInput, usageSettings } = input;
+
       try {
+        // create new Auth0 organization
         const organizationResult = await organizationsManagement.create({
-          name: input.org_name,
-          display_name: input.name,
+          name: tenantInput.org_name,
+          display_name: tenantInput.name,
         });
 
         const organizationId = organizationResult.data.id;
@@ -223,11 +235,19 @@ export const tenant = {
           import.meta.env.AUTH0_AUTH_CON_ID || "con_RXTD1LIbXJgceOUH",
         );
 
+        // create new tenant
         const tenant: Partial<Omit<Tenant, "_id">> = {
-          ...input,
+          ...tenantInput,
           org_id: organizationId,
         };
         const insertResult = await TenantModel.create(tenant);
+
+        // create monthly usage
+        await MonthlyUsageModel.createMonthlyUsage(
+          insertResult.insertedId,
+          usageSettings,
+        );
+
         await session.commitTransaction();
         return transformRawData(insertResult);
       } catch (error) {
@@ -240,21 +260,41 @@ export const tenant = {
   }),
 
   update: defineAction({
-    input: z.intersection(TenantInputParamsSchema, TenantInputIdentifierSchema),
+    input: z.object({
+      tenant: z.intersection(
+        TenantInputParamsSchema,
+        TenantInputIdentifierSchema,
+      ),
+      usageSettings: ServiceSchema,
+    }),
     handler: async (input) => {
       const session = client.startSession();
       session.startTransaction();
+
+      const { tenant: tenantInput, usageSettings } = input;
       try {
+        // update tenant
         const update: Partial<Tenant> = {
-          ...input,
-          _id: new ObjectId(input._id),
+          ...tenantInput,
+          _id: new ObjectId(tenantInput._id),
         };
-        const updatedDocument = await TenantModel.update(input._id, update);
+        const updatedDocument = await TenantModel.update(
+          tenantInput._id,
+          update,
+        );
         const organizationId = updatedDocument?.org_id;
 
+        // update monthly usage
+        console.log("usageSettings", usageSettings);
+        await MonthlyUsageModel.updateMonthlyUsage(
+          tenantInput._id,
+          usageSettings,
+        );
+
+        // sync Auth0 organization
         const bodyParameters: PatchOrganizationsByIdRequest = {
-          name: input.org_name,
-          display_name: input.name,
+          name: tenantInput.org_name,
+          display_name: tenantInput.name,
         };
         await organizationsManagement.update(organizationId, bodyParameters);
 
@@ -329,6 +369,7 @@ export const tenant = {
         azure_openai_api_key,
         perplexity_api_key,
         speech_api_key,
+        fal_ai_api_key,
       } = input;
       if (openai_api_key) {
         input.openai_api_key = encrypt(openai_api_key);
@@ -341,6 +382,9 @@ export const tenant = {
       }
       if (speech_api_key) {
         input.speech_api_key = encrypt(speech_api_key);
+      }
+      if (fal_ai_api_key) {
+        input.fal_ai_api_key = encrypt(fal_ai_api_key);
       }
 
       return input;

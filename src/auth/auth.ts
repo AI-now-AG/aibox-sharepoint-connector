@@ -1,6 +1,6 @@
 import type { User } from "lucia";
 import { UserRole } from "$enums/Users";
-import { TenantFeature } from "$types/TenantFeature";
+import { ApiKeyProvider, TenantFeature } from "$types/TenantFeature";
 
 export const user = (locals: App.Locals): User => {
   return locals.user;
@@ -40,6 +40,20 @@ export const hasFeature = (locals: App.Locals, feature: TenantFeature) => {
   }
 
   return result;
+};
+
+export const hasFeatureWithProvider = (
+  locals: App.Locals,
+  feature: TenantFeature,
+  provider: ApiKeyProvider,
+) => {
+  if (!locals.tenant) {
+    return false;
+  }
+
+  return locals.tenant.included_features?.some((item) => {
+    return item.name == feature && item.provider == provider;
+  });
 };
 
 // export const hasAudioPlaintext = (locals: App.Locals) => {
@@ -127,6 +141,7 @@ export default {
   isAdmin,
   hasRole,
   hasFeature,
+  hasFeatureWithProvider,
   // hasAudioPlaintext,
   // hasAudioSubtitles,
   // hasAudioSubtitlesjson,

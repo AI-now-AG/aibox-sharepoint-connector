@@ -31,6 +31,7 @@ export const SUPER_ADMIN_ROUTES = [
   "/api/prompts/import",
   "/secure",
   "/secure/*",
+  "/usage",
 ];
 
 // export const FEATURE_PLAINTEXT_ROUTE = "/transcription/plaintext";
@@ -58,6 +59,12 @@ export const AUTH_AUTHORIZE_SCOPES = [
   "email",
   "ainow/roles",
 ];
+
+// Usages
+export const MONTHLY_USAGES = {
+  IMAGE_DALLE_LIMIT_REQUEST: 10,
+  IMAGE_FLUX_LIMIT_REQUEST: 20,
+};
 
 // SendGrid
 export const SG_VERIFICATION_TEMPLATE = "d-69ed72334042458783f985ada5dbe61d";

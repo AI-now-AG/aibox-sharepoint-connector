@@ -3,28 +3,48 @@ import type { APIContext } from "astro";
 import { decrypt } from "./secure";
 import { TenantFeature, ApiKeyProvider } from "$types/TenantFeature";
 import log from "./log";
-import Perplexity from "$llm/Perplexity";
+import { UsageTrackerCallbackHandler } from "$llm/UsageTrackerCallbackHandler";
+import { UsageType } from "$types/UsageTracking";
 
 interface ChatConfigOverrides {
   customModel?: string;
 }
 
 // Initialize Perplexity AI's Chat API with OpenAI-like interface
-export const initPerplexityOpenAI = (apiKey: string, model: string) => {
-  return new Perplexity({ api_key: apiKey, model: model });
-  // return new ChatOpenAI({
-  //   openAIApiKey: apiKey, // Set API key for authentication
-  //   configuration: { baseURL: "https://api.perplexity.ai" }, // Use Perplexity's API endpoint
-  //   modelName: model, // Specify model (if provided)
-  //   //maxTokens: 400, // Define max token limit (if provided)
-  // });
+export const initPerplexityOpenAI = (
+  apiKey: string,
+  model: string,
+  tenantId: string,
+) => {
+  return new ChatOpenAI({
+    openAIApiKey: apiKey, // Set API key for authentication
+    configuration: { baseURL: "https://api.perplexity.ai" }, // Use Perplexity's API endpoint
+    modelName: model, // Specify model (if provided)
+    callbacks: [
+      new UsageTrackerCallbackHandler(
+        tenantId,
+        ApiKeyProvider.Perplexity,
+        model,
+        UsageType.Text,
+      ),
+    ],
+    __includeRawResponse: true,
+  });
 };
 
 // Initialize OpenAI's Chat API
-const initChatOpenAI = (apiKey: string, model: string) => {
+const initChatOpenAI = (apiKey: string, model: string, tenantId: string) => {
   return new ChatOpenAI({
-    apiKey, 
+    apiKey,
     model,
+    callbacks: [
+      new UsageTrackerCallbackHandler(
+        tenantId,
+        ApiKeyProvider.OpenAI,
+        model,
+        UsageType.Text,
+      ),
+    ],
   });
 };
 
@@ -34,12 +54,21 @@ const initAzureChatOpenAI = (
   azureOpenAIApiInstanceName: string,
   azureOpenAIApiDeploymentName: string,
   azureOpenAIApiVersion: string,
+  tenantId: string,
 ) => {
   return new AzureChatOpenAI({
-    azureOpenAIApiKey, 
+    azureOpenAIApiKey,
     azureOpenAIApiInstanceName,
-    azureOpenAIApiDeploymentName, 
+    azureOpenAIApiDeploymentName,
     azureOpenAIApiVersion,
+    callbacks: [
+      new UsageTrackerCallbackHandler(
+        tenantId,
+        ApiKeyProvider.AzureOpenAI,
+        azureOpenAIApiDeploymentName,
+        UsageType.Text,
+      ),
+    ],
   });
 };
 
@@ -47,6 +76,7 @@ export const initializeOpenAI = (
   ctx: APIContext,
   overrides?: ChatConfigOverrides,
 ) => {
+  const { tenant } = ctx.locals;
   const { included_features: features } = ctx.locals.tenant;
   const { customModel } = overrides || {};
 
@@ -68,23 +98,20 @@ export const initializeOpenAI = (
 
   // Perplexity AI
   if (provider == ApiKeyProvider.Perplexity) {
-    const perplexityApiKey = decrypt(
-      ctx.locals.tenant?.perplexity_api_key || "",
+    const perplexityApiKey = decrypt(tenant?.perplexity_api_key || "");
+    const perplexityModel: string = tenant?.perplexity_chat_model || "sonar";
+    return initPerplexityOpenAI(
+      perplexityApiKey,
+      perplexityModel,
+      tenant?._id?.toString(),
     );
-    const perplexityModel: string =
-      ctx.locals.tenant?.perplexity_chat_model || "sonar";
-    return initPerplexityOpenAI(perplexityApiKey, perplexityModel);
   }
 
   // Azure OpenAI
   if (provider == ApiKeyProvider.AzureOpenAI) {
-    const azureOpenAIApiKey = decrypt(
-      ctx.locals.tenant?.azure_openai_api_key || "",
-    );
-    const azureOpenAIApiInstanceName =
-      ctx.locals.tenant?.azure_openai_instance_name || "";
-    const azureOpenAIApiDeploymentName =
-      ctx.locals.tenant?.azure_openai_chat_model || "";
+    const azureOpenAIApiKey = decrypt(tenant?.azure_openai_api_key || "");
+    const azureOpenAIApiInstanceName = tenant?.azure_openai_instance_name || "";
+    const azureOpenAIApiDeploymentName = tenant?.azure_openai_chat_model || "";
     const azureOpenAIApiVersion =
       import.meta.env.AZURE_OPENAI_API_VERSION || "2024-08-01-preview";
 
@@ -93,12 +120,17 @@ export const initializeOpenAI = (
       azureOpenAIApiInstanceName,
       azureOpenAIApiDeploymentName,
       azureOpenAIApiVersion,
+      tenant?._id?.toString(),
     );
   }
 
   // OpenAI
-  const apiKey = decrypt(ctx.locals.tenant?.openai_api_key || "");
-  return initChatOpenAI(apiKey, import.meta.env.OPENAI_MODEL);
+  const apiKey = decrypt(tenant?.openai_api_key || "");
+  return initChatOpenAI(
+    apiKey,
+    import.meta.env.OPENAI_MODEL,
+    tenant?._id?.toString(),
+  );
 };
 
 export default initializeOpenAI;
