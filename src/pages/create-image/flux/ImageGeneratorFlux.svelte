@@ -10,8 +10,9 @@
 
   interface Props {
     tenantId: string;
+    hasPermission: boolean;
   }
-  let { tenantId } = $props() as Props;
+  let { tenantId, hasPermission = false } = $props() as Props;
 
   let prompt = $state("");
   let base64Image = $state("");
@@ -47,6 +48,9 @@
   });
 
   onMount(() => {
+    if (!hasPermission) {
+      window.history.back();
+    }
     return () => {};
   });
 
