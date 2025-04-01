@@ -94,6 +94,14 @@
               description: t("onboarding.step-3.description"),
             },
           },
+          {
+            element: "#onboardingId4",
+            popover: {
+              popoverClass: "driverjs-theme",
+              title: t("onboarding.step-4.title"),
+              description: t("onboarding.step-4.description"),
+            },
+          },
         ],
         onPopoverRender: (popover, { config, state }) => {
           _popover = document.getElementById("driver-popover-content");
