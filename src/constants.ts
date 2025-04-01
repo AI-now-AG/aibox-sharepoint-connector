@@ -31,6 +31,7 @@ export const SUPER_ADMIN_ROUTES = [
   "/api/prompts/import",
   "/secure",
   "/secure/*",
+  "/usage",
 ];
 
 // export const FEATURE_PLAINTEXT_ROUTE = "/transcription/plaintext";
