@@ -623,6 +623,7 @@ transcriptionCallbackHandler.on("transcriptionCompleted", async (response) => {
 
     const usage: Partial<Omit<UsageLog, "_id">> = {
       tenant_id: tenantIdObjId,
+      provider: ApiKeyProvider.AzureOpenAI,
       category: category,
       model: deploymentModel,
       type: UsageType.Transcription,

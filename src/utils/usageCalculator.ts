@@ -1,10 +1,9 @@
 import { type UsageLog } from "$data/models/usageLog.model";
-import { ApiKeyProvider } from "$types/TenantFeature";
+import { ApiKeyProvider, AzureTTSModel } from "$types/TenantFeature";
 import type {
   UsageRow,
   UsageItem,
   TokenCreditRate,
-  RequestCreditRate,
 } from "$types/UsageTracking";
 
 /**
@@ -31,10 +30,24 @@ const TOKEN_CREDIT_MAPPING: Record<string, TokenCreditRate> = {
  *   - DALLE: 1 credit = 1 request
  *   - Flux: 1 credit = 2 requests
  */
-const REQUEST_CREDIT_MAPPING: Record<string, RequestCreditRate> = {
+const REQUEST_CREDIT_MAPPING: Record<string, number> = {
   [ApiKeyProvider.OpenAI]: 1,
   [ApiKeyProvider.Flux]: 2,
   [ApiKeyProvider.Perplexity]: 12,
+};
+
+/**
+ * Mapping configuration for each provider with duration rates.
+ *
+ * Format: model => minutes per 1 credit
+ *
+ * Examples:
+ *   - Whisper: 1 credit = 15 minutes
+ *   - Audio Pro: 1 credit = 30 minutes
+ */
+const DURATION_CREDIT_MAPPING: Record<string, number> = {
+  [AzureTTSModel.Whisper]: 15,
+  [AzureTTSModel.AudioPro]: 30,
 };
 
 const _tokensToCredits = (
@@ -67,11 +80,22 @@ const _requestsToCredits = (
     throw new Error(`Unknown provider: ${provider}`);
   }
 
-  // Calculate credits separately for input and output tokens
-  const credits = Math.ceil(requests / rate);
+  // Calculate credits
+  return Math.ceil(requests / rate);
+};
 
-  // Total credits is the sum of input and output credits
-  return credits;
+const _durationsToCredits = (
+  ttsModel: AzureTTSModel,
+  durations: number,
+): number => {
+  const rate = DURATION_CREDIT_MAPPING[ttsModel];
+  if (!rate) {
+    throw new Error(`Unknown model: ${ttsModel}`);
+  }
+
+  // Calculate credits
+  const minutes = Math.ceil(durations / 60);
+  return Math.ceil(minutes / rate);
 };
 
 const _calculateOpenAIUsage = (rawUsages: UsageLog[]) => {
@@ -210,6 +234,47 @@ const _calculatePerplexityUsage = (rawUsages: UsageLog[]) => {
   return usageItems;
 };
 
+const _calculateAudioUsage = (rawUsages: UsageLog[]) => {
+  const usageItems: UsageItem[] = [];
+
+  const usageData = rawUsages.filter((item: UsageLog) => {
+    return item.provider == ApiKeyProvider.AzureOpenAI;
+  });
+
+  // Whisper
+  const whisperItems = usageData.filter(
+    (item: UsageLog) => item.model == AzureTTSModel.Whisper,
+  );
+  const whisperDurations = whisperItems.reduce(
+    (sum: number, item: UsageLog) => sum + (item.duration ?? 0),
+    0,
+  );
+  usageItems.push({
+    model: "Whisper",
+    amount: Math.ceil(whisperDurations / 60),
+    unit: "minutes",
+    credits: _durationsToCredits(AzureTTSModel.Whisper, whisperDurations),
+  });
+
+  // Audio Pro
+  const audioProItems = usageData.filter(
+    (item: UsageLog) => item.model == AzureTTSModel.AudioPro,
+  );
+  const audioProDurations = audioProItems.reduce(
+    (sum: number, item: UsageLog) => sum + (item.duration ?? 0),
+    0,
+  );
+  console.log("audioProItems", { usageData, audioProItems });
+  usageItems.push({
+    model: "Audio Pro",
+    amount: Math.ceil(audioProDurations / 60),
+    unit: "minutes",
+    credits: _durationsToCredits(AzureTTSModel.AudioPro, audioProDurations),
+  });
+
+  return usageItems;
+};
+
 const _calculateFluxUsage = (rawUsages: UsageLog[]) => {
   const usageItems: UsageItem[] = [];
 
@@ -251,6 +316,12 @@ export const calculateUsage = (rawUsages: UsageLog[]) => {
   usageData.push({
     provider: "Perplexity",
     details: _calculatePerplexityUsage(rawUsages),
+  });
+
+  // Audio
+  usageData.push({
+    provider: "Audio",
+    details: _calculateAudioUsage(rawUsages),
   });
 
   // Flux

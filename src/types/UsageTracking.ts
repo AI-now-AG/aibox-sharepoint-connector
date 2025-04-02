@@ -28,6 +28,3 @@ export interface TokenCreditRate {
   input: number;
   output: number;
 }
-
-// Type for request to credit mapping
-export type RequestCreditRate = number;
