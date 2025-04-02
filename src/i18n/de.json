@@ -299,7 +299,7 @@
   "tenant.audio-pro": "Audio Pro",
   "tenant.mark-as-default": "Als default festlegen",
   "tenant.audio.whisper.model.title": "Audio standard (Whisper)",
-  "tenant.default": "default",
+  "tenant.default": "Default",
   "tenant.text.improvement.llm": "LLM für Textverbesserungen",
   "tenant.whisper.model.configured.for.azure.openai": "Whisper Model (Konfiguriert in Azure OpenAI)",
   "tenant.features": "Features",

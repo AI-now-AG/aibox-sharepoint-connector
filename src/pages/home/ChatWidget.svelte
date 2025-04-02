@@ -16,13 +16,7 @@
   import ModelInput from "$pages/prompt-library/prompts/ModelInput.svelte";
   import type { Option } from "$components/SelectOptions.svelte";
 
-  type Model = {
-    _id: string;
-    title: string;
-  };
-
-  let models: Option[] = $state([]);
-  let selectedModel: string = $state("");
+  let selectedModel: string = $state("openai");
 
   interface Props {
     tenant?: any;
@@ -195,7 +189,7 @@
         />
         <div class="flex items-end justify-end mt-2 z-10">
           <div class="">
-            <ModelInput label="Text Model" bind:models bind:selectedModel />
+            <ModelInput label="Text Model" bind:selectedModel />
           </div>
         </div>
       </div>

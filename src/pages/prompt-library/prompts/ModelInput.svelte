@@ -10,14 +10,14 @@
 
   interface Props {
     label?: string;
-    models: Option[];
+    models?: Option[];
     selectedModel: string;
   }
 
   let {
     label,
     models = $bindable([]),
-    selectedModel = $bindable(),
+    selectedModel = $bindable(""),
   }: Props = $props();
 
   onMount(async function () {
@@ -45,10 +45,6 @@
   };
 
   const getActiveModels = (): Option[] => {
-    const defaultModel = $tenant?.api_key_providers?.find(
-      (provider) => provider.default,
-    );
-
     const models =
       $tenant?.api_key_providers
         ?.filter((provider) => provider.active)
@@ -56,16 +52,11 @@
           const providerName = getProviderName(provider);
           const modelName = getModelName(provider);
           return {
-            value: `${provider.name}`,
+            value: provider.name,
             label: `${providerName} ${modelName}`,
           };
         }) || [];
-    const defaultText = t("tenant.default");
-    const defaultName = defaultText.replace(/^./, defaultText[0].toUpperCase());
-    models.unshift({
-      value: getModelName(defaultModel ?? { name: "" }),
-      label: `${defaultName} (${getProviderName(defaultModel ?? { name: "" })} ${getModelName(defaultModel ?? { name: "" })})`,
-    });
+
     return models;
   };
 </script>
@@ -73,7 +64,7 @@
 <SelectOptions
   classes="flex-1 min-w-3xs"
   label={label ?? t("prompt-library.add.prompts.language-model")}
-  placeholder="OpenAI gtp-4o"
+  placeholder={`${t("tenant.default")} (OpenAI gtp-4o)`}
   options={models}
   bind:value={selectedModel}
 ></SelectOptions>
