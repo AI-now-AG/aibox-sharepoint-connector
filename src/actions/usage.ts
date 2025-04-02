@@ -5,7 +5,7 @@ import type { UsageOverview, UsageRow } from "$types/UsageTracking";
 import { transformRawData } from "$utils/transformRawData";
 import TenantModel from "$data/models/tenant.model";
 import UsageLogModel from "$data/models/usageLog.model";
-import { calculateUsage } from "$utils/usageCalculator";
+import { calculateUsage, sumCreditsUsed } from "$utils/usageCalculator";
 
 export const usage = {
   usageSummary: defineAction({
@@ -28,11 +28,12 @@ export const usage = {
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const usageData: UsageRow[] = calculateUsage(usages);
+      const totalCreditsUsed = sumCreditsUsed(usageData);
 
       const overview: UsageOverview = {
         tenant: tenant.name,
         month: monthName,
-        creditsUsed: 0,
+        creditsUsed: totalCreditsUsed,
       };
       const results = {
         overview,

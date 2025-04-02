@@ -61,26 +61,54 @@
     <div class="text-center text-gray-500 py-6">No usage data available.</div>
   {:else}
     {#if usageInfo}
-      <div class="mb-4">
-        <ul>
-          <li><strong>Tenant</strong> {usageInfo.tenant}</li>
-          <li><strong>Month</strong> {usageInfo.month}</li>
-          <li><strong>Credits used</strong> {usageInfo.creditsUsed}</li>
-        </ul>
+      <div class="mb-5">
+        <table class="table table-xs border w-auto ml-auto">
+          <colgroup>
+            <col class="w-[150]" />
+            <col class="w-auto" />
+          </colgroup>
+          <tbody>
+            <tr class="bg-base-100 text-sm">
+              <td class="bg-base-300 text-sm font-medium"
+                ><strong>Tenant</strong></td
+              >
+              <td class="text-sm font-medium">{usageInfo.tenant}</td>
+            </tr>
+            <tr class="bg-base-100 text-sm">
+              <td class="bg-base-300 text-sm font-medium"
+                ><strong>Month</strong></td
+              >
+              <td class="text-sm font-medium">{usageInfo.month}</td>
+            </tr>
+            <tr class="bg-base-100 text-sm">
+              <td class="bg-base-300 text-sm font-medium"
+                ><strong>Credits used</strong></td
+              >
+              <td class="text-sm font-medium">{usageInfo.creditsUsed}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     {/if}
     {#each usageData as row}
       <div class="mb-3">
         <table class="table border min-w-full relative">
+          <colgroup>
+            <col class="w-auto" />
+            <col class="w-[150]" />
+            <col class="w-[100]" />
+            <col class="w-[100]" />
+            <col class="w-[100]" />
+          </colgroup>
           <thead>
-            <tr class="bg-base-300 rounded-lg">
-              <th class="py-3 px-4 text-left font-medium text-sm"
+            <tr class="bg-base-300">
+              <th class="py-3 px-4 text-left font-semibold text-sm"
                 >{row.provider}</th
               >
-              <th class="py-3 px-4 text-left font-medium text-sm">&nbsp;</th>
-              <th class="py-3 px-4 text-left font-medium text-sm">&nbsp;</th>
-              <th class="py-3 px-4 text-left font-medium text-sm">&nbsp;</th>
-              <th class="py-3 px-4 text-left font-medium text-sm">&nbsp;</th>
+              <th class="py-3 px-4 text-left font-semibold text-sm">&nbsp;</th>
+              <th class="py-3 px-4 text-left font-semibold text-sm">&nbsp;</th>
+              <th class="py-3 px-4 text-left font-semibold text-sm">&nbsp;</th>
+              <th class="py-3 px-4 text-left font-semibold text-sm">&nbsp;</th>
             </tr>
           </thead>
           <tbody>

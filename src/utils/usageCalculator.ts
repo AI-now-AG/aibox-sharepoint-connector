@@ -198,7 +198,6 @@ const _calculateFluxUsage = (rawUsages: UsageLog[]) => {
   return usageItems;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const calculateUsage = (rawUsages: UsageLog[]) => {
   const usageData: UsageRow[] = [];
 
@@ -221,4 +220,13 @@ export const calculateUsage = (rawUsages: UsageLog[]) => {
   });
 
   return usageData;
+};
+
+export const sumCreditsUsed = (usageData: UsageRow[]): number => {
+  return usageData.reduce(
+    (total: number, item) =>
+      total +
+      item.details.reduce((subTotal, _item) => subTotal + _item.credits, 0),
+    0,
+  );
 };
