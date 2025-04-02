@@ -21,7 +21,9 @@
   }: Props = $props();
 
   onMount(async function () {
-    models = getActiveModels() || [];
+    setTimeout(() => {
+      models = getActiveModels() || [];
+    }, 0);
   });
 
   const getModelName = (provider: { name: string }) => {
