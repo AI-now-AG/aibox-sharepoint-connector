@@ -1,5 +1,10 @@
 import { ApiKeyProvider } from "$types/TenantFeature";
-import type { UsageRow, UsageItem } from "$types/UsageTracking";
+import type {
+  UsageRow,
+  UsageItem,
+  TokenCreditRate,
+  RequestCreditRate,
+} from "$types/UsageTracking";
 
 /**
  * Mapping configuration for each provider with input and output rates:
@@ -10,7 +15,7 @@ import type { UsageRow, UsageItem } from "$types/UsageTracking";
  *      + OpenAI gpt-4o: 40000 input tokens = 1 request
  *      + OpenAI gpt-4o: 10000 output tokens = 1 request
  */
-const TOKEN_CREDIT_MAPPING = {
+const TOKEN_CREDIT_MAPPING: Record<string, TokenCreditRate> = {
   [ApiKeyProvider.OpenAI]: { input: 40000, output: 10000 },
   [ApiKeyProvider.AzureOpenAI]: { input: 40000, output: 10000 },
   [ApiKeyProvider.Perplexity]: { input: 100000, output: 100000 },
@@ -25,7 +30,7 @@ const TOKEN_CREDIT_MAPPING = {
  *   - DALLE: 1 credit = 1 request
  *   - Flux: 1 credit = 2 requests
  */
-const REQUEST_CREDIT_MAPPING = {
+const REQUEST_CREDIT_MAPPING: Record<string, RequestCreditRate> = {
   [ApiKeyProvider.OpenAI]: 1,
   [ApiKeyProvider.Flux]: 2,
   [ApiKeyProvider.Perplexity]: 12,
@@ -78,11 +83,11 @@ const _calculateOpenAIUsage = (rawUsages: any) => {
   // gpt-4o
   const gpt4oItems = usageData.filter((item: any) => item.model == "gpt-4o");
   const gpt4oInputTokens = gpt4oItems.reduce(
-    (sum, item) => sum + item.input_tokens,
+    (sum: any, item: any) => sum + item.input_tokens,
     0,
   );
   const gpt4oOutputTokens = gpt4oItems.reduce(
-    (sum, item) => sum + item.output_tokens,
+    (sum: any, item: any) => sum + item.output_tokens,
     0,
   );
   const { inputCredits: gpt4oInputCredits, outputCredits: gpt4oOutputCredits } =
@@ -127,11 +132,11 @@ const _calculateAzureOpenAIUsage = (rawUsages: any) => {
   // gpt-4o
   const gpt4oItems = usageData.filter((item: any) => item.model == "gpt-4o");
   const gpt4oInputTokens = gpt4oItems.reduce(
-    (sum, item) => sum + item.input_tokens,
+    (sum: any, item: any) => sum + item.input_tokens,
     0,
   );
   const gpt4oOutputTokens = gpt4oItems.reduce(
-    (sum, item) => sum + item.output_tokens,
+    (sum: any, item: any) => sum + item.output_tokens,
     0,
   );
   const { inputCredits: gpt4oInputCredits, outputCredits: gpt4oOutputCredits } =

@@ -22,3 +22,12 @@ export interface UsageOverview {
   month: string;
   creditsUsed: number;
 }
+
+// Type for token to credit mapping (input and output tokens)
+export interface TokenCreditRate {
+  input: number;
+  output: number;
+}
+
+// Type for request to credit mapping
+export type RequestCreditRate = number;
