@@ -1,3 +1,4 @@
+import { type UsageLog } from "$data/models/usageLog.model";
 import { ApiKeyProvider } from "$types/TenantFeature";
 import type {
   UsageRow,
@@ -73,21 +74,23 @@ const _requestsToCredits = (
   return credits;
 };
 
-const _calculateOpenAIUsage = (rawUsages: any) => {
+const _calculateOpenAIUsage = (rawUsages: UsageLog[]) => {
   const usageItems: UsageItem[] = [];
 
-  const usageData = rawUsages.filter((item: any) => {
+  const usageData = rawUsages.filter((item: UsageLog) => {
     return item.provider == ApiKeyProvider.OpenAI;
   });
 
   // gpt-4o
-  const gpt4oItems = usageData.filter((item: any) => item.model == "gpt-4o");
+  const gpt4oItems = usageData.filter(
+    (item: UsageLog) => item.model == "gpt-4o",
+  );
   const gpt4oInputTokens = gpt4oItems.reduce(
-    (sum: any, item: any) => sum + item.input_tokens,
+    (sum: number, item: UsageLog) => sum + item.input_tokens,
     0,
   );
   const gpt4oOutputTokens = gpt4oItems.reduce(
-    (sum: any, item: any) => sum + item.output_tokens,
+    (sum: number, item: UsageLog) => sum + item.output_tokens,
     0,
   );
   const { inputCredits: gpt4oInputCredits, outputCredits: gpt4oOutputCredits } =
@@ -110,7 +113,9 @@ const _calculateOpenAIUsage = (rawUsages: any) => {
   });
 
   // DALL-E
-  const dalleItems = usageData.filter((item: any) => item.model == "dall-e-3");
+  const dalleItems = usageData.filter(
+    (item: UsageLog) => item.model == "dall-e-3",
+  );
   const dalleRequests = dalleItems.length;
   usageItems.push({
     model: "DALL-E",
@@ -122,21 +127,23 @@ const _calculateOpenAIUsage = (rawUsages: any) => {
   return usageItems;
 };
 
-const _calculateAzureOpenAIUsage = (rawUsages: any) => {
+const _calculateAzureOpenAIUsage = (rawUsages: UsageLog[]) => {
   const usageItems: UsageItem[] = [];
 
-  const usageData = rawUsages.filter((item: any) => {
+  const usageData = rawUsages.filter((item: UsageLog) => {
     return item.provider == ApiKeyProvider.AzureOpenAI;
   });
 
   // gpt-4o
-  const gpt4oItems = usageData.filter((item: any) => item.model == "gpt-4o");
+  const gpt4oItems = usageData.filter(
+    (item: UsageLog) => item.model == "gpt-4o",
+  );
   const gpt4oInputTokens = gpt4oItems.reduce(
-    (sum: any, item: any) => sum + item.input_tokens,
+    (sum: number, item: UsageLog) => sum + item.input_tokens,
     0,
   );
   const gpt4oOutputTokens = gpt4oItems.reduce(
-    (sum: any, item: any) => sum + item.output_tokens,
+    (sum: number, item: UsageLog) => sum + item.output_tokens,
     0,
   );
   const { inputCredits: gpt4oInputCredits, outputCredits: gpt4oOutputCredits } =
@@ -169,16 +176,16 @@ const _calculateAzureOpenAIUsage = (rawUsages: any) => {
   return usageItems;
 };
 
-const _calculateFluxUsage = (rawUsages: any) => {
+const _calculateFluxUsage = (rawUsages: UsageLog[]) => {
   const usageItems: UsageItem[] = [];
 
-  const usageData = rawUsages.filter((item: any) => {
+  const usageData = rawUsages.filter((item: UsageLog) => {
     return item.provider == ApiKeyProvider.Flux;
   });
 
   // Flux-dev
   const fluxItems = usageData.filter(
-    (item: any) => item.model == "fal-ai/flux/dev",
+    (item: UsageLog) => item.model == "fal-ai/flux/dev",
   );
   const fluxRequests = fluxItems.length;
   usageItems.push({
@@ -192,7 +199,7 @@ const _calculateFluxUsage = (rawUsages: any) => {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const calculateUsage = (rawUsages: any) => {
+export const calculateUsage = (rawUsages: UsageLog[]) => {
   const usageData: UsageRow[] = [];
 
   // OpenAI
