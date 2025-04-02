@@ -138,7 +138,6 @@ export async function createTranscriptionTask(
     },
     customProperties: {},
   };
-  console.log("BODY:---- ", body);
 
   if (enableDiarization) {
     body.properties.diarization = {
