@@ -2,7 +2,7 @@ import { decrypt } from "$utils/secure";
 import type { APIContext, APIRoute } from "astro";
 import { OpenAI } from "openai";
 import { ApiKeyProvider } from "$types/TenantFeature";
-import { UsageType, UsageService } from "$types/UsageTracking";
+import { UsageType } from "$types/UsageTracking";
 import UsageLogModel, { type UsageLog } from "$data/models/usageLog.model";
 
 const recordImageUsage = async (ctx: APIContext) => {

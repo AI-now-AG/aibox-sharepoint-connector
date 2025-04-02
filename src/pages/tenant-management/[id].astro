@@ -18,7 +18,6 @@ const tenant = await TenantModel.get(id);
 if (!tenant) {
   return Astro.redirect("/404");
 }
-
 const tenantData = transformRawData(tenant);
 
 [

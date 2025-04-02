@@ -3,7 +3,7 @@ import type { APIContext, APIRoute } from "astro";
 import { fal } from "@fal-ai/client";
 import type { ImageSize } from "@fal-ai/client/endpoints";
 import { ApiKeyProvider } from "$types/TenantFeature";
-import { UsageType, UsageService } from "$types/UsageTracking";
+import { UsageType } from "$types/UsageTracking";
 import UsageLogModel, { type UsageLog } from "$data/models/usageLog.model";
 
 const recordImageUsage = async (ctx: APIContext) => {
