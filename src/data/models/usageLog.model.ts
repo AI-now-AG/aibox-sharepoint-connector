@@ -68,58 +68,9 @@ export default {
     // Get date range for the month
     const { start, end } = getMonthRange(month);
 
-    console.log("listUsageSummary", { tenantId, start, end });
-
-    // Execute the aggregation pipeline
-    return collection.aggregate([
-      {
-        $match: {
-          tenant_id: new ObjectId(tenantId), // Filter by tenant ID
-          created_at: { $gte: start, $lt: end }, // Filter by date range for the month
-        },
-      },
-      {
-        $group: {
-          _id: {
-            tenant_id: "$tenant_id",
-            provider: "$provider",
-            model: "$model",
-            type: "$type",
-          },
-          total_input: { $sum: "$input_tokens" }, // Sum of input tokens
-          total_output: { $sum: "$output_tokens" }, // Sum of output tokens
-        },
-      },
-    ]);
-  },
-
-  countDocuments: async (query: {
-    tenant_id: string;
-    provider: string;
-    model: string;
-    type: string;
-    dateRange?: { start: Date; end: Date };
-  }): Promise<number> => {
-    const { tenant_id, provider, model, type, dateRange } = query;
-
-    // Construct the MongoDB query
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const mongoQuery: any = {
-      tenant_id: new ObjectId(tenant_id), // Convert tenant_id to ObjectId
-      provider,
-      model,
-      type,
-    };
-
-    // Add date range filter if provided
-    if (dateRange) {
-      mongoQuery.created_at = {
-        $gte: dateRange.start,
-        $lte: dateRange.end,
-      };
-    }
-
-    // Count the matching documents
-    return await collection.countDocuments(mongoQuery);
+    return collection.find<Document<UsageLog>>({
+      tenant_id: new ObjectId(tenantId), // Filter by tenant ID
+      created_at: { $gte: start, $lt: end }, // Filter by date range for the month
+    });
   },
 };

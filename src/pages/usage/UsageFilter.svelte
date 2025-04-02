@@ -74,8 +74,10 @@
     />
   </div>
   <div class="form-control">
-    <button class="btn btn-primary" onclick={preventDefault(onsearch)}
-      >Search</button
+    <button
+      class="btn btn-primary"
+      onclick={preventDefault(onsearch)}
+      disabled={!selectedTenant || !selectedMonth}>Search</button
     >
   </div>
 </div>
