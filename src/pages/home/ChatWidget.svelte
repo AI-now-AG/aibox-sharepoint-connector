@@ -14,8 +14,9 @@
     stripHtmlFormatting,
   } from "$utils/common";
   import ModelInput from "$pages/prompt-library/prompts/ModelInput.svelte";
-  import type { Option } from "$components/SelectOptions.svelte";
+  import { useTranslations } from "$i18n/utils";
 
+  const t = useTranslations();
   let selectedModel: string = $state("openai");
 
   interface Props {
@@ -28,6 +29,7 @@
   let files: File[] = $state([]);
   let isProcessing = $state(false);
   let showButton = $state(false);
+  let isDisableSelectModel = $state(false);
 
   const apiProvider = tenant.api_key_providers?.find((item: any) => {
     return item.default && item.active;
@@ -181,17 +183,22 @@
         in:slide={{ duration: 500, delay: 500 }}
         out:slide={{ duration: 500 }}
       >
+        <div class="flex items-end justify-end mb-2 z-10">
+          <div>
+            <ModelInput
+              label={t("prompt.text-model")}
+              bind:selectedModel
+              bind:disabled={isDisableSelectModel}
+              labelClasses="text-sm text-right"
+            />
+          </div>
+        </div>
         <ChatInput
           bind:input
           bind:files
           onsend={fetchMessage}
           {isDisableFileInput}
         />
-        <div class="flex items-end justify-end mt-2 z-10">
-          <div class="">
-            <ModelInput label="Text Model" bind:selectedModel />
-          </div>
-        </div>
       </div>
     {/if}
 
@@ -219,6 +226,16 @@
           in:slide={{ duration: 500, delay: 500 }}
           out:slide={{ duration: 500 }}
         >
+          <div class="flex items-end justify-end mb-2 z-10">
+            <div>
+              <ModelInput
+                label={t("prompt.text-model")}
+                bind:selectedModel
+                bind:disabled={isDisableSelectModel}
+                labelClasses="text-sm text-right"
+              />
+            </div>
+          </div>
           <ChatInput
             bind:input
             bind:files

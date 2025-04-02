@@ -378,5 +378,6 @@
   "tenant.image-creation.flux": "Flux",
   "tenant.image-creation.flux.api-key": "API Key",
   "onboarding.step-4.title": "Create Images",
-  "onboarding.step-4.description": "Easily create images in different sizes and formats."
+  "onboarding.step-4.description": "Easily create images in different sizes and formats.",
+  "prompt.text-model": "Text Model"
 }

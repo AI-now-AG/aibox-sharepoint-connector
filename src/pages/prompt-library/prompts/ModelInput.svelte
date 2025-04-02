@@ -12,12 +12,18 @@
     label?: string;
     models?: Option[];
     selectedModel: string;
+    classes?: string;
+    labelClasses?: string;
+    disabled?: boolean;
   }
 
   let {
     label,
     models = $bindable([]),
     selectedModel = $bindable(""),
+    classes = "",
+    labelClasses = "",
+    disabled = $bindable(false),
   }: Props = $props();
 
   onMount(async function () {
@@ -64,9 +70,11 @@
 </script>
 
 <SelectOptions
-  classes="flex-1 min-w-3xs"
+  classes={"flex-1 min-w-3xs " + classes}
+  {labelClasses}
   label={label ?? t("prompt-library.add.prompts.language-model")}
   placeholder={`${t("tenant.default")} (OpenAI gtp-4o)`}
   options={models}
+  {disabled}
   bind:value={selectedModel}
 ></SelectOptions>
