@@ -39,8 +39,8 @@ const REQUEST_CREDIT_MAPPING: Record<string, RequestCreditRate> = {
 
 const _tokensToCredits = (
   provider: ApiKeyProvider,
-  inputTokens: number,
-  outputTokens: number,
+  inputTokens: number = 0,
+  outputTokens: number = 0,
 ): Record<string, number> => {
   const rates = TOKEN_CREDIT_MAPPING[provider.toLowerCase()];
   if (!rates) {
@@ -86,11 +86,11 @@ const _calculateOpenAIUsage = (rawUsages: UsageLog[]) => {
     (item: UsageLog) => item.model == "gpt-4o",
   );
   const gpt4oInputTokens = gpt4oItems.reduce(
-    (sum: number, item: UsageLog) => sum + item.input_tokens,
+    (sum: number, item: UsageLog) => sum + (item.input_tokens ?? 0),
     0,
   );
   const gpt4oOutputTokens = gpt4oItems.reduce(
-    (sum: number, item: UsageLog) => sum + item.output_tokens,
+    (sum: number, item: UsageLog) => sum + (item.output_tokens ?? 0),
     0,
   );
   const { inputCredits: gpt4oInputCredits, outputCredits: gpt4oOutputCredits } =
@@ -139,11 +139,11 @@ const _calculateAzureOpenAIUsage = (rawUsages: UsageLog[]) => {
     (item: UsageLog) => item.model == "gpt-4o",
   );
   const gpt4oInputTokens = gpt4oItems.reduce(
-    (sum: number, item: UsageLog) => sum + item.input_tokens,
+    (sum: number, item: UsageLog) => sum + (item.input_tokens ?? 0),
     0,
   );
   const gpt4oOutputTokens = gpt4oItems.reduce(
-    (sum: number, item: UsageLog) => sum + item.output_tokens,
+    (sum: number, item: UsageLog) => sum + (item.output_tokens ?? 0),
     0,
   );
   const { inputCredits: gpt4oInputCredits, outputCredits: gpt4oOutputCredits } =
@@ -171,6 +171,40 @@ const _calculateAzureOpenAIUsage = (rawUsages: UsageLog[]) => {
     amount: 0,
     unit: "minutes",
     credits: 0,
+  });
+
+  return usageItems;
+};
+
+const _calculatePerplexityUsage = (rawUsages: UsageLog[]) => {
+  const usageItems: UsageItem[] = [];
+
+  const usageData = rawUsages.filter((item: UsageLog) => {
+    return item.provider == ApiKeyProvider.Perplexity;
+  });
+
+  // sonar
+  const sonarItems = usageData.filter(
+    (item: UsageLog) => item.model == "sonar",
+  );
+  const sonarInputTokens = sonarItems.reduce(
+    (sum: number, item: UsageLog) => sum + (item.input_tokens ?? 0),
+    0,
+  );
+  const sonarOutputTokens = sonarItems.reduce(
+    (sum: number, item: UsageLog) => sum + (item.output_tokens ?? 0),
+    0,
+  );
+  const totalTokens = sonarInputTokens + sonarOutputTokens;
+  const { inputCredits: sonarInOutCredits } = _tokensToCredits(
+    ApiKeyProvider.Perplexity,
+    totalTokens,
+  );
+  usageItems.push({
+    model: "sonar Input/Output",
+    amount: sonarInputTokens + sonarOutputTokens,
+    unit: "tokens",
+    credits: sonarInOutCredits,
   });
 
   return usageItems;
@@ -211,6 +245,12 @@ export const calculateUsage = (rawUsages: UsageLog[]) => {
   usageData.push({
     provider: "Azure OpenAI",
     details: _calculateAzureOpenAIUsage(rawUsages),
+  });
+
+  // Perplexity
+  usageData.push({
+    provider: "Perplexity",
+    details: _calculatePerplexityUsage(rawUsages),
   });
 
   // Flux

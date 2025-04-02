@@ -61,7 +61,7 @@
     <div class="text-center text-gray-500 py-6">No usage data available.</div>
   {:else}
     {#if usageInfo}
-      <div class="mb-5">
+      <div class="mb-8">
         <table class="table table-xs border w-auto ml-auto">
           <colgroup>
             <col class="w-[150]" />
@@ -91,7 +91,7 @@
       </div>
     {/if}
     {#each usageData as row}
-      <div class="mb-3">
+      <div class="mb-4">
         <table class="table border min-w-full relative">
           <colgroup>
             <col class="w-auto" />
