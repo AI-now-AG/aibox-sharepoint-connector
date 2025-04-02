@@ -44,11 +44,13 @@ export const POST: APIRoute = async (ctx: APIContext) => {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let imageSize = formData.get("image_size") as any;
+    console.log("FLUX/DEV ::: imageSize Before", imageSize);
     if (imageSize == "custom") {
       const width = parseInt(formData.get("custom_width") as string, 10);
       const height = parseInt(formData.get("custom_height") as string, 10);
       imageSize = { width, height } as ImageSize;
     }
+    console.log("FLUX/DEV ::: imageSize After", imageSize);
 
     if (!prompt) {
       return new Response(JSON.stringify({ error: "Prompt is required" }), {
@@ -64,6 +66,7 @@ export const POST: APIRoute = async (ctx: APIContext) => {
         image_size: imageSize,
         num_images: 1,
       },
+      logs: true,
     });
     console.log("FLUX/DEV ::: HAS RESULT", result);
 
