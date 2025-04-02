@@ -28,11 +28,9 @@
 
   interface Props {
     tenant?: any;
-    usageSettings?: any;
   }
 
-  let { tenant, usageSettings }: Props = $props();
-  $inspect(usageSettings);
+  let { tenant }: Props = $props();
 
   let addTenantAdminModal: HTMLDialogElement | undefined = $state();
   let confirmUpdateModal: HTMLDialogElement | undefined = $state();
@@ -461,7 +459,6 @@
 
         const createTanentResult = await actions.tenant.create({
           tenant: tenantData,
-          usageSettings,
         });
         const { error, data: createdTenant } = createTanentResult;
 
@@ -572,7 +569,6 @@
 
         const { error } = await actions.tenant.update({
           tenant: tenantData,
-          usageSettings,
         });
         loading = false;
 
@@ -1266,49 +1262,6 @@
             </label>
           </div>
         </div>
-
-        <div class="collapse-content space-y-6">
-          <div class="grid grid-cols-3 gap-4 mx-8">
-            <div class="w-full">
-              <span class="mb-2 text-base-content/50 font-medium text-sm"
-                >{t("tenant.image-creation.usage.request-per-month")}
-              </span>
-
-              <input
-                type="number"
-                class="input input-bordered mt-2 w-full"
-                placeholder={""}
-                use:trimInput
-                bind:value={usageSettings.imageDalle.limitRequests}
-              />
-            </div>
-            <div class="w-full">
-              <span class="mb-2 text-base-content/50 font-medium text-sm"
-                >{t("tenant.image-creation.usage.created-this-month")}</span
-              >
-              <input
-                type="number"
-                class="input input-bordered mt-2 w-full"
-                placeholder={""}
-                use:trimInput
-                disabled={true}
-                bind:value={usageSettings.imageDalle.usedRequests}
-              />
-            </div>
-            <div class="w-full">
-              <span class="mb-2 text-base-content/50 font-medium text-sm"
-                >{t("tenant.image-creation.usage.extra-image-this-month")}</span
-              >
-              <input
-                type="number"
-                class="input input-bordered mt-2 w-full"
-                placeholder={""}
-                use:trimInput
-                bind:value={usageSettings.imageDalle.extraAmount}
-              />
-            </div>
-          </div>
-        </div>
       </div>
       <!-- Flux -->
       <div
@@ -1352,46 +1305,6 @@
                   change={() => togglePassword(falOpenAIKeyField)}
                 />
               </label>
-            </div>
-          </div>
-          <div class="grid grid-cols-3 gap-4 mx-8">
-            <div class="w-full">
-              <span class="mb-2 text-base-content/50 font-medium text-sm"
-                >{t("tenant.image-creation.usage.request-per-month")}
-              </span>
-
-              <input
-                type="number"
-                class="input input-bordered mt-2 w-full"
-                placeholder={""}
-                use:trimInput
-                bind:value={usageSettings.imageFlux.limitRequests}
-              />
-            </div>
-            <div class="w-full">
-              <span class="mb-2 text-base-content/50 font-medium text-sm"
-                >{t("tenant.image-creation.usage.created-this-month")}</span
-              >
-              <input
-                type="number"
-                class="input input-bordered mt-2 w-full"
-                placeholder={""}
-                use:trimInput
-                disabled={true}
-                bind:value={usageSettings.imageFlux.usedRequests}
-              />
-            </div>
-            <div class="w-full">
-              <span class="mb-2 text-base-content/50 font-medium text-sm"
-                >{t("tenant.image-creation.usage.extra-image-this-month")}</span
-              >
-              <input
-                type="number"
-                class="input input-bordered mt-2 w-full"
-                placeholder={""}
-                use:trimInput
-                bind:value={usageSettings.imageFlux.extraAmount}
-              />
             </div>
           </div>
         </div>
