@@ -44,7 +44,7 @@
   $inspect(selectedMonth);
 </script>
 
-<div class="container max-w-full mx-auto p-6 overflow-x-auto mt-4">
+<div class="mt-5">
   <UsageFilter
     {tenants}
     bind:selectedTenant
