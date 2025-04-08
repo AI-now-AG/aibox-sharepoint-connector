@@ -83,7 +83,11 @@
     { title: "Deutsch (Schweiz)", checked: true, locales: "de-ch" },
     {
       title: "Deutsch (Deutschland)",
-      checked: category === AudioCategory.AudioPro ? false : true,
+      checked:
+        category === AudioCategory.AudioPro ||
+        category === AudioCategory.SubtitleLarge
+          ? false
+          : true,
       locales: "de-de",
     },
     { title: "Italienisch (Schweiz)", checked: false, locales: "it-ch" },
@@ -105,7 +109,10 @@
   );
 
   function handleSelectedItems(selected: any) {
-    if (category === AudioCategory.AudioPro) {
+    if (
+      category === AudioCategory.AudioPro ||
+      category === AudioCategory.SubtitleLarge
+    ) {
       const elem = document.activeElement;
       if (elem) {
         elem?.blur();
@@ -113,7 +120,10 @@
     }
     const idx = languageLocales.indexOf(selected);
     if (idx !== -1) {
-      if (category === AudioCategory.AudioPro) {
+      if (
+        category === AudioCategory.AudioPro ||
+        category === AudioCategory.SubtitleLarge
+      ) {
         languageLocales.forEach((item) => (item.checked = false));
       }
       languageLocales[idx].checked = !languageLocales[idx].checked;
@@ -1395,7 +1405,7 @@
             {/if}
           </div>
         </div>
-        {#if (category === AudioCategory.SubtitleLarge && selectedLangLength < 2) || (category === AudioCategory.AudioPro && selectedLangLength < 1)}
+        {#if (category === AudioCategory.SubtitleLarge && selectedLangLength < 1) || (category === AudioCategory.AudioPro && selectedLangLength < 1)}
           <div transition:slide role="alert" class="alert alert-warning">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -1412,7 +1422,7 @@
             </svg>
             <span>
               {category === AudioCategory.SubtitleLarge
-                ? "Wählen Sie mindestens 2 Sprachen aus!"
+                ? "Wählen Sie mindestens 1 Sprachen aus!"
                 : "Wählen Sie mindestens 1 Sprache aus!"}
             </span>
           </div>
