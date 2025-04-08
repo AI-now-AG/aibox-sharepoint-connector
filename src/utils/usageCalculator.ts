@@ -94,7 +94,8 @@ const _durationsToCredits = (
   }
 
   // Calculate credits
-  const minutes = Math.ceil(durations / 60);
+  // durations is milliseconds
+  const minutes = Math.ceil(durations / 60000);
   return Math.ceil(minutes / rate);
 };
 
@@ -243,7 +244,7 @@ const _calculateAudioUsage = (rawUsages: UsageLog[]) => {
   );
   usageItems.push({
     model: "Whisper",
-    amount: Math.ceil(whisperDurations / 60),
+    amount: Math.ceil(whisperDurations / 60000),
     unit: "minutes",
     credits: _durationsToCredits(AzureTTSModel.Whisper, whisperDurations),
   });
@@ -259,7 +260,7 @@ const _calculateAudioUsage = (rawUsages: UsageLog[]) => {
   console.log("audioProItems", { usageData, audioProItems });
   usageItems.push({
     model: "Audio Pro",
-    amount: Math.ceil(audioProDurations / 60),
+    amount: Math.ceil(audioProDurations / 60000),
     unit: "minutes",
     credits: _durationsToCredits(AzureTTSModel.AudioPro, audioProDurations),
   });
