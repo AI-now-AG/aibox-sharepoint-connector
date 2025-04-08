@@ -62,7 +62,7 @@
   {:else}
     {#if usageInfo}
       <div class="mb-8">
-        <table class="table table-xs border w-auto ml-auto">
+        <table class="table table-xs border w-auto">
           <colgroup>
             <col class="w-[150]" />
             <col class="w-auto" />
