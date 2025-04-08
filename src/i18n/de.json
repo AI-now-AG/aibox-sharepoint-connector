@@ -379,5 +379,17 @@
   "tenant.image-creation.flux.api-key": "API Key",
   "onboarding.step-4.title": "Bilder erstellen",
   "onboarding.step-4.description": "Erstelle ganz einfach Bilder in verschiedenen Grössen und Formaten.",
-  "prompt.text-model": "Text Model"
+  "prompt.text-model": "Textmodell",
+  "nav.usage": "Usage",
+  "usage.select-tenant": "Select Tenant",
+  "usage.select-month": "Select Month",
+  "usage.no-data-available": "No usage data available.",
+  "usage.summary.tenant": "Tenant",
+  "usage.summary.month": "Month",
+  "usage.summary.credits-used": "Credits used",
+  "usage.units.tokens": "tokens",
+  "usage.units.request": "calls",
+  "usage.units.minutes": "minutes",
+  "usage.units.credits": "credits",
+  "home.new-chat": "New chat"
 }

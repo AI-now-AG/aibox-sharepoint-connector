@@ -31,6 +31,14 @@
   let showButton = $state(false);
   let isDisableSelectModel = $state(false);
 
+  $effect(() => {
+    if ($sharedMessageHistory.length > 0 || isProcessing) {
+      isDisableSelectModel = true;
+    } else {
+      isDisableSelectModel = false;
+    }
+  });
+
   const apiProvider = tenant.api_key_providers?.find((item: any) => {
     return item.default && item.active;
   });
@@ -55,6 +63,13 @@
   const scrollToBottom = async () => {
     window.scroll({
       top: document.documentElement.scrollHeight,
+      behavior: "smooth",
+    });
+  };
+
+  const scrollToTop = async () => {
+    window.scrollTo({
+      top: 0,
       behavior: "smooth",
     });
   };
@@ -173,6 +188,17 @@
       }
     }
   }
+
+  async function resetChat() {
+    input = "";
+    output = "";
+    files = [];
+    isProcessing = false;
+    sharedMessageHistory.set([]);
+    setTimeout(() => {
+      scrollToTop();
+    }, 10);
+  }
 </script>
 
 <div class="grid grid-cols-1 grid-rows-[1fr_min-content] space-y-6 h-full">
@@ -183,16 +209,6 @@
         in:slide={{ duration: 500, delay: 500 }}
         out:slide={{ duration: 500 }}
       >
-        <div class="flex items-end justify-end mb-2 z-10">
-          <div>
-            <ModelInput
-              label={t("prompt.text-model")}
-              bind:selectedModel
-              bind:disabled={isDisableSelectModel}
-              labelClasses="text-sm text-right"
-            />
-          </div>
-        </div>
         <ChatInput
           bind:input
           bind:files
@@ -202,6 +218,17 @@
       </div>
     {/if}
 
+    <div class="flex items-end justify-end z-10">
+      <div>
+        <ModelInput
+          label={t("prompt.text-model")}
+          bind:selectedModel
+          bind:disabled={isDisableSelectModel}
+          labelClasses="text-sm"
+        />
+      </div>
+    </div>
+
     <ChatResults bind:output bind:isProcessing />
 
     {#if $sharedMessageHistory.length > 0}
@@ -209,6 +236,16 @@
         class="sticky bottom-0 bg-base-200"
         transition:slide={{ duration: 500 }}
       >
+        <div class="mt-6 mb-6">
+          <button
+            onclick={() => {
+              resetChat();
+            }}
+            class="btn btn-active btn-primary mt-4 min-w-[154px]"
+          >
+            {t("home.new-chat")}
+          </button>
+        </div>
         {#if showButton}
           <div class="relative w-full flex justify-center">
             <button
@@ -226,16 +263,6 @@
           in:slide={{ duration: 500, delay: 500 }}
           out:slide={{ duration: 500 }}
         >
-          <div class="flex items-end justify-end mb-2 z-10">
-            <div>
-              <ModelInput
-                label={t("prompt.text-model")}
-                bind:selectedModel
-                bind:disabled={isDisableSelectModel}
-                labelClasses="text-sm text-right"
-              />
-            </div>
-          </div>
           <ChatInput
             bind:input
             bind:files

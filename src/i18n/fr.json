@@ -379,5 +379,17 @@
   "tenant.image-creation.flux.api-key": "API Key",
   "onboarding.step-4.title": "Create Images",
   "onboarding.step-4.description": "Easily create images in different sizes and formats.",
-  "prompt.text-model": "Text Model"
+  "prompt.text-model": "Text Model",
+  "nav.usage": "Usage",
+  "usage.select-tenant": "Select Tenant",
+  "usage.select-month": "Select Month",
+  "usage.no-data-available": "No usage data available.",
+  "usage.summary.tenant": "Tenant",
+  "usage.summary.month": "Month",
+  "usage.summary.credits-used": "Credits used",
+  "usage.units.tokens": "tokens",
+  "usage.units.request": "calls",
+  "usage.units.minutes": "minutes",
+  "usage.units.credits": "credits",
+  "home.new-chat": "New chat"
 }
