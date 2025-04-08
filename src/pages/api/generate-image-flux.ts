@@ -42,12 +42,15 @@ export const POST: APIRoute = async (ctx: APIContext) => {
     const formData = await request.formData();
     const prompt = formData.get("prompt") as string;
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let imageSize = formData.get("image_size") as any;
+    console.log("FLUX/DEV ::: imageSize Before", imageSize);
     if (imageSize == "custom") {
       const width = parseInt(formData.get("custom_width") as string, 10);
       const height = parseInt(formData.get("custom_height") as string, 10);
       imageSize = { width, height } as ImageSize;
     }
+    console.log("FLUX/DEV ::: imageSize After", imageSize);
 
     if (!prompt) {
       return new Response(JSON.stringify({ error: "Prompt is required" }), {
@@ -56,20 +59,26 @@ export const POST: APIRoute = async (ctx: APIContext) => {
       });
     }
 
+    console.log("FLUX/DEV ::: START TIME", Date.now());
     const result = await fal.subscribe("fal-ai/flux/dev", {
       input: {
         prompt,
         image_size: imageSize,
         num_images: 1,
       },
+      logs: true,
     });
-    const imageUrl = result.data.images[0].url;
+    console.log("FLUX/DEV ::: HAS RESULT", result);
 
+    const imageUrl = result.data.images[0].url;
     const imageResponse = await fetch(imageUrl);
     const imageBuffer = await imageResponse.arrayBuffer();
     const base64Image = Buffer.from(imageBuffer).toString("base64");
+    console.log("FLUX/DEV ::: END TIME", Date.now());
 
-    recordImageUsage(ctx);
+    setTimeout(() => {
+      recordImageUsage(ctx);
+    }, 0);
 
     return new Response(JSON.stringify({ image: base64Image }), {
       status: 200,

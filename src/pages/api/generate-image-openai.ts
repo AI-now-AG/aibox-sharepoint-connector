@@ -47,7 +47,7 @@ export const POST: APIRoute = async (ctx: APIContext) => {
         headers: { "Content-Type": "application/json" },
       });
     }
-
+    console.log("DALL-E 3 ::: START TIME", Date.now());
     const response = await openai.images.generate({
       model: "dall-e-3",
       prompt,
@@ -56,12 +56,12 @@ export const POST: APIRoute = async (ctx: APIContext) => {
       quality,
       response_format: "b64_json",
     });
-
-    console.log("Generated image with DALL-E 3 RESPONSE:", response.data[0]);
+    console.log("DALL-E 3 ::: END TIME", Date.now());
 
     const image = response.data[0].b64_json;
-
-    recordImageUsage(ctx);
+    setTimeout(() => {
+      recordImageUsage(ctx);
+    }, 0);
 
     return new Response(JSON.stringify({ image }), {
       status: 200,
