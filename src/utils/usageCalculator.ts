@@ -189,14 +189,6 @@ const _calculateAzureOpenAIUsage = (rawUsages: UsageLog[]) => {
     credits: gpt4oOutputCredits,
   });
 
-  // Whisper
-  usageItems.push({
-    model: "Whisper",
-    amount: 0,
-    unit: "minutes",
-    credits: 0,
-  });
-
   return usageItems;
 };
 
