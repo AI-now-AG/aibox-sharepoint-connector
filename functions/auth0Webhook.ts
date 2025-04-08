@@ -17,7 +17,6 @@ import {
   sendWelcomeEmail,
   sendNotificationEmail,
 } from "$utils/auth0Auth";
-import { syncAllOrganizationUsers } from "$utils/auth0Sync";
 import { UserRole } from "$enums/Users";
 
 /**
@@ -44,11 +43,8 @@ const auth0Webhook: Handler = async (
       };
     }
 
-    console.log("auth0Webhook ::: Authenticated request from Auth0");
-
     // Parse the incoming Auth0 webhook data
     const payload = JSON.parse(event.body || "{}");
-    console.log("auth0Webhook ::: Payload :::", JSON.stringify(payload));
     const { logs } = payload;
 
     // Handle each event type
@@ -64,7 +60,6 @@ const auth0Webhook: Handler = async (
       // Trigger successful login
       // See: https://auth0.com/docs/customize/log-streams/event-filters#login-success
       if (eventType == "s") {
-        // await fetchAndSyncOrgUsersForModerator(data);
       }
 
       // Trigger successful signup
@@ -154,10 +149,6 @@ const auth0Webhook: Handler = async (
           description == "Delete user roles from an Organization member")
       ) {
         if (isPermittedChannel(data)) {
-          console.log(
-            "auth0Webhook ::: BEFORE - updateUserRolesInDatabase ::: data :::",
-            JSON.stringify(data),
-          );
           await updateUserRolesInDatabase(data);
         }
       }
@@ -196,15 +187,7 @@ const auth0Webhook: Handler = async (
 
 const isPermittedChannel = (data: any) => {
   const requestChannel = data?.details?.request?.channel || "";
-  console.log(
-    "auth0Webhook ::: isPermittedChannel ::: requestChannel :::",
-    requestChannel,
-  );
   const permittedChannels = ["https://manage.auth0.com/"];
-  console.log(
-    "auth0Webhook ::: isPermittedChannel :::  permittedChannels.includes(requestChannel) :::",
-    permittedChannels.includes(requestChannel),
-  );
   return permittedChannels.includes(requestChannel);
 };
 
@@ -381,10 +364,6 @@ const deleteUserFromDatabase = async (data: any) => {
 };
 
 const updateUserRolesInDatabase = async (data: any) => {
-  console.log(
-    "auth0Webhook ::: DURING - updateUserRolesInDatabase ::: data :::",
-    JSON.stringify(data),
-  );
   console.log(`Updating user roles`, data?.details?.response);
 
   // Take the "userId" from request path and "roles" from request body
@@ -488,35 +467,6 @@ const updateTenantInDatabase = async (data: any) => {
     }
   } catch (error: any) {
     console.warn(`Updating tenant error`, error);
-  }
-};
-
-const fetchAndSyncOrgUsersForModerator = async (data: any) => {
-  const { user_id: userId, organization_id: orgId } = data;
-  console.log(
-    `Fetching and syncing all Auth0 organization users on moderator login`,
-    {
-      userId,
-      orgId,
-    },
-  );
-
-  try {
-    const localUser = await UserModel.getAuth0Sub(userId);
-    const roles = localUser?.roles || [];
-
-    const isModerator = roles?.some((role: UserRole) =>
-      [UserRole.SuperAdmin, UserRole.Admin].includes(role),
-    );
-
-    if (localUser && isModerator) {
-      await syncAllOrganizationUsers(orgId, userId);
-    }
-  } catch (error: any) {
-    console.warn(
-      `Sync auth0 organization users on moderator login error`,
-      error,
-    );
   }
 };
 
