@@ -64,7 +64,7 @@ const auth0Webhook: Handler = async (
       // Trigger successful login
       // See: https://auth0.com/docs/customize/log-streams/event-filters#login-success
       if (eventType == "s") {
-        await fetchAndSyncOrgUsersForModerator(data);
+        // await fetchAndSyncOrgUsersForModerator(data);
       }
 
       // Trigger successful signup
