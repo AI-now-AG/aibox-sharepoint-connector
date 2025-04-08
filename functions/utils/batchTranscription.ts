@@ -106,32 +106,35 @@ export async function createTranscriptionTask(
   const body: TranscriptionRequestBody = {
     displayName: "My Transcription",
     locale: locale,
-    ...(category === AudioCategory.AudioPro && {
+    ...((category === AudioCategory.AudioPro ||
+      category === AudioCategory.SubtitleLarge) && {
       model: {
         self: "https://westeurope.api.cognitive.microsoft.com/speechtotext/v3.2/models/base/69adf293-9664-4040-932b-02ed16332e00",
       },
     }),
     contentUrls: [blobUrl],
     properties: {
-      wordLevelTimestampsEnabled:
-        category === AudioCategory.SubtitleLarge ? true : false,
-      displayFormWordLevelTimestampsEnabled:
-        category === AudioCategory.SubtitleLarge ? false : true,
+      // wordLevelTimestampsEnabled:
+      //   category === AudioCategory.SubtitleLarge ? true : false,
+      // displayFormWordLevelTimestampsEnabled:
+      //   category === AudioCategory.SubtitleLarge ? false : true,
+      wordLevelTimestampsEnabled: false,
+      displayFormWordLevelTimestampsEnabled: true,
       diarizationEnabled: enableDiarization,
-      ...(category === AudioCategory.SubtitleLarge && {
-        languageIdentification: {
-          candidateLocales: languageLocales || [
-            "de-ch",
-            "de-de",
-            "it-ch",
-            "it-it",
-            "fr-ch",
-            "fr-fr",
-            "en-us",
-            "en-gb",
-          ],
-        },
-      }),
+      // ...(category === AudioCategory.SubtitleLarge && {
+      //   languageIdentification: {
+      //     candidateLocales: languageLocales || [
+      //       "de-ch",
+      //       "de-de",
+      //       "it-ch",
+      //       "it-it",
+      //       "fr-ch",
+      //       "fr-fr",
+      //       "en-us",
+      //       "en-gb",
+      //     ],
+      //   },
+      // }),
       punctuationMode: "DictatedAndAutomatic",
       profanityFilterMode: "None",
       destinationContainerUrl: destinationContainerUrl,
