@@ -29,6 +29,7 @@ const TOKEN_CREDIT_MAPPING: Record<string, TokenCreditRate> = {
  * Examples:
  *   - DALLE: 1 credit = 1 request
  *   - Flux: 1 credit = 2 requests
+ *   - Flux: 1 credit = 12 requests
  */
 const REQUEST_CREDIT_MAPPING: Record<string, number> = {
   [ApiKeyProvider.OpenAI]: 1,
@@ -224,6 +225,14 @@ const _calculatePerplexityUsage = (rawUsages: UsageLog[]) => {
     credits: sonarInOutCredits,
   });
 
+  const sonarRequests = sonarItems.length;
+  usageItems.push({
+    model: "Sonar low / legacy pricing",
+    amount: sonarRequests,
+    unit: "calls",
+    credits: _requestsToCredits(ApiKeyProvider.Perplexity, sonarRequests),
+  });
+
   return usageItems;
 };
 
@@ -257,7 +266,6 @@ const _calculateAudioUsage = (rawUsages: UsageLog[]) => {
     (sum: number, item: UsageLog) => sum + (item.duration ?? 0),
     0,
   );
-  console.log("audioProItems", { usageData, audioProItems });
   usageItems.push({
     model: "Audio Pro",
     amount: Math.ceil(audioProDurations / 60000),
