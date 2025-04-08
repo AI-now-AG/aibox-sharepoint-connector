@@ -549,7 +549,7 @@ export async function uploadSubtitleLargeFiles(
       });
       return bestMatch;
     })
-    .flatMap((n) => n.words ?? []);
+    .flatMap((n) => n.displayWords ?? []);
   const formattedWords = createSRTDataLarge(displayWords);
   await uploadSubtitleFiles(
     selectedFileFormat,

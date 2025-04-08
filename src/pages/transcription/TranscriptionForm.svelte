@@ -83,7 +83,7 @@
     { title: "Deutsch (Schweiz)", checked: true, locales: "de-ch" },
     {
       title: "Deutsch (Deutschland)",
-      checked: category === AudioCategory.AudioPro ? false : true,
+      checked: false,
       locales: "de-de",
     },
     { title: "Italienisch (Schweiz)", checked: false, locales: "it-ch" },
@@ -105,17 +105,13 @@
   );
 
   function handleSelectedItems(selected: any) {
-    if (category === AudioCategory.AudioPro) {
-      const elem = document.activeElement;
-      if (elem) {
-        elem?.blur();
-      }
+    const elem = document.activeElement;
+    if (elem) {
+      elem?.blur();
     }
     const idx = languageLocales.indexOf(selected);
     if (idx !== -1) {
-      if (category === AudioCategory.AudioPro) {
-        languageLocales.forEach((item) => (item.checked = false));
-      }
+      languageLocales.forEach((item) => (item.checked = false));
       languageLocales[idx].checked = !languageLocales[idx].checked;
     }
     languageLocales = [...languageLocales].sort(
@@ -1395,7 +1391,7 @@
             {/if}
           </div>
         </div>
-        {#if (category === AudioCategory.SubtitleLarge && selectedLangLength < 2) || (category === AudioCategory.AudioPro && selectedLangLength < 1)}
+        {#if (category === AudioCategory.SubtitleLarge && selectedLangLength < 1) || (category === AudioCategory.AudioPro && selectedLangLength < 1)}
           <div transition:slide role="alert" class="alert alert-warning">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -1410,11 +1406,7 @@
                 d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
               />
             </svg>
-            <span>
-              {category === AudioCategory.SubtitleLarge
-                ? "Wählen Sie mindestens 2 Sprachen aus!"
-                : "Wählen Sie mindestens 1 Sprache aus!"}
-            </span>
+            <span> "Wählen Sie mindestens 1 Sprache aus! </span>
           </div>
         {/if}
       </div>
@@ -1432,7 +1424,7 @@
         disabled={!isUploaded ||
           !isFormValid ||
           isTranscribing ||
-          (category === AudioCategory.SubtitleLarge && selectedLangLength < 2)}
+          (category === AudioCategory.SubtitleLarge && selectedLangLength < 1)}
         onclick={transcribe}
         >{t("transciption.model.cta.start-transcribing")}</button
       >
