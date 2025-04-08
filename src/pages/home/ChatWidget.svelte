@@ -17,7 +17,7 @@
   import { useTranslations } from "$i18n/utils";
 
   const t = useTranslations();
-  let selectedModel: string = $state("openai");
+  let selectedModel: string = $state("");
 
   interface Props {
     tenant?: any;
@@ -125,6 +125,7 @@
             files: userInputFilesList,
             images: userInputImagesList,
             messageHistory: $sharedMessageHistory,
+            selectedModel: selectedModel ?? undefined
           }),
           credentials: "include",
           headers: {
@@ -242,6 +243,7 @@
               resetChat();
             }}
             class="btn btn-active btn-primary mt-4 min-w-[154px]"
+            disabled={isProcessing}
           >
             {t("home.new-chat")}
           </button>
