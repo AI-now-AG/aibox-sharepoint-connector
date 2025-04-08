@@ -1442,7 +1442,7 @@
         disabled={!isUploaded ||
           !isFormValid ||
           isTranscribing ||
-          (category === AudioCategory.SubtitleLarge && selectedLangLength < 2)}
+          (category === AudioCategory.SubtitleLarge && selectedLangLength < 1)}
         onclick={transcribe}
         >{t("transciption.model.cta.start-transcribing")}</button
       >
