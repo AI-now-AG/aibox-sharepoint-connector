@@ -1,3 +1,4 @@
+import { useTranslations } from "$i18n/utils";
 import { type UsageLog } from "$data/models/usageLog.model";
 import { ApiKeyProvider, AzureTTSModel } from "$types/TenantFeature";
 import type {
@@ -5,6 +6,15 @@ import type {
   UsageItem,
   TokenCreditRate,
 } from "$types/UsageTracking";
+
+const t = useTranslations();
+
+const unitLabels = {
+  tokens: t("usage.units.tokens"),
+  requests: t("usage.units.requests"),
+  minutes: t("usage.units.minutes"),
+  credits: t("usage.units.credits"),
+};
 
 /**
  * Mapping configuration for each provider with input and output rates:
@@ -128,13 +138,13 @@ const _calculateOpenAIUsage = (rawUsages: UsageLog[]) => {
   usageItems.push({
     model: "gpt-4o Input",
     amount: gpt4oInputTokens,
-    unit: "tokens",
+    unit: unitLabels.tokens,
     credits: gpt4oInputCredits,
   });
   usageItems.push({
     model: "gpt-4o Output",
     amount: gpt4oOutputTokens,
-    unit: "tokens",
+    unit: unitLabels.tokens,
     credits: gpt4oOutputCredits,
   });
 
@@ -146,7 +156,7 @@ const _calculateOpenAIUsage = (rawUsages: UsageLog[]) => {
   usageItems.push({
     model: "DALL-E",
     amount: dalleRequests,
-    unit: "calls",
+    unit: unitLabels.requests,
     credits: _requestsToCredits(ApiKeyProvider.OpenAI, dalleRequests),
   });
 
@@ -181,13 +191,13 @@ const _calculateAzureOpenAIUsage = (rawUsages: UsageLog[]) => {
   usageItems.push({
     model: "gpt-4o Input",
     amount: gpt4oInputTokens,
-    unit: "tokens",
+    unit: unitLabels.tokens,
     credits: gpt4oInputCredits,
   });
   usageItems.push({
     model: "gpt-4o Output",
     amount: gpt4oOutputTokens,
-    unit: "tokens",
+    unit: unitLabels.tokens,
     credits: gpt4oOutputCredits,
   });
 
@@ -221,7 +231,7 @@ const _calculatePerplexityUsage = (rawUsages: UsageLog[]) => {
   usageItems.push({
     model: "sonar Input/Output",
     amount: sonarInputTokens + sonarOutputTokens,
-    unit: "tokens",
+    unit: unitLabels.tokens,
     credits: sonarInOutCredits,
   });
 
@@ -229,7 +239,7 @@ const _calculatePerplexityUsage = (rawUsages: UsageLog[]) => {
   usageItems.push({
     model: "Sonar low / legacy pricing",
     amount: sonarRequests,
-    unit: "calls",
+    unit: unitLabels.requests,
     credits: _requestsToCredits(ApiKeyProvider.Perplexity, sonarRequests),
   });
 
@@ -254,7 +264,7 @@ const _calculateAudioUsage = (rawUsages: UsageLog[]) => {
   usageItems.push({
     model: "Whisper",
     amount: Math.ceil(whisperDurations / 60000),
-    unit: "minutes",
+    unit: unitLabels.minutes,
     credits: _durationsToCredits(AzureTTSModel.Whisper, whisperDurations),
   });
 
@@ -269,7 +279,7 @@ const _calculateAudioUsage = (rawUsages: UsageLog[]) => {
   usageItems.push({
     model: "Audio Pro",
     amount: Math.ceil(audioProDurations / 60000),
-    unit: "minutes",
+    unit: unitLabels.minutes,
     credits: _durationsToCredits(AzureTTSModel.AudioPro, audioProDurations),
   });
 
@@ -291,7 +301,7 @@ const _calculateFluxUsage = (rawUsages: UsageLog[]) => {
   usageItems.push({
     model: "Flux-dev",
     amount: fluxRequests,
-    unit: "calls",
+    unit: unitLabels.requests,
     credits: _requestsToCredits(ApiKeyProvider.Flux, fluxRequests),
   });
 

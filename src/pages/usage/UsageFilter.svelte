@@ -1,6 +1,7 @@
 <script lang="ts">
   import { useTranslations } from "$i18n/utils";
   import { preventDefault } from "$utils/common";
+  import { svgIcons } from "$assets/icons";
   import SelectOptions, { type Option } from "$components/SelectOptions.svelte";
 
   const t = useTranslations();
@@ -54,7 +55,7 @@
   <div class="form-control">
     <!-- svelte-ignore a11y_label_has_associated_control -->
     <label class="label">
-      <span class="label-text">Select Tenant:</span>
+      <span class="label-text">{t("usage.select-tenant")}:</span>
     </label>
     <SelectOptions
       classes="flex-1"
@@ -65,7 +66,7 @@
   <div class="form-control">
     <!-- svelte-ignore a11y_label_has_associated_control -->
     <label class="label">
-      <span class="label-text">Select Month:</span>
+      <span class="label-text">{t("usage.select-month")}:</span>
     </label>
     <SelectOptions
       classes="flex-1"
@@ -77,7 +78,8 @@
     <button
       class="btn btn-primary"
       onclick={preventDefault(onsearch)}
-      disabled={!selectedTenant || !selectedMonth}>Search</button
+      disabled={!selectedTenant || !selectedMonth}
+      >{@html svgIcons.search}</button
     >
   </div>
 </div>

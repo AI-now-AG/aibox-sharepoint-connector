@@ -1,8 +1,11 @@
 <script lang="ts">
   import { actions } from "astro:actions";
   import { addToast } from "$stores/toast";
+  import { useTranslations } from "$i18n/utils";
   import type { UsageOverview, UsageRow } from "$types/UsageTracking";
   import UsageFilter from "./UsageFilter.svelte";
+
+  const t = useTranslations();
 
   interface Props {
     tenants?: any;
@@ -58,7 +61,9 @@
       <span>Loading usage data...</span>
     </div>
   {:else if usageData.length === 0}
-    <div class="text-center text-gray-500 py-6">No usage data available.</div>
+    <div class="text-center text-gray-500 py-6">
+      {t("usage.no-data-available")}
+    </div>
   {:else}
     {#if usageInfo}
       <div class="mb-8">
@@ -70,19 +75,19 @@
           <tbody>
             <tr class="bg-base-100 text-sm">
               <td class="bg-base-300 text-sm font-medium"
-                ><strong>Tenant</strong></td
+                ><strong>{t("usage.summary.tenant")}</strong></td
               >
               <td class="text-sm font-medium">{usageInfo.tenant}</td>
             </tr>
             <tr class="bg-base-100 text-sm">
               <td class="bg-base-300 text-sm font-medium"
-                ><strong>Month</strong></td
+                ><strong>{t("usage.summary.month")}</strong></td
               >
               <td class="text-sm font-medium">{usageInfo.month}</td>
             </tr>
             <tr class="bg-base-100 text-sm">
               <td class="bg-base-300 text-sm font-medium"
-                ><strong>Credits used</strong></td
+                ><strong>{t("usage.summary.credits-used")}</strong></td
               >
               <td class="text-sm font-medium">{usageInfo.creditsUsed}</td>
             </tr>
