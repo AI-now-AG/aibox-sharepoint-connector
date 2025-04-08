@@ -44,11 +44,8 @@ const auth0Webhook: Handler = async (
       };
     }
 
-    console.log("auth0Webhook ::: Authenticated request from Auth0");
-
     // Parse the incoming Auth0 webhook data
     const payload = JSON.parse(event.body || "{}");
-    console.log("auth0Webhook ::: Payload :::", JSON.stringify(payload));
     const { logs } = payload;
 
     // Handle each event type
@@ -154,10 +151,6 @@ const auth0Webhook: Handler = async (
           description == "Delete user roles from an Organization member")
       ) {
         if (isPermittedChannel(data)) {
-          console.log(
-            "auth0Webhook ::: BEFORE - updateUserRolesInDatabase ::: data :::",
-            JSON.stringify(data),
-          );
           await updateUserRolesInDatabase(data);
         }
       }
@@ -196,15 +189,7 @@ const auth0Webhook: Handler = async (
 
 const isPermittedChannel = (data: any) => {
   const requestChannel = data?.details?.request?.channel || "";
-  console.log(
-    "auth0Webhook ::: isPermittedChannel ::: requestChannel :::",
-    requestChannel,
-  );
   const permittedChannels = ["https://manage.auth0.com/"];
-  console.log(
-    "auth0Webhook ::: isPermittedChannel :::  permittedChannels.includes(requestChannel) :::",
-    permittedChannels.includes(requestChannel),
-  );
   return permittedChannels.includes(requestChannel);
 };
 
@@ -381,10 +366,6 @@ const deleteUserFromDatabase = async (data: any) => {
 };
 
 const updateUserRolesInDatabase = async (data: any) => {
-  console.log(
-    "auth0Webhook ::: DURING - updateUserRolesInDatabase ::: data :::",
-    JSON.stringify(data),
-  );
   console.log(`Updating user roles`, data?.details?.response);
 
   // Take the "userId" from request path and "roles" from request body
