@@ -97,7 +97,7 @@ const _requestsToCredits = (
 
 const _durationsToCredits = (
   ttsModel: AzureTTSModel,
-  durations: number,
+  durationSeconds: number,
 ): number => {
   const rate = DURATION_CREDIT_MAPPING[ttsModel];
   if (!rate) {
@@ -106,7 +106,7 @@ const _durationsToCredits = (
 
   // Calculate credits
   // durations is milliseconds
-  const minutes = Math.ceil(durations / 60000);
+  const minutes = Math.ceil(durationSeconds / 60);
   return Math.ceil(minutes / rate);
 };
 
@@ -263,7 +263,7 @@ const _calculateAudioUsage = (rawUsages: UsageLog[]) => {
   );
   usageItems.push({
     model: "Whisper",
-    amount: Math.ceil(whisperDurations / 60000),
+    amount: Math.ceil(whisperDurations / 60), // seconds to minutes
     unit: unitLabels.minutes,
     credits: _durationsToCredits(AzureTTSModel.Whisper, whisperDurations),
   });
@@ -278,9 +278,12 @@ const _calculateAudioUsage = (rawUsages: UsageLog[]) => {
   );
   usageItems.push({
     model: "Audio Pro",
-    amount: Math.ceil(audioProDurations / 60000),
+    amount: Math.ceil(audioProDurations / 60000), // milliseconds to minutes
     unit: unitLabels.minutes,
-    credits: _durationsToCredits(AzureTTSModel.AudioPro, audioProDurations),
+    credits: _durationsToCredits(
+      AzureTTSModel.AudioPro,
+      audioProDurations / 1000,
+    ),
   });
 
   return usageItems;
