@@ -383,15 +383,16 @@
   "nav.usage": "Usage",
   "usage.select-tenant": "Select Tenant",
   "usage.select-month": "Select Month",
-  "usage.no-data-available": "No usage data available.",
+  "usage.no-data-available": "No usage data available",
   "usage.summary.tenant": "Tenant",
   "usage.summary.month": "Month",
   "usage.summary.credits-used": "Credits used",
-  "usage.units.tokens": "tokens",
-  "usage.units.requests": "calls",
-  "usage.units.images": "images",
-  "usage.units.minutes": "minutes",
-  "usage.units.credits": "credits",
+  "usage.units.tokens": "Tokens",
+  "usage.units.requests": "Calls",
+  "usage.units.images": "Images",
+  "usage.units.minutes": "Minutes",
+  "usage.units.credits": "Credits",
   "home.new-chat": "New chat",
-  "tenant.settings.private-api-key": "Private API Key"
+  "tenant.settings.private-api-key": "Private API Key",
+  "nav.text-prompts": "AI APPLICATIONS"
 }
