@@ -272,10 +272,9 @@ const _calculatePerplexityUsage = (
 
 const _calculateAudioUsage = (
   rawUsages: UsageLog[],
-  usePrivateKey: boolean,
+  useAzureOpenAIPrivateKey: boolean,
+  useSpeechPrivateKey: boolean,
 ) => {
-  const usageItems: UsageItem[] = [];
-
   const usageData = rawUsages.filter((item: UsageLog) => {
     return item.provider == ApiKeyProvider.AzureOpenAI;
   });
@@ -288,12 +287,12 @@ const _calculateAudioUsage = (
     (sum: number, item: UsageLog) => sum + (item.duration ?? 0),
     0,
   );
-  usageItems.push({
+  const whisperUsageItem: UsageItem = {
     model: "Whisper",
     amount: Math.ceil(whisperDurations / 60), // seconds to minutes
     unit: unitLabels.minutes,
     credits: _durationsToCredits(AzureTTSModel.Whisper, whisperDurations),
-  });
+  };
 
   // Audio Pro
   const audioProItems = usageData.filter(
@@ -303,7 +302,7 @@ const _calculateAudioUsage = (
     (sum: number, item: UsageLog) => sum + (item.duration ?? 0),
     0,
   );
-  usageItems.push({
+  const speechUsageItem: UsageItem = {
     model: "Audio Pro",
     amount: Math.ceil(audioProDurations / 60000), // milliseconds to minutes
     unit: unitLabels.minutes,
@@ -311,9 +310,17 @@ const _calculateAudioUsage = (
       AzureTTSModel.AudioPro,
       audioProDurations / 1000,
     ),
-  });
+  };
 
-  return _skipUsageIfPrivateKeyUsed(usageItems, usePrivateKey);
+  const whisperUsageItems = _skipUsageIfPrivateKeyUsed(
+    [whisperUsageItem],
+    useAzureOpenAIPrivateKey,
+  );
+  const speechUsageItems = _skipUsageIfPrivateKeyUsed(
+    [speechUsageItem],
+    useSpeechPrivateKey,
+  );
+  return [...whisperUsageItems, ...speechUsageItems];
 };
 
 const _calculateFluxUsage = (rawUsages: UsageLog[], usePrivateKey: boolean) => {
@@ -368,7 +375,11 @@ export const calculateUsage = (tenant: Tenant, rawUsages: UsageLog[]) => {
   const useSpeechPrivateKey = tenant.metadata?.speechPrivateKeyEnabled ?? false;
   usageData.push({
     provider: "Audio",
-    details: _calculateAudioUsage(rawUsages, useSpeechPrivateKey),
+    details: _calculateAudioUsage(
+      rawUsages,
+      useAzureOpenAIPrivateKey,
+      useSpeechPrivateKey,
+    ),
   });
 
   // Flux
