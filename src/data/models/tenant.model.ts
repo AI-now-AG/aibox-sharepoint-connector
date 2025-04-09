@@ -110,6 +110,7 @@ const TenantSchema = z.object({
   active: z.boolean().optional().default(true),
   is_restrict_user_managment: z.boolean().optional().default(false),
   is_trial: z.boolean().optional().default(false),
+  metadata: z.record(z.any()).nullish(),
   created_at: z
     .date()
     .optional()
