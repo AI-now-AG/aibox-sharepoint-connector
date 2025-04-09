@@ -654,7 +654,7 @@
 </script>
 
 <div
-  class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14 sticky bg-base-200 top-0 z-20"
+  class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14 sticky bg-base-200 top-0 z-[1000]"
 >
   <div class="flex items-center pt-5 pb-2">
     <button
@@ -956,6 +956,7 @@
                 bind:value={tenantData.azure_openai_chat_model}
               />
             </div>
+            <div></div>
             <div class="grid grid-cols-2 gap-4">
               <label class="flex flex-row items-center gap-2">
                 <input
@@ -1296,9 +1297,7 @@
 
     <div class="container mx-auto">
       <!-- DALL-E (Open AI) Section -->
-      <div
-        class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
-      >
+      <div class="collapse bg-base-100 shadow-sm rounded-lg mb-4">
         <input type="checkbox" />
         <div class="collapse-title flex items-center justify-between gap-4">
           <div class="flex items-center">
