@@ -29,3 +29,8 @@ export const AudioCategoryLabels: Record<AudioCategory, string> = {
   [AudioCategory.SubtitleLarge]: t("tenant.subtitle-large"),
   [AudioCategory.AudioPro]: t("tenant.audio-pro"),
 };
+
+export enum AzureTTSModel {
+  Whisper = "whisper-1",
+  AudioPro = "Audio Pro",
+}

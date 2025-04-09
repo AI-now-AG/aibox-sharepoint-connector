@@ -299,7 +299,7 @@
   "tenant.audio-pro": "Audio Pro",
   "tenant.mark-as-default": "Mark as default",
   "tenant.audio.whisper.model.title": "Audio standard (Whisper)",
-  "tenant.default": "default",
+  "tenant.default": "Default",
   "tenant.text.improvement.llm": "LLM for Text Enhancement",
   "tenant.whisper.model.configured.for.azure.openai": "Whisper Model (Configured on Azure OpenAI)",
   "tenant.features": "Features",
@@ -378,5 +378,18 @@
   "tenant.image-creation.flux": "Flux",
   "tenant.image-creation.flux.api-key": "API Key",
   "onboarding.step-4.title": "Create Images",
-  "onboarding.step-4.description": "Easily create images in different sizes and formats."
+  "onboarding.step-4.description": "Easily create images in different sizes and formats.",
+  "prompt.text-model": "Text Model",
+  "nav.usage": "Usage",
+  "usage.select-tenant": "Select Tenant",
+  "usage.select-month": "Select Month",
+  "usage.no-data-available": "No usage data available.",
+  "usage.summary.tenant": "Tenant",
+  "usage.summary.month": "Month",
+  "usage.summary.credits-used": "Credits used",
+  "usage.units.tokens": "tokens",
+  "usage.units.requests": "calls",
+  "usage.units.minutes": "minutes",
+  "usage.units.credits": "credits",
+  "home.new-chat": "New chat"
 }

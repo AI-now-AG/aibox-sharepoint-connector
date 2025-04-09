@@ -2,6 +2,7 @@ import { BlobServiceClient } from "@azure/storage-blob";
 import { AzureChatOpenAI, ChatOpenAI, toFile } from "@langchain/openai";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { AzureOpenAI, RateLimitError } from "openai";
+import UsageLogModel, { type UsageLog } from "$data/models/usageLog.model";
 
 import {
   groupLines,
@@ -25,6 +26,9 @@ import { ApiKeyProvider, AudioCategory } from "$types/TenantFeature";
 import { LoggingCallbackHandler } from "$callbackLLM/LoggingCallbackHandler";
 import type { TranscriptionVerbose } from "openai/resources/audio/transcriptions.mjs";
 import TranscriptionModel from "$data/models/transcription.model";
+import { UsageType } from "$types/UsageTracking";
+import { transcriptionCallbackHandler } from "./transcriptionCallback";
+import { ObjectId } from "mongodb";
 
 const DEFAULT_WHISPER_MODEL_NAME = "whisper-1";
 const DEFAULT_API_VERSION = "2024-08-01-preview";
@@ -286,6 +290,11 @@ export async function transcribeUsingOpenAI(
       throw new Error("Audio buffer is missing or undefined.");
     }
 
+    const modelName =
+      transcribeParams.azureOpenAIWhisperModel ||
+      process.env.AZURE_OPENAI_DEPLOYMENT_NAME ||
+      DEFAULT_WHISPER_MODEL_NAME;
+
     let response: TranscriptionVerbose | TranscribeResponse | null = null;
     if (transcribeParams.category === AudioCategory.SubtitleJson) {
       const jsonResponse = bufferToTranscribeResponse(audioBuffer);
@@ -299,8 +308,13 @@ export async function transcribeUsingOpenAI(
         timestamp_granularities: ["word"],
         response_format: "verbose_json",
       });
+      transcriptionCallbackHandler.emit("transcriptionCompleted", {
+        duration: response.duration,
+        tenantId: transcribeParams.tenantId,
+        deploymentModel: modelName,
+        category: transcribeParams.category || AudioCategory.AudioToText,
+      });
     }
-
     const transcriptionText = response?.text ?? "";
     const parser = new StringOutputParser();
     const description = await parser.invoke(transcriptionText);
@@ -441,7 +455,16 @@ export async function uploadLargeFile(
   folderName: string,
   jsonData: TranscriptionResponse,
   transcriptionText: string,
+  tenantId: string,
 ): Promise<{ [key: string]: string }> {
+  transcriptionCallbackHandler.emit("transcriptionCompleted", {
+    duration: jsonData.durationMilliseconds
+      ? jsonData.durationMilliseconds
+      : jsonData.durationInTicks / 10000,
+    tenantId: tenantId,
+    deploymentModel: "Audio Pro",
+    category: AudioCategory.AudioPro,
+  });
   const fileNameWithExtension = uploadUrl.split("/").pop()!.split("?")[0];
   const fileNameWithoutExtension = fileNameWithExtension
     .split(".")
@@ -534,6 +557,15 @@ export async function uploadSubtitleLargeFiles(
   isShowImprovedTextPreview: boolean = false,
   transcribeParams: TranscribeRequest,
 ): Promise<{ [key: string]: string }> {
+  console.log("data processinnng...");
+  transcriptionCallbackHandler.emit("transcriptionCompleted", {
+    duration: jsonData.durationMilliseconds
+      ? jsonData.durationMilliseconds
+      : jsonData.durationInTicks / 10000,
+    tenantId: transcribeParams.tenantId,
+    deploymentModel: "Audio Pro",
+    category: transcribeParams.category || AudioCategory.SubtitleLarge,
+  });
   const outputURLs: { [key: string]: string } = {};
   const fileNameWithExtension = uploadUrl.split("/").pop()!.split("?")[0];
   const fileNameWithoutExtension = fileNameWithExtension
@@ -579,6 +611,30 @@ export async function uploadSubtitleLargeFiles(
   );
   return outputURLs;
 }
+
+transcriptionCallbackHandler.on("transcriptionCompleted", async (response) => {
+  console.log("Jelo");
+  try {
+    const { duration, tenantId, deploymentModel, category } = response;
+
+    const tenantIdObjId = ObjectId.isValid(tenantId)
+      ? new ObjectId(tenantId)
+      : new ObjectId();
+
+    const usage: Partial<Omit<UsageLog, "_id">> = {
+      tenant_id: tenantIdObjId,
+      provider: ApiKeyProvider.AzureOpenAI,
+      category: category,
+      model: deploymentModel,
+      type: UsageType.Transcription,
+      duration: duration,
+    };
+
+    await UsageLogModel.create(usage);
+  } catch (error) {
+    console.log("error:::::", error);
+  }
+});
 
 async function uploadOutputToBlob(
   folderName: string,
