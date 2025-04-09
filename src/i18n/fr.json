@@ -388,8 +388,10 @@
   "usage.summary.month": "Month",
   "usage.summary.credits-used": "Credits used",
   "usage.units.tokens": "tokens",
-  "usage.units.request": "calls",
+  "usage.units.requests": "calls",
+  "usage.units.images": "images",
   "usage.units.minutes": "minutes",
   "usage.units.credits": "credits",
-  "home.new-chat": "New chat"
+  "home.new-chat": "New chat",
+  "tenant.settings.private-api-key": "Private API Key"
 }

@@ -206,7 +206,7 @@
     sharedMessageHistory.set([]);
     setTimeout(() => {
       scrollToTop();
-    }, 10);
+    }, 0);
   }
 </script>
 
