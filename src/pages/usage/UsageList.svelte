@@ -100,7 +100,7 @@
             <col class="w-auto" />
             <col class="w-[150]" />
             <col class="w-[100]" />
-            <col class="w-[100]" />
+            <col class="w-[120]" />
             <col class="w-[100]" />
           </colgroup>
           <thead>
@@ -121,8 +121,12 @@
                 <td class="py-3 px-4 text-sm font-medium">{item.model}</td>
                 <td class="py-3 px-4 text-sm font-medium">{item.amount}</td>
                 <td class="py-3 px-4 text-sm font-medium">{item.unit}</td>
-                <td class="py-3 px-4 text-sm font-medium">{item.credits}</td>
-                <td class="py-3 px-4 text-sm font-medium">credits</td>
+                <td class="py-3 px-4 text-sm font-medium"
+                  >{!item.private ? item.credits : "private key"}
+                </td>
+                <td class="py-3 px-4 text-sm font-medium"
+                  >{!item.private ? t("usage.units.credits") : "-"}</td
+                >
               </tr>
             {/each}
           </tbody>

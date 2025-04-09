@@ -1,4 +1,5 @@
 import { useTranslations } from "$i18n/utils";
+import { type Tenant } from "$data/models/tenant.model";
 import { type UsageLog } from "$data/models/usageLog.model";
 import { ApiKeyProvider, AzureTTSModel } from "$types/TenantFeature";
 import type {
@@ -9,7 +10,7 @@ import type {
 
 const t = useTranslations();
 
-const unitLabels: Record<string, unknown> = {
+const unitLabels: Record<string, string> = {
   tokens: t("usage.units.tokens"),
   requests: t("usage.units.requests"),
   images: t("usage.units.images"),
@@ -111,7 +112,23 @@ const _durationsToCredits = (
   return Math.ceil(minutes / rate);
 };
 
-const _calculateOpenAIUsage = (rawUsages: UsageLog[]) => {
+const _skipUsageIfPrivateKeyUsed = (
+  usageItems: UsageItem[],
+  usePrivateKey: boolean,
+) => {
+  return usageItems.map((item) => {
+    item.private = usePrivateKey;
+    if (usePrivateKey) {
+      item.credits = 0;
+    }
+    return item;
+  });
+};
+
+const _calculateOpenAIUsage = (
+  rawUsages: UsageLog[],
+  usePrivateKey: boolean,
+) => {
   const usageItems: UsageItem[] = [];
 
   const usageData = rawUsages.filter((item: UsageLog) => {
@@ -161,10 +178,13 @@ const _calculateOpenAIUsage = (rawUsages: UsageLog[]) => {
     credits: _requestsToCredits(ApiKeyProvider.OpenAI, dalleRequests),
   });
 
-  return usageItems;
+  return _skipUsageIfPrivateKeyUsed(usageItems, usePrivateKey);
 };
 
-const _calculateAzureOpenAIUsage = (rawUsages: UsageLog[]) => {
+const _calculateAzureOpenAIUsage = (
+  rawUsages: UsageLog[],
+  usePrivateKey: boolean,
+) => {
   const usageItems: UsageItem[] = [];
 
   const usageData = rawUsages.filter((item: UsageLog) => {
@@ -202,10 +222,13 @@ const _calculateAzureOpenAIUsage = (rawUsages: UsageLog[]) => {
     credits: gpt4oOutputCredits,
   });
 
-  return usageItems;
+  return _skipUsageIfPrivateKeyUsed(usageItems, usePrivateKey);
 };
 
-const _calculatePerplexityUsage = (rawUsages: UsageLog[]) => {
+const _calculatePerplexityUsage = (
+  rawUsages: UsageLog[],
+  usePrivateKey: boolean,
+) => {
   const usageItems: UsageItem[] = [];
 
   const usageData = rawUsages.filter((item: UsageLog) => {
@@ -244,10 +267,13 @@ const _calculatePerplexityUsage = (rawUsages: UsageLog[]) => {
     credits: _requestsToCredits(ApiKeyProvider.Perplexity, sonarRequests),
   });
 
-  return usageItems;
+  return _skipUsageIfPrivateKeyUsed(usageItems, usePrivateKey);
 };
 
-const _calculateAudioUsage = (rawUsages: UsageLog[]) => {
+const _calculateAudioUsage = (
+  rawUsages: UsageLog[],
+  usePrivateKey: boolean,
+) => {
   const usageItems: UsageItem[] = [];
 
   const usageData = rawUsages.filter((item: UsageLog) => {
@@ -287,10 +313,10 @@ const _calculateAudioUsage = (rawUsages: UsageLog[]) => {
     ),
   });
 
-  return usageItems;
+  return _skipUsageIfPrivateKeyUsed(usageItems, usePrivateKey);
 };
 
-const _calculateFluxUsage = (rawUsages: UsageLog[]) => {
+const _calculateFluxUsage = (rawUsages: UsageLog[], usePrivateKey: boolean) => {
   const usageItems: UsageItem[] = [];
 
   const usageData = rawUsages.filter((item: UsageLog) => {
@@ -309,40 +335,47 @@ const _calculateFluxUsage = (rawUsages: UsageLog[]) => {
     credits: _requestsToCredits(ApiKeyProvider.Flux, fluxRequests),
   });
 
-  return usageItems;
+  return _skipUsageIfPrivateKeyUsed(usageItems, usePrivateKey);
 };
 
-export const calculateUsage = (rawUsages: UsageLog[]) => {
+export const calculateUsage = (tenant: Tenant, rawUsages: UsageLog[]) => {
   const usageData: UsageRow[] = [];
 
   // OpenAI
+  const useOpenAIPrivateKey = tenant.metadata?.openaiPrivateKeyEnabled ?? false;
   usageData.push({
     provider: "OpenAI",
-    details: _calculateOpenAIUsage(rawUsages),
+    details: _calculateOpenAIUsage(rawUsages, useOpenAIPrivateKey),
   });
 
   // AzureOpenAI
+  const useAzureOpenAIPrivateKey =
+    tenant.metadata?.azureOpenaiPrivateKeyEnabled ?? false;
   usageData.push({
     provider: "Azure OpenAI",
-    details: _calculateAzureOpenAIUsage(rawUsages),
+    details: _calculateAzureOpenAIUsage(rawUsages, useAzureOpenAIPrivateKey),
   });
 
   // Perplexity
+  const usePerplexityPrivateKey =
+    tenant.metadata?.perplexityPrivateKeyEnabled ?? false;
   usageData.push({
     provider: "Perplexity",
-    details: _calculatePerplexityUsage(rawUsages),
+    details: _calculatePerplexityUsage(rawUsages, usePerplexityPrivateKey),
   });
 
   // Audio
+  const useSpeechPrivateKey = tenant.metadata?.speechPrivateKeyEnabled ?? false;
   usageData.push({
     provider: "Audio",
-    details: _calculateAudioUsage(rawUsages),
+    details: _calculateAudioUsage(rawUsages, useSpeechPrivateKey),
   });
 
   // Flux
+  const useFluxPrivateKey = tenant.metadata?.fluxPrivateKeyEnabled ?? false;
   usageData.push({
     provider: "Flux",
-    details: _calculateFluxUsage(rawUsages),
+    details: _calculateFluxUsage(rawUsages, useFluxPrivateKey),
   });
 
   return usageData;

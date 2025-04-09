@@ -10,6 +10,7 @@ export interface UsageItem {
   amount: number;
   unit: string;
   credits: number;
+  private?: boolean;
 }
 
 export interface UsageRow {

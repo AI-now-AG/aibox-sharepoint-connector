@@ -27,7 +27,7 @@ export const usage = {
       const usages = await usageCursor.toArray();
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const usageData: UsageRow[] = calculateUsage(usages);
+      const usageData: UsageRow[] = calculateUsage(tenant, usages);
       const totalCreditsUsed = sumCreditsUsed(usageData);
 
       const overview: UsageOverview = {
