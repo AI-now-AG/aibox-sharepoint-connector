@@ -17,7 +17,7 @@
   import { useTranslations } from "$i18n/utils";
 
   const t = useTranslations();
-  let selectedModel: string = $state("");
+  let selectedModel: string = $state(ApiKeyProvider.OpenAI);
 
   interface Props {
     tenant?: any;
