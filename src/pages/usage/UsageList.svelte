@@ -3,6 +3,7 @@
   import { addToast } from "$stores/toast";
   import { useTranslations } from "$i18n/utils";
   import type { UsageOverview, UsageRow } from "$types/UsageTracking";
+  import Loading from "$components/Loading.svelte";
   import UsageFilter from "./UsageFilter.svelte";
 
   const t = useTranslations();
@@ -55,15 +56,12 @@
     onsearch={fetchUsages}
   />
 
-  {#if loading}
-    <div class="flex justify-center items-center gap-2 text-primary">
-      <span class="loading loading-spinner"></span>
-      <span>Loading usage data...</span>
-    </div>
-  {:else if usageData.length === 0}
-    <div class="text-center text-gray-500 py-6">
-      {t("usage.no-data-available")}
-    </div>
+  {#if usageData.length === 0}
+    {#if !loading}
+      <div class="text-center text-gray-500 py-6">
+        {t("usage.no-data-available")}
+      </div>
+    {/if}
   {:else}
     {#if usageInfo}
       <div class="mb-8">
@@ -107,7 +105,8 @@
           </colgroup>
           <thead>
             <tr class="bg-base-300">
-              <th class="py-3 px-4 text-left font-semibold text-sm"
+              <th
+                class="py-3 px-4 text-left font-semibold text-sm text-base-content"
                 >{row.provider}</th
               >
               <th class="py-3 px-4 text-left font-semibold text-sm">&nbsp;</th>
@@ -132,3 +131,5 @@
     {/each}
   {/if}
 </div>
+
+<Loading show={loading} />
