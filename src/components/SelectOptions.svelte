@@ -47,7 +47,10 @@
 
 <div class={classes}>
   {#if label}
-    <label class={"block mb-2 " + labelClasses}>{label}</label>
+    <label
+      class={"block mb-2 " + (disabled ? "text-gray-400 " : " ") + labelClasses}
+      >{label}</label
+    >
   {/if}
 
   <div class="dropdown w-full">

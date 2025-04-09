@@ -46,6 +46,14 @@
     apiProvider?.name == ApiKeyProvider.Perplexity,
   );
 
+  $effect(() => {
+    if (selectedModel == ApiKeyProvider.Perplexity) {
+      isDisableFileInput = true;
+    } else {
+      isDisableFileInput = false;
+    }
+  });
+
   onMount(() => {
     const handleScroll = () => {
       const { scrollHeight, scrollTop, clientHeight } =
@@ -125,7 +133,7 @@
             files: userInputFilesList,
             images: userInputImagesList,
             messageHistory: $sharedMessageHistory,
-            selectedModel: selectedModel ?? undefined
+            selectedModel: selectedModel ?? undefined,
           }),
           credentials: "include",
           headers: {
@@ -225,7 +233,7 @@
           label={t("prompt.text-model")}
           bind:selectedModel
           bind:disabled={isDisableSelectModel}
-          labelClasses="text-sm"
+          labelClasses={"text-sm"}
         />
       </div>
     </div>
