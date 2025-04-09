@@ -389,6 +389,7 @@
   "usage.summary.credits-used": "Credits used",
   "usage.units.tokens": "tokens",
   "usage.units.requests": "calls",
+  "usage.units.images": "images",
   "usage.units.minutes": "minutes",
   "usage.units.credits": "credits",
   "home.new-chat": "New chat",

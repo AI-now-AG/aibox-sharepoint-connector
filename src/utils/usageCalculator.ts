@@ -9,9 +9,10 @@ import type {
 
 const t = useTranslations();
 
-const unitLabels = {
+const unitLabels: Record<string, unknown> = {
   tokens: t("usage.units.tokens"),
   requests: t("usage.units.requests"),
+  images: t("usage.units.images"),
   minutes: t("usage.units.minutes"),
   credits: t("usage.units.credits"),
 };
@@ -156,7 +157,7 @@ const _calculateOpenAIUsage = (rawUsages: UsageLog[]) => {
   usageItems.push({
     model: "DALL-E",
     amount: dalleRequests,
-    unit: unitLabels.requests,
+    unit: unitLabels.images,
     credits: _requestsToCredits(ApiKeyProvider.OpenAI, dalleRequests),
   });
 
@@ -304,7 +305,7 @@ const _calculateFluxUsage = (rawUsages: UsageLog[]) => {
   usageItems.push({
     model: "Flux-dev",
     amount: fluxRequests,
-    unit: unitLabels.requests,
+    unit: unitLabels.images,
     credits: _requestsToCredits(ApiKeyProvider.Flux, fluxRequests),
   });
 
