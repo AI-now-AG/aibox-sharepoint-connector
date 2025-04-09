@@ -27,6 +27,7 @@ const RequestParamsSchema = z.object({
   images: z.array(AttachmentSchema).optional(),
   files: z.array(AttachmentSchema).optional(),
   messageHistory: z.array(MessageSchema).optional(),
+  selectedModel: z.string().optional(),
 });
 
 export const POST: APIRoute = async (ctx) => {
@@ -110,7 +111,13 @@ export const POST: APIRoute = async (ctx) => {
     const { readable, writable } = new TransformStream();
     const writer = writable.getWriter();
 
-    const model = initializeOpenAI(ctx);
+    let overrideConfig;
+    if (data.selectedModel) {
+      overrideConfig = {
+        customModel: data.selectedModel,
+      };
+    }
+    const model = initializeOpenAI(ctx, overrideConfig);
 
     (async () => {
       try {

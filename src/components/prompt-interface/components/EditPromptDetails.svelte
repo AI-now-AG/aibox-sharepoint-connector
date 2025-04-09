@@ -9,6 +9,7 @@
   import LoadingSpinner from "$components/prompt-interface/components/LoadingSpinner.svelte";
   import { svgIcons } from "$assets/icons";
   import { preventDefault } from "$utils/common";
+  import type { Option } from "$components/SelectOptions.svelte";
 
   const t = useTranslations();
 
@@ -46,8 +47,8 @@
   let categories: Category[] = $state([]);
   let selectedCategory: Category | undefined = $state();
 
-  let models: Model[] = $state([]);
-  let selectedModel: Model | undefined = $state();
+  let models: Option[] = $state([]);
+  let selectedModel: string = $state("");
 
   let knowledgeBases: KnowledgeBase[] = $state([]);
   let selectedKnowledgeBases: KnowledgeBase[] = $state([]);
@@ -117,9 +118,9 @@
       }
 
       const model = models.find(
-        (e) => e._id == promptDetails.model?.toString(),
+        (e) => e.value == promptDetails.model?.toString(),
       );
-      selectedModel = model;
+      selectedModel = model?.value || "";
 
       const group = category?.groups.find(
         (e) => e._id == promptDetails.group?.toString(),
@@ -152,7 +153,7 @@
         title: promptTitle,
         prompt: promptText,
         predefined_input: promptPredefinedInput,
-        model: selectedModel ? selectedModel._id : null,
+        model: selectedModel ?? null,
         knowledgebase: selectedKnowledgeBases.map((inst) => inst._id),
         ...(selectedCategory && { category: selectedCategory._id }),
         ...(selectedGroup && { group: selectedGroup._id }),

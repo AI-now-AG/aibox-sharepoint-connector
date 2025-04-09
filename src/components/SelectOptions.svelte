@@ -19,7 +19,10 @@
     options?: Option[];
     label?: string;
     value?: string;
+    placeholder?: string;
     classes?: string;
+    labelClasses?: string;
+    disabled?: boolean;
     children?: import("svelte").Snippet;
   }
 
@@ -27,7 +30,10 @@
     options = [],
     label,
     value = $bindable(""),
+    placeholder = "",
     classes,
+    labelClasses,
+    disabled = $bindable(false),
     children,
   }: Props = $props();
 
@@ -41,15 +47,22 @@
 
 <div class={classes}>
   {#if label}
-    <label class="block mb-1">{label}</label>
+    <label
+      class={"block mb-2 " + (disabled ? "text-gray-400 " : " ") + labelClasses}
+      >{label}</label
+    >
   {/if}
 
   <div class="dropdown w-full">
-    <label tabindex="0" class="select select-bordered w-full rounded-lg">
-      {options.find((opt) => opt.value === value)?.label || ""}
+    <label
+      tabindex={disabled ? -1 : 0}
+      class={"select select-bordered w-full rounded-lg" +
+        (disabled ? " pointer-events-none opacity-50 bg-gray-200" : "")}
+    >
+      {options.find((opt) => opt.value === value)?.label || placeholder}
     </label>
     <ul
-      tabindex="0"
+      tabindex={disabled ? -1 : 0}
       class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-full"
     >
       {#each options as option}
@@ -57,9 +70,12 @@
           <button
             class={option.value === value ? "bg-primary text-white" : ""}
             on:click|preventDefault={() => {
-              value = option.value;
-              blur();
+              if (!disabled) {
+                value = option.value;
+                blur();
+              }
             }}
+            {disabled}
           >
             {option.label}
           </button>

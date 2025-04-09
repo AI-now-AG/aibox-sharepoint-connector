@@ -13,6 +13,11 @@
     formatCitations,
     stripHtmlFormatting,
   } from "$utils/common";
+  import ModelInput from "$pages/prompt-library/prompts/ModelInput.svelte";
+  import { useTranslations } from "$i18n/utils";
+
+  const t = useTranslations();
+  let selectedModel: string = $state(ApiKeyProvider.OpenAI);
 
   interface Props {
     tenant?: any;
@@ -24,6 +29,15 @@
   let files: File[] = $state([]);
   let isProcessing = $state(false);
   let showButton = $state(false);
+  let isDisableSelectModel = $state(false);
+
+  $effect(() => {
+    if ($sharedMessageHistory.length > 0 || isProcessing) {
+      isDisableSelectModel = true;
+    } else {
+      isDisableSelectModel = false;
+    }
+  });
 
   const apiProvider = tenant.api_key_providers?.find((item: any) => {
     return item.default && item.active;
@@ -31,6 +45,14 @@
   let isDisableFileInput = $state(
     apiProvider?.name == ApiKeyProvider.Perplexity,
   );
+
+  $effect(() => {
+    if (selectedModel == ApiKeyProvider.Perplexity) {
+      isDisableFileInput = true;
+    } else {
+      isDisableFileInput = false;
+    }
+  });
 
   onMount(() => {
     const handleScroll = () => {
@@ -49,6 +71,13 @@
   const scrollToBottom = async () => {
     window.scroll({
       top: document.documentElement.scrollHeight,
+      behavior: "smooth",
+    });
+  };
+
+  const scrollToTop = async () => {
+    window.scrollTo({
+      top: 0,
       behavior: "smooth",
     });
   };
@@ -104,6 +133,7 @@
             files: userInputFilesList,
             images: userInputImagesList,
             messageHistory: $sharedMessageHistory,
+            selectedModel: selectedModel ?? undefined,
           }),
           credentials: "include",
           headers: {
@@ -167,6 +197,17 @@
       }
     }
   }
+
+  async function resetChat() {
+    input = "";
+    output = "";
+    files = [];
+    isProcessing = false;
+    sharedMessageHistory.set([]);
+    setTimeout(() => {
+      scrollToTop();
+    }, 0);
+  }
 </script>
 
 <div class="grid grid-cols-1 grid-rows-[1fr_min-content] space-y-6 h-full">
@@ -186,6 +227,17 @@
       </div>
     {/if}
 
+    <div class="flex items-end justify-end z-10">
+      <div>
+        <ModelInput
+          label={t("prompt.text-model")}
+          bind:selectedModel
+          bind:disabled={isDisableSelectModel}
+          labelClasses={"text-sm"}
+        />
+      </div>
+    </div>
+
     <ChatResults bind:output bind:isProcessing />
 
     {#if $sharedMessageHistory.length > 0}
@@ -193,6 +245,17 @@
         class="sticky bottom-0 bg-base-200"
         transition:slide={{ duration: 500 }}
       >
+        <div class="mt-6 mb-6">
+          <button
+            onclick={() => {
+              resetChat();
+            }}
+            class="btn btn-active btn-primary mt-4 min-w-[154px]"
+            disabled={isProcessing}
+          >
+            {t("home.new-chat")}
+          </button>
+        </div>
         {#if showButton}
           <div class="relative w-full flex justify-center">
             <button
