@@ -44,6 +44,16 @@
     }
   };
 
+  const formatNumber = (input: any) => {
+    let number = Number(input);
+    if (isNaN(number)) number = 0;
+
+    return number.toLocaleString("de-CH", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  };
+
   $inspect(selectedTenant);
   $inspect(selectedMonth);
 </script>
@@ -87,7 +97,9 @@
               <td class="bg-base-300 text-sm font-medium"
                 ><strong>{t("usage.summary.credits-used")}</strong></td
               >
-              <td class="text-sm font-medium">{usageInfo.creditsUsed}</td>
+              <td class="text-sm font-medium"
+                >{formatNumber(usageInfo.creditsUsed)}</td
+              >
             </tr>
           </tbody>
         </table>
@@ -119,10 +131,12 @@
             {#each row.details as item}
               <tr class="bg-base-100 text-sm">
                 <td class="py-3 px-4 text-sm font-medium">{item.model}</td>
-                <td class="py-3 px-4 text-sm font-medium">{item.amount}</td>
+                <td class="py-3 px-4 text-sm font-medium"
+                  >{formatNumber(item.amount)}</td
+                >
                 <td class="py-3 px-4 text-sm font-medium">{item.unit}</td>
                 <td class="py-3 px-4 text-sm font-medium"
-                  >{!item.private ? item.credits : "private key"}
+                  >{!item.private ? formatNumber(item.credits) : "private key"}
                 </td>
                 <td class="py-3 px-4 text-sm font-medium"
                   >{!item.private ? t("usage.units.credits") : "-"}</td
