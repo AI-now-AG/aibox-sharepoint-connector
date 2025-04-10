@@ -5,6 +5,9 @@ import type { BaseMessage } from "@langchain/core/messages";
 import type { LLMResult } from "@langchain/core/outputs";
 import { MongoClient, Db, Collection, ObjectId } from "mongodb";
 import type { Serialized } from "node_modules/@langchain/core/dist/load/serializable";
+import UsageLogModel, { type UsageLog } from "$data/models/usageLog.model";
+import type { ApiKeyProvider } from "$types/TenantFeature";
+import { UsageType } from "$types/UsageTracking";
 
 const MONGO_URI = process.env.MONGODB_URI || "";
 const DB_NAME = process.env.MONGODB_DATABASE;
@@ -45,6 +48,8 @@ export class LoggingCallbackHandler extends BaseCallbackHandler {
     private tenantId: string,
     private userId: string,
     private filename: string,
+    private provider: ApiKeyProvider,
+    private model: string,
   ) {
     super();
     this.initialize();
@@ -142,6 +147,23 @@ export class LoggingCallbackHandler extends BaseCallbackHandler {
       timestamp: new Date(),
       expireAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     });
+
+    const respone = JSON.parse(JSON.stringify(output.generations));
+    const usage: Partial<Omit<UsageLog, "_id">> = {
+      tenant_id: new ObjectId(this.tenantId),
+      provider: this.provider,
+      model: this.model,
+      type: UsageType.Text,
+      input_tokens: output.llmOutput?.tokenUsage?.promptTokens ?? 0,
+      output_tokens: output.llmOutput?.tokenUsage?.completionTokens ?? 0,
+      metadata: {
+        cached_tokens:
+          respone?.[0]?.[0]?.message?.kwargs?.response_metadata?.usage
+            ?.prompt_tokens_details?.cached_tokens || 0,
+      },
+    };
+
+    await UsageLogModel.create(usage);
   }
 
   async handleLLMError(

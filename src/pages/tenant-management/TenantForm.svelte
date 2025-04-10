@@ -49,6 +49,16 @@
       ? t("tenant.tenants.add-tenant")
       : tenant.name || t("common.edit");
   let tenantData = $state(tenant ?? {});
+  tenantData.metadata = {
+    ...{
+      openaiPrivateKeyEnabled: false,
+      azureOpenaiPrivateKeyEnabled: false,
+      speechPrivateKeyEnabled: false,
+      fluxPrivateKeyEnabled: false,
+      perplexityPrivateKeyEnabled: false,
+    },
+    ...(tenant?.metadata ?? {}),
+  };
 
   let openAIEnabled: boolean = $state(false);
   let azureOpenAIEnabled: boolean = $state(false);
@@ -644,7 +654,7 @@
 </script>
 
 <div
-  class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14 sticky bg-base-200 top-0 z-20"
+  class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14 sticky bg-base-200 top-0 z-[1000]"
 >
   <div class="flex items-center pt-5 pb-2">
     <button
@@ -819,7 +829,7 @@
                 />
               </label>
             </div>
-            <div>
+            <div class="grid grid-cols-2 gap-4">
               <label class="flex flex-row items-center gap-2">
                 <input
                   type="checkbox"
@@ -828,6 +838,16 @@
                   onchange={() => toggleTextFeature(ApiKeyProvider.OpenAI)}
                 />
                 <span class="label-text">{t("tenant.mark-as-default")}</span>
+              </label>
+              <label class="flex flex-row items-center gap-2">
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-primary"
+                  bind:checked={tenantData.metadata.openaiPrivateKeyEnabled}
+                />
+                <span class="label-text"
+                  >{t("tenant.settings.private-api-key")}</span
+                >
               </label>
             </div>
           </div>
@@ -937,7 +957,7 @@
               />
             </div>
             <div></div>
-            <div>
+            <div class="grid grid-cols-2 gap-4">
               <label class="flex flex-row items-center gap-2">
                 <input
                   type="checkbox"
@@ -946,6 +966,18 @@
                   onchange={() => toggleTextFeature(ApiKeyProvider.AzureOpenAI)}
                 />
                 <span class="label-text">{t("tenant.mark-as-default")}</span>
+              </label>
+              <label class="flex flex-row items-center gap-2">
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-primary"
+                  bind:checked={
+                    tenantData.metadata.azureOpenaiPrivateKeyEnabled
+                  }
+                />
+                <span class="label-text"
+                  >{t("tenant.settings.private-api-key")}</span
+                >
               </label>
             </div>
           </div>
@@ -1015,7 +1047,7 @@
                 />
               </label>
             </div>
-            <div>
+            <div class="grid grid-cols-2 gap-4">
               <label class="flex flex-row items-center gap-2">
                 <input
                   type="checkbox"
@@ -1024,6 +1056,16 @@
                   onchange={() => toggleTextFeature(ApiKeyProvider.Perplexity)}
                 />
                 <span class="label-text">{t("tenant.mark-as-default")}</span>
+              </label>
+              <label class="flex flex-row items-center gap-2">
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-primary"
+                  bind:checked={tenantData.metadata.perplexityPrivateKeyEnabled}
+                />
+                <span class="label-text"
+                  >{t("tenant.settings.private-api-key")}</span
+                >
               </label>
             </div>
           </div>
@@ -1192,6 +1234,19 @@
               />
             </div>
           </div>
+
+          <div class="grid grid-cols-2 gap-4 mx-8">
+            <label class="flex flex-row items-center gap-2">
+              <input
+                type="checkbox"
+                class="checkbox checkbox-primary"
+                bind:checked={tenantData.metadata.speechPrivateKeyEnabled}
+              />
+              <span class="label-text"
+                >{t("tenant.settings.private-api-key")}</span
+              >
+            </label>
+          </div>
         </div>
       </div>
 
@@ -1242,9 +1297,7 @@
 
     <div class="container mx-auto">
       <!-- DALL-E (Open AI) Section -->
-      <div
-        class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
-      >
+      <div class="collapse bg-base-100 shadow-sm rounded-lg mb-4">
         <input type="checkbox" />
         <div class="collapse-title flex items-center justify-between gap-4">
           <div class="flex items-center">
@@ -1304,6 +1357,18 @@
                 <TogglePasswordIcon
                   change={() => togglePassword(falOpenAIKeyField)}
                 />
+              </label>
+            </div>
+            <div class="w-full">
+              <label class="flex flex-row items-center gap-2 mt-10">
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-primary"
+                  bind:checked={tenantData.metadata.fluxPrivateKeyEnabled}
+                />
+                <span class="label-text"
+                  >{t("tenant.settings.private-api-key")}</span
+                >
               </label>
             </div>
           </div>

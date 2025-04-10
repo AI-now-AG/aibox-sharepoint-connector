@@ -55,6 +55,7 @@ export type TranscriptionResponse = {
   source: string;
   timestamp: string;
   durationInTicks: number;
+  durationMilliseconds?: number;
   duration: string;
   combinedRecognizedPhrases: CombinedRecognizedPhrase[];
   recognizedPhrases: RecognizedPhrase[];

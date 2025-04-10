@@ -1,6 +1,7 @@
 <script lang="ts">
   import { useTranslations } from "$i18n/utils";
   import { preventDefault } from "$utils/common";
+  import { svgIcons } from "$assets/icons";
   import SelectOptions, { type Option } from "$components/SelectOptions.svelte";
 
   const t = useTranslations();
@@ -30,7 +31,7 @@
   function getMonthOptions(): Option[] {
     const months = [];
     const now = new Date();
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < 1; i++) {
       const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
       const month = String(date.getMonth() + 1).padStart(2, "0"); // Format as mm
       const year = date.getFullYear(); // Get the full year
@@ -54,7 +55,7 @@
   <div class="form-control">
     <!-- svelte-ignore a11y_label_has_associated_control -->
     <label class="label">
-      <span class="label-text">Select Tenant:</span>
+      <span class="label-text">{t("usage.select-tenant")}:</span>
     </label>
     <SelectOptions
       classes="flex-1"
@@ -65,7 +66,7 @@
   <div class="form-control">
     <!-- svelte-ignore a11y_label_has_associated_control -->
     <label class="label">
-      <span class="label-text">Select Month:</span>
+      <span class="label-text">{t("usage.select-month")}:</span>
     </label>
     <SelectOptions
       classes="flex-1"
@@ -74,8 +75,11 @@
     />
   </div>
   <div class="form-control">
-    <button class="btn btn-primary" onclick={preventDefault(onsearch)}
-      >Search</button
+    <button
+      class="btn btn-primary"
+      onclick={preventDefault(onsearch)}
+      disabled={!selectedTenant || !selectedMonth}
+      >{@html svgIcons.search}</button
     >
   </div>
 </div>
