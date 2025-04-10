@@ -118,6 +118,8 @@ function getOpenAIChatModel(transcribeParams: TranscribeRequest) {
         transcribeParams.tenantId,
         transcribeParams.userId,
         transcribeParams.fileName,
+        ApiKeyProvider.OpenAI,
+        process.env.OPENAI_MODEL ?? "",
       ),
     ],
     tags: ["transcribe", "improve", "text", "quality", "openai"],
@@ -128,15 +130,15 @@ function getOpenAIChatModel(transcribeParams: TranscribeRequest) {
 function getAzureChatModel(transcribeParams: TranscribeRequest) {
   const { azureOpenAIApiKey, azureOpenAIInstanceName, azureOpenAIChatModel } =
     transcribeParams;
-
+  const modelName =
+    azureOpenAIChatModel ||
+    process.env.AZURE_CHAT_OPENAI_DEPLOYMENT_NAME ||
+    DEFAULT_CHAT_MODE_NAME;
   const azureChatConfig = {
     azureOpenAIApiKey,
     azureOpenAIApiInstanceName:
       azureOpenAIInstanceName || process.env.AZURE_OPENAI_API_INSTANCE_NAME,
-    azureOpenAIApiDeploymentName:
-      azureOpenAIChatModel ||
-      process.env.AZURE_CHAT_OPENAI_DEPLOYMENT_NAME ||
-      DEFAULT_CHAT_MODE_NAME,
+    azureOpenAIApiDeploymentName: modelName,
     azureOpenAIApiVersion:
       process.env.AZURE_OPENAI_API_VERSION || DEFAULT_API_VERSION,
     callbacks: [
@@ -144,6 +146,8 @@ function getAzureChatModel(transcribeParams: TranscribeRequest) {
         transcribeParams.tenantId,
         transcribeParams.userId,
         transcribeParams.fileName,
+        ApiKeyProvider.AzureOpenAI,
+        modelName,
       ),
     ],
     tags: ["transcribe", "improve", "text", "quality", "azure"],
