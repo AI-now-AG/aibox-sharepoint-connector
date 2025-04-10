@@ -8,6 +8,7 @@
   import ModelInput from "$pages/prompt-library/prompts/ModelInput.svelte";
   import { addToast } from "$stores/toast";
   import { preventDefault } from "$utils/common";
+  import type { Option } from "$components/SelectOptions.svelte";
 
   const t = useTranslations();
 
@@ -38,8 +39,7 @@
     }
   });
 
-  let models: Model[] = $state([]);
-  let selectedModel: Model | undefined = $state();
+  let selectedModel: string = $state("");
 
   let knowledgeBases: KnowledgeBase[] = $state([]);
   let selectedKnowledgeBases: KnowledgeBase[] = $state([]);
@@ -126,7 +126,7 @@
         title: promptTitle,
         prompt: promptText,
         predefined_input: promptPredefinedInput,
-        model: selectedModel ? selectedModel._id : null,
+        model: selectedModel ?? null,
         knowledgebase: selectedKnowledgeBases.map((inst) => inst._id),
         ...(selectedCategory && { category: selectedCategory._id }),
         ...(selectedGroup && { group: selectedGroup._id }),
@@ -247,7 +247,7 @@
           items={knowledgeBases}
           bind:selectedItems={selectedKnowledgeBases}
         />
-        <ModelInput bind:models bind:selectedModel />
+        <ModelInput bind:selectedModel />
       </div>
 
       {#if isEditable}
