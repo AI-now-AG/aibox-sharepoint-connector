@@ -8,8 +8,9 @@
   import { addToast } from "$stores/toast";
   import LoadingSpinner from "$components/prompt-interface/components/LoadingSpinner.svelte";
   import { svgIcons } from "$assets/icons";
-  import { preventDefault } from "$utils/common";
+  import { formatMarkdown, preventDefault } from "$utils/common";
   import type { Option } from "$components/SelectOptions.svelte";
+  import TextEditor from "$components/TextEditor.svelte";
 
   const t = useTranslations();
 
@@ -106,7 +107,7 @@
       if (dialogMode == "clone") {
         promptTitle = promptTitle?.trim() + " (" + t("common.copy") + ")";
       }
-      promptText = promptDetails.prompt;
+      promptText = formatMarkdown(promptDetails.prompt);
       promptPredefinedInput = promptDetails.predefined_input;
 
       const category = categories.find(
@@ -201,7 +202,7 @@
   function cancelEdit() {
     promptDialog?.close();
     promptTitle = "";
-    promptText = "";
+    promptText = "<p></p>";
     selectedKnowledgeBases = [];
     selectedEditPromptId = null;
   }
@@ -222,6 +223,7 @@
   let isFormValid = $derived(
     promptTitle?.trim() !== "" &&
       promptText?.trim() !== "" &&
+      promptText.trim() !== "<p></p>" &&
       selectedCategory !== undefined &&
       selectedGroup !== undefined,
   );
@@ -257,11 +259,7 @@
 
       <div class="mb-4">
         <p class="mb-2">{t("prompt-library.add.prompts.instructions")}*</p>
-        <textarea
-          bind:value={promptText}
-          placeholder="e.g. Create three headlines..."
-          class="input input-bordered min-w-xs shadow-sm appearance-none min-h-32 w-full py-2 px-3"
-        ></textarea>
+        <TextEditor bind:html={promptText} />
       </div>
 
       <div class="mb-4">
