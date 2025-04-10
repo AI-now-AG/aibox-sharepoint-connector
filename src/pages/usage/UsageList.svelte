@@ -49,7 +49,6 @@
     if (isNaN(number)) number = 0;
 
     return number.toLocaleString("de-CH", {
-      minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     });
   };
