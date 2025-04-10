@@ -66,7 +66,7 @@
         type: "error",
       });
     } else {
-      knowledgeBaseText = data.text;
+      knowledgeBaseText = formatMarkdown(data.text);
     }
 
     loading = false;
