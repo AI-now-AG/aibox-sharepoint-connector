@@ -6,7 +6,8 @@
   import { svgIcons } from "$assets/icons";
   import { AudioCategory } from "$types/TenantFeature";
   import { onMount } from "svelte";
-  import { preventDefault } from "$utils/common";
+  import { formatMarkdown, preventDefault } from "$utils/common";
+  import TextEditor from "$components/TextEditor.svelte";
   const t = useTranslations();
 
   interface Props {
@@ -24,7 +25,7 @@
   let {
     preDefineCategory = [],
     instructionTitle = "",
-    instructionText = "",
+    instructionText = "<p></p>",
     category,
     isEnabled = true,
     isNew = true,
@@ -33,10 +34,13 @@
     mode: screenMode,
   }: Props = $props();
 
+  instructionText = formatMarkdown(instructionText);
+
   let isSaving = $state(false);
   let isFormValid = $derived(
     instructionTitle.trim() !== "" &&
       instructionText.trim() !== "" &&
+      instructionText.trim() !== "<p></p>" &&
       category !== undefined &&
       isEnabled !== undefined,
   );
@@ -274,11 +278,8 @@
       {/if}
       <div class="mb-4">
         <p class="mb-2">{t("prompt-library.add.knowledgebase.text")}</p>
-        <textarea
-          bind:value={instructionText}
-          placeholder="e.g. type knowledge base details..."
-          class="input input-bordered min-w-xs shadow-sm appearance-none min-h-96 w-full py-2 px-3"
-        ></textarea>
+
+        <TextEditor bind:html={instructionText} />
       </div>
 
       {#if isEditable}
