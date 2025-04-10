@@ -7,8 +7,8 @@
   import MultiInput from "$pages/prompt-library/prompts/MultiInput.svelte";
   import ModelInput from "$pages/prompt-library/prompts/ModelInput.svelte";
   import { addToast } from "$stores/toast";
-  import { preventDefault } from "$utils/common";
-  import type { Option } from "$components/SelectOptions.svelte";
+  import { formatMarkdown, preventDefault } from "$utils/common";
+  import TextEditor from "$components/TextEditor.svelte";
 
   const t = useTranslations();
 
@@ -71,7 +71,7 @@
     await fetchInstructionAndKB();
     if (prompt) {
       promptTitle = prompt.title;
-      promptText = prompt.prompt;
+      promptText = formatMarkdown(prompt.prompt);
       promptPredefinedInput = prompt.predefined_input;
 
       const category = categories.find(
@@ -222,11 +222,7 @@
 
       <div class="mb-4">
         <p class="mb-2">{t("prompt-library.add.prompts.instructions")}*</p>
-        <textarea
-          bind:value={promptText}
-          placeholder="e.g. Create three headlines..."
-          class="input input-bordered min-w-xs shadow-sm appearance-none min-h-32 w-full py-2 px-3"
-        ></textarea>
+        <TextEditor bind:html={promptText} />
       </div>
 
       <div class="mb-4">
