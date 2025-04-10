@@ -25,8 +25,10 @@
 
   let body: any = $state("");
 
-  onMount(() => {
-    body = html;
+  $effect(() => {
+    if (body === undefined || body === "") {
+      body = html;
+    }
   });
 
   function onEditorUpdate(e: any) {
