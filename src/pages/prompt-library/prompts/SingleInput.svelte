@@ -15,7 +15,7 @@
     placeholder,
     items,
     selectedItem = $bindable(),
-    displayTop = false
+    displayTop = false,
   }: Props = $props();
 
   let inputValue = $state("");
@@ -28,7 +28,7 @@
   function handleSelectedItems(selected: Item) {
     const elem = document.activeElement;
     if (elem) {
-      elem?.blur();
+      (elem as HTMLElement)?.blur();
     }
     if (selectedItem === selected) {
       resetSelection();
@@ -58,7 +58,9 @@
 
 <div>
   <p class="mb-2">{title}</p>
-  <div class={`dropdown ${displayTop ? 'dropdown-top': 'dropdown-bottom'} w-full min-w-xs`}>
+  <div
+    class={`dropdown ${displayTop ? "dropdown-top" : "dropdown-bottom"} w-full min-w-xs`}
+  >
     <label class="input input-bordered flex items-center gap-2 w-full">
       <input
         type="text"

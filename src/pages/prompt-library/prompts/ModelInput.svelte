@@ -1,31 +1,43 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { useTranslations } from "$i18n/utils";
-  import SingleInput from "./SingleInput.svelte";
   import { tenant } from "$stores";
   import { ApiKeyProvider } from "$types/TenantFeature";
-  import { preventDefault } from "$utils/common";
+  import type { Option } from "$components/SelectOptions.svelte";
+  import SelectOptions from "$components/SelectOptions.svelte";
 
   const t = useTranslations();
 
-  type Item = { title: string } | string;
-
   interface Props {
-    models: Item[];
-    selectedModel: Item | undefined;
+    label?: string;
+    models?: Option[];
+    selectedModel: string;
+    classes?: string;
+    labelClasses?: string;
+    disabled?: boolean;
   }
 
-  let { models = $bindable([]), selectedModel = $bindable() }: Props = $props();
+  let {
+    label,
+    models = $bindable([]),
+    selectedModel = $bindable(""),
+    classes = "",
+    labelClasses = "",
+    disabled = $bindable(false),
+  }: Props = $props();
 
   onMount(async function () {
-    models = getActiveModels();
+    setTimeout(() => {
+      models = getActiveModels() || [];
+    }, 0);
   });
 
-  const getModelName = (provider) => {
-    return $tenant[`${provider.name}_chat_model`] || "gpt-4o";
+  const getModelName = (provider: { name: string }) => {
+    const key = `${provider.name}_chat_model` as keyof typeof $tenant;
+    return $tenant?.[key] || "gpt-4o";
   };
 
-  const getProviderName = (provider) => {
+  const getProviderName = (provider: any) => {
     let title;
     switch (provider.name) {
       case ApiKeyProvider.AzureOpenAI:
@@ -40,34 +52,29 @@
     return title;
   };
 
-  const getActiveModels = () => {
-    const defaultModel = $tenant?.api_key_providers?.find(
-      (provider) => provider.default,
-    );
+  const getActiveModels = (): Option[] => {
+    const models =
+      $tenant?.api_key_providers
+        ?.filter((provider) => provider.active)
+        .map((provider) => {
+          const providerName = getProviderName(provider);
+          const modelName = getModelName(provider);
+          return {
+            value: provider.name,
+            label: `${providerName} ${modelName}`,
+          };
+        }) || [];
 
-    const models = $tenant?.api_key_providers
-      ?.filter((provider) => provider.active)
-      .map((provider) => {
-        const providerName = getProviderName(provider);
-        const modelName = getModelName(provider);
-        return {
-          _id: `${provider.name}`,
-          title: `${providerName} ${modelName}`,
-        };
-      });
-    const defaultText = t("tenant.default");
-    const defaultName = defaultText.replace(/^./, defaultText[0].toUpperCase());
-    const defaultOptionTitle = models?.unshift({
-      _id: null,
-      title: `${defaultName} (${getProviderName(defaultModel)} ${getModelName(defaultModel)})`,
-    });
     return models;
   };
 </script>
 
-<SingleInput
-  title={t("prompt-library.add.prompts.language-model")}
-  placeholder="OpenAI gtp-4o"
-  items={models}
-  bind:selectedItem={selectedModel}
-/>
+<SelectOptions
+  classes={"flex-1 min-w-3xs " + classes}
+  {labelClasses}
+  label={label ?? t("prompt-library.add.prompts.language-model")}
+  placeholder={`${t("tenant.default")} (OpenAI gtp-4o)`}
+  options={models}
+  {disabled}
+  bind:value={selectedModel}
+></SelectOptions>
