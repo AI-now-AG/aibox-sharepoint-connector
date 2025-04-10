@@ -6,6 +6,7 @@
   import { useTranslations } from "$i18n/utils";
   import type { AudioCardItem } from "$types/AudioCardItem";
   import { AudioCategoryLabels } from "$types/TenantFeature";
+  import { stripHtmlFormatting } from "$utils/common";
 
   const t = useTranslations();
 
@@ -97,7 +98,7 @@
     </div>
     {#if item.instruction}
       <p class="text-base-content/60 line-clamp-3">
-        {item.instruction}
+        {stripHtmlFormatting(item.instruction)}
       </p>
     {/if}
   </div>
