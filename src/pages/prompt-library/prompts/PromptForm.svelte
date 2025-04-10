@@ -48,6 +48,8 @@
   let promptText = $state("");
   let promptPredefinedInput = $state("");
 
+  let titleInput: HTMLInputElement | undefined = $state();
+
   interface Props {
     promptId?: string | undefined;
     prompt?: any | undefined;
@@ -196,6 +198,7 @@
             placeholder="e.g. Create three sports headlines"
             class="input input-bordered w-full min-w-xs"
             onkeydown={handleKeyDown}
+            bind:this={titleInput}
           />
         </div>
       </div>
@@ -222,7 +225,14 @@
 
       <div class="mb-4">
         <p class="mb-2">{t("prompt-library.add.prompts.instructions")}*</p>
-        <TextEditor bind:html={promptText} />
+        <TextEditor
+          blur={() => {
+            setTimeout(() => {
+              titleInput?.focus({ preventScroll: true });
+            }, 100);
+          }}
+          bind:html={promptText}
+        />
       </div>
 
       <div class="mb-4">

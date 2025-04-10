@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onMount } from "svelte";
   import { TextSelection } from "prosemirror-state";
   import { Tipex, type TipexEditor } from "@friendofsvelte/tipex";
   import "@friendofsvelte/tipex/styles/Tipex.css";
@@ -15,12 +14,14 @@
     html?: string;
     text?: string;
     cssClass?: string;
+    blur?: Function;
   }
 
   let {
     html = $bindable(""),
     text = $bindable(""),
     cssClass = "",
+    blur,
   }: Props = $props();
 
   let body: any = $state("");
@@ -28,6 +29,7 @@
   $effect(() => {
     if (body === undefined || body === "") {
       body = html;
+      blur?.();
     }
   });
 

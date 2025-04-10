@@ -36,6 +36,8 @@
 
   instructionText = formatMarkdown(instructionText);
 
+  let titleInput: HTMLInputElement | undefined = $state();
+
   let isSaving = $state(false);
   let isFormValid = $derived(
     instructionTitle.trim() !== "" &&
@@ -200,6 +202,7 @@
               type="text"
               bind:value={instructionTitle}
               placeholder="title"
+              bind:this={titleInput}
             />
             <!-- {@html svgIcons.Lock} -->
           </label>
@@ -279,7 +282,14 @@
       <div class="mb-4">
         <p class="mb-2">{t("prompt-library.add.knowledgebase.text")}</p>
 
-        <TextEditor bind:html={instructionText} />
+        <TextEditor
+          blur={() => {
+            setTimeout(() => {
+              titleInput?.focus({ preventScroll: true });
+            }, 100);
+          }}
+          bind:html={instructionText}
+        />
       </div>
 
       {#if isEditable}

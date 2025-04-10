@@ -19,6 +19,8 @@
   let knowledgeBaseTitle = $state("");
   let knowledgeBaseText = $state("");
 
+  let titleInput: HTMLInputElement | undefined = $state();
+
   interface Props {
     knowledgeBaseId?: string | undefined;
     knowledgeBase?: any | undefined;
@@ -150,13 +152,21 @@
             bind:value={knowledgeBaseTitle}
             placeholder="e.g. add knowledge base title"
             class="input input-bordered w-full min-w-xs"
+            bind:this={titleInput}
           />
         </div>
       </div>
 
       <div class="mb-4">
         <p class="mb-2">{t("prompt-library.add.knowledgebase.text")}*</p>
-        <TextEditor bind:html={knowledgeBaseText} />
+        <TextEditor
+          blur={() => {
+            setTimeout(() => {
+              titleInput?.focus({ preventScroll: true });
+            }, 100);
+          }}
+          bind:html={knowledgeBaseText}
+        />
       </div>
 
       {#if isEditable}

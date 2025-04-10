@@ -65,6 +65,8 @@
   let isSaving = $state(false);
   let isLoading = $state(false);
 
+  let titleInput: HTMLInputElement | undefined = $state();
+
   onMount(async function () {
     const categoryResponse = await fetch("/api/categories.json", {
       method: "GET",
@@ -254,12 +256,20 @@
           placeholder="e.g. Create three sports headlines"
           class="input input-bordered w-full min-w-xs"
           onkeydown={handleKeyDown}
+          bind:this={titleInput}
         />
       </div>
 
       <div class="mb-4">
         <p class="mb-2">{t("prompt-library.add.prompts.instructions")}*</p>
-        <TextEditor bind:html={promptText} />
+        <TextEditor
+          blur={() => {
+            setTimeout(() => {
+              titleInput?.focus({ preventScroll: true });
+            }, 100);
+          }}
+          bind:html={promptText}
+        />
       </div>
 
       <div class="mb-4">
