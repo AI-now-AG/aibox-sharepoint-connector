@@ -25,7 +25,7 @@
 
   let body: any = $state("");
 
-  $effect(() => {
+  onMount(() => {
     body = html;
   });
 
@@ -44,8 +44,6 @@
       view?.focus();
     }
   }
-
-  onMount(() => {});
 </script>
 
 {#key body}
