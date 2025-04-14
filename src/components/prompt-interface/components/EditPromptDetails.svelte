@@ -273,7 +273,7 @@
               }, 100);
             }}
             bind:html={promptText}
-            autoInitHeight
+            cssClass=" h-[300px]"
           />
         {/key}
       </div>
