@@ -37,6 +37,11 @@ const initChatOpenAI = (apiKey: string, model: string, tenantId: string) => {
   return new ChatOpenAI({
     apiKey,
     model,
+    modelKwargs: {
+      web_search_options: {
+        search_context_size: "medium",
+      },
+    },
     callbacks: [
       new UsageTrackerCallbackHandler(
         tenantId,
