@@ -273,7 +273,7 @@
               }, 100);
             }}
             bind:html={promptText}
-            cssClass=" h-[300px]"
+            cssClass=" h-[200px]"
           />
         {/key}
       </div>
