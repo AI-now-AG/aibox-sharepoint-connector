@@ -7,7 +7,8 @@
   import MultiInput from "$pages/prompt-library/prompts/MultiInput.svelte";
   import ModelInput from "$pages/prompt-library/prompts/ModelInput.svelte";
   import { addToast } from "$stores/toast";
-  import { preventDefault } from "$utils/common";
+  import { formatMarkdown, preventDefault } from "$utils/common";
+  import TextEditor from "$components/TextEditor.svelte";
 
   const t = useTranslations();
 
@@ -38,8 +39,7 @@
     }
   });
 
-  let models: Model[] = $state([]);
-  let selectedModel: Model | undefined = $state();
+  let selectedModel: string = $state("");
 
   let knowledgeBases: KnowledgeBase[] = $state([]);
   let selectedKnowledgeBases: KnowledgeBase[] = $state([]);
@@ -47,6 +47,8 @@
   let promptTitle = $state("");
   let promptText = $state("");
   let promptPredefinedInput = $state("");
+
+  let titleInput: HTMLInputElement | undefined = $state();
 
   interface Props {
     promptId?: string | undefined;
@@ -71,7 +73,7 @@
     await fetchInstructionAndKB();
     if (prompt) {
       promptTitle = prompt.title;
-      promptText = prompt.prompt;
+      promptText = formatMarkdown(prompt.prompt);
       promptPredefinedInput = prompt.predefined_input;
 
       const category = categories.find(
@@ -126,7 +128,7 @@
         title: promptTitle,
         prompt: promptText,
         predefined_input: promptPredefinedInput,
-        model: selectedModel ? selectedModel._id : null,
+        model: selectedModel ?? null,
         knowledgebase: selectedKnowledgeBases.map((inst) => inst._id),
         ...(selectedCategory && { category: selectedCategory._id }),
         ...(selectedGroup && { group: selectedGroup._id }),
@@ -196,6 +198,7 @@
             placeholder="e.g. Create three sports headlines"
             class="input input-bordered w-full min-w-xs"
             onkeydown={handleKeyDown}
+            bind:this={titleInput}
           />
         </div>
       </div>
@@ -222,11 +225,14 @@
 
       <div class="mb-4">
         <p class="mb-2">{t("prompt-library.add.prompts.instructions")}*</p>
-        <textarea
-          bind:value={promptText}
-          placeholder="e.g. Create three headlines..."
-          class="input input-bordered min-w-xs shadow-sm appearance-none min-h-32 w-full py-2 px-3"
-        ></textarea>
+        <TextEditor
+          blur={() => {
+            setTimeout(() => {
+              titleInput?.focus({ preventScroll: true });
+            }, 100);
+          }}
+          bind:html={promptText}
+        />
       </div>
 
       <div class="mb-4">
@@ -247,7 +253,7 @@
           items={knowledgeBases}
           bind:selectedItems={selectedKnowledgeBases}
         />
-        <ModelInput bind:models bind:selectedModel />
+        <ModelInput bind:selectedModel />
       </div>
 
       {#if isEditable}

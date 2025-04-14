@@ -4,9 +4,10 @@
   import { tenant } from "$stores";
   import { addToast } from "$stores/toast";
   import { svgIcons } from "$assets/icons";
-  import { type TranscriptionCard } from "$types/TranscriptionCard";
   import { AudioCategory } from "$types/TenantFeature";
   import { onMount } from "svelte";
+  import { formatMarkdown, preventDefault } from "$utils/common";
+  import TextEditor from "$components/TextEditor.svelte";
   const t = useTranslations();
 
   interface Props {
@@ -24,7 +25,7 @@
   let {
     preDefineCategory = [],
     instructionTitle = "",
-    instructionText = "",
+    instructionText = "<p></p>",
     category,
     isEnabled = true,
     isNew = true,
@@ -33,10 +34,15 @@
     mode: screenMode,
   }: Props = $props();
 
+  instructionText = formatMarkdown(instructionText);
+
+  let titleInput: HTMLInputElement | undefined = $state();
+
   let isSaving = $state(false);
   let isFormValid = $derived(
     instructionTitle.trim() !== "" &&
       instructionText.trim() !== "" &&
+      instructionText.trim() !== "<p></p>" &&
       category !== undefined &&
       isEnabled !== undefined,
   );
@@ -64,25 +70,23 @@
 
   const inputValue = $derived(
     subtitleList
-      .filter((e) => e.checked === true)
+      .filter(
+        (
+          e,
+        ): e is { title: string; checked: boolean; category: AudioCategory } =>
+          e !== false && e.checked === true,
+      )
       .map((e) => e.title)
       .join(", "),
   );
 
   onMount(() => {
     if (mode == "clone") {
-      isNew = true
+      isNew = true;
       instructionTitle =
         instructionTitle?.trim() + " (" + t("common.copy") + ")";
     }
   });
-
-  function preventDefault(fn) {
-    return function (event) {
-      event.preventDefault();
-      fn.call(this, event);
-    };
-  }
 
   async function createInstruction() {
     if (!category) return;
@@ -163,10 +167,15 @@
   function handleSelectedItems(selected: any) {
     const selectedIndex = subtitleList.indexOf(selected);
     if (selectedIndex !== -1) {
-      subtitleList = subtitleList.map((item, idx) => ({
-        ...item,
-        checked: idx === selectedIndex,
-      }));
+      subtitleList = subtitleList.map((item, idx) => {
+        if (item && item.title && item.category) {
+          return {
+            ...item,
+            checked: idx === selectedIndex,
+          };
+        }
+        return item;
+      });
       category = selected.category;
     }
   }
@@ -193,6 +202,7 @@
               type="text"
               bind:value={instructionTitle}
               placeholder="title"
+              bind:this={titleInput}
             />
             <!-- {@html svgIcons.Lock} -->
           </label>
@@ -258,9 +268,9 @@
                   <li>
                     <button
                       onclick={preventDefault(() => handleSelectedItems(item))}
-                      class={`${item.checked === true ? "bg-primary text-primary-content hover:bg-primary" : "hover:text-neutral"}`}
+                      class={`${item && item.checked === true ? "bg-primary text-primary-content hover:bg-primary" : "hover:text-neutral"}`}
                     >
-                      {item.title}
+                      {item && item.title}
                     </button>
                   </li>
                 {/each}
@@ -271,11 +281,15 @@
       {/if}
       <div class="mb-4">
         <p class="mb-2">{t("prompt-library.add.knowledgebase.text")}</p>
-        <textarea
-          bind:value={instructionText}
-          placeholder="e.g. type knowledge base details..."
-          class="input input-bordered min-w-xs shadow-sm appearance-none min-h-96 w-full py-2 px-3"
-        ></textarea>
+
+        <TextEditor
+          blur={() => {
+            setTimeout(() => {
+              titleInput?.focus({ preventScroll: true });
+            }, 100);
+          }}
+          bind:html={instructionText}
+        />
       </div>
 
       {#if isEditable}

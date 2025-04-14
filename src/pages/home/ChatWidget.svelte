@@ -234,11 +234,12 @@
           bind:selectedModel
           bind:disabled={isDisableSelectModel}
           labelClasses={"text-sm"}
+          skipDefaultOption
         />
       </div>
     </div>
 
-    <ChatResults bind:output bind:isProcessing />
+    <ChatResults bind:output bind:isProcessing/>
 
     {#if $sharedMessageHistory.length > 0}
       <div

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onMount } from "svelte";
   import { TextSelection } from "prosemirror-state";
   import { Tipex, type TipexEditor } from "@friendofsvelte/tipex";
   import "@friendofsvelte/tipex/styles/Tipex.css";
@@ -15,18 +14,26 @@
     html?: string;
     text?: string;
     cssClass?: string;
+    blur?: Function;
+    autoInitHeight?: boolean;
   }
 
   let {
     html = $bindable(""),
     text = $bindable(""),
     cssClass = "",
+    blur,
+    autoInitHeight,
   }: Props = $props();
 
   let body: any = $state("");
+  let autoHeightStyle: any = $state("");
 
   $effect(() => {
-    body = html;
+    if (body === undefined || body === "") {
+      body = html;
+      blur?.();
+    }
   });
 
   function onEditorUpdate(e: any) {
@@ -45,7 +52,15 @@
     }
   }
 
-  onMount(() => {});
+  function setHeightBasedOnContent(_editor: TipexEditor) {
+    if (_editor && autoInitHeight) {
+      const elements = document.querySelectorAll(".tiptap.ProseMirror");
+      elements.forEach((el, index) => {
+        if (index == 0)
+          autoHeightStyle = `height: ${(el as HTMLElement).scrollHeight + 80}px !important;`;
+      });
+    }
+  }
 </script>
 
 {#key body}
@@ -54,10 +69,11 @@
     {body}
     controls
     floating
-    class={"h-[46vh] border border-neutral resize-y " + cssClass}
-    style="transition-duration: 0ms !important;"
+    class={"h-[46vh] min-h-[200px] border border-neutral resize-y " + cssClass}
+    style={"transition-duration: 0ms !important; " + autoHeightStyle}
     oncreate={(e: any) => {
       setFocusAtTheEnd(e.editor);
+      setHeightBasedOnContent(e.editor);
     }}
     onupdate={(e: any) => {
       onEditorUpdate(e);
