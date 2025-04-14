@@ -15,6 +15,7 @@
     classes?: string;
     labelClasses?: string;
     disabled?: boolean;
+    skipDefaultOption?: boolean;
   }
 
   let {
@@ -24,6 +25,7 @@
     classes = "",
     labelClasses = "",
     disabled = $bindable(false),
+    skipDefaultOption = false,
   }: Props = $props();
 
   onMount(async function () {
@@ -32,7 +34,7 @@
     }, 0);
   });
 
-  const getModelName = (provider: { name: string }) => {
+  const getModelName = (provider: any) => {
     const key = `${provider.name}_chat_model` as keyof typeof $tenant;
     return $tenant?.[key] || "gpt-4o";
   };
@@ -53,7 +55,7 @@
   };
 
   const getActiveModels = (): Option[] => {
-    const models =
+    const models: any[] =
       $tenant?.api_key_providers
         ?.filter((provider) => provider.active)
         .map((provider) => {
@@ -64,6 +66,20 @@
             label: `${providerName} ${modelName}`,
           };
         }) || [];
+    if (!skipDefaultOption) {
+      const defaultModel = $tenant?.api_key_providers?.find(
+        (provider) => provider.default,
+      );
+      const defaultText = t("tenant.default");
+      const defaultName = defaultText.replace(
+        /^./,
+        defaultText[0].toUpperCase(),
+      );
+      models?.unshift({
+        value: ApiKeyProvider.Default,
+        label: `${defaultName} (${getProviderName(defaultModel)} ${getModelName(defaultModel)})`,
+      });
+    }
 
     return models;
   };
