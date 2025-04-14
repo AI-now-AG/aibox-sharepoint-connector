@@ -58,6 +58,7 @@
   let previousCategoryId: string | null = $state(null);
 
   let promptTitle = $state("");
+  let initHtml = $state("");
   let promptText = $state("");
   let promptPredefinedInput = $state("");
   let promptDetails: any | undefined = undefined;
@@ -110,6 +111,7 @@
         promptTitle = promptTitle?.trim() + " (" + t("common.copy") + ")";
       }
       promptText = formatMarkdown(promptDetails.prompt);
+      initHtml = formatMarkdown(promptDetails.prompt);
       promptPredefinedInput = promptDetails.predefined_input;
 
       const category = categories.find(
@@ -205,6 +207,7 @@
     promptDialog?.close();
     promptTitle = "";
     promptText = "<p></p>";
+    initHtml = "<p></p>";
     selectedKnowledgeBases = [];
     selectedEditPromptId = null;
   }
@@ -262,12 +265,12 @@
 
       <div class="mb-4">
         <p class="mb-2">{t("prompt-library.add.prompts.instructions")}*</p>
-        {#key promptText}
+        {#key initHtml}
           <TextEditor
             blur={() => {
               setTimeout(() => {
                 titleInput?.focus({ preventScroll: true });
-              }, 50);
+              }, 100);
             }}
             bind:html={promptText}
             autoInitHeight
