@@ -15,6 +15,7 @@
     text?: string;
     cssClass?: string;
     blur?: Function;
+    autoInitHeight?: boolean;
   }
 
   let {
@@ -22,9 +23,11 @@
     text = $bindable(""),
     cssClass = "",
     blur,
+    autoInitHeight,
   }: Props = $props();
 
   let body: any = $state("");
+  let autoHeightStyle: any = $state("");
 
   $effect(() => {
     if (body === undefined || body === "") {
@@ -48,6 +51,16 @@
       view?.focus();
     }
   }
+
+  function setHeightBasedOnContent(_editor: TipexEditor) {
+    if (_editor && autoInitHeight) {
+      const elements = document.querySelectorAll(".tiptap.ProseMirror");
+      elements.forEach((el, index) => {
+        if (index == 0)
+          autoHeightStyle = `height: ${(el as HTMLElement).scrollHeight + 80}px !important;`;
+      });
+    }
+  }
 </script>
 
 {#key body}
@@ -57,9 +70,10 @@
     controls
     floating
     class={"h-[46vh] min-h-[200px] border border-neutral resize-y " + cssClass}
-    style="transition-duration: 0ms !important;"
+    style={"transition-duration: 0ms !important; " + autoHeightStyle}
     oncreate={(e: any) => {
       setFocusAtTheEnd(e.editor);
+      setHeightBasedOnContent(e.editor);
     }}
     onupdate={(e: any) => {
       onEditorUpdate(e);

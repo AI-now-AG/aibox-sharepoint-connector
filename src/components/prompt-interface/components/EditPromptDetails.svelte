@@ -262,14 +262,17 @@
 
       <div class="mb-4">
         <p class="mb-2">{t("prompt-library.add.prompts.instructions")}*</p>
-        <TextEditor
-          blur={() => {
-            setTimeout(() => {
-              titleInput?.focus({ preventScroll: true });
-            }, 100);
-          }}
-          bind:html={promptText}
-        />
+        {#key promptText}
+          <TextEditor
+            blur={() => {
+              setTimeout(() => {
+                titleInput?.focus({ preventScroll: true });
+              }, 50);
+            }}
+            bind:html={promptText}
+            autoInitHeight
+          />
+        {/key}
       </div>
 
       <div class="mb-4">
