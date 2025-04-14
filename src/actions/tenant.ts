@@ -48,6 +48,7 @@ const TenantInputParamsSchema = z.object({
     .optional()
     .default(() => false),
   is_trial: z.boolean().optional().default(false),
+  metadata: z.record(z.any()).optional(),
   tenant_admin_email: z.string().optional(),
 });
 
