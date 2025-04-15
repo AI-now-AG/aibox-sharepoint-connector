@@ -1314,7 +1314,7 @@
               for="audio-elevenLabs-model"
             >
               <span class="label-text text-base-content"
-                >{t("tenant.subtitle-elevenLabs")}</span
+                >{t("tenant.subtitle-elevenLabs.title")}</span
               >
             </label>
           </div>
