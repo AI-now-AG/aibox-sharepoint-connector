@@ -128,6 +128,7 @@ export default {
 
   list: async (filterParams?: TenantFilterParams) => {
     // Start with a default filter for active tenants
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const filter: any = {
       active: true,
     };
@@ -180,5 +181,33 @@ export default {
         },
       },
     );
+  },
+
+  copyTenant: async (
+    sourceId: string | ObjectId,
+    overrides: Partial<Omit<Tenant, "_id">> = {},
+  ) => {
+    const id = sourceId instanceof ObjectId ? sourceId : new ObjectId(sourceId);
+
+    // fetch the original tenant
+    const sourceTenant = await collection.findOne({ _id: id });
+    if (!sourceTenant) {
+      throw new Error("Source tenant not found");
+    }
+
+    // prepare the new tenant data
+    const now = new Date();
+    const newTenant: Partial<Omit<Tenant, "_id">> = {
+      ...sourceTenant,
+      ...overrides,
+      created_at: now,
+      updated_at: now,
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    delete (newTenant as any)._id; // ensure no ID conflict
+
+    // insert the new tenant
+    return await collection.insertOne(newTenant);
   },
 };
