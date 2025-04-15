@@ -382,6 +382,16 @@ export const calculateUsage = (tenant: Tenant, rawUsages: UsageLog[]) => {
     ),
   });
 
+  // const useElevenLabsPrivateKey = tenant.metadata?.elevenLabsPrivateKeyEnabled ?? false;
+  // usageData.push({
+  //   provider: "Audio",
+  //   details: _calculateAudioUsage(
+  //     rawUsages,
+  //     useAzureOpenAIPrivateKey,
+  //     useSpeechPrivateKey,
+  //   ),
+  // });
+
   // Flux
   const useFluxPrivateKey = tenant.metadata?.fluxPrivateKeyEnabled ?? false;
   usageData.push({

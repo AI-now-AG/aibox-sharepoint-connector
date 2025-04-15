@@ -61,7 +61,8 @@ const subtitleTranscriptions = activeTranscriptions
     (tran) =>
       tran.category == AudioCategory.Subtitle ||
       tran.category == AudioCategory.SubtitleJson ||
-      tran.category == AudioCategory.SubtitleLarge
+      tran.category == AudioCategory.SubtitleLarge ||
+      tran.category == AudioCategory.Subtitle11Labs
   )
   .map((tran) => ({
     title: tran.name,

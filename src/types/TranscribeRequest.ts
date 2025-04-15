@@ -22,6 +22,8 @@ export interface TranscribeRequest {
   encryptedSpeechKey?: string;
   speechKey?: string;
   speechRegion?: string;
+  encryptedElevenLabsKey?: string;
+  isAudioTagEnabled?: boolean;
   audioBuffer?: Buffer;
   isDiarizationEnabled?: boolean;
   maxSpeakers?: number;

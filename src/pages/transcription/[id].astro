@@ -32,7 +32,8 @@ if (transcriptions?.category === AudioCategory.AudioToText) {
 } else if (
   transcriptions?.category === AudioCategory.Subtitle ||
   transcriptions?.category === AudioCategory.SubtitleJson ||
-  transcriptions?.category === AudioCategory.SubtitleLarge
+  transcriptions?.category === AudioCategory.SubtitleLarge ||
+  transcriptions?.category === AudioCategory.Subtitle11Labs
 ) {
   title = t("settings.transcription.subtitles-title");
   description = t("settings.transcription.subtitles-description");

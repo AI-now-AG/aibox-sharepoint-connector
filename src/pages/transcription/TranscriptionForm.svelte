@@ -72,6 +72,8 @@
   let minSpeakers = 2;
   let maxSpeakers = 20;
 
+  let isAudioTagEnabled = $state(false);
+
   let confirmModal: HTMLDialogElement | undefined = $state();
 
   let assFileChecked = $state(selectedFileFormat.includes(FileFormat.ASS));
@@ -228,41 +230,8 @@
         isTranscipted = true;
         isTranscriptionFailed = false;
       }
-      // audioFile = entry.options.file;
-      // txtFileUrl = entry.options.txtUrl;
-      // srtFileUrl = entry.options.srtUrl;
-      // assFileUrl = entry.options.assUrl;
-      // jsonFileUrl = entry.options.jsonUrl;
-      // zipFileData = entry.options.zipFile;
-
-      // if (!textOuput) {
-      //   isTranscribing = true;
-      //   isTranscriptionFailed = false;
-      // } else {
-      //   isUploaded = true;
-      //   isTranscipted = true;
-      //   isTranscriptionFailed = false;
-      // }
     }
   }
-
-  /*function retrieveDataInStore() {
-    audioFile = $transcript?.file;
-    txtFileUrl = $transcript?.txtUrl as string;
-    srtFileUrl = $transcript?.srtUrl as string;
-    assFileUrl = $transcript?.assUrl as string;
-    jsonFileUrl = $transcript?.jsonUrl as string;
-    zipFileData = $transcript?.zipFile as string;
-
-    if (!textOuput) {
-      isTranscribing = true;
-      isTranscriptionFailed = false;
-    } else {
-      isUploaded = true;
-      isTranscipted = true;
-      isTranscriptionFailed = false;
-    }
-  }*/
 
   function isFileTypeValid(type: string): boolean {
     if (!type) {
@@ -528,7 +497,8 @@
         if (
           category === AudioCategory.Subtitle ||
           category === AudioCategory.SubtitleJson ||
-          category === AudioCategory.SubtitleLarge
+          category === AudioCategory.SubtitleLarge ||
+          category === AudioCategory.Subtitle11Labs
         ) {
           selectedFileFormat.forEach((format) => {
             tempOutputFileNames.push(`${tempOutputFileName}.${format}`);
@@ -614,6 +584,8 @@
       azureOpenAIChatModel: tenant?.azure_openai_chat_model,
       encryptedSpeechKey: tenant?.speech_api_key,
       speechRegion: tenant?.speech_region,
+      encryptedElevenLabsKey: tenant?.elevenLabs_api_key,
+      isAudioTagEnabled: isAudioTagEnabled,
       isDiarizationEnabled: isDiarizationEnabled,
       maxSpeakers: parseInt(maxNumberOfSpeakers.toString()),
       languageLocales: languageLocales
@@ -637,6 +609,7 @@
           isShowImprovedTextPreview:
             category === AudioCategory.Subtitle ||
             category === AudioCategory.SubtitleJson ||
+            category === AudioCategory.Subtitle11Labs ||
             category === AudioCategory.SubtitleLarge
               ? showTextPreviewChecked
               : false,
@@ -1169,7 +1142,7 @@
     </div>
   {/if}
 
-  {#if category === AudioCategory.Subtitle || category === AudioCategory.SubtitleJson || category === AudioCategory.SubtitleLarge}
+  {#if category === AudioCategory.Subtitle || category === AudioCategory.SubtitleJson || category === AudioCategory.SubtitleLarge || category === AudioCategory.Subtitle11Labs}
     <div class="bg-base-100 mt-10 p-4 px-6 rounded-xl">
       <div class="grid">
         <h2>{t("audiotools.subtitles.what-output-do-you-need")}</h2>
@@ -1253,7 +1226,7 @@
               <div class="basis-1/8">03</div> -->
             </div>
           </div>
-          {#if category === AudioCategory.Subtitle || category === AudioCategory.SubtitleLarge}
+          {#if category === AudioCategory.Subtitle || category === AudioCategory.SubtitleLarge || category === AudioCategory.Subtitle11Labs}
             <div><div class="bg-base-200 h-0.5"></div></div>
             <div class="card rounded-box grid py-8">
               <div class="flex flex-row place-items-center gap-8">
@@ -1305,6 +1278,27 @@
             </div>
           {/if}
         </div>
+      </div>
+    </div>
+  {/if}
+
+  {#if category === AudioCategory.Subtitle11Labs}
+    <div class="bg-base-100 mt-10 p-4 px-6 rounded-xl">
+      <div class="flex flex-col gap-4">
+        <h2 class="font-normal">
+          {t("settings.transcription.largefile-settings")}
+        </h2>
+        <label class="flex items-center gap-2">
+          <input
+            type="checkbox"
+            pattern="[0-9]+"
+            class="checkbox checkbox-neutral"
+            bind:checked={isAudioTagEnabled}
+          />
+          <h3 class="text-sm font-medium">
+            {t("settings.transcription.elevenLabs-audio-tag")}
+          </h3>
+        </label>
       </div>
     </div>
   {/if}
