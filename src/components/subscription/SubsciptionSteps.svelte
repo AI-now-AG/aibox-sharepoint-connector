@@ -13,7 +13,7 @@
   const step4Text = t("subscription.step4");
 </script>
 
-<ul class="steps steps-vertical text-gray-400 text-sm font-sans">
+<ul class="steps steps-vertical text-gray-400 text-sm font-sans font-semibold">
   {#if currentStep === 0}
     <li class="step">
       {step1Text}
