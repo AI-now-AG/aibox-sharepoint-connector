@@ -1,6 +1,7 @@
 import { ObjectId } from "mongodb";
 import { db } from "../mongodb";
 import { SubscriptionStatus, PlanName } from "$types/Subscription";
+import { AudioCategory } from "$types/TenantFeature";
 import { z } from "zod";
 
 const SubscriptionSchema = z.object({
@@ -24,7 +25,7 @@ const SubscriptionSchema = z.object({
   add_ons: z
     .array(
       z.object({
-        name: z.string(),
+        name: z.nativeEnum(AudioCategory),
         title: z.string(),
       }),
     )
