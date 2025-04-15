@@ -1,5 +1,6 @@
 ---
 const { title } = Astro.props;
+import SubsciptionSteps from "$components/subscription/SubsciptionSteps.svelte";
 ---
 
 <!DOCTYPE html>
@@ -14,14 +15,9 @@ const { title } = Astro.props;
   </head>
   <body class="flex min-h-screen bg-gray-100">
     <!-- Left Sidebar -->
-    <aside class="w-64 bg-[#1E3A8A] text-white p-6 flex flex-col items-center">
+    <aside class="w-80 bg-[#491EFF] text-white p-6 flex flex-col items-center">
       <div class="text-2xl font-bold mb-8 text-white">aibox</div>
-      <ul class="steps steps-vertical text-white">
-        <li class="step step-primary">Choose your plan</li>
-        <li class="step">Provide your billing data</li>
-        <li class="step">Customize your aibox</li>
-        <li class="step">Create your aibox organization</li>
-      </ul>
+     <SubsciptionSteps currentStep={2} />
     </aside>
 
     <!-- Right Content Section -->

@@ -335,7 +335,7 @@
   "tenant.this-is-free-trial-version": "This is a free trial version,",
   "tenant.contact-us": "contact us",
   "tenant.to-upgrade": "to upgrade",
-  "tenant.trial-message": "Dies ist eine kostenlose Testversion, <a href=\"https://ainow.ch/aibox/upgrade-aibox\" target=\"_blank\" class=\"font-semibold text-info-content hover:underline\" data-astro-prefetch=\"false\">kontaktiere uns</a>, um ein Upgrade durchzuführen.",
+  "tenant.trial-message": "Dies ist eine kostenlose Testversion, <a href=\"/subscription\" target=\"_blank\" class=\"font-semibold text-info-content hover:underline\" data-astro-prefetch=\"false\">kontaktiere uns</a>, um ein Upgrade durchzuführen.",
   "user.unverified-email-message": "Bitte bestätige deine E-Mail-Adresse. Nicht verifizierte E-Mails werden innerhalb von 24 Stunden blockiert. <a href=\"${url}\" data-verified=\"true\" class=\"font-semibold text-warning-content underline\" data-astro-prefetch=\"false\">Klicke hier</a>, um den Bestätigungslink erneut zu senden",
   "user.send-verify-email-success": "Die Bestätigungs-E-Mail wurde an deine Adresse gesendet. Bitte überprüfe dein Postfach und verifiziere dein Konto. Vielen Dank!",
   "user.send-verify-email-failed": "Die Bestätigungs-E-Mail konnte nicht gesendet werden. Bitte versuche es erneut!",
@@ -394,5 +394,11 @@
   "usage.units.credits": "Credits",
   "home.new-chat": "Neuer Chat",
   "tenant.settings.private-api-key": "Privater API Key",
-  "nav.text-prompts": "TEXT ASSISTENT"
+  "nav.text-prompts": "TEXT ASSISTENT",
+  "tenant.subtitle-elevenLabs": " Subtitle Virtuoso ",
+  "tenant.validate-elevenLabs-key": "Please input ElevenLabs key",
+  "subscription.step1": "Choose your plan",
+  "subscription.step2": "Provide your billing data",
+  "subscription.step3": "Customize your aibox",
+  "subscription.step4": "Create your aibox organization"
 }
