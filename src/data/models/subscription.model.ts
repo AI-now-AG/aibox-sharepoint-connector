@@ -21,6 +21,14 @@ const SubscriptionSchema = z.object({
       return d;
     }),
   metadata: z.record(z.any()).nullish(),
+  add_ons: z
+    .array(
+      z.object({
+        name: z.string(),
+        title: z.string(),
+      }),
+    )
+    .optional(),
   notes: z.string().optional(),
   created_at: z
     .date()
