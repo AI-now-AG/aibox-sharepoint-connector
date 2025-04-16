@@ -77,15 +77,19 @@ export default {
       .sort({ created_at: 1 })
       .sort({ created_at: 1 }),
 
-  listByTenant: async (tenantId: ObjectId) => {
+  listByTenant: async (tenantId: string | ObjectId) => {
+    const _tenantId =
+      tenantId instanceof ObjectId ? tenantId : new ObjectId(tenantId);
     return collection
-      .find<Document<Category>>({ tenant_id: tenantId })
+      .find<Document<Category>>({ tenant_id: _tenantId })
       .sort({ position: 1, created_at: 1 });
   },
 
-  listActiveByTenant: async (tenantId: ObjectId) => {
+  listActiveByTenant: async (tenantId: string | ObjectId) => {
+    const _tenantId =
+      tenantId instanceof ObjectId ? tenantId : new ObjectId(tenantId);
     return collection
-      .find<Document<Category>>({ tenant_id: tenantId, active: true })
+      .find<Document<Category>>({ tenant_id: _tenantId, active: true })
       .sort({ position: 1, created_at: 1 });
   },
 
