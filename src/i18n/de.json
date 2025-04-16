@@ -402,5 +402,8 @@
   "subscription.step1": "Choose your plan",
   "subscription.step2": "Provide your billing data",
   "subscription.step3": "Customize your aibox",
-  "subscription.step4": "Create your aibox organization"
+  "subscription.step4": "Create your aibox organization",
+  "subscription.choose-your-plan": " Choose your plan",
+  "subscription.choose-your-plan-description": "Choose the plan for your needs, more info see <a href=\"https://ainow.ch/aibox/upgrade-aibox\" target=\"_blank\" class=\"text-blue-600 font-bold\">here</a>",
+  "subscription.audio-to-text-options": "Audio to Text Options"
 }

@@ -1,23 +1,23 @@
 ---
 import SubscriptionLayout from "$layouts/SubscriptionLayout.astro";
 import AudioOptions from "$components/subscription/AudioOptions.svelte";
+import { useTranslations } from "$i18n/utils";
+const t = useTranslations();
 ---
 
 <SubscriptionLayout title="Choose Your Plan">
   <div class="max-w-5xl mx-auto">
-    <h1 class="font-sanns text-3xl font-bold text-black mb-2">
-      Choose your plan
+    <h1 class="font-sanns text-3xl font-bold text-black mt-2">
+      {t("subscription.choose-your-plan")}
     </h1>
-    <p class="text-gray-600 mb-6">
-      Choose the plan for your needs, <a href="#" class="text-blue-600"
-        >more info see here</a
-      >
+    <p class="font-sans text-base font-medium text-gray-600 mt-6 mb-6">
+      <span set:html={t("subscription.choose-your-plan-description")} />
     </p>
 
     <!-- Plan Cards -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
       <!-- Starter Plan -->
-      <div class="card bg-white shadow-lg rounded-lg p-6">
+      <div class="card bg-white shadow-2xl rounded-lg p-6">
         <div class="badge badge-primary mb-4">For Solo Users & Beginners</div>
         <h2 class="text-xl font-semibold">aibox Starter</h2>
         <p class="text-3xl font-bold my-2">
@@ -33,7 +33,7 @@ import AudioOptions from "$components/subscription/AudioOptions.svelte";
       </div>
 
       <!-- Team Plan -->
-      <div class="card bg-white shadow-lg rounded-lg p-6">
+      <div class="card bg-white shadow-2xl rounded-lg p-6">
         <div class="badge badge-primary mb-4">For Growing Teams</div>
         <h2 class="text-xl font-semibold">aibox Team</h2>
         <p class="text-3xl font-bold my-2">
@@ -49,7 +49,7 @@ import AudioOptions from "$components/subscription/AudioOptions.svelte";
       </div>
 
       <!-- Pro Plan -->
-      <div class="card bg-white shadow-lg rounded-lg p-6">
+      <div class="card bg-white shadow-2xl rounded-lg p-6">
         <div class="badge badge-primary mb-4">
           For Power Teams & Heavy Usage
         </div>
@@ -68,11 +68,11 @@ import AudioOptions from "$components/subscription/AudioOptions.svelte";
     </div>
 
     <!-- Audio to Text Options -->
-    <h2 class="text-2xl font-semibold mb-4">Audio to Text Options</h2>
-    <p class="text-gray-600 mb-6">
-      Choose the plan for your needs, <a href="#" class="text-blue-600"
-        >more info see here</a
-      >
+    <h1 class="font-sanns text-3xl font-bold text-black mt-2">
+      {t("subscription.audio-to-text-options")}
+    </h1>
+    <p class="font-sans text-base font-medium text-gray-600 mt-6 mb-6">
+      <span set:html={t("subscription.choose-your-plan-description")} />
     </p>
     <AudioOptions client:load />
 
