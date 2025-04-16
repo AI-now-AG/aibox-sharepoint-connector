@@ -2,9 +2,13 @@ import { defineAction } from "astro:actions";
 import { z } from "zod";
 import { transformRawData } from "$utils/transformRawData";
 import TenantModel from "$data/models/tenant.model";
-import CategoryModel, { type Category } from "$data/models/category.model";
+import CategoryModel, {
+  type Category,
+  type Group,
+} from "$data/models/category.model";
 import PromptModel, { type Prompt } from "$data/models/prompt.model";
 import { PlanName, AddOnsName } from "$types/Subscription";
+import { ObjectId } from "mongodb";
 
 const originalTenantId = "67ff572260fa2a8bca5d26d0";
 const OnboardingInputParamsSchema = z.object({
@@ -40,19 +44,33 @@ export const user = {
 
       // Clone each category and store mapping
       const categoryIdMap = new Map();
-      for (const cat of categories) {
-        const newCategory: Category = {
-          ...cat,
-          ...{
-            title: cat.title,
-            tenant_id: newTenant.insertedId,
-          },
-          created_at: new Date(),
-          updated_at: new Date(),
-        };
-        const { insertedId: newCatId } = await CategoryModel.add(newCategory);
+      const groupIdMap = new Map();
+      for (const category of categories) {
+        const newGroups: Group[] = [];
+        for (const group of category.groups) {
+          const newGroupId = new ObjectId();
+          newGroups.push({
+            ...group,
+            ...{
+              _id: newGroupId,
+            },
+          });
+          groupIdMap.set(group._id?.toString(), newGroupId);
+        }
 
-        categoryIdMap.set(cat._id.toString(), newCatId);
+        const newCategory: Category = {
+          ...category,
+          ...{
+            title: category.title,
+            tenant_id: newTenant.insertedId,
+            groups: newGroups,
+            created_at: new Date(),
+            updated_at: new Date(),
+          },
+        };
+
+        const { insertedId: newCatId } = await CategoryModel.add(newCategory);
+        categoryIdMap.set(category._id.toString(), newCatId);
       }
 
       // Clone prompts with updated categoryId
@@ -65,6 +83,7 @@ export const user = {
         ...prompt,
         ...{
           category: categoryIdMap.get(prompt.category),
+          group: groupIdMap.get(prompt.group),
         },
       }));
 
