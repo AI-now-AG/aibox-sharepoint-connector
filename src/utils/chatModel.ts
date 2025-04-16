@@ -24,6 +24,7 @@ export const initPerplexityOpenAI = (
       web_search_options: {
         search_context_size: "medium",
       },
+      search_domain_filter: ["ainow.ch", "wikipedia.org"],
     },
     callbacks: [
       new UsageTrackerCallbackHandler(
