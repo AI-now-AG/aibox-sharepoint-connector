@@ -46,6 +46,7 @@ export const user = {
       const categoryIdMap = new Map();
       const groupIdMap = new Map();
       for (const category of categories) {
+        // Clone each group and store mapping
         const newGroups: Group[] = [];
         for (const group of category.groups) {
           const newGroupId = new ObjectId();
