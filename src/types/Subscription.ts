@@ -9,3 +9,10 @@ export enum SubscriptionStatus {
   Canceled = "canceled",
   Trialing = "trialing",
 }
+
+export enum AddOnsName {
+  AudioBasis = "audio-basis",
+  AudioSubtitles = "audio-subtitles",
+  AudioXL = "audio-xl",
+  AudioPremium = "audio-premium",
+}

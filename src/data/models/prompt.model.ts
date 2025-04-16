@@ -50,6 +50,20 @@ export default {
     return collection.insertOne(doc);
   },
 
+  insertMultiple: async (docs: Prompt[]) => {
+    // Validate and map all docs
+    const validatedDocs = docs.map((doc) => {
+      const validated = PromptSchema.parse(doc);
+      return {
+        position: 0,
+        ...validated,
+      };
+    });
+
+    // Insert all at once
+    return collection.insertMany(validatedDocs);
+  },
+
   remove: async (id: string) => {
     const _id = new ObjectId(id);
     return collection.deleteOne({ _id });
@@ -90,6 +104,12 @@ export default {
     return collection
       .find<Document<Prompt>>({ tenant_id: id })
       .sort({ position: 1, created_at: 1 });
+  },
+
+  listByCategoryIds: async (categoryIds: ObjectId[]) => {
+    return collection.find<Document<Prompt>>({
+      category: { $in: categoryIds },
+    });
   },
 
   listForExportByTenant: async (id: ObjectId) => {
