@@ -1,27 +1,41 @@
 ---
 const { title } = Astro.props;
+import { svgIcons } from "$assets/icons";
 import SubsciptionSteps from "$components/subscription/SubsciptionSteps.svelte";
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" data-theme="mytheme">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
     <style is:global>
-      @import '../styles/global.css';
+      @import "../styles/global.css";
     </style>
   </head>
-  <body class="flex min-h-screen bg-gray-100">
+  <body class="flex min-h-screen bg-white">
     <!-- Left Sidebar -->
-    <aside class="w-80 bg-[#491EFF] text-white p-6 flex flex-col items-center">
-      <div class="text-2xl font-bold mb-8 text-white">aibox</div>
-     <SubsciptionSteps currentStep={2} />
+    <aside
+      class="flex-1 bg-[#491EFF] text-white flex flex-col items-center relative"
+    >
+      <div
+        class="w-full h-auto flex justify-center items-center absolute top-[60px] left-0 z-[1]"
+      >
+        <img src="/sidebar_background.png" />
+      </div>
+      <div class="w-auto self-start">
+        <span set:html={svgIcons.logo} />
+      </div>
+      <div class="flex flex-1 justify-center items-center z-[2]">
+        <div class="">
+          <SubsciptionSteps currentStep={0} />
+        </div>
+      </div>
     </aside>
 
     <!-- Right Content Section -->
-    <main class="flex-1 p-8">
+    <main class="flex-3 p-8">
       <slot />
     </main>
   </body>

@@ -58,6 +58,7 @@ import userGroup from "$assets/icons/user-group.svg?raw";
 import questionMark from "$assets/icons/question.svg?raw";
 import hamburger from "$assets/icons/hamburger.svg?raw";
 import image from "$assets/icons/image.svg?raw";
+import logo from "$assets/icons/logo.svg?raw";
 
 export const svgIcons = {
   menuSettings,
@@ -120,4 +121,5 @@ export const svgIcons = {
   questionMark,
   hamburger,
   image,
+  logo,
 };

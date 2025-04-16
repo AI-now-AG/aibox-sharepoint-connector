@@ -69,7 +69,8 @@ const isSocialAuth = isSocialConnection(userInfo?.auth0_sub);
       </div>
     </div>
     {tenant?.is_trial && <OnboardingTour user={userInfo} client:load />}
-    {tenant?.is_trial && <TrialComponent {locale} client:load />}
+    <!-- {tenant?.is_trial && <TrialComponent {locale} client:load />} -->
+    <TrialComponent {locale} client:load />
     {
       tenant?.is_trial &&
         !isSocialAuth &&

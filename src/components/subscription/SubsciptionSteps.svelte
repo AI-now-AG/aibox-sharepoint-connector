@@ -83,13 +83,23 @@
 </ul>
 
 <style>
-  :global(.steps .step-primary + .step-primary:before) {
-    background-color: white !important;
+  :global(.steps .step) {
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    background-color: transparent !important;
+    text-align: left !important;
   }
+
   :global(.steps .step:before) {
     background-color: #d7dde4 !important;
     border-color: #d7dde4 !important;
   }
+
+  :global(.steps .step-primary + .step-primary:before) {
+    background-color: white !important;
+  }
+
   :global(.steps .step:not(:has(.step-icon)):after) {
     background-color: #d7dde4 !important;
     border: 1px solid #d7dde4 !important;
