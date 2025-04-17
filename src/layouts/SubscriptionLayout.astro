@@ -2,24 +2,25 @@
 const { title } = Astro.props;
 import { svgIcons } from "$assets/icons";
 import SubsciptionSteps from "$components/subscription/SubsciptionSteps.svelte";
+import { SUBSCIPTION_STEP } from "$constants";
 
 let currentStep = 0;
 const pathname = Astro.url.pathname;
 switch (pathname) {
   case "/subscription/step1":
-    currentStep = 0;
+    currentStep = SUBSCIPTION_STEP.Step1;
     break;
   case "/subscription/step2":
-    currentStep = 1;
+    currentStep = SUBSCIPTION_STEP.Step2;
     break;
   case "/subscription/step3":
-    currentStep = 2;
+    currentStep = SUBSCIPTION_STEP.Step3;
     break;
   case "/subscription/step4":
-    currentStep = 3;
+    currentStep = SUBSCIPTION_STEP.Step4;
     break;
   case "/subscription/complete":
-    currentStep = 4;
+    currentStep = SUBSCIPTION_STEP.Completed;
     break;
   default:
     currentStep = -1;

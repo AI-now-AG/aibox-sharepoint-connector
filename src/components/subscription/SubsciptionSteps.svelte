@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { SUBSCIPTION_STEP } from "$constants";
   import { useTranslations } from "$i18n/utils";
 
   interface Props {
@@ -14,7 +15,7 @@
 </script>
 
 <ul class="steps steps-vertical text-gray-400 text-sm font-sans font-semibold">
-  {#if currentStep === 0}
+  {#if currentStep === SUBSCIPTION_STEP.Step0}
     <li class="step">
       {step1Text}
     </li>
@@ -27,8 +28,8 @@
     <li class="step">
       {step4Text}
     </li>
-  {:else if currentStep === 1}
-    <li data-content="✓" class="step step-primary text-white">
+  {:else if currentStep === SUBSCIPTION_STEP.Step1}
+    <li class="step step-primary text-white">
       {step1Text}
     </li>
     <li class="step">
@@ -40,7 +41,7 @@
     <li class="step">
       {step4Text}
     </li>
-  {:else if currentStep === 2}
+  {:else if currentStep === SUBSCIPTION_STEP.Step2}
     <li data-content="✓" class="step step-primary text-white">
       {step1Text}
     </li>
@@ -53,11 +54,11 @@
     <li class="step">
       {step4Text}
     </li>
-  {:else if currentStep === 3}
+  {:else if currentStep === SUBSCIPTION_STEP.Step3}
     <li data-content="✓" class="step step-primary text-white">
       {step1Text}
     </li>
-    <li class="step step-primary text-white">
+    <li data-content="✓" class="step step-primary text-white">
       {step2Text}
     </li>
     <li class="step step-primary text-white">
@@ -66,17 +67,30 @@
     <li class="step">
       {step4Text}
     </li>
-  {:else if currentStep === 4}
+  {:else if currentStep === SUBSCIPTION_STEP.Step4}
     <li data-content="✓" class="step step-primary text-white">
       {step1Text}
     </li>
-    <li class="step step-primary text-white">
+    <li data-content="✓" class="step step-primary text-white">
       {step2Text}
     </li>
-    <li class="step step-primary text-white">
+    <li data-content="✓" class="step step-primary text-white">
       {step3Text}
     </li>
     <li class="step step-primary text-white">
+      {step4Text}
+    </li>
+  {:else if currentStep === SUBSCIPTION_STEP.Completed}
+    <li data-content="✓" class="step step-primary text-white">
+      {step1Text}
+    </li>
+    <li data-content="✓" class="step step-primary text-white">
+      {step2Text}
+    </li>
+    <li data-content="✓" class="step step-primary text-white">
+      {step3Text}
+    </li>
+    <li data-content="✓" class="step step-primary text-white">
       {step4Text}
     </li>
   {/if}

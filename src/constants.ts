@@ -63,3 +63,12 @@ export const AUTH_AUTHORIZE_SCOPES = [
 // SendGrid
 export const SG_VERIFICATION_TEMPLATE = "d-69ed72334042458783f985ada5dbe61d";
 export const SG_WELCOME_TEMPLATE = "d-79e6332e21d14ff792ba9d995127abb7";
+
+export const SUBSCIPTION_STEP = {
+  Step0: 0,
+  Step1: 1,
+  Step2: 2,
+  Step3: 3,
+  Step4: 4,
+  Completed: 5,
+};
