@@ -35,12 +35,13 @@ switch (pathname) {
     <title>{title}</title>
     <style is:global>
       @import "../styles/global.css";
-      html {
-        background-color: white;
+      html,
+      body {
+        background-color: rgb(250, 250, 250);
       }
     </style>
   </head>
-  <body class="flex min-h-screen bg-white">
+  <body class="flex min-h-screen">
     <!-- Left Sidebar -->
     <aside
       class="flex-1 bg-[#491EFF] text-white flex flex-col items-center relative"
@@ -54,10 +55,10 @@ switch (pathname) {
         <span set:html={svgIcons.logo} />
       </div>
 
-      <div class="flex flex-1 justify-center items-center z-[2]">
+      <div class="flex flex-1 justify-center z-[2]">
         {
           currentStep !== -1 && (
-            <div class="mt-[-20px]">
+            <div class="p-6">
               <SubsciptionSteps {currentStep} />
             </div>
           )
