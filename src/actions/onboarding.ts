@@ -28,6 +28,9 @@ const OnboardingInputParamsSchema = z.object({
   ),
 });
 
+// step 1: clone tenant & import categoris / prompts
+// step 2: create Auth0 org + move user from old org to new org
+// step 3: send emails
 export const user = {
   submit: defineAction({
     input: OnboardingInputParamsSchema,
