@@ -1,11 +1,15 @@
 <script lang="ts">
+  import { SubscriptionPackages } from "$subscription-packages.json";
   import SubscriptionPackage from "./SubscriptionPackage.svelte";
 
-  interface Props {
-    packages?: any[];
-  }
+  const packages = [
+    SubscriptionPackages.plan.starter,
+    SubscriptionPackages.plan.team,
+    SubscriptionPackages.plan.pro,
+  ];
+  interface Props {}
+  let {}: Props = $props();
 
-  let { packages = [] }: Props = $props();
   let selectedPackageId = $state("");
   function handleSelectPackage(id: string) {
     selectedPackageId = id;

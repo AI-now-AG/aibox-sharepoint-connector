@@ -1,52 +1,8 @@
 ---
 import SubscriptionLayout from "$layouts/SubscriptionLayout.astro";
-import AudioOptionList from "$components/subscription/AudioOptionList.svelte";
-import SubscriptionPackageList from "$components/subscription/SubscriptionPackageList.svelte";
-import { useTranslations } from "$i18n/utils";
-import { SubscriptionPackages } from "$subscription-packages.json";
-const t = useTranslations();
-
-const packages = [
-  SubscriptionPackages.plan.starter,
-  SubscriptionPackages.plan.team,
-  SubscriptionPackages.plan.pro,
-];
+import StepComponent from "./Step1.svelte";
 ---
 
 <SubscriptionLayout title="Choose Your Plan">
-  <div class="max-w-5xl mx-auto">
-    <!-- Pakage Plan -->
-    <h1 class="font-sanns text-3xl font-bold text-black mt-2">
-      {t("subscription.choose-your-plan")}
-    </h1>
-    <p class="font-sans text-base font-medium text-gray-600 mt-6 mb-10">
-      <span set:html={t("subscription.choose-your-plan-description")} />
-    </p>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 text-black">
-      <SubscriptionPackageList packages={packages} client:load />
-    </div>
-
-    <!-- Audio to Text Options -->
-    <h1 class="font-sanns text-3xl font-bold text-black mt-2">
-      {t("subscription.audio-to-text-options")}
-    </h1>
-    <p class="font-sans text-base font-medium text-gray-600 mt-6 mb-6">
-      <span set:html={t("subscription.choose-your-plan-description")} />
-    </p>
-    <div class="mt-4">
-      <AudioOptionList client:load />
-    </div>
-
-    <!-- Total Price -->
-    <div class="text-right mb-4">
-      <p class="text-gray-600">
-        Total Price for aibox CHF <span class="font-bold">197.-</span> per month
-      </p>
-    </div>
-
-    <!-- Next Button -->
-    <div class="text-right">
-      <button class="btn btn-primary">Next</button>
-    </div>
-  </div>
+  <StepComponent client:load />
 </SubscriptionLayout>

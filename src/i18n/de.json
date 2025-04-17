@@ -399,6 +399,7 @@
   "tenant.validate-elevenLabs-key": "Please input ElevenLabs key",
   "settings.transcription.elevenLabs-audio-tag": "Enable Audio tag",
   "tenant.subtitle-elevenLabs.title": "ElevenLabs",
+  "common.next": "Next",
   "subscription.step1": "Choose your plan",
   "subscription.step2": "Provide your billing data",
   "subscription.step3": "Customize your aibox",
@@ -406,5 +407,6 @@
   "subscription.choose-your-plan": " Choose your plan",
   "subscription.choose-your-plan-description": "Choose the plan for your needs, more info see <a href=\"https://ainow.ch/aibox/upgrade-aibox\" target=\"_blank\" class=\"text-[#491EFF] font-bold\">here</a>",
   "subscription.audio-to-text-options": "Audio to Text Options",
-  "subscription.per-month": "per month"
+  "subscription.per-month": "per month",
+  "subscription.total-price-for-plan": " Total Price for aibox CHF ${total}.- per month"
 }
