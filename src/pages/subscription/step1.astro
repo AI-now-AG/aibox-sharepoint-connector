@@ -3,13 +3,13 @@ import SubscriptionLayout from "$layouts/SubscriptionLayout.astro";
 import AudioOptionList from "$components/subscription/AudioOptionList.svelte";
 import SubscriptionPackageList from "$components/subscription/SubscriptionPackageList.svelte";
 import { useTranslations } from "$i18n/utils";
-import { subscriptionPackages } from "$subscription-packages.json";
+import { SubscriptionPackages } from "$subscription-packages.json";
 const t = useTranslations();
 
 const packages = [
-  subscriptionPackages.plan.starter,
-  subscriptionPackages.plan.team,
-  subscriptionPackages.plan.pro,
+  SubscriptionPackages.plan.starter,
+  SubscriptionPackages.plan.team,
+  SubscriptionPackages.plan.pro,
 ];
 ---
 
@@ -19,7 +19,7 @@ const packages = [
     <h1 class="font-sanns text-3xl font-bold text-black mt-2">
       {t("subscription.choose-your-plan")}
     </h1>
-    <p class="font-sans text-base font-medium text-gray-600 mt-6 mb-6">
+    <p class="font-sans text-base font-medium text-gray-600 mt-6 mb-10">
       <span set:html={t("subscription.choose-your-plan-description")} />
     </p>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 text-black">
@@ -34,7 +34,7 @@ const packages = [
       <span set:html={t("subscription.choose-your-plan-description")} />
     </p>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-      <AudioOptionList client:load />
+      <!-- <AudioOptionList client:load /> -->
     </div>
 
     <!-- Total Price -->

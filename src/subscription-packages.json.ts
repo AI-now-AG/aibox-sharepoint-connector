@@ -1,7 +1,20 @@
-export const subscriptionPackages = {
+export const SubscriptionPackageId = {
+  Starter: "subscription_package_starter",
+  Team: "subscription_package_team",
+  Pro: "subscription_package_pro",
+};
+
+export const AudioOptionId = {
+  AudioPermium: "audio_premium",
+  AudioBasic: "audio_basis",
+  AudioBasicAddOnSubtitle: "audio_basis_addon_subtitle",
+  AudioBasicAddOnLarge: "audio_basis_addon_large",
+};
+
+export const SubscriptionPackages = {
   plan: {
     starter: {
-      id: "subscription_package_starter",
+      id: SubscriptionPackageId.Starter,
       name: {
         en: "aibox Starter",
         de: "aibox Starter",
@@ -31,7 +44,7 @@ export const subscriptionPackages = {
       },
     },
     team: {
-      id: "subscription_package_team",
+      id: SubscriptionPackageId.Team,
       name: {
         en: "aibox Teams",
         de: "aibox Teams",
@@ -61,7 +74,7 @@ export const subscriptionPackages = {
       },
     },
     pro: {
-      id: "subscription_package_pro",
+      id: SubscriptionPackageId.Pro,
       name: {
         en: "aibox Pro",
         de: "aibox Pro",
@@ -93,6 +106,7 @@ export const subscriptionPackages = {
   },
   audioOptions: {
     audioPremium: {
+      id: AudioOptionId.AudioPermium,
       name: {
         en: "AUDIO PREMIUM PACKAGE",
         de: "AUDIO PREMIUM PACKAGE",
@@ -102,6 +116,7 @@ export const subscriptionPackages = {
       priceText: "65 CHF / per month",
     },
     audioBasis: {
+      id: AudioOptionId.AudioBasic,
       name: {
         en: "AUDIO BASIS",
         de: "AUDIO BASIS",
@@ -111,6 +126,7 @@ export const subscriptionPackages = {
       priceText: "25 CHF / per month",
     },
     audioAddOnSubtitle: {
+      id: AudioOptionId.AudioBasicAddOnSubtitle,
       name: {
         en: "ADD-ON UNTERTITEL",
         de: "ADD-ON UNTERTITEL",
@@ -120,6 +136,7 @@ export const subscriptionPackages = {
       priceText: "25 CHF / per month",
     },
     audioAddOnLarge: {
+      id: AudioOptionId.AudioBasicAddOnLarge,
       name: {
         en: "ADD-ON AUDIO XL",
         de: "ADD-ON AUDIO XL",

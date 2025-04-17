@@ -23,6 +23,7 @@
     onSelect,
     selectedPackageId = $bindable(""),
   }: Props = $props();
+
   const t = useTranslations();
   const lang = getLanguage() ?? "de";
 
@@ -34,6 +35,7 @@
       backgroundColor = "background-color: white;";
     }
   });
+
   function handleSelect() {
     onSelect?.({ id, name, description, features, price, currency });
   }
@@ -49,20 +51,22 @@
   <div
     class="absolute top-[-10px] left-0 flex justify-center items-center w-full"
   >
-    <div class="badge badge-primary">
+    <div class="badge badge-primary font-medium text-sm">
       {description?.[lang]}
     </div>
   </div>
-  <h2 class="text-xl font-semibold">{name?.[lang]}</h2>
-  <p class="text-3xl font-bold my-2">
+  <h2 class="text-2xl font-medium text-[#491EFF] text-left mt-2">
+    {name?.[lang]}
+  </h2>
+  <p class="text-4xl font-medium my-2 text-left mt-6">
     {price}
     {currency}
-    <span class="text-sm font-normal">/ {t("subscription.per-month")}</span>
+    <span class="text-base font-medium">/ {t("subscription.per-month")}</span>
   </p>
-  <ul class="mt-4 flex flex-col gap-2 text-base text-black">
+  <ul class="mt-4 flex flex-col gap-2 text-base font-normal text-gray-600">
     {#each features[lang] || [] as feaure}
       <li class="flex items-center">
-        <span class="mr-2">
+        <span class="mr-3">
           {@html svgIcons.checkMark}
         </span>
         <span>
