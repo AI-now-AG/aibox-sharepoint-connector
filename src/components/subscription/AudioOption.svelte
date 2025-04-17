@@ -10,7 +10,7 @@
     price?: number;
     currency?: string;
     onSelect?: Function;
-    selectedPackageIds?: string[];
+    selectedAudioOptionIds?: string[];
   }
 
   let {
@@ -19,7 +19,7 @@
     price,
     currency,
     onSelect,
-    selectedPackageIds = $bindable([]),
+    selectedAudioOptionIds = $bindable([]),
   }: Props = $props();
 
   const t = useTranslations();
@@ -27,7 +27,7 @@
 
   let backgroundColor = $state("background-color: white;");
   $effect(() => {
-    if (selectedPackageIds.includes(id)) {
+    if (selectedAudioOptionIds.includes(id)) {
       backgroundColor = "background-color: #A1E1F8;";
     } else {
       backgroundColor = "background-color: white;";

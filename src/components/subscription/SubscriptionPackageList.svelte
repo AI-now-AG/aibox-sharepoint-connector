@@ -7,13 +7,13 @@
     SubscriptionPackages.plan.team,
     SubscriptionPackages.plan.pro,
   ];
-  interface Props {}
-  let {}: Props = $props();
+  interface Props {
+    selectedPackageId?: string;
+  }
+  let { selectedPackageId = $bindable("") }: Props = $props();
 
-  let selectedPackageId = $state("");
   function handleSelectPackage(id: string) {
     selectedPackageId = id;
-    // TODO: Store data into storage
   }
 </script>
 

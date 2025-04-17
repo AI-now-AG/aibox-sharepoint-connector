@@ -12,31 +12,35 @@
   ];
   const pemiumOptions = [SubscriptionPackages.audioOptions.audioPremium];
 
-  interface Props {}
-  let {}: Props = $props();
+  interface Props {
+    selectedAudioOptionIds?: string[];
+  }
+  let { selectedAudioOptionIds = $bindable([]) }: Props = $props();
 
-  let selectedPackageIds: string[] = $state([]);
   function handleSelectPackage(id: string) {
     if (id == AudioOptionId.AudioPermium) {
-      selectedPackageIds = selectedPackageIds.filter(
+      selectedAudioOptionIds = selectedAudioOptionIds.filter(
         (item) => item === AudioOptionId.AudioPermium,
       );
-      if (selectedPackageIds.includes(id)) {
-        selectedPackageIds = selectedPackageIds.filter((item) => item !== id);
+      if (selectedAudioOptionIds.includes(id)) {
+        selectedAudioOptionIds = selectedAudioOptionIds.filter(
+          (item) => item !== id,
+        );
       } else {
-        selectedPackageIds.push(id);
+        selectedAudioOptionIds.push(id);
       }
     } else {
-      selectedPackageIds = selectedPackageIds.filter(
+      selectedAudioOptionIds = selectedAudioOptionIds.filter(
         (item) => item !== AudioOptionId.AudioPermium,
       );
-      if (selectedPackageIds.includes(id)) {
-        selectedPackageIds = selectedPackageIds.filter((item) => item !== id);
+      if (selectedAudioOptionIds.includes(id)) {
+        selectedAudioOptionIds = selectedAudioOptionIds.filter(
+          (item) => item !== id,
+        );
       } else {
-        selectedPackageIds.push(id);
+        selectedAudioOptionIds.push(id);
       }
     }
-    // TODO: Store data into storage
   }
 </script>
 
@@ -49,7 +53,7 @@
           name={option.name}
           price={option.price}
           currency={option.currency}
-          bind:selectedPackageIds
+          bind:selectedAudioOptionIds
           onSelect={({ id }: { id: string }) => {
             handleSelectPackage(id);
           }}
@@ -65,7 +69,7 @@
           name={option.name}
           price={option.price}
           currency={option.currency}
-          bind:selectedPackageIds
+          bind:selectedAudioOptionIds
           onSelect={({ id }: { id: string }) => {
             handleSelectPackage(id);
           }}
