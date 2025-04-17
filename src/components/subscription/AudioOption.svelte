@@ -40,7 +40,7 @@
 </script>
 
 <button
-  class="bg-white shadow-xl rounded-lg flex justify-between items-center px-6 py-4"
+  class="bg-white shadow-xl rounded-lg flex justify-between items-center px-6 py-4 w-full"
   style={backgroundColor}
   onclick={() => {
     handleSelect();
