@@ -27,14 +27,14 @@
   const lang = getLanguage() ?? "de";
 
   let backgroundColor = $state("background-color: white;");
-  //   let backgroundColor = $state("background-color: #A1E1F8;");
-  function handleSelect() {
+  $effect(() => {
     if (selectedPackageId === id) {
       backgroundColor = "background-color: #A1E1F8;";
     } else {
       backgroundColor = "background-color: white;";
     }
-
+  });
+  function handleSelect() {
     onSelect?.({ id, name, description, features, price, currency });
   }
 </script>

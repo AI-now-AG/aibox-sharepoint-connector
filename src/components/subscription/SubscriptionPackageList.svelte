@@ -7,6 +7,9 @@
 
   let { packages = [] }: Props = $props();
   let selectedPackageId = $state("");
+  function handleSelectPackage(id: string) {
+    // TODO: Store data into storage
+  }
 </script>
 
 {#each packages as packagesItem}
@@ -20,6 +23,7 @@
     bind:selectedPackageId
     onSelect={({ id }: { id: string }) => {
       selectedPackageId = id;
+      handleSelectPackage(id);
     }}
   />
 {/each}
