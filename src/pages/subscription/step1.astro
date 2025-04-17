@@ -11,6 +11,13 @@ const packages = [
   SubscriptionPackages.plan.team,
   SubscriptionPackages.plan.pro,
 ];
+
+const options = [
+  SubscriptionPackages.audioOptions.audioBasis,
+  SubscriptionPackages.audioOptions.audioAddOnSubtitle,
+  SubscriptionPackages.audioOptions.audioAddOnLarge,
+  SubscriptionPackages.audioOptions.audioPremium,
+];
 ---
 
 <SubscriptionLayout title="Choose Your Plan">
@@ -33,8 +40,8 @@ const packages = [
     <p class="font-sans text-base font-medium text-gray-600 mt-6 mb-6">
       <span set:html={t("subscription.choose-your-plan-description")} />
     </p>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-      <!-- <AudioOptionList client:load /> -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-8">
+      <AudioOptionList options={options} client:load />
     </div>
 
     <!-- Total Price -->

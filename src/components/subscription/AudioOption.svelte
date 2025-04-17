@@ -1,17 +1,57 @@
-<script>
-  let { title, price } = $props();
+<script lang="ts">
+  import { svgIcons } from "$assets/icons";
+  import { getLanguage, useTranslations } from "$i18n/utils";
+
+  interface Props {
+    id: string;
+    name?: Record<string, string>;
+    description?: Record<string, string>;
+    features?: Record<string, string[]>;
+    price?: number;
+    currency?: string;
+    onSelect?: Function;
+    selectedPackageIds?: string[];
+  }
+
+  let {
+    id,
+    name = { en: "", de: "" },
+    price,
+    currency,
+    onSelect,
+    selectedPackageIds = $bindable([]),
+  }: Props = $props();
+
+  const t = useTranslations();
+  const lang = getLanguage() ?? "de";
+
+  let backgroundColor = $state("background-color: white;");
+  $effect(() => {
+    if (selectedPackageIds.includes(id)) {
+      backgroundColor = "background-color: #A1E1F8;";
+    } else {
+      backgroundColor = "background-color: white;";
+    }
+  });
+
+  function handleSelect() {
+    onSelect?.({ id, name, price, currency });
+  }
 </script>
 
-<div class="card bg-[#E6F0FA] shadow-lg rounded-lg p-6 text-gray-600">
-  <label
-    class="label cursor-pointer flex items-center justify-between"
-    for="audio-option"
-  >
-    <div>
-      <h3 class="text-lg font-semibold">{title}</h3>
-    </div>
-    <div class="flex items-center">
-      <p class="text-gray-600 mr-3">{price}</p>
-    </div>
-  </label>
-</div>
+<button
+  class="bg-white shadow-xl rounded-lg flex justify-between items-center px-6 py-4"
+  style={backgroundColor}
+  onclick={() => {
+    handleSelect();
+  }}
+>
+  <h2 class="text-sm font-medium text-[#0F172A] text-left">
+    {name?.[lang]}
+  </h2>
+  <p class="text-2xl font-medium text-right text-[#0F172A]">
+    {price}
+    {currency}
+    <span class="text-base font-medium">/ {t("subscription.per-month")}</span>
+  </p>
+</button>

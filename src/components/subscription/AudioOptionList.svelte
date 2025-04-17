@@ -1,20 +1,27 @@
-<script>
+<script lang="ts">
   import AudioOption from "./AudioOption.svelte";
 
-  let selectedOption = $state("AUDIO ON FINETUNE"); // Default selected option
+  interface Props {
+    options?: any[];
+  }
 
-  const options = [
-    { title: "AUDODYNAMIC", price: "10 CHF / per month" },
-    { title: "AUDIO ON FINETUNE", price: "20 CHF / per month" },
-    { title: "AUDIO PREMIUM PACKAGE", price: "50 CHF / per month" },
-  ];
+  let { options = [] }: Props = $props();
+  let selectedPackageIds: string[] = $state([]);
+  function handleSelectPackage(id: string) {
+    // TODO: Store data into storage
+  }
 </script>
 
 {#each options as option}
   <AudioOption
-    title={option.title}
+    id={option.id}
+    name={option.name}
     price={option.price}
-    checked={selectedOption === option.title}
-    on:change={() => (selectedOption = option.title)}
+    currency={option.currency}
+    bind:selectedPackageIds
+    onSelect={({ id }: { id: string }) => {
+      selectedPackageIds.push(id);
+      handleSelectPackage(id);
+    }}
   />
 {/each}
