@@ -33,7 +33,7 @@ export const TextFeatureSchema = z.object({
 });
 
 export const BillingInfoSchema = z.object({
-  street: z.string().optional(),
+  address: z.string().optional(),
   zip_code: z.string().optional(),
   location: z.string().optional(),
   email: z.string().optional(),
