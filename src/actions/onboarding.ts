@@ -1,5 +1,6 @@
 import { defineAction } from "astro:actions";
 import { z } from "zod";
+import { ObjectId } from "mongodb";
 import { transformRawData } from "$utils/transformRawData";
 import TenantModel from "$data/models/tenant.model";
 import CategoryModel, {
@@ -8,15 +9,23 @@ import CategoryModel, {
 } from "$data/models/category.model";
 import PromptModel, { type Prompt } from "$data/models/prompt.model";
 import { PlanName, AddOnsName } from "$types/Subscription";
-import { ObjectId } from "mongodb";
+import organizationsManagement from "$data/auth0/organizations-manager";
+import sendMail from "$utils/mail";
+import getEnvVar from "$utils/getEnvVar";
+import { SG_ONBOARDING_TEMPLATE } from "$constants";
 
 const originalTenantId = "67ff572260fa2a8bca5d26d0";
-const OnboardingInputParamsSchema = z.object({
+const Auth0InputParamsSchema = z.object({
+  company_name: z.string().min(1),
+});
+const TenantInputParamsSchema = z.object({
+  name: z.string().min(1),
+  org_id: z.string().min(1),
+  org_name: z.string().min(1),
   plan_name: z.nativeEnum(PlanName).optional(),
   add_ons: z.nativeEnum(AddOnsName).optional(),
   billing: z.object({
-    company_name: z.string(),
-    street: z.string(),
+    address: z.string(),
     zip_code: z.string(),
     location: z.string(),
     email: z.string(),
@@ -27,17 +36,53 @@ const OnboardingInputParamsSchema = z.object({
     }),
   ),
 });
+const EmailInputParamsSchema = z.object({
+  tenant_id: z.string().min(1),
+  email: z.string().min(1),
+});
 
-// step 1: clone tenant & import categoris / prompts
-// step 2: create Auth0 org + move user from old org to new org
-// step 3: send emails
+// step 1: setupAuth0()  - Create Auth0 org + move user from old org to new org
+// step 2: setupTenant() - Clone tenant & import categories / prompts
+// step 3: sendEmails()  - Send notification emails
+
 export const user = {
-  submit: defineAction({
-    input: OnboardingInputParamsSchema,
+  setupAuth0: defineAction({
+    input: Auth0InputParamsSchema,
+    handler: async (input) => {
+      const { company_name: companyName } = input;
+      const name = companyName
+        .toLowerCase()
+        .normalize("NFKD") // Remove accents/diacritics
+        .replace(/[\u0300-\u036f]/g, "") // Strip combining characters
+        .replace(/[^a-z0-9]+/g, "-") // Replace non-alphanumeric with hyphen
+        .replace(/^-+|-+$/g, "") // Trim leading/trailing hyphens
+        .replace(/-{2,}/g, "-"); // Collapse multiple hyphens
+
+      // create new Auth0 organization
+      const organizationResult = await organizationsManagement.create({
+        name: name,
+        display_name: companyName,
+      });
+
+      const organizationId = organizationResult.data.id;
+
+      // enabled connection
+      await organizationsManagement.addEnabledConnection(
+        organizationId,
+        import.meta.env.AUTH0_AUTH_CON_ID || "con_RXTD1LIbXJgceOUH",
+      );
+
+      return transformRawData(organizationResult.data);
+    },
+  }),
+  setupTenant: defineAction({
+    input: TenantInputParamsSchema,
     handler: async (input) => {
       // Clone the tenant
       const newTenant = await TenantModel.copyTenant(originalTenantId, {
-        name: input.billing.company_name,
+        name: input.name,
+        org_id: input.org_id,
+        org_name: input.org_name,
       });
 
       // Find all categories for the original tenant
@@ -100,6 +145,54 @@ export const user = {
       };
 
       return transformRawData(data);
+    },
+  }),
+  sendEmails: defineAction({
+    input: EmailInputParamsSchema,
+    handler: async (input) => {
+      const { tenant_id: tenantId, email } = input;
+      const tenant = await TenantModel.get(tenantId);
+
+      if (!tenant) {
+        throw new Error("Tenant not found.");
+      }
+
+      // send notification email to aibox-support
+      const env = getEnvVar("NODE_ENV") || "development";
+      const subjectPrefix = env == "production" ? "aibox" : "aibox-dev";
+      const emailSubject = `${subjectPrefix} - New onboarding`;
+      const emailContent = `
+        <div style="font-family: Arial, sans-serif; padding: 20px;">
+          <h1><b>New Onboarding Notification</b></h1>
+          <p><b>Org ID:</b> ${tenant.org_id}</p>
+          <p><b>Org Name:</b> ${tenant.org_name}</p>
+          <p><b>Display name:</b> ${tenant.name}</p>
+          <p><b>Billing address:</b> ${tenant.billing_info?.address}</p>
+          <p><b>Billing email:</b> ${tenant.billing_info?.email}</p>
+        </div>
+      `;
+      await sendMail({
+        from: {
+          name: "AI now AG",
+          email: "no-reply@ainow.ch",
+        },
+        to: "support@aibox-app.ch",
+        subject: emailSubject,
+        html: emailContent,
+      });
+
+      // send verification email to admin user
+      await sendMail({
+        from: {
+          name: "AI now AG",
+          email: "no-reply@ainow.ch",
+        },
+        to: email,
+        templateId: SG_ONBOARDING_TEMPLATE,
+        dynamicTemplateData: {},
+      });
+
+      return transformRawData({});
     },
   }),
 };

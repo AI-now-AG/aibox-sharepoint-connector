@@ -1,4 +1,4 @@
-const getEnvVar = (key: string) => {
+export const getEnvVar = (key: string) => {
   if (import.meta.env && import.meta.env[key]) {
     return import.meta.env[key];
   }
