@@ -93,6 +93,7 @@ export const user = {
         name: input.name,
         org_id: input.org_id,
         org_name: input.org_name,
+        billing_info: input.billing,
       });
 
       // Find all categories for the original tenant
