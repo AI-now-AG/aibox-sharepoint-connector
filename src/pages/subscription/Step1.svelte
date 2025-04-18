@@ -2,11 +2,7 @@
   import AudioOptionList from "$components/subscription/AudioOptionList.svelte";
   import SubscriptionPackageList from "$components/subscription/SubscriptionPackageList.svelte";
   import { useTranslations } from "$i18n/utils";
-  import {
-    AudioOptionId,
-    SubscriptionPackageId,
-    SubscriptionPackages,
-  } from "$subscription-packages.json";
+  import { SubscriptionPackages } from "$subscription-packages.json";
   const t = useTranslations();
 
   let totalPrice: any = $state("");
@@ -20,16 +16,10 @@
 
     // Get package price
     if (selectedPackageId) {
-      let selectedPackage;
-      if (SubscriptionPackageId.Starter === selectedPackageId) {
-        selectedPackage = SubscriptionPackages.plan.starter;
-      }
-      if (SubscriptionPackageId.Team === selectedPackageId) {
-        selectedPackage = SubscriptionPackages.plan.team;
-      }
-      if (SubscriptionPackageId.Pro === selectedPackageId) {
-        selectedPackage = SubscriptionPackages.plan.pro;
-      }
+      let selectedPackage =
+        SubscriptionPackages.plan[
+          selectedPackageId as keyof typeof SubscriptionPackages.plan
+        ];
       if (selectedPackage) {
         packagePrice = selectedPackage?.price || 0;
       }
@@ -38,19 +28,10 @@
     // Get audio options price
     if (selectedAudioOptionIds.length > 0) {
       selectedAudioOptionIds.forEach((audioOptionId) => {
-        let audioOption;
-        if (audioOptionId === AudioOptionId.AudioPermium) {
-          audioOption = SubscriptionPackages.audioOptions.audioPremium;
-        }
-        if (audioOptionId === AudioOptionId.AudioBasic) {
-          audioOption = SubscriptionPackages.audioOptions.audioBasis;
-        }
-        if (audioOptionId === AudioOptionId.AudioBasicAddOnSubtitle) {
-          audioOption = SubscriptionPackages.audioOptions.audioAddOnSubtitle;
-        }
-        if (audioOptionId === AudioOptionId.AudioBasicAddOnLarge) {
-          audioOption = SubscriptionPackages.audioOptions.audioAddOnLarge;
-        }
+        let audioOption =
+          SubscriptionPackages.audioOptions[
+            audioOptionId as keyof typeof SubscriptionPackages.audioOptions
+          ];
         if (audioOption) {
           audioOptionsTotlaPrice += audioOption?.price || 0;
         }

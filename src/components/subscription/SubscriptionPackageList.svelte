@@ -3,9 +3,9 @@
   import SubscriptionPackage from "./SubscriptionPackage.svelte";
 
   const packages = [
-    SubscriptionPackages.plan.starter,
-    SubscriptionPackages.plan.team,
-    SubscriptionPackages.plan.pro,
+    SubscriptionPackages.plan.Starter,
+    SubscriptionPackages.plan.Teams,
+    SubscriptionPackages.plan.Pro,
   ];
   interface Props {
     selectedPackageId?: string;

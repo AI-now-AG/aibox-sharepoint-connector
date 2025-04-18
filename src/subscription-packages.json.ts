@@ -1,19 +1,19 @@
 export const SubscriptionPackageId = {
-  Starter: "subscription_package_starter",
-  Team: "subscription_package_team",
-  Pro: "subscription_package_pro",
+  Starter: "Starter",
+  Teams: "Teams",
+  Pro: "Pro",
 };
 
 export const AudioOptionId = {
-  AudioPermium: "audio_premium",
-  AudioBasic: "audio_basis",
-  AudioBasicAddOnSubtitle: "audio_basis_addon_subtitle",
-  AudioBasicAddOnLarge: "audio_basis_addon_large",
+  AudioPremium: "AudioPremium",
+  AudioBasis: "AudioBasis",
+  AudioBasisAddOnSubtitle: "AudioBasisAddOnSubtitle",
+  AudioBasisAddOnLarge: "AudioBasisAddOnLarge",
 };
 
 export const SubscriptionPackages = {
   plan: {
-    starter: {
+    Starter: {
       id: SubscriptionPackageId.Starter,
       name: {
         en: "aibox Starter",
@@ -43,8 +43,8 @@ export const SubscriptionPackages = {
         ],
       },
     },
-    team: {
-      id: SubscriptionPackageId.Team,
+    Teams: {
+      id: SubscriptionPackageId.Teams,
       name: {
         en: "aibox Teams",
         de: "aibox Teams",
@@ -73,7 +73,7 @@ export const SubscriptionPackages = {
         ],
       },
     },
-    pro: {
+    Pro: {
       id: SubscriptionPackageId.Pro,
       name: {
         en: "aibox Pro",
@@ -105,8 +105,8 @@ export const SubscriptionPackages = {
     },
   },
   audioOptions: {
-    audioPremium: {
-      id: AudioOptionId.AudioPermium,
+    AudioPremium: {
+      id: AudioOptionId.AudioPremium,
       name: {
         en: "AUDIO PREMIUM PACKAGE",
         de: "AUDIO PREMIUM PACKAGE",
@@ -115,8 +115,8 @@ export const SubscriptionPackages = {
       currency: "CHF",
       priceText: "65 CHF / per month",
     },
-    audioBasis: {
-      id: AudioOptionId.AudioBasic,
+    AudioBasis: {
+      id: AudioOptionId.AudioBasis,
       name: {
         en: "AUDIO BASIS",
         de: "AUDIO BASIS",
@@ -125,8 +125,8 @@ export const SubscriptionPackages = {
       currency: "CHF",
       priceText: "25 CHF / per month",
     },
-    audioAddOnSubtitle: {
-      id: AudioOptionId.AudioBasicAddOnSubtitle,
+    AudioBasisAddOnSubtitle: {
+      id: AudioOptionId.AudioBasisAddOnSubtitle,
       name: {
         en: "ADD-ON UNTERTITEL",
         de: "ADD-ON UNTERTITEL",
@@ -135,8 +135,8 @@ export const SubscriptionPackages = {
       currency: "CHF",
       priceText: "25 CHF / per month",
     },
-    audioAddOnLarge: {
-      id: AudioOptionId.AudioBasicAddOnLarge,
+    AudioBasisAddOnLarge: {
+      id: AudioOptionId.AudioBasisAddOnLarge,
       name: {
         en: "ADD-ON AUDIO XL",
         de: "ADD-ON AUDIO XL",

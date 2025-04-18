@@ -6,11 +6,11 @@
   import AudioOption from "./AudioOption.svelte";
 
   const basicOptions = [
-    SubscriptionPackages.audioOptions.audioBasis,
-    SubscriptionPackages.audioOptions.audioAddOnSubtitle,
-    SubscriptionPackages.audioOptions.audioAddOnLarge,
+    SubscriptionPackages.audioOptions.AudioBasis,
+    SubscriptionPackages.audioOptions.AudioBasisAddOnSubtitle,
+    SubscriptionPackages.audioOptions.AudioBasisAddOnLarge,
   ];
-  const pemiumOptions = [SubscriptionPackages.audioOptions.audioPremium];
+  const pemiumOptions = [SubscriptionPackages.audioOptions.AudioPremium];
 
   interface Props {
     selectedAudioOptionIds?: string[];
@@ -18,9 +18,9 @@
   let { selectedAudioOptionIds = $bindable([]) }: Props = $props();
 
   function handleSelectPackage(id: string) {
-    if (id == AudioOptionId.AudioPermium) {
+    if (id == AudioOptionId.AudioPremium) {
       selectedAudioOptionIds = selectedAudioOptionIds.filter(
-        (item) => item === AudioOptionId.AudioPermium,
+        (item) => item === AudioOptionId.AudioPremium,
       );
       if (selectedAudioOptionIds.includes(id)) {
         selectedAudioOptionIds = selectedAudioOptionIds.filter(
@@ -31,7 +31,7 @@
       }
     } else {
       selectedAudioOptionIds = selectedAudioOptionIds.filter(
-        (item) => item !== AudioOptionId.AudioPermium,
+        (item) => item !== AudioOptionId.AudioPremium,
       );
       if (selectedAudioOptionIds.includes(id)) {
         selectedAudioOptionIds = selectedAudioOptionIds.filter(
