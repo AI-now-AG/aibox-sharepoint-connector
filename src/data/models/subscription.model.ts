@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { db } from "../mongodb";
+import { db, toObjectId } from "../mongodb";
 import { SubscriptionStatus, PlanName, AddOnsName } from "$types/Subscription";
 import { z } from "zod";
 
@@ -53,7 +53,7 @@ export default {
   },
 
   update: async (id: string | ObjectId, update: Partial<Subscription>) => {
-    const objectId = id instanceof ObjectId ? id : new ObjectId(id);
+    const objectId = toObjectId(id);
     const validated = SubscriptionSchema.partial().parse(update);
     const doc = {
       ...validated,
@@ -69,12 +69,12 @@ export default {
   },
 
   findByTenant: async (tenantId: string | ObjectId) => {
-    const id = tenantId instanceof ObjectId ? tenantId : new ObjectId(tenantId);
+    const id = toObjectId(tenantId);
     return await collection.findOne({ tenant_id: id });
   },
 
   findActiveByTenant: async (tenantId: string | ObjectId) => {
-    const id = tenantId instanceof ObjectId ? tenantId : new ObjectId(tenantId);
+    const id = toObjectId(tenantId);
     return await collection.findOne({
       tenant_id: id,
       status: SubscriptionStatus.Active,

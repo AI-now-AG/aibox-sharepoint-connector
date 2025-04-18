@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { db, type Document } from "../mongodb";
+import { db, toObjectId, type Document } from "../mongodb";
 import { z } from "zod";
 import { AudioCategory } from "$types/TenantFeature";
 
@@ -40,7 +40,7 @@ export default {
   },
 
   update: async (id: string | ObjectId, update: Partial<Transcription>) => {
-    const objectId = id instanceof ObjectId ? id : new ObjectId(id);
+    const objectId = toObjectId(id);
     const validated = TranscriptionSchema.partial().parse(update);
     const doc = {
       ...validated,
@@ -87,7 +87,9 @@ export default {
       return null;
     }
 
-    const data = collection.find<Document<Transcription>>({ tenant_id: tenantId });
+    const data = collection.find<Document<Transcription>>({
+      tenant_id: tenantId,
+    });
     return await data.toArray();
   },
 

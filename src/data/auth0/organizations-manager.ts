@@ -10,6 +10,8 @@ import type {
   PostOrganizationsRequest,
   PostMembersOperationRequest,
   PostMembersRequest,
+  DeleteMembersOperationRequest,
+  DeleteMembersRequest,
   PostOrganizationMemberRolesOperationRequest,
   PostOrganizationMemberRolesRequest,
   DeleteOrganizationsByIdRequest,
@@ -110,19 +112,6 @@ export const deleteEnabledConnection = async (
   }
 };
 
-export const getMemberRoles = async (id: string, userId: string) => {
-  try {
-    const parameters: GetOrganizationMemberRolesRequest = {
-      id,
-      user_id: userId,
-    };
-    return await managementClient.organizations.getMemberRoles(parameters);
-  } catch (err) {
-    console.error("auth0: get organization member's roles error", err);
-    throw err;
-  }
-};
-
 export const addMembers = async (id: string, members: string[]) => {
   try {
     const requestParameters: PostMembersOperationRequest = {
@@ -138,6 +127,38 @@ export const addMembers = async (id: string, members: string[]) => {
     );
   } catch (err) {
     console.error("auth0: organization add members error", err);
+    throw err;
+  }
+};
+
+export const deleteMembers = async (id: string, members: string[]) => {
+  try {
+    const requestParameters: DeleteMembersOperationRequest = {
+      id,
+    };
+    const bodyParameters: DeleteMembersRequest = {
+      members,
+    };
+
+    return await managementClient.organizations.deleteMembers(
+      requestParameters,
+      bodyParameters,
+    );
+  } catch (err) {
+    console.error("auth0: organization add members error", err);
+    throw err;
+  }
+};
+
+export const getMemberRoles = async (id: string, userId: string) => {
+  try {
+    const parameters: GetOrganizationMemberRolesRequest = {
+      id,
+      user_id: userId,
+    };
+    return await managementClient.organizations.getMemberRoles(parameters);
+  } catch (err) {
+    console.error("auth0: get organization member's roles error", err);
     throw err;
   }
 };
@@ -197,8 +218,9 @@ export default {
   deleteTenant,
   addEnabledConnection,
   deleteEnabledConnection,
-  getMemberRoles,
   addMembers,
+  deleteMembers,
+  getMemberRoles,
   addMemberRoles,
   deleteMemberRoles,
 };

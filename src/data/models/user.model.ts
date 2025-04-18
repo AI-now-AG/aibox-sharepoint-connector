@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { db, type Document } from "../mongodb";
+import { db, toObjectId, type Document } from "../mongodb";
 import { z } from "zod";
 import log from "$utils/log";
 import {
@@ -68,7 +68,7 @@ export async function updateUserData(
   detailsId: string,
   isOpen: boolean,
 ) {
-  const objectId = userId instanceof ObjectId ? userId : new ObjectId(userId);
+  const objectId = toObjectId(userId);
   const updateField = { [`navState.${detailsId}`]: isOpen };
 
   return await collection.findOneAndUpdate(
@@ -85,7 +85,7 @@ export default {
   },
 
   update: async (id: string | ObjectId, user: Partial<User>) => {
-    const objectId = id instanceof ObjectId ? id : new ObjectId(id);
+    const objectId = toObjectId(id);
     const validated = UserSchema.partial().parse(user);
     const doc = {
       ...validated,

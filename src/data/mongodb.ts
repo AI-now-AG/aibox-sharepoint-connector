@@ -16,3 +16,7 @@ const options = {};
 
 export const client = new MongoClient(url, options);
 export const db = client.db(dbName);
+
+export function toObjectId(id: string | ObjectId): ObjectId {
+  return id instanceof ObjectId ? id : new ObjectId(id);
+}
