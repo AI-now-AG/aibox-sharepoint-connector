@@ -4,7 +4,7 @@
   const t = useTranslations();
 
   const BiiliggMethod = {
-    MonthlyEmailInvoice: "invoid",
+    MonthlyEmailInvoice: "invoice",
     MonthlyCreditCard: "creditcard",
   };
 
@@ -96,21 +96,27 @@
     </div>
 
     <br class="mt-6" />
-    <p class="font-sans text-base font-medium text-gray-600 mt-6 mb-10">
+    <p class="font-sans text-base font-medium text-gray-600 mt-6 mb-4">
       {t("subscription.billing-method")}
     </p>
 
     <div class="flex flex-row space-x-8">
       <div class="flex-1 flex flex-col mb-4">
-        <Input
-          id="monthly-invoice-email"
-          label={t("subscription.monthly-invoice-email")}
-          value={billingMethod}
-          placeholder={t("subscription.monthly-invoice-email")}
-          containerClasses="h-[56px] shadow-xl"
-          labelClasses="text-base-content text-sm"
-          classes="text-base"
-        />
+        <button
+          class="bg-white shadow-xl rounded-lg flex justify-between items-center px-6 py-4 w-full mt-9"
+          onclick={() => {}}
+        >
+          <input
+            type="checkbox"
+            checked={billingMethod === BiiliggMethod.MonthlyEmailInvoice}
+            class="checkbox checkbox-primary w-6]"
+            value={BiiliggMethod.MonthlyEmailInvoice}
+            disabled
+          />
+          <h2 class="text-sm font-medium text-[#0F172A] text-left flex-1 px-4">
+            {t("subscription.monthly-invoice-email")}
+          </h2>
+        </button>
       </div>
 
       <div class="flex-1 flex flex-col mb-4">
@@ -131,15 +137,21 @@
 
     <div class="flex flex-row space-x-8">
       <div class="flex-1 flex flex-col mb-4">
-        <Input
-          id="name"
-          label={t("subscription.credit-card")}
-          value={"Creadit Card"}
-          placeholder={t("subscription.credit-card")}
-          containerClasses="h-[56px] shadow-xl"
-          labelClasses="text-base-content text-sm"
-          classes="text-base"
-        />
+        <button
+          class="bg-white shadow-xl rounded-lg flex justify-between items-center px-6 py-4 w-full"
+          onclick={() => {}}
+        >
+          <input
+            type="checkbox"
+            checked={billingMethod === BiiliggMethod.MonthlyCreditCard}
+            class="checkbox checkbox-primary w-6]"
+            value={BiiliggMethod.MonthlyCreditCard}
+            disabled
+          />
+          <h2 class="text-sm font-medium text-[#0F172A] text-left flex-1 px-4">
+            {t("subscription.credit-card")}
+          </h2>
+        </button>
       </div>
 
       <div class="flex-1 flex flex-col mb-4"></div>
