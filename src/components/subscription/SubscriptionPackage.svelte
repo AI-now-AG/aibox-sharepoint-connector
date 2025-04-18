@@ -75,4 +75,8 @@
       </li>
     {/each}
   </ul>
+  <!-- Add this CTA if Stakeholder would like to make clear Clickable for user -->
+  <div class="btn btn-primary btn-sm mt-4 w-full">
+    {t("subscription.select")}
+  </div>
 </button>

@@ -45,7 +45,7 @@
 </script>
 
 <div class="flex">
-  <div class="flex-1">
+  <div class="flex-1 mr-4">
     {#each basicOptions as option}
       <div class="mb-4">
         <AudioOption
@@ -61,7 +61,7 @@
       </div>
     {/each}
   </div>
-  <div class="flex-1 ml-2">
+  <div class="flex-1 ml-4">
     {#each pemiumOptions as option}
       <div class="mb-4">
         <AudioOption

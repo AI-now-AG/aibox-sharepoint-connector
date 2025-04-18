@@ -24,13 +24,16 @@
 
   const t = useTranslations();
   const lang = getLanguage() ?? "de";
+  let selected: boolean = $state(false);
 
   let backgroundColor = $state("background-color: white;");
   $effect(() => {
     if (selectedAudioOptionIds.includes(id)) {
       backgroundColor = "background-color: #A1E1F8;";
+      selected = true;
     } else {
       backgroundColor = "background-color: white;";
+      selected = false;
     }
   });
 
@@ -46,7 +49,13 @@
     handleSelect();
   }}
 >
-  <h2 class="text-sm font-medium text-[#0F172A] text-left">
+  <input
+    type="checkbox"
+    bind:checked={selected}
+    class="checkbox checkbox-primary w-6]"
+    value="text-prompt"
+  />
+  <h2 class="text-sm font-medium text-[#0F172A] text-left flex-1 px-4">
     {name?.[lang]}
   </h2>
   <p class="text-2xl font-medium text-right text-[#0F172A]">
