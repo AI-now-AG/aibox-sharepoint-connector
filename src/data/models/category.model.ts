@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { db, type Document } from "../mongodb";
+import { db, toObjectId, type Document } from "../mongodb";
 import { z } from "zod";
 
 export const GroupSchema = z.object({
@@ -66,8 +66,7 @@ export default {
   },
 
   removeByTenant: async (tenantId: string | ObjectId) => {
-    const objectId =
-      tenantId instanceof ObjectId ? tenantId : new ObjectId(tenantId);
+    const objectId = toObjectId(tenantId);
     return collection.deleteMany({ tenant_id: objectId });
   },
 
@@ -78,16 +77,14 @@ export default {
       .sort({ created_at: 1 }),
 
   listByTenant: async (tenantId: string | ObjectId) => {
-    const _tenantId =
-      tenantId instanceof ObjectId ? tenantId : new ObjectId(tenantId);
+    const _tenantId = toObjectId(tenantId);
     return collection
       .find<Document<Category>>({ tenant_id: _tenantId })
       .sort({ position: 1, created_at: 1 });
   },
 
   listActiveByTenant: async (tenantId: string | ObjectId) => {
-    const _tenantId =
-      tenantId instanceof ObjectId ? tenantId : new ObjectId(tenantId);
+    const _tenantId = toObjectId(tenantId);
     return collection
       .find<Document<Category>>({ tenant_id: _tenantId, active: true })
       .sort({ position: 1, created_at: 1 });
@@ -134,6 +131,14 @@ export default {
       .sort({ position: -1 })
       .limit(1)
       .next();
+  },
+
+  listByTenantAndIds: async (tenantId: string | ObjectId, ids: ObjectId[]) => {
+    const _tenantId = toObjectId(tenantId);
+    return collection.find<Document<Category>>({
+      tenant_id: _tenantId,
+      category: { $in: ids },
+    });
   },
 
   update: async (id: string, updatedInstruction: Partial<Category>) => {

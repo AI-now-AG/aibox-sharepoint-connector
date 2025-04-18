@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { db, type Document } from "../mongodb";
+import { db, toObjectId, type Document } from "../mongodb";
 import { z } from "zod";
 import {
   TenantFeature,
@@ -99,7 +99,7 @@ export default {
   },
 
   update: async (id: string | ObjectId, update: Partial<Tenant>) => {
-    const objectId = id instanceof ObjectId ? id : new ObjectId(id);
+    const objectId = toObjectId(id);
     const validated = TenantSchema.partial().parse(update);
     const doc = {
       ...validated,
@@ -187,7 +187,7 @@ export default {
     sourceId: string | ObjectId,
     overrides: Partial<Omit<Tenant, "_id">> = {},
   ) => {
-    const id = sourceId instanceof ObjectId ? sourceId : new ObjectId(sourceId);
+    const id = toObjectId(sourceId);
 
     // fetch the original tenant
     const sourceTenant = await collection.findOne({ _id: id });

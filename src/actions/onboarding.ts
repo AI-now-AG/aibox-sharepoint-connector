@@ -48,7 +48,7 @@ const EmailInputParamsSchema = z.object({
 export const user = {
   setupAuth0: defineAction({
     input: Auth0InputParamsSchema,
-    handler: async (input) => {
+    handler: async (input, context) => {
       const { company_name: companyName } = input;
       const name = companyName
         .toLowerCase()
@@ -66,11 +66,21 @@ export const user = {
 
       const organizationId = organizationResult.data.id;
 
-      // enabled connection
+      // enable connection
       await organizationsManagement.addEnabledConnection(
         organizationId,
         import.meta.env.AUTH0_AUTH_CON_ID || "con_RXTD1LIbXJgceOUH",
       );
+
+      // delete current user in trial organization
+      // move current user to new organization
+      await organizationsManagement.deleteMembers(
+        context.locals.tenant.org_id,
+        [context.locals.user.auth0_sub],
+      );
+      await organizationsManagement.addMembers(organizationId, [
+        context.locals.user.auth0_sub,
+      ]);
 
       return transformRawData(organizationResult.data);
     },
@@ -86,8 +96,13 @@ export const user = {
       });
 
       // Find all categories for the original tenant
-      const categoryCursor =
-        await CategoryModel.listActiveByTenant(originalTenantId);
+      const selectedCategoryIds = input.use_cases.map(
+        (item) => new ObjectId(item._id),
+      );
+      const categoryCursor = await CategoryModel.listByTenantAndIds(
+        originalTenantId,
+        selectedCategoryIds,
+      );
       const categories = await categoryCursor.toArray();
 
       // Clone each category and store mapping

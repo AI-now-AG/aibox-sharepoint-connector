@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { db, type Document } from "../mongodb";
+import { db, toObjectId, type Document } from "../mongodb";
 import { z } from "zod";
 
 const KnowledgeBaseSchema = z.object({
@@ -30,8 +30,7 @@ export default {
   },
 
   removeByTenant: async (tenantId: string | ObjectId) => {
-    const objectId =
-      tenantId instanceof ObjectId ? tenantId : new ObjectId(tenantId);
+    const objectId = toObjectId(tenantId);
     return collection.deleteMany({ tenant_id: objectId });
   },
 
