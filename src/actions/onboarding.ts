@@ -49,7 +49,7 @@ const EmailInputParamsSchema = z.object({
 // step 2: setupTenant() - Clone tenant & import categories / prompts
 // step 3: sendEmails()  - Send notification emails
 
-export const user = {
+export const onboarding = {
   setupAuth0: defineAction({
     input: Auth0InputParamsSchema,
     handler: async (input, context) => {
