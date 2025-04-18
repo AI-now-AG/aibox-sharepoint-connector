@@ -409,7 +409,7 @@
   "subscription.choose-your-plan-description": "Choose the plan for your needs, more info see <a href=\"https://ainow.ch/aibox/upgrade-aibox\" target=\"_blank\" class=\"text-[#491EFF] font-bold\">here</a>",
   "subscription.audio-to-text-options": "Audio to Text Options",
   "subscription.per-month": "per month",
-  "subscription.total-price-for-plan": " Total Price for aibox CHF ${total}.- per month",
+  "subscription.total-price-for-plan": "Total Price for aibox CHF ${total}.- per month",
   "subscription.please-select-package": "Please select subcription package",
   "subscription.provide-billing-information": "Provide your billing information",
   "subscription.provide-billing-information-description": "We need this information to send you the invoice",
@@ -426,5 +426,11 @@
   "subscription.billing-email": "Billing email",
   "subscription.billing-email-plcae-holder": "ex: billing@somedia.ch",
   "subscription.credit-card": "Credit card",
-  "subscription.other-payment-method": "Other payment methods will be available soon!"
+  "subscription.other-payment-method": "Other payment methods will be available soon!",
+  "subscription.customize-your-aibox": "Customize your aibox",
+  "subscription.customize-your-aibox-description": "Infos to create your aibox experience",
+  "subscription.orgainzation-name": "Organization name ",
+  "subscription.orgainzation-name-placeholder": "ex: Somedia Schweiz",
+  "subscription.language": "Default language",
+  "subscription.choose-categories": "Chose default use cases for your aibox"
 }

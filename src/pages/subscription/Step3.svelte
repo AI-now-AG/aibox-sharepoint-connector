@@ -1,6 +1,29 @@
 <script lang="ts">
+  import Input from "$components/Input/Input.svelte";
   import { useTranslations } from "$i18n/utils";
+  import SingleInput from "$pages/prompt-library/prompts/SingleInput.svelte";
   const t = useTranslations();
+
+  const languages = [
+    { title: "Deutsch", value: "de" },
+    { title: "English", value: "en" },
+  ];
+  let selectedLanguage: { title: string; value: string } | undefined = $state();
+  let organizationName = $state("");
+
+  const SAMPLE_CATEGORIES = [
+    { title: "Category 1", value: "category1" },
+    { title: "Category 2", value: "category2" },
+    { title: "Category 3", value: "category3" },
+    { title: "Category 4", value: "category4" },
+    { title: "Category 5", value: "category5" },
+    { title: "Category 6", value: "category6" },
+    { title: "Category 7", value: "category7" },
+    { title: "Category 8", value: "category8" },
+    { title: "Category 9", value: "category9" },
+    { title: "Category 10", value: "category10" },
+  ];
+  let selectedCategories: string[] = $state([""]);
 
   function handleNext() {
     // TODO: Handle validate before go to next step
@@ -10,11 +33,75 @@
 
 <div class="max-w-5xl mx-auto">
   <h1 class="font-sanns text-3xl font-bold text-black mt-2">
-    Customize your aibox
+    {t("subscription.customize-your-aibox")}
   </h1>
   <p class="font-sans text-base font-medium text-gray-600 mt-6 mb-10">
-    Infos to create your aibox experience
+    {t("subscription.customize-your-aibox-description")}
   </p>
+
+  <!-- Form -->
+  <div class="w-full mx-auto">
+    <div class="flex flex-row space-x-8">
+      <div class="flex-1 flex flex-col mb-4">
+        <Input
+          id="company-name"
+          label={t("subscription.company-name")}
+          value={organizationName}
+          placeholder={t("subscription.company-name-place-holder")}
+          inputChange={(event: any) => {
+            organizationName = event.value;
+          }}
+          containerClasses="h-[56px] shadow-xl"
+          labelClasses="text-base-content text-sm"
+          classes="text-base"
+        />
+      </div>
+
+      <div class="flex-1 flex flex-col mb-4">
+        <SingleInput
+          title={`${t("subscription.language")}`}
+          placeholder={t("tenant.german-language")}
+          items={languages}
+          bind:selectedItem={selectedLanguage}
+          labelClasses="h-[56px]"
+          titleClasses="mb-3"
+        />
+      </div>
+    </div>
+  </div>
+
+  <br class="mt-10" />
+  <div class="font-sans font-bold text-base mt-10 mb-6">
+    {t("subscription.choose-categories")}
+  </div>
+  <br class="mb-6" />
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 mb-10 text-black">
+    {#each SAMPLE_CATEGORIES as category}
+      {#if selectedCategories.includes(category.value)}
+        <button
+          class="btn btn-primary w-full h-[56px] shadow-xl py-2"
+          onclick={() => {
+            selectedCategories = selectedCategories.filter(
+              (item) => item !== category.value,
+            );
+          }}
+          ><span class="w-full text-left py-2">
+            {category.title}
+          </span></button
+        >
+      {:else}
+        <button
+          class="btn btn-primary w-full h-[56px] shadow-xl bg-white text-gray-600 py-2 border-0"
+          onclick={() => {
+            selectedCategories.push(category.value);
+          }}
+        >
+          <span class="w-full text-left py-2"> {category.title} </span></button
+        >
+      {/if}
+    {/each}
+  </div>
 
   <div class="fixed bottom-4 right-10 w-[33.3%] flex items-center justify-end">
     <button

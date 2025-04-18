@@ -426,5 +426,11 @@
   "subscription.billing-email": "Billing email",
   "subscription.billing-email-plcae-holder": "ex: billing@somedia.ch",
   "subscription.credit-card": "Credit card",
-  "subscription.other-payment-method": "Other payment methods will be available soon!"
+  "subscription.other-payment-method": "Other payment methods will be available soon!",
+  "subscription.customize-your-aibox": "Customize your aibox",
+  "subscription.customize-your-aibox-description": "Infos to create your aibox experience",
+  "subscription.orgainzation-name": "Organization name ",
+  "subscription.orgainzation-name-placeholder": "ex: Somedia Schweiz",
+  "subscription.language": "Default language",
+  "subscription.choose-categories": "Chose default use cases for your aibox"
 }

@@ -8,6 +8,8 @@
     items: Item[];
     selectedItem: Item | undefined;
     displayTop?: boolean;
+    titleClasses?: string;
+    labelClasses?: string;
   }
 
   let {
@@ -16,6 +18,8 @@
     items,
     selectedItem = $bindable(),
     displayTop = false,
+    titleClasses = "",
+    labelClasses = "",
   }: Props = $props();
 
   let inputValue = $state("");
@@ -57,11 +61,14 @@
 </script>
 
 <div>
-  <p class="mb-2">{title}</p>
+  <p class={"mb-2 " + titleClasses}>{title}</p>
   <div
     class={`dropdown ${displayTop ? "dropdown-top" : "dropdown-bottom"} w-full min-w-xs`}
   >
-    <label class="input input-bordered flex items-center gap-2 w-full">
+    <label
+      class={"input input-bordered flex items-center gap-2 w-full " +
+        labelClasses}
+    >
       <input
         type="text"
         {placeholder}
