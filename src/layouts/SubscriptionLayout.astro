@@ -1,5 +1,4 @@
 ---
-const { title } = Astro.props;
 import { svgIcons } from "$assets/icons";
 import SubsciptionSteps from "$components/subscription/SubsciptionSteps.svelte";
 import { SUBSCIPTION_STEP } from "$constants";
@@ -25,14 +24,34 @@ switch (pathname) {
   default:
     currentStep = -1;
 }
+
+const { title, description } = Astro.props;
+
+// TODO: save theme settings in db
+let theme = "light";
+
+switch (Astro.locals.user?.tenant_id?.toString()) {
+  case "66aa21a3d40d0b194e280143":
+    theme = "somedia";
+    break;
+  case "674347ba64f450769a147f6a":
+    theme = "weihnachtsmann";
+    break;
+  default:
+    theme = "light";
+}
 ---
 
 <!doctype html>
-<html lang="en" data-theme="mytheme">
+<html lang="en" data-theme={theme}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
+    <meta name="descrption" content={description} />
+
+    <link rel="icon" href="/favicon.svg" />
+
     <style is:global>
       @import "../styles/global.css";
       html,

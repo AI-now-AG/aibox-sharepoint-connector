@@ -409,5 +409,21 @@
   "subscription.audio-to-text-options": "Audio to Text Options",
   "subscription.per-month": "per month",
   "subscription.total-price-for-plan": " Total Price for aibox CHF ${total}.- per month",
-  "subscription.please-select-package": "Please select subcription package"
+  "subscription.please-select-package": "Please select subcription package",
+  "subscription.provide-billing-information": "Provide your billing information",
+  "subscription.provide-billing-information-description": "We need this information to send you the invoice",
+  "subscription.company-name": "Company Name",
+  "subscription.company-name-place-holder": "ex: Somedia Schweiz",
+  "subscription.street-number": "Street, Nr. ",
+  "subscription.street-number-placeholder": "ex: Reussenstrasse 22",
+  "subscription.zip-code": "ZIP Code",
+  "subscription.zip-code-place-holder": "ex: 8000",
+  "subscription.location": "Location",
+  "subscription.location-place-holder": "ex: Zürich",
+  "subscription.billing-method": "Billing method",
+  "subscription.monthly-invoice-email": "Monthly invoice (e-mail)",
+  "subscription.billing-email": "Billing email",
+  "subscription.billing-email-plcae-holder": "ex: billing@somedia.ch",
+  "subscription.credit-card": "Credit card",
+  "subscription.other-payment-method": "Other payment methods will be available soon!"
 }
