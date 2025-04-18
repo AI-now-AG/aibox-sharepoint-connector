@@ -8,7 +8,15 @@ import CategoryModel, {
   type Group,
 } from "$data/models/category.model";
 import PromptModel, { type Prompt } from "$data/models/prompt.model";
-import { PlanName, AddOnsName } from "$types/Subscription";
+import SubscriptionModel, {
+  type Subscription,
+} from "$data/models/subscription.model";
+import {
+  PlanName,
+  AddOnsName,
+  AddOnsLabels,
+  SubscriptionStatus,
+} from "$types/Subscription";
 import organizationsManagement from "$data/auth0/organizations-manager";
 import sendMail from "$utils/mail";
 import getEnvVar from "$utils/getEnvVar";
@@ -23,18 +31,14 @@ const TenantInputParamsSchema = z.object({
   org_id: z.string().min(1),
   org_name: z.string().min(1),
   plan_name: z.nativeEnum(PlanName).optional(),
-  add_ons: z.nativeEnum(AddOnsName).optional(),
+  add_ons: z.array(z.nativeEnum(AddOnsName)).optional(),
   billing: z.object({
     address: z.string(),
     zip_code: z.string(),
     location: z.string(),
     email: z.string(),
   }),
-  use_cases: z.array(
-    z.object({
-      _id: z.string(),
-    }),
-  ),
+  use_cases: z.array(z.string()),
 });
 const EmailInputParamsSchema = z.object({
   tenant_id: z.string().min(1),
@@ -98,7 +102,7 @@ export const user = {
 
       // Find all categories for the original tenant
       const selectedCategoryIds = input.use_cases.map(
-        (item) => new ObjectId(item._id),
+        (categoryId) => new ObjectId(categoryId),
       );
       const categoryCursor = await CategoryModel.listByTenantAndIds(
         originalTenantId,
@@ -155,6 +159,21 @@ export const user = {
       if (newPrompts.length > 0) {
         await PromptModel.insertMultiple(newPrompts);
       }
+
+      // Create tenant subscription
+      const subAddOns = input.add_ons?.map((name) => {
+        return {
+          name,
+          title: AddOnsLabels[name],
+        };
+      });
+      const subscription: Partial<Omit<Subscription, "_id">> = {
+        tenant_id: newTenant.insertedId,
+        plan_name: input.plan_name,
+        status: SubscriptionStatus.Active,
+        add_ons: subAddOns,
+      };
+      await SubscriptionModel.create(subscription);
 
       const data = {
         tenant: newTenant,

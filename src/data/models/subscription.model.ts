@@ -25,7 +25,7 @@ const SubscriptionSchema = z.object({
     .array(
       z.object({
         name: z.nativeEnum(AddOnsName),
-        title: z.string(),
+        title: z.string().optional(),
       }),
     )
     .optional(),
