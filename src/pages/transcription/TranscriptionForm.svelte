@@ -132,7 +132,10 @@
       //maxFileSize = 25; // this is for testing purpose
     }
 
-    if (category === AudioCategory.SubtitleLarge || category === AudioCategory.Subtitle11Labs) {
+    if (
+      category === AudioCategory.SubtitleLarge ||
+      category === AudioCategory.Subtitle11Labs
+    ) {
       maxFileSize = 50;
     }
 
@@ -982,7 +985,7 @@
             <p class="text-xs text-base-content/40 mt-8">
               {#if category === AudioCategory.AudioPro}
                 {t("transcription.maximum-capacity-1gb")}
-              {:else if (category === AudioCategory.SubtitleLarge || AudioCategory.Subtitle11Labs)}
+              {:else if category === AudioCategory.SubtitleLarge || AudioCategory.Subtitle11Labs}
                 {t("transcription.maximum-capacity-50mb")}
               {:else}
                 {t("transcription.maximum-capacity-25mb")}
