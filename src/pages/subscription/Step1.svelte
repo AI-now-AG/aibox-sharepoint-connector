@@ -4,11 +4,15 @@
   import SubscriptionPackageList from "$components/subscription/SubscriptionPackageList.svelte";
   import { useTranslations } from "$i18n/utils";
   import { SubscriptionPackages } from "$subscription-packages.json";
+  import AlertDialog from "$components/AlertDialog.svelte";
   const t = useTranslations();
 
   let totalPrice: any = $state("");
   let selectedPackageId = $state("");
   let selectedAudioOptionIds: string[] = $state([]);
+
+  let alertModal: HTMLDialogElement | undefined = $state();
+  let alertMessage = $state("");
 
   // Calculate total price (include package and audio options)
   $effect(() => {
@@ -52,9 +56,14 @@
     }
   });
 
+  function showAlert(message: any) {
+    alertMessage = message;
+    alertModal?.show();
+  }
+
   function handleNext() {
     if (!selectedPackageId) {
-      alert(t("subscription.please-select-package"));
+      showAlert(t("subscription.please-select-package"));
       return;
     }
     window.location.href = "/subscription/step2";
@@ -105,3 +114,5 @@
     </button>
   </div>
 </div>
+
+<AlertDialog bind:modal={alertModal} bind:message={alertMessage} />
