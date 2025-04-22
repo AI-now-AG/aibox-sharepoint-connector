@@ -138,7 +138,9 @@
         onHighlighted: (_e, _step) => {
           if (
             _step.element == "#onboardingId1" ||
-            _step.element == "#onboardingId3"
+            _step.element == "#onboardingId3" ||
+            _step.element == "#onboardingId4" ||
+            _step.element == "#onboardingId5"
           ) {
             const computedStyle = _popover
               ? getComputedStyle(_popover)
