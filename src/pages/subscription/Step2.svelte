@@ -50,7 +50,7 @@
           inputChange={(event: any) => {
             companyName = event.value;
           }}
-          containerClasses="h-[56px] shadow-xl"
+          containerClasses="h-[56px] shadow-lg"
           labelClasses="text-base-content text-sm"
           classes="text-base"
         />
@@ -65,7 +65,7 @@
           inputChange={(event: any) => {
             street = event.value;
           }}
-          containerClasses="h-[56px] shadow-xl"
+          containerClasses="h-[56px] shadow-lg"
           labelClasses="text-base-content text-sm"
           classes="text-base"
         />
@@ -84,7 +84,7 @@
           inputChange={(event: any) => {
             zipCode = event.value;
           }}
-          containerClasses="h-[56px] shadow-xl"
+          containerClasses="h-[56px] shadow-lg"
           labelClasses="text-base-content text-sm"
           classes="text-base"
         />
@@ -99,7 +99,7 @@
           inputChange={(event: any) => {
             location = event.value;
           }}
-          containerClasses="h-[56px] shadow-xl"
+          containerClasses="h-[56px] shadow-lg"
           labelClasses="text-base-content text-sm"
           classes="text-base"
         />
@@ -116,7 +116,7 @@
     >
       <div class="flex-1 flex flex-col mb-4">
         <button
-          class="bg-white shadow-xl rounded-lg flex justify-between items-center px-6 py-4 w-full mt-9"
+          class="bg-white shadow-md rounded-lg flex justify-between items-center px-6 py-4 w-full mt-9"
           onclick={() => {}}
         >
           <input
@@ -141,7 +141,7 @@
           inputChange={(event: any) => {
             billingEmail = event.value;
           }}
-          containerClasses="h-[56px] shadow-xl"
+          containerClasses="h-[56px] shadow-md"
           labelClasses="text-base-content text-sm"
           classes="text-base"
         />
@@ -153,7 +153,7 @@
     >
       <div class="flex-1 flex flex-col mb-4">
         <button
-          class="bg-white shadow-xl rounded-lg flex justify-between items-center px-6 py-4 w-full"
+          class="bg-gray-200 rounded-lg flex justify-between items-center px-6 py-4 w-full"
           onclick={() => {}}
         >
           <input
