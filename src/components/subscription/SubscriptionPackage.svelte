@@ -69,7 +69,7 @@
         <span class="mr-3">
           {@html svgIcons.checkMark}
         </span>
-        <span>
+        <span class="text-left">
           {@html feaure}
         </span>
       </li>
