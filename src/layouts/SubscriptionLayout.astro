@@ -70,11 +70,11 @@ switch (Astro.locals.user?.tenant_id?.toString()) {
       >
         <img src="/sidebar_background.png" class="w-full" />
       </div>
-      <div class="w-auto self-start ml-4 mt-2">
+      <div class="w-auto self-start ml-4 mt-2 fixed z-[2]">
         <span set:html={svgIcons.logo} />
       </div>
 
-      <div class="flex flex-1 justify-center z-[2]">
+      <div class="flex flex-1 justify-center mt-10 fixed z-[2]">
         {
           currentStep !== -1 && (
             <div class="p-6">
