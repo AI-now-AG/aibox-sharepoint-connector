@@ -111,7 +111,14 @@
     margin: 0 !important;
     border: none !important;
     background-color: transparent !important;
+  }
+
+  :global(.steps .steps-horizontal .step) {
     text-align: left !important;
+  }
+
+  :global(.steps .steps-vertical .step) {
+    text-align: center !important;
   }
 
   :global(.steps .step:before) {
