@@ -17,6 +17,7 @@ import {
   AddOnsLabels,
   SubscriptionStatus,
 } from "$types/Subscription";
+import { AudioCategory } from "$types/TenantFeature";
 import organizationsManagement from "$data/auth0/organizations-manager";
 import sendMail from "$utils/mail";
 import { isProd } from "$utils/env";
@@ -48,6 +49,33 @@ const EmailInputParamsSchema = z.object({
   tenant_id: z.string().min(1),
   email: z.string().min(1),
 });
+
+const getTranscriptionTypes = (selectedAddOns: AddOnsName[]) => {
+  let transcriptionTypes = [];
+
+  // Audio Basis + Add-ons
+  if (selectedAddOns?.includes(AddOnsName.AudioBasis)) {
+    transcriptionTypes.push(AudioCategory.AudioToText);
+  }
+  if (selectedAddOns?.includes(AddOnsName.AudioSubtitles)) {
+    transcriptionTypes.push(AudioCategory.Subtitle);
+  }
+  if (selectedAddOns?.includes(AddOnsName.AudioXL)) {
+    transcriptionTypes.push(AudioCategory.SubtitleLarge);
+  }
+
+  // Audio Premium
+  if (selectedAddOns?.includes(AddOnsName.AudioPremium)) {
+    transcriptionTypes = [
+      AudioCategory.AudioToText,
+      AudioCategory.Subtitle,
+      AudioCategory.AudioPro,
+      AudioCategory.SubtitleLarge,
+    ];
+  }
+
+  return transcriptionTypes;
+};
 
 // step 1: setupAuth0()  - Create Auth0 org + move user from old org to new org
 // step 2: setupTenant() - Clone tenant & import categories / prompts
@@ -97,11 +125,13 @@ export const onboarding = {
     input: TenantInputParamsSchema,
     handler: async (input) => {
       // Clone the tenant
+      const transcriptionTypes = getTranscriptionTypes(input.add_ons ?? []);
       const newTenant = await TenantModel.copyTenant(originalTenantId, {
         name: input.name,
         org_id: input.org_id,
         org_name: input.org_name,
         billing_info: input.billing,
+        transcription_types: transcriptionTypes,
       });
 
       // Find all categories for the original tenant
