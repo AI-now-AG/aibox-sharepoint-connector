@@ -3,10 +3,19 @@
   import { useTranslations } from "$i18n/utils";
 
   interface Props {
+    orientation?: "horizontal" | "vertical";
     currentStep?: number;
   }
 
-  let { currentStep = $bindable(0) }: Props = $props();
+  let { currentStep = $bindable(0), orientation = "horizontal" }: Props =
+    $props();
+
+  let cssClasses = $state(
+    orientation === "horizontal"
+      ? "steps steps-horizontal text-gray-400 text-sm font-sans font-semibold"
+      : "steps steps-vertical text-gray-400 text-sm font-sans font-semibold",
+  );
+
   const t = useTranslations();
   const step1Text = t("subscription.step1");
   const step2Text = t("subscription.step2");
@@ -14,7 +23,7 @@
   const step4Text = t("subscription.step4");
 </script>
 
-<ul class="steps steps-vertical text-gray-400 text-sm font-sans font-semibold">
+<ul class={cssClasses}>
   {#if currentStep === SUBSCIPTION_STEP.Step0}
     <li class="step">
       {step1Text}

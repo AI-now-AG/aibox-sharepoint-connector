@@ -78,8 +78,8 @@
   }
 </script>
 
-<div class="flex">
-  <div class="flex-1 mr-4">
+<div class="block sm:block md:flex lg:flex">
+  <div class="flex-1 mr-0 md:mr-4 lg:mr-4">
     {#each basicOptions as option}
       <div class="mb-4">
         <AudioOption
@@ -96,7 +96,7 @@
       </div>
     {/each}
   </div>
-  <div class="flex-1 ml-4">
+  <div class="flex-1 ml-0 md:ml-4 lg:ml-4">
     {#each pemiumOptions as option}
       <div class="mb-4">
         <AudioOption

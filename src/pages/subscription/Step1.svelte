@@ -1,5 +1,6 @@
 <script lang="ts">
   import AudioOptionList from "$components/subscription/AudioOptionList.svelte";
+  import SubsciptionSteps from "$components/subscription/SubsciptionSteps.svelte";
   import SubscriptionPackageList from "$components/subscription/SubscriptionPackageList.svelte";
   import { useTranslations } from "$i18n/utils";
   import { SubscriptionPackages } from "$subscription-packages.json";
@@ -61,6 +62,11 @@
 </script>
 
 <div class="max-w-5xl mx-auto">
+  <div
+    class="bg-[#491EFF] p-4 rounded-lg mb-6 flex md:hidden lg:hidden items-center justify-center"
+  >
+    <SubsciptionSteps currentStep={1} />
+  </div>
   <!-- Pakage Plan -->
   <h1 class="font-sanns text-3xl font-bold text-black mt-2">
     {t("subscription.choose-your-plan")}
@@ -68,7 +74,9 @@
   <p class="font-sans text-base font-medium text-gray-600 mt-6 mb-10">
     {@html t("subscription.choose-your-plan-description")}
   </p>
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 text-black">
+  <div
+    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10 text-black"
+  >
     <SubscriptionPackageList bind:selectedPackageId />
   </div>
 

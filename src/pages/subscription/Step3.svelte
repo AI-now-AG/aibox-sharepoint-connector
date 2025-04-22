@@ -1,5 +1,6 @@
 <script lang="ts">
   import Input from "$components/Input/Input.svelte";
+  import SubsciptionSteps from "$components/subscription/SubsciptionSteps.svelte";
   import { useTranslations } from "$i18n/utils";
   import SingleInput from "$pages/prompt-library/prompts/SingleInput.svelte";
   const t = useTranslations();
@@ -32,6 +33,12 @@
 </script>
 
 <div class="max-w-5xl mx-auto">
+  <div
+    class="bg-[#491EFF] p-4 rounded-lg mb-6 flex md:hidden lg:hidden items-center justify-center"
+  >
+    <SubsciptionSteps currentStep={3} />
+  </div>
+
   <h1 class="font-sanns text-3xl font-bold text-black mt-2">
     {t("subscription.customize-your-aibox")}
   </h1>
