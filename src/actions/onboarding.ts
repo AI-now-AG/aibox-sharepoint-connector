@@ -2,6 +2,7 @@ import { defineAction } from "astro:actions";
 import { z } from "zod";
 import { ObjectId } from "mongodb";
 import { transformRawData } from "$utils/transformRawData";
+import UserModel from "$data/models/user.model";
 import TenantModel from "$data/models/tenant.model";
 import CategoryModel, {
   type Category,
@@ -123,7 +124,7 @@ export const onboarding = {
   }),
   setupTenant: defineAction({
     input: TenantInputParamsSchema,
-    handler: async (input) => {
+    handler: async (input, context) => {
       // Clone the tenant
       const transcriptionTypes = getTranscriptionTypes(input.add_ons ?? []);
       const newTenant = await TenantModel.copyTenant(originalTenantId, {
@@ -132,6 +133,11 @@ export const onboarding = {
         org_name: input.org_name,
         billing_info: input.billing,
         transcription_types: transcriptionTypes,
+      });
+
+      // Update the current tenant for the logged-in user
+      await UserModel.update(context.locals.user.id, {
+        tenant_id: new ObjectId(input.org_id),
       });
 
       // Find all categories for the original tenant
