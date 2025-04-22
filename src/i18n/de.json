@@ -395,12 +395,12 @@
   "home.new-chat": "Neuer Chat",
   "tenant.settings.private-api-key": "Privater API Key",
   "nav.text-prompts": "TEXT ASSISTENT",
-  "tenant.subtitle-elevenLabs": " Subtitle Virtuoso ",
-  "tenant.validate-elevenLabs-key": "Please input ElevenLabs key",
-  "settings.transcription.elevenLabs-audio-tag": "Enable Audio tag",
+  "tenant.subtitle-elevenLabs": "Subtitle Virtuoso ",
+  "tenant.validate-elevenLabs-key": "Bitte ElevenLabs-Schlüssel eingeben",
+  "settings.transcription.elevenLabs-audio-tag": "Audio Events anzeigen (z. B. \"Musik spielt\")",
   "tenant.subtitle-elevenLabs.title": "ElevenLabs",
-  "common.next": "Next",
-  "subscription.select": "Select",
+  "common.next": "Weiter",
+  "subscription.select": "Auswählen",
   "subscription.step1": "Choose your plan",
   "subscription.step2": "Provide your billing data",
   "subscription.step3": "Customize your aibox",
@@ -432,5 +432,6 @@
   "subscription.orgainzation-name": "Organization name ",
   "subscription.orgainzation-name-placeholder": "ex: Somedia Schweiz",
   "subscription.language": "Default language",
-  "subscription.choose-categories": "Chose default use cases for your aibox"
+  "subscription.choose-categories": "Chose default use cases for your aibox",
+  "subscription.creating-your-account": "We are creating your account..."
 }
