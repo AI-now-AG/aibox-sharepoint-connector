@@ -1,7 +1,11 @@
 ---
+import { useTranslations } from "$i18n/utils";
 import SubscriptionLayout from "$layouts/SubscriptionLayout.astro";
+import StepComponent from "./Complete.svelte";
+
+const t = useTranslations();
 ---
 
-<SubscriptionLayout title="Choose Your Plan">
-  <div class="max-w-5xl mx-auto"></div>
+<SubscriptionLayout title={t("subscription.congratulations-desciption")}>
+  <StepComponent client:load />
 </SubscriptionLayout>

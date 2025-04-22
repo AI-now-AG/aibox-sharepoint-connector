@@ -433,5 +433,8 @@
   "subscription.orgainzation-name-placeholder": "ex: Somedia Schweiz",
   "subscription.language": "Default language",
   "subscription.choose-categories": "Chose default use cases for your aibox",
-  "subscription.creating-your-account": "We are creating your account..."
+  "subscription.creating-your-account": "We are creating your account...",
+  "subscription.congratulations": "Congratulations!",
+  "subscription.congratulations-desciption": "You have completed onboarding, you can start using aibox now.",
+  "subscription.cool-lets-start": "Cool, lets start"
 }
