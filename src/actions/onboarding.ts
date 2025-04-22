@@ -19,10 +19,14 @@ import {
 } from "$types/Subscription";
 import organizationsManagement from "$data/auth0/organizations-manager";
 import sendMail from "$utils/mail";
-import getEnvVar from "$utils/getEnvVar";
-import { SG_ONBOARDING_TEMPLATE } from "$constants";
+import { isProd } from "$utils/env";
+import {
+  TENANT_MASTER_DEV,
+  TENANT_MASTER_PROD,
+  SG_ONBOARDING_TEMPLATE,
+} from "$constants";
 
-const originalTenantId = "67ff572260fa2a8bca5d26d0";
+const originalTenantId = isProd() ? TENANT_MASTER_PROD : TENANT_MASTER_DEV;
 const Auth0InputParamsSchema = z.object({
   company_name: z.string().min(1),
 });
@@ -193,8 +197,7 @@ export const onboarding = {
       }
 
       // send notification email to aibox-support
-      const env = getEnvVar("NODE_ENV") || "development";
-      const subjectPrefix = env == "production" ? "aibox" : "aibox-dev";
+      const subjectPrefix = isProd() ? "aibox" : "aibox-dev";
       const emailSubject = `${subjectPrefix} - New onboarding`;
       const emailContent = `
         <div style="font-family: Arial, sans-serif; padding: 20px;">

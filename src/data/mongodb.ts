@@ -1,5 +1,5 @@
 import { MongoClient, ObjectId } from "mongodb";
-import getEnvVar from "$utils/getEnvVar";
+import { getEnvVar } from "$utils/env";
 
 const url = getEnvVar("MONGODB_URI");
 const dbName = getEnvVar("MONGODB_DATABASE");
