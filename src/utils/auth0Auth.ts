@@ -1,7 +1,7 @@
 import { authenticationClient, managementClient } from "$data/auth0/client";
 import { SG_VERIFICATION_TEMPLATE, SG_WELCOME_TEMPLATE } from "$constants";
 import sendMail from "$utils/mail";
-import getEnvVar from "$utils/getEnvVar";
+import { getEnvVar } from "$utils/env";
 
 const getAccessToken = async () => {
   const AUTH0_TENANT = getEnvVar("AUTH0_TENANT");

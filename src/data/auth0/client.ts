@@ -1,5 +1,5 @@
 import { AuthenticationClient, ManagementClient } from "auth0";
-import getEnvVar from "$utils/getEnvVar";
+import { getEnvVar } from "$utils/env";
 
 const tenant = getEnvVar("AUTH0_TENANT");
 const clientId = getEnvVar("AUTH0_MNGT_CLIENT_ID");
