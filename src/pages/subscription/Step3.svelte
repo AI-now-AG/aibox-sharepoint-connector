@@ -48,7 +48,9 @@
 
   <!-- Form -->
   <div class="w-full mx-auto">
-    <div class="flex flex-row space-x-8">
+    <div
+      class="block md:flex lg:flex flex-row md:space-x-8 space-x-0 lg:space-x-8"
+    >
       <div class="flex-1 flex flex-col mb-4">
         <Input
           id="company-name"

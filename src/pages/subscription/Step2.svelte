@@ -38,7 +38,9 @@
 
   <!-- Form -->
   <div class="w-full mx-auto">
-    <div class="flex flex-row space-x-8">
+    <div
+      class="block md:flex lg:flex flex-row md:space-x-8 space-x-0 lg:space-x-8"
+    >
       <div class="flex-1 flex flex-col mb-4">
         <Input
           id="company-name"
@@ -70,7 +72,9 @@
       </div>
     </div>
 
-    <div class="flex flex-row space-x-8">
+    <div
+      class="block md:flex lg:flex flex-row md:space-x-8 space-x-0 lg:space-x-8"
+    >
       <div class="flex-1 flex flex-col mb-4">
         <Input
           id="zip-code"
@@ -107,7 +111,9 @@
       {t("subscription.billing-method")}
     </p>
 
-    <div class="flex flex-row space-x-8">
+    <div
+      class="block md:flex lg:flex flex-row md:space-x-8 space-x-0 lg:space-x-8"
+    >
       <div class="flex-1 flex flex-col mb-4">
         <button
           class="bg-white shadow-xl rounded-lg flex justify-between items-center px-6 py-4 w-full mt-9"
@@ -142,7 +148,9 @@
       </div>
     </div>
 
-    <div class="flex flex-row space-x-8">
+    <div
+      class="block md:flex lg:flex flex-row md:space-x-8 space-x-0 lg:space-x-8"
+    >
       <div class="flex-1 flex flex-col mb-4">
         <button
           class="bg-white shadow-xl rounded-lg flex justify-between items-center px-6 py-4 w-full"
@@ -163,7 +171,9 @@
 
       <div class="flex-1 flex flex-col mb-4"></div>
     </div>
-    <div class="flex flex-row space-x-8">
+    <div
+      class="block md:flex lg:flex flex-row md:space-x-8 space-x-0 lg:space-x-8"
+    >
       <div class="flex-1 flex flex-col mb-4">
         <div class="rounded-lg bg-[#00B3F059] px-6 py-[12px]">
           {t("subscription.other-payment-method")}
