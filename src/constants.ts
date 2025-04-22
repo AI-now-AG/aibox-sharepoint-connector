@@ -34,21 +34,8 @@ export const SUPER_ADMIN_ROUTES = [
   "/usage",
 ];
 
-// export const FEATURE_PLAINTEXT_ROUTE = "/transcription/plaintext";
-// export const FEATURE_SUBTITLES_ROUTE = "/transcription/subtitles";
-// export const FEATURE_SUBTITLESJSON_ROUTE = "/transcription/subtitlesjson";
-// export const FEATURE_SUMMARY_ROUTE = "/transcription/summary";
-// export const FEATURE_LARGEFILE_ROUTE = "/transcription/largefile";
-
 export const FEATURE_MAP_ROUTES = {
-  "audio-to-text": [
-    "/transcription",
-    // FEATURE_PLAINTEXT_ROUTE,
-    // FEATURE_SUBTITLES_ROUTE,
-    // FEATURE_SUMMARY_ROUTE,
-    // FEATURE_LARGEFILE_ROUTE,
-    "/settings/transcription",
-  ],
+  "audio-to-text": ["/transcription", "/settings/transcription"],
 };
 
 // Auth0
@@ -64,6 +51,10 @@ export const AUTH_AUTHORIZE_SCOPES = [
 export const SG_VERIFICATION_TEMPLATE = "d-69ed72334042458783f985ada5dbe61d";
 export const SG_WELCOME_TEMPLATE = "d-79e6332e21d14ff792ba9d995127abb7";
 export const SG_ONBOARDING_TEMPLATE = "d-79e6332e21d14ff792ba9d995127abb7";
+
+// Tenants
+export const TENANT_MASTER_DEV = "67ff572260fa2a8bca5d26d0"; // aibox dev master
+export const TENANT_MASTER_PROD = "67c869198b14a3bbaa6ba611"; // aibox Trial
 
 export const SUBSCIPTION_STEP = {
   Step0: 0,
