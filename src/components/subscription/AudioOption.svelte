@@ -11,6 +11,7 @@
     currency?: string;
     onSelect?: Function;
     selectedAudioOptionIds?: string[];
+    disabled?: boolean;
   }
 
   let {
@@ -20,6 +21,7 @@
     currency,
     onSelect,
     selectedAudioOptionIds = $bindable([]),
+    disabled = false,
   }: Props = $props();
 
   const t = useTranslations();
@@ -48,12 +50,14 @@
   onclick={() => {
     handleSelect();
   }}
+  {disabled}
 >
   <input
     type="checkbox"
     bind:checked={selected}
     class="checkbox checkbox-primary w-6]"
     value="text-prompt"
+    {disabled}
   />
   <h2 class="text-sm font-medium text-[#0F172A] text-left flex-1 px-4">
     {name?.[lang]}

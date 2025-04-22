@@ -83,7 +83,7 @@
     <AudioOptionList bind:selectedAudioOptionIds />
   </div>
 
-  <div class="fixed bottom-4 right-10 w-[33.3%] flex items-center justify-end">
+  <div class="w-full flex items-center justify-end rounded-lg p-4">
     <p class="text-gray-600 text-right mr-4 font-bold font-inter text-sm">
       {t("subscription.total-price-for-plan", { total: totalPrice })}
     </p>

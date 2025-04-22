@@ -168,7 +168,7 @@
   </div>
 
   <!-- Next -->
-  <div class="fixed bottom-4 right-10 w-[33.3%] flex items-center justify-end">
+  <div class="w-full flex items-center justify-end rounded-lg p-4">
     <button
       class="btn btn-active btn-primary min-w-[144px]"
       onclick={() => {

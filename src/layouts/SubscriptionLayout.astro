@@ -63,12 +63,12 @@ switch (Astro.locals.user?.tenant_id?.toString()) {
   <body class="flex min-h-screen">
     <!-- Left Sidebar -->
     <aside
-      class="flex-1 bg-[#491EFF] text-white flex flex-col items-center relative"
+      class="w-[360px] bg-[#491EFF] text-white flex flex-col items-center relative"
     >
       <div
         class="w-full h-auto flex justify-center items-center absolute top-[60px] left-0 z-[1]"
       >
-        <img src="/sidebar_background.png" />
+        <img src="/sidebar_background.png" class="w-full" />
       </div>
       <div class="w-auto self-start ml-4 mt-2">
         <span set:html={svgIcons.logo} />
@@ -86,7 +86,7 @@ switch (Astro.locals.user?.tenant_id?.toString()) {
     </aside>
 
     <!-- Right Content Section -->
-    <main class="flex-3 p-8">
+    <main class="flex-1 p-8">
       <slot />
     </main>
   </body>
