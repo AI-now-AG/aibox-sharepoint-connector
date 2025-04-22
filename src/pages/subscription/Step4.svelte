@@ -7,14 +7,15 @@
 
   function handleSubscription() {
     // TODO: Devlin - integrate API to create subscription
-    // Simulate a delay of 2 seconds
+    // Simulate successful subscription creation
     setTimeout(() => {
-      // Redirect to the next step after the delay
       window.location.href = "/subscription/complete";
     }, 2000);
   }
 
-  onMount(() => {handleSubscription()});
+  onMount(() => {
+    handleSubscription();
+  });
 </script>
 
 <div
