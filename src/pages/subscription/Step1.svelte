@@ -5,6 +5,12 @@
   import { useTranslations } from "$i18n/utils";
   import { SubscriptionPackages } from "$subscription-packages.json";
   import AlertDialog from "$components/AlertDialog.svelte";
+  import {
+    aiboxsubscription,
+    storePlan,
+    type SubscriptionPackageId,
+    type SubscriptionPlan,
+  } from "$stores/subscription";
   const t = useTranslations();
 
   let totalPrice: any = $state("");
@@ -45,11 +51,20 @@
 
     totalPrice = packagePrice + audioOptionsTotlaPrice;
   });
-
+  $inspect($aiboxsubscription);
   // Store subscription data into storage
   $effect(() => {
     if (selectedPackageId) {
       // TODO: Store selected package data into storage
+      let selectedPackage: SubscriptionPlan = {
+        ...SubscriptionPackages.plan[
+          selectedPackageId as keyof typeof SubscriptionPackages.plan
+        ],
+        id: selectedPackageId as SubscriptionPackageId,
+      };
+      if (selectedPackage) {
+        storePlan(selectedPackage);
+      }
     }
     if (selectedAudioOptionIds?.length > 0) {
       // TODO: Store selected audio options data into storage

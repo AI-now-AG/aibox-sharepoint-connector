@@ -37,7 +37,7 @@ interface SubscriptionPlan {
   description: MultilingualText;
   price: number;
   currency: string;
-  priceText: string;
+  priceText?: string;
   features: PlanFeatures;
 }
 
@@ -47,7 +47,7 @@ interface AudioOption {
   name: MultilingualText;
   price: number;
   currency: string;
-  priceText: string;
+  priceText?: string;
 }
 
 interface BillingInformation {
@@ -87,14 +87,19 @@ export type {
 
 export const aiboxsubscription = writable<AiboxSubscription>({});
 
-export const storePlan = (
-  plan: SubscriptionPlan,
-  audioOptions?: AudioOption,
-) => {
+export const storePlan = (plan: SubscriptionPlan) => {
   aiboxsubscription.update((origin: AiboxSubscription) => {
     return {
       ...origin,
       plan,
+    };
+  });
+};
+
+export const storeAudioOptions = (audioOptions?: AudioOption) => {
+  aiboxsubscription.update((origin: AiboxSubscription) => {
+    return {
+      ...origin,
       audioOptions: audioOptions ?? undefined,
     };
   });
@@ -119,5 +124,11 @@ export const storeOrganizationInformation = (
       ...origin,
       organizationInformation: organizationInformation,
     };
+  });
+};
+
+export const reset = () => {
+  aiboxsubscription.update(() => {
+    return {};
   });
 };
