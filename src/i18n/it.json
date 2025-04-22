@@ -436,5 +436,7 @@
   "subscription.creating-your-account": "We are creating your account...",
   "subscription.congratulations": "Congratulations!",
   "subscription.congratulations-desciption": "You have completed onboarding, you can start using aibox now.",
-  "subscription.cool-lets-start": "Cool, lets start"
+  "subscription.cool-lets-start": "Cool, lets start",
+  "onboarding.step-5.title": "Manage your aibox",
+  "onboarding.step-5.description": "Now you can manage your prompts, change navigation or setup your own knowledgbase.<br/><br/>Add more users directly here."
 }
