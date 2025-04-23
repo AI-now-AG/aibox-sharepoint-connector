@@ -9,10 +9,9 @@
     storeAudioOptions,
     storePlan,
     type AudioOption,
-    type AudioOptionId,
-    type SubscriptionPackageId,
     type SubscriptionPlan,
   } from "$stores/subscription";
+
   const t = useTranslations();
 
   let totalPrice: any = $state("");
@@ -69,7 +68,7 @@
       ...SubscriptionPackages.plan[
         selectedPackageId as keyof typeof SubscriptionPackages.plan
       ],
-      id: selectedPackageId as SubscriptionPackageId,
+      id: selectedPackageId,
     };
     if (selectedPackage) {
       storePlan(selectedPackage);
@@ -83,7 +82,7 @@
           ...SubscriptionPackages.audioOptions[
             id as keyof typeof SubscriptionPackages.audioOptions
           ],
-          id: selectedPackageId as AudioOptionId,
+          id: id,
         };
         if (selectedOption) {
           selectedAudioOptions.push(selectedOption);

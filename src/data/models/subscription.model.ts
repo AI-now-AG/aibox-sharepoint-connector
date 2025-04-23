@@ -1,12 +1,12 @@
 import { ObjectId } from "mongodb";
 import { db, toObjectId } from "../mongodb";
-import { SubscriptionStatus, PlanName, AddOnsName } from "$types/Subscription";
+import { SubscriptionStatus, SubscriptionPackageId, AudioOptionId } from "$types/Subscription";
 import { z } from "zod";
 
 const SubscriptionSchema = z.object({
   _id: z.instanceof(ObjectId),
   tenant_id: z.instanceof(ObjectId).optional(),
-  plan_name: z.nativeEnum(PlanName).optional(),
+  plan_name: z.nativeEnum(SubscriptionPackageId).optional(),
   status: z.nativeEnum(SubscriptionStatus).optional(),
   start_date: z
     .date()
@@ -24,7 +24,7 @@ const SubscriptionSchema = z.object({
   add_ons: z
     .array(
       z.object({
-        name: z.nativeEnum(AddOnsName),
+        name: z.nativeEnum(AudioOptionId),
         title: z.string().optional(),
       }),
     )

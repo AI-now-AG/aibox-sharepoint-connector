@@ -13,8 +13,8 @@ import SubscriptionModel, {
   type Subscription,
 } from "$data/models/subscription.model";
 import {
-  PlanName,
-  AddOnsName,
+  SubscriptionPackageId,
+  AudioOptionId,
   AddOnsLabels,
   SubscriptionStatus,
 } from "$types/Subscription";
@@ -36,8 +36,8 @@ const TenantInputParamsSchema = z.object({
   name: z.string().min(1),
   org_id: z.string().min(1),
   org_name: z.string().min(1),
-  plan_name: z.nativeEnum(PlanName).optional(),
-  add_ons: z.array(z.nativeEnum(AddOnsName)).optional(),
+  plan_name: z.nativeEnum(SubscriptionPackageId).optional(),
+  add_ons: z.array(z.nativeEnum(AudioOptionId)).optional(),
   billing: z.object({
     address: z.string(),
     zip_code: z.string(),
@@ -51,22 +51,22 @@ const EmailInputParamsSchema = z.object({
   email: z.string().min(1),
 });
 
-const getTranscriptionTypes = (selectedAddOns: AddOnsName[]) => {
+const getTranscriptionTypes = (selectedAddOns: AudioOptionId[]) => {
   let transcriptionTypes = [];
 
   // Audio Basis + Add-ons
-  if (selectedAddOns?.includes(AddOnsName.AudioBasis)) {
+  if (selectedAddOns?.includes(AudioOptionId.AudioBasis)) {
     transcriptionTypes.push(AudioCategory.AudioToText);
   }
-  if (selectedAddOns?.includes(AddOnsName.AudioSubtitles)) {
+  if (selectedAddOns?.includes(AudioOptionId.AudioBasisAddOnSubtitle)) {
     transcriptionTypes.push(AudioCategory.Subtitle);
   }
-  if (selectedAddOns?.includes(AddOnsName.AudioXL)) {
+  if (selectedAddOns?.includes(AudioOptionId.AudioBasisAddOnLarge)) {
     transcriptionTypes.push(AudioCategory.SubtitleLarge);
   }
 
   // Audio Premium
-  if (selectedAddOns?.includes(AddOnsName.AudioPremium)) {
+  if (selectedAddOns?.includes(AudioOptionId.AudioPremium)) {
     transcriptionTypes = [
       AudioCategory.AudioToText,
       AudioCategory.Subtitle,

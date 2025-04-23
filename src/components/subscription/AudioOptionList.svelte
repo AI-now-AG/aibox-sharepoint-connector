@@ -1,8 +1,6 @@
 <script lang="ts">
-  import {
-    AudioOptionId,
-    SubscriptionPackages,
-  } from "$subscription-packages.json";
+  import { SubscriptionPackages } from "$subscription-packages.json";
+  import { AudioOptionId } from "$types/Subscription";
   import AudioOption from "./AudioOption.svelte";
 
   const basicOptions = [
@@ -41,7 +39,7 @@
               AudioOptionId.AudioBasis,
               AudioOptionId.AudioBasisAddOnSubtitle,
               AudioOptionId.AudioBasisAddOnLarge,
-            ].includes(optionId),
+            ].includes(optionId as AudioOptionId),
         );
       } else {
         // If AudioBasis is being selected, remove AudioPremium if present
@@ -60,7 +58,7 @@
       [
         AudioOptionId.AudioBasisAddOnSubtitle,
         AudioOptionId.AudioBasisAddOnLarge,
-      ].includes(id)
+      ].includes(id as AudioOptionId)
     ) {
       // Only allow selection if AudioBasis is selected
       if (selectedAudioOptionIds.includes(AudioOptionId.AudioBasis)) {

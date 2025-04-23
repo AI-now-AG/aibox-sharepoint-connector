@@ -1,16 +1,4 @@
 import { writable } from "svelte/store";
-enum SubscriptionPackageId {
-  Starter = "Starter",
-  Teams = "Teams",
-  Pro = "Pro",
-}
-
-enum AudioOptionId {
-  AudioPremium = "AudioPremium",
-  AudioBasis = "AudioBasis",
-  AudioBasisAddOnSubtitle = "AudioBasisAddOnSubtitle",
-  AudioBasisAddOnLarge = "AudioBasisAddOnLarge",
-}
 
 // Common interfaces for multilingual fields
 interface MultilingualText {
@@ -32,7 +20,7 @@ interface PlanFeatures {
 
 // Interface for individual subscription plan
 interface SubscriptionPlan {
-  id: SubscriptionPackageId;
+  id: string;
   name: MultilingualText;
   description: MultilingualText;
   price: number;
@@ -43,7 +31,7 @@ interface SubscriptionPlan {
 
 // Interface for individual audio option
 interface AudioOption {
-  id: AudioOptionId;
+  id: string;
   name: MultilingualText;
   price: number;
   currency: string;
@@ -76,8 +64,6 @@ export type {
   AiboxSubscription,
   SubscriptionPlan,
   AudioOption,
-  SubscriptionPackageId,
-  AudioOptionId,
   MultilingualText,
   Pricing,
   PlanFeatures,
