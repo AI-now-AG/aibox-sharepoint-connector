@@ -5,7 +5,7 @@ import UserModel, { assignPermissions } from "$data/models/user.model";
 import { z } from "zod";
 import log from "$utils/log";
 import TenantModel from "$data/models/tenant.model";
-import { UserRole } from "$enums/Users";
+import { UserRole } from "$types/Users";
 import { AUTH0_SESSION_STATE } from "$constants";
 
 const Auth0JWTSchema = z.object({

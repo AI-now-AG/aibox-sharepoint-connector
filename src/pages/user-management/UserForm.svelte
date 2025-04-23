@@ -12,7 +12,7 @@
   import moment from "moment";
   import Input from "$components/Input/Input.svelte";
   import { isEnterpriseConnection, isValidEmail } from "$utils/common";
-  import { UserRole } from "$enums/Users";
+  import { UserRole } from "$types/Users";
 
   const t = useTranslations();
   let loading = $state(false);

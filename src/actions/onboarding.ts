@@ -266,7 +266,9 @@ export const onboarding = {
         dynamicTemplateData: {},
       });
 
-      return transformRawData({});
+      return transformRawData({
+        success: true,
+      });
     },
   }),
 };

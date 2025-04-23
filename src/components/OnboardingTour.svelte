@@ -5,7 +5,7 @@
   import "driver.js/dist/driver.css";
 
   import { useTranslations } from "$i18n/utils";
-  import { TourType } from "$enums/Users";
+  import { TourType } from "$types/Users";
   import { isOnboarding } from "$stores";
 
   const t = useTranslations();

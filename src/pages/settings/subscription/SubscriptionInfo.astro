@@ -1,0 +1,75 @@
+---
+import { PlanName, AddOnsName } from "$types/Subscription";
+import SubscriptionModel from "$data/models/subscription.model";
+
+const { tenant } = Astro.locals;
+const subscription = await SubscriptionModel.findActiveByTenant(tenant._id);
+const planName = subscription?.plan_name ?? PlanName.Starter;
+const addOns = subscription?.add_ons?.map(
+  (addOn: { name: AddOnsName }) => addOn.name
+);
+---
+
+<div role="alert" class="alert alert-info">
+  <span
+    >Please <a href="#" class="text-primary underline">contact us</a> to change your
+    subscription or your billing information</span
+  >
+</div>
+
+{/* Current subscription */}
+<div class="py-10">
+  <h3 class="mb-3 text-xl font-bold">Your current subscription</h3>
+
+  <!-- Plan name -->
+  {planName == PlanName.Starter && <p>Starter CHF 25</p>}
+  {planName == PlanName.Teams && <p>Teams CHF 149</p>}
+  {planName == PlanName.Pro && <p>Pro CHF 249</p>}
+
+  <!-- Add-Ons list -->
+  {
+    addOns?.some((name: AddOnsName) => name == AddOnsName.AudioBasis) && (
+      <p>Audio zu Text Basis CHF 25</p>
+    )
+  }
+  {
+    addOns?.some((name: AddOnsName) => name == AddOnsName.AudioSubtitles) && (
+      <p>Add-On Subtitle CHF 25</p>
+    )
+  }
+  {
+    addOns?.some((name: AddOnsName) => name == AddOnsName.AudioXL) && (
+      <p>Add-On Audio XL CHF 15</p>
+    )
+  }
+  {
+    addOns?.some((name: AddOnsName) => name == AddOnsName.AudioPremium) && (
+      <p>Audio zu Text Premium CHF 65</p>
+    )
+  }
+</div>
+
+{/* Billing */}
+<div class="py-10">
+  <h3 class="mb-3 text-xl font-bold">Billing</h3>
+  <p>
+    <strong>Company Name: </strong>
+    {tenant.name}
+  </p>
+  <p>
+    <strong>Address: </strong>
+    {tenant.billing_info?.address ?? "-"}
+  </p>
+  <p>
+    <strong>Zip Code: </strong>
+    {tenant.billing_info?.zip_code ?? "-"}
+  </p>
+  <p>
+    <strong>Location: </strong>
+    {tenant.billing_info?.location ?? "-"}
+  </p>
+  <p>
+    <strong>Email: </strong>
+    {tenant.billing_info?.email ?? "-"}
+  </p>
+</div>
