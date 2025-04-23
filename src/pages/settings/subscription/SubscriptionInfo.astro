@@ -1,6 +1,9 @@
 ---
+import { useTranslations } from "$i18n/utils";
 import { PlanName, AddOnsName } from "$types/Subscription";
 import SubscriptionModel from "$data/models/subscription.model";
+
+const t = useTranslations();
 
 const { tenant } = Astro.locals;
 const subscription = await SubscriptionModel.findActiveByTenant(tenant._id);
@@ -11,15 +14,16 @@ const addOns = subscription?.add_ons?.map(
 ---
 
 <div role="alert" class="alert alert-info">
-  <span
-    >Please <a href="#" class="text-primary underline">contact us</a> to change your
-    subscription or your billing information</span
-  >
+  <span>
+    <Fragment set:html={t("settings.subscription.description")} />
+  </span>
 </div>
 
 {/* Current subscription */}
 <div class="py-10">
-  <h3 class="mb-3 text-xl font-bold">Your current subscription</h3>
+  <h3 class="mb-3 text-xl font-bold">
+    {t("settings.subscription.current-plan")}
+  </h3>
 
   <!-- Plan name -->
   {planName == PlanName.Starter && <p>Starter CHF 25</p>}
@@ -51,25 +55,25 @@ const addOns = subscription?.add_ons?.map(
 
 {/* Billing */}
 <div class="py-10">
-  <h3 class="mb-3 text-xl font-bold">Billing</h3>
+  <h3 class="mb-3 text-xl font-bold">{t("settings.subscription.billing")}</h3>
   <p>
-    <strong>Company Name: </strong>
+    <strong>{t("settings.subscription.billing.name")}: </strong>
     {tenant.name}
   </p>
   <p>
-    <strong>Address: </strong>
+    <strong>{t("settings.subscription.billing.address")}: </strong>
     {tenant.billing_info?.address ?? "-"}
   </p>
   <p>
-    <strong>Zip Code: </strong>
+    <strong>{t("settings.subscription.billing.zipcode")}: </strong>
     {tenant.billing_info?.zip_code ?? "-"}
   </p>
   <p>
-    <strong>Location: </strong>
+    <strong>{t("settings.subscription.billing.location")}: </strong>
     {tenant.billing_info?.location ?? "-"}
   </p>
   <p>
-    <strong>Email: </strong>
+    <strong>{t("settings.subscription.billing.email")}: </strong>
     {tenant.billing_info?.email ?? "-"}
   </p>
 </div>
