@@ -31,8 +31,11 @@ import {
 } from "$constants";
 
 const originalTenantId = isProd() ? TENANT_MASTER_PROD : TENANT_MASTER_DEV;
-const Auth0InputParamsSchema = z.object({
+const OrganizationNameInputParamsSchema = z.object({
   company_name: z.string().min(1),
+});
+const OrganizationIdInputParamsSchema = z.object({
+  org_id: z.string().min(1),
 });
 const TenantInputParamsSchema = z.object({
   name: z.string().min(1),
@@ -80,14 +83,15 @@ const getTranscriptionTypes = (selectedAddOns: AudioOptionId[]) => {
   return transcriptionTypes;
 };
 
-// step 1: setupAuth0()  - Create Auth0 org + move user from old org to new org
-// step 2: setupTenant() - Clone tenant & import categories / prompts
-// step 3: sendEmails()  - Send notification emails
+// step 1: createOrganization()  - Create Auth0 organization
+// step 2: createMember()  - Create Auth0 user, move user from trial org to new org
+// step 3: setupTenantData() - Clone tenant & import categories / prompts
+// step 4: finalize()  - Send notification emails
 
 export const onboarding = {
-  setupAuth0: defineAction({
-    input: Auth0InputParamsSchema,
-    handler: async (input, context) => {
+  createOrganization: defineAction({
+    input: OrganizationNameInputParamsSchema,
+    handler: async (input) => {
       const { company_name: companyName } = input;
       const name = companyName
         .toLowerCase()
@@ -111,6 +115,14 @@ export const onboarding = {
         import.meta.env.AUTH0_AUTH_CON_ID || "con_RXTD1LIbXJgceOUH",
       );
 
+      return transformRawData(organizationResult.data);
+    },
+  }),
+  createMember: defineAction({
+    input: OrganizationIdInputParamsSchema,
+    handler: async (input, context) => {
+      const { org_id: organizationId } = input;
+
       // delete current user in trial organization
       // move current user to new organization
       await organizationsManagement.deleteMembers(
@@ -131,10 +143,12 @@ export const onboarding = {
         [roleAdminId],
       );
 
-      return transformRawData(organizationResult.data);
+      return transformRawData({
+        id: organizationId,
+      });
     },
   }),
-  setupTenant: defineAction({
+  setupTenantData: defineAction({
     input: TenantInputParamsSchema,
     handler: async (input, context) => {
       // Clone the tenant
@@ -234,7 +248,7 @@ export const onboarding = {
       return transformRawData(data);
     },
   }),
-  sendEmails: defineAction({
+  finalize: defineAction({
     input: EmailInputParamsSchema,
     handler: async (input) => {
       const { tenant_id: tenantId, email } = input;
