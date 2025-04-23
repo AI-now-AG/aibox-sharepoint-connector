@@ -42,7 +42,7 @@
 </script>
 
 <button
-  class="card bg-white shadow-2xl rounded-2xl p-6"
+  class="card bg-white shadow-2xl rounded-2xl p-6 relative"
   style={backgroundColor}
   onclick={() => {
     handleSelect();
@@ -51,11 +51,13 @@
   <div
     class="absolute top-[-10px] left-0 flex justify-center items-center w-full"
   >
-    <div class="badge badge-primary font-medium text-sm">
+    <div
+      class="badge badge-primary font-medium text-sm md:text-xs lg:text-sm h-auto"
+    >
       {description?.[lang]}
     </div>
   </div>
-  <h2 class="text-2xl font-medium text-[#491EFF] text-left mt-2">
+  <h2 class="text-2xl font-medium text-[#491EFF] text-left mt-3">
     {name?.[lang]}
   </h2>
   <p class="text-4xl font-medium my-2 text-left mt-6">
@@ -75,8 +77,10 @@
       </li>
     {/each}
   </ul>
+  <br class="mb-6" />
+  <br class="mb-6" />
   <!-- Add this CTA if Stakeholder would like to make clear Clickable for user -->
-  <div class="btn btn-primary btn-sm mt-4 w-full">
+  <div class="btn btn-primary btn-sm absolute bottom-6 left-6 right-6">
     {t("subscription.select")}
   </div>
 </button>
