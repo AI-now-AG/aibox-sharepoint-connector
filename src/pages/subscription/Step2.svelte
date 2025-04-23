@@ -3,12 +3,8 @@
   import Input from "$components/Input/Input.svelte";
   import SubsciptionSteps from "$components/subscription/SubsciptionSteps.svelte";
   import { useTranslations } from "$i18n/utils";
-  import {
-    aiboxsubscription,
-    storeBillingInformation,
-  } from "$stores/subscription";
+  import { storeBillingInformation } from "$stores/subscription";
   import { isValidEmail } from "$utils/common";
-  import { onMount } from "svelte";
   const t = useTranslations();
 
   const BiiliggMethod = {

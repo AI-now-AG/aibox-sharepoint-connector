@@ -438,6 +438,8 @@
   "subscription.orgainzation-name-placeholder": "Mustermann",
   "subscription.language": "Default language",
   "subscription.choose-categories": "Chose default use cases for your aibox",
+  "subscription.validate-empty-language-message": "Please select your default language",
+  "subscription.validate-empty-categories-message": "Please select your use cases ",
   "subscription.creating-your-account": "We are creating your aibox organization...",
   "subscription.congratulations": "Congratulations!",
   "subscription.congratulations-desciption": "You have completed onboarding, you can start using aibox now.",

@@ -438,6 +438,8 @@
   "subscription.orgainzation-name-placeholder": "Mustermann",
   "subscription.language": "Sprache aibox",
   "subscription.choose-categories": "Wähle für welche Bereiche wir bereits Anwendungfälle (Prompts) einrichten sollen.",
+  "subscription.validate-empty-language-message": "Please select your default language",
+  "subscription.validate-empty-categories-message": "Please select your use cases ",
   "subscription.creating-your-account": "Wir erstellen deine aibox Organisation...",
   "subscription.congratulations": "Gratuliere!",
   "subscription.congratulations-desciption": "Die Anmeldung ist nun abgeschlossen, du kannst jetzt mit deiner aibox starten.",
