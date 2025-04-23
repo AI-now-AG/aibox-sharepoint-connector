@@ -163,7 +163,7 @@
             value={BiiliggMethod.MonthlyCreditCard}
             disabled
           />
-          <h2 class="text-sm font-medium text-[#0F172A] text-left flex-1 px-4">
+          <h2 class="text-sm font-medium text-[#94A3B8] text-left flex-1 px-4">
             {t("subscription.credit-card")}
           </h2>
         </button>
