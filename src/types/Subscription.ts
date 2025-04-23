@@ -17,7 +17,7 @@ export enum AudioOptionId {
   AudioBasisAddOnLarge = "AudioBasisAddOnLarge",
 }
 
-export const AddOnsLabels: Record<AudioOptionId, string> = {
+export const AudioOptionLabels: Record<AudioOptionId, string> = {
   [AudioOptionId.AudioBasis]: "Audio Basis",
   [AudioOptionId.AudioBasisAddOnSubtitle]: "Add-on Untertitel",
   [AudioOptionId.AudioBasisAddOnLarge]: "Add-on Audio Xl",

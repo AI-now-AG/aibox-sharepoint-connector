@@ -15,7 +15,7 @@ import SubscriptionModel, {
 import {
   SubscriptionPackageId,
   AudioOptionId,
-  AddOnsLabels,
+  AudioOptionLabels,
   SubscriptionStatus,
 } from "$types/Subscription";
 import { AudioCategory } from "$types/TenantFeature";
@@ -204,7 +204,7 @@ export const onboarding = {
       const subAddOns = input.add_ons?.map((name) => {
         return {
           name,
-          title: AddOnsLabels[name],
+          title: AudioOptionLabels[name],
         };
       });
       const subscription: Partial<Omit<Subscription, "_id">> = {
