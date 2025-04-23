@@ -20,7 +20,7 @@ import PromptModel from "$data/models/prompt.model";
 import CategoryModel from "$data/models/category.model";
 import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
 import { AudioCategory } from "$types/TenantFeature";
-import { EncryptedUserPassword, UserRole } from "$enums/Users";
+import { EncryptedUserPassword, UserRole } from "$types/Users";
 
 const TenantInputParamsSchema = z.object({
   name: z.string(),

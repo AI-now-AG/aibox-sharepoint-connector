@@ -16,7 +16,7 @@
   import SortableTable, {
     type ColumnData,
   } from "$components/SortableTable.svelte";
-  import { UserRole } from "$enums/Users";
+  import { UserRole } from "$types/Users";
 
   const t = useTranslations();
   let loading = $state(false);

@@ -37,7 +37,7 @@ const createImageMenus = [];
 const createImageItems = [];
 
 const transcriptions = await TranscriptionModel.listByTenant(
-  Astro.locals.user.tenant_id,
+  Astro.locals.user.tenant_id
 );
 
 const transcriptionTypes = Astro.locals.tenant.transcription_types ?? [];
@@ -45,7 +45,7 @@ const transcriptionTypes = Astro.locals.tenant.transcription_types ?? [];
 const activeTranscriptions =
   transcriptions?.filter(
     (tran) =>
-      transcriptionTypes.includes(tran.category) && tran.enabled === true,
+      transcriptionTypes.includes(tran.category) && tran.enabled === true
   ) ?? [];
 
 const audioToTextTranscriptions = activeTranscriptions
@@ -61,7 +61,7 @@ const subtitleTranscriptions = activeTranscriptions
     (tran) =>
       tran.category == AudioCategory.Subtitle ||
       tran.category == AudioCategory.SubtitleJson ||
-      tran.category == AudioCategory.SubtitleLarge,
+      tran.category == AudioCategory.SubtitleLarge
   )
   .map((tran) => ({
     title: tran.name,
@@ -106,7 +106,7 @@ if (
   auth.hasFeatureWithProvider(
     Astro.locals,
     TenantFeature.CreateImage,
-    ApiKeyProvider.OpenAI,
+    ApiKeyProvider.OpenAI
   )
 ) {
   createImageItems.push({
@@ -118,7 +118,7 @@ if (
   auth.hasFeatureWithProvider(
     Astro.locals,
     TenantFeature.CreateImage,
-    ApiKeyProvider.Flux,
+    ApiKeyProvider.Flux
   )
 ) {
   createImageItems.push({
@@ -163,6 +163,10 @@ if (auth.isAdmin(Astro.locals) || auth.isSuperAdmin(Astro.locals)) {
   settingsItems.push({
     title: t("user.user-management"),
     path: "/user-management",
+  });
+  settingsItems.push({
+    title: "Subscription",
+    path: "/settings/subscription",
   });
   restrictedMenus.push({
     title: t("nav.settings"),
