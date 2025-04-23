@@ -94,7 +94,7 @@
       await finalizeSubscription(tenant.id);
 
       // After successful subscription creation, reset the subscription store
-      //$subscription = {};
+      $subscription = {};
 
       // All steps successful, redirect
       window.location.href = "/subscription/complete";
