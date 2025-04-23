@@ -137,7 +137,7 @@ export default {
     const _tenantId = toObjectId(tenantId);
     return collection.find<Document<Category>>({
       tenant_id: _tenantId,
-      category: { $in: ids },
+      _id: { $in: ids },
     });
   },
 
