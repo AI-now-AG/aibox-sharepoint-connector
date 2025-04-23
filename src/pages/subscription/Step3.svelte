@@ -7,25 +7,21 @@
   import { storeOrganizationInformation } from "$stores/subscription";
   const t = useTranslations();
 
+  interface Props {
+    categories?: any[];
+  }
+
+  interface Props {
+    selectedPackageId?: string;
+  }
+  let { categories = $bindable([]) }: Props = $props();
+
   const languages = [
     { title: "Deutsch", value: "de" },
     { title: "English", value: "en" },
   ];
   let selectedLanguage: { title: string; value: string } | undefined = $state();
   let organizationName = $state("");
-
-  const SAMPLE_CATEGORIES = [
-    { title: "Category 1", value: "category1" },
-    { title: "Category 2", value: "category2" },
-    { title: "Category 3", value: "category3" },
-    { title: "Category 4", value: "category4" },
-    { title: "Category 5", value: "category5" },
-    { title: "Category 6", value: "category6" },
-    { title: "Category 7", value: "category7" },
-    { title: "Category 8", value: "category8" },
-    { title: "Category 9", value: "category9" },
-    { title: "Category 10", value: "category10" },
-  ];
   let selectedCategories: string[] = $state([]);
 
   let alertModal: HTMLDialogElement | undefined = $state();
@@ -121,7 +117,7 @@
   <br class="mb-6" />
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 mb-10 text-black">
-    {#each SAMPLE_CATEGORIES as category}
+    {#each categories as category}
       {#if selectedCategories.includes(category.value)}
         <button
           class="btn btn-primary w-full h-[56px] shadow-xl py-2"

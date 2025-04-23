@@ -2,10 +2,23 @@
 import { useTranslations } from "$i18n/utils";
 import SubscriptionLayout from "$layouts/SubscriptionLayout.astro";
 import StepComponent from "./Step3.svelte";
+import CategoryModel from "$data/models/category.model";
+import { isProd } from "$utils/env";
+import { TENANT_MASTER_DEV, TENANT_MASTER_PROD } from "$constants";
 
 const t = useTranslations();
+
+const masterTenantId = isProd() ? TENANT_MASTER_PROD : TENANT_MASTER_DEV;
+const categories = (await CategoryModel.getByTenantId(masterTenantId)) ?? [];
+const useCases: any[] = [];
+categories.forEach((category) => {
+  useCases.push({
+    title: category.title,
+    value: category._id.toString(),
+  });
+});
 ---
 
 <SubscriptionLayout title={t("subscription.customize-your-aibox")}>
-  <StepComponent client:load />
+  <StepComponent categories={useCases} client:load />
 </SubscriptionLayout>
