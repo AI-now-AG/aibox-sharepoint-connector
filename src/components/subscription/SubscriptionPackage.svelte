@@ -61,8 +61,8 @@
     {name?.[lang]}
   </h2>
   <p class="text-4xl font-medium my-2 text-left mt-6">
-    {price}
     {currency}
+    {price}
     <span class="text-base font-medium">/ {t("subscription.per-month")}</span>
   </p>
   <ul class="mt-4 flex flex-col gap-2 text-base font-normal text-gray-600">
