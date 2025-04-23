@@ -7,7 +7,7 @@ import {
   ROLE_PERMISSIONS_MAP,
   UserRole,
   TourType,
-} from "$enums/Users";
+} from "$types/Users";
 
 export const UserTour = z.object({
   type: z.nativeEnum(TourType).default(TourType.Onboarding),

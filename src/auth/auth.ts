@@ -1,5 +1,5 @@
 import type { User } from "lucia";
-import { UserRole } from "$enums/Users";
+import { UserRole } from "$types/Users";
 import { ApiKeyProvider, TenantFeature } from "$types/TenantFeature";
 
 export const user = (locals: App.Locals): User => {

@@ -1,6 +1,6 @@
 ---
 import Layout from "$layouts/Layout.astro";
-import { Permission } from "$enums/Users";
+import { Permission } from "$types/Users";
 import { TranscriptionType } from "$types/TranscribeRequest";
 import { AudioCategory } from "$types/TenantFeature";
 import UpdateForm from "$pages/settings/transcription/UpdateForm.svelte";
@@ -37,7 +37,7 @@ if (typeParam === TranscriptionType.Plaintext) {
 }
 
 const predefinedCategory = selectedTranType.filter((tran) =>
-  transcriptionTypes?.includes(tran),
+  transcriptionTypes?.includes(tran)
 );
 
 if (selectedUsecase) {
