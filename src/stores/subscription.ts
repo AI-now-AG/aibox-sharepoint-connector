@@ -124,8 +124,4 @@ export const storeOrganizationInformation = (
   });
 };
 
-export const reset = () => {
-  aiboxsubscription.update(() => {
-    return {};
-  });
-};
+export default aiboxsubscription;

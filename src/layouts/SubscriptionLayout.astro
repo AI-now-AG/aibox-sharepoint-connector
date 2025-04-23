@@ -1,5 +1,6 @@
 ---
 import { svgIcons } from "$assets/icons";
+import Toasts from "$components/toast-notification/Toasts.svelte";
 import SubsciptionSteps from "$components/subscription/SubsciptionSteps.svelte";
 import { SUBSCIPTION_STEP } from "$constants";
 
@@ -28,18 +29,7 @@ switch (pathname) {
 const { title, description } = Astro.props;
 
 // TODO: save theme settings in db
-let theme = "light";
-
-switch (Astro.locals.user?.tenant_id?.toString()) {
-  case "66aa21a3d40d0b194e280143":
-    theme = "somedia";
-    break;
-  case "674347ba64f450769a147f6a":
-    theme = "weihnachtsmann";
-    break;
-  default:
-    theme = "light";
-}
+const theme = Astro.locals.tenant.theme || "light";
 ---
 
 <!doctype html>
@@ -89,5 +79,7 @@ switch (Astro.locals.user?.tenant_id?.toString()) {
     <main class="flex-1 p-8">
       <slot />
     </main>
+
+    <Toasts client:load />
   </body>
 </html>

@@ -1,26 +1,113 @@
 <script lang="ts">
+  import { actions } from "astro:actions";
   import SubsciptionSteps from "$components/subscription/SubsciptionSteps.svelte";
   import { useTranslations } from "$i18n/utils";
   import { onMount } from "svelte";
+  import { addToast } from "$stores/toast";
   import RadarLoading from "./RadarLoading.svelte";
-  import { aiboxsubscription, reset } from "$stores/subscription";
+  import subscription from "$stores/subscription";
+  import { SubscriptionPackageId, AudioOptionId } from "$types/Subscription";
+  import { isTrulyEmpty } from "$utils/common";
+
   const t = useTranslations();
 
-  function handleSubscription() {
-    // TODO: Devlin - integrate API to create subscription
-    console.log("iboxsubscription", $aiboxsubscription);
+  async function createOrganization() {
+    const { data, error } = await actions.onboarding.createOrganization({
+      company_name: $subscription.billingInformation?.companyName ?? "",
+    });
 
-     // Simulate successful subscription creation
-    setTimeout(() => {
-      // window.location.href = "/subscription/complete";
-    }, 2000);
+    if (error) throw new Error("Failed to create organization");
+    return data;
+  }
 
-    // TODO: After successful subscription creation, reset the subscription store
-    // reset()
+  async function createMember(organizationId: string) {
+    const { data, error } = await actions.onboarding.createMember({
+      org_id: organizationId,
+    });
+
+    if (error) throw new Error("Failed to create member");
+    return data;
+  }
+
+  async function setupTenantData(
+    organizationId: string,
+    organizationName: string,
+  ) {
+    const { data, error } = await actions.onboarding.setupTenantData({
+      name: $subscription.organizationInformation?.companyName ?? "",
+      org_id: organizationId,
+      org_name: organizationName,
+      plan_name: $subscription.plan?.id as SubscriptionPackageId,
+      add_ons: $subscription.audioOptions?.map(
+        (option) => option.id as AudioOptionId,
+      ),
+      billing: {
+        company_name: $subscription.billingInformation?.companyName ?? "",
+        address: $subscription.billingInformation?.street ?? "",
+        zip_code: $subscription.billingInformation?.zipCode ?? "",
+        location: $subscription.billingInformation?.location ?? "",
+        email: $subscription.billingInformation?.billingEmail ?? "",
+      },
+      use_cases: $subscription.organizationInformation?.useCases ?? [],
+    });
+
+    if (error) throw new Error("Failed to setup tenant data");
+    return data;
+  }
+
+  async function finalizeSubscription(newTenantId: string) {
+    const { data, error } = await actions.onboarding.finalize({
+      tenant_id: newTenantId,
+      email: $subscription.billingInformation?.billingEmail ?? "",
+    });
+
+    if (error) throw new Error("Failed to finalize subscription");
+    return data;
+  }
+
+  async function runOnboardingFlow() {
+    console.log("iboxsubscription", $subscription);
+    if (
+      isTrulyEmpty($subscription.plan) ||
+      isTrulyEmpty($subscription.audioOptions) ||
+      isTrulyEmpty($subscription.billingInformation) ||
+      isTrulyEmpty($subscription.organizationInformation)
+    ) {
+      addToast({
+        type: "error",
+        message: "Oops, missing subscription information.",
+      });
+      return false;
+    }
+
+    try {
+      // Step 1: Create organization
+      const organization = await createOrganization();
+
+      // Step 2: Create member
+      await createMember(organization.id);
+
+      // Step 3: Create member
+      const tenant = await setupTenantData(organization.id, organization.name);
+
+      // Step 4: Create member
+      await finalizeSubscription(tenant.id);
+
+      // After successful subscription creation, reset the subscription store
+      //$subscription = {};
+
+      // All steps successful, redirect
+      window.location.href = "/subscription/complete";
+    } catch (err) {
+      addToast({
+        type: "error",
+        message: "Something went wrong. Please try again.",
+      });
+    }
   }
 
   onMount(() => {
-    handleSubscription();
+    runOnboardingFlow();
   });
 </script>
 

@@ -29,6 +29,10 @@ export const isSocialConnection = (auth0Sub: string): boolean => {
   return socialConnections.includes(provider);
 };
 
+export function isTrulyEmpty(obj: any) {
+  return !obj || Object.keys(obj).length === 0;
+}
+
 export function formatDateToDDMMYY(date: string | Date): string {
   return moment(date).format("DD.MM.YYYY");
 }

@@ -44,6 +44,7 @@ const TenantInputParamsSchema = z.object({
   plan_name: z.nativeEnum(SubscriptionPackageId).optional(),
   add_ons: z.array(z.nativeEnum(AudioOptionId)).optional(),
   billing: z.object({
+    company_name: z.string(),
     address: z.string(),
     zip_code: z.string(),
     location: z.string(),
@@ -51,7 +52,7 @@ const TenantInputParamsSchema = z.object({
   }),
   use_cases: z.array(z.string()),
 });
-const EmailInputParamsSchema = z.object({
+const TenantEmailInputParamsSchema = z.object({
   tenant_id: z.string().min(1),
   email: z.string().min(1),
 });
@@ -163,7 +164,7 @@ export const onboarding = {
 
       // Update the current tenant for the logged-in user
       await UserModel.update(context.locals.user.id, {
-        tenant_id: new ObjectId(input.org_id),
+        tenant_id: newTenant.insertedId,
       });
 
       // Find all categories for the original tenant
@@ -242,14 +243,14 @@ export const onboarding = {
       await SubscriptionModel.create(subscription);
 
       const data = {
-        tenant: newTenant,
+        id: newTenant.insertedId,
       };
 
       return transformRawData(data);
     },
   }),
   finalize: defineAction({
-    input: EmailInputParamsSchema,
+    input: TenantEmailInputParamsSchema,
     handler: async (input) => {
       const { tenant_id: tenantId, email } = input;
       const tenant = await TenantModel.get(tenantId);
