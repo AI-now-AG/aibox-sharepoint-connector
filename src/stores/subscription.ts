@@ -85,7 +85,18 @@ export type {
   OrganizationInformation,
 };
 
-export const aiboxsubscription = writable<AiboxSubscription>({});
+const initialData =
+  typeof window !== "undefined"
+    ? JSON.parse(localStorage.getItem("aiboxsubscription") || "{}")
+    : {};
+
+export const aiboxsubscription = writable<AiboxSubscription>(initialData);
+
+aiboxsubscription.subscribe((value) => {
+  if (typeof window !== "undefined") {
+    localStorage.setItem("aiboxsubscription", JSON.stringify(value));
+  }
+});
 
 export const storePlan = (plan: SubscriptionPlan) => {
   aiboxsubscription.update((origin: AiboxSubscription) => {

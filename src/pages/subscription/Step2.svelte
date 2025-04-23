@@ -5,6 +5,7 @@
   import { useTranslations } from "$i18n/utils";
   import { storeBillingInformation } from "$stores/subscription";
   import { isValidEmail } from "$utils/common";
+  
   const t = useTranslations();
 
   const BiiliggMethod = {

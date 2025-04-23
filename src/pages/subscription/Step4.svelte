@@ -3,14 +3,20 @@
   import { useTranslations } from "$i18n/utils";
   import { onMount } from "svelte";
   import RadarLoading from "./RadarLoading.svelte";
+  import { aiboxsubscription, reset } from "$stores/subscription";
   const t = useTranslations();
 
   function handleSubscription() {
     // TODO: Devlin - integrate API to create subscription
-    // Simulate successful subscription creation
+    console.log("iboxsubscription", $aiboxsubscription);
+
+     // Simulate successful subscription creation
     setTimeout(() => {
-      window.location.href = "/subscription/complete";
+      // window.location.href = "/subscription/complete";
     }, 2000);
+
+    // TODO: After successful subscription creation, reset the subscription store
+    // reset()
   }
 
   onMount(() => {
