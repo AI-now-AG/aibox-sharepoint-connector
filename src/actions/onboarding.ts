@@ -26,6 +26,8 @@ import {
   TENANT_MASTER_DEV,
   TENANT_MASTER_PROD,
   SG_ONBOARDING_TEMPLATE,
+  AUTH0_ROLE_ADMIN_PROD,
+  AUTH0_ROLE_ADMIN_DEV,
 } from "$constants";
 
 const originalTenantId = isProd() ? TENANT_MASTER_PROD : TENANT_MASTER_DEV;
@@ -118,6 +120,16 @@ export const onboarding = {
       await organizationsManagement.addMembers(organizationId, [
         context.locals.user.auth0_sub,
       ]);
+
+      // setup admin role
+      const roleAdminId = isProd()
+        ? AUTH0_ROLE_ADMIN_PROD
+        : AUTH0_ROLE_ADMIN_DEV;
+      await organizationsManagement.addMemberRoles(
+        organizationId,
+        context.locals.user.auth0_sub,
+        [roleAdminId],
+      );
 
       return transformRawData(organizationResult.data);
     },

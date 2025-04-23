@@ -46,6 +46,8 @@ export const AUTH_AUTHORIZE_SCOPES = [
   "email",
   "ainow/roles",
 ];
+export const AUTH0_ROLE_ADMIN_DEV = "rol_gkr3eCUL4jGIFgVu";
+export const AUTH0_ROLE_ADMIN_PROD = "rol_ekmcY6vrW5QiG5NF";
 
 // SendGrid
 export const SG_VERIFICATION_TEMPLATE = "d-69ed72334042458783f985ada5dbe61d";
