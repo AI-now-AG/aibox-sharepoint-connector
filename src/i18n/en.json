@@ -445,5 +445,14 @@
   "subscription.congratulations-desciption": "You have completed onboarding, you can start using aibox now.",
   "subscription.cool-lets-start": "Cool, lets start",
   "onboarding.step-5.title": "Manage your aibox",
-  "onboarding.step-5.description": "Now you can manage your prompts, change navigation or setup your own knowledg base.<br/><br/>Add more users directly here."
+  "onboarding.step-5.description": "Now you can manage your prompts, change navigation or setup your own knowledg base.<br/><br/>Add more users directly here.",
+  "nav.subscription": "Subscription",
+  "settings.subscription.description": "Please <a href=\"https://ainow.ch/en/contact\"  target=\"_blank\" class=\"text-primary underline\">contact us</a> to change your\n    subscription or your billing information",
+  "settings.subscription.current-plan": "Your current subscription",
+  "settings.subscription.billing": "Billing",
+  "settings.subscription.billing.name": "Company Name",
+  "settings.subscription.billing.address": "Address",
+  "settings.subscription.billing.zipcode": "Zip code",
+  "settings.subscription.billing.location": "Location",
+  "settings.subscription.billing.email": "Email"
 }
