@@ -47,9 +47,9 @@ const addOns = subscription?.add_ons?.map(
     ) && <p>Add-On Audio XL CHF 15</p>
   }
   {
-    addOns?.some((name: AudioOptionId) => name == AudioOptionId.AudioPremium) && (
-      <p>Audio zu Text Premium CHF 65</p>
-    )
+    addOns?.some(
+      (name: AudioOptionId) => name == AudioOptionId.AudioPremium,
+    ) && <p>Audio zu Text Premium CHF 65</p>
   }
 </div>
 
