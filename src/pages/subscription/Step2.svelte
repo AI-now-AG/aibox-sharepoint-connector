@@ -44,7 +44,7 @@
       <div class="flex-1 flex flex-col mb-4">
         <Input
           id="company-name"
-          label={t("subscription.company-name")}
+          label={t("subscription.company-name") + " *"}
           value={companyName}
           placeholder={t("subscription.company-name-place-holder")}
           inputChange={(event: any) => {
@@ -59,7 +59,7 @@
       <div class="flex-1 flex flex-col mb-4">
         <Input
           id="street-number"
-          label={t("subscription.street-number")}
+          label={t("subscription.street-number") + " *"}
           value={street}
           placeholder={t("subscription.street-number-placeholder")}
           inputChange={(event: any) => {
@@ -78,7 +78,7 @@
       <div class="flex-1 flex flex-col mb-4">
         <Input
           id="zip-code"
-          label={t("subscription.zip-code")}
+          label={t("subscription.zip-code") + " *"}
           value={zipCode}
           placeholder={t("subscription.zip-code-place-holder")}
           inputChange={(event: any) => {
@@ -93,7 +93,7 @@
       <div class="flex-1 flex flex-col mb-4">
         <Input
           id="location"
-          label={t("subscription.location")}
+          label={t("subscription.location") + " *"}
           value={location}
           placeholder={t("subscription.location-place-holder")}
           inputChange={(event: any) => {
@@ -135,7 +135,7 @@
       <div class="flex-1 flex flex-col mb-4">
         <Input
           id="email"
-          label={t("subscription.billing-email")}
+          label={t("subscription.billing-email") + " *"}
           value={billingEmail}
           placeholder={t("subscription.billing-email-plcae-holder")}
           inputChange={(event: any) => {
