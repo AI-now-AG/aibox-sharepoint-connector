@@ -1,8 +1,10 @@
 <script lang="ts">
+  import AlertDialog from "$components/AlertDialog.svelte";
   import Input from "$components/Input/Input.svelte";
   import SubsciptionSteps from "$components/subscription/SubsciptionSteps.svelte";
   import { useTranslations } from "$i18n/utils";
   import SingleInput from "$pages/prompt-library/prompts/SingleInput.svelte";
+  import { storeOrganizationInformation } from "$stores/subscription";
   const t = useTranslations();
 
   const languages = [
@@ -24,11 +26,44 @@
     { title: "Category 9", value: "category9" },
     { title: "Category 10", value: "category10" },
   ];
-  let selectedCategories: string[] = $state([""]);
+  let selectedCategories: string[] = $state([]);
+
+  let alertModal: HTMLDialogElement | undefined = $state();
+  let alertMessage = $state("");
+
+  function showAlert(message: any) {
+    alertMessage = message;
+    alertModal?.show();
+  }
+
+  function validateForm() {
+    if (!organizationName) {
+      showAlert(t("subscription.validate-empty-company-name-message"));
+      return false;
+    }
+
+    if (!selectedLanguage) {
+      showAlert(t("subscription.validate-empty-language-message"));
+      return false;
+    }
+
+    if (selectedCategories.length === 0) {
+      showAlert(t("subscription.validate-empty-categories-message"));
+      return false;
+    }
+
+    return true;
+  }
 
   function handleNext() {
-    // TODO: Handle validate before go to next step
-    window.location.href = "/subscription/step4";
+    if (validateForm()) {
+      storeOrganizationInformation({
+        companyName: organizationName,
+        defaultLanguage: selectedLanguage?.value ?? "de",
+        useCases: selectedCategories,
+      });
+      window.location.href = "/subscription/step4";
+    }
   }
 </script>
 
@@ -123,3 +158,5 @@
     </button>
   </div>
 </div>
+
+<AlertDialog bind:modal={alertModal} bind:message={alertMessage} />

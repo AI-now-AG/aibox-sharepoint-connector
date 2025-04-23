@@ -6,11 +6,12 @@
   import { SubscriptionPackages } from "$subscription-packages.json";
   import AlertDialog from "$components/AlertDialog.svelte";
   import {
-    aiboxsubscription,
+    storeAudioOptions,
     storePlan,
-    type SubscriptionPackageId,
+    type AudioOption,
     type SubscriptionPlan,
   } from "$stores/subscription";
+
   const t = useTranslations();
 
   let totalPrice: any = $state("");
@@ -51,25 +52,6 @@
 
     totalPrice = packagePrice + audioOptionsTotlaPrice;
   });
-  $inspect($aiboxsubscription);
-  // Store subscription data into storage
-  $effect(() => {
-    if (selectedPackageId) {
-      // TODO: Store selected package data into storage
-      let selectedPackage: SubscriptionPlan = {
-        ...SubscriptionPackages.plan[
-          selectedPackageId as keyof typeof SubscriptionPackages.plan
-        ],
-        id: selectedPackageId as SubscriptionPackageId,
-      };
-      if (selectedPackage) {
-        storePlan(selectedPackage);
-      }
-    }
-    if (selectedAudioOptionIds?.length > 0) {
-      // TODO: Store selected audio options data into storage
-    }
-  });
 
   function showAlert(message: any) {
     alertMessage = message;
@@ -80,6 +62,35 @@
     if (!selectedPackageId) {
       showAlert(t("subscription.please-select-package"));
       return;
+    }
+
+    const selectedPackage: SubscriptionPlan = {
+      ...SubscriptionPackages.plan[
+        selectedPackageId as keyof typeof SubscriptionPackages.plan
+      ],
+      id: selectedPackageId,
+    };
+    if (selectedPackage) {
+      storePlan(selectedPackage);
+    }
+
+    if (selectedAudioOptionIds?.length > 0) {
+      let selectedAudioOptions: AudioOption[] = [];
+      for (let i = 0; i < selectedAudioOptionIds.length; i++) {
+        const id = selectedAudioOptionIds[i];
+        const selectedOption: AudioOption = {
+          ...SubscriptionPackages.audioOptions[
+            id as keyof typeof SubscriptionPackages.audioOptions
+          ],
+          id: id,
+        };
+        if (selectedOption) {
+          selectedAudioOptions.push(selectedOption);
+        }
+      }
+      if (selectedAudioOptions.length > 0) {
+        storeAudioOptions(selectedAudioOptions);
+      }
     }
     window.location.href = "/subscription/step2";
   }

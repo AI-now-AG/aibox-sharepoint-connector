@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { svgIcons } from "$assets/icons";
   import { getLanguage, useTranslations } from "$i18n/utils";
 
   interface Props {
@@ -63,8 +62,8 @@
     {name?.[lang]}
   </h2>
   <p class="text-2xl font-medium text-right text-[#0F172A]">
-    {price}
     {currency}
+    {price}
     <span class="text-base font-medium">/ {t("subscription.per-month")}</span>
   </p>
 </button>

@@ -1,15 +1,15 @@
 ---
-import { useTranslations } from "$i18n/utils";
-import { PlanName, AddOnsName } from "$types/Subscription";
+import { SubscriptionPackageId, AudioOptionId } from "$types/Subscription";
 import SubscriptionModel from "$data/models/subscription.model";
+import { useTranslations } from "$i18n/utils";
 
 const t = useTranslations();
 
 const { tenant } = Astro.locals;
 const subscription = await SubscriptionModel.findActiveByTenant(tenant._id);
-const planName = subscription?.plan_name ?? PlanName.Starter;
+const planName = subscription?.plan_name ?? SubscriptionPackageId.Starter;
 const addOns = subscription?.add_ons?.map(
-  (addOn: { name: AddOnsName }) => addOn.name
+  (addOn: { name: AudioOptionId }) => addOn.name,
 );
 ---
 
@@ -26,30 +26,30 @@ const addOns = subscription?.add_ons?.map(
   </h3>
 
   <!-- Plan name -->
-  {planName == PlanName.Starter && <p>Starter CHF 25</p>}
-  {planName == PlanName.Teams && <p>Teams CHF 149</p>}
-  {planName == PlanName.Pro && <p>Pro CHF 249</p>}
+  {planName == SubscriptionPackageId.Starter && <p>Starter CHF 25</p>}
+  {planName == SubscriptionPackageId.Teams && <p>Teams CHF 149</p>}
+  {planName == SubscriptionPackageId.Pro && <p>Pro CHF 249</p>}
 
   <!-- Add-Ons list -->
   {
-    addOns?.some((name: AddOnsName) => name == AddOnsName.AudioBasis) && (
+    addOns?.some((name: AudioOptionId) => name == AudioOptionId.AudioBasis) && (
       <p>Audio zu Text Basis CHF 25</p>
     )
   }
   {
-    addOns?.some((name: AddOnsName) => name == AddOnsName.AudioSubtitles) && (
-      <p>Add-On Subtitle CHF 25</p>
-    )
+    addOns?.some(
+      (name: AudioOptionId) => name == AudioOptionId.AudioBasisAddOnSubtitle,
+    ) && <p>Add-On Subtitle CHF 25</p>
   }
   {
-    addOns?.some((name: AddOnsName) => name == AddOnsName.AudioXL) && (
-      <p>Add-On Audio XL CHF 15</p>
-    )
+    addOns?.some(
+      (name: AudioOptionId) => name == AudioOptionId.AudioBasisAddOnLarge,
+    ) && <p>Add-On Audio XL CHF 15</p>
   }
   {
-    addOns?.some((name: AddOnsName) => name == AddOnsName.AudioPremium) && (
-      <p>Audio zu Text Premium CHF 65</p>
-    )
+    addOns?.some(
+      (name: AudioOptionId) => name == AudioOptionId.AudioPremium,
+    ) && <p>Audio zu Text Premium CHF 65</p>
   }
 </div>
 

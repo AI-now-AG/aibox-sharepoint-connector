@@ -1,15 +1,4 @@
-export const SubscriptionPackageId = {
-  Starter: "Starter",
-  Teams: "Teams",
-  Pro: "Pro",
-};
-
-export const AudioOptionId = {
-  AudioPremium: "AudioPremium",
-  AudioBasis: "AudioBasis",
-  AudioBasisAddOnSubtitle: "AudioBasisAddOnSubtitle",
-  AudioBasisAddOnLarge: "AudioBasisAddOnLarge",
-};
+import { AudioOptionId, SubscriptionPackageId } from "$types/Subscription";
 
 export const SubscriptionPackages = {
   plan: {

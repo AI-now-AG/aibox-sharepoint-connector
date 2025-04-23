@@ -1,16 +1,4 @@
 import { writable } from "svelte/store";
-enum SubscriptionPackageId {
-  Starter = "Starter",
-  Teams = "Teams",
-  Pro = "Pro",
-}
-
-enum AudioOptionId {
-  AudioPremium = "AudioPremium",
-  AudioBasis = "AudioBasis",
-  AudioBasisAddOnSubtitle = "AudioBasisAddOnSubtitle",
-  AudioBasisAddOnLarge = "AudioBasisAddOnLarge",
-}
 
 // Common interfaces for multilingual fields
 interface MultilingualText {
@@ -32,7 +20,7 @@ interface PlanFeatures {
 
 // Interface for individual subscription plan
 interface SubscriptionPlan {
-  id: SubscriptionPackageId;
+  id: string;
   name: MultilingualText;
   description: MultilingualText;
   price: number;
@@ -43,7 +31,7 @@ interface SubscriptionPlan {
 
 // Interface for individual audio option
 interface AudioOption {
-  id: AudioOptionId;
+  id: string;
   name: MultilingualText;
   price: number;
   currency: string;
@@ -67,7 +55,7 @@ interface OrganizationInformation {
 
 interface AiboxSubscription {
   plan?: SubscriptionPlan;
-  audioOptions?: AudioOption;
+  audioOptions?: AudioOption[];
   billingInformation?: BillingInformation;
   organizationInformation?: OrganizationInformation;
 }
@@ -76,8 +64,6 @@ export type {
   AiboxSubscription,
   SubscriptionPlan,
   AudioOption,
-  SubscriptionPackageId,
-  AudioOptionId,
   MultilingualText,
   Pricing,
   PlanFeatures,
@@ -85,7 +71,18 @@ export type {
   OrganizationInformation,
 };
 
-export const aiboxsubscription = writable<AiboxSubscription>({});
+const initialData =
+  typeof window !== "undefined"
+    ? JSON.parse(localStorage.getItem("aiboxsubscription") || "{}")
+    : {};
+
+export const aiboxsubscription = writable<AiboxSubscription>(initialData);
+
+aiboxsubscription.subscribe((value) => {
+  if (typeof window !== "undefined") {
+    localStorage.setItem("aiboxsubscription", JSON.stringify(value));
+  }
+});
 
 export const storePlan = (plan: SubscriptionPlan) => {
   aiboxsubscription.update((origin: AiboxSubscription) => {
@@ -96,11 +93,11 @@ export const storePlan = (plan: SubscriptionPlan) => {
   });
 };
 
-export const storeAudioOptions = (audioOptions?: AudioOption) => {
+export const storeAudioOptions = (audioOptions?: AudioOption[]) => {
   aiboxsubscription.update((origin: AiboxSubscription) => {
     return {
       ...origin,
-      audioOptions: audioOptions ?? undefined,
+      audioOptions: audioOptions ?? [],
     };
   });
 };

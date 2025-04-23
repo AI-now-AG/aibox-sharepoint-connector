@@ -18,7 +18,8 @@ import {
   sendNotificationEmail,
 } from "$utils/auth0Auth";
 import { syncAllOrganizationUsers } from "$utils/auth0Sync";
-import { UserRole } from "$enums/Users";
+import { UserRole } from "$types/Users";
+
 
 /**
  * Handles Auth0 log stream events

@@ -1,4 +1,4 @@
-export enum PlanName {
+export enum SubscriptionPackageId {
   Starter = "Starter",
   Teams = "Teams",
   Pro = "Pro",
@@ -10,16 +10,16 @@ export enum SubscriptionStatus {
   Trialing = "trialing",
 }
 
-export enum AddOnsName {
-  AudioBasis = "audio-basis",
-  AudioSubtitles = "audio-subtitles",
-  AudioXL = "audio-xl",
-  AudioPremium = "audio-premium",
+export enum AudioOptionId {
+  AudioPremium = "AudioPremium",
+  AudioBasis = "AudioBasis",
+  AudioBasisAddOnSubtitle = "AudioBasisAddOnSubtitle",
+  AudioBasisAddOnLarge = "AudioBasisAddOnLarge",
 }
 
-export const AddOnsLabels: Record<AddOnsName, string> = {
-  [AddOnsName.AudioBasis]: "Audio Basis",
-  [AddOnsName.AudioSubtitles]: "Add-on Untertitel",
-  [AddOnsName.AudioXL]: "Add-on Audio Xl",
-  [AddOnsName.AudioPremium]: "Audio Premium Package",
+export const AddOnsLabels: Record<AudioOptionId, string> = {
+  [AudioOptionId.AudioBasis]: "Audio Basis",
+  [AudioOptionId.AudioBasisAddOnSubtitle]: "Add-on Untertitel",
+  [AudioOptionId.AudioBasisAddOnLarge]: "Add-on Audio Xl",
+  [AudioOptionId.AudioPremium]: "Audio Premium Package",
 };
