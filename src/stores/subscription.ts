@@ -67,7 +67,7 @@ interface OrganizationInformation {
 
 interface AiboxSubscription {
   plan?: SubscriptionPlan;
-  audioOptions?: AudioOption;
+  audioOptions?: AudioOption[];
   billingInformation?: BillingInformation;
   organizationInformation?: OrganizationInformation;
 }
@@ -96,11 +96,11 @@ export const storePlan = (plan: SubscriptionPlan) => {
   });
 };
 
-export const storeAudioOptions = (audioOptions?: AudioOption) => {
+export const storeAudioOptions = (audioOptions?: AudioOption[]) => {
   aiboxsubscription.update((origin: AiboxSubscription) => {
     return {
       ...origin,
-      audioOptions: audioOptions ?? undefined,
+      audioOptions: audioOptions ?? [],
     };
   });
 };

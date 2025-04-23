@@ -1,12 +1,19 @@
 <script lang="ts">
+  import AlertDialog from "$components/AlertDialog.svelte";
   import Input from "$components/Input/Input.svelte";
   import SubsciptionSteps from "$components/subscription/SubsciptionSteps.svelte";
   import { useTranslations } from "$i18n/utils";
+  import {
+    aiboxsubscription,
+    storeBillingInformation,
+  } from "$stores/subscription";
+  import { isValidEmail } from "$utils/common";
+  import { onMount } from "svelte";
   const t = useTranslations();
 
   const BiiliggMethod = {
-    MonthlyEmailInvoice: "invoice",
-    MonthlyCreditCard: "creditcard",
+    MonthlyEmailInvoice: "monthlyInvoice",
+    MonthlyCreditCard: "creditCard",
   };
 
   let companyName = $state("");
@@ -16,9 +23,55 @@
   let billingEmail = $state("");
   let billingMethod = $state(BiiliggMethod.MonthlyEmailInvoice);
 
+  let alertModal: HTMLDialogElement | undefined = $state();
+  let alertMessage = $state("");
+
+  function showAlert(message: any) {
+    alertMessage = message;
+    alertModal?.show();
+  }
+
+  function validateForm() {
+    if (!companyName) {
+      showAlert(t("subscription.validate-empty-company-name-message"));
+      return false;
+    }
+
+    if (!street) {
+      showAlert(t("subscription.validate-empty-street-message"));
+      return false;
+    }
+    if (!zipCode) {
+      showAlert(t("subscription.validate-empty-zip-code-message"));
+      return false;
+    }
+    if (!location) {
+      showAlert(t("subscription.validate-empty-location-message"));
+      return false;
+    }
+
+    if (!isValidEmail(billingEmail)) {
+      showAlert(t("subscription.validate-invalid-email-message"));
+      return false;
+    }
+    return true;
+  }
+
   function handleNext() {
-    // TODO: Handle validate before go to next step
-    window.location.href = "/subscription/step3";
+    if (validateForm()) {
+      storeBillingInformation({
+        companyName,
+        street,
+        zipCode,
+        location,
+        billingEmail,
+        billingMethod:
+          billingMethod === BiiliggMethod.MonthlyEmailInvoice
+            ? "monthlyInvoice"
+            : "creditCard",
+      });
+      window.location.href = "/subscription/step3";
+    }
   }
 </script>
 
@@ -196,3 +249,5 @@
     </button>
   </div>
 </div>
+
+<AlertDialog bind:modal={alertModal} bind:message={alertMessage} />
