@@ -139,7 +139,7 @@ const checkFileExist: Handler = async (event, context) => {
         } else if (fileName.endsWith(".json")) {
           jsonFileUrl = fileUrl; // Store the URL for the .ass file
         } else if (fileName.endsWith(".txt")) {
-          if (typedCategory === AudioCategory.Subtitle) {
+          if (typedCategory === AudioCategory.Subtitle || typedCategory === AudioCategory.Subtitle11Labs) {
             txtFileUrl = fileUrl; // Store the URL for the .txt file
           }
         }

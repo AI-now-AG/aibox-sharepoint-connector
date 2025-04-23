@@ -394,5 +394,12 @@
   "usage.units.credits": "Credits",
   "home.new-chat": "New chat",
   "tenant.settings.private-api-key": "Private API Key",
-  "nav.text-prompts": "TEXT ASSISTANT"
+  "nav.text-prompts": "TEXT ASSISTANT",
+  "tenant.subtitle-elevenLabs": " Subtitle Virtuoso ",
+  "tenant.validate-elevenLabs-key": "Please input ElevenLabs key",
+  "settings.transcription.elevenLabs-audio-tag": "Enable Audio tag",
+  "tenant.subtitle-elevenLabs.title": "ElevenLabs",
+  "subscription.step2": "Provide your billing data",
+  "subscription.step3": "Customize your aibox",
+  "subscription.step4": "Create your aibox organization"
 }

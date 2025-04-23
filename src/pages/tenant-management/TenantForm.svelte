@@ -54,6 +54,7 @@
       openaiPrivateKeyEnabled: false,
       azureOpenaiPrivateKeyEnabled: false,
       speechPrivateKeyEnabled: false,
+      elevenLabsPrivateKeyEnabled: false,
       fluxPrivateKeyEnabled: false,
       perplexityPrivateKeyEnabled: false,
     },
@@ -70,6 +71,7 @@
   let azureOpenAIKeyField: HTMLInputElement;
   let perplexityKeyField: HTMLInputElement;
   let azureOpenAIKeyProField: HTMLInputElement;
+  let elevenLabsAIKeyField: HTMLInputElement;
   let falOpenAIKeyField: HTMLInputElement;
   let defaultTextFeature = $state("");
 
@@ -162,6 +164,27 @@
 
   const audioProInfo = $derived(
     audioProArray
+      .filter((e) => e.checked === true)
+      .map((e) => e.title)
+      .join(", "),
+  );
+
+  const audioElevenLabsArray = $state([
+    {
+      title: t("tenant.subtitle-elevenLabs"),
+      type: AudioCategory.Subtitle11Labs,
+      checked:
+        tenantData?.transcription_types?.includes(
+          AudioCategory.Subtitle11Labs,
+        ) || false,
+    },
+  ]);
+  let isAudioToElevenLabsChecked = $derived(
+    audioElevenLabsArray.some((item: any) => item.checked),
+  );
+
+  const audioElevenLabsInfo = $derived(
+    audioElevenLabsArray
       .filter((e) => e.checked === true)
       .map((e) => e.title)
       .join(", "),
@@ -363,6 +386,10 @@
       }
     }
 
+    if (isAudioToElevenLabsChecked && !tenantData.elevenLabs_api_key) {
+      showAlert(t("tenant.validate-elevenLabs-key"));
+      return false;
+    }
     return true;
   }
 
@@ -401,6 +428,7 @@
             azure_openai_api_key: tenantData.azure_openai_api_key,
             perplexity_api_key: tenantData.perplexity_api_key,
             speech_api_key: tenantData.speech_api_key,
+            elevenLabs_api_key: tenantData.elevenLabs_api_key,
             fal_ai_api_key: tenantData.fal_ai_api_key,
           });
         if (encryptKeysError) {
@@ -412,6 +440,7 @@
           azure_openai_api_key,
           perplexity_api_key,
           speech_api_key,
+          elevenLabs_api_key,
           fal_ai_api_key,
         } = data;
 
@@ -420,6 +449,7 @@
         tenantData.openai_api_key = openai_api_key;
         tenantData.azure_openai_api_key = azure_openai_api_key;
         tenantData.speech_api_key = speech_api_key;
+        tenantData.elevenLabs_api_key = elevenLabs_api_key;
         tenantData.perplexity_api_key = perplexity_api_key;
         tenantData.fal_ai_api_key = fal_ai_api_key;
 
@@ -445,6 +475,11 @@
         }
         if (isAzureAudioProEnabled) {
           tenantData.transcription_types = audioProArray
+            .filter((item) => item.checked)
+            .map((item) => item.type);
+        }
+        if (isAudioToElevenLabsChecked) {
+          tenantData.transcription_types = audioElevenLabsArray
             .filter((item) => item.checked)
             .map((item) => item.type);
         }
@@ -503,6 +538,7 @@
             azure_openai_api_key: tenantData.azure_openai_api_key,
             perplexity_api_key: tenantData.perplexity_api_key,
             speech_api_key: tenantData.speech_api_key,
+            elevenLabs_api_key: tenantData.elevenLabs_api_key,
             fal_ai_api_key: tenantData.fal_ai_api_key,
           });
         if (encryptKeysError) {
@@ -514,6 +550,7 @@
           azure_openai_api_key,
           perplexity_api_key,
           speech_api_key,
+          elevenLabs_api_key,
           fal_ai_api_key,
         } = data;
 
@@ -522,6 +559,7 @@
         tenantData.openai_api_key = openai_api_key;
         tenantData.azure_openai_api_key = azure_openai_api_key;
         tenantData.speech_api_key = speech_api_key;
+        tenantData.elevenLabs_api_key = elevenLabs_api_key;
         tenantData.perplexity_api_key = perplexity_api_key;
         tenantData.fal_ai_api_key = fal_ai_api_key;
 
@@ -552,6 +590,12 @@
         updatedTranscriptionTypes = [
           ...updatedTranscriptionTypes,
           ...audioProArray
+            .filter((item) => item.checked)
+            .map((item) => item.type),
+        ];
+        updatedTranscriptionTypes = [
+          ...updatedTranscriptionTypes,
+          ...audioElevenLabsArray
             .filter((item) => item.checked)
             .map((item) => item.type),
         ];
@@ -1241,6 +1285,102 @@
                 type="checkbox"
                 class="checkbox checkbox-primary"
                 bind:checked={tenantData.metadata.speechPrivateKeyEnabled}
+              />
+              <span class="label-text"
+                >{t("tenant.settings.private-api-key")}</span
+              >
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- 11Labs File Azure Section -->
+      <div
+        class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
+      >
+        <input type="checkbox" />
+        <div class="collapse-title flex items-center justify-between gap-4">
+          <div class="flex items-center">
+            <input
+              id="audio-elevenLabs-model"
+              type="checkbox"
+              checked={isAudioToElevenLabsChecked}
+              class="checkbox checkbox-primary z-10"
+              value="text-prompt"
+              disabled
+            />
+            <label
+              class="label cursor-pointer ml-2"
+              for="audio-elevenLabs-model"
+            >
+              <span class="label-text text-base-content"
+                >{t("tenant.subtitle-elevenLabs.title")}</span
+              >
+            </label>
+          </div>
+          <div class="flex mb-2">
+            <span class="text-base-content/50 font-medium text-sm"
+              >{audioElevenLabsInfo}</span
+            >
+          </div>
+        </div>
+        <div class="collapse-content space-y-4">
+          <div class="grid grid-cols-2 gap-4 mx-8">
+            <!-- Checkboxes for Audio Pro & Subtitles Large -->
+            <div class="rounded-lg">
+              <span class="text-sm font-semibold">{t("tenant.features")}</span>
+              <div class="flex flex-wrap gap-4 mt-2">
+                {#each audioElevenLabsArray as item, index}
+                  <div class="flex items-center">
+                    <input
+                      id="audio-elevenLabs-{item.type}"
+                      type="checkbox"
+                      bind:checked={audioElevenLabsArray[index].checked}
+                      class="checkbox checkbox-primary checkbox-sm z-10"
+                    />
+                    <label
+                      class="label cursor-pointer ml-2"
+                      for="audio-elevenLabs-{item.type}"
+                    >
+                      <span class="label-text text-base-content"
+                        >{item.title}</span
+                      >
+                    </label>
+                  </div>
+                {/each}
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 gap-4 mx-8">
+            <div class="w-full">
+              <span class="mb-2 text-base-content font-medium text-sm"
+                >{t("tenant.settings.large-file-azure-apiKey")}
+              </span>
+
+              <label
+                class="input input-bordered flex items-center gap-2 mt-2 w-full"
+              >
+                <input
+                  bind:this={elevenLabsAIKeyField}
+                  type="password"
+                  class="grow"
+                  placeholder={t("tenant.api-key")}
+                  bind:value={tenantData.elevenLabs_api_key}
+                />
+                <TogglePasswordIcon
+                  change={() => togglePassword(elevenLabsAIKeyField)}
+                />
+              </label>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4 mx-8">
+            <label class="flex flex-row items-center gap-2">
+              <input
+                type="checkbox"
+                class="checkbox checkbox-primary"
+                bind:checked={tenantData.metadata.elevenLabsPrivateKeyEnabled}
               />
               <span class="label-text"
                 >{t("tenant.settings.private-api-key")}</span

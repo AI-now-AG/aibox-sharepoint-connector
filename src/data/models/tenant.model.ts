@@ -103,6 +103,7 @@ const TenantSchema = z.object({
   transcription_types: z.array(z.nativeEnum(AudioCategory)).optional(),
   // transcriptions: z.array(TranscriptionsSchema).optional(),
   speech_api_key: z.string().nullish(),
+  elevenLabs_api_key: z.string().optional(),
   speech_region: z.string().nullish(),
   perplexity_api_key: z.string().nullish(),
   perplexity_chat_model: z.string().nullish(),

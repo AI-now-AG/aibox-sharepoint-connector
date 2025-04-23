@@ -1,7 +1,7 @@
 import { BlobServiceClient } from "@azure/storage-blob";
 import { AzureChatOpenAI, ChatOpenAI, toFile } from "@langchain/openai";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
-import { AzureOpenAI, RateLimitError } from "openai";
+import { OpenAI, AzureOpenAI, RateLimitError } from "openai";
 import UsageLogModel, { type UsageLog } from "$data/models/usageLog.model";
 
 import {
@@ -26,6 +26,8 @@ import { ApiKeyProvider, AudioCategory } from "$types/TenantFeature";
 import { LoggingCallbackHandler } from "$callbackLLM/LoggingCallbackHandler";
 import type { TranscriptionVerbose } from "openai/resources/audio/transcriptions.mjs";
 import TranscriptionModel from "$data/models/transcription.model";
+import { ElevenLabsClient } from "elevenlabs";
+import type { SpeechToTextChunkResponseModel } from "elevenlabs/api";
 import { UsageType } from "$types/UsageTracking";
 import { transcriptionCallbackHandler } from "./transcriptionCallback";
 import { ObjectId } from "mongodb";
@@ -33,6 +35,7 @@ import { ObjectId } from "mongodb";
 const DEFAULT_WHISPER_MODEL_NAME = "whisper-1";
 const DEFAULT_API_VERSION = "2024-08-01-preview";
 const DEFAULT_CHAT_MODE_NAME = "gpt-4o";
+const DEFAULT_ELEVENLABS_MODEL_NAME = "scribe_v1";
 
 const DEFAULT_INSTRUCTION = `
   You are a language expert. Your task is to review subtitles from a transcribed audio and identify potential misinterpretations while fixing missing punctuation. Improve all obvious errors and make illogical sentences logical. You must correct these while maintaining the original format as much as possible.
@@ -89,6 +92,12 @@ const DEFAULT_INSTRUCTION = `
   input> die Ergebnisse präsentiert
   output> die Ergebnisse präsentiert.
 `;
+
+function getElevenLabsClient() {
+  return new ElevenLabsClient({
+    apiKey: process.env.ELEVENLABS_API_KEY,
+  });
+}
 
 function getClient(transcribeParams: TranscribeRequest) {
   const endpoint =
@@ -287,9 +296,16 @@ export async function transcribeUsingOpenAI(
   transcribeParams: TranscribeRequest,
 ): Promise<TranscriptionResult> {
   try {
-    const { audioBuffer, fileName } = transcribeParams;
+    const { category, isAudioTagEnabled, audioBuffer, fileName } =
+      transcribeParams;
 
-    const openaiClient = getClient(transcribeParams);
+    let openaiClient: OpenAI | AzureOpenAI | ElevenLabsClient;
+    if (category === AudioCategory.Subtitle11Labs) {
+      openaiClient = getElevenLabsClient();
+    } else {
+      openaiClient = getClient(transcribeParams);
+    }
+
     if (!audioBuffer) {
       throw new Error("Audio buffer is missing or undefined.");
     }
@@ -299,24 +315,57 @@ export async function transcribeUsingOpenAI(
       process.env.AZURE_OPENAI_DEPLOYMENT_NAME ||
       DEFAULT_WHISPER_MODEL_NAME;
 
-    let response: TranscriptionVerbose | TranscribeResponse | null = null;
-    if (transcribeParams.category === AudioCategory.SubtitleJson) {
+    // let response: TranscriptionVerbose | TranscribeResponse | SpeechToTextChunkResponseModel | null = null;
+    let response: any = null;
+    if (category === AudioCategory.SubtitleJson) {
       const jsonResponse = bufferToTranscribeResponse(audioBuffer);
       response = jsonResponse;
     } else {
       const audioFile = await toFile(audioBuffer, fileName);
-      response = await openaiClient.audio.transcriptions.create({
-        file: audioFile,
-        model: DEFAULT_WHISPER_MODEL_NAME,
-        temperature: 0,
-        timestamp_granularities: ["word"],
-        response_format: "verbose_json",
-      });
+      if (
+        openaiClient instanceof OpenAI ||
+        openaiClient instanceof AzureOpenAI
+      ) {
+        console.log("\n\nwhisper\n\n");
+        response = await openaiClient.audio.transcriptions.create({
+          file: audioFile,
+          model: DEFAULT_WHISPER_MODEL_NAME,
+          temperature: 0,
+          timestamp_granularities: ["word"],
+          response_format: "verbose_json",
+        });
+      } else {
+        console.log("\n\nelevenLabs\n\n");
+        const Audioblob = new Blob([audioBuffer]);
+        const eleventLabResponse = await openaiClient.speechToText.convert({
+          enable_logging: true,
+          model_id: DEFAULT_ELEVENLABS_MODEL_NAME,
+          file: Audioblob,
+        });
+
+        const excludeTypes = ["spacing"];
+        if (!isAudioTagEnabled) {
+          excludeTypes.push("audio_event");
+        }
+        eleventLabResponse.words = eleventLabResponse.words.filter(
+          (word) => !excludeTypes.includes(word.type),
+        );
+        const cleanedWords = eleventLabResponse.words.map(
+          ({ text, start, end }) => ({
+            word: text,
+            start,
+            end,
+          }),
+        );
+
+        response = eleventLabResponse;
+        response = { ...response, words: cleanedWords };
+      }
       transcriptionCallbackHandler.emit("transcriptionCompleted", {
         duration: response.duration,
         tenantId: transcribeParams.tenantId,
         deploymentModel: modelName,
-        category: transcribeParams.category || AudioCategory.AudioToText,
+        category: category || AudioCategory.AudioToText,
       });
     }
     const transcriptionText = response?.text ?? "";
@@ -334,7 +383,7 @@ export async function transcribeUsingOpenAI(
       .slice(0, -1)
       .join(".");
     const outputURLs: { [key: string]: string } = {};
-    if (transcribeParams.category !== AudioCategory.SubtitleJson) {
+    if (category !== AudioCategory.SubtitleJson) {
       outputURLs["json"] = await uploadOutputToBlob(
         transcribeParams.folderName,
         `${fileNameWithoutExtension}.json`,
@@ -342,7 +391,7 @@ export async function transcribeUsingOpenAI(
         "json",
       );
     }
-    if (transcribeParams.category === AudioCategory.AudioToText) {
+    if (category === AudioCategory.AudioToText) {
       if (transcribeParams.usecaseId) {
         const transcription = await TranscriptionModel.get(
           transcribeParams.usecaseId,
@@ -357,8 +406,9 @@ export async function transcribeUsingOpenAI(
         }
       }
     } else if (
-      transcribeParams.category === AudioCategory.Subtitle ||
-      transcribeParams.category === AudioCategory.SubtitleJson
+      category === AudioCategory.Subtitle ||
+      category === AudioCategory.SubtitleJson ||
+      category === AudioCategory.Subtitle11Labs
     ) {
       const jsonData = response as unknown as { words: InputEntry[] };
       await uploadSubtitleFiles(
@@ -368,7 +418,7 @@ export async function transcribeUsingOpenAI(
         fileNameWithoutExtension,
         jsonData,
         outputURLs,
-        transcribeParams.category,
+        category,
         transcribeParams,
       );
     }
@@ -617,7 +667,6 @@ export async function uploadSubtitleLargeFiles(
 }
 
 transcriptionCallbackHandler.on("transcriptionCompleted", async (response) => {
-  console.log("Jelo");
   try {
     const { duration, tenantId, deploymentModel, category } = response;
 

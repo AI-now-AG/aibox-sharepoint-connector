@@ -37,6 +37,7 @@ const TenantInputParamsSchema = z.object({
   azure_openai_whisper_model: z.string().optional(),
   azure_openai_chat_model: z.string().optional(),
   speech_api_key: z.string().optional(),
+  elevenLabs_api_key: z.string().optional(),
   speech_region: z.string().optional(),
   perplexity_api_key: z.string().optional(),
   perplexity_chat_model: z.string().optional(),
@@ -57,6 +58,7 @@ const TenanKeyEncryptSchema = z.object({
   azure_openai_api_key: z.string().optional(),
   perplexity_api_key: z.string().optional(),
   speech_api_key: z.string().optional(),
+  elevenLabs_api_key: z.string().optional(),
   fal_ai_api_key: z.string().optional(),
 });
 

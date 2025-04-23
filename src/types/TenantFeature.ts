@@ -20,6 +20,7 @@ export enum AudioCategory {
   Subtitle = "subtitle",
   SubtitleJson = "subtitle-json",
   SubtitleLarge = "subtitle-large",
+  Subtitle11Labs = "subtitle-11Labs",
   AudioPro = "audio-pro",
 }
 
@@ -28,6 +29,7 @@ export const AudioCategoryLabels: Record<AudioCategory, string> = {
   [AudioCategory.Subtitle]: t("tenant.subtitles"),
   [AudioCategory.SubtitleJson]: t("tenant.subtitles-json"),
   [AudioCategory.SubtitleLarge]: t("tenant.subtitle-large"),
+  [AudioCategory.Subtitle11Labs]: t("tenant.subtitle-elevenLabs"),
   [AudioCategory.AudioPro]: t("tenant.audio-pro"),
 };
 
