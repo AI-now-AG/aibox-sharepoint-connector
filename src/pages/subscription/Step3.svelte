@@ -4,7 +4,10 @@
   import SubsciptionSteps from "$components/subscription/SubsciptionSteps.svelte";
   import { useTranslations } from "$i18n/utils";
   import SingleInput from "$pages/prompt-library/prompts/SingleInput.svelte";
-  import { storeOrganizationInformation } from "$stores/subscription";
+  import {
+    storeOrganizationInformation,
+    aiboxsubscription,
+  } from "$stores/subscription";
   const t = useTranslations();
 
   interface Props {
@@ -16,13 +19,25 @@
   }
   let { categories = $bindable([]) }: Props = $props();
 
+  const initOrganizationInformation =
+    $aiboxsubscription.organizationInformation;
+
   const languages = [
     { title: "Deutsch", value: "de" },
     { title: "English", value: "en" },
   ];
-  let selectedLanguage: { title: string; value: string } | undefined = $state();
-  let organizationName = $state("");
-  let selectedCategories: string[] = $state([]);
+
+  const initSelectedLanguage =
+    initOrganizationInformation?.defaultLanguage == "de"
+      ? languages[0]
+      : languages[1];
+
+  let selectedLanguage: { title: string; value: string } =
+    $state(initSelectedLanguage);
+  let organizationName = $state(initOrganizationInformation?.companyName ?? "");
+  let selectedCategories: string[] = $state(
+    initOrganizationInformation?.useCases ?? [],
+  );
 
   let alertModal: HTMLDialogElement | undefined = $state();
   let alertMessage = $state("");

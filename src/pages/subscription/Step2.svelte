@@ -3,9 +3,12 @@
   import Input from "$components/Input/Input.svelte";
   import SubsciptionSteps from "$components/subscription/SubsciptionSteps.svelte";
   import { useTranslations } from "$i18n/utils";
-  import { storeBillingInformation } from "$stores/subscription";
+  import {
+    storeBillingInformation,
+    aiboxsubscription,
+  } from "$stores/subscription";
   import { isValidEmail } from "$utils/common";
-  
+
   const t = useTranslations();
 
   const BiiliggMethod = {
@@ -13,12 +16,16 @@
     MonthlyCreditCard: "creditCard",
   };
 
-  let companyName = $state("");
-  let street = $state("");
-  let zipCode = $state("");
-  let location = $state("");
-  let billingEmail = $state("");
-  let billingMethod = $state(BiiliggMethod.MonthlyEmailInvoice);
+  const initBillingInformation = $aiboxsubscription.billingInformation;
+
+  let companyName = $state(initBillingInformation?.companyName ?? "");
+  let street = $state(initBillingInformation?.street ?? "");
+  let zipCode = $state(initBillingInformation?.zipCode ?? "");
+  let location = $state(initBillingInformation?.location ?? "");
+  let billingEmail = $state(initBillingInformation?.billingEmail ?? "");
+  let billingMethod = $state(
+    initBillingInformation?.billingMethod ?? BiiliggMethod.MonthlyEmailInvoice,
+  );
 
   let alertModal: HTMLDialogElement | undefined = $state();
   let alertMessage = $state("");
