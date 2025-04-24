@@ -263,9 +263,12 @@ export const user = {
   }),
 
   activeOboarding: defineAction({
-    input: UserInputIdentifierSchema,
+    input: z.intersection(
+      UserInputIdentifierSchema,
+      z.object({ type: z.nativeEnum(TourType).default(TourType.Onboarding) }),
+    ),
     handler: async (input) => {
-      const { _id: userId } = input;
+      const { _id: userId, type } = input;
       const user = await UserModel.get(userId);
       if (!user) {
         throw new Error("User does not exists.");
@@ -277,10 +280,11 @@ export const user = {
       try {
         let userTours = user.tours ?? [
           { type: TourType.Onboarding, active: true },
+          { type: TourType.OnboardingNewTenant, active: true },
         ];
 
         userTours = userTours.map((tour) => {
-          if (tour.type == TourType.Onboarding) {
+          if (tour.type == type) {
             return { ...tour, active: true };
           }
           return tour;
