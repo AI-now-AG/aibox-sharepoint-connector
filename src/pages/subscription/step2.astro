@@ -2,8 +2,13 @@
 import { useTranslations } from "$i18n/utils";
 import SubscriptionLayout from "$layouts/SubscriptionLayout.astro";
 import StepComponent from "./Step2.svelte";
+import { isProd } from "$utils/env";
 
 const t = useTranslations();
+
+if (isProd() && Astro.locals.tenant.is_trial !== true) {
+  return Astro.redirect("/restricted");
+}
 ---
 
 <SubscriptionLayout title={t("subscription.provide-billing-information")}>

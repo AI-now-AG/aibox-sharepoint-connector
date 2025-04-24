@@ -20,7 +20,6 @@ import {
 import { syncAllOrganizationUsers } from "$utils/auth0Sync";
 import { UserRole } from "$types/Users";
 
-
 /**
  * Handles Auth0 log stream events
  * Reference: https://auth0.com/docs/customize/log-streams/event-filters#user-behavioral-success
@@ -473,6 +472,7 @@ const updateTenantInDatabase = async (data: any) => {
   }
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const fetchAndSyncOrgUsersForModerator = async (data: any) => {
   const { user_id: userId, organization_id: orgId } = data;
   console.log(

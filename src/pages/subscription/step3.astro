@@ -11,13 +11,17 @@ const t = useTranslations();
 const masterTenantId = isProd() ? TENANT_MASTER_PROD : TENANT_MASTER_DEV;
 const categoriesCursor = await CategoryModel.listByTenant(masterTenantId);
 const categories = await categoriesCursor.toArray();
-const useCases: any[] = [];
+const useCases: Record<string, unknown>[] = [];
 categories.forEach((category) => {
   useCases.push({
     title: category.title,
     value: category._id.toString(),
   });
 });
+
+if (isProd() && Astro.locals.tenant.is_trial !== true) {
+  return Astro.redirect("/restricted");
+}
 ---
 
 <SubscriptionLayout title={t("subscription.customize-your-aibox")}>
