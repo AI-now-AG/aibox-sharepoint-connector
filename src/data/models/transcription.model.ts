@@ -82,13 +82,13 @@ export default {
     );
   },
 
-  listByTenant: async (tenantId: ObjectId) => {
+  listByTenant: async (tenantId: string | ObjectId) => {
     if (!ObjectId.isValid(tenantId)) {
-      return null;
+      return [];
     }
-
+    const _tenantId = toObjectId(tenantId);
     const data = collection.find<Document<Transcription>>({
-      tenant_id: tenantId,
+      tenant_id: _tenantId,
     });
     return await data.toArray();
   },
@@ -99,5 +99,19 @@ export default {
     }
     const _id = new ObjectId(id);
     return collection.findOne<Document<Transcription>>({ _id });
+  },
+
+  insertMultiple: async (docs: Transcription[]) => {
+    // Validate and map all docs
+    const validatedDocs = docs.map((doc) => {
+      const validated = TranscriptionSchema.parse(doc);
+      return {
+        position: 0,
+        ...validated,
+      };
+    });
+
+    // Insert all at once
+    return collection.insertMany(validatedDocs);
   },
 };
