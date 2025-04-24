@@ -9,6 +9,11 @@
   import { SubscriptionPackageId, AudioOptionId } from "$types/Subscription";
   import { isTrulyEmpty } from "$utils/common";
 
+  interface Props {
+    user: any;
+  }
+  let { user } = $props() as Props;
+
   const t = useTranslations();
 
   async function createOrganization() {
@@ -93,6 +98,10 @@
 
       // Step 4: Create member
       await finalizeSubscription(tenant.id);
+
+      await actions.user.resetLoginCount({
+        _id: user?.id?.toString() ?? "",
+      });
 
       // After successful subscription creation, reset the subscription store
       $subscription = {};

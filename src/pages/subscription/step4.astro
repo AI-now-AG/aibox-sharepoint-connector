@@ -4,8 +4,9 @@ import SubscriptionLayout from "$layouts/SubscriptionLayout.astro";
 import StepComponent from "./Step4.svelte";
 
 const t = useTranslations();
+const user = Astro.locals.user;
 ---
 
 <SubscriptionLayout title={t("subscription.creating-your-account")}>
-  <StepComponent client:load />
+  <StepComponent {user} client:load />
 </SubscriptionLayout>
