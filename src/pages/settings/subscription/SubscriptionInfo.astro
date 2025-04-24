@@ -2,7 +2,7 @@
 import { SubscriptionPackageId, AudioOptionId } from "$types/Subscription";
 import SubscriptionModel from "$data/models/subscription.model";
 import { getLanguage, useTranslations } from "$i18n/utils";
-import SubscriptionPackages from "$subscription-packages.json";
+import { SubscriptionPackages } from "$subscription-packages.json";
 
 const t = useTranslations();
 const lang = getLanguage() as "en" | "de";
@@ -15,7 +15,6 @@ const addOns = subscription?.add_ons?.map(
 );
 
 const { plan, audioOptions } = SubscriptionPackages;
-console.log("lang", lang);
 ---
 
 <div role="alert" class="alert alert-info inline-flex">
