@@ -10,13 +10,20 @@
     storePlan,
     type AudioOption,
     type SubscriptionPlan,
+    aiboxsubscription,
   } from "$stores/subscription";
 
   const t = useTranslations();
 
   let totalPrice: any = $state("");
-  let selectedPackageId = $state("");
-  let selectedAudioOptionIds: string[] = $state([]);
+
+  const initSelectedPackageId = $aiboxsubscription.plan?.id || "";
+  let initSelectedAudioOptionIds: string[] =
+    $aiboxsubscription.audioOptions?.map((option) => {
+      return option.id;
+    }) || [];
+  let selectedPackageId = $state(initSelectedPackageId);
+  let selectedAudioOptionIds: string[] = $state(initSelectedAudioOptionIds);
 
   let alertModal: HTMLDialogElement | undefined = $state();
   let alertMessage = $state("");
