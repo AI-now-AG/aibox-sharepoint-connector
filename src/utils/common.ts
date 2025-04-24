@@ -63,6 +63,17 @@ export function tryParse(input: string): object | string {
   return result;
 }
 
+export function randomString(length: number = 5) {
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let result = "";
+  const charactersLength = characters.length;
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+}
+
 export function parseChunkCitations(inputString: string): object | string {
   const unescapedString = inputString.replace(/\\\"/g, '"');
   const jsonMatch = unescapedString.match(/{.*?}/s);

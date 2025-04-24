@@ -22,6 +22,7 @@ import { AudioCategory } from "$types/TenantFeature";
 import organizationsManagement from "$data/auth0/organizations-manager";
 import sendMail from "$utils/mail";
 import { isProd } from "$utils/env";
+import { randomString } from "$utils/common";
 import {
   TENANT_MASTER_DEV,
   TENANT_MASTER_PROD,
@@ -41,6 +42,7 @@ const TenantInputParamsSchema = z.object({
   name: z.string().min(1),
   org_id: z.string().min(1),
   org_name: z.string().min(1),
+  language: z.string().min(1),
   plan_name: z.nativeEnum(SubscriptionPackageId).optional(),
   add_ons: z.array(z.nativeEnum(AudioOptionId)).optional(),
   billing: z.object({
@@ -101,10 +103,11 @@ export const onboarding = {
         .replace(/[^a-z0-9]+/g, "-") // Replace non-alphanumeric with hyphen
         .replace(/^-+|-+$/g, "") // Trim leading/trailing hyphens
         .replace(/-{2,}/g, "-"); // Collapse multiple hyphens
+      const orgName = `${name}-${randomString(5)}`;
 
       // create new Auth0 organization
       const organizationResult = await organizationsManagement.create({
-        name: name,
+        name: orgName.toLowerCase(),
         display_name: companyName,
       });
 
@@ -160,6 +163,7 @@ export const onboarding = {
         org_name: input.org_name,
         billing_info: input.billing,
         transcription_types: transcriptionTypes,
+        default_language: input.language,
       });
 
       // Update the current tenant for the logged-in user

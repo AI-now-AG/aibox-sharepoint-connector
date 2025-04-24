@@ -37,6 +37,7 @@
       name: $subscription.organizationInformation?.companyName ?? "",
       org_id: organizationId,
       org_name: organizationName,
+      language: $subscription.organizationInformation?.defaultLanguage ?? "",
       plan_name: $subscription.plan?.id as SubscriptionPackageId,
       add_ons: $subscription.audioOptions?.map(
         (option) => option.id as AudioOptionId,
