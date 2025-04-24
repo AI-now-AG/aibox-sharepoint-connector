@@ -65,6 +65,11 @@
         checked: category === AudioCategory.SubtitleJson,
         category: AudioCategory.SubtitleJson,
       },
+      preDefineCategory.includes(AudioCategory.Subtitle11Labs) && {
+        title: t("tenant.subtitle-elevenLabs"),
+        checked: category === AudioCategory.Subtitle11Labs,
+        category: AudioCategory.Subtitle11Labs,
+      }
     ].filter(Boolean),
   );
 

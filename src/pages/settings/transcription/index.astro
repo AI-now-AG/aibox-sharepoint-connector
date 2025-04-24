@@ -30,6 +30,7 @@ if (Astro.locals.tenant) {
     azure_openai_chat_model,
     speech_api_key,
     speech_region,
+    elevenLabs_api_key,
   } = data || {};
   if (
     azure_openai_api_key &&
@@ -52,6 +53,7 @@ if (Astro.locals.tenant) {
         ...(speech_api_key && speech_region
           ? [AudioCategory.SubtitleLarge]
           : []),
+        ...(elevenLabs_api_key ? [AudioCategory.Subtitle11Labs] : []),
       ],
       toggle: hasSubtitle,
       type: TranscriptionType.Subtitles,

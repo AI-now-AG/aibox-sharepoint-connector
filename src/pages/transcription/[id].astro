@@ -26,29 +26,31 @@ let title = t("tenant.audio-to-text");
 let description = t("settings.transcription.plaintext-description");
 
 if (transcriptions?.category === AudioCategory.AudioToText) {
-  title = t("tenant.audio-to-text");
+  // title = t("tenant.audio-to-text");
+  title = transcriptions.name;
   description = t("settings.transcription.plaintext-description");
   selectedTranscriptionType = TranscriptionType.Plaintext;
 } else if (
   transcriptions?.category === AudioCategory.Subtitle ||
   transcriptions?.category === AudioCategory.SubtitleJson ||
-  transcriptions?.category === AudioCategory.SubtitleLarge
+  transcriptions?.category === AudioCategory.SubtitleLarge ||
+  transcriptions?.category === AudioCategory.Subtitle11Labs
 ) {
-  title = t("settings.transcription.subtitles-title");
+  // title = t("settings.transcription.subtitles-title");
+  title = transcriptions.name;
   description = t("settings.transcription.subtitles-description");
-  // } else if (transcriptions.category === TranscriptionType.Subtitlesjson) {
-  //   title = t("settings.transcription.subtitles-title-json");
-  //   description = t("settings.transcription.subtitles-description-json");
   selectedTranscriptionType = TranscriptionType.Subtitles;
 } else if (transcriptions?.category === AudioCategory.AudioPro) {
-  title = t("settings.transcription.largefile-title");
+  // title = t("settings.transcription.largefile-title");
+  title = transcriptions.name;
   description = t("settings.transcription.largefile-description");
   selectedTranscriptionType = TranscriptionType.Largefile;
 }
-// else if (transcriptions.category === TranscriptionType.SubtitleLarge) {
-//   title = t("settings.transcription.subtitle.largefile-title");
-//   description = t("settings.transcription.subtitle.largefile-description");
-// }
+
+if (selectedTranscriptionType === TranscriptionType.Largefile) {
+  title = t("settings.transcription.largefile-title");
+  description = t("settings.transcription.largefile-description");
+}
 ---
 
 <Layout>
@@ -63,7 +65,7 @@ if (transcriptions?.category === AudioCategory.AudioToText) {
             <div class="card-actions justify-start ">
               <div class="badge px-2 border-neutral">
                 {}
-                {AudioCategoryLabels[transcriptions?.category ??AudioCategory.AudioToText]}
+                {AudioCategoryLabels[transcriptions?.category ?? AudioCategory.AudioToText]}
               </div>
             </div>
           )
