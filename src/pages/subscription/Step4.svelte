@@ -104,6 +104,7 @@
         type: "error",
         message: "Something went wrong. Please try again.",
       });
+      $subscription = {};
     }
   }
 

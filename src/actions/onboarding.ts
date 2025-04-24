@@ -12,6 +12,9 @@ import PromptModel, { type Prompt } from "$data/models/prompt.model";
 import SubscriptionModel, {
   type Subscription,
 } from "$data/models/subscription.model";
+import TranscriptionModel, {
+  type Transcription,
+} from "$data/models/transcription.model";
 import {
   SubscriptionPackageId,
   AudioOptionId,
@@ -31,7 +34,7 @@ import {
   AUTH0_ROLE_ADMIN_DEV,
 } from "$constants";
 
-const originalTenantId = isProd() ? TENANT_MASTER_PROD : TENANT_MASTER_DEV;
+const masterTenantId = isProd() ? TENANT_MASTER_PROD : TENANT_MASTER_DEV;
 const OrganizationNameInputParamsSchema = z.object({
   company_name: z.string().min(1),
 });
@@ -157,7 +160,7 @@ export const onboarding = {
     handler: async (input, context) => {
       // Clone the tenant
       const transcriptionTypes = getTranscriptionTypes(input.add_ons ?? []);
-      const newTenant = await TenantModel.copyTenant(originalTenantId, {
+      const newTenant = await TenantModel.copyTenant(masterTenantId, {
         name: input.name,
         org_id: input.org_id,
         org_name: input.org_name,
@@ -176,7 +179,7 @@ export const onboarding = {
         (categoryId) => new ObjectId(categoryId),
       );
       const categoryCursor = await CategoryModel.listByTenantAndIds(
-        originalTenantId,
+        masterTenantId,
         selectedCategoryIds,
       );
       const categories = await categoryCursor.toArray();
@@ -230,6 +233,22 @@ export const onboarding = {
       if (newPrompts.length > 0) {
         await PromptModel.insertMultiple(newPrompts);
       }
+
+      // Find all audio transcriptions for the original tenant
+      const transcriptions =
+        await TranscriptionModel.listByTenant(masterTenantId);
+      const newTranscriptions = transcriptions.map(
+        (transcription: Transcription) => ({
+          ...transcription,
+          ...{
+            _id: new ObjectId(),
+            tenant_id: newTenant.insertedId,
+            created_at: new Date(),
+            updated_at: new Date(),
+          },
+        }),
+      );
+      await TranscriptionModel.insertMultiple(newTranscriptions);
 
       // Create tenant subscription
       const subAddOns = input.add_ons?.map((name) => {
