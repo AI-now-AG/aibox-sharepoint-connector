@@ -21,6 +21,7 @@ import {
   AudioOptionLabels,
   SubscriptionStatus,
 } from "$types/Subscription";
+import { TourType } from "$types/Users";
 import { AudioCategory } from "$types/TenantFeature";
 import organizationsManagement from "$data/auth0/organizations-manager";
 import sendMail from "$utils/mail";
@@ -170,8 +171,14 @@ export const onboarding = {
       });
 
       // Update the current tenant for the logged-in user
-      await UserModel.update(context.locals.user.id, {
+      const { id: userId } = context.locals.user;
+      await UserModel.update(userId, {
         tenant_id: newTenant.insertedId,
+        logins_count: 0,
+      });
+      await UserModel.addTour(userId, {
+        type: TourType.OnboardingNewTenant,
+        active: true,
       });
 
       // Find all categories for the original tenant

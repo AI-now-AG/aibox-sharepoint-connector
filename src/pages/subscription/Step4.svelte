@@ -99,10 +99,6 @@
       // Step 4: Create member
       await finalizeSubscription(tenant.id);
 
-      await actions.user.resetLoginCount({
-        _id: user?.id?.toString() ?? "",
-      });
-
       // After successful subscription creation, reset the subscription store
       $subscription = {};
 

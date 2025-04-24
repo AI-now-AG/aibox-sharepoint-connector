@@ -214,9 +214,25 @@ export default {
     );
   },
 
-  updateTour: async (id: string, tours: z.infer<typeof UserTour>[]) => {
+  addTour: async (id: string | ObjectId, tour: z.infer<typeof UserTour>) => {
+    const _objectId = toObjectId(id);
     return await collection.updateOne(
-      { _id: new ObjectId(id) },
+      { _id: _objectId },
+      {
+        $addToSet: {
+          tours: tour,
+        },
+      },
+    );
+  },
+
+  updateTour: async (
+    id: string | ObjectId,
+    tours: z.infer<typeof UserTour>[],
+  ) => {
+    const _objectId = toObjectId(id);
+    return await collection.updateOne(
+      { _id: _objectId },
       { $set: { tours: tours } },
     );
   },
