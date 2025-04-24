@@ -9,7 +9,8 @@ import { TENANT_MASTER_DEV, TENANT_MASTER_PROD } from "$constants";
 const t = useTranslations();
 
 const masterTenantId = isProd() ? TENANT_MASTER_PROD : TENANT_MASTER_DEV;
-const categories = (await CategoryModel.getByTenantId(masterTenantId)) ?? [];
+const categoriesCursor = await CategoryModel.listByTenant(masterTenantId);
+const categories = await categoriesCursor.toArray();
 const useCases: any[] = [];
 categories.forEach((category) => {
   useCases.push({

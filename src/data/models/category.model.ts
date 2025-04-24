@@ -114,13 +114,6 @@ export default {
     return collection.findOne<Document<Category>>({ title });
   },
 
-  getByTenantId: async (tenantId: string | ObjectId) => {
-    const _tenantId = toObjectId(tenantId);
-    return collection.find<Document<Category>>({
-      tenant_id: _tenantId,
-    }).toArray();
-  },
-
   getByTitleAndTenant: async (title: string, tenantId: ObjectId) => {
     return collection.findOne<Document<Category>>({
       title,
@@ -144,7 +137,7 @@ export default {
     const _tenantId = toObjectId(tenantId);
     return collection.find<Document<Category>>({
       tenant_id: _tenantId,
-      category: { $in: ids },
+      _id: { $in: ids },
     });
   },
 

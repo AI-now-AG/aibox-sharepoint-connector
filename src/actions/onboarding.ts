@@ -31,8 +31,11 @@ import {
 } from "$constants";
 
 const originalTenantId = isProd() ? TENANT_MASTER_PROD : TENANT_MASTER_DEV;
-const Auth0InputParamsSchema = z.object({
+const OrganizationNameInputParamsSchema = z.object({
   company_name: z.string().min(1),
+});
+const OrganizationIdInputParamsSchema = z.object({
+  org_id: z.string().min(1),
 });
 const TenantInputParamsSchema = z.object({
   name: z.string().min(1),
@@ -41,6 +44,7 @@ const TenantInputParamsSchema = z.object({
   plan_name: z.nativeEnum(SubscriptionPackageId).optional(),
   add_ons: z.array(z.nativeEnum(AudioOptionId)).optional(),
   billing: z.object({
+    company_name: z.string(),
     address: z.string(),
     zip_code: z.string(),
     location: z.string(),
@@ -48,7 +52,7 @@ const TenantInputParamsSchema = z.object({
   }),
   use_cases: z.array(z.string()),
 });
-const EmailInputParamsSchema = z.object({
+const TenantEmailInputParamsSchema = z.object({
   tenant_id: z.string().min(1),
   email: z.string().min(1),
 });
@@ -80,14 +84,15 @@ const getTranscriptionTypes = (selectedAddOns: AudioOptionId[]) => {
   return transcriptionTypes;
 };
 
-// step 1: setupAuth0()  - Create Auth0 org + move user from old org to new org
-// step 2: setupTenant() - Clone tenant & import categories / prompts
-// step 3: sendEmails()  - Send notification emails
+// step 1: createOrganization()  - Create Auth0 organization
+// step 2: createMember()  - Create Auth0 user, move user from trial org to new org
+// step 3: setupTenantData() - Clone tenant & import categories / prompts
+// step 4: finalize()  - Send notification emails
 
 export const onboarding = {
-  setupAuth0: defineAction({
-    input: Auth0InputParamsSchema,
-    handler: async (input, context) => {
+  createOrganization: defineAction({
+    input: OrganizationNameInputParamsSchema,
+    handler: async (input) => {
       const { company_name: companyName } = input;
       const name = companyName
         .toLowerCase()
@@ -111,6 +116,14 @@ export const onboarding = {
         import.meta.env.AUTH0_AUTH_CON_ID || "con_RXTD1LIbXJgceOUH",
       );
 
+      return transformRawData(organizationResult.data);
+    },
+  }),
+  createMember: defineAction({
+    input: OrganizationIdInputParamsSchema,
+    handler: async (input, context) => {
+      const { org_id: organizationId } = input;
+
       // delete current user in trial organization
       // move current user to new organization
       await organizationsManagement.deleteMembers(
@@ -131,10 +144,12 @@ export const onboarding = {
         [roleAdminId],
       );
 
-      return transformRawData(organizationResult.data);
+      return transformRawData({
+        id: organizationId,
+      });
     },
   }),
-  setupTenant: defineAction({
+  setupTenantData: defineAction({
     input: TenantInputParamsSchema,
     handler: async (input, context) => {
       // Clone the tenant
@@ -149,7 +164,7 @@ export const onboarding = {
 
       // Update the current tenant for the logged-in user
       await UserModel.update(context.locals.user.id, {
-        tenant_id: new ObjectId(input.org_id),
+        tenant_id: newTenant.insertedId,
       });
 
       // Find all categories for the original tenant
@@ -228,14 +243,14 @@ export const onboarding = {
       await SubscriptionModel.create(subscription);
 
       const data = {
-        tenant: newTenant,
+        id: newTenant.insertedId,
       };
 
       return transformRawData(data);
     },
   }),
-  sendEmails: defineAction({
-    input: EmailInputParamsSchema,
+  finalize: defineAction({
+    input: TenantEmailInputParamsSchema,
     handler: async (input) => {
       const { tenant_id: tenantId, email } = input;
       const tenant = await TenantModel.get(tenantId);

@@ -1,6 +1,10 @@
 import { ObjectId } from "mongodb";
 import { db, toObjectId } from "../mongodb";
-import { SubscriptionStatus, SubscriptionPackageId, AudioOptionId } from "$types/Subscription";
+import {
+  SubscriptionStatus,
+  SubscriptionPackageId,
+  AudioOptionId,
+} from "$types/Subscription";
 import { z } from "zod";
 
 const SubscriptionSchema = z.object({
@@ -8,18 +12,6 @@ const SubscriptionSchema = z.object({
   tenant_id: z.instanceof(ObjectId).optional(),
   plan_name: z.nativeEnum(SubscriptionPackageId).optional(),
   status: z.nativeEnum(SubscriptionStatus).optional(),
-  start_date: z
-    .date()
-    .optional()
-    .default(() => new Date()),
-  end_date: z
-    .date()
-    .optional()
-    .default(() => {
-      const d = new Date();
-      d.setMonth(d.getMonth() + 1);
-      return d;
-    }),
   metadata: z.record(z.any()).nullish(),
   add_ons: z
     .array(
