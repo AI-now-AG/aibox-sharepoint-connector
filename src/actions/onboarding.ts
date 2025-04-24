@@ -297,11 +297,15 @@ export const onboarding = {
       const emailContent = `
         <div style="font-family: Arial, sans-serif; padding: 20px;">
           <h1><b>New Onboarding Notification</b></h1>
-          <p><b>Org ID:</b> ${tenant.org_id}</p>
-          <p><b>Org Name:</b> ${tenant.org_name}</p>
-          <p><b>Display name:</b> ${tenant.name}</p>
-          <p><b>Billing address:</b> ${tenant.billing_info?.address}</p>
-          <p><b>Billing email:</b> ${tenant.billing_info?.email}</p>
+          <p><b>Organization ID:</b> ${tenant.org_id}</p>
+          <p><b>Organization Name:</b> ${tenant.name}</p>
+          <br/><br/>
+          <h4>Billing</h4>
+          <p><b>Company name:</b> ${tenant.billing_info?.company_name ?? "-"}</p>
+          <p><b>Address:</b> ${tenant.billing_info?.address ?? "-"}</p>
+          <p><b>Zip code:</b> ${tenant.billing_info?.zip_code ?? "-"}</p>
+          <p><b>Location:</b> ${tenant.billing_info?.location ?? "-"}</p>
+          <p><b>Email:</b> ${tenant.billing_info?.email ?? "-"}</p>
         </div>
       `;
       await sendMail({
