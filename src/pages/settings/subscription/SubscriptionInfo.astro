@@ -1,16 +1,21 @@
 ---
 import { SubscriptionPackageId, AudioOptionId } from "$types/Subscription";
 import SubscriptionModel from "$data/models/subscription.model";
-import { useTranslations } from "$i18n/utils";
+import { getLanguage, useTranslations } from "$i18n/utils";
+import SubscriptionPackages from "$subscription-packages.json";
 
 const t = useTranslations();
+const lang = getLanguage() as "en" | "de";
 
 const { tenant } = Astro.locals;
 const subscription = await SubscriptionModel.findActiveByTenant(tenant._id);
 const planName = subscription?.plan_name ?? SubscriptionPackageId.Starter;
 const addOns = subscription?.add_ons?.map(
-  (addOn: { name: AudioOptionId }) => addOn.name,
+  (addOn: { name: AudioOptionId }) => addOn.name
 );
+
+const { plan, audioOptions } = SubscriptionPackages;
+console.log("lang", lang);
 ---
 
 <div role="alert" class="alert alert-info inline-flex">
@@ -26,30 +31,28 @@ const addOns = subscription?.add_ons?.map(
   </h3>
 
   <!-- Plan name -->
-  {planName == SubscriptionPackageId.Starter && <p>Starter CHF 25</p>}
-  {planName == SubscriptionPackageId.Teams && <p>Teams CHF 149</p>}
-  {planName == SubscriptionPackageId.Pro && <p>Pro CHF 249</p>}
+  {
+    Object.values(plan)
+      .filter((plan) => plan.id == planName)
+      .map((plan) => {
+        return (
+          <p>
+            {plan?.["name"]?.[lang]} CHF {plan?.["price"]}
+          </p>
+        );
+      })
+  }
 
   <!-- Add-Ons list -->
   {
-    addOns?.some((name: AudioOptionId) => name == AudioOptionId.AudioBasis) && (
-      <p>Audio zu Text Basis CHF 25</p>
-    )
-  }
-  {
-    addOns?.some(
-      (name: AudioOptionId) => name == AudioOptionId.AudioBasisAddOnSubtitle,
-    ) && <p>Add-On Subtitle CHF 25</p>
-  }
-  {
-    addOns?.some(
-      (name: AudioOptionId) => name == AudioOptionId.AudioBasisAddOnLarge,
-    ) && <p>Add-On Audio XL CHF 15</p>
-  }
-  {
-    addOns?.some(
-      (name: AudioOptionId) => name == AudioOptionId.AudioPremium,
-    ) && <p>Audio zu Text Premium CHF 65</p>
+    addOns?.map((addOnName: AudioOptionId) => {
+      return (
+        <p>
+          {audioOptions?.[addOnName]?.["name"]?.[lang]} CHF{" "}
+          {audioOptions?.[addOnName]?.["price"]}
+        </p>
+      );
+    })
   }
 </div>
 
