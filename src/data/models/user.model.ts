@@ -101,7 +101,7 @@ export default {
   },
 
   listByTenant: async (tenantId: ObjectId, filterParams?: UserFilterParams) => {
-    const filter: any = {
+    const filter: Record<string, unknown> = {
       tenant_id: tenantId,
     };
 

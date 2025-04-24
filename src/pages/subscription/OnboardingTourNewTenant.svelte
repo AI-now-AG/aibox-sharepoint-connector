@@ -20,7 +20,7 @@
   async function markAsOnboarded() {
     await actions.user.deactiveTour({
       _id: user.id,
-      type: TourType.Onboarding,
+      type: TourType.OnboardingNewTenant,
     });
   }
 
@@ -30,7 +30,7 @@
       if (tours) {
         for (let i = 0; i < tours.length; i++) {
           const tour = tours[i];
-          if (tour.type === TourType.Onboarding && tour.active) {
+          if (tour.type === TourType.OnboardingNewTenant && tour.active) {
             return true;
           }
         }
@@ -61,45 +61,11 @@
         },
         steps: [
           {
-            element: "#onboardingId0",
-            popover: {
-              showButtons: ["next"],
-              popoverClass: "driverjs-theme",
-              title: t("onboarding.step-0.title"),
-              description: t("onboarding.step-0.description"),
-              nextBtnText: t("onboarding.step-0.next-btn-text"),
-            },
-          },
-          {
-            element: "#onboardingId1",
+            element: "#onboardingNewTenantId1",
             popover: {
               popoverClass: "driverjs-theme",
-              title: t("onboarding.step-1.title"),
-              description: t("onboarding.step-1.description"),
-            },
-          },
-          {
-            element: "#onboardingId2",
-            popover: {
-              popoverClass: "driverjs-theme",
-              title: t("onboarding.step-2.title"),
-              description: t("onboarding.step-2.description"),
-            },
-          },
-          {
-            element: "#onboardingId3",
-            popover: {
-              popoverClass: "driverjs-theme",
-              title: t("onboarding.step-3.title"),
-              description: t("onboarding.step-3.description"),
-            },
-          },
-          {
-            element: "#onboardingId4",
-            popover: {
-              popoverClass: "driverjs-theme",
-              title: t("onboarding.step-4.title"),
-              description: t("onboarding.step-4.description"),
+              title: t("onboarding.step-5.title"),
+              description: t("onboarding.step-5.description"),
             },
           },
         ],
@@ -128,11 +94,7 @@
           }
         },
         onHighlighted: (_e, _step) => {
-          if (
-            _step.element == "#onboardingId1" ||
-            _step.element == "#onboardingId3" ||
-            _step.element == "#onboardingId4"
-          ) {
+          if (_step.element == "#onboardingNewTenantId1") {
             const computedStyle = _popover
               ? getComputedStyle(_popover)
               : { inset: "0 0 0 0" };

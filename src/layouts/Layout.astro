@@ -6,6 +6,7 @@ import Navigation from "$components/nav/Navigation.astro";
 import OnboardingTour from "$components/OnboardingTour.svelte";
 import TrialComponent from "$components/TrialComponent.svelte";
 import RestrictUnverifiedUser from "$components/RestrictUnverifiedUser.svelte";
+import OnboardingTourNewTenant from "../pages/subscription/OnboardingTourNewTenant.svelte";
 import "$styles/global.css";
 
 import { useTranslations } from "$i18n/utils";
@@ -77,6 +78,11 @@ const isSocialAuth = isSocialConnection(userInfo?.auth0_sub);
         !user.email_verified && (
           <RestrictUnverifiedUser user={userInfo} client:load />
         )
+    }
+    {
+      !tenant?.is_trial && (
+        <OnboardingTourNewTenant user={userInfo} client:load />
+      )
     }
   </body>
 </html>

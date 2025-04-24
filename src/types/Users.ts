@@ -22,6 +22,7 @@ export const ROLE_PERMISSIONS_MAP = {
 
 export enum TourType {
   Onboarding = "Onboarding",
+  OnboardingNewTenant = "OnboardingNewTenant",
 }
 
 export const EncryptedUserPassword =
