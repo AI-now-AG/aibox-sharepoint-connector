@@ -52,7 +52,7 @@ export const AUTH0_ROLE_ADMIN_PROD = "rol_ekmcY6vrW5QiG5NF";
 // SendGrid
 export const SG_VERIFICATION_TEMPLATE = "d-69ed72334042458783f985ada5dbe61d";
 export const SG_WELCOME_TEMPLATE = "d-79e6332e21d14ff792ba9d995127abb7";
-export const SG_ONBOARDING_TEMPLATE = "d-79e6332e21d14ff792ba9d995127abb7";
+export const SG_NEW_TENANT_TEMPLATE = "d-87847bafc967448e93d99a411edece3a";
 
 // Tenants
 export const TENANT_MASTER_DEV = "67ff572260fa2a8bca5d26d0"; // aibox dev master
