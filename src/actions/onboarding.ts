@@ -25,7 +25,7 @@ import { isProd } from "$utils/env";
 import {
   TENANT_MASTER_DEV,
   TENANT_MASTER_PROD,
-  SG_ONBOARDING_TEMPLATE,
+  SG_NEW_TENANT_TEMPLATE,
   AUTH0_ROLE_ADMIN_PROD,
   AUTH0_ROLE_ADMIN_DEV,
 } from "$constants";
@@ -289,7 +289,7 @@ export const onboarding = {
           email: "no-reply@ainow.ch",
         },
         to: email,
-        templateId: SG_ONBOARDING_TEMPLATE,
+        templateId: SG_NEW_TENANT_TEMPLATE,
         dynamicTemplateData: {},
       });
 
