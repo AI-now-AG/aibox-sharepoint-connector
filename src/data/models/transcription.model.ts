@@ -82,10 +82,23 @@ export default {
     );
   },
 
+  listByTenantAndCategories: async (
+    tenantId: string | ObjectId,
+    categories: string[],
+  ) => {
+    const _tenantId = toObjectId(tenantId);
+    const data = collection.find<Document<Transcription>>({
+      tenant_id: _tenantId,
+      category: { $in: categories },
+    });
+    return await data.toArray();
+  },
+
   listByTenant: async (tenantId: string | ObjectId) => {
     if (!ObjectId.isValid(tenantId)) {
       return [];
     }
+
     const _tenantId = toObjectId(tenantId);
     const data = collection.find<Document<Transcription>>({
       tenant_id: _tenantId,
