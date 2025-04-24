@@ -235,8 +235,10 @@ export const onboarding = {
       }
 
       // Find all audio transcriptions for the original tenant
-      const transcriptions =
-        await TranscriptionModel.listByTenant(masterTenantId);
+      const transcriptions = await TranscriptionModel.listByTenantAndCategories(
+        masterTenantId,
+        transcriptionTypes,
+      );
       const newTranscriptions = transcriptions.map(
         (transcription: Transcription) => ({
           ...transcription,
