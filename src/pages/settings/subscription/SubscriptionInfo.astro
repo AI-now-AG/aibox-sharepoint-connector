@@ -60,7 +60,7 @@ const { plan, audioOptions } = SubscriptionPackages;
   <h3 class="mb-3 text-xl font-bold">{t("settings.subscription.billing")}</h3>
   <p>
     <strong>{t("settings.subscription.billing.name")}: </strong>
-    {tenant.name}
+    {tenant.billing_info?.company_name ?? "-"}
   </p>
   <p>
     <strong>{t("settings.subscription.billing.address")}: </strong>
