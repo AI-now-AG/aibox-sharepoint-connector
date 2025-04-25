@@ -223,12 +223,13 @@ export const tenant = {
   create: defineAction({
     input: z.object({
       tenant: TenantInputParamsSchema,
+      subscription: SubscriptionInputParamsSchema,
     }),
     handler: async (input) => {
       const session = client.startSession();
       session.startTransaction();
 
-      const { tenant: tenantInput } = input;
+      const { tenant: tenantInput, subscription: subInput } = input;
 
       try {
         // create new Auth0 organization
@@ -250,6 +251,13 @@ export const tenant = {
           org_id: organizationId,
         };
         const insertResult = await TenantModel.create(tenant);
+
+        // create new subscription
+        const subData: Partial<Omit<Subscription, "_id">> = {
+          ...subInput,
+          tenant_id: insertResult.insertedId,
+        };
+        await SubscriptionModel.create(subData);
 
         await session.commitTransaction();
         return transformRawData(insertResult);
@@ -288,9 +296,7 @@ export const tenant = {
         const organizationId = updatedDocument?.org_id;
 
         // update subscription
-        const subUpdate: Partial<Subscription> = {
-          ...subInput,
-        };
+        const subUpdate: Partial<Subscription> = subInput;
         await SubscriptionModel.update(tenantInput._id, subUpdate);
 
         // sync Auth0 organization

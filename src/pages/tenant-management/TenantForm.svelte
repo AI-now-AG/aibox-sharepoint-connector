@@ -53,14 +53,12 @@
       : tenant.name || t("common.edit");
   let tenantData = $state(tenant ?? {});
   tenantData.metadata = {
-    ...{
-      openaiPrivateKeyEnabled: false,
-      azureOpenaiPrivateKeyEnabled: false,
-      speechPrivateKeyEnabled: false,
-      elevenLabsPrivateKeyEnabled: false,
-      fluxPrivateKeyEnabled: false,
-      perplexityPrivateKeyEnabled: false,
-    },
+    openaiPrivateKeyEnabled: false,
+    azureOpenaiPrivateKeyEnabled: false,
+    speechPrivateKeyEnabled: false,
+    elevenLabsPrivateKeyEnabled: false,
+    fluxPrivateKeyEnabled: false,
+    perplexityPrivateKeyEnabled: false,
     ...(tenant?.metadata ?? {}),
   };
 
@@ -505,6 +503,10 @@
 
         const createTanentResult = await actions.tenant.create({
           tenant: tenantData,
+          subscription: {
+            plan_name: selectedPlanName,
+            add_ons: selectedPlanAddOns,
+          },
         });
         const { error, data: createdTenant } = createTanentResult;
 
@@ -524,9 +526,6 @@
       }
     }
   }
-
-  $inspect(selectedThemes);
-  $inspect(selectedPlanAddOns);
 
   async function updateTenant() {
     if (validateForm()) {
@@ -704,7 +703,7 @@
 </script>
 
 <div
-  class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14 sticky bg-base-200 top-0 z-[1000]"
+  class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14 sticky bg-base-200 top-0 z-40"
 >
   <div class="flex items-center pt-5 pb-2">
     <button

@@ -201,22 +201,18 @@ export const onboarding = {
           const newGroupId = new ObjectId();
           newGroups.push({
             ...group,
-            ...{
-              _id: newGroupId,
-            },
+            _id: newGroupId,
           });
           groupIdMap.set(group._id?.toString(), newGroupId);
         }
 
         const newCategory: Category = {
           ...category,
-          ...{
-            title: category.title,
-            tenant_id: newTenant.insertedId,
-            groups: newGroups,
-            created_at: new Date(),
-            updated_at: new Date(),
-          },
+          title: category.title,
+          tenant_id: newTenant.insertedId,
+          groups: newGroups,
+          created_at: new Date(),
+          updated_at: new Date(),
         };
 
         const { insertedId: newCatId } = await CategoryModel.add(newCategory);
@@ -231,13 +227,11 @@ export const onboarding = {
 
       const newPrompts = prompts.map((prompt: Prompt) => ({
         ...prompt,
-        ...{
-          tenant_id: newTenant.insertedId,
-          category: categoryIdMap.get(prompt.category?.toString()),
-          group: groupIdMap.get(prompt.group?.toString()),
-          created_at: new Date(),
-          updated_at: new Date(),
-        },
+        tenant_id: newTenant.insertedId,
+        category: categoryIdMap.get(prompt.category?.toString()),
+        group: groupIdMap.get(prompt.group?.toString()),
+        created_at: new Date(),
+        updated_at: new Date(),
       }));
 
       console.log("Prompt Categories:", categoryIdMap);
@@ -254,12 +248,10 @@ export const onboarding = {
       const newTranscriptions = transcriptions.map(
         (transcription: Transcription) => ({
           ...transcription,
-          ...{
-            _id: new ObjectId(),
-            tenant_id: newTenant.insertedId,
-            created_at: new Date(),
-            updated_at: new Date(),
-          },
+          _id: new ObjectId(),
+          tenant_id: newTenant.insertedId,
+          created_at: new Date(),
+          updated_at: new Date(),
         }),
       );
       await TranscriptionModel.insertMultiple(newTranscriptions);
@@ -268,7 +260,6 @@ export const onboarding = {
       const subscription: Partial<Omit<Subscription, "_id">> = {
         tenant_id: newTenant.insertedId,
         plan_name: input.plan_name,
-        status: SubscriptionStatus.Active,
         add_ons: input.add_ons,
       };
       await SubscriptionModel.create(subscription);

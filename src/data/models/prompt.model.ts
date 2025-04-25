@@ -42,9 +42,7 @@ export default {
   add: async (prompt: Prompt) => {
     const validated = PromptSchema.parse(prompt);
     const doc = {
-      ...{
-        position: 0,
-      },
+      position: 0,
       ...validated,
     };
     return collection.insertOne(doc);

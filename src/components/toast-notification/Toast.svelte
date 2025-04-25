@@ -22,7 +22,10 @@
 
 <div
   role="alert"
-  class="absolute right-4 bottom-4 alert alert-{type}"
+  class="absolute right-4 bottom-4 alert"
+  class:alert-success={type === "success"}
+  class:alert-error={type === "error"}
+  class:alert-info={type === "info"}
   transition:fade
 >
   <span class="icon">

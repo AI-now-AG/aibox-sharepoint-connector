@@ -25,17 +25,6 @@ export default {
       _id: new ObjectId(),
       ...tenant,
     });
-    // const doc = {
-    //   ...{
-    //     included_features: [
-    //       {
-    //         name: TenantFeature.TextPrommpts,
-    //         provider: ApiKeyProvider.OpenAI,
-    //       },
-    //     ],
-    //   },
-    //   ...validated,
-    // };
     return await collection.insertOne(validated);
   },
 

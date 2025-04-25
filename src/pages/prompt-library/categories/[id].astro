@@ -22,7 +22,7 @@ if (
   return Astro.redirect("/404");
 }
 
-const formattedCategory = { ...category, ...{ _id: id } };
+const formattedCategory = { ...category, _id: id };
 
 let userPermissions = Astro.locals.user.permissions;
 ---

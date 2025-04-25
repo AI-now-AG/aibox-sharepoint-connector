@@ -34,7 +34,12 @@ export default {
       _id: new ObjectId(),
       ...subscription,
     });
-    return await collection.insertOne(validated);
+    const doc = {
+      status: SubscriptionStatus.Active,
+      ...validated,
+    };
+
+    return await collection.insertOne(doc);
   },
 
   update: async (
@@ -63,7 +68,7 @@ export default {
       {
         $setOnInsert: {
           tenant_id: _tenantId,
-          plan_name: SubscriptionPackageId.Starter,
+          plan_name: null,
           add_ons: [],
           status: SubscriptionStatus.Active,
           created_at: new Date(),

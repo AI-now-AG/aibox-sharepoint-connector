@@ -57,7 +57,7 @@ export const POST: APIRoute = async (ctx) => {
 
     const data = RunPromptParamsSchema.parse({
       ...requestParams,
-      ...{ _id: id },
+      _id: id,
     });
 
     const prompt = await PromptModel.get(data._id);

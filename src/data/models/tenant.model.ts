@@ -87,14 +87,12 @@ export default {
   create: async (tenant: Partial<Omit<Tenant, "_id">>) => {
     const validated = TenantSchema.parse({ _id: new ObjectId(), ...tenant });
     const doc = {
-      ...{
-        included_features: [
-          {
-            name: TenantFeature.TextPrommpts,
-            provider: ApiKeyProvider.OpenAI,
-          },
-        ],
-      },
+      included_features: [
+        {
+          name: TenantFeature.TextPrommpts,
+          provider: ApiKeyProvider.OpenAI,
+        },
+      ],
       ...validated,
     };
     return await collection.insertOne(doc);

@@ -51,10 +51,8 @@ export default {
   add: async (category: Category) => {
     const validated = CategoryGroupSchema.parse(category);
     const doc = {
-      ...{
-        active: true,
-        position: 0,
-      },
+      active: true,
+      position: 0,
       ...validated,
     };
     return collection.insertOne(doc);
