@@ -20,17 +20,19 @@
     ApiKeyProvider,
     AudioCategory,
   } from "$types/TenantFeature";
-  import SingleInput from "$pages/prompt-library/prompts/SingleInput.svelte";
+  import SelectOptions from "$components/SelectOptions.svelte";
+  import AudioAddonsDropdown from "./AudioAddonsDropdown.svelte";
   import ThemeItem from "./ThemeItem.svelte";
 
   const t = useTranslations();
   let loading = $state(false);
 
   interface Props {
-    tenant?: any;
+    tenant: any;
+    subscription?: any;
   }
 
-  let { tenant }: Props = $props();
+  let { tenant, subscription }: Props = $props();
 
   let addTenantAdminModal: HTMLDialogElement | undefined = $state();
   let confirmUpdateModal: HTMLDialogElement | undefined = $state();
@@ -60,6 +62,10 @@
     },
     ...(tenant?.metadata ?? {}),
   };
+
+  // Subscription & billing
+  let selectedPlanName: string = $state(subscription?.plan_name ?? "");
+  let selectedPlanAddOns: string[] = $state(subscription?.add_ons ?? []);
   tenantData.billing_info = tenant?.billing_info ?? {};
 
   let openAIEnabled: boolean = $state(false);
@@ -195,7 +201,7 @@
     { title: "Deutsch", value: "de" },
     { title: "English", value: "en" },
   ];
-  let selectedLanguage: { title: string; value: string } | undefined = $state();
+  let selectedLanguage: string = $state("en");
 
   const themes = [
     { title: "Light", value: "light" },
@@ -258,16 +264,8 @@
   }
 
   // set default values
-  if (!tenantData.default_language) {
-    // tenantData.default_language = "de";
-    selectedLanguage = languages.find(
-      (item) => item.value === tenantData.default_language,
-    );
-  }
   if (tenantData.default_language) {
-    selectedLanguage = languages.find(
-      (item) => item.value === tenantData.default_language,
-    ) ?? { title: "Deutsch", value: "de" };
+    selectedLanguage = tenantData.default_language;
   }
   if (tenantData && !tenantData.theme) {
     tenantData.theme = "dark" as TenantTheme;
@@ -284,9 +282,8 @@
   }
 
   let selectedPerplexityModel: string = $state(
-    tenantData.perplexity_chat_model,
+    tenantData.perplexity_chat_model ?? "",
   );
-  const listOfPerplexityModel = ["sonar", "sonar-pro"];
 
   function toggleTextFeature(feature: ApiKeyProvider) {
     defaultTextFeature = defaultTextFeature === feature ? "" : feature;
@@ -421,7 +418,7 @@
     if (validateForm()) {
       try {
         loading = true;
-        tenantData.default_language = selectedLanguage?.value;
+        tenantData.default_language = selectedLanguage;
         tenantData.theme = selectedThemes?.value as TenantTheme;
         const { error: encryptKeysError, data } =
           await actions.tenant.encryptApiKeys({
@@ -526,12 +523,13 @@
   }
 
   $inspect(selectedThemes);
+  $inspect(selectedPlanAddOns);
 
   async function updateTenant() {
     if (validateForm()) {
       try {
         loading = true;
-        tenantData.default_language = selectedLanguage?.value;
+        tenantData.default_language = selectedLanguage;
         tenantData.theme = selectedThemes?.value as TenantTheme;
         const { error: encryptKeysError, data } =
           await actions.tenant.encryptApiKeys({
@@ -763,12 +761,11 @@
 
     <div class="flex flex-row space-x-4">
       <div class="flex-1 flex flex-col mb-4">
-        <SingleInput
-          title={`${t("tenant.language")}*`}
-          placeholder={t("tenant.german-language")}
-          items={languages}
-          bind:selectedItem={selectedLanguage}
-        />
+        <SelectOptions
+          label={`${t("tenant.language")}*`}
+          options={languages}
+          bind:value={selectedLanguage}
+        ></SelectOptions>
       </div>
 
       <div class="flex-1 flex flex-col mb-4">
@@ -804,6 +801,26 @@
     <div class="mb-3 flex flex-row items-center gap-2">
       {@html svgIcons.money}
       <p class="font-medium text-md">{"Subscription & Billing"}</p>
+    </div>
+    <div class="flex flex-row space-x-4">
+      <div class="flex-1 flex flex-col mb-4">
+        <SelectOptions
+          label="Subscription"
+          options={[
+            { value: "Starter", title: "Starter" },
+            { value: "Teams", title: "Teams" },
+            { value: "Pro", title: "Pro" },
+          ]}
+          bind:value={selectedPlanName}
+        ></SelectOptions>
+      </div>
+      <div class="flex-1 flex flex-col mb-4">
+        <AudioAddonsDropdown
+          title={"Audio Subscription"}
+          placeholder=""
+          bind:value={selectedPlanAddOns}
+        />
+      </div>
     </div>
     <div class="flex flex-row space-x-4">
       <div class="flex-1 flex flex-col mb-4">
@@ -845,7 +862,7 @@
         <input
           type="text"
           class="input input-bordered w-full"
-          bind:value={tenantData.billing_info.zipcode}
+          bind:value={tenantData.billing_info.zip_code}
         />
       </div>
     </div>
@@ -1127,15 +1144,22 @@
           </div>
         </div>
         <div class="collapse-content">
-          <div class="grid grid-cols-2 gap-4 mx-8">
+          <div class="grid grid-cols-2 gap-4 mx-8 mb-[30]">
             <div class="w-full z-20">
-              <SingleInput
-                title={`${t("tenant.model.name")}*`}
-                placeholder="e.g. sonar"
-                items={listOfPerplexityModel}
-                bind:selectedItem={selectedPerplexityModel}
-                displayTop={true}
-              />
+              <SelectOptions
+                label={`${t("tenant.model.name")}*`}
+                options={[
+                  {
+                    value: "sonar",
+                    title: "sonar",
+                  },
+                  {
+                    value: "sonar-pro",
+                    title: "sonar-pro",
+                  },
+                ]}
+                bind:value={selectedPerplexityModel}
+              ></SelectOptions>
             </div>
             <div class="w-full">
               <span class="mb-2 text-base-content font-medium text-sm"

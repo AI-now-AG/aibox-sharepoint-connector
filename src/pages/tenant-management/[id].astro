@@ -2,6 +2,7 @@
 import Layout from "$layouts/Layout.astro";
 import TenantForm from "./TenantForm.svelte";
 import TenantModel from "$data/models/tenant.model";
+import SubscriptionModel from "$data/models/subscription.model";
 import { transformRawData } from "$utils/transformRawData";
 import { decrypt } from "$utils/secure";
 
@@ -29,8 +30,10 @@ const tenantData = transformRawData(tenant);
 ].forEach((key) => {
   tenantData[key] = tenantData[key] ? decrypt(tenantData[key]) : "";
 });
+const subscription = await SubscriptionModel.getOrCreateSubscription(id);
+const subscriptionData = transformRawData(subscription);
 ---
 
 <Layout>
-  <TenantForm tenant={tenantData} client:load />
+  <TenantForm tenant={tenantData} subscription={subscriptionData} client:load />
 </Layout>
