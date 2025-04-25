@@ -51,6 +51,7 @@ const TenantInputParamsSchema = z.object({
   is_trial: z.boolean().optional().default(false),
   metadata: z.record(z.any()).optional(),
   tenant_admin_email: z.string().optional(),
+  billing_info: z.record(z.any()).optional(),
 });
 
 const TenanKeyEncryptSchema = z.object({

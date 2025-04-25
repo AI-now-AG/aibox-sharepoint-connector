@@ -60,6 +60,7 @@
     },
     ...(tenant?.metadata ?? {}),
   };
+  tenantData.billing_info = tenant?.billing_info ?? {};
 
   let openAIEnabled: boolean = $state(false);
   let azureOpenAIEnabled: boolean = $state(false);
@@ -795,6 +796,71 @@
           </button>
         </div>
       </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Subscription & Billing -->
+    <div class="mb-3 flex flex-row items-center gap-2">
+      {@html svgIcons.money}
+      <p class="font-medium text-md">{"Subscription & Billing"}</p>
+    </div>
+    <div class="flex flex-row space-x-4">
+      <div class="flex-1 flex flex-col mb-4">
+        <span class="mb-2 text-base-content font-medium text-sm"
+          >{t("settings.subscription.billing.name")}</span
+        >
+        <input
+          type="text"
+          class="input input-bordered w-full"
+          bind:value={tenantData.billing_info.company_name}
+        />
+      </div>
+      <div class="flex-1 flex flex-col mb-4">
+        <span class="mb-2 text-base-content font-medium text-sm"
+          >{t("settings.subscription.billing.email")}</span
+        >
+        <input
+          type="text"
+          class="input input-bordered w-full"
+          bind:value={tenantData.billing_info.email}
+        />
+      </div>
+    </div>
+    <div class="flex flex-row space-x-4">
+      <div class="flex-1 flex flex-col mb-4">
+        <span class="mb-2 text-base-content font-medium text-sm"
+          >{t("settings.subscription.billing.address")}</span
+        >
+        <input
+          type="text"
+          class="input input-bordered w-full"
+          bind:value={tenantData.billing_info.address}
+        />
+      </div>
+      <div class="flex-1 flex flex-col mb-4">
+        <span class="mb-2 text-base-content font-medium text-sm"
+          >{t("settings.subscription.billing.zipcode")}</span
+        >
+        <input
+          type="text"
+          class="input input-bordered w-full"
+          bind:value={tenantData.billing_info.zipcode}
+        />
+      </div>
+    </div>
+    <div class="flex flex-row space-x-4">
+      <div class="flex-1 flex flex-col mb-4">
+        <span class="mb-2 text-base-content font-medium text-sm"
+          >{t("settings.subscription.billing.location")}</span
+        >
+        <input
+          type="text"
+          class="input input-bordered w-full"
+          bind:value={tenantData.billing_info.location}
+        />
+      </div>
+      <div class="flex-1 flex flex-col mb-4"></div>
     </div>
 
     <div class="divider"></div>
