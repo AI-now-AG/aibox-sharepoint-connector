@@ -233,13 +233,15 @@ export const onboarding = {
         ...prompt,
         ...{
           tenant_id: newTenant.insertedId,
-          category: categoryIdMap.get(prompt.category),
-          group: groupIdMap.get(prompt.group),
+          category: categoryIdMap.get(prompt.category?.toString()),
+          group: groupIdMap.get(prompt.group?.toString()),
           created_at: new Date(),
           updated_at: new Date(),
         },
       }));
 
+      console.log("Prompt Categories:", categoryIdMap);
+      console.log("Prompt Groups:", groupIdMap);
       if (newPrompts.length > 0) {
         await PromptModel.insertMultiple(newPrompts);
       }
