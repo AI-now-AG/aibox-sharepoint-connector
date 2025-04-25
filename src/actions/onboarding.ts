@@ -232,6 +232,7 @@ export const onboarding = {
       const newPrompts = prompts.map((prompt: Prompt) => ({
         ...prompt,
         ...{
+          tenant_id: newTenant.insertedId,
           category: categoryIdMap.get(prompt.category),
           group: groupIdMap.get(prompt.group),
         },
