@@ -235,6 +235,8 @@ export const onboarding = {
           tenant_id: newTenant.insertedId,
           category: categoryIdMap.get(prompt.category),
           group: groupIdMap.get(prompt.group),
+          created_at: new Date(),
+          updated_at: new Date(),
         },
       }));
 
