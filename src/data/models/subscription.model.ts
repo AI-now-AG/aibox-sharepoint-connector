@@ -60,6 +60,27 @@ export default {
     );
   },
 
+  getOrCreateSubscription: async (tenantId: string | ObjectId) => {
+    const _tenantId = toObjectId(tenantId);
+    return await collection.findOneAndUpdate(
+      { tenant_id: _tenantId },
+      {
+        $setOnInsert: {
+          tenant_id: _tenantId,
+          plan_name: SubscriptionPackageId.Starter,
+          add_ons: [],
+          status: SubscriptionStatus.Active,
+          created_at: new Date(),
+          updated_at: new Date(),
+        },
+      },
+      {
+        upsert: true,
+        returnDocument: "after",
+      },
+    );
+  },
+
   findByTenant: async (tenantId: string | ObjectId) => {
     const id = toObjectId(tenantId);
     return await collection.findOne({ tenant_id: id });
