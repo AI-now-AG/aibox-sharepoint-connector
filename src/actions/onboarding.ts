@@ -19,7 +19,6 @@ import {
   SubscriptionPackageId,
   AudioOptionId,
   AudioOptionLabels,
-  SubscriptionStatus,
 } from "$types/Subscription";
 import { TourType } from "$types/Users";
 import { AudioCategory } from "$types/TenantFeature";
@@ -276,10 +275,17 @@ export const onboarding = {
     handler: async (input) => {
       const { tenant_id: tenantId, email } = input;
       const tenant = await TenantModel.get(tenantId);
+      const subscription = await SubscriptionModel.getByTenant(tenantId);
 
       if (!tenant) {
         throw new Error("Tenant not found.");
       }
+
+      const addOnsStr = subscription?.add_ons
+        ?.map((name: AudioOptionId) => {
+          return AudioOptionLabels[name];
+        })
+        .join(", ");
 
       // send notification email to aibox-support
       const subjectPrefix = isProd() ? "aibox" : "aibox-dev";
@@ -289,6 +295,10 @@ export const onboarding = {
           <h1><b>New Onboarding Notification</b></h1>
           <p><b>Organization ID:</b> ${tenant.org_id}</p>
           <p><b>Organization Name:</b> ${tenant.name}</p>
+          <br/><br/>
+          <h4>Subscription</h4>
+          <p><b>${subscription?.plan_name ?? "-"}</b></p>
+          <p>${addOnsStr}</p>
           <br/><br/>
           <h4>Billing</h4>
           <p><b>Company name:</b> ${tenant.billing_info?.company_name ?? "-"}</p>

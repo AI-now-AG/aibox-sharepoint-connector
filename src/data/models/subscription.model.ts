@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { db, toObjectId } from "../mongodb";
+import { db, toObjectId, type Document } from "../mongodb";
 import {
   SubscriptionStatus,
   SubscriptionPackageId,
@@ -29,6 +29,11 @@ export type Subscription = z.infer<typeof SubscriptionSchema>;
 const collection = db.collection("subscriptions");
 
 export default {
+  getByTenant: async (tenantId: string | ObjectId) => {
+    const _tenantId = toObjectId(tenantId);
+    return collection.findOne<Document<Subscription>>({ tenant_id: _tenantId });
+  },
+
   create: async (subscription: Partial<Omit<Subscription, "_id">>) => {
     const validated = SubscriptionSchema.parse({
       _id: new ObjectId(),
