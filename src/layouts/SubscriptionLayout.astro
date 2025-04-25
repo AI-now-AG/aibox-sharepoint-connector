@@ -68,7 +68,11 @@ const theme = Astro.locals.tenant.theme || "light";
         {
           currentStep !== -1 && (
             <div class="p-6">
-              <SubsciptionSteps orientation="vertical" {currentStep} />
+              <SubsciptionSteps
+                orientation="vertical"
+                {currentStep}
+                client:load
+              />
             </div>
           )
         }
