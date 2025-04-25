@@ -10,9 +10,7 @@ const lang = getLanguage() as "en" | "de";
 const { tenant } = Astro.locals;
 const subscription = await SubscriptionModel.findActiveByTenant(tenant._id);
 const planName = subscription?.plan_name ?? SubscriptionPackageId.Starter;
-const addOns = subscription?.add_ons?.map(
-  (addOn: { name: AudioOptionId }) => addOn.name
-);
+const addOns = subscription?.add_ons ?? [];
 
 const { plan, audioOptions } = SubscriptionPackages;
 ---

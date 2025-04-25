@@ -265,17 +265,11 @@ export const onboarding = {
       await TranscriptionModel.insertMultiple(newTranscriptions);
 
       // Create tenant subscription
-      const subAddOns = input.add_ons?.map((name) => {
-        return {
-          name,
-          title: AudioOptionLabels[name],
-        };
-      });
       const subscription: Partial<Omit<Subscription, "_id">> = {
         tenant_id: newTenant.insertedId,
         plan_name: input.plan_name,
         status: SubscriptionStatus.Active,
-        add_ons: subAddOns,
+        add_ons: input.add_ons,
       };
       await SubscriptionModel.create(subscription);
 

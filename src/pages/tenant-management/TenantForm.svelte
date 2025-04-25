@@ -20,6 +20,7 @@
     ApiKeyProvider,
     AudioCategory,
   } from "$types/TenantFeature";
+  import { SubscriptionPackageId, AudioOptionId } from "$types/Subscription";
   import SelectOptions from "$components/SelectOptions.svelte";
   import AudioAddonsDropdown from "./AudioAddonsDropdown.svelte";
   import ThemeItem from "./ThemeItem.svelte";
@@ -64,8 +65,10 @@
   };
 
   // Subscription & billing
-  let selectedPlanName: string = $state(subscription?.plan_name ?? "");
-  let selectedPlanAddOns: string[] = $state(subscription?.add_ons ?? []);
+  let selectedPlanName: SubscriptionPackageId = $state(
+    subscription?.plan_name ?? "",
+  );
+  let selectedPlanAddOns: AudioOptionId[] = $state(subscription?.add_ons ?? []);
   tenantData.billing_info = tenant?.billing_info ?? {};
 
   let openAIEnabled: boolean = $state(false);
@@ -622,6 +625,10 @@
 
         const { error } = await actions.tenant.update({
           tenant: tenantData,
+          subscription: {
+            plan_name: selectedPlanName,
+            add_ons: selectedPlanAddOns,
+          },
         });
         loading = false;
 

@@ -13,14 +13,7 @@ const SubscriptionSchema = z.object({
   plan_name: z.nativeEnum(SubscriptionPackageId).optional(),
   status: z.nativeEnum(SubscriptionStatus).optional(),
   metadata: z.record(z.any()).nullish(),
-  add_ons: z
-    .array(
-      z.object({
-        name: z.nativeEnum(AudioOptionId),
-        title: z.string().optional(),
-      }),
-    )
-    .optional(),
+  add_ons: z.array(z.nativeEnum(AudioOptionId)).optional(),
   notes: z.string().optional(),
   created_at: z
     .date()
@@ -44,15 +37,18 @@ export default {
     return await collection.insertOne(validated);
   },
 
-  update: async (id: string | ObjectId, update: Partial<Subscription>) => {
-    const objectId = toObjectId(id);
+  update: async (
+    tenantId: string | ObjectId,
+    update: Partial<Subscription>,
+  ) => {
+    const _tenantId = toObjectId(tenantId);
     const validated = SubscriptionSchema.partial().parse(update);
     const doc = {
       ...validated,
       updated_at: new Date(),
     };
     return await collection.findOneAndUpdate(
-      { _id: objectId },
+      { tenant_id: _tenantId },
       { $set: doc },
       {
         returnDocument: "after",
