@@ -806,12 +806,12 @@
     <!-- Subscription & Billing -->
     <div class="mb-3 flex flex-row items-center gap-2">
       {@html svgIcons.money}
-      <p class="font-medium text-md">{"Subscription & Billing"}</p>
+      <p class="font-medium text-md">{t("tenant.subscription-billing")}</p>
     </div>
     <div class="flex flex-row space-x-4">
       <div class="flex-1 flex flex-col mb-4">
         <SelectOptions
-          label="Subscription"
+          label={t("tenant.subscription")}
           options={[
             { value: "Starter", title: "Starter" },
             { value: "Teams", title: "Teams" },
@@ -822,7 +822,7 @@
       </div>
       <div class="flex-1 flex flex-col mb-4">
         <AudioAddonsDropdown
-          title={"Audio Subscription"}
+          title={t("tenant.audio-subscription")}
           placeholder=""
           bind:value={selectedPlanAddOns}
         />

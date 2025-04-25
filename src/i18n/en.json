@@ -437,5 +437,8 @@
   "nav.subscription": "Subscription",
   "settings.subscription.description": "Please <a href=\"https://ainow.ch/en/contact\"  target=\"_blank\" class=\"text-primary underline\">contact us</a> to change your\n    subscription or your billing information",
   "settings.subscription.current-plan": "Your current subscription",
-  "settings.subscription.billing": "Billing"
+  "settings.subscription.billing": "Billing",
+  "tenant.subscription-billing": "Subscription & Billing",
+  "tenant.subscription": "Subscription",
+  "tenant.audio-subscription": "Audio Subscription"
 }
