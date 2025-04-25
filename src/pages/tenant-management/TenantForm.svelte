@@ -808,7 +808,7 @@
     <div class="flex flex-row space-x-4">
       <div class="flex-1 flex flex-col mb-4">
         <span class="mb-2 text-base-content font-medium text-sm"
-          >{t("settings.subscription.billing.name")}</span
+          >{t("subscription.company-name")}</span
         >
         <input
           type="text"
@@ -818,7 +818,7 @@
       </div>
       <div class="flex-1 flex flex-col mb-4">
         <span class="mb-2 text-base-content font-medium text-sm"
-          >{t("settings.subscription.billing.email")}</span
+          >{t("subscription.billing-email")}</span
         >
         <input
           type="text"
@@ -830,7 +830,7 @@
     <div class="flex flex-row space-x-4">
       <div class="flex-1 flex flex-col mb-4">
         <span class="mb-2 text-base-content font-medium text-sm"
-          >{t("settings.subscription.billing.address")}</span
+          >{t("subscription.street-number")}</span
         >
         <input
           type="text"
@@ -840,7 +840,7 @@
       </div>
       <div class="flex-1 flex flex-col mb-4">
         <span class="mb-2 text-base-content font-medium text-sm"
-          >{t("settings.subscription.billing.zipcode")}</span
+          >{t("subscription.zip-code")}</span
         >
         <input
           type="text"
@@ -852,7 +852,7 @@
     <div class="flex flex-row space-x-4">
       <div class="flex-1 flex flex-col mb-4">
         <span class="mb-2 text-base-content font-medium text-sm"
-          >{t("settings.subscription.billing.location")}</span
+          >{t("subscription.location")}</span
         >
         <input
           type="text"

@@ -59,23 +59,23 @@ const { plan, audioOptions } = SubscriptionPackages;
 <div class="flex flex-col space-y-2 py-8">
   <h3 class="mb-3 text-xl font-bold">{t("settings.subscription.billing")}</h3>
   <p>
-    <strong>{t("settings.subscription.billing.name")}: </strong>
+    <strong>{t("subscription.company-name")}: </strong>
     {tenant.billing_info?.company_name ?? "-"}
   </p>
   <p>
-    <strong>{t("settings.subscription.billing.address")}: </strong>
+    <strong>{t("subscription.street-number")}: </strong>
     {tenant.billing_info?.address ?? "-"}
   </p>
   <p>
-    <strong>{t("settings.subscription.billing.zipcode")}: </strong>
+    <strong>{t("subscription.zip-code")}: </strong>
     {tenant.billing_info?.zip_code ?? "-"}
   </p>
   <p>
-    <strong>{t("settings.subscription.billing.location")}: </strong>
+    <strong>{t("subscription.location")}: </strong>
     {tenant.billing_info?.location ?? "-"}
   </p>
   <p>
-    <strong>{t("settings.subscription.billing.email")}: </strong>
+    <strong>{t("subscription.billing-email")}: </strong>
     {tenant.billing_info?.email ?? "-"}
   </p>
 </div>

@@ -437,10 +437,5 @@
   "nav.subscription": "Abonnement",
   "settings.subscription.description": "Please <a href=\"https://ainow.ch/kontakt\" target=\"_blank\" class=\"text-primary underline\">contact us</a> to change your\n    subscription or your billing information",
   "settings.subscription.current-plan": "Your current subscription",
-  "settings.subscription.billing": "Billing",
-  "settings.subscription.billing.name": "Company Name",
-  "settings.subscription.billing.address": "Address",
-  "settings.subscription.billing.zipcode": "Zip code",
-  "settings.subscription.billing.location": "Location",
-  "settings.subscription.billing.email": "Email"
+  "settings.subscription.billing": "Billing"
 }
