@@ -253,7 +253,9 @@ export const onboarding = {
           updated_at: new Date(),
         }),
       );
-      await TranscriptionModel.insertMultiple(newTranscriptions);
+      if (newTranscriptions.length > 0) {
+        await TranscriptionModel.insertMultiple(newTranscriptions);
+      }
 
       // Create tenant subscription
       const subscription: Partial<Omit<Subscription, "_id">> = {

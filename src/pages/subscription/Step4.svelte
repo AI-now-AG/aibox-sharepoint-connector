@@ -75,7 +75,7 @@
     console.log("iboxsubscription", $subscription);
     if (
       isTrulyEmpty($subscription.plan) ||
-      isTrulyEmpty($subscription.audioOptions) ||
+      //isTrulyEmpty($subscription.audioOptions) ||
       isTrulyEmpty($subscription.billingInformation) ||
       isTrulyEmpty($subscription.organizationInformation)
     ) {
