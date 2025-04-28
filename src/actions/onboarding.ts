@@ -2,7 +2,7 @@ import { defineAction } from "astro:actions";
 import { z } from "zod";
 import { ObjectId } from "mongodb";
 import { transformRawData } from "$utils/transformRawData";
-import UserModel from "$data/models/user.model";
+import UserModel, { assignPermissions } from "$data/models/user.model";
 import TenantModel from "$data/models/tenant.model";
 import CategoryModel, {
   type Category,
@@ -171,9 +171,11 @@ export const onboarding = {
 
       // Update the current tenant for the logged-in user
       const { id: userId } = context.locals.user;
+      const newRoles = [UserRole.Admin];
       await UserModel.update(userId, {
         tenant_id: newTenant.insertedId,
-        roles: [UserRole.Admin],
+        roles: newRoles,
+        permissions: assignPermissions(newRoles),
         logins_count: 0,
       });
       await UserModel.addTour(userId, {
