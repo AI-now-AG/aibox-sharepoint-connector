@@ -2,7 +2,7 @@
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <!-- svelte-ignore event_directive_deprecated -->
 <script lang="ts">
-  import { SUBSCIPTION_STEP } from "$constants";
+  import { SUBSCIPTION_STEP } from "$types/Subscription";
   import { useTranslations } from "$i18n/utils";
 
   interface Props {

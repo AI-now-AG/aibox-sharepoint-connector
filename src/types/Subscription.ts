@@ -23,3 +23,12 @@ export const AudioOptionLabels: Record<AudioOptionId, string> = {
   [AudioOptionId.AudioBasisAddOnLarge]: "Add-on Audio Xl",
   [AudioOptionId.AudioPremium]: "Audio Premium Package",
 };
+
+export const SUBSCIPTION_STEP = {
+  Step0: 0,
+  Step1: 1,
+  Step2: 2,
+  Step3: 3,
+  Step4: 4,
+  Completed: 5,
+};
