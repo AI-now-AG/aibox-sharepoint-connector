@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { db, toObjectId, type Document } from "../mongodb";
+import { db, toObjectId } from "../mongodb";
 import {
   SubscriptionStatus,
   SubscriptionPackageId,
@@ -10,7 +10,7 @@ import { z } from "zod";
 const SubscriptionSchema = z.object({
   _id: z.instanceof(ObjectId),
   tenant_id: z.instanceof(ObjectId).optional(),
-  plan_name: z.nativeEnum(SubscriptionPackageId).optional(),
+  plan_name: z.nativeEnum(SubscriptionPackageId).or(z.literal("")).optional(),
   status: z.nativeEnum(SubscriptionStatus).optional(),
   metadata: z.record(z.any()).nullish(),
   add_ons: z.array(z.nativeEnum(AudioOptionId)).optional(),
@@ -29,11 +29,6 @@ export type Subscription = z.infer<typeof SubscriptionSchema>;
 const collection = db.collection("subscriptions");
 
 export default {
-  getByTenant: async (tenantId: string | ObjectId) => {
-    const _tenantId = toObjectId(tenantId);
-    return collection.findOne<Document<Subscription>>({ tenant_id: _tenantId });
-  },
-
   create: async (subscription: Partial<Omit<Subscription, "_id">>) => {
     const validated = SubscriptionSchema.parse({
       _id: new ObjectId(),

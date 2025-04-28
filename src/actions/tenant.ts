@@ -78,7 +78,7 @@ const CreateTenantAdminSchema = z.object({
 });
 
 const SubscriptionInputParamsSchema = z.object({
-  plan_name: z.nativeEnum(SubscriptionPackageId).optional(),
+  plan_name: z.nativeEnum(SubscriptionPackageId).or(z.literal("")).optional(),
   add_ons: z.array(z.nativeEnum(AudioOptionId)).optional(),
 });
 
