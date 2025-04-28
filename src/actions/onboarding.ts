@@ -59,7 +59,6 @@ const TenantInputParamsSchema = z.object({
 });
 const TenantEmailInputParamsSchema = z.object({
   tenant_id: z.string().min(1),
-  email: z.string().min(1),
 });
 
 const getTranscriptionTypes = (selectedAddOns: AudioOptionId[]) => {
@@ -278,8 +277,9 @@ export const onboarding = {
   }),
   finalize: defineAction({
     input: TenantEmailInputParamsSchema,
-    handler: async (input) => {
-      const { tenant_id: tenantId, email } = input;
+    handler: async (input, context) => {
+      const { tenant_id: tenantId } = input;
+      const email = context.locals.user.email;
       const tenant = await TenantModel.get(tenantId);
       const subscription = await SubscriptionModel.findByTenant(tenantId);
 
