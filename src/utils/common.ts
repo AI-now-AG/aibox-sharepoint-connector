@@ -1,33 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-useless-escape */
-import type { ParsedAuth0UserSub } from "$types/auth0.types";
 import moment from "moment";
-
-export const parseAuth0UserSub = (auth0Sub: string): ParsedAuth0UserSub => {
-  const [provider, id] = auth0Sub?.split("|") ?? [];
-  return { provider, id };
-};
-
-export const isEnterpriseConnection = (auth0Sub: string): boolean => {
-  const [provider] = auth0Sub?.split("|") ?? [];
-  const enterpriseConnections = [
-    "saml",
-    "oidc",
-    "okta",
-    "google",
-    "waad",
-    "adfs",
-    "ad",
-    "ping",
-  ];
-  return enterpriseConnections.includes(provider);
-};
-
-export const isSocialConnection = (auth0Sub: string): boolean => {
-  const [provider] = auth0Sub?.split("|") ?? [];
-  const socialConnections = ["google-oauth2", "windowslive"];
-  return socialConnections.includes(provider);
-};
 
 export function isTrulyEmpty(obj: any) {
   return !obj || Object.keys(obj).length === 0;

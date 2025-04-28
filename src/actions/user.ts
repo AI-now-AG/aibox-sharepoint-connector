@@ -12,7 +12,7 @@ import UserModel from "$data/models/user.model";
 import usersManagement from "$data/auth0/users-manager";
 import organizationsManagement from "$data/auth0/organizations-manager";
 import rolesManagement from "$data/auth0/roles-manager";
-import { isEnterpriseConnection } from "$utils/common";
+import { isEnterpriseConnection } from "$utils/auth0Auth";
 import { EncryptedUserPassword, TourType, UserRole } from "$types/Users";
 
 const UserInputParamsSchema = z.object({
