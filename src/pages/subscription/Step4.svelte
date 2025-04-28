@@ -64,7 +64,6 @@
   async function finalizeSubscription(newTenantId: string) {
     const { data, error } = await actions.onboarding.finalize({
       tenant_id: newTenantId,
-      email: $subscription.billingInformation?.billingEmail ?? "",
     });
 
     if (error) throw new Error("Failed to finalize subscription");
