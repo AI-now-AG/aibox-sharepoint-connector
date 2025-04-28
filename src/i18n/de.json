@@ -440,5 +440,10 @@
   "settings.subscription.billing": "Rechnung",
   "tenant.subscription-billing": "Abonnement & Rechnung",
   "tenant.subscription": "Abonnement",
-  "tenant.audio-subscription": "Audio-Abonnement"
+  "tenant.audio-subscription": "Audio-Abonnement",
+  "subscription.create-organization-failed": "Failed to create organization",
+  "subscription.create-memeber-failed": "Failed to create member",
+  "subscription.setup-tenant-data-failed": "Failed to setup tenant data",
+  "subscription.finalize-subsciption-failed": "Failed to finalize subscription",
+  "subscription.missing-subscription-information": "Oops, missing subscription information."
 }

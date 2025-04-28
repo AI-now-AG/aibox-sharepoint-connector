@@ -3,7 +3,6 @@
   import SubsciptionSteps from "$components/subscription/SubsciptionSteps.svelte";
   import { useTranslations } from "$i18n/utils";
   import { onMount } from "svelte";
-  import { addToast } from "$stores/toast";
   import RadarLoading from "./RadarLoading.svelte";
   import subscription from "$stores/subscription";
   import { SubscriptionPackageId, AudioOptionId } from "$types/Subscription";
@@ -15,12 +14,14 @@
   let { defaultLanguage = "en" }: Props = $props();
   const t = useTranslations(defaultLanguage);
 
+  let errorMessage = $state("");
+
   async function createOrganization() {
     const { data, error } = await actions.onboarding.createOrganization({
       company_name: $subscription.billingInformation?.companyName ?? "",
     });
 
-    if (error) throw new Error("Failed to create organization");
+    if (error) throw new Error(t("subscription.create-organization-failed"));
     return data;
   }
 
@@ -29,7 +30,7 @@
       org_id: organizationId,
     });
 
-    if (error) throw new Error("Failed to create member");
+    if (error) throw new Error(t("subscription.create-memeber-failed"));
     return data;
   }
 
@@ -56,7 +57,7 @@
       use_cases: $subscription.organizationInformation?.useCases ?? [],
     });
 
-    if (error) throw new Error("Failed to setup tenant data");
+    if (error) throw new Error(t("subscription.setup-tenant-data-failed"));
     return data;
   }
 
@@ -66,25 +67,20 @@
       email: $subscription.billingInformation?.billingEmail ?? "",
     });
 
-    if (error) throw new Error("Failed to finalize subscription");
+    if (error) throw new Error(t("subscription.finalize-subsciption-failed"));
     return data;
   }
 
   async function runOnboardingFlow() {
-    console.log("iboxsubscription", $subscription);
-    if (
-      isTrulyEmpty($subscription.plan) ||
-      isTrulyEmpty($subscription.billingInformation) ||
-      isTrulyEmpty($subscription.organizationInformation)
-    ) {
-      addToast({
-        type: "error",
-        message: "Oops, missing subscription information.",
-      });
-      return false;
-    }
-
     try {
+      if (
+        isTrulyEmpty($subscription.plan) ||
+        isTrulyEmpty($subscription.billingInformation) ||
+        isTrulyEmpty($subscription.organizationInformation)
+      ) {
+        throw new Error(t("subscription.missing-subscription-information"));
+      }
+
       // Step 1: Create organization
       const organization = await createOrganization();
 
@@ -103,10 +99,10 @@
       // All steps successful, redirect
       window.location.href = "/subscription/complete";
     } catch (err) {
-      addToast({
-        type: "error",
-        message: "Something went wrong. Please try again.",
-      });
+      errorMessage =
+        (err as Error)?.message ||
+        err?.toString() ||
+        "Something went wrong. Please try again.";
       $subscription = {};
     }
   }
@@ -124,13 +120,23 @@
   >
     <SubsciptionSteps currentStep={4} {defaultLanguage} />
   </div>
-
-  <div
-    class="w-[40px] h-[40px] absolute left-[50%] top-[42%] translate-[-50%] flex flex-col justify-center mb-6"
-  >
-    <RadarLoading />
-  </div>
-  <p class="font-sans text-3xl font-bold text-[#0F172A] text-center">
-    {t("subscription.creating-your-account")}
-  </p>
+  {#if errorMessage}
+    <div
+      class="bg-red-500 w-[80px] h-[80px] rounded-full flex justify-center items-center mb-6"
+    >
+      <span class="text-white text-4xl pb-2"> x </span>
+    </div>
+    <p class="font-sans text-3xl font-bold text-red-500 text-center">
+      {errorMessage}
+    </p>
+  {:else}
+    <div
+      class="w-[40px] h-[40px] absolute left-[50%] top-[42%] translate-[-50%] flex flex-col justify-center mb-6"
+    >
+      <RadarLoading />
+    </div>
+    <p class="font-sans text-3xl font-bold text-[#0F172A] text-center">
+      {t("subscription.creating-your-account")}
+    </p>
+  {/if}
 </div>
