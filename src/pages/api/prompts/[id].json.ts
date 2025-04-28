@@ -6,13 +6,11 @@ import {
   AIMessage,
 } from "@langchain/core/messages";
 import PromptModel from "$data/models/prompt.model";
-import InstructionModel from "$data/models/instruction.model";
 import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
 import { z } from "zod";
 import { fileLoader } from "$utils/document-loader";
 import type { APIRoute } from "astro";
 import { AIMessageChunk } from "@langchain/core/messages";
-import type { CreateInstructionParams } from "../instructions.json";
 import type { CreateKnowledgeBaseParams } from "../knowledge-base.json";
 import initializeOpenAI from "$utils/chatModel";
 import { MessageRole } from "$types/MessageHistory";
@@ -20,7 +18,6 @@ import { MessageRole } from "$types/MessageHistory";
 export type PromptDetails = {
   title: string;
   prompt: string;
-  instructions: CreateInstructionParams[];
   knowledgebase: CreateKnowledgeBaseParams[];
 };
 
@@ -72,19 +69,6 @@ export const POST: APIRoute = async (ctx) => {
 
     const messages: BaseMessage[] = [];
     messages.push(new SystemMessage(prompt.prompt));
-
-    if (prompt?.instructions) {
-      const calls = prompt.instructions.map(async (inst) => {
-        const instruction = await InstructionModel.get(inst.toString());
-        return instruction;
-      });
-      const instructions = await Promise.all(calls);
-      instructions.forEach((instruction) => {
-        if (instruction?.instruction) {
-          messages.push(new SystemMessage(instruction.instruction));
-        }
-      });
-    }
 
     if (prompt?.knowledgebase) {
       const calls = prompt.knowledgebase.map(async (kb) => {
@@ -230,15 +214,6 @@ export const PUT: APIRoute<PromptDetails> = async (ctx) => {
 
     if (params) {
       await PromptModel.updatePromptField(promptId, params.prompt);
-
-      const instructionCalls = params.instructions.map(async (inst) => {
-        const instruction = await InstructionModel.updateInstruction(
-          inst._id!,
-          inst.instruction,
-        );
-        return instruction;
-      });
-      await Promise.all(instructionCalls);
 
       const kbCalls = params.knowledgebase.map(async (kb) => {
         const instruction = await KnowledgeBaseModel.updateKnowledgeBase(
