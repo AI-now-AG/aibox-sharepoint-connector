@@ -230,6 +230,7 @@ export const onboarding = {
         tenant_id: newTenant.insertedId,
         category: categoryIdMap.get(prompt.category?.toString()),
         group: groupIdMap.get(prompt.group?.toString()),
+        documents: [],
         created_at: new Date(),
         updated_at: new Date(),
       }));
