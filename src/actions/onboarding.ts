@@ -20,7 +20,7 @@ import {
   AudioOptionId,
   AudioOptionLabels,
 } from "$types/Subscription";
-import { TourType } from "$types/Users";
+import { UserRole, TourType } from "$types/Users";
 import { AudioCategory } from "$types/TenantFeature";
 import organizationsManagement from "$data/auth0/organizations-manager";
 import sendMail from "$utils/mail";
@@ -173,6 +173,7 @@ export const onboarding = {
       const { id: userId } = context.locals.user;
       await UserModel.update(userId, {
         tenant_id: newTenant.insertedId,
+        roles: [UserRole.Admin],
         logins_count: 0,
       });
       await UserModel.addTour(userId, {
