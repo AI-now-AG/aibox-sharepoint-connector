@@ -261,7 +261,7 @@ const _calculatePerplexityUsage = (
 
   const sonarRequests = sonarItems.length;
   usageItems.push({
-    model: "Sonar low / legacy",
+    model: "Sonar medium",
     amount: sonarRequests,
     unit: unitLabels.requests,
     credits: _requestsToCredits(ApiKeyProvider.Perplexity, sonarRequests),
