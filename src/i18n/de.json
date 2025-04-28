@@ -445,5 +445,6 @@
   "subscription.create-memeber-failed": "Mitglied konnte nicht erstellt werden",
   "subscription.setup-tenant-data-failed": "Tenant konnte nicht eingerichtet werden",
   "subscription.finalize-subsciption-failed": "Abonnement konnte nicht abgeschlossen werden",
-  "subscription.missing-subscription-information": "Ups, fehlende Abonnementinformationen."
+  "subscription.missing-subscription-information": "Ups, fehlende Abonnementinformationen.",
+  "subscription.create-my-aibox": "Meine Aibox erstellen"
 }
