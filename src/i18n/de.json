@@ -441,9 +441,9 @@
   "tenant.subscription-billing": "Abonnement & Rechnung",
   "tenant.subscription": "Abonnement",
   "tenant.audio-subscription": "Audio-Abonnement",
-  "subscription.create-organization-failed": "Failed to create organization",
-  "subscription.create-memeber-failed": "Failed to create member",
-  "subscription.setup-tenant-data-failed": "Failed to setup tenant data",
-  "subscription.finalize-subsciption-failed": "Failed to finalize subscription",
-  "subscription.missing-subscription-information": "Oops, missing subscription information."
+  "subscription.create-organization-failed": "Organisation konnte nicht erstellt werden",
+  "subscription.create-memeber-failed": "Mitglied konnte nicht erstellt werden",
+  "subscription.setup-tenant-data-failed": "Tenant konnte nicht eingerichtet werden",
+  "subscription.finalize-subsciption-failed": "Abonnement konnte nicht abgeschlossen werden",
+  "subscription.missing-subscription-information": "Ups, fehlende Abonnementinformationen."
 }
