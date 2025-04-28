@@ -24,10 +24,11 @@
     { title: "English", value: "en" },
   ];
 
-  const initSelectedLanguage =
-    initOrganizationInformation?.defaultLanguage == "de"
+  const initSelectedLanguage = initOrganizationInformation?.defaultLanguage
+    ? initOrganizationInformation?.defaultLanguage == "de"
       ? languages[0]
-      : languages[1];
+      : languages[1]
+    : languages[0];
 
   let selectedLanguage: { title: string; value: string } =
     $state(initSelectedLanguage);
