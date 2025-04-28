@@ -30,6 +30,7 @@ const checkFileExist: Handler = async (event, context) => {
     typedCategory,
     isDiarizationEnabled,
     encryptedSpeechKey,
+    isM4AFile,
   } = JSON.parse(event.body!);
   let requireFilesCount = fileNames.length || 0;
   const tempFileNames: string[] = [];
@@ -44,9 +45,10 @@ const checkFileExist: Handler = async (event, context) => {
     tempFileNames.push(improvedTxtFileName);
   }
 
-  const txtFileName = isDiarizationEnabled
-    ? `${uniqueName}-mono.txt`
-    : `${uniqueName}.txt`;
+  const txtFileName =
+    isDiarizationEnabled || isM4AFile
+      ? `${uniqueName}-mono.txt`
+      : `${uniqueName}.txt`;
   if (!fileNames.includes(txtFileName) && !isShowImprovedTextPreview) {
     requireFilesCount += 1;
     tempFileNames.push(txtFileName);
@@ -139,7 +141,10 @@ const checkFileExist: Handler = async (event, context) => {
         } else if (fileName.endsWith(".json")) {
           jsonFileUrl = fileUrl; // Store the URL for the .ass file
         } else if (fileName.endsWith(".txt")) {
-          if (typedCategory === AudioCategory.Subtitle || typedCategory === AudioCategory.Subtitle11Labs) {
+          if (
+            typedCategory === AudioCategory.Subtitle ||
+            typedCategory === AudioCategory.Subtitle11Labs
+          ) {
             txtFileUrl = fileUrl; // Store the URL for the .txt file
           }
         }
