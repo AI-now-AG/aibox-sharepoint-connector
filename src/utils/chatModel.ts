@@ -20,6 +20,11 @@ export const initPerplexityOpenAI = (
     openAIApiKey: apiKey, // Set API key for authentication
     configuration: { baseURL: "https://api.perplexity.ai" }, // Use Perplexity's API endpoint
     modelName: model, // Specify model (if provided)
+    modelKwargs: {
+      web_search_options: {
+        search_context_size: "medium",
+      },
+    },
     callbacks: [
       new UsageTrackerCallbackHandler(
         tenantId,
