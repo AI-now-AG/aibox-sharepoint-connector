@@ -69,20 +69,22 @@ const isSocialAuth = isSocialConnection(userInfo?.auth0_sub);
         <Navigation />
       </div>
     </div>
-    {tenant?.is_trial && <OnboardingTour user={userInfo} client:load />}
-    {tenant?.is_trial && <TrialComponent {locale} client:load />}
-    {
-      tenant?.is_trial &&
-        !isSocialAuth &&
-        user?.email_verified != undefined &&
-        !user.email_verified && (
-          <RestrictUnverifiedUser user={userInfo} client:load />
+    <div class="z-[11]">
+      {tenant?.is_trial && <OnboardingTour user={userInfo} client:load />}
+      {
+        !tenant?.is_trial && (
+          <OnboardingTourNewTenant user={userInfo} client:load />
         )
-    }
-    {
-      !tenant?.is_trial && (
-        <OnboardingTourNewTenant user={userInfo} client:load />
-      )
-    }
+      }
+      {tenant?.is_trial && <TrialComponent {locale} client:load />}
+      {
+        tenant?.is_trial &&
+          !isSocialAuth &&
+          user?.email_verified != undefined &&
+          !user.email_verified && (
+            <RestrictUnverifiedUser user={userInfo} client:load />
+          )
+      }
+    </div>
   </body>
 </html>
