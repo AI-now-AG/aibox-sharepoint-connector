@@ -2,12 +2,11 @@
 import { useTranslations } from "$i18n/utils";
 import SubscriptionLayout from "$layouts/SubscriptionLayout.astro";
 import StepComponent from "./Step4.svelte";
-import { isProd } from "$utils/env";
 
 const t = useTranslations();
 const user = Astro.locals.user;
 
-if (isProd() && Astro.locals.tenant.is_trial !== true) {
+if (Astro.locals.tenant.is_trial !== true) {
   return Astro.redirect("/restricted");
 }
 

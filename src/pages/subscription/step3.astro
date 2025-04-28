@@ -19,7 +19,7 @@ categories.forEach((category) => {
   });
 });
 
-if (isProd() && Astro.locals.tenant.is_trial !== true) {
+if (Astro.locals.tenant.is_trial !== true) {
   return Astro.redirect("/restricted");
 }
 
