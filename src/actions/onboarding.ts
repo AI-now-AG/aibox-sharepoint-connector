@@ -278,7 +278,7 @@ export const onboarding = {
     handler: async (input) => {
       const { tenant_id: tenantId, email } = input;
       const tenant = await TenantModel.get(tenantId);
-      const subscription = await SubscriptionModel.getByTenant(tenantId);
+      const subscription = await SubscriptionModel.findByTenant(tenantId);
 
       if (!tenant) {
         throw new Error("Tenant not found.");
