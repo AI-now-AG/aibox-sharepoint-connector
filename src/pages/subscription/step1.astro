@@ -9,8 +9,9 @@ const t = useTranslations();
 if (isProd() && Astro.locals.tenant.is_trial !== true) {
   return Astro.redirect("/restricted");
 }
+const defaultLanguage = Astro.locals.tenant.default_language || "en";
 ---
 
 <SubscriptionLayout title={t("subscription.choose-your-plan")}>
-  <StepComponent client:load />
+  <StepComponent client:load {defaultLanguage} />
 </SubscriptionLayout>

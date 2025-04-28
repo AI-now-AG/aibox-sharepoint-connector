@@ -1,7 +1,12 @@
 <script lang="ts">
   import SubsciptionSteps from "$components/subscription/SubsciptionSteps.svelte";
   import { useTranslations } from "$i18n/utils";
-  const t = useTranslations();
+
+  interface Props {
+    defaultLanguage?: string;
+  }
+  let { defaultLanguage = "en" }: Props = $props();
+  const t = useTranslations(defaultLanguage);
 
   function goToHome() {
     window.location.href = "/";
@@ -14,7 +19,7 @@
   <div
     class="bg-[#491EFF] p-4 rounded-lg mb-6 flex md:hidden lg:hidden items-center justify-center absolute top-0"
   >
-    <SubsciptionSteps currentStep={5} />
+    <SubsciptionSteps currentStep={5} {defaultLanguage} />
   </div>
 
   <div

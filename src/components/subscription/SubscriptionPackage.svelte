@@ -1,6 +1,6 @@
 <script lang="ts">
   import { svgIcons } from "$assets/icons";
-  import { getLanguage, useTranslations } from "$i18n/utils";
+  import { useTranslations } from "$i18n/utils";
 
   interface Props {
     id: string;
@@ -11,6 +11,7 @@
     currency?: string;
     onSelect?: Function;
     selectedPackageId?: string;
+    defaultLanguage?: string;
   }
 
   let {
@@ -22,10 +23,10 @@
     currency,
     onSelect,
     selectedPackageId = $bindable(""),
+    defaultLanguage = "en",
   }: Props = $props();
 
-  const t = useTranslations();
-  const lang = getLanguage() ?? "de";
+  const t = useTranslations(defaultLanguage);
 
   let backgroundColor = $state("background-color: white;");
   $effect(() => {
@@ -54,11 +55,11 @@
     <div
       class="badge badge-primary font-medium text-sm md:text-xs lg:text-sm h-auto"
     >
-      {description?.[lang]}
+      {description?.[defaultLanguage]}
     </div>
   </div>
   <h2 class="text-2xl font-medium text-[#491EFF] text-left mt-3">
-    {name?.[lang]}
+    {name?.[defaultLanguage]}
   </h2>
   <p class="text-4xl font-medium my-2 text-left mt-6">
     {currency}
@@ -66,7 +67,7 @@
     <span class="text-base font-medium">/ {t("subscription.per-month")}</span>
   </p>
   <ul class="mt-4 flex flex-col gap-2 text-base font-normal text-gray-600">
-    {#each features[lang] || [] as feaure}
+    {#each features[defaultLanguage] || [] as feaure}
       <li class="flex items-center">
         <span class="mr-3">
           {@html svgIcons.checkMark}

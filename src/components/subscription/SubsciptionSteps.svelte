@@ -8,10 +8,14 @@
   interface Props {
     orientation?: "horizontal" | "vertical";
     currentStep?: number;
+    defaultLanguage?: string;
   }
 
-  let { currentStep = $bindable(0), orientation = "horizontal" }: Props =
-    $props();
+  let {
+    currentStep = $bindable(0),
+    orientation = "horizontal",
+    defaultLanguage = "en",
+  }: Props = $props();
 
   let cssClasses = $state(
     orientation === "horizontal"
@@ -19,7 +23,7 @@
       : "steps steps-vertical text-gray-400 text-sm font-sans font-semibold",
   );
 
-  const t = useTranslations();
+  const t = useTranslations(defaultLanguage);
   const step1Text = t("subscription.step1");
   const step2Text = t("subscription.step2");
   const step3Text = t("subscription.step3");

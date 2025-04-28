@@ -30,6 +30,7 @@ const { title, description } = Astro.props;
 
 // TODO: save theme settings in db
 const theme = Astro.locals.tenant.theme || "light";
+const defaultLanguage = Astro.locals.tenant.default_language || "en";
 ---
 
 <!doctype html>
@@ -71,6 +72,7 @@ const theme = Astro.locals.tenant.theme || "light";
               <SubsciptionSteps
                 orientation="vertical"
                 {currentStep}
+                {defaultLanguage}
                 client:load
               />
             </div>

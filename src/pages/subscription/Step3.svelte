@@ -8,16 +8,13 @@
     storeOrganizationInformation,
     aiboxsubscription,
   } from "$stores/subscription";
-  const t = useTranslations();
 
   interface Props {
+    defaultLanguage?: string;
     categories?: any[];
   }
-
-  interface Props {
-    selectedPackageId?: string;
-  }
-  let { categories = $bindable([]) }: Props = $props();
+  let { defaultLanguage = "en", categories = $bindable([]) }: Props = $props();
+  const t = useTranslations(defaultLanguage);
 
   const initOrganizationInformation =
     $aiboxsubscription.organizationInformation;
@@ -82,7 +79,7 @@
   <div
     class="bg-[#491EFF] p-4 rounded-lg mb-6 flex md:hidden lg:hidden items-center justify-center"
   >
-    <SubsciptionSteps currentStep={3} />
+    <SubsciptionSteps currentStep={3} {defaultLanguage} />
   </div>
 
   <h1 class="font-sanns text-3xl font-bold text-black mt-2">

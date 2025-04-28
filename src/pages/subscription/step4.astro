@@ -10,8 +10,10 @@ const user = Astro.locals.user;
 if (isProd() && Astro.locals.tenant.is_trial !== true) {
   return Astro.redirect("/restricted");
 }
+
+const defaultLanguage = Astro.locals.tenant.default_language || "en";
 ---
 
 <SubscriptionLayout title={t("subscription.creating-your-account")}>
-  <StepComponent {user} client:load />
+  <StepComponent {user} client:load {defaultLanguage} />
 </SubscriptionLayout>

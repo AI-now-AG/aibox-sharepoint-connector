@@ -22,8 +22,10 @@ categories.forEach((category) => {
 if (isProd() && Astro.locals.tenant.is_trial !== true) {
   return Astro.redirect("/restricted");
 }
+
+const defaultLanguage = Astro.locals.tenant.default_language || "en";
 ---
 
 <SubscriptionLayout title={t("subscription.customize-your-aibox")}>
-  <StepComponent categories={useCases} client:load />
+  <StepComponent categories={useCases} client:load {defaultLanguage} />
 </SubscriptionLayout>

@@ -9,8 +9,10 @@
   ];
   interface Props {
     selectedPackageId?: string;
+    defaultLanguage?: string;
   }
-  let { selectedPackageId = $bindable("") }: Props = $props();
+  let { selectedPackageId = $bindable(""), defaultLanguage = "en" }: Props =
+    $props();
 
   function handleSelectPackage(id: string) {
     selectedPackageId = id;
@@ -25,6 +27,7 @@
     price={packagesItem.price}
     currency={packagesItem.currency}
     features={packagesItem.features}
+    {defaultLanguage}
     bind:selectedPackageId
     onSelect={({ id }: { id: string }) => {
       handleSelectPackage(id);

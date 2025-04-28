@@ -12,8 +12,12 @@
 
   interface Props {
     selectedAudioOptionIds?: string[];
+    defaultLanguage?: string;
   }
-  let { selectedAudioOptionIds = $bindable([]) }: Props = $props();
+  let {
+    selectedAudioOptionIds = $bindable([]),
+    defaultLanguage = "en",
+  }: Props = $props();
 
   const isDisabled = (optionId: string) => {
     return (
@@ -86,6 +90,7 @@
           price={option.price}
           currency={option.currency}
           disabled={isDisabled(option.id)}
+          {defaultLanguage}
           bind:selectedAudioOptionIds
           onSelect={({ id }: { id: string }) => {
             handleSelectPackage(id);
@@ -102,6 +107,7 @@
           name={option.name}
           price={option.price}
           currency={option.currency}
+          {defaultLanguage}
           bind:selectedAudioOptionIds
           onSelect={({ id }: { id: string }) => {
             handleSelectPackage(id);

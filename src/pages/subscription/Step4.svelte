@@ -10,11 +10,10 @@
   import { isTrulyEmpty } from "$utils/common";
 
   interface Props {
-    user: any;
+    defaultLanguage?: string;
   }
-  let { user } = $props() as Props;
-
-  const t = useTranslations();
+  let { defaultLanguage = "en" }: Props = $props();
+  const t = useTranslations(defaultLanguage);
 
   async function createOrganization() {
     const { data, error } = await actions.onboarding.createOrganization({
@@ -75,7 +74,6 @@
     console.log("iboxsubscription", $subscription);
     if (
       isTrulyEmpty($subscription.plan) ||
-      //isTrulyEmpty($subscription.audioOptions) ||
       isTrulyEmpty($subscription.billingInformation) ||
       isTrulyEmpty($subscription.organizationInformation)
     ) {
@@ -124,7 +122,7 @@
   <div
     class="bg-[#491EFF] p-4 rounded-lg mb-6 flex md:hidden lg:hidden items-center justify-center absolute top-0"
   >
-    <SubsciptionSteps currentStep={4} />
+    <SubsciptionSteps currentStep={4} {defaultLanguage} />
   </div>
 
   <div

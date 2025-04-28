@@ -9,7 +9,11 @@
   } from "$stores/subscription";
   import { isValidEmail } from "$utils/common";
 
-  const t = useTranslations();
+  interface Props {
+    defaultLanguage?: string;
+  }
+  let { defaultLanguage = "en" }: Props = $props();
+  const t = useTranslations(defaultLanguage);
 
   const BiiliggMethod = {
     MonthlyEmailInvoice: "monthlyInvoice",
@@ -83,7 +87,7 @@
   <div
     class="bg-[#491EFF] p-4 rounded-lg mb-6 flex md:hidden lg:hidden items-center justify-center"
   >
-    <SubsciptionSteps currentStep={2} />
+    <SubsciptionSteps currentStep={2} {defaultLanguage} />
   </div>
 
   <h1 class="font-sanns text-3xl font-bold text-black mt-2">
