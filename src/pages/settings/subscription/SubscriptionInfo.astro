@@ -34,7 +34,7 @@ const { plan, audioOptions } = SubscriptionPackages;
       .map((plan) => {
         return (
           <p>
-            {plan?.["name"]?.[lang]} CHF {plan?.["price"]}
+            {plan?.["name"]?.[lang]} CHF {plan?.["price"]}.-
           </p>
         );
       })
@@ -46,7 +46,7 @@ const { plan, audioOptions } = SubscriptionPackages;
       return (
         <p>
           {audioOptions?.[addOnName]?.["name"]?.[lang]} CHF{" "}
-          {audioOptions?.[addOnName]?.["price"]}
+          {audioOptions?.[addOnName]?.["price"]}.-
         </p>
       );
     })
