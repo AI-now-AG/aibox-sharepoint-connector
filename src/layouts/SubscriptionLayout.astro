@@ -61,11 +61,11 @@ const defaultLanguage = Astro.locals.tenant.default_language || "en";
       >
         <img src="/sidebar_background.png" class="w-full" />
       </div>
-      <div class="w-auto self-start ml-4 mt-2 fixed z-[2]">
+      <a href="/" class="w-auto self-start ml-4 mt-2 fixed z-[2]">
         <span set:html={svgIcons.logo} />
-      </div>
+      </a>
 
-      <div class="flex flex-1 justify-center mt-10 fixed z-[2]">
+      <div class="flex flex-1 justify-center mt-[60px] fixed z-[2]">
         {
           currentStep !== -1 && (
             <div class="p-6">
