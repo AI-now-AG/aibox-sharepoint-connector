@@ -21,7 +21,7 @@ import {
   AudioOptionLabels,
 } from "$types/Subscription";
 import { UserRole, TourType } from "$types/Users";
-import { AudioCategory } from "$types/TenantFeature";
+import { TenantFeature, AudioCategory } from "$types/TenantFeature";
 import { SocialProvider } from "$types/Auth0Auth";
 import organizationsManagement from "$data/auth0/organizations-manager";
 import sendMail from "$utils/mail";
@@ -188,11 +188,20 @@ export const onboarding = {
     handler: async (input, context) => {
       // Clone the tenant
       const transcriptionTypes = getTranscriptionTypes(input.add_ons ?? []);
+      const masterTenant = await TenantModel.get(masterTenantId);
+
+      let includedFeatures = masterTenant?.included_features ?? [];
+      if (transcriptionTypes.length == 0) {
+        includedFeatures = includedFeatures.filter((item) => {
+          return item.name !== TenantFeature.AudioToText;
+        });
+      }
       const newTenant = await TenantModel.copyTenant(masterTenantId, {
         name: input.name,
         org_id: input.org_id,
         org_name: input.org_name,
         billing_info: input.billing,
+        included_features: includedFeatures,
         transcription_types: transcriptionTypes,
         default_language: input.language,
       });

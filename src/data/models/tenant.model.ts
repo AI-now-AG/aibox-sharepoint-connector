@@ -156,11 +156,11 @@ export default {
     return await data.toArray();
   },
 
-  get: async (id: string): Promise<Tenant | null> => {
+  get: async (id: string | ObjectId): Promise<Tenant | null> => {
     if (!ObjectId.isValid(id)) {
       return null;
     }
-    const _id = new ObjectId(id);
+    const _id = toObjectId(id);
     return collection.findOne<Document<Tenant>>({ _id });
   },
 
