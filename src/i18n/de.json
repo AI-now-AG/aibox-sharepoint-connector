@@ -446,5 +446,6 @@
   "subscription.setup-tenant-data-failed": "Tenant konnte nicht eingerichtet werden",
   "subscription.finalize-subsciption-failed": "Abonnement konnte nicht abgeschlossen werden",
   "subscription.missing-subscription-information": "Ups, fehlende Abonnementinformationen.",
-  "subscription.create-my-aibox": "Meine Aibox erstellen"
+  "subscription.create-my-aibox": "Meine aibox erstellen",
+  "subscription.number-of-active-user": "Anzahl der aktiven Benutzer"
 }

@@ -38,6 +38,7 @@ export const BillingInfoSchema = z.object({
   zip_code: z.string().optional(),
   location: z.string().optional(),
   email: z.string().optional(),
+  restrict_number_of_user: z.number().optional(),
 });
 
 const TenantSchema = z.object({
