@@ -814,9 +814,9 @@
         <SelectOptions
           label={t("tenant.subscription")}
           options={[
-            { value: "Starter", title: "Starter" },
-            { value: "Teams", title: "Teams" },
-            { value: "Pro", title: "Pro" },
+            { value: "Starter", title: "aibox Starter (25.-)" },
+            { value: "Teams", title: "aibox Teams (149.-)" },
+            { value: "Pro", title: "aibox Pro (249.-)" },
           ]}
           bind:value={selectedPlanName}
         ></SelectOptions>
