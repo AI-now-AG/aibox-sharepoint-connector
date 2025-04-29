@@ -22,22 +22,35 @@ import {
 } from "$types/Subscription";
 import { UserRole, TourType } from "$types/Users";
 import { AudioCategory } from "$types/TenantFeature";
+import { SocialProvider } from "$types/Auth0Auth";
 import organizationsManagement from "$data/auth0/organizations-manager";
 import sendMail from "$utils/mail";
 import { isProd } from "$utils/env";
 import { randomString } from "$utils/common";
+import { isSocialConnection } from "$utils/auth0Auth";
 import {
   TENANT_MASTER_DEV,
   TENANT_MASTER_PROD,
   SG_NEW_TENANT_TEMPLATE,
   AUTH0_ROLE_ADMIN_PROD,
   AUTH0_ROLE_ADMIN_DEV,
+  AUTH0_AUTH_GOOGLE_CON_DEV,
+  AUTH0_AUTH_WINDOWS_CON_DEV,
+  AUTH0_AUTH_GOOGLE_CON_PROD,
+  AUTH0_AUTH_WINDOWS_CON_PROD,
 } from "$constants";
 
 const masterTenantId = isProd() ? TENANT_MASTER_PROD : TENANT_MASTER_DEV;
+const auth0GoogleCon = isProd()
+  ? AUTH0_AUTH_GOOGLE_CON_PROD
+  : AUTH0_AUTH_GOOGLE_CON_DEV;
+const auth0WindowsCon = isProd()
+  ? AUTH0_AUTH_WINDOWS_CON_PROD
+  : AUTH0_AUTH_WINDOWS_CON_DEV;
 const OrganizationNameInputParamsSchema = z.object({
   company_name: z.string().min(1),
 });
+
 const OrganizationIdInputParamsSchema = z.object({
   org_id: z.string().min(1),
 });
@@ -82,6 +95,7 @@ const getTranscriptionTypes = (selectedAddOns: AudioOptionId[]) => {
       AudioCategory.Subtitle,
       AudioCategory.AudioPro,
       AudioCategory.SubtitleLarge,
+      AudioCategory.Subtitle11Labs,
     ];
   }
 
@@ -96,8 +110,9 @@ const getTranscriptionTypes = (selectedAddOns: AudioOptionId[]) => {
 export const onboarding = {
   createOrganization: defineAction({
     input: OrganizationNameInputParamsSchema,
-    handler: async (input) => {
+    handler: async (input, context) => {
       const { company_name: companyName } = input;
+      const { user } = context.locals;
       const name = companyName
         .toLowerCase()
         .normalize("NFKD") // Remove accents/diacritics
@@ -115,11 +130,25 @@ export const onboarding = {
 
       const organizationId = organizationResult.data.id;
 
-      // enable connection
+      // enable database-pwd connection
       await organizationsManagement.addEnabledConnection(
         organizationId,
         import.meta.env.AUTH0_AUTH_CON_ID || "con_RXTD1LIbXJgceOUH",
       );
+
+      // enable social connections
+      if (isSocialConnection(user.auth0_sub, SocialProvider.GOOGLE)) {
+        await organizationsManagement.addEnabledConnection(
+          organizationId,
+          auth0GoogleCon,
+        );
+      }
+      if (isSocialConnection(user.auth0_sub, SocialProvider.WINDOWS)) {
+        await organizationsManagement.addEnabledConnection(
+          organizationId,
+          auth0WindowsCon,
+        );
+      }
 
       return transformRawData(organizationResult.data);
     },
@@ -252,6 +281,7 @@ export const onboarding = {
           ...transcription,
           _id: new ObjectId(),
           tenant_id: newTenant.insertedId,
+          enabled: true,
           created_at: new Date(),
           updated_at: new Date(),
         }),

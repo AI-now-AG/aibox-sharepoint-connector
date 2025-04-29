@@ -24,7 +24,6 @@
   import SelectOptions from "$components/SelectOptions.svelte";
   import AudioAddonsDropdown from "./AudioAddonsDropdown.svelte";
   import ThemeItem from "./ThemeItem.svelte";
-  import Input from "$components/Input/Input.svelte";
 
   const t = useTranslations();
   let loading = $state(false);
@@ -32,9 +31,10 @@
   interface Props {
     tenant: any;
     subscription?: any;
+    activeUsers?: number;
   }
 
-  let { tenant, subscription }: Props = $props();
+  let { tenant, subscription, activeUsers = 0 }: Props = $props();
 
   let addTenantAdminModal: HTMLDialogElement | undefined = $state();
   let confirmUpdateModal: HTMLDialogElement | undefined = $state();
@@ -885,13 +885,14 @@
         />
       </div>
       <div class="flex-1 flex flex-col mb-4">
-        <Input
-          labelClasses="mb-0 text-base-content font-medium text-sm"
-          containerClasses="mt-[-6px]"
-          id="restrict_number_of_user"
-          label={t("subscription.number-of-active-user")}
-          value={tenantData.billing_info.restrict_number_of_user ?? 23}
-          disabled
+        <span class="mb-2 text-base-content font-medium text-sm"
+          >{t("subscription.number-of-active-user")}</span
+        >
+        <input
+          type="number"
+          class="input input-bordered bg-base-200 w-full"
+          readonly
+          bind:value={activeUsers}
         />
       </div>
     </div>

@@ -15,8 +15,9 @@ import { RequiredColumn, type CsvRowRaw } from "$types/prompt-csv.types";
 const isValidRows = (rows: CsvRowRaw[]) => {
   const requiredColumns = Object.values(RequiredColumn);
 
-  for (let row of rows) {
-    for (let column of requiredColumns) {
+  for (const row of rows) {
+    for (const column of requiredColumns) {
+      // eslint-disable-next-line no-prototype-builtins
       if (!row.hasOwnProperty(column)) {
         throw new Error(`Missing column name "${column}"`);
       }
