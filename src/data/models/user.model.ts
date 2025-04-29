@@ -237,6 +237,14 @@ export default {
     );
   },
 
+  countActiveUsersByTenant: async (tenantId: string | ObjectId) => {
+    const _tenantId = toObjectId(tenantId);
+    return await collection.countDocuments({
+      tenant_id: _tenantId,
+      blocked: false,
+    });
+  },
+
   delete: async (id: string) => {
     return await collection.deleteOne({ _id: new ObjectId(id) });
   },

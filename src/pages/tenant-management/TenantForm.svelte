@@ -31,9 +31,10 @@
   interface Props {
     tenant: any;
     subscription?: any;
+    activeUsers?: number;
   }
 
-  let { tenant, subscription }: Props = $props();
+  let { tenant, subscription, activeUsers = 0 }: Props = $props();
 
   let addTenantAdminModal: HTMLDialogElement | undefined = $state();
   let confirmUpdateModal: HTMLDialogElement | undefined = $state();
@@ -883,7 +884,17 @@
           bind:value={tenantData.billing_info.location}
         />
       </div>
-      <div class="flex-1 flex flex-col mb-4"></div>
+      <div class="flex-1 flex flex-col mb-4">
+        <span class="mb-2 text-base-content font-medium text-sm"
+          >{"Number of active users"}</span
+        >
+        <input
+          type="number"
+          class="input input-bordered bg-base-200 w-full"
+          readonly
+          bind:value={activeUsers}
+        />
+      </div>
     </div>
 
     <div class="divider"></div>

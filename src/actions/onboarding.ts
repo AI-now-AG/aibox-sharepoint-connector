@@ -95,6 +95,7 @@ const getTranscriptionTypes = (selectedAddOns: AudioOptionId[]) => {
       AudioCategory.Subtitle,
       AudioCategory.AudioPro,
       AudioCategory.SubtitleLarge,
+      AudioCategory.Subtitle11Labs,
     ];
   }
 
@@ -280,6 +281,7 @@ export const onboarding = {
           ...transcription,
           _id: new ObjectId(),
           tenant_id: newTenant.insertedId,
+          enabled: true,
           created_at: new Date(),
           updated_at: new Date(),
         }),
