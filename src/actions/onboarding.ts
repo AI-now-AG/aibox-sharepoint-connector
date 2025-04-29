@@ -85,7 +85,7 @@ const getTranscriptionTypes = (selectedAddOns: AudioOptionId[]) => {
     transcriptionTypes.push(AudioCategory.Subtitle);
   }
   if (selectedAddOns?.includes(AudioOptionId.AudioBasisAddOnLarge)) {
-    transcriptionTypes.push(AudioCategory.SubtitleLarge);
+    transcriptionTypes.push(AudioCategory.AudioPro);
   }
 
   // Audio Premium
