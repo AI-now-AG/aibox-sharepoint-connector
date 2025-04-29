@@ -168,4 +168,8 @@
   </div>
 </div>
 
-<AlertDialog bind:modal={alertModal} bind:message={alertMessage} />
+<AlertDialog
+  bind:modal={alertModal}
+  bind:message={alertMessage}
+  okText={t("common.ok")}
+/>

@@ -177,7 +177,7 @@
     >
       <div class="flex-1 flex flex-col mb-4">
         <button
-          class="bg-white shadow-md rounded-lg flex justify-between items-center px-6 py-4 w-full mt-9"
+          class="bg-white shadow-md rounded-lg flex justify-between items-center px-6 py-4 w-full mt-8"
           onclick={() => {}}
         >
           <input
@@ -258,4 +258,8 @@
   </div>
 </div>
 
-<AlertDialog bind:modal={alertModal} bind:message={alertMessage} />
+<AlertDialog
+  bind:modal={alertModal}
+  bind:message={alertMessage}
+  okText={t("common.ok")}
+/>

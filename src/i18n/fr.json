@@ -447,5 +447,6 @@
   "subscription.finalize-subsciption-failed": "Failed to finalize subscription",
   "subscription.missing-subscription-information": "Oops, missing subscription information.",
   "subscription.create-my-aibox": "Create my aibox",
-  "subscription.number-of-active-user": "Number of active users"
+  "subscription.number-of-active-user": "Number of active users",
+  "common.ok": "Ok"
 }

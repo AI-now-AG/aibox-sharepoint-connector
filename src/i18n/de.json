@@ -447,5 +447,6 @@
   "subscription.finalize-subsciption-failed": "Abonnement konnte nicht abgeschlossen werden",
   "subscription.missing-subscription-information": "Ups, fehlende Abonnementinformationen.",
   "subscription.create-my-aibox": "Meine aibox erstellen",
-  "subscription.number-of-active-user": "Anzahl der aktiven Benutzer"
+  "subscription.number-of-active-user": "Anzahl der aktiven Benutzer",
+  "common.ok": "Ok"
 }
