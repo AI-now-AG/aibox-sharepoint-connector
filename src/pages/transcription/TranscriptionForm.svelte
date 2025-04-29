@@ -106,6 +106,12 @@
     languageLocales.filter((e) => e.checked === true).length,
   );
 
+  let isM4AFile = $derived(
+    audioFile
+      ? audioFile.name.split(".").pop()?.toLowerCase() === "m4a"
+      : false,
+  );
+
   function handleSelectedItems(selected: any) {
     const elem = document.activeElement;
     if (elem) {
@@ -619,6 +625,7 @@
           typedCategory: category,
           isDiarizationEnabled: isDiarizationEnabled,
           encryptedSpeechKey: $tenant?.speech_api_key,
+          isM4AFile: isM4AFile,
         }),
       });
       if (response.ok) {

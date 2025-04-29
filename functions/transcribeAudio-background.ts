@@ -105,7 +105,11 @@ const transcribeAudio: Handler = async (
       category === AudioCategory.AudioPro ||
       category === AudioCategory.SubtitleLarge
     ) {
-      if (transcribeParams.isDiarizationEnabled) {
+      const filename = uploadUrl.includes("?")
+          ? uploadUrl.split("?")[0]
+          : uploadUrl;
+      const fileExtension = filename.split(".").pop();
+      if (transcribeParams.isDiarizationEnabled || fileExtension === "m4a") {
         const newBlobFileUrl = await convertStereoToMono(
           uploadUrl,
           category,
