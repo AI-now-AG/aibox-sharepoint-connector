@@ -3,10 +3,6 @@ import { useTranslations } from "$i18n/utils";
 import SubscriptionLayout from "$layouts/SubscriptionLayout.astro";
 import StepComponent from "./Complete.svelte";
 
-if (Astro.locals.tenant.is_trial !== true) {
-  return Astro.redirect("/restricted");
-}
-
 const t = useTranslations();
 
 const defaultLanguage = Astro.locals.tenant.default_language || "en";
