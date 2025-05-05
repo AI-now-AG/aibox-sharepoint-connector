@@ -60,4 +60,4 @@ export const SG_NEW_TENANT_TEMPLATE = "d-87847bafc967448e93d99a411edece3a";
 
 // Tenants
 export const TENANT_MASTER_DEV = "67ff572260fa2a8bca5d26d0"; // aibox dev master
-export const TENANT_MASTER_PROD = "67c869198b14a3bbaa6ba611"; // aibox Trial
+export const TENANT_MASTER_PROD = "66cc50d98103241cf3354d3f"; // aibox master
