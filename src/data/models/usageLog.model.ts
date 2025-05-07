@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { db, type Document } from "../mongodb";
+import { db, toObjectId, type Document } from "../mongodb";
 import { ApiKeyProvider, AudioCategory } from "$types/TenantFeature";
 import { UsageType } from "$types/UsageTracking";
 import { z } from "zod";
@@ -42,7 +42,7 @@ export default {
   },
 
   update: async (id: string | ObjectId, update: Partial<UsageLog>) => {
-    const objectId = id instanceof ObjectId ? id : new ObjectId(id);
+    const objectId = toObjectId(id);
     const validated = UsageLogSchema.partial().parse(update);
     const doc = {
       ...validated,

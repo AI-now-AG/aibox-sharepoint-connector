@@ -2,6 +2,8 @@
 import Layout from "$layouts/Layout.astro";
 import TenantForm from "./TenantForm.svelte";
 import TenantModel from "$data/models/tenant.model";
+import UserModel from "$data/models/user.model";
+import SubscriptionModel from "$data/models/subscription.model";
 import { transformRawData } from "$utils/transformRawData";
 import { decrypt } from "$utils/secure";
 
@@ -29,8 +31,16 @@ const tenantData = transformRawData(tenant);
 ].forEach((key) => {
   tenantData[key] = tenantData[key] ? decrypt(tenantData[key]) : "";
 });
+const subscription = await SubscriptionModel.getOrCreateSubscription(id);
+const subscriptionData = transformRawData(subscription);
+const countActiveUsers = await UserModel.countActiveUsersByTenant(id);
 ---
 
 <Layout>
-  <TenantForm tenant={tenantData} client:load />
+  <TenantForm
+    tenant={tenantData}
+    subscription={subscriptionData}
+    activeUsers={countActiveUsers}
+    client:load
+  />
 </Layout>

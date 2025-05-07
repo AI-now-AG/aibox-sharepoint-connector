@@ -5,12 +5,12 @@
 <script lang="ts" module>
   /*
    const options = [
-    { value: "_value", label: "_label" }
+    { value: "_value", title: "_title" }
   ];
   */
   export interface Option {
     value: string;
-    label: string;
+    title: string;
   }
 </script>
 
@@ -59,7 +59,7 @@
       class={"select select-bordered w-full rounded-lg" +
         (disabled ? " pointer-events-none opacity-50 bg-gray-200" : "")}
     >
-      {options.find((opt) => opt.value === value)?.label || placeholder}
+      {options.find((opt) => opt.value === value)?.title || placeholder}
     </label>
     <ul
       tabindex={disabled ? -1 : 0}
@@ -77,7 +77,7 @@
             }}
             {disabled}
           >
-            {option.label}
+            {option.title}
           </button>
         </li>
       {/each}

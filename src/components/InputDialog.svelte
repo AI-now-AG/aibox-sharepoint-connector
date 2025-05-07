@@ -35,7 +35,6 @@
 </script>
 
 <dialog
-  id="alert_dialog"
   bind:this={modal}
   class="modal"
   style="background-color: rgba(0,0,0,0.5);"

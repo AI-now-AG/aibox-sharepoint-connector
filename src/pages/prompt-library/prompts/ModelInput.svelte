@@ -63,7 +63,7 @@
           const modelName = getModelName(provider);
           return {
             value: provider.name,
-            label: `${providerName} ${modelName}`,
+            title: `${providerName} ${modelName}`,
           };
         }) || [];
     if (!skipDefaultOption) {
@@ -77,7 +77,7 @@
       );
       models?.unshift({
         value: ApiKeyProvider.Default,
-        label: `${defaultName} (${getProviderName(defaultModel)} ${getModelName(defaultModel)})`,
+        title: `${defaultName} (${getProviderName(defaultModel)} ${getModelName(defaultModel)})`,
       });
     }
 

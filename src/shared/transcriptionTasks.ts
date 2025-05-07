@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { MongoClient, Db, Collection, ObjectId } from "mongodb";
 import { FileFormat } from "$types/TranscribeRequest";
-import { client } from "$data/mongodb";
 import { AudioCategory } from "$types/TenantFeature";
 
 const MONGO_URI = process.env.MONGODB_URI || "";

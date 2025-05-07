@@ -7,6 +7,8 @@
     value?: string;
     placeholder?: string;
     classes?: string;
+    containerClasses?: string;
+    labelClasses?: string;
     disabled?: boolean;
     icon?: string | null;
     type?: HTMLInputAttributes["type"];
@@ -20,6 +22,8 @@
     value = "",
     placeholder = "",
     classes = "",
+    containerClasses = "",
+    labelClasses = "",
     disabled = false,
     icon = null,
     type = "text",
@@ -34,10 +38,11 @@
 
 <div class="form-control">
   <label for={id} class="label pl-0 pb-3">
-    <span class="label-text text-base-content">{label}</span>
+    <span class={"label-text text-base-content" + labelClasses}>{label}</span>
   </label>
   <div
-    class="input flex justify-between items-center gap-2 w-full"
+    class={"input flex justify-between items-center gap-2 w-full " +
+      containerClasses}
     style={disabled ? "border: 1px solid" : ""}
   >
     <input

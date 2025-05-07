@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { db, type Document } from "../mongodb";
+import { db, toObjectId, type Document } from "../mongodb";
 import { z } from "zod";
 import log from "$utils/log";
 import {
@@ -7,7 +7,7 @@ import {
   ROLE_PERMISSIONS_MAP,
   UserRole,
   TourType,
-} from "$enums/Users";
+} from "$types/Users";
 
 export const UserTour = z.object({
   type: z.nativeEnum(TourType).default(TourType.Onboarding),
@@ -68,7 +68,7 @@ export async function updateUserData(
   detailsId: string,
   isOpen: boolean,
 ) {
-  const objectId = userId instanceof ObjectId ? userId : new ObjectId(userId);
+  const objectId = toObjectId(userId);
   const updateField = { [`navState.${detailsId}`]: isOpen };
 
   return await collection.findOneAndUpdate(
@@ -85,7 +85,7 @@ export default {
   },
 
   update: async (id: string | ObjectId, user: Partial<User>) => {
-    const objectId = id instanceof ObjectId ? id : new ObjectId(id);
+    const objectId = toObjectId(id);
     const validated = UserSchema.partial().parse(user);
     const doc = {
       ...validated,
@@ -101,7 +101,7 @@ export default {
   },
 
   listByTenant: async (tenantId: ObjectId, filterParams?: UserFilterParams) => {
-    const filter: any = {
+    const filter: Record<string, unknown> = {
       tenant_id: tenantId,
     };
 
@@ -214,11 +214,35 @@ export default {
     );
   },
 
-  updateTour: async (id: string, tours: z.infer<typeof UserTour>[]) => {
+  addTour: async (id: string | ObjectId, tour: z.infer<typeof UserTour>) => {
+    const _objectId = toObjectId(id);
     return await collection.updateOne(
-      { _id: new ObjectId(id) },
+      { _id: _objectId },
+      {
+        $addToSet: {
+          tours: tour,
+        },
+      },
+    );
+  },
+
+  updateTour: async (
+    id: string | ObjectId,
+    tours: z.infer<typeof UserTour>[],
+  ) => {
+    const _objectId = toObjectId(id);
+    return await collection.updateOne(
+      { _id: _objectId },
       { $set: { tours: tours } },
     );
+  },
+
+  countActiveUsersByTenant: async (tenantId: string | ObjectId) => {
+    const _tenantId = toObjectId(tenantId);
+    return await collection.countDocuments({
+      tenant_id: _tenantId,
+      blocked: false,
+    });
   },
 
   delete: async (id: string) => {

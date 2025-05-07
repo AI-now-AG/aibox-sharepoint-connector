@@ -4,6 +4,7 @@ import { actions } from "astro:actions";
 import ChatWidget from "$pages/home/ChatWidget.svelte";
 
 import { useTranslations } from "$i18n/utils";
+import { TourType } from "$types/Users";
 const t = useTranslations();
 
 const tenant = Astro.locals.tenant;
@@ -15,6 +16,19 @@ if (onboarding) {
   });
   await Astro.callAction(actions.user.activeOboarding, {
     _id: user.id.toString(),
+    type: TourType.Onboarding,
+  });
+}
+
+const onboardingNew = Astro.url?.searchParams?.get?.("onboardingnew");
+if (onboardingNew) {
+  const user = Astro.locals.user;
+  await Astro.callAction(actions.user.resetLoginCount, {
+    _id: user.id.toString(),
+  });
+  await Astro.callAction(actions.user.activeOboarding, {
+    _id: user.id.toString(),
+    type: TourType.OnboardingNewTenant,
   });
 }
 ---

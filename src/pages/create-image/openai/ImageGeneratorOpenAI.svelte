@@ -23,19 +23,19 @@
   let selectedFormat = $state("png");
 
   const sizeOptions = [
-    { value: "1024x1024", label: "1024x1024" },
-    { value: "1792x1024", label: "1792x1024" },
-    { value: "1024x1792", label: "1024x1792" },
+    { value: "1024x1024", title: "1024x1024" },
+    { value: "1792x1024", title: "1792x1024" },
+    { value: "1024x1792", title: "1024x1792" },
   ];
 
   const qualityOptions = [
-    { value: "standard", label: "Standard" },
-    { value: "hd", label: "HD" },
+    { value: "standard", title: "Standard" },
+    { value: "hd", title: "HD" },
   ];
 
   const outputOptions = [
-    { value: "png", label: "PNG" },
-    { value: "jpeg", label: "JPEG" },
+    { value: "png", title: "PNG" },
+    { value: "jpeg", title: "JPEG" },
   ];
 
   onMount(() => {

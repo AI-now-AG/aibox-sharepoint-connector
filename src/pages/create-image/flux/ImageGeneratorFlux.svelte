@@ -25,18 +25,18 @@
   let showCustomSizeInputs = $state(false);
 
   const sizeOptions = [
-    { value: "square", label: "Square (512x512)" },
-    { value: "square_hd", label: "Square HD (1024x1024)" },
-    { value: "portrait_4_3", label: "Portrait 4:3 (1024x768)" },
-    { value: "portrait_16_9", label: "Portrait 16:9 (576x1024)" },
-    { value: "landscape_4_3", label: "Landscape 4:3 (1024x768)" },
-    { value: "landscape_16_9", label: "Landscape 16:9 (1024x576)" },
-    { value: "custom", label: "Custom" },
+    { value: "square", title: "Square (512x512)" },
+    { value: "square_hd", title: "Square HD (1024x1024)" },
+    { value: "portrait_4_3", title: "Portrait 4:3 (1024x768)" },
+    { value: "portrait_16_9", title: "Portrait 16:9 (576x1024)" },
+    { value: "landscape_4_3", title: "Landscape 4:3 (1024x768)" },
+    { value: "landscape_16_9", title: "Landscape 16:9 (1024x576)" },
+    { value: "custom", title: "Custom" },
   ];
 
   const outputOptions = [
-    { value: "png", label: "PNG" },
-    { value: "jpeg", label: "JPEG" },
+    { value: "png", title: "PNG" },
+    { value: "jpeg", title: "JPEG" },
   ];
 
   $effect(() => {

@@ -5,8 +5,8 @@ import { prompt } from "./prompt";
 import { transcription_settings } from "./transcription_settings";
 import { transcription } from "./transcription";
 import { user } from "./user";
-import { perplexity } from "./perplexity";
 import { knowledgebase } from "./knowledgebase";
+import { onboarding } from "./onboarding";
 import { usage } from "./usage";
 
 export const server = {
@@ -17,7 +17,7 @@ export const server = {
   transcription,
   auth,
   user,
-  perplexity,
   knowledgebase,
+  onboarding,
   usage,
 };

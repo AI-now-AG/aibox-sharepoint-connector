@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { db, type Document } from "../mongodb";
+import { db, toObjectId, type Document } from "../mongodb";
 import { z } from "zod";
 import { AudioCategory } from "$types/TenantFeature";
 
@@ -25,22 +25,11 @@ export default {
       _id: new ObjectId(),
       ...tenant,
     });
-    // const doc = {
-    //   ...{
-    //     included_features: [
-    //       {
-    //         name: TenantFeature.TextPrommpts,
-    //         provider: ApiKeyProvider.OpenAI,
-    //       },
-    //     ],
-    //   },
-    //   ...validated,
-    // };
     return await collection.insertOne(validated);
   },
 
   update: async (id: string | ObjectId, update: Partial<Transcription>) => {
-    const objectId = id instanceof ObjectId ? id : new ObjectId(id);
+    const objectId = toObjectId(id);
     const validated = TranscriptionSchema.partial().parse(update);
     const doc = {
       ...validated,
@@ -82,12 +71,27 @@ export default {
     );
   },
 
-  listByTenant: async (tenantId: ObjectId) => {
+  listByTenantAndCategories: async (
+    tenantId: string | ObjectId,
+    categories: string[],
+  ) => {
+    const _tenantId = toObjectId(tenantId);
+    const data = collection.find<Document<Transcription>>({
+      tenant_id: _tenantId,
+      category: { $in: categories },
+    });
+    return await data.toArray();
+  },
+
+  listByTenant: async (tenantId: string | ObjectId) => {
     if (!ObjectId.isValid(tenantId)) {
-      return null;
+      return [];
     }
 
-    const data = collection.find<Document<Transcription>>({ tenant_id: tenantId });
+    const _tenantId = toObjectId(tenantId);
+    const data = collection.find<Document<Transcription>>({
+      tenant_id: _tenantId,
+    });
     return await data.toArray();
   },
 
@@ -97,5 +101,19 @@ export default {
     }
     const _id = new ObjectId(id);
     return collection.findOne<Document<Transcription>>({ _id });
+  },
+
+  insertMultiple: async (docs: Transcription[]) => {
+    // Validate and map all docs
+    const validatedDocs = docs.map((doc) => {
+      const validated = TranscriptionSchema.parse(doc);
+      return {
+        position: 0,
+        ...validated,
+      };
+    });
+
+    // Insert all at once
+    return collection.insertMany(validatedDocs);
   },
 };

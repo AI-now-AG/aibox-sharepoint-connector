@@ -1,33 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-useless-escape */
-import type { ParsedAuth0UserSub } from "$types/auth0.types";
 import moment from "moment";
 
-export const parseAuth0UserSub = (auth0Sub: string): ParsedAuth0UserSub => {
-  const [provider, id] = auth0Sub?.split("|") ?? [];
-  return { provider, id };
-};
-
-export const isEnterpriseConnection = (auth0Sub: string): boolean => {
-  const [provider] = auth0Sub?.split("|") ?? [];
-  const enterpriseConnections = [
-    "saml",
-    "oidc",
-    "okta",
-    "google",
-    "waad",
-    "adfs",
-    "ad",
-    "ping",
-  ];
-  return enterpriseConnections.includes(provider);
-};
-
-export const isSocialConnection = (auth0Sub: string): boolean => {
-  const [provider] = auth0Sub?.split("|") ?? [];
-  const socialConnections = ["google-oauth2", "windowslive"];
-  return socialConnections.includes(provider);
-};
+export function isTrulyEmpty(obj: any) {
+  return !obj || Object.keys(obj).length === 0;
+}
 
 export function formatDateToDDMMYY(date: string | Date): string {
   return moment(date).format("DD.MM.YYYY");
@@ -55,6 +32,17 @@ export function tryParse(input: string): object | string {
     result = JSON.parse(input);
   } catch {
     result = input;
+  }
+  return result;
+}
+
+export function randomString(length: number = 5) {
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let result = "";
+  const charactersLength = characters.length;
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
   return result;
 }
