@@ -23,7 +23,7 @@
   const tenantOptions: Option[] = tenants.map((item: any) => {
     return {
       value: item._id,
-      label: item.name,
+      title: item.name,
     };
   });
 
@@ -42,7 +42,7 @@
       const formattedMonth = `${month}-${year}`; // Format as mm-yyyy
       months.push({
         value: formattedMonth,
-        label: monthName,
+        title: monthName,
       });
     }
     return months;

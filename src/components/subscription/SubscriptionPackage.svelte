@@ -1,0 +1,87 @@
+<script lang="ts">
+  import { svgIcons } from "$assets/icons";
+  import { useTranslations } from "$i18n/utils";
+
+  interface Props {
+    id: string;
+    name?: Record<string, string>;
+    description?: Record<string, string>;
+    features?: Record<string, string[]>;
+    price?: number;
+    currency?: string;
+    onSelect?: Function;
+    selectedPackageId?: string;
+    defaultLanguage?: string;
+  }
+
+  let {
+    id,
+    name = { en: "", de: "" },
+    description = { en: "", de: "" },
+    features = { en: [], de: [] },
+    price,
+    currency,
+    onSelect,
+    selectedPackageId = $bindable(""),
+    defaultLanguage = "en",
+  }: Props = $props();
+
+  const t = useTranslations(defaultLanguage);
+
+  let backgroundColor = $state("background-color: white;");
+  $effect(() => {
+    if (selectedPackageId === id) {
+      backgroundColor = "background-color: #A1E1F8;";
+    } else {
+      backgroundColor = "background-color: white;";
+    }
+  });
+
+  function handleSelect() {
+    onSelect?.({ id, name, description, features, price, currency });
+  }
+</script>
+
+<button
+  class="card bg-white shadow-2xl rounded-2xl p-6 relative"
+  style={backgroundColor}
+  onclick={() => {
+    handleSelect();
+  }}
+>
+  <div
+    class="absolute top-[-10px] left-0 flex justify-center items-center w-full"
+  >
+    <div
+      class="badge badge-primary font-medium text-sm md:text-xs lg:text-sm h-auto"
+    >
+      {description?.[defaultLanguage]}
+    </div>
+  </div>
+  <h2 class="text-2xl font-medium text-[#491EFF] text-left mt-3">
+    {name?.[defaultLanguage]}
+  </h2>
+  <p class="text-4xl font-medium my-2 text-left mt-6">
+    {currency}
+    {price}
+    <span class="text-base font-medium">/ {t("subscription.per-month")}</span>
+  </p>
+  <ul class="mt-4 flex flex-col gap-2 text-base font-normal text-gray-600">
+    {#each features[defaultLanguage] || [] as feaure}
+      <li class="flex items-center">
+        <span class="mr-3">
+          {@html svgIcons.checkMark}
+        </span>
+        <span class="text-left">
+          {@html feaure}
+        </span>
+      </li>
+    {/each}
+  </ul>
+  <br class="mb-6" />
+  <br class="mb-6" />
+  <!-- Add this CTA if Stakeholder would like to make clear Clickable for user -->
+  <div class="btn btn-primary btn-sm absolute bottom-6 left-6 right-6">
+    {t("subscription.select")}
+  </div>
+</button>

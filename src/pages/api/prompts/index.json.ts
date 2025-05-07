@@ -4,9 +4,6 @@ import { z } from "zod";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import { stringToObjectId } from "$utils/stringToObjectId";
-import InstructionModel, {
-  type Instruction,
-} from "$data/models/instruction.model";
 import KnowledgeBaseModel, {
   type KnowledgeBase,
 } from "$data/models/knowledgeBase.model";
@@ -17,7 +14,6 @@ const CreatePromptParamsSchema = z.object({
   title: z.string(),
   category: z.string().optional(),
   group: z.string().optional(),
-  instructions: z.array(z.string().optional()).optional(),
   knowledgebase: z.array(z.string().optional()),
   prompt: z.string(),
   predefined_input: z.string().optional(),
@@ -79,9 +75,6 @@ export const POST: APIRoute<CreatePromptParams> = async (ctx) => {
     ...data,
     category: data.category ? stringToObjectId.parse(data.category) : undefined,
     group: data.group ? stringToObjectId.parse(data.group) : undefined,
-    instructions: data.instructions?.map((inst) =>
-      stringToObjectId.parse(inst),
-    ),
     knowledgebase: data.knowledgebase?.map((inst) =>
       stringToObjectId.parse(inst),
     ),
@@ -142,9 +135,6 @@ export const PUT: APIRoute<CreatePromptParams> = async (ctx) => {
     ...data,
     category: data.category ? stringToObjectId.parse(data.category) : undefined,
     group: data.group ? stringToObjectId.parse(data.group) : undefined,
-    instructions: data.instructions?.map((inst) =>
-      stringToObjectId.parse(inst),
-    ),
     knowledgebase: data.knowledgebase?.map((inst) =>
       stringToObjectId.parse(inst),
     ),
@@ -207,17 +197,6 @@ export const GET: APIRoute = async (ctx) => {
         );
       }
 
-      let instructions: Instruction[] = [];
-      if (prompt?.instructions) {
-        const calls = prompt.instructions.map(async (inst) => {
-          const instruction = await InstructionModel.get(inst.toString());
-          return instruction;
-        });
-        instructions = (await Promise.all(calls)).filter(
-          (instr) => instr !== null,
-        );
-      }
-
       let knowledgebases: KnowledgeBase[] = [];
       if (prompt?.knowledgebase) {
         const calls = prompt.knowledgebase.map(async (kb) => {
@@ -231,11 +210,6 @@ export const GET: APIRoute = async (ctx) => {
         title: prompt.title,
         prompt: prompt.prompt,
         model: prompt.model,
-        instructions: instructions.map((inst) => ({
-          _id: inst._id,
-          title: inst.title,
-          instruction: inst.instruction,
-        })),
         knowledgebase: knowledgebases.map((kb) => ({
           _id: kb._id,
           title: kb.title,

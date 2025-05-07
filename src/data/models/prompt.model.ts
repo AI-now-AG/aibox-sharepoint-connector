@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { db, type Document } from "../mongodb";
+import { db, toObjectId, type Document } from "../mongodb";
 import { z } from "zod";
 
 const PromptSchema = z.object({
@@ -9,7 +9,6 @@ const PromptSchema = z.object({
   description: z.string(),
   category: z.instanceof(ObjectId).optional(),
   group: z.instanceof(ObjectId).optional(),
-  instructions: z.array(z.instanceof(ObjectId)).optional(),
   knowledgebase: z.array(z.instanceof(ObjectId)).optional(),
   prompt: z.string(),
   predefined_input: z.string().optional(),
@@ -28,7 +27,6 @@ const convertObjectIdToString = (doc: Document<Prompt>) => {
     creator_id: doc.creator_id?.toString(),
     category: doc.category?.toString(),
     group: doc.group?.toString(),
-    instructions: doc.instructions?.map((id) => id.toString()),
     knowledgebase: doc.knowledgebase?.map((id) => id.toString()),
     documents: doc.documents?.map((id) => id.toString()),
   };
@@ -42,12 +40,24 @@ export default {
   add: async (prompt: Prompt) => {
     const validated = PromptSchema.parse(prompt);
     const doc = {
-      ...{
-        position: 0,
-      },
+      position: 0,
       ...validated,
     };
     return collection.insertOne(doc);
+  },
+
+  insertMultiple: async (docs: Prompt[]) => {
+    // Validate and map all docs
+    const validatedDocs = docs.map((doc) => {
+      const validated = PromptSchema.parse(doc);
+      return {
+        position: 0,
+        ...validated,
+      };
+    });
+
+    // Insert all at once
+    return collection.insertMany(validatedDocs);
   },
 
   remove: async (id: string) => {
@@ -56,8 +66,7 @@ export default {
   },
 
   removeByTenant: async (tenantId: string | ObjectId) => {
-    const objectId =
-      tenantId instanceof ObjectId ? tenantId : new ObjectId(tenantId);
+    const objectId = toObjectId(tenantId);
     return collection.deleteMany({ tenant_id: objectId });
   },
 
@@ -90,6 +99,12 @@ export default {
     return collection
       .find<Document<Prompt>>({ tenant_id: id })
       .sort({ position: 1, created_at: 1 });
+  },
+
+  listByCategoryIds: async (categoryIds: ObjectId[]) => {
+    return collection.find<Document<Prompt>>({
+      category: { $in: categoryIds },
+    });
   },
 
   listForExportByTenant: async (id: ObjectId) => {

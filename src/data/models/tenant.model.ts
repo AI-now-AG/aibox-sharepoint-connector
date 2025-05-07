@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { db, type Document } from "../mongodb";
+import { db, toObjectId, type Document } from "../mongodb";
 import { z } from "zod";
 import {
   TenantFeature,
@@ -32,56 +32,13 @@ export const TextFeatureSchema = z.object({
   default: z.boolean().default(false),
 });
 
-// export const TranscriptionUsecaseSchema = z.object({
-//   enabled: z.boolean().default(false),
-//   title: z.string().optional(),
-//   instruction: z.string().optional(),
-// });
-
-// export const TranscriptionsSchema = z.object({
-//   enabled: z.boolean().default(false),
-//   cateogry: z.nativeEnum(AudioCategory),
-//   usecases: z.array(TranscriptionUsecaseSchema),
-// });
-
-// export const TranscriptionsSchema = z.object({
-//   plaintext: z
-//     .object({
-//       enabled: z.boolean().default(false),
-//       text: z.string().optional(),
-//     })
-//     .optional(),
-//   summary: z
-//     .object({
-//       enabled: z.boolean().default(false),
-//       text: z.string().optional(),
-//     })
-//     .optional(),
-//   subtitles: z
-//     .object({
-//       enabled: z.boolean().default(false),
-//       text: z.string().optional(),
-//     })
-//     .optional(),
-//   subtitlesjson: z
-//     .object({
-//       enabled: z.boolean().default(false),
-//       text: z.string().optional(),
-//     })
-//     .optional(),
-//   largefile: z
-//     .object({
-//       enabled: z.boolean().default(false),
-//       text: z.string().optional(),
-//     })
-//     .optional(),
-//   subtitlelarge: z
-//     .object({
-//       enabled: z.boolean().default(false),
-//       text: z.string().optional(),
-//     })
-//     .optional(),
-// });
+export const BillingInfoSchema = z.object({
+  company_name: z.string().optional(),
+  address: z.string().optional(),
+  zip_code: z.string().optional(),
+  location: z.string().optional(),
+  email: z.string().optional(),
+});
 
 const TenantSchema = z.object({
   _id: z.instanceof(ObjectId),
@@ -99,9 +56,7 @@ const TenantSchema = z.object({
   azure_openai_whisper_model: z.string().nullish().default(null),
   azure_openai_chat_model: z.string().nullish().default(null),
   included_features: z.array(IncludedFeaturesSchema).optional(),
-  //transcriptions: TranscriptionsSchema.optional(),
   transcription_types: z.array(z.nativeEnum(AudioCategory)).optional(),
-  // transcriptions: z.array(TranscriptionsSchema).optional(),
   speech_api_key: z.string().nullish(),
   elevenLabs_api_key: z.string().optional(),
   speech_region: z.string().nullish(),
@@ -112,6 +67,7 @@ const TenantSchema = z.object({
   is_restrict_user_managment: z.boolean().optional().default(false),
   is_trial: z.boolean().optional().default(false),
   metadata: z.record(z.any()).nullish(),
+  billing_info: BillingInfoSchema.optional(),
   created_at: z
     .date()
     .optional()
@@ -122,8 +78,8 @@ const TenantSchema = z.object({
     .default(() => new Date()),
 });
 export type Tenant = z.infer<typeof TenantSchema>;
-// export type Transcriptions = z.infer<typeof TranscriptionsSchema>;
 export type IncludedFeatures = z.infer<typeof IncludedFeaturesSchema>;
+export type BillingInfo = z.infer<typeof BillingInfoSchema>;
 
 const collection = db.collection("tenants");
 
@@ -131,26 +87,25 @@ export default {
   create: async (tenant: Partial<Omit<Tenant, "_id">>) => {
     const validated = TenantSchema.parse({ _id: new ObjectId(), ...tenant });
     const doc = {
-      ...{
-        included_features: [
-          {
-            name: TenantFeature.TextPrommpts,
-            provider: ApiKeyProvider.OpenAI,
-          },
-        ],
-      },
+      included_features: [
+        {
+          name: TenantFeature.TextPrommpts,
+          provider: ApiKeyProvider.OpenAI,
+        },
+      ],
       ...validated,
     };
     return await collection.insertOne(doc);
   },
 
   update: async (id: string | ObjectId, update: Partial<Tenant>) => {
-    const objectId = id instanceof ObjectId ? id : new ObjectId(id);
+    const objectId = toObjectId(id);
     const validated = TenantSchema.partial().parse(update);
     const doc = {
       ...validated,
       updated_at: new Date(),
     };
+    console.log("doc", doc);
     return await collection.findOneAndUpdate(
       { _id: objectId },
       { $set: doc },
@@ -174,6 +129,7 @@ export default {
 
   list: async (filterParams?: TenantFilterParams) => {
     // Start with a default filter for active tenants
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const filter: any = {
       active: true,
     };
@@ -200,11 +156,11 @@ export default {
     return await data.toArray();
   },
 
-  get: async (id: string): Promise<Tenant | null> => {
+  get: async (id: string | ObjectId): Promise<Tenant | null> => {
     if (!ObjectId.isValid(id)) {
       return null;
     }
-    const _id = new ObjectId(id);
+    const _id = toObjectId(id);
     return collection.findOne<Document<Tenant>>({ _id });
   },
 
@@ -226,5 +182,33 @@ export default {
         },
       },
     );
+  },
+
+  copyTenant: async (
+    sourceId: string | ObjectId,
+    overrides: Partial<Omit<Tenant, "_id">> = {},
+  ) => {
+    const id = toObjectId(sourceId);
+
+    // fetch the original tenant
+    const sourceTenant = await collection.findOne({ _id: id });
+    if (!sourceTenant) {
+      throw new Error("Source tenant not found");
+    }
+
+    // prepare the new tenant data
+    const now = new Date();
+    const newTenant: Partial<Omit<Tenant, "_id">> = {
+      ...sourceTenant,
+      ...overrides,
+      created_at: now,
+      updated_at: now,
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    delete (newTenant as any)._id; // ensure no ID conflict
+
+    // insert the new tenant
+    return await collection.insertOne(newTenant);
   },
 };

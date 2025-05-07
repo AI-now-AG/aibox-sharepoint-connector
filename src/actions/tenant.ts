@@ -16,11 +16,15 @@ import TenantModel, {
   type Tenant,
 } from "$data/models/tenant.model";
 import UserModel, { assignPermissions } from "$data/models/user.model";
+import SubscriptionModel, {
+  type Subscription,
+} from "$data/models/subscription.model";
 import PromptModel from "$data/models/prompt.model";
 import CategoryModel from "$data/models/category.model";
 import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
 import { AudioCategory } from "$types/TenantFeature";
-import { EncryptedUserPassword, UserRole } from "$enums/Users";
+import { SubscriptionPackageId, AudioOptionId } from "$types/Subscription";
+import { EncryptedUserPassword, UserRole } from "$types/Users";
 
 const TenantInputParamsSchema = z.object({
   name: z.string(),
@@ -51,6 +55,7 @@ const TenantInputParamsSchema = z.object({
   is_trial: z.boolean().optional().default(false),
   metadata: z.record(z.any()).optional(),
   tenant_admin_email: z.string().optional(),
+  billing_info: z.record(z.any()).optional(),
 });
 
 const TenanKeyEncryptSchema = z.object({
@@ -70,6 +75,11 @@ const CreateTenantAdminSchema = z.object({
   _id: z.string(),
   org_id: z.string().optional(),
   tenant_admin_email: z.string().optional(),
+});
+
+const SubscriptionInputParamsSchema = z.object({
+  plan_name: z.nativeEnum(SubscriptionPackageId).or(z.literal("")).optional(),
+  add_ons: z.array(z.nativeEnum(AudioOptionId)).optional(),
 });
 
 const assignMemberRoles = async (
@@ -213,12 +223,13 @@ export const tenant = {
   create: defineAction({
     input: z.object({
       tenant: TenantInputParamsSchema,
+      subscription: SubscriptionInputParamsSchema,
     }),
     handler: async (input) => {
       const session = client.startSession();
       session.startTransaction();
 
-      const { tenant: tenantInput } = input;
+      const { tenant: tenantInput, subscription: subInput } = input;
 
       try {
         // create new Auth0 organization
@@ -241,6 +252,13 @@ export const tenant = {
         };
         const insertResult = await TenantModel.create(tenant);
 
+        // create new subscription
+        const subData: Partial<Omit<Subscription, "_id">> = {
+          ...subInput,
+          tenant_id: insertResult.insertedId,
+        };
+        await SubscriptionModel.create(subData);
+
         await session.commitTransaction();
         return transformRawData(insertResult);
       } catch (error) {
@@ -258,12 +276,13 @@ export const tenant = {
         TenantInputParamsSchema,
         TenantInputIdentifierSchema,
       ),
+      subscription: SubscriptionInputParamsSchema,
     }),
     handler: async (input) => {
       const session = client.startSession();
       session.startTransaction();
 
-      const { tenant: tenantInput } = input;
+      const { tenant: tenantInput, subscription: subInput } = input;
       try {
         // update tenant
         const update: Partial<Tenant> = {
@@ -275,6 +294,10 @@ export const tenant = {
           update,
         );
         const organizationId = updatedDocument?.org_id;
+
+        // update subscription
+        const subUpdate: Partial<Subscription> = subInput;
+        await SubscriptionModel.update(tenantInput._id, subUpdate);
 
         // sync Auth0 organization
         const bodyParameters: PatchOrganizationsByIdRequest = {

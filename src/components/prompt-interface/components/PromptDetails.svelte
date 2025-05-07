@@ -95,21 +95,6 @@
       </div>
     {/if}
 
-    <!-- {#if instructions}
-      <h2 class="pb-2">Instruction</h2>
-      {#each instructions as instruction}
-        <div
-          class="card border-2 border-base-300 border-2 bg-base-100 p-4 mb-4"
-        >
-          <div>
-            <p class="line-clamp-5">
-              {instruction.instruction}
-            </p>
-          </div>
-        </div>
-      {/each}
-    {/if} -->
-
     {#if knowledgebase}
       <h2 class="pb-2">Knowledge base</h2>
       {#each knowledgebase as knowledgebase}

@@ -1,0 +1,13 @@
+---
+import { useTranslations } from "$i18n/utils";
+import SubscriptionLayout from "$layouts/SubscriptionLayout.astro";
+import StepComponent from "./Complete.svelte";
+
+const t = useTranslations();
+
+const defaultLanguage = Astro.locals.tenant.default_language || "en";
+---
+
+<SubscriptionLayout title={t("subscription.congratulations-desciption")}>
+  <StepComponent client:load {defaultLanguage} />
+</SubscriptionLayout>

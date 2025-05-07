@@ -6,10 +6,11 @@ import Navigation from "$components/nav/Navigation.astro";
 import OnboardingTour from "$components/OnboardingTour.svelte";
 import TrialComponent from "$components/TrialComponent.svelte";
 import RestrictUnverifiedUser from "$components/RestrictUnverifiedUser.svelte";
+import OnboardingTourNewTenant from "../pages/subscription/OnboardingTourNewTenant.svelte";
 import "$styles/global.css";
 
 import { useTranslations } from "$i18n/utils";
-import { isSocialConnection } from "$utils/common";
+import { isSocialConnection } from "$utils/auth0Auth";
 
 interface Props {
   title?: string;
@@ -70,6 +71,11 @@ const isSocialAuth = isSocialConnection(userInfo?.auth0_sub);
     </div>
     <div class="z-[11]">
       {tenant?.is_trial && <OnboardingTour user={userInfo} client:load />}
+      {
+        !tenant?.is_trial && (
+          <OnboardingTourNewTenant user={userInfo} client:load />
+        )
+      }
       {tenant?.is_trial && <TrialComponent {locale} client:load />}
       {
         tenant?.is_trial &&

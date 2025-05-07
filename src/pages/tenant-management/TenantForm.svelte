@@ -20,17 +20,21 @@
     ApiKeyProvider,
     AudioCategory,
   } from "$types/TenantFeature";
-  import SingleInput from "$pages/prompt-library/prompts/SingleInput.svelte";
+  import { SubscriptionPackageId, AudioOptionId } from "$types/Subscription";
+  import SelectOptions from "$components/SelectOptions.svelte";
+  import AudioAddonsDropdown from "./AudioAddonsDropdown.svelte";
   import ThemeItem from "./ThemeItem.svelte";
 
   const t = useTranslations();
   let loading = $state(false);
 
   interface Props {
-    tenant?: any;
+    tenant: any;
+    subscription?: any;
+    activeUsers?: number;
   }
 
-  let { tenant }: Props = $props();
+  let { tenant, subscription, activeUsers = 0 }: Props = $props();
 
   let addTenantAdminModal: HTMLDialogElement | undefined = $state();
   let confirmUpdateModal: HTMLDialogElement | undefined = $state();
@@ -50,16 +54,21 @@
       : tenant.name || t("common.edit");
   let tenantData = $state(tenant ?? {});
   tenantData.metadata = {
-    ...{
-      openaiPrivateKeyEnabled: false,
-      azureOpenaiPrivateKeyEnabled: false,
-      speechPrivateKeyEnabled: false,
-      elevenLabsPrivateKeyEnabled: false,
-      fluxPrivateKeyEnabled: false,
-      perplexityPrivateKeyEnabled: false,
-    },
+    openaiPrivateKeyEnabled: false,
+    azureOpenaiPrivateKeyEnabled: false,
+    speechPrivateKeyEnabled: false,
+    elevenLabsPrivateKeyEnabled: false,
+    fluxPrivateKeyEnabled: false,
+    perplexityPrivateKeyEnabled: false,
     ...(tenant?.metadata ?? {}),
   };
+
+  // Subscription & billing
+  let selectedPlanName: SubscriptionPackageId = $state(
+    subscription?.plan_name ?? "",
+  );
+  let selectedPlanAddOns: AudioOptionId[] = $state(subscription?.add_ons ?? []);
+  tenantData.billing_info = tenant?.billing_info ?? {};
 
   let openAIEnabled: boolean = $state(false);
   let azureOpenAIEnabled: boolean = $state(false);
@@ -194,7 +203,7 @@
     { title: "Deutsch", value: "de" },
     { title: "English", value: "en" },
   ];
-  let selectedLanguage: { title: string; value: string } | undefined = $state();
+  let selectedLanguage: string = $state("en");
 
   const themes = [
     { title: "Light", value: "light" },
@@ -257,16 +266,8 @@
   }
 
   // set default values
-  if (!tenantData.default_language) {
-    // tenantData.default_language = "de";
-    selectedLanguage = languages.find(
-      (item) => item.value === tenantData.default_language,
-    );
-  }
   if (tenantData.default_language) {
-    selectedLanguage = languages.find(
-      (item) => item.value === tenantData.default_language,
-    ) ?? { title: "Deutsch", value: "de" };
+    selectedLanguage = tenantData.default_language;
   }
   if (tenantData && !tenantData.theme) {
     tenantData.theme = "dark" as TenantTheme;
@@ -283,9 +284,8 @@
   }
 
   let selectedPerplexityModel: string = $state(
-    tenantData.perplexity_chat_model,
+    tenantData.perplexity_chat_model ?? "",
   );
-  const listOfPerplexityModel = ["sonar", "sonar-pro"];
 
   function toggleTextFeature(feature: ApiKeyProvider) {
     defaultTextFeature = defaultTextFeature === feature ? "" : feature;
@@ -420,7 +420,7 @@
     if (validateForm()) {
       try {
         loading = true;
-        tenantData.default_language = selectedLanguage?.value;
+        tenantData.default_language = selectedLanguage;
         tenantData.theme = selectedThemes?.value as TenantTheme;
         const { error: encryptKeysError, data } =
           await actions.tenant.encryptApiKeys({
@@ -504,6 +504,10 @@
 
         const createTanentResult = await actions.tenant.create({
           tenant: tenantData,
+          subscription: {
+            plan_name: selectedPlanName,
+            add_ons: selectedPlanAddOns,
+          },
         });
         const { error, data: createdTenant } = createTanentResult;
 
@@ -524,13 +528,11 @@
     }
   }
 
-  $inspect(selectedThemes);
-
   async function updateTenant() {
     if (validateForm()) {
       try {
         loading = true;
-        tenantData.default_language = selectedLanguage?.value;
+        tenantData.default_language = selectedLanguage;
         tenantData.theme = selectedThemes?.value as TenantTheme;
         const { error: encryptKeysError, data } =
           await actions.tenant.encryptApiKeys({
@@ -623,6 +625,10 @@
 
         const { error } = await actions.tenant.update({
           tenant: tenantData,
+          subscription: {
+            plan_name: selectedPlanName,
+            add_ons: selectedPlanAddOns,
+          },
         });
         loading = false;
 
@@ -698,7 +704,7 @@
 </script>
 
 <div
-  class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14 sticky bg-base-200 top-0 z-[1000]"
+  class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14 sticky bg-base-200 top-0 z-40"
 >
   <div class="flex items-center pt-5 pb-2">
     <button
@@ -762,12 +768,11 @@
 
     <div class="flex flex-row space-x-4">
       <div class="flex-1 flex flex-col mb-4">
-        <SingleInput
-          title={`${t("tenant.language")}*`}
-          placeholder={t("tenant.german-language")}
-          items={languages}
-          bind:selectedItem={selectedLanguage}
-        />
+        <SelectOptions
+          label={`${t("tenant.language")}*`}
+          options={languages}
+          bind:value={selectedLanguage}
+        ></SelectOptions>
       </div>
 
       <div class="flex-1 flex flex-col mb-4">
@@ -794,6 +799,101 @@
             {t("tenant.add-tenant-admin")}
           </button>
         </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Subscription & Billing -->
+    <div class="mb-3 flex flex-row items-center gap-2">
+      {@html svgIcons.money}
+      <p class="font-medium text-md">{t("tenant.subscription-billing")}</p>
+    </div>
+    <div class="flex flex-row space-x-4">
+      <div class="flex-1 flex flex-col mb-4">
+        <SelectOptions
+          label={t("tenant.subscription")}
+          options={[
+            { value: "Starter", title: "aibox Starter (25.-)" },
+            { value: "Teams", title: "aibox Teams (149.-)" },
+            { value: "Pro", title: "aibox Pro (249.-)" },
+          ]}
+          bind:value={selectedPlanName}
+        ></SelectOptions>
+      </div>
+      <div class="flex-1 flex flex-col mb-4">
+        <AudioAddonsDropdown
+          title={t("tenant.audio-subscription")}
+          placeholder=""
+          bind:value={selectedPlanAddOns}
+        />
+      </div>
+    </div>
+    <div class="flex flex-row space-x-4">
+      <div class="flex-1 flex flex-col mb-4">
+        <span class="mb-2 text-base-content font-medium text-sm"
+          >{t("subscription.company-name")}</span
+        >
+        <input
+          type="text"
+          class="input input-bordered w-full"
+          bind:value={tenantData.billing_info.company_name}
+        />
+      </div>
+      <div class="flex-1 flex flex-col mb-4">
+        <span class="mb-2 text-base-content font-medium text-sm"
+          >{t("subscription.billing-email")}</span
+        >
+        <input
+          type="text"
+          class="input input-bordered w-full"
+          bind:value={tenantData.billing_info.email}
+        />
+      </div>
+    </div>
+    <div class="flex flex-row space-x-4">
+      <div class="flex-1 flex flex-col mb-4">
+        <span class="mb-2 text-base-content font-medium text-sm"
+          >{t("subscription.street-number")}</span
+        >
+        <input
+          type="text"
+          class="input input-bordered w-full"
+          bind:value={tenantData.billing_info.address}
+        />
+      </div>
+      <div class="flex-1 flex flex-col mb-4">
+        <span class="mb-2 text-base-content font-medium text-sm"
+          >{t("subscription.zip-code")}</span
+        >
+        <input
+          type="text"
+          class="input input-bordered w-full"
+          bind:value={tenantData.billing_info.zip_code}
+        />
+      </div>
+    </div>
+    <div class="flex flex-row space-x-4">
+      <div class="flex-1 flex flex-col mb-4">
+        <span class="mb-2 text-base-content font-medium text-sm"
+          >{t("subscription.location")}</span
+        >
+        <input
+          type="text"
+          class="input input-bordered w-full"
+          bind:value={tenantData.billing_info.location}
+        />
+      </div>
+      <div class="flex-1 flex flex-col mb-4">
+        <span class="mb-2 text-base-content font-medium text-sm"
+          >{t("subscription.number-of-active-user")}</span
+        >
+        <input
+          type="number"
+          class="input input-bordered bg-base-200 w-full"
+          readonly
+          bind:value={activeUsers}
+        />
       </div>
     </div>
 
@@ -1061,15 +1161,22 @@
           </div>
         </div>
         <div class="collapse-content">
-          <div class="grid grid-cols-2 gap-4 mx-8">
+          <div class="grid grid-cols-2 gap-4 mx-8 mb-[30]">
             <div class="w-full z-20">
-              <SingleInput
-                title={`${t("tenant.model.name")}*`}
-                placeholder="e.g. sonar"
-                items={listOfPerplexityModel}
-                bind:selectedItem={selectedPerplexityModel}
-                displayTop={true}
-              />
+              <SelectOptions
+                label={`${t("tenant.model.name")}*`}
+                options={[
+                  {
+                    value: "sonar",
+                    title: "sonar",
+                  },
+                  {
+                    value: "sonar-pro",
+                    title: "sonar-pro",
+                  },
+                ]}
+                bind:value={selectedPerplexityModel}
+              ></SelectOptions>
             </div>
             <div class="w-full">
               <span class="mb-2 text-base-content font-medium text-sm"

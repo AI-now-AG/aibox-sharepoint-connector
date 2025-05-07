@@ -1,7 +1,28 @@
-import sgMail, { type MailDataRequired } from "@sendgrid/mail";
 import { authenticationClient, managementClient } from "$data/auth0/client";
 import { SG_VERIFICATION_TEMPLATE, SG_WELCOME_TEMPLATE } from "$constants";
-import getEnvVar from "$utils/getEnvVar";
+import { EnterpriseConnections, SocialProvider } from "$types/Auth0Auth";
+import sendMail from "$utils/mail";
+import { getEnvVar } from "$utils/env";
+
+export const isEnterpriseConnection = (auth0Sub: string): boolean => {
+  const [provider] = auth0Sub?.split("|") ?? [];
+  return EnterpriseConnections.includes(provider);
+};
+
+export const isSocialConnection = (
+  auth0Sub: string,
+  socialProvider?: SocialProvider,
+): boolean => {
+  const [provider] = auth0Sub?.split("|") ?? [];
+
+  if (socialProvider !== undefined) {
+    return provider == socialProvider;
+  }
+
+  return [SocialProvider.GOOGLE, SocialProvider.WINDOWS].includes(
+    provider as SocialProvider,
+  );
+};
 
 const getAccessToken = async () => {
   const AUTH0_TENANT = getEnvVar("AUTH0_TENANT");
@@ -14,18 +35,6 @@ const getAccessToken = async () => {
     return response.data.access_token;
   } catch (error) {
     console.error("Error getting Auth0 token:", error);
-    throw error;
-  }
-};
-
-const sendMail = async (data: MailDataRequired) => {
-  const apiKey = getEnvVar("SENDGRID_API_KEY");
-  sgMail.setApiKey(apiKey);
-
-  try {
-    return await sgMail.send(data);
-  } catch (error) {
-    console.error("Error sending sendgrid email", error);
     throw error;
   }
 };

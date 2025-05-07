@@ -1,0 +1,16 @@
+---
+import { useTranslations } from "$i18n/utils";
+import SubscriptionLayout from "$layouts/SubscriptionLayout.astro";
+import StepComponent from "./Step1.svelte";
+
+const t = useTranslations();
+
+if (Astro.locals.tenant.is_trial !== true) {
+  return Astro.redirect("/restricted");
+}
+const defaultLanguage = Astro.locals.tenant.default_language || "en";
+---
+
+<SubscriptionLayout title={t("subscription.choose-your-plan")}>
+  <StepComponent client:load {defaultLanguage} />
+</SubscriptionLayout>

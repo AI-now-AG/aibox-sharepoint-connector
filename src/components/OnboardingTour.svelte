@@ -5,7 +5,7 @@
   import "driver.js/dist/driver.css";
 
   import { useTranslations } from "$i18n/utils";
-  import { TourType } from "$enums/Users";
+  import { TourType } from "$types/Users";
   import { isOnboarding } from "$stores";
 
   const t = useTranslations();
@@ -130,7 +130,8 @@
         onHighlighted: (_e, _step) => {
           if (
             _step.element == "#onboardingId1" ||
-            _step.element == "#onboardingId3"
+            _step.element == "#onboardingId3" ||
+            _step.element == "#onboardingId4"
           ) {
             const computedStyle = _popover
               ? getComputedStyle(_popover)

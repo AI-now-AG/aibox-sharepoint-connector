@@ -1,7 +1,7 @@
 ---
 import Layout from "$layouts/Layout.astro";
 import { useTranslations } from "$i18n/utils";
-import { Permission } from "$enums/Users";
+import { Permission } from "$types/Users";
 import { TranscriptionType } from "$types/TranscribeRequest";
 import { AudioCategory } from "$types/TenantFeature";
 import TranscriptionModel from "$data/models/transcription.model";
@@ -36,7 +36,7 @@ if (typeParam === TranscriptionType.Plaintext) {
 }
 
 const transcriptions = await TranscriptionModel.listByTenant(
-  Astro.locals.user.tenant_id,
+  Astro.locals.user.tenant_id
 );
 
 // const transcriptionsFilterd =
@@ -47,7 +47,7 @@ const transcriptions = await TranscriptionModel.listByTenant(
 const transcriptionsFiltered =
   transcriptions
     ?.filter((transcription) =>
-      selectedTranType.includes(transcription.category),
+      selectedTranType.includes(transcription.category)
     )
     ?.sort((a, b) => {
       const indexA = transcriptionTypes.indexOf(a.category);
@@ -79,7 +79,7 @@ const transcriptionsEnriched: AudioCardItem[] = transcriptionsFiltered.map(
       enabled: tran.enabled,
       tags,
     };
-  },
+  }
 );
 ---
 
@@ -90,7 +90,6 @@ const transcriptionsEnriched: AudioCardItem[] = transcriptionsFiltered.map(
     <div class="flex items-center pt-2 pb-6">
       <button class="mr-4" onclick="history.back()">
         <Fragment set:html={svgIcons.back} />
-        
       </button>
 
       <h1 class="text-4xl font-bold">

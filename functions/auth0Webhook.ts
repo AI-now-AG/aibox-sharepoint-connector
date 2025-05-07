@@ -18,7 +18,7 @@ import {
   sendNotificationEmail,
 } from "$utils/auth0Auth";
 import { syncAllOrganizationUsers } from "$utils/auth0Sync";
-import { UserRole } from "$enums/Users";
+import { UserRole } from "$types/Users";
 
 /**
  * Handles Auth0 log stream events
@@ -472,6 +472,7 @@ const updateTenantInDatabase = async (data: any) => {
   }
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const fetchAndSyncOrgUsersForModerator = async (data: any) => {
   const { user_id: userId, organization_id: orgId } = data;
   console.log(

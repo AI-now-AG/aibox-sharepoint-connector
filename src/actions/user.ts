@@ -12,8 +12,8 @@ import UserModel from "$data/models/user.model";
 import usersManagement from "$data/auth0/users-manager";
 import organizationsManagement from "$data/auth0/organizations-manager";
 import rolesManagement from "$data/auth0/roles-manager";
-import { isEnterpriseConnection } from "$utils/common";
-import { EncryptedUserPassword, TourType, UserRole } from "$enums/Users";
+import { isEnterpriseConnection } from "$utils/auth0Auth";
+import { EncryptedUserPassword, TourType, UserRole } from "$types/Users";
 
 const UserInputParamsSchema = z.object({
   name: z.string(),
@@ -231,71 +231,51 @@ export const user = {
         throw new Error("Invalid tour type.");
       }
 
-      const session = client.startSession();
-      session.startTransaction();
+      let userTours = user.tours ?? [
+        { type: TourType.Onboarding, active: false },
+      ];
 
-      try {
-        let userTours = user.tours ?? [
-          { type: TourType.Onboarding, active: false },
-        ];
-
-        if (!userTours.some((tour) => tour.type == type)) {
-          userTours.push({ type, active: false });
-        } else {
-          userTours = userTours.map((tour) => {
-            if (tour.type == type) {
-              return { ...tour, active: false };
-            }
-            return tour;
-          });
-        }
-        await UserModel.updateTour(userId, userTours);
-        await session.commitTransaction();
-
-        return { success: true };
-      } catch (error) {
-        await session.abortTransaction();
-        throw error;
-      } finally {
-        session.endSession();
+      if (!userTours.some((tour) => tour.type == type)) {
+        userTours.push({ type, active: false });
+      } else {
+        userTours = userTours.map((tour) => {
+          if (tour.type == type) {
+            return { ...tour, active: false };
+          }
+          return tour;
+        });
       }
+      await UserModel.updateTour(userId, userTours);
+
+      return { success: true };
     },
   }),
 
   activeOboarding: defineAction({
-    input: UserInputIdentifierSchema,
+    input: z.intersection(
+      UserInputIdentifierSchema,
+      z.object({ type: z.nativeEnum(TourType).default(TourType.Onboarding) }),
+    ),
     handler: async (input) => {
-      const { _id: userId } = input;
+      const { _id: userId, type } = input;
       const user = await UserModel.get(userId);
       if (!user) {
         throw new Error("User does not exists.");
       }
 
-      const session = client.startSession();
-      session.startTransaction();
+      const defaultTours = [
+        { type: TourType.Onboarding, active: true },
+        { type: TourType.OnboardingNewTenant, active: true },
+      ];
 
-      try {
-        let userTours = user.tours ?? [
-          { type: TourType.Onboarding, active: true },
-        ];
+      const userTours = (user.tours ?? defaultTours).map((tour) => ({
+        ...tour,
+        active: tour.type === type ? true : tour.active,
+      }));
 
-        userTours = userTours.map((tour) => {
-          if (tour.type == TourType.Onboarding) {
-            return { ...tour, active: true };
-          }
-          return tour;
-        });
+      await UserModel.updateTour(userId, userTours);
 
-        await UserModel.updateTour(userId, userTours);
-        await session.commitTransaction();
-
-        return { success: true };
-      } catch (error) {
-        await session.abortTransaction();
-        throw error;
-      } finally {
-        session.endSession();
-      }
+      return { success: true };
     },
   }),
 
@@ -308,21 +288,8 @@ export const user = {
         throw new Error("User does not exists.");
       }
 
-      const session = client.startSession();
-      session.startTransaction();
-
-      try {
-        await UserModel.update(userId, { logins_count: 0 });
-        console.log("User logins count reset successfully.");
-        await session.commitTransaction();
-
-        return { success: true };
-      } catch (error) {
-        await session.abortTransaction();
-        throw error;
-      } finally {
-        session.endSession();
-      }
+      await UserModel.update(userId, { logins_count: 0 });
+      console.log("User logins count reset successfully.");
     },
   }),
 

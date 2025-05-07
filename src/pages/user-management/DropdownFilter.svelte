@@ -1,7 +1,7 @@
 <script lang="ts">
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
-  import { UserRole } from "$enums/Users";
+  import { UserRole } from "$types/Users";
 
   const t = useTranslations();
 
