@@ -22,7 +22,7 @@
   let selectedMonth: string = $state("");
 
   if (tenants.length == 0) {
-    selectedTenant = $tenantStore._id ?? "";
+    selectedTenant = $tenantStore?._id?.toString() ?? "";
   }
 
   const fetchUsages = async () => {
