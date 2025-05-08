@@ -1,62 +1,19 @@
-import PDFParser from "pdf2json";
+import pdf from "pdf-parse-debugging-disabled";
 import mammoth from "mammoth";
 
 // Function to extract text from PDF
 export const extractTextFromPDF = async (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const pdfParser = new PDFParser();
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
 
-    // Handle Errors
-    pdfParser.on("pdfParser_dataError", (errData) =>
-      reject(errData.parserError),
-    );
+    const data = await pdf(buffer);
 
-    // Process Extracted Text
-    pdfParser.on("pdfParser_dataReady", (pdfData) => {
-      let text = "";
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      pdfData.Pages.forEach((page: any) => {
-        const lines: { [key: number]: string[] } = {};
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        page.Texts.forEach((textObj: any) => {
-          const y = Math.round(textObj.y); // Use Y-coordinate for line detection
-          const extractedText = decodeURIComponent(
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            textObj.R.map((r: any) => r.T)
-              .join("")
-              .replace(/%20(.)%20/g, "$1"),
-          );
-
-          if (!lines[y]) {
-            lines[y] = [];
-          }
-          lines[y].push(extractedText);
-        });
-
-        // Sort by Y-position and reconstruct lines
-        Object.keys(lines)
-          .sort((a, b) => Number(a) - Number(b))
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          .forEach((y: any) => {
-            text += lines[y].join("") + "\n"; // Preserve line breaks
-          });
-      });
-
-      // Convert newlines to <br> for HTML
-      resolve(text.trim().replace(/\n/g, "<br>"));
-    });
-
-    // Convert File to Buffer
-    file
-      .arrayBuffer()
-      .then((arrayBuffer) => {
-        const buffer = Buffer.from(arrayBuffer);
-        pdfParser.parseBuffer(buffer);
-      })
-      .catch((err) => reject(err));
-  });
+    // Convert newlines to <br> for HTML
+    return data.text.trim().replace(/\n/g, "<br>");
+  } catch (error) {
+    throw new Error(`Error extracting text from PDF: ${error}`);
+  }
 };
 
 // Function to extract text from DOCX

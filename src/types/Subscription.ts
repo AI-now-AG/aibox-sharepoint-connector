@@ -4,6 +4,11 @@ export enum SubscriptionPackageId {
   Pro = "Pro",
 }
 
+export enum SubscriptionExtraPackage {
+  Internal = "Internal",
+  Enterprise = "Enterprise",
+}
+
 export enum SubscriptionStatus {
   Active = "active",
   Canceled = "canceled",

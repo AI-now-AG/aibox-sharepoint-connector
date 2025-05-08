@@ -47,7 +47,7 @@
 
   function validateForm() {
     if (!organizationName) {
-      showAlert(t("subscription.validate-empty-company-name-message"));
+      showAlert(t("subscription.validate-empty-organization-name-message"));
       return false;
     }
 
@@ -97,10 +97,10 @@
     >
       <div class="flex-1 flex flex-col mb-4">
         <Input
-          id="company-name"
-          label={t("subscription.company-name")}
+          id="organization-name"
+          label={t("subscription.organization-name")}
           value={organizationName}
-          placeholder={t("subscription.company-name-place-holder")}
+          placeholder={t("subscription.organization-name-placeholder")}
           inputChange={(event: any) => {
             organizationName = event.value;
           }}

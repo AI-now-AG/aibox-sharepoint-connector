@@ -30,8 +30,10 @@
   let autoHeightStyle: any = $state("");
 
   $effect(() => {
-    if (body === undefined || body === "") {
+    if (html !== body) {
       body = html;
+    }
+    if (body === undefined || body === "") {
       blur?.();
     }
   });
