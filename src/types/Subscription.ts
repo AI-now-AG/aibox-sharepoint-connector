@@ -29,7 +29,7 @@ export const AudioOptionLabels: Record<AudioOptionId, string> = {
   [AudioOptionId.AudioPremium]: "Audio Premium Package",
 };
 
-export const SUBSCIPTION_STEP = {
+export const SubscriptionStep = {
   Step0: 0,
   Step1: 1,
   Step2: 2,
@@ -37,3 +37,10 @@ export const SUBSCIPTION_STEP = {
   Step4: 4,
   Completed: 5,
 };
+
+export enum RoutePath {
+  Step1 = "step1",
+  Step2 = "step2",
+  Step3 = "step3",
+  Step4 = "step4",
+}

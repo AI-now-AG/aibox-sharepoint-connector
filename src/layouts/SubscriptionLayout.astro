@@ -2,25 +2,25 @@
 import { svgIcons } from "$assets/icons";
 import Toasts from "$components/toast-notification/Toasts.svelte";
 import SubsciptionSteps from "$components/subscription/SubsciptionSteps.svelte";
-import { SUBSCIPTION_STEP } from "$types/Subscription";
+import { SubscriptionStep } from "$types/Subscription";
 
 let currentStep = 0;
 const pathname = Astro.url.pathname;
 switch (pathname) {
   case "/subscription/step1":
-    currentStep = SUBSCIPTION_STEP.Step1;
+    currentStep = SubscriptionStep.Step1;
     break;
   case "/subscription/step2":
-    currentStep = SUBSCIPTION_STEP.Step2;
+    currentStep = SubscriptionStep.Step2;
     break;
   case "/subscription/step3":
-    currentStep = SUBSCIPTION_STEP.Step3;
+    currentStep = SubscriptionStep.Step3;
     break;
   case "/subscription/step4":
-    currentStep = SUBSCIPTION_STEP.Step4;
+    currentStep = SubscriptionStep.Step4;
     break;
   case "/subscription/complete":
-    currentStep = SUBSCIPTION_STEP.Completed;
+    currentStep = SubscriptionStep.Completed;
     break;
   default:
     currentStep = -1;
