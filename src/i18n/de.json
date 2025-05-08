@@ -416,7 +416,7 @@
   "subscription.credit-card": "Kreditkarte",
   "subscription.other-payment-method": "Weitere Zahlungsmethoden werden bald verfügbar sein. Aktuell ist nur Rechnung über E-Mail möglich.",
   "subscription.validate-empty-company-name-message": "Bitte gib deinen Firmennamen ein",
-  "subscription.validate-empty-organization-name-message": "Bitte gib deinen Organisation ein",
+  "subscription.validate-empty-organization-name-message": "Bitte gib den Namen deiner Oganisation ein.",
   "subscription.validate-empty-street-message": "Bitte gib deine Straße ein",
   "subscription.validate-empty-zip-code-message": "Bitte gib deine Postleitzahl ein",
   "subscription.validate-empty-location-message": "Bitte gib deinen Ort ein",
