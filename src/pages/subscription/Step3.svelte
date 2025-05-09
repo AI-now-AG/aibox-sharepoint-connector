@@ -197,7 +197,7 @@
     >
       <div class="flex-1 flex flex-col mb-4">
         <div
-          class="bg-white shadow-md rounded-lg flex flex-col justify-between space-y-2 px-6 py-4 w-full mt-8"
+          class="bg-white shadow-md rounded-lg flex flex-col justify-between space-y-2 px-6 py-4 w-full"
         >
           <div class="flex items-center">
             <input
