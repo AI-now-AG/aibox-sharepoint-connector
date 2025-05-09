@@ -413,8 +413,6 @@
   "subscription.monthly-invoice-email": "Monthly invoice (email)",
   "subscription.billing-email": "Billing email",
   "subscription.billing-email-plcae-holder": "billing@company.ch",
-  "subscription.credit-card": "Credit card",
-  "subscription.other-payment-method": "Other payment methods will be available soon!",
   "subscription.validate-empty-company-name-message": "Please input your company name ",
   "subscription.validate-empty-organization-name-message": "Please input your organization name ",
   "subscription.validate-empty-street-message": "Please input your street",
@@ -449,5 +447,6 @@
   "subscription.missing-subscription-information": "Oops, missing subscription information.",
   "subscription.create-my-aibox": "Create my aibox",
   "subscription.number-of-active-user": "Number of active users",
-  "common.ok": "Ok"
+  "common.ok": "Ok",
+  "subscription.billing-method-stripe": "Creditcard and other payment methods (Powered by Stripe)"
 }

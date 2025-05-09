@@ -167,32 +167,9 @@
       </div>
     </div>
 
-    <br class="mt-6" />
-    <p class="font-sans text-base font-medium text-gray-600 mt-6 mb-4">
-      {t("subscription.billing-method")}
-    </p>
-
     <div
       class="block md:flex lg:flex flex-row md:space-x-8 space-x-0 lg:space-x-8"
     >
-      <div class="flex-1 flex flex-col mb-4">
-        <button
-          class="bg-white shadow-md rounded-lg flex justify-between items-center px-6 py-4 w-full mt-8"
-          onclick={() => {}}
-        >
-          <input
-            type="checkbox"
-            checked={billingMethod === BiiliggMethod.MonthlyEmailInvoice}
-            class="checkbox checkbox-primary w-6]"
-            value={BiiliggMethod.MonthlyEmailInvoice}
-            disabled
-          />
-          <h2 class="text-sm font-medium text-[#0F172A] text-left flex-1 px-4">
-            {t("subscription.monthly-invoice-email")}
-          </h2>
-        </button>
-      </div>
-
       <div class="flex-1 flex flex-col mb-4">
         <Input
           id="email"
@@ -207,42 +184,55 @@
           classes="text-base"
         />
       </div>
+      <div class="flex-1 flex flex-col mb-4"></div>
     </div>
 
-    <!-- <div
-      class="block md:flex lg:flex flex-row md:space-x-8 space-x-0 lg:space-x-8"
-    >
-      <div class="flex-1 flex flex-col mb-4">
-        <button
-          class="bg-gray-200 rounded-lg flex justify-between items-center px-6 py-4 w-full"
-          onclick={() => {}}
-        >
-          <input
-            type="checkbox"
-            checked={billingMethod === BiiliggMethod.MonthlyCreditCard}
-            class="checkbox checkbox-primary w-6]"
-            value={BiiliggMethod.MonthlyCreditCard}
-            disabled
-          />
-          <h2 class="text-sm font-medium text-[#94A3B8] text-left flex-1 px-4">
-            {t("subscription.credit-card")}
-          </h2>
-        </button>
-      </div>
+    <br class="mt-6" />
+    <p class="font-sans text-base font-medium text-gray-600 mt-6 mb-4">
+      {t("subscription.billing-method")}
+    </p>
 
-      <div class="flex-1 flex flex-col mb-4"></div>
-    </div> -->
-    <!-- <div
+    <div
       class="block md:flex lg:flex flex-row md:space-x-8 space-x-0 lg:space-x-8"
     >
       <div class="flex-1 flex flex-col mb-4">
-        <div class="rounded-lg bg-[#00B3F059] px-6 py-[12px]">
-          {t("subscription.other-payment-method")}
+        <div
+          class="bg-white shadow-md rounded-lg flex flex-col justify-between space-y-2 px-6 py-4 w-full mt-8"
+        >
+          <div class="flex items-center">
+            <input
+              type="radio"
+              id="stripe-checkout"
+              name="billing_method"
+              class="radio"
+              value=""
+              checked={true}
+            />
+            <label
+              for="stripe-checkout"
+              class="ml-2 text-sm font-medium text-[#0F172A]"
+              >{t("subscription.billing-method-stripe")}</label
+            >
+          </div>
+          <div class="flex items-center">
+            <input
+              type="radio"
+              id="monthly-invoice"
+              name="billing_method"
+              class="radio"
+              value=""
+              checked={true}
+            />
+            <label
+              for="monthly-invoice"
+              class="ml-2 text-sm font-medium text-[#0F172A]"
+              >{t("subscription.monthly-invoice-email")}</label
+            >
+          </div>
         </div>
       </div>
-
       <div class="flex-1 flex flex-col mb-4"></div>
-    </div> -->
+    </div>
   </div>
 
   <!-- Next -->
