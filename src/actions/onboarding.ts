@@ -27,7 +27,7 @@ import organizationsManagement from "$data/auth0/organizations-manager";
 import sendMail from "$utils/mail";
 import { isProd } from "$utils/env";
 import { randomString } from "$utils/common";
-import { isSocialConnection } from "$utils/auth0Auth";
+import { isSocialConnection } from "$utils/auth0";
 import {
   TENANT_MASTER_DEV,
   TENANT_MASTER_PROD,

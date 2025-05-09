@@ -817,6 +817,8 @@
             { value: "Starter", title: "aibox Starter (25.-)" },
             { value: "Teams", title: "aibox Teams (149.-)" },
             { value: "Pro", title: "aibox Pro (249.-)" },
+            { value: "Internal", title: "Internal" },
+            { value: "Enterprise", title: "aibox Enterprise" },
           ]}
           bind:value={selectedPlanName}
         ></SelectOptions>

@@ -3,6 +3,8 @@
 /// <reference path="../.astro/types.d.ts" />
 /// <reference types="astro/client" />
 
+declare module "pdf-parse-debugging-disabled";
+
 declare namespace App {
   interface Locals {
     session: import("lucia").Session; // lucia

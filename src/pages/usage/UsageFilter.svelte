@@ -31,7 +31,7 @@
   function getMonthOptions(): Option[] {
     const months = [];
     const now = new Date();
-    for (let i = 0; i < 1; i++) {
+    for (let i = 0; i < 2; i++) {
       const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
       const month = String(date.getMonth() + 1).padStart(2, "0"); // Format as mm
       const year = date.getFullYear(); // Get the full year
