@@ -31,7 +31,9 @@
 
   let selectedLanguage: { title: string; value: string } =
     $state(initSelectedLanguage);
-  let organizationName = $state(initOrganizationInformation?.companyName ?? "");
+  let organizationName = $state(
+    initOrganizationInformation?.organizationName ?? "",
+  );
   let selectedCategories: string[] = $state(
     initOrganizationInformation?.useCases ?? [],
   );
@@ -67,7 +69,7 @@
   function handleNext() {
     if (validateForm()) {
       storeOrganizationInformation({
-        companyName: organizationName,
+        organizationName: organizationName,
         defaultLanguage: selectedLanguage?.value ?? "de",
         useCases: selectedCategories,
       });

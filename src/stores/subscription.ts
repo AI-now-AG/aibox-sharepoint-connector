@@ -49,7 +49,7 @@ interface BillingInformation {
 }
 
 interface OrganizationInformation {
-  companyName: string;
+  organizationName: string;
   defaultLanguage: string;
   useCases: string[];
 }
