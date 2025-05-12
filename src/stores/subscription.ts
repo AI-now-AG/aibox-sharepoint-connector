@@ -1,4 +1,5 @@
 import { writable } from "svelte/store";
+import { BillingMethod } from "$types/Subscription";
 
 // Common interfaces for multilingual fields
 interface MultilingualText {
@@ -43,7 +44,7 @@ interface BillingInformation {
   street: string;
   zipCode: string;
   location: string;
-  billingMethod: "monthlyInvoice" | "creditCard";
+  billingMethod: BillingMethod;
   billingEmail: string;
 }
 
@@ -53,7 +54,7 @@ interface OrganizationInformation {
   useCases: string[];
 }
 
-interface AiboxSubscription {
+interface SubscriptionStore {
   plan?: SubscriptionPlan;
   audioOptions?: AudioOption[];
   billingInformation?: BillingInformation;
@@ -61,7 +62,7 @@ interface AiboxSubscription {
 }
 
 export type {
-  AiboxSubscription,
+  SubscriptionStore,
   SubscriptionPlan,
   AudioOption,
   MultilingualText,
@@ -71,21 +72,22 @@ export type {
   OrganizationInformation,
 };
 
+const storageItemKey = "aiboxsubscription";
 const initialData =
   typeof window !== "undefined"
-    ? JSON.parse(localStorage.getItem("aiboxsubscription") || "{}")
+    ? JSON.parse(localStorage.getItem(storageItemKey) || "{}")
     : {};
 
-export const aiboxsubscription = writable<AiboxSubscription>(initialData);
+export const subscription = writable<SubscriptionStore>(initialData);
 
-aiboxsubscription.subscribe((value) => {
+subscription.subscribe((value) => {
   if (typeof window !== "undefined") {
-    localStorage.setItem("aiboxsubscription", JSON.stringify(value));
+    localStorage.setItem(storageItemKey, JSON.stringify(value));
   }
 });
 
 export const storePlan = (plan: SubscriptionPlan) => {
-  aiboxsubscription.update((origin: AiboxSubscription) => {
+  subscription.update((origin: SubscriptionStore) => {
     return {
       ...origin,
       plan,
@@ -94,7 +96,7 @@ export const storePlan = (plan: SubscriptionPlan) => {
 };
 
 export const storeAudioOptions = (audioOptions?: AudioOption[]) => {
-  aiboxsubscription.update((origin: AiboxSubscription) => {
+  subscription.update((origin: SubscriptionStore) => {
     return {
       ...origin,
       audioOptions: audioOptions ?? [],
@@ -105,7 +107,7 @@ export const storeAudioOptions = (audioOptions?: AudioOption[]) => {
 export const storeBillingInformation = (
   billingInformation: BillingInformation,
 ) => {
-  aiboxsubscription.update((origin: AiboxSubscription) => {
+  subscription.update((origin: SubscriptionStore) => {
     return {
       ...origin,
       billingInformation: billingInformation,
@@ -116,7 +118,7 @@ export const storeBillingInformation = (
 export const storeOrganizationInformation = (
   organizationInformation: OrganizationInformation,
 ) => {
-  aiboxsubscription.update((origin: AiboxSubscription) => {
+  subscription.update((origin: SubscriptionStore) => {
     return {
       ...origin,
       organizationInformation: organizationInformation,
@@ -124,4 +126,4 @@ export const storeOrganizationInformation = (
   });
 };
 
-export default aiboxsubscription;
+export default subscription;

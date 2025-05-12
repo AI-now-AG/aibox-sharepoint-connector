@@ -29,6 +29,11 @@ export const AudioOptionLabels: Record<AudioOptionId, string> = {
   [AudioOptionId.AudioPremium]: "Audio Premium Package",
 };
 
+export enum BillingMethod {
+  CreditCard = "credit_card",
+  MonthlyInvoice = "monthly_invoice",
+}
+
 export const SubscriptionStep = {
   Step0: 0,
   Step1: 1,

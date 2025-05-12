@@ -10,7 +10,7 @@
     storePlan,
     type AudioOption,
     type SubscriptionPlan,
-    aiboxsubscription,
+    subscription,
   } from "$stores/subscription";
 
   interface Props {
@@ -21,9 +21,9 @@
 
   let totalPrice: any = $state("");
 
-  const initSelectedPackageId = $aiboxsubscription.plan?.id || "";
+  const initSelectedPackageId = $subscription.plan?.id || "";
   let initSelectedAudioOptionIds: string[] =
-    $aiboxsubscription.audioOptions?.map((option) => {
+    $subscription.audioOptions?.map((option) => {
       return option.id;
     }) || [];
   let selectedPackageId = $state(initSelectedPackageId);
@@ -31,6 +31,8 @@
 
   let alertModal: HTMLDialogElement | undefined = $state();
   let alertMessage = $state("");
+
+  $inspect($subscription);
 
   // Calculate total price (include package and audio options)
   $effect(() => {

@@ -6,7 +6,7 @@
   import SingleInput from "$pages/prompt-library/prompts/SingleInput.svelte";
   import {
     storeOrganizationInformation,
-    aiboxsubscription,
+    subscription,
   } from "$stores/subscription";
 
   interface Props {
@@ -16,8 +16,7 @@
   let { defaultLanguage = "en", categories = $bindable([]) }: Props = $props();
   const t = useTranslations(defaultLanguage);
 
-  const initOrganizationInformation =
-    $aiboxsubscription.organizationInformation;
+  const initOrganizationInformation = $subscription.organizationInformation;
 
   const languages = [
     { title: "Deutsch", value: "de" },
@@ -39,6 +38,7 @@
 
   let alertModal: HTMLDialogElement | undefined = $state();
   let alertMessage = $state("");
+  $inspect($subscription);
 
   function showAlert(message: any) {
     alertMessage = message;

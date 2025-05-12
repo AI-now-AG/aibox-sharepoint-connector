@@ -3,10 +3,8 @@
   import Input from "$components/Input/Input.svelte";
   import SubsciptionSteps from "$components/subscription/SubsciptionSteps.svelte";
   import { useTranslations } from "$i18n/utils";
-  import {
-    storeBillingInformation,
-    aiboxsubscription,
-  } from "$stores/subscription";
+  import { storeBillingInformation, subscription } from "$stores/subscription";
+  import { BillingMethod } from "$types/Subscription";
   import { isValidEmail } from "$utils/common";
 
   interface Props {
@@ -15,12 +13,7 @@
   let { defaultLanguage = "en" }: Props = $props();
   const t = useTranslations(defaultLanguage);
 
-  const BiiliggMethod = {
-    MonthlyEmailInvoice: "monthlyInvoice",
-    MonthlyCreditCard: "creditCard",
-  };
-
-  const initBillingInformation = $aiboxsubscription.billingInformation;
+  const initBillingInformation = $subscription.billingInformation;
 
   let companyName = $state(initBillingInformation?.companyName ?? "");
   let street = $state(initBillingInformation?.street ?? "");
@@ -28,11 +21,14 @@
   let location = $state(initBillingInformation?.location ?? "");
   let billingEmail = $state(initBillingInformation?.billingEmail ?? "");
   let billingMethod = $state(
-    initBillingInformation?.billingMethod ?? BiiliggMethod.MonthlyEmailInvoice,
+    initBillingInformation?.billingMethod ?? BillingMethod.MonthlyInvoice,
   );
 
   let alertModal: HTMLDialogElement | undefined = $state();
   let alertMessage = $state("");
+
+  $inspect(billingMethod);
+  $inspect($subscription);
 
   function showAlert(message: any) {
     alertMessage = message;
@@ -73,10 +69,7 @@
         zipCode,
         location,
         billingEmail,
-        billingMethod:
-          billingMethod === BiiliggMethod.MonthlyEmailInvoice
-            ? "monthlyInvoice"
-            : "creditCard",
+        billingMethod,
       });
       window.location.href = "/subscription/step4";
     }
@@ -205,8 +198,11 @@
               id="stripe-checkout"
               name="billing_method"
               class="radio"
-              value=""
-              checked={true}
+              value={BillingMethod.CreditCard}
+              checked={billingMethod == BillingMethod.CreditCard}
+              onchange={() => {
+                billingMethod = BillingMethod.CreditCard;
+              }}
             />
             <label
               for="stripe-checkout"
@@ -220,8 +216,11 @@
               id="monthly-invoice"
               name="billing_method"
               class="radio"
-              value=""
-              checked={true}
+              value={BillingMethod.MonthlyInvoice}
+              checked={billingMethod == BillingMethod.MonthlyInvoice}
+              onchange={() => {
+                billingMethod = BillingMethod.MonthlyInvoice;
+              }}
             />
             <label
               for="monthly-invoice"
