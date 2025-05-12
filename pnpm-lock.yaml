@@ -158,6 +158,9 @@ importers:
       slug:
         specifier: ^10.0.0
         version: 10.0.0
+      stripe:
+        specifier: ^18.1.0
+        version: 18.1.0(@types/node@22.14.1)
       svelte:
         specifier: ^5.26.3
         version: 5.26.3
@@ -8017,6 +8020,15 @@ packages:
     resolution: {integrity: sha512-A21Xsm1XzUkK0qK1ZrytDUvqsQWict2Cykhvi0fBQntGG5JSprESasEyV1EZ/4CiR5WB5KjzLTrP/bO37B0wPg==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
 
+  stripe@18.1.0:
+    resolution: {integrity: sha512-MLDiniPTHqcfIT3anyBPmOEcaiDhYa7/jRaNypQ3Rt2SJnayQZBvVbFghIziUCZdltGAndm/ZxVOSw6uuSCDig==}
+    engines: {node: '>=12.*'}
+    peerDependencies:
+      '@types/node': '>=12.x.x'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+
   strnum@2.0.5:
     resolution: {integrity: sha512-YAT3K/sgpCUxhxNMrrdhtod3jckkpYwH6JAuwmUdXZsmzH1wUyzTMrrK2wYCEEqlKwrWDd35NeuUkbBy/1iK+Q==}
 
@@ -14735,7 +14747,7 @@ snapshots:
       isstream: 0.1.2
       jsonwebtoken: 9.0.2
       mime-types: 2.1.35
-      retry-axios: 2.6.0(axios@1.7.9(debug@4.4.0))
+      retry-axios: 2.6.0(axios@1.7.9)
       tough-cookie: 4.1.4
     transitivePeerDependencies:
       - supports-color
@@ -17223,7 +17235,7 @@ snapshots:
       retext-stringify: 4.0.0
       unified: 11.0.5
 
-  retry-axios@2.6.0(axios@1.7.9(debug@4.4.0)):
+  retry-axios@2.6.0(axios@1.7.9):
     dependencies:
       axios: 1.7.9(debug@4.4.0)
 
@@ -17661,6 +17673,12 @@ snapshots:
   strip-json-comments@3.1.1: {}
 
   strip-outer@2.0.0: {}
+
+  stripe@18.1.0(@types/node@22.14.1):
+    dependencies:
+      qs: 6.14.0
+    optionalDependencies:
+      '@types/node': 22.14.1
 
   strnum@2.0.5: {}
 
