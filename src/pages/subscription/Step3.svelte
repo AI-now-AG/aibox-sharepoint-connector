@@ -242,7 +242,7 @@
         handleNext();
       }}
     >
-      {t("common.next")}
+      {t("subscription.create-my-aibox")}
     </button>
   </div>
 </div>
