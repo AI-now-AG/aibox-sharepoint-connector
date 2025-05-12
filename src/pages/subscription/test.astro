@@ -1,0 +1,55 @@
+---
+import { actions } from "astro:actions";
+import SubscriptionLayout from "$layouts/SubscriptionLayout.astro";
+
+// Use Astro.callAction() to call actions on the server side
+let sessionData = null;
+let sessionError = null;
+
+try {
+  // Using Astro.callAction to call the action from the server side
+  const result = await Astro.callAction(
+    actions.onboarding.createStripeSession,
+    {
+      plan_name: "Teams",
+      add_ons: ["AudioPremium"],
+      billing: {
+        company_name: "AI now - Devlin",
+        address: "Reussenstrasse 22",
+        zip_code: "8000",
+        location: "Zürich",
+        email: "devlin.nguyen@business4you.ch",
+      },
+    }
+  );
+
+  sessionData = result.data;
+  sessionError = result.error;
+} catch (err) {
+  sessionError = err;
+  console.error("Error while creating Stripe session:", err);
+}
+---
+
+<SubscriptionLayout title="Test">
+  <div>
+    <h1>Subscription Details</h1>
+    {
+      sessionData ? (
+        <div>
+          <h2>Session Created Successfully!</h2>
+          <pre>{JSON.stringify(sessionData, null, 2)}</pre>
+        </div>
+      ) : (
+        <div>
+          <h2>Error Occurred</h2>
+          <pre>
+            {sessionError
+              ? JSON.stringify(sessionError, null, 2)
+              : "No error message"}
+          </pre>
+        </div>
+      )
+    }
+  </div>
+</SubscriptionLayout>

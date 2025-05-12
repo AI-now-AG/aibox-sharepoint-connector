@@ -18,7 +18,8 @@
 
   async function createOrganization() {
     const { data, error } = await actions.onboarding.createOrganization({
-      company_name: $subscription.billingInformation?.companyName ?? "",
+      organization_name:
+        $subscription.organizationInformation?.organizationName ?? "",
     });
 
     if (error) throw new Error(t("subscription.create-organization-failed"));

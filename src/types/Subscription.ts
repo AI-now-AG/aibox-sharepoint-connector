@@ -22,6 +22,10 @@ export enum AudioOptionId {
   AudioBasisAddOnLarge = "AudioBasisAddOnLarge",
 }
 
+export type ProductKeys =
+  | keyof typeof SubscriptionPackageId
+  | keyof typeof AudioOptionId;
+
 export const AudioOptionLabels: Record<AudioOptionId, string> = {
   [AudioOptionId.AudioBasis]: "Audio Basis",
   [AudioOptionId.AudioBasisAddOnSubtitle]: "Add-on Untertitel",

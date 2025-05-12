@@ -61,3 +61,23 @@ export const SG_NEW_TENANT_TEMPLATE = "d-87847bafc967448e93d99a411edece3a";
 // Tenants
 export const TENANT_MASTER_DEV = "67ff572260fa2a8bca5d26d0"; // aibox dev master
 export const TENANT_MASTER_PROD = "66cc50d98103241cf3354d3f"; // aibox master
+
+// Stripe
+export const STRIPE_PRODUCTS_DEV = {
+  Starter: "price_1RLNImBIpWAJAQFJ4vb2AddD",
+  Teams: "price_1RLNJgBIpWAJAQFJ6PJgPAvD",
+  Pro: "price_1RLNK5BIpWAJAQFJmBbZPx0w",
+  AudioBasis: "price_1RNrVABIpWAJAQFJ0ETxdNpc",
+  AudioBasisAddOnSubtitle: "price_1RNrVPBIpWAJAQFJGcPJI0jw",
+  AudioBasisAddOnLarge: "price_1RNrVeBIpWAJAQFJwQiaO5en",
+  AudioPremium: "price_1RNrVvBIpWAJAQFJM1vgV62W",
+};
+export const STRIPE_PRODUCTS_PROD = {
+  Starter: "",
+  Teams: "",
+  Pro: "",
+  AudioBasis: "",
+  AudioBasisAddOnSubtitle: "",
+  AudioBasisAddOnLarge: "",
+  AudioPremium: "",
+};

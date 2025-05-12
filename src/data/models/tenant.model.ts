@@ -68,6 +68,7 @@ const TenantSchema = z.object({
   is_trial: z.boolean().optional().default(false),
   metadata: z.record(z.any()).nullish(),
   billing_info: BillingInfoSchema.optional(),
+  stripe_customer_id: z.string().nullish().default(null),
   created_at: z
     .date()
     .optional()

@@ -19,15 +19,22 @@ import {
   SubscriptionPackageId,
   AudioOptionId,
   AudioOptionLabels,
+  type ProductKeys,
 } from "$types/Subscription";
 import { UserRole, TourType } from "$types/Users";
-import { TenantFeature, AudioCategory } from "$types/TenantFeature";
+import { TenantFeature } from "$types/TenantFeature";
 import { SocialProvider } from "$types/Auth0Auth";
 import organizationsManagement from "$data/auth0/organizations-manager";
 import sendMail from "$utils/mail";
 import { isProd } from "$utils/env";
 import { randomString } from "$utils/common";
 import { isSocialConnection } from "$utils/auth0";
+import {
+  createCustomer,
+  getCustomerByEmail,
+  createCheckoutSession,
+} from "$utils/stripe";
+import { getTranscriptionTypes, getStripePrices } from "$utils/onboarding";
 import {
   TENANT_MASTER_DEV,
   TENANT_MASTER_PROD,
@@ -47,13 +54,29 @@ const auth0GoogleCon = isProd()
 const auth0WindowsCon = isProd()
   ? AUTH0_AUTH_WINDOWS_CON_PROD
   : AUTH0_AUTH_WINDOWS_CON_DEV;
+
 const OrganizationNameInputParamsSchema = z.object({
-  company_name: z.string().min(1),
+  organization_name: z.string().min(1),
+});
+
+const BillingParamsSchema = z.object({
+  company_name: z.string(),
+  address: z.string(),
+  zip_code: z.string(),
+  location: z.string(),
+  email: z.string(),
+});
+
+const CheckoutInputParamsSchema = z.object({
+  plan_name: z.nativeEnum(SubscriptionPackageId).optional(),
+  add_ons: z.array(z.nativeEnum(AudioOptionId)).optional(),
+  billing: BillingParamsSchema,
 });
 
 const OrganizationIdInputParamsSchema = z.object({
   org_id: z.string().min(1),
 });
+
 const TenantInputParamsSchema = z.object({
   name: z.string().min(1),
   org_id: z.string().min(1),
@@ -61,46 +84,12 @@ const TenantInputParamsSchema = z.object({
   language: z.string().min(1),
   plan_name: z.nativeEnum(SubscriptionPackageId).optional(),
   add_ons: z.array(z.nativeEnum(AudioOptionId)).optional(),
-  billing: z.object({
-    company_name: z.string(),
-    address: z.string(),
-    zip_code: z.string(),
-    location: z.string(),
-    email: z.string(),
-  }),
+  billing: BillingParamsSchema,
   use_cases: z.array(z.string()),
 });
 const TenantEmailInputParamsSchema = z.object({
   tenant_id: z.string().min(1),
 });
-
-const getTranscriptionTypes = (selectedAddOns: AudioOptionId[]) => {
-  let transcriptionTypes = [];
-
-  // Audio Basis + Add-ons
-  if (selectedAddOns?.includes(AudioOptionId.AudioBasis)) {
-    transcriptionTypes.push(AudioCategory.AudioToText);
-  }
-  if (selectedAddOns?.includes(AudioOptionId.AudioBasisAddOnSubtitle)) {
-    transcriptionTypes.push(AudioCategory.Subtitle);
-  }
-  if (selectedAddOns?.includes(AudioOptionId.AudioBasisAddOnLarge)) {
-    transcriptionTypes.push(AudioCategory.AudioPro);
-  }
-
-  // Audio Premium
-  if (selectedAddOns?.includes(AudioOptionId.AudioPremium)) {
-    transcriptionTypes = [
-      AudioCategory.AudioToText,
-      AudioCategory.Subtitle,
-      AudioCategory.AudioPro,
-      AudioCategory.SubtitleLarge,
-      AudioCategory.Subtitle11Labs,
-    ];
-  }
-
-  return transcriptionTypes;
-};
 
 // step 1: createOrganization()  - Create Auth0 organization
 // step 2: createMember()  - Create Auth0 user, move user from trial org to new org
@@ -108,12 +97,77 @@ const getTranscriptionTypes = (selectedAddOns: AudioOptionId[]) => {
 // step 4: finalize()  - Send notification emails
 
 export const onboarding = {
+  createStripeSession: defineAction({
+    input: CheckoutInputParamsSchema,
+    handler: async (input, context) => {
+      try {
+        const { request } = context;
+        const { plan_name: planName, add_ons: addOns, billing } = input;
+
+        const selectedPackages = [
+          planName as ProductKeys,
+          ...(addOns as ProductKeys[]),
+        ];
+        const priceIds = getStripePrices(selectedPackages);
+
+        // Get the `Host` header (domain)
+        const host = request.headers.get("host");
+
+        // Get the protocol, typically 'https' in production
+        const protocol = request.headers.get("x-forwarded-proto") || "https"; // Default to 'https' if not available
+
+        // Combine protocol and host to form the full URL
+        const fullDomain = `${protocol}://${host}`;
+
+        if (!priceIds.length) {
+          throw new Error("Product prices are required.");
+        }
+
+        // Generate dynamic success URL with user-specific data
+        const successUrl = `${fullDomain}/subscription?success=true`;
+        const cancelUrl = `${fullDomain}/subscription?success=false`;
+
+        // Lookup customer
+        let stripeCustomerId = null;
+        const existingCustomer = await getCustomerByEmail(billing.email);
+        if (!existingCustomer) {
+          const newCustomer = await createCustomer(billing.email, {
+            name: billing.company_name,
+            address: {
+              line1: billing.address,
+              city: billing.location,
+              postal_code: billing.zip_code,
+            },
+          });
+          stripeCustomerId = newCustomer?.id;
+        } else {
+          stripeCustomerId = existingCustomer?.id;
+        }
+
+        const session = await createCheckoutSession({
+          mode: "subscription",
+          line_items: priceIds.map((id: string) => ({
+            price: id,
+            quantity: 1,
+          })),
+          customer: stripeCustomerId,
+          success_url: successUrl,
+          cancel_url: cancelUrl,
+        });
+
+        return { url: session?.url, stripeCustomerId };
+      } catch (error) {
+        console.error("Stripe checkout error:", error);
+        throw error;
+      }
+    },
+  }),
   createOrganization: defineAction({
     input: OrganizationNameInputParamsSchema,
     handler: async (input, context) => {
-      const { company_name: companyName } = input;
+      const { organization_name: organizationName } = input;
       const { user } = context.locals;
-      const name = companyName
+      const name = organizationName
         .toLowerCase()
         .normalize("NFKD") // Remove accents/diacritics
         .replace(/[\u0300-\u036f]/g, "") // Strip combining characters
@@ -125,7 +179,7 @@ export const onboarding = {
       // create new Auth0 organization
       const organizationResult = await organizationsManagement.create({
         name: orgName.toLowerCase(),
-        display_name: companyName,
+        display_name: organizationName,
       });
 
       const organizationId = organizationResult.data.id;
