@@ -8,39 +8,37 @@
   import "@friendofsvelte/tipex/styles/CodeBlock.css";
   import "$styles/editor.css";
 
-  let editor: TipexEditor | undefined = $state();
+  let editor: TipexEditor | undefined;
 
   interface Props {
     html?: string;
-    text?: string;
     cssClass?: string;
-    blur?: Function;
+    onblur?: Function;
     autoInitHeight?: boolean;
   }
 
   let {
     html = $bindable(""),
-    text = $bindable(""),
     cssClass = "",
-    blur,
+    onblur,
     autoInitHeight,
   }: Props = $props();
 
-  let body: any = $state("");
-  let autoHeightStyle: any = $state("");
+  let body: string = $state("");
+  let autoHeightStyle: string = $state("");
 
   $effect(() => {
-    if (html !== body) {
-      body = html;
-    }
     if (body === undefined || body === "") {
-      blur?.();
+      body = html;
+      onblur?.();
+    }
+    if (body === "" && html !== "") {
+      body = html;
     }
   });
 
   function onEditorUpdate(e: any) {
     html = e.editor.getHTML();
-    text = e.editor.getText();
   }
 
   function setFocusAtTheEnd(_editor: TipexEditor) {

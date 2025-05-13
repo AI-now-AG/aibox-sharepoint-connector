@@ -160,7 +160,7 @@
       <div class="mb-4">
         <p class="mb-2">{t("prompt-library.add.knowledgebase.text")}*</p>
         <TextEditor
-          blur={() => {
+          onblur={() => {
             setTimeout(() => {
               titleInput?.focus({ preventScroll: true });
             }, 100);
