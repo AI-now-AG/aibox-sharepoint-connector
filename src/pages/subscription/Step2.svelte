@@ -4,10 +4,7 @@
   import SubsciptionSteps from "$components/subscription/SubsciptionSteps.svelte";
   import { useTranslations } from "$i18n/utils";
   import SingleInput from "$pages/prompt-library/prompts/SingleInput.svelte";
-  import {
-    storeOrganizationInformation,
-    subscription,
-  } from "$stores/subscription";
+  import { storeOrganizationInfo, subscription } from "$stores/subscription";
 
   interface Props {
     defaultLanguage?: string;
@@ -16,7 +13,7 @@
   let { defaultLanguage = "en", categories = $bindable([]) }: Props = $props();
   const t = useTranslations(defaultLanguage);
 
-  const initOrganizationInformation = $subscription.organizationInformation;
+  const initOrganizationInformation = $subscription.organizationInfo;
 
   const languages = [
     { title: "Deutsch", value: "de" },
@@ -68,7 +65,7 @@
 
   function handleNext() {
     if (validateForm()) {
-      storeOrganizationInformation({
+      storeOrganizationInfo({
         organizationName: organizationName,
         defaultLanguage: selectedLanguage?.value ?? "de",
         useCases: selectedCategories,

@@ -19,6 +19,7 @@ import {
   SubscriptionPackageId,
   AudioOptionId,
   AudioOptionLabels,
+  BillingMethod,
   type ProductKeys,
 } from "$types/Subscription";
 import { UserRole, TourType } from "$types/Users";
@@ -59,7 +60,7 @@ const OrganizationNameInputParamsSchema = z.object({
   organization_name: z.string().min(1),
 });
 
-const BillingParamsSchema = z.object({
+const BillingInfoParamsSchema = z.object({
   company_name: z.string(),
   address: z.string(),
   zip_code: z.string(),
@@ -70,7 +71,7 @@ const BillingParamsSchema = z.object({
 const CheckoutInputParamsSchema = z.object({
   plan_name: z.nativeEnum(SubscriptionPackageId).optional(),
   add_ons: z.array(z.nativeEnum(AudioOptionId)).optional(),
-  billing: BillingParamsSchema,
+  billing_info: BillingInfoParamsSchema,
 });
 
 const OrganizationIdInputParamsSchema = z.object({
@@ -84,7 +85,8 @@ const TenantInputParamsSchema = z.object({
   language: z.string().min(1),
   plan_name: z.nativeEnum(SubscriptionPackageId).optional(),
   add_ons: z.array(z.nativeEnum(AudioOptionId)).optional(),
-  billing: BillingParamsSchema,
+  billing_method: z.nativeEnum(BillingMethod).optional(),
+  billing_info: BillingInfoParamsSchema,
   use_cases: z.array(z.string()),
 });
 const TenantEmailInputParamsSchema = z.object({
@@ -102,7 +104,11 @@ export const onboarding = {
     handler: async (input, context) => {
       try {
         const { request } = context;
-        const { plan_name: planName, add_ons: addOns, billing } = input;
+        const {
+          plan_name: planName,
+          add_ons: addOns,
+          billing_info: billingInfo,
+        } = input;
 
         const selectedPackages = [
           planName as ProductKeys,
@@ -124,19 +130,19 @@ export const onboarding = {
         }
 
         // Generate dynamic success URL with user-specific data
-        const successUrl = `${fullDomain}/subscription?success=true`;
-        const cancelUrl = `${fullDomain}/subscription?success=false`;
+        const successUrl = `${fullDomain}/subscription/step4?referer=stripe`;
+        const cancelUrl = `${fullDomain}/subscription?referer=stripe`;
 
         // Lookup customer
         let stripeCustomerId = null;
-        const existingCustomer = await getCustomerByEmail(billing.email);
+        const existingCustomer = await getCustomerByEmail(billingInfo.email);
         if (!existingCustomer) {
-          const newCustomer = await createCustomer(billing.email, {
-            name: billing.company_name,
+          const newCustomer = await createCustomer(billingInfo.email, {
+            name: billingInfo.company_name,
             address: {
-              line1: billing.address,
-              city: billing.location,
-              postal_code: billing.zip_code,
+              line1: billingInfo.address,
+              city: billingInfo.location,
+              postal_code: billingInfo.zip_code,
             },
           });
           stripeCustomerId = newCustomer?.id;
@@ -254,7 +260,7 @@ export const onboarding = {
         name: input.name,
         org_id: input.org_id,
         org_name: input.org_name,
-        billing_info: input.billing,
+        billing_info: input.billing_info,
         included_features: includedFeatures,
         transcription_types: transcriptionTypes,
         default_language: input.language,

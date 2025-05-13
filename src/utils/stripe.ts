@@ -8,8 +8,7 @@ export async function createCheckoutSession(
   params: SessionCreateParams,
 ): Promise<Stripe.Checkout.Session | null> {
   try {
-    const session = await stripe.checkout.sessions.create(params);
-    return session;
+    return await stripe.checkout.sessions.create(params);
   } catch (error) {
     console.error("Error creating checkout session:", error);
     // Return `null` or rethrow, depending on your use case

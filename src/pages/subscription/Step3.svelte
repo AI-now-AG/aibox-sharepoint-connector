@@ -1,10 +1,19 @@
 <script lang="ts">
+  import { actions } from "astro:actions";
   import AlertDialog from "$components/AlertDialog.svelte";
   import Input from "$components/Input/Input.svelte";
   import SubsciptionSteps from "$components/subscription/SubsciptionSteps.svelte";
   import { useTranslations } from "$i18n/utils";
-  import { storeBillingInformation, subscription } from "$stores/subscription";
-  import { BillingMethod } from "$types/Subscription";
+  import {
+    storeBillingInfo,
+    storeStripeCheckout,
+    subscription,
+  } from "$stores/subscription";
+  import {
+    SubscriptionPackageId,
+    AudioOptionId,
+    BillingMethod,
+  } from "$types/Subscription";
   import { isValidEmail } from "$utils/common";
 
   interface Props {
@@ -13,15 +22,15 @@
   let { defaultLanguage = "en" }: Props = $props();
   const t = useTranslations(defaultLanguage);
 
-  const initBillingInformation = $subscription.billingInformation;
+  const initBillingInfo = $subscription.billingInfo;
 
-  let companyName = $state(initBillingInformation?.companyName ?? "");
-  let street = $state(initBillingInformation?.street ?? "");
-  let zipCode = $state(initBillingInformation?.zipCode ?? "");
-  let location = $state(initBillingInformation?.location ?? "");
-  let billingEmail = $state(initBillingInformation?.billingEmail ?? "");
+  let companyName = $state(initBillingInfo?.companyName ?? "");
+  let street = $state(initBillingInfo?.street ?? "");
+  let zipCode = $state(initBillingInfo?.zipCode ?? "");
+  let location = $state(initBillingInfo?.location ?? "");
+  let billingEmail = $state(initBillingInfo?.billingEmail ?? "");
   let billingMethod = $state(
-    initBillingInformation?.billingMethod ?? BillingMethod.MonthlyInvoice,
+    initBillingInfo?.billingMethod ?? BillingMethod.MonthlyInvoice,
   );
 
   let alertModal: HTMLDialogElement | undefined = $state();
@@ -61,9 +70,27 @@
     return true;
   }
 
-  function handleNext() {
+  async function createStripeSession() {
+    const { data, error } = await actions.onboarding.createStripeSession({
+      plan_name: $subscription.plan?.id as SubscriptionPackageId,
+      add_ons: $subscription.audioOptions?.map(
+        (option) => option.id as AudioOptionId,
+      ),
+      billing_info: {
+        company_name: companyName,
+        address: street,
+        zip_code: zipCode,
+        location: location,
+        email: billingEmail,
+      },
+    });
+
+    return data;
+  }
+
+  async function handleNext() {
     if (validateForm()) {
-      storeBillingInformation({
+      storeBillingInfo({
         companyName,
         street,
         zipCode,
@@ -71,7 +98,18 @@
         billingEmail,
         billingMethod,
       });
-      window.location.href = "/subscription/step4";
+
+      if (
+        $subscription.billingInfo?.billingMethod == BillingMethod.CreditCard
+      ) {
+        const data = await createStripeSession();
+        storeStripeCheckout({
+          customerId: data.stripeCustomerId,
+        });
+        window.location.href = data.url;
+      } else {
+        window.location.href = "/subscription/step4";
+      }
     }
   }
 </script>

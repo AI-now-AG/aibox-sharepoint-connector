@@ -54,11 +54,16 @@ interface OrganizationInformation {
   useCases: string[];
 }
 
+interface StripeCheckout {
+  customerId?: string;
+}
+
 interface SubscriptionStore {
   plan?: SubscriptionPlan;
   audioOptions?: AudioOption[];
-  billingInformation?: BillingInformation;
-  organizationInformation?: OrganizationInformation;
+  billingInfo?: BillingInformation;
+  organizationInfo?: OrganizationInformation;
+  stripeCheckout?: StripeCheckout;
 }
 
 export type {
@@ -104,24 +109,31 @@ export const storeAudioOptions = (audioOptions?: AudioOption[]) => {
   });
 };
 
-export const storeBillingInformation = (
-  billingInformation: BillingInformation,
-) => {
+export const storeBillingInfo = (billingInfo: BillingInformation) => {
   subscription.update((origin: SubscriptionStore) => {
     return {
       ...origin,
-      billingInformation: billingInformation,
+      billingInfo: billingInfo,
     };
   });
 };
 
-export const storeOrganizationInformation = (
-  organizationInformation: OrganizationInformation,
+export const storeOrganizationInfo = (
+  organizationInfo: OrganizationInformation,
 ) => {
   subscription.update((origin: SubscriptionStore) => {
     return {
       ...origin,
-      organizationInformation: organizationInformation,
+      organizationInfo: organizationInfo,
+    };
+  });
+};
+
+export const storeStripeCheckout = (stripeCheckout: StripeCheckout) => {
+  subscription.update((origin: SubscriptionStore) => {
+    return {
+      ...origin,
+      stripeCheckout: stripeCheckout,
     };
   });
 };
