@@ -39,7 +39,7 @@
     organizationName: string,
   ) {
     const { data, error } = await actions.onboarding.setupTenantData({
-      name: $subscription.organizationInfo?.companyName ?? "",
+      name: $subscription.organizationInfo?.organizationName ?? "",
       org_id: organizationId,
       org_name: organizationName,
       language: $subscription.organizationInfo?.defaultLanguage ?? "",

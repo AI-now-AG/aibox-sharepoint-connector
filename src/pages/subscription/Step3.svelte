@@ -1,5 +1,6 @@
 <script lang="ts">
   import { actions } from "astro:actions";
+  import Loading from "$components/Loading.svelte";
   import AlertDialog from "$components/AlertDialog.svelte";
   import Input from "$components/Input/Input.svelte";
   import SubsciptionSteps from "$components/subscription/SubsciptionSteps.svelte";
@@ -21,6 +22,7 @@
   }
   let { defaultLanguage = "en" }: Props = $props();
   const t = useTranslations(defaultLanguage);
+  let loading = $state(false);
 
   const initBillingInfo = $subscription.billingInfo;
 
@@ -102,10 +104,12 @@
       if (
         $subscription.billingInfo?.billingMethod == BillingMethod.CreditCard
       ) {
+        loading = true;
         const data = await createStripeSession();
         storeStripeCheckout({
           customerId: data.stripeCustomerId,
         });
+        loading = false;
         window.location.href = data.url;
       } else {
         window.location.href = "/subscription/step4";
@@ -290,3 +294,5 @@
   bind:message={alertMessage}
   okText={t("common.ok")}
 />
+
+<Loading show={loading} />
