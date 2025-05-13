@@ -288,7 +288,7 @@
         <p class="mb-2">{t("prompt-library.add.knowledgebase.text")}</p>
 
         <TextEditor
-          onblur={() => {
+          oncreate={() => {
             setTimeout(() => {
               titleInput?.focus({ preventScroll: true });
             }, 100);

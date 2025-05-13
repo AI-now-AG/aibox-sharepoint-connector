@@ -60,6 +60,7 @@
     formData.append("file", inputFile as File);
 
     loading = true;
+    knowledgeBaseText = "";
     const { data, error } =
       await actions.knowledgebase.extractFileContent(formData);
     if (error) {
@@ -160,7 +161,7 @@
       <div class="mb-4">
         <p class="mb-2">{t("prompt-library.add.knowledgebase.text")}*</p>
         <TextEditor
-          onblur={() => {
+          oncreate={() => {
             setTimeout(() => {
               titleInput?.focus({ preventScroll: true });
             }, 100);
