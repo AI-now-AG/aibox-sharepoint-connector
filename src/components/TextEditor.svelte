@@ -13,14 +13,14 @@
   interface Props {
     html?: string;
     cssClass?: string;
-    onblur?: Function;
+    oncreate?: Function;
     autoInitHeight?: boolean;
   }
 
   let {
     html = $bindable(""),
     cssClass = "",
-    onblur,
+    oncreate,
     autoInitHeight,
   }: Props = $props();
 
@@ -28,14 +28,17 @@
   let autoHeightStyle: string = $state("");
 
   $effect(() => {
-    if (body === undefined || body === "") {
-      body = html;
-      onblur?.();
+    // reset (for reinitialize)
+    if (html === "") {
+      body = "";
     }
+    // set initial body from property
     if (body === "" && html !== "") {
       body = html;
     }
   });
+
+  $inspect(body);
 
   function onEditorUpdate(e: any) {
     html = e.editor.getHTML();
@@ -72,6 +75,7 @@
     class={"h-[46vh] min-h-[200px] border border-neutral resize-y " + cssClass}
     style={"transition-duration: 0ms !important; " + autoHeightStyle}
     oncreate={(e: any) => {
+      oncreate?.();
       setFocusAtTheEnd(e.editor);
       setHeightBasedOnContent(e.editor);
     }}
