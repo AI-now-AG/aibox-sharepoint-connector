@@ -23,7 +23,7 @@
     "@azure/identity": "^4.8.0",
     "@azure/storage-blob": "^12.27.0",
     "@fal-ai/client": "^1.3.0",
-    "@friendofsvelte/tipex": "0.0.7-fix-0",
+    "@friendofsvelte/tipex": "0.0.7-fix-1",
     "@langchain/azure-openai": "^0.0.11",
     "@langchain/community": "^0.3.40",
     "@langchain/core": "^0.3.44",

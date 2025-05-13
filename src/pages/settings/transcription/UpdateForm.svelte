@@ -69,7 +69,7 @@
         title: t("tenant.subtitle-elevenLabs"),
         checked: category === AudioCategory.Subtitle11Labs,
         category: AudioCategory.Subtitle11Labs,
-      }
+      },
     ].filter(Boolean),
   );
 
@@ -288,7 +288,7 @@
         <p class="mb-2">{t("prompt-library.add.knowledgebase.text")}</p>
 
         <TextEditor
-          blur={() => {
+          oncreate={() => {
             setTimeout(() => {
               titleInput?.focus({ preventScroll: true });
             }, 100);
