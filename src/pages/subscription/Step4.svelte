@@ -47,7 +47,7 @@
       add_ons: $subscription.audioOptions?.map(
         (option) => option.id as AudioOptionId,
       ),
-      billing_method: $subscription.billingInfo.billingMethod,
+      billing_method: $subscription.billingInfo?.billingMethod ?? "",
       billing_info: {
         company_name: $subscription.billingInfo?.companyName ?? "",
         address: $subscription.billingInfo?.street ?? "",
@@ -56,6 +56,7 @@
         email: $subscription.billingInfo?.billingEmail ?? "",
       },
       use_cases: $subscription.organizationInfo?.useCases ?? [],
+      stripe_customer_id: $subscription.stripeCheckout?.customerId ?? "",
     });
 
     if (error) throw new Error(t("subscription.setup-tenant-data-failed"));
