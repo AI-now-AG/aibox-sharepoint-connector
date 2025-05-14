@@ -69,7 +69,6 @@ if (Astro.locals.tenant) {
     });
   }
 }
-
 let userPermissions = Astro.locals.user.permissions;
 ---
 
@@ -90,13 +89,15 @@ let userPermissions = Astro.locals.user.permissions;
     >
       {
         userPermissions.includes(Permission.AdminAll) &&
-          cards.map((card) => (
-            <div
-              class={`card bg-base-100 shadow-xl flex flex-col justify-between`}
-            >
-              <ToggleCard transcriptionCard={card} client:load />
-            </div>
-          ))
+          cards
+            .filter((card) =>
+              card.category.some((cat) => transcriptionTypes?.includes(cat))
+            )
+            .map((card) => (
+              <div class={`card bg-base-100 shadow-xl flex flex-col justify-between`}>
+                <ToggleCard transcriptionCard={card} client:load />
+              </div>
+            ))
       }
     </div>
   </div>

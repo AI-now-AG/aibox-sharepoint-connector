@@ -33,8 +33,8 @@ importers:
         specifier: ^1.3.0
         version: 1.3.0
       '@friendofsvelte/tipex':
-        specifier: 0.0.7-fix-0
-        version: 0.0.7-fix-0(highlight.js@11.8.0)(svelte@5.26.3)
+        specifier: 0.0.7-fix-1
+        version: 0.0.7-fix-1(highlight.js@11.8.0)(svelte@5.26.3)
       '@langchain/azure-openai':
         specifier: ^0.0.11
         version: 0.0.11(openai@4.94.0(ws@8.18.1)(zod@3.24.2))
@@ -1383,8 +1383,8 @@ packages:
   '@fastify/static@7.0.4':
     resolution: {integrity: sha512-p2uKtaf8BMOZWLs6wu+Ihg7bWNBdjNgCwDza4MJtTqg+5ovKmcbgbR9Xs5/smZ1YISfzKOCNYmZV8LaCj+eJ1Q==}
 
-  '@friendofsvelte/tipex@0.0.7-fix-0':
-    resolution: {integrity: sha512-GF3xxTIcV20PlL+sF1dW7AHST+GWtCad4Tm3UzHTihOoSA2c1f7eHcVcdPmZ4Y8YHTmYR8yicvls6G/kgWAvFw==}
+  '@friendofsvelte/tipex@0.0.7-fix-1':
+    resolution: {integrity: sha512-Tbsy5pFpni72eF8c+2ilcvwmxJ2ieBMwwRCkCajjvbEswvd6j7MxJaNFMDAH2A7QFNWgye5s+RGlr5NFr1o9dw==}
     peerDependencies:
       svelte: ^5.0.0
 
@@ -10114,7 +10114,7 @@ snapshots:
       fastq: 1.19.1
       glob: 10.4.5
 
-  '@friendofsvelte/tipex@0.0.7-fix-0(highlight.js@11.8.0)(svelte@5.26.3)':
+  '@friendofsvelte/tipex@0.0.7-fix-1(highlight.js@11.8.0)(svelte@5.26.3)':
     dependencies:
       '@tiptap/core': 2.11.7(@tiptap/pm@2.11.7)
       '@tiptap/extension-code-block': 2.11.7(@tiptap/core@2.11.7(@tiptap/pm@2.11.7))(@tiptap/pm@2.11.7)

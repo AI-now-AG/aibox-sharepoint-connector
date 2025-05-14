@@ -58,10 +58,10 @@
   <div>
     <div class="flex justify-between items-center mb-4 gap-2">
       <h2 class="font-semibold text-lg">{transcriptionCard.title}</h2>
-      {#if isSaving}
+      <!-- {#if isSaving}
         <span class="loading loading-dots loading-md"></span>
       {:else}
-        <!-- <label class="swap swap-rotate self-start"> -->
+
           <input
             type="checkbox"
             class="toggle toggle-primary"
@@ -71,8 +71,8 @@
                 (event.target as HTMLInputElement)?.checked,
               )}
           />
-        <!-- </label> -->
-      {/if}
+        
+      {/if} -->
     </div>
   </div>
   {#if !transcriptionCard.category.includes(AudioCategory.AudioPro)}
