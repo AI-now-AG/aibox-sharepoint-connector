@@ -5,6 +5,7 @@
   import Input from "$components/Input/Input.svelte";
   import SubsciptionSteps from "$components/subscription/SubsciptionSteps.svelte";
   import { useTranslations } from "$i18n/utils";
+  import { addToast } from "$stores/toast";
   import {
     storeBillingInfo,
     storeStripeCheckout,
@@ -87,6 +88,14 @@
       },
     });
 
+    if (error) {
+      addToast({
+        message: "Something went wrong",
+        type: "error",
+      });
+      return null;
+    }
+
     return data;
   }
 
@@ -105,12 +114,15 @@
         $subscription.billingInfo?.billingMethod == BillingMethod.CreditCard
       ) {
         loading = true;
-        const data = await createStripeSession();
-        storeStripeCheckout({
-          customerId: data.stripeCustomerId,
-        });
+        const result = await createStripeSession();
         loading = false;
-        window.location.href = data.url;
+
+        if (result) {
+          storeStripeCheckout({
+            customerId: result.stripeCustomerId,
+          });
+          window.location.href = result.url;
+        }
       } else {
         window.location.href = "/subscription/step4";
       }

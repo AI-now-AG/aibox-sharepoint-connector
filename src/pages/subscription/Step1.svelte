@@ -87,8 +87,8 @@
       storePlan(selectedPackage);
     }
 
+    let selectedAudioOptions: AudioOption[] = [];
     if (selectedAudioOptionIds?.length > 0) {
-      let selectedAudioOptions: AudioOption[] = [];
       for (let i = 0; i < selectedAudioOptionIds.length; i++) {
         const id = selectedAudioOptionIds[i];
         const selectedOption: AudioOption = {
@@ -101,10 +101,9 @@
           selectedAudioOptions.push(selectedOption);
         }
       }
-      if (selectedAudioOptions.length > 0) {
-        storeAudioOptions(selectedAudioOptions);
-      }
     }
+    storeAudioOptions(selectedAudioOptions);
+
     window.location.href = "/subscription/step2";
   }
 </script>
