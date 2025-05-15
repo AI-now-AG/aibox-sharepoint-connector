@@ -169,6 +169,10 @@ if (auth.isAdmin(Astro.locals) || auth.isSuperAdmin(Astro.locals)) {
     title: t("nav.subscription"),
     path: "/settings/subscription",
   });
+  settingsItems.push({
+    title: t("nav.usage"),
+    path: `/billing/usage`,
+  });
   restrictedMenus.push({
     title: t("nav.settings"),
     icon: svgIcons.menuSettings,
