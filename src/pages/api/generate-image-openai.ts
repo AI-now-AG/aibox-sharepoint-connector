@@ -58,7 +58,13 @@ export const POST: APIRoute = async (ctx: APIContext) => {
     });
     console.log("DALL-E 3 ::: END TIME", Date.now());
 
-    const image = response.data[0].b64_json;
+    const image = response.data && response.data.length > 0 ? response.data[0].b64_json : null;
+    if (!image) {
+      return new Response(JSON.stringify({ error: "No image data returned from OpenAI." }), {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
     setTimeout(() => {
       recordImageUsage(ctx);
     }, 0);
