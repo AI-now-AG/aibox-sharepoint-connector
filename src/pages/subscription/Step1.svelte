@@ -3,7 +3,7 @@
   import SubsciptionSteps from "$components/subscription/SubsciptionSteps.svelte";
   import SubscriptionPackageList from "$components/subscription/SubscriptionPackageList.svelte";
   import { useTranslations } from "$i18n/utils";
-  import { SubscriptionPackages } from "$subscription-packages.json";
+  import { SubscriptionPackages } from "$data/subscription-packages";
   import AlertDialog from "$components/AlertDialog.svelte";
   import {
     storeAudioOptions,

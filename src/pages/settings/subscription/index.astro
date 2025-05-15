@@ -1,12 +1,20 @@
 ---
 import Layout from "$layouts/Layout.astro";
-import SubscriptionInfo from "./SubscriptionInfo.astro";
+import SubscriptionInfo from "./SubscriptionInfo.svelte";
+import SubscriptionModel from "$data/models/subscription.model";
 import { Permission } from "$types/Users";
 import { useTranslations } from "$i18n/utils";
 
 const t = useTranslations();
 
 let userPermissions = Astro.locals.user.permissions;
+
+const { tenant } = Astro.locals;
+const { billing_method: billingMethod, billing_info: billingInfo } = tenant;
+
+const subscription = await SubscriptionModel.findActiveByTenant(tenant._id);
+const planName = subscription?.plan_name;
+const addOns = subscription?.add_ons ?? [];
 ---
 
 <Layout>
@@ -15,7 +23,17 @@ let userPermissions = Astro.locals.user.permissions;
       {t("nav.subscription")}
     </h1>
     <div class="mt-5">
-      {userPermissions.includes(Permission.AdminAll) && <SubscriptionInfo />}
+      {
+        userPermissions.includes(Permission.AdminAll) && (
+          <SubscriptionInfo
+            {billingMethod}
+            {billingInfo}
+            {planName}
+            {addOns}
+            client:load
+          />
+        )
+      }
     </div>
   </div>
 </Layout>
