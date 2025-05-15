@@ -68,7 +68,7 @@
 <div class="flex flex-col space-y-2 py-8">
   <h3 class="mb-3 text-xl font-bold">{t("settings.subscription.billing")}</h3>
   <div class="grid grid-cols-1 lg:grid-cols-2 space-y-4">
-    <div>
+    <div class="space-y-2">
       <p>
         <strong>{t("subscription.company-name")}: </strong>
         {billingInfo?.company_name ?? "-"}
