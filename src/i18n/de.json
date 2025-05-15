@@ -448,5 +448,6 @@
   "subscription.create-my-aibox": "Meine aibox erstellen",
   "subscription.number-of-active-user": "Anzahl der aktiven Benutzer",
   "common.ok": "Ok",
-  "subscription.billing-method-stripe": "Creditcard and other payment methods (Powered by Stripe)"
+  "subscription.billing-method-stripe": "Creditcard and other payment methods (Powered by Stripe)",
+  "subscription.biliing-details": "Biliing details"
 }

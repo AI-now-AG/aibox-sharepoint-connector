@@ -96,7 +96,7 @@
           class="btn btn-sm btn-primary px-10 self-start font-medium"
           onclick={goToBillingPortal}
         >
-          {"Billing details"}
+          {t("subscription.biliing-details")}
         </button>
       {/if}
     </div>
