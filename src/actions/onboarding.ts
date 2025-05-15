@@ -32,6 +32,7 @@ import { randomString } from "$utils/common";
 import { isSocialConnection } from "$utils/auth0";
 import {
   createCustomer,
+  updateCustomer,
   getCustomerByEmail,
   createCheckoutSession,
 } from "$utils/stripe";
@@ -106,6 +107,7 @@ export const onboarding = {
     handler: async (input, context) => {
       try {
         const { request } = context;
+        const { user } = context.locals;
         const {
           plan_name: planName,
           add_ons: addOns,
@@ -152,7 +154,16 @@ export const onboarding = {
           });
           stripeCustomerId = newCustomer?.id;
         } else {
-          stripeCustomerId = existingCustomer?.id;
+          updateCustomer(existingCustomer.id, {
+            name: billingInfo.company_name,
+            address: {
+              line1: billingInfo.address,
+              city: billingInfo.location,
+              postal_code: billingInfo.zip_code,
+            },
+            preferred_locales: [language],
+          });
+          stripeCustomerId = existingCustomer.id;
         }
 
         const session = await createCheckoutSession({

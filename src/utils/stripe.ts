@@ -32,6 +32,21 @@ export async function createCustomer(
   }
 }
 
+export async function updateCustomer(
+  customerId: string,
+  params: Stripe.CustomerUpdateParams,
+): Promise<Stripe.Customer | null> {
+  try {
+    const customer = await stripe.customers.update(customerId, params);
+
+    console.log(`Customer updated: ${customer.id}`);
+    return customer;
+  } catch (error) {
+    console.error("Error updating customer:", error);
+    return null;
+  }
+}
+
 export async function getCustomerByEmail(
   email: string,
 ): Promise<Stripe.Customer | null> {
