@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { SubscriptionPackages } from "$subscription-packages.json";
+  import { SubscriptionPackages } from "$data/subscription-packages";
   import { AudioOptionId } from "$types/Subscription";
   import AudioOption from "./AudioOption.svelte";
 
