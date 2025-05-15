@@ -2,6 +2,10 @@ import Stripe from "stripe";
 
 const stripe = new Stripe(import.meta.env.STRIPE_SECRET_KEY);
 
+export function isTestMode() {
+  return import.meta.env.STRIPE_SECRET_KEY.startsWith("sk_test_");
+}
+
 export async function createCheckoutSession(
   params: Stripe.Checkout.SessionCreateParams,
 ): Promise<Stripe.Checkout.Session | null> {

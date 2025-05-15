@@ -37,9 +37,15 @@
     tenant: any;
     subscription?: any;
     activeUsers?: number;
+    isStripeInTestMode?: boolean;
   }
 
-  let { tenant, subscription, activeUsers = 0 }: Props = $props();
+  let {
+    tenant,
+    subscription,
+    activeUsers = 0,
+    isStripeInTestMode = false,
+  }: Props = $props();
 
   let addTenantAdminModal: HTMLDialogElement | undefined = $state();
   let confirmUpdateModal: HTMLDialogElement | undefined = $state();
@@ -702,22 +708,12 @@
     }
   }
 
-  async function goToBillingPortal() {
-    loading = true;
-    const { error, data } = await actions.tenant.stripeBillingPortal({
-      customer_id: tenantData.stripe_customer_id,
-      return_url: window.location.href,
-    });
-
-    loading = false;
-    if (error) {
-      addToast({
-        message: error?.message ?? "Something went wrong",
-        type: "error",
-      });
-    } else {
-      window.location.href = data.url;
-    }
+  function goToBillingPortal() {
+    const domain = "https://dashboard.stripe.com";
+    const url = isStripeInTestMode
+      ? `${domain}/test/customers/${tenantData.stripe_customer_id}`
+      : `${domain}/customers/${tenantData.stripe_customer_id}`;
+    window.open(url, "_blank");
   }
 
   function showAlert(message: string) {

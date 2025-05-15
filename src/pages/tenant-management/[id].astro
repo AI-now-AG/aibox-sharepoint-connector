@@ -5,6 +5,7 @@ import TenantModel from "$data/models/tenant.model";
 import UserModel from "$data/models/user.model";
 import SubscriptionModel from "$data/models/subscription.model";
 import { transformRawData } from "$utils/transformRawData";
+import { isTestMode } from "$utils/stripe";
 import { decrypt } from "$utils/secure";
 
 export interface Props {
@@ -41,6 +42,7 @@ const countActiveUsers = await UserModel.countActiveUsersByTenant(id);
     tenant={tenantData}
     subscription={subscriptionData}
     activeUsers={countActiveUsers}
+    isStripeInTestMode={isTestMode()}
     client:load
   />
 </Layout>
