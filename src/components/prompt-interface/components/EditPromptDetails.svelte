@@ -267,7 +267,7 @@
         <p class="mb-2">{t("prompt-library.add.prompts.instructions")}*</p>
         {#key initHtml}
           <TextEditor
-            blur={() => {
+            oncreate={() => {
               setTimeout(() => {
                 titleInput?.focus({ preventScroll: true });
               }, 100);

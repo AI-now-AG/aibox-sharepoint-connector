@@ -27,7 +27,7 @@ import organizationsManagement from "$data/auth0/organizations-manager";
 import sendMail from "$utils/mail";
 import { isProd } from "$utils/env";
 import { randomString } from "$utils/common";
-import { isSocialConnection } from "$utils/auth0Auth";
+import { isSocialConnection } from "$utils/auth0";
 import {
   TENANT_MASTER_DEV,
   TENANT_MASTER_PROD,
@@ -290,6 +290,7 @@ export const onboarding = {
           ...transcription,
           _id: new ObjectId(),
           tenant_id: newTenant.insertedId,
+          user_id: userId,
           enabled: true,
           created_at: new Date(),
           updated_at: new Date(),

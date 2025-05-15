@@ -33,8 +33,8 @@ importers:
         specifier: ^1.3.0
         version: 1.3.0
       '@friendofsvelte/tipex':
-        specifier: 0.0.7-fix-0
-        version: 0.0.7-fix-0(highlight.js@11.8.0)(svelte@5.26.3)
+        specifier: 0.0.7-fix-1
+        version: 0.0.7-fix-1(highlight.js@11.8.0)(svelte@5.26.3)
       '@langchain/azure-openai':
         specifier: ^0.0.11
         version: 0.0.11(openai@4.94.0(ws@8.18.1)(zod@3.24.2))
@@ -149,9 +149,9 @@ importers:
       openai:
         specifier: ^4.94.0
         version: 4.94.0(ws@8.18.1)(zod@3.24.2)
-      pdf2json:
-        specifier: ^3.1.5
-        version: 3.1.5
+      pdf-parse-debugging-disabled:
+        specifier: ^1.1.1
+        version: 1.1.1
       prosemirror-state:
         specifier: ^1.4.3
         version: 1.4.3
@@ -1380,8 +1380,8 @@ packages:
   '@fastify/static@7.0.4':
     resolution: {integrity: sha512-p2uKtaf8BMOZWLs6wu+Ihg7bWNBdjNgCwDza4MJtTqg+5ovKmcbgbR9Xs5/smZ1YISfzKOCNYmZV8LaCj+eJ1Q==}
 
-  '@friendofsvelte/tipex@0.0.7-fix-0':
-    resolution: {integrity: sha512-GF3xxTIcV20PlL+sF1dW7AHST+GWtCad4Tm3UzHTihOoSA2c1f7eHcVcdPmZ4Y8YHTmYR8yicvls6G/kgWAvFw==}
+  '@friendofsvelte/tipex@0.0.7-fix-1':
+    resolution: {integrity: sha512-Tbsy5pFpni72eF8c+2ilcvwmxJ2ieBMwwRCkCajjvbEswvd6j7MxJaNFMDAH2A7QFNWgye5s+RGlr5NFr1o9dw==}
     peerDependencies:
       svelte: ^5.0.0
 
@@ -7033,16 +7033,13 @@ packages:
   pathe@2.0.3:
     resolution: {integrity: sha512-WUjGcAqP1gQacoQe+OBJsFA7Ld4DyXuUIjZ5cc75cLHvJ7dtNsTugphxIADwspS+AraAUePCKrSVtPLFj/F88w==}
 
+  pdf-parse-debugging-disabled@1.1.1:
+    resolution: {integrity: sha512-pTPktRvyvLSj9zIS9DcOKYKcR7qeTqqyMkWjgYV7YglBmA9yrDJ1/rATOpXQoT5QcXKDYjEt4BSmZkJBcP1JDw==}
+    engines: {node: '>=6.8.1'}
+
   pdf-parse@1.1.1:
     resolution: {integrity: sha512-v6ZJ/efsBpGrGGknjtq9J/oC8tZWq0KWL5vQrk2GlzLEQPUDB1ex+13Rmidl1neNN358Jn9EHZw5y07FFtaC7A==}
     engines: {node: '>=6.8.1'}
-
-  pdf2json@3.1.5:
-    resolution: {integrity: sha512-djZPInDLNuJU+o6GaJNvcoUh6MtUAx3IYTQCTxywHzeg1jC5YWgz/XzlgmduxxBblpMTqY2fjcWwvyRdGPTyrQ==}
-    engines: {node: '>=20.18.0', npm: '>=10.8.2'}
-    hasBin: true
-    bundledDependencies:
-      - '@xmldom/xmldom'
 
   peek-readable@4.1.0:
     resolution: {integrity: sha512-ZI3LnwUv5nOGbQzD9c2iDG6toheuXSZP5esSHBjopsXH4dg19soufvpUGA3uohi5anFtGb2lhAVdHzH6R/Evvg==}
@@ -10105,7 +10102,7 @@ snapshots:
       fastq: 1.19.1
       glob: 10.4.5
 
-  '@friendofsvelte/tipex@0.0.7-fix-0(highlight.js@11.8.0)(svelte@5.26.3)':
+  '@friendofsvelte/tipex@0.0.7-fix-1(highlight.js@11.8.0)(svelte@5.26.3)':
     dependencies:
       '@tiptap/core': 2.11.7(@tiptap/pm@2.11.7)
       '@tiptap/extension-code-block': 2.11.7(@tiptap/core@2.11.7(@tiptap/pm@2.11.7))(@tiptap/pm@2.11.7)
@@ -13251,7 +13248,6 @@ snapshots:
   debug@3.2.7:
     dependencies:
       ms: 2.1.3
-    optional: true
 
   debug@4.4.0(supports-color@9.4.0):
     dependencies:
@@ -14739,7 +14735,7 @@ snapshots:
       isstream: 0.1.2
       jsonwebtoken: 9.0.2
       mime-types: 2.1.35
-      retry-axios: 2.6.0(axios@1.7.9(debug@4.4.0))
+      retry-axios: 2.6.0(axios@1.7.9)
       tough-cookie: 4.1.4
     transitivePeerDependencies:
       - supports-color
@@ -16169,8 +16165,7 @@ snapshots:
 
   node-domexception@1.0.0: {}
 
-  node-ensure@0.0.0:
-    optional: true
+  node-ensure@0.0.0: {}
 
   node-fetch-native@1.6.6: {}
 
@@ -16547,6 +16542,13 @@ snapshots:
 
   pathe@2.0.3: {}
 
+  pdf-parse-debugging-disabled@1.1.1:
+    dependencies:
+      debug: 3.2.7
+      node-ensure: 0.0.0
+    transitivePeerDependencies:
+      - supports-color
+
   pdf-parse@1.1.1:
     dependencies:
       debug: 3.2.7
@@ -16554,8 +16556,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
     optional: true
-
-  pdf2json@3.1.5: {}
 
   peek-readable@4.1.0: {}
 
@@ -17223,7 +17223,7 @@ snapshots:
       retext-stringify: 4.0.0
       unified: 11.0.5
 
-  retry-axios@2.6.0(axios@1.7.9(debug@4.4.0)):
+  retry-axios@2.6.0(axios@1.7.9):
     dependencies:
       axios: 1.7.9(debug@4.4.0)
 

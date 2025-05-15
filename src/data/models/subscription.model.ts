@@ -3,6 +3,7 @@ import { db, toObjectId } from "../mongodb";
 import {
   SubscriptionStatus,
   SubscriptionPackageId,
+  SubscriptionExtraPackage,
   AudioOptionId,
 } from "$types/Subscription";
 import { z } from "zod";
@@ -10,7 +11,10 @@ import { z } from "zod";
 const SubscriptionSchema = z.object({
   _id: z.instanceof(ObjectId),
   tenant_id: z.instanceof(ObjectId).optional(),
-  plan_name: z.nativeEnum(SubscriptionPackageId).or(z.literal("")).optional(),
+  plan_name: z
+    .nativeEnum({ ...SubscriptionPackageId, ...SubscriptionExtraPackage })
+    .or(z.literal(""))
+    .optional(),
   status: z.nativeEnum(SubscriptionStatus).optional(),
   metadata: z.record(z.any()).nullish(),
   add_ons: z.array(z.nativeEnum(AudioOptionId)).optional(),

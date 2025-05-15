@@ -23,7 +23,11 @@ import PromptModel from "$data/models/prompt.model";
 import CategoryModel from "$data/models/category.model";
 import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
 import { AudioCategory } from "$types/TenantFeature";
-import { SubscriptionPackageId, AudioOptionId } from "$types/Subscription";
+import {
+  SubscriptionPackageId,
+  SubscriptionExtraPackage,
+  AudioOptionId,
+} from "$types/Subscription";
 import { EncryptedUserPassword, UserRole } from "$types/Users";
 
 const TenantInputParamsSchema = z.object({
@@ -78,7 +82,10 @@ const CreateTenantAdminSchema = z.object({
 });
 
 const SubscriptionInputParamsSchema = z.object({
-  plan_name: z.nativeEnum(SubscriptionPackageId).or(z.literal("")).optional(),
+  plan_name: z
+    .nativeEnum({ ...SubscriptionPackageId, ...SubscriptionExtraPackage })
+    .or(z.literal(""))
+    .optional(),
   add_ons: z.array(z.nativeEnum(AudioOptionId)).optional(),
 });
 

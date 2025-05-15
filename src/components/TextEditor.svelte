@@ -8,37 +8,40 @@
   import "@friendofsvelte/tipex/styles/CodeBlock.css";
   import "$styles/editor.css";
 
-  let editor: TipexEditor | undefined = $state();
+  let editor: TipexEditor | undefined;
 
   interface Props {
     html?: string;
-    text?: string;
     cssClass?: string;
-    blur?: Function;
+    oncreate?: Function;
     autoInitHeight?: boolean;
   }
 
   let {
     html = $bindable(""),
-    text = $bindable(""),
     cssClass = "",
-    blur,
+    oncreate,
     autoInitHeight,
   }: Props = $props();
 
-  let body: any = $state("");
-  let autoHeightStyle: any = $state("");
+  let body: string = $state("");
+  let autoHeightStyle: string = $state("");
 
   $effect(() => {
-    if (body === undefined || body === "") {
+    // reset (for reinitialize)
+    if (html === "") {
+      body = "";
+    }
+    // set initial body from property
+    if (body === "" && html !== "") {
       body = html;
-      blur?.();
     }
   });
 
+  $inspect(body);
+
   function onEditorUpdate(e: any) {
     html = e.editor.getHTML();
-    text = e.editor.getText();
   }
 
   function setFocusAtTheEnd(_editor: TipexEditor) {
@@ -72,6 +75,7 @@
     class={"h-[46vh] min-h-[200px] border border-neutral resize-y " + cssClass}
     style={"transition-duration: 0ms !important; " + autoHeightStyle}
     oncreate={(e: any) => {
+      oncreate?.();
       setFocusAtTheEnd(e.editor);
       setHeightBasedOnContent(e.editor);
     }}
