@@ -72,6 +72,7 @@ const CheckoutInputParamsSchema = z.object({
   plan_name: z.nativeEnum(SubscriptionPackageId).optional(),
   add_ons: z.array(z.nativeEnum(AudioOptionId)).optional(),
   billing_info: BillingInfoParamsSchema,
+  language: z.string().optional().default("en"),
 });
 
 const OrganizationIdInputParamsSchema = z.object({
@@ -109,6 +110,7 @@ export const onboarding = {
           plan_name: planName,
           add_ons: addOns,
           billing_info: billingInfo,
+          language,
         } = input;
 
         const selectedPackages = [
@@ -138,13 +140,15 @@ export const onboarding = {
         let stripeCustomerId = null;
         const existingCustomer = await getCustomerByEmail(billingInfo.email);
         if (!existingCustomer) {
-          const newCustomer = await createCustomer(billingInfo.email, {
+          const newCustomer = await createCustomer({
+            email: billingInfo.email,
             name: billingInfo.company_name,
             address: {
               line1: billingInfo.address,
               city: billingInfo.location,
               postal_code: billingInfo.zip_code,
             },
+            preferred_locales: [language],
           });
           stripeCustomerId = newCustomer?.id;
         } else {

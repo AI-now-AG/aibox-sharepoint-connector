@@ -86,6 +86,7 @@
         location: location,
         email: billingEmail,
       },
+      language: $subscription.organizationInfo?.defaultLanguage,
     });
 
     if (error) {

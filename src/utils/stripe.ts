@@ -1,11 +1,9 @@
 import Stripe from "stripe";
 
-type SessionCreateParams = Stripe.Checkout.SessionCreateParams;
-
 const stripe = new Stripe(import.meta.env.STRIPE_SECRET_KEY);
 
 export async function createCheckoutSession(
-  params: SessionCreateParams,
+  params: Stripe.Checkout.SessionCreateParams,
 ): Promise<Stripe.Checkout.Session | null> {
   try {
     return await stripe.checkout.sessions.create(params);
@@ -17,20 +15,10 @@ export async function createCheckoutSession(
 }
 
 export async function createCustomer(
-  email: string,
-  customerData?: {
-    name?: string;
-    phone?: string;
-    address?: Stripe.AddressParam;
-  },
+  params: Stripe.CustomerCreateParams,
 ): Promise<Stripe.Customer | null> {
   try {
-    const customer = await stripe.customers.create({
-      email,
-      name: customerData?.name,
-      phone: customerData?.phone,
-      address: customerData?.address,
-    });
+    const customer = await stripe.customers.create(params);
 
     console.log(`Customer created: ${customer.id}`);
     return customer;
