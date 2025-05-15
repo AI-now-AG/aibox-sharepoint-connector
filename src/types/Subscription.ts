@@ -1,3 +1,6 @@
+import { useTranslations } from "$i18n/utils";
+const t = useTranslations();
+
 export enum SubscriptionPackageId {
   Starter = "Starter",
   Teams = "Teams",
@@ -37,6 +40,11 @@ export enum BillingMethod {
   CreditCard = "credit_card",
   MonthlyInvoice = "monthly_invoice",
 }
+
+export const BillingMethodLabels: Record<BillingMethod, string> = {
+  [BillingMethod.CreditCard]: t("subscription.billing-method-stripe"),
+  [BillingMethod.MonthlyInvoice]: t("subscription.monthly-invoice-email"),
+};
 
 export const SubscriptionStep = {
   Step0: 0,

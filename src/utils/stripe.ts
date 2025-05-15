@@ -63,3 +63,20 @@ export async function getCustomerByEmail(
     throw new Error(`Failed to retrieve customer for email: ${email}`);
   }
 }
+
+export const createBillingPortalSession = async (
+  customerId: string,
+  returnUrl: string,
+): Promise<string> => {
+  try {
+    const session = await stripe.billingPortal.sessions.create({
+      customer: customerId,
+      return_url: returnUrl,
+    });
+
+    return session.url;
+  } catch (error) {
+    console.error("Error creating billing portal session:", error);
+    throw new Error("Unable to create billing portal session.");
+  }
+};

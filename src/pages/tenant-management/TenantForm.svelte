@@ -20,7 +20,12 @@
     ApiKeyProvider,
     AudioCategory,
   } from "$types/TenantFeature";
-  import { SubscriptionPackageId, AudioOptionId } from "$types/Subscription";
+  import {
+    SubscriptionPackageId,
+    AudioOptionId,
+    BillingMethod,
+    BillingMethodLabels,
+  } from "$types/Subscription";
   import SelectOptions from "$components/SelectOptions.svelte";
   import AudioAddonsDropdown from "./AudioAddonsDropdown.svelte";
   import ThemeItem from "./ThemeItem.svelte";
@@ -697,6 +702,24 @@
     }
   }
 
+  async function goToBillingPortal() {
+    loading = true;
+    const { error, data } = await actions.tenant.stripeBillingPortal({
+      customer_id: tenantData.stripe_customer_id,
+      return_url: window.location.href,
+    });
+
+    loading = false;
+    if (error) {
+      addToast({
+        message: error?.message ?? "Something went wrong",
+        type: "error",
+      });
+    } else {
+      window.location.href = data.url;
+    }
+  }
+
   function showAlert(message: string) {
     alertMessage = message;
     alertModal?.show();
@@ -789,7 +812,7 @@
       <div class="flex-1 flex flex-col mb-4">
         <div class="flex justify-end">
           <button
-            class={"mt-7 btn btn-outline font-normal grow-0 w-auto " +
+            class={"mt-7 btn btn-sm btn-outline font-normal grow-0 w-auto " +
               `${mode == MODE.Edit ? "" : "btn-disabled"}`}
             onclick={() => {
               addTenantAdminModal?.show();
@@ -829,6 +852,32 @@
           placeholder=""
           bind:value={selectedPlanAddOns}
         />
+      </div>
+    </div>
+    <div class="flex flex-row space-x-4">
+      <div class="flex-1 flex flex-col mb-4">
+        <span class="mb-2 text-base-content font-medium text-sm"
+          >{t("subscription.billing-method")}</span
+        >
+        <input
+          type="text"
+          class="input input-bordered bg-base-200 w-full"
+          readonly
+          value={tenantData.billing_method
+            ? BillingMethodLabels[tenantData.billing_method as BillingMethod]
+            : ""}
+        />
+      </div>
+      <div class="flex-1 flex flex-col mb-4">
+        {#if tenantData.billing_method === BillingMethod.CreditCard}
+          <span class="mb-2 text-base-content font-medium text-sm">&nbsp;</span>
+          <button
+            class="btn btn-sm btn-neutral px-10 self-start font-medium"
+            onclick={goToBillingPortal}
+          >
+            {"Stripe"}
+          </button>
+        {/if}
       </div>
     </div>
     <div class="flex flex-row space-x-4">
@@ -894,7 +943,7 @@
           type="number"
           class="input input-bordered bg-base-200 w-full"
           readonly
-          bind:value={activeUsers}
+          value={activeUsers}
         />
       </div>
     </div>
