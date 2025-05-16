@@ -177,6 +177,7 @@ export const onboarding = {
             price: id,
             quantity: 1,
           })),
+          automatic_tax: { enabled: true }, // Enable automatic tax calculation
           customer: stripeCustomerId,
           success_url: successUrl,
           cancel_url: cancelUrl,
