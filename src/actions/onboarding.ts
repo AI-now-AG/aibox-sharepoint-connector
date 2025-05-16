@@ -48,6 +48,7 @@ import {
   AUTH0_AUTH_GOOGLE_CON_PROD,
   AUTH0_AUTH_WINDOWS_CON_PROD,
 } from "$constants";
+import type Stripe from "stripe";
 
 const masterTenantId = isProd() ? TENANT_MASTER_PROD : TENANT_MASTER_DEV;
 const auth0GoogleCon = isProd()
@@ -114,6 +115,7 @@ export const onboarding = {
           billing_info: billingInfo,
           language,
         } = input;
+        const { default_language: defaultLanguage } = context.locals.tenant;
 
         const selectedPackages = [
           planName as ProductKeys,
@@ -153,9 +155,6 @@ export const onboarding = {
             country: "CH",
           },
           preferred_locales: [language],
-          metadata: {
-            billing_email: billingInfo.email,
-          },
         };
 
         // Create new customer if not found
@@ -177,6 +176,9 @@ export const onboarding = {
             price: id,
             quantity: 1,
           })),
+          locale:
+            (defaultLanguage as Stripe.Checkout.SessionCreateParams.Locale) ||
+            "auto",
           automatic_tax: { enabled: true }, // Enable automatic tax calculation
           customer: stripeCustomerId,
           success_url: successUrl,

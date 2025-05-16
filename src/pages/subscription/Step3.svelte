@@ -19,9 +19,10 @@
   import { isValidEmail } from "$utils/common";
 
   interface Props {
+    accountEmail: string;
     defaultLanguage?: string;
   }
-  let { defaultLanguage = "en" }: Props = $props();
+  let { accountEmail, defaultLanguage = "en" }: Props = $props();
   const t = useTranslations(defaultLanguage);
   let loading = $state(false);
 
@@ -35,9 +36,19 @@
   let billingMethod = $state(
     initBillingInfo?.billingMethod ?? BillingMethod.MonthlyInvoice,
   );
+  let isEmailDisabled = $state(false);
 
   let alertModal: HTMLDialogElement | undefined = $state();
   let alertMessage = $state("");
+
+  $effect(() => {
+    isEmailDisabled = billingMethod == BillingMethod.CreditCard;
+    if (billingMethod == BillingMethod.CreditCard) {
+      billingEmail = accountEmail;
+    } else {
+      billingEmail = "";
+    }
+  });
 
   function showAlert(message: any) {
     alertMessage = message;
@@ -144,6 +155,61 @@
 
   <!-- Form -->
   <div class="w-full mx-auto">
+    <!-- Billing method -->
+    <p class="font-sans text-base font-medium text-gray-600 mt-6 mb-4">
+      {t("subscription.billing-method")}
+    </p>
+
+    <div
+      class="block md:flex lg:flex flex-row md:space-x-8 space-x-0 lg:space-x-8"
+    >
+      <div class="flex-1 flex flex-col mb-4">
+        <div
+          class="bg-white shadow-md rounded-lg flex flex-col justify-between space-y-2 px-6 py-4 w-full"
+        >
+          <div class="flex items-center">
+            <input
+              type="radio"
+              id="stripe-checkout"
+              name="billing_method"
+              class="radio"
+              value={BillingMethod.CreditCard}
+              checked={billingMethod == BillingMethod.CreditCard}
+              onchange={() => {
+                billingMethod = BillingMethod.CreditCard;
+              }}
+            />
+            <label
+              for="stripe-checkout"
+              class="ml-2 text-sm font-medium text-[#0F172A]"
+              >{t("subscription.billing-method-stripe")}</label
+            >
+          </div>
+          <div class="flex items-center">
+            <input
+              type="radio"
+              id="monthly-invoice"
+              name="billing_method"
+              class="radio"
+              value={BillingMethod.MonthlyInvoice}
+              checked={billingMethod == BillingMethod.MonthlyInvoice}
+              onchange={() => {
+                billingMethod = BillingMethod.MonthlyInvoice;
+              }}
+            />
+            <label
+              for="monthly-invoice"
+              class="ml-2 text-sm font-medium text-[#0F172A]"
+              >{t("subscription.monthly-invoice-email")}</label
+            >
+          </div>
+        </div>
+      </div>
+      <div class="flex-1 flex flex-col mb-4"></div>
+    </div>
+    <div class="divider mb-6"></div>
+
+    <!-- Billing form -->
     <div
       class="block md:flex lg:flex flex-row md:space-x-8 space-x-0 lg:space-x-8"
     >
@@ -238,61 +304,9 @@
           containerClasses="h-[56px] shadow-md"
           labelClasses="text-sm"
           classes="text-base"
+          disabled={isEmailDisabled}
         />
       </div>
-    </div>
-
-    <br class="mt-6" />
-    <p class="font-sans text-base font-medium text-gray-600 mt-6 mb-4">
-      {t("subscription.billing-method")}
-    </p>
-
-    <div
-      class="block md:flex lg:flex flex-row md:space-x-8 space-x-0 lg:space-x-8"
-    >
-      <div class="flex-1 flex flex-col mb-4">
-        <div
-          class="bg-white shadow-md rounded-lg flex flex-col justify-between space-y-2 px-6 py-4 w-full"
-        >
-          <div class="flex items-center">
-            <input
-              type="radio"
-              id="stripe-checkout"
-              name="billing_method"
-              class="radio"
-              value={BillingMethod.CreditCard}
-              checked={billingMethod == BillingMethod.CreditCard}
-              onchange={() => {
-                billingMethod = BillingMethod.CreditCard;
-              }}
-            />
-            <label
-              for="stripe-checkout"
-              class="ml-2 text-sm font-medium text-[#0F172A]"
-              >{t("subscription.billing-method-stripe")}</label
-            >
-          </div>
-          <div class="flex items-center">
-            <input
-              type="radio"
-              id="monthly-invoice"
-              name="billing_method"
-              class="radio"
-              value={BillingMethod.MonthlyInvoice}
-              checked={billingMethod == BillingMethod.MonthlyInvoice}
-              onchange={() => {
-                billingMethod = BillingMethod.MonthlyInvoice;
-              }}
-            />
-            <label
-              for="monthly-invoice"
-              class="ml-2 text-sm font-medium text-[#0F172A]"
-              >{t("subscription.monthly-invoice-email")}</label
-            >
-          </div>
-        </div>
-      </div>
-      <div class="flex-1 flex flex-col mb-4"></div>
     </div>
   </div>
 

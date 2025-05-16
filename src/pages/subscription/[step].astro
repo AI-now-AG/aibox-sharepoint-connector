@@ -66,6 +66,10 @@ const defaultLanguage = Astro.locals.tenant.default_language || "en";
       <Step2 categories={useCases} {defaultLanguage} client:load />
     )
   }
-  {step == RoutePath.Step3 && <Step3 {defaultLanguage} client:load />}
+  {
+    step == RoutePath.Step3 && (
+      <Step3 accountEmail={user.email} {defaultLanguage} client:load />
+    )
+  }
   {step == RoutePath.Step4 && <Step4 {user} {defaultLanguage} client:load />}
 </SubscriptionLayout>
