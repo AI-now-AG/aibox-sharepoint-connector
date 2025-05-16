@@ -22,6 +22,7 @@ export const ADMIN_ROUTES = [
   "/prompt-library/categories/*",
   "/settings/transcription",
   "/settings/transcription/*",
+  "/billing/usage",
 ];
 
 export const SUPER_ADMIN_ROUTES = [

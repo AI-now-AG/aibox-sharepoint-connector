@@ -5,6 +5,7 @@
   import type { UsageOverview, UsageRow } from "$types/UsageTracking";
   import Loading from "$components/Loading.svelte";
   import UsageFilter from "./UsageFilter.svelte";
+  import { tenant as tenantStore } from "$stores";
 
   const t = useTranslations();
 
@@ -19,6 +20,10 @@
   let usageData: UsageRow[] = $state([]);
   let selectedTenant: string = $state("");
   let selectedMonth: string = $state("");
+
+  if (tenants.length == 0) {
+    selectedTenant = $tenantStore?._id?.toString() ?? "";
+  }
 
   const fetchUsages = async () => {
     loading = true;

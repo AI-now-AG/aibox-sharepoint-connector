@@ -52,23 +52,25 @@
 </script>
 
 <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-end mb-10">
-  <div class="form-control">
-    <!-- svelte-ignore a11y_label_has_associated_control -->
-    <label class="label">
-      <span class="label-text">{t("usage.select-tenant")}:</span>
-    </label>
-    <Dropdown
-      classes="flex-1"
-      options={tenantOptions}
-      bind:value={selectedTenant}
-    />
-  </div>
+  {#if tenantOptions.length}
+    <div class="form-control">
+      <!-- svelte-ignore a11y_label_has_associated_control -->
+      <label class="label">
+        <span class="label-text">{t("usage.select-tenant")}:</span>
+      </label>
+      <Dropdown
+        classes="flex-1"
+        options={tenantOptions}
+        bind:value={selectedTenant}
+      />
+    </div>
+  {/if}
   <div class="form-control">
     <!-- svelte-ignore a11y_label_has_associated_control -->
     <label class="label">
       <span class="label-text">{t("usage.select-month")}:</span>
     </label>
-    <SelectOptions
+    <Dropdown
       classes="flex-1"
       options={monthOptions}
       bind:value={selectedMonth}
