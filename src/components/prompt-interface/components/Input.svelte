@@ -11,6 +11,7 @@
     formatCitations,
     stripHtmlFormatting,
   } from "$utils/common";
+  import { resetTrialBanner, resetUnverifiedBanner } from "$stores/bannerReset";
   const t = useTranslations();
 
   interface Props {
@@ -72,6 +73,10 @@
   };
 
   async function fetchHeadline() {
+    // Reset banners on submit
+    resetTrialBanner.set(true);
+    resetUnverifiedBanner.set(true);
+
     input = "";
 
     if (inputText || inputFiles.length > 0) {
