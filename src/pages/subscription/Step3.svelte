@@ -2,7 +2,7 @@
   import { actions } from "astro:actions";
   import Loading from "$components/Loading.svelte";
   import AlertDialog from "$components/AlertDialog.svelte";
-  import Input from "$components/Input/Input.svelte";
+  import Input from "$components/form/Input.svelte";
   import SubsciptionSteps from "$components/subscription/SubsciptionSteps.svelte";
   import { useTranslations } from "$i18n/utils";
   import { addToast } from "$stores/toast";
@@ -38,9 +38,6 @@
 
   let alertModal: HTMLDialogElement | undefined = $state();
   let alertMessage = $state("");
-
-  $inspect(billingMethod);
-  $inspect($subscription);
 
   function showAlert(message: any) {
     alertMessage = message;
@@ -220,6 +217,17 @@
     >
       <div class="flex-1 flex flex-col mb-4">
         <Input
+          id="country"
+          label={t("subscription.country") + " *"}
+          value={"Schweiz"}
+          containerClasses="h-[56px] shadow-lg"
+          labelClasses="text-base-content text-sm"
+          classes="text-base"
+          disabled={true}
+        />
+      </div>
+      <div class="flex-1 flex flex-col mb-4">
+        <Input
           id="email"
           label={t("subscription.billing-email") + " *"}
           value={billingEmail}
@@ -232,7 +240,6 @@
           classes="text-base"
         />
       </div>
-      <div class="flex-1 flex flex-col mb-4"></div>
     </div>
 
     <br class="mt-6" />

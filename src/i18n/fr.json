@@ -282,7 +282,7 @@
   "tenant.model.name": "Model Name",
   "tenant.validate-atleast-one-select": "Please select at least one of the model",
   "tenant.validate-default-should-be-select": "Please select any default model",
-  "tenant.text.prompt.features": "TEXT ASSISTANT",
+  "tenant.text.prompt.features": "BUSINESS ASSISTANT",
   "tenant.subtitles": "Subtitle Allegro (M)",
   "tenant.subtitles-json": "Subtitle JSON",
   "tenant.subtitle-large": "Subtitle Adagio (L)",
@@ -448,6 +448,7 @@
   "subscription.create-my-aibox": "Create my aibox",
   "subscription.number-of-active-user": "Number of active users",
   "common.ok": "Ok",
-  "subscription.billing-method-stripe": "Creditcard and other payment methods (Powered by Stripe)",
+  "subscription.billing-method-stripe": "Auto-pay (Stripe)",
+  "subscription.country": "Country",
   "subscription.biliing-details": "Biliing details"
 }

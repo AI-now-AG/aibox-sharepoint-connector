@@ -26,7 +26,7 @@
     BillingMethod,
     BillingMethodLabels,
   } from "$types/Subscription";
-  import SelectOptions from "$components/SelectOptions.svelte";
+  import Dropdown from "$components/form/Dropdown.svelte";
   import AudioAddonsDropdown from "./AudioAddonsDropdown.svelte";
   import ThemeItem from "./ThemeItem.svelte";
 
@@ -787,11 +787,11 @@
 
     <div class="flex flex-row space-x-4">
       <div class="flex-1 flex flex-col mb-4">
-        <SelectOptions
+        <Dropdown
           label={`${t("tenant.language")}*`}
           options={languages}
           bind:value={selectedLanguage}
-        ></SelectOptions>
+        />
       </div>
 
       <div class="flex-1 flex flex-col mb-4">
@@ -830,7 +830,7 @@
     </div>
     <div class="flex flex-row space-x-4">
       <div class="flex-1 flex flex-col mb-4">
-        <SelectOptions
+        <Dropdown
           label={t("tenant.subscription")}
           options={[
             { value: "Starter", title: "aibox Starter (25.-)" },
@@ -840,7 +840,7 @@
             { value: "Enterprise", title: "aibox Enterprise" },
           ]}
           bind:value={selectedPlanName}
-        ></SelectOptions>
+        />
       </div>
       <div class="flex-1 flex flex-col mb-4">
         <AudioAddonsDropdown
@@ -1210,7 +1210,7 @@
         <div class="collapse-content">
           <div class="grid grid-cols-2 gap-4 mx-8 mb-[30]">
             <div class="w-full z-20">
-              <SelectOptions
+              <Dropdown
                 label={`${t("tenant.model.name")}*`}
                 options={[
                   {
@@ -1223,7 +1223,7 @@
                   },
                 ]}
                 bind:value={selectedPerplexityModel}
-              ></SelectOptions>
+              />
             </div>
             <div class="w-full">
               <span class="mb-2 text-base-content font-medium text-sm"

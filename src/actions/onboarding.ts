@@ -149,6 +149,7 @@ export const onboarding = {
               line1: billingInfo.address,
               city: billingInfo.location,
               postal_code: billingInfo.zip_code,
+              country: "CH",
             },
             preferred_locales: [language],
           });

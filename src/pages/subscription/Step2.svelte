@@ -1,9 +1,11 @@
 <script lang="ts">
   import AlertDialog from "$components/AlertDialog.svelte";
-  import Input from "$components/Input/Input.svelte";
+  import Input from "$components/form/Input.svelte";
   import SubsciptionSteps from "$components/subscription/SubsciptionSteps.svelte";
   import { useTranslations } from "$i18n/utils";
-  import SingleInput from "$pages/prompt-library/prompts/SingleInput.svelte";
+  import Dropdown, {
+    type Option,
+  } from "$components/subscription/Dropdown.svelte";
   import { storeOrganizationInfo, subscription } from "$stores/subscription";
 
   interface Props {
@@ -15,19 +17,14 @@
 
   const initOrganizationInformation = $subscription.organizationInfo;
 
-  const languages = [
-    { title: "Deutsch", value: "de" },
-    { title: "English", value: "en" },
+  const languages: Option[] = [
+    { value: "de", title: "Deutsch" },
+    { value: "en", title: "English" },
   ];
 
-  const initSelectedLanguage = initOrganizationInformation?.defaultLanguage
-    ? initOrganizationInformation?.defaultLanguage == "de"
-      ? languages[0]
-      : languages[1]
-    : languages[0];
-
-  let selectedLanguage: { title: string; value: string } =
-    $state(initSelectedLanguage);
+  let selectedLanguage: { title: string; value: string } = $state(
+    initOrganizationInformation?.defaultLanguage ?? "de",
+  );
   let organizationName = $state(
     initOrganizationInformation?.organizationName ?? "",
   );
@@ -37,7 +34,8 @@
 
   let alertModal: HTMLDialogElement | undefined = $state();
   let alertMessage = $state("");
-  $inspect($subscription);
+
+  $inspect(selectedLanguage);
 
   function showAlert(message: any) {
     alertMessage = message;
@@ -67,7 +65,7 @@
     if (validateForm()) {
       storeOrganizationInfo({
         organizationName: organizationName,
-        defaultLanguage: selectedLanguage?.value ?? "de",
+        defaultLanguage: selectedLanguage || "de",
         useCases: selectedCategories,
       });
       window.location.href = "/subscription/step3";
@@ -110,13 +108,11 @@
       </div>
 
       <div class="flex-1 flex flex-col mb-4">
-        <SingleInput
-          title={`${t("subscription.language")}`}
+        <Dropdown
+          label={`${t("subscription.language")}`}
           placeholder={t("tenant.german-language")}
-          items={languages}
-          bind:selectedItem={selectedLanguage}
-          labelClasses="h-[56px]"
-          titleClasses="mb-3"
+          options={languages}
+          bind:value={selectedLanguage}
         />
       </div>
     </div>

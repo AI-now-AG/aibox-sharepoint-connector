@@ -32,8 +32,6 @@
   let alertModal: HTMLDialogElement | undefined = $state();
   let alertMessage = $state("");
 
-  $inspect($subscription);
-
   // Calculate total price (include package and audio options)
   $effect(() => {
     let packagePrice = 0;

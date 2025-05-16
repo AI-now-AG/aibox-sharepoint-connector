@@ -2,7 +2,7 @@
   import { useTranslations } from "$i18n/utils";
   import { preventDefault } from "$utils/common";
   import { svgIcons } from "$assets/icons";
-  import SelectOptions, { type Option } from "$components/SelectOptions.svelte";
+  import Dropdown, { type Option } from "$components/form/Dropdown.svelte";
 
   const t = useTranslations();
 
@@ -57,7 +57,7 @@
     <label class="label">
       <span class="label-text">{t("usage.select-tenant")}:</span>
     </label>
-    <SelectOptions
+    <Dropdown
       classes="flex-1"
       options={tenantOptions}
       bind:value={selectedTenant}
