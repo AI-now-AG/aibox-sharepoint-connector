@@ -138,32 +138,36 @@ export const onboarding = {
         const successUrl = `${fullDomain}/subscription/step4?referer=stripe`;
         const cancelUrl = `${fullDomain}/subscription?referer=stripe`;
 
-        // Lookup customer
+        // Lookup customer by email
         let stripeCustomerId = null;
-        const existingCustomer = await getCustomerByEmail(billingInfo.email);
+        const customerEmail = user.email; // billingInfo.email
+        const existingCustomer = await getCustomerByEmail(customerEmail);
+
+        // Define common data for creation and update
+        const customerData = {
+          name: billingInfo.company_name,
+          address: {
+            line1: billingInfo.address,
+            city: billingInfo.location,
+            postal_code: billingInfo.zip_code,
+            country: "CH",
+          },
+          preferred_locales: [language],
+          metadata: {
+            billing_email: billingInfo.email,
+          },
+        };
+
+        // Create new customer if not found
         if (!existingCustomer) {
           const newCustomer = await createCustomer({
-            email: billingInfo.email,
-            name: billingInfo.company_name,
-            address: {
-              line1: billingInfo.address,
-              city: billingInfo.location,
-              postal_code: billingInfo.zip_code,
-              country: "CH",
-            },
-            preferred_locales: [language],
+            email: customerEmail,
+            ...customerData,
           });
           stripeCustomerId = newCustomer?.id;
         } else {
-          updateCustomer(existingCustomer.id, {
-            name: billingInfo.company_name,
-            address: {
-              line1: billingInfo.address,
-              city: billingInfo.location,
-              postal_code: billingInfo.zip_code,
-            },
-            preferred_locales: [language],
-          });
+          // Update existing customer
+          updateCustomer(existingCustomer.id, customerData);
           stripeCustomerId = existingCustomer.id;
         }
 
