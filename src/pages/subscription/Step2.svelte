@@ -102,7 +102,7 @@
             organizationName = event.value;
           }}
           containerClasses="h-[56px] shadow-xl"
-          labelClasses="text-base-content text-sm"
+          labelClasses="text-sm"
           classes="text-base"
         />
       </div>

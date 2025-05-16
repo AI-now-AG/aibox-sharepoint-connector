@@ -157,7 +157,7 @@
             companyName = event.value;
           }}
           containerClasses="h-[56px] shadow-lg"
-          labelClasses="text-base-content text-sm"
+          labelClasses="text-sm"
           classes="text-base"
         />
       </div>
@@ -172,7 +172,7 @@
             street = event.value;
           }}
           containerClasses="h-[56px] shadow-lg"
-          labelClasses="text-base-content text-sm"
+          labelClasses="text-sm"
           classes="text-base"
         />
       </div>
@@ -191,7 +191,7 @@
             zipCode = event.value;
           }}
           containerClasses="h-[56px] shadow-lg"
-          labelClasses="text-base-content text-sm"
+          labelClasses="text-sm"
           classes="text-base"
         />
       </div>
@@ -206,7 +206,7 @@
             location = event.value;
           }}
           containerClasses="h-[56px] shadow-lg"
-          labelClasses="text-base-content text-sm"
+          labelClasses="text-sm"
           classes="text-base"
         />
       </div>
@@ -221,7 +221,7 @@
           label={t("subscription.country") + " *"}
           value={"Schweiz"}
           containerClasses="h-[56px] shadow-lg"
-          labelClasses="text-base-content text-sm"
+          labelClasses="text-sm"
           classes="text-base"
           disabled={true}
         />
@@ -236,7 +236,7 @@
             billingEmail = event.value;
           }}
           containerClasses="h-[56px] shadow-md"
-          labelClasses="text-base-content text-sm"
+          labelClasses="text-sm"
           classes="text-base"
         />
       </div>
