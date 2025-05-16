@@ -175,11 +175,12 @@ export const onboarding = {
           line_items: priceIds.map((id: string) => ({
             price: id,
             quantity: 1,
+            tax_rates: ["txr_1RPNDiBIpWAJAQFJ9jD4Jlpj"],
           })),
           locale:
             (defaultLanguage as Stripe.Checkout.SessionCreateParams.Locale) ||
             "auto",
-          automatic_tax: { enabled: true }, // Enable automatic tax calculation
+          //automatic_tax: { enabled: true }, // Enable automatic tax calculation
           customer: stripeCustomerId,
           success_url: successUrl,
           cancel_url: cancelUrl,
