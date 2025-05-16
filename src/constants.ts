@@ -66,7 +66,7 @@ export const TENANT_MASTER_PROD = "66cc50d98103241cf3354d3f"; // aibox master
 export const STRIPE_PRODUCTS_DEV = {
   Starter: "price_1RLNImBIpWAJAQFJ4vb2AddD",
   Teams: "price_1RLNJgBIpWAJAQFJ6PJgPAvD",
-  Pro: "price_1RLNK5BIpWAJAQFJmBbZPx0w",
+  Pro: "price_1RPIXIBIpWAJAQFJjLdCnZdy",
   AudioBasis: "price_1RNrVABIpWAJAQFJ0ETxdNpc",
   AudioBasisAddOnSubtitle: "price_1RNrVPBIpWAJAQFJGcPJI0jw",
   AudioBasisAddOnLarge: "price_1RNrVeBIpWAJAQFJwQiaO5en",
