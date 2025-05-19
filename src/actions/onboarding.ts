@@ -36,7 +36,12 @@ import {
   getCustomerByEmail,
   createCheckoutSession,
 } from "$utils/stripe";
-import { getTranscriptionTypes, getStripePrices } from "$utils/onboarding";
+
+import {
+  getTranscriptionTypes,
+  getStripePrices,
+  getStripeTaxRate,
+} from "$utils/onboarding";
 import {
   TENANT_MASTER_DEV,
   TENANT_MASTER_PROD,
@@ -170,12 +175,13 @@ export const onboarding = {
           stripeCustomerId = existingCustomer.id;
         }
 
+        const taxtRate = getStripeTaxRate();
         const session = await createCheckoutSession({
           mode: "subscription",
           line_items: priceIds.map((id: string) => ({
             price: id,
             quantity: 1,
-            tax_rates: ["txr_1RPNDiBIpWAJAQFJ9jD4Jlpj"],
+            tax_rates: [taxtRate],
           })),
           locale:
             (defaultLanguage as Stripe.Checkout.SessionCreateParams.Locale) ||

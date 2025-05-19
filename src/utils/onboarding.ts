@@ -1,7 +1,12 @@
 import { AudioCategory } from "$types/TenantFeature";
 import { AudioOptionId, type ProductKeys } from "$types/Subscription";
 import { isProd } from "$utils/env";
-import { STRIPE_PRODUCTS_DEV, STRIPE_PRODUCTS_PROD } from "$constants";
+import {
+  STRIPE_PRODUCTS_DEV,
+  STRIPE_PRODUCTS_PROD,
+  STRIPE_TAX_RATE_DEV,
+  STRIPE_TAX_RATE_PROD,
+} from "$constants";
 
 export const getTranscriptionTypes = (
   selectedAddOns: AudioOptionId[],
@@ -36,4 +41,8 @@ export const getTranscriptionTypes = (
 export const getStripePrices = (keysToFind: ProductKeys[]): string[] => {
   const products = isProd() ? STRIPE_PRODUCTS_PROD : STRIPE_PRODUCTS_DEV;
   return keysToFind.map((key) => products[key]).filter(Boolean);
+};
+
+export const getStripeTaxRate = (): string => {
+  return isProd() ? STRIPE_TAX_RATE_PROD : STRIPE_TAX_RATE_DEV;
 };
