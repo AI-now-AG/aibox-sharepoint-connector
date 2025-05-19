@@ -69,7 +69,7 @@ export const STRIPE_PRODUCTS_DEV = {
   Teams: "price_1RLNJgBIpWAJAQFJ6PJgPAvD",
   Pro: "price_1RPIXIBIpWAJAQFJjLdCnZdy",
   AudioBasis: "price_1RNrVABIpWAJAQFJ0ETxdNpc",
-  AudioBasisAddOnSubtitle: "price_1RNrVPBIpWAJAQFJGcPJI0jw",
+  AudioBasisAddOnSubtitle: "price_1RQPi1BIpWAJAQFJitMHbPKU",
   AudioBasisAddOnLarge: "price_1RNrVeBIpWAJAQFJwQiaO5en",
   AudioPremium: "price_1RNrVvBIpWAJAQFJM1vgV62W",
 };
@@ -78,7 +78,7 @@ export const STRIPE_PRODUCTS_PROD = {
   Teams: "price_1RQOSuBTLa4XuBC9nmmXyldF",
   Pro: "price_1RQOSsBTLa4XuBC9QgPti4FX",
   AudioBasis: "price_1RQOSqBTLa4XuBC95ISq64jQ",
-  AudioBasisAddOnSubtitle: "price_1RQOSoBTLa4XuBC901rG6W8d",
+  AudioBasisAddOnSubtitle: "price_1RQPh2BTLa4XuBC9D06voMqe",
   AudioBasisAddOnLarge: "price_1RQOSkBTLa4XuBC9azJ4ndn1",
   AudioPremium: "price_1RQOSfBTLa4XuBC9t6o6qg8Y",
 };
