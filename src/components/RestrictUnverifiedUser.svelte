@@ -5,6 +5,7 @@
   import { addToast } from "$stores/toast";
   import Loading from "$components/Loading.svelte";
   import { isOnboarding } from "$stores";
+  import { resetUnverifiedBanner } from "$stores/bannerReset";
 
   const t = useTranslations();
   let loading = $state(false);
@@ -15,6 +16,7 @@
   let { user } = $props() as Props;
 
   let isShow = $state(false);
+  let isClosed = $state(false);
 
   const handleClick = async (event: MouseEvent) => {
     const target = event.target as HTMLElement;
@@ -49,6 +51,37 @@
     };
   });
 
+  // Listen for route changes to reset isClosed
+  function resetOnRouteChange() {
+    isClosed = false;
+  }
+
+  // Patch pushState/replaceState to detect SPA navigation
+  function patchHistoryMethod(type: "pushState" | "replaceState") {
+    const orig = history[type];
+    history[type] = function (...args) {
+      const rv = orig.apply(this, args);
+      window.dispatchEvent(new Event("locationchange"));
+      return rv;
+    };
+  }
+
+  if (typeof window !== "undefined") {
+    patchHistoryMethod("pushState");
+    patchHistoryMethod("replaceState");
+    window.addEventListener("popstate", resetOnRouteChange);
+    window.addEventListener("locationchange", resetOnRouteChange);
+  }
+
+  onMount(() => {
+    resetUnverifiedBanner.subscribe((val) => {
+      if (val) {
+        resetOnRouteChange();
+        resetUnverifiedBanner.set(false);
+      }
+    });
+  });
+
   $effect(() => {
     if (!$isOnboarding) {
       setTimeout(async () => {
@@ -66,13 +99,21 @@
   });
 </script>
 
-{#if isShow}
+{#if isShow && !isClosed}
   <div
-    class="fixed bottom-20 right-4 bg-warning text-sm text-warning-content max-w-lg p-2 pl-4 pr-4 rounded-md shadow-lg"
+    class="fixed bottom-20 right-4 bg-warning text-sm text-warning-content max-w-lg p-2 pl-4 pr-4 rounded-md shadow-lg z-50 flex items-center"
   >
-    {@html t("user.unverified-email-message", {
-      url: "#verification",
-    })}
+    <div class="flex-1">
+      {@html t("user.unverified-email-message", {
+        url: "#verification",
+      })}
+    </div>
+    <button
+      class="ml-2 btn btn-xs btn-circle btn-ghost"
+      aria-label="Close"
+      onclick={() => (isClosed = true)}
+      style="line-height: 1;">✕</button
+    >
   </div>
 
   <Loading show={loading} />
