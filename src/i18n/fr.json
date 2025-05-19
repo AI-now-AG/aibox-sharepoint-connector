@@ -448,7 +448,7 @@
   "subscription.create-my-aibox": "Create my aibox",
   "subscription.number-of-active-user": "Number of active users",
   "common.ok": "Ok",
-  "subscription.billing-method-stripe": "Auto-pay (Stripe)",
+  "subscription.billing-method-stripe": "Auto-pay (Credit Card)",
   "subscription.country": "Country",
   "subscription.biliing-details": "Biliing details"
 }
