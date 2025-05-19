@@ -38,7 +38,7 @@
 
 <div class="form-control">
   <label for={id} class="label pl-0 pb-3">
-    <span class={"label-text text-base-content" + labelClasses}>{label}</span>
+    <span class={"label-text text-base-content " + labelClasses}>{label}</span>
   </label>
   <div
     class={"input flex justify-between items-center gap-2 w-full " +

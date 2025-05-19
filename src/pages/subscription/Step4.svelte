@@ -18,7 +18,7 @@
 
   async function createOrganization() {
     const { data, error } = await actions.onboarding.createOrganization({
-      company_name: $subscription.billingInformation?.companyName ?? "",
+      organization_name: $subscription.organizationInfo?.organizationName ?? "",
     });
 
     if (error) throw new Error(t("subscription.create-organization-failed"));
@@ -39,22 +39,24 @@
     organizationName: string,
   ) {
     const { data, error } = await actions.onboarding.setupTenantData({
-      name: $subscription.organizationInformation?.companyName ?? "",
+      name: $subscription.organizationInfo?.organizationName ?? "",
       org_id: organizationId,
       org_name: organizationName,
-      language: $subscription.organizationInformation?.defaultLanguage ?? "",
+      language: $subscription.organizationInfo?.defaultLanguage ?? "",
       plan_name: $subscription.plan?.id as SubscriptionPackageId,
       add_ons: $subscription.audioOptions?.map(
         (option) => option.id as AudioOptionId,
       ),
-      billing: {
-        company_name: $subscription.billingInformation?.companyName ?? "",
-        address: $subscription.billingInformation?.street ?? "",
-        zip_code: $subscription.billingInformation?.zipCode ?? "",
-        location: $subscription.billingInformation?.location ?? "",
-        email: $subscription.billingInformation?.billingEmail ?? "",
+      billing_method: $subscription.billingInfo?.billingMethod ?? "",
+      billing_info: {
+        company_name: $subscription.billingInfo?.companyName ?? "",
+        address: $subscription.billingInfo?.street ?? "",
+        zip_code: $subscription.billingInfo?.zipCode ?? "",
+        location: $subscription.billingInfo?.location ?? "",
+        email: $subscription.billingInfo?.billingEmail ?? "",
       },
-      use_cases: $subscription.organizationInformation?.useCases ?? [],
+      use_cases: $subscription.organizationInfo?.useCases ?? [],
+      stripe_customer_id: $subscription.stripeCheckout?.customerId ?? "",
     });
 
     if (error) throw new Error(t("subscription.setup-tenant-data-failed"));
@@ -74,8 +76,8 @@
     try {
       if (
         isTrulyEmpty($subscription.plan) ||
-        isTrulyEmpty($subscription.billingInformation) ||
-        isTrulyEmpty($subscription.organizationInformation)
+        isTrulyEmpty($subscription.billingInfo) ||
+        isTrulyEmpty($subscription.organizationInfo)
       ) {
         throw new Error(t("subscription.missing-subscription-information"));
       }

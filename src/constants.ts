@@ -62,3 +62,25 @@ export const SG_NEW_TENANT_TEMPLATE = "d-87847bafc967448e93d99a411edece3a";
 // Tenants
 export const TENANT_MASTER_DEV = "67ff572260fa2a8bca5d26d0"; // aibox dev master
 export const TENANT_MASTER_PROD = "66cc50d98103241cf3354d3f"; // aibox master
+
+// Stripe
+export const STRIPE_PRODUCTS_DEV = {
+  Starter: "price_1RLNImBIpWAJAQFJ4vb2AddD",
+  Teams: "price_1RLNJgBIpWAJAQFJ6PJgPAvD",
+  Pro: "price_1RPIXIBIpWAJAQFJjLdCnZdy",
+  AudioBasis: "price_1RNrVABIpWAJAQFJ0ETxdNpc",
+  AudioBasisAddOnSubtitle: "price_1RNrVPBIpWAJAQFJGcPJI0jw",
+  AudioBasisAddOnLarge: "price_1RNrVeBIpWAJAQFJwQiaO5en",
+  AudioPremium: "price_1RNrVvBIpWAJAQFJM1vgV62W",
+};
+export const STRIPE_PRODUCTS_PROD = {
+  Starter: "price_1RQOSyBTLa4XuBC9FSKRnLuV",
+  Teams: "price_1RQOSuBTLa4XuBC9nmmXyldF",
+  Pro: "price_1RQOSsBTLa4XuBC9QgPti4FX",
+  AudioBasis: "price_1RQOSqBTLa4XuBC95ISq64jQ",
+  AudioBasisAddOnSubtitle: "price_1RQOSoBTLa4XuBC901rG6W8d",
+  AudioBasisAddOnLarge: "price_1RQOSkBTLa4XuBC9azJ4ndn1",
+  AudioPremium: "price_1RQOSfBTLa4XuBC9t6o6qg8Y",
+};
+export const STRIPE_TAX_RATE_DEV = "txr_1RPNDiBIpWAJAQFJ9jD4Jlpj";
+export const STRIPE_TAX_RATE_PROD = "txr_1RQOYKBTLa4XuBC9iZoAKkz1";

@@ -5,6 +5,7 @@ import { client } from "$data/mongodb";
 import { z } from "zod";
 import { decrypt, encrypt } from "$utils/secure";
 import { transformRawData } from "$utils/transformRawData";
+import { createBillingPortalSession } from "$utils/stripe";
 import usersManagement from "$data/auth0/users-manager";
 import rolesManagement from "$data/auth0/roles-manager";
 import organizationsManagement from "$data/auth0/organizations-manager";
@@ -421,6 +422,18 @@ export const tenant = {
       }
 
       return input;
+    },
+  }),
+  stripeBillingPortal: defineAction({
+    input: z.object({
+      customer_id: z.string().min(1),
+      return_url: z.string().min(1),
+    }),
+    handler: async (input) => {
+      const { customer_id: customerId, return_url: returnUrl } = input;
+
+      const portalUrl = await createBillingPortalSession(customerId, returnUrl);
+      return { url: portalUrl };
     },
   }),
 };

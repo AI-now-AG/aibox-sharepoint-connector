@@ -3,14 +3,14 @@
   import SubsciptionSteps from "$components/subscription/SubsciptionSteps.svelte";
   import SubscriptionPackageList from "$components/subscription/SubscriptionPackageList.svelte";
   import { useTranslations } from "$i18n/utils";
-  import { SubscriptionPackages } from "$subscription-packages.json";
+  import { SubscriptionPackages } from "$data/subscription-packages";
   import AlertDialog from "$components/AlertDialog.svelte";
   import {
     storeAudioOptions,
     storePlan,
     type AudioOption,
     type SubscriptionPlan,
-    aiboxsubscription,
+    subscription,
   } from "$stores/subscription";
 
   interface Props {
@@ -21,9 +21,9 @@
 
   let totalPrice: any = $state("");
 
-  const initSelectedPackageId = $aiboxsubscription.plan?.id || "";
+  const initSelectedPackageId = $subscription.plan?.id || "";
   let initSelectedAudioOptionIds: string[] =
-    $aiboxsubscription.audioOptions?.map((option) => {
+    $subscription.audioOptions?.map((option) => {
       return option.id;
     }) || [];
   let selectedPackageId = $state(initSelectedPackageId);
@@ -85,8 +85,8 @@
       storePlan(selectedPackage);
     }
 
+    let selectedAudioOptions: AudioOption[] = [];
     if (selectedAudioOptionIds?.length > 0) {
-      let selectedAudioOptions: AudioOption[] = [];
       for (let i = 0; i < selectedAudioOptionIds.length; i++) {
         const id = selectedAudioOptionIds[i];
         const selectedOption: AudioOption = {
@@ -99,10 +99,9 @@
           selectedAudioOptions.push(selectedOption);
         }
       }
-      if (selectedAudioOptions.length > 0) {
-        storeAudioOptions(selectedAudioOptions);
-      }
     }
+    storeAudioOptions(selectedAudioOptions);
+
     window.location.href = "/subscription/step2";
   }
 </script>

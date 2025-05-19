@@ -20,8 +20,13 @@
     ApiKeyProvider,
     AudioCategory,
   } from "$types/TenantFeature";
-  import { SubscriptionPackageId, AudioOptionId } from "$types/Subscription";
-  import SelectOptions from "$components/SelectOptions.svelte";
+  import {
+    SubscriptionPackageId,
+    AudioOptionId,
+    BillingMethod,
+    BillingMethodLabels,
+  } from "$types/Subscription";
+  import Dropdown from "$components/form/Dropdown.svelte";
   import AudioAddonsDropdown from "./AudioAddonsDropdown.svelte";
   import ThemeItem from "./ThemeItem.svelte";
 
@@ -32,9 +37,15 @@
     tenant: any;
     subscription?: any;
     activeUsers?: number;
+    isStripeInTestMode?: boolean;
   }
 
-  let { tenant, subscription, activeUsers = 0 }: Props = $props();
+  let {
+    tenant,
+    subscription,
+    activeUsers = 0,
+    isStripeInTestMode = false,
+  }: Props = $props();
 
   let addTenantAdminModal: HTMLDialogElement | undefined = $state();
   let confirmUpdateModal: HTMLDialogElement | undefined = $state();
@@ -697,6 +708,14 @@
     }
   }
 
+  function goToBillingPortal() {
+    const domain = "https://dashboard.stripe.com";
+    const url = isStripeInTestMode
+      ? `${domain}/test/customers/${tenantData.stripe_customer_id}`
+      : `${domain}/customers/${tenantData.stripe_customer_id}`;
+    window.open(url, "_blank");
+  }
+
   function showAlert(message: string) {
     alertMessage = message;
     alertModal?.show();
@@ -768,11 +787,11 @@
 
     <div class="flex flex-row space-x-4">
       <div class="flex-1 flex flex-col mb-4">
-        <SelectOptions
+        <Dropdown
           label={`${t("tenant.language")}*`}
           options={languages}
           bind:value={selectedLanguage}
-        ></SelectOptions>
+        />
       </div>
 
       <div class="flex-1 flex flex-col mb-4">
@@ -789,7 +808,7 @@
       <div class="flex-1 flex flex-col mb-4">
         <div class="flex justify-end">
           <button
-            class={"mt-7 btn btn-outline font-normal grow-0 w-auto " +
+            class={"mt-7 btn btn-sm btn-outline font-normal grow-0 w-auto " +
               `${mode == MODE.Edit ? "" : "btn-disabled"}`}
             onclick={() => {
               addTenantAdminModal?.show();
@@ -811,7 +830,7 @@
     </div>
     <div class="flex flex-row space-x-4">
       <div class="flex-1 flex flex-col mb-4">
-        <SelectOptions
+        <Dropdown
           label={t("tenant.subscription")}
           options={[
             { value: "Starter", title: "aibox Starter (25.-)" },
@@ -821,7 +840,7 @@
             { value: "Enterprise", title: "aibox Enterprise" },
           ]}
           bind:value={selectedPlanName}
-        ></SelectOptions>
+        />
       </div>
       <div class="flex-1 flex flex-col mb-4">
         <AudioAddonsDropdown
@@ -829,6 +848,32 @@
           placeholder=""
           bind:value={selectedPlanAddOns}
         />
+      </div>
+    </div>
+    <div class="flex flex-row space-x-4">
+      <div class="flex-1 flex flex-col mb-4">
+        <span class="mb-2 text-base-content font-medium text-sm"
+          >{t("subscription.billing-method")}</span
+        >
+        <input
+          type="text"
+          class="input input-bordered bg-base-200 w-full"
+          readonly
+          value={tenantData.billing_method
+            ? BillingMethodLabels[tenantData.billing_method as BillingMethod]
+            : ""}
+        />
+      </div>
+      <div class="flex-1 flex flex-col mb-4">
+        {#if tenantData.billing_method === BillingMethod.CreditCard}
+          <span class="mb-2 text-base-content font-medium text-sm">&nbsp;</span>
+          <button
+            class="btn btn-sm btn-neutral px-10 self-start font-medium"
+            onclick={goToBillingPortal}
+          >
+            {"Stripe"}
+          </button>
+        {/if}
       </div>
     </div>
     <div class="flex flex-row space-x-4">
@@ -894,7 +939,7 @@
           type="number"
           class="input input-bordered bg-base-200 w-full"
           readonly
-          bind:value={activeUsers}
+          value={activeUsers}
         />
       </div>
     </div>
@@ -1165,7 +1210,7 @@
         <div class="collapse-content">
           <div class="grid grid-cols-2 gap-4 mx-8 mb-[30]">
             <div class="w-full z-20">
-              <SelectOptions
+              <Dropdown
                 label={`${t("tenant.model.name")}*`}
                 options={[
                   {
@@ -1178,7 +1223,7 @@
                   },
                 ]}
                 bind:value={selectedPerplexityModel}
-              ></SelectOptions>
+              />
             </div>
             <div class="w-full">
               <span class="mb-2 text-base-content font-medium text-sm"
