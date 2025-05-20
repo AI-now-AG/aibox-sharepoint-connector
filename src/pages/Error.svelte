@@ -14,7 +14,7 @@
   const t = useTranslations();
   let logoutText = $state(t("common.logout"));
   let refreshText = $state(t("common.refresh"));
-  let backToHomText = $state(t("common.back-to-home"));
+  let backToHomeText = $state(t("common.back-to-home"));
 
   onMount(() => {
     let browserLanguage = navigator.language || navigator.languages[0];
@@ -26,9 +26,6 @@
         case "422":
           errorTitle = translate["existing-email.error-title"];
           errorDescription = translate["existing-email.error-description"];
-          logoutText = translate["common.logout"];
-          refreshText = translate["common.refresh"];
-          backToHomText = translate["common.back-to-home"];
           break;
         default:
           break;
@@ -45,33 +42,30 @@
 
 <section class="flex items-center h-full p-16">
   <div
-    class="container flex flex-col items-center justify-center px-5 mx-auto my-8 bg-base-300 bg-opacity-50 rounded-xl shadow-xl p-8 border border-base-300"
+    class="w-full max-w-4xl flex flex-col items-center justify-center px-5 mx-auto my-8 bg-base-300 bg-opacity-50 rounded-xl shadow-xl p-8 border border-base-300"
   >
     <div class="text-center">
-      {#if !errorTitle}
-        <div class="mb-6">
-          <span class="fas fa-exclamation-circle text-6xl text-waring"></span>
-        </div>
-        <h1
-          class="mb-6 text-4xl md:text-5xl font-bold text-white tracking-tight"
+      <div class="mb-6">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-16 w-16 mx-auto shrink-0 stroke-current"
+          fill="none"
+          viewBox="0 0 24 24"
         >
-          {errorTitle}
-        </h1>
-        <p class="mb-8 text-lg md:text-xl text-base-300 mx-auto">
-          {errorDescription}
-        </p>
-      {/if}
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+      </div>
 
       {#if errorTitle || errorDescription}
-        <div class="mb-6">
-          <span class="fas fa-exclamation-circle text-6xl text-warning"> </span>
-        </div>
-        <h1
-          class="mb-6 text-4xl md:text-5xl font-bold text-white tracking-tight"
-        >
+        <h1 class="mb-6 text-4xl md:text-4xl font-bold tracking-tight">
           {errorTitle}
         </h1>
-        <p class="mb-8 text-lg md:text-xl text-base-300 mx-auto">
+        <p class="mb-8 text-lg md:text-xl mx-auto">
           {errorDescription}
         </p>
       {/if}
@@ -97,7 +91,7 @@
           href="/"
           class="btn btn-primary px-6 py-3 text-lg font-semibold rounded-lg shadow-lg hover:bg-primary-focus transition-all duration-300"
         >
-          {backToHomText}
+          {backToHomeText}
         </a>
       {/if}
     </div>
