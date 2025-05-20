@@ -39,9 +39,9 @@ export async function GET(context: APIContext): Promise<Response> {
   // *INFO: Ensure the callback has code and valid state
   if (!code || !state || !storedState || state !== storedState) {
     log.e({ code, state, storedState }, "missing required params");
-    return new Response(null, {
-      status: 400,
-    });
+    return context.redirect(
+      `/error?error=Error&error_description=We couldn't verify your session. Please try again.`,
+    );
   }
 
   const token = await auth0(context.url.origin).validateAuthorizationCode(
