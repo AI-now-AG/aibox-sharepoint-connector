@@ -205,6 +205,7 @@ export const tenant = {
     handler: async (input) => {
       const session = client.startSession();
       session.startTransaction();
+
       try {
         const dbOrgId = input._id;
         const organizationId = input.org_id ?? "";
@@ -354,11 +355,16 @@ export const tenant = {
       if (!tenant) throw new Error("Tenant does not exist.");
 
       const session = client.startSession();
+      session.startTransaction();
 
       try {
         await organizationsManagement.deleteTenant(tenant.org_id);
-        session.startTransaction();
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (error) {
+        console.error("Delete organization on Auth0 error");
+      }
 
+      try {
         await Promise.all([
           CategoryModel.removeByTenant(input._id),
           KnowledgeBaseModel.removeByTenant(input._id),

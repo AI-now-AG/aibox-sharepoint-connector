@@ -65,9 +65,9 @@ export const deleteTenant = async (userId: string) => {
     };
 
     return await managementClient.organizations.delete(requestParameters);
-  } catch (error) {
-    console.error("auth0: delete organization error", error);
-    throw error;
+  } catch (err) {
+    console.error("auth0: delete organization error", err);
+    throw err;
   }
 };
 
