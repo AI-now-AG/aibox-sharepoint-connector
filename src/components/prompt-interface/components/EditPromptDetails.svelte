@@ -9,8 +9,8 @@
   import LoadingSpinner from "$components/prompt-interface/components/LoadingSpinner.svelte";
   import { svgIcons } from "$assets/icons";
   import { formatMarkdown, preventDefault } from "$utils/common";
-  import type { Option } from "$components/SelectOptions.svelte";
-  import TextEditor from "$components/TextEditor.svelte";
+  import type { Option } from "$components/form/Dropdown.svelte";
+  import TextEditor from "$components/form/TextEditor.svelte";
 
   const t = useTranslations();
 

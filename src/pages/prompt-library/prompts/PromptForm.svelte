@@ -8,7 +8,7 @@
   import ModelInput from "$pages/prompt-library/prompts/ModelInput.svelte";
   import { addToast } from "$stores/toast";
   import { formatMarkdown, preventDefault } from "$utils/common";
-  import TextEditor from "$components/TextEditor.svelte";
+  import TextEditor from "$components/form/TextEditor.svelte";
 
   const t = useTranslations();
 

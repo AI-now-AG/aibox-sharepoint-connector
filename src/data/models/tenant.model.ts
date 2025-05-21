@@ -6,6 +6,7 @@ import {
   ApiKeyProvider,
   AudioCategory,
 } from "$types/TenantFeature";
+import { BillingMethod } from "$types/Subscription";
 
 export enum TenantTheme {
   Light = "light",
@@ -67,7 +68,11 @@ const TenantSchema = z.object({
   is_restrict_user_managment: z.boolean().optional().default(false),
   is_trial: z.boolean().optional().default(false),
   metadata: z.record(z.any()).nullish(),
+  billing_method: z
+    .nativeEnum(BillingMethod)
+    .default(BillingMethod.MonthlyInvoice),
   billing_info: BillingInfoSchema.optional(),
+  stripe_customer_id: z.string().nullish().default(null),
   created_at: z
     .date()
     .optional()

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { SubscriptionPackages } from "$subscription-packages.json";
+  import { SubscriptionPackages } from "$data/subscription-packages";
   import SubscriptionPackage from "./SubscriptionPackage.svelte";
 
   const packages = [

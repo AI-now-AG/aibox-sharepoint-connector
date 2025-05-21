@@ -2,7 +2,7 @@
 <!-- svelte-ignore a11y_label_has_associated_control -->
 <!-- svelte-ignore event_directive_deprecated -->
 <script lang="ts">
-  import SelectOptions from "$components/SelectOptions.svelte";
+  import Dropdown from "$components/form/Dropdown.svelte";
   import { useTranslations } from "$i18n/utils";
   import { onMount } from "svelte";
   import Loading from "$components/Loading.svelte";
@@ -148,7 +148,7 @@
     </div>
 
     <div class="flex space-x-4">
-      <SelectOptions
+      <Dropdown
         classes="flex-1"
         options={sizeOptions}
         bind:value={size}
@@ -182,14 +182,14 @@
             </div>
           </div>
         {/if}
-      </SelectOptions>
+      </Dropdown>
 
-      <SelectOptions
+      <Dropdown
         classes="flex-1"
         label={t("create-image.image-format-label")}
         options={outputOptions}
         bind:value={selectedFormat}
-      ></SelectOptions>
+      />
     </div>
 
     <button

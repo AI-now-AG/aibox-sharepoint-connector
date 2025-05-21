@@ -38,8 +38,6 @@
     }
   });
 
-  $inspect(body);
-
   function onEditorUpdate(e: any) {
     html = e.editor.getHTML();
   }

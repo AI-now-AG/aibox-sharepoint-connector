@@ -382,7 +382,7 @@
   "usage.units.credits": "Credits",
   "home.new-chat": "New chat",
   "tenant.settings.private-api-key": "Private API Key",
-  "nav.text-prompts": "TEXT ASSISTANT",
+  "nav.text-prompts": "BUSINESS ASSISTANT",
   "tenant.subtitle-elevenLabs": "Subtitle Virtuoso ",
   "tenant.validate-elevenLabs-key": "Please input ElevenLabs key",
   "settings.transcription.elevenLabs-audio-tag": "Show audio events (e. g. \"music playing\")",
@@ -390,8 +390,8 @@
   "common.next": "Next",
   "subscription.select": "Select",
   "subscription.step1": "Choose your plan",
-  "subscription.step2": "Billing Data",
-  "subscription.step3": "Customize aibox",
+  "subscription.step2": "Customize aibox",
+  "subscription.step3": "Billing Data",
   "subscription.step4": "Create your aibox",
   "subscription.choose-your-plan": "Choose your plan",
   "subscription.choose-your-plan-description": "Choose the plan for your needs, more info see <a href=\"https://ainow.ch/aibox/abos\" target=\"_blank\" class=\"text-[#491EFF] font-bold\">here</a>",
@@ -413,8 +413,6 @@
   "subscription.monthly-invoice-email": "Monthly invoice (email)",
   "subscription.billing-email": "Billing email",
   "subscription.billing-email-plcae-holder": "billing@company.ch",
-  "subscription.credit-card": "Credit card",
-  "subscription.other-payment-method": "Other payment methods will be available soon!",
   "subscription.validate-empty-company-name-message": "Please input your company name ",
   "subscription.validate-empty-organization-name-message": "Please input your organization name ",
   "subscription.validate-empty-street-message": "Please input your street",
@@ -449,5 +447,8 @@
   "subscription.missing-subscription-information": "Oops, missing subscription information.",
   "subscription.create-my-aibox": "Create my aibox",
   "subscription.number-of-active-user": "Number of active users",
-  "common.ok": "Ok"
+  "common.ok": "Ok",
+  "subscription.billing-method-stripe": "Auto-pay (Credit Card)",
+  "subscription.country": "Country",
+  "subscription.biliing-details": "Biliing details"
 }

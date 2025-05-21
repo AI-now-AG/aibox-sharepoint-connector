@@ -2,7 +2,7 @@
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <!-- svelte-ignore event_directive_deprecated -->
 <script lang="ts">
-  import { SUBSCIPTION_STEP } from "$types/Subscription";
+  import { SubscriptionStep } from "$types/Subscription";
   import { useTranslations } from "$i18n/utils";
 
   interface Props {
@@ -31,147 +31,147 @@
 
   const handleClickOnStep = (step: number) => {
     if (
-      currentStep <= SUBSCIPTION_STEP.Step0 ||
-      currentStep >= SUBSCIPTION_STEP.Step4 ||
+      currentStep <= SubscriptionStep.Step0 ||
+      currentStep >= SubscriptionStep.Step4 ||
       currentStep <= step
     ) {
       return;
     }
 
-    if (step > SUBSCIPTION_STEP.Step0 && step < SUBSCIPTION_STEP.Step4) {
+    if (step > SubscriptionStep.Step0 && step < SubscriptionStep.Step4) {
       window.location.href = `/subscription/step${step}`;
     }
   };
 </script>
 
 <ul class={cssClasses}>
-  {#if currentStep === SUBSCIPTION_STEP.Step0}
-    <li class="step" on:click={() => handleClickOnStep(SUBSCIPTION_STEP.Step1)}>
+  {#if currentStep === SubscriptionStep.Step0}
+    <li class="step" on:click={() => handleClickOnStep(SubscriptionStep.Step1)}>
       {step1Text}
     </li>
-    <li class="step" on:click={() => handleClickOnStep(SUBSCIPTION_STEP.Step2)}>
+    <li class="step" on:click={() => handleClickOnStep(SubscriptionStep.Step2)}>
       {step2Text}
     </li>
-    <li class="step" on:click={() => handleClickOnStep(SUBSCIPTION_STEP.Step3)}>
+    <li class="step" on:click={() => handleClickOnStep(SubscriptionStep.Step3)}>
       {step3Text}
     </li>
-    <li class="step" on:click={() => handleClickOnStep(SUBSCIPTION_STEP.Step4)}>
+    <li class="step" on:click={() => handleClickOnStep(SubscriptionStep.Step4)}>
       {step4Text}
     </li>
-  {:else if currentStep === SUBSCIPTION_STEP.Step1}
+  {:else if currentStep === SubscriptionStep.Step1}
     <li
       class="step step-primary text-white"
-      on:click={() => handleClickOnStep(SUBSCIPTION_STEP.Step1)}
+      on:click={() => handleClickOnStep(SubscriptionStep.Step1)}
     >
       {step1Text}
     </li>
-    <li class="step" on:click={() => handleClickOnStep(SUBSCIPTION_STEP.Step2)}>
+    <li class="step" on:click={() => handleClickOnStep(SubscriptionStep.Step2)}>
       {step2Text}
     </li>
-    <li class="step" on:click={() => handleClickOnStep(SUBSCIPTION_STEP.Step3)}>
+    <li class="step" on:click={() => handleClickOnStep(SubscriptionStep.Step3)}>
       {step3Text}
     </li>
-    <li class="step" on:click={() => handleClickOnStep(SUBSCIPTION_STEP.Step4)}>
+    <li class="step" on:click={() => handleClickOnStep(SubscriptionStep.Step4)}>
       {step4Text}
     </li>
-  {:else if currentStep === SUBSCIPTION_STEP.Step2}
+  {:else if currentStep === SubscriptionStep.Step2}
     <li
       data-content="✓"
       class="step step-primary text-white"
-      on:click={() => handleClickOnStep(SUBSCIPTION_STEP.Step1)}
+      on:click={() => handleClickOnStep(SubscriptionStep.Step1)}
     >
       {step1Text}
     </li>
     <li
       class="step step-primary text-white"
-      on:click={() => handleClickOnStep(SUBSCIPTION_STEP.Step2)}
+      on:click={() => handleClickOnStep(SubscriptionStep.Step2)}
     >
       {step2Text}
     </li>
-    <li class="step" on:click={() => handleClickOnStep(SUBSCIPTION_STEP.Step3)}>
+    <li class="step" on:click={() => handleClickOnStep(SubscriptionStep.Step3)}>
       {step3Text}
     </li>
-    <li class="step" on:click={() => handleClickOnStep(SUBSCIPTION_STEP.Step4)}>
+    <li class="step" on:click={() => handleClickOnStep(SubscriptionStep.Step4)}>
       {step4Text}
     </li>
-  {:else if currentStep === SUBSCIPTION_STEP.Step3}
+  {:else if currentStep === SubscriptionStep.Step3}
     <li
       data-content="✓"
       class="step step-primary text-white"
-      on:click={() => handleClickOnStep(SUBSCIPTION_STEP.Step1)}
+      on:click={() => handleClickOnStep(SubscriptionStep.Step1)}
     >
       {step1Text}
     </li>
     <li
       data-content="✓"
       class="step step-primary text-white"
-      on:click={() => handleClickOnStep(SUBSCIPTION_STEP.Step2)}
+      on:click={() => handleClickOnStep(SubscriptionStep.Step2)}
     >
       {step2Text}
     </li>
     <li
       class="step step-primary text-white"
-      on:click={() => handleClickOnStep(SUBSCIPTION_STEP.Step3)}
+      on:click={() => handleClickOnStep(SubscriptionStep.Step3)}
     >
       {step3Text}
     </li>
-    <li class="step" on:click={() => handleClickOnStep(SUBSCIPTION_STEP.Step4)}>
+    <li class="step" on:click={() => handleClickOnStep(SubscriptionStep.Step4)}>
       {step4Text}
     </li>
-  {:else if currentStep === SUBSCIPTION_STEP.Step4}
+  {:else if currentStep === SubscriptionStep.Step4}
     <li
       data-content="✓"
       class="step step-primary text-white"
-      on:click={() => handleClickOnStep(SUBSCIPTION_STEP.Step1)}
+      on:click={() => handleClickOnStep(SubscriptionStep.Step1)}
     >
       {step1Text}
     </li>
     <li
       data-content="✓"
       class="step step-primary text-white"
-      on:click={() => handleClickOnStep(SUBSCIPTION_STEP.Step2)}
+      on:click={() => handleClickOnStep(SubscriptionStep.Step2)}
     >
       {step2Text}
     </li>
     <li
       data-content="✓"
       class="step step-primary text-white"
-      on:click={() => handleClickOnStep(SUBSCIPTION_STEP.Step3)}
+      on:click={() => handleClickOnStep(SubscriptionStep.Step3)}
     >
       {step3Text}
     </li>
     <li
       class="step step-primary text-white"
-      on:click={() => handleClickOnStep(SUBSCIPTION_STEP.Step4)}
+      on:click={() => handleClickOnStep(SubscriptionStep.Step4)}
     >
       {step4Text}
     </li>
-  {:else if currentStep === SUBSCIPTION_STEP.Completed}
+  {:else if currentStep === SubscriptionStep.Completed}
     <li
       data-content="✓"
       class="step step-primary text-white"
-      on:click={() => handleClickOnStep(SUBSCIPTION_STEP.Step1)}
+      on:click={() => handleClickOnStep(SubscriptionStep.Step1)}
     >
       {step1Text}
     </li>
     <li
       data-content="✓"
       class="step step-primary text-white"
-      on:click={() => handleClickOnStep(SUBSCIPTION_STEP.Step2)}
+      on:click={() => handleClickOnStep(SubscriptionStep.Step2)}
     >
       {step2Text}
     </li>
     <li
       data-content="✓"
       class="step step-primary text-white"
-      on:click={() => handleClickOnStep(SUBSCIPTION_STEP.Step3)}
+      on:click={() => handleClickOnStep(SubscriptionStep.Step3)}
     >
       {step3Text}
     </li>
     <li
       data-content="✓"
       class="step step-primary text-white"
-      on:click={() => handleClickOnStep(SUBSCIPTION_STEP.Step4)}
+      on:click={() => handleClickOnStep(SubscriptionStep.Step4)}
     >
       {step4Text}
     </li>

@@ -1,0 +1,75 @@
+---
+import { useTranslations } from "$i18n/utils";
+import SubscriptionLayout from "$layouts/SubscriptionLayout.astro";
+import CategoryModel from "$data/models/category.model";
+import { isProd } from "$utils/env";
+import { TENANT_MASTER_DEV, TENANT_MASTER_PROD } from "$constants";
+import { RoutePath } from "$types/Subscription";
+import Step1 from "./Step1.svelte";
+import Step2 from "./Step2.svelte";
+import Step3 from "./Step3.svelte";
+import Step4 from "./Step4.svelte";
+
+export function getStaticPaths() {
+  return [
+    { params: { step: RoutePath.Step1 } },
+    { params: { step: RoutePath.Step2 } },
+    { params: { step: RoutePath.Step3 } },
+    { params: { step: RoutePath.Step4 } },
+  ];
+}
+
+const t = useTranslations();
+const user = Astro.locals.user;
+const { step } = Astro.params;
+
+let pageTitle = "";
+const useCases: Record<string, unknown>[] = [];
+
+switch (step) {
+  case RoutePath.Step1:
+    pageTitle = t("subscription.choose-your-plan");
+    break;
+  case RoutePath.Step2:
+    pageTitle = t("subscription.customize-your-aibox");
+    break;
+  case RoutePath.Step3:
+    pageTitle = t("subscription.provide-billing-information");
+    break;
+  case RoutePath.Step4:
+    pageTitle = t("subscription.creating-your-account");
+    break;
+}
+
+if (step == RoutePath.Step2) {
+  const masterTenantId = isProd() ? TENANT_MASTER_PROD : TENANT_MASTER_DEV;
+  const categoriesCursor = await CategoryModel.listByTenant(masterTenantId);
+  const categories = await categoriesCursor.toArray();
+  categories.forEach((category) => {
+    useCases.push({
+      title: category.title,
+      value: category._id.toString(),
+    });
+  });
+}
+
+if (Astro.locals.tenant.is_trial !== true) {
+  return Astro.redirect("/restricted");
+}
+const defaultLanguage = Astro.locals.tenant.default_language || "en";
+---
+
+<SubscriptionLayout title={pageTitle}>
+  {step == RoutePath.Step1 && <Step1 {defaultLanguage} client:load />}
+  {
+    step == RoutePath.Step2 && (
+      <Step2 categories={useCases} {defaultLanguage} client:load />
+    )
+  }
+  {
+    step == RoutePath.Step3 && (
+      <Step3 accountEmail={user.email} {defaultLanguage} client:load />
+    )
+  }
+  {step == RoutePath.Step4 && <Step4 {user} {defaultLanguage} client:load />}
+</SubscriptionLayout>

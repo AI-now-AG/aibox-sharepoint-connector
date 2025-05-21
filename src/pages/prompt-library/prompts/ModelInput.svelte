@@ -3,8 +3,7 @@
   import { useTranslations } from "$i18n/utils";
   import { tenant } from "$stores";
   import { ApiKeyProvider } from "$types/TenantFeature";
-  import type { Option } from "$components/SelectOptions.svelte";
-  import SelectOptions from "$components/SelectOptions.svelte";
+  import Dropdown, { Option } from "$components/form/Dropdown.svelte";
 
   const t = useTranslations();
 
@@ -85,7 +84,7 @@
   };
 </script>
 
-<SelectOptions
+<Dropdown
   classes={"flex-1 min-w-3xs " + classes}
   {labelClasses}
   label={label ?? t("prompt-library.add.prompts.language-model")}
@@ -93,4 +92,4 @@
   options={models}
   {disabled}
   bind:value={selectedModel}
-></SelectOptions>
+/>

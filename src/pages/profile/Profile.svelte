@@ -3,7 +3,7 @@
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
   import { addToast } from "$stores/toast";
-  import Input from "$components/Input/Input.svelte";
+  import Input from "$components/form/Input.svelte";
   import { preventDefault } from "$utils/common";
 
   interface Props {

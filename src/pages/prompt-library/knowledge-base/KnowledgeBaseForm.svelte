@@ -6,7 +6,7 @@
   import { addToast } from "$stores/toast";
   import { svgIcons } from "$assets/icons";
   import { formatMarkdown, preventDefault } from "$utils/common";
-  import TextEditor from "$components/TextEditor.svelte";
+  import TextEditor from "$components/form/TextEditor.svelte";
   import ImportFileDialog from "./ImportFileDialog.svelte";
   import Loading from "$components/Loading.svelte";
 

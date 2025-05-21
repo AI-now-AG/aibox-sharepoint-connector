@@ -7,7 +7,7 @@
   import { AudioCategory } from "$types/TenantFeature";
   import { onMount } from "svelte";
   import { formatMarkdown, preventDefault } from "$utils/common";
-  import TextEditor from "$components/TextEditor.svelte";
+  import TextEditor from "$components/form/TextEditor.svelte";
   const t = useTranslations();
 
   interface Props {
