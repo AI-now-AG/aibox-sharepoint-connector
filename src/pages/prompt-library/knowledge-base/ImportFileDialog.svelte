@@ -44,9 +44,18 @@
 
   function isFileValid(file: File) {
     const type = file.type;
-    if (isFileTypeValid(type)) {
+    if (isFileTypeValid(type) && isFileSizeValid(file.size)) {
       return true;
     }
+    return false;
+  }
+
+  function isFileSizeValid(size: number) {
+    if (size <= 5 * 1024 * 1024) {
+      fileErrorMessage = "";
+      return true;
+    }
+    fileErrorMessage = t("transcription.file-validation.exceed-size-limit");
     return false;
   }
 

@@ -111,7 +111,7 @@
   }
 
   function isFileSizeValid(size: number) {
-    if (size <= 25 * 1024 * 1024) {
+    if (size <= 5 * 1024 * 1024) {
       fileErrorMessage = "";
       return true;
     }
@@ -124,6 +124,18 @@
       return true;
     }
     return false;
+  }
+  let isFormValid = $derived(files.length > 0 && fileErrorMessage === "");
+  function confirm() {
+    modal.close();
+    if (files.length > 0) {
+      const fileList = files.map((file) => ({
+        name: file.name,
+        content: URL.createObjectURL(file),
+        type: file.type,
+      }));
+      // Handle the fileList as needed
+    }
   }
 </script>
 
@@ -289,6 +301,20 @@
             {/each}
           </div>
         {/if}
+      </div>
+      <div class="modal-action">
+        <form method="dialog">
+          <!-- <button class="btn btn-outline">{t("common.cancel")}</button> -->
+          <button
+            class="btn btn-primary {!isFormValid && 'btn-disabled'}"
+            type="submit"
+            onclick={() => {
+              confirm();
+            }}
+          >
+            {t("common.upload")}
+          </button>
+        </form>
       </div>
     </div>
   </div>
