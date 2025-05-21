@@ -26,7 +26,7 @@ const checkFileExist: Handler = async (event, context) => {
     uniqueName,
     fileNames,
     folderName,
-    isShowImprovedTextPreview,
+    showTextPreviewChecked,
     typedCategory,
     isDiarizationEnabled,
     encryptedSpeechKey,
@@ -39,6 +39,14 @@ const checkFileExist: Handler = async (event, context) => {
   const protocol = event.headers["x-forwarded-proto"] || "https";
   const previewUrl = `${protocol}://${host}`;
 
+  const isShowImprovedTextPreview =
+    typedCategory === AudioCategory.Subtitle ||
+    typedCategory === AudioCategory.SubtitleJson ||
+    typedCategory === AudioCategory.Subtitle11Labs ||
+    typedCategory === AudioCategory.SubtitleLarge
+      ? showTextPreviewChecked
+      : false;
+
   const improvedTxtFileName = `${uniqueName}_improved.txt`;
   if (isShowImprovedTextPreview) {
     requireFilesCount += 1;
@@ -46,7 +54,7 @@ const checkFileExist: Handler = async (event, context) => {
   }
 
   const txtFileName =
-    isDiarizationEnabled || isM4AFile
+    (isDiarizationEnabled || isM4AFile) && typedCategory !== AudioCategory.AudioToText
       ? `${uniqueName}-mono.txt`
       : `${uniqueName}.txt`;
   if (!fileNames.includes(txtFileName) && !isShowImprovedTextPreview) {
