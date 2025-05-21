@@ -1,8 +1,9 @@
 import type { APIRoute } from "astro";
 import UserModel from "$data/models/user.model";
+import TenantModel from "$data/models/tenant.model";
 import { z } from "zod";
 
-const BlockUserRequestSchema = z.object({
+const CheckTrialRequestSchema = z.object({
   id: z.string(),
 });
 
@@ -23,15 +24,37 @@ export const POST: APIRoute = async (ctx) => {
   try {
     // Parse and validate input
     const params = await ctx.request.json();
-    const { id: userId } = BlockUserRequestSchema.parse(params);
+    const { id: userId } = CheckTrialRequestSchema.parse(params);
 
-    // Attempt to block user
-    await UserModel.update(userId, { blocked: true });
+    // Fetch user by ID
+    const user = await UserModel.get(userId);
+    if (!user) {
+      return Response.json(
+        { error: "User not exist" },
+        {
+          status: 404,
+        },
+      );
+    }
+
+    // Fetch the tenant associated with the user
+    const tenant = await TenantModel.get(user.tenant_id);
+    if (!tenant) {
+      return Response.json(
+        { error: "Tenant not exist" },
+        {
+          status: 404,
+        },
+      );
+    }
+
+    // Return trial status and tenant name
     return Response.json(
-      { message: "User blocked successfully" },
       {
-        status: 200,
+        trial: tenant.is_trial === true,
+        tenant: tenant.name,
       },
+      { status: 200 },
     );
   } catch (error) {
     // Input validation failed (e.g. missing or wrong type)
@@ -43,9 +66,9 @@ export const POST: APIRoute = async (ctx) => {
     }
 
     // Unexpected system error
-    console.error("Error blocking user:", error);
+    console.error("Error checking trial status:", error);
     return Response.json(
-      { error: "Failed to block user" },
+      { error: "Internal server error" },
       {
         status: 500,
       },
