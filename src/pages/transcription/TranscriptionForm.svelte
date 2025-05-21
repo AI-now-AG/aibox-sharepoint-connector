@@ -615,13 +615,7 @@
           uniqueName: tempOutputFileName,
           fileNames: tempOutputFileNames,
           folderName: folderName,
-          isShowImprovedTextPreview:
-            category === AudioCategory.Subtitle ||
-            category === AudioCategory.SubtitleJson ||
-            category === AudioCategory.Subtitle11Labs ||
-            category === AudioCategory.SubtitleLarge
-              ? showTextPreviewChecked
-              : false,
+          showTextPreviewChecked: showTextPreviewChecked,
           typedCategory: category,
           isDiarizationEnabled: isDiarizationEnabled,
           encryptedSpeechKey: $tenant?.speech_api_key,
