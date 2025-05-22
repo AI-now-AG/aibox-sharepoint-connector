@@ -7,19 +7,18 @@ const CheckTrialRequestSchema = z.object({
   id: z.string(),
 });
 
-//const SECRET_API_TOKEN = import.meta.env.API_SECRET;
+const SECRET_API_TOKEN = import.meta.env.API_SECRET_KEY;
 
 export const POST: APIRoute = async (ctx) => {
-  // Check Bearer token
+  // Unified check for Authorization header and token
   const authHeader = ctx.request.headers.get("authorization");
-  if (!authHeader?.startsWith("Bearer ")) {
+  const token = authHeader?.startsWith("Bearer ")
+    ? authHeader.split(" ")[1]
+    : null;
+
+  if (token !== SECRET_API_TOKEN) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
-
-  // const token = authHeader.split(" ")[1];
-  // if (token !== SECRET_API_TOKEN) {
-  //   return Response.json({ error: "Forbidden" }, { status: 403 });
-  // }
 
   try {
     // Parse and validate input
