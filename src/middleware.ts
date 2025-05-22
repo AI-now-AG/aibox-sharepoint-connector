@@ -25,14 +25,15 @@ async function requestOrigin(context: APIContext, next: MiddlewareNext) {
   if (context.request.method !== "GET") {
     const originHeader = context.request.headers.get("Origin");
     const hostHeader = context.request.headers.get("Host");
-    if (
-      !originHeader ||
-      !hostHeader ||
-      !verifyRequestOrigin(originHeader, [hostHeader])
-    ) {
-      return new Response(null, {
-        status: 403,
-      });
+
+    // Allow non-browser clients that don't send `Origin` (like Postman)
+    if (originHeader) {
+      // Only verify if Origin is present (i.e. browser request)
+      if (!hostHeader || !verifyRequestOrigin(originHeader, [hostHeader])) {
+        return new Response(null, {
+          status: 403,
+        });
+      }
     }
   }
   return next();

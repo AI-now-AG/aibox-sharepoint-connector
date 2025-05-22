@@ -1,14 +1,14 @@
 // App
 export const PUBLIC_ROUTES = [
   "/login",
-  "/api/login",
-  "/login/auth0",
-  "/login/auth0/callback",
-  "/logout/success",
+  "/login/*",
+  "/logout/*",
   "/404",
   "/error",
   "/restricted",
   "/signup",
+  "/api/users/block-user.json",
+  "/api/users/check-trial.json",
 ];
 
 export const ADMIN_ROUTES = [

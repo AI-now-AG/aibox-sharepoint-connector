@@ -48,11 +48,14 @@ export const POST: APIRoute = async (ctx) => {
       );
     }
 
-    // Return trial status and tenant name
+    // Return trial status and other attributes
     return Response.json(
       {
         trial: tenant.is_trial === true,
-        tenant: tenant.name,
+        user: {
+          blocked: user.blocked,
+          verified: user.email_verified,
+        },
       },
       { status: 200 },
     );
