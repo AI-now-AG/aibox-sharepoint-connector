@@ -20,53 +20,44 @@
   let isDragOver = $state(false);
   let fileErrorMessage: string = $state("");
 
-  const acceptedMimeTypes = acceptedTypes.flat().join(", ");
+  const acceptedMimeTypes = acceptedTypes.join(", ");
 
   function addFiles(
     event: Event & { currentTarget: EventTarget & HTMLInputElement },
   ) {
     const eventTarget = event.target as HTMLInputElement;
     file = eventTarget?.files?.[0];
-
-    if (!file || !isFileValid(file)) {
-      return;
-    }
+    if (!file) return;
+    validateFile(file);
   }
 
-  function isFileTypeValid(checkType: string) {
-    for (const type in acceptedTypes) {
-      if (acceptedTypes[type].includes(checkType)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  function isFileValid(file: File) {
-    const type = file.type;
-    if (isFileTypeValid(type) && isFileSizeValid(file.size)) {
-      return true;
-    }
-    return false;
+  function isFileTypeValid(type: string) {
+    return acceptedTypes.includes(type);
   }
 
   function isFileSizeValid(size: number) {
-    if (size <= 5 * 1024 * 1024) {
-      fileErrorMessage = "";
-      return true;
+    return size <= 5 * 1024 * 1024;
+  }
+
+  function validateFile(f: File) {
+    if (!isFileTypeValid(f.type)) {
+      fileErrorMessage = "unsupported-type";
+      return false;
     }
-    fileErrorMessage = t("transcription.file-validation.exceed-size-limit");
-    return false;
+    if (!isFileSizeValid(f.size)) {
+      fileErrorMessage = t("transcription.file-validation.exceed-5mb-size-limit");
+      return false;
+    }
+    fileErrorMessage = "";
+    return true;
   }
 
   $effect(() => {
-    if (file && !isFileValid(file)) {
-      fileErrorMessage = "unsupported-type";
-    } else {
-      fileErrorMessage = "";
-    }
+    if (file) validateFile(file);
+    else fileErrorMessage = "";
   });
-  let isFormValid = $derived(file && isFileValid(file));
+
+  let isFormValid = $derived(file && fileErrorMessage === "");
 </script>
 
 <dialog bind:this={modal} class="modal">
