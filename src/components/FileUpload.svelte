@@ -115,7 +115,7 @@
       fileErrorMessage = "";
       return true;
     }
-    fileErrorMessage = t("transcription.file-validation.exceed-size-limit");
+    fileErrorMessage = t("transcription.file-validation.exceed-5mb-size-limit");
     return false;
   }
 
