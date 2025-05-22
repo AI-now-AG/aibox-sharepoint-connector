@@ -3,7 +3,10 @@ import type { APIRoute } from "astro";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const GET: APIRoute = async (ctx) => {
   // Optional: Parse incoming data (e.g., from a form)
-  const data = {};
+  const data = {
+    id: "66f64cc5b0a6fda7fe724409",
+    email: "devlin.nguyen@business4you.ch",
+  };
 
   // Replace this with your actual Make webhook URL
   const makeWebhookUrl =
