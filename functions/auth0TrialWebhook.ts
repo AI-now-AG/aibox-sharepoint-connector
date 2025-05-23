@@ -99,6 +99,8 @@ const triggerTrialWorkflow = async (userId: string, email: string) => {
         },
         body: JSON.stringify(data),
       });
+
+      console.log(`Workflow JSON payload`, data);
     }
   } catch (error: any) {
     console.warn(`Trigger trial workflow error`, error);
