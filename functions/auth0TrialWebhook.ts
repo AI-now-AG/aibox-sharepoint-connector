@@ -81,7 +81,7 @@ const triggerTrialWorkflow = async (userId: string, email: string) => {
   try {
     const localUser = await UserModel.getAuth0Sub(userId);
     if (!localUser) {
-      console.warn(`Tenant not exist`);
+      console.warn(`No local user found for Auth0 userId: ${userId}`);
       return;
     }
 
