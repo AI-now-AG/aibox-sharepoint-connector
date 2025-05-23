@@ -46,9 +46,16 @@ const auth0TrialWebhook: Handler = async (
       // Trigger successful signup
       // See: https://auth0.com/docs/customize/log-streams/event-filters#signup-success
       if (eventType == "ss") {
-        const { user_id: userId } = data;
-        const { email, is_signup: isSignup } = data.details.body || {};
-        if (isSignup && email) {
+        if (["Username-Password-Authentication"].includes(data.connection)) {
+          const { user_id: userId } = data;
+          const { email, is_signup: isSignup } = data.details.body || {};
+          if (isSignup && email) {
+            await triggerTrialWorkflow(userId, email);
+          }
+        }
+
+        if (["windowslive", "google-oauth2"].includes(data.connection)) {
+          const { user_id: userId, user_name: email } = data;
           await triggerTrialWorkflow(userId, email);
         }
       }
