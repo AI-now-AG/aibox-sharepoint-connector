@@ -69,13 +69,16 @@ const auth0Webhook: Handler = async (
       if (eventType == "ss") {
         if (isPermittedConnection(data)) {
           const { user_id: userId } = data;
-          const { email, connection, is_signup: isSignup } = data.details.body;
+          const {
+            email,
+            connection,
+            is_signup: isSignup,
+          } = data.details.body || {};
 
           await triggerRegistrationEmail(userId, email, connection, isSignup);
           if (isSignup) {
             await triggerSignupAlertEmail(userId, email, connection);
             await updateAuth0UserMetadata(userId, { signup: true });
-            await triggerTrialWorkflow(userId, email);
           }
         }
 
@@ -470,33 +473,6 @@ const updateTenantInDatabase = async (data: any) => {
     }
   } catch (error: any) {
     console.warn(`Updating tenant error`, error);
-  }
-};
-
-const triggerTrialWorkflow = async (userId: string, email: string) => {
-  try {
-    const localUser = await UserModel.getAuth0Sub(userId);
-    if (localUser) {
-      const data = {
-        id: localUser._id.toString(),
-        email,
-      };
-
-      // Replace this with your actual Make webhook URL
-      const makeWebhookUrl =
-        "https://hook.eu2.make.com/bmelsaimk76v4eunf7sbcs2ioeh82u1f";
-
-      // Forward the data to the Make.com webhook
-      await fetch(makeWebhookUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-    }
-  } catch (error: any) {
-    console.warn(`Trigger trial workflow error`, error);
   }
 };
 
