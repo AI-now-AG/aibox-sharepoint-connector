@@ -80,27 +80,30 @@ const isDatabaseConnection = (data: any) => {
 const triggerTrialWorkflow = async (userId: string, email: string) => {
   try {
     const localUser = await UserModel.getAuth0Sub(userId);
-    if (localUser) {
-      const data = {
-        id: localUser._id.toString(),
-        email,
-      };
-
-      // Replace this with your actual Make webhook URL
-      const makeWebhookUrl =
-        "https://hook.eu2.make.com/bmelsaimk76v4eunf7sbcs2ioeh82u1f";
-
-      // Forward the data to the Make.com webhook
-      await fetch(makeWebhookUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      console.log(`Workflow JSON payload`, data);
+    if (!localUser) {
+      console.warn(`Tenant not exist`);
+      return;
     }
+
+    const data = {
+      id: localUser._id.toString(),
+      email,
+    };
+
+    // Replace this with your actual Make webhook URL
+    const makeWebhookUrl =
+      "https://hook.eu2.make.com/bmelsaimk76v4eunf7sbcs2ioeh82u1f";
+
+    // Forward the data to the Make.com webhook
+    await fetch(makeWebhookUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    console.log(`Workflow JSON payload`, data);
   } catch (error: any) {
     console.warn(`Trigger trial workflow error`, error);
   }
