@@ -47,7 +47,7 @@ const auth0TrialWebhook: Handler = async (
       // Trigger successful signup
       // See: https://auth0.com/docs/customize/log-streams/event-filters#signup-success
       if (eventType == "ss") {
-        if (isPermittedConnection(data)) {
+        if (isDatabaseConnection(data)) {
           const { user_id: userId } = data;
           const { email, is_signup: isSignup } = data.details.body || {};
           if (isSignup && email) {
@@ -72,10 +72,9 @@ const auth0TrialWebhook: Handler = async (
   }
 };
 
-const isPermittedConnection = (data: any) => {
+const isDatabaseConnection = (data: any) => {
   const connection = data?.connection || "";
-  const permittedCons = ["Username-Password-Authentication"];
-  return permittedCons.includes(connection);
+  return ["Username-Password-Authentication"].includes(connection);
 };
 
 const triggerTrialWorkflow = async (userId: string, email: string) => {
