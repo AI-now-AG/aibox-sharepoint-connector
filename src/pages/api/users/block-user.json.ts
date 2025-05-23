@@ -3,7 +3,7 @@ import UserModel from "$data/models/user.model";
 import { z } from "zod";
 
 const BlockUserRequestSchema = z.object({
-  id: z.string(),
+  id: z.string(), // Auth0 user_id
 });
 
 const SECRET_API_TOKEN = import.meta.env.API_SECRET_KEY;
@@ -25,7 +25,17 @@ export const POST: APIRoute = async (ctx) => {
     const { id: userId } = BlockUserRequestSchema.parse(params);
 
     // Attempt to block user
-    await UserModel.update(userId, { blocked: true });
+    const user = await UserModel.getAuth0Sub(userId);
+    if (!user) {
+      return Response.json(
+        { error: "User does not exist" },
+        {
+          status: 404,
+        },
+      );
+    }
+
+    await UserModel.update(user._id, { blocked: true });
     return Response.json(
       { message: "User blocked successfully" },
       {

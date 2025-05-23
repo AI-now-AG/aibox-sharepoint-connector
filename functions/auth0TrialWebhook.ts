@@ -4,7 +4,6 @@ import type {
   HandlerEvent,
   HandlerResponse,
 } from "@netlify/functions";
-import UserModel from "$data/models/user.model";
 
 /**
  * Handles Auth0 log stream events
@@ -79,14 +78,8 @@ const isDatabaseConnection = (data: any) => {
 
 const triggerTrialWorkflow = async (userId: string, email: string) => {
   try {
-    const localUser = await UserModel.getAuth0Sub(userId);
-    if (!localUser) {
-      console.warn(`No local user found for Auth0 userId: ${userId}`);
-      return;
-    }
-
     const data = {
-      id: localUser._id.toString(),
+      id: userId,
       email,
     };
 
