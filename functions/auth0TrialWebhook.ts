@@ -13,7 +13,7 @@ import UserModel from "$data/models/user.model";
  * @param {Object} event - Incoming event payload from Auth0.
  * @returns {Object} - HTTP response indicating success or failure.
  */
-const auth0SignupToMake: Handler = async (
+const auth0TrialWebhook: Handler = async (
   event: HandlerEvent,
 ): Promise<HandlerResponse> => {
   try {
@@ -105,4 +105,4 @@ const triggerTrialWorkflow = async (userId: string, email: string) => {
   }
 };
 
-export { auth0SignupToMake as handler };
+export { auth0TrialWebhook as handler };
