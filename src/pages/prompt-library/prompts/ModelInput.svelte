@@ -3,7 +3,7 @@
   import { useTranslations } from "$i18n/utils";
   import { tenant } from "$stores";
   import { ApiKeyProvider } from "$types/TenantFeature";
-  import Dropdown, { Option } from "$components/form/Dropdown.svelte";
+  import Dropdown, { type Option } from "$components/form/Dropdown.svelte";
 
   const t = useTranslations();
 

@@ -111,11 +111,11 @@
   }
 
   function isFileSizeValid(size: number) {
-    if (size <= 25 * 1024 * 1024) {
+    if (size <= 5 * 1024 * 1024) {
       fileErrorMessage = "";
       return true;
     }
-    fileErrorMessage = t("transcription.file-validation.exceed-size-limit");
+    fileErrorMessage = t("transcription.file-validation.exceed-5mb-size-limit");
     return false;
   }
 
@@ -124,6 +124,18 @@
       return true;
     }
     return false;
+  }
+  let isFormValid = $derived(files.length > 0 && fileErrorMessage === "");
+  function confirm() {
+    modal.close();
+    if (files.length > 0) {
+      const fileList = files.map((file) => ({
+        name: file.name,
+        content: URL.createObjectURL(file),
+        type: file.type,
+      }));
+      // Handle the fileList as needed
+    }
   }
 </script>
 
@@ -140,7 +152,10 @@
         class="relative flex flex-col p-4 border border-neutral-content rounded-sm"
       >
         <label
-          class={`py-6 relative flex flex-col text-base-content border border-dashed rounded-sm cursor-pointer ${isDragOver ? "border-info" : "border-neutral-content"} ${fileErrorMessage && "border-error bg-error"}`}
+          class={`py-6 relative flex flex-col text-base-content border border-dashed rounded-sm cursor-pointer
+            ${isDragOver ? "border-info"
+              : fileErrorMessage ? "border-error"
+              : "border-neutral-content"}`}
           ondragover={() => {
             isDragOver = true;
           }}
@@ -289,6 +304,20 @@
             {/each}
           </div>
         {/if}
+      </div>
+      <div class="modal-action">
+        <form method="dialog">
+          <!-- <button class="btn btn-outline">{t("common.cancel")}</button> -->
+          <button
+            class="btn btn-primary {!isFormValid && 'btn-disabled'}"
+            type="submit"
+            onclick={() => {
+              confirm();
+            }}
+          >
+            {t("common.ok")}
+          </button>
+        </form>
       </div>
     </div>
   </div>

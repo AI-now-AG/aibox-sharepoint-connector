@@ -93,10 +93,11 @@
         />
       </svg>
     </label>
+    <!-- class="dropdown-content menu bg-base-100 space-y-2 rounded-box z-1 w-52 p-2 shadow-sm max-h-52 overflow-y-auto" -->
     {#if items}
       <ul
         tabindex="-1"
-        class="dropdown-content menu bg-base-100 space-y-2 rounded-box z-1 w-52 p-2 shadow-sm max-h-52 overflow-y-auto"
+        class="dropdown-content menu bg-base-100 space-y-2 rounded-box z-1 w-52 p-2 shadow-sm max-h-min overflow-y-auto"
       >
         {#each items as item}
           <li>
