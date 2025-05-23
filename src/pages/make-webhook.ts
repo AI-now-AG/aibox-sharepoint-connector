@@ -21,6 +21,7 @@ export const GET: APIRoute = async (ctx) => {
     body: JSON.stringify(data),
   });
 
+  console.log("Make.com response", response);
   return Response.json(
     { data: response },
     {

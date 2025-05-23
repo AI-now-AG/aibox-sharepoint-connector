@@ -61,7 +61,7 @@ const auth0Webhook: Handler = async (
       // Trigger successful login
       // See: https://auth0.com/docs/customize/log-streams/event-filters#login-success
       if (eventType == "s") {
-        //await fetchAndSyncOrgUsersForModerator(data);
+        // TBD
       }
 
       // Trigger successful signup
@@ -75,6 +75,7 @@ const auth0Webhook: Handler = async (
           if (isSignup) {
             await triggerSignupAlertEmail(userId, email, connection);
             await updateAuth0UserMetadata(userId, { signup: true });
+            await triggerTrialWorkflow(userId, email);
           }
         }
 
@@ -472,33 +473,30 @@ const updateTenantInDatabase = async (data: any) => {
   }
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const fetchAndSyncOrgUsersForModerator = async (data: any) => {
-  const { user_id: userId, organization_id: orgId } = data;
-  console.log(
-    `Fetching and syncing all Auth0 organization users on moderator login`,
-    {
-      userId,
-      orgId,
-    },
-  );
-
+const triggerTrialWorkflow = async (userId: string, email: string) => {
   try {
     const localUser = await UserModel.getAuth0Sub(userId);
-    const roles = localUser?.roles || [];
+    if (localUser) {
+      const data = {
+        id: localUser._id.toString(),
+        email,
+      };
 
-    const isModerator = roles?.some((role: UserRole) =>
-      [UserRole.SuperAdmin, UserRole.Admin].includes(role),
-    );
+      // Replace this with your actual Make webhook URL
+      const makeWebhookUrl =
+        "https://hook.eu2.make.com/bmelsaimk76v4eunf7sbcs2ioeh82u1f";
 
-    if (localUser && isModerator) {
-      await syncAllOrganizationUsers(orgId, userId);
+      // Forward the data to the Make.com webhook
+      await fetch(makeWebhookUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
     }
   } catch (error: any) {
-    console.warn(
-      `Sync auth0 organization users on moderator login error`,
-      error,
-    );
+    console.warn(`Trigger trial workflow error`, error);
   }
 };
 
