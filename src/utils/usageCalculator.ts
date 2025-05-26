@@ -61,6 +61,7 @@ const REQUEST_CREDIT_MAPPING: Record<string, number> = {
 const DURATION_CREDIT_MAPPING: Record<string, number> = {
   [AzureTTSModel.Whisper]: 15,
   [AzureTTSModel.AudioPro]: 30,
+  [AzureTTSModel.ElevenLabs]: 10,
 };
 
 const _tokensToCredits = (
@@ -274,9 +275,10 @@ const _calculateAudioUsage = (
   rawUsages: UsageLog[],
   useAzureOpenAIPrivateKey: boolean,
   useSpeechPrivateKey: boolean,
+  useElevenLabsPrivateKey: boolean,
 ) => {
   const usageData = rawUsages.filter((item: UsageLog) => {
-    return item.provider == ApiKeyProvider.AzureOpenAI;
+    return item.provider == ApiKeyProvider.AzureOpenAI || item.provider == ApiKeyProvider.ElevenLabs;
   });
 
   // Whisper
@@ -312,6 +314,30 @@ const _calculateAudioUsage = (
     ),
   };
 
+  // ElevenLabs
+  const elevenLabsItems = usageData.filter(
+    (item: UsageLog) => item.model == AzureTTSModel.ElevenLabs,
+  );
+  console.log(
+    `ElevenLabs items: ${elevenLabsItems.length}`,
+  );
+  const elevenLabsDurations = elevenLabsItems.reduce(
+    (sum: number, item: UsageLog) => sum + (item.duration ?? 0),
+    0,
+  );
+  console.log(
+    `ElevenLabs durations: ${elevenLabsDurations} seconds`,
+  );
+  const elevenLabsUsageItem: UsageItem = {
+    model: "ElevenLabs",
+    amount: Math.ceil(elevenLabsDurations / 60), // seconds to minutes
+    unit: unitLabels.minutes,
+    credits: _durationsToCredits(AzureTTSModel.ElevenLabs, elevenLabsDurations),
+  };
+  console.log(
+    `ElevenLabs usage item: ${JSON.stringify(elevenLabsUsageItem)}`,
+  );
+
   const whisperUsageItems = _skipUsageIfPrivateKeyUsed(
     [whisperUsageItem],
     useAzureOpenAIPrivateKey,
@@ -320,7 +346,12 @@ const _calculateAudioUsage = (
     [speechUsageItem],
     useSpeechPrivateKey,
   );
-  return [...whisperUsageItems, ...speechUsageItems];
+
+  const elevenLabsUsageItems = _skipUsageIfPrivateKeyUsed(
+    [elevenLabsUsageItem],
+    useElevenLabsPrivateKey,
+  );
+  return [...whisperUsageItems, ...speechUsageItems, ...elevenLabsUsageItems];
 };
 
 const _calculateFluxUsage = (rawUsages: UsageLog[], usePrivateKey: boolean) => {
@@ -373,12 +404,15 @@ export const calculateUsage = (tenant: Tenant, rawUsages: UsageLog[]) => {
 
   // Audio
   const useSpeechPrivateKey = tenant.metadata?.speechPrivateKeyEnabled ?? false;
+  const useElevenLabsPrivateKey =
+    tenant.metadata?.elevenLabsPrivateKeyEnabled ?? false;
   usageData.push({
     provider: "Audio",
     details: _calculateAudioUsage(
       rawUsages,
       useAzureOpenAIPrivateKey,
       useSpeechPrivateKey,
+      useElevenLabsPrivateKey,
     ),
   });
 

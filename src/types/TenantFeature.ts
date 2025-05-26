@@ -13,6 +13,7 @@ export enum ApiKeyProvider {
   AzureOpenAI = "azure_openai",
   Perplexity = "perplexity",
   Flux = "flux",
+  ElevenLabs = "eleven-labs",
 }
 
 export enum AudioCategory {
@@ -36,4 +37,5 @@ export const AudioCategoryLabels: Record<AudioCategory, string> = {
 export enum AzureTTSModel {
   Whisper = "whisper-1",
   AudioPro = "Audio Pro",
+  ElevenLabs = "scribe_v1",
 }
