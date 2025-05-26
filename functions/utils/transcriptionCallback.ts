@@ -1,11 +1,12 @@
 import { EventEmitter } from "events";
-import type { AudioCategory } from "$types/TenantFeature";
+import type { ApiKeyProvider, AudioCategory } from "$types/TenantFeature";
 
 export interface TranscriptionMetadata {
   duration: number;
   tenantId: string;
   deploymentModel: string;
   category: AudioCategory;
+  provider: ApiKeyProvider;
 }
 
 interface TranscriptionEvents {

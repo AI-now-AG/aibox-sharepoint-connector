@@ -22,12 +22,10 @@ import {
 } from "$types/TranscribeRequest";
 import { processTranscription } from "./batchTranscription";
 import type { TranscriptionResponse } from "$utils/Speech/SpeechResponse";
-import { ApiKeyProvider, AudioCategory } from "$types/TenantFeature";
+import { ApiKeyProvider, AudioCategory, AzureTTSModel } from "$types/TenantFeature";
 import { LoggingCallbackHandler } from "$callbackLLM/LoggingCallbackHandler";
-import type { TranscriptionVerbose } from "openai/resources/audio/transcriptions.mjs";
 import TranscriptionModel from "$data/models/transcription.model";
 import { ElevenLabsClient } from "elevenlabs";
-import type { SpeechToTextChunkResponseModel } from "elevenlabs/api";
 import { UsageType } from "$types/UsageTracking";
 import { transcriptionCallbackHandler } from "./transcriptionCallback";
 import { ObjectId } from "mongodb";
@@ -310,10 +308,12 @@ export async function transcribeUsingOpenAI(
       throw new Error("Audio buffer is missing or undefined.");
     }
 
-    const modelName =
+    const modelName = category === AudioCategory.Subtitle11Labs ? AzureTTSModel.ElevenLabs :
       transcribeParams.azureOpenAIWhisperModel ||
       process.env.AZURE_OPENAI_DEPLOYMENT_NAME ||
       DEFAULT_WHISPER_MODEL_NAME;
+    const provider = category === AudioCategory.Subtitle11Labs
+      ? ApiKeyProvider.ElevenLabs : ApiKeyProvider.AzureOpenAI
 
     // let response: TranscriptionVerbose | TranscribeResponse | SpeechToTextChunkResponseModel | null = null;
     let response: any = null;
@@ -336,37 +336,63 @@ export async function transcribeUsingOpenAI(
         });
       } else {
         console.log("\n\nelevenLabs\n\n");
+        const startTime = Date.now(); // Get start time in milliseconds
         const Audioblob = new Blob([audioBuffer]);
         const eleventLabResponse = await openaiClient.speechToText.convert({
           enable_logging: true,
           model_id: DEFAULT_ELEVENLABS_MODEL_NAME,
           file: Audioblob,
         });
-
+        
+        // Get audio duration from the last word's end time
+        const lastWord = eleventLabResponse.words[eleventLabResponse.words.length - 1];
+        const duration = lastWord ? lastWord.end || 0 : 0;
+        
+        // Get usage metrics for monitoring purposes
+        const usageMetrics = await openaiClient.usage.getCharactersUsageMetrics({
+          start_unix: startTime,
+          end_unix: Date.now()
+        });
+        
+        // Log the usage metrics and duration for monitoring
+        console.log('ElevenLabs Usage Metrics:', JSON.stringify(usageMetrics, null, 2));
+        console.log('Audio Duration in seconds:', duration);
+        
         const excludeTypes = ["spacing"];
         if (!isAudioTagEnabled) {
           excludeTypes.push("audio_event");
         }
-        eleventLabResponse.words = eleventLabResponse.words.filter(
+        
+        const filteredWords = eleventLabResponse.words.filter(
           (word) => !excludeTypes.includes(word.type),
         );
-        const cleanedWords = eleventLabResponse.words.map(
+        
+        const cleanedWords = filteredWords.map(
           ({ text, start, end }) => ({
             word: text,
-            start,
-            end,
+            start: start || 0,
+            end: end || 0,
           }),
         );
 
-        response = eleventLabResponse;
-        response = { ...response, words: cleanedWords };
+        // Format response to match TranscribeResponse interface
+        response = {
+          task: "transcribe",
+          language: eleventLabResponse.language_code || "en",
+          duration: duration,
+          text: eleventLabResponse.text,
+          words: cleanedWords
+        };
       }
-      transcriptionCallbackHandler.emit("transcriptionCompleted", {
-        duration: response.duration,
-        tenantId: transcribeParams.tenantId,
-        deploymentModel: modelName,
-        category: category || AudioCategory.AudioToText,
-      });
+      if (response) {
+        transcriptionCallbackHandler.emit("transcriptionCompleted", {
+          duration: response.duration,
+          tenantId: transcribeParams.tenantId,
+          deploymentModel: modelName,
+          category: category || AudioCategory.AudioToText,
+          provider: provider,
+        });
+      }
     }
     const transcriptionText = response?.text ?? "";
     const parser = new StringOutputParser();
@@ -518,6 +544,7 @@ export async function uploadLargeFile(
     tenantId: tenantId,
     deploymentModel: "Audio Pro",
     category: AudioCategory.AudioPro,
+    provider: ApiKeyProvider.AzureOpenAI,
   });
   const fileNameWithExtension = uploadUrl.split("/").pop()!.split("?")[0];
   const fileNameWithoutExtension = fileNameWithExtension
@@ -619,6 +646,7 @@ export async function uploadSubtitleLargeFiles(
     tenantId: transcribeParams.tenantId,
     deploymentModel: "Audio Pro",
     category: transcribeParams.category || AudioCategory.SubtitleLarge,
+    provider: ApiKeyProvider.AzureOpenAI,
   });
   const outputURLs: { [key: string]: string } = {};
   const fileNameWithExtension = uploadUrl.split("/").pop()!.split("?")[0];
@@ -668,7 +696,7 @@ export async function uploadSubtitleLargeFiles(
 
 transcriptionCallbackHandler.on("transcriptionCompleted", async (response) => {
   try {
-    const { duration, tenantId, deploymentModel, category } = response;
+    const { duration, tenantId, deploymentModel, category, provider } = response;
 
     const tenantIdObjId = ObjectId.isValid(tenantId)
       ? new ObjectId(tenantId)
@@ -676,7 +704,7 @@ transcriptionCallbackHandler.on("transcriptionCompleted", async (response) => {
 
     const usage: Partial<Omit<UsageLog, "_id">> = {
       tenant_id: tenantIdObjId,
-      provider: ApiKeyProvider.AzureOpenAI,
+      provider: provider,
       category: category,
       model: deploymentModel,
       type: UsageType.Transcription,
