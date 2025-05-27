@@ -41,9 +41,9 @@ export const POST: APIRoute = async (ctx) => {
     }
 
     // block user in Auth0
-    await usersManagement.block(user.auth0_sub);
+    await usersManagement.block(userId);
 
-    // update blocked status
+    // update blocked status in local DB
     await UserModel.update(user._id, { blocked: true });
 
     await session.commitTransaction();
