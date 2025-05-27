@@ -85,6 +85,7 @@ const triggerTrialWorkflow = async (userId: string, email: string) => {
 
     // Replace this with your actual Make webhook URL
     const makeWebhookUrl =
+      process.env.MAKE_WEBHOOK_URL ||
       "https://hook.eu2.make.com/bmelsaimk76v4eunf7sbcs2ioeh82u1f";
 
     // Forward the data to the Make.com webhook
