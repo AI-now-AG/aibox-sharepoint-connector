@@ -116,9 +116,7 @@ async function restrictAccess(context: APIContext, next: MiddlewareNext) {
 
   // Ensure that blocked users are restricted from accessing the admin area
   if (context.locals.user?.blocked && context.url.pathname !== "/api/logout") {
-    return context.redirect(
-      `/error?error=account_blocked&error_description=Your account has been temporarily blocked. Please contact support.`,
-    );
+    return context.redirect(`/error?error=account_blocked`);
   }
 
   // Check included features

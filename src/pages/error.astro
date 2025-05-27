@@ -1,12 +1,94 @@
 ---
 import BlankLayout from "$layouts/BlankLayout.astro";
-import ErrorComponent from "./Error.svelte";
+import { useTranslations } from "$i18n/utils";
 
-const errorCode = Astro.url.searchParams.get("code");
-const errorTitle = Astro.url.searchParams.get("error");
-const errorDescription = Astro.url.searchParams.get("error_description");
+let errorName = Astro.url.searchParams.get("error") || 'server_error';
+let errorDescription = Astro.url.searchParams.get("error_description") || 'Oops, something went wrong!';
+let showLogoutButton = false;
+
+const t = useTranslations();
+const logoutText = t("common.logout");
+const refreshText = t("common.refresh");
+const backToHomeText = t("common.back-to-home");
+
+// Check Social Login same email account with existing User
+if (errorName == "account_paired") {
+  errorName = t("existing-email.error-title");
+  errorDescription = t("existing-email.error-description");
+}
+
+// Check Social Login same email account with existing User
+if (errorName == "account_blocked") {
+  errorName = t("error.account-blocked-title");
+  errorDescription = t("error.account-blocked-description");
+}
+
+// Show logout button for inactive tenant
+if (errorName == "tenant_inactive") {
+  showLogoutButton = true;
+}
 ---
 
 <BlankLayout title="Error">
-  <ErrorComponent {errorCode} {errorTitle} {errorDescription} client:load />
+  <section class="flex items-center h-full p-16">
+    <div
+      class="w-full max-w-4xl flex flex-col items-center justify-center px-5 mx-auto my-8 bg-base-300 bg-opacity-50 rounded-xl shadow-xl p-8 border border-base-300"
+    >
+      <div class="text-center">
+        <div class="mb-6">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-16 w-16 mx-auto shrink-0 stroke-current"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+        </div>
+  
+          {
+            (errorName || errorDescription) ? (
+              <h1 class="mb-6 text-4xl md:text-4xl font-bold tracking-tight">
+                {errorName}
+              </h1>
+              <p class="mb-12 text-lg md:text-xl mx-auto">
+                <Fragment set:html={errorDescription} />
+              </p>
+            ) : null
+          }
+  
+          {
+            showLogoutButton ? (
+            <a
+              data-astro-reload
+              href="/api/logout"
+              class="btn btn-outline btn-primary px-6 py-3 text-lg font-semibold rounded-lg shadow-lg hover:bg-primary-focus transition-all duration-300"
+            >
+              {logoutText}
+            </a>
+            <a
+              data-astro-reload
+              href="/"
+              class="btn btn-primary ml-2 px-6 py-3 text-lg font-semibold rounded-lg shadow-lg hover:bg-primary-focus transition-all duration-300"
+            >
+              {refreshText}
+            </a>
+          ) : null
+        }
+
+        <a
+          rel="noopener noreferrer"
+          href="/"
+          class="btn btn-primary px-6 py-3 text-lg font-semibold rounded-lg shadow-lg hover:bg-primary-focus transition-all duration-300"
+        >
+          {backToHomeText}
+        </a>
+      </div>
+    </div>
+  </section>
 </BlankLayout>
