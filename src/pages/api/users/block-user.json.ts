@@ -1,5 +1,7 @@
 import type { APIRoute } from "astro";
+import { client } from "$data/mongodb";
 import UserModel from "$data/models/user.model";
+import usersManagement from "$data/auth0/users-manager";
 import { z } from "zod";
 
 const BlockUserRequestSchema = z.object({
@@ -19,6 +21,9 @@ export const POST: APIRoute = async (ctx) => {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const session = client.startSession();
+  session.startTransaction();
+
   try {
     // Parse and validate input
     const params = await ctx.request.json();
@@ -35,7 +40,13 @@ export const POST: APIRoute = async (ctx) => {
       );
     }
 
+    // block user in Auth0
+    await usersManagement.block(user.auth0_sub);
+
+    // update blocked status
     await UserModel.update(user._id, { blocked: true });
+
+    await session.commitTransaction();
     return Response.json(
       { message: "User blocked successfully" },
       {
@@ -43,6 +54,8 @@ export const POST: APIRoute = async (ctx) => {
       },
     );
   } catch (error) {
+    await session.abortTransaction();
+
     // Input validation failed (e.g. missing or wrong type)
     if (error instanceof z.ZodError) {
       return Response.json(
@@ -59,5 +72,7 @@ export const POST: APIRoute = async (ctx) => {
         status: 500,
       },
     );
+  } finally {
+    session.endSession();
   }
 };
