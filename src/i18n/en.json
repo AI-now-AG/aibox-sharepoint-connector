@@ -451,5 +451,7 @@
   "common.ok": "Ok",
   "subscription.billing-method-stripe": "Auto-pay (Credit Card)",
   "subscription.country": "Country",
-  "subscription.biliing-details": "Biliing details"
+  "subscription.biliing-details": "Billing details",
+  "error.account-blocked-title": "Account is blocked",
+  "error.account-blocked-description": "Your account has been blocked by your organization or because your trial period has ended.\nIf you’d like to reactivate your account, please contact us at <a class=\"underline underline-offset-2\" href=\"mailto:support@aibox-app.ch\">support@aibox-app.ch</a>."
 }

@@ -415,7 +415,7 @@ const modules = [...menuItems];
   }
 
   async function updateNavState(detailsId: string, isOpen: boolean) {
-    await fetch("/api/user/update-nav-state.json", {
+    await fetch("/api/users/update-nav-state.json", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: detailsId, open: isOpen }),

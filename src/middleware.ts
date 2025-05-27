@@ -25,14 +25,15 @@ async function requestOrigin(context: APIContext, next: MiddlewareNext) {
   if (context.request.method !== "GET") {
     const originHeader = context.request.headers.get("Origin");
     const hostHeader = context.request.headers.get("Host");
-    if (
-      !originHeader ||
-      !hostHeader ||
-      !verifyRequestOrigin(originHeader, [hostHeader])
-    ) {
-      return new Response(null, {
-        status: 403,
-      });
+
+    // Allow non-browser clients that don't send `Origin` (like Postman)
+    if (originHeader) {
+      // Only verify if Origin is present (i.e. browser request)
+      if (!hostHeader || !verifyRequestOrigin(originHeader, [hostHeader])) {
+        return new Response(null, {
+          status: 403,
+        });
+      }
     }
   }
   return next();
@@ -115,9 +116,7 @@ async function restrictAccess(context: APIContext, next: MiddlewareNext) {
 
   // Ensure that blocked users are restricted from accessing the admin area
   if (context.locals.user?.blocked && context.url.pathname !== "/api/logout") {
-    return context.redirect(
-      `/error?error=account_blocked&error_description=Your account has been temporarily blocked. Please contact support.`,
-    );
+    return context.redirect(`/error?error=account_blocked`);
   }
 
   // Check included features

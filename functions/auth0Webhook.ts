@@ -61,7 +61,7 @@ const auth0Webhook: Handler = async (
       // Trigger successful login
       // See: https://auth0.com/docs/customize/log-streams/event-filters#login-success
       if (eventType == "s") {
-        //await fetchAndSyncOrgUsersForModerator(data);
+        // TBD
       }
 
       // Trigger successful signup
@@ -69,7 +69,11 @@ const auth0Webhook: Handler = async (
       if (eventType == "ss") {
         if (isPermittedConnection(data)) {
           const { user_id: userId } = data;
-          const { email, connection, is_signup: isSignup } = data.details.body;
+          const {
+            email,
+            connection,
+            is_signup: isSignup,
+          } = data.details.body || {};
 
           await triggerRegistrationEmail(userId, email, connection, isSignup);
           if (isSignup) {
@@ -469,36 +473,6 @@ const updateTenantInDatabase = async (data: any) => {
     }
   } catch (error: any) {
     console.warn(`Updating tenant error`, error);
-  }
-};
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const fetchAndSyncOrgUsersForModerator = async (data: any) => {
-  const { user_id: userId, organization_id: orgId } = data;
-  console.log(
-    `Fetching and syncing all Auth0 organization users on moderator login`,
-    {
-      userId,
-      orgId,
-    },
-  );
-
-  try {
-    const localUser = await UserModel.getAuth0Sub(userId);
-    const roles = localUser?.roles || [];
-
-    const isModerator = roles?.some((role: UserRole) =>
-      [UserRole.SuperAdmin, UserRole.Admin].includes(role),
-    );
-
-    if (localUser && isModerator) {
-      await syncAllOrganizationUsers(orgId, userId);
-    }
-  } catch (error: any) {
-    console.warn(
-      `Sync auth0 organization users on moderator login error`,
-      error,
-    );
   }
 };
 
