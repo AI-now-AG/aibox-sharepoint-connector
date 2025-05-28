@@ -1,0 +1,10 @@
+---
+import Layout from "$layouts/Layout.astro";
+import CreateImageForm from "./CreateImageForm.svelte";
+---
+
+<Layout>
+  <div class="container max-w-6xl mx-auto grid grid-cols-1 px-14">
+    <CreateImageForm client:load />
+  </div>
+</Layout>
