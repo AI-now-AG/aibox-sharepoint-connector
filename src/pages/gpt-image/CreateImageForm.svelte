@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { v4 as uuidv4 } from "uuid";
   import { preventDefault } from "$utils/common";
 
   // Types
@@ -7,14 +8,16 @@
   type BackgroundType = "transparent" | "opaque";
 
   // Reactive form state
-  let prompt = $state<string>("");
+  let prompt = $state<string>(
+    "Generate an image of gray tabby cat hugging an otter with an orange scarf",
+  );
   let imageSize = $state<ImageSize>("1024x1024");
   let imageQuality = $state<number>(80);
   let compressionLevel = $state<number>(75);
   let outputFormat = $state<OutputFormat>("PNG");
   let background = $state<BackgroundType>("transparent");
 
-  function submitForm() {
+  async function submitForm() {
     const payload = {
       prompt,
       imageSize,
@@ -26,6 +29,26 @@
 
     console.log("Submitting payload:", payload);
     // Send to Netlify background function or API
+
+    const params = {
+      jobId: uuidv4(),
+      prompt,
+      imageSize,
+      imageQuality,
+      compressionLevel,
+      outputFormat,
+      background,
+    };
+    const response = await fetch(
+      "/.netlify/functions/createGPTImage-background",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(params),
+      },
+    );
   }
 </script>
 

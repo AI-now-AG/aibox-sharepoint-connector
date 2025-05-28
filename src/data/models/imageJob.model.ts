@@ -8,6 +8,7 @@ export const ErrorSchema = z.object({
 });
 
 const ImageJobSchema = z.object({
+  _id: z.instanceof(ObjectId),
   job_id: z.string().min(1),
   creator_id: z.instanceof(ObjectId).optional(),
   prompt: z.string().min(1),
@@ -16,8 +17,14 @@ const ImageJobSchema = z.object({
   model: z.string().nullish(),
   size: z.string().nullish(),
   error: ErrorSchema.optional(),
-  created_at: z.date().optional(),
-  updated_at: z.date(),
+  created_at: z
+    .date()
+    .optional()
+    .default(() => new Date()),
+  updated_at: z
+    .date()
+    .optional()
+    .default(() => new Date()),
 });
 
 export type ImageJob = z.infer<typeof ImageJobSchema>;
@@ -25,10 +32,9 @@ export type ImageJob = z.infer<typeof ImageJobSchema>;
 const collection = db.collection("image_jobs");
 
 export default {
-  create: async (prompt: ImageJob) => {
-    const validated = ImageJobSchema.parse(prompt);
+  create: async (prompt: Partial<ImageJob>) => {
+    const validated = ImageJobSchema.parse({ _id: new ObjectId(), ...prompt });
     const doc = {
-      position: 0,
       ...validated,
     };
     return collection.insertOne(doc);
