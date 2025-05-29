@@ -42,6 +42,13 @@ const createGPTImage: Handler = async (
       };
     }
 
+    const jobData: Partial<ImageJob> = {
+      job_id: jobId,
+      prompt,
+      status: "pending",
+    };
+    const imageJob = await ImageJobModel.create(jobData);
+
     // Call OpenAI image generation endpoint
     const response = await openai.responses.create({
       model: "gpt-4.1-mini",
@@ -62,18 +69,16 @@ const createGPTImage: Handler = async (
     }
 
     const _ouputResult = imageData[0].result;
-    const _outputFormat = imageData[0].output_format;
+    const _outputFormat = imageData[0]?.output_format;
     const imageUrl = `data:image/${_outputFormat};base64,${_ouputResult}`;
 
-    const imageJob: Partial<ImageJob> = {
-      job_id: jobId,
-      prompt,
+    const updateJob: Partial<ImageJob> = {
       status: "completed",
       imageUrl,
       model: response.model,
       size: imageData[0]?.size,
     };
-    await ImageJobModel.create(imageJob);
+    await ImageJobModel.update(imageJob.insertedId, updateJob);
 
     return {
       statusCode: 200,

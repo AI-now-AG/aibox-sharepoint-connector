@@ -8,6 +8,7 @@
   type BackgroundType = "transparent" | "opaque";
 
   // Reactive form state
+  let jobId = $state<string>("");
   let prompt = $state<string>(
     "Generate an image of gray tabby cat hugging an otter with an orange scarf",
   );
@@ -17,7 +18,12 @@
   let outputFormat = $state<OutputFormat>("PNG");
   let background = $state<BackgroundType>("transparent");
 
+  let loading = $state(false);
+  let imageUrl = $state<string | null>(null);
+  let error = $state<string | null>(null);
+
   async function submitForm() {
+    jobId = uuidv4();
     const payload = {
       prompt,
       imageSize,
@@ -27,11 +33,13 @@
       background,
     };
 
+    loading = true;
+    imageUrl = null;
+    error = null;
     console.log("Submitting payload:", payload);
-    // Send to Netlify background function or API
 
     const params = {
-      jobId: uuidv4(),
+      jobId,
       prompt,
       imageSize,
       imageQuality,
@@ -49,6 +57,41 @@
         body: JSON.stringify(params),
       },
     );
+
+    if (response.status !== 202) {
+      error = "Failed to start image generation.";
+      loading = false;
+      return;
+    }
+
+    await pollImageStatus(jobId);
+  }
+
+  async function pollImageStatus(
+    jobId: string,
+    maxRetries = 30,
+    delayMs = 2000,
+  ) {
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      const res = await fetch(
+        `/.netlify/functions/checkGPTImageStatus?jobId=${jobId}`,
+      );
+      const data = await res.json();
+
+      if (data.status === "completed") {
+        imageUrl = data.imageUrl;
+        loading = false;
+        return;
+      } else if (data.status === "error") {
+        error = "Image generation failed.";
+        loading = false;
+        return;
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+    }
+
+    error = "Image generation timed out.";
   }
 </script>
 
@@ -142,3 +185,30 @@
 
   <button type="submit" class="btn btn-primary mt-4">Generate Image</button>
 </form>
+
+<div class="mt-12">
+  {#if loading}
+    <div class="mt-6 text-center">
+      <p class="text-gray-600">Generating image, please wait...</p>
+      <span class="loading loading-spinner loading-lg mt-2"></span>
+    </div>
+  {/if}
+
+  {#if error}
+    <div class="mt-6 text-red-500 font-semibold">
+      {error}
+    </div>
+  {/if}
+
+  {#if imageUrl}
+    <div class="mt-6">
+      <h3 class="text-lg font-bold mb-2">Generated Image:</h3>
+      <!-- svelte-ignore a11y_img_redundant_alt -->
+      <img
+        src={imageUrl}
+        alt="Generated image"
+        class="rounded-lg shadow-lg max-w-full"
+      />
+    </div>
+  {/if}
+</div>

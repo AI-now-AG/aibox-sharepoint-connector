@@ -48,9 +48,13 @@ export default {
     return collection.findOne<Document<ImageJob>>({ _id });
   },
 
-  update: async (id: string | ObjectId, updatedPrompt: Partial<ImageJob>) => {
+  getByJobId: async (jobId: string): Promise<ImageJob | null> => {
+    return collection.findOne<Document<ImageJob>>({ job_id: jobId });
+  },
+
+  update: async (id: string | ObjectId, update: Partial<ImageJob>) => {
     const _id = toObjectId(id);
-    const validated = ImageJobSchema.partial().parse(updatedPrompt);
+    const validated = ImageJobSchema.partial().parse(update);
     const result = await collection.updateOne(
       { _id },
       { $set: { ...validated } },
