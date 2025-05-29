@@ -92,6 +92,7 @@
     }
 
     error = "Image generation timed out.";
+    loading = false;
   }
 </script>
 
@@ -186,7 +187,7 @@
   <button type="submit" class="btn btn-primary mt-4">Generate Image</button>
 </form>
 
-<div class="mt-12">
+<div class="mt-12 text-center">
   {#if loading}
     <div class="mt-6 text-center">
       <p class="text-gray-600">Generating image, please wait...</p>
