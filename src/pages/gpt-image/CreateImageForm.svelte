@@ -3,9 +3,10 @@
   import { preventDefault } from "$utils/common";
 
   // Types
-  type ImageSize = "1024x1024" | "1024x1536";
-  type OutputFormat = "PNG" | "JPEG" | "WebP";
-  type BackgroundType = "transparent" | "opaque";
+  type ImageSize = "1024x1024" | "1024x1536" | "1536x1024";
+  type ImageQuality = "low" | "medium" | "high";
+  type OutputFormat = "png" | "webp" | "jpeg";
+  type BackgroundType = "transparent" | "opaque" | "auto";
 
   // Reactive form state
   let jobId = $state<string>("");
@@ -13,10 +14,10 @@
     "Generate an image of gray tabby cat hugging an otter with an orange scarf",
   );
   let imageSize = $state<ImageSize>("1024x1024");
-  let imageQuality = $state<number>(80);
-  let compressionLevel = $state<number>(75);
-  let outputFormat = $state<OutputFormat>("PNG");
-  let background = $state<BackgroundType>("transparent");
+  let imageQuality = $state<ImageQuality>("medium");
+  let compressionLevel = $state<number>(100);
+  let outputFormat = $state<OutputFormat>("png");
+  let background = $state<BackgroundType>("auto");
 
   let loading = $state(false);
   let imageUrl = $state<string | null>(null);
@@ -132,16 +133,12 @@
     <!-- Image Quality -->
     <div class="flex-1">
       <!-- svelte-ignore a11y_label_has_associated_control -->
-      <label class="label">
-        Image Quality: {imageQuality}%
-      </label>
-      <input
-        type="range"
-        min="1"
-        max="100"
-        bind:value={imageQuality}
-        class="range range-primary"
-      />
+      <label class="label"> Image Quality </label>
+      <select bind:value={imageQuality} class="select select-bordered">
+        <option value="low">Low</option>
+        <option value="medium">Medium</option>
+        <option value="high">High</option>
+      </select>
     </div>
 
     <!-- Compression Level -->
@@ -166,9 +163,9 @@
       <!-- svelte-ignore a11y_label_has_associated_control -->
       <label class="label"> Output Format </label>
       <select bind:value={outputFormat} class="select select-bordered">
-        <option value="PNG">PNG</option>
-        <option value="JPEG">JPEG</option>
-        <option value="WebP">WebP</option>
+        <option value="png">PNG</option>
+        <option value="jpeg">JPEG</option>
+        <option value="webp">WebP</option>
       </select>
     </div>
 
@@ -179,6 +176,7 @@
       <select bind:value={background} class="select select-bordered">
         <option value="transparent">Transparent</option>
         <option value="opaque">Opaque</option>
+        <option value="auto">Auto</option>
       </select>
     </div>
     <div class="flex flex-1 flex-col"></div>

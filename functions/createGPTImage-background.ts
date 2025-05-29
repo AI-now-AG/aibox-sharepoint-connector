@@ -29,8 +29,8 @@ const createGPTImage: Handler = async (
       jobId,
       prompt,
       imageSize = "1024x1024",
-      imageQuality = 80,
-      compressionLevel = 75,
+      imageQuality = "medium",
+      compressionLevel = 100,
       outputFormat = "PNG",
       background = "transparent",
     } = body;
@@ -53,7 +53,16 @@ const createGPTImage: Handler = async (
     const response = await openai.responses.create({
       model: "gpt-4.1-mini",
       input: prompt,
-      tools: [{ type: "image_generation" }],
+      tools: [
+        {
+          type: "image_generation",
+          background,
+          output_compression: compressionLevel,
+          output_format: outputFormat,
+          quality: imageQuality,
+          size: imageSize,
+        },
+      ],
     });
 
     const imageData = response.output.filter(
@@ -69,14 +78,16 @@ const createGPTImage: Handler = async (
     }
 
     const _ouputResult = imageData[0].result;
-    const _outputFormat = imageData[0]?.output_format;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const _outputFormat = (imageData[0] as any)?.output_format;
     const imageUrl = `data:image/${_outputFormat};base64,${_ouputResult}`;
 
     const updateJob: Partial<ImageJob> = {
       status: "completed",
       imageUrl,
       model: response.model,
-      size: imageData[0]?.size,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      size: (imageData[0] as any)?.size,
     };
     await ImageJobModel.update(imageJob.insertedId, updateJob);
 
