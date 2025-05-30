@@ -152,7 +152,7 @@
         min="0"
         max="100"
         bind:value={compressionLevel}
-        class="range range-secondary"
+        class="range range-primary range-xs"
       />
     </div>
   </div>
