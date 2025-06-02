@@ -1,6 +1,7 @@
 <script lang="ts">
   import { v4 as uuidv4 } from "uuid";
   import { preventDefault } from "$utils/common";
+  import Dropdown from "$components/form/Dropdown.svelte";
 
   // Types
   type ImageSize = "1024x1024" | "1024x1536" | "1536x1024";
@@ -22,6 +23,24 @@
   let loading = $state(false);
   let imageUrl = $state<string | null>(null);
   let error = $state<string | null>(null);
+
+  const sizeOptions = [
+    { value: "1024x1024", title: "1024x1024" },
+    { value: "1024x1536", title: "1024x1536" },
+    { value: "1536x1024", title: "1536x1024" },
+  ];
+
+  const qualityOptions = [
+    { value: "low", title: "Low" },
+    { value: "medium", title: "Medium" },
+    { value: "high", title: "High" },
+  ];
+
+  const outputFormatOptions = [
+    { value: "png", title: "PNG" },
+    { value: "webp", title: "WEBP" },
+    { value: "jpeg", title: "JPEG" },
+  ];
 
   async function submitForm() {
     jobId = uuidv4();
@@ -109,36 +128,31 @@
   >
     <div class="flex space-x-4">
       <!-- Output Format -->
-      <div class="flex flex-1 flex-col">
-        <!-- svelte-ignore a11y_label_has_associated_control -->
-        <label class="label"> Output Format </label>
-        <select bind:value={outputFormat} class="select select-bordered">
-          <option value="png">PNG</option>
-          <option value="jpeg">JPEG</option>
-          <option value="webp">WebP</option>
-        </select>
-      </div>
+      <Dropdown
+        classes="flex-1"
+        labelClasses="label"
+        options={outputFormatOptions}
+        bind:value={outputFormat}
+        label={"Output Format"}
+      />
 
       <!-- Image Quality -->
-      <div class="flex-1">
-        <!-- svelte-ignore a11y_label_has_associated_control -->
-        <label class="label"> Image Quality </label>
-        <select bind:value={imageQuality} class="select select-bordered">
-          <option value="low">Low</option>
-          <option value="medium">Medium</option>
-          <option value="high">High</option>
-        </select>
-      </div>
+      <Dropdown
+        classes="flex-1"
+        labelClasses="label"
+        options={qualityOptions}
+        bind:value={imageQuality}
+        label={"Image Quality"}
+      />
 
       <!-- Image Size -->
-      <div class="flex-1">
-        <!-- svelte-ignore a11y_label_has_associated_control -->
-        <label class="label">Image Size </label>
-        <select bind:value={imageSize} class="select select-bordered">
-          <option value="1024x1024">1024x1024</option>
-          <option value="1024x1536">1024x1536</option>
-        </select>
-      </div>
+      <Dropdown
+        classes="flex-1"
+        labelClasses="label"
+        options={sizeOptions}
+        bind:value={imageSize}
+        label={"Image Size"}
+      />
     </div>
 
     <div class="flex flex-row space-x-4">
