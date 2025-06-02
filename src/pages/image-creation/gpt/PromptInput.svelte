@@ -1,23 +1,15 @@
 <script lang="ts">
-  import FileUpload from "$components/FileUpload.svelte";
+  import UploadDialog from "./UploadDialog.svelte";
   import { svgIcons } from "$assets/icons";
   import { preventDefault } from "$utils/common";
 
   interface Props {
     input?: string;
-    files?: File[];
+    file?: File;
     onsend: Function;
   }
 
-  let {
-    input = $bindable(""),
-    files = $bindable([]),
-    onsend,
-  }: Props = $props();
-
-  const fileTypes = {
-    "image/*": ["image/png", "image/jpeg"],
-  };
+  let { input = $bindable(""), file = $bindable(), onsend }: Props = $props();
 
   let fileModal: HTMLDialogElement | undefined = $state();
 
@@ -51,9 +43,9 @@
         }}
       >
         {@html svgIcons.attachment}
-        {#if files.length > 0}
+        {#if file}
           <div class="badge badge-sm badge-neutral font-normal">
-            {files.length}
+            {1}
           </div>
         {/if}
       </button>
@@ -61,27 +53,20 @@
     <div class="flex self-end">
       <button
         class="btn btn-ghost btn-md disabled:bg-base-100 disabled:cursor-not-allowed"
-        disabled={!input && files.length === 0}
+        disabled={!input && file}
         onclick={preventDefault(() => {
           onsend();
         })}
         aria-label="Fetch"
       >
-        <span
-          class={`${
-            input || files.length > 0 ? "text-primary" : "text-base-300"
-          }`}>{@html svgIcons.paperPlane}</span
+        <span class={`${input || file ? "text-primary" : "text-base-300"}`}
+          >{@html svgIcons.paperPlane}</span
         >
       </button>
     </div>
   </div>
   <div>
     <input type="checkbox" class="modal-toggle" />
-    <FileUpload
-      bind:modal={fileModal}
-      title="Upload Files"
-      acceptedTypes={fileTypes}
-      bind:files
-    />
+    <UploadDialog bind:modal={fileModal} bind:file />
   </div>
 </div>

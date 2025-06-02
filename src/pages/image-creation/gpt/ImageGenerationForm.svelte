@@ -20,7 +20,7 @@
   let compressionLevel: number = $state(100);
   let outputFormat: OutputFormat = $state("png");
   let background: BackgroundType = $state("auto");
-  let files: File[] = $state([]);
+  let file: File = $state();
 
   let loading = $state(false);
   let imageUrl = $state<string | null>(null);
@@ -128,12 +128,7 @@
   <h1 class="pt-2 mb-2 lg:pt-8 text-4xl font-bold">Create GPT Image</h1>
   <p>Create images from the most popular and newest model from OpenAI</p>
 
-  <form
-    class="space-y-4 mt-10"
-    onsubmit={preventDefault(() => {
-      submitForm();
-    })}
-  >
+  <div class="space-y-4 mt-10">
     <div class="flex space-x-4">
       <!-- Output Format -->
       <Dropdown
@@ -193,9 +188,9 @@
 
     <!-- Prompt Textarea -->
     <div class="mt-8">
-      <PromptInput bind:input={prompt} bind:files onsend={submitForm} />
+      <PromptInput bind:input={prompt} bind:file onsend={submitForm} />
     </div>
-  </form>
+  </div>
 
   <div class="mt-12 text-center">
     {#if loading}

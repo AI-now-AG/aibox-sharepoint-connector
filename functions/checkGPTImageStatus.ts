@@ -1,5 +1,5 @@
 import { type Handler } from "@netlify/functions";
-import ImageJobModel from "$data/models/imageJob.model";
+import ImageTaskModel from "$data/models/imageTask.model";
 
 const checkGPTImageStatus: Handler = async (event) => {
   if (event.httpMethod !== "GET") {
@@ -12,7 +12,7 @@ const checkGPTImageStatus: Handler = async (event) => {
   const jobId = event.queryStringParameters?.jobId || "";
 
   try {
-    const job = await ImageJobModel.getByJobId(jobId);
+    const job = await ImageTaskModel.get(jobId);
     if (!job) {
       return {
         statusCode: 404,

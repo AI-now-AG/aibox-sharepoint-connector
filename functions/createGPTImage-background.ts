@@ -5,7 +5,7 @@ import {
 } from "@netlify/functions";
 import { OpenAI } from "openai";
 import { decrypt } from "$utils/secure";
-import ImageJobModel, { type ImageJob } from "$data/models/imageJob.model";
+import ImageTaskModel, { type ImageTask } from "$data/models/imageTask.model";
 
 const openAIApiKey = decrypt(process.env.OPENAI_API_KEY!);
 const openai = new OpenAI({
@@ -22,32 +22,32 @@ const createGPTImage: Handler = async (
     };
   }
 
+  const body = JSON.parse(event.body || "{}");
+
+  const {
+    jobId,
+    prompt,
+    imageSize = "1024x1024",
+    imageQuality = "medium",
+    compressionLevel = 100,
+    outputFormat = "PNG",
+    background = "transparent",
+  } = body;
+
+  if (!prompt) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: "Prompt is required" }),
+    };
+  }
+
   try {
-    const body = JSON.parse(event.body || "{}");
-
-    const {
-      jobId,
-      prompt,
-      imageSize = "1024x1024",
-      imageQuality = "medium",
-      compressionLevel = 100,
-      outputFormat = "PNG",
-      background = "transparent",
-    } = body;
-
-    if (!prompt) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: "Prompt is required" }),
-      };
-    }
-
-    const jobData: Partial<ImageJob> = {
-      job_id: jobId,
+    const document: Partial<ImageTask> = {
+      id: jobId,
       prompt,
       status: "pending",
     };
-    const imageJob = await ImageJobModel.create(jobData);
+    await ImageTaskModel.create(document);
 
     // Call OpenAI image generation endpoint
     const response = await openai.responses.create({
@@ -82,15 +82,17 @@ const createGPTImage: Handler = async (
     const _outputFormat = (imageData[0] as any)?.output_format;
     const imageUrl = `data:image/${_outputFormat};base64,${_ouputResult}`;
 
-    const updateJob: Partial<ImageJob> = {
+    const update: Partial<ImageTask> = {
       status: "completed",
       imageUrl,
       model: response.model,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       size: (imageData[0] as any)?.size,
+      response_id: response.id,
     };
-    await ImageJobModel.update(imageJob.insertedId, updateJob);
+    await ImageTaskModel.update(jobId, update);
 
+    console.log("GPT image response", response);
     return {
       statusCode: 200,
       body: JSON.stringify({
@@ -100,6 +102,17 @@ const createGPTImage: Handler = async (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error("Image generation error:", error);
+
+    const { code, message = "" } = error;
+    const update: Partial<ImageTask> = {
+      status: "failed",
+      error: {
+        code,
+        message,
+      },
+    };
+    await ImageTaskModel.update(jobId, update);
+
     return {
       statusCode: 500,
       body: JSON.stringify({
