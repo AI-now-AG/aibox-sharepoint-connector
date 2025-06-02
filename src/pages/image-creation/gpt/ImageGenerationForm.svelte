@@ -15,12 +15,16 @@
   let prompt: string = $state(
     "Generate an image of gray tabby cat hugging an otter with an orange scarf",
   );
-  let imageSize: ImageSize = $state("1024x1024");
+
   let imageQuality: ImageQuality = $state("medium");
-  let compressionLevel: number = $state(100);
+  let imageSize: ImageSize = $state("1024x1024");
   let outputFormat: OutputFormat = $state("png");
   let background: BackgroundType = $state("auto");
-  let file: File = $state();
+  let outputCompression: number = $state(100);
+  let fileToEdit: File = $state();
+
+  let isBackgroundDisabled: boolean = $state(false);
+  let isCompressionDisabled: boolean = $state(false);
 
   let loading: boolean = $state(false);
   let imageUrl: string | null = $state(null);
@@ -51,13 +55,19 @@
     { value: "auto", title: "Auto" },
   ];
 
+  $effect(() => {
+    isBackgroundDisabled = outputFormat == "jpeg";
+    isCompressionDisabled = outputFormat == "png";
+  });
+  $inspect(outputFormat);
+
   async function submitForm() {
     uniqueId = uuidv4();
     const payload = {
       prompt,
       imageSize,
       imageQuality,
-      compressionLevel,
+      outputCompression,
       outputFormat,
       background,
     };
@@ -72,7 +82,7 @@
       prompt,
       imageSize,
       imageQuality,
-      compressionLevel,
+      outputCompression,
       outputFormat,
       background,
       previousResponseId,
@@ -170,20 +180,22 @@
           options={backgroundOptions}
           bind:value={background}
           label={"Background"}
+          disabled={isBackgroundDisabled}
         />
       </div>
       <!-- Compression Level -->
       <div class="flex-1">
         <!-- svelte-ignore a11y_label_has_associated_control -->
         <label class="label">
-          Compression Level: {compressionLevel}%
+          Compression Level: {outputCompression}%
         </label>
         <input
           type="range"
           min="0"
           max="100"
-          bind:value={compressionLevel}
+          bind:value={outputCompression}
           class="range range-primary range-xs mt-4"
+          disabled={isCompressionDisabled}
         />
       </div>
       <div class="flex flex-1 flex-col"></div>
@@ -191,7 +203,11 @@
 
     <!-- Prompt Textarea -->
     <div class="mt-8">
-      <PromptInput bind:input={prompt} bind:file onsend={submitForm} />
+      <PromptInput
+        bind:input={prompt}
+        bind:file={fileToEdit}
+        onsend={submitForm}
+      />
     </div>
   </div>
 
