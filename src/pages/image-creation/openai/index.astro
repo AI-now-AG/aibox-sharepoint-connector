@@ -1,6 +1,6 @@
 ---
 import Layout from "$layouts/Layout.astro";
-import CreateImageForm from "./CreateImageForm.svelte";
+import ImageGenerationForm from "./ImageGenerationForm.svelte";
 import auth from "$auth/auth";
 import { ApiKeyProvider, TenantFeature } from "$types/TenantFeature";
 
@@ -20,5 +20,5 @@ if (
 ---
 
 <Layout>
-  <CreateImageForm tenantId={tenantId} {hasPermission} client:load />
+  <ImageGenerationForm tenantId={tenantId} {hasPermission} client:load />
 </Layout>

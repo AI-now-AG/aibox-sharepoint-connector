@@ -2,6 +2,7 @@
   import { v4 as uuidv4 } from "uuid";
   import { preventDefault } from "$utils/common";
   import Dropdown from "$components/form/Dropdown.svelte";
+  import PromptInput from "./PromptInput.svelte";
 
   // Types
   type ImageSize = "1024x1024" | "1024x1536" | "1536x1024";
@@ -10,15 +11,16 @@
   type BackgroundType = "transparent" | "opaque" | "auto";
 
   // Reactive form state
-  let jobId = $state<string>("");
-  let prompt = $state<string>(
+  let jobId: string = $state("");
+  let prompt: string = $state(
     "Generate an image of gray tabby cat hugging an otter with an orange scarf",
   );
-  let imageSize = $state<ImageSize>("1024x1024");
-  let imageQuality = $state<ImageQuality>("medium");
-  let compressionLevel = $state<number>(100);
-  let outputFormat = $state<OutputFormat>("png");
-  let background = $state<BackgroundType>("auto");
+  let imageSize: ImageSize = $state("1024x1024");
+  let imageQuality: ImageQuality = $state("medium");
+  let compressionLevel: number = $state(100);
+  let outputFormat: OutputFormat = $state("png");
+  let background: BackgroundType = $state("auto");
+  let files: File[] = $state([]);
 
   let loading = $state(false);
   let imageUrl = $state<string | null>(null);
@@ -26,8 +28,8 @@
 
   const sizeOptions = [
     { value: "1024x1024", title: "1024x1024" },
-    { value: "1024x1536", title: "1024x1536" },
-    { value: "1536x1024", title: "1536x1024" },
+    { value: "1024x1536", title: "1024x1536 (landscape)" },
+    { value: "1536x1024", title: "1536x1024 (portrait)" },
   ];
 
   const qualityOptions = [
@@ -40,6 +42,12 @@
     { value: "png", title: "PNG" },
     { value: "webp", title: "WEBP" },
     { value: "jpeg", title: "JPEG" },
+  ];
+
+  const backgroundOptions = [
+    { value: "transparent", title: "Transparent" },
+    { value: "opaque", title: "Opaque" },
+    { value: "auto", title: "Auto" },
   ];
 
   async function submitForm() {
@@ -158,16 +166,16 @@
     <div class="flex flex-row space-x-4">
       <!-- Background -->
       <div class="flex flex-1 flex-col">
-        <!-- svelte-ignore a11y_label_has_associated_control -->
-        <label class="label">Background</label>
-        <select bind:value={background} class="select select-bordered">
-          <option value="transparent">Transparent</option>
-          <option value="opaque">Opaque</option>
-          <option value="auto">Auto</option>
-        </select>
+        <Dropdown
+          classes="flex-1"
+          labelClasses="label"
+          options={backgroundOptions}
+          bind:value={background}
+          label={"Background"}
+        />
       </div>
       <!-- Compression Level -->
-      <div class="form-control">
+      <div class="flex-1">
         <!-- svelte-ignore a11y_label_has_associated_control -->
         <label class="label">
           Compression Level: {compressionLevel}%
@@ -177,27 +185,16 @@
           min="0"
           max="100"
           bind:value={compressionLevel}
-          class="range range-primary range-xs mt-3"
+          class="range range-primary range-xs mt-4"
         />
       </div>
       <div class="flex flex-1 flex-col"></div>
     </div>
 
-    <div class="flex space-x-4">
-      <!-- Prompt Textarea -->
-      <!-- svelte-ignore a11y_label_has_associated_control -->
-      <div class="flex-1">
-        <label class="label block">Prompt</label>
-        <textarea
-          bind:value={prompt}
-          class="textarea textarea-bordered w-full"
-          placeholder="Describe the image you want to generate"
-          rows="4"
-        ></textarea>
-      </div>
+    <!-- Prompt Textarea -->
+    <div class="mt-8">
+      <PromptInput bind:input={prompt} bind:files onsend={submitForm} />
     </div>
-
-    <button type="submit" class="btn btn-primary mt-4">Generate Image</button>
   </form>
 
   <div class="mt-12 text-center">
