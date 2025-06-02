@@ -97,118 +97,119 @@
   }
 </script>
 
-<form
-  class="space-y-4 p-6"
-  onsubmit={preventDefault(() => {
-    submitForm();
-  })}
->
-  <h1 class="text-4xl font-bold">Create GPT Image</h1>
+<div class="container max-w-6xl mx-auto grid grid-cols-1 px-14">
+  <h1 class="pt-2 mb-2 lg:pt-8 text-4xl font-bold">Create GPT Image</h1>
   <p>Create images from the most popular and newest model from OpenAI</p>
 
-  <div class="flex space-x-4">
-    <!-- Prompt Textarea -->
-    <!-- svelte-ignore a11y_label_has_associated_control -->
-    <div class="flex-1">
-      <label class="label block">Prompt</label>
-      <textarea
-        bind:value={prompt}
-        class="textarea textarea-bordered w-full"
-        placeholder="Describe the image you want to generate"
-        rows="4"
-      ></textarea>
+  <form
+    class="space-y-4 mt-10"
+    onsubmit={preventDefault(() => {
+      submitForm();
+    })}
+  >
+    <div class="flex space-x-4">
+      <!-- Output Format -->
+      <div class="flex flex-1 flex-col">
+        <!-- svelte-ignore a11y_label_has_associated_control -->
+        <label class="label"> Output Format </label>
+        <select bind:value={outputFormat} class="select select-bordered">
+          <option value="png">PNG</option>
+          <option value="jpeg">JPEG</option>
+          <option value="webp">WebP</option>
+        </select>
+      </div>
+
+      <!-- Image Quality -->
+      <div class="flex-1">
+        <!-- svelte-ignore a11y_label_has_associated_control -->
+        <label class="label"> Image Quality </label>
+        <select bind:value={imageQuality} class="select select-bordered">
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+        </select>
+      </div>
+
+      <!-- Image Size -->
+      <div class="flex-1">
+        <!-- svelte-ignore a11y_label_has_associated_control -->
+        <label class="label">Image Size </label>
+        <select bind:value={imageSize} class="select select-bordered">
+          <option value="1024x1024">1024x1024</option>
+          <option value="1024x1536">1024x1536</option>
+        </select>
+      </div>
     </div>
+
+    <div class="flex flex-row space-x-4">
+      <!-- Background -->
+      <div class="flex flex-1 flex-col">
+        <!-- svelte-ignore a11y_label_has_associated_control -->
+        <label class="label">Background</label>
+        <select bind:value={background} class="select select-bordered">
+          <option value="transparent">Transparent</option>
+          <option value="opaque">Opaque</option>
+          <option value="auto">Auto</option>
+        </select>
+      </div>
+      <!-- Compression Level -->
+      <div class="form-control">
+        <!-- svelte-ignore a11y_label_has_associated_control -->
+        <label class="label">
+          Compression Level: {compressionLevel}%
+        </label>
+        <input
+          type="range"
+          min="0"
+          max="100"
+          bind:value={compressionLevel}
+          class="range range-primary range-xs mt-3"
+        />
+      </div>
+      <div class="flex flex-1 flex-col"></div>
+    </div>
+
+    <div class="flex space-x-4">
+      <!-- Prompt Textarea -->
+      <!-- svelte-ignore a11y_label_has_associated_control -->
+      <div class="flex-1">
+        <label class="label block">Prompt</label>
+        <textarea
+          bind:value={prompt}
+          class="textarea textarea-bordered w-full"
+          placeholder="Describe the image you want to generate"
+          rows="4"
+        ></textarea>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-4">Generate Image</button>
+  </form>
+
+  <div class="mt-12 text-center">
+    {#if loading}
+      <div class="mt-6 text-center">
+        <p class="text-gray-600">Generating image, please wait...</p>
+        <span class="loading loading-spinner loading-lg mt-2"></span>
+      </div>
+    {/if}
+
+    {#if error}
+      <div class="mt-6 text-red-500 font-semibold">
+        {error}
+      </div>
+    {/if}
+
+    {#if imageUrl}
+      <div class="mt-6">
+        <h3 class="text-lg font-bold mb-2">Generated Image:</h3>
+        <!-- svelte-ignore a11y_img_redundant_alt -->
+        <img
+          src={imageUrl}
+          alt="Generated image"
+          class="rounded-lg shadow-lg max-w-full"
+        />
+      </div>
+    {/if}
   </div>
-
-  <div class="flex space-x-4">
-    <!-- Image Size -->
-    <div class="flex-1">
-      <!-- svelte-ignore a11y_label_has_associated_control -->
-      <label class="label">Image Size </label>
-      <select bind:value={imageSize} class="select select-bordered">
-        <option value="1024x1024">1024x1024</option>
-        <option value="1024x1536">1024x1536</option>
-      </select>
-    </div>
-
-    <!-- Image Quality -->
-    <div class="flex-1">
-      <!-- svelte-ignore a11y_label_has_associated_control -->
-      <label class="label"> Image Quality </label>
-      <select bind:value={imageQuality} class="select select-bordered">
-        <option value="low">Low</option>
-        <option value="medium">Medium</option>
-        <option value="high">High</option>
-      </select>
-    </div>
-
-    <!-- Compression Level -->
-    <div class="form-control">
-      <!-- svelte-ignore a11y_label_has_associated_control -->
-      <label class="label">
-        Compression Level: {compressionLevel}%
-      </label>
-      <input
-        type="range"
-        min="0"
-        max="100"
-        bind:value={compressionLevel}
-        class="range range-primary range-xs"
-      />
-    </div>
-  </div>
-
-  <div class="flex flex-row space-x-4">
-    <!-- Output Format -->
-    <div class="flex flex-1 flex-col">
-      <!-- svelte-ignore a11y_label_has_associated_control -->
-      <label class="label"> Output Format </label>
-      <select bind:value={outputFormat} class="select select-bordered">
-        <option value="png">PNG</option>
-        <option value="jpeg">JPEG</option>
-        <option value="webp">WebP</option>
-      </select>
-    </div>
-
-    <!-- Background -->
-    <div class="flex flex-1 flex-col">
-      <!-- svelte-ignore a11y_label_has_associated_control -->
-      <label class="label">Background</label>
-      <select bind:value={background} class="select select-bordered">
-        <option value="transparent">Transparent</option>
-        <option value="opaque">Opaque</option>
-        <option value="auto">Auto</option>
-      </select>
-    </div>
-    <div class="flex flex-1 flex-col"></div>
-  </div>
-
-  <button type="submit" class="btn btn-primary mt-4">Generate Image</button>
-</form>
-
-<div class="mt-12 text-center">
-  {#if loading}
-    <div class="mt-6 text-center">
-      <p class="text-gray-600">Generating image, please wait...</p>
-      <span class="loading loading-spinner loading-lg mt-2"></span>
-    </div>
-  {/if}
-
-  {#if error}
-    <div class="mt-6 text-red-500 font-semibold">
-      {error}
-    </div>
-  {/if}
-
-  {#if imageUrl}
-    <div class="mt-6">
-      <h3 class="text-lg font-bold mb-2">Generated Image:</h3>
-      <!-- svelte-ignore a11y_img_redundant_alt -->
-      <img
-        src={imageUrl}
-        alt="Generated image"
-        class="rounded-lg shadow-lg max-w-full"
-      />
-    </div>
-  {/if}
 </div>
