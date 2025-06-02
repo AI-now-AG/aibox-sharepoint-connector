@@ -12,7 +12,7 @@ const openai = new OpenAI({
   apiKey: openAIApiKey,
 });
 
-const createGPTImage: Handler = async (
+const gptImageGenerate: Handler = async (
   event: HandlerEvent,
 ): Promise<HandlerResponse> => {
   if (event.httpMethod !== "POST") {
@@ -25,13 +25,14 @@ const createGPTImage: Handler = async (
   const body = JSON.parse(event.body || "{}");
 
   const {
-    jobId,
+    uniqueId,
     prompt,
     imageSize = "1024x1024",
     imageQuality = "medium",
     compressionLevel = 100,
     outputFormat = "PNG",
     background = "transparent",
+    previousResponseId = "",
   } = body;
 
   if (!prompt) {
@@ -43,7 +44,7 @@ const createGPTImage: Handler = async (
 
   try {
     const document: Partial<ImageTask> = {
-      id: jobId,
+      id: uniqueId,
       prompt,
       status: "pending",
     };
@@ -63,6 +64,9 @@ const createGPTImage: Handler = async (
           size: imageSize,
         },
       ],
+      ...(previousResponseId
+        ? { previous_response_id: previousResponseId }
+        : {}),
     });
 
     const imageData = response.output.filter(
@@ -84,13 +88,13 @@ const createGPTImage: Handler = async (
 
     const update: Partial<ImageTask> = {
       status: "completed",
-      imageUrl,
+      image_url: imageUrl,
       model: response.model,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       size: (imageData[0] as any)?.size,
       response_id: response.id,
     };
-    await ImageTaskModel.update(jobId, update);
+    await ImageTaskModel.update(uniqueId, update);
 
     console.log("GPT image response", response);
     return {
@@ -105,13 +109,13 @@ const createGPTImage: Handler = async (
 
     const { code, message = "" } = error;
     const update: Partial<ImageTask> = {
-      status: "failed",
+      status: "error",
       error: {
         code,
         message,
       },
     };
-    await ImageTaskModel.update(jobId, update);
+    await ImageTaskModel.update(uniqueId, update);
 
     return {
       statusCode: 500,
@@ -122,4 +126,4 @@ const createGPTImage: Handler = async (
   }
 };
 
-export { createGPTImage as handler };
+export { gptImageGenerate as handler };

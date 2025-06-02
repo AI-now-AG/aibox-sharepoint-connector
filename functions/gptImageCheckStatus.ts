@@ -1,7 +1,7 @@
 import { type Handler } from "@netlify/functions";
 import ImageTaskModel from "$data/models/imageTask.model";
 
-const checkGPTImageStatus: Handler = async (event) => {
+const gptImageCheckStatus: Handler = async (event) => {
   if (event.httpMethod !== "GET") {
     return {
       statusCode: 405,
@@ -9,11 +9,11 @@ const checkGPTImageStatus: Handler = async (event) => {
     };
   }
 
-  const jobId = event.queryStringParameters?.jobId || "";
+  const uniqueId = event.queryStringParameters?.uid || "";
 
   try {
-    const job = await ImageTaskModel.get(jobId);
-    if (!job) {
+    const task = await ImageTaskModel.get(uniqueId);
+    if (!task) {
       return {
         statusCode: 404,
         body: JSON.stringify({
@@ -22,9 +22,11 @@ const checkGPTImageStatus: Handler = async (event) => {
       };
     }
 
+    const { status, image_url: imageUrl, response_id: responseId } = task;
+
     return {
       statusCode: 200,
-      body: JSON.stringify({ status: job.status, imageUrl: job.imageUrl }),
+      body: JSON.stringify({ status, imageUrl, responseId }),
     };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
@@ -38,4 +40,4 @@ const checkGPTImageStatus: Handler = async (event) => {
   }
 };
 
-export { checkGPTImageStatus as handler };
+export { gptImageCheckStatus as handler };

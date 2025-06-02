@@ -11,7 +11,7 @@
   type BackgroundType = "transparent" | "opaque" | "auto";
 
   // Reactive form state
-  let jobId: string = $state("");
+  let uniqueId: string = $state("");
   let prompt: string = $state(
     "Generate an image of gray tabby cat hugging an otter with an orange scarf",
   );
@@ -22,9 +22,10 @@
   let background: BackgroundType = $state("auto");
   let file: File = $state();
 
-  let loading = $state(false);
-  let imageUrl = $state<string | null>(null);
-  let error = $state<string | null>(null);
+  let loading: boolean = $state(false);
+  let imageUrl: string | null = $state(null);
+  let error: string | null = $state(null);
+  let previousResponseId: string | null = $state(null);
 
   const sizeOptions = [
     { value: "1024x1024", title: "1024x1024" },
@@ -51,7 +52,7 @@
   ];
 
   async function submitForm() {
-    jobId = uuidv4();
+    uniqueId = uuidv4();
     const payload = {
       prompt,
       imageSize,
@@ -67,16 +68,17 @@
     console.log("Submitting payload:", payload);
 
     const params = {
-      jobId,
+      uniqueId,
       prompt,
       imageSize,
       imageQuality,
       compressionLevel,
       outputFormat,
       background,
+      previousResponseId,
     };
     const response = await fetch(
-      "/.netlify/functions/createGPTImage-background",
+      "/.netlify/functions/gptImageGenerate-background",
       {
         method: "POST",
         headers: {
@@ -92,26 +94,27 @@
       return;
     }
 
-    await pollImageStatus(jobId);
+    await pollImageStatus(uniqueId);
   }
 
   async function pollImageStatus(
-    jobId: string,
+    uniqueId: string,
     maxRetries = 30,
     delayMs = 2000,
   ) {
     for (let attempt = 0; attempt < maxRetries; attempt++) {
       const res = await fetch(
-        `/.netlify/functions/checkGPTImageStatus?jobId=${jobId}`,
+        `/.netlify/functions/gptImageCheckStatus?uid=${uniqueId}`,
       );
       const data = await res.json();
 
       if (data.status === "completed") {
         imageUrl = data.imageUrl;
+        previousResponseId = data.responseId;
         loading = false;
         return;
       } else if (data.status === "error") {
-        error = "Image generation failed.";
+        error = data.error?.message || "Image generation failed.";
         loading = false;
         return;
       }

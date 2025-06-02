@@ -13,7 +13,7 @@ const ImageTaskSchema = z.object({
   creator_id: z.instanceof(ObjectId).optional(),
   prompt: z.string().min(1),
   status: z.string(),
-  imageUrl: z.string().nullish().default(null),
+  image_url: z.string().nullish().default(null),
   model: z.string().nullish().default(null),
   size: z.string().nullish().default(null),
   response_id: z.string().nullish().default(null),
