@@ -112,7 +112,7 @@ if (
 ) {
   createImageItems.push({
     title: t("nav.create-image.dall-e"),
-    path: "/create-image/openai",
+    path: "/image-creation/openai",
   });
 }
 if (
@@ -124,9 +124,15 @@ if (
 ) {
   createImageItems.push({
     title: t("nav.create-image.flux"),
-    path: "/create-image/flux",
+    path: "/image-creation/flux",
   });
 }
+
+// test
+createImageItems.push({
+  title: t("nav.create-image.gpt"),
+  path: "/image-creation/gpt",
+});
 
 if (createImageItems.length > 0) {
   createImageMenus.push({

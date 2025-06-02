@@ -82,7 +82,7 @@
   "prompt-execution.historyRemove.info": "Beim Verlassen dieser Seite, gehen alle bisher erstellten Daten verloren.",
   "prompt-execution.upload-file.drag": "Datei per Drag & Drop verschieben oder <span style=\"color: #491EFF;\">Datei auswählen</span>",
   "prompt-execution.upload-file.supportted-files": "PDF, JSON, TXT, PNG, SVG, JPEG",
-  "prompt-execution.upload-file.maximum-size": "Maximale Dateigrösse: 5 MB",
+  "prompt-execution.upload-file.maximum-size": "Maximale Dateigrösse: 25 MB",
   "prompt-emptyscreen.description": "Starten Sie mit vordefinierten Use Case unten.",
   "prompt-emptyscreen.nousecase": "Keine Prompts vorhanden",
   "prompt-emptyscreen.create.usecaseLbl": "Beginnen Sie mit der Erstellung eines neuen Prompts für diesen Anwendungsfall",
@@ -158,7 +158,6 @@
   "transcription.dowload-srt-file.ass": "ASS-Datei herunterladen",
   "transcription.file-validation.unsupported-type": "Dieses Format wird nicht unterstützt.",
   "transcription.file-validation.exceed-size-limit": "Datei darf nicht grösser sein als 25 MB, bitte Dateigrösse reduzieren und neu hochladen",
-  "transcription.file-validation.exceed-5mb-size-limit": "Datei darf nicht grösser sein als 5 MB, bitte Dateigrösse reduzieren und neu hochladen",
   "transcription.transcription-is-ready": "Deine Transkription ist fertig. Tippe, um sie zu sehen.",
   "transcription.file-uploaded-success": "Datei hochgeladen und Transkription erfolgreich gestartet.",
   "transciption.transcription.failed": "Transkription fehlgeschlagen",
@@ -453,5 +452,6 @@
   "subscription.country": "Land",
   "subscription.biliing-details": "Rechnungsdetails",
   "error.account-blocked-title": "Konto gesperrt",
-  "error.account-blocked-description": "Ihr Konto wurde von Ihrer Organisation gesperrt oder Ihr Testzeitraum ist abgelaufen.\nWenn Sie Ihr Konto reaktivieren möchten, kontaktieren Sie uns bitte unter <a class=\"underline underline-offset-2\" href=\"mailto:support@aibox-app.ch\">support@aibox-app.ch</a>."
+  "error.account-blocked-description": "Ihr Konto wurde von Ihrer Organisation gesperrt oder Ihr Testzeitraum ist abgelaufen.\nWenn Sie Ihr Konto reaktivieren möchten, kontaktieren Sie uns bitte unter <a class=\"underline underline-offset-2\" href=\"mailto:support@aibox-app.ch\">support@aibox-app.ch</a>.",
+  "nav.create-image.gpt": "GPT"
 }

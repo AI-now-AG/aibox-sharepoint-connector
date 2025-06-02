@@ -103,7 +103,8 @@
     submitForm();
   })}
 >
-  <h2 class="text-xl font-bold">Create GPT Image</h2>
+  <h1 class="text-4xl font-bold">Create GPT Image</h1>
+  <p>Create images from the most popular and newest model from OpenAI</p>
 
   <div class="flex space-x-4">
     <!-- Prompt Textarea -->

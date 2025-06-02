@@ -82,7 +82,7 @@
   "prompt-execution.historyRemove.info": "When you leave this page, all data you have created so far will be lost.",
   "prompt-execution.upload-file.drag": "Drag & Drop or <span style=\"color: #491EFF;\">Choose file</span>",
   "prompt-execution.upload-file.supportted-files": "PDF, JSON, TXT, PNG, SVG, JPEG",
-  "prompt-execution.upload-file.maximum-size": "max. file size: 5 MB",
+  "prompt-execution.upload-file.maximum-size": "max. file size: 25 MB",
   "prompt-emptyscreen.description": "Get started with predefined use cases below.",
   "prompt-emptyscreen.nousecase": "No prompts available",
   "prompt-emptyscreen.create.usecaseLbl": "Get started by creating a new prompt for this use case",
@@ -158,7 +158,6 @@
   "transcription.dowload-srt-file.ass": "download ass file",
   "transcription.file-validation.unsupported-type": "Unsupported file format",
   "transcription.file-validation.exceed-size-limit": "File size exceeds the 25 MB limit. Please upload a file smaller than 25 MB",
-  "transcription.file-validation.exceed-5mb-size-limit": "File size exceeds the 5 MB limit. Please upload a file smaller than 5 MB",
   "transcription.transcription-is-ready": "Your transcription is ready. Tap to see.",
   "transcription.file-uploaded-success": "File uploaded and transcription started successfully.",
   "transciption.transcription.failed": "Transcription failed",
@@ -453,5 +452,6 @@
   "subscription.country": "Country",
   "subscription.biliing-details": "Billing details",
   "error.account-blocked-title": "Account is blocked",
-  "error.account-blocked-description": "Your account has been blocked by your organization or because your trial period has ended.\nIf you’d like to reactivate your account, please contact us at <a class=\"underline underline-offset-2\" href=\"mailto:support@aibox-app.ch\">support@aibox-app.ch</a>."
+  "error.account-blocked-description": "Your account has been blocked by your organization or because your trial period has ended.\nIf you’d like to reactivate your account, please contact us at <a class=\"underline underline-offset-2\" href=\"mailto:support@aibox-app.ch\">support@aibox-app.ch</a>.",
+  "nav.create-image.gpt": "GPT"
 }
