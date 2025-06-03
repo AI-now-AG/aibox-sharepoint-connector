@@ -1,11 +1,12 @@
 <script lang="ts">
   import { fade } from "svelte/transition";
   import { MessageRole, type MessageHistory } from "$types/MessageHistory";
+  import ImageCard from "./ImageCard.svelte";
   import { user } from "$stores";
   import { svgIcons } from "$assets/icons";
 
   interface Props {
-    messages: MessageHistory[];
+    messages: MessageHistory;
     isProcessing: boolean;
   }
 
@@ -71,18 +72,13 @@
 
                   {#if role === MessageRole.Assistant && imageUrl}
                     <!-- svelte-ignore a11y_img_redundant_alt -->
-                    <img
-                      src={imageUrl}
-                      alt="Generated image"
-                      class="rounded-lg shadow-lg max-w-md"
-                    />
+                    <ImageCard url={imageUrl} alt={content} />
                   {/if}
                 {/each}
               </div>
 
               {#if isProcessing}
                 <div class="card mt-2 gap-4" transition:fade>
-                  <!-- Latest Output -->
                   <div
                     class="chat-bubble bg-base-100 text-base-content flex flex-row"
                   >
