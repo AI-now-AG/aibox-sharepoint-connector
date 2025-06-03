@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { slide } from "svelte/transition";
   import { v4 as uuidv4 } from "uuid";
   import { Status } from "$types/ImageTask";
   import { MessageRole, type MessageHistory } from "$types/MessageHistory";
@@ -229,6 +230,7 @@
     <!-- Prompt Textarea -->
     <div
       class={`mt-8  ${messages.length > 0 ? "sticky bottom-0 bg-base-200" : ""}`}
+      transition:slide={{ duration: 500 }}
     >
       <PromptInput
         bind:input={prompt}
