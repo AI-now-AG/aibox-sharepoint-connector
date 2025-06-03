@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { onMount, onDestroy } from "svelte";
+  import { onDestroy } from "svelte";
   import { slide } from "svelte/transition";
   import { MessageRole } from "$types/MessageHistory";
   import { sharedMessageHistory } from "$components/prompt-interface/components/Stores";
+  import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
   import ChatInput from "./ChatInput.svelte";
   import ChatResults from "./ChatResults.svelte";
-  import { svgIcons } from "$assets/icons";
   import { ApiKeyProvider } from "$types/TenantFeature";
   import {
     formatMarkdown,
@@ -28,7 +28,6 @@
   let output = $state("");
   let files: File[] = $state([]);
   let isProcessing = $state(false);
-  let showButton = $state(false);
   let isDisableSelectModel = $state(false);
 
   $effect(() => {
@@ -53,27 +52,6 @@
       isDisableFileInput = false;
     }
   });
-
-  onMount(() => {
-    const handleScroll = () => {
-      const { scrollHeight, scrollTop, clientHeight } =
-        document.documentElement;
-
-      if (Math.abs(scrollHeight - clientHeight - scrollTop) > 100) {
-        if (!showButton) showButton = true;
-      } else {
-        if (showButton) showButton = false;
-      }
-    };
-    window.addEventListener("scroll", handleScroll);
-  });
-
-  const scrollToBottom = async () => {
-    window.scroll({
-      top: document.documentElement.scrollHeight,
-      behavior: "smooth",
-    });
-  };
 
   const scrollToTop = async () => {
     window.scrollTo({
@@ -239,7 +217,7 @@
       </div>
     </div>
 
-    <ChatResults bind:output bind:isProcessing/>
+    <ChatResults bind:output bind:isProcessing />
 
     {#if $sharedMessageHistory.length > 0}
       <div
@@ -257,18 +235,7 @@
             {t("home.new-chat")}
           </button>
         </div>
-        {#if showButton}
-          <div class="relative w-full flex justify-center">
-            <button
-              class="absolute shadow-lg hover:shadow-2xl self-center bottom-2 btn btn-sm btn-circle"
-              onclick={() => {
-                scrollToBottom();
-              }}
-            >
-              {@html svgIcons.downIcon}
-            </button>
-          </div>
-        {/if}
+        <ScrollToBottom />
         <div
           class="min-w-full form-wrapper"
           in:slide={{ duration: 500, delay: 500 }}

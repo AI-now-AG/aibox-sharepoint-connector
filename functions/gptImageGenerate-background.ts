@@ -85,22 +85,22 @@ const gptImageGenerate: Handler = async (
     const messageData = response.output.filter(
       (output) => output.type === "message",
     );
-    if (imageData.length == 0) {
-      return {
-        statusCode: 500,
-        body: JSON.stringify({
-          error: "Internal Server Error",
-        }),
-      };
+
+    let imageUrl = "";
+    let outputText = "";
+
+    if (imageData.length) {
+      const result = imageData[0].result;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const format = (imageData[0] as any)?.output_format;
+      imageUrl = `data:image/${format};base64,${result}`;
     }
 
-    const _outputResult = imageData[0].result;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const _outputFormat = (imageData[0] as any)?.output_format;
-    const imageUrl = `data:image/${_outputFormat};base64,${_outputResult}`;
-    const outputText =
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (messageData[0]?.content?.[0] as any)?.text || response.output_text;
+    if (messageData.length) {
+      outputText =
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (messageData[0]?.content?.[0] as any)?.text || response.output_text;
+    }
 
     const update: Partial<ImageTask> = {
       status: Status.Completed,

@@ -3,6 +3,7 @@
   import { v4 as uuidv4 } from "uuid";
   import { Status } from "$types/ImageTask";
   import { MessageRole, type MessageHistory } from "$types/MessageHistory";
+  import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
   import Dropdown from "$components/form/Dropdown.svelte";
   import PromptInput from "./PromptInput.svelte";
   import Output from "./Output.svelte";
@@ -232,6 +233,10 @@
       class={`mt-8  ${messages.length > 0 ? "sticky bottom-0 bg-base-200" : ""}`}
       transition:slide={{ duration: 500 }}
     >
+      {#if messages.length > 0}
+        <ScrollToBottom />
+      {/if}
+
       <PromptInput
         bind:input={prompt}
         bind:file={fileToEdit}

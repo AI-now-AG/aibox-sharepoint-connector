@@ -3,6 +3,7 @@
   import { svgIcons } from "$assets/icons";
   import { preventDefault } from "$utils/common";
   import { useTranslations } from "$i18n/utils";
+  import Loading from "$components/Loading.svelte";
 
   interface Props {
     input?: string;
@@ -66,11 +67,9 @@
     <div class="flex self-end">
       <button
         class="btn btn-ghost btn-md disabled:bg-base-100 disabled:cursor-not-allowed"
-        disabled={!input && file}
-        onclick={preventDefault(() => {
-          onsend();
-        })}
-        aria-label="Fetch"
+        disabled={!input}
+        onclick={preventDefault(onsend)}
+        aria-label="Send"
       >
         <span class={`${input || file ? "text-primary" : "text-base-300"}`}
           >{@html svgIcons.paperPlane}</span
