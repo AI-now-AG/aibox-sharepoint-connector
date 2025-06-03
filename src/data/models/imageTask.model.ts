@@ -13,9 +13,8 @@ const ImageTaskSchema = z.object({
   creator_id: z.instanceof(ObjectId).optional(),
   prompt: z.string().min(1),
   status: z.string(),
+  output_text: z.string().nullish().default(null),
   image_url: z.string().nullish().default(null),
-  model: z.string().nullish().default(null),
-  size: z.string().nullish().default(null),
   response_id: z.string().nullish().default(null),
   error: ErrorSchema.optional(),
   created_at: z
@@ -26,6 +25,14 @@ const ImageTaskSchema = z.object({
     .date()
     .optional()
     .default(() => new Date()),
+  expires_at: z
+    .date()
+    .optional()
+    .default(() => {
+      const d = new Date();
+      d.setHours(d.getHours() + 1);
+      return d;
+    }),
 });
 
 export type ImageTask = z.infer<typeof ImageTaskSchema>;

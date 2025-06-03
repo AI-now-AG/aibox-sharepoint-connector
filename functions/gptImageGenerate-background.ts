@@ -88,10 +88,8 @@ const gptImageGenerate: Handler = async (
 
     const update: Partial<ImageTask> = {
       status: "completed",
+      output_text: response.output_text,
       image_url: imageUrl,
-      model: response.model,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      size: (imageData[0] as any)?.size,
       response_id: response.id,
     };
     await ImageTaskModel.update(uniqueId, update);

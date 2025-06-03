@@ -1,8 +1,9 @@
 <script lang="ts">
   import { v4 as uuidv4 } from "uuid";
-  import { preventDefault } from "$utils/common";
+  import { MessageRole, type MessageHistory } from "$types/MessageHistory";
   import Dropdown from "$components/form/Dropdown.svelte";
   import PromptInput from "./PromptInput.svelte";
+  import Output from "./Output.svelte";
 
   // Types
   type ImageSize = "1024x1024" | "1024x1536" | "1536x1024";
@@ -26,8 +27,8 @@
   let isBackgroundDisabled: boolean = $state(false);
   let isCompressionDisabled: boolean = $state(false);
 
+  let messages: MessageHistory = $state([]);
   let loading: boolean = $state(false);
-  let imageUrl: string | null = $state(null);
   let error: string | null = $state(null);
   let previousResponseId: string | null = $state(null);
 
@@ -60,6 +61,7 @@
     isCompressionDisabled = outputFormat == "png";
   });
   $inspect(outputFormat);
+  $inspect(messages);
 
   async function submitForm() {
     uniqueId = uuidv4();
@@ -73,8 +75,12 @@
     };
 
     loading = true;
-    imageUrl = null;
     error = null;
+
+    messages.push({
+      role: MessageRole.User,
+      content: prompt,
+    });
     console.log("Submitting payload:", payload);
 
     const params = {
@@ -119,9 +125,15 @@
       const data = await res.json();
 
       if (data.status === "completed") {
-        imageUrl = data.imageUrl;
+        messages.push({
+          role: MessageRole.Assistant,
+          content: data.outputText,
+          imageUrl: data.imageUrl,
+        });
+
         previousResponseId = data.responseId;
         loading = false;
+        prompt = "";
         return;
       } else if (data.status === "error") {
         error = data.error?.message || "Image generation failed.";
@@ -142,64 +154,68 @@
   <p>Create images from the most popular and newest model from OpenAI</p>
 
   <div class="space-y-4 mt-10">
-    <div class="flex space-x-4">
-      <!-- Output Format -->
-      <Dropdown
-        classes="flex-1"
-        labelClasses="label"
-        options={outputFormatOptions}
-        bind:value={outputFormat}
-        label={"Output Format"}
-      />
+    <Output {messages} isProcessing={loading} />
 
-      <!-- Image Quality -->
-      <Dropdown
-        classes="flex-1"
-        labelClasses="label"
-        options={qualityOptions}
-        bind:value={imageQuality}
-        label={"Image Quality"}
-      />
-
-      <!-- Image Size -->
-      <Dropdown
-        classes="flex-1"
-        labelClasses="label"
-        options={sizeOptions}
-        bind:value={imageSize}
-        label={"Image Size"}
-      />
-    </div>
-
-    <div class="flex flex-row space-x-4">
-      <!-- Background -->
-      <div class="flex flex-1 flex-col">
+    {#if messages.length == 0}
+      <div class="flex space-x-4">
+        <!-- Output Format -->
         <Dropdown
           classes="flex-1"
           labelClasses="label"
-          options={backgroundOptions}
-          bind:value={background}
-          label={"Background"}
-          disabled={isBackgroundDisabled}
+          options={outputFormatOptions}
+          bind:value={outputFormat}
+          label={"Output Format"}
+        />
+
+        <!-- Image Quality -->
+        <Dropdown
+          classes="flex-1"
+          labelClasses="label"
+          options={qualityOptions}
+          bind:value={imageQuality}
+          label={"Image Quality"}
+        />
+
+        <!-- Image Size -->
+        <Dropdown
+          classes="flex-1"
+          labelClasses="label"
+          options={sizeOptions}
+          bind:value={imageSize}
+          label={"Image Size"}
         />
       </div>
-      <!-- Compression Level -->
-      <div class="flex-1">
-        <!-- svelte-ignore a11y_label_has_associated_control -->
-        <label class="label">
-          Compression Level: {outputCompression}%
-        </label>
-        <input
-          type="range"
-          min="0"
-          max="100"
-          bind:value={outputCompression}
-          class="range range-primary range-xs mt-4"
-          disabled={isCompressionDisabled}
-        />
+
+      <div class="flex flex-row space-x-4">
+        <!-- Background -->
+        <div class="flex flex-1 flex-col">
+          <Dropdown
+            classes="flex-1"
+            labelClasses="label"
+            options={backgroundOptions}
+            bind:value={background}
+            label={"Background"}
+            disabled={isBackgroundDisabled}
+          />
+        </div>
+        <!-- Compression Level -->
+        <div class="flex-1">
+          <!-- svelte-ignore a11y_label_has_associated_control -->
+          <label class="label">
+            Compression Level: {outputCompression}%
+          </label>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            bind:value={outputCompression}
+            class="range range-primary range-xs mt-4"
+            disabled={isCompressionDisabled}
+          />
+        </div>
+        <div class="flex flex-1 flex-col"></div>
       </div>
-      <div class="flex flex-1 flex-col"></div>
-    </div>
+    {/if}
 
     <!-- Prompt Textarea -->
     <div class="mt-8">
@@ -212,28 +228,9 @@
   </div>
 
   <div class="mt-12 text-center">
-    {#if loading}
-      <div class="mt-6 text-center">
-        <p class="text-gray-600">Generating image, please wait...</p>
-        <span class="loading loading-spinner loading-lg mt-2"></span>
-      </div>
-    {/if}
-
     {#if error}
       <div class="mt-6 text-red-500 font-semibold">
         {error}
-      </div>
-    {/if}
-
-    {#if imageUrl}
-      <div class="mt-6">
-        <h3 class="text-lg font-bold mb-2">Generated Image:</h3>
-        <!-- svelte-ignore a11y_img_redundant_alt -->
-        <img
-          src={imageUrl}
-          alt="Generated image"
-          class="rounded-lg shadow-lg max-w-full"
-        />
       </div>
     {/if}
   </div>
