@@ -55,8 +55,8 @@
       name="input"
       id="input"
       class={`textarea textarea-ghost ${
-        $sharedMessageHistory.length > 0 ? `h-[70px]` : `h-24`
-      } w-full focus:outline-hidden focus:border-base-100 text-base`}
+        $sharedMessageHistory.length > 0 ? `h-[50px]` : `h-20`
+      } min-h-auto w-full focus:outline-hidden focus:border-base-100 text-base`}
       placeholder="Your input..."
       bind:value={input}
       onkeydown={onKeyDown}

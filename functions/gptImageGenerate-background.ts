@@ -5,6 +5,7 @@ import {
 } from "@netlify/functions";
 import { OpenAI } from "openai";
 import { decrypt } from "$utils/secure";
+import { Status } from "$types/ImageTask";
 import ImageTaskModel, { type ImageTask } from "$data/models/imageTask.model";
 import TenantModel from "$data/models/tenant.model";
 
@@ -51,7 +52,7 @@ const gptImageGenerate: Handler = async (
     const document: Partial<ImageTask> = {
       id: uniqueId,
       prompt,
-      status: "pending",
+      status: Status.InProgress,
     };
     await ImageTaskModel.create(document);
 
@@ -81,6 +82,9 @@ const gptImageGenerate: Handler = async (
     const imageData = response.output.filter(
       (output) => output.type === "image_generation_call",
     );
+    const messageData = response.output.filter(
+      (output) => output.type === "message",
+    );
     if (imageData.length == 0) {
       return {
         statusCode: 500,
@@ -90,20 +94,23 @@ const gptImageGenerate: Handler = async (
       };
     }
 
-    const _ouputResult = imageData[0].result;
+    const _outputResult = imageData[0].result;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const _outputFormat = (imageData[0] as any)?.output_format;
-    const imageUrl = `data:image/${_outputFormat};base64,${_ouputResult}`;
+    const imageUrl = `data:image/${_outputFormat};base64,${_outputResult}`;
+    const outputText =
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (messageData[0]?.content?.[0] as any)?.text || response.output_text;
 
     const update: Partial<ImageTask> = {
-      status: "completed",
-      output_text: response.output_text,
+      status: Status.Completed,
+      output_text: outputText,
       image_url: imageUrl,
       response_id: response.id,
     };
     await ImageTaskModel.update(uniqueId, update);
 
-    console.log("GPT image response", response);
+    console.log("GPT image response", { response, outputText });
     return {
       statusCode: 200,
       body: JSON.stringify({
@@ -116,7 +123,7 @@ const gptImageGenerate: Handler = async (
 
     const { code, message = "" } = error;
     const update: Partial<ImageTask> = {
-      status: "error",
+      status: Status.Failed,
       error: {
         code,
         message,

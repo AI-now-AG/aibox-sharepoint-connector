@@ -1,5 +1,6 @@
 <script lang="ts">
   import { v4 as uuidv4 } from "uuid";
+  import { Status } from "$types/ImageTask";
   import { MessageRole, type MessageHistory } from "$types/MessageHistory";
   import Dropdown from "$components/form/Dropdown.svelte";
   import PromptInput from "./PromptInput.svelte";
@@ -130,7 +131,7 @@
       );
       const data = await res.json();
 
-      if (data.status === "completed") {
+      if (data.status === Status.Completed) {
         messages.push({
           role: MessageRole.Assistant,
           content: data.outputText,
@@ -141,7 +142,7 @@
         loading = false;
         prompt = "";
         return;
-      } else if (data.status === "error") {
+      } else if (data.status === Status.Failed) {
         error = data.error?.message || "Image generation failed.";
         loading = false;
         return;
@@ -155,89 +156,86 @@
   }
 </script>
 
-<div class="container max-w-6xl mx-auto grid grid-cols-1 px-14">
-  <h1 class="pt-2 mb-2 lg:pt-8 text-4xl font-bold">Create GPT Image</h1>
-  <p>Create images from the most popular and newest model from OpenAI</p>
+<div class="grid grid-cols-1 grid-rows-[1fr_min-content] space-y-6 h-full">
+  <div class="flex flex-col space-y-6">
+    <h1 class="pt-2 mb-2 lg:pt-8 text-4xl font-bold">Create GPT Image</h1>
+    <p>Create images from the most popular and newest model from OpenAI</p>
 
-  <div class="space-y-4 mt-10">
     <Output {messages} isProcessing={loading} />
 
     {#if messages.length == 0}
-      <div class="flex space-x-4">
-        <!-- Output Format -->
-        <Dropdown
-          classes="flex-1"
-          labelClasses="label"
-          options={outputFormatOptions}
-          bind:value={outputFormat}
-          label={"Output Format"}
-        />
-
-        <!-- Image Quality -->
-        <Dropdown
-          classes="flex-1"
-          labelClasses="label"
-          options={qualityOptions}
-          bind:value={imageQuality}
-          label={"Image Quality"}
-        />
-
-        <!-- Image Size -->
-        <Dropdown
-          classes="flex-1"
-          labelClasses="label"
-          options={sizeOptions}
-          bind:value={imageSize}
-          label={"Image Size"}
-        />
-      </div>
-
-      <div class="flex flex-row space-x-4">
-        <!-- Background -->
-        <div class="flex flex-1 flex-col">
+      <div class="space-y-4 mt-10">
+        <div class="flex space-x-4">
+          <!-- Output Format -->
           <Dropdown
             classes="flex-1"
             labelClasses="label"
-            options={backgroundOptions}
-            bind:value={background}
-            label={"Background"}
-            disabled={isBackgroundDisabled}
+            options={outputFormatOptions}
+            bind:value={outputFormat}
+            label={"Output Format"}
+          />
+
+          <!-- Image Quality -->
+          <Dropdown
+            classes="flex-1"
+            labelClasses="label"
+            options={qualityOptions}
+            bind:value={imageQuality}
+            label={"Image Quality"}
+          />
+
+          <!-- Image Size -->
+          <Dropdown
+            classes="flex-1"
+            labelClasses="label"
+            options={sizeOptions}
+            bind:value={imageSize}
+            label={"Image Size"}
           />
         </div>
-        <!-- Compression Level -->
-        <div class="flex-1">
-          <!-- svelte-ignore a11y_label_has_associated_control -->
-          <label class="label">
-            Compression Level: {outputCompression}%
-          </label>
-          <input
-            type="range"
-            min="0"
-            max="100"
-            bind:value={outputCompression}
-            class="range range-primary range-xs mt-4"
-            disabled={isCompressionDisabled}
-          />
+
+        <div class="flex flex-row space-x-4">
+          <!-- Background -->
+          <div class="flex flex-1 flex-col">
+            <Dropdown
+              classes="flex-1"
+              labelClasses="label"
+              options={backgroundOptions}
+              bind:value={background}
+              label={"Background"}
+              disabled={isBackgroundDisabled}
+            />
+          </div>
+          <!-- Compression Level -->
+          <div class="flex-1">
+            <!-- svelte-ignore a11y_label_has_associated_control -->
+            <label class="label">
+              Compression Level: {outputCompression}%
+            </label>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              bind:value={outputCompression}
+              class="range range-primary range-xs mt-4"
+              disabled={isCompressionDisabled}
+            />
+          </div>
+          <div class="flex flex-1 flex-col"></div>
         </div>
-        <div class="flex flex-1 flex-col"></div>
       </div>
     {/if}
 
     <!-- Prompt Textarea -->
-    <div class="mt-8">
+    <div
+      class={`mt-8  ${messages.length > 0 ? "sticky bottom-0 bg-base-200" : ""}`}
+    >
       <PromptInput
         bind:input={prompt}
         bind:file={fileToEdit}
+        stickyFooter={messages.length > 0}
         onsend={submitForm}
       />
     </div>
-  </div>
-
-  <div class="mt-12 text-center">
-    {#if error}
-      <div class="mt-6 text-red-500 font-semibold">
-        {error}
-      </div>
-    {/if}
   </div>
 </div>

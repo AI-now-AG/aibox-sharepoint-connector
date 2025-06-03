@@ -2,14 +2,23 @@
   import UploadDialog from "./UploadDialog.svelte";
   import { svgIcons } from "$assets/icons";
   import { preventDefault } from "$utils/common";
+  import { useTranslations } from "$i18n/utils";
 
   interface Props {
     input?: string;
     file?: File;
+    stickyFooter?: boolean;
     onsend: Function;
   }
 
-  let { input = $bindable(""), file = $bindable(), onsend }: Props = $props();
+  let {
+    input = $bindable(""),
+    file = $bindable(),
+    stickyFooter = false,
+    onsend,
+  }: Props = $props();
+
+  const t = useTranslations();
 
   let fileModal: HTMLDialogElement | undefined = $state();
 
@@ -27,7 +36,9 @@
     <textarea
       name="input"
       id="input"
-      class={`textarea textarea-ghost h-20 w-full focus:outline-hidden focus:border-base-100 text-base`}
+      class={`textarea textarea-ghost ${
+        stickyFooter ? `h-[50px]` : `h-20`
+      } min-h-auto w-full focus:outline-hidden focus:border-base-100 text-base`}
       placeholder="Your input..."
       bind:value={input}
       onkeydown={onKeyDown}
@@ -36,19 +47,21 @@
 
   <div class="grid grid-cols-[1fr_min-content] gap-4">
     <div class="p-2 flex flex-row gap-2">
-      <button
-        class="btn h-auto w-auto p-1 min-h-0 hover:text-base-content/60"
-        onclick={() => {
-          fileModal?.showModal();
-        }}
-      >
-        {@html svgIcons.attachment}
-        {#if file}
-          <div class="badge badge-sm badge-neutral font-normal">
-            {1}
-          </div>
-        {/if}
-      </button>
+      {#if !stickyFooter}
+        <button
+          class="btn h-auto w-auto p-1 min-h-0 hover:text-base-content/60"
+          onclick={() => {
+            fileModal?.showModal();
+          }}
+        >
+          {@html svgIcons.attachment}
+          {#if file}
+            <div class="badge badge-sm badge-neutral font-normal">
+              {1}
+            </div>
+          {/if}
+        </button>
+      {/if}
     </div>
     <div class="flex self-end">
       <button
@@ -70,3 +83,12 @@
     <UploadDialog bind:modal={fileModal} bind:file />
   </div>
 </div>
+
+{#if stickyFooter}
+  <div class="container p-3 gap-2 items-center flex justify-center">
+    {@html svgIcons.warningIcon}
+    <p class="text-xs text-neutral">
+      {t("prompt-execution.historyRemove.info")}
+    </p>
+  </div>
+{/if}
