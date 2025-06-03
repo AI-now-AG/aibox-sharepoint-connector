@@ -6,11 +6,7 @@ import {
 import { OpenAI } from "openai";
 import { decrypt } from "$utils/secure";
 import ImageTaskModel, { type ImageTask } from "$data/models/imageTask.model";
-
-const openAIApiKey = decrypt(process.env.OPENAI_API_KEY!);
-const openai = new OpenAI({
-  apiKey: openAIApiKey,
-});
+import TenantModel from "$data/models/tenant.model";
 
 const gptImageGenerate: Handler = async (
   event: HandlerEvent,
@@ -25,6 +21,7 @@ const gptImageGenerate: Handler = async (
   const body = JSON.parse(event.body || "{}");
 
   const {
+    tenantId,
     uniqueId,
     prompt,
     outputFormat = "png",
@@ -42,6 +39,14 @@ const gptImageGenerate: Handler = async (
     };
   }
 
+  const tenant = await TenantModel.get(tenantId);
+  if (!tenant) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: "Tenant does not exist" }),
+    };
+  }
+
   try {
     const document: Partial<ImageTask> = {
       id: uniqueId,
@@ -51,8 +56,12 @@ const gptImageGenerate: Handler = async (
     await ImageTaskModel.create(document);
 
     // Call OpenAI image generation endpoint
+    const openAIApiKey = decrypt(tenant.openai_api_key as string);
+    const openai = new OpenAI({
+      apiKey: openAIApiKey,
+    });
     const response = await openai.responses.create({
-      model: "gpt-4.1-mini",
+      model: "gpt-4o",
       input: prompt,
       tools: [
         {

@@ -11,6 +11,11 @@
   type OutputFormat = "png" | "webp" | "jpeg";
   type BackgroundType = "transparent" | "opaque" | "auto";
 
+  interface Props {
+    tenantId: string;
+  }
+  let { tenantId } = $props() as Props;
+
   // Reactive form state
   let uniqueId: string = $state("");
   let prompt: string = $state(
@@ -84,6 +89,7 @@
     console.log("Submitting payload:", payload);
 
     const params = {
+      tenantId,
       uniqueId,
       prompt,
       imageSize,

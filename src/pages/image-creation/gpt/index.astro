@@ -1,8 +1,10 @@
 ---
 import Layout from "$layouts/Layout.astro";
 import ImageGenerationForm from "./ImageGenerationForm.svelte";
+
+const tenantId = Astro.locals.tenant?._id?.toString();
 ---
 
 <Layout>
-  <ImageGenerationForm client:load />
+  <ImageGenerationForm {tenantId} client:load />
 </Layout>
