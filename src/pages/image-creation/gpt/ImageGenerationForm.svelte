@@ -82,9 +82,11 @@
       background,
     };
 
+    // reset states
     loading = true;
     error = null;
 
+    // store messages
     messages.push({
       role: MessageRole.User,
       content: prompt,
@@ -119,7 +121,13 @@
       return;
     }
 
-    await pollImageStatus(uniqueId);
+    // clear input text
+    prompt = "";
+
+    // start polling requests
+    setTimeout(async () => {
+      await pollImageStatus(uniqueId);
+    }, 2000);
   }
 
   async function pollImageStatus(
@@ -240,6 +248,7 @@
       <PromptInput
         bind:input={prompt}
         bind:file={fileToEdit}
+        isProcessing={loading}
         stickyFooter={messages.length > 0}
         onsend={submitForm}
       />

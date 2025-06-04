@@ -1,13 +1,14 @@
 <script lang="ts">
+  import { fade } from "svelte/transition";
   import UploadDialog from "./UploadDialog.svelte";
   import { svgIcons } from "$assets/icons";
   import { preventDefault } from "$utils/common";
   import { useTranslations } from "$i18n/utils";
-  import Loading from "$components/Loading.svelte";
 
   interface Props {
-    input?: string;
-    file?: File;
+    input: string;
+    file: File;
+    isProcessing?: boolean;
     stickyFooter?: boolean;
     onsend: Function;
   }
@@ -15,6 +16,7 @@
   let {
     input = $bindable(""),
     file = $bindable(),
+    isProcessing = false,
     stickyFooter = false,
     onsend,
   }: Props = $props();
@@ -27,6 +29,10 @@
     if (e.key === "Enter" && e.ctrlKey) {
       onsend();
     }
+  }
+
+  function clearText() {
+    input = "";
   }
 </script>
 
@@ -44,6 +50,17 @@
       bind:value={input}
       onkeydown={onKeyDown}
     ></textarea>
+    {#if input}
+      <!-- svelte-ignore a11y_consider_explicit_label -->
+      <button
+        type="button"
+        onclick={clearText}
+        class="absolute top-2 right-2 text-base-content hover:text-base-content/60"
+        transition:fade={{ duration: 500 }}
+      >
+        {@html svgIcons.eraser}
+      </button>
+    {/if}
   </div>
 
   <div class="grid grid-cols-[1fr_min-content] gap-4">
@@ -67,7 +84,7 @@
     <div class="flex self-end">
       <button
         class="btn btn-ghost btn-md disabled:bg-base-100 disabled:cursor-not-allowed"
-        disabled={!input}
+        disabled={!input || isProcessing}
         onclick={preventDefault(onsend)}
         aria-label="Send"
       >

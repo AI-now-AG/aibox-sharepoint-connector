@@ -93,9 +93,7 @@
       <button
         class="btn btn-ghost btn-md disabled:bg-base-100 disabled:cursor-not-allowed"
         disabled={!input && files.length === 0}
-        onclick={preventDefault(() => {
-          onsend();
-        })}
+        onclick={preventDefault(onsend)}
         aria-label="Fetch"
       >
         <span
