@@ -4,7 +4,10 @@
   import { useTranslations } from "$i18n/utils";
   import { Status } from "$types/ImageTask";
   import { addToast } from "$stores/toast";
+  import { type FileInput } from "$types/FileInput";
   import { MessageRole, type MessageHistory } from "$types/MessageHistory";
+  import { readFileContent } from "$utils/fileReader";
+  import { formatMarkdown } from "$utils/common";
   import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
   import Dropdown from "$components/form/Dropdown.svelte";
   import PromptInput from "./PromptInput.svelte";
@@ -69,19 +72,27 @@
     isBackgroundDisabled = outputFormat == "jpeg";
     isCompressionDisabled = outputFormat == "png";
   });
-  $inspect(outputFormat);
-  $inspect(messages);
 
   async function submitForm() {
     uniqueId = uuidv4();
-    const payload = {
-      prompt,
-      imageSize,
-      imageQuality,
-      outputCompression,
-      outputFormat,
-      background,
-    };
+    const fileList: FileInput[] = [];
+    const imageList: FileInput[] = [];
+
+    const fileDataList = await Promise.all(
+      files.map(async (file) => ({
+        name: file.name,
+        content: await readFileContent(file),
+        type: file.type,
+      })),
+    );
+
+    for (const fileData of fileDataList) {
+      if (fileData.type.startsWith("image/")) {
+        imageList.push(fileData);
+      } else {
+        fileList.push(fileData);
+      }
+    }
 
     // reset states
     loading = true;
@@ -91,7 +102,6 @@
       role: MessageRole.User,
       content: prompt,
     });
-    console.log("Submitting payload:", payload);
 
     const params = {
       tenantId,
@@ -103,7 +113,10 @@
       outputFormat,
       background,
       previousResponseId,
+      inputImages: imageList,
+      inputFiles: fileList,
     };
+    console.log("Submitting payload:", params);
     const response = await fetch(
       "/.netlify/functions/gptImageGenerate-background",
       {
@@ -147,13 +160,14 @@
       if (data.status === Status.Completed) {
         messages.push({
           role: MessageRole.Assistant,
-          content: data.outputText,
+          content: formatMarkdown(data.outputText),
           imageUrl: data.imageUrl,
         });
 
         previousResponseId = data.responseId;
         loading = false;
         prompt = "";
+        files = [];
         return;
       } else if (data.status === Status.Failed) {
         const errorMessage = data.error?.message || "Image generation failed.";

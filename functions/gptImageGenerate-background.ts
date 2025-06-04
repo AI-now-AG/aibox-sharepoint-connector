@@ -6,8 +6,13 @@ import {
 import { OpenAI } from "openai";
 import { decrypt } from "$utils/secure";
 import { Status } from "$types/ImageTask";
+import { type FileInput } from "$types/FileInput";
 import ImageTaskModel, { type ImageTask } from "$data/models/imageTask.model";
 import TenantModel from "$data/models/tenant.model";
+import type {
+  ResponseInputFile,
+  ResponseInputImage,
+} from "openai/resources/responses/responses";
 
 const gptImageGenerate: Handler = async (
   event: HandlerEvent,
@@ -31,6 +36,8 @@ const gptImageGenerate: Handler = async (
     background = "transparent",
     outputCompression = 100,
     previousResponseId = "",
+    inputImages = [],
+    inputFiles = [],
   } = body;
 
   if (!prompt) {
@@ -61,9 +68,32 @@ const gptImageGenerate: Handler = async (
     const openai = new OpenAI({
       apiKey: openAIApiKey,
     });
+
     const response = await openai.responses.create({
       model: "gpt-4o",
-      input: prompt,
+      //input: prompt,
+      input: [
+        {
+          role: "user",
+          content: [
+            { type: "input_text", text: prompt },
+            ...inputImages.map(
+              (image: FileInput): ResponseInputImage => ({
+                type: "input_image",
+                image_url: image.content,
+                detail: "auto",
+              }),
+            ),
+            ...inputFiles.map(
+              (file: FileInput): ResponseInputFile => ({
+                type: "input_file",
+                file_data: file.content,
+                filename: file.name,
+              }),
+            ),
+          ],
+        },
+      ],
       tools: [
         {
           type: "image_generation",

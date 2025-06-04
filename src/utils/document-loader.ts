@@ -2,13 +2,8 @@
 // import { CSVLoader } from "langchain/document_loaders/fs/csv";
 // import { SRTLoader } from "@langchain/community/document_loaders/fs/srt";
 // import { JSONLoader } from "langchain/document_loaders/fs/json";
+import { type FileInput } from "$types/FileInput";
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
-
-type FileInput = {
-  name: string;
-  type: string;
-  content: string;
-};
 
 export const fileLoader = async (file: FileInput) => {
   if (file.type.includes("pdf")) {

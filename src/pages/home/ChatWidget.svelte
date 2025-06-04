@@ -1,11 +1,13 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
   import { slide } from "svelte/transition";
+  import { type FileInput } from "$types/FileUpload";
   import { MessageRole } from "$types/MessageHistory";
   import { sharedMessageHistory } from "$components/prompt-interface/components/Stores";
   import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
   import ChatInput from "./ChatInput.svelte";
   import ChatResults from "./ChatResults.svelte";
+  import { readFileContent } from "$utils/fileReader";
   import { ApiKeyProvider } from "$types/TenantFeature";
   import {
     formatMarkdown,
@@ -64,23 +66,7 @@
     sharedMessageHistory.set([]);
   });
 
-  const readFileContent = (file: File) => {
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        resolve(reader.result);
-      };
-      reader.readAsDataURL(file);
-    });
-  };
-
   async function fetchMessage() {
-    type FileInput = {
-      name: string;
-      content: unknown;
-      type: string;
-    };
-
     if (input || files.length > 0) {
       output = "";
       isProcessing = true;

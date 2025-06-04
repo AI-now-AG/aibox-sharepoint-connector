@@ -1,9 +1,11 @@
 <script lang="ts">
   import FileUpload from "$components/FileUpload.svelte";
+  import { type FileInput } from "$types/FileInput";
   import { MessageRole } from "$types/MessageHistory";
   import { sharedMessageHistory } from "$components/prompt-interface/components/Stores";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
+  import { readFileContent } from "$utils/fileReader";
   import {
     formatMarkdown,
     parseChunkCitations,
@@ -39,25 +41,13 @@
   });
 
   let inputFiles: File[] = $state([]);
-
-  type ModalTrigger = { showModal: () => void };
-  let fileModal: ModalTrigger | undefined = $state();
+  let fileModal: HTMLDialogElement | undefined = $state();
 
   function onKeyDown(e: KeyboardEvent) {
     if (e.key === "Enter" && e.ctrlKey) {
       fetchHeadline();
     }
   }
-
-  const readFileContent = (file: File) => {
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        resolve(reader.result);
-      };
-      reader.readAsDataURL(file);
-    });
-  };
 
   async function fetchHeadline() {
     // Reset banners on submit
@@ -71,11 +61,6 @@
       clearText();
       output = "";
       isProcessing = true;
-      type FileInput = {
-        name: string;
-        content: unknown;
-        type: string;
-      };
 
       try {
         const userInputFilesList: FileInput[] = [];
