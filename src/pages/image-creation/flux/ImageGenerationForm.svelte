@@ -5,12 +5,13 @@
   import Dropdown from "$components/form/Dropdown.svelte";
   import { useTranslations } from "$i18n/utils";
   import Loading from "$components/Loading.svelte";
-  const t = useTranslations();
 
   interface Props {
     tenantId: string;
   }
   let { tenantId } = $props() as Props;
+
+  const t = useTranslations();
 
   let prompt = $state("");
   let base64Image = $state("");

@@ -454,5 +454,9 @@
   "error.account-blocked-title": "Account is blocked",
   "error.account-blocked-description": "Your account has been blocked by your organization or because your trial period has ended.\nIf you’d like to reactivate your account, please contact us at <a class=\"underline underline-offset-2\" href=\"mailto:support@aibox-app.ch\">support@aibox-app.ch</a>.",
   "nav.create-image.gpt": "GPT",
-  "tenant.image-creation.gpt": "GPT Image"
+  "tenant.image-creation.gpt": "GPT Image",
+  "create-image.image-background-label": "Background",
+  "create-image.image-compression-label": "Compression Level",
+  "create-image.create-gpt-image-title": "Create GPT Image",
+  "create-image.create-gpt-image-description": "Create images from the most popular and newest model from OpenAI"
 }

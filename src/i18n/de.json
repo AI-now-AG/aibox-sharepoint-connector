@@ -454,5 +454,9 @@
   "error.account-blocked-title": "Konto gesperrt",
   "error.account-blocked-description": "Ihr Konto wurde von Ihrer Organisation gesperrt oder Ihr Testzeitraum ist abgelaufen.\nWenn Sie Ihr Konto reaktivieren möchten, kontaktieren Sie uns bitte unter <a class=\"underline underline-offset-2\" href=\"mailto:support@aibox-app.ch\">support@aibox-app.ch</a>.",
   "nav.create-image.gpt": "GPT",
-  "tenant.image-creation.gpt": "GPT Image"
+  "tenant.image-creation.gpt": "GPT Image",
+  "create-image.image-background-label": "Background",
+  "create-image.image-compression-label": "Compression Level",
+  "create-image.create-gpt-image-title": "Create GPT Image",
+  "create-image.create-gpt-image-description": "Create images from the most popular and newest model from OpenAI"
 }
