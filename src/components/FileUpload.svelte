@@ -129,7 +129,7 @@
       fileErrorMessage = "";
       return true;
     }
-    fileErrorMessage = t("transcription.file-validation.exceed-5mb-size-limit");
+    fileErrorMessage = t("prompt-execution.upload-file.exceed-5mb-size-limit");
     return false;
   }
 
