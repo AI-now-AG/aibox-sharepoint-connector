@@ -26,7 +26,7 @@
   let {
     files = $bindable([]),
     modal = $bindable(),
-    title,
+    title = "Upload File",
     acceptedTypes = acceptedTypesDefault,
     supportedFormatsText = "PDF, PNG, JPEG",
   }: Props = $props();

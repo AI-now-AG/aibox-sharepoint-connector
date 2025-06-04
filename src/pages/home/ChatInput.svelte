@@ -97,7 +97,7 @@
     <FileUpload
       bind:files
       bind:modal={fileModal}
-      title="Upload Files"
+      title={t("upload-file.popup.title")}
       supportedFormatsText={t("prompt-execution.upload-file.supportted-files")}
     />
   </div>
