@@ -38,20 +38,7 @@
     inputText = initText;
   });
 
-  const fileTypes = {
-    "audio/*": ["audio/mp3"],
-    "video/*": ["video/mp4", "video/quicktime"],
-    "application/*": ["application/pdf", "application/json"],
-    "text/*": [
-      "text/plain",
-      "application/x-subrip",
-      "text/tab-separated-values",
-    ],
-    "image/*": ["image/svg+xml", "image/png", "image/jpeg"],
-  };
-
   let inputFiles: File[] = $state([]);
-  let isClickOnFile = $state(false);
 
   type ModalTrigger = { showModal: () => void };
   let fileModal: ModalTrigger | undefined = $state();
@@ -226,7 +213,6 @@
           class="btn btn-outline h-auto w-auto p-1 min-h-0 border-base-content/30"
           disabled={!promptId}
           onclick={() => {
-            isClickOnFile = true;
             fileModal?.showModal();
           }}
         >
@@ -268,10 +254,10 @@
   <div>
     <input type="checkbox" class="modal-toggle" />
     <FileUpload
+      bind:files={inputFiles}
       bind:modal={fileModal}
       title="Upload Files"
-      acceptedTypes={fileTypes}
-      bind:files={inputFiles}
+      supportedFormatsText={t("prompt-execution.upload-file.supportted-files")}
     />
   </div>
 </div>

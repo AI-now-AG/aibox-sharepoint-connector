@@ -8,7 +8,7 @@
   const t = useTranslations();
 
   interface Props {
-    input?: string;
+    input: string;
     files?: File[];
     onsend: Function;
     isDisableFileInput?: boolean;
@@ -20,18 +20,6 @@
     onsend,
     isDisableFileInput = false,
   }: Props = $props();
-
-  const fileTypes = {
-    "audio/*": ["audio/mp3"],
-    "video/*": ["video/mp4", "video/quicktime"],
-    "application/*": ["application/pdf", "application/json"],
-    "text/*": [
-      "text/plain",
-      "application/x-subrip",
-      "text/tab-separated-values",
-    ],
-    "image/*": ["image/svg+xml", "image/png", "image/jpeg"],
-  };
 
   let fileModal: HTMLDialogElement | undefined = $state();
 
@@ -107,10 +95,10 @@
   <div>
     <input type="checkbox" class="modal-toggle" />
     <FileUpload
+      bind:files
       bind:modal={fileModal}
       title="Upload Files"
-      acceptedTypes={fileTypes}
-      bind:files
+      supportedFormatsText={t("prompt-execution.upload-file.supportted-files")}
     />
   </div>
 </div>

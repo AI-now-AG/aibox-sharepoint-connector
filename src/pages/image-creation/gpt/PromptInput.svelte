@@ -1,13 +1,13 @@
 <script lang="ts">
   import { fade } from "svelte/transition";
-  import UploadDialog from "./UploadDialog.svelte";
+  import FileUpload from "$components/FileUpload.svelte";
   import { svgIcons } from "$assets/icons";
   import { preventDefault } from "$utils/common";
   import { useTranslations } from "$i18n/utils";
 
   interface Props {
     input: string;
-    file: File;
+    files?: File[];
     isProcessing?: boolean;
     stickyFooter?: boolean;
     onsend: Function;
@@ -15,7 +15,7 @@
 
   let {
     input = $bindable(""),
-    file = $bindable(),
+    files = $bindable([]),
     isProcessing = false,
     stickyFooter = false,
     onsend,
@@ -73,9 +73,9 @@
           }}
         >
           {@html svgIcons.attachment}
-          {#if file}
+          {#if files.length > 0}
             <div class="badge badge-sm badge-neutral font-normal">
-              {1}
+              {files.length}
             </div>
           {/if}
         </button>
@@ -88,15 +88,22 @@
         onclick={preventDefault(onsend)}
         aria-label="Send"
       >
-        <span class={`${input || file ? "text-primary" : "text-base-300"}`}
-          >{@html svgIcons.paperPlane}</span
+        <span
+          class={`${
+            input || files.length > 0 ? "text-primary" : "text-base-300"
+          }`}>{@html svgIcons.paperPlane}</span
         >
       </button>
     </div>
   </div>
   <div>
     <input type="checkbox" class="modal-toggle" />
-    <UploadDialog bind:modal={fileModal} bind:file />
+    <FileUpload
+      bind:files
+      bind:modal={fileModal}
+      title="Upload Files"
+      supportedFormatsText={t("prompt-execution.upload-file.supportted-files")}
+    />
   </div>
 </div>
 

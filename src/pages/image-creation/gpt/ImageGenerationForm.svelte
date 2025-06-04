@@ -32,7 +32,7 @@
   let outputFormat: OutputFormat = $state("png");
   let background: BackgroundType = $state("auto");
   let outputCompression: number = $state(100);
-  let fileToEdit: File = $state();
+  let files: File[] = $state([]);
 
   let isBackgroundDisabled: boolean = $state(false);
   let isCompressionDisabled: boolean = $state(false);
@@ -265,7 +265,7 @@
 
       <PromptInput
         bind:input={prompt}
-        bind:file={fileToEdit}
+        bind:files
         isProcessing={loading}
         stickyFooter={messages.length > 0}
         onsend={submitForm}

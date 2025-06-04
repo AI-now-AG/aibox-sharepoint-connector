@@ -3,18 +3,32 @@
   const t = useTranslations();
   import { svgIcons } from "$assets/icons";
 
+  const acceptedTypesDefault = {
+    "audio/*": ["audio/mp3"],
+    "video/*": ["video/mp4", "video/quicktime"],
+    "application/*": ["application/pdf", "application/json"],
+    "text/*": [
+      "text/plain",
+      "application/x-subrip",
+      "text/tab-separated-values",
+    ],
+    "image/*": ["image/svg+xml", "image/png", "image/jpeg"],
+  };
+
   interface Props {
+    files?: File[];
+    modal: any;
     title: string;
     acceptedTypes: Record<string, string[]>;
-    modal: any;
-    files?: File[];
+    supportedFormatsText?: string;
   }
 
   let {
-    title,
-    acceptedTypes,
-    modal = $bindable(),
     files = $bindable([]),
+    modal = $bindable(),
+    title,
+    acceptedTypes = acceptedTypesDefault,
+    supportedFormatsText = "PDF, PNG, JPEG",
   }: Props = $props();
 
   let isDragOver = $state(false);
@@ -125,6 +139,7 @@
     }
     return false;
   }
+
   let isFormValid = $derived(files.length > 0 && fileErrorMessage === "");
   function confirm() {
     modal.close();
@@ -153,9 +168,13 @@
       >
         <label
           class={`py-6 relative flex flex-col text-base-content border border-dashed rounded-sm cursor-pointer
-            ${isDragOver ? "border-info"
-              : fileErrorMessage ? "border-error"
-              : "border-neutral-content"}`}
+            ${
+              isDragOver
+                ? "border-info"
+                : fileErrorMessage
+                  ? "border-error"
+                  : "border-neutral-content"
+            }`}
           ondragover={() => {
             isDragOver = true;
           }}
@@ -180,7 +199,7 @@
               {@html t("prompt-execution.upload-file.drag")}
             </p>
             <p class="text-sm text-base-content/60 mt-1">
-              {t("prompt-execution.upload-file.supportted-files")}
+              {supportedFormatsText}
             </p>
             <p class="text-xs text-base-content/60 mt-8">
               {t("prompt-execution.upload-file.maximum-size")}
