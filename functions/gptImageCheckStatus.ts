@@ -27,11 +27,12 @@ const gptImageCheckStatus: Handler = async (event) => {
       image_url: imageUrl,
       response_id: responseId,
       output_text: outputText,
+      error,
     } = task;
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ status, outputText, imageUrl, responseId }),
+      body: JSON.stringify({ status, outputText, imageUrl, responseId, error }),
     };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {

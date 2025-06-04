@@ -3,6 +3,7 @@
   import { v4 as uuidv4 } from "uuid";
   import { useTranslations } from "$i18n/utils";
   import { Status } from "$types/ImageTask";
+  import { addToast } from "$stores/toast";
   import { MessageRole, type MessageHistory } from "$types/MessageHistory";
   import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
   import Dropdown from "$components/form/Dropdown.svelte";
@@ -40,7 +41,6 @@
 
   let messages: MessageHistory = $state([]);
   let loading: boolean = $state(false);
-  let error: string | null = $state(null);
   let previousResponseId: string | null = $state(null);
 
   const sizeOptions = [
@@ -87,7 +87,6 @@
 
     // reset states
     loading = true;
-    error = null;
 
     // store messages
     messages.push({
@@ -119,7 +118,10 @@
     );
 
     if (response.status !== 202) {
-      error = "Failed to start image generation.";
+      addToast({
+        message: "Failed to start image generation.",
+        type: "error",
+      });
       loading = false;
       return;
     }
@@ -156,7 +158,16 @@
         prompt = "";
         return;
       } else if (data.status === Status.Failed) {
-        error = data.error?.message || "Image generation failed.";
+        const errorMessage = data.error?.message || "Image generation failed.";
+        messages.push({
+          role: MessageRole.Assistant,
+          content: errorMessage,
+        });
+        addToast({
+          message: errorMessage,
+          type: "error",
+        });
+
         loading = false;
         return;
       }
@@ -164,7 +175,10 @@
       await new Promise((resolve) => setTimeout(resolve, delayMs));
     }
 
-    error = "Image generation timed out.";
+    addToast({
+      message: "Image generation timed out.",
+      type: "error",
+    });
     loading = false;
   }
 </script>
