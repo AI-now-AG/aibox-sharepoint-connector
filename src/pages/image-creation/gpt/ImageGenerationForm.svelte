@@ -25,9 +25,7 @@
 
   // Reactive form state
   let uniqueId: string = $state("");
-  let prompt: string = $state(
-    "Generate an image of gray tabby cat hugging an otter with an orange scarf",
-  );
+  let prompt: string = $state("");
 
   let imageQuality: ImageQuality = $state("medium");
   let imageSize: ImageSize = $state("1024x1024");
