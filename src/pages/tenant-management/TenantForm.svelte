@@ -85,6 +85,7 @@
   let azureOpenAIEnabled: boolean = $state(false);
   let perplexityEnabled: boolean = $state(false);
   let dalleEnabled: boolean = $state(false);
+  let gptImageEnabled: boolean = $state(false);
   let fluxEnabled: boolean = $state(false);
 
   let openAIKeyField: HTMLInputElement;
@@ -257,6 +258,11 @@
     dalleEnabled = tenantData.included_features?.some(
       (item: any) =>
         item.name == TenantFeature.CreateImage &&
+        item.provider == ApiKeyProvider.OpenAI,
+    );
+    gptImageEnabled = tenantData.included_features?.some(
+      (item: any) =>
+        item.name == TenantFeature.GptImage &&
         item.provider == ApiKeyProvider.OpenAI,
     );
     fluxEnabled = tenantData.included_features?.some(
@@ -472,7 +478,7 @@
         // update providers
         tenantData.included_features = [];
         tenantData.included_features.push({
-          name: TenantFeature.TextPrommpts,
+          name: TenantFeature.TextPrompts,
           provider: defaultTextFeature,
         });
         if (isAudioToTextChecked) {
@@ -506,6 +512,13 @@
           tenantData.included_features.push({
             name: TenantFeature.CreateImage,
             provider: ApiKeyProvider.Flux,
+          });
+        }
+
+        if (gptImageEnabled) {
+          tenantData.included_features.push({
+            name: TenantFeature.GptImage,
+            provider: ApiKeyProvider.OpenAI,
           });
         }
 
@@ -588,7 +601,7 @@
         // update providers
         tenantData.included_features = [];
         tenantData.included_features.push({
-          name: TenantFeature.TextPrommpts,
+          name: TenantFeature.TextPrompts,
           provider: defaultTextFeature,
         });
         if (isAudioToTextChecked) {
@@ -627,6 +640,13 @@
           tenantData.included_features.push({
             name: TenantFeature.CreateImage,
             provider: ApiKeyProvider.Flux,
+          });
+        }
+
+        if (gptImageEnabled) {
+          tenantData.included_features.push({
+            name: TenantFeature.GptImage,
+            provider: ApiKeyProvider.OpenAI,
           });
         }
 
@@ -1600,7 +1620,6 @@
               type="checkbox"
               bind:checked={dalleEnabled}
               class="checkbox checkbox-primary z-10"
-              value="text-prompt"
             />
             <label class="label cursor-pointer ml-2" for="image-dalle-model">
               <span class="label-text text-base-content"
@@ -1622,7 +1641,6 @@
               type="checkbox"
               bind:checked={fluxEnabled}
               class="checkbox checkbox-primary z-10"
-              value="text-prompt"
             />
             <label class="label cursor-pointer ml-2" for="image-flux-model">
               <span class="label-text text-base-content"
@@ -1665,6 +1683,25 @@
                 >
               </label>
             </div>
+          </div>
+        </div>
+      </div>
+      <!-- GPT Image Section -->
+      <div class="collapse bg-base-100 shadow-sm rounded-lg mb-4">
+        <input type="checkbox" />
+        <div class="collapse-title flex items-center justify-between gap-4">
+          <div class="flex items-center">
+            <input
+              id="gpt-image-model"
+              type="checkbox"
+              bind:checked={gptImageEnabled}
+              class="checkbox checkbox-primary z-10"
+            />
+            <label class="label cursor-pointer ml-2" for="gpt-image-model">
+              <span class="label-text text-base-content"
+                >{t("tenant.image-creation.gpt")}</span
+              >
+            </label>
           </div>
         </div>
       </div>

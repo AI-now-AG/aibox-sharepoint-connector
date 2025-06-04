@@ -453,5 +453,6 @@
   "subscription.biliing-details": "Rechnungsdetails",
   "error.account-blocked-title": "Konto gesperrt",
   "error.account-blocked-description": "Ihr Konto wurde von Ihrer Organisation gesperrt oder Ihr Testzeitraum ist abgelaufen.\nWenn Sie Ihr Konto reaktivieren möchten, kontaktieren Sie uns bitte unter <a class=\"underline underline-offset-2\" href=\"mailto:support@aibox-app.ch\">support@aibox-app.ch</a>.",
-  "nav.create-image.gpt": "GPT"
+  "nav.create-image.gpt": "GPT",
+  "tenant.image-creation.gpt": "GPT Image"
 }

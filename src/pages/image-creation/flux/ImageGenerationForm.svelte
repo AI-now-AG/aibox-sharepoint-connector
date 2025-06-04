@@ -4,15 +4,13 @@
 <script lang="ts">
   import Dropdown from "$components/form/Dropdown.svelte";
   import { useTranslations } from "$i18n/utils";
-  import { onMount } from "svelte";
   import Loading from "$components/Loading.svelte";
   const t = useTranslations();
 
   interface Props {
     tenantId: string;
-    hasPermission: boolean;
   }
-  let { tenantId, hasPermission = false } = $props() as Props;
+  let { tenantId } = $props() as Props;
 
   let prompt = $state("");
   let base64Image = $state("");
@@ -45,13 +43,6 @@
     } else {
       showCustomSizeInputs = false;
     }
-  });
-
-  onMount(() => {
-    if (!hasPermission) {
-      window.history.back();
-    }
-    return () => {};
   });
 
   async function generateImage() {

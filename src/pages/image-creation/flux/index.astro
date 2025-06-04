@@ -1,21 +1,19 @@
 ---
 import Layout from "$layouts/Layout.astro";
-import ImageGenerationForm from "./ImageGenerationForm.svelte";
 import auth from "$auth/auth";
+import ImageGenerationForm from "./ImageGenerationForm.svelte";
 import { ApiKeyProvider, TenantFeature } from "$types/TenantFeature";
 
 const tenant = Astro.locals.tenant;
 const tenantId = tenant?._id?.toString() ?? "";
-let hasPermission = false;
 
-if (
-  auth.hasFeatureWithProvider(
-    Astro.locals,
-    TenantFeature.CreateImage,
-    ApiKeyProvider.Flux
-  )
-) {
-  hasPermission = true;
+const hasPermission = auth.hasFeatureWithProvider(
+  Astro.locals,
+  TenantFeature.CreateImage,
+  ApiKeyProvider.Flux
+);
+if (!hasPermission) {
+  return Astro.redirect("/restricted");
 }
 ---
 

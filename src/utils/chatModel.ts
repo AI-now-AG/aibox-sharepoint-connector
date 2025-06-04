@@ -87,7 +87,7 @@ export const initializeOpenAI = (
 
   // Find the text prompts feature in enabled features
   const textPromptsProvider = features?.find(
-    (item) => item.name == TenantFeature.TextPrommpts,
+    (item) => item.name == TenantFeature.TextPrompts,
   );
 
   // Determine API provider based on enabled features

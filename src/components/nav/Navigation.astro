@@ -103,6 +103,7 @@ if (audioFeatureItems.length > 0) {
   });
 }
 
+// Image Assistant > DALL-E
 if (
   auth.hasFeatureWithProvider(
     Astro.locals,
@@ -115,6 +116,8 @@ if (
     path: "/image-creation/dalle3",
   });
 }
+
+// Image Assistant > Flux
 if (
   auth.hasFeatureWithProvider(
     Astro.locals,
@@ -128,11 +131,19 @@ if (
   });
 }
 
-// test
-createImageItems.push({
-  title: t("nav.create-image.gpt"),
-  path: "/image-creation/gpt",
-});
+// Image Assistant > GPT Image
+if (
+  auth.hasFeatureWithProvider(
+    Astro.locals,
+    TenantFeature.GptImage,
+    ApiKeyProvider.OpenAI
+  )
+) {
+  createImageItems.push({
+    title: t("nav.create-image.gpt"),
+    path: "/image-creation/gpt",
+  });
+}
 
 if (createImageItems.length > 0) {
   createImageMenus.push({

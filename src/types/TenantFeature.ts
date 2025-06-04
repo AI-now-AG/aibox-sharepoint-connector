@@ -2,9 +2,10 @@ import { useTranslations } from "$i18n/utils";
 const t = useTranslations();
 
 export enum TenantFeature {
-  TextPrommpts = "text-prommpts",
+  TextPrompts = "text-prommpts",
   AudioToText = "audio-to-text",
   CreateImage = "create-image",
+  GptImage = "gpt-image",
 }
 
 export enum ApiKeyProvider {

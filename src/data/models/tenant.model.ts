@@ -94,7 +94,7 @@ export default {
     const doc = {
       included_features: [
         {
-          name: TenantFeature.TextPrommpts,
+          name: TenantFeature.TextPrompts,
           provider: ApiKeyProvider.OpenAI,
         },
       ],
