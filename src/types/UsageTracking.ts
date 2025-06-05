@@ -5,6 +5,27 @@ export enum UsageType {
   Speech = "speech",
 }
 
+export enum TextModel {
+  Gpt4o = "gpt-4o",
+}
+
+export enum AudioModel {
+  Whisper = "whisper-1",
+  AudioPro = "Audio Pro",
+  ElevenLabs = "scribe_v1",
+}
+
+export enum ImageModel {
+  Dalle = "dall-e-3",
+  FluxDev = "fal-ai/flux/dev",
+  GptImage = "gpt-image-1",
+}
+
+export enum WebsearchModel {
+  Sonar = "sonar",
+  SonarPro = "sonar-pro",
+}
+
 export interface UsageItem {
   model: string;
   amount: number;

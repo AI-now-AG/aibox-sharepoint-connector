@@ -351,7 +351,6 @@
   "create-image.image-quality-label": "Image Quality",
   "create-image.select-image-quality-label": "Select Quality",
   "create-image.image-format-label": "Output format",
-  "create-image.select-image-format-label": "Select format",
   "create-image.generate-image": "Create Image",
   "create-image.image-generating": "Generating... ",
   "create-image.download": "Download",
@@ -395,7 +394,7 @@
   "subscription.step3": "Billing Data",
   "subscription.step4": "Create your aibox",
   "subscription.choose-your-plan": "Choose your plan",
-  "subscription.choose-your-plan-description": "Choose the plan for your needs, more info see <a href=\"https://ainow.ch/aibox/abos\" target=\"_blank\" class=\"text-[#491EFF] font-bold\">here</a>",
+  "subscription.choose-your-plan-description": "Choose the plan for your needs, more info see <a href=\"https://www.aibox-app.ch/abos/\" target=\"_blank\" class=\"text-[#491EFF] font-bold\">here</a>",
   "subscription.audio-to-text-options": "Audio to Text Options",
   "subscription.per-month": "per month",
   "subscription.total-price-for-plan": "Total Price for aibox CHF ${total}.- per month",
@@ -459,5 +458,5 @@
   "create-image.image-background-label": "Background",
   "create-image.image-compression-label": "Compression Level",
   "create-image.create-gpt-image-title": "Create GPT Image",
-  "create-image.create-gpt-image-description": "Create images from the most popular and newest model from OpenAI"
+  "create-image.create-gpt-image-description": "Create images from the latest and most popular model from OpenAI"
 }

@@ -350,8 +350,7 @@
   "create-image.select-image-size-label": "Grösse auswählen",
   "create-image.image-quality-label": "Bildqualität",
   "create-image.select-image-quality-label": "Qualität auswählen",
-  "create-image.image-format-label": "Ausgabeformat",
-  "create-image.select-image-format-label": "Format auswählen",
+  "create-image.image-format-label": "Dateifomrat",
   "create-image.generate-image": "Bild erstellen",
   "create-image.image-generating": "Bild wird erstellt...",
   "create-image.download": "Herunterladen",
@@ -395,7 +394,7 @@
   "subscription.step3": "Rechnungsdaten",
   "subscription.step4": "Erstelle deine aibox",
   "subscription.choose-your-plan": "Wähle dein Abo",
-  "subscription.choose-your-plan-description": "Wähle deinen Plan, welcher zu deinen Bedürfnissen passt. Weitere Informationen findest du <a href=\"https://ainow.ch/aibox/abos\" target=\"_blank\" class=\"text-[#491EFF] font-bold\">hier</a>",
+  "subscription.choose-your-plan-description": "Wähle deinen Plan, welcher zu deinen Bedürfnissen passt. Weitere Informationen findest du <a href=\"https://www.aibox-app.ch/abos/\" target=\"_blank\" class=\"text-[#491EFF] font-bold\">hier</a>",
   "subscription.audio-to-text-options": "Audio zu Text Optionen",
   "subscription.per-month": "pro Monat",
   "subscription.total-price-for-plan": "Der Preis für deine aibox beträgt CHF ${total}.- pro Monat",
@@ -456,8 +455,8 @@
   "error.account-blocked-description": "Ihr Konto wurde von Ihrer Organisation gesperrt oder Ihr Testzeitraum ist abgelaufen.\nWenn Sie Ihr Konto reaktivieren möchten, kontaktieren Sie uns bitte unter <a class=\"underline underline-offset-2\" href=\"mailto:support@aibox-app.ch\">support@aibox-app.ch</a>.",
   "nav.create-image.gpt": "GPT",
   "tenant.image-creation.gpt": "GPT Image",
-  "create-image.image-background-label": "Background",
-  "create-image.image-compression-label": "Compression Level",
-  "create-image.create-gpt-image-title": "Create GPT Image",
-  "create-image.create-gpt-image-description": "Create images from the most popular and newest model from OpenAI"
+  "create-image.image-background-label": "Hintergrund",
+  "create-image.image-compression-label": "Komprimierung",
+  "create-image.create-gpt-image-title": "Erstelle Bilder mit GPT",
+  "create-image.create-gpt-image-description": "Erstelle Bilder mit dem neuesten und beliebtesten Modell von OpenAI"
 }
