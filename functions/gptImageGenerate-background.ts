@@ -4,15 +4,34 @@ import {
   type HandlerResponse,
 } from "@netlify/functions";
 import { OpenAI } from "openai";
+import { ObjectId } from "mongodb";
 import { decrypt } from "$utils/secure";
 import { Status } from "$types/ImageTask";
 import { type FileInput } from "$types/FileInput";
+import { ApiKeyProvider } from "$types/TenantFeature";
 import ImageTaskModel, { type ImageTask } from "$data/models/imageTask.model";
 import TenantModel from "$data/models/tenant.model";
+import { UsageType } from "$types/UsageTracking";
+import UsageLogModel, { type UsageLog } from "$data/models/usageLog.model";
 import type {
   ResponseInputFile,
   ResponseInputImage,
 } from "openai/resources/responses/responses";
+
+const recordImageUsage = async (tenantId: string, ) => {
+  try {
+    const usage: Partial<UsageLog> = {
+      tenant_id: new ObjectId(tenantId),
+      provider: ApiKeyProvider.OpenAI,
+      model: "gpt-image-1",
+      type: UsageType.Image,
+    };
+
+    await UsageLogModel.create(usage);
+  } catch (error) {
+    console.error("Error recording image usage:", error);
+  }
+};
 
 const gptImageGenerate: Handler = async (
   event: HandlerEvent,
@@ -124,6 +143,8 @@ const gptImageGenerate: Handler = async (
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const format = (imageData[0] as any)?.output_format;
       imageUrl = `data:image/${format};base64,${result}`;
+
+      recordImageUsage(tenantId);
     }
 
     if (messageData.length) {

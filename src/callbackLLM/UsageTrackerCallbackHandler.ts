@@ -34,7 +34,7 @@ export class UsageTrackerCallbackHandler extends BaseCallbackHandler {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async handleLLMEnd(output: LLMResult, _runId: string) {
     const respone = JSON.parse(JSON.stringify(output.generations));
-    const usage: Partial<Omit<UsageLog, "_id">> = {
+    const usage: Partial<UsageLog> = {
       tenant_id: this.tenantId,
       provider: this.provider,
       model: this.model,

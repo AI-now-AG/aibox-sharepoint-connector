@@ -149,7 +149,7 @@ export class LoggingCallbackHandler extends BaseCallbackHandler {
     });
 
     const respone = JSON.parse(JSON.stringify(output.generations));
-    const usage: Partial<Omit<UsageLog, "_id">> = {
+    const usage: Partial<UsageLog> = {
       tenant_id: new ObjectId(this.tenantId),
       provider: this.provider,
       model: this.model,

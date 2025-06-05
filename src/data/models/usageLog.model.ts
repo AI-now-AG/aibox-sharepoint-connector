@@ -36,7 +36,7 @@ const getMonthRange = (month: string): { start: Date; end: Date } => {
 };
 
 export default {
-  create: async (tenant: Partial<Omit<UsageLog, "_id">>) => {
+  create: async (tenant: Partial<UsageLog>) => {
     const validated = UsageLogSchema.parse({ _id: new ObjectId(), ...tenant });
     return await collection.insertOne(validated);
   },
