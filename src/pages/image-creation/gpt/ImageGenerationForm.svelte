@@ -222,7 +222,7 @@
             labelClasses="label"
             options={qualityOptions}
             bind:value={imageQuality}
-            label={t("create-image.image-quality-label")}
+            label={t("create-image.select-image-quality-label")}
           />
 
           <!-- Image Size -->
