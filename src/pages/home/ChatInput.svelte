@@ -1,5 +1,6 @@
 <script lang="ts">
   import FileUpload from "$components/FileUpload.svelte";
+  import DataLossWarning from "$components/prompt-interface/components/DataLossWarning.svelte";
   import { sharedMessageHistory } from "$components/prompt-interface/components/Stores";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
@@ -104,10 +105,5 @@
 </div>
 
 {#if $sharedMessageHistory.length > 0}
-  <div class="container p-3 gap-2 items-center flex justify-center">
-    {@html svgIcons.warningIcon}
-    <p class="text-xs text-neutral">
-      {t("prompt-execution.historyRemove.info")}
-    </p>
-  </div>
+  <DataLossWarning />
 {/if}

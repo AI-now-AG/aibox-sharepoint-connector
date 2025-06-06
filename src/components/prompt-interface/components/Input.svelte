@@ -3,6 +3,7 @@
   import { type FileInput } from "$types/FileInput";
   import { MessageRole } from "$types/MessageHistory";
   import { sharedMessageHistory } from "$components/prompt-interface/components/Stores";
+  import DataLossWarning from "$components/prompt-interface/components/DataLossWarning.svelte";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
   import { readFileContent } from "$utils/fileReader";
@@ -14,6 +15,7 @@
     stripHtmlFormatting,
   } from "$utils/common";
   import { resetTrialBanner, resetUnverifiedBanner } from "$stores/bannerReset";
+
   const t = useTranslations();
 
   interface Props {
@@ -51,8 +53,8 @@
 
   async function fetchHeadline() {
     // Reset banners on submit
-    resetTrialBanner.set(true);
-    resetUnverifiedBanner.set(true);
+    $resetTrialBanner = true;
+    $resetUnverifiedBanner = true;
 
     input = "";
 
@@ -265,10 +267,5 @@
 </div>
 
 {#if $sharedMessageHistory.length > 0}
-  <div class="container p-3 gap-2 items-center flex justify-center">
-    {@html svgIcons.warningIcon}
-    <p class="text-xs text-neutral">
-      {t("prompt-execution.historyRemove.info")}
-    </p>
-  </div>
+  <DataLossWarning />
 {/if}
