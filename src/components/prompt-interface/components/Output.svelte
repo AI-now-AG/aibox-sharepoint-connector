@@ -14,29 +14,10 @@
   let { output = $bindable(""), isProcessing = $bindable(false) }: Props =
     $props();
 
-  let element;
+  let element: HTMLElement | null = null;
 
   let copyIndex: number = $state(-1);
   let timer: NodeJS.Timeout;
-  let totalMessages = 0;
-
-  $effect(() => {
-    if (
-      ($sharedMessageHistory.length > 0 &&
-        $sharedMessageHistory.length > totalMessages) ||
-      isProcessing
-    ) {
-      scrollToBottom();
-      totalMessages = $sharedMessageHistory.length;
-    }
-  });
-
-  const scrollToBottom = async () => {
-    window?.scroll({
-      top: document.documentElement.scrollHeight,
-      behavior: "smooth",
-    });
-  };
 
   const handleCopy = (event: any) => {
     const selection = window.getSelection();
@@ -87,7 +68,7 @@
 
 <div class="flex flex-col">
   <div bind:this={element} class="mt-2 overflow-y-scroll h-full min-h-12">
-    <div class="card gap-4" transition:fade>
+    <div class="card gap-4 chat-container" transition:fade>
       {#each $sharedMessageHistory as { role, content, rawData }, index}
         <div
           class={`chat-bubble text-base-content ${role === MessageRole.User ? `bg-base-200` : `bg-base-100`}`}
@@ -156,8 +137,9 @@
         </div>
       </div>
     {/if}
+
     {#if isProcessing}
-      <div class="card mt-2 gap-4" transition:fade>
+      <div class="card mt-2 gap-4 min-h-[50vh]" transition:fade>
         <!-- Latest Output -->
         <div class="chat-bubble bg-base-100 text-base-content flex flex-row">
           {@html svgIcons.spinner}

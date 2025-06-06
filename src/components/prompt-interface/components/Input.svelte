@@ -108,6 +108,10 @@
             ...messages,
             newUserMessage,
           ]);
+
+          setTimeout(() => {
+            scrollIntoView();
+          }, 1000);
         }
         let citations = [];
         if (reader) {
@@ -150,11 +154,24 @@
     }
   }
 
+  function scrollIntoView() {
+    const chatBubbles = document?.querySelectorAll(
+      ".chat-container > .chat-bubble",
+    );
+    if (chatBubbles && chatBubbles.length > 0) {
+      chatBubbles[chatBubbles.length - 1].scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }
+
   function clearText() {
     inputText = "";
   }
 
   let textarea: HTMLTextAreaElement;
+
   export function adjustHeightByContent() {
     setTimeout(() => {
       if (textarea) {
@@ -173,7 +190,7 @@
       name="input"
       id="input"
       class={`textarea textarea-ghost ${
-        $sharedMessageHistory.length > 0 ? `h-[70px]` : `h-24`
+        $sharedMessageHistory.length > 0 ? `h-[50px]` : `h-20`
       } w-full focus:outline-hidden focus:border-hidden text-base`}
       placeholder={t("prompt-library.input-placeholder")}
       onkeydown={onKeyDown}

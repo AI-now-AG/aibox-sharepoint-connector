@@ -113,6 +113,7 @@
       />
     </div>
   {/if}
+
   <PromptResults bind:output bind:isProcessing />
 
   <div class="sticky bottom-0 bg-base-200" transition:slide={{ duration: 500 }}>
