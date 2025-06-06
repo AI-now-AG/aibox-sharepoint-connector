@@ -71,7 +71,7 @@
         <div class="grid space-y-6 h-full" transition:fade>
           <div class="flex flex-col">
             <div class="mt-2 overflow-y-scroll h-full min-h-12">
-              <div class="card gap-4" transition:fade>
+              <div class="card gap-4 chat-container" transition:fade>
                 {#each $sharedMessageHistory as { role, content, rawData }, index}
                   <div
                     class={`chat-bubble text-base-content ${role === MessageRole.User ? `bg-base-200` : `bg-base-100`}`}
@@ -140,8 +140,9 @@
                   </div>
                 </div>
               {/if}
+
               {#if isProcessing}
-                <div class="card mt-2 gap-4" transition:fade>
+                <div class="card mt-2 gap-4 min-h-[50vh]" transition:fade>
                   <!-- Latest Output -->
                   <div
                     class="chat-bubble bg-base-100 text-base-content flex flex-row"

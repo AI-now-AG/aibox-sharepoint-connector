@@ -140,6 +140,11 @@
     // clear input text
     prompt = "";
 
+    // scroll to latest user input
+    setTimeout(() => {
+      scrollIntoView();
+    }, 1000);
+
     // start polling requests
     setTimeout(async () => {
       await pollImageStatus(uniqueId);
@@ -168,8 +173,6 @@
         loading = false;
         prompt = "";
         files = [];
-
-        scrollIntoView();
         return;
       } else if (data.status === Status.Failed) {
         const errorMessage = data.error?.message || "Image generation failed.";
@@ -197,10 +200,11 @@
   }
 
   function scrollIntoView() {
-    const chatBubbles = document?.querySelectorAll(".chat-bubble");
-    if (chatBubbles && chatBubbles.length) {
-      const index = chatBubbles.length > 2 ? chatBubbles.length - 2 : 0;
-      chatBubbles[index].scrollIntoView({
+    const chatBubbles = document?.querySelectorAll(
+      ".chat-container > .chat-bubble",
+    );
+    if (chatBubbles && chatBubbles.length > 0) {
+      chatBubbles[chatBubbles.length - 1].scrollIntoView({
         behavior: "smooth",
         block: "start",
       });

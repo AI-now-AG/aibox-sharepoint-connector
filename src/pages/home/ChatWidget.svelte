@@ -113,7 +113,7 @@
 
           setTimeout(() => {
             scrollIntoView();
-          }, 2000);
+          }, 1000);
         }
         let citations = [];
         if (reader) {
@@ -160,7 +160,9 @@
   }
 
   function scrollIntoView() {
-    const chatBubbles = document?.querySelectorAll(".chat-bubble");
+    const chatBubbles = document?.querySelectorAll(
+      ".chat-container > .chat-bubble",
+    );
     if (chatBubbles && chatBubbles.length) {
       const index = chatBubbles.length > 2 ? chatBubbles.length - 2 : 0;
       chatBubbles[index].scrollIntoView({
