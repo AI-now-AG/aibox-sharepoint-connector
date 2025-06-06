@@ -55,13 +55,6 @@
     }
   });
 
-  const scrollToTop = async () => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  };
-
   onDestroy(function () {
     sharedMessageHistory.set([]);
   });
@@ -117,6 +110,10 @@
             ...messages,
             newUserMessage,
           ]);
+
+          setTimeout(() => {
+            scrollIntoView();
+          }, 2000);
         }
         let citations = [];
         if (reader) {
@@ -162,15 +159,28 @@
     }
   }
 
+  function scrollIntoView() {
+    const chatBubbles = document?.querySelectorAll(".chat-bubble");
+    if (chatBubbles && chatBubbles.length) {
+      const index = chatBubbles.length >= 2 ? chatBubbles.length - 2 : 0;
+      chatBubbles[index].scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }
+
   function startNewChat() {
     input = "";
     output = "";
     files = [];
     isProcessing = false;
     sharedMessageHistory.set([]);
-    setTimeout(() => {
-      scrollToTop();
-    }, 0);
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   }
 </script>
 

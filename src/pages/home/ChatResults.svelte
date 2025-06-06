@@ -16,25 +16,6 @@
 
   let copyIndex: number = $state(-1);
   let timer: NodeJS.Timeout;
-  let totalMessages = 0;
-
-  $effect(() => {
-    if (
-      ($sharedMessageHistory.length > 0 &&
-        $sharedMessageHistory.length > totalMessages) ||
-      isProcessing
-    ) {
-      scrollToBottom();
-      totalMessages = $sharedMessageHistory.length;
-    }
-  });
-
-  const scrollToBottom = async () => {
-    window?.scroll({
-      top: document.documentElement.scrollHeight,
-      behavior: "smooth",
-    });
-  };
 
   const handleCopy = (event: any) => {
     const selection = window.getSelection();
