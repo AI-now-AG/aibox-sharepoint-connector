@@ -44,13 +44,13 @@ const TOKEN_CREDIT_MAPPING: Record<string, TokenCreditRate> = {
  *
  * Examples:
  *   - DALLE: 1 credit = 1 request
- *   - GPT image: 1 credit = 0.5 request
+ *   - GPT image: 1 credit = 0.33 request
  *   - Flux: 1 credit = 2 requests
  *   - Perplexity: 1 credit = 12 requests
  */
 const REQUEST_CREDIT_MAPPING: Record<string, number> = {
   [ImageModel.Dalle]: 1,
-  [ImageModel.GptImage]: 0.5,
+  [ImageModel.GptImage]: 0.33,
   [ImageModel.FluxDev]: 2,
   [WebsearchModel.Sonar]: 12,
 };
@@ -192,7 +192,7 @@ const _calculateOpenAIUsage = (
   const gptImageRequests = gptImageItems.length;
   usageItems.push({
     model: "GPT Image",
-    amount: dalleRequests,
+    amount: gptImageRequests,
     unit: unitLabels.images,
     credits: _requestsToCredits(ImageModel.GptImage, gptImageRequests),
   });
