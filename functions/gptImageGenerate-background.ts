@@ -11,11 +11,12 @@ import { type FileInput } from "$types/FileInput";
 import { ApiKeyProvider } from "$types/TenantFeature";
 import ImageTaskModel, { type ImageTask } from "$data/models/imageTask.model";
 import TenantModel from "$data/models/tenant.model";
-import { UsageType } from "$types/UsageTracking";
+import { UsageType, TextModel } from "$types/UsageTracking";
 import UsageLogModel, { type UsageLog } from "$data/models/usageLog.model";
 import type {
   ResponseInputFile,
   ResponseInputImage,
+  ResponseUsage,
 } from "openai/resources/responses/responses";
 
 const recordImageUsage = async (tenantId: string) => {
@@ -30,6 +31,26 @@ const recordImageUsage = async (tenantId: string) => {
     await UsageLogModel.create(usage);
   } catch (error) {
     console.error("Error recording image usage:", error);
+  }
+};
+
+const recordTextUsage = async (
+  tenantId: string,
+  responseUsage: ResponseUsage,
+) => {
+  try {
+    const usage: Partial<UsageLog> = {
+      tenant_id: new ObjectId(tenantId),
+      provider: ApiKeyProvider.OpenAI,
+      model: TextModel.Gpt4o,
+      type: UsageType.Text,
+      input_tokens: responseUsage?.input_tokens ?? 0,
+      output_tokens: responseUsage?.output_tokens ?? 0,
+    };
+
+    await UsageLogModel.create(usage);
+  } catch (error) {
+    console.error("Error recording text usage:", error);
   }
 };
 
@@ -145,7 +166,6 @@ const gptImageGenerate: Handler = async (
       imageUrl = `data:image/${format};base64,${result}`;
 
       recordImageUsage(tenantId);
-
       //console.log("imageData", JSON.stringify(imageData[0]));
     }
 
@@ -156,6 +176,10 @@ const gptImageGenerate: Handler = async (
       //console.log("messageData", JSON.stringify(messageData[0]));
     }
 
+    if (!imageData.length && messageData.length) {
+      recordTextUsage(tenantId, response.usage as ResponseUsage);
+    }
+
     const update: Partial<ImageTask> = {
       status: Status.Completed,
       output_text: outputText,
@@ -164,7 +188,7 @@ const gptImageGenerate: Handler = async (
     };
     await ImageTaskModel.update(uniqueId, update);
 
-    console.log("GPT image response", response);
+    console.log("GPT image response", JSON.stringify(response));
     return {
       statusCode: 200,
       body: JSON.stringify({
