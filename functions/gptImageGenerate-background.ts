@@ -7,8 +7,7 @@ import { OpenAI } from "openai";
 import { ObjectId } from "mongodb";
 import { decrypt } from "$utils/secure";
 import { Status } from "$types/ImageTask";
-import type { FileInput } from "$types/FileInput";
-import type { UploadedFile, ParsedForm } from "$types/FormData";
+import { type FileInput } from "$types/FileInput";
 import { ApiKeyProvider } from "$types/TenantFeature";
 import ImageTaskModel, { type ImageTask } from "$data/models/imageTask.model";
 import TenantModel from "$data/models/tenant.model";
@@ -18,8 +17,6 @@ import type {
   ResponseInputFile,
   ResponseInputImage,
 } from "openai/resources/responses/responses";
-import Busboy from "busboy";
-import { Readable } from "stream";
 
 const recordImageUsage = async (tenantId: string) => {
   try {
@@ -36,74 +33,6 @@ const recordImageUsage = async (tenantId: string) => {
   }
 };
 
-const parseMultipartForm = (event: HandlerEvent): Promise<ParsedForm> => {
-  return new Promise((resolve, reject) => {
-    const fields: Record<string, string | number> = {};
-    const files: UploadedFile[] = [];
-
-    const contentType =
-      event.headers["content-type"] || event.headers["Content-Type"];
-    if (!contentType?.includes("multipart/form-data")) {
-      return reject(new Error("Invalid content-type"));
-    }
-
-    const bb = Busboy({
-      headers: { "content-type": contentType },
-    });
-
-    bb.on("field", (fieldname: string, value: string) => {
-      const parsedValue = isNaN(Number(value)) ? value : Number(value);
-      fields[fieldname] = parsedValue;
-    });
-
-    bb.on(
-      "file",
-      (
-        fieldname: string,
-        file: NodeJS.ReadableStream,
-        info: {
-          filename: string;
-          encoding: string;
-          mimeType: string;
-        },
-      ) => {
-        const { filename, encoding, mimeType } = info;
-        const chunks: Buffer[] = [];
-
-        file.on("data", (chunk: Buffer) => {
-          chunks.push(chunk);
-        });
-
-        file.on("end", () => {
-          const buffer = Buffer.concat(chunks);
-          files.push({
-            fieldname,
-            filename,
-            encoding,
-            mimeType,
-            buffer,
-          });
-
-          console.log("files", files);
-        });
-      },
-    );
-
-    bb.on("error", reject);
-
-    bb.on("finish", () => {
-      resolve({ fields, files });
-    });
-
-    const body = Buffer.from(
-      event.body || "",
-      event.isBase64Encoded ? "base64" : "utf8",
-    );
-
-    Readable.from(body).pipe(bb);
-  });
-};
-
 const gptImageGenerate: Handler = async (
   event: HandlerEvent,
 ): Promise<HandlerResponse> => {
@@ -114,7 +43,10 @@ const gptImageGenerate: Handler = async (
     };
   }
 
-  const { fields, files } = await parseMultipartForm(event);
+  console.log("body 1");
+  const body = JSON.parse(event.body || "{}");
+  console.log("body 2");
+
   const {
     tenantId,
     uniqueId,
@@ -125,12 +57,14 @@ const gptImageGenerate: Handler = async (
     background = "transparent",
     outputCompression = 100,
     previousResponseId = "",
-  } = fields;
+    inputImages = [],
+    inputFiles = [],
+  } = body;
 
-  if (!tenantId || !uniqueId || !prompt) {
+  if (!prompt) {
     return {
       statusCode: 400,
-      body: JSON.stringify({ error: "Missing required fields" }),
+      body: JSON.stringify({ error: "Prompt is required" }),
     };
   }
 
@@ -142,25 +76,9 @@ const gptImageGenerate: Handler = async (
     };
   }
 
-  // Prepare inputImages and inputFiles from uploaded files
-  const inputImages: FileInput[] = [];
-  const inputFiles: FileInput[] = [];
-  for (const file of files) {
-    const base64Content = `data:${file.mimeType};base64,${file.buffer.toString("base64")}`;
-    const fileObj: FileInput = {
-      name: file.filename,
-      content: base64Content,
-      type: file.mimeType,
-    };
-    if (file.mimeType.startsWith("image/")) {
-      inputImages.push(fileObj);
-    } else {
-      inputFiles.push(fileObj);
-    }
-  }
+  console.log("body 3");
 
   try {
-    // Create task
     const document: Partial<ImageTask> = {
       id: uniqueId,
       prompt,

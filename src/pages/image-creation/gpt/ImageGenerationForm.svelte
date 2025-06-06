@@ -75,6 +75,24 @@
 
   async function submitForm() {
     uniqueId = uuidv4();
+    const fileList: FileInput[] = [];
+    const imageList: FileInput[] = [];
+
+    const fileDataList = await Promise.all(
+      files.map(async (file) => ({
+        name: file.name,
+        content: await readFileContent(file),
+        type: file.type,
+      })),
+    );
+
+    for (const fileData of fileDataList) {
+      if (fileData.type.startsWith("image/")) {
+        imageList.push(fileData);
+      } else {
+        fileList.push(fileData);
+      }
+    }
 
     // reset states
     loading = true;
@@ -85,27 +103,28 @@
       content: prompt,
     });
 
-    const formData = new FormData();
-    formData.append("tenantId", tenantId);
-    formData.append("uniqueId", uniqueId);
-    formData.append("prompt", prompt);
-    formData.append("imageSize", imageSize);
-    formData.append("imageQuality", imageQuality);
-    formData.append("outputCompression", String(outputCompression));
-    formData.append("outputFormat", outputFormat);
-    formData.append("background", background);
-    formData.append("previousResponseId", previousResponseId || "");
-
-    files.forEach((file, i) => {
-      formData.append("files", file); // key "files" will be array on server
-    });
-
-    console.log("Submitting payload:", formData);
+    const params = {
+      tenantId,
+      uniqueId,
+      prompt,
+      imageSize,
+      imageQuality,
+      outputCompression,
+      outputFormat,
+      background,
+      previousResponseId,
+      inputImages: imageList,
+      inputFiles: fileList,
+    };
+    console.log("Submitting payload:", params);
     const response = await fetch(
       "/.netlify/functions/gptImageGenerate-background",
       {
         method: "POST",
-        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(params),
       },
     );
 
