@@ -43,9 +43,7 @@ const gptImageGenerate: Handler = async (
     };
   }
 
-  console.log("body 1");
   const body = JSON.parse(event.body || "{}");
-  console.log("body 2");
 
   const {
     tenantId,
@@ -75,8 +73,6 @@ const gptImageGenerate: Handler = async (
       body: JSON.stringify({ error: "Tenant does not exist" }),
     };
   }
-
-  console.log("body 3");
 
   try {
     const document: Partial<ImageTask> = {
@@ -149,12 +145,15 @@ const gptImageGenerate: Handler = async (
       imageUrl = `data:image/${format};base64,${result}`;
 
       recordImageUsage(tenantId);
+
+      //console.log("imageData", JSON.stringify(imageData[0]));
     }
 
     if (messageData.length) {
       outputText =
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (messageData[0]?.content?.[0] as any)?.text || response.output_text;
+      //console.log("messageData", JSON.stringify(messageData[0]));
     }
 
     const update: Partial<ImageTask> = {
@@ -165,7 +164,7 @@ const gptImageGenerate: Handler = async (
     };
     await ImageTaskModel.update(uniqueId, update);
 
-    console.log("GPT image response", { response, outputText });
+    console.log("GPT image response", response);
     return {
       statusCode: 200,
       body: JSON.stringify({

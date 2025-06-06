@@ -162,7 +162,7 @@
     }
   }
 
-  async function resetChat() {
+  function startNewChat() {
     input = "";
     output = "";
     files = [];
@@ -210,12 +210,10 @@
         class="sticky bottom-0 bg-base-200"
         transition:slide={{ duration: 500 }}
       >
-        <div class="mt-6 mb-6">
+        <div class="my-4">
           <button
-            onclick={() => {
-              resetChat();
-            }}
-            class="btn btn-active btn-primary mt-4 min-w-[154px]"
+            onclick={startNewChat}
+            class="btn btn-active btn-primary btn-sm min-w-[154px]"
             disabled={isProcessing}
           >
             {t("home.new-chat")}

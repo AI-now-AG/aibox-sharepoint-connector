@@ -46,8 +46,8 @@
 
   const sizeOptions = [
     { value: "1024x1024", title: "1024x1024" },
-    { value: "1024x1536", title: "1024x1536 (landscape)" },
-    { value: "1536x1024", title: "1536x1024 (portrait)" },
+    { value: "1024x1536", title: "1024x1536 (portrait)" },
+    { value: "1536x1024", title: "1536x1024 (landscape)" },
   ];
 
   const qualityOptions = [
@@ -193,6 +193,13 @@
     });
     loading = false;
   }
+
+  function startNewChat() {
+    prompt = "";
+    files = [];
+    loading = false;
+    messages = [];
+  }
 </script>
 
 <div class="grid grid-cols-1 grid-rows-[1fr_min-content] space-y-6 h-full">
@@ -274,6 +281,16 @@
       transition:slide={{ duration: 500 }}
     >
       {#if messages.length > 0}
+        <div class="my-4">
+          <button
+            onclick={startNewChat}
+            class="btn btn-active btn-primary btn-sm min-w-[154px]"
+            disabled={loading}
+          >
+            {t("home.new-chat")}
+          </button>
+        </div>
+
         <ScrollToBottom />
       {/if}
 
