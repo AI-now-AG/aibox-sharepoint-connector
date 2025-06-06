@@ -11,24 +11,6 @@
   }
 
   let { messages = [], isProcessing = false }: Props = $props();
-  let totalMessages = 0;
-
-  $effect(() => {
-    if (
-      (messages.length > 0 && messages.length > totalMessages) ||
-      isProcessing
-    ) {
-      scrollToBottom();
-      totalMessages = messages.length;
-    }
-  });
-
-  const scrollToBottom = async () => {
-    window?.scroll({
-      top: document.documentElement.scrollHeight,
-      behavior: "smooth",
-    });
-  };
 
   let username = $user?.name || $user?.username;
   let userPicture = $user?.picture;

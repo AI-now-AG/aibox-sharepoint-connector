@@ -162,7 +162,7 @@
   function scrollIntoView() {
     const chatBubbles = document?.querySelectorAll(".chat-bubble");
     if (chatBubbles && chatBubbles.length) {
-      const index = chatBubbles.length >= 2 ? chatBubbles.length - 2 : 0;
+      const index = chatBubbles.length > 2 ? chatBubbles.length - 2 : 0;
       chatBubbles[index].scrollIntoView({
         behavior: "smooth",
         block: "start",
