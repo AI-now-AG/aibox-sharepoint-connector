@@ -191,7 +191,7 @@
       id="input"
       class={`textarea textarea-ghost ${
         $sharedMessageHistory.length > 0 ? `h-[50px]` : `h-20`
-      } w-full focus:outline-hidden focus:border-hidden text-base`}
+      } min-h-auto w-full focus:outline-hidden focus:border-hidden text-base`}
       placeholder={t("prompt-library.input-placeholder")}
       onkeydown={onKeyDown}
       bind:this={textarea}

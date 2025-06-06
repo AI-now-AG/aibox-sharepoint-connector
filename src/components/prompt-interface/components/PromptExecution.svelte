@@ -77,7 +77,7 @@
   });
 </script>
 
-<div>
+<div class="grid grid-cols-1 grid-rows-[1fr_min-content] h-full">
   {#if selectedPromptId}
     <p class="mb-2">
       {promptItems.filter((e: { _id: string }) => e._id === selectedPromptId)[0]
