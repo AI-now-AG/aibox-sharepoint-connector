@@ -43,14 +43,9 @@ const gptImageGenerate: Handler = async (
     };
   }
 
-  if ((event.body?.length || 0) > 10 * 1024 * 1024) {
-    return {
-      statusCode: 413,
-      body: JSON.stringify({ error: "Payload too large" }),
-    };
-  }
-
+  console.log("body 1");
   const body = JSON.parse(event.body || "{}");
+  console.log("body 2");
 
   const {
     tenantId,
@@ -80,6 +75,8 @@ const gptImageGenerate: Handler = async (
       body: JSON.stringify({ error: "Tenant does not exist" }),
     };
   }
+
+  console.log("body 3");
 
   try {
     const document: Partial<ImageTask> = {
