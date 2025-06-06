@@ -18,7 +18,7 @@ import type {
   ResponseInputImage,
 } from "openai/resources/responses/responses";
 
-const recordImageUsage = async (tenantId: string, ) => {
+const recordImageUsage = async (tenantId: string) => {
   try {
     const usage: Partial<UsageLog> = {
       tenant_id: new ObjectId(tenantId),
@@ -40,6 +40,13 @@ const gptImageGenerate: Handler = async (
     return {
       statusCode: 405,
       body: JSON.stringify({ message: "Method Not Allowed" }),
+    };
+  }
+
+  if ((event.body?.length || 0) > 10 * 1024 * 1024) {
+    return {
+      statusCode: 413,
+      body: JSON.stringify({ error: "Payload too large" }),
     };
   }
 
