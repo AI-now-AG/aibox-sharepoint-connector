@@ -7,6 +7,7 @@ export interface UploadedFile {
 }
 
 export interface ParsedForm {
-  fields: Record<string, string>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  fields: Record<string, any>;
   files: UploadedFile[];
 }

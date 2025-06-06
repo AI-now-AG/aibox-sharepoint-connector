@@ -123,7 +123,7 @@ const gptImageGenerate: Handler = async (
     imageQuality = "medium",
     imageSize = "1024x1024",
     background = "transparent",
-    outputCompression = "100",
+    outputCompression = 100,
     previousResponseId = "",
   } = fields;
 
@@ -203,7 +203,7 @@ const gptImageGenerate: Handler = async (
         {
           type: "image_generation",
           background,
-          output_compression: parseInt(outputCompression || "100"),
+          output_compression: outputCompression,
           output_format: outputFormat,
           quality: imageQuality,
           size: imageSize,
