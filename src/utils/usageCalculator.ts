@@ -1,11 +1,15 @@
 import { useTranslations } from "$i18n/utils";
 import { type Tenant } from "$data/models/tenant.model";
 import { type UsageLog } from "$data/models/usageLog.model";
-import { ApiKeyProvider, AzureTTSModel } from "$types/TenantFeature";
-import type {
-  UsageRow,
-  UsageItem,
-  TokenCreditRate,
+import { ApiKeyProvider } from "$types/TenantFeature";
+import {
+  TextModel,
+  AudioModel,
+  ImageModel,
+  WebsearchModel,
+  type UsageRow,
+  type UsageItem,
+  type TokenCreditRate,
 } from "$types/UsageTracking";
 
 const t = useTranslations();
@@ -40,13 +44,15 @@ const TOKEN_CREDIT_MAPPING: Record<string, TokenCreditRate> = {
  *
  * Examples:
  *   - DALLE: 1 credit = 1 request
+ *   - GPT image: 1 credit = 0.33 request
  *   - Flux: 1 credit = 2 requests
- *   - Flux: 1 credit = 12 requests
+ *   - Perplexity: 1 credit = 12 requests
  */
 const REQUEST_CREDIT_MAPPING: Record<string, number> = {
-  [ApiKeyProvider.OpenAI]: 1,
-  [ApiKeyProvider.Flux]: 2,
-  [ApiKeyProvider.Perplexity]: 12,
+  [ImageModel.Dalle]: 1,
+  [ImageModel.GptImage]: 0.33,
+  [ImageModel.FluxDev]: 2,
+  [WebsearchModel.Sonar]: 12,
 };
 
 /**
@@ -59,9 +65,9 @@ const REQUEST_CREDIT_MAPPING: Record<string, number> = {
  *   - Audio Pro: 1 credit = 30 minutes
  */
 const DURATION_CREDIT_MAPPING: Record<string, number> = {
-  [AzureTTSModel.Whisper]: 15,
-  [AzureTTSModel.AudioPro]: 30,
-  [AzureTTSModel.ElevenLabs]: 10,
+  [AudioModel.Whisper]: 15,
+  [AudioModel.AudioPro]: 30,
+  [AudioModel.ElevenLabs]: 10,
 };
 
 const _tokensToCredits = (
@@ -86,12 +92,12 @@ const _tokensToCredits = (
 };
 
 const _requestsToCredits = (
-  provider: ApiKeyProvider,
+  model: ImageModel | WebsearchModel,
   requests: number,
 ): number => {
-  const rate = REQUEST_CREDIT_MAPPING[provider.toLowerCase()];
+  const rate = REQUEST_CREDIT_MAPPING[model.toLowerCase()];
   if (!rate) {
-    throw new Error(`Unknown provider: ${provider}`);
+    throw new Error(`Unknown model: ${model}`);
   }
 
   // Calculate credits
@@ -99,7 +105,7 @@ const _requestsToCredits = (
 };
 
 const _durationsToCredits = (
-  ttsModel: AzureTTSModel,
+  ttsModel: AudioModel,
   durationSeconds: number,
 ): number => {
   const rate = DURATION_CREDIT_MAPPING[ttsModel];
@@ -138,7 +144,7 @@ const _calculateOpenAIUsage = (
 
   // gpt-4o
   const gpt4oItems = usageData.filter(
-    (item: UsageLog) => item.model == "gpt-4o",
+    (item: UsageLog) => item.model == TextModel.Gpt4o,
   );
   const gpt4oInputTokens = gpt4oItems.reduce(
     (sum: number, item: UsageLog) => sum + (item.input_tokens ?? 0),
@@ -169,14 +175,26 @@ const _calculateOpenAIUsage = (
 
   // DALL-E
   const dalleItems = usageData.filter(
-    (item: UsageLog) => item.model == "dall-e-3",
+    (item: UsageLog) => item.model == ImageModel.Dalle,
   );
   const dalleRequests = dalleItems.length;
   usageItems.push({
     model: "DALL-E",
     amount: dalleRequests,
     unit: unitLabels.images,
-    credits: _requestsToCredits(ApiKeyProvider.OpenAI, dalleRequests),
+    credits: _requestsToCredits(ImageModel.Dalle, dalleRequests),
+  });
+
+  // GPT Image
+  const gptImageItems = usageData.filter(
+    (item: UsageLog) => item.model == ImageModel.GptImage,
+  );
+  const gptImageRequests = gptImageItems.length;
+  usageItems.push({
+    model: "GPT Image",
+    amount: gptImageRequests,
+    unit: unitLabels.images,
+    credits: _requestsToCredits(ImageModel.GptImage, gptImageRequests),
   });
 
   return _skipUsageIfPrivateKeyUsed(usageItems, usePrivateKey);
@@ -238,7 +256,7 @@ const _calculatePerplexityUsage = (
 
   // sonar
   const sonarItems = usageData.filter(
-    (item: UsageLog) => item.model == "sonar",
+    (item: UsageLog) => item.model == WebsearchModel.Sonar,
   );
   const sonarInputTokens = sonarItems.reduce(
     (sum: number, item: UsageLog) => sum + (item.input_tokens ?? 0),
@@ -265,7 +283,7 @@ const _calculatePerplexityUsage = (
     model: "Sonar medium",
     amount: sonarRequests,
     unit: unitLabels.requests,
-    credits: _requestsToCredits(ApiKeyProvider.Perplexity, sonarRequests),
+    credits: _requestsToCredits(WebsearchModel.Sonar, sonarRequests),
   });
 
   return _skipUsageIfPrivateKeyUsed(usageItems, usePrivateKey);
@@ -278,12 +296,15 @@ const _calculateAudioUsage = (
   useElevenLabsPrivateKey: boolean,
 ) => {
   const usageData = rawUsages.filter((item: UsageLog) => {
-    return item.provider == ApiKeyProvider.AzureOpenAI || item.provider == ApiKeyProvider.ElevenLabs;
+    return (
+      item.provider == ApiKeyProvider.AzureOpenAI ||
+      item.provider == ApiKeyProvider.ElevenLabs
+    );
   });
 
   // Whisper
   const whisperItems = usageData.filter(
-    (item: UsageLog) => item.model == AzureTTSModel.Whisper,
+    (item: UsageLog) => item.model == AudioModel.Whisper,
   );
   const whisperDurations = whisperItems.reduce(
     (sum: number, item: UsageLog) => sum + (item.duration ?? 0),
@@ -293,12 +314,12 @@ const _calculateAudioUsage = (
     model: "Whisper",
     amount: Math.ceil(whisperDurations / 60), // seconds to minutes
     unit: unitLabels.minutes,
-    credits: _durationsToCredits(AzureTTSModel.Whisper, whisperDurations),
+    credits: _durationsToCredits(AudioModel.Whisper, whisperDurations),
   };
 
   // Audio Pro
   const audioProItems = usageData.filter(
-    (item: UsageLog) => item.model == AzureTTSModel.AudioPro,
+    (item: UsageLog) => item.model == AudioModel.AudioPro,
   );
   const audioProDurations = audioProItems.reduce(
     (sum: number, item: UsageLog) => sum + (item.duration ?? 0),
@@ -308,35 +329,26 @@ const _calculateAudioUsage = (
     model: "Audio Pro",
     amount: Math.ceil(audioProDurations / 60000), // milliseconds to minutes
     unit: unitLabels.minutes,
-    credits: _durationsToCredits(
-      AzureTTSModel.AudioPro,
-      audioProDurations / 1000,
-    ),
+    credits: _durationsToCredits(AudioModel.AudioPro, audioProDurations / 1000),
   };
 
   // ElevenLabs
   const elevenLabsItems = usageData.filter(
-    (item: UsageLog) => item.model == AzureTTSModel.ElevenLabs,
+    (item: UsageLog) => item.model == AudioModel.ElevenLabs,
   );
-  console.log(
-    `ElevenLabs items: ${elevenLabsItems.length}`,
-  );
+  console.log(`ElevenLabs items: ${elevenLabsItems.length}`);
   const elevenLabsDurations = elevenLabsItems.reduce(
     (sum: number, item: UsageLog) => sum + (item.duration ?? 0),
     0,
   );
-  console.log(
-    `ElevenLabs durations: ${elevenLabsDurations} seconds`,
-  );
+  console.log(`ElevenLabs durations: ${elevenLabsDurations} seconds`);
   const elevenLabsUsageItem: UsageItem = {
     model: "ElevenLabs",
     amount: Math.ceil(elevenLabsDurations / 60), // seconds to minutes
     unit: unitLabels.minutes,
-    credits: _durationsToCredits(AzureTTSModel.ElevenLabs, elevenLabsDurations),
+    credits: _durationsToCredits(AudioModel.ElevenLabs, elevenLabsDurations),
   };
-  console.log(
-    `ElevenLabs usage item: ${JSON.stringify(elevenLabsUsageItem)}`,
-  );
+  console.log(`ElevenLabs usage item: ${JSON.stringify(elevenLabsUsageItem)}`);
 
   const whisperUsageItems = _skipUsageIfPrivateKeyUsed(
     [whisperUsageItem],
@@ -363,14 +375,14 @@ const _calculateFluxUsage = (rawUsages: UsageLog[], usePrivateKey: boolean) => {
 
   // Flux-dev
   const fluxItems = usageData.filter(
-    (item: UsageLog) => item.model == "fal-ai/flux/dev",
+    (item: UsageLog) => item.model == ImageModel.FluxDev,
   );
   const fluxRequests = fluxItems.length;
   usageItems.push({
     model: "Flux-dev",
     amount: fluxRequests,
     unit: unitLabels.images,
-    credits: _requestsToCredits(ApiKeyProvider.Flux, fluxRequests),
+    credits: _requestsToCredits(ImageModel.FluxDev, fluxRequests),
   });
 
   return _skipUsageIfPrivateKeyUsed(usageItems, usePrivateKey);

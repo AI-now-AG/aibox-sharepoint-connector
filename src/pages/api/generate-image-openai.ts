@@ -7,7 +7,7 @@ import UsageLogModel, { type UsageLog } from "$data/models/usageLog.model";
 
 const recordImageUsage = async (ctx: APIContext) => {
   try {
-    const usage: Partial<Omit<UsageLog, "_id">> = {
+    const usage: Partial<UsageLog> = {
       tenant_id: ctx.locals.tenant._id,
       provider: ApiKeyProvider.OpenAI,
       model: "dall-e-3",

@@ -1,9 +1,12 @@
 <script lang="ts">
   import FileUpload from "$components/FileUpload.svelte";
+  import { type FileInput } from "$types/FileInput";
   import { MessageRole } from "$types/MessageHistory";
   import { sharedMessageHistory } from "$components/prompt-interface/components/Stores";
+  import DataLossWarning from "$components/prompt-interface/components/DataLossWarning.svelte";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
+  import { readFileContent } from "$utils/fileReader";
   import {
     formatMarkdown,
     parseChunkCitations,
@@ -12,6 +15,7 @@
     stripHtmlFormatting,
   } from "$utils/common";
   import { resetTrialBanner, resetUnverifiedBanner } from "$stores/bannerReset";
+
   const t = useTranslations();
 
   interface Props {
@@ -38,23 +42,8 @@
     inputText = initText;
   });
 
-  const fileTypes = {
-    "audio/*": ["audio/mp3"],
-    "video/*": ["video/mp4", "video/quicktime"],
-    "application/*": ["application/pdf", "application/json"],
-    "text/*": [
-      "text/plain",
-      "application/x-subrip",
-      "text/tab-separated-values",
-    ],
-    "image/*": ["image/svg+xml", "image/png", "image/jpeg"],
-  };
-
   let inputFiles: File[] = $state([]);
-  let isClickOnFile = $state(false);
-
-  type ModalTrigger = { showModal: () => void };
-  let fileModal: ModalTrigger | undefined = $state();
+  let fileModal: HTMLDialogElement | undefined = $state();
 
   function onKeyDown(e: KeyboardEvent) {
     if (e.key === "Enter" && e.ctrlKey) {
@@ -62,20 +51,10 @@
     }
   }
 
-  const readFileContent = (file: File) => {
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        resolve(reader.result);
-      };
-      reader.readAsDataURL(file);
-    });
-  };
-
   async function fetchHeadline() {
     // Reset banners on submit
-    resetTrialBanner.set(true);
-    resetUnverifiedBanner.set(true);
+    $resetTrialBanner = true;
+    $resetUnverifiedBanner = true;
 
     input = "";
 
@@ -84,11 +63,6 @@
       clearText();
       output = "";
       isProcessing = true;
-      type FileInput = {
-        name: string;
-        content: unknown;
-        type: string;
-      };
 
       try {
         const userInputFilesList: FileInput[] = [];
@@ -136,6 +110,10 @@
             ...messages,
             newUserMessage,
           ]);
+
+          setTimeout(() => {
+            scrollIntoView();
+          }, 1000);
         }
         let citations = [];
         if (reader) {
@@ -178,11 +156,24 @@
     }
   }
 
+  function scrollIntoView() {
+    const chatBubbles = document?.querySelectorAll(
+      ".chat-container > .chat-bubble",
+    );
+    if (chatBubbles && chatBubbles.length > 0) {
+      chatBubbles[chatBubbles.length - 1].scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }
+
   function clearText() {
     inputText = "";
   }
 
   let textarea: HTMLTextAreaElement;
+
   export function adjustHeightByContent() {
     setTimeout(() => {
       if (textarea) {
@@ -201,8 +192,8 @@
       name="input"
       id="input"
       class={`textarea textarea-ghost ${
-        $sharedMessageHistory.length > 0 ? `h-[70px]` : `h-24`
-      } w-full focus:outline-hidden focus:border-hidden text-base`}
+        $sharedMessageHistory.length > 0 ? `h-[50px]` : `h-20`
+      } min-h-auto w-full focus:outline-hidden focus:border-hidden text-base`}
       placeholder={t("prompt-library.input-placeholder")}
       onkeydown={onKeyDown}
       bind:this={textarea}
@@ -226,7 +217,6 @@
           class="btn btn-outline h-auto w-auto p-1 min-h-0 border-base-content/30"
           disabled={!promptId}
           onclick={() => {
-            isClickOnFile = true;
             fileModal?.showModal();
           }}
         >
@@ -268,19 +258,14 @@
   <div>
     <input type="checkbox" class="modal-toggle" />
     <FileUpload
-      bind:modal={fileModal}
-      title="Upload Files"
-      acceptedTypes={fileTypes}
       bind:files={inputFiles}
+      bind:modal={fileModal}
+      title={t("upload-file.popup.title")}
+      supportedFormatsText={t("prompt-execution.upload-file.supportted-files")}
     />
   </div>
 </div>
 
 {#if $sharedMessageHistory.length > 0}
-  <div class="container p-3 gap-2 items-center flex justify-center">
-    {@html svgIcons.warningIcon}
-    <p class="text-xs text-neutral">
-      {t("prompt-execution.historyRemove.info")}
-    </p>
-  </div>
+  <DataLossWarning />
 {/if}

@@ -1,0 +1,22 @@
+---
+import Layout from "$layouts/Layout.astro";
+import auth from "$auth/auth";
+import ImageGenerationForm from "./ImageGenerationForm.svelte";
+import { ApiKeyProvider, TenantFeature } from "$types/TenantFeature";
+
+const tenant = Astro.locals.tenant;
+const tenantId = tenant?._id?.toString() ?? "";
+
+const hasPermission = auth.hasFeatureWithProvider(
+  Astro.locals,
+  TenantFeature.CreateImage,
+  ApiKeyProvider.OpenAI
+);
+if (!hasPermission) {
+  return Astro.redirect("/restricted");
+}
+---
+
+<Layout>
+  <ImageGenerationForm tenantId={tenantId} {hasPermission} client:load />
+</Layout>

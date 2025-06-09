@@ -1,11 +1,13 @@
 <script lang="ts">
-  import { onMount, onDestroy } from "svelte";
+  import { onDestroy } from "svelte";
   import { slide } from "svelte/transition";
+  import { type FileInput } from "$types/FileUpload";
   import { MessageRole } from "$types/MessageHistory";
   import { sharedMessageHistory } from "$components/prompt-interface/components/Stores";
+  import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
   import ChatInput from "./ChatInput.svelte";
   import ChatResults from "./ChatResults.svelte";
-  import { svgIcons } from "$assets/icons";
+  import { readFileContent } from "$utils/fileReader";
   import { ApiKeyProvider } from "$types/TenantFeature";
   import {
     formatMarkdown,
@@ -28,7 +30,6 @@
   let output = $state("");
   let files: File[] = $state([]);
   let isProcessing = $state(false);
-  let showButton = $state(false);
   let isDisableSelectModel = $state(false);
 
   $effect(() => {
@@ -54,55 +55,11 @@
     }
   });
 
-  onMount(() => {
-    const handleScroll = () => {
-      const { scrollHeight, scrollTop, clientHeight } =
-        document.documentElement;
-
-      if (Math.abs(scrollHeight - clientHeight - scrollTop) > 100) {
-        if (!showButton) showButton = true;
-      } else {
-        if (showButton) showButton = false;
-      }
-    };
-    window.addEventListener("scroll", handleScroll);
-  });
-
-  const scrollToBottom = async () => {
-    window.scroll({
-      top: document.documentElement.scrollHeight,
-      behavior: "smooth",
-    });
-  };
-
-  const scrollToTop = async () => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  };
-
   onDestroy(function () {
     sharedMessageHistory.set([]);
   });
 
-  const readFileContent = (file: File) => {
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        resolve(reader.result);
-      };
-      reader.readAsDataURL(file);
-    });
-  };
-
   async function fetchMessage() {
-    type FileInput = {
-      name: string;
-      content: unknown;
-      type: string;
-    };
-
     if (input || files.length > 0) {
       output = "";
       isProcessing = true;
@@ -153,6 +110,10 @@
             ...messages,
             newUserMessage,
           ]);
+
+          setTimeout(() => {
+            scrollIntoView();
+          }, 1000);
         }
         let citations = [];
         if (reader) {
@@ -198,19 +159,33 @@
     }
   }
 
-  async function resetChat() {
+  function scrollIntoView() {
+    const chatBubbles = document?.querySelectorAll(
+      ".chat-container > .chat-bubble",
+    );
+    if (chatBubbles && chatBubbles.length > 0) {
+      chatBubbles[chatBubbles.length - 1].scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }
+
+  function startNewChat() {
     input = "";
     output = "";
     files = [];
     isProcessing = false;
     sharedMessageHistory.set([]);
-    setTimeout(() => {
-      scrollToTop();
-    }, 0);
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   }
 </script>
 
-<div class="grid grid-cols-1 grid-rows-[1fr_min-content] space-y-6 h-full">
+<div class="grid grid-cols-1 grid-rows-[1fr_min-content] h-full">
   <div class="flex flex-col space-y-6">
     {#if $sharedMessageHistory.length == 0}
       <div
@@ -239,36 +214,23 @@
       </div>
     </div>
 
-    <ChatResults bind:output bind:isProcessing/>
+    <ChatResults bind:output bind:isProcessing />
 
     {#if $sharedMessageHistory.length > 0}
       <div
         class="sticky bottom-0 bg-base-200"
         transition:slide={{ duration: 500 }}
       >
-        <div class="mt-6 mb-6">
+        <div class="my-4">
           <button
-            onclick={() => {
-              resetChat();
-            }}
-            class="btn btn-active btn-primary mt-4 min-w-[154px]"
+            onclick={startNewChat}
+            class="btn btn-active btn-primary btn-sm min-w-[154px]"
             disabled={isProcessing}
           >
             {t("home.new-chat")}
           </button>
         </div>
-        {#if showButton}
-          <div class="relative w-full flex justify-center">
-            <button
-              class="absolute shadow-lg hover:shadow-2xl self-center bottom-2 btn btn-sm btn-circle"
-              onclick={() => {
-                scrollToBottom();
-              }}
-            >
-              {@html svgIcons.downIcon}
-            </button>
-          </div>
-        {/if}
+        <ScrollToBottom />
         <div
           class="min-w-full form-wrapper"
           in:slide={{ duration: 500, delay: 500 }}
