@@ -10,10 +10,10 @@ import CategoryModel, {
   type Category,
   type Group,
 } from "$data/models/category.model";
-import { RequiredColumn, type CsvRowRaw } from "$types/prompt-csv.types";
+import { CsvColumn, type CsvRowRaw } from "$types/PromptCsv.types";
 
 const isValidRows = (rows: CsvRowRaw[]) => {
-  const requiredColumns = Object.values(RequiredColumn);
+  const requiredColumns = Object.values(CsvColumn);
 
   for (const row of rows) {
     for (const column of requiredColumns) {

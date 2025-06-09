@@ -1,11 +1,13 @@
 import { z } from "zod";
 
-export enum RequiredColumn {
+export enum CsvColumn {
   Title = "title",
   Description = "description",
   Instruction = "instruction",
   Category = "category",
   Group = "group",
+  Model = "model",
+  PredefinedInput = "predefined_input",
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
