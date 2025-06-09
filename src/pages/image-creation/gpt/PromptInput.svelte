@@ -25,6 +25,17 @@
   const t = useTranslations();
 
   let fileModal: HTMLDialogElement | undefined = $state();
+  const acceptedTypes = {
+    "audio/*": ["audio/mp3"],
+    "video/*": ["video/mp4", "video/quicktime"],
+    "application/*": ["application/pdf", "application/json"],
+    "text/*": [
+      "text/plain",
+      "application/x-subrip",
+      "text/tab-separated-values",
+    ],
+    "image/*": ["image/png", "image/jpeg"],
+  };
 
   function onKeyDown(e: KeyboardEvent) {
     if (e.key === "Enter" && e.ctrlKey) {
@@ -103,6 +114,7 @@
       bind:files
       bind:modal={fileModal}
       title={t("upload-file.popup.title")}
+      {acceptedTypes}
       supportedFormatsText={t("prompt-execution.upload-file.supportted-files")}
     />
   </div>
