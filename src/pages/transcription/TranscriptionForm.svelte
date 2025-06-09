@@ -12,6 +12,11 @@
   import { TranscriptionType } from "$types/TranscribeRequest";
   import { AudioCategory, TenantFeature } from "$types/TenantFeature";
   import { preventDefault } from "$utils/common";
+  import {
+    convertToMono,
+    type ConvertToMonoConfig,
+  } from "$api/audio/mono-converter-api";
+
   const t = useTranslations();
 
   type Item = { title: string; checked: boolean };
@@ -472,6 +477,83 @@
   }
 
   async function transcribe() {
+    const filename = tempUploadUrl.includes("?")
+      ? tempUploadUrl.split("?")[0]
+      : tempUploadUrl;
+    const fileExtension = filename.split(".").pop();
+    if (isDiarizationEnabled || fileExtension === "m4a") {
+      startPollingConversionFile();
+    } else {
+      await startTranscription();
+    }
+  }
+
+  async function startPollingConversionFile() {
+    try {
+      isTranscribing = true;
+      isTranscriptionFailed = false;
+      console.log("Starting conversion to mono...");
+
+      // Get the API key from the server
+      const configResponse = await fetch('/.netlify/functions/getTranscriptionConfig', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      if (!configResponse.ok) {
+        throw new Error('Failed to get transcription configuration');
+      }
+      
+      const { apiKey, apiUrl: baseUrl } = await configResponse.json();
+      
+      const config: ConvertToMonoConfig = {
+        baseUrl,
+        apiKey,
+        blobName: tempUploadUrl,
+        category,
+        folderName,
+        uniqueName: tempOutputFileName,
+      };
+
+      const result = await convertToMono(config);
+
+      if (result.success && result.data) {
+        console.log(
+          `File converted successfully. New URL: ${result.data.convertedBlobUrl}`,
+        );
+        console.log(
+          `Compression: ${((1 - result.data.compressionRatio) * 100).toFixed(2)}% reduction`,
+        );
+        // Update the upload URL to use the converted file for transcription
+        tempUploadUrl =
+          result.data.convertedSasUrl || result.data.convertedBlobUrl;
+        await startTranscription();
+      } else {
+        console.error("Conversion failed:", result.message);
+        addToast({
+          message: result.message || "Failed to convert audio file",
+          type: "error",
+          timeout: 5000,
+        });
+        isTranscribing = false;
+        isTranscriptionFailed = true;
+      }
+    } catch (error) {
+      console.error("Error in conversion process:", error);
+      addToast({
+        message:
+          error instanceof Error
+            ? error.message
+            : "Network error: CORS issue - Please check server configuration",
+        type: "error",
+        timeout: 5000,
+      });
+      isTranscribing = false;
+      isTranscriptionFailed = true;
+    }
+  }
+
+  async function startTranscription() {
     try {
       isTranscribing = true;
       isTranscriptionFailed = false;

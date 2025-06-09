@@ -6,7 +6,7 @@ import {
 import {
   BlobSASPermissions,
   BlobServiceClient,
-  BlockBlobClient,
+  // BlockBlobClient,
   ContainerClient,
   type BlobDownloadResponseParsed,
 } from "@azure/storage-blob";
@@ -21,27 +21,27 @@ import {
   type TranscriptionResult,
 } from "$types/TranscribeRequest";
 import { ObjectId } from "mongodb";
-import ffmpeg from "fluent-ffmpeg";
-import stream, { PassThrough } from "stream";
-import path from "path";
-import os from "os";
-import { Readable } from "stream";
-import { createWriteStream, unlink, existsSync, mkdirSync } from "fs";
-import { v4 as uuidv4 } from "uuid";
+// import ffmpeg from "fluent-ffmpeg";
+// import stream, { PassThrough } from "stream";
+// import path from "path";
+// import os from "os";
+// import { Readable } from "stream";
+// import { createWriteStream, unlink, existsSync, mkdirSync } from "fs";
+// import { v4 as uuidv4 } from "uuid";
 import { AudioCategory } from "$types/TenantFeature";
 
 // const ffmpegPath = path.join(process.cwd(), 'bin', 'osx', 'ffmpeg');
-let ffmpegPath: string;
-const platform = os.platform();
-const arch = os.arch();
+// let ffmpegPath: string;
+// const platform = os.platform();
+// const arch = os.arch();
 
-if (platform === "darwin" && arch === "arm64") {
-  ffmpegPath = path.join(__dirname, "..", "bin", "osx", "ffmpeg");
-} else if (platform === "linux" && arch === "x64") {
-  ffmpegPath = path.join(__dirname, "..", "bin", "linux", "ffmpeg");
-} else {
-  throw new Error(`Unsupported platform: ${platform} (${arch})`);
-}
+// if (platform === "darwin" && arch === "arm64") {
+//   ffmpegPath = path.join(__dirname, "..", "bin", "osx", "ffmpeg");
+// } else if (platform === "linux" && arch === "x64") {
+//   ffmpegPath = path.join(__dirname, "..", "bin", "linux", "ffmpeg");
+// } else {
+//   throw new Error(`Unsupported platform: ${platform} (${arch})`);
+// }
 
 const transcribeAudio: Handler = async (
   event: HandlerEvent,
@@ -106,32 +106,39 @@ const transcribeAudio: Handler = async (
       category === AudioCategory.SubtitleLarge
     ) {
       const filename = uploadUrl.includes("?")
-          ? uploadUrl.split("?")[0]
-          : uploadUrl;
+        ? uploadUrl.split("?")[0]
+        : uploadUrl;
       const fileExtension = filename.split(".").pop();
       if (transcribeParams.isDiarizationEnabled || fileExtension === "m4a") {
-        const newBlobFileUrl = await convertStereoToMono(
+        /*const newBlobFileUrl = await convertStereoToMono(
           uploadUrl,
           category,
           transcribeParams.folderName,
           uniqueName,
         );
-        if (newBlobFileUrl) {
-          await updateTask(uniqueName, {
-            status: "processing",
-            output_url: newBlobFileUrl,
-          });
-          transcribeParams.uploadUrl = newBlobFileUrl;
-          transcriptionResult =
-            await transcribeUsingAzureOpenAI(transcribeParams);
-        } else {
+        if (newBlobFileUrl) {*/
+        console.log("\n\n\n\n");
+        console.log(
+          "Updating task status to processing with mono audio URL: ",
+          uploadUrl,
+        );
+        await updateTask(uniqueName, {
+          status: "processing",
+          output_url: uploadUrl,
+        });
+        // transcribeParams.uploadUrl = newBlobFileUrl;
+        transcriptionResult =
+          await transcribeUsingAzureOpenAI(transcribeParams);
+        console.log("Transcription result: ", transcriptionResult);
+        console.log("\n\n\n\n");
+        /*} else {
           return {
             statusCode: 500,
             body: JSON.stringify({
               message: "Error in conversion of audio",
             }),
           };
-        }
+        }*/
       } else {
         await updateTask(uniqueName, {
           status: "processing",
@@ -233,83 +240,83 @@ async function getContainerClient(
   return blobServiceClient.getContainerClient(containerName);
 }
 
-async function uploadToBlobStorage(
-  containerClient: ContainerClient,
-  convertedBlobName: string,
-  outputStream: stream.PassThrough,
-): Promise<BlockBlobClient> {
-  const monoBlobClient = containerClient.getBlockBlobClient(convertedBlobName);
-  const uploadPromise = monoBlobClient.uploadStream(
-    outputStream,
-    4 * 1024 * 1024,
-    5,
-  );
-  await uploadPromise;
-  return monoBlobClient;
-}
+// async function uploadToBlobStorage(
+//   containerClient: ContainerClient,
+//   convertedBlobName: string,
+//   outputStream: stream.PassThrough,
+// ): Promise<BlockBlobClient> {
+//   const monoBlobClient = containerClient.getBlockBlobClient(convertedBlobName);
+//   const uploadPromise = monoBlobClient.uploadStream(
+//     outputStream,
+//     4 * 1024 * 1024,
+//     5,
+//   );
+//   await uploadPromise;
+//   return monoBlobClient;
+// }
 
-async function convertStereoToMono(
-  blobUrl: string,
-  category: AudioCategory,
-  folderName: string,
-  uniqueName: string,
-): Promise<string | null> {
-  const blobServiceClient = await getBlobServiceClient(category);
-  const containerClient = await getContainerClient(blobServiceClient, category);
+// async function convertStereoToMono(
+//   blobUrl: string,
+//   category: AudioCategory,
+//   folderName: string,
+//   uniqueName: string,
+// ): Promise<string | null> {
+//   const blobServiceClient = await getBlobServiceClient(category);
+//   const containerClient = await getContainerClient(blobServiceClient, category);
 
-  const downloadBlockBlob = await downloadFile(blobUrl, category);
-  const downloadBlockBlobResponse =
-    (await downloadBlockBlob.readableStreamBody) as Readable;
-  if (!downloadBlockBlobResponse) {
-    throw new Error("Failed to retrieve blob stream");
-  }
+//   const downloadBlockBlob = await downloadFile(blobUrl, category);
+//   const downloadBlockBlobResponse =
+//     (await downloadBlockBlob.readableStreamBody) as Readable;
+//   if (!downloadBlockBlobResponse) {
+//     throw new Error("Failed to retrieve blob stream");
+//   }
 
-  const filename = blobUrl.includes("?") ? blobUrl.split("?")[0] : blobUrl;
-  const fileExtension = filename.split(".").pop();
+//   const filename = blobUrl.includes("?") ? blobUrl.split("?")[0] : blobUrl;
+//   const fileExtension = filename.split(".").pop();
 
-  if (!fileExtension) {
-    console.error(`Unsupported file extension: ${fileExtension}`);
-    return null;
-  }
+//   if (!fileExtension) {
+//     console.error(`Unsupported file extension: ${fileExtension}`);
+//     return null;
+//   }
 
-  const newFormat = fileExtension === "m4a" ? "mp3" : fileExtension;
-  const convertedBlobName = `${folderName}/${uniqueName}-mono.${newFormat}`;
-  const outputStream = new stream.PassThrough();
+//   const newFormat = fileExtension === "m4a" ? "mp3" : fileExtension;
+//   const convertedBlobName = `${folderName}/${uniqueName}-mono.${newFormat}`;
+//   const outputStream = new stream.PassThrough();
 
-  try {
-    console.log("Starting FFmpeg processing and upload...");
-    const processingPromise = processWithFFmpeg(
-      downloadBlockBlobResponse,
-      outputStream,
-      fileExtension,
-    );
+//   try {
+//     console.log("Starting FFmpeg processing and upload...");
+//     const processingPromise = processWithFFmpeg(
+//       downloadBlockBlobResponse,
+//       outputStream,
+//       fileExtension,
+//     );
 
-    const monoBlobClient = await uploadToBlobStorage(
-      containerClient,
-      convertedBlobName,
-      outputStream,
-    );
-    await processingPromise;
+//     const monoBlobClient = await uploadToBlobStorage(
+//       containerClient,
+//       convertedBlobName,
+//       outputStream,
+//     );
+//     await processingPromise;
 
-    return monoBlobClient.generateSasUrl({
-      permissions: BlobSASPermissions.parse("r"),
-      expiresOn: new Date(new Date().getTime() + 6 * 60 * 60 * 1000), // Expire in 6 hours
-    });
-  } catch (error) {
-    if (error instanceof Error) {
-      console.error("FFmpeg error:", error.message);
-      await updateTask(uniqueName, {
-        status: "failed",
-        error: error.message,
-      });
-    } else {
-      console.error("Unknown error occurred:", error);
-    }
-    return null;
-  } finally {
-    outputStream.end();
-  }
-}
+//     return monoBlobClient.generateSasUrl({
+//       permissions: BlobSASPermissions.parse("r"),
+//       expiresOn: new Date(new Date().getTime() + 6 * 60 * 60 * 1000), // Expire in 6 hours
+//     });
+//   } catch (error) {
+//     if (error instanceof Error) {
+//       console.error("FFmpeg error:", error.message);
+//       await updateTask(uniqueName, {
+//         status: "failed",
+//         error: error.message,
+//       });
+//     } else {
+//       console.error("Unknown error occurred:", error);
+//     }
+//     return null;
+//   } finally {
+//     outputStream.end();
+//   }
+// }
 
 export async function generateSasUrlFromBlobUrl(
   blobUrl: string,
@@ -336,88 +343,88 @@ export async function generateSasUrlFromBlobUrl(
   }
 }
 
-async function processWithFFmpeg(
-  inputStream: Readable,
-  outputStream: PassThrough,
-  format: string,
-): Promise<void> {
-  const newFormat = format === "m4a" ? "mp3" : format;
-  const tempDir = path.join("/tmp", "audio");
-  if (!existsSync(tempDir)) {
-    mkdirSync(tempDir, { recursive: true });
-    console.log("Created directory:", tempDir);
-  }
-  const tempFilePath = path.join(tempDir, `${uuidv4()}.${format}`);
-  await saveStreamToFile(inputStream, tempFilePath);
+// async function processWithFFmpeg(
+//   inputStream: Readable,
+//   outputStream: PassThrough,
+//   format: string,
+// ): Promise<void> {
+//   const newFormat = format === "m4a" ? "mp3" : format;
+//   const tempDir = path.join("/tmp", "audio");
+//   if (!existsSync(tempDir)) {
+//     mkdirSync(tempDir, { recursive: true });
+//     console.log("Created directory:", tempDir);
+//   }
+//   const tempFilePath = path.join(tempDir, `${uuidv4()}.${format}`);
+//   await saveStreamToFile(inputStream, tempFilePath);
 
-  const ffmpegProcess = ffmpeg()
-    .setFfmpegPath(ffmpegPath)
-    .input(tempFilePath)
-    .audioChannels(1)
-    //.audioBitrate("192k")
-    .audioCodec("libmp3lame")
-    .format(newFormat)
-    .output(outputStream);
-  // .on("start", (commandLine) => {
-  //   console.log("FFmpeg command:", commandLine);
-  // })
-  // .on("stderr", (stderrLine) => {
-  //   console.error("FFmpeg stderr:", stderrLine);
-  // })
-  // .on("progress", (progress) => {
-  //   console.log("Processing:");
-  //   console.log(progress);
-  // });
+//   const ffmpegProcess = ffmpeg()
+//     .setFfmpegPath(ffmpegPath)
+//     .input(tempFilePath)
+//     .audioChannels(1)
+//     //.audioBitrate("192k")
+//     .audioCodec("libmp3lame")
+//     .format(newFormat)
+//     .output(outputStream);
+//   // .on("start", (commandLine) => {
+//   //   console.log("FFmpeg command:", commandLine);
+//   // })
+//   // .on("stderr", (stderrLine) => {
+//   //   console.error("FFmpeg stderr:", stderrLine);
+//   // })
+//   // .on("progress", (progress) => {
+//   //   console.log("Processing:");
+//   //   console.log(progress);
+//   // });
 
-  ffmpegProcess.run();
+//   ffmpegProcess.run();
 
-  try {
-    await new Promise<void>((resolve, reject) => {
-      ffmpegProcess
-        .on("error", (err) => {
-          console.error("FFmpeg error:", err.message);
-          reject(err);
-        })
-        .on("end", () => {
-          console.log("FFmpeg processing completed");
-          resolve();
-        });
-    });
-  } catch (err) {
-    if (err instanceof Error) {
-      throw new Error(`FFmpeg processing failed: ${err.message}`);
-    } else {
-      throw new Error("FFmpeg processing failed: Unknown error");
-    }
-  } finally {
-    unlink(tempFilePath, (err) => {
-      if (err) {
-        console.error("Failed to delete temporary file:", err.message);
-      } else {
-        console.log("Temporary file deleted:", tempFilePath);
-      }
-    });
-  }
-}
+//   try {
+//     await new Promise<void>((resolve, reject) => {
+//       ffmpegProcess
+//         .on("error", (err) => {
+//           console.error("FFmpeg error:", err.message);
+//           reject(err);
+//         })
+//         .on("end", () => {
+//           console.log("FFmpeg processing completed");
+//           resolve();
+//         });
+//     });
+//   } catch (err) {
+//     if (err instanceof Error) {
+//       throw new Error(`FFmpeg processing failed: ${err.message}`);
+//     } else {
+//       throw new Error("FFmpeg processing failed: Unknown error");
+//     }
+//   } finally {
+//     unlink(tempFilePath, (err) => {
+//       if (err) {
+//         console.error("Failed to delete temporary file:", err.message);
+//       } else {
+//         console.log("Temporary file deleted:", tempFilePath);
+//       }
+//     });
+//   }
+// }
 
-async function saveStreamToFile(
-  stream: Readable,
-  filePath: string,
-): Promise<void> {
-  return new Promise<void>((resolve, reject) => {
-    const writeStream = createWriteStream(filePath);
-    stream
-      .pipe(writeStream)
-      .on("finish", () => {
-        console.log("Stream saved to file:", filePath);
-        resolve();
-      })
-      .on("error", (err) => {
-        console.error("Failed to save stream:", err.message);
-        reject(err);
-      });
-  });
-}
+// async function saveStreamToFile(
+//   stream: Readable,
+//   filePath: string,
+// ): Promise<void> {
+//   return new Promise<void>((resolve, reject) => {
+//     const writeStream = createWriteStream(filePath);
+//     stream
+//       .pipe(writeStream)
+//       .on("finish", () => {
+//         console.log("Stream saved to file:", filePath);
+//         resolve();
+//       })
+//       .on("error", (err) => {
+//         console.error("Failed to save stream:", err.message);
+//         reject(err);
+//       });
+//   });
+// }
 
 async function downloadFileFromBlob(
   blobUrl: string,
