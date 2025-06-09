@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import { writeToString } from "fast-csv";
 import PromptModel from "$data/models/prompt.model";
 import type { Group } from "$data/models/category.model";
-import { RequiredColumn, type CsvRowRaw } from "$types/prompt-csv.types";
+import { CsvColumn, type CsvRowRaw } from "$types/PromptCsv.types";
 
 export const GET: APIRoute = async (ctx: APIContext) => {
   const { tenant_id: tenantId } = ctx.locals.user;
@@ -24,11 +24,13 @@ export const GET: APIRoute = async (ctx: APIContext) => {
 
       // Returning the data formatted for CSV
       return {
-        [RequiredColumn.Title]: prompt.title,
-        [RequiredColumn.Description]: prompt.description,
-        [RequiredColumn.Instruction]: prompt.prompt,
-        [RequiredColumn.Category]: category,
-        [RequiredColumn.Group]: group,
+        [CsvColumn.Title]: prompt.title,
+        [CsvColumn.Description]: prompt.description,
+        [CsvColumn.Instruction]: prompt.prompt,
+        [CsvColumn.Category]: category,
+        [CsvColumn.Group]: group,
+        [CsvColumn.Model]: prompt.model,
+        [CsvColumn.PredefinedInput]: prompt.predefined_input,
       };
     });
 
