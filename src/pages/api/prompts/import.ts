@@ -36,6 +36,7 @@ const syncCategoriesWithGroups = async (rows: CsvRowRaw[], user: User) => {
         group: item.group,
       };
     })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     .reduce<Record<string, any>>((acc, item) => {
       const key = item["name"] as string;
       if (!acc[key]) {
@@ -129,6 +130,8 @@ const syncPrompts = async (rows: CsvRowRaw[], user: User) => {
       created_at: new Date(),
       updated_at: new Date(),
       prompt: item.instruction,
+      model: item.model ?? "",
+      predefined_input: item.predefined_input ?? "",
     };
     await PromptModel.add(newPrompt);
   }

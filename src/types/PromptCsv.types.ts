@@ -17,6 +17,8 @@ const CsvRowRawSchema = z.object({
   instruction: z.string(),
   category: z.string().optional(),
   group: z.string().optional(),
+  model: z.string().optional(),
+  predefined_input: z.string().optional(),
 });
 
 export type CsvRowRaw = z.infer<typeof CsvRowRawSchema>;
