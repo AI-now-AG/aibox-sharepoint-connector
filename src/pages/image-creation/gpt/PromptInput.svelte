@@ -115,7 +115,7 @@
       bind:modal={fileModal}
       title={t("upload-file.popup.title")}
       {acceptedTypes}
-      supportedFormatsText={t("prompt-execution.upload-file.supportted-files")}
+      supportedFormatsText={"PDF, JSON, TXT, PNG, JPEG"}
     />
   </div>
 </div>
