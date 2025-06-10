@@ -155,7 +155,7 @@
 
   async function pollImageStatus(
     uniqueId: string,
-    maxRetries = 30,
+    maxRetries = 100,
     delayMs = 2000,
   ) {
     for (let attempt = 0; attempt < maxRetries; attempt++) {
