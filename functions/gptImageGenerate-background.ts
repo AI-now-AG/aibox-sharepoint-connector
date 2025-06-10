@@ -220,7 +220,7 @@ const gptImageGenerate: Handler = async (
   } catch (error: any) {
     console.error("Image generation error:", error);
 
-    const { code, message = "" } = error;
+    const { code = "", message = "" } = error;
     const update: Partial<ImageTask> = {
       status: Status.Failed,
       error: {
