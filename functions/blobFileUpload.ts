@@ -1,4 +1,4 @@
-import { getDeployStore } from "@netlify/blobs";
+import { getStore } from "@netlify/blobs";
 import type { Handler } from "@netlify/functions";
 import { v4 as uuid } from "uuid";
 import { type FileInput } from "$types/FileInput";
@@ -14,20 +14,19 @@ const blobFileUpload: Handler = async (event) => {
   const body = JSON.parse(event.body || "{}");
   const files: FileInput[] = body?.files ?? [];
 
-  const uploads = getDeployStore("file-uploads");
+  const store = getStore({
+    name: "file-uploads",
+    siteID: "f86d169e-317a-41ba-be2f-9d7f5e141ba7",
+    token: "nfc_K7E9M5NV1WiRBtWK4sec2AXzfkryYbTo24d3",
+  });
   const results = [];
   for (const file of files) {
     const key = uuid();
-    await uploads.set(key, file.content, {
-      metadata: {
-        name: file.name,
-        type: file.type,
-      },
-    });
-
+    await store.setJSON(key, file);
     results.push(key);
   }
 
+  console.log("results", results);
   return {
     statusCode: 200,
     body: JSON.stringify({ results }),

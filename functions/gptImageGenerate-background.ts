@@ -18,6 +18,7 @@ import type {
   ResponseInputImage,
   ResponseUsage,
 } from "openai/resources/responses/responses";
+import { getStore } from "@netlify/blobs";
 
 const recordImageUsage = async (tenantId: string) => {
   try {
@@ -76,8 +77,7 @@ const gptImageGenerate: Handler = async (
     background = "transparent",
     outputCompression = 100,
     previousResponseId = "",
-    inputImages = [],
-    inputFiles = [],
+    files = [],
   } = body;
 
   if (!prompt) {
@@ -108,6 +108,28 @@ const gptImageGenerate: Handler = async (
     const openai = new OpenAI({
       apiKey: openAIApiKey,
     });
+
+    const inputImages: FileInput[] = [];
+    const inputFiles: FileInput[] = [];
+
+    const store = getStore({
+      name: "file-uploads",
+      siteID: "f86d169e-317a-41ba-be2f-9d7f5e141ba7",
+      token: "nfc_K7E9M5NV1WiRBtWK4sec2AXzfkryYbTo24d3",
+    });
+    const fileDataList = [];
+    for (const key of files) {
+      const data = await store.get(key);
+      fileDataList.push(JSON.parse(data) as FileInput);
+    }
+    for (const fileData of fileDataList) {
+      if (fileData.type.startsWith("image/")) {
+        inputImages.push(fileData);
+      } else {
+        inputFiles.push(fileData);
+      }
+    }
+    console.log("fileDataList", { inputImages, inputFiles });
 
     const response = await openai.responses.create({
       model: "gpt-4o",
