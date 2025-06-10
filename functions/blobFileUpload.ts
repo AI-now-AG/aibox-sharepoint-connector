@@ -16,7 +16,7 @@ const blobFileUpload: Handler = async (event) => {
 
   const store = getStore({
     name: "file-uploads",
-    siteID: "f86d169e-317a-41ba-be2f-9d7f5e141ba7",
+    siteID: process.env.SITE_ID,
     token: "nfc_K7E9M5NV1WiRBtWK4sec2AXzfkryYbTo24d3",
   });
   const results = [];
