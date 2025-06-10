@@ -111,7 +111,6 @@ const gptImageGenerate: Handler = async (
 
     const response = await openai.responses.create({
       model: "gpt-4o",
-      //input: prompt,
       input: [
         {
           role: "user",

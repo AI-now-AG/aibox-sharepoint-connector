@@ -117,6 +117,18 @@
       inputFiles: fileList,
     };
     console.log("Submitting payload:", params);
+
+    const uploadResponse = await fetch("/.netlify/functions/blobFileUpload", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(fileDataList),
+    });
+
+    console.log("blobFileUpload:", uploadResponse);
+    return;
+
     const response = await fetch(
       "/.netlify/functions/gptImageGenerate-background",
       {
