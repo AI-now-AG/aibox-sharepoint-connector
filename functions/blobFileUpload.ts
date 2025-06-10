@@ -2,6 +2,7 @@ import { getStore } from "@netlify/blobs";
 import type { Handler } from "@netlify/functions";
 import { v4 as uuid } from "uuid";
 import { type FileInput } from "$types/FileInput";
+import { NETLIFY_BLOBS_STORE } from "$constants";
 
 const blobFileUpload: Handler = async (event) => {
   if (event.httpMethod !== "POST") {
@@ -15,9 +16,9 @@ const blobFileUpload: Handler = async (event) => {
   const files: FileInput[] = body?.files ?? [];
 
   const store = getStore({
-    name: "file-uploads",
+    name: NETLIFY_BLOBS_STORE,
     siteID: process.env.SITE_ID,
-    token: "nfc_K7E9M5NV1WiRBtWK4sec2AXzfkryYbTo24d3",
+    token: process.env.NETLIFY_BLOBS_TOKEN,
   });
   const results = [];
   for (const file of files) {
@@ -26,7 +27,6 @@ const blobFileUpload: Handler = async (event) => {
     results.push(key);
   }
 
-  console.log("results", results);
   return {
     statusCode: 200,
     body: JSON.stringify({ results }),

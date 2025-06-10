@@ -3,6 +3,7 @@ import {
   type HandlerEvent,
   type HandlerResponse,
 } from "@netlify/functions";
+import { getStore } from "@netlify/blobs";
 import { OpenAI } from "openai";
 import { ObjectId } from "mongodb";
 import { decrypt } from "$utils/secure";
@@ -18,7 +19,7 @@ import type {
   ResponseInputImage,
   ResponseUsage,
 } from "openai/resources/responses/responses";
-import { getStore } from "@netlify/blobs";
+import { NETLIFY_BLOBS_STORE } from "$constants";
 
 const recordImageUsage = async (tenantId: string) => {
   try {
@@ -95,6 +96,12 @@ const gptImageGenerate: Handler = async (
     };
   }
 
+  const store = getStore({
+    name: NETLIFY_BLOBS_STORE,
+    siteID: process.env.SITE_ID,
+    token: process.env.NETLIFY_BLOBS_TOKEN,
+  });
+
   try {
     const document: Partial<ImageTask> = {
       id: uniqueId,
@@ -112,11 +119,6 @@ const gptImageGenerate: Handler = async (
     const inputImages: FileInput[] = [];
     const inputFiles: FileInput[] = [];
 
-    const store = getStore({
-      name: "file-uploads",
-      siteID: process.env.SITE_ID,
-      token: "nfc_K7E9M5NV1WiRBtWK4sec2AXzfkryYbTo24d3",
-    });
     const fileDataList = [];
     for (const key of files) {
       const data = await store.get(key);
@@ -129,12 +131,7 @@ const gptImageGenerate: Handler = async (
         inputFiles.push(fileData);
       }
     }
-    console.log("fileDataList", { inputImages, inputFiles });
-
-    // remove all blods
-    for (const key of files) {
-      await store.delete(key);
-    }
+    //console.log("fileDataList", { inputImages, inputFiles });
 
     const response = await openai.responses.create({
       model: "gpt-4o",
@@ -192,14 +189,12 @@ const gptImageGenerate: Handler = async (
       imageUrl = `data:image/${format};base64,${result}`;
 
       recordImageUsage(tenantId);
-      //console.log("imageData", JSON.stringify(imageData[0]));
     }
 
     if (messageData.length) {
       outputText =
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (messageData[0]?.content?.[0] as any)?.text || response.output_text;
-      //console.log("messageData", JSON.stringify(messageData[0]));
     }
 
     if (!imageData.length && messageData.length) {
@@ -241,6 +236,11 @@ const gptImageGenerate: Handler = async (
         error: error?.message || "Internal Server Error",
       }),
     };
+  } finally {
+    // remove all blobs
+    for (const key of files) {
+      await store.delete(key);
+    }
   }
 };
 
