@@ -1,4 +1,4 @@
-import { getStore } from "@netlify/blobs";
+import { getDeployStore } from "@netlify/blobs";
 import type { Handler } from "@netlify/functions";
 import { v4 as uuid } from "uuid";
 import { type FileInput } from "$types/FileInput";
@@ -14,7 +14,7 @@ const blobFileUpload: Handler = async (event) => {
   const body = JSON.parse(event.body || "{}");
   const files: FileInput[] = body?.files ?? [];
 
-  const uploads = getStore("file-uploads");
+  const uploads = getDeployStore("file-uploads");
   const results = [];
   for (const file of files) {
     const key = uuid();
