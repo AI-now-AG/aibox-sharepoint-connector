@@ -139,8 +139,9 @@
       return;
     }
 
-    // clear input text
+    // clear input text & files
     prompt = "";
+    files = [];
 
     // scroll to latest user input
     setTimeout(() => {
@@ -173,8 +174,6 @@
 
         previousResponseId = data.responseId;
         loading = false;
-        prompt = "";
-        files = [];
         return;
       } else if (data.status === Status.Failed) {
         const errorMessage = data.error?.message || "Image generation failed.";

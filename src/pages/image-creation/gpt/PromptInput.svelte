@@ -77,21 +77,20 @@
 
   <div class="grid grid-cols-[1fr_min-content] gap-4">
     <div class="p-2 flex flex-row gap-2">
-      {#if !stickyFooter}
-        <button
-          class="btn h-auto w-auto p-1 min-h-0 hover:text-base-content/60"
-          onclick={() => {
-            fileModal?.showModal();
-          }}
-        >
-          {@html svgIcons.attachment}
-          {#if files.length > 0}
-            <div class="badge badge-sm badge-neutral font-normal">
-              {files.length}
-            </div>
-          {/if}
-        </button>
-      {/if}
+      <button
+        class="btn h-auto w-auto p-1 min-h-0 hover:text-base-content/60"
+        onclick={() => {
+          fileModal?.showModal();
+        }}
+        disabled={isProcessing}
+      >
+        {@html svgIcons.attachment}
+        {#if files.length > 0}
+          <div class="badge badge-sm badge-neutral font-normal">
+            {files.length}
+          </div>
+        {/if}
+      </button>
     </div>
     <div class="flex self-end">
       <button
