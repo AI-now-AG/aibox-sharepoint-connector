@@ -3,6 +3,7 @@ import {
   type HandlerEvent,
   type HandlerResponse,
 } from "@netlify/functions";
+import { getStore } from "@netlify/blobs";
 import { OpenAI } from "openai";
 import { ObjectId } from "mongodb";
 import { decrypt } from "$utils/secure";
@@ -18,6 +19,7 @@ import type {
   ResponseInputImage,
   ResponseUsage,
 } from "openai/resources/responses/responses";
+import { NETLIFY_BLOBS_STORE } from "$constants";
 
 const recordImageUsage = async (tenantId: string) => {
   try {
@@ -76,8 +78,7 @@ const gptImageGenerate: Handler = async (
     background = "transparent",
     outputCompression = 100,
     previousResponseId = "",
-    inputImages = [],
-    inputFiles = [],
+    files = [],
   } = body;
 
   if (!prompt) {
@@ -95,6 +96,12 @@ const gptImageGenerate: Handler = async (
     };
   }
 
+  const store = getStore({
+    name: NETLIFY_BLOBS_STORE,
+    siteID: process.env.SITE_ID,
+    token: process.env.NETLIFY_BLOBS_TOKEN,
+  });
+
   try {
     const document: Partial<ImageTask> = {
       id: uniqueId,
@@ -109,9 +116,25 @@ const gptImageGenerate: Handler = async (
       apiKey: openAIApiKey,
     });
 
+    const inputImages: FileInput[] = [];
+    const inputFiles: FileInput[] = [];
+
+    const fileDataList = [];
+    for (const key of files) {
+      const data = await store.get(key);
+      fileDataList.push(JSON.parse(data) as FileInput);
+    }
+    for (const fileData of fileDataList) {
+      if (fileData.type.startsWith("image/")) {
+        inputImages.push(fileData);
+      } else {
+        inputFiles.push(fileData);
+      }
+    }
+    //console.log("fileDataList", { inputImages, inputFiles });
+
     const response = await openai.responses.create({
       model: "gpt-4o",
-      //input: prompt,
       input: [
         {
           role: "user",
@@ -166,14 +189,12 @@ const gptImageGenerate: Handler = async (
       imageUrl = `data:image/${format};base64,${result}`;
 
       recordImageUsage(tenantId);
-      //console.log("imageData", JSON.stringify(imageData[0]));
     }
 
     if (messageData.length) {
       outputText =
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (messageData[0]?.content?.[0] as any)?.text || response.output_text;
-      //console.log("messageData", JSON.stringify(messageData[0]));
     }
 
     if (!imageData.length && messageData.length) {
@@ -199,7 +220,7 @@ const gptImageGenerate: Handler = async (
   } catch (error: any) {
     console.error("Image generation error:", error);
 
-    const { code, message = "" } = error;
+    const { code = "", message = "" } = error;
     const update: Partial<ImageTask> = {
       status: Status.Failed,
       error: {
@@ -215,6 +236,11 @@ const gptImageGenerate: Handler = async (
         error: error?.message || "Internal Server Error",
       }),
     };
+  } finally {
+    // remove all blobs
+    for (const key of files) {
+      await store.delete(key);
+    }
   }
 };
 

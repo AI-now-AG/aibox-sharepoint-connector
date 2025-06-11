@@ -75,8 +75,6 @@
 
   async function submitForm() {
     uniqueId = uuidv4();
-    const fileList: FileInput[] = [];
-    const imageList: FileInput[] = [];
 
     const fileDataList = await Promise.all(
       files.map(async (file) => ({
@@ -85,14 +83,6 @@
         type: file.type,
       })),
     );
-
-    for (const fileData of fileDataList) {
-      if (fileData.type.startsWith("image/")) {
-        imageList.push(fileData);
-      } else {
-        fileList.push(fileData);
-      }
-    }
 
     // reset states
     loading = true;
@@ -113,10 +103,22 @@
       outputFormat,
       background,
       previousResponseId,
-      inputImages: imageList,
-      inputFiles: fileList,
     };
     console.log("Submitting payload:", params);
+
+    const uploadResponse = await fetch("/.netlify/functions/blobFileUpload", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        files: fileDataList,
+      }),
+    });
+
+    const uploadData = await uploadResponse.json();
+    params["files"] = uploadData.results;
+
     const response = await fetch(
       "/.netlify/functions/gptImageGenerate-background",
       {
@@ -153,7 +155,7 @@
 
   async function pollImageStatus(
     uniqueId: string,
-    maxRetries = 30,
+    maxRetries = 100,
     delayMs = 2000,
   ) {
     for (let attempt = 0; attempt < maxRetries; attempt++) {

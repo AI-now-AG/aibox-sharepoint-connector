@@ -29,6 +29,7 @@
     "@langchain/core": "^0.3.55",
     "@langchain/openai": "^0.4.9",
     "@lucia-auth/adapter-mongodb": "^1.0.3",
+    "@netlify/blobs": "^9.1.6",
     "@netlify/functions": "^3.1.8",
     "@sendgrid/mail": "^8.1.5",
     "@sentry/astro": "^9.19.0",
