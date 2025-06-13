@@ -62,11 +62,7 @@
 
               {#if isProcessing}
                 <div class="card mt-2 gap-4 min-h-[50vh]" transition:fade>
-                  <div
-                    class="chat-bubble bg-base-100 text-base-content flex flex-row"
-                  >
-                    {@html svgIcons.spinner}
-                  </div>
+                  <div class="skeleton h-24 w-md"></div>
                 </div>
               {/if}
             </div>

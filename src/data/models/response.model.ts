@@ -21,7 +21,7 @@ const ResponseSchema = z.object({
   prompt: z.string().min(1),
   status: z.string(),
   output_text: z.string().nullish().default(null),
-  tools: z.array(ToolOutputSchema).optional(),
+  tools: z.array(ToolOutputSchema).optional().default([]),
   response_id: z.string().nullish().default(null),
   error: ErrorSchema.optional(),
   created_at: z
