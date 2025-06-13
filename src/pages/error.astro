@@ -11,14 +11,14 @@ const logoutText = t("common.logout");
 const refreshText = t("common.refresh");
 const backToHomeText = t("common.back-to-home");
 
-// Check Social Login same email account with existing User
+// Check social login same email account with existing user
 if (errorName == "account_paired") {
   errorName = t("existing-email.error-title");
   errorDescription = t("existing-email.error-description");
 }
 
-// Check Social Login same email account with existing User
-if (errorName == "account_blocked") {
+// Check account blocked
+if (errorName == "account_blocked" || (errorName == "unauthorized" && errorDescription == 'user is blocked')) {
   errorName = t("error.account-blocked-title");
   errorDescription = t("error.account-blocked-description");
 }
