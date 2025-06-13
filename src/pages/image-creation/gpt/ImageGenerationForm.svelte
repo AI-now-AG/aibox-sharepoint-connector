@@ -88,12 +88,6 @@
     isFetching = true;
     isGenerating = false;
 
-    // store messages
-    messages.push({
-      role: MessageRole.User,
-      content: prompt,
-    });
-
     const params: Record<string, unknown> = {
       tenantId,
       uniqueId,
@@ -140,10 +134,6 @@
       return;
     }
 
-    // clear input text & files
-    prompt = "";
-    files = [];
-
     // scroll to latest user input
     setTimeout(() => {
       scrollIntoView();
@@ -177,12 +167,23 @@
         const imageUrl =
           data.tools.find((item: any) => item.name === ToolName.Image)
             ?.image_url || "";
+
+        // store messages
+        messages.push({
+          role: MessageRole.User,
+          content: prompt,
+        });
         messages.push({
           role: MessageRole.Assistant,
           content: formatMarkdown(data.outputText),
           imageUrl,
         });
 
+        // clear input text & files
+        prompt = "";
+        files = [];
+
+        // reset states
         previousResponseId = data.responseId;
         isFetching = false;
         isGenerating = false;
@@ -245,7 +246,10 @@
     </h1>
     <p>{t("create-image.create-gpt-image-description")}</p>
 
-    <Output {messages} {isFetching} {isGenerating} />
+    <!-- Output (Follow-Up) -->
+    {#if messages.length > 0}
+      <Output {messages} {isFetching} {isGenerating} />
+    {/if}
 
     {#if messages.length == 0}
       <div class="space-y-4 mt-10">
@@ -338,5 +342,10 @@
         onsend={submitForm}
       />
     </div>
+
+    <!-- Output (Normal) -->
+    {#if messages.length == 0}
+      <Output {messages} {isFetching} {isGenerating} />
+    {/if}
   </div>
 </div>
