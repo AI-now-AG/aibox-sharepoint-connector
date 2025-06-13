@@ -52,7 +52,7 @@ export async function convertToMono(config: ConvertToMonoConfig): Promise<Conver
     deleteOriginal = false,
     folderName,
     uniqueName,
-    timeoutMs = 300000
+    timeoutMs = 1800000
   } = config;
 
   const apiUrl = `${baseUrl}/api/audio/convert-to-mono`;
