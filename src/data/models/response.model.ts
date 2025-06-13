@@ -8,13 +8,20 @@ export const ErrorSchema = z.object({
   message: z.string().optional(),
 });
 
-const ImageTaskSchema = z.object({
+const ToolOutputSchema = z.discriminatedUnion("type", [
+  z.object({
+    type: z.literal("image"),
+    image_url: z.string().url(),
+  }),
+]);
+
+const ResponseSchema = z.object({
   id: z.string().min(1),
   creator_id: z.instanceof(ObjectId).optional(),
   prompt: z.string().min(1),
   status: z.string(),
   output_text: z.string().nullish().default(null),
-  image_url: z.string().nullish().default(null),
+  tools: z.array(ToolOutputSchema).optional(),
   response_id: z.string().nullish().default(null),
   error: ErrorSchema.optional(),
   created_at: z
@@ -35,22 +42,22 @@ const ImageTaskSchema = z.object({
     }),
 });
 
-export type ImageTask = z.infer<typeof ImageTaskSchema>;
+export type Response = z.infer<typeof ResponseSchema>;
 
 const collection = db.collection("image_tasks");
 
 export default {
-  create: async (document: Partial<ImageTask>) => {
-    const validated = ImageTaskSchema.parse({ id: uuidv4(), ...document });
+  create: async (document: Partial<Response>) => {
+    const validated = ResponseSchema.parse({ id: uuidv4(), ...document });
     return collection.insertOne(validated);
   },
 
-  get: async (id: string): Promise<ImageTask | null> => {
-    return collection.findOne<Document<ImageTask>>({ id });
+  get: async (id: string): Promise<Response | null> => {
+    return collection.findOne<Document<Response>>({ id });
   },
 
-  update: async (id: string, update: Partial<ImageTask>) => {
-    const validated = ImageTaskSchema.partial().parse(update);
+  update: async (id: string, update: Partial<Response>) => {
+    const validated = ResponseSchema.partial().parse(update);
     const result = await collection.updateOne(
       { id },
       { $set: { ...validated } },

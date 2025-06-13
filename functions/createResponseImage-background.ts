@@ -7,10 +7,10 @@ import { getStore } from "@netlify/blobs";
 import { OpenAI } from "openai";
 import { ObjectId } from "mongodb";
 import { decrypt } from "$utils/secure";
-import { Status } from "$types/ImageTask";
+import { ResponseStatus } from "$types/AIResponse";
 import { type FileInput } from "$types/FileInput";
 import { ApiKeyProvider } from "$types/TenantFeature";
-import ImageTaskModel, { type ImageTask } from "$data/models/imageTask.model";
+import ResponseModel, { type Response } from "$data/models/response.model";
 import TenantModel from "$data/models/tenant.model";
 import { UsageType, TextModel } from "$types/UsageTracking";
 import UsageLogModel, { type UsageLog } from "$data/models/usageLog.model";
@@ -56,7 +56,7 @@ const recordTextUsage = async (
   }
 };
 
-const gptImageGenerate: Handler = async (
+const createResponseImage: Handler = async (
   event: HandlerEvent,
 ): Promise<HandlerResponse> => {
   if (event.httpMethod !== "POST") {
@@ -103,12 +103,12 @@ const gptImageGenerate: Handler = async (
   });
 
   try {
-    const document: Partial<ImageTask> = {
+    const document: Partial<Response> = {
       id: uniqueId,
       prompt,
-      status: Status.InProgress,
+      status: ResponseStatus.InProgress,
     };
-    await ImageTaskModel.create(document);
+    await ResponseModel.create(document);
 
     // Call OpenAI image generation endpoint
     const openAIApiKey = decrypt(tenant.openai_api_key as string);
@@ -201,13 +201,18 @@ const gptImageGenerate: Handler = async (
       recordTextUsage(tenantId, response.usage as ResponseUsage);
     }
 
-    const update: Partial<ImageTask> = {
-      status: Status.Completed,
+    const update: Partial<Response> = {
+      status: ResponseStatus.Completed,
       output_text: outputText,
-      image_url: imageUrl,
+      tools: [
+        {
+          type: "image",
+          image_url: imageUrl,
+        },
+      ],
       response_id: response.id,
     };
-    await ImageTaskModel.update(uniqueId, update);
+    await ResponseModel.update(uniqueId, update);
 
     console.log("GPT image response", JSON.stringify(response));
     return {
@@ -218,17 +223,17 @@ const gptImageGenerate: Handler = async (
     };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
-    console.error("Image generation error:", error);
+    console.error("Response API error:", error);
 
     const { code = "", message = "" } = error;
-    const update: Partial<ImageTask> = {
-      status: Status.Failed,
+    const update: Partial<Response> = {
+      status: ResponseStatus.Failed,
       error: {
         code,
         message,
       },
     };
-    await ImageTaskModel.update(uniqueId, update);
+    await ResponseModel.update(uniqueId, update);
 
     return {
       statusCode: 500,
@@ -244,4 +249,4 @@ const gptImageGenerate: Handler = async (
   }
 };
 
-export { gptImageGenerate as handler };
+export { createResponseImage as handler };

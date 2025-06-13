@@ -2,9 +2,8 @@
   import { slide } from "svelte/transition";
   import { v4 as uuidv4 } from "uuid";
   import { useTranslations } from "$i18n/utils";
-  import { Status } from "$types/ImageTask";
+  import { ResponseStatus } from "$types/AIResponse";
   import { addToast } from "$stores/toast";
-  import { type FileInput } from "$types/FileInput";
   import { MessageRole, type MessageHistory } from "$types/MessageHistory";
   import { readFileContent } from "$utils/fileReader";
   import { formatMarkdown } from "$utils/common";
@@ -93,7 +92,7 @@
       content: prompt,
     });
 
-    const params = {
+    const params: Record<string, unknown> = {
       tenantId,
       uniqueId,
       prompt,
@@ -120,7 +119,7 @@
     params["files"] = uploadData.results;
 
     const response = await fetch(
-      "/.netlify/functions/gptImageGenerate-background",
+      "/.netlify/functions/createResponseImage-background",
       {
         method: "POST",
         headers: {
@@ -161,21 +160,23 @@
   ) {
     for (let attempt = 0; attempt < maxRetries; attempt++) {
       const res = await fetch(
-        `/.netlify/functions/gptImageCheckStatus?uid=${uniqueId}`,
+        `/.netlify/functions/checkResponseStatus?uid=${uniqueId}`,
       );
       const data = await res.json();
 
-      if (data.status === Status.Completed) {
+      if (data.status === ResponseStatus.Completed) {
         messages.push({
           role: MessageRole.Assistant,
           content: formatMarkdown(data.outputText),
-          imageUrl: data.imageUrl,
+          imageUrl:
+            data.tools.find((item: any) => item.type === "image")?.image_url ||
+            "",
         });
 
         previousResponseId = data.responseId;
         loading = false;
         return;
-      } else if (data.status === Status.Failed) {
+      } else if (data.status === ResponseStatus.Failed) {
         const errorMessage = data.error?.message || "Image generation failed.";
         messages.push({
           role: MessageRole.Assistant,

@@ -1,4 +1,4 @@
-export enum Status {
+export enum ResponseStatus {
   InProgress = "in_progress",
   Completed = "completed",
   Failed = "failed",
