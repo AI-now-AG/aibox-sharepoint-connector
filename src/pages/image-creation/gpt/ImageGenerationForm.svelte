@@ -134,11 +134,6 @@
       return;
     }
 
-    // scroll to latest user input
-    setTimeout(() => {
-      scrollIntoView();
-    }, 1000);
-
     // start polling requests
     setTimeout(async () => {
       await pollImageStatus(uniqueId);
@@ -178,6 +173,11 @@
           content: formatMarkdown(data.outputText),
           imageUrl,
         });
+
+        // scroll to latest user input
+        setTimeout(() => {
+          scrollIntoView();
+        }, 1000);
 
         // clear input text & files
         prompt = "";

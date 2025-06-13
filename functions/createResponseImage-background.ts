@@ -224,13 +224,17 @@ const createResponseImage: Handler = async (
         const update: Partial<Response> = {
           status: ResponseStatus.Completed,
           output_text: outputText,
-          tools: [
-            {
-              name: ToolName.Image,
-              image_url: imageUrl,
-              is_generated: true,
-            },
-          ],
+          ...(imageData.length
+            ? {
+                tools: [
+                  {
+                    name: ToolName.Image,
+                    image_url: imageUrl,
+                    is_generated: true,
+                  },
+                ],
+              }
+            : {}),
           response_id: response.id,
         };
         await ResponseModel.update(uniqueId, update);
@@ -238,7 +242,7 @@ const createResponseImage: Handler = async (
         console.log("GPT image response", JSON.stringify(response));
       }
 
-      //console.log("event ===> ", { event, response });
+      //console.log("ResponseAPI event ===> ", event);
     }
 
     return {
