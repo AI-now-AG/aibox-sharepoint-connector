@@ -84,10 +84,12 @@ export async function convertToMono(config: ConvertToMonoConfig): Promise<Conver
   if (folderName) requestBody.folderName = folderName;
   if (uniqueName) requestBody.uniqueName = uniqueName;
 
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => {
+    controller.abort();
+  }, timeoutMs);
 
+  try {
     const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
@@ -98,8 +100,8 @@ export async function convertToMono(config: ConvertToMonoConfig): Promise<Conver
       signal: controller.signal
     });
 
-    clearTimeout(timeoutId);
     const result: ConvertToMonoResponse = await response.json();
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       return {
@@ -111,15 +113,16 @@ export async function convertToMono(config: ConvertToMonoConfig): Promise<Conver
 
     return result;
 
-  } catch (error) {
+  } catch (err) {
+    clearTimeout(timeoutId);
+    const error = err as Error;
     if (error instanceof Error && error.name === 'AbortError') {
       return {
         success: false,
-        message: `Request timed out after ${timeoutMs / 1000} seconds`,
-        error: 'Request timeout'
+        message: 'Operation timed out',
+        error: `Request exceeded timeout of ${timeoutMs/1000} seconds`
       };
     }
-
     return {
       success: false,
       message: 'Network error occurred while calling the API',

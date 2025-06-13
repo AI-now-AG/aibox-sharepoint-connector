@@ -21,8 +21,36 @@ import { setLanguage } from "$i18n/utils";
 import { wildcardMatch, wildcardMatchInArray } from "$utils/wildcardMatch";
 
 async function requestOrigin(context: APIContext, next: MiddlewareNext) {
-  // Basic CSRF protection
-  if (context.request.method !== "GET") {
+  const path = context.url.pathname;
+  const isAudioConversion = path.includes('/api/audio/convert-to-mono');
+
+  // Set CORS headers for audio conversion endpoint
+  if (isAudioConversion) {
+    if (context.request.method === 'OPTIONS') {
+      return new Response(null, {
+        status: 204,
+        headers: {
+          'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, X-API-Key',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Max-Age': '86400', // 24 hours
+        },
+      });
+    }
+
+    // For actual requests, let the response handle CORS headers
+    const response = await next();
+    const newHeaders = new Headers(response.headers);
+    newHeaders.set('Access-Control-Allow-Origin', '*');
+    
+    return new Response(response.body, {
+      status: response.status,
+      headers: newHeaders,
+    });
+  }
+
+  // Regular CSRF protection for other endpoints
+  if (context.request.method !== "GET" && !isAudioConversion) {
     const originHeader = context.request.headers.get("Origin");
     const hostHeader = context.request.headers.get("Host");
 
