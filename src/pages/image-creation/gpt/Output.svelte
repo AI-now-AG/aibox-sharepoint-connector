@@ -8,12 +8,14 @@
     messages: MessageHistory;
     isFetching: boolean;
     isGenerating: boolean;
+    infoText?: string;
   }
 
   let {
     messages = [],
     isFetching = false,
     isGenerating = false,
+    infoText = "",
   }: Props = $props();
 
   let username = $user?.name || $user?.username;
@@ -58,7 +60,7 @@
 
                   {#if role === MessageRole.Assistant && imageUrl}
                     <div class="chat-bubble text-base-content bg-base-200">
-                      <ImageCard url={imageUrl} alt={content} />
+                      <ImageCard url={imageUrl} alt={content} {infoText} />
                     </div>
                   {/if}
                 {/each}

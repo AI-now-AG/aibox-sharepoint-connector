@@ -6,7 +6,7 @@
   import { addToast } from "$stores/toast";
   import { MessageRole, type MessageHistory } from "$types/MessageHistory";
   import { readFileContent } from "$utils/fileReader";
-  import { formatMarkdown } from "$utils/common";
+  import { formatMarkdown, capitalizeFirst } from "$utils/common";
   import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
   import Dropdown from "$components/form/Dropdown.svelte";
   import PromptInput from "./PromptInput.svelte";
@@ -226,6 +226,14 @@
     }
   }
 
+  function getInfoText() {
+    return t("create-image.image-info-text", {
+      format: outputFormat.toUpperCase(),
+      quality: capitalizeFirst(imageQuality),
+      size: imageSize,
+    });
+  }
+
   function startNewChat() {
     prompt = "";
     files = [];
@@ -248,7 +256,7 @@
 
     <!-- Output (Follow-Up) -->
     {#if messages.length > 0}
-      <Output {messages} {isFetching} {isGenerating} />
+      <Output {messages} {isFetching} {isGenerating} infoText={getInfoText()} />
     {/if}
 
     {#if messages.length == 0}

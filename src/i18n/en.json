@@ -456,5 +456,6 @@
   "create-image.image-background-label": "Background",
   "create-image.image-compression-label": "Compression Level",
   "create-image.create-gpt-image-title": "Create GPT Image",
-  "create-image.create-gpt-image-description": "Create images from the latest and most popular model from OpenAI"
+  "create-image.create-gpt-image-description": "Create images from the latest and most popular model from OpenAI",
+  "create-image.image-info-text": "Format:${format}, Quality:${quality}, Size:${size}"
 }
