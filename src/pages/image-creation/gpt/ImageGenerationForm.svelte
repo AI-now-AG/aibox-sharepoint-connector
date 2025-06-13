@@ -2,7 +2,7 @@
   import { slide } from "svelte/transition";
   import { v4 as uuidv4 } from "uuid";
   import { useTranslations } from "$i18n/utils";
-  import { ResponseStatus } from "$types/AIResponse";
+  import { ResponseStatus, ToolName } from "$types/AIResponse";
   import { addToast } from "$stores/toast";
   import { MessageRole, type MessageHistory } from "$types/MessageHistory";
   import { readFileContent } from "$utils/fileReader";
@@ -169,8 +169,8 @@
           role: MessageRole.Assistant,
           content: formatMarkdown(data.outputText),
           imageUrl:
-            data.tools.find((item: any) => item.type === "image")?.image_url ||
-            "",
+            data.tools.find((item: any) => item.type === ToolName.Image)
+              ?.image_url || "",
         });
 
         previousResponseId = data.responseId;

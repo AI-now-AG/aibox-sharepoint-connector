@@ -6,9 +6,9 @@
  * @returns {string | undefined} - The value of the environment variable.
  */
 export const getEnvVar = (key: string) => {
-  // if (import.meta.env && import.meta.env[key]) {
-  //   return import.meta.env[key];
-  // }
+  if (import.meta.env && import.meta.env[key]) {
+    return import.meta.env[key];
+  }
 
   return process.env[key];
 };

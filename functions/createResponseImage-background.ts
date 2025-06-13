@@ -7,7 +7,7 @@ import { getStore } from "@netlify/blobs";
 import { OpenAI } from "openai";
 import { ObjectId } from "mongodb";
 import { decrypt } from "$utils/secure";
-import { ResponseStatus } from "$types/AIResponse";
+import { ResponseStatus, ToolName } from "$types/AIResponse";
 import { type FileInput } from "$types/FileInput";
 import { ApiKeyProvider } from "$types/TenantFeature";
 import ResponseModel, { type Response } from "$data/models/response.model";
@@ -206,7 +206,7 @@ const createResponseImage: Handler = async (
       output_text: outputText,
       tools: [
         {
-          type: "image",
+          name: ToolName.Image,
           image_url: imageUrl,
         },
       ],

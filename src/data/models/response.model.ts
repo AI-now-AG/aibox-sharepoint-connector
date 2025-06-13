@@ -8,9 +8,9 @@ export const ErrorSchema = z.object({
   message: z.string().optional(),
 });
 
-const ToolOutputSchema = z.discriminatedUnion("type", [
+const ToolOutputSchema = z.discriminatedUnion("name", [
   z.object({
-    type: z.literal("image"),
+    name: z.literal("image"),
     image_url: z.string().url(),
   }),
 ]);
@@ -44,7 +44,7 @@ const ResponseSchema = z.object({
 
 export type Response = z.infer<typeof ResponseSchema>;
 
-const collection = db.collection("image_tasks");
+const collection = db.collection("responses");
 
 export default {
   create: async (document: Partial<Response>) => {
