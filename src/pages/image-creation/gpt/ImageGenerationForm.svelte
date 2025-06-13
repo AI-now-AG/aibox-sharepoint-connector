@@ -165,12 +165,13 @@
       const data = await res.json();
 
       if (data.status === ResponseStatus.Completed) {
+        const imageUrl =
+          data.tools.find((item: any) => item.name === ToolName.Image)
+            ?.image_url || "";
         messages.push({
           role: MessageRole.Assistant,
           content: formatMarkdown(data.outputText),
-          imageUrl:
-            data.tools.find((item: any) => item.type === ToolName.Image)
-              ?.image_url || "",
+          imageUrl,
         });
 
         previousResponseId = data.responseId;
