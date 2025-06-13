@@ -185,6 +185,7 @@ const createResponseImage: Handler = async (
             {
               name: ToolName.Image,
               image_url: imageUrl,
+              is_generated: false,
             },
           ],
         };
