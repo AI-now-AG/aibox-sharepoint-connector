@@ -244,7 +244,7 @@
     <h1 class="pt-2 mb-2 lg:pt-8 text-4xl font-bold">
       {t("create-image.create-gpt-image-title")}
     </h1>
-    <p>{t("create-image.create-gpt-image-description")}</p>
+    <p class="m-0">{t("create-image.create-gpt-image-description")}</p>
 
     <!-- Output (Follow-Up) -->
     {#if messages.length > 0}
