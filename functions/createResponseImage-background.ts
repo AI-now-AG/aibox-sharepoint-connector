@@ -133,7 +133,7 @@ const createResponseImage: Handler = async (
     }
     //console.log("fileDataList", { inputImages, inputFiles });
 
-    const response = await openai.responses.create({
+    const stream = await openai.responses.create({
       model: "gpt-4o",
       input: [
         {
@@ -165,60 +165,86 @@ const createResponseImage: Handler = async (
           output_format: outputFormat,
           quality: imageQuality,
           size: imageSize,
+          partial_images: 1,
         },
       ],
+      stream: true,
       ...(previousResponseId
         ? { previous_response_id: previousResponseId }
         : {}),
     });
 
-    const imageData = response.output.filter(
-      (output) => output.type === "image_generation_call",
-    );
-    const messageData = response.output.filter(
-      (output) => output.type === "message",
-    );
-
     let imageUrl = "";
     let outputText = "";
 
-    if (imageData.length) {
-      const result = imageData[0].result;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const format = (imageData[0] as any)?.output_format;
-      imageUrl = `data:image/${format};base64,${result}`;
+    for await (const event of stream) {
+      // Emitted when an image generation tool call is actively generating an image (intermediate state).
+      if (event.type == "response.image_generation_call.generating") {
+        const update: Partial<Response> = {
+          tools: [
+            {
+              name: ToolName.Image,
+              image_url: imageUrl,
+            },
+          ],
+        };
+        await ResponseModel.update(uniqueId, update);
+      }
 
-      recordImageUsage(tenantId);
+      // Emitted when the model response is complete.
+      if (event.type == "response.completed") {
+        const { response } = event;
+
+        const imageData = response.output.filter(
+          (output) => output.type === "image_generation_call",
+        );
+        const messageData = response.output.filter(
+          (output) => output.type === "message",
+        );
+
+        if (imageData.length) {
+          const result = imageData[0].result;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const format = (imageData[0] as any)?.output_format;
+          imageUrl = `data:image/${format};base64,${result}`;
+
+          recordImageUsage(tenantId);
+        }
+
+        if (messageData.length) {
+          outputText =
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (messageData[0]?.content?.[0] as any)?.text || response.output_text;
+        }
+
+        if (!imageData.length && messageData.length) {
+          recordTextUsage(tenantId, response.usage as ResponseUsage);
+        }
+
+        const update: Partial<Response> = {
+          status: ResponseStatus.Completed,
+          output_text: outputText,
+          tools: [
+            {
+              name: ToolName.Image,
+              image_url: imageUrl,
+              is_generated: true,
+            },
+          ],
+          response_id: response.id,
+        };
+        await ResponseModel.update(uniqueId, update);
+
+        console.log("GPT image response", JSON.stringify(response));
+      }
+
+      //console.log("event ===> ", { event, response });
     }
 
-    if (messageData.length) {
-      outputText =
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (messageData[0]?.content?.[0] as any)?.text || response.output_text;
-    }
-
-    if (!imageData.length && messageData.length) {
-      recordTextUsage(tenantId, response.usage as ResponseUsage);
-    }
-
-    const update: Partial<Response> = {
-      status: ResponseStatus.Completed,
-      output_text: outputText,
-      tools: [
-        {
-          name: ToolName.Image,
-          image_url: imageUrl,
-        },
-      ],
-      response_id: response.id,
-    };
-    await ResponseModel.update(uniqueId, update);
-
-    console.log("GPT image response", JSON.stringify(response));
     return {
       statusCode: 200,
       body: JSON.stringify({
-        result: response.output,
+        success: true,
       }),
     };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

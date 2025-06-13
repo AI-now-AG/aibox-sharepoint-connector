@@ -3,20 +3,24 @@
   import { MessageRole, type MessageHistory } from "$types/MessageHistory";
   import ImageCard from "./ImageCard.svelte";
   import { user } from "$stores";
-  import { svgIcons } from "$assets/icons";
 
   interface Props {
     messages: MessageHistory;
-    isProcessing: boolean;
+    isFetching: boolean;
+    isGenerating: boolean;
   }
 
-  let { messages = [], isProcessing = false }: Props = $props();
+  let {
+    messages = [],
+    isFetching = false,
+    isGenerating = false,
+  }: Props = $props();
 
   let username = $user?.name || $user?.username;
   let userPicture = $user?.picture;
 </script>
 
-{#if messages.length > 0 || isProcessing}
+{#if messages.length > 0 || isFetching}
   <div class="flex-1 h-full">
     <div class="flex flex-wrap h-full">
       <div class="grow md:w-1/2 p-2 pb-4 h-full">
@@ -60,9 +64,18 @@
                 {/each}
               </div>
 
-              {#if isProcessing}
+              {#if isFetching || isGenerating}
                 <div class="card mt-2 gap-4 min-h-[50vh]" transition:fade>
-                  <div class="skeleton h-24 w-md"></div>
+                  {#if isFetching}
+                    <div
+                      class="chat-bubble bg-base-100 text-base-content flex flex-row"
+                    >
+                      <span class="loading loading-dots loading-lg"></span>
+                    </div>
+                  {/if}
+                  {#if isGenerating}
+                    <div class="skeleton h-80 w-80"></div>
+                  {/if}
                 </div>
               {/if}
             </div>

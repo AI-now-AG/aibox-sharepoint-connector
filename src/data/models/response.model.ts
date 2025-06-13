@@ -11,7 +11,8 @@ export const ErrorSchema = z.object({
 const ToolOutputSchema = z.discriminatedUnion("name", [
   z.object({
     name: z.literal("image"),
-    image_url: z.string().url(),
+    image_url: z.string().nullish().default(null),
+    is_generated: z.boolean().optional().default(false),
   }),
 ]);
 

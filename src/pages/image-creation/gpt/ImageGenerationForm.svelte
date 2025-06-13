@@ -40,7 +40,8 @@
   let isCompressionDisabled: boolean = $state(false);
 
   let messages: MessageHistory = $state([]);
-  let loading: boolean = $state(false);
+  let isFetching: boolean = $state(false);
+  let isGenerating: boolean = $state(false);
   let previousResponseId: string | null = $state(null);
 
   const sizeOptions = [
@@ -84,7 +85,8 @@
     );
 
     // reset states
-    loading = true;
+    isFetching = true;
+    isGenerating = false;
 
     // store messages
     messages.push({
@@ -134,7 +136,7 @@
         message: "Failed to start image generation.",
         type: "error",
       });
-      loading = false;
+      isFetching = false;
       return;
     }
 
@@ -164,6 +166,13 @@
       );
       const data = await res.json();
 
+      if (data.status === ResponseStatus.InProgress) {
+        const isGenerated =
+          data.tools.find((item: any) => item.name === ToolName.Image)
+            ?.is_generated ?? true;
+        isGenerating = !isGenerated;
+      }
+
       if (data.status === ResponseStatus.Completed) {
         const imageUrl =
           data.tools.find((item: any) => item.name === ToolName.Image)
@@ -175,7 +184,8 @@
         });
 
         previousResponseId = data.responseId;
-        loading = false;
+        isFetching = false;
+        isGenerating = false;
         return;
       } else if (data.status === ResponseStatus.Failed) {
         const errorMessage = data.error?.message || "Image generation failed.";
@@ -188,7 +198,8 @@
           type: "error",
         });
 
-        loading = false;
+        isFetching = false;
+        isGenerating = false;
         return;
       }
 
@@ -199,7 +210,7 @@
       message: "Image generation timed out.",
       type: "error",
     });
-    loading = false;
+    isFetching = false;
   }
 
   function scrollIntoView() {
@@ -217,7 +228,7 @@
   function startNewChat() {
     prompt = "";
     files = [];
-    loading = false;
+    isFetching = false;
     messages = [];
 
     window.scrollTo({
@@ -234,7 +245,7 @@
     </h1>
     <p>{t("create-image.create-gpt-image-description")}</p>
 
-    <Output {messages} isProcessing={loading} />
+    <Output {messages} {isFetching} {isGenerating} />
 
     {#if messages.length == 0}
       <div class="space-y-4 mt-10">
@@ -309,8 +320,8 @@
         <div class="my-4">
           <button
             onclick={startNewChat}
-            class="btn btn-active btn-primary btn-sm min-w-[154px]"
-            disabled={loading}
+            class="btn btn-active btn-primary btn-sm px-8"
+            disabled={isFetching}
           >
             {t("home.new-chat")}
           </button>
@@ -322,7 +333,7 @@
       <PromptInput
         bind:input={prompt}
         bind:files
-        isProcessing={loading}
+        {isFetching}
         stickyFooter={messages.length > 0}
         onsend={submitForm}
       />

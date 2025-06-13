@@ -9,7 +9,7 @@
   interface Props {
     input: string;
     files?: File[];
-    isProcessing?: boolean;
+    isFetching?: boolean;
     stickyFooter?: boolean;
     onsend: Function;
   }
@@ -17,7 +17,7 @@
   let {
     input = $bindable(""),
     files = $bindable([]),
-    isProcessing = false,
+    isFetching = false,
     stickyFooter = false,
     onsend,
   }: Props = $props();
@@ -82,7 +82,7 @@
         onclick={() => {
           fileModal?.showModal();
         }}
-        disabled={isProcessing}
+        disabled={isFetching}
       >
         {@html svgIcons.attachment}
         {#if files.length > 0}
@@ -95,7 +95,7 @@
     <div class="flex self-end">
       <button
         class="btn btn-ghost btn-md disabled:bg-base-100 disabled:cursor-not-allowed"
-        disabled={!input || isProcessing}
+        disabled={!input || isFetching}
         onclick={preventDefault(onsend)}
         aria-label="Send"
       >
