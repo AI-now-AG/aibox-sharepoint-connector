@@ -176,7 +176,7 @@
     output = "";
     files = [];
     isProcessing = false;
-    sharedMessageHistory.set([]);
+    $sharedMessageHistory = [];
 
     window.scrollTo({
       top: 0,
@@ -224,7 +224,7 @@
         <div class="my-4">
           <button
             onclick={startNewChat}
-            class="btn btn-active btn-primary btn-sm min-w-[154px]"
+            class="btn btn-active btn-primary btn-sm px-8"
             disabled={isProcessing}
           >
             {t("home.new-chat")}

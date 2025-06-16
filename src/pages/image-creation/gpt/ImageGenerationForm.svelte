@@ -2,12 +2,11 @@
   import { slide } from "svelte/transition";
   import { v4 as uuidv4 } from "uuid";
   import { useTranslations } from "$i18n/utils";
-  import { Status } from "$types/ImageTask";
+  import { ResponseStatus, ToolName } from "$types/AIResponse";
   import { addToast } from "$stores/toast";
-  import { type FileInput } from "$types/FileInput";
   import { MessageRole, type MessageHistory } from "$types/MessageHistory";
   import { readFileContent } from "$utils/fileReader";
-  import { formatMarkdown } from "$utils/common";
+  import { formatMarkdown, capitalizeFirst } from "$utils/common";
   import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
   import Dropdown from "$components/form/Dropdown.svelte";
   import PromptInput from "./PromptInput.svelte";
@@ -41,7 +40,8 @@
   let isCompressionDisabled: boolean = $state(false);
 
   let messages: MessageHistory = $state([]);
-  let loading: boolean = $state(false);
+  let isFetching: boolean = $state(false);
+  let isGenerating: boolean = $state(false);
   let previousResponseId: string | null = $state(null);
 
   const sizeOptions = [
@@ -85,15 +85,10 @@
     );
 
     // reset states
-    loading = true;
+    isFetching = true;
+    isGenerating = false;
 
-    // store messages
-    messages.push({
-      role: MessageRole.User,
-      content: prompt,
-    });
-
-    const params = {
+    const params: Record<string, unknown> = {
       tenantId,
       uniqueId,
       prompt,
@@ -120,7 +115,7 @@
     params["files"] = uploadData.results;
 
     const response = await fetch(
-      "/.netlify/functions/gptImageGenerate-background",
+      "/.netlify/functions/createResponseImage-background",
       {
         method: "POST",
         headers: {
@@ -135,17 +130,9 @@
         message: "Failed to start image generation.",
         type: "error",
       });
-      loading = false;
+      isFetching = false;
       return;
     }
-
-    // clear input text
-    prompt = "";
-
-    // scroll to latest user input
-    setTimeout(() => {
-      scrollIntoView();
-    }, 1000);
 
     // start polling requests
     setTimeout(async () => {
@@ -160,23 +147,48 @@
   ) {
     for (let attempt = 0; attempt < maxRetries; attempt++) {
       const res = await fetch(
-        `/.netlify/functions/gptImageCheckStatus?uid=${uniqueId}`,
+        `/.netlify/functions/checkResponseStatus?uid=${uniqueId}`,
       );
       const data = await res.json();
 
-      if (data.status === Status.Completed) {
+      if (data.status === ResponseStatus.InProgress) {
+        const isGenerated =
+          data.tools.find((item: any) => item.name === ToolName.Image)
+            ?.is_generated ?? true;
+        isGenerating = !isGenerated;
+      }
+
+      if (data.status === ResponseStatus.Completed) {
+        const imageUrl =
+          data.tools.find((item: any) => item.name === ToolName.Image)
+            ?.image_url || "";
+
+        // store messages
+        messages.push({
+          role: MessageRole.User,
+          content: prompt,
+        });
         messages.push({
           role: MessageRole.Assistant,
           content: formatMarkdown(data.outputText),
-          imageUrl: data.imageUrl,
+          imageUrl,
         });
 
-        previousResponseId = data.responseId;
-        loading = false;
+        // scroll to latest user input
+        setTimeout(() => {
+          scrollIntoView();
+        }, 1000);
+
+        // clear input text & files
         prompt = "";
         files = [];
+
+        // reset states
+        previousResponseId = data.responseId;
+        isFetching = false;
+        isGenerating = false;
         return;
-      } else if (data.status === Status.Failed) {
+      } else if (data.status === ResponseStatus.Failed) {
         const errorMessage = data.error?.message || "Image generation failed.";
         messages.push({
           role: MessageRole.Assistant,
@@ -187,7 +199,8 @@
           type: "error",
         });
 
-        loading = false;
+        isFetching = false;
+        isGenerating = false;
         return;
       }
 
@@ -198,7 +211,7 @@
       message: "Image generation timed out.",
       type: "error",
     });
-    loading = false;
+    isFetching = false;
   }
 
   function scrollIntoView() {
@@ -213,10 +226,18 @@
     }
   }
 
+  function getInfoText() {
+    return t("create-image.image-info-text", {
+      format: outputFormat.toUpperCase(),
+      quality: capitalizeFirst(imageQuality),
+      size: imageSize,
+    });
+  }
+
   function startNewChat() {
     prompt = "";
     files = [];
-    loading = false;
+    isFetching = false;
     messages = [];
 
     window.scrollTo({
@@ -231,9 +252,12 @@
     <h1 class="pt-2 mb-2 lg:pt-8 text-4xl font-bold">
       {t("create-image.create-gpt-image-title")}
     </h1>
-    <p>{t("create-image.create-gpt-image-description")}</p>
+    <p class="m-0">{t("create-image.create-gpt-image-description")}</p>
 
-    <Output {messages} isProcessing={loading} />
+    <!-- Output (Follow-Up) -->
+    {#if messages.length > 0}
+      <Output {messages} {isFetching} {isGenerating} infoText={getInfoText()} />
+    {/if}
 
     {#if messages.length == 0}
       <div class="space-y-4 mt-10">
@@ -308,8 +332,8 @@
         <div class="my-4">
           <button
             onclick={startNewChat}
-            class="btn btn-active btn-primary btn-sm min-w-[154px]"
-            disabled={loading}
+            class="btn btn-active btn-primary btn-sm px-8"
+            disabled={isFetching}
           >
             {t("home.new-chat")}
           </button>
@@ -321,10 +345,15 @@
       <PromptInput
         bind:input={prompt}
         bind:files
-        isProcessing={loading}
+        {isFetching}
         stickyFooter={messages.length > 0}
         onsend={submitForm}
       />
     </div>
+
+    <!-- Output (Normal) -->
+    {#if messages.length == 0}
+      <Output {messages} {isFetching} {isGenerating} />
+    {/if}
   </div>
 </div>

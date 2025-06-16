@@ -6,9 +6,10 @@
   interface Props {
     url: string;
     alt?: string;
+    infoText?: string;
   }
 
-  let { url = "", alt = "" }: Props = $props();
+  let { url = "", alt = "", infoText = "" }: Props = $props();
 
   function download() {
     if (!url) return;
@@ -44,17 +45,29 @@
 </script>
 
 {#if url}
-  <div class="inline-flex max-w-md relative">
+  <div class="inline-flex max-w-md group/item relative" transition:fade>
     <img
       src={url}
       alt={alt || "Generated image"}
       class="rounded-lg shadow-lg"
     />
-    <button
-      class="btn btn-square btn-soft btn-primary btn-sm absolute top-1 right-1"
-      onclick={preventDefault(download)}
+    <div
+      class="absolute top-1 right-1 space-x-1 group/edit invisible group-hover/item:visible"
+      transition:fade
     >
-      {@html svgIcons.download}
-    </button>
+      {#if infoText}
+        <div class="tooltip tooltip-top" data-tip={infoText}>
+          <button class="btn btn-square btn-soft btn-primary btn-sm">
+            {@html svgIcons.toastInfo}
+          </button>
+        </div>
+      {/if}
+      <button
+        class="btn btn-square btn-soft btn-primary btn-sm"
+        onclick={preventDefault(download)}
+      >
+        {@html svgIcons.download}
+      </button>
+    </div>
   </div>
 {/if}

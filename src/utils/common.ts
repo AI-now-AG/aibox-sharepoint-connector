@@ -6,6 +6,10 @@ export function isTrulyEmpty(obj: any) {
   return !obj || Object.keys(obj).length === 0;
 }
 
+export function capitalizeFirst(text: string) {
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
 export function formatDateToDDMMYY(date: string | Date): string {
   return moment(date).format("DD.MM.YYYY");
 }
