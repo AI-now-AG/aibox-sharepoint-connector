@@ -40,7 +40,8 @@ export interface HealthCheckResponse {
 
 // SSE Event types from server
 export interface SSEEvent {
-  type: 'progress' | 'complete' | 'error';
+  type: 'connection' | 'progress' | 'complete' | 'error';
+  message?: string;
   progress?: number;
   result?: ConvertToMonoResponse;
 }
@@ -114,6 +115,8 @@ export async function convertToMono(
 
   return new Promise<ConvertToMonoResponse>((resolve, reject) => {
     let finalResult: ConvertToMonoResponse | null = null;
+    
+    console.log('Starting fetch request to:', apiUrl);
 
     fetch(apiUrl, {
       method: 'POST',
@@ -128,6 +131,7 @@ export async function convertToMono(
     })
     .then(response => {
       clearTimeout(timeoutId);
+      console.log('Fetch response received:', response.status, response.statusText);
 
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -137,6 +141,7 @@ export async function convertToMono(
         throw new Error('No response body for streaming');
       }
 
+      console.log('Starting to read SSE stream...');
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
@@ -170,6 +175,10 @@ export async function convertToMono(
                 console.log('Received SSE event:', eventData.type, eventData);
                 
                 switch (eventData.type) {
+                  case 'connection':
+                    console.log('SSE connection confirmed:', eventData.message);
+                    break;
+                    
                   case 'progress':
                     if (eventData.progress !== undefined) {
                       callbacks?.onProgress?.(eventData.progress);
@@ -214,6 +223,7 @@ export async function convertToMono(
     })
     .catch(error => {
       clearTimeout(timeoutId);
+      console.error('Fetch error:', error);
       
       if (error.name === 'AbortError') {
         const timeoutError: ConvertToMonoResponse = {
@@ -224,6 +234,12 @@ export async function convertToMono(
         callbacks?.onError?.(timeoutError);
         reject(timeoutError);
       } else {
+        console.error('Network error details:', {
+          name: error.name,
+          message: error.message,
+          stack: error.stack
+        });
+        
         const networkError: ConvertToMonoResponse = {
           success: false,
           message: 'Network error occurred while calling the API',
