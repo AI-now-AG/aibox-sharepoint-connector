@@ -144,10 +144,13 @@ export async function convertToMono(
       function readStream(): void {
         reader.read().then(({ done, value }) => {
           if (done) {
+            console.log('SSE stream ended');
             // Stream ended, resolve with final result
             if (finalResult) {
+              console.log('Resolving with final result:', finalResult);
               resolve(finalResult);
             } else {
+              console.warn('Stream ended without final result');
               reject(new Error('Stream ended without final result'));
             }
             return;
@@ -164,6 +167,7 @@ export async function convertToMono(
             if (line.startsWith('data: ')) {
               try {
                 const eventData = JSON.parse(line.slice(6)) as SSEEvent;
+                console.log('Received SSE event:', eventData.type, eventData);
                 
                 switch (eventData.type) {
                   case 'progress':
@@ -173,13 +177,16 @@ export async function convertToMono(
                     break;
                     
                   case 'complete':
+                    console.log('Received completion event:', eventData.result);
                     if (eventData.result) {
                       finalResult = eventData.result;
                       callbacks?.onComplete?.(eventData.result);
+                      // Don't resolve here, wait for stream to end
                     }
                     break;
                     
                   case 'error':
+                    console.log('Received error event:', eventData.result);
                     if (eventData.result) {
                       const errorResult = eventData.result;
                       callbacks?.onError?.(errorResult);
@@ -191,6 +198,8 @@ export async function convertToMono(
               } catch (parseError) {
                 console.warn('Failed to parse SSE event:', line, parseError);
               }
+            } else if (line.trim()) {
+              console.log('Non-SSE line received:', line);
             }
           }
 
