@@ -43,11 +43,12 @@ export interface SSEEvent {
   type: 'connection' | 'progress' | 'complete' | 'error';
   message?: string;
   progress?: number;
+  status?: string; // Additional status message for progress
   result?: ConvertToMonoResponse;
 }
 
-// Progress callback function type
-export type ProgressCallback = (progress: number) => void;
+// Progress callback function type  
+export type ProgressCallback = (progress: number, status?: string) => void;
 export type CompleteCallback = (result: ConvertToMonoResponse) => void;
 export type ErrorCallback = (error: ConvertToMonoResponse) => void;
 
@@ -181,7 +182,7 @@ export async function convertToMono(
                     
                   case 'progress':
                     if (eventData.progress !== undefined) {
-                      callbacks?.onProgress?.(eventData.progress);
+                      callbacks?.onProgress?.(eventData.progress, eventData.status);
                     }
                     break;
                     
