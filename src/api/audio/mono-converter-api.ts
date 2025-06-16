@@ -94,10 +94,13 @@ export async function convertToMono(config: ConvertToMonoConfig): Promise<Conver
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-API-Key': apiKey
+        'X-API-Key': apiKey,
+        'Connection': 'keep-alive',
+        'Keep-Alive': 'timeout=3600, max=3600' // 1 hour keep-alive
       },
       body: JSON.stringify(requestBody),
-      signal: controller.signal
+      signal: controller.signal,
+      keepalive: true // Enable keepalive for the request
     });
 
     const result: ConvertToMonoResponse = await response.json();
