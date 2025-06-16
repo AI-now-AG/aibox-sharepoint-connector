@@ -328,6 +328,8 @@ async function fetchTranscriptionStatus(
   url: string,
   subscriptionKey: string,
 ): Promise<PollStatusResponse> {
+  console.log(`Fetching transcription status from: ${url}`);
+  console.log(`Using subscription key: ${subscriptionKey}`);
   const response = await fetch(url, {
     method: "GET",
     headers: { "Ocp-Apim-Subscription-Key": subscriptionKey },

@@ -68,7 +68,6 @@
   let isTranscriptionFailed: boolean = $state(false);
 
   // Stream response
-  let conversionProgress = $state(0);
   let conversionStatus = $state("");
   let isConverting = $state(false);
 
@@ -499,7 +498,6 @@
       isTranscribing = true;
       isConverting = true;
       isTranscriptionFailed = false;
-      conversionProgress = 0;
       conversionStatus = "Starting conversion...";
 
       console.log("Starting conversion to mono...");
@@ -531,14 +529,10 @@
       // Use callbacks to handle streaming events
       const result = await convertToMono(config, {
         onProgress: (progress: number) => {
-          conversionProgress = progress;
           conversionStatus = `Converting audio... ${progress}%`;
-          console.log(`Conversion progress: ${progress}%`);
         },
         onComplete: (result) => {
-          conversionProgress = 100;
           conversionStatus = "Conversion completed!";
-          console.log("Conversion completed:", result);
         },
         onError: (error) => {
           console.error("Conversion error:", error);
@@ -562,11 +556,11 @@
         tempUploadUrl =
           result.data.convertedSasUrl || result.data.convertedBlobUrl;
 
-        addToast({
-          message: `Audio converted successfully! ${((1 - result.data.compressionRatio) * 100).toFixed(1)}% size reduction`,
-          type: "success",
-          timeout: 3000,
-        });
+        // addToast({
+        //   message: `Audio converted successfully! ${((1 - result.data.compressionRatio) * 100).toFixed(1)}% size reduction`,
+        //   type: "success",
+        //   timeout: 3000,
+        // });
 
         await startTranscription();
       } else {
@@ -1591,15 +1585,6 @@
 
   {#if isConverting}
     <div class="conversion-progress" transition:slide>
-      <div class="progress-header">
-        <h4>Converting to Mono Audio</h4>
-        <span class="progress-percentage">{conversionProgress}%</span>
-      </div>
-
-      <div class="progress-bar">
-        <div class="progress-fill" style="width: {conversionProgress}%"></div>
-      </div>
-
       <p class="progress-status">{conversionStatus}</p>
     </div>
   {/if}

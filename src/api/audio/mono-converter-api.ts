@@ -173,7 +173,6 @@ export async function convertToMono(
             if (line.startsWith('data: ')) {
               try {
                 const eventData = JSON.parse(line.slice(6)) as SSEEvent;
-                console.log('Received SSE event:', eventData.type, eventData);
                 
                 switch (eventData.type) {
                   case 'connection':
