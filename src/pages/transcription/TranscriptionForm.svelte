@@ -15,6 +15,7 @@
   import {
     convertToMono,
     type ConvertToMonoConfig,
+    type ConvertToMonoCallbacks,
   } from "$api/audio/mono-converter-api";
 
   const t = useTranslations();
@@ -65,6 +66,10 @@
   let isTranscribing: boolean = $state(false);
   let isTranscipted: boolean = $state(false);
   let isTranscriptionFailed: boolean = $state(false);
+
+  // Stream response
+  let conversionStatus = $state("");
+  let isConverting = $state(false);
 
   // API, polling
   let intervalId: any;
@@ -491,21 +496,27 @@
   async function startPollingConversionFile() {
     try {
       isTranscribing = true;
+      isConverting = true;
       isTranscriptionFailed = false;
+      conversionStatus = "Starting conversion...";
+
       console.log("Starting conversion to mono...");
 
-      // Get the API key from the server
-      const configResponse = await fetch('/.netlify/functions/getTranscriptionConfig', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-      });
-      
+      // Get API configuration (your existing code)
+      const configResponse = await fetch(
+        "/.netlify/functions/getTranscriptionConfig",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+
       if (!configResponse.ok) {
-        throw new Error('Failed to get transcription configuration');
+        throw new Error("Failed to get transcription configuration");
       }
-      
+
       const { apiKey, apiUrl: baseUrl } = await configResponse.json();
-      
+
       const config: ConvertToMonoConfig = {
         baseUrl,
         apiKey,
@@ -515,18 +526,41 @@
         uniqueName: tempOutputFileName,
       };
 
-      const result = await convertToMono(config);
+      // Use callbacks to handle streaming events
+      const result = await convertToMono(config, {
+        onProgress: (progress: number) => {
+          conversionStatus = `Converting audio... ${progress}%`;
+        },
+        onComplete: (result) => {
+          conversionStatus = "Conversion completed!";
+        },
+        onError: (error) => {
+          console.error("Conversion error:", error);
+          conversionStatus = `Error: ${error.message}`;
+          addToast({
+            message: error.message || "Failed to convert audio file",
+            type: "error",
+            timeout: 5000,
+          });
+        },
+      });
 
+      isConverting = false;
+      // Handle final result (your existing logic)
       if (result.success && result.data) {
         console.log(
           `File converted successfully. New URL: ${result.data.convertedBlobUrl}`,
         );
-        console.log(
-          `Compression: ${((1 - result.data.compressionRatio) * 100).toFixed(2)}% reduction`,
-        );
-        // Update the upload URL to use the converted file for transcription
+
         tempUploadUrl =
           result.data.convertedSasUrl || result.data.convertedBlobUrl;
+
+        // addToast({
+        //   message: `Audio converted successfully! ${((1 - result.data.compressionRatio) * 100).toFixed(1)}% size reduction`,
+        //   type: "success",
+        //   timeout: 3000,
+        // });
+
         await startTranscription();
       } else {
         console.error("Conversion failed:", result.message);
@@ -540,11 +574,12 @@
       }
     } catch (error) {
       console.error("Error in conversion process:", error);
+      isConverting = false;
+      conversionStatus = "Conversion failed";
+
       addToast({
         message:
-          error instanceof Error
-            ? error.message
-            : "Network error: CORS issue - Please check server configuration",
+          error instanceof Error ? error.message : "Network error occurred",
         type: "error",
         timeout: 5000,
       });
@@ -1546,4 +1581,10 @@
     {downloadFile}
     confirm={startNew}
   />
+
+  {#if isConverting}
+    <div class="conversion-progress" transition:slide>
+      <p class="progress-status">{conversionStatus}</p>
+    </div>
+  {/if}
 </div>

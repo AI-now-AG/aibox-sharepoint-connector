@@ -38,11 +38,36 @@ export interface HealthCheckResponse {
   error?: string;
 }
 
+// SSE Event types from server
+export interface SSEEvent {
+  type: 'connection' | 'progress' | 'complete' | 'error';
+  message?: string;
+  progress?: number;
+  status?: string; // Additional status message for progress
+  result?: ConvertToMonoResponse;
+}
+
+// Progress callback function type  
+export type ProgressCallback = (progress: number, status?: string) => void;
+export type CompleteCallback = (result: ConvertToMonoResponse) => void;
+export type ErrorCallback = (error: ConvertToMonoResponse) => void;
+
+export interface ConvertToMonoCallbacks {
+  onProgress?: ProgressCallback;
+  onComplete?: CompleteCallback;
+  onError?: ErrorCallback;
+}
+
 /**
- * Convert stereo audio to mono using the remote API
+ * Convert stereo audio to mono using SSE streaming
  * @param config Configuration object for the conversion
+ * @param callbacks Callback functions for progress, completion, and errors
+ * @returns Promise<ConvertToMonoResponse> - Final result
  */
-export async function convertToMono(config: ConvertToMonoConfig): Promise<ConvertToMonoResponse> {
+export async function convertToMono(
+  config: ConvertToMonoConfig, 
+  callbacks?: ConvertToMonoCallbacks
+): Promise<ConvertToMonoResponse> {
   const {
     baseUrl,
     apiKey,
@@ -84,48 +109,137 @@ export async function convertToMono(config: ConvertToMonoConfig): Promise<Conver
   if (folderName) requestBody.folderName = folderName;
   if (uniqueName) requestBody.uniqueName = uniqueName;
 
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => {
+    controller.abort();
+  }, timeoutMs);
 
-    const response = await fetch(apiUrl, {
+  return new Promise<ConvertToMonoResponse>((resolve, reject) => {
+    let finalResult: ConvertToMonoResponse | null = null;
+
+    fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-API-Key': apiKey
+        'X-API-Key': apiKey,
+        'Accept': 'text/event-stream',
+        'Cache-Control': 'no-cache'
       },
       body: JSON.stringify(requestBody),
       signal: controller.signal
+    })
+    .then(response => {
+      clearTimeout(timeoutId);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      if (!response.body) {
+        throw new Error('No response body for streaming');
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      function readStream(): void {
+        reader.read().then(({ done, value }) => {
+          if (done) {
+            // Stream ended, resolve with final result
+            if (finalResult) {
+              resolve(finalResult);
+            } else {
+              reject(new Error('Stream ended without final result'));
+            }
+            return;
+          }
+
+          // Decode the chunk and add to buffer
+          buffer += decoder.decode(value, { stream: true });
+          
+          // Process complete lines
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || ''; // Keep incomplete line in buffer
+
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              try {
+                const eventData = JSON.parse(line.slice(6)) as SSEEvent;
+                
+                switch (eventData.type) {
+                  case 'connection':
+                    break;
+                    
+                  case 'progress':
+                    if (eventData.progress !== undefined) {
+                      callbacks?.onProgress?.(eventData.progress, eventData.status);
+                    }
+                    break;
+                    
+                  case 'complete':
+                    if (eventData.result) {
+                      finalResult = eventData.result;
+                      callbacks?.onComplete?.(eventData.result);
+                    }
+                    break;
+                    
+                  case 'error':
+                    if (eventData.result) {
+                      const errorResult = eventData.result;
+                      callbacks?.onError?.(errorResult);
+                      reject(new Error(errorResult.message || 'Conversion failed'));
+                      return;
+                    }
+                    break;
+                }
+              } catch (parseError) {
+                console.warn('Failed to parse SSE event:', line, parseError);
+              }
+            } else if (line.trim()) {
+              console.log('Non-SSE line received:', line);
+            }
+          }
+
+          readStream(); // Continue reading
+        }).catch(error => {
+          clearTimeout(timeoutId);
+          reject(error);
+        });
+      }
+
+      readStream(); // Start reading the stream
+    })
+    .catch(error => {
+      clearTimeout(timeoutId);
+      console.error('Fetch error:', error);
+      
+      if (error.name === 'AbortError') {
+        const timeoutError: ConvertToMonoResponse = {
+          success: false,
+          message: 'Operation timed out',
+          error: `Request exceeded timeout of ${timeoutMs/1000} seconds`
+        };
+        callbacks?.onError?.(timeoutError);
+        reject(timeoutError);
+      } else {        
+        const networkError: ConvertToMonoResponse = {
+          success: false,
+          message: 'Network error occurred while calling the API',
+          error: error instanceof Error ? error.message : 'Unknown error occurred'
+        };
+        callbacks?.onError?.(networkError);
+        reject(networkError);
+      }
     });
+  });
+}
 
-    clearTimeout(timeoutId);
-    const result: ConvertToMonoResponse = await response.json();
-
-    if (!response.ok) {
-      return {
-        success: false,
-        message: result.message || `HTTP ${response.status}: ${response.statusText}`,
-        error: result.error || `Request failed with status ${response.status}`
-      };
-    }
-
-    return result;
-
-  } catch (error) {
-    if (error instanceof Error && error.name === 'AbortError') {
-      return {
-        success: false,
-        message: `Request timed out after ${timeoutMs / 1000} seconds`,
-        error: 'Request timeout'
-      };
-    }
-
-    return {
-      success: false,
-      message: 'Network error occurred while calling the API',
-      error: error instanceof Error ? error.message : 'Unknown error occurred'
-    };
-  }
+/**
+ * Legacy function for backward compatibility (without streaming)
+ * @deprecated Use convertToMono with callbacks for better UX
+ */
+export async function convertToMonoLegacy(config: ConvertToMonoConfig): Promise<ConvertToMonoResponse> {
+  return convertToMono(config);
 }
 
 export default convertToMono;
