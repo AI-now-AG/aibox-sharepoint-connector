@@ -116,8 +116,6 @@ export async function convertToMono(
 
   return new Promise<ConvertToMonoResponse>((resolve, reject) => {
     let finalResult: ConvertToMonoResponse | null = null;
-    
-    console.log('Starting fetch request to:', apiUrl);
 
     fetch(apiUrl, {
       method: 'POST',
@@ -132,8 +130,6 @@ export async function convertToMono(
     })
     .then(response => {
       clearTimeout(timeoutId);
-      console.log('Fetch response received:', response.status, response.statusText);
-
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
@@ -142,7 +138,6 @@ export async function convertToMono(
         throw new Error('No response body for streaming');
       }
 
-      console.log('Starting to read SSE stream...');
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
@@ -150,13 +145,10 @@ export async function convertToMono(
       function readStream(): void {
         reader.read().then(({ done, value }) => {
           if (done) {
-            console.log('SSE stream ended');
             // Stream ended, resolve with final result
             if (finalResult) {
-              console.log('Resolving with final result:', finalResult);
               resolve(finalResult);
             } else {
-              console.warn('Stream ended without final result');
               reject(new Error('Stream ended without final result'));
             }
             return;
@@ -176,7 +168,6 @@ export async function convertToMono(
                 
                 switch (eventData.type) {
                   case 'connection':
-                    console.log('SSE connection confirmed:', eventData.message);
                     break;
                     
                   case 'progress':
@@ -186,16 +177,13 @@ export async function convertToMono(
                     break;
                     
                   case 'complete':
-                    console.log('Received completion event:', eventData.result);
                     if (eventData.result) {
                       finalResult = eventData.result;
                       callbacks?.onComplete?.(eventData.result);
-                      // Don't resolve here, wait for stream to end
                     }
                     break;
                     
                   case 'error':
-                    console.log('Received error event:', eventData.result);
                     if (eventData.result) {
                       const errorResult = eventData.result;
                       callbacks?.onError?.(errorResult);
@@ -233,13 +221,7 @@ export async function convertToMono(
         };
         callbacks?.onError?.(timeoutError);
         reject(timeoutError);
-      } else {
-        console.error('Network error details:', {
-          name: error.name,
-          message: error.message,
-          stack: error.stack
-        });
-        
+      } else {        
         const networkError: ConvertToMonoResponse = {
           success: false,
           message: 'Network error occurred while calling the API',

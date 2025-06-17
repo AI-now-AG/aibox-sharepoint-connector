@@ -546,7 +546,6 @@
       });
 
       isConverting = false;
-      console.log("Conversion result:", result);
       // Handle final result (your existing logic)
       if (result.success && result.data) {
         console.log(
