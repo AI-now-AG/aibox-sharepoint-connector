@@ -1,7 +1,7 @@
 import { type Handler } from "@netlify/functions";
-import ImageTaskModel from "$data/models/imageTask.model";
+import ResponseModel from "$data/models/response.model";
 
-const gptImageCheckStatus: Handler = async (event) => {
+const checkResponseStatus: Handler = async (event) => {
   if (event.httpMethod !== "GET") {
     return {
       statusCode: 405,
@@ -12,19 +12,19 @@ const gptImageCheckStatus: Handler = async (event) => {
   const uniqueId = event.queryStringParameters?.uid || "";
 
   try {
-    const task = await ImageTaskModel.get(uniqueId);
+    const task = await ResponseModel.get(uniqueId);
     if (!task) {
       return {
         statusCode: 404,
         body: JSON.stringify({
-          error: "Job not found",
+          error: "Task not found",
         }),
       };
     }
 
     const {
       status,
-      image_url: imageUrl,
+      tools,
       response_id: responseId,
       output_text: outputText,
       error,
@@ -32,11 +32,11 @@ const gptImageCheckStatus: Handler = async (event) => {
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ status, outputText, imageUrl, responseId, error }),
+      body: JSON.stringify({ status, outputText, tools, responseId, error }),
     };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
-    console.error("Error during check GPT image status:", error);
+    console.error("Error during check response status:", error);
     return {
       statusCode: 500,
       body: JSON.stringify({
@@ -46,4 +46,4 @@ const gptImageCheckStatus: Handler = async (event) => {
   }
 };
 
-export { gptImageCheckStatus as handler };
+export { checkResponseStatus as handler };

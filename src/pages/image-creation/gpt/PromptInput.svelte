@@ -9,7 +9,7 @@
   interface Props {
     input: string;
     files?: File[];
-    isProcessing?: boolean;
+    isFetching?: boolean;
     stickyFooter?: boolean;
     onsend: Function;
   }
@@ -17,7 +17,7 @@
   let {
     input = $bindable(""),
     files = $bindable([]),
-    isProcessing = false,
+    isFetching = false,
     stickyFooter = false,
     onsend,
   }: Props = $props();
@@ -77,26 +77,25 @@
 
   <div class="grid grid-cols-[1fr_min-content] gap-4">
     <div class="p-2 flex flex-row gap-2">
-      {#if !stickyFooter}
-        <button
-          class="btn h-auto w-auto p-1 min-h-0 hover:text-base-content/60"
-          onclick={() => {
-            fileModal?.showModal();
-          }}
-        >
-          {@html svgIcons.attachment}
-          {#if files.length > 0}
-            <div class="badge badge-sm badge-neutral font-normal">
-              {files.length}
-            </div>
-          {/if}
-        </button>
-      {/if}
+      <button
+        class="btn h-auto w-auto p-1 min-h-0 hover:text-base-content/60"
+        onclick={() => {
+          fileModal?.showModal();
+        }}
+        disabled={isFetching}
+      >
+        {@html svgIcons.attachment}
+        {#if files.length > 0}
+          <div class="badge badge-sm badge-neutral font-normal">
+            {files.length}
+          </div>
+        {/if}
+      </button>
     </div>
     <div class="flex self-end">
       <button
         class="btn btn-ghost btn-md disabled:bg-base-100 disabled:cursor-not-allowed"
-        disabled={!input || isProcessing}
+        disabled={!input || isFetching}
         onclick={preventDefault(onsend)}
         aria-label="Send"
       >
