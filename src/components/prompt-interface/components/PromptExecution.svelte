@@ -83,6 +83,7 @@
         }}
       />
     </div>
+
     {#if $sharedMessageHistory.length == 0}
       <div
         class="min-w-full form-wrapper"
@@ -116,7 +117,7 @@
           in:slide={{ duration: 500, delay: 500 }}
         >
           <InputArea
-            bind:promptId={selectedPromptId}
+            promptId={selectedPromptId}
             bind:input
             bind:output
             bind:isProcessing
