@@ -53,13 +53,13 @@
     return items.filter((item) => item.group === groupId);
   }
 
-  async function editCard(index: number) {
+  function editCard(index: number) {
     selectedEditPromptId = items[index]?.id ?? "";
     promptDialogMode = "update";
     promptDialog?.showModal();
   }
 
-  async function duplicateCard(index: number) {
+  function duplicateCard(index: number) {
     selectedEditPromptId = items[index]?.id ?? "";
     promptDialogMode = "clone";
     promptDialog?.showModal();
