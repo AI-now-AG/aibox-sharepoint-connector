@@ -4,7 +4,7 @@
   import ExecutionCard from "$components/prompt-interface/components/ExecutionCard.svelte";
   import { sharedMessageHistory } from "$components/prompt-interface/components/Stores";
   import InputArea from "./Input.svelte";
-  import PromptResults from "./PromptResults.svelte";
+  import Output from "./Output.svelte";
   import { svgIcons } from "$assets/icons";
   import { ApiKeyProvider } from "$types/TenantFeature";
 
@@ -116,7 +116,7 @@
       </div>
     {/if}
 
-    <PromptResults bind:output bind:isProcessing />
+    <Output {output} {isProcessing} />
 
     <div
       class="sticky bottom-0 bg-base-200"
