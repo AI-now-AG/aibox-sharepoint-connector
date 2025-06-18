@@ -2,7 +2,7 @@
   import FileUpload from "$components/FileUpload.svelte";
   import { type FileInput } from "$types/FileInput";
   import { MessageRole } from "$types/MessageHistory";
-  import { sharedMessageHistory } from "$components/prompt-interface/components/Stores";
+  import { sharedMessageHistory } from "$stores/chatHistory";
   import DataLossWarning from "$components/prompt-interface/components/DataLossWarning.svelte";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";

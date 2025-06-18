@@ -2,7 +2,7 @@
   import { fade } from "svelte/transition";
   import { onMount } from "svelte";
   import { MessageRole } from "$types/MessageHistory";
-  import { sharedMessageHistory } from "$components/prompt-interface/components/Stores";
+  import { sharedMessageHistory } from "$stores/chatHistory";
   import { user } from "$stores";
   import { svgIcons } from "$assets/icons";
 

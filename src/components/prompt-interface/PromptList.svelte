@@ -11,7 +11,7 @@
 
 <script lang="ts">
   import PromptItem from "$components/prompt-interface/PromptItem.svelte";
-  import EditPromptDetails from "$components/prompt-interface/components/EditPromptDetails.svelte";
+  import EditPromptDialog from "$components/prompt-interface/components/EditPromptDialog.svelte";
   import PromptOrderDialog from "$components/prompt-interface/components/PromptOrderDialog.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import Loading from "$components/Loading.svelte";
@@ -172,7 +172,7 @@
   </div>
 </div>
 
-<EditPromptDetails
+<EditPromptDialog
   bind:promptDialog
   bind:selectedEditPromptId
   dialogMode={promptDialogMode}

@@ -1,7 +1,7 @@
 <script lang="ts">
   import FileUpload from "$components/FileUpload.svelte";
   import DataLossWarning from "$components/prompt-interface/components/DataLossWarning.svelte";
-  import { sharedMessageHistory } from "$components/prompt-interface/components/Stores";
+  import { sharedMessageHistory } from "$stores/chatHistory";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
   import { preventDefault } from "$utils/common";
