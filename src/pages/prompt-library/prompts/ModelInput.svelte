@@ -2,7 +2,7 @@
   import { onMount } from "svelte";
   import { useTranslations } from "$i18n/utils";
   import { tenant } from "$stores";
-  import { ApiKeyProvider } from "$types/TenantFeature";
+  import { PromptModel } from "$types/PromptModel";
   import Dropdown, { type Option } from "$components/form/Dropdown.svelte";
 
   const t = useTranslations();
@@ -28,9 +28,7 @@
   }: Props = $props();
 
   onMount(async function () {
-    setTimeout(() => {
-      models = getActiveModels() || [];
-    }, 0);
+    models = getActiveModels() || [];
   });
 
   const getModelName = (provider: any) => {
@@ -41,10 +39,10 @@
   const getProviderName = (provider: any) => {
     let title;
     switch (provider.name) {
-      case ApiKeyProvider.AzureOpenAI:
+      case PromptModel.AzureOpenAI:
         title = t("tenant.azure-open-ai-provider");
         break;
-      case ApiKeyProvider.Perplexity:
+      case PromptModel.Perplexity:
         title = t("tenant.perplexity-provider");
         break;
       default:
@@ -54,10 +52,10 @@
   };
 
   const getActiveModels = (): Option[] => {
-    const models: any[] =
-      $tenant?.api_key_providers
-        ?.filter((provider) => provider.active)
-        .map((provider) => {
+    const models: Option[] =
+      ($tenant?.api_key_providers ?? [])
+        ?.filter((provider: any) => provider.active)
+        .map((provider: any) => {
           const providerName = getProviderName(provider);
           const modelName = getModelName(provider);
           return {
@@ -65,20 +63,31 @@
             title: `${providerName} ${modelName}`,
           };
         }) || [];
+
     if (!skipDefaultOption) {
       const defaultModel = $tenant?.api_key_providers?.find(
-        (provider) => provider.default,
+        (provider: any) => provider.default,
       );
       const defaultText = t("tenant.default");
       const defaultName = defaultText.replace(
         /^./,
         defaultText[0].toUpperCase(),
       );
-      models?.unshift({
-        value: ApiKeyProvider.Default,
+      models.unshift({
+        value: PromptModel.Default,
         title: `${defaultName} (${getProviderName(defaultModel)} ${getModelName(defaultModel)})`,
       });
     }
+
+    // OpenAI Responses API
+    models.push({
+      value: PromptModel.OpenAIWithTools,
+      title: `Open AI gpt-4o (New)`,
+    });
+    models.push({
+      value: PromptModel.OpenAIWithImageTools,
+      title: `Open AI gpt-4o with Image`,
+    });
 
     return models;
   };

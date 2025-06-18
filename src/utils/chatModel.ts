@@ -96,8 +96,9 @@ export const initializeOpenAI = (
     : ApiKeyProvider.OpenAI;
 
   // If a custom model is provided, override the default API provider
+  // Extract the provider name (the first segment).
   if (customModel) {
-    provider = customModel as ApiKeyProvider;
+    provider = customModel.split(":")[0] as ApiKeyProvider;
   }
   log.i(provider, "API PROVIDER");
 
