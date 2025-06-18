@@ -2,7 +2,7 @@
   import { onMount } from "svelte";
   import { useTranslations } from "$i18n/utils";
   import EditPromptDialog from "$components/prompt-interface/components/EditPromptDialog.svelte";
-  import ExecutionCardItem from "$components/prompt-interface/components/UseCaseActions.svelte";
+  import UseCaseActions from "$components/prompt-interface/components/UseCaseActions.svelte";
   import PromptOrderDialog from "$components/prompt-interface/components/PromptOrderDialog.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import Loading from "$components/Loading.svelte";
@@ -161,7 +161,7 @@
   >
     {#each cards as card, index}
       {#if index < promptLimit || showMore}
-        <ExecutionCardItem
+        <UseCaseActions
           {isEditable}
           data={card}
           active={selectedCardIndex == index}

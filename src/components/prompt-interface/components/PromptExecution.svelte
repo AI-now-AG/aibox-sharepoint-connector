@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
   import { slide } from "svelte/transition";
-  import ExecutionCard from "$components/prompt-interface/components/UseCaseCard.svelte";
+  import UseCaseCard from "$components/prompt-interface/components/UseCaseCard.svelte";
   import { sharedMessageHistory } from "$stores/chatHistory";
   import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
   import InputArea from "./Input.svelte";
@@ -77,7 +77,7 @@
       </p>
     {/if}
     <div class="mb-6 mt-6">
-      <ExecutionCard
+      <UseCaseCard
         cards={promptItems}
         bind:selectedPromptId
         {isEditable}
