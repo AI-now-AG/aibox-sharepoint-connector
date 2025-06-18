@@ -43,13 +43,6 @@
     adjustHeightByContent();
   });
 
-  const scrollToBottom = async () => {
-    window.scroll({
-      top: document.documentElement.scrollHeight,
-      behavior: "smooth",
-    });
-  };
-
   $effect(() => {
     if (selectedPromptId) {
       $sharedMessageHistory = [];
