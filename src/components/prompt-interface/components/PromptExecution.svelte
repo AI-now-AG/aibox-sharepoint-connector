@@ -57,6 +57,8 @@
         (e: { _id: string }) => e._id === selectedPromptId,
       );
       selectPromptPredefinedInput = currentPrompt.predefined_input ?? "";
+
+      // Check and disabled file input for Perplexity
       const promptModel = currentPrompt.model ?? apiProvider.name;
       isDisableFileInput = promptModel == ApiKeyProvider.Perplexity;
     }
