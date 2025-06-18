@@ -1,7 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { useTranslations } from "$i18n/utils";
-  import { storePromptId } from "$components/prompt-interface/components/Stores";
   import EditPromptDetails from "$components/prompt-interface/components/EditPromptDetails.svelte";
   import ExecutionCardItem from "$components/prompt-interface/components/ExecutionCardItem.svelte";
   import PromptOrderDialog from "$components/prompt-interface/components/PromptOrderDialog.svelte";
@@ -15,15 +14,15 @@
     isEditable?: boolean;
     isDisabling?: boolean;
     cards: any;
-    selectedPromptId: any;
+    selectedPromptId: string;
     onSelectCard?: Function;
   }
 
   let {
-    isEditable = $bindable(false),
-    isDisabling = $bindable(false),
-    cards = $bindable(),
-    selectedPromptId = $bindable(),
+    isEditable = false,
+    isDisabling = false,
+    cards = [],
+    selectedPromptId = $bindable(""),
     onSelectCard = () => null,
   }: Props = $props();
 
@@ -50,7 +49,6 @@
   onMount(async function () {
     selectedCardIndex = 0;
     selectedPromptId = cards[0]._id;
-    storePromptId.set(selectedPromptId);
     if (selectedEditPromptId) {
       promptDialog?.showModal();
     }
@@ -67,7 +65,6 @@
     onSelectCard?.();
     selectedCardIndex = index;
     selectedPromptId = cards[index]?._id ?? "";
-    storePromptId.set(selectedPromptId);
   }
 
   async function editCard(index: number) {

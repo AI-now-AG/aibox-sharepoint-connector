@@ -3,27 +3,27 @@
   import { slide } from "svelte/transition";
   import ExecutionCard from "$components/prompt-interface/components/ExecutionCard.svelte";
   import { sharedMessageHistory } from "$components/prompt-interface/components/Stores";
+  import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
   import InputArea from "./Input.svelte";
   import Output from "./Output.svelte";
   import { svgIcons } from "$assets/icons";
   import { ApiKeyProvider } from "$types/TenantFeature";
+  import { tenant } from "$stores";
 
   interface Props {
     promptItems: any;
     isEditable?: boolean;
-    tenant?: any;
   }
 
-  let { promptItems, isEditable = $bindable(false), tenant }: Props = $props();
+  let { promptItems, isEditable = false }: Props = $props();
 
   let selectedPromptId = $state("");
   let selectPromptPredefinedInput = $state("");
   let input = $state("");
   let output = $state("");
   let isProcessing = $state(false);
-  let showButton = $state(false);
 
-  const apiProvider = tenant.api_key_providers?.find((item: any) => {
+  const apiProvider = $tenant.api_key_providers?.find((item: any) => {
     return item.default && item.active;
   });
   let isDisableFileInput = $state(
@@ -32,6 +32,7 @@
 
   // svelte-ignore non_reactive_update
   let textInputComponent: any;
+
   function adjustHeightByContent() {
     setTimeout(() => {
       textInputComponent?.adjustHeightByContent();
@@ -39,17 +40,6 @@
   }
 
   onMount(() => {
-    const handleScroll = () => {
-      const { scrollHeight, scrollTop, clientHeight } =
-        document.documentElement;
-
-      if (Math.abs(scrollHeight - clientHeight - scrollTop) > 100) {
-        if (!showButton) showButton = true;
-      } else {
-        if (showButton) showButton = false;
-      }
-    };
-    window.addEventListener("scroll", handleScroll);
     adjustHeightByContent();
   });
 
@@ -62,7 +52,7 @@
 
   $effect(() => {
     if (selectedPromptId) {
-      sharedMessageHistory.set([]);
+      $sharedMessageHistory = [];
       const currentPrompt = promptItems.find(
         (e: { _id: string }) => e._id === selectedPromptId,
       );
@@ -73,7 +63,7 @@
   });
 
   onDestroy(function () {
-    sharedMessageHistory.set([]);
+    $sharedMessageHistory = [];
   });
 </script>
 
@@ -90,10 +80,10 @@
       <ExecutionCard
         cards={promptItems}
         bind:selectedPromptId
-        bind:isEditable
-        bind:isDisabling={isProcessing}
+        {isEditable}
+        isDisabling={isProcessing}
         onSelectCard={() => {
-          sharedMessageHistory.set([]);
+          $sharedMessageHistory = [];
           adjustHeightByContent();
         }}
       />
@@ -123,18 +113,8 @@
       transition:slide={{ duration: 500 }}
     >
       {#if $sharedMessageHistory.length > 0}
-        {#if showButton}
-          <div class="relative w-full flex justify-center">
-            <button
-              class="absolute shadow-lg hover:shadow-2xl self-center bottom-2 btn btn-sm btn-circle"
-              onclick={() => {
-                scrollToBottom();
-              }}
-            >
-              {@html svgIcons.downIcon}
-            </button>
-          </div>
-        {/if}
+        <ScrollToBottom />
+
         <div
           class="inset-x-0 bottom-0 min-w-full form-wrapper"
           out:slide={{ duration: 500 }}
