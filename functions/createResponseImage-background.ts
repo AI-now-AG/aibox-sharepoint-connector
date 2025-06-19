@@ -243,7 +243,7 @@ const createResponseImage: Handler = async (
         console.log("GPT image response", JSON.stringify(response));
       }
 
-      //console.log("ResponseAPI event ===> ", event);
+      console.log("ResponseAPI event ===> ", event);
     }
 
     return {

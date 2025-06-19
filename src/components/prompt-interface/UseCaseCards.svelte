@@ -1,9 +1,9 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { useTranslations } from "$i18n/utils";
-  import EditPromptDialog from "$components/prompt-interface/components/EditPromptDialog.svelte";
-  import UseCaseActions from "$components/prompt-interface/components/UseCaseActions.svelte";
-  import PromptOrderDialog from "$components/prompt-interface/components/PromptOrderDialog.svelte";
+  import EditPromptDialog from "$components/prompt-interface/EditPromptDialog.svelte";
+  import UseCaseActions from "$components/prompt-interface/UseCaseActions.svelte";
+  import PromptOrderDialog from "$components/prompt-interface/PromptOrderDialog.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import Loading from "$components/Loading.svelte";
   import { addToast } from "$stores/toast";
@@ -62,9 +62,11 @@
       });
       return;
     }
-    onSelectCard?.();
+    const currentCard = cards[index];
+
+    onSelectCard?.(currentCard);
     selectedCardIndex = index;
-    selectedPromptId = cards[index]?._id ?? "";
+    selectedPromptId = currentCard?._id ?? "";
   }
 
   async function editCard(index: number) {

@@ -6,7 +6,7 @@
   import ModelInput from "$pages/prompt-library/prompts/ModelInput.svelte";
   import type { CreatePromptParams } from "$pages/api/prompts/index.json";
   import { addToast } from "$stores/toast";
-  import LoadingSpinner from "$components/prompt-interface/components/LoadingSpinner.svelte";
+  import LoadingSpinner from "$components/prompt-interface/LoadingSpinner.svelte";
   import { svgIcons } from "$assets/icons";
   import { formatMarkdown, preventDefault } from "$utils/common";
   import type { Option } from "$components/form/Dropdown.svelte";

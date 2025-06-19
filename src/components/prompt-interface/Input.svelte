@@ -3,7 +3,7 @@
   import { type FileInput } from "$types/FileInput";
   import { MessageRole } from "$types/MessageHistory";
   import { sharedMessageHistory } from "$stores/chatHistory";
-  import DataLossWarning from "$components/prompt-interface/components/DataLossWarning.svelte";
+  import DataLossWarning from "$components/chat-ui/DataLossWarning.svelte";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
   import { readFileContent } from "$utils/fileReader";
@@ -28,7 +28,7 @@
   }
 
   let {
-    promptId = $bindable(""),
+    promptId = "",
     input = $bindable(""),
     output = $bindable(""),
     isProcessing = $bindable(false),
@@ -174,14 +174,14 @@
 
   let textarea: HTMLTextAreaElement;
 
-  export function adjustHeightByContent() {
-    setTimeout(() => {
-      if (textarea) {
-        textarea.style.height = "auto";
-        textarea.style.height = `${textarea.scrollHeight}px`;
-      }
-    }, 0);
-  }
+  // export function adjustHeightByContent() {
+  //   setTimeout(() => {
+  //     if (textarea) {
+  //       textarea.style.height = "auto";
+  //       textarea.style.height = `${textarea.scrollHeight}px`;
+  //     }
+  //   }, 0);
+  // }
 </script>
 
 <div
