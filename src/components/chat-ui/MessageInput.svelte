@@ -109,10 +109,12 @@
           <input
             type="checkbox"
             bind:checked={tool.active}
-            disabled={tool.disabled}
+            disabled={tool.disabled || isFetching}
             class="toggle toggle-xs"
           />
-          <span class="text-sm text-gray-500">{tool.name}</span>
+          <span class="text-sm text-gray-500">
+            {t(`prompt-execution.tools.${tool.name || "image"}`)}
+          </span>
         </label>
       {/each}
     </div>

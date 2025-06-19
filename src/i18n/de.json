@@ -457,5 +457,6 @@
   "create-image.image-compression-label": "Komprimierung",
   "create-image.create-gpt-image-title": "Erstelle Bilder mit GPT",
   "create-image.create-gpt-image-description": "Erstelle Bilder mit dem neuesten und beliebtesten Modell von OpenAI",
-  "create-image.image-info-text": "Format:${format}, Quality:${quality}, Size:${size}"
+  "create-image.image-info-text": "Format:${format}, Quality:${quality}, Size:${size}",
+  "prompt-execution.tools.image": "Bild"
 }
