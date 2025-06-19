@@ -486,7 +486,7 @@
       ? tempUploadUrl.split("?")[0]
       : tempUploadUrl;
     const fileExtension = filename.split(".").pop();
-    if (isDiarizationEnabled || fileExtension === "m4a") {
+    if (isDiarizationEnabled || fileExtension === "m4a" || fileExtension === "mp4") {
       startPollingConversionFile();
     } else {
       await startTranscription();
