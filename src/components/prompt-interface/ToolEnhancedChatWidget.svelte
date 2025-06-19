@@ -2,28 +2,43 @@
   import { v4 as uuidv4 } from "uuid";
   import { useTranslations } from "$i18n/utils";
   import { ResponseStatus, ToolName } from "$types/AIResponse";
+  import { PromptModel } from "$types/PromptModel";
   import { addToast } from "$stores/toast";
   import { MessageRole, type MessageHistory } from "$types/MessageHistory";
   import { readFileContent } from "$utils/fileReader";
-  import { formatMarkdown, capitalizeFirst } from "$utils/common";
+  import { formatMarkdown } from "$utils/common";
   import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
-  import MessageInput from "$components/chat-ui/MessageInput.svelte";
+  import MessageInput, {
+    type Tool,
+  } from "$components/chat-ui/MessageInput.svelte";
   import MessageList from "$components/chat-ui/MessageList.svelte";
   import { tenant } from "$stores";
 
   interface Props {
-    promptId: string;
     currentPrompt: any;
     isProcessing: boolean;
   }
-  let {
-    promptId = "",
-    currentPrompt,
-    isProcessing = $bindable(false),
-  }: Props = $props();
+  let { currentPrompt, isProcessing = $bindable(false) }: Props = $props();
+  let enabledTools: Tool[] = $state([]);
 
   const t = useTranslations();
   const tenantId = $tenant?._id?.toString();
+
+  switch (currentPrompt?.model) {
+    case PromptModel.OpenAIWithTools:
+      enabledTools.push({
+        name: "image",
+        active: false,
+      });
+      break;
+    case PromptModel.OpenAIWithImageTools:
+      enabledTools.push({
+        name: "image",
+        active: true,
+        disabled: true,
+      });
+      break;
+  }
 
   // Reactive form state
   let uniqueId: string = $state("");
@@ -50,10 +65,15 @@
     isFetching = true;
     isGenerating = false;
 
+    const primaryTool =
+      enabledTools.length && enabledTools[0].active
+        ? enabledTools[0].name
+        : undefined;
     const params: Record<string, unknown> = {
       tenantId,
       uniqueId,
       prompt,
+      ...(primaryTool && { tool: primaryTool }),
       previousResponseId,
     };
     console.log("Submitting payload:", params);
@@ -72,7 +92,7 @@
     params["files"] = uploadData.results;
 
     const response = await fetch(
-      "/.netlify/functions/createResponseImage-background",
+      "/.netlify/functions/createResponse-background",
       {
         method: "POST",
         headers: {
@@ -93,11 +113,11 @@
 
     // start polling requests
     setTimeout(async () => {
-      await pollImageStatus(uniqueId);
+      await pollResponseStatus(uniqueId);
     }, 2000);
   }
 
-  async function pollImageStatus(
+  async function pollResponseStatus(
     uniqueId: string,
     maxRetries = 100,
     delayMs = 2000,
@@ -200,6 +220,7 @@
     bind:files
     {isFetching}
     stickyFooter={messages.length > 0}
+    bind:tools={enabledTools}
     onsend={submitForm}
   />
 </div>

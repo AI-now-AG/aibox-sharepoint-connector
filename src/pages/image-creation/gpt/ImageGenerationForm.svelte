@@ -92,6 +92,7 @@
       tenantId,
       uniqueId,
       prompt,
+      tool: ToolName.Image,
       imageSize,
       imageQuality,
       outputCompression,
@@ -115,7 +116,7 @@
     params["files"] = uploadData.results;
 
     const response = await fetch(
-      "/.netlify/functions/createResponseImage-background",
+      "/.netlify/functions/createResponse-background",
       {
         method: "POST",
         headers: {

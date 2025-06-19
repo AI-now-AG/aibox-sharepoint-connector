@@ -21,6 +21,23 @@ import type {
 } from "openai/resources/responses/responses";
 import { NETLIFY_BLOBS_STORE } from "$constants";
 
+type RequestTool = "image" | "websearch";
+
+interface RequestBodyParams {
+  tenantId: string;
+  uniqueId: string;
+  prompt: string;
+  instructions?: string;
+  files?: string[];
+  previousResponseId?: string;
+  outputFormat?: "png" | "jpeg" | "webp";
+  imageQuality?: "low" | "medium" | "high";
+  imageSize?: "1024x1024" | "1024x1536" | "1536x1024";
+  background?: "transparent" | "opaque" | "auto";
+  outputCompression?: number;
+  tool?: RequestTool;
+}
+
 const recordImageUsage = async (tenantId: string) => {
   try {
     const usage: Partial<UsageLog> = {
@@ -72,6 +89,7 @@ const createResponseImage: Handler = async (
     tenantId,
     uniqueId,
     prompt,
+    instructions,
     outputFormat = "png",
     imageQuality = "medium",
     imageSize = "1024x1024",
@@ -79,7 +97,8 @@ const createResponseImage: Handler = async (
     outputCompression = 100,
     previousResponseId = "",
     files = [],
-  } = body;
+    tool,
+  }: RequestBodyParams = body;
 
   if (!prompt) {
     return {
@@ -133,8 +152,24 @@ const createResponseImage: Handler = async (
     }
     //console.log("fileDataList", { inputImages, inputFiles });
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const enabledTools: any[] = [];
+    if (tool === ToolName.Image) {
+      enabledTools.push({
+        type: "image_generation",
+        background,
+        output_compression: outputCompression,
+        output_format: outputFormat,
+        quality: imageQuality,
+        size: imageSize,
+        partial_images: 1,
+      });
+    }
+
     const stream = await openai.responses.create({
       model: "gpt-4o",
+      instructions,
+      stream: true,
       input: [
         {
           role: "user",
@@ -157,18 +192,7 @@ const createResponseImage: Handler = async (
           ],
         },
       ],
-      tools: [
-        {
-          type: "image_generation",
-          background,
-          output_compression: outputCompression,
-          output_format: outputFormat,
-          quality: imageQuality,
-          size: imageSize,
-          partial_images: 1,
-        },
-      ],
-      stream: true,
+      ...(enabledTools.length > 0 ? { tools: enabledTools } : {}),
       ...(previousResponseId
         ? { previous_response_id: previousResponseId }
         : {}),

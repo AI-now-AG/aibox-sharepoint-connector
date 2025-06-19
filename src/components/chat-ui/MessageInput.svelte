@@ -1,3 +1,11 @@
+<script lang="ts" module>
+  export interface Tool {
+    name: "image" | "websearch";
+    active?: boolean;
+    disabled?: boolean;
+  }
+</script>
+
 <script lang="ts">
   import { fade } from "svelte/transition";
   import FileUpload from "$components/FileUpload.svelte";
@@ -11,6 +19,7 @@
     files?: File[];
     isFetching?: boolean;
     stickyFooter?: boolean;
+    tools?: Tool[];
     onsend: Function;
   }
 
@@ -19,10 +28,12 @@
     files = $bindable([]),
     isFetching = false,
     stickyFooter = false,
+    tools = $bindable([]),
     onsend,
   }: Props = $props();
 
   const t = useTranslations();
+  const imageTool = tools?.find((tool) => tool.name === "image");
 
   let fileModal: HTMLDialogElement | undefined = $state();
   const acceptedTypes = {
@@ -36,6 +47,8 @@
     ],
     "image/*": ["image/png", "image/jpeg"],
   };
+
+  $inspect(tools);
 
   function onKeyDown(e: KeyboardEvent) {
     if (e.key === "Enter" && e.ctrlKey) {
@@ -58,7 +71,7 @@
       class={`textarea textarea-ghost ${
         stickyFooter ? `h-[50px]` : `h-20`
       } min-h-auto w-full focus:outline-hidden focus:border-base-100 text-base`}
-      placeholder="Your input..."
+      placeholder={t("prompt-library.input-placeholder")}
       bind:value={input}
       onkeydown={onKeyDown}
     ></textarea>
@@ -91,6 +104,17 @@
           </div>
         {/if}
       </button>
+      {#each tools as tool}
+        <label class="label">
+          <input
+            type="checkbox"
+            bind:checked={tool.active}
+            disabled={tool.disabled}
+            class="toggle toggle-xs"
+          />
+          <span class="text-sm text-gray-500">{tool.name}</span>
+        </label>
+      {/each}
     </div>
     <div class="flex self-end">
       <button

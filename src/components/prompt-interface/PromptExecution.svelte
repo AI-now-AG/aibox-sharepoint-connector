@@ -1,8 +1,8 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
   import UseCaseCards from "$components/prompt-interface/UseCaseCards.svelte";
-  import ExecutionWidget from "./ExecutionWidget.svelte";
-  import ExecutionToolsWidget from "./ExecutionToolsWidget.svelte";
+  import ChatExecutionWidget from "./ChatExecutionWidget.svelte";
+  import ToolEnhancedChatWidget from "./ToolEnhancedChatWidget.svelte";
   import { sharedMessageHistory } from "$stores/chatHistory";
   import { PromptModel } from "$types/PromptModel";
 
@@ -52,10 +52,10 @@
       />
     </div>
 
-    {#if currentPrompt?.model == PromptModel.OpenAIWithImageTools}
-      <ExecutionToolsWidget />
+    {#if [PromptModel.OpenAIWithTools, PromptModel.OpenAIWithImageTools].includes(currentPrompt?.model)}
+      <ToolEnhancedChatWidget {currentPrompt} bind:isProcessing />
     {:else}
-      <ExecutionWidget
+      <ChatExecutionWidget
         promptId={selectedPromptId}
         {currentPrompt}
         bind:isProcessing
