@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { fade } from "svelte/transition";
   import FileUpload from "$components/FileUpload.svelte";
   import { type FileInput } from "$types/FileInput";
   import { MessageRole } from "$types/MessageHistory";
@@ -185,7 +186,7 @@
 </script>
 
 <div
-  class={`flex flex-col p-1 rounded-xl bg-base-100 border border-base-content/20 has-focus:ring-2 has-focus:ring-base-primary has-focus:ring-offset-2 has-focus:ring-offset-base-200`}
+  class={`flex flex-col rounded-xl bg-base-100 border border-base-content/20 has-focus:ring-2 has-focus:ring-base-primary has-focus:ring-offset-2 has-focus:ring-offset-base-200`}
 >
   <div class="flex-1 relative">
     <textarea
@@ -200,14 +201,17 @@
       bind:value={inputText}
     ></textarea>
 
-    <!-- svelte-ignore a11y_consider_explicit_label -->
-    <button
-      type="button"
-      onclick={clearText}
-      class="absolute top-2 right-2 text-base-content hover:text-base-content/60"
-    >
-      {@html svgIcons.eraser}
-    </button>
+    {#if input}
+      <!-- svelte-ignore a11y_consider_explicit_label -->
+      <button
+        type="button"
+        onclick={clearText}
+        class="absolute top-2 right-2 text-base-content hover:text-base-content/60"
+        transition:fade={{ duration: 500 }}
+      >
+        {@html svgIcons.eraser}
+      </button>
+    {/if}
   </div>
 
   <div class="grid grid-cols-[1fr_min-content] gap-4">
