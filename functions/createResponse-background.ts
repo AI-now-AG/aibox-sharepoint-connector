@@ -23,7 +23,7 @@ import { NETLIFY_BLOBS_STORE } from "$constants";
 
 type RequestTool = "image" | "websearch";
 
-interface RequestBodyParams {
+interface CreateResponseParams {
   tenantId: string;
   uniqueId: string;
   prompt: string;
@@ -98,7 +98,7 @@ const createResponseImage: Handler = async (
     previousResponseId = "",
     files = [],
     tool,
-  }: RequestBodyParams = body;
+  }: CreateResponseParams = body;
 
   if (!prompt) {
     return {
