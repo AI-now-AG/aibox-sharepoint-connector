@@ -458,5 +458,7 @@
   "create-image.create-gpt-image-title": "Erstelle Bilder mit GPT",
   "create-image.create-gpt-image-description": "Erstelle Bilder mit dem neuesten und beliebtesten Modell von OpenAI",
   "create-image.image-info-text": "Format:${format}, Quality:${quality}, Size:${size}",
-  "prompt-execution.tools.image": "Bild"
+  "prompt-execution.tools.image": "Bild",
+  "prompt-execution.models.openai-with-tools": "Open AI gpt-4o (New)",
+  "prompt-execution.models.openai-with-image-tools": "Open AI gpt-4o with Image"
 }

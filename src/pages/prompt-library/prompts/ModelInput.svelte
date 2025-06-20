@@ -11,7 +11,6 @@
 
   interface Props {
     label?: string;
-    models?: Option[];
     selectedModel: string;
     classes?: string;
     labelClasses?: string;
@@ -21,13 +20,14 @@
 
   let {
     label,
-    models = $bindable([]),
     selectedModel = $bindable(""),
     classes = "",
     labelClasses = "",
     disabled = $bindable(false),
     skipDefaultOption = false,
   }: Props = $props();
+
+  let models: Option[] = $state([]);
 
   $inspect(models);
 
@@ -104,11 +104,11 @@
     // OpenAI Responses API
     models.push({
       value: PromptModel.OpenAIWithTools,
-      title: `Open AI gpt-4o (New)`,
+      title: t("prompt-execution.models.openai-with-tools"),
     });
     models.push({
       value: PromptModel.OpenAIWithImageTools,
-      title: `Open AI gpt-4o with Image`,
+      title: t("prompt-execution.models.openai-with-image-tools"),
     });
 
     return models;
