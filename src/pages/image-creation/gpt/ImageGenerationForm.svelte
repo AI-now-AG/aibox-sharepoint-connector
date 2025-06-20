@@ -102,18 +102,20 @@
     };
     console.log("Submitting payload:", params);
 
-    const uploadResponse = await fetch("/.netlify/functions/blobFileUpload", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        files: fileDataList,
-      }),
-    });
+    if (fileDataList.length > 0) {
+      const uploadResponse = await fetch("/.netlify/functions/blobFileUpload", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          files: fileDataList,
+        }),
+      });
 
-    const uploadData = await uploadResponse.json();
-    params["files"] = uploadData.results;
+      const uploadData = await uploadResponse.json();
+      params["files"] = uploadData.results;
+    }
 
     const response = await fetch(
       "/.netlify/functions/createResponse-background",
