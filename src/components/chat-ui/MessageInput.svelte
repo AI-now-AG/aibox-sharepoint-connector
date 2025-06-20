@@ -48,7 +48,7 @@
     "image/*": ["image/png", "image/jpeg"],
   };
 
-  $inspect(tools);
+  //$inspect(tools);
 
   function onKeyDown(e: KeyboardEvent) {
     if (e.key === "Enter" && e.ctrlKey) {

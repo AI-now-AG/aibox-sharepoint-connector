@@ -1,8 +1,10 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { useTranslations } from "$i18n/utils";
+  import { capitalizeFirst } from "$utils/common";
   import { tenant } from "$stores";
   import { PromptModel } from "$types/PromptModel";
+  import { ApiKeyProvider } from "$types/TenantFeature";
   import Dropdown, { type Option } from "$components/form/Dropdown.svelte";
 
   const t = useTranslations();
@@ -26,6 +28,8 @@
     disabled = $bindable(false),
     skipDefaultOption = false,
   }: Props = $props();
+
+  $inspect(models);
 
   onMount(async function () {
     models = getActiveModels() || [];
@@ -51,31 +55,49 @@
     return title;
   };
 
+  const sortProviders = (providers: any[]) => {
+    const sortOrder = [
+      ApiKeyProvider.OpenAI,
+      ApiKeyProvider.AzureOpenAI,
+      ApiKeyProvider.Perplexity,
+    ];
+    return providers.slice().sort((a, b) => {
+      return sortOrder.indexOf(a.name) - sortOrder.indexOf(b.name);
+    });
+  };
+
   const getActiveModels = (): Option[] => {
+    const rawProviders = $tenant?.api_key_providers ?? [];
+    const sortedProviders = sortProviders(rawProviders);
+
     const models: Option[] =
-      ($tenant?.api_key_providers ?? [])
-        ?.filter((provider: any) => provider.active)
+      sortedProviders
+        .filter((provider: any) => provider.active)
         .map((provider: any) => {
           const providerName = getProviderName(provider);
           const modelName = getModelName(provider);
+          const suffix =
+            provider.name == ApiKeyProvider.OpenAI ? " (Legacy)" : "";
           return {
             value: provider.name,
-            title: `${providerName} ${modelName}`,
+            title: `${providerName} ${modelName}${suffix}`,
           };
         }) || [];
 
     if (!skipDefaultOption) {
-      const defaultModel = $tenant?.api_key_providers?.find(
+      const defaultModel = sortedProviders.find(
         (provider: any) => provider.default,
       );
       const defaultText = t("tenant.default");
-      const defaultName = defaultText.replace(
-        /^./,
-        defaultText[0].toUpperCase(),
-      );
+      const defaultName = capitalizeFirst(defaultText);
+
+      const providerName = getProviderName(defaultModel);
+      const modelName = getModelName(defaultModel);
+      const suffix =
+        defaultModel.name == ApiKeyProvider.OpenAI ? " (Legacy)" : "";
       models.unshift({
         value: PromptModel.Default,
-        title: `${defaultName} (${getProviderName(defaultModel)} ${getModelName(defaultModel)})`,
+        title: `${defaultName} - ${providerName} ${modelName}${suffix}`,
       });
     }
 

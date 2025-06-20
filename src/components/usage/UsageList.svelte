@@ -58,8 +58,8 @@
     });
   };
 
-  $inspect(selectedTenant);
-  $inspect(selectedMonth);
+  //$inspect(selectedTenant);
+  //$inspect(selectedMonth);
 </script>
 
 <div class="mt-5">
