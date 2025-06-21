@@ -15,7 +15,13 @@
   const exportUrl: string = "/api/prompts/export";
 
   async function startImport() {
-    console.log("file", inputFile);
+    if (!inputFile) {
+      addToast({
+        message: "Please select a file to import before continuing",
+        type: "error",
+      });
+      return;
+    }
 
     const data = new FormData();
     data.append("file", inputFile);
@@ -27,8 +33,8 @@
     });
 
     // ensure the upload dialog is closed if it is currently open
-    if (fileUploadModal.open) {
-      fileUploadModal.close();
+    if (fileUploadModal && fileUploadModal?.open) {
+      fileUploadModal?.close();
     }
 
     try {
@@ -95,7 +101,7 @@
   <button
     class="btn btn-default btn-outline font-normal grow-0"
     onclick={() => {
-      fileUploadModal.showModal();
+      fileUploadModal?.showModal();
     }}
   >
     {@html svgIcons.fileImport}

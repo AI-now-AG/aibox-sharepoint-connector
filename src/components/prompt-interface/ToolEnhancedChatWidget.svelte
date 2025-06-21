@@ -1,6 +1,8 @@
 <script lang="ts">
+  import { onDestroy } from "svelte";
   import { v4 as uuidv4 } from "uuid";
-  import { useTranslations } from "$i18n/utils";
+  import { sharedMessageHistory } from "$stores/chatHistory";
+  import { type Message } from "$types/MessageHistory";
   import { ResponseStatus, ToolName } from "$types/AIResponse";
   import { PromptModel } from "$types/PromptModel";
   import { addToast } from "$stores/toast";
@@ -19,36 +21,43 @@
     isProcessing: boolean;
   }
   let { currentPrompt, isProcessing = $bindable(false) }: Props = $props();
-  let enabledTools: Tool[] = $state([]);
 
-  const t = useTranslations();
+  let enabledTools = $derived.by(() => {
+    const tools: Tool[] = [];
+
+    switch (currentPrompt?.model) {
+      case PromptModel.OpenAIWithTools:
+        tools.push({
+          name: "image",
+          active: false,
+        });
+        break;
+      case PromptModel.OpenAIWithImageTools:
+        tools.push({
+          name: "image",
+          active: true,
+          disabled: true,
+        });
+        break;
+    }
+
+    return tools;
+  });
+
   const tenantId = $tenant?._id?.toString();
-
-  switch (currentPrompt?.model) {
-    case PromptModel.OpenAIWithTools:
-      enabledTools.push({
-        name: "image",
-        active: false,
-      });
-      break;
-    case PromptModel.OpenAIWithImageTools:
-      enabledTools.push({
-        name: "image",
-        active: true,
-        disabled: true,
-      });
-      break;
-  }
 
   // Reactive form state
   let uniqueId: string = $state("");
   let prompt: string = $state("");
   let files: File[] = $state([]);
 
-  let messages: MessageHistory = $state([]);
   let isFetching: boolean = $state(false);
   let isGenerating: boolean = $state(false);
   let previousResponseId: string | null = $state(null);
+
+  onDestroy(function () {
+    $sharedMessageHistory = [];
+  });
 
   async function submitForm() {
     uniqueId = uuidv4();
@@ -143,15 +152,22 @@
             ?.image_url || "";
 
         // store messages
-        messages.push({
-          role: MessageRole.User,
-          content: prompt,
-        });
-        messages.push({
-          role: MessageRole.Assistant,
-          content: formatMarkdown(data.outputText),
-          imageUrl,
-        });
+        sharedMessageHistory.update((messages: Message[]) => [
+          ...messages,
+          {
+            role: MessageRole.User,
+            content: prompt,
+          },
+        ]);
+
+        sharedMessageHistory.update((messages: Message[]) => [
+          ...messages,
+          {
+            role: MessageRole.Assistant,
+            content: formatMarkdown(data.outputText),
+            imageUrl,
+          },
+        ]);
 
         // scroll to latest user input
         setTimeout(() => {
@@ -169,7 +185,7 @@
         return;
       } else if (data.status === ResponseStatus.Failed) {
         const errorMessage = data.error?.message || "Image generation failed.";
-        messages.push({
+        $sharedMessageHistory.push({
           role: MessageRole.Assistant,
           content: errorMessage,
         });
@@ -207,13 +223,15 @@
 </script>
 
 <!-- Output (Follow-Up) -->
-{#if messages.length > 0}
-  <MessageList {messages} {isFetching} {isGenerating} />
+{#if $sharedMessageHistory.length > 0}
+  <MessageList messages={$sharedMessageHistory} {isFetching} {isGenerating} />
 {/if}
 
 <!-- Prompt Textarea -->
-<div class={`${messages.length > 0 ? "sticky bottom-0 bg-base-200" : ""}`}>
-  {#if messages.length > 0}
+<div
+  class={`${$sharedMessageHistory.length > 0 ? "sticky bottom-0 bg-base-200" : ""}`}
+>
+  {#if $sharedMessageHistory.length > 0}
     <ScrollToBottom />
   {/if}
 
@@ -221,13 +239,13 @@
     bind:input={prompt}
     bind:files
     {isFetching}
-    stickyFooter={messages.length > 0}
+    stickyFooter={$sharedMessageHistory.length > 0}
     bind:tools={enabledTools}
     onsend={submitForm}
   />
 </div>
 
 <!-- Output (Normal) -->
-{#if messages.length == 0}
-  <MessageList {messages} {isFetching} {isGenerating} />
+{#if $sharedMessageHistory.length == 0}
+  <MessageList messages={$sharedMessageHistory} {isFetching} {isGenerating} />
 {/if}

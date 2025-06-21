@@ -33,7 +33,6 @@
   }: Props = $props();
 
   const t = useTranslations();
-  const imageTool = tools?.find((tool) => tool.name === "image");
 
   let fileModal: HTMLDialogElement | undefined = $state();
   const acceptedTypes = {
@@ -104,12 +103,20 @@
           </div>
         {/if}
       </button>
-      {#each tools as tool}
+      {#each tools as tool, index}
         <label class="label">
           <input
             type="checkbox"
-            bind:checked={tool.active}
+            checked={tool.active}
             disabled={tool.disabled || isFetching}
+            onchange={(e: Event) => {
+              const target = e.target;
+              if (target instanceof HTMLInputElement) {
+                tools = tools.map((t, i) =>
+                  index === i ? { ...t, active: target.checked } : t,
+                );
+              }
+            }}
             class="toggle toggle-xs"
           />
           <span class="text-sm text-gray-500">

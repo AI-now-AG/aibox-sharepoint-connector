@@ -29,7 +29,7 @@
 
   let models: Option[] = $state([]);
 
-  $inspect(models);
+  //$inspect(models);
 
   onMount(async function () {
     models = getActiveModels() || [];

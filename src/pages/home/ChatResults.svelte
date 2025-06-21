@@ -72,7 +72,7 @@
           <div class="flex flex-col">
             <div class="mt-2 overflow-y-scroll h-full min-h-12">
               <div class="card gap-4 chat-container" transition:fade>
-                {#each $sharedMessageHistory as { role, content, rawData }, index}
+                {#each $sharedMessageHistory as { role, content, rawData = "" }, index}
                   <div
                     class={`chat-bubble text-base-content ${role === MessageRole.User ? `bg-base-200` : `bg-base-100`}`}
                   >

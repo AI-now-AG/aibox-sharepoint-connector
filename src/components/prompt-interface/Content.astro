@@ -30,6 +30,7 @@ const promptItems = categoryGroupPrompt.map((prompt) => ({
   _id: prompt._id?.toString(),
   title: prompt.title,
   description: prompt.description,
+  prompt: prompt.prompt,
   model: prompt.model,
   predefined_input: prompt.predefined_input,
 }));

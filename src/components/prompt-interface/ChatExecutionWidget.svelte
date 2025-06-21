@@ -37,7 +37,8 @@
       predefinedInput = currentPrompt?.predefined_input ?? "";
 
       // Check and disabled file input for Perplexity
-      const promptModel = currentPrompt?.model ?? apiProvider.name;
+      const defaultModel = apiProvider?.name || "";
+      const promptModel = currentPrompt?.model ?? defaultModel;
       isDisableFileInput = promptModel == ApiKeyProvider.Perplexity;
     }
   });

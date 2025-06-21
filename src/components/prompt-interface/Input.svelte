@@ -2,7 +2,7 @@
   import { fade } from "svelte/transition";
   import FileUpload from "$components/FileUpload.svelte";
   import { type FileInput } from "$types/FileInput";
-  import { MessageRole } from "$types/MessageHistory";
+  import { MessageRole, type Message } from "$types/MessageHistory";
   import { sharedMessageHistory } from "$stores/chatHistory";
   import DataLossWarning from "$components/chat-ui/DataLossWarning.svelte";
   import { svgIcons } from "$assets/icons";
@@ -107,7 +107,7 @@
             content: input,
             rawData: input,
           };
-          sharedMessageHistory.update((messages) => [
+          sharedMessageHistory.update((messages: Message[]) => [
             ...messages,
             newUserMessage,
           ]);
@@ -143,7 +143,7 @@
             content: output,
             rawData: stripHtmlFormatting(output),
           };
-          sharedMessageHistory.update((messages) => [
+          sharedMessageHistory.update((messages: Message[]) => [
             ...messages,
             newAssistantMessage,
           ]);
