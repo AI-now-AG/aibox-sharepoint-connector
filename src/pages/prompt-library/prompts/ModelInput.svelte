@@ -77,7 +77,9 @@
           const providerName = getProviderName(provider);
           const modelName = getModelName(provider);
           const suffix =
-            provider.name == ApiKeyProvider.OpenAI ? " (Legacy)" : "";
+            provider.name == ApiKeyProvider.OpenAI && !excludePromptOptions
+              ? " (Legacy)"
+              : "";
           return {
             value: provider.name,
             title: `${providerName} ${modelName}${suffix}`,
