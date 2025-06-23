@@ -172,7 +172,7 @@
           ...messages,
           {
             role: MessageRole.Assistant,
-            content: formatMarkdown(data.outputText),
+            content: formatMarkdown(data.outputText ?? ""),
             imageUrl,
           },
         ]);
