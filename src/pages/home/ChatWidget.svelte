@@ -209,7 +209,7 @@
           bind:selectedModel
           bind:disabled={isDisableSelectModel}
           labelClasses={"text-sm"}
-          skipDefaultOption
+          excludePromptOptions={true}
         />
       </div>
     </div>

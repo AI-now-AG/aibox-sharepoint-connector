@@ -15,7 +15,7 @@
     classes?: string;
     labelClasses?: string;
     disabled?: boolean;
-    skipDefaultOption?: boolean;
+    excludePromptOptions?: boolean;
   }
 
   let {
@@ -24,7 +24,7 @@
     classes = "",
     labelClasses = "",
     disabled = $bindable(false),
-    skipDefaultOption = false,
+    excludePromptOptions = false,
   }: Props = $props();
 
   let models: Option[] = $state([]);
@@ -84,7 +84,7 @@
           };
         }) || [];
 
-    if (!skipDefaultOption) {
+    if (!excludePromptOptions) {
       const defaultModel = sortedProviders.find(
         (provider: any) => provider.default,
       );
@@ -102,14 +102,16 @@
     }
 
     // OpenAI Responses API
-    models.push({
-      value: PromptModel.OpenAIWithTools,
-      title: t("prompt-execution.models.openai-with-tools"),
-    });
-    models.push({
-      value: PromptModel.OpenAIWithImageTools,
-      title: t("prompt-execution.models.openai-with-image-tools"),
-    });
+    if (!excludePromptOptions) {
+      models.push({
+        value: PromptModel.OpenAIWithTools,
+        title: t("prompt-execution.models.openai-with-tools"),
+      });
+      models.push({
+        value: PromptModel.OpenAIWithImageTools,
+        title: t("prompt-execution.models.openai-with-image-tools"),
+      });
+    }
 
     return models;
   };
