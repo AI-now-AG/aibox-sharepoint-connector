@@ -89,6 +89,7 @@
       tenantId,
       uniqueId,
       prompt,
+      instructions: currentPrompt.prompt ?? "",
       ...(primaryTool && { tool: primaryTool }),
       previousResponseId,
     };
