@@ -88,7 +88,7 @@
   </div>
 
   <div class="grid grid-cols-[1fr_min-content] gap-4">
-    <div class="p-2 flex flex-row gap-2">
+    <div class="p-2 flex flex-row gap-3">
       <button
         class="btn h-auto w-auto p-1 min-h-0 hover:text-base-content/60"
         onclick={() => {
@@ -104,7 +104,13 @@
         {/if}
       </button>
       {#each tools as tool, index}
-        <label class="label">
+        <label class="label px-2 border border-base-300">
+          <span
+            class="text-xs text-gray-500"
+            class:text-primary={tool.active && !tool.disabled}
+          >
+            {@html svgIcons.imageTool}
+          </span>
           <input
             type="checkbox"
             checked={tool.active}
@@ -117,11 +123,8 @@
                 );
               }
             }}
-            class="toggle toggle-xs"
+            class="toggle toggle-xs checked:border-primary checked:bg-primary checked:text-primary-content disabled:text-white"
           />
-          <span class="text-sm text-gray-500">
-            {t(`prompt-execution.tools.${tool.name || "image"}`)}
-          </span>
         </label>
       {/each}
     </div>
@@ -155,3 +158,9 @@
 {#if stickyFooter}
   <DataLossWarning />
 {/if}
+
+<style>
+  .toggle:disabled::before {
+    background-color: currentColor;
+  }
+</style>
