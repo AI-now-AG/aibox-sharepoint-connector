@@ -70,7 +70,7 @@
       <div class="grow md:w-1/2 p-2 pb-4 h-full">
         <div class="grid space-y-6 h-full" transition:fade>
           <div class="flex flex-col">
-            <div class="mt-2 overflow-y-scroll h-full min-h-12">
+            <div class="mt-2 overflow-y-scroll h-full min-h-screen">
               <div class="card gap-4 chat-container" transition:fade>
                 {#each $sharedMessageHistory as { role, content, rawData = "" }, index}
                   <div
