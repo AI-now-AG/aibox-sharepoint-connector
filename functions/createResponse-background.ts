@@ -166,7 +166,7 @@ const createResponseImage: Handler = async (
       });
     }
 
-    console.log('instructions', {instructions});
+    //console.log('instructions', instructions);
     const stream = await openai.responses.create({
       model: "gpt-4o",
       instructions,
