@@ -18,9 +18,9 @@
 
   interface Props {
     currentPrompt: any;
-    isProcessing: boolean;
+    isFetching: boolean;
   }
-  let { currentPrompt, isProcessing = $bindable(false) }: Props = $props();
+  let { currentPrompt, isFetching = $bindable(false) }: Props = $props();
 
   let enabledTools = $derived.by(() => {
     const tools: Tool[] = [];
@@ -51,9 +51,16 @@
   let prompt: string = $state("");
   let files: File[] = $state([]);
 
-  let isFetching: boolean = $state(false);
   let isGenerating: boolean = $state(false);
+
   let previousResponseId: string | null = $state(null);
+
+  $effect(() => {
+    if (currentPrompt) {
+      prompt = currentPrompt?.predefined_input ?? "";
+      files = [];
+    }
+  });
 
   onDestroy(function () {
     $sharedMessageHistory = [];

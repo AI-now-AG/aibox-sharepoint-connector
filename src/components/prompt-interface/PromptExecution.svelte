@@ -53,7 +53,7 @@
     </div>
 
     {#if [PromptModel.OpenAIWithTools, PromptModel.OpenAIWithImageTools].includes(currentPrompt?.model)}
-      <ToolEnhancedChatWidget {currentPrompt} bind:isProcessing />
+      <ToolEnhancedChatWidget {currentPrompt} bind:isFetching={isProcessing} />
     {:else}
       <ChatExecutionWidget
         promptId={selectedPromptId}
