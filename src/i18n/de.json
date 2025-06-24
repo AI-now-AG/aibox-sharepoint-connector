@@ -295,7 +295,7 @@
   "tenant.whisper.model.configured.for.azure.openai": "Whisper Model (Konfiguriert in Azure OpenAI)",
   "tenant.features": "Features",
   "tenant.perplexity-provider": "Perplexity",
-  "prompt-library.add.prompts.language-model": "Sprachmodell",
+  "prompt-library.add.prompts.language-model": "KI Funktionen",
   "prompt-library.delete.knowledge-base.confirm": "Möchten Sie diese Knowledge wirklich löschen?",
   "common.edited-by": "Zuetzt geändert",
   "prompt-library.knowledgebase.file-import": "Aus Datei importieren",
@@ -365,7 +365,7 @@
   "tenant.image-creation.flux.api-key": "API Key",
   "onboarding.step-4.title": "Bilder erstellen",
   "onboarding.step-4.description": "Erstelle ganz einfach Bilder in verschiedenen Grössen und Formaten.",
-  "prompt.text-model": "Textmodell",
+  "prompt.text-model": "KI Funktionen",
   "nav.usage": "Nutzung",
   "usage.select-tenant": "Tenant auswählen",
   "usage.select-month": "Monat auswählen",
@@ -458,7 +458,9 @@
   "create-image.create-gpt-image-title": "Erstelle Bilder mit GPT",
   "create-image.create-gpt-image-description": "Erstelle Bilder mit dem neuesten und beliebtesten Modell von OpenAI",
   "create-image.image-info-text": "Format:${format}, Quality:${quality}, Size:${size}",
-  "prompt-execution.tools.image": "Bild",
-  "prompt-execution.models.openai-with-tools": "Open AI gpt-4o (New)",
-  "prompt-execution.models.openai-with-image-tools": "Open AI gpt-4o with Image"
+  "prompt-execution.models.openai-model": "Text (${model} Legacy)",
+  "prompt-execution.models.azure-openai-model": "Text (Azure ${model})",
+  "prompt-execution.models.perplexity-model": "Text & Websuche (Perplexity ${model})",
+  "prompt-execution.models.openai-with-tools": "Text & Tools (gpt-4o)",
+  "prompt-execution.models.openai-with-image-tools": "Bild (gpt-4o)"
 }

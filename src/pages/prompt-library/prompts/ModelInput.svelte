@@ -35,22 +35,20 @@
     models = getActiveModels() || [];
   });
 
-  const getModelName = (provider: any) => {
+  const getModelLabel = (provider: any) => {
     const key = `${provider.name}_chat_model` as keyof typeof $tenant;
-    return $tenant?.[key] || "gpt-4o";
-  };
+    const model = $tenant?.[key] || "gpt-4o";
 
-  const getProviderName = (provider: any) => {
     let title;
     switch (provider.name) {
       case PromptModel.AzureOpenAI:
-        title = t("tenant.azure-open-ai-provider");
+        title = t("prompt-execution.models.azure-openai-model", { model });
         break;
       case PromptModel.Perplexity:
-        title = t("tenant.perplexity-provider");
+        title = t("prompt-execution.models.perplexity-model", { model });
         break;
       default:
-        title = t("tenant.open-ai-provider");
+        title = t("prompt-execution.models.openai-model", { model });
     }
     return title;
   };
@@ -74,15 +72,10 @@
       sortedProviders
         .filter((provider: any) => provider.active)
         .map((provider: any) => {
-          const providerName = getProviderName(provider);
-          const modelName = getModelName(provider);
-          const suffix =
-            provider.name == ApiKeyProvider.OpenAI && !excludePromptOptions
-              ? " (Legacy)"
-              : "";
+          const modelName = getModelLabel(provider);
           return {
             value: provider.name,
-            title: `${providerName} ${modelName}${suffix}`,
+            title: `${modelName}`,
           };
         }) || [];
 
@@ -93,13 +86,10 @@
       const defaultText = t("tenant.default");
       const defaultName = capitalizeFirst(defaultText);
 
-      const providerName = getProviderName(defaultModel);
-      const modelName = getModelName(defaultModel);
-      const suffix =
-        defaultModel.name == ApiKeyProvider.OpenAI ? " (Legacy)" : "";
+      const modelName = getModelLabel(defaultModel);
       models.unshift({
         value: PromptModel.Default,
-        title: `${defaultName} - ${providerName} ${modelName}${suffix}`,
+        title: `${defaultName} - ${modelName}`,
       });
     }
 
