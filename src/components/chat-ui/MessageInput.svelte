@@ -47,7 +47,7 @@
     "image/*": ["image/png", "image/jpeg"],
   };
 
-  //$inspect(tools);
+  $inspect(tools);
 
   function onKeyDown(e: KeyboardEvent) {
     if (e.key === "Enter" && e.ctrlKey) {
@@ -104,28 +104,20 @@
         {/if}
       </button>
       {#each tools as tool, index}
-        <label class="label px-2 border border-base-300">
-          <span
-            class="text-xs text-gray-500"
-            class:text-primary={tool.active && !tool.disabled}
-          >
-            {@html svgIcons.imageTool}
-          </span>
-          <input
-            type="checkbox"
-            checked={tool.active}
-            disabled={tool.disabled || isFetching}
-            onchange={(e: Event) => {
-              const target = e.target;
-              if (target instanceof HTMLInputElement) {
-                tools = tools.map((t, i) =>
-                  index === i ? { ...t, active: target.checked } : t,
-                );
-              }
-            }}
-            class="toggle toggle-xs checked:border-primary checked:bg-primary checked:text-primary-content disabled:text-white"
-          />
-        </label>
+        <button
+          class="btn h-auto w-auto p-1"
+          class:btn-active={tool.active}
+          class:btn-primary={tool.active}
+          disabled={tool.disabled || isFetching}
+          aria-pressed={tool.active}
+          onclick={() => {
+            tools = tools.map((t, i) =>
+              i === index ? { ...t, active: !t.active } : t,
+            );
+          }}
+        >
+          <span>{@html svgIcons.imageTool}</span>
+        </button>
       {/each}
     </div>
     <div class="flex self-end">
