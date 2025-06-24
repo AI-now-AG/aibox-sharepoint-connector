@@ -88,7 +88,7 @@
   </div>
 
   <div class="grid grid-cols-[1fr_min-content] gap-4">
-    <div class="p-2 flex flex-row gap-3">
+    <div class="p-2 flex flex-row gap-2">
       <button
         class="btn h-auto w-auto p-1 min-h-0 hover:text-base-content/60"
         onclick={() => {
