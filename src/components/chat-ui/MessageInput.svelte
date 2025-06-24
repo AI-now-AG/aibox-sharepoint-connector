@@ -105,7 +105,7 @@
       </button>
       {#each tools as tool, index}
         <button
-          class={`btn h-auto w-[30] p-1
+          class={`btn btn-outline h-auto w-[30] p-1 border-base-content/30
           ${tool.active ? "btn-active btn-primary" : ""}
           ${tool.disabled || isFetching ? "opacity-50 cursor-not-allowed" : ""}
         `}
