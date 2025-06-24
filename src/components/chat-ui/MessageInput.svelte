@@ -107,11 +107,13 @@
         <button
           class={`btn btn-outline h-auto w-[30] p-1 border-base-content/30
           ${tool.active ? "btn-active btn-primary" : ""}
-          ${tool.disabled || isFetching ? "opacity-50 cursor-not-allowed" : ""}
+          ${tool.disabled ? "cursor-not-allowed" : ""}
+          ${isFetching ? "opacity-50 cursor-not-allowed" : ""}
         `}
-          disabled={tool.disabled || isFetching}
+          disabled={isFetching}
           aria-pressed={tool.active}
           onclick={() => {
+            if (tool.disabled) return;
             tools = tools.map((t, i) =>
               i === index ? { ...t, active: !t.active } : t,
             );
