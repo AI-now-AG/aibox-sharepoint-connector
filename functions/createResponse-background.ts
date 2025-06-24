@@ -31,8 +31,8 @@ interface CreateResponseParams {
   files?: string[];
   previousResponseId?: string;
   outputFormat?: "png" | "jpeg" | "webp";
-  imageQuality?: "low" | "medium" | "high";
-  imageSize?: "1024x1024" | "1024x1536" | "1536x1024";
+  imageQuality?: "low" | "medium" | "high" | "auto";
+  imageSize?: "1024x1024" | "1024x1536" | "1536x1024" | "auto";
   background?: "transparent" | "opaque" | "auto";
   outputCompression?: number;
   tool?: RequestTool;
@@ -91,8 +91,8 @@ const createResponseImage: Handler = async (
     prompt,
     instructions,
     outputFormat = "png",
-    imageQuality = "medium",
-    imageSize = "1024x1024",
+    imageQuality = "auto",
+    imageSize = "auto",
     background = "auto",
     outputCompression = 100,
     previousResponseId = "",
