@@ -105,9 +105,10 @@
       </button>
       {#each tools as tool, index}
         <button
-          class="btn h-auto w-auto p-1"
-          class:btn-active={tool.active}
-          class:btn-primary={tool.active}
+          class={`btn h-auto w-auto p-1
+          ${tool.active ? "btn-active btn-primary" : ""}
+          ${tool.disabled || isFetching ? "opacity-50 cursor-not-allowed" : ""}
+        `}
           disabled={tool.disabled || isFetching}
           aria-pressed={tool.active}
           onclick={() => {
