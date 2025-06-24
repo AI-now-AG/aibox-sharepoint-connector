@@ -151,9 +151,3 @@
 {#if stickyFooter}
   <DataLossWarning />
 {/if}
-
-<style>
-  .toggle:disabled::before {
-    background-color: currentColor;
-  }
-</style>
