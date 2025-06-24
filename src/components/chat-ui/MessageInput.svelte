@@ -116,6 +116,7 @@
               i === index ? { ...t, active: !t.active } : t,
             );
           }}
+          title={tool.name}
         >
           <span>{@html svgIcons.imageTool}</span>
         </button>
