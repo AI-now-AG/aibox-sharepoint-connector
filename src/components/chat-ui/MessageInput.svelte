@@ -90,7 +90,7 @@
   <div class="grid grid-cols-[1fr_min-content] gap-4">
     <div class="p-2 flex flex-row gap-2">
       <button
-        class="btn h-auto w-auto p-1 min-h-0 hover:text-base-content/60"
+        class="btn btn-outline h-auto w-auto p-1 min-h-0 border-base-content/30"
         onclick={() => {
           fileModal?.showModal();
         }}
