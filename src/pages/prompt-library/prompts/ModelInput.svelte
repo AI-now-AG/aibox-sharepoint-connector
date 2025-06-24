@@ -42,13 +42,15 @@
     let title;
     switch (provider.name) {
       case PromptModel.AzureOpenAI:
-        title = t("prompt-execution.models.azure-openai-model", { model });
+        title = t("prompt-execution.models.azure-openai", { model });
         break;
       case PromptModel.Perplexity:
-        title = t("prompt-execution.models.perplexity-model", { model });
+        title = t("prompt-execution.models.perplexity", { model });
         break;
       default:
-        title = t("prompt-execution.models.openai-model", { model });
+        title = !excludePromptOptions
+          ? t("prompt-execution.models.openai-legacy", { model })
+          : t("prompt-execution.models.openai", { model });
     }
     return title;
   };

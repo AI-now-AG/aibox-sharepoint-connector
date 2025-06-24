@@ -458,9 +458,10 @@
   "create-image.create-gpt-image-title": "Erstelle Bilder mit GPT",
   "create-image.create-gpt-image-description": "Erstelle Bilder mit dem neuesten und beliebtesten Modell von OpenAI",
   "create-image.image-info-text": "Format:${format}, Quality:${quality}, Size:${size}",
-  "prompt-execution.models.openai-model": "Text (${model} Legacy)",
-  "prompt-execution.models.azure-openai-model": "Text (Azure ${model})",
-  "prompt-execution.models.perplexity-model": "Text & Websuche (Perplexity ${model})",
+  "prompt-execution.models.openai-legacy": "Text (${model} Legacy)",
+  "prompt-execution.models.openai": "Text (${model})",
+  "prompt-execution.models.azure-openai": "Text (Azure ${model})",
+  "prompt-execution.models.perplexity": "Text & Websuche (Perplexity ${model})",
   "prompt-execution.models.openai-with-tools": "Text & Tools (gpt-4o)",
   "prompt-execution.models.openai-with-image-tools": "Bild (gpt-4o)"
 }
