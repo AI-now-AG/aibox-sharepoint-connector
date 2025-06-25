@@ -30,7 +30,7 @@
     apiProvider?.name == ApiKeyProvider.Perplexity,
   );
 
-  //$inspect(currentPrompt);
+  $inspect(currentPrompt);
 
   $effect(() => {
     if (currentPrompt) {
