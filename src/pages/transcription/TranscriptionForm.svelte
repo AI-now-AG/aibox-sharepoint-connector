@@ -118,7 +118,9 @@
 
   let isM4AFile = $derived(
     audioFile
-      ? audioFile.name.split(".").pop()?.toLowerCase() === "m4a"
+      ? ["m4a", "mp4"].includes(
+          audioFile.name.split(".").pop()?.toLowerCase() || "",
+        )
       : false,
   );
 
@@ -486,7 +488,11 @@
       ? tempUploadUrl.split("?")[0]
       : tempUploadUrl;
     const fileExtension = filename.split(".").pop();
-    if (isDiarizationEnabled || fileExtension === "m4a") {
+    if (
+      (isDiarizationEnabled ||
+      fileExtension === "m4a" ||
+      fileExtension === "mp4") && (category === AudioCategory.SubtitleLarge || category === AudioCategory.AudioPro)
+    ) {
       startPollingConversionFile();
     } else {
       await startTranscription();
