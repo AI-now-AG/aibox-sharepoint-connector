@@ -139,8 +139,8 @@
             class="btn btn-outline btn-sm"
             onclick={(e) => {
               const elem = document.activeElement;
-              if (elem) {
-                elem?.blur();
+              if (elem instanceof HTMLElement) {
+                elem.blur();
               }
               e.stopPropagation();
               onfilter();

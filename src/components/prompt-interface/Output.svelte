@@ -11,8 +11,7 @@
     isProcessing: boolean;
   }
 
-  let { output = $bindable(""), isProcessing = $bindable(false) }: Props =
-    $props();
+  let { output = "", isProcessing = false }: Props = $props();
 
   let copyIndex: number = $state(-1);
   let timer: NodeJS.Timeout;
@@ -20,7 +19,7 @@
   const handleCopy = (event: any) => {
     const selection = window.getSelection();
     const range =
-      selection && selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+      (selection?.rangeCount ?? 0) > 0 ? selection?.getRangeAt(0) : null;
 
     if (!range) {
       return;
@@ -31,10 +30,10 @@
     container.appendChild(range.cloneContents());
 
     const richText = container.innerHTML;
-    const plainText = (selection ?? "").toString();
+    const plainText = selection?.toString();
 
     event.clipboardData.setData("text/html", richText);
-    event.clipboardData.setData("text/plain", plainText);
+    event.clipboardData.setData("text/plain", plainText ?? "");
   };
 
   onMount(() => {
@@ -84,7 +83,8 @@
                             <!-- svelte-ignore a11y_img_redundant_alt -->
                             <img alt="Avatar Image" src={userPicture} />
                           {:else}
-                            <img src="/aibox-logo-dark.svg" alt="dark logo" />
+                            <img src="/aibox-logo-dark.svg" alt="light Logo" />
+                            {@html svgIcons.editPrompt}
                           {/if}
                         </div>
                       </div>
@@ -129,6 +129,7 @@
                       <div class="avatar">
                         <div class="w-10 rounded-full">
                           <img src="/aibox-logo-dark.svg" alt="light Logo" />
+                          {@html svgIcons.editPrompt}
                         </div>
                       </div>
 

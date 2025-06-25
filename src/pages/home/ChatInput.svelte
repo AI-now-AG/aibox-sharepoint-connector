@@ -1,7 +1,8 @@
 <script lang="ts">
+  import { fade } from "svelte/transition";
   import FileUpload from "$components/FileUpload.svelte";
-  import DataLossWarning from "$components/prompt-interface/components/DataLossWarning.svelte";
-  import { sharedMessageHistory } from "$components/prompt-interface/components/Stores";
+  import DataLossWarning from "$components/chat-ui/DataLossWarning.svelte";
+  import { sharedMessageHistory } from "$stores/chatHistory";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
   import { preventDefault } from "$utils/common";
@@ -50,14 +51,17 @@
       bind:value={input}
       onkeydown={onKeyDown}
     ></textarea>
-    <!-- svelte-ignore a11y_consider_explicit_label -->
-    <button
-      type="button"
-      onclick={clearText}
-      class="absolute top-2 right-2 text-base-content hover:text-base-content/60"
-    >
-      {@html svgIcons.eraser}
-    </button>
+    {#if input}
+      <!-- svelte-ignore a11y_consider_explicit_label -->
+      <button
+        type="button"
+        onclick={clearText}
+        class="absolute top-2 right-2 text-base-content hover:text-base-content/60"
+        transition:fade={{ duration: 500 }}
+      >
+        {@html svgIcons.eraser}
+      </button>
+    {/if}
   </div>
 
   <div class="grid grid-cols-[1fr_min-content] gap-4">

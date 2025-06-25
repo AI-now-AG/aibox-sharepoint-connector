@@ -6,10 +6,9 @@
   import ModelInput from "$pages/prompt-library/prompts/ModelInput.svelte";
   import type { CreatePromptParams } from "$pages/api/prompts/index.json";
   import { addToast } from "$stores/toast";
-  import LoadingSpinner from "$components/prompt-interface/components/LoadingSpinner.svelte";
+  import LoadingSpinner from "$components/prompt-interface/LoadingSpinner.svelte";
   import { svgIcons } from "$assets/icons";
   import { formatMarkdown, preventDefault } from "$utils/common";
-  import type { Option } from "$components/form/Dropdown.svelte";
   import TextEditor from "$components/form/TextEditor.svelte";
 
   const t = useTranslations();
@@ -48,7 +47,6 @@
   let categories: Category[] = $state([]);
   let selectedCategory: Category | undefined = $state();
 
-  let models: Option[] = $state([]);
   let selectedModel: string = $state("");
 
   let knowledgeBases: KnowledgeBase[] = $state([]);
@@ -122,10 +120,7 @@
         previousCategoryId = category._id;
       }
 
-      const model = models.find(
-        (e) => e.value == promptDetails.model?.toString(),
-      );
-      selectedModel = model?.value || "";
+      selectedModel = promptDetails.model?.toString() || "";
 
       const group = category?.groups.find(
         (e) => e._id == promptDetails.group?.toString(),
@@ -296,7 +291,7 @@
           items={knowledgeBases}
           bind:selectedItems={selectedKnowledgeBases}
         />
-        <ModelInput bind:models bind:selectedModel />
+        <ModelInput bind:selectedModel />
       </div>
 
       <div

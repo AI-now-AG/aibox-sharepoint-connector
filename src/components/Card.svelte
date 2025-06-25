@@ -37,7 +37,7 @@
       ?.showModal();
   };
 
-  function showSuccessToast(type) {
+  function showSuccessToast(type: string) {
     const translationKey = `prompt-library.delete.${type}.success`;
     addToast({
       message: t(translationKey),
@@ -45,7 +45,7 @@
     });
   }
 
-  function showErrorToast(type) {
+  function showErrorToast(type: string) {
     const translationKey = `prompt-library.delete.${type}.failed`;
     addToast({
       message: t(translationKey),

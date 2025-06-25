@@ -52,8 +52,8 @@
 
   const setTheme = (item: Item) => {
     const elem = document.activeElement;
-    if (elem) {
-      elem?.blur();
+    if (elem instanceof HTMLElement) {
+      elem.blur();
     }
     document.documentElement.setAttribute("data-theme", item.value);
     handleSelectedItems(item);

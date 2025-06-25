@@ -11,8 +11,8 @@
 
 <script lang="ts">
   import PromptItem from "$components/prompt-interface/PromptItem.svelte";
-  import EditPromptDetails from "$components/prompt-interface/components/EditPromptDetails.svelte";
-  import PromptOrderDialog from "$components/prompt-interface/components/PromptOrderDialog.svelte";
+  import EditPromptDialog from "$components/prompt-interface/EditPromptDialog.svelte";
+  import PromptOrderDialog from "$components/prompt-interface/PromptOrderDialog.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import Loading from "$components/Loading.svelte";
   import { addToast } from "$stores/toast";
@@ -53,13 +53,13 @@
     return items.filter((item) => item.group === groupId);
   }
 
-  async function editCard(index: number) {
+  function editCard(index: number) {
     selectedEditPromptId = items[index]?.id ?? "";
     promptDialogMode = "update";
     promptDialog?.showModal();
   }
 
-  async function duplicateCard(index: number) {
+  function duplicateCard(index: number) {
     selectedEditPromptId = items[index]?.id ?? "";
     promptDialogMode = "clone";
     promptDialog?.showModal();
@@ -172,7 +172,7 @@
   </div>
 </div>
 
-<EditPromptDetails
+<EditPromptDialog
   bind:promptDialog
   bind:selectedEditPromptId
   dialogMode={promptDialogMode}

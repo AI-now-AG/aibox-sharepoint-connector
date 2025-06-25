@@ -9,7 +9,7 @@
   import AlertDialog from "$components/AlertDialog.svelte";
   import { user as currentUser } from "$stores";
   import log from "$utils/log";
-  import moment from "moment";
+  import dayjs from "dayjs";
   import Input from "$components/form/Input.svelte";
   import { isValidEmail } from "$utils/common";
   import { isEnterpriseConnection } from "$utils/auth0";
@@ -332,10 +332,10 @@
                 <tr class="mb-4">
                   <td class="text-base-content/80">{t("user.signed-up")}</td>
                   <td class="text-base">
-                    {moment(userData.created_at, "DD.MM.YYYY").format(
+                    {dayjs(userData.created_at, "DD.MM.YYYY").format(
                       "dddd DD.MM.YYYY",
-                    )}</td
-                  >
+                    )}
+                  </td>
                 </tr>
                 <tr class="mb-4">
                   <td class="text-base-content/80">{t("user.logins")}</td>
@@ -364,7 +364,9 @@
                   <td class="text-base-content/80">{t("user.latest-login")}</td>
                   <td class="text-base">
                     {userData.last_login
-                      ? moment(userData.last_login).format("dddd DD.MM.YYYY")
+                      ? dayjs(userData.last_login, "DD.MM.YYYY").format(
+                          "dddd DD.MM.YYYY",
+                        )
                       : "-"}
                   </td>
                 </tr>

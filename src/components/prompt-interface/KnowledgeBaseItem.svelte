@@ -5,7 +5,7 @@
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
   import type { KnowledgeBaseCardItem } from "./KnowledgeBaseList.svelte";
-  import moment from "moment";
+  import dayjs from "dayjs";
 
   const t = useTranslations();
 
@@ -69,7 +69,7 @@
     </p>
     <p class="text-xs font-medium">
       {data?.modifiedAt
-        ? moment(data?.modifiedAt).format("DD.MM.YYYY, HH:mm")
+        ? dayjs(data.modifiedAt).format("DD.MM.YYYY, HH:mm")
         : "-"}
     </p>
   </div>

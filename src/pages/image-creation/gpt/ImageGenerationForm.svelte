@@ -9,8 +9,8 @@
   import { formatMarkdown, capitalizeFirst } from "$utils/common";
   import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
   import Dropdown from "$components/form/Dropdown.svelte";
-  import PromptInput from "./PromptInput.svelte";
-  import Output from "./Output.svelte";
+  import MessageInput from "$components/chat-ui/MessageInput.svelte";
+  import MessageList from "$components/chat-ui/MessageList.svelte";
 
   // Types
   type ImageSize = "1024x1024" | "1024x1536" | "1536x1024";
@@ -92,6 +92,7 @@
       tenantId,
       uniqueId,
       prompt,
+      tool: ToolName.Image,
       imageSize,
       imageQuality,
       outputCompression,
@@ -101,21 +102,23 @@
     };
     console.log("Submitting payload:", params);
 
-    const uploadResponse = await fetch("/.netlify/functions/blobFileUpload", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        files: fileDataList,
-      }),
-    });
+    if (fileDataList.length > 0) {
+      const uploadResponse = await fetch("/.netlify/functions/blobFileUpload", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          files: fileDataList,
+        }),
+      });
 
-    const uploadData = await uploadResponse.json();
-    params["files"] = uploadData.results;
+      const uploadData = await uploadResponse.json();
+      params["files"] = uploadData.results;
+    }
 
     const response = await fetch(
-      "/.netlify/functions/createResponseImage-background",
+      "/.netlify/functions/createResponse-background",
       {
         method: "POST",
         headers: {
@@ -256,7 +259,12 @@
 
     <!-- Output (Follow-Up) -->
     {#if messages.length > 0}
-      <Output {messages} {isFetching} {isGenerating} infoText={getInfoText()} />
+      <MessageList
+        {messages}
+        {isFetching}
+        {isGenerating}
+        infoText={getInfoText()}
+      />
     {/if}
 
     {#if messages.length == 0}
@@ -342,7 +350,7 @@
         <ScrollToBottom />
       {/if}
 
-      <PromptInput
+      <MessageInput
         bind:input={prompt}
         bind:files
         {isFetching}
@@ -353,7 +361,7 @@
 
     <!-- Output (Normal) -->
     {#if messages.length == 0}
-      <Output {messages} {isFetching} {isGenerating} />
+      <MessageList {messages} {isFetching} {isGenerating} />
     {/if}
   </div>
 </div>

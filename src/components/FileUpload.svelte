@@ -19,7 +19,7 @@
     files?: File[];
     modal: any;
     title: string;
-    acceptedTypes: Record<string, string[]>;
+    acceptedTypes?: Record<string, string[]>;
     supportedFormatsText?: string;
   }
 

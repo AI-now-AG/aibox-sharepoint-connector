@@ -1,7 +1,9 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { useTranslations } from "$i18n/utils";
+  import { capitalizeFirst } from "$utils/common";
   import { tenant } from "$stores";
+  import { PromptModel } from "$types/PromptModel";
   import { ApiKeyProvider } from "$types/TenantFeature";
   import Dropdown, { type Option } from "$components/form/Dropdown.svelte";
 
@@ -9,74 +11,99 @@
 
   interface Props {
     label?: string;
-    models?: Option[];
     selectedModel: string;
     classes?: string;
     labelClasses?: string;
     disabled?: boolean;
-    skipDefaultOption?: boolean;
+    excludePromptOptions?: boolean;
   }
 
   let {
     label,
-    models = $bindable([]),
     selectedModel = $bindable(""),
     classes = "",
     labelClasses = "",
     disabled = $bindable(false),
-    skipDefaultOption = false,
+    excludePromptOptions = false,
   }: Props = $props();
 
+  let models: Option[] = $state([]);
+
+  //$inspect(models);
+
   onMount(async function () {
-    setTimeout(() => {
-      models = getActiveModels() || [];
-    }, 0);
+    models = getActiveModels() || [];
   });
 
-  const getModelName = (provider: any) => {
+  const getModelLabel = (provider: any) => {
     const key = `${provider.name}_chat_model` as keyof typeof $tenant;
-    return $tenant?.[key] || "gpt-4o";
-  };
+    const model = $tenant?.[key] || "gpt-4o";
 
-  const getProviderName = (provider: any) => {
     let title;
     switch (provider.name) {
-      case ApiKeyProvider.AzureOpenAI:
-        title = t("tenant.azure-open-ai-provider");
+      case PromptModel.AzureOpenAI:
+        title = t("prompt-execution.models.azure-openai", { model });
         break;
-      case ApiKeyProvider.Perplexity:
-        title = t("tenant.perplexity-provider");
+      case PromptModel.Perplexity:
+        title = t("prompt-execution.models.perplexity", { model });
         break;
       default:
-        title = t("tenant.open-ai-provider");
+        title = !excludePromptOptions
+          ? t("prompt-execution.models.openai-legacy", { model })
+          : t("prompt-execution.models.openai", { model });
     }
     return title;
   };
 
+  const sortProviders = (providers: any[]) => {
+    const sortOrder = [
+      ApiKeyProvider.OpenAI,
+      ApiKeyProvider.AzureOpenAI,
+      ApiKeyProvider.Perplexity,
+    ];
+    return providers.slice().sort((a, b) => {
+      return sortOrder.indexOf(a.name) - sortOrder.indexOf(b.name);
+    });
+  };
+
   const getActiveModels = (): Option[] => {
-    const models: any[] =
-      $tenant?.api_key_providers
-        ?.filter((provider) => provider.active)
-        .map((provider) => {
-          const providerName = getProviderName(provider);
-          const modelName = getModelName(provider);
+    const rawProviders = $tenant?.api_key_providers ?? [];
+    const sortedProviders = sortProviders(rawProviders);
+
+    const models: Option[] =
+      sortedProviders
+        .filter((provider: any) => provider.active)
+        .map((provider: any) => {
+          const modelName = getModelLabel(provider);
           return {
             value: provider.name,
-            title: `${providerName} ${modelName}`,
+            title: `${modelName}`,
           };
         }) || [];
-    if (!skipDefaultOption) {
-      const defaultModel = $tenant?.api_key_providers?.find(
-        (provider) => provider.default,
+
+    if (!excludePromptOptions) {
+      const defaultModel = sortedProviders.find(
+        (provider: any) => provider.default,
       );
       const defaultText = t("tenant.default");
-      const defaultName = defaultText.replace(
-        /^./,
-        defaultText[0].toUpperCase(),
-      );
-      models?.unshift({
-        value: ApiKeyProvider.Default,
-        title: `${defaultName} (${getProviderName(defaultModel)} ${getModelName(defaultModel)})`,
+      const defaultName = capitalizeFirst(defaultText);
+
+      const modelName = getModelLabel(defaultModel);
+      models.unshift({
+        value: PromptModel.Default,
+        title: `${defaultName} - ${modelName}`,
+      });
+    }
+
+    // OpenAI Responses API
+    if (!excludePromptOptions) {
+      models.push({
+        value: PromptModel.OpenAIWithTools,
+        title: t("prompt-execution.models.openai-with-tools"),
+      });
+      models.push({
+        value: PromptModel.OpenAIWithImageTools,
+        title: t("prompt-execution.models.openai-with-image-tools"),
       });
     }
 

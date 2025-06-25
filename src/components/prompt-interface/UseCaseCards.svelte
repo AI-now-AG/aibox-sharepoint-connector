@@ -1,10 +1,9 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { useTranslations } from "$i18n/utils";
-  import { storePromptId } from "$components/prompt-interface/components/Stores";
-  import EditPromptDetails from "$components/prompt-interface/components/EditPromptDetails.svelte";
-  import ExecutionCardItem from "$components/prompt-interface/components/ExecutionCardItem.svelte";
-  import PromptOrderDialog from "$components/prompt-interface/components/PromptOrderDialog.svelte";
+  import EditPromptDialog from "$components/prompt-interface/EditPromptDialog.svelte";
+  import UseCaseActions from "$components/prompt-interface/UseCaseActions.svelte";
+  import PromptOrderDialog from "$components/prompt-interface/PromptOrderDialog.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import Loading from "$components/Loading.svelte";
   import { addToast } from "$stores/toast";
@@ -15,15 +14,15 @@
     isEditable?: boolean;
     isDisabling?: boolean;
     cards: any;
-    selectedPromptId: any;
+    selectedPromptId: string;
     onSelectCard?: Function;
   }
 
   let {
-    isEditable = $bindable(false),
-    isDisabling = $bindable(false),
-    cards = $bindable(),
-    selectedPromptId = $bindable(),
+    isEditable = false,
+    isDisabling = false,
+    cards = [],
+    selectedPromptId = $bindable(""),
     onSelectCard = () => null,
   }: Props = $props();
 
@@ -50,7 +49,6 @@
   onMount(async function () {
     selectedCardIndex = 0;
     selectedPromptId = cards[0]._id;
-    storePromptId.set(selectedPromptId);
     if (selectedEditPromptId) {
       promptDialog?.showModal();
     }
@@ -64,10 +62,11 @@
       });
       return;
     }
-    onSelectCard?.();
+    const currentCard = cards[index];
+
+    onSelectCard?.(currentCard);
     selectedCardIndex = index;
-    selectedPromptId = cards[index]?._id ?? "";
-    storePromptId.set(selectedPromptId);
+    selectedPromptId = currentCard?._id ?? "";
   }
 
   async function editCard(index: number) {
@@ -164,7 +163,7 @@
   >
     {#each cards as card, index}
       {#if index < promptLimit || showMore}
-        <ExecutionCardItem
+        <UseCaseActions
           {isEditable}
           data={card}
           active={selectedCardIndex == index}
@@ -201,7 +200,7 @@
   {/if}
 </div>
 
-<EditPromptDetails
+<EditPromptDialog
   bind:promptDialog
   bind:selectedEditPromptId
   dialogMode={promptDialogMode}

@@ -8,6 +8,7 @@
   import "@friendofsvelte/tipex/styles/CodeBlock.css";
   import "$styles/editor.css";
 
+  // svelte-ignore non_reactive_update
   let editor: TipexEditor | undefined;
 
   interface Props {

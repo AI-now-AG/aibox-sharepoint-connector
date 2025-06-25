@@ -1,5 +1,6 @@
 export enum ToolName {
   Image = "image",
+  Websearch = "websearch",
 }
 
 export enum ResponseStatus {

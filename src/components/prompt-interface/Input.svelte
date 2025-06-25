@@ -1,9 +1,10 @@
 <script lang="ts">
+  import { fade } from "svelte/transition";
   import FileUpload from "$components/FileUpload.svelte";
   import { type FileInput } from "$types/FileInput";
-  import { MessageRole } from "$types/MessageHistory";
-  import { sharedMessageHistory } from "$components/prompt-interface/components/Stores";
-  import DataLossWarning from "$components/prompt-interface/components/DataLossWarning.svelte";
+  import { MessageRole, type Message } from "$types/MessageHistory";
+  import { sharedMessageHistory } from "$stores/chatHistory";
+  import DataLossWarning from "$components/chat-ui/DataLossWarning.svelte";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
   import { readFileContent } from "$utils/fileReader";
@@ -28,7 +29,7 @@
   }
 
   let {
-    promptId = $bindable(""),
+    promptId = "",
     input = $bindable(""),
     output = $bindable(""),
     isProcessing = $bindable(false),
@@ -106,7 +107,7 @@
             content: input,
             rawData: input,
           };
-          sharedMessageHistory.update((messages) => [
+          sharedMessageHistory.update((messages: Message[]) => [
             ...messages,
             newUserMessage,
           ]);
@@ -142,7 +143,7 @@
             content: output,
             rawData: stripHtmlFormatting(output),
           };
-          sharedMessageHistory.update((messages) => [
+          sharedMessageHistory.update((messages: Message[]) => [
             ...messages,
             newAssistantMessage,
           ]);
@@ -174,18 +175,18 @@
 
   let textarea: HTMLTextAreaElement;
 
-  export function adjustHeightByContent() {
-    setTimeout(() => {
-      if (textarea) {
-        textarea.style.height = "auto";
-        textarea.style.height = `${textarea.scrollHeight}px`;
-      }
-    }, 0);
-  }
+  // export function adjustHeightByContent() {
+  //   setTimeout(() => {
+  //     if (textarea) {
+  //       textarea.style.height = "auto";
+  //       textarea.style.height = `${textarea.scrollHeight}px`;
+  //     }
+  //   }, 0);
+  // }
 </script>
 
 <div
-  class={`flex flex-col p-1 rounded-xl bg-base-100 border border-base-content/20 has-focus:ring-2 has-focus:ring-base-primary has-focus:ring-offset-2 has-focus:ring-offset-base-200`}
+  class={`flex flex-col rounded-xl bg-base-100 border border-base-content/20 has-focus:ring-2 has-focus:ring-base-primary has-focus:ring-offset-2 has-focus:ring-offset-base-200`}
 >
   <div class="flex-1 relative">
     <textarea
@@ -200,14 +201,17 @@
       bind:value={inputText}
     ></textarea>
 
-    <!-- svelte-ignore a11y_consider_explicit_label -->
-    <button
-      type="button"
-      onclick={clearText}
-      class="absolute top-2 right-2 text-base-content hover:text-base-content/60"
-    >
-      {@html svgIcons.eraser}
-    </button>
+    {#if input}
+      <!-- svelte-ignore a11y_consider_explicit_label -->
+      <button
+        type="button"
+        onclick={clearText}
+        class="absolute top-2 right-2 text-base-content hover:text-base-content/60"
+        transition:fade={{ duration: 500 }}
+      >
+        {@html svgIcons.eraser}
+      </button>
+    {/if}
   </div>
 
   <div class="grid grid-cols-[1fr_min-content] gap-4">

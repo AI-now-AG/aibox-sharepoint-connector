@@ -1,7 +1,15 @@
+<script lang="ts" module>
+  export interface Tool {
+    name: "image" | "websearch";
+    active?: boolean;
+    disabled?: boolean;
+  }
+</script>
+
 <script lang="ts">
   import { fade } from "svelte/transition";
   import FileUpload from "$components/FileUpload.svelte";
-  import DataLossWarning from "$components/prompt-interface/components/DataLossWarning.svelte";
+  import DataLossWarning from "$components/chat-ui/DataLossWarning.svelte";
   import { svgIcons } from "$assets/icons";
   import { preventDefault } from "$utils/common";
   import { useTranslations } from "$i18n/utils";
@@ -11,6 +19,7 @@
     files?: File[];
     isFetching?: boolean;
     stickyFooter?: boolean;
+    tools?: Tool[];
     onsend: Function;
   }
 
@@ -19,6 +28,7 @@
     files = $bindable([]),
     isFetching = false,
     stickyFooter = false,
+    tools = $bindable([]),
     onsend,
   }: Props = $props();
 
@@ -36,6 +46,8 @@
     ],
     "image/*": ["image/png", "image/jpeg"],
   };
+
+  $inspect(tools);
 
   function onKeyDown(e: KeyboardEvent) {
     if (e.key === "Enter" && e.ctrlKey) {
@@ -58,7 +70,7 @@
       class={`textarea textarea-ghost ${
         stickyFooter ? `h-[50px]` : `h-20`
       } min-h-auto w-full focus:outline-hidden focus:border-base-100 text-base`}
-      placeholder="Your input..."
+      placeholder={t("prompt-library.input-placeholder")}
       bind:value={input}
       onkeydown={onKeyDown}
     ></textarea>
@@ -78,7 +90,7 @@
   <div class="grid grid-cols-[1fr_min-content] gap-4">
     <div class="p-2 flex flex-row gap-2">
       <button
-        class="btn h-auto w-auto p-1 min-h-0 hover:text-base-content/60"
+        class="btn btn-outline h-auto w-auto p-1 min-h-0 border-base-content/30"
         onclick={() => {
           fileModal?.showModal();
         }}
@@ -91,6 +103,26 @@
           </div>
         {/if}
       </button>
+      {#each tools as tool, index}
+        <button
+          class={`btn btn-outline h-auto w-[30] p-1 border-base-content/30
+          ${tool.active ? "btn-active btn-primary" : ""}
+          ${tool.disabled ? "cursor-not-allowed" : ""}
+          ${isFetching ? "opacity-50 cursor-not-allowed" : ""}
+        `}
+          disabled={isFetching}
+          aria-pressed={tool.active}
+          onclick={() => {
+            if (tool.disabled) return;
+            tools = tools.map((t, i) =>
+              i === index ? { ...t, active: !t.active } : t,
+            );
+          }}
+          title={tool.name}
+        >
+          <span>{@html svgIcons.imageTool}</span>
+        </button>
+      {/each}
     </div>
     <div class="flex self-end">
       <button

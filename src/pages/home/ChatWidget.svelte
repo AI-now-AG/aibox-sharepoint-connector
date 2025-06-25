@@ -3,7 +3,7 @@
   import { slide } from "svelte/transition";
   import { type FileInput } from "$types/FileUpload";
   import { MessageRole } from "$types/MessageHistory";
-  import { sharedMessageHistory } from "$components/prompt-interface/components/Stores";
+  import { sharedMessageHistory } from "$stores/chatHistory";
   import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
   import ChatInput from "./ChatInput.svelte";
   import ChatResults from "./ChatResults.svelte";
@@ -56,7 +56,7 @@
   });
 
   onDestroy(function () {
-    sharedMessageHistory.set([]);
+    $sharedMessageHistory = [];
   });
 
   async function fetchMessage() {
@@ -209,7 +209,7 @@
           bind:selectedModel
           bind:disabled={isDisableSelectModel}
           labelClasses={"text-sm"}
-          skipDefaultOption
+          excludePromptOptions={true}
         />
       </div>
     </div>

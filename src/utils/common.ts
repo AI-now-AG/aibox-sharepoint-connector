@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-useless-escape */
-import moment from "moment";
+import dayjs from "dayjs";
 
 export function isTrulyEmpty(obj: any) {
   return !obj || Object.keys(obj).length === 0;
@@ -11,7 +11,7 @@ export function capitalizeFirst(text: string) {
 }
 
 export function formatDateToDDMMYY(date: string | Date): string {
-  return moment(date).format("DD.MM.YYYY");
+  return dayjs(date).format("DD.MM.YYYY");
 }
 
 export const isValidEmail = (email: string) => {
