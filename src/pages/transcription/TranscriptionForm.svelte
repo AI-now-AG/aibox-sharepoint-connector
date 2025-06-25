@@ -489,9 +489,9 @@
       : tempUploadUrl;
     const fileExtension = filename.split(".").pop();
     if (
-      isDiarizationEnabled ||
+      (isDiarizationEnabled ||
       fileExtension === "m4a" ||
-      fileExtension === "mp4"
+      fileExtension === "mp4") && (category === AudioCategory.SubtitleLarge || category === AudioCategory.AudioPro)
     ) {
       startPollingConversionFile();
     } else {
