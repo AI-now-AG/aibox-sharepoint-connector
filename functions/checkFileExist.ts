@@ -54,7 +54,7 @@ const checkFileExist: Handler = async (event, context) => {
   }
 
   const txtFileName =
-    (isDiarizationEnabled || isM4AFile) && typedCategory !== AudioCategory.AudioToText
+    (isDiarizationEnabled || isM4AFile) && (typedCategory === AudioCategory.SubtitleLarge || typedCategory === AudioCategory.AudioPro)
       ? `${uniqueName}-mono.txt`
       : `${uniqueName}.txt`;
   if (!fileNames.includes(txtFileName) && !isShowImprovedTextPreview) {
