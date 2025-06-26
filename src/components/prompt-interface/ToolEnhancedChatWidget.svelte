@@ -5,8 +5,8 @@
     messageHistories,
     addMessageToHistory,
     getMessageHistory,
+    clearMessageHistory,
   } from "$components/prompt-interface/components/stores/messageHistoryStore";
-  import { type Message } from "$types/MessageHistory";
   import { ResponseStatus, ToolName } from "$types/AIResponse";
   import { PromptModel } from "$types/PromptModel";
   import { addToast } from "$stores/toast";
@@ -19,6 +19,9 @@
   } from "$components/chat-ui/MessageInput.svelte";
   import MessageList from "$components/chat-ui/MessageList.svelte";
   import { tenant } from "$stores";
+  import { useTranslations } from "$i18n/utils";
+
+  const t = useTranslations();
 
   interface Props {
     promptId: string;
@@ -26,9 +29,16 @@
     currentPrompt: any;
     isFetching: boolean;
   }
-  let { promptId, groupId, currentPrompt, isFetching = $bindable(false) }: Props = $props();
+  let {
+    promptId,
+    groupId,
+    currentPrompt,
+    isFetching = $bindable(false),
+  }: Props = $props();
 
-  let currentMessageHistory = $derived($messageHistories[promptId] || getMessageHistory(promptId) || []);
+  let currentMessageHistory = $derived(
+    $messageHistories[promptId] || getMessageHistory(promptId) || [],
+  );
 
   let enabledTools = $derived.by(() => {
     const tools: Tool[] = [];
@@ -233,6 +243,14 @@
       });
     }
   }
+
+  function startNewChat() {
+    clearMessageHistory(promptId);
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }
 </script>
 
 <!-- Output (Follow-Up) -->
@@ -247,7 +265,17 @@
   {#if currentMessageHistory.length > 0}
     <ScrollToBottom />
   {/if}
-
+  {#if currentMessageHistory.length > 0}
+    <div class="my-4">
+      <button
+        onclick={startNewChat}
+        class="btn btn-active btn-primary btn-sm px-8"
+        disabled={isGenerating || isFetching}
+      >
+        {t("home.new-chat")}
+      </button>
+    </div>
+  {/if}
   <MessageInput
     bind:input={prompt}
     bind:files
