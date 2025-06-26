@@ -3,15 +3,15 @@
   import UseCaseCards from "$components/prompt-interface/UseCaseCards.svelte";
   import ChatExecutionWidget from "./ChatExecutionWidget.svelte";
   import ToolEnhancedChatWidget from "./ToolEnhancedChatWidget.svelte";
-  import { sharedMessageHistory } from "$stores/chatHistory";
   import { PromptModel } from "$types/PromptModel";
 
   interface Props {
     promptItems: any;
     isEditable?: boolean;
+    groupId: string;
   }
 
-  let { promptItems, isEditable = false }: Props = $props();
+  let { promptItems, isEditable = false, groupId }: Props = $props();
 
   let selectedPromptId = $state("");
   let currentPrompt: any = $state();
@@ -28,7 +28,7 @@
   });
 
   onDestroy(function () {
-    $sharedMessageHistory = [];
+    // $sharedMessageHistory = [];
   });
 </script>
 
@@ -47,16 +47,22 @@
         isDisabling={isProcessing}
         onSelectCard={(prompt) => {
           currentPrompt = prompt;
-          $sharedMessageHistory = [];
+          // $sharedMessageHistory = [];
         }}
       />
     </div>
 
     {#if [PromptModel.OpenAIWithTools, PromptModel.OpenAIWithImageTools].includes(currentPrompt?.model)}
-      <ToolEnhancedChatWidget {currentPrompt} bind:isFetching={isProcessing} />
+      <ToolEnhancedChatWidget
+        promptId={selectedPromptId}
+        {groupId}
+        {currentPrompt}
+        bind:isFetching={isProcessing}
+      />
     {:else}
       <ChatExecutionWidget
         promptId={selectedPromptId}
+        {groupId}
         {currentPrompt}
         bind:isProcessing
       />

@@ -1,7 +1,11 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
   import { v4 as uuidv4 } from "uuid";
-  import { sharedMessageHistory } from "$stores/chatHistory";
+  import {
+    messageHistories,
+    addMessageToHistory,
+    getMessageHistory,
+  } from "$components/prompt-interface/components/stores/messageHistoryStore";
   import { type Message } from "$types/MessageHistory";
   import { ResponseStatus, ToolName } from "$types/AIResponse";
   import { PromptModel } from "$types/PromptModel";
@@ -17,10 +21,14 @@
   import { tenant } from "$stores";
 
   interface Props {
+    promptId: string;
+    groupId: string;
     currentPrompt: any;
     isFetching: boolean;
   }
-  let { currentPrompt, isFetching = $bindable(false) }: Props = $props();
+  let { promptId, groupId, currentPrompt, isFetching = $bindable(false) }: Props = $props();
+
+  let currentMessageHistory = $derived($messageHistories[promptId] || getMessageHistory(promptId) || []);
 
   let enabledTools = $derived.by(() => {
     const tools: Tool[] = [];
@@ -63,7 +71,7 @@
   });
 
   onDestroy(function () {
-    $sharedMessageHistory = [];
+    // $sharedMessageHistory = [];
   });
 
   async function submitForm() {
@@ -160,22 +168,18 @@
             ?.image_url || "";
 
         // store messages
-        sharedMessageHistory.update((messages: Message[]) => [
-          ...messages,
-          {
-            role: MessageRole.User,
-            content: prompt,
-          },
-        ]);
+        const newUserMessage: MessageHistory = {
+          role: MessageRole.User,
+          content: prompt,
+        };
+        addMessageToHistory(groupId, promptId, newUserMessage);
 
-        sharedMessageHistory.update((messages: Message[]) => [
-          ...messages,
-          {
-            role: MessageRole.Assistant,
-            content: formatMarkdown(data.outputText ?? ""),
-            imageUrl,
-          },
-        ]);
+        const newAssistentMessage = {
+          role: MessageRole.Assistant,
+          content: formatMarkdown(data.outputText ?? ""),
+          imageUrl,
+        };
+        addMessageToHistory(groupId, promptId, newAssistentMessage);
 
         // scroll to latest user input
         setTimeout(() => {
@@ -193,10 +197,11 @@
         return;
       } else if (data.status === ResponseStatus.Failed) {
         const errorMessage = data.error?.message || "Image generation failed.";
-        $sharedMessageHistory.push({
+        const newAssistentMessage = {
           role: MessageRole.Assistant,
           content: errorMessage,
-        });
+        };
+        addMessageToHistory(groupId, promptId, newAssistentMessage);
         addToast({
           message: errorMessage,
           type: "error",
@@ -231,15 +236,15 @@
 </script>
 
 <!-- Output (Follow-Up) -->
-{#if $sharedMessageHistory.length > 0}
-  <MessageList messages={$sharedMessageHistory} {isFetching} {isGenerating} />
+{#if currentMessageHistory.length > 0}
+  <MessageList messages={currentMessageHistory} {isFetching} {isGenerating} />
 {/if}
 
 <!-- Prompt Textarea -->
 <div
-  class={`${$sharedMessageHistory.length > 0 ? "sticky bottom-0 bg-base-200" : ""}`}
+  class={`${currentMessageHistory.length > 0 ? "sticky bottom-0 bg-base-200" : ""}`}
 >
-  {#if $sharedMessageHistory.length > 0}
+  {#if currentMessageHistory.length > 0}
     <ScrollToBottom />
   {/if}
 
@@ -247,13 +252,13 @@
     bind:input={prompt}
     bind:files
     {isFetching}
-    stickyFooter={$sharedMessageHistory.length > 0}
+    stickyFooter={currentMessageHistory.length > 0}
     bind:tools={enabledTools}
     onsend={submitForm}
   />
 </div>
 
 <!-- Output (Normal) -->
-{#if $sharedMessageHistory.length == 0}
-  <MessageList messages={$sharedMessageHistory} {isFetching} {isGenerating} />
+{#if currentMessageHistory.length == 0}
+  <MessageList messages={currentMessageHistory} {isFetching} {isGenerating} />
 {/if}
