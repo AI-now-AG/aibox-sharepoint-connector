@@ -5,6 +5,8 @@ import type { MessageHistory } from '$types/MessageHistory';
 const messageHistories = writable<Record<string, MessageHistory[]>>({});
 // Map categoryId to current promptId
 const groupPromptMap = writable<Record<string, string>>({});
+// Store previousResponseId for each promptId
+const previousResponseIds = writable<Record<string, string | null>>({});
 
 // Helper functions to manage message histories
 export function addMessageToHistory(groupId: string, promptId: string, message: MessageHistory) {
@@ -42,6 +44,23 @@ export function clearMessageHistory(promptId: string) {
         delete newHistories[promptId];
         return newHistories;
     });
+    previousResponseIds.update(ids => {
+        const newIds = { ...ids };
+        delete newIds[promptId];
+        return newIds;
+    });
 }
 
-export { messageHistories, groupPromptMap };
+export function setPreviousResponseId(promptId: string, responseId: string | null) {
+    previousResponseIds.update(ids => ({ ...ids, [promptId]: responseId }));
+}
+
+export function getPreviousResponseId(promptId: string): string | null {
+    let id: string | null = null;
+    previousResponseIds.subscribe(ids => {
+        id = ids[promptId] ?? null;
+    })();
+    return id;
+}
+
+export { messageHistories, groupPromptMap, previousResponseIds };

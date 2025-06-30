@@ -6,6 +6,9 @@
     addMessageToHistory,
     getMessageHistory,
     clearMessageHistory,
+    previousResponseIds,
+    setPreviousResponseId,
+    getPreviousResponseId,
   } from "$components/prompt-interface/components/stores/messageHistoryStore";
   import { ResponseStatus, ToolName } from "$types/AIResponse";
   import { PromptModel } from "$types/PromptModel";
@@ -71,12 +74,20 @@
 
   let isGenerating: boolean = $state(false);
 
-  let previousResponseId: string | null = $state(null);
+  // Use store for previousResponseId
+  let previousResponseId: string | null = $derived(
+    $previousResponseIds[promptId] ?? getPreviousResponseId(promptId),
+  );
 
   $effect(() => {
     if (currentPrompt) {
-      prompt = currentPrompt?.predefined_input ?? "";
-      files = [];
+      if (previousResponseId) {
+        prompt = "";
+        files = [];
+      } else {
+        prompt = currentPrompt?.predefined_input ?? "";
+        files = [];
+      }
     }
   });
 
@@ -201,7 +212,7 @@
         files = [];
 
         // reset states
-        previousResponseId = data.responseId;
+        setPreviousResponseId(promptId, data.responseId);
         isFetching = false;
         isGenerating = false;
         return;
@@ -246,6 +257,7 @@
 
   function startNewChat() {
     clearMessageHistory(promptId);
+    setPreviousResponseId(promptId, null);
     window.scrollTo({
       top: 0,
       behavior: "smooth",
