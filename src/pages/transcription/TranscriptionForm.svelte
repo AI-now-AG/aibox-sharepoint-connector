@@ -281,7 +281,16 @@
       fileErrorMessage = "";
       return true;
     }
-    fileErrorMessage = t("transcription.file-validation.exceed-size-limit");
+    if (
+      category === AudioCategory.SubtitleLarge ||
+      category === AudioCategory.Subtitle11Labs
+    ) {
+      fileErrorMessage = t(
+        "transcription.file-validation.exceed-size-50-limit",
+      );
+    } else {
+      fileErrorMessage = t("transcription.file-validation.exceed-size-limit");
+    }
     return false;
   }
 
@@ -455,17 +464,17 @@
             tempOutputFileName = outputFileName;
             if (
               audioFile &&
-              (isM4AFile) &&
+              isM4AFile &&
               category === AudioCategory.SubtitleLarge
             ) {
               tempOutputFileNames = [
-              `${outputFileName}-mono.txt`,
-              `${outputFileName}-mono.srt`,
+                `${outputFileName}-mono.txt`,
+                `${outputFileName}-mono.srt`,
               ];
             } else {
               tempOutputFileNames = [
-              `${outputFileName}.txt`,
-              `${outputFileName}.srt`,
+                `${outputFileName}.txt`,
+                `${outputFileName}.srt`,
               ];
             }
 
@@ -501,8 +510,10 @@
     const fileExtension = filename.split(".").pop();
     if (
       (isDiarizationEnabled ||
-      fileExtension === "m4a" ||
-      fileExtension === "mp4") && (category === AudioCategory.SubtitleLarge || category === AudioCategory.AudioPro)
+        fileExtension === "m4a" ||
+        fileExtension === "mp4") &&
+      (category === AudioCategory.SubtitleLarge ||
+        category === AudioCategory.AudioPro)
     ) {
       startPollingConversionFile();
     } else {
@@ -646,7 +657,7 @@
           selectedFileFormat.forEach((format) => {
             if (
               audioFile &&
-                (isM4AFile) &&
+              isM4AFile &&
               category === AudioCategory.SubtitleLarge
             ) {
               tempOutputFileNames.push(`${tempOutputFileName}-mono.${format}`);

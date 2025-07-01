@@ -159,6 +159,7 @@
   "transcription.dowload-srt-file.ass": "ASS-Datei herunterladen",
   "transcription.file-validation.unsupported-type": "Dieses Format wird nicht unterstützt.",
   "transcription.file-validation.exceed-size-limit": "Datei darf nicht grösser sein als 25 MB, bitte Dateigrösse reduzieren und neu hochladen",
+  "transcription.file-validation.exceed-size-50-limit": "Datei darf nicht grösser sein als 50 MB, bitte Dateigrösse reduzieren und neu hochladen",
   "transcription.transcription-is-ready": "Deine Transkription ist fertig. Tippe, um sie zu sehen.",
   "transcription.file-uploaded-success": "Datei hochgeladen und Transkription erfolgreich gestartet.",
   "transciption.transcription.failed": "Transkription fehlgeschlagen",
