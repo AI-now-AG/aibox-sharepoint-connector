@@ -2,16 +2,19 @@
   import { fade } from "svelte/transition";
   import { onMount } from "svelte";
   import { MessageRole } from "$types/MessageHistory";
-  import { sharedMessageHistory } from "$stores/chatHistory";
+  import { messageHistories, getMessageHistory } from "$components/prompt-interface/components/stores/messageHistoryStore";
   import { user } from "$stores";
   import { svgIcons } from "$assets/icons";
 
   interface Props {
+    promptId?: string;
     output: string;
     isProcessing: boolean;
   }
 
-  let { output = "", isProcessing = false }: Props = $props();
+  let { promptId = "", output = "", isProcessing = $bindable(false) }: Props = $props();
+
+  let currentMessageHistory = $derived($messageHistories[promptId] || getMessageHistory(promptId) || []);
 
   let copyIndex: number = $state(-1);
   let timer: NodeJS.Timeout;
@@ -63,7 +66,7 @@
   let userPicture = $user?.picture;
 </script>
 
-{#if output || $sharedMessageHistory.length > 0 || isProcessing}
+{#if output || currentMessageHistory.length > 0 || isProcessing}
   <div class="flex-1 h-full">
     <div class="flex flex-wrap h-full">
       <div class="grow md:w-1/2 p-2 pb-4 h-full">
@@ -71,7 +74,7 @@
           <div class="flex flex-col">
             <div class="mt-2 overflow-y-scroll h-full min-h-screen">
               <div class="card gap-4 chat-container" transition:fade>
-                {#each $sharedMessageHistory as { role, content, rawData = "" }, index}
+                {#each currentMessageHistory as { role, content, rawData = "" }, index}
                   <div
                     class={`chat-bubble text-base-content ${role === MessageRole.User ? `bg-base-200` : `bg-base-100`}`}
                   >

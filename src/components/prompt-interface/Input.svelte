@@ -2,8 +2,8 @@
   import { fade } from "svelte/transition";
   import FileUpload from "$components/FileUpload.svelte";
   import { type FileInput } from "$types/FileInput";
-  import { MessageRole, type Message } from "$types/MessageHistory";
-  import { sharedMessageHistory } from "$stores/chatHistory";
+  import { MessageRole } from "$types/MessageHistory";
+  import { messageHistories, getMessageHistory, addMessageToHistory } from "$components/prompt-interface/components/stores/messageHistoryStore";
   import DataLossWarning from "$components/chat-ui/DataLossWarning.svelte";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
@@ -21,6 +21,7 @@
 
   interface Props {
     promptId?: string;
+    groupId?: string;
     input?: string;
     output?: string;
     isProcessing?: boolean;
@@ -29,7 +30,8 @@
   }
 
   let {
-    promptId = "",
+    promptId = $bindable(""),
+    groupId = $bindable(""),
     input = $bindable(""),
     output = $bindable(""),
     isProcessing = $bindable(false),
@@ -38,6 +40,7 @@
   }: Props = $props();
 
   let inputText = $state("");
+  let currentMessageHistory = $derived($messageHistories[promptId] || getMessageHistory(promptId) || []);
 
   $effect(() => {
     inputText = initText;
@@ -91,7 +94,7 @@
             promptId: promptId,
             files: userInputFilesList,
             images: userInputImagesList,
-            messageHistory: $sharedMessageHistory,
+            messageHistory: currentMessageHistory,
           }),
           credentials: "include",
           headers: {
@@ -107,10 +110,7 @@
             content: input,
             rawData: input,
           };
-          sharedMessageHistory.update((messages: Message[]) => [
-            ...messages,
-            newUserMessage,
-          ]);
+          addMessageToHistory(groupId, promptId, newUserMessage);
 
           setTimeout(() => {
             scrollIntoView();
@@ -143,10 +143,7 @@
             content: output,
             rawData: stripHtmlFormatting(output),
           };
-          sharedMessageHistory.update((messages: Message[]) => [
-            ...messages,
-            newAssistantMessage,
-          ]);
+          addMessageToHistory(groupId, promptId, newAssistantMessage);
           output = "";
         }
         isProcessing = false;
@@ -193,7 +190,7 @@
       name="input"
       id="input"
       class={`textarea textarea-ghost ${
-        $sharedMessageHistory.length > 0 ? `h-[50px]` : `h-20`
+        currentMessageHistory.length > 0 ? `h-[50px]` : `h-20`
       } min-h-auto w-full focus:outline-hidden focus:border-hidden text-base`}
       placeholder={t("prompt-library.input-placeholder")}
       onkeydown={onKeyDown}
@@ -216,7 +213,7 @@
 
   <div class="grid grid-cols-[1fr_min-content] gap-4">
     <div class="p-2 flex flex-row gap-2">
-      {#if $sharedMessageHistory.length == 0 && !isDisableFileInput}
+      {#if currentMessageHistory.length == 0 && !isDisableFileInput}
         <button
           class="btn btn-outline h-auto w-auto p-1 min-h-0 border-base-content/30"
           disabled={!promptId}
@@ -270,6 +267,6 @@
   </div>
 </div>
 
-{#if $sharedMessageHistory.length > 0}
+{#if currentMessageHistory.length > 0}
   <DataLossWarning />
 {/if}
