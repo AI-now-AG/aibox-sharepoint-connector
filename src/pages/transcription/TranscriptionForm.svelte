@@ -453,10 +453,21 @@
             // Store temporary upload URL, filename for later
             tempUploadUrl = uploadUrl;
             tempOutputFileName = outputFileName;
-            tempOutputFileNames = [
+            if (
+              audioFile &&
+              (isM4AFile) &&
+              category === AudioCategory.SubtitleLarge
+            ) {
+              tempOutputFileNames = [
+              `${outputFileName}-mono.txt`,
+              `${outputFileName}-mono.srt`,
+              ];
+            } else {
+              tempOutputFileNames = [
               `${outputFileName}.txt`,
               `${outputFileName}.srt`,
-            ];
+              ];
+            }
 
             isUploading = false;
             isUploaded = true;
@@ -633,7 +644,15 @@
           category === AudioCategory.Subtitle11Labs
         ) {
           selectedFileFormat.forEach((format) => {
-            tempOutputFileNames.push(`${tempOutputFileName}.${format}`);
+            if (
+              audioFile &&
+                (isM4AFile) &&
+              category === AudioCategory.SubtitleLarge
+            ) {
+              tempOutputFileNames.push(`${tempOutputFileName}-mono.${format}`);
+            } else {
+              tempOutputFileNames.push(`${tempOutputFileName}.${format}`);
+            }
           });
         }
         startPolling();

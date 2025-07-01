@@ -47,7 +47,15 @@ const checkFileExist: Handler = async (event, context) => {
       ? showTextPreviewChecked
       : false;
 
-  const improvedTxtFileName = `${uniqueName}_improved.txt`;
+  let improvedTxtFileName: string;
+  if (
+    typedCategory === AudioCategory.SubtitleLarge &&
+    isM4AFile
+  ) {
+    improvedTxtFileName = `${uniqueName}-mono_improved.txt`;
+  } else {
+    improvedTxtFileName = `${uniqueName}_improved.txt`;
+  }
   if (isShowImprovedTextPreview) {
     requireFilesCount += 1;
     tempFileNames.push(improvedTxtFileName);
@@ -157,7 +165,7 @@ const checkFileExist: Handler = async (event, context) => {
           }
         }
 
-        if (fileName.endsWith(".txt") || fileName.endsWith("_improved.txt")) {
+        if (fileName.endsWith(".txt") || fileName.endsWith("_improved.txt") || fileName.endsWith("-mono_improved.txt")) {
           const downloadBlockBlobResponse = await blobClient.download();
           rawTxtContent = await streamToString(
             downloadBlockBlobResponse.readableStreamBody!,
@@ -165,7 +173,7 @@ const checkFileExist: Handler = async (event, context) => {
         }
 
         if (!downloadedFiles.some((file) => file.name === fileName)) {
-          if (!fileName.endsWith("_improved.txt")) {
+          if (!fileName.endsWith("_improved.txt") || !fileName.endsWith("-mono_improved.txt")) {
             downloadedFiles.push({ name: fileName, path: filePath });
           }
         }
