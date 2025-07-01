@@ -11,6 +11,9 @@
   import Dropdown from "$components/form/Dropdown.svelte";
   import MessageInput from "$components/chat-ui/MessageInput.svelte";
   import MessageList from "$components/chat-ui/MessageList.svelte";
+  import { gptImageMessageHistory, saveGptImageMessageHistory, gptImageFiles, saveGptImageFiles, gptImagePreviousResponseId, saveGptImagePreviousResponseId } from "$stores/gptImageMessageHistoryStore";
+  import { get } from "svelte/store";
+  import { onMount } from "svelte";
 
   // Types
   type ImageSize = "1024x1024" | "1024x1536" | "1536x1024";
@@ -242,12 +245,38 @@
     files = [];
     isFetching = false;
     messages = [];
-
+    previousResponseId = null;
+    saveGptImageMessageHistory([]);
+    saveGptImageFiles([]);
+    saveGptImagePreviousResponseId(null);
     window.scrollTo({
       top: 0,
       behavior: "smooth",
     });
   }
+
+  // Restore message history, files, and previousResponseId on mount
+  onMount(() => {
+    const history = get(gptImageMessageHistory);
+    if (history && history.length > 0) {
+      messages = [...history];
+    }
+    const storedFiles = get(gptImageFiles);
+    if (storedFiles && storedFiles.length > 0) {
+      files = [...storedFiles];
+    }
+    const storedPrevId = get(gptImagePreviousResponseId);
+    if (storedPrevId) {
+      previousResponseId = storedPrevId;
+    }
+  });
+
+  // Save message history, files, and previousResponseId whenever they change
+  $effect(() => {
+    saveGptImageMessageHistory(messages);
+    saveGptImageFiles(files);
+    saveGptImagePreviousResponseId(previousResponseId);
+  });
 </script>
 
 <div class="grid grid-cols-1 grid-rows-[1fr_min-content] space-y-6 h-full">

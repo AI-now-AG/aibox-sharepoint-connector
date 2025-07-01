@@ -350,6 +350,7 @@
   "create-image.select-image-quality-label": "Bildqualität",
   "create-image.image-format-label": "Dateifomrat",
   "create-image.generate-image": "Bild erstellen",
+  "create-image.generate-new-image": "Neus Bild erstelle",
   "create-image.image-generating": "Bild wird erstellt...",
   "create-image.download": "Herunterladen",
   "create-image.prompt-required-error": "Beschreibe dein Bild",
