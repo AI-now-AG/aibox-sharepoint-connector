@@ -79,7 +79,7 @@
   "prompt-execution.card.showMore": "mehr anzeigen",
   "prompt-execution.card.showLess": "weniger anzeigen",
   "prompt-execution.showGlobal": "Global speichern",
-  "prompt-execution.historyRemove.info": "Beim Verlassen dieser Seite, gehen alle bisher erstellten Daten verloren.",
+  "prompt-execution.historyRemove.info": "Beim Schliessen des Browsers, gehen alle bisher erstellten Daten verloren.",
   "prompt-execution.upload-file.drag": "Datei per Drag & Drop verschieben oder <span style=\"color: #491EFF;\">Datei auswählen</span>",
   "prompt-execution.upload-file.supportted-files": "PDF, JSON, TXT, PNG, SVG, JPEG",
   "prompt-execution.upload-file.maximum-size": "Maximale Dateigrösse: 5 MB",
