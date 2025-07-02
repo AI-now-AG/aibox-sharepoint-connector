@@ -281,7 +281,16 @@
       fileErrorMessage = "";
       return true;
     }
-    fileErrorMessage = t("transcription.file-validation.exceed-size-limit");
+    if (
+      category === AudioCategory.SubtitleLarge ||
+      category === AudioCategory.Subtitle11Labs
+    ) {
+      fileErrorMessage = t(
+        "transcription.file-validation.exceed-size-50-limit",
+      );
+    } else {
+      fileErrorMessage = t("transcription.file-validation.exceed-size-limit");
+    }
     return false;
   }
 
@@ -453,10 +462,21 @@
             // Store temporary upload URL, filename for later
             tempUploadUrl = uploadUrl;
             tempOutputFileName = outputFileName;
-            tempOutputFileNames = [
-              `${outputFileName}.txt`,
-              `${outputFileName}.srt`,
-            ];
+            if (
+              audioFile &&
+              isM4AFile &&
+              category === AudioCategory.SubtitleLarge
+            ) {
+              tempOutputFileNames = [
+                `${outputFileName}-mono.txt`,
+                `${outputFileName}-mono.srt`,
+              ];
+            } else {
+              tempOutputFileNames = [
+                `${outputFileName}.txt`,
+                `${outputFileName}.srt`,
+              ];
+            }
 
             isUploading = false;
             isUploaded = true;
@@ -490,8 +510,10 @@
     const fileExtension = filename.split(".").pop();
     if (
       (isDiarizationEnabled ||
-      fileExtension === "m4a" ||
-      fileExtension === "mp4") && (category === AudioCategory.SubtitleLarge || category === AudioCategory.AudioPro)
+        fileExtension === "m4a" ||
+        fileExtension === "mp4") &&
+      (category === AudioCategory.SubtitleLarge ||
+        category === AudioCategory.AudioPro)
     ) {
       startPollingConversionFile();
     } else {
@@ -633,7 +655,15 @@
           category === AudioCategory.Subtitle11Labs
         ) {
           selectedFileFormat.forEach((format) => {
-            tempOutputFileNames.push(`${tempOutputFileName}.${format}`);
+            if (
+              audioFile &&
+              isM4AFile &&
+              category === AudioCategory.SubtitleLarge
+            ) {
+              tempOutputFileNames.push(`${tempOutputFileName}-mono.${format}`);
+            } else {
+              tempOutputFileNames.push(`${tempOutputFileName}.${format}`);
+            }
           });
         }
         startPolling();
