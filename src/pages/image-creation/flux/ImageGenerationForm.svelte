@@ -5,6 +5,9 @@
   import Dropdown from "$components/form/Dropdown.svelte";
   import { useTranslations } from "$i18n/utils";
   import Loading from "$components/Loading.svelte";
+  import { lastFluxImage } from "$stores/imageGenerationStore";
+  import { get } from "svelte/store";
+  import { onMount } from "svelte";
 
   interface Props {
     tenantId: string;
@@ -43,6 +46,14 @@
       showCustomSizeInputs = true;
     } else {
       showCustomSizeInputs = false;
+    }
+  });
+
+  // Restore image from store on mount
+  onMount(() => {
+    const storedImage = get(lastFluxImage);
+    if (storedImage) {
+      base64Image = storedImage;
     }
   });
 
@@ -85,6 +96,7 @@
       }
 
       base64Image = `data:image/${selectedFormat};base64,${data.image}`;
+      lastFluxImage.set(base64Image); // Store image persistently
     } catch (err) {
       error = err;
     } finally {
@@ -191,7 +203,9 @@
     >
       {loading
         ? t("create-image.image-generating")
-        : t("create-image.generate-image")}
+        : base64Image
+          ? t("create-image.generate-new-image")
+          : t("create-image.generate-image")}
     </button>
   </form>
 

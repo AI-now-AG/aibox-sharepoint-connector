@@ -6,6 +6,8 @@
   import { useTranslations } from "$i18n/utils";
   import { onMount } from "svelte";
   import Loading from "$components/Loading.svelte";
+  import { lastDalleImage } from "$stores/imageGenerationStore";
+  import { get } from "svelte/store";
   const t = useTranslations();
 
   interface Props {
@@ -38,9 +40,15 @@
     { value: "jpeg", title: "JPEG" },
   ];
 
+  // Load image from store on mount
   onMount(() => {
     if (!hasPermission) {
       window.history.back();
+    }
+    // Restore image if available
+    const storedImage = get(lastDalleImage);
+    if (storedImage) {
+      base64Image = storedImage;
     }
     return () => {};
   });
@@ -74,6 +82,7 @@
       }
 
       base64Image = "data:image/png;base64," + data.image;
+      lastDalleImage.set(base64Image); // Store image persistently
     } catch (err) {
       error = err;
     } finally {
@@ -160,7 +169,9 @@
     >
       {loading
         ? t("create-image.image-generating")
-        : t("create-image.generate-image")}
+        : base64Image
+          ? t("create-image.generate-new-image")
+          : t("create-image.generate-image")}
     </button>
   </form>
 

@@ -351,6 +351,7 @@
   "create-image.select-image-quality-label": "Image Quality",
   "create-image.image-format-label": "Output format",
   "create-image.generate-image": "Create Image",
+  "create-image.generate-new-image": "Create New Image",
   "create-image.image-generating": "Generating... ",
   "create-image.download": "Download",
   "create-image.prompt-required-error": "Decribe your image",
