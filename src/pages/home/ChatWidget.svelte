@@ -56,7 +56,7 @@
   });
 
   onDestroy(function () {
-    $sharedMessageHistory = [];
+    // $sharedMessageHistory = [];
   });
 
   async function fetchMessage() {
