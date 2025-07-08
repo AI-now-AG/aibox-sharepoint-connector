@@ -4,6 +4,7 @@ import {
   SystemMessage,
   AIMessage,
 } from "@langchain/core/messages";
+import { getInstructionMessage } from "$i18n/instructionMessages";
 import PromptModel from "$data/models/prompt.model";
 import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
 import { z } from "zod";
@@ -44,6 +45,8 @@ export type Attachment = z.infer<typeof AttachmentSchema>;
 
 export const POST: APIRoute = async (ctx) => {
   const { params, request } = ctx;
+  const { default_language } = ctx.locals.tenant;
+  const defaultLanguage = default_language || "en";
   const id = params.id;
 
   try {
@@ -67,6 +70,8 @@ export const POST: APIRoute = async (ctx) => {
     }
 
     const messages: BaseMessage[] = [];
+    messages.push(new SystemMessage(getInstructionMessage(defaultLanguage)));
+    
     messages.push(new SystemMessage(prompt.prompt));
 
     if (prompt?.knowledgebase) {

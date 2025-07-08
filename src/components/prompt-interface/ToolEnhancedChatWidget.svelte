@@ -118,7 +118,8 @@
       tenantId,
       uniqueId,
       prompt,
-      instructions: currentPrompt.prompt ?? "",
+      _id: promptId,
+      // instructions: currentPrompt.prompt ?? "",
       ...(primaryTool && { tool: primaryTool }),
       previousResponseId,
     };

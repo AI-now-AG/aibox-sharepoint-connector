@@ -3,6 +3,9 @@ import {
   type HandlerEvent,
   type HandlerResponse,
 } from "@netlify/functions";
+import PromptModel from "$data/models/prompt.model";
+import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
+import { getInstructionMessage } from "$i18n/instructionMessages";
 import { getStore } from "@netlify/blobs";
 import { OpenAI } from "openai";
 import { ObjectId } from "mongodb";
@@ -17,6 +20,7 @@ import UsageLogModel, { type UsageLog } from "$data/models/usageLog.model";
 import type {
   ResponseInputFile,
   ResponseInputImage,
+  ResponseInputText,
   ResponseUsage,
 } from "openai/resources/responses/responses";
 import { NETLIFY_BLOBS_STORE } from "$constants";
@@ -89,7 +93,7 @@ const createResponseImage: Handler = async (
     tenantId,
     uniqueId,
     prompt,
-    instructions,
+    // instructions,
     outputFormat = "png",
     imageQuality = "auto",
     imageSize = "auto",
@@ -100,11 +104,32 @@ const createResponseImage: Handler = async (
     tool,
   }: CreateResponseParams = body;
 
+  const currentPrompt = await PromptModel.get(body._id);
   if (!prompt) {
     return {
       statusCode: 400,
       body: JSON.stringify({ error: "Prompt is required" }),
     };
+  }
+
+  if (!currentPrompt?.prompt) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: "Prompt is required" }),
+    };
+  }
+  const messages: string[] = [];
+  if (currentPrompt?.knowledgebase) {
+    const calls = currentPrompt.knowledgebase.map(async (kb) => {
+      const instruction = await KnowledgeBaseModel.get(kb.toString());
+      return instruction;
+    });
+    const knowledgebases = await Promise.all(calls);
+    knowledgebases.forEach((knowledgebase) => {
+      if (knowledgebase?.knowledge_base) {
+        messages.push(knowledgebase.knowledge_base);
+      }
+    });
   }
 
   const tenant = await TenantModel.get(tenantId);
@@ -114,6 +139,7 @@ const createResponseImage: Handler = async (
       body: JSON.stringify({ error: "Tenant does not exist" }),
     };
   }
+  const defaultLanguage = tenant.default_language || "en";
 
   const store = getStore({
     name: NETLIFY_BLOBS_STORE,
@@ -169,9 +195,38 @@ const createResponseImage: Handler = async (
     //console.log('instructions', instructions);
     const stream = await openai.responses.create({
       model: "gpt-4o",
-      instructions,
+      // instructions: ,
       stream: true,
       input: [
+        {
+          role: "system",
+          content: [
+            {
+              type: "input_text",
+              text: getInstructionMessage(defaultLanguage),
+            },
+          ],
+        },
+        {
+          role: "system",
+          content: [
+            ...messages.map(
+              (text: string): ResponseInputText => ({
+                type: "input_text",
+                text,
+              }),
+            ),
+          ],
+        },
+        {
+          role: "system",
+          content: [
+            {
+              type: "input_text",
+              text: currentPrompt.prompt,
+            },
+          ],
+        },
         {
           role: "user",
           content: [

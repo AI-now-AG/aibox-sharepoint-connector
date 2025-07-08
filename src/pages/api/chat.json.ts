@@ -10,6 +10,7 @@ import { AIMessageChunk } from "@langchain/core/messages";
 import { fileLoader } from "$utils/document-loader";
 import initializeOpenAI from "$utils/chatModel";
 import { MessageRole } from "$types/MessageHistory";
+import { getInstructionMessage } from "$i18n/instructionMessages";
 
 const AttachmentSchema = z.object({
   name: z.string(),
@@ -31,7 +32,7 @@ const RequestParamsSchema = z.object({
 });
 
 export const POST: APIRoute = async (ctx) => {
-  const { request } = ctx;
+  const { request, locals } = ctx;
 
   try {
     const encoder = new TextEncoder();
@@ -43,7 +44,9 @@ export const POST: APIRoute = async (ctx) => {
     });
 
     const messages: BaseMessage[] = [];
-    messages.push(new SystemMessage("You are a helpful assistant."));
+    // Determine language from tenant or fallback to 'en'
+    const defaultLanguage = locals?.tenant?.default_language || "en";
+    messages.push(new SystemMessage(getInstructionMessage(defaultLanguage)));
 
     let hasMessageHistory = false;
     if (data.messageHistory && data.messageHistory.length > 0) {
