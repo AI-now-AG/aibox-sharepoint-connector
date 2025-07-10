@@ -112,14 +112,8 @@ const createResponseImage: Handler = async (
     };
   }
 
-  if (!currentPrompt?.prompt) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: "Prompt is required" }),
-    };
-  }
   const messages: string[] = [];
-  if (currentPrompt?.knowledgebase) {
+  if (currentPrompt && currentPrompt?.knowledgebase) {
     const calls = currentPrompt.knowledgebase.map(async (kb) => {
       const instruction = await KnowledgeBaseModel.get(kb.toString());
       return instruction;
@@ -207,6 +201,19 @@ const createResponseImage: Handler = async (
             },
           ],
         },
+        ...(messages.length > 0
+          ? [
+              {
+                role: "system",
+                content: messages.map(
+                  (text: string): ResponseInputText => ({
+                    type: "input_text",
+                    text,
+                  }),
+                ),
+              },
+            ]
+          : []),
         {
           role: "system",
           content: [
@@ -218,15 +225,19 @@ const createResponseImage: Handler = async (
             ),
           ],
         },
-        {
-          role: "system",
-          content: [
-            {
-              type: "input_text",
-              text: currentPrompt.prompt,
-            },
-          ],
-        },
+        ...(currentPrompt
+          ? [
+              {
+                role: "system",
+                content: [
+                  {
+                    type: "input_text",
+                    text: currentPrompt.prompt,
+                  },
+                ],
+              },
+            ]
+          : []),
         {
           role: "user",
           content: [
