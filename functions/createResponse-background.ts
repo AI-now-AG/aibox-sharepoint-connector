@@ -192,71 +192,23 @@ const createResponseImage: Handler = async (
       // instructions: ,
       stream: true,
       input: [
-        {
-          role: "system",
-          content: [
-            {
-              type: "input_text",
-              text: getInstructionMessage(defaultLanguage),
-            },
-          ],
-        },
         ...(messages.length > 0
-          ? [
-              {
-                role: "system",
-                content: messages.map(
-                  (text: string): ResponseInputText => ({
-                    type: "input_text",
-                    text,
-                  }),
-                ),
-              },
-            ]
+          ? messages.map((text: string) => ({
+              role: "system" as const,
+              content: text,
+            }))
           : []),
-        {
-          role: "system",
-          content: [
-            ...messages.map(
-              (text: string): ResponseInputText => ({
-                type: "input_text",
-                text,
-              }),
-            ),
-          ],
-        },
         ...(currentPrompt
           ? [
               {
-                role: "system",
-                content: [
-                  {
-                    type: "input_text",
-                    text: currentPrompt.prompt,
-                  },
-                ],
+                role: "system" as const,
+                content: currentPrompt.prompt,
               },
             ]
           : []),
         {
-          role: "user",
-          content: [
-            { type: "input_text", text: prompt },
-            ...inputImages.map(
-              (image: FileInput): ResponseInputImage => ({
-                type: "input_image",
-                image_url: image.content,
-                detail: "auto",
-              }),
-            ),
-            ...inputFiles.map(
-              (file: FileInput): ResponseInputFile => ({
-                type: "input_file",
-                file_data: file.content,
-                filename: file.name,
-              }),
-            ),
-          ],
+          role: "user" as const,
+          content: prompt,
         },
       ],
       ...(enabledTools.length > 0 ? { tools: enabledTools } : {}),
