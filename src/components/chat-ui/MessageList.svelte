@@ -5,6 +5,8 @@
   import { user } from "$stores";
 
   interface Props {
+    currentMessage: string;
+    currentImageUrl?: string;
     messages: MessageHistory;
     isFetching: boolean;
     isGenerating: boolean;
@@ -12,6 +14,8 @@
   }
 
   let {
+    currentMessage = "",
+    currentImageUrl = "",
     messages = [],
     isFetching = false,
     isGenerating = false,
@@ -54,6 +58,13 @@
                           </p>
                           <p class="mt-2 text-sm">{@html content}</p>
                         </div>
+                      {:else}
+                        <div class="flex-1 p-4 pt-2.5">
+                          <p class="font-bold text-sm">
+                            {role == MessageRole.User ? username : `aibox`}
+                          </p>
+                          <p class="mt-2 text-sm">No content available</p>
+                        </div>
                       {/if}
                     </div>
                   </div>
@@ -64,6 +75,32 @@
                     </div>
                   {/if}
                 {/each}
+
+                {#if currentMessage}
+                  <div class="chat-bubble bg-base-100 text-base-content">
+                    <div class="flex items-start">
+                      <div class="avatar">
+                        <div class="w-10 rounded-full">
+                          <img src="/aibox-logo-dark.svg" alt="aibox logo" />
+                        </div>
+                      </div>
+                      <div class="flex-1 p-4 pt-2.5">
+                        <p class="font-bold text-sm">aibox</p>
+                        <p class="mt-2 text-sm">{@html currentMessage}</p>
+                      </div>
+                    </div>
+                  </div>
+                {/if}
+                <!-- Show streaming image if available -->
+                {#if currentImageUrl}
+                  <div class="chat-bubble text-base-content bg-base-200">
+                    <ImageCard
+                      url={currentImageUrl}
+                      alt="Generated image"
+                      {infoText}
+                    />
+                  </div>
+                {/if}
               </div>
 
               {#if isFetching || isGenerating}
