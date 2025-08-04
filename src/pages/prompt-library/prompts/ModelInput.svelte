@@ -60,6 +60,7 @@
       ApiKeyProvider.OpenAI,
       ApiKeyProvider.AzureOpenAI,
       ApiKeyProvider.Perplexity,
+      ApiKeyProvider.Claude,
     ];
     return providers.slice().sort((a, b) => {
       return sortOrder.indexOf(a.name) - sortOrder.indexOf(b.name);
