@@ -47,6 +47,9 @@
       case PromptModel.Perplexity:
         title = t("prompt-execution.models.perplexity", { model });
         break;
+      case PromptModel.Claude:
+        title = t("prompt-execution.models.claude", { model });
+        break;
       default:
         title = !excludePromptOptions
           ? t("prompt-execution.models.openai-legacy", { model })
