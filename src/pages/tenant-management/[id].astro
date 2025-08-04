@@ -29,6 +29,7 @@ const tenantData = transformRawData(tenant);
   "speech_api_key",
   "perplexity_api_key",
   "fal_ai_api_key",
+  "claude_api_key",
 ].forEach((key) => {
   tenantData[key] = tenantData[key] ? decrypt(tenantData[key]) : "";
 });

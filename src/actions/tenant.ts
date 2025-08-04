@@ -386,27 +386,19 @@ export const tenant = {
   encryptApiKeys: defineAction({
     input: TenanKeyEncryptSchema,
     handler: async (input) => {
-      const {
-        openai_api_key,
-        azure_openai_api_key,
-        perplexity_api_key,
-        speech_api_key,
-        fal_ai_api_key,
-      } = input;
-      if (openai_api_key) {
-        input.openai_api_key = encrypt(openai_api_key);
-      }
-      if (azure_openai_api_key) {
-        input.azure_openai_api_key = encrypt(azure_openai_api_key);
-      }
-      if (perplexity_api_key) {
-        input.perplexity_api_key = encrypt(perplexity_api_key);
-      }
-      if (speech_api_key) {
-        input.speech_api_key = encrypt(speech_api_key);
-      }
-      if (fal_ai_api_key) {
-        input.fal_ai_api_key = encrypt(fal_ai_api_key);
+      const keysToEncrypt = [
+        "openai_api_key",
+        "azure_openai_api_key",
+        "perplexity_api_key",
+        "speech_api_key",
+        "fal_ai_api_key",
+        "claude_api_key",
+      ] as const;
+
+      for (const key of keysToEncrypt) {
+        if (input[key]) {
+          input[key] = encrypt(input[key]!);
+        }
       }
 
       return input;
@@ -430,6 +422,7 @@ export const tenant = {
       return input;
     },
   }),
+
   stripeBillingPortal: defineAction({
     input: z.object({
       customer_id: z.string().min(1),

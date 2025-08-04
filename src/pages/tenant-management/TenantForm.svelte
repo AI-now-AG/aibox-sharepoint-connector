@@ -71,6 +71,7 @@
     elevenLabsPrivateKeyEnabled: false,
     fluxPrivateKeyEnabled: false,
     perplexityPrivateKeyEnabled: false,
+    claudePrivateKeyEnabled: false,
     ...(tenant?.metadata ?? {}),
   };
 
@@ -87,6 +88,7 @@
   let dalleEnabled: boolean = $state(false);
   let gptImageEnabled: boolean = $state(false);
   let fluxEnabled: boolean = $state(false);
+  let claudeEnabled: boolean = $state(false);
 
   let openAIKeyField: HTMLInputElement;
   let azureOpenAIKeyField: HTMLInputElement;
@@ -94,6 +96,7 @@
   let azureOpenAIKeyProField: HTMLInputElement;
   let elevenLabsAIKeyField: HTMLInputElement;
   let falOpenAIKeyField: HTMLInputElement;
+  let claudeKeyField: HTMLInputElement;
   let defaultTextFeature = $state("");
 
   // API providers
@@ -254,6 +257,7 @@
     openAIEnabled = findProvider(ApiKeyProvider.OpenAI);
     azureOpenAIEnabled = findProvider(ApiKeyProvider.AzureOpenAI);
     perplexityEnabled = findProvider(ApiKeyProvider.Perplexity);
+    claudeEnabled = findProvider(ApiKeyProvider.Claude);
 
     dalleEnabled = tenantData.included_features?.some(
       (item: any) =>
@@ -304,6 +308,10 @@
     tenantData.perplexity_chat_model ?? "",
   );
 
+  let selectedClaudeModel: string = $state(
+    tenantData.claude_chat_model ?? "",
+  );
+
   function toggleTextFeature(feature: ApiKeyProvider) {
     defaultTextFeature = defaultTextFeature === feature ? "" : feature;
 
@@ -313,6 +321,8 @@
       (azureOpenAIEnabled = defaultTextFeature === ApiKeyProvider.AzureOpenAI);
     !perplexityEnabled &&
       (perplexityEnabled = defaultTextFeature === ApiKeyProvider.Perplexity);
+    !claudeEnabled &&
+      (claudeEnabled = defaultTextFeature === ApiKeyProvider.Claude);
 
     if (feature === ApiKeyProvider.OpenAI) {
       updateTextFeature(feature, openAIEnabled);
@@ -320,6 +330,8 @@
       updateTextFeature(feature, azureOpenAIEnabled);
     } else if (feature === ApiKeyProvider.Perplexity) {
       updateTextFeature(feature, perplexityEnabled);
+    } else if (feature === ApiKeyProvider.Claude) {
+      updateTextFeature(feature, claudeEnabled);
     }
   }
 
@@ -347,7 +359,7 @@
     }
 
     const atLeastTextSelected =
-      openAIEnabled || azureOpenAIEnabled || perplexityEnabled;
+      openAIEnabled || azureOpenAIEnabled || perplexityEnabled || claudeEnabled;
     if (!atLeastTextSelected) {
       showAlert(t("tenant.validate-atleast-one-select"));
       return false;
@@ -447,6 +459,7 @@
             speech_api_key: tenantData.speech_api_key,
             elevenLabs_api_key: tenantData.elevenLabs_api_key,
             fal_ai_api_key: tenantData.fal_ai_api_key,
+            claude_api_key: tenantData.claude_api_key,
           });
         if (encryptKeysError) {
           showAlert(encryptKeysError?.toString());
@@ -459,6 +472,7 @@
           speech_api_key,
           elevenLabs_api_key,
           fal_ai_api_key,
+          claude_api_key,
         } = data;
 
         cleanupValues();
@@ -469,11 +483,14 @@
         tenantData.elevenLabs_api_key = elevenLabs_api_key;
         tenantData.perplexity_api_key = perplexity_api_key;
         tenantData.fal_ai_api_key = fal_ai_api_key;
+        tenantData.claude_api_key = fal_ai_api_key;
 
         tenantData.perplexity_chat_model = selectedPerplexityModel;
+        tenantData.claude_chat_model = selectedClaudeModel;
         updateTextFeature(ApiKeyProvider.OpenAI, openAIEnabled);
         updateTextFeature(ApiKeyProvider.AzureOpenAI, azureOpenAIEnabled);
         updateTextFeature(ApiKeyProvider.Perplexity, perplexityEnabled);
+        updateTextFeature(ApiKeyProvider.Claude, claudeEnabled);
 
         // update providers
         tenantData.included_features = [];
@@ -565,7 +582,8 @@
             perplexity_api_key: tenantData.perplexity_api_key,
             speech_api_key: tenantData.speech_api_key,
             elevenLabs_api_key: tenantData.elevenLabs_api_key,
-            fal_ai_api_key: tenantData.fal_ai_api_key,
+            fal_ai_api_key: tenantData.fal_ai_api_key, 
+            claude_api_key: tenantData.claude_api_key, 
           });
         if (encryptKeysError) {
           showAlert(encryptKeysError?.toString());
@@ -578,6 +596,7 @@
           speech_api_key,
           elevenLabs_api_key,
           fal_ai_api_key,
+          claude_api_key,
         } = data;
 
         cleanupValues();
@@ -588,11 +607,14 @@
         tenantData.elevenLabs_api_key = elevenLabs_api_key;
         tenantData.perplexity_api_key = perplexity_api_key;
         tenantData.fal_ai_api_key = fal_ai_api_key;
+        tenantData.claude_api_key = claude_api_key;
 
         tenantData.perplexity_chat_model = selectedPerplexityModel;
+        enantData.claude_chat_model = selectedClaudeModel;
         updateTextFeature(ApiKeyProvider.OpenAI, openAIEnabled);
         updateTextFeature(ApiKeyProvider.AzureOpenAI, azureOpenAIEnabled);
         updateTextFeature(ApiKeyProvider.Perplexity, perplexityEnabled);
+        updateTextFeature(ApiKeyProvider.Claude, claudeEnabled);
 
         if (!tenantData.transcription_types) {
           tenantData.transcription_types = [];
@@ -1280,6 +1302,105 @@
                   type="checkbox"
                   class="checkbox checkbox-primary"
                   bind:checked={tenantData.metadata.perplexityPrivateKeyEnabled}
+                />
+                <span class="label-text"
+                  >{t("tenant.settings.private-api-key")}</span
+                >
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Claude Section -->
+      <div
+        class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
+      >
+        <input type="checkbox" />
+        <div class="collapse-title">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <input
+                id="feature-claude-section"
+                type="checkbox"
+                bind:checked={claudeEnabled}
+                class="checkbox checkbox-primary z-10"
+                value="text-prompt"
+                disabled={defaultTextFeature === ApiKeyProvider.Claude}
+              />
+              <label
+                class="label cursor-pointer ml-2"
+                for="feature-claude-section"
+              >
+                <span class="label-text text-base-content"
+                  >{t("tenant.perplexity.name")}</span
+                >
+              </label>
+            </div>
+            {#if defaultTextFeature === ApiKeyProvider.Perplexity}
+              <span class="mb-2 text-base-content/50 font-medium text-sm"
+                >{t("tenant.default")}</span
+              >
+            {/if}
+          </div>
+        </div>
+        <div class="collapse-content">
+          <div class="grid grid-cols-2 gap-4 mx-8 mb-[30]">
+            <div class="w-full z-20">
+              <Dropdown
+                label={`${t("tenant.model.name")}*`}
+                options={[
+                  {
+                    value: "claude-3-5-haiku-latest",
+                    title: "claude-3-5-haiku-latest",
+                  },
+                  {
+                    value: "claude-sonnet-4-0",
+                    title: "claude-sonnet-4-0",
+                  },
+                  {
+                    value: "claude-opus-4-0	",
+                    title: "claude-opus-4-0	",
+                  },
+                ]}
+                bind:value={selectedClaudeModel}
+              />
+            </div>
+            <div class="w-full">
+              <span class="mb-2 text-base-content font-medium text-sm"
+                >{t("tenant.api-key")}</span
+              >
+
+              <label
+                class="input input-bordered flex items-center gap-2 mt-1 w-full"
+              >
+                <input
+                  bind:this={claudeKeyField}
+                  type="password"
+                  class="grow"
+                  placeholder={t("tenant.api-key")}
+                  bind:value={tenantData.claude_api_key}
+                />
+                <TogglePasswordIcon
+                  change={() => togglePassword(claudeKeyField)}
+                />
+              </label>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <label class="flex flex-row items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={defaultTextFeature === ApiKeyProvider.Claude}
+                  class="checkbox checkbox-primary"
+                  onchange={() => toggleTextFeature(ApiKeyProvider.Claude)}
+                />
+                <span class="label-text">{t("tenant.mark-as-default")}</span>
+              </label>
+              <label class="flex flex-row items-center gap-2">
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-primary"
+                  bind:checked={tenantData.metadata.claudePrivateKeyEnabled}
                 />
                 <span class="label-text"
                   >{t("tenant.settings.private-api-key")}</span
