@@ -610,7 +610,7 @@
         tenantData.claude_api_key = claude_api_key;
 
         tenantData.perplexity_chat_model = selectedPerplexityModel;
-        enantData.claude_chat_model = selectedClaudeModel;
+        tenantData.claude_chat_model = selectedClaudeModel;
         updateTextFeature(ApiKeyProvider.OpenAI, openAIEnabled);
         updateTextFeature(ApiKeyProvider.AzureOpenAI, azureOpenAIEnabled);
         updateTextFeature(ApiKeyProvider.Perplexity, perplexityEnabled);
