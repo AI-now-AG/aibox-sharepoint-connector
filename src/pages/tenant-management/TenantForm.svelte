@@ -1333,7 +1333,7 @@
                 for="feature-claude-section"
               >
                 <span class="label-text text-base-content"
-                  >{t("tenant.perplexity.name")}</span
+                  >{t("tenant.claude.name")}</span
                 >
               </label>
             </div>
