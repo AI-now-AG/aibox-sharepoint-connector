@@ -1359,8 +1359,8 @@
                     title: "claude-sonnet-4-0",
                   },
                   {
-                    value: "claude-opus-4-0	",
-                    title: "claude-opus-4-0	",
+                    value: "claude-opus-4-0",
+                    title: "claude-opus-4-0",
                   },
                 ]}
                 bind:value={selectedClaudeModel}
