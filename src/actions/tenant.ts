@@ -70,6 +70,7 @@ const TenanKeyEncryptSchema = z.object({
   speech_api_key: z.string().optional(),
   elevenLabs_api_key: z.string().optional(),
   fal_ai_api_key: z.string().optional(),
+  claude_api_key: z.string().optional(),
 });
 
 const TenantInputIdentifierSchema = z.object({
