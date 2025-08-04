@@ -51,6 +51,8 @@ const TenantInputParamsSchema = z.object({
   perplexity_api_key: z.string().optional(),
   perplexity_chat_model: z.string().optional(),
   fal_ai_api_key: z.string().optional(),
+  claude_api_key: z.string().optional(),
+  claude_chat_model: z.string().optional(),
   included_features: z.array(IncludedFeaturesSchema),
   transcription_types: z.array(z.nativeEnum(AudioCategory)).optional(),
   is_restrict_user_managment: z
