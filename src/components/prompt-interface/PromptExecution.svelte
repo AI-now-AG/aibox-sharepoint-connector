@@ -52,7 +52,7 @@
       />
     </div>
 
-    {#if [PromptModel.OpenAIWithTools, PromptModel.OpenAIWithImageTools].includes(currentPrompt?.model)}
+    {#if [PromptModel.OpenAIWithTools, PromptModel.OpenAIWithImageTools, PromptModel.Claude].includes(currentPrompt?.model)}
       <ToolEnhancedChatWidget
         promptId={selectedPromptId}
         {groupId}

@@ -196,17 +196,17 @@
 
     const requestBody = {
       tenantId: $tenant?._id?.toString(),
-      provider: "openai-response",
+      provider: "claude", // "openai-response",
       prompt: prompt,
       promptId: promptId,
       stream: true,
-      tool: "image_generation",
-      imageGenerationOptions: {
-        outputFormat: "png",
-        quality: "high",
-        size: "1024x1024",
-        background: "auto",
-      },
+      // tool: "image_generation",
+      // imageGenerationOptions: {
+      //   outputFormat: "png",
+      //   quality: "high",
+      //   size: "1024x1024",
+      //   background: "auto",
+      // },
       previousResponseId: previousResponseId,
     };
 
