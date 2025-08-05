@@ -372,6 +372,7 @@
                         }
                       }
                     });
+                    currentMessage = "";
                     break;
 
                   case "complete":
