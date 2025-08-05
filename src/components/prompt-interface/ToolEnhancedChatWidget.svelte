@@ -13,7 +13,11 @@
   import { ResponseStatus, ToolName } from "$types/AIResponse";
   import { PromptModel } from "$types/PromptModel";
   import { addToast } from "$stores/toast";
-  import { MessageRole, type MessageHistory } from "$types/MessageHistory";
+  import {
+    MessageRole,
+    type Message,
+    type MessageHistory,
+  } from "$types/MessageHistory";
   import { readFileContent } from "$utils/fileReader";
   import { formatMarkdown } from "$utils/common";
   import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
@@ -39,6 +43,7 @@
     isFetching = $bindable(false),
   }: Props = $props();
 
+  let currentMessage = $state("");
   let currentMessageHistory = $derived(
     $messageHistories[promptId] || getMessageHistory(promptId) || [],
   );
@@ -71,6 +76,7 @@
   let uniqueId: string = $state("");
   let prompt: string = $state("");
   let files: File[] = $state([]);
+  let currentStreamingImageUrl: string = $state("");
 
   let isGenerating: boolean = $state(false);
 
@@ -140,30 +146,322 @@
       params["files"] = uploadData.results;
     }
 
-    const response = await fetch(
-      "/.netlify/functions/createResponse-background",
+    await callStreamingAPI();
+    // const response = await fetch(
+    //   "/.netlify/functions/createResponse-background",
+    //   {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify(params),
+    //   },
+    // );
+
+    // if (response.status !== 202) {
+    //   addToast({
+    //     message: "Failed to start image generation.",
+    //     type: "error",
+    //   });
+    //   isFetching = false;
+    //   return;
+    // }
+
+    // // start polling requests
+    // setTimeout(async () => {
+    //   await pollResponseStatus(uniqueId);
+    // }, 2000);
+  }
+
+  async function callStreamingAPI() {
+    // Reset current message and image at the start of streaming
+    currentMessage = "";
+    currentStreamingImageUrl = "";
+
+    // Get API configuration (your existing code)
+    const configResponse = await fetch(
+      "/.netlify/functions/getTranscriptionConfig",
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(params),
+        headers: { "Content-Type": "application/json" },
       },
     );
 
-    if (response.status !== 202) {
-      addToast({
-        message: "Failed to start image generation.",
-        type: "error",
-      });
-      isFetching = false;
-      return;
+    if (!configResponse.ok) {
+      throw new Error("Failed to get transcription configuration");
     }
 
-    // start polling requests
-    setTimeout(async () => {
-      await pollResponseStatus(uniqueId);
-    }, 2000);
+    const { apiKey, apiUrl: baseUrl } = await configResponse.json();
+    const apiUrl = `${baseUrl}/api/prompt/execute`;
+
+    const requestBody = {
+      tenantId: $tenant?._id?.toString(),
+      provider: "openai-response",
+      prompt: prompt,
+      promptId: promptId,
+      stream: true,
+      tool: "image_generation",
+      imageGenerationOptions: {
+        outputFormat: "png",
+        quality: "high",
+        size: "1024x1024",
+        background: "auto",
+      },
+      previousResponseId: previousResponseId,
+    };
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-Key": apiKey,
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      if (response.headers.get("content-type")?.includes("text/event-stream")) {
+        console.log("📡 Streaming response received");
+
+        const reader = response.body?.getReader();
+        const decoder = new TextDecoder();
+
+        if (!reader) {
+          throw new Error("No reader available");
+        }
+
+        prompt = ""; // Reset prompt for new request
+        let buffer = "";
+        let messageContent = "";
+        let currentImageUrl = "";
+        const newUserMessage: Message = {
+          role: MessageRole.User,
+          content: requestBody.prompt,
+        };
+        addMessageToHistory(groupId, promptId, newUserMessage);
+
+        while (true) {
+          const { done, value } = await reader.read();
+
+          if (done) {
+            console.log("✅ Stream completed");
+
+            // Process any remaining data in buffer
+            if (buffer.trim()) {
+              const trimmedLine = buffer.trim();
+              if (trimmedLine.startsWith("data: ")) {
+                try {
+                  const jsonStr = trimmedLine.substring(6).trim();
+                  if (
+                    jsonStr &&
+                    jsonStr !== "[DONE]" &&
+                    jsonStr.startsWith("{")
+                  ) {
+                    const data = JSON.parse(jsonStr);
+                    console.log(
+                      "📥 Processing final buffered data:",
+                      data.type,
+                    );
+                    // Handle the final data if needed
+                  }
+                } catch (parseError) {
+                  console.warn(
+                    "Failed to parse final buffer data:",
+                    parseError,
+                  );
+                }
+              }
+            }
+
+            break;
+          }
+
+          const chunk = decoder.decode(value, { stream: true });
+
+          // Add chunk to buffer
+          buffer += chunk;
+
+          // Process complete lines from buffer
+          const lines = buffer.split("\n");
+          // Keep the last line in buffer (might be incomplete)
+          buffer = lines.pop() || "";
+
+          for (const line of lines) {
+            const trimmedLine = line.trim();
+            if (trimmedLine.startsWith("data: ")) {
+              try {
+                // Remove the "data: " prefix and parse the JSON
+                const jsonStr = trimmedLine.substring(6).trim();
+
+                // Skip empty data lines or completion markers
+                if (!jsonStr || jsonStr === "[DONE]" || jsonStr === "") {
+                  continue;
+                }
+
+                // Basic validation: check if string looks like JSON
+                if (!jsonStr.startsWith("{") && !jsonStr.startsWith("[")) {
+                  continue;
+                }
+
+                const data = JSON.parse(jsonStr);
+
+                switch (data.type) {
+                  case "start":
+                    console.log(
+                      `🚀 Started with ${data.provider} using ${data.model}`,
+                    );
+                    break;
+
+                  case "chunk":
+                    if (data.content && typeof data.content === "string") {
+                      messageContent += data.content;
+                      currentMessage += data.content;
+                      // Format markdown data.content then set into currentMessage
+                      currentMessage = formatMarkdown(currentMessage);
+                    }
+                    break;
+
+                  case "images":
+                    console.log(
+                      "🖼️ Images generated:",
+                      data.images?.length || 0,
+                    );
+                    if (data.images && data.images.length > 0) {
+                      const firstImage = data.images[0];
+
+                      // Store the image URL from the first image
+                      const imageData = firstImage.result || firstImage.image;
+
+                      if (imageData) {
+                        // Check if it's already a data URL, if not, format it as one
+                        if (imageData.startsWith("data:")) {
+                          currentImageUrl = imageData;
+                          currentStreamingImageUrl = imageData;
+                        } else {
+                          // Assume it's base64 and format as PNG data URL
+                          currentImageUrl = `data:image/png;base64,${imageData}`;
+                          currentStreamingImageUrl = `data:image/png;base64,${imageData}`;
+                        }
+                      }
+                    }
+                    break;
+
+                  case "tool_outputs":
+                    console.log(
+                      "🔧 Tool outputs received:",
+                      data.outputs.length,
+                    );
+
+                    // Check if any tool outputs contain image data
+                    data.outputs.forEach((output: any, index: number) => {
+                      // If this tool output has image data, store it
+                      if (output.image || output.result) {
+                        const imageData = output.image || output.result;
+                        if (imageData && !currentImageUrl) {
+                          if (imageData.startsWith("data:")) {
+                            currentImageUrl = imageData;
+                            currentStreamingImageUrl = imageData;
+                          } else {
+                            currentImageUrl = `data:image/png;base64,${imageData}`;
+                            currentStreamingImageUrl = `data:image/png;base64,${imageData}`;
+                          }
+                        }
+                      }
+                    });
+                    break;
+
+                  case "complete":
+                    console.log(
+                      `✅ Complete! Processing time: ${data.processingTimeMs}ms`,
+                    );
+                    if (data.responseId) {
+                      console.log(`Response ID: ${data.responseId}`);
+                    }
+
+                    // Handle Completed Status
+                    // Use stored image URL, or fallback to data.images if available
+                    const imageUrl =
+                      currentImageUrl ||
+                      data.images?.[0]?.result ||
+                      data.images?.[0]?.image ||
+                      "";
+
+                    // If we have image data but no proper URL format, format it
+                    const finalImageUrl =
+                      imageUrl &&
+                      !imageUrl.startsWith("data:") &&
+                      !imageUrl.startsWith("http")
+                        ? `data:image/png;base64,${imageUrl}`
+                        : imageUrl;
+
+                    // Use fullResponse if available, fallback to outputText, then messageContent
+                    const responseText =
+                      data.fullResponse ??
+                      data.outputText ??
+                      messageContent ??
+                      "";
+
+                    const newAssistentMessage: Message = {
+                      role: MessageRole.Assistant,
+                      content: formatMarkdown(responseText),
+                      imageUrl: finalImageUrl,
+                    };
+                    addMessageToHistory(groupId, promptId, newAssistentMessage);
+
+                    // Scroll to latest user input
+                    setTimeout(() => {
+                      scrollIntoView();
+                    }, 1000);
+
+                    // Clear input text & files
+                    prompt = "";
+                    files = [];
+                    currentMessage = "";
+                    currentStreamingImageUrl = "";
+
+                    // Reset states
+                    setPreviousResponseId(promptId, data.responseId);
+                    isFetching = false;
+                    isGenerating = false;
+                    return data;
+
+                  case "error":
+                    console.error(`❌ Stream error: ${data.error}`);
+
+                    // Handle Failed Status
+                    const errorMessage =
+                      data.error || "Image generation failed.";
+                    const failedMessage: Message = {
+                      role: MessageRole.Assistant,
+                      content: errorMessage,
+                    };
+                    addMessageToHistory(groupId, promptId, failedMessage);
+                    addToast({
+                      message: errorMessage,
+                      type: "error",
+                    });
+
+                    currentMessage = "";
+                    currentStreamingImageUrl = "";
+                    isFetching = false;
+                    isGenerating = false;
+                    throw new Error(data.error);
+                }
+              } catch (parseError) {
+                // Don't throw the error, just skip this malformed chunk
+              }
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error("❌ Request failed:", error);
+      throw error;
+    }
   }
 
   async function pollResponseStatus(
@@ -211,6 +509,8 @@
         // clear input text & files
         prompt = "";
         files = [];
+        currentMessage = "";
+        currentStreamingImageUrl = "";
 
         // reset states
         setPreviousResponseId(promptId, data.responseId);
@@ -229,6 +529,8 @@
           type: "error",
         });
 
+        currentMessage = "";
+        currentStreamingImageUrl = "";
         isFetching = false;
         isGenerating = false;
         return;
@@ -241,6 +543,8 @@
       message: "Image generation timed out.",
       type: "error",
     });
+    currentMessage = "";
+    currentStreamingImageUrl = "";
     isFetching = false;
   }
 
@@ -268,7 +572,13 @@
 
 <!-- Output (Follow-Up) -->
 {#if currentMessageHistory.length > 0}
-  <MessageList messages={currentMessageHistory} {isFetching} {isGenerating} />
+  <MessageList
+    {currentMessage}
+    messages={currentMessageHistory}
+    currentImageUrl={currentStreamingImageUrl}
+    {isFetching}
+    {isGenerating}
+  />
 {/if}
 
 <!-- Prompt Textarea -->
@@ -301,5 +611,11 @@
 
 <!-- Output (Normal) -->
 {#if currentMessageHistory.length == 0}
-  <MessageList messages={currentMessageHistory} {isFetching} {isGenerating} />
+  <MessageList
+    {currentMessage}
+    currentImageUrl={currentStreamingImageUrl}
+    messages={currentMessageHistory}
+    {isFetching}
+    {isGenerating}
+  />
 {/if}
