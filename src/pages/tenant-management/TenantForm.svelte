@@ -309,7 +309,7 @@
   );
 
   let selectedClaudeModel: string = $state(
-    tenantData.claude_chat_model ?? "",
+    tenantData.anthropic_chat_model ?? "",
   );
 
   function toggleTextFeature(feature: ApiKeyProvider) {
@@ -459,7 +459,7 @@
             speech_api_key: tenantData.speech_api_key,
             elevenLabs_api_key: tenantData.elevenLabs_api_key,
             fal_ai_api_key: tenantData.fal_ai_api_key,
-            claude_api_key: tenantData.claude_api_key,
+            anthropic_api_key: tenantData.anthropic_api_key,
           });
         if (encryptKeysError) {
           showAlert(encryptKeysError?.toString());
@@ -472,7 +472,7 @@
           speech_api_key,
           elevenLabs_api_key,
           fal_ai_api_key,
-          claude_api_key,
+          anthropic_api_key,
         } = data;
 
         cleanupValues();
@@ -483,10 +483,10 @@
         tenantData.elevenLabs_api_key = elevenLabs_api_key;
         tenantData.perplexity_api_key = perplexity_api_key;
         tenantData.fal_ai_api_key = fal_ai_api_key;
-        tenantData.claude_api_key = fal_ai_api_key;
+        tenantData.anthropic_api_key = anthropic_api_key;
 
         tenantData.perplexity_chat_model = selectedPerplexityModel;
-        tenantData.claude_chat_model = selectedClaudeModel;
+        tenantData.anthropic_chat_model = selectedClaudeModel;
         updateTextFeature(ApiKeyProvider.OpenAI, openAIEnabled);
         updateTextFeature(ApiKeyProvider.AzureOpenAI, azureOpenAIEnabled);
         updateTextFeature(ApiKeyProvider.Perplexity, perplexityEnabled);
@@ -583,7 +583,7 @@
             speech_api_key: tenantData.speech_api_key,
             elevenLabs_api_key: tenantData.elevenLabs_api_key,
             fal_ai_api_key: tenantData.fal_ai_api_key, 
-            claude_api_key: tenantData.claude_api_key, 
+            anthropic_api_key: tenantData.anthropic_api_key, 
           });
         if (encryptKeysError) {
           showAlert(encryptKeysError?.toString());
@@ -596,7 +596,7 @@
           speech_api_key,
           elevenLabs_api_key,
           fal_ai_api_key,
-          claude_api_key,
+          anthropic_api_key,
         } = data;
 
         cleanupValues();
@@ -607,10 +607,10 @@
         tenantData.elevenLabs_api_key = elevenLabs_api_key;
         tenantData.perplexity_api_key = perplexity_api_key;
         tenantData.fal_ai_api_key = fal_ai_api_key;
-        tenantData.claude_api_key = claude_api_key;
+        tenantData.anthropic_api_key = anthropic_api_key;
 
         tenantData.perplexity_chat_model = selectedPerplexityModel;
-        tenantData.claude_chat_model = selectedClaudeModel;
+        tenantData.anthropic_chat_model = selectedClaudeModel;
         updateTextFeature(ApiKeyProvider.OpenAI, openAIEnabled);
         updateTextFeature(ApiKeyProvider.AzureOpenAI, azureOpenAIEnabled);
         updateTextFeature(ApiKeyProvider.Perplexity, perplexityEnabled);
@@ -1379,7 +1379,7 @@
                   type="password"
                   class="grow"
                   placeholder={t("tenant.api-key")}
-                  bind:value={tenantData.claude_api_key}
+                  bind:value={tenantData.anthropic_api_key}
                 />
                 <TogglePasswordIcon
                   change={() => togglePassword(claudeKeyField)}
