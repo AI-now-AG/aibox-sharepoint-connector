@@ -9,9 +9,10 @@
     promptItems: any;
     isEditable?: boolean;
     groupId: string;
+    folderName?: string;
   }
 
-  let { promptItems, isEditable = false, groupId }: Props = $props();
+  let { promptItems, isEditable = false, groupId, folderName }: Props = $props();
 
   let selectedPromptId = $state("");
   let currentPrompt: any = $state();
@@ -58,6 +59,7 @@
         {groupId}
         {currentPrompt}
         bind:isFetching={isProcessing}
+        {folderName}
       />
     {:else}
       <ChatExecutionWidget

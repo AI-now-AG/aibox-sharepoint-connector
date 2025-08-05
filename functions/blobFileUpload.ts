@@ -1,8 +1,17 @@
-import { getStore } from "@netlify/blobs";
+import { BlobServiceClient, BlobSASPermissions } from "@azure/storage-blob";
 import type { Handler } from "@netlify/functions";
 import { v4 as uuid } from "uuid";
 import { type FileInput } from "$types/FileInput";
-import { NETLIFY_BLOBS_STORE } from "$constants";
+
+const containerName = "fileuploadcontainer";
+
+async function getBlobServiceClient() {
+  const connectionString = process.env.AZURE_BLOB_STORAGE_NAME || "";
+  if (!connectionString) {
+    throw new Error("Azure storage configuration is missing.");
+  }
+  return BlobServiceClient.fromConnectionString(connectionString);
+}
 
 const blobFileUpload: Handler = async (event) => {
   if (event.httpMethod !== "POST") {
@@ -12,25 +21,45 @@ const blobFileUpload: Handler = async (event) => {
     };
   }
 
-  const body = JSON.parse(event.body || "{}");
-  const files: FileInput[] = body?.files ?? [];
+  try {
+    const body = JSON.parse(event.body || "{}");
+    const files: FileInput[] = body?.files ?? [];
+    const folderName: string = body?.folderName || "default";
+    console.log("Uploading files:", files);
+    const blobServiceClient = await getBlobServiceClient();
+    const containerClient = blobServiceClient.getContainerClient(containerName);
+    await containerClient.createIfNotExists();
 
-  const store = getStore({
-    name: NETLIFY_BLOBS_STORE,
-    siteID: process.env.SITE_ID,
-    token: process.env.NETLIFY_BLOBS_TOKEN,
-  });
-  const results = [];
-  for (const file of files) {
-    const key = uuid();
-    await store.setJSON(key, file);
-    results.push(key);
+    const results: string[] = [];
+    for (const file of files) {
+      const blobName = `${folderName}/${uuid()}-${file.name}`;
+      const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+      
+      // Convert base64 to buffer
+      const buffer = Buffer.from(file.content.split(',')[1], 'base64');
+      await blockBlobClient.upload(buffer, buffer.length);
+      
+      const sasUrl = await blockBlobClient.generateSasUrl({
+        permissions: BlobSASPermissions.parse("r"),
+        expiresOn: new Date(new Date().getTime() + 6 * 60 * 60 * 1000), // Expire in 6 hours
+      });
+      
+      results.push(sasUrl);
+    }
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ results }),
+    };
+  } catch (error) {
+    console.error("Error uploading files:", error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ 
+        message: error instanceof Error ? error.message : "Unknown error during file upload" 
+      }),
+    };
   }
-
-  return {
-    statusCode: 200,
-    body: JSON.stringify({ results }),
-  };
 };
 
 export { blobFileUpload as handler };

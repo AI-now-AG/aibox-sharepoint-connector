@@ -35,12 +35,14 @@
     groupId: string;
     currentPrompt: any;
     isFetching: boolean;
+    folderName?: string;
   }
   let {
     promptId,
     groupId,
     currentPrompt,
     isFetching = $bindable(false),
+    folderName,
   }: Props = $props();
 
   let currentMessage = $state("");
@@ -109,6 +111,7 @@
         name: file.name,
         content: await readFileContent(file),
         type: file.type,
+        size: file.size,
       })),
     );
 
@@ -139,6 +142,7 @@
         },
         body: JSON.stringify({
           files: fileDataList,
+          folderName: folderName,
         }),
       });
 
@@ -146,7 +150,7 @@
       params["files"] = uploadData.results;
     }
 
-    await callStreamingAPI();
+    await callStreamingAPI(params["files"] as string[] || []);
     // const response = await fetch(
     //   "/.netlify/functions/createResponse-background",
     //   {
@@ -173,7 +177,7 @@
     // }, 2000);
   }
 
-  async function callStreamingAPI() {
+  async function callStreamingAPI(fileUrls: string[] = []) {
     // Reset current message and image at the start of streaming
     currentMessage = "";
     currentStreamingImageUrl = "";
@@ -201,6 +205,7 @@
       promptId: promptId,
       stream: true,
       tool: "image_generation",
+      fileUrls: fileUrls,
       imageGenerationOptions: {
         outputFormat: "png",
         quality: "high",
