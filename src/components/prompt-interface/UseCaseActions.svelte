@@ -1,10 +1,8 @@
 <script lang="ts">
-  import { onMount } from "svelte";
   import DropdownSection from "$components/DropdownSection.svelte";
   import { type Option } from "$components/DropdownOptions.svelte";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
-  import { tenant } from "$stores";
 
   const t = useTranslations();
 
@@ -62,41 +60,6 @@
       },
     },
   ];
-
-  let activeModels: any = $state("");
-
-  onMount(async function () {
-    activeModels = getActiveModels();
-  });
-
-  const getActiveModels = (): any[] => {
-    const getModelLabel = (provider: any) => {
-      const key = `${provider.name}_chat_model` as keyof typeof $tenant;
-      const model = $tenant?.[key] || "gpt-4o";
-      return model;
-    };
-    const aiProviders = $tenant?.api_key_providers ?? [];
-    const models: any[] =
-      aiProviders
-        .filter((provider: any) => provider.active)
-        .map((provider: any) => {
-          return {
-            provider: provider.name,
-            modelName: getModelLabel(provider),
-          };
-        }) || [];
-    return models;
-  };
-
-  const getModelName = (model: string) => {
-    for (let i = 0; i < activeModels.length; i++) {
-      const modelItem = activeModels[i];
-      if (model?.includes(modelItem?.provider)) {
-        return modelItem.modelName;
-      }
-    }
-    return t("tenant.default").toLowerCase();
-  };
 </script>
 
 {#if options.length >= 1}
@@ -110,7 +73,7 @@
     <span
       class="absolute top-2 left-2 px-2 py-[1px] bg-white border-1 border-base-content/30 rounded-lg text-xs text-black font-medium"
     >
-      {getModelName(data?.model)}
+      {data?.modelName || t("tenant.default").toLowerCase()}
     </span>
 
     {#if isEditable}
