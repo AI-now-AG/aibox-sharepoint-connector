@@ -216,6 +216,12 @@
       //   size: "1024x1024",
       //   background: "auto",
       // },
+      ...(enabledTools.length && { imageGenerationOptions: {
+        outputFormat: "png",
+        quality: "high",
+        size: "1024x1024",
+        background: "auto",
+      } }),
       previousResponseId: previousResponseId,
     };
 
