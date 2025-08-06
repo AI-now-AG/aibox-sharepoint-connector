@@ -5,6 +5,35 @@ import { type FileInput } from "$types/FileInput";
 
 const containerName = "fileuploadcontainer";
 
+/**
+ * Sanitizes filename for safe storage and downloading
+ * - Replaces spaces with underscores
+ * - Removes special characters except dots, hyphens, and underscores
+ * - Preserves file extension
+ * - Limits length to prevent issues
+ */
+function sanitizeFilename(filename: string): string {
+  // Extract extension
+  const lastDotIndex = filename.lastIndexOf('.');
+  const name = lastDotIndex > 0 ? filename.substring(0, lastDotIndex) : filename;
+  const extension = lastDotIndex > 0 ? filename.substring(lastDotIndex) : '';
+  
+  // Sanitize the name part
+  const sanitizedName = name
+    .replace(/\s+/g, '_')                    // Replace spaces with underscores
+    .replace(/[^a-zA-Z0-9._-]/g, '')         // Remove special characters
+    .replace(/_{2,}/g, '_')                  // Replace multiple underscores with single
+    .replace(/^_+|_+$/g, '')                 // Remove leading/trailing underscores
+    .substring(0, 100);                      // Limit length
+  
+  // Sanitize extension
+  const sanitizedExtension = extension
+    .replace(/[^a-zA-Z0-9.]/g, '')          // Keep only alphanumeric and dots
+    .substring(0, 10);                       // Limit extension length
+  
+  return sanitizedName + sanitizedExtension;
+}
+
 async function getBlobServiceClient() {
   const connectionString = process.env.AZURE_BLOB_STORAGE_NAME || "";
   if (!connectionString) {
@@ -32,7 +61,9 @@ const blobFileUpload: Handler = async (event) => {
 
     const results: string[] = [];
     for (const file of files) {
-      const blobName = `${folderName}/${uuid()}-${file.name}`;
+      const sanitizedFilename = sanitizeFilename(file.name);
+      const blobName = `${folderName}/${uuid()}-${sanitizedFilename}`;
+      
       const blockBlobClient = containerClient.getBlockBlobClient(blobName);
       
       // Convert base64 to buffer
