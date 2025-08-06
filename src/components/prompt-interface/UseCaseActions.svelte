@@ -70,9 +70,15 @@
     }}
     style={`z-index: ${zIndex};`}
   >
+    <span
+      class="absolute top-2 left-2 px-2 py-[1px] bg-white border-1 border-base-content/30 rounded-lg text-xs text-black font-medium"
+    >
+      {data?.model || t("tenant.default").toLowerCase()}
+    </span>
+
     {#if isEditable}
       <DropdownSection class={"absolute top-1 right-1"} {options} />
     {/if}
-    <p class="card-title text-sm font-normal">{data?.title ?? ""}</p>
+    <p class="card-title text-sm font-normal mt-4">{data?.title ?? ""}</p>
   </button>
 {/if}
