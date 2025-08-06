@@ -198,20 +198,24 @@
     const { apiKey, apiUrl: baseUrl } = await configResponse.json();
     const apiUrl = `${baseUrl}/api/prompt/execute`;
 
+    const provider = [PromptModel.OpenAIWithTools, PromptModel.OpenAIWithImageTools].includes(currentPrompt?.model) 
+      ? "openai-response" 
+      : currentPrompt?.model;
     const requestBody = {
       tenantId: $tenant?._id?.toString(),
-      provider: "openai-response",
+      provider: provider, //"openai-response",
       prompt: prompt,
       promptId: promptId,
       stream: true,
-      tool: "image_generation",
+      //tool: "image_generation",
+      ...(enabledTools.length && { tool: "image_generation" }),
       fileUrls: fileUrls,
-      imageGenerationOptions: {
-        outputFormat: "png",
-        quality: "high",
-        size: "1024x1024",
-        background: "auto",
-      },
+      // imageGenerationOptions: {
+      //   outputFormat: "png",
+      //   quality: "high",
+      //   size: "1024x1024",
+      //   background: "auto",
+      // },
       previousResponseId: previousResponseId,
     };
 
