@@ -243,11 +243,6 @@
         let buffer = "";
         let messageContent = "";
         let currentImageUrl = "";
-        const newUserMessage: Message = {
-          role: MessageRole.User,
-          content: requestBody.prompt,
-        };
-        addMessageToHistory(groupId, promptId, newUserMessage);
 
         while (true) {
           const { done, value } = await reader.read();
@@ -377,7 +372,6 @@
                         }
                       }
                     });
-                    currentMessage = "";
                     break;
 
                   case "complete":
@@ -411,6 +405,13 @@
                       messageContent ??
                       "";
 
+                    // Add user message to history
+                    const newUserMessage: Message = {
+                      role: MessageRole.User,
+                      content: requestBody.prompt,
+                    };
+                    addMessageToHistory(groupId, promptId, newUserMessage);
+
                     const newAssistentMessage: Message = {
                       role: MessageRole.Assistant,
                       content: formatMarkdown(responseText),
@@ -441,6 +442,14 @@
                     // Handle Failed Status
                     const errorMessage =
                       data.error || "Image generation failed.";
+                    
+                    // Add user message to history
+                    const errorUserMessage: Message = {
+                      role: MessageRole.User,
+                      content: requestBody.prompt,
+                    };
+                    addMessageToHistory(groupId, promptId, errorUserMessage);
+                    
                     const failedMessage: Message = {
                       role: MessageRole.Assistant,
                       content: errorMessage,
