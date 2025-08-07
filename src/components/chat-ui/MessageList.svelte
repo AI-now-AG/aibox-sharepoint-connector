@@ -1,7 +1,9 @@
 <script lang="ts">
   import { fade } from "svelte/transition";
+  import { onMount } from "svelte";
   import { MessageRole, type MessageHistory } from "$types/MessageHistory";
   import ImageCard from "./ImageCard.svelte";
+  import { svgIcons } from "$assets/icons";
   import { user } from "$stores";
 
   interface Props {
@@ -22,6 +24,53 @@
     infoText = "",
   }: Props = $props();
 
+  let copyIndex: number = $state(-1);
+  let timer: NodeJS.Timeout;
+
+  const handleCopy = (event: any) => {
+    const selection = window.getSelection();
+    const range =
+      selection && selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+
+    if (!range) {
+      return;
+    }
+    event.preventDefault();
+
+    const container = document.createElement("div");
+    container.appendChild(range.cloneContents());
+
+    const richText = container.innerHTML;
+    const plainText = (selection ?? "").toString();
+
+    event.clipboardData.setData("text/html", richText);
+    event.clipboardData.setData("text/plain", plainText);
+  };
+
+  onMount(() => {
+    document.addEventListener("copy", handleCopy);
+
+    return () => {
+      document.removeEventListener("copy", handleCopy);
+    };
+  });
+
+  function copyToClipboard(content: string, index: number) {
+    console.log('content', {content});
+    navigator.clipboard
+      .writeText(content)
+      .then(() => {
+        copyIndex = index;
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+          copyIndex = -1;
+        }, 2000);
+      })
+      .catch((err) => {
+        console.error("Could not copy text: ", err);
+      });
+  }
+
   let username = $user?.name || $user?.username;
   let userPicture = $user?.picture;
 </script>
@@ -34,7 +83,7 @@
           <div class="flex flex-col">
             <div class="mt-2 overflow-y-scroll h-full min-h-screen">
               <div class="card gap-4 chat-container" transition:fade>
-                {#each messages as { role, content, imageUrl }, index}
+                {#each messages as { role, content, rawData = "" , imageUrl }, index}
                   <div
                     class={`chat-bubble text-base-content ${role === MessageRole.User ? `bg-base-200` : `bg-base-100`}`}
                   >
@@ -64,6 +113,24 @@
                             {role == MessageRole.User ? username : `aibox`}
                           </p>
                           <p class="mt-2 text-sm">No content available</p>
+                        </div>
+                      {/if}
+                      {#if role === MessageRole.Assistant}
+                        <div>
+                          <div
+                            class="flex flex-col justify-items-end order-last"
+                          >
+                            <button
+                              class="btn p-2 btn-ghost"
+                              onclick={() => copyToClipboard(rawData, index)}
+                            >
+                              {#if index == copyIndex}
+                                {@html svgIcons.checkMark}
+                              {:else}
+                                {@html svgIcons.copyClipboard}
+                              {/if}
+                            </button>
+                          </div>
                         </div>
                       {/if}
                     </div>
