@@ -43,7 +43,7 @@
 
     const key = `${provider.name}_chat_model` as keyof typeof $tenant;
     const rawModel = $tenant?.[key] || "gpt-4o";
-    const modelLabel = modelNameMap[model] || rawModel;
+    const modelLabel = modelNameMap[rawModel] || rawModel;
 
     let title;
     switch (provider.name) {
