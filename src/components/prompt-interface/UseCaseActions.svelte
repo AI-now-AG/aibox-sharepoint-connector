@@ -70,7 +70,7 @@
     }}
     style={`z-index: ${zIndex};`}
   >
-    <div class="absolute top-2 left-2 badge px-2 border-neutral font-normal">
+    <div class="absolute top-2 left-2 badge px-2 border-base-300 font-normal">
       {data?.modelName || t("tenant.default").toLowerCase()}
     </div>
 
