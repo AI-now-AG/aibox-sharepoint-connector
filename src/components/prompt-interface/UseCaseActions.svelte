@@ -77,6 +77,6 @@
     {#if isEditable}
       <DropdownSection class={"absolute top-1 right-1"} {options} />
     {/if}
-    <p class="card-title text-sm font-normal mt-4">{data?.title ?? ""}</p>
+    <p class="card-title text-sm font-normal mt-3">{data?.title ?? ""}</p>
   </button>
 {/if}
