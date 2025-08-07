@@ -7,6 +7,7 @@ export enum UsageType {
 
 export enum TextModel {
   Gpt4o = "gpt-4o",
+  ClaudeSonnet = "claude-sonnet-4-0",
 }
 
 export enum AudioModel {
