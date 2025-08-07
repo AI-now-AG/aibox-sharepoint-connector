@@ -64,12 +64,22 @@
   };
 
   const getModelName = (model: string) => {
+    const modelNameMap: Record<string, string> = {
+      "claude-sonnet-4-0": "Claude Sonnet",
+      "sonar": "Perplexity Sonar",
+    };
+
+    if (modelNameMap[model]) {
+      return modelNameMap[model];
+    }
+
     for (let i = 0; i < activeModels.length; i++) {
       const modelItem = activeModels[i];
       if (model?.includes(modelItem?.provider)) {
         return modelItem.modelName;
       }
     }
+    
     return t("tenant.default").toLowerCase();
   };
 
