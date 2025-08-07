@@ -46,8 +46,18 @@
   let activeModels: any = $state("");
   const getActiveModels = (): any[] => {
     const getModelLabel = (provider: any) => {
+      const modelNameMap: Record<string, string> = {
+        "claude-sonnet-4-0": "Claude Sonnet",
+        "sonar": "Perplexity Sonar",
+      };
+
       const key = `${provider.name}_chat_model` as keyof typeof $tenant;
       const model = $tenant?.[key] || "gpt-4o";
+
+      if (modelNameMap[model]) {
+        return modelNameMap[model];
+      }
+
       return model;
     };
     const aiProviders = $tenant?.api_key_providers ?? [];
@@ -70,6 +80,7 @@
         return modelItem.modelName;
       }
     }
+    
     return t("tenant.default").toLowerCase();
   };
 
