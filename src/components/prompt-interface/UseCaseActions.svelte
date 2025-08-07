@@ -64,7 +64,7 @@
 
 {#if options.length >= 1}
   <button
-    class={`relative btn w-full rounded-xl h-auto pt-6 pb-4 ${active ? "btn-primary " : "btn-outline border-1 border-base-content/30"} flex`}
+    class={`relative btn w-full rounded-xl h-auto p-4 ${active ? "btn-primary " : "btn-outline border-1 border-base-content/30"} flex`}
     onclick={() => {
       onSelectCart?.(data);
     }}
@@ -77,6 +77,6 @@
     {#if isEditable}
       <DropdownSection class={"absolute top-1 right-1"} {options} />
     {/if}
-    <p class="card-title text-sm font-normal mt-3">{data?.title ?? ""}</p>
+    <p class="card-title text-sm font-normal mt-4">{data?.title ?? ""}</p>
   </button>
 {/if}
