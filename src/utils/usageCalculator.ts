@@ -312,16 +312,25 @@ const _calculateClaudeUsage = (
     (sum: number, item: UsageLog) => sum + (item.output_tokens ?? 0),
     0,
   );
-  const totalTokens = sonnetInputTokens + sonnetOutputTokens;
-  const { inputCredits: sonarInOutCredits } = _tokensToCredits(
+  const {
+    inputCredits: sonnetInputCredits,
+    outputCredits: sonnetOutputCredits,
+  } = _tokensToCredits(
     ApiKeyProvider.Claude,
-    totalTokens,
+    sonnetInputTokens,
+    sonnetOutputTokens,
   );
   usageItems.push({
-    model: "sonnet Input/Output",
-    amount: sonnetInputTokens + sonnetOutputTokens,
+    model: "sonnet Input",
+    amount: sonnetInputTokens,
     unit: unitLabels.tokens,
-    credits: sonarInOutCredits,
+    credits: sonnetInputCredits,
+  });
+  usageItems.push({
+    model: "sonnet Output",
+    amount: sonnetOutputTokens,
+    unit: unitLabels.tokens,
+    credits: sonnetOutputCredits,
   });
 
   return _skipUsageIfPrivateKeyUsed(usageItems, usePrivateKey);
