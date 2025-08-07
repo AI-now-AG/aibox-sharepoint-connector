@@ -1259,10 +1259,6 @@
                     value: "sonar",
                     title: "sonar",
                   },
-                  {
-                    value: "sonar-pro",
-                    title: "sonar-pro",
-                  },
                 ]}
                 bind:value={selectedPerplexityModel}
               />
@@ -1351,16 +1347,8 @@
                 label={`${t("tenant.model.name")}*`}
                 options={[
                   {
-                    value: "claude-3-5-haiku-latest",
-                    title: "claude-3-5-haiku-latest",
-                  },
-                  {
                     value: "claude-sonnet-4-0",
                     title: "claude-sonnet-4-0",
-                  },
-                  {
-                    value: "claude-opus-4-0",
-                    title: "claude-opus-4-0",
                   },
                 ]}
                 bind:value={selectedClaudeModel}
