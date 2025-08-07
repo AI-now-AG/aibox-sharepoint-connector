@@ -9,6 +9,7 @@
   import { addToast } from "$stores/toast";
   import { actions } from "astro:actions";
   import log from "$utils/log";
+  import { tenant } from "$stores";
 
   interface Props {
     isEditable?: boolean;
@@ -41,6 +42,37 @@
 
   let timeout: any = $state();
   let orderCards = $state(cards);
+
+  let activeModels: any = $state("");
+  const getActiveModels = (): any[] => {
+    const getModelLabel = (provider: any) => {
+      const key = `${provider.name}_chat_model` as keyof typeof $tenant;
+      const model = $tenant?.[key] || "gpt-4o";
+      return model;
+    };
+    const aiProviders = $tenant?.api_key_providers ?? [];
+    const models: any[] =
+      aiProviders
+        .filter((provider: any) => provider.active)
+        .map((provider: any) => {
+          return {
+            provider: provider.name,
+            modelName: getModelLabel(provider),
+          };
+        }) || [];
+    return models;
+  };
+
+  const getModelName = (model: string) => {
+    for (let i = 0; i < activeModels.length; i++) {
+      const modelItem = activeModels[i];
+      if (model?.includes(modelItem?.provider)) {
+        return modelItem.modelName;
+      }
+    }
+    return t("tenant.default").toLowerCase();
+  };
+
   // svelte-ignore state_referenced_locally
   for (let i = 0; i < orderCards?.length; i++) {
     orderCards[i] = { ...orderCards[i], id: orderCards[i]._id };
@@ -52,6 +84,7 @@
     if (selectedEditPromptId) {
       promptDialog?.showModal();
     }
+    activeModels = getActiveModels();
   });
 
   function selectCard(index: number) {
@@ -165,7 +198,7 @@
       {#if index < promptLimit || showMore}
         <UseCaseActions
           {isEditable}
-          data={card}
+          data={{ ...card, modelName: getModelName(card.model) }}
           active={selectedCardIndex == index}
           onSelectCart={() => selectCard(index)}
           onSelectEdit={() => {

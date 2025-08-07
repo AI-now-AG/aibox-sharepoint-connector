@@ -35,6 +35,7 @@ const TOKEN_CREDIT_MAPPING: Record<string, TokenCreditRate> = {
   [ApiKeyProvider.OpenAI]: { input: 40000, output: 10000 },
   [ApiKeyProvider.AzureOpenAI]: { input: 40000, output: 10000 },
   [ApiKeyProvider.Perplexity]: { input: 100000, output: 100000 },
+  [ApiKeyProvider.Claude]: { input: 33000, output: 6500 },
 };
 
 /**
@@ -289,6 +290,52 @@ const _calculatePerplexityUsage = (
   return _skipUsageIfPrivateKeyUsed(usageItems, usePrivateKey);
 };
 
+const _calculateClaudeUsage = (
+  rawUsages: UsageLog[],
+  usePrivateKey: boolean,
+) => {
+  const usageItems: UsageItem[] = [];
+
+  const usageData = rawUsages.filter((item: UsageLog) => {
+    return item.provider == ApiKeyProvider.Claude;
+  });
+
+  // sonnet
+  const sonnetItems = usageData.filter(
+    (item: UsageLog) => item.model == TextModel.ClaudeSonnet,
+  );
+  const sonnetInputTokens = sonnetItems.reduce(
+    (sum: number, item: UsageLog) => sum + (item.input_tokens ?? 0),
+    0,
+  );
+  const sonnetOutputTokens = sonnetItems.reduce(
+    (sum: number, item: UsageLog) => sum + (item.output_tokens ?? 0),
+    0,
+  );
+  const {
+    inputCredits: sonnetInputCredits,
+    outputCredits: sonnetOutputCredits,
+  } = _tokensToCredits(
+    ApiKeyProvider.Claude,
+    sonnetInputTokens,
+    sonnetOutputTokens,
+  );
+  usageItems.push({
+    model: "sonnet Input",
+    amount: sonnetInputTokens,
+    unit: unitLabels.tokens,
+    credits: sonnetInputCredits,
+  });
+  usageItems.push({
+    model: "sonnet Output",
+    amount: sonnetOutputTokens,
+    unit: unitLabels.tokens,
+    credits: sonnetOutputCredits,
+  });
+
+  return _skipUsageIfPrivateKeyUsed(usageItems, usePrivateKey);
+};
+
 const _calculateAudioUsage = (
   rawUsages: UsageLog[],
   useAzureOpenAIPrivateKey: boolean,
@@ -412,6 +459,13 @@ export const calculateUsage = (tenant: Tenant, rawUsages: UsageLog[]) => {
   usageData.push({
     provider: "Perplexity",
     details: _calculatePerplexityUsage(rawUsages, usePerplexityPrivateKey),
+  });
+
+  // Claude
+  const useClaudePrivateKey = tenant.metadata?.claudePrivateKeyEnabled ?? false;
+  usageData.push({
+    provider: "Claude",
+    details: _calculateClaudeUsage(rawUsages, useClaudePrivateKey),
   });
 
   // Audio
