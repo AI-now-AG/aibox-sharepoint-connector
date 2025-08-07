@@ -6,6 +6,7 @@
   import PromptOrderDialog from "$components/prompt-interface/PromptOrderDialog.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import Loading from "$components/Loading.svelte";
+  import { ApiKeyProvider } from "$types/TenantFeature";
   import { addToast } from "$stores/toast";
   import { actions } from "astro:actions";
   import log from "$utils/log";
@@ -46,12 +47,17 @@
   let activeModels: any = $state("");
   const getActiveModels = (): any[] => {
     const getModelLabel = (provider: any) => {
+      const providerModelMap: Record<string, string> = {
+        [ApiKeyProvider.AzureOpenAI]: "azure_openai_chat_model",
+        [ApiKeyProvider.Perplexity]: "perplexity_chat_model",
+        [ApiKeyProvider.Claude]: "anthropic_chat_model",
+      };
       const modelNameMap: Record<string, string> = {
         "claude-sonnet-4-0": "Claude Sonnet",
         "sonar": "Perplexity Sonar",
       };
 
-      const key = `${provider.name}_chat_model` as keyof typeof $tenant;
+      const key = providerModelMap[provider.name] as keyof typeof $tenant;
       const model = $tenant?.[key] || "gpt-4o";
 
       if (modelNameMap[model]) {
