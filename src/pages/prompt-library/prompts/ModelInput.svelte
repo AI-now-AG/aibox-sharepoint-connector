@@ -36,12 +36,17 @@
   });
 
   const getModelLabel = (provider: any) => {
+    const providerModelMap: Record<string, string> = {
+      [ApiKeyProvider.AzureOpenAI]: "azure_openai_chat_model",
+      [ApiKeyProvider.Perplexity]: "perplexity_chat_model",
+      [ApiKeyProvider.Claude]: "anthropic_chat_model",
+    };
     const modelNameMap: Record<string, string> = {
       "claude-sonnet-4-0": "Sonnet",
       "sonar": "Sonar",
     };
 
-    const key = `${provider.name}_chat_model` as keyof typeof $tenant;
+    const key = providerModelMap[provider.name] as keyof typeof $tenant;
     const rawModel = $tenant?.[key] || "gpt-4o";
     const modelLabel = modelNameMap[rawModel] || rawModel;
 

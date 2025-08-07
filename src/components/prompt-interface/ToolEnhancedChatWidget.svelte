@@ -19,7 +19,7 @@
     type MessageHistory,
   } from "$types/MessageHistory";
   import { readFileContent } from "$utils/fileReader";
-  import { formatMarkdown } from "$utils/common";
+  import { formatMarkdown, stripHtmlFormatting } from "$utils/common";
   import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
   import MessageInput, {
     type Tool,
@@ -427,6 +427,7 @@
                     const newAssistentMessage: Message = {
                       role: MessageRole.Assistant,
                       content: formatMarkdown(responseText),
+                      rawData: stripHtmlFormatting(responseText),
                       imageUrl: finalImageUrl,
                     };
                     addMessageToHistory(groupId, promptId, newAssistentMessage);
