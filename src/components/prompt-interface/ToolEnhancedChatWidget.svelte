@@ -226,6 +226,8 @@
     };
 
     try {
+      const hasImageTool = enabledTools.some(tool => tool.name === ToolName.Image && tool.active);
+      isGenerating = hasImageTool;
       const response = await fetch(apiUrl, {
         method: "POST",
         headers: {
