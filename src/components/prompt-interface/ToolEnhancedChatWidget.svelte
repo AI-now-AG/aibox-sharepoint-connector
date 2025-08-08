@@ -119,21 +119,7 @@
     isFetching = true;
     isGenerating = false;
 
-    const primaryTool =
-      enabledTools.length && enabledTools[0].active
-        ? enabledTools[0].name
-        : undefined;
-    const params: Record<string, unknown> = {
-      tenantId,
-      uniqueId,
-      prompt,
-      _id: promptId,
-      // instructions: currentPrompt.prompt ?? "",
-      ...(primaryTool && { tool: primaryTool }),
-      previousResponseId,
-    };
-    console.log("Submitting payload:", params);
-
+    let uploadedFileUrls = [];
     if (fileDataList.length > 0) {
       const uploadResponse = await fetch("/.netlify/functions/blobFileUpload", {
         method: "POST",
@@ -147,10 +133,10 @@
       });
 
       const uploadData = await uploadResponse.json();
-      params["files"] = uploadData.results;
+      uploadedFileUrls = uploadData.results;
     }
 
-    await callStreamingAPI(params["files"] as string[] || []);
+    await callStreamingAPI(uploadedFileUrls as string[] || []);
     // const response = await fetch(
     //   "/.netlify/functions/createResponse-background",
     //   {
@@ -223,6 +209,7 @@
         background: "auto",
       } }),
       previousResponseId: previousResponseId,
+      messageHistory: currentMessageHistory,
     };
 
     try {
