@@ -184,32 +184,24 @@
     const { apiKey, apiUrl: baseUrl } = await configResponse.json();
     const apiUrl = `${baseUrl}/api/prompt/execute`;
 
-    const provider = [PromptModel.OpenAIWithTools, PromptModel.OpenAIWithImageTools].includes(currentPrompt?.model) 
-      ? "openai-response" 
-      : currentPrompt?.model;
+    const isOpenAIResponseModel = [PromptModel.OpenAIWithTools, PromptModel.OpenAIWithImageTools].includes(currentPrompt?.model);
+    const provider = isOpenAIResponseModel ? "openai-response" : currentPrompt?.model;
     const requestBody = {
       tenantId: $tenant?._id?.toString(),
-      provider: provider, //"openai-response",
-      prompt: prompt,
-      promptId: promptId,
+      provider, //"openai-response",
+      prompt,
+      promptId,
       stream: true,
-      //tool: "image_generation",
       ...(enabledTools.length && { tool: "image_generation" }),
       fileUrls: fileUrls,
-      // imageGenerationOptions: {
-      //   outputFormat: "png",
-      //   quality: "high",
-      //   size: "1024x1024",
-      //   background: "auto",
-      // },
       ...(enabledTools.length && { imageGenerationOptions: {
         outputFormat: "png",
         quality: "high",
         size: "1024x1024",
         background: "auto",
       } }),
-      previousResponseId: previousResponseId,
-      messageHistory: currentMessageHistory,
+      ...(isOpenAIResponseModel && { previousResponseId }),
+      ...(!isOpenAIResponseModel && { messageHistory: currentMessageHistory }),
     };
 
     try {
