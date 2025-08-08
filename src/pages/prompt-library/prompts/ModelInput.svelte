@@ -83,7 +83,14 @@
 
   const getActiveModels = (): Option[] => {
     const rawProviders = $tenant?.api_key_providers ?? [];
-    const sortedProviders = sortProviders(rawProviders);
+    let sortedProviders = sortProviders(rawProviders);
+
+    // Exclude Claude if excludePromptOptions is true
+    if (excludePromptOptions) {
+      sortedProviders = sortedProviders.filter(
+        (provider: any) => provider.name !== ApiKeyProvider.Claude
+      );
+    }
 
     const models: Option[] =
       sortedProviders
