@@ -119,21 +119,7 @@
     isFetching = true;
     isGenerating = false;
 
-    const primaryTool =
-      enabledTools.length && enabledTools[0].active
-        ? enabledTools[0].name
-        : undefined;
-    const params: Record<string, unknown> = {
-      tenantId,
-      uniqueId,
-      prompt,
-      _id: promptId,
-      // instructions: currentPrompt.prompt ?? "",
-      ...(primaryTool && { tool: primaryTool }),
-      previousResponseId,
-    };
-    console.log("Submitting payload:", params);
-
+    let uploadedFileUrls = [];
     if (fileDataList.length > 0) {
       const uploadResponse = await fetch("/.netlify/functions/blobFileUpload", {
         method: "POST",
@@ -147,10 +133,10 @@
       });
 
       const uploadData = await uploadResponse.json();
-      params["files"] = uploadData.results;
+      uploadedFileUrls = uploadData.results;
     }
 
-    await callStreamingAPI(params["files"] as string[] || []);
+    await callStreamingAPI(uploadedFileUrls as string[] || []);
     // const response = await fetch(
     //   "/.netlify/functions/createResponse-background",
     //   {
@@ -198,31 +184,24 @@
     const { apiKey, apiUrl: baseUrl } = await configResponse.json();
     const apiUrl = `${baseUrl}/api/prompt/execute`;
 
-    const provider = [PromptModel.OpenAIWithTools, PromptModel.OpenAIWithImageTools].includes(currentPrompt?.model) 
-      ? "openai-response" 
-      : currentPrompt?.model;
+    const isOpenAIResponseModel = [PromptModel.OpenAIWithTools, PromptModel.OpenAIWithImageTools].includes(currentPrompt?.model);
+    const provider = isOpenAIResponseModel ? "openai-response" : currentPrompt?.model;
     const requestBody = {
       tenantId: $tenant?._id?.toString(),
-      provider: provider, //"openai-response",
-      prompt: prompt,
-      promptId: promptId,
+      provider, //"openai-response",
+      prompt,
+      promptId,
       stream: true,
-      //tool: "image_generation",
       ...(enabledTools.length && { tool: "image_generation" }),
       fileUrls: fileUrls,
-      // imageGenerationOptions: {
-      //   outputFormat: "png",
-      //   quality: "high",
-      //   size: "1024x1024",
-      //   background: "auto",
-      // },
       ...(enabledTools.length && { imageGenerationOptions: {
         outputFormat: "png",
         quality: "high",
         size: "1024x1024",
         background: "auto",
       } }),
-      previousResponseId: previousResponseId,
+      ...(isOpenAIResponseModel && { previousResponseId }),
+      ...(!isOpenAIResponseModel && { messageHistory: currentMessageHistory }),
     };
 
     try {
