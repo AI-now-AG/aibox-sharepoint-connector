@@ -16,7 +16,6 @@
   import {
     MessageRole,
     type Message,
-    type MessageHistory,
   } from "$types/MessageHistory";
   import { readFileContent } from "$utils/fileReader";
   import { formatMarkdown, stripHtmlFormatting } from "$utils/common";
@@ -25,9 +24,9 @@
     type Tool,
   } from "$components/chat-ui/MessageInput.svelte";
   import MessageList from "$components/chat-ui/MessageList.svelte";
-  import { tenant } from "$stores";
+  import { tenant, user } from "$stores";
   import { useTranslations } from "$i18n/utils";
-
+  
   const t = useTranslations();
 
   interface Props {
@@ -137,30 +136,6 @@
     }
 
     await callStreamingAPI(uploadedFileUrls as string[] || []);
-    // const response = await fetch(
-    //   "/.netlify/functions/createResponse-background",
-    //   {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify(params),
-    //   },
-    // );
-
-    // if (response.status !== 202) {
-    //   addToast({
-    //     message: "Failed to start image generation.",
-    //     type: "error",
-    //   });
-    //   isFetching = false;
-    //   return;
-    // }
-
-    // // start polling requests
-    // setTimeout(async () => {
-    //   await pollResponseStatus(uniqueId);
-    // }, 2000);
   }
 
   async function callStreamingAPI(fileUrls: string[] = []) {
@@ -207,11 +182,17 @@
     try {
       const hasImageTool = enabledTools.some(tool => tool.name === ToolName.Image && tool.active);
       isGenerating = hasImageTool;
+      console.log("📡 User data:", $user);
+      let auth0AccessToken = $user?.auth0AccessToken;
+      if (!auth0AccessToken) {
+        // auth0AccessToken = await requestAccessToken();
+      }
       const response = await fetch(apiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "X-API-Key": apiKey,
+          "Authorization": `Bearer ${$user?.auth0AccessToken || ""}`,
         },
         body: JSON.stringify(requestBody),
       });
