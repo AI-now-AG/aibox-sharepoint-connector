@@ -5,4 +5,5 @@ export enum PromptModel {
   OpenAIWithImageTools = "openai:tools:image",
   AzureOpenAI = "azure_openai",
   Perplexity = "perplexity",
+  Claude = "claude",
 }

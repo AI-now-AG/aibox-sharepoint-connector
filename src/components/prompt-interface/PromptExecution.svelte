@@ -9,9 +9,10 @@
     promptItems: any;
     isEditable?: boolean;
     groupId: string;
+    folderName?: string;
   }
 
-  let { promptItems, isEditable = false, groupId }: Props = $props();
+  let { promptItems, isEditable = false, groupId, folderName }: Props = $props();
 
   let selectedPromptId = $state("");
   let currentPrompt: any = $state();
@@ -52,12 +53,13 @@
       />
     </div>
 
-    {#if [PromptModel.OpenAIWithTools, PromptModel.OpenAIWithImageTools].includes(currentPrompt?.model)}
+    {#if [PromptModel.OpenAIWithTools, PromptModel.OpenAIWithImageTools, PromptModel.Claude].includes(currentPrompt?.model)}
       <ToolEnhancedChatWidget
         promptId={selectedPromptId}
         {groupId}
         {currentPrompt}
         bind:isFetching={isProcessing}
+        {folderName}
       />
     {:else}
       <ChatExecutionWidget

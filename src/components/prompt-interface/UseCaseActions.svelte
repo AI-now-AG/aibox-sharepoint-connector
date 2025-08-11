@@ -64,15 +64,19 @@
 
 {#if options.length >= 1}
   <button
-    class={`relative btn w-full rounded-xl h-auto p-6 ${active ? "btn-primary " : "btn-outline border-1 border-base-content/30"} flex`}
+    class={`relative btn w-full rounded-xl h-auto min-h-24 p-3 ${active ? "btn-primary " : "btn-outline border-1 border-base-content/30"} flex`}
     onclick={() => {
       onSelectCart?.(data);
     }}
     style={`z-index: ${zIndex};`}
   >
+    <div class="absolute top-2 left-2 badge badge-xs px-2 border-base-300 font-normal">
+      {data?.modelName || t("tenant.default").toLowerCase()}
+    </div>
+
     {#if isEditable}
       <DropdownSection class={"absolute top-1 right-1"} {options} />
     {/if}
-    <p class="card-title text-sm font-normal">{data?.title ?? ""}</p>
+    <p class="card-title text-sm font-normal mt-4">{data?.title ?? ""}</p>
   </button>
 {/if}

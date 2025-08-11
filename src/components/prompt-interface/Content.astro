@@ -49,6 +49,7 @@ let userPermissions = Astro.locals.user.permissions;
         promptItems={promptItems}
         isEditable={userPermissions.includes(Permission.AdminAll)}
         groupId={groupId}
+        folderName={Astro.locals.tenant.org_name}
         client:load
       />
     ) : (

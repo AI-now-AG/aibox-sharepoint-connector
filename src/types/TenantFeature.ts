@@ -14,6 +14,7 @@ export enum ApiKeyProvider {
   Perplexity = "perplexity",
   Flux = "flux",
   ElevenLabs = "eleven-labs",
+  Claude = "claude",
 }
 
 export enum AudioCategory {

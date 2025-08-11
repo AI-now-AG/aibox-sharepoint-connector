@@ -1,10 +1,14 @@
 <script lang="ts">
   import { fade } from "svelte/transition";
+  import { onMount } from "svelte";
   import { MessageRole, type MessageHistory } from "$types/MessageHistory";
   import ImageCard from "./ImageCard.svelte";
+  import { svgIcons } from "$assets/icons";
   import { user } from "$stores";
 
   interface Props {
+    currentMessage: string;
+    currentImageUrl?: string;
     messages: MessageHistory;
     isFetching: boolean;
     isGenerating: boolean;
@@ -12,11 +16,60 @@
   }
 
   let {
+    currentMessage = "",
+    currentImageUrl = "",
     messages = [],
     isFetching = false,
     isGenerating = false,
     infoText = "",
   }: Props = $props();
+
+  let copyIndex: number = $state(-1);
+  let timer: NodeJS.Timeout;
+
+  const handleCopy = (event: any) => {
+    const selection = window.getSelection();
+    const range =
+      selection && selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+
+    if (!range) {
+      return;
+    }
+    event.preventDefault();
+
+    const container = document.createElement("div");
+    container.appendChild(range.cloneContents());
+
+    const richText = container.innerHTML;
+    const plainText = (selection ?? "").toString();
+
+    event.clipboardData.setData("text/html", richText);
+    event.clipboardData.setData("text/plain", plainText);
+  };
+
+  onMount(() => {
+    document.addEventListener("copy", handleCopy);
+
+    return () => {
+      document.removeEventListener("copy", handleCopy);
+    };
+  });
+
+  function copyToClipboard(content: string, index: number) {
+    console.log('content', {content});
+    navigator.clipboard
+      .writeText(content)
+      .then(() => {
+        copyIndex = index;
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+          copyIndex = -1;
+        }, 2000);
+      })
+      .catch((err) => {
+        console.error("Could not copy text: ", err);
+      });
+  }
 
   let username = $user?.name || $user?.username;
   let userPicture = $user?.picture;
@@ -30,7 +83,7 @@
           <div class="flex flex-col">
             <div class="mt-2 overflow-y-scroll h-full min-h-screen">
               <div class="card gap-4 chat-container" transition:fade>
-                {#each messages as { role, content, imageUrl }, index}
+                {#each messages as { role, content, rawData = "" , imageUrl }, index}
                   <div
                     class={`chat-bubble text-base-content ${role === MessageRole.User ? `bg-base-200` : `bg-base-100`}`}
                   >
@@ -54,6 +107,31 @@
                           </p>
                           <p class="mt-2 text-sm">{@html content}</p>
                         </div>
+                      {:else}
+                        <div class="flex-1 p-4 pt-2.5">
+                          <p class="font-bold text-sm">
+                            {role == MessageRole.User ? username : `aibox`}
+                          </p>
+                          <p class="mt-2 text-sm">No content available</p>
+                        </div>
+                      {/if}
+                      {#if role === MessageRole.Assistant}
+                        <div>
+                          <div
+                            class="flex flex-col justify-items-end order-last"
+                          >
+                            <button
+                              class="btn p-2 btn-ghost"
+                              onclick={() => copyToClipboard(rawData, index)}
+                            >
+                              {#if index == copyIndex}
+                                {@html svgIcons.checkMark}
+                              {:else}
+                                {@html svgIcons.copyClipboard}
+                              {/if}
+                            </button>
+                          </div>
+                        </div>
                       {/if}
                     </div>
                   </div>
@@ -64,6 +142,32 @@
                     </div>
                   {/if}
                 {/each}
+
+                {#if currentMessage}
+                  <div class="chat-bubble bg-base-100 text-base-content">
+                    <div class="flex items-start">
+                      <div class="avatar">
+                        <div class="w-10 rounded-full">
+                          <img src="/aibox-logo-dark.svg" alt="aibox logo" />
+                        </div>
+                      </div>
+                      <div class="flex-1 p-4 pt-2.5">
+                        <p class="font-bold text-sm">aibox</p>
+                        <p class="mt-2 text-sm">{@html currentMessage}</p>
+                      </div>
+                    </div>
+                  </div>
+                {/if}
+                <!-- Show streaming image if available -->
+                {#if currentImageUrl}
+                  <div class="chat-bubble text-base-content bg-base-200">
+                    <ImageCard
+                      url={currentImageUrl}
+                      alt="Generated image"
+                      {infoText}
+                    />
+                  </div>
+                {/if}
               </div>
 
               {#if isFetching || isGenerating}
