@@ -495,7 +495,7 @@
             ?.image_url || "";
 
         // store messages
-        const newUserMessage: MessageHistory = {
+        const newUserMessage: Message = {
           role: MessageRole.User,
           content: prompt,
         };
