@@ -85,10 +85,11 @@
     const rawProviders = $tenant?.api_key_providers ?? [];
     let sortedProviders = sortProviders(rawProviders);
 
-    // Exclude Claude if excludePromptOptions is true
+    // Exclude some models if excludePromptOptions is true
     if (excludePromptOptions) {
+      const excludedModels = [ApiKeyProvider.OpenAI, ApiKeyProvider.AzureOpenAI];
       sortedProviders = sortedProviders.filter(
-        (provider: any) => provider.name !== ApiKeyProvider.Claude
+        (provider: any) => !excludedModels.includes(provider.name)
       );
     }
 
@@ -118,16 +119,14 @@
     }
 
     // OpenAI Responses API
-    if (!excludePromptOptions) {
-      models.push({
-        value: PromptModel.OpenAIWithTools,
-        title: t("prompt-execution.models.openai-with-tools"),
-      });
-      models.push({
-        value: PromptModel.OpenAIWithImageTools,
-        title: t("prompt-execution.models.openai-with-image-tools"),
-      });
-    }
+    models.push({
+      value: PromptModel.OpenAIWithTools,
+      title: t("prompt-execution.models.openai-with-tools"),
+    });
+    models.push({
+      value: PromptModel.OpenAIWithImageTools,
+      title: t("prompt-execution.models.openai-with-image-tools"),
+    });
 
     return models;
   };
