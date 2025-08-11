@@ -87,7 +87,7 @@
       }
     }
     
-    return t("tenant.default").toLowerCase();
+    return 'gpt-4o';
   };
 
   // svelte-ignore state_referenced_locally
