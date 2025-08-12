@@ -21,6 +21,15 @@
 
   const t = useTranslations();
   
+  interface Props {
+    apiKeyProviders: any;
+    folderName?: string;
+  }
+  let {
+    apiKeyProviders = [],
+    folderName,
+  }: Props = $props();
+
   let input = $state("");
   let files: File[] = $state([]);
   let selectedModel: string = $state(PromptModel.OpenAIWithTools);
@@ -48,7 +57,7 @@
     }
   });
 
-  const apiProvider = $tenant?.api_key_providers?.find((item: any) => {
+  const apiProvider = apiKeyProviders?.find((item: any) => {
     return item.default && item.active;
   });
   let isDisableFileInput = $state(
@@ -90,7 +99,7 @@
         },
         body: JSON.stringify({
           files: fileDataList,
-          folderName: $tenant.org_name,
+          folderName,
         }),
       });
 
@@ -431,7 +440,6 @@
           bind:input
           bind:files
           {isFetching}
-          stickyFooter={true}
           bind:tools={enabledTools}
           onsend={submitForm}
         />
@@ -483,6 +491,7 @@
             bind:files
             {isFetching}
             bind:tools={enabledTools}
+            stickyFooter={true}
             onsend={submitForm}
           />
         </div>
