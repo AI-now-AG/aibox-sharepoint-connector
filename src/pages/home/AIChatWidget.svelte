@@ -4,7 +4,9 @@
   import { type Message, MessageRole } from "$types/MessageHistory";
   import { sharedMessageHistory } from "$stores/chatHistory";
   import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
-  import ChatInput from "./ChatInput.svelte";
+  import MessageInput, {
+    type Tool,
+  } from "$components/chat-ui/MessageInput.svelte";
   import MessageList from "$components/chat-ui/MessageList.svelte";
   import { readFileContent } from "$utils/fileReader";
   import { PromptModel } from "$types/PromptModel";
@@ -20,7 +22,6 @@
   const t = useTranslations();
   
   let input = $state("");
-  let output = $state("");
   let files: File[] = $state([]);
   let selectedModel: string = $state(PromptModel.OpenAIWithTools);
   let isDisableSelectModel = $state(false);
@@ -31,6 +32,13 @@
   let isFetching: boolean = $state(false);
   let isGenerating: boolean = $state(false);
   let previousResponseId: string | null = $state(null);
+
+  let enabledTools: Tool[] = $state([
+    {
+      name: "image",
+      active: false,
+    },
+  ]);
 
   $effect(() => {
     if ($sharedMessageHistory.length > 0 || isFetching) {
@@ -58,10 +66,6 @@
   onDestroy(function () {
     $sharedMessageHistory = [];
   });
-
-  $inspect(input);
-  $inspect($sharedMessageHistory);
-  $inspect(isFetching);
 
   async function submitForm() {
     const fileDataList = await Promise.all(
@@ -125,16 +129,16 @@
       provider, //"openai-response",
       prompt: input,
       stream: true,
-      //...(enabledTools.length && { tool: "image_generation" }),
+      ...(enabledTools.length && { tool: "image_generation" }),
       fileUrls: fileUrls,
-      //...(enabledTools.length && { imageGenerationOptions: {
-      //   outputFormat: "png",
-      //   quality: "high",
-      //   size: "1024x1024",
-      //   background: "auto",
-      // } }),
-      //...(isOpenAIResponseModel && { previousResponseId }),
-      //...(!isOpenAIResponseModel && { messageHistory: currentMessageHistory }),
+      ...(enabledTools.length && { imageGenerationOptions: {
+        outputFormat: "png",
+        quality: "high",
+        size: "1024x1024",
+        background: "auto",
+      } }),
+      ...(isOpenAIResponseModel && { previousResponseId }),
+      ...(!isOpenAIResponseModel && { messageHistory: $sharedMessageHistory }),
     };
 
     try {
@@ -423,11 +427,13 @@
         in:slide={{ duration: 500, delay: 500 }}
         out:slide={{ duration: 500 }}
       >
-        <ChatInput
+        <MessageInput
           bind:input
           bind:files
+          {isFetching}
+          stickyFooter={true}
+          bind:tools={enabledTools}
           onsend={submitForm}
-          {isDisableFileInput}
         />
       </div>
     {/if}
@@ -472,11 +478,12 @@
           in:slide={{ duration: 500, delay: 500 }}
           out:slide={{ duration: 500 }}
         >
-          <ChatInput
+          <MessageInput
             bind:input
             bind:files
+            {isFetching}
+            bind:tools={enabledTools}
             onsend={submitForm}
-            {isDisableFileInput}
           />
         </div>
       </div>
