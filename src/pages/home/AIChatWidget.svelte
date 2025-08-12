@@ -30,10 +30,10 @@
     folderName,
   }: Props = $props();
 
-  let input = $state("");
+  let input: string = $state("");
   let files: File[] = $state([]);
-  let selectedModel: string = $state(PromptModel.OpenAIWithTools);
-  let isDisableSelectModel = $state(false);
+  let selectedModel: PromptModel = $state(PromptModel.OpenAIWithTools);
+  let isDisableSelectModel: boolean = $state(false);
 
   let currentMessage = $state("");
   let currentStreamingImageUrl: string = $state("");
@@ -42,18 +42,21 @@
   let isGenerating: boolean = $state(false);
   let previousResponseId: string | null = $state(null);
 
-  let enabledTools: Tool[] = $state([
-    {
-      name: "image",
-      active: false,
-    },
-  ]);
+  let enabledTools: Tool[] = $state([]);
 
   $effect(() => {
-    if ($sharedMessageHistory.length > 0 || isFetching) {
-      isDisableSelectModel = true;
+    isDisableSelectModel = $sharedMessageHistory.length > 0 || isFetching;
+    isDisableFileInput = selectedModel === PromptModel.Perplexity;
+
+    if ([PromptModel.OpenAIWithTools, PromptModel.OpenAIWithImageTools].includes(selectedModel)) {
+      enabledTools = [
+        {
+          name: "image",
+          active: false,
+        },
+      ];
     } else {
-      isDisableSelectModel = false;
+      enabledTools = [];
     }
   });
 
@@ -63,14 +66,6 @@
   let isDisableFileInput = $state(
     apiProvider?.name == PromptModel.Perplexity,
   );
-
-  $effect(() => {
-    if (selectedModel == PromptModel.Perplexity) {
-      isDisableFileInput = true;
-    } else {
-      isDisableFileInput = false;
-    }
-  });
 
   onDestroy(function () {
     $sharedMessageHistory = [];
