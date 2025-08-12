@@ -28,8 +28,9 @@
   let currentMessage = $state("");
   let currentStreamingImageUrl: string = $state("");
 
-  let isFetching = $state(false);
-  let isGenerating = $state(false);
+  let isFetching: boolean = $state(false);
+  let isGenerating: boolean = $state(false);
+  let previousResponseId: string | null = $state(null);
 
   $effect(() => {
     if ($sharedMessageHistory.length > 0 || isFetching) {
@@ -55,8 +56,12 @@
   });
 
   onDestroy(function () {
-    // $sharedMessageHistory = [];
+    $sharedMessageHistory = [];
   });
+
+  $inspect(input);
+  $inspect($sharedMessageHistory);
+  $inspect(isFetching);
 
   async function submitForm() {
     const fileDataList = await Promise.all(
@@ -168,34 +173,6 @@
 
           if (done) {
             console.log("✅ Stream completed");
-
-            // Process any remaining data in buffer
-            if (buffer.trim()) {
-              const trimmedLine = buffer.trim();
-              if (trimmedLine.startsWith("data: ")) {
-                try {
-                  const jsonStr = trimmedLine.substring(6).trim();
-                  if (
-                    jsonStr &&
-                    jsonStr !== "[DONE]" &&
-                    jsonStr.startsWith("{")
-                  ) {
-                    const data = JSON.parse(jsonStr);
-                    console.log(
-                      "📥 Processing final buffered data:",
-                      data.type,
-                    );
-                    // Handle the final data if needed
-                  }
-                } catch (parseError) {
-                  console.warn(
-                    "Failed to parse final buffer data:",
-                    parseError,
-                  );
-                }
-              }
-            }
-
             break;
           }
 
@@ -357,7 +334,7 @@
                     currentStreamingImageUrl = "";
 
                     // Reset states
-                    setPreviousResponseId(promptId, data.responseId);
+                    previousResponseId = data.responseId;
                     isFetching = false;
                     isGenerating = false;
                     return data;
@@ -469,7 +446,7 @@
 
     <MessageList
       {currentMessage}
-      messages={sharedMessageHistory}
+      messages={$sharedMessageHistory}
       currentImageUrl={currentStreamingImageUrl}
       {isFetching}
       {isGenerating}
