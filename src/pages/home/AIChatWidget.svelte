@@ -412,7 +412,6 @@
 
   function startNewChat() {
     input = "";
-    output = "";
     files = [];
     isFetching = false;
     isGenerating = false;
