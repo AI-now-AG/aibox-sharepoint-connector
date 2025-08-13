@@ -15,7 +15,7 @@
     formatMarkdown,
     stripHtmlFormatting,
   } from "$utils/common";
-  import ModelInput from "$pages/prompt-library/prompts/ModelInput.svelte";
+  import AIModelDropdown from "./AIModelDropdown.svelte";
   import { tenant } from "$stores";
   import { useTranslations } from "$i18n/utils";
   import { addToast } from "$stores/toast";
@@ -444,12 +444,11 @@
 
     <div class="flex items-end justify-end z-10">
       <div>
-        <ModelInput
-          label={t("home.model-selection-label")}
+        <AIModelDropdown
+          label={t("home.model-label")}
           bind:selectedModel
           bind:disabled={isDisableSelectModel}
           labelClasses={"text-sm"}
-          excludePromptOptions={true}
         />
       </div>
     </div>
