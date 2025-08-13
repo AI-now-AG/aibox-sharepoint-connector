@@ -1,10 +1,9 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { useTranslations } from "$i18n/utils";
-  import { capitalizeFirst } from "$utils/common";
   import { tenant } from "$stores";
-  import { PromptModel } from "$types/PromptModel";
   import { ApiKeyProvider } from "$types/TenantFeature";
+  import { PromptModel } from "$types/PromptModel";
   import Dropdown, { type Option } from "$components/form/Dropdown.svelte";
 
   const t = useTranslations();
