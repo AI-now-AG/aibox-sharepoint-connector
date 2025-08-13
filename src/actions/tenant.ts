@@ -41,6 +41,9 @@ const TenantInputParamsSchema = z.object({
   api_key_providers: z.array(TextFeatureSchema).optional(),
   openai_chat_model: z.string().optional().default('gpt-4o'),
   openai_api_key: z.string().optional(),
+  openai_gpt5_chat_model: z.string().optional().default('gpt-5'),
+  openai_gpt5_reasoning_effort: z.string().optional().default('low'),
+  openai_gpt5_api_key: z.string().optional(),
   azure_openai_api_key: z.string().optional(),
   azure_openai_endpoint: z.string().optional(),
   azure_openai_instance_name: z.string().optional(),
@@ -68,6 +71,7 @@ const TenantInputParamsSchema = z.object({
 
 const TenanKeyEncryptSchema = z.object({
   openai_api_key: z.string().optional(),
+  openai_gpt5_api_key: z.string().optional(),
   azure_openai_api_key: z.string().optional(),
   perplexity_api_key: z.string().optional(),
   speech_api_key: z.string().optional(),
@@ -392,6 +396,7 @@ export const tenant = {
     handler: async (input) => {
       const keysToEncrypt = [
         "openai_api_key",
+        "openai_gpt5_api_key",
         "azure_openai_api_key",
         "perplexity_api_key",
         "speech_api_key",
