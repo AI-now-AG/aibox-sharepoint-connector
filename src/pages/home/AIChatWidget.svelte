@@ -9,6 +9,7 @@
   } from "$components/chat-ui/MessageInput.svelte";
   import MessageList from "$components/chat-ui/MessageList.svelte";
   import { readFileContent } from "$utils/fileReader";
+  import { ToolName } from "$types/AIResponse";
   import { PromptModel } from "$types/PromptModel";
   import {
     formatMarkdown,
@@ -128,14 +129,15 @@
 
     const isOpenAIResponseModel = [PromptModel.OpenAIWithTools, PromptModel.OpenAIWithImageTools].includes(selectedModel);
     const provider = isOpenAIResponseModel ? "openai-response" : selectedModel;
+    const hasImageTool = enabledTools.some(tool => tool.name === ToolName.Image && tool.active);
     const requestBody = {
       tenantId: $tenant?._id?.toString(),
       provider, //"openai-response",
       prompt: input,
       stream: true,
-      ...(enabledTools.length && { tool: "image_generation" }),
+      ...(hasImageTool && { tool: "image_generation" }),
       fileUrls: fileUrls,
-      ...(enabledTools.length && { imageGenerationOptions: {
+      ...(hasImageTool && { imageGenerationOptions: {
         outputFormat: "png",
         quality: "high",
         size: "1024x1024",
