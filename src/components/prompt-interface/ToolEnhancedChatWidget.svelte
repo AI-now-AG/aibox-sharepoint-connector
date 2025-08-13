@@ -137,30 +137,6 @@
     }
 
     await callStreamingAPI(uploadedFileUrls as string[] || []);
-    // const response = await fetch(
-    //   "/.netlify/functions/createResponse-background",
-    //   {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify(params),
-    //   },
-    // );
-
-    // if (response.status !== 202) {
-    //   addToast({
-    //     message: "Failed to start image generation.",
-    //     type: "error",
-    //   });
-    //   isFetching = false;
-    //   return;
-    // }
-
-    // // start polling requests
-    // setTimeout(async () => {
-    //   await pollResponseStatus(uniqueId);
-    // }, 2000);
   }
 
   async function callStreamingAPI(fileUrls: string[] = []) {
@@ -469,90 +445,6 @@
       console.error("❌ Request failed:", error);
       throw error;
     }
-  }
-
-  async function pollResponseStatus(
-    uniqueId: string,
-    maxRetries = 100,
-    delayMs = 2000,
-  ) {
-    for (let attempt = 0; attempt < maxRetries; attempt++) {
-      const res = await fetch(
-        `/.netlify/functions/checkResponseStatus?uid=${uniqueId}`,
-      );
-      const data = await res.json();
-
-      if (data.status === ResponseStatus.InProgress) {
-        const isGenerated =
-          data.tools.find((item: any) => item.name === ToolName.Image)
-            ?.is_generated ?? true;
-        isGenerating = !isGenerated;
-      }
-
-      if (data.status === ResponseStatus.Completed) {
-        const imageUrl =
-          data.tools.find((item: any) => item.name === ToolName.Image)
-            ?.image_url || "";
-
-        // store messages
-        const newUserMessage: MessageHistory = {
-          role: MessageRole.User,
-          content: prompt,
-        };
-        addMessageToHistory(groupId, promptId, newUserMessage);
-
-        const newAssistentMessage = {
-          role: MessageRole.Assistant,
-          content: formatMarkdown(data.outputText ?? ""),
-          imageUrl,
-        };
-        addMessageToHistory(groupId, promptId, newAssistentMessage);
-
-        // scroll to latest user input
-        setTimeout(() => {
-          scrollIntoView();
-        }, 1000);
-
-        // clear input text & files
-        prompt = "";
-        files = [];
-        currentMessage = "";
-        currentStreamingImageUrl = "";
-
-        // reset states
-        setPreviousResponseId(promptId, data.responseId);
-        isFetching = false;
-        isGenerating = false;
-        return;
-      } else if (data.status === ResponseStatus.Failed) {
-        const errorMessage = data.error?.message || "Image generation failed.";
-        const newAssistentMessage = {
-          role: MessageRole.Assistant,
-          content: errorMessage,
-        };
-        addMessageToHistory(groupId, promptId, newAssistentMessage);
-        addToast({
-          message: errorMessage,
-          type: "error",
-        });
-
-        currentMessage = "";
-        currentStreamingImageUrl = "";
-        isFetching = false;
-        isGenerating = false;
-        return;
-      }
-
-      await new Promise((resolve) => setTimeout(resolve, delayMs));
-    }
-
-    addToast({
-      message: "Image generation timed out.",
-      type: "error",
-    });
-    currentMessage = "";
-    currentStreamingImageUrl = "";
-    isFetching = false;
   }
 
   function scrollIntoView() {
