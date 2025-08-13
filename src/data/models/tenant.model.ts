@@ -50,6 +50,7 @@ const TenantSchema = z.object({
   theme: z.nativeEnum(TenantTheme).default(TenantTheme.Light),
   primary_color: z.string().nullish(),
   api_key_providers: z.array(TextFeatureSchema).optional(),
+  openai_chat_model: z.string().nullish().default('gpt-4o'),
   openai_api_key: z.string().nullish().default(null),
   azure_openai_api_key: z.string().nullish().default(null),
   azure_openai_endpoint: z.string().nullish().default(null),

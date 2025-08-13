@@ -39,6 +39,7 @@ const TenantInputParamsSchema = z.object({
   theme: z.nativeEnum(TenantTheme),
   primary_color: z.string().optional(),
   api_key_providers: z.array(TextFeatureSchema).optional(),
+  openai_chat_model: z.string().optional().default('gpt-4o'),
   openai_api_key: z.string().optional(),
   azure_openai_api_key: z.string().optional(),
   azure_openai_endpoint: z.string().optional(),

@@ -297,6 +297,9 @@
   if (tenantData.theme) {
     selectedThemes = themes.find((item) => item.value === tenantData.theme);
   }
+  if (tenantData && !tenantData.openai_chat_model) {
+    tenantData.openai_chat_model = "gpt-4o";
+  }
 
   function togglePassword(field: HTMLInputElement) {
     if (field) {
@@ -582,8 +585,8 @@
             perplexity_api_key: tenantData.perplexity_api_key,
             speech_api_key: tenantData.speech_api_key,
             elevenLabs_api_key: tenantData.elevenLabs_api_key,
-            fal_ai_api_key: tenantData.fal_ai_api_key, 
-            anthropic_api_key: tenantData.anthropic_api_key, 
+            fal_ai_api_key: tenantData.fal_ai_api_key,
+            anthropic_api_key: tenantData.anthropic_api_key,
           });
         if (encryptKeysError) {
           showAlert(encryptKeysError?.toString());
@@ -1030,16 +1033,13 @@
         <div class="collapse-content">
           <div class="grid grid-cols-2 gap-4 mx-8">
             <div class="w-full">
-              <span class="mb-2 text-base-content font-medium text-sm"
-                >{t("tenant.model.name")}</span
-              >
-              <input
-                type="text"
-                class="input input-bordered mt-2 w-full"
-                placeholder={""}
-                use:trimInput
-                value="gpt-4o"
-                disabled
+              <Dropdown
+                label={`${t("tenant.model.name")}*`}
+                options={[
+                  { title: "gpt-4o", value: "gpt-4o" },
+                  { title: "gpt-5", value: "gpt-5" },
+                ]}
+                bind:value={tenantData.openai_chat_model}
               />
             </div>
             <div class="w-full">
