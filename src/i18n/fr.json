@@ -467,5 +467,6 @@
   "prompt-execution.models.openai-with-tools": "Text & Tools (gpt-4o)",
   "prompt-execution.models.openai-with-image-tools": "Image (gpt-4o)",
   "tenant.claude.name": "Claude",
-  "prompt-execution.models.claude": "Text (Claude ${model})"
+  "prompt-execution.models.claude": "Text (Claude ${model})",
+  "home.model-selection-label": "AI Models"
 }

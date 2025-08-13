@@ -445,7 +445,7 @@
     <div class="flex items-end justify-end z-10">
       <div>
         <ModelInput
-          label={t("prompt.text-model")}
+          label={t("home.model-selection-label")}
           bind:selectedModel
           bind:disabled={isDisableSelectModel}
           labelClasses={"text-sm"}
