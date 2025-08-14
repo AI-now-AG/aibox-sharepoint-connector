@@ -437,6 +437,7 @@
           bind:files
           {isFetching}
           bind:tools={enabledTools}
+          showAttachmentButton={!isDisableFileInput}
           onsend={submitForm}
         />
       </div>

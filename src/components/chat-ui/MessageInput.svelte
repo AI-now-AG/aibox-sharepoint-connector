@@ -19,6 +19,7 @@
     files?: File[];
     isFetching?: boolean;
     stickyFooter?: boolean;
+    showAttachmentButton?: boolean;
     tools?: Tool[];
     onsend: Function;
   }
@@ -28,6 +29,7 @@
     files = $bindable([]),
     isFetching = false,
     stickyFooter = false,
+    showAttachmentButton = true,
     tools = $bindable([]),
     onsend,
   }: Props = $props();
@@ -89,20 +91,22 @@
 
   <div class="grid grid-cols-[1fr_min-content] gap-4">
     <div class="p-2 flex flex-row gap-2">
-      <button
-        class="btn btn-outline h-auto w-auto p-1 min-h-0 border-base-content/30"
-        onclick={() => {
-          fileModal?.showModal();
-        }}
-        disabled={isFetching}
-      >
-        {@html svgIcons.attachment}
-        {#if files.length > 0}
-          <div class="badge badge-sm badge-neutral font-normal">
-            {files.length}
-          </div>
-        {/if}
-      </button>
+      {#if showAttachmentButton}
+        <button
+          class="btn btn-outline h-auto w-auto p-1 min-h-0 border-base-content/30"
+          onclick={() => {
+            fileModal?.showModal();
+          }}
+          disabled={isFetching}
+        >
+          {@html svgIcons.attachment}
+          {#if files.length > 0}
+            <div class="badge badge-sm badge-neutral font-normal">
+              {files.length}
+            </div>
+          {/if}
+        </button>
+      {/if}
       {#each tools as tool, index}
         <button
           class={`btn btn-outline h-auto w-[30] p-1 border-base-content/30
