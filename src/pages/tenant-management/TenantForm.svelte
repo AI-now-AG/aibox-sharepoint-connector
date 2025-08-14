@@ -29,7 +29,6 @@
   import Dropdown from "$components/form/Dropdown.svelte";
   import AudioAddonsDropdown from "./AudioAddonsDropdown.svelte";
   import ThemeItem from "./ThemeItem.svelte";
-  import RadioButtons from "$components/RadioButtons.svelte";
 
   const t = useTranslations();
   let loading = $state(false);
@@ -1200,11 +1199,7 @@
                 />
               </label>
             </div>
-          </div>
-          <div class="grid grid-cols-2 gap-4 mx-8 mt-4">
-            <RadioButtons />
-          </div>
-          <div class="grid grid-cols-2 gap-4 mx-8 mt-4">
+
             <div class="grid grid-cols-2 gap-4">
               <label class="flex flex-row items-center gap-2">
                 <input
