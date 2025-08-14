@@ -13,6 +13,7 @@
   import { PromptModel } from "$types/PromptModel";
   import {
     formatMarkdown,
+    formatCitations,
     stripHtmlFormatting,
   } from "$utils/common";
   import AIModelDropdown from "./AIModelDropdown.svelte";
@@ -36,8 +37,9 @@
   let selectedModel: PromptModel = $state(PromptModel.OpenAIWithTools);
   let isDisableSelectModel: boolean = $state(false);
 
-  let currentMessage = $state("");
+  let currentMessage: string = $state("");
   let currentStreamingImageUrl: string = $state("");
+  let currentCitations: string[] = $state([]);
 
   let isFetching: boolean = $state(false);
   let isGenerating: boolean = $state(false);
@@ -67,6 +69,8 @@
   let isDisableFileInput = $state(
     apiProvider?.name == PromptModel.Perplexity,
   );
+
+  $inspect(currentCitations);
 
   onDestroy(function () {
     $sharedMessageHistory = [];
@@ -231,6 +235,13 @@
                     }
                     break;
 
+                  case "citations":
+                    // Store citations but don't send them yet to avoid interrupting content flow
+                    if (data.citations && data.citations.length > 0) {
+                      currentCitations = data.citations;
+                    }
+                    break;
+
                   case "images":
                     console.log(
                       "🖼️ Images generated:",
@@ -321,15 +332,19 @@
                       newUserMessage,
                     ]);
 
-                    const newAssistentMessage: Message = {
+                    let finalContent = formatMarkdown(responseText);
+                    if (currentCitations.length > 0) {
+                      finalContent = formatCitations(finalContent, currentCitations);
+                    }
+                    const newAssistantMessage: Message = {
                       role: MessageRole.Assistant,
-                      content: formatMarkdown(responseText),
+                      content: finalContent,
                       rawData: stripHtmlFormatting(responseText),
                       imageUrl: finalImageUrl,
                     };
                     sharedMessageHistory.update((messages) => [
                       ...messages,
-                      newAssistentMessage,
+                      newAssistantMessage,
                     ]);
 
                     // Scroll to latest user input
