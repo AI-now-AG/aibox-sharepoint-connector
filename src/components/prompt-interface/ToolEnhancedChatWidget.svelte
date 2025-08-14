@@ -47,6 +47,18 @@
     $messageHistories[promptId] || getMessageHistory(promptId) || [],
   );
 
+  function isGpt5Default() {
+    const aiProviders = $tenant?.api_key_providers ?? [];
+    const activeDefaultProvider = aiProviders.find(
+      (item) => item.active === true && item.default === true,
+    );
+
+    if (activeDefaultProvider?.name === ApiKeyProvider.OpenAIGtp5) {
+      return true;
+    }
+    return false;
+  }
+
   let enabledTools = $derived.by(() => {
     const tools: Tool[] = [];
 
@@ -85,6 +97,13 @@
         break;
     }
 
+    if (!currentPrompt?.model && isGpt5Default()) {
+      tools.push({
+        name: "image",
+        active: false,
+      });
+    }
+
     return tools;
   });
 
@@ -114,18 +133,6 @@
       }
     }
   });
-
-  function isGpt5Default() {
-    const aiProviders = $tenant?.api_key_providers ?? [];
-    const activeDefaultProvider = aiProviders.find(
-      (item) => item.active === true && item.default === true,
-    );
-
-    if (activeDefaultProvider?.name === ApiKeyProvider.OpenAIGtp5) {
-      return true;
-    }
-    return false;
-  }
 
   async function submitForm() {
     uniqueId = uuidv4();
