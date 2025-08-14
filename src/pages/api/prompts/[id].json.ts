@@ -68,7 +68,7 @@ const isPerplexityProvider = (ctx: any, model?: string | null): boolean => {
   return provider === ApiKeyProvider.Perplexity;
 };
 
-// Perplexity streaming function similar to callStreamingAPI in ToolEnhancedChatWidget
+// Perplexity streaming function similar to callStreamingAPI in StreamingChatWidget
 const callPerplexityStreamingAPI = async (
   ctx: any,
   prompt: any,
@@ -82,7 +82,7 @@ const callPerplexityStreamingAPI = async (
     const protocol = ctx.request.headers.get("x-forwarded-proto") || "http";
     const previewUrl = `${protocol}://${host}`;
 
-    // Get API configuration like in ToolEnhancedChatWidget
+    // Get API configuration like in StreamingChatWidget
     const configResponse = await fetch(
       `${previewUrl}/.netlify/functions/getTranscriptionConfig`,
       {

@@ -1,30 +1,40 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
-  import { slide } from "svelte/transition";
-  import { type Message, MessageRole } from "$types/MessageHistory";
-  import { sharedMessageHistory } from "$stores/chatHistory";
-  import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
-  import MessageInput, {
-    type Tool,
-  } from "$components/chat-ui/MessageInput.svelte";
-  import MessageList from "$components/chat-ui/MessageList.svelte";
-  import { readFileContent } from "$utils/fileReader";
-  import { ToolName } from "$types/AIResponse";
+  import { v4 as uuidv4 } from "uuid";
+  import {
+    messageHistories,
+    addMessageToHistory,
+    getMessageHistory,
+    clearMessageHistory,
+    previousResponseIds,
+    setPreviousResponseId,
+    getPreviousResponseId,
+  } from "$components/prompt-interface/components/stores/messageHistoryStore";
+  import { ResponseStatus, ToolName } from "$types/AIResponse";
   import { PromptModel } from "$types/PromptModel";
+  import { addToast } from "$stores/toast";
+  import {
+    MessageRole,
+    type Message,
+    type MessageHistory,
+  } from "$types/MessageHistory";
+  import { readFileContent } from "$utils/fileReader";
   import {
     formatMarkdown,
     parseChunkCitations,
     formatCitations,
     stripHtmlFormatting,
   } from "$utils/common";
-  import AIModelDropdown from "./AIModelDropdown.svelte";
+  import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
+  import MessageInput, {
+    type Tool,
+  } from "$components/chat-ui/MessageInput.svelte";
+  import MessageList from "$components/chat-ui/MessageList.svelte";
   import { tenant } from "$stores";
   import { useTranslations } from "$i18n/utils";
-  import { addToast } from "$stores/toast";
 
   const t = useTranslations();
 
-  // === Types and Interfaces ===
   interface StreamingState {
     messageContent: string;
     citations: any[];
@@ -41,58 +51,84 @@
     tenantId: string;
     provider: string;
     prompt: string;
+    promptId: string;
     stream: boolean;
     tool?: string;
     fileUrls: string[];
     imageGenerationOptions?: any;
     previousResponseId?: string | null;
-    messageHistory?: Message[];
+    messageHistory?: MessageHistory;
   }
 
   interface Props {
-    apiKeyProviders: any;
+    promptId: string;
+    groupId: string;
+    currentPrompt: any;
+    isFetching: boolean;
     folderName?: string;
   }
-  let { apiKeyProviders = [], folderName }: Props = $props();
+  let {
+    promptId,
+    groupId,
+    currentPrompt,
+    isFetching = $bindable(false),
+    folderName,
+  }: Props = $props();
 
-  let input: string = $state("");
-  let files: File[] = $state([]);
-  let selectedModel: PromptModel = $state(PromptModel.OpenAIWithTools);
-  let isDisableSelectModel: boolean = $state(false);
+  // === State Management ===
   let currentMessage = $state("");
+  let currentMessageHistory = $derived(
+    $messageHistories[promptId] || getMessageHistory(promptId) || [],
+  );
+  let uniqueId: string = $state("");
+  let prompt: string = $state("");
+  let files: File[] = $state([]);
   let currentStreamingImageUrl: string = $state("");
-  let isFetching: boolean = $state(false);
   let isGenerating: boolean = $state(false);
-  let previousResponseId: string | null = $state(null);
-  let enabledTools: Tool[] = $state([]);
 
-  const apiProvider = apiKeyProviders?.find((item: any) => {
-    return item.default && item.active;
-  });
-  let isDisableFileInput = $state(apiProvider?.name == PromptModel.Perplexity);
+  // === Derived State ===
+  let enabledTools = $derived.by(() => {
+    const tools: Tool[] = [];
 
-  $effect(() => {
-    isDisableSelectModel = $sharedMessageHistory.length > 0 || isFetching;
-    isDisableFileInput = selectedModel === PromptModel.Perplexity;
-
-    if (
-      [PromptModel.OpenAIWithTools, PromptModel.OpenAIWithImageTools].includes(
-        selectedModel,
-      )
-    ) {
-      enabledTools = [
-        {
+    switch (currentPrompt?.model) {
+      case PromptModel.OpenAIWithTools:
+        tools.push({
           name: "image",
           active: false,
-        },
-      ];
-    } else {
-      enabledTools = [];
+        });
+        break;
+      case PromptModel.OpenAIWithImageTools:
+        tools.push({
+          name: "image",
+          active: true,
+          disabled: true,
+        });
+        break;
+    }
+
+    return tools;
+  });
+
+  const tenantId = $tenant?._id?.toString();
+  let previousResponseId: string | null = $derived(
+    $previousResponseIds[promptId] ?? getPreviousResponseId(promptId),
+  );
+
+  // === Effects ===
+  $effect(() => {
+    if (currentPrompt) {
+      if (previousResponseId) {
+        prompt = "";
+        files = [];
+      } else {
+        prompt = currentPrompt?.predefined_input ?? "";
+        files = [];
+      }
     }
   });
 
   onDestroy(function () {
-    $sharedMessageHistory = [];
+    // Cleanup if needed
   });
 
   // === API Configuration ===
@@ -121,22 +157,23 @@
     const isOpenAIResponseModel = [
       PromptModel.OpenAIWithTools,
       PromptModel.OpenAIWithImageTools,
-    ].includes(selectedModel);
-    const provider = isOpenAIResponseModel ? "openai-response" : selectedModel;
-    const hasImageTool = enabledTools.some(
-      (tool) => tool.name === ToolName.Image && tool.active,
-    );
+    ].includes(currentPrompt?.model);
+    
+    const provider = isOpenAIResponseModel
+      ? "openai-response"
+      : currentPrompt?.model;
 
     const payload: RequestPayload = {
-      tenantId: $tenant?._id?.toString()!,
+      tenantId: tenantId!,
       provider,
-      prompt: input,
+      prompt,
+      promptId,
       stream: true,
       fileUrls,
     };
 
     // Add conditional properties
-    if (hasImageTool) {
+    if (enabledTools.length) {
       payload.tool = "image_generation";
       payload.imageGenerationOptions = {
         outputFormat: "png",
@@ -149,7 +186,7 @@
     if (isOpenAIResponseModel) {
       payload.previousResponseId = previousResponseId;
     } else {
-      payload.messageHistory = $sharedMessageHistory;
+      payload.messageHistory = currentMessageHistory;
     }
 
     return payload;
@@ -158,11 +195,11 @@
   // === Image Processing Utilities ===
   function formatImageUrl(imageData: string): string {
     if (!imageData) return "";
-
+    
     if (imageData.startsWith("data:") || imageData.startsWith("http")) {
       return imageData;
     }
-
+    
     return `data:image/png;base64,${imageData}`;
   }
 
@@ -175,8 +212,9 @@
     console.log(`🚀 Started with ${data.provider} using ${data.model}`);
   }
 
-  function handleChunkEvent(data: any): void {
+  function handleChunkEvent(data: any, state: StreamingState): void {
     if (data.content && typeof data.content === "string") {
+      state.messageContent += data.content;
       currentMessage += data.content;
       currentMessage = formatMarkdown(currentMessage);
     }
@@ -191,11 +229,11 @@
 
   function handleImagesEvent(data: any, state: StreamingState): void {
     console.log("🖼️ Images generated:", data.images?.length || 0);
-
+    
     if (data.images && data.images.length > 0) {
       const firstImage = data.images[0];
       const imageData = extractImageFromData(firstImage);
-
+      
       if (imageData) {
         const formattedUrl = formatImageUrl(imageData);
         state.currentImageUrl = formattedUrl;
@@ -206,7 +244,7 @@
 
   function handleToolOutputsEvent(data: any, state: StreamingState): void {
     console.log("🔧 Tool outputs received:", data.outputs.length);
-
+    
     data.outputs.forEach((output: any) => {
       if (output.image || output.result) {
         const imageData = extractImageFromData(output);
@@ -219,11 +257,7 @@
     });
   }
 
-  function handleCompleteEvent(
-    data: any,
-    state: StreamingState,
-    requestBody: RequestPayload,
-  ): any {
+  function handleCompleteEvent(data: any, state: StreamingState, requestBody: RequestPayload): any {
     console.log(`✅ Complete! Processing time: ${data.processingTimeMs}ms`);
     if (data.responseId) {
       console.log(`Response ID: ${data.responseId}`);
@@ -231,60 +265,55 @@
 
     const finalImageUrl = formatImageUrl(
       state.currentImageUrl ||
-        data.images?.[0]?.result ||
-        data.images?.[0]?.image ||
-        "",
+      data.images?.[0]?.result ||
+      data.images?.[0]?.image ||
+      ""
     );
 
-    const responseText =
-      data.fullResponse ?? data.outputText ?? state.messageContent ?? "";
+    const responseText = data.fullResponse ?? data.outputText ?? state.messageContent ?? "";
 
     // Add user message to history
     const newUserMessage: Message = {
       role: MessageRole.User,
       content: requestBody.prompt,
     };
-    sharedMessageHistory.update((messages) => [...messages, newUserMessage]);
+    addMessageToHistory(groupId, promptId, newUserMessage);
 
     // Handle assistant message with citations
     if (state.citations.length > 0 && !state.isSentCitations) {
-      addAssistantMessageWithCitations(
-        responseText,
-        state.citations,
-        finalImageUrl,
-      );
+      addAssistantMessageWithCitations(responseText, state.citations, finalImageUrl);
     } else {
       addAssistantMessage(responseText, finalImageUrl);
     }
 
     // Clean up and reset states
     resetUIState();
-    previousResponseId = data.responseId;
-
+    setPreviousResponseId(promptId, data.responseId);
+    
     // Scroll to latest message
     setTimeout(() => scrollIntoView(), 1000);
-
+    
     return data;
   }
 
   function handleErrorEvent(data: any, requestBody: RequestPayload): void {
     console.error(`❌ Stream error: ${data.error}`);
-
+    
     const errorMessage = data.error || "Image generation failed.";
-
+    
     // Add user message to history
     const errorUserMessage: Message = {
       role: MessageRole.User,
       content: requestBody.prompt,
     };
-    sharedMessageHistory.update((messages) => [...messages, errorUserMessage]);
+    addMessageToHistory(groupId, promptId, errorUserMessage);
 
     const failedMessage: Message = {
       role: MessageRole.Assistant,
       content: errorMessage,
     };
-    sharedMessageHistory.update((messages) => [...messages, failedMessage]);
-
+    addMessageToHistory(groupId, promptId, failedMessage);
+    
     addToast({
       message: errorMessage,
       type: "error",
@@ -295,16 +324,12 @@
   }
 
   // === Message History Utilities ===
-  function addAssistantMessageWithCitations(
-    responseText: string,
-    citations: any[],
-    imageUrl: string,
-  ): void {
+  function addAssistantMessageWithCitations(responseText: string, citations: any[], imageUrl: string): void {
     console.log("📚 Citations sent:", citations);
-
+    
     const citationsJson = JSON.stringify({ citations });
     const parsedChunk: any = parseChunkCitations(citationsJson);
-
+    
     if (parsedChunk.citations) {
       citations = parsedChunk.citations;
     }
@@ -313,7 +338,7 @@
       .split("\n")
       .map((line) => formatMarkdown(line))
       .join("\n");
-
+    
     currentMessage = formatCitations(formattedChunk, citations);
 
     const newAssistantMessage: Message = {
@@ -322,11 +347,8 @@
       rawData: stripHtmlFormatting(currentMessage),
       imageUrl,
     };
-
-    sharedMessageHistory.update((messages) => [
-      ...messages,
-      newAssistantMessage,
-    ]);
+    
+    addMessageToHistory(groupId, promptId, newAssistantMessage);
   }
 
   function addAssistantMessage(responseText: string, imageUrl: string): void {
@@ -336,11 +358,8 @@
       rawData: stripHtmlFormatting(responseText),
       imageUrl,
     };
-
-    sharedMessageHistory.update((messages) => [
-      ...messages,
-      newAssistantMessage,
-    ]);
+    
+    addMessageToHistory(groupId, promptId, newAssistantMessage);
   }
 
   // === State Management Utilities ===
@@ -350,7 +369,7 @@
   }
 
   function resetUIState(): void {
-    input = "";
+    prompt = "";
     files = [];
     currentMessage = "";
     currentStreamingImageUrl = "";
@@ -366,7 +385,7 @@
     }
 
     const jsonStr = trimmedLine.substring(6).trim();
-
+    
     // Skip empty data lines or completion markers
     if (!jsonStr || jsonStr === "[DONE]" || jsonStr === "") {
       return null;
@@ -384,19 +403,14 @@
     }
   }
 
-  function processStreamEvent(
-    data: any,
-    state: StreamingState,
-    requestBody: RequestPayload,
-  ): any {
+  function processStreamEvent(data: any, state: StreamingState, requestBody: RequestPayload): any {
     switch (data.type) {
       case "start":
         handleStartEvent(data);
         break;
 
       case "chunk":
-        handleChunkEvent(data);
-        state.messageContent += data.content || "";
+        handleChunkEvent(data, state);
         break;
 
       case "citations":
@@ -421,17 +435,14 @@
       default:
         console.warn(`Unknown event type: ${data.type}`);
     }
-
+    
     return null;
   }
 
-  async function processStream(
-    reader: ReadableStreamDefaultReader,
-    requestBody: RequestPayload,
-  ): Promise<any> {
+  async function processStream(reader: ReadableStreamDefaultReader, requestBody: RequestPayload): Promise<any> {
     const decoder = new TextDecoder();
     let buffer = "";
-
+    
     const state: StreamingState = {
       messageContent: "",
       citations: [],
@@ -444,6 +455,15 @@
 
       if (done) {
         console.log("✅ Stream completed");
+        
+        // Process any remaining data in buffer
+        if (buffer.trim()) {
+          const data = parseStreamLine(buffer);
+          if (data) {
+            console.log("📥 Processing final buffered data:", data.type);
+            processStreamEvent(data, state, requestBody);
+          }
+        }
         break;
       }
 
@@ -470,12 +490,18 @@
   async function callStreamingAPI(fileUrls: string[] = []) {
     try {
       resetStreamingState();
-
+      
       // Get API configuration
       const config = await getAPIConfiguration();
-
+      
       // Build request payload
       const requestBody = buildRequestPayload(fileUrls);
+      
+      // Check for image generation tool
+      const hasImageTool = enabledTools.some(
+        (tool) => tool.name === ToolName.Image && tool.active,
+      );
+      isGenerating = hasImageTool;
 
       // Make API request
       const response = await fetch(config.apiUrl, {
@@ -494,13 +520,13 @@
       // Process streaming response
       if (response.headers.get("content-type")?.includes("text/event-stream")) {
         console.log("📡 Streaming response received");
-
+        
         const reader = response.body?.getReader();
         if (!reader) {
           throw new Error("No reader available");
         }
 
-        input = ""; // Reset prompt for new request
+        prompt = ""; // Reset prompt for new request
         return await processStream(reader, requestBody);
       }
     } catch (error) {
@@ -512,6 +538,8 @@
 
   // === File Upload Handler ===
   async function submitForm() {
+    uniqueId = uuidv4();
+
     const fileDataList = await Promise.all(
       files.map(async (file) => ({
         name: file.name,
@@ -534,7 +562,7 @@
         },
         body: JSON.stringify({
           files: fileDataList,
-          folderName,
+          folderName: folderName,
         }),
       });
 
@@ -559,12 +587,8 @@
   }
 
   function startNewChat() {
-    input = "";
-    files = [];
-    isFetching = false;
-    isGenerating = false;
-    $sharedMessageHistory = [];
-
+    clearMessageHistory(promptId);
+    setPreviousResponseId(promptId, null);
     window.scrollTo({
       top: 0,
       behavior: "smooth",
@@ -572,74 +596,52 @@
   }
 </script>
 
-<div class="grid grid-cols-1 grid-rows-[1fr_min-content] h-full">
-  <div class="flex flex-col space-y-6">
-    {#if $sharedMessageHistory.length == 0}
-      <div
-        class="min-w-full form-wrapper"
-        in:slide={{ duration: 500, delay: 500 }}
-        out:slide={{ duration: 500 }}
-      >
-        <MessageInput
-          bind:input
-          bind:files
-          {isFetching}
-          bind:tools={enabledTools}
-          showAttachmentButton={!isDisableFileInput}
-          onsend={submitForm}
-        />
-      </div>
-    {/if}
+<!-- Output (Follow-Up) -->
+{#if currentMessageHistory.length > 0}
+  <MessageList
+    {currentMessage}
+    messages={currentMessageHistory}
+    currentImageUrl={currentStreamingImageUrl}
+    {isFetching}
+    {isGenerating}
+  />
+{/if}
 
-    <div class="flex items-end justify-end z-10">
-      <div>
-        <AIModelDropdown
-          label={t("home.model-label")}
-          bind:selectedModel
-          bind:disabled={isDisableSelectModel}
-          labelClasses={"text-sm"}
-        />
-      </div>
+<!-- Prompt Textarea -->
+<div
+  class={`${currentMessageHistory.length > 0 ? "sticky bottom-0 bg-base-200" : ""}`}
+>
+  {#if currentMessageHistory.length > 0}
+    <ScrollToBottom />
+  {/if}
+  {#if currentMessageHistory.length > 0}
+    <div class="my-4">
+      <button
+        onclick={startNewChat}
+        class="btn btn-active btn-primary btn-sm px-8"
+        disabled={isGenerating || isFetching}
+      >
+        {t("home.new-chat")}
+      </button>
     </div>
-
-    <MessageList
-      {currentMessage}
-      messages={$sharedMessageHistory}
-      currentImageUrl={currentStreamingImageUrl}
-      {isFetching}
-      {isGenerating}
-    />
-
-    {#if $sharedMessageHistory.length > 0}
-      <div
-        class="sticky bottom-0 bg-base-200"
-        transition:slide={{ duration: 500 }}
-      >
-        <div class="my-4">
-          <button
-            onclick={startNewChat}
-            class="btn btn-active btn-primary btn-sm px-8"
-            disabled={isFetching}
-          >
-            {t("home.new-chat")}
-          </button>
-        </div>
-        <ScrollToBottom />
-        <div
-          class="min-w-full form-wrapper"
-          in:slide={{ duration: 500, delay: 500 }}
-          out:slide={{ duration: 500 }}
-        >
-          <MessageInput
-            bind:input
-            bind:files
-            {isFetching}
-            bind:tools={enabledTools}
-            stickyFooter={true}
-            onsend={submitForm}
-          />
-        </div>
-      </div>
-    {/if}
-  </div>
+  {/if}
+  <MessageInput
+    bind:input={prompt}
+    bind:files
+    {isFetching}
+    stickyFooter={currentMessageHistory.length > 0}
+    bind:tools={enabledTools}
+    onsend={submitForm}
+  />
 </div>
+
+<!-- Output (Normal) -->
+{#if currentMessageHistory.length == 0}
+  <MessageList
+    {currentMessage}
+    currentImageUrl={currentStreamingImageUrl}
+    messages={currentMessageHistory}
+    {isFetching}
+    {isGenerating}
+  />
+{/if}
