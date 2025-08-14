@@ -125,10 +125,6 @@
           (item) => item.value == findTextProvider.provider,
         ) || providerValues[0];
     }
-
-    // isAudioToTextChecked = tenantData.included_features.some(
-    //   (item: any) => item.name == TenantFeature.AudioToText,
-    // );
   }
 
   let tenantAdminEmail = $state("");
@@ -232,24 +228,7 @@
 
   let selectedThemes: { title: string; value: string } | undefined = $state();
 
-  if (tenantData && tenantData.transcription_types?.length) {
-    //   isAzureAudioProEnabled = tenantData.transcription_types.some(
-    //     (item: any) =>
-    //       item === AudioCategory.AudioPro || item === AudioCategory.SubtitleLarge,
-    //   );
-  }
-
   if (tenantData) {
-    // const findTextProvider = tenantData.api_key_providers.find(
-    //   (item: any) => item.name == ApiKeyProvider.OpenAI,
-    // );
-    // if (findTextProvider) {
-    //   textSelectedProvider =
-    //     providerValues.find(
-    //       (item) => item.value == findTextProvider.provider,
-    //     ) || providerValues[0];
-    // }
-
     const { api_key_providers = [], included_features = [] } = tenantData;
 
     const findProvider = (provider: ApiKeyProvider) =>

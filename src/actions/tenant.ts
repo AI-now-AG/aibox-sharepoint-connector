@@ -417,9 +417,12 @@ export const tenant = {
   decryptApiKeys: defineAction({
     input: TenanKeyEncryptSchema,
     handler: async (input) => {
-      const { openai_api_key, azure_openai_api_key, speech_api_key } = input;
+      const { openai_api_key, openai_gpt5_api_key, azure_openai_api_key, speech_api_key } = input;
       if (openai_api_key) {
         input.openai_api_key = decrypt(openai_api_key);
+      }
+      if (openai_gpt5_api_key) {
+        input.openai_gpt5_api_key = decrypt(openai_gpt5_api_key);
       }
       if (azure_openai_api_key) {
         input.azure_openai_api_key = decrypt(azure_openai_api_key);
