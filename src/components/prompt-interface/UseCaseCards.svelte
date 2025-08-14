@@ -45,7 +45,7 @@
   let timeout: any = $state();
   let orderCards = $state(cards);
 
-  let activeModels: any = $state("");
+  let activeModels: any[] = $state([]);
   const getActiveModels = (): any[] => {
     const getModelLabel = (provider: any, defaultModelName: string) => {
       const providerModelMap: Record<string, string> = {
@@ -82,20 +82,30 @@
           return {
             provider: provider.name,
             modelName: getModelLabel(provider, defaultModelName),
-            isDefault: provider.isDefault,
+            default: provider.default,
           };
         }) || [];
     return models;
   };
 
-  const getModelName = (model: string) => {
-    for (let i = 0; i < activeModels.length; i++) {
-      const modelItem = activeModels[i];
-      if (model?.includes(modelItem?.provider)) {
-        return modelItem.modelName;
-      }
+  const getModelName = (model: string): string | undefined => {
+    if (model?.includes("openai-gpt-5")) {
+      const defaultModel = activeModels.find((m: any) =>
+        m.provider?.includes("openai-gpt-5"),
+      );
+      return defaultModel?.modelName || "gpt-5";
     }
-    return defaultModelName;
+    if (model?.includes("openai")) {
+      const defaultModel = activeModels.find((m: any) =>
+        m.provider?.includes("openai"),
+      );
+      return defaultModel?.modelName || "gpt-4o";
+    }
+    const matchingModel = activeModels.find((m: any) =>
+      model?.includes(m.provider),
+    );
+
+    return matchingModel?.modelName || defaultModelName;
   };
 
   // svelte-ignore state_referenced_locally
