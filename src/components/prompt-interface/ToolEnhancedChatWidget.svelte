@@ -221,6 +221,10 @@
       }),
       ...(isOpenAIResponseModel && { previousResponseId }),
       ...(!isOpenAIResponseModel && { messageHistory: currentMessageHistory }),
+      ...(isOpenAIGpt5ResponseModel && {
+        verbosity: currentPrompt?.reasoning_effort || "low",
+        reasoningEffort: currentPrompt?.verbosity || "low",
+      }),
     };
 
     try {
