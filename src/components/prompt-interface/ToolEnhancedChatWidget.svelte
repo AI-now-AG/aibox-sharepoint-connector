@@ -16,7 +16,6 @@
   import {
     MessageRole,
     type Message,
-    type MessageHistory,
   } from "$types/MessageHistory";
   import { readFileContent } from "$utils/fileReader";
   import { formatMarkdown, stripHtmlFormatting } from "$utils/common";
@@ -136,31 +135,7 @@
       uploadedFileUrls = uploadData.results;
     }
 
-    await callStreamingAPI(uploadedFileUrls as string[] || []);
-    // const response = await fetch(
-    //   "/.netlify/functions/createResponse-background",
-    //   {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify(params),
-    //   },
-    // );
-
-    // if (response.status !== 202) {
-    //   addToast({
-    //     message: "Failed to start image generation.",
-    //     type: "error",
-    //   });
-    //   isFetching = false;
-    //   return;
-    // }
-
-    // // start polling requests
-    // setTimeout(async () => {
-    //   await pollResponseStatus(uniqueId);
-    // }, 2000);
+    await callStreamingAPI(uploadedFileUrls as string[] || []); 
   }
 
   async function callStreamingAPI(fileUrls: string[] = []) {
@@ -495,7 +470,7 @@
             ?.image_url || "";
 
         // store messages
-        const newUserMessage: MessageHistory = {
+        const newUserMessage: Message = {
           role: MessageRole.User,
           content: prompt,
         };

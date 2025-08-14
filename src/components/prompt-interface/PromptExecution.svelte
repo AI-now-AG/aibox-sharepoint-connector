@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, onDestroy } from "svelte";
+  import { onMount } from "svelte";
   import UseCaseCards from "$components/prompt-interface/UseCaseCards.svelte";
   import ChatExecutionWidget from "./ChatExecutionWidget.svelte";
   import ToolEnhancedChatWidget from "./ToolEnhancedChatWidget.svelte";
@@ -22,15 +22,6 @@
     currentPrompt = promptItems[0];
   });
 
-  $effect(() => {
-    if (selectedPromptId) {
-      //currentPrompt = promptItems.find((e: any) => e._id === selectedPromptId);
-    }
-  });
-
-  onDestroy(function () {
-    // $sharedMessageHistory = [];
-  });
 </script>
 
 <div class="grid grid-cols-1 grid-rows-[1fr_min-content] h-full">
@@ -46,9 +37,8 @@
         bind:selectedPromptId
         {isEditable}
         isDisabling={isProcessing}
-        onSelectCard={(prompt) => {
+        onSelectCard={(prompt: any) => {
           currentPrompt = prompt;
-          // $sharedMessageHistory = [];
         }}
       />
     </div>
