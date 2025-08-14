@@ -4,6 +4,8 @@
   import ChatExecutionWidget from "./ChatExecutionWidget.svelte";
   import ToolEnhancedChatWidget from "./ToolEnhancedChatWidget.svelte";
   import { PromptModel } from "$types/PromptModel";
+  import { tenant } from "$stores";
+  import { ApiKeyProvider } from "$types/TenantFeature";
 
   interface Props {
     promptItems: any;
@@ -12,7 +14,12 @@
     folderName?: string;
   }
 
-  let { promptItems, isEditable = false, groupId, folderName }: Props = $props();
+  let {
+    promptItems,
+    isEditable = false,
+    groupId,
+    folderName,
+  }: Props = $props();
 
   let selectedPromptId = $state("");
   let currentPrompt: any = $state();
@@ -21,6 +28,18 @@
   onMount(async function () {
     currentPrompt = promptItems[0];
   });
+
+  function isGpt5Default() {
+    const aiProviders = $tenant?.api_key_providers ?? [];
+    const activeDefaultProvider = aiProviders.find(
+      (item) => item.active === true && item.default === true,
+    );
+
+    if (activeDefaultProvider?.name === ApiKeyProvider.OpenAIGtp5) {
+      return true;
+    }
+    return false;
+  }
 
 </script>
 
@@ -43,7 +62,7 @@
       />
     </div>
 
-    {#if [PromptModel.OpenAIWithTools, PromptModel.OpenAIWithImageTools, PromptModel.Claude].includes(currentPrompt?.model)}
+    {#if [PromptModel.OpenAIWithTools, PromptModel.OpenAIWithImageTools, PromptModel.OpenAIGpt5, PromptModel.OpenAIGpt5WithTools, PromptModel.OpenAIGpt5WithImageTools, PromptModel.Claude].includes(currentPrompt?.model) || (isGpt5Default() && !currentPrompt?.model)}
       <ToolEnhancedChatWidget
         promptId={selectedPromptId}
         {groupId}

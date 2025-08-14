@@ -23,6 +23,7 @@
   import MessageList from "$components/chat-ui/MessageList.svelte";
   import { tenant } from "$stores";
   import { useTranslations } from "$i18n/utils";
+  import { ApiKeyProvider } from "$types/TenantFeature";
 
   const t = useTranslations();
 
@@ -95,9 +96,17 @@
     }
   });
 
-  onDestroy(function () {
-    // $sharedMessageHistory = [];
-  });
+  function isGpt5Default() {
+    const aiProviders = $tenant?.api_key_providers ?? [];
+    const activeDefaultProvider = aiProviders.find(
+      (item) => item.active === true && item.default === true,
+    );
+
+    if (activeDefaultProvider?.name === ApiKeyProvider.OpenAIGtp5) {
+      return true;
+    }
+    return false;
+  }
 
   async function submitForm() {
     uniqueId = uuidv4();
@@ -159,14 +168,22 @@
     const isOpenAIResponseModel = [
       PromptModel.OpenAIWithTools,
       PromptModel.OpenAIWithImageTools,
-      PromptModel.OpenAIGpt5WithTools,
-      PromptModel.OpenAIGpt5WithImageTools,
     ].includes(currentPrompt?.model);
+
+    const isOpenAIGpt5ResponseModel =
+      [
+        PromptModel.OpenAIGpt5,
+        PromptModel.OpenAIGpt5WithTools,
+        PromptModel.OpenAIGpt5WithImageTools,
+      ].includes(currentPrompt?.model) ||
+      (isGpt5Default() && !currentPrompt?.model);
 
     const provider = isOpenAIResponseModel
       ? "openai-response"
-      : currentPrompt?.model;
-      
+      : isOpenAIGpt5ResponseModel
+        ? "openai-gpt-5-response"
+        : currentPrompt?.model;
+
     const requestBody = {
       tenantId: $tenant?._id?.toString(),
       provider, //"openai-response",
