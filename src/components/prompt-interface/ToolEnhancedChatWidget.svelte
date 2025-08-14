@@ -64,6 +64,25 @@
           disabled: true,
         });
         break;
+      case PromptModel.OpenAIGpt5:
+        tools.push({
+          name: "image",
+          active: false,
+        });
+        break;
+      case PromptModel.OpenAIGpt5WithTools:
+        tools.push({
+          name: "image",
+          active: false,
+        });
+        break;
+      case PromptModel.OpenAIGpt5WithImageTools:
+        tools.push({
+          name: "image",
+          active: true,
+          disabled: true,
+        });
+        break;
     }
 
     return tools;
