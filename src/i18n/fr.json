@@ -472,5 +472,7 @@
   "home.model-option-text": "Text",
   "home.model-option-text-tools": "Text and Tools",
   "home.model-option-text-websearch": "Text and Websearch",
-  "prompt-execution.models.openai-gpt-5-with-tools": "gpt-5 (Text & Tools)"
+  "prompt-execution.models.openai-gpt-5-with-tools": "gpt-5 (Text & Tools)",
+  "prompt-execution.reasoning-level": "Reasoning level",
+  "prompt-execution.text-verbosity": "Text verbosity"
 }

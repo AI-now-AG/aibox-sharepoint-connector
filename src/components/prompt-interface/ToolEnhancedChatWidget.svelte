@@ -229,11 +229,11 @@
       ...(isOpenAIResponseModel && { previousResponseId }),
       ...(!isOpenAIResponseModel && { messageHistory: currentMessageHistory }),
       ...(isOpenAIGpt5ResponseModel && {
-        reasoningEffort: currentPrompt?.reasoning_effort || "low",
+        reasoningEffort: currentPrompt?.reasoningEffort || "low",
       }),
       ...(isOpenAIGpt5ResponseModel &&
-        currentPrompt?.verbosity && {
-          verbosity: currentPrompt?.verbosity,
+        currentPrompt?.textVerbosity && {
+          verbosity: currentPrompt?.textVerbosity,
         }),
     };
 

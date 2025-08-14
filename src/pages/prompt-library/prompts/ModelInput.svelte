@@ -64,7 +64,7 @@
       case PromptModel.Claude:
         title = t("prompt-execution.models.claude", { model: modelLabel });
         break;
-       case PromptModel.OpenAIGpt5:
+      case PromptModel.OpenAIGpt5:
         title = t("prompt-execution.models.openai-gpt-5-with-tools", {
           model: modelLabel,
         });
@@ -80,6 +80,7 @@
   const sortProviders = (providers: any[]) => {
     const sortOrder = [
       ApiKeyProvider.OpenAI,
+      ApiKeyProvider.OpenAIGtp5,
       ApiKeyProvider.AzureOpenAI,
       ApiKeyProvider.Perplexity,
       ApiKeyProvider.Claude,

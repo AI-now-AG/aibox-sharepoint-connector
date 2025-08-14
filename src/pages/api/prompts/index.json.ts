@@ -18,6 +18,8 @@ const CreatePromptParamsSchema = z.object({
   prompt: z.string(),
   predefined_input: z.string().optional(),
   model: z.string().nullish(),
+  reasoningEffort: z.string().nullish(),
+  textVerbosity: z.string().nullish(),
   documents: z.array(z.string()).optional(),
 });
 
@@ -210,6 +212,8 @@ export const GET: APIRoute = async (ctx) => {
         title: prompt.title,
         prompt: prompt.prompt,
         model: prompt.model,
+        reasoningEffort: prompt.reasoningEffort,
+        textVerbosity: prompt.textVerbosity,
         knowledgebase: knowledgebases.map((kb) => ({
           _id: kb._id,
           title: kb.title,
