@@ -222,9 +222,12 @@
       ...(isOpenAIResponseModel && { previousResponseId }),
       ...(!isOpenAIResponseModel && { messageHistory: currentMessageHistory }),
       ...(isOpenAIGpt5ResponseModel && {
-        verbosity: currentPrompt?.reasoning_effort || "low",
-        reasoningEffort: currentPrompt?.verbosity || "low",
+        reasoningEffort: currentPrompt?.reasoning_effort || "low",
       }),
+      ...(isOpenAIGpt5ResponseModel &&
+        currentPrompt?.verbosity && {
+          verbosity: currentPrompt?.verbosity,
+        }),
     };
 
     try {
