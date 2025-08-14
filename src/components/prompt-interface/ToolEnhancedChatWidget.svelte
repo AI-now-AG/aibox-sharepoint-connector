@@ -13,10 +13,7 @@
   import { ResponseStatus, ToolName } from "$types/AIResponse";
   import { PromptModel } from "$types/PromptModel";
   import { addToast } from "$stores/toast";
-  import {
-    MessageRole,
-    type Message,
-  } from "$types/MessageHistory";
+  import { MessageRole, type Message } from "$types/MessageHistory";
   import { readFileContent } from "$utils/fileReader";
   import { formatMarkdown, stripHtmlFormatting } from "$utils/common";
   import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
@@ -135,7 +132,7 @@
       uploadedFileUrls = uploadData.results;
     }
 
-    await callStreamingAPI(uploadedFileUrls as string[] || []); 
+    await callStreamingAPI((uploadedFileUrls as string[]) || []);
   }
 
   async function callStreamingAPI(fileUrls: string[] = []) {
@@ -159,8 +156,17 @@
     const { apiKey, apiUrl: baseUrl } = await configResponse.json();
     const apiUrl = `${baseUrl}/api/prompt/execute`;
 
-    const isOpenAIResponseModel = [PromptModel.OpenAIWithTools, PromptModel.OpenAIWithImageTools].includes(currentPrompt?.model);
-    const provider = isOpenAIResponseModel ? "openai-response" : currentPrompt?.model;
+    const isOpenAIResponseModel = [
+      PromptModel.OpenAIWithTools,
+      PromptModel.OpenAIWithImageTools,
+      PromptModel.OpenAIGpt5WithTools,
+      PromptModel.OpenAIGpt5WithImageTools,
+    ].includes(currentPrompt?.model);
+
+    const provider = isOpenAIResponseModel
+      ? "openai-response"
+      : currentPrompt?.model;
+      
     const requestBody = {
       tenantId: $tenant?._id?.toString(),
       provider, //"openai-response",
@@ -169,18 +175,22 @@
       stream: true,
       ...(enabledTools.length && { tool: "image_generation" }),
       fileUrls: fileUrls,
-      ...(enabledTools.length && { imageGenerationOptions: {
-        outputFormat: "png",
-        quality: "high",
-        size: "1024x1024",
-        background: "auto",
-      } }),
+      ...(enabledTools.length && {
+        imageGenerationOptions: {
+          outputFormat: "png",
+          quality: "high",
+          size: "1024x1024",
+          background: "auto",
+        },
+      }),
       ...(isOpenAIResponseModel && { previousResponseId }),
       ...(!isOpenAIResponseModel && { messageHistory: currentMessageHistory }),
     };
 
     try {
-      const hasImageTool = enabledTools.some(tool => tool.name === ToolName.Image && tool.active);
+      const hasImageTool = enabledTools.some(
+        (tool) => tool.name === ToolName.Image && tool.active,
+      );
       isGenerating = hasImageTool;
       const response = await fetch(apiUrl, {
         method: "POST",
@@ -409,14 +419,14 @@
                     // Handle Failed Status
                     const errorMessage =
                       data.error || "Image generation failed.";
-                    
+
                     // Add user message to history
                     const errorUserMessage: Message = {
                       role: MessageRole.User,
                       content: requestBody.prompt,
                     };
                     addMessageToHistory(groupId, promptId, errorUserMessage);
-                    
+
                     const failedMessage: Message = {
                       role: MessageRole.Assistant,
                       content: errorMessage,
