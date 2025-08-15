@@ -92,7 +92,7 @@
   });
 
   onDestroy(function () {
-    $sharedMessageHistory = [];
+    //$sharedMessageHistory = [];
   });
 
   // === API Configuration ===
