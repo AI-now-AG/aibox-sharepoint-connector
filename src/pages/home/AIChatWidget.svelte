@@ -74,9 +74,11 @@
   $effect(() => {
     isDisableSelectModel = $sharedMessageHistory.length > 0 || isFetching;
     isDisableFileInput = selectedModel === PromptModel.Perplexity;
+  });
 
+  $effect(() => {
     if (
-      [PromptModel.OpenAIWithTools, PromptModel.OpenAIWithImageTools].includes(
+      [PromptModel.OpenAIWithTools].includes(
         selectedModel,
       )
     ) {
@@ -120,7 +122,6 @@
   function buildRequestPayload(fileUrls: string[]): RequestPayload {
     const isOpenAIResponseModel = [
       PromptModel.OpenAIWithTools,
-      PromptModel.OpenAIWithImageTools,
     ].includes(selectedModel);
     const provider = isOpenAIResponseModel ? "openai-response" : selectedModel;
     const hasImageTool = enabledTools.some(
