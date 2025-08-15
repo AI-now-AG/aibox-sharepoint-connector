@@ -21,6 +21,7 @@
   import { tenant } from "$stores";
   import { useTranslations } from "$i18n/utils";
   import { addToast } from "$stores/toast";
+  import { ApiKeyProvider } from "$types/TenantFeature";
 
   const t = useTranslations();
 
@@ -47,6 +48,7 @@
     imageGenerationOptions?: any;
     previousResponseId?: string | null;
     messageHistory?: Message[];
+    reasoningEffort?: string;
   }
 
   interface Props {
@@ -78,7 +80,7 @@
 
   $effect(() => {
     if (
-      [PromptModel.OpenAIWithTools].includes(
+      [PromptModel.OpenAIWithTools, PromptModel.OpenAIGpt5].includes(
         selectedModel,
       )
     ) {
@@ -92,6 +94,18 @@
       enabledTools = [];
     }
   });
+
+  function isGpt5Default() {
+    const aiProviders = $tenant?.api_key_providers ?? [];
+    const activeDefaultProvider = aiProviders.find(
+      (item) => item.active === true && item.default === true,
+    );
+
+    if (activeDefaultProvider?.name === ApiKeyProvider.OpenAIGtp5) {
+      return true;
+    }
+    return false;
+  }
 
   onDestroy(function () {
     //$sharedMessageHistory = [];
@@ -120,10 +134,24 @@
 
   // === Request Builder ===
   function buildRequestPayload(fileUrls: string[]): RequestPayload {
-    const isOpenAIResponseModel = [
-      PromptModel.OpenAIWithTools,
-    ].includes(selectedModel);
-    const provider = isOpenAIResponseModel ? "openai-response" : selectedModel;
+    const isOpenAIResponseModel = [PromptModel.OpenAIWithTools].includes(
+      selectedModel,
+    );
+
+    const isOpenAIGpt5ResponseModel =
+      [
+        PromptModel.OpenAIGpt5,
+        PromptModel.OpenAIGpt5WithTools,
+        PromptModel.OpenAIGpt5WithImageTools,
+      ].includes(selectedModel) ||
+      (isGpt5Default() && !selectedModel);
+
+    const provider = isOpenAIResponseModel
+      ? "openai-response"
+      : isOpenAIGpt5ResponseModel
+        ? "openai-gpt-5-response"
+        : selectedModel;
+
     const hasImageTool = enabledTools.some(
       (tool) => tool.name === ToolName.Image && tool.active,
     );
@@ -151,6 +179,10 @@
       payload.previousResponseId = previousResponseId;
     } else {
       payload.messageHistory = $sharedMessageHistory;
+    }
+
+    if (isOpenAIGpt5ResponseModel) {
+      payload.reasoningEffort = "low";
     }
 
     return payload;
