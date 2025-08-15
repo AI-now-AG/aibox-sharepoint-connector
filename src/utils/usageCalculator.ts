@@ -30,10 +30,12 @@ const unitLabels: Record<string, string> = {
  *  Example:
  *      + OpenAI gpt-4o: 40000 input tokens = 1 request
  *      + OpenAI gpt-4o: 10000 output tokens = 1 request
+ *  *   + OpenAI gpt-5: 80000 input tokens = 1 request
+ *      + OpenAI gpt-5: 10000 output tokens = 1 request
  */
 const TOKEN_CREDIT_MAPPING: Record<string, TokenCreditRate> = {
   [ApiKeyProvider.OpenAI]: { input: 40000, output: 10000 },
-  [ApiKeyProvider.OpenAIGtp5]: { input: 40000, output: 10000 },
+  [ApiKeyProvider.OpenAIGtp5]: { input: 80000, output: 10000 },
   [ApiKeyProvider.AzureOpenAI]: { input: 40000, output: 10000 },
   [ApiKeyProvider.Perplexity]: { input: 100000, output: 100000 },
   [ApiKeyProvider.Claude]: { input: 33000, output: 6500 },
