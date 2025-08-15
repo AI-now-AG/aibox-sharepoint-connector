@@ -101,6 +101,14 @@
     return false;
   }
 
+  function getDefaultModelName() {
+    const aiProviders = $tenant?.api_key_providers ?? [];
+    const activeDefaultProvider = aiProviders.find(
+      (item) => item.active === true && item.default === true,
+    );
+    return activeDefaultProvider?.name || ApiKeyProvider.OpenAI;
+  }
+
   // === Derived State ===
   let enabledTools = $derived.by(() => {
     const tools: Tool[] = [];
@@ -191,10 +199,14 @@
 
   // === Request Builder ===
   function buildRequestPayload(fileUrls: string[]): RequestPayload {
-    const isOpenAIResponseModel = [
+    let isOpenAIResponseModel = [
       PromptModel.OpenAIWithTools,
       PromptModel.OpenAIWithImageTools,
     ].includes(currentPrompt?.model);
+
+    if (getDefaultModelName() === ApiKeyProvider.OpenAI) {
+      isOpenAIResponseModel = true;
+    }
 
     const isOpenAIGpt5ResponseModel =
       [
@@ -208,7 +220,7 @@
       ? "openai-response"
       : isOpenAIGpt5ResponseModel
         ? "openai-gpt-5-response"
-        : currentPrompt?.model;
+        : currentPrompt?.model || getDefaultModelName();
 
     const payload: RequestPayload = {
       tenantId: tenantId!,

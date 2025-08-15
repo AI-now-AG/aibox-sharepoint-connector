@@ -68,7 +68,9 @@
         });
         break;
       default:
-        title = t("prompt-execution.models.openai-legacy", { model: modelLabel });
+        title = t("prompt-execution.models.openai-legacy", {
+          model: modelLabel,
+        });
     }
     return title;
   };
@@ -100,7 +102,7 @@
             title: `${modelName}`,
           };
         }) || [];
-        
+
     const defaultModel = sortedProviders.find(
       (provider: any) => provider.default,
     );
@@ -108,15 +110,23 @@
     const defaultName = capitalizeFirst(defaultText);
 
     const modelName = getModelLabel(defaultModel);
-    models.unshift({
-      value: PromptModel.Default,
-      title: `${defaultName} - ${modelName}`,
-    });
 
+    if (defaultModel?.name !== ApiKeyProvider.OpenAI) {
+      models.unshift({
+        value: PromptModel.Default,
+        title: `${defaultName} - ${modelName}`,
+      });
+    }
     // OpenAI Responses API
     models.push({
-      value: PromptModel.OpenAIWithTools,
-      title: t("prompt-execution.models.openai-with-tools"),
+      value:
+        defaultModel?.name === ApiKeyProvider.OpenAI
+          ? PromptModel.Default
+          : PromptModel.OpenAIWithTools,
+      title:
+        defaultModel?.name === ApiKeyProvider.OpenAI
+          ? `${defaultName} - ${t("prompt-execution.models.openai-with-tools")}`
+          : `${t("prompt-execution.models.openai-with-tools")}`,
     });
     models.push({
       value: PromptModel.OpenAIWithImageTools,
