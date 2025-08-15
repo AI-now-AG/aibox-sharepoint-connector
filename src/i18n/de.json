@@ -470,9 +470,12 @@
   "prompt-execution.models.claude": "Text (Claude ${model})",
   "home.model-label": "KI-Modelle",
   "home.model-option-text": "Text",
-  "home.model-option-text-tools": "Text and Tools",
-  "home.model-option-text-websearch": "Text and Websearch",
+  "home.model-option-text-tools": "Text & Tools",
+  "home.model-option-text-websearch": "Text & Websuche",
   "prompt-execution.models.openai-gpt-5-with-tools": "gpt-5 (Text & Tools)",
   "prompt-execution.reasoning-level": "Denktiefe",
-  "prompt-execution.text-verbosity": "Ausführlichkeit"
+  "prompt-execution.text-verbosity": "Ausführlichkeit",
+  "prompt-execution.level-low": "niedrig",
+  "prompt-execution.level-medium": "mittel",
+  "prompt-execution.level-high": "hoch"
 }

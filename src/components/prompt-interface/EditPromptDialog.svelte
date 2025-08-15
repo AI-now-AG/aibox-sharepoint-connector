@@ -10,6 +10,7 @@
   import { svgIcons } from "$assets/icons";
   import { formatMarkdown, preventDefault } from "$utils/common";
   import TextEditor from "$components/form/TextEditor.svelte";
+  import Dropdown from "$components/form/Dropdown.svelte";
 
   const t = useTranslations();
 
@@ -123,8 +124,8 @@
       }
 
       selectedModel = promptDetails.model?.toString() || "";
-      selectedReasoningLevel = { title: promptDetails.reasoningEffort || "" };
-      selectedTextVerbosity = { title: promptDetails.textVerbosity || "" };
+      selectedReasoningLevel = promptDetails.reasoningEffort || "";
+      selectedTextVerbosity = promptDetails.textVerbosity || "";
 
       const group = category?.groups.find(
         (e) => e._id == promptDetails.group?.toString(),
@@ -158,8 +159,8 @@
         prompt: promptText,
         predefined_input: promptPredefinedInput,
         model: selectedModel ?? null,
-        reasoningEffort: selectedReasoningLevel.title || null,
-        textVerbosity: selectedTextVerbosity.title || null,
+        reasoningEffort: selectedReasoningLevel || null,
+        textVerbosity: selectedTextVerbosity || null,
         knowledgebase: selectedKnowledgeBases.map((inst) => inst._id),
         ...(selectedCategory && { category: selectedCategory._id }),
         ...(selectedGroup && { group: selectedGroup._id }),
@@ -304,18 +305,29 @@
         <div
           class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 justify-center"
         >
-          <SingleInput
-            title={`${t("prompt-execution.reasoning-level")}`}
-            placeholder="low | medium | high"
-            items={[{ title: "low" }, { title: "medium" }, { title: "high" }]}
-            bind:selectedItem={selectedReasoningLevel}
+          <Dropdown
+            classes={"flex-1 min-w-3xs "}
+            label={t("prompt-execution.reasoning-level")}
+            placeholder={`${t("prompt-execution.level-low")} | ${t("prompt-execution.level-medium")} | ${t("prompt-execution.level-high")}`}
+            options={[
+              { title: t("prompt-execution.level-low"), value: "low" },
+              { title: t("prompt-execution.level-medium"), value: "medium" },
+              { title: t("prompt-execution.level-high"), value: "high" },
+            ]}
+            bind:value={selectedReasoningLevel}
           />
 
-          <SingleInput
-            title={`${t("prompt-execution.text-verbosity")}`}
-            placeholder="low | medium | high"
-            items={[{ title: "low" }, { title: "medium" }, { title: "high" }]}
-            bind:selectedItem={selectedTextVerbosity}
+          <Dropdown
+            classes={"flex-1 min-w-3xs "}
+            label={t("prompt-execution.text-verbosity")}
+            placeholder={`${t("prompt-execution.level-low")} | ${t("prompt-execution.level-medium")} | ${t("prompt-execution.level-high")}`}
+            
+            options={[
+              { title: t("prompt-execution.level-low"), value: "low" },
+              { title: t("prompt-execution.level-medium"), value: "medium" },
+              { title: t("prompt-execution.level-high"), value: "high" },
+            ]}
+            bind:value={selectedTextVerbosity}
           />
         </div>
       {/if}
