@@ -1,15 +1,15 @@
 import { writable } from 'svelte/store';
-import type { MessageHistory } from '$types/MessageHistory';
+import type { MessageHistory, Message } from '$types/MessageHistory';
 
 // Store message histories for each promptId
-const messageHistories = writable<Record<string, MessageHistory[]>>({});
+const messageHistories = writable<Record<string, MessageHistory>>({});
 // Map categoryId to current promptId
 const groupPromptMap = writable<Record<string, string>>({});
 // Store previousResponseId for each promptId
 const previousResponseIds = writable<Record<string, string | null>>({});
 
 // Helper functions to manage message histories
-export function addMessageToHistory(groupId: string, promptId: string, message: MessageHistory) {
+export function addMessageToHistory(groupId: string, promptId: string, message: Message) {
     console.log("Adding message to history:", groupId, promptId, message);
     // let oldPromptId: string | undefined;
     // groupPromptMap.update(map => {
@@ -31,7 +31,7 @@ export function addMessageToHistory(groupId: string, promptId: string, message: 
 }
 
 export function getMessageHistory(promptId: string) {
-    let history: MessageHistory[] = [];
+    let history: MessageHistory = [];
     messageHistories.subscribe(histories => {
         history = histories[promptId] || [];
     })();

@@ -2,7 +2,7 @@
   import { onMount, onDestroy } from "svelte";
   import UseCaseCards from "$components/prompt-interface/UseCaseCards.svelte";
   import ChatExecutionWidget from "./ChatExecutionWidget.svelte";
-  import ToolEnhancedChatWidget from "./ToolEnhancedChatWidget.svelte";
+  import StreamingChatWidget from "./StreamingChatWidget.svelte";
   import { PromptModel } from "$types/PromptModel";
 
   interface Props {
@@ -53,8 +53,8 @@
       />
     </div>
 
-    {#if [PromptModel.OpenAIWithTools, PromptModel.OpenAIWithImageTools, PromptModel.Claude].includes(currentPrompt?.model)}
-      <ToolEnhancedChatWidget
+    {#if [PromptModel.OpenAIWithTools, PromptModel.OpenAIWithImageTools, PromptModel.Claude, PromptModel.Perplexity].includes(currentPrompt?.model)}
+      <StreamingChatWidget
         promptId={selectedPromptId}
         {groupId}
         {currentPrompt}
