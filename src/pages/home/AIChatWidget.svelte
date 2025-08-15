@@ -169,7 +169,7 @@
       payload.tool = "image_generation";
       payload.imageGenerationOptions = {
         outputFormat: "png",
-        quality: "high",
+        quality: "medium",
         size: "1024x1024",
         background: "auto",
       };
