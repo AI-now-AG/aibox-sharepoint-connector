@@ -36,19 +36,23 @@
     const providerModelMap: Record<string, string> = {
       [ApiKeyProvider.Perplexity]: "perplexity_chat_model",
       [ApiKeyProvider.Claude]: "anthropic_chat_model",
+      [ApiKeyProvider.OpenAIGtp5]: "openai_gpt5_chat_model",
     };
     const modelNameMap: Record<string, string> = {
       "claude-sonnet-4-0": "Claude Sonnet",
-      "sonar": "Perplexity Sonar",
+      sonar: "Perplexity Sonar",
     };
 
     const key = providerModelMap[provider.name] as keyof typeof $tenant;
     const rawModel = $tenant?.[key] || "gpt-4o";
     const modelLabel = modelNameMap[rawModel] || rawModel;
 
-    let title = '-';
+    let title = "-";
     switch (provider.name) {
-    case PromptModel.OpenAI:
+      case PromptModel.OpenAI:
+        title = `${modelLabel} (${t("home.model-option-text-tools")})`;
+        break;
+      case PromptModel.OpenAIGpt5:
         title = `${modelLabel} (${t("home.model-option-text-tools")})`;
         break;
       case PromptModel.Perplexity:
@@ -74,11 +78,18 @@
 
   const getActiveModels = (): Option[] => {
     const allProviders = $tenant?.api_key_providers ?? [];
-    const allowedProviders = [ApiKeyProvider.Perplexity, ApiKeyProvider.Claude];
+    const allowedProviders = [
+      ApiKeyProvider.Perplexity,
+      ApiKeyProvider.Claude,
+      ApiKeyProvider.OpenAIGtp5,
+    ];
 
     const models: Option[] =
       allProviders
-        .filter((provider: any) => provider.active && allowedProviders.includes(provider.name))
+        .filter(
+          (provider: any) =>
+            provider.active && allowedProviders.includes(provider.name),
+        )
         .map((provider: any) => {
           const modelName = getModelLabel(provider);
           return {
@@ -101,7 +112,7 @@
   classes={"flex-1 min-w-3xs " + classes}
   {labelClasses}
   label={label ?? t("prompt-library.add.prompts.language-model")}
-  placeholder={''}
+  placeholder={""}
   options={models}
   {disabled}
   bind:value={selectedModel}
