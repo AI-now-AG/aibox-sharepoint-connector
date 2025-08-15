@@ -10,6 +10,7 @@ export enum TenantFeature {
 
 export enum ApiKeyProvider {
   OpenAI = "openai",
+  OpenAIGtp5 = "openai-gpt-5",
   AzureOpenAI = "azure_openai",
   Perplexity = "perplexity",
   Flux = "flux",

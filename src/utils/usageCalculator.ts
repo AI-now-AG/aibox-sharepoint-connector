@@ -33,6 +33,7 @@ const unitLabels: Record<string, string> = {
  */
 const TOKEN_CREDIT_MAPPING: Record<string, TokenCreditRate> = {
   [ApiKeyProvider.OpenAI]: { input: 40000, output: 10000 },
+  [ApiKeyProvider.OpenAIGtp5]: { input: 40000, output: 10000 },
   [ApiKeyProvider.AzureOpenAI]: { input: 40000, output: 10000 },
   [ApiKeyProvider.Perplexity]: { input: 100000, output: 100000 },
   [ApiKeyProvider.Claude]: { input: 33000, output: 6500 },
@@ -184,6 +185,63 @@ const _calculateOpenAIUsage = (
     amount: dalleRequests,
     unit: unitLabels.images,
     credits: _requestsToCredits(ImageModel.Dalle, dalleRequests),
+  });
+
+  // GPT Image
+  const gptImageItems = usageData.filter(
+    (item: UsageLog) => item.model == ImageModel.GptImage,
+  );
+  const gptImageRequests = gptImageItems.length;
+  usageItems.push({
+    model: "GPT Image",
+    amount: gptImageRequests,
+    unit: unitLabels.images,
+    credits: _requestsToCredits(ImageModel.GptImage, gptImageRequests),
+  });
+
+  return _skipUsageIfPrivateKeyUsed(usageItems, usePrivateKey);
+};
+
+
+const _calculateOpenAIGpt5Usage = (
+  rawUsages: UsageLog[],
+  usePrivateKey: boolean,
+) => {
+  const usageItems: UsageItem[] = [];
+
+  const usageData = rawUsages.filter((item: UsageLog) => {
+    return item.provider == ApiKeyProvider.OpenAIGtp5;
+  });
+
+  // gpt-4o
+  const gpt5Items = usageData.filter(
+    (item: UsageLog) => item.model == TextModel.Gpt5,
+  );
+  const gpt5InputTokens = gpt5Items.reduce(
+    (sum: number, item: UsageLog) => sum + (item.input_tokens ?? 0),
+    0,
+  );
+  const gpt5OutputTokens = gpt5Items.reduce(
+    (sum: number, item: UsageLog) => sum + (item.output_tokens ?? 0),
+    0,
+  );
+  const { inputCredits: gpt4oInputCredits, outputCredits: gpt4oOutputCredits } =
+    _tokensToCredits(
+      ApiKeyProvider.OpenAIGtp5,
+      gpt5InputTokens,
+      gpt5OutputTokens,
+    );
+  usageItems.push({
+    model: "gpt-5 Input",
+    amount: gpt5InputTokens,
+    unit: unitLabels.tokens,
+    credits: gpt4oInputCredits,
+  });
+  usageItems.push({
+    model: "gpt-5 Output",
+    amount: gpt5OutputTokens,
+    unit: unitLabels.tokens,
+    credits: gpt4oOutputCredits,
   });
 
   // GPT Image
@@ -443,6 +501,13 @@ export const calculateUsage = (tenant: Tenant, rawUsages: UsageLog[]) => {
   usageData.push({
     provider: "OpenAI",
     details: _calculateOpenAIUsage(rawUsages, useOpenAIPrivateKey),
+  });
+
+  // OpenAI GPT5
+  const useOpenAIGpt5PrivateKey = tenant.metadata?.openaiGpt5PrivateKeyEnabled ?? false;
+  usageData.push({
+    provider: "OpenAI GPT-5",
+    details: _calculateOpenAIGpt5Usage(rawUsages, useOpenAIGpt5PrivateKey),
   });
 
   // AzureOpenAI

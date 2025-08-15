@@ -48,6 +48,8 @@
   let selectedCategory: Category | undefined = $state();
 
   let selectedModel: string = $state("");
+  let selectedReasoningLevel: any = $state();
+  let selectedTextVerbosity: any = $state();
 
   let knowledgeBases: KnowledgeBase[] = $state([]);
   let selectedKnowledgeBases: KnowledgeBase[] = $state([]);
@@ -121,6 +123,8 @@
       }
 
       selectedModel = promptDetails.model?.toString() || "";
+      selectedReasoningLevel = { title: promptDetails.reasoningEffort || "" };
+      selectedTextVerbosity = { title: promptDetails.textVerbosity || "" };
 
       const group = category?.groups.find(
         (e) => e._id == promptDetails.group?.toString(),
@@ -154,6 +158,8 @@
         prompt: promptText,
         predefined_input: promptPredefinedInput,
         model: selectedModel ?? null,
+        reasoningEffort: selectedReasoningLevel.title || null,
+        textVerbosity: selectedTextVerbosity.title || null,
         knowledgebase: selectedKnowledgeBases.map((inst) => inst._id),
         ...(selectedCategory && { category: selectedCategory._id }),
         ...(selectedGroup && { group: selectedGroup._id }),
@@ -293,6 +299,26 @@
         />
         <ModelInput bind:selectedModel />
       </div>
+
+      {#if selectedModel.includes("openai-gpt-5")}
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 justify-center"
+        >
+          <SingleInput
+            title={`${t("prompt-execution.reasoning-level")}`}
+            placeholder="low | medium | high"
+            items={[{ title: "low" }, { title: "medium" }, { title: "high" }]}
+            bind:selectedItem={selectedReasoningLevel}
+          />
+
+          <SingleInput
+            title={`${t("prompt-execution.text-verbosity")}`}
+            placeholder="low | medium | high"
+            items={[{ title: "low" }, { title: "medium" }, { title: "high" }]}
+            bind:selectedItem={selectedTextVerbosity}
+          />
+        </div>
+      {/if}
 
       <div
         class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 justify-center"

@@ -32,6 +32,7 @@
   import MessageList from "$components/chat-ui/MessageList.svelte";
   import { tenant } from "$stores";
   import { useTranslations } from "$i18n/utils";
+  import { ApiKeyProvider } from "$types/TenantFeature";
 
   const t = useTranslations();
 
@@ -58,6 +59,8 @@
     imageGenerationOptions?: any;
     previousResponseId?: string | null;
     messageHistory?: MessageHistory;
+    reasoningEffort?: string;
+    verbosity?: string;
   }
 
   interface Props {
@@ -86,6 +89,18 @@
   let currentStreamingImageUrl: string = $state("");
   let isGenerating: boolean = $state(false);
 
+  function isGpt5Default() {
+    const aiProviders = $tenant?.api_key_providers ?? [];
+    const activeDefaultProvider = aiProviders.find(
+      (item) => item.active === true && item.default === true,
+    );
+
+    if (activeDefaultProvider?.name === ApiKeyProvider.OpenAIGtp5) {
+      return true;
+    }
+    return false;
+  }
+
   // === Derived State ===
   let enabledTools = $derived.by(() => {
     const tools: Tool[] = [];
@@ -104,6 +119,32 @@
           disabled: true,
         });
         break;
+      case PromptModel.OpenAIGpt5:
+        tools.push({
+          name: "image",
+          active: false,
+        });
+        break;
+      case PromptModel.OpenAIGpt5WithTools:
+        tools.push({
+          name: "image",
+          active: false,
+        });
+        break;
+      case PromptModel.OpenAIGpt5WithImageTools:
+        tools.push({
+          name: "image",
+          active: true,
+          disabled: true,
+        });
+        break;
+    }
+
+    if (!currentPrompt?.model && isGpt5Default()) {
+      tools.push({
+        name: "image",
+        active: false,
+      });
     }
 
     return tools;
@@ -125,10 +166,6 @@
         files = [];
       }
     }
-  });
-
-  onDestroy(function () {
-    // Cleanup if needed
   });
 
   // === API Configuration ===
@@ -158,10 +195,20 @@
       PromptModel.OpenAIWithTools,
       PromptModel.OpenAIWithImageTools,
     ].includes(currentPrompt?.model);
-    
+
+    const isOpenAIGpt5ResponseModel =
+      [
+        PromptModel.OpenAIGpt5,
+        PromptModel.OpenAIGpt5WithTools,
+        PromptModel.OpenAIGpt5WithImageTools,
+      ].includes(currentPrompt?.model) ||
+      (isGpt5Default() && !currentPrompt?.model);
+
     const provider = isOpenAIResponseModel
       ? "openai-response"
-      : currentPrompt?.model;
+      : isOpenAIGpt5ResponseModel
+        ? "openai-gpt-5-response"
+        : currentPrompt?.model;
 
     const payload: RequestPayload = {
       tenantId: tenantId!,
@@ -189,17 +236,24 @@
       payload.messageHistory = currentMessageHistory;
     }
 
+    if (isOpenAIGpt5ResponseModel) {
+      payload.reasoningEffort = currentPrompt?.reasoningEffort || "low";
+      if (currentPrompt?.textVerbosity) {
+        payload.verbosity = currentPrompt?.textVerbosity;
+      }
+    }
+
     return payload;
   }
 
   // === Image Processing Utilities ===
   function formatImageUrl(imageData: string): string {
     if (!imageData) return "";
-    
+
     if (imageData.startsWith("data:") || imageData.startsWith("http")) {
       return imageData;
     }
-    
+
     return `data:image/png;base64,${imageData}`;
   }
 
@@ -229,11 +283,11 @@
 
   function handleImagesEvent(data: any, state: StreamingState): void {
     console.log("🖼️ Images generated:", data.images?.length || 0);
-    
+
     if (data.images && data.images.length > 0) {
       const firstImage = data.images[0];
       const imageData = extractImageFromData(firstImage);
-      
+
       if (imageData) {
         const formattedUrl = formatImageUrl(imageData);
         state.currentImageUrl = formattedUrl;
@@ -244,7 +298,7 @@
 
   function handleToolOutputsEvent(data: any, state: StreamingState): void {
     console.log("🔧 Tool outputs received:", data.outputs.length);
-    
+
     data.outputs.forEach((output: any) => {
       if (output.image || output.result) {
         const imageData = extractImageFromData(output);
@@ -257,7 +311,11 @@
     });
   }
 
-  function handleCompleteEvent(data: any, state: StreamingState, requestBody: RequestPayload): any {
+  function handleCompleteEvent(
+    data: any,
+    state: StreamingState,
+    requestBody: RequestPayload,
+  ): any {
     console.log(`✅ Complete! Processing time: ${data.processingTimeMs}ms`);
     if (data.responseId) {
       console.log(`Response ID: ${data.responseId}`);
@@ -265,12 +323,13 @@
 
     const finalImageUrl = formatImageUrl(
       state.currentImageUrl ||
-      data.images?.[0]?.result ||
-      data.images?.[0]?.image ||
-      ""
+        data.images?.[0]?.result ||
+        data.images?.[0]?.image ||
+        "",
     );
 
-    const responseText = data.fullResponse ?? data.outputText ?? state.messageContent ?? "";
+    const responseText =
+      data.fullResponse ?? data.outputText ?? state.messageContent ?? "";
 
     // Add user message to history
     const newUserMessage: Message = {
@@ -281,7 +340,11 @@
 
     // Handle assistant message with citations
     if (state.citations.length > 0 && !state.isSentCitations) {
-      addAssistantMessageWithCitations(responseText, state.citations, finalImageUrl);
+      addAssistantMessageWithCitations(
+        responseText,
+        state.citations,
+        finalImageUrl,
+      );
     } else {
       addAssistantMessage(responseText, finalImageUrl);
     }
@@ -289,18 +352,18 @@
     // Clean up and reset states
     resetUIState();
     setPreviousResponseId(promptId, data.responseId);
-    
+
     // Scroll to latest message
     setTimeout(() => scrollIntoView(), 1000);
-    
+
     return data;
   }
 
   function handleErrorEvent(data: any, requestBody: RequestPayload): void {
     console.error(`❌ Stream error: ${data.error}`);
-    
+
     const errorMessage = data.error || "Image generation failed.";
-    
+
     // Add user message to history
     const errorUserMessage: Message = {
       role: MessageRole.User,
@@ -313,7 +376,7 @@
       content: errorMessage,
     };
     addMessageToHistory(groupId, promptId, failedMessage);
-    
+
     addToast({
       message: errorMessage,
       type: "error",
@@ -324,12 +387,16 @@
   }
 
   // === Message History Utilities ===
-  function addAssistantMessageWithCitations(responseText: string, citations: any[], imageUrl: string): void {
+  function addAssistantMessageWithCitations(
+    responseText: string,
+    citations: any[],
+    imageUrl: string,
+  ): void {
     console.log("📚 Citations sent:", citations);
-    
+
     const citationsJson = JSON.stringify({ citations });
     const parsedChunk: any = parseChunkCitations(citationsJson);
-    
+
     if (parsedChunk.citations) {
       citations = parsedChunk.citations;
     }
@@ -338,7 +405,7 @@
       .split("\n")
       .map((line) => formatMarkdown(line))
       .join("\n");
-    
+
     currentMessage = formatCitations(formattedChunk, citations);
 
     const newAssistantMessage: Message = {
@@ -347,7 +414,7 @@
       rawData: stripHtmlFormatting(currentMessage),
       imageUrl,
     };
-    
+
     addMessageToHistory(groupId, promptId, newAssistantMessage);
   }
 
@@ -358,7 +425,7 @@
       rawData: stripHtmlFormatting(responseText),
       imageUrl,
     };
-    
+
     addMessageToHistory(groupId, promptId, newAssistantMessage);
   }
 
@@ -385,7 +452,7 @@
     }
 
     const jsonStr = trimmedLine.substring(6).trim();
-    
+
     // Skip empty data lines or completion markers
     if (!jsonStr || jsonStr === "[DONE]" || jsonStr === "") {
       return null;
@@ -403,7 +470,11 @@
     }
   }
 
-  function processStreamEvent(data: any, state: StreamingState, requestBody: RequestPayload): any {
+  function processStreamEvent(
+    data: any,
+    state: StreamingState,
+    requestBody: RequestPayload,
+  ): any {
     switch (data.type) {
       case "start":
         handleStartEvent(data);
@@ -435,14 +506,17 @@
       default:
         console.warn(`Unknown event type: ${data.type}`);
     }
-    
+
     return null;
   }
 
-  async function processStream(reader: ReadableStreamDefaultReader, requestBody: RequestPayload): Promise<any> {
+  async function processStream(
+    reader: ReadableStreamDefaultReader,
+    requestBody: RequestPayload,
+  ): Promise<any> {
     const decoder = new TextDecoder();
     let buffer = "";
-    
+
     const state: StreamingState = {
       messageContent: "",
       citations: [],
@@ -455,7 +529,7 @@
 
       if (done) {
         console.log("✅ Stream completed");
-        
+
         // Process any remaining data in buffer
         if (buffer.trim()) {
           const data = parseStreamLine(buffer);
@@ -490,13 +564,13 @@
   async function callStreamingAPI(fileUrls: string[] = []) {
     try {
       resetStreamingState();
-      
+
       // Get API configuration
       const config = await getAPIConfiguration();
-      
+
       // Build request payload
       const requestBody = buildRequestPayload(fileUrls);
-      
+
       // Check for image generation tool
       const hasImageTool = enabledTools.some(
         (tool) => tool.name === ToolName.Image && tool.active,
@@ -520,7 +594,7 @@
       // Process streaming response
       if (response.headers.get("content-type")?.includes("text/event-stream")) {
         console.log("📡 Streaming response received");
-        
+
         const reader = response.body?.getReader();
         if (!reader) {
           throw new Error("No reader available");

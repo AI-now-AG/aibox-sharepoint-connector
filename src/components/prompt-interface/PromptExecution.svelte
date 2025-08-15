@@ -1,9 +1,11 @@
 <script lang="ts">
-  import { onMount, onDestroy } from "svelte";
+  import { onMount } from "svelte";
   import UseCaseCards from "$components/prompt-interface/UseCaseCards.svelte";
   import ChatExecutionWidget from "./ChatExecutionWidget.svelte";
   import StreamingChatWidget from "./StreamingChatWidget.svelte";
   import { PromptModel } from "$types/PromptModel";
+  import { tenant } from "$stores";
+  import { ApiKeyProvider } from "$types/TenantFeature";
 
   interface Props {
     promptItems: any;
@@ -12,7 +14,12 @@
     folderName?: string;
   }
 
-  let { promptItems, isEditable = false, groupId, folderName }: Props = $props();
+  let {
+    promptItems,
+    isEditable = false,
+    groupId,
+    folderName,
+  }: Props = $props();
 
   let selectedPromptId = $state("");
   let currentPrompt: any = $state();
@@ -22,15 +29,17 @@
     currentPrompt = promptItems[0];
   });
 
-  $effect(() => {
-    if (selectedPromptId) {
-      //currentPrompt = promptItems.find((e: any) => e._id === selectedPromptId);
-    }
-  });
+  function isGpt5Default() {
+    const aiProviders = $tenant?.api_key_providers ?? [];
+    const activeDefaultProvider = aiProviders.find(
+      (item) => item.active === true && item.default === true,
+    );
 
-  onDestroy(function () {
-    // $sharedMessageHistory = [];
-  });
+    if (activeDefaultProvider?.name === ApiKeyProvider.OpenAIGtp5) {
+      return true;
+    }
+    return false;
+  }
 </script>
 
 <div class="grid grid-cols-1 grid-rows-[1fr_min-content] h-full">
@@ -46,14 +55,13 @@
         bind:selectedPromptId
         {isEditable}
         isDisabling={isProcessing}
-        onSelectCard={(prompt) => {
+        onSelectCard={(prompt: any) => {
           currentPrompt = prompt;
-          // $sharedMessageHistory = [];
         }}
       />
     </div>
 
-    {#if [PromptModel.OpenAIWithTools, PromptModel.OpenAIWithImageTools, PromptModel.Claude, PromptModel.Perplexity].includes(currentPrompt?.model)}
+    {#if [PromptModel.OpenAIWithTools, PromptModel.OpenAIWithImageTools, PromptModel.Claude, PromptModel.Perplexity, PromptModel.OpenAIGpt5, PromptModel.OpenAIGpt5WithTools, PromptModel.OpenAIGpt5WithImageTools].includes(currentPrompt?.model) || (isGpt5Default() && !currentPrompt?.model)}
       <StreamingChatWidget
         promptId={selectedPromptId}
         {groupId}

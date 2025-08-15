@@ -38,10 +38,11 @@
       [ApiKeyProvider.AzureOpenAI]: "azure_openai_chat_model",
       [ApiKeyProvider.Perplexity]: "perplexity_chat_model",
       [ApiKeyProvider.Claude]: "anthropic_chat_model",
+      [ApiKeyProvider.OpenAIGtp5]: "openai_gpt5_chat_model",
     };
     const modelNameMap: Record<string, string> = {
       "claude-sonnet-4-0": "Sonnet",
-      "sonar": "Sonar",
+      sonar: "Sonar",
     };
 
     const key = providerModelMap[provider.name] as keyof typeof $tenant;
@@ -51,13 +52,20 @@
     let title;
     switch (provider.name) {
       case PromptModel.AzureOpenAI:
-        title = t("prompt-execution.models.azure-openai", { model: modelLabel });
+        title = t("prompt-execution.models.azure-openai", {
+          model: modelLabel,
+        });
         break;
       case PromptModel.Perplexity:
         title = t("prompt-execution.models.perplexity", { model: modelLabel });
         break;
       case PromptModel.Claude:
         title = t("prompt-execution.models.claude", { model: modelLabel });
+        break;
+      case PromptModel.OpenAIGpt5:
+        title = t("prompt-execution.models.openai-gpt-5-with-tools", {
+          model: modelLabel,
+        });
         break;
       default:
         title = t("prompt-execution.models.openai-legacy", { model: modelLabel });
@@ -68,6 +76,7 @@
   const sortProviders = (providers: any[]) => {
     const sortOrder = [
       ApiKeyProvider.OpenAI,
+      ApiKeyProvider.OpenAIGtp5,
       ApiKeyProvider.AzureOpenAI,
       ApiKeyProvider.Perplexity,
       ApiKeyProvider.Claude,
