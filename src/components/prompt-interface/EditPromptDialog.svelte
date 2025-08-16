@@ -308,11 +308,20 @@
           <Dropdown
             classes={"flex-1 min-w-3xs "}
             label={t("prompt-execution.reasoning-level")}
-            placeholder={`${t("prompt-execution.level-low")} | ${t("prompt-execution.level-medium")} | ${t("prompt-execution.level-high")}`}
+            placeholder={t("prompt-execution.reasoning-level.placeholder")}
             options={[
-              { title: t("prompt-execution.level-low"), value: "low" },
-              { title: t("prompt-execution.level-medium"), value: "medium" },
-              { title: t("prompt-execution.level-high"), value: "high" },
+              {
+                title: t("prompt-execution.reasoning-effort.level-low"),
+                value: "low",
+              },
+              {
+                title: t("prompt-execution.reasoning-effort.level-medium"),
+                value: "medium",
+              },
+              {
+                title: t("prompt-execution.reasoning-effort.level-high"),
+                value: "high",
+              },
             ]}
             bind:value={selectedReasoningLevel}
           />
@@ -320,12 +329,20 @@
           <Dropdown
             classes={"flex-1 min-w-3xs "}
             label={t("prompt-execution.text-verbosity")}
-            placeholder={`${t("prompt-execution.level-low")} | ${t("prompt-execution.level-medium")} | ${t("prompt-execution.level-high")}`}
-            
+            placeholder={t("prompt-execution.text-verbosity.placeholder")}
             options={[
-              { title: t("prompt-execution.level-low"), value: "low" },
-              { title: t("prompt-execution.level-medium"), value: "medium" },
-              { title: t("prompt-execution.level-high"), value: "high" },
+              {
+                title: t("prompt-execution.verbosity.level-low"),
+                value: "low",
+              },
+              {
+                title: t("prompt-execution.verbosity.level-medium"),
+                value: "medium",
+              },
+              {
+                title: t("prompt-execution.verbosity.level-high"),
+                value: "high",
+              },
             ]}
             bind:value={selectedTextVerbosity}
           />
