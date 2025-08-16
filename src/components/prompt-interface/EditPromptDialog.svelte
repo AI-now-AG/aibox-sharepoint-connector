@@ -49,8 +49,8 @@
   let selectedCategory: Category | undefined = $state();
 
   let selectedModel: string = $state("");
-  let selectedReasoningLevel: any = $state();
-  let selectedTextVerbosity: any = $state();
+  let selectedReasoningLevel: any = $state("low");
+  let selectedTextVerbosity: any = $state("low");
 
   let knowledgeBases: KnowledgeBase[] = $state([]);
   let selectedKnowledgeBases: KnowledgeBase[] = $state([]);
@@ -124,8 +124,8 @@
       }
 
       selectedModel = promptDetails.model?.toString() || "";
-      selectedReasoningLevel = promptDetails.reasoningEffort || "";
-      selectedTextVerbosity = promptDetails.textVerbosity || "";
+      selectedReasoningLevel = promptDetails.reasoningEffort || "low";
+      selectedTextVerbosity = promptDetails.textVerbosity || "low";
 
       const group = category?.groups.find(
         (e) => e._id == promptDetails.group?.toString(),

@@ -238,9 +238,7 @@
 
     if (isOpenAIGpt5ResponseModel) {
       payload.reasoningEffort = currentPrompt?.reasoningEffort || "low";
-      if (currentPrompt?.textVerbosity) {
-        payload.verbosity = currentPrompt?.textVerbosity;
-      }
+      payload.verbosity = currentPrompt?.textVerbosity || "low";
     }
 
     return payload;
