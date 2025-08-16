@@ -474,13 +474,13 @@
   "home.model-option-text-websearch": "Text & Websearch",
   "prompt-execution.models.openai-gpt-5-with-tools": "gpt-5 (Text & Tools)",
   "prompt-execution.reasoning-level": "Reasoning level",
-  "prompt-execution.reasoning-level.placeholder": "low | medium | high",
-  "prompt-execution.reasoning-effort.level-low": "low",
-  "prompt-execution.reasoning-effort.level-medium": "medium",
-  "prompt-execution.reasoning-effort.level-high": "high",
+  "prompt-execution.reasoning-level.placeholder": "fast | balanced | high",
+  "prompt-execution.reasoning-effort.level-low": "Fast response - lower reasoning",
+  "prompt-execution.reasoning-effort.level-medium": "Balanced response and reasoning",
+  "prompt-execution.reasoning-effort.level-high": "Deeper thinking for complext tasks",
   "prompt-execution.text-verbosity": "Text verbosity",
   "prompt-execution.text-verbosity.placeholder": "low | medium | high",
-  "prompt-execution.verbosity.level-low": "low",
-  "prompt-execution.verbosity.level-medium": "medium",
-  "prompt-execution.verbosity.level-high": "high"
+  "prompt-execution.verbosity.level-low": "Short Answer",
+  "prompt-execution.verbosity.level-medium": "Compact, some detail",
+  "prompt-execution.verbosity.level-high": "Highly detailed"
 }
