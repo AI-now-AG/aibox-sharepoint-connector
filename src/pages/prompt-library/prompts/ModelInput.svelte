@@ -75,25 +75,28 @@
     return title;
   };
 
-  const sortProviders = (providers: any[]) => {
-    const sortOrder = [
-      ApiKeyProvider.OpenAI,
-      ApiKeyProvider.OpenAIGtp5,
-      ApiKeyProvider.AzureOpenAI,
-      ApiKeyProvider.Perplexity,
-      ApiKeyProvider.Claude,
-    ];
-    return providers.slice().sort((a, b) => {
-      return sortOrder.indexOf(a.name) - sortOrder.indexOf(b.name);
+  function sortProviders(providers: any[]): any[] {
+    const customSortOrder: { [key: string]: number } = {
+      [PromptModel.Default]: 1, // Default - gpt-4o, Legacy (Text)
+      [PromptModel.OpenAIWithTools]: 2, // gpt-4o (Text & Tools)
+      [PromptModel.OpenAIGpt5]: 3, // gpt-5 (Text & Tools)
+      [PromptModel.Perplexity]: 4, // Perplexity Sonar (Text & Websuche)
+      [PromptModel.Claude]: 5, // Claude Sonnet (Text)
+      [PromptModel.OpenAIWithImageTools]: 6, // gpt Image (Bilder)
+      [PromptModel.OpenAI]: 7, // gpt-4o, Legacy (Text)
+    };
+    return providers.sort((a, b) => {
+      const orderA = customSortOrder[a.value] || Infinity;
+      const orderB = customSortOrder[b.value] || Infinity;
+      return orderA - orderB;
     });
-  };
+  }
 
   const getActiveModels = (): Option[] => {
     const rawProviders = $tenant?.api_key_providers ?? [];
-    let sortedProviders = sortProviders(rawProviders);
 
     const models: Option[] =
-      sortedProviders
+      rawProviders
         .filter((provider: any) => provider.active)
         .map((provider: any) => {
           const modelName = getModelLabel(provider);
@@ -103,9 +106,7 @@
           };
         }) || [];
 
-    const defaultModel = sortedProviders.find(
-      (provider: any) => provider.default,
-    );
+    const defaultModel = rawProviders.find((provider: any) => provider.default);
     const defaultText = t("tenant.default");
     const defaultName = capitalizeFirst(defaultText);
 
@@ -133,7 +134,7 @@
       title: t("prompt-execution.models.openai-with-image-tools"),
     });
 
-    return models;
+    return sortProviders(models);
   };
 </script>
 

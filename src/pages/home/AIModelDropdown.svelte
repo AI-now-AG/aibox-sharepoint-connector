@@ -65,16 +65,22 @@
     return title;
   };
 
-  const sortModelOptions = (models: any[]) => {
-    const sortOrder = [
-      PromptModel.OpenAIWithTools,
-      PromptModel.Claude,
-      PromptModel.Perplexity,
-    ];
-    return models.slice().sort((a, b) => {
-      return sortOrder.indexOf(a.value) - sortOrder.indexOf(b.value);
+  function sortProviders(providers: any[]): any[] {
+    const customSortOrder: { [key: string]: number } = {
+      [PromptModel.Default]: 1, // Default - gpt-4o, Legacy (Text)
+      [PromptModel.OpenAIWithTools]: 2, // gpt-4o (Text & Tools)
+      [PromptModel.OpenAIGpt5]: 3, // gpt-5 (Text & Tools)
+      [PromptModel.Perplexity]: 4, // Perplexity Sonar (Text & Websuche)
+      [PromptModel.Claude]: 5, // Claude Sonnet (Text)
+      [PromptModel.OpenAIWithImageTools]: 6, // gpt Image (Bilder)
+      [PromptModel.OpenAI]: 7, // gpt-4o, Legacy (Text)
+    };
+    return providers.sort((a, b) => {
+      const orderA = customSortOrder[a.value] || Infinity;
+      const orderB = customSortOrder[b.value] || Infinity;
+      return orderA - orderB;
     });
-  };
+  }
 
   const getActiveModels = (): Option[] => {
     const allProviders = $tenant?.api_key_providers ?? [];
@@ -104,7 +110,7 @@
       title: `gpt-4o (${t("home.model-option-text-tools")})`,
     });
 
-    return sortModelOptions(models);
+    return sortProviders(models);
   };
 </script>
 
