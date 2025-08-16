@@ -49,6 +49,7 @@
     previousResponseId?: string | null;
     messageHistory?: Message[];
     reasoningEffort?: string;
+    verbosity?: string;
   }
 
   interface Props {
@@ -183,6 +184,7 @@
 
     if (isOpenAIGpt5ResponseModel) {
       payload.reasoningEffort = "low";
+      payload.verbosity = "low";
     }
 
     return payload;
