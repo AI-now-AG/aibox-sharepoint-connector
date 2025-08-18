@@ -156,6 +156,8 @@
     const hasImageTool = enabledTools.some(
       (tool) => tool.name === ToolName.Image && tool.active,
     );
+    
+    isGenerating = hasImageTool;
 
     const payload: RequestPayload = {
       tenantId: $tenant?._id?.toString()!,

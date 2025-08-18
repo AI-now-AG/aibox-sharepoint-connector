@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onDestroy } from "svelte";
+
   import { v4 as uuidv4 } from "uuid";
   import {
     messageHistories,
@@ -10,7 +10,7 @@
     setPreviousResponseId,
     getPreviousResponseId,
   } from "$components/prompt-interface/components/stores/messageHistoryStore";
-  import { ResponseStatus, ToolName } from "$types/AIResponse";
+  import { ToolName } from "$types/AIResponse";
   import { PromptModel } from "$types/PromptModel";
   import { addToast } from "$stores/toast";
   import {
