@@ -5,6 +5,9 @@
   import ImageCard from "./ImageCard.svelte";
   import { svgIcons } from "$assets/icons";
   import { user } from "$stores";
+    import { useTranslations } from "$i18n/utils";
+
+  const t = useTranslations();
 
   interface Props {
     currentMessage: string;
@@ -12,6 +15,7 @@
     messages: MessageHistory;
     isFetching: boolean;
     isGenerating: boolean;
+    isResoningThingking: boolean;
     infoText?: string;
   }
 
@@ -21,6 +25,7 @@
     messages = [],
     isFetching = false,
     isGenerating = false,
+    isResoningThingking = false,
     infoText = "",
   }: Props = $props();
 
@@ -56,7 +61,7 @@
   });
 
   function copyToClipboard(content: string, index: number) {
-    console.log('content', {content});
+    console.log("content", { content });
     navigator.clipboard
       .writeText(content)
       .then(() => {
@@ -83,7 +88,7 @@
           <div class="flex flex-col">
             <div class="mt-2 overflow-y-scroll h-full min-h-screen">
               <div class="card gap-4 chat-container" transition:fade>
-                {#each messages as { role, content, rawData = "" , imageUrl }, index}
+                {#each messages as { role, content, rawData = "", imageUrl }, index}
                   <div
                     class={`chat-bubble text-base-content ${role === MessageRole.User ? `bg-base-200` : `bg-base-100`}`}
                   >
@@ -177,6 +182,9 @@
                       class="chat-bubble bg-base-100 text-base-content flex flex-row"
                     >
                       <span class="loading loading-dots loading-lg"></span>
+                      {#if isResoningThingking}
+                        <span class="ml-2">{t("prompt-execution.thinking")}</span>
+                      {/if}
                     </div>
                   {/if}
                   {#if isGenerating}

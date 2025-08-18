@@ -1,5 +1,4 @@
 <script lang="ts">
-
   import { v4 as uuidv4 } from "uuid";
   import {
     messageHistories,
@@ -88,6 +87,7 @@
   let files: File[] = $state([]);
   let currentStreamingImageUrl: string = $state("");
   let isGenerating: boolean = $state(false);
+  let isResoningThingking: boolean = $state(false);
 
   function isGpt5Default() {
     const aiProviders = $tenant?.api_key_providers ?? [];
@@ -215,6 +215,13 @@
         PromptModel.OpenAIGpt5WithImageTools,
       ].includes(currentPrompt?.model) ||
       (isGpt5Default() && !currentPrompt?.model);
+
+    if (
+      getDefaultModelName() === ApiKeyProvider.OpenAI &&
+      !isOpenAIGpt5ResponseModel
+    ) {
+      isOpenAIResponseModel = true;
+    }
 
     const provider = isOpenAIResponseModel
       ? "openai-response"
@@ -487,10 +494,14 @@
   ): any {
     switch (data.type) {
       case "start":
+        if (data.model === "gpt-5") {
+          isResoningThingking = true;
+        }
         handleStartEvent(data);
         break;
 
       case "chunk":
+        isResoningThingking = false;
         handleChunkEvent(data, state);
         break;
 
@@ -688,6 +699,7 @@
     currentImageUrl={currentStreamingImageUrl}
     {isFetching}
     {isGenerating}
+    {isResoningThingking}
   />
 {/if}
 
@@ -727,5 +739,6 @@
     messages={currentMessageHistory}
     {isFetching}
     {isGenerating}
+    {isResoningThingking}
   />
 {/if}

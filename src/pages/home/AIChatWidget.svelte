@@ -66,6 +66,7 @@
   let currentStreamingImageUrl: string = $state("");
   let isFetching: boolean = $state(false);
   let isGenerating: boolean = $state(false);
+  let isResoningThingking: boolean = $state(false);
   let previousResponseId: string | null = $state(null);
   let enabledTools: Tool[] = $state([]);
 
@@ -156,7 +157,7 @@
     const hasImageTool = enabledTools.some(
       (tool) => tool.name === ToolName.Image && tool.active,
     );
-    
+
     isGenerating = hasImageTool;
 
     const payload: RequestPayload = {
@@ -428,10 +429,14 @@
   ): any {
     switch (data.type) {
       case "start":
+        if (data.model === "gpt-5") {
+          isResoningThingking = true;
+        }
         handleStartEvent(data);
         break;
 
       case "chunk":
+        isResoningThingking = false;
         handleChunkEvent(data);
         state.messageContent += data.content || "";
         break;
@@ -645,6 +650,7 @@
       currentImageUrl={currentStreamingImageUrl}
       {isFetching}
       {isGenerating}
+      {isResoningThingking}
     />
 
     {#if $sharedMessageHistory.length > 0}
