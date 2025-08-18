@@ -14,6 +14,7 @@ import { AIMessageChunk } from "@langchain/core/messages";
 import type { CreateKnowledgeBaseParams } from "../knowledge-base.json";
 import initializeOpenAI from "$utils/chatModel";
 import { MessageRole } from "$types/MessageHistory";
+import { ApiKeyProvider, TenantFeature } from "$types/TenantFeature";
 
 export type PromptDetails = {
   title: string;
@@ -43,6 +44,259 @@ const RunPromptParamsSchema = z.object({
 export type RunPromptParams = z.infer<typeof RunPromptParamsSchema>;
 export type Attachment = z.infer<typeof AttachmentSchema>;
 
+// Helper function to check if provider is Perplexity
+const isPerplexityProvider = (ctx: any, model?: string | null): boolean => {
+  const { tenant } = ctx.locals;
+  const { included_features: features } = ctx.locals.tenant;
+
+  // Find the text prompts feature in enabled features
+  const textPromptsProvider = features?.find(
+    (item: any) => item.name == TenantFeature.TextPrompts,
+  );
+
+  // Determine API provider based on enabled features
+  let provider = textPromptsProvider
+    ? textPromptsProvider.provider
+    : ApiKeyProvider.OpenAI;
+
+  // If a custom model is provided, override the default API provider
+  // Extract the provider name (the first segment).
+  if (model) {
+    provider = model.split(":")[0] as ApiKeyProvider;
+  }
+
+  return provider === ApiKeyProvider.Perplexity;
+};
+
+// Perplexity streaming function similar to callStreamingAPI in StreamingChatWidget
+const callPerplexityStreamingAPI = async (
+  ctx: any,
+  prompt: any,
+  messages: BaseMessage[],
+  data: RunPromptParams,
+  overrides: any
+): Promise<Response> => {
+  try {
+    // Get headers from request object in Astro context
+    const host = ctx.request.headers.get("host") || "localhost:4321";
+    const protocol = ctx.request.headers.get("x-forwarded-proto") || "http";
+    const previewUrl = `${protocol}://${host}`;
+
+    // Get API configuration like in StreamingChatWidget
+    const configResponse = await fetch(
+      `${previewUrl}/.netlify/functions/getTranscriptionConfig`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+
+    if (!configResponse.ok) {
+      throw new Error("Failed to get transcription configuration");
+    }
+
+    const { apiKey, apiUrl: baseUrl } = await configResponse.json();
+    const apiUrl = `${baseUrl}/api/prompt/execute`;
+
+    const provider = "perplexity";
+    const requestBody = {
+      tenantId: ctx.locals.tenant?._id?.toString(),
+      provider,
+      prompt: data.article || "",
+      promptId: data._id,
+      stream: true,
+      messageHistory: data.messageHistory || [],
+    };
+
+    const response = await fetch(apiUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-Key": apiKey,
+      },
+      body: JSON.stringify(requestBody),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    // Check if response is event-stream
+    if (response.headers.get("content-type")?.includes("text/event-stream")) {
+
+      // Set up server-side streaming response for plain text
+      const encoder = new TextEncoder();
+      const headers = new Headers();
+      headers.set("Content-Type", "text/plain; charset=UTF-8");
+      headers.set("Transfer-Encoding", "chunked");
+
+      const { readable, writable } = new TransformStream();
+      const writer = writable.getWriter();
+
+      // Process the streaming response
+      (async () => {
+        try {
+          const reader = response.body?.getReader();
+          const decoder = new TextDecoder();
+
+          if (!reader) {
+            throw new Error("No reader available");
+          }
+
+          let buffer = "";
+          let messageContent = "";
+          let citations: any[] = [];
+          let isSentCitations = false;
+
+          while (true) {
+            const { done, value } = await reader.read();
+
+            if (done) {
+              break;
+            }
+
+            const chunk = decoder.decode(value, { stream: true });
+            buffer += chunk;
+
+            // Process complete lines from buffer
+            const lines = buffer.split("\n");
+            buffer = lines.pop() || "";
+
+            for (const line of lines) {
+              const trimmedLine = line.trim();
+              if (trimmedLine.startsWith("data: ")) {
+                try {
+                  const jsonStr = trimmedLine.substring(6).trim();
+
+                  if (!jsonStr || jsonStr === "[DONE]" || jsonStr === "") {
+                    continue;
+                  }
+
+                  if (!jsonStr.startsWith("{") && !jsonStr.startsWith("[")) {
+                    continue;
+                  }
+
+                  const eventData = JSON.parse(jsonStr);
+
+                  switch (eventData.type) {
+                    case "start":
+                      break;
+
+                    case "chunk":
+                      if (eventData.content && typeof eventData.content === "string") {
+                        messageContent += eventData.content;
+                        // Send content chunk as plain text
+                        await writer.write(encoder.encode(eventData.content));
+                      }
+                      break;
+
+                    case "citations":
+                      // Store citations but don't send them yet to avoid interrupting content flow
+                      if (eventData.citations && eventData.citations.length > 0) {
+                        citations = eventData.citations;
+                        // Don't send citations here - wait for completion or end of content
+                      }
+                      break;
+
+                    case "complete":
+                      console.log(`✅ Complete! Processing time: ${eventData.processingTimeMs}ms`);
+                      // Now send citations at the end after all content is streamed
+                      if (citations.length > 0 && !isSentCitations) {
+                        isSentCitations = true;
+                        const citationsJson = JSON.stringify({ citations });
+                        await writer.write(encoder.encode(citationsJson));
+                      }
+
+                      // Complete the stream
+                      return;
+
+                    case "error":
+                      console.error(`❌ Perplexity stream error: ${eventData.error}`);
+                      const errorMessage = eventData.error || "Perplexity streaming failed.";
+                      await writer.write(encoder.encode("Error: " + errorMessage + "\n"));
+                      throw new Error(eventData.error);
+                  }
+                } catch (parseError) {
+                  console.warn("Failed to parse Perplexity event data:", parseError);
+                }
+              }
+            }
+          }
+        } catch (error) {
+          console.error("Perplexity streaming error:", error);
+          await writer.write(
+            encoder.encode("Error processing Perplexity stream: " + error + "\n"),
+          );
+        } finally {
+          writer.close();
+        }
+      })();
+
+      return new Response(readable, { headers });
+    }
+
+    // If not event-stream, throw error since we expect streaming
+    throw new Error("Expected event-stream response from Perplexity API");
+
+  } catch (error) {
+    console.error("Perplexity streaming API error:", error);
+
+    // Fallback to regular LangChain streaming for Perplexity
+    const encoder = new TextEncoder();
+    const headers = new Headers();
+    headers.set("Content-Type", "text/plain; charset=UTF-8");
+    headers.set("Transfer-Encoding", "chunked");
+
+    const { readable, writable } = new TransformStream();
+    const writer = writable.getWriter();
+
+    const model = initializeOpenAI(ctx, overrides);
+
+    (async () => {
+      try {
+        let isSentCitations = false;
+        let partialChunk = "";
+
+        const stream: AsyncIterable<AIMessageChunk> = await model.stream(messages);
+        for await (const chunk of stream) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const rawResponse = chunk?.additional_kwargs?.__raw_response as any;
+          const citations = rawResponse?.citations ?? [];
+          if (citations.length > 0 && !isSentCitations) {
+            isSentCitations = true;
+            console.log("Citations found but not sending to avoid corruption:", citations);
+            // Don't write citations to text stream to avoid corruption
+          }
+
+          partialChunk += chunk.content;
+          let lastCompleteCharIndex = partialChunk.length;
+          try {
+            encoder.encode(partialChunk);
+          } catch {
+            lastCompleteCharIndex = Buffer.byteLength(partialChunk) - 1;
+          }
+
+          const validChunk = partialChunk.slice(0, lastCompleteCharIndex);
+          partialChunk = partialChunk.slice(lastCompleteCharIndex);
+
+          if (validChunk) {
+            await writer.write(encoder.encode(validChunk));
+          }
+        }
+      } catch (error) {
+        console.error("Perplexity fallback streaming error:", error);
+        await writer.write(
+          encoder.encode("Error processing chunks:" + error + "\n"),
+        );
+      } finally {
+        writer.close();
+      }
+    })();
+
+    return new Response(readable, { headers });
+  }
+};
+
 export const POST: APIRoute = async (ctx) => {
   const { params, request } = ctx;
   const { default_language } = ctx.locals.tenant;
@@ -50,8 +304,6 @@ export const POST: APIRoute = async (ctx) => {
   const id = params.id;
 
   try {
-    const encoder = new TextEncoder();
-
     const requestParams = await request.json();
 
     const data = RunPromptParamsSchema.parse({
@@ -71,7 +323,7 @@ export const POST: APIRoute = async (ctx) => {
 
     const messages: BaseMessage[] = [];
     messages.push(new SystemMessage(getInstructionMessage(defaultLanguage)));
-    
+
     messages.push(new SystemMessage(prompt.prompt));
 
     if (prompt?.knowledgebase) {
@@ -144,6 +396,14 @@ export const POST: APIRoute = async (ctx) => {
       }
     }
 
+    const overrides = prompt.model ? { customModel: prompt.model } : {};
+    // Check if provider is Perplexity and use streaming API
+    if (isPerplexityProvider(ctx, prompt.model)) {
+      return await callPerplexityStreamingAPI(ctx, prompt, messages, data, overrides);
+    }
+
+    // Original streaming flow for other providers
+    const encoder = new TextEncoder();
     const headers = new Headers();
     headers.set("Content-Type", "text/plain; charset=UTF-8");
     headers.set("Transfer-Encoding", "chunked");
@@ -151,7 +411,6 @@ export const POST: APIRoute = async (ctx) => {
     const { readable, writable } = new TransformStream();
     const writer = writable.getWriter();
 
-    const overrides = prompt.model ? { customModel: prompt.model } : {};
     const model = initializeOpenAI(ctx, overrides);
 
     (async () => {

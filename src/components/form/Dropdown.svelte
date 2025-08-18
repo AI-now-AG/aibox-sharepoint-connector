@@ -32,7 +32,7 @@
     value = $bindable(""),
     placeholder = "",
     classes,
-    labelClasses,
+    labelClasses = "",
     disabled = $bindable(false),
     children,
   }: Props = $props();
@@ -56,7 +56,8 @@
   <div class="dropdown w-full">
     <label
       tabindex={disabled ? -1 : 0}
-      class={"select select-bordered w-full rounded-lg" +
+      class={"select select-bordered w-full rounded-lg " +
+        (value ? "" : "text-[#a29bd6]") +
         (disabled ? " pointer-events-none opacity-50 bg-gray-200" : "")}
     >
       {options.find((opt) => opt.value === value)?.title || placeholder}

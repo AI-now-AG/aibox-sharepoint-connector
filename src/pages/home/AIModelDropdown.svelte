@@ -1,10 +1,9 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { useTranslations } from "$i18n/utils";
-  import { capitalizeFirst } from "$utils/common";
   import { tenant } from "$stores";
-  import { PromptModel } from "$types/PromptModel";
   import { ApiKeyProvider } from "$types/TenantFeature";
+  import { PromptModel } from "$types/PromptModel";
   import Dropdown, { type Option } from "$components/form/Dropdown.svelte";
 
   const t = useTranslations();
@@ -35,42 +34,33 @@
 
   const getModelLabel = (provider: any) => {
     const providerModelMap: Record<string, string> = {
-      [ApiKeyProvider.AzureOpenAI]: "azure_openai_chat_model",
       [ApiKeyProvider.Perplexity]: "perplexity_chat_model",
       [ApiKeyProvider.Claude]: "anthropic_chat_model",
       [ApiKeyProvider.OpenAIGtp5]: "openai_gpt5_chat_model",
     };
     const modelNameMap: Record<string, string> = {
-      "claude-sonnet-4-0": "Sonnet",
-      sonar: "Sonar",
+      "claude-sonnet-4-0": "Claude Sonnet",
+      sonar: "Perplexity Sonar",
     };
 
     const key = providerModelMap[provider.name] as keyof typeof $tenant;
     const rawModel = $tenant?.[key] || "gpt-4o";
     const modelLabel = modelNameMap[rawModel] || rawModel;
 
-    let title;
+    let title = "-";
     switch (provider.name) {
-      case PromptModel.AzureOpenAI:
-        title = t("prompt-execution.models.azure-openai", {
-          model: modelLabel,
-        });
-        break;
-      case PromptModel.Perplexity:
-        title = t("prompt-execution.models.perplexity", { model: modelLabel });
-        break;
-      case PromptModel.Claude:
-        title = t("prompt-execution.models.claude", { model: modelLabel });
+      case PromptModel.OpenAI:
+        title = `${modelLabel} (${t("home.model-option-text-tools")})`;
         break;
       case PromptModel.OpenAIGpt5:
-        title = t("prompt-execution.models.openai-gpt-5-with-tools", {
-          model: modelLabel,
-        });
+        title = `${modelLabel} (${t("home.model-option-text-tools")})`;
         break;
-      default:
-        title = t("prompt-execution.models.openai-legacy", {
-          model: modelLabel,
-        });
+      case PromptModel.Perplexity:
+        title = `${modelLabel} (${t("home.model-option-text-websearch")})`;
+        break;
+      case PromptModel.Claude:
+        title = `${modelLabel} (${t("home.model-option-text")})`;
+        break;
     }
     return title;
   };
@@ -93,11 +83,19 @@
   }
 
   const getActiveModels = (): Option[] => {
-    const rawProviders = $tenant?.api_key_providers ?? [];
+    const allProviders = $tenant?.api_key_providers ?? [];
+    const allowedProviders = [
+      ApiKeyProvider.Perplexity,
+      ApiKeyProvider.Claude,
+      ApiKeyProvider.OpenAIGtp5,
+    ];
 
     const models: Option[] =
-      rawProviders
-        .filter((provider: any) => provider.active)
+      allProviders
+        .filter(
+          (provider: any) =>
+            provider.active && allowedProviders.includes(provider.name),
+        )
         .map((provider: any) => {
           const modelName = getModelLabel(provider);
           return {
@@ -106,32 +104,10 @@
           };
         }) || [];
 
-    const defaultModel = rawProviders.find((provider: any) => provider.default);
-    const defaultText = t("tenant.default");
-    const defaultName = capitalizeFirst(defaultText);
-
-    const modelName = getModelLabel(defaultModel);
-
-    if (defaultModel?.name !== ApiKeyProvider.OpenAI) {
-      models.unshift({
-        value: PromptModel.Default,
-        title: `${defaultName} - ${modelName}`,
-      });
-    }
     // OpenAI Responses API
     models.push({
-      value:
-        defaultModel?.name === ApiKeyProvider.OpenAI
-          ? PromptModel.Default
-          : PromptModel.OpenAIWithTools,
-      title:
-        defaultModel?.name === ApiKeyProvider.OpenAI
-          ? `${defaultName} - ${t("prompt-execution.models.openai-with-tools")}`
-          : `${t("prompt-execution.models.openai-with-tools")}`,
-    });
-    models.push({
-      value: PromptModel.OpenAIWithImageTools,
-      title: t("prompt-execution.models.openai-with-image-tools"),
+      value: PromptModel.OpenAIWithTools,
+      title: `gpt-4o (${t("home.model-option-text-tools")})`,
     });
 
     return sortProviders(models);
@@ -142,7 +118,7 @@
   classes={"flex-1 min-w-3xs " + classes}
   {labelClasses}
   label={label ?? t("prompt-library.add.prompts.language-model")}
-  placeholder={`${t("tenant.default")} (OpenAI gtp-4o)`}
+  placeholder={""}
   options={models}
   {disabled}
   bind:value={selectedModel}
