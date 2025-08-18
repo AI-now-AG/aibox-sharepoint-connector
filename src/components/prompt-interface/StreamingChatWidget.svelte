@@ -203,11 +203,7 @@
       PromptModel.OpenAIWithTools,
       PromptModel.OpenAIWithImageTools,
     ].includes(currentPrompt?.model);
-
-    if (getDefaultModelName() === ApiKeyProvider.OpenAI) {
-      isOpenAIResponseModel = true;
-    }
-
+    
     const isOpenAIGpt5ResponseModel =
       [
         PromptModel.OpenAIGpt5,
@@ -215,6 +211,9 @@
         PromptModel.OpenAIGpt5WithImageTools,
       ].includes(currentPrompt?.model) ||
       (isGpt5Default() && !currentPrompt?.model);
+
+
+      console.log(currentPrompt?.model, !isOpenAIGpt5ResponseModel)
 
     if (
       getDefaultModelName() === ApiKeyProvider.OpenAI &&
