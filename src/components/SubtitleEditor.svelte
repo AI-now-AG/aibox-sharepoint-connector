@@ -218,7 +218,7 @@
 
     if (currentRowIndices.length > 0) {
       currentRowIndex = currentRowIndices[0];
-      scrollToCurrentRow();
+    //   scrollToCurrentRow();
     }
   }
 
