@@ -66,6 +66,7 @@
   let tenantData = $state(tenant ?? {});
   tenantData.metadata = {
     openaiPrivateKeyEnabled: false,
+    openaiGpt5PrivateKeyEnabled: false,
     azureOpenaiPrivateKeyEnabled: false,
     speechPrivateKeyEnabled: false,
     elevenLabsPrivateKeyEnabled: false,
@@ -83,6 +84,7 @@
   tenantData.billing_info = tenant?.billing_info ?? {};
 
   let openAIEnabled: boolean = $state(false);
+  let openAIGpt5Enabled: boolean = $state(false);
   let azureOpenAIEnabled: boolean = $state(false);
   let perplexityEnabled: boolean = $state(false);
   let dalleEnabled: boolean = $state(false);
@@ -91,6 +93,7 @@
   let claudeEnabled: boolean = $state(false);
 
   let openAIKeyField: HTMLInputElement;
+  let openAIGpt5KeyField: HTMLInputElement;
   let azureOpenAIKeyField: HTMLInputElement;
   let perplexityKeyField: HTMLInputElement;
   let azureOpenAIKeyProField: HTMLInputElement;
@@ -122,10 +125,6 @@
           (item) => item.value == findTextProvider.provider,
         ) || providerValues[0];
     }
-
-    // isAudioToTextChecked = tenantData.included_features.some(
-    //   (item: any) => item.name == TenantFeature.AudioToText,
-    // );
   }
 
   let tenantAdminEmail = $state("");
@@ -229,24 +228,7 @@
 
   let selectedThemes: { title: string; value: string } | undefined = $state();
 
-  if (tenantData && tenantData.transcription_types?.length) {
-    //   isAzureAudioProEnabled = tenantData.transcription_types.some(
-    //     (item: any) =>
-    //       item === AudioCategory.AudioPro || item === AudioCategory.SubtitleLarge,
-    //   );
-  }
-
   if (tenantData) {
-    // const findTextProvider = tenantData.api_key_providers.find(
-    //   (item: any) => item.name == ApiKeyProvider.OpenAI,
-    // );
-    // if (findTextProvider) {
-    //   textSelectedProvider =
-    //     providerValues.find(
-    //       (item) => item.value == findTextProvider.provider,
-    //     ) || providerValues[0];
-    // }
-
     const { api_key_providers = [], included_features = [] } = tenantData;
 
     const findProvider = (provider: ApiKeyProvider) =>
@@ -255,6 +237,7 @@
       );
 
     openAIEnabled = findProvider(ApiKeyProvider.OpenAI);
+    openAIGpt5Enabled = findProvider(ApiKeyProvider.OpenAIGtp5);
     azureOpenAIEnabled = findProvider(ApiKeyProvider.AzureOpenAI);
     perplexityEnabled = findProvider(ApiKeyProvider.Perplexity);
     claudeEnabled = findProvider(ApiKeyProvider.Claude);
@@ -282,6 +265,7 @@
     // svelte-ignore state_referenced_locally
     if (defaultTextFeature) {
       openAIEnabled ||= defaultTextFeature === ApiKeyProvider.OpenAI;
+      openAIGpt5Enabled ||= defaultTextFeature === ApiKeyProvider.OpenAIGtp5;
       azureOpenAIEnabled ||= defaultTextFeature === ApiKeyProvider.AzureOpenAI;
     }
   }
@@ -296,6 +280,15 @@
   }
   if (tenantData.theme) {
     selectedThemes = themes.find((item) => item.value === tenantData.theme);
+  }
+  if (tenantData && !tenantData.openai_chat_model) {
+    tenantData.openai_chat_model = "gpt-4o";
+  }
+  if (tenantData && !tenantData.openai_gpt5_chat_model) {
+    tenantData.openai_gpt5_chat_model = "gpt-5";
+  }
+  if (tenantData && !tenantData.openai_gpt5_reasoning_effort) {
+    tenantData.openai_gpt5_reasoning_effort = "low";
   }
 
   function togglePassword(field: HTMLInputElement) {
@@ -317,6 +310,8 @@
 
     !openAIEnabled &&
       (openAIEnabled = defaultTextFeature === ApiKeyProvider.OpenAI);
+    !openAIGpt5Enabled &&
+      (openAIGpt5Enabled = defaultTextFeature === ApiKeyProvider.OpenAIGtp5);
     !azureOpenAIEnabled &&
       (azureOpenAIEnabled = defaultTextFeature === ApiKeyProvider.AzureOpenAI);
     !perplexityEnabled &&
@@ -326,6 +321,8 @@
 
     if (feature === ApiKeyProvider.OpenAI) {
       updateTextFeature(feature, openAIEnabled);
+    } else if (feature === ApiKeyProvider.OpenAIGtp5) {
+      updateTextFeature(feature, openAIGpt5Enabled);
     } else if (feature === ApiKeyProvider.AzureOpenAI) {
       updateTextFeature(feature, azureOpenAIEnabled);
     } else if (feature === ApiKeyProvider.Perplexity) {
@@ -358,8 +355,20 @@
       return false;
     }
 
+    if (
+      defaultTextFeature == ApiKeyProvider.OpenAIGtp5 &&
+      !tenantData.openai_gpt5_api_key
+    ) {
+      showAlert("[GPT-5] " + t("tenant.validate-open-ai-key-message"));
+      return false;
+    }
+
     const atLeastTextSelected =
-      openAIEnabled || azureOpenAIEnabled || perplexityEnabled || claudeEnabled;
+      openAIEnabled ||
+      openAIGpt5Enabled ||
+      azureOpenAIEnabled ||
+      perplexityEnabled ||
+      claudeEnabled;
     if (!atLeastTextSelected) {
       showAlert(t("tenant.validate-atleast-one-select"));
       return false;
@@ -399,6 +408,14 @@
         !tenantData.openai_api_key
       ) {
         showAlert(t("tenant.validate-open-ai-key-message"));
+        return false;
+      }
+
+      if (
+        audioSelectedProvider.value === ApiKeyProvider.OpenAIGtp5 &&
+        !tenantData.openai_gpt5_api_key
+      ) {
+        showAlert("[GPT-5] " + t("tenant.validate-open-ai-key-message"));
         return false;
       }
     }
@@ -454,6 +471,7 @@
         const { error: encryptKeysError, data } =
           await actions.tenant.encryptApiKeys({
             openai_api_key: tenantData.openai_api_key,
+            openai_gpt5_api_key: tenantData.openai_gpt5_api_key,
             azure_openai_api_key: tenantData.azure_openai_api_key,
             perplexity_api_key: tenantData.perplexity_api_key,
             speech_api_key: tenantData.speech_api_key,
@@ -467,6 +485,7 @@
         }
         const {
           openai_api_key,
+          openai_gpt5_api_key,
           azure_openai_api_key,
           perplexity_api_key,
           speech_api_key,
@@ -478,6 +497,7 @@
         cleanupValues();
         // API Keys
         tenantData.openai_api_key = openai_api_key;
+        tenantData.openai_gpt5_api_key = openai_gpt5_api_key;
         tenantData.azure_openai_api_key = azure_openai_api_key;
         tenantData.speech_api_key = speech_api_key;
         tenantData.elevenLabs_api_key = elevenLabs_api_key;
@@ -488,6 +508,7 @@
         tenantData.perplexity_chat_model = selectedPerplexityModel;
         tenantData.anthropic_chat_model = selectedClaudeModel;
         updateTextFeature(ApiKeyProvider.OpenAI, openAIEnabled);
+        updateTextFeature(ApiKeyProvider.OpenAIGtp5, openAIGpt5Enabled);
         updateTextFeature(ApiKeyProvider.AzureOpenAI, azureOpenAIEnabled);
         updateTextFeature(ApiKeyProvider.Perplexity, perplexityEnabled);
         updateTextFeature(ApiKeyProvider.Claude, claudeEnabled);
@@ -578,12 +599,13 @@
         const { error: encryptKeysError, data } =
           await actions.tenant.encryptApiKeys({
             openai_api_key: tenantData.openai_api_key,
+            openai_gpt5_api_key: tenantData.openai_gpt5_api_key,
             azure_openai_api_key: tenantData.azure_openai_api_key,
             perplexity_api_key: tenantData.perplexity_api_key,
             speech_api_key: tenantData.speech_api_key,
             elevenLabs_api_key: tenantData.elevenLabs_api_key,
-            fal_ai_api_key: tenantData.fal_ai_api_key, 
-            anthropic_api_key: tenantData.anthropic_api_key, 
+            fal_ai_api_key: tenantData.fal_ai_api_key,
+            anthropic_api_key: tenantData.anthropic_api_key,
           });
         if (encryptKeysError) {
           showAlert(encryptKeysError?.toString());
@@ -591,6 +613,7 @@
         }
         const {
           openai_api_key,
+          openai_gpt5_api_key,
           azure_openai_api_key,
           perplexity_api_key,
           speech_api_key,
@@ -602,6 +625,7 @@
         cleanupValues();
         // API Keys
         tenantData.openai_api_key = openai_api_key;
+        tenantData.openai_gpt5_api_key = openai_gpt5_api_key;
         tenantData.azure_openai_api_key = azure_openai_api_key;
         tenantData.speech_api_key = speech_api_key;
         tenantData.elevenLabs_api_key = elevenLabs_api_key;
@@ -612,6 +636,7 @@
         tenantData.perplexity_chat_model = selectedPerplexityModel;
         tenantData.anthropic_chat_model = selectedClaudeModel;
         updateTextFeature(ApiKeyProvider.OpenAI, openAIEnabled);
+        updateTextFeature(ApiKeyProvider.OpenAIGtp5, openAIGpt5Enabled);
         updateTextFeature(ApiKeyProvider.AzureOpenAI, azureOpenAIEnabled);
         updateTextFeature(ApiKeyProvider.Perplexity, perplexityEnabled);
         updateTextFeature(ApiKeyProvider.Claude, claudeEnabled);
@@ -1038,7 +1063,7 @@
                 class="input input-bordered mt-2 w-full"
                 placeholder={""}
                 use:trimInput
-                value="gpt-4o"
+                bind:value={tenantData.openai_chat_model}
                 disabled
               />
             </div>
@@ -1086,6 +1111,99 @@
           </div>
         </div>
       </div>
+
+      <!-- Open AI GPT-5 Section -->
+      <div
+        class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
+      >
+        <input type="checkbox" />
+        <div class="collapse-title">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <input
+                id="feature-text-prompt-gpt-5"
+                type="checkbox"
+                bind:checked={openAIGpt5Enabled}
+                class="checkbox checkbox-primary z-10"
+                value="text-prompt"
+                disabled={defaultTextFeature === ApiKeyProvider.OpenAIGtp5}
+              />
+              <label
+                class="label cursor-pointer ml-2"
+                for="feature-text-prompt-gpt-5"
+              >
+                <span class="label-text text-base-content"
+                  >{t("tenant.open-ai-provider")} GPT-5</span
+                >
+              </label>
+            </div>
+            {#if defaultTextFeature === ApiKeyProvider.OpenAIGtp5}
+              <span class="mb-2 text-base-content/50 font-medium text-sm"
+                >{t("tenant.default")}</span
+              >
+            {/if}
+          </div>
+        </div>
+        <div class="collapse-content">
+          <div class="grid grid-cols-2 gap-4 mx-8">
+            <div class="w-full">
+              <span class="mb-2 text-base-content font-medium text-sm"
+                >{t("tenant.model.name")}</span
+              >
+              <input
+                type="text"
+                class="input input-bordered mt-2 w-full"
+                placeholder={""}
+                use:trimInput
+                bind:value={tenantData.openai_gpt5_chat_model}
+                disabled
+              />
+            </div>
+            <div class="w-full">
+              <span class="mb-2 text-base-content font-medium text-sm"
+                >{t("tenant.api-key")}</span
+              >
+              <label
+                class="input input-bordered flex items-center gap-2 mt-2 w-full"
+              >
+                <input
+                  bind:this={openAIGpt5KeyField}
+                  type="password"
+                  class="grow"
+                  placeholder={t("tenant.api-key")}
+                  bind:value={tenantData.openai_gpt5_api_key}
+                />
+                <TogglePasswordIcon
+                  change={() => togglePassword(openAIGpt5KeyField)}
+                />
+              </label>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <label class="flex flex-row items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={defaultTextFeature === ApiKeyProvider.OpenAIGtp5}
+                  class="checkbox checkbox-primary"
+                  onchange={() => toggleTextFeature(ApiKeyProvider.OpenAIGtp5)}
+                />
+                <span class="label-text">{t("tenant.mark-as-default")}</span>
+              </label>
+              <label class="flex flex-row items-center gap-2">
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-primary"
+                  bind:checked={tenantData.metadata.openaiGpt5PrivateKeyEnabled}
+                />
+                <span class="label-text"
+                  >{t("tenant.settings.private-api-key")}</span
+                >
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Azure Section -->
       <div
         class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"

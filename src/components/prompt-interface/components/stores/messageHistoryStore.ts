@@ -11,16 +11,6 @@ const previousResponseIds = writable<Record<string, string | null>>({});
 // Helper functions to manage message histories
 export function addMessageToHistory(groupId: string, promptId: string, message: Message) {
     console.log("Adding message to history:", groupId, promptId, message);
-    // let oldPromptId: string | undefined;
-    // groupPromptMap.update(map => {
-    //     oldPromptId = map[groupId];
-    //     // If the category already has a different promptId, remove its history
-    //     if (oldPromptId && oldPromptId !== promptId) {
-    //         clearMessageHistory(oldPromptId);
-    //     }
-    //     return { ...map, [groupId]: promptId };
-    // });
-    // Add message to the new promptId's history
     messageHistories.update(histories => {
         const currentHistory = histories[promptId] || [];
         return {

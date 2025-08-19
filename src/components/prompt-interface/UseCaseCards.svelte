@@ -40,25 +40,27 @@
   let promptDialogMode: "update" | "clone" = $state("update");
   let confirmDeleteModal: HTMLDialogElement | undefined = $state();
   let promptOrderDialog: HTMLDialogElement | undefined = $state();
+  let defaultModelName = "gpt-4o";
 
   let timeout: any = $state();
   let orderCards = $state(cards);
 
-  let activeModels: any = $state("");
+  let activeModels: any[] = $state([]);
   const getActiveModels = (): any[] => {
-    const getModelLabel = (provider: any) => {
+    const getModelLabel = (provider: any, defaultModelName: string) => {
       const providerModelMap: Record<string, string> = {
         [ApiKeyProvider.AzureOpenAI]: "azure_openai_chat_model",
         [ApiKeyProvider.Perplexity]: "perplexity_chat_model",
         [ApiKeyProvider.Claude]: "anthropic_chat_model",
+        [ApiKeyProvider.OpenAIGtp5]: "openai_gpt5_chat_model",
+        [ApiKeyProvider.OpenAI]: "openai_chat_model",
       };
       const modelNameMap: Record<string, string> = {
         "claude-sonnet-4-0": "Claude Sonnet",
-        "sonar": "Perplexity Sonar",
+        sonar: "Perplexity Sonar",
       };
-
       const key = providerModelMap[provider.name] as keyof typeof $tenant;
-      const model = $tenant?.[key] || "gpt-4o";
+      const model = $tenant?.[key] || defaultModelName;
 
       if (modelNameMap[model]) {
         return modelNameMap[model];
@@ -67,27 +69,43 @@
       return model;
     };
     const aiProviders = $tenant?.api_key_providers ?? [];
+    const activeDefaultProvider = aiProviders.find(
+      (item) => item.active === true && item.default === true,
+    );
+    if (activeDefaultProvider?.name === ApiKeyProvider.OpenAIGtp5) {
+      defaultModelName = "gpt-5";
+    }
     const models: any[] =
       aiProviders
         .filter((provider: any) => provider.active)
         .map((provider: any) => {
           return {
             provider: provider.name,
-            modelName: getModelLabel(provider),
+            modelName: getModelLabel(provider, defaultModelName),
+            default: provider.default,
           };
         }) || [];
     return models;
   };
 
-  const getModelName = (model: string) => {
-    for (let i = 0; i < activeModels.length; i++) {
-      const modelItem = activeModels[i];
-      if (model?.includes(modelItem?.provider)) {
-        return modelItem.modelName;
-      }
+  const getModelName = (model: string): string | undefined => {
+    if (model?.includes("openai-gpt-5")) {
+      const defaultModel = activeModels.find((m: any) =>
+        m.provider?.includes("openai-gpt-5"),
+      );
+      return defaultModel?.modelName || "gpt-5";
     }
-    
-    return 'gpt-4o';
+    if (model?.includes("openai")) {
+      const defaultModel = activeModels.find((m: any) =>
+        m.provider?.includes("openai"),
+      );
+      return defaultModel?.modelName || "gpt-4o";
+    }
+    const matchingModel = activeModels.find((m: any) =>
+      model?.includes(m.provider),
+    );
+
+    return matchingModel?.modelName || defaultModelName;
   };
 
   // svelte-ignore state_referenced_locally

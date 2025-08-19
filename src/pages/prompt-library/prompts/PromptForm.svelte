@@ -9,6 +9,7 @@
   import { addToast } from "$stores/toast";
   import { formatMarkdown, preventDefault } from "$utils/common";
   import TextEditor from "$components/form/TextEditor.svelte";
+  import Dropdown from "$components/form/Dropdown.svelte";
 
   const t = useTranslations();
 
@@ -18,10 +19,7 @@
     _id: string;
     groups: Group[];
   };
-  type Model = {
-    _id: string;
-    title: string;
-  };
+
   type KnowledgeBase = {
     title: string;
     _id: string;
@@ -40,6 +38,8 @@
   });
 
   let selectedModel: string = $state("");
+  let selectedReasoningLevel: any = $state("low");
+  let selectedTextVerbosity: any = $state("low");
 
   let knowledgeBases: KnowledgeBase[] = $state([]);
   let selectedKnowledgeBases: KnowledgeBase[] = $state([]);
@@ -129,6 +129,8 @@
         prompt: promptText,
         predefined_input: promptPredefinedInput,
         model: selectedModel ?? null,
+        reasoningEffort: selectedReasoningLevel || null,
+        textVerbosity: selectedTextVerbosity || null,
         knowledgebase: selectedKnowledgeBases.map((inst) => inst._id),
         ...(selectedCategory && { category: selectedCategory._id }),
         ...(selectedGroup && { group: selectedGroup._id }),
@@ -255,6 +257,54 @@
         />
         <ModelInput bind:selectedModel />
       </div>
+
+      {#if selectedModel.includes("openai-gpt-5")}
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 justify-center"
+        >
+          <Dropdown
+            classes={"flex-1 min-w-3xs "}
+            label={t("prompt-execution.reasoning-level")}
+            placeholder={t("prompt-execution.reasoning-level.placeholder")}
+            options={[
+              {
+                title: t("prompt-execution.reasoning-effort.level-low"),
+                value: "low",
+              },
+              {
+                title: t("prompt-execution.reasoning-effort.level-medium"),
+                value: "medium",
+              },
+              {
+                title: t("prompt-execution.reasoning-effort.level-high"),
+                value: "high",
+              },
+            ]}
+            bind:value={selectedReasoningLevel}
+          />
+
+          <Dropdown
+            classes={"flex-1 min-w-3xs "}
+            label={t("prompt-execution.text-verbosity")}
+            placeholder={t("prompt-execution.text-verbosity.placeholder")}
+            options={[
+              {
+                title: t("prompt-execution.verbosity.level-low"),
+                value: "low",
+              },
+              {
+                title: t("prompt-execution.verbosity.level-medium"),
+                value: "medium",
+              },
+              {
+                title: t("prompt-execution.verbosity.level-high"),
+                value: "high",
+              },
+            ]}
+            bind:value={selectedTextVerbosity}
+          />
+        </div>
+      {/if}
 
       {#if isEditable}
         <div class="flex items-center justify-between">
