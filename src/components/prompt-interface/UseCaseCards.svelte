@@ -28,6 +28,18 @@
     onSelectCard = () => null,
   }: Props = $props();
 
+   const providerModelMap: Record<string, string> = {
+      [ApiKeyProvider.Perplexity]: "perplexity_chat_model",
+      [ApiKeyProvider.Claude]: "anthropic_chat_model",
+      [ApiKeyProvider.OpenAI]: "openai_chat_model",
+      [ApiKeyProvider.OpenAIGtp5]: "openai_gpt5_chat_model",
+      [ApiKeyProvider.AzureOpenAI]: "azure_openai_chat_model",
+    };
+    const modelNameMap: Record<string, string> = {
+      "claude-sonnet-4-0": "Claude Sonnet",
+      sonar: "Perplexity Sonar",
+    };
+
   const t = useTranslations();
   let loading = $state(false);
 
@@ -51,18 +63,6 @@
       (item) => item.active === true && item.default === true,
     );
     const providerName = activeDefaultProvider?.name || ApiKeyProvider.OpenAI;
-    const providerModelMap: Record<string, string> = {
-      [ApiKeyProvider.Perplexity]: "perplexity_chat_model",
-      [ApiKeyProvider.Claude]: "anthropic_chat_model",
-      [ApiKeyProvider.OpenAI]: "openai_chat_model",
-      [ApiKeyProvider.OpenAIGtp5]: "openai_gpt5_chat_model",
-      [ApiKeyProvider.AzureOpenAI]: "azure_openai_chat_model",
-    };
-    const modelNameMap: Record<string, string> = {
-      "claude-sonnet-4-0": "Claude Sonnet",
-      sonar: "Perplexity Sonar",
-    };
-
     const key = providerModelMap[providerName] as keyof typeof $tenant;
     const rawModel = $tenant?.[key] || "-";
     return modelNameMap[rawModel] || rawModel;
@@ -71,20 +71,8 @@
   let activeModels: any[] = $state([]);
   const getActiveModels = (): any[] => {
     const getModelLabel = (provider: any) => {
-      const providerModelMap: Record<string, string> = {
-        [ApiKeyProvider.AzureOpenAI]: "azure_openai_chat_model",
-        [ApiKeyProvider.Perplexity]: "perplexity_chat_model",
-        [ApiKeyProvider.Claude]: "anthropic_chat_model",
-        [ApiKeyProvider.OpenAIGtp5]: "openai_gpt5_chat_model",
-        [ApiKeyProvider.OpenAI]: "openai_chat_model",
-      };
-      const modelNameMap: Record<string, string> = {
-        "claude-sonnet-4-0": "Claude Sonnet",
-        sonar: "Perplexity Sonar",
-      };
       const key = providerModelMap[provider.name] as keyof typeof $tenant;
       const model = $tenant?.[key] || defaultModelName;
-
       if (modelNameMap[model]) {
         return modelNameMap[model];
       }
@@ -92,10 +80,6 @@
       return model;
     };
     const aiProviders = $tenant?.api_key_providers ?? [];
-    const activeDefaultProvider = aiProviders.find(
-      (item) => item.active === true && item.default === true,
-    );
-    
     const models: any[] =
       aiProviders
         .filter((provider: any) => provider.active)
