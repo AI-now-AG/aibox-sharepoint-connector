@@ -5,7 +5,7 @@ import { AUTH0_SESSION_STATE, AUTH_AUTHORIZE_SCOPES } from "$constants";
 
 export async function GET(context: APIContext): Promise<Response> {
   const state = generateState();
-  const url = auth0(context.url.origin).createAuthorizationURL(
+  const authorizeUrl = auth0(context.url.origin).createAuthorizationURL(
     state,
     null,
     AUTH_AUTHORIZE_SCOPES,
@@ -19,5 +19,11 @@ export async function GET(context: APIContext): Promise<Response> {
     sameSite: "lax",
   });
 
-  return context.redirect(url.toString());
+  // 👇 tell Auth0 which API you want a token for
+  authorizeUrl.searchParams.set(
+    "audience",
+    import.meta.env.AUTH0_API_AUDIENCE || "https://dev-api.aibox-app.com",
+  );
+
+  return context.redirect(authorizeUrl.toString());
 }

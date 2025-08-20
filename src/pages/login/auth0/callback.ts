@@ -74,7 +74,9 @@ export async function GET(context: APIContext): Promise<Response> {
   // Get the user's roles
   const roles = auth0User.data["ainow/roles"];
 
-  const access_token = await requestAccessToken();
+  //const access_token = await requestAccessToken();
+  const accessToken = token.accessToken();
+  console.log("Auth0 accessToken", accessToken);
   // TODO: Sync current user from Auth0 to aibox
   const userId = await UserModel.upsertByAuth0Sub(auth0User.data.sub, {
     tenant_id: tenant._id,
@@ -88,7 +90,7 @@ export async function GET(context: APIContext): Promise<Response> {
     logins_count: auth0User.data.logins_count,
     email_verified: auth0User.data.email_verified,
     last_login: new Date().toISOString(),
-    auth0AccessToken: access_token,
+    auth0AccessToken: accessToken,
   });
 
   const session = await lucia.createSession(userId, {});

@@ -18,7 +18,7 @@
     stripHtmlFormatting,
   } from "$utils/common";
   import AIModelDropdown from "./AIModelDropdown.svelte";
-  import { tenant } from "$stores";
+  import { tenant, user } from "$stores";
   import { useTranslations } from "$i18n/utils";
   import { addToast } from "$stores/toast";
   import { ApiKeyProvider } from "$types/TenantFeature";
@@ -525,6 +525,7 @@
         headers: {
           "Content-Type": "application/json",
           "X-API-Key": config.apiKey,
+          "Authorization": `Bearer ${$user?.auth0AccessToken || ""}`,
         },
         body: JSON.stringify(requestBody),
       });

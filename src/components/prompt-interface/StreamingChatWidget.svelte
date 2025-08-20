@@ -29,7 +29,7 @@
     type Tool,
   } from "$components/chat-ui/MessageInput.svelte";
   import MessageList from "$components/chat-ui/MessageList.svelte";
-  import { tenant } from "$stores";
+  import { tenant, user } from "$stores";
   import { useTranslations } from "$i18n/utils";
   import { ApiKeyProvider } from "$types/TenantFeature";
 
@@ -600,6 +600,7 @@
         headers: {
           "Content-Type": "application/json",
           "X-API-Key": config.apiKey,
+          "Authorization": `Bearer ${$user?.auth0AccessToken || ""}`,
         },
         body: JSON.stringify(requestBody),
       });
