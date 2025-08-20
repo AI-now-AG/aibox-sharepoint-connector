@@ -82,6 +82,7 @@
   "prompt-execution.historyRemove.info": "When closing the browser, all previously created data will be lost.",
   "prompt-execution.upload-file.drag": "Drag & Drop or <span style=\"color: #491EFF;\">Choose file</span>",
   "prompt-execution.upload-file.supportted-files": "PDF, JSON, TXT, PNG, SVG, JPEG",
+  "prompt-execution.upload-file.supportted-files-input": "PDF, JSON, TXT, PNG, SVG, JPEG, CSV, DOC, XLS, PPTX",
   "prompt-execution.upload-file.maximum-size": "max. file size: 5 MB",
   "prompt-execution.upload-file.exceed-5mb-size-limit": "File size exceeds the 5 MB limit. Please upload a file smaller than 5 MB",
   "prompt-emptyscreen.description": "Get started with predefined use cases below.",
