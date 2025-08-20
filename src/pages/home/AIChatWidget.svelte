@@ -522,7 +522,13 @@
       // Make API request
       const accessToken = $user?.auth0_access_token;
       if (!accessToken) {
-        window.location.href = "/api/logout";
+        addToast({
+          message: 'Your session has expired. Please log in again',
+          type: "error",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/logout";
+        }, 2000);
         return;
       }
       const response = await fetch(config.apiUrl, {
