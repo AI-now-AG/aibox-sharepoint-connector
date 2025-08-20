@@ -20,6 +20,7 @@ export async function GET(context: APIContext): Promise<Response> {
   });
 
   // 👇 tell Auth0 which API you want a token for
+  // see audience setting in Auth0: Applications > APIs > Azure Backend API
   authorizeUrl.searchParams.set(
     "audience",
     import.meta.env.AUTH0_API_AUDIENCE || "https://dev-api.aibox-app.com",
