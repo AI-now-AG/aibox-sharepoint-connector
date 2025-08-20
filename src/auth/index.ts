@@ -33,7 +33,7 @@ export const lucia = new Lucia(adapter, {
       blocked: attributes.blocked,
       logins_count: attributes.logins_count,
       tours: attributes.tours,
-      auth0AccessToken: attributes.auth0AccessToken,
+      auth0_access_token: attributes.auth0_access_token,
     };
   },
 });
@@ -58,17 +58,19 @@ export const auth0 = (basepath: string) => {
 
 export async function requestAccessToken() {
   try {
-    const response = await fetch(`https://${import.meta.env.AUTH0_TENANT}.eu.auth0.com/oauth/token`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        client_id: import.meta.env.AZURE_AUTH0_CLIENT_ID,
-        client_secret:
-         import.meta.env.AZURE_AUTH0_CLIENT_SECRET,
-        audience: import.meta.env.AZURE_AUTH0_AUDIENCE,
-        grant_type: "client_credentials",
-      }),
-    });
+    const response = await fetch(
+      `https://${import.meta.env.AUTH0_TENANT}.eu.auth0.com/oauth/token`,
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          client_id: import.meta.env.AZURE_AUTH0_CLIENT_ID,
+          client_secret: import.meta.env.AZURE_AUTH0_CLIENT_SECRET,
+          audience: import.meta.env.AZURE_AUTH0_AUDIENCE,
+          grant_type: "client_credentials",
+        }),
+      },
+    );
 
     if (!response.ok) {
       throw new Error("Request access Auth0 access token failed");

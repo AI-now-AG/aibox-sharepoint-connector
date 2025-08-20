@@ -520,12 +520,17 @@
       const requestBody = buildRequestPayload(fileUrls);
 
       // Make API request
+      const accessToken = $user?.auth0_access_token;
+      if (!accessToken) {
+        window.location.href = "/api/logout";
+        return;
+      }
       const response = await fetch(config.apiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-API-Key": config.apiKey,
-          "Authorization": `Bearer ${$user?.auth0AccessToken || ""}`,
+          //"X-API-Key": config.apiKey,
+          "Authorization": `Bearer ${accessToken}`,
         },
         body: JSON.stringify(requestBody),
       });

@@ -600,7 +600,7 @@
         headers: {
           "Content-Type": "application/json",
           "X-API-Key": config.apiKey,
-          "Authorization": `Bearer ${$user?.auth0AccessToken || ""}`,
+          "Authorization": `Bearer ${$user?.auth0_access_token || ""}`,
         },
         body: JSON.stringify(requestBody),
       });

@@ -90,7 +90,7 @@ export async function GET(context: APIContext): Promise<Response> {
     logins_count: auth0User.data.logins_count,
     email_verified: auth0User.data.email_verified,
     last_login: new Date().toISOString(),
-    auth0AccessToken: accessToken,
+    auth0_access_token: accessToken,
   });
 
   const session = await lucia.createSession(userId, {});
