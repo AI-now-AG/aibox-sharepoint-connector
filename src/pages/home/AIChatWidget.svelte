@@ -668,8 +668,11 @@
           >
             {t("home.new-chat")}
           </button>
+          <div class="mt-2">
+            <ScrollToBottom />
+          </div>
         </div>
-        <ScrollToBottom />
+
         <div
           class="min-w-full form-wrapper"
           in:slide={{ duration: 500, delay: 500 }}

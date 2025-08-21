@@ -706,9 +706,6 @@
   class={`${currentMessageHistory.length > 0 ? "sticky bottom-0 bg-base-200" : ""}`}
 >
   {#if currentMessageHistory.length > 0}
-    <ScrollToBottom />
-  {/if}
-  {#if currentMessageHistory.length > 0}
     <div class="my-4">
       <button
         onclick={startNewChat}
@@ -717,6 +714,9 @@
       >
         {t("home.new-chat")}
       </button>
+      <div class="mt-2">
+        <ScrollToBottom />
+      </div>
     </div>
   {/if}
   <MessageInput
