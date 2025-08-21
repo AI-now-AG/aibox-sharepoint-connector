@@ -64,7 +64,7 @@
     );
     const providerName = activeDefaultProvider?.name || ApiKeyProvider.OpenAI;
     const key = providerModelMap[providerName] as keyof typeof $tenant;
-    const rawModel = $tenant?.[key] || "-";
+    const rawModel = $tenant?.[key] || "gpt-4o";
     return modelNameMap[rawModel] || rawModel;
   }
 
