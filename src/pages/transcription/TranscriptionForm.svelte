@@ -3,7 +3,6 @@
   import { slide, fly } from "svelte/transition";
   import TextOuput from "./TextOuput.svelte";
   import StartNewConfirmDialog from "./StartNewConfirmDialog.svelte";
-  import SubtitleEditor from "$components/SubtitleEditor.svelte";
   import { useTranslations } from "$i18n/utils";
   import { svgIcons } from "$assets/icons";
   import { tenant, user } from "$stores";
@@ -86,8 +85,6 @@
   let isAudioTagEnabled = $state(false);
 
   let confirmModal: HTMLDialogElement | undefined = $state();
-  let subtitleEditorModal: HTMLDialogElement | undefined = $state();
-  let showSubtitleEditor: boolean = $state(false);
 
   let assFileChecked = $state(selectedFileFormat.includes(FileFormat.ASS));
   let srtFileChecked = $state(selectedFileFormat.includes(FileFormat.SRT));
@@ -903,106 +900,6 @@
     confirmModal?.showModal();
   }
 
-  function openSubtitleEditor() {
-    showSubtitleEditor = true;
-    subtitleEditorModal?.showModal();
-  }
-
-  function closeSubtitleEditor() {
-    showSubtitleEditor = false;
-    subtitleEditorModal?.close();
-  }
-
-  function handleSubtitleSave(updatedContent: string | any) {
-    console.log('Updated subtitle content:', updatedContent);
-    
-    // Check if this is both formats data
-    if (typeof updatedContent === 'object' && updatedContent.isBothFormats) {
-      // Handle both formats export - download both files separately
-      const { assContent, srtContent } = updatedContent;
-      
-      // Download ASS file
-      const assBlob = new Blob([assContent], { type: 'text/x-ass' });
-      const assUrl = URL.createObjectURL(assBlob);
-      const assLink = document.createElement('a');
-      assLink.href = assUrl;
-      assLink.download = 'updated-subtitles.ass';
-      document.body.appendChild(assLink);
-      assLink.click();
-      document.body.removeChild(assLink);
-      URL.revokeObjectURL(assUrl);
-      
-      // Small delay before downloading the second file
-      setTimeout(() => {
-        // Download SRT file
-        const srtBlob = new Blob([srtContent], { type: 'text/srt' });
-        const srtUrl = URL.createObjectURL(srtBlob);
-        const srtLink = document.createElement('a');
-        srtLink.href = srtUrl;
-        srtLink.download = 'updated-subtitles.srt';
-        document.body.appendChild(srtLink);
-        srtLink.click();
-        document.body.removeChild(srtLink);
-        URL.revokeObjectURL(srtUrl);
-      }, 200);
-
-      addToast({
-        message: "Both subtitle formats (ASS and SRT) have been downloaded successfully!",
-        type: "success",
-        timeout: 3000,
-      });
-      
-      // Close the subtitle editor after successful export
-      closeSubtitleEditor();
-      return;
-    }
-    
-    // Handle regular string content (ASS or SRT)
-    const contentString = updatedContent as string;
-    
-    // Determine file format based on content
-    let fileName = 'updated-subtitles';
-    let mimeType = 'text/plain';
-    
-    if (contentString.includes('[Script Info]') || contentString.includes('[V4+ Styles]')) {
-      // ASS format detected
-      fileName += '.ass';
-      mimeType = 'text/x-ass';
-    } else if (contentString.includes(' --> ')) {
-      // SRT format detected
-      fileName += '.srt';
-      mimeType = 'text/srt';
-    } else {
-      // Default to ASS
-      fileName += '.ass';
-      mimeType = 'text/x-ass';
-    }
-
-    // Create and download the file
-    const blob = new Blob([contentString], { type: mimeType });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = fileName;
-    
-    // Append to body, click, and remove
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    // Clean up the object URL
-    URL.revokeObjectURL(url);
-
-    addToast({
-      message: "Subtitles have been updated and downloaded successfully!",
-      type: "success",
-      timeout: 3000,
-    });
-    
-    // Close the subtitle editor after successful export
-    closeSubtitleEditor();
-  }
-
   function startNew() {
     if (transcriptionType) {
       transcriptStore.update((current) =>
@@ -1718,15 +1615,6 @@
         >
       {/if}
       
-      {#if (assFileUrl || srtFileUrl) && audioFile}
-        <button
-          class="btn btn-primary btn-sm"
-          onclick={openSubtitleEditor}
-        >
-          {@html svgIcons.edit} Edit Subtitles
-        </button>
-      {/if}
-      
       <button class="btn bg-neutral btn-sm text-white" onclick={confirmStartNew}
         >{t("transciption.model.cta.start-new-transciption")}</button
       >
@@ -1741,24 +1629,6 @@
     {downloadFile}
     confirm={startNew}
   />
-
-  <!-- Subtitle Editor Modal -->
-  <dialog bind:this={subtitleEditorModal} class="modal">
-    <div class="modal-box max-w-7xl w-11/12 h-5/6 max-h-none p-0">
-      {#if showSubtitleEditor}
-        <SubtitleEditor
-          {srtFileUrl}
-          {assFileUrl}
-          {audioFile}
-          onSave={handleSubtitleSave}
-          onClose={closeSubtitleEditor}
-        />
-      {/if}
-    </div>
-    <form method="dialog" class="modal-backdrop">
-      <button onclick={closeSubtitleEditor}>close</button>
-    </form>
-  </dialog>
 
   {#if isConverting}
     <div class="conversion-progress" transition:slide>
