@@ -80,10 +80,11 @@
       [PromptModel.Default]: 1, // Default - gpt-4o, Legacy (Text)
       [PromptModel.OpenAIWithTools]: 2, // gpt-4o (Text & Tools)
       [PromptModel.OpenAIGpt5]: 3, // gpt-5 (Text & Tools)
-      [PromptModel.Perplexity]: 4, // Perplexity Sonar (Text & Websuche)
-      [PromptModel.Claude]: 5, // Claude Sonnet (Text)
-      [PromptModel.OpenAIWithImageTools]: 6, // gpt Image (Bilder)
-      [PromptModel.OpenAI]: 7, // gpt-4o, Legacy (Text)
+      [PromptModel.AzureOpenAI]: 4, // Azure gpt-4o (Text)
+      [PromptModel.Perplexity]: 5, // Perplexity Sonar (Text & Websuche)
+      [PromptModel.Claude]: 6, // Claude Sonnet (Text)
+      [PromptModel.OpenAIWithImageTools]: 7, // gpt Image (Bilder)
+      [PromptModel.OpenAI]: 8, // gpt-4o, Legacy (Text)
     };
     return providers.sort((a, b) => {
       const orderA = customSortOrder[a.value] || Infinity;
