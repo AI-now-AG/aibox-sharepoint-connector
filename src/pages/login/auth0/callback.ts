@@ -1,4 +1,4 @@
-import { auth0, lucia } from "$auth";
+import { auth0, lucia, requestAccessToken } from "$auth";
 import { decodeJwt } from "jose";
 import type { APIContext } from "astro";
 import UserModel, { assignPermissions } from "$data/models/user.model";
@@ -48,6 +48,7 @@ export async function GET(context: APIContext): Promise<Response> {
     code,
     null,
   );
+
   const decoded = decodeJwt(token.idToken());
   const auth0User = Auth0JWTSchema.safeParse(decoded);
   if (auth0User.error) {
@@ -73,6 +74,9 @@ export async function GET(context: APIContext): Promise<Response> {
   // Get the user's roles
   const roles = auth0User.data["ainow/roles"];
 
+  //const access_token = await requestAccessToken();
+  const accessToken = token.accessToken();
+  console.log("Auth0 accessToken", accessToken);
   // TODO: Sync current user from Auth0 to aibox
   const userId = await UserModel.upsertByAuth0Sub(auth0User.data.sub, {
     tenant_id: tenant._id,
@@ -86,6 +90,7 @@ export async function GET(context: APIContext): Promise<Response> {
     logins_count: auth0User.data.logins_count,
     email_verified: auth0User.data.email_verified,
     last_login: new Date().toISOString(),
+    auth0_access_token: accessToken,
   });
 
   const session = await lucia.createSession(userId, {});

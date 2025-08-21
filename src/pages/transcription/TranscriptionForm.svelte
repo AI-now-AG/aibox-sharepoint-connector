@@ -547,10 +547,21 @@
       }
 
       const { apiKey, apiUrl: baseUrl } = await configResponse.json();
+      const accessToken = $user?.auth0_access_token;
+      if (!accessToken) {
+        addToast({
+          message: 'Your session has expired. Please log in again',
+          type: "error",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/logout";
+        }, 2000);
+        return;
+      }
 
       const config: ConvertToMonoConfig = {
         baseUrl,
-        apiKey,
+        apiKey: accessToken,
         blobName: tempUploadUrl,
         category,
         folderName,

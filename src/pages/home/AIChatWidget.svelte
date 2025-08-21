@@ -18,7 +18,7 @@
     stripHtmlFormatting,
   } from "$utils/common";
   import AIModelDropdown from "./AIModelDropdown.svelte";
-  import { tenant } from "$stores";
+  import { tenant, user } from "$stores";
   import { useTranslations } from "$i18n/utils";
   import { addToast } from "$stores/toast";
   import { ApiKeyProvider } from "$types/TenantFeature";
@@ -520,11 +520,23 @@
       const requestBody = buildRequestPayload(fileUrls);
 
       // Make API request
+      const accessToken = $user?.auth0_access_token;
+      if (!accessToken) {
+        addToast({
+          message: 'Your session has expired. Please log in again',
+          type: "error",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/logout";
+        }, 2000);
+        return;
+      }
       const response = await fetch(config.apiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-API-Key": config.apiKey,
+          //"X-API-Key": config.apiKey,
+          "Authorization": `Bearer ${accessToken}`,
         },
         body: JSON.stringify(requestBody),
       });
