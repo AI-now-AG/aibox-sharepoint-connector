@@ -73,6 +73,7 @@
     fluxPrivateKeyEnabled: false,
     perplexityPrivateKeyEnabled: false,
     claudePrivateKeyEnabled: false,
+    geminiPrivateKeyEnabled: false,
     ...(tenant?.metadata ?? {}),
   };
 
@@ -91,6 +92,7 @@
   let gptImageEnabled: boolean = $state(false);
   let fluxEnabled: boolean = $state(false);
   let claudeEnabled: boolean = $state(false);
+  let geminiEnabled: boolean = $state(false);
 
   let openAIKeyField: HTMLInputElement;
   let openAIGpt5KeyField: HTMLInputElement;
@@ -100,6 +102,7 @@
   let elevenLabsAIKeyField: HTMLInputElement;
   let falOpenAIKeyField: HTMLInputElement;
   let claudeKeyField: HTMLInputElement;
+  let geminiKeyField: HTMLInputElement;
   let defaultTextFeature = $state("");
 
   // API providers
@@ -241,6 +244,7 @@
     azureOpenAIEnabled = findProvider(ApiKeyProvider.AzureOpenAI);
     perplexityEnabled = findProvider(ApiKeyProvider.Perplexity);
     claudeEnabled = findProvider(ApiKeyProvider.Claude);
+    geminiEnabled = findProvider(ApiKeyProvider.Gemini);
 
     dalleEnabled = tenantData.included_features?.some(
       (item: any) =>
@@ -305,6 +309,10 @@
     tenantData.anthropic_chat_model ?? "",
   );
 
+  let selectedGeminiModel: string = $state(
+    tenantData.gemini_chat_model ?? "",
+  );
+
   function toggleTextFeature(feature: ApiKeyProvider) {
     defaultTextFeature = defaultTextFeature === feature ? "" : feature;
 
@@ -318,6 +326,8 @@
       (perplexityEnabled = defaultTextFeature === ApiKeyProvider.Perplexity);
     !claudeEnabled &&
       (claudeEnabled = defaultTextFeature === ApiKeyProvider.Claude);
+    !geminiEnabled &&
+      (geminiEnabled = defaultTextFeature === ApiKeyProvider.Gemini);
 
     if (feature === ApiKeyProvider.OpenAI) {
       updateTextFeature(feature, openAIEnabled);
@@ -329,6 +339,8 @@
       updateTextFeature(feature, perplexityEnabled);
     } else if (feature === ApiKeyProvider.Claude) {
       updateTextFeature(feature, claudeEnabled);
+    } else if (feature === ApiKeyProvider.Gemini) {
+      updateTextFeature(feature, geminiEnabled);
     }
   }
 
@@ -368,7 +380,8 @@
       openAIGpt5Enabled ||
       azureOpenAIEnabled ||
       perplexityEnabled ||
-      claudeEnabled;
+      claudeEnabled || 
+      geminiEnabled;
     if (!atLeastTextSelected) {
       showAlert(t("tenant.validate-atleast-one-select"));
       return false;
@@ -478,6 +491,7 @@
             elevenLabs_api_key: tenantData.elevenLabs_api_key,
             fal_ai_api_key: tenantData.fal_ai_api_key,
             anthropic_api_key: tenantData.anthropic_api_key,
+            gemini_api_key: tenantData.gemini_api_key,
           });
         if (encryptKeysError) {
           showAlert(encryptKeysError?.toString());
@@ -492,6 +506,7 @@
           elevenLabs_api_key,
           fal_ai_api_key,
           anthropic_api_key,
+          gemini_api_key,
         } = data;
 
         cleanupValues();
@@ -504,14 +519,17 @@
         tenantData.perplexity_api_key = perplexity_api_key;
         tenantData.fal_ai_api_key = fal_ai_api_key;
         tenantData.anthropic_api_key = anthropic_api_key;
+        tenantData.gemini_api_key = gemini_api_key;
 
         tenantData.perplexity_chat_model = selectedPerplexityModel;
         tenantData.anthropic_chat_model = selectedClaudeModel;
+        tenantData.gemini_chat_model = selectedGeminiModel;
         updateTextFeature(ApiKeyProvider.OpenAI, openAIEnabled);
         updateTextFeature(ApiKeyProvider.OpenAIGtp5, openAIGpt5Enabled);
         updateTextFeature(ApiKeyProvider.AzureOpenAI, azureOpenAIEnabled);
         updateTextFeature(ApiKeyProvider.Perplexity, perplexityEnabled);
         updateTextFeature(ApiKeyProvider.Claude, claudeEnabled);
+        updateTextFeature(ApiKeyProvider.Gemini, geminiEnabled);
 
         // update providers
         tenantData.included_features = [];
@@ -606,6 +624,7 @@
             elevenLabs_api_key: tenantData.elevenLabs_api_key,
             fal_ai_api_key: tenantData.fal_ai_api_key,
             anthropic_api_key: tenantData.anthropic_api_key,
+            gemini_api_key: tenantData.gemini_api_key,
           });
         if (encryptKeysError) {
           showAlert(encryptKeysError?.toString());
@@ -620,6 +639,7 @@
           elevenLabs_api_key,
           fal_ai_api_key,
           anthropic_api_key,
+          gemini_api_key,
         } = data;
 
         cleanupValues();
@@ -632,14 +652,17 @@
         tenantData.perplexity_api_key = perplexity_api_key;
         tenantData.fal_ai_api_key = fal_ai_api_key;
         tenantData.anthropic_api_key = anthropic_api_key;
+        tenantData.gemini_api_key = gemini_api_key;
 
         tenantData.perplexity_chat_model = selectedPerplexityModel;
         tenantData.anthropic_chat_model = selectedClaudeModel;
+        tenantData.gemini_chat_model = selectedGeminiModel;
         updateTextFeature(ApiKeyProvider.OpenAI, openAIEnabled);
         updateTextFeature(ApiKeyProvider.OpenAIGtp5, openAIGpt5Enabled);
         updateTextFeature(ApiKeyProvider.AzureOpenAI, azureOpenAIEnabled);
         updateTextFeature(ApiKeyProvider.Perplexity, perplexityEnabled);
         updateTextFeature(ApiKeyProvider.Claude, claudeEnabled);
+        updateTextFeature(ApiKeyProvider.Gemini, geminiEnabled);
 
         if (!tenantData.transcription_types) {
           tenantData.transcription_types = [];
@@ -1033,7 +1056,6 @@
                 type="checkbox"
                 bind:checked={openAIEnabled}
                 class="checkbox checkbox-primary z-10"
-                value="text-prompt"
                 disabled={defaultTextFeature === ApiKeyProvider.OpenAI}
               />
               <label
@@ -1125,7 +1147,6 @@
                 type="checkbox"
                 bind:checked={openAIGpt5Enabled}
                 class="checkbox checkbox-primary z-10"
-                value="text-prompt"
                 disabled={defaultTextFeature === ApiKeyProvider.OpenAIGtp5}
               />
               <label
@@ -1217,7 +1238,6 @@
                 type="checkbox"
                 bind:checked={azureOpenAIEnabled}
                 class="checkbox checkbox-primary z-10"
-                value="text-prompt"
                 disabled={defaultTextFeature === ApiKeyProvider.AzureOpenAI}
               />
               <label
@@ -1348,7 +1368,6 @@
                 type="checkbox"
                 bind:checked={perplexityEnabled}
                 class="checkbox checkbox-primary z-10"
-                value="text-prompt"
                 disabled={defaultTextFeature === ApiKeyProvider.Perplexity}
               />
               <label
@@ -1439,7 +1458,6 @@
                 type="checkbox"
                 bind:checked={claudeEnabled}
                 class="checkbox checkbox-primary z-10"
-                value="text-prompt"
                 disabled={defaultTextFeature === ApiKeyProvider.Claude}
               />
               <label
@@ -1451,7 +1469,7 @@
                 >
               </label>
             </div>
-            {#if defaultTextFeature === ApiKeyProvider.Perplexity}
+            {#if defaultTextFeature === ApiKeyProvider.Claude}
               <span class="mb-2 text-base-content/50 font-medium text-sm"
                 >{t("tenant.default")}</span
               >
@@ -1516,6 +1534,96 @@
           </div>
         </div>
       </div>
+
+      <!-- Gemini Section -->
+      <div
+        class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
+      >
+        <input type="checkbox" />
+        <div class="collapse-title">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <input
+                id="feature-gemini-section"
+                type="checkbox"
+                bind:checked={geminiEnabled}
+                class="checkbox checkbox-primary z-10"
+                disabled={defaultTextFeature === ApiKeyProvider.Gemini}
+              />
+              <label
+                class="label cursor-pointer ml-2"
+                for="feature-gemini-section"
+              >
+                <span class="label-text text-base-content"
+                  >{t("tenant.gemini.name")}</span
+                >
+              </label>
+            </div>
+            {#if defaultTextFeature === ApiKeyProvider.Gemini}
+              <span class="mb-2 text-base-content/50 font-medium text-sm"
+                >{t("tenant.default")}</span
+              >
+            {/if}
+          </div>
+        </div>
+        <div class="collapse-content">
+          <div class="grid grid-cols-2 gap-4 mx-8 mb-[30]">
+            <div class="w-full z-20">
+              <Dropdown
+                label={`${t("tenant.model.name")}*`}
+                options={[
+                  {
+                    value: "gemini-2.5-flash",
+                    title: "gemini-2.5-flash",
+                  },
+                ]}
+                bind:value={selectedGeminiModel}
+              />
+            </div>
+            <div class="w-full">
+              <span class="mb-2 text-base-content font-medium text-sm"
+                >{t("tenant.api-key")}</span
+              >
+
+              <label
+                class="input input-bordered flex items-center gap-2 mt-1 w-full"
+              >
+                <input
+                  bind:this={geminiKeyField}
+                  type="password"
+                  class="grow"
+                  placeholder={t("tenant.api-key")}
+                  bind:value={tenantData.gemini_api_key}
+                />
+                <TogglePasswordIcon
+                  change={() => togglePassword(geminiKeyField)}
+                />
+              </label>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <label class="flex flex-row items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={defaultTextFeature === ApiKeyProvider.Gemini}
+                  class="checkbox checkbox-primary"
+                  onchange={() => toggleTextFeature(ApiKeyProvider.Gemini)}
+                />
+                <span class="label-text">{t("tenant.mark-as-default")}</span>
+              </label>
+              <label class="flex flex-row items-center gap-2">
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-primary"
+                  bind:checked={tenantData.metadata.geminiPrivateKeyEnabled}
+                />
+                <span class="label-text"
+                  >{t("tenant.settings.private-api-key")}</span
+                >
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="divider"></div>
@@ -1538,7 +1646,6 @@
               type="checkbox"
               checked={isAudioToTextChecked}
               class="checkbox checkbox-primary z-10"
-              value="text-prompt"
               disabled
             />
             <label class="label cursor-pointer ml-2" for="audio-whisper-model">
@@ -1602,7 +1709,6 @@
               type="checkbox"
               checked={isAzureAudioProEnabled}
               class="checkbox checkbox-primary z-10"
-              value="text-prompt"
               disabled
             />
             <label class="label cursor-pointer ml-2" for="audio-pro-model">
@@ -1707,7 +1813,6 @@
               type="checkbox"
               checked={isAudioToElevenLabsChecked}
               class="checkbox checkbox-primary z-10"
-              value="text-prompt"
               disabled
             />
             <label
