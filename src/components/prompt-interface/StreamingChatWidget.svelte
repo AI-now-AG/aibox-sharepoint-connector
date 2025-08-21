@@ -646,6 +646,16 @@
     isFetching = true;
     isGenerating = false;
 
+    setTimeout(() => {
+      const thinkingIndicator = document.getElementById("thinking-indicator");
+      if (thinkingIndicator) {
+        thinkingIndicator.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      }
+    }, 100);
+
     let uploadedFileUrls = [];
     if (fileDataList.length > 0) {
       const uploadResponse = await fetch("/.netlify/functions/blobFileUpload", {
@@ -675,6 +685,17 @@
       chatBubbles[chatBubbles.length - 1].scrollIntoView({
         behavior: "smooth",
         block: "start",
+      });
+    }
+  }
+
+  function scrollIntoThreeDotView() {
+    const threeDotIndicator = document.getElementById("three-dot-indicator");
+    console.log("threeDotIndicator", threeDotIndicator);
+    if (threeDotIndicator) {
+      threeDotIndicator.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
       });
     }
   }
