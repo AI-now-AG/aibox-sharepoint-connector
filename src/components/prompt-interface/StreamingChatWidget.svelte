@@ -225,10 +225,12 @@
         ? "openai-gpt-5-response"
         : currentPrompt?.model || getDefaultModelName();
 
+    const promptForAttachedFilesOnly = fileUrls.length > 0 ? " " : "";
+
     const payload: RequestPayload = {
       tenantId: tenantId!,
       provider,
-      prompt,
+      prompt: prompt || promptForAttachedFilesOnly,
       promptId,
       stream: true,
       fileUrls,

@@ -160,10 +160,12 @@
 
     isGenerating = hasImageTool;
 
+    const promptForAttachedFilesOnly = fileUrls.length > 0 ? " " : "";
+
     const payload: RequestPayload = {
       tenantId: $tenant?._id?.toString()!,
       provider,
-      prompt: input,
+      prompt: input || promptForAttachedFilesOnly,
       stream: true,
       fileUrls,
     };
