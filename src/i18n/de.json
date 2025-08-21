@@ -483,5 +483,6 @@
   "prompt-execution.verbosity.level-low": "Kurze Antwort",
   "prompt-execution.verbosity.level-medium": "Kompakte Antwort mit einigen Details",
   "prompt-execution.verbosity.level-high": "Ausführliche Antwort mit Beispielen",
-  "prompt-execution.thinking": "Ich denke nach..."
+  "prompt-execution.thinking": "Ich denke nach...",
+  "auth.session-missing-force-login": "Keine aktive Sitzung gefunden. Bitte melden Sie sich erneut an."
 }
