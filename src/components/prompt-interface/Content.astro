@@ -15,6 +15,7 @@ if (
 ) {
   return Astro.redirect("/404");
 }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const group = category?.groups.find((g: any) => g._id.toString() === groupId);
 
 const cursor = await PromptModel.listByTenant(Astro.locals.user.tenant_id);
@@ -34,6 +35,7 @@ const promptItems = categoryGroupPrompt.map((prompt) => ({
   model: prompt.model,
   reasoningEffort: prompt.reasoningEffort,
   textVerbosity: prompt.textVerbosity,
+  geminiTool: prompt.geminiTool,
   predefined_input: prompt.predefined_input,
 }));
 

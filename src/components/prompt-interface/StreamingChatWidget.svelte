@@ -133,19 +133,6 @@
           active: false,
         });
         break;
-      case PromptModel.OpenAIGpt5WithTools:
-        tools.push({
-          name: "image",
-          active: false,
-        });
-        break;
-      case PromptModel.OpenAIGpt5WithImageTools:
-        tools.push({
-          name: "image",
-          active: true,
-          disabled: true,
-        });
-        break;
     }
 
     if (!currentPrompt?.model && isGpt5Default()) {
@@ -207,8 +194,6 @@
     const isOpenAIGpt5ResponseModel =
       [
         PromptModel.OpenAIGpt5,
-        PromptModel.OpenAIGpt5WithTools,
-        PromptModel.OpenAIGpt5WithImageTools,
       ].includes(currentPrompt?.model) ||
       (isGpt5Default() && !currentPrompt?.model);
 

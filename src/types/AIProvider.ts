@@ -1,7 +1,7 @@
 import { PromptModel } from "./PromptModel";
 import { ApiKeyProvider } from "./TenantFeature";
 
-export const providerModelMap: Record<string, string> = {
+export const ProviderModelMap: Record<string, string> = {
   [ApiKeyProvider.Perplexity]: "perplexity_chat_model",
   [ApiKeyProvider.Claude]: "anthropic_chat_model",
   [ApiKeyProvider.OpenAI]: "openai_chat_model",
@@ -10,13 +10,13 @@ export const providerModelMap: Record<string, string> = {
   [ApiKeyProvider.Gemini]: "gemini_chat_model",
 };
 
-export const modelNameMap: Record<string, string> = {
+export const ModelNameMap: Record<string, string> = {
   "claude-sonnet-4-0": "Claude Sonnet",
   sonar: "Perplexity Sonar",
   "gemini-2.5-flash": "gemini-2.5-flash",
 };
 
-export const customSortOrder: { [key: string]: number } = {
+export const CustomSortOrder: { [key: string]: number } = {
   [PromptModel.Default]: 1, // Default - gpt-4o, Legacy (Text)
   [PromptModel.OpenAIWithTools]: 2, // gpt-4o (Text & Tools)
   [PromptModel.OpenAIGpt5]: 3, // gpt-5 (Text & Tools)
@@ -27,3 +27,25 @@ export const customSortOrder: { [key: string]: number } = {
   [PromptModel.OpenAIWithImageTools]: 8, // gpt Image (Bilder)
   [PromptModel.OpenAI]: 9, // gpt-4o, Legacy (Text)
 };
+
+export enum TextVerbositiOption {
+  Low = "low",
+  Medium = "medium",
+  High = "high",
+}
+
+export enum ReasoningEffortOption {
+  Minimal = "minimal",
+  Low = "low",
+  Medium = "medium",
+  High = "high",
+}
+
+export enum GeminiToolOption {
+  Websearch = "websearch",
+  Thinking = "thinking",
+}
+
+export enum OtherToolOption {}
+
+export type ToolOption = GeminiToolOption | OtherToolOption;

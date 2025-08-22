@@ -11,7 +11,7 @@
   import { actions } from "astro:actions";
   import log from "$utils/log";
   import { tenant } from "$stores";
-  import { modelNameMap, providerModelMap } from "$types/AIProvider";
+  import { ModelNameMap, ProviderModelMap } from "$types/AIProvider";
 
   interface Props {
     isEditable?: boolean;
@@ -52,18 +52,18 @@
       (item) => item.active === true && item.default === true,
     );
     const providerName = activeDefaultProvider?.name || ApiKeyProvider.OpenAI;
-    const key = providerModelMap[providerName] as keyof typeof $tenant;
+    const key = ProviderModelMap[providerName] as keyof typeof $tenant;
     const rawModel = $tenant?.[key] || "gpt-4o";
-    return modelNameMap[rawModel] || rawModel;
+    return ModelNameMap[rawModel] || rawModel;
   }
 
   let activeModels: any[] = $state([]);
   const getActiveModels = (): any[] => {
     const getModelLabel = (provider: any) => {
-      const key = providerModelMap[provider.name] as keyof typeof $tenant;
+      const key = ProviderModelMap[provider.name] as keyof typeof $tenant;
       const model = $tenant?.[key] || defaultModelName;
-      if (modelNameMap[model]) {
-        return modelNameMap[model];
+      if (ModelNameMap[model]) {
+        return ModelNameMap[model];
       }
 
       return model;

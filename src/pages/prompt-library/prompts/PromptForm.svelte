@@ -10,6 +10,12 @@
   import { formatMarkdown, preventDefault } from "$utils/common";
   import TextEditor from "$components/form/TextEditor.svelte";
   import Dropdown from "$components/form/Dropdown.svelte";
+  import { PromptModel } from "$types/PromptModel";
+  import {
+    GeminiToolOption,
+    ReasoningEffortOption,
+    TextVerbositiOption,
+  } from "$types/AIProvider";
 
   const t = useTranslations();
 
@@ -40,6 +46,7 @@
   let selectedModel: string = $state("");
   let selectedReasoningLevel: any = $state("low");
   let selectedTextVerbosity: any = $state("low");
+  let selectedGeminiTool: any = $state("");
 
   let knowledgeBases: KnowledgeBase[] = $state([]);
   let selectedKnowledgeBases: KnowledgeBase[] = $state([]);
@@ -131,6 +138,7 @@
         model: selectedModel ?? null,
         reasoningEffort: selectedReasoningLevel || null,
         textVerbosity: selectedTextVerbosity || null,
+        geminiTool: selectedGeminiTool || null,
         knowledgebase: selectedKnowledgeBases.map((inst) => inst._id),
         ...(selectedCategory && { category: selectedCategory._id }),
         ...(selectedGroup && { group: selectedGroup._id }),
@@ -258,7 +266,7 @@
         <ModelInput bind:selectedModel />
       </div>
 
-      {#if selectedModel.includes("openai-gpt-5")}
+      {#if selectedModel.includes(PromptModel.OpenAIGpt5)}
         <div
           class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 justify-center"
         >
@@ -269,15 +277,15 @@
             options={[
               {
                 title: t("prompt-execution.reasoning-effort.level-low"),
-                value: "low",
+                value: ReasoningEffortOption.Low,
               },
               {
                 title: t("prompt-execution.reasoning-effort.level-medium"),
-                value: "medium",
+                value: ReasoningEffortOption.Medium,
               },
               {
                 title: t("prompt-execution.reasoning-effort.level-high"),
-                value: "high",
+                value: ReasoningEffortOption.High,
               },
             ]}
             bind:value={selectedReasoningLevel}
@@ -290,18 +298,43 @@
             options={[
               {
                 title: t("prompt-execution.verbosity.level-low"),
-                value: "low",
+                value: TextVerbositiOption.Low,
               },
               {
                 title: t("prompt-execution.verbosity.level-medium"),
-                value: "medium",
+                value: TextVerbositiOption.Medium,
               },
               {
                 title: t("prompt-execution.verbosity.level-high"),
-                value: "high",
+                value: TextVerbositiOption.High,
               },
             ]}
             bind:value={selectedTextVerbosity}
+          />
+        </div>
+      {/if}
+
+      {#if selectedModel.includes(PromptModel.Gemini)}
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 justify-center"
+        >
+          <div class={"flex-1 min-w-3xs "}></div>
+
+          <Dropdown
+            classes={"flex-1 min-w-3xs "}
+            label={t("prompt-execution.gemini-tool")}
+            placeholder={t("prompt-execution.gemini-tool.placeholder")}
+            options={[
+              {
+                title: t("prompt-execution.gemini-tool.web-search"),
+                value: GeminiToolOption.Websearch,
+              },
+              {
+                title: t("prompt-execution.gemini-tool.thinking"),
+                value: GeminiToolOption.Thinking,
+              },
+            ]}
+            bind:value={selectedGeminiTool}
           />
         </div>
       {/if}

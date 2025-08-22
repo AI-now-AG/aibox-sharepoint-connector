@@ -6,9 +6,9 @@
   import { PromptModel } from "$types/PromptModel";
   import Dropdown, { type Option } from "$components/form/Dropdown.svelte";
   import {
-    customSortOrder,
-    modelNameMap,
-    providerModelMap,
+    CustomSortOrder,
+    ModelNameMap,
+    ProviderModelMap,
   } from "$types/AIProvider";
 
   const t = useTranslations();
@@ -36,9 +36,9 @@
   });
 
   const getModelLabel = (provider: any) => {
-    const key = providerModelMap[provider.name] as keyof typeof $tenant;
+    const key = ProviderModelMap[provider.name] as keyof typeof $tenant;
     const rawModel = $tenant?.[key] || "gpt-4o";
-    const modelLabel = modelNameMap[rawModel] || rawModel;
+    const modelLabel = ModelNameMap[rawModel] || rawModel;
 
     let title = "-";
     switch (provider.name) {
@@ -63,8 +63,8 @@
 
   function sortProviders(providers: any[]): any[] {
     return providers.sort((a, b) => {
-      const orderA = customSortOrder[a.value] || Infinity;
-      const orderB = customSortOrder[b.value] || Infinity;
+      const orderA = CustomSortOrder[a.value] || Infinity;
+      const orderB = CustomSortOrder[b.value] || Infinity;
       return orderA - orderB;
     });
   }

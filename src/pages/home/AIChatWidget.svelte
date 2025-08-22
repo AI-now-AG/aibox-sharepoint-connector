@@ -49,6 +49,7 @@
     previousResponseId?: string | null;
     messageHistory?: Message[];
     reasoningEffort?: string;
+    geminiTool?: string,
     verbosity?: string;
   }
 
@@ -143,8 +144,6 @@
     const isOpenAIGpt5ResponseModel =
       [
         PromptModel.OpenAIGpt5,
-        PromptModel.OpenAIGpt5WithTools,
-        PromptModel.OpenAIGpt5WithImageTools,
       ].includes(selectedModel) ||
       (isGpt5Default() && !selectedModel);
 

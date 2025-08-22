@@ -486,5 +486,9 @@
   "prompt-execution.thinking": "Ich denke nach...",
   "auth.session-missing-force-login": "Keine aktive Sitzung gefunden. Bitte melden Sie sich erneut an.",
   "tenant.gemini.name": "Gemini",
-  "prompt-execution.models.gemini-with-tools": "${model} (Text & Tools)"
+  "prompt-execution.models.gemini-with-tools": "${model} (Text & Tools)",
+  "prompt-execution.gemini-tool": "Gemini Tool",
+  "prompt-execution.gemini-tool.placeholder": "Web Search | Thinking ",
+  "prompt-execution.gemini-tool.web-search": "Web Search  ",
+  "prompt-execution.gemini-tool.thinking": "Thinking "
 }
