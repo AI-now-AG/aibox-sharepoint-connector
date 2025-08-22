@@ -29,6 +29,7 @@
   import Dropdown from "$components/form/Dropdown.svelte";
   import AudioAddonsDropdown from "./AudioAddonsDropdown.svelte";
   import ThemeItem from "./ThemeItem.svelte";
+  import { TextModel } from "$types/UsageTracking";
 
   const t = useTranslations();
   let loading = $state(false);
@@ -309,9 +310,7 @@
     tenantData.anthropic_chat_model ?? "",
   );
 
-  let selectedGeminiModel: string = $state(
-    tenantData.gemini_chat_model ?? "",
-  );
+  let selectedGeminiModel: string = $state(tenantData.gemini_chat_model ?? "");
 
   function toggleTextFeature(feature: ApiKeyProvider) {
     defaultTextFeature = defaultTextFeature === feature ? "" : feature;
@@ -380,7 +379,7 @@
       openAIGpt5Enabled ||
       azureOpenAIEnabled ||
       perplexityEnabled ||
-      claudeEnabled || 
+      claudeEnabled ||
       geminiEnabled;
     if (!atLeastTextSelected) {
       showAlert(t("tenant.validate-atleast-one-select"));
@@ -1573,7 +1572,7 @@
                 label={`${t("tenant.model.name")}*`}
                 options={[
                   {
-                    value: "gemini-2.5-flash",
+                    value: TextModel.Gemini,
                     title: "gemini-2.5-flash",
                   },
                 ]}
