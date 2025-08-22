@@ -5,6 +5,11 @@
   import { ApiKeyProvider } from "$types/TenantFeature";
   import { PromptModel } from "$types/PromptModel";
   import Dropdown, { type Option } from "$components/form/Dropdown.svelte";
+  import {
+    customSortOrder,
+    modelNameMap,
+    providerModelMap,
+  } from "$types/AIProvider";
 
   const t = useTranslations();
 
@@ -26,23 +31,11 @@
 
   let models: Option[] = $state([]);
 
-  //$inspect(models);
-
   onMount(async function () {
     models = getActiveModels() || [];
   });
 
   const getModelLabel = (provider: any) => {
-    const providerModelMap: Record<string, string> = {
-      [ApiKeyProvider.Perplexity]: "perplexity_chat_model",
-      [ApiKeyProvider.Claude]: "anthropic_chat_model",
-      [ApiKeyProvider.OpenAIGtp5]: "openai_gpt5_chat_model",
-    };
-    const modelNameMap: Record<string, string> = {
-      "claude-sonnet-4-0": "Claude Sonnet",
-      sonar: "Perplexity Sonar",
-    };
-
     const key = providerModelMap[provider.name] as keyof typeof $tenant;
     const rawModel = $tenant?.[key] || "gpt-4o";
     const modelLabel = modelNameMap[rawModel] || rawModel;
@@ -66,16 +59,6 @@
   };
 
   function sortProviders(providers: any[]): any[] {
-    const customSortOrder: { [key: string]: number } = {
-     [PromptModel.Default]: 1, // Default - gpt-4o, Legacy (Text)
-      [PromptModel.OpenAIWithTools]: 2, // gpt-4o (Text & Tools)
-      [PromptModel.OpenAIGpt5]: 3, // gpt-5 (Text & Tools)
-      [PromptModel.AzureOpenAI]: 4, // Azure gpt-4o (Text)
-      [PromptModel.Perplexity]: 5, // Perplexity Sonar (Text & Websuche)
-      [PromptModel.Claude]: 6, // Claude Sonnet (Text)
-      [PromptModel.OpenAIWithImageTools]: 7, // gpt Image (Bilder)
-      [PromptModel.OpenAI]: 8, // gpt-4o, Legacy (Text)
-    };
     return providers.sort((a, b) => {
       const orderA = customSortOrder[a.value] || Infinity;
       const orderB = customSortOrder[b.value] || Infinity;

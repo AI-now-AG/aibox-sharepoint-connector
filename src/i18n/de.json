@@ -485,5 +485,6 @@
   "prompt-execution.verbosity.level-high": "Ausführliche Antwort mit Beispielen",
   "prompt-execution.thinking": "Ich denke nach...",
   "auth.session-missing-force-login": "Keine aktive Sitzung gefunden. Bitte melden Sie sich erneut an.",
-  "tenant.gemini.name": "Gemini"
+  "tenant.gemini.name": "Gemini",
+  "prompt-execution.models.gemini-with-tools": "${model} (Text & Tools)"
 }

@@ -11,6 +11,7 @@
   import { actions } from "astro:actions";
   import log from "$utils/log";
   import { tenant } from "$stores";
+  import { modelNameMap, providerModelMap } from "$types/AIProvider";
 
   interface Props {
     isEditable?: boolean;
@@ -27,18 +28,6 @@
     selectedPromptId = $bindable(""),
     onSelectCard = () => null,
   }: Props = $props();
-
-   const providerModelMap: Record<string, string> = {
-      [ApiKeyProvider.Perplexity]: "perplexity_chat_model",
-      [ApiKeyProvider.Claude]: "anthropic_chat_model",
-      [ApiKeyProvider.OpenAI]: "openai_chat_model",
-      [ApiKeyProvider.OpenAIGtp5]: "openai_gpt5_chat_model",
-      [ApiKeyProvider.AzureOpenAI]: "azure_openai_chat_model",
-    };
-    const modelNameMap: Record<string, string> = {
-      "claude-sonnet-4-0": "Claude Sonnet",
-      sonar: "Perplexity Sonar",
-    };
 
   const t = useTranslations();
   let loading = $state(false);
@@ -124,7 +113,7 @@
     if (selectedEditPromptId) {
       promptDialog?.showModal();
     }
-    defaultModelName = getDefaultModelName()
+    defaultModelName = getDefaultModelName();
     activeModels = getActiveModels();
   });
 

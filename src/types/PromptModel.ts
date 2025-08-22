@@ -12,4 +12,6 @@ export enum PromptModel {
   AzureOpenAI = "azure_openai",
   Perplexity = "perplexity",
   Claude = "claude",
+
+  Gemini = "gemini",
 }
