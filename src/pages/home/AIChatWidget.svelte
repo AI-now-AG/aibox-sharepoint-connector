@@ -160,10 +160,12 @@
 
     isGenerating = hasImageTool;
 
+    const promptForAttachedFilesOnly = fileUrls.length > 0 ? " " : "";
+
     const payload: RequestPayload = {
       tenantId: $tenant?._id?.toString()!,
       provider,
-      prompt: input,
+      prompt: input || promptForAttachedFilesOnly,
       stream: true,
       fileUrls,
     };
@@ -567,6 +569,17 @@
     isFetching = true;
     isGenerating = false;
 
+     setTimeout(() => {
+      const thinkingIndicator = document.getElementById("thinking-indicator");
+      if (thinkingIndicator) {
+        thinkingIndicator.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      }
+    }, 100);
+
+
     let uploadedFileUrls = [];
     if (fileDataList.length > 0) {
       const uploadResponse = await fetch("/.netlify/functions/blobFileUpload", {
@@ -666,8 +679,11 @@
           >
             {t("home.new-chat")}
           </button>
+          <div class="mt-2">
+            <ScrollToBottom />
+          </div>
         </div>
-        <ScrollToBottom />
+
         <div
           class="min-w-full form-wrapper"
           in:slide={{ duration: 500, delay: 500 }}

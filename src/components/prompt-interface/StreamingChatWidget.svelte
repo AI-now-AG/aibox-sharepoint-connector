@@ -225,10 +225,12 @@
         ? "openai-gpt-5-response"
         : currentPrompt?.model || getDefaultModelName();
 
+    const promptForAttachedFilesOnly = fileUrls.length > 0 ? " " : "";
+
     const payload: RequestPayload = {
       tenantId: tenantId!,
       provider,
-      prompt,
+      prompt: prompt || promptForAttachedFilesOnly,
       promptId,
       stream: true,
       fileUrls,
@@ -644,6 +646,16 @@
     isFetching = true;
     isGenerating = false;
 
+    setTimeout(() => {
+      const thinkingIndicator = document.getElementById("thinking-indicator");
+      if (thinkingIndicator) {
+        thinkingIndicator.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      }
+    }, 100);
+
     let uploadedFileUrls = [];
     if (fileDataList.length > 0) {
       const uploadResponse = await fetch("/.netlify/functions/blobFileUpload", {
@@ -704,9 +716,6 @@
   class={`${currentMessageHistory.length > 0 ? "sticky bottom-0 bg-base-200" : ""}`}
 >
   {#if currentMessageHistory.length > 0}
-    <ScrollToBottom />
-  {/if}
-  {#if currentMessageHistory.length > 0}
     <div class="my-4">
       <button
         onclick={startNewChat}
@@ -715,6 +724,9 @@
       >
         {t("home.new-chat")}
       </button>
+      <div class="mt-2">
+        <ScrollToBottom />
+      </div>
     </div>
   {/if}
   <MessageInput
