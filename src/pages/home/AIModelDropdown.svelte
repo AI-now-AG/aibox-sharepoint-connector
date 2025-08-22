@@ -54,6 +54,9 @@
       case PromptModel.Claude:
         title = `${modelLabel} (${t("home.model-option-text")})`;
         break;
+      case PromptModel.Gemini:
+        title = `${modelLabel} (${t("home.model-option-text-tools")})`;
+        break;
     }
     return title;
   };
@@ -72,6 +75,7 @@
       ApiKeyProvider.Perplexity,
       ApiKeyProvider.Claude,
       ApiKeyProvider.OpenAIGtp5,
+      ApiKeyProvider.Gemini,
     ];
 
     const models: Option[] =
