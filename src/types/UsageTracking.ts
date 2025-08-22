@@ -9,6 +9,7 @@ export enum TextModel {
   Gpt4o = "gpt-4o",
   Gpt5 = "gpt-5",
   ClaudeSonnet = "claude-sonnet-4-0",
+  Gemini = "gemini-2.5-flash",
 }
 
 export enum AudioModel {
