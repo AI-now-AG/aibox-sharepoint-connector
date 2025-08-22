@@ -689,17 +689,6 @@
     }
   }
 
-  function scrollIntoThreeDotView() {
-    const threeDotIndicator = document.getElementById("three-dot-indicator");
-    console.log("threeDotIndicator", threeDotIndicator);
-    if (threeDotIndicator) {
-      threeDotIndicator.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
-    }
-  }
-
   function startNewChat() {
     clearMessageHistory(promptId);
     setPreviousResponseId(promptId, null);
