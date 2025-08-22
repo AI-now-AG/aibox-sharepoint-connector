@@ -181,7 +181,7 @@
                     <div
                       class="chat-bubble bg-base-100 text-base-content flex flex-row"
                     >
-                      <span class="loading loading-dots loading-lg"></span>
+                      <span id="thinking-indicator" class="loading loading-dots loading-lg"></span>
                       {#if isResoningThingking}
                         <span class="ml-2">{t("prompt-execution.thinking")}</span>
                       {/if}
