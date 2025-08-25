@@ -3,7 +3,7 @@ import { SG_VERIFICATION_TEMPLATE, SG_WELCOME_TEMPLATE } from "$constants";
 import sendMail from "$utils/mail";
 import { getEnvVar } from "$utils/env";
 
-const getAccessToken = async () => {
+export const getAccessToken = async () => {
   const AUTH0_TENANT = getEnvVar("AUTH0_TENANT");
   const API_AUDIENCE = `https://${AUTH0_TENANT}.eu.auth0.com/api/v2/`;
 
@@ -61,18 +61,14 @@ export const sendPasswordResetEmail = async (
 
 export const sendVerificationEmail = async (userId: string, email: string) => {
   try {
-    // Step 1: Get Auth0 Management API Token
-    const accessToken = await getAccessToken();
-    console.log(`Response access token`, accessToken);
-
-    // Step 2: Trigger Auth0's Standard Email Verification
+    // Step 1: Trigger Auth0's Standard Email Verification
     const ticketResponse = await managementClient.tickets.verifyEmail({
       user_id: userId,
     });
     const { ticket } = ticketResponse.data;
     console.log(`Email verification ticket URL: ${ticket}`);
 
-    // Step 3: Send verification email via SendGrid
+    // Step 2: Send verification email via SendGrid
     await sendMail({
       from: {
         name: "AI now AG",

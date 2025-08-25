@@ -37,16 +37,54 @@
   const t = useTranslations();
 
   let fileModal: HTMLDialogElement | undefined = $state();
+  // const acceptedTypes = {
+  //   "audio/*": ["audio/mp3"],
+  //   "video/*": ["video/mp4", "video/quicktime"],
+  //   "application/*": [
+  //     "application/pdf",
+  //     "application/json",
+  //     "application/vnd.ms-powerpoint",
+  //     "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  //   ],
+  //   "text/*": [
+  //     "text/plain",
+  //     "application/x-subrip",
+  //     "text/tab-separated-values",
+  //   ],
+  //   "image/*": ["image/png", "image/jpeg"],
+  // };
+
   const acceptedTypes = {
-    "audio/*": ["audio/mp3"],
+    "audio/*": ["audio/mp3", "audio/wav", "audio/mpeg"],
     "video/*": ["video/mp4", "video/quicktime"],
-    "application/*": ["application/pdf", "application/json"],
+    "application/*": [
+      "application/pdf",
+      "application/json",
+      "application/msword",
+      "application/vnd.ms-excel",
+      "application/vnd.ms-powerpoint",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+      "application/rtf",
+      "application/xml",
+      "application/vnd.oasis.opendocument.text",
+      "application/vnd.oasis.opendocument.spreadsheet",
+      "application/vnd.oasis.opendocument.presentation",
+    ],
     "text/*": [
       "text/plain",
+      "text/csv",
       "application/x-subrip",
       "text/tab-separated-values",
     ],
-    "image/*": ["image/png", "image/jpeg"],
+    "image/*": [
+      "image/png",
+      "image/jpeg",
+      "image/jpg",
+      "image/gif",
+      "image/webp",
+    ],
   };
 
   $inspect(tools);
@@ -150,7 +188,7 @@
       bind:modal={fileModal}
       title={t("upload-file.popup.title")}
       {acceptedTypes}
-      supportedFormatsText={"PDF, JSON, TXT, PNG, JPEG"}
+      supportedFormatsText={t("prompt-execution.upload-file.supportted-files-input")}
     />
   </div>
 </div>

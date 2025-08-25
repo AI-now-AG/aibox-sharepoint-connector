@@ -544,10 +544,21 @@
       }
 
       const { apiKey, apiUrl: baseUrl } = await configResponse.json();
+      const accessToken = $user?.auth0_access_token;
+      if (!accessToken) {
+        addToast({
+          message: t('auth.session-missing-force-login'),
+          type: "error",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/logout";
+        }, 2000);
+        return;
+      }
 
       const config: ConvertToMonoConfig = {
         baseUrl,
-        apiKey,
+        apiKey: accessToken,
         blobName: tempUploadUrl,
         category,
         folderName,
@@ -1603,6 +1614,7 @@
           )}</button
         >
       {/if}
+      
       <button class="btn bg-neutral btn-sm text-white" onclick={confirmStartNew}
         >{t("transciption.model.cta.start-new-transciption")}</button
       >

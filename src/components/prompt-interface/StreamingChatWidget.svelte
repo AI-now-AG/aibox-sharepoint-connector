@@ -29,7 +29,7 @@
     type Tool,
   } from "$components/chat-ui/MessageInput.svelte";
   import MessageList from "$components/chat-ui/MessageList.svelte";
-  import { tenant } from "$stores";
+  import { tenant, user } from "$stores";
   import { useTranslations } from "$i18n/utils";
   import { ApiKeyProvider } from "$types/TenantFeature";
 
@@ -597,11 +597,23 @@
       isGenerating = hasImageTool;
 
       // Make API request
+      const accessToken = $user?.auth0_access_token;
+      if (!accessToken) {
+        addToast({
+          message: t('auth.session-missing-force-login'),
+          type: "error",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/logout";
+        }, 2000);
+        return;
+      }
       const response = await fetch(config.apiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-API-Key": config.apiKey,
+          //"X-API-Key": config.apiKey,
+          "Authorization": `Bearer ${accessToken}`,
         },
         body: JSON.stringify(requestBody),
       });

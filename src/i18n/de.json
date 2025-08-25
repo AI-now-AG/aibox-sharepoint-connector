@@ -82,6 +82,7 @@
   "prompt-execution.historyRemove.info": "Beim Schliessen des Browsers, gehen alle bisher erstellten Daten verloren.",
   "prompt-execution.upload-file.drag": "Datei per Drag & Drop verschieben oder <span style=\"color: #491EFF;\">Datei auswählen</span>",
   "prompt-execution.upload-file.supportted-files": "PDF, JSON, TXT, PNG, SVG, JPEG",
+  "prompt-execution.upload-file.supportted-files-input": "PDF, JSON, TXT, PNG, SVG, JPEG, CSV, DOC, XLS, PPTX",
   "prompt-execution.upload-file.maximum-size": "Maximale Dateigrösse: 5 MB",
   "prompt-execution.upload-file.exceed-5mb-size-limit": "Datei darf nicht grösser sein als 5 MB, bitte Dateigrösse reduzieren und neu hochladen",
   "prompt-emptyscreen.description": "Starten Sie mit vordefinierten Use Case unten.",
@@ -483,5 +484,6 @@
   "prompt-execution.verbosity.level-low": "Kurze Antwort",
   "prompt-execution.verbosity.level-medium": "Kompakte Antwort mit einigen Details",
   "prompt-execution.verbosity.level-high": "Ausführliche Antwort mit Beispielen",
-  "prompt-execution.thinking": "Ich denke nach..."
+  "prompt-execution.thinking": "Ich denke nach...",
+  "auth.session-missing-force-login": "Keine aktive Sitzung gefunden. Bitte melden Sie sich erneut an."
 }
