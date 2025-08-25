@@ -17,6 +17,8 @@
     ReasoningEffortOption,
     TextVerbositiOption,
   } from "$types/AIProvider";
+  import { getPromptTools, useProviderInfo } from "$shared/AIProvider";
+  import { tenant } from "$stores";
 
   const t = useTranslations();
 
@@ -42,10 +44,7 @@
     title: string;
     groups: Group[];
   };
-  type Model = {
-    _id: string;
-    title: string;
-  };
+
   type KnowledgeBase = {
     _id: string;
     title: string;
@@ -54,13 +53,15 @@
   let categories: Category[] = $state([]);
   let selectedCategory: Category | undefined = $state();
 
-  let selectedModel: string = $state("");
-  let selectedReasoningLevel: any = $state("low");
-  let selectedTextVerbosity: any = $state("low");
-  let selectedPromptTool: any = $state("");
-
   let knowledgeBases: KnowledgeBase[] = $state([]);
   let selectedKnowledgeBases: KnowledgeBase[] = $state([]);
+
+  let selectedModel: string = $state("");
+  let previousSelectedModel: string = $state("");
+  let selectedPromptTool: any = $state("");
+
+  let selectedReasoningLevel: any = $state("low");
+  let selectedTextVerbosity: any = $state("low");
 
   let selectedGroup: Group | any = $state();
   let previousCategoryId: string | null = $state(null);
@@ -75,6 +76,27 @@
   let isLoading = $state(false);
 
   let titleInput: HTMLInputElement | undefined = $state();
+
+  const providerIno = useProviderInfo($tenant);
+  let promptTools: Array<any> = $derived(
+    getPromptTools(
+      (selectedModel == PromptModel.Default
+        ? providerIno?.defaultProviderPromptModelName
+        : selectedModel) as PromptModel,
+    ) ?? [],
+  );
+
+  $effect(() => {
+    if (selectedModel || selectedModel == "") {
+      previousSelectedModel = selectedModel;
+    }
+  });
+
+  $effect(() => {
+    if (selectedModel != previousSelectedModel) {
+      selectedPromptTool = PromptToolOption.None;
+    }
+  });
 
   onMount(async function () {
     const categoryResponse = await fetch("/api/categories.json", {
@@ -310,7 +332,23 @@
         <ModelInput bind:selectedModel />
       </div>
 
-      {#if selectedModel.includes(PromptModel.OpenAIGpt5)}
+      {#if Array.isArray(promptTools) && promptTools.length > 0}
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 justify-center"
+        >
+          <div class={"flex-1 min-w-3xs "}></div>
+
+          <Dropdown
+            classes={"flex-1 min-w-3xs "}
+            label={t("prompt-execution.prompt-tool")}
+            placeholder={t("prompt-execution.prompt-tool.placeholder")}
+            options={promptTools}
+            bind:value={selectedPromptTool}
+          />
+        </div>
+      {/if}
+
+      {#if selectedPromptTool == PromptToolOption.Thinking}
         <div
           class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 justify-center"
         >
@@ -354,32 +392,6 @@
               },
             ]}
             bind:value={selectedTextVerbosity}
-          />
-        </div>
-      {/if}
-
-    
-      {#if selectedModel.includes(PromptModel.Gemini)}
-        <div
-          class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 justify-center"
-        >
-          <div class={"flex-1 min-w-3xs "}></div>
-
-          <Dropdown
-            classes={"flex-1 min-w-3xs "}
-            label={t("prompt-execution.prompt-tool")}
-            placeholder={t("prompt-execution.prompt-tool.placeholder")}
-            options={[
-              {
-                title: t("prompt-execution.prompt-tool.web-search"),
-                value: PromptToolOption.Websearch,
-              },
-              {
-                title: t("prompt-execution.prompt-tool.thinking"),
-                value: PromptToolOption.Thinking,
-              },
-            ]}
-            bind:value={selectedPromptTool}
           />
         </div>
       {/if}

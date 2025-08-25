@@ -12,6 +12,7 @@ export enum ReasoningEffortOption {
 }
 
 export enum PromptToolOption {
+  None = "",
   Image = "image",
   Websearch = "websearch",
   Thinking = "thinking",

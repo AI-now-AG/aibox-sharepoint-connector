@@ -487,8 +487,8 @@
   "auth.session-missing-force-login": "Keine aktive Sitzung gefunden. Bitte melden Sie sich erneut an.",
   "tenant.gemini.name": "Gemini",
   "prompt-execution.models.gemini-with-tools": "${model} (Text & Tools)",
-  "prompt-execution.prompt-tool": "Gemini Tool",
-  "prompt-execution.prompt-tool.placeholder": "Web Search | Thinking ",
+  "prompt-execution.prompt-tool": "Prompt Tool",
+  "prompt-execution.prompt-tool.placeholder": "Please select tool",
   "prompt-execution.prompt-tool.image": "Image Creation",
   "prompt-execution.prompt-tool.web-search": "Web Search  ",
   "prompt-execution.prompt-tool.thinking": "Thinking "
