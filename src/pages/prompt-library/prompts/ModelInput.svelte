@@ -119,11 +119,7 @@
           ? `${defaultName} - ${t("prompt-execution.models.openai-with-tools")}`
           : `${t("prompt-execution.models.openai-with-tools")}`,
     });
-    models.push({
-      value: PromptModel.OpenAIWithImageTools,
-      title: t("prompt-execution.models.openai-with-image-tools"),
-    });
-
+ 
     return sortProviders(models);
   };
 </script>

@@ -77,10 +77,13 @@
   let titleInput: HTMLInputElement | undefined = $state();
 
   const providerIno = useProviderInfo($tenant);
+  
   let promptTools: Array<any> = $derived(
     getPromptTools(
       (selectedModel == PromptModel.Default
-        ? providerIno?.defaultProviderPromptModelName
+        ? providerIno?.defaultProviderPromptModelName == PromptModel.OpenAI
+          ? PromptModel.OpenAIWithTools
+          : providerIno?.defaultProviderPromptModelName
         : selectedModel) as PromptModel,
     ) ?? [],
   );
