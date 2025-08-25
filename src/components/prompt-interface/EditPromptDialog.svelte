@@ -15,7 +15,7 @@
   import {
     PromptToolOption,
     ReasoningEffortOption,
-    TextVerbositiOption,
+    TextVerbosityOption,
   } from "$types/AIProvider";
   import { getPromptTools, useProviderInfo } from "$shared/AIProvider";
   import { tenant } from "$stores";
@@ -380,15 +380,15 @@
             options={[
               {
                 title: t("prompt-execution.verbosity.level-low"),
-                value: TextVerbositiOption.Low,
+                value: TextVerbosityOption.Low,
               },
               {
                 title: t("prompt-execution.verbosity.level-medium"),
-                value: TextVerbositiOption.Medium,
+                value: TextVerbosityOption.Medium,
               },
               {
                 title: t("prompt-execution.verbosity.level-high"),
-                value: TextVerbositiOption.High,
+                value: TextVerbosityOption.High,
               },
             ]}
             bind:value={selectedTextVerbosity}
