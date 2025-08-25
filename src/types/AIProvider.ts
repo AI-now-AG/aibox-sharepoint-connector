@@ -42,7 +42,7 @@ export enum ReasoningEffortOption {
 }
 
 export enum PromptToolOption {
-  ImageGeneration = "image_generation",
+  Image = "image",
   Websearch = "websearch",
   Thinking = "thinking",
 }
