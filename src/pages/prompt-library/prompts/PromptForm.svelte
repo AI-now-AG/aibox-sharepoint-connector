@@ -12,7 +12,7 @@
   import Dropdown from "$components/form/Dropdown.svelte";
   import { PromptModel } from "$types/PromptModel";
   import {
-    GeminiToolOption,
+    PromptToolOption,
     ReasoningEffortOption,
     TextVerbositiOption,
   } from "$types/AIProvider";
@@ -46,7 +46,7 @@
   let selectedModel: string = $state("");
   let selectedReasoningLevel: any = $state("low");
   let selectedTextVerbosity: any = $state("low");
-  let selectedGeminiTool: any = $state("");
+  let selectedPromptTool: any = $state("");
 
   let knowledgeBases: KnowledgeBase[] = $state([]);
   let selectedKnowledgeBases: KnowledgeBase[] = $state([]);
@@ -138,7 +138,7 @@
         model: selectedModel ?? null,
         reasoningEffort: selectedReasoningLevel || null,
         textVerbosity: selectedTextVerbosity || null,
-        geminiTool: selectedGeminiTool || null,
+        promptTool: selectedPromptTool || null,
         knowledgebase: selectedKnowledgeBases.map((inst) => inst._id),
         ...(selectedCategory && { category: selectedCategory._id }),
         ...(selectedGroup && { group: selectedGroup._id }),
@@ -327,14 +327,14 @@
             options={[
               {
                 title: t("prompt-execution.gemini-tool.web-search"),
-                value: GeminiToolOption.Websearch,
+                value: PromptToolOption.Websearch,
               },
               {
                 title: t("prompt-execution.gemini-tool.thinking"),
-                value: GeminiToolOption.Thinking,
+                value: PromptToolOption.Thinking,
               },
             ]}
-            bind:value={selectedGeminiTool}
+            bind:value={selectedPromptTool}
           />
         </div>
       {/if}

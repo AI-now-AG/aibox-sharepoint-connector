@@ -41,11 +41,8 @@ export enum ReasoningEffortOption {
   High = "high",
 }
 
-export enum GeminiToolOption {
+export enum PromptToolOption {
+  ImageGeneration = "image_generation",
   Websearch = "websearch",
   Thinking = "thinking",
 }
-
-export enum OtherToolOption {}
-
-export type ToolOption = GeminiToolOption | OtherToolOption;

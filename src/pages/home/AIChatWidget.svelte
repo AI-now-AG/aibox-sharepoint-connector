@@ -49,7 +49,7 @@
     previousResponseId?: string | null;
     messageHistory?: Message[];
     reasoningEffort?: string;
-    geminiTool?: string,
+    promptTool?: string,
     verbosity?: string;
   }
 
