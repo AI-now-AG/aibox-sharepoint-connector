@@ -2,7 +2,7 @@
   import { slide } from "svelte/transition";
   import { v4 as uuidv4 } from "uuid";
   import { useTranslations } from "$i18n/utils";
-  import { ResponseStatus, ToolName } from "$types/AIResponse";
+  import { ResponseStatus } from "$types/AIResponse";
   import { addToast } from "$stores/toast";
   import { MessageRole, type MessageHistory } from "$types/MessageHistory";
   import { readFileContent } from "$utils/fileReader";
@@ -14,6 +14,7 @@
   import { gptImageMessageHistory, saveGptImageMessageHistory, gptImageFiles, saveGptImageFiles, gptImagePreviousResponseId, saveGptImagePreviousResponseId } from "$stores/gptImageMessageHistoryStore";
   import { get } from "svelte/store";
   import { onMount } from "svelte";
+    import { PromptToolOption } from "$types/AIProvider";
 
   // Types
   type ImageSize = "1024x1024" | "1024x1536" | "1536x1024";
@@ -95,7 +96,7 @@
       tenantId,
       uniqueId,
       prompt,
-      tool: ToolName.Image,
+      tool: PromptToolOption.Image,
       imageSize,
       imageQuality,
       outputCompression,
@@ -159,14 +160,14 @@
 
       if (data.status === ResponseStatus.InProgress) {
         const isGenerated =
-          data.tools.find((item: any) => item.name === ToolName.Image)
+          data.tools.find((item: any) => item.name === PromptToolOption.Image)
             ?.is_generated ?? true;
         isGenerating = !isGenerated;
       }
 
       if (data.status === ResponseStatus.Completed) {
         const imageUrl =
-          data.tools.find((item: any) => item.name === ToolName.Image)
+          data.tools.find((item: any) => item.name === PromptToolOption.Image)
             ?.image_url || "";
 
         // store messages

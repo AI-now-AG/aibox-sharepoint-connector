@@ -9,7 +9,6 @@
     setPreviousResponseId,
     getPreviousResponseId,
   } from "$components/prompt-interface/components/stores/messageHistoryStore";
-  import { ToolName } from "$types/AIResponse";
   import { PromptModel } from "$types/PromptModel";
   import { addToast } from "$stores/toast";
   import {
@@ -32,6 +31,7 @@
   import { tenant } from "$stores";
   import { useTranslations } from "$i18n/utils";
   import { ApiKeyProvider } from "$types/TenantFeature";
+  import { PromptToolOption } from "$types/AIProvider";
 
   const t = useTranslations();
 
@@ -192,9 +192,7 @@
     ].includes(currentPrompt?.model);
 
     const isOpenAIGpt5ResponseModel =
-      [
-        PromptModel.OpenAIGpt5,
-      ].includes(currentPrompt?.model) ||
+      [PromptModel.OpenAIGpt5].includes(currentPrompt?.model) ||
       (isGpt5Default() && !currentPrompt?.model);
 
     if (
@@ -577,7 +575,7 @@
 
       // Check for image generation tool
       const hasImageTool = enabledTools.some(
-        (tool) => tool.name === ToolName.Image && tool.active,
+        (tool) => tool.name === PromptToolOption.Image && tool.active,
       );
       isGenerating = hasImageTool;
 

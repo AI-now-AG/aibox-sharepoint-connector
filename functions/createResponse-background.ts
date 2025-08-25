@@ -5,25 +5,20 @@ import {
 } from "@netlify/functions";
 import PromptModel from "$data/models/prompt.model";
 import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
-import { getInstructionMessage } from "$i18n/instructionMessages";
 import { getStore } from "@netlify/blobs";
 import { OpenAI } from "openai";
 import { ObjectId } from "mongodb";
 import { decrypt } from "$utils/secure";
-import { ResponseStatus, ToolName } from "$types/AIResponse";
+import { ResponseStatus } from "$types/AIResponse";
 import { type FileInput } from "$types/FileInput";
 import { ApiKeyProvider } from "$types/TenantFeature";
 import ResponseModel, { type Response } from "$data/models/response.model";
 import TenantModel from "$data/models/tenant.model";
 import { UsageType, TextModel } from "$types/UsageTracking";
 import UsageLogModel, { type UsageLog } from "$data/models/usageLog.model";
-import type {
-  ResponseInputFile,
-  ResponseInputImage,
-  ResponseInputText,
-  ResponseUsage,
-} from "openai/resources/responses/responses";
+import type { ResponseUsage } from "openai/resources/responses/responses";
 import { NETLIFY_BLOBS_STORE } from "$constants";
+import { PromptToolOption } from "$types/AIProvider";
 
 type RequestTool = "image" | "websearch";
 
@@ -133,7 +128,6 @@ const createResponseImage: Handler = async (
       body: JSON.stringify({ error: "Tenant does not exist" }),
     };
   }
-  const defaultLanguage = tenant.default_language || "en";
 
   const store = getStore({
     name: NETLIFY_BLOBS_STORE,
@@ -174,7 +168,7 @@ const createResponseImage: Handler = async (
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const enabledTools: any[] = [];
-    if (tool === ToolName.Image) {
+    if (tool === PromptToolOption.Image) {
       enabledTools.push({
         type: "image_generation",
         background,
@@ -226,7 +220,7 @@ const createResponseImage: Handler = async (
         const update: Partial<Response> = {
           tools: [
             {
-              name: ToolName.Image,
+              name: PromptToolOption.Image,
               image_url: imageUrl,
               is_generated: false,
             },
@@ -272,7 +266,7 @@ const createResponseImage: Handler = async (
             ? {
                 tools: [
                   {
-                    name: ToolName.Image,
+                    name: PromptToolOption.Image,
                     image_url: imageUrl,
                     is_generated: true,
                   },

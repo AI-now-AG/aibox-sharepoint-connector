@@ -9,7 +9,6 @@
   } from "$components/chat-ui/MessageInput.svelte";
   import MessageList from "$components/chat-ui/MessageList.svelte";
   import { readFileContent } from "$utils/fileReader";
-  import { ToolName } from "$types/AIResponse";
   import { PromptModel } from "$types/PromptModel";
   import {
     formatMarkdown,
@@ -22,6 +21,7 @@
   import { useTranslations } from "$i18n/utils";
   import { addToast } from "$stores/toast";
   import { ApiKeyProvider } from "$types/TenantFeature";
+  import { PromptToolOption } from "$types/AIProvider";
 
   const t = useTranslations();
 
@@ -49,7 +49,7 @@
     previousResponseId?: string | null;
     messageHistory?: Message[];
     reasoningEffort?: string;
-    promptTool?: string,
+    promptTool?: string;
     verbosity?: string;
   }
 
@@ -142,9 +142,7 @@
     );
 
     const isOpenAIGpt5ResponseModel =
-      [
-        PromptModel.OpenAIGpt5,
-      ].includes(selectedModel) ||
+      [PromptModel.OpenAIGpt5].includes(selectedModel) ||
       (isGpt5Default() && !selectedModel);
 
     const provider = isOpenAIResponseModel
@@ -154,7 +152,7 @@
         : selectedModel;
 
     const hasImageTool = enabledTools.some(
-      (tool) => tool.name === ToolName.Image && tool.active,
+      (tool) => tool.name === PromptToolOption.Image && tool.active,
     );
 
     isGenerating = hasImageTool;
@@ -568,7 +566,7 @@
     isFetching = true;
     isGenerating = false;
 
-     setTimeout(() => {
+    setTimeout(() => {
       const thinkingIndicator = document.getElementById("thinking-indicator");
       if (thinkingIndicator) {
         thinkingIndicator.scrollIntoView({
@@ -577,7 +575,6 @@
         });
       }
     }, 100);
-
 
     let uploadedFileUrls = [];
     if (fileDataList.length > 0) {
