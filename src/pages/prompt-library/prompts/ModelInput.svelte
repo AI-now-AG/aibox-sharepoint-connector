@@ -20,6 +20,7 @@
     classes?: string;
     labelClasses?: string;
     disabled?: boolean;
+    onValueChange?: Function;
   }
 
   let {
@@ -28,6 +29,7 @@
     classes = "",
     labelClasses = "",
     disabled = $bindable(false),
+    onValueChange,
   }: Props = $props();
 
   let models: Option[] = $state([]);
@@ -133,5 +135,6 @@
   placeholder={`${t("tenant.default")} (OpenAI gtp-4o)`}
   options={models}
   {disabled}
+  {onValueChange}
   bind:value={selectedModel}
 />

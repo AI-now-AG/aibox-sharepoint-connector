@@ -57,7 +57,6 @@
   let selectedKnowledgeBases: KnowledgeBase[] = $state([]);
 
   let selectedModel: string = $state("");
-  let previousSelectedModel: string = $state("");
   let selectedPromptTool: any = $state("");
 
   let selectedReasoningLevel: any = $state("low");
@@ -85,18 +84,6 @@
         : selectedModel) as PromptModel,
     ) ?? [],
   );
-
-  $effect(() => {
-    if (selectedModel || selectedModel == "") {
-      previousSelectedModel = selectedModel;
-    }
-  });
-
-  $effect(() => {
-    if (selectedModel != previousSelectedModel) {
-      selectedPromptTool = PromptToolOption.None;
-    }
-  });
 
   onMount(async function () {
     const categoryResponse = await fetch("/api/categories.json", {
@@ -329,7 +316,14 @@
           items={knowledgeBases}
           bind:selectedItems={selectedKnowledgeBases}
         />
-        <ModelInput bind:selectedModel />
+        <ModelInput
+          bind:selectedModel
+          onValueChange={(_value: any) => {
+            selectedPromptTool = PromptToolOption.None;
+            selectedTextVerbosity = "";
+            selectedReasoningLevel = "";
+          }}
+        />
       </div>
 
       {#if Array.isArray(promptTools) && promptTools.length > 0}

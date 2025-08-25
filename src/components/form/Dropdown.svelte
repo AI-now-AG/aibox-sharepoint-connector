@@ -24,6 +24,7 @@
     labelClasses?: string;
     disabled?: boolean;
     children?: import("svelte").Snippet;
+    onValueChange?: Function;
   }
 
   let {
@@ -35,6 +36,7 @@
     labelClasses = "",
     disabled = $bindable(false),
     children,
+    onValueChange,
   }: Props = $props();
 
   function blur() {
@@ -73,6 +75,7 @@
             on:click|preventDefault={() => {
               if (!disabled) {
                 value = option.value;
+                onValueChange?.(value);
                 blur();
               }
             }}
