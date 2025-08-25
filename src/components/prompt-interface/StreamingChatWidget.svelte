@@ -719,6 +719,7 @@
     stickyFooter={currentMessageHistory.length > 0}
     bind:tools={enabledTools}
     onsend={submitForm}
+    promptModel={PromptModel.Gemini}
   />
 </div>
 

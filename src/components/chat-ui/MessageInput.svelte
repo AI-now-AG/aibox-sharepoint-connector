@@ -13,6 +13,8 @@
   import { svgIcons } from "$assets/icons";
   import { preventDefault } from "$utils/common";
   import { useTranslations } from "$i18n/utils";
+  import SelectToolOption from "./SelectToolOption.svelte";
+  import { PromptModel } from "$types/PromptModel";
 
   interface Props {
     input: string;
@@ -22,6 +24,7 @@
     showAttachmentButton?: boolean;
     tools?: Tool[];
     onsend: Function;
+    promptModel?: PromptModel;
   }
 
   let {
@@ -32,6 +35,7 @@
     showAttachmentButton = true,
     tools = $bindable([]),
     onsend,
+    promptModel,
   }: Props = $props();
 
   const t = useTranslations();
@@ -93,7 +97,7 @@
     <div class="p-2 flex flex-row gap-2">
       {#if showAttachmentButton}
         <button
-          class="btn btn-outline h-auto w-auto p-1 min-h-0 border-base-content/30"
+          class="btn btn-outline h-8 w-auto p-1 min-h-0 border-base-content/30 aspect-square"
           onclick={() => {
             fileModal?.showModal();
           }}
@@ -107,7 +111,7 @@
           {/if}
         </button>
       {/if}
-      {#each tools as tool, index}
+      <!-- {#each tools as tool, index}
         <button
           class={`btn btn-outline h-auto w-[30] p-1 border-base-content/30
           ${tool.active ? "btn-active btn-primary" : ""}
@@ -126,7 +130,13 @@
         >
           <span>{@html svgIcons.imageTool}</span>
         </button>
-      {/each}
+      {/each} -->
+
+      <SelectToolOption
+        {promptModel}
+        classes="min-w-auto"
+        placeholderClasses="h-8"
+      />
     </div>
     <div class="flex self-end">
       <button

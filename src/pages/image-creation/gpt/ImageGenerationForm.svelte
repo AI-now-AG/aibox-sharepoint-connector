@@ -11,10 +11,17 @@
   import Dropdown from "$components/form/Dropdown.svelte";
   import MessageInput from "$components/chat-ui/MessageInput.svelte";
   import MessageList from "$components/chat-ui/MessageList.svelte";
-  import { gptImageMessageHistory, saveGptImageMessageHistory, gptImageFiles, saveGptImageFiles, gptImagePreviousResponseId, saveGptImagePreviousResponseId } from "$stores/gptImageMessageHistoryStore";
+  import {
+    gptImageMessageHistory,
+    saveGptImageMessageHistory,
+    gptImageFiles,
+    saveGptImageFiles,
+    gptImagePreviousResponseId,
+    saveGptImagePreviousResponseId,
+  } from "$stores/gptImageMessageHistoryStore";
   import { get } from "svelte/store";
   import { onMount } from "svelte";
-    import { PromptToolOption } from "$types/AIProvider";
+  import { PromptToolOption } from "$types/AIProvider";
 
   // Types
   type ImageSize = "1024x1024" | "1024x1536" | "1536x1024";

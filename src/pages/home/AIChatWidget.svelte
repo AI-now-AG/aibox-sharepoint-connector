@@ -638,6 +638,7 @@
           bind:tools={enabledTools}
           showAttachmentButton={!isDisableFileInput}
           onsend={submitForm}
+          promptModel={PromptModel.Gemini}
         />
       </div>
     {/if}
@@ -692,6 +693,7 @@
             bind:tools={enabledTools}
             stickyFooter={true}
             onsend={submitForm}
+            promptModel={PromptModel.Gemini}
           />
         </div>
       </div>
