@@ -322,15 +322,15 @@
 
           <Dropdown
             classes={"flex-1 min-w-3xs "}
-            label={t("prompt-execution.gemini-tool")}
-            placeholder={t("prompt-execution.gemini-tool.placeholder")}
+            label={t("prompt-execution.prompt-tool")}
+            placeholder={t("prompt-execution.prompt-tool.placeholder")}
             options={[
               {
-                title: t("prompt-execution.gemini-tool.web-search"),
+                title: t("prompt-execution.prompt-tool.web-search"),
                 value: PromptToolOption.Websearch,
               },
               {
-                title: t("prompt-execution.gemini-tool.thinking"),
+                title: t("prompt-execution.prompt-tool.thinking"),
                 value: PromptToolOption.Thinking,
               },
             ]}

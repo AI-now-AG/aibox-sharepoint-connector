@@ -10,7 +10,7 @@
     CustomSortOrder,
     ModelNameMap,
     ProviderModelMap,
-  } from "$types/AIProvider";
+  } from "$shared/AIProvider";
 
   const t = useTranslations();
 

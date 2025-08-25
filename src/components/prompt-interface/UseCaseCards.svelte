@@ -11,7 +11,7 @@
   import { actions } from "astro:actions";
   import log from "$utils/log";
   import { tenant } from "$stores";
-  import { ModelNameMap, ProviderModelMap } from "$types/AIProvider";
+  import { ProviderModelMap, ModelNameMap } from "$shared/AIProvider";
 
   interface Props {
     isEditable?: boolean;
