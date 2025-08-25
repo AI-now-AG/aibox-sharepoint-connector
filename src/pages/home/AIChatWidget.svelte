@@ -4,9 +4,7 @@
   import { type Message, MessageRole } from "$types/MessageHistory";
   import { sharedMessageHistory } from "$stores/chatHistory";
   import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
-  import MessageInput, {
-    type Tool,
-  } from "$components/chat-ui/MessageInput.svelte";
+  import MessageInput from "$components/chat-ui/MessageInput.svelte";
   import MessageList from "$components/chat-ui/MessageList.svelte";
   import { readFileContent } from "$utils/fileReader";
   import { PromptModel } from "$types/PromptModel";
@@ -22,6 +20,7 @@
   import { addToast } from "$stores/toast";
   import { ApiKeyProvider } from "$types/TenantFeature";
   import { PromptToolOption } from "$types/AIProvider";
+  import { getPromptTools, useProviderInfo } from "$shared/AIProvider";
 
   const t = useTranslations();
 
@@ -69,7 +68,7 @@
   let isGenerating: boolean = $state(false);
   let isResoningThingking: boolean = $state(false);
   let previousResponseId: string | null = $state(null);
-  let enabledTools: Tool[] = $state([]);
+  let enabledTools: any[] = $state([]);
 
   const apiProvider = apiKeyProviders?.find((item: any) => {
     return item.default && item.active;
@@ -98,6 +97,18 @@
     }
   });
 
+  const providerIno = useProviderInfo($tenant);
+  // === Derived State ===
+  let toolOptions = $derived.by(() => {
+    return getPromptTools(
+      (selectedModel == PromptModel.Default
+        ? providerIno?.defaultProviderPromptModelName == PromptModel.OpenAI
+          ? PromptModel.OpenAIWithTools
+          : providerIno?.defaultProviderPromptModelName
+        : selectedModel) as PromptModel,
+    );
+  });
+
   function isGpt5Default() {
     const aiProviders = $tenant?.api_key_providers ?? [];
     const activeDefaultProvider = aiProviders.find(
@@ -109,10 +120,6 @@
     }
     return false;
   }
-
-  onDestroy(function () {
-    //$sharedMessageHistory = [];
-  });
 
   // === API Configuration ===
   async function getAPIConfiguration(): Promise<APIConfiguration> {
@@ -635,10 +642,9 @@
           bind:input
           bind:files
           {isFetching}
-          bind:tools={enabledTools}
           showAttachmentButton={!isDisableFileInput}
           onsend={submitForm}
-          promptModel={PromptModel.Gemini}
+          {toolOptions}
         />
       </div>
     {/if}
@@ -690,10 +696,9 @@
             bind:input
             bind:files
             {isFetching}
-            bind:tools={enabledTools}
             stickyFooter={true}
             onsend={submitForm}
-            promptModel={PromptModel.Gemini}
+            {toolOptions}
           />
         </div>
       </div>

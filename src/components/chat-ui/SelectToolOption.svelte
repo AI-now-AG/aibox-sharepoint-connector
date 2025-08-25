@@ -1,27 +1,24 @@
 <script lang="ts">
   import Dropdown, { type Option } from "$components/form/Dropdown.svelte";
-  import type { PromptModel } from "$types/PromptModel";
-  import { getPromptTools } from "$shared/AIProvider";
-  import { onMount } from "svelte";
   import { useTranslations } from "$i18n/utils";
+  import { PromptToolOption } from "$types/AIProvider";
 
   const t = useTranslations();
 
   interface Props {
-    promptModel?: PromptModel;
+    value?: PromptToolOption;
     classes?: string;
     placeholderClasses?: string;
+    toolOptions?: Array<Option>;
   }
 
-  let { promptModel, classes = "", placeholderClasses = "" }: Props = $props();
-
-  let toolOptions: Array<Option> = $state([]);
-
-  onMount(async function () {
-    if (promptModel) {
-      toolOptions = (getPromptTools(promptModel) || []) as Option[];
-    }
-  });
+  let {
+    value = $bindable(PromptToolOption.None),
+    classes = "",
+    placeholderClasses = "",
+    toolOptions,
+  }: Props = $props();
+  
 </script>
 
 {#if Array.isArray(toolOptions) && toolOptions.length > 0}
@@ -30,5 +27,6 @@
     options={toolOptions}
     {classes}
     {placeholderClasses}
+    bind:value
   />
 {/if}

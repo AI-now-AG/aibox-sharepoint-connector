@@ -1,11 +1,3 @@
-<script lang="ts" module>
-  export interface Tool {
-    name: "image" | "websearch";
-    active?: boolean;
-    disabled?: boolean;
-  }
-</script>
-
 <script lang="ts">
   import { fade } from "svelte/transition";
   import FileUpload from "$components/FileUpload.svelte";
@@ -14,7 +6,7 @@
   import { preventDefault } from "$utils/common";
   import { useTranslations } from "$i18n/utils";
   import SelectToolOption from "./SelectToolOption.svelte";
-  import { PromptModel } from "$types/PromptModel";
+  import type { Option } from "$components/form/Dropdown.svelte";
 
   interface Props {
     input: string;
@@ -22,9 +14,8 @@
     isFetching?: boolean;
     stickyFooter?: boolean;
     showAttachmentButton?: boolean;
-    tools?: Tool[];
     onsend: Function;
-    promptModel?: PromptModel;
+    toolOptions?: Array<Option>;
   }
 
   let {
@@ -33,9 +24,8 @@
     isFetching = false,
     stickyFooter = false,
     showAttachmentButton = true,
-    tools = $bindable([]),
     onsend,
-    promptModel,
+    toolOptions,
   }: Props = $props();
 
   const t = useTranslations();
@@ -52,8 +42,6 @@
     ],
     "image/*": ["image/png", "image/jpeg"],
   };
-
-  $inspect(tools);
 
   function onKeyDown(e: KeyboardEvent) {
     if (e.key === "Enter" && e.ctrlKey) {
@@ -111,32 +99,14 @@
           {/if}
         </button>
       {/if}
-      <!-- {#each tools as tool, index}
-        <button
-          class={`btn btn-outline h-auto w-[30] p-1 border-base-content/30
-          ${tool.active ? "btn-active btn-primary" : ""}
-          ${tool.disabled ? "cursor-not-allowed" : ""}
-          ${isFetching ? "opacity-50 cursor-not-allowed" : ""}
-        `}
-          disabled={isFetching}
-          aria-pressed={tool.active}
-          onclick={() => {
-            if (tool.disabled) return;
-            tools = tools.map((t, i) =>
-              i === index ? { ...t, active: !t.active } : t,
-            );
-          }}
-          title={tool.name}
-        >
-          <span>{@html svgIcons.imageTool}</span>
-        </button>
-      {/each} -->
 
-      <SelectToolOption
-        {promptModel}
-        classes="min-w-auto"
-        placeholderClasses="h-8"
-      />
+      {#if Array.isArray(toolOptions) && toolOptions.length > 0}
+        <SelectToolOption
+          {toolOptions}
+          classes="min-w-auto"
+          placeholderClasses="h-8"
+        />
+      {/if}
     </div>
     <div class="flex self-end">
       <button

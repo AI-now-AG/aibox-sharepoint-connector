@@ -25,13 +25,13 @@
   } from "$utils/common";
   import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
   import MessageInput, {
-    type Tool,
   } from "$components/chat-ui/MessageInput.svelte";
   import MessageList from "$components/chat-ui/MessageList.svelte";
   import { tenant } from "$stores";
   import { useTranslations } from "$i18n/utils";
   import { ApiKeyProvider } from "$types/TenantFeature";
   import { PromptToolOption } from "$types/AIProvider";
+    import { getPromptTools, useProviderInfo } from "$shared/AIProvider";
 
   const t = useTranslations();
 
@@ -111,7 +111,7 @@
 
   // === Derived State ===
   let enabledTools = $derived.by(() => {
-    const tools: Tool[] = [];
+    const tools: any[] = [];
 
     switch (currentPrompt?.model) {
       case PromptModel.OpenAIWithTools:
@@ -143,6 +143,18 @@
     }
 
     return tools;
+  });
+
+  const providerIno = useProviderInfo($tenant);
+  // === Derived State ===
+  let toolOptions = $derived.by(() => {
+    return  getPromptTools(
+      (currentPrompt?.model == PromptModel.Default
+        ? providerIno?.defaultProviderPromptModelName == PromptModel.OpenAI
+          ? PromptModel.OpenAIWithTools
+          : providerIno?.defaultProviderPromptModelName
+        : currentPrompt?.model) as PromptModel,
+    )
   });
 
   const tenantId = $tenant?._id?.toString();
@@ -717,9 +729,8 @@
     bind:files
     {isFetching}
     stickyFooter={currentMessageHistory.length > 0}
-    bind:tools={enabledTools}
     onsend={submitForm}
-    promptModel={PromptModel.Gemini}
+    {toolOptions}
   />
 </div>
 
