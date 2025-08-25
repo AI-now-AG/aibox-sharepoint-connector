@@ -1,4 +1,4 @@
-import { auth0, lucia, requestAccessToken } from "$auth";
+import { auth0, lucia } from "$auth";
 import { decodeJwt } from "jose";
 import type { APIContext } from "astro";
 import UserModel, { assignPermissions } from "$data/models/user.model";
@@ -74,9 +74,8 @@ export async function GET(context: APIContext): Promise<Response> {
   // Get the user's roles
   const roles = auth0User.data["ainow/roles"];
 
-  //const access_token = await requestAccessToken();
   const accessToken = token.accessToken();
-  console.log("Auth0 accessToken", accessToken);
+  //console.log("Auth0 accessToken", accessToken);
   // TODO: Sync current user from Auth0 to aibox
   const userId = await UserModel.upsertByAuth0Sub(auth0User.data.sub, {
     tenant_id: tenant._id,

@@ -547,7 +547,7 @@
       const accessToken = $user?.auth0_access_token;
       if (!accessToken) {
         addToast({
-          message: 'Your session has expired. Please log in again',
+          message: t('auth.session-missing-force-login'),
           type: "error",
         });
         setTimeout(() => {
