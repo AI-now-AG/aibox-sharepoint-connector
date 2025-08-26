@@ -121,6 +121,7 @@
   });
 
   let selectedPromptTool = $state(PromptToolOption.None);
+  let isDisablePromptTool = $state(false);
 
   // === Effects ===
   $effect(() => {
@@ -129,6 +130,14 @@
     }
     if (currentPrompt?.model == PromptModel.Perplexity) {
       selectedPromptTool = PromptToolOption.Websearch;
+    }
+    if (
+      currentPrompt.promptTool &&
+      currentPrompt.promptTool != PromptToolOption.None
+    ) {
+      isDisablePromptTool = true;
+    } else {
+      isDisablePromptTool = false;
     }
   });
 
@@ -699,6 +708,7 @@
     onsend={submitForm}
     {toolOptions}
     bind:selectedPromptTool
+    bind:isDisablePromptTool
   />
 </div>
 

@@ -18,6 +18,7 @@
     onsend: Function;
     toolOptions?: Array<Option>;
     selectedPromptTool?: PromptToolOption;
+    isDisablePromptTool?: boolean;
   }
 
   let {
@@ -29,6 +30,7 @@
     onsend,
     toolOptions,
     selectedPromptTool = $bindable(PromptToolOption.None),
+    isDisablePromptTool = $bindable(false),
   }: Props = $props();
 
   const t = useTranslations();
@@ -109,6 +111,7 @@
           classes="min-w-48"
           placeholderClasses="h-8"
           bind:value={selectedPromptTool}
+          bind:disabled={isDisablePromptTool}
         />
       {/if}
     </div>

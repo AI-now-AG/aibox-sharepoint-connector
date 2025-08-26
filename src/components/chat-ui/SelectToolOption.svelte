@@ -10,6 +10,7 @@
     classes?: string;
     placeholderClasses?: string;
     toolOptions?: Array<Option>;
+    disabled?: boolean;
   }
 
   let {
@@ -17,8 +18,8 @@
     classes = "",
     placeholderClasses = "",
     toolOptions,
+    disabled = $bindable(false),
   }: Props = $props();
-  
 </script>
 
 {#if Array.isArray(toolOptions) && toolOptions.length > 0}
@@ -28,5 +29,6 @@
     {classes}
     {placeholderClasses}
     bind:value
+    bind:disabled
   />
 {/if}
