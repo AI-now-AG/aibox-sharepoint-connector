@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onDestroy } from "svelte";
   import { slide } from "svelte/transition";
   import { type Message, MessageRole } from "$types/MessageHistory";
   import { sharedMessageHistory } from "$stores/chatHistory";
@@ -68,7 +67,6 @@
   let isGenerating: boolean = $state(false);
   let isResoningThingking: boolean = $state(false);
   let previousResponseId: string | null = $state(null);
-  let enabledTools: any[] = $state([]);
 
   const apiProvider = apiKeyProviders?.find((item: any) => {
     return item.default && item.active;
@@ -78,23 +76,6 @@
   $effect(() => {
     isDisableSelectModel = $sharedMessageHistory.length > 0 || isFetching;
     isDisableFileInput = selectedModel === PromptModel.Perplexity;
-  });
-
-  $effect(() => {
-    if (
-      [PromptModel.OpenAIWithTools, PromptModel.OpenAIGpt5].includes(
-        selectedModel,
-      )
-    ) {
-      enabledTools = [
-        {
-          name: "image",
-          active: false,
-        },
-      ];
-    } else {
-      enabledTools = [];
-    }
   });
 
   const providerIno = useProviderInfo($tenant);
@@ -108,6 +89,8 @@
         : selectedModel) as PromptModel,
     );
   });
+
+  let selectedPromptTool = $state(PromptToolOption.None);
 
   function isGpt5Default() {
     const aiProviders = $tenant?.api_key_providers ?? [];
@@ -158,11 +141,7 @@
         ? "openai-gpt-5-response"
         : selectedModel;
 
-    const hasImageTool = enabledTools.some(
-      (tool) => tool.name === PromptToolOption.Image && tool.active,
-    );
-
-    isGenerating = hasImageTool;
+    isGenerating = selectedPromptTool == PromptToolOption.Image;
 
     const promptForAttachedFilesOnly = fileUrls.length > 0 ? " " : "";
 
@@ -175,14 +154,16 @@
     };
 
     // Add conditional properties
-    if (hasImageTool) {
-      payload.tool = "image_generation";
-      payload.imageGenerationOptions = {
-        outputFormat: "png",
-        quality: "medium",
-        size: "1024x1024",
-        background: "auto",
-      };
+    if (selectedPromptTool != PromptToolOption.None) {
+      payload.tool = selectedPromptTool;
+      if (selectedPromptTool == PromptToolOption.Image) {
+        payload.imageGenerationOptions = {
+          outputFormat: "png",
+          quality: "medium",
+          size: "1024x1024",
+          background: "auto",
+        };
+      }
     }
 
     if (isOpenAIResponseModel) {
@@ -645,6 +626,7 @@
           showAttachmentButton={!isDisableFileInput}
           onsend={submitForm}
           {toolOptions}
+          bind:selectedPromptTool
         />
       </div>
     {/if}
@@ -656,6 +638,12 @@
           bind:selectedModel
           bind:disabled={isDisableSelectModel}
           labelClasses={"text-sm"}
+          onValueChange={(_value: any) => {
+            selectedPromptTool = PromptToolOption.None;
+            if (_value == PromptModel.Perplexity) {
+              selectedPromptTool = PromptToolOption.Websearch;
+            }
+          }}
         />
       </div>
     </div>
@@ -699,6 +687,7 @@
             stickyFooter={true}
             onsend={submitForm}
             {toolOptions}
+            bind:selectedPromptTool
           />
         </div>
       </div>

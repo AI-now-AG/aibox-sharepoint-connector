@@ -7,6 +7,7 @@
   import { useTranslations } from "$i18n/utils";
   import SelectToolOption from "./SelectToolOption.svelte";
   import type { Option } from "$components/form/Dropdown.svelte";
+  import { PromptToolOption } from "$types/AIProvider";
 
   interface Props {
     input: string;
@@ -16,6 +17,7 @@
     showAttachmentButton?: boolean;
     onsend: Function;
     toolOptions?: Array<Option>;
+    selectedPromptTool?: PromptToolOption;
   }
 
   let {
@@ -26,6 +28,7 @@
     showAttachmentButton = true,
     onsend,
     toolOptions,
+    selectedPromptTool = $bindable(PromptToolOption.None),
   }: Props = $props();
 
   const t = useTranslations();
@@ -105,6 +108,7 @@
           {toolOptions}
           classes="min-w-auto"
           placeholderClasses="h-8"
+          bind:value={selectedPromptTool}
         />
       {/if}
     </div>

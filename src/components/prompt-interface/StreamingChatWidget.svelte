@@ -24,14 +24,13 @@
     stripHtmlFormatting,
   } from "$utils/common";
   import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
-  import MessageInput, {
-  } from "$components/chat-ui/MessageInput.svelte";
+  import MessageInput from "$components/chat-ui/MessageInput.svelte";
   import MessageList from "$components/chat-ui/MessageList.svelte";
   import { tenant } from "$stores";
   import { useTranslations } from "$i18n/utils";
   import { ApiKeyProvider } from "$types/TenantFeature";
   import { PromptToolOption } from "$types/AIProvider";
-    import { getPromptTools, useProviderInfo } from "$shared/AIProvider";
+  import { getPromptTools, useProviderInfo } from "$shared/AIProvider";
 
   const t = useTranslations();
 
@@ -109,52 +108,28 @@
     return activeDefaultProvider?.name || ApiKeyProvider.OpenAI;
   }
 
-  // === Derived State ===
-  let enabledTools = $derived.by(() => {
-    const tools: any[] = [];
-
-    switch (currentPrompt?.model) {
-      case PromptModel.OpenAIWithTools:
-        tools.push({
-          name: "image",
-          active: false,
-        });
-        break;
-      case PromptModel.OpenAIWithImageTools:
-        tools.push({
-          name: "image",
-          active: true,
-          disabled: true,
-        });
-        break;
-      case PromptModel.OpenAIGpt5:
-        tools.push({
-          name: "image",
-          active: false,
-        });
-        break;
-    }
-
-    if (!currentPrompt?.model && isGpt5Default()) {
-      tools.push({
-        name: "image",
-        active: false,
-      });
-    }
-
-    return tools;
-  });
-
   const providerIno = useProviderInfo($tenant);
   // === Derived State ===
   let toolOptions = $derived.by(() => {
-    return  getPromptTools(
+    return getPromptTools(
       (currentPrompt?.model == PromptModel.Default
         ? providerIno?.defaultProviderPromptModelName == PromptModel.OpenAI
           ? PromptModel.OpenAIWithTools
           : providerIno?.defaultProviderPromptModelName
         : currentPrompt?.model) as PromptModel,
-    )
+    );
+  });
+
+  let selectedPromptTool = $state(currentPrompt.promptTool);
+
+  // === Effects ===
+  $effect(() => {
+    if (currentPrompt.promptTool != PromptToolOption.None) {
+      selectedPromptTool = currentPrompt.promptTool;
+    }
+    if (currentPrompt?.model == PromptModel.Perplexity) {
+      selectedPromptTool = PromptToolOption.Websearch;
+    }
   });
 
   const tenantId = $tenant?._id?.toString();
@@ -232,14 +207,16 @@
     };
 
     // Add conditional properties
-    if (enabledTools.length) {
-      payload.tool = "image_generation";
-      payload.imageGenerationOptions = {
-        outputFormat: "png",
-        quality: "medium",
-        size: "1024x1024",
-        background: "auto",
-      };
+    if (selectedPromptTool != PromptToolOption.None) {
+      payload.tool = selectedPromptTool;
+      if (selectedPromptTool == PromptToolOption.Image) {
+        payload.imageGenerationOptions = {
+          outputFormat: "png",
+          quality: "medium",
+          size: "1024x1024",
+          background: "auto",
+        };
+      }
     }
 
     if (isOpenAIResponseModel) {
@@ -586,10 +563,7 @@
       const requestBody = buildRequestPayload(fileUrls);
 
       // Check for image generation tool
-      const hasImageTool = enabledTools.some(
-        (tool) => tool.name === PromptToolOption.Image && tool.active,
-      );
-      isGenerating = hasImageTool;
+      isGenerating = selectedPromptTool == PromptToolOption.Image;
 
       // Make API request
       const response = await fetch(config.apiUrl, {
@@ -731,6 +705,7 @@
     stickyFooter={currentMessageHistory.length > 0}
     onsend={submitForm}
     {toolOptions}
+    bind:selectedPromptTool
   />
 </div>
 
