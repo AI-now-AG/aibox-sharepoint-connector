@@ -9,10 +9,9 @@
   import { PromptModel } from "$types/PromptModel";
   import {
     formatMarkdown,
-    parseChunkCitations,
     formatCitations,
     stripHtmlFormatting,
-  } from "$utils/common";
+  } from "$utils/textFormatting";
   import AIModelDropdown from "./AIModelDropdown.svelte";
   import { tenant } from "$stores";
   import { useTranslations } from "$i18n/utils";
@@ -151,6 +150,7 @@
       prompt: input || promptForAttachedFilesOnly,
       stream: true,
       fileUrls,
+      tool: "websearch",
     };
 
     // Add conditional properties
@@ -327,23 +327,12 @@
   ): void {
     console.log("📚 Citations sent:", citations);
 
-    const citationsJson = JSON.stringify({ citations });
-    const parsedChunk: any = parseChunkCitations(citationsJson);
-
-    if (parsedChunk.citations) {
-      citations = parsedChunk.citations;
-    }
-
-    const formattedChunk = formatMarkdown(responseText)
-      .split("\n")
-      .map((line) => formatMarkdown(line))
-      .join("\n");
-
-    currentMessage = formatCitations(formattedChunk, citations);
+    const formattedText = formatCitations(responseText, citations);
+    currentMessage = formatMarkdown(formattedText);
 
     const newAssistantMessage: Message = {
       role: MessageRole.Assistant,
-      content: formatMarkdown(currentMessage),
+      content: currentMessage,
       rawData: stripHtmlFormatting(currentMessage),
       imageUrl,
     };

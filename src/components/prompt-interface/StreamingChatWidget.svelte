@@ -19,10 +19,9 @@
   import { readFileContent } from "$utils/fileReader";
   import {
     formatMarkdown,
-    parseChunkCitations,
     formatCitations,
     stripHtmlFormatting,
-  } from "$utils/common";
+  } from "$utils/textFormatting";
   import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
   import MessageInput from "$components/chat-ui/MessageInput.svelte";
   import MessageList from "$components/chat-ui/MessageList.svelte";
@@ -386,19 +385,8 @@
   ): void {
     console.log("📚 Citations sent:", citations);
 
-    const citationsJson = JSON.stringify({ citations });
-    const parsedChunk: any = parseChunkCitations(citationsJson);
-
-    if (parsedChunk.citations) {
-      citations = parsedChunk.citations;
-    }
-
-    const formattedChunk = formatMarkdown(responseText)
-      .split("\n")
-      .map((line) => formatMarkdown(line))
-      .join("\n");
-
-    currentMessage = formatCitations(formattedChunk, citations);
+    const formattedText = formatMarkdown(responseText);
+    currentMessage = formatCitations(formattedText, citations);
 
     const newAssistantMessage: Message = {
       role: MessageRole.Assistant,

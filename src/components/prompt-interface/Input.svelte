@@ -9,10 +9,12 @@
   import { useTranslations } from "$i18n/utils";
   import { readFileContent } from "$utils/fileReader";
   import {
-    formatMarkdown,
     preventDefault,
-    stripHtmlFormatting,
   } from "$utils/common";
+  import {
+    formatMarkdown,
+    stripHtmlFormatting,
+  } from "$utils/textFormatting";
   import { resetTrialBanner, resetUnverifiedBanner } from "$stores/bannerReset";
 
   const t = useTranslations();

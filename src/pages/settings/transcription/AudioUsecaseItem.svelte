@@ -6,7 +6,7 @@
   import { useTranslations } from "$i18n/utils";
   import type { AudioCardItem } from "$types/AudioCardItem";
   import { AudioCategoryLabels } from "$types/TenantFeature";
-  import { stripHtmlFormatting } from "$utils/common";
+  import { stripHtmlFormatting } from "$utils/textFormatting";
 
   const t = useTranslations();
 
