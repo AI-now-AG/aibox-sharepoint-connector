@@ -3,6 +3,7 @@ import { useTranslations } from "$i18n/utils";
 import { PromptToolOption } from "$types/AIProvider";
 import { PromptModel } from "$types/PromptModel";
 import { ApiKeyProvider } from "$types/TenantFeature";
+import { svgIcons } from "$assets/icons";
 
 const t = useTranslations();
 
@@ -46,6 +47,7 @@ export const Gpt4oPromptTools = [
   {
     title: t("prompt-execution.prompt-tool.image"),
     value: PromptToolOption.Image,
+    icon: svgIcons.image,
   },
 ];
 
@@ -53,6 +55,7 @@ export const Gpt5PromptTools = [
   {
     title: t("prompt-execution.prompt-tool.image"),
     value: PromptToolOption.Image,
+    icon: svgIcons.image,
   },
   // {
   //   title: t("prompt-execution.prompt-tool.thinking"),
@@ -64,6 +67,7 @@ export const PerplexityPromptTools = [
   {
     title: t("prompt-execution.prompt-tool.web-search"),
     value: PromptToolOption.Websearch,
+    icon: svgIcons.web,
   },
 ];
 
@@ -71,6 +75,7 @@ export const GeminiPromptTools = [
   {
     title: t("prompt-execution.prompt-tool.web-search"),
     value: PromptToolOption.Websearch,
+    icon: svgIcons.web,
   },
   // { // Langchain not support Gemini Thinking yet
   //   title: t("prompt-execution.prompt-tool.thinking"),

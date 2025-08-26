@@ -106,7 +106,7 @@
       {#if Array.isArray(toolOptions) && toolOptions.length > 0}
         <SelectToolOption
           {toolOptions}
-          classes="min-w-auto"
+          classes="min-w-48"
           placeholderClasses="h-8"
           bind:value={selectedPromptTool}
         />

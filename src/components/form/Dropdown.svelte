@@ -3,14 +3,10 @@
 <!-- svelte-ignore event_directive_deprecated -->
 
 <script lang="ts" module>
-  /*
-   const options = [
-    { value: "_value", title: "_title" }
-  ];
-  */
   export interface Option {
     value: string;
     title: string;
+    icon?: string; // Change the type to string for SVG data
   }
 </script>
 
@@ -64,7 +60,12 @@
         (value ? "" : "text-[#a29bd6]") +
         (disabled ? " pointer-events-none opacity-50 bg-gray-200 " : " ") + placeholderClasses}
     >
-      {options.find((opt) => opt.value === value)?.title || placeholder}
+      <span class="flex items-center gap-2">
+        {#if options.find((opt) => opt.value === value)?.icon}
+          {@html options.find((opt) => opt.value === value)?.icon}
+        {/if}
+        {options.find((opt) => opt.value === value)?.title || placeholder}
+      </span>
     </label>
     <ul
       tabindex={disabled ? -1 : 0}
@@ -73,7 +74,10 @@
       {#each options as option}
         <li>
           <button
-            class={option.value === value ? "bg-primary text-white" : ""}
+            class={
+              "w-full text-left flex items-center gap-2" +
+              (option.value === value ? " bg-primary text-white" : "")
+            }
             on:click|preventDefault={() => {
               if (!disabled) {
                 value = option.value;
@@ -83,6 +87,9 @@
             }}
             {disabled}
           >
+            {#if option.icon}
+              {@html option.icon}
+            {/if}
             {option.title}
           </button>
         </li>
