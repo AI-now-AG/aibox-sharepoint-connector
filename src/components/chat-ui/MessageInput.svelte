@@ -1,11 +1,3 @@
-<script lang="ts" module>
-  export interface Tool {
-    name: "image" | "websearch";
-    active?: boolean;
-    disabled?: boolean;
-  }
-</script>
-
 <script lang="ts">
   import { fade } from "svelte/transition";
   import FileUpload from "$components/FileUpload.svelte";
@@ -13,6 +5,9 @@
   import { svgIcons } from "$assets/icons";
   import { preventDefault } from "$utils/common";
   import { useTranslations } from "$i18n/utils";
+  import SelectToolOption from "./SelectToolOption.svelte";
+  import type { Option } from "$components/form/Dropdown.svelte";
+  import { PromptToolOption } from "$types/AIProvider";
 
   interface Props {
     input: string;
@@ -20,8 +15,9 @@
     isFetching?: boolean;
     stickyFooter?: boolean;
     showAttachmentButton?: boolean;
-    tools?: Tool[];
     onsend: Function;
+    toolOptions?: Array<Option>;
+    selectedPromptTool?: PromptToolOption;
   }
 
   let {
@@ -30,8 +26,9 @@
     isFetching = false,
     stickyFooter = false,
     showAttachmentButton = true,
-    tools = $bindable([]),
     onsend,
+    toolOptions,
+    selectedPromptTool = $bindable(PromptToolOption.None),
   }: Props = $props();
 
   const t = useTranslations();
@@ -48,8 +45,6 @@
     ],
     "image/*": ["image/png", "image/jpeg"],
   };
-
-  $inspect(tools);
 
   function onKeyDown(e: KeyboardEvent) {
     if (e.key === "Enter" && e.ctrlKey) {
@@ -93,7 +88,7 @@
     <div class="p-2 flex flex-row gap-2">
       {#if showAttachmentButton}
         <button
-          class="btn btn-outline h-auto w-auto p-1 min-h-0 border-base-content/30"
+          class="btn btn-outline h-8 w-auto p-1 min-h-0 border-base-content/30 aspect-square"
           onclick={() => {
             fileModal?.showModal();
           }}
@@ -107,26 +102,15 @@
           {/if}
         </button>
       {/if}
-      {#each tools as tool, index}
-        <button
-          class={`btn btn-outline h-auto w-[30] p-1 border-base-content/30
-          ${tool.active ? "btn-active btn-primary" : ""}
-          ${tool.disabled ? "cursor-not-allowed" : ""}
-          ${isFetching ? "opacity-50 cursor-not-allowed" : ""}
-        `}
-          disabled={isFetching}
-          aria-pressed={tool.active}
-          onclick={() => {
-            if (tool.disabled) return;
-            tools = tools.map((t, i) =>
-              i === index ? { ...t, active: !t.active } : t,
-            );
-          }}
-          title={tool.name}
-        >
-          <span>{@html svgIcons.imageTool}</span>
-        </button>
-      {/each}
+
+      {#if Array.isArray(toolOptions) && toolOptions.length > 0}
+        <SelectToolOption
+          {toolOptions}
+          classes="min-w-auto"
+          placeholderClasses="h-8"
+          bind:value={selectedPromptTool}
+        />
+      {/if}
     </div>
     <div class="flex self-end">
       <button

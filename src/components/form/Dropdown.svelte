@@ -22,6 +22,7 @@
     placeholder?: string;
     classes?: string;
     labelClasses?: string;
+    placeholderClasses?: string;
     disabled?: boolean;
     children?: import("svelte").Snippet;
     onValueChange?: Function;
@@ -34,6 +35,7 @@
     placeholder = "",
     classes,
     labelClasses = "",
+    placeholderClasses = "",
     disabled = $bindable(false),
     children,
     onValueChange,
@@ -60,7 +62,7 @@
       tabindex={disabled ? -1 : 0}
       class={"select select-bordered w-full rounded-lg " +
         (value ? "" : "text-[#a29bd6]") +
-        (disabled ? " pointer-events-none opacity-50 bg-gray-200" : "")}
+        (disabled ? " pointer-events-none opacity-50 bg-gray-200 " : " ") + placeholderClasses}
     >
       {options.find((opt) => opt.value === value)?.title || placeholder}
     </label>

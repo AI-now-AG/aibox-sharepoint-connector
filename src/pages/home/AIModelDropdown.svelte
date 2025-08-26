@@ -19,6 +19,7 @@
     classes?: string;
     labelClasses?: string;
     disabled?: boolean;
+    onValueChange?: Function;
   }
 
   let {
@@ -27,6 +28,7 @@
     classes = "",
     labelClasses = "",
     disabled = $bindable(false),
+    onValueChange,
   }: Props = $props();
 
   let models: Option[] = $state([]);
@@ -109,5 +111,6 @@
   placeholder={""}
   options={models}
   {disabled}
+  {onValueChange}
   bind:value={selectedModel}
 />

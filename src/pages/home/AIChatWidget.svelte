@@ -1,12 +1,9 @@
 <script lang="ts">
-  import { onDestroy } from "svelte";
   import { slide } from "svelte/transition";
   import { type Message, MessageRole } from "$types/MessageHistory";
   import { sharedMessageHistory } from "$stores/chatHistory";
   import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
-  import MessageInput, {
-    type Tool,
-  } from "$components/chat-ui/MessageInput.svelte";
+  import MessageInput from "$components/chat-ui/MessageInput.svelte";
   import MessageList from "$components/chat-ui/MessageList.svelte";
   import { readFileContent } from "$utils/fileReader";
   import { PromptModel } from "$types/PromptModel";
@@ -22,6 +19,7 @@
   import { addToast } from "$stores/toast";
   import { ApiKeyProvider } from "$types/TenantFeature";
   import { PromptToolOption } from "$types/AIProvider";
+  import { getPromptTools, useProviderInfo } from "$shared/AIProvider";
 
   const t = useTranslations();
 
@@ -69,7 +67,6 @@
   let isGenerating: boolean = $state(false);
   let isResoningThingking: boolean = $state(false);
   let previousResponseId: string | null = $state(null);
-  let enabledTools: Tool[] = $state([]);
 
   const apiProvider = apiKeyProviders?.find((item: any) => {
     return item.default && item.active;
@@ -81,22 +78,19 @@
     isDisableFileInput = selectedModel === PromptModel.Perplexity;
   });
 
-  $effect(() => {
-    if (
-      [PromptModel.OpenAIWithTools, PromptModel.OpenAIGpt5].includes(
-        selectedModel,
-      )
-    ) {
-      enabledTools = [
-        {
-          name: "image",
-          active: false,
-        },
-      ];
-    } else {
-      enabledTools = [];
-    }
+  const providerIno = useProviderInfo($tenant);
+  // === Derived State ===
+  let toolOptions = $derived.by(() => {
+    return getPromptTools(
+      (selectedModel == PromptModel.Default
+        ? providerIno?.defaultProviderPromptModelName == PromptModel.OpenAI
+          ? PromptModel.OpenAIWithTools
+          : providerIno?.defaultProviderPromptModelName
+        : selectedModel) as PromptModel,
+    );
   });
+
+  let selectedPromptTool = $state(PromptToolOption.None);
 
   function isGpt5Default() {
     const aiProviders = $tenant?.api_key_providers ?? [];
@@ -109,10 +103,6 @@
     }
     return false;
   }
-
-  onDestroy(function () {
-    //$sharedMessageHistory = [];
-  });
 
   // === API Configuration ===
   async function getAPIConfiguration(): Promise<APIConfiguration> {
@@ -151,11 +141,7 @@
         ? "openai-gpt-5-response"
         : selectedModel;
 
-    const hasImageTool = enabledTools.some(
-      (tool) => tool.name === PromptToolOption.Image && tool.active,
-    );
-
-    isGenerating = hasImageTool;
+    isGenerating = selectedPromptTool == PromptToolOption.Image;
 
     const promptForAttachedFilesOnly = fileUrls.length > 0 ? " " : "";
 
@@ -168,14 +154,16 @@
     };
 
     // Add conditional properties
-    if (hasImageTool) {
-      payload.tool = "image_generation";
-      payload.imageGenerationOptions = {
-        outputFormat: "png",
-        quality: "medium",
-        size: "1024x1024",
-        background: "auto",
-      };
+    if (selectedPromptTool != PromptToolOption.None) {
+      payload.tool = selectedPromptTool;
+      if (selectedPromptTool == PromptToolOption.Image) {
+        payload.imageGenerationOptions = {
+          outputFormat: "png",
+          quality: "medium",
+          size: "1024x1024",
+          background: "auto",
+        };
+      }
     }
 
     if (isOpenAIResponseModel) {
@@ -635,9 +623,10 @@
           bind:input
           bind:files
           {isFetching}
-          bind:tools={enabledTools}
           showAttachmentButton={!isDisableFileInput}
           onsend={submitForm}
+          {toolOptions}
+          bind:selectedPromptTool
         />
       </div>
     {/if}
@@ -649,6 +638,12 @@
           bind:selectedModel
           bind:disabled={isDisableSelectModel}
           labelClasses={"text-sm"}
+          onValueChange={(_value: any) => {
+            selectedPromptTool = PromptToolOption.None;
+            if (_value == PromptModel.Perplexity) {
+              selectedPromptTool = PromptToolOption.Websearch;
+            }
+          }}
         />
       </div>
     </div>
@@ -689,9 +684,10 @@
             bind:input
             bind:files
             {isFetching}
-            bind:tools={enabledTools}
             stickyFooter={true}
             onsend={submitForm}
+            {toolOptions}
+            bind:selectedPromptTool
           />
         </div>
       </div>

@@ -323,6 +323,9 @@
           bind:selectedModel
           onValueChange={(_value: any) => {
             selectedPromptTool = PromptToolOption.None;
+            if (_value == PromptModel.Perplexity) {
+              selectedPromptTool = PromptToolOption.Websearch;
+            }
             selectedTextVerbosity = "";
             selectedReasoningLevel = "";
           }}
