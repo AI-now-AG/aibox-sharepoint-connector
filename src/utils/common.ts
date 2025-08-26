@@ -86,7 +86,7 @@ export function formatCitations(
   return updatedString;
 }
 
-export function formatMarkdown(text: string) {
+export function formatMarkdown_bak(text: string) {
   text = text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
   text = text.replace(/(\*|_)(.*?)\1/g, "<em>$2</em>");
   text = text.replace(/__(.*?)__/g, "<u>$1</u>");
@@ -100,6 +100,112 @@ export function formatMarkdown(text: string) {
   text = text.replace(/^## (.*)$/gm, "<h2 class='text-xl'>$1</h2>");
   text = text.replace(/^# (.*)$/gm, "<h1 class='text-2xl'>$1</h1>");
   text = text.replace(/\n/g, "<br>");
+  return text;
+}
+
+export function formatMarkdown(text: string): string {
+  // 1. Handle code blocks first to protect their internal structure from other replacements.
+  // This ensures markdown like '```js\nconsole.log("hello");\n```' is correctly parsed.
+  text = text.replace(/```([\s\S]*?)```/g, (match, codeContent) => {
+    // Trim any leading/trailing newlines within the code content to ensure clean <pre><code>.
+    return `<pre class="bg-gray-800 text-white p-4 rounded-lg my-4 overflow-x-auto"><code class="language-plaintext">${codeContent.trim()}</code></pre>`;
+  });
+
+  // 2. Handle Markdown headings (h1-h6) with Tailwind CSS classes for styling.
+  // Added `font-bold` for H1 and `font-semibold` for H2-H6, along with margin for spacing.
+  text = text.replace(
+    /^###### (.*)$/gm,
+    "<h6 class='text-xs font-semibold mt-4 mb-2 text-gray-700'>$1</h6>",
+  );
+  text = text.replace(
+    /^##### (.*)$/gm,
+    "<h5 class='text-sm font-semibold mt-4 mb-2 text-gray-700'>$1</h5>",
+  );
+  text = text.replace(
+    /^#### (.*)$/gm,
+    "<h4 class='text-base font-semibold mt-4 mb-2 text-gray-700'>$1</h4>",
+  );
+  text = text.replace(
+    /^### (.*)$/gm,
+    "<h3 class='text-lg font-semibold mt-4 mb-2 text-gray-800'>$1</h3>",
+  );
+  text = text.replace(
+    /^## (.*)$/gm,
+    "<h2 class='text-xl font-semibold mt-4 mb-2 text-gray-800'>$1</h2>",
+  );
+  text = text.replace(
+    /^# (.*)$/gm,
+    "<h1 class='text-2xl font-bold mt-4 mb-2 text-gray-900'>$1</h1>",
+  );
+
+  // 3. Handle inline markdown formatting.
+  text = text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>"); // Bold
+  text = text.replace(/(\*|_)(.*?)\1/g, "<em>$2</em>"); // Italic
+  text = text.replace(/__(.*?)__/g, "<u>$1</u>"); // Underline
+  text = text.replace(/~~(.*?)~~/g, "<del>$1</del>"); // Strikethrough
+  text = text.replace(
+    /`(.*?)`/g,
+    "<code class='bg-gray-200 text-red-700 px-1 py-0.5 rounded text-sm'>$1</code>",
+  ); // Inline code with subtle styling
+
+  // 4. Handle Markdown Tables. This is a multi-step process using a replacer function.
+  // The regex captures the header line, the separator line (with alignment indicators),
+  // and all subsequent body lines.
+  const tableRegex =
+    /^\|(.+)\|(?:\r?\n|\r)(?:\s*\|(?: *:?-+:? *\|)+)(?:\r?\n|\r)((?:\|.*\|(?:\r?\n|\r))*)/gm;
+
+  text = text.replace(
+    tableRegex,
+    (match, headerLine: string, bodyLines: string) => {
+      // Extract and trim headers. Filter out empty strings from splitting.
+      const headers = headerLine
+        .split("|")
+        .map((h) => h.trim())
+        .filter((h) => h !== "");
+
+      let htmlTable =
+        '<table class="w-full border-collapse table-auto my-4 rounded-lg overflow-hidden shadow-md">';
+      htmlTable += '<thead class="bg-blue-600 text-white">';
+      htmlTable += '<tr class="text-left">';
+      headers.forEach((header) => {
+        htmlTable += `<th class="p-3 border-r border-blue-700 last:border-r-0 font-semibold uppercase text-sm">${header}</th>`;
+      });
+      htmlTable += "</tr>";
+      htmlTable += "</thead>";
+      htmlTable += "<tbody>";
+
+      // Process body rows if they exist.
+      if (bodyLines) {
+        // Split body lines and filter out any empty lines.
+        const rows = bodyLines
+          .split(/\r?\n|\r/)
+          .filter((line) => line.trim() !== "");
+        rows.forEach((row, index) => {
+          // Cells are split by '|' and trimmed. Filter out empty strings.
+          const cells = row
+            .split("|")
+            .map((c) => c.trim())
+            .filter((c) => c !== "");
+          // Apply alternating background colors for better readability.
+          const rowBgClass = index % 2 === 0 ? "bg-white" : "bg-gray-50";
+          htmlTable += `<tr class="${rowBgClass} hover:bg-gray-100 transition-colors duration-200">`;
+          cells.forEach((cell) => {
+            htmlTable += `<td class="p-3 border-r border-gray-200 last:border-r-0 text-gray-800">${cell}</td>`;
+          });
+          htmlTable += "</tr>";
+        });
+      }
+
+      htmlTable += "</tbody>";
+      htmlTable += "</table>";
+      return htmlTable;
+    },
+  );
+
+  // 5. Finally, replace remaining standalone newlines with <br> tags.
+  // This step comes last to avoid converting newlines within already-generated HTML structures.
+  text = text.replace(/\n/g, "<br>");
+
   return text;
 }
 
