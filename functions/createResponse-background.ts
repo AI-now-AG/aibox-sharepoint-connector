@@ -20,8 +20,6 @@ import type { ResponseUsage } from "openai/resources/responses/responses";
 import { NETLIFY_BLOBS_STORE } from "$constants";
 import { PromptToolOption } from "$types/AIProvider";
 
-type RequestTool = "image" | "websearch";
-
 interface CreateResponseParams {
   tenantId: string;
   uniqueId: string;
@@ -34,7 +32,7 @@ interface CreateResponseParams {
   imageSize?: "1024x1024" | "1024x1536" | "1536x1024" | "auto";
   background?: "transparent" | "opaque" | "auto";
   outputCompression?: number;
-  tool?: RequestTool;
+  tool?: PromptToolOption;
 }
 
 const recordImageUsage = async (tenantId: string) => {

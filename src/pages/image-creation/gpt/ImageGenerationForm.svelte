@@ -4,7 +4,10 @@
   import { useTranslations } from "$i18n/utils";
   import { ResponseStatus } from "$types/AIResponse";
   import { addToast } from "$stores/toast";
-  import { MessageRole, type MessageHistory } from "$types/MessageHistory";
+  import {
+    MessageRole,
+    type Message,
+  } from "$types/MessageHistory";
   import { readFileContent } from "$utils/fileReader";
   import { formatMarkdown, capitalizeFirst } from "$utils/common";
   import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
@@ -50,7 +53,7 @@
   let isBackgroundDisabled: boolean = $state(false);
   let isCompressionDisabled: boolean = $state(false);
 
-  let messages: MessageHistory = $state([]);
+  let messages: Message[] = $state([]);
   let isFetching: boolean = $state(false);
   let isGenerating: boolean = $state(false);
   let previousResponseId: string | null = $state(null);
@@ -300,6 +303,8 @@
         {messages}
         {isFetching}
         {isGenerating}
+        isResoningThingking={false}
+        currentMessage={""}
         infoText={getInfoText()}
       />
     {/if}
@@ -398,7 +403,13 @@
 
     <!-- Output (Normal) -->
     {#if messages.length == 0}
-      <MessageList {messages} {isFetching} {isGenerating} />
+      <MessageList
+        {messages}
+        {isFetching}
+        {isGenerating}
+        isResoningThingking={false}
+        currentMessage={""}
+      />
     {/if}
   </div>
 </div>
