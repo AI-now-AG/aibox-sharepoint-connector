@@ -120,7 +120,7 @@
     );
   });
 
-  let selectedPromptTool = $state(currentPrompt.promptTool);
+  let selectedPromptTool = $state(PromptToolOption.None);
 
   // === Effects ===
   $effect(() => {
@@ -181,13 +181,6 @@
     const isOpenAIGpt5ResponseModel =
       [PromptModel.OpenAIGpt5].includes(currentPrompt?.model) ||
       (isGpt5Default() && !currentPrompt?.model);
-
-    if (
-      getDefaultModelName() === ApiKeyProvider.OpenAI &&
-      !isOpenAIGpt5ResponseModel
-    ) {
-      isOpenAIResponseModel = true;
-    }
 
     const provider = isOpenAIResponseModel
       ? "openai-response"
