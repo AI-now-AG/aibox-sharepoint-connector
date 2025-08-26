@@ -10,9 +10,7 @@
   import { readFileContent } from "$utils/fileReader";
   import {
     formatMarkdown,
-    parseChunkCitations,
     preventDefault,
-    formatCitations,
     stripHtmlFormatting,
   } from "$utils/common";
   import { resetTrialBanner, resetUnverifiedBanner } from "$stores/bannerReset";
@@ -116,7 +114,6 @@
             scrollIntoView();
           }, 1000);
         }
-        let citations = [];
         if (reader) {
           const decoder = new TextDecoder();
           while (true) {
@@ -124,17 +121,13 @@
             if (done) break;
 
             const chunk = decoder.decode(value, { stream: true });
-            const parsedChunk: any = parseChunkCitations(chunk);
-            if (parsedChunk.citations) {
-              citations = parsedChunk.citations;
-            }
-            partialData += parsedChunk.content ?? parsedChunk;
+            partialData += chunk;
 
             const formattedChunk = formatMarkdown(partialData)
               .split("\n")
               .map((line) => formatMarkdown(line))
               .join("\n");
-            output = formatCitations(formattedChunk, citations);
+            output = formattedChunk;
           }
         }
         if (output) {
