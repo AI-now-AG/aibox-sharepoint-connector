@@ -182,10 +182,13 @@
 
   // === Request Builder ===
   function buildRequestPayload(fileUrls: string[]): RequestPayload {
-    let isOpenAIResponseModel = [
-      PromptModel.OpenAIWithTools,
-      PromptModel.OpenAIWithImageTools,
-    ].includes(currentPrompt?.model);
+    let isOpenAIResponseModel =
+      [
+        PromptModel.OpenAI,
+        PromptModel.OpenAIWithTools,
+        PromptModel.OpenAIWithImageTools,
+      ].includes(currentPrompt?.model) ||
+      (getDefaultModelName() == ApiKeyProvider.OpenAI && !currentPrompt?.model);
 
     const isOpenAIGpt5ResponseModel =
       [PromptModel.OpenAIGpt5].includes(currentPrompt?.model) ||
