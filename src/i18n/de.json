@@ -486,10 +486,11 @@
   "prompt-execution.thinking": "Ich denke nach...",
   "auth.session-missing-force-login": "Keine aktive Sitzung gefunden. Bitte melden Sie sich erneut an.",
   "tenant.gemini.name": "Gemini",
-  "prompt-execution.models.gemini-with-tools": "${model} (Text & Tools)",
-  "prompt-execution.prompt-tool": "Prompt Tool",
-  "prompt-execution.prompt-tool.placeholder": "Select tool",
-  "prompt-execution.prompt-tool.image": "Image Creation",
-  "prompt-execution.prompt-tool.web-search": "Web Search  ",
-  "prompt-execution.prompt-tool.thinking": "Thinking "
+  "prompt-execution.models.gemini-with-tools": "${model} (Text & Websuche)",
+  "prompt-execution.prompt-tool": "Tool-Auswahl",
+  "prompt-execution.prompt-tool.placeholder": "Tool wählen",
+  "prompt-execution.prompt-tool.image": "Bild erstellen",
+  "prompt-execution.prompt-tool.web-search": "Websuche",
+  "prompt-execution.prompt-tool.thinking": "Denken",
+  "prompt-execution.upload-file.supportted-files-input": "-"
 }
