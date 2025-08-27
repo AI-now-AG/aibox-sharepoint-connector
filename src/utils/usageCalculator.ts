@@ -11,6 +11,7 @@ import {
   type UsageItem,
   type TokenCreditRate,
 } from "$types/UsageTracking";
+import { ModelName } from "$types/AIProvider";
 
 const t = useTranslations();
 
@@ -52,12 +53,14 @@ const TOKEN_CREDIT_MAPPING: Record<string, TokenCreditRate> = {
  *   - GPT image: 1 credit = 0.33 request
  *   - Flux: 1 credit = 2 requests
  *   - Perplexity: 1 credit = 12 requests
+ *   - Gemini: 1 credit = 2 webserch requests
  */
 const REQUEST_CREDIT_MAPPING: Record<string, number> = {
   [ImageModel.Dalle]: 1,
   [ImageModel.GptImage]: 0.33,
   [ImageModel.FluxDev]: 2,
   [WebsearchModel.Sonar]: 12,
+  [ModelName.Gemini25Flash]: 2,
 };
 
 /**
@@ -97,7 +100,7 @@ const _tokensToCredits = (
 };
 
 const _requestsToCredits = (
-  model: ImageModel | WebsearchModel,
+  model: ImageModel | WebsearchModel | ModelName,
   requests: number,
 ): number => {
   const rate = REQUEST_CREDIT_MAPPING[model.toLowerCase()];
@@ -418,6 +421,11 @@ const _calculateGeminiUsage = (
     (sum: number, item: UsageLog) => sum + (item.output_tokens ?? 0),
     0,
   );
+  const geminiWebsearchRequests = geminiItems.reduce(
+    (sum: number, item: UsageLog) =>
+      sum + (item.metadata?.websearch_count ?? 0),
+    0,
+  );
   const {
     inputCredits: geminiInputCredits,
     outputCredits: geminiOutputCredits,
@@ -441,6 +449,15 @@ const _calculateGeminiUsage = (
     credits: geminiOutputCredits,
   });
 
+  usageItems.push({
+    model: "gemini Websearch",
+    amount: geminiWebsearchRequests,
+    unit: unitLabels.requests,
+    credits: _requestsToCredits(
+      ModelName.Gemini25Flash,
+      geminiWebsearchRequests,
+    ),
+  });
   return _skipUsageIfPrivateKeyUsed(usageItems, usePrivateKey);
 };
 

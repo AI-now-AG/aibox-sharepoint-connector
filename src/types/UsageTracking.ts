@@ -3,6 +3,7 @@ export enum UsageType {
   Image = "image",
   Transcription = "transcription",
   Speech = "speech",
+  Websearch = "websearch",
 }
 
 export enum TextModel {
