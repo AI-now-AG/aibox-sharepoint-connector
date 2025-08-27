@@ -146,7 +146,12 @@
       selectedModel = promptDetails.model?.toString() || "";
       selectedReasoningLevel = promptDetails.reasoningEffort || "low";
       selectedTextVerbosity = promptDetails.textVerbosity || "low";
+
       selectedPromptTool = promptDetails.promptTool || "";
+      // Support Old gpt-image selection (active image toool by default)
+      if (selectedModel == PromptModel.OpenAIWithImageTools) {
+        selectedPromptTool = PromptToolOption.Image;
+      }
 
       const group = category?.groups.find(
         (e) => e._id == promptDetails.group?.toString(),
@@ -276,7 +281,9 @@
     <LoadingSpinner bind:isLoading />
     <form class="rounded-sm pt-6 space-y-6">
       <div class="grid grid-cols-1 gap-4 justify-center">
-        <p class="mb-2">{t("prompt-library.add.prompts.title")}*</p>
+        <p class="mb-2">
+          {t("prompt-library.add.prompts.title")}*
+        </p>
         <input
           type="text"
           bind:value={promptTitle}
