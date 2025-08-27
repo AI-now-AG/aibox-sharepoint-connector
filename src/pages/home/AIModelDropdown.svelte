@@ -57,7 +57,7 @@
         title = `${modelLabel} (${t("home.model-option-text")})`;
         break;
       case PromptModel.Gemini:
-        title = `${modelLabel} (${t("home.model-option-text-tools")})`;
+        title = `${modelLabel} (${t("home.model-option-text-websearch")})`;
         break;
     }
     return title;
