@@ -37,7 +37,6 @@
     messageContent: string;
     citations: any[];
     currentImageUrl: string;
-    isSentCitations: boolean;
   }
 
   interface APIConfiguration {
@@ -334,7 +333,7 @@
     addMessageToHistory(groupId, promptId, newUserMessage);
 
     // Handle assistant message with citations
-    if (state.citations.length > 0 && !state.isSentCitations) {
+    if (state.citations.length > 0) {
       addAssistantMessageWithCitations(
         responseText,
         state.citations,
@@ -509,7 +508,6 @@
       messageContent: "",
       citations: [],
       currentImageUrl: "",
-      isSentCitations: false,
     };
 
     while (true) {
