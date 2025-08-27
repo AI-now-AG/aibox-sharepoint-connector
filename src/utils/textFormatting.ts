@@ -21,7 +21,7 @@ function buildNumberedCitationLinks(
   });
 }
 
-export function buildIconCitationLinks(
+function buildIconCitationLinks(
   inputString: string,
   citations: Record<string, any>[],
 ): string {
@@ -171,37 +171,6 @@ export function formatMarkdown(text: string): string {
       htmlTable += "</tbody>";
       htmlTable += "</table>";
       return htmlTable;
-    },
-  );
-
-  // 5. Lists
-  // Unordered lists: group consecutive lines starting with -, *, or +
-  text = text.replace(
-    /(^|\n)((?:[ \t]*[-+*]\s+.*(?:\r?\n|\r)?)+)/g,
-    (_m, prefix, block) => {
-      // Split lines, filter empty, map to <li>
-      const items = block
-        .split(/\r?\n|\r/)
-        .map((l: string) => l.replace(/^[ \t]*[-+*]\s+/, "").trim())
-        .filter((l: string) => l.length > 0);
-      const lis = items
-        .map((it: string) => `<li class="mb-1">${it}</li>`)
-        .join("");
-      return `${prefix}<ul class="list-disc pl-6 my-2">${lis}</ul>`;
-    },
-  );
-  // Ordered lists: group consecutive lines starting with "1. " or "2. " etc.
-  text = text.replace(
-    /(^|\n)((?:[ \t]*\d+\.\s+.*(?:\r?\n|\r)?)+)/g,
-    (_m, prefix, block) => {
-      const items = block
-        .split(/\r?\n|\r/)
-        .map((l: string) => l.replace(/^[ \t]*\d+\.\s+/, "").trim())
-        .filter((l: string) => l.length > 0);
-      const lis = items
-        .map((it: string) => `<li class="mb-1">${it}</li>`)
-        .join("");
-      return `${prefix}<ol class="list-decimal pl-6 my-2">${lis}</ol>`;
     },
   );
 
