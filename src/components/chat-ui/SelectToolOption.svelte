@@ -9,6 +9,7 @@
     value?: PromptToolOption;
     classes?: string;
     placeholderClasses?: string;
+    dropdownBoxClasses?: string;
     toolOptions?: Array<Option>;
     disabled?: boolean;
   }
@@ -17,6 +18,7 @@
     value = $bindable(PromptToolOption.None),
     classes = "",
     placeholderClasses = "",
+    dropdownBoxClasses = "",
     toolOptions,
     disabled = $bindable(false),
   }: Props = $props();
@@ -28,6 +30,7 @@
     options={toolOptions}
     {classes}
     {placeholderClasses}
+    {dropdownBoxClasses}
     bind:value
     bind:disabled
   />

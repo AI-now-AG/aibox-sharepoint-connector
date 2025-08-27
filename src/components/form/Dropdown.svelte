@@ -19,6 +19,7 @@
     classes?: string;
     labelClasses?: string;
     placeholderClasses?: string;
+    dropdownBoxClasses?: string;
     disabled?: boolean;
     children?: import("svelte").Snippet;
     onValueChange?: Function;
@@ -32,6 +33,7 @@
     classes,
     labelClasses = "",
     placeholderClasses = "",
+    dropdownBoxClasses = "",
     disabled = $bindable(false),
     children,
     onValueChange,
@@ -58,7 +60,8 @@
       tabindex={disabled ? -1 : 0}
       class={"select select-bordered w-full rounded-lg " +
         (value ? "" : "text-[#a29bd6]") +
-        (disabled ? " pointer-events-none opacity-50 bg-gray-200 " : " ") + placeholderClasses}
+        (disabled ? " pointer-events-none opacity-50 bg-gray-200 " : " ") +
+        placeholderClasses}
     >
       <span class="flex items-center gap-2">
         {#if options.find((opt) => opt.value === value)?.icon}
@@ -69,15 +72,14 @@
     </label>
     <ul
       tabindex={disabled ? -1 : 0}
-      class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-full"
+      class={"dropdown-content menu p-2 shadow bg-base-100 rounded-box w-full " +
+        dropdownBoxClasses}
     >
       {#each options as option}
         <li>
           <button
-            class={
-              "w-full text-left flex items-center gap-2" +
-              (option.value === value ? " bg-primary text-white" : "")
-            }
+            class={"w-full text-left flex items-center gap-2" +
+              (option.value === value ? " bg-primary text-white" : "")}
             on:click|preventDefault={() => {
               if (!disabled) {
                 value = option.value;

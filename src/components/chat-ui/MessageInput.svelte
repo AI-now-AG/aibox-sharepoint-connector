@@ -108,8 +108,9 @@
       {#if Array.isArray(toolOptions) && toolOptions.length > 0}
         <SelectToolOption
           {toolOptions}
-          classes="min-w-48"
+          classes=""
           placeholderClasses="h-8"
+          dropdownBoxClasses="min-w-48"
           bind:value={selectedPromptTool}
           bind:disabled={isDisablePromptTool}
         />
