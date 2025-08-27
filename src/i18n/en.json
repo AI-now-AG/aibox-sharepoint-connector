@@ -82,7 +82,6 @@
   "prompt-execution.historyRemove.info": "When closing the browser, all previously created data will be lost.",
   "prompt-execution.upload-file.drag": "Drag & Drop or <span style=\"color: #491EFF;\">Choose file</span>",
   "prompt-execution.upload-file.supportted-files": "PDF, JSON, TXT, PNG, SVG, JPEG",
-  "prompt-execution.upload-file.supportted-files-input": "PDF, JSON, TXT, PNG, SVG, JPEG, CSV, DOC, XLS, PPTX",
   "prompt-execution.upload-file.maximum-size": "max. file size: 5 MB",
   "prompt-execution.upload-file.exceed-5mb-size-limit": "File size exceeds the 5 MB limit. Please upload a file smaller than 5 MB",
   "prompt-emptyscreen.description": "Get started with predefined use cases below.",
@@ -485,5 +484,13 @@
   "prompt-execution.verbosity.level-medium": "Compact, some detail",
   "prompt-execution.verbosity.level-high": "Highly detailed",
   "prompt-execution.thinking": "I am thinking...",
-  "auth.session-missing-force-login": "No active session found. Please log in again."
+  "auth.session-missing-force-login": "No active session found. Please log in again.",
+  "tenant.gemini.name": "Gemini",
+  "prompt-execution.models.gemini-with-tools": "${model} (Text & Websearch)",
+  "prompt-execution.prompt-tool": "Tool selection",
+  "prompt-execution.prompt-tool.placeholder": "Select tool",
+  "prompt-execution.prompt-tool.image": "Create images",
+  "prompt-execution.prompt-tool.web-search": "Web Search  ",
+  "prompt-execution.prompt-tool.thinking": "Thinking ",
+  "prompt-execution.upload-file.supportted-files-input": "PDF, JSON, TXT, PNG, SVG, JPEG, CSV, DOC, XLS, PPTX"
 }

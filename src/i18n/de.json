@@ -82,7 +82,6 @@
   "prompt-execution.historyRemove.info": "Beim Schliessen des Browsers, gehen alle bisher erstellten Daten verloren.",
   "prompt-execution.upload-file.drag": "Datei per Drag & Drop verschieben oder <span style=\"color: #491EFF;\">Datei auswählen</span>",
   "prompt-execution.upload-file.supportted-files": "PDF, JSON, TXT, PNG, SVG, JPEG",
-  "prompt-execution.upload-file.supportted-files-input": "PDF, JSON, TXT, PNG, SVG, JPEG, CSV, DOC, XLS, PPTX",
   "prompt-execution.upload-file.maximum-size": "Maximale Dateigrösse: 5 MB",
   "prompt-execution.upload-file.exceed-5mb-size-limit": "Datei darf nicht grösser sein als 5 MB, bitte Dateigrösse reduzieren und neu hochladen",
   "prompt-emptyscreen.description": "Starten Sie mit vordefinierten Use Case unten.",
@@ -485,5 +484,13 @@
   "prompt-execution.verbosity.level-medium": "Kompakte Antwort mit einigen Details",
   "prompt-execution.verbosity.level-high": "Ausführliche Antwort mit Beispielen",
   "prompt-execution.thinking": "Ich denke nach...",
-  "auth.session-missing-force-login": "Keine aktive Sitzung gefunden. Bitte melden Sie sich erneut an."
+  "auth.session-missing-force-login": "Keine aktive Sitzung gefunden. Bitte melden Sie sich erneut an.",
+  "tenant.gemini.name": "Gemini",
+  "prompt-execution.models.gemini-with-tools": "${model} (Text & Websuche)",
+  "prompt-execution.prompt-tool": "Tool-Auswahl",
+  "prompt-execution.prompt-tool.placeholder": "Tool wählen",
+  "prompt-execution.prompt-tool.image": "Bild erstellen",
+  "prompt-execution.prompt-tool.web-search": "Websuche",
+  "prompt-execution.prompt-tool.thinking": "Denken",
+  "prompt-execution.upload-file.supportted-files-input": "PDF, JSON, TXT, PNG, SVG, JPEG, CSV, DOC, XLS, PPTX"
 }
