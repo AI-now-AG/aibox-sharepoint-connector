@@ -331,8 +331,6 @@
           bind:selectedModel
           onValueChange={(_value: any) => {
             selectedPromptTool = PromptToolOption.None;
-            selectedTextVerbosity = "";
-            selectedReasoningLevel = "";
           }}
         />
       </div>
