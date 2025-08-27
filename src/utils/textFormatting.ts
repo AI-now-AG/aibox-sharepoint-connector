@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 function formatCitationLinksNumber(
   inputString: string,
   citations: string[],
@@ -42,7 +43,6 @@ export function formatCitationLinksIcons(
 
 export function formatCitations(
   inputString: string,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   citations: (string | Record<string, any>)[],
 ): string {
   if (!citations?.length) {
@@ -58,7 +58,6 @@ export function formatCitations(
   if (typeof citations[0] === "object" && citations[0] !== null) {
     return formatCitationLinksIcons(
       inputString,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       citations as Record<string, any>[],
     );
   }

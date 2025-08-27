@@ -8,7 +8,6 @@
   import ModelInput from "$pages/prompt-library/prompts/ModelInput.svelte";
   import { addToast } from "$stores/toast";
   import { preventDefault } from "$utils/common";
-  import { formatMarkdown } from "$utils/textFormatting";
   import TextEditor from "$components/form/TextEditor.svelte";
   import Dropdown from "$components/form/Dropdown.svelte";
   import { PromptModel } from "$types/PromptModel";
@@ -19,6 +18,7 @@
   } from "$types/AIProvider";
   import { getPromptTools, useProviderInfo } from "$shared/AIProvider";
   import { tenant } from "$stores";
+  import { formatMarkdown } from "$utils/textFormatting";
 
   const t = useTranslations();
 
@@ -282,9 +282,6 @@
           bind:selectedModel
           onValueChange={(_value: any) => {
             selectedPromptTool = PromptToolOption.None;
-            if (_value == PromptModel.Perplexity) {
-              selectedPromptTool = PromptToolOption.Websearch;
-            }
             selectedTextVerbosity = "";
             selectedReasoningLevel = "";
           }}

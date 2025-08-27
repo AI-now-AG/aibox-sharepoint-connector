@@ -8,8 +8,7 @@
   import { addToast } from "$stores/toast";
   import LoadingSpinner from "$components/prompt-interface/LoadingSpinner.svelte";
   import { svgIcons } from "$assets/icons";
-  import {  preventDefault } from "$utils/common";
-  import { formatMarkdown } from "$utils/textFormatting";
+  import { preventDefault } from "$utils/common";
   import TextEditor from "$components/form/TextEditor.svelte";
   import Dropdown from "$components/form/Dropdown.svelte";
   import { PromptModel } from "$types/PromptModel";
@@ -20,6 +19,7 @@
   } from "$types/AIProvider";
   import { getPromptTools, useProviderInfo } from "$shared/AIProvider";
   import { tenant } from "$stores";
+  import { formatMarkdown } from "$utils/textFormatting";
 
   const t = useTranslations();
 
@@ -78,7 +78,7 @@
   let titleInput: HTMLInputElement | undefined = $state();
 
   const providerIno = useProviderInfo($tenant);
-  
+
   let promptTools: Array<any> = $derived(
     getPromptTools(
       (selectedModel == PromptModel.Default
@@ -146,7 +146,12 @@
       selectedModel = promptDetails.model?.toString() || "";
       selectedReasoningLevel = promptDetails.reasoningEffort || "low";
       selectedTextVerbosity = promptDetails.textVerbosity || "low";
+
       selectedPromptTool = promptDetails.promptTool || "";
+      // Support Old gpt-image selection (active image toool by default)
+      if (selectedModel == PromptModel.OpenAIWithImageTools) {
+        selectedPromptTool = PromptToolOption.Image;
+      }
 
       const group = category?.groups.find(
         (e) => e._id == promptDetails.group?.toString(),
@@ -276,7 +281,9 @@
     <LoadingSpinner bind:isLoading />
     <form class="rounded-sm pt-6 space-y-6">
       <div class="grid grid-cols-1 gap-4 justify-center">
-        <p class="mb-2">{t("prompt-library.add.prompts.title")}*</p>
+        <p class="mb-2">
+          {t("prompt-library.add.prompts.title")}*
+        </p>
         <input
           type="text"
           bind:value={promptTitle}
@@ -324,9 +331,6 @@
           bind:selectedModel
           onValueChange={(_value: any) => {
             selectedPromptTool = PromptToolOption.None;
-            if (_value == PromptModel.Perplexity) {
-              selectedPromptTool = PromptToolOption.Websearch;
-            }
             selectedTextVerbosity = "";
             selectedReasoningLevel = "";
           }}

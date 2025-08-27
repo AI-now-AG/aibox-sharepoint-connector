@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable no-useless-escape */
 import dayjs from "dayjs";
 
 export function isTrulyEmpty(obj: any) {
