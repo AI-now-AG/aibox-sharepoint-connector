@@ -33,6 +33,7 @@ export const lucia = new Lucia(adapter, {
       blocked: attributes.blocked,
       logins_count: attributes.logins_count,
       tours: attributes.tours,
+      auth0_access_token: attributes.auth0_access_token,
     };
   },
 });

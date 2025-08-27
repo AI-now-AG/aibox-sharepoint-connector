@@ -10,7 +10,7 @@
   import { svgIcons } from "$assets/icons";
   import { preventDefault } from "$utils/common";
   import TextEditor from "$components/form/TextEditor.svelte";
-  import Dropdown from "$components/form/Dropdown.svelte";
+  import Dropdown, { type Option } from "$components/form/Dropdown.svelte";
   import { PromptModel } from "$types/PromptModel";
   import {
     PromptToolOption,
@@ -148,7 +148,7 @@
       selectedTextVerbosity = promptDetails.textVerbosity || "low";
 
       selectedPromptTool = promptDetails.promptTool || "";
-      // Support Old gpt-image selection (active image toool by default)
+      // Support Old gpt-image selection (active image tool by default)
       if (selectedModel == PromptModel.OpenAIWithImageTools) {
         selectedPromptTool = PromptToolOption.Image;
       }
@@ -331,8 +331,6 @@
           bind:selectedModel
           onValueChange={(_value: any) => {
             selectedPromptTool = PromptToolOption.None;
-            selectedTextVerbosity = "";
-            selectedReasoningLevel = "";
           }}
         />
       </div>
@@ -347,13 +345,24 @@
             classes={"flex-1 min-w-3xs "}
             label={t("prompt-execution.prompt-tool")}
             placeholder={t("prompt-execution.prompt-tool.placeholder")}
-            options={promptTools}
+            options={[
+              {
+                title: t("prompt-execution.prompt-tool.placeholder"),
+                value: PromptToolOption.None,
+              },
+              ...promptTools.map((item: Option) => {
+                return {
+                  title: item.title,
+                  value: item.value,
+                };
+              }),
+            ]}
             bind:value={selectedPromptTool}
           />
         </div>
       {/if}
 
-      {#if selectedPromptTool == PromptToolOption.Thinking}
+      {#if selectedModel.includes(PromptModel.OpenAIGpt5)}
         <div
           class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 justify-center"
         >

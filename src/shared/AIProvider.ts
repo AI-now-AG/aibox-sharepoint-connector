@@ -19,7 +19,7 @@ export const ProviderModelMap: Record<string, string> = {
 export const ModelNameMap: Record<string, string> = {
   "claude-sonnet-4-0": "Claude Sonnet",
   sonar: "Perplexity Sonar",
-  "gemini-2.5-flash": "gemini-2.5-flash",
+  "gemini-2.5-flash": "Gemini 2.5 Flash",
 };
 
 export const ProviderPromptModelNameMap: Record<string, string> = {
@@ -57,10 +57,6 @@ export const Gpt5PromptTools = [
     value: PromptToolOption.Image,
     icon: svgIcons.image,
   },
-  // {
-  //   title: t("prompt-execution.prompt-tool.thinking"),
-  //   value: PromptToolOption.Thinking,
-  // },
 ];
 
 export const PerplexityPromptTools = [];
@@ -71,10 +67,6 @@ export const GeminiPromptTools = [
     value: PromptToolOption.Websearch,
     icon: svgIcons.web,
   },
-  // { // Langchain not support Gemini Thinking yet
-  //   title: t("prompt-execution.prompt-tool.thinking"),
-  //   value: PromptToolOption.Thinking,
-  // },
 ];
 
 export function getPromptTools(promptModel: PromptModel) {

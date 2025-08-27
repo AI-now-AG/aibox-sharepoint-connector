@@ -121,7 +121,8 @@ export async function convertToMono(
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-API-Key': apiKey,
+        //'X-API-Key': apiKey,
+        'Authorization': `Bearer ${apiKey}`,
         'Accept': 'text/event-stream',
         'Cache-Control': 'no-cache'
       },
