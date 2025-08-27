@@ -148,7 +148,7 @@
       selectedTextVerbosity = promptDetails.textVerbosity || "low";
 
       selectedPromptTool = promptDetails.promptTool || "";
-      // Support Old gpt-image selection (active image toool by default)
+      // Support Old gpt-image selection (active image tool by default)
       if (selectedModel == PromptModel.OpenAIWithImageTools) {
         selectedPromptTool = PromptToolOption.Image;
       }
