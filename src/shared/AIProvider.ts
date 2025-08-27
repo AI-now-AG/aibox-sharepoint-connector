@@ -63,13 +63,7 @@ export const Gpt5PromptTools = [
   // },
 ];
 
-export const PerplexityPromptTools = [
-  {
-    title: t("prompt-execution.prompt-tool.web-search"),
-    value: PromptToolOption.Websearch,
-    icon: svgIcons.web,
-  },
-];
+export const PerplexityPromptTools = [];
 
 export const GeminiPromptTools = [
   {
@@ -87,11 +81,10 @@ export function getPromptTools(promptModel: PromptModel) {
   switch (promptModel) {
     // case PromptModel.OpenAI:
     case PromptModel.OpenAIWithTools:
+    case PromptModel.OpenAIWithImageTools:
       return Gpt4oPromptTools;
     case PromptModel.OpenAIGpt5:
       return Gpt5PromptTools;
-    case PromptModel.Perplexity:
-      return PerplexityPromptTools;
     case PromptModel.Gemini:
       return GeminiPromptTools;
     default:
