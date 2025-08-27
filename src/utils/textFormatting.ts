@@ -27,9 +27,6 @@ function buildIconCitationLinks(
 ): string {
   if (!citations || !citations.length) return inputString;
 
-  // Keep SVG inline so no line breaks mess it up
-  const icon = `<span style="font-size: 0.5rem;">🔗</span>`;
-
   let result = inputString;
 
   citations.forEach((c) => {
@@ -37,6 +34,7 @@ function buildIconCitationLinks(
 
     const anchors = c.sources
       .map((s) => {
+        const icon = `<span style="font-size: 0.5rem;" title="${s.title || ""}">🔗</span>`;
         const url = s.uri || s.url || s;
         return url ? `[${icon}](${url})` : "";
       })
