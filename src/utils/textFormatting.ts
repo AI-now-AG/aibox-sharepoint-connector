@@ -1,4 +1,4 @@
-function escapeHtml(str) {
+function escapeHtml(str: string) {
   return str
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
