@@ -385,12 +385,12 @@
   ): void {
     console.log("📚 Citations sent:", citations);
 
-    const formattedText = formatMarkdown(responseText);
-    currentMessage = formatCitations(formattedText, citations);
+    const formattedText = formatCitations(responseText, citations);
+    currentMessage = formatMarkdown(formattedText);
 
     const newAssistantMessage: Message = {
       role: MessageRole.Assistant,
-      content: formatMarkdown(currentMessage),
+      content: currentMessage,
       rawData: stripHtmlFormatting(currentMessage),
       imageUrl,
     };
