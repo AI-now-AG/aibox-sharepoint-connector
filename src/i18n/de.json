@@ -492,5 +492,5 @@
   "prompt-execution.prompt-tool.image": "Bild erstellen",
   "prompt-execution.prompt-tool.web-search": "Websuche",
   "prompt-execution.prompt-tool.thinking": "Denken",
-  "prompt-execution.upload-file.supportted-files-input": "-"
+  "prompt-execution.upload-file.supportted-files-input": "PDF, JSON, TXT, PNG, SVG, JPEG, CSV, DOC, XLS, PPTX"
 }
