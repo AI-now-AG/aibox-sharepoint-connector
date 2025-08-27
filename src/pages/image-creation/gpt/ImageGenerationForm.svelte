@@ -9,7 +9,8 @@
     type Message,
   } from "$types/MessageHistory";
   import { readFileContent } from "$utils/fileReader";
-  import { formatMarkdown, capitalizeFirst } from "$utils/common";
+  import {  capitalizeFirst } from "$utils/common";
+  import { formatMarkdown } from "$utils/textFormatting";
   import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
   import Dropdown from "$components/form/Dropdown.svelte";
   import MessageInput from "$components/chat-ui/MessageInput.svelte";

@@ -7,7 +7,8 @@
   import MultiInput from "$pages/prompt-library/prompts/MultiInput.svelte";
   import ModelInput from "$pages/prompt-library/prompts/ModelInput.svelte";
   import { addToast } from "$stores/toast";
-  import { formatMarkdown, preventDefault } from "$utils/common";
+  import { preventDefault } from "$utils/common";
+  import { formatMarkdown } from "$utils/textFormatting";
   import TextEditor from "$components/form/TextEditor.svelte";
   import Dropdown from "$components/form/Dropdown.svelte";
   import { PromptModel } from "$types/PromptModel";

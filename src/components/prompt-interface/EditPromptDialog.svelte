@@ -8,7 +8,8 @@
   import { addToast } from "$stores/toast";
   import LoadingSpinner from "$components/prompt-interface/LoadingSpinner.svelte";
   import { svgIcons } from "$assets/icons";
-  import { formatMarkdown, preventDefault } from "$utils/common";
+  import {  preventDefault } from "$utils/common";
+  import { formatMarkdown } from "$utils/textFormatting";
   import TextEditor from "$components/form/TextEditor.svelte";
   import Dropdown from "$components/form/Dropdown.svelte";
   import { PromptModel } from "$types/PromptModel";
