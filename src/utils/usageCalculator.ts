@@ -601,7 +601,7 @@ export const calculateUsage = (tenant: Tenant, rawUsages: UsageLog[]) => {
     details: _calculateClaudeUsage(rawUsages, useClaudePrivateKey),
   });
 
-  // OpenAI GPT5
+  // Gemini
   const useGeminiPrivateKey = tenant.metadata?.geminiPrivateKeyEnabled ?? false;
   usageData.push({
     provider: "Gemini",
