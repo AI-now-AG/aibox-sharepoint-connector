@@ -57,10 +57,6 @@ export const Gpt5PromptTools = [
     value: PromptToolOption.Image,
     icon: svgIcons.image,
   },
-  {
-    title: t("prompt-execution.prompt-tool.thinking"),
-    value: PromptToolOption.Thinking,
-  },
 ];
 
 export const PerplexityPromptTools = [];
@@ -71,10 +67,6 @@ export const GeminiPromptTools = [
     value: PromptToolOption.Websearch,
     icon: svgIcons.web,
   },
-  // { // Langchain not support Gemini Thinking yet
-  //   title: t("prompt-execution.prompt-tool.thinking"),
-  //   value: PromptToolOption.Thinking,
-  // },
 ];
 
 export function getPromptTools(promptModel: PromptModel) {
