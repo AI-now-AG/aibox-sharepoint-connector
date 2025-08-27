@@ -8,7 +8,7 @@
   import { addToast } from "$stores/toast";
   import LoadingSpinner from "$components/prompt-interface/LoadingSpinner.svelte";
   import { svgIcons } from "$assets/icons";
-  import { formatMarkdown, preventDefault } from "$utils/common";
+  import { preventDefault } from "$utils/common";
   import TextEditor from "$components/form/TextEditor.svelte";
   import Dropdown from "$components/form/Dropdown.svelte";
   import { PromptModel } from "$types/PromptModel";
@@ -19,6 +19,7 @@
   } from "$types/AIProvider";
   import { getPromptTools, useProviderInfo } from "$shared/AIProvider";
   import { tenant } from "$stores";
+  import { formatMarkdown } from "$utils/textFormatting";
 
   const t = useTranslations();
 
@@ -77,7 +78,7 @@
   let titleInput: HTMLInputElement | undefined = $state();
 
   const providerIno = useProviderInfo($tenant);
-  
+
   let promptTools: Array<any> = $derived(
     getPromptTools(
       (selectedModel == PromptModel.Default
@@ -323,9 +324,6 @@
           bind:selectedModel
           onValueChange={(_value: any) => {
             selectedPromptTool = PromptToolOption.None;
-            if (_value == PromptModel.Perplexity) {
-              selectedPromptTool = PromptToolOption.Websearch;
-            }
             selectedTextVerbosity = "";
             selectedReasoningLevel = "";
           }}
