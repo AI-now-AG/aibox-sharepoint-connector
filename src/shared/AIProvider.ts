@@ -19,7 +19,7 @@ export const ProviderModelMap: Record<string, string> = {
 export const ModelNameMap: Record<string, string> = {
   "claude-sonnet-4-0": "Claude Sonnet",
   sonar: "Perplexity Sonar",
-  "gemini-2.5-flash": "gemini-2.5-flash",
+  "gemini-2.5-flash": "Gemini 2.5 Flash",
 };
 
 export const ProviderPromptModelNameMap: Record<string, string> = {
