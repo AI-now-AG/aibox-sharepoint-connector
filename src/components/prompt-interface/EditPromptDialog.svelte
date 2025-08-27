@@ -353,7 +353,7 @@
         </div>
       {/if}
 
-      {#if selectedPromptTool == PromptToolOption.Thinking}
+      {#if selectedModel.includes(PromptModel.OpenAIGpt5)}
         <div
           class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 justify-center"
         >
