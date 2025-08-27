@@ -57,10 +57,10 @@ export const Gpt5PromptTools = [
     value: PromptToolOption.Image,
     icon: svgIcons.image,
   },
-  // {
-  //   title: t("prompt-execution.prompt-tool.thinking"),
-  //   value: PromptToolOption.Thinking,
-  // },
+  {
+    title: t("prompt-execution.prompt-tool.thinking"),
+    value: PromptToolOption.Thinking,
+  },
 ];
 
 export const PerplexityPromptTools = [];
