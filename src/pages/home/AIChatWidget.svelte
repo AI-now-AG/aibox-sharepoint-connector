@@ -150,7 +150,6 @@
       prompt: input || promptForAttachedFilesOnly,
       stream: true,
       fileUrls,
-      tool: "websearch",
     };
 
     // Add conditional properties
