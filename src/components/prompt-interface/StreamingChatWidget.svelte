@@ -19,7 +19,7 @@
   import { readFileContent } from "$utils/fileReader";
   import {
     formatMarkdown,
-    formatCitations,
+    buildCitationLinks,
     stripHtmlFormatting,
   } from "$utils/textFormatting";
   import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
@@ -389,7 +389,7 @@
   ): void {
     console.log("📚 Citations sent:", citations);
 
-    const formattedText = formatCitations(responseText, citations);
+    const formattedText = buildCitationLinks(responseText, citations);
     currentMessage = formatMarkdown(formattedText);
 
     const newAssistantMessage: Message = {

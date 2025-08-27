@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-function formatCitationLinksNumber(
+function buildNumberedCitationLinks(
   inputString: string,
   citations: string[],
 ): string {
@@ -7,20 +7,20 @@ function formatCitationLinksNumber(
     const index = parseInt(p1, 10) - 1;
     if (index >= 0 && index < citations.length) {
       const url = citations[index];
-      return `<a href="${url}" target="_blank" class="bg-base-200 hover:bg-info text-info hover:text-base-200 text-xs font-normal ml-1 rounded-sm">[${p1}]</a>`;
+      return `[<span style="font-size: 0.8rem;">[${p1}]</span>](${url})`;
     }
     return match;
   });
 }
 
-export function formatCitationLinksIcons(
+export function buildIconCitationLinks(
   inputString: string,
   citations: Record<string, any>[],
 ): string {
   if (!citations || !citations.length) return inputString;
 
   // Keep SVG inline so no line breaks mess it up
-  const icon = `<span class="text-xs">🔗</span>`;
+  const icon = `<span style="font-size: 0.5rem;">🔗</span>`;
 
   let result = inputString;
 
@@ -41,7 +41,7 @@ export function formatCitationLinksIcons(
   return result;
 }
 
-export function formatCitations(
+export function buildCitationLinks(
   inputString: string,
   citations: (string | Record<string, any>)[],
 ): string {
@@ -51,12 +51,12 @@ export function formatCitations(
 
   // string[] case
   if (typeof citations[0] === "string") {
-    return formatCitationLinksNumber(inputString, citations as string[]);
+    return buildNumberedCitationLinks(inputString, citations as string[]);
   }
 
   // object[] case (explicitly narrow type)
   if (typeof citations[0] === "object" && citations[0] !== null) {
-    return formatCitationLinksIcons(
+    return buildIconCitationLinks(
       inputString,
       citations as Record<string, any>[],
     );
@@ -103,7 +103,8 @@ export function formatMarkdown(text: string): string {
 
   // 3. Handle inline markdown formatting.
   text = text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>"); // Bold
-  text = text.replace(/(\*|_)(.*?)\1/g, "<em>$2</em>"); // Italic
+  //text = text.replace(/(\*|_)(.*?)\1/g, "<em>$2</em>"); // Italic
+  text = text.replace(/(\*|_)(?![^\\(]*\))(.+?)\1/g, "<em>$2</em>"); // Italic
   text = text.replace(/__(.*?)__/g, "<u>$1</u>"); // Underline
   text = text.replace(/~~(.*?)~~/g, "<del>$1</del>"); // Strikethrough
   text = text.replace(
@@ -167,9 +168,7 @@ export function formatMarkdown(text: string): string {
 
   // 5. Replace links and remove all HTML tags inside link text
   text = text.replace(/\[([\s\S]+?)\]\(([^)]+)\)/g, (_match, p1, p2) => {
-    // Remove only <tag> or </tag>, nothing else
-    const cleanUrl = p2.replace(/<\/?[^>]+>/g, "");
-    return `<a href='${cleanUrl}' target='_blank' rel='noopener noreferrer'>${p1}</a>`;
+    return `<a class="btn btn-xs btn-soft btn-info ml-1" href="${p2}" target="_blank" rel="noopener noreferrer" style="height: auto; padding: 1px 3px; border-radius: 2px;">${p1}</a>`;
   });
 
   // 6. Finally, replace remaining standalone newlines with <br> tags.

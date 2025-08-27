@@ -9,7 +9,7 @@
   import { PromptModel } from "$types/PromptModel";
   import {
     formatMarkdown,
-    formatCitations,
+    buildCitationLinks,
     stripHtmlFormatting,
   } from "$utils/textFormatting";
   import AIModelDropdown from "./AIModelDropdown.svelte";
@@ -150,6 +150,7 @@
       prompt: input || promptForAttachedFilesOnly,
       stream: true,
       fileUrls,
+      tool: "websearch",
     };
 
     // Add conditional properties
@@ -326,7 +327,7 @@
   ): void {
     console.log("📚 Citations sent:", citations);
 
-    const formattedText = formatCitations(responseText, citations);
+    const formattedText = buildCitationLinks(responseText, citations);
     currentMessage = formatMarkdown(formattedText);
 
     const newAssistantMessage: Message = {
