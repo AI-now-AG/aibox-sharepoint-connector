@@ -488,7 +488,7 @@
   "tenant.gemini.name": "Gemini",
   "prompt-execution.models.gemini-with-tools": "${model} (Text & Websearch)",
   "prompt-execution.prompt-tool": "Tool selection",
-  "prompt-execution.prompt-tool.placeholder": "Select tool",
+  "prompt-execution.prompt-tool.placeholder": "No tool selected",
   "prompt-execution.prompt-tool.image": "Create images",
   "prompt-execution.prompt-tool.web-search": "Web Search  ",
   "prompt-execution.prompt-tool.thinking": "Thinking ",

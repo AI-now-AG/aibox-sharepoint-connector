@@ -119,7 +119,7 @@
           ? `${defaultName} - ${t("prompt-execution.models.openai-with-tools")}`
           : `${t("prompt-execution.models.openai-with-tools")}`,
     });
- 
+
     return sortProviders(models);
   };
 </script>
