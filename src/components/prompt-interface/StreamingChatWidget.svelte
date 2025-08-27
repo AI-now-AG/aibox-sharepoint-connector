@@ -127,9 +127,6 @@
     if (currentPrompt.promptTool != PromptToolOption.None) {
       selectedPromptTool = currentPrompt.promptTool;
     }
-    if (currentPrompt?.model == PromptModel.Perplexity) {
-      selectedPromptTool = PromptToolOption.Websearch;
-    }
     if (
       currentPrompt.promptTool &&
       currentPrompt.promptTool != PromptToolOption.None
