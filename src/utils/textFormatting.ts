@@ -1,4 +1,12 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+function escapeHtml(str) {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 function buildNumberedCitationLinks(
   inputString: string,
   citations: string[],
@@ -71,7 +79,7 @@ export function formatMarkdown(text: string): string {
   // This ensures markdown like '```js\nconsole.log("hello");\n```' is correctly parsed.
   text = text.replace(/```([\s\S]*?)```/g, (match, codeContent) => {
     // Trim any leading/trailing newlines within the code content to ensure clean <pre><code>.
-    return `<pre class="bg-gray-800 text-white p-4 rounded-lg my-4 overflow-x-auto"><code class="language-plaintext">${codeContent.trim()}</code></pre>`;
+    return `<pre class="bg-gray-800 text-white p-4 rounded-lg my-4 overflow-x-auto"><code class="language-plaintext">${escapeHtml(codeContent.trim())}</code></pre>`;
   });
 
   // 2. Handle Markdown headings (h1-h6) with Tailwind CSS classes for styling.
@@ -166,12 +174,43 @@ export function formatMarkdown(text: string): string {
     },
   );
 
-  // 5. Replace links and remove all HTML tags inside link text
+  // 5. Lists
+  // Unordered lists: group consecutive lines starting with -, *, or +
+  text = text.replace(
+    /(^|\n)((?:[ \t]*[-+*]\s+.*(?:\r?\n|\r)?)+)/g,
+    (_m, prefix, block) => {
+      // Split lines, filter empty, map to <li>
+      const items = block
+        .split(/\r?\n|\r/)
+        .map((l: string) => l.replace(/^[ \t]*[-+*]\s+/, "").trim())
+        .filter((l: string) => l.length > 0);
+      const lis = items
+        .map((it: string) => `<li class="mb-1">${it}</li>`)
+        .join("");
+      return `${prefix}<ul class="list-disc pl-6 my-2">${lis}</ul>`;
+    },
+  );
+  // Ordered lists: group consecutive lines starting with "1. " or "2. " etc.
+  text = text.replace(
+    /(^|\n)((?:[ \t]*\d+\.\s+.*(?:\r?\n|\r)?)+)/g,
+    (_m, prefix, block) => {
+      const items = block
+        .split(/\r?\n|\r/)
+        .map((l: string) => l.replace(/^[ \t]*\d+\.\s+/, "").trim())
+        .filter((l: string) => l.length > 0);
+      const lis = items
+        .map((it: string) => `<li class="mb-1">${it}</li>`)
+        .join("");
+      return `${prefix}<ol class="list-decimal pl-6 my-2">${lis}</ol>`;
+    },
+  );
+
+  // 6. Replace links and remove all HTML tags inside link text
   text = text.replace(/\[([\s\S]+?)\]\(([^)]+)\)/g, (_match, p1, p2) => {
     return `<a class="btn btn-xs btn-soft btn-info ml-1" href="${p2}" target="_blank" rel="noopener noreferrer" style="height: auto; padding: 1px 3px; border-radius: 2px;">${p1}</a>`;
   });
 
-  // 6. Finally, replace remaining standalone newlines with <br> tags.
+  // 7. Finally, replace remaining standalone newlines with <br> tags.
   // This step comes last to avoid converting newlines within already-generated HTML structures.
   text = text.replace(/\n/g, "<br>");
 

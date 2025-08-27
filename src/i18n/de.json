@@ -488,9 +488,9 @@
   "tenant.gemini.name": "Gemini",
   "prompt-execution.models.gemini-with-tools": "${model} (Text & Websuche)",
   "prompt-execution.prompt-tool": "Tool-Auswahl",
-  "prompt-execution.prompt-tool.placeholder": "Keine Tool ausgewählt",
+  "prompt-execution.prompt-tool.placeholder": "Keine Tools",
   "prompt-execution.prompt-tool.image": "Bild erstellen",
   "prompt-execution.prompt-tool.web-search": "Websuche",
   "prompt-execution.prompt-tool.thinking": "Denken",
-  "prompt-execution.upload-file.supportted-files-input": "PDF, JSON, TXT, PNG, SVG, JPEG, CSV, DOC, XLS, PPTX"
+  "prompt-execution.upload-file.supportted-files-input": "PDF, JSON, TXT, PNG, SVG, JPEG, CSV, DOCX, XLSX, PPTX"
 }
