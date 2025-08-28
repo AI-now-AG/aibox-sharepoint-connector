@@ -135,10 +135,10 @@ export function formatMarkdown(text: string): string {
 
       let htmlTable =
         '<table class="w-full border-collapse table-auto my-4 rounded-lg overflow-hidden shadow-md">';
-      htmlTable += '<thead class="bg-blue-600 text-white">';
+      htmlTable += '<thead class="bg-primary text-white">';
       htmlTable += '<tr class="text-left">';
       headers.forEach((header) => {
-        htmlTable += `<th class="p-3 border-r border-blue-700 last:border-r-0 font-semibold uppercase text-sm">${header}</th>`;
+        htmlTable += `<th class="p-2 border-r border-primary last:border-r-0 font-semibold text-sm">${header}</th>`;
       });
       htmlTable += "</tr>";
       htmlTable += "</thead>";
@@ -157,10 +157,10 @@ export function formatMarkdown(text: string): string {
             .map((c) => c.trim())
             .filter((c) => c !== "");
           // Apply alternating background colors for better readability.
-          const rowBgClass = index % 2 === 0 ? "bg-white" : "bg-gray-50";
-          htmlTable += `<tr class="${rowBgClass} hover:bg-gray-100 transition-colors duration-200">`;
+          const rowBgClass = index % 2 === 0 ? "bg-base-100" : "bg-base-300";
+          htmlTable += `<tr class="${rowBgClass} hover:bg-base-300 transition-colors duration-200">`;
           cells.forEach((cell) => {
-            htmlTable += `<td class="p-3 border-r border-gray-200 last:border-r-0 text-gray-800">${cell}</td>`;
+            htmlTable += `<td class="p-2 border-r last:border-r-0 text-base-content">${cell}</td>`;
           });
           htmlTable += "</tr>";
         });
