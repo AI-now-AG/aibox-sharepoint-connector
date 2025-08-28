@@ -11,6 +11,7 @@
   import { actions } from "astro:actions";
   import log from "$utils/log";
   import { tenant } from "$stores";
+  import { ProviderModelMap, ModelNameMap } from "$shared/AIProvider";
 
   interface Props {
     isEditable?: boolean;
@@ -27,18 +28,6 @@
     selectedPromptId = $bindable(""),
     onSelectCard = () => null,
   }: Props = $props();
-
-   const providerModelMap: Record<string, string> = {
-      [ApiKeyProvider.Perplexity]: "perplexity_chat_model",
-      [ApiKeyProvider.Claude]: "anthropic_chat_model",
-      [ApiKeyProvider.OpenAI]: "openai_chat_model",
-      [ApiKeyProvider.OpenAIGtp5]: "openai_gpt5_chat_model",
-      [ApiKeyProvider.AzureOpenAI]: "azure_openai_chat_model",
-    };
-    const modelNameMap: Record<string, string> = {
-      "claude-sonnet-4-0": "Claude Sonnet",
-      sonar: "Perplexity Sonar",
-    };
 
   const t = useTranslations();
   let loading = $state(false);
@@ -63,18 +52,18 @@
       (item) => item.active === true && item.default === true,
     );
     const providerName = activeDefaultProvider?.name || ApiKeyProvider.OpenAI;
-    const key = providerModelMap[providerName] as keyof typeof $tenant;
+    const key = ProviderModelMap[providerName] as keyof typeof $tenant;
     const rawModel = $tenant?.[key] || "gpt-4o";
-    return modelNameMap[rawModel] || rawModel;
+    return ModelNameMap[rawModel] || rawModel;
   }
 
   let activeModels: any[] = $state([]);
   const getActiveModels = (): any[] => {
     const getModelLabel = (provider: any) => {
-      const key = providerModelMap[provider.name] as keyof typeof $tenant;
+      const key = ProviderModelMap[provider.name] as keyof typeof $tenant;
       const model = $tenant?.[key] || defaultModelName;
-      if (modelNameMap[model]) {
-        return modelNameMap[model];
+      if (ModelNameMap[model]) {
+        return ModelNameMap[model];
       }
 
       return model;
@@ -124,7 +113,7 @@
     if (selectedEditPromptId) {
       promptDialog?.showModal();
     }
-    defaultModelName = getDefaultModelName()
+    defaultModelName = getDefaultModelName();
     activeModels = getActiveModels();
   });
 

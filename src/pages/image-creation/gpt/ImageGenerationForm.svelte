@@ -2,18 +2,30 @@
   import { slide } from "svelte/transition";
   import { v4 as uuidv4 } from "uuid";
   import { useTranslations } from "$i18n/utils";
-  import { ResponseStatus, ToolName } from "$types/AIResponse";
+  import { ResponseStatus } from "$types/AIResponse";
   import { addToast } from "$stores/toast";
-  import { MessageRole, type MessageHistory } from "$types/MessageHistory";
+  import {
+    MessageRole,
+    type Message,
+  } from "$types/MessageHistory";
   import { readFileContent } from "$utils/fileReader";
-  import { formatMarkdown, capitalizeFirst } from "$utils/common";
+  import {  capitalizeFirst } from "$utils/common";
+  import { formatMarkdown } from "$utils/textFormatting";
   import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
   import Dropdown from "$components/form/Dropdown.svelte";
   import MessageInput from "$components/chat-ui/MessageInput.svelte";
   import MessageList from "$components/chat-ui/MessageList.svelte";
-  import { gptImageMessageHistory, saveGptImageMessageHistory, gptImageFiles, saveGptImageFiles, gptImagePreviousResponseId, saveGptImagePreviousResponseId } from "$stores/gptImageMessageHistoryStore";
+  import {
+    gptImageMessageHistory,
+    saveGptImageMessageHistory,
+    gptImageFiles,
+    saveGptImageFiles,
+    gptImagePreviousResponseId,
+    saveGptImagePreviousResponseId,
+  } from "$stores/gptImageMessageHistoryStore";
   import { get } from "svelte/store";
   import { onMount } from "svelte";
+  import { PromptToolOption } from "$types/AIProvider";
 
   // Types
   type ImageSize = "1024x1024" | "1024x1536" | "1536x1024";
@@ -42,7 +54,7 @@
   let isBackgroundDisabled: boolean = $state(false);
   let isCompressionDisabled: boolean = $state(false);
 
-  let messages: MessageHistory = $state([]);
+  let messages: Message[] = $state([]);
   let isFetching: boolean = $state(false);
   let isGenerating: boolean = $state(false);
   let previousResponseId: string | null = $state(null);
@@ -95,7 +107,7 @@
       tenantId,
       uniqueId,
       prompt,
-      tool: ToolName.Image,
+      tool: PromptToolOption.Image,
       imageSize,
       imageQuality,
       outputCompression,
@@ -159,14 +171,14 @@
 
       if (data.status === ResponseStatus.InProgress) {
         const isGenerated =
-          data.tools.find((item: any) => item.name === ToolName.Image)
+          data.tools.find((item: any) => item.name === PromptToolOption.Image)
             ?.is_generated ?? true;
         isGenerating = !isGenerated;
       }
 
       if (data.status === ResponseStatus.Completed) {
         const imageUrl =
-          data.tools.find((item: any) => item.name === ToolName.Image)
+          data.tools.find((item: any) => item.name === PromptToolOption.Image)
             ?.image_url || "";
 
         // store messages
@@ -292,6 +304,8 @@
         {messages}
         {isFetching}
         {isGenerating}
+        isResoningThingking={false}
+        currentMessage={""}
         infoText={getInfoText()}
       />
     {/if}
@@ -390,7 +404,13 @@
 
     <!-- Output (Normal) -->
     {#if messages.length == 0}
-      <MessageList {messages} {isFetching} {isGenerating} />
+      <MessageList
+        {messages}
+        {isFetching}
+        {isGenerating}
+        isResoningThingking={false}
+        currentMessage={""}
+      />
     {/if}
   </div>
 </div>

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   BaseMessage,
   HumanMessage,
@@ -46,7 +47,6 @@ export type Attachment = z.infer<typeof AttachmentSchema>;
 
 // Helper function to check if provider is Perplexity
 const isPerplexityProvider = (ctx: any, model?: string | null): boolean => {
-  const { tenant } = ctx.locals;
   const { included_features: features } = ctx.locals.tenant;
 
   // Find the text prompts feature in enabled features
@@ -74,7 +74,7 @@ const callPerplexityStreamingAPI = async (
   prompt: any,
   messages: BaseMessage[],
   data: RunPromptParams,
-  overrides: any
+  overrides: any,
 ): Promise<Response> => {
   try {
     // Get headers from request object in Astro context
@@ -123,7 +123,6 @@ const callPerplexityStreamingAPI = async (
 
     // Check if response is event-stream
     if (response.headers.get("content-type")?.includes("text/event-stream")) {
-
       // Set up server-side streaming response for plain text
       const encoder = new TextEncoder();
       const headers = new Headers();
@@ -144,7 +143,6 @@ const callPerplexityStreamingAPI = async (
           }
 
           let buffer = "";
-          let messageContent = "";
           let citations: any[] = [];
           let isSentCitations = false;
 
@@ -183,8 +181,10 @@ const callPerplexityStreamingAPI = async (
                       break;
 
                     case "chunk":
-                      if (eventData.content && typeof eventData.content === "string") {
-                        messageContent += eventData.content;
+                      if (
+                        eventData.content &&
+                        typeof eventData.content === "string"
+                      ) {
                         // Send content chunk as plain text
                         await writer.write(encoder.encode(eventData.content));
                       }
@@ -192,14 +192,19 @@ const callPerplexityStreamingAPI = async (
 
                     case "citations":
                       // Store citations but don't send them yet to avoid interrupting content flow
-                      if (eventData.citations && eventData.citations.length > 0) {
+                      if (
+                        eventData.citations &&
+                        eventData.citations.length > 0
+                      ) {
                         citations = eventData.citations;
                         // Don't send citations here - wait for completion or end of content
                       }
                       break;
 
                     case "complete":
-                      console.log(`✅ Complete! Processing time: ${eventData.processingTimeMs}ms`);
+                      console.log(
+                        `✅ Complete! Processing time: ${eventData.processingTimeMs}ms`,
+                      );
                       // Now send citations at the end after all content is streamed
                       if (citations.length > 0 && !isSentCitations) {
                         isSentCitations = true;
@@ -210,14 +215,23 @@ const callPerplexityStreamingAPI = async (
                       // Complete the stream
                       return;
 
-                    case "error":
-                      console.error(`❌ Perplexity stream error: ${eventData.error}`);
-                      const errorMessage = eventData.error || "Perplexity streaming failed.";
-                      await writer.write(encoder.encode("Error: " + errorMessage + "\n"));
+                    case "error": {
+                      console.error(
+                        `❌ Perplexity stream error: ${eventData.error}`,
+                      );
+                      const errorMessage =
+                        eventData.error || "Perplexity streaming failed.";
+                      await writer.write(
+                        encoder.encode("Error: " + errorMessage + "\n"),
+                      );
                       throw new Error(eventData.error);
+                    }
                   }
                 } catch (parseError) {
-                  console.warn("Failed to parse Perplexity event data:", parseError);
+                  console.warn(
+                    "Failed to parse Perplexity event data:",
+                    parseError,
+                  );
                 }
               }
             }
@@ -225,7 +239,9 @@ const callPerplexityStreamingAPI = async (
         } catch (error) {
           console.error("Perplexity streaming error:", error);
           await writer.write(
-            encoder.encode("Error processing Perplexity stream: " + error + "\n"),
+            encoder.encode(
+              "Error processing Perplexity stream: " + error + "\n",
+            ),
           );
         } finally {
           writer.close();
@@ -237,7 +253,6 @@ const callPerplexityStreamingAPI = async (
 
     // If not event-stream, throw error since we expect streaming
     throw new Error("Expected event-stream response from Perplexity API");
-
   } catch (error) {
     console.error("Perplexity streaming API error:", error);
 
@@ -257,14 +272,17 @@ const callPerplexityStreamingAPI = async (
         let isSentCitations = false;
         let partialChunk = "";
 
-        const stream: AsyncIterable<AIMessageChunk> = await model.stream(messages);
+        const stream: AsyncIterable<AIMessageChunk> =
+          await model.stream(messages);
         for await (const chunk of stream) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const rawResponse = chunk?.additional_kwargs?.__raw_response as any;
           const citations = rawResponse?.citations ?? [];
           if (citations.length > 0 && !isSentCitations) {
             isSentCitations = true;
-            console.log("Citations found but not sending to avoid corruption:", citations);
+            console.log(
+              "Citations found but not sending to avoid corruption:",
+              citations,
+            );
             // Don't write citations to text stream to avoid corruption
           }
 
@@ -399,7 +417,13 @@ export const POST: APIRoute = async (ctx) => {
     const overrides = prompt.model ? { customModel: prompt.model } : {};
     // Check if provider is Perplexity and use streaming API
     if (isPerplexityProvider(ctx, prompt.model)) {
-      return await callPerplexityStreamingAPI(ctx, prompt, messages, data, overrides);
+      return await callPerplexityStreamingAPI(
+        ctx,
+        prompt,
+        messages,
+        data,
+        overrides,
+      );
     }
 
     // Original streaming flow for other providers
@@ -421,9 +445,6 @@ export const POST: APIRoute = async (ctx) => {
         const stream: AsyncIterable<AIMessageChunk> =
           await model.stream(messages);
         for await (const chunk of stream) {
-          //console.log("stream chunk ==> ", chunk);
-
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const rawResponse = chunk?.additional_kwargs?.__raw_response as any;
           const citations = rawResponse?.citations ?? [];
           if (citations.length > 0 && !isSentCitations) {

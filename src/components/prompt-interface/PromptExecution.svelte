@@ -61,7 +61,7 @@
       />
     </div>
 
-    {#if [PromptModel.OpenAIWithTools, PromptModel.OpenAIWithImageTools, PromptModel.Claude, PromptModel.Perplexity, PromptModel.OpenAIGpt5, PromptModel.OpenAIGpt5WithTools, PromptModel.OpenAIGpt5WithImageTools, PromptModel.Default].includes(currentPrompt?.model) || (isGpt5Default() && !currentPrompt?.model)}
+    {#if [PromptModel.OpenAIWithTools, PromptModel.OpenAIWithImageTools, PromptModel.Claude, PromptModel.Perplexity, PromptModel.OpenAIGpt5, PromptModel.Gemini, PromptModel.Default].includes(currentPrompt?.model) || (isGpt5Default() && !currentPrompt?.model)}
       <StreamingChatWidget
         promptId={selectedPromptId}
         {groupId}

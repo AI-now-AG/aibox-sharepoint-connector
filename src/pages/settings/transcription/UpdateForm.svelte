@@ -6,7 +6,8 @@
   import { svgIcons } from "$assets/icons";
   import { AudioCategory } from "$types/TenantFeature";
   import { onMount } from "svelte";
-  import { formatMarkdown, preventDefault } from "$utils/common";
+  import { preventDefault } from "$utils/common";
+  import { formatMarkdown } from "$utils/textFormatting";
   import TextEditor from "$components/form/TextEditor.svelte";
   const t = useTranslations();
 

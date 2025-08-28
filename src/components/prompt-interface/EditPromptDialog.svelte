@@ -8,9 +8,18 @@
   import { addToast } from "$stores/toast";
   import LoadingSpinner from "$components/prompt-interface/LoadingSpinner.svelte";
   import { svgIcons } from "$assets/icons";
-  import { formatMarkdown, preventDefault } from "$utils/common";
+  import { preventDefault } from "$utils/common";
   import TextEditor from "$components/form/TextEditor.svelte";
-  import Dropdown from "$components/form/Dropdown.svelte";
+  import Dropdown, { type Option } from "$components/form/Dropdown.svelte";
+  import { PromptModel } from "$types/PromptModel";
+  import {
+    PromptToolOption,
+    ReasoningEffortOption,
+    TextVerbosityOption,
+  } from "$types/AIProvider";
+  import { getPromptTools, useProviderInfo } from "$shared/AIProvider";
+  import { tenant } from "$stores";
+  import { formatMarkdown } from "$utils/textFormatting";
 
   const t = useTranslations();
 
@@ -36,10 +45,7 @@
     title: string;
     groups: Group[];
   };
-  type Model = {
-    _id: string;
-    title: string;
-  };
+
   type KnowledgeBase = {
     _id: string;
     title: string;
@@ -48,12 +54,14 @@
   let categories: Category[] = $state([]);
   let selectedCategory: Category | undefined = $state();
 
-  let selectedModel: string = $state("");
-  let selectedReasoningLevel: any = $state("low");
-  let selectedTextVerbosity: any = $state("low");
-
   let knowledgeBases: KnowledgeBase[] = $state([]);
   let selectedKnowledgeBases: KnowledgeBase[] = $state([]);
+
+  let selectedModel: string = $state("");
+  let selectedPromptTool: any = $state("");
+
+  let selectedReasoningLevel: any = $state("low");
+  let selectedTextVerbosity: any = $state("low");
 
   let selectedGroup: Group | any = $state();
   let previousCategoryId: string | null = $state(null);
@@ -68,6 +76,18 @@
   let isLoading = $state(false);
 
   let titleInput: HTMLInputElement | undefined = $state();
+
+  const providerIno = useProviderInfo($tenant);
+
+  let promptTools: Array<any> = $derived(
+    getPromptTools(
+      (selectedModel == PromptModel.Default
+        ? providerIno?.defaultProviderPromptModelName == PromptModel.OpenAI
+          ? PromptModel.OpenAIWithTools
+          : providerIno?.defaultProviderPromptModelName
+        : selectedModel) as PromptModel,
+    ) ?? [],
+  );
 
   onMount(async function () {
     const categoryResponse = await fetch("/api/categories.json", {
@@ -127,6 +147,12 @@
       selectedReasoningLevel = promptDetails.reasoningEffort || "low";
       selectedTextVerbosity = promptDetails.textVerbosity || "low";
 
+      selectedPromptTool = promptDetails.promptTool || "";
+      // Support Old gpt-image selection (active image tool by default)
+      if (selectedModel == PromptModel.OpenAIWithImageTools) {
+        selectedPromptTool = PromptToolOption.Image;
+      }
+
       const group = category?.groups.find(
         (e) => e._id == promptDetails.group?.toString(),
       );
@@ -161,6 +187,7 @@
         model: selectedModel ?? null,
         reasoningEffort: selectedReasoningLevel || null,
         textVerbosity: selectedTextVerbosity || null,
+        promptTool: selectedPromptTool || null,
         knowledgebase: selectedKnowledgeBases.map((inst) => inst._id),
         ...(selectedCategory && { category: selectedCategory._id }),
         ...(selectedGroup && { group: selectedGroup._id }),
@@ -254,7 +281,9 @@
     <LoadingSpinner bind:isLoading />
     <form class="rounded-sm pt-6 space-y-6">
       <div class="grid grid-cols-1 gap-4 justify-center">
-        <p class="mb-2">{t("prompt-library.add.prompts.title")}*</p>
+        <p class="mb-2">
+          {t("prompt-library.add.prompts.title")}*
+        </p>
         <input
           type="text"
           bind:value={promptTitle}
@@ -298,10 +327,42 @@
           items={knowledgeBases}
           bind:selectedItems={selectedKnowledgeBases}
         />
-        <ModelInput bind:selectedModel />
+        <ModelInput
+          bind:selectedModel
+          onValueChange={(_value: any) => {
+            selectedPromptTool = PromptToolOption.None;
+          }}
+        />
       </div>
 
-      {#if selectedModel.includes("openai-gpt-5")}
+      {#if Array.isArray(promptTools) && promptTools.length > 0}
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 justify-center"
+        >
+          <div class={"flex-1 min-w-3xs "}></div>
+
+          <Dropdown
+            classes={"flex-1 min-w-3xs "}
+            label={t("prompt-execution.prompt-tool")}
+            placeholder={t("prompt-execution.prompt-tool.placeholder")}
+            options={[
+              {
+                title: t("prompt-execution.prompt-tool.placeholder"),
+                value: PromptToolOption.None,
+              },
+              ...promptTools.map((item: Option) => {
+                return {
+                  title: item.title,
+                  value: item.value,
+                };
+              }),
+            ]}
+            bind:value={selectedPromptTool}
+          />
+        </div>
+      {/if}
+
+      {#if selectedModel.includes(PromptModel.OpenAIGpt5)}
         <div
           class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 justify-center"
         >
@@ -312,15 +373,15 @@
             options={[
               {
                 title: t("prompt-execution.reasoning-effort.level-low"),
-                value: "low",
+                value: ReasoningEffortOption.Low,
               },
               {
                 title: t("prompt-execution.reasoning-effort.level-medium"),
-                value: "medium",
+                value: ReasoningEffortOption.Medium,
               },
               {
                 title: t("prompt-execution.reasoning-effort.level-high"),
-                value: "high",
+                value: ReasoningEffortOption.High,
               },
             ]}
             bind:value={selectedReasoningLevel}
@@ -333,15 +394,15 @@
             options={[
               {
                 title: t("prompt-execution.verbosity.level-low"),
-                value: "low",
+                value: TextVerbosityOption.Low,
               },
               {
                 title: t("prompt-execution.verbosity.level-medium"),
-                value: "medium",
+                value: TextVerbosityOption.Medium,
               },
               {
                 title: t("prompt-execution.verbosity.level-high"),
-                value: "high",
+                value: TextVerbosityOption.High,
               },
             ]}
             bind:value={selectedTextVerbosity}

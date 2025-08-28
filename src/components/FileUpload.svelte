@@ -3,17 +3,6 @@
   const t = useTranslations();
   import { svgIcons } from "$assets/icons";
 
-  // const acceptedTypesDefault = {
-  //   "audio/*": ["audio/mp3"],
-  //   "video/*": ["video/mp4", "video/quicktime"],
-  //   "application/*": ["application/pdf", "application/json", "application/vnd.ms-powerpoint", "application/vnd.openxmlformats-officedocument.presentationml.presentation"],
-  //   "text/*": [
-  //     "text/plain",
-  //     "application/x-subrip",
-  //     "text/tab-separated-values",
-  //   ],
-  //   "image/*": ["image/svg+xml", "image/png", "image/jpeg"],
-  // };
   const acceptedTypesDefault = {
     "audio/*": ["audio/mp3", "audio/wav", "audio/mpeg"],
     "video/*": ["video/mp4", "video/quicktime"],

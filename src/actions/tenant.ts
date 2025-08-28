@@ -39,10 +39,10 @@ const TenantInputParamsSchema = z.object({
   theme: z.nativeEnum(TenantTheme),
   primary_color: z.string().optional(),
   api_key_providers: z.array(TextFeatureSchema).optional(),
-  openai_chat_model: z.string().optional().default('gpt-4o'),
+  openai_chat_model: z.string().optional().default("gpt-4o"),
   openai_api_key: z.string().optional(),
-  openai_gpt5_chat_model: z.string().optional().default('gpt-5'),
-  openai_gpt5_reasoning_effort: z.string().optional().default('low'),
+  openai_gpt5_chat_model: z.string().optional().default("gpt-5"),
+  openai_gpt5_reasoning_effort: z.string().optional().default("low"),
   openai_gpt5_api_key: z.string().optional(),
   azure_openai_api_key: z.string().optional(),
   azure_openai_endpoint: z.string().optional(),
@@ -57,6 +57,8 @@ const TenantInputParamsSchema = z.object({
   fal_ai_api_key: z.string().optional(),
   anthropic_api_key: z.string().optional(),
   anthropic_chat_model: z.string().optional(),
+  gemini_api_key: z.string().optional(),
+  gemini_chat_model: z.string().optional(),
   included_features: z.array(IncludedFeaturesSchema),
   transcription_types: z.array(z.nativeEnum(AudioCategory)).optional(),
   is_restrict_user_managment: z
@@ -78,6 +80,7 @@ const TenanKeyEncryptSchema = z.object({
   elevenLabs_api_key: z.string().optional(),
   fal_ai_api_key: z.string().optional(),
   anthropic_api_key: z.string().optional(),
+  gemini_api_key: z.string().optional(),
 });
 
 const TenantInputIdentifierSchema = z.object({
@@ -402,6 +405,7 @@ export const tenant = {
         "speech_api_key",
         "fal_ai_api_key",
         "anthropic_api_key",
+        "gemini_api_key",
       ] as const;
 
       for (const key of keysToEncrypt) {
@@ -417,7 +421,12 @@ export const tenant = {
   decryptApiKeys: defineAction({
     input: TenanKeyEncryptSchema,
     handler: async (input) => {
-      const { openai_api_key, openai_gpt5_api_key, azure_openai_api_key, speech_api_key } = input;
+      const {
+        openai_api_key,
+        openai_gpt5_api_key,
+        azure_openai_api_key,
+        speech_api_key,
+      } = input;
       if (openai_api_key) {
         input.openai_api_key = decrypt(openai_api_key);
       }

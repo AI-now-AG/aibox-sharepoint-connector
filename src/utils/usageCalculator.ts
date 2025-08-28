@@ -11,6 +11,7 @@ import {
   type UsageItem,
   type TokenCreditRate,
 } from "$types/UsageTracking";
+import { ModelName } from "$types/AIProvider";
 
 const t = useTranslations();
 
@@ -39,6 +40,7 @@ const TOKEN_CREDIT_MAPPING: Record<string, TokenCreditRate> = {
   [ApiKeyProvider.AzureOpenAI]: { input: 40000, output: 10000 },
   [ApiKeyProvider.Perplexity]: { input: 100000, output: 100000 },
   [ApiKeyProvider.Claude]: { input: 33000, output: 6500 },
+  [ApiKeyProvider.Gemini]: { input: 330000, output: 40000 },
 };
 
 /**
@@ -51,12 +53,14 @@ const TOKEN_CREDIT_MAPPING: Record<string, TokenCreditRate> = {
  *   - GPT image: 1 credit = 0.33 request
  *   - Flux: 1 credit = 2 requests
  *   - Perplexity: 1 credit = 12 requests
+ *   - Gemini: 1 credit = 2 webserch requests
  */
 const REQUEST_CREDIT_MAPPING: Record<string, number> = {
   [ImageModel.Dalle]: 1,
   [ImageModel.GptImage]: 0.33,
   [ImageModel.FluxDev]: 2,
   [WebsearchModel.Sonar]: 12,
+  [ModelName.Gemini25Flash]: 2,
 };
 
 /**
@@ -96,7 +100,7 @@ const _tokensToCredits = (
 };
 
 const _requestsToCredits = (
-  model: ImageModel | WebsearchModel,
+  model: ImageModel | WebsearchModel | ModelName,
   requests: number,
 ): number => {
   const rate = REQUEST_CREDIT_MAPPING[model.toLowerCase()];
@@ -204,7 +208,6 @@ const _calculateOpenAIUsage = (
   return _skipUsageIfPrivateKeyUsed(usageItems, usePrivateKey);
 };
 
-
 const _calculateOpenAIGpt5Usage = (
   rawUsages: UsageLog[],
   usePrivateKey: boolean,
@@ -215,7 +218,7 @@ const _calculateOpenAIGpt5Usage = (
     return item.provider == ApiKeyProvider.OpenAIGtp5;
   });
 
-  // gpt-4o
+  // gpt-5
   const gpt5Items = usageData.filter(
     (item: UsageLog) => item.model == TextModel.Gpt5,
   );
@@ -396,6 +399,68 @@ const _calculateClaudeUsage = (
   return _skipUsageIfPrivateKeyUsed(usageItems, usePrivateKey);
 };
 
+const _calculateGeminiUsage = (
+  rawUsages: UsageLog[],
+  usePrivateKey: boolean,
+) => {
+  const usageItems: UsageItem[] = [];
+
+  const usageData = rawUsages.filter((item: UsageLog) => {
+    return item.provider == ApiKeyProvider.Gemini;
+  });
+
+  // gemini
+  const geminiItems = usageData.filter(
+    (item: UsageLog) => item.model == TextModel.Gemini,
+  );
+  const geminiInputTokens = geminiItems.reduce(
+    (sum: number, item: UsageLog) => sum + (item.input_tokens ?? 0),
+    0,
+  );
+  const geminiOutputTokens = geminiItems.reduce(
+    (sum: number, item: UsageLog) => sum + (item.output_tokens ?? 0),
+    0,
+  );
+  const geminiWebsearchRequests = geminiItems.reduce(
+    (sum: number, item: UsageLog) =>
+      sum + (item.metadata?.websearch_count ?? 0),
+    0,
+  );
+  const {
+    inputCredits: geminiInputCredits,
+    outputCredits: geminiOutputCredits,
+  } = _tokensToCredits(
+    ApiKeyProvider.Gemini,
+    geminiInputTokens,
+    geminiOutputTokens,
+  );
+
+  usageItems.push({
+    model: "gemini Input",
+    amount: geminiInputTokens,
+    unit: unitLabels.tokens,
+    credits: geminiInputCredits,
+  });
+
+  usageItems.push({
+    model: "gemini Output",
+    amount: geminiOutputTokens,
+    unit: unitLabels.tokens,
+    credits: geminiOutputCredits,
+  });
+
+  usageItems.push({
+    model: "gemini Websearch",
+    amount: geminiWebsearchRequests,
+    unit: unitLabels.requests,
+    credits: _requestsToCredits(
+      ModelName.Gemini25Flash,
+      geminiWebsearchRequests,
+    ),
+  });
+  return _skipUsageIfPrivateKeyUsed(usageItems, usePrivateKey);
+};
+
 const _calculateAudioUsage = (
   rawUsages: UsageLog[],
   useAzureOpenAIPrivateKey: boolean,
@@ -506,7 +571,8 @@ export const calculateUsage = (tenant: Tenant, rawUsages: UsageLog[]) => {
   });
 
   // OpenAI GPT5
-  const useOpenAIGpt5PrivateKey = tenant.metadata?.openaiGpt5PrivateKeyEnabled ?? false;
+  const useOpenAIGpt5PrivateKey =
+    tenant.metadata?.openaiGpt5PrivateKeyEnabled ?? false;
   usageData.push({
     provider: "OpenAI GPT-5",
     details: _calculateOpenAIGpt5Usage(rawUsages, useOpenAIGpt5PrivateKey),
@@ -533,6 +599,13 @@ export const calculateUsage = (tenant: Tenant, rawUsages: UsageLog[]) => {
   usageData.push({
     provider: "Claude",
     details: _calculateClaudeUsage(rawUsages, useClaudePrivateKey),
+  });
+
+  // Gemini
+  const useGeminiPrivateKey = tenant.metadata?.geminiPrivateKeyEnabled ?? false;
+  usageData.push({
+    provider: "Gemini",
+    details: _calculateGeminiUsage(rawUsages, useGeminiPrivateKey),
   });
 
   // Audio

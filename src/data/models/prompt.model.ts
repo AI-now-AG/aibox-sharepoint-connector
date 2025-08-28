@@ -15,6 +15,7 @@ const PromptSchema = z.object({
   model: z.string().nullish(),
   reasoningEffort: z.string().nullish(),
   textVerbosity: z.string().nullish(),
+  promptTool: z.string().nullish(),
   documents: z.array(z.instanceof(ObjectId)).optional(),
   position: z.number().default(0).optional(),
   created_at: z.date().optional(),

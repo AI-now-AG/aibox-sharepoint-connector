@@ -61,6 +61,8 @@ import image from "$assets/icons/image.svg?raw";
 import money from "$assets/icons/money.svg?raw";
 import logo from "$assets/icons/logo.svg?raw";
 import imageTool from "$assets/icons/image-tool.svg?raw";
+import expand from "$assets/icons/expand.svg?raw";
+import web from "$assets/icons/web.svg?raw";
 
 export const svgIcons = {
   menuSettings,
@@ -126,4 +128,6 @@ export const svgIcons = {
   money,
   logo,
   imageTool,
+  expand,
+  web,
 };

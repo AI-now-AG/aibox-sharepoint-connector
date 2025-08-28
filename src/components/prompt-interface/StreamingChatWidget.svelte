@@ -9,7 +9,6 @@
     setPreviousResponseId,
     getPreviousResponseId,
   } from "$components/prompt-interface/components/stores/messageHistoryStore";
-  import { ToolName } from "$types/AIResponse";
   import { PromptModel } from "$types/PromptModel";
   import { addToast } from "$stores/toast";
   import {
@@ -20,18 +19,17 @@
   import { readFileContent } from "$utils/fileReader";
   import {
     formatMarkdown,
-    parseChunkCitations,
-    formatCitations,
+    buildCitationLinks,
     stripHtmlFormatting,
-  } from "$utils/common";
+  } from "$utils/textFormatting";
   import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
-  import MessageInput, {
-    type Tool,
-  } from "$components/chat-ui/MessageInput.svelte";
+  import MessageInput from "$components/chat-ui/MessageInput.svelte";
   import MessageList from "$components/chat-ui/MessageList.svelte";
   import { tenant, user } from "$stores";
   import { useTranslations } from "$i18n/utils";
   import { ApiKeyProvider } from "$types/TenantFeature";
+  import { PromptToolOption } from "$types/AIProvider";
+  import { getPromptTools, useProviderInfo } from "$shared/AIProvider";
 
   const t = useTranslations();
 
@@ -39,7 +37,6 @@
     messageContent: string;
     citations: any[];
     currentImageUrl: string;
-    isSentCitations: boolean;
   }
 
   interface APIConfiguration {
@@ -109,53 +106,41 @@
     return activeDefaultProvider?.name || ApiKeyProvider.OpenAI;
   }
 
+  const providerIno = useProviderInfo($tenant);
   // === Derived State ===
-  let enabledTools = $derived.by(() => {
-    const tools: Tool[] = [];
+  let toolOptions = $derived.by(() => {
+    return getPromptTools(
+      (currentPrompt?.model == PromptModel.Default
+        ? providerIno?.defaultProviderPromptModelName == PromptModel.OpenAI
+          ? PromptModel.OpenAIWithTools
+          : providerIno?.defaultProviderPromptModelName
+        : currentPrompt?.model) as PromptModel,
+    );
+  });
 
-    switch (currentPrompt?.model) {
-      case PromptModel.OpenAIWithTools:
-        tools.push({
-          name: "image",
-          active: false,
-        });
-        break;
-      case PromptModel.OpenAIWithImageTools:
-        tools.push({
-          name: "image",
-          active: true,
-          disabled: true,
-        });
-        break;
-      case PromptModel.OpenAIGpt5:
-        tools.push({
-          name: "image",
-          active: false,
-        });
-        break;
-      case PromptModel.OpenAIGpt5WithTools:
-        tools.push({
-          name: "image",
-          active: false,
-        });
-        break;
-      case PromptModel.OpenAIGpt5WithImageTools:
-        tools.push({
-          name: "image",
-          active: true,
-          disabled: true,
-        });
-        break;
+  let selectedPromptTool = $state(PromptToolOption.None);
+  let isDisablePromptTool = $state(false);
+
+  // === Effects ===
+  $effect(() => {
+    if (currentPrompt.promptTool != PromptToolOption.None) {
+      selectedPromptTool = currentPrompt.promptTool;
     }
-
-    if (!currentPrompt?.model && isGpt5Default()) {
-      tools.push({
-        name: "image",
-        active: false,
-      });
+    // Support Old gpt-image selection (active image tool by default)
+    const isOpenAiWithImageTool =
+      currentPrompt.model == PromptModel.OpenAIWithImageTools;
+    if (isOpenAiWithImageTool) {
+      selectedPromptTool = PromptToolOption.Image;
     }
-
-    return tools;
+    if (
+      (currentPrompt.promptTool &&
+        currentPrompt.promptTool != PromptToolOption.None) ||
+      isOpenAiWithImageTool
+    ) {
+      isDisablePromptTool = true;
+    } else {
+      isDisablePromptTool = false;
+    }
   });
 
   const tenantId = $tenant?._id?.toString();
@@ -199,25 +184,17 @@
 
   // === Request Builder ===
   function buildRequestPayload(fileUrls: string[]): RequestPayload {
-    let isOpenAIResponseModel = [
-      PromptModel.OpenAIWithTools,
-      PromptModel.OpenAIWithImageTools,
-    ].includes(currentPrompt?.model);
+    let isOpenAIResponseModel =
+      [
+        PromptModel.OpenAI,
+        PromptModel.OpenAIWithTools,
+        PromptModel.OpenAIWithImageTools,
+      ].includes(currentPrompt?.model) ||
+      (getDefaultModelName() == ApiKeyProvider.OpenAI && !currentPrompt?.model);
 
     const isOpenAIGpt5ResponseModel =
-      [
-        PromptModel.OpenAIGpt5,
-        PromptModel.OpenAIGpt5WithTools,
-        PromptModel.OpenAIGpt5WithImageTools,
-      ].includes(currentPrompt?.model) ||
+      [PromptModel.OpenAIGpt5].includes(currentPrompt?.model) ||
       (isGpt5Default() && !currentPrompt?.model);
-
-    if (
-      getDefaultModelName() === ApiKeyProvider.OpenAI &&
-      !isOpenAIGpt5ResponseModel
-    ) {
-      isOpenAIResponseModel = true;
-    }
 
     const provider = isOpenAIResponseModel
       ? "openai-response"
@@ -237,14 +214,16 @@
     };
 
     // Add conditional properties
-    if (enabledTools.length) {
-      payload.tool = "image_generation";
-      payload.imageGenerationOptions = {
-        outputFormat: "png",
-        quality: "medium",
-        size: "1024x1024",
-        background: "auto",
-      };
+    if (selectedPromptTool != PromptToolOption.None) {
+      payload.tool = selectedPromptTool;
+      if (selectedPromptTool == PromptToolOption.Image) {
+        payload.imageGenerationOptions = {
+          outputFormat: "png",
+          quality: "medium",
+          size: "1024x1024",
+          background: "auto",
+        };
+      }
     }
 
     if (isOpenAIResponseModel) {
@@ -354,7 +333,7 @@
     addMessageToHistory(groupId, promptId, newUserMessage);
 
     // Handle assistant message with citations
-    if (state.citations.length > 0 && !state.isSentCitations) {
+    if (state.citations.length > 0) {
       addAssistantMessageWithCitations(
         responseText,
         state.citations,
@@ -409,23 +388,12 @@
   ): void {
     console.log("📚 Citations sent:", citations);
 
-    const citationsJson = JSON.stringify({ citations });
-    const parsedChunk: any = parseChunkCitations(citationsJson);
-
-    if (parsedChunk.citations) {
-      citations = parsedChunk.citations;
-    }
-
-    const formattedChunk = formatMarkdown(responseText)
-      .split("\n")
-      .map((line) => formatMarkdown(line))
-      .join("\n");
-
-    currentMessage = formatCitations(formattedChunk, citations);
+    const formattedText = buildCitationLinks(responseText, citations);
+    currentMessage = formatMarkdown(formattedText);
 
     const newAssistantMessage: Message = {
       role: MessageRole.Assistant,
-      content: formatMarkdown(currentMessage),
+      content: currentMessage,
       rawData: stripHtmlFormatting(currentMessage),
       imageUrl,
     };
@@ -540,7 +508,6 @@
       messageContent: "",
       citations: [],
       currentImageUrl: "",
-      isSentCitations: false,
     };
 
     while (true) {
@@ -591,10 +558,7 @@
       const requestBody = buildRequestPayload(fileUrls);
 
       // Check for image generation tool
-      const hasImageTool = enabledTools.some(
-        (tool) => tool.name === ToolName.Image && tool.active,
-      );
-      isGenerating = hasImageTool;
+      isGenerating = selectedPromptTool == PromptToolOption.Image;
 
       // Make API request
       const accessToken = $user?.auth0_access_token;
@@ -746,8 +710,10 @@
     bind:files
     {isFetching}
     stickyFooter={currentMessageHistory.length > 0}
-    bind:tools={enabledTools}
     onsend={submitForm}
+    {toolOptions}
+    bind:selectedPromptTool
+    bind:isDisablePromptTool
   />
 </div>
 
