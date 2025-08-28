@@ -34,7 +34,7 @@ function buildIconCitationLinks(
 
     const anchors = c.sources
       .map((s) => {
-        const icon = `<span style="font-size: 0.5rem;" title="${s.title || ""}">🔗</span>`;
+        const icon = `<span class="tooltip" data-tip="${s.title || ""}" style="font-size: 0.5rem;">🔗</span>`;
         const url = s.uri || s.url || s;
         return url ? `[${icon}](${url})` : "";
       })
