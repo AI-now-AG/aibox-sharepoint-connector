@@ -70,6 +70,19 @@ export function markdownToHtml(text: string) {
     breaks: true,
     gfm: true,
     extensions: [
+      // Paragraphs
+      {
+        name: "paragraph",
+        level: "block",
+        renderer(this, token) {
+          const pClass = "mb-4";
+          const inner = marked.parseInline(token.text || "");
+
+          return `<p class="${pClass}">${inner}</p>`;
+        },
+      },
+
+      // Headings (#, ##, ### ...)
       {
         name: "heading",
         renderer(this, token) {
@@ -87,6 +100,8 @@ export function markdownToHtml(text: string) {
           return `<h${token.depth} class="${headingClass}"}>${inner}</h${token.depth}>`;
         },
       },
+
+      // Lists (ul, ol)
       {
         name: "list",
         renderer(this, token) {
@@ -106,6 +121,8 @@ export function markdownToHtml(text: string) {
           return `<ul class="${ulClass}">${body}</ul>`;
         },
       },
+
+      // Tables
       {
         name: "table",
         renderer(this, token) {
@@ -150,6 +167,8 @@ export function markdownToHtml(text: string) {
           `;
         },
       },
+
+      // Links [text](url)
       {
         name: "link",
         level: "block",
@@ -165,6 +184,8 @@ export function markdownToHtml(text: string) {
           return `<a href="${href}" title="${title}" class="${linkClass}"} style="${linkstyle}"} target="_blank" rel="noopener noreferrer">${text}</a>`;
         },
       },
+
+      // Horizontal Rule (--- *** ___)
       {
         name: "hr",
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
