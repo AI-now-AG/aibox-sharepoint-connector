@@ -97,7 +97,7 @@
                           <p class="font-bold text-sm">
                             {role == MessageRole.User ? username : `aibox`}
                           </p>
-                          <p class="mt-2 text-sm">{@html content}</p>
+                          <div class="mt-2 text-sm">{@html content}</div>
                         </div>
                       {/if}
 
@@ -138,7 +138,7 @@
 
                       <div class="flex-1 p-4 pt-2.5">
                         <p class="font-bold text-sm">aibox</p>
-                        <p class="mt-2 text-sm">{@html output}</p>
+                        <div class="mt-2 text-sm">{@html output}</div>
                       </div>
                     </div>
                   </div>

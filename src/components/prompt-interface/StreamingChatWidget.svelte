@@ -18,7 +18,7 @@
   } from "$types/MessageHistory";
   import { readFileContent } from "$utils/fileReader";
   import {
-    formatMarkdown,
+    markdownToHtml,
     buildCitationLinks,
     stripHtmlFormatting,
   } from "$utils/textFormatting";
@@ -264,7 +264,7 @@
     if (data.content && typeof data.content === "string") {
       state.messageContent += data.content;
       currentMessage += data.content;
-      currentMessage = formatMarkdown(currentMessage);
+      currentMessage = markdownToHtml(currentMessage);
     }
   }
 
@@ -389,7 +389,7 @@
     console.log("📚 Citations sent:", citations);
 
     const formattedText = buildCitationLinks(responseText, citations);
-    currentMessage = formatMarkdown(formattedText);
+    currentMessage = markdownToHtml(formattedText);
 
     const newAssistantMessage: Message = {
       role: MessageRole.Assistant,
@@ -404,7 +404,7 @@
   function addAssistantMessage(responseText: string, imageUrl: string): void {
     const newAssistantMessage: Message = {
       role: MessageRole.Assistant,
-      content: formatMarkdown(responseText),
+      content: markdownToHtml(responseText),
       rawData: stripHtmlFormatting(responseText),
       imageUrl,
     };

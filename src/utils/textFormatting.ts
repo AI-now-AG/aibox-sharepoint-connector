@@ -1,11 +1,4 @@
-function escapeHtml(str: string) {
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
+import { marked, Renderer, type Token } from "marked";
 
 function buildNumberedCitationLinks(
   inputString: string,
@@ -72,115 +65,62 @@ export function buildCitationLinks(
   return inputString;
 }
 
-export function formatMarkdown(text: string): string {
-  // 1. Handle code blocks first to protect their internal structure from other replacements.
-  // This ensures markdown like '```js\nconsole.log("hello");\n```' is correctly parsed.
-  text = text.replace(/```([\s\S]*?)```/g, (match, codeContent) => {
-    // Trim any leading/trailing newlines within the code content to ensure clean <pre><code>.
-    return `<pre class="bg-gray-800 text-white p-4 rounded-lg my-4 overflow-x-auto"><code class="language-plaintext">${escapeHtml(codeContent.trim())}</code></pre>`;
+export function markdownToHtml(text: string) {
+  marked.use({
+    breaks: true,
+    gfm: true,
+    extensions: [
+      {
+        name: "heading",
+        renderer(this, token) {
+          const classes: Record<number, string> = {
+            1: "text-2xl font-semibold mt-4 mb-2",
+            2: "text-xl font-semibold mt-4 mb-2",
+            3: "text-lg font-semibold mt-4 mb-2",
+            4: "text-base font-semibold mt-4 mb-2",
+            5: "text-sm font-semibold mt-4 mb-2",
+            6: "text-xs font-semibold mt-4 mb-2",
+          };
+          const headingClass = classes[token.depth] ?? "";
+          const inner = this.parser.parseInline(token.tokens || []);
+
+          return `<h${token.depth} class="${headingClass}"}>${inner}</h${token.depth}>`;
+        },
+      },
+      {
+        name: "link",
+        renderer(this, token) {
+          const href = token.href;
+          const title = token.title || "";
+          const text = token.text || token.raw;
+
+          const linkClass = "btn btn-xs btn-soft btn-info ml-1";
+          const linkstyle =
+            "height: auto; padding: 1px 3px; border-radius: 2px;";
+
+          return `<a href="${href}" title="${title}" class="${linkClass}"} style="${linkstyle}"} target="_blank" rel="noopener noreferrer">${text}</a>`;
+        },
+      },
+    ],
   });
 
-  // 2. Handle Markdown headings (h1-h6) with Tailwind CSS classes for styling.
-  // Added `font-bold` for H1 and `font-semibold` for H2-H6, along with margin for spacing.
-  text = text.replace(
-    /^###### (.*)$/gm,
-    "<h6 class='text-xs font-semibold mt-4 mb-2'>$1</h6>",
-  );
-  text = text.replace(
-    /^##### (.*)$/gm,
-    "<h5 class='text-sm font-semibold mt-4 mb-2'>$1</h5>",
-  );
-  text = text.replace(
-    /^#### (.*)$/gm,
-    "<h4 class='text-base font-semibold mt-4 mb-2'>$1</h4>",
-  );
-  text = text.replace(
-    /^### (.*)$/gm,
-    "<h3 class='text-lg font-semibold mt-4 mb-2'>$1</h3>",
-  );
-  text = text.replace(
-    /^## (.*)$/gm,
-    "<h2 class='text-xl font-semibold mt-4 mb-2'>$1</h2>",
-  );
-  text = text.replace(
-    /^# (.*)$/gm,
-    "<h1 class='text-2xl font-bold mt-4 mb-2'>$1</h1>",
-  );
+  return marked.parse(text);
+}
 
-  // 3. Handle inline markdown formatting.
-  text = text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>"); // Bold
-  //text = text.replace(/(\*|_)(.*?)\1/g, "<em>$2</em>"); // Italic
-  text = text.replace(/(\*|_)(?![^\\(]*\))(.+?)\1/g, "<em>$2</em>"); // Italic
-  text = text.replace(/__(.*?)__/g, "<u>$1</u>"); // Underline
-  text = text.replace(/~~(.*?)~~/g, "<del>$1</del>"); // Strikethrough
-  text = text.replace(
-    /`(.*?)`/g,
-    "<code class='bg-gray-200 text-red-700 px-1 py-0.5 rounded text-sm'>$1</code>",
-  ); // Inline code with subtle styling
-
-  // 4. Handle Markdown Tables. This is a multi-step process using a replacer function.
-  // The regex captures the header line, the separator line (with alignment indicators),
-  // and all subsequent body lines.
-  const tableRegex =
-    /^\|(.+)\|(?:\r?\n|\r)(?:\s*\|(?: *:?-+:? *\|)+)(?:\r?\n|\r)((?:\|.*\|(?:\r?\n|\r))*)/gm;
-
-  text = text.replace(
-    tableRegex,
-    (match, headerLine: string, bodyLines: string) => {
-      // Extract and trim headers. Filter out empty strings from splitting.
-      const headers = headerLine
-        .split("|")
-        .map((h) => h.trim())
-        .filter((h) => h !== "");
-
-      let htmlTable =
-        '<table class="w-full border-collapse table-auto my-4 rounded-lg overflow-hidden shadow-md">';
-      htmlTable += '<thead class="bg-primary text-white">';
-      htmlTable += '<tr class="text-left">';
-      headers.forEach((header) => {
-        htmlTable += `<th class="p-2 border-r border-primary last:border-r-0 font-semibold text-sm">${header}</th>`;
-      });
-      htmlTable += "</tr>";
-      htmlTable += "</thead>";
-      htmlTable += "<tbody>";
-
-      // Process body rows if they exist.
-      if (bodyLines) {
-        // Split body lines and filter out any empty lines.
-        const rows = bodyLines
-          .split(/\r?\n|\r/)
-          .filter((line) => line.trim() !== "");
-        rows.forEach((row, index) => {
-          // Cells are split by '|' and trimmed. Filter out empty strings.
-          const cells = row
-            .split("|")
-            .map((c) => c.trim())
-            .filter((c) => c !== "");
-          // Apply alternating background colors for better readability.
-          const rowBgClass = index % 2 === 0 ? "bg-base-100" : "bg-base-300";
-          htmlTable += `<tr class="${rowBgClass} hover:bg-base-300 transition-colors duration-200">`;
-          cells.forEach((cell) => {
-            htmlTable += `<td class="p-2 border-r last:border-r-0 text-base-content">${cell}</td>`;
-          });
-          htmlTable += "</tr>";
-        });
-      }
-
-      htmlTable += "</tbody>";
-      htmlTable += "</table>";
-      return htmlTable;
-    },
-  );
-
-  // 6. Replace links and remove all HTML tags inside link text
-  text = text.replace(/\[([\s\S]+?)\]\(([^)]+)\)/g, (_match, p1, p2) => {
-    return `<a class="btn btn-xs btn-soft btn-info ml-1" href="${p2}" target="_blank" rel="noopener noreferrer" style="height: auto; padding: 1px 3px; border-radius: 2px;">${p1}</a>`;
-  });
-
-  // 7. Finally, replace remaining standalone newlines with <br> tags.
-  // This step comes last to avoid converting newlines within already-generated HTML structures.
+export function formatMarkdown(text: string) {
+  text = text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+  text = text.replace(/(\*|_)(.*?)\1/g, "<em>$2</em>");
+  text = text.replace(/__(.*?)__/g, "<u>$1</u>");
+  text = text.replace(/~~(.*?)~~/g, "<del>$1</del>");
+  text = text.replace(/`(.*?)`/g, "<code>$1</code>");
+  text = text.replace(/```([\s\S]*?)```/g, "<pre><code>$1</code></pre>");
+  text = text.replace(/^###### (.*)$/gm, "<h6 class='text-xs'>$1</h6>");
+  text = text.replace(/^##### (.*)$/gm, "<h5 class='text-sm'>$1</h5>");
+  text = text.replace(/^#### (.*)$/gm, "<h4 class='text-base'>$1</h4>");
+  text = text.replace(/^### (.*)$/gm, "<h3 class='text-lg'>$1</h3>");
+  text = text.replace(/^## (.*)$/gm, "<h2 class='text-xl'>$1</h2>");
+  text = text.replace(/^# (.*)$/gm, "<h1 class='text-2xl'>$1</h1>");
   text = text.replace(/\n/g, "<br>");
-
   return text;
 }
 

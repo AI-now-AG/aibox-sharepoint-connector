@@ -110,14 +110,14 @@
                           <p class="font-bold text-sm">
                             {role == MessageRole.User ? username : `aibox`}
                           </p>
-                          <p class="mt-2 text-sm">{@html content}</p>
+                          <div class="mt-2 text-sm">{@html content}</div>
                         </div>
                       {:else}
                         <div class="flex-1 p-4 pt-2.5">
                           <p class="font-bold text-sm">
                             {role == MessageRole.User ? username : `aibox`}
                           </p>
-                          <p class="mt-2 text-sm">No content available</p>
+                          <div class="mt-2 text-sm">No content available</div>
                         </div>
                       {/if}
                       {#if role === MessageRole.Assistant}
@@ -158,7 +158,7 @@
                       </div>
                       <div class="flex-1 p-4 pt-2.5">
                         <p class="font-bold text-sm">aibox</p>
-                        <p class="mt-2 text-sm">{@html currentMessage}</p>
+                        <div class="mt-2 text-sm">{@html currentMessage}</div>
                       </div>
                     </div>
                   </div>
