@@ -1,4 +1,4 @@
-import { marked, Renderer, type Token } from "marked";
+import { marked, type Tokens } from "marked";
 
 function buildNumberedCitationLinks(
   inputString: string,
@@ -85,6 +85,69 @@ export function markdownToHtml(text: string) {
           const inner = this.parser.parseInline(token.tokens || []);
 
           return `<h${token.depth} class="${headingClass}"}>${inner}</h${token.depth}>`;
+        },
+      },
+      {
+        name: "list",
+        renderer(this, token) {
+          const ulClass = "list-disc list-inside space-y-1 ml-4";
+          const olClass = "list-decimal list-inside space-y-1 ml-4";
+
+          const body = (token.items || [])
+            .map((item: Tokens.ListItem) =>
+              this.parser.parseInline(item.tokens || []),
+            )
+            .map((html: string) => `<li>${html}</li>`)
+            .join("");
+
+          if (token.ordered) {
+            return `<ol class="${olClass}">${body}</ol>`;
+          }
+          return `<ul class="${ulClass}">${body}</ul>`;
+        },
+      },
+      {
+        name: "table",
+        renderer(this, token) {
+          const tableClass =
+            "w-full border-collapse table-auto my-4 rounded-lg overflow-hidden shadow-md";
+          const thClass =
+            "p-2 border-r border-primary last:border-r-0 font-semibold text-sm";
+          const trClass = "hover:bg-base-300 transition-colors duration-200";
+          const tdClass = "p-2 border-r last:border-r-0 text-base-content";
+
+          // Header row
+          const header = token.header
+            .map((cell: Tokens.TableCell) => {
+              const inner = marked.parseInline(cell.text); // cell.text is string
+              return `<th class="${thClass}">${inner}</th>`;
+            })
+            .join("");
+
+          // Body rows
+          const body = token.rows
+            .map((row: Tokens.TableCell[], rowIndex: number) => {
+              const cols = row
+                .map((cell: Tokens.TableCell) => {
+                  const inner = cell.tokens
+                    ? this.parser.parseInline(cell.tokens)
+                    : cell.text;
+                  return `<td class="${tdClass}">${inner}</td>`;
+                })
+                .join("");
+
+              const extraClass =
+                rowIndex % 2 === 0 ? "bg-base-100" : "bg-base-300";
+              return `<tr class="${trClass} ${extraClass}">${cols}</tr>`;
+            })
+            .join("");
+
+          return `
+            <table class="${tableClass}">
+              <thead class="bg-primary text-base-content"><tr>${header}</tr></thead>
+              <tbody>${body}</tbody>
+            </table>
+          `;
         },
       },
       {
