@@ -144,7 +144,7 @@ export function markdownToHtml(text: string) {
 
           return `
             <table class="${tableClass}">
-              <thead class="bg-primary text-base-content"><tr>${header}</tr></thead>
+              <thead class="bg-primary text-white"><tr>${header}</tr></thead>
               <tbody>${body}</tbody>
             </table>
           `;
@@ -152,6 +152,7 @@ export function markdownToHtml(text: string) {
       },
       {
         name: "link",
+        level: "block",
         renderer(this, token) {
           const href = token.href;
           const title = token.title || "";
@@ -162,6 +163,14 @@ export function markdownToHtml(text: string) {
             "height: auto; padding: 1px 3px; border-radius: 2px;";
 
           return `<a href="${href}" title="${title}" class="${linkClass}"} style="${linkstyle}"} target="_blank" rel="noopener noreferrer">${text}</a>`;
+        },
+      },
+      {
+        name: "hr",
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        renderer(this, token): string {
+          const hrClass = "border-t border-base-300 my-3";
+          return `<hr class="${hrClass}" />`;
         },
       },
     ],
