@@ -40,7 +40,7 @@ const UserSchema = z.object({
   blocked: z.boolean().default(false),
   navState: z.record(z.string(), z.boolean()).optional(),
   tours: z.array(UserTour).optional(),
-  auth0_access_token: z.string(),
+  auth0_access_token: z.string().optional(),
 });
 
 export const UserFilterParamsSchema = z.object({
