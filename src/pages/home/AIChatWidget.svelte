@@ -201,7 +201,11 @@
   function handleChunkEvent(data: any): void {
     if (data.content && typeof data.content === "string") {
       currentMessage += data.content;
-      currentMessage = markdownToHtml(currentMessage);
+
+      if (data.content.includes("\n")) {
+        console.log('latest chunk contains a line break, re-render', data);
+        currentMessage = markdownToHtml(currentMessage);
+      }
     }
   }
 
