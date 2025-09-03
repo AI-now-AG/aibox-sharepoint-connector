@@ -69,6 +69,7 @@ export function markdownToHtml(text: string) {
   marked.use({
     breaks: true,
     gfm: true,
+    silent: true,
     extensions: [
       // Paragraphs
       {
