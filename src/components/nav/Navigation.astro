@@ -32,6 +32,8 @@ const menuItems = categories.map((category, index) => ({
 
 const audioToTextMenus = [];
 const audioFeatureItems = [];
+const subtitleStudioMenus = [];
+const subtitleFeatureItems = [];
 
 const createImageMenus = [];
 const createImageItems = [];
@@ -79,10 +81,17 @@ if (audioToTextTranscriptions.length > 0) {
 }
 
 if (subtitleTranscriptions.length > 0) {
-  audioFeatureItems.push({
+  subtitleFeatureItems.push({
     title: t("settings.transcription.subtitles-title"),
-    isOpened: navState["audio-menu-id-1"] ?? false,
+    isOpened: navState["subtitle-menu-id-0"] ?? false,
     items: subtitleTranscriptions,
+  });
+}
+
+if (Astro.locals.tenant.subtitle_editor) {
+  subtitleFeatureItems.push({
+    title: t("settings.transcription.subtitle-editor"),
+    path: `/subtitle-studio/editor`,
   });
 }
 
@@ -100,6 +109,15 @@ if (audioFeatureItems.length > 0) {
     icon: svgIcons.audio,
     isOpened: navState["audio-menu"] ?? false,
     items: audioFeatureItems,
+  });
+}
+
+if (subtitleFeatureItems.length > 0) {
+  subtitleStudioMenus.push({
+    title: t("nav.subtitle-studio"),
+    icon: svgIcons.subtitle,
+    isOpened: navState["subtitle-menu"] ?? false,
+    items: subtitleFeatureItems,
   });
 }
 
@@ -319,6 +337,58 @@ const modules = [...menuItems];
                       {sub.items ? (
                         <details
                           data-id={`audio-menu-id-${id}`}
+                          open={sub.isOpened}
+                          class="active:bg-transparent"
+                        >
+                          <summary>{sub.title}</summary>
+                          {sub.items.length > 0 && (
+                            <ul class="active:bg-transparent">
+                              {sub.items.map((sub1) => (
+                                <li class="pl-1 active:bg-transparent">
+                                  <MenuItem {...sub1} />
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </details>
+                      ) : (
+                        <MenuItem {...sub} />
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </details>
+          </li>
+        ))
+      }
+      {
+        subtitleStudioMenus.length > 0 && (
+          <div class="divider mx-6 pointer-events-none" />
+        )
+      }
+      {
+        subtitleStudioMenus.map((mod) => (
+          <li class="active:bg-transparent">
+            <details
+              data-id={`subtitle-menu`}
+              open={mod.isOpened}
+              id="onboardingId5"
+              class="active:bg-transparent"
+            >
+              <summary>
+                <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
+                  {mod.icon && <Fragment set:html={mod.icon} />}
+                </div>
+                {mod.title}
+              </summary>
+              {"items" in mod && (
+                <ul class="active:bg-transparent">
+                  {mod.items?.map((sub, id) => (
+                    <li class="pl-1 active:bg-transparent">
+                      {sub.items ? (
+                        <details
+                          data-id={`subtitle-menu-id-${id}`}
                           open={sub.isOpened}
                           class="active:bg-transparent"
                         >
