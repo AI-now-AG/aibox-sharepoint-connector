@@ -1,0 +1,35 @@
+---
+import Layout from "$layouts/Layout.astro";
+import { useTranslations } from "$i18n/utils";
+import SubtitleUpload from "./SubtitleUpload.svelte";
+
+const t = useTranslations();
+
+// Check if the user has subtitle editor feature enabled
+if (!Astro.locals.tenant?.subtitle_editor) {
+  return Astro.redirect("/404");
+}
+
+// Get URL parameters for file URLs
+const srtFile = Astro.url.searchParams.get('srtFile');
+const assFile = Astro.url.searchParams.get('assFile');
+const hasAudio = Astro.url.searchParams.get('hasAudio') === 'true';
+---
+
+<Layout>
+  <div class="container max-w-6xl mx-auto px-14">
+    <div class="pt-2 mb-2 lg:pt-8 flex justify-between items-center">
+      <h1 class="text-4xl font-bold">
+        {t("settings.transcription.subtitle-editor")}
+      </h1>
+    </div>
+    <p class="mb-6">{t("subtitle-editor.upload-description")}</p>
+    
+    <SubtitleUpload 
+      client:load 
+      srtFileUrl={srtFile}
+      assFileUrl={assFile}
+      hasPreloadedAudio={hasAudio}
+    />
+  </div>
+</Layout>
