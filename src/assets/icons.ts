@@ -63,6 +63,9 @@ import logo from "$assets/icons/logo.svg?raw";
 import imageTool from "$assets/icons/image-tool.svg?raw";
 import expand from "$assets/icons/expand.svg?raw";
 import web from "$assets/icons/web.svg?raw";
+import subtitle from "$assets/icons/subtitle.svg?raw";
+import deleteIcon from "$assets/icons/delete.svg?raw";
+import addIcon from "$assets/icons/add.svg?raw";
 
 export const svgIcons = {
   menuSettings,
@@ -130,4 +133,7 @@ export const svgIcons = {
   imageTool,
   expand,
   web,
+  subtitle,
+  deleteIcon,
+  addIcon,
 };

@@ -78,6 +78,11 @@
     ...(tenant?.metadata ?? {}),
   };
 
+  // Initialize subtitle_editor field if not already set
+  if (tenantData && tenantData.subtitle_editor === undefined) {
+    tenantData.subtitle_editor = false;
+  }
+
   // Subscription & billing
   let selectedPlanName: SubscriptionPackageId = $state(
     subscription?.plan_name ?? "",
@@ -1926,6 +1931,28 @@
                   >
                 </div>
               {/each}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Subtitle Editor Feature -->
+      <div class="container mx-auto">
+        <div class="bg-base-100 shadow-sm rounded-lg my-4">
+          <div class="flex p-4 items-center justify-between">
+            <div class="flex items-center">
+              <input
+                id="subtitle-editor-feature"
+                type="checkbox"
+                class="checkbox checkbox-primary"
+                value="subtitle-editor-feature"
+                bind:checked={tenantData.subtitle_editor}
+              />
+              <label class="label cursor-pointer ml-2" for="subtitle-editor-feature">
+                <span class="label-text text-base-content ml-2"
+                  >{t("settings.transcription.subtitle-editor")}</span
+                >
+              </label>
             </div>
           </div>
         </div>

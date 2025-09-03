@@ -62,6 +62,7 @@ const TenantSchema = z.object({
   azure_openai_chat_model: z.string().nullish().default(null),
   included_features: z.array(IncludedFeaturesSchema).optional(),
   transcription_types: z.array(z.nativeEnum(AudioCategory)).optional(),
+  subtitle_editor: z.boolean().optional().default(false),
   speech_api_key: z.string().nullish(),
   elevenLabs_api_key: z.string().optional(),
   speech_region: z.string().nullish(),
