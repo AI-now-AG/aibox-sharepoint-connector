@@ -307,14 +307,32 @@
   }
 
   function formatFilename(name: string) {
-    // replace special characters
-    let str = name.replace(/[&\/\#\=\`!,+()$~%.'":@^*?<>{}]/g, "");
+    // Normalize Unicode characters to their decomposed form and remove diacritics
+    let str = name.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // Remove diacritics/accents
 
-    // replace whitespaces
+    // Replace common special Unicode characters with safe alternatives
+    str = str
+      .replace(/[äæ]/gi, "ae")
+      .replace(/[öø]/gi, "oe")
+      .replace(/[üù]/gi, "ue")
+      .replace(/[ß]/gi, "ss")
+      .replace(/[ñ]/gi, "n")
+      .replace(/[ç]/gi, "c");
+
+    // Replace any remaining non-ASCII characters with empty string
+    str = str.replace(/[^\x00-\x7F]/g, "");
+
+    // Replace ASCII special characters
+    str = str.replace(/[&\/\#\=\`!,+()$~%.'":@^*?<>{}]/g, "");
+
+    // Replace whitespaces with hyphens
     str = str.replace(/\s/g, "-");
 
-    // replace multiple consecutive hyphens with one
+    // Replace multiple consecutive hyphens with one
     str = str.replace(/-+/g, "-");
+
+    // Remove leading and trailing hyphens
+    str = str.replace(/^-+|-+$/g, "");
 
     return str;
   }
@@ -547,7 +565,7 @@
       const accessToken = $user?.auth0_access_token;
       if (!accessToken) {
         addToast({
-          message: t('auth.session-missing-force-login'),
+          message: t("auth.session-missing-force-login"),
           type: "error",
         });
         setTimeout(() => {
@@ -775,7 +793,7 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           tenantId: $tenant?._id,
-          userId: $user?.id,
+          userId: $user?._id,
           uniqueName: tempOutputFileName,
           fileNames: tempOutputFileNames,
           folderName: folderName,
@@ -1614,7 +1632,7 @@
           )}</button
         >
       {/if}
-      
+
       <button class="btn bg-neutral btn-sm text-white" onclick={confirmStartNew}
         >{t("transciption.model.cta.start-new-transciption")}</button
       >
