@@ -1656,7 +1656,7 @@
         >
         
         <!-- Subtitle Editor Button -->
-        {#if (assFileUrl || srtFileUrl) && audioFile}
+        {#if (assFileUrl || srtFileUrl) && audioFile && $tenant?.subtitle_editor}
           <button
             class="btn btn-primary btn-sm"
             onclick={openSubtitleEditor}
