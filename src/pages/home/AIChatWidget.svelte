@@ -198,13 +198,20 @@
     console.log(`🚀 Started with ${data.provider} using ${data.model}`);
   }
 
-  function handleChunkEvent(data: any): void {
+  function handleChunkEvent(data: any, state: StreamingState): void {
     if (data.content && typeof data.content === "string") {
+      // Accumulate the raw text
+      state.messageContent += data.content;
+
+      // Append the raw chunk to the current displayed message
       currentMessage += data.content;
 
+      // If the current chunk contains a newline,
+      // re-render the entire accumulated text as HTML.
+      // This avoids trying to parse on every single character
+      // and ensures we only re-render when a natural "block" ends.
       if (data.content.includes("\n")) {
-        console.log('latest chunk contains a line break, re-render', data);
-        currentMessage = markdownToHtml(currentMessage);
+        currentMessage = markdownToHtml(state.messageContent);
       }
     }
   }
@@ -415,8 +422,7 @@
 
       case "chunk":
         isResoningThingking = false;
-        handleChunkEvent(data);
-        state.messageContent += data.content || "";
+        handleChunkEvent(data, state);
         break;
 
       case "citations":

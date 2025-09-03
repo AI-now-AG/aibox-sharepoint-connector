@@ -264,7 +264,14 @@
     if (data.content && typeof data.content === "string") {
       state.messageContent += data.content;
       currentMessage += data.content;
-      currentMessage = markdownToHtml(currentMessage);
+
+      // If the current chunk contains a newline,
+      // re-render the entire accumulated text as HTML.
+      // This avoids trying to parse on every single character
+      // and ensures we only re-render when a natural "block" ends.
+      if (data.content.includes("\n")) {
+        currentMessage = markdownToHtml(state.messageContent);
+      }
     }
   }
 
