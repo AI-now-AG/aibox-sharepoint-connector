@@ -55,6 +55,7 @@
   // Media source
   let mediaSrc = $state<string>("");
   let mediaType = $state<"audio" | "video">("audio");
+  let mediaFileName = $state<string>("");
   let hasMedia = $derived(!!mediaSrc);
 
   // File input for manual media upload
@@ -175,6 +176,7 @@
   function setupMediaSource() {
     if (audioFile) {
       mediaSrc = URL.createObjectURL(audioFile);
+      mediaFileName = audioFile.name;
       const fileName = audioFile.name.toLowerCase();
       mediaType =
         fileName.includes(".mp4") || fileName.includes(".webm") || fileName.includes(".mov") || fileName.includes(".avi")
@@ -210,6 +212,7 @@
       
       // Create new media source
       mediaSrc = URL.createObjectURL(file);
+      mediaFileName = file.name;
       
       // Detect media type based on file extension
       if (isValidVideo) {
@@ -644,17 +647,17 @@
       <h3 class="text-lg font-semibold mb-3">{t("subtitle-editor.subtitle-table")}</h3>
       {#if dialogues.length > 0}
         <div class="overflow-x-auto">
-          <table class="table table-xs w-full table-fixed">
+          <table class="table table-xs w-full">
             <thead>
               <tr class="bg-base-300">
                 {#if hasMedia}
-                  <th class="w-12">{t("subtitle-editor.play")}</th>
+                  <th class="w-16 min-w-16 text-center">{t("subtitle-editor.play")}</th>
                 {/if}
-                <th class="w-36">{t("subtitle-editor.start")}</th>
-                <th class="w-auto">{t("subtitle-editor.text")}</th>
-                <th class="w-36">{t("subtitle-editor.end")}</th>
-                <th class="w-20">{t("subtitle-editor.chars")}</th>
-                <th class="w-20">{t("subtitle-editor.actions")}</th>
+                <th class="w-32 min-w-32">{t("subtitle-editor.start")}</th>
+                <th class="min-w-0 flex-1">{t("subtitle-editor.text")}</th>
+                <th class="w-32 min-w-32">{t("subtitle-editor.end")}</th>
+                <th class="w-24 min-w-24 text-center">{t("subtitle-editor.chars")}</th>
+                <th class="w-28 min-w-28 text-center">{t("subtitle-editor.actions")}</th>
               </tr>
             </thead>
             <tbody>
@@ -693,7 +696,7 @@
                       placeholder="0:00:00"
                     />
                   </td>
-                  <td class="p-1">
+                  <td class="p-1 min-w-0 flex-1">
                     <textarea
                       bind:value={dialogue.text}
                       onclick={(e) => e.stopPropagation()}
@@ -777,6 +780,11 @@
               <div class="w-2 h-2 bg-success-content rounded-full"></div>
               {mediaType.toUpperCase()} {t("subtitle-editor.loaded")}
             </div>
+            {#if mediaFileName}
+              <div class="text-xs text-base-content/70 max-w-48 truncate" title={mediaFileName}>
+                {mediaFileName}
+              </div>
+            {/if}
             {#if mediaType === "video"}
               <button 
                 onclick={() => isVideoMinimized = !isVideoMinimized}
@@ -792,6 +800,7 @@
                   URL.revokeObjectURL(mediaSrc);
                 }
                 mediaSrc = "";
+                mediaFileName = "";
                 if (mediaFileInput) mediaFileInput.value = "";
                 statusText = t("subtitle-editor.media-removed");
                 setTimeout(() => statusText = "", 3000);
@@ -834,6 +843,9 @@
               <div class="flex-1">
                 <p class="text-sm font-medium">{t("subtitle-editor.video-preview-minimized")}</p>
                 <p class="text-xs opacity-60">{t("subtitle-editor.audio-controls-available")}</p>
+                {#if mediaFileName}
+                  <p class="text-xs opacity-60 truncate" title={mediaFileName}>{mediaFileName}</p>
+                {/if}
               </div>
             </div>
             <!-- Hidden video element for audio playback -->
