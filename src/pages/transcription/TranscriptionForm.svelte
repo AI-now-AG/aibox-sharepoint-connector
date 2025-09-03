@@ -793,7 +793,7 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           tenantId: $tenant?._id,
-          userId: $user?.id,
+          userId: $user?._id,
           uniqueName: tempOutputFileName,
           fileNames: tempOutputFileNames,
           folderName: folderName,
