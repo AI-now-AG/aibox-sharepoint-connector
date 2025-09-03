@@ -13,6 +13,9 @@
     secondsToTime,
   } from "$utils/subtitleParser";
   import { svgIcons } from "$assets/icons";
+  import { useTranslations } from "$i18n/utils";
+
+  const t = useTranslations();
 
   interface Props {
     srtFileUrl?: string;
@@ -195,7 +198,7 @@
                           fileName.includes(".mkv") || fileName.includes(".wmv");
       
       if (!isValidAudio && !isValidVideo) {
-        statusText = "Please select a valid audio or video file";
+        statusText = t("subtitle-editor.valid-file-required");
         setTimeout(() => statusText = "", 3000);
         return;
       }
@@ -215,7 +218,7 @@
         mediaType = "audio";
       }
       
-      statusText = `Media file "${file.name}" loaded successfully`;
+      statusText = t("subtitle-editor.media-loaded-success", { filename: file.name });
       setTimeout(() => statusText = "", 3000);
     }
   }
@@ -369,7 +372,7 @@
 
   function searchAndReplace() {
     if (!searchText.trim()) {
-      statusText = "Please enter search text";
+      statusText = t("subtitle-editor.enter-search-text");
       setTimeout(() => statusText = "", 3000);
       return;
     }
@@ -382,7 +385,7 @@
       }
     });
 
-    statusText = `${count} occurrences replaced`;
+    statusText = t("subtitle-editor.occurrences-replaced", { count });
     setTimeout(() => statusText = "", 3000);
     searchText = "";
     replaceText = "";
@@ -390,10 +393,10 @@
   }
 
   function deleteRow(index: number) {
-    if (confirm("Are you sure you want to delete this subtitle?")) {
+    if (confirm(t("subtitle-editor.delete-confirm"))) {
       dialogues.splice(index, 1);
       dialogues = [...dialogues];
-      statusText = `Subtitle ${index + 1} deleted`;
+      statusText = t("subtitle-editor.subtitle-deleted", { index: index + 1 });
       setTimeout(() => statusText = "", 3000);
     }
   }
@@ -409,7 +412,7 @@
 
     dialogues.splice(index + 1, 0, newDialogue);
     dialogues = [...dialogues];
-    statusText = `New subtitle added after ${index + 1}`;
+    statusText = t("subtitle-editor.subtitle-added", { index: index + 1 });
     setTimeout(() => statusText = "", 3000);
   }
 
@@ -423,19 +426,19 @@
       // Only ASS format available
       const assContent = generateASSContent(dialogues);
       onSave(assContent);
-      statusText = "Subtitles exported as ASS format";
+      statusText = t("subtitle-editor.exported-ass");
       setTimeout(() => statusText = "", 3000);
     } else if (srtFileUrl) {
       // Only SRT format available - export as SRT
       const srtContent = generateSRTContent(dialogues);
       onSave(srtContent);
-      statusText = "Subtitles exported as SRT format";
+      statusText = t("subtitle-editor.exported-srt");
       setTimeout(() => statusText = "", 3000);
     } else {
       // Default to ASS format
       const assContent = generateASSContent(dialogues);
       onSave(assContent);
-      statusText = "Subtitles exported as ASS format (default)";
+      statusText = t("subtitle-editor.exported-default");
       setTimeout(() => statusText = "", 3000);
     }
   }
@@ -456,11 +459,11 @@
         onSave(bothFormats);
       }
       
-      statusText = "Subtitles exported (both ASS and SRT formats will be downloaded)";
+      statusText = t("subtitle-editor.exported-both");
       setTimeout(() => statusText = "", 3000);
     } catch (error) {
       console.error("Error creating both formats:", error);
-      statusText = "Error creating both formats. Exporting ASS format...";
+      statusText = t("subtitle-editor.export-error");
       setTimeout(() => statusText = "", 5000);
     }
   }
@@ -470,7 +473,7 @@
     if (onSave) {
       onSave(assContent);
     }
-    statusText = "Subtitles exported as ASS format";
+    statusText = t("subtitle-editor.exported-ass");
     setTimeout(() => statusText = "", 3000);
   }
 
@@ -479,7 +482,7 @@
     if (onSave) {
       onSave(srtContent);
     }
-    statusText = "Subtitles exported as SRT format";
+    statusText = t("subtitle-editor.exported-srt");
     setTimeout(() => statusText = "", 3000);
   }
 
@@ -545,38 +548,38 @@
     <!-- Search and Replace with Close Button -->
     <div class="search-replace flex items-center gap-4 mb-4">
       <div class="flex items-center gap-2">
-        <label for="search">Search:</label>
+        <label for="search">{t("subtitle-editor.search")}:</label>
         <input
           id="search"
           type="text"
           bind:value={searchText}
-          placeholder="Search text"
+          placeholder={t("subtitle-editor.search-placeholder")}
           class="input input-sm input-bordered"
         />
       </div>
       <div class="flex items-center gap-2">
-        <label for="replace">Replace:</label>
+        <label for="replace">{t("subtitle-editor.replace")}:</label>
         <input
           id="replace"
           type="text"
           bind:value={replaceText}
-          placeholder="Replace text"
+          placeholder={t("subtitle-editor.replace-placeholder")}
           class="input input-sm input-bordered"
         />
       </div>
-      <button onclick={searchAndReplace} class="btn btn-primary btn-sm">Replace</button>
+      <button onclick={searchAndReplace} class="btn btn-primary btn-sm">{t("subtitle-editor.replace-button")}</button>
       
       <!-- Layout Controls and Close Button -->
       <div class="flex items-center gap-2 ml-auto">
         {#if mediaType === "video" && mediaSrc}
           <div class="dropdown dropdown-end">
             <div tabindex="0" role="button" class="btn btn-sm btn-ghost">
-              Switch Layout ⚙️
+              {t("subtitle-editor.switch-layout")} ⚙️
             </div>
             <ul class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
-              <li><button onclick={() => { useSideBySideLayout = false; isVideoMinimized = false; }}>Standard (Video Top)</button></li>
-              <li><button onclick={() => { useSideBySideLayout = true; isVideoMinimized = false; }}>Side-by-Side</button></li>
-              <li><button onclick={() => { useSideBySideLayout = false; isVideoMinimized = true; }}>Minimized Video</button></li>
+              <li><button onclick={() => { useSideBySideLayout = false; isVideoMinimized = false; }}>{t("subtitle-editor.standard-video-top")}</button></li>
+              <li><button onclick={() => { useSideBySideLayout = true; isVideoMinimized = false; }}>{t("subtitle-editor.side-by-side")}</button></li>
+              <li><button onclick={() => { useSideBySideLayout = false; isVideoMinimized = true; }}>{t("subtitle-editor.minimized-video")}</button></li>
             </ul>
           </div>
         {/if}
@@ -608,27 +611,27 @@
     <div class="export-controls flex items-center gap-4">
       <!-- Always show both formats option -->
       <button onclick={exportBothFormats} class="btn btn-primary btn-sm">
-        {@html svgIcons.fileExport} Export Both Formats
+        {@html svgIcons.fileExport} {t("subtitle-editor.export-both-formats")}
       </button>
-      <div class="">OR</div>
+      <div class="">{t("subtitle-editor.or")}</div>
       
       {#if assFileUrl}
         <!-- ASS format available - show individual ASS export -->
         <button onclick={exportAsASS} class="btn btn-success btn-sm">
-          {@html svgIcons.fileExport} ASS Only
+          {@html svgIcons.fileExport} {t("subtitle-editor.ass-only")}
         </button>
       {:else if srtFileUrl}
         <!-- SRT format available - show individual SRT export -->
         <button onclick={exportAsSRT} class="btn btn-info btn-sm">
-          {@html svgIcons.fileExport} SRT Only
+          {@html svgIcons.fileExport} {t("subtitle-editor.srt-only")}
         </button>
       {:else}
         <!-- No source format - show both individual options -->
         <button onclick={exportAsASS} class="btn btn-success btn-sm">
-          {@html svgIcons.fileExport} ASS Only
+          {@html svgIcons.fileExport} {t("subtitle-editor.ass-only")}
         </button>
         <button onclick={exportAsSRT} class="btn btn-info btn-sm">
-          {@html svgIcons.fileExport} SRT Only
+          {@html svgIcons.fileExport} {t("subtitle-editor.srt-only")}
         </button>
       {/if}
     </div>
@@ -638,20 +641,20 @@
   <div class="flex-1 flex {useSideBySideLayout ? 'flex-row gap-4' : 'flex-col'} min-h-0">
     <!-- Subtitle Table -->
     <div class="flex-1 bg-base-200 rounded-lg p-4 overflow-auto {useSideBySideLayout ? 'min-w-0' : ''} {isVideoMinimized ? 'min-h-96' : 'min-h-64'}">
-      <h3 class="text-lg font-semibold mb-3">Subtitle Table</h3>
+      <h3 class="text-lg font-semibold mb-3">{t("subtitle-editor.subtitle-table")}</h3>
       {#if dialogues.length > 0}
         <div class="overflow-x-auto">
           <table class="table table-xs w-full table-fixed">
             <thead>
               <tr class="bg-base-300">
                 {#if hasMedia}
-                  <th class="w-12">Play</th>
+                  <th class="w-12">{t("subtitle-editor.play")}</th>
                 {/if}
-                <th class="w-36">Start</th>
-                <th class="w-auto">Text</th>
-                <th class="w-36">End</th>
-                <th class="w-20">Chars</th>
-                <th class="w-20">Actions</th>
+                <th class="w-36">{t("subtitle-editor.start")}</th>
+                <th class="w-auto">{t("subtitle-editor.text")}</th>
+                <th class="w-36">{t("subtitle-editor.end")}</th>
+                <th class="w-20">{t("subtitle-editor.chars")}</th>
+                <th class="w-20">{t("subtitle-editor.actions")}</th>
               </tr>
             </thead>
             <tbody>
@@ -702,7 +705,7 @@
                         ? 'textarea-bordered bg-base-100 text-base-content' 
                         : ''}"
                       rows="2"
-                      placeholder="Subtitle text..."
+                      placeholder={t("subtitle-editor.subtitle-text-placeholder")}
                     ></textarea>
                   </td>
                   <td class="p-1">
@@ -735,7 +738,7 @@
                           deleteRow(index);
                         }}
                         class="btn btn-xs btn-outline btn-error join-item"
-                        title="Delete"
+                        title={t("subtitle-editor.delete-title")}
                       >
                         {@html svgIcons.trash}
                       </button>
@@ -745,7 +748,7 @@
                           addRowAfter(index);
                         }}
                         class="btn btn-xs btn-outline btn-success join-item"
-                        title="Add after"
+                        title={t("subtitle-editor.add-after-title")}
                       >
                         {@html svgIcons.add}
                       </button>
@@ -758,7 +761,7 @@
         </div>
       {:else}
         <div class="text-center text-base-content opacity-60 py-8">
-          No subtitles loaded
+          {t("subtitle-editor.no-subtitles-loaded")}
         </div>
       {/if}
     </div>
@@ -768,17 +771,17 @@
       {#if hasMedia}
         <!-- Media Status Header -->
         <div class="flex items-center justify-between">
-          <h3 class="text-lg font-semibold">Media Player</h3>
+          <h3 class="text-lg font-semibold mb-4">{t("subtitle-editor.media-player")}</h3>
           <div class="flex items-center gap-2">
             <div class="badge badge-success badge-sm gap-1">
               <div class="w-2 h-2 bg-success-content rounded-full"></div>
-              {mediaType.toUpperCase()} loaded
+              {mediaType.toUpperCase()} {t("subtitle-editor.loaded")}
             </div>
             {#if mediaType === "video"}
               <button 
                 onclick={() => isVideoMinimized = !isVideoMinimized}
                 class="btn btn-xs btn-ghost"
-                title={isVideoMinimized ? "Show video" : "Minimize video"}
+                title={isVideoMinimized ? t("subtitle-editor.show-video") : t("subtitle-editor.minimize-video")}
               >
                 {isVideoMinimized ? "📹➕" : "📹➖"}
               </button>
@@ -790,11 +793,11 @@
                 }
                 mediaSrc = "";
                 if (mediaFileInput) mediaFileInput.value = "";
-                statusText = "Media file removed";
+                statusText = t("subtitle-editor.media-removed");
                 setTimeout(() => statusText = "", 3000);
               }}
               class="btn btn-xs btn-ghost text-error hover:bg-error/20"
-              title="Remove media file"
+              title={t("subtitle-editor.remove-media")}
             >
               ✕
             </button>
@@ -829,8 +832,8 @@
                 </svg>
               </div>
               <div class="flex-1">
-                <p class="text-sm font-medium">Video Preview (Minimized)</p>
-                <p class="text-xs opacity-60">Audio controls still available below</p>
+                <p class="text-sm font-medium">{t("subtitle-editor.video-preview-minimized")}</p>
+                <p class="text-xs opacity-60">{t("subtitle-editor.audio-controls-available")}</p>
               </div>
             </div>
             <!-- Hidden video element for audio playback -->
@@ -887,7 +890,7 @@
           </div>
 
           <div class="flex items-center gap-2">
-            <label for="speed-select" class="text-sm">Speed:</label>
+            <label for="speed-select" class="text-sm">{t("subtitle-editor.speed")}:</label>
             <select
               id="speed-select"
               bind:value={playbackRate}
@@ -914,8 +917,8 @@
       </div>
     {:else}
       <!-- Media Upload Section -->
-      <h3 class="text-lg font-semibold mb-3">Media Player</h3>
-      <p class="mb-3 text-sm text-base-content/70">Upload audio or video file for timeline synchronization</p>
+      <h3 class="text-lg font-semibold mb-3">{t("subtitle-editor.media-player")}</h3>
+      <p class="mb-3 text-sm text-base-content/70">{t("subtitle-editor.upload-media-description")}</p>
         
         <div class="relative flex flex-col">
           <label
@@ -941,10 +944,10 @@
                 </svg>
               </div>
               <p class="text-base font-semibold text-center transition-colors duration-200 mt-2">
-                Add Media File
+                {t("subtitle-editor.add-media-file")}
               </p>
               <p class="text-base text-base-content/70 text-center transition-colors duration-200 mt-1">
-                Drag and drop or <span class="text-primary hover:text-primary/80 transition-colors duration-200">click to browse</span>
+                {t("subtitle-editor.drag-and-drop")} <span class="text-primary hover:text-primary/80 transition-colors duration-200">{t("subtitle-editor.click-to-browse")}</span>
               </p>
               <div class="flex flex-wrap justify-center gap-2 mt-3">
                 <span class="badge badge-outline badge-sm">MP3</span>
@@ -955,7 +958,7 @@
                 <span class="badge badge-outline badge-sm">AVI</span>
               </div>
               <p class="text-xs text-base-content/40 mt-4 transition-opacity duration-200 hover:opacity-60">
-                Maximum file size: 100MB per file
+                {t("subtitle-editor.maximum-file-size")}
               </p>
             </div>
           </label>
@@ -964,7 +967,7 @@
         <!-- Info Text -->
         <div class="mt-4 text-center">
           <p class="text-sm text-base-content/40 leading-relaxed">
-            Adding a media file enables timeline synchronization, making it easier to edit subtitles with audio/video context
+            {t("subtitle-editor.media-sync-description")}
           </p>
         </div>
     {/if}

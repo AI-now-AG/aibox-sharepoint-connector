@@ -352,7 +352,7 @@
       </div>
     {/if}
     
-    <p class="mb-2">Upload subtitle files for editing</p>
+    <p class="mb-2">{t("subtitle-editor.upload-title")}</p>
     
     <div class="relative flex flex-col mt-2">
       <label
@@ -376,13 +376,13 @@
             {@html svgIcons.upload}
           </div>
           <p class="text-base font-semibold text-center transition-colors duration-200">
-            Drag and drop your subtitle files here, or <span class="text-primary hover:text-primary/80 transition-colors duration-200">browse</span>
+            {t("subtitle-editor.drag-drop-subtitle")} <span class="text-primary hover:text-primary/80 transition-colors duration-200">{t("subtitle-editor.browse")}</span>
           </p>
           <p class="text-sm text-base-content/40 mt-1 transition-opacity duration-200 hover:opacity-60">
-            Supported formats: .ass, .srt
+            {t("subtitle-editor.supported-formats")}
           </p>
           <p class="text-xs text-base-content/40 mt-8 transition-opacity duration-200 hover:opacity-60">
-            Maximum file size: 10MB per file
+            {t("subtitle-editor.max-file-size-10mb")}
           </p>
         </div>
       </label>
@@ -490,7 +490,7 @@
     {#if hasFiles}
       <div class="mt-6 flex justify-end">
         <button class="continue-btn pulse btn btn-primary" onclick={openEditor}>
-          Open Subtitle Editor
+          {t("subtitle-editor.open-subtitle-editor")}
         </button>
       </div>
     {/if}
