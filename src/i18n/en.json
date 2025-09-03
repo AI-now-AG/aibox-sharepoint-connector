@@ -20,6 +20,7 @@
   "nav.tenant-management": "Tenant Management",
   "nav.audiotool": "AUDIO ASSISTANT",
   "nav.audiotool.audio-to-text": "Audio to text",
+  "nav.subtitle-studio": "SUBTITLE STUDIO",
   "login.welcome": "Welcome to",
   "login.title": "Sign in to your account",
   "login.email": "Email",
@@ -211,7 +212,7 @@
   "user.search-for-users": "Search for users",
   "user.role": "Role",
   "user.status": "Status",
-  "user.e-mail": "email",
+  "user.e-mail": "Email",
   "user.logins": "Logins",
   "user.latest-login": "Latest login",
   "user.veriried": "Verified",
@@ -492,5 +493,15 @@
   "prompt-execution.prompt-tool.image": "Create images",
   "prompt-execution.prompt-tool.web-search": "Web Search  ",
   "prompt-execution.prompt-tool.thinking": "Thinking ",
-  "prompt-execution.upload-file.supportted-files-input": "PDF, JSON, TXT, PNG, SVG, JPEG, CSV, DOCX, XLSX, PPTX"
+  "prompt-execution.upload-file.supportted-files-input": "PDF, JSON, TXT, PNG, SVG, JPEG, CSV, DOCX, XLSX, PPTX",
+  "settings.transcription.subtitle-editor": "Subtitle Editor",
+  "subtitle-editor.edit-subtitles": "Edit Subtitles",
+  "subtitle-editor.files-ready": "Files Ready",
+  "subtitle-editor.transcription-result-srt": "Transcription Result (SRT)",
+  "subtitle-editor.transcription-result-ass": "Transcription Result (ASS)",
+  "subtitle-editor.from-transcription": "From Transcription",
+  "subtitle-editor.preloaded": "Preloaded",
+  "subtitle-editor.audio-for-sync": "Audio for Synchronization",
+  "subtitle-editor.audio-loaded": "Audio Loaded",
+  "subtitle-editor.upload-description": "Upload your subtitle files (ASS or SRT format) to start editing with advanced timeline synchronization and formatting tools."
 }

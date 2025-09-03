@@ -20,6 +20,7 @@
   "nav.tenant-management": "Tenant Verwaltung",
   "nav.audiotool": "AUDIO ASSISTENT",
   "nav.audiotool.audio-to-text": "Audio zu Text",
+  "nav.subtitle-studio": "UNTERTITEL STUDIO",
   "login.welcome": "Willkommen bei",
   "login.title": "Melden Sie sich bei Ihrem Konto an",
   "login.email": "E-Mail",
@@ -492,5 +493,15 @@
   "prompt-execution.prompt-tool.image": "Bild erstellen",
   "prompt-execution.prompt-tool.web-search": "Websuche",
   "prompt-execution.prompt-tool.thinking": "Denken",
-  "prompt-execution.upload-file.supportted-files-input": "PDF, JSON, TXT, PNG, SVG, JPEG, CSV, DOCX, XLSX, PPTX"
+  "prompt-execution.upload-file.supportted-files-input": "PDF, JSON, TXT, PNG, SVG, JPEG, CSV, DOCX, XLSX, PPTX",
+  "settings.transcription.subtitle-editor": "Untertitel Editor",
+  "subtitle-editor.edit-subtitles": "Untertitel bearbeiten",
+  "subtitle-editor.files-ready": "Dateien bereit",
+  "subtitle-editor.transcription-result-srt": "Transkriptionsergebnis (SRT)",
+  "subtitle-editor.transcription-result-ass": "Transkriptionsergebnis (ASS)",
+  "subtitle-editor.from-transcription": "Von Transkription",
+  "subtitle-editor.preloaded": "Vorgeladen",
+  "subtitle-editor.audio-for-sync": "Audio für Synchronisation",
+  "subtitle-editor.audio-loaded": "Audio geladen",
+  "subtitle-editor.upload-description": "Laden Sie Ihre Untertiteldateien (ASS- oder SRT-Format) hoch, um mit erweiterten Timeline-Synchronisations- und Formatierungstools zu beginnen."
 }
