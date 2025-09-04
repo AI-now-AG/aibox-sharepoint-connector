@@ -494,6 +494,7 @@
   "prompt-execution.prompt-tool.web-search": "Websuche",
   "prompt-execution.prompt-tool.thinking": "Denken",
   "prompt-execution.upload-file.supportted-files-input": "PDF, JSON, TXT, PNG, SVG, JPEG, CSV, DOCX, XLSX, PPTX",
+  "prompt.save-chat": "Save Chat",
   "settings.transcription.subtitle-editor": "Untertitel Editor",
   "subtitle-editor.edit-subtitles": "Untertitel bearbeiten",
   "subtitle-editor.files-ready": "Dateien bereit",
