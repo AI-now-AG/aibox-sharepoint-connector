@@ -21,17 +21,17 @@
   let { srtFileUrl: preloadedSrtUrl, assFileUrl: preloadedAssUrl, hasPreloadedAudio }: Props = $props();
 
   // State variables
-  let uploadedFiles: UploadedFile[] = $state([]);
+  let uploadedFile: UploadedFile | null = $state(null);
   let isDragOver = $state(false);
   let fileErrorMessage = $state("");
   let showEditor = $state(false);
   let isTransitioning = $state(false);
   let preloadedAudioFile: File | undefined = $state();
 
-  // Derived state - prioritize uploaded files over preloaded URLs
-  let assFileUrl = $derived(uploadedFiles.find(f => f.type === 'ass')?.url || preloadedAssUrl);
-  let srtFileUrl = $derived(uploadedFiles.find(f => f.type === 'srt')?.url || preloadedSrtUrl);
-  let hasFiles = $derived(uploadedFiles.length > 0 || !!(preloadedAssUrl || preloadedSrtUrl));
+  // Derived state - prioritize uploaded file over preloaded URLs
+  let assFileUrl = $derived(uploadedFile?.type === 'ass' ? uploadedFile.url : preloadedAssUrl);
+  let srtFileUrl = $derived(uploadedFile?.type === 'srt' ? uploadedFile.url : preloadedSrtUrl);
+  let hasFiles = $derived(!!uploadedFile || !!(preloadedAssUrl || preloadedSrtUrl));
 
   // File validation
   function validateFile(file: File): string | null {
@@ -50,37 +50,38 @@
     return null;
   }
 
-  // Handle file selection
+  // Handle file selection - single file only
   function handleFiles(files: FileList) {
     fileErrorMessage = "";
 
-    for (const file of Array.from(files)) {
-      const error = validateFile(file);
-      if (error) {
-        fileErrorMessage = error;
-        continue;
-      }
+    // Only process the first file (single file upload)
+    const file = files[0];
+    if (!file) return;
 
-      // Check for duplicates
-      const exists = uploadedFiles.some(f => f.file.name === file.name);
-      if (exists) {
-        fileErrorMessage = `File "${file.name}" is already uploaded.`;
-        continue;
-      }
-
-      // Create object URL for the file
-      const url = URL.createObjectURL(file);
-      const type = file.name.toLowerCase().endsWith('.ass') ? 'ass' : 'srt';
-      
-      uploadedFiles = [...uploadedFiles, { file, url, type }];
+    const error = validateFile(file);
+    if (error) {
+      fileErrorMessage = error;
+      return;
     }
+
+    // Clean up previous file URL if exists
+    if (uploadedFile) {
+      URL.revokeObjectURL(uploadedFile.url);
+    }
+
+    // Create object URL for the new file
+    const url = URL.createObjectURL(file);
+    const type = file.name.toLowerCase().endsWith('.ass') ? 'ass' : 'srt';
+    
+    uploadedFile = { file, url, type };
   }
 
   // Remove file
-  function removeFile(index: number) {
-    const removed = uploadedFiles[index];
-    URL.revokeObjectURL(removed.url);
-    uploadedFiles = uploadedFiles.filter((_, i) => i !== index);
+  function removeFile() {
+    if (uploadedFile) {
+      URL.revokeObjectURL(uploadedFile.url);
+      uploadedFile = null;
+    }
   }
 
   // File input change handler
@@ -166,7 +167,9 @@
 
   // Cleanup URLs on component destroy
   function cleanup() {
-    uploadedFiles.forEach(item => URL.revokeObjectURL(item.url));
+    if (uploadedFile) {
+      URL.revokeObjectURL(uploadedFile.url);
+    }
   }
 
   // Cleanup when component is destroyed
@@ -367,7 +370,6 @@
           type="file"
           class="absolute inset-0 z-50 w-full h-full p-0 m-0 outline-hidden opacity-0 cursor-pointer"
           accept=".ass,.srt"
-          multiple
           onchange={onFileInputChange}
         />
 
@@ -378,7 +380,7 @@
           <p class="text-base font-semibold text-center transition-colors duration-200">
             {t("subtitle-editor.drag-drop-subtitle")} <span class="text-primary hover:text-primary/80 transition-colors duration-200">{t("subtitle-editor.browse")}</span>
           </p>
-          <p class="text-sm text-base-content/40 mt-1 transition-opacity duration-200 hover:opacity-60">
+          <p class="text-sm text-base-content/60 mt-1 transition-opacity duration-200 hover:opacity-60">
             {t("subtitle-editor.supported-formats")}
           </p>
           <p class="text-xs text-base-content/40 mt-8 transition-opacity duration-200 hover:opacity-60">
@@ -403,7 +405,7 @@
         </h3>
         <div class="space-y-2">
           <!-- Preloaded Files -->
-          {#if preloadedSrtUrl && !uploadedFiles.find(f => f.type === 'srt')}
+          {#if preloadedSrtUrl && uploadedFile?.type !== 'srt'}
             <div class="file-item flex items-center justify-between p-2 border rounded-lg bg-info/20">
               <div class="flex items-center">
                 <div class="shrink-0 p-2 rounded-md">
@@ -420,7 +422,7 @@
             </div>
           {/if}
           
-          {#if preloadedAssUrl && !uploadedFiles.find(f => f.type === 'ass')}
+          {#if preloadedAssUrl && uploadedFile?.type !== 'ass'}
             <div class="file-item flex items-center justify-between p-2 border rounded-lg bg-info/20">
               <div class="flex items-center">
                 <div class="shrink-0 p-2 rounded-md">
@@ -457,23 +459,23 @@
             </div>
           {/if}
 
-          <!-- Uploaded Files -->
-          {#each uploadedFiles as item, index}
+          <!-- Uploaded File -->
+          {#if uploadedFile}
             <div class="file-item flex items-center justify-between p-2 border rounded-lg bg-accent/30">
               <div class="flex items-center">
                 <div class="shrink-0 p-2 rounded-md">
                   {@html svgIcons.document}
                 </div>
                 <div class="ml-4">
-                  <p class="font-medium">{item.file.name}</p>
+                  <p class="font-medium">{uploadedFile.file.name}</p>
                   <p class="text-sm text-base-content/60">
-                    {formatFileSize(item.file.size)} MB • {item.type.toUpperCase()}
+                    {formatFileSize(uploadedFile.file.size)} MB • {uploadedFile.type.toUpperCase()}
                   </p>
                 </div>
               </div>
               <button 
                 class="btn btn-ghost btn-sm hover:bg-error/20 hover:text-error transition-all duration-200" 
-                onclick={() => removeFile(index)}
+                onclick={removeFile}
                 aria-label="Remove file"
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -481,7 +483,7 @@
                 </svg>
               </button>
             </div>
-          {/each}
+          {/if}
         </div>
       </div>
     {/if}
