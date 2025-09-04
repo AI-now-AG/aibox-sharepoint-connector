@@ -65,11 +65,11 @@ export default {
       .sort({ created_at: -1 });
   },
 
-  get: async (id: string): Promise<Conversation | null> => {
+  get: async (id: string | ObjectId): Promise<Conversation | null> => {
     if (!ObjectId.isValid(id)) {
       return null;
     }
-    const _id = new ObjectId(id);
+    const _id = new toObjectId(id);
     const doc = await collection.findOne<Document<Conversation>>({ _id });
     if (!doc) return null;
     return doc;
