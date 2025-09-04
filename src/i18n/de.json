@@ -510,7 +510,6 @@
   "subtitle-editor.replace-placeholder": "Ersetzungstext",
   "subtitle-editor.replace-button": "Ersetzen",
   "subtitle-editor.export-both-formats": "Beide Formate exportieren",
-  "subtitle-editor.or": "ODER",
   "subtitle-editor.ass-only": "Nur ASS",
   "subtitle-editor.srt-only": "Nur SRT",
   "subtitle-editor.switch-layout": "Layout wechseln",
@@ -560,5 +559,14 @@
   "subtitle-editor.browse": "durchsuchen",
   "subtitle-editor.supported-formats": "Unterstützte Formate: .ass, .srt",
   "subtitle-editor.max-file-size-10mb": "Maximale Dateigröße: 10 MB pro Datei",
-  "subtitle-editor.open-subtitle-editor": "Untertitel-Editor öffnen"
+  "subtitle-editor.open-subtitle-editor": "Untertitel-Editor öffnen",
+  "subtitle-editor.subtitle-overlay-menu": "Untertitel",
+  "subtitle-editor.show-subtitles-on-video": "Untertitel im Video anzeigen",
+  "subtitle-editor.subtitle-position": "Position",
+  "subtitle-editor.position-bottom": "Unten",
+  "subtitle-editor.position-center": "Mitte",
+  "subtitle-editor.position-top": "Oben",
+  "subtitle-editor.subtitle-appearance": "Aussehen",
+  "subtitle-editor.font-size": "Schriftgröße",
+  "subtitle-editor.background-opacity": "Hintergrund"
 }

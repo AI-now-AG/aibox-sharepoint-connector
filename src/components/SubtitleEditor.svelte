@@ -62,6 +62,14 @@
   let mediaFileInput = $state<HTMLInputElement>();
   let isDragOver = $state(false);
 
+  // Subtitle overlay state
+  let showSubtitleOverlay = $state(true);
+  let subtitleFontSize = $state(24);
+  let subtitlePosition = $state<"bottom" | "top" | "center">("bottom");
+  let subtitleBackgroundOpacity = $state(0.8);
+  let subtitleTextColor = $state("#FFFFFF");
+  let subtitleOutlineColor = $state("#000000");
+
   // Drag and drop handlers for media upload
   function onDragOver(event: DragEvent) {
     event.preventDefault();
@@ -304,6 +312,28 @@
     if (row) {
       row.scrollIntoView({ behavior: "smooth", block: "center" });
     }
+  }
+
+  function getCurrentSubtitleText(): string {
+    if (!showSubtitleOverlay || currentRowIndices.length === 0) return "";
+
+    // Get all currently active subtitles
+    const activeSubtitles = currentRowIndices
+      .map(index => dialogues[index])
+      .filter(dialogue => dialogue && dialogue.text.trim());
+
+    if (activeSubtitles.length === 0) return "";
+
+    // Join multiple active subtitles with line breaks
+    return activeSubtitles
+      .map(dialogue => {
+        // Convert ASS/SRT line breaks to HTML line breaks
+        return dialogue.text
+          .replace(/\\N/g, '\n')
+          .replace(/\\n/g, '\n')
+          .trim();
+      })
+      .join('\n');
   }
 
   function togglePlayPause() {
@@ -572,20 +602,56 @@
       </div>
       <button onclick={searchAndReplace} class="btn btn-primary btn-sm">{t("subtitle-editor.replace-button")}</button>
       
+      <!-- Export Dropdown -->
+      <div class="dropdown dropdown-end">
+        <div tabindex="0" role="button" class="btn btn-success btn-sm">
+          {@html svgIcons.fileExport} Export
+        </div>
+        <ul class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-64">
+          <!-- Both formats option -->
+          <li>
+            <button onclick={exportBothFormats} class="flex items-center gap-2">
+              {@html svgIcons.fileExport}
+              <span>{t("subtitle-editor.export-both-formats")}</span>
+            </button>
+          </li>
+          
+          {#if assFileUrl}
+            <!-- ASS format available - show individual ASS export -->
+            <li>
+              <button onclick={exportAsASS} class="flex items-center gap-2">
+                {@html svgIcons.fileExport}
+                <span>{t("subtitle-editor.ass-only")}</span>
+              </button>
+            </li>
+          {:else if srtFileUrl}
+            <!-- SRT format available - show individual SRT export -->
+            <li>
+              <button onclick={exportAsSRT} class="flex items-center gap-2">
+                {@html svgIcons.fileExport}
+                <span>{t("subtitle-editor.srt-only")}</span>
+              </button>
+            </li>
+          {:else}
+            <!-- No source format - show both individual options -->
+            <li>
+              <button onclick={exportAsASS} class="flex items-center gap-2">
+                {@html svgIcons.fileExport}
+                <span>{t("subtitle-editor.ass-only")}</span>
+              </button>
+            </li>
+            <li>
+              <button onclick={exportAsSRT} class="flex items-center gap-2">
+                {@html svgIcons.fileExport}
+                <span>{t("subtitle-editor.srt-only")}</span>
+              </button>
+            </li>
+          {/if}
+        </ul>
+      </div>
+      
       <!-- Layout Controls and Close Button -->
       <div class="flex items-center gap-2 ml-auto">
-        {#if mediaType === "video" && mediaSrc}
-          <div class="dropdown dropdown-end">
-            <div tabindex="0" role="button" class="btn btn-sm btn-ghost">
-              {t("subtitle-editor.switch-layout")} ⚙️
-            </div>
-            <ul class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
-              <li><button onclick={() => { useSideBySideLayout = false; isVideoMinimized = false; }}>{t("subtitle-editor.standard-video-top")}</button></li>
-              <li><button onclick={() => { useSideBySideLayout = true; isVideoMinimized = false; }}>{t("subtitle-editor.side-by-side")}</button></li>
-              <li><button onclick={() => { useSideBySideLayout = false; isVideoMinimized = true; }}>{t("subtitle-editor.minimized-video")}</button></li>
-            </ul>
-          </div>
-        {/if}
         {#if onClose}
           <button
             class="btn btn-sm btn-circle btn-ghost"
@@ -609,52 +675,23 @@
         {/if}
       </div>
     </div>
-
-    <!-- Export Controls -->
-    <div class="export-controls flex items-center gap-4">
-      <!-- Always show both formats option -->
-      <button onclick={exportBothFormats} class="btn btn-primary btn-sm">
-        {@html svgIcons.fileExport} {t("subtitle-editor.export-both-formats")}
-      </button>
-      <div class="">{t("subtitle-editor.or")}</div>
-      
-      {#if assFileUrl}
-        <!-- ASS format available - show individual ASS export -->
-        <button onclick={exportAsASS} class="btn btn-success btn-sm">
-          {@html svgIcons.fileExport} {t("subtitle-editor.ass-only")}
-        </button>
-      {:else if srtFileUrl}
-        <!-- SRT format available - show individual SRT export -->
-        <button onclick={exportAsSRT} class="btn btn-info btn-sm">
-          {@html svgIcons.fileExport} {t("subtitle-editor.srt-only")}
-        </button>
-      {:else}
-        <!-- No source format - show both individual options -->
-        <button onclick={exportAsASS} class="btn btn-success btn-sm">
-          {@html svgIcons.fileExport} {t("subtitle-editor.ass-only")}
-        </button>
-        <button onclick={exportAsSRT} class="btn btn-info btn-sm">
-          {@html svgIcons.fileExport} {t("subtitle-editor.srt-only")}
-        </button>
-      {/if}
-    </div>
   </div>
 
   <!-- Main Content Area with Layout Switching -->
   <div class="flex-1 flex {useSideBySideLayout ? 'flex-row gap-4' : 'flex-col'} min-h-0">
     <!-- Subtitle Table -->
-    <div class="flex-1 bg-base-200 rounded-lg p-4 overflow-auto {useSideBySideLayout ? 'min-w-0' : ''} {isVideoMinimized ? 'min-h-96' : 'min-h-64'}">
+    <div class="flex-1 bg-base-200 rounded-lg p-4 overflow-auto {useSideBySideLayout ? 'min-w-96' : ''} {isVideoMinimized ? 'min-h-96' : 'min-h-64'}">
       <h3 class="text-lg font-semibold mb-3">{t("subtitle-editor.subtitle-table")}</h3>
       {#if dialogues.length > 0}
         <div class="overflow-x-auto">
-          <table class="table table-xs w-full">
+          <table class="table table-xs w-full min-w-[800px]">
             <thead>
               <tr class="bg-base-300">
                 {#if hasMedia}
-                  <th class="w-16 min-w-16 text-center">{t("subtitle-editor.play")}</th>
+                  <th class="w-16 min-w-16"></th>
                 {/if}
                 <th class="w-32 min-w-32">{t("subtitle-editor.start")}</th>
-                <th class="min-w-0 flex-1">{t("subtitle-editor.text")}</th>
+                <th class="min-w-80 flex-1">{t("subtitle-editor.text")}</th>
                 <th class="w-32 min-w-32">{t("subtitle-editor.end")}</th>
                 <th class="w-24 min-w-24 text-center">{t("subtitle-editor.chars")}</th>
                 <th class="w-28 min-w-28 text-center">{t("subtitle-editor.actions")}</th>
@@ -696,7 +733,7 @@
                       placeholder="0:00:00"
                     />
                   </td>
-                  <td class="p-1 min-w-0 flex-1">
+                  <td class="p-1 min-w-80 flex-1">
                     <textarea
                       bind:value={dialogue.text}
                       onclick={(e) => e.stopPropagation()}
@@ -770,30 +807,141 @@
     </div>
 
     <!-- Media Player Section -->
-    <div class="media-section bg-base-200 rounded-lg {useSideBySideLayout ? 'w-96 flex-shrink-0 p-4' : isVideoMinimized ? 'mt-4 flex-shrink-0 h-auto p-2' : 'mt-4 flex-shrink-0 p-4'}">
+    <div class="media-section bg-base-200 rounded-lg {useSideBySideLayout ? 'w-[480px] flex-shrink-0 p-4' : isVideoMinimized ? 'mt-4 flex-shrink-0 h-auto p-2' : 'mt-4 flex-shrink-0 p-4'}">
       {#if hasMedia}
         <!-- Media Status Header -->
-        <div class="flex items-center justify-between">
-          <h3 class="text-lg font-semibold mb-4">{t("subtitle-editor.media-player")}</h3>
-          <div class="flex items-center gap-2">
-            <div class="badge badge-success badge-sm gap-1">
-              <div class="w-2 h-2 bg-success-content rounded-full"></div>
-              {mediaType.toUpperCase()} {t("subtitle-editor.loaded")}
+        <div class="flex flex-col gap-3">
+          <!-- Top Row: Controls -->
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-semibold">{t("subtitle-editor.media-player")}</h3>
+            <div class="flex items-center gap-2">
+              {#if mediaType === "video" && dialogues.length > 0}
+                <!-- Subtitle Overlay Controls -->
+                <div class="dropdown dropdown-end">
+                  <div tabindex="0" role="button" class="btn btn-xs btn-ghost">
+                    📄 {t("subtitle-editor.subtitle-overlay-menu")}
+                  </div>
+                  <ul class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-64">
+                    <li>
+                      <label class="cursor-pointer flex items-center gap-2">
+                        <input 
+                          type="checkbox" 
+                          bind:checked={showSubtitleOverlay} 
+                          class="checkbox checkbox-sm"
+                        />
+                        <span>{t("subtitle-editor.show-subtitles-on-video")}</span>
+                      </label>
+                    </li>
+                    {#if showSubtitleOverlay}
+                      <li class="menu-title">
+                        <span>{t("subtitle-editor.subtitle-position")}</span>
+                      </li>
+                      <li>
+                        <label class="cursor-pointer flex items-center gap-2">
+                          <input 
+                            type="radio" 
+                            bind:group={subtitlePosition} 
+                            value="bottom" 
+                            name="subtitle-position"
+                            class="radio radio-sm"
+                          />
+                          <span>{t("subtitle-editor.position-bottom")}</span>
+                        </label>
+                      </li>
+                      <li>
+                        <label class="cursor-pointer flex items-center gap-2">
+                          <input 
+                            type="radio" 
+                            bind:group={subtitlePosition} 
+                            value="center" 
+                            name="subtitle-position"
+                            class="radio radio-sm"
+                          />
+                          <span>{t("subtitle-editor.position-center")}</span>
+                        </label>
+                      </li>
+                      <li>
+                        <label class="cursor-pointer flex items-center gap-2">
+                          <input 
+                            type="radio" 
+                            bind:group={subtitlePosition} 
+                            value="top" 
+                            name="subtitle-position"
+                            class="radio radio-sm"
+                          />
+                          <span>{t("subtitle-editor.position-top")}</span>
+                        </label>
+                      </li>
+                      <li class="menu-title">
+                        <span>{t("subtitle-editor.subtitle-appearance")}</span>
+                      </li>
+                      <li>
+                        <label class="cursor-pointer">
+                          <div class="flex items-center justify-between">
+                            <span>{t("subtitle-editor.font-size")}</span>
+                            <span class="text-xs">{subtitleFontSize}px</span>
+                          </div>
+                          <input 
+                            type="range" 
+                            bind:value={subtitleFontSize}
+                            min="12" 
+                            max="48" 
+                            step="2"
+                            class="range range-xs"
+                          />
+                        </label>
+                      </li>
+                      <li>
+                        <label class="cursor-pointer">
+                          <div class="flex items-center justify-between">
+                            <span>{t("subtitle-editor.background-opacity")}</span>
+                            <span class="text-xs">{Math.round(subtitleBackgroundOpacity * 100)}%</span>
+                          </div>
+                          <input 
+                            type="range" 
+                            bind:value={subtitleBackgroundOpacity}
+                            min="0" 
+                            max="1" 
+                            step="0.1"
+                            class="range range-xs"
+                          />
+                        </label>
+                      </li>
+                    {/if}
+                  </ul>
+                </div>
+              {/if}
+              
+              {#if mediaType === "video"}
+                <!-- Layout Switch Controls -->
+                <div class="dropdown dropdown-end">
+                  <div tabindex="0" role="button" class="btn btn-xs btn-ghost">
+                    {t("subtitle-editor.switch-layout")} ⚙️
+                  </div>
+                  <ul class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
+                    <li><button onclick={() => { useSideBySideLayout = false; isVideoMinimized = false; }}>{t("subtitle-editor.standard-video-top")}</button></li>
+                    <li><button onclick={() => { useSideBySideLayout = true; isVideoMinimized = false; }}>{t("subtitle-editor.side-by-side")}</button></li>
+                    <li><button onclick={() => { useSideBySideLayout = false; isVideoMinimized = true; }}>{t("subtitle-editor.minimized-video")}</button></li>
+                  </ul>
+                </div>
+              {/if}
             </div>
-            {#if mediaFileName}
-              <div class="text-xs text-base-content/70 max-w-48 truncate" title={mediaFileName}>
-                {mediaFileName}
+          </div>
+          
+          <!-- Bottom Row: Status & Close -->
+          <div class="flex items-center justify-end pb-2">
+            <div class="flex items-center gap-2">
+              <div class="badge badge-success badge-sm gap-1">
+                <div class="w-2 h-2 bg-success-content rounded-full"></div>
+                {mediaType.toUpperCase()} {t("subtitle-editor.loaded")}
               </div>
-            {/if}
-            {#if mediaType === "video"}
-              <button 
-                onclick={() => isVideoMinimized = !isVideoMinimized}
-                class="btn btn-xs btn-ghost"
-                title={isVideoMinimized ? t("subtitle-editor.show-video") : t("subtitle-editor.minimize-video")}
-              >
-                {isVideoMinimized ? "📹➕" : "📹➖"}
-              </button>
-            {/if}
+              {#if mediaFileName}
+                <div class="text-xs text-base-content/70 max-w-48 truncate" title={mediaFileName}>
+                  {mediaFileName}
+                </div>
+              {/if}
+            </div>
+            
             <button
               onclick={() => {
                 if (mediaSrc && mediaSrc.startsWith("blob:")) {
@@ -819,18 +967,55 @@
           <!-- Media Element -->
         {#if mediaType === "video"}
           {#if !isVideoMinimized}
-            <!-- svelte-ignore a11y_media_has_caption -->
-            <video
-              bind:this={mediaPlayer}
-              src={mediaSrc}
-              class="max-w-full {useSideBySideLayout ? 'max-h-48' : 'max-h-24'} bg-black rounded shadow-lg"
-              controls
-              ontimeupdate={handleTimeUpdate}
-              onplay={() => (isPlaying = true)}
-              onpause={() => (isPlaying = false)}
-              onloadedmetadata={() => (duration = mediaPlayer?.duration || 0)}
-            >
-            </video>
+            <!-- Video Container with Subtitle Overlay -->
+            <div class="relative inline-block max-w-full">
+              <!-- svelte-ignore a11y_media_has_caption -->
+              <video
+                bind:this={mediaPlayer}
+                src={mediaSrc}
+                class="w-full {useSideBySideLayout ? 'max-h-80 max-w-[440px]' : 'max-h-96 max-w-full'} bg-black rounded shadow-lg block"
+                controls
+                ontimeupdate={handleTimeUpdate}
+                onplay={() => (isPlaying = true)}
+                onpause={() => (isPlaying = false)}
+                onloadedmetadata={() => (duration = mediaPlayer?.duration || 0)}
+              >
+              </video>
+              
+              <!-- Subtitle Overlay -->
+              {#if showSubtitleOverlay && getCurrentSubtitleText()}
+                <div 
+                  class="absolute left-0 right-0 pointer-events-none z-10 px-4 py-2 flex justify-center
+                    {subtitlePosition === 'bottom' ? 'bottom-4' : 
+                     subtitlePosition === 'top' ? 'top-4' : 
+                     'top-1/2 -translate-y-1/2'}"
+                >
+                  <div 
+                    class="inline-block text-center leading-tight rounded px-3 py-2 mb-4 max-w-full break-words"
+                    style="
+                      font-size: {subtitleFontSize}px;
+                      color: {subtitleTextColor};
+                      background-color: rgba(0, 0, 0, {subtitleBackgroundOpacity});
+                      text-shadow: 
+                        1px 1px 0 {subtitleOutlineColor},
+                        -1px 1px 0 {subtitleOutlineColor},
+                        1px -1px 0 {subtitleOutlineColor},
+                        -1px -1px 0 {subtitleOutlineColor},
+                        2px 2px 4px rgba(0, 0, 0, 0.8);
+                      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+                      font-weight: bold;
+                      word-wrap: break-word;
+                      hyphens: auto;
+                      max-width: calc(100% - 2rem);
+                    "
+                  >
+                    {#each getCurrentSubtitleText().split('\n') as line}
+                      <div>{line}</div>
+                    {/each}
+                  </div>
+                </div>
+              {/if}
+            </div>
           {:else}
             <!-- Minimized video - just show a small thumbnail/placeholder -->
             <div class="flex items-center gap-3 bg-base-300 p-3 rounded-lg w-full">

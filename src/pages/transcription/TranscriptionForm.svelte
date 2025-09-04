@@ -1658,10 +1658,11 @@
         <!-- Subtitle Editor Button -->
         {#if (assFileUrl || srtFileUrl) && audioFile && $tenant?.subtitle_editor}
           <button
-            class="btn btn-primary btn-sm"
+            class="btn bg-neutral btn-sm text-white"
             onclick={openSubtitleEditor}
           >
-            {@html svgIcons.edit} {t("subtitle-editor.edit-subtitles")}
+            <!-- {@html svgIcons.edit} {t("subtitle-editor.edit-subtitles")} -->
+            {@html svgIcons.edit} {t("settings.transcription.subtitle-editor")}
           </button>
         {/if}
       {/if}
