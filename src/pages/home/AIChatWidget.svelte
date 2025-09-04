@@ -617,6 +617,10 @@
       behavior: "smooth",
     });
   }
+
+  function saveConversation() {
+    
+  }
 </script>
 
 <div class="grid grid-cols-1 grid-rows-[1fr_min-content] h-full">
@@ -674,6 +678,13 @@
             disabled={isFetching}
           >
             {t("home.new-chat")}
+          </button>
+          <button
+            onclick={saveConversation}
+            class="btn btn-outline btn-primary btn-sm px-8"
+            disabled={isGenerating || isFetching}
+          >
+            {t("prompt.save-chat")}
           </button>
           <div class="mt-2">
             <ScrollToBottom />

@@ -4,7 +4,7 @@ import { MessageRole } from "$types/MessageHistory";
 import { z } from "zod";
 
 // Zod schema for a single Message
-const MessageSchema = z.object({
+export const MessageSchema = z.object({
   role: z.nativeEnum(MessageRole),
   content: z.string(),
   rawData: z.string().optional(),
@@ -23,17 +23,34 @@ const ChatConversationSchema = z.object({
   updated_at: z.date().optional(),
 });
 
-export type ChatConversation = z.infer<typeof ChatConversationSchema>;
+export type Message = z.infer<typeof MessageSchema>;
+export type Conversation = z.infer<typeof ChatConversationSchema>;
 
-const collection = db.collection("chat_conversations");
+const collection = db.collection("conversations");
 
 export default {
-  create: async (conversation: ChatConversation) => {
+  create: async (conversation: Partial<Omit<Conversation, "_id">>) => {
     const validated = ChatConversationSchema.parse(conversation);
     const doc = {
       ...validated,
     };
     return collection.insertOne(doc);
+  },
+
+  update: async (id: string | ObjectId, update: Partial<Conversation>) => {
+    const objectId = toObjectId(id);
+    const validated = ChatConversationSchema.partial().parse(update);
+    const doc = {
+      ...validated,
+      updated_at: new Date(),
+    };
+    return await collection.findOneAndUpdate(
+      { _id: objectId },
+      { $set: doc },
+      {
+        returnDocument: "after",
+      },
+    );
   },
 
   remove: async (id: string) => {
@@ -44,16 +61,16 @@ export default {
   listByUser: async (userId: string | ObjectId) => {
     const _userId = toObjectId(userId);
     return collection
-      .find<Document<ChatConversation>>({ creator_id: _userId })
+      .find<Document<Conversation>>({ creator_id: _userId })
       .sort({ created_at: -1 });
   },
 
-  get: async (id: string): Promise<ChatConversation | null> => {
+  get: async (id: string): Promise<Conversation | null> => {
     if (!ObjectId.isValid(id)) {
       return null;
     }
     const _id = new ObjectId(id);
-    const doc = await collection.findOne<Document<ChatConversation>>({ _id });
+    const doc = await collection.findOne<Document<Conversation>>({ _id });
     if (!doc) return null;
     return doc;
   },

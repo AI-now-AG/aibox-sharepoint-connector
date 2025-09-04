@@ -69,7 +69,7 @@
     });
   }
 
-  function persistChatHistory() {
+  function saveConversation() {
     
   }
 </script>
@@ -103,7 +103,7 @@
           {t("home.new-chat")}
         </button>
         <button
-          onclick={persistChatHistory}
+          onclick={saveConversation}
           class="btn btn-active btn-primary btn-sm px-8"
           disabled={isGenerating || isFetching}
         >
