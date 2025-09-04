@@ -14,6 +14,7 @@
   } from "$utils/subtitleParser";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
+  import ConfirmDialog from "$components/ConfirmDialog.svelte";
 
   const t = useTranslations();
 
@@ -64,11 +65,15 @@
 
   // Subtitle overlay state
   let showSubtitleOverlay = $state(true);
-  let subtitleFontSize = $state(24);
+  let subtitleFontSize = $state(16);
   let subtitlePosition = $state<"bottom" | "top" | "center">("bottom");
-  let subtitleBackgroundOpacity = $state(0.8);
+  let subtitleBackgroundOpacity = $state(0.6);
   let subtitleTextColor = $state("#FFFFFF");
   let subtitleOutlineColor = $state("#000000");
+
+  // Delete confirmation modal state
+  let deleteConfirmModal = $state<HTMLDialogElement>();
+  let deleteIndex = $state<number | null>(null);
 
   // Drag and drop handlers for media upload
   function onDragOver(event: DragEvent) {
@@ -286,6 +291,7 @@
   }
 
   function updateCurrentRows() {
+    const previousRowIndex = currentRowIndex;
     currentRowIndices = [];
 
     dialogues.forEach((dialogue, index) => {
@@ -298,8 +304,16 @@
     });
 
     if (currentRowIndices.length > 0) {
-      currentRowIndex = currentRowIndices[0];
+      // If the previously selected row is still active, keep it selected
+      // Otherwise, select the first active row
+      if (previousRowIndex !== null && currentRowIndices.includes(previousRowIndex)) {
+        currentRowIndex = previousRowIndex;
+      } else {
+        currentRowIndex = currentRowIndices[0];
+      }
     //   scrollToCurrentRow();
+    } else {
+      currentRowIndex = null;
     }
   }
 
@@ -426,12 +440,19 @@
   }
 
   function deleteRow(index: number) {
-    if (confirm(t("subtitle-editor.delete-confirm"))) {
-      dialogues.splice(index, 1);
+    deleteIndex = index;
+    deleteConfirmModal?.showModal();
+  }
+
+  function confirmDelete() {
+    if (deleteIndex !== null) {
+      dialogues.splice(deleteIndex, 1);
       dialogues = [...dialogues];
-      statusText = t("subtitle-editor.subtitle-deleted", { index: index + 1 });
+      statusText = t("subtitle-editor.subtitle-deleted", { index: deleteIndex + 1 });
       setTimeout(() => statusText = "", 3000);
+      deleteIndex = null;
     }
+    deleteConfirmModal?.close();
   }
 
   function addRowAfter(index: number) {
@@ -579,7 +600,7 @@
   <!-- Controls Section -->
   <div class="controls-section bg-base-200 p-4 rounded-lg mb-4">
     <!-- Search and Replace with Close Button -->
-    <div class="search-replace flex items-center gap-4 mb-4">
+    <div class="search-replace flex items-center gap-4">
       <div class="flex items-center gap-2">
         <label for="search">{t("subtitle-editor.search")}:</label>
         <input
@@ -681,7 +702,6 @@
   <div class="flex-1 flex {useSideBySideLayout ? 'flex-row gap-4' : 'flex-col'} min-h-0">
     <!-- Subtitle Table -->
     <div class="flex-1 bg-base-200 rounded-lg p-4 overflow-auto {useSideBySideLayout ? 'min-w-96' : ''} {isVideoMinimized ? 'min-h-96' : 'min-h-64'}">
-      <h3 class="text-lg font-semibold mb-3">{t("subtitle-editor.subtitle-table")}</h3>
       {#if dialogues.length > 0}
         <div class="overflow-x-auto">
           <table class="table table-xs w-full min-w-[800px]">
@@ -701,7 +721,7 @@
               {#each dialogues as dialogue, index}
                 <tr
                   data-row-index={index}
-                  class="hover:bg-base-200 cursor-pointer transition-colors duration-200 {currentRowIndices.includes(index)
+                  class="hover:bg-base-200 cursor-pointer transition-colors duration-200 {currentRowIndex === index
                     ? 'bg-accent text-accent-content shadow-lg border-l-4 border-accent-focus'
                     : ''}"
                   onclick={() => highlightRow(index)}
@@ -727,7 +747,7 @@
                       type="text"
                       bind:value={dialogue.start}
                       onclick={(e) => e.stopPropagation()}
-                      class="input w-full {currentRowIndices.includes(index) 
+                      class="input w-full min-w-30 {currentRowIndex === index 
                         ? 'input-bordered bg-base-100 text-base-content' 
                         : ''}"
                       placeholder="0:00:00"
@@ -741,7 +761,7 @@
                         // Trigger reactivity for character count updates
                         updateTrigger++;
                       }}
-                      class="textarea w-full resize-none leading-tight {currentRowIndices.includes(index) 
+                      class="textarea w-full resize-none leading-tight py-1 px-2 min-h-0 {currentRowIndex === index 
                         ? 'textarea-bordered bg-base-100 text-base-content' 
                         : ''}"
                       rows="2"
@@ -753,14 +773,14 @@
                       type="text"
                       bind:value={dialogue.end}
                       onclick={(e) => e.stopPropagation()}
-                      class="input w-full {currentRowIndices.includes(index) 
+                      class="input w-full min-w-30 {currentRowIndex === index 
                         ? 'input-bordered bg-base-100 text-base-content' 
                         : ''}"
                       placeholder="0:00:00"
                     />
                   </td>
                   <td class="p-1 text-center">
-                    <div class="text-sm font-mono {currentRowIndices.includes(index) 
+                    <div class="text-sm font-mono {currentRowIndex === index 
                       ? 'font-bold text-accent-content' 
                       : getCharCountClass(dialogue, updateTrigger)}">
                       {#if dialogue.text.split(/\\N|\\n|\r\n|\r|\n/).length > 1}
@@ -810,7 +830,7 @@
     <div class="media-section bg-base-200 rounded-lg {useSideBySideLayout ? 'w-[480px] flex-shrink-0 p-4' : isVideoMinimized ? 'mt-4 flex-shrink-0 h-auto p-2' : 'mt-4 flex-shrink-0 p-4'}">
       {#if hasMedia}
         <!-- Media Status Header -->
-        <div class="flex flex-col gap-3">
+        <div class="flex flex-col gap-2">
           <!-- Top Row: Controls -->
           <div class="flex items-center justify-between">
             <h3 class="text-lg font-semibold">{t("subtitle-editor.media-player")}</h3>
@@ -872,7 +892,7 @@
                           <span>{t("subtitle-editor.position-top")}</span>
                         </label>
                       </li>
-                      <li class="menu-title">
+                      <!-- <li class="menu-title">
                         <span>{t("subtitle-editor.subtitle-appearance")}</span>
                       </li>
                       <li>
@@ -906,7 +926,7 @@
                             class="range range-xs"
                           />
                         </label>
-                      </li>
+                      </li> -->
                     {/if}
                   </ul>
                 </div>
@@ -1171,3 +1191,11 @@
   </div>
 </div>
 </div>
+
+<!-- Delete Confirmation Modal -->
+<ConfirmDialog
+  bind:modal={deleteConfirmModal}
+  confirm={confirmDelete}
+  title={t("confirmation.delete.title")}
+  description={t("subtitle-editor.delete-confirm")}
+/>
