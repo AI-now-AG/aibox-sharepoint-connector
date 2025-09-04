@@ -6,6 +6,7 @@ import { transcription_settings } from "./transcription_settings";
 import { transcription } from "./transcription";
 import { user } from "./user";
 import { knowledgebase } from "./knowledgebase";
+import { conversation } from "./conversation";
 import { onboarding } from "./onboarding";
 import { usage } from "./usage";
 
@@ -18,6 +19,7 @@ export const server = {
   auth,
   user,
   knowledgebase,
+  conversation,
   onboarding,
   usage,
 };

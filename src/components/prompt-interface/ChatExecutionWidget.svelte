@@ -104,7 +104,7 @@
         </button>
         <button
           onclick={saveConversation}
-          class="btn btn-active btn-primary btn-sm px-8"
+          class="btn btn-primary btn-outline btn-sm px-8"
           disabled={isGenerating || isFetching}
         >
           {t("prompt.save-chat")}

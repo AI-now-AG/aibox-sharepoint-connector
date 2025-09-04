@@ -7,8 +7,8 @@ import { z } from "zod";
 export const MessageSchema = z.object({
   role: z.nativeEnum(MessageRole),
   content: z.string(),
-  rawData: z.string().optional(),
-  imageUrl: z.string().url().optional(),
+  rawData: z.string().nullish().default(null),
+  imageUrl: z.string().nullish().default(null),
 });
 
 // Zod schema for a conversation

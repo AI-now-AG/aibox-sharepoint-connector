@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { v4 as uuidv4 } from "uuid";
+  import { actions } from "astro:actions";
   import {
     messageHistories,
     addMessageToHistory,
@@ -25,6 +25,7 @@
   import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
   import MessageInput from "$components/chat-ui/MessageInput.svelte";
   import MessageList from "$components/chat-ui/MessageList.svelte";
+  import Loading from "$components/Loading.svelte";
   import { tenant, user } from "$stores";
   import { useTranslations } from "$i18n/utils";
   import { ApiKeyProvider } from "$types/TenantFeature";
@@ -79,12 +80,12 @@
   let currentMessageHistory = $derived(
     $messageHistories[promptId] || getMessageHistory(promptId) || [],
   );
-  let uniqueId: string = $state("");
   let prompt: string = $state("");
   let files: File[] = $state([]);
   let currentStreamingImageUrl: string = $state("");
   let isGenerating: boolean = $state(false);
   let isResoningThingking: boolean = $state(false);
+  let loading: boolean = $state(false);
 
   function isGpt5Default() {
     const aiProviders = $tenant?.api_key_providers ?? [];
@@ -614,8 +615,6 @@
 
   // === File Upload Handler ===
   async function submitForm() {
-    uniqueId = uuidv4();
-
     const fileDataList = await Promise.all(
       files.map(async (file) => ({
         name: file.name,
@@ -681,8 +680,23 @@
     });
   }
 
-  function saveConversation() {
-    
+  async function saveConversation() {
+    loading = true;
+    const { error, data } = await actions.conversation.save({
+      prompt_id: currentPrompt._id?.toString() || "",
+      model: currentPrompt.model,
+      messages: currentMessageHistory,
+    });
+    loading = false;
+
+    if (error) {
+      addToast({
+        message: error?.message ?? "Something went wrong",
+        type: "error",
+      });
+    } else {
+      console.log('saveConversation result', data);
+    }
   }
 </script>
 
@@ -713,7 +727,7 @@
       </button>
       <button
         onclick={saveConversation}
-        class="btn btn-active btn-primary btn-sm px-8"
+        class="btn btn-primary btn-outline btn-sm px-8"
         disabled={isGenerating || isFetching}
       >
         {t("prompt.save-chat")}
@@ -746,3 +760,5 @@
     {isResoningThingking}
   />
 {/if}
+
+<Loading show={loading} />

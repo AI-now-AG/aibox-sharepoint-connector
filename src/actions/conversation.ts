@@ -1,11 +1,15 @@
-import { defineAction } from "astro:actions";
+import { defineAction, type ActionAPIContext } from "astro:actions";
 import { z } from "zod";
 import { transformRawData } from "$utils/transformRawData";
 import ConversationModel, {
   type Conversation,
   MessageSchema,
 } from "$data/models/conversation.model";
+import PromptModel from "$data/models/prompt.model";
 import { ObjectId } from "mongodb";
+import { HumanMessage, SystemMessage } from "@langchain/core/messages";
+import { StringOutputParser } from "@langchain/core/output_parsers";
+import initializeOpenAI from "$utils/chatModel";
 
 const ConversationInputIdentifierSchema = z.object({
   _id: z.string(),
@@ -21,24 +25,89 @@ const UpdateConversationSchema = ConversationInputParamsSchema.omit({
   prompt_id: true,
 }).merge(ConversationInputIdentifierSchema);
 
-export const category = {
+const generateConversationTitle = async (
+  ctx: ActionAPIContext,
+  promptTitle: string,
+  userInput: string,
+) => {
+  const model = initializeOpenAI(ctx);
+
+  const instructions = `
+      Generate a short conversation title (max. 50 characters).
+      The title must summarize both the prompt title and the user input. 
+      Write it in the same language as the prompt title. 
+      If the language cannot be determined, default to German.
+  `;
+  const messages = [
+    new SystemMessage(instructions),
+    new HumanMessage(`
+      Prompt title: ${promptTitle}
+      User input: ${userInput}  
+    `),
+  ];
+  const parser = new StringOutputParser();
+  const result = await model.invoke(messages);
+  const description = await parser.invoke(result);
+
+  return description;
+};
+
+export const conversation = {
+  get: defineAction({
+    input: ConversationInputIdentifierSchema,
+    handler: async (input) => {
+      // Fetch a single conversation by its ID
+      const data = await ConversationModel.get(input._id);
+
+      // Normalize and return the conversation
+      return transformRawData(data);
+    },
+  }),
+
+  list: defineAction({
+    handler: async (input, context) => {
+      // Get the current user ID from the request context
+      const userId = context.locals.user.id;
+
+      // Fetch all conversations created by this user
+      const data = await ConversationModel.listByUser(userId);
+
+      // Normalize and return the list of conversations
+      return transformRawData(data);
+    },
+  }),
+
   save: defineAction({
     input: ConversationInputParamsSchema,
     handler: async (input, context) => {
       const { model, messages, prompt_id: promptId } = input;
 
-      if (!promptId) {
-        throw new Error("promptId not found.");
+      // Fetch the prompt definition from the database
+      const prompt = await PromptModel.get(promptId);
+      if (!prompt) {
+        throw new Error("Prompt not found.");
       }
 
+      // Generate a short conversation title based on:
+      // - the stored prompt title
+      // - the most recent user message (last message in the array)
+      const generatedTitle = await generateConversationTitle(
+        context,
+        prompt.title,
+        messages[messages.length - 1].content,
+      );
+
+      // Build the conversation object to be persisted
       const conversation: Partial<Conversation> = {
-        title: "Test",
+        title: generatedTitle || "Test",
         model,
         messages,
         prompt_id: new ObjectId(promptId),
         tenant_id: context.locals.tenant._id,
         creator_id: context.locals.user.id,
       };
+
+      // Save the conversation and return the transformed result
       const insertResult = await ConversationModel.create(conversation);
       return transformRawData(insertResult);
     },
@@ -47,10 +116,15 @@ export const category = {
   update: defineAction({
     input: UpdateConversationSchema,
     handler: async (input) => {
+      // Prepare the fields to update from the validated input
       const update: Partial<Conversation> = {
         ...input,
       };
+
+      // Update the conversation document by ID
       const updatedDocument = await ConversationModel.update(input._id, update);
+
+      // Normalize and return the updated conversation
       return transformRawData(updatedDocument);
     },
   }),
@@ -58,7 +132,10 @@ export const category = {
   delete: defineAction({
     input: ConversationInputIdentifierSchema,
     handler: async (input) => {
+      // Remove the conversation document by ID
       const deleteResult = await ConversationModel.remove(input._id);
+
+      // Normalize and return the deletion result
       return transformRawData(deleteResult);
     },
   }),
