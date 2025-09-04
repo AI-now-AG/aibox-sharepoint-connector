@@ -69,7 +69,7 @@ export default {
     if (!ObjectId.isValid(id)) {
       return null;
     }
-    const _id = new toObjectId(id);
+    const _id = toObjectId(id);
     const doc = await collection.findOne<Document<Conversation>>({ _id });
     if (!doc) return null;
     return doc;
