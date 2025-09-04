@@ -68,6 +68,10 @@
       behavior: "smooth",
     });
   }
+
+  function persistChatHistory() {
+    
+  }
 </script>
 
 {#if currentMessageHistory.length == 0}
@@ -97,6 +101,13 @@
           disabled={isProcessing}
         >
           {t("home.new-chat")}
+        </button>
+        <button
+          onclick={persistChatHistory}
+          class="btn btn-active btn-primary btn-sm px-8"
+          disabled={isGenerating || isFetching}
+        >
+          {t("prompt.save-chat")}
         </button>
       </div>
       <InputArea

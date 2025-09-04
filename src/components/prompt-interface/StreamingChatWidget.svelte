@@ -673,6 +673,10 @@
       behavior: "smooth",
     });
   }
+
+  function persistChatHistory() {
+    
+  }
 </script>
 
 <!-- Output (Follow-Up) -->
@@ -699,6 +703,13 @@
         disabled={isGenerating || isFetching}
       >
         {t("home.new-chat")}
+      </button>
+      <button
+        onclick={persistChatHistory}
+        class="btn btn-active btn-primary btn-sm px-8"
+        disabled={isGenerating || isFetching}
+      >
+        {t("prompt.save-chat")}
       </button>
       <div class="mt-2">
         <ScrollToBottom />
