@@ -8,7 +8,7 @@
   import { readFileContent } from "$utils/fileReader";
   import { PromptModel } from "$types/PromptModel";
   import {
-    formatMarkdown,
+    markdownToHtml,
     buildCitationLinks,
     stripHtmlFormatting,
   } from "$utils/textFormatting";
@@ -198,10 +198,21 @@
     console.log(`🚀 Started with ${data.provider} using ${data.model}`);
   }
 
-  function handleChunkEvent(data: any): void {
+  function handleChunkEvent(data: any, state: StreamingState): void {
     if (data.content && typeof data.content === "string") {
+      // Accumulate the raw text
+      state.messageContent += data.content;
+
+      // Append the raw chunk to the current displayed message
       currentMessage += data.content;
-      currentMessage = formatMarkdown(currentMessage);
+
+      // If the current chunk contains a newline,
+      // re-render the entire accumulated text as HTML.
+      // This avoids trying to parse on every single character
+      // and ensures we only re-render when a natural "block" ends.
+      if (data.content.includes("\n")) {
+        currentMessage = markdownToHtml(state.messageContent);
+      }
     }
   }
 
@@ -326,7 +337,7 @@
     console.log("📚 Citations sent:", citations);
 
     const formattedText = buildCitationLinks(responseText, citations);
-    currentMessage = formatMarkdown(formattedText);
+    currentMessage = markdownToHtml(formattedText);
 
     const newAssistantMessage: Message = {
       role: MessageRole.Assistant,
@@ -344,7 +355,7 @@
   function addAssistantMessage(responseText: string, imageUrl: string): void {
     const newAssistantMessage: Message = {
       role: MessageRole.Assistant,
-      content: formatMarkdown(responseText),
+      content: markdownToHtml(responseText),
       rawData: stripHtmlFormatting(responseText),
       imageUrl,
     };
@@ -411,8 +422,7 @@
 
       case "chunk":
         isResoningThingking = false;
-        handleChunkEvent(data);
-        state.messageContent += data.content || "";
+        handleChunkEvent(data, state);
         break;
 
       case "citations":
