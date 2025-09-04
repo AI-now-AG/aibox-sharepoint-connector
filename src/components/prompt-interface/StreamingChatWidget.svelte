@@ -572,7 +572,7 @@
       const accessToken = $user?.auth0_access_token;
       if (!accessToken) {
         addToast({
-          message: t('auth.session-missing-force-login'),
+          message: t("auth.session-missing-force-login"),
           type: "error",
         });
         setTimeout(() => {
@@ -585,7 +585,7 @@
         headers: {
           "Content-Type": "application/json",
           //"X-API-Key": config.apiKey,
-          "Authorization": `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify(requestBody),
       });
@@ -695,7 +695,8 @@
         type: "error",
       });
     } else {
-      console.log('saveConversation result', data);
+      console.log("saveConversation result", data);
+      window.location.href = `/conversations/${data.insertedId}`;
     }
   }
 </script>

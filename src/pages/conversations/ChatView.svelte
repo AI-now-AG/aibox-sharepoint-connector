@@ -46,5 +46,6 @@
     onsend={submitForm}
     bind:selectedPromptTool
     bind:isDisablePromptTool
+    showDataLossWarning={false}
   />
 </div>

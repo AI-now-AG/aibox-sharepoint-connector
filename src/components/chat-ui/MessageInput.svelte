@@ -19,6 +19,7 @@
     toolOptions?: Array<Option>;
     selectedPromptTool?: PromptToolOption;
     isDisablePromptTool?: boolean;
+    showDataLossWarning?: boolean;
   }
 
   let {
@@ -31,6 +32,7 @@
     toolOptions,
     selectedPromptTool = $bindable(PromptToolOption.None),
     isDisablePromptTool = $bindable(false),
+    showDataLossWarning = true,
   }: Props = $props();
 
   const t = useTranslations();
@@ -167,6 +169,6 @@
   </div>
 </div>
 
-{#if stickyFooter}
+{#if stickyFooter && showDataLossWarning}
   <DataLossWarning />
 {/if}
