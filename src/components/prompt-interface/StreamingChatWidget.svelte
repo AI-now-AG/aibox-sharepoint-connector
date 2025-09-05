@@ -686,6 +686,7 @@
       prompt_id: currentPrompt._id?.toString() || "",
       model: currentPrompt.model,
       messages: currentMessageHistory,
+      previous_response_id: previousResponseId,
     });
     loading = false;
 

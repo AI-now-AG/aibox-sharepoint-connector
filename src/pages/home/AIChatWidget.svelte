@@ -614,6 +614,7 @@
     isFetching = false;
     isGenerating = false;
     $sharedMessageHistory = [];
+    previousResponseId = null;
 
     window.scrollTo({
       top: 0,
@@ -626,6 +627,7 @@
     const { error, data } = await actions.conversation.save({
       model: selectedModel,
       messages: $sharedMessageHistory,
+      previous_response_id: previousResponseId,
     });
     loading = false;
 
