@@ -37,6 +37,7 @@
   />
 
   <div class="sticky bottom-0 bg-base-200">
+    
     <div class="my-4">
       <div class="mt-2">
         <ScrollToBottom />
@@ -56,5 +57,6 @@
         showDataLossWarning={false}
       />
     </div>
+
   </div>
 </div>

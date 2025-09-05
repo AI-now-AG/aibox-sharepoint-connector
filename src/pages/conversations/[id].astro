@@ -21,6 +21,11 @@ const prompt = await PromptModel.get(conversation.prompt_id || "");
   >
     <div class="px-16 py-6 w-full h-full">
       <div class="flex flex-col h-full max-w-6xl mx-auto">
+
+        <h1 class="pt-2 mb-2 lg:pt-8 text-4xl font-bold">
+          {conversation?.title || prompt?.title || ""}
+        </h1>
+
         <ChatView
           conversationId={conversation.prompt_id?.toString()}
           messages={conversation.messages || []}
