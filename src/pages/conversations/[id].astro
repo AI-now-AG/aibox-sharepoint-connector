@@ -11,7 +11,6 @@ const conversation = await ConversationModel.get(id || "");
 if (!conversation || !conversation.creator_id.equals(Astro.locals.user.id)) {
   return Astro.redirect("/404");
 }
-
 const prompt = await PromptModel.get(conversation.prompt_id || "");
 ---
 
@@ -21,13 +20,12 @@ const prompt = await PromptModel.get(conversation.prompt_id || "");
   >
     <div class="px-16 py-6 w-full h-full">
       <div class="flex flex-col h-full max-w-6xl mx-auto">
-
         <h1 class="pt-2 mb-2 lg:pt-8 text-4xl font-bold">
           {conversation?.title || prompt?.title || ""}
         </h1>
 
         <ChatView
-          conversationId={conversation.prompt_id?.toString()}
+          conversationId={id?.toString()}
           messages={conversation.messages || []}
           promptData={prompt}
           client:load

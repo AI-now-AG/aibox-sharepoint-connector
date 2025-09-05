@@ -5,6 +5,9 @@
   import MessageInput from "$components/chat-ui/MessageInput.svelte";
   import MessageList from "$components/chat-ui/MessageList.svelte";
   import { useTranslations } from "$i18n/utils";
+  import { actions } from "astro:actions";
+  import Loading from "$components/Loading.svelte";
+  import { addToast } from "$stores/toast";
 
   const t = useTranslations();
   interface Props {
@@ -25,12 +28,37 @@
   let selectedPromptTool = $state(PromptToolOption.None);
   let isDisablePromptTool = $state(false);
 
+  let loading = $state(false);
+
+  async function deleteConversation() {
+    try {
+      loading = true;
+      const { error } = await actions.conversation.delete({
+        _id: conversationId,
+      });
+      if (!error) {
+        window.location.href = "/";
+      } else {
+        addToast({ message: JSON.stringify(error), type: "error" });
+      }
+    } catch (error) {
+      console.error("Exception when delete conversation", error);
+    } finally {
+      loading = false;
+    }
+  }
+
   async function submitForm() {}
 </script>
 
 <div class="grid grid-cols-1 grid-rows-[1fr_min-content] h-full">
   <div class="flex justify-end">
-    <button class="btn btn-outline font-normal">
+    <button
+      class="btn btn-outline font-normal"
+      onclick={() => {
+        deleteConversation();
+      }}
+    >
       {t("conversation.remove-from-my-ai-box")}
     </button>
   </div>
@@ -66,3 +94,5 @@
     </div>
   </div>
 </div>
+
+<Loading show={loading} />
