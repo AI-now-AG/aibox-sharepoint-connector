@@ -15,7 +15,7 @@ export const MessageSchema = z.object({
 const ChatConversationSchema = z.object({
   tenant_id: z.instanceof(ObjectId),
   creator_id: z.instanceof(ObjectId),
-  prompt_id: z.instanceof(ObjectId),
+  prompt_id: z.instanceof(ObjectId).nullish().default(null),
   title: z.string(),
   model: z.string().nullish(),
   messages: z.array(MessageSchema),
