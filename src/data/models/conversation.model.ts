@@ -9,6 +9,7 @@ export const MessageSchema = z.object({
   content: z.string(),
   rawData: z.string().nullish().default(null),
   imageUrl: z.string().nullish().default(null),
+  fileUrls: z.array(z.string()).optional().default([]),
 });
 
 // Zod schema for a conversation
