@@ -695,7 +695,6 @@
         type: "error",
       });
     } else {
-      console.log("saveConversation result", data);
       window.location.href = `/conversations/${data.insertedId}`;
     }
   }

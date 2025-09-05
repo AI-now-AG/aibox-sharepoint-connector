@@ -1,10 +1,12 @@
 <script lang="ts">
+  import { actions } from "astro:actions";
   import { slide } from "svelte/transition";
   import { type Message, MessageRole } from "$types/MessageHistory";
   import { sharedMessageHistory } from "$stores/chatHistory";
   import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
   import MessageInput from "$components/chat-ui/MessageInput.svelte";
   import MessageList from "$components/chat-ui/MessageList.svelte";
+  import Loading from "$components/Loading.svelte";
   import { readFileContent } from "$utils/fileReader";
   import { PromptModel } from "$types/PromptModel";
   import {
@@ -65,6 +67,7 @@
   let isGenerating: boolean = $state(false);
   let isResoningThingking: boolean = $state(false);
   let previousResponseId: string | null = $state(null);
+  let loading: boolean = $state(false);
 
   const apiProvider = apiKeyProviders?.find((item: any) => {
     return item.default && item.active;
@@ -506,7 +509,7 @@
       const accessToken = $user?.auth0_access_token;
       if (!accessToken) {
         addToast({
-          message: t('auth.session-missing-force-login'),
+          message: t("auth.session-missing-force-login"),
           type: "error",
         });
         setTimeout(() => {
@@ -519,7 +522,7 @@
         headers: {
           "Content-Type": "application/json",
           //"X-API-Key": config.apiKey,
-          "Authorization": `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify(requestBody),
       });
@@ -617,6 +620,24 @@
       behavior: "smooth",
     });
   }
+
+  async function saveConversation() {
+    loading = true;
+    const { error, data } = await actions.conversation.save({
+      model: selectedModel,
+      messages: $sharedMessageHistory,
+    });
+    loading = false;
+
+    if (error) {
+      addToast({
+        message: error?.message ?? "Something went wrong",
+        type: "error",
+      });
+    } else {
+      window.location.href = `/conversations/${data.insertedId}`;
+    }
+  }
 </script>
 
 <div class="grid grid-cols-1 grid-rows-[1fr_min-content] h-full">
@@ -675,6 +696,13 @@
           >
             {t("home.new-chat")}
           </button>
+          <button
+            onclick={saveConversation}
+            class="btn btn-primary btn-outline btn-sm px-8"
+            disabled={isGenerating || isFetching}
+          >
+            {t("prompt.save-chat")}
+          </button>
           <div class="mt-2">
             <ScrollToBottom />
           </div>
@@ -699,3 +727,5 @@
     {/if}
   </div>
 </div>
+
+<Loading show={loading} />

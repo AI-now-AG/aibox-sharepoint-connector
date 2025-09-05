@@ -16,7 +16,7 @@ const ConversationInputIdentifierSchema = z.object({
 });
 
 const ConversationInputParamsSchema = z.object({
-  prompt_id: z.string(),
+  prompt_id: z.string().nullish(),
   model: z.string().optional(),
   messages: z.array(MessageSchema),
 });
@@ -32,18 +32,30 @@ const generateConversationTitle = async (
 ) => {
   const model = initializeOpenAI(ctx);
 
-  const instructions = `
+  const instructionsWithPrompt = `
       Generate a short conversation title (max. 50 characters).
       The title must summarize both the prompt title and the user input. 
       Write it in the same language as the prompt title. 
       If the language cannot be determined, default to German.
   `;
+  const instructionsWithoutPrompt = `
+      Generate a short conversation title (max. 50 characters).
+      The title must summarize the user input only. 
+      Write it in the same language as the user input. 
+      If the language cannot be determined, default to German.
+  `;
+
+  const hasPrompt = promptTitle.trim().length > 0;
+  const instructions = hasPrompt
+    ? instructionsWithPrompt
+    : instructionsWithoutPrompt;
+  const humanMessage = hasPrompt
+    ? `Prompt title: ${promptTitle}\nUser input: ${userInput}`
+    : `User input: ${userInput}`;
+
   const messages = [
     new SystemMessage(instructions),
-    new HumanMessage(`
-      Prompt title: ${promptTitle}
-      User input: ${userInput}  
-    `),
+    new HumanMessage(humanMessage),
   ];
   const parser = new StringOutputParser();
   const result = await model.invoke(messages);
@@ -81,11 +93,15 @@ export const conversation = {
     input: ConversationInputParamsSchema,
     handler: async (input, context) => {
       const { model, messages, prompt_id: promptId } = input;
+      let promptTitle = "";
 
       // Fetch the prompt definition from the database
-      const prompt = await PromptModel.get(promptId);
-      if (!prompt) {
-        throw new Error("Prompt not found.");
+      if (promptId) {
+        const prompt = await PromptModel.get(promptId);
+        if (!prompt) {
+          throw new Error("Prompt not found.");
+        }
+        promptTitle = prompt.title;
       }
 
       // Generate a short conversation title based on:
@@ -93,7 +109,7 @@ export const conversation = {
       // - the most recent user message (last message in the array)
       const generatedTitle = await generateConversationTitle(
         context,
-        prompt.title,
+        promptTitle,
         messages[messages.length - 1].content,
       );
 
@@ -102,7 +118,7 @@ export const conversation = {
         title: generatedTitle || "Test",
         model,
         messages,
-        prompt_id: new ObjectId(promptId),
+        prompt_id: promptId ? new ObjectId(promptId) : null,
         tenant_id: context.locals.tenant._id,
         creator_id: context.locals.user.id,
       };

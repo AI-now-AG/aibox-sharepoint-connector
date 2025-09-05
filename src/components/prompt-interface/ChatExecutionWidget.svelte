@@ -68,10 +68,6 @@
       behavior: "smooth",
     });
   }
-
-  function saveConversation() {
-    
-  }
 </script>
 
 {#if currentMessageHistory.length == 0}
@@ -101,13 +97,6 @@
           disabled={isProcessing}
         >
           {t("home.new-chat")}
-        </button>
-        <button
-          onclick={saveConversation}
-          class="btn btn-primary btn-outline btn-sm px-8"
-          disabled={isGenerating || isFetching}
-        >
-          {t("prompt.save-chat")}
         </button>
       </div>
       <InputArea
