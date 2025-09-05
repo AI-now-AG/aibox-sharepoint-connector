@@ -30,6 +30,7 @@ const prompt = await PromptModel.get(conversation.prompt_id || "");
           conversationId={conversation.prompt_id?.toString()}
           messages={conversation.messages || []}
           promptData={prompt}
+          client:load
         />
       </div>
     </div>
