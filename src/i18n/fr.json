@@ -511,7 +511,6 @@
   "subtitle-editor.replace-placeholder": "Replace text",
   "subtitle-editor.replace-button": "Replace",
   "subtitle-editor.export-both-formats": "Export Both Formats",
-  "subtitle-editor.or": "OR",
   "subtitle-editor.ass-only": "ASS Only",
   "subtitle-editor.srt-only": "SRT Only",
   "subtitle-editor.switch-layout": "Switch Layout",
@@ -561,5 +560,16 @@
   "subtitle-editor.browse": "browse",
   "subtitle-editor.supported-formats": "Supported formats: .ass, .srt",
   "subtitle-editor.max-file-size-10mb": "Maximum file size: 10MB per file",
-  "subtitle-editor.open-subtitle-editor": "Open Subtitle Editor"
+  "subtitle-editor.open-subtitle-editor": "Open Subtitle Editor",
+  "subtitle-editor.subtitle-overlay-menu": "Subtitles",
+  "subtitle-editor.show-subtitles-on-video": "Show subtitles on video",
+  "subtitle-editor.subtitle-position": "Position",
+  "subtitle-editor.position-bottom": "Bottom",
+  "subtitle-editor.position-center": "Center",
+  "subtitle-editor.position-top": "Top",
+  "subtitle-editor.subtitle-appearance": "Appearance",
+  "subtitle-editor.font-size": "Font size",
+  "subtitle-editor.background-opacity": "Background",
+  "conversation.my-ai-box-nav-title": "MY AIBOX ",
+  "conversation.show-more": "Show more"
 }

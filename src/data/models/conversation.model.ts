@@ -60,9 +60,10 @@ export default {
 
   listByUser: async (userId: string | ObjectId) => {
     const _userId = toObjectId(userId);
-    return collection
+    const data = collection
       .find<Document<Conversation>>({ creator_id: _userId })
       .sort({ created_at: -1 });
+    return await data.toArray();
   },
 
   get: async (id: string | ObjectId): Promise<Conversation | null> => {

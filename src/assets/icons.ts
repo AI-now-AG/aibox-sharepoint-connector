@@ -63,6 +63,7 @@ import logo from "$assets/icons/logo.svg?raw";
 import imageTool from "$assets/icons/image-tool.svg?raw";
 import expand from "$assets/icons/expand.svg?raw";
 import web from "$assets/icons/web.svg?raw";
+import pin from "$assets/icons/pin.svg?raw";
 
 export const svgIcons = {
   menuSettings,
@@ -130,4 +131,5 @@ export const svgIcons = {
   imageTool,
   expand,
   web,
+  pin
 };
