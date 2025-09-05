@@ -202,14 +202,11 @@
     return payload;
   }
 
-  // === Image Processing Utilities ===
   function formatImageUrl(imageData: string): string {
     if (!imageData) return "";
-
     if (imageData.startsWith("data:") || imageData.startsWith("http")) {
       return imageData;
     }
-
     return `data:image/png;base64,${imageData}`;
   }
 
@@ -217,23 +214,14 @@
     return data.result || data.image || "";
   }
 
-  // === Stream Event Handlers ===
   function handleStartEvent(data: any): void {
     console.log(`🚀 Started with ${data.provider} using ${data.model}`);
   }
 
   function handleChunkEvent(data: any, state: StreamingState): void {
     if (data.content && typeof data.content === "string") {
-      // Accumulate the raw text
       state.messageContent += data.content;
-
-      // Append the raw chunk to the current displayed message
       currentMessage += data.content;
-
-      // If the current chunk contains a newline,
-      // re-render the entire accumulated text as HTML.
-      // This avoids trying to parse on every single character
-      // and ensures we only re-render when a natural "block" ends.
       if (data.content.includes("\n")) {
         currentMessage = markdownToHtml(state.messageContent);
       }
@@ -242,14 +230,11 @@
 
   function handleCitationsEvent(data: any, state: StreamingState): void {
     if (data.citations && data.citations.length > 0) {
-      console.log("📚 Citations received:", data.citations.length);
       state.citations = data.citations;
     }
   }
 
   function handleImagesEvent(data: any, state: StreamingState): void {
-    console.log("🖼️ Images generated:", data.images?.length || 0);
-
     if (data.images && data.images.length > 0) {
       const firstImage = data.images[0];
       const imageData = extractImageFromData(firstImage);
@@ -263,8 +248,6 @@
   }
 
   function handleToolOutputsEvent(data: any, state: StreamingState): void {
-    console.log("🔧 Tool outputs received:", data.outputs.length);
-
     data.outputs.forEach((output: any) => {
       if (output.image || output.result) {
         const imageData = extractImageFromData(output);
@@ -282,11 +265,6 @@
     state: StreamingState,
     requestBody: RequestPayload,
   ): any {
-    console.log(`✅ Complete! Processing time: ${data.processingTimeMs}ms`);
-    if (data.responseId) {
-      console.log(`Response ID: ${data.responseId}`);
-    }
-
     const finalImageUrl = formatImageUrl(
       state.currentImageUrl ||
         data.images?.[0]?.result ||
@@ -297,7 +275,6 @@
     const responseText =
       data.fullResponse ?? data.outputText ?? state.messageContent ?? "";
 
-    // Add user message to history
     const newUserMessage: Message = {
       role: MessageRole.User,
       content: requestBody.prompt,
@@ -305,7 +282,7 @@
 
     messageHistory.push(newUserMessage);
     updateConversation();
-    // Handle assistant message with citations
+
     if (state.citations.length > 0) {
       addAssistantMessageWithCitations(
         responseText,
@@ -316,22 +293,17 @@
       addAssistantMessage(responseText, finalImageUrl);
     }
 
-    // Clean up and reset states
     resetUIState();
     previousResponseId = data.responseId;
 
-    // Scroll to latest message
     setTimeout(() => scrollIntoView(), 1000);
 
     return data;
   }
 
   function handleErrorEvent(data: any, requestBody: RequestPayload): void {
-    console.error(`❌ Stream error: ${data.error}`);
-
     const errorMessage = data.error || "Image generation failed.";
 
-    // Add user message to history
     const errorUserMessage: Message = {
       role: MessageRole.User,
       content: requestBody.prompt,
@@ -356,14 +328,11 @@
     throw new Error(data.error);
   }
 
-  // === Message History Utilities ===
   function addAssistantMessageWithCitations(
     responseText: string,
     citations: any[],
     imageUrl: string,
   ): void {
-    console.log("📚 Citations sent:", citations);
-
     const formattedText = buildCitationLinks(responseText, citations);
     currentMessage = markdownToHtml(formattedText);
 
@@ -495,34 +464,27 @@
       const chunk = decoder.decode(value, { stream: true });
       buffer += chunk;
 
-      // Process complete lines from buffer
       const lines = buffer.split("\n");
-      buffer = lines.pop() || ""; // Keep the last line in buffer (might be incomplete)
+      buffer = lines.pop() || "";
 
       for (const line of lines) {
         const data = parseStreamLine(line);
         if (data) {
           const result = processStreamEvent(data, state, requestBody);
           if (result) {
-            return result; // Return on completion
+            return result;
           }
         }
       }
     }
   }
 
-  // === Main API Function ===
   async function callStreamingAPI(fileUrls: string[] = []) {
     try {
       resetStreamingState();
-
-      // Get API configuration
       const config = await getAPIConfiguration();
-
-      // Build request payload
       const requestBody = buildRequestPayload(fileUrls);
 
-      // Make API request
       const accessToken = $user?.auth0_access_token;
       if (!accessToken) {
         addToast({
@@ -538,7 +500,6 @@
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          //"X-API-Key": config.apiKey,
           Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify(requestBody),
@@ -548,16 +509,13 @@
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      // Process streaming response
       if (response.headers.get("content-type")?.includes("text/event-stream")) {
-        console.log("📡 Streaming response received");
-
         const reader = response.body?.getReader();
         if (!reader) {
           throw new Error("No reader available");
         }
 
-        input = ""; // Reset prompt for new request
+        input = "";
         return await processStream(reader, requestBody);
       }
     } catch (error) {
@@ -567,7 +525,6 @@
     }
   }
 
-  // === File Upload Handler ===
   async function submitForm() {
     const fileDataList = await Promise.all(
       files.map(async (file) => ({
@@ -578,7 +535,6 @@
       })),
     );
 
-    // Reset states
     isFetching = true;
     isGenerating = false;
 
@@ -612,7 +568,6 @@
     await callStreamingAPI((uploadedFileUrls as string[]) || []);
   }
 
-  // === UI Utilities ===
   function scrollIntoView() {
     const chatBubbles = document?.querySelectorAll(
       ".chat-container > .chat-bubble",
