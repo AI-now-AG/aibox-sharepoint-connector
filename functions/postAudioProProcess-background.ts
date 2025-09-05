@@ -55,7 +55,7 @@ const postAudioProProcess: Handler = async (
 
     if (
       !tenantId ||
-      !userId ||
+      // !userId ||
       !uniqueName ||
       !folderName ||
       !uploadUrl ||
