@@ -26,6 +26,7 @@ const prompt = await PromptModel.get(conversation.prompt_id || "");
 
         <ChatView
           conversationId={id?.toString()}
+          model={conversation.model}
           messages={conversation.messages || []}
           promptData={prompt}
           client:load

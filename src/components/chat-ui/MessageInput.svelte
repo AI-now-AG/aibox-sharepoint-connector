@@ -171,4 +171,6 @@
 
 {#if stickyFooter && showDataLossWarning}
   <DataLossWarning />
+{:else}
+  <div class="container p-3 gap-2 items-center flex justify-center"></div>
 {/if}

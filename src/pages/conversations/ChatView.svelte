@@ -8,15 +8,24 @@
   import { actions } from "astro:actions";
   import Loading from "$components/Loading.svelte";
   import { addToast } from "$stores/toast";
+  import { getPromptTools, useProviderInfo } from "$shared/AIProvider";
+  import { tenant } from "$stores";
+  import { PromptModel } from "$types/PromptModel";
 
   const t = useTranslations();
   interface Props {
     conversationId: string;
+    model: string;
     messages: MessageHistory;
     promptData: any;
   }
 
-  let { conversationId, messages, promptData }: Props = $props();
+  let {
+    conversationId,
+    model = PromptModel.Default,
+    messages,
+    promptData,
+  }: Props = $props();
 
   let input: string = $state("");
   let files: File[] = $state([]);
@@ -24,6 +33,16 @@
   let currentStreamingImageUrl: string = $state("");
   let isFetching: boolean = $state(false);
   let isGenerating: boolean = $state(false);
+
+  const providerIno = useProviderInfo($tenant);
+  // === Derived State ===
+  let toolOptions = getPromptTools(
+    (model == PromptModel.Default
+      ? providerIno?.defaultProviderPromptModelName == PromptModel.OpenAI
+        ? PromptModel.OpenAIWithTools
+        : providerIno?.defaultProviderPromptModelName
+      : model) as PromptModel,
+  );
 
   let selectedPromptTool = $state(PromptToolOption.None);
   let isDisablePromptTool = $state(false);
@@ -86,7 +105,7 @@
         {isFetching}
         stickyFooter={true}
         onsend={submitForm}
-        toolOptions={[]}
+        {toolOptions}
         bind:selectedPromptTool
         bind:isDisablePromptTool
         showDataLossWarning={false}
