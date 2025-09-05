@@ -571,5 +571,6 @@
   "subtitle-editor.font-size": "Schriftgröße",
   "subtitle-editor.background-opacity": "Hintergrund",
   "conversation.my-ai-box-nav-title": "MY AIBOX ",
-  "conversation.show-more": "Show more"
+  "conversation.show-more": "Show more",
+  "conversation.remove-from-my-ai-box": "Remove from My aibox "
 }

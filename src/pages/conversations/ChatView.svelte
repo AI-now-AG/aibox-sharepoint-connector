@@ -4,7 +4,9 @@
   import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
   import MessageInput from "$components/chat-ui/MessageInput.svelte";
   import MessageList from "$components/chat-ui/MessageList.svelte";
+  import { useTranslations } from "$i18n/utils";
 
+  const t = useTranslations();
   interface Props {
     conversationId: string;
     messages: MessageHistory;
@@ -27,6 +29,12 @@
 </script>
 
 <div class="grid grid-cols-1 grid-rows-[1fr_min-content] h-full">
+  <div class="flex justify-end">
+    <button class="btn btn-outline font-normal">
+      {t("conversation.remove-from-my-ai-box")}
+    </button>
+  </div>
+
   <MessageList
     {currentMessage}
     {messages}
@@ -37,7 +45,6 @@
   />
 
   <div class="sticky bottom-0 bg-base-200">
-    
     <div class="my-4">
       <div class="mt-2">
         <ScrollToBottom />
@@ -57,6 +64,5 @@
         showDataLossWarning={false}
       />
     </div>
-
   </div>
 </div>
