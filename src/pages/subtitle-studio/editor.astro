@@ -18,12 +18,12 @@ const hasAudio = Astro.url.searchParams.get('hasAudio') === 'true';
 
 <Layout>
   <div class="container max-w-8xl mx-auto px-14">
-    <div class="pt-2 mb-2 lg:pt-8 flex justify-between items-center">
+    <div class="xl:pt-2 2xl:pt-4 flex justify-between items-center">
       <h1 class="text-4xl font-bold">
         {t("settings.transcription.subtitle-editor")}
       </h1>
     </div>
-    <p class="mb-6">{t("subtitle-editor.upload-description")}</p>
+    <!-- <p class="mb-6">{t("subtitle-editor.upload-description")}</p> -->
     
     <SubtitleUpload 
       client:load 

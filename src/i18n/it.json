@@ -538,7 +538,6 @@
   "subtitle-editor.show-video": "Show video",
   "subtitle-editor.minimize-video": "Minimize video",
   "subtitle-editor.remove-media": "Remove media file",
-  "subtitle-editor.loaded": "loaded",
   "subtitle-editor.media-removed": "Media file removed",
   "subtitle-editor.valid-file-required": "Please select a valid audio or video file",
   "subtitle-editor.media-loaded-success": "Media file \\\"${filename}\\\" loaded successfully",
