@@ -68,7 +68,7 @@
 
   let input: string = $state("");
   let files: File[] = $state([]);
-  let sharedMessageHistory: MessageHistory = $state(messages);
+  let messageHistory: MessageHistory = $state(messages);
   let currentMessage = $state("");
   let currentStreamingImageUrl: string = $state("");
   let isFetching: boolean = $state(false);
@@ -103,6 +103,20 @@
       console.error("Exception when delete conversation", error);
     } finally {
       loading = false;
+    }
+  }
+
+  async function updateConversation() {
+    try {
+      const { error } = await actions.conversation.update({
+        _id: conversationId,
+        messages: messageHistory,
+      });
+      if (error) {
+        addToast({ message: JSON.stringify(error), type: "error" });
+      }
+    } catch (error) {
+      console.error("Exception when update conversation", error);
     }
   }
 
@@ -177,7 +191,7 @@
     if (isOpenAIResponseModel) {
       payload.previousResponseId = previousResponseId;
     } else {
-      payload.messageHistory = sharedMessageHistory;
+      payload.messageHistory = messageHistory;
     }
 
     if (isOpenAIGpt5ResponseModel) {
@@ -289,7 +303,8 @@
       content: requestBody.prompt,
     };
 
-    sharedMessageHistory.push(newUserMessage);
+    messageHistory.push(newUserMessage);
+    updateConversation();
     // Handle assistant message with citations
     if (state.citations.length > 0) {
       addAssistantMessageWithCitations(
@@ -322,14 +337,15 @@
       content: requestBody.prompt,
     };
 
-    sharedMessageHistory.push(errorUserMessage);
+    messageHistory.push(errorUserMessage);
 
     const failedMessage: Message = {
       role: MessageRole.Assistant,
       content: errorMessage,
     };
 
-    sharedMessageHistory.push(failedMessage);
+    messageHistory.push(failedMessage);
+    updateConversation();
 
     addToast({
       message: errorMessage,
@@ -358,7 +374,8 @@
       imageUrl,
     };
 
-    sharedMessageHistory.push(newAssistantMessage);
+    messageHistory.push(newAssistantMessage);
+    updateConversation();
   }
 
   function addAssistantMessage(responseText: string, imageUrl: string): void {
@@ -369,7 +386,8 @@
       imageUrl,
     };
 
-    sharedMessageHistory.push(newAssistantMessage);
+    messageHistory.push(newAssistantMessage);
+    updateConversation();
   }
 
   function resetStreamingState(): void {
