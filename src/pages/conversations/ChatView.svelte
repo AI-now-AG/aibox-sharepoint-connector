@@ -1,6 +1,6 @@
 <script lang="ts">
   import { PromptToolOption } from "$types/AIProvider";
-  import { MessageRole, type MessageHistory } from "$types/MessageHistory";
+  import { type MessageHistory } from "$types/MessageHistory";
   import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
   import MessageInput from "$components/chat-ui/MessageInput.svelte";
   import MessageList from "$components/chat-ui/MessageList.svelte";
@@ -10,9 +10,10 @@
     messages: MessageHistory;
     promptData: any;
   }
+
   let { conversationId, messages, promptData }: Props = $props();
 
-  let prompt: string = $state("");
+  let input: string = $state("");
   let files: File[] = $state([]);
   let currentMessage = $state("");
   let currentStreamingImageUrl: string = $state("");
@@ -25,27 +26,35 @@
   async function submitForm() {}
 </script>
 
-<MessageList
-  {currentMessage}
-  {messages}
-  currentImageUrl={currentStreamingImageUrl}
-  {isFetching}
-  {isGenerating}
-/>
-
-<div class="sticky bottom-0 bg-base-200">
-  <div class="mt-2">
-    <ScrollToBottom />
-  </div>
-
-  <MessageInput
-    bind:input={prompt}
-    bind:files
+<div class="grid grid-cols-1 grid-rows-[1fr_min-content] h-full">
+  <MessageList
+    {currentMessage}
+    {messages}
+    currentImageUrl={currentStreamingImageUrl}
     {isFetching}
-    stickyFooter={true}
-    onsend={submitForm}
-    bind:selectedPromptTool
-    bind:isDisablePromptTool
-    showDataLossWarning={false}
+    {isGenerating}
+    isResoningThingking={false}
   />
+
+  <div class="sticky bottom-0 bg-base-200">
+    <div class="my-4">
+      <div class="mt-2">
+        <ScrollToBottom />
+      </div>
+    </div>
+
+    <div class="min-w-full form-wrapper">
+      <MessageInput
+        bind:input
+        bind:files
+        {isFetching}
+        stickyFooter={true}
+        onsend={submitForm}
+        toolOptions={[]}
+        bind:selectedPromptTool
+        bind:isDisablePromptTool
+        showDataLossWarning={false}
+      />
+    </div>
+  </div>
 </div>
