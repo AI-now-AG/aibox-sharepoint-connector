@@ -572,5 +572,6 @@
   "subtitle-editor.background-opacity": "Background",
   "conversation.my-ai-box-nav-title": "MY AIBOX ",
   "conversation.show-more": "Show more",
-  "conversation.remove-from-my-ai-box": "Remove from My aibox "
+  "conversation.remove-from-my-ai-box": "Remove from My aibox ",
+  "conversation.limit-reached": "You have reached the maximum number of conversations allowed. Please delete some conversations before creating new ones."
 }

@@ -17,7 +17,8 @@ const ChatConversationSchema = z.object({
   creator_id: z.instanceof(ObjectId),
   prompt_id: z.instanceof(ObjectId).nullish().default(null),
   title: z.string(),
-  model: z.string().nullish(),
+  model: z.string().nullish().default(null),
+  previous_response_id: z.string().nullish().default(null),
   messages: z.array(MessageSchema),
   created_at: z.date().optional(),
   updated_at: z.date().optional(),
@@ -58,14 +59,6 @@ export default {
     return collection.deleteOne({ _id });
   },
 
-  listByUser: async (userId: string | ObjectId) => {
-    const _userId = toObjectId(userId);
-    const data = collection
-      .find<Document<Conversation>>({ creator_id: _userId })
-      .sort({ created_at: -1 });
-    return await data.toArray();
-  },
-
   get: async (id: string | ObjectId): Promise<Conversation | null> => {
     if (!ObjectId.isValid(id)) {
       return null;
@@ -74,5 +67,20 @@ export default {
     const doc = await collection.findOne<Document<Conversation>>({ _id });
     if (!doc) return null;
     return doc;
+  },
+
+  countByUser: async (userId: string | ObjectId) => {
+    const _userId = toObjectId(userId);
+    return await collection.countDocuments({
+      creator_id: _userId,
+    });
+  },
+
+  listByUser: async (userId: string | ObjectId) => {
+    const _userId = toObjectId(userId);
+    const data = collection
+      .find<Document<Conversation>>({ creator_id: _userId })
+      .sort({ created_at: -1 });
+    return await data.toArray();
   },
 };

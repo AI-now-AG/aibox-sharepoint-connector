@@ -10,6 +10,9 @@ import { ObjectId } from "mongodb";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import initializeOpenAI from "$utils/chatModel";
+import { useTranslations } from "$i18n/utils";
+
+const t = useTranslations();
 
 const ConversationInputIdentifierSchema = z.object({
   _id: z.string(),
@@ -17,7 +20,8 @@ const ConversationInputIdentifierSchema = z.object({
 
 const ConversationInputParamsSchema = z.object({
   prompt_id: z.string().nullish(),
-  model: z.string().optional(),
+  model: z.string().nullish(),
+  previous_response_id: z.string().nullish(),
   messages: z.array(MessageSchema),
 });
 
@@ -92,8 +96,24 @@ export const conversation = {
   save: defineAction({
     input: ConversationInputParamsSchema,
     handler: async (input, context) => {
-      const { model, messages, prompt_id: promptId } = input;
+      // Destructure the validated input
+      const {
+        model,
+        messages,
+        prompt_id: promptId,
+        previous_response_id: previousResponseId,
+      } = input;
       let promptTitle = "";
+
+      // Get the current user ID from the request context
+      const userId = context.locals.user.id;
+
+      // Enforce a limit of 10 conversations per user
+      const countConversations = await ConversationModel.countByUser(userId);
+      console.log("Current conversation count:", countConversations);
+      if (countConversations >= 10) {
+        throw new Error(t("conversation.limit-reached"));
+      }
 
       // Fetch the prompt definition from the database
       if (promptId) {
@@ -121,6 +141,7 @@ export const conversation = {
         prompt_id: promptId ? new ObjectId(promptId) : null,
         tenant_id: context.locals.tenant._id,
         creator_id: context.locals.user.id,
+        previous_response_id: previousResponseId,
       };
 
       // Save the conversation and return the transformed result
