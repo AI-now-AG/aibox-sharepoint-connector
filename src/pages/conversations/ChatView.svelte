@@ -600,8 +600,8 @@
   }
 </script>
 
-<div class="grid grid-cols-1 grid-rows-[1fr_min-content] h-full">
-  <div class="flex justify-end">
+<div class="grid grid-cols-1 grid-rows-[min-content_1fr_min-content] h-full">
+  <div class="flex justify-end p-4">
     <button
       class="btn btn-sm btn-outline font-normal"
       onclick={() => {
@@ -621,13 +621,10 @@
     {isResoningThingking}
   />
 
-  <div class="sticky bottom-0 bg-base-200">
-    <div class="my-4">
-      <div class="mt-2">
-        <ScrollToBottom />
-      </div>
+  <div class="sticky bottom-0 bg-base-200 p-4">
+    <div class="mt-2">
+      <ScrollToBottom />
     </div>
-
     <div class="min-w-full form-wrapper">
       <MessageInput
         bind:input
