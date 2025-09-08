@@ -17,7 +17,6 @@
   import { PromptModel } from "$types/PromptModel";
   import {
     markdownToHtml,
-    textToHtml,
     buildCitationLinks,
     stripMarkdownFormatting,
   } from "$utils/textFormatting";
@@ -289,7 +288,7 @@
 
     const newUserMessage: Message = {
       role: MessageRole.User,
-      content: textToHtml(requestBody.prompt),
+      content: requestBody.prompt,
       fileUrls: fileUrls,
     };
 

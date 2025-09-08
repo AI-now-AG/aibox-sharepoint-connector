@@ -3,11 +3,11 @@
   import { onMount } from "svelte";
   import { MessageRole, type MessageHistory } from "$types/MessageHistory";
   import ImageCard from "./ImageCard.svelte";
+  import FileAttachmentList from "./FileAttachmentList.svelte";
   import { svgIcons } from "$assets/icons";
   import { user } from "$stores";
   import { useTranslations } from "$i18n/utils";
-  import { getFileNameFromAzureUrl } from "$utils/documentExtractor";
-  import { markdownToHtml } from "$utils/textFormatting";
+  import { markdownToHtml, textToHtml } from "$utils/textFormatting";
 
   const t = useTranslations();
 
@@ -112,20 +112,12 @@
                             {role == MessageRole.User ? username : `aibox`}
                           </p>
                           <div class="mt-2 text-sm">
-                            {@html markdownToHtml(content)}
+                            {@html role == MessageRole.User
+                              ? textToHtml(content)
+                              : markdownToHtml(content)}
                           </div>
                           {#if role === MessageRole.User && Array.isArray(fileUrls) && fileUrls.length > 0}
-                            <div class="flex mt-2">
-                              {#each fileUrls as url}
-                                <div class="flex items-center mr-4">
-                                  <span class="text-green-600 mr-2">📎</span>
-                                  <span
-                                    class=" link-primary text-xs font-medium"
-                                    >{getFileNameFromAzureUrl(url)}</span
-                                  >
-                                </div>
-                              {/each}
-                            </div>
+                            <FileAttachmentList {fileUrls} />
                           {/if}
                         </div>
                       {:else}
