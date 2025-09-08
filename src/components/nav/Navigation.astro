@@ -48,7 +48,7 @@ const myAIBobItems: Array<any> = [];
 const conversations = await ConversationModel.listByUser(Astro.locals.user.id);
 
 const transcriptions = await TranscriptionModel.listByTenant(
-  Astro.locals.user.tenant_id
+  Astro.locals.user.tenant_id,
 );
 
 const transcriptionTypes = Astro.locals.tenant.transcription_types ?? [];
@@ -56,7 +56,7 @@ const transcriptionTypes = Astro.locals.tenant.transcription_types ?? [];
 const activeTranscriptions =
   transcriptions?.filter(
     (tran) =>
-      transcriptionTypes.includes(tran.category) && tran.enabled === true
+      transcriptionTypes.includes(tran.category) && tran.enabled === true,
   ) ?? [];
 
 const audioToTextTranscriptions = activeTranscriptions
@@ -73,7 +73,7 @@ const subtitleTranscriptions = activeTranscriptions
       tran.category == AudioCategory.Subtitle ||
       tran.category == AudioCategory.SubtitleJson ||
       tran.category == AudioCategory.SubtitleLarge ||
-      tran.category == AudioCategory.Subtitle11Labs
+      tran.category == AudioCategory.Subtitle11Labs,
   )
   .map((tran) => ({
     title: tran.name,
@@ -135,7 +135,7 @@ if (
   auth.hasFeatureWithProvider(
     Astro.locals,
     TenantFeature.CreateImage,
-    ApiKeyProvider.OpenAI
+    ApiKeyProvider.OpenAI,
   )
 ) {
   createImageItems.push({
@@ -149,7 +149,7 @@ if (
   auth.hasFeatureWithProvider(
     Astro.locals,
     TenantFeature.CreateImage,
-    ApiKeyProvider.Flux
+    ApiKeyProvider.Flux,
   )
 ) {
   createImageItems.push({
@@ -163,7 +163,7 @@ if (
   auth.hasFeatureWithProvider(
     Astro.locals,
     TenantFeature.GptImage,
-    ApiKeyProvider.OpenAI
+    ApiKeyProvider.OpenAI,
   )
 ) {
   createImageItems.push({
@@ -190,12 +190,12 @@ for (let i = 0; i < conversations.length; i++) {
     });
   }
 }
-myAIBobItems.push({
-  title: t("conversation.show-more"),
-  isCta: true,
-});
 
 if (myAIBobItems.length > 0) {
+  myAIBobItems.push({
+    title: t("conversation.show-more"),
+    isCta: true,
+  });
   myAIBoxMenus.push({
     title: t("conversation.my-ai-box-nav-title"),
     icon: svgIcons.pin,
@@ -738,14 +738,14 @@ const modules = [...menuItems];
           "tooltip",
           "tooltip-right",
           "flex",
-          "justify-center"
+          "justify-center",
         );
       } else {
         summary.classList.remove(
           "tooltip",
           "tooltip-right",
           "flex",
-          "justify-center"
+          "justify-center",
         );
       }
     });
@@ -763,11 +763,11 @@ const modules = [...menuItems];
 
     toggleBtn.setAttribute(
       "aria-label",
-      newCollapsedState ? "Expand navigation" : "Collapse navigation"
+      newCollapsedState ? "Expand navigation" : "Collapse navigation",
     );
     toggleBtn.setAttribute(
       "title",
-      newCollapsedState ? "Expand navigation" : "Collapse navigation"
+      newCollapsedState ? "Expand navigation" : "Collapse navigation",
     );
 
     const iconContainer = toggleBtn.querySelector("div");

@@ -7,8 +7,14 @@
   }
 
   let { text = t("conversation.show-more") }: Props = $props();
+
   async function loadMore() {
-   
+    const myAiboxConversationDialog = document.getElementById(
+      "my-ai-box-conversation-dialog",
+    );
+    if (myAiboxConversationDialog) {
+      (myAiboxConversationDialog as HTMLDialogElement).show();
+    }
   }
 </script>
 

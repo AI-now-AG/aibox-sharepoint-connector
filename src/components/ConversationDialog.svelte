@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import { useTranslations } from "$i18n/utils";
   import { svgIcons } from "$assets/icons";
   import { addToast } from "$stores/toast";
@@ -10,21 +11,41 @@
   interface Props {
     conversationDialog?: HTMLDialogElement;
     dialogTitle?: string;
-    conversations: any[];
   }
 
   let {
     conversationDialog = $bindable(),
-    dialogTitle = "My aibox Conversations",
-    conversations = $bindable([]),
+    dialogTitle = t("conversation.my-ai-box-conversation-dialog-title"),
   }: Props = $props();
 
   let loading: boolean = $state(false);
+  let conversations: any[] = $state([]);
+
+  async function getListConversation() {
+    try {
+      const { error, data } = await actions.conversation.list({});
+      if (!error) {
+        conversations = data;
+      } else {
+        console.error(error);
+      }
+    } catch (error) {
+      console.error("Exception when delete conversation", error);
+    }
+  }
+
+  onMount(async () => {
+    console.log("ConversationDialog $onMount getListConversation");
+    getListConversation();
+  });
 
   function removeDeletedItem(deletedId: string) {
     conversations = conversations?.filter(
       (item: any) => item._id !== deletedId,
     );
+    if (conversations.length === 0) {
+      window.location.href = "/";
+    }
   }
 
   async function deleteConversation(conversationId: string) {
@@ -54,7 +75,11 @@
   }
 </script>
 
-<dialog bind:this={conversationDialog} class="modal">
+<dialog
+  bind:this={conversationDialog}
+  class="modal"
+  id="my-ai-box-conversation-dialog"
+>
   <div class="modal-box w-8/12 max-w-5xl">
     <div class="flex justify-between">
       <h3 class="text-lg font-bold py-4">{dialogTitle}</h3>
