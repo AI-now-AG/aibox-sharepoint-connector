@@ -505,7 +505,16 @@
       const requestBody = buildRequestPayload(fileUrls);
 
       const accessToken = $user?.auth0_access_token;
-      if (!accessToken) {
+      const response = await fetch(config.apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (response.status === 401) {
         addToast({
           message: t("auth.session-missing-force-login"),
           type: "error",
@@ -515,14 +524,6 @@
         }, 2000);
         return;
       }
-      const response = await fetch(config.apiUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify(requestBody),
-      });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

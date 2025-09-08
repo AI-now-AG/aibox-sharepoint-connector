@@ -579,16 +579,6 @@
 
       // Make API request
       const accessToken = $user?.auth0_access_token;
-      if (!accessToken) {
-        addToast({
-          message: t("auth.session-missing-force-login"),
-          type: "error",
-        });
-        setTimeout(() => {
-          window.location.href = "/api/logout";
-        }, 2000);
-        return;
-      }
       const response = await fetch(config.apiUrl, {
         method: "POST",
         headers: {
@@ -598,6 +588,17 @@
         },
         body: JSON.stringify(requestBody),
       });
+
+      if (response.status === 401) {
+        addToast({
+          message: t("auth.session-missing-force-login"),
+          type: "error",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/logout";
+        }, 2000);
+        return;
+      }
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
