@@ -4,6 +4,7 @@
   import { addToast } from "$stores/toast";
   import { actions } from "astro:actions";
   import { preventDefault } from "$utils/common";
+  import Loading from "./Loading.svelte";
   const t = useTranslations();
 
   interface Props {
@@ -18,12 +19,22 @@
     conversations = $bindable([]),
   }: Props = $props();
 
+  let loading: boolean = $state(false);
+
+  function removeDeletedItem(deletedId: string) {
+    conversations = conversations?.filter(
+      (item: any) => item._id !== deletedId,
+    );
+  }
+
   async function deleteConversation(conversationId: string) {
     try {
+      loading = true;
       const { error } = await actions.conversation.delete({
         _id: conversationId,
       });
       if (!error) {
+        removeDeletedItem(conversationId);
         addToast({
           message: t("conversation.delete-conversation-successfull"),
           type: "success",
@@ -33,6 +44,8 @@
       }
     } catch (error) {
       console.error("Exception when delete conversation", error);
+    } finally {
+      loading = false;
     }
   }
 
@@ -79,3 +92,5 @@
     </div>
   </div>
 </dialog>
+
+<Loading show={loading} />
