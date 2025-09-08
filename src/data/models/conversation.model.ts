@@ -34,7 +34,7 @@ const ChatConversationSchema = z.object({
     .optional()
     .default(() => {
       const d = new Date();
-      d.setMonth(d.getMonth() + 1); // add 1 month
+      d.setDate(d.getDate() + 30); // add 30 days
       return d;
     }),
 });
