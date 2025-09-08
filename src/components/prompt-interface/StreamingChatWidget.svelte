@@ -87,8 +87,6 @@
   let isGenerating: boolean = $state(false);
   let isResoningThingking: boolean = $state(false);
   let loading: boolean = $state(false);
-  let conversations: any[] = $state([]);
-  let conversationDialog: HTMLDialogElement | undefined = $state();
 
   function isGpt5Default() {
     const aiProviders = $tenant?.api_key_providers ?? [];
@@ -711,23 +709,6 @@
       window.location.href = `/conversations/${data.insertedId}`;
     }
   }
-
-  async function getListConversation() {
-    try {
-      const { error, data } = await actions.conversation.list({});
-      if (!error) {
-        conversations = data;
-      } else {
-        console.error(error);
-      }
-    } catch (error) {
-      console.error("Exception when delete conversation", error);
-    }
-  }
-
-  $effect(() => {
-    getListConversation();
-  });
 </script>
 
 <!-- Output (Follow-Up) -->
@@ -762,16 +743,6 @@
       >
         {t("prompt.save-chat")}
       </button>
-      <!-- Temporary CTA to show Chat History - START  -->
-      <button
-        onclick={() => {
-          conversationDialog?.show();
-        }}
-        class="btn btn-primary btn-outline btn-sm px-8"
-      >
-        {"Show Chat History"}
-      </button>
-      <!-- Temporary CTA to show Chat History - END -->
       <div class="mt-2">
         <ScrollToBottom />
       </div>
@@ -800,7 +771,5 @@
     {isResoningThingking}
   />
 {/if}
-
-<ConversationDialog bind:conversationDialog bind:conversations />
 
 <Loading show={loading} />

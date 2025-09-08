@@ -20,7 +20,8 @@
   }: Props = $props();
 
   let sortable: HTMLElement | null = null;
-  let localItems = [...items];
+  // svelte-ignore non_reactive_update
+    let localItems = [...items];
 
   $effect(() => {
     // Keep localItems in sync if items changes from outside
