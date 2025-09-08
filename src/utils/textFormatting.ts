@@ -65,6 +65,7 @@ export function buildCitationLinks(
   return inputString;
 }
 
+// Convert Markdown → HTML
 export function markdownToHtml(text: string) {
   marked.use({
     breaks: true,
@@ -198,7 +199,24 @@ export function markdownToHtml(text: string) {
     ],
   });
 
-  return marked.parse(text);
+  return marked.parse(text) as string;
+}
+
+// Convert plain text → HTML (escape & wrap in <p>)
+export function textToHtml(text: string): string {
+  // Escape HTML entities first
+  const escaped = text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
+  // Convert line breaks → <br>
+  const withBreaks = escaped.replace(/\n/g, "<br>");
+
+  // Wrap in a paragraph
+  return `<p>${withBreaks}</p>`;
 }
 
 export function formatMarkdown(text: string) {

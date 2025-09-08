@@ -19,6 +19,7 @@
   import { readFileContent } from "$utils/fileReader";
   import {
     markdownToHtml,
+    textToHtml,
     buildCitationLinks,
     stripHtmlFormatting,
   } from "$utils/textFormatting";
@@ -338,7 +339,7 @@
     // Add user message to history
     const newUserMessage: Message = {
       role: MessageRole.User,
-      content: requestBody.prompt,
+      content: textToHtml(requestBody.prompt),
       fileUrls: fileUrls,
     };
     addMessageToHistory(groupId, promptId, newUserMessage);
