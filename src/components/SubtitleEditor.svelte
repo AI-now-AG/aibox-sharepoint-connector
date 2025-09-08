@@ -903,17 +903,18 @@
                   <div tabindex="0" role="button" class="btn btn-xs btn-ghost">
                     📄 {t("subtitle-editor.subtitle-overlay-menu")}
                   </div>
+                  <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
                   <ul
-                    class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-64"
+                    tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-64"
                   >
                     <li>
-                      <label class="cursor-pointer flex items-center gap-2">
+                      <label class="cursor-pointer flex items-center gap-2 py-2 px-2 hover:bg-base-200 rounded">
                         <input
                           type="checkbox"
                           bind:checked={showSubtitleOverlay}
                           class="checkbox checkbox-sm"
                         />
-                        <span
+                        <span class="flex-1"
                           >{t("subtitle-editor.show-subtitles-on-video")}</span
                         >
                       </label>
@@ -923,7 +924,7 @@
                         <span>{t("subtitle-editor.subtitle-position")}</span>
                       </li>
                       <li>
-                        <label class="cursor-pointer flex items-center gap-2">
+                        <label class="cursor-pointer flex items-center gap-2 py-2 px-2 hover:bg-base-200 rounded">
                           <input
                             type="radio"
                             bind:group={subtitlePosition}
@@ -931,11 +932,11 @@
                             name="subtitle-position"
                             class="radio radio-sm"
                           />
-                          <span>{t("subtitle-editor.position-bottom")}</span>
+                          <span class="flex-1">{t("subtitle-editor.position-bottom")}</span>
                         </label>
                       </li>
                       <li>
-                        <label class="cursor-pointer flex items-center gap-2">
+                        <label class="cursor-pointer flex items-center gap-2 py-2 px-2 hover:bg-base-200 rounded">
                           <input
                             type="radio"
                             bind:group={subtitlePosition}
@@ -943,11 +944,11 @@
                             name="subtitle-position"
                             class="radio radio-sm"
                           />
-                          <span>{t("subtitle-editor.position-center")}</span>
+                          <span class="flex-1">{t("subtitle-editor.position-center")}</span>
                         </label>
                       </li>
                       <li>
-                        <label class="cursor-pointer flex items-center gap-2">
+                        <label class="cursor-pointer flex items-center gap-2 py-2 px-2 hover:bg-base-200 rounded">
                           <input
                             type="radio"
                             bind:group={subtitlePosition}
@@ -955,7 +956,7 @@
                             name="subtitle-position"
                             class="radio radio-sm"
                           />
-                          <span>{t("subtitle-editor.position-top")}</span>
+                          <span class="flex-1">{t("subtitle-editor.position-top")}</span>
                         </label>
                       </li>
                       <!-- <li class="menu-title">
