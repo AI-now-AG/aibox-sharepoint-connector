@@ -117,7 +117,8 @@
                               {#each fileUrls as url}
                                 <div class="flex items-center mr-4">
                                   <span class="text-green-600 mr-2">📎</span>
-                                  <span class="link link-primary text-xs font-medium"
+                                  <span
+                                    class=" link-primary text-xs font-medium"
                                     >{getFileNameFromAzureUrl(url)}</span
                                   >
                                 </div>
