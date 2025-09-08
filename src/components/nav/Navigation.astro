@@ -1,6 +1,7 @@
 ---
 import { useTranslations } from "$i18n/utils";
 import MenuItem from "./MenuItem.astro";
+import LoadMoreConversation from "./LoadMoreConversation.svelte";
 import Category from "$data/models/category.model";
 import { AudioCategory, TenantFeature } from "$types/TenantFeature";
 import { TranscriptionType } from "$types/TranscribeRequest";
@@ -623,7 +624,14 @@ const modules = [...menuItems];
                 >
                   {mod.items?.map((sub) => (
                     <li class="pl-1 active:bg-transparent">
-                      <MenuItem {...sub} />
+                      {sub.isCta ? (
+                        <LoadMoreConversation
+                          text={t("conversation.show-more")}
+                          client:load
+                        />
+                      ) : (
+                        <MenuItem {...sub} />
+                      )}
                     </li>
                   ))}
                 </ul>

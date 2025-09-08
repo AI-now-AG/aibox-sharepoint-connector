@@ -69,6 +69,7 @@ import subtitle from "$assets/icons/subtitle.svg?raw";
 import deleteIcon from "$assets/icons/delete.svg?raw";
 import addIcon from "$assets/icons/add.svg?raw";
 import pin from "$assets/icons/pin.svg?raw";
+import longArrowRight from "$assets/icons/long-arrow-right.svg?raw";
 
 export const svgIcons = {
   menuSettings,
@@ -142,4 +143,5 @@ export const svgIcons = {
   deleteIcon,
   addIcon,
   pin,
+  longArrowRight,
 };
