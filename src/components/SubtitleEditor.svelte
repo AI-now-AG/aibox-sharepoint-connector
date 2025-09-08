@@ -905,10 +905,13 @@
                   </div>
                   <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
                   <ul
-                    tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-64"
+                    tabindex="0"
+                    class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-64"
                   >
                     <li>
-                      <label class="cursor-pointer flex items-center gap-2 py-2 px-2 hover:bg-base-200 rounded">
+                      <label
+                        class="cursor-pointer flex items-center gap-2 py-2 px-2 hover:bg-base-200 rounded"
+                      >
                         <input
                           type="checkbox"
                           bind:checked={showSubtitleOverlay}
@@ -924,7 +927,9 @@
                         <span>{t("subtitle-editor.subtitle-position")}</span>
                       </li>
                       <li>
-                        <label class="cursor-pointer flex items-center gap-2 py-2 px-2 hover:bg-base-200 rounded">
+                        <label
+                          class="cursor-pointer flex items-center gap-2 py-2 px-2 hover:bg-base-200 rounded"
+                        >
                           <input
                             type="radio"
                             bind:group={subtitlePosition}
@@ -932,11 +937,15 @@
                             name="subtitle-position"
                             class="radio radio-sm"
                           />
-                          <span class="flex-1">{t("subtitle-editor.position-bottom")}</span>
+                          <span class="flex-1"
+                            >{t("subtitle-editor.position-bottom")}</span
+                          >
                         </label>
                       </li>
                       <li>
-                        <label class="cursor-pointer flex items-center gap-2 py-2 px-2 hover:bg-base-200 rounded">
+                        <label
+                          class="cursor-pointer flex items-center gap-2 py-2 px-2 hover:bg-base-200 rounded"
+                        >
                           <input
                             type="radio"
                             bind:group={subtitlePosition}
@@ -944,11 +953,15 @@
                             name="subtitle-position"
                             class="radio radio-sm"
                           />
-                          <span class="flex-1">{t("subtitle-editor.position-center")}</span>
+                          <span class="flex-1"
+                            >{t("subtitle-editor.position-center")}</span
+                          >
                         </label>
                       </li>
                       <li>
-                        <label class="cursor-pointer flex items-center gap-2 py-2 px-2 hover:bg-base-200 rounded">
+                        <label
+                          class="cursor-pointer flex items-center gap-2 py-2 px-2 hover:bg-base-200 rounded"
+                        >
                           <input
                             type="radio"
                             bind:group={subtitlePosition}
@@ -956,7 +969,9 @@
                             name="subtitle-position"
                             class="radio radio-sm"
                           />
-                          <span class="flex-1">{t("subtitle-editor.position-top")}</span>
+                          <span class="flex-1"
+                            >{t("subtitle-editor.position-top")}</span
+                          >
                         </label>
                       </li>
                       <!-- <li class="menu-title">
@@ -996,6 +1011,36 @@
                       </li> -->
                     {/if}
                   </ul>
+                </div>
+              {:else if mediaFileName}
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <!-- <div class="badge badge-info badge-sm">
+                    🎵 {mediaType.toUpperCase()}
+                  </div> -->
+                    <div
+                      class="text-sm text-base-content/80 max-w-64 truncate"
+                      title={mediaFileName}
+                    >
+                      {mediaFileName}
+                    </div>
+                  </div>
+                  <button
+                    onclick={() => {
+                      if (mediaSrc && mediaSrc.startsWith("blob:")) {
+                        URL.revokeObjectURL(mediaSrc);
+                      }
+                      mediaSrc = "";
+                      mediaFileName = "";
+                      if (mediaFileInput) mediaFileInput.value = "";
+                      statusText = t("subtitle-editor.media-removed");
+                      setTimeout(() => (statusText = ""), 3000);
+                    }}
+                    class="btn btn-xs btn-ghost text-error hover:bg-error/20"
+                    title={t("subtitle-editor.remove-media")}
+                  >
+                    ✕
+                  </button>
                 </div>
               {/if}
 
