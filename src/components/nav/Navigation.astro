@@ -16,6 +16,7 @@ const cursor = await Category.listActiveByTenant(Astro.locals.user.tenant_id);
 const categories = await cursor.toArray();
 
 const navState = Astro.locals.user.navState || {};
+const isNavCollapsed = navState["nav-collapsed"] ?? false;
 
 const menuItems = categories.map((category, index) => ({
   title: category.title,
@@ -33,6 +34,8 @@ const menuItems = categories.map((category, index) => ({
 
 const audioToTextMenus = [];
 const audioFeatureItems = [];
+const subtitleStudioMenus = [];
+const subtitleFeatureItems = [];
 
 const createImageMenus = [];
 const createImageItems = [];
@@ -44,7 +47,7 @@ const myAIBobItems: Array<any> = [];
 const conversations = await ConversationModel.listByUser(Astro.locals.user.id);
 
 const transcriptions = await TranscriptionModel.listByTenant(
-  Astro.locals.user.tenant_id,
+  Astro.locals.user.tenant_id
 );
 
 const transcriptionTypes = Astro.locals.tenant.transcription_types ?? [];
@@ -52,7 +55,7 @@ const transcriptionTypes = Astro.locals.tenant.transcription_types ?? [];
 const activeTranscriptions =
   transcriptions?.filter(
     (tran) =>
-      transcriptionTypes.includes(tran.category) && tran.enabled === true,
+      transcriptionTypes.includes(tran.category) && tran.enabled === true
   ) ?? [];
 
 const audioToTextTranscriptions = activeTranscriptions
@@ -69,7 +72,7 @@ const subtitleTranscriptions = activeTranscriptions
       tran.category == AudioCategory.Subtitle ||
       tran.category == AudioCategory.SubtitleJson ||
       tran.category == AudioCategory.SubtitleLarge ||
-      tran.category == AudioCategory.Subtitle11Labs,
+      tran.category == AudioCategory.Subtitle11Labs
   )
   .map((tran) => ({
     title: tran.name,
@@ -86,10 +89,17 @@ if (audioToTextTranscriptions.length > 0) {
 }
 
 if (subtitleTranscriptions.length > 0) {
-  audioFeatureItems.push({
+  subtitleFeatureItems.push({
     title: t("settings.transcription.subtitles-title"),
-    isOpened: navState["audio-menu-id-1"] ?? false,
+    isOpened: navState["subtitle-menu-id-0"] ?? false,
     items: subtitleTranscriptions,
+  });
+}
+
+if (Astro.locals.tenant.subtitle_editor) {
+  subtitleFeatureItems.push({
+    title: t("settings.transcription.subtitle-editor"),
+    path: `/subtitle-studio/editor`,
   });
 }
 
@@ -110,12 +120,21 @@ if (audioFeatureItems.length > 0) {
   });
 }
 
+if (subtitleFeatureItems.length > 0) {
+  subtitleStudioMenus.push({
+    title: t("nav.subtitle-studio"),
+    icon: svgIcons.subtitle,
+    isOpened: navState["subtitle-menu"] ?? false,
+    items: subtitleFeatureItems,
+  });
+}
+
 // Image Assistant > DALL-E
 if (
   auth.hasFeatureWithProvider(
     Astro.locals,
     TenantFeature.CreateImage,
-    ApiKeyProvider.OpenAI,
+    ApiKeyProvider.OpenAI
   )
 ) {
   createImageItems.push({
@@ -129,7 +148,7 @@ if (
   auth.hasFeatureWithProvider(
     Astro.locals,
     TenantFeature.CreateImage,
-    ApiKeyProvider.Flux,
+    ApiKeyProvider.Flux
   )
 ) {
   createImageItems.push({
@@ -143,7 +162,7 @@ if (
   auth.hasFeatureWithProvider(
     Astro.locals,
     TenantFeature.GptImage,
-    ApiKeyProvider.OpenAI,
+    ApiKeyProvider.OpenAI
   )
 ) {
   createImageItems.push({
@@ -162,17 +181,18 @@ if (createImageItems.length > 0) {
 }
 
 for (let i = 0; i < conversations.length; i++) {
-  const con = conversations[i];
-  myAIBobItems.push({
-    title: con.title,
-    path: `/conversations/${con._id}`,
-  });
-
-  // myAIBobItems.push({
-  //   title: t("conversation.show-more"),
-  //   path: "",
-  // });
+  if (i < 5) {
+    const con = conversations[i];
+    myAIBobItems.push({
+      title: con.title,
+      path: `/conversations/${con._id}`,
+    });
+  }
 }
+myAIBobItems.push({
+  title: t("conversation.show-more"),
+  isCta: true,
+});
 
 if (myAIBobItems.length > 0) {
   myAIBoxMenus.push({
@@ -248,9 +268,12 @@ if (auth.isSuperAdmin(Astro.locals)) {
 const modules = [...menuItems];
 ---
 
-<nav class="flex flex-col bg-base-100 w-80 min-h-screen gap-6">
-  <div class="mt-4 pl-6">
-    <a href="/">
+<nav
+  class={`flex flex-col bg-base-100 min-h-screen gap-3 transition-all duration-300 ${isNavCollapsed ? "w-16" : "w-80"}`}
+  id="main-navigation"
+>
+  <div class="mt-3 pl-6 flex items-center justify-between">
+    <a href="/" class={isNavCollapsed ? "hidden" : ""}>
       <img
         src="/aibox-logo-text.svg"
         alt="Aibox Default Logo"
@@ -278,10 +301,30 @@ const modules = [...menuItems];
         class="logo-dark h-8 hidden in-data-[theme=dark]:block"
       />
     </a>
+
+    <!-- Toggle Button -->
+    <button
+      id="nav-toggle-btn"
+      class={`btn btn-ghost btn-sm btn-circle mr-2 hidden lg:flex ${isNavCollapsed ? "ml-2" : ""}`}
+      aria-label={isNavCollapsed ? "Expand navigation" : "Collapse navigation"}
+      title={isNavCollapsed ? "Expand navigation" : "Collapse navigation"}
+      data-menu-open-icon={svgIcons.menuOpen}
+      data-menu-close-icon={svgIcons.menuClose}
+    >
+      <div class="[&>svg]:h-4 [&>svg]:w-4">
+        {
+          isNavCollapsed ? (
+            <Fragment set:html={svgIcons.menuOpen} />
+          ) : (
+            <Fragment set:html={svgIcons.menuClose} />
+          )
+        }
+      </div>
+    </button>
   </div>
 
   <div class="grow">
-    <ul class="menu w-full pr-6">
+    <ul class={`menu w-full ${isNavCollapsed ? "pr-2" : "pr-6"}`}>
       <li class="active:bg-transparent">
         <details
           data-id={`ai-tools`}
@@ -289,13 +332,22 @@ const modules = [...menuItems];
           id="onboardingId1"
           class="active:bg-transparent"
         >
-          <summary>
+          <summary
+            class={isNavCollapsed
+              ? "tooltip tooltip-right flex justify-center"
+              : ""}
+            data-tip={isNavCollapsed ? t("nav.text-prompts") : ""}
+          >
             <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
               {svgIcons.aitool && <Fragment set:html={svgIcons.aitool} />}
             </div>
-            {t("nav.text-prompts")}
+            <span class={isNavCollapsed ? "hidden" : ""}
+              >{t("nav.text-prompts")}</span
+            >
           </summary>
-          <ul class="w-full pr-6 active:bg-transparent">
+          <ul
+            class={`w-full active:bg-transparent ${isNavCollapsed ? "hidden pr-2" : "pr-6"}`}
+          >
             {
               modules.map((mod, index) => (
                 <li class="active:bg-transparent">
@@ -323,7 +375,9 @@ const modules = [...menuItems];
       </li>
       {
         audioToTextMenus.length > 0 && (
-          <div class="divider mx-6 pointer-events-none" />
+          <div
+            class={`mx-6 my-2 pointer-events-none ${isNavCollapsed ? "hidden" : ""}`}
+          />
         )
       }
       {
@@ -335,14 +389,23 @@ const modules = [...menuItems];
               id="onboardingId3"
               class="active:bg-transparent"
             >
-              <summary>
+              <summary
+                class={
+                  isNavCollapsed
+                    ? "tooltip tooltip-right flex justify-center"
+                    : ""
+                }
+                data-tip={isNavCollapsed ? mod.title : ""}
+              >
                 <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
                   {mod.icon && <Fragment set:html={mod.icon} />}
                 </div>
-                {mod.title}
+                <span class={isNavCollapsed ? "hidden" : ""}>{mod.title}</span>
               </summary>
               {"items" in mod && (
-                <ul class="active:bg-transparent">
+                <ul
+                  class={`active:bg-transparent ${isNavCollapsed ? "hidden" : ""}`}
+                >
                   {mod.items?.map((sub, id) => (
                     <li class="pl-1 active:bg-transparent">
                       {sub.items ? (
@@ -373,10 +436,69 @@ const modules = [...menuItems];
           </li>
         ))
       }
+      <div class="mx-6 my-2 pointer-events-none nav-spacer"></div>
+      {
+        subtitleStudioMenus.map((mod) => (
+          <li class="active:bg-transparent">
+            <details
+              data-id={`subtitle-menu`}
+              open={mod.isOpened}
+              id="onboardingId5"
+              class="active:bg-transparent"
+            >
+              <summary
+                class={
+                  isNavCollapsed
+                    ? "tooltip tooltip-right flex justify-center"
+                    : ""
+                }
+                data-tip={isNavCollapsed ? mod.title : ""}
+              >
+                <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
+                  {mod.icon && <Fragment set:html={mod.icon} />}
+                </div>
+                <span class={isNavCollapsed ? "hidden" : ""}>{mod.title}</span>
+              </summary>
+              {"items" in mod && (
+                <ul
+                  class={`active:bg-transparent ${isNavCollapsed ? "hidden" : ""}`}
+                >
+                  {mod.items?.map((sub, id) => (
+                    <li class="pl-1 active:bg-transparent">
+                      {sub.items ? (
+                        <details
+                          data-id={`subtitle-menu-id-${id}`}
+                          open={sub.isOpened}
+                          class="active:bg-transparent"
+                        >
+                          <summary>{sub.title}</summary>
+                          {sub.items.length > 0 && (
+                            <ul class="active:bg-transparent">
+                              {sub.items.map((sub1) => (
+                                <li class="pl-1 active:bg-transparent">
+                                  <MenuItem {...sub1} />
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </details>
+                      ) : (
+                        <MenuItem {...sub} />
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </details>
+          </li>
+        ))
+      }
 
       {
         createImageMenus.length > 0 && (
-          <div class="divider mx-6 pointer-events-none" />
+          <div
+            class={`mx-6 my-2 pointer-events-none ${isNavCollapsed ? "hidden" : ""}`}
+          />
         )
       }
       {
@@ -388,14 +510,23 @@ const modules = [...menuItems];
               class="active:bg-transparent"
               id="onboardingId4"
             >
-              <summary>
+              <summary
+                class={
+                  isNavCollapsed
+                    ? "tooltip tooltip-right flex justify-center"
+                    : ""
+                }
+                data-tip={isNavCollapsed ? mod.title : ""}
+              >
                 <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
                   {mod.icon && <Fragment set:html={mod.icon} />}
                 </div>
-                {mod.title}
+                <span class={isNavCollapsed ? "hidden" : ""}>{mod.title}</span>
               </summary>
               {"items" in mod && (
-                <ul class="active:bg-transparent">
+                <ul
+                  class={`active:bg-transparent ${isNavCollapsed ? "hidden" : ""}`}
+                >
                   {mod.items?.map((sub) => (
                     <li class="pl-1 active:bg-transparent">
                       <MenuItem {...sub} />
@@ -410,7 +541,9 @@ const modules = [...menuItems];
 
       {
         restrictedMenus.length > 0 && (
-          <div class="divider mx-6 pointer-events-none" />
+          <div
+            class={`mx-6 my-2 pointer-events-none ${isNavCollapsed ? "hidden" : ""}`}
+          />
         )
       }
       {
@@ -422,14 +555,23 @@ const modules = [...menuItems];
               class="active:bg-transparent"
               id="onboardingNewTenantId1"
             >
-              <summary>
+              <summary
+                class={
+                  isNavCollapsed
+                    ? "tooltip tooltip-right flex justify-center"
+                    : ""
+                }
+                data-tip={isNavCollapsed ? mod.title : ""}
+              >
                 <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
                   {mod.icon && <Fragment set:html={mod.icon} />}
                 </div>
-                {mod.title}
+                <span class={isNavCollapsed ? "hidden" : ""}>{mod.title}</span>
               </summary>
               {"items" in mod && (
-                <ul class="active:bg-transparent">
+                <ul
+                  class={`active:bg-transparent ${isNavCollapsed ? "hidden" : ""}`}
+                >
                   {mod.items?.map((sub) => (
                     <li class="pl-1 active:bg-transparent">
                       <MenuItem {...sub} />
@@ -439,7 +581,9 @@ const modules = [...menuItems];
               )}
             </details>
             {index < restrictedMenus.length - 1 && (
-              <div class="divider pointer-events-none" />
+              <div
+                class={`mx-6 my-1 pointer-events-none ${isNavCollapsed ? "hidden" : ""}`}
+              />
             )}
           </li>
         ))
@@ -447,25 +591,36 @@ const modules = [...menuItems];
 
       {
         myAIBoxMenus.length > 0 && (
-          <div class="divider mx-6 pointer-events-none" />
+          <div
+            class={`mx-6 my-2 pointer-events-none ${isNavCollapsed ? "hidden" : ""}`}
+          />
         )
       }
       {
-        myAIBoxMenus.map((mod) => (
+        myAIBoxMenus.map((mod, index) => (
           <li class="active:bg-transparent">
             <details
               data-id={"my-ai-box"}
               open={mod.isOpened}
               class="active:bg-transparent"
             >
-              <summary>
+              <summary
+                class={
+                  isNavCollapsed
+                    ? "tooltip tooltip-right flex justify-center"
+                    : ""
+                }
+                data-tip={isNavCollapsed ? mod.title : ""}
+              >
                 <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
                   {mod.icon && <Fragment set:html={mod.icon} />}
                 </div>
-                {mod.title}
+                <span class={isNavCollapsed ? "hidden" : ""}>{mod.title}</span>
               </summary>
               {"items" in mod && (
-                <ul class="active:bg-transparent">
+                <ul
+                  class={`active:bg-transparent ${isNavCollapsed ? "hidden" : ""}`}
+                >
                   {mod.items?.map((sub) => (
                     <li class="pl-1 active:bg-transparent">
                       <MenuItem {...sub} />
@@ -474,6 +629,11 @@ const modules = [...menuItems];
                 </ul>
               )}
             </details>
+            {index < restrictedMenus.length - 1 && (
+              <div
+                class={`mx-6 my-1 pointer-events-none ${isNavCollapsed ? "hidden" : ""}`}
+              />
+            )}
           </li>
         ))
       }
@@ -493,6 +653,161 @@ const modules = [...menuItems];
     });
   }
 
+  function toggleNavigation(expand?: boolean) {
+    const toggleBtn = document.getElementById("nav-toggle-btn");
+    const navigation = document.getElementById("main-navigation");
+
+    if (!toggleBtn || !navigation) return;
+
+    const isCurrentlyCollapsed = navigation.classList.contains("w-16");
+    const newCollapsedState =
+      expand !== undefined ? !expand : !isCurrentlyCollapsed;
+
+    // Update nav state in database
+    updateNavState("nav-collapsed", newCollapsedState);
+
+    // Update navigation width
+    if (newCollapsedState) {
+      navigation.classList.remove("w-80");
+      navigation.classList.add("w-16");
+    } else {
+      navigation.classList.remove("w-16");
+      navigation.classList.add("w-80");
+    }
+
+    // Update toggle button positioning
+    if (newCollapsedState) {
+      toggleBtn.classList.add("ml-2");
+    } else {
+      toggleBtn.classList.remove("ml-2");
+    }
+
+    // Update logo visibility
+    const logoContainer = navigation.querySelector('a[href="/"]');
+    if (logoContainer) {
+      if (newCollapsedState) {
+        logoContainer.classList.add("hidden");
+      } else {
+        logoContainer.classList.remove("hidden");
+      }
+    }
+
+    // Update text spans visibility
+    const textSpans = navigation.querySelectorAll("span:not(.tooltip)");
+    textSpans.forEach((span) => {
+      if (newCollapsedState) {
+        span.classList.add("hidden");
+      } else {
+        span.classList.remove("hidden");
+      }
+    });
+
+    // Update submenu visibility
+    const subMenus = navigation.querySelectorAll("ul ul");
+    subMenus.forEach((menu) => {
+      if (newCollapsedState) {
+        menu.classList.add("hidden");
+      } else {
+        menu.classList.remove("hidden");
+      }
+    });
+
+    // Update spacer visibility
+    const spacers = navigation.querySelectorAll(".mx-6.my-2, .mx-6.my-1");
+    spacers.forEach((spacer) => {
+      if (newCollapsedState) {
+        spacer.classList.add("hidden");
+      } else {
+        spacer.classList.remove("hidden");
+      }
+    });
+
+    // Update summary tooltip classes
+    const summaries = navigation.querySelectorAll("details > summary");
+    summaries.forEach((summary) => {
+      if (newCollapsedState) {
+        summary.classList.add(
+          "tooltip",
+          "tooltip-right",
+          "flex",
+          "justify-center"
+        );
+      } else {
+        summary.classList.remove(
+          "tooltip",
+          "tooltip-right",
+          "flex",
+          "justify-center"
+        );
+      }
+    });
+
+    const menuElement = navigation.querySelector(".menu");
+    if (menuElement) {
+      if (newCollapsedState) {
+        menuElement.classList.remove("pr-6");
+        menuElement.classList.add("pr-2");
+      } else {
+        menuElement.classList.remove("pr-2");
+        menuElement.classList.add("pr-6");
+      }
+    }
+
+    toggleBtn.setAttribute(
+      "aria-label",
+      newCollapsedState ? "Expand navigation" : "Collapse navigation"
+    );
+    toggleBtn.setAttribute(
+      "title",
+      newCollapsedState ? "Expand navigation" : "Collapse navigation"
+    );
+
+    const iconContainer = toggleBtn.querySelector("div");
+    if (iconContainer) {
+      const menuOpenIcon = toggleBtn.dataset.menuOpenIcon;
+      const menuCloseIcon = toggleBtn.dataset.menuCloseIcon;
+
+      if (newCollapsedState) {
+        iconContainer.innerHTML =
+          menuOpenIcon ||
+          `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>`;
+      } else {
+        iconContainer.innerHTML =
+          menuCloseIcon ||
+          `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>`;
+      }
+    }
+  }
+
+  function setupNavToggle() {
+    const toggleBtn = document.getElementById("nav-toggle-btn");
+
+    if (toggleBtn) {
+      toggleBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleNavigation();
+      });
+    }
+  }
+
+  function setupCollapsedMenuClicks() {
+    const navigation = document.getElementById("main-navigation");
+    if (!navigation) return;
+
+    const summaries = navigation.querySelectorAll("details > summary");
+    summaries.forEach((summary) => {
+      summary.addEventListener("click", (e) => {
+        const isCurrentlyCollapsed = navigation.classList.contains("w-16");
+        if (isCurrentlyCollapsed) {
+          e.preventDefault(); // Prevent the details toggle
+          e.stopPropagation(); // Stop event bubbling
+          toggleNavigation(true); // Expand the navigation
+        }
+      });
+    });
+  }
+
   async function updateNavState(detailsId: string, isOpen: boolean) {
     await fetch("/api/users/update-nav-state.json", {
       method: "POST",
@@ -501,8 +816,9 @@ const modules = [...menuItems];
     });
   }
 
-  // Ensure open states are applied after page load
   document.addEventListener("astro:page-load", () => {
     applyOpenStates();
+    setupNavToggle();
+    setupCollapsedMenuClicks();
   });
 </script>

@@ -43,6 +43,8 @@ import filter from "$assets/icons/filter.svg?raw";
 import arrowDownFill from "$assets/icons/arrow-down-fill.svg?raw";
 import arrowUp from "$assets/icons/arrow-up.svg?raw";
 import arrowDown from "$assets/icons/arrow-down.svg?raw";
+import menuClose from "$assets/icons/menu-left.svg?raw";
+import menuOpen from "$assets/icons/menu-right.svg?raw";
 import arrowUpDown from "$assets/icons/arrow-up-down.svg?raw";
 import attachment from "$assets/icons/attachment.svg?raw";
 import eraser from "$assets/icons/eraser.svg?raw";
@@ -63,6 +65,9 @@ import logo from "$assets/icons/logo.svg?raw";
 import imageTool from "$assets/icons/image-tool.svg?raw";
 import expand from "$assets/icons/expand.svg?raw";
 import web from "$assets/icons/web.svg?raw";
+import subtitle from "$assets/icons/subtitle.svg?raw";
+import deleteIcon from "$assets/icons/delete.svg?raw";
+import addIcon from "$assets/icons/add.svg?raw";
 import pin from "$assets/icons/pin.svg?raw";
 
 export const svgIcons = {
@@ -111,6 +116,8 @@ export const svgIcons = {
   arrowDownFill,
   arrowUp,
   arrowDown,
+  menuClose,
+  menuOpen,
   arrowUpDown,
   attachment,
   eraser,
@@ -131,5 +138,8 @@ export const svgIcons = {
   imageTool,
   expand,
   web,
-  pin
+  subtitle,
+  deleteIcon,
+  addIcon,
+  pin,
 };
