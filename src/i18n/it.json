@@ -568,5 +568,10 @@
   "subtitle-editor.position-top": "Top",
   "subtitle-editor.subtitle-appearance": "Appearance",
   "subtitle-editor.font-size": "Font size",
-  "subtitle-editor.background-opacity": "Background"
+  "subtitle-editor.background-opacity": "Background",
+  "conversation.my-ai-box-nav-title": "MY AIBOX ",
+  "conversation.show-more": "Show more",
+  "conversation.remove-from-my-ai-box": "Remove from My aibox ",
+  "conversation.delete-conversation-successfull": "Delete conversation successfull",
+  "common.close": "Close"
 }

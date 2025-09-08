@@ -1,5 +1,6 @@
 import { ChatOpenAI, AzureChatOpenAI } from "@langchain/openai";
 import type { APIContext } from "astro";
+import type { ActionAPIContext } from "astro:actions";
 import { decrypt } from "./secure";
 import { TenantFeature, ApiKeyProvider } from "$types/TenantFeature";
 import log from "./log";
@@ -78,7 +79,7 @@ const initAzureChatOpenAI = (
 };
 
 export const initializeOpenAI = (
-  ctx: APIContext,
+  ctx: APIContext | ActionAPIContext,
   overrides?: ChatConfigOverrides,
 ) => {
   const { tenant } = ctx.locals;

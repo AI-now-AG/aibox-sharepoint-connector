@@ -347,7 +347,6 @@
       </div>
       <div class="modal-action">
         <form method="dialog">
-          <!-- <button class="btn btn-outline">{t("common.cancel")}</button> -->
           <button
             class="btn btn-primary {!isFormValid && 'btn-disabled'}"
             type="submit"

@@ -119,7 +119,6 @@ export default {
       ...validated,
       updated_at: new Date(),
     };
-    console.log("doc", doc);
     return await collection.findOneAndUpdate(
       { _id: objectId },
       { $set: doc },

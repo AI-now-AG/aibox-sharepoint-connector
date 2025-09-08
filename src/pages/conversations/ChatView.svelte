@@ -1,37 +1,27 @@
 <script lang="ts">
-  import { actions } from "astro:actions";
-  import {
-    messageHistories,
-    addMessageToHistory,
-    getMessageHistory,
-    clearMessageHistory,
-    previousResponseIds,
-    setPreviousResponseId,
-    getPreviousResponseId,
-  } from "$components/prompt-interface/components/stores/messageHistoryStore";
-  import { PromptModel } from "$types/PromptModel";
-  import { addToast } from "$stores/toast";
+  import { PromptToolOption } from "$types/AIProvider";
   import {
     MessageRole,
     type Message,
     type MessageHistory,
   } from "$types/MessageHistory";
-  import { readFileContent } from "$utils/fileReader";
-  import {
-    markdownToHtml,
-    buildCitationLinks,
-    stripHtmlFormatting,
-  } from "$utils/textFormatting";
   import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
   import MessageInput from "$components/chat-ui/MessageInput.svelte";
   import MessageList from "$components/chat-ui/MessageList.svelte";
-  import Loading from "$components/Loading.svelte";
-  import { tenant, user } from "$stores";
   import { useTranslations } from "$i18n/utils";
-  import { ApiKeyProvider } from "$types/TenantFeature";
-  import { PromptToolOption } from "$types/AIProvider";
+  import { actions } from "astro:actions";
+  import Loading from "$components/Loading.svelte";
+  import { addToast } from "$stores/toast";
   import { getPromptTools, useProviderInfo } from "$shared/AIProvider";
-  import ConversationDialog from "$components/ConversationDialog.svelte";
+  import { tenant, user } from "$stores";
+  import { PromptModel } from "$types/PromptModel";
+  import {
+    buildCitationLinks,
+    markdownToHtml,
+    stripHtmlFormatting,
+  } from "$utils/textFormatting";
+  import { ApiKeyProvider } from "$types/TenantFeature";
+  import { readFileContent } from "$utils/fileReader";
 
   const t = useTranslations();
 
@@ -50,43 +40,87 @@
     tenantId: string;
     provider: string;
     prompt: string;
-    promptId: string;
     stream: boolean;
     tool?: string;
     fileUrls: string[];
     imageGenerationOptions?: any;
     previousResponseId?: string | null;
-    messageHistory?: MessageHistory;
+    messageHistory?: Message[];
     reasoningEffort?: string;
+    promptTool?: string;
     verbosity?: string;
   }
 
   interface Props {
-    promptId: string;
-    groupId: string;
-    currentPrompt: any;
-    isFetching: boolean;
+    conversationId: string;
+    model: PromptModel;
+    messages: MessageHistory;
+    promptData: any;
     folderName?: string;
+    lastResponseId?: string | null;
   }
+
   let {
-    promptId,
-    groupId,
-    currentPrompt,
-    isFetching = $bindable(false),
+    conversationId,
+    model = PromptModel.Default,
+    messages,
     folderName,
+    lastResponseId = null,
   }: Props = $props();
 
-  // === State Management ===
-  let currentMessage = $state("");
-  let currentMessageHistory = $derived(
-    $messageHistories[promptId] || getMessageHistory(promptId) || [],
-  );
-  let prompt: string = $state("");
+  let input: string = $state("");
   let files: File[] = $state([]);
+  let messageHistory: MessageHistory = $state(messages);
+  let currentMessage = $state("");
   let currentStreamingImageUrl: string = $state("");
+  let isFetching: boolean = $state(false);
   let isGenerating: boolean = $state(false);
   let isResoningThingking: boolean = $state(false);
-  let loading: boolean = $state(false);
+  let previousResponseId: string | null = $state(lastResponseId);
+  let loading = $state(false);
+
+  const providerIno = useProviderInfo($tenant);
+  let toolOptions = getPromptTools(
+    (model == PromptModel.Default
+      ? providerIno?.defaultProviderPromptModelName == PromptModel.OpenAI
+        ? PromptModel.OpenAIWithTools
+        : providerIno?.defaultProviderPromptModelName
+      : model) as PromptModel,
+  );
+
+  let selectedPromptTool = $state(PromptToolOption.None);
+
+  async function deleteConversation() {
+    try {
+      loading = true;
+      const { error } = await actions.conversation.delete({
+        _id: conversationId,
+      });
+      if (!error) {
+        window.location.href = "/";
+      } else {
+        addToast({ message: JSON.stringify(error), type: "error" });
+      }
+    } catch (error) {
+      console.error("Exception when delete conversation", error);
+    } finally {
+      loading = false;
+    }
+  }
+
+  async function updateConversation() {
+    try {
+      const { error } = await actions.conversation.update({
+        _id: conversationId,
+        messages: messageHistory,
+      });
+      if (error) {
+        addToast({ message: JSON.stringify(error), type: "error" });
+      }
+    } catch (error) {
+      console.error("Exception when update conversation", error);
+    }
+  }
 
   function isGpt5Default() {
     const aiProviders = $tenant?.api_key_providers ?? [];
@@ -100,70 +134,6 @@
     return false;
   }
 
-  function getDefaultModelName() {
-    const aiProviders = $tenant?.api_key_providers ?? [];
-    const activeDefaultProvider = aiProviders.find(
-      (item) => item.active === true && item.default === true,
-    );
-    return activeDefaultProvider?.name || ApiKeyProvider.OpenAI;
-  }
-
-  const providerIno = useProviderInfo($tenant);
-  // === Derived State ===
-  let toolOptions = $derived.by(() => {
-    return getPromptTools(
-      (currentPrompt?.model == PromptModel.Default
-        ? providerIno?.defaultProviderPromptModelName == PromptModel.OpenAI
-          ? PromptModel.OpenAIWithTools
-          : providerIno?.defaultProviderPromptModelName
-        : currentPrompt?.model) as PromptModel,
-    );
-  });
-
-  let selectedPromptTool = $state(PromptToolOption.None);
-  let isDisablePromptTool = $state(false);
-
-  // === Effects ===
-  $effect(() => {
-    if (currentPrompt.promptTool != PromptToolOption.None) {
-      selectedPromptTool = currentPrompt.promptTool;
-    }
-    // Support Old gpt-image selection (active image tool by default)
-    const isOpenAiWithImageTool =
-      currentPrompt.model == PromptModel.OpenAIWithImageTools;
-    if (isOpenAiWithImageTool) {
-      selectedPromptTool = PromptToolOption.Image;
-    }
-    if (
-      (currentPrompt.promptTool &&
-        currentPrompt.promptTool != PromptToolOption.None) ||
-      isOpenAiWithImageTool
-    ) {
-      isDisablePromptTool = true;
-    } else {
-      isDisablePromptTool = false;
-    }
-  });
-
-  const tenantId = $tenant?._id?.toString();
-  let previousResponseId: string | null = $derived(
-    $previousResponseIds[promptId] ?? getPreviousResponseId(promptId),
-  );
-
-  // === Effects ===
-  $effect(() => {
-    if (currentPrompt) {
-      if (previousResponseId) {
-        prompt = "";
-        files = [];
-      } else {
-        prompt = currentPrompt?.predefined_input ?? "";
-        files = [];
-      }
-    }
-  });
-
-  // === API Configuration ===
   async function getAPIConfiguration(): Promise<APIConfiguration> {
     const configResponse = await fetch(
       "/.netlify/functions/getTranscriptionConfig",
@@ -184,38 +154,30 @@
     };
   }
 
-  // === Request Builder ===
   function buildRequestPayload(fileUrls: string[]): RequestPayload {
-    let isOpenAIResponseModel =
-      [
-        PromptModel.OpenAI,
-        PromptModel.OpenAIWithTools,
-        PromptModel.OpenAIWithImageTools,
-      ].includes(currentPrompt?.model) ||
-      (getDefaultModelName() == ApiKeyProvider.OpenAI && !currentPrompt?.model);
+    const isOpenAIResponseModel = [PromptModel.OpenAIWithTools].includes(model);
 
     const isOpenAIGpt5ResponseModel =
-      [PromptModel.OpenAIGpt5].includes(currentPrompt?.model) ||
-      (isGpt5Default() && !currentPrompt?.model);
+      [PromptModel.OpenAIGpt5].includes(model) || (isGpt5Default() && !model);
 
     const provider = isOpenAIResponseModel
       ? "openai-response"
       : isOpenAIGpt5ResponseModel
         ? "openai-gpt-5-response"
-        : currentPrompt?.model || getDefaultModelName();
+        : model;
+
+    isGenerating = selectedPromptTool == PromptToolOption.Image;
 
     const promptForAttachedFilesOnly = fileUrls.length > 0 ? " " : "";
 
     const payload: RequestPayload = {
-      tenantId: tenantId!,
+      tenantId: $tenant?._id?.toString()!,
       provider,
-      prompt: prompt || promptForAttachedFilesOnly,
-      promptId,
+      prompt: input || promptForAttachedFilesOnly,
       stream: true,
       fileUrls,
     };
 
-    // Add conditional properties
     if (selectedPromptTool != PromptToolOption.None) {
       payload.tool = selectedPromptTool;
       if (selectedPromptTool == PromptToolOption.Image) {
@@ -231,25 +193,22 @@
     if (isOpenAIResponseModel) {
       payload.previousResponseId = previousResponseId;
     } else {
-      payload.messageHistory = currentMessageHistory;
+      payload.messageHistory = messageHistory;
     }
 
     if (isOpenAIGpt5ResponseModel) {
-      payload.reasoningEffort = currentPrompt?.reasoningEffort || "low";
-      payload.verbosity = currentPrompt?.textVerbosity || "low";
+      payload.reasoningEffort = "low";
+      payload.verbosity = "low";
     }
 
     return payload;
   }
 
-  // === Image Processing Utilities ===
   function formatImageUrl(imageData: string): string {
     if (!imageData) return "";
-
     if (imageData.startsWith("data:") || imageData.startsWith("http")) {
       return imageData;
     }
-
     return `data:image/png;base64,${imageData}`;
   }
 
@@ -257,7 +216,6 @@
     return data.result || data.image || "";
   }
 
-  // === Stream Event Handlers ===
   function handleStartEvent(data: any): void {
     console.log(`🚀 Started with ${data.provider} using ${data.model}`);
   }
@@ -266,11 +224,6 @@
     if (data.content && typeof data.content === "string") {
       state.messageContent += data.content;
       currentMessage += data.content;
-
-      // If the current chunk contains a newline,
-      // re-render the entire accumulated text as HTML.
-      // This avoids trying to parse on every single character
-      // and ensures we only re-render when a natural "block" ends.
       if (data.content.includes("\n")) {
         currentMessage = markdownToHtml(state.messageContent);
       }
@@ -279,14 +232,11 @@
 
   function handleCitationsEvent(data: any, state: StreamingState): void {
     if (data.citations && data.citations.length > 0) {
-      console.log("📚 Citations received:", data.citations.length);
       state.citations = data.citations;
     }
   }
 
   function handleImagesEvent(data: any, state: StreamingState): void {
-    console.log("🖼️ Images generated:", data.images?.length || 0);
-
     if (data.images && data.images.length > 0) {
       const firstImage = data.images[0];
       const imageData = extractImageFromData(firstImage);
@@ -300,8 +250,6 @@
   }
 
   function handleToolOutputsEvent(data: any, state: StreamingState): void {
-    console.log("🔧 Tool outputs received:", data.outputs.length);
-
     data.outputs.forEach((output: any) => {
       if (output.image || output.result) {
         const imageData = extractImageFromData(output);
@@ -320,11 +268,6 @@
     requestBody: RequestPayload,
     fileUrls?: string[],
   ): any {
-    console.log(`✅ Complete! Processing time: ${data.processingTimeMs}ms`);
-    if (data.responseId) {
-      console.log(`Response ID: ${data.responseId}`);
-    }
-
     const finalImageUrl = formatImageUrl(
       state.currentImageUrl ||
         data.images?.[0]?.result ||
@@ -335,15 +278,14 @@
     const responseText =
       data.fullResponse ?? data.outputText ?? state.messageContent ?? "";
 
-    // Add user message to history
     const newUserMessage: Message = {
       role: MessageRole.User,
       content: requestBody.prompt,
       fileUrls: fileUrls,
     };
-    addMessageToHistory(groupId, promptId, newUserMessage);
 
-    // Handle assistant message with citations
+    messageHistory.push(newUserMessage);
+
     if (state.citations.length > 0) {
       addAssistantMessageWithCitations(
         responseText,
@@ -353,12 +295,11 @@
     } else {
       addAssistantMessage(responseText, finalImageUrl);
     }
+    updateConversation();
 
-    // Clean up and reset states
     resetUIState();
-    setPreviousResponseId(promptId, data.responseId);
+    previousResponseId = data.responseId;
 
-    // Scroll to latest message
     setTimeout(() => scrollIntoView(), 1000);
 
     return data;
@@ -369,23 +310,23 @@
     requestBody: RequestPayload,
     fileUrls?: string[],
   ): void {
-    console.error(`❌ Stream error: ${data.error}`);
-
     const errorMessage = data.error || "Image generation failed.";
 
-    // Add user message to history
     const errorUserMessage: Message = {
       role: MessageRole.User,
       content: requestBody.prompt,
       fileUrls: fileUrls,
     };
-    addMessageToHistory(groupId, promptId, errorUserMessage);
+
+    messageHistory.push(errorUserMessage);
 
     const failedMessage: Message = {
       role: MessageRole.Assistant,
       content: errorMessage,
     };
-    addMessageToHistory(groupId, promptId, failedMessage);
+
+    messageHistory.push(failedMessage);
+    updateConversation();
 
     addToast({
       message: errorMessage,
@@ -396,14 +337,11 @@
     throw new Error(data.error);
   }
 
-  // === Message History Utilities ===
   function addAssistantMessageWithCitations(
     responseText: string,
     citations: any[],
     imageUrl: string,
   ): void {
-    console.log("📚 Citations sent:", citations);
-
     const formattedText = buildCitationLinks(responseText, citations);
     currentMessage = markdownToHtml(formattedText);
 
@@ -414,7 +352,7 @@
       imageUrl,
     };
 
-    addMessageToHistory(groupId, promptId, newAssistantMessage);
+    messageHistory.push(newAssistantMessage);
   }
 
   function addAssistantMessage(responseText: string, imageUrl: string): void {
@@ -425,17 +363,16 @@
       imageUrl,
     };
 
-    addMessageToHistory(groupId, promptId, newAssistantMessage);
+    messageHistory.push(newAssistantMessage);
   }
 
-  // === State Management Utilities ===
   function resetStreamingState(): void {
     currentMessage = "";
     currentStreamingImageUrl = "";
   }
 
   function resetUIState(): void {
-    prompt = "";
+    input = "";
     files = [];
     currentMessage = "";
     currentStreamingImageUrl = "";
@@ -443,7 +380,6 @@
     isGenerating = false;
   }
 
-  // === Stream Processing ===
   function parseStreamLine(line: string): any | null {
     const trimmedLine = line.trim();
     if (!trimmedLine.startsWith("data: ")) {
@@ -452,12 +388,10 @@
 
     const jsonStr = trimmedLine.substring(6).trim();
 
-    // Skip empty data lines or completion markers
     if (!jsonStr || jsonStr === "[DONE]" || jsonStr === "") {
       return null;
     }
 
-    // Basic validation: check if string looks like JSON
     if (!jsonStr.startsWith("{") && !jsonStr.startsWith("[")) {
       return null;
     }
@@ -533,52 +467,33 @@
 
       if (done) {
         console.log("✅ Stream completed");
-
-        // Process any remaining data in buffer
-        if (buffer.trim()) {
-          const data = parseStreamLine(buffer);
-          if (data) {
-            console.log("📥 Processing final buffered data:", data.type);
-            processStreamEvent(data, state, requestBody, fileUrls);
-          }
-        }
         break;
       }
 
       const chunk = decoder.decode(value, { stream: true });
       buffer += chunk;
 
-      // Process complete lines from buffer
       const lines = buffer.split("\n");
-      buffer = lines.pop() || ""; // Keep the last line in buffer (might be incomplete)
+      buffer = lines.pop() || "";
 
       for (const line of lines) {
         const data = parseStreamLine(line);
         if (data) {
           const result = processStreamEvent(data, state, requestBody, fileUrls);
           if (result) {
-            return result; // Return on completion
+            return result;
           }
         }
       }
     }
   }
 
-  // === Main API Function ===
   async function callStreamingAPI(fileUrls: string[] = []) {
     try {
       resetStreamingState();
-
-      // Get API configuration
       const config = await getAPIConfiguration();
-
-      // Build request payload
       const requestBody = buildRequestPayload(fileUrls);
 
-      // Check for image generation tool
-      isGenerating = selectedPromptTool == PromptToolOption.Image;
-
-      // Make API request
       const accessToken = $user?.auth0_access_token;
       if (!accessToken) {
         addToast({
@@ -594,7 +509,6 @@
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          //"X-API-Key": config.apiKey,
           Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify(requestBody),
@@ -604,16 +518,13 @@
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      // Process streaming response
       if (response.headers.get("content-type")?.includes("text/event-stream")) {
-        console.log("📡 Streaming response received");
-
         const reader = response.body?.getReader();
         if (!reader) {
           throw new Error("No reader available");
         }
 
-        prompt = ""; // Reset prompt for new request
+        input = "";
         return await processStream(reader, requestBody, fileUrls);
       }
     } catch (error) {
@@ -623,7 +534,6 @@
     }
   }
 
-  // === File Upload Handler ===
   async function submitForm() {
     const fileDataList = await Promise.all(
       files.map(async (file) => ({
@@ -634,7 +544,6 @@
       })),
     );
 
-    // Reset states
     isFetching = true;
     isGenerating = false;
 
@@ -657,7 +566,7 @@
         },
         body: JSON.stringify({
           files: fileDataList,
-          folderName: folderName,
+          folderName,
         }),
       });
 
@@ -668,7 +577,6 @@
     await callStreamingAPI((uploadedFileUrls as string[]) || []);
   }
 
-  // === UI Utilities ===
   function scrollIntoView() {
     const chatBubbles = document?.querySelectorAll(
       ".chat-container > .chat-bubble",
@@ -680,96 +588,49 @@
       });
     }
   }
-
-  function startNewChat() {
-    clearMessageHistory(promptId);
-    setPreviousResponseId(promptId, null);
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  }
-
-  async function saveConversation() {
-    loading = true;
-    const { error, data } = await actions.conversation.save({
-      prompt_id: currentPrompt._id?.toString() || "",
-      model: currentPrompt.model,
-      messages: currentMessageHistory,
-      previous_response_id: previousResponseId,
-    });
-    loading = false;
-
-    if (error) {
-      addToast({
-        message: error?.message ?? "Something went wrong",
-        type: "error",
-      });
-    } else {
-      window.location.href = `/conversations/${data.insertedId}`;
-    }
-  }
 </script>
 
-<!-- Output (Follow-Up) -->
-{#if currentMessageHistory.length > 0}
+<div class="grid grid-cols-1 grid-rows-[1fr_min-content] h-full">
+  <div class="flex justify-end">
+    <button
+      class="btn btn-outline font-normal"
+      onclick={() => {
+        deleteConversation();
+      }}
+    >
+      {t("conversation.remove-from-my-ai-box")}
+    </button>
+  </div>
+
   <MessageList
     {currentMessage}
-    messages={currentMessageHistory}
+    {messages}
     currentImageUrl={currentStreamingImageUrl}
     {isFetching}
     {isGenerating}
     {isResoningThingking}
   />
-{/if}
 
-<!-- Prompt Textarea -->
-<div
-  class={`${currentMessageHistory.length > 0 ? "sticky bottom-0 bg-base-200" : ""}`}
->
-  {#if currentMessageHistory.length > 0}
+  <div class="sticky bottom-0 bg-base-200">
     <div class="my-4">
-      <button
-        onclick={startNewChat}
-        class="btn btn-active btn-primary btn-sm px-8"
-        disabled={isGenerating || isFetching}
-      >
-        {t("home.new-chat")}
-      </button>
-      <button
-        onclick={saveConversation}
-        class="btn btn-primary btn-outline btn-sm px-8"
-        disabled={isGenerating || isFetching}
-      >
-        {t("prompt.save-chat")}
-      </button>
       <div class="mt-2">
         <ScrollToBottom />
       </div>
     </div>
-  {/if}
-  <MessageInput
-    bind:input={prompt}
-    bind:files
-    {isFetching}
-    stickyFooter={currentMessageHistory.length > 0}
-    onsend={submitForm}
-    {toolOptions}
-    bind:selectedPromptTool
-    bind:isDisablePromptTool
-  />
-</div>
 
-<!-- Output (Normal) -->
-{#if currentMessageHistory.length == 0}
-  <MessageList
-    {currentMessage}
-    currentImageUrl={currentStreamingImageUrl}
-    messages={currentMessageHistory}
-    {isFetching}
-    {isGenerating}
-    {isResoningThingking}
-  />
-{/if}
+    <div class="min-w-full form-wrapper">
+      <MessageInput
+        bind:input
+        bind:files
+        {isFetching}
+        stickyFooter={true}
+        onsend={submitForm}
+        {toolOptions}
+        bind:selectedPromptTool
+        showDataLossWarning={false}
+      />
+    </div>
+  </div>
+</div>
 
 <Loading show={loading} />

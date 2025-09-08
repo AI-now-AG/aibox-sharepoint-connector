@@ -1,14 +1,16 @@
 <script lang="ts">
+  import { actions } from "astro:actions";
   import { slide } from "svelte/transition";
   import { type Message, MessageRole } from "$types/MessageHistory";
   import { sharedMessageHistory } from "$stores/chatHistory";
   import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
   import MessageInput from "$components/chat-ui/MessageInput.svelte";
   import MessageList from "$components/chat-ui/MessageList.svelte";
+  import Loading from "$components/Loading.svelte";
   import { readFileContent } from "$utils/fileReader";
   import { PromptModel } from "$types/PromptModel";
   import {
-    formatMarkdown,
+    markdownToHtml,
     buildCitationLinks,
     stripHtmlFormatting,
   } from "$utils/textFormatting";
@@ -19,6 +21,7 @@
   import { ApiKeyProvider } from "$types/TenantFeature";
   import { PromptToolOption } from "$types/AIProvider";
   import { getPromptTools, useProviderInfo } from "$shared/AIProvider";
+  import ConversationDialog from "$components/ConversationDialog.svelte";
 
   const t = useTranslations();
 
@@ -65,6 +68,7 @@
   let isGenerating: boolean = $state(false);
   let isResoningThingking: boolean = $state(false);
   let previousResponseId: string | null = $state(null);
+  let loading: boolean = $state(false);
 
   const apiProvider = apiKeyProviders?.find((item: any) => {
     return item.default && item.active;
@@ -198,10 +202,21 @@
     console.log(`🚀 Started with ${data.provider} using ${data.model}`);
   }
 
-  function handleChunkEvent(data: any): void {
+  function handleChunkEvent(data: any, state: StreamingState): void {
     if (data.content && typeof data.content === "string") {
+      // Accumulate the raw text
+      state.messageContent += data.content;
+
+      // Append the raw chunk to the current displayed message
       currentMessage += data.content;
-      currentMessage = formatMarkdown(currentMessage);
+
+      // If the current chunk contains a newline,
+      // re-render the entire accumulated text as HTML.
+      // This avoids trying to parse on every single character
+      // and ensures we only re-render when a natural "block" ends.
+      if (data.content.includes("\n")) {
+        currentMessage = markdownToHtml(state.messageContent);
+      }
     }
   }
 
@@ -246,6 +261,7 @@
     data: any,
     state: StreamingState,
     requestBody: RequestPayload,
+    fileUrls?: string[],
   ): any {
     console.log(`✅ Complete! Processing time: ${data.processingTimeMs}ms`);
     if (data.responseId) {
@@ -266,6 +282,7 @@
     const newUserMessage: Message = {
       role: MessageRole.User,
       content: requestBody.prompt,
+      fileUrls: fileUrls,
     };
     sharedMessageHistory.update((messages) => [...messages, newUserMessage]);
 
@@ -290,7 +307,11 @@
     return data;
   }
 
-  function handleErrorEvent(data: any, requestBody: RequestPayload): void {
+  function handleErrorEvent(
+    data: any,
+    requestBody: RequestPayload,
+    fileUrls?: string[],
+  ): void {
     console.error(`❌ Stream error: ${data.error}`);
 
     const errorMessage = data.error || "Image generation failed.";
@@ -299,6 +320,7 @@
     const errorUserMessage: Message = {
       role: MessageRole.User,
       content: requestBody.prompt,
+      fileUrls: fileUrls,
     };
     sharedMessageHistory.update((messages) => [...messages, errorUserMessage]);
 
@@ -326,7 +348,7 @@
     console.log("📚 Citations sent:", citations);
 
     const formattedText = buildCitationLinks(responseText, citations);
-    currentMessage = formatMarkdown(formattedText);
+    currentMessage = markdownToHtml(formattedText);
 
     const newAssistantMessage: Message = {
       role: MessageRole.Assistant,
@@ -344,7 +366,7 @@
   function addAssistantMessage(responseText: string, imageUrl: string): void {
     const newAssistantMessage: Message = {
       role: MessageRole.Assistant,
-      content: formatMarkdown(responseText),
+      content: markdownToHtml(responseText),
       rawData: stripHtmlFormatting(responseText),
       imageUrl,
     };
@@ -400,6 +422,7 @@
     data: any,
     state: StreamingState,
     requestBody: RequestPayload,
+    fileUrls?: string[],
   ): any {
     switch (data.type) {
       case "start":
@@ -411,8 +434,7 @@
 
       case "chunk":
         isResoningThingking = false;
-        handleChunkEvent(data);
-        state.messageContent += data.content || "";
+        handleChunkEvent(data, state);
         break;
 
       case "citations":
@@ -428,10 +450,10 @@
         break;
 
       case "complete":
-        return handleCompleteEvent(data, state, requestBody);
+        return handleCompleteEvent(data, state, requestBody, fileUrls);
 
       case "error":
-        handleErrorEvent(data, requestBody);
+        handleErrorEvent(data, requestBody, fileUrls);
         break;
 
       default:
@@ -444,6 +466,7 @@
   async function processStream(
     reader: ReadableStreamDefaultReader,
     requestBody: RequestPayload,
+    fileUrls: string[],
   ): Promise<any> {
     const decoder = new TextDecoder();
     let buffer = "";
@@ -472,7 +495,7 @@
       for (const line of lines) {
         const data = parseStreamLine(line);
         if (data) {
-          const result = processStreamEvent(data, state, requestBody);
+          const result = processStreamEvent(data, state, requestBody, fileUrls);
           if (result) {
             return result; // Return on completion
           }
@@ -496,7 +519,7 @@
       const accessToken = $user?.auth0_access_token;
       if (!accessToken) {
         addToast({
-          message: t('auth.session-missing-force-login'),
+          message: t("auth.session-missing-force-login"),
           type: "error",
         });
         setTimeout(() => {
@@ -509,7 +532,7 @@
         headers: {
           "Content-Type": "application/json",
           //"X-API-Key": config.apiKey,
-          "Authorization": `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify(requestBody),
       });
@@ -528,7 +551,7 @@
         }
 
         input = ""; // Reset prompt for new request
-        return await processStream(reader, requestBody);
+        return await processStream(reader, requestBody, fileUrls);
       }
     } catch (error) {
       console.error("❌ Request failed:", error);
@@ -601,11 +624,31 @@
     isFetching = false;
     isGenerating = false;
     $sharedMessageHistory = [];
+    previousResponseId = null;
 
     window.scrollTo({
       top: 0,
       behavior: "smooth",
     });
+  }
+
+  async function saveConversation() {
+    loading = true;
+    const { error, data } = await actions.conversation.save({
+      model: selectedModel,
+      messages: $sharedMessageHistory,
+      previous_response_id: previousResponseId,
+    });
+    loading = false;
+
+    if (error) {
+      addToast({
+        message: error?.message ?? "Something went wrong",
+        type: "error",
+      });
+    } else {
+      window.location.href = `/conversations/${data.insertedId}`;
+    }
   }
 </script>
 
@@ -665,6 +708,13 @@
           >
             {t("home.new-chat")}
           </button>
+          <button
+            onclick={saveConversation}
+            class="btn btn-primary btn-outline btn-sm px-8"
+            disabled={isGenerating || isFetching}
+          >
+            {t("prompt.save-chat")}
+          </button>
           <div class="mt-2">
             <ScrollToBottom />
           </div>
@@ -689,3 +739,5 @@
     {/if}
   </div>
 </div>
+
+<Loading show={loading} />

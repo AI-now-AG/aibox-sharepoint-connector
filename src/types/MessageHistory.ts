@@ -8,6 +8,7 @@ export interface Message {
   content: string;
   rawData?: string;
   imageUrl?: string;
+  fileUrls?: string[];
 }
 
 export type MessageHistory = Message[];

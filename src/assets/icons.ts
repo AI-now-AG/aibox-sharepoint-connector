@@ -66,6 +66,7 @@ import web from "$assets/icons/web.svg?raw";
 import subtitle from "$assets/icons/subtitle.svg?raw";
 import deleteIcon from "$assets/icons/delete.svg?raw";
 import addIcon from "$assets/icons/add.svg?raw";
+import pin from "$assets/icons/pin.svg?raw";
 
 export const svgIcons = {
   menuSettings,
@@ -136,4 +137,5 @@ export const svgIcons = {
   subtitle,
   deleteIcon,
   addIcon,
+  pin,
 };
