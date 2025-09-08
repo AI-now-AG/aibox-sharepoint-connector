@@ -69,6 +69,7 @@
   let isResoningThingking: boolean = $state(false);
   let previousResponseId: string | null = $state(null);
   let loading: boolean = $state(false);
+  let conversations: any[] = $state([]);
   let conversationDialog: HTMLDialogElement | undefined = $state();
 
   const apiProvider = apiKeyProviders?.find((item: any) => {
@@ -651,6 +652,23 @@
       window.location.href = `/conversations/${data.insertedId}`;
     }
   }
+
+  async function getListConversation() {
+    try {
+      const { error, data } = await actions.conversation.list({});
+      if (!error) {
+        conversations = data;
+      } else {
+        console.error(error);
+      }
+    } catch (error) {
+      console.error("Exception when delete conversation", error);
+    }
+  }
+
+  $effect(() => {
+    getListConversation();
+  });
 </script>
 
 <div class="grid grid-cols-1 grid-rows-[1fr_min-content] h-full">
@@ -718,7 +736,9 @@
           </button>
           <!-- Temporary CTA to show Chat History - START  -->
           <button
-            onclick={() => {conversationDialog?.show()}}
+            onclick={() => {
+              conversationDialog?.show();
+            }}
             class="btn btn-primary btn-outline btn-sm px-8"
           >
             {"Show Chat History"}
@@ -749,6 +769,6 @@
   </div>
 </div>
 
-<ConversationDialog bind:conversationDialog conversations={[]} />
+<ConversationDialog bind:conversationDialog bind:conversations />
 
 <Loading show={loading} />

@@ -87,6 +87,7 @@
   let isGenerating: boolean = $state(false);
   let isResoningThingking: boolean = $state(false);
   let loading: boolean = $state(false);
+  let conversations: any[] = $state([]);
   let conversationDialog: HTMLDialogElement | undefined = $state();
 
   function isGpt5Default() {
@@ -710,6 +711,23 @@
       window.location.href = `/conversations/${data.insertedId}`;
     }
   }
+
+  async function getListConversation() {
+    try {
+      const { error, data } = await actions.conversation.list({});
+      if (!error) {
+        conversations = data;
+      } else {
+        console.error(error);
+      }
+    } catch (error) {
+      console.error("Exception when delete conversation", error);
+    }
+  }
+
+  $effect(() => {
+    getListConversation();
+  });
 </script>
 
 <!-- Output (Follow-Up) -->
@@ -783,6 +801,6 @@
   />
 {/if}
 
-<ConversationDialog bind:conversationDialog conversations={[]} />
+<ConversationDialog bind:conversationDialog bind:conversations />
 
 <Loading show={loading} />

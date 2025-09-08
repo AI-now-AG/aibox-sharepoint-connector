@@ -6,19 +6,6 @@
   import { preventDefault } from "$utils/common";
   const t = useTranslations();
 
-  let sample_conversations = [
-    { id: 1, title: "Übersetze einen Artikel in Englisch (1)" },
-    { id: 2, title: "Übersetze einen Artikel in Englisch (2)" },
-    { id: 3, title: "Übersetze einen Artikel in Englisch (3)" },
-    { id: 4, title: "Übersetze einen Artikel in Englisch (4)" },
-    { id: 5, title: "Übersetze einen Artikel in Englisch (5)" },
-    { id: 6, title: "Übersetze einen Artikel in Englisch (6)" },
-    { id: 7, title: "Übersetze einen Artikel in Englisch (7)" },
-    { id: 8, title: "Übersetze einen Artikel in Englisch (8)" },
-    { id: 9, title: "Übersetze einen Artikel in Englisch (9)" },
-    { id: 10, title: "Übersetze einen Artikel in Englisch (10)" },
-  ];
-
   interface Props {
     conversationDialog?: HTMLDialogElement;
     dialogTitle?: string;
@@ -28,10 +15,8 @@
   let {
     conversationDialog = $bindable(),
     dialogTitle = "My aibox Conversations",
-    conversations = [],
+    conversations = $bindable([]),
   }: Props = $props();
-
-  conversations = sample_conversations;
 
   async function deleteConversation(conversationId: string) {
     try {
@@ -67,13 +52,13 @@
 
     <section>
       <div class="min-h-0 max-h-full overflow-y-auto space-y-2">
-        {#each conversations as conversation (conversation.id)}
+        {#each conversations as conversation}
           <div
             class="flex items-center justify-between border-b px-2 py-1 rounded-lg border"
           >
             <span class="text-sm">{conversation.title}</span>
             <button
-              onclick={() => deleteConversation(conversation.id)}
+              onclick={() => deleteConversation(conversation._id)}
               class="btn btn-primary btn-outline btn-sm"
             >
               {@html svgIcons.trash}
