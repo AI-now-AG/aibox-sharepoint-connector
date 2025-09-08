@@ -11,6 +11,7 @@
   import { PromptModel } from "$types/PromptModel";
   import {
     markdownToHtml,
+    textToHtml,
     buildCitationLinks,
     stripHtmlFormatting,
   } from "$utils/textFormatting";
@@ -283,7 +284,7 @@
     // Add user message to history
     const newUserMessage: Message = {
       role: MessageRole.User,
-      content: requestBody.prompt,
+      content: textToHtml(requestBody.prompt),
       fileUrls: fileUrls,
     };
     sharedMessageHistory.update((messages) => [...messages, newUserMessage]);

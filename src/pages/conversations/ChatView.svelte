@@ -18,6 +18,7 @@
   import {
     buildCitationLinks,
     markdownToHtml,
+    textToHtml,
     stripHtmlFormatting,
   } from "$utils/textFormatting";
   import { ApiKeyProvider } from "$types/TenantFeature";
@@ -280,7 +281,7 @@
 
     const newUserMessage: Message = {
       role: MessageRole.User,
-      content: requestBody.prompt,
+      content: textToHtml(requestBody.prompt),
       fileUrls: fileUrls,
     };
 
@@ -593,7 +594,7 @@
 <div class="grid grid-cols-1 grid-rows-[1fr_min-content] h-full">
   <div class="flex justify-end">
     <button
-      class="btn btn-outline font-normal"
+      class="btn btn-sm btn-outline font-normal"
       onclick={() => {
         deleteConversation();
       }}
