@@ -202,6 +202,24 @@ export function markdownToHtml(text: string) {
         },
       },
 
+      // Code blocks + inline code
+      {
+        name: "code",
+        renderer(this, token) {
+          const langClass = token.lang
+            ? `language-${token.lang}`
+            : "language-plaintext";
+
+          if (token.raw.startsWith("```")) {
+            // fenced block
+            return `<pre class="whitespace-pre-wrap break-words p-3 rounded-md bg-base-200 overflow-x-auto"><code class="${langClass}">${token.text}</code></pre>`;
+          }
+
+          // inline code
+          return `<code class="px-1 rounded bg-base-200 text-base-content">${token.text}</code>`;
+        },
+      },
+
       // Horizontal Rule (--- *** ___)
       {
         name: "hr",
