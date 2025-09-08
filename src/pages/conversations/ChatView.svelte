@@ -16,10 +16,10 @@
   import { tenant, user } from "$stores";
   import { PromptModel } from "$types/PromptModel";
   import {
-    buildCitationLinks,
     markdownToHtml,
     textToHtml,
-    stripHtmlFormatting,
+    buildCitationLinks,
+    stripMarkdownFormatting,
   } from "$utils/textFormatting";
   import { ApiKeyProvider } from "$types/TenantFeature";
   import { readFileContent } from "$utils/fileReader";
@@ -343,13 +343,12 @@
     citations: any[],
     imageUrl: string,
   ): void {
-    const formattedText = buildCitationLinks(responseText, citations);
-    currentMessage = markdownToHtml(formattedText);
+    const markdownWithLinks = buildCitationLinks(responseText, citations);
 
     const newAssistantMessage: Message = {
       role: MessageRole.Assistant,
-      content: currentMessage,
-      rawData: stripHtmlFormatting(currentMessage),
+      content: markdownWithLinks,
+      rawData: stripMarkdownFormatting(markdownWithLinks),
       imageUrl,
     };
 
@@ -359,8 +358,8 @@
   function addAssistantMessage(responseText: string, imageUrl: string): void {
     const newAssistantMessage: Message = {
       role: MessageRole.Assistant,
-      content: markdownToHtml(responseText),
-      rawData: stripHtmlFormatting(responseText),
+      content: responseText,
+      rawData: stripMarkdownFormatting(responseText),
       imageUrl,
     };
 

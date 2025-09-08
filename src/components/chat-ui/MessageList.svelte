@@ -7,6 +7,7 @@
   import { user } from "$stores";
   import { useTranslations } from "$i18n/utils";
   import { getFileNameFromAzureUrl } from "$utils/documentExtractor";
+  import { markdownToHtml } from "$utils/textFormatting";
 
   const t = useTranslations();
 
@@ -62,7 +63,6 @@
   });
 
   function copyToClipboard(content: string, index: number) {
-    console.log("content", { content });
     navigator.clipboard
       .writeText(content)
       .then(() => {
@@ -111,7 +111,9 @@
                           <p class="font-bold text-sm">
                             {role == MessageRole.User ? username : `aibox`}
                           </p>
-                          <div class="mt-2 text-sm">{@html content}</div>
+                          <div class="mt-2 text-sm">
+                            {@html markdownToHtml(content)}
+                          </div>
                           {#if role === MessageRole.User && Array.isArray(fileUrls) && fileUrls.length > 0}
                             <div class="flex mt-2">
                               {#each fileUrls as url}

@@ -13,7 +13,7 @@
     markdownToHtml,
     textToHtml,
     buildCitationLinks,
-    stripHtmlFormatting,
+    stripMarkdownFormatting,
   } from "$utils/textFormatting";
   import AIModelDropdown from "./AIModelDropdown.svelte";
   import { tenant, user } from "$stores";
@@ -22,7 +22,6 @@
   import { ApiKeyProvider } from "$types/TenantFeature";
   import { PromptToolOption } from "$types/AIProvider";
   import { getPromptTools, useProviderInfo } from "$shared/AIProvider";
-  import ConversationDialog from "$components/ConversationDialog.svelte";
 
   const t = useTranslations();
 
@@ -348,13 +347,12 @@
   ): void {
     console.log("📚 Citations sent:", citations);
 
-    const formattedText = buildCitationLinks(responseText, citations);
-    currentMessage = markdownToHtml(formattedText);
+    const markdownWithLinks = buildCitationLinks(responseText, citations);
 
     const newAssistantMessage: Message = {
       role: MessageRole.Assistant,
-      content: currentMessage,
-      rawData: stripHtmlFormatting(currentMessage),
+      content: markdownWithLinks,
+      rawData: stripMarkdownFormatting(markdownWithLinks),
       imageUrl,
     };
 
@@ -367,8 +365,8 @@
   function addAssistantMessage(responseText: string, imageUrl: string): void {
     const newAssistantMessage: Message = {
       role: MessageRole.Assistant,
-      content: markdownToHtml(responseText),
-      rawData: stripHtmlFormatting(responseText),
+      content: responseText,
+      rawData: stripMarkdownFormatting(responseText),
       imageUrl,
     };
 
