@@ -35,7 +35,6 @@
   }
 
   onMount(async () => {
-    console.log("ConversationDialog $onMount getListConversation");
     getListConversation();
   });
 
