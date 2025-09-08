@@ -46,7 +46,7 @@ const myAIBobItems: Array<any> = [];
 const conversations = await ConversationModel.listByUser(Astro.locals.user.id);
 
 const transcriptions = await TranscriptionModel.listByTenant(
-  Astro.locals.user.tenant_id,
+  Astro.locals.user.tenant_id
 );
 
 const transcriptionTypes = Astro.locals.tenant.transcription_types ?? [];
@@ -54,7 +54,7 @@ const transcriptionTypes = Astro.locals.tenant.transcription_types ?? [];
 const activeTranscriptions =
   transcriptions?.filter(
     (tran) =>
-      transcriptionTypes.includes(tran.category) && tran.enabled === true,
+      transcriptionTypes.includes(tran.category) && tran.enabled === true
   ) ?? [];
 
 const audioToTextTranscriptions = activeTranscriptions
@@ -71,7 +71,7 @@ const subtitleTranscriptions = activeTranscriptions
       tran.category == AudioCategory.Subtitle ||
       tran.category == AudioCategory.SubtitleJson ||
       tran.category == AudioCategory.SubtitleLarge ||
-      tran.category == AudioCategory.Subtitle11Labs,
+      tran.category == AudioCategory.Subtitle11Labs
   )
   .map((tran) => ({
     title: tran.name,
@@ -133,7 +133,7 @@ if (
   auth.hasFeatureWithProvider(
     Astro.locals,
     TenantFeature.CreateImage,
-    ApiKeyProvider.OpenAI,
+    ApiKeyProvider.OpenAI
   )
 ) {
   createImageItems.push({
@@ -147,7 +147,7 @@ if (
   auth.hasFeatureWithProvider(
     Astro.locals,
     TenantFeature.CreateImage,
-    ApiKeyProvider.Flux,
+    ApiKeyProvider.Flux
   )
 ) {
   createImageItems.push({
@@ -161,7 +161,7 @@ if (
   auth.hasFeatureWithProvider(
     Astro.locals,
     TenantFeature.GptImage,
-    ApiKeyProvider.OpenAI,
+    ApiKeyProvider.OpenAI
   )
 ) {
   createImageItems.push({
@@ -180,17 +180,18 @@ if (createImageItems.length > 0) {
 }
 
 for (let i = 0; i < conversations.length; i++) {
-  const con = conversations[i];
-  myAIBobItems.push({
-    title: con.title,
-    path: `/conversations/${con._id}`,
-  });
-
-  // myAIBobItems.push({
-  //   title: t("conversation.show-more"),
-  //   path: "",
-  // });
+  if (i < 5) {
+    const con = conversations[i];
+    myAIBobItems.push({
+      title: con.title,
+      path: `/conversations/${con._id}`,
+    });
+  }
 }
+myAIBobItems.push({
+  title: t("conversation.show-more"),
+  isCta: true,
+});
 
 if (myAIBobItems.length > 0) {
   myAIBoxMenus.push({
@@ -515,11 +516,7 @@ const modules = [...menuItems];
         ))
       }
 
-      {
-        myAIBoxMenus.length > 0 && (
-          <div class="divider mx-6 pointer-events-none" />
-        )
-      }
+      {myAIBoxMenus.length > 0 && <div class="mx-6 my-2 pointer-events-none" />}
       {
         myAIBoxMenus.map((mod) => (
           <li class="active:bg-transparent">
