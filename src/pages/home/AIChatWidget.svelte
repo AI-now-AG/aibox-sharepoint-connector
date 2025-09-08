@@ -21,6 +21,7 @@
   import { ApiKeyProvider } from "$types/TenantFeature";
   import { PromptToolOption } from "$types/AIProvider";
   import { getPromptTools, useProviderInfo } from "$shared/AIProvider";
+  import ConversationDialog from "$components/ConversationDialog.svelte";
 
   const t = useTranslations();
 
@@ -68,6 +69,7 @@
   let isResoningThingking: boolean = $state(false);
   let previousResponseId: string | null = $state(null);
   let loading: boolean = $state(false);
+  let conversationDialog: HTMLDialogElement | undefined = $state();
 
   const apiProvider = apiKeyProviders?.find((item: any) => {
     return item.default && item.active;
@@ -714,6 +716,14 @@
           >
             {t("prompt.save-chat")}
           </button>
+          <!-- Temporary CTA to show Chat History - START  -->
+          <button
+            onclick={() => {conversationDialog?.show()}}
+            class="btn btn-primary btn-outline btn-sm px-8"
+          >
+            {"Show Chat History"}
+          </button>
+          <!-- Temporary CTA to show Chat History - END -->
           <div class="mt-2">
             <ScrollToBottom />
           </div>
@@ -738,5 +748,7 @@
     {/if}
   </div>
 </div>
+
+<ConversationDialog bind:conversationDialog conversations={[]} />
 
 <Loading show={loading} />

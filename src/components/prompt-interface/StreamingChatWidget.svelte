@@ -31,6 +31,7 @@
   import { ApiKeyProvider } from "$types/TenantFeature";
   import { PromptToolOption } from "$types/AIProvider";
   import { getPromptTools, useProviderInfo } from "$shared/AIProvider";
+  import ConversationDialog from "$components/ConversationDialog.svelte";
 
   const t = useTranslations();
 
@@ -86,6 +87,7 @@
   let isGenerating: boolean = $state(false);
   let isResoningThingking: boolean = $state(false);
   let loading: boolean = $state(false);
+  let conversationDialog: HTMLDialogElement | undefined = $state();
 
   function isGpt5Default() {
     const aiProviders = $tenant?.api_key_providers ?? [];
@@ -742,6 +744,16 @@
       >
         {t("prompt.save-chat")}
       </button>
+      <!-- Temporary CTA to show Chat History - START  -->
+      <button
+        onclick={() => {
+          conversationDialog?.show();
+        }}
+        class="btn btn-primary btn-outline btn-sm px-8"
+      >
+        {"Show Chat History"}
+      </button>
+      <!-- Temporary CTA to show Chat History - END -->
       <div class="mt-2">
         <ScrollToBottom />
       </div>
@@ -770,5 +782,7 @@
     {isResoningThingking}
   />
 {/if}
+
+<ConversationDialog bind:conversationDialog conversations={[]} />
 
 <Loading show={loading} />

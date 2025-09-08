@@ -538,7 +538,6 @@
   "subtitle-editor.show-video": "Video anzeigen",
   "subtitle-editor.minimize-video": "Video minimieren",
   "subtitle-editor.remove-media": "Mediendatei entfernen",
-  "subtitle-editor.loaded": "geladen",
   "subtitle-editor.media-removed": "Mediendatei entfernt",
   "subtitle-editor.valid-file-required": "Bitte wählen Sie eine gültige Audio- oder Videodatei",
   "subtitle-editor.media-loaded-success": "Mediendatei \\\"${filename}\\\" erfolgreich geladen\"",
@@ -573,5 +572,7 @@
   "conversation.my-ai-box-nav-title": "MY AIBOX ",
   "conversation.show-more": "Show more",
   "conversation.remove-from-my-ai-box": "Remove from My aibox ",
-  "conversation.limit-reached": "Sie haben die maximal zulässige Anzahl an Unterhaltungen erreicht. Bitte löschen Sie einige Unterhaltungen, bevor Sie neue erstellen."
+  "conversation.limit-reached": "Sie haben die maximal zulässige Anzahl an Unterhaltungen erreicht. Bitte löschen Sie einige Unterhaltungen, bevor Sie neue erstellen.",
+  "conversation.delete-conversation-successfull": "Delete conversation successfull",
+  "common.close": "Close"
 }
