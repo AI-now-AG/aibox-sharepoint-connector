@@ -1,0 +1,33 @@
+---
+import Layout from "$layouts/Layout.astro";
+import { useTranslations } from "$i18n/utils";
+
+const t = useTranslations();
+---
+
+<Layout>
+  <div class="container max-w-8xl mx-auto px-14">
+    <div class="pt-2 mb-2 lg:pt-8">
+      <h1 class="text-4xl font-bold mb-4">
+        {t("nav.subtitle-studio")}
+      </h1>
+      <p class="text-lg mb-8">Professional subtitle creation and editing tools for your content.</p>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {Astro.locals.tenant?.subtitle_editor && (
+          <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+              <h2 class="card-title">{t("settings.transcription.subtitle-editor")}</h2>
+              <p>Advanced subtitle editor with timeline synchronization and format conversion.</p>
+              <div class="card-actions justify-end">
+                <a href="/subtitle-studio/editor" class="btn btn-primary">
+                  {t("common.edit")}
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+</Layout>

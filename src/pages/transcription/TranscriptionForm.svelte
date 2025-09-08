@@ -1027,6 +1027,29 @@
     }
   }
 
+  function openSubtitleEditor() {
+    // Create URL parameters to pass file data to subtitle editor
+    const params = new URLSearchParams();
+
+    if (srtFileUrl) {
+      params.set("srtFile", srtFileUrl);
+    }
+    if (assFileUrl) {
+      params.set("assFile", assFileUrl);
+    }
+    if (audioFile) {
+      // Store audio file in sessionStorage temporarily
+      const audioBlob = audioFile;
+      const audioUrl = URL.createObjectURL(audioBlob);
+      sessionStorage.setItem("subtitle-editor-audio", audioUrl);
+      sessionStorage.setItem("subtitle-editor-audio-name", audioFile.name);
+      params.set("hasAudio", "true");
+    }
+
+    // Navigate to subtitle editor
+    window.location.href = `/subtitle-studio/editor?${params.toString()}`;
+  }
+
   function removeFile() {
     reset();
   }
@@ -1633,6 +1656,18 @@
         >
       {/if}
 
+      <!-- Subtitle Editor Button -->
+      {#if (assFileUrl || srtFileUrl) && audioFile && $tenant?.subtitle_editor}
+        <button
+          class="btn bg-neutral btn-sm text-white"
+          onclick={openSubtitleEditor}
+        >
+          <!-- {@html svgIcons.edit} {t("subtitle-editor.edit-subtitles")} -->
+          {@html svgIcons.edit}
+          {t("settings.transcription.subtitle-editor")}
+        </button>
+      {/if}
+      
       <button class="btn bg-neutral btn-sm text-white" onclick={confirmStartNew}
         >{t("transciption.model.cta.start-new-transciption")}</button
       >

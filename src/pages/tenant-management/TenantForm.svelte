@@ -3,6 +3,7 @@
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
   import { addToast } from "$stores/toast";
+  import { slide } from "svelte/transition";
   import Loading from "$components/Loading.svelte";
   import TogglePasswordIcon from "./TogglePasswordIcon.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
@@ -77,6 +78,10 @@
     geminiPrivateKeyEnabled: false,
     ...(tenant?.metadata ?? {}),
   };
+
+  if (tenantData && tenantData.subtitle_editor === undefined) {
+    tenantData.subtitle_editor = false;
+  }
 
   // Subscription & billing
   let selectedPlanName: SubscriptionPackageId = $state(
@@ -215,6 +220,19 @@
       .filter((e) => e.checked === true)
       .map((e) => e.title)
       .join(", "),
+  );
+
+  // Check if any subtitle features are enabled
+  const isAnySubtitleFeatureEnabled = $derived(
+    audioStandardArray.some((item) => 
+      item.checked && (item.type === AudioCategory.Subtitle || item.type === AudioCategory.SubtitleJson)
+    ) ||
+    audioProArray.some((item) => 
+      item.checked && item.type === AudioCategory.SubtitleLarge
+    ) ||
+    audioElevenLabsArray.some((item) => 
+      item.checked && item.type === AudioCategory.Subtitle11Labs
+    )
   );
 
   const languages = [
@@ -1930,6 +1948,30 @@
           </div>
         </div>
       </div>
+
+      <!-- Subtitle Editor Feature -->
+      {#if isAnySubtitleFeatureEnabled}
+        <div class="container mx-auto" transition:slide={{ duration: 300 }}>
+          <div class="bg-base-100 shadow-sm rounded-lg my-4">
+            <div class="flex p-4 items-center justify-between">
+              <div class="flex items-center">
+                <input
+                  id="subtitle-editor-feature"
+                  type="checkbox"
+                  class="checkbox checkbox-primary"
+                  value="subtitle-editor-feature"
+                  bind:checked={tenantData.subtitle_editor}
+                />
+                <label class="label cursor-pointer ml-2" for="subtitle-editor-feature">
+                  <span class="label-text text-base-content ml-2"
+                    >{t("settings.transcription.subtitle-editor")}</span
+                  >
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      {/if}
     </div>
 
     <div class="divider"></div>
