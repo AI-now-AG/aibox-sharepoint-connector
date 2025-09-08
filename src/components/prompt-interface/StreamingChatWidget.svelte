@@ -317,6 +317,7 @@
     data: any,
     state: StreamingState,
     requestBody: RequestPayload,
+    fileUrls?: string[],
   ): any {
     console.log(`✅ Complete! Processing time: ${data.processingTimeMs}ms`);
     if (data.responseId) {
@@ -337,6 +338,7 @@
     const newUserMessage: Message = {
       role: MessageRole.User,
       content: requestBody.prompt,
+      fileUrls: fileUrls,
     };
     addMessageToHistory(groupId, promptId, newUserMessage);
 
@@ -361,7 +363,11 @@
     return data;
   }
 
-  function handleErrorEvent(data: any, requestBody: RequestPayload): void {
+  function handleErrorEvent(
+    data: any,
+    requestBody: RequestPayload,
+    fileUrls?: string[],
+  ): void {
     console.error(`❌ Stream error: ${data.error}`);
 
     const errorMessage = data.error || "Image generation failed.";
@@ -370,6 +376,7 @@
     const errorUserMessage: Message = {
       role: MessageRole.User,
       content: requestBody.prompt,
+      fileUrls: fileUrls,
     };
     addMessageToHistory(groupId, promptId, errorUserMessage);
 
@@ -465,6 +472,7 @@
     data: any,
     state: StreamingState,
     requestBody: RequestPayload,
+    fileUrls?: string[],
   ): any {
     switch (data.type) {
       case "start":
@@ -492,10 +500,10 @@
         break;
 
       case "complete":
-        return handleCompleteEvent(data, state, requestBody);
+        return handleCompleteEvent(data, state, requestBody, fileUrls);
 
       case "error":
-        handleErrorEvent(data, requestBody);
+        handleErrorEvent(data, requestBody, fileUrls);
         break;
 
       default:
@@ -508,6 +516,7 @@
   async function processStream(
     reader: ReadableStreamDefaultReader,
     requestBody: RequestPayload,
+    fileUrls: string[],
   ): Promise<any> {
     const decoder = new TextDecoder();
     let buffer = "";
@@ -529,7 +538,7 @@
           const data = parseStreamLine(buffer);
           if (data) {
             console.log("📥 Processing final buffered data:", data.type);
-            processStreamEvent(data, state, requestBody);
+            processStreamEvent(data, state, requestBody, fileUrls);
           }
         }
         break;
@@ -545,7 +554,7 @@
       for (const line of lines) {
         const data = parseStreamLine(line);
         if (data) {
-          const result = processStreamEvent(data, state, requestBody);
+          const result = processStreamEvent(data, state, requestBody, fileUrls);
           if (result) {
             return result; // Return on completion
           }
@@ -604,7 +613,7 @@
         }
 
         prompt = ""; // Reset prompt for new request
-        return await processStream(reader, requestBody);
+        return await processStream(reader, requestBody, fileUrls);
       }
     } catch (error) {
       console.error("❌ Request failed:", error);

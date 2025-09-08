@@ -264,6 +264,7 @@
     data: any,
     state: StreamingState,
     requestBody: RequestPayload,
+    fileUrls?: string[],
   ): any {
     const finalImageUrl = formatImageUrl(
       state.currentImageUrl ||
@@ -278,6 +279,7 @@
     const newUserMessage: Message = {
       role: MessageRole.User,
       content: requestBody.prompt,
+      fileUrls: fileUrls,
     };
 
     messageHistory.push(newUserMessage);
@@ -301,12 +303,17 @@
     return data;
   }
 
-  function handleErrorEvent(data: any, requestBody: RequestPayload): void {
+  function handleErrorEvent(
+    data: any,
+    requestBody: RequestPayload,
+    fileUrls?: string[],
+  ): void {
     const errorMessage = data.error || "Image generation failed.";
 
     const errorUserMessage: Message = {
       role: MessageRole.User,
       content: requestBody.prompt,
+      fileUrls: fileUrls,
     };
 
     messageHistory.push(errorUserMessage);
@@ -398,6 +405,7 @@
     data: any,
     state: StreamingState,
     requestBody: RequestPayload,
+    fileUrls?: string[],
   ): any {
     switch (data.type) {
       case "start":
@@ -425,10 +433,10 @@
         break;
 
       case "complete":
-        return handleCompleteEvent(data, state, requestBody);
+        return handleCompleteEvent(data, state, requestBody, fileUrls);
 
       case "error":
-        handleErrorEvent(data, requestBody);
+        handleErrorEvent(data, requestBody, fileUrls);
         break;
 
       default:
@@ -441,6 +449,7 @@
   async function processStream(
     reader: ReadableStreamDefaultReader,
     requestBody: RequestPayload,
+    fileUrls: string[],
   ): Promise<any> {
     const decoder = new TextDecoder();
     let buffer = "";
@@ -468,7 +477,7 @@
       for (const line of lines) {
         const data = parseStreamLine(line);
         if (data) {
-          const result = processStreamEvent(data, state, requestBody);
+          const result = processStreamEvent(data, state, requestBody, fileUrls);
           if (result) {
             return result;
           }
@@ -514,7 +523,7 @@
         }
 
         input = "";
-        return await processStream(reader, requestBody);
+        return await processStream(reader, requestBody, fileUrls);
       }
     } catch (error) {
       console.error("❌ Request failed:", error);
