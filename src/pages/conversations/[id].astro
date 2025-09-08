@@ -30,6 +30,7 @@ const prompt = await PromptModel.get(conversation.prompt_id || "");
           messages={conversation.messages || []}
           promptData={prompt}
           folderName={tenant.org_name}
+          lastResponseId={conversation.previous_response_id}
           client:load
         />
       </div>

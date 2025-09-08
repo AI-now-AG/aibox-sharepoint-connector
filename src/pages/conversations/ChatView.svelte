@@ -57,6 +57,7 @@
     messages: MessageHistory;
     promptData: any;
     folderName?: string;
+    lastResponseId?: string | null;
   }
 
   let {
@@ -64,6 +65,7 @@
     model = PromptModel.Default,
     messages,
     folderName,
+    lastResponseId = null,
   }: Props = $props();
 
   let input: string = $state("");
@@ -74,7 +76,7 @@
   let isFetching: boolean = $state(false);
   let isGenerating: boolean = $state(false);
   let isResoningThingking: boolean = $state(false);
-  let previousResponseId: string | null = $state(null);
+  let previousResponseId: string | null = $state(lastResponseId);
   let loading = $state(false);
 
   const providerIno = useProviderInfo($tenant);
