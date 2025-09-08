@@ -21,8 +21,22 @@ const ChatConversationSchema = z.object({
   model: z.string().nullish().default(null),
   previous_response_id: z.string().nullish().default(null),
   messages: z.array(MessageSchema),
-  created_at: z.date().optional(),
-  updated_at: z.date().optional(),
+  created_at: z
+    .date()
+    .optional()
+    .default(() => new Date()),
+  updated_at: z
+    .date()
+    .optional()
+    .default(() => new Date()),
+  expires_at: z
+    .date()
+    .optional()
+    .default(() => {
+      const d = new Date();
+      d.setMonth(d.getMonth() + 1); // add 1 month
+      return d;
+    }),
 });
 
 export type Message = z.infer<typeof MessageSchema>;
@@ -79,9 +93,9 @@ export default {
 
   listByUser: async (userId: string | ObjectId) => {
     const _userId = toObjectId(userId);
-    const data = collection
+    return collection
       .find<Document<Conversation>>({ creator_id: _userId })
-      .sort({ created_at: -1 });
-    return await data.toArray();
+      .sort({ updated_at: -1 })
+      .toArray();
   },
 };
