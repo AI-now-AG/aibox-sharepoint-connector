@@ -573,5 +573,6 @@
   "conversation.show-more": "Show more",
   "conversation.remove-from-my-ai-box": "Remove from My aibox ",
   "conversation.delete-conversation-successfull": "Delete conversation successfull",
-  "common.close": "Close"
+  "common.close": "Close",
+  "conversation.my-ai-box-conversation-dialog-title": "My aibox Conversations"
 }

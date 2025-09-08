@@ -7,6 +7,7 @@ import OnboardingTour from "$components/onboarding/OnboardingTour.svelte";
 import TrialComponent from "$components/onboarding/TrialComponent.svelte";
 import RestrictUnverifiedUser from "$components/onboarding/RestrictUnverifiedUser.svelte";
 import OnboardingTourNewTenant from "../pages/subscription/OnboardingTourNewTenant.svelte";
+import ConversationDialog from "$components/ConversationDialog.svelte";
 import "$styles/global.css";
 
 import { useTranslations } from "$i18n/utils";
@@ -57,6 +58,7 @@ const isSocialAuth = isSocialConnection(userInfo?.auth0_sub);
         >
           <Header />
           <slot />
+          <ConversationDialog client:load />
         </main>
         {isFooterVisible && <Footer />}
       </div>
