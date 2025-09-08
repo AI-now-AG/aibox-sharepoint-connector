@@ -284,7 +284,12 @@ export function stripMarkdownFormatting(text: string): string {
   text = text.replace(/!\[([^\]]*)\]\([^)]+\)/g, "$1"); // images
   text = text.replace(/^(-{3,}|\*{3,}|_{3,})$/gm, ""); // horizontal rules
   text = text.replace(/\[\^.+?\](\: .*?$)?/g, ""); // footnotes
-  text = text.replace(/\n{2,}/g, "\n\n"); // collapse newlines
+
+  // Remove raw HTML tags (like <span>, <strong>, etc.)
+  text = text.replace(/<[^>]+>/g, "");
+
+  // Collapse multiple newlines
+  text = text.replace(/\n{2,}/g, "\n\n");
 
   return text.trim();
 }

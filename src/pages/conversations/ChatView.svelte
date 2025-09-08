@@ -114,6 +114,9 @@
       const { error } = await actions.conversation.update({
         _id: conversationId,
         messages: messageHistory,
+        ...(previousResponseId
+          ? { previous_response_id: previousResponseId }
+          : {}),
       });
       if (error) {
         addToast({ message: JSON.stringify(error), type: "error" });
@@ -269,6 +272,11 @@
     requestBody: RequestPayload,
     fileUrls?: string[],
   ): any {
+    console.log(`✅ Complete! Processing time: ${data.processingTimeMs}ms`);
+    if (data.responseId) {
+      console.log(`Response ID: ${data.responseId}`);
+    }
+
     const finalImageUrl = formatImageUrl(
       state.currentImageUrl ||
         data.images?.[0]?.result ||
@@ -298,9 +306,11 @@
     }
     updateConversation();
 
+    // Clean up and reset states
     resetUIState();
     previousResponseId = data.responseId;
 
+    // Scroll to latest message
     setTimeout(() => scrollIntoView(), 1000);
 
     return data;
