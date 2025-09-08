@@ -66,18 +66,21 @@
     <section>
       <div class="min-h-0 max-h-full overflow-y-auto space-y-2">
         {#each conversations as conversation}
-          <div
+          <a
+            href={"/conversations/" + conversation._id}
             class="flex items-center justify-between border-b px-2 py-1 rounded-lg border"
           >
             <span class="text-sm">{conversation.title}</span>
             <button
-              onclick={() => deleteConversation(conversation._id)}
+              onclick={preventDefault(() =>
+                deleteConversation(conversation._id),
+              )}
               class="btn btn-primary btn-outline btn-sm"
             >
               {@html svgIcons.trash}
               {t("conversation.remove-from-my-ai-box")}
             </button>
-          </div>
+          </a>
         {/each}
       </div>
     </section>
