@@ -281,7 +281,6 @@
     };
 
     messageHistory.push(newUserMessage);
-    updateConversation();
 
     if (state.citations.length > 0) {
       addAssistantMessageWithCitations(
@@ -292,6 +291,7 @@
     } else {
       addAssistantMessage(responseText, finalImageUrl);
     }
+    updateConversation();
 
     resetUIState();
     previousResponseId = data.responseId;
@@ -344,7 +344,6 @@
     };
 
     messageHistory.push(newAssistantMessage);
-    updateConversation();
   }
 
   function addAssistantMessage(responseText: string, imageUrl: string): void {
@@ -356,7 +355,6 @@
     };
 
     messageHistory.push(newAssistantMessage);
-    updateConversation();
   }
 
   function resetStreamingState(): void {
