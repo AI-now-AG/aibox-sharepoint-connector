@@ -603,15 +603,22 @@
 </script>
 
 <div class="grid grid-cols-1 grid-rows-[min-content_1fr_min-content] h-full">
-  <div class="flex justify-end px-4">
-    <button
-      class="btn btn-sm btn-outline font-normal"
-      onclick={() => {
-        deleteConversation();
-      }}
-    >
-      {t("conversation.remove-from-my-ai-box")}
-    </button>
+  <div class="flex items-center">
+    <div class="flex flex-1">
+      <span class="self-start badge badge-xs px-2 border-base-300 font-normal"
+        >{model}</span
+      >
+    </div>
+    <div class="flex justify-end pr-4">
+      <button
+        class="btn btn-sm btn-outline font-normal"
+        onclick={() => {
+          deleteConversation();
+        }}
+      >
+        {t("conversation.remove-from-my-ai-box")}
+      </button>
+    </div>
   </div>
 
   <MessageList
