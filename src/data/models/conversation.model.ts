@@ -56,9 +56,17 @@ export default {
   update: async (id: string | ObjectId, update: Partial<Conversation>) => {
     const objectId = toObjectId(id);
     const validated = ChatConversationSchema.partial().parse(update);
+
+    const expiresAt = (() => {
+      const d = new Date();
+      d.setDate(d.getDate() + 30); // add 30 days
+      return d;
+    })();
+
     const doc = {
       ...validated,
       updated_at: new Date(),
+      expires_at: expiresAt,
     };
     return await collection.findOneAndUpdate(
       { _id: objectId },
