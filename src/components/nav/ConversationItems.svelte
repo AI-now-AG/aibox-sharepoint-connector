@@ -79,7 +79,7 @@
         >
       </li>
     {/each}
-    {#if items.length >= 5}
+    {#if items.length > 0}
       <li class="pl-1 active:bg-transparent w-full">
         <button
           class="flex hover:underline px-3 mt-2 link-primary"
