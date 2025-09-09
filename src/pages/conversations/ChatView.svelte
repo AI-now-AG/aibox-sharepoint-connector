@@ -603,7 +603,7 @@
 </script>
 
 <div class="grid grid-cols-1 grid-rows-[min-content_1fr_min-content] h-full">
-  <div class="flex justify-end p-4">
+  <div class="flex justify-end px-4">
     <button
       class="btn btn-sm btn-outline font-normal"
       onclick={() => {

@@ -16,9 +16,9 @@ const prompt = await PromptModel.get(conversation.prompt_id || "");
 
 <Layout>
   <div
-    class="flex flex-col bg-base-200 h-full content-baseline gap-0 place-items-center mt-8"
+    class="flex flex-col bg-base-200 h-full content-baseline gap-0 place-items-center"
   >
-    <div class="px-16 py-6 w-full h-full">
+    <div class="px-16 max-w-6xl h-full">
       <div class="flex flex-col h-full max-w-6xl mx-auto">
         <h1 class="pt-2 mb-2 lg:pt-8 text-4xl font-bold">
           {conversation?.title || prompt?.title || ""}
