@@ -79,6 +79,8 @@
   let previousResponseId: string | null = $state(lastResponseId);
   let loading = $state(false);
 
+  let isShowAttachmentButton = $state(model != PromptModel.Perplexity);
+
   const providerIno = useProviderInfo($tenant);
   let toolOptions = getPromptTools(
     (model == PromptModel.Default
@@ -635,6 +637,7 @@
         {toolOptions}
         bind:selectedPromptTool
         showDataLossWarning={false}
+        showAttachmentButton={isShowAttachmentButton}
       />
     </div>
   </div>
