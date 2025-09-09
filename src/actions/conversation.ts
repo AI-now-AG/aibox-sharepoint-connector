@@ -1,6 +1,6 @@
 import { defineAction, type ActionAPIContext } from "astro:actions";
 import { z } from "zod";
-import { transformRawData } from "$utils/transformRawData";
+import { transformRawData, transformRawDataWithoutReplacer } from "$utils/transformRawData";
 import ConversationModel, {
   type Conversation,
   MessageSchema,
@@ -86,7 +86,7 @@ export const conversation = {
       const data = await ConversationModel.listByUser(userId);
 
       // Normalize and return the list of conversations
-      return transformRawData(data);
+      return transformRawDataWithoutReplacer(data);
     },
   }),
 

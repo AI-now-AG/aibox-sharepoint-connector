@@ -6,6 +6,7 @@
   import { actions } from "astro:actions";
   import { preventDefault } from "$utils/common";
   import Loading from "./Loading.svelte";
+  import dayjs from "dayjs";
   const t = useTranslations();
 
   interface Props {
@@ -94,7 +95,10 @@
             href={"/conversations/" + conversation._id}
             class="flex items-center justify-between border-b px-2 py-1 rounded-lg border"
           >
-            <span class="text-sm">{conversation.title}</span>
+            <span class="flex-1 text-sm">{conversation.title}</span>
+            <span class="text-xs text-left mx-4"
+              >{dayjs(conversation.updated_at).format("DD.MM.YYYY HH:mm")}</span
+            >
             <button
               onclick={preventDefault(() =>
                 deleteConversation(conversation._id),
