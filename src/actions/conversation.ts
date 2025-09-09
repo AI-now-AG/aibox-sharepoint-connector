@@ -16,6 +16,7 @@ const ConversationInputIdentifierSchema = z.object({
 });
 
 const ConversationInputParamsSchema = z.object({
+  title: z.string().optional(),
   prompt_id: z.string().nullish(),
   model: z.string().nullish(),
   previous_response_id: z.string().nullish(),

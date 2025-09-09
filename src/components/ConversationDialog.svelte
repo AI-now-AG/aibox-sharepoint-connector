@@ -88,13 +88,13 @@
   async function saveTitle(conversation: any) {
     try {
       loading = true;
+
       const { error } = await actions.conversation.update({
         ...conversation,
         title: newTitle,
       });
 
       if (!error) {
-        // Update the conversation's title in the local array
         conversations = conversations.map((c) =>
           c._id === conversation._id ? { ...c, title: newTitle } : c,
         );
