@@ -135,6 +135,7 @@
   }
 
   function cancel() {
+    cancelEditing()
     conversationDialog?.close();
   }
 </script>
