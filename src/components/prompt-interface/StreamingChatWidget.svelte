@@ -1,5 +1,6 @@
 <script lang="ts">
   import { actions } from "astro:actions";
+  import { navigate } from "astro:transitions/client";
   import {
     messageHistories,
     addMessageToHistory,
@@ -713,7 +714,8 @@
         type: "error",
       });
     } else {
-      window.location.href = `/conversations/${data.insertedId}`;
+      //window.location.href = `/conversations/${data.insertedId}`;
+      navigate(`/conversations/${data.insertedId}`);
     }
   }
 </script>
