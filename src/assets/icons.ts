@@ -70,6 +70,8 @@ import deleteIcon from "$assets/icons/delete.svg?raw";
 import addIcon from "$assets/icons/add.svg?raw";
 import pin from "$assets/icons/pin.svg?raw";
 import longArrowRight from "$assets/icons/long-arrow-right.svg?raw";
+import check from "$assets/icons/check.svg?raw";
+import cancel from "$assets/icons/cancel.svg?raw";
 
 export const svgIcons = {
   menuSettings,
@@ -144,4 +146,6 @@ export const svgIcons = {
   addIcon,
   pin,
   longArrowRight,
+  check,
+  cancel
 };

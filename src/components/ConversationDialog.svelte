@@ -140,7 +140,7 @@
             {#if editingId === conversation._id}
               <input
                 type="text"
-                class="input input-bordered input-sm flex-1"
+                class="input input-bordered input-sm flex-1 text-sm"
                 bind:value={newTitle}
                 onkeydown={(e) => {
                   if (e.key === "Enter") {
@@ -168,14 +168,14 @@
                 onclick={preventDefault(() => saveTitle(conversation))}
                 class="btn btn-secondary btn-outline btn-sm mr-2"
               >
-                {@html svgIcons.edit}
+                {@html svgIcons.check}
                 {t("common.save")}
               </button>
               <button
                 onclick={preventDefault(cancelEditing)}
                 class="btn btn-secondary btn-outline btn-sm"
               >
-                {@html svgIcons.close}
+                {@html svgIcons.cancel}
                 {t("common.cancel")}
               </button>
             {:else}
