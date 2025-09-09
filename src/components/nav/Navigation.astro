@@ -599,11 +599,11 @@ const modules = [...menuItems];
       }
       {
         myAIBoxMenus.map((mod, index) => (
-          <li class="active:bg-transparent">
+          <li class="active:bg-transparent w-full">
             <details
               data-id={"my-ai-box"}
               open={mod.isOpened}
-              class="active:bg-transparent"
+              class="active:bg-transparent w-full"
             >
               <summary
                 class={
@@ -620,10 +620,10 @@ const modules = [...menuItems];
               </summary>
               {"items" in mod && (
                 <ul
-                  class={`active:bg-transparent ${isNavCollapsed ? "hidden" : ""}`}
+                  class={`active:bg-transparent w-full pr-4 ${isNavCollapsed ? "hidden" : ""}`}
                 >
                   {mod.items?.map((sub) => (
-                    <li class="pl-1 active:bg-transparent">
+                    <li class="pl-1 active:bg-transparent w-full">
                       {sub.isCta ? (
                         <LoadMoreConversation
                           text={t("conversation.show-more")}
