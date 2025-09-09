@@ -87,6 +87,14 @@
   let isResoningThingking: boolean = $state(false);
   let loading: boolean = $state(false);
 
+  let isShowAttachmentButton = $state(
+    currentPrompt?.model != PromptModel.Perplexity,
+  );
+
+  $effect(() => {
+    isShowAttachmentButton = currentPrompt?.model != PromptModel.Perplexity;
+  });
+
   function isGpt5Default() {
     const aiProviders = $tenant?.api_key_providers ?? [];
     const activeDefaultProvider = aiProviders.find(
@@ -756,6 +764,7 @@
     {toolOptions}
     bind:selectedPromptTool
     bind:isDisablePromptTool
+    showAttachmentButton={isShowAttachmentButton}
   />
 </div>
 
