@@ -9,12 +9,14 @@ const replacer = function (this: any, key: any, value: any) {
   return value;
 };
 
-export const transformRawData = (data: any) => {
-  return JSON.parse(JSON.stringify(data, replacer));
-};
-
-export const transformRawDataWithoutReplacer = (data: any) => {
-  return JSON.parse(JSON.stringify(data));
-};
+/**
+ * Convert raw data to plain JSON.
+ * @param data - The value to serialize/clone.
+ * @param useReplacer - Apply the custom `replacer` (default: true).
+ * @returns The JSON-cloned value.
+ */
+export function transformRawData(data: any, useReplacer = true) {
+  return JSON.parse(JSON.stringify(data, useReplacer ? replacer : undefined));
+}
 
 export default transformRawData;

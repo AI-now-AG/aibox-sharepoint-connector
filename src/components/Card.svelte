@@ -12,8 +12,9 @@
 <script lang="ts">
   import { fade } from "svelte/transition";
   import { addToast } from "$stores/toast";
-
+  import { DialogId } from "$types/UiDialog";
   import { useTranslations } from "$i18n/utils";
+
   interface Props {
     items?: CardItem[];
     type?: string;
@@ -33,7 +34,9 @@
 
   const showDeleteConfirmationDlg = (id: string) => {
     document
-      .querySelector<HTMLDialogElement>(`#delete_confirmation_modal_${id}`)
+      .querySelector<HTMLDialogElement>(
+        `#${DialogId.UseCaseDeleteConfirmation}_${id}`,
+      )
       ?.showModal();
   };
 
@@ -147,7 +150,10 @@
               </button>
             {/if}
 
-            <dialog id={`delete_confirmation_modal_${card.id}`} class="modal">
+            <dialog
+              id={`${DialogId.UseCaseDeleteConfirmation}_${card.id}`}
+              class="modal"
+            >
               <div class="modal-box">
                 <h3 class="text-lg font-bold">Please confirm</h3>
                 <p class="py-4">

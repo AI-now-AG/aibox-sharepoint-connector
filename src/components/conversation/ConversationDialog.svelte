@@ -5,7 +5,8 @@
   import { addToast } from "$stores/toast";
   import { actions } from "astro:actions";
   import { preventDefault } from "$utils/common";
-  import Loading from "./Loading.svelte";
+  import Loading from "$components/Loading.svelte";
+  import { DialogId } from "$types/UiDialog";
   import dayjs from "dayjs";
   const t = useTranslations();
 
@@ -24,6 +25,20 @@
   let editingId: string | null = $state(null); // Tracks the ID of the conversation being edited
   let newTitle: string = $state(""); // Stores the new title as the user types
 
+  onMount(async () => {
+    getListConversation();
+  });
+
+  /**
+   * Reloads the sidebar by dispatching a global event.
+   * The sidebar component listens for "reload-sidebar" and refetches conversations.
+   */
+  function reloadSidebar() {
+    setTimeout(() => {
+      window.dispatchEvent(new Event("reload-sidebar"));
+    }, 1000);
+  }
+
   async function getListConversation() {
     try {
       const { error, data } = await actions.conversation.list({});
@@ -36,10 +51,6 @@
       console.error("Exception when get conversations", error);
     }
   }
-
-  onMount(async () => {
-    getListConversation();
-  });
 
   function removeDeletedItem(deletedId: string) {
     conversations = conversations?.filter(
@@ -62,6 +73,7 @@
           message: t("conversation.delete-conversation-successfull"),
           type: "success",
         });
+        reloadSidebar();
       } else {
         addToast({ message: JSON.stringify(error), type: "error" });
       }
@@ -95,14 +107,23 @@
       });
 
       if (!error) {
-        conversations = conversations.map((c) =>
-          c._id === conversation._id ? { ...c, title: newTitle } : c,
-        );
+        conversations = conversations
+          .map((c) =>
+            c._id === conversation._id
+              ? { ...c, title: newTitle, updated_at: new Date() }
+              : c,
+          )
+          .sort(
+            (a, b) =>
+              new Date(b.updated_at).getTime() -
+              new Date(a.updated_at).getTime(), // newest first
+          );
         addToast({
           message: t("conversation.update-conversation-successfull"),
           type: "success",
         });
         cancelEditing(); // Exit editing mode
+        reloadSidebar();
       } else {
         addToast({ message: JSON.stringify(error), type: "error" });
       }
@@ -121,7 +142,7 @@
 <dialog
   bind:this={conversationDialog}
   class="modal"
-  id="my-ai-box-conversation-dialog"
+  id={DialogId.MyAiboxConversation}
 >
   <div class="modal-box w-8/12 max-w-5xl">
     <div class="flex justify-between">
