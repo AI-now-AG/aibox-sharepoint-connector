@@ -72,6 +72,7 @@ import pin from "$assets/icons/pin.svg?raw";
 import longArrowRight from "$assets/icons/long-arrow-right.svg?raw";
 import check from "$assets/icons/check.svg?raw";
 import cancel from "$assets/icons/cancel.svg?raw";
+import chat from "$assets/icons/chat.svg?raw";
 
 export const svgIcons = {
   menuSettings,
@@ -147,5 +148,6 @@ export const svgIcons = {
   pin,
   longArrowRight,
   check,
-  cancel
+  cancel,
+  chat
 };
