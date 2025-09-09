@@ -34,16 +34,16 @@ const generateConversationTitle = async (
   const model = initializeOpenAI(ctx);
 
   const instructionsWithPrompt = `
-      Generate a short conversation title (max. 50 characters).
-      The title must summarize both the prompt title and the user input. 
-      Write it in the same language as the prompt title. 
-      If the language cannot be determined, default to German.
+    Generate a short conversation title of max 30 characters. 
+    The title must summarize prompt title and user input to fit on a navigation. 
+    Write it in the same language as the user input. 
+    If the language cannot be determined, default to German.
   `;
   const instructionsWithoutPrompt = `
-      Generate a short conversation title (max. 50 characters).
-      The title must summarize the user input only. 
-      Write it in the same language as the user input. 
-      If the language cannot be determined, default to German.
+    Generate a short conversation title max 30 characters. 
+    The title must summarize the user input to fit on a navigation. 
+    Write it in the same language as the user input. 
+    If the language cannot be determined, default to German.
   `;
 
   const hasPrompt = promptTitle.trim().length > 0;
