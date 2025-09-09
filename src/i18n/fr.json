@@ -575,6 +575,6 @@
   "conversation.delete-conversation-successfull": "Chat successfully deleted",
   "common.close": "Close",
   "conversation.my-ai-box-conversation-dialog-title": "My aibox Chats",
-  "conversation.update-conversation-successfull": "Update title successfull",
+  "conversation.update-conversation-successfull": "Title successfully changed",
   "conversation.edit-title": "Edit"
 }
