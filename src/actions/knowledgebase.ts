@@ -2,7 +2,7 @@ import { defineAction } from "astro:actions";
 import { z } from "zod";
 import { ObjectId } from "mongodb";
 import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
-import { transformRawDataWithoutReplacer } from "$utils/transformRawData";
+import { transformRawData } from "$utils/transformRawData";
 import {
   extractTextFromPDF,
   extractTextFromDocx,
@@ -18,7 +18,7 @@ export const knowledgebase = {
       const id = new ObjectId(input.tenant_id);
       const knowledgeBaseCursor = await KnowledgeBaseModel.listByTenant(id);
       const knowledgeBases = await knowledgeBaseCursor.toArray();
-      return transformRawDataWithoutReplacer(knowledgeBases);
+      return transformRawData(knowledgeBases, false);
     },
   }),
 

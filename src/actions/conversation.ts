@@ -1,6 +1,6 @@
 import { defineAction, type ActionAPIContext } from "astro:actions";
 import { z } from "zod";
-import { transformRawData, transformRawDataWithoutReplacer } from "$utils/transformRawData";
+import { transformRawData } from "$utils/transformRawData";
 import ConversationModel, {
   type Conversation,
   MessageSchema,
@@ -26,6 +26,10 @@ const ConversationInputParamsSchema = z.object({
 const UpdateConversationSchema = ConversationInputParamsSchema.omit({
   prompt_id: true,
 }).merge(ConversationInputIdentifierSchema);
+
+const ConversationListSchema = z.object({
+  limit: z.number().min(0).optional(),
+});
 
 const generateConversationTitle = async (
   ctx: ActionAPIContext,
@@ -79,15 +83,16 @@ export const conversation = {
   }),
 
   list: defineAction({
+    input: ConversationListSchema,
     handler: async (input, context) => {
       // Get the current user ID from the request context
       const userId = context.locals.user.id;
 
       // Fetch all conversations created by this user
-      const data = await ConversationModel.listByUser(userId);
+      const data = await ConversationModel.listByUser(userId, input.limit);
 
       // Normalize and return the list of conversations
-      return transformRawDataWithoutReplacer(data);
+      return transformRawData(data, false);
     },
   }),
 

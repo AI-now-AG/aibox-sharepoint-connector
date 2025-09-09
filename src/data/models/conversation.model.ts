@@ -99,11 +99,12 @@ export default {
     });
   },
 
-  listByUser: async (userId: string | ObjectId) => {
+  listByUser: async (userId: string | ObjectId, limit = 500) => {
     const _userId = toObjectId(userId);
     return collection
       .find<Document<Conversation>>({ creator_id: _userId })
       .sort({ updated_at: -1 })
+      .limit(limit)
       .toArray();
   },
 };

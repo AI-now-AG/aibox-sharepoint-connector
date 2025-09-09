@@ -314,6 +314,11 @@
     // Scroll to latest message
     setTimeout(() => scrollIntoView(), 1000);
 
+    // Trigger sidebar reload (refetch conversations)
+    setTimeout(() => {
+      window.dispatchEvent(new Event("reload-sidebar"));
+    }, 1000);
+
     return data;
   }
 
