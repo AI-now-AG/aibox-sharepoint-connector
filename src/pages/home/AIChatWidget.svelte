@@ -1,7 +1,7 @@
 <script lang="ts">
   import { actions } from "astro:actions";
   import { slide } from "svelte/transition";
-  import { navigate } from "astro:transitions/client";
+  //import { navigate } from "astro:transitions/client";
   import { type Message, MessageRole } from "$types/MessageHistory";
   import { sharedMessageHistory } from "$stores/chatHistory";
   import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
@@ -647,8 +647,8 @@
         type: "error",
       });
     } else {
-      //window.location.href = `/conversations/${data.insertedId}`;
-      navigate(`/conversations/${data.insertedId}`);
+      window.location.href = `/conversations/${data.insertedId}`;
+      //navigate(`/conversations/${data.insertedId}`);
     }
   }
 </script>
@@ -710,7 +710,6 @@
             {t("home.new-chat")}
           </button>
           <button
-            type="button"
             onclick={saveConversation}
             class="btn btn-primary btn-outline btn-sm px-8"
             disabled={isGenerating || isFetching}
