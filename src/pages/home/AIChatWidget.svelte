@@ -729,6 +729,7 @@
             bind:files
             {isFetching}
             stickyFooter={true}
+            showAttachmentButton={!isDisableFileInput}
             onsend={submitForm}
             {toolOptions}
             bind:selectedPromptTool
