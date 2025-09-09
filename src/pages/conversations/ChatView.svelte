@@ -12,7 +12,12 @@
   import { actions } from "astro:actions";
   import Loading from "$components/Loading.svelte";
   import { addToast } from "$stores/toast";
-  import { getPromptTools, useProviderInfo } from "$shared/AIProvider";
+  import {
+    getPromptTools,
+    ModelNameMap,
+    ProviderModelMap,
+    useProviderInfo,
+  } from "$shared/AIProvider";
   import { tenant, user } from "$stores";
   import { PromptModel } from "$types/PromptModel";
   import {
@@ -91,6 +96,62 @@
   );
 
   let selectedPromptTool = $state(PromptToolOption.None);
+
+  function getDefaultModelName() {
+    const aiProviders = $tenant?.api_key_providers ?? [];
+    const activeDefaultProvider = aiProviders.find(
+      (item) => item.active === true && item.default === true,
+    );
+    const providerName = activeDefaultProvider?.name || ApiKeyProvider.OpenAI;
+    const key = ProviderModelMap[providerName] as keyof typeof $tenant;
+    const rawModel = $tenant?.[key] || "gpt-4o";
+    return ModelNameMap[rawModel] || rawModel;
+  }
+
+  const getActiveModels = (defaultModelName: string): any[] => {
+    const getModelLabel = (provider: any) => {
+      const key = ProviderModelMap[provider.name] as keyof typeof $tenant;
+      const model = $tenant?.[key] || defaultModelName;
+      if (ModelNameMap[model]) {
+        return ModelNameMap[model];
+      }
+      return model;
+    };
+    const aiProviders = $tenant?.api_key_providers ?? [];
+    const models: any[] =
+      aiProviders
+        .filter((provider: any) => provider.active)
+        .map((provider: any) => {
+          return {
+            provider: provider.name,
+            modelName: getModelLabel(provider),
+            default: provider.default,
+          };
+        }) || [];
+    return models;
+  };
+
+  const getModelName = (model: string): string | undefined => {
+    const defaultModelName = getDefaultModelName();
+    const activeModels = getActiveModels(defaultModelName);
+    if (model?.includes("openai-gpt-5")) {
+      const defaultModel = activeModels.find((m: any) =>
+        m.provider?.includes("openai-gpt-5"),
+      );
+      return defaultModel?.modelName || "gpt-5";
+    }
+    if (model?.includes("openai")) {
+      const defaultModel = activeModels.find((m: any) =>
+        m.provider?.includes("openai"),
+      );
+      return defaultModel?.modelName || "gpt-4o";
+    }
+    const matchingModel = activeModels.find((m: any) =>
+      model?.includes(m.provider),
+    );
+
+    return matchingModel?.modelName || defaultModelName;
+  };
 
   async function deleteConversation() {
     try {
@@ -611,7 +672,7 @@
   <div class="flex items-center">
     <div class="flex flex-1">
       <span class="self-start badge badge-xs px-2 border-base-300 font-normal"
-        >{model}</span
+        >{getModelName(model)}</span
       >
     </div>
     <div class="flex justify-end pr-4">
