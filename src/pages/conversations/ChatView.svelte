@@ -221,7 +221,11 @@
   }
 
   function buildRequestPayload(fileUrls: string[]): RequestPayload {
-    const isOpenAIResponseModel = [PromptModel.OpenAIWithTools].includes(model);
+    const isOpenAIResponseModel = [
+      PromptModel.OpenAI,
+      PromptModel.OpenAIWithTools,
+      PromptModel.OpenAIWithImageTools,
+    ].includes(model);
 
     const isOpenAIGpt5ResponseModel =
       [PromptModel.OpenAIGpt5].includes(model) || (isGpt5Default() && !model);
