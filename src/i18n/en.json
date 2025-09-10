@@ -577,5 +577,6 @@
   "conversation.my-ai-box-conversation-dialog-title": "My aibox Chats",
   "conversation.update-conversation-successfull": "Title successfully changed",
   "conversation.edit-title": "Edit",
-  "common.no-content-available": "No content available"
+  "common.no-content-available": "No content available",
+  "nav.create-image.nano-banana": "Nano Banana"
 }
