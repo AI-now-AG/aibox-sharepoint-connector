@@ -578,5 +578,7 @@
   "conversation.update-conversation-successfull": "Title successfully changed",
   "conversation.edit-title": "Edit",
   "common.no-content-available": "No content available",
-  "nav.create-image.nano-banana": "Nano Banana"
+  "nav.create-image.nano-banana": "Nano Banana",
+  "create-image.create-nano-banana-image-title": "Create Nano Banana Image",
+  "create-image.create-nano-banana-image-description": "Create images from the latest and most popular model from Gemini"
 }
