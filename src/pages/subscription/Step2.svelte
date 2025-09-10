@@ -22,7 +22,7 @@
     { value: "en", title: "English" },
   ];
 
-  let selectedLanguage: { title: string; value: string } = $state(
+  let selectedLanguage: string = $state(
     initOrganizationInformation?.defaultLanguage ?? "de",
   );
   let organizationName = $state(
