@@ -21,6 +21,7 @@
   }: Props = $props();
 
   let loading: boolean = $state(false);
+  let isConversationLoading: boolean = $state(true);
   let conversations: any[] = $state([]);
   let editingId: string | null = $state(null); // Tracks the ID of the conversation being edited
   let newTitle: string = $state(""); // Stores the new title as the user types
@@ -41,6 +42,7 @@
 
   async function getListConversation() {
     try {
+      isConversationLoading = true;
       const { error, data } = await actions.conversation.list({});
       if (!error) {
         conversations = data;
@@ -49,6 +51,8 @@
       }
     } catch (error) {
       console.error("Exception when get conversations", error);
+    } finally {
+      isConversationLoading = false;
     }
   }
 
@@ -135,7 +139,7 @@
   }
 
   function cancel() {
-    cancelEditing()
+    cancelEditing();
     conversationDialog?.close();
   }
 </script>
@@ -152,76 +156,91 @@
         {@html svgIcons.closeMenu}
       </button>
     </div>
-
-    <section>
-      <div class="min-h-0 max-h-full overflow-y-auto space-y-2">
-        {#each conversations as conversation}
-          <div
-            class="flex items-center justify-between border-b px-2 py-1 rounded-lg border"
-          >
-            {#if editingId === conversation._id}
-              <input
-                type="text"
-                class="input input-bordered input-sm flex-1 text-sm"
-                bind:value={newTitle}
-                onkeydown={(e) => {
-                  if (e.key === "Enter") {
-                    saveTitle(conversation);
-                  } else if (e.key === "Escape") {
-                    cancelEditing();
-                  }
-                }}
-              />
-            {:else}
-              <a
-                href={"/conversations/" + conversation._id}
-                class="flex items-center flex-1"
-              >
-                <span class="text-sm">{conversation.title}</span>
-              </a>
-            {/if}
-
-            <span class="text-xs text-left mx-4"
-              >{dayjs(conversation.updated_at).format("DD.MM.YYYY HH:mm")}</span
-            >
-
-            {#if editingId === conversation._id}
-              <button
-                onclick={preventDefault(() => saveTitle(conversation))}
-                class="btn btn-secondary btn-outline btn-sm mr-2"
-              >
-                {@html svgIcons.check}
-                {t("common.save")}
-              </button>
-              <button
-                onclick={preventDefault(cancelEditing)}
-                class="btn btn-secondary btn-outline btn-sm"
-              >
-                {@html svgIcons.cancel}
-                {t("common.cancel")}
-              </button>
-            {:else}
-              <button
-                onclick={preventDefault(() => startEditing(conversation))}
-                class="btn btn-primary btn-outline btn-sm mr-2"
-              >
-                {@html svgIcons.edit}
-                {t("conversation.edit-title")}
-              </button>
-              <button
-                onclick={preventDefault(() =>
-                  deleteConversation(conversation._id),
-                )}
-                class="btn btn-primary btn-outline btn-sm"
-              >
-                {@html svgIcons.trash}
-                {t("conversation.remove-from-my-ai-box")}
-              </button>
-            {/if}
-          </div>
-        {/each}
+    {#if isConversationLoading}
+      <div class="flex w-full items-center justify-center">
+        <span class="loading loading-spinner loading-md"></span>
       </div>
-    </section>
+    {:else}
+      <section>
+        {#if Array.isArray(conversations) && conversations.length > 0}
+          <div class="min-h-0 max-h-full overflow-y-auto space-y-2">
+            {#each conversations as conversation}
+              <div
+                class="flex items-center justify-between border-b px-2 py-1 rounded-lg border"
+              >
+                {#if editingId === conversation._id}
+                  <input
+                    type="text"
+                    class="input input-bordered input-sm flex-1 text-sm"
+                    bind:value={newTitle}
+                    onkeydown={(e) => {
+                      if (e.key === "Enter") {
+                        saveTitle(conversation);
+                      } else if (e.key === "Escape") {
+                        cancelEditing();
+                      }
+                    }}
+                  />
+                {:else}
+                  <a
+                    href={"/conversations/" + conversation._id}
+                    class="flex items-center flex-1"
+                  >
+                    <span class="text-sm">{conversation.title}</span>
+                  </a>
+                {/if}
+
+                <span class="text-xs text-left mx-4"
+                  >{dayjs(conversation.updated_at).format(
+                    "DD.MM.YYYY HH:mm",
+                  )}</span
+                >
+
+                {#if editingId === conversation._id}
+                  <button
+                    onclick={preventDefault(() => saveTitle(conversation))}
+                    class="btn btn-secondary btn-outline btn-sm mr-2"
+                  >
+                    {@html svgIcons.check}
+                    {t("common.save")}
+                  </button>
+                  <button
+                    onclick={preventDefault(cancelEditing)}
+                    class="btn btn-secondary btn-outline btn-sm"
+                  >
+                    {@html svgIcons.cancel}
+                    {t("common.cancel")}
+                  </button>
+                {:else}
+                  <button
+                    onclick={preventDefault(() => startEditing(conversation))}
+                    class="btn btn-primary btn-outline btn-sm mr-2"
+                  >
+                    {@html svgIcons.edit}
+                    {t("conversation.edit-title")}
+                  </button>
+                  <button
+                    onclick={preventDefault(() =>
+                      deleteConversation(conversation._id),
+                    )}
+                    class="btn btn-primary btn-outline btn-sm"
+                  >
+                    {@html svgIcons.trash}
+                    {t("conversation.remove-from-my-ai-box")}
+                  </button>
+                {/if}
+              </div>
+            {/each}
+          </div>
+        {:else}
+          <div class="flex w-full items-center justify-center">
+            <span class="text-sm">
+              {t("common.no-content-available")}
+            </span>
+          </div>
+        {/if}
+      </section>
+    {/if}
 
     <div class="flex justify-end">
       <button

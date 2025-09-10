@@ -125,7 +125,9 @@
                           <p class="font-bold text-sm">
                             {role == MessageRole.User ? username : `aibox`}
                           </p>
-                          <div class="mt-2 text-sm">No content available</div>
+                          <div class="mt-2 text-sm">
+                            {t("common.no-content-available")}
+                          </div>
                         </div>
                       {/if}
                       {#if role === MessageRole.Assistant}

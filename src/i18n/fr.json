@@ -576,5 +576,6 @@
   "common.close": "Close",
   "conversation.my-ai-box-conversation-dialog-title": "My aibox Chats",
   "conversation.update-conversation-successfull": "Title successfully changed",
-  "conversation.edit-title": "Edit"
+  "conversation.edit-title": "Edit",
+  "common.no-content-available": "No content available"
 }
