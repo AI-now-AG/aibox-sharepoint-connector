@@ -80,14 +80,14 @@
     isDisableFileInput = selectedModel === PromptModel.Perplexity;
   });
 
-  const providerIno = useProviderInfo($tenant);
+  const providerInfo = useProviderInfo($tenant);
   // === Derived State ===
   let toolOptions = $derived.by(() => {
     return getPromptTools(
       (selectedModel == PromptModel.Default
-        ? providerIno?.defaultProviderPromptModelName == PromptModel.OpenAI
+        ? providerInfo?.defaultProviderPromptModelName == PromptModel.OpenAI
           ? PromptModel.OpenAIWithTools
-          : providerIno?.defaultProviderPromptModelName
+          : providerInfo?.defaultProviderPromptModelName
         : selectedModel) as PromptModel,
     );
   });

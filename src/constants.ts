@@ -84,6 +84,3 @@ export const STRIPE_PRODUCTS_PROD = {
 };
 export const STRIPE_TAX_RATE_DEV = "txr_1RPNDiBIpWAJAQFJ9jD4Jlpj";
 export const STRIPE_TAX_RATE_PROD = "txr_1RQOYKBTLa4XuBC9iZoAKkz1";
-
-// Netlify
-export const NETLIFY_BLOBS_STORE = "aibox-store";
