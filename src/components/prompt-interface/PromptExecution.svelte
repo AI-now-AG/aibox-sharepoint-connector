@@ -1,12 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import UseCaseCards from "$components/prompt-interface/UseCaseCards.svelte";
-  import ChatExecutionWidget from "./ChatExecutionWidget.svelte";
   import StreamingChatWidget from "./StreamingChatWidget.svelte";
-  import { PromptModel } from "$types/PromptModel";
-  import { tenant } from "$stores";
-  import { ApiKeyProvider } from "$types/TenantFeature";
-
   interface Props {
     promptItems: any;
     isEditable?: boolean;
@@ -28,18 +23,6 @@
   onMount(async function () {
     currentPrompt = promptItems[0];
   });
-
-  function isGpt5Default() {
-    const aiProviders = $tenant?.api_key_providers ?? [];
-    const activeDefaultProvider = aiProviders.find(
-      (item) => item.active === true && item.default === true,
-    );
-
-    if (activeDefaultProvider?.name === ApiKeyProvider.OpenAIGtp5) {
-      return true;
-    }
-    return false;
-  }
 </script>
 
 <div class="grid grid-cols-1 grid-rows-[1fr_min-content] h-full">
@@ -61,21 +44,12 @@
       />
     </div>
 
-    {#if [PromptModel.OpenAIWithTools, PromptModel.OpenAIWithImageTools, PromptModel.Claude, PromptModel.Perplexity, PromptModel.OpenAIGpt5, PromptModel.Gemini, PromptModel.Default].includes(currentPrompt?.model) || (isGpt5Default() && !currentPrompt?.model)}
-      <StreamingChatWidget
-        promptId={selectedPromptId}
-        {groupId}
-        {currentPrompt}
-        bind:isFetching={isProcessing}
-        {folderName}
-      />
-    {:else}
-      <ChatExecutionWidget
-        promptId={selectedPromptId}
-        {groupId}
-        {currentPrompt}
-        bind:isProcessing
-      />
-    {/if}
+    <StreamingChatWidget
+      promptId={selectedPromptId}
+      {groupId}
+      {currentPrompt}
+      bind:isFetching={isProcessing}
+      {folderName}
+    />
   </div>
 </div>
