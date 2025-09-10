@@ -45,6 +45,11 @@
 
     let title;
     switch (provider.name) {
+      case PromptModel.OpenAI:
+      case PromptModel.OpenAIWithTools:
+      case PromptModel.OpenAIWithImageTools:
+        title = `${modelLabel} (${t("home.model-option-text-tools")})`;
+        break;
       case PromptModel.AzureOpenAI:
         title = t("prompt-execution.models.azure-openai", {
           model: modelLabel,
@@ -82,11 +87,17 @@
     });
   }
 
+  let rawProviders = $tenant?.api_key_providers ?? [];
+  const defaultModel = rawProviders.find((provider: any) => provider.default);
+  const defaultText = t("tenant.default");
+  const defaultName = capitalizeFirst(defaultText);
+  const defaultModelName = getModelLabel(defaultModel);
+
   const getActiveModels = (): Option[] => {
-    const rawProviders = $tenant?.api_key_providers ?? [];
+    const providers = rawProviders.filter((provider: any) => !provider.default);
 
     const models: Option[] =
-      rawProviders
+      providers
         .filter((provider: any) => provider.active)
         .map((provider: any) => {
           const modelName = getModelLabel(provider);
@@ -96,39 +107,35 @@
           };
         }) || [];
 
-    const defaultModel = rawProviders.find((provider: any) => provider.default);
-    const defaultText = t("tenant.default");
-    const defaultName = capitalizeFirst(defaultText);
+    sortProviders(models);
 
-    const modelName = getModelLabel(defaultModel);
-
-    if (defaultModel?.name !== ApiKeyProvider.OpenAI) {
-      models.unshift({
-        value: PromptModel.Default,
-        title: `${defaultName} - ${modelName}`,
-      });
-    }
-    // OpenAI Responses API
-    models.push({
-      value:
-        defaultModel?.name === ApiKeyProvider.OpenAI
-          ? PromptModel.Default
-          : PromptModel.OpenAIWithTools,
-      title:
-        defaultModel?.name === ApiKeyProvider.OpenAI
-          ? `${defaultName} - ${t("prompt-execution.models.openai-with-tools")}`
-          : `${t("prompt-execution.models.openai-with-tools")}`,
+    models.unshift({
+      value: defaultModel?.name || PromptModel.Default,
+      title: `${defaultName} - ${defaultModelName}`,
     });
 
-    return sortProviders(models);
+    return models;
   };
+
+  $effect(() => {
+    if (!selectedModel) {
+      selectedModel = defaultModel?.name || PromptModel.Default;
+    } else {
+      if (
+        selectedModel == PromptModel.OpenAIWithTools ||
+        selectedModel == PromptModel.OpenAIWithImageTools
+      ) {
+        selectedModel = PromptModel.OpenAI;
+      }
+    }
+  });
 </script>
 
 <Dropdown
   classes={"flex-1 min-w-3xs " + classes}
   {labelClasses}
   label={label ?? t("prompt-library.add.prompts.language-model")}
-  placeholder={`${t("tenant.default")} (OpenAI gtp-4o)`}
+  placeholder={`${defaultName} - ${defaultModelName}`}
   options={models}
   {disabled}
   {onValueChange}

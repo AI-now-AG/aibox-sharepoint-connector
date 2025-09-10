@@ -133,18 +133,18 @@
 
   // === Effects ===
   $effect(() => {
-    if (currentPrompt.promptTool != PromptToolOption.None) {
-      selectedPromptTool = currentPrompt.promptTool;
+    if (currentPrompt?.promptTool != PromptToolOption.None) {
+      selectedPromptTool = currentPrompt?.promptTool;
     }
     // Support Old gpt-image selection (active image tool by default)
     const isOpenAiWithImageTool =
-      currentPrompt.model == PromptModel.OpenAIWithImageTools;
+      currentPrompt?.model == PromptModel.OpenAIWithImageTools;
     if (isOpenAiWithImageTool) {
       selectedPromptTool = PromptToolOption.Image;
     }
     if (
-      (currentPrompt.promptTool &&
-        currentPrompt.promptTool != PromptToolOption.None) ||
+      (currentPrompt?.promptTool &&
+        currentPrompt?.promptTool != PromptToolOption.None) ||
       isOpenAiWithImageTool
     ) {
       isDisablePromptTool = true;
