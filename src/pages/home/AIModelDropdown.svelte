@@ -45,6 +45,8 @@
     let title = "-";
     switch (provider.name) {
       case PromptModel.OpenAI:
+      case PromptModel.OpenAIWithTools:
+      case PromptModel.OpenAIWithImageTools:
         title = `${modelLabel} (${t("home.model-option-text-tools")})`;
         break;
       case PromptModel.OpenAIGpt5:
