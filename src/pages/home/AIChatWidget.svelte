@@ -80,14 +80,14 @@
     isDisableFileInput = selectedModel === PromptModel.Perplexity;
   });
 
-  const providerIno = useProviderInfo($tenant);
+  const providerInfo = useProviderInfo($tenant);
   // === Derived State ===
   let toolOptions = $derived.by(() => {
     return getPromptTools(
       (selectedModel == PromptModel.Default
-        ? providerIno?.defaultProviderPromptModelName == PromptModel.OpenAI
+        ? providerInfo?.defaultProviderPromptModelName == PromptModel.OpenAI
           ? PromptModel.OpenAIWithTools
-          : providerIno?.defaultProviderPromptModelName
+          : providerInfo?.defaultProviderPromptModelName
         : selectedModel) as PromptModel,
     );
   });
@@ -129,9 +129,11 @@
 
   // === Request Builder ===
   function buildRequestPayload(fileUrls: string[]): RequestPayload {
-    const isOpenAIResponseModel = [PromptModel.OpenAIWithTools].includes(
-      selectedModel,
-    );
+    const isOpenAIResponseModel = [
+      PromptModel.OpenAI,
+      PromptModel.OpenAIWithTools,
+      PromptModel.OpenAIWithImageTools,
+    ].includes(selectedModel);
 
     const isOpenAIGpt5ResponseModel =
       [PromptModel.OpenAIGpt5].includes(selectedModel) ||
@@ -314,7 +316,7 @@
   ): void {
     console.error(`❌ Stream error: ${data.error}`);
 
-    const errorMessage = data.error || "Image generation failed.";
+    const errorMessage = data.error || "Text generation request failed.";
 
     // Add user message to history
     const errorUserMessage: Message = {
@@ -520,7 +522,6 @@
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          //"X-API-Key": config.apiKey,
           Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify(requestBody),
