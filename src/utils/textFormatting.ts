@@ -40,6 +40,16 @@ function buildIconCitationLinks(
   return result;
 }
 
+/**
+ * Build citation links into a Markdown string.
+ *
+ * - Supports numbered citations (`string[]`) or icon-style citations (`object[]`).
+ * - Returns the input unchanged if no citations are provided.
+ *
+ * @param inputString - The base Markdown text
+ * @param citations - Citation strings or objects
+ * @returns Markdown string with citation links
+ */
 export function buildCitationLinks(
   inputString: string,
   citations: (string | Record<string, any>)[],
@@ -65,6 +75,12 @@ export function buildCitationLinks(
   return inputString;
 }
 
+/**
+ * Convert Markdown text to styled HTML using marked.js with custom renderers.
+ *
+ * @param text - Markdown string
+ * @returns HTML string
+ */
 export function markdownToHtml(text: string) {
   marked.use({
     breaks: true,
@@ -106,8 +122,8 @@ export function markdownToHtml(text: string) {
       {
         name: "list",
         renderer(this, token) {
-          const ulClass = "list-disc list-inside space-y-1 ml-4";
-          const olClass = "list-decimal list-inside space-y-1 ml-4";
+          const ulClass = "list-disc list-inside space-y-1 ml-4 mb-3";
+          const olClass = "list-decimal list-inside space-y-1 ml-4 mb-3";
 
           const body = (token.items || [])
             .map((item: Tokens.ListItem) =>
@@ -137,7 +153,7 @@ export function markdownToHtml(text: string) {
           // Header row
           const header = token.header
             .map((cell: Tokens.TableCell) => {
-              const inner = marked.parseInline(cell.text); // cell.text is string
+              const inner = marked.parseInline(cell.text || ""); // cell.text is string
               return `<th class="${thClass}">${inner}</th>`;
             })
             .join("");
@@ -186,6 +202,24 @@ export function markdownToHtml(text: string) {
         },
       },
 
+      // Code blocks + inline code
+      {
+        name: "code",
+        renderer(this, token) {
+          const langClass = token.lang
+            ? `language-${token.lang}`
+            : "language-plaintext";
+
+          if (token.raw.startsWith("```")) {
+            // fenced block
+            return `<pre class="whitespace-pre-wrap break-words p-3 rounded-md bg-base-200 overflow-x-auto"><code class="${langClass}">${token.text}</code></pre>`;
+          }
+
+          // inline code
+          return `<code class="px-1 rounded bg-base-200 text-base-content">${token.text}</code>`;
+        },
+      },
+
       // Horizontal Rule (--- *** ___)
       {
         name: "hr",
@@ -198,9 +232,37 @@ export function markdownToHtml(text: string) {
     ],
   });
 
-  return marked.parse(text);
+  return marked.parse(text) as string;
 }
 
+/**
+ * Convert plain text to safe HTML.
+ *
+ * @param text - Input text
+ * @returns HTML string
+ */
+export function textToHtml(text: string): string {
+  // Escape HTML entities first
+  const escaped = text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
+  // Convert line breaks → <br>
+  const withBreaks = escaped.replace(/\n/g, "<br>");
+
+  // Wrap in a paragraph
+  return `<p>${withBreaks}</p>`;
+}
+
+/**
+ * Convert basic Markdown to HTML.
+ *
+ * @param text - Markdown string
+ * @returns HTML string
+ */
 export function formatMarkdown(text: string) {
   text = text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
   text = text.replace(/(\*|_)(.*?)\1/g, "<em>$2</em>");
@@ -218,6 +280,44 @@ export function formatMarkdown(text: string) {
   return text;
 }
 
+/**
+ * Removes common Markdown formatting while keeping readable text.
+ *
+ * Strips code blocks, inline code, bold/italic, strikethrough,
+ * headings, blockquotes, lists, links, images, rules, and footnotes.
+ *
+ * @param text - String containing Markdown.
+ * @returns Clean plain text.
+ */
+export function stripMarkdownFormatting(text: string): string {
+  text = text.replace(/```[\s\S]*?```/g, ""); // fenced code blocks
+  text = text.replace(/`([^`]*)`/g, "$1"); // inline code
+  text = text.replace(/(\*\*|__)(.*?)\1/g, "$2"); // bold
+  text = text.replace(/(\*|_)(.*?)\1/g, "$2"); // italic
+  text = text.replace(/~~(.*?)~~/g, "$1"); // strikethrough
+  text = text.replace(/^#{1,6}\s+/gm, ""); // headings
+  text = text.replace(/^>\s?/gm, ""); // blockquotes
+  text = text.replace(/^(\s*[-*+]|\s*\d+\.)\s+/gm, ""); // lists
+  text = text.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1"); // links
+  text = text.replace(/!\[([^\]]*)\]\([^)]+\)/g, "$1"); // images
+  text = text.replace(/^(-{3,}|\*{3,}|_{3,})$/gm, ""); // horizontal rules
+  text = text.replace(/\[\^.+?\](\: .*?$)?/g, ""); // footnotes
+
+  // Remove raw HTML tags (like <span>, <strong>, etc.)
+  text = text.replace(/<[^>]+>/g, "");
+
+  // Collapse multiple newlines
+  text = text.replace(/\n{2,}/g, "\n\n");
+
+  return text.trim();
+}
+
+/**
+ * Removes HTML tags from text, preserving line breaks and plain content.
+ *
+ * @param text - String with HTML markup.
+ * @returns Clean plain text.
+ */
 export function stripHtmlFormatting(text: string): string {
   text = text.replace(/<\/?(strong|em|u|del|code|pre|h[1-6][^>]*)>/gi, "");
   text = text.replace(/<br>/gi, "\n");

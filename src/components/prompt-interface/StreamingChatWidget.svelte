@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { v4 as uuidv4 } from "uuid";
+  import { actions } from "astro:actions";
+  //import { navigate } from "astro:transitions/client";
   import {
     messageHistories,
     addMessageToHistory,
@@ -20,11 +21,12 @@
   import {
     markdownToHtml,
     buildCitationLinks,
-    stripHtmlFormatting,
+    stripMarkdownFormatting,
   } from "$utils/textFormatting";
   import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
   import MessageInput from "$components/chat-ui/MessageInput.svelte";
   import MessageList from "$components/chat-ui/MessageList.svelte";
+  import Loading from "$components/Loading.svelte";
   import { tenant, user } from "$stores";
   import { useTranslations } from "$i18n/utils";
   import { ApiKeyProvider } from "$types/TenantFeature";
@@ -79,12 +81,20 @@
   let currentMessageHistory = $derived(
     $messageHistories[promptId] || getMessageHistory(promptId) || [],
   );
-  let uniqueId: string = $state("");
   let prompt: string = $state("");
   let files: File[] = $state([]);
   let currentStreamingImageUrl: string = $state("");
   let isGenerating: boolean = $state(false);
   let isResoningThingking: boolean = $state(false);
+  let loading: boolean = $state(false);
+
+  let isShowAttachmentButton = $state(
+    currentPrompt?.model != PromptModel.Perplexity,
+  );
+
+  $effect(() => {
+    isShowAttachmentButton = currentPrompt?.model != PromptModel.Perplexity;
+  });
 
   function isGpt5Default() {
     const aiProviders = $tenant?.api_key_providers ?? [];
@@ -316,6 +326,7 @@
     data: any,
     state: StreamingState,
     requestBody: RequestPayload,
+    fileUrls?: string[],
   ): any {
     console.log(`✅ Complete! Processing time: ${data.processingTimeMs}ms`);
     if (data.responseId) {
@@ -336,6 +347,7 @@
     const newUserMessage: Message = {
       role: MessageRole.User,
       content: requestBody.prompt,
+      fileUrls: fileUrls,
     };
     addMessageToHistory(groupId, promptId, newUserMessage);
 
@@ -360,7 +372,11 @@
     return data;
   }
 
-  function handleErrorEvent(data: any, requestBody: RequestPayload): void {
+  function handleErrorEvent(
+    data: any,
+    requestBody: RequestPayload,
+    fileUrls?: string[],
+  ): void {
     console.error(`❌ Stream error: ${data.error}`);
 
     const errorMessage = data.error || "Image generation failed.";
@@ -369,6 +385,7 @@
     const errorUserMessage: Message = {
       role: MessageRole.User,
       content: requestBody.prompt,
+      fileUrls: fileUrls,
     };
     addMessageToHistory(groupId, promptId, errorUserMessage);
 
@@ -395,13 +412,12 @@
   ): void {
     console.log("📚 Citations sent:", citations);
 
-    const formattedText = buildCitationLinks(responseText, citations);
-    currentMessage = markdownToHtml(formattedText);
+    const markdownWithLinks = buildCitationLinks(responseText, citations);
 
     const newAssistantMessage: Message = {
       role: MessageRole.Assistant,
-      content: currentMessage,
-      rawData: stripHtmlFormatting(currentMessage),
+      content: markdownWithLinks,
+      rawData: stripMarkdownFormatting(markdownWithLinks),
       imageUrl,
     };
 
@@ -411,8 +427,8 @@
   function addAssistantMessage(responseText: string, imageUrl: string): void {
     const newAssistantMessage: Message = {
       role: MessageRole.Assistant,
-      content: markdownToHtml(responseText),
-      rawData: stripHtmlFormatting(responseText),
+      content: responseText,
+      rawData: stripMarkdownFormatting(responseText),
       imageUrl,
     };
 
@@ -464,6 +480,7 @@
     data: any,
     state: StreamingState,
     requestBody: RequestPayload,
+    fileUrls?: string[],
   ): any {
     switch (data.type) {
       case "start":
@@ -491,10 +508,10 @@
         break;
 
       case "complete":
-        return handleCompleteEvent(data, state, requestBody);
+        return handleCompleteEvent(data, state, requestBody, fileUrls);
 
       case "error":
-        handleErrorEvent(data, requestBody);
+        handleErrorEvent(data, requestBody, fileUrls);
         break;
 
       default:
@@ -507,6 +524,7 @@
   async function processStream(
     reader: ReadableStreamDefaultReader,
     requestBody: RequestPayload,
+    fileUrls: string[],
   ): Promise<any> {
     const decoder = new TextDecoder();
     let buffer = "";
@@ -528,7 +546,7 @@
           const data = parseStreamLine(buffer);
           if (data) {
             console.log("📥 Processing final buffered data:", data.type);
-            processStreamEvent(data, state, requestBody);
+            processStreamEvent(data, state, requestBody, fileUrls);
           }
         }
         break;
@@ -544,7 +562,7 @@
       for (const line of lines) {
         const data = parseStreamLine(line);
         if (data) {
-          const result = processStreamEvent(data, state, requestBody);
+          const result = processStreamEvent(data, state, requestBody, fileUrls);
           if (result) {
             return result; // Return on completion
           }
@@ -569,9 +587,19 @@
 
       // Make API request
       const accessToken = $user?.auth0_access_token;
-      if (!accessToken) {
+      const response = await fetch(config.apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          //"X-API-Key": config.apiKey,
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (response.status === 401) {
         addToast({
-          message: t('auth.session-missing-force-login'),
+          message: t("auth.session-missing-force-login"),
           type: "error",
         });
         setTimeout(() => {
@@ -579,15 +607,6 @@
         }, 2000);
         return;
       }
-      const response = await fetch(config.apiUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          //"X-API-Key": config.apiKey,
-          "Authorization": `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify(requestBody),
-      });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -603,7 +622,7 @@
         }
 
         prompt = ""; // Reset prompt for new request
-        return await processStream(reader, requestBody);
+        return await processStream(reader, requestBody, fileUrls);
       }
     } catch (error) {
       console.error("❌ Request failed:", error);
@@ -614,8 +633,6 @@
 
   // === File Upload Handler ===
   async function submitForm() {
-    uniqueId = uuidv4();
-
     const fileDataList = await Promise.all(
       files.map(async (file) => ({
         name: file.name,
@@ -680,6 +697,27 @@
       behavior: "smooth",
     });
   }
+
+  async function saveConversation() {
+    loading = true;
+    const { error, data } = await actions.conversation.save({
+      prompt_id: currentPrompt._id?.toString() || "",
+      model: currentPrompt.model,
+      messages: currentMessageHistory,
+      previous_response_id: previousResponseId,
+    });
+    loading = false;
+
+    if (error) {
+      addToast({
+        message: error?.message ?? "Something went wrong",
+        type: "error",
+      });
+    } else {
+      window.location.href = `/conversations/${data.insertedId}`;
+      //navigate(`/conversations/${data.insertedId}`);
+    }
+  }
 </script>
 
 <!-- Output (Follow-Up) -->
@@ -707,6 +745,13 @@
       >
         {t("home.new-chat")}
       </button>
+      <button
+        onclick={saveConversation}
+        class="btn btn-primary btn-outline btn-sm px-8"
+        disabled={isGenerating || isFetching}
+      >
+        {t("prompt.save-chat")}
+      </button>
       <div class="mt-2">
         <ScrollToBottom />
       </div>
@@ -721,6 +766,7 @@
     {toolOptions}
     bind:selectedPromptTool
     bind:isDisablePromptTool
+    showAttachmentButton={isShowAttachmentButton}
   />
 </div>
 
@@ -735,3 +781,5 @@
     {isResoningThingking}
   />
 {/if}
+
+<Loading show={loading} />

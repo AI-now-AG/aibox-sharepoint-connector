@@ -17,7 +17,6 @@ import {
   sendWelcomeEmail,
   sendNotificationEmail,
 } from "$utils/auth0Auth";
-import { syncAllOrganizationUsers } from "$utils/auth0Sync";
 import { UserRole } from "$types/Users";
 
 /**

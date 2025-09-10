@@ -73,11 +73,11 @@ export default {
     return collection.deleteMany({ tenant_id: objectId });
   },
 
-  get: async (id: string): Promise<Prompt | null> => {
+  get: async (id: string | ObjectId): Promise<Prompt | null> => {
     if (!ObjectId.isValid(id)) {
       return null;
     }
-    const _id = new ObjectId(id);
+    const _id = toObjectId(id);
     return collection.findOne<Document<Prompt>>({ _id });
   },
 

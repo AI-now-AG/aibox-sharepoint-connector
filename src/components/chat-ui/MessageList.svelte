@@ -3,9 +3,11 @@
   import { onMount } from "svelte";
   import { MessageRole, type MessageHistory } from "$types/MessageHistory";
   import ImageCard from "./ImageCard.svelte";
+  import FileAttachmentList from "./FileAttachmentList.svelte";
   import { svgIcons } from "$assets/icons";
   import { user } from "$stores";
-    import { useTranslations } from "$i18n/utils";
+  import { useTranslations } from "$i18n/utils";
+  import { markdownToHtml, textToHtml } from "$utils/textFormatting";
 
   const t = useTranslations();
 
@@ -61,7 +63,6 @@
   });
 
   function copyToClipboard(content: string, index: number) {
-    console.log("content", { content });
     navigator.clipboard
       .writeText(content)
       .then(() => {
@@ -88,7 +89,7 @@
           <div class="flex flex-col">
             <div class="mt-2 overflow-y-scroll h-full min-h-screen">
               <div class="card gap-4 chat-container" transition:fade>
-                {#each messages as { role, content, rawData = "", imageUrl }, index}
+                {#each messages as { role, content, rawData = "", imageUrl, fileUrls }, index}
                   <div
                     class={`chat-bubble text-base-content ${role === MessageRole.User ? `bg-base-200` : `bg-base-100`}`}
                   >
@@ -110,14 +111,23 @@
                           <p class="font-bold text-sm">
                             {role == MessageRole.User ? username : `aibox`}
                           </p>
-                          <div class="mt-2 text-sm">{@html content}</div>
+                          <div class="mt-2 text-sm">
+                            {@html role == MessageRole.User
+                              ? textToHtml(content)
+                              : markdownToHtml(content)}
+                          </div>
+                          {#if role === MessageRole.User && Array.isArray(fileUrls) && fileUrls.length > 0}
+                            <FileAttachmentList {fileUrls} />
+                          {/if}
                         </div>
                       {:else}
                         <div class="flex-1 p-4 pt-2.5">
                           <p class="font-bold text-sm">
                             {role == MessageRole.User ? username : `aibox`}
                           </p>
-                          <div class="mt-2 text-sm">No content available</div>
+                          <div class="mt-2 text-sm">
+                            {t("common.no-content-available")}
+                          </div>
                         </div>
                       {/if}
                       {#if role === MessageRole.Assistant}
@@ -181,9 +191,14 @@
                     <div
                       class="chat-bubble bg-base-100 text-base-content flex flex-row"
                     >
-                      <span id="thinking-indicator" class="loading loading-dots loading-lg"></span>
+                      <span
+                        id="thinking-indicator"
+                        class="loading loading-dots loading-lg"
+                      ></span>
                       {#if isResoningThingking}
-                        <span class="ml-2">{t("prompt-execution.thinking")}</span>
+                        <span class="ml-2"
+                          >{t("prompt-execution.thinking")}</span
+                        >
                       {/if}
                     </div>
                   {/if}
