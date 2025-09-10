@@ -591,7 +591,6 @@
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          //"X-API-Key": config.apiKey,
           Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify(requestBody),

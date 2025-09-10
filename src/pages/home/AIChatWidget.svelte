@@ -129,9 +129,11 @@
 
   // === Request Builder ===
   function buildRequestPayload(fileUrls: string[]): RequestPayload {
-    const isOpenAIResponseModel = [PromptModel.OpenAIWithTools].includes(
-      selectedModel,
-    );
+    const isOpenAIResponseModel = [
+      PromptModel.OpenAI,
+      PromptModel.OpenAIWithTools,
+      PromptModel.OpenAIWithImageTools,
+    ].includes(selectedModel);
 
     const isOpenAIGpt5ResponseModel =
       [PromptModel.OpenAIGpt5].includes(selectedModel) ||
@@ -520,7 +522,6 @@
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          //"X-API-Key": config.apiKey,
           Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify(requestBody),
