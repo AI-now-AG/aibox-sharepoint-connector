@@ -379,7 +379,7 @@
   ): void {
     console.error(`❌ Stream error: ${data.error}`);
 
-    const errorMessage = data.error || "Image generation failed.";
+    const errorMessage = data.error || "Text generation request failed.";
 
     // Add user message to history
     const errorUserMessage: Message = {
