@@ -580,5 +580,6 @@
   "common.no-content-available": "Kein Inhalt verfügbar.",
   "nav.create-image.nano-banana": "Nano Banana",
   "create-image.create-nano-banana-image-title": "Create Nano Banana Image",
-  "create-image.create-nano-banana-image-description": "Create images from the latest and most popular model from Gemini"
+  "create-image.create-nano-banana-image-description": "Create images from the latest and most popular model from Gemini",
+  "tenant.image-creation.nano-banana": "Nano Banana"
 }
