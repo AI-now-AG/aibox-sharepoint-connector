@@ -44,9 +44,7 @@
     imageGenerationOptions?: any;
     previousResponseId?: string | null;
     messageHistory?: Message[];
-    reasoningEffort?: string;
     promptTool?: string;
-    verbosity?: string;
   }
 
   // Types
