@@ -12,7 +12,6 @@
   import {
     nanoBananaImageMessageHistory,
     nanoBananaImageFiles,
-    nanoBananaImagePreviousResponseId,
   } from "$stores/nanoBananaImageMessageHistory";
   import {
     markdownToHtml,
@@ -39,11 +38,8 @@
     stream: boolean;
     tool?: string;
     fileUrls: string[];
-    previousResponseId?: string | null;
     messageHistory?: Message[];
-    reasoningEffort?: string;
     promptTool?: string;
-    verbosity?: string;
     model?: string;
   }
 
@@ -55,25 +51,19 @@
   let currentStreamingImageUrl: string = $state("");
   let isFetching: boolean = $state(false);
   let isGenerating: boolean = $state(false);
-  let previousResponseId: string | null = $state(null);
 
   let files: File[] = $state([]);
 
-  // Restore files, and previousResponseId on mount
+  // Restore files on mount
   onMount(() => {
     if ($nanoBananaImageFiles && $nanoBananaImageFiles.length > 0) {
       files = [...$nanoBananaImageFiles];
     }
-
-    if ($nanoBananaImagePreviousResponseId) {
-      previousResponseId = $nanoBananaImagePreviousResponseId;
-    }
   });
 
-  // Save files, and previousResponseId whenever they change
+  // Save files whenever they change
   $effect(() => {
     $nanoBananaImageFiles = files;
-    $nanoBananaImagePreviousResponseId = previousResponseId;
   });
 
   // === API Configuration ===
@@ -110,8 +100,8 @@
       prompt: input || promptForAttachedFilesOnly,
       stream: true,
       fileUrls,
-      previousResponseId: previousResponseId,
       tool: PromptToolOption.Image,
+      messageHistory: $nanoBananaImageMessageHistory,
     };
 
     return payload;
@@ -214,7 +204,6 @@
 
     // Clean up and reset states
     resetUIState();
-    previousResponseId = data.responseId;
 
     // Scroll to latest message
     setTimeout(() => scrollIntoView(), 1000);
@@ -493,10 +482,8 @@
     input = "";
     files = [];
     isFetching = false;
-    previousResponseId = null;
     $nanoBananaImageMessageHistory = [];
     $nanoBananaImageFiles = [];
-    $nanoBananaImagePreviousResponseId = null;
 
     window.scrollTo({
       top: 0,
