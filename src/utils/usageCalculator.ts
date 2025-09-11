@@ -54,13 +54,15 @@ const TOKEN_CREDIT_MAPPING: Record<string, TokenCreditRate> = {
  *   - Flux: 1 credit = 2 requests
  *   - Perplexity: 1 credit = 12 requests
  *   - Gemini: 1 credit = 2 webserch requests
+ *   - Gemini: 1 credit = 2 images
  */
 const REQUEST_CREDIT_MAPPING: Record<string, number> = {
-  [ImageModel.Dalle]: 1,
-  [ImageModel.GptImage]: 0.33,
-  [ImageModel.FluxDev]: 2,
-  [WebsearchModel.Sonar]: 12,
+  [ModelName.Dalle]: 1,
+  [ModelName.GptImage]: 0.33,
+  [ModelName.FluxDev]: 2,
+  [ModelName.Sonar]: 12,
   [ModelName.Gemini25Flash]: 2,
+  [ModelName.Gemini25FlashImage]: 2,
 };
 
 /**
@@ -152,7 +154,7 @@ const _calculateOpenAIUsage = (
 
   // gpt-4o
   const gpt4oItems = usageData.filter(
-    (item: UsageLog) => item.model == TextModel.Gpt4o,
+    (item: UsageLog) => item.model == ModelName.Gpt4o,
   );
   const gpt4oInputTokens = gpt4oItems.reduce(
     (sum: number, item: UsageLog) => sum + (item.input_tokens ?? 0),
@@ -220,7 +222,7 @@ const _calculateOpenAIGpt5Usage = (
 
   // gpt-5
   const gpt5Items = usageData.filter(
-    (item: UsageLog) => item.model == TextModel.Gpt5,
+    (item: UsageLog) => item.model == ModelName.Gpt5,
   );
   const gpt5InputTokens = gpt5Items.reduce(
     (sum: number, item: UsageLog) => sum + (item.input_tokens ?? 0),
@@ -458,6 +460,22 @@ const _calculateGeminiUsage = (
       geminiWebsearchRequests,
     ),
   });
+
+  // GPT Image
+  const geminiImageItems = usageData.filter(
+    (item: UsageLog) => { return item.model == ModelName.Gemini25FlashImage && item.type == "image" },
+  );
+  const geminiImageRequests = geminiImageItems.length;
+  usageItems.push({
+    model: "gemini Image",
+    amount: geminiImageRequests,
+    unit: unitLabels.images,
+    credits: _requestsToCredits(
+      ModelName.Gemini25FlashImage,
+      geminiImageRequests
+    ),
+  });
+
   return _skipUsageIfPrivateKeyUsed(usageItems, usePrivateKey);
 };
 
