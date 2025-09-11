@@ -44,9 +44,7 @@
     imageGenerationOptions?: any;
     previousResponseId?: string | null;
     messageHistory?: Message[];
-    reasoningEffort?: string;
     promptTool?: string;
-    verbosity?: string;
   }
 
   // Types
@@ -585,7 +583,8 @@
         messages={$gptImageMessageHistory}
         {isFetching}
         {isGenerating}
-        currentMessage={""}
+        {currentMessage}
+        currentImageUrl={currentStreamingImageUrl}
         infoText={getInfoText()}
       />
     {/if}
@@ -688,7 +687,8 @@
         messages={$gptImageMessageHistory}
         {isFetching}
         {isGenerating}
-        currentMessage={""}
+        {currentMessage}
+        currentImageUrl={currentStreamingImageUrl}
       />
     {/if}
   </div>
