@@ -23,6 +23,7 @@ export enum ImageModel {
   Dalle = "dall-e-3",
   FluxDev = "fal-ai/flux/dev",
   GptImage = "gpt-image-1",
+  GeminiImage = "gemini-2.5-flash-image-preview",
 }
 
 export enum WebsearchModel {
