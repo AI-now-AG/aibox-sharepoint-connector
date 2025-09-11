@@ -130,15 +130,31 @@
   // Handle subtitle save/export
   function handleSubtitleSave(content: string | { assContent: string; srtContent: string; isBothFormats: boolean }) {
     try {
+      function getEditedFileName(url: string | undefined, fallback: string) {
+        if (!url) return fallback;
+        const parts = url.split("/");
+        const orig = parts[parts.length - 1] || fallback;
+        const dotIdx = orig.lastIndexOf(".");
+        if (dotIdx === -1) return orig + "_edited";
+        return orig.slice(0, dotIdx) + "_edited" + orig.slice(dotIdx);
+      }
+
       if (typeof content === 'string') {
         // Single format export
-        const filename = assFileUrl ? 'edited-subtitles.ass' : 'edited-subtitles.srt';
+        let filename = 'edited-subtitles.srt';
+        if (assFileUrl) {
+          filename = getEditedFileName(assFileUrl, 'edited-subtitles.ass');
+        } else if (srtFileUrl) {
+          filename = getEditedFileName(srtFileUrl, 'edited-subtitles.srt');
+        }
         downloadFile(content, filename);
       } else if (content.isBothFormats) {
         // Both formats export
-        downloadFile(content.assContent, 'edited-subtitles.ass');
+        const assName = getEditedFileName(assFileUrl, 'edited-subtitles.ass');
+        const srtName = getEditedFileName(srtFileUrl, 'edited-subtitles.srt');
+        downloadFile(content.assContent, assName);
         setTimeout(() => {
-          downloadFile(content.srtContent, 'edited-subtitles.srt');
+          downloadFile(content.srtContent, srtName);
         }, 100);
       }
     } catch (error) {
@@ -183,7 +199,7 @@
     if (hasPreloadedAudio) {
       const audioUrl = sessionStorage.getItem('subtitle-editor-audio');
       const audioName = sessionStorage.getItem('subtitle-editor-audio-name');
-      
+      console.log('Preloaded audio from sessionStorage:', audioUrl, audioName);
       if (audioUrl && audioName) {
         try {
           // Fetch the blob from the URL

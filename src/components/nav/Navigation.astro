@@ -290,7 +290,7 @@ const modules = [...menuItems];
     <!-- Toggle Button -->
     <button
       id="nav-toggle-btn"
-      class={`btn btn-ghost btn-sm btn-circle mr-2 hidden lg:flex ${isNavCollapsed ? "ml-2" : ""}`}
+      class={`btn btn-ghost btn-sm btn-circle mr-6 hidden lg:flex ${isNavCollapsed ? "ml-2" : ""}`}
       aria-label={isNavCollapsed ? "Expand navigation" : "Collapse navigation"}
       title={isNavCollapsed ? "Expand navigation" : "Collapse navigation"}
       data-menu-open-icon={svgIcons.menuOpen}
@@ -657,9 +657,9 @@ const modules = [...menuItems];
 
     // Update toggle button positioning
     if (newCollapsedState) {
-      toggleBtn.classList.add("ml-2");
+      // toggleBtn.classList.add("ml-2");
     } else {
-      toggleBtn.classList.remove("ml-2");
+      // toggleBtn.classList.remove("ml-2");
     }
 
     // Update logo visibility

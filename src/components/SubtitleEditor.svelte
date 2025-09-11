@@ -333,7 +333,7 @@
       } else {
         currentRowIndex = currentRowIndices[0];
       }
-      //   scrollToCurrentRow();
+      scrollToCurrentRow();
     } else {
       currentRowIndex = null;
     }

@@ -1027,7 +1027,7 @@
     }
   }
 
-  function openSubtitleEditor() {
+  async function openSubtitleEditor() {
     // Create URL parameters to pass file data to subtitle editor
     const params = new URLSearchParams();
 
@@ -1038,16 +1038,29 @@
       params.set("assFile", assFileUrl);
     }
     if (audioFile) {
-      // Store audio file in sessionStorage temporarily
-      const audioBlob = audioFile;
-      const audioUrl = URL.createObjectURL(audioBlob);
-      sessionStorage.setItem("subtitle-editor-audio", audioUrl);
+      // Safari its working,
+      // const audioBlob = audioFile;
+      // const audioUrl = URL.createObjectURL(audioBlob);
+      // sessionStorage.setItem("subtitle-editor-audio", audioUrl);
+      // sessionStorage.setItem("subtitle-editor-audio-name", audioFile.name);
+
+      const base64Data = await blobToBase64(audioFile);
+      sessionStorage.setItem("subtitle-editor-audio", base64Data);
       sessionStorage.setItem("subtitle-editor-audio-name", audioFile.name);
       params.set("hasAudio", "true");
     }
 
     // Navigate to subtitle editor
     window.location.href = `/subtitle-studio/editor?${params.toString()}`;
+  }
+
+  function blobToBase64(blob: Blob) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
   }
 
   function removeFile() {
@@ -1616,10 +1629,6 @@
     </div>
   {/if}
 
-  {#if textOuput && showTextPreviewChecked}
-    <TextOuput output={textOuput} />
-  {/if}
-
   <div class="mt-8 mb-5 flex items-center space-x-4">
     {#if !isTranscipted}
       <button
@@ -1667,12 +1676,16 @@
           {t("settings.transcription.subtitle-editor")}
         </button>
       {/if}
-      
+
       <button class="btn bg-neutral btn-sm text-white" onclick={confirmStartNew}
         >{t("transciption.model.cta.start-new-transciption")}</button
       >
     {/if}
   </div>
+
+  {#if textOuput && showTextPreviewChecked}
+    <TextOuput output={textOuput} />
+  {/if}
 
   <StartNewConfirmDialog
     bind:modal={confirmModal}
