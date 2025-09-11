@@ -392,7 +392,7 @@
     requestBody: RequestPayload,
     fileUrls?: string[],
   ): void {
-    const errorMessage = data.error || "Image generation failed.";
+    const errorMessage = data.error || "Text generation request failed.";
 
     const errorUserMessage: Message = {
       role: MessageRole.User,

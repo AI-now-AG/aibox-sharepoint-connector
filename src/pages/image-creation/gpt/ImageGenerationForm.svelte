@@ -1,31 +1,53 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import { slide } from "svelte/transition";
-  import { v4 as uuidv4 } from "uuid";
   import { useTranslations } from "$i18n/utils";
-  import { ResponseStatus } from "$types/AIResponse";
   import { addToast } from "$stores/toast";
-  import {
-    MessageRole,
-    type Message,
-  } from "$types/MessageHistory";
+  import { MessageRole, type Message } from "$types/MessageHistory";
   import { readFileContent } from "$utils/fileReader";
-  import {  capitalizeFirst } from "$utils/common";
-  import { formatMarkdown } from "$utils/textFormatting";
+  import { capitalizeFirst } from "$utils/common";
   import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
   import Dropdown from "$components/form/Dropdown.svelte";
   import MessageInput from "$components/chat-ui/MessageInput.svelte";
   import MessageList from "$components/chat-ui/MessageList.svelte";
+  import { tenant, user } from "$stores";
   import {
     gptImageMessageHistory,
-    saveGptImageMessageHistory,
     gptImageFiles,
-    saveGptImageFiles,
     gptImagePreviousResponseId,
-    saveGptImagePreviousResponseId,
-  } from "$stores/gptImageMessageHistoryStore";
-  import { get } from "svelte/store";
-  import { onMount } from "svelte";
+  } from "$stores/gptImageMessageHistory";
+  import {
+    markdownToHtml,
+    stripMarkdownFormatting,
+  } from "$utils/textFormatting";
   import { PromptToolOption } from "$types/AIProvider";
+
+  // === Types and Interfaces ===
+  interface StreamingState {
+    messageContent: string;
+    citations: any[];
+    currentImageUrl: string;
+  }
+
+  interface APIConfiguration {
+    apiKey: string;
+    apiUrl: string;
+  }
+
+  interface RequestPayload {
+    tenantId: string;
+    provider: string;
+    prompt: string;
+    stream: boolean;
+    tool?: string;
+    fileUrls: string[];
+    imageGenerationOptions?: any;
+    previousResponseId?: string | null;
+    messageHistory?: Message[];
+    reasoningEffort?: string;
+    promptTool?: string;
+    verbosity?: string;
+  }
 
   // Types
   type ImageSize = "1024x1024" | "1024x1536" | "1536x1024";
@@ -33,16 +55,15 @@
   type OutputFormat = "png" | "webp" | "jpeg";
   type BackgroundType = "transparent" | "opaque" | "auto";
 
-  interface Props {
-    tenantId: string;
-  }
-  let { tenantId } = $props() as Props;
-
   const t = useTranslations();
 
   // Reactive form state
-  let uniqueId: string = $state("");
-  let prompt: string = $state("");
+  let input: string = $state("");
+  let currentMessage = $state("");
+  let currentStreamingImageUrl: string = $state("");
+  let isFetching: boolean = $state(false);
+  let isGenerating: boolean = $state(false);
+  let previousResponseId: string | null = $state(null);
 
   let imageQuality: ImageQuality = $state("medium");
   let imageSize: ImageSize = $state("1024x1024");
@@ -53,11 +74,6 @@
 
   let isBackgroundDisabled: boolean = $state(false);
   let isCompressionDisabled: boolean = $state(false);
-
-  let messages: Message[] = $state([]);
-  let isFetching: boolean = $state(false);
-  let isGenerating: boolean = $state(false);
-  let previousResponseId: string | null = $state(null);
 
   const sizeOptions = [
     { value: "1024x1024", title: "1024x1024" },
@@ -88,14 +104,411 @@
     isCompressionDisabled = outputFormat == "png";
   });
 
-  async function submitForm() {
-    uniqueId = uuidv4();
+  // Restore files, and previousResponseId on mount
+  onMount(() => {
+    if ($gptImageFiles && $gptImageFiles.length > 0) {
+      files = [...$gptImageFiles];
+    }
 
+    if ($gptImagePreviousResponseId) {
+      previousResponseId = $gptImagePreviousResponseId;
+    }
+  });
+
+  // Save files, and previousResponseId whenever they change
+  $effect(() => {
+    $gptImageFiles = files;
+    $gptImagePreviousResponseId = previousResponseId;
+  });
+
+  // === API Configuration ===
+  async function getAPIConfiguration(): Promise<APIConfiguration> {
+    const configResponse = await fetch(
+      "/.netlify/functions/getTranscriptionConfig",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+
+    if (!configResponse.ok) {
+      throw new Error("Failed to get transcription configuration");
+    }
+
+    const { apiKey, apiUrl: baseUrl } = await configResponse.json();
+    return {
+      apiKey,
+      apiUrl: `${baseUrl}/api/prompt/execute`,
+    };
+  }
+
+  // === Request Builder ===
+  function buildRequestPayload(fileUrls: string[]): RequestPayload {
+    isGenerating = true;
+
+    const promptForAttachedFilesOnly = fileUrls.length > 0 ? " " : "";
+
+    const payload: RequestPayload = {
+      tenantId: $tenant?._id?.toString()!,
+      provider: "openai-response",
+      prompt: input || promptForAttachedFilesOnly,
+      stream: true,
+      fileUrls,
+      previousResponseId: previousResponseId,
+      tool: PromptToolOption.Image,
+      imageGenerationOptions: {
+        outputFormat,
+        quality: imageQuality,
+        size: imageSize,
+        background,
+      },
+    };
+
+    return payload;
+  }
+
+  // === Image Processing Utilities ===
+  function formatImageUrl(imageData: string): string {
+    if (!imageData) return "";
+
+    if (imageData.startsWith("data:") || imageData.startsWith("http")) {
+      return imageData;
+    }
+
+    return `data:image/png;base64,${imageData}`;
+  }
+
+  function extractImageFromData(data: any): string {
+    return data.result || data.image || "";
+  }
+
+  // === Stream Event Handlers ===
+  function handleStartEvent(data: any): void {
+    console.log(`🚀 Started with ${data.provider} using ${data.model}`);
+  }
+
+  function handleChunkEvent(data: any, state: StreamingState): void {
+    if (data.content && typeof data.content === "string") {
+      // Accumulate the raw text
+      state.messageContent += data.content;
+
+      // Append the raw chunk to the current displayed message
+      currentMessage += data.content;
+
+      // If the current chunk contains a newline,
+      // re-render the entire accumulated text as HTML.
+      // This avoids trying to parse on every single character
+      // and ensures we only re-render when a natural "block" ends.
+      if (data.content.includes("\n")) {
+        currentMessage = markdownToHtml(state.messageContent);
+      }
+    }
+  }
+
+  function handleImagesEvent(data: any, state: StreamingState): void {
+    console.log("🖼️ Images generated:", data.images?.length || 0);
+
+    if (data.images && data.images.length > 0) {
+      const firstImage = data.images[0];
+      const imageData = extractImageFromData(firstImage);
+
+      if (imageData) {
+        const formattedUrl = formatImageUrl(imageData);
+        state.currentImageUrl = formattedUrl;
+        currentStreamingImageUrl = formattedUrl;
+      }
+    }
+  }
+
+  function handleToolOutputsEvent(data: any, state: StreamingState): void {
+    console.log("🔧 Tool outputs received:", data.outputs.length);
+
+    data.outputs.forEach((output: any) => {
+      if (output.image || output.result) {
+        const imageData = extractImageFromData(output);
+        if (imageData && !state.currentImageUrl) {
+          const formattedUrl = formatImageUrl(imageData);
+          state.currentImageUrl = formattedUrl;
+          currentStreamingImageUrl = formattedUrl;
+        }
+      }
+    });
+  }
+
+  function handleCompleteEvent(
+    data: any,
+    state: StreamingState,
+    requestBody: RequestPayload,
+    fileUrls?: string[],
+  ): any {
+    console.log(`✅ Complete! Processing time: ${data.processingTimeMs}ms`);
+    if (data.responseId) {
+      console.log(`Response ID: ${data.responseId}`);
+    }
+
+    const finalImageUrl = formatImageUrl(
+      state.currentImageUrl ||
+        data.images?.[0]?.result ||
+        data.images?.[0]?.image ||
+        "",
+    );
+
+    const responseText =
+      data.fullResponse ?? data.outputText ?? state.messageContent ?? "";
+
+    // Add user message to history
+    const newUserMessage: Message = {
+      role: MessageRole.User,
+      content: requestBody.prompt,
+      fileUrls: fileUrls,
+    };
+    gptImageMessageHistory.update((messages) => [...messages, newUserMessage]);
+
+    // Handle assistant message
+    addAssistantMessage(responseText, finalImageUrl);
+
+    // Clean up and reset states
+    resetUIState();
+    previousResponseId = data.responseId;
+
+    // Scroll to latest message
+    setTimeout(() => scrollIntoView(), 1000);
+
+    return data;
+  }
+
+  function handleErrorEvent(
+    data: any,
+    requestBody: RequestPayload,
+    fileUrls?: string[],
+  ): void {
+    console.error(`❌ Stream error: ${data.error}`);
+
+    const errorMessage = data.error || "Image generation failed.";
+
+    // Add user message to history
+    const errorUserMessage: Message = {
+      role: MessageRole.User,
+      content: requestBody.prompt,
+      fileUrls: fileUrls,
+    };
+    gptImageMessageHistory.update((messages) => [
+      ...messages,
+      errorUserMessage,
+    ]);
+
+    const failedMessage: Message = {
+      role: MessageRole.Assistant,
+      content: errorMessage,
+    };
+    gptImageMessageHistory.update((messages) => [...messages, failedMessage]);
+
+    addToast({
+      message: errorMessage,
+      type: "error",
+    });
+
+    resetUIState();
+    throw new Error(data.error);
+  }
+
+  function addAssistantMessage(responseText: string, imageUrl: string): void {
+    const newAssistantMessage: Message = {
+      role: MessageRole.Assistant,
+      content: responseText,
+      rawData: stripMarkdownFormatting(responseText),
+      imageUrl,
+    };
+
+    gptImageMessageHistory.update((messages) => [
+      ...messages,
+      newAssistantMessage,
+    ]);
+  }
+
+  // === State Management Utilities ===
+  function resetStreamingState(): void {
+    currentMessage = "";
+    currentStreamingImageUrl = "";
+  }
+
+  function resetUIState(): void {
+    input = "";
+    files = [];
+    currentMessage = "";
+    currentStreamingImageUrl = "";
+    isFetching = false;
+    isGenerating = false;
+  }
+
+  // === Stream Processing ===
+  function parseStreamLine(line: string): any | null {
+    const trimmedLine = line.trim();
+    if (!trimmedLine.startsWith("data: ")) {
+      return null;
+    }
+
+    const jsonStr = trimmedLine.substring(6).trim();
+
+    // Skip empty data lines or completion markers
+    if (!jsonStr || jsonStr === "[DONE]" || jsonStr === "") {
+      return null;
+    }
+
+    // Basic validation: check if string looks like JSON
+    if (!jsonStr.startsWith("{") && !jsonStr.startsWith("[")) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(jsonStr);
+    } catch (parseError) {
+      return null;
+    }
+  }
+
+  function processStreamEvent(
+    data: any,
+    state: StreamingState,
+    requestBody: RequestPayload,
+    fileUrls?: string[],
+  ): any {
+    switch (data.type) {
+      case "start":
+        handleStartEvent(data);
+        break;
+
+      case "chunk":
+        handleChunkEvent(data, state);
+        break;
+
+      case "images":
+        handleImagesEvent(data, state);
+        break;
+
+      case "tool_outputs":
+        handleToolOutputsEvent(data, state);
+        break;
+
+      case "complete":
+        return handleCompleteEvent(data, state, requestBody, fileUrls);
+
+      case "error":
+        handleErrorEvent(data, requestBody, fileUrls);
+        break;
+
+      default:
+        console.warn(`Unknown event type: ${data.type}`);
+    }
+
+    return null;
+  }
+
+  async function processStream(
+    reader: ReadableStreamDefaultReader,
+    requestBody: RequestPayload,
+    fileUrls: string[],
+  ): Promise<any> {
+    const decoder = new TextDecoder();
+    let buffer = "";
+
+    const state: StreamingState = {
+      messageContent: "",
+      citations: [],
+      currentImageUrl: "",
+    };
+
+    while (true) {
+      const { done, value } = await reader.read();
+
+      if (done) {
+        console.log("✅ Stream completed");
+        break;
+      }
+
+      const chunk = decoder.decode(value, { stream: true });
+      buffer += chunk;
+
+      // Process complete lines from buffer
+      const lines = buffer.split("\n");
+      buffer = lines.pop() || ""; // Keep the last line in buffer (might be incomplete)
+
+      for (const line of lines) {
+        const data = parseStreamLine(line);
+        if (data) {
+          const result = processStreamEvent(data, state, requestBody, fileUrls);
+          if (result) {
+            return result; // Return on completion
+          }
+        }
+      }
+    }
+  }
+
+  // === Main API Function ===
+  async function callStreamingAPI(fileUrls: string[] = []) {
+    try {
+      resetStreamingState();
+
+      // Get API configuration
+      const config = await getAPIConfiguration();
+
+      // Build request payload
+      const requestBody = buildRequestPayload(fileUrls);
+
+      // Make API request
+      const accessToken = $user?.auth0_access_token;
+      const response = await fetch(config.apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          //"X-API-Key": config.apiKey,
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (response.status === 401) {
+        addToast({
+          message: t("auth.session-missing-force-login"),
+          type: "error",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/logout";
+        }, 2000);
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      // Process streaming response
+      if (response.headers.get("content-type")?.includes("text/event-stream")) {
+        console.log("📡 Streaming response received");
+
+        const reader = response.body?.getReader();
+        if (!reader) {
+          throw new Error("No reader available");
+        }
+
+        input = ""; // Reset prompt for new request
+        return await processStream(reader, requestBody, fileUrls);
+      }
+    } catch (error) {
+      console.error("❌ Request failed:", error);
+      resetUIState();
+      throw error;
+    }
+  }
+
+  async function submitForm() {
     const fileDataList = await Promise.all(
       files.map(async (file) => ({
         name: file.name,
         content: await readFileContent(file),
         type: file.type,
+        size: file.size,
       })),
     );
 
@@ -103,20 +516,7 @@
     isFetching = true;
     isGenerating = false;
 
-    const params: Record<string, unknown> = {
-      tenantId,
-      uniqueId,
-      prompt,
-      tool: PromptToolOption.Image,
-      imageSize,
-      imageQuality,
-      outputCompression,
-      outputFormat,
-      background,
-      previousResponseId,
-    };
-    console.log("Submitting payload:", params);
-
+    let uploadedFileUrls = [];
     if (fileDataList.length > 0) {
       const uploadResponse = await fetch("/.netlify/functions/blobFileUpload", {
         method: "POST",
@@ -125,111 +525,15 @@
         },
         body: JSON.stringify({
           files: fileDataList,
+          folderName: $tenant?.org_name || "general",
         }),
       });
 
       const uploadData = await uploadResponse.json();
-      params["files"] = uploadData.results;
+      uploadedFileUrls = uploadData.results;
     }
 
-    const response = await fetch(
-      "/.netlify/functions/createResponse-background",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(params),
-      },
-    );
-
-    if (response.status !== 202) {
-      addToast({
-        message: "Failed to start image generation.",
-        type: "error",
-      });
-      isFetching = false;
-      return;
-    }
-
-    // start polling requests
-    setTimeout(async () => {
-      await pollImageStatus(uniqueId);
-    }, 2000);
-  }
-
-  async function pollImageStatus(
-    uniqueId: string,
-    maxRetries = 100,
-    delayMs = 2000,
-  ) {
-    for (let attempt = 0; attempt < maxRetries; attempt++) {
-      const res = await fetch(
-        `/.netlify/functions/checkResponseStatus?uid=${uniqueId}`,
-      );
-      const data = await res.json();
-
-      if (data.status === ResponseStatus.InProgress) {
-        const isGenerated =
-          data.tools.find((item: any) => item.name === PromptToolOption.Image)
-            ?.is_generated ?? true;
-        isGenerating = !isGenerated;
-      }
-
-      if (data.status === ResponseStatus.Completed) {
-        const imageUrl =
-          data.tools.find((item: any) => item.name === PromptToolOption.Image)
-            ?.image_url || "";
-
-        // store messages
-        messages.push({
-          role: MessageRole.User,
-          content: prompt,
-        });
-        messages.push({
-          role: MessageRole.Assistant,
-          content: formatMarkdown(data.outputText),
-          imageUrl,
-        });
-
-        // scroll to latest user input
-        setTimeout(() => {
-          scrollIntoView();
-        }, 1000);
-
-        // clear input text & files
-        prompt = "";
-        files = [];
-
-        // reset states
-        previousResponseId = data.responseId;
-        isFetching = false;
-        isGenerating = false;
-        return;
-      } else if (data.status === ResponseStatus.Failed) {
-        const errorMessage = data.error?.message || "Image generation failed.";
-        messages.push({
-          role: MessageRole.Assistant,
-          content: errorMessage,
-        });
-        addToast({
-          message: errorMessage,
-          type: "error",
-        });
-
-        isFetching = false;
-        isGenerating = false;
-        return;
-      }
-
-      await new Promise((resolve) => setTimeout(resolve, delayMs));
-    }
-
-    addToast({
-      message: "Image generation timed out.",
-      type: "error",
-    });
-    isFetching = false;
+    await callStreamingAPI((uploadedFileUrls as string[]) || []);
   }
 
   function scrollIntoView() {
@@ -253,42 +557,19 @@
   }
 
   function startNewChat() {
-    prompt = "";
+    input = "";
     files = [];
     isFetching = false;
-    messages = [];
     previousResponseId = null;
-    saveGptImageMessageHistory([]);
-    saveGptImageFiles([]);
-    saveGptImagePreviousResponseId(null);
+    $gptImageMessageHistory = [];
+    $gptImageFiles = [];
+    $gptImagePreviousResponseId = null;
+
     window.scrollTo({
       top: 0,
       behavior: "smooth",
     });
   }
-
-  // Restore message history, files, and previousResponseId on mount
-  onMount(() => {
-    const history = get(gptImageMessageHistory);
-    if (history && history.length > 0) {
-      messages = [...history];
-    }
-    const storedFiles = get(gptImageFiles);
-    if (storedFiles && storedFiles.length > 0) {
-      files = [...storedFiles];
-    }
-    const storedPrevId = get(gptImagePreviousResponseId);
-    if (storedPrevId) {
-      previousResponseId = storedPrevId;
-    }
-  });
-
-  // Save message history, files, and previousResponseId whenever they change
-  $effect(() => {
-    saveGptImageMessageHistory(messages);
-    saveGptImageFiles(files);
-    saveGptImagePreviousResponseId(previousResponseId);
-  });
 </script>
 
 <div class="grid grid-cols-1 grid-rows-[1fr_min-content] space-y-6 h-full">
@@ -299,18 +580,17 @@
     <p class="m-0">{t("create-image.create-gpt-image-description")}</p>
 
     <!-- Output (Follow-Up) -->
-    {#if messages.length > 0}
+    {#if $gptImageMessageHistory.length > 0}
       <MessageList
-        {messages}
+        messages={$gptImageMessageHistory}
         {isFetching}
         {isGenerating}
-        isResoningThingking={false}
-        currentMessage={""}
+        {currentMessage}
         infoText={getInfoText()}
       />
     {/if}
 
-    {#if messages.length == 0}
+    {#if $gptImageMessageHistory.length == 0}
       <div class="space-y-4 mt-10">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <!-- Output Format -->
@@ -376,10 +656,10 @@
 
     <!-- Prompt Textarea -->
     <div
-      class={`mt-8  ${messages.length > 0 ? "sticky bottom-0 bg-base-200" : ""}`}
+      class={`mt-8  ${$gptImageMessageHistory.length > 0 ? "sticky bottom-0 bg-base-200" : ""}`}
       transition:slide={{ duration: 500 }}
     >
-      {#if messages.length > 0}
+      {#if $gptImageMessageHistory.length > 0}
         <div class="my-4">
           <button
             onclick={startNewChat}
@@ -394,22 +674,22 @@
       {/if}
 
       <MessageInput
-        bind:input={prompt}
+        bind:input
         bind:files
         {isFetching}
-        stickyFooter={messages.length > 0}
+        stickyFooter={$gptImageMessageHistory.length > 0}
         onsend={submitForm}
       />
     </div>
 
     <!-- Output (Normal) -->
-    {#if messages.length == 0}
+    {#if $gptImageMessageHistory.length == 0}
       <MessageList
-        {messages}
+        messages={$gptImageMessageHistory}
         {isFetching}
         {isGenerating}
-        isResoningThingking={false}
-        currentMessage={""}
+        {currentMessage}
+        currentImageUrl={currentStreamingImageUrl}
       />
     {/if}
   </div>

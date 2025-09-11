@@ -17,7 +17,7 @@
     messages: MessageHistory;
     isFetching: boolean;
     isGenerating: boolean;
-    isResoningThingking: boolean;
+    isResoningThingking?: boolean;
     infoText?: string;
   }
 
