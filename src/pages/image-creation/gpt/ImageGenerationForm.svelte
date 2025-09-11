@@ -583,7 +583,8 @@
         messages={$gptImageMessageHistory}
         {isFetching}
         {isGenerating}
-        currentMessage={""}
+        {currentMessage}
+        currentImageUrl={currentStreamingImageUrl}
         infoText={getInfoText()}
       />
     {/if}
@@ -686,7 +687,8 @@
         messages={$gptImageMessageHistory}
         {isFetching}
         {isGenerating}
-        currentMessage={""}
+        {currentMessage}
+        currentImageUrl={currentStreamingImageUrl}
       />
     {/if}
   </div>

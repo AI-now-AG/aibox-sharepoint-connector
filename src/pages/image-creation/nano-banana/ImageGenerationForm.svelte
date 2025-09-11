@@ -505,7 +505,8 @@
         messages={$nanoBananaImageMessageHistory}
         {isFetching}
         {isGenerating}
-        currentMessage={""}
+        {currentMessage}
+        currentImageUrl={currentStreamingImageUrl}
       />
     {/if}
 
@@ -543,7 +544,8 @@
         messages={$nanoBananaImageMessageHistory}
         {isFetching}
         {isGenerating}
-        currentMessage={""}
+        {currentMessage}
+        currentImageUrl={currentStreamingImageUrl}
       />
     {/if}
   </div>
