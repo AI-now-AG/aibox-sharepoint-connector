@@ -12,6 +12,7 @@
   import { TranscriptionType } from "$types/TranscribeRequest";
   import { AudioCategory, TenantFeature } from "$types/TenantFeature";
   import { preventDefault } from "$utils/common";
+  import { navigate } from 'astro:transitions/client';
   import {
     convertToMono,
     type ConvertToMonoConfig,
@@ -26,6 +27,7 @@
     folderName?: string;
     usecaseId?: string;
     category: AudioCategory;
+    handleReload?: (value: string) => void;
   }
 
   let {
@@ -33,6 +35,7 @@
     folderName = "",
     usecaseId,
     category,
+    handleReload,
   }: Props = $props();
   // general
   let audioFile: File | undefined = $state();
@@ -1050,8 +1053,15 @@
       params.set("hasAudio", "true");
     }
 
+    const newURL = `/subtitle-studio/editor?${params.toString()}`;
+    handleReload(newURL);
+    // redirect(newURL);
+    // window.location.assign(
+    //   `/subtitle-studio/editor?${params.toString()}`,
+    // );
+    // window.history.pushState(history.state, '', newURL);
     // Navigate to subtitle editor
-    window.location.href = `/subtitle-studio/editor?${params.toString()}`;
+    // window.location.href = `/subtitle-studio/editor?${params.toString()}`;
   }
 
   function blobToBase64(blob: Blob) {
@@ -1163,6 +1173,10 @@
       txtFileChecked ||
       showTextPreviewChecked,
   );
+
+  if (!handleReload) {
+    handleReload = (value: string) => navigate(value);
+  }
 </script>
 
 <div class="container max-w-6xl mx-auto px-14 mt-10 max-w-6xl">
