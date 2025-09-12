@@ -579,7 +579,7 @@
   "conversation.edit-title": "Ändern",
   "common.no-content-available": "Kein Inhalt verfügbar.",
   "nav.create-image.nano-banana": "Nano Banana",
-  "create-image.create-nano-banana-image-title": "Create Nano Banana Image",
-  "create-image.create-nano-banana-image-description": "Create images from the latest and most popular model from Gemini",
+  "create-image.create-nano-banana-image-title": "Bilder mit Nano Banana erstellen",
+  "create-image.create-nano-banana-image-description": "Erstelle Bilder mit dem neuesten und beliebtesten Modell von Gemini",
   "tenant.image-creation.nano-banana": "Nano Banana"
 }
