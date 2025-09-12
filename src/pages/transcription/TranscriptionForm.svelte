@@ -12,6 +12,7 @@
   import { TranscriptionType } from "$types/TranscribeRequest";
   import { AudioCategory, TenantFeature } from "$types/TenantFeature";
   import { preventDefault } from "$utils/common";
+  import { navigate } from 'astro:transitions/client';
   import {
     convertToMono,
     type ConvertToMonoConfig,
@@ -26,6 +27,7 @@
     folderName?: string;
     usecaseId?: string;
     category: AudioCategory;
+    // handleReload?: (value: string) => void;
   }
 
   let {
@@ -33,6 +35,7 @@
     folderName = "",
     usecaseId,
     category,
+    // handleReload,
   }: Props = $props();
   // general
   let audioFile: File | undefined = $state();
@@ -1027,7 +1030,7 @@
     }
   }
 
-  function openSubtitleEditor() {
+  async function openSubtitleEditor() {
     // Create URL parameters to pass file data to subtitle editor
     const params = new URLSearchParams();
 
@@ -1038,16 +1041,20 @@
       params.set("assFile", assFileUrl);
     }
     if (audioFile) {
-      // Store audio file in sessionStorage temporarily
-      const audioBlob = audioFile;
-      const audioUrl = URL.createObjectURL(audioBlob);
-      sessionStorage.setItem("subtitle-editor-audio", audioUrl);
-      sessionStorage.setItem("subtitle-editor-audio-name", audioFile.name);
+      params.set("audioFile", tempUploadUrl);
+      params.set("audioName", audioFile.name);
       params.set("hasAudio", "true");
     }
 
+    const newURL = `/subtitle-studio/editor?${params.toString()}`;
+    navigate(newURL);
+    // redirect(newURL);
+    // window.location.assign(
+    //   `/subtitle-studio/editor?${params.toString()}`,
+    // );
+    // window.history.pushState(history.state, '', newURL);
     // Navigate to subtitle editor
-    window.location.href = `/subtitle-studio/editor?${params.toString()}`;
+    // window.location.href = `/subtitle-studio/editor?${params.toString()}`;
   }
 
   function removeFile() {
@@ -1150,6 +1157,10 @@
       txtFileChecked ||
       showTextPreviewChecked,
   );
+
+  // if (!handleReload) {
+  //   handleReload = (value: string) => navigate(value);
+  // }
 </script>
 
 <div class="container max-w-6xl mx-auto px-14 mt-10 max-w-6xl">
@@ -1616,10 +1627,6 @@
     </div>
   {/if}
 
-  {#if textOuput && showTextPreviewChecked}
-    <TextOuput output={textOuput} />
-  {/if}
-
   <div class="mt-8 mb-5 flex items-center space-x-4">
     {#if !isTranscipted}
       <button
@@ -1667,12 +1674,16 @@
           {t("settings.transcription.subtitle-editor")}
         </button>
       {/if}
-      
+
       <button class="btn bg-neutral btn-sm text-white" onclick={confirmStartNew}
         >{t("transciption.model.cta.start-new-transciption")}</button
       >
     {/if}
   </div>
+
+  {#if textOuput && showTextPreviewChecked}
+    <TextOuput output={textOuput} />
+  {/if}
 
   <StartNewConfirmDialog
     bind:modal={confirmModal}
