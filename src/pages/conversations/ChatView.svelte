@@ -171,20 +171,22 @@
     }
   }
 
-  async function updateConversation() {
+  async function updateConversationWithNewMessage(messages: Array<Message>) {
     try {
-      const { error } = await actions.conversation.update({
-        _id: conversationId,
-        messages: messageHistory,
-        ...(previousResponseId
-          ? { previous_response_id: previousResponseId }
-          : {}),
-      });
-      if (error) {
-        addToast({ message: JSON.stringify(error), type: "error" });
+      let _error = null;
+      for (let i = 0; i < messages.length; i++) {
+        const message = messages[i];
+        const { error } = await actions.conversation.updateMessage({
+          _id: conversationId,
+          message,
+        });
+        _error = error;
+      }
+      if (_error) {
+        addToast({ message: JSON.stringify(_error), type: "error" });
       }
     } catch (error) {
-      console.error("Exception when update conversation", error);
+      console.error("Exception when update conversation message", error);
     }
   }
 
@@ -358,19 +360,20 @@
       content: requestBody.prompt,
       fileUrls: fileUrls,
     };
-
     messageHistory.push(newUserMessage);
 
+    let assistantMessage: Message;
     if (state.citations.length > 0) {
-      addAssistantMessageWithCitations(
+      assistantMessage = getAssistantMessageWithCitations(
         responseText,
         state.citations,
         finalImageUrl,
       );
     } else {
-      addAssistantMessage(responseText, finalImageUrl);
+      assistantMessage = getAssistantMessage(responseText, finalImageUrl);
     }
-    updateConversation();
+    messageHistory.push(assistantMessage);
+    updateConversationWithNewMessage([newUserMessage, assistantMessage]);
 
     // Clean up and reset states
     resetUIState();
@@ -399,16 +402,14 @@
       content: requestBody.prompt,
       fileUrls: fileUrls,
     };
-
     messageHistory.push(errorUserMessage);
 
     const failedMessage: Message = {
       role: MessageRole.Assistant,
       content: errorMessage,
     };
-
     messageHistory.push(failedMessage);
-    updateConversation();
+    updateConversationWithNewMessage([errorMessage, failedMessage]);
 
     addToast({
       message: errorMessage,
@@ -419,11 +420,11 @@
     throw new Error(data.error);
   }
 
-  function addAssistantMessageWithCitations(
+  function getAssistantMessageWithCitations(
     responseText: string,
     citations: any[],
     imageUrl: string,
-  ): void {
+  ): Message {
     const markdownWithLinks = buildCitationLinks(responseText, citations);
 
     const newAssistantMessage: Message = {
@@ -433,10 +434,13 @@
       imageUrl,
     };
 
-    messageHistory.push(newAssistantMessage);
+    return newAssistantMessage;
   }
 
-  function addAssistantMessage(responseText: string, imageUrl: string): void {
+  function getAssistantMessage(
+    responseText: string,
+    imageUrl: string,
+  ): Message {
     const newAssistantMessage: Message = {
       role: MessageRole.Assistant,
       content: responseText,
@@ -444,7 +448,7 @@
       imageUrl,
     };
 
-    messageHistory.push(newAssistantMessage);
+    return newAssistantMessage;
   }
 
   function resetStreamingState(): void {
