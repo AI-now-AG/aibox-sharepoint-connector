@@ -5,7 +5,7 @@ import TranscriptionForm from "./TranscriptionForm.svelte";
 import { TranscriptionType } from "$types/TranscribeRequest";
 import TranscriptionModel from "$data/models/transcription.model";
 import { AudioCategory, AudioCategoryLabels } from "$types/TenantFeature";
-import { navigate } from 'astro:transitions/client';
+// import { navigate } from 'astro:transitions/client';
 
 const t = useTranslations();
 
@@ -81,7 +81,7 @@ if (selectedTranscriptionType === TranscriptionType.Largefile) {
       folderName={Astro.locals.tenant.org_name}
       usecaseId={transcriptions?._id.toString()}
       category={transcriptions?.category ?? AudioCategory.AudioPro}
-      handleReload={(value: string) => navigate(value)}
+      
       client:load
     />
   </div>

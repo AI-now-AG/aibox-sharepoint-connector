@@ -27,7 +27,7 @@
     folderName?: string;
     usecaseId?: string;
     category: AudioCategory;
-    handleReload?: (value: string) => void;
+    // handleReload?: (value: string) => void;
   }
 
   let {
@@ -35,7 +35,7 @@
     folderName = "",
     usecaseId,
     category,
-    handleReload,
+    // handleReload,
   }: Props = $props();
   // general
   let audioFile: File | undefined = $state();
@@ -1041,20 +1041,13 @@
       params.set("assFile", assFileUrl);
     }
     if (audioFile) {
-      // Safari its working,
-      // const audioBlob = audioFile;
-      // const audioUrl = URL.createObjectURL(audioBlob);
-      // sessionStorage.setItem("subtitle-editor-audio", audioUrl);
-      // sessionStorage.setItem("subtitle-editor-audio-name", audioFile.name);
-
-      const base64Data = await blobToBase64(audioFile);
-      sessionStorage.setItem("subtitle-editor-audio", base64Data);
-      sessionStorage.setItem("subtitle-editor-audio-name", audioFile.name);
+      params.set("audioFile", tempUploadUrl);
+      params.set("audioName", audioFile.name);
       params.set("hasAudio", "true");
     }
 
     const newURL = `/subtitle-studio/editor?${params.toString()}`;
-    handleReload(newURL);
+    navigate(newURL);
     // redirect(newURL);
     // window.location.assign(
     //   `/subtitle-studio/editor?${params.toString()}`,
@@ -1062,15 +1055,6 @@
     // window.history.pushState(history.state, '', newURL);
     // Navigate to subtitle editor
     // window.location.href = `/subtitle-studio/editor?${params.toString()}`;
-  }
-
-  function blobToBase64(blob: Blob) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
   }
 
   function removeFile() {
@@ -1174,9 +1158,9 @@
       showTextPreviewChecked,
   );
 
-  if (!handleReload) {
-    handleReload = (value: string) => navigate(value);
-  }
+  // if (!handleReload) {
+  //   handleReload = (value: string) => navigate(value);
+  // }
 </script>
 
 <div class="container max-w-6xl mx-auto px-14 mt-10 max-w-6xl">

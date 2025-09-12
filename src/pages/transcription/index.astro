@@ -2,7 +2,7 @@
 import Layout from "$layouts/Layout.astro";
 import { useTranslations } from "$i18n/utils";
 import TranscriptionForm from "./TranscriptionForm.svelte";
-import { navigate } from 'astro:transitions/client';
+// import { navigate } from 'astro:transitions/client';
 const t = useTranslations();
 ---
 
@@ -15,6 +15,6 @@ const t = useTranslations();
       <p>{t("transcription.page-description")}</p>
     </div>
 
-    <TranscriptionForm folderName={Astro.locals.tenant.org_name} handleReload={(value: string) => navigate(value)} client:load />
+    <TranscriptionForm folderName={Astro.locals.tenant.org_name} client:load />
   </div>
 </Layout>

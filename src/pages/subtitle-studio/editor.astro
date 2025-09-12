@@ -13,6 +13,8 @@ if (!Astro.locals.tenant?.subtitle_editor) {
 // Get URL parameters for file URLs
 const srtFile = Astro.url.searchParams.get('srtFile');
 const assFile = Astro.url.searchParams.get('assFile');
+const audioFile = Astro.url.searchParams.get('audioFile');
+const audioName = Astro.url.searchParams.get('audioName');
 const hasAudio = Astro.url.searchParams.get('hasAudio') === 'true';
 ---
 
@@ -29,6 +31,8 @@ const hasAudio = Astro.url.searchParams.get('hasAudio') === 'true';
       client:load 
       srtFileUrl={srtFile}
       assFileUrl={assFile}
+      audioFileUrl={audioFile}
+      audioFileName={audioName}
       hasPreloadedAudio={hasAudio}
     />
   </div>
