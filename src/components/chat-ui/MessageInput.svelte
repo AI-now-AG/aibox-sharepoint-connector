@@ -73,7 +73,13 @@
   };
 
   function onKeyDown(e: KeyboardEvent) {
-    if (e.key === "Enter" && e.ctrlKey) {
+    if (e.key === "Enter") {
+      if (e.shiftKey) {
+        // allow newline
+        return;
+      }
+      // prevent default newline
+      e.preventDefault();
       onsend();
     }
   }

@@ -5,24 +5,21 @@
   import { addToast } from "$stores/toast";
   import { MessageRole, type Message } from "$types/MessageHistory";
   import { readFileContent } from "$utils/fileReader";
-  import { capitalizeFirst } from "$utils/common";
   import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
-  import Dropdown from "$components/form/Dropdown.svelte";
   import MessageInput from "$components/chat-ui/MessageInput.svelte";
   import MessageList from "$components/chat-ui/MessageList.svelte";
   import { tenant, user } from "$stores";
   import {
-    gptImageMessageHistory,
-    gptImageFiles,
-    gptImagePreviousResponseId,
-  } from "$stores/gptImageMessageHistory";
+    nanoBananaImageMessageHistory,
+    nanoBananaImageFiles,
+  } from "$stores/nanoBananaImageMessageHistory";
   import {
     markdownToHtml,
     stripMarkdownFormatting,
   } from "$utils/textFormatting";
-  import { PromptToolOption } from "$types/AIProvider";
+  import { ModelName, PromptToolOption } from "$types/AIProvider";
+  import { ApiKeyProvider } from "$types/TenantFeature";
 
-  // === Types and Interfaces ===
   interface StreamingState {
     messageContent: string;
     citations: any[];
@@ -41,17 +38,10 @@
     stream: boolean;
     tool?: string;
     fileUrls: string[];
-    imageGenerationOptions?: any;
-    previousResponseId?: string | null;
     messageHistory?: Message[];
     promptTool?: string;
+    model?: string;
   }
-
-  // Types
-  type ImageSize = "1024x1024" | "1024x1536" | "1536x1024";
-  type ImageQuality = "low" | "medium" | "high";
-  type OutputFormat = "png" | "webp" | "jpeg";
-  type BackgroundType = "transparent" | "opaque" | "auto";
 
   const t = useTranslations();
 
@@ -61,62 +51,19 @@
   let currentStreamingImageUrl: string = $state("");
   let isFetching: boolean = $state(false);
   let isGenerating: boolean = $state(false);
-  let previousResponseId: string | null = $state(null);
 
-  let imageQuality: ImageQuality = $state("medium");
-  let imageSize: ImageSize = $state("1024x1024");
-  let outputFormat: OutputFormat = $state("png");
-  let background: BackgroundType = $state("auto");
-  let outputCompression: number = $state(100);
   let files: File[] = $state([]);
 
-  let isBackgroundDisabled: boolean = $state(false);
-  let isCompressionDisabled: boolean = $state(false);
-
-  const sizeOptions = [
-    { value: "1024x1024", title: "1024x1024" },
-    { value: "1024x1536", title: "1024x1536 (portrait)" },
-    { value: "1536x1024", title: "1536x1024 (landscape)" },
-  ];
-
-  const qualityOptions = [
-    { value: "low", title: "Low" },
-    { value: "medium", title: "Medium" },
-    { value: "high", title: "High" },
-  ];
-
-  const outputFormatOptions = [
-    { value: "png", title: "PNG" },
-    { value: "webp", title: "WEBP" },
-    { value: "jpeg", title: "JPEG" },
-  ];
-
-  const backgroundOptions = [
-    { value: "transparent", title: "Transparent" },
-    { value: "opaque", title: "Opaque" },
-    { value: "auto", title: "Auto" },
-  ];
-
-  $effect(() => {
-    isBackgroundDisabled = outputFormat == "jpeg";
-    isCompressionDisabled = outputFormat == "png";
-  });
-
-  // Restore files, and previousResponseId on mount
+  // Restore files on mount
   onMount(() => {
-    if ($gptImageFiles && $gptImageFiles.length > 0) {
-      files = [...$gptImageFiles];
-    }
-
-    if ($gptImagePreviousResponseId) {
-      previousResponseId = $gptImagePreviousResponseId;
+    if ($nanoBananaImageFiles && $nanoBananaImageFiles.length > 0) {
+      files = [...$nanoBananaImageFiles];
     }
   });
 
-  // Save files, and previousResponseId whenever they change
+  // Save files whenever they change
   $effect(() => {
-    $gptImageFiles = files;
-    $gptImagePreviousResponseId = previousResponseId;
+    $nanoBananaImageFiles = files;
   });
 
   // === API Configuration ===
@@ -148,18 +95,13 @@
 
     const payload: RequestPayload = {
       tenantId: $tenant?._id?.toString()!,
-      provider: "openai-response",
+      provider: ApiKeyProvider.Gemini,
+      model: ModelName.Gemini25FlashImage,
       prompt: input || promptForAttachedFilesOnly,
       stream: true,
       fileUrls,
-      previousResponseId: previousResponseId,
       tool: PromptToolOption.Image,
-      imageGenerationOptions: {
-        outputFormat,
-        quality: imageQuality,
-        size: imageSize,
-        background,
-      },
+      messageHistory: $nanoBananaImageMessageHistory,
     };
 
     return payload;
@@ -187,16 +129,8 @@
 
   function handleChunkEvent(data: any, state: StreamingState): void {
     if (data.content && typeof data.content === "string") {
-      // Accumulate the raw text
       state.messageContent += data.content;
-
-      // Append the raw chunk to the current displayed message
       currentMessage += data.content;
-
-      // If the current chunk contains a newline,
-      // re-render the entire accumulated text as HTML.
-      // This avoids trying to parse on every single character
-      // and ensures we only re-render when a natural "block" ends.
       if (data.content.includes("\n")) {
         currentMessage = markdownToHtml(state.messageContent);
       }
@@ -260,14 +194,16 @@
       content: requestBody.prompt,
       fileUrls: fileUrls,
     };
-    gptImageMessageHistory.update((messages) => [...messages, newUserMessage]);
+    nanoBananaImageMessageHistory.update((messages) => [
+      ...messages,
+      newUserMessage,
+    ]);
 
     // Handle assistant message
     addAssistantMessage(responseText, finalImageUrl);
 
     // Clean up and reset states
     resetUIState();
-    previousResponseId = data.responseId;
 
     // Scroll to latest message
     setTimeout(() => scrollIntoView(), 1000);
@@ -290,7 +226,7 @@
       content: requestBody.prompt,
       fileUrls: fileUrls,
     };
-    gptImageMessageHistory.update((messages) => [
+    nanoBananaImageMessageHistory.update((messages) => [
       ...messages,
       errorUserMessage,
     ]);
@@ -299,7 +235,10 @@
       role: MessageRole.Assistant,
       content: errorMessage,
     };
-    gptImageMessageHistory.update((messages) => [...messages, failedMessage]);
+    nanoBananaImageMessageHistory.update((messages) => [
+      ...messages,
+      failedMessage,
+    ]);
 
     addToast({
       message: errorMessage,
@@ -318,7 +257,7 @@
       imageUrl,
     };
 
-    gptImageMessageHistory.update((messages) => [
+    nanoBananaImageMessageHistory.update((messages) => [
       ...messages,
       newAssistantMessage,
     ]);
@@ -448,19 +387,14 @@
     try {
       resetStreamingState();
 
-      // Get API configuration
       const config = await getAPIConfiguration();
-
-      // Build request payload
       const requestBody = buildRequestPayload(fileUrls);
 
-      // Make API request
       const accessToken = $user?.auth0_access_token;
       const response = await fetch(config.apiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          //"X-API-Key": config.apiKey,
           Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify(requestBody),
@@ -480,8 +414,6 @@
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-
-      // Process streaming response
       if (response.headers.get("content-type")?.includes("text/event-stream")) {
         console.log("📡 Streaming response received");
 
@@ -490,7 +422,7 @@
           throw new Error("No reader available");
         }
 
-        input = ""; // Reset prompt for new request
+        input = "";
         return await processStream(reader, requestBody, fileUrls);
       }
     } catch (error) {
@@ -546,22 +478,12 @@
     }
   }
 
-  function getInfoText() {
-    return t("create-image.image-info-text", {
-      format: outputFormat.toUpperCase(),
-      quality: capitalizeFirst(imageQuality),
-      size: imageSize,
-    });
-  }
-
   function startNewChat() {
     input = "";
     files = [];
     isFetching = false;
-    previousResponseId = null;
-    $gptImageMessageHistory = [];
-    $gptImageFiles = [];
-    $gptImagePreviousResponseId = null;
+    $nanoBananaImageMessageHistory = [];
+    $nanoBananaImageFiles = [];
 
     window.scrollTo({
       top: 0,
@@ -573,92 +495,27 @@
 <div class="grid grid-cols-1 grid-rows-[1fr_min-content] space-y-6 h-full">
   <div class="flex flex-col space-y-6">
     <h1 class="pt-2 mb-2 lg:pt-8 text-4xl font-bold">
-      {t("create-image.create-gpt-image-title")}
+      {t("create-image.create-nano-banana-image-title")}
     </h1>
-    <p class="m-0">{t("create-image.create-gpt-image-description")}</p>
+    <p class="m-0">{t("create-image.create-nano-banana-image-description")}</p>
 
     <!-- Output (Follow-Up) -->
-    {#if $gptImageMessageHistory.length > 0}
+    {#if $nanoBananaImageMessageHistory.length > 0}
       <MessageList
-        messages={$gptImageMessageHistory}
+        messages={$nanoBananaImageMessageHistory}
         {isFetching}
         {isGenerating}
         {currentMessage}
         currentImageUrl={currentStreamingImageUrl}
-        infoText={getInfoText()}
       />
-    {/if}
-
-    {#if $gptImageMessageHistory.length == 0}
-      <div class="space-y-4 mt-10">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <!-- Output Format -->
-          <Dropdown
-            classes="flex-1"
-            labelClasses="label"
-            options={outputFormatOptions}
-            bind:value={outputFormat}
-            label={t("create-image.image-format-label")}
-          />
-
-          <!-- Image Quality -->
-          <Dropdown
-            classes="flex-1"
-            labelClasses="label"
-            options={qualityOptions}
-            bind:value={imageQuality}
-            label={t("create-image.select-image-quality-label")}
-          />
-
-          <!-- Image Size -->
-          <Dropdown
-            classes="flex-1"
-            labelClasses="label"
-            options={sizeOptions}
-            bind:value={imageSize}
-            label={t("create-image.image-size-label")}
-          />
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <!-- Background -->
-          <div class="flex flex-1 flex-col">
-            <Dropdown
-              classes="flex-1"
-              labelClasses="label"
-              options={backgroundOptions}
-              bind:value={background}
-              label={t("create-image.image-background-label")}
-              disabled={isBackgroundDisabled}
-            />
-          </div>
-          <!-- Compression Level -->
-          <div class="flex-1">
-            <!-- svelte-ignore a11y_label_has_associated_control -->
-            <label class="label">
-              {t("create-image.image-compression-label")}
-              <span class="text-xs">({outputCompression}%)</span>
-            </label>
-            <input
-              type="range"
-              min="0"
-              max="100"
-              bind:value={outputCompression}
-              class="range range-primary range-xs mt-4"
-              disabled={isCompressionDisabled}
-            />
-          </div>
-          <div class="flex flex-1 flex-col"></div>
-        </div>
-      </div>
     {/if}
 
     <!-- Prompt Textarea -->
     <div
-      class={`mt-8  ${$gptImageMessageHistory.length > 0 ? "sticky bottom-0 bg-base-200" : ""}`}
+      class={`mt-8  ${$nanoBananaImageMessageHistory.length > 0 ? "sticky bottom-0 bg-base-200" : ""}`}
       transition:slide={{ duration: 500 }}
     >
-      {#if $gptImageMessageHistory.length > 0}
+      {#if $nanoBananaImageMessageHistory.length > 0}
         <div class="my-4">
           <button
             onclick={startNewChat}
@@ -676,15 +533,15 @@
         bind:input
         bind:files
         {isFetching}
-        stickyFooter={$gptImageMessageHistory.length > 0}
+        stickyFooter={$nanoBananaImageMessageHistory.length > 0}
         onsend={submitForm}
       />
     </div>
 
     <!-- Output (Normal) -->
-    {#if $gptImageMessageHistory.length == 0}
+    {#if $nanoBananaImageMessageHistory.length == 0}
       <MessageList
-        messages={$gptImageMessageHistory}
+        messages={$nanoBananaImageMessageHistory}
         {isFetching}
         {isGenerating}
         {currentMessage}

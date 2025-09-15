@@ -42,7 +42,7 @@ const ChatConversationSchema = z.object({
 export type Message = z.infer<typeof MessageSchema>;
 export type Conversation = z.infer<typeof ChatConversationSchema>;
 
-const collection = db.collection("conversations");
+const collection = db.collection<Conversation>("conversations");
 
 export default {
   create: async (conversation: Partial<Omit<Conversation, "_id">>) => {
@@ -76,6 +76,39 @@ export default {
       },
     );
   },
+
+  // New function to update the messages array using $push
+  updateMessage: async (
+  id: string | ObjectId,
+  message: Message,
+) => {
+  const objectId = toObjectId(id);
+
+  // Validate the incoming message object
+  const validatedMessage = MessageSchema.parse(message);
+
+  const expiresAt = (() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 30);
+    return d;
+  })();
+
+  // Use the $push operator to append the new message
+  // Also, update the updated_at and expires_at fields
+  return await collection.findOneAndUpdate(
+    { _id: objectId },
+    {
+      $push: { messages: validatedMessage },
+      $set: {
+        updated_at: new Date(),
+        expires_at: expiresAt,
+      },
+    },
+    {
+      returnDocument: "after",
+    },
+  );
+},
 
   remove: async (id: string) => {
     const _id = new ObjectId(id);

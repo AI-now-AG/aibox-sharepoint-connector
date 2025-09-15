@@ -27,6 +27,12 @@ const UpdateConversationSchema = ConversationInputParamsSchema.omit({
   prompt_id: true,
 }).merge(ConversationInputIdentifierSchema);
 
+// The input schema for appending a new message
+export const AppendMessageSchema = z.object({
+  _id: z.string(), // The conversation ID
+  message: MessageSchema, // The new message to append
+});
+
 const ConversationListSchema = z.object({
   limit: z.number().min(0).optional(),
 });
@@ -155,6 +161,20 @@ export const conversation = {
       const updatedDocument = await ConversationModel.update(input._id, update);
 
       // Normalize and return the updated conversation
+      return transformRawData(updatedDocument);
+    },
+  }),
+
+  // New action to append a message to a conversation
+  updateMessage: defineAction({
+    input: AppendMessageSchema,
+    handler: async (input) => {
+      // The handler now uses a more specific model function
+      const updatedDocument = await ConversationModel.updateMessage(
+        input._id,
+        input.message,
+      );
+      // Transform and return the updated conversation
       return transformRawData(updatedDocument);
     },
   }),

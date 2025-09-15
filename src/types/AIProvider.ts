@@ -17,6 +17,7 @@ export enum ModelName {
 
   // Google
   Gemini25Flash = "gemini-2.5-flash", // Text & Tools (Websearch, Thinking)
+  Gemini25FlashImage = "gemini-2.5-flash-image-preview", // Image Generation
 
   // Perplexity
   Sonar = "sonar", // Text & Tools (Websearch)

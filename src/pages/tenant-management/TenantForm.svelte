@@ -96,6 +96,7 @@
   let perplexityEnabled: boolean = $state(false);
   let dalleEnabled: boolean = $state(false);
   let gptImageEnabled: boolean = $state(false);
+  let nanoBananaImageEnabled: boolean = $state(false);
   let fluxEnabled: boolean = $state(false);
   let claudeEnabled: boolean = $state(false);
   let geminiEnabled: boolean = $state(false);
@@ -224,15 +225,18 @@
 
   // Check if any subtitle features are enabled
   const isAnySubtitleFeatureEnabled = $derived(
-    audioStandardArray.some((item) => 
-      item.checked && (item.type === AudioCategory.Subtitle || item.type === AudioCategory.SubtitleJson)
+    audioStandardArray.some(
+      (item) =>
+        item.checked &&
+        (item.type === AudioCategory.Subtitle ||
+          item.type === AudioCategory.SubtitleJson),
     ) ||
-    audioProArray.some((item) => 
-      item.checked && item.type === AudioCategory.SubtitleLarge
-    ) ||
-    audioElevenLabsArray.some((item) => 
-      item.checked && item.type === AudioCategory.Subtitle11Labs
-    )
+      audioProArray.some(
+        (item) => item.checked && item.type === AudioCategory.SubtitleLarge,
+      ) ||
+      audioElevenLabsArray.some(
+        (item) => item.checked && item.type === AudioCategory.Subtitle11Labs,
+      ),
   );
 
   const languages = [
@@ -270,11 +274,19 @@
         item.name == TenantFeature.CreateImage &&
         item.provider == ApiKeyProvider.OpenAI,
     );
+
     gptImageEnabled = tenantData.included_features?.some(
       (item: any) =>
         item.name == TenantFeature.GptImage &&
         item.provider == ApiKeyProvider.OpenAI,
     );
+
+    nanoBananaImageEnabled = tenantData.included_features?.some(
+      (item: any) =>
+        item.name == TenantFeature.CreateImage &&
+        item.provider == ApiKeyProvider.Gemini,
+    );
+
     fluxEnabled = tenantData.included_features?.some(
       (item: any) => item.provider == ApiKeyProvider.Flux,
     );
@@ -595,6 +607,13 @@
           });
         }
 
+        if (nanoBananaImageEnabled) {
+          tenantData.included_features.push({
+            name: TenantFeature.CreateImage,
+            provider: ApiKeyProvider.Gemini,
+          });
+        }
+
         if (tenantAdminEmail && isValidEmail(tenantAdminEmail)) {
           tenantData.tenant_admin_email = tenantAdminEmail;
         }
@@ -734,6 +753,13 @@
           tenantData.included_features.push({
             name: TenantFeature.GptImage,
             provider: ApiKeyProvider.OpenAI,
+          });
+        }
+
+        if (nanoBananaImageEnabled) {
+          tenantData.included_features.push({
+            name: TenantFeature.CreateImage,
+            provider: ApiKeyProvider.Gemini,
           });
         }
 
@@ -1962,7 +1988,10 @@
                   value="subtitle-editor-feature"
                   bind:checked={tenantData.subtitle_editor}
                 />
-                <label class="label cursor-pointer ml-2" for="subtitle-editor-feature">
+                <label
+                  class="label cursor-pointer ml-2"
+                  for="subtitle-editor-feature"
+                >
                   <span class="label-text text-base-content ml-2"
                     >{t("settings.transcription.subtitle-editor")}</span
                   >
@@ -2073,6 +2102,29 @@
             <label class="label cursor-pointer ml-2" for="gpt-image-model">
               <span class="label-text text-base-content"
                 >{t("tenant.image-creation.gpt")}</span
+              >
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gemini Nano Banana Image Section -->
+      <div class="collapse bg-base-100 shadow-sm rounded-lg mb-4">
+        <input type="checkbox" />
+        <div class="collapse-title flex items-center justify-between gap-4">
+          <div class="flex items-center">
+            <input
+              id="nano-banana-image-model"
+              type="checkbox"
+              bind:checked={nanoBananaImageEnabled}
+              class="checkbox checkbox-primary z-10"
+            />
+            <label
+              class="label cursor-pointer ml-2"
+              for="nano-banana-image-model"
+            >
+              <span class="label-text text-base-content"
+                >{t("tenant.image-creation.nano-banana")}</span
               >
             </label>
           </div>
