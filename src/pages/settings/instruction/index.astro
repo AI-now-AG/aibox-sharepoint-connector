@@ -1,0 +1,24 @@
+---
+import Layout from "$layouts/Layout.astro";
+import SvelteInstructionForm from "./SvelteInstructionForm.svelte";
+import LanguageSelector from "./LanguageSelector.svelte";
+// import { useTranslations } from "$i18n/utils";
+
+// const t = useTranslations();
+// const { tenant } = Astro.locals;
+
+// Get initial data from the API
+const response = await fetch(`${Astro.url.origin}/api/instructions`);
+const initialData = await response.json();
+---
+
+<Layout>
+  <div class="container max-w-5xl mx-auto p-6 space-y-4">
+    <h1 class="text-4xl font-bold">Instructions Settings</h1>
+    <div class="flex justify-end mb-4">
+      <LanguageSelector client:load />
+    </div>
+
+    <SvelteInstructionForm instructions={initialData} client:load />
+  </div>
+</Layout>
