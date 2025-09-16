@@ -15,7 +15,7 @@ export type InstructionType = z.infer<typeof InstructionTypeEnum>;
 // Zod schema for a instruction
 export const InstructionSchema = z.object({
   _id: z.instanceof(ObjectId).optional(),
-  provider: z.nativeEnum(ApiKeyProvider).optional(),
+  provider: z.nativeEnum(ApiKeyProvider).nullish(),
   model: z.string().nullish().default(null),
   type: InstructionTypeEnum.default("prompt"),
   instructions: InstructionsSchema,
