@@ -45,34 +45,41 @@
   onMount(() => {});
 </script>
 
-<div class="form-control">
-  <label class="label" for="language-select">
-    <span class="label-text">{t("instructions.select-language")}</span>
-  </label>
-  <select
-    onchange={(event) => switchLanguage(event)}
-    value={selectedLang}
-    class="select select-bordered w-full max-w-xs"
-  >
-    <option value="en">English</option>
-    <option value="de">German</option>
-  </select>
+<div class="sticky top-0 right-0 z-50 p-4 bg-base-100/90 backdrop-blur-sm flex justify-between items-center shadow-lg">
+  <div class="form-control">
+    <label class="label" for="language-select">
+      <span class="label-text">{t("instructions.select-language")}</span>
+    </label>
+    <select
+      onchange={(event) => switchLanguage(event)}
+      value={selectedLang}
+      class="select select-bordered w-full max-w-xs"
+    >
+      <option value="en">English</option>
+      <option value="de">German</option>
+    </select>
+  </div>
+  <button type="submit" class="btn btn-primary" onclick={preventDefault(saveInstructions)}>
+    {t("common.save")}
+  </button>
 </div>
 
 <form onsubmit={preventDefault(saveInstructions)}>
   {#each formData as providerData}
-    <div class="card bg-base-100 shadow-xl my-4">
+    <div class="card shadow-lg my-6">
       <div class="card-body">
-        <h2 class="card-title capitalize">
-          {providerData.provider} Instructions
-        </h2>
+        <h1 class="card-title capitalize text-2xl font-extrabold text-primary">
+          {providerData.provider}
+        </h1>
 
-        <div class="form-control">
+        <div class="form-control bg-base-200 p-4 rounded-xl border border-base-300 transition-colors hover:bg-base-300">
           <label
             class="label"
             for={`default-instruction-${providerData.provider}-${selectedLang}`}
           >
-            <span class="label-text">Default Instruction ({selectedLang})</span>
+            <span class="label-text text-lg font-semibold">
+              Default Instruction ({selectedLang})
+            </span>
           </label>
           <textarea
             id={`default-instruction-${providerData.provider}-${selectedLang}`}
@@ -87,7 +94,7 @@
               instruction: Record<string, string>;
             }}
             <div class="divider"></div>
-            <h3 class="font-bold text-lg">{modelName}</h3>
+            <h3 class="font-bold text-lg text-secondary">{modelName}</h3>
             <div class="form-control">
               <label
                 class="label"
@@ -108,8 +115,4 @@
       </div>
     </div>
   {/each}
-
-  <div class="mt-8 flex justify-end">
-    <button type="submit" class="btn btn-primary">{t("common.save")}</button>
-  </div>
 </form>
