@@ -19,7 +19,7 @@
   } from "$types/AIProvider";
   import { getPromptTools, useProviderInfo } from "$shared/AIProvider";
   import { tenant } from "$stores";
-  import { formatMarkdown } from "$utils/textFormatting";
+  import { normalizeTextToHtml } from "$utils/textFormatting";
 
   const t = useTranslations();
 
@@ -131,8 +131,8 @@
       if (dialogMode == "clone") {
         promptTitle = promptTitle?.trim() + " (" + t("common.copy") + ")";
       }
-      promptText = formatMarkdown(promptDetails.prompt);
-      initHtml = formatMarkdown(promptDetails.prompt);
+      promptText = normalizeTextToHtml(promptDetails.prompt);
+      initHtml = normalizeTextToHtml(promptDetails.prompt);
       promptPredefinedInput = promptDetails.predefined_input;
 
       const category = categories.find(

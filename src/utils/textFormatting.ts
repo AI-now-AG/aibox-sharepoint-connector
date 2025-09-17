@@ -258,12 +258,19 @@ export function textToHtml(text: string): string {
 }
 
 /**
- * Convert basic Markdown to HTML.
+ * Convert raw Markdown-like text to simple HTML.
+ * If the input already contains HTML, it is returned unchanged.
  *
- * @param text - Markdown string
+ * @param text - Markdown or HTML string
  * @returns HTML string
  */
-export function formatMarkdown(text: string) {
+export function normalizeTextToHtml(text: string) {
+  // If input already looks like HTML, skip formatting
+  if (/<[a-z][\s\S]*>/i.test(text)) {
+    return text;
+  }
+
+  // Otherwise, apply simple Markdown replacements
   text = text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
   text = text.replace(/(\*|_)(.*?)\1/g, "<em>$2</em>");
   text = text.replace(/__(.*?)__/g, "<u>$1</u>");
