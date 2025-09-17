@@ -44,7 +44,9 @@
   onMount(() => {});
 </script>
 
-<div class="sticky top-0 right-0 z-50 p-4 bg-white flex justify-between items-center shadow-lg">
+<div
+  class="sticky top-0 right-0 z-50 p-4 bg-white flex justify-between items-center shadow-lg"
+>
   <div class="form-control">
     <label class="label mb-2" for="language-select">
       <span class="label-text">{t("instructions.select-language")}</span>
@@ -58,7 +60,11 @@
       <option value="de">German</option>
     </select>
   </div>
-  <button type="submit" class="btn btn-primary" onclick={preventDefault(saveInstructions)}>
+  <button
+    type="submit"
+    class="btn btn-primary"
+    onclick={preventDefault(saveInstructions)}
+  >
     {t("common.save")}
   </button>
 </div>
@@ -70,8 +76,12 @@
         <h1 class="card-title capitalize text-2xl font-extrabold text-primary">
           {providerData.provider}
         </h1>
-
-        <div class="flex items-center gap-4 bg-base-200 p-4 rounded-xl border border-base-300 transition-colors hover:bg-base-300">
+        <span class="label-text">
+          (Leave Model Instruction blank to use Default Instruction)
+        </span>
+        <div
+          class="flex items-center gap-4 bg-base-200 p-4 rounded-xl border border-base-300 transition-colors hover:bg-base-300"
+        >
           <label
             class="label w-1/3"
             for={`default-instruction-${providerData.provider}-${selectedLang}`}
