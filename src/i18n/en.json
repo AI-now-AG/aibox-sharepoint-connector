@@ -583,5 +583,10 @@
   "create-image.create-nano-banana-image-description": "Create images from the latest and most popular model from Gemini",
   "tenant.image-creation.nano-banana": "Nano Banana",
   "instructions.title": "Instructions Setting",
-  "instructions.select-language": "Select languages"
+  "instructions.select-language": "Select languages",
+  "instructions.update-instructions-setting-successfull": "Update Instructions setting successfull",
+  "instructions.update-instructions-setting-failed": "Update Instructions setting failed",
+  "instructions.default-instruction": "Default instruction",
+  "instructions.model-instruction": "Model Instruction",
+  "instructions.leave-model-instruction-empty-to-use-default-instruction": "Leave Model Instruction empty to use Default Instruction"
 }

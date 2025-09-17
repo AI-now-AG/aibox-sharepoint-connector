@@ -1,8 +1,9 @@
 <script lang="ts">
+  import Loading from "$components/Loading.svelte";
   import { useTranslations } from "$i18n/utils";
+  import { addToast } from "$stores/toast";
   import { preventDefault } from "$utils/common";
   import { actions } from "astro:actions";
-  import { onMount } from "svelte";
 
   const t = useTranslations();
 
@@ -11,37 +12,48 @@
     instructions: Array<any>;
   }
 
-  let { configurationId, instructions }: Props = $props();
+  let { configurationId, instructions: formData }: Props = $props();
 
   let selectedLang: string = $state("en");
-
-  let formData = instructions;
+  let loading: boolean = $state(false);
 
   function switchLanguage(langEvent: Event) {
     const target = langEvent.target as HTMLSelectElement;
     selectedLang = target.value;
-    console.log("Switching language to", selectedLang);
   }
 
   async function saveInstructions() {
     try {
-      const result = await actions.configurations.update({
+      loading = true;
+      const { error } = await actions.configurations.update({
         defaultInstructions: formData,
         _id: configurationId,
       });
-      if (result.data && result.data.success) {
-        alert("Instructions saved successfully!");
+
+      if (!error) {
+        addToast({
+          message: t("instructions.update-instructions-setting-successfull"),
+          type: "success",
+        });
       } else {
-        console.error(result.data?.error);
-        alert("Failed to save instructions.");
+        addToast({
+          message:
+            t("instructions.update-instructions-setting-failed") +
+            JSON.stringify(error),
+          type: "error",
+        });
       }
     } catch (error) {
-      console.error("Error saving instructions:", error);
-      alert("An error occurred.");
+      addToast({
+        message: JSON.stringify(
+          t("instructions.update-instructions-setting-failed") + error,
+        ),
+        type: "error",
+      });
+    } finally {
+      loading = false;
     }
   }
-
-  onMount(() => {});
 </script>
 
 <div
@@ -72,13 +84,12 @@
 <form onsubmit={preventDefault(saveInstructions)}>
   {#each formData as providerData}
     <div class="card shadow-lg my-6">
-      <div class="card-body">
+      <div
+        class={`card-body ${providerData.provider === "default" ? "bg-yellow-50" : ""} rounded-xl`}
+      >
         <h1 class="card-title capitalize text-2xl font-extrabold text-primary">
           {providerData.provider}
         </h1>
-        <span class="label-text">
-          (Leave Model Instruction blank to use Default Instruction)
-        </span>
         <div
           class="flex items-center gap-4 bg-base-200 p-4 rounded-xl border border-base-300 transition-colors hover:bg-base-300"
         >
@@ -87,7 +98,7 @@
             for={`default-instruction-${providerData.provider}-${selectedLang}`}
           >
             <span class="label-text text-lg font-semibold">
-              Default Instruction ({selectedLang})
+              {t("instructions.default-instruction")} ({selectedLang})
             </span>
           </label>
           <div class="w-2/3">
@@ -105,14 +116,22 @@
               instruction: Record<string, string>;
             }}
             <div class="divider"></div>
-            <h3 class="font-bold text-lg text-secondary">{modelName}</h3>
+            <h3 class="font-bold text-lg text-secondary flex items-center">
+              {modelName}
+              <span class="text-xs text-gray-400 font-normal">
+                ({t(
+                  "instructions.leave-model-instruction-empty-to-use-default-instruction",
+                )})
+              </span>
+            </h3>
+
             <div class="flex items-center gap-4">
               <label
-                class="label w-1/3"
+                class="label w-1/3 flex-wrap"
                 for={`model-instruction-${providerData.provider}-${modelName}-${selectedLang}`}
               >
-                <span class="label-text">
-                  Model Instruction ({selectedLang})
+                <span class="label-text font-semibold">
+                  {t("instructions.model-instruction")} ({selectedLang})
                 </span>
               </label>
               <div class="w-2/3">
@@ -129,3 +148,5 @@
     </div>
   {/each}
 </form>
+
+<Loading show={loading} />
