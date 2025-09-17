@@ -1,0 +1,166 @@
+---
+import Layout from "$layouts/Layout.astro";
+import SvelteInstructionForm from "./SvelteInstructionForm.svelte";
+import { useTranslations } from "$i18n/utils";
+import { actions } from "astro:actions";
+
+const t = useTranslations();
+
+const { data } = await Astro.callAction(actions.configurations.get, {});
+const configuration = data;
+
+// const defaultInstructions = [
+//   {
+//     provider: "openai",
+//     instruction: {
+//       en: "You are a versatile AI assistant from OpenAI. Your responses should be helpful and accurate.",
+//       de: "Sie sind ein vielseitiger KI-Assistent von OpenAI. Ihre Antworten sollten hilfreich und präzise sein.",
+//     },
+//     model: {
+//       "gpt-4o": {
+//         instruction: {
+//           en: "gpt-4o is a multimodal model. Prioritize visual and text-based reasoning tasks.",
+//           de: "gpt-4o ist ein multimodales Modell. Priorisieren Sie visuelle und textbasierte Denkaufgaben.",
+//         },
+//       },
+//       "gpt-5": {
+//         instruction: {
+//           en: "gpt-5 is an advanced text and tools model. Use its reasoning capabilities to solve complex problems.",
+//           de: "gpt-5 ist ein fortschrittliches Text- und Werkzeugmodell. Nutzen Sie seine Denkfähigkeiten, um komplexe Probleme zu lösen.",
+//         },
+//       },
+//       "dall-e-3": {
+//         instruction: {
+//           en: "dall-e-3 is for image generation. Focus on creating high-quality, detailed images from text prompts.",
+//           de: "dall-e-3 ist für die Bilderzeugung. Konzentrieren Sie sich auf die Erstellung hochwertiger, detaillierter Bilder aus Textaufforderungen.",
+//         },
+//       },
+//       "gpt-image-1": {
+//         instruction: {
+//           en: "gpt-image-1 is a tool for prompt-based image creation. Use it to enhance and modify images based on user instructions.",
+//           de: "gpt-image-1 ist ein Werkzeug zur promptbasierten Bilderstellung. Verwenden Sie es, um Bilder basierend auf Benutzeranweisungen zu verbessern und zu modifizieren.",
+//         },
+//       },
+//     },
+//   },
+//   {
+//     provider: "google",
+//     instruction: {
+//       en: "You are a helpful and informative AI assistant powered by Google. Provide concise and relevant answers.",
+//       de: "Sie sind ein hilfreicher und informativer KI-Assistent von Google. Geben Sie präzise und relevante Antworten.",
+//     },
+//     model: {
+//       "gemini-2.5-flash": {
+//         instruction: {
+//           en: "gemini-2.5-flash is optimized for speed. Provide quick, accurate, and concise text-based responses.",
+//           de: "gemini-2.5-flash ist auf Geschwindigkeit optimiert. Geben Sie schnelle, genaue und prägnante textbasierte Antworten.",
+//         },
+//       },
+//       "gemini-2.5-flash-image-preview": {
+//         instruction: {
+//           en: "gemini-2.5-flash-image-preview is for image generation. Create visually appealing images based on user requests.",
+//           de: "gemini-2.5-flash-image-preview ist für die Bilderzeugung. Erstellen Sie visuell ansprechende Bilder basierend auf Benutzeranfragen.",
+//         },
+//       },
+//     },
+//   },
+//   {
+//     provider: "azure",
+//     instruction: {
+//       en: "You are an AI assistant powered by Azure. Ensure responses are professional, secure, and adhere to enterprise standards.",
+//       de: "Sie sind ein KI-Assistent von Azure. Stellen Sie sicher, dass die Antworten professionell, sicher und den Unternehmensstandards entsprechen.",
+//     },
+//     model: {
+//       "whisper-1": {
+//         instruction: {
+//           en: "whisper-1 is for audio transcription. Transcribe spoken language into accurate text, handling different accents and languages.",
+//           de: "whisper-1 ist für die Audiotranskription. Transkribieren Sie gesprochene Sprache in präzisen Text und berücksichtigen Sie dabei verschiedene Akzente und Sprachen.",
+//         },
+//       },
+//       "Audio Pro": {
+//         instruction: {
+//           en: "Audio Pro is a high-fidelity audio transcription tool. Provide highly accurate transcriptions for professional use cases.",
+//           de: "Audio Pro ist ein hochpräzises Audiotranskriptionstool. Liefern Sie hochgenaue Transkriptionen für professionelle Anwendungsfälle.",
+//         },
+//       },
+//     },
+//   },
+//   {
+//     provider: "claude",
+//     instruction: {
+//       en: "You are an ethical and safe AI assistant from Claude. Focus on providing harmless, helpful, and honest responses.",
+//       de: "Sie sind ein ethischer und sicherer KI-Assistent von Claude. Konzentrieren Sie sich darauf, harmlose, hilfreiche und ehrliche Antworten zu geben.",
+//     },
+//     model: {
+//       "claude-sonnet-4-0": {
+//         instruction: {
+//           en: "claude-sonnet-4-0 is a powerful text model. Use its reasoning and long-context capabilities to answer complex, multi-step queries.",
+//           de: "claude-sonnet-4-0 ist ein leistungsstarkes Textmodell. Nutzen Sie seine Denkfähigkeiten und langen Kontextfenster, um komplexe, mehrstufige Anfragen zu beantworten.",
+//         },
+//       },
+//     },
+//   },
+//   {
+//     provider: "perplexity",
+//     instruction: {
+//       en: "You are a research-focused AI assistant from Perplexity. Always provide accurate information with citations and sources.",
+//       de: "Sie sind ein forschungsorientierter KI-Assistent von Perplexity. Geben Sie immer genaue Informationen mit Zitaten und Quellen an.",
+//     },
+//     model: {
+//       sonar: {
+//         instruction: {
+//           en: "sonar is a lightweight search model. Use it for quick facts, news updates, and simple Q&A.",
+//           de: "sonar ist ein schlankes Suchmodell. Verwenden Sie es für schnelle Fakten, Nachrichtenupdates und einfache Fragen und Antworten.",
+//         },
+//       },
+//       "sonar-pro": {
+//         instruction: {
+//           en: "sonar-pro is for advanced search. Provide in-depth analysis and detailed research based on multiple sources.",
+//           de: "sonar-pro ist für die erweiterte Suche. Liefern Sie detaillierte Analysen und Recherchen basierend auf mehreren Quellen.",
+//         },
+//       },
+//     },
+//   },
+//   {
+//     provider: "elevenlabs",
+//     instruction: {
+//       en: "You are a text-to-speech assistant from ElevenLabs. Focus on generating natural-sounding and emotionally-aware audio from text.",
+//       de: "Sie sind ein Text-to-Speech-Assistent von ElevenLabs. Konzentrieren Sie sich auf die Erzeugung von natürlich klingendem und emotional bewusstseinsfähigem Audio aus Text.",
+//     },
+//     model: {
+//       scribe_v1: {
+//         instruction: {
+//           en: "scribe_v1 is a transcription model. Convert spoken content from audio to accurate, well-formatted text.",
+//           de: "scribe_v1 ist ein Transkriptionsmodell. Konvertieren Sie gesprochene Inhalte von Audio in präzisen, gut formatierten Text.",
+//         },
+//       },
+//     },
+//   },
+//   {
+//     provider: "flux",
+//     instruction: {
+//       en: "You are an AI for text-to-image generation from Flux. Your goal is to create high-quality, photorealistic images from prompts.",
+//       de: "Sie sind eine KI für die Text-zu-Bild-Erzeugung von Flux. Ihr Ziel ist es, hochwertige, fotorealistische Bilder aus Prompts zu erstellen.",
+//     },
+//     model: {
+//       "fal-ai/flux/dev": {
+//         instruction: {
+//           en: "fal-ai/flux/dev is a development image generation model. Generate production-ready images quickly for prototyping and testing.",
+//           de: "fal-ai/flux/dev ist ein Entwicklungsmodell zur Bilderzeugung. Generieren Sie schnell produktionsreife Bilder für Prototyping und Tests.",
+//         },
+//       },
+//     },
+//   },
+// ];
+---
+
+<Layout>
+  <div class="container max-w-5xl mx-auto p-6 space-y-4">
+    <h1 class="text-4xl font-bold">{t("instructions.title")}</h1>
+    <SvelteInstructionForm
+      instructions={configuration?.defaultInstructions ?? []}
+      configurationId={configuration?._id.toString() ?? ""}
+      client:load
+    />
+  </div>
+</Layout>

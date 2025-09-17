@@ -10,6 +10,7 @@ import { conversation } from "./conversation";
 import { instruction } from "./instruction";
 import { onboarding } from "./onboarding";
 import { usage } from "./usage";
+import { configurations } from "./configuration";
 
 export const server = {
   tenant,
@@ -24,4 +25,5 @@ export const server = {
   instruction,
   onboarding,
   usage,
+  configurations,
 };
