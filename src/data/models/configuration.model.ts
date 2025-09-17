@@ -14,10 +14,10 @@ const ModelInstructionSchema = z.record(
   }),
 );
 
-const ProviderInstructionSchema = z.object({
+export const ProviderInstructionSchema = z.object({
   provider: z.string(),
   instruction: InstructionSchema,
-  models: ModelInstructionSchema.optional().default({}),
+  models: ModelInstructionSchema.nullish().default({}),
 });
 
 export const ConfigurationSchema = z.object({

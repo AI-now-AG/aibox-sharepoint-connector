@@ -1,24 +1,8 @@
 import { defineAction } from "astro:actions";
 import { z } from "zod";
-import configurationModel from "$data/models/configuration.model";
-
-const InstructionSchema = z.object({
-  en: z.string(),
-  de: z.string(),
-});
-
-const ModelInstructionSchema = z.record(
-  z.string(), // Model Name
-  z.object({
-    instruction: InstructionSchema,
-  }),
-);
-
-const ProviderInstructionSchema = z.object({
-  provider: z.string(),
-  instruction: InstructionSchema,
-  models: ModelInstructionSchema.optional(),
-});
+import ConfigurationModel, {
+  ProviderInstructionSchema,
+} from "$data/models/configuration.model";
 
 export const ConfigurationSchema = z.object({
   defaultInstructions: z.array(ProviderInstructionSchema),
@@ -33,7 +17,7 @@ export const configurations = {
     input: z.intersection(ConfigurationSchema, ConfigurationIdentifierSchema),
     handler: async (input) => {
       try {
-        await configurationModel.update(input._id, {
+        await ConfigurationModel.update(input._id, {
           defaultInstructions: input.defaultInstructions,
         });
         return { success: true };
@@ -46,7 +30,7 @@ export const configurations = {
   get: defineAction({
     input: z.object({}),
     handler: async () => {
-      const config = await configurationModel.get();
+      const config = await ConfigurationModel.get();
       return config;
     },
   }),
