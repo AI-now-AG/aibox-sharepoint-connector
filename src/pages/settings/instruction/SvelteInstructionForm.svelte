@@ -1,15 +1,17 @@
 <script lang="ts">
   import { useTranslations } from "$i18n/utils";
   import { preventDefault } from "$utils/common";
+  import { actions } from "astro:actions";
   import { onMount } from "svelte";
 
   const t = useTranslations();
 
   interface Props {
+    configurationId: string;
     instructions: Array<any>;
   }
 
-  let { instructions }: Props = $props();
+  let { configurationId, instructions }: Props = $props();
 
   let selectedLang: string = $state("en");
 
@@ -22,17 +24,15 @@
   }
 
   async function saveInstructions() {
-    alert("Saving instructions...");
-    return;
     try {
-      const response = await fetch("/api/instructions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ defaultInstructions: formData }),
+      const result = await actions.configurations.update({
+        defaultInstructions: formData,
+        _id: configurationId,
       });
-      if (response.ok) {
+      if (result.data && result.data.success) {
         alert("Instructions saved successfully!");
       } else {
+        console.error(result.data?.error);
         alert("Failed to save instructions.");
       }
     } catch (error) {
