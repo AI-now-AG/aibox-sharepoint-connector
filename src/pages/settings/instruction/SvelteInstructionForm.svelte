@@ -21,7 +21,6 @@
     console.log("Switching language to", selectedLang);
   }
 
-  // Handle saving data to the backend
   async function saveInstructions() {
     alert("Saving instructions...");
     return;
@@ -72,20 +71,22 @@
           {providerData.provider}
         </h1>
 
-        <div class="form-control bg-base-200 p-4 rounded-xl border border-base-300 transition-colors hover:bg-base-300">
+        <div class="flex items-center gap-4 bg-base-200 p-4 rounded-xl border border-base-300 transition-colors hover:bg-base-300">
           <label
-            class="label"
+            class="label w-1/3"
             for={`default-instruction-${providerData.provider}-${selectedLang}`}
           >
             <span class="label-text text-lg font-semibold">
               Default Instruction ({selectedLang})
             </span>
           </label>
-          <textarea
-            id={`default-instruction-${providerData.provider}-${selectedLang}`}
-            class="textarea textarea-bordered h-24"
-            bind:value={providerData.instruction[selectedLang]}
-          ></textarea>
+          <div class="w-2/3">
+            <textarea
+              id={`default-instruction-${providerData.provider}-${selectedLang}`}
+              class="textarea textarea-bordered h-24 w-full"
+              bind:value={providerData.instruction[selectedLang]}
+            ></textarea>
+          </div>
         </div>
 
         {#if providerData.model}
@@ -95,20 +96,22 @@
             }}
             <div class="divider"></div>
             <h3 class="font-bold text-lg text-secondary">{modelName}</h3>
-            <div class="form-control">
+            <div class="flex items-center gap-4">
               <label
-                class="label"
+                class="label w-1/3"
                 for={`model-instruction-${providerData.provider}-${modelName}-${selectedLang}`}
               >
-                <span class="label-text"
-                  >Model Instruction ({selectedLang})</span
-                >
+                <span class="label-text">
+                  Model Instruction ({selectedLang})
+                </span>
               </label>
-              <textarea
-                id={`model-instruction-${providerData.provider}-${modelName}-${selectedLang}`}
-                class="textarea textarea-bordered h-24"
-                bind:value={typedModelData.instruction[selectedLang]}
-              ></textarea>
+              <div class="w-2/3">
+                <textarea
+                  id={`model-instruction-${providerData.provider}-${modelName}-${selectedLang}`}
+                  class="textarea textarea-bordered h-24 w-full"
+                  bind:value={typedModelData.instruction[selectedLang]}
+                ></textarea>
+              </div>
             </div>
           {/each}
         {/if}
