@@ -12,7 +12,7 @@
   "header.about": "About",
   "nav.settings": "SETTINGS",
   "nav.settings.prompts": "Prompts",
-  "nav.settings.instructions": "Instructions",
+  "nav.settings.instructions": "Instructions Setting",
   "nav.settings.knowledge-base": "Knowledge Base",
   "nav.settings.categories": "Categories",
   "nav.settings.audio": "Audio Instructions",
@@ -581,5 +581,7 @@
   "nav.create-image.nano-banana": "Nano Banana",
   "create-image.create-nano-banana-image-title": "Create Nano Banana Image",
   "create-image.create-nano-banana-image-description": "Create images from the latest and most popular model from Gemini",
-  "tenant.image-creation.nano-banana": "Nano Banana"
+  "tenant.image-creation.nano-banana": "Nano Banana",
+  "instructions.title": "Instructions Setting",
+  "instructions.select-language": "Select languages"
 }

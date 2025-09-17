@@ -1,6 +1,9 @@
 <script lang="ts">
+  import { useTranslations } from "$i18n/utils";
   import { preventDefault } from "$utils/common";
   import { onMount } from "svelte";
+
+  const t = useTranslations();
 
   interface Props {
     instructions: Array<any>;
@@ -8,20 +11,20 @@
 
   let { instructions }: Props = $props();
 
-  let currentLang: string = $state("en");
+  let selectedLang: string = $state("en");
 
   let formData = instructions;
 
-  // Handle language change event
-  function handleLangChange(event: Event) {
-    const customEvent = event as CustomEvent<{ lang: string }>;
-    if (customEvent.detail && customEvent.detail.lang) {
-      currentLang = customEvent.detail.lang;
-    }
+  function switchLanguage(langEvent: Event) {
+    const target = langEvent.target as HTMLSelectElement;
+    selectedLang = target.value;
+    console.log("Switching language to", selectedLang);
   }
 
   // Handle saving data to the backend
   async function saveInstructions() {
+    alert("Saving instructions...");
+    return;
     try {
       const response = await fetch("/api/instructions", {
         method: "POST",
@@ -39,11 +42,22 @@
     }
   }
 
-  // This part connects the language selector to this component
-  onMount(() => {
-    window.addEventListener("langChange", handleLangChange);
-  });
+  onMount(() => {});
 </script>
+
+<div class="form-control">
+  <label class="label" for="language-select">
+    <span class="label-text">{t("instructions.select-language")}</span>
+  </label>
+  <select
+    onchange={(event) => switchLanguage(event)}
+    value={selectedLang}
+    class="select select-bordered w-full max-w-xs"
+  >
+    <option value="en">English</option>
+    <option value="de">German</option>
+  </select>
+</div>
 
 <form onsubmit={preventDefault(saveInstructions)}>
   {#each formData as providerData}
@@ -56,14 +70,14 @@
         <div class="form-control">
           <label
             class="label"
-            for={`default-instruction-${providerData.provider}-${currentLang}`}
+            for={`default-instruction-${providerData.provider}-${selectedLang}`}
           >
-            <span class="label-text">Default Instruction ({currentLang})</span>
+            <span class="label-text">Default Instruction ({selectedLang})</span>
           </label>
           <textarea
-            id={`default-instruction-${providerData.provider}-${currentLang}`}
+            id={`default-instruction-${providerData.provider}-${selectedLang}`}
             class="textarea textarea-bordered h-24"
-            bind:value={providerData.instruction[currentLang]}
+            bind:value={providerData.instruction[selectedLang]}
           ></textarea>
         </div>
 
@@ -77,15 +91,16 @@
             <div class="form-control">
               <label
                 class="label"
-                for={`model-instruction-${providerData.provider}-${modelName}-${currentLang}`}
+                for={`model-instruction-${providerData.provider}-${modelName}-${selectedLang}`}
               >
-                <span class="label-text">Model Instruction ({currentLang})</span
+                <span class="label-text"
+                  >Model Instruction ({selectedLang})</span
                 >
               </label>
               <textarea
-                id={`model-instruction-${providerData.provider}-${modelName}-${currentLang}`}
+                id={`model-instruction-${providerData.provider}-${modelName}-${selectedLang}`}
                 class="textarea textarea-bordered h-24"
-                bind:value={typedModelData.instruction[currentLang]}
+                bind:value={typedModelData.instruction[selectedLang]}
               ></textarea>
             </div>
           {/each}
@@ -95,6 +110,6 @@
   {/each}
 
   <div class="mt-8 flex justify-end">
-    <button type="submit" class="btn btn-primary">Save Instructions</button>
+    <button type="submit" class="btn btn-primary">{t("common.save")}</button>
   </div>
 </form>
