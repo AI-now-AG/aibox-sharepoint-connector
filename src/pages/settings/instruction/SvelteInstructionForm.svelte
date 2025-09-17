@@ -68,8 +68,8 @@
       value={selectedLang}
       class="select select-bordered w-full max-w-xs"
     >
-      <option value="en">English</option>
-      <option value="de">German</option>
+      <option value="en">{t("tenant.english-language")}</option>
+      <option value="de">{t("tenant.german-language")}</option>
     </select>
   </div>
   <button
@@ -116,6 +116,7 @@
               instruction: Record<string, string>;
             }}
             <div class="divider"></div>
+
             <h3 class="font-bold text-lg text-secondary flex items-center">
               {modelName}
               <span class="text-xs text-gray-400 font-normal">
