@@ -2,26 +2,26 @@ import { defineAction } from "astro:actions";
 import { z } from "zod";
 import configurationModel from "$data/models/configuration.model";
 
-const instructionSchema = z.object({
+const InstructionSchema = z.object({
   en: z.string(),
   de: z.string(),
 });
 
-const modelInstructionSchema = z.record(
+const ModelInstructionSchema = z.record(
   z.string(), // Model Name
   z.object({
-    instruction: instructionSchema,
+    instruction: InstructionSchema,
   }),
 );
 
-const providerInstructionSchema = z.object({
+const ProviderInstructionSchema = z.object({
   provider: z.string(),
-  instruction: instructionSchema,
-  model: modelInstructionSchema.optional(),
+  instruction: InstructionSchema,
+  models: ModelInstructionSchema.optional(),
 });
 
 export const ConfigurationSchema = z.object({
-  defaultInstructions: z.array(providerInstructionSchema),
+  defaultInstructions: z.array(ProviderInstructionSchema),
 });
 
 const ConfigurationIdentifierSchema = z.object({

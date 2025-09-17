@@ -2,27 +2,27 @@ import { db, toObjectId } from "$data/mongodb";
 import { ObjectId } from "mongodb";
 import { z } from "zod";
 
-const instructionSchema = z.object({
+const InstructionSchema = z.object({
   en: z.string(),
   de: z.string(),
 });
 
-const modelInstructionSchema = z.record(
+const ModelInstructionSchema = z.record(
   z.string(), // Model Name
   z.object({
-    instruction: instructionSchema,
+    instruction: InstructionSchema,
   }),
 );
 
-const providerInstructionSchema = z.object({
+const ProviderInstructionSchema = z.object({
   provider: z.string(),
-  instruction: instructionSchema,
-  model: modelInstructionSchema.optional(),
+  instruction: InstructionSchema,
+  models: ModelInstructionSchema.optional().default({}),
 });
 
 export const ConfigurationSchema = z.object({
   _id: z.instanceof(ObjectId),
-  defaultInstructions: z.array(providerInstructionSchema),
+  defaultInstructions: z.array(ProviderInstructionSchema),
 });
 
 export type Configuration = z.infer<typeof ConfigurationSchema>;

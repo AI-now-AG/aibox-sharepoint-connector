@@ -57,7 +57,7 @@
 </script>
 
 <div
-  class="sticky top-0 right-0 z-50 p-4 bg-white flex justify-between items-center shadow-lg"
+  class="sticky top-0 right-0 z-50 p-4 bg-base-100 flex justify-between items-center shadow-lg"
 >
   <div class="form-control">
     <label class="label mb-2" for="language-select">
@@ -85,7 +85,7 @@
   {#each formData as providerData}
     <div class="card shadow-lg my-6">
       <div
-        class={`card-body ${providerData.provider === "default" ? "bg-yellow-50" : ""} rounded-xl`}
+        class={`card-body ${providerData.provider === "default" ? "bg-yellow-50" : "bg-base-100"} rounded-xl`}
       >
         <h1 class="card-title capitalize text-2xl font-extrabold text-primary">
           {providerData.provider}
@@ -110,8 +110,8 @@
           </div>
         </div>
 
-        {#if providerData.model}
-          {#each Object.entries(providerData.model) as [modelName, modelData]}
+        {#if providerData.models}
+          {#each Object.entries(providerData.models) as [modelName, modelData]}
             {@const typedModelData = modelData as {
               instruction: Record<string, string>;
             }}
@@ -119,7 +119,7 @@
 
             <h3 class="font-bold text-lg text-secondary flex items-center">
               {modelName}
-              <span class="text-xs text-gray-400 font-normal">
+              <span class="text-xs text-gray-400 font-normal ml-2">
                 ({t(
                   "instructions.leave-model-instruction-empty-to-use-default-instruction",
                 )})
