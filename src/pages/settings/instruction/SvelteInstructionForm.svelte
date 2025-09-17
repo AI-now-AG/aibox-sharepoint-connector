@@ -45,9 +45,9 @@
   onMount(() => {});
 </script>
 
-<div class="sticky top-0 right-0 z-50 p-4 bg-base-100/90 backdrop-blur-sm flex justify-between items-center shadow-lg">
+<div class="sticky top-0 right-0 z-50 p-4 bg-white flex justify-between items-center shadow-lg">
   <div class="form-control">
-    <label class="label" for="language-select">
+    <label class="label mb-2" for="language-select">
       <span class="label-text">{t("instructions.select-language")}</span>
     </label>
     <select
