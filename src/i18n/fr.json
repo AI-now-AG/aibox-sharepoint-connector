@@ -12,7 +12,7 @@
   "header.about": "About",
   "nav.settings": "SETTINGS",
   "nav.settings.prompts": "Prompts",
-  "nav.settings.instructions": "Instructions Setting",
+  "nav.settings.instructions": "System Messages",
   "nav.settings.knowledge-base": "Knowledge Base",
   "nav.settings.categories": "Categories",
   "nav.settings.audio": "Audio Instructions",
@@ -582,11 +582,11 @@
   "create-image.create-nano-banana-image-title": "Create Nano Banana Image",
   "create-image.create-nano-banana-image-description": "Create images from the latest and most popular model from Gemini",
   "tenant.image-creation.nano-banana": "Nano Banana",
-  "instructions.title": "Instructions Setting",
-  "instructions.select-language": "Select languages",
-  "instructions.update-instructions-setting-successfull": "Update Instructions setting successfull",
-  "instructions.update-instructions-setting-failed": "Update Instructions setting failed",
-  "instructions.default-instruction": "Default instruction",
-  "instructions.model-instruction": "Model Instruction",
-  "instructions.leave-model-instruction-empty-to-use-default-instruction": "Leave Model Instruction empty to use Default Instruction"
+  "instructions.title": "System Messages",
+  "instructions.select-language": "Select language",
+  "instructions.update-instructions-setting-successfull": "System message updated successfully",
+  "instructions.update-instructions-setting-failed": "Update system message failed",
+  "instructions.default-instruction": "Default System Message",
+  "instructions.model-instruction": "Model System Message",
+  "instructions.leave-model-instruction-empty-to-use-default-instruction": " "
 }
