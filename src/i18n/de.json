@@ -569,6 +569,8 @@
   "subtitle-editor.subtitle-appearance": "Aussehen",
   "subtitle-editor.font-size": "Schriftgrösse",
   "subtitle-editor.background-opacity": "Hintergrund",
+  "subtitle-editor.auto-saved": "Automatisch gespeichert",
+  "subtitle-editor.auto-saved-data-loaded": "Automatisch gespeicherte Daten geladen",
   "conversation.my-ai-box-nav-title": "MEINE AIBOX ",
   "conversation.show-more": "Alle Chats",
   "conversation.remove-from-my-ai-box": "Aus Liste löschen",
