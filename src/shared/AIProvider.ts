@@ -71,7 +71,7 @@ export const GeminiPromptTools = [
 
 export function getPromptTools(promptModel: PromptModel) {
   switch (promptModel) {
-    // case PromptModel.OpenAI:
+    case PromptModel.OpenAI:
     case PromptModel.OpenAIWithTools:
     case PromptModel.OpenAIWithImageTools:
       return Gpt4oPromptTools;
