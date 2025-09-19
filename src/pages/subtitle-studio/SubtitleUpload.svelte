@@ -275,7 +275,7 @@
   // Handle preloaded files and audio
   onMount(async () => {
     // Load auto-saved data if exists
-    if(!srtFileUrl && !assFileUrl) {
+    if(!srtFileUrl || !assFileUrl) {
       loadAutoSavedData();
     }
     // Load preloaded audio file if URL provided
