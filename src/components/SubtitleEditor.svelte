@@ -79,6 +79,11 @@
   let deleteConfirmModal = $state<HTMLDialogElement>();
   let deleteIndex = $state<number | null>(null);
 
+  // Auto-save state
+  let autoSaveEnabled = $state(true);
+  let autoSaveTimeout = $state<number | null>(null);
+  let lastSavedTimestamp = $state<number | null>(null);
+
   // Drag and drop handlers for media upload
   function onDragOver(event: DragEvent) {
     event.preventDefault();
@@ -117,6 +122,7 @@
 
   onMount(async () => {
     await loadSubtitleData();
+    loadAutoSavedData();
     setupMediaSource();
     setupKeyboardHandlers();
   });
@@ -456,6 +462,7 @@
     searchText = "";
     replaceText = "";
     dialogues = [...dialogues];
+    triggerAutoSave();
   }
 
   function deleteRow(index: number) {
@@ -474,6 +481,7 @@
       deleteIndex = null;
     }
     deleteConfirmModal?.close();
+    triggerAutoSave();
   }
 
   function addRowAfter(index: number) {
@@ -489,6 +497,54 @@
     dialogues = [...dialogues];
     statusText = t("subtitle-editor.subtitle-added", { index: index + 1 });
     setTimeout(() => (statusText = ""), 3000);
+    triggerAutoSave();
+  }
+
+  // Auto-save functionality
+  function triggerAutoSave() {
+    if (!autoSaveEnabled || dialogues.length === 0) return;
+
+    // Clear existing timeout
+    if (autoSaveTimeout) {
+      clearTimeout(autoSaveTimeout);
+    }
+
+    // Set new timeout for auto-save (1 second delay)
+    autoSaveTimeout = setTimeout(() => {
+      try {
+        const data = {
+          dialogues: dialogues,
+          timestamp: new Date().toISOString(),
+          mediaFileName: mediaFileName,
+          assFileUrl: assFileUrl,
+          srtFileUrl: srtFileUrl,
+        };
+
+        localStorage.setItem('subtitle-editor-autosave', JSON.stringify(data));
+        lastSavedTimestamp = Date.now();
+        autoSaveTimeout = null;
+      } catch (error) {
+        console.error("Auto-save error:", error);
+      }
+    }, 1000);
+  }
+
+  // Load auto-saved data on component mount
+  function loadAutoSavedData() {
+    try {
+      const stored = localStorage.getItem('subtitle-editor-autosave');
+      if (stored) {
+        const data = JSON.parse(stored);
+        dialogues = data.dialogues || [];
+        mediaFileName = data.mediaFileName || "";
+        assFileUrl = data.assFileUrl || "";
+        srtFileUrl = data.srtFileUrl || "";
+        statusText = t("subtitle-editor.auto-saved-data-loaded");
+        setTimeout(() => (statusText = ""), 3000);
+      }
+    } catch (error) {
+      console.error("Error loading auto-saved data:", error);
+    }
   }
 
   async function exportSubtitles() {
@@ -793,6 +849,7 @@
                       type="text"
                       bind:value={dialogue.start}
                       onclick={(e) => e.stopPropagation()}
+                      oninput={triggerAutoSave}
                       class="input w-full min-w-30 {currentRowIndex === index
                         ? 'input-bordered bg-base-100 text-base-content'
                         : ''}"
@@ -806,6 +863,7 @@
                       oninput={() => {
                         // Trigger reactivity for character count updates
                         updateTrigger++;
+                        triggerAutoSave();
                       }}
                       class="textarea w-full resize-none leading-tight py-1 px-2 min-h-0 {currentRowIndex ===
                       index
@@ -822,6 +880,7 @@
                       type="text"
                       bind:value={dialogue.end}
                       onclick={(e) => e.stopPropagation()}
+                      oninput={triggerAutoSave}
                       class="input w-full min-w-30 {currentRowIndex === index
                         ? 'input-bordered bg-base-100 text-base-content'
                         : ''}"
