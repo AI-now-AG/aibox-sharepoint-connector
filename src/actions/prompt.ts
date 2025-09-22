@@ -63,13 +63,11 @@ export const prompt = {
         let chatModel
         switch (aiProvider) {
           case Provider.Perplexity:
-            chatModel = initializeOpenAI(context)
-            break
           case Provider.Claude:
           case Provider.Gemini:
           case Provider.OpenAI:
           default:
-            chatModel = initializeOpenAI(context, { customProvider: Provider.OpenAI })
+            chatModel = initializeOpenAI(context)
             break
         }
         const messages = [
