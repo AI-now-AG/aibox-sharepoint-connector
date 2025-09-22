@@ -2,7 +2,7 @@ export enum Provider {
   Azure = "azure",
   OpenAI = "openai",
   Claude = "claude",
-  Google = "google",
+  Gemini = "gemini",
   Perplexity = "perplexity",
   ElevenLabs = "elevenlabs",
   Flux = "flux",
