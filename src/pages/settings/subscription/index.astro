@@ -8,6 +8,11 @@ import { useTranslations } from "$i18n/utils";
 const t = useTranslations();
 
 let userPermissions = Astro.locals.user.permissions;
+const hasPermission = userPermissions.includes(Permission.AdminAll);
+
+if (!hasPermission) {
+  return Astro.redirect("/restricted");
+}
 
 const { tenant } = Astro.locals;
 const { billing_method: billingMethod, billing_info: billingInfo } = tenant;
@@ -23,17 +28,13 @@ const addOns = subscription?.add_ons ?? [];
       {t("nav.subscription")}
     </h1>
     <div class="mt-5">
-      {
-        userPermissions.includes(Permission.AdminAll) && (
-          <SubscriptionInfo
-            {billingMethod}
-            {billingInfo}
-            {planName}
-            {addOns}
-            client:load
-          />
-        )
-      }
+      <SubscriptionInfo
+        {billingMethod}
+        {billingInfo}
+        {planName}
+        {addOns}
+        client:load
+      />
     </div>
   </div>
 </Layout>

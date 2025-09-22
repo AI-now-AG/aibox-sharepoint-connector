@@ -3,6 +3,10 @@
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
   import SubtitleEditor from "$components/SubtitleEditor.svelte";
+  import {
+    generateASSContent,
+    generateSRTContent,
+  } from "$utils/subtitleParser";
 
   const t = useTranslations();
 
@@ -45,7 +49,7 @@
     uploadedFile?.type === "srt" ? uploadedFile.url : preloadedSrtUrl,
   );
   let hasFiles = $derived(
-    !!uploadedFile || !!(preloadedAssUrl || preloadedSrtUrl),
+    !!uploadedFile || !!(preloadedAssUrl || preloadedSrtUrl) || !!(preloadedAssUrl && preloadedSrtUrl),
   );
 
   // File validation
@@ -200,10 +204,66 @@
     return (bytes / 1024 / 1024).toFixed(2);
   }
 
+  // Load auto-saved data from localStorage
+  function loadAutoSavedData() {
+    try {
+      const stored = localStorage.getItem('subtitle-editor-autosave');
+      if (stored) {
+        const data = JSON.parse(stored);
+
+        // Create blob URLs for the saved subtitle content
+        if (data.dialogues && data.dialogues.length > 0) {
+          // Generate ASS content from dialogues
+          const assContent = generateASSContent(data.dialogues);
+          const assBlob = new Blob([assContent], { type: 'text/plain;charset=utf-8' });
+          preloadedAssUrl = URL.createObjectURL(assBlob);
+
+          // Generate SRT content from dialogues
+          const srtContent = generateSRTContent(data.dialogues);
+          const srtBlob = new Blob([srtContent], { type: 'text/plain;charset=utf-8' });
+          preloadedSrtUrl = URL.createObjectURL(srtBlob);
+
+          console.log("Auto-saved subtitle data loaded from localStorage");
+        }
+      }
+    } catch (error) {
+      console.error("Error loading auto-saved data:", error);
+    }
+  }
+
+  // Clear auto-saved data
+  function clearAutoSavedData() {
+    try {
+      localStorage.removeItem('subtitle-editor-autosave');
+
+      // Clean up blob URLs
+      if (preloadedAssUrl && preloadedAssUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(preloadedAssUrl);
+      }
+      if (preloadedSrtUrl && preloadedSrtUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(preloadedSrtUrl);
+      }
+
+      preloadedAssUrl = "";
+      preloadedSrtUrl = "";
+
+      console.log("Auto-saved data cleared");
+    } catch (error) {
+      console.error("Error clearing auto-saved data:", error);
+    }
+  }
+
   // Cleanup URLs on component destroy
   function cleanup() {
     if (uploadedFile) {
       URL.revokeObjectURL(uploadedFile.url);
+    }
+    // Clean up auto-saved URLs
+    if (preloadedAssUrl && preloadedAssUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(preloadedAssUrl);
+    }
+    if (preloadedSrtUrl && preloadedSrtUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(preloadedSrtUrl);
     }
   }
 
@@ -214,6 +274,12 @@
 
   // Handle preloaded files and audio
   onMount(async () => {
+    // Load auto-saved data if exists
+    if(srtFileUrl || assFileUrl) {
+      cleanup();
+    } else {
+      loadAutoSavedData();
+    }
     // Load preloaded audio file if URL provided
     if (audioFileUrl && audioFileName) {
       isLoadingAudio = true;
@@ -232,7 +298,7 @@
       }
     }
 
-    // Auto-open editor if we have preloaded subtitle files
+    // Auto-open editor if we have preloaded subtitle files or auto-saved data
     if (preloadedAssUrl || preloadedSrtUrl) {
       openEditor();
     }
@@ -429,38 +495,54 @@
             </div>
           {/if}
 
-          <!-- Uploaded File -->
-          {#if uploadedFile}
+          <!-- Auto-saved Files -->
+          {#if preloadedAssUrl && preloadedSrtUrl && !uploadedFile}
             <div
-              class="file-item flex items-center justify-between p-2 border rounded-lg bg-accent/30"
+              class="file-item flex items-center justify-between p-2 border rounded-lg bg-warning/20"
             >
               <div class="flex items-center">
                 <div class="shrink-0 p-2 rounded-md">
-                  {@html svgIcons.document}
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path
+                      d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M11,6V8H13V6H11M11,10V18H13V10H11Z"
+                    />
+                  </svg>
                 </div>
                 <div class="ml-4">
-                  <p class="font-medium">{uploadedFile.file.name}</p>
+                  <p class="font-medium">
+                    {t("subtitle-editor.auto-saved-data")}
+                  </p>
                   <p class="text-sm text-base-content/60">
-                    {formatFileSize(uploadedFile.file.size)} MB • {uploadedFile.type.toUpperCase()}
+                    {t("subtitle-editor.recovered-from-local-storage")}
                   </p>
                 </div>
               </div>
-              <button
-                class="btn btn-ghost btn-sm hover:bg-error/20 hover:text-error transition-all duration-200"
-                onclick={removeFile}
-                aria-label="Remove file"
-              >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
+              <div class="flex items-center gap-2">
+                <div class="badge badge-warning badge-sm">
+                  {t("subtitle-editor.auto-saved")}
+                </div>
+                <button
+                  class="btn btn-ghost btn-sm hover:bg-error/20 hover:text-error transition-all duration-200"
+                  onclick={clearAutoSavedData}
+                  aria-label="Clear auto-saved data"
                 >
-                  <path
-                    d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"
-                  />
-                </svg>
-              </button>
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path
+                      d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"
+                    />
+                  </svg>
+                </button>
+              </div>
             </div>
           {/if}
         </div>

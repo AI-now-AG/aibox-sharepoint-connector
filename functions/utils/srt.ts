@@ -174,12 +174,14 @@ export const groupLines = (data: Entry[]): Entry[] => {
     let nextEntry = i + 1 < data.length ? data[i + 1] : null;
     const nextToNextEntry = i + 2 < data.length ? data[i + 2] : null;
 
-    const currentText = carryOverGroup?.text
-      ? `${carryOverGroup.text} ${currentEntry.text || ""}`
-      : currentEntry.text || "";
-    const currentStart = carryOverGroup?.start || currentEntry.start;
+    // const currentText = carryOverGroup?.text
+    //   ? `${carryOverGroup.text} ${currentEntry.text || ""}`
+    //   : currentEntry.text || "";
+    // const currentStart = carryOverGroup?.start || currentEntry.start;
+    const currentText = currentEntry.text || "";
+    const currentStart = currentEntry.start;
 
-    carryOverGroup = nextEntry ? handleCarryOver(nextEntry) : null;
+    // carryOverGroup = nextEntry ? handleCarryOver(nextEntry) : null;
     if (nextEntry) {
       const shouldNullifyNext = adjustEntryEnd(
         currentEntry,

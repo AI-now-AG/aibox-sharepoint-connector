@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useTranslations } from "$i18n/utils";
-import { PromptToolOption } from "$types/AIProvider";
+import { PromptToolOption, Provider } from "$types/AIProvider";
 import { PromptModel } from "$types/PromptModel";
 import { ApiKeyProvider } from "$types/TenantFeature";
 import { svgIcons } from "$assets/icons";
@@ -81,6 +81,23 @@ export function getPromptTools(promptModel: PromptModel) {
       return GeminiPromptTools;
     default:
       return undefined;
+  }
+}
+
+export function getProviderFromPromptModel(promptModel: PromptModel) {
+  switch (promptModel) {
+    case PromptModel.Perplexity:
+      return Provider.Perplexity;
+    case PromptModel.Claude:
+      return Provider.Claude;
+    case PromptModel.Gemini:
+      return Provider.Gemini;
+    case PromptModel.OpenAI:
+    case PromptModel.OpenAIWithTools:
+    case PromptModel.OpenAIWithImageTools:
+    case PromptModel.OpenAIGpt5:
+    default:
+      return Provider.OpenAI;
   }
 }
 

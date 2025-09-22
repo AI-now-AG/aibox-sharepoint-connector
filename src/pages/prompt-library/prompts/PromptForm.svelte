@@ -16,9 +16,15 @@
     ReasoningEffortOption,
     TextVerbosityOption,
   } from "$types/AIProvider";
-  import { getPromptTools, useProviderInfo } from "$shared/AIProvider";
+  import {
+    getPromptTools,
+    getProviderFromPromptModel,
+    useProviderInfo,
+  } from "$shared/AIProvider";
   import { tenant } from "$stores";
-  import { formatMarkdown } from "$utils/textFormatting";
+  import { normalizeTextToHtml } from "$utils/textFormatting";
+  import { actions } from "astro:actions";
+  import Loading from "$components/Loading.svelte";
 
   const t = useTranslations();
 
@@ -56,6 +62,7 @@
   });
 
   let promptTitle = $state("");
+  let initHtml = $state("");
   let promptText = $state("");
   let promptPredefinedInput = $state("");
 
@@ -74,6 +81,7 @@
   }: Props = $props();
 
   let isSaving = $state(false);
+  let isLoading = $state(false);
 
   const providerIno = useProviderInfo($tenant);
   let promptTools: Array<any> = $derived(
@@ -95,7 +103,8 @@
     await fetchInstructionAndKB();
     if (prompt) {
       promptTitle = prompt.title;
-      promptText = formatMarkdown(prompt.prompt);
+      initHtml = normalizeTextToHtml(prompt.prompt);
+      promptText = normalizeTextToHtml(prompt.prompt);
       promptPredefinedInput = prompt.predefined_input;
 
       const category = categories.find(
@@ -197,6 +206,40 @@
       event.preventDefault();
     }
   }
+
+  async function improvePromptInstruction() {
+    try {
+      const originInstruction = promptText;
+      isLoading = true;
+      const { data, error } = await actions.prompt.improvePrompt({
+        llmSystemMessage: promptText,
+        improveForLLM: getProviderFromPromptModel(selectedModel as PromptModel),
+      });
+      if (error) {
+        console.error("improvePromptInstruction error", error);
+        addToast({ type: "error", message: error?.toString() });
+      } else {
+        initHtml = normalizeTextToHtml(data);
+        promptText = normalizeTextToHtml(data);
+        addToast({
+          type: "success",
+          message: t(
+            "prompt-library.add.prompts.instructions.toast-completed-improvement",
+          ),
+        });
+
+        console.log({
+          originInstruction,
+          improvedInstruction: data,
+        });
+      }
+    } catch (error: any) {
+      addToast({ type: "error", message: error?.toString() });
+      console.error("improvePromptInstruction exception", error);
+    } finally {
+      isLoading = false;
+    }
+  }
 </script>
 
 <div class="container max-w-5xl mx-auto p-4">
@@ -248,16 +291,30 @@
         {/if}
       </div>
 
-      <div class="mb-4">
+      <div class="mb-4 relative">
         <p class="mb-2">{t("prompt-library.add.prompts.instructions")}*</p>
-        <TextEditor
-          oncreate={() => {
-            setTimeout(() => {
-              titleInput?.focus({ preventScroll: true });
-            }, 100);
-          }}
-          bind:html={promptText}
-        />
+        {#key initHtml}
+          <TextEditor
+            oncreate={() => {
+              setTimeout(() => {
+                titleInput?.focus({ preventScroll: true });
+              }, 100);
+            }}
+            bind:html={promptText}
+            cssClass=" mt-6"
+          />
+          <button
+            class="btn absolute top-0 right-0 flex"
+            onclick={preventDefault(improvePromptInstruction)}
+          >
+            <span class="">{@html svgIcons.aitool}</span>
+            <span class="text-sm font-bold"
+              >{t(
+                "prompt-library.add.prompts.instructions.improve-instruction",
+              )}</span
+            >
+          </button>
+        {/key}
       </div>
 
       <div class="mb-4">
@@ -379,3 +436,5 @@
     </form>
   </div>
 </div>
+
+<Loading show={isLoading} />
