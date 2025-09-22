@@ -591,6 +591,6 @@
   "instructions.default-instruction": "Default System Message",
   "instructions.model-instruction": "Model System Message",
   "instructions.leave-model-instruction-empty-to-use-default-instruction": "Leave model system message empty to use Default Instruction",
-  "prompt-library.add.prompts.instructions.toast-completed-improvement": "Completed Imrpovement",
+  "prompt-library.add.prompts.instructions.toast-completed-improvement": "Improvement completed!",
   "prompt-library.add.prompts.instructions.improve-instruction": "Improve Instruction"
 }
