@@ -24,12 +24,11 @@
     useProviderInfo,
   } from "$shared/AIProvider";
   import { tenant } from "$stores";
-  import { formatMarkdown } from "$utils/textFormatting";
+  import { normalizeTextToHtml } from "$utils/textFormatting";;
   import { actions } from "astro:actions";
   import Toast, {
     type ToastType,
   } from "$components/toast-notification/Toast.svelte";
-
   const t = useTranslations();
 
   interface Props {
@@ -156,8 +155,8 @@
       if (dialogMode == "clone") {
         promptTitle = promptTitle?.trim() + " (" + t("common.copy") + ")";
       }
-      promptText = formatMarkdown(promptDetails.prompt);
-      initHtml = formatMarkdown(promptDetails.prompt);
+      promptText = normalizeTextToHtml(promptDetails.prompt);
+      initHtml = normalizeTextToHtml(promptDetails.prompt);
       promptPredefinedInput = promptDetails.predefined_input;
 
       const category = categories.find(
@@ -305,8 +304,8 @@
         console.error("improvePromptInstruction error", error);
         showToast("error", error?.toString());
       } else {
-        promptText = formatMarkdown(data);
-        initHtml = formatMarkdown(data);
+        promptText = normalizeTextToHtml(data);
+        initHtml = normalizeTextToHtml(data);
         showToast("success", "Completed Imrpovement");
         console.log({
           originInstruction: promptDetails.prompt,

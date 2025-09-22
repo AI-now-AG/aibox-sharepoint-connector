@@ -1,3 +1,13 @@
+export enum Provider {
+  Azure = "azure",
+  OpenAI = "openai",
+  Claude = "claude",
+  Google = "google",
+  Perplexity = "perplexity",
+  ElevenLabs = "elevenlabs",
+  Flux = "flux",
+}
+
 export enum ModelName {
   // OpenAI
   Gpt4o = "gpt-4o", // Text & Tools (Image) (Azure)

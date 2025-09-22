@@ -8,8 +8,8 @@ const tenantId = Astro.locals.tenant?._id?.toString();
 
 const hasPermission = auth.hasFeatureWithProvider(
   Astro.locals,
-  TenantFeature.GptImage,
-  ApiKeyProvider.OpenAI
+  TenantFeature.CreateImage,
+  ApiKeyProvider.Gemini
 );
 if (!hasPermission) {
   return Astro.redirect("/restricted");

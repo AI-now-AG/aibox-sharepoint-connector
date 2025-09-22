@@ -7,7 +7,7 @@
   import { AudioCategory } from "$types/TenantFeature";
   import { onMount } from "svelte";
   import { preventDefault } from "$utils/common";
-  import { formatMarkdown } from "$utils/textFormatting";
+  import { normalizeTextToHtml } from "$utils/textFormatting";
   import TextEditor from "$components/form/TextEditor.svelte";
   const t = useTranslations();
 
@@ -35,7 +35,7 @@
     mode: screenMode,
   }: Props = $props();
 
-  instructionText = formatMarkdown(instructionText);
+  instructionText = normalizeTextToHtml(instructionText);
 
   let titleInput: HTMLInputElement | undefined = $state();
 
