@@ -590,5 +590,7 @@
   "instructions.update-instructions-setting-failed": "Anpassung System Message fehlgeschlagen",
   "instructions.default-instruction": "Default System Message",
   "instructions.model-instruction": "Model System Message",
-  "instructions.leave-model-instruction-empty-to-use-default-instruction": "Model System Message leer lassen, um default System Message zu verwenden"
+  "instructions.leave-model-instruction-empty-to-use-default-instruction": "Model System Message leer lassen, um default System Message zu verwenden",
+  "prompt-library.add.prompts.instructions.toast-completed-improvement": "Instruktion wurde verbessert",
+  "prompt-library.add.prompts.instructions.improve-instruction": "Instruktion verbessern"
 }

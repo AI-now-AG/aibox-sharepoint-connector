@@ -8,6 +8,7 @@ import { UsageTrackerCallbackHandler } from "$callbackLLM/UsageTrackerCallbackHa
 import { UsageType } from "$types/UsageTracking";
 
 interface ChatConfigOverrides {
+  customProvider?: string;
   customModel?: string;
 }
 
@@ -84,7 +85,7 @@ export const initializeOpenAI = (
 ) => {
   const { tenant } = ctx.locals;
   const { included_features: features } = ctx.locals.tenant;
-  const { customModel } = overrides || {};
+  const { customModel, customProvider } = overrides || {};
 
   // Find the text prompts feature in enabled features
   const textPromptsProvider = features?.find(
@@ -92,7 +93,7 @@ export const initializeOpenAI = (
   );
 
   // Determine API provider based on enabled features
-  let provider = textPromptsProvider
+  let provider = customProvider ? customProvider : textPromptsProvider
     ? textPromptsProvider.provider
     : ApiKeyProvider.OpenAI;
 
