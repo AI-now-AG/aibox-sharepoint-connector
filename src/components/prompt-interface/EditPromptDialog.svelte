@@ -14,7 +14,6 @@
   import { PromptModel } from "$types/PromptModel";
   import {
     PromptToolOption,
-    Provider,
     ReasoningEffortOption,
     TextVerbosityOption,
   } from "$types/AIProvider";
@@ -24,7 +23,7 @@
     useProviderInfo,
   } from "$shared/AIProvider";
   import { tenant } from "$stores";
-  import { normalizeTextToHtml } from "$utils/textFormatting";;
+  import { normalizeTextToHtml } from "$utils/textFormatting";
   import { actions } from "astro:actions";
   import Toast, {
     type ToastType,
@@ -306,7 +305,12 @@
       } else {
         promptText = normalizeTextToHtml(data);
         initHtml = normalizeTextToHtml(data);
-        showToast("success", "Completed Imrpovement");
+        showToast(
+          "success",
+          t(
+            "prompt-library.add.prompts.instructions.toast-completed-improvement",
+          ),
+        );
         console.log({
           originInstruction: promptDetails.prompt,
           improvedInstruction: data,
@@ -362,7 +366,11 @@
             onclick={preventDefault(improvePromptInstruction)}
           >
             <span class="">{@html svgIcons.aitool}</span>
-            <span class="text-sm font-bold">Improve Instructions</span>
+            <span class="text-sm font-bold"
+              >{t(
+                "prompt-library.add.prompts.instructions.improve-instruction",
+              )}</span
+            >
           </button>
         {/key}
       </div>

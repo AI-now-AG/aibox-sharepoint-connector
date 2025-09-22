@@ -569,8 +569,6 @@
   "subtitle-editor.subtitle-appearance": "Appearance",
   "subtitle-editor.font-size": "Font size",
   "subtitle-editor.background-opacity": "Background",
-  "subtitle-editor.auto-saved": "Auto-saved",
-  "subtitle-editor.auto-saved-data-loaded": "Auto-saved data loaded",
   "conversation.my-ai-box-nav-title": "MY AIBOX ",
   "conversation.show-more": "Show all chats",
   "conversation.remove-from-my-ai-box": "Remove from list",
@@ -584,11 +582,15 @@
   "create-image.create-nano-banana-image-title": "Create Nano Banana Image",
   "create-image.create-nano-banana-image-description": "Create images from the latest and most popular model from Gemini",
   "tenant.image-creation.nano-banana": "Nano Banana",
+  "subtitle-editor.auto-saved": "Auto-saved",
+  "subtitle-editor.auto-saved-data-loaded": "Auto-saved data loaded",
   "instructions.title": "System Messages",
   "instructions.select-language": "Select language",
   "instructions.update-instructions-setting-successfull": "System message updated successfully",
   "instructions.update-instructions-setting-failed": "Update system message failed",
   "instructions.default-instruction": "Default System Message",
   "instructions.model-instruction": "Model System Message",
-  "instructions.leave-model-instruction-empty-to-use-default-instruction": " "
+  "instructions.leave-model-instruction-empty-to-use-default-instruction": " ",
+  "prompt-library.add.prompts.instructions.toast-completed-improvement": " ",
+  "prompt-library.add.prompts.instructions.improve-instruction": " "
 }
