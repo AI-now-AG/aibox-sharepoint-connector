@@ -79,6 +79,11 @@
   let deleteConfirmModal = $state<HTMLDialogElement>();
   let deleteIndex = $state<number | null>(null);
 
+  // Auto-save state
+  let autoSaveEnabled = $state(true);
+  let autoSaveTimeout = $state<number | null>(null);
+  let lastSavedTimestamp = $state<number | null>(null);
+
   // Drag and drop handlers for media upload
   function onDragOver(event: DragEvent) {
     event.preventDefault();
@@ -456,6 +461,7 @@
     searchText = "";
     replaceText = "";
     dialogues = [...dialogues];
+    triggerAutoSave();
   }
 
   function deleteRow(index: number) {
@@ -474,6 +480,7 @@
       deleteIndex = null;
     }
     deleteConfirmModal?.close();
+    triggerAutoSave();
   }
 
   function addRowAfter(index: number) {
@@ -489,7 +496,39 @@
     dialogues = [...dialogues];
     statusText = t("subtitle-editor.subtitle-added", { index: index + 1 });
     setTimeout(() => (statusText = ""), 3000);
+    triggerAutoSave();
   }
+
+  // Auto-save functionality
+  function triggerAutoSave() {
+    if (!autoSaveEnabled || dialogues.length === 0) return;
+
+    // Clear existing timeout
+    if (autoSaveTimeout) {
+      clearTimeout(autoSaveTimeout);
+    }
+
+    // Set new timeout for auto-save (1 second delay)
+    autoSaveTimeout = setTimeout(() => {
+      try {
+        const data = {
+          dialogues: dialogues,
+          timestamp: new Date().toISOString(),
+          mediaFileName: mediaFileName,
+          assFileUrl: assFileUrl,
+          srtFileUrl: srtFileUrl,
+        };
+
+        localStorage.setItem('subtitle-editor-autosave', JSON.stringify(data));
+        lastSavedTimestamp = Date.now();
+        autoSaveTimeout = null;
+      } catch (error) {
+        console.error("Auto-save error:", error);
+      }
+    }, 1000);
+  }
+
+  // Load auto-saved data on component mount
 
   async function exportSubtitles() {
     if (!onSave) return;
@@ -793,6 +832,7 @@
                       type="text"
                       bind:value={dialogue.start}
                       onclick={(e) => e.stopPropagation()}
+                      oninput={triggerAutoSave}
                       class="input w-full min-w-30 {currentRowIndex === index
                         ? 'input-bordered bg-base-100 text-base-content'
                         : ''}"
@@ -806,6 +846,7 @@
                       oninput={() => {
                         // Trigger reactivity for character count updates
                         updateTrigger++;
+                        triggerAutoSave();
                       }}
                       class="textarea w-full resize-none leading-tight py-1 px-2 min-h-0 {currentRowIndex ===
                       index
@@ -822,6 +863,7 @@
                       type="text"
                       bind:value={dialogue.end}
                       onclick={(e) => e.stopPropagation()}
+                      oninput={triggerAutoSave}
                       class="input w-full min-w-30 {currentRowIndex === index
                         ? 'input-bordered bg-base-100 text-base-content'
                         : ''}"

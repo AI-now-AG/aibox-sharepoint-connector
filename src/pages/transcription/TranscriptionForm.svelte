@@ -1041,9 +1041,15 @@
       params.set("assFile", assFileUrl);
     }
     if (audioFile) {
-      params.set("audioFile", tempUploadUrl);
+      params.set("audioFile", tempUploadUrl || URL.createObjectURL(audioFile));
       params.set("audioName", audioFile.name);
       params.set("hasAudio", "true");
+
+      // Optional: Use blob URL from local file (only works in same document, not across page navigation)
+      // const audioBlobUrl = URL.createObjectURL(audioFile);
+      // params.set("audioFile", audioBlobUrl);
+      // params.set("audioName", audioFile.name);
+      // params.set("hasAudio", "true");
     }
 
     const newURL = `/subtitle-studio/editor?${params.toString()}`;
