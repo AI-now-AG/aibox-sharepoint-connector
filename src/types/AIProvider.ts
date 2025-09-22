@@ -56,11 +56,3 @@ export enum PromptToolOption {
   Websearch = "websearch",
   Thinking = "thinking",
 }
-
-export enum Provider {
-  Default = "",
-  OpenAI = "openai",
-  Perplexity = "perplexity",
-  Claude = "claude",
-  Gemini = "gemini",
-}
