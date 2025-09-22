@@ -294,7 +294,7 @@
         />
       </div>
 
-      <div class="mb-4">
+      <div class="mb-4 relative">
         <p class="mb-2">{t("prompt-library.add.prompts.instructions")}*</p>
         {#key initHtml}
           <TextEditor
@@ -304,8 +304,17 @@
               }, 100);
             }}
             bind:html={promptText}
-            cssClass=" h-[200px]"
+            cssClass=" h-[200px] mt-6"
           />
+          <button
+            class="btn absolute top-0 right-0 flex"
+            onclick={() => {
+              alert("improve promt");
+            }}
+          >
+            <span class="">{@html svgIcons.aitool}</span>
+            <span class="text-sm font-bold">Improve Instructions</span>
+          </button>
         {/key}
       </div>
 
