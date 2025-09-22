@@ -3,7 +3,7 @@
   import { fade } from "svelte/transition";
 
   // Define the available toast types for type safety
-  type ToastType = "success" | "error" | "info";
+  export type ToastType = "success" | "error" | "info";
 
   interface Props {
     type?: ToastType | undefined;

@@ -14,12 +14,17 @@
   import { PromptModel } from "$types/PromptModel";
   import {
     PromptToolOption,
+    Provider,
     ReasoningEffortOption,
     TextVerbosityOption,
   } from "$types/AIProvider";
   import { getPromptTools, useProviderInfo } from "$shared/AIProvider";
   import { tenant } from "$stores";
   import { formatMarkdown } from "$utils/textFormatting";
+  import { actions } from "astro:actions";
+  import Toast, {
+    type ToastType,
+  } from "$components/toast-notification/Toast.svelte";
 
   const t = useTranslations();
 
@@ -74,6 +79,22 @@
 
   let isSaving = $state(false);
   let isLoading = $state(false);
+
+  let isShowToast = $state(false);
+  let toasData: any = $state();
+
+  function showToast(type: ToastType, message: string) {
+    toasData = { type, message };
+    isShowToast = true;
+    setTimeout(() => {
+      hideToast();
+    }, 1000);
+  }
+
+  function hideToast() {
+    isShowToast = false;
+    toasData = undefined;
+  }
 
   let titleInput: HTMLInputElement | undefined = $state();
 
@@ -268,10 +289,37 @@
       getPromptDetail(selectedEditPromptId);
     }
   });
+
+  async function improvePromptInstruction() {
+    try {
+      isLoading = true;
+      const { data, error } = await actions.prompt.improvePrompt({
+        improveForLLM: Provider.OpenAI,
+        llmSystemMessage: promptDetails.prompt,
+      });
+      if (error) {
+        console.error("improvePromptInstruction error", error);
+        showToast("error", error?.toString());
+      } else {
+        promptText = formatMarkdown(data)
+        initHtml = formatMarkdown(data)
+        showToast("success", "Completed Imrpovement");
+        console.log({
+          originInstruction: promptDetails.prompt,
+          improvedInstruction: data,
+        });
+      }
+    } catch (error: any) {
+      showToast("error", error.toString());
+      console.error("improvePromptInstruction exception", error);
+    } finally {
+      isLoading = false;
+    }
+  }
 </script>
 
 <dialog class="modal" bind:this={promptDialog}>
-  <div class="modal-box w-8/12 max-w-5xl">
+  <div class="modal-box w-8/12 max-w-5xl relative">
     <div class="flex justify-between">
       <h3 class="text-lg font-bold py-4">{dialogTitle}</h3>
       <button class="btn btn-sm btn-circle btn-ghost" onclick={cancelEdit}>
@@ -308,9 +356,7 @@
           />
           <button
             class="btn absolute top-0 right-0 flex"
-            onclick={() => {
-              alert("improve promt");
-            }}
+            onclick={preventDefault(improvePromptInstruction)}
           >
             <span class="">{@html svgIcons.aitool}</span>
             <span class="text-sm font-bold">Improve Instructions</span>
@@ -461,5 +507,10 @@
         </div>
       {/if}
     </form>
+    {#if isShowToast && toasData}
+      <Toast type={toasData.type} dismissible={true} dismiss={() => hideToast()}
+        >{toasData.message}</Toast
+      >
+    {/if}
   </div>
 </dialog>

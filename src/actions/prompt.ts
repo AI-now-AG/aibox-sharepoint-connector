@@ -14,10 +14,10 @@ const PromptListIdentifierSchema = z.array(
 );
 
 const PromptImprovementSchema = z.object({
-  instruction: z.string().min(1, "Prompt cannot be empty."),
+  instruction: z.string().optional(),
   aiProvider: z.nativeEnum(Provider).optional().default(Provider.OpenAI),
-  improveForLLM: z.string(),
-  llmSystemMessage: z.string().optional()
+  improveForLLM: z.nativeEnum(Provider),
+  llmSystemMessage: z.string().default(""),
 })
 
 
@@ -79,6 +79,7 @@ export const prompt = {
         const result = await chatModel.invoke(messages);
         const parser = new StringOutputParser();
         const improvedInstruction = await parser.invoke(result);
+        console.log({ originInstruction: llmSystemMessage, improvedInstruction })
         return improvedInstruction;
       } catch (error) {
         console.error('Error in improvePrompt action:', error);
