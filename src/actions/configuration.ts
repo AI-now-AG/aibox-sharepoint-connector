@@ -5,7 +5,8 @@ import ConfigurationModel, {
 } from "$data/models/configuration.model";
 
 export const ConfigurationSchema = z.object({
-  defaultInstructions: z.array(ProviderInstructionSchema),
+  defaultInstructions: z.array(ProviderInstructionSchema).optional(),
+  promptRefinementInstruction: z.string().optional(),
 });
 
 const ConfigurationIdentifierSchema = z.object({
@@ -17,9 +18,21 @@ export const configurations = {
     input: z.intersection(ConfigurationSchema, ConfigurationIdentifierSchema),
     handler: async (input) => {
       try {
-        await ConfigurationModel.update(input._id, {
-          defaultInstructions: input.defaultInstructions,
-        });
+        const update: Record<string, unknown> = {};
+
+        if (input.defaultInstructions !== undefined) {
+          update.defaultInstructions = input.defaultInstructions;
+        }
+        if (input.promptRefinementInstruction !== undefined) {
+          update.promptRefinementInstruction =
+            input.promptRefinementInstruction;
+        }
+
+        if (Object.keys(update).length === 0) {
+          throw new Error("No valid fields to update.");
+        }
+
+        await ConfigurationModel.update(input._id, update);
         return { success: true };
       } catch (error) {
         console.error("Failed to update instructions:", error);

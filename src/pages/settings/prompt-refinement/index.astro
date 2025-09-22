@@ -1,6 +1,6 @@
 ---
 import Layout from "$layouts/Layout.astro";
-import InstructionSettingForm from "./InstructionSettingForm.svelte";
+import PromptRefinementForm from "./PromptRefinementForm.svelte";
 import { useTranslations } from "$i18n/utils";
 import { actions } from "astro:actions";
 import { Permission } from "$types/Users";
@@ -14,16 +14,19 @@ if (!hasPermission) {
   return Astro.redirect("/restricted");
 }
 
-const { data } = await Astro.callAction(actions.configurations.get, {});
-const configuration = data;
+const { data: configuration } = await Astro.callAction(
+  actions.configurations.get,
+  {}
+);
 ---
 
 <Layout>
   <div class="container max-w-5xl mx-auto p-6 space-y-4">
-    <h1 class="text-4xl font-bold">{t("instructions.title")}</h1>
-    <InstructionSettingForm
-      instructions={configuration?.defaultInstructions ?? []}
+    <h1 class="text-4xl font-bold">{t("prompt-refinement.title")}</h1>
+    <PromptRefinementForm
       configurationId={configuration?._id.toString() ?? ""}
+      promptRefinementInstruction={configuration?.promptRefinementInstruction ||
+        ""}
       client:load
     />
   </div>
