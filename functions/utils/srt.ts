@@ -179,7 +179,7 @@ export const groupLines = (data: Entry[]): Entry[] => {
       : currentEntry.text || "";
     const currentStart = carryOverGroup?.start || currentEntry.start;
 
-    carryOverGroup = nextEntry ? handleCarryOver(nextEntry) : null;
+    // carryOverGroup = nextEntry ? handleCarryOver(nextEntry) : null;
     if (nextEntry) {
       const shouldNullifyNext = adjustEntryEnd(
         currentEntry,
