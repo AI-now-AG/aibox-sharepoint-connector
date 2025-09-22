@@ -15,7 +15,7 @@ const PromptListIdentifierSchema = z.array(
 
 const PromptImprovementSchema = z.object({
   instruction: z.string().optional(),
-  aiProvider: z.nativeEnum(Provider).optional().default(Provider.OpenAI),
+  aiProvider: z.nativeEnum(Provider).optional(),
   improveForLLM: z.nativeEnum(Provider),
   llmSystemMessage: z.string().default(""),
 })

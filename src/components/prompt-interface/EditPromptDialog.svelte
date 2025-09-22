@@ -18,7 +18,11 @@
     ReasoningEffortOption,
     TextVerbosityOption,
   } from "$types/AIProvider";
-  import { getPromptTools, useProviderInfo } from "$shared/AIProvider";
+  import {
+    getPromptTools,
+    getProviderFromPromptModel,
+    useProviderInfo,
+  } from "$shared/AIProvider";
   import { tenant } from "$stores";
   import { formatMarkdown } from "$utils/textFormatting";
   import { actions } from "astro:actions";
@@ -294,15 +298,15 @@
     try {
       isLoading = true;
       const { data, error } = await actions.prompt.improvePrompt({
-        improveForLLM: Provider.OpenAI,
         llmSystemMessage: promptDetails.prompt,
+        improveForLLM: getProviderFromPromptModel(selectedModel as PromptModel),
       });
       if (error) {
         console.error("improvePromptInstruction error", error);
         showToast("error", error?.toString());
       } else {
-        promptText = formatMarkdown(data)
-        initHtml = formatMarkdown(data)
+        promptText = formatMarkdown(data);
+        initHtml = formatMarkdown(data);
         showToast("success", "Completed Imrpovement");
         console.log({
           originInstruction: promptDetails.prompt,
