@@ -62,6 +62,7 @@
   });
 
   let promptTitle = $state("");
+  let initHtml = $state("");
   let promptText = $state("");
   let promptPredefinedInput = $state("");
 
@@ -102,6 +103,7 @@
     await fetchInstructionAndKB();
     if (prompt) {
       promptTitle = prompt.title;
+      initHtml = normalizeTextToHtml(prompt.prompt);
       promptText = normalizeTextToHtml(prompt.prompt);
       promptPredefinedInput = prompt.predefined_input;
 
@@ -217,6 +219,7 @@
         console.error("improvePromptInstruction error", error);
         addToast({ type: "error", message: error?.toString() });
       } else {
+        initHtml = normalizeTextToHtml(data);
         promptText = normalizeTextToHtml(data);
         addToast({
           type: "success",
@@ -290,26 +293,28 @@
 
       <div class="mb-4 relative">
         <p class="mb-2">{t("prompt-library.add.prompts.instructions")}*</p>
-        <TextEditor
-          oncreate={() => {
-            setTimeout(() => {
-              titleInput?.focus({ preventScroll: true });
-            }, 100);
-          }}
-          bind:html={promptText}
-          cssClass=" mt-6"
-        />
-        <button
-          class="btn absolute top-0 right-0 flex"
-          onclick={preventDefault(improvePromptInstruction)}
-        >
-          <span class="">{@html svgIcons.aitool}</span>
-          <span class="text-sm font-bold"
-            >{t(
-              "prompt-library.add.prompts.instructions.improve-instruction",
-            )}</span
+        {#key initHtml}
+          <TextEditor
+            oncreate={() => {
+              setTimeout(() => {
+                titleInput?.focus({ preventScroll: true });
+              }, 100);
+            }}
+            bind:html={promptText}
+            cssClass=" mt-6"
+          />
+          <button
+            class="btn absolute top-0 right-0 flex"
+            onclick={preventDefault(improvePromptInstruction)}
           >
-        </button>
+            <span class="">{@html svgIcons.aitool}</span>
+            <span class="text-sm font-bold"
+              >{t(
+                "prompt-library.add.prompts.instructions.improve-instruction",
+              )}</span
+            >
+          </button>
+        {/key}
       </div>
 
       <div class="mb-4">
