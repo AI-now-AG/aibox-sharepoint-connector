@@ -122,7 +122,6 @@
 
   onMount(async () => {
     await loadSubtitleData();
-    loadAutoSavedData();
     setupMediaSource();
     setupKeyboardHandlers();
   });
@@ -530,22 +529,6 @@
   }
 
   // Load auto-saved data on component mount
-  function loadAutoSavedData() {
-    try {
-      const stored = localStorage.getItem('subtitle-editor-autosave');
-      if (stored) {
-        const data = JSON.parse(stored);
-        dialogues = data.dialogues || [];
-        mediaFileName = data.mediaFileName || "";
-        assFileUrl = data.assFileUrl || "";
-        srtFileUrl = data.srtFileUrl || "";
-        statusText = t("subtitle-editor.auto-saved-data-loaded");
-        setTimeout(() => (statusText = ""), 3000);
-      }
-    } catch (error) {
-      console.error("Error loading auto-saved data:", error);
-    }
-  }
 
   async function exportSubtitles() {
     if (!onSave) return;
