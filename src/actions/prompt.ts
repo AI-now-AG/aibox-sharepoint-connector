@@ -57,6 +57,7 @@ export const prompt = {
 
       // eslint-disable-next-line prefer-const
       let { instruction = DEAULT_SYSTEM_INSTRCUTION_FOR_PROMPT_IMPROVEMENT, aiProvider, improveForLLM, llmSystemMessage = '' } = input
+      // TODO: Get instruction from Admin Setting
       instruction = instruction?.replace('[LLM]', improveForLLM)?.replace('[System Message LLM]', llmSystemMessage)
 
       try {
