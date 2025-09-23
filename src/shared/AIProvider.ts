@@ -98,10 +98,13 @@ export function getProviderFromPromptModel(promptModel: PromptModel) {
   return map[promptModel] ?? ApiKeyProvider.OpenAI;
 }
 
-export function getProviderModel(tenant: any, providerName: ApiKeyProvider) {
+export function getProviderModelName(
+  tenant: any,
+  providerName: ApiKeyProvider,
+) {
   const key = ProviderModelMap[providerName] as keyof typeof tenant;
-  const model = tenant?.[key] || "gpt-4o";
-  return model;
+  const rawModel = tenant?.[key] || "gpt-4o";
+  return ModelNameMap[rawModel] || rawModel;
 }
 
 export function useProviderInfo(tenant: any) {
