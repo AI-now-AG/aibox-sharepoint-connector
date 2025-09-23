@@ -361,7 +361,7 @@
             bind:html={promptText}
             cssClass=" h-[200px] mt-6"
           />
-          <button
+          <!-- <button
             class="btn absolute top-0 right-0 flex"
             onclick={preventDefault(improvePromptInstruction)}
           >
@@ -371,7 +371,7 @@
                 "prompt-library.add.prompts.instructions.improve-instruction",
               )}</span
             >
-          </button>
+          </button> -->
         {/key}
       </div>
 
