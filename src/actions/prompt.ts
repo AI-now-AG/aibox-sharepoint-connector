@@ -69,7 +69,8 @@ export const prompt = {
         const result = await chatModel.invoke(messages);
         const parser = new StringOutputParser();
         const improvedInstruction = await parser.invoke(result);
-        console.log({
+        console.log("Prompt Refinement Info", {
+          promptForImprovement: finalInstruction,
           originInstruction: llmSystemMessage,
           improvedInstruction,
         });
