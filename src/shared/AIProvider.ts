@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useTranslations } from "$i18n/utils";
-import { PromptToolOption, Provider } from "$types/AIProvider";
+import { PromptToolOption } from "$types/AIProvider";
 import { PromptModel } from "$types/PromptModel";
 import { ApiKeyProvider } from "$types/TenantFeature";
 import { svgIcons } from "$assets/icons";
@@ -85,20 +85,23 @@ export function getPromptTools(promptModel: PromptModel) {
 }
 
 export function getProviderFromPromptModel(promptModel: PromptModel) {
-  switch (promptModel) {
-    case PromptModel.Perplexity:
-      return Provider.Perplexity;
-    case PromptModel.Claude:
-      return Provider.Claude;
-    case PromptModel.Gemini:
-      return Provider.Gemini;
-    case PromptModel.OpenAI:
-    case PromptModel.OpenAIWithTools:
-    case PromptModel.OpenAIWithImageTools:
-    case PromptModel.OpenAIGpt5:
-    default:
-      return Provider.OpenAI;
-  }
+  // Mapping from PromptModel to ApiKeyProvider
+  const map: Partial<Record<PromptModel, ApiKeyProvider>> = {
+    [PromptModel.Perplexity]: ApiKeyProvider.Perplexity,
+    [PromptModel.Claude]: ApiKeyProvider.Claude,
+    [PromptModel.Gemini]: ApiKeyProvider.Gemini,
+    [PromptModel.OpenAI]: ApiKeyProvider.OpenAI,
+    [PromptModel.OpenAIGpt5]: ApiKeyProvider.OpenAIGtp5, // double-check typo: Gtp5 vs Gpt5
+  };
+
+  // Return mapped value, fallback to OpenAI if not found
+  return map[promptModel] ?? ApiKeyProvider.OpenAI;
+}
+
+export function getProviderModel(tenant: any, providerName: ApiKeyProvider) {
+  const key = ProviderModelMap[providerName] as keyof typeof tenant;
+  const model = tenant?.[key] || "gpt-4o";
+  return model;
 }
 
 export function useProviderInfo(tenant: any) {
