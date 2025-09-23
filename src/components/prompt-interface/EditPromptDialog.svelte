@@ -295,9 +295,12 @@
   async function improvePromptInstruction() {
     try {
       isLoading = true;
+      const improveForLLM = getProviderFromPromptModel(
+        selectedModel as PromptModel,
+      );
       const { data, error } = await actions.prompt.improvePrompt({
         llmSystemMessage: promptDetails.prompt,
-        improveForLLM: getProviderFromPromptModel(selectedModel as PromptModel),
+        improveForLLM,
       });
       if (error) {
         console.error("improvePromptInstruction error", error);
@@ -305,13 +308,16 @@
       } else {
         promptText = normalizeTextToHtml(data);
         initHtml = normalizeTextToHtml(data);
+        
         showToast(
           "success",
           t(
             "prompt-library.add.prompts.instructions.toast-completed-improvement",
           ),
         );
-        console.log({
+
+        console.log("improvePromptInstruction", {
+          improveForLLM,
           originInstruction: promptDetails.prompt,
           improvedInstruction: data,
         });

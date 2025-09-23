@@ -209,11 +209,14 @@
 
   async function improvePromptInstruction() {
     try {
-      const originInstruction = promptText;
       isLoading = true;
+      const originInstruction = promptText;
+      const improveForLLM = getProviderFromPromptModel(
+        selectedModel as PromptModel,
+      );
       const { data, error } = await actions.prompt.improvePrompt({
         llmSystemMessage: promptText,
-        improveForLLM: getProviderFromPromptModel(selectedModel as PromptModel),
+        improveForLLM,
       });
       if (error) {
         console.error("improvePromptInstruction error", error);
@@ -221,6 +224,7 @@
       } else {
         initHtml = normalizeTextToHtml(data);
         promptText = normalizeTextToHtml(data);
+        
         addToast({
           type: "success",
           message: t(
@@ -229,6 +233,7 @@
         });
 
         console.log({
+          improveForLLM,
           originInstruction,
           improvedInstruction: data,
         });
