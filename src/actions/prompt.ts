@@ -6,7 +6,7 @@ import ConfigurationModel from "$data/models/configuration.model";
 import createChatModel from "$utils/chatModel";
 import { htmlToMarkdown } from "$utils/textFormatting";
 import { getProviderInstruction } from "$utils/providerInstruction";
-import { getProviderModel } from "$shared/AIProvider";
+import { getProviderModelName } from "$shared/AIProvider";
 import { ApiKeyProvider } from "$types/TenantFeature";
 import {
   BaseMessage,
@@ -83,7 +83,10 @@ export const prompt = {
       );
 
       // Identify which model is tied to this provider
-      const providerModel = getProviderModel(context.locals.tenant, provider);
+      const providerModel = getProviderModelName(
+        context.locals.tenant,
+        provider,
+      );
 
       // Normalize user instruction from HTML → Markdown (ensures consistent formatting)
       const markdownInstruction = htmlToMarkdown(instruction);
