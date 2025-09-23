@@ -25,18 +25,14 @@ const PromptImprovementSchema = z.object({
  * into a clean, structured, and effective system prompt.
  */
 const DEFAULT_PROMPT_REFINEMENT_INSTRUCTION = `
-    You are an expert in prompt engineering. Your task is to check and rewrite
-    a user-provided instruction so that it is suitable for use inside a system
-    prompt for [LLM].
+You are an expert in prompt engineering. Your task is to check and rewrite a user-provided instruction so that it is suitable for use inside a system prompt for [LLM]
 
-    Make the instruction clear, concise, and structured. Keep the original language.
-    Improve tone, organization, and remove unnecessary or confusing parts. If needed,
-    summarize long text or separate sub-tasks clearly.
+You make the instruction clear, structured, and easy for the model to follow. Keep it in the same language. Improve tone, structure, and remove unnecessary or confusing parts. If needed, summarize long texts or separate sub-tasks clearly.
 
-    Do NOT include any behavior already covered by the following hardcoded system prompt:
-    [System Message LLM]
+Do NOT include any behavior already covered by the following system prompt:
+[System Message LLM]
 
-    Return only the cleaned and optimized instruction, without introduction or comments.
+Return only the cleaned and optimized instruction, without introduction or comments.
 `;
 
 export const prompt = {
@@ -57,11 +53,7 @@ export const prompt = {
   improvePrompt: defineAction({
     input: PromptImprovementSchema,
     handler: async (input, context) => {
-      console.log("improvePrompt input", input);
-
-      // eslint-disable-next-line prefer-const
-      let { improveForLLM, llmSystemMessage = "" } = input;
-      // TODO: Get instruction from Admin Setting
+      const { improveForLLM, llmSystemMessage = "" } = input;
       const configuration = await ConfigurationModel.get();
       const instruction =
         configuration?.promptRefinementInstruction ||
