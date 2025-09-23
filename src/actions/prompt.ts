@@ -3,9 +3,16 @@ import { z } from "zod";
 import { transformRawData } from "$utils/transformRawData";
 import promptModel, { type Prompt } from "$data/models/prompt.model";
 import ConfigurationModel from "$data/models/configuration.model";
-import { Provider } from "$types/AIProvider";
 import createChatModel from "$utils/chatModel";
-import { SystemMessage } from "@langchain/core/messages";
+import { htmlToMarkdown } from "$utils/textFormatting";
+import { getProviderInstruction } from "$utils/providerInstruction";
+import { getProviderModel } from "$shared/AIProvider";
+import { ApiKeyProvider } from "$types/TenantFeature";
+import {
+  BaseMessage,
+  SystemMessage,
+  HumanMessage,
+} from "@langchain/core/messages";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 
 const PromptListIdentifierSchema = z.array(
@@ -15,8 +22,8 @@ const PromptListIdentifierSchema = z.array(
 );
 
 const PromptImprovementSchema = z.object({
-  improveForLLM: z.nativeEnum(Provider),
-  llmSystemMessage: z.string().default(""),
+  provider: z.nativeEnum(ApiKeyProvider),
+  instruction: z.string().default(""),
 });
 
 /**
@@ -53,27 +60,70 @@ export const prompt = {
   improvePrompt: defineAction({
     input: PromptImprovementSchema,
     handler: async (input, context) => {
-      const { improveForLLM, llmSystemMessage = "" } = input;
+      // Extract provider and instruction from input (default empty string if missing)
+      const { provider, instruction = "" } = input;
+
+      // Fallback to English if tenant doesn’t have a default language
+      const defaultLanguage = context.locals.tenant.default_language || "en";
+
+      // Load global configuration (may include custom refinement instructions)
       const configuration = await ConfigurationModel.get();
-      const instruction =
+
+      // Use tenant-defined prompt refinement instruction if available, otherwise fallback to default
+      const refinementInstruction =
         configuration?.promptRefinementInstruction ||
         DEFAULT_PROMPT_REFINEMENT_INSTRUCTION;
-      const finalInstruction = instruction
-        ?.replace("[LLM]", improveForLLM)
-        ?.replace("[System Message LLM]", llmSystemMessage);
+
+      // Get provider-specific system instruction (customized for the chosen AI provider)
+      const providerInstruction = getProviderInstruction(
+        configuration,
+        provider,
+        "",
+        defaultLanguage,
+      );
+
+      // Identify which model is tied to this provider
+      const providerModel = getProviderModel(context.locals.tenant, provider);
+
+      // Normalize user instruction from HTML → Markdown (ensures consistent formatting)
+      const markdownInstruction = htmlToMarkdown(instruction);
+
+      // Build the system message for the LLM, replacing placeholders with actual values
+      const systemMessage = refinementInstruction
+        ?.replaceAll("[LLM]", providerModel)
+        ?.replaceAll("[System Message LLM]", providerInstruction || "");
+
+      // Wrap user input as a human message
+      const humanMessage = `${markdownInstruction}`;
 
       try {
+        // Initialize the chat model for this request
         const chatModel = createChatModel(context);
-        const messages = [new SystemMessage(finalInstruction)];
 
+        // Construct a conversation history with system + human messages
+        const messages: BaseMessage[] = [
+          new SystemMessage(systemMessage),
+          new HumanMessage(humanMessage),
+        ];
+
+        // Send messages to the LLM and await a response
         const result = await chatModel.invoke(messages);
+
+        // Parse raw model output into a clean string
         const parser = new StringOutputParser();
         const improvedInstruction = await parser.invoke(result);
-        console.log("Prompt Refinement Info", {
-          promptForImprovement: finalInstruction,
-          originInstruction: llmSystemMessage,
+
+        // Log details for debugging and monitoring
+        console.log("Prompt Refinement Message", {
+          systemMessage,
+          humanMessage,
+        });
+        console.log("Prompt Refinement Result", {
+          originInstruction: markdownInstruction,
           improvedInstruction,
         });
+
+        // Return the refined prompt back to the caller
         return improvedInstruction;
       } catch (error) {
         console.error("Error in improvePrompt action:", error);
