@@ -7,7 +7,7 @@ import { stringToObjectId } from "$utils/stringToObjectId";
 import KnowledgeBaseModel, {
   type KnowledgeBase,
 } from "$data/models/knowledgeBase.model";
-import initializeOpenAI from "$utils/chatModel";
+import createChatModel from "$utils/chatModel";
 
 const CreatePromptParamsSchema = z.object({
   _id: z.string().optional(),
@@ -46,7 +46,7 @@ Input: Erstelle eine Titel für einen Schweizer Presseartikel im Stil von "Knowl
 Output: Hier kannst du einen prägnanten Titel für einen Schweizer Presseartikel erstellen, der den spezifischen Anforderungen und dem gewünschten Stil entspricht. Die Überschrift wird an die Erwartungen der Schweizer Medien angepasst und berücksichtigt die vorhandene Knowledge Base.`;
 
 const generatePromptDescription = async (ctx: APIContext, prompt: string) => {
-  const model = initializeOpenAI(ctx);
+  const model = createChatModel(ctx);
 
   const messages = [new SystemMessage(instructions), new HumanMessage(prompt)];
   const parser = new StringOutputParser();

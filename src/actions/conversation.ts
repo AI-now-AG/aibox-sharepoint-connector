@@ -9,7 +9,7 @@ import PromptModel from "$data/models/prompt.model";
 import { ObjectId } from "mongodb";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { StringOutputParser } from "@langchain/core/output_parsers";
-import initializeOpenAI from "$utils/chatModel";
+import createChatModel from "$utils/chatModel";
 
 const ConversationInputIdentifierSchema = z.object({
   _id: z.string(),
@@ -42,7 +42,7 @@ const generateConversationTitle = async (
   promptTitle: string,
   userInput: string,
 ) => {
-  const model = initializeOpenAI(ctx);
+  const model = createChatModel(ctx);
 
   const instructionsWithPrompt = `
     Generate a short conversation title of max 30 characters. 

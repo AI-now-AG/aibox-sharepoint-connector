@@ -4,7 +4,7 @@ import { transformRawData } from "$utils/transformRawData";
 import promptModel, { type Prompt } from "$data/models/prompt.model";
 import ConfigurationModel from "$data/models/configuration.model";
 import { Provider } from "$types/AIProvider";
-import initializeOpenAI from "$utils/chatModel";
+import createChatModel from "$utils/chatModel";
 import { SystemMessage } from "@langchain/core/messages";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 
@@ -63,7 +63,7 @@ export const prompt = {
         ?.replace("[System Message LLM]", llmSystemMessage);
 
       try {
-        const chatModel = initializeOpenAI(context);
+        const chatModel = createChatModel(context);
         const messages = [new SystemMessage(finalInstruction)];
 
         const result = await chatModel.invoke(messages);

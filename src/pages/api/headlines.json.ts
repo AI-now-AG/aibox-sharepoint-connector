@@ -3,7 +3,7 @@ import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import somediaInstructions from "$data/somedia_instructions";
 import type { APIRoute } from "astro";
-import initializeOpenAI from "$utils/chatModel";
+import createChatModel from "$utils/chatModel";
 
 // export const model = new ChatOpenAI({
 //   apiKey: import.meta.env.OPENAI_API_KEY,
@@ -62,7 +62,7 @@ export const POST: APIRoute = async (ctx) => {
   }
 
   try {
-    const model = initializeOpenAI(ctx);
+    const model = createChatModel(ctx);
 
     const messages = [
       new SystemMessage(promptText),
