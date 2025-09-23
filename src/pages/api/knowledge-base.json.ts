@@ -6,7 +6,7 @@ import { z } from "zod";
 //import { ChatOpenAI } from "@langchain/openai";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { StringOutputParser } from "@langchain/core/output_parsers";
-import initializeOpenAI from "$utils/chatModel";
+import createChatModel from "$utils/chatModel";
 
 const CreateKnowledgeBaseParamsSchema = z.object({
   _id: z.string().optional(),
@@ -35,7 +35,7 @@ const generateKnowledgeBaseDescription = async (
   ctx: APIContext,
   knowledgeBase: string,
 ) => {
-  const model = initializeOpenAI(ctx);
+  const model = createChatModel(ctx);
 
   const messages = [
     new SystemMessage(knowledgeBaseInfo),
