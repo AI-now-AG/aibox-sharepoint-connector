@@ -17,7 +17,7 @@ function buildNumberedCitationLinks(
 
 function buildIconCitationLinks(
   inputString: string,
-  citations: Record<string, any>[],
+  citations: Record<string, unknown>[],
 ): string {
   if (!citations || !citations.length) return inputString;
 
@@ -35,7 +35,7 @@ function buildIconCitationLinks(
       .join(" ");
 
     // Replace only the first occurrence of the citation text with itself + links
-    result = result.replace(c.text, `${c.text} ${anchors}`);
+    result = result.replace((c.text as string), `${c.text} ${anchors}`);
   });
 
   return result;
@@ -53,7 +53,7 @@ function buildIconCitationLinks(
  */
 export function buildCitationLinks(
   inputString: string,
-  citations: (string | Record<string, any>)[],
+  citations: (string | Record<string, unknown>)[],
 ): string {
   if (!citations?.length) {
     return inputString;
@@ -68,7 +68,7 @@ export function buildCitationLinks(
   if (typeof citations[0] === "object" && citations[0] !== null) {
     return buildIconCitationLinks(
       inputString,
-      citations as Record<string, any>[],
+      citations as Record<string, unknown>[],
     );
   }
 
@@ -309,7 +309,7 @@ export function stripMarkdownFormatting(text: string): string {
   text = text.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1"); // links
   text = text.replace(/!\[([^\]]*)\]\([^)]+\)/g, "$1"); // images
   text = text.replace(/^(-{3,}|\*{3,}|_{3,})$/gm, ""); // horizontal rules
-  text = text.replace(/\[\^.+?\](\: .*?$)?/g, ""); // footnotes
+  text = text.replace(/\[\^.+?\](\\: .*?$)?/g, ""); // footnotes
 
   // Remove raw HTML tags (like <span>, <strong>, etc.)
   text = text.replace(/<[^>]+>/g, "");

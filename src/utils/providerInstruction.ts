@@ -1,5 +1,6 @@
 import { ApiKeyProvider } from "$types/TenantFeature";
 import { type Configuration } from "$data/models/configuration.model";
+import { ProviderMap } from "$shared/AIProvider";
 
 /**
  * Retrieves the instruction text to guide an AI provider’s behavior.
@@ -17,18 +18,9 @@ export function getProviderInstruction(
   model: string,
   language: string = "en",
 ): string | null {
-  // Mapping of AI providers to internal config keys
-  const providerMap: Partial<Record<ApiKeyProvider, string>> = {
-    [ApiKeyProvider.OpenAI]: "openai",
-    [ApiKeyProvider.OpenAIGtp5]: "openai",
-    [ApiKeyProvider.AzureOpenAI]: "openai",
-    [ApiKeyProvider.Perplexity]: "perplexity",
-    [ApiKeyProvider.Claude]: "claude",
-    [ApiKeyProvider.Gemini]: "gemini",
-  };
 
   // Resolve the config provider key from request provider
-  const providerKey = providerMap[provider];
+  const providerKey = ProviderMap[provider];
 
   // Attempt to fetch an instruction for the provider/model
   let instruction = resolveInstruction(

@@ -196,7 +196,7 @@
       (item) => item.active === true && item.default === true,
     );
 
-    if (activeDefaultProvider?.name === ApiKeyProvider.OpenAIGtp5) {
+    if (activeDefaultProvider?.name === ApiKeyProvider.OpenAIGpt5) {
       return true;
     }
     return false;

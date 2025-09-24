@@ -36,7 +36,7 @@ const unitLabels: Record<string, string> = {
  */
 const TOKEN_CREDIT_MAPPING: Record<string, TokenCreditRate> = {
   [ApiKeyProvider.OpenAI]: { input: 40000, output: 10000 },
-  [ApiKeyProvider.OpenAIGtp5]: { input: 80000, output: 10000 },
+  [ApiKeyProvider.OpenAIGpt5]: { input: 80000, output: 10000 },
   [ApiKeyProvider.AzureOpenAI]: { input: 40000, output: 10000 },
   [ApiKeyProvider.Perplexity]: { input: 100000, output: 100000 },
   [ApiKeyProvider.Claude]: { input: 33000, output: 6500 },
@@ -217,7 +217,7 @@ const _calculateOpenAIGpt5Usage = (
   const usageItems: UsageItem[] = [];
 
   const usageData = rawUsages.filter((item: UsageLog) => {
-    return item.provider == ApiKeyProvider.OpenAIGtp5;
+    return item.provider == ApiKeyProvider.OpenAIGpt5;
   });
 
   // gpt-5
@@ -234,7 +234,7 @@ const _calculateOpenAIGpt5Usage = (
   );
   const { inputCredits: gpt4oInputCredits, outputCredits: gpt4oOutputCredits } =
     _tokensToCredits(
-      ApiKeyProvider.OpenAIGtp5,
+      ApiKeyProvider.OpenAIGpt5,
       gpt5InputTokens,
       gpt5OutputTokens,
     );

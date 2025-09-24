@@ -263,7 +263,7 @@
       );
 
     openAIEnabled = findProvider(ApiKeyProvider.OpenAI);
-    openAIGpt5Enabled = findProvider(ApiKeyProvider.OpenAIGtp5);
+    openAIGpt5Enabled = findProvider(ApiKeyProvider.OpenAIGpt5);
     azureOpenAIEnabled = findProvider(ApiKeyProvider.AzureOpenAI);
     perplexityEnabled = findProvider(ApiKeyProvider.Perplexity);
     claudeEnabled = findProvider(ApiKeyProvider.Claude);
@@ -300,7 +300,7 @@
     // svelte-ignore state_referenced_locally
     if (defaultTextFeature) {
       openAIEnabled ||= defaultTextFeature === ApiKeyProvider.OpenAI;
-      openAIGpt5Enabled ||= defaultTextFeature === ApiKeyProvider.OpenAIGtp5;
+      openAIGpt5Enabled ||= defaultTextFeature === ApiKeyProvider.OpenAIGpt5;
       azureOpenAIEnabled ||= defaultTextFeature === ApiKeyProvider.AzureOpenAI;
     }
   }
@@ -348,7 +348,7 @@
     !openAIEnabled &&
       (openAIEnabled = defaultTextFeature === ApiKeyProvider.OpenAI);
     !openAIGpt5Enabled &&
-      (openAIGpt5Enabled = defaultTextFeature === ApiKeyProvider.OpenAIGtp5);
+      (openAIGpt5Enabled = defaultTextFeature === ApiKeyProvider.OpenAIGpt5);
     !azureOpenAIEnabled &&
       (azureOpenAIEnabled = defaultTextFeature === ApiKeyProvider.AzureOpenAI);
     !perplexityEnabled &&
@@ -360,7 +360,7 @@
 
     if (feature === ApiKeyProvider.OpenAI) {
       updateTextFeature(feature, openAIEnabled);
-    } else if (feature === ApiKeyProvider.OpenAIGtp5) {
+    } else if (feature === ApiKeyProvider.OpenAIGpt5) {
       updateTextFeature(feature, openAIGpt5Enabled);
     } else if (feature === ApiKeyProvider.AzureOpenAI) {
       updateTextFeature(feature, azureOpenAIEnabled);
@@ -397,7 +397,7 @@
     }
 
     if (
-      defaultTextFeature == ApiKeyProvider.OpenAIGtp5 &&
+      defaultTextFeature == ApiKeyProvider.OpenAIGpt5 &&
       !tenantData.openai_gpt5_api_key
     ) {
       showAlert("[GPT-5] " + t("tenant.validate-open-ai-key-message"));
@@ -454,7 +454,7 @@
       }
 
       if (
-        audioSelectedProvider.value === ApiKeyProvider.OpenAIGtp5 &&
+        audioSelectedProvider.value === ApiKeyProvider.OpenAIGpt5 &&
         !tenantData.openai_gpt5_api_key
       ) {
         showAlert("[GPT-5] " + t("tenant.validate-open-ai-key-message"));
@@ -554,7 +554,7 @@
         tenantData.anthropic_chat_model = selectedClaudeModel;
         tenantData.gemini_chat_model = selectedGeminiModel;
         updateTextFeature(ApiKeyProvider.OpenAI, openAIEnabled);
-        updateTextFeature(ApiKeyProvider.OpenAIGtp5, openAIGpt5Enabled);
+        updateTextFeature(ApiKeyProvider.OpenAIGpt5, openAIGpt5Enabled);
         updateTextFeature(ApiKeyProvider.AzureOpenAI, azureOpenAIEnabled);
         updateTextFeature(ApiKeyProvider.Perplexity, perplexityEnabled);
         updateTextFeature(ApiKeyProvider.Claude, claudeEnabled);
@@ -694,7 +694,7 @@
         tenantData.anthropic_chat_model = selectedClaudeModel;
         tenantData.gemini_chat_model = selectedGeminiModel;
         updateTextFeature(ApiKeyProvider.OpenAI, openAIEnabled);
-        updateTextFeature(ApiKeyProvider.OpenAIGtp5, openAIGpt5Enabled);
+        updateTextFeature(ApiKeyProvider.OpenAIGpt5, openAIGpt5Enabled);
         updateTextFeature(ApiKeyProvider.AzureOpenAI, azureOpenAIEnabled);
         updateTextFeature(ApiKeyProvider.Perplexity, perplexityEnabled);
         updateTextFeature(ApiKeyProvider.Claude, claudeEnabled);
@@ -1190,7 +1190,7 @@
                 type="checkbox"
                 bind:checked={openAIGpt5Enabled}
                 class="checkbox checkbox-primary z-10"
-                disabled={defaultTextFeature === ApiKeyProvider.OpenAIGtp5}
+                disabled={defaultTextFeature === ApiKeyProvider.OpenAIGpt5}
               />
               <label
                 class="label cursor-pointer ml-2"
@@ -1201,7 +1201,7 @@
                 >
               </label>
             </div>
-            {#if defaultTextFeature === ApiKeyProvider.OpenAIGtp5}
+            {#if defaultTextFeature === ApiKeyProvider.OpenAIGpt5}
               <span class="mb-2 text-base-content/50 font-medium text-sm"
                 >{t("tenant.default")}</span
               >
@@ -1247,9 +1247,9 @@
               <label class="flex flex-row items-center gap-2">
                 <input
                   type="checkbox"
-                  checked={defaultTextFeature === ApiKeyProvider.OpenAIGtp5}
+                  checked={defaultTextFeature === ApiKeyProvider.OpenAIGpt5}
                   class="checkbox checkbox-primary"
-                  onchange={() => toggleTextFeature(ApiKeyProvider.OpenAIGtp5)}
+                  onchange={() => toggleTextFeature(ApiKeyProvider.OpenAIGpt5)}
                 />
                 <span class="label-text">{t("tenant.mark-as-default")}</span>
               </label>
