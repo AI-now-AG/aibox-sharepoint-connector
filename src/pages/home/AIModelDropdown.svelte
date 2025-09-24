@@ -78,7 +78,7 @@
     const allowedProviders = [
       ApiKeyProvider.Perplexity,
       ApiKeyProvider.Claude,
-      ApiKeyProvider.OpenAIGtp5,
+      ApiKeyProvider.OpenAIGpt5,
       ApiKeyProvider.Gemini,
     ];
 

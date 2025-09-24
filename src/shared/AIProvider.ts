@@ -7,28 +7,46 @@ import { svgIcons } from "$assets/icons";
 
 const t = useTranslations();
 
-export const ProviderModelMap: Record<string, string> = {
-  [ApiKeyProvider.Perplexity]: "perplexity_chat_model",
-  [ApiKeyProvider.Claude]: "anthropic_chat_model",
-  [ApiKeyProvider.OpenAI]: "openai_chat_model",
-  [ApiKeyProvider.OpenAIGtp5]: "openai_gpt5_chat_model",
-  [ApiKeyProvider.AzureOpenAI]: "azure_openai_chat_model",
-  [ApiKeyProvider.Gemini]: "gemini_chat_model",
-};
-
 export const ModelNameMap: Record<string, string> = {
   "claude-sonnet-4-0": "Claude Sonnet",
   sonar: "Perplexity Sonar",
   "gemini-2.5-flash": "Gemini 2.5 Flash",
+}
+
+export const ProviderMap: Partial<Record<ApiKeyProvider, string>> = {
+  [ApiKeyProvider.OpenAI]: ApiKeyProvider.OpenAI,
+  [ApiKeyProvider.OpenAIGpt5]: ApiKeyProvider.OpenAI,
+  [ApiKeyProvider.AzureOpenAI]: ApiKeyProvider.OpenAI,
+  [ApiKeyProvider.Perplexity]: ApiKeyProvider.Perplexity,
+  [ApiKeyProvider.Claude]: ApiKeyProvider.Claude,
+  [ApiKeyProvider.Gemini]: ApiKeyProvider.Gemini,
+};
+
+export const ProviderModelMap: Record<string, string> = {
+  [ApiKeyProvider.Perplexity]: "perplexity_chat_model",
+  [ApiKeyProvider.Claude]: "anthropic_chat_model",
+  [ApiKeyProvider.OpenAI]: "openai_chat_model",
+  [ApiKeyProvider.OpenAIGpt5]: "openai_gpt5_chat_model",
+  [ApiKeyProvider.AzureOpenAI]: "azure_openai_chat_model",
+  [ApiKeyProvider.Gemini]: "gemini_chat_model",
 };
 
 export const ProviderPromptModelNameMap: Record<string, string> = {
   [ApiKeyProvider.Perplexity]: PromptModel.Perplexity,
   [ApiKeyProvider.Claude]: PromptModel.Claude,
   [ApiKeyProvider.OpenAI]: PromptModel.OpenAI,
-  [ApiKeyProvider.OpenAIGtp5]: PromptModel.OpenAIGpt5,
+  [ApiKeyProvider.OpenAIGpt5]: PromptModel.OpenAIGpt5,
   [ApiKeyProvider.AzureOpenAI]: PromptModel.AzureOpenAI,
   [ApiKeyProvider.Gemini]: PromptModel.Gemini,
+};
+
+export const ModelNameProviderPromptMap: Record<string, string> = {
+  [PromptModel.Perplexity]: ApiKeyProvider.Perplexity,
+  [PromptModel.Claude]: ApiKeyProvider.Claude,
+  [PromptModel.OpenAI]: ApiKeyProvider.OpenAI,
+  [PromptModel.OpenAIGpt5]: ApiKeyProvider.OpenAIGpt5,
+  [PromptModel.AzureOpenAI]: ApiKeyProvider.AzureOpenAI,
+  [PromptModel.Gemini]: ApiKeyProvider.Gemini,
 };
 
 export const CustomSortOrder: { [key: string]: number } = {
@@ -85,17 +103,7 @@ export function getPromptTools(promptModel: PromptModel) {
 }
 
 export function getProviderFromPromptModel(promptModel: PromptModel) {
-  // Mapping from PromptModel to ApiKeyProvider
-  const map: Partial<Record<PromptModel, ApiKeyProvider>> = {
-    [PromptModel.Perplexity]: ApiKeyProvider.Perplexity,
-    [PromptModel.Claude]: ApiKeyProvider.Claude,
-    [PromptModel.Gemini]: ApiKeyProvider.Gemini,
-    [PromptModel.OpenAI]: ApiKeyProvider.OpenAI,
-    [PromptModel.OpenAIGpt5]: ApiKeyProvider.OpenAIGtp5, // double-check typo: Gtp5 vs Gpt5
-  };
-
-  // Return mapped value, fallback to OpenAI if not found
-  return map[promptModel] ?? ApiKeyProvider.OpenAI;
+  return ModelNameProviderPromptMap[promptModel] ?? ApiKeyProvider.OpenAI;
 }
 
 export function getProviderModelName(

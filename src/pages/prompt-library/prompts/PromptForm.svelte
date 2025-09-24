@@ -25,6 +25,7 @@
   import { normalizeTextToHtml } from "$utils/textFormatting";
   import { actions } from "astro:actions";
   import Loading from "$components/Loading.svelte";
+  import type { ApiKeyProvider } from "$types/TenantFeature";
 
   const t = useTranslations();
 
@@ -210,11 +211,11 @@
   async function improvePromptInstruction() {
     try {
       isLoading = true;
-      const selectedProvider = getProviderFromPromptModel(
+      const provider = getProviderFromPromptModel(
         selectedModel as PromptModel,
-      );
+      ) as ApiKeyProvider;
       const { data, error } = await actions.prompt.improvePrompt({
-        provider: selectedProvider,
+        provider,
         instruction: promptText,
       });
       if (error) {

@@ -28,6 +28,7 @@
   import Toast, {
     type ToastType,
   } from "$components/toast-notification/Toast.svelte";
+  import type { ApiKeyProvider } from "$types/TenantFeature";
   const t = useTranslations();
 
   interface Props {
@@ -295,11 +296,11 @@
   async function improvePromptInstruction() {
     try {
       isLoading = true;
-      const selectedProvider = getProviderFromPromptModel(
+      const provider = getProviderFromPromptModel(
         selectedModel as PromptModel,
-      );
+      ) as ApiKeyProvider;
       const { data, error } = await actions.prompt.improvePrompt({
-        provider: selectedProvider,
+        provider,
         instruction: promptDetails.prompt,
       });
       if (error) {
