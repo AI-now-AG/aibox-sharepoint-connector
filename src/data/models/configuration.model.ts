@@ -23,6 +23,15 @@ export const ProviderInstructionSchema = z.object({
 export const ConfigurationSchema = z.object({
   _id: z.instanceof(ObjectId),
   defaultInstructions: z.array(ProviderInstructionSchema),
+  promptRefinementInstruction: z.string().nullish().default(null),
+  created_at: z
+    .date()
+    .optional()
+    .default(() => new Date()),
+  updated_at: z
+    .date()
+    .optional()
+    .default(() => new Date()),
 });
 
 export type Configuration = z.infer<typeof ConfigurationSchema>;

@@ -1,3 +1,5 @@
+import { ChatAnthropic } from "@langchain/anthropic";
+import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { ChatOpenAI, AzureChatOpenAI } from "@langchain/openai";
 import type { APIContext } from "astro";
 import type { ActionAPIContext } from "astro:actions";
@@ -12,8 +14,8 @@ interface ChatConfigOverrides {
   customModel?: string;
 }
 
-// Initialize Perplexity AI's Chat API with OpenAI-like interface
-export const initPerplexityOpenAI = (
+// Perplexity AI
+export const createPerplexityModel = (
   apiKey: string,
   model: string,
   tenantId: string,
@@ -39,8 +41,8 @@ export const initPerplexityOpenAI = (
   });
 };
 
-// Initialize OpenAI's Chat API
-const initChatOpenAI = (apiKey: string, model: string, tenantId: string) => {
+// OpenAI's Chat API
+const createOpenAIModel = (apiKey: string, model: string, tenantId: string) => {
   return new ChatOpenAI({
     apiKey,
     model,
@@ -55,8 +57,8 @@ const initChatOpenAI = (apiKey: string, model: string, tenantId: string) => {
   });
 };
 
-// Initialize Azure OpenAI Chat API
-const initAzureChatOpenAI = (
+// Azure OpenAI Chat API
+const createAzureOpenAIModel = (
   azureOpenAIApiKey: string,
   azureOpenAIApiInstanceName: string,
   azureOpenAIApiDeploymentName: string,
@@ -79,7 +81,39 @@ const initAzureChatOpenAI = (
   });
 };
 
-export const initializeOpenAI = (
+// Claude (Anthropic)
+const createClaudeModel = (apiKey: string, model: string, tenantId: string) => {
+  return new ChatAnthropic({
+    apiKey,
+    model,
+    callbacks: [
+      new UsageTrackerCallbackHandler(
+        tenantId,
+        ApiKeyProvider.Claude,
+        model,
+        UsageType.Text,
+      ),
+    ],
+  });
+};
+
+// Gemini (Google GenAI)
+const createGeminiModel = (apiKey: string, model: string, tenantId: string) => {
+  return new ChatGoogleGenerativeAI({
+    apiKey,
+    model,
+    callbacks: [
+      new UsageTrackerCallbackHandler(
+        tenantId,
+        ApiKeyProvider.Gemini,
+        model,
+        UsageType.Text,
+      ),
+    ],
+  });
+};
+
+export const createChatModel = (
   ctx: APIContext | ActionAPIContext,
   overrides?: ChatConfigOverrides,
 ) => {
@@ -93,9 +127,11 @@ export const initializeOpenAI = (
   );
 
   // Determine API provider based on enabled features
-  let provider = customProvider ? customProvider : textPromptsProvider
-    ? textPromptsProvider.provider
-    : ApiKeyProvider.OpenAI;
+  let provider = customProvider
+    ? customProvider
+    : textPromptsProvider
+      ? textPromptsProvider.provider
+      : ApiKeyProvider.OpenAI;
 
   // If a custom model is provided, override the default API provider
   // Extract the provider name (the first segment).
@@ -108,7 +144,7 @@ export const initializeOpenAI = (
   if (provider == ApiKeyProvider.Perplexity) {
     const perplexityApiKey = decrypt(tenant?.perplexity_api_key || "");
     const perplexityModel: string = tenant?.perplexity_chat_model || "sonar";
-    return initPerplexityOpenAI(
+    return createPerplexityModel(
       perplexityApiKey,
       perplexityModel,
       tenant?._id?.toString(),
@@ -123,7 +159,7 @@ export const initializeOpenAI = (
     const azureOpenAIApiVersion =
       import.meta.env.AZURE_OPENAI_API_VERSION || "2024-08-01-preview";
 
-    return initAzureChatOpenAI(
+    return createAzureOpenAIModel(
       azureOpenAIApiKey,
       azureOpenAIApiInstanceName,
       azureOpenAIApiDeploymentName,
@@ -132,13 +168,36 @@ export const initializeOpenAI = (
     );
   }
 
+  // Claude (Anthropic)
+  if (provider == ApiKeyProvider.Claude) {
+    const anthropicApiKey = decrypt(tenant?.anthropic_api_key || "");
+    const anthropicModel: string =
+      tenant?.anthropic_chat_model || "claude-sonnet-4-20250514";
+    return createClaudeModel(
+      anthropicApiKey,
+      anthropicModel,
+      tenant?._id?.toString(),
+    );
+  }
+
+  // Gemini (Google GenAI)
+  if (provider == ApiKeyProvider.Gemini) {
+    const geminiApiKey = decrypt(tenant?.gemini_api_key || "");
+    const geminiModel: string = tenant?.gemini_chat_model || "gemini-2.5-flash";
+    return createGeminiModel(
+      geminiApiKey,
+      geminiModel,
+      tenant?._id?.toString(),
+    );
+  }
+
   // OpenAI
   const apiKey = decrypt(tenant?.openai_api_key || "");
-  return initChatOpenAI(
+  return createOpenAIModel(
     apiKey,
     import.meta.env.OPENAI_MODEL,
     tenant?._id?.toString(),
   );
 };
 
-export default initializeOpenAI;
+export default createChatModel;

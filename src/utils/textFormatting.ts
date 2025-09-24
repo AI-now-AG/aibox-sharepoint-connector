@@ -1,4 +1,5 @@
 import { marked, type Tokens } from "marked";
+import TurndownService from "turndown";
 
 function buildNumberedCitationLinks(
   inputString: string,
@@ -317,6 +318,30 @@ export function stripMarkdownFormatting(text: string): string {
   text = text.replace(/\n{2,}/g, "\n\n");
 
   return text.trim();
+}
+
+/**
+ * Convert HTML string to Markdown safely.
+ *
+ * @param html - HTML input
+ * @returns Markdown string (or original HTML if conversion fails)
+ */
+export function htmlToMarkdown(html: string): string {
+  try {
+    const turndownService = new TurndownService({
+      headingStyle: "atx", // #
+      codeBlockStyle: "fenced", // ```
+      emDelimiter: "*", // *italic*
+      bulletListMarker: "-", // - list
+    });
+    // Override escape to avoid unnecessary backslashes
+    turndownService.escape = (str: string) => str;
+
+    return turndownService.turndown(html);
+  } catch (err) {
+    console.error("htmlToMarkdown failed:", err);
+    return html; // fallback: return unchanged HTML
+  }
 }
 
 /**

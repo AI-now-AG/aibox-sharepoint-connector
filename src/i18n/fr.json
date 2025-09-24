@@ -592,5 +592,9 @@
   "instructions.model-instruction": "Model System Message",
   "instructions.leave-model-instruction-empty-to-use-default-instruction": " ",
   "prompt-library.add.prompts.instructions.toast-completed-improvement": " ",
-  "prompt-library.add.prompts.instructions.improve-instruction": " "
+  "prompt-library.add.prompts.instructions.improve-instruction": " ",
+  "nav.settings.prompt-refinement": "Prompt Refinement",
+  "prompt-refinement.title": "Prompt for Improvement",
+  "prompt-refinement.update-setting-successfull": "Prompt improvement updated successfully",
+  "prompt-refinement.update-setting-failed": "Update prompt improvement failed"
 }

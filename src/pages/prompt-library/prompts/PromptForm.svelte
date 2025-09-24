@@ -83,13 +83,13 @@
   let isSaving = $state(false);
   let isLoading = $state(false);
 
-  const providerIno = useProviderInfo($tenant);
+  const providerInfo = useProviderInfo($tenant);
   let promptTools: Array<any> = $derived(
     getPromptTools(
       (selectedModel == PromptModel.Default
-        ? providerIno?.defaultProviderPromptModelName == PromptModel.OpenAI
+        ? providerInfo?.defaultProviderPromptModelName == PromptModel.OpenAI
           ? PromptModel.OpenAIWithTools
-          : providerIno?.defaultProviderPromptModelName
+          : providerInfo?.defaultProviderPromptModelName
         : selectedModel) as PromptModel,
     ) ?? [],
   );
@@ -209,11 +209,13 @@
 
   async function improvePromptInstruction() {
     try {
-      const originInstruction = promptText;
       isLoading = true;
+      const selectedProvider = getProviderFromPromptModel(
+        selectedModel as PromptModel,
+      );
       const { data, error } = await actions.prompt.improvePrompt({
-        llmSystemMessage: promptText,
-        improveForLLM: getProviderFromPromptModel(selectedModel as PromptModel),
+        provider: selectedProvider,
+        instruction: promptText,
       });
       if (error) {
         console.error("improvePromptInstruction error", error);
@@ -221,16 +223,12 @@
       } else {
         initHtml = normalizeTextToHtml(data);
         promptText = normalizeTextToHtml(data);
+
         addToast({
           type: "success",
           message: t(
             "prompt-library.add.prompts.instructions.toast-completed-improvement",
           ),
-        });
-
-        console.log({
-          originInstruction,
-          improvedInstruction: data,
         });
       }
     } catch (error: any) {
@@ -301,10 +299,10 @@
               }, 100);
             }}
             bind:html={promptText}
-            cssClass=" mt-6"
+            cssClass=" mt-3"
           />
-          <!-- <button
-            class="btn absolute top-0 right-0 flex"
+          <button
+            class="btn btn-sm absolute top-[-5] right-0 flex"
             onclick={preventDefault(improvePromptInstruction)}
           >
             <span class="">{@html svgIcons.aitool}</span>
@@ -313,7 +311,7 @@
                 "prompt-library.add.prompts.instructions.improve-instruction",
               )}</span
             >
-          </button> -->
+          </button>
         {/key}
       </div>
 

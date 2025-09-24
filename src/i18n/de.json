@@ -592,5 +592,9 @@
   "instructions.model-instruction": "Model System Message",
   "instructions.leave-model-instruction-empty-to-use-default-instruction": "Model System Message leer lassen, um default System Message zu verwenden",
   "prompt-library.add.prompts.instructions.toast-completed-improvement": "Instruktion wurde verbessert",
-  "prompt-library.add.prompts.instructions.improve-instruction": "Instruktion verbessern"
+  "prompt-library.add.prompts.instructions.improve-instruction": "Instruktion verbessern",
+  "nav.settings.prompt-refinement": "Prompt Optimierung",
+  "prompt-refinement.title": "Prompt für Verbesserung Anwendungsfall",
+  "prompt-refinement.update-setting-successfull": "Prompt erfolgreich gespeichert",
+  "prompt-refinement.update-setting-failed": "Prompt konnte nicht gespeichert werden."
 }
