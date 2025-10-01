@@ -47,7 +47,7 @@
       add_ons: $subscription.audioOptions?.map(
         (option) => option.id as AudioOptionId,
       ),
-      billing_method: $subscription.billingInfo?.billingMethod ?? "",
+      billing_method: $subscription.billingInfo?.billingMethod,
       billing_info: {
         company_name: $subscription.billingInfo?.companyName ?? "",
         address: $subscription.billingInfo?.street ?? "",

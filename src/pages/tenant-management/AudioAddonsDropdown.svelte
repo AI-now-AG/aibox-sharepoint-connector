@@ -75,7 +75,7 @@
       } else {
         selectedItems = selectedItems
           .filter(
-            (i) =>
+            (i: any) =>
               ![
                 AudioOptionId.AudioBasis,
                 AudioOptionId.AudioBasisAddOnLarge,

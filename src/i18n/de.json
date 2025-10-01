@@ -596,5 +596,6 @@
   "nav.settings.prompt-refinement": "Prompt Optimierung",
   "prompt-refinement.title": "Prompt für Verbesserung Anwendungsfall",
   "prompt-refinement.update-setting-successfull": "Prompt erfolgreich gespeichert",
-  "prompt-refinement.update-setting-failed": "Prompt konnte nicht gespeichert werden."
+  "prompt-refinement.update-setting-failed": "Prompt konnte nicht gespeichert werden.",
+  "tenant.subtitle-subscription": "Substitle Subscription"
 }

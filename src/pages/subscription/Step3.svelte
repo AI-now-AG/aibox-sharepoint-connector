@@ -130,7 +130,7 @@
           storeStripeCheckout({
             customerId: result.stripeCustomerId,
           });
-          window.location.href = result.url;
+          window.location.href = result.url || '';
         }
       } else {
         window.location.href = "/subscription/step4";
