@@ -23,7 +23,7 @@ export enum AudioOptionId {
   AudioBasis = "AudioBasis", // [Audio to Text Basic]
   AudioBasisAddOnLarge = "AudioBasisAddOnLarge",  // [Audio to Text Large]
   AudioBasisAddOnSubtitle = "AudioBasisAddOnSubtitle", // [Subtitle Studio Basic]
-  AudioPremium = "AudioPremium",  // [Subtitle Studio Plus]
+  AudioPremium = "AudioPremium",  // [Subtitle Studio Plus] => Included Subtitle editor
 }
 
 export type ProductKeys =
