@@ -87,7 +87,34 @@
   let selectedPlanName: SubscriptionPackageId = $state(
     subscription?.plan_name ?? "",
   );
-  let selectedPlanAddOns: AudioOptionId[] = $state(subscription?.add_ons ?? []);
+  const planAddOns = subscription?.add_ons ?? [];
+  console.log("planAddOns", JSON.stringify(planAddOns));
+  const initAudioToTextOptions =
+    planAddOns.filter((option: any) => {
+      return (
+        option == AudioOptionId.AudioBasis ||
+        option == AudioOptionId.AudioBasisAddOnSubtitle
+      );
+    }) || [];
+  console.log("initAudioToTextOptions", JSON.stringify(initAudioToTextOptions));
+  const initSubtitleStudioOptions =
+    planAddOns.filter((option: any) => {
+      return (
+        option == AudioOptionId.AudioBasisAddOnLarge ||
+        option == AudioOptionId.AudioPremium
+      );
+    }) || [];
+
+  console.log(
+    "initSubtitleStudioOptions",
+    JSON.stringify(initSubtitleStudioOptions),
+  );
+  let selectedAudioToTextOptions: AudioOptionId[] = $state(
+    initAudioToTextOptions,
+  );
+  let selectedSubtitleStudioOptions: AudioOptionId[] = $state(
+    initSubtitleStudioOptions,
+  );
   tenantData.billing_info = tenant?.billing_info ?? {};
 
   let openAIEnabled: boolean = $state(false);
@@ -622,7 +649,10 @@
           tenant: tenantData,
           subscription: {
             plan_name: selectedPlanName,
-            add_ons: selectedPlanAddOns,
+            add_ons: [
+              ...selectedAudioToTextOptions,
+              ...selectedSubtitleStudioOptions,
+            ],
           },
         });
         const { error, data: createdTenant } = createTanentResult;
@@ -771,7 +801,10 @@
           tenant: tenantData,
           subscription: {
             plan_name: selectedPlanName,
-            add_ons: selectedPlanAddOns,
+            add_ons: [
+              ...selectedAudioToTextOptions,
+              ...selectedSubtitleStudioOptions,
+            ],
           },
         });
         loading = false;
@@ -975,14 +1008,28 @@
           bind:value={selectedPlanName}
         />
       </div>
+      <div class="flex-1 flex flex-col mb-4"></div>
+    </div>
+
+    <div class="flex flex-row space-x-4">
       <div class="flex-1 flex flex-col mb-4">
         <AudioAddonsDropdown
           title={t("tenant.audio-subscription")}
           placeholder=""
-          bind:value={selectedPlanAddOns}
+          bind:value={selectedAudioToTextOptions}
+          type="audiototext"
+        />
+      </div>
+      <div class="flex-1 flex flex-col mb-4">
+        <AudioAddonsDropdown
+          title={t("tenant.subtitle-subscription")}
+          placeholder=""
+          bind:value={selectedSubtitleStudioOptions}
+          type="subtitlestudio"
         />
       </div>
     </div>
+
     <div class="flex flex-row space-x-4">
       <div class="flex-1 flex flex-col mb-4">
         <span class="mb-2 text-base-content font-medium text-sm"
