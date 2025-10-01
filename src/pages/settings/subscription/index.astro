@@ -15,7 +15,7 @@ if (!hasPermission) {
 }
 
 const { tenant } = Astro.locals;
-const { billing_method: billingMethod, billing_info: billingInfo } = tenant;
+const { billing_method: billingMethod, billing_info: billingInfo, totalPrice } = tenant;
 
 const subscription = await SubscriptionModel.findActiveByTenant(tenant._id);
 const planName = subscription?.plan_name;
@@ -33,6 +33,7 @@ const addOns = subscription?.add_ons ?? [];
         {billingInfo}
         {planName}
         {addOns}
+        {totalPrice}
         client:load
       />
     </div>
