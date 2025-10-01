@@ -32,6 +32,7 @@
   import ThemeItem from "./ThemeItem.svelte";
   import { TextModel } from "$types/UsageTracking";
   import { SubscriptionPackages } from "$data/subscription-packages";
+  import { onMount } from "svelte";
 
   const t = useTranslations();
   let loading = $state(false);
@@ -111,7 +112,6 @@
     initSubtitleStudioOptions,
   );
   tenantData.billing_info = tenant?.billing_info ?? {};
-  let totalPrice: any = $state("");
 
   let openAIEnabled: boolean = $state(false);
   let openAIGpt5Enabled: boolean = $state(false);
@@ -882,50 +882,54 @@
     alertMessage = message;
     alertModal?.show();
   }
+  onMount(() => {
+    const calculateTotalPrice = () => {
+      let packagePrice = 0;
+      let audioOptionsTotalPrice = 0;
 
-  // Calculate total price (include package and audio options)
-  $effect(() => {
-    let packagePrice = 0;
-    let audioOptionsTotalPrice = 0;
-
-    // Get package price
-    if (selectedPlan) {
-      let selectedPackage =
-        SubscriptionPackages.plan[
-          selectedPlan as keyof typeof SubscriptionPackages.plan
-        ];
-      if (selectedPackage) {
-        packagePrice = selectedPackage?.price || 0;
+      // Get package price
+      if (selectedPlan) {
+        let selectedPackage =
+          SubscriptionPackages.plan[
+            selectedPlan as keyof typeof SubscriptionPackages.plan
+          ];
+        if (selectedPackage) {
+          packagePrice = selectedPackage?.price || 0;
+        }
       }
-    }
 
-    // Get audio options price
-    if (selectedAudioToTextOptions.length > 0) {
-      selectedAudioToTextOptions.forEach((audioOptionId) => {
-        let audioOption =
-          SubscriptionPackages.audioOptions[
-            audioOptionId as keyof typeof SubscriptionPackages.audioOptions
-          ];
-        if (audioOption) {
-          audioOptionsTotalPrice += audioOption?.price || 0;
-        }
-      });
-    }
+      // Get audio options price
+      if (selectedAudioToTextOptions.length > 0) {
+        selectedAudioToTextOptions.forEach((audioOptionId) => {
+          let audioOption =
+            SubscriptionPackages.audioOptions[
+              audioOptionId as keyof typeof SubscriptionPackages.audioOptions
+            ];
+          if (audioOption) {
+            audioOptionsTotalPrice += audioOption?.price || 0;
+          }
+        });
+      }
 
-    // Get audio options price
-    if (selectedSubtitleStudioOptions.length > 0) {
-      selectedSubtitleStudioOptions.forEach((audioOptionId) => {
-        let audioOption =
-          SubscriptionPackages.audioOptions[
-            audioOptionId as keyof typeof SubscriptionPackages.audioOptions
-          ];
-        if (audioOption) {
-          audioOptionsTotalPrice += audioOption?.price || 0;
-        }
-      });
-    }
+      // Get audio options price
+      if (selectedSubtitleStudioOptions.length > 0) {
+        selectedSubtitleStudioOptions.forEach((audioOptionId) => {
+          let audioOption =
+            SubscriptionPackages.audioOptions[
+              audioOptionId as keyof typeof SubscriptionPackages.audioOptions
+            ];
+          if (audioOption) {
+            audioOptionsTotalPrice += audioOption?.price || 0;
+          }
+        });
+      }
 
-    totalPrice = packagePrice + audioOptionsTotalPrice;
+      return String(packagePrice + audioOptionsTotalPrice);
+    };
+
+    if (!tenant.totalPrice) {
+      tenant.totalPrice = calculateTotalPrice();
+    }
   });
 </script>
 
@@ -1068,12 +1072,14 @@
           type="subtitlestudio"
         />
       </div>
-      <div class="flex-1 flex flex-col mb-4 relative">
-        <p
-          class="text-right font-bold font-inter text-sm absolute right-0 bottom-0"
-        >
-          {t("subscription.total-price-for-plan", { total: totalPrice })}
-        </p>
+
+      <div class="flex-1 flex flex-col mb-4">
+        <p class="mb-2">{t("tenant.total-price")}</p>
+        <input
+          type="text"
+          class="input input-bordered w-full"
+          bind:value={tenantData.totalPrice}
+        />
       </div>
     </div>
 

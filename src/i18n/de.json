@@ -597,5 +597,6 @@
   "prompt-refinement.title": "Prompt für Verbesserung Anwendungsfall",
   "prompt-refinement.update-setting-successfull": "Prompt erfolgreich gespeichert",
   "prompt-refinement.update-setting-failed": "Prompt konnte nicht gespeichert werden.",
-  "tenant.subtitle-subscription": "Substitle Subscription"
+  "tenant.subtitle-subscription": "Substitle Subscription",
+  "tenant.total-price": "Total price"
 }

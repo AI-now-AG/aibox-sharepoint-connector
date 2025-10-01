@@ -597,5 +597,6 @@
   "prompt-refinement.title": "Prompt for Improvement",
   "prompt-refinement.update-setting-successfull": "Prompt improvement updated successfully",
   "prompt-refinement.update-setting-failed": "Update prompt improvement failed",
-  "tenant.subtitle-subscription": "Substitle Subscription"
+  "tenant.subtitle-subscription": "Substitle Subscription",
+  "tenant.total-price": "Total price"
 }
