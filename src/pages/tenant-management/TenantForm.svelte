@@ -31,6 +31,7 @@
   import AudioAddonsDropdown from "./AudioAddonsDropdown.svelte";
   import ThemeItem from "./ThemeItem.svelte";
   import { TextModel } from "$types/UsageTracking";
+  import { SubscriptionPackages } from "$data/subscription-packages";
 
   const t = useTranslations();
   let loading = $state(false);
@@ -84,11 +85,10 @@
   }
 
   // Subscription & billing
-  let selectedPlanName: SubscriptionPackageId = $state(
+  let selectedPlan: SubscriptionPackageId = $state(
     subscription?.plan_name ?? "",
   );
   const planAddOns = subscription?.add_ons ?? [];
-  console.log("planAddOns", JSON.stringify(planAddOns));
   const initAudioToTextOptions =
     planAddOns.filter((option: any) => {
       return (
@@ -96,7 +96,6 @@
         option == AudioOptionId.AudioBasisAddOnSubtitle
       );
     }) || [];
-  console.log("initAudioToTextOptions", JSON.stringify(initAudioToTextOptions));
   const initSubtitleStudioOptions =
     planAddOns.filter((option: any) => {
       return (
@@ -105,10 +104,6 @@
       );
     }) || [];
 
-  console.log(
-    "initSubtitleStudioOptions",
-    JSON.stringify(initSubtitleStudioOptions),
-  );
   let selectedAudioToTextOptions: AudioOptionId[] = $state(
     initAudioToTextOptions,
   );
@@ -116,6 +111,7 @@
     initSubtitleStudioOptions,
   );
   tenantData.billing_info = tenant?.billing_info ?? {};
+  let totalPrice: any = $state("");
 
   let openAIEnabled: boolean = $state(false);
   let openAIGpt5Enabled: boolean = $state(false);
@@ -648,7 +644,7 @@
         const createTanentResult = await actions.tenant.create({
           tenant: tenantData,
           subscription: {
-            plan_name: selectedPlanName,
+            plan_name: selectedPlan,
             add_ons: [
               ...selectedAudioToTextOptions,
               ...selectedSubtitleStudioOptions,
@@ -800,7 +796,7 @@
         const { error } = await actions.tenant.update({
           tenant: tenantData,
           subscription: {
-            plan_name: selectedPlanName,
+            plan_name: selectedPlan,
             add_ons: [
               ...selectedAudioToTextOptions,
               ...selectedSubtitleStudioOptions,
@@ -886,6 +882,51 @@
     alertMessage = message;
     alertModal?.show();
   }
+
+  // Calculate total price (include package and audio options)
+  $effect(() => {
+    let packagePrice = 0;
+    let audioOptionsTotalPrice = 0;
+
+    // Get package price
+    if (selectedPlan) {
+      let selectedPackage =
+        SubscriptionPackages.plan[
+          selectedPlan as keyof typeof SubscriptionPackages.plan
+        ];
+      if (selectedPackage) {
+        packagePrice = selectedPackage?.price || 0;
+      }
+    }
+
+    // Get audio options price
+    if (selectedAudioToTextOptions.length > 0) {
+      selectedAudioToTextOptions.forEach((audioOptionId) => {
+        let audioOption =
+          SubscriptionPackages.audioOptions[
+            audioOptionId as keyof typeof SubscriptionPackages.audioOptions
+          ];
+        if (audioOption) {
+          audioOptionsTotalPrice += audioOption?.price || 0;
+        }
+      });
+    }
+
+    // Get audio options price
+    if (selectedSubtitleStudioOptions.length > 0) {
+      selectedSubtitleStudioOptions.forEach((audioOptionId) => {
+        let audioOption =
+          SubscriptionPackages.audioOptions[
+            audioOptionId as keyof typeof SubscriptionPackages.audioOptions
+          ];
+        if (audioOption) {
+          audioOptionsTotalPrice += audioOption?.price || 0;
+        }
+      });
+    }
+
+    totalPrice = packagePrice + audioOptionsTotalPrice;
+  });
 </script>
 
 <div
@@ -999,19 +1040,15 @@
         <Dropdown
           label={t("tenant.subscription")}
           options={[
-            { value: "Starter", title: "aibox Starter" },
-            { value: "Teams", title: "aibox Teams" },
-            { value: "Pro", title: "aibox Pro" },
+            { value: SubscriptionPackageId.Starter, title: "aibox Starter" },
+            { value: SubscriptionPackageId.Teams, title: "aibox Teams" },
+            { value: SubscriptionPackageId.Pro, title: "aibox Pro" },
             { value: "Internal", title: "Internal" },
             { value: "Enterprise", title: "aibox Enterprise" },
           ]}
-          bind:value={selectedPlanName}
+          bind:value={selectedPlan}
         />
       </div>
-      <div class="flex-1 flex flex-col mb-4"></div>
-    </div>
-
-    <div class="flex flex-row space-x-4">
       <div class="flex-1 flex flex-col mb-4">
         <AudioAddonsDropdown
           title={t("tenant.audio-subscription")}
@@ -1020,6 +1057,9 @@
           type="audiototext"
         />
       </div>
+    </div>
+
+    <div class="flex flex-row space-x-4">
       <div class="flex-1 flex flex-col mb-4">
         <AudioAddonsDropdown
           title={t("tenant.subtitle-subscription")}
@@ -1027,6 +1067,13 @@
           bind:value={selectedSubtitleStudioOptions}
           type="subtitlestudio"
         />
+      </div>
+      <div class="flex-1 flex flex-col mb-4 relative">
+        <p
+          class="text-right font-bold font-inter text-sm absolute right-0 bottom-0"
+        >
+          {t("subscription.total-price-for-plan", { total: totalPrice })}
+        </p>
       </div>
     </div>
 
