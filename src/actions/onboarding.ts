@@ -39,6 +39,7 @@ import {
 
 import {
   getTranscriptionTypes,
+  hasSubtitleEditor,
   getStripePrices,
   getStripeTaxRate,
 } from "$utils/onboarding";
@@ -287,6 +288,7 @@ export const onboarding = {
           return item.name !== TenantFeature.AudioToText;
         });
       }
+      const subtitleEditorEnabled = hasSubtitleEditor(input.add_ons ?? []);
       const newTenant = await TenantModel.copyTenant(masterTenantId, {
         name: input.name,
         org_id: input.org_id,
@@ -297,6 +299,7 @@ export const onboarding = {
         transcription_types: transcriptionTypes,
         default_language: input.language,
         stripe_customer_id: input.stripe_customer_id,
+        subtitle_editor: subtitleEditorEnabled,
       });
 
       // Update the current tenant for the logged-in user

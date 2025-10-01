@@ -9,7 +9,7 @@ import {
 } from "$constants";
 
 export const getTranscriptionTypes = (
-  selectedAddOns: AudioOptionId[],
+  selectedAddOns: AudioOptionId[] = [],
 ): AudioCategory[] => {
   let transcriptionTypes = [];
 
@@ -36,6 +36,12 @@ export const getTranscriptionTypes = (
   }
 
   return transcriptionTypes;
+};
+
+export const hasSubtitleEditor = (
+  selectedAddOns: AudioOptionId[] = [],
+): boolean => {
+  return selectedAddOns?.includes(AudioOptionId.AudioPremium);
 };
 
 export const getStripePrices = (keysToFind: ProductKeys[]): string[] => {
