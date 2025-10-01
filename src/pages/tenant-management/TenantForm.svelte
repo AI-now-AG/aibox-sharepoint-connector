@@ -94,13 +94,13 @@
     planAddOns.filter((option: any) => {
       return (
         option == AudioOptionId.AudioBasis ||
-        option == AudioOptionId.AudioBasisAddOnSubtitle
+        option == AudioOptionId.AudioBasisAddOnLarge
       );
     }) || [];
   const initSubtitleStudioOptions =
     planAddOns.filter((option: any) => {
       return (
-        option == AudioOptionId.AudioBasisAddOnLarge ||
+        option == AudioOptionId.AudioBasisAddOnSubtitle ||
         option == AudioOptionId.AudioPremium
       );
     }) || [];
