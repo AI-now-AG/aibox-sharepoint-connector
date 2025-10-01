@@ -12,7 +12,7 @@ export const SubscriptionPackages = {
         en: "For single users & beginners",
         de: "Einzelanwender & Einsteiger",
       },
-      price: 25,
+      price: 29, // Change from [25] to [29]
       currency: "CHF",
       priceText: "25 CHF / pro Monat",
       features: {
@@ -93,16 +93,36 @@ export const SubscriptionPackages = {
       },
     },
   },
-  audioOptions: {
-    AudioPremium: {
+  audioOptions: { // Select [Subtitle Studio Plus] or [Subtitle Studio Basic] | [Audio to Text Large] or [Audio to Text Basic]
+    AudioPremium: { // Change from [Audio zu Text Premium] to [Subtitle Studio Plus]
       id: AudioOptionId.AudioPremium,
       name: {
-        en: "Audio zu Text Premium",
-        de: "Audio zu Text Premium",
+        en: "Subtitle Studio Plus",
+        de: "Subtitle Studio Plus",
       },
-      price: 65,
+      price: 150, // Change from [65] to [150]
       currency: "CHF",
       priceText: "65 CHF / pro Monat",
+    },
+    AudioBasisAddOnSubtitle: { // Change from [Add-On Subtitle] to [Subtitle Studio Basic]
+      id: AudioOptionId.AudioBasisAddOnSubtitle,
+      name: {
+        en: "Subtitle Studio Basic",
+        de: "Subtitle Studio Basic",
+      },
+      price: 50,// Change from [25] to [50]
+      currency: "CHF",
+      priceText: "25 CHF / per Monat",
+    },
+    AudioBasisAddOnLarge: {  // Change from [Add-On Audio XL] to [Audio to Text Large]
+      id: AudioOptionId.AudioBasisAddOnLarge,
+      name: {
+        en: "Audio to Text Large",
+        de: "Audio to Text Large",
+      },
+      price: 49, // Change from [15] to [49]
+      currency: "CHF",
+      priceText: "25 CHF / per Monat",
     },
     AudioBasis: {
       id: AudioOptionId.AudioBasis,
@@ -110,29 +130,9 @@ export const SubscriptionPackages = {
         en: "Audio zu Text Basis",
         de: "Audio zu Text Basis",
       },
-      price: 25,
+      price: 29, // Change from [25] to [29]
       currency: "CHF",
       priceText: "25 CHF / pro Monat",
-    },
-    AudioBasisAddOnSubtitle: {
-      id: AudioOptionId.AudioBasisAddOnSubtitle,
-      name: {
-        en: "Add-On Subtitle",
-        de: "Add-On Untertitel",
-      },
-      price: 25,
-      currency: "CHF",
-      priceText: "25 CHF / per Monat",
-    },
-    AudioBasisAddOnLarge: {
-      id: AudioOptionId.AudioBasisAddOnLarge,
-      name: {
-        en: "Add-On Audio XL",
-        de: "Add-On Audio XL",
-      },
-      price: 15,
-      currency: "CHF",
-      priceText: "25 CHF / per Monat",
     },
   },
 };
