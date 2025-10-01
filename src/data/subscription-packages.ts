@@ -113,7 +113,7 @@ export const SubscriptionPackages = {
       },
       price: 50, // Change from [25] to [50]
       currency: "CHF",
-      priceText: "50 CHF / per Monat",
+      priceText: "50 CHF / pro Monat",
     },
     AudioBasisAddOnLarge: {  // Change from [Add-On Audio XL] to [Audio to Text Large]
       id: AudioOptionId.AudioBasisAddOnLarge,
@@ -123,7 +123,7 @@ export const SubscriptionPackages = {
       },
       price: 49, // Change from [15] to [49]
       currency: "CHF",
-      priceText: "49 CHF / per Monat",
+      priceText: "49 CHF / pro Monat",
     },
     AudioBasis: {
       id: AudioOptionId.AudioBasis,

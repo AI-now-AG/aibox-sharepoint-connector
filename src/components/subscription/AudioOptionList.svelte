@@ -3,6 +3,7 @@
   import { AudioOptionId } from "$types/Subscription";
   import AudioOption from "./AudioOption.svelte";
 
+  // Applied changes from this ticket: https://ainow.atlassian.net/browse/AINOW-1430
   const audioToTextOptions = [
     SubscriptionPackages.audioOptions.AudioBasis, // [Audio to Text Basic]
     SubscriptionPackages.audioOptions.AudioBasisAddOnLarge, // [Audio to Text Large]
