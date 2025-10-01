@@ -93,6 +93,7 @@ export const SubscriptionPackages = {
       },
     },
   },
+  // Applied changes from this ticket: https://ainow.atlassian.net/browse/AINOW-1430
   audioOptions: { // Select [Subtitle Studio Plus] or [Subtitle Studio Basic] | [Audio to Text Large] or [Audio to Text Basic]
     AudioPremium: { // Change from [Audio zu Text Premium] to [Subtitle Studio Plus]
       id: AudioOptionId.AudioPremium,
