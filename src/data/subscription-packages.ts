@@ -99,7 +99,7 @@ export const SubscriptionPackages = {
       id: AudioOptionId.AudioPremium,
       name: {
         en: "Subtitle Studio Plus",
-        de: "Subtitle Studio Plus",
+        de: "Untertitel Studio Plus",
       },
       price: 150, // Change from [65] to [150]
       currency: "CHF",
@@ -109,7 +109,7 @@ export const SubscriptionPackages = {
       id: AudioOptionId.AudioBasisAddOnSubtitle,
       name: {
         en: "Subtitle Studio Basic",
-        de: "Subtitle Studio Basic",
+        de: "Untertitel Studio Basis",
       },
       price: 50, // Change from [25] to [50]
       currency: "CHF",
@@ -119,7 +119,7 @@ export const SubscriptionPackages = {
       id: AudioOptionId.AudioBasisAddOnLarge,
       name: {
         en: "Audio to Text Large",
-        de: "Audio to Text Large",
+        de: "Audio zu Text Large",
       },
       price: 49, // Change from [15] to [49]
       currency: "CHF",
