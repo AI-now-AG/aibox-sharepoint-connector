@@ -966,9 +966,9 @@
         <Dropdown
           label={t("tenant.subscription")}
           options={[
-            { value: "Starter", title: "aibox Starter (25.-)" },
-            { value: "Teams", title: "aibox Teams (149.-)" },
-            { value: "Pro", title: "aibox Pro (249.-)" },
+            { value: "Starter", title: "aibox Starter" },
+            { value: "Teams", title: "aibox Teams" },
+            { value: "Pro", title: "aibox Pro" },
             { value: "Internal", title: "Internal" },
             { value: "Enterprise", title: "aibox Enterprise" },
           ]}
