@@ -14,7 +14,7 @@ export const SubscriptionPackages = {
       },
       price: 29, // Change from [25] to [29]
       currency: "CHF",
-      priceText: "25 CHF / pro Monat",
+      priceText: "29 CHF / pro Monat",
       features: {
         en: [
           "1 User included",
@@ -102,7 +102,7 @@ export const SubscriptionPackages = {
       },
       price: 150, // Change from [65] to [150]
       currency: "CHF",
-      priceText: "65 CHF / pro Monat",
+      priceText: "150 CHF / pro Monat",
     },
     AudioBasisAddOnSubtitle: { // Change from [Add-On Subtitle] to [Subtitle Studio Basic]
       id: AudioOptionId.AudioBasisAddOnSubtitle,
@@ -110,9 +110,9 @@ export const SubscriptionPackages = {
         en: "Subtitle Studio Basic",
         de: "Subtitle Studio Basic",
       },
-      price: 50,// Change from [25] to [50]
+      price: 50, // Change from [25] to [50]
       currency: "CHF",
-      priceText: "25 CHF / per Monat",
+      priceText: "50 CHF / per Monat",
     },
     AudioBasisAddOnLarge: {  // Change from [Add-On Audio XL] to [Audio to Text Large]
       id: AudioOptionId.AudioBasisAddOnLarge,
@@ -122,7 +122,7 @@ export const SubscriptionPackages = {
       },
       price: 49, // Change from [15] to [49]
       currency: "CHF",
-      priceText: "25 CHF / per Monat",
+      priceText: "49 CHF / per Monat",
     },
     AudioBasis: {
       id: AudioOptionId.AudioBasis,
@@ -132,7 +132,7 @@ export const SubscriptionPackages = {
       },
       price: 29, // Change from [25] to [29]
       currency: "CHF",
-      priceText: "25 CHF / pro Monat",
+      priceText: "29 CHF / pro Monat",
     },
   },
 };
