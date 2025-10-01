@@ -21,9 +21,43 @@
   let { planName, addOns = [], billingMethod, billingInfo }: Props = $props();
   const { plan, audioOptions } = SubscriptionPackages;
 
+  let totalPrice: any = $state("");
+
   const lang = (getLanguage() as "en" | "de") || "en";
   const t = useTranslations();
   let loading = $state(false);
+
+  // Calculate total price (include package and audio options)
+  $effect(() => {
+    let packagePrice = 0;
+    let audioOptionsTotalPrice = 0;
+
+    // Get package price
+    if (planName) {
+      let selectedPackage =
+        SubscriptionPackages.plan[
+          planName as keyof typeof SubscriptionPackages.plan
+        ];
+      if (selectedPackage) {
+        packagePrice = selectedPackage?.price || 0;
+      }
+    }
+
+    // Get audio options price
+    if (addOns.length > 0) {
+      addOns.forEach((audioOptionId) => {
+        let audioOption =
+          SubscriptionPackages.audioOptions[
+            audioOptionId as keyof typeof SubscriptionPackages.audioOptions
+          ];
+        if (audioOption) {
+          audioOptionsTotalPrice += audioOption?.price || 0;
+        }
+      });
+    }
+
+    totalPrice = packagePrice + audioOptionsTotalPrice;
+  });
 
   async function goToBillingPortal() {
     loading = true;
@@ -63,6 +97,9 @@
         ?.price}.-
     </p>
   {/each}
+   <p class="font-bold mt-4">
+      {t("subscription.total-price-for-plan", { total: totalPrice })}
+    </p>
 </div>
 
 <div class="flex flex-col space-y-2 py-8">
