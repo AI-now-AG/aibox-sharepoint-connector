@@ -39,6 +39,7 @@ import {
 
 import {
   getTranscriptionTypes,
+  hasSubtitleEditor,
   getStripePrices,
   getStripeTaxRate,
 } from "$utils/onboarding";
@@ -97,6 +98,7 @@ const TenantInputParamsSchema = z.object({
   billing_info: BillingInfoParamsSchema,
   use_cases: z.array(z.string()),
   stripe_customer_id: z.string().optional(),
+  totalPrice: z.string().optional(),
 });
 const TenantEmailInputParamsSchema = z.object({
   tenant_id: z.string().min(1),
@@ -287,6 +289,7 @@ export const onboarding = {
           return item.name !== TenantFeature.AudioToText;
         });
       }
+      const subtitleEditorEnabled = hasSubtitleEditor(input.add_ons ?? []);
       const newTenant = await TenantModel.copyTenant(masterTenantId, {
         name: input.name,
         org_id: input.org_id,
@@ -297,6 +300,8 @@ export const onboarding = {
         transcription_types: transcriptionTypes,
         default_language: input.language,
         stripe_customer_id: input.stripe_customer_id,
+        subtitle_editor: subtitleEditorEnabled,
+        totalPrice: ""
       });
 
       // Update the current tenant for the logged-in user

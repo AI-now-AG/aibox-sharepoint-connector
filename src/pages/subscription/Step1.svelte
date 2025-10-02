@@ -35,7 +35,7 @@
   // Calculate total price (include package and audio options)
   $effect(() => {
     let packagePrice = 0;
-    let audioOptionsTotlaPrice = 0;
+    let audioOptionsTotalPrice = 0;
 
     // Get package price
     if (selectedPackageId) {
@@ -56,12 +56,12 @@
             audioOptionId as keyof typeof SubscriptionPackages.audioOptions
           ];
         if (audioOption) {
-          audioOptionsTotlaPrice += audioOption?.price || 0;
+          audioOptionsTotalPrice += audioOption?.price || 0;
         }
       });
     }
 
-    totalPrice = packagePrice + audioOptionsTotlaPrice;
+    totalPrice = packagePrice + audioOptionsTotalPrice;
   });
 
   function showAlert(message: any) {

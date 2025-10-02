@@ -395,8 +395,8 @@
   "subscription.step3": "Billing Data",
   "subscription.step4": "Create your aibox",
   "subscription.choose-your-plan": "Choose your plan",
-  "subscription.choose-your-plan-description": "Choose the plan for your needs, more info see <a href=\"https://www.aibox-app.ch/abos/\" target=\"_blank\" class=\"text-[#491EFF] font-bold\">here</a>",
-  "subscription.audio-to-text-options": "Audio to Text Options",
+  "subscription.choose-your-plan-description": "Choose the plan for your needs, more info see <a href=\"https://aibox.ainow.ch/preise\" target=\"_blank\" class=\"text-[#491EFF] font-bold\">here</a>",
+  "subscription.audio-to-text-options": "Audio and Subtitle Options",
   "subscription.per-month": "per month",
   "subscription.total-price-for-plan": "Total Price for aibox CHF ${total}.- per month",
   "subscription.please-select-package": "Please select subcription package",
@@ -596,5 +596,7 @@
   "nav.settings.prompt-refinement": "Prompt Refinement",
   "prompt-refinement.title": "Prompt for Improvement",
   "prompt-refinement.update-setting-successfull": "Prompt improvement updated successfully",
-  "prompt-refinement.update-setting-failed": "Update prompt improvement failed"
+  "prompt-refinement.update-setting-failed": "Update prompt improvement failed",
+  "tenant.subtitle-subscription": "Subtitle Subscription",
+  "tenant.total-price": "Total price"
 }

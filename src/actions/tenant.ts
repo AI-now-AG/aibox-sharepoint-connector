@@ -70,6 +70,7 @@ const TenantInputParamsSchema = z.object({
   metadata: z.record(z.any()).optional(),
   tenant_admin_email: z.string().optional(),
   billing_info: z.record(z.any()).optional(),
+  totalPrice: z.string().optional(),
 });
 
 const TenanKeyEncryptSchema = z.object({

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { slide, fly } from "svelte/transition";
+  import { slide } from "svelte/transition";
   import TextOuput from "./TextOuput.svelte";
   import StartNewConfirmDialog from "./StartNewConfirmDialog.svelte";
   import { useTranslations } from "$i18n/utils";
@@ -12,11 +12,10 @@
   import { TranscriptionType } from "$types/TranscribeRequest";
   import { AudioCategory, TenantFeature } from "$types/TenantFeature";
   import { preventDefault } from "$utils/common";
-  import { navigate } from 'astro:transitions/client';
+  import { navigate } from "astro:transitions/client";
   import {
     convertToMono,
     type ConvertToMonoConfig,
-    type ConvertToMonoCallbacks,
   } from "$api/audio/mono-converter-api";
   import {
     getSASToken,
@@ -142,7 +141,7 @@
   );
 
   function handleSelectedItems(selected: any) {
-    const elem = document.activeElement;
+    const elem: any = document.activeElement;
     if (elem) {
       elem?.blur();
     }
@@ -164,7 +163,6 @@
 
     if (category === AudioCategory.AudioPro) {
       maxFileSize = 1000;
-      //maxFileSize = 25; // this is for testing purpose
     }
 
     if (
@@ -1237,8 +1235,7 @@ $inspect(tenant?.elevenLabs_api_key);
     return !isNaN(value);
   }
 
-  function handleInput(e) {
-    let oldValue = maxNumberOfSpeakers;
+  function handleInput(e: any) {
     let newValue = e.target.value;
     checkNumberInput(newValue);
   }
@@ -1246,7 +1243,7 @@ $inspect(tenant?.elevenLabs_api_key);
   function checkNumberInput(value: number, increase?: number) {
     let newValue = parseInt(value.toString());
     if (increase) {
-      newValue = newValue + parseInt(increase);
+      newValue = newValue + increase;
     }
     if (isNumber(newValue)) {
       if (newValue <= minSpeakers) {
@@ -1701,22 +1698,7 @@ $inspect(tenant?.elevenLabs_api_key);
                 class="w-auto min-w-0 font-medium grow"
                 readonly
               />
-              <svg
-                width="12"
-                height="7"
-                viewBox="0 0 12 7"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                class="flex-none"
-              >
-                <path
-                  d="M10.6663 1L5.99967 5.66667L1.33301 1"
-                  stroke="#111827"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
+              {@html svgIcons.dropdownArrowDown}
             </label>
             {#if languageLocales}
               <ul
@@ -1731,16 +1713,6 @@ $inspect(tenant?.elevenLabs_api_key);
                     >
                       {item.title}
                     </button>
-
-                    <!-- <label class="flex items-center">
-                    <input
-                      type="checkbox"
-                      class="checkbox checkbox-sm checkbox-neutral"
-                      bind:checked={item.checked}
-                      onchange={() => handleSelectedItems(item)}
-                    />
-                    <span class="font-normal">{item.title}</span>
-                  </label> -->
                   </li>
                 {/each}
               </ul>

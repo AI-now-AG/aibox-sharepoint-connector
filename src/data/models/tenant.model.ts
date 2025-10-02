@@ -82,6 +82,7 @@ const TenantSchema = z.object({
     .default(BillingMethod.MonthlyInvoice),
   billing_info: BillingInfoSchema.optional(),
   stripe_customer_id: z.string().nullish().default(null),
+  totalPrice: z.string().optional(),
   created_at: z
     .date()
     .optional()

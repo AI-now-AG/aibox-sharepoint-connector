@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { svgIcons } from "$assets/icons";
   import { preventDefault } from "$utils/common";
   import { onMount } from "svelte";
   type Item = { title: string; value: string };
@@ -72,21 +73,7 @@
         class="font-medium w-full min-w-xs"
         readonly
       />
-      <svg
-        width="12"
-        height="7"
-        viewBox="0 0 12 7"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M10.6663 1L5.99967 5.66667L1.33301 1"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
-      </svg>
+      {@html svgIcons.dropdownArrowDown}
     </label>
     {#if items}
       <ul
