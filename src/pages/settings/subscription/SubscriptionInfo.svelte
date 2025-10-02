@@ -24,13 +24,46 @@
     addOns = [],
     billingMethod,
     billingInfo,
-    totalPrice,
+    totalPrice: _initTotalPrice,
   }: Props = $props();
   const { plan, audioOptions } = SubscriptionPackages;
 
   const lang = (getLanguage() as "en" | "de") || "en";
   const t = useTranslations();
   let loading = $state(false);
+  let totalPrice: any = $state("");
+
+  // Calculate total price (include package and audio options)
+  $effect(() => {
+    let packagePrice = 0;
+    let audioOptionsTotalPrice = 0;
+
+    // Get package price
+    if (planName) {
+      let selectedPackage =
+        SubscriptionPackages.plan[
+          planName as keyof typeof SubscriptionPackages.plan
+        ];
+      if (selectedPackage) {
+        packagePrice = selectedPackage?.price || 0;
+      }
+    }
+
+    // Get audio options price
+    if (addOns.length > 0) {
+      addOns.forEach((audioOptionId) => {
+        let audioOption =
+          SubscriptionPackages.audioOptions[
+            audioOptionId as keyof typeof SubscriptionPackages.audioOptions
+          ];
+        if (audioOption) {
+          audioOptionsTotalPrice += audioOption?.price || 0;
+        }
+      });
+    }
+
+    totalPrice = String(packagePrice + audioOptionsTotalPrice);
+  });
 
   async function goToBillingPortal() {
     loading = true;
