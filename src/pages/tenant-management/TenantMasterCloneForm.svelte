@@ -5,17 +5,19 @@
   import { addToast } from "$stores/toast";
   import Loading from "$components/Loading.svelte";
   import AlertDialog from "$components/AlertDialog.svelte";
-  import { type TenantTheme } from "$data/models/tenant.model";
   import { SubscriptionExtraPackage } from "$types/Subscription";
   import Dropdown from "$components/form/Dropdown.svelte";
   import ThemeItem from "./ThemeItem.svelte";
+  import {
+    LanguageCode,
+    Languges,
+    ThemeCode,
+    ThemeMap,
+    Themes,
+  } from "$types/TenantFeature";
 
   const t = useTranslations();
   let loading = $state(false);
-
-  interface Props {}
-
-  let {}: Props = $props();
 
   let alertModal: HTMLDialogElement | undefined = $state();
   let alertMessage = $state("");
@@ -23,34 +25,10 @@
   const headerTitle = t("tenant.clone-from-master-tenant");
   let tenantData = $state<any>({});
 
-  const languages = [
-    { title: "Deutsch", value: "de" },
-    { title: "English", value: "en" },
-  ];
-
-  let selectedLanguage: string = $state("de");
-
-  const themes = [
-    { title: "Light", value: "light" },
-    { title: "Dark", value: "dark" },
-    { title: "aibox", value: "aibox" },
-    { title: "Somedia", value: "somedia" },
-  ];
-
-  let selectedThemes: { title: string; value: string } | undefined = $state({
-    title: "aibox",
-    value: "aibox",
-  });
-  // if (tenantData.default_language) {
-  //   selectedLanguage = tenantData.default_language;
-  // }
-  // if (tenantData && !tenantData.theme) {
-  //   tenantData.theme = "dark" as TenantTheme;
-  //   selectedThemes = themes.find((item) => item.value === tenantData.theme);
-  // }
-  // if (tenantData.theme) {
-  //   selectedThemes = themes.find((item) => item.value === tenantData.theme);
-  // }
+  let selectedLanguage: string = $state(LanguageCode.En);
+  let selectedThemes: { title: string; value: string } | undefined = $state(
+    ThemeMap.aibox,
+  );
 
   function validateForm() {
     return false;
@@ -67,7 +45,7 @@
       try {
         loading = true;
         tenantData.default_language = selectedLanguage;
-        tenantData.theme = selectedThemes?.value as TenantTheme;
+        tenantData.theme = selectedThemes?.value as ThemeCode;
 
         const createTanentResult = await actions.tenant.create({
           tenant: tenantData,
@@ -138,8 +116,8 @@
   <div class="container w-full mx-auto p-6">
     <div class="flex flex-row space-x-4">
       <div class="flex-1 flex flex-col mb-4">
-        <span class="mb-2 text-base-content font-medium text-sm"
-          >{t("tenant.tenants.tenant.display-name")}</span
+        <span class="mb-3 text-base-content font-medium text-sm"
+          >{t("tenant.tenants.tenant.display-name")}*</span
         >
         <input
           type="text"
@@ -148,22 +126,23 @@
           bind:value={tenantData.name}
         />
       </div>
-    </div>
-
-    <div class="flex flex-row space-x-4">
       <div class="flex-1 flex flex-col mb-4">
         <Dropdown
           label={`${t("tenant.language")}*`}
-          options={languages}
+          options={Languges}
           bind:value={selectedLanguage}
         />
       </div>
+    </div>
+
+    <div class="flex flex-row space-x-4">
+      <div class="flex-1 flex flex-col mb-4"></div>
 
       <div class="flex-1 flex flex-col mb-4">
         <ThemeItem
           title={`${t("tenant.theme")}*`}
           placeholder="e.g Light"
-          items={themes}
+          items={Themes}
           bind:selectedItem={selectedThemes}
         />
       </div>
