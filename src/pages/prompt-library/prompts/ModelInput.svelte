@@ -105,6 +105,12 @@
           };
         }) || [];
 
+    // Gemini Nano Banana
+    models.push({
+      value: PromptModel.NanoBanana,
+      title: `Nano Banana`,
+    });
+
     sortProviders(models);
 
     models.unshift({

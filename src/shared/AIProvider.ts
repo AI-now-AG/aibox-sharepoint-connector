@@ -56,10 +56,8 @@ export const CustomSortOrder: { [key: string]: number } = {
   [PromptModel.AzureOpenAI]: 4, // Azure gpt-4o (Text)
   [PromptModel.Perplexity]: 5, // Perplexity Sonar (Text & Websuche)
   [PromptModel.Claude]: 6, // Claude Sonnet (Text)
-  [PromptModel.Gemini]: 7, // gemini (Text& Tools)
-
-  [PromptModel.OpenAIWithTools]: 9, // Deprecated — removal imminent
-  [PromptModel.OpenAIWithImageTools]: 10, // Deprecated — removal imminent
+  [PromptModel.Gemini]: 7, // Gemini (Text& Tools)
+  [PromptModel.NanoBanana]: 8, // Gemini Nano Banana
 };
 
 export const Gpt4oPromptTools = [
@@ -84,6 +82,14 @@ export const GeminiPromptTools = [
   {
     title: t("prompt-execution.prompt-tool.web-search"),
     value: PromptToolOption.Websearch,
+    icon: svgIcons.web,
+  },
+];
+
+export const NanoBananaPromptTools = [
+  {
+    title: t("prompt-execution.prompt-tool.image"),
+    value: PromptToolOption.Image,
     icon: svgIcons.web,
   },
 ];

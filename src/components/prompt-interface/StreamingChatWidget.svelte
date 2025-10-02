@@ -31,7 +31,11 @@
   import { useTranslations } from "$i18n/utils";
   import { ApiKeyProvider } from "$types/TenantFeature";
   import { PromptToolOption } from "$types/AIProvider";
-  import { getPromptTools, useProviderInfo } from "$shared/AIProvider";
+  import {
+    getPromptTools,
+    useProviderInfo,
+    NanoBananaPromptTools,
+  } from "$shared/AIProvider";
 
   const t = useTranslations();
 
@@ -119,6 +123,10 @@
   const providerInfo = useProviderInfo($tenant);
   // === Derived State ===
   let toolOptions = $derived.by(() => {
+    if (currentPrompt?.model == PromptModel.NanoBanana) {
+      return NanoBananaPromptTools;
+    }
+
     return getPromptTools(
       (currentPrompt?.model == PromptModel.Default
         ? providerInfo?.defaultProviderPromptModelName
@@ -126,19 +134,22 @@
     );
   });
 
-  let selectedPromptTool = $state(PromptToolOption.None);
+  let selectedPromptTool = $state(PromptToolOption.Image);
   let isDisablePromptTool = $state(false);
 
-  // === Effects ===
+  // Apply prompt’s tool if specified
   $effect(() => {
     if (currentPrompt?.promptTool != PromptToolOption.None) {
       selectedPromptTool = currentPrompt?.promptTool;
     }
-    // Support Old gpt-image selection (active image tool by default)
+  });
 
+  // Disable tool switching if prompt has a tool or model is NanoBanana
+  $effect(() => {
     if (
-      currentPrompt?.promptTool &&
-      currentPrompt?.promptTool != PromptToolOption.None
+      (currentPrompt?.promptTool &&
+        currentPrompt?.promptTool != PromptToolOption.None) ||
+      currentPrompt?.model == PromptModel.NanoBanana
     ) {
       isDisablePromptTool = true;
     } else {
@@ -151,7 +162,7 @@
     $previousResponseIds[promptId] ?? getPreviousResponseId(promptId),
   );
 
-  // === Effects ===
+  // Reset prompt and files when prompt changes
   $effect(() => {
     if (currentPrompt) {
       if (previousResponseId) {
@@ -160,6 +171,15 @@
       } else {
         prompt = currentPrompt?.predefined_input ?? "";
         files = [];
+      }
+    }
+  });
+
+  // Auto-select Image tool for NanoBanana prompts
+  $effect(() => {
+    if (currentPrompt) {
+      if (currentPrompt?.model == PromptModel.NanoBanana) {
+        selectedPromptTool = PromptToolOption.Image;
       }
     }
   });

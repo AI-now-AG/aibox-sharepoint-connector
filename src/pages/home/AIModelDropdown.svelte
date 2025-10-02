@@ -75,9 +75,9 @@
     const allProviders = $tenant?.api_key_providers ?? [];
     const allowedProviders = [
       ApiKeyProvider.OpenAI,
+      ApiKeyProvider.OpenAIGpt5,
       ApiKeyProvider.Perplexity,
       ApiKeyProvider.Claude,
-      ApiKeyProvider.OpenAIGpt5,
       ApiKeyProvider.Gemini,
     ];
 
