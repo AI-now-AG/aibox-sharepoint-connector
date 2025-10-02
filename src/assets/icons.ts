@@ -73,6 +73,8 @@ import longArrowRight from "$assets/icons/long-arrow-right.svg?raw";
 import check from "$assets/icons/check.svg?raw";
 import cancel from "$assets/icons/cancel.svg?raw";
 import chat from "$assets/icons/chat.svg?raw";
+import dropdownArrowDown from "$assets/icons/dropdown-arrow-down.svg?raw";
+
 
 export const svgIcons = {
   menuSettings,
@@ -149,5 +151,6 @@ export const svgIcons = {
   longArrowRight,
   check,
   cancel,
-  chat
+  chat,
+  dropdownArrowDown
 };

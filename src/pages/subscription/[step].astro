@@ -53,9 +53,9 @@ if (step == RoutePath.Step2) {
   });
 }
 
-if (Astro.locals.tenant.is_trial !== true) {
-  return Astro.redirect("/restricted");
-}
+// if (Astro.locals.tenant.is_trial !== true) {
+//   return Astro.redirect("/restricted");
+// }
 const defaultLanguage = Astro.locals.tenant.default_language || "en";
 ---
 
