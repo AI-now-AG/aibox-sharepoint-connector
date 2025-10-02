@@ -18,22 +18,31 @@ export enum SubscriptionStatus {
   Trialing = "trialing",
 }
 
+// Applied changes from this ticket: https://ainow.atlassian.net/browse/AINOW-1430
 export enum AudioOptionId {
-  AudioPremium = "AudioPremium",
+  /** [Audio to Text Basic] */
   AudioBasis = "AudioBasis",
-  AudioBasisAddOnSubtitle = "AudioBasisAddOnSubtitle",
+
+  /** [Audio to Text Large] */
   AudioBasisAddOnLarge = "AudioBasisAddOnLarge",
+
+  /** [Subtitle Studio Basic] */
+  AudioBasisAddOnSubtitle = "AudioBasisAddOnSubtitle",
+
+  /** [Subtitle Studio Plus] => Included Subtitle editor */
+  AudioPremium = "AudioPremium",
 }
 
 export type ProductKeys =
   | keyof typeof SubscriptionPackageId
   | keyof typeof AudioOptionId;
 
+// Applied changes from this ticket: https://ainow.atlassian.net/browse/AINOW-1430
 export const AudioOptionLabels: Record<AudioOptionId, string> = {
-  [AudioOptionId.AudioBasis]: "Audio Basis",
-  [AudioOptionId.AudioBasisAddOnSubtitle]: "Add-on Untertitel",
-  [AudioOptionId.AudioBasisAddOnLarge]: "Add-on Audio Xl",
-  [AudioOptionId.AudioPremium]: "Audio Premium Package",
+  [AudioOptionId.AudioBasis]: "Audio to Text Basic", // [Audio to Text Basic]
+  [AudioOptionId.AudioBasisAddOnLarge]: "Audio to Text Large", // [Audio to Text Large]
+  [AudioOptionId.AudioBasisAddOnSubtitle]: "Subtitle Studio Basic", // [Subtitle Studio Basic]
+  [AudioOptionId.AudioPremium]: "Subtitle Studio Plus", // [Subtitle Studio Plus]
 };
 
 export enum BillingMethod {

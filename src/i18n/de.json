@@ -395,8 +395,8 @@
   "subscription.step3": "Rechnungsdaten",
   "subscription.step4": "Erstelle deine aibox",
   "subscription.choose-your-plan": "Wähle dein Abo",
-  "subscription.choose-your-plan-description": "Wähle deinen Plan, welcher zu deinen Bedürfnissen passt. Weitere Informationen findest du <a href=\"https://www.aibox-app.ch/abos/\" target=\"_blank\" class=\"text-[#491EFF] font-bold\">hier</a>",
-  "subscription.audio-to-text-options": "Audio zu Text Optionen",
+  "subscription.choose-your-plan-description": "Wähle deinen Plan, welcher zu deinen Bedürfnissen passt. Weitere Informationen findest du <a href=\"https://aibox.ainow.ch/preise\" target=\"_blank\" class=\"text-[#491EFF] font-bold\">hier</a>",
+  "subscription.audio-to-text-options": "Audio und Untertitel Optionen",
   "subscription.per-month": "pro Monat",
   "subscription.total-price-for-plan": "Der Preis für deine aibox beträgt CHF ${total}.- pro Monat",
   "subscription.please-select-package": "Bitte wähle dein Abonnement aus",
@@ -596,5 +596,7 @@
   "nav.settings.prompt-refinement": "Prompt Optimierung",
   "prompt-refinement.title": "Prompt für Verbesserung Anwendungsfall",
   "prompt-refinement.update-setting-successfull": "Prompt erfolgreich gespeichert",
-  "prompt-refinement.update-setting-failed": "Prompt konnte nicht gespeichert werden."
+  "prompt-refinement.update-setting-failed": "Prompt konnte nicht gespeichert werden.",
+  "tenant.subtitle-subscription": "Untertitel Abonnement",
+  "tenant.total-price": "Gesamtpreis"
 }
