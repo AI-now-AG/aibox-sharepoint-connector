@@ -86,12 +86,10 @@
 
   let isShowAttachmentButton = $state(model != PromptModel.Perplexity);
 
-  const providerIno = useProviderInfo($tenant);
+  const providerInfo = useProviderInfo($tenant);
   let toolOptions = getPromptTools(
     (model == PromptModel.Default
-      ? providerIno?.defaultProviderPromptModelName == PromptModel.OpenAI
-        ? PromptModel.OpenAIWithTools
-        : providerIno?.defaultProviderPromptModelName
+      ? providerInfo?.defaultProviderPromptModelName
       : model) as PromptModel,
   );
 
@@ -225,8 +223,8 @@
   function buildRequestPayload(fileUrls: string[]): RequestPayload {
     const isOpenAIResponseModel = [
       PromptModel.OpenAI,
-      PromptModel.OpenAIWithTools,
-      PromptModel.OpenAIWithImageTools,
+      PromptModel.OpenAIWithTools, // Deprecated — removal imminent
+      PromptModel.OpenAIWithImageTools, // Deprecated — removal imminent
     ].includes(model);
 
     const isOpenAIGpt5ResponseModel =

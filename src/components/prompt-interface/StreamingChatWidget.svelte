@@ -116,14 +116,12 @@
     return activeDefaultProvider?.name || ApiKeyProvider.OpenAI;
   }
 
-  const providerIno = useProviderInfo($tenant);
+  const providerInfo = useProviderInfo($tenant);
   // === Derived State ===
   let toolOptions = $derived.by(() => {
     return getPromptTools(
       (currentPrompt?.model == PromptModel.Default
-        ? providerIno?.defaultProviderPromptModelName == PromptModel.OpenAI
-          ? PromptModel.OpenAIWithTools
-          : providerIno?.defaultProviderPromptModelName
+        ? providerInfo?.defaultProviderPromptModelName
         : currentPrompt?.model) as PromptModel,
     );
   });
@@ -137,15 +135,10 @@
       selectedPromptTool = currentPrompt?.promptTool;
     }
     // Support Old gpt-image selection (active image tool by default)
-    const isOpenAiWithImageTool =
-      currentPrompt?.model == PromptModel.OpenAIWithImageTools;
-    if (isOpenAiWithImageTool) {
-      selectedPromptTool = PromptToolOption.Image;
-    }
+
     if (
-      (currentPrompt?.promptTool &&
-        currentPrompt?.promptTool != PromptToolOption.None) ||
-      isOpenAiWithImageTool
+      currentPrompt?.promptTool &&
+      currentPrompt?.promptTool != PromptToolOption.None
     ) {
       isDisablePromptTool = true;
     } else {
@@ -197,8 +190,8 @@
     let isOpenAIResponseModel =
       [
         PromptModel.OpenAI,
-        PromptModel.OpenAIWithTools,
-        PromptModel.OpenAIWithImageTools,
+        PromptModel.OpenAIWithTools, // Deprecated — removal imminent
+        PromptModel.OpenAIWithImageTools, // Deprecated — removal imminent
       ].includes(currentPrompt?.model) ||
       (getDefaultModelName() == ApiKeyProvider.OpenAI && !currentPrompt?.model);
 

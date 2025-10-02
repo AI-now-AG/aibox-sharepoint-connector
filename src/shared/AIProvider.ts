@@ -11,7 +11,7 @@ export const ModelNameMap: Record<string, string> = {
   "claude-sonnet-4-0": "Claude Sonnet",
   sonar: "Perplexity Sonar",
   "gemini-2.5-flash": "Gemini 2.5 Flash",
-}
+};
 
 export const ProviderMap: Partial<Record<ApiKeyProvider, string>> = {
   [ApiKeyProvider.OpenAI]: ApiKeyProvider.OpenAI,
@@ -23,42 +23,43 @@ export const ProviderMap: Partial<Record<ApiKeyProvider, string>> = {
 };
 
 export const ProviderModelMap: Record<string, string> = {
-  [ApiKeyProvider.Perplexity]: "perplexity_chat_model",
-  [ApiKeyProvider.Claude]: "anthropic_chat_model",
   [ApiKeyProvider.OpenAI]: "openai_chat_model",
   [ApiKeyProvider.OpenAIGpt5]: "openai_gpt5_chat_model",
   [ApiKeyProvider.AzureOpenAI]: "azure_openai_chat_model",
+  [ApiKeyProvider.Perplexity]: "perplexity_chat_model",
+  [ApiKeyProvider.Claude]: "anthropic_chat_model",
   [ApiKeyProvider.Gemini]: "gemini_chat_model",
 };
 
 export const ProviderPromptModelNameMap: Record<string, string> = {
-  [ApiKeyProvider.Perplexity]: PromptModel.Perplexity,
-  [ApiKeyProvider.Claude]: PromptModel.Claude,
   [ApiKeyProvider.OpenAI]: PromptModel.OpenAI,
   [ApiKeyProvider.OpenAIGpt5]: PromptModel.OpenAIGpt5,
   [ApiKeyProvider.AzureOpenAI]: PromptModel.AzureOpenAI,
+  [ApiKeyProvider.Perplexity]: PromptModel.Perplexity,
+  [ApiKeyProvider.Claude]: PromptModel.Claude,
   [ApiKeyProvider.Gemini]: PromptModel.Gemini,
 };
 
 export const ModelNameProviderPromptMap: Record<string, string> = {
-  [PromptModel.Perplexity]: ApiKeyProvider.Perplexity,
-  [PromptModel.Claude]: ApiKeyProvider.Claude,
   [PromptModel.OpenAI]: ApiKeyProvider.OpenAI,
   [PromptModel.OpenAIGpt5]: ApiKeyProvider.OpenAIGpt5,
   [PromptModel.AzureOpenAI]: ApiKeyProvider.AzureOpenAI,
+  [PromptModel.Perplexity]: ApiKeyProvider.Perplexity,
+  [PromptModel.Claude]: ApiKeyProvider.Claude,
   [PromptModel.Gemini]: ApiKeyProvider.Gemini,
 };
 
 export const CustomSortOrder: { [key: string]: number } = {
   [PromptModel.Default]: 1, // Default - gpt-4o, Legacy (Text)
-  [PromptModel.OpenAIWithTools]: 2, // gpt-4o (Text & Tools)
+  [PromptModel.OpenAI]: 2, // gpt-4o, Legacy (Text)
   [PromptModel.OpenAIGpt5]: 3, // gpt-5 (Text & Tools)
   [PromptModel.AzureOpenAI]: 4, // Azure gpt-4o (Text)
   [PromptModel.Perplexity]: 5, // Perplexity Sonar (Text & Websuche)
   [PromptModel.Claude]: 6, // Claude Sonnet (Text)
   [PromptModel.Gemini]: 7, // gemini (Text& Tools)
-  [PromptModel.OpenAIWithImageTools]: 8, // gpt Image (Bilder)
-  [PromptModel.OpenAI]: 9, // gpt-4o, Legacy (Text)
+
+  [PromptModel.OpenAIWithTools]: 9, // Deprecated — removal imminent
+  [PromptModel.OpenAIWithImageTools]: 10, // Deprecated — removal imminent
 };
 
 export const Gpt4oPromptTools = [
@@ -90,8 +91,6 @@ export const GeminiPromptTools = [
 export function getPromptTools(promptModel: PromptModel) {
   switch (promptModel) {
     case PromptModel.OpenAI:
-    case PromptModel.OpenAIWithTools:
-    case PromptModel.OpenAIWithImageTools:
       return Gpt4oPromptTools;
     case PromptModel.OpenAIGpt5:
       return Gpt5PromptTools;

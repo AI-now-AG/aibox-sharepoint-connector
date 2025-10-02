@@ -88,9 +88,7 @@
   let promptTools: Array<any> = $derived(
     getPromptTools(
       (selectedModel == PromptModel.Default
-        ? providerInfo?.defaultProviderPromptModelName == PromptModel.OpenAI
-          ? PromptModel.OpenAIWithTools
-          : providerInfo?.defaultProviderPromptModelName
+        ? providerInfo?.defaultProviderPromptModelName
         : selectedModel) as PromptModel,
     ) ?? [],
   );

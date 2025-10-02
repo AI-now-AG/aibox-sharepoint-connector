@@ -1,8 +1,8 @@
 export enum PromptModel {
   Default = "",
   OpenAI = "openai",
-  OpenAIWithTools = "openai:tools",
-  OpenAIWithImageTools = "openai:tools:image",
+  OpenAIWithTools = "openai:tools", // Deprecated — removal imminent
+  OpenAIWithImageTools = "openai:tools:image", // Deprecated — removal imminent
   OpenAIGpt5 = "openai-gpt-5",
   AzureOpenAI = "azure_openai",
   Perplexity = "perplexity",

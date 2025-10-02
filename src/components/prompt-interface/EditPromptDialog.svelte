@@ -106,9 +106,7 @@
   let promptTools: Array<any> = $derived(
     getPromptTools(
       (selectedModel == PromptModel.Default
-        ? providerInfo?.defaultProviderPromptModelName == PromptModel.OpenAI
-          ? PromptModel.OpenAIWithTools
-          : providerInfo?.defaultProviderPromptModelName
+        ? providerInfo?.defaultProviderPromptModelName
         : selectedModel) as PromptModel,
     ) ?? [],
   );
@@ -168,14 +166,23 @@
       }
 
       selectedModel = promptDetails.model?.toString() || "";
+      // Handle deprecated models. Deprecated — removal imminent
+      if (
+        [
+          PromptModel.OpenAIWithTools,
+          PromptModel.OpenAIWithImageTools,
+        ].includes(selectedModel as PromptModel)
+      ) {
+        console.log(
+          `[DEPRECATION WARNING]: ${selectedModel} is deprecated and will be removed soon. Please switch to ${PromptModel.OpenAI}.`,
+        );
+        selectedModel = PromptModel.OpenAI;
+      }
+
       selectedReasoningLevel = promptDetails.reasoningEffort || "low";
       selectedTextVerbosity = promptDetails.textVerbosity || "low";
 
       selectedPromptTool = promptDetails.promptTool || "";
-      // Support Old gpt-image selection (active image tool by default)
-      if (selectedModel == PromptModel.OpenAIWithImageTools) {
-        selectedPromptTool = PromptToolOption.Image;
-      }
 
       const group = category?.groups.find(
         (e) => e._id == promptDetails.group?.toString(),
