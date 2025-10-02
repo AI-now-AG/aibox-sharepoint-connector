@@ -25,9 +25,9 @@
   const headerTitle = t("tenant.clone-from-master-tenant");
   let tenantData = $state<any>({});
 
-  let selectedLanguage: string = $state(LanguageCode.En);
+  let selectedLanguage: string = $state(LanguageCode.De);
   let selectedThemes: { title: string; value: string } | undefined = $state(
-    ThemeMap.aibox,
+    ThemeMap[ThemeCode.AIBox],
   );
 
   function validateForm() {
@@ -116,7 +116,7 @@
   <div class="container w-full mx-auto p-6">
     <div class="flex flex-row space-x-4">
       <div class="flex-1 flex flex-col mb-4">
-        <span class="mb-3 text-base-content font-medium text-sm"
+        <span class="mb-2 text-base-content font-medium text-sm"
           >{t("tenant.tenants.tenant.display-name")}*</span
         >
         <input
@@ -126,6 +126,10 @@
           bind:value={tenantData.name}
         />
       </div>
+      <div class="flex-1 flex flex-col mb-4"></div>
+    </div>
+
+    <div class="flex flex-row space-x-4">
       <div class="flex-1 flex flex-col mb-4">
         <Dropdown
           label={`${t("tenant.language")}*`}
@@ -133,10 +137,6 @@
           bind:value={selectedLanguage}
         />
       </div>
-    </div>
-
-    <div class="flex flex-row space-x-4">
-      <div class="flex-1 flex flex-col mb-4"></div>
 
       <div class="flex-1 flex flex-col mb-4">
         <ThemeItem

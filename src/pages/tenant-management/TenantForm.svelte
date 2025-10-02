@@ -266,9 +266,9 @@
       ),
   );
 
-  let selectedLanguage: string = $state(LanguageCode.En);
+  let selectedLanguage: string = $state(LanguageCode.De);
   let selectedThemes: { title: string; value: string } | undefined = $state(
-    ThemeMap.aibox,
+    ThemeMap[ThemeCode.AIBox],
   );
 
   if (tenantData) {
@@ -327,7 +327,7 @@
     selectedLanguage = tenantData.default_language;
   }
   if (tenantData && !tenantData.theme) {
-    tenantData.theme = ThemeMap.aibox as ThemeCode;
+    tenantData.theme = ThemeCode.AIBox as ThemeCode;
     selectedThemes = Themes.find((item) => item.value === tenantData.theme);
   }
   if (tenantData.theme) {
@@ -964,7 +964,7 @@
     <div class="flex flex-row space-x-4">
       <div class="flex-1 flex flex-col mb-4">
         <span class="mb-2 text-base-content font-medium text-sm"
-          >{t("tenant.tenants.tenant.display-name")}</span
+          >{t("tenant.tenants.tenant.display-name")}*</span
         >
         <input
           type="text"
@@ -976,7 +976,7 @@
 
       <div class="flex-1 flex flex-col mb-4">
         <span class="mb-2 text-base-content font-medium text-sm"
-          >{t("tenant.tenants.tenant.name")}</span
+          >{t("tenant.tenants.tenant.name")}*</span
         >
         <input
           type="text"
