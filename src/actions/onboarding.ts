@@ -98,6 +98,7 @@ const TenantInputParamsSchema = z.object({
   billing_info: BillingInfoParamsSchema,
   use_cases: z.array(z.string()),
   stripe_customer_id: z.string().optional(),
+  totalPrice: z.string().optional(),
 });
 const TenantEmailInputParamsSchema = z.object({
   tenant_id: z.string().min(1),
@@ -300,6 +301,7 @@ export const onboarding = {
         default_language: input.language,
         stripe_customer_id: input.stripe_customer_id,
         subtitle_editor: subtitleEditorEnabled,
+        totalPrice: ""
       });
 
       // Update the current tenant for the logged-in user
