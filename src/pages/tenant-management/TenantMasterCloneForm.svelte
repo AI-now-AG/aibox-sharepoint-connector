@@ -16,6 +16,20 @@
     Themes,
   } from "$types/TenantFeature";
 
+
+  // TODO: Handle getting data from Master tenant
+  const example_categories = [
+    { title: "Marketing", value: "67ff5a7c60fa2a8bca5d26da" },
+    { title: "HR", value: "67ff5a7c60fa2a8bca5d26df" },
+    { title: "Texting", value: "67ff5a7c60fa2a8bca5d26e6" },
+    { title: "Interne Prozesse", value: "67ff5a7c60fa2a8bca5d26eb" },
+    { title: "Produktmanagement", value: "67ff5a7c60fa2a8bca5d26ef" },
+    { title: "Sales & Support", value: "67ff5a7c60fa2a8bca5d26f3" },
+    { title: "Kommunikation", value: "67ff5a7c60fa2a8bca5d26f7" },
+    { title: "Perplexity", value: "67ff5a7c60fa2a8bca5d26fb" },
+    { title: "Neu für Test", value: "680f891b3dc2162f30c88685" },
+  ];
+
   const t = useTranslations();
   let loading = $state(false);
 
@@ -29,6 +43,8 @@
   let selectedThemes: { title: string; value: string } | undefined = $state(
     ThemeMap[ThemeCode.AIBox],
   );
+
+  let selectedCategories: string[] = $state([]);
 
   function validateForm() {
     return false;
@@ -149,6 +165,41 @@
     </div>
 
     <div class="divider"></div>
+
+    <div class="font-sans font-bold text-base mt-10 mb-6">
+      {t("subscription.choose-categories")}
+    </div>
+
+    <div
+      class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 mb-10 text-black"
+    >
+      {#each example_categories as category}
+        {#if selectedCategories.includes(category.value)}
+          <button
+            class="btn btn-primary w-full h-[56px] shadow-xl py-2"
+            onclick={() => {
+              selectedCategories = selectedCategories.filter(
+                (item) => item !== category.value,
+              );
+            }}
+            ><span class="w-full text-left py-2">
+              {category.title}
+            </span></button
+          >
+        {:else}
+          <button
+            class="btn btn-primary w-full h-[56px] shadow-xl bg-white text-gray-600 py-2 border-0"
+            onclick={() => {
+              selectedCategories.push(category.value);
+            }}
+          >
+            <span class="w-full text-left py-2">
+              {category.title}
+            </span></button
+          >
+        {/if}
+      {/each}
+    </div>
   </div>
 </div>
 
