@@ -114,8 +114,10 @@ export async function startTranscription(
         "Authorization": `Bearer ${accessToken}`,
         "Accept": "text/event-stream",
         "Cache-Control": "no-cache",
+        "Connection": "keep-alive",
       },
       body: JSON.stringify(params),
+      keepalive: true,
     })
       .then(response => {
         if (!response.ok) {
