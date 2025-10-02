@@ -82,16 +82,16 @@
         throw new Error(t("subscription.missing-subscription-information"));
       }
 
-      // Step 1: Create organization
+      // Step 1: Create Organization
       const organization = await createOrganization();
 
-      // Step 2: Create member
+      // Step 2: Create Member
       await createMember(organization.id);
 
-      // Step 3: Create member
+      // Step 3: Setup Tenant
       const tenant = await setupTenantData(organization.id, organization.name);
 
-      // Step 4: Create member
+      // Step 4: Finalize
       await finalizeSubscription(tenant.id);
 
       // After successful subscription creation, reset the subscription store
