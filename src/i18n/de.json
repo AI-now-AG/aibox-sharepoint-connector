@@ -598,5 +598,7 @@
   "prompt-refinement.update-setting-successfull": "Prompt erfolgreich gespeichert",
   "prompt-refinement.update-setting-failed": "Prompt konnte nicht gespeichert werden.",
   "tenant.subtitle-subscription": "Untertitel Abonnement",
-  "tenant.total-price": "Gesamtpreis"
+  "tenant.total-price": "Gesamtpreis",
+  "tenant.add-empty-tenant": "Empty Tenant ",
+  "tenant.clone-from-master-tenant": "Clone from Master "
 }

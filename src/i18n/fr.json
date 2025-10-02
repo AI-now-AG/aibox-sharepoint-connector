@@ -598,5 +598,7 @@
   "prompt-refinement.update-setting-successfull": "Prompt improvement updated successfully",
   "prompt-refinement.update-setting-failed": "Update prompt improvement failed",
   "tenant.subtitle-subscription": "Subtitle Subscription",
-  "tenant.total-price": "Total price"
+  "tenant.total-price": "Total price",
+  "tenant.add-empty-tenant": "Empty Tenant ",
+  "tenant.clone-from-master-tenant": "Clone from Master "
 }
