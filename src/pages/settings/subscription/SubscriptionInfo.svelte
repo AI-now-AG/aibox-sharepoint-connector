@@ -10,6 +10,7 @@
   } from "$types/Subscription";
   import { tenant } from "$stores";
   import { SubscriptionPackages } from "$data/subscription-packages";
+  import { onMount } from "svelte";
 
   interface Props {
     planName: SubscriptionPackageId | undefined;
@@ -24,13 +25,54 @@
     addOns = [],
     billingMethod,
     billingInfo,
-    totalPrice,
+    totalPrice: _initTotalPrice,
   }: Props = $props();
   const { plan, audioOptions } = SubscriptionPackages;
 
   const lang = (getLanguage() as "en" | "de") || "en";
   const t = useTranslations();
   let loading = $state(false);
+
+  let totalPrice: any = $state("");
+
+  onMount(() => {
+    const calculateTotalPrice = () => {
+      let packagePrice = 0;
+      let audioOptionsTotalPrice = 0;
+
+      // Get package price
+      if (planName) {
+        let selectedPackage =
+          SubscriptionPackages.plan[
+            planName as keyof typeof SubscriptionPackages.plan
+          ];
+        if (selectedPackage) {
+          packagePrice = selectedPackage?.price || 0;
+        }
+      }
+
+      // Get audio options price
+      if (addOns.length > 0) {
+        addOns.forEach((audioOptionId) => {
+          let audioOption =
+            SubscriptionPackages.audioOptions[
+              audioOptionId as keyof typeof SubscriptionPackages.audioOptions
+            ];
+          if (audioOption) {
+            audioOptionsTotalPrice += audioOption?.price || 0;
+          }
+        });
+      }
+
+      return String(packagePrice + audioOptionsTotalPrice);
+    };
+
+    if (!_initTotalPrice) {
+      totalPrice = calculateTotalPrice();
+    } else {
+      totalPrice = _initTotalPrice;
+    }
+  });
 
   async function goToBillingPortal() {
     loading = true;
