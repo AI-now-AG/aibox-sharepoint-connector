@@ -64,7 +64,7 @@
       organization_name: organizationName ?? "",
     });
 
-    if (error) throw new Error(t("subscription.create-organization-failed"));
+    if (error) throw new Error(t("tenant.create-organization-failed"));
     return data;
   }
 
@@ -84,7 +84,7 @@
       add_ons: [],
     });
 
-    if (error) throw new Error(t("subscription.setup-tenant-data-failed"));
+    if (error) throw new Error(t("tenant.setup-tenant-data-failed"));
     return data;
   }
 
@@ -202,7 +202,7 @@
     <div class="divider"></div>
 
     <div class="font-sans font-bold text-base mt-10 mb-6">
-      {t("subscription.choose-categories")}
+      {t("tenant.choose-categories")}
     </div>
 
     <div

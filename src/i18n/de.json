@@ -600,5 +600,8 @@
   "tenant.subtitle-subscription": "Untertitel Abonnement",
   "tenant.total-price": "Gesamtpreis",
   "tenant.add-empty-tenant": "Empty Tenant ",
-  "tenant.clone-from-master-tenant": "Clone from Master "
+  "tenant.clone-from-master-tenant": "Clone from Master ",
+  "tenant.choose-categories": "Wähle für welche Bereiche wir bereits Anwendungfälle (Prompts) einrichten sollen.",
+  "tenant.create-organization-failed": "Organisation konnte nicht erstellt werden",
+  "tenant.setup-tenant-data-failed": "Tenant konnte nicht eingerichtet werden"
 }

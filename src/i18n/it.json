@@ -600,5 +600,8 @@
   "tenant.subtitle-subscription": "Subtitle Subscription",
   "tenant.total-price": "Total price",
   "tenant.add-empty-tenant": "Empty Tenant ",
-  "tenant.clone-from-master-tenant": "Clone from Master "
+  "tenant.clone-from-master-tenant": "Clone from Master ",
+  "tenant.choose-categories": "Chose default use cases for your aibox",
+  "tenant.create-organization-failed": "Failed to create organization",
+  "tenant.setup-tenant-data-failed": "Failed to setup tenant data"
 }
