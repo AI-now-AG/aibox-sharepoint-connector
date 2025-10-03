@@ -5,7 +5,6 @@
   import { addToast } from "$stores/toast";
   import Loading from "$components/Loading.svelte";
   import AlertDialog from "$components/AlertDialog.svelte";
-  import { SubscriptionExtraPackage } from "$types/Subscription";
   import Dropdown from "$components/form/Dropdown.svelte";
   import ThemeItem from "./ThemeItem.svelte";
   import {
@@ -21,19 +20,15 @@
   interface Props {
     masterTenantId: string;
   }
-
   let { masterTenantId }: Props = $props();
 
   let loading = $state(false);
-
   let alertModal: HTMLDialogElement | undefined = $state();
   let alertMessage = $state("");
 
-  const headerTitle = t("tenant.clone-from-master-tenant");
-  let tenantData = $state<any>({});
-
+  let organizationName = $state<string>("");
   let selectedLanguage: string = $state(LanguageCode.De);
-  let selectedThemes: { title: string; value: string } | undefined = $state(
+  let selectedTheme: { title: string; value: ThemeCode } | undefined = $state(
     ThemeMap[ThemeCode.AIBox],
   );
 
@@ -64,40 +59,62 @@
     }
   });
 
-  function validateForm() {
-    return false;
-    // if (!tenantData?.name) {
-    //   showAlert(t("tenant.validate-empty-display-name-message"));
-    //   return false;
-    // }
+  async function createOrganization() {
+    const { data, error } = await actions.cloneMasterTeant.createOrganization({
+      organization_name: organizationName ?? "",
+    });
 
-    // return true;
+    if (error) throw new Error(t("subscription.create-organization-failed"));
+    return data;
+  }
+
+  async function setupTenantData(
+    organizationId: string,
+    organizationName: string,
+    organizationDisplayName: string,
+  ) {
+    const { data, error } = await actions.cloneMasterTeant.setupTenantData({
+      name: organizationDisplayName ?? "",
+      org_id: organizationId,
+      org_name: organizationName,
+      language: selectedLanguage ?? LanguageCode.De,
+      theme: selectedTheme?.value ?? ThemeCode.AIBox,
+      use_cases: selectedCategories ?? [],
+      plan_name: undefined,
+      add_ons: [],
+    });
+
+    if (error) throw new Error(t("subscription.setup-tenant-data-failed"));
+    return data;
+  }
+
+  function validateForm() {
+    if (!organizationName) {
+      showAlert(t("tenant.validate-empty-display-name-message"));
+      return false;
+    }
+    return true;
   }
 
   async function createTenant() {
     if (validateForm()) {
       try {
         loading = true;
-        tenantData.default_language = selectedLanguage;
-        tenantData.theme = selectedThemes?.value as ThemeCode;
+        // Step 1: Create [Auth0] Organization
+        const organization = await createOrganization();
+        // Step 2: Setup [AIBOX] Tenant
+        const tenant = await setupTenantData(
+          organization.id,
+          organization.name,
+          organization.display_name,
+        );
 
-        const { error, data: createdTenant } = await actions.tenant.create({
-          tenant: tenantData,
-          subscription: {
-            plan_name: SubscriptionExtraPackage.Internal,
-            add_ons: [],
-          },
-        });
-
-        if (error) {
-          showAlert(error?.toString());
-        } else {
+        if (tenant) {
           addToast({
             message: t("tenant.create-successful"),
             type: "success",
           });
-          const { insertedId = "" } = createdTenant;
-          window.location.href = "/tenant-management/" + insertedId;
+          window.location.href = "/tenant-management/" + tenant.id;
         }
       } catch (error: any) {
         showAlert(error?.toString());
@@ -124,7 +141,7 @@
       {@html svgIcons.back}
     </button>
     <h1 class="text-4xl font-bold">
-      {headerTitle}
+      {t("tenant.clone-from-master-tenant")}
     </h1>
 
     <div class="flex space-x-2 ml-auto">
@@ -157,7 +174,7 @@
           type="text"
           placeholder={t("tenant.tenants.tenant.display-name")}
           class="input input-bordered w-full"
-          bind:value={tenantData.name}
+          bind:value={organizationName}
         />
       </div>
       <div class="flex-1 flex flex-col mb-4"></div>
@@ -177,7 +194,7 @@
           title={`${t("tenant.theme")}*`}
           placeholder="e.g Light"
           items={Themes}
-          bind:selectedItem={selectedThemes}
+          bind:selectedItem={selectedTheme}
         />
       </div>
     </div>
