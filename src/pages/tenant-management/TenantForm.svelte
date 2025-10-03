@@ -31,6 +31,8 @@
   import AudioAddonsDropdown from "./AudioAddonsDropdown.svelte";
   import ThemeItem from "./ThemeItem.svelte";
   import { TextModel } from "$types/UsageTracking";
+  import { SubscriptionPackages } from "$data/subscription-packages";
+  import { onMount } from "svelte";
 
   const t = useTranslations();
   let loading = $state(false);
@@ -84,10 +86,31 @@
   }
 
   // Subscription & billing
-  let selectedPlanName: SubscriptionPackageId = $state(
+  let selectedPlan: SubscriptionPackageId = $state(
     subscription?.plan_name ?? "",
   );
-  let selectedPlanAddOns: AudioOptionId[] = $state(subscription?.add_ons ?? []);
+  const planAddOns = subscription?.add_ons ?? [];
+  const initAudioToTextOptions =
+    planAddOns.filter((option: any) => {
+      return (
+        option == AudioOptionId.AudioBasis ||
+        option == AudioOptionId.AudioBasisAddOnLarge
+      );
+    }) || [];
+  const initSubtitleStudioOptions =
+    planAddOns.filter((option: any) => {
+      return (
+        option == AudioOptionId.AudioBasisAddOnSubtitle ||
+        option == AudioOptionId.AudioPremium
+      );
+    }) || [];
+
+  let selectedAudioToTextOptions: AudioOptionId[] = $state(
+    initAudioToTextOptions,
+  );
+  let selectedSubtitleStudioOptions: AudioOptionId[] = $state(
+    initSubtitleStudioOptions,
+  );
   tenantData.billing_info = tenant?.billing_info ?? {};
 
   let openAIEnabled: boolean = $state(false);
@@ -621,8 +644,11 @@
         const createTanentResult = await actions.tenant.create({
           tenant: tenantData,
           subscription: {
-            plan_name: selectedPlanName,
-            add_ons: selectedPlanAddOns,
+            plan_name: selectedPlan,
+            add_ons: [
+              ...selectedAudioToTextOptions,
+              ...selectedSubtitleStudioOptions,
+            ],
           },
         });
         const { error, data: createdTenant } = createTanentResult;
@@ -770,8 +796,11 @@
         const { error } = await actions.tenant.update({
           tenant: tenantData,
           subscription: {
-            plan_name: selectedPlanName,
-            add_ons: selectedPlanAddOns,
+            plan_name: selectedPlan,
+            add_ons: [
+              ...selectedAudioToTextOptions,
+              ...selectedSubtitleStudioOptions,
+            ],
           },
         });
         loading = false;
@@ -853,6 +882,55 @@
     alertMessage = message;
     alertModal?.show();
   }
+  onMount(() => {
+    const calculateTotalPrice = () => {
+      let packagePrice = 0;
+      let audioOptionsTotalPrice = 0;
+
+      // Get package price
+      if (selectedPlan) {
+        let selectedPackage =
+          SubscriptionPackages.plan[
+            selectedPlan as keyof typeof SubscriptionPackages.plan
+          ];
+        if (selectedPackage) {
+          packagePrice = selectedPackage?.price || 0;
+        }
+      }
+
+      // Get audio options price
+      if (selectedAudioToTextOptions.length > 0) {
+        selectedAudioToTextOptions.forEach((audioOptionId) => {
+          let audioOption =
+            SubscriptionPackages.audioOptions[
+              audioOptionId as keyof typeof SubscriptionPackages.audioOptions
+            ];
+          if (audioOption) {
+            audioOptionsTotalPrice += audioOption?.price || 0;
+          }
+        });
+      }
+
+      // Get audio options price
+      if (selectedSubtitleStudioOptions.length > 0) {
+        selectedSubtitleStudioOptions.forEach((audioOptionId) => {
+          let audioOption =
+            SubscriptionPackages.audioOptions[
+              audioOptionId as keyof typeof SubscriptionPackages.audioOptions
+            ];
+          if (audioOption) {
+            audioOptionsTotalPrice += audioOption?.price || 0;
+          }
+        });
+      }
+
+      return String(packagePrice + audioOptionsTotalPrice);
+    };
+
+    if (!tenant.totalPrice) {
+      tenant.totalPrice = calculateTotalPrice();
+    }
+  });
 </script>
 
 <div
@@ -966,23 +1044,45 @@
         <Dropdown
           label={t("tenant.subscription")}
           options={[
-            { value: "Starter", title: "aibox Starter (25.-)" },
-            { value: "Teams", title: "aibox Teams (149.-)" },
-            { value: "Pro", title: "aibox Pro (249.-)" },
+            { value: SubscriptionPackageId.Starter, title: "aibox Starter" },
+            { value: SubscriptionPackageId.Teams, title: "aibox Teams" },
+            { value: SubscriptionPackageId.Pro, title: "aibox Pro" },
             { value: "Internal", title: "Internal" },
             { value: "Enterprise", title: "aibox Enterprise" },
           ]}
-          bind:value={selectedPlanName}
+          bind:value={selectedPlan}
         />
       </div>
       <div class="flex-1 flex flex-col mb-4">
         <AudioAddonsDropdown
           title={t("tenant.audio-subscription")}
           placeholder=""
-          bind:value={selectedPlanAddOns}
+          bind:value={selectedAudioToTextOptions}
+          type="audiototext"
         />
       </div>
     </div>
+
+    <div class="flex flex-row space-x-4">
+      <div class="flex-1 flex flex-col mb-4">
+        <AudioAddonsDropdown
+          title={t("tenant.subtitle-subscription")}
+          placeholder=""
+          bind:value={selectedSubtitleStudioOptions}
+          type="subtitlestudio"
+        />
+      </div>
+
+      <div class="flex-1 flex flex-col mb-4">
+        <p class="mb-2">{t("tenant.total-price")}</p>
+        <input
+          type="text"
+          class="input input-bordered w-full"
+          bind:value={tenantData.totalPrice}
+        />
+      </div>
+    </div>
+
     <div class="flex flex-row space-x-4">
       <div class="flex-1 flex flex-col mb-4">
         <span class="mb-2 text-base-content font-medium text-sm"

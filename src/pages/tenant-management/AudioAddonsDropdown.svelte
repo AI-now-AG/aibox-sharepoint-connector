@@ -8,96 +8,86 @@
 <script lang="ts">
   import { preventDefault } from "$utils/common";
   import { AudioOptionId, AudioOptionLabels } from "$types/Subscription";
+  import { svgIcons } from "$assets/icons";
 
   interface Props {
     title: string;
     placeholder?: string;
     value: string[];
+    type: "audiototext" | "subtitlestudio";
   }
 
-  let { title, placeholder, value = $bindable() }: Props = $props();
+  let {
+    title,
+    placeholder,
+    value = $bindable(),
+    type = "audiototext",
+  }: Props = $props();
 
-  const items: ItemOption[] = [
-    { value: AudioOptionId.AudioBasis, title: AudioOptionLabels.AudioBasis },
-    {
-      value: AudioOptionId.AudioBasisAddOnSubtitle,
-      title: AudioOptionLabels.AudioBasisAddOnSubtitle,
-    },
-    {
-      value: AudioOptionId.AudioBasisAddOnLarge,
-      title: AudioOptionLabels.AudioBasisAddOnLarge,
-    },
-    {
-      value: AudioOptionId.AudioPremium,
-      title: AudioOptionLabels.AudioPremium,
-    },
-  ];
+  const items: ItemOption[] =
+    type == "audiototext"
+      ? [
+          {
+            value: AudioOptionId.AudioBasis,
+            title: AudioOptionLabels.AudioBasis,
+          },
+          {
+            value: AudioOptionId.AudioBasisAddOnLarge,
+            title: AudioOptionLabels.AudioBasisAddOnLarge,
+          },
+        ]
+      : [
+          {
+            value: AudioOptionId.AudioBasisAddOnSubtitle,
+            title: AudioOptionLabels.AudioBasisAddOnSubtitle,
+          },
+          {
+            value: AudioOptionId.AudioPremium,
+            title: AudioOptionLabels.AudioPremium,
+          },
+        ];
 
-  let selectedItems: ItemOption[] = $state([]);
+  // Internal state for single selection
+  let selectedItem: ItemOption | undefined = $state(undefined);
   let inputValue = $state("");
   let initialized = false;
 
-  // Derived state for easier logic
-  const isSelected = (val: string) =>
-    selectedItems.some((i) => i.value === val);
-  const getItemByValue = (val: string) => items.find((i) => i.value === val);
+  // Derived state
+  const isSelected = (val: string) => selectedItem?.value === val;
 
-  // One-time sync from external value
+  // --- Effect 1: Sync from external value (string[]) to internal state (single item)
   $effect(() => {
     if (!initialized && value?.length) {
-      selectedItems = items.filter((item) => value.includes(item.value));
+      // Find the first item in the external value array and set it as the single selected item
+      selectedItem = items.find((item) => item.value === value[0]);
       initialized = true;
     }
   });
 
-  // Update external value + input field
+  // --- Effect 2: Sync from internal state (single item) to external value (string[]) and input field
   $effect(() => {
-    value = selectedItems.map((e) => e.value);
-    inputValue = selectedItems.map((e) => e.title).join(", ");
+    // If an item is selected, the external value array contains only that item's value.
+    if (selectedItem) {
+      value = [selectedItem.value];
+      inputValue = selectedItem.title;
+    } else {
+      // If nothing is selected, the external value array is empty.
+      value = [];
+      inputValue = "";
+    }
   });
 
-  function toggleSelection(item: ItemOption) {
-    const exists = isSelected(item.value);
-
-    // Handle special logic:
-    if (item.value === AudioOptionId.AudioBasis) {
-      // Toggle AudioBasis
-      if (exists) {
-        selectedItems = selectedItems.filter((i) => i.value !== item.value);
-      } else {
-        selectedItems = selectedItems
-          .filter((i) => i.value !== AudioOptionId.AudioPremium) // Remove AudioPremium
-          .concat(item);
-      }
-    } else if (item.value === AudioOptionId.AudioPremium) {
-      if (exists) {
-        selectedItems = selectedItems.filter((i) => i.value !== item.value);
-      } else {
-        selectedItems = selectedItems
-          .filter(
-            (i) =>
-              ![
-                AudioOptionId.AudioBasis,
-                AudioOptionId.AudioBasisAddOnLarge,
-                AudioOptionId.AudioBasisAddOnSubtitle,
-              ].includes(i.value),
-          )
-          .concat(item);
-      }
-    } else if (
-      item.value === AudioOptionId.AudioBasisAddOnSubtitle ||
-      item.value === AudioOptionId.AudioBasisAddOnLarge
-    ) {
-      if (!isSelected(AudioOptionId.AudioBasis)) return; // Prevent selection if AudioBasis not selected
-
-      selectedItems = exists
-        ? selectedItems.filter((i) => i.value !== item.value)
-        : [...selectedItems, item];
+  /**
+   * Handles selection, enforcing single-select logic.
+   * Updates the internal 'selectedItem' state.
+   */
+  function selectItem(item: ItemOption) {
+    // If the clicked item is already selected, deselect it (set to undefined).
+    if (selectedItem?.value === item.value) {
+      selectedItem = undefined;
     } else {
-      // Normal toggle
-      selectedItems = exists
-        ? selectedItems.filter((i) => i.value !== item.value)
-        : [...selectedItems, item];
+      // Otherwise, select the new item, replacing any previous selection.
+      selectedItem = item;
     }
   }
 </script>
@@ -108,28 +98,13 @@
     <label class="input input-bordered flex items-center gap-2 w-full">
       <input
         type="text"
-        placeholder={placeholder ?? "Select options..."}
+        placeholder={placeholder ?? "Select option..."}
         bind:value={inputValue}
         role="button"
         class="font-medium w-full min-w-xs"
         readonly
       />
-
-      <svg
-        width="12"
-        height="7"
-        viewBox="0 0 12 7"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M10.6663 1L5.99967 5.66667L1.33301 1"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
-      </svg>
+      {@html svgIcons.dropdownArrowDown}
     </label>
 
     {#if items}
@@ -140,20 +115,12 @@
         {#each items as item}
           <li>
             <button
-              disabled={(item.value === AudioOptionId.AudioBasisAddOnSubtitle ||
-                item.value === AudioOptionId.AudioBasisAddOnLarge) &&
-                !isSelected(AudioOptionId.AudioBasis)}
-              onclick={preventDefault(() => toggleSelection(item))}
+              disabled={false}
+              onclick={preventDefault(() => selectItem(item))}
               class={`${
                 isSelected(item.value)
                   ? "bg-primary text-primary-content hover:bg-primary"
                   : "hover:text-neutral"
-              } ${
-                (item.value === AudioOptionId.AudioBasisAddOnSubtitle ||
-                  item.value === AudioOptionId.AudioBasisAddOnLarge) &&
-                !isSelected(AudioOptionId.AudioBasis)
-                  ? "opacity-50 pointer-events-none"
-                  : ""
               }`}
             >
               {item.title}
