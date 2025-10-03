@@ -1,8 +1,12 @@
 ---
+import { TENANT_MASTER_DEV, TENANT_MASTER_PROD } from "$constants";
 import Layout from "$layouts/Layout.astro";
+import { isProd } from "$utils/env";
 import TenantForm from "./TenantMasterCloneForm.svelte";
+
+const masterTenantId = isProd() ? TENANT_MASTER_PROD : TENANT_MASTER_DEV;
 ---
 
 <Layout>
-  <TenantForm client:load />
+  <TenantForm masterTenantId={masterTenantId} client:load />
 </Layout>

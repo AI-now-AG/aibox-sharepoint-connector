@@ -7,6 +7,10 @@ const CategoryInputIdentifierSchema = z.object({
   _id: z.string(),
 });
 
+const TenantIdentifierSchema = z.object({
+  _id: z.string(),
+});
+
 const CategoryInputListIdentifierSchema = z.array(
   z.object({
     _id: z.string(),
@@ -34,6 +38,15 @@ export const category = {
         active: true,
       });
       return transformRawData(updateResult);
+    },
+  }),
+
+  listByTenant: defineAction({
+    input: TenantIdentifierSchema,
+    handler: async (input) => {
+      const categoriesCursor = await CategoryModel.listByTenant(input._id);
+      const categories = await categoriesCursor.toArray();
+      return transformRawData(categories)
     },
   }),
 

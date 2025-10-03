@@ -15,22 +15,15 @@
     ThemeMap,
     Themes,
   } from "$types/TenantFeature";
-
-
-  // TODO: Handle getting data from Master tenant
-  const example_categories = [
-    { title: "Marketing", value: "67ff5a7c60fa2a8bca5d26da" },
-    { title: "HR", value: "67ff5a7c60fa2a8bca5d26df" },
-    { title: "Texting", value: "67ff5a7c60fa2a8bca5d26e6" },
-    { title: "Interne Prozesse", value: "67ff5a7c60fa2a8bca5d26eb" },
-    { title: "Produktmanagement", value: "67ff5a7c60fa2a8bca5d26ef" },
-    { title: "Sales & Support", value: "67ff5a7c60fa2a8bca5d26f3" },
-    { title: "Kommunikation", value: "67ff5a7c60fa2a8bca5d26f7" },
-    { title: "Perplexity", value: "67ff5a7c60fa2a8bca5d26fb" },
-    { title: "Neu für Test", value: "680f891b3dc2162f30c88685" },
-  ];
+  import { onMount } from "svelte";
 
   const t = useTranslations();
+  interface Props {
+    masterTenantId: string;
+  }
+
+  let { masterTenantId }: Props = $props();
+
   let loading = $state(false);
 
   let alertModal: HTMLDialogElement | undefined = $state();
@@ -44,7 +37,32 @@
     ThemeMap[ThemeCode.AIBox],
   );
 
+  let categories: any[] = $state([]);
   let selectedCategories: string[] = $state([]);
+
+  onMount(async () => {
+    try {
+      loading = true;
+      const { error, data } = await actions.category.listByTenant({
+        _id: masterTenantId,
+      });
+
+      if (error) {
+        showAlert(error?.toString());
+      } else {
+        data.forEach((category: any) => {
+          categories.push({
+            title: category.title,
+            value: category._id.toString(),
+          });
+        });
+      }
+    } catch (error: any) {
+      showAlert(error?.toString());
+    } finally {
+      loading = false;
+    }
+  });
 
   function validateForm() {
     return false;
@@ -63,16 +81,14 @@
         tenantData.default_language = selectedLanguage;
         tenantData.theme = selectedThemes?.value as ThemeCode;
 
-        const createTanentResult = await actions.tenant.create({
+        const { error, data: createdTenant } = await actions.tenant.create({
           tenant: tenantData,
           subscription: {
             plan_name: SubscriptionExtraPackage.Internal,
             add_ons: [],
           },
         });
-        const { error, data: createdTenant } = createTanentResult;
 
-        loading = false;
         if (error) {
           showAlert(error?.toString());
         } else {
@@ -85,6 +101,8 @@
         }
       } catch (error: any) {
         showAlert(error?.toString());
+      } finally {
+        loading = false;
       }
     }
   }
@@ -173,7 +191,7 @@
     <div
       class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 mb-10 text-black"
     >
-      {#each example_categories as category}
+      {#each categories as category}
         {#if selectedCategories.includes(category.value)}
           <button
             class="btn btn-primary w-full h-[56px] shadow-xl py-2"
