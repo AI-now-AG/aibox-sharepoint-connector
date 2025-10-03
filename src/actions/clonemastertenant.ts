@@ -107,7 +107,7 @@ export const cloneMasterTeant = {
         included_features: includedFeatures,
         transcription_types: transcriptionTypes,
         subtitle_editor: subtitleEditorEnabled,
-        totalPrice: ""
+        totalPrice: input.totalPrice
       });
 
       // Find all categories for the original tenant
