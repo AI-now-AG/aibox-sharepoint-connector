@@ -2,7 +2,6 @@ import { defineAction } from "astro:actions";
 import { z } from "zod";
 import { ObjectId } from "mongodb";
 import { transformRawData } from "$utils/transformRawData";
-import UserModel, { assignPermissions } from "$data/models/user.model";
 import TenantModel from "$data/models/tenant.model";
 import CategoryModel, {
   type Category,
@@ -19,7 +18,6 @@ import {
   SubscriptionPackageId,
   AudioOptionId,
 } from "$types/Subscription";
-import { UserRole, TourType } from "$types/Users";
 import { TenantFeature, ThemeCode } from "$types/TenantFeature";
 import organizationsManagement from "$data/auth0/organizations-manager";
 import { isProd } from "$utils/env";
@@ -58,9 +56,8 @@ const TenantInputParamsSchema = z.object({
 export const cloneMasterTeant = {
   createOrganization: defineAction({
     input: OrganizationNameInputParamsSchema,
-    handler: async (input, context) => {
+    handler: async (input) => {
       const { organization_name: organizationName } = input;
-      const { user } = context.locals;
       const name = organizationName
         .toLowerCase()
         .normalize("NFKD") // Remove accents/diacritics
