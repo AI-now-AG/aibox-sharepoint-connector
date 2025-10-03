@@ -13,6 +13,10 @@ export const ModelNameMap: Record<string, string> = {
   "gemini-2.5-flash": "Gemini 2.5 Flash",
 };
 
+const ModelNameExceptions: Record<string, string> = {
+  nano_banana: "Nano Banana",
+};
+
 export const ProviderMap: Partial<Record<ApiKeyProvider, string>> = {
   [ApiKeyProvider.OpenAI]: ApiKeyProvider.OpenAI,
   [ApiKeyProvider.OpenAIGpt5]: ApiKeyProvider.OpenAI,
@@ -90,7 +94,7 @@ export const NanoBananaPromptTools = [
   {
     title: t("prompt-execution.prompt-tool.image"),
     value: PromptToolOption.Image,
-    icon: svgIcons.web,
+    icon: svgIcons.image,
   },
 ];
 
@@ -107,6 +111,18 @@ export function getPromptTools(promptModel: PromptModel) {
   }
 }
 
+export function isProviderActive(
+  tenant: any,
+  providerName: ApiKeyProvider,
+): boolean {
+  if (!tenant) return false;
+
+  const aiProviders = tenant?.api_key_providers ?? [];
+  return aiProviders.some(
+    (p: any) => p.name === providerName && p.active === true,
+  );
+}
+
 export function getProviderFromPromptModel(promptModel: PromptModel) {
   return ModelNameProviderPromptMap[promptModel] ?? ApiKeyProvider.OpenAI;
 }
@@ -118,6 +134,66 @@ export function getProviderModelName(
   const key = ProviderModelMap[providerName] as keyof typeof tenant;
   const rawModel = tenant?.[key] || "gpt-4o";
   return ModelNameMap[rawModel] || rawModel;
+}
+
+export function resolveModelName(rawModel: string): string {
+  return ModelNameExceptions[rawModel] || ModelNameMap[rawModel] || rawModel;
+}
+
+export function getActiveModels(tenant: any, defaultModelName: string) {
+  if (!tenant) {
+    return [];
+  }
+
+  const getModelLabel = (provider: any) => {
+    const key = ProviderModelMap[provider.name] as keyof typeof tenant;
+    const model = tenant?.[key] || defaultModelName;
+    return ModelNameMap[model] || model;
+  };
+
+  const aiProviders = tenant?.api_key_providers ?? [];
+
+  return aiProviders
+    .filter((provider: any) => provider.active)
+    .map((provider: any) => ({
+      provider: provider.name,
+      modelName: getModelLabel(provider),
+      default: provider.default,
+    }));
+}
+
+export function getModelName(tenant: any, model: string) {
+  if (!tenant) {
+    return resolveModelName("gpt-4o");
+  }
+
+  const providerInfo = useProviderInfo(tenant);
+  const defaultModelName = providerInfo?.defaultProviderModelName || "gpt-4o";
+  const activeModels = getActiveModels(tenant, defaultModelName);
+
+  const findModel = (match: string, fallback: string) => {
+    const m = activeModels.find((m: any) => m.provider?.includes(match));
+    return m?.modelName || fallback;
+  };
+
+  if (model?.includes("openai-gpt-5")) {
+    return findModel("openai-gpt-5", "gpt-5");
+  }
+
+  if (model?.includes("openai")) {
+    return findModel("openai", "gpt-4o");
+  }
+
+  const matchingModel = activeModels.find((m: any) =>
+    model?.includes(m.provider),
+  );
+
+  if (matchingModel) {
+    return resolveModelName(matchingModel.modelName);
+  }
+
+  // only here we resolve exceptions
+  return resolveModelName(model) || defaultModelName;
 }
 
 export function useProviderInfo(tenant: any) {

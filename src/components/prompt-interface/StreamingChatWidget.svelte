@@ -30,7 +30,7 @@
   import { tenant, user } from "$stores";
   import { useTranslations } from "$i18n/utils";
   import { ApiKeyProvider } from "$types/TenantFeature";
-  import { PromptToolOption } from "$types/AIProvider";
+  import { ModelName, PromptToolOption } from "$types/AIProvider";
   import {
     getPromptTools,
     useProviderInfo,
@@ -110,14 +110,6 @@
       return true;
     }
     return false;
-  }
-
-  function getDefaultModelName() {
-    const aiProviders = $tenant?.api_key_providers ?? [];
-    const activeDefaultProvider = aiProviders.find(
-      (item) => item.active === true && item.default === true,
-    );
-    return activeDefaultProvider?.name || ApiKeyProvider.OpenAI;
   }
 
   const providerInfo = useProviderInfo($tenant);
@@ -213,23 +205,34 @@
         PromptModel.OpenAIWithTools, // Deprecated — removal imminent
         PromptModel.OpenAIWithImageTools, // Deprecated — removal imminent
       ].includes(currentPrompt?.model) ||
-      (getDefaultModelName() == ApiKeyProvider.OpenAI && !currentPrompt?.model);
+      (providerInfo.defaultProviderPromptModelName == ApiKeyProvider.OpenAI &&
+        !currentPrompt?.model);
 
     const isOpenAIGpt5ResponseModel =
       [PromptModel.OpenAIGpt5].includes(currentPrompt?.model) ||
       (isGpt5Default() && !currentPrompt?.model);
 
+    const isGeminiImageModel = [PromptModel.NanoBanana].includes(
+      currentPrompt?.model,
+    );
+
     const provider = isOpenAIResponseModel
-      ? "openai-response"
+      ? "openai-response" // openai
       : isOpenAIGpt5ResponseModel
-        ? "openai-gpt-5-response"
-        : currentPrompt?.model || getDefaultModelName();
+        ? "openai-gpt-5-response" // openai-gpt-5
+        : isGeminiImageModel
+          ? "gemini"
+          : currentPrompt?.model || providerInfo.defaultProviderPromptModelName;
+    const requestModel = isGeminiImageModel
+      ? ModelName.Gemini25FlashImage
+      : undefined;
 
     const promptForAttachedFilesOnly = fileUrls.length > 0 ? " " : "";
 
     const payload: RequestPayload = {
       tenantId: tenantId!,
       provider,
+      model: requestModel,
       prompt: prompt || promptForAttachedFilesOnly,
       promptId,
       stream: true,
@@ -249,7 +252,7 @@
       }
     }
 
-    if (isOpenAIResponseModel) {
+    if (isOpenAIResponseModel || isOpenAIGpt5ResponseModel) {
       payload.previousResponseId = previousResponseId;
     } else {
       payload.messageHistory = currentMessageHistory;

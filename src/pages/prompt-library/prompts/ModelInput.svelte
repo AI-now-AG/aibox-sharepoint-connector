@@ -10,6 +10,7 @@
     CustomSortOrder,
     ModelNameMap,
     ProviderModelMap,
+    isProviderActive,
   } from "$shared/AIProvider";
 
   const t = useTranslations();
@@ -105,11 +106,13 @@
           };
         }) || [];
 
-    // Gemini Nano Banana
-    models.push({
-      value: PromptModel.NanoBanana,
-      title: `Nano Banana`,
-    });
+    // Nano Banana
+    if (isProviderActive($tenant, ApiKeyProvider.Gemini)) {
+      models.push({
+        value: PromptModel.NanoBanana,
+        title: t("prompt-execution.models.nano-banana"),
+      });
+    }
 
     sortProviders(models);
 
