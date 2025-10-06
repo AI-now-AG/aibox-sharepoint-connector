@@ -124,6 +124,7 @@
     await loadSubtitleData();
     setupMediaSource();
     setupKeyboardHandlers();
+    loadAutoSavedData();
   });
 
   onDestroy(() => {
@@ -529,6 +530,42 @@
   }
 
   // Load auto-saved data on component mount
+  function loadAutoSavedData() {
+    try {
+      const savedData = localStorage.getItem('subtitle-editor-autosave');
+      if (!savedData) {
+        // No saved data, save initial state after loading
+        if (dialogues.length > 0) {
+          triggerAutoSave();
+        }
+        return;
+      }
+
+      const parsed = JSON.parse(savedData);
+      
+      // Check if saved data matches current file URLs
+      const isSameFile = 
+        (assFileUrl && parsed.assFileUrl === assFileUrl) ||
+        (srtFileUrl && parsed.srtFileUrl === srtFileUrl);
+
+      if (isSameFile && parsed.dialogues && parsed.dialogues.length > 0) {
+        // Restore saved data
+        dialogues = parsed.dialogues;
+        lastSavedTimestamp = new Date(parsed.timestamp).getTime();
+      } else {
+        // Different file or no valid data, save current state
+        if (dialogues.length > 0) {
+          triggerAutoSave();
+        }
+      }
+    } catch (error) {
+      console.error("Error loading auto-saved data:", error);
+      // If there's an error, just save current state
+      if (dialogues.length > 0) {
+        triggerAutoSave();
+      }
+    }
+  }
 
   async function exportSubtitles() {
     if (!onSave) return;
