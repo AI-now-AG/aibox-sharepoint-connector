@@ -5,16 +5,9 @@ import {
   TenantFeature,
   ApiKeyProvider,
   AudioCategory,
+  ThemeCode,
 } from "$types/TenantFeature";
 import { BillingMethod } from "$types/Subscription";
-
-export enum TenantTheme {
-  Light = "light",
-  Dark = "dark",
-  AIBox = "aibox",
-  Somedia = "somedia",
-  Weihnachtsmann = "weihnachtsmann",
-}
 
 export const TenantFilterParamsSchema = z.object({
   searchValue: z.string().nullish(),
@@ -47,7 +40,7 @@ const TenantSchema = z.object({
   org_name: z.string().min(1),
   org_id: z.string(),
   default_language: z.string().nullish().default("en"),
-  theme: z.nativeEnum(TenantTheme).default(TenantTheme.Light),
+  theme: z.nativeEnum(ThemeCode).default(ThemeCode.AIBox),
   primary_color: z.string().nullish(),
   api_key_providers: z.array(TextFeatureSchema).optional(),
   openai_chat_model: z.string().nullish().default("gpt-4o"),

@@ -13,13 +13,17 @@
     toLowerCase,
     replaceSpecialChars,
   } from "$components/actions/Input.svelte";
-  import { type TenantTheme } from "$data/models/tenant.model";
   import InputDialog from "$components/InputDialog.svelte";
   import { isValidEmail } from "$utils/common";
   import {
     TenantFeature,
     ApiKeyProvider,
     AudioCategory,
+    Languges,
+    Themes,
+    LanguageCode,
+    ThemeMap,
+    ThemeCode,
   } from "$types/TenantFeature";
   import {
     SubscriptionPackageId,
@@ -262,20 +266,10 @@
       ),
   );
 
-  const languages = [
-    { title: "Deutsch", value: "de" },
-    { title: "English", value: "en" },
-  ];
-  let selectedLanguage: string = $state("en");
-
-  const themes = [
-    { title: "Light", value: "light" },
-    { title: "Dark", value: "dark" },
-    { title: "aibox", value: "aibox" },
-    { title: "Somedia", value: "somedia" },
-  ];
-
-  let selectedThemes: { title: string; value: string } | undefined = $state();
+  let selectedLanguage: string = $state(LanguageCode.De);
+  let selectedThemes: { title: string; value: string } | undefined = $state(
+    ThemeMap[ThemeCode.AIBox],
+  );
 
   if (tenantData) {
     const { api_key_providers = [], included_features = [] } = tenantData;
@@ -333,11 +327,11 @@
     selectedLanguage = tenantData.default_language;
   }
   if (tenantData && !tenantData.theme) {
-    tenantData.theme = "dark" as TenantTheme;
-    selectedThemes = themes.find((item) => item.value === tenantData.theme);
+    tenantData.theme = ThemeCode.AIBox as ThemeCode;
+    selectedThemes = Themes.find((item) => item.value === tenantData.theme);
   }
   if (tenantData.theme) {
-    selectedThemes = themes.find((item) => item.value === tenantData.theme);
+    selectedThemes = Themes.find((item) => item.value === tenantData.theme);
   }
   if (tenantData && !tenantData.openai_chat_model) {
     tenantData.openai_chat_model = "gpt-4o";
@@ -532,7 +526,7 @@
       try {
         loading = true;
         tenantData.default_language = selectedLanguage;
-        tenantData.theme = selectedThemes?.value as TenantTheme;
+        tenantData.theme = selectedThemes?.value as ThemeCode;
         const { error: encryptKeysError, data } =
           await actions.tenant.encryptApiKeys({
             openai_api_key: tenantData.openai_api_key,
@@ -675,7 +669,7 @@
       try {
         loading = true;
         tenantData.default_language = selectedLanguage;
-        tenantData.theme = selectedThemes?.value as TenantTheme;
+        tenantData.theme = selectedThemes?.value as ThemeCode;
         const { error: encryptKeysError, data } =
           await actions.tenant.encryptApiKeys({
             openai_api_key: tenantData.openai_api_key,
@@ -970,7 +964,7 @@
     <div class="flex flex-row space-x-4">
       <div class="flex-1 flex flex-col mb-4">
         <span class="mb-2 text-base-content font-medium text-sm"
-          >{t("tenant.tenants.tenant.display-name")}</span
+          >{t("tenant.tenants.tenant.display-name")}*</span
         >
         <input
           type="text"
@@ -982,7 +976,7 @@
 
       <div class="flex-1 flex flex-col mb-4">
         <span class="mb-2 text-base-content font-medium text-sm"
-          >{t("tenant.tenants.tenant.name")}</span
+          >{t("tenant.tenants.tenant.name")}*</span
         >
         <input
           type="text"
@@ -1000,7 +994,7 @@
       <div class="flex-1 flex flex-col mb-4">
         <Dropdown
           label={`${t("tenant.language")}*`}
-          options={languages}
+          options={Languges}
           bind:value={selectedLanguage}
         />
       </div>
@@ -1009,7 +1003,7 @@
         <ThemeItem
           title={`${t("tenant.theme")}*`}
           placeholder="e.g Light"
-          items={themes}
+          items={Themes}
           bind:selectedItem={selectedThemes}
         />
       </div>
