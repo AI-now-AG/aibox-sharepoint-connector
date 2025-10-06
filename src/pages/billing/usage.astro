@@ -1,7 +1,7 @@
 ---
 import Layout from "$layouts/Layout.astro";
 import { useTranslations } from "$i18n/utils";
-import TenantUsageFilter from "$components/usage/TenantUsageFilter.svelte";
+import TenantUsageReport from "$components/usage/TenantUsageReport.svelte";
 
 const t = useTranslations();
 ---
@@ -13,6 +13,6 @@ const t = useTranslations();
     </h1>
   </div>
   <div class="container max-w-6xl mx-auto grid grid-cols-1 px-14">
-    <TenantUsageFilter client:load />
+    <TenantUsageReport client:load />
   </div>
 </Layout>
