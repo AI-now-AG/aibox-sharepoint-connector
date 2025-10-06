@@ -16,6 +16,7 @@
     ModelNameMap,
     useProviderInfo,
     getModelName,
+    getActiveModels,
   } from "$shared/AIProvider";
 
   interface Props {
@@ -66,7 +67,7 @@
       promptDialog?.showModal();
     }
     defaultModelName = providerInfo.defaultProviderModelName;
-    activeModels = getActiveModels();
+    activeModels = getActiveModels($tenant);
   });
 
   function selectCard(index: number) {
