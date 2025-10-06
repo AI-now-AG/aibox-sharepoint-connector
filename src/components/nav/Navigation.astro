@@ -31,6 +31,7 @@ const menuItems = categories.map((category, index) => ({
     .map((group) => ({
       title: group.title,
       path: `/prompts/${category._id}/${group._id}`,
+      // isFullPageReload: true
     })),
 }));
 

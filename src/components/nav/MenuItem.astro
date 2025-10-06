@@ -11,11 +11,20 @@ export type MenuItem = {
   icon?: Name | string;
   usecaseId?: string;
   transcriptionType?: TranscriptionType;
+  isFullPageReload?: boolean;
 };
 
 type Props = MenuItem;
 
-const { title, path, icon, usecaseId, transcriptionType } = Astro.props;
+const {
+  title,
+  path,
+  icon,
+  usecaseId,
+  transcriptionType,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  isFullPageReload = false,
+} = Astro.props;
 ---
 
 {
