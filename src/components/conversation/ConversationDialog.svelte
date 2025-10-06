@@ -44,6 +44,7 @@
     try {
       isConversationLoading = true;
       const { error, data } = await actions.conversation.list({});
+      console.log("HCMUS ::: ConversationDialog conversation.list action");
       if (!error) {
         conversations = data;
       } else {
