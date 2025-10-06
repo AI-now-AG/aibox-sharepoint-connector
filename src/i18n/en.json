@@ -476,6 +476,7 @@
   "prompt-execution.models.openai-gpt-5-with-tools": "gpt-5 (Text & Tools)",
   "prompt-execution.reasoning-level": "Reasoning level",
   "prompt-execution.reasoning-level.placeholder": "fast | balanced | high",
+  "prompt-execution.reasoning-effort.level-minimal": "Fastest response - lowest reasoning",
   "prompt-execution.reasoning-effort.level-low": "Fast response - lower reasoning",
   "prompt-execution.reasoning-effort.level-medium": "Balanced response and reasoning",
   "prompt-execution.reasoning-effort.level-high": "Deeper thinking for complext tasks",
