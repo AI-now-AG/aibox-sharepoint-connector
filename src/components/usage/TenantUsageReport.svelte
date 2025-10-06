@@ -57,9 +57,6 @@
       maximumFractionDigits: 2,
     });
   };
-
-  //$inspect(selectedTenant);
-  //$inspect(selectedMonth);
 </script>
 
 <div class="mt-5">

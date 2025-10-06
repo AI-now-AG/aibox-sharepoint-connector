@@ -15,7 +15,7 @@
   }
 
   let {
-    tenants,
+    tenants = [],
     selectedTenant = $bindable(),
     selectedMonth = $bindable(),
     onsearch,
