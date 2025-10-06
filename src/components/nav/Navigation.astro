@@ -631,7 +631,7 @@ const modules = [...menuItems];
                 conversations={transformRawData(conversations)}
                 routePath={Astro.url.pathname}
                 isCollapsed={isNavCollapsed}
-                client:load
+                client:idle
               />
             </details>
             {index < restrictedMenus.length - 1 && (
