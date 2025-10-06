@@ -58,7 +58,7 @@ const isSocialAuth = isSocialConnection(userInfo?.auth0_sub);
         >
           <Header />
           <slot />
-          <ConversationDialog client:load />
+          <ConversationDialog client:visible />
         </main>
         {isFooterVisible && <Footer />}
       </div>
@@ -72,19 +72,19 @@ const isSocialAuth = isSocialConnection(userInfo?.auth0_sub);
       </div>
     </div>
     <div class="z-[11]">
-      {tenant?.is_trial && <OnboardingTour user={userInfo} client:load />}
+      {tenant?.is_trial && <OnboardingTour user={userInfo} client:visible />}
       {
         !tenant?.is_trial && (
-          <OnboardingTourNewTenant user={userInfo} client:load />
+          <OnboardingTourNewTenant user={userInfo} client:visible />
         )
       }
-      {tenant?.is_trial && <TrialComponent {locale} client:load />}
+      {tenant?.is_trial && <TrialComponent {locale} client:visible />}
       {
         tenant?.is_trial &&
           !isSocialAuth &&
           user?.email_verified != undefined &&
           !user.email_verified && (
-            <RestrictUnverifiedUser user={userInfo} client:load />
+            <RestrictUnverifiedUser user={userInfo} client:visible />
           )
       }
     </div>
