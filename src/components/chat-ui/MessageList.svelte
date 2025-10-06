@@ -120,7 +120,7 @@
                             <FileAttachmentList {fileUrls} />
                           {/if}
                         </div>
-                      {:else if !imageUrl}
+                      {:else}
                         <div class="flex-1 p-4 pt-2.5">
                           <p class="font-bold text-sm">
                             {role == MessageRole.User ? username : `aibox`}
