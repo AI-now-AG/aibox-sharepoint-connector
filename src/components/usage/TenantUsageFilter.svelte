@@ -16,8 +16,8 @@
 
   let {
     tenants = [],
-    selectedTenant = $bindable(),
-    selectedMonth = $bindable(),
+    selectedTenant = $bindable(null),
+    selectedMonth = $bindable(null),
     onsearch,
   }: Props = $props();
 
@@ -40,6 +40,7 @@
   };
 
   const monthOptions = getMonthOptions();
+  $inspect(tenants);
 </script>
 
 <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-end mb-10">

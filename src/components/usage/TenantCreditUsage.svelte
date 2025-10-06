@@ -48,7 +48,6 @@
   };
 
   const monthOptions = getMonthOptions();
-  $inspect(selectedMonth);
 </script>
 
 <div class="mt-5">
@@ -68,7 +67,7 @@
       <button
         class="btn btn-primary"
         onclick={preventDefault(fetchCreditUsages)}
-        disabled={!selectedMonth}>{@html svgIcons.search}</button
+        disabled={!selectedMonth || loading}>{@html svgIcons.search}</button
       >
     </div>
   </div>
