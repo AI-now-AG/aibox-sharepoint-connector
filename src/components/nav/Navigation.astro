@@ -820,7 +820,7 @@ const modules = [...menuItems];
     });
   }
 
-  document.addEventListener("astro:page-load", () => {
+  document.addEventListener("DOMContentLoaded", () => {
     applyOpenStates();
     setupNavToggle();
     setupCollapsedMenuClicks();
