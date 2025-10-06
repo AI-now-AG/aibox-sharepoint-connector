@@ -4,7 +4,7 @@
   import { useTranslations } from "$i18n/utils";
   import type { UsageOverview, UsageRow } from "$types/UsageTracking";
   import Loading from "$components/Loading.svelte";
-  import UsageFilter from "./UsageFilter.svelte";
+  import TenantUsageFilter from "./TenantUsageFilter.svelte";
   import { tenant as tenantStore } from "$stores";
 
   const t = useTranslations();
@@ -63,7 +63,7 @@
 </script>
 
 <div class="mt-5">
-  <UsageFilter
+  <TenantUsageFilter
     {tenants}
     bind:selectedTenant
     bind:selectedMonth
