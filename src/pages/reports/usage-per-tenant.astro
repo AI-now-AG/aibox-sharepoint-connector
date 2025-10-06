@@ -1,7 +1,7 @@
 ---
 import Layout from "$layouts/Layout.astro";
 import { useTranslations } from "$i18n/utils";
-import UsageList from "$components/usage/UsageList.svelte";
+import UsagePerTenant from "$components/usage/UsagePerTenant.svelte";
 import TenantModel from "$data/models/tenant.model";
 import { transformRawData } from "$utils/transformRawData";
 
@@ -18,6 +18,6 @@ const tenantList = transformRawData(tenants);
     </h1>
   </div>
   <div class="container max-w-6xl mx-auto grid grid-cols-1 px-14">
-    <UsageList tenants={tenantList} client:load />
+    <UsagePerTenant tenants={tenantList} client:load />
   </div>
 </Layout>

@@ -259,16 +259,32 @@ if (auth.isSuperAdmin(Astro.locals)) {
         path: `/tenant-management`,
       },
       {
-        title: t("nav.settings.instructions"),
-        path: `/settings/instruction`,
+        title: t("nav.system-config"),
+        isOpened: navState[`admin-menu-id-1`] ?? false,
+        items: [
+          {
+            title: t("nav.settings.instructions"),
+            path: `/settings/instruction`,
+          },
+          {
+            title: t("nav.settings.prompt-refinement"),
+            path: `/settings/prompt-refinement`,
+          },
+        ]
       },
       {
-        title: t("nav.settings.prompt-refinement"),
-        path: `/settings/prompt-refinement`,
-      },
-      {
-        title: t("nav.usage"),
-        path: `/usage`,
+        title: t("nav.reports"),
+        isOpened: navState[`admin-menu-id-2`] ?? false,
+        items: [
+          {
+            title: t("nav.usage-per-tenant"),
+            path: `/reports/usage-per-tenant`,
+          },
+          {
+            title: t("nav.credit-usage-all"),
+            path: `/reports/credit-usage-all`,
+          },
+        ]
       },
     ],
   });
@@ -581,9 +597,28 @@ const modules = [...menuItems];
                 <ul
                   class={`active:bg-transparent ${isNavCollapsed ? "hidden" : ""}`}
                 >
-                  {mod.items?.map((sub) => (
+                  {mod.items?.map((sub, index) => (
                     <li class="pl-1 active:bg-transparent">
-                      <MenuItem {...sub} />
+                      {sub.items ? (
+                        <details
+                          data-id={`admin-menu-id-${index}`}
+                          open={sub.isOpened}
+                          class="active:bg-transparent"
+                        >
+                          <summary>{sub.title}</summary>
+                          {sub.items.length > 0 && (
+                            <ul class="active:bg-transparent">
+                              {sub.items.map((sub1) => (
+                                <li class="pl-1 active:bg-transparent">
+                                  <MenuItem {...sub1} />
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </details>
+                      ) : (
+                        <MenuItem {...sub} />
+                      )}
                     </li>
                   ))}
                 </ul>

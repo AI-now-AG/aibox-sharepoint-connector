@@ -32,7 +32,7 @@ export const SUPER_ADMIN_ROUTES = [
   "/api/prompts/import",
   "/secure",
   "/secure/*",
-  "/usage",
+  "/reports/*",
 ];
 
 export const FEATURE_MAP_ROUTES = {

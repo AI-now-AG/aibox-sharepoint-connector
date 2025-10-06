@@ -8,7 +8,7 @@ import { user } from "./user";
 import { knowledgebase } from "./knowledgebase";
 import { conversation } from "./conversation";
 import { onboarding } from "./onboarding";
-import { usage } from "./usage";
+import { report } from "./report";
 import { configurations } from "./configuration";
 
 export const server = {
@@ -22,6 +22,6 @@ export const server = {
   knowledgebase,
   conversation,
   onboarding,
-  usage,
+  report,
   configurations,
 };

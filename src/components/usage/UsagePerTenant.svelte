@@ -31,7 +31,7 @@
     usageInfo = undefined;
     usageData = [];
 
-    const { data, error } = await actions.usage.usageSummary({
+    const { data, error } = await actions.report.usagePerTeant({
       tenant_id: selectedTenant,
       month: selectedMonth,
     });

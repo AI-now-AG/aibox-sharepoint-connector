@@ -62,16 +62,19 @@ export default {
     return collection.deleteOne({ _id });
   },
 
-  listByTenant: async (tenantId: string) => {
-    return collection.find<Document<UsageLog>>({ tenant_id: tenantId });
+  listByTenant: async (tenantId: string | ObjectId) => {
+    const _tenantId = toObjectId(tenantId);
+    return collection.find<Document<UsageLog>>({ tenant_id: _tenantId });
   },
 
-  listUsageSummary: async (tenantId: string, month: string) => {
+  listUsageSummary: async (tenantId: string | ObjectId, month: string) => {
+    const _tenantId = toObjectId(tenantId);
+
     // Get date range for the month
     const { start, end } = getMonthRange(month);
 
     return collection.find<Document<UsageLog>>({
-      tenant_id: new ObjectId(tenantId), // Filter by tenant ID
+      tenant_id: _tenantId, // Filter by tenant ID
       created_at: { $gte: start, $lt: end }, // Filter by date range for the month
     });
   },
