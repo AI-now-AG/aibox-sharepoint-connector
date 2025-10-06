@@ -714,7 +714,7 @@
     accessToken: string
   ): Promise<any> {
     const pollInterval = 15000; // 15 seconds
-    const maxAttempts = 120; // 30 minutes max (120 * 15 seconds)
+    const maxAttempts = 480; // 90 minutes max (480 * 15 seconds)
     let attempts = 0;
 
     batchMaxAttempts = maxAttempts;
@@ -728,8 +728,7 @@
       const remainingMinutes = Math.floor(((maxAttempts - attempts) * pollInterval) / 60000);
 
       transcriptionStatus = `Processing batch (${elapsedMinutes}min elapsed, ~${remainingMinutes}min remaining)`;
-      console.log(`Polling batch status (attempt ${attempts}/${maxAttempts})...`);
-
+      
       try {
         const statusResult = await checkBatchTranscriptionStatus(jobId, accessToken);
 
