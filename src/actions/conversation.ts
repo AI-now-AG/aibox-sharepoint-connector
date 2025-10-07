@@ -73,6 +73,8 @@ const generateConversationTitle = async (
   const result = await model.invoke(messages);
   const description = await parser.invoke(result);
 
+  console.log("Generate conversation title - chat model messages", messages);
+
   return description;
 };
 
@@ -129,7 +131,7 @@ export const conversation = {
       const generatedTitle = await generateConversationTitle(
         context,
         promptTitle,
-        messages[messages.length - 1].content,
+        messages[0].content,
       );
 
       // Build the conversation object to be persisted
