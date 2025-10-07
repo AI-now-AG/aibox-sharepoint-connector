@@ -45,7 +45,7 @@ export default defineConfig({
     },
     build: {
       sourcemap: false,
-      minify: 'terser'
+      minify: true
     },
     plugins: [tailwindcss()],
   },
