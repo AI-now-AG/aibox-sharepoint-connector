@@ -26,14 +26,41 @@
   let editingId: string | null = $state(null); // Tracks the ID of the conversation being edited
   let newTitle: string = $state(""); // Stores the new title as the user types
 
-  onMount(async () => {
-    getListConversation();
+  let isDataLoaded = false;
+
+  onMount(() => {
+    const handler = () => getListConversation();
+    window.addEventListener("reload-conversation-dialog", handler);
+
+    return () => {
+      window.removeEventListener("reload-conversation-dialog", handler);
+    };
   });
 
-  /**
-   * Reloads the sidebar by dispatching a global event.
-   * The sidebar component listens for "reload-sidebar" and refetches conversations.
-   */
+  onMount(() => {
+    if (conversationDialog) {
+      const originalShow = conversationDialog.show;
+      const originalShowModal = conversationDialog.showModal;
+
+      conversationDialog.show = function (...args) {
+        handleDialogShow();
+        return originalShow.apply(this, args);
+      };
+
+      conversationDialog.showModal = function (...args) {
+        handleDialogShow();
+        return originalShowModal.apply(this, args);
+      };
+    }
+  });
+
+  async function handleDialogShow() {
+    if (!isDataLoaded) {
+      await getListConversation();
+      isDataLoaded = true;
+    }
+  }
+
   function reloadSidebar() {
     setTimeout(() => {
       window.dispatchEvent(new Event("reload-sidebar"));

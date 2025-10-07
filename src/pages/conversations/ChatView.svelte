@@ -385,6 +385,7 @@
     // Trigger sidebar reload (refetch conversations)
     setTimeout(() => {
       window.dispatchEvent(new Event("reload-sidebar"));
+      window.dispatchEvent(new Event("reload-conversation-dialog"));
     }, 1000);
 
     return data;
