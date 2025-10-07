@@ -73,7 +73,6 @@
     try {
       isConversationLoading = true;
       const { error, data } = await actions.conversation.list({});
-      console.log("HCMUS ::: ConversationDialog conversation.list action");
       if (!error) {
         conversations = data;
       } else {
@@ -268,8 +267,8 @@
     </section>
 
     {#if isConversationLoading}
-      <div class="flex w-full items-center justify-center mt-4">
-        <span id="thinking-indicator" class="loading loading-dots loading-lg"
+      <div class="flex w-full items-center justify-center mt-2">
+        <span class="loading loading-dots loading-sm"
         ></span>
       </div>
     {/if}

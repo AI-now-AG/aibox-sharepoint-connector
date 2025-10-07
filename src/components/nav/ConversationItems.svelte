@@ -45,7 +45,6 @@
     const { data, error } = await actions.conversation.list({
       limit: 5,
     });
-    console.log("HCMUS ::: ConversationItems conversation.list action");
     if (error) {
       addToast({
         message: error?.message ?? "Something went wrong",
