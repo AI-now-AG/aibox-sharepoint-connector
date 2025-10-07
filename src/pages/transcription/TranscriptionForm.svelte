@@ -1497,7 +1497,6 @@
                         {#if batchPollAttempt > 0}
                           <div class="flex items-center justify-between text-xs text-base-content/60">
                             <span>{t("transcription.progress.poll-attempt")}: {batchPollAttempt} / {batchMaxAttempts}</span>
-                            <span>{t("transcription.progress.checking-every")}</span>
                           </div>
                         {/if}
 
