@@ -12,7 +12,6 @@ import organizationsManagement from "$data/auth0/organizations-manager";
 import TenantModel, {
   IncludedFeaturesSchema,
   TenantFilterParamsSchema,
-  TenantTheme,
   TextFeatureSchema,
   type Tenant,
 } from "$data/models/tenant.model";
@@ -23,7 +22,7 @@ import SubscriptionModel, {
 import PromptModel from "$data/models/prompt.model";
 import CategoryModel from "$data/models/category.model";
 import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
-import { AudioCategory } from "$types/TenantFeature";
+import { AudioCategory, ThemeCode } from "$types/TenantFeature";
 import {
   SubscriptionPackageId,
   SubscriptionExtraPackage,
@@ -36,7 +35,7 @@ const TenantInputParamsSchema = z.object({
   org_name: z.string(),
   org_id: z.string().optional(),
   default_language: z.string(),
-  theme: z.nativeEnum(TenantTheme),
+  theme: z.nativeEnum(ThemeCode),
   primary_color: z.string().optional(),
   api_key_providers: z.array(TextFeatureSchema).optional(),
   openai_chat_model: z.string().optional().default("gpt-4o"),

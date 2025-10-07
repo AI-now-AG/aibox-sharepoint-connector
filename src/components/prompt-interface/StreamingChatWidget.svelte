@@ -30,8 +30,12 @@
   import { tenant, user } from "$stores";
   import { useTranslations } from "$i18n/utils";
   import { ApiKeyProvider } from "$types/TenantFeature";
-  import { PromptToolOption } from "$types/AIProvider";
-  import { getPromptTools, useProviderInfo } from "$shared/AIProvider";
+  import { ModelName, PromptToolOption } from "$types/AIProvider";
+  import {
+    getPromptTools,
+    useProviderInfo,
+    NanoBananaPromptTools,
+  } from "$shared/AIProvider";
 
   const t = useTranslations();
 
@@ -108,44 +112,36 @@
     return false;
   }
 
-  function getDefaultModelName() {
-    const aiProviders = $tenant?.api_key_providers ?? [];
-    const activeDefaultProvider = aiProviders.find(
-      (item) => item.active === true && item.default === true,
-    );
-    return activeDefaultProvider?.name || ApiKeyProvider.OpenAI;
-  }
-
-  const providerIno = useProviderInfo($tenant);
+  const providerInfo = useProviderInfo($tenant);
   // === Derived State ===
   let toolOptions = $derived.by(() => {
+    if (currentPrompt?.model == PromptModel.NanoBanana) {
+      return NanoBananaPromptTools;
+    }
+
     return getPromptTools(
       (currentPrompt?.model == PromptModel.Default
-        ? providerIno?.defaultProviderPromptModelName == PromptModel.OpenAI
-          ? PromptModel.OpenAIWithTools
-          : providerIno?.defaultProviderPromptModelName
+        ? providerInfo?.defaultProviderPromptModelName
         : currentPrompt?.model) as PromptModel,
     );
   });
 
-  let selectedPromptTool = $state(PromptToolOption.None);
+  let selectedPromptTool = $state(PromptToolOption.Image);
   let isDisablePromptTool = $state(false);
 
-  // === Effects ===
+  // Apply prompt’s tool if specified
   $effect(() => {
     if (currentPrompt?.promptTool != PromptToolOption.None) {
       selectedPromptTool = currentPrompt?.promptTool;
     }
-    // Support Old gpt-image selection (active image tool by default)
-    const isOpenAiWithImageTool =
-      currentPrompt?.model == PromptModel.OpenAIWithImageTools;
-    if (isOpenAiWithImageTool) {
-      selectedPromptTool = PromptToolOption.Image;
-    }
+  });
+
+  // Disable tool switching if prompt has a tool or model is NanoBanana
+  $effect(() => {
     if (
       (currentPrompt?.promptTool &&
         currentPrompt?.promptTool != PromptToolOption.None) ||
-      isOpenAiWithImageTool
+      currentPrompt?.model == PromptModel.NanoBanana
     ) {
       isDisablePromptTool = true;
     } else {
@@ -158,7 +154,7 @@
     $previousResponseIds[promptId] ?? getPreviousResponseId(promptId),
   );
 
-  // === Effects ===
+  // Reset prompt and files when prompt changes
   $effect(() => {
     if (currentPrompt) {
       if (previousResponseId) {
@@ -167,6 +163,15 @@
       } else {
         prompt = currentPrompt?.predefined_input ?? "";
         files = [];
+      }
+    }
+  });
+
+  // Auto-select Image tool for NanoBanana prompts
+  $effect(() => {
+    if (currentPrompt) {
+      if (currentPrompt?.model == PromptModel.NanoBanana) {
+        selectedPromptTool = PromptToolOption.Image;
       }
     }
   });
@@ -197,26 +202,37 @@
     let isOpenAIResponseModel =
       [
         PromptModel.OpenAI,
-        PromptModel.OpenAIWithTools,
-        PromptModel.OpenAIWithImageTools,
+        PromptModel.OpenAIWithTools, // Deprecated — removal imminent
+        PromptModel.OpenAIWithImageTools, // Deprecated — removal imminent
       ].includes(currentPrompt?.model) ||
-      (getDefaultModelName() == ApiKeyProvider.OpenAI && !currentPrompt?.model);
+      (providerInfo.defaultProviderPromptModelName == ApiKeyProvider.OpenAI &&
+        !currentPrompt?.model);
 
     const isOpenAIGpt5ResponseModel =
       [PromptModel.OpenAIGpt5].includes(currentPrompt?.model) ||
       (isGpt5Default() && !currentPrompt?.model);
 
+    const isGeminiImageModel = [PromptModel.NanoBanana].includes(
+      currentPrompt?.model,
+    );
+
     const provider = isOpenAIResponseModel
-      ? "openai-response"
+      ? "openai-response" // openai
       : isOpenAIGpt5ResponseModel
-        ? "openai-gpt-5-response"
-        : currentPrompt?.model || getDefaultModelName();
+        ? "openai-gpt-5-response" // openai-gpt-5
+        : isGeminiImageModel
+          ? "gemini"
+          : currentPrompt?.model || providerInfo.defaultProviderPromptModelName;
+    const requestModel = isGeminiImageModel
+      ? ModelName.Gemini25FlashImage
+      : undefined;
 
     const promptForAttachedFilesOnly = fileUrls.length > 0 ? " " : "";
 
     const payload: RequestPayload = {
       tenantId: tenantId!,
       provider,
+      model: requestModel,
       prompt: prompt || promptForAttachedFilesOnly,
       promptId,
       stream: true,
@@ -236,7 +252,7 @@
       }
     }
 
-    if (isOpenAIResponseModel) {
+    if (isOpenAIResponseModel || isOpenAIGpt5ResponseModel) {
       payload.previousResponseId = previousResponseId;
     } else {
       payload.messageHistory = currentMessageHistory;

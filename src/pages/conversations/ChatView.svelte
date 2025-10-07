@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { PromptToolOption } from "$types/AIProvider";
+  import { ModelName, PromptToolOption } from "$types/AIProvider";
   import {
     MessageRole,
     type Message,
@@ -17,6 +17,7 @@
     ModelNameMap,
     ProviderModelMap,
     useProviderInfo,
+    getModelName,
   } from "$shared/AIProvider";
   import { tenant, user } from "$stores";
   import { PromptModel } from "$types/PromptModel";
@@ -86,72 +87,14 @@
 
   let isShowAttachmentButton = $state(model != PromptModel.Perplexity);
 
-  const providerIno = useProviderInfo($tenant);
+  const providerInfo = useProviderInfo($tenant);
   let toolOptions = getPromptTools(
     (model == PromptModel.Default
-      ? providerIno?.defaultProviderPromptModelName == PromptModel.OpenAI
-        ? PromptModel.OpenAIWithTools
-        : providerIno?.defaultProviderPromptModelName
+      ? providerInfo?.defaultProviderPromptModelName
       : model) as PromptModel,
   );
 
   let selectedPromptTool = $state(PromptToolOption.None);
-
-  function getDefaultModelName() {
-    const aiProviders = $tenant?.api_key_providers ?? [];
-    const activeDefaultProvider = aiProviders.find(
-      (item) => item.active === true && item.default === true,
-    );
-    const providerName = activeDefaultProvider?.name || ApiKeyProvider.OpenAI;
-    const key = ProviderModelMap[providerName] as keyof typeof $tenant;
-    const rawModel = $tenant?.[key] || "gpt-4o";
-    return ModelNameMap[rawModel] || rawModel;
-  }
-
-  const getActiveModels = (defaultModelName: string): any[] => {
-    const getModelLabel = (provider: any) => {
-      const key = ProviderModelMap[provider.name] as keyof typeof $tenant;
-      const model = $tenant?.[key] || defaultModelName;
-      if (ModelNameMap[model]) {
-        return ModelNameMap[model];
-      }
-      return model;
-    };
-    const aiProviders = $tenant?.api_key_providers ?? [];
-    const models: any[] =
-      aiProviders
-        .filter((provider: any) => provider.active)
-        .map((provider: any) => {
-          return {
-            provider: provider.name,
-            modelName: getModelLabel(provider),
-            default: provider.default,
-          };
-        }) || [];
-    return models;
-  };
-
-  const getModelName = (model: string): string | undefined => {
-    const defaultModelName = getDefaultModelName();
-    const activeModels = getActiveModels(defaultModelName);
-    if (model?.includes("openai-gpt-5")) {
-      const defaultModel = activeModels.find((m: any) =>
-        m.provider?.includes("openai-gpt-5"),
-      );
-      return defaultModel?.modelName || "gpt-5";
-    }
-    if (model?.includes("openai")) {
-      const defaultModel = activeModels.find((m: any) =>
-        m.provider?.includes("openai"),
-      );
-      return defaultModel?.modelName || "gpt-4o";
-    }
-    const matchingModel = activeModels.find((m: any) =>
-      model?.includes(m.provider),
-    );
-
-    return matchingModel?.modelName || defaultModelName;
-  };
 
   async function deleteConversation() {
     try {
@@ -225,18 +168,25 @@
   function buildRequestPayload(fileUrls: string[]): RequestPayload {
     const isOpenAIResponseModel = [
       PromptModel.OpenAI,
-      PromptModel.OpenAIWithTools,
-      PromptModel.OpenAIWithImageTools,
+      PromptModel.OpenAIWithTools, // Deprecated — removal imminent
+      PromptModel.OpenAIWithImageTools, // Deprecated — removal imminent
     ].includes(model);
 
     const isOpenAIGpt5ResponseModel =
       [PromptModel.OpenAIGpt5].includes(model) || (isGpt5Default() && !model);
 
+    const isGeminiImageModel = [PromptModel.NanoBanana].includes(model);
+
     const provider = isOpenAIResponseModel
       ? "openai-response"
       : isOpenAIGpt5ResponseModel
         ? "openai-gpt-5-response"
-        : model;
+        : isGeminiImageModel
+          ? "gemini"
+          : model;
+    const requestModel = isGeminiImageModel
+      ? ModelName.Gemini25FlashImage
+      : undefined;
 
     isGenerating = selectedPromptTool == PromptToolOption.Image;
 
@@ -245,6 +195,7 @@
     const payload: RequestPayload = {
       tenantId: $tenant?._id?.toString()!,
       provider,
+      model: requestModel,
       prompt: input || promptForAttachedFilesOnly,
       stream: true,
       fileUrls,
@@ -262,7 +213,7 @@
       }
     }
 
-    if (isOpenAIResponseModel) {
+    if (isOpenAIResponseModel || isOpenAIGpt5ResponseModel) {
       payload.previousResponseId = previousResponseId;
     } else {
       payload.messageHistory = messageHistory;
@@ -680,7 +631,7 @@
   <div class="flex items-center">
     <div class="flex flex-1">
       <span class="self-start badge badge-xs px-2 border-base-300 font-normal"
-        >{getModelName(model)}</span
+        >{getModelName($tenant, model)}</span
       >
     </div>
     <div class="flex justify-end pr-4">

@@ -88,9 +88,7 @@
   let promptTools: Array<any> = $derived(
     getPromptTools(
       (selectedModel == PromptModel.Default
-        ? providerInfo?.defaultProviderPromptModelName == PromptModel.OpenAI
-          ? PromptModel.OpenAIWithTools
-          : providerInfo?.defaultProviderPromptModelName
+        ? providerInfo?.defaultProviderPromptModelName
         : selectedModel) as PromptModel,
     ) ?? [],
   );
@@ -378,6 +376,10 @@
             label={t("prompt-execution.reasoning-level")}
             placeholder={t("prompt-execution.reasoning-level.placeholder")}
             options={[
+              {
+                title: t("prompt-execution.reasoning-effort.level-minimal"),
+                value: ReasoningEffortOption.Minimal,
+              },
               {
                 title: t("prompt-execution.reasoning-effort.level-low"),
                 value: ReasoningEffortOption.Low,
