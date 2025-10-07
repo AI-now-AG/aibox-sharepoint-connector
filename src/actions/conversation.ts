@@ -155,6 +155,7 @@ export const conversation = {
       // Prepare the fields to update from the validated input
       const update: Partial<Conversation> = {
         ...input,
+        _id: new ObjectId(input._id),
       };
 
       // Update the conversation document by ID
