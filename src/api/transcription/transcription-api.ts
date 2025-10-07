@@ -308,6 +308,7 @@ export async function checkBatchTranscriptionStatus(
     json?: string;
   };
   jsonData?: any;
+  zip_file?: string;
   error?: string;
 }> {
   const config = await getTranscriptionConfig();
