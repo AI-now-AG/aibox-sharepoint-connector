@@ -161,15 +161,24 @@
       $transcriptStore,
     );
 
+    // Initialize file format based on category
     if (category === AudioCategory.AudioPro) {
       maxFileSize = 1000;
-    }
-
-    if (
+      // AudioPro only generates text files, not subtitle files
+      selectedFileFormat = [FileFormat.TXT];
+      standardSubtitlesChecked = false;
+      rawOutputChecked = true;
+      txtFileChecked = true;
+    } else if (
       category === AudioCategory.SubtitleLarge ||
       category === AudioCategory.Subtitle11Labs
     ) {
       maxFileSize = 50;
+      // Keep default subtitle format
+      selectedFileFormat = [FileFormat.ASS];
+    } else {
+      // Keep default subtitle format for other categories
+      selectedFileFormat = [FileFormat.ASS];
     }
 
     if ($transcriptStore && transcriptionType) {
@@ -222,7 +231,7 @@
 
           // Show appropriate status message
           if (isBatchMode) {
-            transcriptionStatus = "Batch transcription in progress... (check back in 10-30 minutes)";
+            transcriptionStatus = "Batch transcription in progress... (check back in 5-10 minutes)";
           } else {
             transcriptionStatus = "Transcription in progress... (connection may have been lost)";
           }
@@ -1925,7 +1934,9 @@
             "transciption.model.cta.download-zip",
           )}</button
         >
-      {:else if assFileUrl || srtFileUrl || jsonFileUrl || txtFileUrl}
+      {/if}
+      
+      {#if assFileUrl || srtFileUrl || jsonFileUrl || txtFileUrl}
         <!-- <button
           class="btn btn-success btn-sm text-base-100"
           on:click={downloadFileSRT}
