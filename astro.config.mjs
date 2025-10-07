@@ -45,6 +45,7 @@ export default defineConfig({
     },
     build: {
       sourcemap: process.env.BUILD_CONTEXT !== 'deploy-preview',
+      minify: 'terser'
     },
     plugins: [tailwindcss()],
   },
