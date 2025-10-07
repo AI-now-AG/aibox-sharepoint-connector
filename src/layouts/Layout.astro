@@ -53,7 +53,7 @@ const conversations = await cached(
   `conversations:${Astro.locals.user.tenant_id}`,
   1000 * 60 * 0.5,
   async () => {
-    const data: any[] = await ConversationModel.listByUser(
+    const data: Conversation[] = await ConversationModel.listByUser(
       Astro.locals.user.id,
       5
     );
