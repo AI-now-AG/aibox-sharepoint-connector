@@ -18,4 +18,24 @@ export const wildcardMatchInArray = (text: string, patterns: string[]) => {
   return matchPaths.length ? true : false;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function omitWithWildcard<T extends Record<string, any>>(
+  obj: T,
+  excludedPatterns: string[] = [],
+): Partial<T> {
+  const patterns = excludedPatterns.map((pattern) => {
+    // Escape regex special chars except '*'
+    const regexPattern = pattern
+      .replace(/[.+^${}()|[\]\\]/g, "\\$&")
+      .replace(/\*/g, ".*"); // turn * into .*
+    return new RegExp(`^${regexPattern}$`);
+  });
+
+  return Object.fromEntries(
+    Object.entries(obj).filter(
+      ([key]) => !patterns.some((regex) => regex.test(key)),
+    ),
+  ) as Partial<T>;
+}
+
 export default wildcardMatch;

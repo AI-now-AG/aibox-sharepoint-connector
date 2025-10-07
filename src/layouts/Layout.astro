@@ -8,7 +8,9 @@ import TrialComponent from "$components/onboarding/TrialComponent.svelte";
 import RestrictUnverifiedUser from "$components/onboarding/RestrictUnverifiedUser.svelte";
 import OnboardingTourNewTenant from "../pages/subscription/OnboardingTourNewTenant.svelte";
 import ConversationDialog from "$components/conversation/ConversationDialog.svelte";
-import ConversationModel from "$data/models/conversation.model";
+import ConversationModel, {
+  type Conversation,
+} from "$data/models/conversation.model";
 import "$styles/global.css";
 
 import { useTranslations } from "$i18n/utils";
@@ -51,8 +53,15 @@ const conversations = await cached(
   `conversations:${Astro.locals.user.tenant_id}`,
   1000 * 60 * 0.5,
   async () => {
-    const data = await ConversationModel.listByUser(Astro.locals.user.id, 5);
-    return data;
+    const data: Conversation[] = await ConversationModel.listByUser(
+      Astro.locals.user.id,
+      5
+    );
+    return data.map(({ _id, title, updated_at }) => ({
+      _id,
+      title,
+      updated_at,
+    }));
   }
 );
 ---
