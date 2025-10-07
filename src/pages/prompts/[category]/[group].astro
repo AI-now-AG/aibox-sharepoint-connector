@@ -2,23 +2,6 @@
 // Component
 import Layout from "$layouts/Layout.astro";
 import Content from "$components/prompt-interface/Content.astro";
-import CategoryModel from "$data/models/category.model";
-import { ObjectId } from "mongodb";
-
-const { category: categoryId, group: groupId } = Astro.params;
-
-const category = await CategoryModel.get(categoryId || "");
-if (
-  !category ||
-  !new ObjectId(category.tenant_id).equals(Astro.locals.tenant._id)
-) {
-  return Astro.redirect("/404");
-}
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const group = category?.groups.find((g: any) => g._id.toString() === groupId);
-if (!group) {
-  return Astro.redirect("/404");
-}
 ---
 
 <Layout>
