@@ -67,13 +67,12 @@ if (onboardingNew) {
         <h1 class="text-4xl font-bold mt-9 mb-4">
           {t("home.welcome", { name: Astro.locals.user.name })}
 
-          <h1 class="text-4xl font-bold mt-9 mb-4">
-            process.env.CONTEXT {process.env.CONTEXT}
-          </h1>
-          <h1 class="text-4xl font-bold mt-9 mb-4">
-            is Not Deploy Preview {process.env.CONTEXT !== "deploy-preview"}
-          </h1>
+         
         </h1>
+         <h1 class="text-4xl font-bold mt-9 mb-4">
+            process.env.CONTEXT {process.env.CONTEXT + ""}
+          </h1>
+  
       </div>
     </div>
 
