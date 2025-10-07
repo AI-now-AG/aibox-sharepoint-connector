@@ -180,7 +180,7 @@
   "transcription.steps.extracting": "Extraktion",
   "transcription.steps.generating": "Generierung",
   "transcription.steps.complete": "Fertig",
-  "transcription.alert.large-files-time": "Grosse Dateien können 10-30 Minuten dauern. Sie können sicher wegnavigieren und später zurückkehren.",
+  "transcription.alert.large-files-time": "Grosse Dateien können 5-10 Minuten dauern. Sie können sicher wegnavigieren und später zurückkehren.",
   "transcription.success.completed": "Transkription erfolgreich abgeschlossen!",
   "transcription.success.files-ready": "Ihre Dateien sind bereit zum Download",
   "transcription.error.failed": "Transkription fehlgeschlagen",

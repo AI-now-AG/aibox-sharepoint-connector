@@ -1928,29 +1928,24 @@
       >
     {/if}
     {#if isTranscipted}
-      {#if zipFileData}
-        <button class="btn btn-success" onclick={downloadZip}
-          >{@html svgIcons.download}{t(
-            "transciption.model.cta.download-zip",
-          )}</button
-        >
-      {/if}
-      
-      {#if assFileUrl || srtFileUrl || jsonFileUrl || txtFileUrl}
-        <!-- <button
-          class="btn btn-success btn-sm text-base-100"
-          on:click={downloadFileSRT}
-          >{@html svgIcons.download}{t(
-            "transciption.model.cta.download-output.srt",
-          )}</button
-        > -->
-        <button
-          class="btn btn-success btn-sm text-base-100"
-          onclick={downloadFile}
-          >{@html svgIcons.download}{t(
-            "transciption.model.cta.download-output",
-          )}</button
-        >
+      {#if category !== AudioCategory.AudioPro}
+        {#if zipFileData}
+          <!-- Show Download Zip if zip data exists -->
+          <button class="btn btn-success" onclick={downloadZip}
+            >{@html svgIcons.download}{t(
+              "transciption.model.cta.download-zip",
+            )}</button
+          >
+        {:else if assFileUrl || srtFileUrl || jsonFileUrl || txtFileUrl}
+          <!-- Show Download Output only if no zip data exists -->
+          <button
+            class="btn btn-success btn-sm text-base-100"
+            onclick={downloadFile}
+            >{@html svgIcons.download}{t(
+              "transciption.model.cta.download-output",
+            )}</button
+          >
+        {/if}
       {/if}
 
       <!-- Subtitle Editor Button -->
@@ -1959,7 +1954,6 @@
           class="btn bg-neutral btn-sm text-white"
           onclick={openSubtitleEditor}
         >
-          <!-- {@html svgIcons.edit} {t("subtitle-editor.edit-subtitles")} -->
           {@html svgIcons.edit}
           {t("settings.transcription.subtitle-editor")}
         </button>
