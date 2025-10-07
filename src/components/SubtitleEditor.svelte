@@ -81,7 +81,7 @@
 
   // Auto-save state
   let autoSaveEnabled = $state(true);
-  let autoSaveTimeout = $state<number | null>(null);
+  let autoSaveTimeout = $state<ReturnType<typeof setTimeout> | null>(null);
   let lastSavedTimestamp = $state<number | null>(null);
 
   // Drag and drop handlers for media upload
@@ -520,7 +520,7 @@
           srtFileUrl: srtFileUrl,
         };
 
-        localStorage.setItem('subtitle-editor-autosave', JSON.stringify(data));
+        sessionStorage.setItem('subtitle-editor-autosave', JSON.stringify(data));
         lastSavedTimestamp = Date.now();
         autoSaveTimeout = null;
       } catch (error) {
@@ -532,7 +532,7 @@
   // Load auto-saved data on component mount
   function loadAutoSavedData() {
     try {
-      const savedData = localStorage.getItem('subtitle-editor-autosave');
+      const savedData = sessionStorage.getItem('subtitle-editor-autosave');
       if (!savedData) {
         // No saved data, save initial state after loading
         if (dialogues.length > 0) {
@@ -637,6 +637,18 @@
     setTimeout(() => (statusText = ""), 3000);
   }
 
+  function clearSessionData() {
+    try {
+      sessionStorage.removeItem('subtitle-editor-autosave');
+      console.log('Session data cleared');
+      if (onClose) {
+        onClose();
+      }
+    } catch (error) {
+      console.error('Error clearing session data:', error);
+    }
+  }
+
   function getCharCountClass(dialogue: DialogueEntry, trigger: number = 0) {
     // The trigger parameter ensures this function is called when updateTrigger changes
     const start = timeToSeconds(dialogue.start);
@@ -703,7 +715,7 @@
 
   <!-- Controls Section -->
   <div class="controls-section bg-base-200 p-4 rounded-lg mb-4">
-    <!-- Search and Replace with Close Button -->
+    <!-- Search and Replace -->
     <div class="search-replace flex items-center gap-4">
       <div class="flex items-center gap-2">
         <label for="search">{t("subtitle-editor.search")}:</label>
@@ -784,8 +796,9 @@
         {#if onClose}
           <button
             class="btn btn-sm btn-circle btn-ghost"
-            onclick={onClose}
-            aria-label="Close subtitle editor"
+            onclick={clearSessionData}
+            aria-label="Close subtitle editor and clear session"
+            title="Close and clear session"
           >
             <svg
               class="w-4 h-4"

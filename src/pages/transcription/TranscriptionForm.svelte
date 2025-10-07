@@ -1777,7 +1777,7 @@ $inspect(tenant?.elevenLabs_api_key);
       {/if}
 
       <!-- Subtitle Editor Button -->
-      {#if (assFileUrl || srtFileUrl) && audioFile && $tenant?.subtitle_editor}
+      {#if (assFileUrl || srtFileUrl) && audioFile && $tenant?.subtitle_editor && (category === AudioCategory.Subtitle || category === AudioCategory.SubtitleLarge || category === AudioCategory.Subtitle11Labs)}
         <button
           class="btn bg-neutral btn-sm text-white"
           onclick={openSubtitleEditor}
@@ -1807,28 +1807,32 @@ $inspect(tenant?.elevenLabs_api_key);
     confirm={startNew}
   />
 
-  {#if isConverting}
-    <div class="conversion-progress" transition:slide>
-      <p class="progress-status">{conversionStatus}</p>
-    </div>
-  {/if}
-
-  <!-- Transcription Progress Indicator -->
-  {#if isTranscribing}
+  <!-- Unified Progress Indicator for both Conversion and Transcription -->
+  {#if isTranscribing || isConverting}
     <div class="mt-6 p-6 bg-base-200 rounded-lg" transition:slide>
       <div class="flex items-center gap-3 mb-4">
         <span class="loading loading-spinner loading-lg text-primary"></span>
         <div class="flex-1">
           <h3 class="text-lg font-semibold">
-            {isBatchMode ? "Batch Transcription in Progress" : "Transcription in Progress"}
+            {#if isConverting}
+              Converting audio...
+            {:else if isBatchMode}
+              Batch Transcription in Progress
+            {:else}
+              Transcription in Progress
+            {/if}
           </h3>
           <p class="text-sm text-base-content/70">
-            {transcriptionStatus || "Processing your file..."}
+            {#if isConverting}
+              {conversionStatus}
+            {:else}
+              {transcriptionStatus || "Processing your file..."}
+            {/if}
           </p>
         </div>
       </div>
 
-      {#if isBatchMode}
+      {#if isBatchMode && !isConverting}
         <!-- Batch Mode Progress with Steps -->
         <div class="space-y-4">
           <!-- Progress Steps -->
