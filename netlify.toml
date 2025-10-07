@@ -2,10 +2,6 @@
   functions = "functions" 
   publish = "dist"     
 
-[context.deploy-preview]
-  command = "npm run build"
-  publish = "dist"
-
 [dev]
   command = "pnpm run dev"    
 
@@ -37,4 +33,3 @@
 
   [functions.max_lambda_size]
     value = "50mb"
-

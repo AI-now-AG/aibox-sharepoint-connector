@@ -43,10 +43,7 @@ export default defineConfig({
     css: {
       transformer: "lightningcss",
     },
-    build: {
-      sourcemap: false,
-      minify: true
-    },
+
     plugins: [tailwindcss()],
   },
 });
