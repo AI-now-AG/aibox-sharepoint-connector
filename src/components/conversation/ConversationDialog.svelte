@@ -10,12 +10,25 @@
   import dayjs from "dayjs";
   const t = useTranslations();
 
-  let conversationDialog: HTMLDialogElement | undefined = $state();
+  interface Props {
+    conversationDialog?: HTMLDialogElement;
+    dialogTitle?: string;
+  }
+
+  let {
+    conversationDialog = $bindable(),
+    dialogTitle = t("conversation.my-ai-box-conversation-dialog-title"),
+  }: Props = $props();
+
   let loading: boolean = $state(false);
   let isConversationLoading: boolean = $state(true);
   let conversations: any[] = $state([]);
   let editingId: string | null = $state(null); // Tracks the ID of the conversation being edited
   let newTitle: string = $state(""); // Stores the new title as the user types
+
+  onMount(async () => {
+    getListConversation();
+  });
 
   /**
    * Reloads the sidebar by dispatching a global event.
@@ -129,25 +142,6 @@
     cancelEditing();
     conversationDialog?.close();
   }
-
-  // ✅ Detect when the dialog is opened via showModal()
-  onMount(() => {
-    const observer = new MutationObserver((mutations) => {
-      for (const mutation of mutations) {
-        if (
-          mutation.attributeName === "open" &&
-          conversationDialog.open === true
-        ) {
-          // dialog just opened
-          getListConversation();
-        }
-      }
-    });
-
-    observer.observe(conversationDialog, { attributes: true });
-
-    return () => observer.disconnect();
-  });
 </script>
 
 <dialog
@@ -157,9 +151,7 @@
 >
   <div class="modal-box w-8/12 max-w-5xl">
     <div class="flex justify-between">
-      <h3 class="text-lg font-bold py-4">
-        {t("conversation.my-ai-box-conversation-dialog-title")}
-      </h3>
+      <h3 class="text-lg font-bold py-4">{dialogTitle}</h3>
       <button class="btn btn-sm btn-circle btn-ghost" onclick={cancel}>
         {@html svgIcons.closeMenu}
       </button>

@@ -1,7 +1,6 @@
 <script lang="ts">
   import { svgIcons } from "$assets/icons";
   import { preventDefault } from "$utils/common";
-  import { onMount } from "svelte";
   type Item = { title: string; value: string };
 
   interface Props {
@@ -146,13 +145,6 @@
               </div>
             </button>
           </li>
-          <!-- <li>
-            <button
-              onclick={preventDefault(() => handleSelectedItems(item))}
-              class={`${(typeof selectedItem === "string" ? selectedItem : selectedItem?.title) === (typeof item === "string" ? item : item.title) ? "bg-primary text-primary-content hover:bg-primary" : "hover:text-neutral"}`}
-              >{typeof item === "string" ? item : item.title}
-            </button>
-          </li> -->
         {/each}
       </ul>
     {/if}

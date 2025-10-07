@@ -60,7 +60,7 @@
 
   let input: string = $state("");
   let files: File[] = $state([]);
-  let selectedModel: PromptModel = $state(PromptModel.OpenAIWithTools);
+  let selectedModel: PromptModel = $state(PromptModel.OpenAI);
   let isDisableSelectModel: boolean = $state(false);
   let currentMessage = $state("");
   let currentStreamingImageUrl: string = $state("");
@@ -85,9 +85,7 @@
   let toolOptions = $derived.by(() => {
     return getPromptTools(
       (selectedModel == PromptModel.Default
-        ? providerInfo?.defaultProviderPromptModelName == PromptModel.OpenAI
-          ? PromptModel.OpenAIWithTools
-          : providerInfo?.defaultProviderPromptModelName
+        ? providerInfo?.defaultProviderPromptModelName
         : selectedModel) as PromptModel,
     );
   });
@@ -129,11 +127,7 @@
 
   // === Request Builder ===
   function buildRequestPayload(fileUrls: string[]): RequestPayload {
-    const isOpenAIResponseModel = [
-      PromptModel.OpenAI,
-      PromptModel.OpenAIWithTools,
-      PromptModel.OpenAIWithImageTools,
-    ].includes(selectedModel);
+    const isOpenAIResponseModel = [PromptModel.OpenAI].includes(selectedModel);
 
     const isOpenAIGpt5ResponseModel =
       [PromptModel.OpenAIGpt5].includes(selectedModel) ||

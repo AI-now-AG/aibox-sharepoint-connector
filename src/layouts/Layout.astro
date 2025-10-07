@@ -58,6 +58,7 @@ const isSocialAuth = isSocialConnection(userInfo?.auth0_sub);
         >
           <Header />
           <slot />
+          <ConversationDialog client:load />
         </main>
         {isFooterVisible && <Footer />}
       </div>
@@ -87,6 +88,5 @@ const isSocialAuth = isSocialConnection(userInfo?.auth0_sub);
           )
       }
     </div>
-    <ConversationDialog client:idle />
   </body>
 </html>

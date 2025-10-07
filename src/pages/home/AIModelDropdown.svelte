@@ -45,8 +45,6 @@
     let title = "-";
     switch (provider.name) {
       case PromptModel.OpenAI:
-      case PromptModel.OpenAIWithTools:
-      case PromptModel.OpenAIWithImageTools:
         title = `${modelLabel} (${t("home.model-option-text-tools")})`;
         break;
       case PromptModel.OpenAIGpt5:
@@ -76,9 +74,10 @@
   const getActiveModels = (): Option[] => {
     const allProviders = $tenant?.api_key_providers ?? [];
     const allowedProviders = [
+      ApiKeyProvider.OpenAI,
+      ApiKeyProvider.OpenAIGpt5,
       ApiKeyProvider.Perplexity,
       ApiKeyProvider.Claude,
-      ApiKeyProvider.OpenAIGpt5,
       ApiKeyProvider.Gemini,
     ];
 
@@ -95,12 +94,6 @@
             title: `${modelName}`,
           };
         }) || [];
-
-    // OpenAI Responses API
-    models.push({
-      value: PromptModel.OpenAIWithTools,
-      title: `gpt-4o (${t("home.model-option-text-tools")})`,
-    });
 
     return sortProviders(models);
   };
