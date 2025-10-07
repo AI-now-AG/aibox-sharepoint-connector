@@ -1041,9 +1041,6 @@
     };
   }
 
-$inspect(tenant?.elevenLabs_api_key);
-
-
   function confirmStartNew() {
     confirmModal?.showModal();
   }
@@ -1354,58 +1351,225 @@ $inspect(tenant?.elevenLabs_api_key);
     {/if}
 
     {#if audioFile}
-      <div
-        class={`flex items-center justify-between p-2 border rounded-lg shadow-sm mt-2 ${isUploading ? "bg-transparent" : "bg-accent/30"}`}
-      >
-        <div class="flex items-center">
-          <div class="shrink-0 p-2 rounded-md">
-            {@html svgIcons.document}
-          </div>
-          <div class="ml-4">
-            <p class="font-medium">{audioFile.name}</p>
-            <p class="text-sm text-base-content/60">
-              {audioFile?.size ? bytesToMegabytes(audioFile?.size) + " MB" : ""}
-            </p>
-          </div>
-          <p class="font-medium ml-16">{audioDuration}</p>
-        </div>
-        <div class="flex items-center space-x-6">
-          <div class="flex items-center space-x-4">
-            <div class="flex items-center space-x-2">
-              {#if isUploading && !isUploaded}
-                <progress
-                  class="progress progress-primary w-56"
-                  value={uploadingValue}
-                  max="100"
-                ></progress>
-                <p class="font-medium">{t("transciption.uploading")}</p>
-              {/if}
-              {#if isTranscribing}
-                <span class="loading loading-spinner loading-md text-primary"
-                ></span>
-                <p class="font-medium text-primary">
-                  {t("transciption.transcribing")}
+      <div class="mt-2">
+        <!-- Main File Card with Integrated Progress -->
+        <div
+          class={`border rounded-xl shadow-sm overflow-hidden transition-all duration-300 ${
+            isUploading || isConverting || isTranscribing
+              ? "border-primary/50 bg-primary/5"
+              : isTranscipted
+                ? "border-success/50 bg-success/5"
+                : isTranscriptionFailed
+                  ? "border-error/50 bg-error/5"
+                  : "border-base-300 bg-accent/30"
+          }`}
+        >
+          <!-- File Info Header -->
+          <div class="flex items-center justify-between p-4">
+            <div class="flex items-center flex-1 min-w-0">
+              <div class="shrink-0 p-2 rounded-md bg-base-100">
+                {@html svgIcons.document}
+              </div>
+              <div class="ml-4 flex-1 min-w-0">
+                <p class="font-medium truncate" title={audioFile.name}>
+                  {audioFile.name}
                 </p>
-              {/if}
-              {#if isTranscipted}
-                {@html svgIcons.transcribed}
-                <p class="font-medium text-success">
-                  {t("transciption.transcribed")}
-                </p>
-              {/if}
-              {#if isTranscriptionFailed}
-                <p class="font-medium text-error">
-                  {t("transciption.transcription.failed")}
-                </p>
-              {/if}
+                <div class="flex items-center gap-3 text-sm text-base-content/60 mt-0.5">
+                  <span>
+                    {audioFile?.size ? bytesToMegabytes(audioFile?.size) + " MB" : ""}
+                  </span>
+                  {#if audioDuration}
+                    <span class="flex items-center gap-1">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      {audioDuration}
+                    </span>
+                  {/if}
+                </div>
+              </div>
             </div>
-            <button
-              onclick={preventDefault(removeFile)}
-              class="text-base-content hover:text-primary"
-            >
-              {@html svgIcons.close}
-            </button>
+
+            <!-- Status Badge & Actions -->
+            <div class="flex items-center gap-3 ml-4">
+              {#if isUploading && !isUploaded}
+                <div class="badge badge-primary gap-2">
+                  <span class="loading loading-spinner loading-xs"></span>
+                  {t("transciption.uploading")}
+                </div>
+              {:else if isConverting}
+                <div class="badge badge-info gap-2">
+                  <span class="loading loading-spinner loading-xs"></span>
+                  {t("transcription.status.converting")}
+                </div>
+              {:else if isTranscribing}
+                <div class="badge badge-primary gap-2">
+                  <span class="loading loading-spinner loading-xs"></span>
+                  {isBatchMode ? t("transcription.status.processing") : t("transciption.transcribing")}
+                </div>
+              {:else if isTranscipted}
+                <div class="badge badge-success gap-2">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  {t("transciption.transcribed")}
+                </div>
+              {:else if isTranscriptionFailed}
+                <div class="badge badge-error gap-2">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  {t("transciption.transcription.failed")}
+                </div>
+              {:else}
+                <div class="badge badge-ghost">{t("transcription.status.ready")}</div>
+              {/if}
+
+              <button
+                onclick={preventDefault(removeFile)}
+                class="btn btn-ghost btn-circle btn-sm hover:bg-error/10 hover:text-error"
+                title={t("transcription.button.remove-file")}
+              >
+                {@html svgIcons.close}
+              </button>
+            </div>
           </div>
+
+          <!-- Progress Section (Expanded when processing) -->
+          {#if isUploading || isConverting || isTranscribing}
+            <div class="px-4 pb-4 pt-0" transition:slide>
+              <div class="bg-base-100 rounded-lg p-4 space-y-3">
+                <!-- Upload Progress -->
+                {#if isUploading && !isUploaded}
+                  <div class="space-y-2">
+                    <div class="flex items-center justify-between text-sm">
+                      <span class="font-medium">{t("transcription.progress.uploading-to-cloud")}</span>
+                      <span class="text-base-content/60">{uploadingValue}%</span>
+                    </div>
+                    <progress
+                      class="progress progress-primary w-full h-2"
+                      value={uploadingValue}
+                      max="100"
+                    ></progress>
+                  </div>
+                {/if}
+
+                <!-- Conversion Progress -->
+                {#if isConverting}
+                  <div class="space-y-2">
+                    <div class="flex items-center gap-2 text-sm">
+                      <span class="loading loading-spinner loading-sm text-info"></span>
+                      <span class="font-medium">{t("transcription.progress.audio-conversion")}</span>
+                    </div>
+                    <p class="text-xs text-base-content/60 pl-6">
+                      {conversionStatus}
+                    </p>
+                    <progress class="progress progress-info w-full h-2"></progress>
+                  </div>
+                {/if}
+
+                <!-- Transcription Progress -->
+                {#if isTranscribing && !isConverting}
+                  <div class="space-y-3">
+                    <div class="flex items-center gap-2 text-sm">
+                      <span class="loading loading-spinner loading-sm text-primary"></span>
+                      <span class="font-medium">
+                        {isBatchMode ? t("transcription.progress.batch-transcription") : t("transcription.progress.transcription-in-progress")}
+                      </span>
+                    </div>
+
+                    {#if isBatchMode}
+                      <!-- Batch Mode: Show Steps -->
+                      <div class="bg-base-200/50 rounded-lg p-3 space-y-2">
+                        <div class="text-xs text-base-content/70">
+                          {transcriptionStatus || t("transcription.progress.job-queued")}
+                        </div>
+                        
+                        {#if batchPollAttempt > 0}
+                          <div class="flex items-center justify-between text-xs text-base-content/60">
+                            <span>{t("transcription.progress.poll-attempt")}: {batchPollAttempt} / {batchMaxAttempts}</span>
+                            <span>{t("transcription.progress.checking-every")}</span>
+                          </div>
+                        {/if}
+
+                        <!-- Simplified Progress Steps -->
+                        <ul class="steps steps-horizontal w-full text-xs mt-3">
+                          <li class="step step-primary">{t("transcription.steps.submitted")}</li>
+                          <li class={`step ${transcriptionStatus.toLowerCase().includes('processing') || transcriptionStatus.toLowerCase().includes('transcribing') || transcriptionStatus.toLowerCase().includes('extracting') || transcriptionStatus.toLowerCase().includes('generating') ? 'step-primary' : ''}`}>
+                            {t("transcription.steps.processing")}
+                          </li>
+                          <li class={`step ${transcriptionStatus.toLowerCase().includes('extracting') || transcriptionStatus.toLowerCase().includes('generating') ? 'step-primary' : ''}`}>
+                            {t("transcription.steps.extracting")}
+                          </li>
+                          <li class={`step ${transcriptionStatus.toLowerCase().includes('generating') ? 'step-primary' : ''}`}>
+                            {t("transcription.steps.generating")}
+                          </li>
+                          <li class={`step ${transcriptionStatus.toLowerCase().includes('completed') ? 'step-primary' : ''}`}>
+                            {t("transcription.steps.complete")}
+                          </li>
+                        </ul>
+
+                        <!-- Time Estimate Alert -->
+                        <div class="alert alert-info py-2 mt-2">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <span class="text-xs">{t("transcription.alert.large-files-time")}</span>
+                        </div>
+                      </div>
+                    {:else}
+                      <!-- Regular Mode: Show Progress Bar -->
+                      <div class="space-y-2">
+                        <p class="text-xs text-base-content/60">
+                          {transcriptionStatus || t("transcription.progress.processing-file")}
+                        </p>
+                        <progress
+                          class="progress progress-primary w-full h-2"
+                          value={transcriptionProgress}
+                          max="100"
+                        ></progress>
+                        {#if transcriptionProgress > 0}
+                          <div class="flex justify-end text-xs text-base-content/60">
+                            <span>{transcriptionProgress}%</span>
+                          </div>
+                        {/if}
+                      </div>
+                    {/if}
+                  </div>
+                {/if}
+              </div>
+            </div>
+          {/if}
+
+          <!-- Success State Summary -->
+          {#if isTranscipted && !isTranscribing}
+            <div class="px-4 pb-4 pt-0">
+              <div class="bg-success/10 border border-success/20 rounded-lg p-3 flex items-center gap-3">
+                <svg class="w-5 h-5 text-success shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-medium text-success">{t("transcription.success.completed")}</p>
+                  <p class="text-xs text-base-content/60 mt-0.5">{t("transcription.success.files-ready")}</p>
+                </div>
+              </div>
+            </div>
+          {/if}
+
+          <!-- Error State -->
+          {#if isTranscriptionFailed}
+            <div class="px-4 pb-4 pt-0">
+              <div class="bg-error/10 border border-error/20 rounded-lg p-3 flex items-center gap-3">
+                <svg class="w-5 h-5 text-error shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-medium text-error">{t("transcription.error.failed")}</p>
+                  <p class="text-xs text-base-content/60 mt-0.5">{t("transcription.error.try-again")}</p>
+                </div>
+              </div>
+            </div>
+          {/if}
         </div>
       </div>
     {/if}
@@ -1806,83 +1970,4 @@ $inspect(tenant?.elevenLabs_api_key);
     {downloadFile}
     confirm={startNew}
   />
-
-  <!-- Unified Progress Indicator for both Conversion and Transcription -->
-  {#if isTranscribing || isConverting}
-    <div class="mt-6 p-6 bg-base-200 rounded-lg" transition:slide>
-      <div class="flex items-center gap-3 mb-4">
-        <span class="loading loading-spinner loading-lg text-primary"></span>
-        <div class="flex-1">
-          <h3 class="text-lg font-semibold">
-            {#if isConverting}
-              Converting audio...
-            {:else if isBatchMode}
-              Batch Transcription in Progress
-            {:else}
-              Transcription in Progress
-            {/if}
-          </h3>
-          <p class="text-sm text-base-content/70">
-            {#if isConverting}
-              {conversionStatus}
-            {:else}
-              {transcriptionStatus || "Processing your file..."}
-            {/if}
-          </p>
-        </div>
-      </div>
-
-      {#if isBatchMode && !isConverting}
-        <!-- Batch Mode Progress with Steps -->
-        <div class="space-y-4">
-          <!-- Progress Steps -->
-          <ul class="steps steps-vertical lg:steps-horizontal w-full">
-            <li class="step step-primary">
-              <div class="text-left">
-                <div class="font-semibold">Job Submitted</div>
-                <div class="text-xs text-base-content/60">File received</div>
-              </div>
-            </li>
-            <li class={`step ${transcriptionStatus.toLowerCase().includes('processing') || transcriptionStatus.toLowerCase().includes('transcribing') || transcriptionStatus.toLowerCase().includes('extracting') || transcriptionStatus.toLowerCase().includes('generating') || transcriptionStatus.toLowerCase().includes('batch transcription completed') ? 'step-primary' : ''}`}>
-              <div class="text-left">
-                <div class="font-semibold">Processing</div>
-                <div class="text-xs text-base-content/60">Transcribing audio</div>
-              </div>
-            </li>
-            <li class={`step ${transcriptionStatus.toLowerCase().includes('extracting') || transcriptionStatus.toLowerCase().includes('extracted') || transcriptionStatus.toLowerCase().includes('generating') || transcriptionStatus.toLowerCase().includes('batch transcription completed') ? 'step-primary' : ''}`}>
-              <div class="text-left">
-                <div class="font-semibold">Extracting Data</div>
-                <div class="text-xs text-base-content/60">Getting timestamps</div>
-              </div>
-            </li>
-            <li class={`step ${transcriptionStatus.toLowerCase().includes('generating') || transcriptionStatus.toLowerCase().includes('generated') || transcriptionStatus.toLowerCase().includes('saving') || transcriptionStatus.toLowerCase().includes('batch transcription completed') ? 'step-primary' : ''}`}>
-              <div class="text-left">
-                <div class="font-semibold">Generating Files</div>
-                <div class="text-xs text-base-content/60">Creating subtitles</div>
-              </div>
-            </li>
-            <li class={`step ${transcriptionStatus.toLowerCase().includes('batch transcription completed') ? 'step-primary' : ''}`}>
-              <div class="text-left">
-                <div class="font-semibold">Complete</div>
-                <div class="text-xs text-base-content/60">Ready to download</div>
-              </div>
-            </li>
-          </ul>
-        </div>
-      {:else}
-        <!-- Regular Mode Progress -->
-        <div class="space-y-2">
-          <progress
-            class="progress progress-primary w-full"
-            value={transcriptionProgress}
-            max="100"
-          ></progress>
-          <div class="flex justify-between text-sm text-base-content/60">
-            <span>Progress</span>
-            <span>{transcriptionProgress}%</span>
-          </div>
-        </div>
-      {/if}
-    </div>
-  {/if}
 </div>
