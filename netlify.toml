@@ -2,8 +2,9 @@
   functions = "functions" 
   publish = "dist"     
 
-[context.deploy-preview.environment]
-CONTEXT = "production"
+[context.deploy-preview]
+  command = "npm run build"
+  publish = "dist"
 
 [dev]
   command = "pnpm run dev"    
