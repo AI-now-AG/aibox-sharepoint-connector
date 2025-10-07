@@ -33,3 +33,6 @@
 
   [functions.max_lambda_size]
     value = "50mb"
+
+[context.deploy-preview.environment]
+CONTEXT = "production"
