@@ -44,7 +44,7 @@ export default defineConfig({
       transformer: "lightningcss",
     },
     build: {
-      sourcemap: process.env.CONTEXT !== 'deploy-preview',
+      sourcemap: process.env.BUILD_CONTEXT !== 'deploy-preview',
     },
     plugins: [tailwindcss()],
   },

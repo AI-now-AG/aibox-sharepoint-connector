@@ -66,13 +66,8 @@ if (onboardingNew) {
 
         <h1 class="text-4xl font-bold mt-9 mb-4">
           {t("home.welcome", { name: Astro.locals.user.name })}
-
-         
+          {process.env.BUILD_CONTEXT + ""}
         </h1>
-         <h1 class="text-4xl font-bold mt-9 mb-4">
-            process.env.CONTEXT {process.env.CONTEXT + ""}
-          </h1>
-  
       </div>
     </div>
 
