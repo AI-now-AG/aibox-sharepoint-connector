@@ -49,3 +49,11 @@ export function randomString(length: number = 5) {
   }
   return result;
 }
+
+export function isSameObjectId(a: unknown, b: unknown): boolean {
+  const strA = typeof a === "string" ? a : a?.toString();
+  const strB = typeof b === "string" ? b : b?.toString();
+
+  if (!strA || !strB) return false;
+  return strA === strB;
+}

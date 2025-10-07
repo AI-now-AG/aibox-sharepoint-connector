@@ -15,6 +15,7 @@ import "$styles/global.css";
 
 import { useTranslations } from "$i18n/utils";
 import { isSocialConnection } from "$utils/auth0";
+import { transformRawData } from "$utils/transformRawData";
 import { cached } from "$utils/cache";
 
 interface Props {
@@ -55,14 +56,14 @@ const conversations = await cached(
   async () => {
     const data: Conversation[] = await ConversationModel.listByUser(
       Astro.locals.user.id,
-      5,
+      5
     );
     return data.map(({ _id, title, updated_at }) => ({
       _id,
       title,
       updated_at,
     }));
-  },
+  }
 );
 ---
 
@@ -78,7 +79,10 @@ const conversations = await cached(
         >
           <Header />
           <slot />
-          <ConversationDialog conversations={conversations} client:idle />
+          <ConversationDialog
+            conversations={transformRawData(conversations)}
+            client:idle
+          />
         </main>
         {isFooterVisible && <Footer />}
       </div>
@@ -88,7 +92,7 @@ const conversations = await cached(
           aria-label="close sidebar"
           class="drawer-overlay"></label>
 
-        <Navigation conversations={conversations} />
+        <Navigation conversations={transformRawData(conversations)} />
       </div>
     </div>
     <div class="z-[11]">

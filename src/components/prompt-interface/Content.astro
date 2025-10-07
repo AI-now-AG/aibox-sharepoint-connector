@@ -1,45 +1,18 @@
 ---
-import CategoryModel from "$data/models/category.model";
-import PromptModel from "$data/models/prompt.model";
 import EmptyPrompt from "./EmptyPrompt.astro";
 import PromptExecution from "./PromptExecution.svelte";
 import { Permission } from "$types/Users";
-import { ObjectId } from "mongodb";
 
-const { category: categoryId, group: groupId } = Astro.params;
-
-const category = await CategoryModel.get(categoryId || "");
-if (
-  !category ||
-  !new ObjectId(category.tenant_id).equals(Astro.locals.tenant._id)
-) {
-  return Astro.redirect("/404");
+export interface Props {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  group: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  promptItems: any;
 }
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const group = category?.groups.find((g: any) => g._id.toString() === groupId);
 
-const cursor = await PromptModel.listByTenant(Astro.locals.user.tenant_id);
-const prompts = await cursor.toArray();
-
-const categoryPrompt = prompts.filter(
-  (g) => g.category?.toString() === categoryId,
-);
-const categoryGroupPrompt = categoryPrompt.filter(
-  (g) => g.group?.toString() === group?._id?.toString(),
-);
-const promptItems = categoryGroupPrompt.map((prompt) => ({
-  _id: prompt._id?.toString(),
-  title: prompt.title,
-  description: prompt.description,
-  prompt: prompt.prompt,
-  model: prompt.model,
-  reasoningEffort: prompt.reasoningEffort,
-  textVerbosity: prompt.textVerbosity,
-  promptTool: prompt.promptTool,
-  predefined_input: prompt.predefined_input,
-}));
-
-let userPermissions = Astro.locals.user.permissions;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const { group, promptItems = [] } = Astro.props;
+const userPermissions = Astro.locals.user.permissions;
 ---
 
 <div class="container max-w-6xl mx-auto grid grid-cols-1 px-14">
@@ -52,7 +25,7 @@ let userPermissions = Astro.locals.user.permissions;
       <PromptExecution
         promptItems={promptItems}
         isEditable={userPermissions.includes(Permission.AdminAll)}
-        groupId={groupId}
+        groupId={group._id?.toString() || ""}
         folderName={Astro.locals.tenant.org_name}
         client:load
       />

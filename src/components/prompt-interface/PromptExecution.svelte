@@ -2,6 +2,7 @@
   import { onMount } from "svelte";
   import UseCaseCards from "$components/prompt-interface/UseCaseCards.svelte";
   import StreamingChatWidget from "./StreamingChatWidget.svelte";
+
   interface Props {
     promptItems: any;
     isEditable?: boolean;
