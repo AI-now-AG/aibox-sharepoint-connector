@@ -57,11 +57,13 @@ const conversations = await cached(
       Astro.locals.user.id,
       5
     );
-    return data.map(({ _id, title, updated_at }) => ({
-      _id,
-      title,
-      updated_at,
-    }));
+    // return data.map(({ _id, title, updated_at }) => ({
+    //   _id,
+    //   title,
+    //   updated_at,
+    // }));
+
+    return data;
   }
 );
 ---
