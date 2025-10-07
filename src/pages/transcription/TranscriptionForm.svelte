@@ -1550,7 +1550,9 @@
                 </svg>
                 <div class="flex-1 min-w-0">
                   <p class="text-sm font-medium text-success">{t("transcription.success.completed")}</p>
-                  <p class="text-xs text-base-content/60 mt-0.5">{t("transcription.success.files-ready")}</p>
+                  {#if category === AudioCategory.Subtitle || category === AudioCategory.SubtitleLarge || category === AudioCategory.Subtitle11Labs || category === AudioCategory.SubtitleJson}
+                    <p class="text-xs text-base-content/60 mt-0.5">{t("transcription.success.files-ready")}</p>
+                  {/if}
                 </div>
               </div>
             </div>
