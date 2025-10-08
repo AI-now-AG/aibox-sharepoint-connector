@@ -49,6 +49,7 @@ export const UserFilterParamsSchema = z.object({
   isBlocked: z.boolean().optional(),
   isVerified: z.boolean().optional(),
   isUnVerified: z.boolean().optional(),
+  isExcludeSA: z.boolean().optional().default(true),
 });
 export type UserFilterParams = z.infer<typeof UserFilterParamsSchema>;
 export type User = z.infer<typeof UserSchema>;
@@ -118,11 +119,22 @@ export default {
       }
 
       // Add roles filter
-      let filterRolles = {}
-      if (roles && roles?.length > 0) {
-        filterRolles = { $in: roles.map((role) => new RegExp(role, "i")) };
+      let filterRoles: Record<string, unknown> = {};
+
+      // If specific roles are provided, add them to $in
+      if (roles && roles.length > 0) {
+        filterRoles.$in = roles.map((role) => new RegExp(role, "i"));
       }
-      filter.roles = { ...filterRolles, $nin: [new RegExp(`^${UserRole.SuperAdmin}$`, "i")] };
+
+      // If "isExcludeSA" flag is true, exclude Super Admin
+      if (filterParams.isExcludeSA) {
+        filterRoles.$nin = [new RegExp(`^${UserRole.SuperAdmin}$`, "i")];
+      }
+
+      // Only assign filter.roles if there's something to filter by
+      if (Object.keys(filterRoles).length > 0) {
+        filter.roles = filterRoles;
+      }
 
       // Handle isBlocked, isVerified, and isUnVerified filters
       const emailVerifiedFilter = [];
