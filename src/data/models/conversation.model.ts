@@ -57,7 +57,7 @@ export default {
     return collection.insertOne(doc);
   },
 
-  update: async (id: string | ObjectId, update: Partial<Conversation>) => {
+  update: async (id: string | ObjectId, update: Partial<Conversation>, isReturnUpdatedData: boolean = true) => {
     const objectId = toObjectId(id);
     const validated = ChatConversationSchema.partial().parse(update);
 
@@ -72,13 +72,16 @@ export default {
       updated_at: new Date(),
       expires_at: expiresAt,
     };
-    return await collection.findOneAndUpdate(
-      { _id: objectId },
-      { $set: doc },
-      {
-        returnDocument: "after",
-      },
-    );
+    if (isReturnUpdatedData) {
+      return await collection.findOneAndUpdate(
+        { _id: objectId },
+        { $set: doc },
+        {
+          returnDocument: "after",
+        },
+      );
+    }
+    return { success: true }
   },
 
   // New function to update the messages array using $push

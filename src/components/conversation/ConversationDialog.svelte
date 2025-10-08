@@ -137,6 +137,7 @@
       const { error } = await actions.conversation.update({
         _id: conversationId,
         title: newTitle,
+        isReturnUpdatedData: false
       });
 
       if (!error) {

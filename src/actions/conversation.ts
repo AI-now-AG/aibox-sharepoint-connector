@@ -21,6 +21,7 @@ const ConversationInputParamsSchema = z.object({
   model: z.string().nullish(),
   previous_response_id: z.string().nullish(),
   messages: z.array(MessageSchema).optional(),
+  isReturnUpdatedData: z.boolean().optional().default(true)
 });
 
 const UpdateConversationSchema = ConversationInputParamsSchema.omit({
@@ -161,8 +162,7 @@ export const conversation = {
       };
 
       // Update the conversation document by ID
-      const updatedDocument = await ConversationModel.update(input._id, update);
-
+      const updatedDocument = await ConversationModel.update(input._id, update, input.isReturnUpdatedData);
       // Normalize and return the updated conversation
       return transformRawData(updatedDocument);
     },
