@@ -87,10 +87,15 @@
   });
 
   function getRoleString(roles: any[] = []) {
-    const isAdmin = roles?.some((role) =>
-      [UserRole.SuperAdmin, UserRole.Admin].includes(role),
+    const isSupperAdmin = roles?.some((role) =>
+      [UserRole.SuperAdmin].includes(role),
     );
-    return isAdmin ? t("user.admin") : t("user.user");
+    const isAdmin = roles?.some((role) => [UserRole.Admin].includes(role));
+    return isSupperAdmin
+      ? "Supper Admin"
+      : isAdmin
+        ? t("user.admin")
+        : t("user.user");
   }
 
   function getUserStatus(isBlocked: boolean, isVerified: boolean) {
