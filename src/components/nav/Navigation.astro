@@ -288,7 +288,7 @@ if (auth.isSuperAdmin(Astro.locals)) {
             title: t("nav.settings.prompt-refinement"),
             path: `/settings/prompt-refinement`,
           },
-        ]
+        ],
       },
       {
         title: t("nav.reports"),
@@ -302,7 +302,7 @@ if (auth.isSuperAdmin(Astro.locals)) {
             title: t("nav.credit-usage-all"),
             path: `/reports/credit-usage-all`,
           },
-        ]
+        ],
       },
     ],
   });
@@ -709,9 +709,28 @@ const modules = [...menuItems];
                 <ul
                   class={`active:bg-transparent ${isNavCollapsed ? "hidden" : ""}`}
                 >
-                  {mod.items?.map((sub) => (
+                  {mod.items?.map((sub, _index) => (
                     <li class="pl-1 active:bg-transparent">
-                      <MenuItem {...sub} />
+                      {sub.items ? (
+                        <details
+                          data-id={`admin-menu-id-${_index}`}
+                          open={sub.isOpened}
+                          class="active:bg-transparent"
+                        >
+                          <summary>{sub.title}</summary>
+                          {sub.items.length > 0 && (
+                            <ul class="active:bg-transparent">
+                              {sub.items.map((sub1) => (
+                                <li class="pl-1 active:bg-transparent">
+                                  <MenuItem {...sub1} />
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </details>
+                      ) : (
+                        <MenuItem {...sub} />
+                      )}
                     </li>
                   ))}
                 </ul>
