@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getFileNameFromAzureUrl } from "$utils/documentExtractor";
+  import { getFileNameFromAzureUrl } from "$utils/azureFileUtils";
 
   interface Props {
     fileUrls: string[];

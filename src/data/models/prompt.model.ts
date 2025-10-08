@@ -22,19 +22,6 @@ const PromptSchema = z.object({
   updated_at: z.date(),
 });
 
-const convertObjectIdToString = (doc: Document<Prompt>) => {
-  return {
-    ...doc,
-    _id: doc._id.toString(),
-    tenant_id: doc.tenant_id?.toString(),
-    creator_id: doc.creator_id?.toString(),
-    category: doc.category?.toString(),
-    group: doc.group?.toString(),
-    knowledgebase: doc.knowledgebase?.map((id) => id.toString()),
-    documents: doc.documents?.map((id) => id.toString()),
-  };
-};
-
 export type Prompt = z.infer<typeof PromptSchema>;
 
 const collection = db.collection("prompts");
@@ -81,16 +68,6 @@ export default {
     return collection.findOne<Document<Prompt>>({ _id });
   },
 
-  getAsString: async (id: string) => {
-    if (!ObjectId.isValid(id)) {
-      return null;
-    }
-    const _id = new ObjectId(id);
-    const doc = await collection.findOne<Document<Prompt>>({ _id });
-    if (!doc) return null;
-    return convertObjectIdToString(doc);
-  },
-
   getByTitleAndTenant: async (title: string, tenantId: ObjectId) => {
     return collection.findOne<Document<Prompt>>({ title, tenant_id: tenantId });
   },
@@ -102,6 +79,16 @@ export default {
     return collection
       .find<Document<Prompt>>({ tenant_id: id })
       .sort({ position: 1, created_at: 1 });
+  },
+
+  listByCategory: async (categoryId: string | ObjectId) => {
+    const _categoryId = toObjectId(categoryId);
+    return collection
+      .find<Document<Prompt>>({
+        category: _categoryId,
+      })
+      .sort({ position: 1, created_at: 1 })
+      .toArray();
   },
 
   listByCategoryIds: async (categoryIds: ObjectId[]) => {

@@ -3,6 +3,8 @@ import Layout from "$layouts/Layout.astro";
 import Prompts from "$data/models/prompt.model";
 import PromptForm from "$pages/prompt-library/prompts/PromptForm.svelte";
 import { Permission } from "$types/Users";
+import { isSameObjectId } from "$utils/common";
+import { transformRawData } from "$utils/transformRawData";
 
 export interface Props {
   id: string;
@@ -12,9 +14,9 @@ if (id === undefined) {
   throw new Error("Id is required");
 }
 
-const prompt = await Prompts.getAsString(id || ""); // TODO: Render 404 if not found
+const prompt = await Prompts.get(id || ""); // TODO: Render 404 if not found
 
-if (!prompt || prompt.tenant_id !== Astro.locals.tenant._id.toString()) {
+if (!prompt || !isSameObjectId(prompt.tenant_id, Astro.locals.tenant._id)) {
   return Astro.redirect("/404");
 }
 
@@ -25,7 +27,7 @@ const userPermissions = Astro.locals.user.permissions;
   <div>
     <PromptForm
       promptId={id}
-      prompt={prompt}
+      prompt={transformRawData(prompt)}
       isEditable={userPermissions.includes(Permission.AdminAll)}
       client:load
     />

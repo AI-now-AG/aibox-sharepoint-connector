@@ -9,13 +9,38 @@ import { svgIcons } from "$assets/icons";
 import auth from "$auth/auth";
 import { ApiKeyProvider } from "$types/TenantFeature";
 import TranscriptionModel from "$data/models/transcription.model";
-import ConversationModel from "$data/models/conversation.model";
 import { transformRawData } from "$utils/transformRawData";
+import { cached } from "$utils/cache";
 
 const t = useTranslations();
 
-const cursor = await Category.listActiveByTenant(Astro.locals.user.tenant_id);
-const categories = await cursor.toArray();
+interface Props {
+  conversations?: Array<unknown>;
+}
+
+const { conversations = [] } = Astro.props as Props;
+
+const categories = await cached(
+  `categories:${Astro.locals.user.tenant_id}`,
+  1000 * 60 * 0.5,
+  async () => {
+    const cursor = await await Category.listActiveByTenant(
+      Astro.locals.user.tenant_id
+    );
+    return await cursor.toArray();
+  }
+);
+
+const transcriptions = await cached(
+  `transcriptions:${Astro.locals.user.tenant_id}`,
+  1000 * 60 * 2,
+  async () => {
+    const data = await TranscriptionModel.listByTenant(
+      Astro.locals.user.tenant_id
+    );
+    return data;
+  }
+);
 
 const navState = Astro.locals.user.navState || {};
 const isNavCollapsed = navState["nav-collapsed"] ?? false;
@@ -44,14 +69,6 @@ const createImageItems = [];
 
 const myAIBoxMenus = [];
 
-const conversations = await ConversationModel.listByUser(
-  Astro.locals.user.id,
-  5
-);
-
-const transcriptions = await TranscriptionModel.listByTenant(
-  Astro.locals.user.tenant_id
-);
 const transcriptionTypes = Astro.locals.tenant.transcription_types ?? [];
 
 const activeTranscriptions =
@@ -680,184 +697,140 @@ const modules = [...menuItems];
   </div>
 </nav>
 
-<script>
-  function applyOpenStates() {
-    const detailsElements = document.querySelectorAll("details[data-id]");
-    detailsElements.forEach((element) => {
-      const details = element as HTMLDetailsElement;
-      const detailsId = details.getAttribute("data-id") || "";
-      details.addEventListener("toggle", () => {
-        updateNavState(detailsId, details.open);
+<script type="module">
+  if (!window.__NAVIGATION_INITIALIZED__) {
+    window.__NAVIGATION_INITIALIZED__ = true;
+
+    async function updateNavState(detailsId, isOpen) {
+      try {
+        await fetch("/api/users/update-nav-state.json", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: detailsId, open: isOpen }),
+        });
+      } catch (err) {
+        console.warn("[Navigation] Failed to update nav state:", err);
+      }
+    }
+
+    function applyOpenStates() {
+      const detailsElements = document.querySelectorAll("details[data-id]");
+      for (const element of detailsElements) {
+        const detailsId = element.dataset.id;
+        if (!detailsId) continue;
+
+        element.addEventListener(
+          "toggle",
+          () => updateNavState(detailsId, element.open),
+          { passive: true }
+        );
+      }
+    }
+
+    function toggleNavigation(expand) {
+      const navigation = document.getElementById("main-navigation");
+      const toggleBtn = document.getElementById("nav-toggle-btn");
+      if (!navigation || !toggleBtn) return;
+
+      const collapsed = navigation.classList.contains("w-16");
+      const newCollapsed = expand !== undefined ? !expand : !collapsed;
+
+      // Update DB state (non-blocking)
+      updateNavState("nav-collapsed", newCollapsed);
+
+      // Toggle nav width
+      navigation.classList.toggle("w-80", !newCollapsed);
+      navigation.classList.toggle("w-16", newCollapsed);
+
+      // Handle visibility of elements
+      const selectorGroups = {
+        logo: navigation.querySelector('a[href="/"]'),
+        textSpans: navigation.querySelectorAll("span:not(.tooltip)"),
+        subMenus: navigation.querySelectorAll("ul ul"),
+        spacers: navigation.querySelectorAll(".mx-6.my-2, .mx-6.my-1"),
+        summaries: navigation.querySelectorAll("details > summary"),
+        menuElement: navigation.querySelector(".menu"),
+      };
+
+      if (selectorGroups.logo)
+        selectorGroups.logo.classList.toggle("hidden", newCollapsed);
+
+      selectorGroups.textSpans.forEach((el) =>
+        el.classList.toggle("hidden", newCollapsed)
+      );
+      selectorGroups.subMenus.forEach((el) =>
+        el.classList.toggle("hidden", newCollapsed)
+      );
+      selectorGroups.spacers.forEach((el) =>
+        el.classList.toggle("hidden", newCollapsed)
+      );
+
+      selectorGroups.summaries.forEach((summary) => {
+        summary.classList.toggle("tooltip", newCollapsed);
+        summary.classList.toggle("tooltip-right", newCollapsed);
+        summary.classList.toggle("flex", newCollapsed);
+        summary.classList.toggle("justify-center", newCollapsed);
       });
-    });
-  }
 
-  function toggleNavigation(expand?: boolean) {
-    const toggleBtn = document.getElementById("nav-toggle-btn");
-    const navigation = document.getElementById("main-navigation");
-
-    if (!toggleBtn || !navigation) return;
-
-    const isCurrentlyCollapsed = navigation.classList.contains("w-16");
-    const newCollapsedState =
-      expand !== undefined ? !expand : !isCurrentlyCollapsed;
-
-    // Update nav state in database
-    updateNavState("nav-collapsed", newCollapsedState);
-
-    // Update navigation width
-    if (newCollapsedState) {
-      navigation.classList.remove("w-80");
-      navigation.classList.add("w-16");
-    } else {
-      navigation.classList.remove("w-16");
-      navigation.classList.add("w-80");
-    }
-
-    // Update toggle button positioning
-    if (newCollapsedState) {
-      // toggleBtn.classList.add("ml-2");
-    } else {
-      // toggleBtn.classList.remove("ml-2");
-    }
-
-    // Update logo visibility
-    const logoContainer = navigation.querySelector('a[href="/"]');
-    if (logoContainer) {
-      if (newCollapsedState) {
-        logoContainer.classList.add("hidden");
-      } else {
-        logoContainer.classList.remove("hidden");
+      if (selectorGroups.menuElement) {
+        selectorGroups.menuElement.classList.toggle("pr-6", !newCollapsed);
+        selectorGroups.menuElement.classList.toggle("pr-2", newCollapsed);
       }
-    }
 
-    // Update text spans visibility
-    const textSpans = navigation.querySelectorAll("span:not(.tooltip)");
-    textSpans.forEach((span) => {
-      if (newCollapsedState) {
-        span.classList.add("hidden");
-      } else {
-        span.classList.remove("hidden");
-      }
-    });
+      // Update accessibility labels
+      toggleBtn.setAttribute(
+        "aria-label",
+        newCollapsed ? "Expand navigation" : "Collapse navigation"
+      );
+      toggleBtn.setAttribute(
+        "title",
+        newCollapsed ? "Expand navigation" : "Collapse navigation"
+      );
 
-    // Update submenu visibility
-    const subMenus = navigation.querySelectorAll("ul ul");
-    subMenus.forEach((menu) => {
-      if (newCollapsedState) {
-        menu.classList.add("hidden");
-      } else {
-        menu.classList.remove("hidden");
-      }
-    });
-
-    // Update spacer visibility
-    const spacers = navigation.querySelectorAll(".mx-6.my-2, .mx-6.my-1");
-    spacers.forEach((spacer) => {
-      if (newCollapsedState) {
-        spacer.classList.add("hidden");
-      } else {
-        spacer.classList.remove("hidden");
-      }
-    });
-
-    // Update summary tooltip classes
-    const summaries = navigation.querySelectorAll("details > summary");
-    summaries.forEach((summary) => {
-      if (newCollapsedState) {
-        summary.classList.add(
-          "tooltip",
-          "tooltip-right",
-          "flex",
-          "justify-center"
-        );
-      } else {
-        summary.classList.remove(
-          "tooltip",
-          "tooltip-right",
-          "flex",
-          "justify-center"
-        );
-      }
-    });
-
-    const menuElement = navigation.querySelector(".menu");
-    if (menuElement) {
-      if (newCollapsedState) {
-        menuElement.classList.remove("pr-6");
-        menuElement.classList.add("pr-2");
-      } else {
-        menuElement.classList.remove("pr-2");
-        menuElement.classList.add("pr-6");
-      }
-    }
-
-    toggleBtn.setAttribute(
-      "aria-label",
-      newCollapsedState ? "Expand navigation" : "Collapse navigation"
-    );
-    toggleBtn.setAttribute(
-      "title",
-      newCollapsedState ? "Expand navigation" : "Collapse navigation"
-    );
-
-    const iconContainer = toggleBtn.querySelector("div");
-    if (iconContainer) {
-      const menuOpenIcon = toggleBtn.dataset.menuOpenIcon;
-      const menuCloseIcon = toggleBtn.dataset.menuCloseIcon;
-
-      if (newCollapsedState) {
-        iconContainer.innerHTML =
-          menuOpenIcon ||
+      // Update icon
+      const iconContainer = toggleBtn.querySelector("div");
+      if (iconContainer) {
+        const openIcon =
+          toggleBtn.dataset.menuOpenIcon ||
           `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>`;
-      } else {
-        iconContainer.innerHTML =
-          menuCloseIcon ||
+        const closeIcon =
+          toggleBtn.dataset.menuCloseIcon ||
           `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>`;
+        iconContainer.innerHTML = newCollapsed ? openIcon : closeIcon;
       }
     }
-  }
 
-  function setupNavToggle() {
-    const toggleBtn = document.getElementById("nav-toggle-btn");
+    function setupNavToggle() {
+      const toggleBtn = document.getElementById("nav-toggle-btn");
+      if (!toggleBtn) return;
 
-    if (toggleBtn) {
       toggleBtn.addEventListener("click", (e) => {
         e.preventDefault();
         e.stopPropagation();
         toggleNavigation();
       });
     }
-  }
 
-  function setupCollapsedMenuClicks() {
-    const navigation = document.getElementById("main-navigation");
-    if (!navigation) return;
+    function setupCollapsedMenuClicks() {
+      const navigation = document.getElementById("main-navigation");
+      if (!navigation) return;
 
-    const summaries = navigation.querySelectorAll("details > summary");
-    summaries.forEach((summary) => {
-      summary.addEventListener("click", (e) => {
-        const isCurrentlyCollapsed = navigation.classList.contains("w-16");
-        if (isCurrentlyCollapsed) {
-          e.preventDefault(); // Prevent the details toggle
-          e.stopPropagation(); // Stop event bubbling
-          toggleNavigation(true); // Expand the navigation
-        }
-      });
+      const summaries = navigation.querySelectorAll("details > summary");
+      for (const summary of summaries) {
+        summary.addEventListener("click", (e) => {
+          if (navigation.classList.contains("w-16")) {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleNavigation(true);
+          }
+        });
+      }
+    }
+
+    document.addEventListener("astro:page-load", () => {
+      applyOpenStates();
+      setupNavToggle();
+      setupCollapsedMenuClicks();
     });
   }
-
-  async function updateNavState(detailsId: string, isOpen: boolean) {
-    await fetch("/api/users/update-nav-state.json", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: detailsId, open: isOpen }),
-    });
-  }
-
-  document.addEventListener("astro:page-load", () => {
-    applyOpenStates();
-    setupNavToggle();
-    setupCollapsedMenuClicks();
-  });
 </script>

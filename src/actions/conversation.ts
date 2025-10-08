@@ -20,7 +20,8 @@ const ConversationInputParamsSchema = z.object({
   prompt_id: z.string().nullish(),
   model: z.string().nullish(),
   previous_response_id: z.string().nullish(),
-  messages: z.array(MessageSchema),
+  messages: z.array(MessageSchema).optional(),
+  isReturnUpdatedData: z.boolean().optional().default(true)
 });
 
 const UpdateConversationSchema = ConversationInputParamsSchema.omit({
@@ -131,7 +132,7 @@ export const conversation = {
       const generatedTitle = await generateConversationTitle(
         context,
         promptTitle,
-        messages[0].content,
+        messages?.[0]?.content ?? "",
       );
 
       // Build the conversation object to be persisted
@@ -157,11 +158,11 @@ export const conversation = {
       // Prepare the fields to update from the validated input
       const update: Partial<Conversation> = {
         ...input,
+        _id: new ObjectId(input._id),
       };
 
       // Update the conversation document by ID
-      const updatedDocument = await ConversationModel.update(input._id, update);
-
+      const updatedDocument = await ConversationModel.update(input._id, update, input.isReturnUpdatedData);
       // Normalize and return the updated conversation
       return transformRawData(updatedDocument);
     },

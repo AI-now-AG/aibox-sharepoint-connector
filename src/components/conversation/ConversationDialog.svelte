@@ -13,27 +13,56 @@
   interface Props {
     conversationDialog?: HTMLDialogElement;
     dialogTitle?: string;
+    conversations?: any[];
   }
 
   let {
     conversationDialog = $bindable(),
     dialogTitle = t("conversation.my-ai-box-conversation-dialog-title"),
+    conversations: initConversations = [],
   }: Props = $props();
 
   let loading: boolean = $state(false);
-  let isConversationLoading: boolean = $state(true);
-  let conversations: any[] = $state([]);
-  let editingId: string | null = $state(null); // Tracks the ID of the conversation being edited
+  let isConversationLoading: boolean = $state(false);
+  let conversations: any[] = $state(initConversations);
+  let editingId: string = $state(""); // Tracks the ID of the conversation being edited
   let newTitle: string = $state(""); // Stores the new title as the user types
 
-  onMount(async () => {
-    getListConversation();
+  let isDataLoaded = false;
+
+  onMount(() => {
+    const handler = () => getListConversation();
+    window.addEventListener("reload-conversation-dialog", handler);
+
+    return () => {
+      window.removeEventListener("reload-conversation-dialog", handler);
+    };
   });
 
-  /**
-   * Reloads the sidebar by dispatching a global event.
-   * The sidebar component listens for "reload-sidebar" and refetches conversations.
-   */
+  onMount(() => {
+    if (conversationDialog) {
+      const originalShow = conversationDialog.show;
+      const originalShowModal = conversationDialog.showModal;
+
+      conversationDialog.show = function (...args) {
+        handleDialogShow();
+        return originalShow.apply(this, args);
+      };
+
+      conversationDialog.showModal = function (...args) {
+        handleDialogShow();
+        return originalShowModal.apply(this, args);
+      };
+    }
+  });
+
+  async function handleDialogShow() {
+    if (!isDataLoaded) {
+      await getListConversation();
+      isDataLoaded = true;
+    }
+  }
+
   function reloadSidebar() {
     setTimeout(() => {
       window.dispatchEvent(new Event("reload-sidebar"));
@@ -96,7 +125,7 @@
 
   // Cancels the editing process
   function cancelEditing() {
-    editingId = null;
+    editingId = "";
     newTitle = "";
   }
 
@@ -104,16 +133,17 @@
   async function saveTitle(conversation: any) {
     try {
       loading = true;
-
+      const conversationId = conversation._id;
       const { error } = await actions.conversation.update({
-        ...conversation,
+        _id: conversationId,
         title: newTitle,
+        isReturnUpdatedData: false
       });
 
       if (!error) {
         conversations = conversations
           .map((c) =>
-            c._id === conversation._id
+            c._id === conversationId
               ? { ...c, title: newTitle, updated_at: new Date() }
               : c,
           )
@@ -156,90 +186,91 @@
         {@html svgIcons.closeMenu}
       </button>
     </div>
-    {#if isConversationLoading}
-      <div class="flex w-full items-center justify-center">
-        <span class="loading loading-spinner loading-md"></span>
-      </div>
-    {:else}
-      <section>
-        {#if Array.isArray(conversations) && conversations.length > 0}
-          <div class="min-h-0 max-h-full overflow-y-auto space-y-2">
-            {#each conversations as conversation}
-              <div
-                class="flex items-center justify-between border-b px-2 py-1 rounded-lg border"
-              >
-                {#if editingId === conversation._id}
-                  <input
-                    type="text"
-                    class="input input-bordered input-sm flex-1 text-sm"
-                    bind:value={newTitle}
-                    onkeydown={(e) => {
-                      if (e.key === "Enter") {
-                        saveTitle(conversation);
-                      } else if (e.key === "Escape") {
-                        cancelEditing();
-                      }
-                    }}
-                  />
-                {:else}
-                  <a
-                    href={"/conversations/" + conversation._id}
-                    class="flex items-center flex-1"
-                  >
-                    <span class="text-sm">{conversation.title}</span>
-                  </a>
-                {/if}
 
-                <span class="text-xs text-left mx-4"
-                  >{dayjs(conversation.updated_at).format(
-                    "DD.MM.YYYY HH:mm",
-                  )}</span
+    <section>
+      {#if Array.isArray(conversations) && conversations.length > 0}
+        <div class="min-h-0 max-h-full overflow-y-auto space-y-2">
+          {#each conversations as conversation}
+            <div
+              class="flex items-center justify-between border-b px-2 py-1 rounded-lg border"
+            >
+              {#if editingId === conversation._id}
+                <input
+                  type="text"
+                  class="input input-bordered input-sm flex-1 text-sm"
+                  bind:value={newTitle}
+                  onkeydown={(e) => {
+                    if (e.key === "Enter") {
+                      saveTitle(conversation);
+                    } else if (e.key === "Escape") {
+                      cancelEditing();
+                    }
+                  }}
+                />
+              {:else}
+                <a
+                  href={"/conversations/" + conversation._id}
+                  class="flex items-center flex-1"
                 >
+                  <span class="text-sm">{conversation.title}</span>
+                </a>
+              {/if}
 
-                {#if editingId === conversation._id}
-                  <button
-                    onclick={preventDefault(() => saveTitle(conversation))}
-                    class="btn btn-secondary btn-outline btn-sm mr-2"
-                  >
-                    {@html svgIcons.check}
-                    {t("common.save")}
-                  </button>
-                  <button
-                    onclick={preventDefault(cancelEditing)}
-                    class="btn btn-secondary btn-outline btn-sm"
-                  >
-                    {@html svgIcons.cancel}
-                    {t("common.cancel")}
-                  </button>
-                {:else}
-                  <button
-                    onclick={preventDefault(() => startEditing(conversation))}
-                    class="btn btn-primary btn-outline btn-sm mr-2"
-                  >
-                    {@html svgIcons.edit}
-                    {t("conversation.edit-title")}
-                  </button>
-                  <button
-                    onclick={preventDefault(() =>
-                      deleteConversation(conversation._id),
-                    )}
-                    class="btn btn-primary btn-outline btn-sm"
-                  >
-                    {@html svgIcons.trash}
-                    {t("conversation.remove-from-my-ai-box")}
-                  </button>
-                {/if}
-              </div>
-            {/each}
-          </div>
-        {:else}
-          <div class="flex w-full items-center justify-center">
-            <span class="text-sm">
-              {t("common.no-content-available")}
-            </span>
-          </div>
-        {/if}
-      </section>
+              <span class="text-xs text-left mx-4"
+                >{dayjs(conversation.updated_at).format(
+                  "DD.MM.YYYY HH:mm",
+                )}</span
+              >
+
+              {#if editingId === conversation._id}
+                <button
+                  onclick={preventDefault(() => saveTitle(conversation))}
+                  class="btn btn-secondary btn-outline btn-sm mr-2"
+                >
+                  {@html svgIcons.check}
+                  {t("common.save")}
+                </button>
+                <button
+                  onclick={preventDefault(cancelEditing)}
+                  class="btn btn-secondary btn-outline btn-sm"
+                >
+                  {@html svgIcons.cancel}
+                  {t("common.cancel")}
+                </button>
+              {:else}
+                <button
+                  onclick={preventDefault(() => startEditing(conversation))}
+                  class="btn btn-primary btn-outline btn-sm mr-2"
+                >
+                  {@html svgIcons.edit}
+                  {t("conversation.edit-title")}
+                </button>
+                <button
+                  onclick={preventDefault(() =>
+                    deleteConversation(conversation._id),
+                  )}
+                  class="btn btn-primary btn-outline btn-sm"
+                >
+                  {@html svgIcons.trash}
+                  {t("conversation.remove-from-my-ai-box")}
+                </button>
+              {/if}
+            </div>
+          {/each}
+        </div>
+      {:else}
+        <div class="flex w-full items-center justify-center">
+          <span class="text-sm">
+            {t("common.no-content-available")}
+          </span>
+        </div>
+      {/if}
+    </section>
+
+    {#if isConversationLoading}
+      <div class="flex w-full items-center justify-center mt-2">
+        <span class="loading loading-dots loading-sm"></span>
+      </div>
     {/if}
 
     <div class="flex justify-end">
