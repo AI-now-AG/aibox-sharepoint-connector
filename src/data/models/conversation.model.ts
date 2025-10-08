@@ -72,14 +72,17 @@ export default {
       updated_at: new Date(),
       expires_at: expiresAt,
     };
+
+    const updatedDocument = await collection.findOneAndUpdate(
+      { _id: objectId },
+      { $set: doc },
+      {
+        returnDocument: "after",
+      },
+    );
+
     if (isReturnUpdatedData) {
-      return await collection.findOneAndUpdate(
-        { _id: objectId },
-        { $set: doc },
-        {
-          returnDocument: "after",
-        },
-      );
+      return updatedDocument
     }
     return { success: true }
   },
