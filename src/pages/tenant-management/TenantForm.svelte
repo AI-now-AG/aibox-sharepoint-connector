@@ -55,6 +55,7 @@
     isStripeInTestMode = false,
   }: Props = $props();
 
+  let addTenantAdminFor: "admin" | "sa" = $state("admin");
   let addTenantAdminModal: HTMLDialogElement | undefined = $state();
   let confirmUpdateModal: HTMLDialogElement | undefined = $state();
   let alertModal: HTMLDialogElement | undefined = $state();
@@ -831,14 +832,23 @@
     }
   }
 
-  async function createTenantAdmin() {
+  async function createTenantAdmin(role: "admin" | "sa" = "admin") {
     try {
       loading = true;
-      const { error } = await actions.tenant.createAdminUser({
-        _id: tenantData._id,
-        org_id: tenantData.org_id,
-        tenant_admin_email: tenantAdminEmail,
-      });
+      const { error } =
+        role === "admin"
+          ? await actions.tenant.createAdminUser({
+              _id: tenantData._id,
+              org_id: tenantData.org_id,
+              tenant_admin_email: tenantAdminEmail,
+              role,
+            })
+          : await actions.tenant.createAdminUser({
+              _id: tenantData._id,
+              org_id: tenantData.org_id,
+              tenant_admin_email: tenantAdminEmail,
+              role,
+            });
 
       loading = false;
       if (error) {
@@ -1013,14 +1023,27 @@
       <div class="flex-1 flex flex-col mb-4">
         <div class="flex justify-end">
           <button
-            class={"mt-7 btn btn-sm btn-outline font-normal grow-0 w-auto " +
+            class={"mt-7 mr-2 btn btn-sm btn-outline font-normal grow-0 w-auto " +
               `${mode == MODE.Edit ? "" : "btn-disabled"}`}
             onclick={() => {
+              addTenantAdminFor = "admin";
               addTenantAdminModal?.show();
             }}
           >
             {@html svgIcons.add}
             {t("tenant.add-tenant-admin")}
+          </button>
+
+          <button
+            class={"mt-7 btn btn-sm btn-secondary font-normal grow-0 w-auto " +
+              `${mode == MODE.Edit ? "" : "btn-disabled"}`}
+            onclick={() => {
+              addTenantAdminFor = "sa";
+              addTenantAdminModal?.show();
+            }}
+          >
+            {@html svgIcons.add}
+            {t("tenant.add-tenant-supper-admin")}
           </button>
         </div>
       </div>
@@ -2287,7 +2310,9 @@
   bind:modal={addTenantAdminModal}
   bind:value={tenantAdminEmail}
   bind:errorMessage={tenantAdminEmailErrorMessage}
-  title={t("tenant.add-tenant-admin")}
+  title={addTenantAdminFor == "admin"
+    ? t("tenant.add-tenant-admin")
+    : t("tenant.add-tenant-supper-admin")}
   label={t("login.email")}
   save={(value: string) => {
     if (!isValidEmail(value)) {
@@ -2295,7 +2320,7 @@
     } else {
       tenantAdminEmailErrorMessage = "";
       addTenantAdminModal?.close();
-      createTenantAdmin();
+      createTenantAdmin(addTenantAdminFor);
     }
   }}
 />

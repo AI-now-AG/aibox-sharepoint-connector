@@ -50,6 +50,13 @@ export interface UsageOverview {
   creditsUsed: number;
 }
 
+export interface CreditUsage {
+  tenantName: string;
+  planName: string;
+  creditsUsed: number;
+  activeUsers: number;
+}
+
 // Type for token to credit mapping (input and output tokens)
 export interface TokenCreditRate {
   input: number;

@@ -633,5 +633,6 @@
   "transcription.success.files-ready": "Deine Dateien stehen zum Download bereit",
   "transcription.error.failed": "Transkription fehlgeschlagen",
   "transcription.error.try-again": "Bitte versuche es erneut oder kontaktiere den Support, wenn das Problem weiterhin besteht.",
-  "transcription.button.remove-file": "Datei entfernen"
+  "transcription.button.remove-file": "Datei entfernen",
+  "tenant.add-tenant-supper-admin": "Super Admin hinzufügen"
 }

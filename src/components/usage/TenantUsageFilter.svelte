@@ -1,4 +1,5 @@
 <script lang="ts">
+  import dayjs from "dayjs";
   import { useTranslations } from "$i18n/utils";
   import { preventDefault } from "$utils/common";
   import { svgIcons } from "$assets/icons";
@@ -14,9 +15,9 @@
   }
 
   let {
-    tenants,
-    selectedTenant = $bindable(),
-    selectedMonth = $bindable(),
+    tenants = [],
+    selectedTenant = $bindable(null),
+    selectedMonth = $bindable(null),
     onsearch,
   }: Props = $props();
 
@@ -28,25 +29,15 @@
   });
 
   // Generate an array of the current month and the previous 6 months
-  function getMonthOptions(): Option[] {
-    const months = [];
-    const now = new Date();
-    for (let i = 0; i < 3; i++) {
-      const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      const month = String(date.getMonth() + 1).padStart(2, "0"); // Format as mm
-      const year = date.getFullYear(); // Get the full year
-      const monthName = date.toLocaleString("default", {
-        month: "long",
-        year: "numeric",
-      });
-      const formattedMonth = `${month}-${year}`; // Format as mm-yyyy
-      months.push({
-        value: formattedMonth,
-        title: monthName,
-      });
-    }
-    return months;
-  }
+  const getMonthOptions = (): Option[] => {
+    return Array.from({ length: 6 }, (_, i) => {
+      const date = dayjs().subtract(i, "month");
+      return {
+        value: date.format("MM-YYYY"), // e.g., "10-2025"
+        title: date.format("MMMM YYYY"), // e.g., "October 2025"
+      };
+    });
+  };
 
   const monthOptions = getMonthOptions();
 </script>

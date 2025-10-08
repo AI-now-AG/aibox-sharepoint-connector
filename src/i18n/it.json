@@ -633,5 +633,6 @@
   "transcription.success.files-ready": "Your files are ready for download",
   "transcription.error.failed": "Transcription failed",
   "transcription.error.try-again": "Please try again or contact support if the issue persists",
-  "transcription.button.remove-file": "Remove file"
+  "transcription.button.remove-file": "Remove file",
+  "tenant.add-tenant-supper-admin": "Add Super Admin"
 }
