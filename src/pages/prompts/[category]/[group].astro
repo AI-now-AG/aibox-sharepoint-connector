@@ -3,36 +3,49 @@
 import Layout from "$layouts/Layout.astro";
 import Content from "$components/prompt-interface/Content.astro";
 import CategoryModel from "$data/models/category.model";
-import { ObjectId } from "mongodb";
+import PromptModel, { type Prompt } from "$data/models/prompt.model";
+import { isSameObjectId } from "$utils/common";
 
 const { category: categoryId, group: groupId } = Astro.params;
 
-const category = await CategoryModel.get(categoryId || "");
+const category = await CategoryModel.get(categoryId as string);
 if (
   !category ||
-  !new ObjectId(category.tenant_id).equals(Astro.locals.tenant._id)
+  (category && !isSameObjectId(category.tenant_id, Astro.locals.tenant._id))
 ) {
-  return Astro.redirect("/404");
+  return Astro.rewrite("/404");
 }
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const group = category?.groups.find((g: any) => g._id.toString() === groupId);
-if (!group) {
-  return Astro.redirect("/404");
-}
+const prompts = await PromptModel.listByCategory(categoryId as string);
+
+const categoryPrompt = prompts.filter(
+  (p: Prompt) => p.category?.toString() === categoryId
+);
+const categoryGroupPrompt = categoryPrompt.filter(
+  (p: Prompt) => p.group?.toString() === group?._id?.toString()
+);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const promptItems = categoryGroupPrompt.map((prompt: any) => ({
+  _id: prompt._id?.toString(),
+  title: prompt.title,
+  description: prompt.description,
+  prompt: prompt.prompt,
+  model: prompt.model,
+  reasoningEffort: prompt.reasoningEffort,
+  textVerbosity: prompt.textVerbosity,
+  promptTool: prompt.promptTool,
+  predefined_input: prompt.predefined_input,
+}));
 ---
 
 <Layout>
-  <!-- <div
-    class="grid grid-cols-1 xl:grid-cols-[1fr_minmax(min-content,420px)] bg-base-200 h-full"
-    > -->
-  <!-- <div
-    class="grid grid-cols-1 grid-rows-[min-content-1fr] bg-base-200 h-full content-baseline gap-0 place-items-center"
-  > -->
   <div
     class="flex flex-col bg-base-200 h-full content-baseline gap-0 place-items-center"
   >
     <div class="w-full h-full">
-      <Content />
+      <Content {group} {promptItems} />
     </div>
   </div>
 </Layout>

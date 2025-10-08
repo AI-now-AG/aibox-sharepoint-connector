@@ -4,12 +4,16 @@ import Layout from "$layouts/Layout.astro";
 import ChatView from "./ChatView.svelte";
 import ConversationModel from "$data/models/conversation.model";
 import PromptModel from "$data/models/prompt.model";
+import { isSameObjectId } from "$utils/common";
 
 const { id } = Astro.params;
 const tenant = Astro.locals.tenant;
 const conversation = await ConversationModel.get(id || "");
-if (!conversation || !conversation.creator_id.equals(Astro.locals.user.id)) {
-  return Astro.redirect("/404");
+if (
+  !conversation ||
+  !isSameObjectId(conversation.creator_id, Astro.locals.user.id)
+) {
+  return Astro.rewrite("/404");
 }
 const prompt = await PromptModel.get(conversation.prompt_id || "");
 ---
