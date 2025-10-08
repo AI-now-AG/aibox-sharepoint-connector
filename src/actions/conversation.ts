@@ -20,7 +20,7 @@ const ConversationInputParamsSchema = z.object({
   prompt_id: z.string().nullish(),
   model: z.string().nullish(),
   previous_response_id: z.string().nullish(),
-  messages: z.array(MessageSchema),
+  messages: z.array(MessageSchema).optional(),
 });
 
 const UpdateConversationSchema = ConversationInputParamsSchema.omit({
@@ -131,7 +131,7 @@ export const conversation = {
       const generatedTitle = await generateConversationTitle(
         context,
         promptTitle,
-        messages[0].content,
+        messages?.[0]?.content ?? "",
       );
 
       // Build the conversation object to be persisted

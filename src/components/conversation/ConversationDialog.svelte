@@ -25,7 +25,7 @@
   let loading: boolean = $state(false);
   let isConversationLoading: boolean = $state(false);
   let conversations: any[] = $state(initConversations);
-  let editingId: string | null = $state(null); // Tracks the ID of the conversation being edited
+  let editingId: string = $state(""); // Tracks the ID of the conversation being edited
   let newTitle: string = $state(""); // Stores the new title as the user types
 
   let isDataLoaded = false;
@@ -125,7 +125,7 @@
 
   // Cancels the editing process
   function cancelEditing() {
-    editingId = null;
+    editingId = "";
     newTitle = "";
   }
 
@@ -133,16 +133,16 @@
   async function saveTitle(conversation: any) {
     try {
       loading = true;
-
+      const conversationId = conversation._id;
       const { error } = await actions.conversation.update({
-        ...conversation,
+        _id: conversationId,
         title: newTitle,
       });
 
       if (!error) {
         conversations = conversations
           .map((c) =>
-            c._id === conversation._id
+            c._id === conversationId
               ? { ...c, title: newTitle, updated_at: new Date() }
               : c,
           )
@@ -268,8 +268,7 @@
 
     {#if isConversationLoading}
       <div class="flex w-full items-center justify-center mt-2">
-        <span class="loading loading-dots loading-sm"
-        ></span>
+        <span class="loading loading-dots loading-sm"></span>
       </div>
     {/if}
 
