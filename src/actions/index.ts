@@ -8,7 +8,7 @@ import { user } from "./user";
 import { knowledgebase } from "./knowledgebase";
 import { conversation } from "./conversation";
 import { onboarding } from "./onboarding";
-import { usage } from "./usage";
+import { report } from "./report";
 import { configurations } from "./configuration";
 import { cloneMasterTeant } from "./clonemastertenant";
 
@@ -23,7 +23,7 @@ export const server = {
   knowledgebase,
   conversation,
   onboarding,
-  usage,
+  report,
   configurations,
   cloneMasterTeant
 };

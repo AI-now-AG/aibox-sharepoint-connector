@@ -25,10 +25,10 @@ const categories = await cached(
   1000 * 60 * 0.5,
   async () => {
     const cursor = await await Category.listActiveByTenant(
-      Astro.locals.user.tenant_id
+      Astro.locals.user.tenant_id,
     );
     return await cursor.toArray();
-  }
+  },
 );
 
 const transcriptions = await cached(
@@ -36,10 +36,10 @@ const transcriptions = await cached(
   1000 * 60 * 2,
   async () => {
     const data = await TranscriptionModel.listByTenant(
-      Astro.locals.user.tenant_id
+      Astro.locals.user.tenant_id,
     );
     return data;
-  }
+  },
 );
 
 const navState = Astro.locals.user.navState || {};
@@ -74,7 +74,7 @@ const transcriptionTypes = Astro.locals.tenant.transcription_types ?? [];
 const activeTranscriptions =
   transcriptions?.filter(
     (tran) =>
-      transcriptionTypes.includes(tran.category) && tran.enabled === true
+      transcriptionTypes.includes(tran.category) && tran.enabled === true,
   ) ?? [];
 
 const audioToTextTranscriptions = activeTranscriptions
@@ -91,7 +91,7 @@ const subtitleTranscriptions = activeTranscriptions
       tran.category == AudioCategory.Subtitle ||
       tran.category == AudioCategory.SubtitleJson ||
       tran.category == AudioCategory.SubtitleLarge ||
-      tran.category == AudioCategory.Subtitle11Labs
+      tran.category == AudioCategory.Subtitle11Labs,
   )
   .map((tran) => ({
     title: tran.name,
@@ -153,7 +153,7 @@ if (
   auth.hasFeatureWithProvider(
     Astro.locals,
     TenantFeature.CreateImage,
-    ApiKeyProvider.OpenAI
+    ApiKeyProvider.OpenAI,
   )
 ) {
   createImageItems.push({
@@ -167,7 +167,7 @@ if (
   auth.hasFeatureWithProvider(
     Astro.locals,
     TenantFeature.CreateImage,
-    ApiKeyProvider.Flux
+    ApiKeyProvider.Flux,
   )
 ) {
   createImageItems.push({
@@ -181,7 +181,7 @@ if (
   auth.hasFeatureWithProvider(
     Astro.locals,
     TenantFeature.GptImage,
-    ApiKeyProvider.OpenAI
+    ApiKeyProvider.OpenAI,
   )
 ) {
   createImageItems.push({
@@ -195,7 +195,7 @@ if (
   auth.hasFeatureWithProvider(
     Astro.locals,
     TenantFeature.CreateImage,
-    ApiKeyProvider.Gemini
+    ApiKeyProvider.Gemini,
   )
 ) {
   createImageItems.push({
@@ -221,7 +221,8 @@ if (conversations.length > 0) {
   });
 }
 
-const restrictedMenus = [];
+const adminMenus = [];
+const supperAdminMenus = [];
 const settingsItems = [
   {
     title: t("nav.settings.prompts"),
@@ -257,35 +258,51 @@ if (auth.isAdmin(Astro.locals) || auth.isSuperAdmin(Astro.locals)) {
     title: t("nav.usage"),
     path: `/billing/usage`,
   });
-  restrictedMenus.push({
+  adminMenus.push({
     title: t("nav.settings"),
     icon: svgIcons.menuSettings,
-    isOpened: navState[`restricted-menu-0`] ?? false,
+    isOpened: navState[`admin-menu`] ?? false,
     items: settingsItems,
   });
 }
 
 if (auth.isSuperAdmin(Astro.locals)) {
-  restrictedMenus.push({
+  supperAdminMenus.push({
     title: t("nav.settings.admin"),
     icon: svgIcons.admin,
-    isOpened: navState[`restricted-menu-1`] ?? false,
+    isOpened: navState[`supper-admin-menu`] ?? false,
     items: [
       {
         title: t("nav.tenant-management"),
         path: `/tenant-management`,
       },
       {
-        title: t("nav.settings.instructions"),
-        path: `/settings/instruction`,
+        title: t("nav.system-config"),
+        isOpened: navState[`admin-menu-id-1`] ?? false,
+        items: [
+          {
+            title: t("nav.settings.instructions"),
+            path: `/settings/instruction`,
+          },
+          {
+            title: t("nav.settings.prompt-refinement"),
+            path: `/settings/prompt-refinement`,
+          },
+        ],
       },
       {
-        title: t("nav.settings.prompt-refinement"),
-        path: `/settings/prompt-refinement`,
-      },
-      {
-        title: t("nav.usage"),
-        path: `/usage`,
+        title: t("nav.reports"),
+        isOpened: navState[`admin-menu-id-2`] ?? false,
+        items: [
+          {
+            title: t("nav.usage-per-tenant"),
+            path: `/reports/usage-per-tenant`,
+          },
+          {
+            title: t("nav.credit-usage-all"),
+            path: `/reports/credit-usage-all`,
+          },
+        ],
       },
     ],
   });
@@ -566,56 +583,6 @@ const modules = [...menuItems];
       }
 
       {
-        restrictedMenus.length > 0 && (
-          <div
-            class={`mx-6 my-2 pointer-events-none ${isNavCollapsed ? "hidden" : ""}`}
-          />
-        )
-      }
-      {
-        restrictedMenus.map((mod, index) => (
-          <li class="active:bg-transparent">
-            <details
-              data-id={`restricted-menu-${index}`}
-              open={mod.isOpened}
-              class="active:bg-transparent"
-              id="onboardingNewTenantId1"
-            >
-              <summary
-                class={
-                  isNavCollapsed
-                    ? "tooltip tooltip-right flex justify-center"
-                    : ""
-                }
-                data-tip={isNavCollapsed ? mod.title : ""}
-              >
-                <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
-                  {mod.icon && <Fragment set:html={mod.icon} />}
-                </div>
-                <span class={isNavCollapsed ? "hidden" : ""}>{mod.title}</span>
-              </summary>
-              {"items" in mod && (
-                <ul
-                  class={`active:bg-transparent ${isNavCollapsed ? "hidden" : ""}`}
-                >
-                  {mod.items?.map((sub) => (
-                    <li class="pl-1 active:bg-transparent">
-                      <MenuItem {...sub} />
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </details>
-            {index < restrictedMenus.length - 1 && (
-              <div
-                class={`mx-6 my-1 pointer-events-none ${isNavCollapsed ? "hidden" : ""}`}
-              />
-            )}
-          </li>
-        ))
-      }
-
-      {
         myAIBoxMenus.length > 0 && (
           <div
             class={`mx-6 my-2 pointer-events-none ${isNavCollapsed ? "hidden" : ""}`}
@@ -650,7 +617,126 @@ const modules = [...menuItems];
                 client:idle
               />
             </details>
-            {index < restrictedMenus.length - 1 && (
+            {index < myAIBoxMenus.length - 1 && (
+              <div
+                class={`mx-6 my-1 pointer-events-none ${isNavCollapsed ? "hidden" : ""}`}
+              />
+            )}
+          </li>
+        ))
+      }
+
+      {
+        adminMenus.length > 0 && (
+          <div
+            class={`mx-6 my-2 pointer-events-none ${isNavCollapsed ? "hidden" : ""}`}
+          />
+        )
+      }
+      {
+        adminMenus.map((mod, index) => (
+          <li class="active:bg-transparent">
+            <details
+              data-id={`admin-menu`}
+              open={mod.isOpened}
+              class="active:bg-transparent"
+              id="onboardingNewTenantId1"
+            >
+              <summary
+                class={
+                  isNavCollapsed
+                    ? "tooltip tooltip-right flex justify-center"
+                    : ""
+                }
+                data-tip={isNavCollapsed ? mod.title : ""}
+              >
+                <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
+                  {mod.icon && <Fragment set:html={mod.icon} />}
+                </div>
+                <span class={isNavCollapsed ? "hidden" : ""}>{mod.title}</span>
+              </summary>
+              {"items" in mod && (
+                <ul
+                  class={`active:bg-transparent ${isNavCollapsed ? "hidden" : ""}`}
+                >
+                  {mod.items?.map((sub) => (
+                    <li class="pl-1 active:bg-transparent">
+                      <MenuItem {...sub} />
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </details>
+            {index < adminMenus.length - 1 && (
+              <div
+                class={`mx-6 my-1 pointer-events-none ${isNavCollapsed ? "hidden" : ""}`}
+              />
+            )}
+          </li>
+        ))
+      }
+
+      {
+        supperAdminMenus.length > 0 && (
+          <div
+            class={`divider mx-6 pointer-events-none ${isNavCollapsed ? "hidden" : ""}`}
+          />
+        )
+      }
+      {
+        supperAdminMenus.map((mod, index) => (
+          <li class="active:bg-transparent">
+            <details
+              data-id={`supper-admin-menu`}
+              open={mod.isOpened}
+              class="active:bg-transparent"
+              id="onboardingNewTenantId1"
+            >
+              <summary
+                class={
+                  isNavCollapsed
+                    ? "tooltip tooltip-right flex justify-center"
+                    : ""
+                }
+                data-tip={isNavCollapsed ? mod.title : ""}
+              >
+                <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
+                  {mod.icon && <Fragment set:html={mod.icon} />}
+                </div>
+                <span class={isNavCollapsed ? "hidden" : ""}>{mod.title}</span>
+              </summary>
+              {"items" in mod && (
+                <ul
+                  class={`active:bg-transparent ${isNavCollapsed ? "hidden" : ""}`}
+                >
+                  {mod.items?.map((sub, _index) => (
+                    <li class="pl-1 active:bg-transparent">
+                      {sub.items ? (
+                        <details
+                          data-id={`admin-menu-id-${_index}`}
+                          open={sub.isOpened}
+                          class="active:bg-transparent"
+                        >
+                          <summary>{sub.title}</summary>
+                          {sub.items.length > 0 && (
+                            <ul class="active:bg-transparent">
+                              {sub.items.map((sub1) => (
+                                <li class="pl-1 active:bg-transparent">
+                                  <MenuItem {...sub1} />
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </details>
+                      ) : (
+                        <MenuItem {...sub} />
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </details>
+            {index < supperAdminMenus.length - 1 && (
               <div
                 class={`mx-6 my-1 pointer-events-none ${isNavCollapsed ? "hidden" : ""}`}
               />
@@ -687,7 +773,7 @@ const modules = [...menuItems];
         element.addEventListener(
           "toggle",
           () => updateNavState(detailsId, element.open),
-          { passive: true }
+          { passive: true },
         );
       }
     }
@@ -721,13 +807,13 @@ const modules = [...menuItems];
         selectorGroups.logo.classList.toggle("hidden", newCollapsed);
 
       selectorGroups.textSpans.forEach((el) =>
-        el.classList.toggle("hidden", newCollapsed)
+        el.classList.toggle("hidden", newCollapsed),
       );
       selectorGroups.subMenus.forEach((el) =>
-        el.classList.toggle("hidden", newCollapsed)
+        el.classList.toggle("hidden", newCollapsed),
       );
       selectorGroups.spacers.forEach((el) =>
-        el.classList.toggle("hidden", newCollapsed)
+        el.classList.toggle("hidden", newCollapsed),
       );
 
       selectorGroups.summaries.forEach((summary) => {
@@ -745,11 +831,11 @@ const modules = [...menuItems];
       // Update accessibility labels
       toggleBtn.setAttribute(
         "aria-label",
-        newCollapsed ? "Expand navigation" : "Collapse navigation"
+        newCollapsed ? "Expand navigation" : "Collapse navigation",
       );
       toggleBtn.setAttribute(
         "title",
-        newCollapsed ? "Expand navigation" : "Collapse navigation"
+        newCollapsed ? "Expand navigation" : "Collapse navigation",
       );
 
       // Update icon

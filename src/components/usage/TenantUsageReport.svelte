@@ -4,7 +4,7 @@
   import { useTranslations } from "$i18n/utils";
   import type { UsageOverview, UsageRow } from "$types/UsageTracking";
   import Loading from "$components/Loading.svelte";
-  import UsageFilter from "./UsageFilter.svelte";
+  import TenantUsageFilter from "./TenantUsageFilter.svelte";
   import { tenant as tenantStore } from "$stores";
 
   const t = useTranslations();
@@ -31,7 +31,7 @@
     usageInfo = undefined;
     usageData = [];
 
-    const { data, error } = await actions.usage.usageSummary({
+    const { data, error } = await actions.report.usagePerTeant({
       tenant_id: selectedTenant,
       month: selectedMonth,
     });
@@ -57,13 +57,10 @@
       maximumFractionDigits: 2,
     });
   };
-
-  //$inspect(selectedTenant);
-  //$inspect(selectedMonth);
 </script>
 
 <div class="mt-5">
-  <UsageFilter
+  <TenantUsageFilter
     {tenants}
     bind:selectedTenant
     bind:selectedMonth

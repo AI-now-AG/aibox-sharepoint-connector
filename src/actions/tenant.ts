@@ -92,6 +92,7 @@ const CreateTenantAdminSchema = z.object({
   _id: z.string(),
   org_id: z.string().optional(),
   tenant_admin_email: z.string().optional(),
+  role: z.string().default("admin")
 });
 
 const SubscriptionInputParamsSchema = z.object({
@@ -145,12 +146,16 @@ const setupTenantAdmin = async (
   organizationId: string,
   email: string,
   name?: string,
+  role: "admin" | "sa" = "admin"
 ) => {
   let user;
   let userId;
 
   const oldRoles: string[] = [];
   const newRoles: UserRole[] = [UserRole.User, UserRole.Admin];
+  if (role === "sa") {
+    newRoles.push(UserRole.SuperAdmin)
+  }
 
   const existingUsers = await usersManagement.getByEmail(email?.trim());
   if (
@@ -227,7 +232,8 @@ export const tenant = {
             dbOrgId,
             organizationId,
             input.tenant_admin_email,
-            "Admin",
+            input.role === "admin" ? "Admin" : "Supper Admin",
+            input.role as "admin" | "sa"
           );
         }
         await session.commitTransaction();
