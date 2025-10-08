@@ -118,9 +118,11 @@ export default {
       }
 
       // Add roles filter
+      let filterRolles = {}
       if (roles && roles?.length > 0) {
-        filter.roles = { $in: roles.map((role) => new RegExp(role, "i")) };
+        filterRolles = { $in: roles.map((role) => new RegExp(role, "i")) };
       }
+      filter.roles = { ...filterRolles, $nin: [new RegExp(`^${UserRole.SuperAdmin}$`, "i")] };
 
       // Handle isBlocked, isVerified, and isUnVerified filters
       const emailVerifiedFilter = [];

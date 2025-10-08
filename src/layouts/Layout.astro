@@ -52,7 +52,7 @@ const isSocialAuth = isSocialConnection(userInfo?.auth0_sub);
 
 const conversations = await cached(
   `conversations:${Astro.locals.user.tenant_id}`,
-  1000 * 60 * 0.5,
+  1000 * 60 * 0.1,
   async () => {
     const data: Conversation[] = await ConversationModel.listByUser(
       Astro.locals.user.id,
