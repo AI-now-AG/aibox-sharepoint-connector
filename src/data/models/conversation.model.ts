@@ -14,6 +14,7 @@ export const MessageSchema = z.object({
 
 // Zod schema for a conversation
 const ChatConversationSchema = z.object({
+  _id: z.instanceof(ObjectId),
   tenant_id: z.instanceof(ObjectId),
   creator_id: z.instanceof(ObjectId),
   prompt_id: z.instanceof(ObjectId).nullish().default(null),
@@ -46,14 +47,17 @@ const collection = db.collection<Conversation>("conversations");
 
 export default {
   create: async (conversation: Partial<Omit<Conversation, "_id">>) => {
-    const validated = ChatConversationSchema.parse(conversation);
+    const validated = ChatConversationSchema.parse({
+      _id: new ObjectId(),
+      ...conversation,
+    });
     const doc = {
       ...validated,
     };
     return collection.insertOne(doc);
   },
 
-  update: async (id: string | ObjectId, update: Partial<Conversation>) => {
+  update: async (id: string | ObjectId, update: Partial<Conversation>, isReturnUpdatedData: boolean = true) => {
     const objectId = toObjectId(id);
     const validated = ChatConversationSchema.partial().parse(update);
 
@@ -68,47 +72,50 @@ export default {
       updated_at: new Date(),
       expires_at: expiresAt,
     };
-    return await collection.findOneAndUpdate(
+
+    const updatedDocument = await collection.findOneAndUpdate(
       { _id: objectId },
       { $set: doc },
       {
         returnDocument: "after",
       },
     );
+
+    if (isReturnUpdatedData) {
+      return updatedDocument
+    }
+    return { success: true }
   },
 
   // New function to update the messages array using $push
-  updateMessage: async (
-  id: string | ObjectId,
-  message: Message,
-) => {
-  const objectId = toObjectId(id);
+  updateMessage: async (id: string | ObjectId, message: Message) => {
+    const objectId = toObjectId(id);
 
-  // Validate the incoming message object
-  const validatedMessage = MessageSchema.parse(message);
+    // Validate the incoming message object
+    const validatedMessage = MessageSchema.parse(message);
 
-  const expiresAt = (() => {
-    const d = new Date();
-    d.setDate(d.getDate() + 30);
-    return d;
-  })();
+    const expiresAt = (() => {
+      const d = new Date();
+      d.setDate(d.getDate() + 30);
+      return d;
+    })();
 
-  // Use the $push operator to append the new message
-  // Also, update the updated_at and expires_at fields
-  return await collection.findOneAndUpdate(
-    { _id: objectId },
-    {
-      $push: { messages: validatedMessage },
-      $set: {
-        updated_at: new Date(),
-        expires_at: expiresAt,
+    // Use the $push operator to append the new message
+    // Also, update the updated_at and expires_at fields
+    return await collection.findOneAndUpdate(
+      { _id: objectId },
+      {
+        $push: { messages: validatedMessage },
+        $set: {
+          updated_at: new Date(),
+          expires_at: expiresAt,
+        },
       },
-    },
-    {
-      returnDocument: "after",
-    },
-  );
-},
+      {
+        returnDocument: "after",
+      },
+    );
+  },
 
   remove: async (id: string) => {
     const _id = new ObjectId(id);

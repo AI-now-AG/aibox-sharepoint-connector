@@ -10,6 +10,7 @@ import { conversation } from "./conversation";
 import { onboarding } from "./onboarding";
 import { usage } from "./usage";
 import { configurations } from "./configuration";
+import { cloneMasterTeant } from "./clonemastertenant";
 
 export const server = {
   tenant,
@@ -24,4 +25,5 @@ export const server = {
   onboarding,
   usage,
   configurations,
+  cloneMasterTeant
 };

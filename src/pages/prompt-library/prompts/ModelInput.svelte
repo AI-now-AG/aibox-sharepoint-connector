@@ -10,6 +10,7 @@
     CustomSortOrder,
     ModelNameMap,
     ProviderModelMap,
+    isProviderActive,
   } from "$shared/AIProvider";
 
   const t = useTranslations();
@@ -46,8 +47,6 @@
     let title;
     switch (provider.name) {
       case PromptModel.OpenAI:
-      case PromptModel.OpenAIWithTools:
-      case PromptModel.OpenAIWithImageTools:
         title = `${modelLabel} (${t("home.model-option-text-tools")})`;
         break;
       case PromptModel.AzureOpenAI:
@@ -107,6 +106,14 @@
           };
         }) || [];
 
+    // Nano Banana
+    if (isProviderActive($tenant, ApiKeyProvider.Gemini)) {
+      models.push({
+        value: PromptModel.NanoBanana,
+        title: t("prompt-execution.models.nano-banana"),
+      });
+    }
+
     sortProviders(models);
 
     models.unshift({
@@ -120,13 +127,6 @@
   $effect(() => {
     if (!selectedModel) {
       selectedModel = defaultModel?.name || PromptModel.Default;
-    } else {
-      if (
-        selectedModel == PromptModel.OpenAIWithTools ||
-        selectedModel == PromptModel.OpenAIWithImageTools
-      ) {
-        selectedModel = PromptModel.OpenAI;
-      }
     }
   });
 </script>

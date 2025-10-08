@@ -3,10 +3,9 @@
   import Input from "$components/form/Input.svelte";
   import SubsciptionSteps from "$components/subscription/SubsciptionSteps.svelte";
   import { useTranslations } from "$i18n/utils";
-  import Dropdown, {
-    type Option,
-  } from "$components/subscription/Dropdown.svelte";
+  import Dropdown from "$components/subscription/Dropdown.svelte";
   import { storeOrganizationInfo, subscription } from "$stores/subscription";
+  import { Languges } from "$types/TenantFeature";
 
   interface Props {
     defaultLanguage?: string;
@@ -16,11 +15,6 @@
   const t = useTranslations(defaultLanguage);
 
   const initOrganizationInformation = $subscription.organizationInfo;
-
-  const languages: Option[] = [
-    { value: "de", title: "Deutsch" },
-    { value: "en", title: "English" },
-  ];
 
   let selectedLanguage: string = $state(
     initOrganizationInformation?.defaultLanguage ?? "de",
@@ -111,7 +105,7 @@
         <Dropdown
           label={`${t("subscription.language")}`}
           placeholder={t("tenant.german-language")}
-          options={languages}
+          options={Languges}
           bind:value={selectedLanguage}
         />
       </div>

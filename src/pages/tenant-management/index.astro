@@ -15,13 +15,28 @@ const t = useTranslations();
       {t("tenant.tenants")}
     </h1>
 
-    <a
-      href="./tenant-management/add"
-      class="mt-2 lg:mt-8 btn btn-outline font-normal grow-0"
-    >
-      <span set:html={svgIcons.add} />
-      {t("tenant.tenants.add-new-tenant")}
-    </a>
+    <div class="dropdown dropdown-end mt-2 lg:mt-8">
+      <label tabindex="0" class="btn btn-outline font-normal grow-0">
+        <span set:html={svgIcons.add} class="mr-2" />
+        {t("tenant.tenants.add-new-tenant")}
+      </label>
+
+      <ul
+        tabindex="0"
+        class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52"
+      >
+        <li>
+          <a href="/tenant-management/add">
+            {t("tenant.add-empty-tenant")}
+          </a>
+        </li>
+        <li>
+          <a href="/tenant-management/clone">
+            {t("tenant.clone-from-master-tenant")}
+          </a>
+        </li>
+      </ul>
+    </div>
   </div>
   <div class="px-8">
     <TenantList client:load />
