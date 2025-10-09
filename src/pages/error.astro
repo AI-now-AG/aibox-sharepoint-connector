@@ -5,10 +5,10 @@ import { useTranslations } from "$i18n/utils";
 let errorName = Astro.url.searchParams.get("error") || 'server_error';
 let errorDescription = Astro.url.searchParams.get("error_description") || 'Oops, something went wrong!';
 let showLogoutButton = false;
+let showHomeButton = false;
 
 const t = useTranslations();
 const logoutText = t("common.logout");
-const refreshText = t("common.refresh");
 const backToHomeText = t("common.back-to-home");
 
 // Check social login same email account with existing user
@@ -26,6 +26,7 @@ if (errorName == "account_blocked" || (errorName == "unauthorized" && errorDescr
 // Show logout button for inactive tenant
 if (errorName == "tenant_inactive") {
   showLogoutButton = true;
+  showHomeButton = false
 }
 ---
 
@@ -71,23 +72,19 @@ if (errorName == "tenant_inactive") {
             >
               {logoutText}
             </a>
-            <a
-              data-astro-reload
-              href="/"
-              class="btn btn-primary ml-2 px-6 py-3 text-lg font-semibold rounded-lg shadow-lg hover:bg-primary-focus transition-all duration-300"
-            >
-              {refreshText}
-            </a>
           ) : null
         }
-
-        <a
-          rel="noopener noreferrer"
-          href="/"
-          class="btn btn-primary px-6 py-3 text-lg font-semibold rounded-lg shadow-lg hover:bg-primary-focus transition-all duration-300"
-        >
-          {backToHomeText}
-        </a>
+        
+        {showHomeButton ? (
+          <a
+            rel="noopener noreferrer"
+            href="/"
+            class="btn btn-primary px-6 py-3 text-lg font-semibold rounded-lg shadow-lg hover:bg-primary-focus transition-all duration-300"
+          >
+            {backToHomeText}
+          </a>
+          ) : null
+        }
       </div>
     </div>
   </section>

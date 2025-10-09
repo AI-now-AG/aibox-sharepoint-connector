@@ -7,19 +7,15 @@ import {
   ADMIN_ROUTES,
   SUPER_ADMIN_ROUTES,
   FEATURE_MAP_ROUTES,
-  // FEATURE_PLAINTEXT_ROUTE,
-  // FEATURE_SUBTITLES_ROUTE,
-  // FEATURE_SUBTITLESJSON_ROUTE,
-  // FEATURE_SUMMARY_ROUTE,
-  // FEATURE_LARGEFILE_ROUTE,
 } from "$constants";
 import type { APIContext, MiddlewareNext } from "astro";
 import TenantModel from "$data/models/tenant.model";
 import { TenantFeature } from "$types/TenantFeature";
 import { defaultLang } from "$i18n/ui";
-import { setLanguage } from "$i18n/utils";
+import { setLanguage, useTranslations } from "$i18n/utils";
 import { wildcardMatch, wildcardMatchInArray } from "$utils/wildcardMatch";
 
+const t = useTranslations()
 async function requestOrigin(context: APIContext, next: MiddlewareNext) {
   const path = context.url.pathname;
   const isAudioConversion = path.includes('/api/audio/convert-to-mono');
@@ -42,7 +38,7 @@ async function requestOrigin(context: APIContext, next: MiddlewareNext) {
     const response = await next();
     const newHeaders = new Headers(response.headers);
     newHeaders.set('Access-Control-Allow-Origin', '*');
-    
+
     return new Response(response.body, {
       status: response.status,
       headers: newHeaders,
@@ -137,8 +133,9 @@ async function restrictAccess(context: APIContext, next: MiddlewareNext) {
     context.locals.tenant?.active == false &&
     context.url.pathname !== "/api/logout"
   ) {
+    const errorMessage = t("common.tenant-inactive-error-message")
     return context.redirect(
-      `/error?error=tenant_inactive&error_description=Sorry, the tenant associated with your account is currently inactive. Please contact the tenant administrator or support for assistance.`,
+      `/error?error=tenant_inactive&error_description=${errorMessage}`,
     );
   }
 
@@ -159,22 +156,6 @@ async function restrictAccess(context: APIContext, next: MiddlewareNext) {
         (item) => item.name == (key as TenantFeature),
       );
     }
-    // if (context.url.pathname === FEATURE_PLAINTEXT_ROUTE) {
-    //   hasAccess =
-    //     context.locals.tenant.transcriptions?.plaintext?.enabled ?? true;
-    // } else if (context.url.pathname === FEATURE_SUBTITLES_ROUTE) {
-    //   hasAccess =
-    //     context.locals.tenant.transcriptions?.subtitles?.enabled ?? true;
-    // } else if (context.url.pathname === FEATURE_SUBTITLESJSON_ROUTE) {
-    //   hasAccess =
-    //     context.locals.tenant.transcriptions?.subtitlesjson?.enabled ?? true;
-    // } else if (context.url.pathname === FEATURE_SUMMARY_ROUTE) {
-    //   hasAccess =
-    //     context.locals.tenant.transcriptions?.summary?.enabled ?? true;
-    // } else if (context.url.pathname === FEATURE_LARGEFILE_ROUTE) {
-    //   hasAccess =
-    //     context.locals.tenant.transcriptions?.largefile?.enabled ?? true;
-    // }
 
     if (matchAudioToTextPaths && !hasAccess) {
       return context.rewrite("/restricted");
