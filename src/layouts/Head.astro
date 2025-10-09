@@ -1,8 +1,6 @@
 ---
 import { ClientRouter } from "astro:transitions";
 const { title, description } = Astro.props;
-
-const apiUrl = import.meta.env.TRANSCRIPTION_API_URL || "http://localhost:7071";
 ---
 
 <head>
@@ -27,10 +25,5 @@ const apiUrl = import.meta.env.TRANSCRIPTION_API_URL || "http://localhost:7071";
         document.documentElement.setAttribute("data-theme", theme);
       }
     });
-  </script>
-  <script is:inline>
-    window.APP_CONFIG = {
-      AZURE_BACKEND_URL: "${apiUrl}",
-    };
   </script>
 </head>

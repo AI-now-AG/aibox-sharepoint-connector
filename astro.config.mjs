@@ -1,7 +1,7 @@
 import netlify from "@astrojs/netlify";
 import svelte from "@astrojs/svelte";
 import sentry from "@sentry/astro";
-import { defineConfig } from "astro/config";
+import { defineConfig, envField } from "astro/config";
 
 import tailwindcss from "@tailwindcss/vite";
 
@@ -45,5 +45,13 @@ export default defineConfig({
     },
 
     plugins: [tailwindcss()],
+  },
+  env: {
+    schema: {
+      TRANSCRIPTION_API_URL: envField.string({
+        context: "client",
+        access: "public",
+      }),
+    },
   },
 });

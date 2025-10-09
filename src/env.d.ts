@@ -13,11 +13,3 @@ declare namespace App {
     locale: string; // custom
   }
 }
-
-declare global {
-  interface Window {
-    APP_CONFIG: {
-      AZURE_BACKEND_URL: string;
-    };
-  }
-}

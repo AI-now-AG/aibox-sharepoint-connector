@@ -22,6 +22,7 @@
   import { ApiKeyProvider } from "$types/TenantFeature";
   import { PromptToolOption } from "$types/AIProvider";
   import { getPromptTools, useProviderInfo } from "$shared/AIProvider";
+  import { TRANSCRIPTION_API_URL } from "astro:env/client";
 
   const t = useTranslations();
 
@@ -33,8 +34,8 @@
   }
 
   interface APIConfiguration {
-    apiKey: string;
     apiUrl: string;
+    accessToken: string;
   }
 
   interface RequestPayload {
@@ -106,27 +107,9 @@
 
   // === API Configuration ===
   async function getAPIConfiguration(): Promise<APIConfiguration> {
-    // const configResponse = await fetch(
-    //   "/.netlify/functions/getTranscriptionConfig",
-    //   {
-    //     method: "POST",
-    //     headers: { "Content-Type": "application/json" },
-    //   },
-    // );
-
-    // if (!configResponse.ok) {
-    //   throw new Error("Failed to get transcription configuration");
-    // }
-
-    // const { apiKey, apiUrl: baseUrl } = await configResponse.json();
-    // return {
-    //   apiKey,
-    //   apiUrl: `${baseUrl}/api/prompt/execute`,
-    // };
-
     return {
-      apiUrl: `${window.APP_CONFIG.AZURE_BACKEND_URL}/api/prompt/execute`,
-      accessToken: $user?.auth0_access_token,
+      apiUrl: `${TRANSCRIPTION_API_URL}/api/prompt/execute`,
+      accessToken: $user?.auth0_access_token as string,
     };
   }
 
