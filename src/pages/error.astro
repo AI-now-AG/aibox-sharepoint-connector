@@ -69,12 +69,13 @@ if (errorName == "tenant_inactive") {
               data-astro-reload
               href="/api/logout"
               class="btn btn-outline btn-primary px-6 py-3 text-lg font-semibold rounded-lg shadow-lg hover:bg-primary-focus transition-all duration-300"
+              data-astro-prefetch="false"
             >
               {logoutText}
             </a>
           ) : null
         }
-        
+
         {showHomeButton ? (
           <a
             rel="noopener noreferrer"
