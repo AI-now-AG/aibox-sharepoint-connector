@@ -178,22 +178,25 @@
 
   // === API Configuration ===
   async function getAPIConfiguration(): Promise<APIConfiguration> {
-    const configResponse = await fetch(
-      "/.netlify/functions/getTranscriptionConfig",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-      },
-    );
+    // const configResponse = await fetch(
+    //   "/.netlify/functions/getTranscriptionConfig",
+    //   {
+    //     method: "POST",
+    //     headers: { "Content-Type": "application/json" },
+    //   },
+    // );
+    // if (!configResponse.ok) {
+    //   throw new Error("Failed to get transcription configuration");
+    // }
+    // const { apiKey, apiUrl: baseUrl } = await configResponse.json();
+    // return {
+    //   apiKey,
+    //   apiUrl: `${baseUrl}/api/prompt/execute`,
+    // };
 
-    if (!configResponse.ok) {
-      throw new Error("Failed to get transcription configuration");
-    }
-
-    const { apiKey, apiUrl: baseUrl } = await configResponse.json();
     return {
-      apiKey,
-      apiUrl: `${baseUrl}/api/prompt/execute`,
+      apiUrl: `${window.APP_CONFIG.AZURE_BACKEND_URL}/api/prompt/execute`,
+      accessToken: $user?.auth0_access_token,
     };
   }
 
@@ -602,12 +605,11 @@
       isGenerating = selectedPromptTool == PromptToolOption.Image;
 
       // Make API request
-      const accessToken = $user?.auth0_access_token;
       const response = await fetch(config.apiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${config.accessToken}`,
         },
         body: JSON.stringify(requestBody),
       });
