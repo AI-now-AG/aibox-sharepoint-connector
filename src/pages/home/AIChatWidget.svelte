@@ -409,10 +409,11 @@
   ): any {
     switch (data.type) {
       case "start":
-        if (data.model === "gpt-5") {
-          isResoningThingking = true;
-        }
         handleStartEvent(data);
+        break;
+
+      case "reasoning":
+        isResoningThingking = true;
         break;
 
       case "chunk":
