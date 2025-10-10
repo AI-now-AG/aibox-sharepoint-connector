@@ -107,6 +107,26 @@ export async function startTranscription(
   return new Promise((resolve, reject) => {
     let finalResult: TranscriptionResult | null = null;
 
+    // Maximum connection time: 2 hours for transcriptions with text improvement
+    const MAX_CONNECTION_TIME = 2 * 60 * 60 * 1000; // 2 hours in milliseconds
+
+    // Create AbortController for timeout
+    const abortController = new AbortController();
+
+    // Set maximum timeout
+    const timeoutId = setTimeout(() => {
+      abortController.abort();
+      reject(new Error(
+        `Transcription timeout: Connection exceeded maximum time of ${MAX_CONNECTION_TIME / 3600000} hours. ` +
+        `Please contact support if processing takes longer than expected.`
+      ));
+    }, MAX_CONNECTION_TIME);
+
+    // Cleanup function
+    const cleanup = () => {
+      clearTimeout(timeoutId);
+    };
+
     fetch(`${config.apiUrl}/api/transcription/start`, {
       method: "POST",
       headers: {
@@ -117,14 +137,17 @@ export async function startTranscription(
         "Connection": "keep-alive",
       },
       body: JSON.stringify(params),
+      signal: abortController.signal,
       keepalive: true,
     })
       .then(response => {
         if (!response.ok) {
+          cleanup();
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
 
         if (!response.body) {
+          cleanup();
           throw new Error("No response body for streaming");
         }
 
@@ -135,6 +158,7 @@ export async function startTranscription(
         function readStream(): void {
           reader.read().then(({ done, value }) => {
             if (done) {
+              cleanup();
               // Stream ended, resolve with final result
               if (finalResult) {
                 resolve(finalResult);
@@ -156,6 +180,11 @@ export async function startTranscription(
                 try {
                   const eventData = JSON.parse(line.slice(6));
 
+                  // Handle keepalive events silently (ignore, just prevents timeout)
+                  if (eventData.type === 'keepalive') {
+                    continue;
+                  }
+
                   // Call progress callback
                   onProgress(eventData);
 
@@ -164,6 +193,7 @@ export async function startTranscription(
                       finalResult = eventData.result;
                       break;
                     case 'error':
+                      cleanup();
                       reject(new Error(eventData.error || 'Transcription failed'));
                       return;
                   }
@@ -175,6 +205,12 @@ export async function startTranscription(
 
             readStream(); // Continue reading
           }).catch(error => {
+            cleanup();
+            // Check if this is an abort error
+            if (error.name === 'AbortError') {
+              // Already handled by timeout - don't reject again
+              return;
+            }
             reject(error);
           });
         }
@@ -182,7 +218,13 @@ export async function startTranscription(
         readStream(); // Start reading the stream
       })
       .catch(error => {
+        cleanup();
         console.error('Transcription error:', error);
+        // Check if this is an abort error
+        if (error.name === 'AbortError') {
+          // Already handled by timeout - don't reject again
+          return;
+        }
         reject(error);
       });
   });
