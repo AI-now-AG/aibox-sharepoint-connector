@@ -74,6 +74,7 @@ import check from "$assets/icons/check.svg?raw";
 import cancel from "$assets/icons/cancel.svg?raw";
 import chat from "$assets/icons/chat.svg?raw";
 import dropdownArrowDown from "$assets/icons/dropdown-arrow-down.svg?raw";
+import error from "$assets/icons/error.svg?raw";
 
 
 export const svgIcons = {
@@ -152,5 +153,6 @@ export const svgIcons = {
   check,
   cancel,
   chat,
-  dropdownArrowDown
+  dropdownArrowDown, 
+  error
 };
