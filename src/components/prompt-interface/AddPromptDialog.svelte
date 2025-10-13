@@ -1,17 +1,19 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+   import { actions } from "astro:actions";
+  import type { CreatePromptParams } from "$pages/api/prompts/index.json";
   import { useTranslations } from "$i18n/utils";
+  import { svgIcons } from "$assets/icons";
+  import { onMount } from "svelte";
   import SingleInput from "$pages/prompt-library/prompts/SingleInput.svelte";
   import MultiInput from "$pages/prompt-library/prompts/MultiInput.svelte";
   import ModelInput from "$pages/prompt-library/prompts/ModelInput.svelte";
-  import type { CreatePromptParams } from "$pages/api/prompts/index.json";
   import { addToast } from "$stores/toast";
-  import LoadingSpinner from "$components/prompt-interface/LoadingSpinner.svelte";
-  import { svgIcons } from "$assets/icons";
-  import { preventDefault } from "$utils/common";
   import TextEditor from "$components/form/TextEditor.svelte";
+  import LoadingSpinner from "$components/prompt-interface/LoadingSpinner.svelte";
   import Dropdown, { type Option } from "$components/form/Dropdown.svelte";
+  import { preventDefault } from "$utils/common";
   import { PromptModel } from "$types/PromptModel";
+   import type { ApiKeyProvider } from "$types/TenantFeature";
   import {
     PromptToolOption,
     ReasoningEffortOption,
@@ -24,43 +26,24 @@
   } from "$shared/AIProvider";
   import { tenant } from "$stores";
   import { normalizeTextToHtml } from "$utils/textFormatting";
-  import { actions } from "astro:actions";
-  import Toast, {
-    type ToastType,
-  } from "$components/toast-notification/Toast.svelte";
-  import type { ApiKeyProvider } from "$types/TenantFeature";
+ 
   const t = useTranslations();
 
-  interface Props {
-    isEditable?: boolean;
-    selectedEditPromptId?: any;
-    promptDialog?: HTMLDialogElement;
-    dialogMode?: "create" | "update" | "clone";
-    dialogTitle?: string;
-  }
-
-  let {
-    isEditable = true,
-    selectedEditPromptId = $bindable(null),
-    promptDialog = $bindable(),
-    dialogMode = "update",
-    dialogTitle = t("prompt-library.edit.title"),
-  }: Props = $props();
-
-  type Group = { _id: string; title: string }; // TODO: Get the type from the API endpoint
+  type Group = { title: string; _id: string };
   type Category = {
-    _id: string;
     title: string;
+    _id: string;
     groups: Group[];
   };
 
   type KnowledgeBase = {
-    _id: string;
     title: string;
+    _id: string;
   };
 
   let categories: Category[] = $state([]);
   let selectedCategory: Category | undefined = $state();
+  let selectedGroup: Group | undefined = $state();
 
   let knowledgeBases: KnowledgeBase[] = $state([]);
   let selectedKnowledgeBases: KnowledgeBase[] = $state([]);
@@ -71,40 +54,35 @@
   let selectedReasoningLevel: any = $state("low");
   let selectedTextVerbosity: any = $state("low");
 
-  let selectedGroup: Group | any = $state();
   let previousCategoryId: string | null = $state(null);
+  $effect(() => {
+    if (selectedCategory && selectedCategory._id !== previousCategoryId) {
+      selectedGroup = undefined;
+      previousCategoryId = selectedCategory._id;
+    }
+  });
 
   let promptTitle = $state("");
   let initHtml = $state("");
   let promptText = $state("");
   let promptPredefinedInput = $state("");
-  let promptDetails: any | undefined = undefined;
+
+  let titleInput: HTMLInputElement | undefined = $state();
+
+  interface Props {
+    isEditable?: boolean;
+    addPromptDialog?: HTMLDialogElement;
+  }
+
+  let {
+    isEditable = false,
+    addPromptDialog = $bindable(),
+  }: Props = $props();
 
   let isSaving = $state(false);
   let isLoading = $state(false);
 
-  let isShowToast = $state(false);
-  let toasData: any = $state();
-
-  let isDataLoaded = false;
-
-  function showToast(type: ToastType, message: string) {
-    toasData = { type, message };
-    isShowToast = true;
-    setTimeout(() => {
-      hideToast();
-    }, 1000);
-  }
-
-  function hideToast() {
-    isShowToast = false;
-    toasData = undefined;
-  }
-
-  let titleInput: HTMLInputElement | undefined = $state();
-
   const providerInfo = useProviderInfo($tenant);
-
   let promptTools: Array<any> = $derived(
     getPromptTools(
       (selectedModel == PromptModel.Default
@@ -113,39 +91,16 @@
     ) ?? [],
   );
 
-  onMount(() => {
-    if (promptDialog) {
-      const originalShow = promptDialog.show;
-      const originalShowModal = promptDialog.showModal;
-
-      promptDialog.show = function (...args) {
-        handleDialogShow();
-        return originalShow.apply(this, args);
-      };
-
-      promptDialog.showModal = function (...args) {
-        handleDialogShow();
-        return originalShowModal.apply(this, args);
-      };
+  onMount(async function () {
+    const response = await fetch("/api/categories.json", { method: "GET" });
+    const data = await response.json();
+    if (data) {
+      categories = data;
     }
+    await fetchInstructionAndKB();
   });
 
-  async function handleDialogShow() {
-    if (!isDataLoaded) {
-      await initDatas();
-      isDataLoaded = true;
-    }
-  }
-
-  async function initDatas() {
-    const categoryResponse = await fetch("/api/categories.json", {
-      method: "GET",
-    });
-    const categoryData = (await categoryResponse.json()) as Category[];
-    if (categoryData) {
-      categories = categoryData;
-    }
-
+  async function fetchInstructionAndKB() {
     const knowledgeBaseResponse = await fetch("/api/knowledge-base.json", {
       method: "GET",
     });
@@ -156,85 +111,16 @@
     }
   }
 
-  async function getPromptDetail(id: string) {
-    isLoading = true;
-    try {
-      const response = await fetch(`/api/prompts/index.json?_id=${id}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.message ||
-            "Failed to get prompt details. Please try again.",
-        );
-      }
-
-      promptDetails = await response.json();
-      promptTitle = promptDetails.title;
-      if (dialogMode == "clone") {
-        promptTitle = promptTitle?.trim() + " (" + t("common.copy") + ")";
-      }
-      promptText = normalizeTextToHtml(promptDetails.prompt);
-      initHtml = normalizeTextToHtml(promptDetails.prompt);
-      promptPredefinedInput = promptDetails.predefined_input;
-
-      const category = categories.find(
-        (e) => e._id == promptDetails.category?.toString(),
-      );
-      if (category) {
-        selectedCategory = category;
-        previousCategoryId = category._id;
-      }
-
-      selectedModel = promptDetails.model?.toString() || "";
-      // Handle deprecated models. Deprecated — removal imminent
-      if (
-        [
-          PromptModel.OpenAIWithTools,
-          PromptModel.OpenAIWithImageTools,
-        ].includes(selectedModel as PromptModel)
-      ) {
-        console.log(
-          `[DEPRECATION WARNING]: ${selectedModel} is deprecated and will be removed soon. Please switch to ${PromptModel.OpenAI}.`,
-        );
-        selectedModel = PromptModel.OpenAI;
-      }
-
-      selectedReasoningLevel = promptDetails.reasoningEffort || "low";
-      selectedTextVerbosity = promptDetails.textVerbosity || "low";
-
-      selectedPromptTool = promptDetails.promptTool || "";
-
-      const group = category?.groups.find(
-        (e) => e._id == promptDetails.group?.toString(),
-      );
-      if (group) {
-        selectedGroup = group;
-      }
-      selectedKnowledgeBases = promptDetails.knowledgebase
-        .map((kbObj: any) =>
-          knowledgeBases.find((e) => e._id == kbObj._id.toString()),
-        )
-        .filter((kb: any) => kb !== undefined) as KnowledgeBase[];
-    } catch (error) {
-      promptDialog?.close();
-      addToast({
-        message:
-          error instanceof Error ? error.message : t("common.unexpected.error"),
-        type: "error",
-      });
-    } finally {
-      isLoading = false;
-    }
-  }
+  let isFormValid = $derived(
+    promptTitle.trim() !== "" &&
+      promptText.trim() !== "" &&
+      selectedCategory !== undefined &&
+      selectedGroup !== undefined,
+  );
 
   async function savePrompt() {
     if (!isFormValid) return;
+
     isSaving = true;
     try {
       const newPrompt: CreatePromptParams = {
@@ -245,18 +131,13 @@
         reasoningEffort: selectedReasoningLevel || null,
         textVerbosity: selectedTextVerbosity || null,
         promptTool: selectedPromptTool || null,
-        knowledgebase: selectedKnowledgeBases.map((inst) => inst._id),
+        knowledgebase: selectedKnowledgeBases.map((kb) => kb._id),
         ...(selectedCategory && { category: selectedCategory._id }),
         ...(selectedGroup && { group: selectedGroup._id }),
-        ...(selectedEditPromptId && { _id: selectedEditPromptId }),
       };
 
-      let httpMethod = "PUT"; // FOR UPDATING EXISING
-      if (dialogMode == "clone") {
-        httpMethod = "POST"; // FOR CREATING NEW
-      }
       const response = await fetch("/api/prompts/index.json", {
-        method: httpMethod,
+        method: "POST",
         body: JSON.stringify(newPrompt),
         headers: {
           "Content-Type": "application/json",
@@ -271,13 +152,11 @@
       }
 
       const data = await response.json();
+      window.history.back();
       addToast({
         message: data.message,
         type: "success",
       });
-      setTimeout(() => {
-        window.location.reload();
-      }, 0);
     } catch (error) {
       addToast({
         message:
@@ -289,42 +168,11 @@
     }
   }
 
-  function cancelEdit() {
-    promptDialog?.close();
-    promptTitle = "";
-    promptText = "<p></p>";
-    initHtml = "<p></p>";
-    selectedKnowledgeBases = [];
-    selectedEditPromptId = null;
-  }
-
   function handleKeyDown(event: any) {
     if (event.key === "Enter") {
       event.preventDefault();
     }
   }
-
-  $effect(() => {
-    if (selectedCategory && selectedCategory._id !== previousCategoryId) {
-      selectedGroup = null;
-      previousCategoryId = selectedCategory._id;
-    }
-  });
-
-  let isFormValid = $derived(
-    promptTitle?.trim() !== "" &&
-      promptText?.trim() !== "" &&
-      promptText.trim() !== "<p></p>" &&
-      selectedCategory !== undefined &&
-      selectedGroup !== undefined,
-  );
-
-  // Fetch prompt details when selectedEditPromptId changes
-  $effect(() => {
-    if (selectedEditPromptId) {
-      getPromptDetail(selectedEditPromptId);
-    }
-  });
 
   async function improvePromptInstruction() {
     try {
@@ -334,24 +182,24 @@
       ) as ApiKeyProvider;
       const { data, error } = await actions.prompt.improvePrompt({
         provider,
-        instruction: promptDetails.prompt,
+        instruction: promptText,
       });
       if (error) {
         console.error("improvePromptInstruction error", error);
-        showToast("error", error?.toString());
+        addToast({ type: "error", message: error?.toString() });
       } else {
-        promptText = normalizeTextToHtml(data);
         initHtml = normalizeTextToHtml(data);
+        promptText = normalizeTextToHtml(data);
 
-        showToast(
-          "success",
-          t(
+        addToast({
+          type: "success",
+          message: t(
             "prompt-library.add.prompts.instructions.toast-completed-improvement",
           ),
-        );
+        });
       }
     } catch (error: any) {
-      showToast("error", error.toString());
+      addToast({ type: "error", message: error?.toString() });
       console.error("improvePromptInstruction exception", error);
     } finally {
       isLoading = false;
@@ -359,28 +207,48 @@
   }
 </script>
 
-<dialog class="modal" bind:this={promptDialog}>
+<dialog class="modal" bind:this={addPromptDialog}>
   <div class="modal-box w-8/12 max-w-5xl relative">
     <div class="flex justify-between">
-      <h3 class="text-lg font-bold py-4">{dialogTitle}</h3>
+      <h3 class="text-lg font-bold py-4">{t("prompt-library.prompts.add")}</h3>
       <button class="btn btn-sm btn-circle btn-ghost" onclick={cancelEdit}>
         {@html svgIcons.closeMenu}
       </button>
     </div>
     <LoadingSpinner {isLoading} />
-    <form class="rounded-sm pt-6 space-y-6">
+    <form class="rounded-sm pt-6 mb-4 space-y-6">
       <div class="grid grid-cols-1 gap-4 justify-center">
-        <p class="mb-2">
-          {t("prompt-library.add.prompts.title")}*
-        </p>
-        <input
-          type="text"
-          bind:value={promptTitle}
-          placeholder="e.g. Create three sports headlines"
-          class="input input-bordered w-full min-w-xs"
-          onkeydown={handleKeyDown}
-          bind:this={titleInput}
+        <div>
+          <p class="mb-2">{t("prompt-library.add.prompts.title")}*</p>
+          <input
+            type="text"
+            bind:value={promptTitle}
+            placeholder="e.g. Create three sports headlines"
+            class="input input-bordered w-full min-w-xs"
+            onkeydown={handleKeyDown}
+            bind:this={titleInput}
+          />
+        </div>
+      </div>
+
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 justify-center"
+      >
+        <SingleInput
+          title={`${t("prompt-library.add.prompts.category")}*`}
+          placeholder="e.g. Editing"
+          items={categories}
+          bind:selectedItem={selectedCategory}
         />
+
+        {#if selectedCategory}
+          <SingleInput
+            title={`${t("prompt-library.add.prompts.group")}*`}
+            placeholder="e.g. Headlines"
+            items={selectedCategory.groups}
+            bind:selectedItem={selectedGroup}
+          />
+        {/if}
       </div>
 
       <div class="mb-4 relative">
@@ -393,7 +261,7 @@
               }, 100);
             }}
             bind:html={promptText}
-            cssClass=" h-[200px] mt-3"
+            cssClass=" mt-3"
           />
           <button
             class="btn btn-sm absolute top-[-5] right-0 flex"
@@ -514,34 +382,8 @@
         </div>
       {/if}
 
-      <div
-        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 justify-center"
-      >
-        <SingleInput
-          title={`${t("prompt-library.add.prompts.category")}*`}
-          placeholder="e.g. Editing"
-          items={categories}
-          bind:selectedItem={selectedCategory}
-        />
-
-        {#if selectedCategory}
-          <SingleInput
-            title={`${t("prompt-library.add.prompts.group")}*`}
-            placeholder="e.g. Headlines"
-            items={selectedCategory.groups}
-            bind:selectedItem={selectedGroup}
-          />
-        {/if}
-      </div>
-
       {#if isEditable}
-        <div class="flex justify-end">
-          <button
-            class="btn btn-outline px-8 font-normal mr-2"
-            onclick={preventDefault(cancelEdit)}
-          >
-            {t("common.cancel")}
-          </button>
+        <div class="flex items-center justify-between">
           <button
             class={`btn btn-active btn-primary px-8 font-normal ${(!isFormValid || isSaving) && "btn-disabled"}`}
             onclick={preventDefault(savePrompt)}
@@ -556,10 +398,5 @@
         </div>
       {/if}
     </form>
-    {#if isShowToast && toasData}
-      <Toast type={toasData.type} dismissible={true} dismiss={() => hideToast()}
-        >{toasData.message}</Toast
-      >
-    {/if}
   </div>
-</dialog>
+</div>

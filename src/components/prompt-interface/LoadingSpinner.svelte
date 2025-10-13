@@ -4,7 +4,7 @@
     isLoading?: boolean;
   }
 
-  let { isLoading = $bindable(false) }: Props = $props();
+  let { isLoading = false }: Props = $props();
 </script>
 
 {#if isLoading}
