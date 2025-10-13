@@ -410,6 +410,7 @@ export const tenant = {
         "azure_openai_api_key",
         "perplexity_api_key",
         "speech_api_key",
+        "elevenLabs_api_key",
         "fal_ai_api_key",
         "anthropic_api_key",
         "gemini_api_key",

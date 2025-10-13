@@ -25,8 +25,8 @@
   }
 
   let {
-    srtFileUrl: preloadedSrtUrl,
-    assFileUrl: preloadedAssUrl,
+    srtFileUrl: preloadedSrtUrlProp = undefined,
+    assFileUrl: preloadedAssUrlProp = undefined,
     audioFileUrl,
     audioFileName,
     hasPreloadedAudio,
@@ -40,16 +40,26 @@
   let isTransitioning = $state(false);
   let preloadedAudioFile: File | undefined = $state();
   let isLoadingAudio = $state(false);
+  let preloadedSrtUrl = $state<string | undefined>(preloadedSrtUrlProp);
+  let preloadedAssUrl = $state<string | undefined>(preloadedAssUrlProp);
 
   // Derived state - prioritize uploaded file over preloaded URLs
-  let assFileUrl = $derived(
-    uploadedFile?.type === "ass" ? uploadedFile.url : preloadedAssUrl,
-  );
-  let srtFileUrl = $derived(
-    uploadedFile?.type === "srt" ? uploadedFile.url : preloadedSrtUrl,
-  );
+  let assFileUrl = $derived.by(() => {
+    if (uploadedFile !== null && uploadedFile.type === "ass") {
+      return uploadedFile.url;
+    }
+    return preloadedAssUrl;
+  });
+  
+  let srtFileUrl = $derived.by(() => {
+    if (uploadedFile !== null && uploadedFile.type === "srt") {
+      return uploadedFile.url;
+    }
+    return preloadedSrtUrl;
+  });
+  
   let hasFiles = $derived(
-    !!uploadedFile || !!(preloadedAssUrl || preloadedSrtUrl) || !!(preloadedAssUrl && preloadedSrtUrl),
+    !!uploadedFile || !!(preloadedAssUrl || preloadedSrtUrl),
   );
 
   // File validation
@@ -204,10 +214,10 @@
     return (bytes / 1024 / 1024).toFixed(2);
   }
 
-  // Load auto-saved data from localStorage
+  // Load auto-saved data from sessionStorage
   function loadAutoSavedData() {
     try {
-      const stored = localStorage.getItem('subtitle-editor-autosave');
+      const stored = sessionStorage.getItem('subtitle-editor-autosave');
       if (stored) {
         const data = JSON.parse(stored);
 
@@ -223,7 +233,7 @@
           const srtBlob = new Blob([srtContent], { type: 'text/plain;charset=utf-8' });
           preloadedSrtUrl = URL.createObjectURL(srtBlob);
 
-          console.log("Auto-saved subtitle data loaded from localStorage");
+          console.log("Auto-saved subtitle data loaded from sessionStorage");
         }
       }
     } catch (error) {
@@ -234,7 +244,7 @@
   // Clear auto-saved data
   function clearAutoSavedData() {
     try {
-      localStorage.removeItem('subtitle-editor-autosave');
+      sessionStorage.removeItem('subtitle-editor-autosave');
 
       // Clean up blob URLs
       if (preloadedAssUrl && preloadedAssUrl.startsWith('blob:')) {
@@ -274,10 +284,8 @@
 
   // Handle preloaded files and audio
   onMount(async () => {
-    // Load auto-saved data if exists
-    if(srtFileUrl || assFileUrl) {
-      cleanup();
-    } else {
+    // Only load auto-saved data if no preloaded files are provided
+    if (!preloadedSrtUrl && !preloadedAssUrl) {
       loadAutoSavedData();
     }
     // Load preloaded audio file if URL provided
