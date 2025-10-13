@@ -25,6 +25,8 @@ if (errorName == "account_blocked" || (errorName == "unauthorized" && errorDescr
 
 // Show logout button for inactive tenant
 if (errorName == "tenant_inactive") {
+  errorName = t("error.tenant-inactive-error-title");
+  errorDescription = t("error.tenant-inactive-error-message");
   showLogoutButton = true;
   showHomeButton = false
 }

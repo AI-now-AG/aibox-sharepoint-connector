@@ -635,5 +635,6 @@
   "transcription.error.try-again": "Please try again or contact support if the issue persists",
   "transcription.button.remove-file": "Remove file",
   "tenant.add-tenant-supper-admin": "Add Super Admin",
-  "common.tenant-inactive-error-message": "Sorry, the tenant associated with your account is currently inactive. Please contact the tenant administrator or support for assistance."
+  "error.tenant-inactive-error-title": "Access expired",
+  "error.tenant-inactive-error-message": "Your access to aibox is currently inactive. The trial period may have expired, or there is no active subscription.\nIf you need assistance, please contact our support team at support@aibox-app.ch\n or reach out to your aibox administrator."
 }

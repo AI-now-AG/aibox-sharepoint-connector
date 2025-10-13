@@ -12,10 +12,9 @@ import type { APIContext, MiddlewareNext } from "astro";
 import TenantModel from "$data/models/tenant.model";
 import { TenantFeature } from "$types/TenantFeature";
 import { defaultLang } from "$i18n/ui";
-import { setLanguage, useTranslations } from "$i18n/utils";
+import { setLanguage } from "$i18n/utils";
 import { wildcardMatch, wildcardMatchInArray } from "$utils/wildcardMatch";
 
-const t = useTranslations()
 async function requestOrigin(context: APIContext, next: MiddlewareNext) {
   const path = context.url.pathname;
   const isAudioConversion = path.includes('/api/audio/convert-to-mono');
@@ -133,9 +132,8 @@ async function restrictAccess(context: APIContext, next: MiddlewareNext) {
     context.locals.tenant?.active == false &&
     context.url.pathname !== "/api/logout"
   ) {
-    const errorMessage = t("common.tenant-inactive-error-message")
     return context.redirect(
-      `/error?error=tenant_inactive&error_description=${errorMessage}`,
+      `/error?error=tenant_inactive`,
     );
   }
 
