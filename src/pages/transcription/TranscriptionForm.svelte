@@ -17,6 +17,13 @@
     convertToMono,
     type ConvertToMonoConfig,
   } from "$api/audio/mono-converter-api";
+  import {
+    getSASToken,
+    startTranscription as startTranscriptionAPI,
+    startBatchTranscription,
+    checkBatchTranscriptionStatus,
+    type TranscriptionProgressEvent,
+  } from "$api/transcription/transcription-api";
 
   const t = useTranslations();
 
@@ -73,11 +80,18 @@
   let conversionStatus = $state("");
   let isConverting = $state(false);
 
-  // API, polling
-  let intervalId: any;
+  // Progress tracking
+  let transcriptionProgress = $state(0);
+  let transcriptionStatus = $state("");
+  let batchPollAttempt = $state(0);
+  let batchMaxAttempts = $state(120);
+  let isBatchMode = $state(false);
+
+  // API
   let tempUploadUrl: string;
   let tempOutputFileName: string;
   let tempOutputFileNames: string[] = [];
+  let currentJobId: string = "";
 
   let maxNumberOfSpeakers = $state(2);
   let isDiarizationEnabled = $state(false);
@@ -147,15 +161,24 @@
       $transcriptStore,
     );
 
+    // Initialize file format based on category
     if (category === AudioCategory.AudioPro) {
       maxFileSize = 1000;
-    }
-
-    if (
+      // AudioPro only generates text files, not subtitle files
+      selectedFileFormat = [FileFormat.TXT];
+      standardSubtitlesChecked = false;
+      rawOutputChecked = true;
+      txtFileChecked = true;
+    } else if (
       category === AudioCategory.SubtitleLarge ||
       category === AudioCategory.Subtitle11Labs
     ) {
       maxFileSize = 50;
+      // Keep default subtitle format
+      selectedFileFormat = [FileFormat.ASS];
+    } else {
+      // Keep default subtitle format for other categories
+      selectedFileFormat = [FileFormat.ASS];
     }
 
     if ($transcriptStore && transcriptionType) {
@@ -170,15 +193,16 @@
       );
       if (entry) {
         let options = entry.options;
-        if (
+        const hasResults =
           options.txtOuput ||
           options.txtUrl ||
           options.srtUrl ||
           options.assUrl ||
           options.jsonUrl ||
-          options.zipFile
-        ) {
-          // Retrieve the specific entry based on transcriptionType
+          options.zipFile;
+
+        if (hasResults) {
+          // Transcription completed - restore results
           txtFileUrl = options.txtUrl;
           srtFileUrl = options.srtUrl;
           assFileUrl = options.assUrl;
@@ -191,6 +215,26 @@
           isTranscribing = false;
           isTranscipted = true;
           isTranscriptionFailed = false;
+        } else if (options.file) {
+          // Transcription in progress - restore running state
+          audioFile = options.file;
+          audioDuration = options.duration;
+          isUploaded = true;
+          isTranscribing = true;
+          isTranscipted = false;
+          isTranscriptionFailed = false;
+
+          // Set batch mode based on category
+          isBatchMode =
+            category === AudioCategory.AudioPro ||
+            category === AudioCategory.SubtitleLarge;
+
+          // Show appropriate status message
+          if (isBatchMode) {
+            transcriptionStatus = "Batch transcription in progress... (check back in 5-10 minutes)";
+          } else {
+            transcriptionStatus = "Transcription in progress... (connection may have been lost)";
+          }
         }
       }
     });
@@ -219,15 +263,18 @@
     if (entry) {
       let options = entry.options;
       audioFile = options.file;
-      if (
+      audioDuration = options.duration;
+
+      const hasResults =
         options.txtOuput ||
         options.txtUrl ||
         options.srtUrl ||
         options.assUrl ||
         options.jsonUrl ||
-        options.zipFile
-      ) {
-        // Retrieve the specific entry based on transcriptionType
+        options.zipFile;
+
+      if (hasResults) {
+        // Transcription completed - restore results
         txtFileUrl = options.txtUrl;
         srtFileUrl = options.srtUrl;
         assFileUrl = options.assUrl;
@@ -235,6 +282,28 @@
         zipFileData = options.zipFile;
         textOuput = options.txtOuput;
         checkDataAvaibility();
+
+        isTranscribing = false;
+        isTranscipted = true;
+        isTranscriptionFailed = false;
+      } else if (options.file) {
+        // Transcription in progress - restore running state
+        isUploaded = true;
+        isTranscribing = true;
+        isTranscipted = false;
+        isTranscriptionFailed = false;
+
+        // Set batch mode based on category
+        isBatchMode =
+          category === AudioCategory.AudioPro ||
+          category === AudioCategory.SubtitleLarge;
+
+        // Show appropriate status message
+        if (isBatchMode) {
+          transcriptionStatus = "Batch transcription in progress... (check back in 10-30 minutes)";
+        } else {
+          transcriptionStatus = "Transcription in progress... (connection may have been lost)";
+        }
       }
 
       let isPresent =
@@ -338,21 +407,21 @@
     return str;
   }
 
-  async function getSASToken(
+  async function getSASTokenFromBackend(
     fileNameWithoutExtension: string,
     fileExtension: string,
   ) {
-    const response: any = await fetch("/.netlify/functions/getSASToken", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        fileNameWithoutExtension: fileNameWithoutExtension,
-        fileExtension: fileExtension,
-        folderName: folderName,
-        category: category,
-      }),
-    });
-    return await response.json();
+    const accessToken = $user?.auth0_access_token;
+    if (!accessToken) {
+      throw new Error("No access token available");
+    }
+    return await getSASToken(
+      fileNameWithoutExtension,
+      fileExtension,
+      folderName,
+      category,
+      accessToken,
+    );
   }
 
   async function uploadBlobFileWithProgress(
@@ -466,7 +535,7 @@
           fileExtension = splitedFileName?.[splitedFileName?.length - 1];
         }
       }
-      const { uploadUrl, outputFileName } = await getSASToken(
+      const { uploadUrl, outputFileName } = await getSASTokenFromBackend(
         fileNameWithoutExtension,
         fileExtension,
       );
@@ -534,13 +603,13 @@
       (category === AudioCategory.SubtitleLarge ||
         category === AudioCategory.AudioPro)
     ) {
-      startPollingConversionFile();
+      await startConversionAndTranscription();
     } else {
       await startTranscription();
     }
   }
 
-  async function startPollingConversionFile() {
+  async function startConversionAndTranscription() {
     try {
       isTranscribing = true;
       isConverting = true;
@@ -646,10 +715,90 @@
     }
   }
 
+  /**
+   * Poll batch transcription status until completion
+   */
+  async function pollBatchTranscription(
+    jobId: string,
+    accessToken: string
+  ): Promise<any> {
+    const pollInterval = 15000; // 15 seconds
+    const maxAttempts = 480; // 90 minutes max (480 * 15 seconds)
+    let attempts = 0;
+
+    batchMaxAttempts = maxAttempts;
+
+    while (attempts < maxAttempts) {
+      attempts++;
+      batchPollAttempt = attempts;
+
+      // Calculate elapsed time and estimated time remaining
+      const elapsedMinutes = Math.floor((attempts * pollInterval) / 60000);
+      const remainingMinutes = Math.floor(((maxAttempts - attempts) * pollInterval) / 60000);
+
+      transcriptionStatus = `Processing batch (${elapsedMinutes}min elapsed, ~${remainingMinutes}min remaining)`;
+      
+      try {
+        const statusResult = await checkBatchTranscriptionStatus(jobId, accessToken);
+
+        if (statusResult.status === 'Succeeded') {
+          console.log("Batch transcription succeeded:", statusResult);
+          transcriptionStatus = "Batch transcription completed!";
+          batchPollAttempt = 0;
+          addToast({
+            message: "Batch transcription completed successfully!",
+            type: "success",
+            timeout: 5000,
+          });
+
+          // Return result in the same format as regular transcription
+          return {
+            text: statusResult.text,
+            urls: statusResult.urls,
+            zip_file: statusResult.zip_file,
+            jsonData: statusResult.jsonData,
+          };
+        }
+
+        if (statusResult.status === 'Failed') {
+          transcriptionStatus = "Batch transcription failed";
+          batchPollAttempt = 0;
+          throw new Error(statusResult.error || "Batch transcription failed");
+        }
+
+        // Still running - show progress if available
+        if (statusResult.progress) {
+          console.log(`Status: ${statusResult.progress}`);
+          transcriptionStatus = `${statusResult.progress} (${elapsedMinutes}min elapsed)`;
+        }
+
+        // Wait before next poll
+        await new Promise(resolve => setTimeout(resolve, pollInterval));
+      } catch (error) {
+        console.error("Error polling batch status:", error);
+        batchPollAttempt = 0;
+        throw error;
+      }
+    }
+
+    batchPollAttempt = 0;
+    throw new Error("Batch transcription timed out after 30 minutes");
+  }
+
   async function startTranscription() {
     try {
       isTranscribing = true;
       isTranscriptionFailed = false;
+      transcriptionProgress = 0;
+      transcriptionStatus = "";
+      batchPollAttempt = 0;
+
+      // Show "transcription started" toast immediately
+      addToast({
+        message: `${t("transcription.file-uploaded-success")}`,
+        type: "success",
+        timeout: 3000,
+      });
 
       const params: TranscribeRequest = createTranscribeRequest(
         folderName,
@@ -660,89 +809,203 @@
         $user,
       );
 
-      const response = await fetch(
-        "/.netlify/functions/transcribeAudio-background",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(params),
-        },
-      );
-
-      console.log("Upload audio background response", {
-        status: response.status,
-        statusText: response.statusText,
-      });
-
-      if (response.ok) {
-        tempOutputFileNames = [];
-        if (
-          category === AudioCategory.Subtitle ||
-          category === AudioCategory.SubtitleJson ||
-          category === AudioCategory.SubtitleLarge ||
-          category === AudioCategory.Subtitle11Labs
-        ) {
-          selectedFileFormat.forEach((format) => {
-            if (
-              audioFile &&
-              isM4AFile &&
-              category === AudioCategory.SubtitleLarge
-            ) {
-              tempOutputFileNames.push(`${tempOutputFileName}-mono.${format}`);
-            } else {
-              tempOutputFileNames.push(`${tempOutputFileName}.${format}`);
-            }
-          });
-        }
-        startPolling();
-
-        if (transcriptionType) {
-          transcriptStore.update((current) => [
-            ...current.filter((entry) =>
-              usecaseId
-                ? entry.usecaseId !== usecaseId
-                : entry.type !== transcriptionType,
-            ), // Remove old entry based on condition
-            {
-              type: transcriptionType,
-              options: {
-                file: audioFile,
-                duration: audioDuration,
-                txtOuput: "",
-                txtUrl: "",
-                srtUrl: "",
-                assUrl: "",
-                jsonUrl: "",
-                zipFile: "",
-              },
-              usecaseId: usecaseId ?? "",
-            },
-          ]);
-        }
+      const accessToken = $user?.auth0_access_token;
+      if (!accessToken) {
         addToast({
-          message: `${t("transcription.file-uploaded-success")}`,
-          type: "success",
-          timeout: 5000,
-        });
-      } else {
-        const result = await response.json();
-        addToast({
-          message: result.message || "An error occurred during transcription.",
+          message: t("auth.session-missing-force-login"),
           type: "error",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/logout";
+        }, 2000);
+        return;
+      }
+
+      // Check if this is a batch transcription (AudioPro or SubtitleLarge)
+      const isBatchTranscription =
+        category === AudioCategory.AudioPro ||
+        category === AudioCategory.SubtitleLarge;
+
+      isBatchMode = isBatchTranscription;
+      let result;
+
+      // Add entry to store when transcription starts (for navigation indicator)
+      if (transcriptionType) {
+        transcriptStore.update((current) => [
+          ...current.filter((entry) =>
+            usecaseId
+              ? entry.usecaseId !== usecaseId
+              : entry.type !== transcriptionType,
+          ),
+          {
+            type: transcriptionType,
+            options: {
+              file: audioFile,
+              duration: audioDuration,
+              txtOuput: "",
+              txtUrl: "",
+              srtUrl: "",
+              assUrl: "",
+              jsonUrl: "",
+              zipFile: "",
+            },
+            usecaseId: usecaseId ?? "",
+          },
+        ]);
+      }
+
+      if (isBatchTranscription) {
+        // Use batch transcription flow with polling
+        console.log("Starting batch transcription...");
+        transcriptionStatus = "Starting batch transcription...";
+        const batchResult = await startBatchTranscription(params, accessToken);
+        currentJobId = batchResult.jobId;
+
+        console.log("Batch job started:", batchResult);
+        transcriptionStatus = "Batch job started, polling for status...";
+        addToast({
+          message: "Batch transcription started. This may take 10-30 minutes...",
+          type: "info",
           timeout: 5000,
         });
+
+        // Poll for status
+        result = await pollBatchTranscription(batchResult.jobId, accessToken);
+
+        // Handle batch completion
+        if (result) {
+          handleTranscriptionComplete(result);
+        }
+      } else {
+        // Use regular SSE streaming for fast transcription
+        const onProgress = (event: TranscriptionProgressEvent) => {
+          console.log("Transcription event:", event);
+
+          switch (event.type) {
+            case 'connection':
+              transcriptionStatus = "Connecting to server...";
+              transcriptionProgress = 0;
+              break;
+
+            case 'started':
+              currentJobId = event.jobId || "";
+              transcriptionStatus = "Transcription started";
+              transcriptionProgress = 5;
+              console.log("Transcription started with job ID:", currentJobId);
+              break;
+
+            case 'progress':
+              if (event.status) {
+                transcriptionStatus = event.status;
+                transcriptionProgress = event.progress || 0;
+                console.log(`Progress: ${event.progress}% - ${event.status}`);
+              }
+              break;
+
+            case 'complete':
+              transcriptionStatus = "Processing complete!";
+              transcriptionProgress = 100;
+              if (event.result) {
+                handleTranscriptionComplete(event.result);
+              }
+              break;
+
+            case 'error':
+              console.error("Transcription error:", event.error);
+              transcriptionStatus = "Error occurred";
+              isTranscribing = false;
+              isTranscriptionFailed = true;
+              addToast({
+                message: event.error || "An error occurred during transcription.",
+                type: "error",
+                timeout: 5000,
+              });
+              break;
+          }
+        };
+
+        // Start transcription with SSE streaming
+        result = await startTranscriptionAPI(
+          params,
+          accessToken,
+          onProgress
+        );
       }
+
+      // Store is updated in handleTranscriptionComplete() with final results
     } catch (error) {
-      console.error("Fetch error:", error);
+      console.error("Transcription error:", error);
+      isTranscribing = false;
+      isTranscriptionFailed = true;
       addToast({
         message:
-          "Failed to upload the file. Please check your network connection.",
+          error instanceof Error
+            ? error.message
+            : "Failed to transcribe the file.",
         type: "error",
         timeout: 5000,
       });
     }
+  }
+
+  function handleTranscriptionComplete(result: any) {
+    console.log("Transcription complete:", result);
+
+    // Update URLs from result
+    if (result.urls) {
+      txtFileUrl = result.urls.txt || "";
+      srtFileUrl = result.urls.srt || "";
+      assFileUrl = result.urls.ass || "";
+      jsonFileUrl = result.urls.json || "";
+    }
+
+    if (result.text) {
+      textOuput = result.text;
+    }
+
+    // Update zip file data if present (from batch transcription)
+    if (result.zip_file) {
+      zipFileData = result.zip_file;
+    }
+
+    checkDataAvaibility();
+    isTranscribing = false;
+    isTranscipted = true;
+    isTranscriptionFailed = false;
+
+    // Update store with final results
+    if (transcriptionType) {
+      transcriptStore.update((current) => [
+        ...current.filter((entry) =>
+          usecaseId
+            ? entry.usecaseId !== usecaseId
+            : entry.type !== transcriptionType,
+        ),
+        {
+          type: transcriptionType,
+          options: {
+            file: audioFile,
+            duration: audioDuration,
+            txtOuput: result.text || "",
+            txtUrl: result.urls?.txt || "",
+            srtUrl: result.urls?.srt || "",
+            assUrl: result.urls?.ass || "",
+            jsonUrl: result.urls?.json || "",
+            zipFile: zipFileData,
+          },
+          usecaseId: usecaseId ?? "",
+        },
+      ]);
+    }
+
+    addToast({
+      message:
+        category === AudioCategory.AudioPro
+          ? `<a href="/transcription/${transcriptionType}">${t("transcription.transcription-is-ready")}</a>`
+          : `<a href="/transcription/${usecaseId}">${t("transcription.transcription-is-ready")}</a>`,
+      type: "success",
+      timeout: 5000,
+    });
   }
 
   function createTranscribeRequest(
@@ -767,16 +1030,16 @@
       category: category,
       selectedFileFormat: selectedFileFormat,
       isShowImprovedTextPreview: showTextPreviewChecked,
-      apiKeyProvider: provider,
-      openaiEncryptedApiKey: tenant?.openai_api_key,
-      encryptedApiKey: tenant?.azure_openai_api_key,
-      azureOpenAIInstanceName: tenant?.azure_openai_instance_name,
-      azureOpenAIEndpoint: tenant?.azure_openai_endpoint,
-      azureOpenAIWhisperModel: tenant?.azure_openai_whisper_model,
-      azureOpenAIChatModel: tenant?.azure_openai_chat_model,
-      encryptedSpeechKey: tenant?.speech_api_key,
-      speechRegion: tenant?.speech_region,
-      encryptedElevenLabsKey: tenant?.elevenLabs_api_key,
+      // apiKeyProvider: provider,
+      // openaiEncryptedApiKey: tenant?.openai_api_key,
+      // encryptedApiKey: tenant?.azure_openai_api_key,
+      // azureOpenAIInstanceName: tenant?.azure_openai_instance_name,
+      // azureOpenAIEndpoint: tenant?.azure_openai_endpoint,
+      // azureOpenAIWhisperModel: tenant?.azure_openai_whisper_model,
+      // azureOpenAIChatModel: tenant?.azure_openai_chat_model,
+      // encryptedSpeechKey: tenant?.speech_api_key,
+      // speechRegion: tenant?.speech_region,
+      // encryptedElevenLabsKey: tenant?.elevenLabs_api_key,
       isAudioTagEnabled: isAudioTagEnabled,
       isDiarizationEnabled: isDiarizationEnabled,
       maxSpeakers: parseInt(maxNumberOfSpeakers.toString()),
@@ -785,134 +1048,6 @@
         .map((item) => item.locales),
       usecaseId: usecaseId,
     };
-  }
-
-  async function checkOutputFileReady() {
-    try {
-      const response = await fetch("/.netlify/functions/checkFileExist", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          tenantId: $tenant?._id,
-          userId: $user?._id,
-          uniqueName: tempOutputFileName,
-          fileNames: tempOutputFileNames,
-          folderName: folderName,
-          showTextPreviewChecked: showTextPreviewChecked,
-          typedCategory: category,
-          isDiarizationEnabled: isDiarizationEnabled,
-          encryptedSpeechKey: $tenant?.speech_api_key,
-          isM4AFile: isM4AFile,
-        }),
-      });
-      if (response.ok) {
-        const result = await response.json();
-        console.log("Check output file ready response", result);
-        if (result.status === "completed") {
-          // Note: Handle complete status later on
-        } else if (result.status === "failed") {
-          clearInterval(intervalId);
-          addToast({
-            message: result.error || "An error occurred during transcription.",
-            type: "error",
-            timeout: 5000,
-          });
-          isTranscribing = false;
-          isTranscipted = false;
-          isTranscriptionFailed = true;
-        }
-        if (result.exists) {
-          clearInterval(intervalId);
-          txtFileUrl = result.txt_file;
-          srtFileUrl = result.srt_file;
-          assFileUrl = result.ass_file;
-          jsonFileUrl = result.json_file;
-          zipFileData = result.zip_file;
-          checkDataAvaibility();
-          if (transcriptionType) {
-            transcriptStore.update((current) => [
-              ...current.filter((entry) =>
-                usecaseId
-                  ? entry.usecaseId !== usecaseId
-                  : entry.type !== transcriptionType,
-              ), // Remove old entry if it exists
-              {
-                type: transcriptionType,
-                options: {
-                  file: audioFile,
-                  duration: audioDuration,
-                  txtOuput: result.text_output,
-                  txtUrl: result.txt_file,
-                  srtUrl: result.srt_file,
-                  assUrl: result.ass_file,
-                  jsonUrl: result.json_file,
-                  zipFile: result.zip_file,
-                },
-                usecaseId: usecaseId ?? "",
-              },
-            ]);
-          }
-          addToast({
-            message:
-              category === AudioCategory.AudioPro
-                ? `<a href="/transcription/${transcriptionType}">${t("transcription.transcription-is-ready")}</a>`
-                : `<a href="/transcription/${usecaseId}">${t("transcription.transcription-is-ready")}</a>`,
-            type: "success",
-            timeout: 5000,
-          });
-          console.log("File found!");
-        } else {
-          console.warn("Still file is processing!");
-        }
-      } else {
-        const result = await response.json();
-        if (response.status != 404) {
-          clearInterval(intervalId);
-          addToast({
-            message: result.error,
-            type: "error",
-            timeout: 5000,
-          });
-          isTranscribing = false;
-          isTranscipted = false;
-          isTranscriptionFailed = true;
-        }
-      }
-    } catch (error) {
-      console.error("Check output file ready error", error);
-    }
-  }
-
-  function getPollingInterval(fileSizeBytes: number): number {
-    const fileSizeMB = fileSizeBytes / 1024 / 1024;
-    const timePerMB = 60 / 1.7;
-    const estimatedTime = timePerMB * fileSizeMB;
-
-    if (fileSizeMB <= 25) return Math.min(estimatedTime, 30) * 1000;
-    if (fileSizeMB <= 50) return Math.min(estimatedTime, 60) * 1000;
-    if (fileSizeMB <= 200) return Math.min(estimatedTime, 120) * 1000;
-    if (fileSizeMB <= 500) return Math.min(estimatedTime, 300) * 1000;
-    if (fileSizeMB <= 1000) return Math.min(estimatedTime, 600) * 1000;
-    return Math.min(estimatedTime, 900) * 1000;
-  }
-
-  function startPolling() {
-    if (
-      category === AudioCategory.AudioPro ||
-      category === AudioCategory.SubtitleLarge
-    ) {
-      let fileSize = audioFile?.size;
-      if (fileSize) {
-        intervalId = setInterval(
-          checkOutputFileReady,
-          getPollingInterval(fileSize),
-        );
-      } else {
-        intervalId = setInterval(checkOutputFileReady, getPollingInterval(200));
-      }
-    } else {
-      intervalId = setInterval(checkOutputFileReady, 5000);
-    }
   }
 
   function confirmStartNew() {
@@ -1082,6 +1217,12 @@
 
     isZipDataPresent = false;
     isFileDataPresent = false;
+
+    // Reset progress tracking
+    transcriptionProgress = 0;
+    transcriptionStatus = "";
+    batchPollAttempt = 0;
+    isBatchMode = false;
   }
 
   // Handlers to update the array
@@ -1219,58 +1360,226 @@
     {/if}
 
     {#if audioFile}
-      <div
-        class={`flex items-center justify-between p-2 border rounded-lg shadow-sm mt-2 ${isUploading ? "bg-transparent" : "bg-accent/30"}`}
-      >
-        <div class="flex items-center">
-          <div class="shrink-0 p-2 rounded-md">
-            {@html svgIcons.document}
-          </div>
-          <div class="ml-4">
-            <p class="font-medium">{audioFile.name}</p>
-            <p class="text-sm text-base-content/60">
-              {audioFile?.size ? bytesToMegabytes(audioFile?.size) + " MB" : ""}
-            </p>
-          </div>
-          <p class="font-medium ml-16">{audioDuration}</p>
-        </div>
-        <div class="flex items-center space-x-6">
-          <div class="flex items-center space-x-4">
-            <div class="flex items-center space-x-2">
-              {#if isUploading && !isUploaded}
-                <progress
-                  class="progress progress-primary w-56"
-                  value={uploadingValue}
-                  max="100"
-                ></progress>
-                <p class="font-medium">{t("transciption.uploading")}</p>
-              {/if}
-              {#if isTranscribing}
-                <span class="loading loading-spinner loading-md text-primary"
-                ></span>
-                <p class="font-medium text-primary">
-                  {t("transciption.transcribing")}
+      <div class="mt-2">
+        <!-- Main File Card with Integrated Progress -->
+        <div
+          class={`border rounded-xl shadow-sm overflow-hidden transition-all duration-300 ${
+            isUploading || isConverting || isTranscribing
+              ? "border-primary/50 bg-primary/5"
+              : isTranscipted
+                ? "border-success/50 bg-success/5"
+                : isTranscriptionFailed
+                  ? "border-error/50 bg-error/5"
+                  : "border-base-300 bg-accent/30"
+          }`}
+        >
+          <!-- File Info Header -->
+          <div class="flex items-center justify-between p-4">
+            <div class="flex items-center flex-1 min-w-0">
+              <div class="shrink-0 p-2 rounded-md bg-base-100">
+                {@html svgIcons.document}
+              </div>
+              <div class="ml-4 flex-1 min-w-0">
+                <p class="font-medium truncate" title={audioFile.name}>
+                  {audioFile.name}
                 </p>
-              {/if}
-              {#if isTranscipted}
-                {@html svgIcons.transcribed}
-                <p class="font-medium text-success">
-                  {t("transciption.transcribed")}
-                </p>
-              {/if}
-              {#if isTranscriptionFailed}
-                <p class="font-medium text-error">
-                  {t("transciption.transcription.failed")}
-                </p>
-              {/if}
+                <div class="flex items-center gap-3 text-sm text-base-content/60 mt-0.5">
+                  <span>
+                    {audioFile?.size ? bytesToMegabytes(audioFile?.size) + " MB" : ""}
+                  </span>
+                  {#if audioDuration}
+                    <span class="flex items-center gap-1">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      {audioDuration}
+                    </span>
+                  {/if}
+                </div>
+              </div>
             </div>
-            <button
-              onclick={preventDefault(removeFile)}
-              class="text-base-content hover:text-primary"
-            >
-              {@html svgIcons.close}
-            </button>
+
+            <!-- Status Badge & Actions -->
+            <div class="flex items-center gap-3 ml-4">
+              {#if isUploading && !isUploaded}
+                <div class="badge badge-primary gap-2">
+                  <span class="loading loading-spinner loading-xs"></span>
+                  {t("transciption.uploading")}
+                </div>
+              {:else if isConverting}
+                <div class="badge badge-info gap-2">
+                  <span class="loading loading-spinner loading-xs"></span>
+                  {t("transcription.status.converting")}
+                </div>
+              {:else if isTranscribing}
+                <div class="badge badge-primary gap-2">
+                  <span class="loading loading-spinner loading-xs"></span>
+                  {isBatchMode ? t("transcription.status.processing") : t("transciption.transcribing")}
+                </div>
+              {:else if isTranscipted}
+                <div class="badge badge-success gap-2">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  {t("transciption.transcribed")}
+                </div>
+              {:else if isTranscriptionFailed}
+                <div class="badge badge-error gap-2">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  {t("transciption.transcription.failed")}
+                </div>
+              {:else}
+                <div class="badge badge-ghost">{t("transcription.status.ready")}</div>
+              {/if}
+
+              <button
+                onclick={preventDefault(removeFile)}
+                class="btn btn-ghost btn-circle btn-sm hover:bg-error/10 hover:text-error"
+                title={t("transcription.button.remove-file")}
+              >
+                {@html svgIcons.close}
+              </button>
+            </div>
           </div>
+
+          <!-- Progress Section (Expanded when processing) -->
+          {#if isUploading || isConverting || isTranscribing}
+            <div class="px-4 pb-4 pt-0" transition:slide>
+              <div class="bg-base-100 rounded-lg p-4 space-y-3">
+                <!-- Upload Progress -->
+                {#if isUploading && !isUploaded}
+                  <div class="space-y-2">
+                    <div class="flex items-center justify-between text-sm">
+                      <span class="font-medium">{t("transcription.progress.uploading-to-cloud")}</span>
+                      <span class="text-base-content/60">{uploadingValue}%</span>
+                    </div>
+                    <progress
+                      class="progress progress-primary w-full h-2"
+                      value={uploadingValue}
+                      max="100"
+                    ></progress>
+                  </div>
+                {/if}
+
+                <!-- Conversion Progress -->
+                {#if isConverting}
+                  <div class="space-y-2">
+                    <div class="flex items-center gap-2 text-sm">
+                      <span class="loading loading-spinner loading-sm text-info"></span>
+                      <span class="font-medium">{t("transcription.progress.audio-conversion")}</span>
+                    </div>
+                    <p class="text-xs text-base-content/60 pl-6">
+                      {conversionStatus}
+                    </p>
+                    <progress class="progress progress-info w-full h-2"></progress>
+                  </div>
+                {/if}
+
+                <!-- Transcription Progress -->
+                {#if isTranscribing && !isConverting}
+                  <div class="space-y-3">
+                    <div class="flex items-center gap-2 text-sm">
+                      <span class="loading loading-spinner loading-sm text-primary"></span>
+                      <span class="font-medium">
+                        {isBatchMode ? t("transcription.progress.batch-transcription") : t("transcription.progress.transcription-in-progress")}
+                      </span>
+                    </div>
+
+                    {#if isBatchMode}
+                      <!-- Batch Mode: Show Steps -->
+                      <div class="bg-base-200/50 rounded-lg p-3 space-y-2">
+                        <div class="text-xs text-base-content/70">
+                          {transcriptionStatus || t("transcription.progress.job-queued")}
+                        </div>
+                        
+                        {#if batchPollAttempt > 0}
+                          <div class="flex items-center justify-between text-xs text-base-content/60">
+                            <span>{t("transcription.progress.poll-attempt")}: {batchPollAttempt} / {batchMaxAttempts}</span>
+                          </div>
+                        {/if}
+
+                        <!-- Simplified Progress Steps -->
+                        <ul class="steps steps-horizontal w-full text-xs mt-3">
+                          <li class="step step-primary">{t("transcription.steps.submitted")}</li>
+                          <li class={`step ${transcriptionStatus.toLowerCase().includes('processing') || transcriptionStatus.toLowerCase().includes('transcribing') || transcriptionStatus.toLowerCase().includes('extracting') || transcriptionStatus.toLowerCase().includes('generating') ? 'step-primary' : ''}`}>
+                            {t("transcription.steps.processing")}
+                          </li>
+                          <li class={`step ${transcriptionStatus.toLowerCase().includes('extracting') || transcriptionStatus.toLowerCase().includes('generating') ? 'step-primary' : ''}`}>
+                            {t("transcription.steps.extracting")}
+                          </li>
+                          <li class={`step ${transcriptionStatus.toLowerCase().includes('generating') ? 'step-primary' : ''}`}>
+                            {t("transcription.steps.generating")}
+                          </li>
+                          <li class={`step ${transcriptionStatus.toLowerCase().includes('completed') ? 'step-primary' : ''}`}>
+                            {t("transcription.steps.complete")}
+                          </li>
+                        </ul>
+
+                        <!-- Time Estimate Alert -->
+                        <div class="alert alert-info py-2 mt-2">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <span class="text-xs">{t("transcription.alert.large-files-time")}</span>
+                        </div>
+                      </div>
+                    {:else}
+                      <!-- Regular Mode: Show Progress Bar -->
+                      <div class="space-y-2">
+                        <p class="text-xs text-base-content/60">
+                          {transcriptionStatus || t("transcription.progress.processing-file")}
+                        </p>
+                        <progress
+                          class="progress progress-primary w-full h-2"
+                          value={transcriptionProgress}
+                          max="100"
+                        ></progress>
+                        {#if transcriptionProgress > 0}
+                          <div class="flex justify-end text-xs text-base-content/60">
+                            <span>{transcriptionProgress}%</span>
+                          </div>
+                        {/if}
+                      </div>
+                    {/if}
+                  </div>
+                {/if}
+              </div>
+            </div>
+          {/if}
+
+          <!-- Success State Summary -->
+          {#if isTranscipted && !isTranscribing}
+            <div class="px-4 pb-4 pt-0">
+              <div class="bg-success/10 border border-success/20 rounded-lg p-3 flex items-center gap-3">
+                <svg class="w-5 h-5 text-success shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-medium text-success">{t("transcription.success.completed")}</p>
+                  {#if category === AudioCategory.Subtitle || category === AudioCategory.SubtitleLarge || category === AudioCategory.Subtitle11Labs || category === AudioCategory.SubtitleJson}
+                    <p class="text-xs text-base-content/60 mt-0.5">{t("transcription.success.files-ready")}</p>
+                  {/if}
+                </div>
+              </div>
+            </div>
+          {/if}
+
+          <!-- Error State -->
+          {#if isTranscriptionFailed}
+            <div class="px-4 pb-4 pt-0">
+              <div class="bg-error/10 border border-error/20 rounded-lg p-3 flex items-center gap-3">
+                <svg class="w-5 h-5 text-error shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-medium text-error">{t("transcription.error.failed")}</p>
+                  <p class="text-xs text-base-content/60 mt-0.5">{t("transcription.error.try-again")}</p>
+                </div>
+              </div>
+            </div>
+          {/if}
         </div>
       </div>
     {/if}
@@ -1618,36 +1927,32 @@
       >
     {/if}
     {#if isTranscipted}
-      {#if zipFileData}
-        <button class="btn btn-success" onclick={downloadZip}
-          >{@html svgIcons.download}{t(
-            "transciption.model.cta.download-zip",
-          )}</button
-        >
-      {:else if assFileUrl || srtFileUrl || jsonFileUrl || txtFileUrl}
-        <!-- <button
-          class="btn btn-success btn-sm text-base-100"
-          on:click={downloadFileSRT}
-          >{@html svgIcons.download}{t(
-            "transciption.model.cta.download-output.srt",
-          )}</button
-        > -->
-        <button
-          class="btn btn-success btn-sm text-base-100"
-          onclick={downloadFile}
-          >{@html svgIcons.download}{t(
-            "transciption.model.cta.download-output",
-          )}</button
-        >
+      {#if category !== AudioCategory.AudioPro}
+        {#if zipFileData}
+          <!-- Show Download Zip if zip data exists -->
+          <button class="btn btn-success" onclick={downloadZip}
+            >{@html svgIcons.download}{t(
+              "transciption.model.cta.download-zip",
+            )}</button
+          >
+        {:else if assFileUrl || srtFileUrl || jsonFileUrl || txtFileUrl}
+          <!-- Show Download Output only if no zip data exists -->
+          <button
+            class="btn btn-success btn-sm text-base-100"
+            onclick={downloadFile}
+            >{@html svgIcons.download}{t(
+              "transciption.model.cta.download-output",
+            )}</button
+          >
+        {/if}
       {/if}
 
       <!-- Subtitle Editor Button -->
-      {#if (assFileUrl || srtFileUrl) && audioFile && $tenant?.subtitle_editor}
+      {#if (assFileUrl || srtFileUrl) && audioFile && $tenant?.subtitle_editor && (category === AudioCategory.Subtitle || category === AudioCategory.SubtitleLarge || category === AudioCategory.Subtitle11Labs)}
         <button
           class="btn bg-neutral btn-sm text-white"
           onclick={openSubtitleEditor}
         >
-          <!-- {@html svgIcons.edit} {t("subtitle-editor.edit-subtitles")} -->
           {@html svgIcons.edit}
           {t("settings.transcription.subtitle-editor")}
         </button>
@@ -1671,10 +1976,4 @@
     {downloadFile}
     confirm={startNew}
   />
-
-  {#if isConverting}
-    <div class="conversion-progress" transition:slide>
-      <p class="progress-status">{conversionStatus}</p>
-    </div>
-  {/if}
 </div>
