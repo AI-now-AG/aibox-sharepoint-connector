@@ -28,6 +28,7 @@
   } from "$utils/textFormatting";
   import { ApiKeyProvider } from "$types/TenantFeature";
   import { readFileContent } from "$utils/fileReader";
+  import { TRANSCRIPTION_API_URL } from "astro:env/client";
 
   const t = useTranslations();
 
@@ -38,8 +39,8 @@
   }
 
   interface APIConfiguration {
-    apiKey: string;
     apiUrl: string;
+    accessToken: string;
   }
 
   interface RequestPayload {
@@ -146,22 +147,9 @@
   }
 
   async function getAPIConfiguration(): Promise<APIConfiguration> {
-    const configResponse = await fetch(
-      "/.netlify/functions/getTranscriptionConfig",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-      },
-    );
-
-    if (!configResponse.ok) {
-      throw new Error("Failed to get transcription configuration");
-    }
-
-    const { apiKey, apiUrl: baseUrl } = await configResponse.json();
     return {
-      apiKey,
-      apiUrl: `${baseUrl}/api/prompt/execute`,
+      apiUrl: `${TRANSCRIPTION_API_URL}/api/prompt/execute`,
+      accessToken: $user?.auth0_access_token as string,
     };
   }
 
@@ -448,10 +436,11 @@
   ): any {
     switch (data.type) {
       case "start":
-        if (data.model === "gpt-5") {
-          isResoningThingking = true;
-        }
         handleStartEvent(data);
+        break;
+
+      case "reasoning":
+        isResoningThingking = true;
         break;
 
       case "chunk":
@@ -531,12 +520,11 @@
       const config = await getAPIConfiguration();
       const requestBody = buildRequestPayload(fileUrls);
 
-      const accessToken = $user?.auth0_access_token;
       const response = await fetch(config.apiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${config.accessToken}`,
         },
         body: JSON.stringify(requestBody),
       });

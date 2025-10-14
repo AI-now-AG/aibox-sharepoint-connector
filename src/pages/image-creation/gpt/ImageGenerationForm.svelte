@@ -21,6 +21,7 @@
     stripMarkdownFormatting,
   } from "$utils/textFormatting";
   import { PromptToolOption } from "$types/AIProvider";
+  import { TRANSCRIPTION_API_URL } from "astro:env/client";
 
   // === Types and Interfaces ===
   interface StreamingState {
@@ -30,8 +31,8 @@
   }
 
   interface APIConfiguration {
-    apiKey: string;
     apiUrl: string;
+    accessToken: string;
   }
 
   interface RequestPayload {
@@ -121,22 +122,9 @@
 
   // === API Configuration ===
   async function getAPIConfiguration(): Promise<APIConfiguration> {
-    const configResponse = await fetch(
-      "/.netlify/functions/getTranscriptionConfig",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-      },
-    );
-
-    if (!configResponse.ok) {
-      throw new Error("Failed to get transcription configuration");
-    }
-
-    const { apiKey, apiUrl: baseUrl } = await configResponse.json();
     return {
-      apiKey,
-      apiUrl: `${baseUrl}/api/prompt/execute`,
+      apiUrl: `${TRANSCRIPTION_API_URL}/api/prompt/execute`,
+      accessToken: $user?.auth0_access_token as string,
     };
   }
 
@@ -455,13 +443,12 @@
       const requestBody = buildRequestPayload(fileUrls);
 
       // Make API request
-      const accessToken = $user?.auth0_access_token;
       const response = await fetch(config.apiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           //"X-API-Key": config.apiKey,
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${config.accessToken}`,
         },
         body: JSON.stringify(requestBody),
       });
