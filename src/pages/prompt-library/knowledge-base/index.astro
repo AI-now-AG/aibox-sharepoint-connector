@@ -4,11 +4,33 @@ import { useTranslations } from "$i18n/utils";
 import { Permission } from "$types/Users";
 import KnowledgeBaseList from "$components/prompt-interface/KnowledgeBaseList.svelte";
 import { svgIcons } from "$assets/icons";
+import { actions } from "astro:actions";
 
 const t = useTranslations();
 const tenant = Astro.locals.tenant;
 const tenantId = tenant?._id?.toString() ?? "";
 let userPermissions = Astro.locals.user.permissions;
+
+const { data, error } = await Astro.callAction(
+  actions.knowledgebase.listByTenant,
+  {
+    tenant_id: tenantId,
+  }
+);
+
+let items = [];
+
+if (!error) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  items = data.map((knowledgeBase: any) => ({
+    id: knowledgeBase._id?.toString(),
+    title: knowledgeBase?.title,
+    description: knowledgeBase.description,
+    instruction: knowledgeBase.knowledge_base,
+    modifiedAt: knowledgeBase.updated_at,
+    modifiedBy: knowledgeBase.modified_by,
+  }));
+}
 ---
 
 <Layout>
@@ -20,7 +42,7 @@ let userPermissions = Astro.locals.user.permissions;
     </h1>
 
     {
-      userPermissions.includes(Permission.AdminAll) && (
+      userPermissions.includes(Permission.AdminAll) && items.length > 0 && (
         <a
           href="/prompt-library/knowledge-base/add"
           class="mt-2 lg:mt-8 btn btn-outline font-normal grow-0"
@@ -34,7 +56,7 @@ let userPermissions = Astro.locals.user.permissions;
 
   <KnowledgeBaseList
     isEditable={userPermissions.includes(Permission.AdminAll)}
-    tenantId={tenantId}
+    items={items}
     client:load
   />
 </Layout>
