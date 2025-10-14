@@ -34,7 +34,7 @@
     labelClasses = "",
     placeholderClasses = "",
     dropdownBoxClasses = "",
-    disabled = $bindable(false),
+    disabled = false,
     children,
     onValueChange,
   }: Props = $props();

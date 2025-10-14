@@ -11,6 +11,7 @@
     displayTop?: boolean;
     titleClasses?: string;
     labelClasses?: string;
+    disabled?: boolean;
   }
 
   let {
@@ -21,6 +22,7 @@
     displayTop = false,
     titleClasses = "",
     labelClasses = "",
+    disabled = false,
   }: Props = $props();
 
   let inputValue = $state("");
@@ -64,11 +66,12 @@
 <div>
   <p class={"mb-2 " + titleClasses}>{title}</p>
   <div
-    class={`dropdown ${displayTop ? "dropdown-top" : "dropdown-bottom"} w-full min-w-xs`}
+    class="{`dropdown ${displayTop ? 'dropdown-top' : 'dropdown-bottom'}`}  w-full min-w-xs"
   >
     <label
-      class={"input input-bordered flex items-center gap-2 w-full " +
-        labelClasses}
+      class="input input-bordered flex items-center gap-2 w-full {labelClasses} {disabled
+        ? 'pointer-events-none opacity-50 bg-gray-200'
+        : ''}"
     >
       <input
         type="text"
@@ -91,6 +94,7 @@
             <button
               onclick={preventDefault(() => handleSelectedItems(item))}
               class={`${(typeof selectedItem === "string" ? selectedItem : selectedItem?.title) === (typeof item === "string" ? item : item.title) ? "bg-primary text-primary-content hover:bg-primary" : "hover:text-neutral"}`}
+              {disabled}
               >{typeof item === "string" ? item : item.title}
             </button>
           </li>

@@ -6,7 +6,7 @@ import CategoryModel from "$data/models/category.model";
 import PromptModel, { type Prompt } from "$data/models/prompt.model";
 import { isSameObjectId } from "$utils/common";
 
-const { category: categoryId, group: groupId } = Astro.params;
+const { category: categoryId = "", group: groupId = "" } = Astro.params;
 
 const category = await CategoryModel.get(categoryId as string);
 if (
@@ -45,7 +45,7 @@ const promptItems = categoryGroupPrompt.map((prompt: any) => ({
     class="flex flex-col bg-base-200 h-full content-baseline gap-0 place-items-center"
   >
     <div class="w-full h-full">
-      <Content {group} {promptItems} />
+      <Content {categoryId} {groupId} useCaseTitle={group?.title || ""} {promptItems} />
     </div>
   </div>
 </Layout>

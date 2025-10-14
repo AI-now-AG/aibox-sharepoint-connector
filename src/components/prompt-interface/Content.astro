@@ -1,36 +1,42 @@
 ---
-import EmptyPrompt from "./EmptyPrompt.astro";
+import EmptyPrompt from "./EmptyPrompt.svelte";
 import PromptExecution from "./PromptExecution.svelte";
 import { Permission } from "$types/Users";
 
 export interface Props {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  group: any;
+  categoryId: string;
+  groupId: string;
+  useCaseTitle: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   promptItems: any;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const { group, promptItems = [] } = Astro.props;
+const { categoryId, groupId, useCaseTitle, promptItems = [] } = Astro.props;
 const userPermissions = Astro.locals.user.permissions;
+const isEditable = userPermissions.includes(Permission.AdminAll);
 ---
 
 <div class="container max-w-6xl mx-auto grid grid-cols-1 px-14">
   <h1 class="pt-2 mb-2 lg:pt-8 text-4xl font-bold">
-    {group?.title}
+    {useCaseTitle}
   </h1>
 
   {
     promptItems.length > 0 ? (
       <PromptExecution
         promptItems={promptItems}
-        isEditable={userPermissions.includes(Permission.AdminAll)}
-        groupId={group._id?.toString() || ""}
+        {isEditable}
+        groupId={groupId}
         folderName={Astro.locals.tenant.org_name}
         client:load
       />
     ) : (
-      <EmptyPrompt />
+      <EmptyPrompt
+        currentCategoryId={categoryId}
+        currentGroupId={groupId}
+        {isEditable}
+        client:load
+      />
     )
   }
 </div>

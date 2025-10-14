@@ -1,4 +1,3 @@
-<!-- LoadingSpinner.svelte -->
 <script lang="ts">
   interface Props {
     isLoading?: boolean;

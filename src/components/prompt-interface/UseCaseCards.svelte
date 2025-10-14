@@ -6,14 +6,11 @@
   import PromptOrderDialog from "$components/prompt-interface/PromptOrderDialog.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import Loading from "$components/Loading.svelte";
-  import { ApiKeyProvider } from "$types/TenantFeature";
   import { addToast } from "$stores/toast";
   import { actions } from "astro:actions";
   import log from "$utils/log";
   import { tenant } from "$stores";
   import {
-    ProviderModelMap,
-    ModelNameMap,
     useProviderInfo,
     getModelName,
     getActiveModels,

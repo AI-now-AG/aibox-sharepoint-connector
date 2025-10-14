@@ -1,5 +1,4 @@
 <script lang="ts">
-   import { actions } from "astro:actions";
   import type { CreatePromptParams } from "$pages/api/prompts/index.json";
   import { useTranslations } from "$i18n/utils";
   import { svgIcons } from "$assets/icons";
@@ -9,37 +8,51 @@
   import ModelInput from "$pages/prompt-library/prompts/ModelInput.svelte";
   import { addToast } from "$stores/toast";
   import TextEditor from "$components/form/TextEditor.svelte";
+  import RefinementButton from "$components/prompt-interface/RefinementButton.svelte";
   import LoadingSpinner from "$components/prompt-interface/LoadingSpinner.svelte";
   import Dropdown, { type Option } from "$components/form/Dropdown.svelte";
   import { preventDefault } from "$utils/common";
   import { PromptModel } from "$types/PromptModel";
-   import type { ApiKeyProvider } from "$types/TenantFeature";
   import {
     PromptToolOption,
     ReasoningEffortOption,
     TextVerbosityOption,
   } from "$types/AIProvider";
-  import {
-    getPromptTools,
-    getProviderFromPromptModel,
-    useProviderInfo,
-  } from "$shared/AIProvider";
+  import { getPromptTools, useProviderInfo } from "$shared/AIProvider";
   import { tenant } from "$stores";
-  import { normalizeTextToHtml } from "$utils/textFormatting";
- 
+  import {
+    normalizeTextToHtml,
+    isHtmlContentEmpty,
+  } from "$utils/textFormatting";
+
   const t = useTranslations();
 
-  type Group = { title: string; _id: string };
   type Category = {
-    title: string;
     _id: string;
+    title: string;
     groups: Group[];
   };
 
+  type Group = { _id: string; title: string };
+
   type KnowledgeBase = {
-    title: string;
     _id: string;
+    title: string;
   };
+
+  interface Props {
+    currentCategoryId?: string | null;
+    currentGroupId?: string | null;
+    isEditable?: boolean;
+    addPromptDialog?: HTMLDialogElement;
+  }
+
+  let {
+    currentCategoryId = null,
+    currentGroupId = null,
+    isEditable = false,
+    addPromptDialog = $bindable(),
+  }: Props = $props();
 
   let categories: Category[] = $state([]);
   let selectedCategory: Category | undefined = $state();
@@ -54,30 +67,12 @@
   let selectedReasoningLevel: any = $state("low");
   let selectedTextVerbosity: any = $state("low");
 
-  let previousCategoryId: string | null = $state(null);
-  $effect(() => {
-    if (selectedCategory && selectedCategory._id !== previousCategoryId) {
-      selectedGroup = undefined;
-      previousCategoryId = selectedCategory._id;
-    }
-  });
-
   let promptTitle = $state("");
-  let initHtml = $state("");
-  let promptText = $state("");
+  let initHtml = $state("<p></p>");
+  let promptText = $state("<p></p>");
   let promptPredefinedInput = $state("");
 
   let titleInput: HTMLInputElement | undefined = $state();
-
-  interface Props {
-    isEditable?: boolean;
-    addPromptDialog?: HTMLDialogElement;
-  }
-
-  let {
-    isEditable = false,
-    addPromptDialog = $bindable(),
-  }: Props = $props();
 
   let isSaving = $state(false);
   let isLoading = $state(false);
@@ -92,20 +87,46 @@
   );
 
   onMount(async function () {
-    const response = await fetch("/api/categories.json", { method: "GET" });
-    const data = await response.json();
-    if (data) {
-      categories = data;
-    }
-    await fetchInstructionAndKB();
+    await fetchCategories();
+    await fetchKnowledgeBases();
   });
 
-  async function fetchInstructionAndKB() {
+  async function fetchCategories() {
+    // Send a GET request to the API endpoint
+    const response = await fetch("/api/categories.json", { method: "GET" });
+
+    // Parse the JSON response into a typed array of Category objects
+    const categoryData = (await response.json()) as Category[];
+
+    // If data is successfully retrieved, update the local variable
+    if (categoryData) {
+      categories = categoryData;
+
+      // Pre-select category and group if IDs are provided
+      if (currentCategoryId) {
+        selectedCategory = categories.find(
+          (cat) => cat._id === currentCategoryId,
+        );
+        if (currentGroupId && selectedCategory) {
+          selectedGroup = selectedCategory.groups.find(
+            (grp) => grp._id === currentGroupId,
+          );
+        }
+      }
+    }
+  }
+
+  async function fetchKnowledgeBases() {
+    // Send a GET request to the API endpoint
     const knowledgeBaseResponse = await fetch("/api/knowledge-base.json", {
       method: "GET",
     });
+
+    // Parse the JSON response into a typed array of KnowledgeBase objects
     const knowledgeBaseData =
       (await knowledgeBaseResponse.json()) as KnowledgeBase[];
+
+    // If data is successfully retrieved, update the local variable
     if (knowledgeBaseData) {
       knowledgeBases = knowledgeBaseData;
     }
@@ -168,41 +189,16 @@
     }
   }
 
+  function closeDialog() {
+    addPromptDialog?.close();
+    promptTitle = "";
+    promptText = "<p></p>";
+    selectedKnowledgeBases = [];
+  }
+
   function handleKeyDown(event: any) {
     if (event.key === "Enter") {
       event.preventDefault();
-    }
-  }
-
-  async function improvePromptInstruction() {
-    try {
-      isLoading = true;
-      const provider = getProviderFromPromptModel(
-        selectedModel as PromptModel,
-      ) as ApiKeyProvider;
-      const { data, error } = await actions.prompt.improvePrompt({
-        provider,
-        instruction: promptText,
-      });
-      if (error) {
-        console.error("improvePromptInstruction error", error);
-        addToast({ type: "error", message: error?.toString() });
-      } else {
-        initHtml = normalizeTextToHtml(data);
-        promptText = normalizeTextToHtml(data);
-
-        addToast({
-          type: "success",
-          message: t(
-            "prompt-library.add.prompts.instructions.toast-completed-improvement",
-          ),
-        });
-      }
-    } catch (error: any) {
-      addToast({ type: "error", message: error?.toString() });
-      console.error("improvePromptInstruction exception", error);
-    } finally {
-      isLoading = false;
     }
   }
 </script>
@@ -211,12 +207,13 @@
   <div class="modal-box w-8/12 max-w-5xl relative">
     <div class="flex justify-between">
       <h3 class="text-lg font-bold py-4">{t("prompt-library.prompts.add")}</h3>
-      <button class="btn btn-sm btn-circle btn-ghost" onclick={cancelEdit}>
+      <button class="btn btn-sm btn-circle btn-ghost" onclick={closeDialog}>
         {@html svgIcons.closeMenu}
       </button>
     </div>
-    <LoadingSpinner {isLoading} />
+
     <form class="rounded-sm pt-6 mb-4 space-y-6">
+      <!-- Prompt Title -->
       <div class="grid grid-cols-1 gap-4 justify-center">
         <div>
           <p class="mb-2">{t("prompt-library.add.prompts.title")}*</p>
@@ -231,26 +228,7 @@
         </div>
       </div>
 
-      <div
-        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 justify-center"
-      >
-        <SingleInput
-          title={`${t("prompt-library.add.prompts.category")}*`}
-          placeholder="e.g. Editing"
-          items={categories}
-          bind:selectedItem={selectedCategory}
-        />
-
-        {#if selectedCategory}
-          <SingleInput
-            title={`${t("prompt-library.add.prompts.group")}*`}
-            placeholder="e.g. Headlines"
-            items={selectedCategory.groups}
-            bind:selectedItem={selectedGroup}
-          />
-        {/if}
-      </div>
-
+      <!-- Instructions -->
       <div class="mb-4 relative">
         <p class="mb-2">{t("prompt-library.add.prompts.instructions")}*</p>
         {#key initHtml}
@@ -261,22 +239,22 @@
               }, 100);
             }}
             bind:html={promptText}
-            cssClass=" mt-3"
+            cssClass="h-[200px] mt-3"
           />
-          <button
-            class="btn btn-sm absolute top-[-5] right-0 flex"
-            onclick={preventDefault(improvePromptInstruction)}
-          >
-            <span class="">{@html svgIcons.aitool}</span>
-            <span class="text-sm font-bold"
-              >{t(
-                "prompt-library.add.prompts.instructions.improve-instruction",
-              )}</span
-            >
-          </button>
         {/key}
+        <RefinementButton
+          {promptText}
+          {selectedModel}
+          bind:isLoading
+          disabled={isHtmlContentEmpty(promptText)}
+          onResultReady={(output: string) => {
+            initHtml = normalizeTextToHtml(output);
+            promptText = normalizeTextToHtml(output);
+          }}
+        />
       </div>
 
+      <!-- Predfined input -->
       <div class="mb-4">
         <p class="mb-2">{t("prompt-library.add.prompts.predefined-input")}</p>
         <textarea
@@ -286,6 +264,7 @@
         ></textarea>
       </div>
 
+      <!-- Knowledge Base & AI Features -->
       <div
         class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 justify-center"
       >
@@ -303,6 +282,7 @@
         />
       </div>
 
+      <!-- Prompt Tools -->
       {#if Array.isArray(promptTools) && promptTools.length > 0}
         <div
           class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 justify-center"
@@ -330,6 +310,7 @@
         </div>
       {/if}
 
+      <!-- Reasoning & Verbosity -->
       {#if selectedModel.includes(PromptModel.OpenAIGpt5)}
         <div
           class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 justify-center"
@@ -382,8 +363,38 @@
         </div>
       {/if}
 
+      <!-- Category & Group -->
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 justify-center"
+      >
+        <SingleInput
+          title={`${t("prompt-library.add.prompts.category")}*`}
+          placeholder="e.g. Editing"
+          items={categories}
+          bind:selectedItem={selectedCategory}
+          disabled={currentCategoryId !== null}
+        />
+
+        {#if selectedCategory}
+          <SingleInput
+            title={`${t("prompt-library.add.prompts.group")}*`}
+            placeholder="e.g. Headlines"
+            items={selectedCategory.groups}
+            bind:selectedItem={selectedGroup}
+            disabled={currentGroupId !== null}
+          />
+        {/if}
+      </div>
+
+      <!-- Save button -->
       {#if isEditable}
-        <div class="flex items-center justify-between">
+        <div class="flex items-center justify-end">
+          <button
+            class="btn btn-outline px-8 font-normal mr-2"
+            onclick={preventDefault(closeDialog)}
+          >
+            {t("common.cancel")}
+          </button>
           <button
             class={`btn btn-active btn-primary px-8 font-normal ${(!isFormValid || isSaving) && "btn-disabled"}`}
             onclick={preventDefault(savePrompt)}
@@ -398,5 +409,7 @@
         </div>
       {/if}
     </form>
+
+    <LoadingSpinner {isLoading} />
   </div>
-</div>
+</dialog>

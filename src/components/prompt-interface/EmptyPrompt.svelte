@@ -1,9 +1,30 @@
----
-import { useTranslations } from "$i18n/utils";
-const t = useTranslations();
----
+<script lang="ts">
+  import AddPromptDialog from "$components/prompt-interface/AddPromptDialog.svelte";
+  import { preventDefault } from "$utils/common";
+  import { useTranslations } from "$i18n/utils";
 
-<div class="flex flex-col">
+  interface Props {
+    currentCategoryId: string;
+    currentGroupId: string;
+    isEditable?: boolean;
+  }
+
+  let {
+    currentCategoryId,
+    currentGroupId,
+    isEditable = false,
+  }: Props = $props();
+
+  const t = useTranslations();
+
+  let addPromptDialog: HTMLDialogElement | undefined = $state();
+
+  function addPrompt() {
+    addPromptDialog?.showModal();
+  }
+</script>
+
+<div class="flex flex-col mt-3">
   <div class="w-full">
     <div
       class="flex flex-col border-dashed border-2 border-base-content/40 rounded-lg items-center justify-center p-6 lg:max-w-none"
@@ -20,7 +41,8 @@ const t = useTranslations();
             d="M14.0833 45.625H31.2917C34.0071 45.625 36.2083 43.4237 36.2083 40.7083V17.1433C36.2083 16.4913 35.9493 15.866 35.4883 15.405L22.1784 2.09503C21.7173 1.634 21.092 1.375 20.4401 1.375H6.70833C3.99293 1.375 1.79167 3.57627 1.79167 6.29167V33.3333M1.79167 45.625L13.7851 33.6316M13.7851 33.6316C15.1197 34.9662 16.9634 35.7917 19 35.7917C23.0731 35.7917 26.375 32.4898 26.375 28.4167C26.375 24.3436 23.0731 21.0417 19 21.0417C14.9269 21.0417 11.625 24.3436 11.625 28.4167C11.625 30.4532 12.4505 32.297 13.7851 33.6316Z"
             stroke="currentColor"
             stroke-width="2"
-            stroke-linecap="round"></path>
+            stroke-linecap="round"
+          ></path>
         </svg>
       </div>
 
@@ -31,8 +53,8 @@ const t = useTranslations();
         {t("prompt-emptyscreen.create.usecaseLbl")}
       </p>
       <div class="mt-8 flex justify-center">
-        <a href="/prompt-library/prompts">
-          <button class="btn btn-primary">
+        {#if isEditable}
+          <button class="btn btn-primary" onclick={preventDefault(addPrompt)}>
             <svg
               width="13"
               height="12"
@@ -51,8 +73,15 @@ const t = useTranslations();
             </svg>
             {t("prompt-emptyscreen.create.usecaseBtn")}
           </button>
-        </a>
+        {/if}
       </div>
     </div>
   </div>
 </div>
+
+<AddPromptDialog
+  bind:addPromptDialog
+  {currentCategoryId}
+  {currentGroupId}
+  {isEditable}
+/>

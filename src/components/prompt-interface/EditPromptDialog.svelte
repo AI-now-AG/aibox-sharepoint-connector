@@ -6,6 +6,7 @@
   import ModelInput from "$pages/prompt-library/prompts/ModelInput.svelte";
   import type { CreatePromptParams } from "$pages/api/prompts/index.json";
   import { addToast } from "$stores/toast";
+  import RefinementButton from "$components/prompt-interface/RefinementButton.svelte";
   import LoadingSpinner from "$components/prompt-interface/LoadingSpinner.svelte";
   import { svgIcons } from "$assets/icons";
   import { preventDefault } from "$utils/common";
@@ -17,18 +18,13 @@
     ReasoningEffortOption,
     TextVerbosityOption,
   } from "$types/AIProvider";
-  import {
-    getPromptTools,
-    getProviderFromPromptModel,
-    useProviderInfo,
-  } from "$shared/AIProvider";
+  import { getPromptTools, useProviderInfo } from "$shared/AIProvider";
   import { tenant } from "$stores";
-  import { normalizeTextToHtml } from "$utils/textFormatting";
-  import { actions } from "astro:actions";
-  import Toast, {
-    type ToastType,
-  } from "$components/toast-notification/Toast.svelte";
-  import type { ApiKeyProvider } from "$types/TenantFeature";
+  import {
+    normalizeTextToHtml,
+    isHtmlContentEmpty,
+  } from "$utils/textFormatting";
+
   const t = useTranslations();
 
   interface Props {
@@ -47,12 +43,13 @@
     dialogTitle = t("prompt-library.edit.title"),
   }: Props = $props();
 
-  type Group = { _id: string; title: string }; // TODO: Get the type from the API endpoint
   type Category = {
     _id: string;
     title: string;
     groups: Group[];
   };
+
+  type Group = { _id: string; title: string };
 
   type KnowledgeBase = {
     _id: string;
@@ -78,28 +75,13 @@
   let initHtml = $state("");
   let promptText = $state("");
   let promptPredefinedInput = $state("");
-  let promptDetails: any | undefined = undefined;
+
+  let promptDetails: any | undefined = $state();
 
   let isSaving = $state(false);
   let isLoading = $state(false);
 
-  let isShowToast = $state(false);
-  let toasData: any = $state();
-
   let isDataLoaded = false;
-
-  function showToast(type: ToastType, message: string) {
-    toasData = { type, message };
-    isShowToast = true;
-    setTimeout(() => {
-      hideToast();
-    }, 1000);
-  }
-
-  function hideToast() {
-    isShowToast = false;
-    toasData = undefined;
-  }
 
   let titleInput: HTMLInputElement | undefined = $state();
 
@@ -325,38 +307,6 @@
       getPromptDetail(selectedEditPromptId);
     }
   });
-
-  async function improvePromptInstruction() {
-    try {
-      isLoading = true;
-      const provider = getProviderFromPromptModel(
-        selectedModel as PromptModel,
-      ) as ApiKeyProvider;
-      const { data, error } = await actions.prompt.improvePrompt({
-        provider,
-        instruction: promptDetails.prompt,
-      });
-      if (error) {
-        console.error("improvePromptInstruction error", error);
-        showToast("error", error?.toString());
-      } else {
-        promptText = normalizeTextToHtml(data);
-        initHtml = normalizeTextToHtml(data);
-
-        showToast(
-          "success",
-          t(
-            "prompt-library.add.prompts.instructions.toast-completed-improvement",
-          ),
-        );
-      }
-    } catch (error: any) {
-      showToast("error", error.toString());
-      console.error("improvePromptInstruction exception", error);
-    } finally {
-      isLoading = false;
-    }
-  }
 </script>
 
 <dialog class="modal" bind:this={promptDialog}>
@@ -393,19 +343,18 @@
               }, 100);
             }}
             bind:html={promptText}
-            cssClass=" h-[200px] mt-3"
+            cssClass="h-[200px] mt-3"
           />
-          <button
-            class="btn btn-sm absolute top-[-5] right-0 flex"
-            onclick={preventDefault(improvePromptInstruction)}
-          >
-            <span class="">{@html svgIcons.aitool}</span>
-            <span class="text-sm font-bold"
-              >{t(
-                "prompt-library.add.prompts.instructions.improve-instruction",
-              )}</span
-            >
-          </button>
+          <RefinementButton
+            promptText={promptDetails?.prompt || ""}
+            {selectedModel}
+            bind:isLoading
+            disabled={isHtmlContentEmpty(promptText)}
+            onResultReady={(output: string) => {
+              promptText = normalizeTextToHtml(output);
+              initHtml = normalizeTextToHtml(output);
+            }}
+          />
         {/key}
       </div>
 
@@ -556,10 +505,5 @@
         </div>
       {/if}
     </form>
-    {#if isShowToast && toasData}
-      <Toast type={toasData.type} dismissible={true} dismiss={() => hideToast()}
-        >{toasData.message}</Toast
-      >
-    {/if}
   </div>
 </dialog>
