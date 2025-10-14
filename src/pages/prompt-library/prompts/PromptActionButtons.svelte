@@ -1,0 +1,35 @@
+<script lang="ts">
+  import { svgIcons } from "$assets/icons";
+  import { preventDefault } from "$utils/common";
+  import ImportExport from "./ImportExport.svelte";
+  import AddPromptDialog from "$components/prompt-interface/AddPromptDialog.svelte";
+  import { useTranslations } from "$i18n/utils";
+
+  interface Props {
+    isEditable?: boolean;
+  }
+
+  let { isEditable = false }: Props = $props();
+
+  const t = useTranslations();
+
+  let addPromptDialog: HTMLDialogElement | undefined = $state();
+
+  function addPrompt() {
+    addPromptDialog?.showModal();
+  }
+</script>
+
+<div class="flex gap-2">
+  <ImportExport />
+
+  <button
+    class="btn btn-outline font-normal grow-0"
+    onclick={preventDefault(addPrompt)}
+  >
+    {@html svgIcons.add}
+    {t("prompt-library.prompts.add")}
+  </button>
+</div>
+
+<AddPromptDialog bind:addPromptDialog {isEditable} />

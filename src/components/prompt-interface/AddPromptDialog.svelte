@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { navigate } from "astro:transitions/client";
   import type { CreatePromptParams } from "$pages/api/prompts/index.json";
   import { useTranslations } from "$i18n/utils";
   import { svgIcons } from "$assets/icons";
@@ -173,7 +174,8 @@
       }
 
       const data = await response.json();
-      window.history.back();
+      navigate(window.location.href);
+
       addToast({
         message: data.message,
         type: "success",
