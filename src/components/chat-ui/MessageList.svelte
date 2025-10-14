@@ -8,6 +8,7 @@
   import { user } from "$stores";
   import { useTranslations } from "$i18n/utils";
   import { markdownToHtml, textToHtml } from "$utils/textFormatting";
+  import MessageAction from "$components/MessageAction.svelte";
 
   const t = useTranslations();
 
@@ -33,6 +34,8 @@
 
   let copyIndex: number = $state(-1);
   let timer: NodeJS.Timeout;
+
+  let contentElement: HTMLElement = $state<any>(null);
 
   const handleCopy = (event: any) => {
     const selection = window.getSelection();
@@ -111,7 +114,7 @@
                           <p class="font-bold text-sm">
                             {role == MessageRole.User ? username : `aibox`}
                           </p>
-                          <div class="mt-2 text-sm">
+                          <div class="mt-2 text-sm" bind:this={contentElement}>
                             {@html role == MessageRole.User
                               ? textToHtml(content)
                               : markdownToHtml(content)}
@@ -132,6 +135,11 @@
                       {/if}
                       {#if role === MessageRole.Assistant}
                         <div>
+                          <MessageAction
+                            message={rawData}
+                            author={"message-" + index}
+                            {contentElement}
+                          />
                           <div
                             class="flex flex-col justify-items-end order-last"
                           >
