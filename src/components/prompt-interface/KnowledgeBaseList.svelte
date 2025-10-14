@@ -18,7 +18,7 @@
   import { onMount } from "svelte";
   import { actions } from "astro:actions";
   import log from "$utils/log";
-  import EmptyActiion from "./EmptyActiion.svelte";
+  import EmptyActiion from "./EmptyAction.svelte";
 
   const t = useTranslations();
   let loading = $state(false);
