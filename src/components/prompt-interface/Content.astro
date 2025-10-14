@@ -1,6 +1,7 @@
 ---
-import EmptyPrompt from "./EmptyPrompt.svelte";
+import ContentHeader from "./ContentHeader.svelte";
 import PromptExecution from "./PromptExecution.svelte";
+import EmptyPrompt from "./EmptyPrompt.svelte";
 import { Permission } from "$types/Users";
 
 export interface Props {
@@ -17,9 +18,13 @@ const isEditable = userPermissions.includes(Permission.AdminAll);
 ---
 
 <div class="container max-w-6xl mx-auto grid grid-cols-1 px-14">
-  <h1 class="pt-2 mb-2 lg:pt-8 text-4xl font-bold">
-    {useCaseTitle}
-  </h1>
+  <ContentHeader 
+    title={useCaseTitle} 
+    currentCategoryId={categoryId} 
+    currentGroupId={groupId} 
+    {isEditable} 
+    client:load 
+  />
 
   {
     promptItems.length > 0 ? (
