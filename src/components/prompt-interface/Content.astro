@@ -1,16 +1,16 @@
 ---
-import EmptyPrompt from "./EmptyPrompt.astro";
+import EmptyAction from "./EmptyActiion.svelte";
 import PromptExecution from "./PromptExecution.svelte";
 import { Permission } from "$types/Users";
+import { useTranslations } from "$i18n/utils";
 
+const t = useTranslations();
 export interface Props {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   group: any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   promptItems: any;
 }
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const { group, promptItems = [] } = Astro.props;
 const userPermissions = Astro.locals.user.permissions;
 ---
@@ -30,7 +30,13 @@ const userPermissions = Astro.locals.user.permissions;
         client:load
       />
     ) : (
-      <EmptyPrompt />
+      <EmptyAction
+        title={t("prompt-emptyscreen.nousecase")}
+        description={t("prompt-emptyscreen.create.usecaseLbl")}
+        ctaLabel={t("prompt-emptyscreen.create.usecaseBtn")}
+        ctaUrl="/prompt-library/prompts"
+        client:load
+      />
     )
   }
 </div>
