@@ -18,6 +18,7 @@
   import { onMount } from "svelte";
   import { actions } from "astro:actions";
   import log from "$utils/log";
+  import EmptyActiion from "./EmptyActiion.svelte";
 
   const t = useTranslations();
   let loading = $state(false);
@@ -129,27 +130,36 @@
 </script>
 
 <div class="container max-w-5xl mx-auto p-6 space-y-4">
-  <h1 class="text-lg font-normal text-base-content/80">
-    {title}
-  </h1>
+  {#if items?.length > 0}
+    <h1 class="text-lg font-normal text-base-content/80">
+      {title}
+    </h1>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-    {#each items as card, index}
-      <KnowledgeBaseItem
-        {isEditable}
-        data={card}
-        onSelectEdit={() => {
-          editCard(index);
-        }}
-        onSelectDuplicate={() => {
-          duplicateCard(index);
-        }}
-        onSelectDelete={() => {
-          onDeleteCard(index);
-        }}
-      />
-    {/each}
-  </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+      {#each items as card, index}
+        <KnowledgeBaseItem
+          {isEditable}
+          data={card}
+          onSelectEdit={() => {
+            editCard(index);
+          }}
+          onSelectDuplicate={() => {
+            duplicateCard(index);
+          }}
+          onSelectDelete={() => {
+            onDeleteCard(index);
+          }}
+        />
+      {/each}
+    </div>
+  {:else}
+    <EmptyActiion
+      title={t("knowledgebase.empty.title")}
+      description={t("knowledgebase.empty.description")}
+      ctaLabel={t("prompt-library.knowledgebase.add")}
+      ctaUrl="/prompt-library/knowledge-base/add"
+    />
+  {/if}
 </div>
 
 <ConfirmDialog

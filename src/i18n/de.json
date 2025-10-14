@@ -636,5 +636,7 @@
   "transcription.button.remove-file": "Datei entfernen",
   "tenant.add-tenant-supper-admin": "Super Admin hinzufügen",
   "error.tenant-inactive-error-title": "Zugang abgelaufen",
-  "error.tenant-inactive-error-message": "Dein Zugriff auf die aibox ist derzeit nicht aktiv. Die Testphase ist möglicherweise abgelaufen oder es besteht kein gültiges Abonnement mehr.\nWenn du Unterstützung benötigst, wende dich bitte an den Support <a href=\"mailto:support@aibox-app.ch\" class=\"text-primary underline\">support@aibox-app.ch</a> oder an deinen aibox Administrator."
+  "error.tenant-inactive-error-message": "Dein Zugriff auf die aibox ist derzeit nicht aktiv. Die Testphase ist möglicherweise abgelaufen oder es besteht kein gültiges Abonnement mehr.\nWenn du Unterstützung benötigst, wende dich bitte an den Support <a href=\"mailto:support@aibox-app.ch\" class=\"text-primary underline\">support@aibox-app.ch</a> oder an deinen aibox Administrator.",
+  "knowledgebase.empty.title": "Kein Wissen verfügbar",
+  "knowledgebase.empty.description": "Beginnen Sie mit der Erstellung einer neuen Wissensdatenbank."
 }
