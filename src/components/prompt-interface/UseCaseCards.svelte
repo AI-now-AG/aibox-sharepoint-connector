@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import { navigate } from "astro:transitions/client";
   import { useTranslations } from "$i18n/utils";
   import EditPromptDialog from "$components/prompt-interface/EditPromptDialog.svelte";
   import UseCaseActions from "$components/prompt-interface/UseCaseActions.svelte";
@@ -102,6 +103,11 @@
   function removeDeletedItem(deletedId: string) {
     cards = cards?.filter((item: any) => item._id !== deletedId);
     orderCards = orderCards?.filter((item: any) => item._id !== deletedId);
+
+    // Reload if all cards are deleted
+    if (cards.length == 0) {
+      navigate(window.location.href);
+    }
   }
 
   async function deleteCard() {
