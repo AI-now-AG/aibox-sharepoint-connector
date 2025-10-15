@@ -28,12 +28,12 @@
 </script>
 
 <div
-  class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 justify-between pt-2 mb-2 lg:pt-8"
+  class="grid grid-cols-1 lg:grid-cols-2 gap-4 justify-between items-center py-2 lg:pt-8"
 >
   <h1 class="text-4xl font-bold">
     {title}
   </h1>
-  <div class="text-right">
+  <div class="text-left lg:text-right">
     {#if isEditable}
       <button
         class="btn btn-sm btn-outline font-normal grow-0"
