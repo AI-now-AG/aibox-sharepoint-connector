@@ -1,7 +1,6 @@
 <script lang="ts">
   import { actions } from "astro:actions";
   import { slide } from "svelte/transition";
-  //import { navigate } from "astro:transitions/client";
   import { type Message, MessageRole } from "$types/MessageHistory";
   import { sharedMessageHistory } from "$stores/chatHistory";
   import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
