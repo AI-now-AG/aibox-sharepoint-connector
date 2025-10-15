@@ -661,7 +661,7 @@
         <AIModelDropdown
           label={t("home.model-label")}
           bind:selectedModel
-          bind:disabled={isDisableSelectModel}
+          disabled={isDisableSelectModel}
           labelClasses={"text-sm"}
           onValueChange={(_value: any) => {
             selectedPromptTool = PromptToolOption.None;

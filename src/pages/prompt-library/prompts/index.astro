@@ -4,11 +4,10 @@ import { useTranslations } from "$i18n/utils";
 import PromptModel from "$data/models/prompt.model";
 import CategoryModel from "$data/models/category.model";
 import { type CardItem } from "$components/Card.svelte";
-import ImportExport from "./ImportExport.svelte";
+import PromptToolbar from "./PromptToolbar.svelte";
 import PromptFilter from "./PromptFilter.svelte";
 import { Permission } from "$types/Users";
 import type { CategoryItem } from "$types/CategoryItem";
-import { svgIcons } from "$assets/icons";
 
 const t = useTranslations();
 
@@ -80,16 +79,7 @@ let userPermissions = Astro.locals.user.permissions;
     <div class="flex gap-2">
       {
         userPermissions.includes(Permission.SuperAll) && (
-          <ImportExport client:load />
-        )
-      }
-
-      {
-        userPermissions.includes(Permission.AdminAll) && (
-          <a href="prompts/add" class="btn btn-outline font-normal grow-0">
-            <span set:html={svgIcons.add} />
-            {t("prompt-library.prompts.add")}
-          </a>
+          <PromptToolbar isEditable={true} client:load />
         )
       }
     </div>

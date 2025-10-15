@@ -6,7 +6,10 @@
   import { addToast } from "$stores/toast";
   import { svgIcons } from "$assets/icons";
   import { preventDefault } from "$utils/common";
-  import { normalizeTextToHtml } from "$utils/textFormatting";
+  import {
+    normalizeTextToHtml,
+    isHtmlContentEmpty,
+  } from "$utils/textFormatting";
   import TextEditor from "$components/form/TextEditor.svelte";
   import ImportFileDialog from "./ImportFileDialog.svelte";
   import Loading from "$components/Loading.svelte";
@@ -40,9 +43,7 @@
 
   let isSaving = $state(false);
   let isFormValid = $derived(
-    knowledgeBaseTitle !== "" &&
-      knowledgeBaseText.trim() !== "" &&
-      knowledgeBaseText.trim() !== "<p></p>",
+    knowledgeBaseTitle !== "" && !isHtmlContentEmpty(knowledgeBaseText),
   );
 
   onMount(async function () {
@@ -53,6 +54,8 @@
           knowledgeBaseTitle?.trim() + " (" + t("common.copy") + ")";
       }
       knowledgeBaseText = normalizeTextToHtml(knowledgeBase.knowledge_base);
+    } else {
+      knowledgeBaseText = "<p></p>";
     }
   });
 
