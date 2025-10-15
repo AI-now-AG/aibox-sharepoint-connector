@@ -21,7 +21,7 @@ const isEditable = userPermissions.includes(Permission.AdminAll);
     title={useCaseTitle}
     currentCategoryId={categoryId}
     currentGroupId={groupId}
-    {isEditable}
+    isEditable={isEditable && promptItems.length > 0} 
     client:load
   />
 
