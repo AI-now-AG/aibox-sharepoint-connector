@@ -9,6 +9,7 @@
   import { useTranslations } from "$i18n/utils";
   import { markdownToHtml, textToHtml } from "$utils/textFormatting";
   import MessageAction from "$components/MessageAction.svelte";
+  import Loading from "$components/Loading.svelte";
 
   const t = useTranslations();
 
@@ -34,8 +35,10 @@
 
   let copyIndex: number = $state(-1);
   let timer: NodeJS.Timeout;
+  let loading: boolean = $state(false);
 
-  let contentElement: HTMLElement = $state<any>(null);
+  let exportedTextElement: HTMLElement = $state<any>(null);
+  let exportedImageElement: HTMLElement = $state<any>(null);
 
   const handleCopy = (event: any) => {
     const selection = window.getSelection();
@@ -82,6 +85,69 @@
 
   let username = $user?.name || $user?.username;
   let userPicture = $user?.picture;
+
+  function removeDownloadButton(htmlString: string): string {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlString, "text/html");
+    doc.querySelectorAll(".removed-export-pdf").forEach((el) => el.remove());
+    return doc.body.innerHTML;
+  }
+
+  async function exportAsPDF() {
+    try {
+      const fullHtml = `
+        <html>
+          <head>
+            <style>
+              body {
+                font-family: "Helvetica", sans-serif;
+                font-size: 16px;
+              }
+
+              #imageSection img {
+                max-width: 100%;
+                max-height: 500px;
+                object-fit: contain;
+              }
+
+              #messageSection {
+                font-size: 16px;
+                line-height: 1.6;
+              }
+            </style>
+          </head>
+          <body>
+          <div id="messageSection">
+              ${exportedTextElement ? exportedTextElement.outerHTML : "<br/>"}
+            </div>
+            <div id="imageSection">
+              ${exportedImageElement ? removeDownloadButton(exportedImageElement.outerHTML) : "<br/>"}
+            </div>
+          </body>
+        </html>
+      `;
+
+      loading = true;
+
+      const res = await fetch("/api/export-pdf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ html: fullHtml }),
+      });
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `prompt-result-${Date.now()}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error exporting as PDF:", error);
+    } finally {
+      loading = false;
+    }
+  }
 </script>
 
 {#if messages.length > 0 || isFetching}
@@ -114,7 +180,10 @@
                           <p class="font-bold text-sm">
                             {role == MessageRole.User ? username : `aibox`}
                           </p>
-                          <div class="mt-2 text-sm" bind:this={contentElement}>
+                          <div
+                            class="mt-2 text-sm"
+                            bind:this={exportedTextElement}
+                          >
                             {@html role == MessageRole.User
                               ? textToHtml(content)
                               : markdownToHtml(content)}
@@ -135,15 +204,41 @@
                       {/if}
                       {#if role === MessageRole.Assistant}
                         <div>
-                          <MessageAction
-                            message={rawData}
-                            author={"message-" + index}
-                            {contentElement}
-                          />
                           <div
-                            class="flex flex-col justify-items-end order-last"
+                            class="flex flex-row justify-items-end order-last"
                           >
+                            <!-- <MessageAction
+                              message={rawData}
+                              author={"message-" + index}
+                              contentElement={exportedTextElement}
+                            /> -->
+
                             <button
+                              onclick={exportAsPDF}
+                              title="PDF"
+                              class="btn p-2 btn-ghost"
+                            >
+                              {@html svgIcons.pdf}
+                            </button>
+
+                            <button
+                              onclick={() => {}}
+                              title="Word"
+                              class="btn p-2 btn-ghost"
+                            >
+                              {@html svgIcons.word}
+                            </button>
+
+                            <button
+                              onclick={() => {}}
+                              title="Email"
+                              class="btn p-2 btn-ghost"
+                            >
+                              {@html svgIcons.email}
+                            </button>
+
+                            <button
+                              title="Coppy"
                               class="btn p-2 btn-ghost"
                               onclick={() => copyToClipboard(rawData, index)}
                             >
@@ -160,7 +255,10 @@
                   </div>
 
                   {#if role === MessageRole.Assistant && imageUrl}
-                    <div class="chat-bubble text-base-content bg-base-200">
+                    <div
+                      class="chat-bubble text-base-content bg-base-200"
+                      bind:this={exportedImageElement}
+                    >
                       <ImageCard url={imageUrl} alt={content} {infoText} />
                     </div>
                   {/if}
@@ -222,3 +320,5 @@
     </div>
   </div>
 {/if}
+
+<Loading show={loading} />

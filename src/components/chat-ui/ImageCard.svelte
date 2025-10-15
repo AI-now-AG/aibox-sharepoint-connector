@@ -63,7 +63,7 @@
         </div>
       {/if}
       <button
-        class="btn btn-square btn-soft btn-primary btn-sm"
+        class="btn btn-square btn-soft btn-primary btn-sm removed-export-pdf"
         onclick={preventDefault(download)}
       >
         {@html svgIcons.download}

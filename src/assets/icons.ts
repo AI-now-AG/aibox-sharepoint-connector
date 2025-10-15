@@ -76,7 +76,9 @@ import chat from "$assets/icons/chat.svg?raw";
 import dropdownArrowDown from "$assets/icons/dropdown-arrow-down.svg?raw";
 import error from "$assets/icons/error.svg?raw";
 import empty from "$assets/icons/empty.svg?raw";
-
+import pdf from "$assets/icons/pdf.svg?raw";
+import word from "$assets/icons/word.svg?raw";
+import email from "$assets/icons/email.svg?raw";
 
 export const svgIcons = {
   menuSettings,
@@ -157,4 +159,7 @@ export const svgIcons = {
   dropdownArrowDown,
   error,
   empty,
+  pdf, 
+  word, 
+  email
 };
