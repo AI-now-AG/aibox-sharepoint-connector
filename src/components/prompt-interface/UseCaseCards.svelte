@@ -101,13 +101,11 @@
   }
 
   function removeDeletedItem(deletedId: string) {
-    cards = cards?.filter((item: any) => item._id !== deletedId);
-    orderCards = orderCards?.filter((item: any) => item._id !== deletedId);
+    //cards = cards?.filter((item: any) => item._id !== deletedId);
+    //orderCards = orderCards?.filter((item: any) => item._id !== deletedId);
 
     // Reload if all cards are deleted
-    if (cards.length == 0) {
-      navigate(window.location.href);
-    }
+    navigate(window.location.href);
   }
 
   async function deleteCard() {
