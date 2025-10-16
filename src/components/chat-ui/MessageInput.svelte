@@ -142,7 +142,7 @@
           placeholderClasses="h-8"
           dropdownBoxClasses="min-w-48"
           bind:value={selectedPromptTool}
-          bind:disabled={isDisablePromptTool}
+          disabled={isDisablePromptTool}
         />
       {/if}
     </div>

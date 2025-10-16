@@ -27,7 +27,7 @@
     selectedModel = $bindable(""),
     classes = "",
     labelClasses = "",
-    disabled = $bindable(false),
+    disabled = false,
     onValueChange,
   }: Props = $props();
 

@@ -638,5 +638,5 @@
   "error.tenant-inactive-error-title": "Access expired",
   "error.tenant-inactive-error-message": "Your access to aibox is currently inactive. The trial period may have expired, or there is no active subscription.\nIf you need assistance, please contact our support team at <a href=\"mailto:support@aibox-app.ch\" class=\"text-primary underline\">support@aibox-app.ch</a>\n or reach out to your aibox administrator.",
   "knowledgebase.empty.title": "No knowledge available",
-  "knowledgebase.empty.description": "Get started by creating a new knowledgebase"
+  "knowledgebase.empty.description": "Get started by creating a new Knowledge Base"
 }

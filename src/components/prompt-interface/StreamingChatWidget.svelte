@@ -1,6 +1,5 @@
 <script lang="ts">
   import { actions } from "astro:actions";
-  //import { navigate } from "astro:transitions/client";
   import {
     messageHistories,
     addMessageToHistory,

@@ -1,40 +1,44 @@
 ---
-import EmptyAction from "./EmptyAction.svelte";
+import ContentHeader from "./ContentHeader.svelte";
 import PromptExecution from "./PromptExecution.svelte";
+import EmptyPrompt from "./EmptyPrompt.svelte";
 import { Permission } from "$types/Users";
-import { useTranslations } from "$i18n/utils";
 
-const t = useTranslations();
 export interface Props {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  group: any;
+  categoryId: string;
+  groupId: string;
+  useCaseTitle: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   promptItems: any;
 }
-const { group, promptItems = [] } = Astro.props;
+const { categoryId, groupId, useCaseTitle, promptItems = [] } = Astro.props;
 const userPermissions = Astro.locals.user.permissions;
+const isEditable = userPermissions.includes(Permission.AdminAll);
 ---
 
 <div class="container max-w-6xl mx-auto grid grid-cols-1 px-14">
-  <h1 class="pt-2 mb-2 lg:pt-8 text-4xl font-bold">
-    {group?.title}
-  </h1>
+  <ContentHeader
+    title={useCaseTitle}
+    currentCategoryId={categoryId}
+    currentGroupId={groupId}
+    isEditable={isEditable && promptItems.length > 0} 
+    client:load
+  />
 
   {
     promptItems.length > 0 ? (
       <PromptExecution
         promptItems={promptItems}
         isEditable={userPermissions.includes(Permission.AdminAll)}
-        groupId={group._id?.toString() || ""}
+        groupId={groupId}
         folderName={Astro.locals.tenant.org_name}
         client:load
       />
     ) : (
-      <EmptyAction
-        title={t("prompt-emptyscreen.nousecase")}
-        description={t("prompt-emptyscreen.create.usecaseLbl")}
-        ctaLabel={t("prompt-emptyscreen.create.usecaseBtn")}
-        ctaUrl="/prompt-library/prompts"
+      <EmptyPrompt
+        currentCategoryId={categoryId}
+        currentGroupId={groupId}
+        {isEditable}
         client:load
       />
     )

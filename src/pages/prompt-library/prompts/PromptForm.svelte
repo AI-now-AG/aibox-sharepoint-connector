@@ -3,9 +3,11 @@
   import { useTranslations } from "$i18n/utils";
   import { svgIcons } from "$assets/icons";
   import { onMount } from "svelte";
+  import { tenant } from "$stores";
   import SingleInput from "$pages/prompt-library/prompts/SingleInput.svelte";
   import MultiInput from "$pages/prompt-library/prompts/MultiInput.svelte";
   import ModelInput from "$pages/prompt-library/prompts/ModelInput.svelte";
+  import RefinementButton from "$components/prompt-interface/RefinementButton.svelte";
   import { addToast } from "$stores/toast";
   import { preventDefault } from "$utils/common";
   import TextEditor from "$components/form/TextEditor.svelte";
@@ -16,16 +18,9 @@
     ReasoningEffortOption,
     TextVerbosityOption,
   } from "$types/AIProvider";
-  import {
-    getPromptTools,
-    getProviderFromPromptModel,
-    useProviderInfo,
-  } from "$shared/AIProvider";
-  import { tenant } from "$stores";
+  import { getPromptTools, useProviderInfo } from "$shared/AIProvider";
   import { normalizeTextToHtml } from "$utils/textFormatting";
-  import { actions } from "astro:actions";
   import Loading from "$components/Loading.svelte";
-  import type { ApiKeyProvider } from "$types/TenantFeature";
 
   const t = useTranslations();
 
@@ -62,9 +57,9 @@
     }
   });
 
-  let promptTitle = $state("");
   let initHtml = $state("");
-  let promptText = $state("");
+  let promptTitle = $state("");
+  let promptText = $state("<p></p>");
   let promptPredefinedInput = $state("");
 
   let titleInput: HTMLInputElement | undefined = $state();
@@ -94,12 +89,9 @@
   );
 
   onMount(async function () {
-    const response = await fetch("/api/categories.json", { method: "GET" });
-    const data = await response.json();
-    if (data) {
-      categories = data;
-    }
-    await fetchInstructionAndKB();
+    await fetchCategories();
+    await fetchKnowledgeBases();
+
     if (prompt) {
       promptTitle = prompt.title;
       initHtml = normalizeTextToHtml(prompt.prompt);
@@ -123,7 +115,15 @@
     }
   });
 
-  async function fetchInstructionAndKB() {
+  async function fetchCategories() {
+    const response = await fetch("/api/categories.json", { method: "GET" });
+    const data = await response.json();
+    if (data) {
+      categories = data;
+    }
+  }
+
+  async function fetchKnowledgeBases() {
     const knowledgeBaseResponse = await fetch("/api/knowledge-base.json", {
       method: "GET",
     });
@@ -205,38 +205,6 @@
       event.preventDefault();
     }
   }
-
-  async function improvePromptInstruction() {
-    try {
-      isLoading = true;
-      const provider = getProviderFromPromptModel(
-        selectedModel as PromptModel,
-      ) as ApiKeyProvider;
-      const { data, error } = await actions.prompt.improvePrompt({
-        provider,
-        instruction: promptText,
-      });
-      if (error) {
-        console.error("improvePromptInstruction error", error);
-        addToast({ type: "error", message: error?.toString() });
-      } else {
-        initHtml = normalizeTextToHtml(data);
-        promptText = normalizeTextToHtml(data);
-
-        addToast({
-          type: "success",
-          message: t(
-            "prompt-library.add.prompts.instructions.toast-completed-improvement",
-          ),
-        });
-      }
-    } catch (error: any) {
-      addToast({ type: "error", message: error?.toString() });
-      console.error("improvePromptInstruction exception", error);
-    } finally {
-      isLoading = false;
-    }
-  }
 </script>
 
 <div class="container max-w-5xl mx-auto p-4">
@@ -298,20 +266,18 @@
               }, 100);
             }}
             bind:html={promptText}
-            cssClass=" mt-3"
+            cssClass="mt-3"
           />
-          <button
-            class="btn btn-sm absolute top-[-5] right-0 flex"
-            onclick={preventDefault(improvePromptInstruction)}
-          >
-            <span class="">{@html svgIcons.aitool}</span>
-            <span class="text-sm font-bold"
-              >{t(
-                "prompt-library.add.prompts.instructions.improve-instruction",
-              )}</span
-            >
-          </button>
         {/key}
+        <RefinementButton
+          {promptText}
+          {selectedModel}
+          bind:isLoading
+          onResultReady={(output: string) => {
+            initHtml = normalizeTextToHtml(output);
+            promptText = normalizeTextToHtml(output);
+          }}
+        />
       </div>
 
       <div class="mb-4">

@@ -22,7 +22,7 @@
     placeholderClasses = "",
     dropdownBoxClasses = "",
     toolOptions,
-    disabled = $bindable(false),
+    disabled = false,
   }: Props = $props();
 </script>
 
@@ -35,7 +35,7 @@
       {placeholderClasses}
       {dropdownBoxClasses}
       bind:value
-      bind:disabled
+      {disabled}
     />
     {#if !disabled && value && (value as PromptToolOption) !== PromptToolOption.None}
       <button
