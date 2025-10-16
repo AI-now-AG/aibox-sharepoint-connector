@@ -43,7 +43,7 @@ importers:
         version: 0.0.11(openai@4.104.0(ws@8.18.3)(zod@3.24.4))
       '@langchain/community':
         specifier: ^0.3.42
-        version: 0.3.42(sg2bo25gunronoz4j3v2bv7yqi)
+        version: 0.3.42(a3lejhezgnagbrtuhhmwnz2rjm)
       '@langchain/core':
         specifier: ^0.3.55
         version: 0.3.77(@opentelemetry/api@1.8.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.8.0))(openai@4.104.0(ws@8.18.3)(zod@3.24.4))
@@ -173,6 +173,9 @@ importers:
       pdf-parse-debugging-disabled:
         specifier: ^1.1.1
         version: 1.1.1
+      playwright:
+        specifier: ^1.56.0
+        version: 1.56.0
       playwright-core:
         specifier: ^1.56.0
         version: 1.56.0
@@ -7589,6 +7592,11 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
+  playwright@1.56.0:
+    resolution: {integrity: sha512-X5Q1b8lOdWIE4KAoHpW3SE8HvUB+ZZsUoN64ZhjnN8dOb1UpujxBtENGiZFE+9F/yhzJwYa+ca3u43FeLbboHA==}
+    engines: {node: '>=18'}
+    hasBin: true
+
   postcss-lit@1.2.0:
     resolution: {integrity: sha512-PV1wC6MttgaA0w0P2nMCw4SyF/awtH2PgDTIuPVc+L8UHcy28DBQ2pUEqw12Ux342Y/E/cJU6Bq+gZHwBaHs0g==}
     peerDependencies:
@@ -10905,7 +10913,7 @@ snapshots:
       - openai
       - supports-color
 
-  '@langchain/community@0.3.42(sg2bo25gunronoz4j3v2bv7yqi)':
+  '@langchain/community@0.3.42(a3lejhezgnagbrtuhhmwnz2rjm)':
     dependencies:
       '@browserbasehq/stagehand': 1.12.0(@playwright/test@1.50.1)(deepmerge@4.3.1)(dotenv@16.5.0)(openai@4.104.0(ws@8.18.3)(zod@3.24.4))(zod@3.24.4)
       '@ibm-cloud/watsonx-ai': 1.5.0(@langchain/core@0.3.77(@opentelemetry/api@1.8.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.8.0))(openai@4.104.0(ws@8.18.3)(zod@3.24.4)))
@@ -10934,7 +10942,7 @@ snapshots:
       mammoth: 1.9.0
       mongodb: 6.16.0(socks@2.8.7)
       pdf-parse: 1.1.1
-      playwright: 1.50.1
+      playwright: 1.56.0
       puppeteer: 24.25.0(typescript@5.8.3)
       ws: 8.18.3
     transitivePeerDependencies:
@@ -12267,7 +12275,7 @@ snapshots:
 
   '@sparticuz/chromium@141.0.0':
     dependencies:
-      follow-redirects: 1.15.11
+      follow-redirects: 1.15.11(debug@4.4.3)
       tar-fs: 3.1.1
     transitivePeerDependencies:
       - bare-buffer
@@ -13518,18 +13526,9 @@ snapshots:
       '@fastify/error': 3.4.1
       fastq: 1.19.1
 
-  axios@1.7.9:
-    dependencies:
-      follow-redirects: 1.15.9(debug@4.4.0)
-      form-data: 4.0.2
-      proxy-from-env: 1.1.0
-    transitivePeerDependencies:
-      - debug
-    optional: true
-
   axios@1.7.9(debug@4.4.3):
     dependencies:
-      follow-redirects: 1.15.9(debug@4.4.3)
+      follow-redirects: 1.15.11(debug@4.4.3)
       form-data: 4.0.2
       proxy-from-env: 1.1.0
     transitivePeerDependencies:
@@ -15178,15 +15177,13 @@ snapshots:
     dependencies:
       from2: 2.3.0
 
-  follow-redirects@1.15.11: {}
+  follow-redirects@1.15.11(debug@4.4.3):
+    optionalDependencies:
+      debug: 4.4.3(supports-color@9.4.0)
 
   follow-redirects@1.15.9(debug@4.4.0):
     optionalDependencies:
       debug: 4.4.0
-
-  follow-redirects@1.15.9(debug@4.4.3):
-    optionalDependencies:
-      debug: 4.4.3(supports-color@9.4.0)
 
   foreground-child@3.3.1:
     dependencies:
@@ -16240,7 +16237,7 @@ snapshots:
     optionalDependencies:
       '@langchain/anthropic': 0.3.28(@langchain/core@0.3.77(@opentelemetry/api@1.8.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.8.0))(openai@4.104.0(ws@8.18.3)(zod@3.24.4)))
       '@langchain/google-genai': 0.2.18(@langchain/core@0.3.77(@opentelemetry/api@1.8.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.8.0))(openai@4.104.0(ws@8.18.3)(zod@3.24.4)))
-      axios: 1.7.9
+      axios: 1.7.9(debug@4.4.3)
     transitivePeerDependencies:
       - encoding
       - openai
@@ -17787,6 +17784,12 @@ snapshots:
   playwright@1.50.1:
     dependencies:
       playwright-core: 1.50.1
+    optionalDependencies:
+      fsevents: 2.3.2
+
+  playwright@1.56.0:
+    dependencies:
+      playwright-core: 1.56.0
     optionalDependencies:
       fsevents: 2.3.2
 
