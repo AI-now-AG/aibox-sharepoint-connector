@@ -92,7 +92,7 @@
     return doc.body.innerHTML;
   }
 
-async function exportFileAs(fileTpe: 'pdf' | 'word' = 'pdf') {
+  async function exportFileAs(fileTpe: "pdf" | "word" = "pdf") {
     try {
       const fullHtml = `
         <html>
@@ -128,13 +128,16 @@ async function exportFileAs(fileTpe: 'pdf' | 'word' = 'pdf') {
 
       loading = true;
 
-      let filename = `prompt-result-${Date.now()}.${fileTpe === 'pdf' ? 'pdf' : 'docx'}`;
+      let filename = `prompt-result-${Date.now()}.${fileTpe === "pdf" ? "pdf" : "docx"}`;
 
-      const res = await fetch(fileTpe === 'pdf' ? "/api/export-pdf" : "/api/export-word", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ html: fullHtml, filename: filename }),
-      });
+      const res = await fetch(
+        fileTpe === "pdf" ? "/api/export-pdf" : "/api/export-word",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ html: fullHtml, filename: filename }),
+        },
+      );
 
       if (!res.ok) {
         const errorMessage = await res.text();
@@ -153,158 +156,27 @@ async function exportFileAs(fileTpe: 'pdf' | 'word' = 'pdf') {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = filename; 
+      a.download = filename;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      console.log(`${fileTpe.toUpperCase()} file "${filename}" successfully downloaded.`);
+      console.log(
+        `${fileTpe.toUpperCase()} file "${filename}" successfully downloaded.`,
+      );
     } catch (error) {
       console.error(`Error exporting as ${fileTpe.toUpperCase()}:`, error);
     } finally {
       loading = false;
     }
-}
-
+  }
 
   async function exportAsPDF() {
-
-    exportFileAs('pdf');
-    return;
-
-    try {
-      const fullHtml = `
-        <html>
-          <head>
-            <style>
-              body {
-                font-family: "Helvetica", sans-serif;
-                font-size: 16px;
-              }
-
-              #imageSection img {
-                max-width: 100%;
-                max-height: 500px;
-                object-fit: contain;
-              }
-
-              #messageSection {
-                font-size: 16px;
-                line-height: 1.6;
-              }
-            </style>
-          </head>
-          <body>
-          <div id="messageSection">
-              ${exportedTextElement ? exportedTextElement.outerHTML : "<br/>"}
-            </div>
-            <div id="imageSection">
-              ${exportedImageElement ? removeDownloadButton(exportedImageElement.outerHTML) : "<br/>"}
-            </div>
-          </body>
-        </html>
-      `;
-
-      loading = true;
-
-      const filename = `prompt-result-${Date.now()}.pdf`;
-
-      const res = await fetch("/api/export-pdf", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ html: fullHtml, filename: filename }),
-      });
-
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = filename;
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error("Error exporting as PDF:", error);
-    } finally {
-      loading = false;
-    }
+    exportFileAs("pdf");
   }
 
   async function exportToWord() {
-    exportFileAs('word');
-    return;
-
-    try {
-      const fullHtml = `
-        <html>
-          <head>
-            <style>
-              body {
-                font-family: "Helvetica", sans-serif;
-                font-size: 16px;
-              }
-
-              #imageSection img {
-                max-width: 100%;
-                max-height: 500px;
-                object-fit: contain;
-              }
-
-              #messageSection {
-                font-size: 16px;
-                line-height: 1.6;
-              }
-            </style>
-          </head>
-          <body>
-          <div id="messageSection">
-              ${exportedTextElement ? exportedTextElement.outerHTML : "<br/>"}
-            </div>
-            <div id="imageSection">
-              ${exportedImageElement ? removeDownloadButton(exportedImageElement.outerHTML) : "<br/>"}
-            </div>
-          </body>
-        </html>
-      `;
-
-      loading = true;
-
-      let filename = `prompt-result-${Date.now()}.docx`;
-
-      const res = await fetch("/api/export-word", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ html: fullHtml, filename: filename }),
-      });
-
-      if (!res.ok) {
-        const errorMessage = await res.text();
-        throw new Error(`Server conversion failed: ${errorMessage}`);
-      }
-      const blob = await res.blob();
-
-      const contentDisposition = res.headers.get("Content-Disposition");
-      if (contentDisposition) {
-        const match = contentDisposition.match(/filename="(.+?)"/);
-        if (match && match[1]) {
-          filename = match[1];
-        }
-      }
-
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = filename; 
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      console.log(`DOCX file "${filename}" successfully downloaded.`);
-
-    } catch (error) {
-      console.error("Error exporting as Word:", error);
-    } finally {
-      loading = false;
-    }
+    exportFileAs("word");
   }
 </script>
 
@@ -365,12 +237,6 @@ async function exportFileAs(fileTpe: 'pdf' | 'word' = 'pdf') {
                           <div
                             class="flex flex-row justify-items-end order-last"
                           >
-                            <!-- <MessageAction
-                              message={rawData}
-                              author={"message-" + index}
-                              contentElement={exportedTextElement}
-                            /> -->
-
                             <button
                               onclick={exportAsPDF}
                               title="PDF"
