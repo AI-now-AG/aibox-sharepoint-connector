@@ -8,7 +8,6 @@
   import { user } from "$stores";
   import { useTranslations } from "$i18n/utils";
   import { markdownToHtml, textToHtml } from "$utils/textFormatting";
-  import MessageAction from "$components/MessageAction.svelte";
   import Loading from "$components/Loading.svelte";
 
   const t = useTranslations();
@@ -93,7 +92,7 @@
     return doc.body.innerHTML;
   }
 
-  async function exportAsPDF() {
+async function exportFileAs(fileTpe: 'pdf' | 'word' = 'pdf') {
     try {
       const fullHtml = `
         <html>
@@ -129,21 +128,180 @@
 
       loading = true;
 
+      let filename = `prompt-result-${Date.now()}.${fileTpe === 'pdf' ? 'pdf' : 'docx'}`;
+
+      const res = await fetch(fileTpe === 'pdf' ? "/api/export-pdf" : "/api/export-word", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ html: fullHtml, filename: filename }),
+      });
+
+      if (!res.ok) {
+        const errorMessage = await res.text();
+        throw new Error(`Server conversion failed: ${errorMessage}`);
+      }
+      const blob = await res.blob();
+
+      const contentDisposition = res.headers.get("Content-Disposition");
+      if (contentDisposition) {
+        const match = contentDisposition.match(/filename="(.+?)"/);
+        if (match && match[1]) {
+          filename = match[1];
+        }
+      }
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename; 
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      console.log(`${fileTpe.toUpperCase()} file "${filename}" successfully downloaded.`);
+    } catch (error) {
+      console.error(`Error exporting as ${fileTpe.toUpperCase()}:`, error);
+    } finally {
+      loading = false;
+    }
+}
+
+
+  async function exportAsPDF() {
+
+    exportFileAs('pdf');
+    return;
+
+    try {
+      const fullHtml = `
+        <html>
+          <head>
+            <style>
+              body {
+                font-family: "Helvetica", sans-serif;
+                font-size: 16px;
+              }
+
+              #imageSection img {
+                max-width: 100%;
+                max-height: 500px;
+                object-fit: contain;
+              }
+
+              #messageSection {
+                font-size: 16px;
+                line-height: 1.6;
+              }
+            </style>
+          </head>
+          <body>
+          <div id="messageSection">
+              ${exportedTextElement ? exportedTextElement.outerHTML : "<br/>"}
+            </div>
+            <div id="imageSection">
+              ${exportedImageElement ? removeDownloadButton(exportedImageElement.outerHTML) : "<br/>"}
+            </div>
+          </body>
+        </html>
+      `;
+
+      loading = true;
+
+      const filename = `prompt-result-${Date.now()}.pdf`;
+
       const res = await fetch("/api/export-pdf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ html: fullHtml }),
+        body: JSON.stringify({ html: fullHtml, filename: filename }),
       });
 
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `prompt-result-${Date.now()}.pdf`;
+      a.download = filename;
       a.click();
       URL.revokeObjectURL(url);
     } catch (error) {
       console.error("Error exporting as PDF:", error);
+    } finally {
+      loading = false;
+    }
+  }
+
+  async function exportToWord() {
+    exportFileAs('word');
+    return;
+
+    try {
+      const fullHtml = `
+        <html>
+          <head>
+            <style>
+              body {
+                font-family: "Helvetica", sans-serif;
+                font-size: 16px;
+              }
+
+              #imageSection img {
+                max-width: 100%;
+                max-height: 500px;
+                object-fit: contain;
+              }
+
+              #messageSection {
+                font-size: 16px;
+                line-height: 1.6;
+              }
+            </style>
+          </head>
+          <body>
+          <div id="messageSection">
+              ${exportedTextElement ? exportedTextElement.outerHTML : "<br/>"}
+            </div>
+            <div id="imageSection">
+              ${exportedImageElement ? removeDownloadButton(exportedImageElement.outerHTML) : "<br/>"}
+            </div>
+          </body>
+        </html>
+      `;
+
+      loading = true;
+
+      let filename = `prompt-result-${Date.now()}.docx`;
+
+      const res = await fetch("/api/export-word", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ html: fullHtml, filename: filename }),
+      });
+
+      if (!res.ok) {
+        const errorMessage = await res.text();
+        throw new Error(`Server conversion failed: ${errorMessage}`);
+      }
+      const blob = await res.blob();
+
+      const contentDisposition = res.headers.get("Content-Disposition");
+      if (contentDisposition) {
+        const match = contentDisposition.match(/filename="(.+?)"/);
+        if (match && match[1]) {
+          filename = match[1];
+        }
+      }
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename; 
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      console.log(`DOCX file "${filename}" successfully downloaded.`);
+
+    } catch (error) {
+      console.error("Error exporting as Word:", error);
     } finally {
       loading = false;
     }
@@ -222,7 +380,9 @@
                             </button>
 
                             <button
-                              onclick={() => {}}
+                              onclick={() => {
+                                exportToWord();
+                              }}
                               title="Word"
                               class="btn p-2 btn-ghost"
                             >
