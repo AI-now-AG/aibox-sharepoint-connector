@@ -9,6 +9,7 @@
   import { useTranslations } from "$i18n/utils";
   import { markdownToHtml, textToHtml } from "$utils/textFormatting";
   import Loading from "$components/Loading.svelte";
+  import { addToast } from "$stores/toast";
   // import MessageAction from "$components/MessageAction.svelte";
 
   const t = useTranslations();
@@ -195,12 +196,13 @@
   async function sendMessageResultViaEmail() {
     try {
       const fullHtml = getFullHtmlContent();
+      const to = "hoanghcmus@gmail.com";
       const payload = {
-        to: "hoanghcmus@gmail.com",
+        to: to,
         subject: "Shared AI Prompt Result",
         html: fullHtml,
       };
-      
+
       loading = true;
       const res = await fetch("/api/send-email", {
         method: "POST",
@@ -213,10 +215,17 @@
         throw new Error(errorText);
       }
 
-      alert("✅ Email sent successfully!");
+      addToast({
+        message: `✅ Email sent to ${to} successfully!`,
+        type: "success",
+      });
     } catch (err) {
       console.error("Error sending email:", err);
       alert("❌ Failed to send email.");
+      addToast({
+        message: "❌ Failed to send email.",
+        type: "error",
+      });
     } finally {
       loading = false;
     }
@@ -297,9 +306,7 @@
                             </button>
 
                             <button
-                              onclick={() => {
-                                sendMessageResultViaEmail();
-                              }}
+                              onclick={sendMessageResultViaEmail}
                               title="Email"
                               class="btn p-2 btn-ghost"
                             >
