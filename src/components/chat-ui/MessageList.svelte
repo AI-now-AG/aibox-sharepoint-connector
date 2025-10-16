@@ -9,6 +9,7 @@
   import { useTranslations } from "$i18n/utils";
   import { markdownToHtml, textToHtml } from "$utils/textFormatting";
   import Loading from "$components/Loading.svelte";
+  // import MessageAction from "$components/MessageAction.svelte";
 
   const t = useTranslations();
 
@@ -92,39 +93,51 @@
     return doc.body.innerHTML;
   }
 
+  function getFullHtmlContent() {
+    return `
+      <html>
+        <head>
+          <style>
+            body {
+              font-family: "Helvetica", sans-serif;
+              font-size: 16px;
+            }
+
+            #imageSection img {
+              max-width: 100%;
+              max-height: 500px;
+              object-fit: contain;
+            }
+
+            #messageSection {
+              font-size: 16px;
+              line-height: 1.6;
+            }
+
+            table, th, td {
+              border: 1px solid black;
+            }
+
+            table {
+              border-collapse: collapse; 
+            }
+          </style>
+        </head>
+        <body>
+          <div id="messageSection">
+            ${exportedTextElement ? exportedTextElement.outerHTML : "<br/>"}
+          </div>
+          <div id="imageSection">
+            ${exportedImageElement ? removeDownloadButton(exportedImageElement.outerHTML) : "<br/>"}
+          </div>
+        </body>
+      </html>
+    `;
+  }
+
   async function exportFileAs(fileTpe: "pdf" | "word" = "pdf") {
     try {
-      const fullHtml = `
-        <html>
-          <head>
-            <style>
-              body {
-                font-family: "Helvetica", sans-serif;
-                font-size: 16px;
-              }
-
-              #imageSection img {
-                max-width: 100%;
-                max-height: 500px;
-                object-fit: contain;
-              }
-
-              #messageSection {
-                font-size: 16px;
-                line-height: 1.6;
-              }
-            </style>
-          </head>
-          <body>
-          <div id="messageSection">
-              ${exportedTextElement ? exportedTextElement.outerHTML : "<br/>"}
-            </div>
-            <div id="imageSection">
-              ${exportedImageElement ? removeDownloadButton(exportedImageElement.outerHTML) : "<br/>"}
-            </div>
-          </body>
-        </html>
-      `;
+      const fullHtml = getFullHtmlContent();
 
       loading = true;
 
@@ -171,12 +184,42 @@
     }
   }
 
-  async function exportAsPDF() {
+  async function exportToPDF() {
     exportFileAs("pdf");
   }
 
   async function exportToWord() {
     exportFileAs("word");
+  }
+
+  async function sendMessageResultViaEmail() {
+    try {
+      const fullHtml = getFullHtmlContent();
+      const payload = {
+        to: "hoanghcmus@gmail.com",
+        subject: "Shared AI Prompt Result",
+        html: fullHtml,
+      };
+      
+      loading = true;
+      const res = await fetch("/api/send-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(errorText);
+      }
+
+      alert("✅ Email sent successfully!");
+    } catch (err) {
+      console.error("Error sending email:", err);
+      alert("❌ Failed to send email.");
+    } finally {
+      loading = false;
+    }
   }
 </script>
 
@@ -238,7 +281,7 @@
                             class="flex flex-row justify-items-end order-last"
                           >
                             <button
-                              onclick={exportAsPDF}
+                              onclick={exportToPDF}
                               title="PDF"
                               class="btn p-2 btn-ghost"
                             >
@@ -246,9 +289,7 @@
                             </button>
 
                             <button
-                              onclick={() => {
-                                exportToWord();
-                              }}
+                              onclick={exportToWord}
                               title="Word"
                               class="btn p-2 btn-ghost"
                             >
@@ -256,7 +297,9 @@
                             </button>
 
                             <button
-                              onclick={() => {}}
+                              onclick={() => {
+                                sendMessageResultViaEmail();
+                              }}
                               title="Email"
                               class="btn p-2 btn-ghost"
                             >
@@ -274,6 +317,11 @@
                                 {@html svgIcons.copyClipboard}
                               {/if}
                             </button>
+
+                            <!-- <MessageAction
+                              author={"Steve"}
+                              message={getFullHtmlContent()}
+                            /> -->
                           </div>
                         </div>
                       {/if}

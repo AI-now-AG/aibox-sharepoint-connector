@@ -5,7 +5,6 @@
   interface Props {
     author?: string;
     message?: any;
-    contentElement: HTMLElement;
   }
   const { author, message }: Props = $props();
 
@@ -36,38 +35,17 @@
   }
 </script>
 
-<div
-  class="message-card relative bg-white dark:bg-gray-900 shadow p-4 rounded-2xl"
+<button
+  onclick={exportAsWord}
+  title="Export as Word"
+  class="p-1 hover:bg-gray-100 rounded"
 >
-  <div class="flex justify-between items-start">
-    <div class="flex flex-col gap-2 ml-2">
-      <!-- <button
-        onclick={exportAsPDF}
-        title="Export as PDF"
-        class="p-1 hover:bg-gray-100 rounded"
-      >
-        📄
-      </button> -->
-      <button
-        onclick={exportAsWord}
-        title="Export as Word"
-        class="p-1 hover:bg-gray-100 rounded"
-      >
-        🧾
-      </button>
-      <button
-        onclick={shareByEmail}
-        title="Share via Email"
-        class="p-1 hover:bg-gray-100 rounded"
-      >
-        ✉️
-      </button>
-    </div>
-  </div>
-</div>
-
-<style>
-  .message-card {
-    width: 100%;
-  }
-</style>
+  🧾
+</button>
+<button
+  onclick={shareByEmail}
+  title="Share via Email"
+  class="p-1 hover:bg-gray-100 rounded"
+>
+  ✉️
+</button>
