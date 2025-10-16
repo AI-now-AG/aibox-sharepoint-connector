@@ -10,6 +10,8 @@
   import { markdownToHtml, textToHtml } from "$utils/textFormatting";
   import Loading from "$components/Loading.svelte";
   import { addToast } from "$stores/toast";
+  import InputDialog from "$components/InputDialog.svelte";
+  import { isValidEmail } from "$utils/common";
   // import MessageAction from "$components/MessageAction.svelte";
 
   const t = useTranslations();
@@ -40,6 +42,10 @@
 
   let exportedTextElement: HTMLElement = $state<any>(null);
   let exportedImageElement: HTMLElement = $state<any>(null);
+
+  let sendEmailToModal: HTMLDialogElement | undefined = $state();
+  let toEmail = $state("");
+  let sendEmailPromptResultError = $state("");
 
   const handleCopy = (event: any) => {
     const selection = window.getSelection();
@@ -196,9 +202,8 @@
   async function sendMessageResultViaEmail() {
     try {
       const fullHtml = getFullHtmlContent();
-      const to = "hoanghcmus@gmail.com";
       const payload = {
-        to: to,
+        to: toEmail,
         subject: "Shared AI Prompt Result",
         html: fullHtml,
       };
@@ -216,7 +221,7 @@
       }
 
       addToast({
-        message: `✅ Email sent to ${to} successfully!`,
+        message: `✅ Email sent to ${toEmail} successfully!`,
         type: "success",
       });
     } catch (err) {
@@ -306,7 +311,9 @@
                             </button>
 
                             <button
-                              onclick={sendMessageResultViaEmail}
+                              onclick={() => {
+                                sendEmailToModal?.show();
+                              }}
                               title="Email"
                               class="btn p-2 btn-ghost"
                             >
@@ -401,5 +408,23 @@
     </div>
   </div>
 {/if}
+
+<InputDialog
+  bind:modal={sendEmailToModal}
+  bind:value={toEmail}
+  bind:errorMessage={sendEmailPromptResultError}
+  title={"Share AI Prompt Result"}
+  label={t("login.email")}
+  ctaText={"Send"}
+  save={(email: string) => {
+    if (!isValidEmail(email)) {
+      sendEmailPromptResultError = t("tenant.email-invalid");
+    } else {
+      sendEmailPromptResultError = "";
+      sendEmailToModal?.close();
+      sendMessageResultViaEmail();
+    }
+  }}
+/>
 
 <Loading show={loading} />
