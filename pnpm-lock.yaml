@@ -110,6 +110,9 @@ importers:
       auth0:
         specifier: ^4.23.0
         version: 4.23.0
+      chrome-aws-lambda:
+        specifier: ^10.1.0
+        version: 10.1.0(puppeteer-core@24.25.0)
       daisyui:
         specifier: ^5.0.35
         version: 5.0.35
@@ -173,6 +176,9 @@ importers:
       puppeteer:
         specifier: ^24.25.0
         version: 24.25.0(typescript@5.8.3)
+      puppeteer-core:
+        specifier: ^24.25.0
+        version: 24.25.0
       slug:
         specifier: ^10.0.0
         version: 10.0.0
@@ -4153,6 +4159,12 @@ packages:
     resolution: {integrity: sha512-+IxzY9BZOQd/XuYPRmrvEVjF/nqj5kgT4kEq7VofrDoM1MxoRjEWkrCC3EtLi59TVawxTAn+orJwFQcrqEN1+g==}
     engines: {node: '>=18'}
 
+  chrome-aws-lambda@10.1.0:
+    resolution: {integrity: sha512-NZQVf+J4kqG4sVhRm3WNmOfzY0OtTSm+S8rg77pwePa9RCYHzhnzRs8YvNI6L9tALIW6RpmefWiPURt3vURXcw==}
+    engines: {node: '>= 10.16'}
+    peerDependencies:
+      puppeteer-core: ^10.1.0
+
   chromium-bidi@9.1.0:
     resolution: {integrity: sha512-rlUzQ4WzIAWdIbY/viPShhZU2n21CxDUgazXVbw4Hu1MwaeUSEksSeM6DqPgpRjCLXRk702AVRxJxoOz0dw4OA==}
     peerDependencies:
@@ -6193,6 +6205,13 @@ packages:
     resolution: {integrity: sha512-bPcgpIXbHnVGfI/omZIlgucDqlf4LrsunwoKue5JdZeGybt8L6KyJz2Zu19ffuZwIwLj2NAI2ZyaqNT6/cetcg==}
     engines: {node: '>=8'}
     hasBin: true
+
+  lambdafs@2.1.1:
+    resolution: {integrity: sha512-x5k8JcoJWkWLvCVBzrl4pzvkEHSgSBqFjg3Dpsc4AcTMq7oUMym4cL/gRTZ6VM4mUMY+M0dIbQ+V1c1tsqqanQ==}
+    engines: {node: '>= 10.16'}
+    hasBin: true
+    bundledDependencies:
+      - tar-fs
 
   langchain@0.3.25:
     resolution: {integrity: sha512-ADUE7zfW4C72YJ+jdDU2xtHly8oigPaRMzP40GBU24vRUtDY1tHxWjKuAVkzXvrciV3GNeMZVRYBYWPt5EoZ5Q==}
@@ -11915,7 +11934,7 @@ snapshots:
 
   '@puppeteer/browsers@2.10.12':
     dependencies:
-      debug: 4.4.3
+      debug: 4.4.3(supports-color@9.4.0)
       extract-zip: 2.0.1
       progress: 2.0.3
       proxy-agent: 6.5.0
@@ -12734,7 +12753,7 @@ snapshots:
     dependencies:
       '@typescript-eslint/types': 5.62.0
       '@typescript-eslint/visitor-keys': 5.62.0
-      debug: 4.4.1(supports-color@9.4.0)
+      debug: 4.4.3(supports-color@9.4.0)
       globby: 11.1.0
       is-glob: 4.0.3
       semver: 7.7.2
@@ -13470,9 +13489,18 @@ snapshots:
       '@fastify/error': 3.4.1
       fastq: 1.19.1
 
-  axios@1.7.9(debug@4.4.3):
+  axios@1.7.9:
     dependencies:
       follow-redirects: 1.15.9(debug@4.4.0)
+      form-data: 4.0.2
+      proxy-from-env: 1.1.0
+    transitivePeerDependencies:
+      - debug
+    optional: true
+
+  axios@1.7.9(debug@4.4.3):
+    dependencies:
+      follow-redirects: 1.15.9(debug@4.4.3)
       form-data: 4.0.2
       proxy-from-env: 1.1.0
     transitivePeerDependencies:
@@ -13755,6 +13783,11 @@ snapshots:
   chownr@2.0.0: {}
 
   chownr@3.0.0: {}
+
+  chrome-aws-lambda@10.1.0(puppeteer-core@24.25.0):
+    dependencies:
+      lambdafs: 2.1.1
+      puppeteer-core: 24.25.0
 
   chromium-bidi@9.1.0(devtools-protocol@0.0.1508733):
     dependencies:
@@ -14087,9 +14120,11 @@ snapshots:
     optionalDependencies:
       supports-color: 9.4.0
 
-  debug@4.4.3:
+  debug@4.4.3(supports-color@9.4.0):
     dependencies:
       ms: 2.1.3
+    optionalDependencies:
+      supports-color: 9.4.0
 
   decache@4.6.2:
     dependencies:
@@ -15118,6 +15153,10 @@ snapshots:
     optionalDependencies:
       debug: 4.4.0
 
+  follow-redirects@1.15.9(debug@4.4.3):
+    optionalDependencies:
+      debug: 4.4.3(supports-color@9.4.0)
+
   foreground-child@3.3.1:
     dependencies:
       cross-spawn: 7.0.6
@@ -15271,7 +15310,7 @@ snapshots:
     dependencies:
       basic-ftp: 5.0.5
       data-uri-to-buffer: 6.0.2
-      debug: 4.4.3
+      debug: 4.4.3(supports-color@9.4.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -15645,7 +15684,7 @@ snapshots:
   http-proxy-agent@7.0.2:
     dependencies:
       agent-base: 7.1.3
-      debug: 4.4.1(supports-color@9.4.0)
+      debug: 4.4.3(supports-color@9.4.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -15684,7 +15723,7 @@ snapshots:
   https-proxy-agent@5.0.1(supports-color@9.4.0):
     dependencies:
       agent-base: 6.0.2(supports-color@9.4.0)
-      debug: 4.4.1(supports-color@9.4.0)
+      debug: 4.4.3(supports-color@9.4.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -15714,7 +15753,7 @@ snapshots:
       '@types/tough-cookie': 4.0.5
       axios: 1.7.9(debug@4.4.3)
       camelcase: 6.3.0
-      debug: 4.4.3
+      debug: 4.4.3(supports-color@9.4.0)
       dotenv: 16.5.0
       extend: 3.0.2
       file-type: 16.5.4
@@ -16150,6 +16189,8 @@ snapshots:
       dotenv: 16.5.0
       winston: 3.17.0
 
+  lambdafs@2.1.1: {}
+
   langchain@0.3.25(@langchain/anthropic@0.3.28(@langchain/core@0.3.77(@opentelemetry/api@1.8.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.8.0))(openai@4.104.0(ws@8.18.3)(zod@3.24.4))))(@langchain/core@0.3.77(@opentelemetry/api@1.8.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.8.0))(openai@4.104.0(ws@8.18.3)(zod@3.24.4)))(@langchain/google-genai@0.2.18(@langchain/core@0.3.77(@opentelemetry/api@1.8.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.8.0))(openai@4.104.0(ws@8.18.3)(zod@3.24.4))))(axios@1.7.9)(openai@4.104.0(ws@8.18.3)(zod@3.24.4))(ws@8.18.3):
     dependencies:
       '@langchain/core': 0.3.77(@opentelemetry/api@1.8.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.8.0))(openai@4.104.0(ws@8.18.3)(zod@3.24.4))
@@ -16168,7 +16209,7 @@ snapshots:
     optionalDependencies:
       '@langchain/anthropic': 0.3.28(@langchain/core@0.3.77(@opentelemetry/api@1.8.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.8.0))(openai@4.104.0(ws@8.18.3)(zod@3.24.4)))
       '@langchain/google-genai': 0.2.18(@langchain/core@0.3.77(@opentelemetry/api@1.8.0)(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.8.0))(openai@4.104.0(ws@8.18.3)(zod@3.24.4)))
-      axios: 1.7.9(debug@4.4.3)
+      axios: 1.7.9
     transitivePeerDependencies:
       - encoding
       - openai
@@ -16856,7 +16897,7 @@ snapshots:
   micromark@4.0.2:
     dependencies:
       '@types/debug': 4.1.12
-      debug: 4.4.1(supports-color@9.4.0)
+      debug: 4.4.3(supports-color@9.4.0)
       decode-named-character-reference: 1.1.0
       devlop: 1.1.0
       micromark-core-commonmark: 2.0.3
@@ -17526,7 +17567,7 @@ snapshots:
     dependencies:
       '@tootallnate/quickjs-emscripten': 0.23.0
       agent-base: 7.1.3
-      debug: 4.4.3
+      debug: 4.4.3(supports-color@9.4.0)
       get-uri: 6.0.5
       http-proxy-agent: 7.0.2
       https-proxy-agent: 7.0.6
@@ -18002,7 +18043,7 @@ snapshots:
   proxy-agent@6.5.0:
     dependencies:
       agent-base: 7.1.3
-      debug: 4.4.3
+      debug: 4.4.3(supports-color@9.4.0)
       http-proxy-agent: 7.0.2
       https-proxy-agent: 7.0.6
       lru-cache: 7.18.3
@@ -18044,7 +18085,7 @@ snapshots:
     dependencies:
       '@puppeteer/browsers': 2.10.12
       chromium-bidi: 9.1.0(devtools-protocol@0.0.1508733)
-      debug: 4.4.3
+      debug: 4.4.3(supports-color@9.4.0)
       devtools-protocol: 0.0.1508733
       typed-query-selector: 2.12.0
       webdriver-bidi-protocol: 0.3.7
@@ -18289,7 +18330,7 @@ snapshots:
 
   require-in-the-middle@7.5.2:
     dependencies:
-      debug: 4.4.1(supports-color@9.4.0)
+      debug: 4.4.3(supports-color@9.4.0)
       module-details-from-path: 1.0.4
       resolve: 1.22.10
     transitivePeerDependencies:
@@ -18689,7 +18730,7 @@ snapshots:
   socks-proxy-agent@8.0.5:
     dependencies:
       agent-base: 7.1.3
-      debug: 4.4.3
+      debug: 4.4.3(supports-color@9.4.0)
       socks: 2.8.7
     transitivePeerDependencies:
       - supports-color
