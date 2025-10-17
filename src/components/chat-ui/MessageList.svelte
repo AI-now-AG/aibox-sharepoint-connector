@@ -12,6 +12,7 @@
   import { addToast } from "$stores/toast";
   import InputDialog from "$components/InputDialog.svelte";
   import { isValidEmail } from "$utils/common";
+  import { Document, Packer, Paragraph, TextRun, HeadingLevel } from "docx";
   // import MessageAction from "$components/MessageAction.svelte";
 
   import jsPDF from "jspdf";
@@ -289,6 +290,59 @@
     }
   }
 
+  async function exportWordClientSide(index: number = 0) {
+    if (typeof window === "undefined") return;
+
+    // Example: extract your HTML/text content
+    const textElement = document.getElementById("exportedTextElement-" + index);
+    const imageElement = document.getElementById(
+      "exportedImageElement-" + index,
+    );
+    const text = textElement?.innerText ?? "";
+    const imageSrc = imageElement?.querySelector("img")?.src ?? null;
+
+    // 1️⃣ Create document
+    const doc = new Document({
+      sections: [
+        {
+          properties: {},
+          children: [
+            new Paragraph({
+              children: [new TextRun(text)],
+            }),
+            ...(imageSrc ? [await createImageParagraph(imageSrc)] : []),
+          ],
+        },
+      ],
+    });
+
+    // 2️⃣ Generate and download file
+    const blob = await Packer.toBlob(doc);
+    const filename = `exported-${Date.now()}.docx`;
+
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    link.click();
+    URL.revokeObjectURL(link.href);
+  }
+
+  // Utility to embed image
+  async function createImageParagraph(src: string) {
+    const res = await fetch(src);
+    const arrayBuffer = await res.arrayBuffer();
+    const { ImageRun, Paragraph } = await import("docx");
+
+    return new Paragraph({
+      children: [
+        new ImageRun({
+          data: arrayBuffer,
+          transformation: { width: 400, height: 300 },
+        }),
+      ],
+    });
+  }
+
   async function exportToPDF(index: number = 0) {
     const imageElement = document.getElementById(
       "exportedImageElement-" + index,
@@ -301,7 +355,8 @@
   }
 
   async function exportToWord(index: number = 0) {
-    exportFileAs("word", index);
+    // exportFileAs("word", index);
+    exportWordClientSide(index);
   }
 
   async function sendMessageResultViaEmail(index: number = 0) {
