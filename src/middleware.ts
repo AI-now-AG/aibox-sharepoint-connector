@@ -17,18 +17,18 @@ import { wildcardMatch, wildcardMatchInArray } from "$utils/wildcardMatch";
 
 async function requestOrigin(context: APIContext, next: MiddlewareNext) {
   const path = context.url.pathname;
-  const isAudioConversion = path.includes('/api/audio/convert-to-mono');
+  const isAudioConversion = path.includes("/api/audio/convert-to-mono");
 
   // Set CORS headers for audio conversion endpoint
   if (isAudioConversion) {
-    if (context.request.method === 'OPTIONS') {
+    if (context.request.method === "OPTIONS") {
       return new Response(null, {
         status: 204,
         headers: {
-          'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, X-API-Key',
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Max-Age': '86400', // 24 hours
+          "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type, X-API-Key",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Max-Age": "86400", // 24 hours
         },
       });
     }
@@ -36,7 +36,7 @@ async function requestOrigin(context: APIContext, next: MiddlewareNext) {
     // For actual requests, let the response handle CORS headers
     const response = await next();
     const newHeaders = new Headers(response.headers);
-    newHeaders.set('Access-Control-Allow-Origin', '*');
+    newHeaders.set("Access-Control-Allow-Origin", "*");
 
     return new Response(response.body, {
       status: response.status,
@@ -84,14 +84,15 @@ async function authenticate(context: APIContext, next: MiddlewareNext) {
   const { session, user } = await lucia.validateSession(sessionId);
   if (!session) return sessionRequired();
 
-  if (session && session.fresh) {
-    const sessionCookie = lucia.createSessionCookie(session.id);
-    context.cookies.set(
-      sessionCookie.name,
-      sessionCookie.value,
-      sessionCookie.attributes,
-    );
-  }
+  // Skip cookie refresh — we use fixed-lifetime sessions (no auto-extension)
+  // if (session && session.fresh) {
+  //   const sessionCookie = lucia.createSessionCookie(session.id);
+  //   context.cookies.set(
+  //     sessionCookie.name,
+  //     sessionCookie.value,
+  //     sessionCookie.attributes,
+  //   );
+  // }
 
   context.locals.session = session;
   context.locals.user = user;
@@ -132,9 +133,7 @@ async function restrictAccess(context: APIContext, next: MiddlewareNext) {
     context.locals.tenant?.active == false &&
     context.url.pathname !== "/api/logout"
   ) {
-    return context.redirect(
-      `/error?error=tenant_inactive`,
-    );
+    return context.redirect(`/error?error=tenant_inactive`);
   }
 
   // Ensure that blocked users are restricted from accessing the admin area

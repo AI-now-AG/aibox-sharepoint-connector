@@ -1,6 +1,6 @@
 import { Auth0 } from "arctic";
 import { MongodbAdapter } from "@lucia-auth/adapter-mongodb";
-import { Lucia } from "lucia";
+import { Lucia, TimeSpan } from "lucia";
 import {
   collection as userCollection,
   type User,
@@ -8,9 +8,22 @@ import {
 import type { ObjectId } from "mongodb";
 import { collection as sessionCollection } from "$data/models/session.model";
 
-export const adapter = new MongodbAdapter(sessionCollection, userCollection);
+// export const adapter = new MongodbAdapter(sessionCollection, userCollection);
+
+// 🔧 Create a subclass that disables auto-extension
+class NoExtendMongoAdapter extends MongodbAdapter {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async updateSessionExpiration(sessionId: string, expiresAt: Date) {
+    // 🚫 Do nothing, prevents auto-extension
+    return;
+  }
+}
+
+// use your subclass
+const adapter = new NoExtendMongoAdapter(sessionCollection, userCollection);
 
 export const lucia = new Lucia(adapter, {
+  sessionExpiresIn: new TimeSpan(5, "m"),
   sessionCookie: {
     attributes: {
       secure: import.meta.env.PROD,
