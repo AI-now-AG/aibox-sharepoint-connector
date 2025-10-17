@@ -40,9 +40,6 @@
   let timer: NodeJS.Timeout;
   let loading: boolean = $state(false);
 
-  let exportedTextElement: HTMLElement = $state<any>(null);
-  let exportedImageElement: HTMLElement = $state<any>(null);
-
   let sendEmailToModal: HTMLDialogElement | undefined = $state();
   let toEmail = $state("");
   let sendEmailPromptResultError = $state("");
@@ -100,7 +97,11 @@
     return doc.body.innerHTML;
   }
 
-  function getFullHtmlContent() {
+  function getFullHtmlContent(index: number = 0): string {
+    const textElement = document.getElementById("exportedTextElement-" + index);
+    const imageElement = document.getElementById(
+      "exportedImageElement-" + index,
+    );
     return `
       <html>
         <head>
@@ -132,19 +133,22 @@
         </head>
         <body>
           <div id="messageSection">
-            ${exportedTextElement ? exportedTextElement.outerHTML : "<br/>"}
+            ${textElement ? textElement.outerHTML : "<br/>"}
           </div>
           <div id="imageSection">
-            ${exportedImageElement ? removeDownloadButton(exportedImageElement.outerHTML) : "<br/>"}
+            ${imageElement ? removeDownloadButton(imageElement.outerHTML) : "<br/>"}
           </div>
         </body>
       </html>
     `;
   }
 
-  async function exportFileAs(fileTpe: "pdf" | "word" = "pdf") {
+  async function exportFileAs(
+    fileTpe: "pdf" | "word" = "pdf",
+    index: number = 0,
+  ) {
     try {
-      const fullHtml = getFullHtmlContent();
+      const fullHtml = getFullHtmlContent(index);
 
       loading = true;
 
@@ -191,17 +195,17 @@
     }
   }
 
-  async function exportToPDF() {
-    exportFileAs("pdf");
+  async function exportToPDF(index: number = 0) {
+    exportFileAs("pdf", index);
   }
 
-  async function exportToWord() {
-    exportFileAs("word");
+  async function exportToWord(index: number = 0) {
+    exportFileAs("word", index);
   }
 
-  async function sendMessageResultViaEmail() {
+  async function sendMessageResultViaEmail(index: number = 0) {
     try {
-      const fullHtml = getFullHtmlContent();
+      const fullHtml = getFullHtmlContent(index);
       const payload = {
         to: toEmail,
         subject: "Shared AI Prompt Result",
@@ -269,7 +273,7 @@
                           </p>
                           <div
                             class="mt-2 text-sm"
-                            bind:this={exportedTextElement}
+                            id={`exportedTextElement-${index}`}
                           >
                             {@html role == MessageRole.User
                               ? textToHtml(content)
@@ -295,7 +299,7 @@
                             class="flex flex-row justify-items-end order-last"
                           >
                             <button
-                              onclick={exportToPDF}
+                              onclick={() => exportToPDF(index)}
                               title="PDF"
                               class="btn p-2 btn-ghost"
                             >
@@ -303,7 +307,7 @@
                             </button>
 
                             <button
-                              onclick={exportToWord}
+                              onclick={() => exportToWord(index)}
                               title="Word"
                               class="btn p-2 btn-ghost"
                             >
@@ -334,7 +338,7 @@
 
                             <!-- <MessageAction
                               author={"Steve"}
-                              message={getFullHtmlContent()}
+                              message={getFullHtmlContent(index)}
                             /> -->
                           </div>
                         </div>
@@ -345,7 +349,7 @@
                   {#if role === MessageRole.Assistant && imageUrl}
                     <div
                       class="chat-bubble text-base-content bg-base-200"
-                      bind:this={exportedImageElement}
+                      id={`exportedImageElement-${index}`}
                     >
                       <ImageCard url={imageUrl} alt={content} {infoText} />
                     </div>
