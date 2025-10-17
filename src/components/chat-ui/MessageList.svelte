@@ -47,6 +47,7 @@
   let sendEmailToModal: HTMLDialogElement | undefined = $state();
   let toEmail = $state("");
   let sendEmailPromptResultError = $state("");
+  let sendEmailPromptResultIndex = $state(0);
 
   const handleCopy = (event: any) => {
     const selection = window.getSelection();
@@ -344,25 +345,27 @@
   }
 
   async function exportToPDF(index: number = 0) {
-    const imageElement = document.getElementById(
-      "exportedImageElement-" + index,
-    );
-    if (imageElement) {
-      await exportPdfClientSide(index);
-    } else {
-      await exportFileAs("pdf", index);
-    }
+    await exportFileAs("pdf", index);
+    // const imageElement = document.getElementById(
+    //   "exportedImageElement-" + index,
+    // );
+    // if (imageElement) {
+    //   await exportPdfClientSide(index);
+    // } else {
+    //   await exportFileAs("pdf", index);
+    // }
   }
 
   async function exportToWord(index: number = 0) {
-    const imageElement = document.getElementById(
-      "exportedImageElement-" + index,
-    );
-    if (imageElement) {
-      await exportWordClientSide(index);
-    } else {
-      awaitexportFileAs("word", index);
-    }
+    await exportFileAs("word", index);
+    // const imageElement = document.getElementById(
+    //   "exportedImageElement-" + index,
+    // );
+    // if (imageElement) {
+    //   await exportWordClientSide(index);
+    // } else {
+    //   await exportFileAs("word", index);
+    // }
   }
 
   async function sendMessageResultViaEmail(index: number = 0) {
@@ -478,6 +481,7 @@
 
                             <button
                               onclick={() => {
+                                sendEmailPromptResultIndex = index;
                                 sendEmailToModal?.show();
                               }}
                               title="Email"
@@ -584,6 +588,7 @@
       sendEmailPromptResultError = t("tenant.email-invalid");
     } else {
       sendEmailPromptResultError = "";
+      sendEmailPromptResultIndex = 0;
       sendEmailToModal?.close();
       sendMessageResultViaEmail();
     }
