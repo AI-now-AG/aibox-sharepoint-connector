@@ -355,8 +355,14 @@
   }
 
   async function exportToWord(index: number = 0) {
-    // exportFileAs("word", index);
-    exportWordClientSide(index);
+    const imageElement = document.getElementById(
+      "exportedImageElement-" + index,
+    );
+    if (imageElement) {
+      await exportWordClientSide(index);
+    } else {
+      awaitexportFileAs("word", index);
+    }
   }
 
   async function sendMessageResultViaEmail(index: number = 0) {
