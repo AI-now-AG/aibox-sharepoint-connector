@@ -79,6 +79,7 @@ import empty from "$assets/icons/empty.svg?raw";
 import pdf from "$assets/icons/pdf.svg?raw";
 import word from "$assets/icons/word.svg?raw";
 import email from "$assets/icons/email.svg?raw";
+import share from "$assets/icons/share.svg?raw";
 
 export const svgIcons = {
   menuSettings,
@@ -159,7 +160,8 @@ export const svgIcons = {
   dropdownArrowDown,
   error,
   empty,
-  pdf, 
-  word, 
-  email
+  pdf,
+  word,
+  email,
+  share
 };
