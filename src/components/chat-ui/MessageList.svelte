@@ -14,6 +14,9 @@
   import { isValidEmail } from "$utils/common";
   // import MessageAction from "$components/MessageAction.svelte";
 
+  import jsPDF from "jspdf";
+  import * as htmlToImage from "html-to-image";
+
   const t = useTranslations();
 
   interface Props {
@@ -142,7 +145,7 @@
       </html>
     `;
   }
-
+  // --- Export as PDF | Word on Server side ==> No Image, Only Text (multipe pages) ---
   async function exportFileAs(
     fileTpe: "pdf" | "word" = "pdf",
     index: number = 0,
@@ -195,8 +198,106 @@
     }
   }
 
+  // --- Export as PDF Client Side ==> Include image (single page)---
+  async function exportPdfClientSide(index: number = 0) {
+    const fullHtml = getFullHtmlContent(index);
+    const filename = `prompt-result-${Date.now()}.pdf`;
+    try {
+      loading = true;
+      const wrapper = document.createElement("div");
+      wrapper.style.position = "fixed";
+      wrapper.style.left = "-9999px";
+      wrapper.style.top = "0";
+      wrapper.style.opacity = "0";
+      wrapper.style.pointerEvents = "none";
+      wrapper.style.zIndex = "-9999";
+
+      wrapper.innerHTML = `
+        <div id="exportedContainer" style="font-family: Helvetica, sans-serif; font-size: 20px; line-height: 1.6; padding: 32px; width: 800px; background: white;">
+        ${fullHtml}
+        </div>
+      `;
+
+      document.body.appendChild(wrapper);
+
+      const container = wrapper.querySelector(
+        "#exportedContainer",
+      ) as HTMLElement;
+      const originalStyle = container.getAttribute("style") || "";
+      container.setAttribute(
+        "style",
+        `${originalStyle}; font-size: 20px; line-height: 1.6; padding: 24px; max-width: 800px;`,
+      );
+
+      const dataUrl = await htmlToImage.toPng(container, {
+        backgroundColor: "#ffffff",
+        cacheBust: true,
+        pixelRatio: 6, // higher = sharper text
+        skipFonts: true,
+        style: {
+          fontFamily: "Helvetica, sans-serif",
+          fontSize: "16px",
+        },
+      });
+
+      document.body.removeChild(wrapper);
+
+      // Create A4 PDF
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+      });
+
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const margin = 10;
+
+      // Compute image scaling
+      const imgProps = pdf.getImageProperties(dataUrl);
+      const imgWidth = imgProps.width;
+      const imgHeight = imgProps.height;
+      const aspectRatio = imgHeight / imgWidth;
+
+      // Scale image to nearly full width of the PDF (minus margin)
+      const renderWidth = pdfWidth - margin * 2;
+      const renderHeight = renderWidth * aspectRatio;
+
+      pdf.addImage(
+        dataUrl,
+        "PNG",
+        margin,
+        margin,
+        renderWidth,
+        renderHeight > pdfHeight - 20 ? pdfHeight - 20 : renderHeight,
+      );
+
+      pdf.save(filename);
+
+      addToast({
+        message: `✅ Email sent to ${toEmail} successfully!`,
+        type: "success",
+      });
+    } catch (err) {
+      console.error("Failed to export PDF:", err);
+      addToast({
+        message: "❌  Failed to export PDF",
+        type: "error",
+      });
+    } finally {
+      loading = false;
+    }
+  }
+
   async function exportToPDF(index: number = 0) {
-    exportFileAs("pdf", index);
+    const imageElement = document.getElementById(
+      "exportedImageElement-" + index,
+    );
+    if (imageElement) {
+      await exportPdfClientSide(index);
+    } else {
+      await exportFileAs("pdf", index);
+    }
   }
 
   async function exportToWord(index: number = 0) {
@@ -336,10 +437,7 @@
                               {/if}
                             </button>
 
-                            <!-- <MessageAction
-                              author={"Steve"}
-                              message={getFullHtmlContent(index)}
-                            /> -->
+                            <!-- <MessageAction html={getFullHtmlContent(index)} /> -->
                           </div>
                         </div>
                       {/if}
