@@ -183,7 +183,7 @@
 
   function showAlert(message: string) {
     alertMessage = message;
-    alertModal?.show();
+    alertModal?.showModal();
   }
 </script>
 

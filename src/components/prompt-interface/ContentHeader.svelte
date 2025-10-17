@@ -23,7 +23,8 @@
   const t = useTranslations();
 
   function addPrompt() {
-    addPromptDialog?.showModal();
+    // Use show() instead of showModal() to allow toast visibility
+    addPromptDialog?.show();
   }
 </script>
 

@@ -45,7 +45,7 @@
 
   async function handleDelete(categoryId: string) {
     groupToDelete = categoryId;
-    confirmDeleteModal?.show();
+    confirmDeleteModal?.showModal();
   }
 
   async function updateStatus(id: string, active: boolean) {

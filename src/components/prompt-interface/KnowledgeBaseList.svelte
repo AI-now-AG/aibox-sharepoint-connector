@@ -53,7 +53,7 @@
 
   function onDeleteCard(index: number) {
     selectedDeletePKnowledgeBaseId = items[index]?.id ?? "";
-    confirmDeleteModal?.show();
+    confirmDeleteModal?.showModal();
   }
 
   function removeDeletedItem(deletedId: string) {

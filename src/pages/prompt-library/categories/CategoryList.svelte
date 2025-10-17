@@ -49,7 +49,7 @@
 
   async function handleDelete(categoryId: string) {
     categoryToDelete = categoryId;
-    confirmDeleteModal?.show();
+    confirmDeleteModal?.showModal();
   }
 
   async function updateStatus(id: string, active: boolean) {

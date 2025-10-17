@@ -56,7 +56,7 @@
 
   function onDeleteCard(index: number) {
     selectedDeletePromptId = items[index]?.id ?? "";
-    confirmDeleteModal?.show();
+    confirmDeleteModal?.showModal();
   }
 
   function removeDeletedItem(deletedId: string) {

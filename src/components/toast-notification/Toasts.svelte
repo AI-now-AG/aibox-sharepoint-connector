@@ -5,7 +5,7 @@
 
 {#if $toasts}
   <div
-    class="flex flex-col fixed justify-center right-0 bottom-0 w-full z-1000"
+    class="flex flex-col fixed justify-center right-0 bottom-0 w-full z-[1000]"
   >
     {#each $toasts as toast (toast.id)}
       <Toast
