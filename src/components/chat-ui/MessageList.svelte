@@ -224,10 +224,7 @@
       }
 
       addToast({
-        message: t("prompt-execution.result.share-via-mail-success").replace(
-          "${toEmail}",
-          toEmail,
-        ),
+        message: t("prompt-execution.result.share-via-mail-success"),
         type: "success",
       });
     } catch (err) {

@@ -644,6 +644,6 @@
   "prompt-execution.result.export-to-pdf": "Export PDF",
   "prompt-execution.result.export-to-word": "Export to Word",
   "prompt-execution.result.share-via-mail-subject": "Shared AI Prompt Result",
-  "prompt-execution.result.share-via-mail-success": "Email sent to ${toEmail} successfully!",
+  "prompt-execution.result.share-via-mail-success": "Email sent successfully!",
   "prompt-execution.result.share-via-mail-failed": "Failed to send email."
 }

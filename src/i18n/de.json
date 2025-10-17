@@ -644,6 +644,6 @@
   "prompt-execution.result.export-to-pdf": "Als PDF exportieren",
   "prompt-execution.result.export-to-word": "Als Word exportieren",
   "prompt-execution.result.share-via-mail-subject": "Geteiltes KI-Prompt-Ergebnis",
-  "prompt-execution.result.share-via-mail-success": "E-Mail an ${toEmail} erfolgreich gesendet!",
+  "prompt-execution.result.share-via-mail-success": "E-Mail erfolgreich gesendet!",
   "prompt-execution.result.share-via-mail-failed": "Senden der E-Mail fehlgeschlagen."
 }
