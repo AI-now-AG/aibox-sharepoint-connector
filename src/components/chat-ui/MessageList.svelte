@@ -587,10 +587,10 @@
     if (!isValidEmail(email)) {
       sendEmailPromptResultError = t("tenant.email-invalid");
     } else {
+      sendEmailToModal?.close();
+      sendMessageResultViaEmail(sendEmailPromptResultIndex);
       sendEmailPromptResultError = "";
       sendEmailPromptResultIndex = 0;
-      sendEmailToModal?.close();
-      sendMessageResultViaEmail();
     }
   }}
 />
