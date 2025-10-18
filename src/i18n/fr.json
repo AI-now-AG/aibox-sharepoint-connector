@@ -641,10 +641,10 @@
   "knowledgebase.empty.description": "Get started by creating a new Knowledge Base",
   "prompt-execution.result.copy": "Copy",
   "prompt-execution.result.send-via-email": "Send email",
-  "prompt-execution.result.export-to-pdf": "Export PDF",
+  "prompt-execution.result.export-to-pdf": "Export to PDF",
   "prompt-execution.result.export-to-word": "Export to Word",
   "prompt-execution.result.share-via-mail-subject": "Shared result from aibox",
+  "prompt-execution.result.share-via-mail-message": "${username} (${useremail}) wants to share the following result from aibox with you:",
   "prompt-execution.result.share-via-mail-success": "Email sent successfully!",
-  "prompt-execution.result.share-via-mail-failed": "Failed to send email.",
-  "prompt-execution.result.share-via-mail-message": "${username} (${useremail}) wants to share the following result from aibox with you:"
+  "prompt-execution.result.share-via-mail-failed": "Failed to send email."
 }

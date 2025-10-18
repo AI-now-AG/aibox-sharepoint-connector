@@ -643,8 +643,8 @@
   "prompt-execution.result.send-via-email": "E-Mail senden",
   "prompt-execution.result.export-to-pdf": "Als PDF exportieren",
   "prompt-execution.result.export-to-word": "Als Word exportieren",
-  "prompt-execution.result.share-via-mail-subject": "Gemeinsames Ergebnis von aibox",
+  "prompt-execution.result.share-via-mail-subject": "Geteiltes Resultat aus der aibox",
+  "prompt-execution.result.share-via-mail-message": "${username} (${useremail}) will das folgende Resultat aus der aibox mit dir teilen:",
   "prompt-execution.result.share-via-mail-success": "E-Mail erfolgreich gesendet!",
-  "prompt-execution.result.share-via-mail-failed": "Senden der E-Mail fehlgeschlagen.",
-  "prompt-execution.result.share-via-mail-message": "${username} (${useremail}) möchte das folgende Ergebnis von aibox mit Ihnen teilen:"
+  "prompt-execution.result.share-via-mail-failed": "Senden der E-Mail fehlgeschlagen."
 }
