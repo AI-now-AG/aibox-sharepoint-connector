@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 import chromium from "@sparticuz/chromium";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let playwright: any;
 if (process.env.NETLIFY || process.env.AWS_REGION) {
     // ✅ Running on Netlify (serverless)
