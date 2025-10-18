@@ -3,7 +3,7 @@ import sendMail from "$utils/mail";
 
 export const POST: APIRoute = async ({ request }) => {
     try {
-        const { to, subject, html } = await request.json();
+        const { fromName, to, subject, html } = await request.json();
 
         if (!to || !subject || !html) {
             return new Response(
@@ -14,8 +14,8 @@ export const POST: APIRoute = async ({ request }) => {
 
         const msg = {
             from: {
-                name: "AI now AG",
-                email: "no-reply@ainow.ch",
+                name: fromName ?? "AI now AG",
+                email: "no-reply@aibox-app.ch",
             },
             to,
             subject,
@@ -28,7 +28,7 @@ export const POST: APIRoute = async ({ request }) => {
             status: 200,
             headers: { "Content-Type": "application/json" },
         });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
         console.error("❌ SendGrid Error:", err);
 

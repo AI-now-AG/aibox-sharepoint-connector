@@ -94,6 +94,7 @@
   }
 
   let username = $user?.name || $user?.username;
+  let useremail = $user?.email;
   let userPicture = $user?.picture;
 
   function removeDownloadButton(htmlString: string): string {
@@ -103,7 +104,10 @@
     return doc.body.innerHTML;
   }
 
-  function getFullHtmlContent(index: number = 0): string {
+  function getFullHtmlContent(
+    index: number = 0,
+    isSendMail: boolean = false,
+  ): string {
     const textElement = document.getElementById("exportedTextElement-" + index);
     const imageElement = document.getElementById(
       "exportedImageElement-" + index,
@@ -112,7 +116,7 @@
       <html>
         <head>
           <style>
-            body {
+            body, * {
               font-family: "Helvetica", sans-serif;
               font-size: 16px;
             }
@@ -138,6 +142,19 @@
           </style>
         </head>
         <body>
+         ${
+           isSendMail
+             ? `
+              <p id="userMessage"><strong>${t(
+                "prompt-execution.result.share-via-mail-message",
+                {
+                  username: username,
+                  useremail: useremail,
+                },
+              )}</strong></p> 
+            `
+             : ""
+         }
           <div id="messageSection">
             ${textElement ? textElement.outerHTML : "<br/>"}
           </div>
@@ -236,8 +253,9 @@
 
   async function sendMessageResultViaEmail(index: number = 0) {
     try {
-      const fullHtml = getFullHtmlContent(index);
+      const fullHtml = getFullHtmlContent(index, true);
       const payload = {
+        fromName: `${username} (aibox)`,
         to: toEmail,
         subject: t("prompt-execution.result.share-via-mail-subject"),
         html: fullHtml,
