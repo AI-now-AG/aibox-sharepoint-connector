@@ -184,7 +184,6 @@
       let filename = `prompt-result-${Date.now()}.${fileTpe === "pdf" ? "pdf" : "docx"}`;
 
       const config = await getAPIConfiguration();
-      console.log("Using API configuration:", config);
       const requestBody = {
         html: fullHtml,
         filename: filename,
