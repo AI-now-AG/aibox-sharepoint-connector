@@ -44,7 +44,7 @@
       class="absolute right-0 mt-2 min-w-40 rounded-2xl bg-base-100 shadow-lg z-50 border border-base-200"
       onmouseleave={closeDropdown}
     >
-      <ul class="menu menu-sm">
+      <ul class="menu menu-md w-full">
         <li>
           <button
             onclick={() => {
@@ -52,7 +52,6 @@
               closeDropdown();
             }}
           >
-            {@html svgIcons.pdf}
             <span>{t("prompt-execution.result.export-to-pdf")}</span>
           </button>
         </li>
@@ -63,7 +62,6 @@
               closeDropdown();
             }}
           >
-            {@html svgIcons.word}
             <span>{t("prompt-execution.result.export-to-word")}</span>
           </button>
         </li>
@@ -75,7 +73,6 @@
                 closeDropdown();
               }}
             >
-              {@html svgIcons.email}
               <span>{t("prompt-execution.result.send-via-email")}</span>
             </button>
           </li>
@@ -87,7 +84,6 @@
               closeDropdown();
             }}
           >
-            {@html svgIcons.copyClipboard}
             <span>{t("prompt-execution.result.copy")}</span>
           </button>
         </li>
