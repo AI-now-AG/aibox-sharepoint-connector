@@ -52,7 +52,7 @@
 
   function showAlert(message: any) {
     alertMessage = message;
-    alertModal?.show();
+    alertModal?.showModal();
   }
 
   function validateForm() {
@@ -130,7 +130,7 @@
           storeStripeCheckout({
             customerId: result.stripeCustomerId,
           });
-          window.location.href = result.url || '';
+          window.location.href = result.url || "";
         }
       } else {
         window.location.href = "/subscription/step4";

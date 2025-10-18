@@ -717,7 +717,6 @@
       });
     } else {
       window.location.href = `/conversations/${data.insertedId}`;
-      //navigate(`/conversations/${data.insertedId}`);
     }
   }
 </script>

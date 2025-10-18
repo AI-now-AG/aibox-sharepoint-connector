@@ -10,6 +10,7 @@
 </script>
 
 <script lang="ts">
+  import { navigate } from "astro:transitions/client";
   import KnowledgeBaseItem from "./KnowledgeBaseItem.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import Loading from "$components/Loading.svelte";
@@ -39,21 +40,21 @@
 
   async function editCard(index: number) {
     selectedEditKnowledgeBaseId = items[index]?.id ?? "";
-    window.location.href =
-      "/prompt-library/knowledge-base/" + selectedEditKnowledgeBaseId;
+    //window.location.href = `/prompt-library/knowledge-base/${selectedEditKnowledgeBaseId}`;
+    navigate(`/prompt-library/knowledge-base/${selectedEditKnowledgeBaseId}`);
   }
 
   async function duplicateCard(index: number) {
     selectedEditKnowledgeBaseId = items[index]?.id ?? "";
-    window.location.href =
-      "/prompt-library/knowledge-base/" +
-      selectedEditKnowledgeBaseId +
-      "?mode=clone";
+    //window.location.href = `/prompt-library/knowledge-base/${selectedEditKnowledgeBaseId}?mode=clone`;
+    navigate(
+      `/prompt-library/knowledge-base/${selectedEditKnowledgeBaseId}?mode=clone`,
+    );
   }
 
   function onDeleteCard(index: number) {
     selectedDeletePKnowledgeBaseId = items[index]?.id ?? "";
-    confirmDeleteModal?.show();
+    confirmDeleteModal?.showModal();
   }
 
   function removeDeletedItem(deletedId: string) {

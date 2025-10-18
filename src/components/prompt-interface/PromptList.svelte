@@ -56,18 +56,20 @@
   function editCard(index: number) {
     selectedEditPromptId = items[index]?.id ?? "";
     promptDialogMode = "update";
-    promptDialog?.showModal();
+    // Use show() instead of showModal() to allow toast visibility
+    promptDialog?.show();
   }
 
   function duplicateCard(index: number) {
     selectedEditPromptId = items[index]?.id ?? "";
     promptDialogMode = "clone";
-    promptDialog?.showModal();
+    // Use show() instead of showModal() to allow toast visibility
+    promptDialog?.show();
   }
 
   function onDeleteCard(index: number) {
     selectedDeletePromptId = items[index]?.id ?? "";
-    confirmDeleteModal?.show();
+    confirmDeleteModal?.showModal();
   }
 
   function removeDeletedItem(deletedId: string) {
