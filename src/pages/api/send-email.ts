@@ -28,6 +28,7 @@ export const POST: APIRoute = async ({ request }) => {
             status: 200,
             headers: { "Content-Type": "application/json" },
         });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
         console.error("❌ SendGrid Error:", err);
 

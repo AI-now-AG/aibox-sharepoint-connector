@@ -46,6 +46,7 @@
   interface RequestPayload {
     tenantId: string;
     provider: string;
+    model?: string;
     prompt: string;
     stream: boolean;
     tool?: string;

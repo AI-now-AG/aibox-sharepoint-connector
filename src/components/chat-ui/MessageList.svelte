@@ -12,8 +12,14 @@
   import InputDialog from "$components/InputDialog.svelte";
   import { isValidEmail } from "$utils/common";
   import MessageAction from "$components/chat-ui/MessageAction.svelte";
+  import { TRANSCRIPTION_API_URL } from "astro:env/client";
 
   const t = useTranslations();
+
+  interface APIConfiguration {
+    apiUrl: string;
+    accessToken: string;
+  }
 
   interface Props {
     currentMessage: string;
@@ -142,25 +148,51 @@
       </html>
     `;
   }
+
+  async function getAPIConfiguration(): Promise<APIConfiguration> {
+    return {
+      apiUrl: `${TRANSCRIPTION_API_URL}/api/prompt/export`,
+      accessToken: $user?.auth0_access_token as string,
+    };
+  }
+
   async function exportFileAs(
     fileTpe: "pdf" | "word" = "pdf",
     index: number = 0,
   ) {
     try {
-      const fullHtml = getFullHtmlContent(index);
-
       loading = true;
+      const fullHtml = getFullHtmlContent(index);
 
       let filename = `prompt-result-${Date.now()}.${fileTpe === "pdf" ? "pdf" : "docx"}`;
 
-      const res = await fetch(
-        fileTpe === "pdf" ? "/api/export-pdf" : "/api/export-word",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ html: fullHtml, filename: filename }),
+      const config = await getAPIConfiguration();
+      console.log("Using API configuration:", config);
+      const requestBody = {
+        html: fullHtml,
+        filename: filename,
+        fileType: fileTpe,
+      };
+
+      const res = await fetch(config.apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${config.accessToken}`,
         },
-      );
+        body: JSON.stringify(requestBody),
+      });
+
+      if (res.status === 401) {
+        addToast({
+          message: t("auth.session-missing-force-login"),
+          type: "error",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/logout";
+        }, 2000);
+        return;
+      }
 
       if (!res.ok) {
         const errorMessage = await res.text();
