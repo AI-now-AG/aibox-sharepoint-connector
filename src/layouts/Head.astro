@@ -31,9 +31,21 @@ const { title, description } = Astro.props;
 
     // Override fetch to handle 401 redirects
     window.fetch = async (...args) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const [input, init] = args;
+
       const response = await originalFetch(...args);
       console.log("Wrapped fetch request", args);
-      if (response.status === 401) {
+
+      // Only act on same-origin requests
+      const url = typeof input === "string" ? input : input.url;
+      const isSameOrigin =
+        url.startsWith(window.location.origin) || !url.startsWith("http");
+
+      if (isSameOrigin && response.status === 401) {
+        console.warn(
+          "Session expired or unauthorized. Redirecting to login..."
+        );
         window.location.href = "/login/auth0";
         return new Response(null, { status: 401 });
       }
