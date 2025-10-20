@@ -884,7 +884,7 @@
 
   function showAlert(message: string) {
     alertMessage = message;
-    alertModal?.show();
+    alertModal?.showModal();
   }
   onMount(() => {
     const calculateTotalPrice = () => {
@@ -955,7 +955,7 @@
       <button
         class="btn btn-primary"
         onclick={() => {
-          mode == MODE.Edit ? confirmUpdateModal?.show() : createTenant();
+          mode == MODE.Edit ? confirmUpdateModal?.showModal() : createTenant();
         }}
       >
         {t("common.save")}

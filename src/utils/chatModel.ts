@@ -195,7 +195,7 @@ export const createChatModel = (
   const apiKey = decrypt(tenant?.openai_api_key || "");
   return createOpenAIModel(
     apiKey,
-    import.meta.env.OPENAI_MODEL,
+    import.meta.env.OPENAI_MODEL || "gpt-4o",
     tenant?._id?.toString(),
   );
 };

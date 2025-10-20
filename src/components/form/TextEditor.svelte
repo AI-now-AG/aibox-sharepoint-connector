@@ -71,7 +71,7 @@
     {body}
     controls
     floating
-    class={"h-[46vh] min-h-[200px] border border-neutral resize-y " + cssClass}
+    class="h-[46vh] min-h-[200px] border border-neutral resize-y {cssClass}"
     style={"transition-duration: 0ms !important; " + autoHeightStyle}
     oncreate={(e: any) => {
       oncreate?.();

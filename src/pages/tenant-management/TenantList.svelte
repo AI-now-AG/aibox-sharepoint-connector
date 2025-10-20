@@ -56,7 +56,7 @@
 
   function confirmUpdateStatus(tenant: any) {
     selectedTenant = tenant;
-    confirmUpdateModal?.show();
+    confirmUpdateModal?.showModal();
   }
 
   const updateStatus = async () => {
@@ -86,7 +86,7 @@
 
   function confirmDelete(tenant: any) {
     selectedTenant = tenant;
-    confirmDeleteModal?.show();
+    confirmDeleteModal?.showModal();
   }
 
   async function deleteTenant() {

@@ -1,19 +1,17 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import { navigate } from "astro:transitions/client";
   import { useTranslations } from "$i18n/utils";
   import EditPromptDialog from "$components/prompt-interface/EditPromptDialog.svelte";
   import UseCaseActions from "$components/prompt-interface/UseCaseActions.svelte";
   import PromptOrderDialog from "$components/prompt-interface/PromptOrderDialog.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import Loading from "$components/Loading.svelte";
-  import { ApiKeyProvider } from "$types/TenantFeature";
   import { addToast } from "$stores/toast";
   import { actions } from "astro:actions";
   import log from "$utils/log";
   import { tenant } from "$stores";
   import {
-    ProviderModelMap,
-    ModelNameMap,
     useProviderInfo,
     getModelName,
     getActiveModels,
@@ -88,13 +86,15 @@
   async function editCard(index: number) {
     selectedEditPromptId = cards[index]?._id ?? "";
     promptDialogMode = "update";
-    promptDialog?.showModal();
+    // Use show() instead of showModal() to allow toast visibility
+    promptDialog?.show();
   }
 
   async function duplicateCard(index: number) {
     selectedEditPromptId = cards[index]?._id ?? "";
     promptDialogMode = "clone";
-    promptDialog?.showModal();
+    // Use show() instead of showModal() to allow toast visibility
+    promptDialog?.show();
   }
 
   function onDeleteCard(index: number) {
@@ -103,8 +103,11 @@
   }
 
   function removeDeletedItem(deletedId: string) {
-    cards = cards?.filter((item: any) => item._id !== deletedId);
-    orderCards = orderCards?.filter((item: any) => item._id !== deletedId);
+    //cards = cards?.filter((item: any) => item._id !== deletedId);
+    //orderCards = orderCards?.filter((item: any) => item._id !== deletedId);
+
+    // Reload if all cards are deleted
+    navigate(window.location.href);
   }
 
   async function deleteCard() {

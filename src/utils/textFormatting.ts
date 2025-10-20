@@ -35,7 +35,7 @@ function buildIconCitationLinks(
       .join(" ");
 
     // Replace only the first occurrence of the citation text with itself + links
-    result = result.replace((c.text as string), `${c.text} ${anchors}`);
+    result = result.replace(c.text as string, `${c.text} ${anchors}`);
   });
 
   return result;
@@ -355,4 +355,19 @@ export function stripHtmlFormatting(text: string): string {
   text = text.replace(/<br>/gi, "\n");
   text = text.replace(/<[^>]+>/g, "");
   return text.trim();
+}
+
+/**
+ * Checks whether an HTML string is effectively empty.
+ *
+ * This is useful for WYSIWYG or rich-text editor fields that may output
+ * minimal HTML (e.g., `<p></p>` or `<p><br></p>`) when no real text is entered.
+ *
+ * @param {string} html - The HTML string to evaluate.
+ * @returns {boolean} `true` if the content is empty or contains only placeholder tags, otherwise `false`.
+ */
+export function isHtmlContentEmpty(html: string): boolean {
+  if (!html) return true;
+  const clean = html.trim().toLowerCase();
+  return clean === "" || clean === "<p></p>" || clean === "<p><br></p>";
 }
