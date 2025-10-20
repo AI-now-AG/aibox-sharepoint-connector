@@ -25,5 +25,19 @@ const { title, description } = Astro.props;
         document.documentElement.setAttribute("data-theme", theme);
       }
     });
+
+    // Keep original fetch reference
+    const originalFetch = window.fetch;
+
+    // Override fetch to handle 401 redirects
+    window.fetch = async (...args) => {
+      const response = await originalFetch(...args);
+      console.log("Wrapped fetch request", args);
+      if (response.status === 401) {
+        window.location.href = "/login/auth0";
+        return new Response(null, { status: 401 });
+      }
+      return response;
+    };
   </script>
 </head>

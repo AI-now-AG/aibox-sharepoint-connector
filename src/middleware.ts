@@ -13,7 +13,7 @@ import TenantModel from "$data/models/tenant.model";
 import { TenantFeature } from "$types/TenantFeature";
 import { defaultLang } from "$i18n/ui";
 import { setLanguage } from "$i18n/utils";
-import { wildcardMatch, wildcardMatchInArray } from "$utils/wildcardMatch";
+import { wildcardMatchInArray } from "$utils/wildcardMatch";
 
 async function requestOrigin(context: APIContext, next: MiddlewareNext) {
   const path = context.url.pathname;
@@ -69,10 +69,18 @@ async function authenticate(context: APIContext, next: MiddlewareNext) {
   }
 
   const sessionRequired = () => {
-    if (wildcardMatch(context.url.pathname, "/api/*")) {
-      return new Response(JSON.stringify({ message: "unauthorized" }), {
-        status: 401,
-      });
+    if (
+      wildcardMatchInArray(context.url.pathname, ["/api/*", "/_actions1/*"])
+    ) {
+      return new Response(
+        JSON.stringify({
+          code: "UNAUTHORIZED",
+          message: "Authentication required. Please log in to continue.",
+        }),
+        {
+          status: 401,
+        },
+      );
     }
 
     return context.redirect("/login/auth0");
