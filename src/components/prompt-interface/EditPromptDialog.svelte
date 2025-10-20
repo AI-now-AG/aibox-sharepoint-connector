@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import { navigate } from "astro:transitions/client";
   import { useTranslations } from "$i18n/utils";
   import SingleInput from "$pages/prompt-library/prompts/SingleInput.svelte";
   import MultiInput from "$pages/prompt-library/prompts/MultiInput.svelte";
@@ -258,7 +259,8 @@
         type: "success",
       });
       setTimeout(() => {
-        window.location.reload();
+        //window.location.reload();
+        navigate(window.location.href);
       }, 0);
     } catch (error) {
       addToast({

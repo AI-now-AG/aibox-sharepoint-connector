@@ -150,7 +150,7 @@
 
   function showAlert(message: any) {
     alertMessage = message;
-    alertModal?.show();
+    alertModal?.showModal();
   }
 
   async function handleBlockingUser() {
@@ -223,7 +223,7 @@
       <button
         class="btn btn-primary"
         onclick={() => {
-          mode == MODE.Edit ? confirmUpdateModal?.show() : createUser();
+          mode == MODE.Edit ? confirmUpdateModal?.showModal() : createUser();
         }}
       >
         {t("common.save")}
@@ -396,7 +396,7 @@
             <button
               class="flex items-center text-base-content/80"
               onclick={(e) => {
-                confirmBlockModal?.show();
+                confirmBlockModal?.showModal();
               }}
             >
               <span class="w-5 h-5 flex items-center">
@@ -412,7 +412,7 @@
             <button
               class="flex items-center text-error/60 ml-8"
               onclick={(e) => {
-                confirmDeleteModal?.show();
+                confirmDeleteModal?.showModal();
               }}
             >
               <span class="w-5 h-5 flex items-center">

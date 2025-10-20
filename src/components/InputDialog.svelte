@@ -9,6 +9,7 @@
     placeholder?: string;
     value?: string;
     errorMessage?: string;
+    ctaText?: string;
     save?: Function;
   }
 
@@ -19,6 +20,7 @@
     placeholder = label,
     value = $bindable(""),
     errorMessage = $bindable(""),
+    ctaText = t("common.save"),
     save = () => null,
   }: Props = $props();
 
@@ -70,7 +72,7 @@
           save?.(value);
         }}
       >
-        {t("common.save")}
+        {ctaText}
       </button>
       <button
         class="btn"

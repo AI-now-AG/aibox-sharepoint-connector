@@ -4,12 +4,22 @@
   import { MessageRole, type MessageHistory } from "$types/MessageHistory";
   import ImageCard from "./ImageCard.svelte";
   import FileAttachmentList from "./FileAttachmentList.svelte";
-  import { svgIcons } from "$assets/icons";
   import { user } from "$stores";
   import { useTranslations } from "$i18n/utils";
   import { markdownToHtml, textToHtml } from "$utils/textFormatting";
+  import Loading from "$components/Loading.svelte";
+  import { addToast } from "$stores/toast";
+  import InputDialog from "$components/InputDialog.svelte";
+  import { isValidEmail } from "$utils/common";
+  import MessageAction from "$components/chat-ui/MessageAction.svelte";
+  import { TRANSCRIPTION_API_URL } from "astro:env/client";
 
   const t = useTranslations();
+
+  interface APIConfiguration {
+    apiUrl: string;
+    accessToken: string;
+  }
 
   interface Props {
     currentMessage: string;
@@ -33,6 +43,12 @@
 
   let copyIndex: number = $state(-1);
   let timer: NodeJS.Timeout;
+  let loading: boolean = $state(false);
+
+  let sendEmailToModal: HTMLDialogElement | undefined = $state();
+  let toEmail = $state("");
+  let sendEmailPromptResultError = $state("");
+  let sendEmailPromptResultIndex = $state(0);
 
   const handleCopy = (event: any) => {
     const selection = window.getSelection();
@@ -78,7 +94,198 @@
   }
 
   let username = $user?.name || $user?.username;
+  let useremail = $user?.email;
   let userPicture = $user?.picture;
+
+  function removeDownloadButton(htmlString: string): string {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlString, "text/html");
+    doc.querySelectorAll(".removed-export-pdf").forEach((el) => el.remove());
+    return doc.body.innerHTML;
+  }
+
+  function getFullHtmlContent(
+    index: number = 0,
+    isSendMail: boolean = false,
+  ): string {
+    const textElement = document.getElementById("exportedTextElement-" + index);
+    const imageElement = document.getElementById(
+      "exportedImageElement-" + index,
+    );
+    return `
+      <html>
+        <head>
+          <style>
+            body, * {
+              font-family: "Helvetica", sans-serif;
+              font-size: 16px;
+            }
+
+            #imageSection img {
+              max-width: 100%;
+              max-height: 500px;
+              object-fit: contain;
+            }
+
+            #messageSection {
+              font-size: 16px;
+              line-height: 1.6;
+            }
+
+            table, th, td {
+              border: 1px solid black;
+            }
+
+            table {
+              border-collapse: collapse; 
+            }
+          </style>
+        </head>
+        <body>
+         ${
+           isSendMail
+             ? `
+              <p id="userMessage"><strong>${t(
+                "prompt-execution.result.share-via-mail-message",
+                {
+                  username: username,
+                  useremail: useremail,
+                },
+              )}</strong></p> 
+            `
+             : ""
+         }
+          <div id="messageSection">
+            ${textElement ? textElement.outerHTML : "<br/>"}
+          </div>
+          <div id="imageSection">
+            ${imageElement ? removeDownloadButton(imageElement.outerHTML) : "<br/>"}
+          </div>
+        </body>
+      </html>
+    `;
+  }
+
+  async function getAPIConfiguration(): Promise<APIConfiguration> {
+    return {
+      apiUrl: `${TRANSCRIPTION_API_URL}/api/prompt/export`,
+      accessToken: $user?.auth0_access_token as string,
+    };
+  }
+
+  async function exportFileAs(
+    fileTpe: "pdf" | "word" = "pdf",
+    index: number = 0,
+  ) {
+    try {
+      loading = true;
+      const fullHtml = getFullHtmlContent(index);
+
+      let filename = `prompt-result-${Date.now()}.${fileTpe === "pdf" ? "pdf" : "docx"}`;
+
+      const config = await getAPIConfiguration();
+      const requestBody = {
+        html: fullHtml,
+        filename: filename,
+        fileType: fileTpe,
+      };
+
+      const res = await fetch(config.apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${config.accessToken}`,
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (res.status === 401) {
+        addToast({
+          message: t("auth.session-missing-force-login"),
+          type: "error",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/logout";
+        }, 2000);
+        return;
+      }
+
+      if (!res.ok) {
+        const errorMessage = await res.text();
+        throw new Error(`Server conversion failed: ${errorMessage}`);
+      }
+      const blob = await res.blob();
+
+      const contentDisposition = res.headers.get("Content-Disposition");
+      if (contentDisposition) {
+        const match = contentDisposition.match(/filename="(.+?)"/);
+        if (match && match[1]) {
+          filename = match[1];
+        }
+      }
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      console.log(
+        `${fileTpe.toUpperCase()} file "${filename}" successfully downloaded.`,
+      );
+    } catch (error) {
+      console.error(`Error exporting as ${fileTpe.toUpperCase()}:`, error);
+    } finally {
+      loading = false;
+    }
+  }
+
+  async function exportToPDF(index: number = 0) {
+    await exportFileAs("pdf", index);
+  }
+
+  async function exportToWord(index: number = 0) {
+    await exportFileAs("word", index);
+  }
+
+  async function sendMessageResultViaEmail(index: number = 0) {
+    try {
+      const fullHtml = getFullHtmlContent(index, true);
+      const payload = {
+        fromName: `${username} (aibox)`,
+        to: toEmail,
+        subject: t("prompt-execution.result.share-via-mail-subject"),
+        html: fullHtml,
+      };
+
+      loading = true;
+      const res = await fetch("/api/send-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(errorText);
+      }
+
+      addToast({
+        message: t("prompt-execution.result.share-via-mail-success"),
+        type: "success",
+      });
+    } catch (err) {
+      console.error("Error sending email:", err);
+      addToast({
+        message: t("prompt-execution.result.share-via-mail-failed"),
+        type: "error",
+      });
+    } finally {
+      loading = false;
+    }
+  }
 </script>
 
 {#if messages.length > 0 || isFetching}
@@ -111,7 +318,10 @@
                           <p class="font-bold text-sm">
                             {role == MessageRole.User ? username : `aibox`}
                           </p>
-                          <div class="mt-2 text-sm">
+                          <div
+                            class="mt-2 text-sm"
+                            id={`exportedTextElement-${index}`}
+                          >
                             {@html role == MessageRole.User
                               ? textToHtml(content)
                               : markdownToHtml(content)}
@@ -131,28 +341,28 @@
                         </div>
                       {/if}
                       {#if role === MessageRole.Assistant}
-                        <div>
-                          <div
-                            class="flex flex-col justify-items-end order-last"
-                          >
-                            <button
-                              class="btn p-2 btn-ghost"
-                              onclick={() => copyToClipboard(rawData, index)}
-                            >
-                              {#if index == copyIndex}
-                                {@html svgIcons.checkMark}
-                              {:else}
-                                {@html svgIcons.copyClipboard}
-                              {/if}
-                            </button>
-                          </div>
+                        <div class="flex flex-row justify-items-end order-last">
+                          <MessageAction
+                            exportToPdfAction={() => exportToPDF(index)}
+                            exportToWordAction={() => exportToWord(index)}
+                            sendEmailAction={() => {
+                              sendEmailPromptResultIndex = index;
+                              sendEmailToModal?.show();
+                            }}
+                            copyToClipboardAction={() =>
+                              copyToClipboard(rawData, index)}
+                            isHideSendEmailAction={imageUrl ? true : false}
+                          />
                         </div>
                       {/if}
                     </div>
                   </div>
 
                   {#if role === MessageRole.Assistant && imageUrl}
-                    <div class="chat-bubble text-base-content bg-base-200">
+                    <div
+                      class="chat-bubble text-base-content bg-base-200"
+                      id={`exportedImageElement-${index}`}
+                    >
                       <ImageCard url={imageUrl} alt={content} {infoText} />
                     </div>
                   {/if}
@@ -214,3 +424,24 @@
     </div>
   </div>
 {/if}
+
+<InputDialog
+  bind:modal={sendEmailToModal}
+  bind:value={toEmail}
+  bind:errorMessage={sendEmailPromptResultError}
+  title={"Share AI Prompt Result"}
+  label={t("login.email")}
+  ctaText={"Send"}
+  save={(email: string) => {
+    if (!isValidEmail(email)) {
+      sendEmailPromptResultError = t("tenant.email-invalid");
+    } else {
+      sendEmailToModal?.close();
+      sendMessageResultViaEmail(sendEmailPromptResultIndex);
+      sendEmailPromptResultError = "";
+      sendEmailPromptResultIndex = 0;
+    }
+  }}
+/>
+
+<Loading show={loading} />

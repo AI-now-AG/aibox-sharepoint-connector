@@ -137,7 +137,7 @@
 
   function onSelectBlock(user: any) {
     selectedUser = user;
-    confirmBlockModal?.show();
+    confirmBlockModal?.showModal();
   }
 
   async function deleteUser() {
@@ -164,7 +164,7 @@
 
   function onSelectDelete(user: any) {
     selectedUser = user;
-    confirmDeleteModal?.show();
+    confirmDeleteModal?.showModal();
   }
 
   function getOptions(user: any) {

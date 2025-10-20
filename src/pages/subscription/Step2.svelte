@@ -33,7 +33,7 @@
 
   function showAlert(message: any) {
     alertMessage = message;
-    alertModal?.show();
+    alertModal?.showModal();
   }
 
   function validateForm() {

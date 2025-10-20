@@ -86,13 +86,15 @@
   async function editCard(index: number) {
     selectedEditPromptId = cards[index]?._id ?? "";
     promptDialogMode = "update";
-    promptDialog?.showModal();
+    // Use show() instead of showModal() to allow toast visibility
+    promptDialog?.show();
   }
 
   async function duplicateCard(index: number) {
     selectedEditPromptId = cards[index]?._id ?? "";
     promptDialogMode = "clone";
-    promptDialog?.showModal();
+    // Use show() instead of showModal() to allow toast visibility
+    promptDialog?.show();
   }
 
   function onDeleteCard(index: number) {
