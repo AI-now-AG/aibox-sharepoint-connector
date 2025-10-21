@@ -69,9 +69,8 @@ async function authenticate(context: APIContext, next: MiddlewareNext) {
   }
 
   const sessionRequired = () => {
-    if (
-      wildcardMatchInArray(context.url.pathname, ["/api/*", "/_actions1/*"])
-    ) {
+    const contentType = context.request.headers.get("content-type") ?? "";
+    if (contentType.includes("application/json")) {
       return new Response(
         JSON.stringify({
           code: "UNAUTHORIZED",
