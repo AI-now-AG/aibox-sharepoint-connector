@@ -33,12 +33,12 @@ const { title, description } = Astro.props;
     window.fetch = async (...args) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const [input, init] = args;
+      const url = typeof input === "string" ? input : input.url;
 
       const response = await originalFetch(...args);
-      console.log("Wrapped fetch request", args);
+      console.log(`[aibox] Wrapped fetch request: ${url}`);
 
       // Only act on same-origin requests
-      const url = typeof input === "string" ? input : input.url;
       const isSameOrigin =
         url.startsWith(window.location.origin) || !url.startsWith("http");
 
