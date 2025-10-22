@@ -144,22 +144,22 @@ export function markdownToHtml(text: string) {
       {
         name: "table",
         renderer(this, token) {
-          const tableClass =
-            "w-full border-collapse table-auto my-4 rounded-lg overflow-hidden shadow-md";
+          const outerWrapper = "w-full max-w-full overflow-x-auto my-4";
+          const innerWrapper = "inline-block min-w-max align-top";
+          const tableClass = "border-collapse table-auto rounded-lg overflow-hidden shadow-md";
+
           const thClass =
             "p-2 border-r border-primary last:border-r-0 font-semibold text-sm";
           const trClass = "hover:bg-base-300 transition-colors duration-200";
           const tdClass = "p-2 border-r last:border-r-0 text-base-content";
 
-          // Header row
           const header = token.header
             .map((cell: Tokens.TableCell) => {
-              const inner = marked.parseInline(cell.text || ""); // cell.text is string
+              const inner = marked.parseInline(cell.text || "");
               return `<th class="${thClass}">${inner}</th>`;
             })
             .join("");
 
-          // Body rows
           const body = token.rows
             .map((row: Tokens.TableCell[], rowIndex: number) => {
               const cols = row
@@ -170,18 +170,20 @@ export function markdownToHtml(text: string) {
                   return `<td class="${tdClass}">${inner}</td>`;
                 })
                 .join("");
-
-              const extraClass =
-                rowIndex % 2 === 0 ? "bg-base-100" : "bg-base-300";
+              const extraClass = rowIndex % 2 === 0 ? "bg-base-100" : "bg-base-300";
               return `<tr class="${trClass} ${extraClass}">${cols}</tr>`;
             })
             .join("");
 
           return `
-            <table class="${tableClass}">
-              <thead class="bg-primary text-white"><tr>${header}</tr></thead>
-              <tbody>${body}</tbody>
-            </table>
+            <div class="${outerWrapper}">
+              <div class="${innerWrapper}">
+                <table class="${tableClass}">
+                  <thead class="bg-primary text-white"><tr>${header}</tr></thead>
+                  <tbody>${body}</tbody>
+                </table>
+              </div>
+            </div>
           `;
         },
       },
