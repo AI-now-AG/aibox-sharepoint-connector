@@ -124,7 +124,7 @@
   async function getAPIConfiguration(): Promise<APIConfiguration> {
     return {
       apiUrl: `${TRANSCRIPTION_API_URL}/api/prompt/execute`,
-      accessToken: $user?.auth0_access_token as string,
+      accessToken: $user?.api_token as string,
     };
   }
 

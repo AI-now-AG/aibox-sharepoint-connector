@@ -411,7 +411,7 @@
     fileNameWithoutExtension: string,
     fileExtension: string,
   ) {
-    const accessToken = $user?.auth0_access_token;
+    const accessToken = $user?.api_token;
     if (!accessToken) {
       throw new Error("No access token available");
     }
@@ -632,7 +632,7 @@
       }
 
       const { apiKey, apiUrl: baseUrl } = await configResponse.json();
-      const accessToken = $user?.auth0_access_token;
+      const accessToken = $user?.api_token;
       if (!accessToken) {
         addToast({
           message: t("auth.session-missing-force-login"),
@@ -809,7 +809,7 @@
         $user,
       );
 
-      const accessToken = $user?.auth0_access_token;
+      const accessToken = $user?.api_token;
       if (!accessToken) {
         addToast({
           message: t("auth.session-missing-force-login"),

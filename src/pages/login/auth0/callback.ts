@@ -4,6 +4,7 @@ import type { APIContext } from "astro";
 import UserModel, { assignPermissions } from "$data/models/user.model";
 import { z } from "zod";
 import log from "$utils/log";
+import createApiToken from "$utils/apiToken";
 import TenantModel from "$data/models/tenant.model";
 import { UserRole } from "$types/Users";
 import { AUTH0_SESSION_STATE } from "$constants";
@@ -74,7 +75,7 @@ export async function GET(context: APIContext): Promise<Response> {
   // Get the user's roles
   const roles = auth0User.data["ainow/roles"];
 
-  const accessToken = token.accessToken();
+  //const accessToken = token.accessToken();
   //console.log("Auth0 accessToken", accessToken);
   // TODO: Sync current user from Auth0 to aibox
   const userId = await UserModel.upsertByAuth0Sub(auth0User.data.sub, {
@@ -89,17 +90,28 @@ export async function GET(context: APIContext): Promise<Response> {
     logins_count: auth0User.data.logins_count,
     email_verified: auth0User.data.email_verified,
     last_login: new Date().toISOString(),
-    auth0_access_token: accessToken,
+    //api_token: accessToken,
   });
 
+  // 🍪 Create a new Lucia session and set the session cookie
   const session = await lucia.createSession(userId, {});
   const sessionCookie = lucia.createSessionCookie(session.id);
-
   context.cookies.set(
     sessionCookie.name,
     sessionCookie.value,
     sessionCookie.attributes,
   );
 
+  // 🪙 Generate a short-lived API JWT tied to this Lucia session
+  //    - Expires at the same time as the Lucia session
+  //    - Can be used for authenticated API requests to our backend
+  const apiToken = createApiToken(session);
+
+  // 💾 Store the API token in the user record
+  await UserModel.upsertByAuth0Sub(auth0User.data.sub, {
+    api_token: apiToken,
+  });
+
+  // ✅ Redirect back to the app after successful login
   return context.redirect("/");
 }

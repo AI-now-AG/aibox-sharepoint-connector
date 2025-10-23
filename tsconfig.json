@@ -12,7 +12,6 @@
     "strict": true,
     "types": [
       "./src/env.d.ts",
-      "./src/types/turndown.d.ts"
     ],
     "module": "ESNext",
     "strictNullChecks": true,
