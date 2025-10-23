@@ -23,7 +23,7 @@ class NoExtendMongoAdapter extends MongodbAdapter {
 const adapter = new NoExtendMongoAdapter(sessionCollection, userCollection);
 
 export const lucia = new Lucia(adapter, {
-  sessionExpiresIn: new TimeSpan(15, "m"),
+  sessionExpiresIn: new TimeSpan(1, "w"),
   sessionCookie: {
     attributes: {
       secure: import.meta.env.PROD,
