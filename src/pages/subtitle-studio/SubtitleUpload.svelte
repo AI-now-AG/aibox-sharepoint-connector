@@ -43,6 +43,10 @@
   let preloadedSrtUrl = $state<string | undefined>(preloadedSrtUrlProp);
   let preloadedAssUrl = $state<string | undefined>(preloadedAssUrlProp);
 
+  // Store original filenames for auto-saved files
+  let originalAssFileName = $state<string | undefined>();
+  let originalSrtFileName = $state<string | undefined>();
+
   // Derived state - prioritize uploaded file over preloaded URLs
   let assFileUrl = $derived.by(() => {
     if (uploadedFile !== null && uploadedFile.type === "ass") {
@@ -163,7 +167,14 @@
       | { assContent: string; srtContent: string; isBothFormats: boolean },
   ) {
     try {
-      function getEditedFileName(url: string | undefined, fallback: string) {
+      function getEditedFileName(url: string | undefined, fallback: string, originalFileName?: string) {
+        // Use stored original filename for auto-saved files
+        if (originalFileName) {
+          const dotIdx = originalFileName.lastIndexOf(".");
+          if (dotIdx === -1) return originalFileName + "_edited";
+          return originalFileName.slice(0, dotIdx) + "_edited" + originalFileName.slice(dotIdx);
+        }
+        
         if (!url) return fallback;
         const parts = url.split("/");
         const orig = parts[parts.length - 1] || fallback;
@@ -172,19 +183,55 @@
         return orig.slice(0, dotIdx) + "_edited" + orig.slice(dotIdx);
       }
 
+      function getBaseFilename(filename: string): string {
+        // Extract base filename without extension
+        const dotIdx = filename.lastIndexOf(".");
+        if (dotIdx === -1) return filename;
+        return filename.slice(0, dotIdx);
+      }
+
+      function changeExtension(filename: string, newExt: string): string {
+        // Change the file extension
+        const base = getBaseFilename(filename);
+        return base + newExt;
+      }
+
       if (typeof content === "string") {
         // Single format export
         let filename = "edited-subtitles.srt";
         if (assFileUrl) {
-          filename = getEditedFileName(assFileUrl, "edited-subtitles.ass");
+          filename = getEditedFileName(assFileUrl, "edited-subtitles.ass", originalAssFileName);
         } else if (srtFileUrl) {
-          filename = getEditedFileName(srtFileUrl, "edited-subtitles.srt");
+          filename = getEditedFileName(srtFileUrl, "edited-subtitles.srt", originalSrtFileName);
         }
         downloadFile(content, filename);
       } else if (content.isBothFormats) {
         // Both formats export
-        const assName = getEditedFileName(assFileUrl, "edited-subtitles.ass");
-        const srtName = getEditedFileName(srtFileUrl, "edited-subtitles.srt");
+        // Get filenames for both formats, handling cases where only one URL exists
+        let assName: string;
+        let srtName: string;
+
+        if (originalAssFileName || originalSrtFileName) {
+          // Use stored original filenames
+          const baseName = originalAssFileName 
+            ? getBaseFilename(originalAssFileName)
+            : getBaseFilename(originalSrtFileName!);
+          assName = baseName + "_edited.ass";
+          srtName = baseName + "_edited.srt";
+        } else if (assFileUrl || srtFileUrl) {
+          // Extract from URL
+          const sourceUrl = assFileUrl || srtFileUrl;
+          const parts = sourceUrl!.split("/");
+          const orig = parts[parts.length - 1];
+          const baseName = getBaseFilename(orig);
+          assName = baseName + "_edited.ass";
+          srtName = baseName + "_edited.srt";
+        } else {
+          // Fallback to default names
+          assName = "edited-subtitles.ass";
+          srtName = "edited-subtitles.srt";
+        }
+
         downloadFile(content.assContent, assName);
         setTimeout(() => {
           downloadFile(content.srtContent, srtName);
@@ -197,7 +244,15 @@
 
   // Download file helper function
   function downloadFile(content: string, filename: string) {
-    const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+    // Determine MIME type based on file extension
+    let mimeType = "text/plain;charset=utf-8";
+    if (filename.toLowerCase().endsWith(".ass")) {
+      mimeType = "text/x-ssa;charset=utf-8"; // ASS/SSA subtitle format
+    } else if (filename.toLowerCase().endsWith(".srt")) {
+      mimeType = "application/x-subrip;charset=utf-8"; // SRT subtitle format
+    }
+    
+    const blob = new Blob([content], { type: mimeType });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
@@ -223,14 +278,46 @@
 
         // Create blob URLs for the saved subtitle content
         if (data.dialogues && data.dialogues.length > 0) {
+          // Store original filenames if available
+          // Extract base filename to derive both ASS and SRT names
+          let baseFileName: string | undefined;
+
+          if (data.assFileUrl) {
+            const assUrlParts = data.assFileUrl.split('/');
+            originalAssFileName = decodeURIComponent(assUrlParts[assUrlParts.length - 1].split('?')[0]);
+            // Extract base name (without extension)
+            const dotIdx = originalAssFileName.lastIndexOf(".");
+            baseFileName = dotIdx !== -1 ? originalAssFileName.slice(0, dotIdx) : originalAssFileName;
+          }
+          
+          if (data.srtFileUrl) {
+            const srtUrlParts = data.srtFileUrl.split('/');
+            originalSrtFileName = decodeURIComponent(srtUrlParts[srtUrlParts.length - 1].split('?')[0]);
+            // Extract base name if not already set
+            if (!baseFileName) {
+              const dotIdx = originalSrtFileName.lastIndexOf(".");
+              baseFileName = dotIdx !== -1 ? originalSrtFileName.slice(0, dotIdx) : originalSrtFileName;
+            }
+          }
+
+          // If only one filename was provided, derive the other one from the base name
+          if (baseFileName) {
+            if (!originalAssFileName) {
+              originalAssFileName = baseFileName + ".ass";
+            }
+            if (!originalSrtFileName) {
+              originalSrtFileName = baseFileName + ".srt";
+            }
+          }
+
           // Generate ASS content from dialogues
           const assContent = generateASSContent(data.dialogues);
-          const assBlob = new Blob([assContent], { type: 'text/plain;charset=utf-8' });
+          const assBlob = new Blob([assContent], { type: 'text/x-ssa;charset=utf-8' });
           preloadedAssUrl = URL.createObjectURL(assBlob);
 
           // Generate SRT content from dialogues
           const srtContent = generateSRTContent(data.dialogues);
-          const srtBlob = new Blob([srtContent], { type: 'text/plain;charset=utf-8' });
+          const srtBlob = new Blob([srtContent], { type: 'application/x-subrip;charset=utf-8' });
           preloadedSrtUrl = URL.createObjectURL(srtBlob);
 
           console.log("Auto-saved subtitle data loaded from sessionStorage");
