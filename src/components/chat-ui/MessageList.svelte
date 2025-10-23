@@ -314,12 +314,12 @@
                       </div>
 
                       {#if content}
-                        <div class="flex-1 p-4 pt-2.5">
+                        <div class="flex-1 p-4 pt-2.5 min-w-0">
                           <p class="font-bold text-sm">
                             {role == MessageRole.User ? username : `aibox`}
                           </p>
                           <div
-                            class="mt-2 text-sm"
+                            class="mt-2 text-sm w-full max-w-full break-words whitespace-normal overflow-x-auto"
                             id={`exportedTextElement-${index}`}
                           >
                             {@html role == MessageRole.User
@@ -445,3 +445,30 @@
 />
 
 <Loading show={loading} />
+
+<style>
+  :global([id^="exportedTextElement-"]) {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  :global([id^="exportedTextElement-"] table) {
+    table-layout: auto;
+    border-collapse: collapse;
+    width: auto;      /* do NOT force 100% */
+    max-width: none;
+    min-width: 0;     /* ensure it doesn't force parent's min width */
+  }
+
+  :global([id^="exportedTextElement-"] th),
+  :global([id^="exportedTextElement-"] td) {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  :global([id^="exportedTextElement-"] > .overflow-x-auto) {
+    contain: inline-size;
+    -webkit-overflow-scrolling: touch;
+  }
+</style>
