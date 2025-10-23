@@ -8,6 +8,9 @@ export enum SubscriptionPackageId {
 }
 
 export enum SubscriptionExtraPackage {
+  Test = "Test",
+  TeamsReseller = "TeamsReseller",
+  ProReseller = "ProReseller",
   Internal = "Internal",
   Enterprise = "Enterprise",
 }
