@@ -44,6 +44,7 @@
   const t = useTranslations();
 
   let fileModal: HTMLDialogElement | undefined = $state();
+  let isDragging: boolean = $state(false);
 
   const acceptedTypes = {
     "audio/*": ["audio/mp3", "audio/wav", "audio/mpeg"],
@@ -116,11 +117,17 @@
 </script>
 
 <div
-  class={`flex flex-col rounded-xl bg-base-100 border border-base-content/20 focus:ring-base-200 has-focus:ring-2 has-focus:ring-base-primary has-focus:ring-offset-2 has-focus:ring-offset-base-200`}
+  class={`flex flex-col rounded-xl bg-base-100 border border-base-content/20 focus:ring-base-200 has-focus:ring-2 has-focus:ring-base-primary has-focus:ring-offset-2 has-focus:ring-offset-base-200 relative`}
   use:dndFileUpload={{
     enabled: allowFileUpload,
     acceptedTypes,
     maxSize: 5 * 1024 * 1024, // 5 MB
+    onDragStart: () => {
+      isDragging = true;
+    },
+    onDragEnd: () => {
+      isDragging = false;
+    },
   }}
   onfilesdropped={(e) => handleFilesDropped(e.detail)}
   onfilesrejected={(e) => handleFilesRejected(e.detail)}
@@ -194,6 +201,16 @@
       </button>
     </div>
   </div>
+
+  {#if isDragging}
+    <div
+      class="absolute inset-0 bg-base-200/80 backdrop-blur-sm flex items-center justify-center rounded-lg z-10 pointer-events-none rounded-xl"
+    >
+      <div class="text-md font-medium text-primary animate-pulse">
+        {t("prompt-execution.upload-file.drop-files-here")}
+      </div>
+    </div>
+  {/if}
 </div>
 
 <FileUpload

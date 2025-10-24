@@ -2,7 +2,13 @@ import type { DndOptions, ProcessedFile } from "$types/DndFileUpload";
 
 export function dndFileUpload(
   node: HTMLElement,
-  { enabled = true, maxSize, acceptedTypes }: DndOptions = {},
+  {
+    enabled = true,
+    maxSize,
+    acceptedTypes,
+    onDragStart,
+    onDragEnd,
+  }: DndOptions = {},
 ) {
   const dragOverClass = "bg-blue-50"; // ← Choose any Tailwind or custom class
 
@@ -47,11 +53,36 @@ export function dndFileUpload(
     return reasons;
   }
 
-  function onDropped(e: DragEvent) {
+  const onDragEnter = (e: DragEvent) => {
+    preventDefaults(e);
+    if (!shouldIgnore(e)) {
+      highlight();
+      onDragStart?.();
+    }
+  };
+
+  const onDragOver = (e: DragEvent) => {
+    preventDefaults(e);
+    if (!shouldIgnore(e)) {
+      highlight();
+      onDragStart?.();
+    }
+  };
+
+  const onDragLeave = (e: DragEvent) => {
+    preventDefaults(e);
+    if (!shouldIgnore(e)) {
+      unhighlight();
+      onDragEnd?.();
+    }
+  };
+
+  const onDropped = (e: DragEvent) => {
     if (shouldIgnore(e)) return;
 
     preventDefaults(e);
     unhighlight();
+    onDragEnd?.();
 
     const droppedFiles = Array.from(e.dataTransfer?.files ?? []);
     const accepted: ProcessedFile[] = [];
@@ -81,22 +112,6 @@ export function dndFileUpload(
         }),
       );
     }
-  }
-
-  // -------- Event handlers with ignore logic inside --------
-  function onDragEnter(e: DragEvent) {
-    preventDefaults(e);
-    if (!shouldIgnore(e)) highlight();
-  }
-
-  const onDragOver = (e: DragEvent) => {
-    preventDefaults(e);
-    if (!shouldIgnore(e)) highlight();
-  };
-
-  const onDragLeave = (e: DragEvent) => {
-    preventDefaults(e);
-    if (!shouldIgnore(e)) unhighlight();
   };
 
   // Register events if enabled

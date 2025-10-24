@@ -646,5 +646,6 @@
   "prompt-execution.result.share-via-mail-subject": "Geteiltes Resultat aus der aibox",
   "prompt-execution.result.share-via-mail-message": "${username} (${useremail}) will das folgende Resultat aus der aibox mit dir teilen:",
   "prompt-execution.result.share-via-mail-success": "E-Mail erfolgreich gesendet!",
-  "prompt-execution.result.share-via-mail-failed": "Senden der E-Mail fehlgeschlagen."
+  "prompt-execution.result.share-via-mail-failed": "Senden der E-Mail fehlgeschlagen.",
+  "prompt-execution.upload-file.drop-files-here": "Dateien hier ablegen, um sie dem Gespräch hinzuzufügen."
 }

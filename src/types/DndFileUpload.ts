@@ -19,4 +19,6 @@ export type DndOptions = {
   enabled?: boolean;
   acceptedTypes?: Record<string, string[]>; // Allowed MIME types
   maxSize?: number; // Max file size in bytes
+  onDragStart?: () => void;
+  onDragEnd?: () => void;
 };
