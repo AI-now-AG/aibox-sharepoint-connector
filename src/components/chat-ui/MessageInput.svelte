@@ -181,7 +181,7 @@
     </div>
     <div class="flex self-end">
       <button
-        class="btn btn-ghost btn-md disabled:bg-base-100 disabled:cursor-not-allowed"
+        class="btn btn-ghost btn-sm mx-1 my-1 disabled:bg-base-100 disabled:cursor-not-allowed"
         disabled={(!input && files.length == 0) || isFetching}
         onclick={preventDefault(onsend)}
         aria-label="Send"

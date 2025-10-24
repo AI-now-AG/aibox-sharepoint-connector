@@ -4,6 +4,8 @@ export function dndFileUpload(
   node: HTMLElement,
   { enabled = true, maxSize, acceptedTypes }: DndOptions = {},
 ) {
+  const dragOverClass = "bg-blue-50"; // ← Choose any Tailwind or custom class
+
   function preventDefaults(e: Event) {
     e.preventDefault();
     e.stopPropagation();
@@ -17,6 +19,7 @@ export function dndFileUpload(
 
   function highlight() {
     node.classList.add("dragover", "border-dashed", "border-info", "shadow-xl");
+    node.classList.add(dragOverClass);
   }
 
   function unhighlight() {
@@ -26,6 +29,7 @@ export function dndFileUpload(
       "border-info",
       "shadow-xl",
     );
+    node.classList.remove(dragOverClass);
   }
 
   function validateFile(file: File): string[] {
