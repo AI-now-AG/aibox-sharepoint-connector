@@ -7,6 +7,7 @@
     SubscriptionPackageId,
     AudioOptionId,
     BillingMethod,
+    SubscriptionPackageLabels,
   } from "$types/Subscription";
   import { tenant } from "$stores";
   import { SubscriptionPackages } from "$data/subscription-packages";
@@ -98,9 +99,13 @@
 </div>
 
 <div class="flex flex-col space-y-2 py-8">
-  <h3 class="mb-3 text-xl font-bold">
+  <h3 class="mb-0 text-xl font-bold">
     {t("settings.subscription.current-plan")}
   </h3>
+  <div class="divider mt-0"></div>
+  {#if planName}
+    <p class="font-bold mb-4">{SubscriptionPackageLabels[planName]}</p>
+  {/if}
 
   {#each Object.values(plan).filter((p) => p.id == planName) as planItem}
     <p>{planItem?.name?.[lang]}</p>
@@ -117,7 +122,8 @@
 </div>
 
 <div class="flex flex-col space-y-2 py-8">
-  <h3 class="mb-3 text-xl font-bold">{t("settings.subscription.billing")}</h3>
+  <h3 class="mb-0 text-xl font-bold">{t("settings.subscription.billing")}</h3>
+  <div class="divider mt-0"></div>
   <div class="grid grid-cols-1 lg:grid-cols-2 space-y-4">
     <div class="space-y-2">
       <p>

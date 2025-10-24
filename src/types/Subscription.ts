@@ -15,6 +15,20 @@ export enum SubscriptionExtraPackage {
   Enterprise = "Enterprise",
 }
 
+export const SubscriptionPackageLabels: Record<
+  SubscriptionPackageId | SubscriptionExtraPackage,
+  string
+> = {
+  [SubscriptionPackageId.Starter]: "aibox Starter",
+  [SubscriptionPackageId.Teams]: "aibox Teams",
+  [SubscriptionPackageId.Pro]: "aibox Pro",
+  [SubscriptionExtraPackage.Test]: "Test",
+  [SubscriptionExtraPackage.TeamsReseller]: "aibox Teams (Reseller)",
+  [SubscriptionExtraPackage.ProReseller]: "aibox Pro (Reseller)",
+  [SubscriptionExtraPackage.Internal]: "Internal",
+  [SubscriptionExtraPackage.Enterprise]: "aibox Enterprise",
+};
+
 export enum SubscriptionStatus {
   Active = "active",
   Canceled = "canceled",
