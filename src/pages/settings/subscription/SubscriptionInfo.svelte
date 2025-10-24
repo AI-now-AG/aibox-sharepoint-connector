@@ -104,12 +104,12 @@
   </h3>
   <div class="divider mt-0"></div>
   {#if planName}
-    <p class="font-bold mb-4">{SubscriptionPackageLabels[planName]}</p>
+    <p>{SubscriptionPackageLabels[planName]}</p>
   {/if}
 
-  {#each Object.values(plan).filter((p) => p.id == planName) as planItem}
+  <!-- {#each Object.values(plan).filter((p) => p.id == planName) as planItem}
     <p>{planItem?.name?.[lang]}</p>
-  {/each}
+  {/each} -->
 
   {#each addOns as addOnName}
     <p>
