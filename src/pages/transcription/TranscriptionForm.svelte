@@ -1028,6 +1028,11 @@
       tenantId: tenant?._id,
       userId: user?.id,
       category: category,
+      subtitleConfig: {
+        useSentenceBasedFlow: true,
+        maxCharsPerLine: 34,
+        maxLinesPerBlock: 2,
+      },
       selectedFileFormat: selectedFileFormat,
       isShowImprovedTextPreview: showTextPreviewChecked,
       // apiKeyProvider: provider,

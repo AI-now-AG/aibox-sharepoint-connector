@@ -8,27 +8,34 @@ export interface TranscribeRequest {
   tenantId: string;
   userId: string;
   category?: AudioCategory;
+  subtitleConfig?: SubtitleConfig;
   selectedFileFormat?: FileFormat[];
   isShowImprovedTextPreview?: boolean;
-  apiKeyProvider?: ApiKeyProvider;
-  openaiEncryptedApiKey?: string;
-  encryptedApiKey?: string;
-  azureOpenAIInstanceName?: string;
-  azureOpenAIEndpoint?: string;
-  azureOpenAIWhisperModel?: string;
-  azureOpenAIChatModel?: string;
-  azureOpenAIApiKey?: string;
-  openAIApiKey?: string;
-  encryptedSpeechKey?: string;
-  speechKey?: string;
-  speechRegion?: string;
-  encryptedElevenLabsKey?: string;
+  // apiKeyProvider?: ApiKeyProvider;
+  // openaiEncryptedApiKey?: string;
+  // encryptedApiKey?: string;
+  // azureOpenAIInstanceName?: string;
+  // azureOpenAIEndpoint?: string;
+  // azureOpenAIWhisperModel?: string;
+  // azureOpenAIChatModel?: string;
+  // azureOpenAIApiKey?: string;
+  // openAIApiKey?: string;
+  // encryptedSpeechKey?: string;
+  // speechKey?: string;
+  // speechRegion?: string;
+  // encryptedElevenLabsKey?: string;
   isAudioTagEnabled?: boolean;
-  audioBuffer?: Buffer;
+  // audioBuffer?: Buffer;
   isDiarizationEnabled?: boolean;
   maxSpeakers?: number;
   languageLocales?: string[];
   usecaseId?: string;
+}
+
+export interface SubtitleConfig {
+  useSentenceBasedFlow: boolean,
+  maxCharsPerLine: number,
+  maxLinesPerBlock: number,
 }
 
 export enum FileFormat {
