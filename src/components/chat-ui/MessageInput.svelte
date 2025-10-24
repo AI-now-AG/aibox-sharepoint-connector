@@ -194,19 +194,17 @@
       </button>
     </div>
   </div>
-  <div>
-    <input type="checkbox" class="modal-toggle" />
-    <FileUpload
-      bind:files
-      bind:modal={fileModal}
-      title={t("upload-file.popup.title")}
-      {acceptedTypes}
-      supportedFormatsText={t(
-        "prompt-execution.upload-file.supportted-files-input",
-      )}
-    />
-  </div>
 </div>
+
+<FileUpload
+  bind:files
+  bind:modal={fileModal}
+  title={t("upload-file.popup.title")}
+  {acceptedTypes}
+  supportedFormatsText={t(
+    "prompt-execution.upload-file.supportted-files-input",
+  )}
+/>
 
 {#if stickyFooter && showDataLossWarning}
   <DataLossWarning />

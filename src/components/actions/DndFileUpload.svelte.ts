@@ -9,8 +9,13 @@ export function dndFileUpload(
     e.stopPropagation();
   }
 
+  function shouldIgnore(e: DragEvent): boolean {
+    if (!enabled) return true;
+    const el = e.target as HTMLElement | null;
+    return !!el?.closest("[data-dnd-ignore]");
+  }
+
   function highlight() {
-    if (!enabled) return;
     node.classList.add("dragover", "border-dashed", "border-info", "shadow-xl");
   }
 
@@ -38,8 +43,8 @@ export function dndFileUpload(
     return reasons;
   }
 
-  function handleDrop(e: DragEvent) {
-    if (!enabled) return;
+  function onDropped(e: DragEvent) {
+    if (shouldIgnore(e)) return;
 
     preventDefaults(e);
     unhighlight();
@@ -74,31 +79,52 @@ export function dndFileUpload(
     }
   }
 
-  const events = ["dragenter", "dragover", "dragleave", "drop"];
+  // -------- Event handlers with ignore logic inside --------
+  function onDragEnter(e: DragEvent) {
+    preventDefaults(e);
+    if (!shouldIgnore(e)) highlight();
+  }
 
+  const onDragOver = (e: DragEvent) => {
+    preventDefaults(e);
+    if (!shouldIgnore(e)) highlight();
+  };
+
+  const onDragLeave = (e: DragEvent) => {
+    preventDefaults(e);
+    if (!shouldIgnore(e)) unhighlight();
+  };
+
+  // Register events if enabled
   function addListeners() {
-    for (const evt of events) node.addEventListener(evt, preventDefaults);
-    node.addEventListener("dragenter", highlight);
-    node.addEventListener("dragover", highlight);
-    node.addEventListener("dragleave", unhighlight);
-    node.addEventListener("drop", handleDrop);
+    node.addEventListener("dragenter", onDragEnter);
+    node.addEventListener("dragover", onDragOver);
+    node.addEventListener("dragleave", onDragLeave);
+    node.addEventListener("drop", onDropped);
   }
 
   function removeListeners() {
-    for (const evt of events) node.removeEventListener(evt, preventDefaults);
-    node.removeEventListener("dragenter", highlight);
-    node.removeEventListener("dragover", highlight);
-    node.removeEventListener("dragleave", unhighlight);
-    node.removeEventListener("drop", handleDrop);
+    node.removeEventListener("dragenter", onDragEnter);
+    node.removeEventListener("dragover", onDragOver);
+    node.removeEventListener("dragleave", onDragLeave);
+    node.removeEventListener("drop", onDropped);
   }
 
   // Initialize if enabled
   if (enabled) addListeners();
 
   return {
-    update(newEnabled: boolean) {
-      enabled = newEnabled;
-      if (!enabled) unhighlight();
+    update(options: DndOptions) {
+      enabled = options.enabled ?? enabled;
+      maxSize = options.maxSize ?? maxSize;
+      acceptedTypes = options.acceptedTypes ?? acceptedTypes;
+
+      if (!enabled) {
+        removeListeners();
+        unhighlight();
+      } else {
+        addListeners();
+      }
     },
     destroy() {
       removeListeners();
