@@ -3,18 +3,24 @@
   import FileUpload from "$components/FileUpload.svelte";
   import DataLossWarning from "$components/chat-ui/DataLossWarning.svelte";
   import { svgIcons } from "$assets/icons";
+  import { addToast } from "$stores/toast";
   import { preventDefault } from "$utils/common";
   import { useTranslations } from "$i18n/utils";
   import SelectToolOption from "./SelectToolOption.svelte";
   import type { Option } from "$components/form/Dropdown.svelte";
+  import { dndFileUpload } from "$components/actions/DndFileUpload.svelte";
   import { PromptToolOption } from "$types/AIProvider";
+  import type {
+    FilesDroppedEvent,
+    FilesRejectedEvent,
+  } from "$types/DndFileUpload";
 
   interface Props {
     input: string;
     files?: File[];
     isFetching?: boolean;
     stickyFooter?: boolean;
-    showAttachmentButton?: boolean;
+    allowFileUpload?: boolean;
     onsend: Function;
     toolOptions?: Array<Option>;
     selectedPromptTool?: PromptToolOption;
@@ -27,7 +33,7 @@
     files = $bindable([]),
     isFetching = false,
     stickyFooter = false,
-    showAttachmentButton = true,
+    allowFileUpload = true,
     onsend,
     toolOptions,
     selectedPromptTool = $bindable(PromptToolOption.None),
@@ -87,10 +93,37 @@
   function clearText() {
     input = "";
   }
+
+  function handleFilesDropped(droppedFiles: FilesDroppedEvent) {
+    console.log("Files dropped:", droppedFiles);
+    files = droppedFiles.map(({ file }) => file);
+  }
+
+  function handleFilesRejected(rejectedFiles: FilesRejectedEvent) {
+    console.log("Files rejected:", rejectedFiles);
+    rejectedFiles.forEach(({ file, reasons }) => {
+      const reason = reasons.includes("FILE_TOO_LARGE")
+        ? t("prompt-execution.upload-file.exceed-5mb-size-limit")
+        : reasons.includes("INVALID_MIMETYPE")
+          ? t("transcription.file-validation.unsupported-type")
+          : "Unknown error occurred";
+      addToast({
+        message: `${file.name} - ${reason}`,
+        type: "error",
+      });
+    });
+  }
 </script>
 
 <div
   class={`flex flex-col rounded-xl bg-base-100 border border-base-content/20 focus:ring-base-200 has-focus:ring-2 has-focus:ring-base-primary has-focus:ring-offset-2 has-focus:ring-offset-base-200`}
+  use:dndFileUpload={{
+    enabled: allowFileUpload,
+    acceptedTypes,
+    maxSize: 5 * 1024 * 1024, // 5 MB
+  }}
+  onfilesdropped={(e) => handleFilesDropped(e.detail)}
+  onfilesrejected={(e) => handleFilesRejected(e.detail)}
 >
   <div class="flex-1 relative">
     <textarea
@@ -118,7 +151,7 @@
 
   <div class="grid grid-cols-[1fr_min-content] gap-4">
     <div class="p-2 flex flex-row gap-2">
-      {#if showAttachmentButton}
+      {#if allowFileUpload}
         <button
           class="btn btn-outline h-8 w-auto p-1 min-h-0 border-base-content/30 aspect-square"
           onclick={() => {

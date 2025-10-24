@@ -647,7 +647,7 @@
           bind:input
           bind:files
           {isFetching}
-          showAttachmentButton={!isDisableFileInput}
+          allowFileUpload={!isDisableFileInput}
           onsend={submitForm}
           {toolOptions}
           bind:selectedPromptTool
@@ -713,7 +713,7 @@
             bind:files
             {isFetching}
             stickyFooter={true}
-            showAttachmentButton={!isDisableFileInput}
+            allowFileUpload={!isDisableFileInput}
             onsend={submitForm}
             {toolOptions}
             bind:selectedPromptTool

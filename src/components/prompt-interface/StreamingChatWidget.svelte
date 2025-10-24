@@ -767,7 +767,7 @@
     {toolOptions}
     bind:selectedPromptTool
     bind:isDisablePromptTool
-    showAttachmentButton={isShowAttachmentButton}
+    allowFileUpload={isShowAttachmentButton}
   />
 </div>
 
