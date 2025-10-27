@@ -34,6 +34,7 @@
     getPromptTools,
     useProviderInfo,
     NanoBananaPromptTools,
+    resolveAPIProvider,
   } from "$shared/AIProvider";
   import { TRANSCRIPTION_API_URL } from "astro:env/client";
 
@@ -99,18 +100,6 @@
   $effect(() => {
     isShowAttachmentButton = currentPrompt?.model != PromptModel.Perplexity;
   });
-
-  function isGpt5Default() {
-    const aiProviders = $tenant?.api_key_providers ?? [];
-    const activeDefaultProvider = aiProviders.find(
-      (item) => item.active === true && item.default === true,
-    );
-
-    if (activeDefaultProvider?.name === ApiKeyProvider.OpenAIGpt5) {
-      return true;
-    }
-    return false;
-  }
 
   const providerInfo = useProviderInfo($tenant);
   // === Derived State ===
@@ -186,30 +175,21 @@
 
   // === Request Builder ===
   function buildRequestPayload(fileUrls: string[]): RequestPayload {
-    let isOpenAIResponseModel =
-      [
-        PromptModel.OpenAI,
-        PromptModel.OpenAIWithTools, // Deprecated — removal imminent
-        PromptModel.OpenAIWithImageTools, // Deprecated — removal imminent
-      ].includes(currentPrompt?.model) ||
-      (providerInfo.defaultProviderPromptModelName == ApiKeyProvider.OpenAI &&
-        !currentPrompt?.model);
-
-    const isOpenAIGpt5ResponseModel =
-      [PromptModel.OpenAIGpt5].includes(currentPrompt?.model) ||
-      (isGpt5Default() && !currentPrompt?.model);
+    let isResponseModel = [
+      PromptModel.OpenAI,
+      PromptModel.OpenAIWithTools, // Deprecated — removal imminent
+      PromptModel.OpenAIWithImageTools, // Deprecated — removal imminent
+      PromptModel.OpenAIGpt5,
+    ].includes(currentPrompt?.model);
 
     const isGeminiImageModel = [PromptModel.NanoBanana].includes(
       currentPrompt?.model,
     );
 
-    const provider = isOpenAIResponseModel
-      ? "openai-response" // openai
-      : isOpenAIGpt5ResponseModel
-        ? "openai-gpt-5-response" // openai-gpt-5
-        : isGeminiImageModel
-          ? "gemini"
-          : currentPrompt?.model || providerInfo.defaultProviderPromptModelName;
+    const provider = resolveAPIProvider(
+      currentPrompt?.model,
+      providerInfo.defaultProviderPromptModelName,
+    );
     const requestModel = isGeminiImageModel
       ? ModelName.Gemini25FlashImage
       : undefined;
@@ -239,13 +219,13 @@
       }
     }
 
-    if (isOpenAIResponseModel || isOpenAIGpt5ResponseModel) {
+    if (isResponseModel) {
       payload.previousResponseId = previousResponseId;
     } else {
       payload.messageHistory = currentMessageHistory;
     }
 
-    if (isOpenAIGpt5ResponseModel) {
+    if (isResponseModel) {
       payload.reasoningEffort = currentPrompt?.reasoningEffort || "low";
       payload.verbosity = currentPrompt?.textVerbosity || "low";
     }

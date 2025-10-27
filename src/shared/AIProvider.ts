@@ -64,6 +64,15 @@ export const CustomSortOrder: { [key: string]: number } = {
   [PromptModel.NanoBanana]: 8, // Gemini Nano Banana
 };
 
+const APIProviderMap: Record<string, string> = {
+  [PromptModel.OpenAI]: "openai-response",
+  [PromptModel.OpenAIWithTools]: "openai-response", // Deprecated — removal imminent
+  [PromptModel.OpenAIWithImageTools]: "openai-response", // Deprecated — removal imminent
+  [PromptModel.AzureOpenAI]: "azure-openai-chat",
+  [PromptModel.OpenAIGpt5]: "openai-gpt-5-response",
+  [PromptModel.NanoBanana]: "gemini",
+};
+
 export const Gpt4oPromptTools = [
   {
     title: t("prompt-execution.prompt-tool.image"),
@@ -227,4 +236,16 @@ export function useProviderInfo(tenant: any) {
     defaultProviderModelName: getDefaultProviderModelName(),
     defaultProviderPromptModelName: getDefaultProviderPromptModelName(),
   };
+}
+
+export function resolveAPIProvider(
+  selectedModel: PromptModel,
+  defaultModel: PromptModel | null = null,
+) {
+  const mapped = selectedModel ? APIProviderMap[selectedModel] : null;
+
+  if (mapped) return mapped;
+  if (selectedModel) return selectedModel;
+
+  return defaultModel;
 }
