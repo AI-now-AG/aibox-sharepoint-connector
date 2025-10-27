@@ -78,9 +78,13 @@
     };
   });
 
-  function copyToClipboard(content: string, index: number) {
+  function copyToClipboard(index: number) {
+    const fullHtml = getFullHtmlContent(index);
+    const blob = new Blob([fullHtml], { type: "text/html" });
+    const data = [new ClipboardItem({ "text/html": blob })];
+
     navigator.clipboard
-      .writeText(content)
+      .write(data)
       .then(() => {
         copyIndex = index;
         clearTimeout(timer);
@@ -89,7 +93,7 @@
         }, 2000);
       })
       .catch((err) => {
-        console.error("Could not copy text: ", err);
+        console.error("Could not copy HTML content: ", err);
       });
   }
 
@@ -349,8 +353,7 @@
                               sendEmailPromptResultIndex = index;
                               sendEmailToModal?.show();
                             }}
-                            copyToClipboardAction={() =>
-                              copyToClipboard(rawData, index)}
+                            copyToClipboardAction={() => copyToClipboard(index)}
                             isHideSendEmailAction={imageUrl ? true : false}
                           />
                         </div>
@@ -455,9 +458,9 @@
   :global([id^="exportedTextElement-"] table) {
     table-layout: auto;
     border-collapse: collapse;
-    width: auto;      /* do NOT force 100% */
+    width: auto; /* do NOT force 100% */
     max-width: none;
-    min-width: 0;     /* ensure it doesn't force parent's min width */
+    min-width: 0; /* ensure it doesn't force parent's min width */
   }
 
   :global([id^="exportedTextElement-"] th),
