@@ -131,58 +131,88 @@
     const imageElement = document.getElementById(
       "exportedImageElement-" + index,
     );
-    return `
-      <html>
-        <head>
-          <style>
-            body, * {
-              font-family: "Helvetica", sans-serif;
-              font-size: 16px;
-            }
 
-            #imageSection img {
-              max-width: 100%;
-              max-height: 500px;
-              object-fit: contain;
-            }
+    // Escape potentially unsafe characters in text nodes
+    const escapeHtml = (str: string) =>
+      str
+        ?.replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\"/g, "&quot;")
+        .replace(/'/g, "&#039;") || "";
 
-            #messageSection {
-              font-size: 16px;
-              line-height: 1.6;
-            }
+    const messageBlock = isSendMail
+      ? `<p id="userMessage"><strong>${escapeHtml(
+          t("prompt-execution.result.share-via-mail-message", {
+            username,
+            useremail,
+          }),
+        )}</strong></p>`
+      : "";
 
-            table, th, td {
-              border: 1px solid black;
-            }
+    // 1. Get dynamic content
+    let textHtml = textElement ? textElement.outerHTML : "<p><br/></p>";
+    const imageHtml = imageElement
+      ? removeDownloadButton(imageElement.outerHTML)
+      : "<p><br/></p>";
 
-            table {
-              border-collapse: collapse; 
-            }
-          </style>
-        </head>
-        <body>
-         ${
-           isSendMail
-             ? `
-              <p id="userMessage"><strong>${t(
-                "prompt-execution.result.share-via-mail-message",
-                {
-                  username: username,
-                  useremail: useremail,
-                },
-              )}</strong></p> 
-            `
-             : ""
-         }
-          <div id="messageSection">
-            ${textElement ? textElement.outerHTML : "<br/>"}
-          </div>
-          <div id="imageSection">
-            ${imageElement ? removeDownloadButton(imageElement.outerHTML) : "<br/>"}
-          </div>
-        </body>
-      </html>
-    `;
+    // 2. Clean up HTML
+    textHtml = textHtml
+      .replace(/ }=""/g, "")
+      .replace(/<\/?div[^>]*>/gi, "")
+      .replace(/<\/?(colgroup|col|tbody|thead)[^>]*>/gi, "")
+      .replace(/<!--[\s\S]*?-->/g, "")
+      .replace(/<(\/?(table|tr|th|td))\s[^>]*>/gi, "<$1>")
+      .replace(/class="[^"]*"/g, "")
+      .replace(/style="[^"]*"/g, "")
+      .replace(/<p><br\/><\/p>$/gi, "")
+      .replace(/\s+([a-z0-9]+)="(\s*)"/gi, ' $1=""')
+      .replace(/\s{2,}/g, " ")
+      .replace(/<([a-z0-9]+)\s+>/gi, (match, tag) => {
+        return `<${tag}>`;
+      });
+
+    textHtml = textHtml.trim();
+
+    let finalHtml = `
+      <!DOCTYPE html>
+      <html xmlns="http://www.w3.org/1999/xhtml">
+      <head>
+        <meta charset="UTF-8" />
+        <title>Document</title>
+
+        <style>
+        /* Sử dụng thuộc tính CSS thay vì thuộc tính HTML inline cho bảng */
+        body { 
+            color: #000;
+            font-family: Times New Roman, serif;
+            font-size: 12pt;
+            line-height: 1.5;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%; 
+        }
+
+        table, th, td {
+            border: 1px solid #000;
+        }
+
+        th, td {
+            padding: 4pt 8pt;
+        }
+        </style>
+      </head>
+      <body>
+        ${messageBlock}
+        ${textHtml}
+        ${imageHtml}
+      </body>
+    </html>
+  `;
+
+    return finalHtml.replace("*{}", " ").trim();
   }
 
   async function getAPIConfiguration(): Promise<APIConfiguration> {
