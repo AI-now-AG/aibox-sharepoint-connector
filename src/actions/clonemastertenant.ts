@@ -86,7 +86,7 @@ export const cloneMasterTeant = {
   }),
   setupTenantData: defineAction({
     input: TenantInputParamsSchema,
-    handler: async (input) => {
+    handler: async (input, context) => {
       // Clone the tenant
       const transcriptionTypes = getTranscriptionTypes(input.add_ons ?? []);
       const masterTenant = await TenantModel.get(masterTenantId);
@@ -175,11 +175,14 @@ export const cloneMasterTeant = {
         masterTenantId,
         transcriptionTypes,
       );
+
+      const { id: userId } = context.locals.user;
       const newTranscriptions = transcriptions.map(
         (transcription: Transcription) => ({
           ...transcription,
           _id: new ObjectId(),
           tenant_id: newTenant.insertedId,
+          user_id: userId,
           enabled: true,
           created_at: new Date(),
           updated_at: new Date(),
