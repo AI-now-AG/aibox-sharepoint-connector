@@ -94,7 +94,7 @@
   }
 
   function copyHtmlToClipboard(index: number) {
-    const fullHtml = getFullHtmlContent(index);
+    const fullHtml = getFullHtmlContent(index, 12);
     const blob = new Blob([fullHtml], { type: "text/html" });
     const data = [new ClipboardItem({ "text/html": blob })];
 
@@ -125,6 +125,7 @@
 
   function getFullHtmlContent(
     index: number = 0,
+    fontSize: number = 12,
     isSendMail: boolean = false,
   ): string {
     const textElement = document.getElementById("exportedTextElement-" + index);
@@ -184,25 +185,23 @@
           body { 
               color: #000;
               font-family: "Times New Roman", serif;
-              font-size: 12pt;
+              line-height: normal !important;
           }
-
+          p, li { }       
           table {
               border-collapse: collapse;
               width: 100%; 
           }
-
           table, th, td {
               border: 1px solid #000;
               white-space: nowrap;
           }
-
           th, td {
               padding: 4pt 8pt;
           }
         </style>
       </head>
-      <body>
+      <body style="font-size: ${fontSize}pt;">
         ${messageBlock}
         ${textHtml}
         ${imageHtml}
@@ -226,7 +225,7 @@
   ) {
     try {
       loading = true;
-      const fullHtml = getFullHtmlContent(index);
+      const fullHtml = getFullHtmlContent(index, fileTpe === "pdf" ? 18 : 12);
 
       let filename = `prompt-result-${Date.now()}.${fileTpe === "pdf" ? "pdf" : "docx"}`;
 
@@ -299,7 +298,7 @@
 
   async function sendMessageResultViaEmail(index: number = 0) {
     try {
-      const fullHtml = getFullHtmlContent(index, true);
+      const fullHtml = getFullHtmlContent(index, 12, true);
       const payload = {
         fromName: `${username} (aibox)`,
         to: toEmail,
