@@ -97,7 +97,17 @@
 
   function handleFilesDropped(droppedFiles: FilesDroppedEvent) {
     console.log("Files dropped:", droppedFiles);
-    files = droppedFiles.map(({ file }) => file);
+    const newFiles = droppedFiles.map(({ file }) => file);
+
+    // Merge and remove duplicates by name + size
+    const combined = [...files, ...newFiles];
+    const unique = combined.filter(
+      (file, index, self) =>
+        index ===
+        self.findIndex((f) => f.name === file.name && f.size === file.size),
+    );
+
+    files = unique;
   }
 
   function handleFilesRejected(rejectedFiles: FilesRejectedEvent) {
