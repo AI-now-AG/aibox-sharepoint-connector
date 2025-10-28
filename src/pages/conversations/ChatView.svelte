@@ -162,6 +162,8 @@
     ].includes(model);
 
     const provider = resolveAPIProvider(model);
+
+    const isGeminiImageModel = [PromptModel.NanoBanana].includes(model);
     const requestModel = isGeminiImageModel
       ? ModelName.Gemini25FlashImage
       : undefined;
