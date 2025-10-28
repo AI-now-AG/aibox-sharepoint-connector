@@ -50,6 +50,9 @@
       case PromptModel.OpenAIGpt5:
         title = `${modelLabel} (${t("home.model-option-text-tools")})`;
         break;
+      case PromptModel.AzureOpenAI:
+        title = `${modelLabel} (Azure)`;
+        break;
       case PromptModel.Perplexity:
         title = `${modelLabel} (${t("home.model-option-text-websearch")})`;
         break;
