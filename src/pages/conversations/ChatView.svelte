@@ -659,7 +659,7 @@
         {toolOptions}
         bind:selectedPromptTool
         showDataLossWarning={false}
-        showAttachmentButton={isShowAttachmentButton}
+        allowFileUpload={isShowAttachmentButton}
       />
     </div>
   </div>
