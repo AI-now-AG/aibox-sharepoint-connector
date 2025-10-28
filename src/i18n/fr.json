@@ -639,8 +639,8 @@
   "error.tenant-inactive-error-message": "Your access to aibox is currently inactive. The trial period may have expired, or there is no active subscription.\nIf you need assistance, please contact our support team at <a href=\"mailto:support@aibox-app.ch\" class=\"text-primary underline\">support@aibox-app.ch</a>\n or reach out to your aibox administrator.",
   "knowledgebase.empty.title": "No knowledge available",
   "knowledgebase.empty.description": "Get started by creating a new Knowledge Base",
-  "prompt-execution.result.copy-text": "Copy Text",
-  "prompt-execution.result.copy-html": "Copy HTML",
+  "prompt-execution.result.copy-text": "Copy (text only)",
+  "prompt-execution.result.copy-html": "Copy (formatted)",
   "prompt-execution.result.send-via-email": "Send email",
   "prompt-execution.result.export-to-pdf": "Export to PDF",
   "prompt-execution.result.export-to-word": "Export to Word",
@@ -648,5 +648,5 @@
   "prompt-execution.result.share-via-mail-message": "${username} (${useremail}) wants to share the following result from aibox with you:",
   "prompt-execution.result.share-via-mail-success": "Email sent successfully!",
   "prompt-execution.result.share-via-mail-failed": "Failed to send email.",
-  "prompt-execution.upload-file.drop-files-here": "Drop any files here to add it to the conversation."
+  "prompt-execution.upload-file.drop-files-here": "Drop any files here to add it to the chat."
 }
