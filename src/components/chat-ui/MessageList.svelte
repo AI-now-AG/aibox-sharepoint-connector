@@ -179,29 +179,27 @@
       <html xmlns="http://www.w3.org/1999/xhtml">
       <head>
         <meta charset="UTF-8" />
-        <title>Document</title>
-
+        <title>Prompt Result</title>
         <style>
-        /* Sử dụng thuộc tính CSS thay vì thuộc tính HTML inline cho bảng */
-        body { 
-            color: #000;
-            font-family: Times New Roman, serif;
-            font-size: 12pt;
-            line-height: 1.5;
-        }
+          body { 
+              color: #000;
+              font-family: "Times New Roman", serif;
+              font-size: 12pt;
+          }
 
-        table {
-            border-collapse: collapse;
-            width: 100%; 
-        }
+          table {
+              border-collapse: collapse;
+              width: 100%; 
+          }
 
-        table, th, td {
-            border: 1px solid #000;
-        }
+          table, th, td {
+              border: 1px solid #000;
+              white-space: nowrap;
+          }
 
-        th, td {
-            padding: 4pt 8pt;
-        }
+          th, td {
+              padding: 4pt 8pt;
+          }
         </style>
       </head>
       <body>
