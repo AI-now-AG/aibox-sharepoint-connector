@@ -157,6 +157,7 @@
       ? removeDownloadButton(imageElement.outerHTML)
       : "<p><br/></p>";
 
+      
     // 2. Clean up HTML
     textHtml = textHtml
       .replace(/ }=""/g, "")
@@ -187,17 +188,17 @@
               font-family: "Times New Roman", serif;
               line-height: normal !important;
           }
-          p, li { }       
           table {
               border-collapse: collapse;
               width: 100%; 
           }
           table, th, td {
               border: 1px solid #000;
-              white-space: nowrap;
           }
           th, td {
               padding: 4pt 8pt;
+              word-break: break-word; 
+              overflow-wrap: break-word
           }
         </style>
       </head>
@@ -225,7 +226,7 @@
   ) {
     try {
       loading = true;
-      const fullHtml = getFullHtmlContent(index, fileTpe === "pdf" ? 18 : 12);
+      const fullHtml = getFullHtmlContent(index, fileTpe === "pdf" ? 14 : 12);
 
       let filename = `prompt-result-${Date.now()}.${fileTpe === "pdf" ? "pdf" : "docx"}`;
 
