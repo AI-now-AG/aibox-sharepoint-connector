@@ -57,7 +57,7 @@ export const CustomSortOrder: { [key: string]: number } = {
   [PromptModel.Default]: 1, // Default - gpt-4o, Legacy (Text)
   [PromptModel.OpenAI]: 2, // gpt-4o, Legacy (Text)
   [PromptModel.OpenAIGpt5]: 3, // gpt-5 (Text & Tools)
-  [PromptModel.AzureOpenAI]: 4, // Azure gpt-4o (Text)
+  [PromptModel.AzureOpenAI]: 4, // gpt-4o (Azure)
   [PromptModel.Perplexity]: 5, // Perplexity Sonar (Text & Websuche)
   [PromptModel.Claude]: 6, // Claude Sonnet (Text)
   [PromptModel.Gemini]: 7, // Gemini (Text& Tools)
@@ -173,29 +173,19 @@ export function getActiveModels(tenant: any, defaultModelName: string) {
 
 export function getModelName(tenant: any, model: string) {
   if (!tenant) {
-    return resolveModelName("gpt-4o");
+    return resolveModelName("unknown");
   }
 
   const providerInfo = useProviderInfo(tenant);
   const defaultModelName = providerInfo?.defaultProviderModelName || "gpt-4o";
   const activeModels = getActiveModels(tenant, defaultModelName);
 
-  const findModel = (match: string, fallback: string) => {
-    const m = activeModels.find((m: any) => m.provider?.includes(match));
-    return m?.modelName || fallback;
-  };
+  const matchingModel = activeModels.find((m: any) => model == m.provider);
+  //console.log("getModelName() debug", { activeModels, matchingModel });
 
-  if (model?.includes("openai-gpt-5")) {
-    return findModel("openai-gpt-5", "gpt-5");
+  if (matchingModel && matchingModel.provider == PromptModel.AzureOpenAI) {
+    return `${matchingModel.modelName} (Azure)`;
   }
-
-  if (model?.includes("openai")) {
-    return findModel("openai", "gpt-4o");
-  }
-
-  const matchingModel = activeModels.find((m: any) =>
-    model?.includes(m.provider),
-  );
 
   if (matchingModel) {
     return resolveModelName(matchingModel.modelName);
