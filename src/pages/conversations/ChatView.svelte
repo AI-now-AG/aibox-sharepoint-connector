@@ -611,7 +611,8 @@
 <div class="grid grid-cols-1 grid-rows-[min-content_1fr_min-content] h-full">
   <div class="flex items-center">
     <div class="flex flex-1">
-      <span class="self-start badge badge-xs px-2 border-base-300 font-normal"
+      <span
+        class="self-start badge badge-xs py-2 px-2 border-base-300 font-normal"
         >{getModelName($tenant, model)}</span
       >
     </div>
