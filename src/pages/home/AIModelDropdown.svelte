@@ -79,6 +79,7 @@
     const allowedProviders = [
       ApiKeyProvider.OpenAI,
       ApiKeyProvider.OpenAIGpt5,
+      ApiKeyProvider.AzureOpenAI,
       ApiKeyProvider.Perplexity,
       ApiKeyProvider.Claude,
       ApiKeyProvider.Gemini,
