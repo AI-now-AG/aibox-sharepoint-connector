@@ -639,12 +639,14 @@
   "error.tenant-inactive-error-message": "Dein Zugriff auf die aibox ist derzeit nicht aktiv. Die Testphase ist möglicherweise abgelaufen oder es besteht kein gültiges Abonnement mehr.\nWenn du Unterstützung benötigst, wende dich bitte an den Support <a href=\"mailto:support@aibox-app.ch\" class=\"text-primary underline\">support@aibox-app.ch</a> oder an deinen aibox Administrator.",
   "knowledgebase.empty.title": "Keine Knowledge Base vorhanden",
   "knowledgebase.empty.description": "Beginnen Sie mit der Erstellung einer neuen Knowledge Base",
-  "prompt-execution.result.copy": "Kopieren",
+  "prompt-execution.result.copy-text": "Text Kopieren",
+  "prompt-execution.result.copy-html": "HTML kopieren",
   "prompt-execution.result.send-via-email": "E-Mail senden",
   "prompt-execution.result.export-to-pdf": "Als PDF exportieren",
   "prompt-execution.result.export-to-word": "Als Word exportieren",
   "prompt-execution.result.share-via-mail-subject": "Geteiltes Resultat aus der aibox",
   "prompt-execution.result.share-via-mail-message": "${username} (${useremail}) will das folgende Resultat aus der aibox mit dir teilen:",
   "prompt-execution.result.share-via-mail-success": "E-Mail erfolgreich gesendet!",
-  "prompt-execution.result.share-via-mail-failed": "Senden der E-Mail fehlgeschlagen."
+  "prompt-execution.result.share-via-mail-failed": "Senden der E-Mail fehlgeschlagen.",
+  "prompt-execution.upload-file.drop-files-here": "Dateien hier ablegen, um sie dem Gespräch hinzuzufügen."
 }

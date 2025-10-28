@@ -78,7 +78,22 @@
     };
   });
 
-  function copyToClipboard(index: number) {
+  function copyTextToClipboard(content: string, index: number) {
+    navigator.clipboard
+      .writeText(content)
+      .then(() => {
+        copyIndex = index;
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+          copyIndex = -1;
+        }, 2000);
+      })
+      .catch((err) => {
+        console.error("Could not copy text: ", err);
+      });
+  }
+
+  function copyHtmlToClipboard(index: number) {
     const fullHtml = getFullHtmlContent(index);
     const blob = new Blob([fullHtml], { type: "text/html" });
     const data = [new ClipboardItem({ "text/html": blob })];
@@ -353,7 +368,10 @@
                               sendEmailPromptResultIndex = index;
                               sendEmailToModal?.show();
                             }}
-                            copyToClipboardAction={() => copyToClipboard(index)}
+                            copyTextToClipboardAction={() =>
+                              copyTextToClipboard(content, index)}
+                            copyHtmlToClipboardAction={() =>
+                              copyHtmlToClipboard(index)}
                             isHideSendEmailAction={imageUrl ? true : false}
                           />
                         </div>
