@@ -463,7 +463,7 @@
   "create-image.image-info-text": "Format:${format}, Quality:${quality}, Size:${size}",
   "prompt-execution.models.openai-legacy": "${model}, Legacy (Text)",
   "prompt-execution.models.openai": "${model} (Text)",
-  "prompt-execution.models.azure-openai": "Azure ${model} (Text)",
+  "prompt-execution.models.azure-openai": "${model} (Azure)",
   "prompt-execution.models.perplexity": "${model} (Text & Websuche)",
   "prompt-execution.models.openai-with-tools": "gpt-4o (Text & Tools)",
   "prompt-execution.models.openai-with-image-tools": "gpt Image (Bilder)",
