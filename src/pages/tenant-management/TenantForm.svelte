@@ -27,6 +27,7 @@
   } from "$types/TenantFeature";
   import {
     SubscriptionPackageId,
+    SubscriptionExtraPackage,
     AudioOptionId,
     BillingMethod,
     BillingMethodLabels,
@@ -1064,8 +1065,20 @@
             { value: SubscriptionPackageId.Starter, title: "aibox Starter" },
             { value: SubscriptionPackageId.Teams, title: "aibox Teams" },
             { value: SubscriptionPackageId.Pro, title: "aibox Pro" },
-            { value: "Internal", title: "Internal" },
-            { value: "Enterprise", title: "aibox Enterprise" },
+            { value: SubscriptionExtraPackage.Test, title: "Test" },
+            {
+              value: SubscriptionExtraPackage.TeamsReseller,
+              title: "aibox Teams (Reseller)",
+            },
+            {
+              value: SubscriptionExtraPackage.ProReseller,
+              title: "aibox Pro (Reseller)",
+            },
+            { value: SubscriptionExtraPackage.Internal, title: "Internal" },
+            {
+              value: SubscriptionExtraPackage.Enterprise,
+              title: "aibox Enterprise",
+            },
           ]}
           bind:value={selectedPlan}
         />
