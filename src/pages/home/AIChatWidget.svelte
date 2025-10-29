@@ -1,5 +1,6 @@
 <script lang="ts">
   import { actions } from "astro:actions";
+  import { onMount } from "svelte";
   import { slide } from "svelte/transition";
   import { type Message, MessageRole } from "$types/MessageHistory";
   import { sharedMessageHistory } from "$stores/chatHistory";
@@ -20,7 +21,11 @@
   import { addToast } from "$stores/toast";
   import { ApiKeyProvider } from "$types/TenantFeature";
   import { PromptToolOption } from "$types/AIProvider";
-  import { getPromptTools, useProviderInfo } from "$shared/AIProvider";
+  import {
+    getPromptTools,
+    useProviderInfo,
+    resolveAPIProvider,
+  } from "$shared/AIProvider";
   import { TRANSCRIPTION_API_URL } from "astro:env/client";
 
   const t = useTranslations();
@@ -75,12 +80,17 @@
   });
   let isDisableFileInput = $state(apiProvider?.name == PromptModel.Perplexity);
 
+  const providerInfo = useProviderInfo($tenant);
+
+  onMount(() => {
+    selectedModel = providerInfo?.defaultProviderPromptModelName as PromptModel;
+  });
+
   $effect(() => {
     isDisableSelectModel = $sharedMessageHistory.length > 0 || isFetching;
     isDisableFileInput = selectedModel === PromptModel.Perplexity;
   });
 
-  const providerInfo = useProviderInfo($tenant);
   // === Derived State ===
   let toolOptions = $derived.by(() => {
     return getPromptTools(
@@ -92,18 +102,6 @@
 
   let selectedPromptTool = $state(PromptToolOption.None);
 
-  function isGpt5Default() {
-    const aiProviders = $tenant?.api_key_providers ?? [];
-    const activeDefaultProvider = aiProviders.find(
-      (item) => item.active === true && item.default === true,
-    );
-
-    if (activeDefaultProvider?.name === ApiKeyProvider.OpenAIGpt5) {
-      return true;
-    }
-    return false;
-  }
-
   // === API Configuration ===
   async function getAPIConfiguration(): Promise<APIConfiguration> {
     return {
@@ -114,17 +112,12 @@
 
   // === Request Builder ===
   function buildRequestPayload(fileUrls: string[]): RequestPayload {
-    const isOpenAIResponseModel = [PromptModel.OpenAI].includes(selectedModel);
+    const isResponseModel = [
+      PromptModel.OpenAI,
+      PromptModel.OpenAIGpt5,
+    ].includes(selectedModel);
 
-    const isOpenAIGpt5ResponseModel =
-      [PromptModel.OpenAIGpt5].includes(selectedModel) ||
-      (isGpt5Default() && !selectedModel);
-
-    const provider = isOpenAIResponseModel
-      ? "openai-response"
-      : isOpenAIGpt5ResponseModel
-        ? "openai-gpt-5-response"
-        : selectedModel;
+    const provider = resolveAPIProvider(selectedModel);
 
     isGenerating = selectedPromptTool == PromptToolOption.Image;
 
@@ -151,13 +144,13 @@
       }
     }
 
-    if (isOpenAIResponseModel) {
+    if (isResponseModel) {
       payload.previousResponseId = previousResponseId;
     } else {
       payload.messageHistory = $sharedMessageHistory;
     }
 
-    if (isOpenAIGpt5ResponseModel) {
+    if (isResponseModel) {
       payload.reasoningEffort = "low";
       payload.verbosity = "low";
     }
@@ -647,7 +640,7 @@
           bind:input
           bind:files
           {isFetching}
-          showAttachmentButton={!isDisableFileInput}
+          allowFileUpload={!isDisableFileInput}
           onsend={submitForm}
           {toolOptions}
           bind:selectedPromptTool
@@ -713,7 +706,7 @@
             bind:files
             {isFetching}
             stickyFooter={true}
-            showAttachmentButton={!isDisableFileInput}
+            allowFileUpload={!isDisableFileInput}
             onsend={submitForm}
             {toolOptions}
             bind:selectedPromptTool

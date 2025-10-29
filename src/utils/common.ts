@@ -5,6 +5,15 @@ export function isTrulyEmpty(obj: any) {
   return !obj || Object.keys(obj).length === 0;
 }
 
+export function toHeadline(str = "") {
+  return str
+    .replace(/[_\-.]+/g, " ")
+    .trim()
+    .split(/\s+/)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(" ");
+}
+
 export function capitalizeFirst(text: string) {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }

@@ -8,14 +8,16 @@
     exportToPdfAction: Function;
     exportToWordAction: Function;
     sendEmailAction: Function;
-    copyToClipboardAction: Function;
+    copyTextToClipboardAction: Function;
+    copyHtmlToClipboardAction: Function;
     isHideSendEmailAction?: boolean;
   }
   const {
     exportToPdfAction,
     exportToWordAction,
     sendEmailAction,
-    copyToClipboardAction,
+    copyTextToClipboardAction,
+    copyHtmlToClipboardAction,
     isHideSendEmailAction = false,
   }: Props = $props();
 
@@ -80,11 +82,21 @@
         <li>
           <button
             onclick={() => {
-              copyToClipboardAction?.();
+              copyTextToClipboardAction?.();
               closeDropdown();
             }}
           >
-            <span>{t("prompt-execution.result.copy")}</span>
+            <span>{t("prompt-execution.result.copy-text")}</span>
+          </button>
+        </li>
+        <li>
+          <button
+            onclick={() => {
+              copyHtmlToClipboardAction?.();
+              closeDropdown();
+            }}
+          >
+            <span>{t("prompt-execution.result.copy-html")}</span>
           </button>
         </li>
       </ul>

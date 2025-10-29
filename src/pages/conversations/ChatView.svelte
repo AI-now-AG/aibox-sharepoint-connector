@@ -14,10 +14,9 @@
   import { addToast } from "$stores/toast";
   import {
     getPromptTools,
-    ModelNameMap,
-    ProviderModelMap,
     useProviderInfo,
     getModelName,
+    resolveAPIProvider,
   } from "$shared/AIProvider";
   import { tenant, user } from "$stores";
   import { PromptModel } from "$types/PromptModel";
@@ -155,24 +154,16 @@
   }
 
   function buildRequestPayload(fileUrls: string[]): RequestPayload {
-    const isOpenAIResponseModel = [
+    const isResponseModel = [
       PromptModel.OpenAI,
       PromptModel.OpenAIWithTools, // Deprecated — removal imminent
       PromptModel.OpenAIWithImageTools, // Deprecated — removal imminent
+      PromptModel.OpenAIGpt5,
     ].includes(model);
 
-    const isOpenAIGpt5ResponseModel =
-      [PromptModel.OpenAIGpt5].includes(model) || (isGpt5Default() && !model);
+    const provider = resolveAPIProvider(model);
 
     const isGeminiImageModel = [PromptModel.NanoBanana].includes(model);
-
-    const provider = isOpenAIResponseModel
-      ? "openai-response"
-      : isOpenAIGpt5ResponseModel
-        ? "openai-gpt-5-response"
-        : isGeminiImageModel
-          ? "gemini"
-          : model;
     const requestModel = isGeminiImageModel
       ? ModelName.Gemini25FlashImage
       : undefined;
@@ -202,13 +193,13 @@
       }
     }
 
-    if (isOpenAIResponseModel || isOpenAIGpt5ResponseModel) {
+    if (isResponseModel) {
       payload.previousResponseId = previousResponseId;
     } else {
       payload.messageHistory = messageHistory;
     }
 
-    if (isOpenAIGpt5ResponseModel) {
+    if (isResponseModel) {
       payload.reasoningEffort = "low";
       payload.verbosity = "low";
     }
@@ -620,7 +611,8 @@
 <div class="grid grid-cols-1 grid-rows-[min-content_1fr_min-content] h-full">
   <div class="flex items-center">
     <div class="flex flex-1">
-      <span class="self-start badge badge-xs px-2 border-base-300 font-normal"
+      <span
+        class="self-start badge badge-xs py-2 px-2 border-base-300 font-normal"
         >{getModelName($tenant, model)}</span
       >
     </div>
@@ -659,7 +651,7 @@
         {toolOptions}
         bind:selectedPromptTool
         showDataLossWarning={false}
-        showAttachmentButton={isShowAttachmentButton}
+        allowFileUpload={isShowAttachmentButton}
       />
     </div>
   </div>

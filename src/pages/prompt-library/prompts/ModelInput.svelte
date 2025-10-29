@@ -39,6 +39,8 @@
     models = getActiveModels() || [];
   });
 
+  $inspect(selectedModel);
+
   const getModelLabel = (provider: any) => {
     const key = ProviderModelMap[provider.name] as keyof typeof $tenant;
     const rawModel = $tenant?.[key] || "gpt-4o";
@@ -48,6 +50,11 @@
     switch (provider.name) {
       case PromptModel.OpenAI:
         title = `${modelLabel} (${t("home.model-option-text-tools")})`;
+        break;
+      case PromptModel.OpenAIGpt5:
+        title = t("prompt-execution.models.openai-gpt-5-with-tools", {
+          model: modelLabel,
+        });
         break;
       case PromptModel.AzureOpenAI:
         title = t("prompt-execution.models.azure-openai", {
@@ -59,11 +66,6 @@
         break;
       case PromptModel.Claude:
         title = t("prompt-execution.models.claude", { model: modelLabel });
-        break;
-      case PromptModel.OpenAIGpt5:
-        title = t("prompt-execution.models.openai-gpt-5-with-tools", {
-          model: modelLabel,
-        });
         break;
       case PromptModel.Gemini:
         title = t("prompt-execution.models.gemini-with-tools", {
