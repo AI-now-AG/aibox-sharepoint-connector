@@ -100,6 +100,10 @@
 
   let isAudioTagEnabled = $state(false);
 
+  // Subtitle configuration
+  let maxCharsPerLine = $state(34);
+  let maxLinesPerBlock = $state(2);
+
   let confirmModal: HTMLDialogElement | undefined = $state();
 
   let assFileChecked = $state(selectedFileFormat.includes(FileFormat.ASS));
@@ -1028,10 +1032,12 @@
       tenantId: tenant?._id,
       userId: user?.id,
       category: category,
-      subtitleConfig: {
-        useSentenceBasedFlow: true,
-        maxCharsPerLine: 34,
-        maxLinesPerBlock: 2,
+      ...(category === AudioCategory.SubtitleLarge || category === AudioCategory.Subtitle11Labs) && {
+        subtitleConfig: {
+          useSentenceBasedFlow: true,
+          maxCharsPerLine: maxCharsPerLine,
+          maxLinesPerBlock: maxLinesPerBlock,
+        },
       },
       selectedFileFormat: selectedFileFormat,
       isShowImprovedTextPreview: showTextPreviewChecked,
@@ -1836,6 +1842,102 @@
             {t("settings.transcription.elevenLabs-audio-tag")}
           </h3>
         </label>
+      </div>
+    </div>
+  {/if}
+
+  {#if category === AudioCategory.SubtitleLarge || category === AudioCategory.Subtitle11Labs}
+    <div class="bg-base-100 mt-10 p-4 px-6 rounded-xl">
+      <div class="flex flex-col gap-4">
+        <h2 class="font-semibold text-lg">Subtitle Configuration</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Max Characters Per Line -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-medium">Max Characters Per Line</span>
+            </label>
+            <div class="join w-full">
+              <input
+                type="number"
+                class="input input-bordered join-item w-full [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                min="20"
+                max="60"
+                bind:value={maxCharsPerLine}
+                placeholder="34"
+              />
+              <div class="join-item flex flex-col border border-l-0 border-base-300 rounded-r-lg">
+                <button
+                  type="button"
+                  class="btn btn-ghost btn-xs h-1/2 rounded-none rounded-tr-lg px-2 min-h-0 border-b border-base-300"
+                  onclick={() => {
+                    if (maxCharsPerLine < 60) maxCharsPerLine += 1;
+                  }}
+                  aria-label="Increment"
+                >
+                  <svg width="12" height="7" viewBox="0 0 12 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1.33341 6L6.00008 1.33333L10.6667 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-ghost btn-xs h-1/2 rounded-none rounded-br-lg px-2 min-h-0"
+                  onclick={() => {
+                    if (maxCharsPerLine > 20) maxCharsPerLine -= 1;
+                  }}
+                  aria-label="Decrement"
+                >
+                  <svg width="12" height="7" viewBox="0 0 12 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10.6666 1L5.99992 5.66667L1.33325 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Max Lines Per Block -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-medium">Max Lines Per Block</span>
+            </label>
+            <div class="join w-full">
+              <input
+                type="number"
+                class="input input-bordered join-item w-full [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                min="1"
+                max="4"
+                bind:value={maxLinesPerBlock}
+                placeholder="2"
+              />
+              <div class="join-item flex flex-col border border-l-0 border-base-300 rounded-r-lg">
+                <button
+                  type="button"
+                  class="btn btn-ghost btn-xs h-1/2 rounded-none rounded-tr-lg px-2 min-h-0 border-b border-base-300"
+                  onclick={() => {
+                    if (maxLinesPerBlock < 4) maxLinesPerBlock += 1;
+                  }}
+                  aria-label="Increment"
+                >
+                  <svg width="12" height="7" viewBox="0 0 12 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1.33341 6L6.00008 1.33333L10.6667 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-ghost btn-xs h-1/2 rounded-none rounded-br-lg px-2 min-h-0"
+                  onclick={() => {
+                    if (maxLinesPerBlock > 1) maxLinesPerBlock -= 1;
+                  }}
+                  aria-label="Decrement"
+                >
+                  <svg width="12" height="7" viewBox="0 0 12 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10.6666 1L5.99992 5.66667L1.33325 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   {/if}
