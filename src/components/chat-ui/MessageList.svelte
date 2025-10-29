@@ -13,6 +13,7 @@
   import { isValidEmail } from "$utils/common";
   import MessageAction from "$components/chat-ui/MessageAction.svelte";
   import { TRANSCRIPTION_API_URL } from "astro:env/client";
+  import { marked } from "marked";
 
   const t = useTranslations();
 
@@ -78,19 +79,106 @@
     };
   });
 
-  function copyTextToClipboard(content: string, index: number) {
-    navigator.clipboard
-      .writeText(content)
-      .then(() => {
-        copyIndex = index;
-        clearTimeout(timer);
-        timer = setTimeout(() => {
-          copyIndex = -1;
-        }, 2000);
-      })
-      .catch((err) => {
-        console.error("Could not copy text: ", err);
-      });
+  function extractTextWithStructure(element: HTMLElement): string {
+    let text = "";
+
+    for (const node of element.childNodes) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        text += node.textContent;
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        const el = node as HTMLElement;
+        switch (el.tagName.toLowerCase()) {
+          case "br":
+            break;
+          case "p":
+            text += extractTextWithStructure(el).trim() + "\n\n";
+            break;
+          case "ul":
+            for (const li of el.children) {
+              text +=
+                "• " +
+                extractTextWithStructure(li as HTMLElement).trim() +
+                "\n";
+            }
+            break;
+          case "ol":
+            let i = 1;
+            for (const li of el.children) {
+              text +=
+                `${i}. ` +
+                extractTextWithStructure(li as HTMLElement).trim() +
+                "\n";
+              i++;
+            }
+            break;
+          case "table":
+            text += formatTable(el);
+            break;
+          case "h1":
+          case "h2":
+          case "h3":
+          case "h4":
+          case "h5":
+          case "h6":
+            text += "\n" + el.textContent.trim() + "\n";
+            break;
+          default:
+            text += extractTextWithStructure(el);
+        }
+      }
+    }
+
+    return text;
+  }
+
+  /**
+   * Format HTML tables into readable plain text
+   */
+  function formatTable(table: HTMLElement): string {
+    const rows = Array.from(table.querySelectorAll("tr")).map((tr) =>
+      Array.from(tr.querySelectorAll("th, td")).map((td) =>
+        td.textContent.trim().replace(/\s+/g, " "),
+      ),
+    );
+
+    if (!rows.length) return "";
+
+    // Compute column widths
+    const colWidths = rows[0].map((_, colIndex) =>
+      Math.max(...rows.map((row) => (row[colIndex] || "").length)),
+    );
+
+    // Build aligned text
+    const lines = rows.map((row, rowIndex) =>
+      row
+        .map((cell, i) => cell.padEnd(colWidths[i] + 2, " "))
+        .join("")
+        .trimEnd(),
+    );
+
+    return lines.join("\n");
+  }
+
+  async function copyTextToClipboard(content: string, index: number) {
+    marked.setOptions({ breaks: true });
+    const html = await marked.parse(content);
+    console.log("Original HTML content:\n", html);
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+    const text = extractTextWithStructure(doc.body).trim();
+    console.log("------------------------------------------------");
+    console.log("Extracted plain text with structure:\n", text);
+
+    try {
+      await navigator.clipboard.writeText(text);
+      copyIndex = index;
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        copyIndex = -1;
+      }, 2000);
+    } catch (err) {
+      console.error("Could not copy text: ", err);
+    }
   }
 
   function copyHtmlToClipboard(index: number) {
