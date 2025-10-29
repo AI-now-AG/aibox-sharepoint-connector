@@ -1,7 +1,8 @@
 <script lang="ts">
   import { useTranslations } from "$i18n/utils";
-  const t = useTranslations();
   import { svgIcons } from "$assets/icons";
+
+  const t = useTranslations();
 
   const acceptedTypesDefault = {
     "audio/*": ["audio/mp3", "audio/wav", "audio/mpeg"],

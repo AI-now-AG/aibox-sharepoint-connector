@@ -2,7 +2,7 @@
   import Loading from "$components/Loading.svelte";
   import { useTranslations } from "$i18n/utils";
   import { addToast } from "$stores/toast";
-  import { preventDefault } from "$utils/common";
+  import { preventDefault, toHeadline } from "$utils/common";
   import { actions } from "astro:actions";
 
   const t = useTranslations();
@@ -88,7 +88,7 @@
         class={`card-body ${providerData.provider === "default" ? "bg-yellow-50" : "bg-base-100"} rounded-xl`}
       >
         <h1 class="card-title capitalize text-2xl font-extrabold text-primary">
-          {providerData.provider}
+          {toHeadline(providerData.provider)}
         </h1>
         <div
           class="flex items-center gap-4 bg-base-200 p-4 rounded-xl border border-base-300 transition-colors hover:bg-base-300"
