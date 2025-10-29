@@ -31,6 +31,7 @@
     AudioOptionId,
     BillingMethod,
     BillingMethodLabels,
+    SubscriptionStatus,
   } from "$types/Subscription";
   import Dropdown from "$components/form/Dropdown.svelte";
   import AudioAddonsDropdown from "./AudioAddonsDropdown.svelte";
@@ -118,6 +119,8 @@
     initSubtitleStudioOptions,
   );
   tenantData.billing_info = tenant?.billing_info ?? {};
+  let subscriptionDate: any = $state("");
+  let subscriptionStatus: any = $state(subscription?.status ?? "");
 
   let openAIEnabled: boolean = $state(false);
   let openAIGpt5Enabled: boolean = $state(false);
@@ -797,6 +800,10 @@
               ...selectedAudioToTextOptions,
               ...selectedSubtitleStudioOptions,
             ],
+            subscription_date: subscriptionDate
+              ? new Date(subscriptionDate)
+              : null,
+            status: subscriptionStatus,
           },
         });
         loading = false;
@@ -934,6 +941,12 @@
 
     if (!tenant.totalPrice) {
       tenant.totalPrice = calculateTotalPrice();
+    }
+
+    if (subscription?.subscription_date) {
+      const iso = subscription.subscription_date;
+      // Convert "2025-10-01T00:00:00.000Z" -> "2025-10-01"
+      subscriptionDate = iso.split("T")[0];
     }
   });
 </script>
@@ -1110,6 +1123,56 @@
           class="input input-bordered w-full"
           bind:value={tenantData.totalPrice}
         />
+      </div>
+    </div>
+
+    <div class="flex flex-row space-x-4">
+      <div class="flex-1 flex flex-col mb-4">
+        <p class="mb-2">{"Subscription Date"}</p>
+        <input
+          type="date"
+          bind:value={subscriptionDate}
+          placeholder="Select date"
+          class="input input-bordered font-medium w-full min-w-xs"
+        />
+      </div>
+      <div class="flex-1 flex flex-col mb-4">
+        <p class="mb-2">{"Subscription Status"}</p>
+
+        <div class="flex items-center space-x-6 mt-2">
+          <label class="label cursor-pointer space-x-2">
+            <input
+              type="radio"
+              name="subscription-status"
+              class="radio radio-primary"
+              value={SubscriptionStatus.Active}
+              bind:group={subscriptionStatus}
+            />
+            <span class="label-text">Active</span>
+          </label>
+
+          <label class="label cursor-pointer space-x-2">
+            <input
+              type="radio"
+              name="subscription-status"
+              class="radio radio-primary"
+              value={SubscriptionStatus.Canceled}
+              bind:group={subscriptionStatus}
+            />
+            <span class="label-text">Canceled</span>
+          </label>
+
+          <label class="label cursor-pointer space-x-2">
+            <input
+              type="radio"
+              name="subscription-status"
+              class="radio radio-primary"
+              value={SubscriptionStatus.Trialing}
+              bind:group={subscriptionStatus}
+            />
+            <span class="label-text">Trialing</span>
+          </label>
+        </div>
       </div>
     </div>
 

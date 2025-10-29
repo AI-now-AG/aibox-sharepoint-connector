@@ -27,6 +27,7 @@ import {
   SubscriptionPackageId,
   SubscriptionExtraPackage,
   AudioOptionId,
+  SubscriptionStatus,
 } from "$types/Subscription";
 import { EncryptedUserPassword, UserRole } from "$types/Users";
 
@@ -101,6 +102,8 @@ const SubscriptionInputParamsSchema = z.object({
     .or(z.literal(""))
     .optional(),
   add_ons: z.array(z.nativeEnum(AudioOptionId)).optional(),
+  status: z.nativeEnum(SubscriptionStatus).optional(),
+  subscription_date: z.coerce.date().nullable().optional()
 });
 
 const assignMemberRoles = async (
