@@ -9,20 +9,16 @@ export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();
     const { tenants = [] } = body;
-    
+
     const userCounts: any = {};
     for (let i = 0; i < tenants.length; i++) {
       const tenant = tenants[i];
       const totalActiveUsers = await UserModel.countActiveUsersByTenant(
         tenant._id,
       );
-      console.log(`totalActiveUsers of tenant ${tenant.name}`, totalActiveUsers)
       userCounts[tenant._id] = totalActiveUsers
     }
 
-
-
-    // Build CSV rows
     const csvData = tenants.map((tenant: any) => {
       const sub = tenant.subscription;
       const billing = tenant.billing_info ?? {};
@@ -55,10 +51,8 @@ export const POST: APIRoute = async ({ request }) => {
       };
     });
 
-    // Convert to CSV
     const csvString = await writeToString(csvData, { headers: true });
 
-    // Return CSV as a downloadable file
     return new Response(csvString, {
       headers: {
         "Content-Type": "text/csv",
