@@ -216,7 +216,7 @@ export const tenant = {
     input: TenantFilterParamsSchema,
     handler: async (input) => {
       const data = await TenantModel.list(input);
-      return transformRawData(data);
+      return transformRawData(data, false);
     },
   }),
 

@@ -1128,7 +1128,7 @@
 
     <div class="flex flex-row space-x-4">
       <div class="flex-1 flex flex-col mb-4">
-        <p class="mb-2">{"Subscription Date"}</p>
+        <p class="mb-2">{t("tenant.subscription-date")}</p>
         <input
           type="date"
           bind:value={subscriptionDate}
@@ -1137,7 +1137,7 @@
         />
       </div>
       <div class="flex-1 flex flex-col mb-4">
-        <p class="mb-2">{"Subscription Status"}</p>
+        <p class="mb-2">{t("tenant.subscription-status")}</p>
 
         <div class="flex items-center space-x-6 mt-2">
           <label class="label cursor-pointer space-x-2">

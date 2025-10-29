@@ -135,32 +135,48 @@ export default {
   },
 
   list: async (filterParams?: TenantFilterParams) => {
-    // Start with a default filter for active tenants
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const filter: any = {
       active: true,
     };
 
-    // If filterParams are provided, adjust the filter accordingly
     if (filterParams) {
       const { searchValue, showArchived } = filterParams;
 
-      // Add search filter if there's a search value
       if (searchValue) {
-        filter.name = {
-          $regex: searchValue,
-          $options: "i",
-        };
+        filter.name = { $regex: searchValue, $options: "i" };
       }
 
-      // Adjust filter to include archived tenants if requested
       if (showArchived) {
-        filter.active = false; // Overwrites active to false for archived tenants
+        filter.active = false;
       }
     }
 
-    const data = collection.find<Document<Tenant>>(filter);
-    return await data.toArray();
+    const pipeline = [
+      { $match: filter },
+      {
+        $lookup: {
+          from: "subscriptions",
+          localField: "_id",
+          foreignField: "tenant_id",
+          as: "subscriptions",
+        },
+      },
+      {
+        $addFields: {
+          // Include only the latest or first subscription
+          subscription: { $arrayElemAt: ["$subscriptions", 0] },
+        },
+      },
+      {
+        $project: {
+          subscriptions: 0, // hide the full array coz only need one
+        },
+      },
+    ];
+
+    const data = await collection.aggregate<Document<Tenant & { subscription?: any }>>(pipeline).toArray();
+
+    return data;
   },
 
   get: async (id: string | ObjectId): Promise<Tenant | null> => {

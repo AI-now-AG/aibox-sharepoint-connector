@@ -9,6 +9,13 @@
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import Loading from "$components/Loading.svelte";
   import InputSearchFilter from "./InputSearchFilter.svelte";
+  import dayjs from "dayjs";
+  import {
+    AudioOptionId,
+    AudioOptionLabels,
+    SubscriptionPackageId,
+  } from "$types/Subscription";
+  import { SubscriptionPackages } from "$data/subscription-packages";
 
   const t = useTranslations();
   let loading = $state(false);
@@ -31,6 +38,7 @@
       searchValue,
       showArchived,
     });
+
     loading = false;
 
     if (!error) {
@@ -38,20 +46,6 @@
     } else {
       log.e(error, "Error fetching tenants");
     }
-  };
-
-  const copyName = (name: string) => {
-    navigator.clipboard.writeText(name).then(
-      function () {
-        addToast({
-          message: "Copied to clipboard: " + name,
-          type: "success",
-        });
-      },
-      function (err) {
-        console.error("Could not copy text: ", err);
-      },
-    );
   };
 
   function confirmUpdateStatus(tenant: any) {
@@ -114,6 +108,92 @@
       });
     }
   }
+
+  const getSubscriptionAddOnName = (
+    forOption: "audiototext" | "subtitle" = "audiototext",
+    planAddOns: Array<any> = [],
+  ) => {
+    const addOnOptions: Array<any> =
+      forOption == "audiototext"
+        ? planAddOns.filter((option: any) => {
+            return (
+              option == AudioOptionId.AudioBasis ||
+              option == AudioOptionId.AudioBasisAddOnLarge
+            );
+          }) || []
+        : planAddOns.filter((option: any) => {
+            return (
+              option == AudioOptionId.AudioBasisAddOnSubtitle ||
+              option == AudioOptionId.AudioPremium
+            );
+          }) || [];
+    const firstOption = addOnOptions?.[0] as AudioOptionId | undefined;
+    return firstOption ? AudioOptionLabels[firstOption] || "-" : "-";
+  };
+
+  const calculateTotalPrice = (
+    selectedPlan: SubscriptionPackageId,
+    planAddOns: Array<any> = [],
+  ) => {
+    const selectedAudioToTextOptions =
+      planAddOns.filter((option: any) => {
+        return (
+          option == AudioOptionId.AudioBasis ||
+          option == AudioOptionId.AudioBasisAddOnLarge
+        );
+      }) || [];
+    const selectedSubtitleStudioOptions =
+      planAddOns.filter((option: any) => {
+        return (
+          option == AudioOptionId.AudioBasisAddOnSubtitle ||
+          option == AudioOptionId.AudioPremium
+        );
+      }) || [];
+
+    let packagePrice = 0;
+    let audioOptionsTotalPrice = 0;
+
+    // Get package price
+    if (selectedPlan) {
+      let selectedPackage =
+        SubscriptionPackages.plan[
+          selectedPlan as keyof typeof SubscriptionPackages.plan
+        ];
+      if (selectedPackage) {
+        packagePrice = selectedPackage?.price || 0;
+      }
+    }
+
+    // Get audio options price
+    if (selectedAudioToTextOptions.length > 0) {
+      selectedAudioToTextOptions.forEach((audioOptionId) => {
+        let audioOption =
+          SubscriptionPackages.audioOptions[
+            audioOptionId as keyof typeof SubscriptionPackages.audioOptions
+          ];
+        if (audioOption) {
+          audioOptionsTotalPrice += audioOption?.price || 0;
+        }
+      });
+    }
+
+    // Get audio options price
+    if (selectedSubtitleStudioOptions.length > 0) {
+      selectedSubtitleStudioOptions.forEach((audioOptionId) => {
+        let audioOption =
+          SubscriptionPackages.audioOptions[
+            audioOptionId as keyof typeof SubscriptionPackages.audioOptions
+          ];
+        if (audioOption) {
+          audioOptionsTotalPrice += audioOption?.price || 0;
+        }
+      });
+    }
+
+    return packagePrice + audioOptionsTotalPrice == 0
+      ? "-"
+      : String(packagePrice + audioOptionsTotalPrice) + " CHF";
+  };
 </script>
 
 <div class="container max-w-full mx-auto p-6">
@@ -147,13 +227,19 @@
               >{t("tenant.tenants.tenant.display-name")}</th
             >
             <th class="py-3 px-4 text-left font-normal text-xs"
-              >{t("tenant.tenants.tenant.name")}</th
+              >{t("tenant.subscription")}</th
             >
             <th class="py-3 px-4 text-left font-normal text-xs"
-              >{t("tenant.trial")}</th
+              >{t("tenant.audio-subscription")}</th
             >
             <th class="py-3 px-4 text-left font-normal text-xs"
-              >{t("tenant.tenants.tenant.date-added")}</th
+              >{t("tenant.subtitle-subscription")}</th
+            >
+            <th class="py-3 px-4 text-left font-normal text-xs"
+              >{t("tenant.total-price")}</th
+            >
+            <th class="py-3 px-4 text-left font-normal text-xs"
+              >{t("tenant.subscription-date")}</th
             >
             <th class="py-3 px-4 text-left font-normal text-xs"
               >{t("tenant.tenants.tenant.active")}</th
@@ -170,22 +256,51 @@
                   href="/tenant-management/{tenant._id}">{tenant.name}</a
                 >
               </td>
-              <td
-                class="py-3 px-4 text-base-content flex items-center text-xs font-normal h-16"
-              >
-                {tenant.org_name}
-                <button
-                  class="mx-1 self-center"
-                  onclick={() => copyName(tenant.org_name)}
-                  >{@html svgIcons.copy}</button
-                >
+
+              <td class="py-3 px-4">
+                <span class="text text-sm font-medium">
+                  {tenant.subscription?.plan_name}
+                </span>
               </td>
+
+              <td class="py-3 px-4">
+                <span class="text text-sm font-medium">
+                  {getSubscriptionAddOnName(
+                    "audiototext",
+                    tenant.subscription?.add_ons,
+                  )}
+                </span>
+              </td>
+
+              <td class="py-3 px-4">
+                <span class="text text-sm font-medium">
+                  {getSubscriptionAddOnName(
+                    "subtitle",
+                    tenant.subscription?.add_ons,
+                  )}
+                </span>
+              </td>
+
               <td class="py-3 px-4">
                 <span class="text-warning text-sm font-medium"
-                  >{tenant.is_trial ? t("common.yes") : ""}</span
+                  >{calculateTotalPrice(
+                    tenant.subscription?.plan_name,
+                    tenant.subscription?.add_ons,
+                  )}</span
                 >
               </td>
-              <td class="py-3 px-4 text-sm font-medium">{tenant.created_at}</td>
+
+              <td class="py-3 px-4">
+                <span class="text text-sm font-medium">
+                  {tenant.subscription?.subscription_date
+                    ? dayjs(
+                        tenant.subscription?.subscription_date,
+                        "DD.MM.YYYY",
+                      ).format("DD.MM.YYYY")
+                    : "-"}
+                </span>
+              </td>
+
               <td class="py-3 px-4">
                 <span
                   class={tenant.active == 1
@@ -196,6 +311,7 @@
                     : t("tenant.tenants.tenant.archived")}</span
                 >
               </td>
+
               <td
                 class="py-3 px-4 text-right relative relative-dropdown rounded-r-lg"
               >
