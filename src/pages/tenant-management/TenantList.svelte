@@ -10,12 +10,9 @@
   import Loading from "$components/Loading.svelte";
   import InputSearchFilter from "./InputSearchFilter.svelte";
   import dayjs from "dayjs";
-  import {
-    AudioOptionId,
-    AudioOptionLabels,
-    SubscriptionPackageId,
-  } from "$types/Subscription";
+  import { AudioOptionId, SubscriptionPackageId } from "$types/Subscription";
   import { SubscriptionPackages } from "$data/subscription-packages";
+  import { getSubscriptionAddOnName } from "$utils/common";
 
   const t = useTranslations();
   let loading = $state(false);
@@ -109,28 +106,6 @@
     }
   }
 
-  const getSubscriptionAddOnName = (
-    forOption: "audiototext" | "subtitle" = "audiototext",
-    planAddOns: Array<any> = [],
-  ) => {
-    const addOnOptions: Array<any> =
-      forOption == "audiototext"
-        ? planAddOns.filter((option: any) => {
-            return (
-              option == AudioOptionId.AudioBasis ||
-              option == AudioOptionId.AudioBasisAddOnLarge
-            );
-          }) || []
-        : planAddOns.filter((option: any) => {
-            return (
-              option == AudioOptionId.AudioBasisAddOnSubtitle ||
-              option == AudioOptionId.AudioPremium
-            );
-          }) || [];
-    const firstOption = addOnOptions?.[0] as AudioOptionId | undefined;
-    return firstOption ? AudioOptionLabels[firstOption] || "-" : "-";
-  };
-
   const calculateTotalPrice = (
     selectedPlan: SubscriptionPackageId,
     planAddOns: Array<any> = [],
@@ -201,24 +176,24 @@
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          tenants: tenants, 
-          userCounts: {},
+          tenants: tenants,
         }),
       });
 
-      if (!response.ok) throw new Error("Export failed");
+      if (!response.ok) throw new Error("Export Tenants failed");
 
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
-
       const a = document.createElement("a");
       a.href = url;
-      a.download = "Tenants.csv";
+      a.download = `Tenants-Export-${dayjs(new Date(), "DD.MM.YYYY HH-mm-ss").format("DD.MM.YYYY HH-mm-ss")}.csv`;
       a.click();
-
       URL.revokeObjectURL(url);
-    } catch (err) {
-      alert("Export failed — see console for details");
+    } catch (err: any) {
+      addToast({
+        message: err,
+        type: "error",
+      });
       console.error(err);
     }
   }
@@ -287,13 +262,6 @@
           class="border-separate border-spacing-x-0 border-spacing-y-3 min-w-full relative"
           style="font-family:Inter;"
         >
-          <!-- <colgroup>
-          <col class="w-auto" />
-          <col class="w-80" />
-          <col class="w-48" />
-          <col class="w-24" />
-          <col class="w-16" />
-        </colgroup> -->
           <thead>
             <tr class="bg-base-300 rounded-lg">
               <th class="py-3 px-4 text-left font-normal text-xs rounded-l-lg"
@@ -356,10 +324,12 @@
 
                 <td class="py-3 px-4">
                   <span class="text-warning text-sm font-medium"
-                    >{calculateTotalPrice(
-                      tenant.subscription?.plan_name,
-                      tenant.subscription?.add_ons,
-                    )}</span
+                    >{tenant.totalPrice
+                      ? tenant.totalPrice + " CHF"
+                      : calculateTotalPrice(
+                          tenant.subscription?.plan_name,
+                          tenant.subscription?.add_ons,
+                        )}</span
                   >
                 </td>
 

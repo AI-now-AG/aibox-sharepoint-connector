@@ -1,11 +1,26 @@
+import UserModel from "$data/models/user.model";
+import { getSubscriptionAddOnName } from "$utils/common";
 import type { APIRoute } from "astro";
+import dayjs from "dayjs";
 import { writeToString } from "fast-csv";
 
 
 export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();
-    const { tenants = [], userCounts = {} } = body;
+    const { tenants = [] } = body;
+    
+    const userCounts: any = {};
+    for (let i = 0; i < tenants.length; i++) {
+      const tenant = tenants[i];
+      const totalActiveUsers = await UserModel.countActiveUsersByTenant(
+        tenant._id,
+      );
+      console.log(`totalActiveUsers of tenant ${tenant.name}`, totalActiveUsers)
+      userCounts[tenant._id] = totalActiveUsers
+    }
+
+
 
     // Build CSV rows
     const csvData = tenants.map((tenant: any) => {
@@ -16,18 +31,12 @@ export const POST: APIRoute = async ({ request }) => {
       return {
         "Tenant Name": tenant.name ?? "-",
         "Status": tenant.active ? "Active" : "Archived",
-        "Date created": tenant.created_at
-          ? new Date(tenant.created_at).toISOString().split("T")[0]
-          : "",
+        "Date created": `${dayjs(tenant.created_at, "DD.MM.YYYY HH-mm-ss").format("DD.MM.YYYY HH-mm-ss")}`,
         "Subscription": sub?.plan_name ?? "-",
-        "Audio subscription": tenant.transcription_types?.includes("audio-to-text")
-          ? "Yes"
-          : "No",
-        "Subtitle Subscription": tenant.transcription_types?.includes("subtitle")
-          ? "Yes"
-          : "No",
+        "Audio subscription": getSubscriptionAddOnName('audiototext', sub?.add_ons),
+        "Subtitle Subscription": getSubscriptionAddOnName('subtitle', sub?.add_ons),
         "Subscription Price": tenant.totalPrice ?? "-",
-        "Number of Users": userCounts[tenant._id?.toString()] ?? "-",
+        "Number of Users": userCounts[tenant._id] ?? "-",
         "Language": tenant.default_language ?? "-",
         "Company Name": billing.company_name ?? "-",
         "E-Mail": billing.email ?? "-",
@@ -36,7 +45,7 @@ export const POST: APIRoute = async ({ request }) => {
         "OpenAI is private key": meta.openaiPrivateKeyEnabled ? "Yes" : "No",
         "Open AI GPT-5 is private key": meta.openaiGpt5PrivateKeyEnabled ? "Yes" : "No",
         "Azure OpenAI is private key": meta.azureOpenaiPrivateKeyEnabled ? "Yes" : "No",
-        "Azure OpenAI ressource name": tenant.azure_openai_instance_name ?? "",
+        "Azure OpenAI ressource name": tenant.azure_openai_instance_name ?? "-",
         "Perplexitiy is private key": meta.perplexityPrivateKeyEnabled ? "Yes" : "No",
         "Claude is private key": meta.claudePrivateKeyEnabled ? "Yes" : "No",
         "Gemini is private key": meta.geminiPrivateKeyEnabled ? "Yes" : "No",
@@ -53,9 +62,7 @@ export const POST: APIRoute = async ({ request }) => {
     return new Response(csvString, {
       headers: {
         "Content-Type": "text/csv",
-        "Content-Disposition": `attachment; filename="Tenants-Export-${new Date()
-          .toISOString()
-          .split("T")[0]}.csv"`,
+        "Content-Disposition": `attachment; filename="Tenants-Export-${dayjs(new Date(), "DD.MM.YYYY HH-mm-ss").format("DD.MM.YYYY HH-mm-ss")}.csv"`,
       },
     });
   } catch (error) {
