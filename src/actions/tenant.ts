@@ -30,6 +30,7 @@ import {
   SubscriptionStatus,
 } from "$types/Subscription";
 import { EncryptedUserPassword, UserRole } from "$types/Users";
+import { writeToString } from "fast-csv";
 
 const TenantInputParamsSchema = z.object({
   name: z.string(),
@@ -467,4 +468,69 @@ export const tenant = {
       return { url: portalUrl };
     },
   }),
+
+  exportTenants: defineAction({
+    accept: "json",
+    input: z.object({
+      tenants: z.array(z.any()),
+      userCounts: z.record(z.string(), z.number()).default({}),
+    }),
+
+    handler: async ({ tenants, userCounts }) => {
+      try {
+        // Build CSV rows
+        const csvData = tenants.map((tenant: any) => {
+          const sub = tenant.subscription
+          const billing = tenant.billing_info ?? {};
+          const meta = tenant.metadata ?? {};
+
+          return {
+            "Tenant Name": tenant.name ?? "-",
+            "Status": tenant.active ? "Active" : "Archived",
+            "Date created": tenant.created_at
+              ? new Date(tenant.created_at).toISOString().split("T")[0]
+              : "",
+            "Subscription": sub?.plan_name ?? "-",
+            "Audio subscription": tenant.transcription_types?.includes("audio-to-text") ? "Yes" : "No",
+            "Subtitle Subscription": tenant.transcription_types?.includes("subtitle") ? "Yes" : "No",
+            "Subscription Price": tenant.totalPrice ?? "-",
+            "Number of Users": userCounts[tenant._id?.toString()] ?? "-",
+            "Language": tenant.default_language ?? "-",
+            "Company Name": billing.company_name ?? "-",
+            "E-Mail": billing.email ?? "-",
+            "Street, Nr.": billing.address ?? "-",
+            "ZIP": billing.zip_code ?? "-",
+            "OpenAI is private key": meta.openaiPrivateKeyEnabled ? "Yes" : "No",
+            "Open AI GPT-5 is private key": meta.openaiGpt5PrivateKeyEnabled ? "Yes" : "No",
+            "Azure OpenAI is private key": meta.azureOpenaiPrivateKeyEnabled ? "Yes" : "No",
+            "Azure OpenAI ressource name": tenant.azure_openai_instance_name ?? "",
+            "Perplexitiy is private key": meta.perplexityPrivateKeyEnabled ? "Yes" : "No",
+            "Claude is private key": meta.claudePrivateKeyEnabled ? "Yes" : "No",
+            "Gemini is private key": meta.geminiPrivateKeyEnabled ? "Yes" : "No",
+            "Azure Speech is private key": meta.speechPrivateKeyEnabled ? "Yes" : "No",
+            "Eleven Labs is private key": meta.elevenLabsPrivateKeyEnabled ? "Yes" : "No",
+            "Flux is private key": meta.fluxPrivateKeyEnabled ? "Yes" : "No",
+          };
+        });
+
+        // Convert to CSV
+        const csvString = await writeToString(csvData, { headers: true });
+
+        // Return CSV file response
+        return new Response(csvString, {
+          headers: {
+            "Content-Type": "text/csv",
+            "Content-Disposition": `attachment; filename="Tenants-Export-${new Date()
+              .toISOString()
+              .split("T")[0]}.csv"`,
+          },
+        });
+      } catch (error) {
+        console.error("Error exporting tenants:", error);
+        throw new Error("Failed to export tenant data.");
+      }
+    },
+  }),
+
+
 };
