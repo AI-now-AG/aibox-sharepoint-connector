@@ -119,7 +119,7 @@
     initSubtitleStudioOptions,
   );
   tenantData.billing_info = tenant?.billing_info ?? {};
-  let subscriptionDate: any = $state("");
+  let subscriptionStartDate: any = $state("");
   let subscriptionStatus: any = $state(subscription?.status ?? "");
 
   let openAIEnabled: boolean = $state(false);
@@ -800,8 +800,8 @@
               ...selectedAudioToTextOptions,
               ...selectedSubtitleStudioOptions,
             ],
-            subscription_date: subscriptionDate
-              ? new Date(subscriptionDate)
+            start_date: subscriptionStartDate
+              ? new Date(subscriptionStartDate)
               : null,
             status: subscriptionStatus,
           },
@@ -943,10 +943,8 @@
       tenant.totalPrice = calculateTotalPrice();
     }
 
-    if (subscription?.subscription_date) {
-      const iso = subscription.subscription_date;
-      // Convert "2025-10-01T00:00:00.000Z" -> "2025-10-01"
-      subscriptionDate = iso.split("T")[0];
+    if (subscription?.start_date) {
+      subscriptionStartDate = subscription.start_date.split("T")[0];
     }
   });
 </script>
@@ -1131,7 +1129,7 @@
         <p class="mb-2">{t("tenant.subscription-date")}</p>
         <input
           type="date"
-          bind:value={subscriptionDate}
+          bind:value={subscriptionStartDate}
           placeholder="Select date"
           class="input input-bordered font-medium w-full min-w-xs"
         />

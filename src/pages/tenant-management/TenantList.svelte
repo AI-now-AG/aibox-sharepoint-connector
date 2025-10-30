@@ -335,9 +335,9 @@
 
                 <td class="py-3 px-4">
                   <span class="text text-sm font-medium">
-                    {tenant.subscription?.subscription_date
+                    {tenant.subscription?.start_date
                       ? dayjs(
-                          tenant.subscription?.subscription_date,
+                          tenant.subscription?.start_date,
                           "DD.MM.YYYY",
                         ).format("DD.MM.YYYY")
                       : "-"}

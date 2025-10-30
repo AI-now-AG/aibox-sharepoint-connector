@@ -19,7 +19,7 @@ const SubscriptionSchema = z.object({
   metadata: z.record(z.any()).nullish(),
   add_ons: z.array(z.nativeEnum(AudioOptionId)).optional(),
   notes: z.string().optional(),
-  subscription_date: z.coerce.date().nullable().optional(),
+  start_date: z.coerce.date().nullable().optional(),
   created_at: z
     .date()
     .optional()
@@ -76,7 +76,7 @@ export default {
           plan_name: null,
           add_ons: [],
           status: SubscriptionStatus.Active,
-          subscription_date: new Date(),
+          start_date: new Date(),
           created_at: new Date(),
           updated_at: new Date(),
         },
