@@ -102,8 +102,8 @@ const SubscriptionInputParamsSchema = z.object({
     .or(z.literal(""))
     .optional(),
   add_ons: z.array(z.nativeEnum(AudioOptionId)).optional(),
-  status: z.nativeEnum(SubscriptionStatus).optional(),
-  start_date: z.coerce.date().nullable().optional()
+  start_date: z.coerce.date().nullable().optional(),
+  cancelled_date: z.coerce.date().nullable().optional()
 });
 
 const assignMemberRoles = async (

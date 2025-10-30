@@ -120,7 +120,7 @@
   );
   tenantData.billing_info = tenant?.billing_info ?? {};
   let subscriptionStartDate: any = $state("");
-  let subscriptionStatus: any = $state(subscription?.status ?? "");
+  let subscriptionCancelledDate: any = $state("");
 
   let openAIEnabled: boolean = $state(false);
   let openAIGpt5Enabled: boolean = $state(false);
@@ -803,7 +803,9 @@
             start_date: subscriptionStartDate
               ? new Date(subscriptionStartDate)
               : null,
-            status: subscriptionStatus,
+            cancelled_date: subscriptionCancelledDate
+              ? new Date(subscriptionCancelledDate)
+              : null,
           },
         });
         loading = false;
@@ -945,6 +947,10 @@
 
     if (subscription?.start_date) {
       subscriptionStartDate = subscription.start_date.split("T")[0];
+    }
+
+    if (subscription?.cancelled_date) {
+      subscriptionCancelledDate = subscription.cancelled_date.split("T")[0];
     }
   });
 </script>
@@ -1126,51 +1132,21 @@
 
     <div class="flex flex-row space-x-4">
       <div class="flex-1 flex flex-col mb-4">
-        <p class="mb-2">{t("tenant.subscription-date")}</p>
+        <p class="mb-2">{t("tenant.subscription-start-date")}</p>
         <input
           type="date"
           bind:value={subscriptionStartDate}
-          placeholder="Select date"
-          class="input input-bordered font-medium w-full min-w-xs"
+          class="input input-bordered w-full font-medium pr-10 focus:ring-2 focus:ring-indigo-500"
         />
       </div>
       <div class="flex-1 flex flex-col mb-4">
-        <p class="mb-2">{t("tenant.subscription-status")}</p>
+        <p class="mb-2">{t("tenant.subscription-cancelled-date")}</p>
 
-        <div class="flex items-center space-x-6 mt-2">
-          <label class="label cursor-pointer space-x-2">
-            <input
-              type="radio"
-              name="subscription-status"
-              class="radio radio-primary"
-              value={SubscriptionStatus.Active}
-              bind:group={subscriptionStatus}
-            />
-            <span class="label-text">Active</span>
-          </label>
-
-          <label class="label cursor-pointer space-x-2">
-            <input
-              type="radio"
-              name="subscription-status"
-              class="radio radio-primary"
-              value={SubscriptionStatus.Canceled}
-              bind:group={subscriptionStatus}
-            />
-            <span class="label-text">Canceled</span>
-          </label>
-
-          <label class="label cursor-pointer space-x-2">
-            <input
-              type="radio"
-              name="subscription-status"
-              class="radio radio-primary"
-              value={SubscriptionStatus.Trialing}
-              bind:group={subscriptionStatus}
-            />
-            <span class="label-text">Trialing</span>
-          </label>
-        </div>
+        <input
+          type="date"
+          bind:value={subscriptionCancelledDate}
+          class="input input-bordered font-medium w-full min-w-xs"
+        />
       </div>
     </div>
 

@@ -649,6 +649,6 @@
   "prompt-execution.result.share-via-mail-success": "Email sent successfully!",
   "prompt-execution.result.share-via-mail-failed": "Failed to send email.",
   "prompt-execution.upload-file.drop-files-here": "Drop any files here to add it to the chat.",
-  "tenant.subscription-date": "Subscription Date",
-  "tenant.subscription-status": "Subscription Status"
+  "tenant.subscription-start-date": "Subscription Start Date",
+  "tenant.subscription-cancelled-date": "Subscription Cancelled Date"
 }

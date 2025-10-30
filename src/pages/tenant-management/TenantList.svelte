@@ -280,7 +280,7 @@
                 >{t("tenant.total-price")}</th
               >
               <th class="py-3 px-4 text-left font-normal text-xs"
-                >{t("tenant.subscription-date")}</th
+                >{t("tenant.subscription-start-date")}</th
               >
               <th class="py-3 px-4 text-left font-normal text-xs"
                 >{t("tenant.tenants.tenant.active")}</th
