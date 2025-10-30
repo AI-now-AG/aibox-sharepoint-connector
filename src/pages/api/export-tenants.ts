@@ -29,7 +29,7 @@ export const POST: APIRoute = async ({ request }) => {
         "Status": tenant.active ? "Active" : "Archived",
         "Date created": `${dayjs(tenant.created_at, "DD.MM.YYYY HH-mm-ss").format("DD.MM.YYYY HH-mm-ss")}`,
         "Subscription start date": sub.start_date ? `${dayjs(sub.start_date, "DD.MM.YYYY").format("DD.MM.YYYY")}` : "-",
-        "Suscription cancelled date": sub.cancelled_date ? `${dayjs(sub.cancelled_date, "DD.MM.YYYY").format("DD.MM.YYYY")}` : "-",
+        "Subscription cancelled date": sub.cancelled_date ? `${dayjs(sub.cancelled_date, "DD.MM.YYYY").format("DD.MM.YYYY")}` : "-",
         "Subscription": sub?.plan_name ?? "-",
         "Audio subscription": getSubscriptionAddOnName('audiototext', sub?.add_ons),
         "Subtitle Subscription": getSubscriptionAddOnName('subtitle', sub?.add_ons),
