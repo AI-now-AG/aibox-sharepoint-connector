@@ -27,7 +27,6 @@ import {
   SubscriptionPackageId,
   SubscriptionExtraPackage,
   AudioOptionId,
-  SubscriptionStatus,
 } from "$types/Subscription";
 import { EncryptedUserPassword, UserRole } from "$types/Users";
 
