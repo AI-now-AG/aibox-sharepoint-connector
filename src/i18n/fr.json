@@ -651,5 +651,6 @@
   "prompt-execution.upload-file.drop-files-here": "Drop any files here to add it to the chat.",
   "tenant.subscription-start-date": "Subscription Start Date",
   "tenant.subscription-cancelled-date": "Subscription Cancelled Date",
-  "home.search-prompt": "Seach prompt"
+  "home.search-prompt": "Seach prompt",
+  "home.search-prompt-result": "Search result"
 }

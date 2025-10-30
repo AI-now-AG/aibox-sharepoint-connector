@@ -101,6 +101,8 @@ const SubscriptionInputParamsSchema = z.object({
     .or(z.literal(""))
     .optional(),
   add_ons: z.array(z.nativeEnum(AudioOptionId)).optional(),
+  start_date: z.coerce.date().nullable().optional(),
+  cancelled_date: z.coerce.date().nullable().optional()
 });
 
 const assignMemberRoles = async (
@@ -213,7 +215,7 @@ export const tenant = {
     input: TenantFilterParamsSchema,
     handler: async (input) => {
       const data = await TenantModel.list(input);
-      return transformRawData(data);
+      return transformRawData(data, false);
     },
   }),
 

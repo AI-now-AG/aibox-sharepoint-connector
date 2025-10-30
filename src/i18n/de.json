@@ -651,5 +651,6 @@
   "prompt-execution.upload-file.drop-files-here": "Dateien hier ablegen, um sie dem Chat hinzuzufügen.",
   "tenant.subscription-start-date": "Abonnement seit",
   "tenant.subscription-cancelled-date": "Abonnement gekündigt",
-  "home.search-prompt": "Seach prompt"
+  "home.search-prompt": "Seach prompt",
+  "home.search-prompt-result": "Search result"
 }

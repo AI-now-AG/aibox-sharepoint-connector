@@ -37,7 +37,7 @@ const tenantData = transformRawData(tenant);
   tenantData[key] = tenantData[key] ? decrypt(tenantData[key]) : "";
 });
 const subscription = await SubscriptionModel.getOrCreateSubscription(id);
-const subscriptionData = transformRawData(subscription);
+const subscriptionData = transformRawData(subscription, false);
 const countActiveUsers = await UserModel.countActiveUsersByTenant(id);
 ---
 
