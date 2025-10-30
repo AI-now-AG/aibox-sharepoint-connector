@@ -19,7 +19,6 @@
   import { tenant, user } from "$stores";
   import { useTranslations } from "$i18n/utils";
   import { addToast } from "$stores/toast";
-  import { ApiKeyProvider } from "$types/TenantFeature";
   import { PromptToolOption } from "$types/AIProvider";
   import {
     getPromptTools,
@@ -27,6 +26,11 @@
     resolveAPIProvider,
   } from "$shared/AIProvider";
   import { TRANSCRIPTION_API_URL } from "astro:env/client";
+  import { svgIcons } from "$assets/icons";
+  import PromptList, {
+    type PromptCartItem,
+  } from "$components/prompt-interface/PromptList.svelte";
+  import type { CategoryItem } from "$types/CategoryItem";
 
   const t = useTranslations();
 
@@ -60,8 +64,15 @@
   interface Props {
     apiKeyProviders: any;
     folderName?: string;
+
+    promptsEnriched?: PromptCartItem[];
   }
-  let { apiKeyProviders = [], folderName }: Props = $props();
+  let {
+    apiKeyProviders = [],
+    folderName,
+
+    promptsEnriched = [],
+  }: Props = $props();
 
   let input: string = $state("");
   let files: File[] = $state([]);
@@ -117,7 +128,7 @@
       PromptModel.OpenAIGpt5,
     ].includes(selectedModel);
 
-    const provider = resolveAPIProvider(selectedModel);
+    const provider: any = resolveAPIProvider(selectedModel);
 
     isGenerating = selectedPromptTool == PromptToolOption.Image;
 
@@ -623,13 +634,62 @@
       });
     } else {
       window.location.href = `/conversations/${data.insertedId}`;
-      //navigate(`/conversations/${data.insertedId}`);
     }
   }
+
+  let searchQuery = $state("");
+  let filteredPrompts: any[] = $state([]);
+
+  function filterPrompts() {
+    filteredPrompts = promptsEnriched.filter((prompt) => {
+      return (
+        prompt.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        prompt.instruction.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    });
+  }
+  $effect(() => {
+    if (searchQuery) {
+      filterPrompts();
+    }
+    if (searchQuery === "") {
+      filteredPrompts = [];
+    }
+  });
 </script>
 
 <div class="grid grid-cols-1 grid-rows-[1fr_min-content] h-full">
   <div class="flex flex-col space-y-6">
+    <div class="w-full">
+      <label class="input input-bordered flex items-center gap-2 w-full">
+        {@html svgIcons.search}
+        <input
+          type="text"
+          class="grow"
+          placeholder={t("home.search-prompt")}
+          bind:value={searchQuery}
+        />
+        {#if searchQuery?.length > 0}
+          <button
+            onclick={() => {
+              searchQuery = "";
+            }}
+          >
+            {@html svgIcons.close}
+          </button>
+        {/if}
+      </label>
+
+      {#if filteredPrompts.length > 0}
+        <PromptList
+          isEditable={false}
+          title={""}
+          cssClasses={"max-w-6xl"}
+          bind:items={filteredPrompts}
+        />
+      {/if}
+    </div>
+
     {#if $sharedMessageHistory.length == 0}
       <div
         class="min-w-full form-wrapper"

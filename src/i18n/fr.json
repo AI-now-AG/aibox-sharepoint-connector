@@ -31,7 +31,7 @@
   "prompt-library.prompts.title": "Prompt Management",
   "prompt-library.prompts.add": "Add Prompt",
   "prompt-library.prompts.edit": "Edit Prompt",
-  "prompt-library.prompts.search": "Type here",
+  "prompt-library.prompts.search": "Search prompt",
   "prompt-library.prompts.filter": "Filter",
   "prompt-library.prompts.all": "All Prompts",
   "prompt-library.prompts.view": "View prompt",
@@ -648,5 +648,8 @@
   "prompt-execution.result.share-via-mail-message": "${username} (${useremail}) wants to share the following result from aibox with you:",
   "prompt-execution.result.share-via-mail-success": "Email sent successfully!",
   "prompt-execution.result.share-via-mail-failed": "Failed to send email.",
-  "prompt-execution.upload-file.drop-files-here": "Drop any files here to add it to the chat."
+  "prompt-execution.upload-file.drop-files-here": "Drop any files here to add it to the chat.",
+  "tenant.subscription-start-date": "Subscription Start Date",
+  "tenant.subscription-cancelled-date": "Subscription Cancelled Date",
+  "home.search-prompt": "Seach prompt"
 }

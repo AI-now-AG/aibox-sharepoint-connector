@@ -27,12 +27,14 @@
     items?: PromptCartItem[];
     title?: string;
     isEditable?: boolean;
+    cssClasses?: string;
   }
 
   let {
     items = $bindable([]),
     title = t("prompt-library.prompts.all"),
     isEditable = false,
+    cssClasses = "",
   }: Props = $props();
 
   let selectedEditPromptId: string = $state("");
@@ -147,7 +149,7 @@
   }
 </script>
 
-<div class="container max-w-5xl mx-auto p-6 space-y-4">
+<div class={"container max-w-5xl mx-auto p-6 space-y-4 " + cssClasses}>
   <h1 class="text-lg font-normal text-base-content/80">
     {title}
   </h1>
