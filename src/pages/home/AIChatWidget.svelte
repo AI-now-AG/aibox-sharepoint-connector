@@ -750,7 +750,7 @@
     {/if}
 
     {#if !selectedPrompt}
-      <div class="flex items-end justify-end z-10">
+      <div class="flex items-end justify-end z-10" in:fade out:fade>
         <div>
           <AIModelDropdown
             label={t("home.model-label")}
