@@ -8,6 +8,7 @@
     isEditable?: boolean;
     groupId: string;
     folderName?: string;
+    initSelectedPromptId?: string;
   }
 
   let {
@@ -15,15 +16,18 @@
     isEditable = false,
     groupId,
     folderName,
+    initSelectedPromptId = "",
   }: Props = $props();
 
-  let selectedPromptId = $state("");
-  let currentPrompt: any = $state();
+  let initSelectedPrompt;
+  if (initSelectedPromptId) {
+    initSelectedPrompt = promptItems.find(
+      (prompt: any) => prompt._id === initSelectedPromptId,
+    );
+  }
+  let selectedPromptId: string = $state(initSelectedPromptId);
+  let currentPrompt: any = $state(initSelectedPrompt || promptItems[0]);
   let isProcessing = $state(false);
-
-  onMount(async function () {
-    currentPrompt = promptItems[0];
-  });
 </script>
 
 <div class="grid grid-cols-1 grid-rows-[1fr_min-content] h-full">

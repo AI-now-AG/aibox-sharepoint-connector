@@ -259,8 +259,10 @@
         type: "success",
       });
       setTimeout(() => {
-        //window.location.reload();
-        navigate(window.location.href);
+        // window.location.href = `${window.location.href.split("?")[0]}?promptId=${selectedEditPromptId}`;
+        navigate(
+          `${window.location.href.split("?")[0]}?promptId=${selectedEditPromptId}`,
+        );
       }, 0);
     } catch (error) {
       addToast({

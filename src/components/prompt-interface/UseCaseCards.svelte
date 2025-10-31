@@ -59,13 +59,24 @@
   }
 
   onMount(async function () {
-    selectedCardIndex = 0;
-    selectedPromptId = cards[0]._id;
+    if (selectedPromptId) {
+      for (let i = 0; i < cards.length; i++) {
+        const card = cards[i];
+        if (card._id == selectedPromptId) {
+          selectedCardIndex = i;
+          break;
+        }
+      }
+    } else {
+      selectedCardIndex = 0;
+      selectedPromptId = cards[0]._id;
+    }
+
     if (selectedEditPromptId) {
       promptDialog?.showModal();
     }
-    defaultModelName = providerInfo.defaultProviderModelName;
-    activeModels = getActiveModels($tenant);
+    defaultModelName = providerInfo?.defaultProviderModelName;
+    activeModels = getActiveModels($tenant, defaultModelName);
   });
 
   function selectCard(index: number) {
