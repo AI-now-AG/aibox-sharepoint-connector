@@ -675,7 +675,7 @@
   <div class="flex flex-col space-y-6">
     {#if $sharedMessageHistory.length == 0}
       <div class="dropdown w-full">
-        <div class="flex flex-row items-center space-x-6">
+        <div class="flex flex-row items-center space-x-2">
           <div
             class={"input flex justify-between items-center gap-2 "}
             style={isFetching ? "border: 1px solid" : ""}
