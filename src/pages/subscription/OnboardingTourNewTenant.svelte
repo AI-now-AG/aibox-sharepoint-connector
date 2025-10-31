@@ -72,6 +72,7 @@
         onPopoverRender: (popover, { config, state }) => {
           _popover = document.getElementById("driver-popover-content");
           if (state?.activeStep?.element == "#onboardingId0") {
+          if (state?.activeStep?.element == "#onboardingNewTenantId1") {
             (
               document.getElementsByClassName(
                 "driver-popover-navigation-btns",
