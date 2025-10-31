@@ -19,7 +19,7 @@
   import { tenant, user } from "$stores";
   import { useTranslations } from "$i18n/utils";
   import { addToast } from "$stores/toast";
-  import { PromptToolOption } from "$types/AIProvider";
+  import { ModelName, PromptToolOption } from "$types/AIProvider";
   import {
     getPromptTools,
     useProviderInfo,
@@ -138,13 +138,21 @@
 
   // === Request Builder ===
   function buildRequestPayload(fileUrls: string[]): RequestPayload {
-    const requestModel = selectedPrompt?.model || selectedModel;
+    const userSelectModel = selectedPrompt?.model || selectedModel;
     const isResponseModel = [
       PromptModel.OpenAI,
       PromptModel.OpenAIGpt5,
-    ].includes(requestModel);
+    ].includes(userSelectModel);
 
-    const provider: any = resolveAPIProvider(requestModel);
+    const isGeminiImageModel = [PromptModel.NanoBanana].includes(
+      userSelectModel,
+    );
+
+    const provider: any = resolveAPIProvider(userSelectModel);
+
+    const requestModel = isGeminiImageModel
+      ? ModelName.Gemini25FlashImage
+      : undefined;
 
     isGenerating = selectedPromptTool == PromptToolOption.Image;
 
@@ -153,6 +161,7 @@
     const payload: RequestPayload = {
       tenantId: $tenant?._id?.toString()!,
       provider,
+      model: requestModel,
       prompt: input || promptForAttachedFilesOnly,
       stream: true,
       fileUrls,
@@ -162,7 +171,6 @@
       payload.promptId = selectedPrompt.id;
     }
 
-    // Add conditional properties
     if (selectedPromptTool != PromptToolOption.None) {
       payload.tool = selectedPromptTool;
       if (selectedPromptTool == PromptToolOption.Image) {

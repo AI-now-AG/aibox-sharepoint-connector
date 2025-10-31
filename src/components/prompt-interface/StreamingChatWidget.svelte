@@ -209,7 +209,6 @@
       fileUrls,
     };
 
-    // Add conditional properties
     if (selectedPromptTool != PromptToolOption.None) {
       payload.tool = selectedPromptTool;
       if (selectedPromptTool == PromptToolOption.Image) {
@@ -224,13 +223,10 @@
 
     if (isResponseModel) {
       payload.previousResponseId = previousResponseId;
-    } else {
-      payload.messageHistory = currentMessageHistory;
-    }
-
-    if (isResponseModel) {
       payload.reasoningEffort = currentPrompt?.reasoningEffort || "low";
       payload.verbosity = currentPrompt?.textVerbosity || "low";
+    } else {
+      payload.messageHistory = currentMessageHistory;
     }
 
     return payload;
