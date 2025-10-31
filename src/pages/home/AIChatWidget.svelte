@@ -105,6 +105,13 @@
 
   // === Derived State ===
   let toolOptions = $derived.by(() => {
+    if (selectedPrompt) {
+      // return getPromptTools(
+      //   (selectedModel == PromptModel.Default
+      //     ? providerInfo?.defaultProviderPromptModelName
+      //     : selectedModel) as PromptModel,
+      // );
+    }
     return getPromptTools(
       (selectedModel == PromptModel.Default
         ? providerInfo?.defaultProviderPromptModelName
@@ -688,7 +695,7 @@
         </label>
         {#if selectedPrompt}
           <div class="flex flex-1 flex-row items-center space-x-2">
-            <span class="shadow px-4 py-2 rounded bg-white">
+            <span class="shadow px-4 py-2 rounded-xl bg-white font-bold">
               {selectedPrompt.title}
             </span>
             <button
@@ -704,7 +711,7 @@
 
       {#if filteredPrompts.length > 0}
         <div
-          class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-full mt-4"
+          class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-full mt-4 max-h-[420px] overflow-scroll"
           out:fade
         >
           <PromptList
@@ -715,6 +722,9 @@
             onItemSelect={(prompt: any) => {
               selectedPrompt = prompt;
               searchQuery = "";
+              // Hide model selection
+
+              // Handle selection tool
             }}
           />
         </div>
@@ -739,19 +749,21 @@
       </div>
     {/if}
 
-    <div class="flex items-end justify-end z-10">
-      <div>
-        <AIModelDropdown
-          label={t("home.model-label")}
-          bind:selectedModel
-          disabled={isDisableSelectModel}
-          labelClasses={"text-sm"}
-          onValueChange={(_value: any) => {
-            selectedPromptTool = PromptToolOption.None;
-          }}
-        />
+    {#if !selectedPrompt}
+      <div class="flex items-end justify-end z-10">
+        <div>
+          <AIModelDropdown
+            label={t("home.model-label")}
+            bind:selectedModel
+            disabled={isDisableSelectModel}
+            labelClasses={"text-sm"}
+            onValueChange={(_value: any) => {
+              selectedPromptTool = PromptToolOption.None;
+            }}
+          />
+        </div>
       </div>
-    </div>
+    {/if}
 
     <MessageList
       {currentMessage}
