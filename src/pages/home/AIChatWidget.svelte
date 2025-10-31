@@ -104,17 +104,19 @@
 
   $effect(() => {
     isDisableSelectModel = $sharedMessageHistory.length > 0 || isFetching;
-    isDisableFileInput = selectedModel === PromptModel.Perplexity;
+    isDisableFileInput =
+      selectedModel === PromptModel.Perplexity ||
+      selectedPrompt?.model === PromptModel.Perplexity;
   });
 
   // === Derived State ===
   let toolOptions = $derived.by(() => {
     if (selectedPrompt) {
-      // return getPromptTools(
-      //   (selectedModel == PromptModel.Default
-      //     ? providerInfo?.defaultProviderPromptModelName
-      //     : selectedModel) as PromptModel,
-      // );
+      return getPromptTools(
+        (selectedPrompt.model == PromptModel.Default
+          ? providerInfo?.defaultProviderPromptModelName
+          : selectedPrompt.model) as PromptModel,
+      );
     }
     return getPromptTools(
       (selectedModel == PromptModel.Default
@@ -188,11 +190,9 @@
   // === Image Processing Utilities ===
   function formatImageUrl(imageData: string): string {
     if (!imageData) return "";
-
     if (imageData.startsWith("data:") || imageData.startsWith("http")) {
       return imageData;
     }
-
     return `data:image/png;base64,${imageData}`;
   }
 
@@ -207,16 +207,8 @@
 
   function handleChunkEvent(data: any, state: StreamingState): void {
     if (data.content && typeof data.content === "string") {
-      // Accumulate the raw text
       state.messageContent += data.content;
-
-      // Append the raw chunk to the current displayed message
       currentMessage += data.content;
-
-      // If the current chunk contains a newline,
-      // re-render the entire accumulated text as HTML.
-      // This avoids trying to parse on every single character
-      // and ensures we only re-render when a natural "block" ends.
       if (data.content.includes("\n")) {
         currentMessage = markdownToHtml(state.messageContent);
       }
@@ -720,11 +712,9 @@
             cssClasses={"max-w-6xl"}
             bind:items={filteredPrompts}
             onItemSelect={(prompt: any) => {
+              console.log("Selected Prompt", JSON.stringify(prompt));
               selectedPrompt = prompt;
               searchQuery = "";
-              // Hide model selection
-
-              // Handle selection tool
             }}
           />
         </div>
