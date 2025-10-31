@@ -28,17 +28,22 @@
     const { logins_count = 0, tours } = user || {};
     if (logins_count <= 1) {
       if (tours) {
+        let hasOnboardingNewTenantTour = false;
         for (let i = 0; i < tours.length; i++) {
           const tour = tours[i];
-          if (tour.type === TourType.OnboardingNewTenant && tour.active) {
-            return true;
+          if (tour.type === TourType.OnboardingNewTenant) {
+            hasOnboardingNewTenantTour = true;
+            return tour.active;
           }
+        }
+        if (!hasOnboardingNewTenantTour) {
+          return true;
         }
       } else {
         return true;
       }
     }
-    return false;
+    return true;
   }
 
   onMount(async () => {
@@ -71,7 +76,6 @@
         ],
         onPopoverRender: (popover, { config, state }) => {
           _popover = document.getElementById("driver-popover-content");
-          if (state?.activeStep?.element == "#onboardingId0") {
           if (state?.activeStep?.element == "#onboardingNewTenantId1") {
             (
               document.getElementsByClassName(
