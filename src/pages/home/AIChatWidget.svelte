@@ -87,6 +87,10 @@
   let previousResponseId: string | null = $state(null);
   let loading: boolean = $state(false);
 
+  let searchQuery = $state("");
+  let filteredPrompts: any[] = $state([]);
+  let selectedPrompt = $state<any>();
+
   const apiProvider = apiKeyProviders?.find((item: any) => {
     return item.default && item.active;
   });
@@ -648,10 +652,6 @@
       window.location.href = `/conversations/${data.insertedId}`;
     }
   }
-
-  let searchQuery = $state("");
-  let filteredPrompts: any[] = $state([]);
-  let selectedPrompt = $state<any>();
 
   function filterPrompts() {
     filteredPrompts = promptsEnriched.filter((prompt) => {
