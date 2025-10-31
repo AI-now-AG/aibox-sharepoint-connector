@@ -137,12 +137,13 @@
 
   // === Request Builder ===
   function buildRequestPayload(fileUrls: string[]): RequestPayload {
+    const requestModel = selectedPrompt?.model || selectedModel;
     const isResponseModel = [
       PromptModel.OpenAI,
       PromptModel.OpenAIGpt5,
-    ].includes(selectedModel);
+    ].includes(requestModel);
 
-    const provider: any = resolveAPIProvider(selectedModel);
+    const provider: any = resolveAPIProvider(requestModel);
 
     isGenerating = selectedPromptTool == PromptToolOption.Image;
 
@@ -175,13 +176,10 @@
 
     if (isResponseModel) {
       payload.previousResponseId = previousResponseId;
-    } else {
-      payload.messageHistory = $sharedMessageHistory;
-    }
-
-    if (isResponseModel) {
       payload.reasoningEffort = "low";
       payload.verbosity = "low";
+    } else {
+      payload.messageHistory = $sharedMessageHistory;
     }
 
     return payload;
@@ -629,7 +627,7 @@
   async function saveConversation() {
     loading = true;
     const { error, data } = await actions.conversation.save({
-      model: selectedModel,
+      model: selectedPrompt?.model || selectedModel,
       messages: $sharedMessageHistory,
       previous_response_id: previousResponseId,
     });
@@ -665,61 +663,63 @@
 
 <div class="grid grid-cols-1 grid-rows-[1fr_min-content] h-full">
   <div class="flex flex-col space-y-6">
-    <div class="dropdown w-full">
-      <div class="flex flex-row items-center space-x-6">
-        <label class="input input-bordered flex items-center gap-2">
-          {@html svgIcons.search}
-          <input
-            type="text"
-            class="grow"
-            placeholder={t("home.search-prompt")}
-            bind:value={searchQuery}
-          />
-          {#if searchQuery?.length > 0}
-            <button
-              onclick={() => {
+    {#if $sharedMessageHistory.length == 0}
+      <div class="dropdown w-full">
+        <div class="flex flex-row items-center space-x-6">
+          <label class="input input-bordered flex items-center gap-2">
+            {@html svgIcons.search}
+            <input
+              type="text"
+              class="grow"
+              placeholder={t("home.search-prompt")}
+              bind:value={searchQuery}
+            />
+            {#if searchQuery?.length > 0}
+              <button
+                onclick={() => {
+                  searchQuery = "";
+                }}
+              >
+                {@html svgIcons.close}
+              </button>
+            {/if}
+          </label>
+          {#if selectedPrompt}
+            <div class="flex flex-1 flex-row items-center space-x-2">
+              <span class="shadow px-4 py-2 rounded-xl bg-white font-bold">
+                {selectedPrompt.title}
+              </span>
+              <button
+                onclick={() => {
+                  selectedPrompt = null;
+                }}
+              >
+                {@html svgIcons.close}
+              </button>
+            </div>
+          {/if}
+        </div>
+
+        {#if filteredPrompts.length > 0}
+          <div
+            class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-full mt-4 max-h-[420px] overflow-scroll"
+            out:fade
+          >
+            <PromptList
+              isEditable={false}
+              title={""}
+              cssClasses={"max-w-6xl"}
+              bind:items={filteredPrompts}
+              onItemSelect={(prompt: any) => {
+                console.log("Selected Prompt", JSON.stringify(prompt));
+                selectedPrompt = prompt;
                 searchQuery = "";
               }}
-            >
-              {@html svgIcons.close}
-            </button>
-          {/if}
-        </label>
-        {#if selectedPrompt}
-          <div class="flex flex-1 flex-row items-center space-x-2">
-            <span class="shadow px-4 py-2 rounded-xl bg-white font-bold">
-              {selectedPrompt.title}
-            </span>
-            <button
-              onclick={() => {
-                selectedPrompt = null;
-              }}
-            >
-              {@html svgIcons.close}
-            </button>
+            />
           </div>
         {/if}
       </div>
-
-      {#if filteredPrompts.length > 0}
-        <div
-          class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-full mt-4 max-h-[420px] overflow-scroll"
-          out:fade
-        >
-          <PromptList
-            isEditable={false}
-            title={""}
-            cssClasses={"max-w-6xl"}
-            bind:items={filteredPrompts}
-            onItemSelect={(prompt: any) => {
-              console.log("Selected Prompt", JSON.stringify(prompt));
-              selectedPrompt = prompt;
-              searchQuery = "";
-            }}
-          />
-        </div>
-      {/if}
-    </div>
+    {/if}
 
     {#if $sharedMessageHistory.length == 0}
       <div
