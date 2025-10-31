@@ -675,13 +675,17 @@
     {#if $sharedMessageHistory.length == 0}
       <div class="dropdown w-full">
         <div class="flex flex-row items-center space-x-6">
-          <label class="input input-bordered flex items-center gap-2">
+          <div
+            class={"input flex justify-between items-center gap-2 "}
+            style={isFetching ? "border: 1px solid" : ""}
+          >
             {@html svgIcons.search}
             <input
               type="text"
               class="grow"
               placeholder={t("home.search-prompt")}
               bind:value={searchQuery}
+              disabled={isFetching}
             />
             {#if searchQuery?.length > 0}
               <button
@@ -692,7 +696,8 @@
                 {@html svgIcons.close}
               </button>
             {/if}
-          </label>
+          </div>
+
           {#if selectedPrompt}
             <div class="flex flex-1 flex-row items-center space-x-2">
               <a
@@ -706,6 +711,7 @@
                 onclick={() => {
                   selectedPrompt = null;
                 }}
+                disabled={isFetching}
               >
                 {@html svgIcons.close}
               </button>
