@@ -1,7 +1,7 @@
 <script lang="ts">
   import { actions } from "astro:actions";
   import { onMount } from "svelte";
-  import { slide } from "svelte/transition";
+  import { fade, slide } from "svelte/transition";
   import { type Message, MessageRole } from "$types/MessageHistory";
   import { sharedMessageHistory } from "$stores/chatHistory";
   import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
@@ -50,6 +50,7 @@
     tenantId: string;
     provider: string;
     prompt: string;
+    promptId?: string;
     stream: boolean;
     tool?: string;
     fileUrls: string[];
@@ -141,6 +142,10 @@
       stream: true,
       fileUrls,
     };
+
+    if (selectedPrompt && selectedPrompt.id) {
+      payload.promptId = selectedPrompt.id;
+    }
 
     // Add conditional properties
     if (selectedPromptTool != PromptToolOption.None) {
@@ -639,6 +644,7 @@
 
   let searchQuery = $state("");
   let filteredPrompts: any[] = $state([]);
+  let selectedPrompt = $state<any>();
 
   function filterPrompts() {
     filteredPrompts = promptsEnriched.filter((prompt) => {
@@ -660,33 +666,58 @@
 
 <div class="grid grid-cols-1 grid-rows-[1fr_min-content] h-full">
   <div class="flex flex-col space-y-6">
-    <div class="w-full">
-      <label class="input input-bordered flex items-center gap-2 w-full">
-        {@html svgIcons.search}
-        <input
-          type="text"
-          class="grow"
-          placeholder={t("home.search-prompt")}
-          bind:value={searchQuery}
-        />
-        {#if searchQuery?.length > 0}
-          <button
-            onclick={() => {
-              searchQuery = "";
-            }}
-          >
-            {@html svgIcons.close}
-          </button>
+    <div class="dropdown w-full">
+      <div class="flex flex-row items-center space-x-6">
+        <label class="input input-bordered flex items-center gap-2">
+          {@html svgIcons.search}
+          <input
+            type="text"
+            class="grow"
+            placeholder={t("home.search-prompt")}
+            bind:value={searchQuery}
+          />
+          {#if searchQuery?.length > 0}
+            <button
+              onclick={() => {
+                searchQuery = "";
+              }}
+            >
+              {@html svgIcons.close}
+            </button>
+          {/if}
+        </label>
+        {#if selectedPrompt}
+          <div class="flex flex-1 flex-row items-center space-x-2">
+            <span class="shadow px-4 py-2 rounded bg-white">
+              {selectedPrompt.title}
+            </span>
+            <button
+              onclick={() => {
+                selectedPrompt = null;
+              }}
+            >
+              {@html svgIcons.close}
+            </button>
+          </div>
         {/if}
-      </label>
+      </div>
 
       {#if filteredPrompts.length > 0}
-        <PromptList
-          isEditable={false}
-          title={""}
-          cssClasses={"max-w-6xl"}
-          bind:items={filteredPrompts}
-        />
+        <div
+          class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-full mt-4"
+          out:fade
+        >
+          <PromptList
+            isEditable={false}
+            title={""}
+            cssClasses={"max-w-6xl"}
+            bind:items={filteredPrompts}
+            onItemSelect={(prompt: any) => {
+              selectedPrompt = prompt;
+              searchQuery = "";
+            }}
+          />
+        </div>
       {/if}
     </div>
 

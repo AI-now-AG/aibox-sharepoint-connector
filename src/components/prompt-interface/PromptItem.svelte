@@ -14,6 +14,7 @@
     onSelectDuplicate?: Function;
     onSelectReorder?: Function;
     onSelectDelete?: Function;
+    onItemSelect?: Function;
   }
 
   let {
@@ -23,6 +24,7 @@
     onSelectDuplicate,
     onSelectReorder,
     onSelectDelete,
+    onItemSelect,
   }: Props = $props();
 
   let options: Option[] = [
@@ -57,7 +59,11 @@
   ];
 </script>
 
-<div class="card bg-base-100 shadow-xl" out:fade>
+<button
+  class="card bg-base-100 shadow-xl"
+  out:fade
+  onclick={() => onItemSelect?.()}
+>
   <div class="card-body space-y-2 justify-between">
     {#if data?.tags}
       <div class="card-actions justify-start">
@@ -78,4 +84,4 @@
   {#if isEditable}
     <DropdownSection class={"absolute top-6 right-3"} {options} />
   {/if}
-</div>
+</button>

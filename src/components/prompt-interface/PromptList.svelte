@@ -25,6 +25,7 @@
 
   interface Props {
     items?: PromptCartItem[];
+    onItemSelect?: Function;
     title?: string;
     isEditable?: boolean;
     cssClasses?: string;
@@ -32,6 +33,7 @@
 
   let {
     items = $bindable([]),
+    onItemSelect = () => null,
     title = t("prompt-library.prompts.all"),
     isEditable = false,
     cssClasses = "",
@@ -155,10 +157,13 @@
   </h1>
 
   <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-    {#each items as card, index}
+    {#each items as item, index}
       <PromptItem
         {isEditable}
-        data={card}
+        data={item}
+        onItemSelect={() => {
+          onItemSelect(item);
+        }}
         onSelectEdit={() => {
           editCard(index);
         }}
