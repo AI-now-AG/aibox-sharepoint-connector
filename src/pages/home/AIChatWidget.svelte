@@ -24,6 +24,7 @@
     getPromptTools,
     useProviderInfo,
     resolveAPIProvider,
+    getModelName,
   } from "$shared/AIProvider";
   import { TRANSCRIPTION_API_URL } from "astro:env/client";
   import { svgIcons } from "$assets/icons";
@@ -705,7 +706,7 @@
                 target="_blank"
                 class="hover:text-blue-600 hover:underline visited:text-purple-600 shadow px-4 py-2 rounded-xl bg-white font-bold"
               >
-                {selectedPrompt.title}
+                {`${selectedPrompt.title} (${getModelName($tenant, selectedPrompt.model)})`}
               </a>
               <button
                 onclick={() => {
@@ -721,7 +722,7 @@
 
         {#if filteredPrompts.length > 0}
           <div
-            class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-full mt-2 max-h-[420px] overflow-scroll"
+            class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-full mt-2 max-h-[560px] overflow-scroll"
             out:fade
           >
             <PromptList
