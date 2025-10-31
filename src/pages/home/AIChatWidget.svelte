@@ -704,14 +704,16 @@
               <a
                 href={`/prompts/${selectedPrompt.category}/${selectedPrompt.group}?promptId=${selectedPrompt.id}`}
                 target="_blank"
-                class="hover:text-blue-600 hover:underline visited:text-purple-600 shadow px-4 py-2 rounded-xl bg-white font-bold"
+                class="hover:text-blue-600 hover:underline visited:text-purple-600 shadow px-4 py-2 rounded-xl bg-white font-bold tooltip"
+                data-tip={selectedPrompt.title}
               >
-                {`${selectedPrompt.title} (${getModelName($tenant, selectedPrompt.model)})`}
+                {`${getModelName($tenant, selectedPrompt.model)}`}
               </a>
               <button
                 onclick={() => {
                   selectedPrompt = null;
                   selectedPromptTool = PromptToolOption.None;
+                  input = "";
                 }}
                 disabled={isFetching}
               >
@@ -733,6 +735,7 @@
               bind:items={filteredPrompts}
               onItemSelect={(prompt: any) => {
                 selectedPrompt = prompt;
+                input = prompt.predefined_input;
                 searchQuery = "";
               }}
             />
