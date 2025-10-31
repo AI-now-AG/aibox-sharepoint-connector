@@ -711,6 +711,7 @@
               <button
                 onclick={() => {
                   selectedPrompt = null;
+                  selectedPromptTool = PromptToolOption.None;
                 }}
                 disabled={isFetching}
               >
