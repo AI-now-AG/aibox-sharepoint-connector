@@ -20,6 +20,10 @@ if (onboarding) {
     _id: user.id.toString(),
     type: TourType.Onboarding,
   });
+  await Astro.callAction(actions.user.activeOboarding, {
+    _id: user.id.toString(),
+    type: TourType.OnboardingNewTenant,
+  });
 }
 
 const onboardingNew = Astro.url?.searchParams?.get?.("onboardingnew");
