@@ -56,6 +56,7 @@
     provider: string;
     prompt: string;
     promptId: string;
+    model?: string;
     stream: boolean;
     tool?: string;
     fileUrls: string[];
@@ -186,9 +187,11 @@
       currentPrompt?.model,
     );
 
-    const provider = resolveAPIProvider(
+    const provider: any = resolveAPIProvider(
       currentPrompt?.model,
-      providerInfo.defaultProviderPromptModelName,
+      providerInfo?.defaultProviderPromptModelName as unknown as
+        | PromptModel
+        | undefined,
     );
     const requestModel = isGeminiImageModel
       ? ModelName.Gemini25FlashImage

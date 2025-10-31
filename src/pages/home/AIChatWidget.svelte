@@ -51,6 +51,7 @@
     provider: string;
     prompt: string;
     promptId?: string;
+    model?: string;
     stream: boolean;
     tool?: string;
     fileUrls: string[];
@@ -646,8 +647,8 @@
   function filterPrompts() {
     filteredPrompts = promptsEnriched.filter((prompt) => {
       return (
-        prompt.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        prompt.instruction.toLowerCase().includes(searchQuery.toLowerCase())
+        prompt.title?.toLowerCase()?.includes(searchQuery?.toLowerCase()) ||
+        prompt.instruction?.toLowerCase()?.includes(searchQuery?.toLowerCase())
       );
     });
   }
@@ -686,9 +687,13 @@
           </label>
           {#if selectedPrompt}
             <div class="flex flex-1 flex-row items-center space-x-2">
-              <span class="shadow px-4 py-2 rounded-xl bg-white font-bold">
+              <a
+                href={`/prompts/${selectedPrompt.category}/${selectedPrompt.group}?promptId=${selectedPrompt.id}`}
+                target="_blank"
+                class="hover:text-blue-600 hover:underline visited:text-purple-600 shadow px-4 py-2 rounded-xl bg-white font-bold"
+              >
                 {selectedPrompt.title}
-              </span>
+              </a>
               <button
                 onclick={() => {
                   selectedPrompt = null;
@@ -711,7 +716,6 @@
               cssClasses={"max-w-6xl"}
               bind:items={filteredPrompts}
               onItemSelect={(prompt: any) => {
-                console.log("Selected Prompt", JSON.stringify(prompt));
                 selectedPrompt = prompt;
                 searchQuery = "";
               }}

@@ -3,7 +3,7 @@
     id: string;
     title: string;
     description?: string;
-    instruction: string;
+    instruction?: string;
     group?: string;
     tags?: string[];
   }
@@ -41,7 +41,7 @@
   };
 
   function showSuccessToast(type: string) {
-    const translationKey = `prompt-library.delete.${type}.success`;
+    const translationKey: any = `prompt-library.delete.${type}.success`;
     addToast({
       message: t(translationKey),
       type: "success",
@@ -49,7 +49,7 @@
   }
 
   function showErrorToast(type: string) {
-    const translationKey = `prompt-library.delete.${type}.failed`;
+    const translationKey: any = `prompt-library.delete.${type}.failed`;
     addToast({
       message: t(translationKey),
       type: "error",
