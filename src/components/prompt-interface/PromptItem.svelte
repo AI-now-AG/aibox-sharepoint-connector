@@ -4,6 +4,8 @@
   import { fade } from "svelte/transition";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
+  import { getModelName } from "$shared/AIProvider";
+  import { tenant } from "$stores";
 
   const t = useTranslations();
 
@@ -14,6 +16,7 @@
     onSelectDuplicate?: Function;
     onSelectReorder?: Function;
     onSelectDelete?: Function;
+    onItemSelect?: Function;
   }
 
   let {
@@ -23,6 +26,7 @@
     onSelectDuplicate,
     onSelectReorder,
     onSelectDelete,
+    onItemSelect,
   }: Props = $props();
 
   let options: Option[] = [
@@ -57,20 +61,27 @@
   ];
 </script>
 
-<div class="card bg-base-100 shadow-xl" out:fade>
+<button
+  class="card bg-base-100 shadow-xl"
+  out:fade
+  onclick={() => onItemSelect?.()}
+>
   <div class="card-body space-y-2 justify-between">
     {#if data?.tags}
-      <div class="card-actions justify-start">
+      <div class="card-actions justify-start mr-6">
         {#each data?.tags as tag}
           <div class="badge px-2 border-base-300">
             {tag}
           </div>
         {/each}
+        <div class="badge px-2 border-base-300 bg-gray-200 font-semibold">
+          {getModelName($tenant, data.model)}
+        </div>
       </div>
     {/if}
     <h2 class="card-title">{data?.title}</h2>
     {#if data?.description}
-      <p class="text-base-content/60 line-clamp-3">
+      <p class="text-base-content/60 line-clamp-3 text-left">
         {data?.description}
       </p>
     {/if}
@@ -78,4 +89,4 @@
   {#if isEditable}
     <DropdownSection class={"absolute top-6 right-3"} {options} />
   {/if}
-</div>
+</button>

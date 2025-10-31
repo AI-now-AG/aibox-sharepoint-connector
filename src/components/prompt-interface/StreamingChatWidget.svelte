@@ -56,6 +56,7 @@
     provider: string;
     prompt: string;
     promptId: string;
+    model?: string;
     stream: boolean;
     tool?: string;
     fileUrls: string[];
@@ -186,9 +187,11 @@
       currentPrompt?.model,
     );
 
-    const provider = resolveAPIProvider(
+    const provider: any = resolveAPIProvider(
       currentPrompt?.model,
-      providerInfo.defaultProviderPromptModelName,
+      providerInfo?.defaultProviderPromptModelName as unknown as
+        | PromptModel
+        | undefined,
     );
     const requestModel = isGeminiImageModel
       ? ModelName.Gemini25FlashImage
@@ -206,7 +209,6 @@
       fileUrls,
     };
 
-    // Add conditional properties
     if (selectedPromptTool != PromptToolOption.None) {
       payload.tool = selectedPromptTool;
       if (selectedPromptTool == PromptToolOption.Image) {
@@ -221,13 +223,10 @@
 
     if (isResponseModel) {
       payload.previousResponseId = previousResponseId;
-    } else {
-      payload.messageHistory = currentMessageHistory;
-    }
-
-    if (isResponseModel) {
       payload.reasoningEffort = currentPrompt?.reasoningEffort || "low";
       payload.verbosity = currentPrompt?.textVerbosity || "low";
+    } else {
+      payload.messageHistory = currentMessageHistory;
     }
 
     return payload;

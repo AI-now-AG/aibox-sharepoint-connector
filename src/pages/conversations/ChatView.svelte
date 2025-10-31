@@ -161,7 +161,7 @@
       PromptModel.OpenAIGpt5,
     ].includes(model);
 
-    const provider = resolveAPIProvider(model);
+    const provider: any = resolveAPIProvider(model);
 
     const isGeminiImageModel = [PromptModel.NanoBanana].includes(model);
     const requestModel = isGeminiImageModel

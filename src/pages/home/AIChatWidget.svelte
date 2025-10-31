@@ -1,7 +1,7 @@
 <script lang="ts">
   import { actions } from "astro:actions";
   import { onMount } from "svelte";
-  import { slide } from "svelte/transition";
+  import { fade, slide } from "svelte/transition";
   import { type Message, MessageRole } from "$types/MessageHistory";
   import { sharedMessageHistory } from "$stores/chatHistory";
   import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
@@ -19,14 +19,19 @@
   import { tenant, user } from "$stores";
   import { useTranslations } from "$i18n/utils";
   import { addToast } from "$stores/toast";
-  import { ApiKeyProvider } from "$types/TenantFeature";
-  import { PromptToolOption } from "$types/AIProvider";
+  import { ModelName, PromptToolOption } from "$types/AIProvider";
   import {
     getPromptTools,
     useProviderInfo,
     resolveAPIProvider,
+    getModelName,
   } from "$shared/AIProvider";
   import { TRANSCRIPTION_API_URL } from "astro:env/client";
+  import { svgIcons } from "$assets/icons";
+  import PromptList, {
+    type PromptCartItem,
+  } from "$components/prompt-interface/PromptList.svelte";
+  import type { CategoryItem } from "$types/CategoryItem";
 
   const t = useTranslations();
 
@@ -46,6 +51,8 @@
     tenantId: string;
     provider: string;
     prompt: string;
+    promptId?: string;
+    model?: string;
     stream: boolean;
     tool?: string;
     fileUrls: string[];
@@ -60,8 +67,15 @@
   interface Props {
     apiKeyProviders: any;
     folderName?: string;
+
+    promptsEnriched?: PromptCartItem[];
   }
-  let { apiKeyProviders = [], folderName }: Props = $props();
+  let {
+    apiKeyProviders = [],
+    folderName,
+
+    promptsEnriched = [],
+  }: Props = $props();
 
   let input: string = $state("");
   let files: File[] = $state([]);
@@ -74,6 +88,10 @@
   let isResoningThingking: boolean = $state(false);
   let previousResponseId: string | null = $state(null);
   let loading: boolean = $state(false);
+
+  let searchQuery = $state("");
+  let filteredPrompts: any[] = $state([]);
+  let selectedPrompt = $state<any>();
 
   const apiProvider = apiKeyProviders?.find((item: any) => {
     return item.default && item.active;
@@ -88,11 +106,20 @@
 
   $effect(() => {
     isDisableSelectModel = $sharedMessageHistory.length > 0 || isFetching;
-    isDisableFileInput = selectedModel === PromptModel.Perplexity;
+    isDisableFileInput =
+      selectedModel === PromptModel.Perplexity ||
+      selectedPrompt?.model === PromptModel.Perplexity;
   });
 
   // === Derived State ===
   let toolOptions = $derived.by(() => {
+    if (selectedPrompt) {
+      return getPromptTools(
+        (selectedPrompt.model == PromptModel.Default
+          ? providerInfo?.defaultProviderPromptModelName
+          : selectedPrompt.model) as PromptModel,
+      );
+    }
     return getPromptTools(
       (selectedModel == PromptModel.Default
         ? providerInfo?.defaultProviderPromptModelName
@@ -112,12 +139,21 @@
 
   // === Request Builder ===
   function buildRequestPayload(fileUrls: string[]): RequestPayload {
+    const userSelectModel = selectedPrompt?.model || selectedModel;
     const isResponseModel = [
       PromptModel.OpenAI,
       PromptModel.OpenAIGpt5,
-    ].includes(selectedModel);
+    ].includes(userSelectModel);
 
-    const provider = resolveAPIProvider(selectedModel);
+    const isGeminiImageModel = [PromptModel.NanoBanana].includes(
+      userSelectModel,
+    );
+
+    const provider: any = resolveAPIProvider(userSelectModel);
+
+    const requestModel = isGeminiImageModel
+      ? ModelName.Gemini25FlashImage
+      : undefined;
 
     isGenerating = selectedPromptTool == PromptToolOption.Image;
 
@@ -126,12 +162,16 @@
     const payload: RequestPayload = {
       tenantId: $tenant?._id?.toString()!,
       provider,
+      model: requestModel,
       prompt: input || promptForAttachedFilesOnly,
       stream: true,
       fileUrls,
     };
 
-    // Add conditional properties
+    if (selectedPrompt && selectedPrompt.id) {
+      payload.promptId = selectedPrompt.id;
+    }
+
     if (selectedPromptTool != PromptToolOption.None) {
       payload.tool = selectedPromptTool;
       if (selectedPromptTool == PromptToolOption.Image) {
@@ -146,13 +186,10 @@
 
     if (isResponseModel) {
       payload.previousResponseId = previousResponseId;
-    } else {
-      payload.messageHistory = $sharedMessageHistory;
-    }
-
-    if (isResponseModel) {
       payload.reasoningEffort = "low";
       payload.verbosity = "low";
+    } else {
+      payload.messageHistory = $sharedMessageHistory;
     }
 
     return payload;
@@ -161,11 +198,9 @@
   // === Image Processing Utilities ===
   function formatImageUrl(imageData: string): string {
     if (!imageData) return "";
-
     if (imageData.startsWith("data:") || imageData.startsWith("http")) {
       return imageData;
     }
-
     return `data:image/png;base64,${imageData}`;
   }
 
@@ -180,16 +215,8 @@
 
   function handleChunkEvent(data: any, state: StreamingState): void {
     if (data.content && typeof data.content === "string") {
-      // Accumulate the raw text
       state.messageContent += data.content;
-
-      // Append the raw chunk to the current displayed message
       currentMessage += data.content;
-
-      // If the current chunk contains a newline,
-      // re-render the entire accumulated text as HTML.
-      // This avoids trying to parse on every single character
-      // and ensures we only re-render when a natural "block" ends.
       if (data.content.includes("\n")) {
         currentMessage = markdownToHtml(state.messageContent);
       }
@@ -610,7 +637,7 @@
   async function saveConversation() {
     loading = true;
     const { error, data } = await actions.conversation.save({
-      model: selectedModel,
+      model: selectedPrompt?.model || selectedModel,
       messages: $sharedMessageHistory,
       previous_response_id: previousResponseId,
     });
@@ -623,13 +650,96 @@
       });
     } else {
       window.location.href = `/conversations/${data.insertedId}`;
-      //navigate(`/conversations/${data.insertedId}`);
     }
   }
+
+  function filterPrompts() {
+    filteredPrompts = promptsEnriched.filter((prompt) => {
+      return (
+        prompt.title?.toLowerCase()?.includes(searchQuery?.toLowerCase()) ||
+        prompt.instruction?.toLowerCase()?.includes(searchQuery?.toLowerCase())
+      );
+    });
+  }
+  $effect(() => {
+    if (searchQuery) {
+      filterPrompts();
+    }
+    if (searchQuery === "") {
+      filteredPrompts = [];
+    }
+  });
 </script>
 
 <div class="grid grid-cols-1 grid-rows-[1fr_min-content] h-full">
   <div class="flex flex-col space-y-6">
+    {#if $sharedMessageHistory.length == 0}
+      <div class="dropdown w-full">
+        <div class="flex flex-row items-center space-x-6">
+          <div
+            class={"input flex justify-between items-center gap-2 "}
+            style={isFetching ? "border: 1px solid" : ""}
+          >
+            {@html svgIcons.search}
+            <input
+              type="text"
+              class="grow"
+              placeholder={t("home.search-prompt")}
+              bind:value={searchQuery}
+              disabled={isFetching}
+            />
+            {#if searchQuery?.length > 0}
+              <button
+                onclick={() => {
+                  searchQuery = "";
+                }}
+              >
+                {@html svgIcons.close}
+              </button>
+            {/if}
+          </div>
+
+          {#if selectedPrompt}
+            <div class="flex flex-1 flex-row items-center space-x-2">
+              <a
+                href={`/prompts/${selectedPrompt.category}/${selectedPrompt.group}?promptId=${selectedPrompt.id}`}
+                target="_blank"
+                class="hover:text-blue-600 hover:underline visited:text-purple-600 shadow px-4 py-2 rounded-xl bg-white font-bold"
+              >
+                {`${selectedPrompt.title} (${getModelName($tenant, selectedPrompt.model)})`}
+              </a>
+              <button
+                onclick={() => {
+                  selectedPrompt = null;
+                }}
+                disabled={isFetching}
+              >
+                {@html svgIcons.close}
+              </button>
+            </div>
+          {/if}
+        </div>
+
+        {#if filteredPrompts.length > 0}
+          <div
+            class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-full mt-2 max-h-[560px] overflow-scroll"
+            out:fade
+          >
+            <PromptList
+              isEditable={false}
+              title={""}
+              cssClasses={"max-w-6xl"}
+              bind:items={filteredPrompts}
+              onItemSelect={(prompt: any) => {
+                selectedPrompt = prompt;
+                searchQuery = "";
+              }}
+            />
+          </div>
+        {/if}
+      </div>
+    {/if}
+
     {#if $sharedMessageHistory.length == 0}
       <div
         class="min-w-full form-wrapper"
@@ -648,19 +758,21 @@
       </div>
     {/if}
 
-    <div class="flex items-end justify-end z-10">
-      <div>
-        <AIModelDropdown
-          label={t("home.model-label")}
-          bind:selectedModel
-          disabled={isDisableSelectModel}
-          labelClasses={"text-sm"}
-          onValueChange={(_value: any) => {
-            selectedPromptTool = PromptToolOption.None;
-          }}
-        />
+    {#if !selectedPrompt}
+      <div class="flex items-end justify-end z-10" in:fade out:fade>
+        <div>
+          <AIModelDropdown
+            label={t("home.model-label")}
+            bind:selectedModel
+            disabled={isDisableSelectModel}
+            labelClasses={"text-sm"}
+            onValueChange={(_value: any) => {
+              selectedPromptTool = PromptToolOption.None;
+            }}
+          />
+        </div>
       </div>
-    </div>
+    {/if}
 
     <MessageList
       {currentMessage}
