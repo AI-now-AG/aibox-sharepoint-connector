@@ -675,7 +675,7 @@
   <div class="flex flex-col space-y-6">
     {#if $sharedMessageHistory.length == 0}
       <div class="dropdown w-full">
-        <div class="flex flex-row items-center space-x-6">
+        <div class="flex flex-row items-center space-x-2">
           <div
             class={"input flex justify-between items-center gap-2 "}
             style={isFetching ? "border: 1px solid" : ""}
@@ -704,14 +704,16 @@
               <a
                 href={`/prompts/${selectedPrompt.category}/${selectedPrompt.group}?promptId=${selectedPrompt.id}`}
                 target="_blank"
-                class="hover:text-blue-600 hover:underline visited:text-purple-600 shadow px-4 py-2 rounded-xl bg-white font-bold"
+                class="hover:text-blue-600 hover:underline px-4 py-1 border rounded-lg tooltip"
+                data-tip={selectedPrompt.title}
               >
-                {`${selectedPrompt.title} (${getModelName($tenant, selectedPrompt.model)})`}
+                {`${getModelName($tenant, selectedPrompt.model)}`}
               </a>
               <button
                 onclick={() => {
                   selectedPrompt = null;
                   selectedPromptTool = PromptToolOption.None;
+                  input = "";
                 }}
                 disabled={isFetching}
               >
@@ -733,6 +735,7 @@
               bind:items={filteredPrompts}
               onItemSelect={(prompt: any) => {
                 selectedPrompt = prompt;
+                input = prompt.predefined_input;
                 searchQuery = "";
               }}
             />
