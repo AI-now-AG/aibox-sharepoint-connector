@@ -704,10 +704,10 @@
               <a
                 href={`/prompts/${selectedPrompt.category}/${selectedPrompt.group}?promptId=${selectedPrompt.id}`}
                 target="_blank"
-                class="hover:text-blue-600 hover:underline px-4 py-1 border rounded-lg tooltip"
-                data-tip={selectedPrompt.title}
+                class="hover:text-blue-600 hover:underline px-4 py-1 border rounded-lg font-semibold tooltip"
+                data-tip={getModelName($tenant, selectedPrompt.model)}
               >
-                {`${getModelName($tenant, selectedPrompt.model)}`}
+                {selectedPrompt.title}
               </a>
               <button
                 onclick={() => {
