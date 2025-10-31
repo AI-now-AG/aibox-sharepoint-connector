@@ -702,7 +702,7 @@
 
         {#if filteredPrompts.length > 0}
           <div
-            class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-full mt-4 max-h-[420px] overflow-scroll"
+            class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-full mt-2 max-h-[420px] overflow-scroll"
             out:fade
           >
             <PromptList
