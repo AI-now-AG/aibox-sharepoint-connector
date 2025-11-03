@@ -700,11 +700,11 @@
           </div>
 
           {#if selectedPrompt}
-            <div class="flex flex-1 flex-row items-center space-x-2">
+            <div class="flex flex-row items-center space-x-2">
               <a
                 href={`/prompts/${selectedPrompt.category}/${selectedPrompt.group}?promptId=${selectedPrompt.id}`}
                 target="_blank"
-                class="hover:text-blue-600 hover:underline px-4 py-1 border rounded-lg font-semibold tooltip"
+                class="input rounded-lg hover:underline px-4 py-1 tooltip w-auto inline-flex bg-[#f3f4f6]"
                 data-tip={getModelName($tenant, selectedPrompt.model)}
               >
                 {selectedPrompt.title}

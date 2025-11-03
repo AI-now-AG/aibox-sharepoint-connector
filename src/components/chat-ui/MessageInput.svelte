@@ -149,7 +149,7 @@
       id="input"
       class={`textarea textarea-ghost ${
         stickyFooter ? `h-[50px]` : `h-20`
-      } min-h-auto w-full focus:outline-hidden focus:border-base-100 text-base`}
+      } min-h-auto w-full focus:outline-hidden focus:border-base-100`}
       placeholder={t("prompt-library.input-placeholder")}
       bind:value={input}
       onkeydown={onKeyDown}
