@@ -1,7 +1,7 @@
 <script lang="ts">
   import { actions } from "astro:actions";
   import { onMount } from "svelte";
-  import { fade, slide } from "svelte/transition";
+  import { fade, fly, slide } from "svelte/transition";
   import { type Message, MessageRole } from "$types/MessageHistory";
   import { sharedMessageHistory } from "$stores/chatHistory";
   import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
@@ -32,6 +32,7 @@
     type PromptCartItem,
   } from "$components/prompt-interface/PromptList.svelte";
   import type { CategoryItem } from "$types/CategoryItem";
+  import PromptItem from "$components/prompt-interface/PromptItem.svelte";
 
   const t = useTranslations();
 
@@ -700,26 +701,33 @@
           </div>
 
           {#if selectedPrompt}
-            <div class="flex flex-row items-center space-x-2">
+            <div class="relative group" out:fly>
               <a
                 href={`/prompts/${selectedPrompt.category}/${selectedPrompt.group}?promptId=${selectedPrompt.id}`}
                 target="_blank"
-                class="input rounded-lg hover:underline px-4 py-1 tooltip w-auto inline-flex bg-[#f3f4f6] cursor-pointer"
-                data-tip={getModelName($tenant, selectedPrompt.model)}
+                class="input rounded-lg hover:underline px-4 py-1 w-auto inline-flex bg-[#f3f4f6] cursor-pointer"
               >
                 {selectedPrompt.title}
               </a>
-              <button
-                onclick={() => {
-                  selectedPrompt = null;
-                  selectedPromptTool = PromptToolOption.None;
-                  input = "";
-                }}
-                disabled={isFetching}
+
+              <div
+                class="absolute left-0 top-full mt-2 hidden group-hover:block z-50 w-96"
               >
-                {@html svgIcons.close}
-              </button>
+                <PromptItem isEditable={false} data={selectedPrompt} />
+              </div>
             </div>
+            <button
+              onclick={() => {
+                selectedPrompt = null;
+                selectedPromptTool = PromptToolOption.None;
+                input = "";
+              }}
+              disabled={isFetching}
+              class="btn btn-ghost h-8 p-0 min-h-0 aspect-square"
+              out:fly
+            >
+              {@html svgIcons.close}
+            </button>
           {/if}
         </div>
 
