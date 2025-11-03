@@ -235,7 +235,7 @@ export function resolveAPIProvider(
   const mapped = selectedModel ? APIProviderMap[selectedModel] : null;
 
   if (mapped) return mapped;
-  if (selectedModel) return selectedModel;
+  //if (selectedModel) return selectedModel;
 
   return defaultModel;
 }
