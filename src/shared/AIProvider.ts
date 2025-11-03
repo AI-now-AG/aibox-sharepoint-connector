@@ -232,10 +232,20 @@ export function resolveAPIProvider(
   selectedModel: PromptModel,
   defaultModel: PromptModel | null = null,
 ) {
+  // If no model is selected, immediately return the default model
+  if (!selectedModel) {
+    return defaultModel;
+  }
+
+  // Attempt to find the corresponding API provider from the mapping
   const mapped = selectedModel ? APIProviderMap[selectedModel] : null;
 
+  // If a mapped provider exists, return it
   if (mapped) return mapped;
-  //if (selectedModel) return selectedModel;
 
+  // If a model is explicitly selected, use it directly
+  if (selectedModel) return selectedModel;
+
+  // Otherwise, fall back to the default model (may be null)
   return defaultModel;
 }
