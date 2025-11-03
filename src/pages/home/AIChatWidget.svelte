@@ -704,7 +704,7 @@
               <a
                 href={`/prompts/${selectedPrompt.category}/${selectedPrompt.group}?promptId=${selectedPrompt.id}`}
                 target="_blank"
-                class="input rounded-lg hover:underline px-4 py-1 tooltip w-auto inline-flex bg-[#f3f4f6]"
+                class="input rounded-lg hover:underline px-4 py-1 tooltip w-auto inline-flex bg-[#f3f4f6] cursor-pointer"
                 data-tip={getModelName($tenant, selectedPrompt.model)}
               >
                 {selectedPrompt.title}
