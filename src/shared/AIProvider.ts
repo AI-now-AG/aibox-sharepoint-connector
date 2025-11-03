@@ -232,6 +232,8 @@ export function resolveAPIProvider(
   selectedModel: PromptModel,
   defaultModel: PromptModel | null = null,
 ) {
+  console.log("resolveAPIProvider() debug", { selectedModel, defaultModel });
+
   // If no model is selected, immediately return the default model
   if (!selectedModel) {
     return defaultModel;
