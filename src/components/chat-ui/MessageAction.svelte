@@ -6,7 +6,6 @@
 
   interface Props {
     exportToPdfAction: Function;
-    exportToWordAction: Function;
     sendEmailAction: Function;
     copyTextToClipboardAction: Function;
     copyHtmlToClipboardAction: Function;
@@ -14,7 +13,6 @@
   }
   const {
     exportToPdfAction,
-    exportToWordAction,
     sendEmailAction,
     copyTextToClipboardAction,
     copyHtmlToClipboardAction,
@@ -57,16 +55,7 @@
             <span>{t("prompt-execution.result.export-to-pdf")}</span>
           </button>
         </li>
-        <li>
-          <button
-            onclick={() => {
-              exportToWordAction?.();
-              closeDropdown();
-            }}
-          >
-            <span>{t("prompt-execution.result.export-to-word")}</span>
-          </button>
-        </li>
+        
         {#if !isHideSendEmailAction}
           <li>
             <button
