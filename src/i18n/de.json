@@ -619,7 +619,6 @@
   "transcription.status.ready": "Bereit",
   "transcription.progress.uploading-to-cloud": "In Speicher hochladen",
   "transcription.progress.audio-conversion": "Audio Umwandlung",
-  "transcription.progress.transcription-in-progress": "Umwandlung läuft",
   "transcription.progress.batch-transcription": "Batch Transkription",
   "transcription.progress.job-queued": "Auftrag in Warteschlange und startet bald...",
   "transcription.progress.poll-attempt": "Statusabfrage",

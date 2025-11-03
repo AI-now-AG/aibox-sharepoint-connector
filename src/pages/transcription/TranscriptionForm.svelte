@@ -1494,7 +1494,7 @@
                     <div class="flex items-center gap-2 text-sm">
                       <span class="loading loading-spinner loading-sm text-primary"></span>
                       <span class="font-medium">
-                        {isBatchMode ? t("transcription.progress.batch-transcription") : t("transcription.progress.transcription-in-progress")}
+                        {isBatchMode ? t("transcription.progress.batch-transcription") : t("transcription.status.processing")}
                       </span>
                     </div>
 
