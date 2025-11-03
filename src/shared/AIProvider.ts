@@ -233,10 +233,13 @@ export function resolveAPIProvider(
   defaultModel: PromptModel | null = null,
 ) {
   console.log("resolveAPIProvider() debug", { selectedModel, defaultModel });
+  const defaultProvider = defaultModel
+    ? APIProviderMap[defaultModel]
+    : APIProviderMap[PromptModel.OpenAI];
 
   // If no model is selected, immediately return the default model
   if (!selectedModel) {
-    return defaultModel;
+    return defaultProvider;
   }
 
   // Attempt to find the corresponding API provider from the mapping
@@ -249,7 +252,5 @@ export function resolveAPIProvider(
   if (selectedModel) return selectedModel;
 
   // Otherwise, fall back to the default model (may be null)
-  return defaultModel
-    ? APIProviderMap[defaultModel]
-    : APIProviderMap[PromptModel.OpenAI];
+  return defaultProvider;
 }
