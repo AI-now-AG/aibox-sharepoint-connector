@@ -249,5 +249,7 @@ export function resolveAPIProvider(
   if (selectedModel) return selectedModel;
 
   // Otherwise, fall back to the default model (may be null)
-  return defaultModel;
+  return defaultModel
+    ? APIProviderMap[defaultModel]
+    : APIProviderMap[PromptModel.OpenAI];
 }
