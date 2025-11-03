@@ -214,7 +214,7 @@
           </label>
         </div>
       </div>
-      {#if preDefineCategory.includes(AudioCategory.Subtitle || AudioCategory.SubtitleLarge || AudioCategory.SubtitleJson)}
+      {#if preDefineCategory.includes(AudioCategory.Subtitle) || preDefineCategory.includes(AudioCategory.SubtitleLarge) || preDefineCategory.includes(AudioCategory.SubtitleJson) || preDefineCategory.includes(AudioCategory.Subtitle11Labs)}
         <div class="mb-4">
           <p class="mb-2">{t("prompt-library.add.prompts.group")}</p>
           <div class="dropdown dropdown-bottom min-w-xs">
