@@ -19,7 +19,12 @@
   import { tenant, user } from "$stores";
   import { useTranslations } from "$i18n/utils";
   import { addToast } from "$stores/toast";
-  import { ModelName, PromptToolOption } from "$types/AIProvider";
+  import {
+    ModelName,
+    PromptToolOption,
+    ReasoningEffortOption,
+    TextVerbosityOption,
+  } from "$types/AIProvider";
   import {
     getPromptTools,
     useProviderInfo,
@@ -187,8 +192,8 @@
 
     if (isResponseModel) {
       payload.previousResponseId = previousResponseId;
-      payload.reasoningEffort = "low";
-      payload.verbosity = "low";
+      payload.reasoningEffort = ReasoningEffortOption.Low;
+      payload.verbosity = TextVerbosityOption.Low;
     } else {
       payload.messageHistory = $sharedMessageHistory;
     }

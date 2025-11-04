@@ -29,7 +29,12 @@
   import { tenant, user } from "$stores";
   import { useTranslations } from "$i18n/utils";
   import { ApiKeyProvider } from "$types/TenantFeature";
-  import { ModelName, PromptToolOption } from "$types/AIProvider";
+  import {
+    ModelName,
+    PromptToolOption,
+    ReasoningEffortOption,
+    TextVerbosityOption,
+  } from "$types/AIProvider";
   import {
     getPromptTools,
     useProviderInfo,
@@ -223,8 +228,10 @@
 
     if (isResponseModel) {
       payload.previousResponseId = previousResponseId;
-      payload.reasoningEffort = currentPrompt?.reasoningEffort || "low";
-      payload.verbosity = currentPrompt?.textVerbosity || "low";
+      payload.reasoningEffort =
+        currentPrompt?.reasoningEffort || ReasoningEffortOption.Low;
+      payload.verbosity =
+        currentPrompt?.textVerbosity || TextVerbosityOption.Low;
     } else {
       payload.messageHistory = currentMessageHistory;
     }
