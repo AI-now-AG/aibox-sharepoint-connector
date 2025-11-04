@@ -31,6 +31,7 @@
     AudioOptionId,
     BillingMethod,
     BillingMethodLabels,
+    SubscriptionStatus,
   } from "$types/Subscription";
   import Dropdown from "$components/form/Dropdown.svelte";
   import AudioAddonsDropdown from "./AudioAddonsDropdown.svelte";
@@ -118,6 +119,8 @@
     initSubtitleStudioOptions,
   );
   tenantData.billing_info = tenant?.billing_info ?? {};
+  let subscriptionStartDate: any = $state("");
+  let subscriptionCancelledDate: any = $state("");
 
   let openAIEnabled: boolean = $state(false);
   let openAIGpt5Enabled: boolean = $state(false);
@@ -797,6 +800,12 @@
               ...selectedAudioToTextOptions,
               ...selectedSubtitleStudioOptions,
             ],
+            start_date: subscriptionStartDate
+              ? new Date(subscriptionStartDate)
+              : null,
+            cancelled_date: subscriptionCancelledDate
+              ? new Date(subscriptionCancelledDate)
+              : null,
           },
         });
         loading = false;
@@ -934,6 +943,14 @@
 
     if (!tenant.totalPrice) {
       tenant.totalPrice = calculateTotalPrice();
+    }
+
+    if (subscription?.start_date) {
+      subscriptionStartDate = subscription.start_date.split("T")[0];
+    }
+
+    if (subscription?.cancelled_date) {
+      subscriptionCancelledDate = subscription.cancelled_date.split("T")[0];
     }
   });
 </script>
@@ -1109,6 +1126,26 @@
           type="text"
           class="input input-bordered w-full"
           bind:value={tenantData.totalPrice}
+        />
+      </div>
+    </div>
+
+    <div class="flex flex-row space-x-4">
+      <div class="flex-1 flex flex-col mb-4">
+        <p class="mb-2">{t("tenant.subscription-start-date")}</p>
+        <input
+          type="date"
+          bind:value={subscriptionStartDate}
+          class="input input-bordered w-full font-medium pr-10 focus:ring-2 focus:ring-indigo-500"
+        />
+      </div>
+      <div class="flex-1 flex flex-col mb-4">
+        <p class="mb-2">{t("tenant.subscription-cancelled-date")}</p>
+
+        <input
+          type="date"
+          bind:value={subscriptionCancelledDate}
+          class="input input-bordered font-medium w-full min-w-xs"
         />
       </div>
     </div>

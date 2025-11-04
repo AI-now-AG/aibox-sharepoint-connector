@@ -245,7 +245,6 @@
       ? removeDownloadButton(imageElement.outerHTML)
       : "<p><br/></p>";
 
-      
     // 2. Clean up HTML
     textHtml = textHtml
       .replace(/ }=""/g, "")
@@ -381,10 +380,6 @@
     await exportFileAs("pdf", index);
   }
 
-  async function exportToWord(index: number = 0) {
-    await exportFileAs("word", index);
-  }
-
   async function sendMessageResultViaEmail(index: number = 0) {
     try {
       const fullHtml = getFullHtmlContent(index, 12, true);
@@ -479,7 +474,6 @@
                         <div class="flex flex-row justify-items-end order-last">
                           <MessageAction
                             exportToPdfAction={() => exportToPDF(index)}
-                            exportToWordAction={() => exportToWord(index)}
                             sendEmailAction={() => {
                               sendEmailPromptResultIndex = index;
                               sendEmailToModal?.show();

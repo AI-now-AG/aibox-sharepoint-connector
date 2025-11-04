@@ -14,6 +14,8 @@ export interface Props {
 const { categoryId, groupId, useCaseTitle, promptItems = [] } = Astro.props;
 const userPermissions = Astro.locals.user.permissions;
 const isEditable = userPermissions.includes(Permission.AdminAll);
+
+const promptId = Astro.url?.searchParams?.get?.("promptId") ?? "";
 ---
 
 <div class="container max-w-6xl mx-auto grid grid-cols-1 px-14">
@@ -21,7 +23,7 @@ const isEditable = userPermissions.includes(Permission.AdminAll);
     title={useCaseTitle}
     currentCategoryId={categoryId}
     currentGroupId={groupId}
-    isEditable={isEditable && promptItems.length > 0} 
+    isEditable={isEditable && promptItems.length > 0}
     client:load
   />
 
@@ -32,6 +34,7 @@ const isEditable = userPermissions.includes(Permission.AdminAll);
         isEditable={userPermissions.includes(Permission.AdminAll)}
         groupId={groupId}
         folderName={Astro.locals.tenant.org_name}
+        initSelectedPromptId={promptId}
         client:load
       />
     ) : (

@@ -127,6 +127,7 @@
 </script>
 
 <div
+  id="onboardingId2"
   class={`flex flex-col rounded-xl bg-base-100 border border-base-content/20 focus:ring-base-200 has-focus:ring-2 has-focus:ring-base-primary has-focus:ring-offset-2 has-focus:ring-offset-base-200 relative`}
   use:dndFileUpload={{
     enabled: allowFileUpload,
@@ -148,7 +149,7 @@
       id="input"
       class={`textarea textarea-ghost ${
         stickyFooter ? `h-[50px]` : `h-20`
-      } min-h-auto w-full focus:outline-hidden focus:border-base-100 text-base`}
+      } min-h-auto w-full focus:outline-hidden focus:border-base-100`}
       placeholder={t("prompt-library.input-placeholder")}
       bind:value={input}
       onkeydown={onKeyDown}
