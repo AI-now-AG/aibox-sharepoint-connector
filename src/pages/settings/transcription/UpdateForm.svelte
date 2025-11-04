@@ -9,6 +9,7 @@
   import { preventDefault } from "$utils/common";
   import { normalizeTextToHtml } from "$utils/textFormatting";
   import TextEditor from "$components/form/TextEditor.svelte";
+  import { htmlToMarkdown } from "$utils/textFormatting";
   const t = useTranslations();
 
   interface Props {
@@ -103,7 +104,7 @@
       tenant_id: $tenant!._id.toString(),
       category: category,
       enabled: isEnabled,
-      text: instructionText,
+      text: htmlToMarkdown(instructionText),
     };
 
     const { error } = await actions.transcription.create(transcriptionCreate);
@@ -135,7 +136,7 @@
       tenant_id: $tenant!._id.toString(),
       category: category,
       enabled: isEnabled,
-      text: instructionText,
+      text: htmlToMarkdown(instructionText),
     };
 
     const { error } = await actions.transcription.update(transcriptionUpdate);
