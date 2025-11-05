@@ -1,5 +1,7 @@
 ---
 import { ClientRouter } from "astro:transitions";
+import PostHog from "$components/posthog.astro";
+
 const { title, description } = Astro.props;
 ---
 
@@ -10,6 +12,8 @@ const { title, description } = Astro.props;
   <meta name="descrption" content={description} />
 
   <link rel="icon" href="/favicon.svg" />
+
+  <PostHog />
 
   <ClientRouter />
 
@@ -44,7 +48,7 @@ const { title, description } = Astro.props;
 
       if (isSameOrigin && response.status === 401) {
         console.warn(
-          "Session expired or unauthorized. Redirecting to login..."
+          "Session expired or unauthorized. Redirecting to login...",
         );
         window.location.href = "/login/auth0";
         return new Response(null, { status: 401 });
