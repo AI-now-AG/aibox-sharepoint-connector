@@ -319,8 +319,9 @@
       distinctId: $user?._id?.toString() || "-",
       event: EventName.AiboxPromptResult,
       properties: {
+        tenant_id: $tenant?._id?.toString(),
         prompt: input,
-        model: model,
+        model: getModelName($tenant, model),
         result: responseText,
         from: ScreenName.MyAibox,
       },

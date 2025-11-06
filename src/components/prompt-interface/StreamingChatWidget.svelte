@@ -35,6 +35,7 @@
     useProviderInfo,
     NanoBananaPromptTools,
     resolveAPIProvider,
+    getModelName,
   } from "$shared/AIProvider";
   import { TRANSCRIPTION_API_URL } from "astro:env/client";
   import { EventName, ScreenName, type EventMessage } from "$types/Posthog";
@@ -356,8 +357,9 @@
       distinctId: $user?._id?.toString() || "-",
       event: EventName.AiboxPromptResult,
       properties: {
+        tenant_id: $tenant?._id?.toString(),
         prompt: prompt,
-        model: currentPrompt?.model,
+        model: getModelName($tenant, currentPrompt?.model),
         result: responseText,
         from: ScreenName.PromptExecutionArea,
       },
