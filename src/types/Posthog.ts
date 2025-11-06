@@ -1,7 +1,4 @@
-export const API_HOST = "https://eu.i.posthog.com"
-
-export const PUBLIC_POSTHOG_KEY = "phc_bJ5bQTIBkxqCtA2BQYlIm1aiVtQ6ybcy7RLTWjH5chd"
-
+export const POSTHOG_API_HOST = "https://eu.i.posthog.com"
 
 export enum EventName {
   AiboxLogin = 'aibox_login',

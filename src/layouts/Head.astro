@@ -1,8 +1,11 @@
 ---
 import { ClientRouter } from "astro:transitions";
-import PostHog from "$components/posthog.astro";
+import PostHogDev from "$components/PosthogDev.astro";
+import PostProd from "$components/PosthogProd.astro";
+import { isDev } from "$utils/env";
 
 const { title, description } = Astro.props;
+const isDevEnvironment = isDev();
 ---
 
 <head>
@@ -13,7 +16,7 @@ const { title, description } = Astro.props;
 
   <link rel="icon" href="/favicon.svg" />
 
-  <PostHog />
+  {isDevEnvironment ? <PostHogDev /> : <PostProd />}
 
   <ClientRouter />
 
