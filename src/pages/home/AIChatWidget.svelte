@@ -313,6 +313,7 @@
     posthogClient.capture(EventName.AiboxPromptResult, {
       user: $user?.email,
       prompt: input,
+      model: selectedPrompt?.model || selectedModel,
       result: responseText,
       from: ScreenName.Home,
     });

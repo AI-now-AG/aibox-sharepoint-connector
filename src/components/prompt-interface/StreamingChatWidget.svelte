@@ -356,6 +356,7 @@
     posthogClient.capture(EventName.AiboxPromptResult, {
       user: $user?.email,
       prompt: prompt,
+      model: currentPrompt?.model,
       result: responseText,
       from: ScreenName.PromptExecutionArea,
     });
