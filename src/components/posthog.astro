@@ -54,13 +54,10 @@ const userEmail = Astro.locals.user.email || "";
         const el = document.getElementById("posthog-user");
         const userId = el.dataset.userId;
         const userEmail = el.dataset.userEmail;
-
-        posthog.identify(
-          userId, // Replace 'distinct_id' with your user's unique identifier
-          { email: userEmail }, // optional: set additional person properties
-        );
+        posthog.identify(userId, { email: userEmail });
       },
       opt_in_site_apps: true,
+      // disable_session_recording: true // Off HERE
     });
   }
 </script>
