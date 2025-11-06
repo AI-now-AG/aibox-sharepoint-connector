@@ -28,6 +28,8 @@
   import { ApiKeyProvider } from "$types/TenantFeature";
   import { readFileContent } from "$utils/fileReader";
   import { TRANSCRIPTION_API_URL } from "astro:env/client";
+  import posthogClient from "$utils/posthogClient";
+  import { EventName, ScreenName } from "$types/Posthog";
 
   const t = useTranslations();
 
@@ -318,6 +320,13 @@
       window.dispatchEvent(new Event("reload-sidebar"));
       window.dispatchEvent(new Event("reload-conversation-dialog"));
     }, 1000);
+
+    posthogClient.capture(EventName.AiboxPromptResult, {
+      user: $user?.email,
+      prompt: input,
+      result: responseText,
+      from: ScreenName.MyAibox,
+    });
 
     return data;
   }

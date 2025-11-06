@@ -8,7 +8,8 @@ import createApiToken from "$utils/apiToken";
 import TenantModel from "$data/models/tenant.model";
 import { UserRole } from "$types/Users";
 import { AUTH0_SESSION_STATE } from "$constants";
-import posthog from "$utils/posthogClient";
+import posthogServer from "$utils/posthogServer";
+import { EventName } from "$types/Posthog";
 
 const Auth0JWTSchema = z.object({
   sub: z.string().min(24),
@@ -113,7 +114,7 @@ export async function GET(context: APIContext): Promise<Response> {
     api_token: apiToken,
   });
 
-  posthog.identify({
+  posthogServer.identify({
     distinctId: userId?.toString(), properties: {
       username: auth0User.data.nickname,
       name: auth0User.data.name,
@@ -121,9 +122,9 @@ export async function GET(context: APIContext): Promise<Response> {
     }
   })
 
-  posthog.capture({
+  posthogServer.capture({
     distinctId: userId?.toString(),
-    event: 'aibox-login',
+    event: EventName.AiboxLogin,
     properties: {
       username: auth0User.data.nickname,
       name: auth0User.data.name,

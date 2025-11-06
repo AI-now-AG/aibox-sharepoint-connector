@@ -33,6 +33,8 @@
   } from "$components/prompt-interface/PromptList.svelte";
   import type { CategoryItem } from "$types/CategoryItem";
   import PromptItem from "$components/prompt-interface/PromptItem.svelte";
+  import posthogClient from "$utils/posthogClient";
+  import { EventName, ScreenName } from "$types/Posthog";
 
   const t = useTranslations();
 
@@ -308,6 +310,12 @@
     // Scroll to latest message
     setTimeout(() => scrollIntoView(), 1000);
 
+    posthogClient.capture(EventName.AiboxPromptResult, {
+      user: $user?.email,
+      prompt: input,
+      result: responseText,
+      from: ScreenName.Home,
+    });
     return data;
   }
 

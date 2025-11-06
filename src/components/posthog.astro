@@ -1,6 +1,6 @@
 ---
-const userId = Astro.locals.user.id?.toString() || "anonymous";
-const userEmail = Astro.locals.user.email || "";
+const userId = Astro.locals?.user?.id?.toString() || "anonymous";
+const userEmail = Astro.locals?.user?.email || "";
 ---
 
 <div id="posthog-user" data-user-id={userId} data-user-email={userEmail}></div>
