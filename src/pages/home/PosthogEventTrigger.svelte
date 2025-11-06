@@ -11,7 +11,8 @@
     // TODO: Handle logic check tenant specific here
     // Could be use configuration from Supper Admin to control which tenant will be effected
     posthogClient.capture(EventName.AiboxTriggerSurvey, {
-      tenant_id: $tenant?._id?.toString(),
+      tenant_id: $tenant?._id?.toString() || "-",
+      trigger_by: "Mount Posthog Event Trigger",
     });
     console.log("posthogClient.capture(EventName.AiboxTriggerSurvey)");
   });

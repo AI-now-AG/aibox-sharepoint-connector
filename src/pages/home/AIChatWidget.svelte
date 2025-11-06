@@ -784,7 +784,8 @@
           class="btn btn-secondary mb-2"
           onclick={() => {
             posthogClient.capture(EventName.AiboxTriggerSurvey, {
-              tenant_id: $tenant?._id?.toString(),
+              tenant_id: $tenant?._id?.toString() || "-",
+              trigger_by: 'Click Button Trigger'
             });
           }}
         >
