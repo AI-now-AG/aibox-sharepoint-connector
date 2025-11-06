@@ -57,6 +57,6 @@ const userEmail = Astro.locals?.user?.email || "";
       posthog.identify(userId, { email: userEmail });
     },
     opt_in_site_apps: true,
-    disable_session_recording: true // Off HERE
+    // disable_session_recording: true // Off HERE
   });
 </script>
