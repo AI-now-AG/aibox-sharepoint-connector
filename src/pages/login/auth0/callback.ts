@@ -129,6 +129,7 @@ export async function GET(context: APIContext): Promise<Response> {
       username: auth0User.data.nickname,
       name: auth0User.data.name,
       email: auth0User.data.email,
+      tenant_id: tenant._id.toString(),
     }
   })
 
