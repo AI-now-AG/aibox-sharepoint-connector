@@ -37,8 +37,7 @@
     resolveAPIProvider,
   } from "$shared/AIProvider";
   import { TRANSCRIPTION_API_URL } from "astro:env/client";
-  import posthogClient from "$utils/posthogClient";
-  import { EventName, ScreenName } from "$types/Posthog";
+  import { EventName, ScreenName, type EventMessage } from "$types/Posthog";
 
   const t = useTranslations();
 
@@ -353,12 +352,15 @@
     // Scroll to latest message
     setTimeout(() => scrollIntoView(), 1000);
 
-    posthogClient.capture(EventName.AiboxPromptResult, {
-      user: $user?.email,
-      prompt: prompt,
-      model: currentPrompt?.model,
-      result: responseText,
-      from: ScreenName.PromptExecutionArea,
+    capturePosthog({
+      distinctId: $user?._id?.toString() || "-",
+      event: EventName.AiboxPromptResult,
+      properties: {
+        prompt: prompt,
+        model: currentPrompt?.model,
+        result: responseText,
+        from: ScreenName.PromptExecutionArea,
+      },
     });
 
     return data;
@@ -687,6 +689,14 @@
       top: 0,
       behavior: "smooth",
     });
+  }
+
+  async function capturePosthog(params: EventMessage) {
+    try {
+      actions.posthog.capture(params);
+    } catch (error) {
+      console.error("Capture Posthog event faield: " + params.event);
+    }
   }
 
   async function saveConversation() {

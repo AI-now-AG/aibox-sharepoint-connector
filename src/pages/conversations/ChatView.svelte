@@ -25,11 +25,9 @@
     buildCitationLinks,
     stripMarkdownFormatting,
   } from "$utils/textFormatting";
-  import { ApiKeyProvider } from "$types/TenantFeature";
   import { readFileContent } from "$utils/fileReader";
   import { TRANSCRIPTION_API_URL } from "astro:env/client";
-  import posthogClient from "$utils/posthogClient";
-  import { EventName, ScreenName } from "$types/Posthog";
+  import { EventName, ScreenName, type EventMessage } from "$types/Posthog";
 
   const t = useTranslations();
 
@@ -99,6 +97,14 @@
 
   let selectedPromptTool = $state(PromptToolOption.None);
 
+  async function capturePosthog(params: EventMessage) {
+    try {
+      actions.posthog.capture(params);
+    } catch (error) {
+      console.error("Capture Posthog event faield: " + params.event);
+    }
+  }
+
   async function deleteConversation() {
     try {
       loading = true;
@@ -134,18 +140,6 @@
     } catch (error) {
       console.error("Exception when update conversation message", error);
     }
-  }
-
-  function isGpt5Default() {
-    const aiProviders = $tenant?.api_key_providers ?? [];
-    const activeDefaultProvider = aiProviders.find(
-      (item) => item.active === true && item.default === true,
-    );
-
-    if (activeDefaultProvider?.name === ApiKeyProvider.OpenAIGpt5) {
-      return true;
-    }
-    return false;
   }
 
   async function getAPIConfiguration(): Promise<APIConfiguration> {
@@ -321,12 +315,15 @@
       window.dispatchEvent(new Event("reload-conversation-dialog"));
     }, 1000);
 
-    posthogClient.capture(EventName.AiboxPromptResult, {
-      user: $user?.email,
-      prompt: input,
-      model: model,
-      result: responseText,
-      from: ScreenName.MyAibox,
+    capturePosthog({
+      distinctId: $user?._id?.toString() || "-",
+      event: EventName.AiboxPromptResult,
+      properties: {
+        prompt: input,
+        model: model,
+        result: responseText,
+        from: ScreenName.MyAibox,
+      },
     });
 
     return data;

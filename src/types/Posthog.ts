@@ -1,13 +1,39 @@
 export const API_HOST = "https://eu.i.posthog.com"
 
+export const PUBLIC_POSTHOG_DEV_KEY = "phc_bJ5bQTIBkxqCtA2BQYlIm1aiVtQ6ybcy7RLTWjH5chd"
+export const PUBLIC_POSTHOG_PROD_KEY = "--TBD--"
+export const PUBLIC_POSTHOG_KEY = PUBLIC_POSTHOG_DEV_KEY
+
+
 export enum EventName {
   AiboxLogin = 'aibox_login',
   AiboxPromptResult = 'aibox_prompt_result'
 }
 
-
 export enum ScreenName {
   Home = 'home_screen',
   MyAibox = 'my_aibox_screen',
   PromptExecutionArea = 'prompt_execution_area_screen'
+}
+
+
+export interface IdentifyMessage {
+  distinctId: string
+  properties?: Record<string | number, any>
+  disableGeoip?: boolean
+}
+
+export interface SendFeatureFlagsOptions {
+  onlyEvaluateLocally?: boolean
+  personProperties?: Record<string, any>
+  groupProperties?: Record<string, Record<string, any>>
+  flagKeys?: string[]
+}
+
+export interface EventMessage extends IdentifyMessage {
+  event: string
+  groups?: Record<string, string | number> // Mapping of group type to group id
+  sendFeatureFlags?: boolean | SendFeatureFlagsOptions
+  timestamp?: Date
+  uuid?: string
 }
