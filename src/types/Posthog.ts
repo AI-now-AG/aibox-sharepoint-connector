@@ -5,7 +5,8 @@ export const PUBLIC_POSTHOG_KEY = "phc_bJ5bQTIBkxqCtA2BQYlIm1aiVtQ6ybcy7RLTWjH5c
 
 export enum EventName {
   AiboxLogin = 'aibox_login',
-  AiboxPromptResult = 'aibox_prompt_result'
+  AiboxPromptResult = 'aibox_prompt_result',
+  AiboxTriggerSurvey =  'aibox_trigger_survey'
 }
 
 export enum ScreenName {

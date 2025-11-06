@@ -2,6 +2,7 @@
 import Layout from "$layouts/Layout.astro";
 import { actions } from "astro:actions";
 import AIChatWidget from "$pages/home/AIChatWidget.svelte";
+import PosthogEventTrigger from "$pages/home/PosthogEventTrigger.svelte";
 import { useTranslations } from "$i18n/utils";
 import { TourType } from "$types/Users";
 import type { CardItem } from "$components/Card.svelte";
@@ -128,4 +129,5 @@ const promptsEnriched: CardItem[] = prompts.map((prompt: any) => {
       </div>
     </div>
   </div>
+  <PosthogEventTrigger client:load />
 </Layout>
