@@ -34,6 +34,7 @@
   import type { CategoryItem } from "$types/CategoryItem";
   import PromptItem from "$components/prompt-interface/PromptItem.svelte";
   import { EventName, ScreenName, type EventMessage } from "$types/Posthog";
+  import posthogClient from "$utils/posthogClient";
 
   const t = useTranslations();
 
@@ -779,6 +780,18 @@
         in:slide={{ duration: 500, delay: 500 }}
         out:slide={{ duration: 500 }}
       >
+        <button
+          class="btn btn-secondary mb-2"
+          onclick={() => {
+            posthogClient.capture(EventName.AiboxTriggerSurvey, {
+              tenant_id: $tenant?._id?.toString(),
+            });
+          }}
+        >
+          {@html svgIcons.email}
+          <span>Trigger survey for tenant: AI now DEV (do not change)</span>
+        </button>
+
         <MessageInput
           bind:input
           bind:files
