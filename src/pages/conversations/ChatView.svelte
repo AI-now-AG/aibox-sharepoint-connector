@@ -321,7 +321,7 @@
       event: EventName.AiboxPromptResult,
       properties: {
         tenant_id: $tenant?._id?.toString() || "-",
-        prompt_name: promptData.title || "-",
+        prompt_name: promptData?.title || "-",
         tool: selectedPromptTool,
         model: getModelName($tenant, model),
         from: ScreenName.MyAibox,

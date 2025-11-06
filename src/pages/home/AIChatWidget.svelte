@@ -315,7 +315,7 @@
       event: EventName.AiboxPromptResult,
       properties: {
         tenant_id: $tenant?._id?.toString() || "-",
-        prompt_name: selectedPrompt.title || "-",
+        prompt_name: selectedPrompt?.title || "-",
         tool: selectedPromptTool,
         model: getModelName($tenant, selectedPrompt?.model || selectedModel),
         from: ScreenName.Home,
@@ -660,6 +660,7 @@
   async function saveConversation() {
     loading = true;
     const { error, data } = await actions.conversation.save({
+      prompt_id: selectedPrompt?.id?.toString() || null,
       model: selectedPrompt?.model || selectedModel,
       messages: $sharedMessageHistory,
       previous_response_id: previousResponseId,
