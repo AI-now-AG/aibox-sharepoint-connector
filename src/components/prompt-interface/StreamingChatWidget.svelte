@@ -357,10 +357,10 @@
       distinctId: $user?._id?.toString() || "-",
       event: EventName.AiboxPromptResult,
       properties: {
-        tenant_id: $tenant?._id?.toString(),
-        prompt: prompt,
+        tenant_id: $tenant?._id?.toString() || "-",
+        prompt_name: currentPrompt.title || "-",
+        tool: selectedPromptTool,
         model: getModelName($tenant, currentPrompt?.model),
-        result: responseText,
         from: ScreenName.PromptExecutionArea,
       },
     });

@@ -71,6 +71,7 @@
     conversationId,
     model = PromptModel.Default,
     messages,
+    promptData,
     folderName,
     lastResponseId = null,
   }: Props = $props();
@@ -319,10 +320,10 @@
       distinctId: $user?._id?.toString() || "-",
       event: EventName.AiboxPromptResult,
       properties: {
-        tenant_id: $tenant?._id?.toString(),
-        prompt: input,
+        tenant_id: $tenant?._id?.toString() || "-",
+        prompt_name: promptData.title || "-",
+        tool: selectedPromptTool,
         model: getModelName($tenant, model),
-        result: responseText,
         from: ScreenName.MyAibox,
       },
     });

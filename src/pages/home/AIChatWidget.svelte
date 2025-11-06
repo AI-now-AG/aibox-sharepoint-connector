@@ -314,10 +314,10 @@
       distinctId: $user?._id?.toString() || "-",
       event: EventName.AiboxPromptResult,
       properties: {
-        tenant_id: $tenant?._id?.toString(),
-        prompt: input,
+        tenant_id: $tenant?._id?.toString() || "-",
+        prompt_name: selectedPrompt.title || "-",
+        tool: selectedPromptTool,
         model: getModelName($tenant, selectedPrompt?.model || selectedModel),
-        result: responseText,
         from: ScreenName.Home,
       },
     });
@@ -785,7 +785,7 @@
           onclick={() => {
             posthogClient.capture(EventName.AiboxTriggerSurvey, {
               tenant_id: $tenant?._id?.toString() || "-",
-              trigger_by: 'Click Button Trigger'
+              trigger_by: "Click Button Trigger",
             });
           }}
         >
