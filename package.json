@@ -70,7 +70,6 @@
     "netlify-cli": "^18.1.0",
     "openai": "^4.104.0",
     "pdf-parse-debugging-disabled": "^1.1.1",
-    "posthog-js": "^1.288.0",
     "posthog-node": "^5.11.0",
     "prosemirror-state": "^1.4.3",
     "slug": "^10.0.0",
