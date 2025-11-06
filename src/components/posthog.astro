@@ -46,18 +46,17 @@ const userEmail = Astro.locals?.user?.email || "";
       }),
       (e.__SV = 1));
   })(document, window.posthog || []);
-  if (!window.posthog) {
-    posthog.init("phc_bJ5bQTIBkxqCtA2BQYlIm1aiVtQ6ybcy7RLTWjH5chd", {
-      api_host: "https://eu.i.posthog.com",
-      defaults: "2025-05-24",
-      loaded: function (posthog) {
-        const el = document.getElementById("posthog-user");
-        const userId = el.dataset.userId;
-        const userEmail = el.dataset.userEmail;
-        posthog.identify(userId, { email: userEmail });
-      },
-      opt_in_site_apps: true,
-      // disable_session_recording: true // Off HERE
-    });
-  }
+
+  posthog.init("phc_bJ5bQTIBkxqCtA2BQYlIm1aiVtQ6ybcy7RLTWjH5chd", {
+    api_host: "https://eu.i.posthog.com",
+    defaults: "2025-05-24",
+    loaded: function (posthog) {
+      const el = document.getElementById("posthog-user");
+      const userId = el.dataset.userId;
+      const userEmail = el.dataset.userEmail;
+      posthog.identify(userId, { email: userEmail });
+    },
+    opt_in_site_apps: true,
+    // disable_session_recording: true // Off HERE
+  });
 </script>

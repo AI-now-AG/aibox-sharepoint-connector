@@ -39,6 +39,10 @@ const { title, description } = Astro.props;
       const [input, init] = args;
       const url = typeof input === "string" ? input : input.url;
 
+      if (url.includes("posthog.com")) {
+        return originalFetch(...args);
+      }
+
       const response = await originalFetch(...args);
       console.log(`[aibox] Wrapped fetch request: ${url}`);
 
