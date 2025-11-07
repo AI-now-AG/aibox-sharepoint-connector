@@ -930,6 +930,13 @@
                 type: "error",
                 timeout: 5000,
               });
+              transcriptStore.update((current) =>
+                  current.filter((entry) =>
+                    usecaseId
+                      ? entry.usecaseId !== usecaseId
+                      : entry.type !== transcriptionType,
+                  ),
+              );
               break;
           }
         };
