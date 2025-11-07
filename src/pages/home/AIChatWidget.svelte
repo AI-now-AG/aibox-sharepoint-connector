@@ -770,7 +770,7 @@
         out:slide={{ duration: 500 }}
       >
         <!-- TESTING TRIGGER SURVEY ONLY -->
-        {#if $tenant && $tenant.is_on_posthog && (window.location.href.includes("http://localhost") || window.location.href.includes("https://staging.aibox-app.com/"))}
+        {#if typeof window !== "undefined" && $tenant && $tenant.is_on_posthog && (window.location.href.includes("http://localhost") || window.location.href.includes("https://staging.aibox-app.com/"))}
           <button
             class="btn btn-secondary mb-2"
             onclick={() => {
