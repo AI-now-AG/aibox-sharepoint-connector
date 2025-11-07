@@ -62,7 +62,7 @@
   let isFileDataPresent: boolean = $state(false);
 
   let fileErrorMessage: string = $state("");
-  let selectedFileFormat: FileFormat[] = [FileFormat.ASS];
+  let selectedFileFormat: FileFormat[] = [FileFormat.ASS, FileFormat.SRT];
 
   let standardSubtitlesChecked: boolean = $state(true);
   let showTextPreviewChecked: boolean = $state(true);
@@ -101,7 +101,7 @@
   let isAudioTagEnabled = $state(false);
 
   // Subtitle configuration
-  let maxCharsPerLine = $state(34);
+  let maxCharsPerLine = $state(36);
   let maxLinesPerBlock = $state(2);
 
   let confirmModal: HTMLDialogElement | undefined = $state();
@@ -173,16 +173,22 @@
       standardSubtitlesChecked = false;
       rawOutputChecked = true;
       txtFileChecked = true;
+      assFileChecked = false;
+      srtFileChecked = false;
     } else if (
       category === AudioCategory.SubtitleLarge ||
       category === AudioCategory.Subtitle11Labs
     ) {
       maxFileSize = 50;
-      // Keep default subtitle format
-      selectedFileFormat = [FileFormat.ASS];
+      // Keep default subtitle format (both ASS and SRT)
+      selectedFileFormat = [FileFormat.ASS, FileFormat.SRT];
+      assFileChecked = true;
+      srtFileChecked = true;
     } else {
-      // Keep default subtitle format for other categories
-      selectedFileFormat = [FileFormat.ASS];
+      // Keep default subtitle format for other categories (both ASS and SRT)
+      selectedFileFormat = [FileFormat.ASS, FileFormat.SRT];
+      assFileChecked = true;
+      srtFileChecked = true;
     }
 
     if ($transcriptStore && transcriptionType) {
@@ -1140,6 +1146,66 @@
       });
   }
 
+  function downloadSpecificFile(fileUrl: string) {
+    if (!fileUrl) {
+      console.error("No file URL provided for download.");
+      return;
+    }
+
+    fetch(fileUrl)
+      .then((response) => response.blob())
+      .then((blob) => {
+        // Determine MIME type based on file extension
+        const fileName = fileUrl.split("/").pop() ?? "";
+        let mimeType = "application/octet-stream";
+        
+        if (fileName.toLowerCase().endsWith(".ass")) {
+          mimeType = "text/x-ssa;charset=utf-8"; // ASS/SSA subtitle format
+        } else if (fileName.toLowerCase().endsWith(".srt")) {
+          mimeType = "application/x-subrip;charset=utf-8"; // SRT subtitle format
+        } else if (fileName.toLowerCase().endsWith(".json")) {
+          mimeType = "application/json;charset=utf-8";
+        } else if (fileName.toLowerCase().endsWith(".txt")) {
+          mimeType = "text/plain;charset=utf-8";
+        }
+
+        const blobUrl = URL.createObjectURL(
+          new Blob([blob], { type: mimeType }),
+        );
+
+        const link = document.createElement("a");
+        link.href = blobUrl;
+        link.target = "_blank";
+        link.download = fileName;
+
+        document.body.appendChild(link);
+        link.click();
+
+        document.body.removeChild(link);
+        URL.revokeObjectURL(blobUrl);
+      })
+      .catch((error) => {
+        console.error("Error downloading file:", error);
+        addToast({
+          message: `Failed to download ${fileUrl.split("/").pop()}`,
+          type: "error",
+          timeout: 3000,
+        });
+      });
+  }
+
+  function downloadBothSubtitles() {
+    if (assFileUrl) {
+      downloadSpecificFile(assFileUrl);
+    }
+    if (srtFileUrl) {
+      // Add slight delay to prevent browser blocking multiple downloads
+      setTimeout(() => {
+        downloadSpecificFile(srtFileUrl);
+      }, 100);
+    }
+  }
+
   async function downloadZip() {
     const fileUrl = assFileUrl || srtFileUrl || jsonFileUrl || txtFileUrl;
     if (zipFileData) {
@@ -1685,11 +1751,10 @@
     </div>
   {/if}
 
-  {#if category === AudioCategory.Subtitle || category === AudioCategory.SubtitleJson || category === AudioCategory.SubtitleLarge || category === AudioCategory.Subtitle11Labs}
+  <!-- {#if category === AudioCategory.Subtitle || category === AudioCategory.SubtitleJson || category === AudioCategory.SubtitleLarge || category === AudioCategory.Subtitle11Labs}
     <div class="bg-base-100 mt-10 p-4 px-6 rounded-xl">
       <div class="grid">
         <h2>{t("audiotools.subtitles.what-output-do-you-need")}</h2>
-        <!-- Standard Subtitles -->
         <div class="form-control py-2">
           <div class="card rounded-box grid py-8">
             <div class="flex flex-row place-items-center gap-8">
@@ -1736,7 +1801,6 @@
                   </label>
                 </div>
               </div>
-              <!-- <div class="basis-1/8">03</div> -->
             </div>
           </div>
           <div><div class="bg-base-200 h-0.5"></div></div>
@@ -1765,8 +1829,6 @@
                   </div>
                 </div>
               </div>
-              <!-- <div class="basis-1/3">02</div>
-              <div class="basis-1/8">03</div> -->
             </div>
           </div>
           {#if category === AudioCategory.Subtitle || category === AudioCategory.SubtitleLarge || category === AudioCategory.Subtitle11Labs}
@@ -1816,14 +1878,13 @@
                     </label>
                   </div>
                 </div>
-                <!-- <div class="basis-1/8">03</div> -->
               </div>
             </div>
           {/if}
         </div>
       </div>
     </div>
-  {/if}
+  {/if} -->
 
   {#if category === AudioCategory.Subtitle11Labs}
     <div class="bg-base-100 mt-10 p-4 px-6 rounded-xl">
@@ -1864,7 +1925,7 @@
                 min="20"
                 max="60"
                 bind:value={maxCharsPerLine}
-                placeholder="34"
+                placeholder="36"
               />
               <div class="join-item flex flex-col border border-l-0 border-base-300 rounded-r-lg">
                 <button
@@ -2035,15 +2096,48 @@
     {/if}
     {#if isTranscipted}
       {#if category !== AudioCategory.AudioPro}
-        {#if zipFileData}
-          <!-- Show Download Zip if zip data exists -->
+        {#if assFileUrl && srtFileUrl}
+          <!-- Both subtitle files available - show dropdown with options (prioritize over zip) -->
+          <div class="dropdown dropdown-start">
+            <div tabindex="0" role="button" class="btn btn-success btn-sm">
+              {@html svgIcons.fileExport} Export
+            </div>
+            <ul
+              tabindex="-1"
+              class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 z-10"
+            >
+              <!-- Download both formats -->
+              <li>
+                <button onclick={downloadBothSubtitles} class="flex items-center gap-2">
+                  {@html svgIcons.fileExport}
+                  <span>{t("subtitle-editor.export-both-formats")}</span>
+                </button>
+              </li>
+              <!-- Download ASS only -->
+              <li>
+                <button onclick={() => downloadSpecificFile(assFileUrl)} class="flex items-center gap-2">
+                  {@html svgIcons.fileExport}
+                  <span>{t("subtitle-editor.ass-only")}</span>
+                </button>
+              </li>
+              <!-- Download SRT only -->
+              <li>
+                <button onclick={() => downloadSpecificFile(srtFileUrl)} class="flex items-center gap-2">
+                  {@html svgIcons.fileExport}
+                  <span>{t("subtitle-editor.srt-only")}</span>
+                </button>
+              </li>
+            </ul>
+          </div>
+        {:else if zipFileData}
+          <!-- Show Download Zip if zip data exists and no individual files -->
           <button class="btn btn-success" onclick={downloadZip}
             >{@html svgIcons.download}{t(
               "transciption.model.cta.download-zip",
             )}</button
           >
         {:else if assFileUrl || srtFileUrl || jsonFileUrl || txtFileUrl}
-          <!-- Show Download Output only if no zip data exists -->
+          <!-- Single file available - direct download button -->
           <button
             class="btn btn-success btn-sm text-base-100"
             onclick={downloadFile}
