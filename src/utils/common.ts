@@ -31,7 +31,7 @@ export const isValidEmail = (email: string) => {
 export const preventDefault = (fn: any) => {
   return function (this: any, event: any) {
     event.preventDefault();
-    fn?.call(this, event);
+    fn?.call?.(this, event);
   };
 };
 
