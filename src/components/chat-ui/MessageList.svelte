@@ -14,6 +14,7 @@
   import MessageAction from "$components/chat-ui/MessageAction.svelte";
   import { TRANSCRIPTION_API_URL } from "astro:env/client";
   import { marked } from "marked";
+  import ThumbRating from "./ ThumbRating.svelte";
 
   const t = useTranslations();
 
@@ -487,6 +488,11 @@
                         </div>
                       {/if}
                     </div>
+                    {#if role === MessageRole.Assistant}
+                      <div class="ml-12 mt-[-10px]">
+                        <ThumbRating />
+                      </div>
+                    {/if}
                   </div>
 
                   {#if role === MessageRole.Assistant && imageUrl}
