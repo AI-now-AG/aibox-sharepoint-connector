@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ObjectId } from "mongodb";
 import { db, toObjectId, type Document } from "../mongodb";
 import { z } from "zod";
@@ -69,6 +70,7 @@ const TenantSchema = z.object({
   active: z.boolean().optional().default(true),
   is_restrict_user_managment: z.boolean().optional().default(false),
   is_trial: z.boolean().optional().default(false),
+  is_on_posthog: z.boolean().optional().default(false),
   metadata: z.record(z.any()).nullish(),
   billing_method: z
     .nativeEnum(BillingMethod)
@@ -228,7 +230,7 @@ export default {
       updated_at: now,
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     delete (newTenant as any)._id; // ensure no ID conflict
 
     // insert the new tenant

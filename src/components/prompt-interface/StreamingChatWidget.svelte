@@ -28,7 +28,6 @@
   import Loading from "$components/Loading.svelte";
   import { tenant, user } from "$stores";
   import { useTranslations } from "$i18n/utils";
-  import { ApiKeyProvider } from "$types/TenantFeature";
   import { ModelName, PromptToolOption } from "$types/AIProvider";
   import {
     getPromptTools,
@@ -38,7 +37,8 @@
     getModelName,
   } from "$shared/AIProvider";
   import { TRANSCRIPTION_API_URL } from "astro:env/client";
-  import { EventName, ScreenName, type EventMessage } from "$types/Posthog";
+  import { EventName, ScreenName } from "$types/Posthog";
+  import { posthogClientCapture } from "$utils/posthogClient";
 
   const t = useTranslations();
 
@@ -353,16 +353,13 @@
     // Scroll to latest message
     setTimeout(() => scrollIntoView(), 1000);
 
-    capturePosthog({
-      distinctId: $user?._id?.toString() || "-",
-      event: EventName.AiboxPromptResult,
-      properties: {
-        tenant_id: $tenant?._id?.toString() || "-",
-        prompt_name: currentPrompt?.title || "-",
-        tool: selectedPromptTool,
-        model: getModelName($tenant, currentPrompt?.model),
-        from: ScreenName.PromptExecutionArea,
-      },
+    posthogClientCapture($tenant, EventName.AiboxPromptResult, {
+      tenant_id: $tenant?._id?.toString() || "-",
+      tenant_name: $tenant?.name?.toString() || "-",
+      prompt_name: currentPrompt?.title || "-",
+      tool: selectedPromptTool,
+      model: getModelName($tenant, currentPrompt?.model),
+      from: ScreenName.PromptExecutionArea,
     });
 
     return data;
@@ -691,14 +688,6 @@
       top: 0,
       behavior: "smooth",
     });
-  }
-
-  async function capturePosthog(params: EventMessage) {
-    try {
-      actions.posthog.capture(params);
-    } catch (error) {
-      console.error("Capture Posthog event faield: " + params.event);
-    }
   }
 
   async function saveConversation() {

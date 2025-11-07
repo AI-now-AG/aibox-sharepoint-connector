@@ -27,7 +27,8 @@
   } from "$utils/textFormatting";
   import { readFileContent } from "$utils/fileReader";
   import { TRANSCRIPTION_API_URL } from "astro:env/client";
-  import { EventName, ScreenName, type EventMessage } from "$types/Posthog";
+  import { EventName, ScreenName } from "$types/Posthog";
+  import { posthogClientCapture } from "$utils/posthogClient";
 
   const t = useTranslations();
 
@@ -97,14 +98,6 @@
   );
 
   let selectedPromptTool = $state(PromptToolOption.None);
-
-  async function capturePosthog(params: EventMessage) {
-    try {
-      actions.posthog.capture(params);
-    } catch (error) {
-      console.error("Capture Posthog event faield: " + params.event);
-    }
-  }
 
   async function deleteConversation() {
     try {
@@ -316,16 +309,13 @@
       window.dispatchEvent(new Event("reload-conversation-dialog"));
     }, 1000);
 
-    capturePosthog({
-      distinctId: $user?._id?.toString() || "-",
-      event: EventName.AiboxPromptResult,
-      properties: {
-        tenant_id: $tenant?._id?.toString() || "-",
-        prompt_name: promptData?.title || "-",
-        tool: selectedPromptTool,
-        model: getModelName($tenant, model),
-        from: ScreenName.MyAibox,
-      },
+    posthogClientCapture($tenant, EventName.AiboxPromptResult, {
+      tenant_id: $tenant?._id?.toString() || "-",
+      tenant_name: $tenant?.name?.toString() || "-",
+      prompt_name: promptData?.title || "-",
+      tool: selectedPromptTool,
+      model: getModelName($tenant, model),
+      from: ScreenName.MyAibox,
     });
 
     return data;

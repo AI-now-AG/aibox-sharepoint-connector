@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export const POSTHOG_API_HOST = "https://eu.i.posthog.com"
 
 export enum EventName {
@@ -33,3 +34,6 @@ export interface EventMessage extends IdentifyMessage {
   timestamp?: Date
   uuid?: string
 }
+
+type Property = any;
+export type Properties = Record<string, Property>;

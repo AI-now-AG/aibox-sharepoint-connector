@@ -31,10 +31,9 @@
   import PromptList, {
     type PromptCartItem,
   } from "$components/prompt-interface/PromptList.svelte";
-  import type { CategoryItem } from "$types/CategoryItem";
   import PromptItem from "$components/prompt-interface/PromptItem.svelte";
-  import { EventName, ScreenName, type EventMessage } from "$types/Posthog";
-  import posthogClient from "$utils/posthogClient";
+  import { EventName, ScreenName } from "$types/Posthog";
+  import { posthogClientCapture } from "$utils/posthogClient";
 
   const t = useTranslations();
 
@@ -310,16 +309,13 @@
     // Scroll to latest message
     setTimeout(() => scrollIntoView(), 1000);
 
-    capturePosthog({
-      distinctId: $user?._id?.toString() || "-",
-      event: EventName.AiboxPromptResult,
-      properties: {
-        tenant_id: $tenant?._id?.toString() || "-",
-        prompt_name: selectedPrompt?.title || "-",
-        tool: selectedPromptTool,
-        model: getModelName($tenant, selectedPrompt?.model || selectedModel),
-        from: ScreenName.Home,
-      },
+    posthogClientCapture($tenant, EventName.AiboxPromptResult, {
+      tenant_id: $tenant?._id?.toString() || "-",
+      tenant_name: $tenant?.name?.toString() || "-",
+      prompt_name: selectedPrompt?.title || "-",
+      tool: selectedPromptTool,
+      model: getModelName($tenant, selectedPrompt?.model || selectedModel),
+      from: ScreenName.Home,
     });
 
     return data;
@@ -649,14 +645,6 @@
     });
   }
 
-  async function capturePosthog(params: EventMessage) {
-    try {
-      actions.posthog.capture(params);
-    } catch (error) {
-      console.error("Capture Posthog event faield: " + params.event);
-    }
-  }
-
   async function saveConversation() {
     loading = true;
     const { error, data } = await actions.conversation.save({
@@ -781,18 +769,21 @@
         in:slide={{ duration: 500, delay: 500 }}
         out:slide={{ duration: 500 }}
       >
-        <button
-          class="btn btn-secondary mb-2"
-          onclick={() => {
-            posthogClient.capture(EventName.AiboxTriggerSurvey, {
-              tenant_id: $tenant?._id?.toString() || "-",
-              trigger_by: "Click Button Trigger",
-            });
-          }}
-        >
-          {@html svgIcons.email}
-          <span>Trigger survey for tenant: AI now DEV (do not change)</span>
-        </button>
+        <!-- TESTING TRIGGER SURVEY ONLY -->
+        {#if $tenant && $tenant.is_on_posthog && (window.location.href.includes("http://localhost") || window.location.href.includes("https://staging.aibox-app.com/"))}
+          <button
+            class="btn btn-secondary mb-2"
+            onclick={() => {
+              posthogClientCapture($tenant, EventName.AiboxTriggerSurvey, {
+                tenant_id: $tenant?._id?.toString() || "-",
+                trigger_by: "Click Button Trigger",
+              });
+            }}
+          >
+            {@html svgIcons.email}
+            <span>Trigger survey for tenant: AI now DEV (do not change)</span>
+          </button>
+        {/if}
 
         <MessageInput
           bind:input

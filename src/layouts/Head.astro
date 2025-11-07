@@ -4,7 +4,8 @@ import PostHogDev from "$components/PosthogDev.astro";
 import PostProd from "$components/PosthogProd.astro";
 import { isDev } from "$utils/env";
 
-const { title, description } = Astro.props;
+const { tenant, title, description } = Astro.props;
+const isOnHostpog = tenant && tenant.is_on_posthog;
 const isDevEnvironment = isDev();
 ---
 
@@ -16,7 +17,7 @@ const isDevEnvironment = isDev();
 
   <link rel="icon" href="/favicon.svg" />
 
-  {isDevEnvironment ? <PostHogDev /> : <PostProd />}
+  {isOnHostpog && (isDevEnvironment ? <PostHogDev /> : <PostProd />)}
 
   <ClientRouter />
 
@@ -55,7 +56,7 @@ const isDevEnvironment = isDev();
 
       if (isSameOrigin && response.status === 401) {
         console.warn(
-          "Session expired or unauthorized. Redirecting to login...",
+          "Session expired or unauthorized. Redirecting to login..."
         );
         window.location.href = "/login/auth0";
         return new Response(null, { status: 401 });
