@@ -619,7 +619,6 @@
   "transcription.status.ready": "Ready",
   "transcription.progress.uploading-to-cloud": "Uploading to storage",
   "transcription.progress.audio-conversion": "Audio Conversion",
-  "transcription.progress.transcription-in-progress": "Converting",
   "transcription.progress.batch-transcription": "Batch Transcription",
   "transcription.progress.job-queued": "Job is queued and will start soon...",
   "transcription.progress.poll-attempt": "Poll attempt",
@@ -651,5 +650,6 @@
   "prompt-execution.upload-file.drop-files-here": "Drop any files here to add it to the chat.",
   "tenant.subscription-start-date": "Subscription Start Date",
   "tenant.subscription-cancelled-date": "Subscription Cancelled Date",
-  "home.search-prompt": "Seach Assistants"
+  "home.search-prompt": "Seach Assistants",
+  "tenant.posthog": "Posthog user feeback and survey"
 }

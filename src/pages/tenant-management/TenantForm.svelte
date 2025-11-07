@@ -2348,6 +2348,27 @@
         </div>
       </div>
     </div>
+
+    <div class="container mx-auto">
+      <div class="bg-base-100 shadow-sm rounded-lg my-4">
+        <div class="flex p-4 items-center justify-between">
+          <div class="flex items-center">
+            <input
+              id="is-on-posthog"
+              type="checkbox"
+              class="checkbox checkbox-primary"
+              value="is-on-posthog"
+              bind:checked={tenantData.is_on_posthog}
+            />
+            <label class="label cursor-pointer ml-2" for="is-on-posthog">
+              <span class="label-text text-base-content ml-2"
+                >{t("tenant.posthog")}</span
+              >
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
