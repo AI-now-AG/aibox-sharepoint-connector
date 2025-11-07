@@ -46,6 +46,7 @@ export function posthogServerCapture(tenant: { is_on_posthog?: boolean } | null 
     if (!tenant || !tenant.is_on_posthog) {
         return;
     }
+    console.log("posthogServerCapture", props)
     getPosthogServerInstance?.()?.capture(props)
 }
 
@@ -73,5 +74,6 @@ export function posthogServerIdentify(tenant: { is_on_posthog?: boolean } | null
     if (!tenant || !tenant.is_on_posthog) {
         return;
     }
+    console.log("posthogServerIdentify", props)
     getPosthogServerInstance?.()?.identify(props)
 }

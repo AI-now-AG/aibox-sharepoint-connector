@@ -48,5 +48,6 @@ export function posthogClientCapture(tenant: { is_on_posthog?: boolean } | null 
     if (!tenant || !tenant.is_on_posthog) {
         return;
     }
+    console.log("posthogClientCapture", event_name, properties, options)
     getPosthogClilentInstance?.()?.capture(event_name, properties, options);
 }
