@@ -96,31 +96,7 @@
     ) ?? [],
   );
 
-  onMount(() => {
-    if (promptDialog) {
-      const originalShow = promptDialog.show;
-      const originalShowModal = promptDialog.showModal;
-
-      promptDialog.show = function (...args) {
-        handleDialogShow();
-        return originalShow.apply(this, args);
-      };
-
-      promptDialog.showModal = function (...args) {
-        handleDialogShow();
-        return originalShowModal.apply(this, args);
-      };
-    }
-  });
-
-  async function handleDialogShow() {
-    if (!isDataLoaded) {
-      await initDatas();
-      isDataLoaded = true;
-    }
-  }
-
-  async function initDatas() {
+  onMount(async () => {
     const categoryResponse = await fetch("/api/categories.json", {
       method: "GET",
     });
@@ -137,7 +113,7 @@
     if (knowledgeBaseData) {
       knowledgeBases = knowledgeBaseData;
     }
-  }
+  });
 
   async function getPromptDetail(id: string) {
     isLoading = true;
