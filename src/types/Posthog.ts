@@ -12,7 +12,7 @@ export enum EventName {
 
   AiboxSubtitleCreated = 'aibox_subtitle_created',
   AiboxAssistantSaved = 'aibox_assistant_saved',
-  AiboxKnowledgeSaved = 'aibox_knowledgebase_saved',
+  AiboxKnowledgeBaseSaved = 'aibox_knowledgebase_saved',
 
   AiboxCategorySaved = 'aibox_category_saved',
   AiboxAudioInstructionSaved = 'aibox_audioinsruction_saved',
@@ -29,6 +29,7 @@ export enum ScreenName {
   GptImageGeneration = 'gpt_image_generation',
   FluxImageGeneration = 'flux_image_generation',
   NanoBananaImageGeneration = 'nano_banana_image_generation',
+  CreateOrUpdateKnowledgeBase = 'create_or_update_knowledge_base',
 }
 
 

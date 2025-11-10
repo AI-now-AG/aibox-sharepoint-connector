@@ -14,6 +14,9 @@
   import TextEditor from "$components/form/TextEditor.svelte";
   import ImportFileDialog from "./ImportFileDialog.svelte";
   import Loading from "$components/Loading.svelte";
+  import { tenant } from "$stores";
+  import { EventName, ScreenName } from "$types/Posthog";
+  import { posthogClientCapture } from "$utils/posthogClient";
 
   const t = useTranslations();
   let loading = $state(false);
@@ -109,6 +112,12 @@
       const data = await response.json();
       //window.location.replace("/prompt-library/knowledge-base");
       navigate("/prompt-library/knowledge-base");
+
+      posthogClientCapture($tenant, EventName.AiboxKnowledgeBaseSaved, {
+        page_name: ScreenName.CreateOrUpdateKnowledgeBase,
+        screen_mode: knowledgeBase ? "update" : "create",
+        use_case: knowledgeBaseTitle || "-",
+      });
 
       addToast({
         message: data.message,
