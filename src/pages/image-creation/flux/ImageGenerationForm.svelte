@@ -8,6 +8,10 @@
   import { lastFluxImage } from "$stores/imageGenerationStore";
   import { get } from "svelte/store";
   import { onMount } from "svelte";
+  import { tenant } from "$stores";
+  import { ModelName } from "$types/AIProvider";
+  import { EventName, ScreenName } from "$types/Posthog";
+  import { posthogClientCapture } from "$utils/posthogClient";
 
   interface Props {
     tenantId: string;
@@ -97,6 +101,11 @@
 
       base64Image = `data:image/${selectedFormat};base64,${data.image}`;
       lastFluxImage.set(base64Image); // Store image persistently
+
+      posthogClientCapture($tenant, EventName.AiboxImageCreated, {
+        page_name: ScreenName.FluxImageGeneration,
+        model: ModelName.FluxDev,
+      });
     } catch (err) {
       error = err;
     } finally {

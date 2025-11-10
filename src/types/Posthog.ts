@@ -24,7 +24,11 @@ export enum EventName {
 export enum ScreenName {
   Home = 'home_screen',
   MyAibox = 'my_aibox_screen',
-  PromptExecutionArea = 'prompt_execution_area_screen'
+  PromptExecutionArea = 'prompt_execution_area_screen',
+  Dalle3ImageGeneration = 'dalle3_image_generation',
+  GptImageGeneration = 'gpt_image_generation',
+  FluxImageGeneration = 'flux_image_generation',
+  NanoBananaImageGeneration = 'nano_banana_image_generation',
 }
 
 
