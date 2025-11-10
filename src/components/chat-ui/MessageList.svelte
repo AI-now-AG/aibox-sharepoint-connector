@@ -1,7 +1,11 @@
 <script lang="ts">
   import { fade } from "svelte/transition";
   import { onMount } from "svelte";
-  import { MessageRole, type MessageHistory } from "$types/MessageHistory";
+  import {
+    MessageRole,
+    MessageThumbRating,
+    type MessageHistory,
+  } from "$types/MessageHistory";
   import ImageCard from "./ImageCard.svelte";
   import FileAttachmentList from "./FileAttachmentList.svelte";
   import { user } from "$stores";
@@ -31,6 +35,7 @@
     isGenerating: boolean;
     isResoningThingking?: boolean;
     infoText?: string;
+    updateMessageRating?: Function;
   }
 
   let {
@@ -41,6 +46,7 @@
     isGenerating = false,
     isResoningThingking = false,
     infoText = "",
+    updateMessageRating = () => null,
   }: Props = $props();
 
   let copyIndex: number = $state(-1);
@@ -427,7 +433,7 @@
           <div class="flex flex-col">
             <div class="mt-2 overflow-y-scroll h-full min-h-screen">
               <div class="card gap-4 chat-container" transition:fade>
-                {#each messages as { role, content, rawData = "", imageUrl, fileUrls }, index}
+                {#each messages as { role, content, imageUrl, fileUrls, thumbRating }, index}
                   <div
                     class={`chat-bubble text-base-content ${role === MessageRole.User ? `bg-base-200` : `bg-base-100`}`}
                   >
@@ -490,7 +496,13 @@
                     </div>
                     {#if role === MessageRole.Assistant}
                       <div class="ml-12 mt-[-10px]">
-                        <ThumbRating />
+                        <ThumbRating
+                          selected={thumbRating}
+                          rate={(selectedRating: MessageThumbRating) => {
+                            messages[index].thumbRating = selectedRating;
+                            updateMessageRating?.(index, selectedRating);
+                          }}
+                        />
                       </div>
                     {/if}
                   </div>

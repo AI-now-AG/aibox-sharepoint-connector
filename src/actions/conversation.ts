@@ -10,6 +10,7 @@ import { ObjectId } from "mongodb";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import createChatModel from "$utils/chatModel";
+import { MessageThumbRating } from "$types/MessageHistory";
 
 const ConversationInputIdentifierSchema = z.object({
   _id: z.string(),
@@ -33,6 +34,14 @@ export const AppendMessageSchema = z.object({
   _id: z.string(), // The conversation ID
   message: MessageSchema, // The new message to append
 });
+
+
+export const UpdateMessageRatingSchema = z.object({
+  _id: z.string(), // The conversation ID
+  messageIndex: z.number(),
+  newRating: z.nativeEnum(MessageThumbRating).nullish().default(null)
+});
+
 
 const ConversationListSchema = z.object({
   limit: z.number().min(0).optional(),
@@ -168,16 +177,26 @@ export const conversation = {
     },
   }),
 
-  // New action to append a message to a conversation
   updateMessage: defineAction({
     input: AppendMessageSchema,
     handler: async (input) => {
-      // The handler now uses a more specific model function
       const updatedDocument = await ConversationModel.updateMessage(
         input._id,
         input.message,
       );
-      // Transform and return the updated conversation
+      return transformRawData(updatedDocument);
+    },
+  }),
+
+  updateMessageRating: defineAction({
+    input: UpdateMessageRatingSchema,
+    handler: async (input) => {
+      console.log(`UpdateMessageRatingSchema`, input)
+      const updatedDocument = await ConversationModel.updateMessageRating(
+        input._id,
+        input.messageIndex,
+        input.newRating
+      );
       return transformRawData(updatedDocument);
     },
   }),

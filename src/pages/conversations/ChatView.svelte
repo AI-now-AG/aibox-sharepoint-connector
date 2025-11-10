@@ -2,6 +2,7 @@
   import { ModelName, PromptToolOption } from "$types/AIProvider";
   import {
     MessageRole,
+    MessageThumbRating,
     type Message,
     type MessageHistory,
   } from "$types/MessageHistory";
@@ -133,6 +134,28 @@
       }
     } catch (error) {
       console.error("Exception when update conversation message", error);
+    }
+  }
+
+  async function updateConversationMessageRating(
+    index: number,
+    rating: MessageThumbRating | null,
+  ) {
+    try {
+      let _error = null;
+
+      const { error } = await actions.conversation.updateMessageRating({
+        _id: conversationId,
+        messageIndex: index,
+        newRating: rating,
+      });
+      _error = error;
+
+      if (_error) {
+        addToast({ message: JSON.stringify(_error), type: "error" });
+      }
+    } catch (error) {
+      console.error("Exception when update message rating", error);
     }
   }
 
@@ -634,6 +657,12 @@
     {isFetching}
     {isGenerating}
     {isResoningThingking}
+    updateMessageRating={(
+      index: number,
+      selectedRating: MessageThumbRating | null,
+    ) => {
+      updateConversationMessageRating(index, selectedRating);
+    }}
   />
 
   <div class="sticky bottom-0 bg-base-200 p-4">
