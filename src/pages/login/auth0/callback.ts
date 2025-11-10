@@ -114,9 +114,9 @@ export async function GET(context: APIContext): Promise<Response> {
     api_token: apiToken,
   });
 
-  posthogServerIdentify(tenant,{
+  posthogServerIdentify(tenant, {
     distinctId: userId?.toString(), properties: {
-      username: auth0User.data.nickname,
+      user_name: auth0User.data.nickname,
       name: auth0User.data.name,
       email: auth0User.data.email,
     }
@@ -126,10 +126,9 @@ export async function GET(context: APIContext): Promise<Response> {
     distinctId: userId?.toString(),
     event: EventName.AiboxLogin,
     properties: {
-      username: auth0User.data.nickname,
+      user_name: auth0User.data.nickname,
       name: auth0User.data.name,
       email: auth0User.data.email,
-      tenant_id: tenant._id.toString(),
     }
   })
 
