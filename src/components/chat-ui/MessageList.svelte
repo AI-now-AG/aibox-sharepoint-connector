@@ -525,6 +525,7 @@
                                   promptResultTrackging?.use_case || "-",
                                 tool: promptResultTrackging?.tool || "-",
                                 model: promptResultTrackging?.model || "-",
+                                rating: selectedRating
                               },
                             );
                           }}
