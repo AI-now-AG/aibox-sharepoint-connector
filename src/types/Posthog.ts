@@ -31,6 +31,7 @@ export enum ScreenName {
   NanoBananaImageGeneration = 'nano_banana_image_generation',
   CreateOrUpdateKnowledgeBase = 'create_or_update_knowledge_base',
   CreateOrUpdateCategory = 'create_or_update_category',
+  BillingUsage = 'billing_usage',
 }
 
 
