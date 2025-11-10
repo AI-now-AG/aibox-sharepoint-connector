@@ -28,7 +28,7 @@
   import MessageAction from "$components/chat-ui/MessageAction.svelte";
   import { TRANSCRIPTION_API_URL } from "astro:env/client";
   import { marked } from "marked";
-  import ThumbRating from "./ ThumbRating.svelte";
+  import ThumbRating from "./ThumbRating.svelte";
   import { posthogClientCapture } from "$utils/posthogClient";
   import { EventName } from "$types/Posthog";
 
