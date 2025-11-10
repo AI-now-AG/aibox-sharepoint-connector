@@ -191,7 +191,6 @@ export const conversation = {
   updateMessageRating: defineAction({
     input: UpdateMessageRatingSchema,
     handler: async (input) => {
-      console.log(`UpdateMessageRatingSchema`, input)
       const updatedDocument = await ConversationModel.updateMessageRating(
         input._id,
         input.messageIndex,
