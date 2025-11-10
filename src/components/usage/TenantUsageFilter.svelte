@@ -9,15 +9,15 @@
 
   interface Props {
     tenants: any;
-    selectedTenant: string;
-    selectedMonth?: string;
+    selectedTenant: string | undefined;
+    selectedMonth?: string | undefined;
     onsearch: Function;
   }
 
   let {
     tenants = [],
-    selectedTenant = $bindable(null),
-    selectedMonth = $bindable(null),
+    selectedTenant = $bindable(undefined),
+    selectedMonth = $bindable(undefined),
     onsearch,
   }: Props = $props();
 
