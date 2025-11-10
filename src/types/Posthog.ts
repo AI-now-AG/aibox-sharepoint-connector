@@ -11,7 +11,7 @@ export enum EventName {
   AiboxTranscriptionCreated = 'aibox_transcription_created',
 
   AiboxSubtitleCreated = 'aibox_subtitle_created',
-  AiboxAssistantCreated = 'aibox_assistant_saved',
+  AiboxAssistantSaved = 'aibox_assistant_saved',
   AiboxKnowledgeSaved = 'aibox_knowledgebase_saved',
 
   AiboxCategorySaved = 'aibox_category_saved',

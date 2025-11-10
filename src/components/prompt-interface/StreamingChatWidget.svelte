@@ -698,6 +698,11 @@
     });
     loading = false;
 
+    posthogClientCapture($tenant, EventName.AiboxAssistantSaved, {
+      page_name: ScreenName.PromptExecutionArea,
+      use_case: currentPrompt?.title || "-",
+    });
+
     if (error) {
       addToast({
         message: error?.message ?? "Something went wrong",

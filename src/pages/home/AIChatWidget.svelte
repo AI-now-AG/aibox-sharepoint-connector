@@ -310,10 +310,10 @@
     setTimeout(() => scrollIntoView(), 1000);
 
     posthogClientCapture($tenant, EventName.AiboxPromptResult, {
+      page_name: ScreenName.Home,
       use_case: selectedPrompt?.title || "-",
       tool: selectedPromptTool,
       model: getModelName($tenant, selectedPrompt?.model || selectedModel),
-      page_name: ScreenName.Home,
     });
 
     return data;
@@ -652,6 +652,11 @@
       previous_response_id: previousResponseId,
     });
     loading = false;
+
+    posthogClientCapture($tenant, EventName.AiboxAssistantSaved, {
+      page_name: ScreenName.Home,
+      use_case: selectedPrompt?.title || "-",
+    });
 
     if (error) {
       addToast({
