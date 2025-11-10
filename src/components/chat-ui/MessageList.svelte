@@ -1,3 +1,13 @@
+<script lang="ts" module>
+  import type { PromptToolOption } from "$types/AIProvider";
+  export interface MessagePromptResultTracking {
+    page_name?: string;
+    use_case?: string;
+    tool?: PromptToolOption;
+    model: string;
+  }
+</script>
+
 <script lang="ts">
   import { fade } from "svelte/transition";
   import { onMount } from "svelte";
@@ -8,7 +18,7 @@
   } from "$types/MessageHistory";
   import ImageCard from "./ImageCard.svelte";
   import FileAttachmentList from "./FileAttachmentList.svelte";
-  import { user } from "$stores";
+  import { tenant, user } from "$stores";
   import { useTranslations } from "$i18n/utils";
   import { markdownToHtml, textToHtml } from "$utils/textFormatting";
   import Loading from "$components/Loading.svelte";
@@ -19,6 +29,8 @@
   import { TRANSCRIPTION_API_URL } from "astro:env/client";
   import { marked } from "marked";
   import ThumbRating from "./ ThumbRating.svelte";
+  import { posthogClientCapture } from "$utils/posthogClient";
+  import { EventName } from "$types/Posthog";
 
   const t = useTranslations();
 
@@ -36,6 +48,7 @@
     isResoningThingking?: boolean;
     infoText?: string;
     updateMessageRating?: Function;
+    promptResultTrackging?: MessagePromptResultTracking;
   }
 
   let {
@@ -47,6 +60,7 @@
     isResoningThingking = false,
     infoText = "",
     updateMessageRating = () => null,
+    promptResultTrackging,
   }: Props = $props();
 
   let copyIndex: number = $state(-1);
@@ -501,6 +515,18 @@
                           rate={(selectedRating: MessageThumbRating) => {
                             messages[index].thumbRating = selectedRating;
                             updateMessageRating?.(index, selectedRating);
+                            posthogClientCapture(
+                              $tenant,
+                              EventName.AiboxRating,
+                              {
+                                page_name:
+                                  promptResultTrackging?.page_name || "unknow",
+                                use_case:
+                                  promptResultTrackging?.use_case || "-",
+                                tool: promptResultTrackging?.tool || "-",
+                                model: promptResultTrackging?.model || "-",
+                              },
+                            );
                           }}
                         />
                       </div>

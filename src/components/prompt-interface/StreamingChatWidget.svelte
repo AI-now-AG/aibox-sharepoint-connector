@@ -354,12 +354,10 @@
     setTimeout(() => scrollIntoView(), 1000);
 
     posthogClientCapture($tenant, EventName.AiboxPromptResult, {
-      tenant_id: $tenant?._id?.toString() || "-",
-      tenant_name: $tenant?.name?.toString() || "-",
-      prompt_name: currentPrompt?.title || "-",
+      use_case: currentPrompt?.title || "-",
       tool: selectedPromptTool,
       model: getModelName($tenant, currentPrompt?.model),
-      from: ScreenName.PromptExecutionArea,
+      pagename: ScreenName.PromptExecutionArea,
     });
 
     return data;
@@ -720,6 +718,12 @@
     {isFetching}
     {isGenerating}
     {isResoningThingking}
+    promptResultTrackging={{
+      page_name: ScreenName.PromptExecutionArea,
+      use_case: currentPrompt?.title || "-",
+      tool: selectedPromptTool,
+      model: getModelName($tenant, currentPrompt?.model),
+    }}
   />
 {/if}
 
@@ -770,6 +774,12 @@
     {isFetching}
     {isGenerating}
     {isResoningThingking}
+    promptResultTrackging={{
+      page_name: ScreenName.PromptExecutionArea,
+      use_case: currentPrompt?.title || "-",
+      tool: selectedPromptTool,
+      model: getModelName($tenant, currentPrompt?.model),
+    }}
   />
 {/if}
 

@@ -333,12 +333,10 @@
     }, 1000);
 
     posthogClientCapture($tenant, EventName.AiboxPromptResult, {
-      tenant_id: $tenant?._id?.toString() || "-",
-      tenant_name: $tenant?.name?.toString() || "-",
-      prompt_name: promptData?.title || "-",
+      use_case: promptData?.title || "-",
       tool: selectedPromptTool,
       model: getModelName($tenant, model),
-      from: ScreenName.MyAibox,
+      pagename: ScreenName.MyAibox,
     });
 
     return data;
@@ -662,6 +660,12 @@
       selectedRating: MessageThumbRating | null,
     ) => {
       updateConversationMessageRating(index, selectedRating);
+    }}
+    promptResultTrackging={{
+      page_name: ScreenName.MyAibox,
+      use_case: promptData?.title || "-",
+      tool: selectedPromptTool,
+      model: getModelName($tenant, model),
     }}
   />
 

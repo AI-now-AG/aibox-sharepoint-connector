@@ -310,12 +310,10 @@
     setTimeout(() => scrollIntoView(), 1000);
 
     posthogClientCapture($tenant, EventName.AiboxPromptResult, {
-      tenant_id: $tenant?._id?.toString() || "-",
-      tenant_name: $tenant?.name?.toString() || "-",
-      prompt_name: selectedPrompt?.title || "-",
+      use_case: selectedPrompt?.title || "-",
       tool: selectedPromptTool,
       model: getModelName($tenant, selectedPrompt?.model || selectedModel),
-      from: ScreenName.Home,
+      pagename: ScreenName.Home,
     });
 
     return data;
@@ -769,22 +767,6 @@
         in:slide={{ duration: 500, delay: 500 }}
         out:slide={{ duration: 500 }}
       >
-        <!-- TESTING TRIGGER SURVEY ONLY -->
-        {#if typeof window !== "undefined" && $tenant && $tenant.is_on_posthog && (window.location.href.includes("http://localhost") || window.location.href.includes("https://staging.aibox-app.com/"))}
-          <button
-            class="btn btn-secondary mb-2"
-            onclick={() => {
-              posthogClientCapture($tenant, EventName.AiboxTriggerSurvey, {
-                tenant_id: $tenant?._id?.toString() || "-",
-                trigger_by: "Click Button Trigger",
-              });
-            }}
-          >
-            {@html svgIcons.email}
-            <span>Trigger survey for tenant: AI now DEV (do not change)</span>
-          </button>
-        {/if}
-
         <MessageInput
           bind:input
           bind:files
@@ -820,6 +802,12 @@
       {isFetching}
       {isGenerating}
       {isResoningThingking}
+      promptResultTrackging={{
+        page_name: ScreenName.Home,
+        use_case: selectedPrompt?.title || "-",
+        tool: selectedPromptTool,
+        model: getModelName($tenant, selectedPrompt?.model || selectedModel),
+      }}
     />
 
     {#if $sharedMessageHistory.length > 0}

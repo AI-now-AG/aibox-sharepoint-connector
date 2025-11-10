@@ -1,4 +1,5 @@
 import { EventName as AiboxEventName, POSTHOG_API_HOST } from '$types/Posthog'
+import type { ObjectId } from 'mongodb';
 import posthogClient, { PostHog, type CaptureOptions, type EventName, type Properties } from 'posthog-js'
 
 let clientInstance: PostHog;
@@ -31,7 +32,7 @@ export function getPosthogClilentInstance() {
    * posthogClientCapture(tenant, EventName.AiboxPromptResult, {
    *    tenant_id: $tenant?._id?.toString() || "-",
    *    tenant_name: $tenant?.name?.toString() || "-",
-   *    prompt_name: currentPrompt?.title || "-",
+   *    use_case: currentPrompt?.title || "-",
    *    tool: selectedPromptTool,
    *    model: getModelName($tenant, currentPrompt?.model),
    *    from: ScreenName.PromptExecutionArea,
@@ -44,10 +45,15 @@ export function getPosthogClilentInstance() {
    * @param options {@link CaptureOptions}
    * @returns 
 */
-export function posthogClientCapture(tenant: { is_on_posthog?: boolean } | null | undefined, event_name: AiboxEventName | EventName, properties?: Properties | null, options?: CaptureOptions) {
+export function posthogClientCapture(tenant: { is_on_posthog?: boolean, _id: ObjectId | string, name: string } | null | undefined, event_name: AiboxEventName | EventName, properties?: Properties | null, options?: CaptureOptions) {
     if (!tenant || !tenant.is_on_posthog) {
         return;
     }
-    console.log("posthogClientCapture", event_name, properties, options)
-    getPosthogClilentInstance?.()?.capture(event_name, properties, options);
+
+    const newProperties = {
+        tenant_id: tenant._id?.toString() || "-",
+        tenant_name: tenant.name?.toString() || "-", ...properties
+    }
+    console.log("posthogClientCapture", event_name, newProperties, options)
+    getPosthogClilentInstance?.()?.capture(event_name, newProperties, options);
 }

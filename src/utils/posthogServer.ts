@@ -1,5 +1,6 @@
 
 import { POSTHOG_API_HOST } from '$types/Posthog'
+import type { ObjectId } from 'mongodb';
 import { PostHog, type EventMessage, type IdentifyMessage } from 'posthog-node'
 
 let serverInstance: PostHog;
@@ -42,12 +43,16 @@ export function getPosthogServerInstance() {
    * @param props {@link EventMessage}
    * @returns 
 */
-export function posthogServerCapture(tenant: { is_on_posthog?: boolean } | null | undefined, props: EventMessage) {
+export function posthogServerCapture(tenant: { is_on_posthog?: boolean, _id: ObjectId | string, name: string } | null | undefined, props: EventMessage) {
     if (!tenant || !tenant.is_on_posthog) {
         return;
     }
-    console.log("posthogServerCapture", props)
-    getPosthogServerInstance?.()?.capture(props)
+    const newProperties = {
+        tenant_id: tenant._id?.toString() || "-",
+        tenant_name: tenant.name?.toString() || "-", ...props
+    }
+    console.log("posthogServerCapture", newProperties)
+    getPosthogServerInstance?.()?.capture(newProperties)
 }
 
 /**
@@ -70,10 +75,14 @@ export function posthogServerCapture(tenant: { is_on_posthog?: boolean } | null 
    * @param props {@link IdentifyMessage}
    * @returns 
 */
-export function posthogServerIdentify(tenant: { is_on_posthog?: boolean } | null | undefined, props: IdentifyMessage) {
+export function posthogServerIdentify(tenant: { is_on_posthog?: boolean, _id: ObjectId | string, name: string } | null | undefined, props: IdentifyMessage) {
     if (!tenant || !tenant.is_on_posthog) {
         return;
     }
-    console.log("posthogServerIdentify", props)
-    getPosthogServerInstance?.()?.identify(props)
+    const newProperties = {
+        tenant_id: tenant._id?.toString() || "-",
+        tenant_name: tenant.name?.toString() || "-", ...props
+    }
+    console.log("posthogServerIdentify", newProperties)
+    getPosthogServerInstance?.()?.identify(newProperties)
 }

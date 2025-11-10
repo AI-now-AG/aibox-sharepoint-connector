@@ -3,8 +3,22 @@ export const POSTHOG_API_HOST = "https://eu.i.posthog.com"
 
 export enum EventName {
   AiboxLogin = 'aibox_login',
+  AiboxLogout = 'aibox_logout',
   AiboxPromptResult = 'aibox_prompt_result',
-  AiboxTriggerSurvey =  'aibox_trigger_survey'
+
+  AiboxTriggerSurvey = 'aibox_trigger_survey',
+  AiboxImageCreated = 'aibox_image_created',
+  AiboxTranscriptionCreated = 'aibox_transcription_created',
+
+  AiboxSubtitleCreated = 'aibox_subtitle_created',
+  AiboxAssistantCreated = 'aibox_assistant_saved',
+  AiboxKnowledgeSaved = 'aibox_knowledgebase_saved',
+
+  AiboxCategorySaved = 'aibox_category_saved',
+  AiboxAudioInstructionSaved = 'aibox_audioinsruction_saved',
+  AiboxUsageRequested = 'aibox_usage_requested',
+
+  AiboxRating = 'aibox_rating',
 }
 
 export enum ScreenName {
