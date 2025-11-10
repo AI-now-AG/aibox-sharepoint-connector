@@ -336,7 +336,7 @@
       use_case: promptData?.title || "-",
       tool: selectedPromptTool,
       model: getModelName($tenant, model),
-      pagename: ScreenName.MyAibox,
+      page_name: ScreenName.MyAibox,
     });
 
     return data;

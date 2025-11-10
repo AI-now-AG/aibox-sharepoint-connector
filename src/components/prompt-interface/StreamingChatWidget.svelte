@@ -357,7 +357,7 @@
       use_case: currentPrompt?.title || "-",
       tool: selectedPromptTool,
       model: getModelName($tenant, currentPrompt?.model),
-      pagename: ScreenName.PromptExecutionArea,
+      page_name: ScreenName.PromptExecutionArea,
     });
 
     return data;

@@ -313,7 +313,7 @@
       use_case: selectedPrompt?.title || "-",
       tool: selectedPromptTool,
       model: getModelName($tenant, selectedPrompt?.model || selectedModel),
-      pagename: ScreenName.Home,
+      page_name: ScreenName.Home,
     });
 
     return data;
