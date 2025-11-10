@@ -6,6 +6,9 @@
   import { svgIcons } from "$assets/icons";
   import GroupList, { type GroupItem } from "./GroupList.svelte";
   import { preventDefault } from "$utils/common";
+  import { tenant } from "$stores";
+  import { EventName, ScreenName } from "$types/Posthog";
+  import { posthogClientCapture } from "$utils/posthogClient";
   const t = useTranslations();
 
   /**
@@ -64,6 +67,13 @@
         const data = await response.json();
 
         groups = [];
+
+        posthogClientCapture($tenant, EventName.AiboxCategorySaved, {
+          page_name: ScreenName.CreateOrUpdateCategory,
+          screen_mode: category ? "update" : "create",
+          use_case: title || category?.title || "-",
+        });
+
         title = undefined;
 
         addToast({
