@@ -585,25 +585,39 @@
           name: TenantFeature.TextPrompts,
           provider: defaultTextFeature,
         });
-        if (isAudioToTextChecked) {
+        // Add AudioToText feature if ANY audio feature is enabled (standard, pro, or ElevenLabs)
+        if (isAudioToTextChecked || isAzureAudioProEnabled || isAudioToElevenLabsChecked) {
           tenantData.included_features.push({
             name: TenantFeature.AudioToText,
             provider: audioSelectedProvider.value,
           });
-          tenantData.transcription_types = audioStandardArray
-            .filter((item) => item.checked)
-            .map((item) => item.type);
+        }
+        let allTranscriptionTypes: string[] = [];
+        if (isAudioToTextChecked) {
+          allTranscriptionTypes = [
+            ...allTranscriptionTypes,
+            ...audioStandardArray
+              .filter((item) => item.checked)
+              .map((item) => item.type)
+          ];
         }
         if (isAzureAudioProEnabled) {
-          tenantData.transcription_types = audioProArray
-            .filter((item) => item.checked)
-            .map((item) => item.type);
+          allTranscriptionTypes = [
+            ...allTranscriptionTypes,
+            ...audioProArray
+              .filter((item) => item.checked)
+              .map((item) => item.type)
+          ];
         }
         if (isAudioToElevenLabsChecked) {
-          tenantData.transcription_types = audioElevenLabsArray
-            .filter((item) => item.checked)
-            .map((item) => item.type);
+          allTranscriptionTypes = [
+            ...allTranscriptionTypes,
+            ...audioElevenLabsArray
+              .filter((item) => item.checked)
+              .map((item) => item.type)
+          ];
         }
+        tenantData.transcription_types = allTranscriptionTypes;
 
         if (dalleEnabled) {
           tenantData.included_features.push({
@@ -732,7 +746,8 @@
           name: TenantFeature.TextPrompts,
           provider: defaultTextFeature,
         });
-        if (isAudioToTextChecked) {
+        // Add AudioToText feature if ANY audio feature is enabled (standard, pro, or ElevenLabs)
+        if (isAudioToTextChecked || isAzureAudioProEnabled || isAudioToElevenLabsChecked) {
           tenantData.included_features.push({
             name: TenantFeature.AudioToText,
             provider: audioSelectedProvider.value,
@@ -753,8 +768,6 @@
             .filter((item) => item.checked)
             .map((item) => item.type),
         ];
-        if (isAzureAudioProEnabled) {
-        }
         tenantData.transcription_types = updatedTranscriptionTypes;
 
         if (dalleEnabled) {
