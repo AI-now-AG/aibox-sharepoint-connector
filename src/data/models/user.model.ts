@@ -119,7 +119,7 @@ export default {
       }
 
       // Add roles filter
-      let filterRoles: Record<string, unknown> = {};
+      const filterRoles: Record<string, unknown> = {};
 
       // If specific roles are provided, add them to $in
       if (roles && roles.length > 0) {

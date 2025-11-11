@@ -28,15 +28,22 @@
   import Loading from "$components/Loading.svelte";
   import { tenant, user } from "$stores";
   import { useTranslations } from "$i18n/utils";
-  import { ApiKeyProvider } from "$types/TenantFeature";
-  import { ModelName, PromptToolOption } from "$types/AIProvider";
+  import {
+    ModelName,
+    PromptToolOption,
+    ReasoningEffortOption,
+    TextVerbosityOption,
+  } from "$types/AIProvider";
   import {
     getPromptTools,
     useProviderInfo,
     NanoBananaPromptTools,
     resolveAPIProvider,
+    getModelName,
   } from "$shared/AIProvider";
   import { TRANSCRIPTION_API_URL } from "astro:env/client";
+  import { EventName, ScreenName } from "$types/Posthog";
+  import { posthogClientCapture } from "$utils/posthogClient";
 
   const t = useTranslations();
 
@@ -223,8 +230,10 @@
 
     if (isResponseModel) {
       payload.previousResponseId = previousResponseId;
-      payload.reasoningEffort = currentPrompt?.reasoningEffort || "low";
-      payload.verbosity = currentPrompt?.textVerbosity || "low";
+      payload.reasoningEffort =
+        currentPrompt?.reasoningEffort || ReasoningEffortOption.Low;
+      payload.verbosity =
+        currentPrompt?.textVerbosity || TextVerbosityOption.Low;
     } else {
       payload.messageHistory = currentMessageHistory;
     }
@@ -350,6 +359,13 @@
 
     // Scroll to latest message
     setTimeout(() => scrollIntoView(), 1000);
+
+    posthogClientCapture($tenant, EventName.AiboxPromptResult, {
+      use_case: currentPrompt?.title || "-",
+      tool: selectedPromptTool,
+      model: getModelName($tenant, currentPrompt?.model),
+      page_name: ScreenName.PromptExecutionArea,
+    });
 
     return data;
   }
@@ -688,7 +704,6 @@
       previous_response_id: previousResponseId,
     });
     loading = false;
-
     if (error) {
       addToast({
         message: error?.message ?? "Something went wrong",
@@ -709,6 +724,12 @@
     {isFetching}
     {isGenerating}
     {isResoningThingking}
+    promptResultTrackging={{
+      page_name: ScreenName.PromptExecutionArea,
+      use_case: currentPrompt?.title || "-",
+      tool: selectedPromptTool,
+      model: getModelName($tenant, currentPrompt?.model),
+    }}
   />
 {/if}
 
@@ -759,6 +780,12 @@
     {isFetching}
     {isGenerating}
     {isResoningThingking}
+    promptResultTrackging={{
+      page_name: ScreenName.PromptExecutionArea,
+      use_case: currentPrompt?.title || "-",
+      tool: selectedPromptTool,
+      model: getModelName($tenant, currentPrompt?.model),
+    }}
   />
 {/if}
 

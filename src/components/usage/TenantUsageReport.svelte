@@ -5,15 +5,18 @@
   import type { UsageOverview, UsageRow } from "$types/UsageTracking";
   import Loading from "$components/Loading.svelte";
   import TenantUsageFilter from "./TenantUsageFilter.svelte";
-  import { tenant as tenantStore } from "$stores";
+  import { tenant, tenant as tenantStore } from "$stores";
+  import { EventName, ScreenName } from "$types/Posthog";
+  import { posthogClientCapture } from "$utils/posthogClient";
 
   const t = useTranslations();
 
   interface Props {
     tenants?: any;
+    isPosthogCaptureUsageRequest?: boolean;
   }
 
-  let { tenants = [] }: Props = $props();
+  let { tenants = [], isPosthogCaptureUsageRequest = false }: Props = $props();
 
   let loading: boolean = $state(false);
   let usageInfo: UsageOverview | undefined = $state();
@@ -36,6 +39,13 @@
       month: selectedMonth,
     });
     loading = false;
+
+    if (isPosthogCaptureUsageRequest) {
+      posthogClientCapture($tenant, EventName.AiboxUsageRequested, {
+        page_name: ScreenName.BillingUsage,
+        use_case: selectedMonth || "-",
+      });
+    }
 
     if (error) {
       console.error(error);

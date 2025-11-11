@@ -80,6 +80,8 @@ import pdf from "$assets/icons/pdf.svg?raw";
 import word from "$assets/icons/word.svg?raw";
 import email from "$assets/icons/email.svg?raw";
 import share from "$assets/icons/share.svg?raw";
+import thumbUp from "$assets/icons/thumb-up.svg?raw";
+import thumbDown from "$assets/icons/thumb-down.svg?raw";
 
 export const svgIcons = {
   menuSettings,
@@ -163,5 +165,7 @@ export const svgIcons = {
   pdf,
   word,
   email,
-  share
+  share,
+  thumbUp,
+  thumbDown
 };

@@ -79,6 +79,11 @@ export const Gpt4oPromptTools = [
     value: PromptToolOption.Image,
     icon: svgIcons.image,
   },
+  {
+    title: t("prompt-execution.prompt-tool.web-search"),
+    value: PromptToolOption.Websearch,
+    icon: svgIcons.web,
+  },
 ];
 
 export const Gpt5PromptTools = [
@@ -86,6 +91,11 @@ export const Gpt5PromptTools = [
     title: t("prompt-execution.prompt-tool.image"),
     value: PromptToolOption.Image,
     icon: svgIcons.image,
+  },
+  {
+    title: t("prompt-execution.prompt-tool.web-search"),
+    value: PromptToolOption.Websearch,
+    icon: svgIcons.web,
   },
 ];
 

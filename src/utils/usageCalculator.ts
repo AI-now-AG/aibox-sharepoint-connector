@@ -63,6 +63,8 @@ const REQUEST_CREDIT_MAPPING: Record<string, number> = {
   [ModelName.Sonar]: 12,
   [ModelName.Gemini25Flash]: 2,
   [ModelName.Gemini25FlashImage]: 2,
+  [ModelName.Gpt4o]: 10,
+  [ModelName.Gpt5]: 10,
 };
 
 /**
@@ -183,6 +185,23 @@ const _calculateOpenAIUsage = (
     credits: gpt4oOutputCredits,
   });
 
+  const openAiWebsearchRequests = gpt4oItems.reduce(
+    (sum: number, item: UsageLog) =>
+      sum + (item.metadata?.websearch_count ?? 0),
+    0,
+  );
+
+  usageItems.push({
+    model: "gpt-4o Websearch",
+    amount: openAiWebsearchRequests,
+    unit: unitLabels.requests,
+    credits: _requestsToCredits(
+      ModelName.Gpt4o,
+      openAiWebsearchRequests,
+    ),
+  });
+
+
   // DALL-E
   const dalleItems = usageData.filter(
     (item: UsageLog) => item.model == ImageModel.Dalle,
@@ -250,6 +269,23 @@ const _calculateOpenAIGpt5Usage = (
     unit: unitLabels.tokens,
     credits: gpt4oOutputCredits,
   });
+
+  const openAiWebsearchRequests = gpt5Items.reduce(
+    (sum: number, item: UsageLog) =>
+      sum + (item.metadata?.websearch_count ?? 0),
+    0,
+  );
+
+  usageItems.push({
+    model: "gpt-5 Websearch",
+    amount: openAiWebsearchRequests,
+    unit: unitLabels.requests,
+    credits: _requestsToCredits(
+      ModelName.Gpt5,
+      openAiWebsearchRequests,
+    ),
+  });
+
 
   // GPT Image
   const gptImageItems = usageData.filter(
@@ -639,16 +675,6 @@ export const calculateUsage = (tenant: Tenant, rawUsages: UsageLog[]) => {
       useElevenLabsPrivateKey,
     ),
   });
-
-  // const useElevenLabsPrivateKey = tenant.metadata?.elevenLabsPrivateKeyEnabled ?? false;
-  // usageData.push({
-  //   provider: "Audio",
-  //   details: _calculateAudioUsage(
-  //     rawUsages,
-  //     useAzureOpenAIPrivateKey,
-  //     useSpeechPrivateKey,
-  //   ),
-  // });
 
   // Flux
   const useFluxPrivateKey = tenant.metadata?.fluxPrivateKeyEnabled ?? false;

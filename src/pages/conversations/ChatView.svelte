@@ -1,7 +1,13 @@
 <script lang="ts">
-  import { ModelName, PromptToolOption } from "$types/AIProvider";
+  import {
+    ModelName,
+    PromptToolOption,
+    ReasoningEffortOption,
+    TextVerbosityOption,
+  } from "$types/AIProvider";
   import {
     MessageRole,
+    MessageThumbRating,
     type Message,
     type MessageHistory,
   } from "$types/MessageHistory";
@@ -25,9 +31,10 @@
     buildCitationLinks,
     stripMarkdownFormatting,
   } from "$utils/textFormatting";
-  import { ApiKeyProvider } from "$types/TenantFeature";
   import { readFileContent } from "$utils/fileReader";
   import { TRANSCRIPTION_API_URL } from "astro:env/client";
+  import { EventName, ScreenName } from "$types/Posthog";
+  import { posthogClientCapture } from "$utils/posthogClient";
 
   const t = useTranslations();
 
@@ -71,6 +78,7 @@
     conversationId,
     model = PromptModel.Default,
     messages,
+    promptData,
     folderName,
     lastResponseId = null,
   }: Props = $props();
@@ -134,16 +142,26 @@
     }
   }
 
-  function isGpt5Default() {
-    const aiProviders = $tenant?.api_key_providers ?? [];
-    const activeDefaultProvider = aiProviders.find(
-      (item) => item.active === true && item.default === true,
-    );
+  async function updateConversationMessageRating(
+    index: number,
+    rating: MessageThumbRating | null,
+  ) {
+    try {
+      let _error = null;
 
-    if (activeDefaultProvider?.name === ApiKeyProvider.OpenAIGpt5) {
-      return true;
+      const { error } = await actions.conversation.updateMessageRating({
+        _id: conversationId,
+        messageIndex: index,
+        newRating: rating,
+      });
+      _error = error;
+
+      if (_error) {
+        addToast({ message: JSON.stringify(_error), type: "error" });
+      }
+    } catch (error) {
+      console.error("Exception when update message rating", error);
     }
-    return false;
   }
 
   async function getAPIConfiguration(): Promise<APIConfiguration> {
@@ -200,8 +218,8 @@
     }
 
     if (isResponseModel) {
-      payload.reasoningEffort = "low";
-      payload.verbosity = "low";
+      payload.reasoningEffort = ReasoningEffortOption.Low;
+      payload.verbosity = TextVerbosityOption.Low;
     }
 
     return payload;
@@ -318,6 +336,13 @@
       window.dispatchEvent(new Event("reload-sidebar"));
       window.dispatchEvent(new Event("reload-conversation-dialog"));
     }, 1000);
+
+    posthogClientCapture($tenant, EventName.AiboxPromptResult, {
+      use_case: promptData?.title || "-",
+      tool: selectedPromptTool,
+      model: getModelName($tenant, model),
+      page_name: ScreenName.MyAibox,
+    });
 
     return data;
   }
@@ -635,6 +660,18 @@
     {isFetching}
     {isGenerating}
     {isResoningThingking}
+    updateMessageRating={(
+      index: number,
+      selectedRating: MessageThumbRating | null,
+    ) => {
+      updateConversationMessageRating(index, selectedRating);
+    }}
+    promptResultTrackging={{
+      page_name: ScreenName.MyAibox,
+      use_case: promptData?.title || "-",
+      tool: selectedPromptTool,
+      model: getModelName($tenant, model),
+    }}
   />
 
   <div class="sticky bottom-0 bg-base-200 p-4">

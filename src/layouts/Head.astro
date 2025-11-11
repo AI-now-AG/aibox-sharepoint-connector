@@ -1,6 +1,12 @@
 ---
 import { ClientRouter } from "astro:transitions";
-const { title, description } = Astro.props;
+import PostHogDev from "$components/PosthogDev.astro";
+import PostProd from "$components/PosthogProd.astro";
+import { isDev } from "$utils/env";
+
+const { tenant, title, description } = Astro.props;
+const isOnHostpog = tenant && tenant.is_on_posthog;
+const isDevEnvironment = isDev();
 ---
 
 <head>
@@ -10,6 +16,8 @@ const { title, description } = Astro.props;
   <meta name="descrption" content={description} />
 
   <link rel="icon" href="/favicon.svg" />
+
+  {isOnHostpog && (isDevEnvironment ? <PostHogDev /> : <PostProd />)}
 
   <ClientRouter />
 
@@ -34,6 +42,10 @@ const { title, description } = Astro.props;
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const [input, init] = args;
       const url = typeof input === "string" ? input : input.url;
+
+      if (url.includes("posthog.com")) {
+        return originalFetch(...args);
+      }
 
       const response = await originalFetch(...args);
       console.log(`[aibox] Wrapped fetch request: ${url}`);

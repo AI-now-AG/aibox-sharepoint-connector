@@ -9,6 +9,13 @@ export interface Message {
   rawData?: string;
   imageUrl?: string;
   fileUrls?: string[];
+  thumbRating?: MessageThumbRating | null;
+}
+
+export enum MessageThumbRating {
+  Up = "up",
+  Down = "down",
+  Cancel = "cancel"
 }
 
 export type MessageHistory = Message[];

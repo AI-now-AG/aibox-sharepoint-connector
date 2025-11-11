@@ -20,6 +20,8 @@
   import { ModelName, PromptToolOption } from "$types/AIProvider";
   import { ApiKeyProvider } from "$types/TenantFeature";
   import { TRANSCRIPTION_API_URL } from "astro:env/client";
+  import { EventName, ScreenName } from "$types/Posthog";
+  import { posthogClientCapture } from "$utils/posthogClient";
 
   interface StreamingState {
     messageContent: string;
@@ -136,6 +138,11 @@
         const formattedUrl = formatImageUrl(imageData);
         state.currentImageUrl = formattedUrl;
         currentStreamingImageUrl = formattedUrl;
+
+        posthogClientCapture($tenant, EventName.AiboxImageCreated, {
+          page_name: ScreenName.NanoBananaImageGeneration,
+          model: ModelName.Gemini25FlashImage,
+        });
       }
     }
   }

@@ -11,6 +11,7 @@ import { onboarding } from "./onboarding";
 import { report } from "./report";
 import { configurations } from "./configuration";
 import { cloneMasterTeant } from "./clonemastertenant";
+import { posthog } from "./posthog";
 
 export const server = {
   tenant,
@@ -25,5 +26,6 @@ export const server = {
   onboarding,
   report,
   configurations,
-  cloneMasterTeant
+  cloneMasterTeant,
+  posthog
 };

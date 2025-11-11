@@ -19,7 +19,12 @@
   import { tenant, user } from "$stores";
   import { useTranslations } from "$i18n/utils";
   import { addToast } from "$stores/toast";
-  import { ModelName, PromptToolOption } from "$types/AIProvider";
+  import {
+    ModelName,
+    PromptToolOption,
+    ReasoningEffortOption,
+    TextVerbosityOption,
+  } from "$types/AIProvider";
   import {
     getPromptTools,
     useProviderInfo,
@@ -31,8 +36,9 @@
   import PromptList, {
     type PromptCartItem,
   } from "$components/prompt-interface/PromptList.svelte";
-  import type { CategoryItem } from "$types/CategoryItem";
   import PromptItem from "$components/prompt-interface/PromptItem.svelte";
+  import { EventName, ScreenName } from "$types/Posthog";
+  import { posthogClientCapture } from "$utils/posthogClient";
 
   const t = useTranslations();
 
@@ -187,8 +193,8 @@
 
     if (isResponseModel) {
       payload.previousResponseId = previousResponseId;
-      payload.reasoningEffort = "low";
-      payload.verbosity = "low";
+      payload.reasoningEffort = ReasoningEffortOption.Low;
+      payload.verbosity = TextVerbosityOption.Low;
     } else {
       payload.messageHistory = $sharedMessageHistory;
     }
@@ -307,6 +313,13 @@
 
     // Scroll to latest message
     setTimeout(() => scrollIntoView(), 1000);
+
+    posthogClientCapture($tenant, EventName.AiboxPromptResult, {
+      page_name: ScreenName.Home,
+      use_case: selectedPrompt?.title || "-",
+      tool: selectedPromptTool,
+      model: getModelName($tenant, selectedPrompt?.model || selectedModel),
+    });
 
     return data;
   }
@@ -638,12 +651,12 @@
   async function saveConversation() {
     loading = true;
     const { error, data } = await actions.conversation.save({
+      prompt_id: selectedPrompt?.id?.toString() || null,
       model: selectedPrompt?.model || selectedModel,
       messages: $sharedMessageHistory,
       previous_response_id: previousResponseId,
     });
     loading = false;
-
     if (error) {
       addToast({
         message: error?.message ?? "Something went wrong",
@@ -793,6 +806,12 @@
       {isFetching}
       {isGenerating}
       {isResoningThingking}
+      promptResultTrackging={{
+        page_name: ScreenName.Home,
+        use_case: selectedPrompt?.title || "-",
+        tool: selectedPromptTool,
+        model: getModelName($tenant, selectedPrompt?.model || selectedModel),
+      }}
     />
 
     {#if $sharedMessageHistory.length > 0}
