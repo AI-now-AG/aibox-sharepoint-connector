@@ -652,12 +652,6 @@
       previous_response_id: previousResponseId,
     });
     loading = false;
-
-    posthogClientCapture($tenant, EventName.AiboxAssistantSaved, {
-      page_name: ScreenName.Home,
-      use_case: selectedPrompt?.title || "-",
-    });
-
     if (error) {
       addToast({
         message: error?.message ?? "Something went wrong",

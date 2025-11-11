@@ -44,14 +44,16 @@ const categoryListArray: CategoryItem[] = categoryArray.map((category) => {
   };
 });
 
-const categories = (await Promise.all(calls)) as any;
+const categories = await Promise.all(calls);
 
 const promptsEnriched: CardItem[] = prompts.map((prompt) => {
   const category = categories.find(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (category: any) => category?._id.toString() === prompt.category?.toString()
   );
 
   const group = category?.groups.find(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (g: any) => g._id?.toString() === prompt.group?.toString()
   );
 

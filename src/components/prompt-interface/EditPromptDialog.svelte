@@ -25,6 +25,8 @@
     normalizeTextToHtml,
     isHtmlContentEmpty,
   } from "$utils/textFormatting";
+  import { EventName, ScreenName } from "$types/Posthog";
+  import { posthogClientCapture } from "$utils/posthogClient";
 
   const t = useTranslations();
 
@@ -234,8 +236,13 @@
         message: data.message,
         type: "success",
       });
+
+      posthogClientCapture($tenant, EventName.AiboxAssistantSaved, {
+        page_name: ScreenName.EditPromptDialog,
+        use_case: promptTitle || "-",
+      });
+
       setTimeout(() => {
-        // window.location.href = `${window.location.href.split("?")[0]}?promptId=${selectedEditPromptId}`;
         navigate(
           `${window.location.href.split("?")[0]}?promptId=${selectedEditPromptId}`,
         );

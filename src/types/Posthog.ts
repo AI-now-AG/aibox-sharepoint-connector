@@ -33,6 +33,8 @@ export enum ScreenName {
   CreateOrUpdateCategory = 'create_or_update_category',
   CreateOrUpdateAudioInstruction = 'create_or_update_audio_instruction',
   BillingUsage = 'billing_usage',
+  AddPromptDialog = 'add_prompt_dialog',
+  EditPromptDialog = 'edit_prompt_dialog',
 }
 
 
