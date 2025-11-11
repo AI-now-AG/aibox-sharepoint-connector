@@ -28,9 +28,10 @@
   import MessageAction from "$components/chat-ui/MessageAction.svelte";
   import { TRANSCRIPTION_API_URL } from "astro:env/client";
   import { marked } from "marked";
-  import ThumbRating from "./ThumbRating.svelte";
-  import { posthogClientCapture } from "$utils/posthogClient";
-  import { EventName } from "$types/Posthog";
+  // TODO: Enable rating feature later after revise UI design
+  // import ThumbRating from "./ThumbRating.svelte";
+  // import { posthogClientCapture } from "$utils/posthogClient";
+  // import { EventName } from "$types/Posthog";
 
   const t = useTranslations();
 
@@ -508,7 +509,8 @@
                         </div>
                       {/if}
                     </div>
-                    {#if role === MessageRole.Assistant}
+                    <!-- // TODO: Enable rating feature later after revise UI design -->
+                    <!-- {#if role === MessageRole.Assistant}
                       <div class="ml-12 mt-[-10px]">
                         <ThumbRating
                           selected={thumbRating}
@@ -531,7 +533,7 @@
                           }}
                         />
                       </div>
-                    {/if}
+                    {/if} -->
                   </div>
 
                   {#if role === MessageRole.Assistant && imageUrl}
