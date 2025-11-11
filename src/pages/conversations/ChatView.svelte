@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { ModelName, PromptToolOption } from "$types/AIProvider";
+  import {
+    ModelName,
+    PromptToolOption,
+    ReasoningEffortOption,
+    TextVerbosityOption,
+  } from "$types/AIProvider";
   import {
     MessageRole,
     MessageThumbRating,
@@ -213,8 +218,8 @@
     }
 
     if (isResponseModel) {
-      payload.reasoningEffort = "low";
-      payload.verbosity = "low";
+      payload.reasoningEffort = ReasoningEffortOption.Low;
+      payload.verbosity = TextVerbosityOption.Low;
     }
 
     return payload;
