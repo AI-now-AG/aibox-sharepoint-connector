@@ -9,7 +9,7 @@ export enum Permission {
   UserAll = "user:all",
   SuperUserAll = "super:user:all",
   AdminAll = "admin:all",
-  SuperAll = "super:all",
+  SuperAll = "super:admin:all",
 }
 
 export const ROLE_PERMISSIONS_MAP = {
