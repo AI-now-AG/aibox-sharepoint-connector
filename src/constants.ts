@@ -25,14 +25,6 @@ export const SUPER_USER_ROUTES = [
 export const ADMIN_ROUTES = [
   "/user-management",
   "/user-management/*",
-  "/prompt-library/prompts",
-  "/prompt-library/prompts/*",
-  "/prompt-library/knowledge-base",
-  "/prompt-library/knowledge-base/*",
-  "/prompt-library/categories",
-  "/prompt-library/categories/*",
-  "/settings/transcription",
-  "/settings/transcription/*",
   "/billing/usage",
 ];
 
