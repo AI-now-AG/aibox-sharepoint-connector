@@ -11,6 +11,17 @@ export const PUBLIC_ROUTES = [
   "/api/users/check-trial.json",
 ];
 
+export const SUPER_USER_ROUTES = [
+  "/prompt-library/prompts",
+  "/prompt-library/prompts/*",
+  "/prompt-library/knowledge-base",
+  "/prompt-library/knowledge-base/*",
+  "/prompt-library/categories",
+  "/prompt-library/categories/*",
+  "/settings/transcription",
+  "/settings/transcription/*",
+];
+
 export const ADMIN_ROUTES = [
   "/user-management",
   "/user-management/*",
