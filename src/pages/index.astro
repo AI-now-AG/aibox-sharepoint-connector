@@ -7,6 +7,7 @@ import { TourType } from "$types/Users";
 import type { CardItem } from "$components/Card.svelte";
 import CategoryModel from "$data/models/category.model";
 import PromptModel from "$data/models/prompt.model";
+import ThemeLogo from "$components/ThemeLogo.astro";
 const t = useTranslations();
 
 const tenant = Astro.locals.tenant;
@@ -49,15 +50,19 @@ const calls = prompts.map(async (prompt) => {
   return category;
 });
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const categories = (await Promise.all(calls)) as any;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const promptsEnriched: CardItem[] = prompts.map((prompt: any) => {
   const category = categories.find(
-    (category: any) => category?._id.toString() === prompt.category?.toString(),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (category: any) => category?._id.toString() === prompt.category?.toString()
   );
 
   const group = category?.groups.find(
-    (g: any) => g._id?.toString() === prompt.group?.toString(),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (g: any) => g._id?.toString() === prompt.group?.toString()
   );
 
   const tags = [category?.title, group?.title].filter(Boolean) as string[];
@@ -81,31 +86,7 @@ const promptsEnriched: CardItem[] = prompts.map((prompt: any) => {
   >
     <div class="w-full px-16 py-auto">
       <div class="mt-8 text-center space-y-8 max-w-3xl mx-auto">
-        <img
-          src="/logo-aibox-christmasedition.svg"
-          alt="Weihnachtsmann Logo"
-          class="h-8 hidden in-data-[theme=weihnachtsmann]:inline"
-        />
-        <img
-          src="/soki-somedia.png"
-          alt="somedia logo"
-          class="h-12 hidden in-data-[theme=somedia]:inline"
-        />
-        <img
-          src="/aibox-logo-text.svg"
-          alt="light logo"
-          class="w-auto h-12 w-auto hidden in-data-[theme=light]:inline"
-        />
-        <img
-          src="/aibox-logo-text.svg"
-          alt="light logo"
-          class="w-auto h-12 w-auto hidden in-data-[theme=aibox]:inline"
-        />
-        <img
-          src="/aibox-logo-text-dark.svg"
-          alt="dark logo"
-          class="w-auto h-12 hidden in-data-[theme=dark]:inline"
-        />
+        <ThemeLogo from="home" />
 
         <h1 class="text-4xl font-bold mt-9 mb-4">
           {t("home.welcome", { name: Astro.locals.user.name })}
