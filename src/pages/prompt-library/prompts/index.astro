@@ -80,7 +80,8 @@ let userPermissions = Astro.locals.user.permissions;
 
     <div class="flex gap-2">
       {
-        userPermissions.includes(Permission.SuperAllDeprecated) && (
+        (userPermissions.includes(Permission.SuperAdminAll) ||
+          userPermissions.includes(Permission.SuperAllDeprecated)) && (
           <PromptToolbar isEditable={true} client:load />
         )
       }
