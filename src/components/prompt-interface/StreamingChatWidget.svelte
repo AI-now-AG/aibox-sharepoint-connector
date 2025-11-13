@@ -735,7 +735,7 @@
 
 <!-- Prompt Textarea -->
 <div
-  class={`${currentMessageHistory.length > 0 ? "sticky bottom-0 bg-base-200" : ""}`}
+  class={`${currentMessageHistory.length > 0 ? "sticky bottom-0 bg-base-200 z-50" : "z-50"}`}
 >
   {#if currentMessageHistory.length > 0}
     <div class="my-4">
