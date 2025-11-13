@@ -25,6 +25,7 @@ export const SUPER_USER_ROUTES = [
 export const ADMIN_ROUTES = [
   "/user-management",
   "/user-management/*",
+  "/settings/subscription",
   "/billing/usage",
 ];
 
@@ -36,6 +37,8 @@ export const SUPER_ADMIN_ROUTES = [
   "/secure",
   "/secure/*",
   "/reports/*",
+  "/settings/instruction",
+  "settings/prompt-refinement"
 ];
 
 export const FEATURE_MAP_ROUTES = {

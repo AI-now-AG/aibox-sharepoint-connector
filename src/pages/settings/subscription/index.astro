@@ -2,20 +2,16 @@
 import Layout from "$layouts/Layout.astro";
 import SubscriptionInfo from "./SubscriptionInfo.svelte";
 import SubscriptionModel from "$data/models/subscription.model";
-import { Permission } from "$types/Users";
 import { useTranslations } from "$i18n/utils";
 
 const t = useTranslations();
 
-let userPermissions = Astro.locals.user.permissions;
-const hasPermission = userPermissions.includes(Permission.AdminAll);
-
-if (!hasPermission) {
-  return Astro.redirect("/restricted");
-}
-
 const { tenant } = Astro.locals;
-const { billing_method: billingMethod, billing_info: billingInfo, totalPrice } = tenant;
+const {
+  billing_method: billingMethod,
+  billing_info: billingInfo,
+  totalPrice,
+} = tenant;
 
 const subscription = await SubscriptionModel.findActiveByTenant(tenant._id);
 const planName = subscription?.plan_name;

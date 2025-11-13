@@ -3,16 +3,8 @@ import Layout from "$layouts/Layout.astro";
 import PromptRefinementForm from "./PromptRefinementForm.svelte";
 import { useTranslations } from "$i18n/utils";
 import { actions } from "astro:actions";
-import { Permission } from "$types/Users";
 
 const t = useTranslations();
-
-let userPermissions = Astro.locals.user.permissions;
-const hasPermission = userPermissions.includes(Permission.AdminAll);
-
-if (!hasPermission) {
-  return Astro.redirect("/restricted");
-}
 
 const { data: configuration } = await Astro.callAction(
   actions.configurations.get,
