@@ -55,7 +55,9 @@
       (role) => role === UserRole.SuperAdmin || role === UserRole.Admin,
     )
       ? UserRole.Admin
-      : UserRole.User;
+      : roles?.some((role) => role === UserRole.SuperUser)
+        ? UserRole.SuperUser
+        : UserRole.User;
   }
 
   function isSuperAdmin(roles: string[] = []): boolean {
@@ -292,6 +294,23 @@
           />
           <label for="role-admin" class="ml-2 font-medium text-sm"
             >{t("user.admin")}</label
+          >
+        </div>
+        <div class="flex items-center ml-8">
+          <input
+            type="radio"
+            id="role-super-user"
+            name="role"
+            class="radio"
+            value={UserRole.SuperUser}
+            checked={role == UserRole.SuperUser}
+            onchange={() => {
+              role = UserRole.SuperUser;
+            }}
+            disabled={isUpdateRoleDisabled}
+          />
+          <label for="role-super-user" class="ml-2 font-medium text-sm"
+            >{t("user.super-user")}</label
           >
         </div>
         <div class="flex items-center ml-8">
