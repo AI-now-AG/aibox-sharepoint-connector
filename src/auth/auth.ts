@@ -18,6 +18,10 @@ export const isAdmin = (locals: App.Locals) => {
   return hasRole(locals, UserRole.Admin);
 };
 
+export const isSuperUser = (locals: App.Locals) => {
+  return hasRole(locals, UserRole.SuperUser);
+};
+
 export const hasRole = (locals: App.Locals, role: UserRole) => {
   if (!locals.user) {
     return false;
@@ -61,6 +65,7 @@ export default {
   check,
   isSuperAdmin,
   isAdmin,
+  isSuperUser,
   hasRole,
   hasFeature,
   hasFeatureWithProvider,
