@@ -9,14 +9,15 @@ export enum Permission {
   UserAll = "user:all",
   SuperUserAll = "super:user:all",
   AdminAll = "admin:all",
-  SuperAll = "super:all",
+  SuperAdminAll = "super:admin:all",
+  SuperAllDeprecated = "super:all",
 }
 
 export const ROLE_PERMISSIONS_MAP = {
   [UserRole.User]: [Permission.UserAll],
   [UserRole.SuperUser]: [Permission.UserAll, Permission.SuperUserAll],
   [UserRole.Admin]: [Permission.UserAll, Permission.SuperUserAll, Permission.AdminAll],
-  [UserRole.SuperAdmin]: [Permission.UserAll, Permission.SuperUserAll, Permission.AdminAll, Permission.SuperAll,],
+  [UserRole.SuperAdmin]: [Permission.UserAll, Permission.SuperUserAll, Permission.AdminAll, Permission.SuperAdminAll, Permission.SuperAllDeprecated,],
 };
 
 export enum TourType {
