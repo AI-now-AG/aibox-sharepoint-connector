@@ -31,7 +31,8 @@ const mode = Astro.url?.searchParams?.get?.("mode") ?? "update";
     <KnowledgeBaseForm
       knowledgeBaseId={id}
       knowledgeBase={knowledgeBase}
-      isEditable={userPermissions.includes(Permission.AdminAll)}
+      isEditable={userPermissions.includes(Permission.AdminAll) ||
+        userPermissions.includes(Permission.SuperUserAll)}
       mode={mode}
       client:load
     />

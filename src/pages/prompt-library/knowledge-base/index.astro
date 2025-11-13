@@ -42,20 +42,23 @@ if (!error) {
     </h1>
 
     {
-      userPermissions.includes(Permission.AdminAll) && items.length > 0 && (
-        <a
-          href="/prompt-library/knowledge-base/add"
-          class="mt-2 lg:mt-8 btn btn-outline font-normal grow-0"
-        >
-          <span set:html={svgIcons.add} />
-          {t("prompt-library.knowledgebase.add")}
-        </a>
-      )
+      (userPermissions.includes(Permission.AdminAll) ||
+        userPermissions.includes(Permission.SuperUserAll)) &&
+        items.length > 0 && (
+          <a
+            href="/prompt-library/knowledge-base/add"
+            class="mt-2 lg:mt-8 btn btn-outline font-normal grow-0"
+          >
+            <span set:html={svgIcons.add} />
+            {t("prompt-library.knowledgebase.add")}
+          </a>
+        )
     }
   </div>
 
   <KnowledgeBaseList
-    isEditable={userPermissions.includes(Permission.AdminAll)}
+    isEditable={userPermissions.includes(Permission.AdminAll) ||
+      userPermissions.includes(Permission.SuperUserAll)}
     items={items}
     client:load
   />

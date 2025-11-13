@@ -9,7 +9,8 @@ let userPermissions = Astro.locals.user.permissions;
 
 <Layout>
   <KnowledgeBaseForm
-    isEditable={userPermissions.includes(Permission.AdminAll)}
+    isEditable={userPermissions.includes(Permission.AdminAll) ||
+      userPermissions.includes(Permission.SuperUserAll)}
     mode="create"
     client:load
   />

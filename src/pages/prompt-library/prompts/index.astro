@@ -91,7 +91,8 @@ let userPermissions = Astro.locals.user.permissions;
   <PromptFilter
     promptsEnriched={promptsEnriched}
     categoryList={categoryListArray}
-    isEditable={userPermissions.includes(Permission.AdminAll)}
+    isEditable={userPermissions.includes(Permission.AdminAll) ||
+      userPermissions.includes(Permission.SuperUserAll)}
     client:load
   />
 </Layout>

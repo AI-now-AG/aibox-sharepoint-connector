@@ -15,10 +15,7 @@ if (id === undefined) {
 }
 
 const category = await CategoryModel.getConvertedObj(id);
-if (
-  !category ||
-  !isSameObjectId(category.tenant_id, Astro.locals.tenant._id)
-) {
+if (!category || !isSameObjectId(category.tenant_id, Astro.locals.tenant._id)) {
   return Astro.redirect("/404");
 }
 
@@ -31,7 +28,8 @@ let userPermissions = Astro.locals.user.permissions;
   <div>
     <CategoryForm
       category={formattedCategory}
-      isEditable={userPermissions.includes(Permission.AdminAll)}
+      isEditable={userPermissions.includes(Permission.AdminAll) ||
+        userPermissions.includes(Permission.SuperUserAll)}
       client:load
     />
   </div>
