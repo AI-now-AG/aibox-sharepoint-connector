@@ -68,10 +68,6 @@ export default {
     return collection.findOne<Document<Prompt>>({ _id });
   },
 
-  getByTitleAndTenant: async (title: string, tenantId: ObjectId) => {
-    return collection.findOne<Document<Prompt>>({ title, tenant_id: tenantId });
-  },
-
   list: async () =>
     collection.find<Document<Prompt>>({}).sort({ created_at: 1 }),
 
@@ -130,29 +126,10 @@ export default {
   update: async (id: string, updatedPrompt: Partial<Prompt>) => {
     const _id = new ObjectId(id);
     const validated = PromptSchema.partial().parse(updatedPrompt);
-    const result = await collection.updateOne(
-      { _id },
-      { $set: { ...validated } },
-    );
-    return result;
-  },
-
-  findAndUpdate: async (id: string, updatedPrompt: Partial<Prompt>) => {
-    const _id = new ObjectId(id);
-    const validated = PromptSchema.partial().parse(updatedPrompt);
     const result = await collection.findOneAndUpdate(
       { _id },
       { $set: { ...validated } },
       { returnDocument: "after" },
-    );
-    return result;
-  },
-
-  updatePromptField: async (id: string, newPrompt: string) => {
-    const _id = new ObjectId(id);
-    const result = await collection.updateOne(
-      { _id },
-      { $set: { prompt: newPrompt } },
     );
     return result;
   },

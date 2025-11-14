@@ -10,8 +10,7 @@ export const GroupSchema = z.object({
 });
 
 const CategorySchema = z.object({
-  tenant_id: z.instanceof(ObjectId).optional(),
-  creator_id: z.instanceof(ObjectId).optional(),
+  _id: z.instanceof(ObjectId),
   title: z.string(),
   slug: z.string(),
   icon: z.string().optional(),
@@ -28,10 +27,10 @@ const CategoryGroupSchema = CategorySchema.extend({
 export type Category = z.infer<typeof CategoryGroupSchema>;
 export type Group = z.infer<typeof GroupSchema>;
 
-const collection = db.collection("categories");
+const collection = db.collection("global_categories");
 
 export default {
-  add: async (category: Category) => {
+  create: async (category: Partial<Omit<Category, "_id">>) => {
     const validated = CategoryGroupSchema.parse(category);
     const doc = {
       active: true,
@@ -57,30 +56,12 @@ export default {
     return collection.deleteOne({ _id });
   },
 
-  removeByTenant: async (tenantId: string | ObjectId) => {
-    const objectId = toObjectId(tenantId);
-    return collection.deleteMany({ tenant_id: objectId });
-  },
-
   list: async () =>
     collection
       .find<Document<Category>>({})
       .sort({ created_at: 1 })
-      .sort({ created_at: 1 }),
-
-  listByTenant: async (tenantId: string | ObjectId) => {
-    const _tenantId = toObjectId(tenantId);
-    return collection
-      .find<Document<Category>>({ tenant_id: _tenantId })
-      .sort({ position: 1, created_at: 1 });
-  },
-
-  listActiveByTenant: async (tenantId: string | ObjectId) => {
-    const _tenantId = toObjectId(tenantId);
-    return collection
-      .find<Document<Category>>({ tenant_id: _tenantId, active: true })
-      .sort({ position: 1, created_at: 1 });
-  },
+      .sort({ created_at: 1 })
+      .toArray(),
 
   get: async (id: string): Promise<Category | null> => {
     if (!ObjectId.isValid(id)) {
@@ -92,30 +73,11 @@ export default {
     return doc;
   },
 
-  getByTitleAndTenant: async (title: string, tenantId: ObjectId) => {
-    return collection.findOne<Document<Category>>({
-      title,
-      tenant_id: tenantId,
-    });
-  },
-
-  getBySlug: async (slug: string) => {
-    return collection.findOne<Document<Category>>({ slug });
-  },
-
-  getMaxPosition: async (tenantId: ObjectId) => {
+  getMaxPosition: async () => {
     return collection
-      .find<Document<Category>>({ tenant_id: tenantId })
+      .find<Document<Category>>({})
       .sort({ position: -1 })
       .limit(1)
       .next();
-  },
-
-  listByTenantAndIds: async (tenantId: string | ObjectId, ids: ObjectId[]) => {
-    const _tenantId = toObjectId(tenantId);
-    return collection.find<Document<Category>>({
-      tenant_id: _tenantId,
-      _id: { $in: ids },
-    });
   },
 };

@@ -4,6 +4,7 @@ import CategoryModel from "$data/models/category.model";
 import { Permission } from "$types/Users";
 import CategoryForm from "$pages/prompt-library/categories/CategoryForm.svelte";
 import { isSameObjectId } from "$utils/common";
+import { transformRawData } from "$utils/transformRawData";
 
 export interface Props {
   id: string;
@@ -14,15 +15,13 @@ if (id === undefined) {
   throw new Error("Id is required");
 }
 
-const category = await CategoryModel.getConvertedObj(id);
-if (
-  !category ||
-  !isSameObjectId(category.tenant_id, Astro.locals.tenant._id)
-) {
+const category = await CategoryModel.get(id);
+if (!category || !isSameObjectId(category.tenant_id, Astro.locals.tenant._id)) {
   return Astro.redirect("/404");
 }
 
-const formattedCategory = { ...category, _id: id };
+const formattedCategory = transformRawData(category, false);
+console.log("Formatted Category:", formattedCategory);
 
 let userPermissions = Astro.locals.user.permissions;
 ---

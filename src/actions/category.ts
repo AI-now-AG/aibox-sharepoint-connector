@@ -46,7 +46,7 @@ export const category = {
     handler: async (input) => {
       const categoriesCursor = await CategoryModel.listByTenant(input._id);
       const categories = await categoriesCursor.toArray();
-      return transformRawData(categories)
+      return transformRawData(categories);
     },
   }),
 
@@ -70,7 +70,7 @@ export const category = {
         const currentItem = await CategoryModel.get(item._id);
 
         if (currentItem && currentItem.position !== index) {
-          const updateResult = await CategoryModel.findAndUpdate(item._id, {
+          const updateResult = await CategoryModel.update(item._id, {
             position: index,
           });
           items.push(transformRawData(updateResult));
