@@ -652,5 +652,5 @@
   "tenant.subscription-cancelled-date": "Abonnement gekündigt",
   "home.search-prompt": "Suche Assistenten",
   "tenant.posthog": "Posthog (Tracking, Feedback und Umfragen)",
-  "user.super-user": "Superbenutzer"
+  "user.super-user": "Super User"
 }
