@@ -2,18 +2,14 @@
 import Layout from "$layouts/Layout.astro";
 import { svgIcons } from "$assets/icons";
 import { useTranslations } from "$i18n/utils";
-import CategoryModel from "$data/models/category.model";
+import GlobalCategoryModel from "$data/models/globalCategory.model";
 import CategoryList from "$components/prompt-library/categories/CategoryList.svelte";
 
 import { Permission } from "$types/Users";
 import type { ViewCategory } from "$actions/category";
 
 const t = useTranslations();
-
-const categoriesCursor = await CategoryModel.listByTenant(
-  Astro.locals.user.tenant_id
-);
-const categories = await categoriesCursor.toArray();
+const categories = await GlobalCategoryModel.list();
 
 const categoriesEnriched: ViewCategory[] = categories.map((category) => ({
   id: category._id.toString(),

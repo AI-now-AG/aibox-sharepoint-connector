@@ -4,9 +4,9 @@
   import { useTranslations } from "$i18n/utils";
   import { svgIcons } from "$assets/icons";
   import { onMount } from "svelte";
-  import SingleInput from "$pages/prompt-library/prompts/SingleInput.svelte";
-  import MultiInput from "$pages/prompt-library/prompts/MultiInput.svelte";
-  import ModelInput from "$pages/prompt-library/prompts/ModelInput.svelte";
+  import SingleInput from "$components/prompt-library/prompts/SingleInput.svelte";
+  import MultiInput from "$components/prompt-library/prompts/MultiInput.svelte";
+  import ModelInput from "$components/prompt-library/prompts/ModelInput.svelte";
   import { addToast } from "$stores/toast";
   import TextEditor from "$components/form/TextEditor.svelte";
   import RefinementButton from "$components/prompt-interface/RefinementButton.svelte";

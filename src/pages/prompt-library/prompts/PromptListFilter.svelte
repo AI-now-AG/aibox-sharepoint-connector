@@ -1,14 +1,9 @@
 <script lang="ts">
-  import { slide } from "svelte/transition";
   import PromptFilter from "$components/prompt-interface/PromptFilter.svelte";
   import PromptList, {
     type PromptCartItem,
   } from "$components/prompt-interface/PromptList.svelte";
   import type { CategoryItem } from "$types/CategoryItem";
-  import { useTranslations } from "$i18n/utils";
-  import { svgIcons } from "$assets/icons";
-
-  const t = useTranslations();
 
   interface Props {
     promptsEnriched?: PromptCartItem[];
