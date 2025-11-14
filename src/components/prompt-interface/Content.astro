@@ -31,7 +31,10 @@ const promptId = Astro.url?.searchParams?.get?.("promptId") ?? "";
     promptItems.length > 0 ? (
       <PromptExecution
         promptItems={promptItems}
-        isEditable={userPermissions.includes(Permission.AdminAll)}
+        isEditable={
+          userPermissions.includes(Permission.AdminAll) ||
+          userPermissions.includes(Permission.SuperUserAll)
+        }
         groupId={groupId}
         folderName={Astro.locals.tenant.org_name}
         initSelectedPromptId={promptId}
