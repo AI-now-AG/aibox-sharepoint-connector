@@ -323,7 +323,8 @@
       const start = timeToSeconds(dialogue.start);
       const end = timeToSeconds(dialogue.end);
 
-      if (currentTime >= start && currentTime <= end) {
+      // Use < for end time to avoid multiple selections at boundary times
+      if (currentTime >= start && currentTime < end) {
         currentRowIndices.push(index);
       }
     });
@@ -411,11 +412,12 @@
 
   function highlightRow(index: number) {
     currentRowIndex = index;
-    currentRowIndices = [index];
     const dialogue = dialogues[index];
     if (dialogue) {
       jumpToTime(dialogue.start);
     }
+    // Don't manually set currentRowIndices - let updateCurrentRows() handle it based on actual time
+    // This will be called automatically by handleTimeUpdate() when the audio time changes
     scrollToCurrentRow();
   }
 
@@ -757,37 +759,19 @@
             </button>
           </li>
 
-          {#if assFileUrl}
-            <!-- ASS format available - show individual ASS export -->
-            <li>
-              <button onclick={exportAsASS} class="flex items-center gap-2">
-                {@html svgIcons.fileExport}
-                <span>{t("subtitle-editor.ass-only")}</span>
-              </button>
-            </li>
-          {:else if srtFileUrl}
-            <!-- SRT format available - show individual SRT export -->
-            <li>
-              <button onclick={exportAsSRT} class="flex items-center gap-2">
-                {@html svgIcons.fileExport}
-                <span>{t("subtitle-editor.srt-only")}</span>
-              </button>
-            </li>
-          {:else}
-            <!-- No source format - show both individual options -->
-            <li>
-              <button onclick={exportAsASS} class="flex items-center gap-2">
-                {@html svgIcons.fileExport}
-                <span>{t("subtitle-editor.ass-only")}</span>
-              </button>
-            </li>
-            <li>
-              <button onclick={exportAsSRT} class="flex items-center gap-2">
-                {@html svgIcons.fileExport}
-                <span>{t("subtitle-editor.srt-only")}</span>
-              </button>
-            </li>
-          {/if}
+          <!-- Always show both individual format options for conversion flexibility -->
+          <li>
+            <button onclick={exportAsASS} class="flex items-center gap-2">
+              {@html svgIcons.fileExport}
+              <span>{t("subtitle-editor.ass-only")}</span>
+            </button>
+          </li>
+          <li>
+            <button onclick={exportAsSRT} class="flex items-center gap-2">
+              {@html svgIcons.fileExport}
+              <span>{t("subtitle-editor.srt-only")}</span>
+            </button>
+          </li>
         </ul>
       </div>
 
@@ -854,9 +838,10 @@
               {#each dialogues as dialogue, index}
                 <tr
                   data-row-index={index}
-                  class="hover:bg-base-200 cursor-pointer transition-colors duration-200 {currentRowIndex ===
-                  index
-                    ? 'bg-accent text-accent-content shadow-lg border-l-4 border-accent-focus'
+                  class="hover:bg-base-200 cursor-pointer transition-colors duration-200 {currentRowIndices.includes(
+                    index,
+                  )
+                    ? 'bg-accent shadow-lg border-l-4 border-accent-focus'
                     : ''}"
                   onclick={() => highlightRow(index)}
                 >
@@ -869,11 +854,11 @@
                           togglePlayPause();
                         }}
                         class="btn btn-xs btn-circle {isPlaying &&
-                        currentRowIndex === index
+                        currentRowIndices.includes(index)
                           ? 'btn-success text-success-content'
                           : 'btn-ghost hover:btn-primary'}"
                       >
-                        {isPlaying && currentRowIndex === index ? "⏸️" : "▶️"}
+                        {isPlaying && currentRowIndices.includes(index) ? "⏸️" : "▶️"}
                       </button>
                     </td>
                   {/if}
@@ -883,8 +868,10 @@
                       bind:value={dialogue.start}
                       onclick={(e) => e.stopPropagation()}
                       oninput={triggerAutoSave}
-                      class="input w-full min-w-30 {currentRowIndex === index
-                        ? 'input-bordered bg-base-100 text-base-content'
+                      class="input w-full min-w-30 {currentRowIndices.includes(
+                        index,
+                      )
+                        ? 'input-bordered bg-base-100'
                         : ''}"
                       placeholder="0:00:00"
                     />
@@ -898,9 +885,10 @@
                         updateTrigger++;
                         triggerAutoSave();
                       }}
-                      class="textarea w-full resize-none leading-tight py-1 px-2 min-h-0 {currentRowIndex ===
-                      index
-                        ? 'textarea-bordered bg-base-100 text-base-content'
+                      class="textarea w-full resize-none leading-tight py-1 px-2 min-h-0 {currentRowIndices.includes(
+                        index,
+                      )
+                        ? 'textarea-bordered bg-base-100'
                         : ''}"
                       rows="2"
                       placeholder={t(
@@ -914,16 +902,18 @@
                       bind:value={dialogue.end}
                       onclick={(e) => e.stopPropagation()}
                       oninput={triggerAutoSave}
-                      class="input w-full min-w-30 {currentRowIndex === index
-                        ? 'input-bordered bg-base-100 text-base-content'
+                      class="input w-full min-w-30 {currentRowIndices.includes(
+                        index,
+                      )
+                        ? 'input-bordered bg-base-100'
                         : ''}"
                       placeholder="0:00:00"
                     />
                   </td>
                   <td class="p-1 text-center">
                     <div
-                      class="text-sm font-mono {currentRowIndex === index
-                        ? 'font-bold text-accent-content'
+                      class="text-sm font-mono {currentRowIndices.includes(index)
+                        ? 'font-bold text-base-content'
                         : getCharCountClass(dialogue, updateTrigger)}"
                     >
                       {#if dialogue.text.split(/\\N|\\n|\r\n|\r|\n/).length > 1}
