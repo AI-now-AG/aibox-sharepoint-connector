@@ -12,7 +12,7 @@ import type { CategoryItem } from "$types/CategoryItem";
 const t = useTranslations();
 
 const promptsCursor = await PromptModel.listByTenant(
-  Astro.locals.user.tenant_id
+  Astro.locals.user.tenant_id,
 );
 const prompts = await promptsCursor.toArray();
 
@@ -23,7 +23,7 @@ const calls = prompts.map(async (prompt) => {
 });
 
 const categoryList = await CategoryModel.listActiveByTenant(
-  Astro.locals.user.tenant_id
+  Astro.locals.user.tenant_id,
 );
 let categoryArray = await categoryList.toArray();
 const categoryListArray: CategoryItem[] = categoryArray.map((category) => {
@@ -49,12 +49,12 @@ const categories = await Promise.all(calls);
 const promptsEnriched: CardItem[] = prompts.map((prompt) => {
   const category = categories.find(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (category: any) => category?._id.toString() === prompt.category?.toString()
+    (category: any) => category?._id.toString() === prompt.category?.toString(),
   );
 
   const group = category?.groups.find(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (g: any) => g._id?.toString() === prompt.group?.toString()
+    (g: any) => g._id?.toString() === prompt.group?.toString(),
   );
 
   const tags = [category?.title, group?.title].filter(Boolean) as string[];
@@ -80,7 +80,7 @@ let userPermissions = Astro.locals.user.permissions;
 
     <div class="flex gap-2">
       {
-        userPermissions.includes(Permission.SuperAll) && (
+        userPermissions.includes(Permission.SuperAdminAll) && (
           <PromptToolbar isEditable={true} client:load />
         )
       }
@@ -90,7 +90,8 @@ let userPermissions = Astro.locals.user.permissions;
   <PromptFilter
     promptsEnriched={promptsEnriched}
     categoryList={categoryListArray}
-    isEditable={userPermissions.includes(Permission.AdminAll)}
+    isEditable={userPermissions.includes(Permission.AdminAll) ||
+      userPermissions.includes(Permission.SuperUserAll)}
     client:load
   />
 </Layout>

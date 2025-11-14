@@ -265,6 +265,13 @@ if (auth.isAdmin(Astro.locals) || auth.isSuperAdmin(Astro.locals)) {
     isOpened: navState[`admin-menu`] ?? false,
     items: settingsItems,
   });
+} else if (auth.isSuperUser(Astro.locals)) {
+  adminMenus.push({
+    title: t("nav.settings"),
+    icon: svgIcons.menuSettings,
+    isOpened: navState[`admin-menu`] ?? false,
+    items: settingsItems,
+  });
 }
 
 if (auth.isSuperAdmin(Astro.locals)) {

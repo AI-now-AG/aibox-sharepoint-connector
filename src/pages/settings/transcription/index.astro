@@ -88,13 +88,16 @@ let userPermissions = Astro.locals.user.permissions;
       class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 justify-center"
     >
       {
-        userPermissions.includes(Permission.AdminAll) &&
+        (userPermissions.includes(Permission.AdminAll) ||
+          userPermissions.includes(Permission.SuperUserAll)) &&
           cards
             .filter((card) =>
               card.category.some((cat) => transcriptionTypes?.includes(cat))
             )
             .map((card) => (
-              <div class={`card bg-base-100 shadow-xl flex flex-col justify-between`}>
+              <div
+                class={`card bg-base-100 shadow-xl flex flex-col justify-between`}
+              >
                 <ToggleCard transcriptionCard={card} client:load />
               </div>
             ))

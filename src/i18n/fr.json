@@ -651,5 +651,6 @@
   "tenant.subscription-start-date": "Subscription Start Date",
   "tenant.subscription-cancelled-date": "Subscription Cancelled Date",
   "home.search-prompt": "Seach Assistants",
-  "tenant.posthog": "Posthog (tracking, user feeback and survey)"
+  "tenant.posthog": "Posthog (tracking, user feeback and survey)",
+  "user.super-user": "Super User"
 }

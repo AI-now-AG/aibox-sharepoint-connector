@@ -33,7 +33,8 @@ let userPermissions = Astro.locals.user.permissions;
     </h1>
 
     {
-      userPermissions.includes(Permission.AdminAll) && (
+      (userPermissions.includes(Permission.AdminAll) ||
+        userPermissions.includes(Permission.SuperUserAll)) && (
         <a
           href="categories/add"
           class="mt-2 lg:mt-8 btn btn-outline font-normal grow-0"
