@@ -115,7 +115,7 @@ async function authenticate(context: APIContext, next: MiddlewareNext) {
 }
 
 async function restrictAccess(context: APIContext, next: MiddlewareNext) {
-  // Restrict access for non-admin users
+  // Restrict access for non Super Admin users
   const matchSAPaths = wildcardMatchInArray(
     context.url.pathname,
     SUPER_ADMIN_ROUTES,
@@ -124,6 +124,7 @@ async function restrictAccess(context: APIContext, next: MiddlewareNext) {
     return context.rewrite("/restricted");
   }
 
+  // Restrict access for non Admin users
   const matchAdminPaths = wildcardMatchInArray(
     context.url.pathname,
     ADMIN_ROUTES,
@@ -136,6 +137,7 @@ async function restrictAccess(context: APIContext, next: MiddlewareNext) {
     return context.rewrite("/restricted");
   }
 
+  // Restrict access for non Super User users
   const matchSuperUserPaths = wildcardMatchInArray(
     context.url.pathname,
     SUPER_USER_ROUTES,
