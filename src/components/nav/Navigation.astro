@@ -24,7 +24,7 @@ const categories = await cached(
   `categories:${Astro.locals.user.tenant_id}`,
   1000 * 60 * 0.5,
   async () => {
-    const cursor = await await Category.listActiveByTenant(
+    const cursor = await Category.listActiveByTenant(
       Astro.locals.user.tenant_id
     );
     return await cursor.toArray();
