@@ -25,10 +25,10 @@ const categories = await cached(
   1000 * 60 * 0.5,
   async () => {
     const cursor = await await Category.listActiveByTenant(
-      Astro.locals.user.tenant_id
+      Astro.locals.user.tenant_id,
     );
     return await cursor.toArray();
-  }
+  },
 );
 
 const transcriptions = await cached(
@@ -36,10 +36,10 @@ const transcriptions = await cached(
   1000 * 60 * 2,
   async () => {
     const data = await TranscriptionModel.listByTenant(
-      Astro.locals.user.tenant_id
+      Astro.locals.user.tenant_id,
     );
     return data;
-  }
+  },
 );
 
 const navState = Astro.locals.user.navState || {};
@@ -74,7 +74,7 @@ const transcriptionTypes = Astro.locals.tenant.transcription_types ?? [];
 const activeTranscriptions =
   transcriptions?.filter(
     (tran) =>
-      transcriptionTypes.includes(tran.category) && tran.enabled === true
+      transcriptionTypes.includes(tran.category) && tran.enabled === true,
   ) ?? [];
 
 const audioToTextTranscriptions = activeTranscriptions
@@ -91,7 +91,7 @@ const subtitleTranscriptions = activeTranscriptions
       tran.category == AudioCategory.Subtitle ||
       tran.category == AudioCategory.SubtitleJson ||
       tran.category == AudioCategory.SubtitleLarge ||
-      tran.category == AudioCategory.Subtitle11Labs
+      tran.category == AudioCategory.Subtitle11Labs,
   )
   .map((tran) => ({
     title: tran.name,
@@ -153,7 +153,7 @@ if (
   auth.hasFeatureWithProvider(
     Astro.locals,
     TenantFeature.CreateImage,
-    ApiKeyProvider.OpenAI
+    ApiKeyProvider.OpenAI,
   )
 ) {
   createImageItems.push({
@@ -167,7 +167,7 @@ if (
   auth.hasFeatureWithProvider(
     Astro.locals,
     TenantFeature.CreateImage,
-    ApiKeyProvider.Flux
+    ApiKeyProvider.Flux,
   )
 ) {
   createImageItems.push({
@@ -181,7 +181,7 @@ if (
   auth.hasFeatureWithProvider(
     Astro.locals,
     TenantFeature.GptImage,
-    ApiKeyProvider.OpenAI
+    ApiKeyProvider.OpenAI,
   )
 ) {
   createImageItems.push({
@@ -195,7 +195,7 @@ if (
   auth.hasFeatureWithProvider(
     Astro.locals,
     TenantFeature.CreateImage,
-    ApiKeyProvider.Gemini
+    ApiKeyProvider.Gemini,
   )
 ) {
   createImageItems.push({
@@ -223,18 +223,25 @@ if (conversations.length > 0) {
 
 const adminMenus = [];
 const supperAdminMenus = [];
-const settingsItems = [
+
+const settingsItems: Array<any> = [
   {
-    title: t("nav.settings.prompts"),
-    path: "/prompt-library/prompts",
-  },
-  {
-    title: t("nav.settings.knowledge-base"),
-    path: "/prompt-library/knowledge-base",
-  },
-  {
-    title: t("nav.settings.categories"),
-    path: "/prompt-library/categories",
+    title: t("nav.text-assistant"),
+    isOpened: navState[`admin-menu-id-0`] ?? false,
+    items: [
+      {
+        title: t("nav.settings.prompts"),
+        path: "/prompt-library/prompts",
+      },
+      {
+        title: t("nav.settings.knowledge-base"),
+        path: "/prompt-library/knowledge-base",
+      },
+      {
+        title: t("nav.settings.categories"),
+        path: "/prompt-library/categories",
+      },
+    ],
   },
 ];
 
@@ -246,18 +253,27 @@ if (auth.hasFeature(Astro.locals, TenantFeature.AudioToText)) {
 }
 
 if (auth.isAdmin(Astro.locals) || auth.isSuperAdmin(Astro.locals)) {
-  settingsItems.push({
-    title: t("user.user-management"),
-    path: "/user-management",
-  });
-  settingsItems.push({
-    title: t("nav.subscription"),
-    path: "/settings/subscription",
-  });
-  settingsItems.push({
-    title: t("nav.usage"),
-    path: `/billing/usage`,
-  });
+  settingsItems.push(
+    {
+      title: t("user.user-management"),
+      path: "/user-management",
+    },
+    {
+      title: t("nav.organization-settings"),
+      isOpened: navState[`admin-menu-id-1`] ?? false,
+      items: [
+        {
+          title: t("nav.subscription"),
+          path: "/settings/subscription",
+        },
+        {
+          title: t("nav.usage"),
+          path: `/billing/usage`,
+        },
+      ],
+    },
+  );
+
   adminMenus.push({
     title: t("nav.settings"),
     icon: svgIcons.menuSettings,
@@ -285,7 +301,7 @@ if (auth.isSuperAdmin(Astro.locals)) {
       },
       {
         title: t("nav.system-config"),
-        isOpened: navState[`admin-menu-id-1`] ?? false,
+        isOpened: navState[`super-admin-menu-id-1`] ?? false,
         items: [
           {
             title: t("nav.settings.instructions"),
@@ -299,7 +315,7 @@ if (auth.isSuperAdmin(Astro.locals)) {
       },
       {
         title: t("nav.reports"),
-        isOpened: navState[`admin-menu-id-2`] ?? false,
+        isOpened: navState[`super-admin-menu-id-2`] ?? false,
         items: [
           {
             title: t("nav.usage-per-tenant"),
@@ -640,7 +656,7 @@ const modules = [...menuItems];
           />
         )
       }
-      {
+      <!-- {
         adminMenus.map((mod, index) => (
           <li class="active:bg-transparent">
             <details
@@ -669,6 +685,67 @@ const modules = [...menuItems];
                   {mod.items?.map((sub) => (
                     <li class="pl-1 active:bg-transparent">
                       <MenuItem {...sub} />
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </details>
+            {index < adminMenus.length - 1 && (
+              <div
+                class={`mx-6 my-1 pointer-events-none ${isNavCollapsed ? "hidden" : ""}`}
+              />
+            )}
+          </li>
+        ))
+      } -->
+
+      {
+        adminMenus.map((mod, index) => (
+          <li class="active:bg-transparent">
+            <details
+              data-id={`admin-menu`}
+              open={mod.isOpened}
+              class="active:bg-transparent"
+            >
+              <summary
+                class={
+                  isNavCollapsed
+                    ? "tooltip tooltip-right flex justify-center"
+                    : ""
+                }
+                data-tip={isNavCollapsed ? mod.title : ""}
+              >
+                <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
+                  {mod.icon && <Fragment set:html={mod.icon} />}
+                </div>
+                <span class={isNavCollapsed ? "hidden" : ""}>{mod.title}</span>
+              </summary>
+              {"items" in mod && (
+                <ul
+                  class={`active:bg-transparent ${isNavCollapsed ? "hidden" : ""}`}
+                >
+                  {mod.items?.map((sub, _index) => (
+                    <li class="pl-1 active:bg-transparent">
+                      {sub.items ? (
+                        <details
+                          data-id={`admin-menu-id-${_index}`}
+                          open={sub.isOpened}
+                          class="active:bg-transparent"
+                        >
+                          <summary>{sub.title}</summary>
+                          {sub.items.length > 0 && (
+                            <ul class="active:bg-transparent">
+                              {sub.items.map((sub1: any) => (
+                                <li class="pl-1 active:bg-transparent">
+                                  <MenuItem {...sub1} />
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </details>
+                      ) : (
+                        <MenuItem {...sub} />
+                      )}
                     </li>
                   ))}
                 </ul>
@@ -719,7 +796,7 @@ const modules = [...menuItems];
                     <li class="pl-1 active:bg-transparent">
                       {sub.items ? (
                         <details
-                          data-id={`admin-menu-id-${_index}`}
+                          data-id={`super-admin-menu-id-${_index}`}
                           open={sub.isOpened}
                           class="active:bg-transparent"
                         >
@@ -779,7 +856,7 @@ const modules = [...menuItems];
         element.addEventListener(
           "toggle",
           () => updateNavState(detailsId, element.open),
-          { passive: true }
+          { passive: true },
         );
       }
     }
@@ -813,13 +890,13 @@ const modules = [...menuItems];
         selectorGroups.logo.classList.toggle("hidden", newCollapsed);
 
       selectorGroups.textSpans.forEach((el) =>
-        el.classList.toggle("hidden", newCollapsed)
+        el.classList.toggle("hidden", newCollapsed),
       );
       selectorGroups.subMenus.forEach((el) =>
-        el.classList.toggle("hidden", newCollapsed)
+        el.classList.toggle("hidden", newCollapsed),
       );
       selectorGroups.spacers.forEach((el) =>
-        el.classList.toggle("hidden", newCollapsed)
+        el.classList.toggle("hidden", newCollapsed),
       );
 
       selectorGroups.summaries.forEach((summary) => {
@@ -837,11 +914,11 @@ const modules = [...menuItems];
       // Update accessibility labels
       toggleBtn.setAttribute(
         "aria-label",
-        newCollapsed ? "Expand navigation" : "Collapse navigation"
+        newCollapsed ? "Expand navigation" : "Collapse navigation",
       );
       toggleBtn.setAttribute(
         "title",
-        newCollapsed ? "Expand navigation" : "Collapse navigation"
+        newCollapsed ? "Expand navigation" : "Collapse navigation",
       );
 
       // Update icon
