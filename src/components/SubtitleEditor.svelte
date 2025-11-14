@@ -29,6 +29,10 @@
             assContent: string;
             srtContent: string;
             isBothFormats: boolean;
+          }
+        | {
+            content: string;
+            format: 'srt' | 'ass';
           },
     ) => void;
     onClose?: () => void;
@@ -624,7 +628,7 @@
   function exportAsASS() {
     const assContent = generateASSContent(dialogues);
     if (onSave) {
-      onSave(assContent);
+      onSave({ content: assContent, format: 'ass' as const });
     }
     statusText = t("subtitle-editor.exported-ass");
     setTimeout(() => (statusText = ""), 3000);
@@ -633,7 +637,7 @@
   function exportAsSRT() {
     const srtContent = generateSRTContent(dialogues);
     if (onSave) {
-      onSave(srtContent);
+      onSave({ content: srtContent, format: 'srt' as const });
     }
     statusText = t("subtitle-editor.exported-srt");
     setTimeout(() => (statusText = ""), 3000);

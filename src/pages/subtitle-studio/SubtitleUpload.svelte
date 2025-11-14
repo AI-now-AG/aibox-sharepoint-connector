@@ -164,7 +164,8 @@
   function handleSubtitleSave(
     content:
       | string
-      | { assContent: string; srtContent: string; isBothFormats: boolean },
+      | { assContent: string; srtContent: string; isBothFormats: boolean }
+      | { content: string; format: 'srt' | 'ass' },
   ) {
     try {
       function getEditedFileName(url: string | undefined, fallback: string, originalFileName?: string) {
@@ -174,9 +175,11 @@
           if (dotIdx === -1) return originalFileName + "_edited";
           return originalFileName.slice(0, dotIdx) + "_edited" + originalFileName.slice(dotIdx);
         }
-        
+
         if (!url) return fallback;
-        const parts = url.split("/");
+        // Remove query parameters from URL before extracting filename
+        const urlWithoutQuery = url.split("?")[0];
+        const parts = urlWithoutQuery.split("/");
         const orig = parts[parts.length - 1] || fallback;
         const dotIdx = orig.lastIndexOf(".");
         if (dotIdx === -1) return orig + "_edited";
@@ -197,7 +200,7 @@
       }
 
       if (typeof content === "string") {
-        // Single format export
+        // Legacy: Single format export (backward compatibility)
         let filename = "edited-subtitles.srt";
         if (assFileUrl) {
           filename = getEditedFileName(assFileUrl, "edited-subtitles.ass", originalAssFileName);
@@ -205,7 +208,24 @@
           filename = getEditedFileName(srtFileUrl, "edited-subtitles.srt", originalSrtFileName);
         }
         downloadFile(content, filename);
-      } else if (content.isBothFormats) {
+      } else if ('format' in content && (content.format === 'ass' || content.format === 'srt')) {
+        // New: Single format export with explicit format specification
+        const ext = content.format;
+        const defaultFilename = `edited-subtitles.${ext}`;
+        let filename = defaultFilename;
+
+        // Determine source URL and original filename based on format
+        const sourceUrl = ext === 'ass' ? assFileUrl : srtFileUrl;
+        const originalName = ext === 'ass' ? originalAssFileName : originalSrtFileName;
+
+        if (sourceUrl) {
+          filename = getEditedFileName(sourceUrl, defaultFilename, originalName);
+          if (!filename.toLowerCase().endsWith(`.${ext}`)) {
+            filename = `${filename}.${ext}`;
+          }
+        }
+        downloadFile(content.content, filename);
+      } else if ('isBothFormats' in content && content.isBothFormats) {
         // Both formats export
         // Get filenames for both formats, handling cases where only one URL exists
         let assName: string;
@@ -219,9 +239,10 @@
           assName = baseName + "_edited.ass";
           srtName = baseName + "_edited.srt";
         } else if (assFileUrl || srtFileUrl) {
-          // Extract from URL
+          // Extract from URL (remove query parameters first)
           const sourceUrl = assFileUrl || srtFileUrl;
-          const parts = sourceUrl!.split("/");
+          const urlWithoutQuery = sourceUrl!.split("?")[0];
+          const parts = urlWithoutQuery.split("/");
           const orig = parts[parts.length - 1];
           const baseName = getBaseFilename(orig);
           assName = baseName + "_edited.ass";
