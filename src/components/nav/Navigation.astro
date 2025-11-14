@@ -245,7 +245,11 @@ const settingsItems: Array<any> = [
   },
 ];
 
-if (auth.hasFeature(Astro.locals, TenantFeature.AudioToText)) {
+const hasAudioToTextFeature = auth.hasFeature(
+  Astro.locals,
+  TenantFeature.AudioToText,
+);
+if (hasAudioToTextFeature) {
   settingsItems.push({
     title: t("nav.settings.audio"),
     path: "/settings/transcription",
@@ -260,7 +264,8 @@ if (auth.isAdmin(Astro.locals) || auth.isSuperAdmin(Astro.locals)) {
     },
     {
       title: t("nav.organization-settings"),
-      isOpened: navState[`admin-menu-id-1`] ?? false,
+      isOpened:
+        navState[`admin-menu-id-${hasAudioToTextFeature ? 3 : 2}`] ?? false,
       items: [
         {
           title: t("nav.subscription"),
