@@ -111,7 +111,8 @@
       try {
         loading = true;
         userData = { ...userData, roles: [role] };
-        const { error } = await actions.user.create(userData);
+        const { error, data: createdUser } =
+          await actions.user.create(userData);
         loading = false;
         if (error) {
           showAlert(error);
@@ -120,7 +121,9 @@
             message: t("user.create-successful"),
             type: "success",
           });
-          window.location.href = "/user-management";
+          // window.location.href = "/user-management";
+          const { insertedId = "" } = createdUser;
+          window.location.href = "/user-management/" + insertedId;
         }
       } catch (error) {
         showAlert(error);
@@ -142,7 +145,10 @@
             message: t("user.update-successful"),
             type: "success",
           });
-          window.location.href = "/user-management";
+          // window.location.href = "/user-management";
+          setTimeout(() => {
+            window.location.reload();
+          }, 10);
         }
       } catch (error) {
         showAlert(error);
@@ -211,9 +217,7 @@
   <div class="flex items-center pt-5 pb-2">
     <button
       class="mr-4"
-      onclick={() => {
-        window.history.back();
-      }}
+      onclick={() => (window.location.href = "/user-management")}
     >
       {@html svgIcons.back}
     </button>
@@ -232,9 +236,7 @@
       </button>
       <button
         class="btn btn-outline"
-        onclick={() => {
-          window.history.back();
-        }}
+        onclick={() => (window.location.href = "/user-management")}
       >
         {t("common.cancel")}
       </button>
