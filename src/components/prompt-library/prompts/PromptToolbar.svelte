@@ -7,9 +7,10 @@
 
   interface Props {
     isEditable?: boolean;
+    showImportExport?: boolean;
   }
 
-  let { isEditable = false }: Props = $props();
+  let { showImportExport = true, isEditable = false }: Props = $props();
 
   const t = useTranslations();
 
@@ -22,7 +23,9 @@
 </script>
 
 <div class="flex gap-2">
-  <ImportExport />
+  {#if showImportExport}
+    <ImportExport />
+  {/if}
 
   <button
     class="btn btn-outline font-normal grow-0"
