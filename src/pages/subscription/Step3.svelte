@@ -32,6 +32,10 @@
   let street = $state(initBillingInfo?.street ?? "");
   let zipCode = $state(initBillingInfo?.zipCode ?? "");
   let location = $state(initBillingInfo?.location ?? "");
+
+  let contactPhone = $state(initBillingInfo?.contactPhone ?? "");
+  let contactName = $state(initBillingInfo?.contactName ?? "");
+
   let billingEmail = $state(initBillingInfo?.billingEmail ?? "");
   let billingMethod = $state(
     initBillingInfo?.billingMethod ?? BillingMethod.MonthlyInvoice,
@@ -71,6 +75,16 @@
     }
     if (!location) {
       showAlert(t("subscription.validate-empty-location-message"));
+      return false;
+    }
+
+    if (!contactPhone) {
+      showAlert(t("subscription.validate-empty-contact-phone-message"));
+      return false;
+    }
+
+    if (!contactName) {
+      showAlert(t("subscription.validate-empty-contact-name-message"));
       return false;
     }
 
@@ -115,6 +129,8 @@
         street,
         zipCode,
         location,
+        contactPhone,
+        contactName,
         billingEmail,
         billingMethod,
       });
@@ -270,6 +286,40 @@
           placeholder={t("subscription.location-place-holder")}
           inputChange={(event: any) => {
             location = event.value;
+          }}
+          containerClasses="h-[56px] shadow-lg"
+          labelClasses="text-sm"
+          classes="text-base"
+        />
+      </div>
+    </div>
+
+    <div
+      class="block md:flex lg:flex flex-row md:space-x-8 space-x-0 lg:space-x-8"
+    >
+      <div class="flex-1 flex flex-col mb-4">
+        <Input
+          id="contact-phone"
+          label={t("subscription.contact-phone") + " *"}
+          value={contactPhone}
+          placeholder={t("subscription.contact-phone-placeholder")}
+          inputChange={(event: any) => {
+            contactPhone = event.value;
+          }}
+          containerClasses="h-[56px] shadow-lg"
+          labelClasses="text-sm"
+          classes="text-base"
+        />
+      </div>
+
+      <div class="flex-1 flex flex-col mb-4">
+        <Input
+          id="contact-name"
+          label={t("subscription.contact-name") + " *"}
+          value={contactName}
+          placeholder={t("subscription.contact-name-placeholder")}
+          inputChange={(event: any) => {
+            contactName = event.value;
           }}
           containerClasses="h-[56px] shadow-lg"
           labelClasses="text-sm"

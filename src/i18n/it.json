@@ -654,5 +654,11 @@
   "tenant.posthog": "Posthog (tracking, user feeback and survey)",
   "user.super-user": "Super User",
   "nav.text-assistant": "Business Assistants",
-  "nav.organization-settings": "Organization Settings"
+  "nav.organization-settings": "Organization Settings",
+  "subscription.contact-phone": "Contact Phone",
+  "subscription.contact-phone-placeholder": "+84 983 688 507",
+  "subscription.contact-name": "Contact Name",
+  "subscription.contact-name-placeholder": "Alex",
+  "subscription.validate-empty-contact-phone-message": "Please input your contact phone  ",
+  "subscription.validate-empty-contact-name-message": "Please input your contact name "
 }
