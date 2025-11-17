@@ -8,6 +8,7 @@ export interface TranscribeRequest {
   tenantId: string;
   userId: string;
   category?: AudioCategory;
+  subtitleConfig?: SubtitleConfig;
   selectedFileFormat?: FileFormat[];
   isShowImprovedTextPreview?: boolean;
   apiKeyProvider?: ApiKeyProvider;
@@ -29,6 +30,12 @@ export interface TranscribeRequest {
   maxSpeakers?: number;
   languageLocales?: string[];
   usecaseId?: string;
+}
+
+export interface SubtitleConfig {
+  useSentenceBasedFlow: boolean,
+  maxCharsPerLine: number,
+  maxLinesPerBlock: number,
 }
 
 export enum FileFormat {

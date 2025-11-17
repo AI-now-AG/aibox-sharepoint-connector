@@ -390,11 +390,11 @@
   "tenant.subtitle-elevenLabs.title": "ElevenLabs",
   "common.next": "Weiter",
   "subscription.select": "Auswählen",
-  "subscription.step1": "Wähle dein Abo",
-  "subscription.step2": "aibox Einstellungen",
+  "subscription.step1": "aibox Einstellungen",
+  "subscription.step2": "Wähle dein Abo",
   "subscription.step3": "Rechnungsdaten",
   "subscription.step4": "Erstelle deine aibox",
-  "subscription.choose-your-plan": "Wähle dein Abo",
+  "subscription.choose-your-plan": "Wähle dein Abo und teste 14 Tage kostenlos",
   "subscription.choose-your-plan-description": "Wähle deinen Plan, welcher zu deinen Bedürfnissen passt. Weitere Informationen findest du <a href=\"https://aibox.ainow.ch/preise\" target=\"_blank\" class=\"text-[#491EFF] font-bold\">hier</a>",
   "subscription.audio-to-text-options": "Audio und Untertitel Optionen",
   "subscription.per-month": "pro Monat",
@@ -654,5 +654,12 @@
   "tenant.posthog": "Posthog (Tracking, Feedback und Umfragen)",
   "user.super-user": "Super User",
   "nav.text-assistant": "Business Assistenten",
-  "nav.organization-settings": "Organisation"
+  "nav.organization-settings": "Organisation",
+  "subscription.contact-phone": "Telefonnummer",
+  "subscription.contact-phone-placeholder": "+41 43 888 77 64",
+  "subscription.contact-name": "Kontaktperson",
+  "subscription.contact-name-placeholder": "Max Muster",
+  "subscription.validate-empty-contact-phone-message": "Bitte Telefonnummer erfassen",
+  "subscription.validate-empty-contact-name-message": "Bitte Kontaktnamen erfassen",
+  "subscription.validate-invalid-contact-phone-message": "Bitte gültige Telefonnummer erfassen"
 }
