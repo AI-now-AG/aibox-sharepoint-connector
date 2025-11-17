@@ -16,7 +16,7 @@
     AudioOptionId,
     BillingMethod,
   } from "$types/Subscription";
-  import { isValidEmail } from "$utils/common";
+  import { isValidEmail, isValidPhone } from "$utils/common";
 
   interface Props {
     accountEmail: string;
@@ -80,6 +80,11 @@
 
     if (!contactPhone) {
       showAlert(t("subscription.validate-empty-contact-phone-message"));
+      return false;
+    }
+
+    if (!isValidPhone(contactPhone)) {
+      showAlert(t("subscription.validate-invalid-contact-phone-message"));
       return false;
     }
 
