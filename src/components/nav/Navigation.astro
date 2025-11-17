@@ -11,6 +11,7 @@ import { ApiKeyProvider } from "$types/TenantFeature";
 import TranscriptionModel from "$data/models/transcription.model";
 import { transformRawData } from "$utils/transformRawData";
 import { cached } from "$utils/cache";
+import ThemeLogo from "$components/ThemeLogo.astro";
 
 const t = useTranslations();
 
@@ -345,32 +346,7 @@ const modules = [...menuItems];
 >
   <div class="mt-3 pl-6 flex items-center justify-between">
     <a href="/" class={isNavCollapsed ? "hidden" : ""}>
-      <img
-        src="/aibox-logo-text.svg"
-        alt="Aibox Default Logo"
-        class="h-8 block in-data-[theme=weihnachtsmann]:hidden in-data-[theme=somedia]:hidden in-data-[theme=light]:hidden in-data-[theme=dark]:hidden"
-      />
-
-      <img
-        src="/logo-aibox-christmasedition.svg"
-        alt="Weihnachtsmann Logo"
-        class="h-8 hidden in-data-[theme=weihnachtsmann]:block"
-      />
-      <img
-        src="/soki-somedia.png"
-        alt="somedia Logo"
-        class="h-8 hidden in-data-[theme=somedia]:block"
-      />
-      <img
-        src="/aibox-logo-text.svg"
-        alt="light logo"
-        class="logo-light h-8 w-auto hidden in-data-[theme=light]:block"
-      />
-      <img
-        src="/aibox-logo-text-dark.svg"
-        alt="dark logo"
-        class="logo-dark h-8 hidden in-data-[theme=dark]:block"
-      />
+      <ThemeLogo from="navigation" />
     </a>
 
     <!-- Toggle Button -->
