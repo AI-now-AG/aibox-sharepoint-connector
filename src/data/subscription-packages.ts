@@ -101,7 +101,7 @@ export const SubscriptionPackages = {
         en: "Subtitle Studio Plus",
         de: "Untertitel Studio Plus",
       },
-      price: 150, // Change from [65] to [150]
+      price: 300, // Change from [150] to [300] => https://ainow.atlassian.net/browse/AINOW-1571
       currency: "CHF",
       priceText: "150 CHF / pro Monat",
     },

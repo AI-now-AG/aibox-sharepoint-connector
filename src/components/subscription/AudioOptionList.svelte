@@ -9,7 +9,6 @@
     SubscriptionPackages.audioOptions.AudioBasisAddOnLarge, // [Audio to Text Large]
   ];
   const subtitleStudioOptions = [
-    SubscriptionPackages.audioOptions.AudioBasisAddOnSubtitle, // [Subtitle Studio Basic]
     SubscriptionPackages.audioOptions.AudioPremium, // [Subtitle Studio Plus]
   ];
 
