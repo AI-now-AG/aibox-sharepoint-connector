@@ -1,108 +1,69 @@
 <script lang="ts">
-  import AudioOptionList from "$components/subscription/AudioOptionList.svelte";
-  import SubsciptionSteps from "$components/subscription/SubsciptionSteps.svelte";
-  import SubscriptionPackageList from "$components/subscription/SubscriptionPackageList.svelte";
-  import { useTranslations } from "$i18n/utils";
-  import { SubscriptionPackages } from "$data/subscription-packages";
   import AlertDialog from "$components/AlertDialog.svelte";
-  import {
-    storeAudioOptions,
-    storePlan,
-    type AudioOption,
-    type SubscriptionPlan,
-    subscription,
-  } from "$stores/subscription";
+  import Input from "$components/form/Input.svelte";
+  import SubsciptionSteps from "$components/subscription/SubsciptionSteps.svelte";
+  import { useTranslations } from "$i18n/utils";
+  import Dropdown from "$components/subscription/Dropdown.svelte";
+  import { storeOrganizationInfo, subscription } from "$stores/subscription";
+  import { Languges } from "$types/TenantFeature";
 
   interface Props {
     defaultLanguage?: string;
+    categories?: any[];
   }
-  let { defaultLanguage = "en" }: Props = $props();
+  let { defaultLanguage = "en", categories = $bindable([]) }: Props = $props();
   const t = useTranslations(defaultLanguage);
 
-  let totalPrice: any = $state("");
+  const initOrganizationInformation = $subscription.organizationInfo;
 
-  const initSelectedPackageId = $subscription.plan?.id || "";
-  let initSelectedAudioOptionIds: string[] =
-    $subscription.audioOptions?.map((option) => {
-      return option.id;
-    }) || [];
-  let selectedPackageId = $state(initSelectedPackageId);
-  let selectedAudioOptionIds: string[] = $state(initSelectedAudioOptionIds);
+  let selectedLanguage: string = $state(
+    initOrganizationInformation?.defaultLanguage ?? "de",
+  );
+  let organizationName = $state(
+    initOrganizationInformation?.organizationName ?? "",
+  );
+  let selectedCategories: string[] = $state(
+    initOrganizationInformation?.useCases ?? [],
+  );
 
   let alertModal: HTMLDialogElement | undefined = $state();
   let alertMessage = $state("");
 
-  // Calculate total price (include package and audio options)
-  $effect(() => {
-    let packagePrice = 0;
-    let audioOptionsTotalPrice = 0;
-
-    // Get package price
-    if (selectedPackageId) {
-      let selectedPackage =
-        SubscriptionPackages.plan[
-          selectedPackageId as keyof typeof SubscriptionPackages.plan
-        ];
-      if (selectedPackage) {
-        packagePrice = selectedPackage?.price || 0;
-      }
-    }
-
-    // Get audio options price
-    if (selectedAudioOptionIds.length > 0) {
-      selectedAudioOptionIds.forEach((audioOptionId) => {
-        let audioOption =
-          SubscriptionPackages.audioOptions[
-            audioOptionId as keyof typeof SubscriptionPackages.audioOptions
-          ];
-        if (audioOption) {
-          audioOptionsTotalPrice += audioOption?.price || 0;
-        }
-      });
-    }
-
-    totalPrice = packagePrice + audioOptionsTotalPrice;
-  });
+  $inspect(selectedLanguage);
 
   function showAlert(message: any) {
     alertMessage = message;
     alertModal?.showModal();
   }
 
+  function validateForm() {
+    if (!organizationName) {
+      showAlert(t("subscription.validate-empty-organization-name-message"));
+      return false;
+    }
+
+    if (!selectedLanguage) {
+      showAlert(t("subscription.validate-empty-language-message"));
+      return false;
+    }
+
+    if (selectedCategories.length === 0) {
+      showAlert(t("subscription.validate-empty-categories-message"));
+      return false;
+    }
+
+    return true;
+  }
+
   function handleNext() {
-    if (!selectedPackageId) {
-      showAlert(t("subscription.please-select-package"));
-      return;
+    if (validateForm()) {
+      storeOrganizationInfo({
+        organizationName: organizationName,
+        defaultLanguage: selectedLanguage || "de",
+        useCases: selectedCategories,
+      });
+      window.location.href = "/subscription/step2";
     }
-
-    const selectedPackage: SubscriptionPlan = {
-      ...SubscriptionPackages.plan[
-        selectedPackageId as keyof typeof SubscriptionPackages.plan
-      ],
-      id: selectedPackageId,
-    };
-    if (selectedPackage) {
-      storePlan(selectedPackage);
-    }
-
-    let selectedAudioOptions: AudioOption[] = [];
-    if (selectedAudioOptionIds?.length > 0) {
-      for (let i = 0; i < selectedAudioOptionIds.length; i++) {
-        const id = selectedAudioOptionIds[i];
-        const selectedOption: AudioOption = {
-          ...SubscriptionPackages.audioOptions[
-            id as keyof typeof SubscriptionPackages.audioOptions
-          ],
-          id: id,
-        };
-        if (selectedOption) {
-          selectedAudioOptions.push(selectedOption);
-        }
-      }
-    }
-    storeAudioOptions(selectedAudioOptions);
-
-    window.location.href = "/subscription/step2";
   }
 </script>
 
@@ -110,36 +71,81 @@
   <div
     class="bg-[#491EFF] p-4 rounded-lg mb-6 flex md:hidden lg:hidden items-center justify-center"
   >
-    <SubsciptionSteps currentStep={1} {defaultLanguage} />
-  </div>
-  <!-- Pakage Plan -->
-  <h1 class="font-sanns text-3xl font-bold text-black mt-2">
-    {t("subscription.choose-your-plan")}
-  </h1>
-  <p class="font-sans text-base font-medium text-gray-600 mt-6 mb-10">
-    {@html t("subscription.choose-your-plan-description")}
-  </p>
-  <div
-    class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-10 text-black"
-  >
-    <SubscriptionPackageList bind:selectedPackageId {defaultLanguage} />
+    <SubsciptionSteps currentStep={2} {defaultLanguage} />
   </div>
 
-  <!-- Audio to Text Options -->
   <h1 class="font-sanns text-3xl font-bold text-black mt-2">
-    {t("subscription.audio-to-text-options")}
+    {t("subscription.customize-your-aibox")}
   </h1>
-  <p class="font-sans text-base font-medium text-gray-600 mt-6 mb-6">
-    {@html t("subscription.choose-your-plan-description")}
+  <p class="font-sans text-base font-medium text-gray-600 mt-6 mb-10">
+    {t("subscription.customize-your-aibox-description")}
   </p>
-  <div class="mt-4">
-    <AudioOptionList bind:selectedAudioOptionIds {defaultLanguage} />
+
+  <!-- Form -->
+  <div class="w-full mx-auto">
+    <div
+      class="block md:flex lg:flex flex-row md:space-x-8 space-x-0 lg:space-x-8"
+    >
+      <div class="flex-1 flex flex-col mb-4">
+        <Input
+          id="organization-name"
+          label={t("subscription.organization-name")}
+          value={organizationName}
+          placeholder={t("subscription.organization-name-placeholder")}
+          inputChange={(event: any) => {
+            organizationName = event.value;
+          }}
+          containerClasses="h-[56px] shadow-xl"
+          labelClasses="text-sm"
+          classes="text-base"
+        />
+      </div>
+
+      <div class="flex-1 flex flex-col mb-4">
+        <Dropdown
+          label={`${t("subscription.language")}`}
+          placeholder={t("tenant.german-language")}
+          options={Languges}
+          bind:value={selectedLanguage}
+        />
+      </div>
+    </div>
+  </div>
+
+  <br class="mt-10" />
+  <div class="font-sans font-bold text-base mt-10 mb-6">
+    {t("subscription.choose-categories")}
+  </div>
+  <br class="mb-6" />
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 mb-10 text-black">
+    {#each categories as category}
+      {#if selectedCategories.includes(category.value)}
+        <button
+          class="btn btn-primary w-full h-[56px] shadow-xl py-2"
+          onclick={() => {
+            selectedCategories = selectedCategories.filter(
+              (item) => item !== category.value,
+            );
+          }}
+          ><span class="w-full text-left py-2">
+            {category.title}
+          </span></button
+        >
+      {:else}
+        <button
+          class="btn btn-primary w-full h-[56px] shadow-xl bg-white text-gray-600 py-2 border-0"
+          onclick={() => {
+            selectedCategories.push(category.value);
+          }}
+        >
+          <span class="w-full text-left py-2"> {category.title} </span></button
+        >
+      {/if}
+    {/each}
   </div>
 
   <div class="w-full flex items-center justify-end rounded-lg p-4">
-    <p class="text-gray-600 text-right mr-4 font-bold font-inter text-sm">
-      {t("subscription.total-price-for-plan", { total: totalPrice })}
-    </p>
     <button
       class="btn btn-active btn-primary min-w-[144px]"
       onclick={() => {
