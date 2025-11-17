@@ -62,7 +62,7 @@
   let isFileDataPresent: boolean = $state(false);
 
   let fileErrorMessage: string = $state("");
-  let selectedFileFormat: FileFormat[] = [FileFormat.ASS];
+  let selectedFileFormat: FileFormat[] = [FileFormat.ASS, FileFormat.SRT];
 
   let standardSubtitlesChecked: boolean = $state(true);
   let showTextPreviewChecked: boolean = $state(true);
@@ -99,6 +99,10 @@
   let maxSpeakers = 20;
 
   let isAudioTagEnabled = $state(false);
+
+  // Subtitle configuration
+  let maxCharsPerLine = $state(36);
+  let maxLinesPerBlock = $state(2);
 
   let confirmModal: HTMLDialogElement | undefined = $state();
 
@@ -169,16 +173,22 @@
       standardSubtitlesChecked = false;
       rawOutputChecked = true;
       txtFileChecked = true;
+      assFileChecked = false;
+      srtFileChecked = false;
     } else if (
       category === AudioCategory.SubtitleLarge ||
       category === AudioCategory.Subtitle11Labs
     ) {
       maxFileSize = 50;
-      // Keep default subtitle format
-      selectedFileFormat = [FileFormat.ASS];
+      // Keep default subtitle format (both ASS and SRT)
+      selectedFileFormat = [FileFormat.ASS, FileFormat.SRT];
+      assFileChecked = true;
+      srtFileChecked = true;
     } else {
-      // Keep default subtitle format for other categories
-      selectedFileFormat = [FileFormat.ASS];
+      // Keep default subtitle format for other categories (both ASS and SRT)
+      selectedFileFormat = [FileFormat.ASS, FileFormat.SRT];
+      assFileChecked = true;
+      srtFileChecked = true;
     }
 
     if ($transcriptStore && transcriptionType) {
@@ -920,6 +930,13 @@
                 type: "error",
                 timeout: 5000,
               });
+              transcriptStore.update((current) =>
+                  current.filter((entry) =>
+                    usecaseId
+                      ? entry.usecaseId !== usecaseId
+                      : entry.type !== transcriptionType,
+                  ),
+              );
               break;
           }
         };
@@ -1028,6 +1045,13 @@
       tenantId: tenant?._id,
       userId: user?.id,
       category: category,
+      ...(category === AudioCategory.SubtitleLarge || category === AudioCategory.Subtitle11Labs) && {
+        subtitleConfig: {
+          useSentenceBasedFlow: true,
+          maxCharsPerLine: maxCharsPerLine,
+          maxLinesPerBlock: maxLinesPerBlock,
+        },
+      },
       selectedFileFormat: selectedFileFormat,
       isShowImprovedTextPreview: showTextPreviewChecked,
       // apiKeyProvider: provider,
@@ -1127,6 +1151,66 @@
       .catch((error) => {
         console.error("Error downloading file:", error);
       });
+  }
+
+  function downloadSpecificFile(fileUrl: string) {
+    if (!fileUrl) {
+      console.error("No file URL provided for download.");
+      return;
+    }
+
+    fetch(fileUrl)
+      .then((response) => response.blob())
+      .then((blob) => {
+        // Determine MIME type based on file extension
+        const fileName = fileUrl.split("/").pop() ?? "";
+        let mimeType = "application/octet-stream";
+        
+        if (fileName.toLowerCase().endsWith(".ass")) {
+          mimeType = "text/x-ssa;charset=utf-8"; // ASS/SSA subtitle format
+        } else if (fileName.toLowerCase().endsWith(".srt")) {
+          mimeType = "application/x-subrip;charset=utf-8"; // SRT subtitle format
+        } else if (fileName.toLowerCase().endsWith(".json")) {
+          mimeType = "application/json;charset=utf-8";
+        } else if (fileName.toLowerCase().endsWith(".txt")) {
+          mimeType = "text/plain;charset=utf-8";
+        }
+
+        const blobUrl = URL.createObjectURL(
+          new Blob([blob], { type: mimeType }),
+        );
+
+        const link = document.createElement("a");
+        link.href = blobUrl;
+        link.target = "_blank";
+        link.download = fileName;
+
+        document.body.appendChild(link);
+        link.click();
+
+        document.body.removeChild(link);
+        URL.revokeObjectURL(blobUrl);
+      })
+      .catch((error) => {
+        console.error("Error downloading file:", error);
+        addToast({
+          message: `Failed to download ${fileUrl.split("/").pop()}`,
+          type: "error",
+          timeout: 3000,
+        });
+      });
+  }
+
+  function downloadBothSubtitles() {
+    if (assFileUrl) {
+      downloadSpecificFile(assFileUrl);
+    }
+    if (srtFileUrl) {
+      // Add slight delay to prevent browser blocking multiple downloads
+      setTimeout(() => {
+        downloadSpecificFile(srtFileUrl);
+      }, 100);
+    }
   }
 
   async function downloadZip() {
@@ -1483,7 +1567,7 @@
                     <div class="flex items-center gap-2 text-sm">
                       <span class="loading loading-spinner loading-sm text-primary"></span>
                       <span class="font-medium">
-                        {isBatchMode ? t("transcription.progress.batch-transcription") : t("transcription.progress.transcription-in-progress")}
+                        {isBatchMode ? t("transcription.progress.batch-transcription") : t("transcription.status.processing")}
                       </span>
                     </div>
 
@@ -1674,11 +1758,10 @@
     </div>
   {/if}
 
-  {#if category === AudioCategory.Subtitle || category === AudioCategory.SubtitleJson || category === AudioCategory.SubtitleLarge || category === AudioCategory.Subtitle11Labs}
+  <!-- {#if category === AudioCategory.Subtitle || category === AudioCategory.SubtitleJson || category === AudioCategory.SubtitleLarge || category === AudioCategory.Subtitle11Labs}
     <div class="bg-base-100 mt-10 p-4 px-6 rounded-xl">
       <div class="grid">
         <h2>{t("audiotools.subtitles.what-output-do-you-need")}</h2>
-        <!-- Standard Subtitles -->
         <div class="form-control py-2">
           <div class="card rounded-box grid py-8">
             <div class="flex flex-row place-items-center gap-8">
@@ -1725,7 +1808,6 @@
                   </label>
                 </div>
               </div>
-              <!-- <div class="basis-1/8">03</div> -->
             </div>
           </div>
           <div><div class="bg-base-200 h-0.5"></div></div>
@@ -1754,8 +1836,6 @@
                   </div>
                 </div>
               </div>
-              <!-- <div class="basis-1/3">02</div>
-              <div class="basis-1/8">03</div> -->
             </div>
           </div>
           {#if category === AudioCategory.Subtitle || category === AudioCategory.SubtitleLarge || category === AudioCategory.Subtitle11Labs}
@@ -1805,14 +1885,13 @@
                     </label>
                   </div>
                 </div>
-                <!-- <div class="basis-1/8">03</div> -->
               </div>
             </div>
           {/if}
         </div>
       </div>
     </div>
-  {/if}
+  {/if} -->
 
   {#if category === AudioCategory.Subtitle11Labs}
     <div class="bg-base-100 mt-10 p-4 px-6 rounded-xl">
@@ -1831,6 +1910,102 @@
             {t("settings.transcription.elevenLabs-audio-tag")}
           </h3>
         </label>
+      </div>
+    </div>
+  {/if}
+
+  {#if category === AudioCategory.SubtitleLarge || category === AudioCategory.Subtitle11Labs}
+    <div class="bg-base-100 mt-10 p-4 px-6 rounded-xl">
+      <div class="flex flex-col gap-4">
+        <h2 class="font-semibold text-lg">Subtitle Configuration</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Max Characters Per Line -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-medium">Max Characters Per Line</span>
+            </label>
+            <div class="join w-full">
+              <input
+                type="number"
+                class="input input-bordered join-item w-full [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                min="20"
+                max="60"
+                bind:value={maxCharsPerLine}
+                placeholder="36"
+              />
+              <div class="join-item flex flex-col border border-l-0 border-base-300 rounded-r-lg">
+                <button
+                  type="button"
+                  class="btn btn-ghost btn-xs h-1/2 rounded-none rounded-tr-lg px-2 min-h-0 border-b border-base-300"
+                  onclick={() => {
+                    if (maxCharsPerLine < 60) maxCharsPerLine += 1;
+                  }}
+                  aria-label="Increment"
+                >
+                  <svg width="12" height="7" viewBox="0 0 12 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1.33341 6L6.00008 1.33333L10.6667 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-ghost btn-xs h-1/2 rounded-none rounded-br-lg px-2 min-h-0"
+                  onclick={() => {
+                    if (maxCharsPerLine > 20) maxCharsPerLine -= 1;
+                  }}
+                  aria-label="Decrement"
+                >
+                  <svg width="12" height="7" viewBox="0 0 12 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10.6666 1L5.99992 5.66667L1.33325 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Max Lines Per Block -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-medium">Max Lines Per Block</span>
+            </label>
+            <div class="join w-full">
+              <input
+                type="number"
+                class="input input-bordered join-item w-full [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                min="1"
+                max="4"
+                bind:value={maxLinesPerBlock}
+                placeholder="2"
+              />
+              <div class="join-item flex flex-col border border-l-0 border-base-300 rounded-r-lg">
+                <button
+                  type="button"
+                  class="btn btn-ghost btn-xs h-1/2 rounded-none rounded-tr-lg px-2 min-h-0 border-b border-base-300"
+                  onclick={() => {
+                    if (maxLinesPerBlock < 4) maxLinesPerBlock += 1;
+                  }}
+                  aria-label="Increment"
+                >
+                  <svg width="12" height="7" viewBox="0 0 12 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1.33341 6L6.00008 1.33333L10.6667 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-ghost btn-xs h-1/2 rounded-none rounded-br-lg px-2 min-h-0"
+                  onclick={() => {
+                    if (maxLinesPerBlock > 1) maxLinesPerBlock -= 1;
+                  }}
+                  aria-label="Decrement"
+                >
+                  <svg width="12" height="7" viewBox="0 0 12 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10.6666 1L5.99992 5.66667L1.33325 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   {/if}
@@ -1928,15 +2103,48 @@
     {/if}
     {#if isTranscipted}
       {#if category !== AudioCategory.AudioPro}
-        {#if zipFileData}
-          <!-- Show Download Zip if zip data exists -->
+        {#if assFileUrl && srtFileUrl}
+          <!-- Both subtitle files available - show dropdown with options (prioritize over zip) -->
+          <div class="dropdown dropdown-start">
+            <div tabindex="0" role="button" class="btn btn-success btn-sm">
+              {@html svgIcons.fileExport} Export
+            </div>
+            <ul
+              tabindex="-1"
+              class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 z-10"
+            >
+              <!-- Download both formats -->
+              <li>
+                <button onclick={downloadBothSubtitles} class="flex items-center gap-2">
+                  {@html svgIcons.fileExport}
+                  <span>{t("subtitle-editor.export-both-formats")}</span>
+                </button>
+              </li>
+              <!-- Download ASS only -->
+              <li>
+                <button onclick={() => downloadSpecificFile(assFileUrl)} class="flex items-center gap-2">
+                  {@html svgIcons.fileExport}
+                  <span>{t("subtitle-editor.ass-only")}</span>
+                </button>
+              </li>
+              <!-- Download SRT only -->
+              <li>
+                <button onclick={() => downloadSpecificFile(srtFileUrl)} class="flex items-center gap-2">
+                  {@html svgIcons.fileExport}
+                  <span>{t("subtitle-editor.srt-only")}</span>
+                </button>
+              </li>
+            </ul>
+          </div>
+        {:else if zipFileData}
+          <!-- Show Download Zip if zip data exists and no individual files -->
           <button class="btn btn-success" onclick={downloadZip}
             >{@html svgIcons.download}{t(
               "transciption.model.cta.download-zip",
             )}</button
           >
         {:else if assFileUrl || srtFileUrl || jsonFileUrl || txtFileUrl}
-          <!-- Show Download Output only if no zip data exists -->
+          <!-- Single file available - direct download button -->
           <button
             class="btn btn-success btn-sm text-base-100"
             onclick={downloadFile}
