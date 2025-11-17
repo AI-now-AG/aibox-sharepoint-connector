@@ -45,10 +45,10 @@ if (step == RoutePath.Step1) {
   });
 }
 
-if (Astro.locals.tenant.is_trial !== true) {
+if (Astro.locals.tenant?.is_trial !== true) {
   return Astro.redirect("/restricted");
 }
-const defaultLanguage = Astro.locals.tenant.default_language || "en";
+const defaultLanguage = Astro.locals?.tenant?.default_language || "en";
 ---
 
 <SubscriptionLayout title={pageTitle}>
@@ -60,7 +60,7 @@ const defaultLanguage = Astro.locals.tenant.default_language || "en";
   {step == RoutePath.Step2 && <Step2 {defaultLanguage} client:load />}
   {
     step == RoutePath.Step3 && (
-      <Step3 accountEmail={user.email} {defaultLanguage} client:load />
+      <Step3 accountEmail={user?.email} {defaultLanguage} client:load />
     )
   }
   {step == RoutePath.Step4 && <Step4 {user} {defaultLanguage} client:load />}
