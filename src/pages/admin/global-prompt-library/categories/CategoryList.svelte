@@ -57,11 +57,11 @@
 
     let result: any;
     if (active == true) {
-      result = await actions.category.activate({
+      result = await actions.globalCategory.activate({
         _id: id,
       });
     } else {
-      result = await actions.category.deactivate({
+      result = await actions.globalCategory.deactivate({
         _id: id,
       });
     }
@@ -77,15 +77,15 @@
         _id: item.id,
       };
     });
-    const newItems = await actions.category.updatePosition(sortedIds);
-    items = newItems.data?.items ?? items;
-    console.log("updated: newItems", newItems);
+    const { data } = await actions.globalCategory.updatePosition(sortedIds);
+    console.log("updated items:", { sortedIds, data });
+    items = data?.items ?? items;
     loading = false;
   }
 
   async function deleteCategory() {
     try {
-      const response = await fetch(`/api/categories.json`, {
+      const response = await fetch(`/api/admin/global-categories.json`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

@@ -10,6 +10,7 @@ import { onboarding } from "./onboarding";
 import { report } from "./report";
 import { configurations } from "./configuration";
 import { cloneMasterTenant } from "./cloneMasterTenant";
+import { globalCategory } from "./globalCategory";
 import { posthog } from "./posthog";
 
 export const server = {
@@ -25,5 +26,6 @@ export const server = {
   report,
   configurations,
   cloneMasterTenant,
+  globalCategory,
   posthog,
 };

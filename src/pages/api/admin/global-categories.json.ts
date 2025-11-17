@@ -2,8 +2,8 @@ import type { APIRoute } from "astro";
 import { ObjectId } from "mongodb";
 import { z } from "zod";
 import slug from "slug";
-import CategoryModel from "$data/models/category.model";
-import type { Category, Group } from "$data/models/category.model";
+import GlobalCategoryModel from "$data/models/globalCategory.model";
+import type { Category, Group } from "$data/models/globalCategory.model";
 
 const GroupParamSchema = z.object({
   _id: z.string().optional(),
@@ -27,10 +27,10 @@ const CategoryParamsSchema = z.object({
 
 export type CategoryParams = z.infer<typeof CategoryParamsSchema>;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const GET: APIRoute = async (ctx) => {
   try {
-    const result = await CategoryModel.listByTenant(ctx.locals.user.tenant_id);
-    const categories = await result.toArray();
+    const categories = await GlobalCategoryModel.list();
     return new Response(
       JSON.stringify(
         categories.map((category) => ({
@@ -57,10 +57,9 @@ export const GET: APIRoute = async (ctx) => {
 export const POST: APIRoute = async (ctx) => {
   const params = await ctx.request.json();
   const data = CreateCategoryParamsSchema.parse(params);
-  const { tenant_id: tenantId } = ctx.locals.user;
 
   // Determine the new position
-  const maxPositionCategory = await CategoryModel.getMaxPosition(tenantId);
+  const maxPositionCategory = await GlobalCategoryModel.getMaxPosition();
   const newPosition = maxPositionCategory
     ? (maxPositionCategory?.position || 0) + 1
     : 1;
@@ -97,7 +96,7 @@ export const POST: APIRoute = async (ctx) => {
   };
 
   try {
-    await CategoryModel.add(newCategory);
+    await GlobalCategoryModel.create(newCategory);
     return new Response(JSON.stringify({ message: "Category added" }), {
       status: 200,
     });
@@ -133,8 +132,7 @@ export const PUT: APIRoute = async (ctx) => {
     return uniqueGroups;
   }, []);
 
-  const newCategory: Category = {
-    ...data,
+  const category: Category = {
     title: data.title,
     groups: Array.from(groups),
     slug: slug(data.title),
@@ -147,7 +145,7 @@ export const PUT: APIRoute = async (ctx) => {
   };
 
   try {
-    await CategoryModel.update(data._id!, newCategory);
+    await GlobalCategoryModel.update(data._id!, category);
 
     return new Response(
       JSON.stringify({
@@ -176,7 +174,7 @@ export const DELETE: APIRoute<CategoryParams> = async (ctx) => {
     const data = CategoryParamsSchema.parse(params);
 
     if (data._id) {
-      const result = await CategoryModel.remove(data._id.toString());
+      const result = await GlobalCategoryModel.remove(data._id.toString());
       return new Response(JSON.stringify(result), { status: 200 });
     }
 

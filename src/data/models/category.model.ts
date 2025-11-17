@@ -65,8 +65,7 @@ export default {
   list: async () =>
     collection
       .find<Document<Category>>({})
-      .sort({ created_at: 1 })
-      .sort({ created_at: 1 }),
+      .sort({ position: 1, created_at: 1 }),
 
   listByTenant: async (tenantId: string | ObjectId) => {
     const _tenantId = toObjectId(tenantId);

@@ -56,18 +56,15 @@ export default {
     return collection.deleteOne({ _id });
   },
 
-  list: async () =>
-    collection
+  list: async () => {
+    return collection
       .find<Document<Category>>({})
-      .sort({ created_at: 1 })
-      .sort({ created_at: 1 })
-      .toArray(),
+      .sort({ position: 1, created_at: 1 })
+      .toArray();
+  },
 
-  get: async (id: string): Promise<Category | null> => {
-    if (!ObjectId.isValid(id)) {
-      return null;
-    }
-    const _id = new ObjectId(id);
+  get: async (id: string | ObjectId): Promise<Category | null> => {
+    const _id = toObjectId(id);
     const doc = await collection.findOne<Document<Category>>({ _id });
     if (!doc) return null;
     return doc;

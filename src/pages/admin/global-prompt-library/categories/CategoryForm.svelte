@@ -4,12 +4,13 @@
   import { useTranslations } from "$i18n/utils";
   import { addToast } from "$stores/toast";
   import { svgIcons } from "$assets/icons";
-  import GroupList, { type GroupItem } from "./GroupList.svelte";
+  import GroupList, {
+    type GroupItem,
+  } from "$components/prompt-library/categories/GroupList.svelte";
   import { preventDefault } from "$utils/common";
   import { tenant } from "$stores";
   import { EventName, ScreenName } from "$types/Posthog";
   import { posthogClientCapture } from "$utils/posthogClient";
-
   const t = useTranslations();
 
   /**
@@ -58,7 +59,7 @@
       };
 
       try {
-        const response = await fetch("/api/categories.json", {
+        const response = await fetch("/api/admin/global-categories.json", {
           method: category ? "PUT" : "POST",
           body: JSON.stringify(newCategory),
           headers: {
