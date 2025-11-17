@@ -78,13 +78,10 @@ export const POST: APIRoute = async (ctx) => {
 
   // Create the new category
   const now = new Date();
-  const newCategory: Category = {
-    ...data,
+  const newCategory: Partial<Category> = {
     title: data.title,
     groups: Array.from(groups),
     slug: slug(data.title),
-    tenant_id: tenantId,
-    creator_id: ctx.locals.user.id,
     position: newPosition,
     created_at: now,
     updated_at: now,
@@ -132,7 +129,7 @@ export const PUT: APIRoute = async (ctx) => {
     return uniqueGroups;
   }, []);
 
-  const category: Category = {
+  const category: Partial<Category> = {
     title: data.title,
     groups: Array.from(groups),
     slug: slug(data.title),

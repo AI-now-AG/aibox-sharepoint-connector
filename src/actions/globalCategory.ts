@@ -49,10 +49,10 @@ export const globalCategory = {
           const updateResult = await GlobalCategoryModel.update(item._id, {
             position: index,
           });
-          items.push(updateResult);
+          items.push(updateResult as Category);
           updated = true;
         } else {
-          items.push(currentItem);
+          items.push(currentItem as Category);
         }
       }
 

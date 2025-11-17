@@ -31,7 +31,10 @@ const collection = db.collection("global_categories");
 
 export default {
   create: async (category: Partial<Omit<Category, "_id">>) => {
-    const validated = CategoryGroupSchema.parse(category);
+    const validated = CategoryGroupSchema.parse({
+      _id: new ObjectId(),
+      ...category,
+    });
     const doc = {
       active: true,
       position: 0,
