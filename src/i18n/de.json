@@ -659,6 +659,7 @@
   "subscription.contact-phone-placeholder": "+84 983 688 508",
   "subscription.contact-name": "Contact Name",
   "subscription.contact-name-placeholder": "Alex",
-  "subscription.validate-empty-contact-phone-message": "Please input your contact phone  ",
-  "subscription.validate-empty-contact-name-message": "Please input your contact name "
+  "subscription.validate-empty-contact-phone-message": "Bitte geben Sie Ihre Kontakttelefonnummer ein.",
+  "subscription.validate-empty-contact-name-message": "Bitte geben Sie Ihren Kontaktnamen ein.",
+  "subscription.validate-invalid-contact-phone-message": "Bitte geben Sie eine gültige Telefonnummer ein."
 }
