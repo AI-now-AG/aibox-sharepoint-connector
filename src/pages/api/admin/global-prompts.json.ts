@@ -33,19 +33,21 @@ const PromptParamsSchema = z.object({
 
 export type PromptParams = z.infer<typeof PromptParamsSchema>;
 
-const instructions = `You are a helpful assistant who writes helpful descriptions of prompts for users that will use these prompts for a UI:
-* You receive a prompt
-* You create a friendly description of the prompt, describing what it does and what it is about, to the user that is using this prompt.
-* Use at most 2 sentences
-* Return just the description, without any formatting or the prompt
-* The description must be german and target a swiss audience
-* Use a friendly and personal tone
-* Only describe what the prompt does, do not add a call to action
+const instructions = `
+  You are a helpful assistant who writes helpful descriptions of prompts for users that will use these prompts for a UI:
+  * You receive a prompt
+  * You create a friendly description of the prompt, describing what it does and what it is about, to the user that is using this prompt.
+  * Use at most 2 sentences
+  * Return just the description, without any formatting or the prompt
+  * The description must be german and target a swiss audience
+  * Use a friendly and personal tone
+  * Only describe what the prompt does, do not add a call to action
 
-Example:
-Input: Erstelle eine Titel für einen Schweizer Presseartikel im Stil von "Knowledge Base Somedia-Schlagzeilen" und "Instructions Headline" auf Basis der folgenden Texteingabe. Stelle sicher, dass die Schlagzeilen dem Stil und den Erwartungen der Schweizer Presseartikel und sowie der vorhandenen Knowledge Base entsprechen. Befolge die angegebenen spezifischen Instruktionen.
+  Example:
+  Input: Erstelle eine Titel für einen Schweizer Presseartikel im Stil von "Knowledge Base Somedia-Schlagzeilen" und "Instructions Headline" auf Basis der folgenden Texteingabe. Stelle sicher, dass die Schlagzeilen dem Stil und den Erwartungen der Schweizer Presseartikel und sowie der vorhandenen Knowledge Base entsprechen. Befolge die angegebenen spezifischen Instruktionen.
 
-Output: Hier kannst du einen prägnanten Titel für einen Schweizer Presseartikel erstellen, der den spezifischen Anforderungen und dem gewünschten Stil entspricht. Die Überschrift wird an die Erwartungen der Schweizer Medien angepasst und berücksichtigt die vorhandene Knowledge Base.`;
+  Output: Hier kannst du einen prägnanten Titel für einen Schweizer Presseartikel erstellen, der den spezifischen Anforderungen und dem gewünschten Stil entspricht. Die Überschrift wird an die Erwartungen der Schweizer Medien angepasst und berücksichtigt die vorhandene Knowledge Base.
+`;
 
 const generatePromptDescription = async (ctx: APIContext, prompt: string) => {
   const model = createChatModel(ctx);
