@@ -8,6 +8,10 @@
   import Loading from "$components/Loading.svelte";
   import { lastDalleImage } from "$stores/imageGenerationStore";
   import { get } from "svelte/store";
+  import { posthogClientCapture } from "$utils/posthogClient";
+  import { tenant } from "$stores";
+  import { EventName, ScreenName } from "$types/Posthog";
+  import { ModelName } from "$types/AIProvider";
   const t = useTranslations();
 
   interface Props {
@@ -83,6 +87,11 @@
 
       base64Image = "data:image/png;base64," + data.image;
       lastDalleImage.set(base64Image); // Store image persistently
+
+      posthogClientCapture($tenant, EventName.AiboxImageCreated, {
+        page_name: ScreenName.Dalle3ImageGeneration,
+        model: ModelName.Dalle,
+      });
     } catch (err) {
       error = err;
     } finally {

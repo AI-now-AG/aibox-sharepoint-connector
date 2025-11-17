@@ -1,8 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { AudioOptionId, AudioOptionLabels } from "$types/Subscription";
 import dayjs from "dayjs";
 
 export function isTrulyEmpty(obj: any) {
   return !obj || Object.keys(obj).length === 0;
+}
+
+export function toHeadline(str = "") {
+  return str
+    .replace(/[_\-.]+/g, " ")
+    .trim()
+    .split(/\s+/)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(" ");
 }
 
 export function capitalizeFirst(text: string) {
@@ -21,7 +31,7 @@ export const isValidEmail = (email: string) => {
 export const preventDefault = (fn: any) => {
   return function (this: any, event: any) {
     event.preventDefault();
-    fn.call(this, event);
+    fn?.call?.(this, event);
   };
 };
 
@@ -57,3 +67,26 @@ export function isSameObjectId(a: unknown, b: unknown): boolean {
   if (!strA || !strB) return false;
   return strA === strB;
 }
+
+
+export const getSubscriptionAddOnName = (
+  forOption: "audiototext" | "subtitle" = "audiototext",
+  planAddOns: Array<any> = [],
+) => {
+  const addOnOptions: Array<any> =
+    forOption == "audiototext"
+      ? planAddOns.filter((option: any) => {
+        return (
+          option == AudioOptionId.AudioBasis ||
+          option == AudioOptionId.AudioBasisAddOnLarge
+        );
+      }) || []
+      : planAddOns.filter((option: any) => {
+        return (
+          option == AudioOptionId.AudioBasisAddOnSubtitle ||
+          option == AudioOptionId.AudioPremium
+        );
+      }) || [];
+  const firstOption = addOnOptions?.[0] as AudioOptionId | undefined;
+  return firstOption ? AudioOptionLabels[firstOption] || "-" : "-";
+};

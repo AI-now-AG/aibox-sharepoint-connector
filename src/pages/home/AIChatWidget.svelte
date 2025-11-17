@@ -1,6 +1,7 @@
 <script lang="ts">
   import { actions } from "astro:actions";
-  import { slide } from "svelte/transition";
+  import { onMount } from "svelte";
+  import { fade, fly, slide } from "svelte/transition";
   import { type Message, MessageRole } from "$types/MessageHistory";
   import { sharedMessageHistory } from "$stores/chatHistory";
   import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
@@ -18,10 +19,26 @@
   import { tenant, user } from "$stores";
   import { useTranslations } from "$i18n/utils";
   import { addToast } from "$stores/toast";
-  import { ApiKeyProvider } from "$types/TenantFeature";
-  import { PromptToolOption } from "$types/AIProvider";
-  import { getPromptTools, useProviderInfo } from "$shared/AIProvider";
+  import {
+    ModelName,
+    PromptToolOption,
+    ReasoningEffortOption,
+    TextVerbosityOption,
+  } from "$types/AIProvider";
+  import {
+    getPromptTools,
+    useProviderInfo,
+    resolveAPIProvider,
+    getModelName,
+  } from "$shared/AIProvider";
   import { TRANSCRIPTION_API_URL } from "astro:env/client";
+  import { svgIcons } from "$assets/icons";
+  import PromptList, {
+    type PromptCartItem,
+  } from "$components/prompt-interface/PromptList.svelte";
+  import PromptItem from "$components/prompt-interface/PromptItem.svelte";
+  import { EventName, ScreenName } from "$types/Posthog";
+  import { posthogClientCapture } from "$utils/posthogClient";
 
   const t = useTranslations();
 
@@ -41,6 +58,8 @@
     tenantId: string;
     provider: string;
     prompt: string;
+    promptId?: string;
+    model?: string;
     stream: boolean;
     tool?: string;
     fileUrls: string[];
@@ -55,8 +74,15 @@
   interface Props {
     apiKeyProviders: any;
     folderName?: string;
+
+    promptsEnriched?: PromptCartItem[];
   }
-  let { apiKeyProviders = [], folderName }: Props = $props();
+  let {
+    apiKeyProviders = [],
+    folderName,
+
+    promptsEnriched = [],
+  }: Props = $props();
 
   let input: string = $state("");
   let files: File[] = $state([]);
@@ -70,19 +96,37 @@
   let previousResponseId: string | null = $state(null);
   let loading: boolean = $state(false);
 
+  let searchQuery = $state("");
+  let filteredPrompts: any[] = $state([]);
+  let selectedPrompt = $state<any>();
+
   const apiProvider = apiKeyProviders?.find((item: any) => {
     return item.default && item.active;
   });
   let isDisableFileInput = $state(apiProvider?.name == PromptModel.Perplexity);
 
-  $effect(() => {
-    isDisableSelectModel = $sharedMessageHistory.length > 0 || isFetching;
-    isDisableFileInput = selectedModel === PromptModel.Perplexity;
+  const providerInfo = useProviderInfo($tenant);
+
+  onMount(() => {
+    selectedModel = providerInfo?.defaultProviderPromptModelName as PromptModel;
   });
 
-  const providerInfo = useProviderInfo($tenant);
+  $effect(() => {
+    isDisableSelectModel = $sharedMessageHistory.length > 0 || isFetching;
+    isDisableFileInput =
+      selectedModel === PromptModel.Perplexity ||
+      selectedPrompt?.model === PromptModel.Perplexity;
+  });
+
   // === Derived State ===
   let toolOptions = $derived.by(() => {
+    if (selectedPrompt) {
+      return getPromptTools(
+        (selectedPrompt.model == PromptModel.Default
+          ? providerInfo?.defaultProviderPromptModelName
+          : selectedPrompt.model) as PromptModel,
+      );
+    }
     return getPromptTools(
       (selectedModel == PromptModel.Default
         ? providerInfo?.defaultProviderPromptModelName
@@ -91,18 +135,6 @@
   });
 
   let selectedPromptTool = $state(PromptToolOption.None);
-
-  function isGpt5Default() {
-    const aiProviders = $tenant?.api_key_providers ?? [];
-    const activeDefaultProvider = aiProviders.find(
-      (item) => item.active === true && item.default === true,
-    );
-
-    if (activeDefaultProvider?.name === ApiKeyProvider.OpenAIGpt5) {
-      return true;
-    }
-    return false;
-  }
 
   // === API Configuration ===
   async function getAPIConfiguration(): Promise<APIConfiguration> {
@@ -114,17 +146,21 @@
 
   // === Request Builder ===
   function buildRequestPayload(fileUrls: string[]): RequestPayload {
-    const isOpenAIResponseModel = [PromptModel.OpenAI].includes(selectedModel);
+    const userSelectModel = selectedPrompt?.model || selectedModel;
+    const isResponseModel = [
+      PromptModel.OpenAI,
+      PromptModel.OpenAIGpt5,
+    ].includes(userSelectModel);
 
-    const isOpenAIGpt5ResponseModel =
-      [PromptModel.OpenAIGpt5].includes(selectedModel) ||
-      (isGpt5Default() && !selectedModel);
+    const isGeminiImageModel = [PromptModel.NanoBanana].includes(
+      userSelectModel,
+    );
 
-    const provider = isOpenAIResponseModel
-      ? "openai-response"
-      : isOpenAIGpt5ResponseModel
-        ? "openai-gpt-5-response"
-        : selectedModel;
+    const provider: any = resolveAPIProvider(userSelectModel);
+
+    const requestModel = isGeminiImageModel
+      ? ModelName.Gemini25FlashImage
+      : undefined;
 
     isGenerating = selectedPromptTool == PromptToolOption.Image;
 
@@ -133,12 +169,16 @@
     const payload: RequestPayload = {
       tenantId: $tenant?._id?.toString()!,
       provider,
+      model: requestModel,
       prompt: input || promptForAttachedFilesOnly,
       stream: true,
       fileUrls,
     };
 
-    // Add conditional properties
+    if (selectedPrompt && selectedPrompt.id) {
+      payload.promptId = selectedPrompt.id;
+    }
+
     if (selectedPromptTool != PromptToolOption.None) {
       payload.tool = selectedPromptTool;
       if (selectedPromptTool == PromptToolOption.Image) {
@@ -151,15 +191,12 @@
       }
     }
 
-    if (isOpenAIResponseModel) {
+    if (isResponseModel) {
       payload.previousResponseId = previousResponseId;
+      payload.reasoningEffort = ReasoningEffortOption.Low;
+      payload.verbosity = TextVerbosityOption.Low;
     } else {
       payload.messageHistory = $sharedMessageHistory;
-    }
-
-    if (isOpenAIGpt5ResponseModel) {
-      payload.reasoningEffort = "low";
-      payload.verbosity = "low";
     }
 
     return payload;
@@ -168,11 +205,9 @@
   // === Image Processing Utilities ===
   function formatImageUrl(imageData: string): string {
     if (!imageData) return "";
-
     if (imageData.startsWith("data:") || imageData.startsWith("http")) {
       return imageData;
     }
-
     return `data:image/png;base64,${imageData}`;
   }
 
@@ -187,16 +222,8 @@
 
   function handleChunkEvent(data: any, state: StreamingState): void {
     if (data.content && typeof data.content === "string") {
-      // Accumulate the raw text
       state.messageContent += data.content;
-
-      // Append the raw chunk to the current displayed message
       currentMessage += data.content;
-
-      // If the current chunk contains a newline,
-      // re-render the entire accumulated text as HTML.
-      // This avoids trying to parse on every single character
-      // and ensures we only re-render when a natural "block" ends.
       if (data.content.includes("\n")) {
         currentMessage = markdownToHtml(state.messageContent);
       }
@@ -286,6 +313,13 @@
 
     // Scroll to latest message
     setTimeout(() => scrollIntoView(), 1000);
+
+    posthogClientCapture($tenant, EventName.AiboxPromptResult, {
+      page_name: ScreenName.Home,
+      use_case: selectedPrompt?.title || "-",
+      tool: selectedPromptTool,
+      model: getModelName($tenant, selectedPrompt?.model || selectedModel),
+    });
 
     return data;
   }
@@ -617,12 +651,12 @@
   async function saveConversation() {
     loading = true;
     const { error, data } = await actions.conversation.save({
-      model: selectedModel,
+      prompt_id: selectedPrompt?.id?.toString() || null,
+      model: selectedPrompt?.model || selectedModel,
       messages: $sharedMessageHistory,
       previous_response_id: previousResponseId,
     });
     loading = false;
-
     if (error) {
       addToast({
         message: error?.message ?? "Something went wrong",
@@ -630,13 +664,107 @@
       });
     } else {
       window.location.href = `/conversations/${data.insertedId}`;
-      //navigate(`/conversations/${data.insertedId}`);
     }
   }
+
+  function filterPrompts() {
+    filteredPrompts = promptsEnriched.filter((prompt) => {
+      return (
+        prompt.title?.toLowerCase()?.includes(searchQuery?.toLowerCase()) ||
+        prompt.instruction?.toLowerCase()?.includes(searchQuery?.toLowerCase())
+      );
+    });
+  }
+  $effect(() => {
+    if (searchQuery) {
+      filterPrompts();
+    }
+    if (searchQuery === "") {
+      filteredPrompts = [];
+    }
+  });
 </script>
 
 <div class="grid grid-cols-1 grid-rows-[1fr_min-content] h-full">
   <div class="flex flex-col space-y-6">
+    {#if $sharedMessageHistory.length == 0}
+      <div class="dropdown w-full">
+        <div class="flex flex-row items-center space-x-2">
+          <div
+            class={"input flex justify-between items-center gap-2 "}
+            style={isFetching ? "border: 1px solid" : ""}
+          >
+            {@html svgIcons.search}
+            <input
+              type="text"
+              class="grow"
+              placeholder={t("home.search-prompt")}
+              bind:value={searchQuery}
+              disabled={isFetching}
+            />
+            {#if searchQuery?.length > 0}
+              <button
+                onclick={() => {
+                  searchQuery = "";
+                }}
+              >
+                {@html svgIcons.close}
+              </button>
+            {/if}
+          </div>
+
+          {#if selectedPrompt}
+            <div class="relative group" out:fly>
+              <a
+                href={`/prompts/${selectedPrompt.category}/${selectedPrompt.group}?promptId=${selectedPrompt.id}`}
+                target="_blank"
+                class="input rounded-lg hover:underline px-4 py-1 w-auto inline-flex bg-[#f3f4f6] cursor-pointer"
+              >
+                {selectedPrompt.title}
+              </a>
+
+              <div
+                class="absolute left-0 top-full mt-2 hidden group-hover:block z-50 w-96"
+              >
+                <PromptItem isEditable={false} data={selectedPrompt} />
+              </div>
+            </div>
+            <button
+              onclick={() => {
+                selectedPrompt = null;
+                selectedPromptTool = PromptToolOption.None;
+                input = "";
+              }}
+              disabled={isFetching}
+              class="btn btn-ghost h-8 p-0 min-h-0 aspect-square"
+              out:fly
+            >
+              {@html svgIcons.close}
+            </button>
+          {/if}
+        </div>
+
+        {#if filteredPrompts.length > 0}
+          <div
+            class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-full mt-2 max-h-[560px] overflow-scroll"
+            out:fade
+          >
+            <PromptList
+              isEditable={false}
+              title={""}
+              cssClasses={"max-w-6xl"}
+              bind:items={filteredPrompts}
+              onItemSelect={(prompt: any) => {
+                selectedPrompt = prompt;
+                input = prompt.predefined_input;
+                searchQuery = "";
+              }}
+            />
+          </div>
+        {/if}
+      </div>
+    {/if}
+
     {#if $sharedMessageHistory.length == 0}
       <div
         class="min-w-full form-wrapper"
@@ -647,7 +775,7 @@
           bind:input
           bind:files
           {isFetching}
-          showAttachmentButton={!isDisableFileInput}
+          allowFileUpload={!isDisableFileInput}
           onsend={submitForm}
           {toolOptions}
           bind:selectedPromptTool
@@ -655,19 +783,21 @@
       </div>
     {/if}
 
-    <div class="flex items-end justify-end z-10">
-      <div>
-        <AIModelDropdown
-          label={t("home.model-label")}
-          bind:selectedModel
-          disabled={isDisableSelectModel}
-          labelClasses={"text-sm"}
-          onValueChange={(_value: any) => {
-            selectedPromptTool = PromptToolOption.None;
-          }}
-        />
+    {#if !selectedPrompt}
+      <div class="flex items-end justify-end z-10" in:fade out:fade>
+        <div>
+          <AIModelDropdown
+            label={t("home.model-label")}
+            bind:selectedModel
+            disabled={isDisableSelectModel}
+            labelClasses={"text-sm"}
+            onValueChange={(_value: any) => {
+              selectedPromptTool = PromptToolOption.None;
+            }}
+          />
+        </div>
       </div>
-    </div>
+    {/if}
 
     <MessageList
       {currentMessage}
@@ -676,6 +806,12 @@
       {isFetching}
       {isGenerating}
       {isResoningThingking}
+      promptResultTrackging={{
+        page_name: ScreenName.Home,
+        use_case: selectedPrompt?.title || "-",
+        tool: selectedPromptTool,
+        model: getModelName($tenant, selectedPrompt?.model || selectedModel),
+      }}
     />
 
     {#if $sharedMessageHistory.length > 0}
@@ -713,7 +849,7 @@
             bind:files
             {isFetching}
             stickyFooter={true}
-            showAttachmentButton={!isDisableFileInput}
+            allowFileUpload={!isDisableFileInput}
             onsend={submitForm}
             {toolOptions}
             bind:selectedPromptTool

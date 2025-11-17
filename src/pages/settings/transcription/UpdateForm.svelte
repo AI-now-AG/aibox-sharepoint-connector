@@ -9,6 +9,8 @@
   import { preventDefault } from "$utils/common";
   import { normalizeTextToHtml } from "$utils/textFormatting";
   import TextEditor from "$components/form/TextEditor.svelte";
+  import { EventName, ScreenName } from "$types/Posthog";
+  import { posthogClientCapture } from "$utils/posthogClient";
   const t = useTranslations();
 
   interface Props {
@@ -115,6 +117,11 @@
         type: "error",
       });
     } else {
+      posthogClientCapture($tenant, EventName.AiboxAudioInstructionSaved, {
+        page_name: ScreenName.CreateOrUpdateAudioInstruction,
+        screen_mode: "create",
+        use_case: instructionTitle || "-",
+      });
       addToast({
         message: "Created",
         type: "success",
@@ -150,6 +157,11 @@
       addToast({
         message: "Updated",
         type: "success",
+      });
+      posthogClientCapture($tenant, EventName.AiboxAudioInstructionSaved, {
+        page_name: ScreenName.CreateOrUpdateAudioInstruction,
+        screen_mode: "update",
+        use_case: instructionTitle || "-",
       });
       setTimeout(() => {
         window.location.assign(document.referrer || "/settings/transcription");

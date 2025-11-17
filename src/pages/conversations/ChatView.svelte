@@ -1,7 +1,13 @@
 <script lang="ts">
-  import { ModelName, PromptToolOption } from "$types/AIProvider";
+  import {
+    ModelName,
+    PromptToolOption,
+    ReasoningEffortOption,
+    TextVerbosityOption,
+  } from "$types/AIProvider";
   import {
     MessageRole,
+    MessageThumbRating,
     type Message,
     type MessageHistory,
   } from "$types/MessageHistory";
@@ -14,10 +20,9 @@
   import { addToast } from "$stores/toast";
   import {
     getPromptTools,
-    ModelNameMap,
-    ProviderModelMap,
     useProviderInfo,
     getModelName,
+    resolveAPIProvider,
   } from "$shared/AIProvider";
   import { tenant, user } from "$stores";
   import { PromptModel } from "$types/PromptModel";
@@ -26,9 +31,10 @@
     buildCitationLinks,
     stripMarkdownFormatting,
   } from "$utils/textFormatting";
-  import { ApiKeyProvider } from "$types/TenantFeature";
   import { readFileContent } from "$utils/fileReader";
   import { TRANSCRIPTION_API_URL } from "astro:env/client";
+  import { EventName, ScreenName } from "$types/Posthog";
+  import { posthogClientCapture } from "$utils/posthogClient";
 
   const t = useTranslations();
 
@@ -72,6 +78,7 @@
     conversationId,
     model = PromptModel.Default,
     messages,
+    promptData,
     folderName,
     lastResponseId = null,
   }: Props = $props();
@@ -135,16 +142,26 @@
     }
   }
 
-  function isGpt5Default() {
-    const aiProviders = $tenant?.api_key_providers ?? [];
-    const activeDefaultProvider = aiProviders.find(
-      (item) => item.active === true && item.default === true,
-    );
+  async function updateConversationMessageRating(
+    index: number,
+    rating: MessageThumbRating | null,
+  ) {
+    try {
+      let _error = null;
 
-    if (activeDefaultProvider?.name === ApiKeyProvider.OpenAIGpt5) {
-      return true;
+      const { error } = await actions.conversation.updateMessageRating({
+        _id: conversationId,
+        messageIndex: index,
+        newRating: rating,
+      });
+      _error = error;
+
+      if (_error) {
+        addToast({ message: JSON.stringify(_error), type: "error" });
+      }
+    } catch (error) {
+      console.error("Exception when update message rating", error);
     }
-    return false;
   }
 
   async function getAPIConfiguration(): Promise<APIConfiguration> {
@@ -155,24 +172,16 @@
   }
 
   function buildRequestPayload(fileUrls: string[]): RequestPayload {
-    const isOpenAIResponseModel = [
+    const isResponseModel = [
       PromptModel.OpenAI,
       PromptModel.OpenAIWithTools, // Deprecated — removal imminent
       PromptModel.OpenAIWithImageTools, // Deprecated — removal imminent
+      PromptModel.OpenAIGpt5,
     ].includes(model);
 
-    const isOpenAIGpt5ResponseModel =
-      [PromptModel.OpenAIGpt5].includes(model) || (isGpt5Default() && !model);
+    const provider: any = resolveAPIProvider(model);
 
     const isGeminiImageModel = [PromptModel.NanoBanana].includes(model);
-
-    const provider = isOpenAIResponseModel
-      ? "openai-response"
-      : isOpenAIGpt5ResponseModel
-        ? "openai-gpt-5-response"
-        : isGeminiImageModel
-          ? "gemini"
-          : model;
     const requestModel = isGeminiImageModel
       ? ModelName.Gemini25FlashImage
       : undefined;
@@ -202,15 +211,15 @@
       }
     }
 
-    if (isOpenAIResponseModel || isOpenAIGpt5ResponseModel) {
+    if (isResponseModel) {
       payload.previousResponseId = previousResponseId;
     } else {
       payload.messageHistory = messageHistory;
     }
 
-    if (isOpenAIGpt5ResponseModel) {
-      payload.reasoningEffort = "low";
-      payload.verbosity = "low";
+    if (isResponseModel) {
+      payload.reasoningEffort = ReasoningEffortOption.Low;
+      payload.verbosity = TextVerbosityOption.Low;
     }
 
     return payload;
@@ -327,6 +336,13 @@
       window.dispatchEvent(new Event("reload-sidebar"));
       window.dispatchEvent(new Event("reload-conversation-dialog"));
     }, 1000);
+
+    posthogClientCapture($tenant, EventName.AiboxPromptResult, {
+      use_case: promptData?.title || "-",
+      tool: selectedPromptTool,
+      model: getModelName($tenant, model),
+      page_name: ScreenName.MyAibox,
+    });
 
     return data;
   }
@@ -620,7 +636,8 @@
 <div class="grid grid-cols-1 grid-rows-[min-content_1fr_min-content] h-full">
   <div class="flex items-center">
     <div class="flex flex-1">
-      <span class="self-start badge badge-xs px-2 border-base-300 font-normal"
+      <span
+        class="self-start badge badge-xs py-2 px-2 border-base-300 font-normal"
         >{getModelName($tenant, model)}</span
       >
     </div>
@@ -643,6 +660,18 @@
     {isFetching}
     {isGenerating}
     {isResoningThingking}
+    updateMessageRating={(
+      index: number,
+      selectedRating: MessageThumbRating | null,
+    ) => {
+      updateConversationMessageRating(index, selectedRating);
+    }}
+    promptResultTrackging={{
+      page_name: ScreenName.MyAibox,
+      use_case: promptData?.title || "-",
+      tool: selectedPromptTool,
+      model: getModelName($tenant, model),
+    }}
   />
 
   <div class="sticky bottom-0 bg-base-200 p-4">
@@ -659,7 +688,7 @@
         {toolOptions}
         bind:selectedPromptTool
         showDataLossWarning={false}
-        showAttachmentButton={isShowAttachmentButton}
+        allowFileUpload={isShowAttachmentButton}
       />
     </div>
   </div>

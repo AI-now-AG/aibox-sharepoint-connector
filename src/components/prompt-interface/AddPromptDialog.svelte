@@ -25,6 +25,8 @@
     normalizeTextToHtml,
     isHtmlContentEmpty,
   } from "$utils/textFormatting";
+  import { posthogClientCapture } from "$utils/posthogClient";
+  import { EventName, ScreenName } from "$types/Posthog";
 
   const t = useTranslations();
 
@@ -174,6 +176,12 @@
       }
 
       const data = await response.json();
+
+      posthogClientCapture($tenant, EventName.AiboxAssistantSaved, {
+        page_name: ScreenName.AddPromptDialog,
+        use_case: promptTitle || "-",
+      });
+
       navigate(window.location.href);
 
       addToast({

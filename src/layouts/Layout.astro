@@ -56,20 +56,20 @@ const conversations = await cached(
   async () => {
     const data: Conversation[] = await ConversationModel.listByUser(
       Astro.locals.user.id,
-      5
+      5,
     );
     return data.map(({ _id, title, updated_at }) => ({
       _id,
       title,
       updated_at,
     }));
-  }
+  },
 );
 ---
 
 <!doctype html>
 <html lang="en" data-theme={theme}>
-  <Head {title} {description} />
+  <Head {tenant} {title} {description} />
   <body class="min-h-screen grid grid-rows-[min-content_1fr]">
     <div class="drawer lg:drawer-open">
       <input id="left-drawer-trigger" type="checkbox" class="drawer-toggle" />
@@ -96,19 +96,19 @@ const conversations = await cached(
       </div>
     </div>
     <div class="z-[11]">
-      {tenant?.is_trial && <OnboardingTour user={userInfo} client:visible />}
+      {tenant?.is_trial && <OnboardingTour user={userInfo} client:load />}
       {
         !tenant?.is_trial && (
-          <OnboardingTourNewTenant user={userInfo} client:visible />
+          <OnboardingTourNewTenant user={userInfo} client:load />
         )
       }
-      {tenant?.is_trial && <TrialComponent {locale} client:visible />}
+      {tenant?.is_trial && <TrialComponent {locale} client:load />}
       {
         tenant?.is_trial &&
           !isSocialAuth &&
           user?.email_verified != undefined &&
           !user.email_verified && (
-            <RestrictUnverifiedUser user={userInfo} client:visible />
+            <RestrictUnverifiedUser user={userInfo} client:load />
           )
       }
     </div>

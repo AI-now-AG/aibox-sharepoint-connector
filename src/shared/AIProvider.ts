@@ -57,11 +57,20 @@ export const CustomSortOrder: { [key: string]: number } = {
   [PromptModel.Default]: 1, // Default - gpt-4o, Legacy (Text)
   [PromptModel.OpenAI]: 2, // gpt-4o, Legacy (Text)
   [PromptModel.OpenAIGpt5]: 3, // gpt-5 (Text & Tools)
-  [PromptModel.AzureOpenAI]: 4, // Azure gpt-4o (Text)
+  [PromptModel.AzureOpenAI]: 4, // gpt-4o (Azure)
   [PromptModel.Perplexity]: 5, // Perplexity Sonar (Text & Websuche)
   [PromptModel.Claude]: 6, // Claude Sonnet (Text)
   [PromptModel.Gemini]: 7, // Gemini (Text& Tools)
   [PromptModel.NanoBanana]: 8, // Gemini Nano Banana
+};
+
+const APIProviderMap: Record<string, string> = {
+  [PromptModel.OpenAI]: "openai-response",
+  [PromptModel.OpenAIWithTools]: "openai-response", // Deprecated — removal imminent
+  [PromptModel.OpenAIWithImageTools]: "openai-response", // Deprecated — removal imminent
+  [PromptModel.AzureOpenAI]: "azure-openai-chat",
+  [PromptModel.OpenAIGpt5]: "openai-gpt-5-response",
+  [PromptModel.NanoBanana]: "gemini",
 };
 
 export const Gpt4oPromptTools = [
@@ -70,6 +79,11 @@ export const Gpt4oPromptTools = [
     value: PromptToolOption.Image,
     icon: svgIcons.image,
   },
+  {
+    title: t("prompt-execution.prompt-tool.web-search"),
+    value: PromptToolOption.Websearch,
+    icon: svgIcons.web,
+  },
 ];
 
 export const Gpt5PromptTools = [
@@ -77,6 +91,11 @@ export const Gpt5PromptTools = [
     title: t("prompt-execution.prompt-tool.image"),
     value: PromptToolOption.Image,
     icon: svgIcons.image,
+  },
+  {
+    title: t("prompt-execution.prompt-tool.web-search"),
+    value: PromptToolOption.Websearch,
+    icon: svgIcons.web,
   },
 ];
 
@@ -164,29 +183,19 @@ export function getActiveModels(tenant: any, defaultModelName: string) {
 
 export function getModelName(tenant: any, model: string) {
   if (!tenant) {
-    return resolveModelName("gpt-4o");
+    return resolveModelName("unknown");
   }
 
   const providerInfo = useProviderInfo(tenant);
   const defaultModelName = providerInfo?.defaultProviderModelName || "gpt-4o";
   const activeModels = getActiveModels(tenant, defaultModelName);
 
-  const findModel = (match: string, fallback: string) => {
-    const m = activeModels.find((m: any) => m.provider?.includes(match));
-    return m?.modelName || fallback;
-  };
+  const matchingModel = activeModels.find((m: any) => model == m.provider);
+  //console.log("getModelName() debug", { activeModels, matchingModel });
 
-  if (model?.includes("openai-gpt-5")) {
-    return findModel("openai-gpt-5", "gpt-5");
+  if (matchingModel && matchingModel.provider == PromptModel.AzureOpenAI) {
+    return `${matchingModel.modelName} (Azure)`;
   }
-
-  if (model?.includes("openai")) {
-    return findModel("openai", "gpt-4o");
-  }
-
-  const matchingModel = activeModels.find((m: any) =>
-    model?.includes(m.provider),
-  );
 
   if (matchingModel) {
     return resolveModelName(matchingModel.modelName);
@@ -227,4 +236,31 @@ export function useProviderInfo(tenant: any) {
     defaultProviderModelName: getDefaultProviderModelName(),
     defaultProviderPromptModelName: getDefaultProviderPromptModelName(),
   };
+}
+
+export function resolveAPIProvider(
+  selectedModel: PromptModel,
+  defaultModel: PromptModel | null = null,
+) {
+  console.log("resolveAPIProvider() debug", { selectedModel, defaultModel });
+  const defaultProvider = defaultModel
+    ? APIProviderMap[defaultModel]
+    : APIProviderMap[PromptModel.OpenAI];
+
+  // If no model is selected, immediately return the default model
+  if (!selectedModel) {
+    return defaultProvider;
+  }
+
+  // Attempt to find the corresponding API provider from the mapping
+  const mapped = selectedModel ? APIProviderMap[selectedModel] : null;
+
+  // If a mapped provider exists, return it
+  if (mapped) return mapped;
+
+  // If a model is explicitly selected, use it directly
+  if (selectedModel) return selectedModel;
+
+  // Otherwise, fall back to the default model (may be null)
+  return defaultProvider;
 }

@@ -3,18 +3,24 @@
   import FileUpload from "$components/FileUpload.svelte";
   import DataLossWarning from "$components/chat-ui/DataLossWarning.svelte";
   import { svgIcons } from "$assets/icons";
+  import { addToast } from "$stores/toast";
   import { preventDefault } from "$utils/common";
   import { useTranslations } from "$i18n/utils";
   import SelectToolOption from "./SelectToolOption.svelte";
   import type { Option } from "$components/form/Dropdown.svelte";
+  import { dndFileUpload } from "$components/actions/DndFileUpload.svelte";
   import { PromptToolOption } from "$types/AIProvider";
+  import type {
+    FilesDroppedEvent,
+    FilesRejectedEvent,
+  } from "$types/DndFileUpload";
 
   interface Props {
     input: string;
     files?: File[];
     isFetching?: boolean;
     stickyFooter?: boolean;
-    showAttachmentButton?: boolean;
+    allowFileUpload?: boolean;
     onsend: Function;
     toolOptions?: Array<Option>;
     selectedPromptTool?: PromptToolOption;
@@ -27,7 +33,7 @@
     files = $bindable([]),
     isFetching = false,
     stickyFooter = false,
-    showAttachmentButton = true,
+    allowFileUpload = true,
     onsend,
     toolOptions,
     selectedPromptTool = $bindable(PromptToolOption.None),
@@ -38,6 +44,7 @@
   const t = useTranslations();
 
   let fileModal: HTMLDialogElement | undefined = $state();
+  let isDragging: boolean = $state(false);
 
   const acceptedTypes = {
     "audio/*": ["audio/mp3", "audio/wav", "audio/mpeg"],
@@ -87,10 +94,54 @@
   function clearText() {
     input = "";
   }
+
+  function handleFilesDropped(droppedFiles: FilesDroppedEvent) {
+    console.log("Files dropped:", droppedFiles);
+    const newFiles = droppedFiles.map(({ file }) => file);
+
+    // Merge and remove duplicates by name + size
+    const combined = [...files, ...newFiles];
+    const unique = combined.filter(
+      (file, index, self) =>
+        index ===
+        self.findIndex((f) => f.name === file.name && f.size === file.size),
+    );
+
+    files = unique;
+  }
+
+  function handleFilesRejected(rejectedFiles: FilesRejectedEvent) {
+    console.log("Files rejected:", rejectedFiles);
+    rejectedFiles.forEach(({ file, reasons }) => {
+      const reason = reasons.includes("FILE_TOO_LARGE")
+        ? t("prompt-execution.upload-file.exceed-5mb-size-limit")
+        : reasons.includes("INVALID_MIMETYPE")
+          ? t("transcription.file-validation.unsupported-type")
+          : "Unknown error occurred";
+      addToast({
+        message: `${file.name} - ${reason}`,
+        type: "error",
+      });
+    });
+  }
 </script>
 
 <div
-  class={`flex flex-col rounded-xl bg-base-100 border border-base-content/20 focus:ring-base-200 has-focus:ring-2 has-focus:ring-base-primary has-focus:ring-offset-2 has-focus:ring-offset-base-200`}
+  id="onboardingId2"
+  class={`flex flex-col rounded-xl bg-base-100 border border-base-content/20 focus:ring-base-200 has-focus:ring-2 has-focus:ring-base-primary has-focus:ring-offset-2 has-focus:ring-offset-base-200 relative`}
+  use:dndFileUpload={{
+    enabled: allowFileUpload,
+    acceptedTypes,
+    maxSize: 5 * 1024 * 1024, // 5 MB
+    onDragStart: () => {
+      isDragging = true;
+    },
+    onDragEnd: () => {
+      isDragging = false;
+    },
+  }}
+  onfilesdropped={(e) => handleFilesDropped(e.detail)}
+  onfilesrejected={(e) => handleFilesRejected(e.detail)}
 >
   <div class="flex-1 relative">
     <textarea
@@ -98,7 +149,7 @@
       id="input"
       class={`textarea textarea-ghost ${
         stickyFooter ? `h-[50px]` : `h-20`
-      } min-h-auto w-full focus:outline-hidden focus:border-base-100 text-base`}
+      } min-h-auto w-full focus:outline-hidden focus:border-base-100`}
       placeholder={t("prompt-library.input-placeholder")}
       bind:value={input}
       onkeydown={onKeyDown}
@@ -118,7 +169,7 @@
 
   <div class="grid grid-cols-[1fr_min-content] gap-4">
     <div class="p-2 flex flex-row gap-2">
-      {#if showAttachmentButton}
+      {#if allowFileUpload}
         <button
           class="btn btn-outline h-8 w-auto p-1 min-h-0 border-base-content/30 aspect-square"
           onclick={() => {
@@ -148,7 +199,7 @@
     </div>
     <div class="flex self-end">
       <button
-        class="btn btn-ghost btn-md disabled:bg-base-100 disabled:cursor-not-allowed"
+        class="btn btn-ghost btn-sm mx-1 my-1 disabled:bg-base-100 disabled:cursor-not-allowed"
         disabled={(!input && files.length == 0) || isFetching}
         onclick={preventDefault(onsend)}
         aria-label="Send"
@@ -161,19 +212,27 @@
       </button>
     </div>
   </div>
-  <div>
-    <input type="checkbox" class="modal-toggle" />
-    <FileUpload
-      bind:files
-      bind:modal={fileModal}
-      title={t("upload-file.popup.title")}
-      {acceptedTypes}
-      supportedFormatsText={t(
-        "prompt-execution.upload-file.supportted-files-input",
-      )}
-    />
-  </div>
+
+  {#if isDragging}
+    <div
+      class="absolute inset-0 bg-base-200/80 backdrop-blur-sm flex items-center justify-center rounded-lg z-10 pointer-events-none rounded-xl"
+    >
+      <div class="text-md font-medium text-primary animate-pulse">
+        {t("prompt-execution.upload-file.drop-files-here")}
+      </div>
+    </div>
+  {/if}
 </div>
+
+<FileUpload
+  bind:files
+  bind:modal={fileModal}
+  title={t("upload-file.popup.title")}
+  {acceptedTypes}
+  supportedFormatsText={t(
+    "prompt-execution.upload-file.supportted-files-input",
+  )}
+/>
 
 {#if stickyFooter && showDataLossWarning}
   <DataLossWarning />

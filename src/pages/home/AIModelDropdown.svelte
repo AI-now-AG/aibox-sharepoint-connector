@@ -50,6 +50,9 @@
       case PromptModel.OpenAIGpt5:
         title = `${modelLabel} (${t("home.model-option-text-tools")})`;
         break;
+      case PromptModel.AzureOpenAI:
+        title = `${modelLabel} (Azure)`;
+        break;
       case PromptModel.Perplexity:
         title = `${modelLabel} (${t("home.model-option-text-websearch")})`;
         break;
@@ -76,6 +79,7 @@
     const allowedProviders = [
       ApiKeyProvider.OpenAI,
       ApiKeyProvider.OpenAIGpt5,
+      ApiKeyProvider.AzureOpenAI,
       ApiKeyProvider.Perplexity,
       ApiKeyProvider.Claude,
       ApiKeyProvider.Gemini,

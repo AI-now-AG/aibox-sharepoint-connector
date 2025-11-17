@@ -25,6 +25,8 @@
     normalizeTextToHtml,
     isHtmlContentEmpty,
   } from "$utils/textFormatting";
+  import { EventName, ScreenName } from "$types/Posthog";
+  import { posthogClientCapture } from "$utils/posthogClient";
 
   const t = useTranslations();
 
@@ -96,31 +98,7 @@
     ) ?? [],
   );
 
-  onMount(() => {
-    if (promptDialog) {
-      const originalShow = promptDialog.show;
-      const originalShowModal = promptDialog.showModal;
-
-      promptDialog.show = function (...args) {
-        handleDialogShow();
-        return originalShow.apply(this, args);
-      };
-
-      promptDialog.showModal = function (...args) {
-        handleDialogShow();
-        return originalShowModal.apply(this, args);
-      };
-    }
-  });
-
-  async function handleDialogShow() {
-    if (!isDataLoaded) {
-      await initDatas();
-      isDataLoaded = true;
-    }
-  }
-
-  async function initDatas() {
+  onMount(async () => {
     const categoryResponse = await fetch("/api/categories.json", {
       method: "GET",
     });
@@ -137,7 +115,7 @@
     if (knowledgeBaseData) {
       knowledgeBases = knowledgeBaseData;
     }
-  }
+  });
 
   async function getPromptDetail(id: string) {
     isLoading = true;
@@ -258,9 +236,16 @@
         message: data.message,
         type: "success",
       });
+
+      posthogClientCapture($tenant, EventName.AiboxAssistantSaved, {
+        page_name: ScreenName.EditPromptDialog,
+        use_case: promptTitle || "-",
+      });
+
       setTimeout(() => {
-        //window.location.reload();
-        navigate(window.location.href);
+        navigate(
+          `${window.location.href.split("?")[0]}?promptId=${selectedEditPromptId}`,
+        );
       }, 0);
     } catch (error) {
       addToast({

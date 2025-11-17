@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 import { db, toObjectId, type Document } from "../mongodb";
-import { MessageRole } from "$types/MessageHistory";
+import { MessageRole, MessageThumbRating } from "$types/MessageHistory";
 import { z } from "zod";
 
 // Zod schema for a single Message
@@ -10,6 +10,7 @@ export const MessageSchema = z.object({
   rawData: z.string().nullish().default(null),
   imageUrl: z.string().nullish().default(null),
   fileUrls: z.array(z.string()).optional().default([]),
+  thumbRating: z.nativeEnum(MessageThumbRating).nullish().default(null),
 });
 
 // Zod schema for a conversation
@@ -94,26 +95,41 @@ export default {
     // Validate the incoming message object
     const validatedMessage = MessageSchema.parse(message);
 
-    const expiresAt = (() => {
-      const d = new Date();
-      d.setDate(d.getDate() + 30);
-      return d;
-    })();
-
-    // Use the $push operator to append the new message
-    // Also, update the updated_at and expires_at fields
     return await collection.findOneAndUpdate(
       { _id: objectId },
       {
         $push: { messages: validatedMessage },
         $set: {
           updated_at: new Date(),
-          expires_at: expiresAt,
         },
       },
       {
         returnDocument: "after",
       },
+    );
+  },
+  updateMessageRating: async (
+    id: string | ObjectId,
+    messageIndex: number,
+    newRating: MessageThumbRating | null
+  ) => {
+    const objectId = toObjectId(id);
+
+    if (!["up", "down", "cancel", null].includes(newRating)) {
+      throw new Error("Invalid rating value");
+    }
+
+    return await collection.findOneAndUpdate(
+      { _id: objectId },
+      {
+        $set: {
+          [`messages.${messageIndex}.thumbRating`]: newRating,
+          updated_at: new Date()
+        },
+      },
+      {
+        returnDocument: "after",
+      }
     );
   },
 

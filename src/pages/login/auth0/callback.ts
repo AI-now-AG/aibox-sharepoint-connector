@@ -8,6 +8,8 @@ import createApiToken from "$utils/apiToken";
 import TenantModel from "$data/models/tenant.model";
 import { UserRole } from "$types/Users";
 import { AUTH0_SESSION_STATE } from "$constants";
+import { posthogServerCapture, posthogServerIdentify } from "$utils/posthogServer";
+import { EventName } from "$types/Posthog";
 
 const Auth0JWTSchema = z.object({
   sub: z.string().min(24),
@@ -111,6 +113,24 @@ export async function GET(context: APIContext): Promise<Response> {
   await UserModel.upsertByAuth0Sub(auth0User.data.sub, {
     api_token: apiToken,
   });
+
+  posthogServerIdentify(tenant, {
+    distinctId: userId?.toString(), properties: {
+      user_name: auth0User.data.nickname,
+      name: auth0User.data.name,
+      email: auth0User.data.email,
+    }
+  })
+
+  posthogServerCapture(tenant, {
+    distinctId: userId?.toString(),
+    event: EventName.AiboxLogin,
+    properties: {
+      user_name: auth0User.data.nickname,
+      name: auth0User.data.name,
+      email: auth0User.data.email,
+    }
+  })
 
   // ✅ Redirect back to the app after successful login
   return context.redirect("/");

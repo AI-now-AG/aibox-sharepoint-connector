@@ -20,8 +20,10 @@
     markdownToHtml,
     stripMarkdownFormatting,
   } from "$utils/textFormatting";
-  import { PromptToolOption } from "$types/AIProvider";
+  import { ModelName, PromptToolOption } from "$types/AIProvider";
   import { TRANSCRIPTION_API_URL } from "astro:env/client";
+  import { EventName, ScreenName } from "$types/Posthog";
+  import { posthogClientCapture } from "$utils/posthogClient";
 
   // === Types and Interfaces ===
   interface StreamingState {
@@ -202,6 +204,11 @@
         const formattedUrl = formatImageUrl(imageData);
         state.currentImageUrl = formattedUrl;
         currentStreamingImageUrl = formattedUrl;
+
+        posthogClientCapture($tenant, EventName.AiboxImageCreated, {
+          page_name: ScreenName.GptImageGeneration,
+          model: ModelName.GptImage,
+        });
       }
     }
   }

@@ -28,14 +28,22 @@
   import Loading from "$components/Loading.svelte";
   import { tenant, user } from "$stores";
   import { useTranslations } from "$i18n/utils";
-  import { ApiKeyProvider } from "$types/TenantFeature";
-  import { ModelName, PromptToolOption } from "$types/AIProvider";
+  import {
+    ModelName,
+    PromptToolOption,
+    ReasoningEffortOption,
+    TextVerbosityOption,
+  } from "$types/AIProvider";
   import {
     getPromptTools,
     useProviderInfo,
     NanoBananaPromptTools,
+    resolveAPIProvider,
+    getModelName,
   } from "$shared/AIProvider";
   import { TRANSCRIPTION_API_URL } from "astro:env/client";
+  import { EventName, ScreenName } from "$types/Posthog";
+  import { posthogClientCapture } from "$utils/posthogClient";
 
   const t = useTranslations();
 
@@ -55,6 +63,7 @@
     provider: string;
     prompt: string;
     promptId: string;
+    model?: string;
     stream: boolean;
     tool?: string;
     fileUrls: string[];
@@ -99,18 +108,6 @@
   $effect(() => {
     isShowAttachmentButton = currentPrompt?.model != PromptModel.Perplexity;
   });
-
-  function isGpt5Default() {
-    const aiProviders = $tenant?.api_key_providers ?? [];
-    const activeDefaultProvider = aiProviders.find(
-      (item) => item.active === true && item.default === true,
-    );
-
-    if (activeDefaultProvider?.name === ApiKeyProvider.OpenAIGpt5) {
-      return true;
-    }
-    return false;
-  }
 
   const providerInfo = useProviderInfo($tenant);
   // === Derived State ===
@@ -186,30 +183,23 @@
 
   // === Request Builder ===
   function buildRequestPayload(fileUrls: string[]): RequestPayload {
-    let isOpenAIResponseModel =
-      [
-        PromptModel.OpenAI,
-        PromptModel.OpenAIWithTools, // Deprecated — removal imminent
-        PromptModel.OpenAIWithImageTools, // Deprecated — removal imminent
-      ].includes(currentPrompt?.model) ||
-      (providerInfo.defaultProviderPromptModelName == ApiKeyProvider.OpenAI &&
-        !currentPrompt?.model);
-
-    const isOpenAIGpt5ResponseModel =
-      [PromptModel.OpenAIGpt5].includes(currentPrompt?.model) ||
-      (isGpt5Default() && !currentPrompt?.model);
+    let isResponseModel = [
+      PromptModel.OpenAI,
+      PromptModel.OpenAIWithTools, // Deprecated — removal imminent
+      PromptModel.OpenAIWithImageTools, // Deprecated — removal imminent
+      PromptModel.OpenAIGpt5,
+    ].includes(currentPrompt?.model);
 
     const isGeminiImageModel = [PromptModel.NanoBanana].includes(
       currentPrompt?.model,
     );
 
-    const provider = isOpenAIResponseModel
-      ? "openai-response" // openai
-      : isOpenAIGpt5ResponseModel
-        ? "openai-gpt-5-response" // openai-gpt-5
-        : isGeminiImageModel
-          ? "gemini"
-          : currentPrompt?.model || providerInfo.defaultProviderPromptModelName;
+    const provider: any = resolveAPIProvider(
+      currentPrompt?.model,
+      providerInfo?.defaultProviderPromptModelName as unknown as
+        | PromptModel
+        | undefined,
+    );
     const requestModel = isGeminiImageModel
       ? ModelName.Gemini25FlashImage
       : undefined;
@@ -226,7 +216,6 @@
       fileUrls,
     };
 
-    // Add conditional properties
     if (selectedPromptTool != PromptToolOption.None) {
       payload.tool = selectedPromptTool;
       if (selectedPromptTool == PromptToolOption.Image) {
@@ -239,15 +228,14 @@
       }
     }
 
-    if (isOpenAIResponseModel || isOpenAIGpt5ResponseModel) {
+    if (isResponseModel) {
       payload.previousResponseId = previousResponseId;
+      payload.reasoningEffort =
+        currentPrompt?.reasoningEffort || ReasoningEffortOption.Low;
+      payload.verbosity =
+        currentPrompt?.textVerbosity || TextVerbosityOption.Low;
     } else {
       payload.messageHistory = currentMessageHistory;
-    }
-
-    if (isOpenAIGpt5ResponseModel) {
-      payload.reasoningEffort = currentPrompt?.reasoningEffort || "low";
-      payload.verbosity = currentPrompt?.textVerbosity || "low";
     }
 
     return payload;
@@ -371,6 +359,13 @@
 
     // Scroll to latest message
     setTimeout(() => scrollIntoView(), 1000);
+
+    posthogClientCapture($tenant, EventName.AiboxPromptResult, {
+      use_case: currentPrompt?.title || "-",
+      tool: selectedPromptTool,
+      model: getModelName($tenant, currentPrompt?.model),
+      page_name: ScreenName.PromptExecutionArea,
+    });
 
     return data;
   }
@@ -709,7 +704,6 @@
       previous_response_id: previousResponseId,
     });
     loading = false;
-
     if (error) {
       addToast({
         message: error?.message ?? "Something went wrong",
@@ -730,6 +724,12 @@
     {isFetching}
     {isGenerating}
     {isResoningThingking}
+    promptResultTrackging={{
+      page_name: ScreenName.PromptExecutionArea,
+      use_case: currentPrompt?.title || "-",
+      tool: selectedPromptTool,
+      model: getModelName($tenant, currentPrompt?.model),
+    }}
   />
 {/if}
 
@@ -767,7 +767,7 @@
     {toolOptions}
     bind:selectedPromptTool
     bind:isDisablePromptTool
-    showAttachmentButton={isShowAttachmentButton}
+    allowFileUpload={isShowAttachmentButton}
   />
 </div>
 
@@ -780,6 +780,12 @@
     {isFetching}
     {isGenerating}
     {isResoningThingking}
+    promptResultTrackging={{
+      page_name: ScreenName.PromptExecutionArea,
+      use_case: currentPrompt?.title || "-",
+      tool: selectedPromptTool,
+      model: getModelName($tenant, currentPrompt?.model),
+    }}
   />
 {/if}
 
