@@ -36,6 +36,9 @@
     promptDialog?: HTMLDialogElement;
     dialogMode?: "create" | "update" | "clone";
     dialogTitle?: string;
+    apiEndPointPrompt?: string;
+    apiEndPointCategory?: string;
+    apiEndPointKnowledgeBase?: string;
   }
 
   let {
@@ -44,6 +47,9 @@
     promptDialog = $bindable(),
     dialogMode = "update",
     dialogTitle = t("prompt-library.edit.title"),
+    apiEndPointPrompt = "/api/prompts/index.json",
+    apiEndPointCategory = "/api/categories.json",
+    apiEndPointKnowledgeBase = "/api/knowledge-base.json",
   }: Props = $props();
 
   type Category = {
@@ -99,7 +105,7 @@
   );
 
   onMount(async () => {
-    const categoryResponse = await fetch("/api/categories.json", {
+    const categoryResponse = await fetch(apiEndPointCategory, {
       method: "GET",
     });
     const categoryData = (await categoryResponse.json()) as Category[];
@@ -107,7 +113,7 @@
       categories = categoryData;
     }
 
-    const knowledgeBaseResponse = await fetch("/api/knowledge-base.json", {
+    const knowledgeBaseResponse = await fetch(apiEndPointKnowledgeBase, {
       method: "GET",
     });
     const knowledgeBaseData =
@@ -120,7 +126,7 @@
   async function getPromptDetail(id: string) {
     isLoading = true;
     try {
-      const response = await fetch(`/api/prompts/index.json?_id=${id}`, {
+      const response = await fetch(`${apiEndPointPrompt}?_id=${id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -216,7 +222,7 @@
       if (dialogMode == "clone") {
         httpMethod = "POST"; // FOR CREATING NEW
       }
-      const response = await fetch("/api/prompts/index.json", {
+      const response = await fetch(apiEndPointPrompt, {
         method: httpMethod,
         body: JSON.stringify(newPrompt),
         headers: {

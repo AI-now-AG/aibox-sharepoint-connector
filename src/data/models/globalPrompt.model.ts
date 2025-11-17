@@ -17,8 +17,14 @@ const PromptSchema = z.object({
   promptTool: z.string().nullish(),
   documents: z.array(z.instanceof(ObjectId)).optional(),
   position: z.number().default(0).optional(),
-  created_at: z.date().optional(),
-  updated_at: z.date(),
+  created_at: z
+    .date()
+    .optional()
+    .default(() => new Date()),
+  updated_at: z
+    .date()
+    .optional()
+    .default(() => new Date()),
 });
 
 export type Prompt = z.infer<typeof PromptSchema>;
@@ -27,7 +33,7 @@ const collection = db.collection("global_prompts");
 
 export default {
   create: async (prompt: Partial<Omit<Prompt, "_id">>) => {
-    const validated = PromptSchema.parse(prompt);
+    const validated = PromptSchema.parse({ _id: new ObjectId(), ...prompt });
     const doc = {
       position: 0,
       ...validated,
@@ -38,9 +44,14 @@ export default {
   update: async (id: string | ObjectId, update: Partial<Prompt>) => {
     const _id = toObjectId(id);
     const validated = PromptSchema.partial().parse(update);
+    const doc = {
+      ...validated,
+      updated_at: new Date(),
+    };
+
     const result = await collection.findOneAndUpdate(
       { _id },
-      { $set: { ...validated } },
+      { $set: doc },
       { returnDocument: "after" },
     );
     return result;

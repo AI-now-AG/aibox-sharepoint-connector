@@ -16,8 +16,14 @@ const CategorySchema = z.object({
   icon: z.string().optional(),
   active: z.boolean().default(true).optional(),
   position: z.number().default(0).optional(),
-  created_at: z.date().optional(),
-  updated_at: z.date().optional(),
+  created_at: z
+    .date()
+    .optional()
+    .default(() => new Date()),
+  updated_at: z
+    .date()
+    .optional()
+    .default(() => new Date()),
 });
 
 const CategoryGroupSchema = CategorySchema.extend({
@@ -46,9 +52,14 @@ export default {
   update: async (id: string | ObjectId, update: Partial<Category>) => {
     const _id = toObjectId(id);
     const validated = CategoryGroupSchema.partial().parse(update);
+    const doc = {
+      ...validated,
+      updated_at: new Date(),
+    };
+
     const result = await collection.findOneAndUpdate(
       { _id },
-      { $set: { ...validated } },
+      { $set: doc },
       { returnDocument: "after" },
     );
     return result;

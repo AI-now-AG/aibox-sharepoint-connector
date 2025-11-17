@@ -11,6 +11,7 @@ import { report } from "./report";
 import { configurations } from "./configuration";
 import { cloneMasterTenant } from "./cloneMasterTenant";
 import { globalCategory } from "./globalCategory";
+import { globalPrompt } from "./globalPrompt";
 import { posthog } from "./posthog";
 
 export const server = {
@@ -27,5 +28,6 @@ export const server = {
   configurations,
   cloneMasterTenant,
   globalCategory,
+  globalPrompt,
   posthog,
 };

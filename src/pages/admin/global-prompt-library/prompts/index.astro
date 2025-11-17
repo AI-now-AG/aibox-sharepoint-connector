@@ -4,7 +4,7 @@ import { useTranslations } from "$i18n/utils";
 import GlobalPromptModel from "$data/models/globalPrompt.model";
 import GlobalCategoryModel from "$data/models/globalCategory.model";
 import { type CardItem } from "$components/Card.svelte";
-import PromptToolbar from "$components/prompt-library/prompts/PromptToolbar.svelte";
+import PromptToolbar from "./PromptToolbar.svelte";
 import PromptListFilter from "./PromptListFilter.svelte";
 import { Permission } from "$types/Users";
 import type { CategoryItem } from "$types/CategoryItem";
@@ -75,7 +75,7 @@ let userPermissions = Astro.locals.user.permissions;
     <div class="flex gap-2">
       {
         userPermissions.includes(Permission.SuperAll) && (
-          <PromptToolbar isEditable={true} showImportExport={false} client:load />
+          <PromptToolbar isEditable={true} client:load />
         )
       }
     </div>

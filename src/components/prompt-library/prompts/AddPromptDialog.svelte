@@ -48,6 +48,9 @@
     currentGroupId?: string | null;
     isEditable?: boolean;
     addPromptDialog?: HTMLDialogElement;
+    apiEndPointPrompt?: string;
+    apiEndPointCategory?: string;
+    apiEndPointKnowledgeBase?: string;
   }
 
   let {
@@ -55,6 +58,9 @@
     currentGroupId = null,
     isEditable = false,
     addPromptDialog = $bindable(),
+    apiEndPointPrompt = "/api/prompts/index.json",
+    apiEndPointCategory = "/api/categories.json",
+    apiEndPointKnowledgeBase = "/api/knowledge-base.json",
   }: Props = $props();
 
   let categories: Category[] = $state([]);
@@ -96,7 +102,7 @@
 
   async function fetchCategories() {
     // Send a GET request to the API endpoint
-    const response = await fetch("/api/categories.json", { method: "GET" });
+    const response = await fetch(apiEndPointCategory, { method: "GET" });
 
     // Parse the JSON response into a typed array of Category objects
     const categoryData = (await response.json()) as Category[];
@@ -121,7 +127,7 @@
 
   async function fetchKnowledgeBases() {
     // Send a GET request to the API endpoint
-    const knowledgeBaseResponse = await fetch("/api/knowledge-base.json", {
+    const knowledgeBaseResponse = await fetch(apiEndPointKnowledgeBase, {
       method: "GET",
     });
 
@@ -160,7 +166,7 @@
         ...(selectedGroup && { group: selectedGroup._id }),
       };
 
-      const response = await fetch("/api/prompts/index.json", {
+      const response = await fetch(apiEndPointPrompt, {
         method: "POST",
         body: JSON.stringify(newPrompt),
         headers: {

@@ -1,8 +1,6 @@
 <script lang="ts">
   import PromptFilter from "$components/prompt-interface/PromptFilter.svelte";
-  import PromptList, {
-    type PromptCartItem,
-  } from "$components/prompt-interface/PromptList.svelte";
+  import PromptList, { type PromptCartItem } from "./PromptList.svelte";
   import type { CategoryItem } from "$types/CategoryItem";
 
   interface Props {
