@@ -57,7 +57,8 @@ let userPermissions = Astro.locals.user.permissions;
     isEnabled={selectedUsecase?.enabled}
     isNew={!selectedUsecase}
     selectedUsecaseId={selectedUsecase?._id.toString()}
-    isEditable={userPermissions.includes(Permission.AdminAll)}
+    isEditable={userPermissions.includes(Permission.AdminAll) ||
+      userPermissions.includes(Permission.SuperUserAll)}
     mode={mode}
     client:load
   />
