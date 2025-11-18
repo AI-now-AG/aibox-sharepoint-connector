@@ -31,7 +31,7 @@ export enum FeaturePermission {
   EditAssistantInAssistantLibrary = "EditAssistantInAssistantLibrary",
   EditInstructionInAudioInstructionList = "EditInstructionInAudioInstructionList",
   EditSubInstructionInAudioSubInstructionList = "EditSubInstructionInAudioSubInstructionList",
-  EditInstructionInstructionUsecaseForm = "EditInstructionInstructionUsecaseForm",
+  EditInstructionInAudioInstructionUsecaseForm = "EditInstructionInAudioInstructionUsecaseForm",
 }
 
 export const FEATURE_PERMISSIONS_MAP: Record<FeaturePermission, Permission[]> = {
@@ -46,7 +46,7 @@ export const FEATURE_PERMISSIONS_MAP: Record<FeaturePermission, Permission[]> = 
   [FeaturePermission.EditAssistantInAssistantLibrary]: [Permission.SuperAdminAll, Permission.AdminAll, Permission.SuperUserAll],
   [FeaturePermission.EditInstructionInAudioInstructionList]: [Permission.SuperAdminAll, Permission.AdminAll, Permission.SuperUserAll],
   [FeaturePermission.EditSubInstructionInAudioSubInstructionList]: [Permission.SuperAdminAll, Permission.AdminAll, Permission.SuperUserAll],
-  [FeaturePermission.EditInstructionInstructionUsecaseForm]: [Permission.SuperAdminAll, Permission.AdminAll, Permission.SuperUserAll],
+  [FeaturePermission.EditInstructionInAudioInstructionUsecaseForm]: [Permission.SuperAdminAll, Permission.AdminAll, Permission.SuperUserAll],
 };
 
 export enum TourType {
