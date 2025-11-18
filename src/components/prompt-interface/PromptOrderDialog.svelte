@@ -7,21 +7,19 @@
 
   interface Props {
     promptOrderDialog?: HTMLDialogElement;
-    dialogTitle?: string;
     items: any[];
     confirm: any;
   }
 
   let {
     promptOrderDialog = $bindable(),
-    dialogTitle = t("prompt-library.prompt.change-order"),
     items = $bindable(),
     confirm,
   }: Props = $props();
 
   let sortable: HTMLElement | null = null;
   // svelte-ignore non_reactive_update
-    let localItems = [...items];
+  let localItems = [...items];
 
   $effect(() => {
     // Keep localItems in sync if items changes from outside
@@ -76,7 +74,9 @@
 <dialog bind:this={promptOrderDialog} class="modal">
   <div class="modal-box w-8/12 max-w-5xl">
     <div class="flex justify-between">
-      <h3 class="text-lg font-bold py-4">{dialogTitle}</h3>
+      <h3 class="text-lg font-bold py-4">
+        {t("prompt-library.prompt.change-order")}
+      </h3>
       <button class="btn btn-sm btn-circle btn-ghost" onclick={cancelEdit}>
         {@html svgIcons.closeMenu}
       </button>
@@ -93,7 +93,7 @@
       >
         {#each localItems as item (item.id)}
           <li
-            class="flex-none w-full p-4 mb-2 flex items-center text-sm font-medium rounded-lg border cursor-pointer  my-handle cursor-move"
+            class="flex-none w-full p-4 mb-2 flex items-center text-sm font-medium rounded-lg border cursor-pointer my-handle cursor-move"
           >
             <span class="inline-flex mr-3">
               {@html svgIcons.drag}
