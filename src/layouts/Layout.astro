@@ -47,7 +47,7 @@ switch (Astro.locals.user?.tenant_id?.toString()) {
 }
 
 const { user, tenant, locale } = Astro.locals;
-const userInfo = { ...user, id: user.id.toString() };
+const userInfo = { ...user, id: user.id?.toString() };
 const isSocialAuth = isSocialConnection(userInfo?.auth0_sub);
 
 const conversations = await cached(

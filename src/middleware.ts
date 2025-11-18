@@ -118,7 +118,7 @@ async function authenticate(context: APIContext, next: MiddlewareNext) {
 async function onboardingCheck(context: APIContext, next: MiddlewareNext) {
   const skipCheckSubscriptionPath = wildcardMatchInArray(
     context.url.pathname,
-    ['/subscription', '/subscription/*', '/logout', '/logout/*', '/api/logout'],
+    ['/subscription', '/subscription/*', '/logout', '/logout/*', '/api/logout', '/_actions/*'],
   );
 
   if (skipCheckSubscriptionPath) {
