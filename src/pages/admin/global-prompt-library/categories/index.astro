@@ -19,7 +19,7 @@ const tagMap = new Map(tags.map((tag) => [tag._id.toString(), tag.title]));
 
 const categoriesEnriched: CategoryItem[] = categories.map((category) => {
   const categoryTags: string[] = (category.tags ?? []).map((tagId: ObjectId) =>
-    tagMap.get(tagId.toString())
+    tagMap.get(tagId.toString()) || "Unknown"
   );
 
   return {

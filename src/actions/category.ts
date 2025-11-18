@@ -60,14 +60,14 @@ export const category = {
           const updateResult = await CategoryModel.update(item._id, {
             position: index,
           });
-          items.push(updateResult as Category);
+          items.push(transformRawData(updateResult));
           updated = true;
         } else {
-          items.push(currentItem as Category);
+          items.push(transformRawData(currentItem));
         }
       }
 
-      return transformRawData({ updated, items });
+      return { updated, items };
     },
   }),
 };

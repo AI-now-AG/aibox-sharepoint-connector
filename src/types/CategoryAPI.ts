@@ -25,7 +25,7 @@ export type CategoryParams = z.infer<typeof CategoryParamsSchema>;
 export const CategoryItemSchema = z.object({
   id: z.string(),
   title: z.string(),
-  tags: z.array(z.string()),
+  tags: z.array(z.string()).optional(),
   active: z.boolean().optional(),
 });
 
