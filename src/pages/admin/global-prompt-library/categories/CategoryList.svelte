@@ -152,8 +152,8 @@
               href={`categories/${item.id}`}
               class="flex-1 underline underline-offset-2">{item.title}</a
             >
-            {#if item.tags.length > 0}
-              <div class="flex space-x-1">
+            {#if item?.tags && item.tags.length > 0}
+              <div class="flex space-x-1 space-y-1 max-w-lg flex-wrap">
                 {#each item.tags as tag}
                   <span
                     class="px-2 py-1 text-xs bg-primary/10 text-primary rounded-full"
