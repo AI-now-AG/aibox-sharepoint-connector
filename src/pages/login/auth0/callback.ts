@@ -132,6 +132,27 @@ export async function GET(context: APIContext): Promise<Response> {
     }
   })
 
+  const user = await UserModel.get(userId?.toString() || "");
+  console.log("Login Callback ::: userId", userId);
+  console.log("Login Callback ::: user", user);
+  if (!user) {
+    console.log("Login Callback ::: User not found after login");
+    return new Response(null, {
+      status: 400,
+    });
+  } else {
+    if (user.created_by_admin != undefined && user.created_by_admin !== null && user.created_by_admin !== true) {// Self-registration flow
+      console.log("Login Callback ::: Self-registration flow detected");
+      if (user.logins_count <= 1) {// First login
+        console.log("Login Callback :::First login - redirect to subscription");
+        return context.redirect("/subscription");
+      } else if (!user.is_complete_self_registration) {// Incomplete subscription
+        console.log("Login Callback :::Incomplete subscription - redirect to subscription");
+        return context.redirect("/subscription");
+      }
+    }
+  }
+
   // ✅ Redirect back to the app after successful login
   return context.redirect("/");
 }
