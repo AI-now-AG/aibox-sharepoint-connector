@@ -1,10 +1,11 @@
 ---
 import Layout from "$layouts/Layout.astro";
-import { Permission } from "$types/Users";
+import { FeaturePermission } from "$types/Users";
 import { TranscriptionType } from "$types/TranscribeRequest";
 import { AudioCategory } from "$types/TenantFeature";
 import UpdateForm from "$pages/settings/transcription/UpdateForm.svelte";
 import transcriptionModel from "$data/models/transcription.model";
+import { isFeaturePermissionEnabled } from "$utils/permission";
 
 const { searchParams } = Astro.url;
 const typeParam = searchParams.get("type") as TranscriptionType;
@@ -57,8 +58,10 @@ let userPermissions = Astro.locals.user.permissions;
     isEnabled={selectedUsecase?.enabled}
     isNew={!selectedUsecase}
     selectedUsecaseId={selectedUsecase?._id.toString()}
-    isEditable={userPermissions.includes(Permission.AdminAll) ||
-      userPermissions.includes(Permission.SuperUserAll)}
+    isEditable={isFeaturePermissionEnabled(
+      FeaturePermission.EditInstructionInstructionUsecaseForm,
+      userPermissions
+    )}
     mode={mode}
     client:load
   />

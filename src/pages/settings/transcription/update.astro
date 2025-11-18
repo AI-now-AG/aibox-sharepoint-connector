@@ -1,13 +1,14 @@
 ---
 import Layout from "$layouts/Layout.astro";
 import { useTranslations } from "$i18n/utils";
-import { Permission } from "$types/Users";
+import { FeaturePermission, Permission } from "$types/Users";
 import { TranscriptionType } from "$types/TranscribeRequest";
 import { AudioCategory } from "$types/TenantFeature";
 import TranscriptionModel from "$data/models/transcription.model";
 import { svgIcons } from "$assets/icons";
 import AudioUsecaseList from "./AudioUsecaseList.svelte";
 import type { AudioCardItem } from "$types/AudioCardItem";
+import { isFeaturePermissionEnabled } from "$utils/permission";
 
 const t = useTranslations();
 const { searchParams } = Astro.url;
@@ -102,7 +103,10 @@ const transcriptionsEnriched: AudioCardItem[] = transcriptionsFiltered.map(
     </div>
     <div class="flex items-center space-x-2">
       {
-        userPermissions.includes(Permission.AdminAll) && (
+        isFeaturePermissionEnabled(
+          FeaturePermission.EditSubInstructionInAudioSubInstructionList,
+          userPermissions
+        ) && (
           <a
             href={`/settings/transcription/UsecaseForm?type=${encodeURIComponent(typeParam)}`}
             class="btn btn-outline font-normal grow-0"
@@ -117,7 +121,10 @@ const transcriptionsEnriched: AudioCardItem[] = transcriptionsFiltered.map(
   <AudioUsecaseList
     items={transcriptionsEnriched}
     typeParam={typeParam}
-    isEditable={userPermissions.includes(Permission.AdminAll)}
+    isEditable={isFeaturePermissionEnabled(
+      FeaturePermission.EditSubInstructionInAudioSubInstructionList,
+      userPermissions
+    )}
     client:load
   />
 </Layout>
