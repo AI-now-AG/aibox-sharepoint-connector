@@ -8,6 +8,7 @@ import {
   SUPER_ADMIN_ROUTES,
   FEATURE_MAP_ROUTES,
   SUPER_USER_ROUTES,
+  SKIP_CHEKING_ONBOARDING_ROUTES,
 } from "$constants";
 import type { APIContext, MiddlewareNext } from "astro";
 import TenantModel from "$data/models/tenant.model";
@@ -118,7 +119,7 @@ async function authenticate(context: APIContext, next: MiddlewareNext) {
 async function onboardingCheck(context: APIContext, next: MiddlewareNext) {
   const skipCheckSubscriptionPath = wildcardMatchInArray(
     context.url.pathname,
-    ['/subscription', '/subscription/*', '/logout', '/logout/*', '/api/logout', '/_actions/*'],
+    SKIP_CHEKING_ONBOARDING_ROUTES,
   );
 
   if (skipCheckSubscriptionPath) {

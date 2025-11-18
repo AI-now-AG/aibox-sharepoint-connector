@@ -50,6 +50,15 @@ export const FEATURE_MAP_ROUTES = {
   "audio-to-text": ["/transcription", "/settings/transcription"],
 };
 
+export const SKIP_CHEKING_ONBOARDING_ROUTES = [
+  '/subscription',
+  '/subscription/*',
+  '/logout',
+  '/logout/*',
+  '/api/logout',
+  '/_actions/*'
+]
+
 // Auth0
 export const AUTH0_SESSION_STATE = "auth0_state";
 export const AUTH_AUTHORIZE_SCOPES = [
