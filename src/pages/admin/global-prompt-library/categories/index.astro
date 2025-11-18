@@ -2,7 +2,9 @@
 import Layout from "$layouts/Layout.astro";
 import { svgIcons } from "$assets/icons";
 import { useTranslations } from "$i18n/utils";
+import { ObjectId } from "mongodb";
 import GlobalCategoryModel from "$data/models/globalCategory.model";
+import GlobalTagModel from "$data/models/globalTag.model";
 import CategoryList from "./CategoryList.svelte";
 
 import { Permission } from "$types/Users";
@@ -10,13 +12,23 @@ import type { CategoryItem } from "$types/GlobalCategoryAPI";
 
 const t = useTranslations();
 const categories = await GlobalCategoryModel.list();
+const tags = await GlobalTagModel.list();
 
-const categoriesEnriched: CategoryItem[] = categories.map((category) => ({
-  id: category._id.toString(),
-  title: category.title,
-  tags: ["aaaa"],
-  active: category.active,
-}));
+// Build a map for faster lookup
+const tagMap = new Map(tags.map((tag) => [tag._id.toString(), tag.title]));
+
+const categoriesEnriched: CategoryItem[] = categories.map((category) => {
+  const categoryTags: string[] = (category.tags ?? []).map((tagId: ObjectId) =>
+    tagMap.get(tagId.toString())
+  );
+
+  return {
+    id: category._id.toString(),
+    title: category.title,
+    tags: categoryTags,
+    active: category.active,
+  };
+});
 
 let userPermissions = Astro.locals.user.permissions;
 ---

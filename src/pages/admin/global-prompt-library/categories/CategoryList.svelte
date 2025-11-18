@@ -10,7 +10,7 @@
   import { preventDefault } from "$utils/common";
 
   interface Props {
-    items?: CategoryItem[];
+    items: CategoryItem[];
   }
 
   let { items = $bindable([]) }: Props = $props();
@@ -152,6 +152,16 @@
               href={`categories/${item.id}`}
               class="flex-1 underline underline-offset-2">{item.title}</a
             >
+            {#if item.tags.length > 0}
+              <div class="flex space-x-1">
+                {#each item.tags as tag}
+                  <span
+                    class="px-2 py-1 text-xs bg-primary/10 text-primary rounded-full"
+                    >{tag}</span
+                  >
+                {/each}
+              </div>
+            {/if}
           </div>
           <div class="flex-none w-20">
             <span

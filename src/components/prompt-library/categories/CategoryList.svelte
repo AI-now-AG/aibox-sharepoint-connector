@@ -10,7 +10,7 @@
   import { preventDefault } from "$utils/common";
 
   interface Props {
-    items?: CategoryItem[];
+    items: CategoryItem[];
   }
 
   let { items = $bindable([]) }: Props = $props();
