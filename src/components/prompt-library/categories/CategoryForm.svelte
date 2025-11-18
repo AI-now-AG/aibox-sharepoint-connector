@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { CreateCategoryParams } from "$pages/api/categories.json";
+  import { type CreateCategoryParams } from "$types/CategoryAPI";
   import { onMount } from "svelte";
   import { useTranslations } from "$i18n/utils";
   import { addToast } from "$stores/toast";

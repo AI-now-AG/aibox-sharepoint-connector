@@ -87,7 +87,7 @@
       const deletedPrompt = {
         ...(selectedDeletePromptId && { _id: selectedDeletePromptId }),
       };
-      const response = await fetch("/api/prompts/index.json", {
+      const response = await fetch("/api/admin/global-prompts.json", {
         method: "DELETE",
         body: JSON.stringify(deletedPrompt),
         headers: {

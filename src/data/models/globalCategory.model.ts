@@ -16,6 +16,7 @@ const CategorySchema = z.object({
   icon: z.string().optional(),
   active: z.boolean().default(true).optional(),
   position: z.number().default(0).optional(),
+  tags: z.array(z.instanceof(ObjectId)),
   created_at: z
     .date()
     .optional()

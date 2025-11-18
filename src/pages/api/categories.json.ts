@@ -4,28 +4,11 @@ import { z } from "zod";
 import slug from "slug";
 import CategoryModel from "$data/models/category.model";
 import type { Category, Group } from "$data/models/category.model";
-
-const GroupParamSchema = z.object({
-  _id: z.string().optional(),
-  title: z.string(),
-  active: z.boolean().optional(),
-  position: z.number().optional(),
-});
-
-const CreateCategoryParamsSchema = z.object({
-  _id: z.string().optional(),
-  title: z.string(),
-  groups: z.array(GroupParamSchema),
-});
-
-export type CreateCategoryParams = z.infer<typeof CreateCategoryParamsSchema>;
-export type GroupParam = z.infer<typeof GroupParamSchema>;
-
-const CategoryParamsSchema = z.object({
-  _id: z.string(),
-});
-
-export type CategoryParams = z.infer<typeof CategoryParamsSchema>;
+import {
+  CategoryParamsSchema,
+  CreateCategoryParamsSchema,
+  type CategoryParams,
+} from "$types/CategoryAPI";
 
 export const GET: APIRoute = async (ctx) => {
   try {

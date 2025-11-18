@@ -2,7 +2,6 @@ import type { APIContext, APIRoute } from "astro";
 import GlobalPromptModel, {
   type Prompt,
 } from "$data/models/globalPrompt.model";
-import { z } from "zod";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import { stringToObjectId } from "$utils/stringToObjectId";
@@ -10,28 +9,12 @@ import KnowledgeBaseModel, {
   type KnowledgeBase,
 } from "$data/models/knowledgeBase.model";
 import createChatModel from "$utils/chatModel";
-
-const CreatePromptParamsSchema = z.object({
-  _id: z.string().optional(),
-  title: z.string(),
-  category: z.string().optional(),
-  group: z.string().optional(),
-  knowledgebase: z.array(z.string().optional()),
-  prompt: z.string(),
-  predefined_input: z.string().optional(),
-  model: z.string().nullish(),
-  reasoningEffort: z.string().nullish(),
-  textVerbosity: z.string().nullish(),
-  promptTool: z.string().nullish(),
-  documents: z.array(z.string()).optional(),
-});
-
-export type CreatePromptParams = z.infer<typeof CreatePromptParamsSchema>;
-const PromptParamsSchema = z.object({
-  _id: z.string(),
-});
-
-export type PromptParams = z.infer<typeof PromptParamsSchema>;
+import {
+  CreatePromptParamsSchema,
+  PromptParamsSchema,
+  type CreatePromptParams,
+  type PromptParams,
+} from "$types/GlobalPromptAPI";
 
 const instructions = `
   You are a helpful assistant who writes helpful descriptions of prompts for users that will use these prompts for a UI:

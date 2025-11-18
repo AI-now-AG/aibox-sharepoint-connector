@@ -4,28 +4,11 @@ import { z } from "zod";
 import slug from "slug";
 import GlobalCategoryModel from "$data/models/globalCategory.model";
 import type { Category, Group } from "$data/models/globalCategory.model";
-
-const GroupParamSchema = z.object({
-  _id: z.string().optional(),
-  title: z.string(),
-  active: z.boolean().optional(),
-  position: z.number().optional(),
-});
-
-const CreateCategoryParamsSchema = z.object({
-  _id: z.string().optional(),
-  title: z.string(),
-  groups: z.array(GroupParamSchema),
-});
-
-export type CreateCategoryParams = z.infer<typeof CreateCategoryParamsSchema>;
-export type GroupParam = z.infer<typeof GroupParamSchema>;
-
-const CategoryParamsSchema = z.object({
-  _id: z.string(),
-});
-
-export type CategoryParams = z.infer<typeof CategoryParamsSchema>;
+import {
+  CreateCategoryParamsSchema,
+  CategoryParamsSchema,
+  type CategoryParams,
+} from "$types/GlobalCategoryAPI";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const GET: APIRoute = async (ctx) => {
@@ -76,10 +59,13 @@ export const POST: APIRoute = async (ctx) => {
     return uniqueGroups;
   }, []);
 
+  const tags = data.tags.map((item) => new ObjectId(item));
+
   // Create the new category
   const newCategory: Partial<Category> = {
     title: data.title,
     groups: Array.from(groups),
+    tags: Array.from(tags),
     slug: slug(data.title),
     position: newPosition,
     icon: z
@@ -126,9 +112,12 @@ export const PUT: APIRoute = async (ctx) => {
     return uniqueGroups;
   }, []);
 
+  const tags = data.tags.map((item) => new ObjectId(item));
+
   const category: Partial<Category> = {
     title: data.title,
     groups: Array.from(groups),
+    tags: Array.from(tags),
     slug: slug(data.title),
     icon: z
       .string()

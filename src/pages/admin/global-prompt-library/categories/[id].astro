@@ -1,6 +1,7 @@
 ---
 import Layout from "$layouts/Layout.astro";
 import GlobalCategoryModel from "$data/models/globalCategory.model";
+import GlobalTagModel from "$data/models/globalTag.model";
 import { Permission } from "$types/Users";
 import CategoryForm from "./CategoryForm.svelte";
 import { transformRawData } from "$utils/transformRawData";
@@ -18,8 +19,10 @@ const category = await GlobalCategoryModel.get(id);
 if (!category) {
   return Astro.redirect("/404");
 }
-
 const formattedCategory = transformRawData(category, false);
+
+const tags = await GlobalTagModel.list();
+const formattedTags = transformRawData(tags);
 
 let userPermissions = Astro.locals.user.permissions;
 ---
@@ -28,6 +31,7 @@ let userPermissions = Astro.locals.user.permissions;
   <div>
     <CategoryForm
       category={formattedCategory}
+      tags={formattedTags}
       isEditable={userPermissions.includes(Permission.AdminAll)}
       client:load
     />
