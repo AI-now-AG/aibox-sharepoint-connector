@@ -6,7 +6,7 @@ import CategoryModel from "$data/models/category.model";
 import CategoryList from "$components/prompt-library/categories/CategoryList.svelte";
 
 import { Permission } from "$types/Users";
-import type { ViewCategory } from "$actions/category";
+import type { CategoryItem } from "$types/CategoryAPI";
 
 const t = useTranslations();
 
@@ -15,7 +15,7 @@ const categoriesCursor = await CategoryModel.listByTenant(
 );
 const categories = await categoriesCursor.toArray();
 
-const categoriesEnriched: ViewCategory[] = categories.map((category) => ({
+const categoriesEnriched: CategoryItem[] = categories.map((category) => ({
   id: category._id.toString(),
   title: category.title,
   active: category.active,

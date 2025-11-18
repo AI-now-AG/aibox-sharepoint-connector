@@ -1,6 +1,11 @@
 import { z } from "zod";
 import { GroupParamSchema, CategoryParamsSchema } from "./CategoryAPI";
-export { GroupParamSchema, CategoryParamsSchema } from "./CategoryAPI";
+export {
+  GroupParamSchema,
+  CategoryParamsSchema,
+  type CategoryItem,
+  type CategoryList,
+} from "./CategoryAPI";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const CreateCategoryParamsSchema = z.object({

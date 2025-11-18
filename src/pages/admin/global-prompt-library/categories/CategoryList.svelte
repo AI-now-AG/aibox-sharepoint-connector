@@ -6,11 +6,11 @@
   import { useTranslations } from "$i18n/utils";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import Loading from "$components/Loading.svelte";
-  import type { ViewCategory } from "$actions/category";
+  import type { CategoryItem } from "$types/CategoryAPI";
   import { preventDefault } from "$utils/common";
 
   interface Props {
-    items?: ViewCategory[];
+    items?: CategoryItem[];
   }
 
   let { items = $bindable([]) }: Props = $props();
@@ -70,7 +70,7 @@
     reloadPage(1000);
   }
 
-  async function updatePosition(items: ViewCategory[]) {
+  async function updatePosition(items: CategoryItem[]) {
     loading = true;
     const sortedIds = items.map((item) => {
       return {

@@ -6,14 +6,15 @@ import GlobalCategoryModel from "$data/models/globalCategory.model";
 import CategoryList from "./CategoryList.svelte";
 
 import { Permission } from "$types/Users";
-import type { ViewCategory } from "$actions/category";
+import type { CategoryItem } from "$types/GlobalCategoryAPI";
 
 const t = useTranslations();
 const categories = await GlobalCategoryModel.list();
 
-const categoriesEnriched: ViewCategory[] = categories.map((category) => ({
+const categoriesEnriched: CategoryItem[] = categories.map((category) => ({
   id: category._id.toString(),
   title: category.title,
+  tags: ["aaaa"],
   active: category.active,
 }));
 

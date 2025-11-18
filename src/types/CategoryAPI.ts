@@ -21,3 +21,18 @@ export const CategoryParamsSchema = z.object({
 });
 
 export type CategoryParams = z.infer<typeof CategoryParamsSchema>;
+
+export const CategoryItemSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  tags: z.array(z.string()),
+  active: z.boolean().optional(),
+});
+
+export const CategoryListSchema = z.object({
+  updated: z.boolean(),
+  items: z.array(CategoryItemSchema),
+});
+
+export type CategoryItem = z.infer<typeof CategoryItemSchema>;
+export type CategoryList = z.infer<typeof CategoryListSchema>;
