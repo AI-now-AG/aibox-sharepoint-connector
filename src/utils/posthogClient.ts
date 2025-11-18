@@ -57,3 +57,21 @@ export function posthogClientCapture(tenant: { is_on_posthog?: boolean, _id: Obj
     console.log("posthogClientCapture", event_name, newProperties, options)
     getPosthogClilentInstance?.()?.capture(event_name, newProperties, options);
 }
+
+/**
+   * Captures an event with optional properties without tenant check
+   *
+   * @example
+   * ```ts
+   * posthogClientCaptureWithoutTenant(EventName.OnboardingStep1, {
+   *     page_name: auth0User.data.nickname,
+   * })
+   * ```
+   *
+   * @param props {@link EventMessage}
+   * @returns 
+*/
+export function posthogClientCaptureWithoutTenant(event_name: AiboxEventName | EventName, properties: Properties, options?: CaptureOptions) {
+    console.log("posthogClientCaptureWithoutTenant", event_name, properties, options)
+    getPosthogClilentInstance?.()?.capture(event_name, properties, options);
+}

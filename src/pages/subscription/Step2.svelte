@@ -12,6 +12,8 @@
     type SubscriptionPlan,
     subscription,
   } from "$stores/subscription";
+  import { EventName, ScreenName } from "$types/Posthog";
+  import { posthogClientCaptureWithoutTenant } from "$utils/posthogClient";
 
   interface Props {
     defaultLanguage?: string;
@@ -101,7 +103,9 @@
       }
     }
     storeAudioOptions(selectedAudioOptions);
-
+    posthogClientCaptureWithoutTenant(EventName.AiboxOnboardingStep2, {
+      page_name: ScreenName.OnboardingStep2,
+    });
     window.location.href = "/subscription/step3";
   }
 </script>

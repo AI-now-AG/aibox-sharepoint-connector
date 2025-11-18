@@ -6,6 +6,8 @@
   import Dropdown from "$components/subscription/Dropdown.svelte";
   import { storeOrganizationInfo, subscription } from "$stores/subscription";
   import { Languges } from "$types/TenantFeature";
+  import { posthogClientCaptureWithoutTenant } from "$utils/posthogClient";
+  import { EventName, ScreenName } from "$types/Posthog";
 
   interface Props {
     defaultLanguage?: string;
@@ -61,6 +63,9 @@
         organizationName: organizationName,
         defaultLanguage: selectedLanguage || "de",
         useCases: selectedCategories,
+      });
+      posthogClientCaptureWithoutTenant(EventName.AiboxOnboardingStep1, {
+        page_name: ScreenName.OnboardingStep1,
       });
       window.location.href = "/subscription/step2";
     }

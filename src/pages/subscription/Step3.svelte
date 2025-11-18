@@ -17,6 +17,8 @@
     BillingMethod,
   } from "$types/Subscription";
   import { isValidEmail, isValidPhone } from "$utils/common";
+  import { EventName, ScreenName } from "$types/Posthog";
+  import { posthogClientCaptureWithoutTenant } from "$utils/posthogClient";
 
   interface Props {
     accountEmail: string;
@@ -151,9 +153,15 @@
           storeStripeCheckout({
             customerId: result.stripeCustomerId,
           });
+          posthogClientCaptureWithoutTenant(EventName.AiboxOnboardingStep3, {
+            page_name: ScreenName.OnboardingStep3,
+          });
           window.location.href = result.url || "";
         }
       } else {
+        posthogClientCaptureWithoutTenant(EventName.AiboxOnboardingStep3, {
+          page_name: ScreenName.OnboardingStep3,
+        });
         window.location.href = "/subscription/step4";
       }
     }
