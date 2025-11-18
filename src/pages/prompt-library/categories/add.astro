@@ -1,15 +1,18 @@
 ---
 import Layout from "$layouts/Layout.astro";
 import CategoryForm from "$pages/prompt-library/categories/CategoryForm.svelte";
-import { Permission } from "$types/Users";
+import { FeaturePermission } from "$types/Users";
+import { isFeaturePermissionEnabled } from "$utils/permission";
 
 let userPermissions = Astro.locals.user.permissions;
 ---
 
 <Layout>
   <CategoryForm
-    isEditable={userPermissions.includes(Permission.AdminAll) ||
-      userPermissions.includes(Permission.SuperUserAll)}
+    isEditable={isFeaturePermissionEnabled(
+      FeaturePermission.EditCategoryInCategoryForm,
+      userPermissions
+    )}
     client:load
   />
 </Layout>
