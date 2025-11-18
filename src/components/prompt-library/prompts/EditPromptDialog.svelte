@@ -5,7 +5,7 @@
   import SingleInput from "$components/prompt-library/prompts/SingleInput.svelte";
   import MultiInput from "$components/prompt-library/prompts/MultiInput.svelte";
   import ModelInput from "$components/prompt-library/prompts/ModelInput.svelte";
-  import type { CreatePromptParams } from "$pages/api/prompts/index.json";
+  import type { CreatePromptParams } from "$types/PromptAPI";
   import { addToast } from "$stores/toast";
   import RefinementButton from "$components/prompt-interface/RefinementButton.svelte";
   import LoadingSpinner from "$components/prompt-interface/LoadingSpinner.svelte";

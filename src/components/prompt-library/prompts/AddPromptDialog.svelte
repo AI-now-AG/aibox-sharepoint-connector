@@ -1,6 +1,6 @@
 <script lang="ts">
   import { navigate } from "astro:transitions/client";
-  import type { CreatePromptParams } from "$pages/api/prompts/index.json";
+  import type { CreatePromptParams } from "$types/PromptAPI";
   import { useTranslations } from "$i18n/utils";
   import { svgIcons } from "$assets/icons";
   import { onMount } from "svelte";
