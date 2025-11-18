@@ -4,8 +4,6 @@
   import { svgIcons } from "$assets/icons";
   import { type TagItem } from "$types/TagInput";
 
-  const API_BASE = "/api/admin/global-tags.json";
-
   interface Props {
     tagDialog?: HTMLDialogElement;
   }
@@ -18,7 +16,7 @@
 
   async function loadTags() {
     loading = true;
-    const res = await fetch(API_BASE);
+    const res = await fetch("/api/admin/global-tags.json");
     const data = await res.json();
 
     tags = data.map((item: TagItem) => ({
@@ -30,7 +28,7 @@
 
   async function createTag() {
     if (!newTitle.trim()) return;
-    const res = await fetch(API_BASE, {
+    const res = await fetch("/api/admin/global-tags.json", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title: newTitle }),
@@ -40,16 +38,20 @@
   }
 
   async function updateTag(tag: TagItem) {
-    await fetch(`${API_BASE}/${tag._id}`, {
+    await fetch("/api/admin/global-tags.json", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: tag.title }),
+      body: JSON.stringify({ _id: tag._id, title: tag.title }),
     });
     await loadTags();
   }
 
   async function deleteTag(id: string) {
-    await fetch(`${API_BASE}/${id}`, { method: "DELETE" });
+    await fetch("/api/admin/global-tags.json", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ _id: id }),
+    });
     await loadTags();
   }
 
