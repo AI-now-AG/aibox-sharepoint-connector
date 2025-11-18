@@ -26,10 +26,10 @@ const categories = await cached(
   1000 * 60 * 0.5,
   async () => {
     const cursor = await await Category.listActiveByTenant(
-      Astro.locals.user.tenant_id,
+      Astro.locals.user.tenant_id
     );
     return await cursor.toArray();
-  },
+  }
 );
 
 const transcriptions = await cached(
@@ -37,10 +37,10 @@ const transcriptions = await cached(
   1000 * 60 * 2,
   async () => {
     const data = await TranscriptionModel.listByTenant(
-      Astro.locals.user.tenant_id,
+      Astro.locals.user.tenant_id
     );
     return data;
-  },
+  }
 );
 
 const navState = Astro.locals.user.navState || {};
@@ -75,7 +75,7 @@ const transcriptionTypes = Astro.locals.tenant.transcription_types ?? [];
 const activeTranscriptions =
   transcriptions?.filter(
     (tran) =>
-      transcriptionTypes.includes(tran.category) && tran.enabled === true,
+      transcriptionTypes.includes(tran.category) && tran.enabled === true
   ) ?? [];
 
 const audioToTextTranscriptions = activeTranscriptions
@@ -92,7 +92,7 @@ const subtitleTranscriptions = activeTranscriptions
       tran.category == AudioCategory.Subtitle ||
       tran.category == AudioCategory.SubtitleJson ||
       tran.category == AudioCategory.SubtitleLarge ||
-      tran.category == AudioCategory.Subtitle11Labs,
+      tran.category == AudioCategory.Subtitle11Labs
   )
   .map((tran) => ({
     title: tran.name,
@@ -154,7 +154,7 @@ if (
   auth.hasFeatureWithProvider(
     Astro.locals,
     TenantFeature.CreateImage,
-    ApiKeyProvider.OpenAI,
+    ApiKeyProvider.OpenAI
   )
 ) {
   createImageItems.push({
@@ -168,7 +168,7 @@ if (
   auth.hasFeatureWithProvider(
     Astro.locals,
     TenantFeature.CreateImage,
-    ApiKeyProvider.Flux,
+    ApiKeyProvider.Flux
   )
 ) {
   createImageItems.push({
@@ -182,7 +182,7 @@ if (
   auth.hasFeatureWithProvider(
     Astro.locals,
     TenantFeature.GptImage,
-    ApiKeyProvider.OpenAI,
+    ApiKeyProvider.OpenAI
   )
 ) {
   createImageItems.push({
@@ -196,7 +196,7 @@ if (
   auth.hasFeatureWithProvider(
     Astro.locals,
     TenantFeature.CreateImage,
-    ApiKeyProvider.Gemini,
+    ApiKeyProvider.Gemini
   )
 ) {
   createImageItems.push({
@@ -225,6 +225,7 @@ if (conversations.length > 0) {
 const adminMenus = [];
 const supperAdminMenus = [];
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const settingsItems: Array<any> = [
   {
     title: t("nav.text-assistant"),
@@ -248,7 +249,7 @@ const settingsItems: Array<any> = [
 
 const hasAudioToTextFeature = auth.hasFeature(
   Astro.locals,
-  TenantFeature.AudioToText,
+  TenantFeature.AudioToText
 );
 if (hasAudioToTextFeature) {
   settingsItems.push({
@@ -277,7 +278,7 @@ if (auth.isAdmin(Astro.locals) || auth.isSuperAdmin(Astro.locals)) {
           path: `/billing/usage`,
         },
       ],
-    },
+    }
   );
 
   adminMenus.push({
@@ -716,6 +717,7 @@ const modules = [...menuItems];
                           <summary>{sub.title}</summary>
                           {sub.items.length > 0 && (
                             <ul class="active:bg-transparent">
+                              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                               {sub.items.map((sub1: any) => (
                                 <li class="pl-1 active:bg-transparent">
                                   <MenuItem {...sub1} />
@@ -837,7 +839,7 @@ const modules = [...menuItems];
         element.addEventListener(
           "toggle",
           () => updateNavState(detailsId, element.open),
-          { passive: true },
+          { passive: true }
         );
       }
     }
@@ -871,13 +873,13 @@ const modules = [...menuItems];
         selectorGroups.logo.classList.toggle("hidden", newCollapsed);
 
       selectorGroups.textSpans.forEach((el) =>
-        el.classList.toggle("hidden", newCollapsed),
+        el.classList.toggle("hidden", newCollapsed)
       );
       selectorGroups.subMenus.forEach((el) =>
-        el.classList.toggle("hidden", newCollapsed),
+        el.classList.toggle("hidden", newCollapsed)
       );
       selectorGroups.spacers.forEach((el) =>
-        el.classList.toggle("hidden", newCollapsed),
+        el.classList.toggle("hidden", newCollapsed)
       );
 
       selectorGroups.summaries.forEach((summary) => {
@@ -895,11 +897,11 @@ const modules = [...menuItems];
       // Update accessibility labels
       toggleBtn.setAttribute(
         "aria-label",
-        newCollapsed ? "Expand navigation" : "Collapse navigation",
+        newCollapsed ? "Expand navigation" : "Collapse navigation"
       );
       toggleBtn.setAttribute(
         "title",
-        newCollapsed ? "Expand navigation" : "Collapse navigation",
+        newCollapsed ? "Expand navigation" : "Collapse navigation"
       );
 
       // Update icon

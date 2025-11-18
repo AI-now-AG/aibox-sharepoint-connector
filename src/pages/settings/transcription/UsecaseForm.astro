@@ -59,7 +59,7 @@ let userPermissions = Astro.locals.user.permissions;
     isNew={!selectedUsecase}
     selectedUsecaseId={selectedUsecase?._id.toString()}
     isEditable={isFeaturePermissionEnabled(
-      FeaturePermission.EditInstructionInstructionUsecaseForm,
+      FeaturePermission.EditInstructionInAudioInstructionUsecaseForm,
       userPermissions
     )}
     mode={mode}
