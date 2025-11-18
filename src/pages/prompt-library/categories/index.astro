@@ -5,8 +5,9 @@ import { useTranslations } from "$i18n/utils";
 import CategoryModel from "$data/models/category.model";
 import CategoryList from "./CategoryList.svelte";
 
-import { Permission } from "$types/Users";
+import { FeaturePermission } from "$types/Users";
 import type { ViewCategory } from "$actions/category";
+import { isFeaturePermissionEnabled } from "$utils/permission";
 
 const t = useTranslations();
 
@@ -33,8 +34,10 @@ let userPermissions = Astro.locals.user.permissions;
     </h1>
 
     {
-      (userPermissions.includes(Permission.AdminAll) ||
-        userPermissions.includes(Permission.SuperUserAll)) && (
+      isFeaturePermissionEnabled(
+        FeaturePermission.AddCategoryInCategoryList,
+        userPermissions
+      ) && (
         <a
           href="categories/add"
           class="mt-2 lg:mt-8 btn btn-outline font-normal grow-0"
