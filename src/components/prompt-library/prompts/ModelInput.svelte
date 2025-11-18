@@ -47,7 +47,7 @@
     const modelLabel = ModelNameMap[rawModel] || rawModel;
 
     let title;
-    switch (provider.name) {
+    switch (provider?.name) {
       case PromptModel.OpenAI:
         title = `${modelLabel} (${t("home.model-option-text-tools")})`;
         break;

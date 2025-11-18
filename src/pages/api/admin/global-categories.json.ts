@@ -1,4 +1,4 @@
-import type { APIRoute } from "astro";
+import type { APIContext, APIRoute } from "astro";
 import { ObjectId } from "mongodb";
 import { z } from "zod";
 import slug from "slug";
@@ -11,7 +11,7 @@ import {
 } from "$types/GlobalCategoryAPI";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const GET: APIRoute = async (ctx) => {
+export const GET: APIRoute = async (ctx: APIContext) => {
   try {
     const categories = await GlobalCategoryModel.list();
     return new Response(
