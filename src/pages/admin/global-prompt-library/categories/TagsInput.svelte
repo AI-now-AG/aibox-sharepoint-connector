@@ -14,15 +14,17 @@
   }: Props = $props();
 </script>
 
-<Tags
-  bind:tags
-  autoComplete={tagList}
-  autoCompleteKey={"title"}
-  placeholder={"Enter a tag name..."}
-  onTagClick={(tag: Tag) => console.log("Tag clicked", JSON.stringify(tag))}
-  onlyUnique={true}
-  onlyAutocomplete={true}
-/>
+<div class="my-tags-input">
+  <Tags
+    bind:tags
+    autoComplete={tagList}
+    autoCompleteKey={"title"}
+    placeholder={"Enter a tag name..."}
+    onTagClick={(tag: Tag) => console.log("Tag clicked", JSON.stringify(tag))}
+    onlyUnique={true}
+    onlyAutocomplete={true}
+  />
+</div>
 
 <div class="text-right">
   <button
@@ -34,3 +36,9 @@
     <span>Manage tags</span>
   </button>
 </div>
+
+<style>
+  .my-tags-input :global(.svelte-tags-input-matchs) {
+    z-index: 999;
+  }
+</style>
