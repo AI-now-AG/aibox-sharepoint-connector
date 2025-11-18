@@ -18,7 +18,6 @@
   import { addToast } from "$stores/toast";
   import { useTranslations } from "$i18n/utils";
   import { actions } from "astro:actions";
-  import log from "$utils/log";
 
   const t = useTranslations();
   let loading = $state(false);
@@ -140,7 +139,7 @@
         type: "success",
       });
     } catch (error) {
-      log.e(error, "Error happening during update position");
+      console.error("Error happening during update position", error);
       addToast({
         message: t("prompt-library.prompt.order-failed"),
         type: "error",
@@ -199,6 +198,7 @@
   confirm={() => {
     clearTimeout(timeout);
     timeout = setTimeout(() => {
+      console.log("Updating position with items: ", JSON.stringify(orderCards));
       updatePosition(orderCards);
     }, 100);
   }}

@@ -13,17 +13,18 @@
 
   let {
     promptOrderDialog = $bindable(),
-    items = $bindable(),
+    items = $bindable([]),
     confirm,
   }: Props = $props();
 
   let sortable: HTMLElement | null = null;
-  // svelte-ignore non_reactive_update
-  let localItems = [...items];
+  let localItems = $state<any[]>([]);
 
   $effect(() => {
     // Keep localItems in sync if items changes from outside
-    localItems = [...items];
+    if (items.length !== localItems.length) {
+      localItems = [...items];
+    }
   });
 
   // Reset localItems when dialog is opened
