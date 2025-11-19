@@ -12,21 +12,18 @@ import { isFeaturePermissionEnabled } from "$utils/permission";
 
 const t = useTranslations();
 
-const promptsCursor = await PromptModel.listByTenant(
+const prompts = await PromptModel.listByTenant(
   Astro.locals.user.tenant_id
 );
-const prompts = await promptsCursor.toArray();
-
 const calls = prompts.map(async (prompt) => {
   if (!prompt.category) return null;
   const category = await CategoryModel.get(prompt.category.toString());
   return category;
 });
 
-const categoryList = await CategoryModel.listActiveByTenant(
+const categoryArray = await CategoryModel.listActiveByTenant(
   Astro.locals.user.tenant_id
 );
-let categoryArray = await categoryList.toArray();
 const categoryListArray: CategoryItem[] = categoryArray.map((category) => {
   const group = category.groups
     ?.filter((group) => {

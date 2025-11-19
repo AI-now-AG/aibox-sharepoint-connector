@@ -102,8 +102,7 @@ const syncCategoriesWithGroups = async (rows: CsvRowRaw[], user: User) => {
 };
 
 const syncPrompts = async (rows: CsvRowRaw[], user: User) => {
-  const categoriesCursor = await CategoryModel.listByTenant(user.tenant_id);
-  const categories = await categoriesCursor.toArray();
+  const categories = await CategoryModel.listByTenant(user.tenant_id);
 
   for (const item of rows) {
     // Get the _id of the category that matches item.category, or undefined if not found.

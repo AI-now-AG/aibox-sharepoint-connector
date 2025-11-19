@@ -68,13 +68,18 @@ export default {
     return collection.findOne<Document<Prompt>>({ _id });
   },
 
-  list: async () =>
-    collection.find<Document<Prompt>>({}).sort({ created_at: 1 }),
+  list: async () => {
+    return collection
+      .find<Document<Prompt>>({})
+      .sort({ created_at: 1 })
+      .toArray();
+  },
 
   listByTenant: async (id: ObjectId) => {
     return collection
       .find<Document<Prompt>>({ tenant_id: id })
-      .sort({ position: 1, created_at: 1 });
+      .sort({ position: 1, created_at: 1 })
+      .toArray();
   },
 
   listByCategory: async (categoryId: string | ObjectId) => {
@@ -87,40 +92,36 @@ export default {
       .toArray();
   },
 
-  listByCategoryIds: async (categoryIds: ObjectId[]) => {
-    return collection.find<Document<Prompt>>({
-      category: { $in: categoryIds },
-    });
-  },
-
   listForExportByTenant: async (id: ObjectId) => {
     // Execute the aggregation
-    return collection.aggregate([
-      {
-        $match: {
-          tenant_id: id,
+    return collection
+      .aggregate([
+        {
+          $match: {
+            tenant_id: id,
+          },
         },
-      },
-      {
-        $lookup: {
-          from: "categories",
-          localField: "category",
-          foreignField: "_id",
-          as: "category",
+        {
+          $lookup: {
+            from: "categories",
+            localField: "category",
+            foreignField: "_id",
+            as: "category",
+          },
         },
-      },
-      {
-        $lookup: {
-          from: "knowlegebases",
-          localField: "knowledgebase",
-          foreignField: "_id",
-          as: "knowledgebase",
+        {
+          $lookup: {
+            from: "knowlegebases",
+            localField: "knowledgebase",
+            foreignField: "_id",
+            as: "knowledgebase",
+          },
         },
-      },
-      {
-        $unwind: "$category",
-      },
-    ]);
+        {
+          $unwind: "$category",
+        },
+      ])
+      .toArray();
   },
 
   update: async (id: string, updatedPrompt: Partial<Prompt>) => {

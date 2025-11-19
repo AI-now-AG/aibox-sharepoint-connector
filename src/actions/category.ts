@@ -31,8 +31,7 @@ export const category = {
   listByTenant: defineAction({
     input: TenantIdentifierSchema,
     handler: async (input) => {
-      const categoriesCursor = await CategoryModel.listByTenant(input._id);
-      const categories = await categoriesCursor.toArray();
+      const categories = await CategoryModel.listByTenant(input._id);
       return transformRawData(categories);
     },
   }),

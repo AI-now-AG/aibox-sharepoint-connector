@@ -41,8 +41,7 @@ if (onboardingNew) {
 
 // ------------------------------------------------------
 
-const promptsCursor = await PromptModel.listByTenant(tenant._id);
-const prompts = await promptsCursor.toArray();
+const prompts = await PromptModel.listByTenant(tenant._id);
 
 const calls = prompts.map(async (prompt) => {
   if (!prompt.category) return null;

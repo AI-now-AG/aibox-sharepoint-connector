@@ -43,8 +43,10 @@ switch (Astro.locals.user?.tenant_id?.toString()) {
     theme = "light";
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const { user, tenant, locale } = Astro.locals;
 const userInfo = { ...user, id: user.id?.toString() };
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const isSocialAuth = isSocialConnection(userInfo?.auth0_sub);
 
 const conversations = await cached(

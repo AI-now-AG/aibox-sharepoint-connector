@@ -16,8 +16,7 @@ export const knowledgebase = {
     }),
     handler: async (input) => {
       const id = new ObjectId(input.tenant_id);
-      const knowledgeBaseCursor = await KnowledgeBaseModel.listByTenant(id);
-      const knowledgeBases = await knowledgeBaseCursor.toArray();
+      const knowledgeBases = await KnowledgeBaseModel.listByTenant(id);
       return transformRawData(knowledgeBases, false);
     },
   }),
