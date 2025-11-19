@@ -13,53 +13,54 @@ import type {
  * @returns {Object} - HTTP response indicating success or failure.
  */
 const auth0TrialWebhook: Handler = async (
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   event: HandlerEvent,
 ): Promise<HandlerResponse> => {
   try {
-    // Ensure the request is from Auth0 (validate secret, IP, or header signature)
-    const authHeader = event.headers["authorization"];
+    // // Ensure the request is from Auth0 (validate secret, IP, or header signature)
+    // const authHeader = event.headers["authorization"];
 
-    if (
-      !authHeader ||
-      authHeader !== `Bearer ${process.env.AUTH0_LOG_SECRET}`
-    ) {
-      return {
-        statusCode: 401,
-        body: JSON.stringify({ message: "Unauthorized" }),
-      };
-    }
+    // if (
+    //   !authHeader ||
+    //   authHeader !== `Bearer ${process.env.AUTH0_LOG_SECRET}`
+    // ) {
+    //   return {
+    //     statusCode: 401,
+    //     body: JSON.stringify({ message: "Unauthorized" }),
+    //   };
+    // }
 
-    // Parse the incoming Auth0 webhook data
-    const payload = JSON.parse(event.body || "{}");
-    const { logs } = payload;
+    // // Parse the incoming Auth0 webhook data
+    // const payload = JSON.parse(event.body || "{}");
+    // const { logs } = payload;
 
-    // Handle each event type
-    for (const log of logs) {
-      const { data } = log;
-      const { type: eventType, description } = data;
+    // // Handle each event type
+    // for (const log of logs) {
+    //   const { data } = log;
+    //   const { type: eventType, description } = data;
 
-      console.log(
-        `Event log: ${eventType} / ${description || "-"}`,
-        JSON.stringify(log),
-      );
+    //   console.log(
+    //     `Event log: ${eventType} / ${description || "-"}`,
+    //     JSON.stringify(log),
+    //   );
 
-      // Trigger successful signup
-      // See: https://auth0.com/docs/customize/log-streams/event-filters#signup-success
-      if (eventType == "ss") {
-        if (["Username-Password-Authentication"].includes(data.connection)) {
-          const { user_id: userId } = data;
-          const { email, is_signup: isSignup } = data.details.body || {};
-          if (isSignup && email) {
-            await triggerTrialWorkflow(userId, email);
-          }
-        }
+    //   // Trigger successful signup
+    //   // See: https://auth0.com/docs/customize/log-streams/event-filters#signup-success
+    //   if (eventType == "ss") {
+    //     if (["Username-Password-Authentication"].includes(data.connection)) {
+    //       const { user_id: userId } = data;
+    //       const { email, is_signup: isSignup } = data.details.body || {};
+    //       if (isSignup && email) {
+    //         // await triggerTrialWorkflow(userId, email);
+    //       }
+    //     }
 
-        if (["windowslive", "google-oauth2"].includes(data.connection)) {
-          const { user_id: userId, user_name: email } = data;
-          await triggerTrialWorkflow(userId, email);
-        }
-      }
-    }
+    //     if (["windowslive", "google-oauth2"].includes(data.connection)) {
+    //       const { user_id: userId, user_name: email } = data;
+    //       await triggerTrialWorkflow(userId, email);
+    //     }
+    //   }
+    // }
 
     return {
       statusCode: 200,
@@ -76,6 +77,7 @@ const auth0TrialWebhook: Handler = async (
   }
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const triggerTrialWorkflow = async (userId: string, email: string) => {
   try {
     const data = {
