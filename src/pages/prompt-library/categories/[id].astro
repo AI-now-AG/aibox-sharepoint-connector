@@ -1,9 +1,10 @@
 ---
 import Layout from "$layouts/Layout.astro";
 import CategoryModel from "$data/models/category.model";
-import { Permission } from "$types/Users";
+import { FeaturePermission } from "$types/Users";
 import CategoryForm from "$pages/prompt-library/categories/CategoryForm.svelte";
 import { isSameObjectId } from "$utils/common";
+import { isFeaturePermissionEnabled } from "$utils/permission";
 
 export interface Props {
   id: string;
@@ -15,10 +16,7 @@ if (id === undefined) {
 }
 
 const category = await CategoryModel.getConvertedObj(id);
-if (
-  !category ||
-  !isSameObjectId(category.tenant_id, Astro.locals.tenant._id)
-) {
+if (!category || !isSameObjectId(category.tenant_id, Astro.locals.tenant._id)) {
   return Astro.redirect("/404");
 }
 
@@ -31,7 +29,10 @@ let userPermissions = Astro.locals.user.permissions;
   <div>
     <CategoryForm
       category={formattedCategory}
-      isEditable={userPermissions.includes(Permission.AdminAll)}
+      isEditable={isFeaturePermissionEnabled(
+        FeaturePermission.EditCategoryInCategoryForm,
+        userPermissions
+      )}
       client:load
     />
   </div>

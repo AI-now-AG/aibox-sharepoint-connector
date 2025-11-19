@@ -6,8 +6,9 @@ import CategoryModel from "$data/models/category.model";
 import { type CardItem } from "$components/Card.svelte";
 import PromptToolbar from "./PromptToolbar.svelte";
 import PromptFilter from "./PromptFilter.svelte";
-import { Permission } from "$types/Users";
+import { FeaturePermission } from "$types/Users";
 import type { CategoryItem } from "$types/CategoryItem";
+import { isFeaturePermissionEnabled } from "$utils/permission";
 
 const t = useTranslations();
 
@@ -80,9 +81,10 @@ let userPermissions = Astro.locals.user.permissions;
 
     <div class="flex gap-2">
       {
-        userPermissions.includes(Permission.SuperAll) && (
-          <PromptToolbar isEditable={true} client:load />
-        )
+        isFeaturePermissionEnabled(
+          FeaturePermission.ImportExportAddAssistantInAssistantLibrary,
+          userPermissions
+        ) && <PromptToolbar isEditable={true} client:load />
       }
     </div>
   </div>
@@ -90,7 +92,10 @@ let userPermissions = Astro.locals.user.permissions;
   <PromptFilter
     promptsEnriched={promptsEnriched}
     categoryList={categoryListArray}
-    isEditable={userPermissions.includes(Permission.AdminAll)}
+    isEditable={isFeaturePermissionEnabled(
+      FeaturePermission.ImportExportAddAssistantInAssistantLibrary,
+      userPermissions
+    )}
     client:load
   />
 </Layout>

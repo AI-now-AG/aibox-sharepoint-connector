@@ -1,10 +1,11 @@
 ---
 import Layout from "$layouts/Layout.astro";
 import { useTranslations } from "$i18n/utils";
-import { Permission } from "$types/Users";
+import { FeaturePermission } from "$types/Users";
 import KnowledgeBaseList from "$components/prompt-interface/KnowledgeBaseList.svelte";
 import { svgIcons } from "$assets/icons";
 import { actions } from "astro:actions";
+import { isFeaturePermissionEnabled } from "$utils/permission";
 
 const t = useTranslations();
 const tenant = Astro.locals.tenant;
@@ -42,20 +43,27 @@ if (!error) {
     </h1>
 
     {
-      userPermissions.includes(Permission.AdminAll) && items.length > 0 && (
-        <a
-          href="/prompt-library/knowledge-base/add"
-          class="mt-2 lg:mt-8 btn btn-outline font-normal grow-0"
-        >
-          <span set:html={svgIcons.add} />
-          {t("prompt-library.knowledgebase.add")}
-        </a>
-      )
+      isFeaturePermissionEnabled(
+        FeaturePermission.AddKnowledgeBaseInKnowledgeBaseList,
+        userPermissions
+      ) &&
+        items.length > 0 && (
+          <a
+            href="/prompt-library/knowledge-base/add"
+            class="mt-2 lg:mt-8 btn btn-outline font-normal grow-0"
+          >
+            <span set:html={svgIcons.add} />
+            {t("prompt-library.knowledgebase.add")}
+          </a>
+        )
     }
   </div>
 
   <KnowledgeBaseList
-    isEditable={userPermissions.includes(Permission.AdminAll)}
+    isEditable={isFeaturePermissionEnabled(
+      FeaturePermission.EditKnowledgeBaseInKnowledgeBaseList,
+      userPermissions
+    )}
     items={items}
     client:load
   />

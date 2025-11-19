@@ -2,14 +2,18 @@
 // Component
 import Layout from "$layouts/Layout.astro";
 import KnowledgeBaseForm from "$pages/prompt-library/knowledge-base/KnowledgeBaseForm.svelte";
-import { Permission } from "$types/Users";
+import { FeaturePermission } from "$types/Users";
+import { isFeaturePermissionEnabled } from "$utils/permission";
 
 let userPermissions = Astro.locals.user.permissions;
 ---
 
 <Layout>
   <KnowledgeBaseForm
-    isEditable={userPermissions.includes(Permission.AdminAll)}
+    isEditable={isFeaturePermissionEnabled(
+      FeaturePermission.EditKnowledgeBaseInKnowledgeBaseForm,
+      userPermissions
+    )}
     mode="create"
     client:load
   />

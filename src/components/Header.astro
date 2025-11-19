@@ -9,6 +9,7 @@ import { svgIcons } from "$assets/icons";
 import { useTranslations } from "$i18n/utils";
 import { omitWithWildcard } from "$utils/wildcardMatch";
 import HeaderLogout from "$components/HeaderLogout.svelte";
+import ThemeLogo from "./ThemeLogo.astro";
 
 const user = Astro.locals.user;
 const t = useTranslations();
@@ -59,32 +60,7 @@ function pickTenant(tenant: Tenant) {
     </div>
     <div class="lg:hidden pl-2">
       <a href="/">
-        <img
-          src="/aibox-logo-text.svg"
-          alt="Aibox Default Logo"
-          class="h-8 block in-data-[theme=weihnachtsmann]:hidden in-data-[theme=somedia]:hidden in-data-[theme=light]:hidden in-data-[theme=dark]:hidden"
-        />
-
-        <img
-          src="/logo-aibox-christmasedition.svg"
-          alt="Weihnachtsmann Logo"
-          class="h-8 hidden in-data-[theme=weihnachtsmann]:block"
-        />
-        <img
-          src="/soki-somedia.png"
-          alt="Somedia Logo"
-          class="h-8 hidden in-data-[theme=somedia]:block"
-        />
-        <img
-          src="/aibox-logo-text.svg"
-          alt="light Logo"
-          class="logo-light h-8 w-auto hidden in-data-[theme=light]:block"
-        />
-        <img
-          src="/aibox-logo-text-dark.svg"
-          alt="dark Logo"
-          class="logo-dark h-8 hidden in-data-[theme=dark]:block"
-        />
+        <ThemeLogo from="header"/>
       </a>
     </div>
   </div>

@@ -91,11 +91,16 @@
       [UserRole.SuperAdmin].includes(role),
     );
     const isAdmin = roles?.some((role) => [UserRole.Admin].includes(role));
+    const isSuperUser = roles?.some((role) =>
+      [UserRole.SuperUser].includes(role),
+    );
     return isSupperAdmin
       ? "Supper Admin"
       : isAdmin
         ? t("user.admin")
-        : t("user.user");
+        : isSuperUser
+          ? t("user.super-user")
+          : t("user.user");
   }
 
   function getUserStatus(isBlocked: boolean, isVerified: boolean) {

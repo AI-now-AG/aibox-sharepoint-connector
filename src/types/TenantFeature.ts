@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useTranslations } from "$i18n/utils";
 const t = useTranslations();
 

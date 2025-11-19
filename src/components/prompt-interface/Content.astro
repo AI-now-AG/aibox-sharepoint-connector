@@ -2,7 +2,8 @@
 import ContentHeader from "./ContentHeader.svelte";
 import PromptExecution from "./PromptExecution.svelte";
 import EmptyPrompt from "./EmptyPrompt.svelte";
-import { Permission } from "$types/Users";
+import { FeaturePermission } from "$types/Users";
+import { isFeaturePermissionEnabled } from "$utils/permission";
 
 export interface Props {
   categoryId: string;
@@ -13,7 +14,14 @@ export interface Props {
 }
 const { categoryId, groupId, useCaseTitle, promptItems = [] } = Astro.props;
 const userPermissions = Astro.locals.user.permissions;
-const isEditable = userPermissions.includes(Permission.AdminAll);
+const isAddable = isFeaturePermissionEnabled(
+  FeaturePermission.AddAssistantInPromptExecutionArea,
+  userPermissions
+);
+const isEditable = isFeaturePermissionEnabled(
+  FeaturePermission.EditAssistantInPromptExecutionArea,
+  userPermissions
+);
 
 const promptId = Astro.url?.searchParams?.get?.("promptId") ?? "";
 ---
@@ -23,7 +31,7 @@ const promptId = Astro.url?.searchParams?.get?.("promptId") ?? "";
     title={useCaseTitle}
     currentCategoryId={categoryId}
     currentGroupId={groupId}
-    isEditable={isEditable && promptItems.length > 0}
+    isEditable={isAddable && promptItems.length > 0}
     client:load
   />
 
@@ -31,7 +39,7 @@ const promptId = Astro.url?.searchParams?.get?.("promptId") ?? "";
     promptItems.length > 0 ? (
       <PromptExecution
         promptItems={promptItems}
-        isEditable={userPermissions.includes(Permission.AdminAll)}
+        {isEditable}
         groupId={groupId}
         folderName={Astro.locals.tenant.org_name}
         initSelectedPromptId={promptId}

@@ -55,7 +55,9 @@
       (role) => role === UserRole.SuperAdmin || role === UserRole.Admin,
     )
       ? UserRole.Admin
-      : UserRole.User;
+      : roles?.some((role) => role === UserRole.SuperUser)
+        ? UserRole.SuperUser
+        : UserRole.User;
   }
 
   function isSuperAdmin(roles: string[] = []): boolean {
@@ -109,7 +111,8 @@
       try {
         loading = true;
         userData = { ...userData, roles: [role] };
-        const { error } = await actions.user.create(userData);
+        const { error, data: createdUser } =
+          await actions.user.create(userData);
         loading = false;
         if (error) {
           showAlert(error);
@@ -118,7 +121,9 @@
             message: t("user.create-successful"),
             type: "success",
           });
-          window.location.href = "/user-management";
+          // window.location.href = "/user-management";
+          const { insertedId = "" } = createdUser;
+          window.location.href = "/user-management/" + insertedId;
         }
       } catch (error) {
         showAlert(error);
@@ -140,7 +145,10 @@
             message: t("user.update-successful"),
             type: "success",
           });
-          window.location.href = "/user-management";
+          // window.location.href = "/user-management";
+          setTimeout(() => {
+            window.location.reload();
+          }, 10);
         }
       } catch (error) {
         showAlert(error);
@@ -209,9 +217,7 @@
   <div class="flex items-center pt-5 pb-2">
     <button
       class="mr-4"
-      onclick={() => {
-        window.history.back();
-      }}
+      onclick={() => (window.location.href = "/user-management")}
     >
       {@html svgIcons.back}
     </button>
@@ -230,9 +236,7 @@
       </button>
       <button
         class="btn btn-outline"
-        onclick={() => {
-          window.history.back();
-        }}
+        onclick={() => (window.location.href = "/user-management")}
       >
         {t("common.cancel")}
       </button>
@@ -292,6 +296,23 @@
           />
           <label for="role-admin" class="ml-2 font-medium text-sm"
             >{t("user.admin")}</label
+          >
+        </div>
+        <div class="flex items-center ml-8">
+          <input
+            type="radio"
+            id="role-super-user"
+            name="role"
+            class="radio"
+            value={UserRole.SuperUser}
+            checked={role == UserRole.SuperUser}
+            onchange={() => {
+              role = UserRole.SuperUser;
+            }}
+            disabled={isUpdateRoleDisabled}
+          />
+          <label for="role-super-user" class="ml-2 font-medium text-sm"
+            >{t("user.super-user")}</label
           >
         </div>
         <div class="flex items-center ml-8">
