@@ -24,6 +24,8 @@
     checkBatchTranscriptionStatus,
     type TranscriptionProgressEvent,
   } from "$api/transcription/transcription-api";
+  import { EventName, ScreenName } from "$types/Posthog";
+  import { posthogClientCapture } from "$utils/posthogClient";
 
   const t = useTranslations();
 
@@ -32,6 +34,7 @@
     transcriptionType?: TranscriptionType | undefined;
     folderName?: string;
     usecaseId?: string;
+    usecaseName?: string;
     category: AudioCategory;
     // handleReload?: (value: string) => void;
   }
@@ -40,6 +43,7 @@
     transcriptionType = undefined,
     folderName = "",
     usecaseId,
+    usecaseName,
     category,
     // handleReload,
   }: Props = $props();
@@ -1020,6 +1024,30 @@
           usecaseId: usecaseId ?? "",
         },
       ]);
+    }
+
+    // Track posthog events based on category
+    if (category === AudioCategory.AudioPro) {
+      // Audio to Text was created
+      console.log("Audio to Text was created");
+      posthogClientCapture($tenant, EventName.AiboxTranscriptionCreated, {
+        page_name: ScreenName.AudioToText,
+        model: category,
+        use_case: usecaseName || usecaseId,
+      });
+    } else if (
+      category === AudioCategory.Subtitle ||
+      category === AudioCategory.SubtitleLarge ||
+      category === AudioCategory.Subtitle11Labs ||
+      category === AudioCategory.SubtitleJson
+    ) {
+      // Subtitle was created
+      console.log("Subtitle was created");
+      posthogClientCapture($tenant, EventName.AiboxSubtitleCreated, {
+        page_name: ScreenName.SubtitleGeneration,
+        model: category,
+        use_case: usecaseName || usecaseId,
+      });
     }
 
     addToast({

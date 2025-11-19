@@ -35,6 +35,8 @@ export enum ScreenName {
   BillingUsage = 'billing_usage',
   AddPromptDialog = 'add_prompt_dialog',
   EditPromptDialog = 'edit_prompt_dialog',
+  AudioToText = 'audio_to_text',
+  SubtitleGeneration = 'subtitle_generation',
 }
 
 
