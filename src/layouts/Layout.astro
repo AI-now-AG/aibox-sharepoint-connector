@@ -4,8 +4,6 @@ import Footer from "$components/Footer.astro";
 import Head from "./Head.astro";
 import Navigation from "$components/nav/Navigation.astro";
 import OnboardingTour from "$components/onboarding/OnboardingTour.svelte";
-import TrialComponent from "$components/onboarding/TrialComponent.svelte";
-import RestrictUnverifiedUser from "$components/onboarding/RestrictUnverifiedUser.svelte";
 import ConversationDialog from "$components/conversation/ConversationDialog.svelte";
 import ConversationModel, {
   type Conversation,
@@ -55,14 +53,14 @@ const conversations = await cached(
   async () => {
     const data: Conversation[] = await ConversationModel.listByUser(
       Astro.locals.user.id,
-      5
+      5,
     );
     return data.map(({ _id, title, updated_at }) => ({
       _id,
       title,
       updated_at,
     }));
-  }
+  },
 );
 ---
 
@@ -96,15 +94,6 @@ const conversations = await cached(
     </div>
     <div class="z-[11]">
       <OnboardingTour user={userInfo} client:load />
-      {tenant?.is_trial && <TrialComponent {locale} client:load />}
-      {
-        tenant?.is_trial &&
-          !isSocialAuth &&
-          user?.email_verified != undefined &&
-          !user.email_verified && (
-            <RestrictUnverifiedUser user={userInfo} client:load />
-          )
-      }
     </div>
   </body>
 </html>
