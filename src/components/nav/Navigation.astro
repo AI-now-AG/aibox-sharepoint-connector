@@ -638,49 +638,6 @@ const modules = [...menuItems];
           />
         )
       }
-      <!-- {
-        adminMenus.map((mod, index) => (
-          <li class="active:bg-transparent">
-            <details
-              data-id={`admin-menu`}
-              open={mod.isOpened}
-              class="active:bg-transparent"
-              id="onboardingNewTenantId1"
-            >
-              <summary
-                class={
-                  isNavCollapsed
-                    ? "tooltip tooltip-right flex justify-center"
-                    : ""
-                }
-                data-tip={isNavCollapsed ? mod.title : ""}
-              >
-                <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
-                  {mod.icon && <Fragment set:html={mod.icon} />}
-                </div>
-                <span class={isNavCollapsed ? "hidden" : ""}>{mod.title}</span>
-              </summary>
-              {"items" in mod && (
-                <ul
-                  class={`active:bg-transparent ${isNavCollapsed ? "hidden" : ""}`}
-                >
-                  {mod.items?.map((sub) => (
-                    <li class="pl-1 active:bg-transparent">
-                      <MenuItem {...sub} />
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </details>
-            {index < adminMenus.length - 1 && (
-              <div
-                class={`mx-6 my-1 pointer-events-none ${isNavCollapsed ? "hidden" : ""}`}
-              />
-            )}
-          </li>
-        ))
-      } -->
-
       {
         adminMenus.map((mod, index) => (
           <li class="active:bg-transparent">
@@ -688,6 +645,7 @@ const modules = [...menuItems];
               data-id={`admin-menu`}
               open={mod.isOpened}
               class="active:bg-transparent"
+              id="onboardingId5"
             >
               <summary
                 class={
