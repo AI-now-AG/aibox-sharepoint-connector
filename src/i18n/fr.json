@@ -661,5 +661,6 @@
   "subscription.contact-name-placeholder": "Max Muster",
   "subscription.validate-empty-contact-phone-message": "Please input your contact phone  ",
   "subscription.validate-empty-contact-name-message": "Please input your contact name ",
-  "subscription.validate-invalid-contact-phone-message": "Please input valid phone number"
+  "subscription.validate-invalid-contact-phone-message": "Please input valid phone number",
+  "nav.global-assistant-library": "Global Assistant Library"
 }

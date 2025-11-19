@@ -1,9 +1,9 @@
 ---
 // Component
 import Layout from "$layouts/Layout.astro";
-import KnowledgeBaseForm from "$pages/prompt-library/knowledge-base/KnowledgeBaseForm.svelte";
 import { FeaturePermission } from "$types/Users";
 import { isFeaturePermissionEnabled } from "$utils/permission";
+import KnowledgeBaseForm from "$components/prompt-library/knowledge-base/KnowledgeBaseForm.svelte";
 
 let userPermissions = Astro.locals.user.permissions;
 ---

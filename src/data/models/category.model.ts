@@ -30,23 +30,6 @@ export type Group = z.infer<typeof GroupSchema>;
 
 const collection = db.collection("categories");
 
-const convertGroupObjectIdToString = (group: Group) => {
-  return {
-    ...group,
-    _id: group._id?.toString(),
-  };
-};
-
-// Function to convert ObjectId to string in a Category object
-const convertObjectIdToString = (category: Document<Category>) => {
-  return {
-    ...category,
-    tenant_id: category.tenant_id?.toString(),
-    creator_id: category.creator_id?.toString(),
-    groups: category.groups.map(convertGroupObjectIdToString),
-  };
-};
-
 export default {
   add: async (category: Category) => {
     const validated = CategoryGroupSchema.parse(category);
@@ -58,8 +41,19 @@ export default {
     return collection.insertOne(doc);
   },
 
-  remove: async (id: string) => {
-    const _id = new ObjectId(id);
+  update: async (id: string | ObjectId, update: Partial<Category>) => {
+    const _id = toObjectId(id);
+    const validated = CategoryGroupSchema.partial().parse(update);
+    const result = await collection.findOneAndUpdate(
+      { _id },
+      { $set: { ...validated } },
+      { returnDocument: "after" },
+    );
+    return result;
+  },
+
+  remove: async (id: string | ObjectId) => {
+    const _id = toObjectId(id);
     return collection.deleteOne({ _id });
   },
 
@@ -71,8 +65,7 @@ export default {
   list: async () =>
     collection
       .find<Document<Category>>({})
-      .sort({ created_at: 1 })
-      .sort({ created_at: 1 }),
+      .sort({ position: 1, created_at: 1 }),
 
   listByTenant: async (tenantId: string | ObjectId) => {
     const _tenantId = toObjectId(tenantId);
@@ -96,20 +89,6 @@ export default {
     const doc = await collection.findOne<Document<Category>>({ _id });
     if (!doc) return null;
     return doc;
-  },
-
-  getConvertedObj: async (id: string) => {
-    if (!ObjectId.isValid(id)) {
-      return null;
-    }
-    const _id = new ObjectId(id);
-    const doc = await collection.findOne<Document<Category>>({ _id });
-    if (!doc) return null;
-    return convertObjectIdToString(doc);
-  },
-
-  getByTitle: async (title: string) => {
-    return collection.findOne<Document<Category>>({ title });
   },
 
   getByTitleAndTenant: async (title: string, tenantId: ObjectId) => {
@@ -137,26 +116,5 @@ export default {
       tenant_id: _tenantId,
       _id: { $in: ids },
     });
-  },
-
-  update: async (id: string, updatedInstruction: Partial<Category>) => {
-    const _id = new ObjectId(id);
-    const validated = CategoryGroupSchema.partial().parse(updatedInstruction);
-    const result = await collection.updateOne(
-      { _id },
-      { $set: { ...validated } },
-    );
-    return result;
-  },
-
-  findAndUpdate: async (id: string, updatedInstruction: Partial<Category>) => {
-    const _id = new ObjectId(id);
-    const validated = CategoryGroupSchema.partial().parse(updatedInstruction);
-    const result = await collection.findOneAndUpdate(
-      { _id },
-      { $set: { ...validated } },
-      { returnDocument: "after" },
-    );
-    return result;
   },
 };

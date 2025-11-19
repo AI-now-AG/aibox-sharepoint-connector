@@ -1,7 +1,7 @@
 <script lang="ts">
   import { svgIcons } from "$assets/icons";
   import { preventDefault } from "$utils/common";
-  import AddPromptDialog from "$components/prompt-interface/AddPromptDialog.svelte";
+  import AddPromptDialog from "$components/prompt-library/prompts/AddPromptDialog.svelte";
   import { useTranslations } from "$i18n/utils";
 
   interface Props {

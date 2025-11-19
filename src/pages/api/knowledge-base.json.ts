@@ -2,32 +2,15 @@ import type { APIContext, APIRoute } from "astro";
 import KnowledgeBaseModel, {
   type KnowledgeBase,
 } from "$data/models/knowledgeBase.model";
-import { z } from "zod";
-//import { ChatOpenAI } from "@langchain/openai";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import createChatModel from "$utils/chatModel";
-
-const CreateKnowledgeBaseParamsSchema = z.object({
-  _id: z.string().optional(),
-  title: z.string(),
-  knowledge_base: z.string(),
-});
-
-export type CreateKnowledgeBaseParams = z.infer<
-  typeof CreateKnowledgeBaseParamsSchema
->;
-
-const KnowledgeBaseParamsSchema = z.object({
-  _id: z.string(),
-});
-
-export type KnowledgeBaseParams = z.infer<typeof KnowledgeBaseParamsSchema>;
-
-// export const model = new ChatOpenAI({
-//   apiKey: import.meta.env.OPENAI_API_KEY,
-//   model: import.meta.env.OPENAI_MODEL,
-// });
+import {
+  KnowledgeBaseParamsSchema,
+  CreateKnowledgeBaseParamsSchema,
+  type CreateKnowledgeBaseParams,
+  type KnowledgeBaseParams,
+} from "$types/KnowledgeBaseAPI";
 
 const knowledgeBaseInfo = `Write me a short summary that will be shown in the UI to describe the provided knowledge base. The output should contain not more than 100 characters. Also it should be created in the language provided in the knowledge base. If it’s unclear, always provide a German summary.`;
 

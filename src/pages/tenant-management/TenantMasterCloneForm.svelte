@@ -103,7 +103,7 @@
   });
 
   async function createOrganization() {
-    const { data, error } = await actions.cloneMasterTeant.createOrganization({
+    const { data, error } = await actions.cloneMasterTenant.createOrganization({
       organization_name: organizationName ?? "",
     });
 
@@ -116,7 +116,7 @@
     organizationName: string,
     organizationDisplayName: string,
   ) {
-    const { data, error } = await actions.cloneMasterTeant.setupTenantData({
+    const { data, error } = await actions.cloneMasterTenant.setupTenantData({
       name: organizationDisplayName ?? "",
       org_id: organizationId,
       org_name: organizationName,

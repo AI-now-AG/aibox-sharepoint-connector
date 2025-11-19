@@ -1,7 +1,7 @@
 class Log {
   static TAG = "AINOW - AIBOX - ";
   log = (type: string, what?: string, message?: unknown) => {
-    if (process.env.MODE === "development") {
+    if (import.meta.env.MODE === "development") {
       what = what ?? "GENERAL";
       switch (type) {
         case "DEBUG":

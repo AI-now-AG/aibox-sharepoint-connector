@@ -2,7 +2,7 @@
   import { onMount } from "svelte";
   import { navigate } from "astro:transitions/client";
   import { useTranslations } from "$i18n/utils";
-  import EditPromptDialog from "$components/prompt-interface/EditPromptDialog.svelte";
+  import EditPromptDialog from "$components/prompt-library/prompts/EditPromptDialog.svelte";
   import UseCaseActions from "$components/prompt-interface/UseCaseActions.svelte";
   import PromptOrderDialog from "$components/prompt-interface/PromptOrderDialog.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";

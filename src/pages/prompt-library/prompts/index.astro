@@ -4,9 +4,9 @@ import { useTranslations } from "$i18n/utils";
 import PromptModel from "$data/models/prompt.model";
 import CategoryModel from "$data/models/category.model";
 import { type CardItem } from "$components/Card.svelte";
-import PromptToolbar from "./PromptToolbar.svelte";
-import PromptFilter from "./PromptFilter.svelte";
 import { FeaturePermission } from "$types/Users";
+import PromptToolbar from "$components/prompt-library/prompts/PromptToolbar.svelte";
+import PromptListFilter from "./PromptListFilter.svelte";
 import type { CategoryItem } from "$types/CategoryItem";
 import { isFeaturePermissionEnabled } from "$utils/permission";
 
@@ -89,7 +89,7 @@ let userPermissions = Astro.locals.user.permissions;
     </div>
   </div>
 
-  <PromptFilter
+  <PromptListFilter
     promptsEnriched={promptsEnriched}
     categoryList={categoryListArray}
     isEditable={isFeaturePermissionEnabled(
