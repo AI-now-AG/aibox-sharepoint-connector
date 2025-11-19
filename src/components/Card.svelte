@@ -6,7 +6,6 @@
     instruction?: string;
     group?: string;
     tags?: string[];
-    model?: string;
   }
 </script>
 

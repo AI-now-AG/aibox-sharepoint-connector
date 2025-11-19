@@ -7,7 +7,7 @@
     category?: string;
     group?: string;
     tags?: string[];
-    model?: string;
+    model?: string | null;
     predefined_input?: string;
   }
 </script>
