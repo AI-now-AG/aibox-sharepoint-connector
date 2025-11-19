@@ -38,7 +38,7 @@
 
   const filteredCategories = $derived(
     selectedTags.length === 0
-      ? [] //categories
+      ? categories
       : categories.filter((cat) =>
           cat.tags?.some((tag) => selectedTags?.includes(tag)),
         ),
@@ -48,6 +48,7 @@
   let alertMessage = $state("");
 
   $inspect(selectedLanguage);
+  $inspect(selectedCategories);
 
   function showAlert(message: any) {
     alertMessage = message;
@@ -74,9 +75,23 @@
   }
 
   function toggleTag(id: string) {
-    selectedTags = selectedTags.includes(id)
-      ? selectedTags.filter((i) => i !== id)
+    const isSelected = selectedTags.includes(id);
+
+    selectedTags = isSelected
+      ? selectedTags.filter((t) => t !== id)
       : [...selectedTags, id];
+
+    // remove invalid categories immediately
+    const newFiltered =
+      selectedTags.length === 0
+        ? categories
+        : categories.filter((cat) =>
+            cat.tags?.some((tag) => selectedTags.includes(tag)),
+          );
+
+    selectedCategories = selectedCategories.filter((catId) =>
+      newFiltered.some((cat) => cat.value === catId),
+    );
   }
 
   function toggleCategory(id: string) {
@@ -171,10 +186,7 @@
   </div>
 
   <!-- CATEGORIES -->
-  <br class="mb-6" />
-  <div
-    class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 mb-10 text-black min-h-[200]"
-  >
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 mb-10 text-black">
     {#each filteredCategories as category}
       <button
         class={`btn w-full h-[48px] shadow-xl py-2 ${
