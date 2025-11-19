@@ -38,7 +38,23 @@
 </div>
 
 <style>
+   .my-tags-input :global(.svelte-tags-input-layout) {
+    min-height: 40px;
+    border-radius: 8px;
+    border-color: #dcdbdf;
+  }
+  .my-tags-input :global(.svelte-tags-input-tag) {
+    background-color: #491eff;
+    border-radius: 5px;
+  }
+
   .my-tags-input :global(.svelte-tags-input-matchs) {
     z-index: 999;
+  }
+
+  .my-tags-input :global(.svelte-tags-input-matchs li:hover),
+  .my-tags-input :global(.svelte-tags-input-matchs li.focus) {
+    background-color: #eee;
+    color: #3527a9;
   }
 </style>

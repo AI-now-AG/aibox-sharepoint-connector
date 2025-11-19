@@ -1,3 +1,17 @@
+<script lang="ts" module>
+  export interface PromptCardItem {
+    id: string;
+    title: string;
+    description?: string;
+    instruction?: string;
+    category?: string;
+    group?: string;
+    tags?: string[];
+    model?: string;
+    predefined_input?: string;
+  }
+</script>
+
 <script lang="ts">
   import DropdownSection from "$components/DropdownSection.svelte";
   import { type Option } from "$components/DropdownOptions.svelte";
@@ -67,18 +81,21 @@
   onclick={() => onItemSelect?.()}
 >
   <div class="card-body space-y-2 justify-between">
-    {#if data?.tags}
-      <div class="card-actions justify-start mr-6">
+    <div class="card-actions justify-start mr-6">
+      {#if data?.tags && data?.tags.length > 0}
         {#each data?.tags as tag}
-          <div class="badge px-2 border-base-300">
+          <div
+            class="badge px-2 border-base-300 max-w-[10rem] inline-block truncate"
+            title={tag}
+          >
             {tag}
           </div>
         {/each}
-        <div class="badge px-2 border-base-300 bg-gray-200 font-semibold">
-          {getModelName($tenant, data.model)}
-        </div>
+      {/if}
+      <div class="badge px-2 border-base-300 bg-gray-200 font-semibold">
+        {getModelName($tenant, data.model)}
       </div>
-    {/if}
+    </div>
     <h2 class="card-title">{data?.title}</h2>
     {#if data?.description}
       <p class="text-base-content/60 line-clamp-3 text-left">
