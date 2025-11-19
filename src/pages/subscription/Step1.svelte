@@ -205,11 +205,11 @@
       >
         {#if category?.tags && category?.tags.length > 0}
           <div
-            class="absolute top-2 right-2 flex flex-wrap justify-end w-full gap-2"
+            class="absolute top-2 right-2 flex flex-wrap justify-end w-full gap-1"
           >
             {#each category?.tags || [] as tagId}
               <span
-                class={`px-[8px] py-[2px] rounded-xl text-[10px] font-normal bg-secondary text-white`}
+                class={`px-[8px] py-[2px] rounded-xl text-[9px] font-medium bg-gray-100 text-gray-700`}
               >
                 {getTagNameById(tagId, tags)}</span
               >
