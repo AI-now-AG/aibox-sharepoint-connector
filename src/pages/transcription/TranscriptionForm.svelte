@@ -57,6 +57,12 @@
   let assFileUrl: string = $state("");
   let jsonFileUrl: string = $state("");
   let zipFileData: string = $state("");
+  let improvementStats: {
+    totalSentences: number;
+    improvedSentences: number;
+    failedSentences: number;
+    completionPercentage: number;
+  } | undefined = $state();
 
   let isZipDataPresent: boolean = $state(false);
   let isFileDataPresent: boolean = $state(false);
@@ -974,6 +980,7 @@
       srtFileUrl = result.urls.srt || "";
       assFileUrl = result.urls.ass || "";
       jsonFileUrl = result.urls.json || "";
+      improvementStats = result.urls.improvement_stats;
     }
 
     if (result.text) {
@@ -1128,11 +1135,27 @@
     fetch(fileUrl)
       .then((response) => response.blob())
       .then((blob) => {
+        // Extract filename from URL, removing query parameters (e.g., SAS tokens)
+        const urlWithoutQuery = fileUrl.split("?")[0];
+        const fileName = urlWithoutQuery.split("/").pop() ?? "";
+
+        // Determine MIME type based on file extension
+        let mimeType = "application/octet-stream";
+
+        if (fileName.toLowerCase().endsWith(".ass")) {
+          mimeType = "text/x-ssa;charset=utf-8";
+        } else if (fileName.toLowerCase().endsWith(".srt")) {
+          mimeType = "application/x-subrip;charset=utf-8";
+        } else if (fileName.toLowerCase().endsWith(".json")) {
+          mimeType = "application/json;charset=utf-8";
+        } else if (fileName.toLowerCase().endsWith(".txt")) {
+          mimeType = "text/plain;charset=utf-8";
+        }
+
         const blobUrl = URL.createObjectURL(
-          new Blob([blob], { type: "application/octet-stream" }),
+          new Blob([blob], { type: mimeType }),
         );
 
-        const fileName = fileUrl.split("/").pop() ?? "";
         const link = document.createElement("a");
         link.href = blobUrl;
         link.target = "_blank";
@@ -1162,10 +1185,13 @@
     fetch(fileUrl)
       .then((response) => response.blob())
       .then((blob) => {
+        // Extract filename from URL, removing query parameters (e.g., SAS tokens)
+        const urlWithoutQuery = fileUrl.split("?")[0];
+        const fileName = urlWithoutQuery.split("/").pop() ?? "";
+
         // Determine MIME type based on file extension
-        const fileName = fileUrl.split("/").pop() ?? "";
         let mimeType = "application/octet-stream";
-        
+
         if (fileName.toLowerCase().endsWith(".ass")) {
           mimeType = "text/x-ssa;charset=utf-8"; // ASS/SSA subtitle format
         } else if (fileName.toLowerCase().endsWith(".srt")) {
@@ -1193,8 +1219,10 @@
       })
       .catch((error) => {
         console.error("Error downloading file:", error);
+        const urlWithoutQuery = fileUrl.split("?")[0];
+        const errorFileName = urlWithoutQuery.split("/").pop() ?? "file";
         addToast({
-          message: `Failed to download ${fileUrl.split("/").pop()}`,
+          message: `Failed to download ${errorFileName}`,
           type: "error",
           timeout: 3000,
         });
@@ -1298,6 +1326,7 @@
     jsonFileUrl = "";
     zipFileData = "";
     textOuput = "";
+    improvementStats = undefined;
 
     isZipDataPresent = false;
     isFileDataPresent = false;
@@ -1645,6 +1674,31 @@
                   {#if category === AudioCategory.Subtitle || category === AudioCategory.SubtitleLarge || category === AudioCategory.Subtitle11Labs || category === AudioCategory.SubtitleJson}
                     <p class="text-xs text-base-content/60 mt-0.5">{t("transcription.success.files-ready")}</p>
                   {/if}
+                </div>
+              </div>
+            </div>
+          {/if}
+
+          <!-- Text Improvement Completion Warning -->
+          {#if isTranscipted && !isTranscribing && improvementStats && improvementStats.completionPercentage < 80}
+            <div class="px-4 pb-4 pt-0">
+              <div role="alert" class="alert alert-warning">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     class="h-6 w-6 shrink-0 stroke-current"
+                     fill="none"
+                     viewBox="0 0 24 24">
+                  <path stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <div class="flex-1">
+                  <p class="text-sm font-medium">Text Improvement Incomplete</p>
+                  <p class="text-xs mt-1">
+                    Only {improvementStats.completionPercentage}% of sentences were successfully improved
+                    ({improvementStats.improvedSentences} out of {improvementStats.totalSentences} sentences).
+                    Some sentences may retain their original transcription quality.
+                  </p>
                 </div>
               </div>
             </div>
