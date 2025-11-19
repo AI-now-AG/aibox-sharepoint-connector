@@ -1,0 +1,118 @@
+---
+import { ThemeCode } from "$types/TenantFeature";
+
+interface Props {
+  from: "header" | "navigation" | "home";
+}
+
+const { from = [] } = Astro.props as Props;
+
+const { tenant } = Astro.locals;
+const theme = tenant?.theme || ThemeCode.AIBox;
+
+const pathname = Astro.url.pathname;
+const isTenantManagement = /^\/tenant-management\/[a-fA-F0-9]+$/.test(pathname);
+---
+
+{
+  isTenantManagement ? (
+    <>
+      {/* Theme Logo for NAVIGATION (large sccreen) OR HEADER (small screen)*/}
+      <img
+        src="/logo-aibox-christmasedition.svg"
+        alt="Weihnachtsmann Logo"
+        class="h-8 hidden in-data-[theme=weihnachtsmann]:block"
+      />
+      <img
+        src="/soki-somedia.png"
+        alt="somedia Logo"
+        class="h-8 hidden in-data-[theme=somedia]:block"
+      />
+      <img
+        src="/aibox-logo-text.svg"
+        alt="light logo"
+        class="logo-light h-8 w-auto hidden in-data-[theme=light]:block"
+      />
+      <img
+        src="/aibox-logo-text-dark.svg"
+        alt="dark logo"
+        class="logo-dark h-8 hidden in-data-[theme=dark]:block"
+      />
+      <img
+        src="/aibox-logo-text.svg"
+        alt="Aibox Default Logo"
+        class="h-8 block in-data-[theme=weihnachtsmann]:hidden in-data-[theme=somedia]:hidden in-data-[theme=light]:hidden in-data-[theme=dark]:hidden"
+      />
+    </>
+  ) : from === "home" ? (
+    <>
+      {/* Theme Logo for HOME pages*/}
+      {theme === ThemeCode.Weihnachtsmann ? (
+        <img
+          src="/logo-aibox-christmasedition.svg"
+          alt="Weihnachtsmann Logo"
+          class="h-8 hidden in-data-[theme=weihnachtsmann]:inline"
+        />
+      ) : theme === ThemeCode.Somedia ? (
+        <img
+          src="/soki-somedia.png"
+          alt="somedia logo"
+          class="h-12 hidden in-data-[theme=somedia]:inline"
+        />
+      ) : theme === ThemeCode.Light ? (
+        <img
+          src="/aibox-logo-text.svg"
+          alt="light logo"
+          class="w-auto h-12 w-auto hidden in-data-[theme=light]:inline"
+        />
+      ) : theme === ThemeCode.Dark ? (
+        <img
+          src="/aibox-logo-text-dark.svg"
+          alt="dark logo"
+          class="w-auto h-12 hidden in-data-[theme=dark]:inline"
+        />
+      ) : (
+        <img
+          src="/aibox-logo-text.svg"
+          alt="light logo"
+          class="w-auto h-12 w-auto hidden in-data-[theme=aibox]:inline"
+        />
+      )}
+    </>
+  ) : (
+    <>
+      {/* Theme Logo for NAVIGATION (large sccreen) OR HEADER (small screen)*/}
+      {theme === ThemeCode.Weihnachtsmann ? (
+        <img
+          src="/logo-aibox-christmasedition.svg"
+          alt="Weihnachtsmann Logo"
+          class="h-8 hidden in-data-[theme=weihnachtsmann]:block"
+        />
+      ) : theme === ThemeCode.Somedia ? (
+        <img
+          src="/soki-somedia.png"
+          alt="somedia Logo"
+          class="h-8 hidden in-data-[theme=somedia]:block"
+        />
+      ) : theme === ThemeCode.Light ? (
+        <img
+          src="/aibox-logo-text.svg"
+          alt="light logo"
+          class="logo-light h-8 w-auto hidden in-data-[theme=light]:block"
+        />
+      ) : theme === ThemeCode.Dark ? (
+        <img
+          src="/aibox-logo-text-dark.svg"
+          alt="dark logo"
+          class="logo-dark h-8 hidden in-data-[theme=dark]:block"
+        />
+      ) : (
+        <img
+          src="/aibox-logo-text.svg"
+          alt="Aibox Default Logo"
+          class="h-8 block in-data-[theme=weihnachtsmann]:hidden in-data-[theme=somedia]:hidden in-data-[theme=light]:hidden in-data-[theme=dark]:hidden"
+        />
+      )}
+    </>
+  )
+}

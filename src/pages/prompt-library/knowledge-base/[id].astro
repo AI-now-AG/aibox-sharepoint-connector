@@ -2,8 +2,9 @@
 import Layout from "$layouts/Layout.astro";
 import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
 import KnowledgeBaseForm from "$pages/prompt-library/knowledge-base/KnowledgeBaseForm.svelte";
-import { Permission } from "$types/Users";
+import { FeaturePermission } from "$types/Users";
 import { isSameObjectId } from "$utils/common";
+import { isFeaturePermissionEnabled } from "$utils/permission";
 
 export interface Props {
   id: string;
@@ -31,7 +32,10 @@ const mode = Astro.url?.searchParams?.get?.("mode") ?? "update";
     <KnowledgeBaseForm
       knowledgeBaseId={id}
       knowledgeBase={knowledgeBase}
-      isEditable={userPermissions.includes(Permission.AdminAll)}
+      isEditable={isFeaturePermissionEnabled(
+        FeaturePermission.EditKnowledgeBaseInKnowledgeBaseForm,
+        userPermissions
+      )}
       mode={mode}
       client:load
     />

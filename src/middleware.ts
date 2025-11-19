@@ -7,6 +7,7 @@ import {
   ADMIN_ROUTES,
   SUPER_ADMIN_ROUTES,
   FEATURE_MAP_ROUTES,
+  SUPER_USER_ROUTES,
 } from "$constants";
 import type { APIContext, MiddlewareNext } from "astro";
 import TenantModel from "$data/models/tenant.model";
@@ -114,7 +115,7 @@ async function authenticate(context: APIContext, next: MiddlewareNext) {
 }
 
 async function restrictAccess(context: APIContext, next: MiddlewareNext) {
-  // Restrict access for non-admin users
+  // Restrict access for non Super Admin users
   const matchSAPaths = wildcardMatchInArray(
     context.url.pathname,
     SUPER_ADMIN_ROUTES,
@@ -123,6 +124,7 @@ async function restrictAccess(context: APIContext, next: MiddlewareNext) {
     return context.rewrite("/restricted");
   }
 
+  // Restrict access for non Admin users
   const matchAdminPaths = wildcardMatchInArray(
     context.url.pathname,
     ADMIN_ROUTES,
@@ -131,6 +133,20 @@ async function restrictAccess(context: APIContext, next: MiddlewareNext) {
     matchAdminPaths &&
     !auth.isSuperAdmin(context.locals) &&
     !auth.isAdmin(context.locals)
+  ) {
+    return context.rewrite("/restricted");
+  }
+
+  // Restrict access for non Super User users
+  const matchSuperUserPaths = wildcardMatchInArray(
+    context.url.pathname,
+    SUPER_USER_ROUTES,
+  );
+  if (
+    matchSuperUserPaths &&
+    !auth.isSuperAdmin(context.locals) &&
+    !auth.isAdmin(context.locals) &&
+    !auth.isSuperUser(context.locals)
   ) {
     return context.rewrite("/restricted");
   }

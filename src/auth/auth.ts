@@ -18,6 +18,10 @@ export const isAdmin = (locals: App.Locals) => {
   return hasRole(locals, UserRole.Admin);
 };
 
+export const isSuperUser = (locals: App.Locals) => {
+  return hasRole(locals, UserRole.SuperUser);
+};
+
 export const hasRole = (locals: App.Locals, role: UserRole) => {
   if (!locals.user) {
     return false;
@@ -56,96 +60,13 @@ export const hasFeatureWithProvider = (
   });
 };
 
-// export const hasAudioPlaintext = (locals: App.Locals) => {
-//   if (!locals.tenant) {
-//     return false;
-//   }
-
-//   const { transcriptions } = locals.tenant;
-//   let result = false;
-//   if (transcriptions?.plaintext?.enabled ?? false) {
-//     result = true;
-//   }
-//   return result;
-// };
-
-// export const hasAudioSubtitles = (locals: App.Locals) => {
-//   if (!locals.tenant) {
-//     return false;
-//   }
-
-//   const { transcriptions } = locals.tenant;
-//   let result = false;
-//   if (transcriptions?.subtitles?.enabled ?? false) {
-//     result = true;
-//   }
-//   return result;
-// };
-
-// export const hasAudioSubtitlesjson = (locals: App.Locals) => {
-//   if (!locals.tenant) {
-//     return false;
-//   }
-
-//   const { transcriptions } = locals.tenant;
-//   let result = false;
-//   if (transcriptions?.subtitlesjson?.enabled ?? false) {
-//     result = true;
-//   }
-//   return result;
-// };
-
-// export const hasAudioSummary = (locals: App.Locals) => {
-//   if (!locals.tenant) {
-//     return false;
-//   }
-
-//   const { transcriptions } = locals.tenant;
-//   let result = false;
-//   if (transcriptions?.summary?.enabled ?? false) {
-//     result = true;
-//   }
-//   return result;
-// };
-
-// export const hasAudioLargefile = (locals: App.Locals) => {
-//   if (!locals.tenant) {
-//     return false;
-//   }
-
-//   const { transcriptions } = locals.tenant;
-//   let result = false;
-//   if (transcriptions?.largefile?.enabled ?? false) {
-//     result = true;
-//   }
-//   return result;
-// };
-
-// export const hasAudioSubtitleLarge = (locals: App.Locals) => {
-//   if (!locals.tenant) {
-//     return false;
-//   }
-
-//   const { transcriptions } = locals.tenant;
-//   let result = false;
-//   if (transcriptions?.subtitlelarge?.enabled ?? false) {
-//     result = true;
-//   }
-//   return result;
-// };
-
 export default {
   user,
   check,
   isSuperAdmin,
   isAdmin,
+  isSuperUser,
   hasRole,
   hasFeature,
   hasFeatureWithProvider,
-  // hasAudioPlaintext,
-  // hasAudioSubtitles,
-  // hasAudioSubtitlesjson,
-  // hasAudioSummary,
-  // hasAudioLargefile,
-  // hasAudioSubtitleLarge,
 };
