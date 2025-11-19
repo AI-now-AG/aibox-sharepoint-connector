@@ -2345,27 +2345,6 @@
         <div class="flex p-4 items-center justify-between">
           <div class="flex items-center">
             <input
-              id="is-trial-tenant"
-              type="checkbox"
-              class="checkbox checkbox-primary"
-              value="is-trial-tenant"
-              bind:checked={tenantData.is_trial}
-            />
-            <label class="label cursor-pointer ml-2" for="is-trial-tenant">
-              <span class="label-text text-base-content ml-2"
-                >{t("tenant.trial")}</span
-              >
-            </label>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="container mx-auto">
-      <div class="bg-base-100 shadow-sm rounded-lg my-4">
-        <div class="flex p-4 items-center justify-between">
-          <div class="flex items-center">
-            <input
               id="is-on-posthog"
               type="checkbox"
               class="checkbox checkbox-primary"
