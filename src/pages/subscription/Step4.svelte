@@ -57,7 +57,7 @@
         location: $subscription.billingInfo?.location ?? "",
         email: $subscription.billingInfo?.billingEmail ?? "",
       },
-      use_cases: $subscription.organizationInfo?.useCases ?? [],
+      use_cases: $subscription.organizationInfo?.selectedCategories ?? [],
       stripe_customer_id: $subscription.stripeCheckout?.customerId ?? "",
     });
 

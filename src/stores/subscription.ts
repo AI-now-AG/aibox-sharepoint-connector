@@ -53,7 +53,8 @@ interface BillingInformation {
 interface OrganizationInformation {
   organizationName: string;
   defaultLanguage: string;
-  useCases: string[];
+  selectedTags: string[];
+  selectedCategories: string[];
 }
 
 interface StripeCheckout {
@@ -79,7 +80,7 @@ export type {
   OrganizationInformation,
 };
 
-const storageItemKey = "aiboxsubscription";
+const storageItemKey = "aiboxSubscription";
 const initialData =
   typeof window !== "undefined"
     ? JSON.parse(localStorage.getItem(storageItemKey) || "{}")

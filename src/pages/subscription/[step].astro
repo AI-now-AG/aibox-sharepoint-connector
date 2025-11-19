@@ -1,10 +1,10 @@
 ---
 import { useTranslations } from "$i18n/utils";
+import { ObjectId } from "mongodb";
 import SubscriptionLayout from "$layouts/SubscriptionLayout.astro";
-import CategoryModel from "$data/models/category.model";
-import { isProd } from "$utils/env";
-import { TENANT_MASTER_DEV, TENANT_MASTER_PROD } from "$constants";
-import { RoutePath } from "$types/Subscription";
+import GlobalTagModel from "$data/models/globalTag.model";
+import GlobalCategoryModel from "$data/models/globalCategory.model";
+import { RoutePath, type TagItem, type CategoryItem } from "$types/Subscription";
 import Step1 from "./Step1.svelte";
 import Step2 from "./Step2.svelte";
 import Step3 from "./Step3.svelte";
@@ -15,7 +15,8 @@ const user = Astro.locals.user;
 const { step } = Astro.params;
 
 let pageTitle = "";
-const useCases: Record<string, unknown>[] = [];
+let tags: TagItem[] = [];
+let categories: CategoryItem[] = [];
 
 switch (step) {
   case RoutePath.Step1:
@@ -34,14 +35,22 @@ switch (step) {
 }
 
 if (step == RoutePath.Step1) {
-  const masterTenantId = isProd() ? TENANT_MASTER_PROD : TENANT_MASTER_DEV;
-  const categoriesCursor = await CategoryModel.listByTenant(masterTenantId);
-  const categories = await categoriesCursor.toArray();
-  categories.forEach((category) => {
-    useCases.push({
+  const allTags = await GlobalTagModel.list();
+  const allCategories = await GlobalCategoryModel.list();
+
+  tags = allTags.map((tag) => {
+    return {
+      title: tag.title,
+      value: tag._id.toString(),
+    };
+  });
+
+  categories = allCategories.map((category) => {
+    return {
       title: category.title,
       value: category._id.toString(),
-    });
+      tags: category.tags?.map((t: ObjectId) => t.toString()) ?? [],
+    };
   });
 }
 
@@ -54,7 +63,7 @@ const defaultLanguage = Astro.locals?.tenant?.default_language || "en";
 <SubscriptionLayout title={pageTitle}>
   {
     step == RoutePath.Step1 && (
-      <Step1 categories={useCases} {defaultLanguage} client:load />
+      <Step1 {categories} {tags} {defaultLanguage} client:load />
     )
   }
   {step == RoutePath.Step2 && <Step2 {defaultLanguage} client:load />}

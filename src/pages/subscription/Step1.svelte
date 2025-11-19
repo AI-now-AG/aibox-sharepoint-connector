@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { fade, fly } from "svelte/transition";
+  import type { TagItem, CategoryItem } from "$types/Subscription";
   import AlertDialog from "$components/AlertDialog.svelte";
   import Input from "$components/form/Input.svelte";
   import SubsciptionSteps from "$components/subscription/SubsciptionSteps.svelte";
@@ -11,9 +13,11 @@
 
   interface Props {
     defaultLanguage?: string;
-    categories?: any[];
+    tags: TagItem[];
+    categories: CategoryItem[];
   }
-  let { defaultLanguage = "en", categories = $bindable([]) }: Props = $props();
+  let { defaultLanguage = "en", tags = [], categories = [] }: Props = $props();
+
   const t = useTranslations(defaultLanguage);
 
   const initOrganizationInformation = $subscription.organizationInfo;
@@ -24,8 +28,20 @@
   let organizationName = $state(
     initOrganizationInformation?.organizationName ?? "",
   );
+
+  let selectedTags: string[] = $state(
+    initOrganizationInformation?.selectedTags ?? [],
+  );
   let selectedCategories: string[] = $state(
-    initOrganizationInformation?.useCases ?? [],
+    initOrganizationInformation?.selectedCategories ?? [],
+  );
+
+  const filteredCategories = $derived(
+    selectedTags.length === 0
+      ? [] //categories
+      : categories.filter((cat) =>
+          cat.tags?.some((tag) => selectedTags?.includes(tag)),
+        ),
   );
 
   let alertModal: HTMLDialogElement | undefined = $state();
@@ -57,12 +73,25 @@
     return true;
   }
 
+  function toggleTag(id: string) {
+    selectedTags = selectedTags.includes(id)
+      ? selectedTags.filter((i) => i !== id)
+      : [...selectedTags, id];
+  }
+
+  function toggleCategory(id: string) {
+    selectedCategories = selectedCategories.includes(id)
+      ? selectedCategories.filter((i) => i !== id)
+      : [...selectedCategories, id];
+  }
+
   function handleNext() {
     if (validateForm()) {
       storeOrganizationInfo({
         organizationName: organizationName,
         defaultLanguage: selectedLanguage || "de",
-        useCases: selectedCategories,
+        selectedTags,
+        selectedCategories,
       });
       posthogClientCaptureWithoutTenant(EventName.AiboxOnboardingStep1, {
         page_name: ScreenName.OnboardingStep1,
@@ -116,37 +145,49 @@
       </div>
     </div>
   </div>
-
   <br class="mt-10" />
+
   <div class="font-sans font-bold text-base mt-10 mb-6">
     {t("subscription.choose-categories")}
   </div>
-  <br class="mb-6" />
+  <!-- TAGS -->
+  <div class="mb-10">
+    <div
+      class="flex flex-wrap justify-center max-w-md space-x-2 space-y-2 mx-auto"
+    >
+      {#each tags as tag}
+        <button
+          class={`btn btn-sm shadow-md py-2 ${
+            selectedTags.includes(tag.value)
+              ? "btn-primary"
+              : "bg-white text-gray-600 border-0"
+          }`}
+          onclick={() => toggleTag(tag.value)}
+        >
+          <span class="w-full text-left py-2">{tag.title}</span>
+        </button>
+      {/each}
+    </div>
+  </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 mb-10 text-black">
-    {#each categories as category}
-      {#if selectedCategories.includes(category.value)}
-        <button
-          class="btn btn-primary w-full h-[56px] shadow-xl py-2"
-          onclick={() => {
-            selectedCategories = selectedCategories.filter(
-              (item) => item !== category.value,
-            );
-          }}
-          ><span class="w-full text-left py-2">
-            {category.title}
-          </span></button
-        >
-      {:else}
-        <button
-          class="btn btn-primary w-full h-[56px] shadow-xl bg-white text-gray-600 py-2 border-0"
-          onclick={() => {
-            selectedCategories.push(category.value);
-          }}
-        >
-          <span class="w-full text-left py-2"> {category.title} </span></button
-        >
-      {/if}
+  <!-- CATEGORIES -->
+  <br class="mb-6" />
+  <div
+    class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 mb-10 text-black min-h-[200]"
+  >
+    {#each filteredCategories as category}
+      <button
+        class={`btn w-full h-[48px] shadow-xl py-2 ${
+          selectedCategories.includes(category.value)
+            ? "btn-primary"
+            : "bg-white text-gray-600 border-0"
+        }`}
+        onclick={() => toggleCategory(category.value)}
+        in:fade
+        out:fly
+      >
+        <span class="w-full text-left">{category.title}</span>
+      </button>
     {/each}
   </div>
 

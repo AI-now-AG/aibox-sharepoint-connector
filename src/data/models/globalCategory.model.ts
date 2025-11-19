@@ -78,6 +78,14 @@ export default {
       .toArray();
   },
 
+  listByIds: async (ids: ObjectId[]) => {
+    return collection
+      .find<Document<Category>>({
+        _id: { $in: ids },
+      })
+      .toArray();
+  },
+
   get: async (id: string | ObjectId): Promise<Category | null> => {
     const _id = toObjectId(id);
     const doc = await collection.findOne<Document<Category>>({ _id });
