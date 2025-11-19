@@ -1,7 +1,7 @@
 <script lang="ts">
   import { actions } from "astro:actions";
   import { navigate } from "astro:transitions/client";
-  import type { CreateKnowledgeBaseParams } from "$pages/api/knowledge-base.json";
+  import { type CreateKnowledgeBaseParams } from "$types/KnowledgeBaseAPI";
   import { useTranslations } from "$i18n/utils";
   import { onMount } from "svelte";
   import { addToast } from "$stores/toast";

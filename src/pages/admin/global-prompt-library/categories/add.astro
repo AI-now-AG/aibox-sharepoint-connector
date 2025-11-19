@@ -1,0 +1,20 @@
+---
+import Layout from "$layouts/Layout.astro";
+import GlobalTagModel from "$data/models/globalTag.model";
+import CategoryForm from "./CategoryForm.svelte";
+import { Permission } from "$types/Users";
+import { transformRawData } from "$utils/transformRawData";
+
+const tags = await GlobalTagModel.list();
+const formattedTags = transformRawData(tags);
+
+let userPermissions = Astro.locals.user.permissions;
+---
+
+<Layout>
+  <CategoryForm
+    isEditable={userPermissions.includes(Permission.AdminAll)}
+    tags={formattedTags}
+    client:load
+  />
+</Layout>

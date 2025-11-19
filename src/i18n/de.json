@@ -661,5 +661,6 @@
   "subscription.contact-name-placeholder": "Max Muster",
   "subscription.validate-empty-contact-phone-message": "Bitte Telefonnummer erfassen",
   "subscription.validate-empty-contact-name-message": "Bitte Kontaktnamen erfassen",
-  "subscription.validate-invalid-contact-phone-message": "Bitte gültige Telefonnummer erfassen"
+  "subscription.validate-invalid-contact-phone-message": "Bitte gültige Telefonnummer erfassen",
+  "nav.global-assistant-library": "Globale Assistenzbibliothek"
 }

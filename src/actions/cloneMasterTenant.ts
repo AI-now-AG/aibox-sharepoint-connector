@@ -14,23 +14,13 @@ import SubscriptionModel, {
 import TranscriptionModel, {
   type Transcription,
 } from "$data/models/transcription.model";
-import {
-  SubscriptionPackageId,
-  AudioOptionId,
-} from "$types/Subscription";
+import { SubscriptionPackageId, AudioOptionId } from "$types/Subscription";
 import { TenantFeature, ThemeCode } from "$types/TenantFeature";
 import organizationsManagement from "$data/auth0/organizations-manager";
 import { isProd } from "$utils/env";
 import { randomString } from "$utils/common";
-import {
-  getTranscriptionTypes,
-  hasSubtitleEditor,
-} from "$utils/onboarding";
-import {
-  TENANT_MASTER_DEV,
-  TENANT_MASTER_PROD,
-} from "$constants";
-
+import { getTranscriptionTypes, hasSubtitleEditor } from "$utils/onboarding";
+import { TENANT_MASTER_DEV, TENANT_MASTER_PROD } from "$constants";
 
 const masterTenantId = isProd() ? TENANT_MASTER_PROD : TENANT_MASTER_DEV;
 
@@ -53,7 +43,7 @@ const TenantInputParamsSchema = z.object({
 // step 1: createOrganization()  - Create Auth0 organization
 // step 2: setupTenantData() - Clone tenant, override configs & import categories / prompts
 
-export const cloneMasterTeant = {
+export const cloneMasterTenant = {
   createOrganization: defineAction({
     input: OrganizationNameInputParamsSchema,
     handler: async (input) => {
@@ -107,7 +97,7 @@ export const cloneMasterTeant = {
         included_features: includedFeatures,
         transcription_types: transcriptionTypes,
         subtitle_editor: subtitleEditorEnabled,
-        totalPrice: input.totalPrice
+        totalPrice: input.totalPrice,
       });
 
       // Find all categories for the original tenant
@@ -207,5 +197,4 @@ export const cloneMasterTeant = {
       return transformRawData(data);
     },
   }),
-
 };

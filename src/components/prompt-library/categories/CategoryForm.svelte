@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { CreateCategoryParams } from "$pages/api/categories.json";
+  import { type CreateCategoryParams } from "$types/CategoryAPI";
   import { onMount } from "svelte";
   import { useTranslations } from "$i18n/utils";
   import { addToast } from "$stores/toast";
@@ -9,6 +9,7 @@
   import { tenant } from "$stores";
   import { EventName, ScreenName } from "$types/Posthog";
   import { posthogClientCapture } from "$utils/posthogClient";
+
   const t = useTranslations();
 
   /**

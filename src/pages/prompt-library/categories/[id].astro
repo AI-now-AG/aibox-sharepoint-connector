@@ -2,9 +2,10 @@
 import Layout from "$layouts/Layout.astro";
 import CategoryModel from "$data/models/category.model";
 import { FeaturePermission } from "$types/Users";
-import CategoryForm from "$pages/prompt-library/categories/CategoryForm.svelte";
-import { isSameObjectId } from "$utils/common";
 import { isFeaturePermissionEnabled } from "$utils/permission";
+import CategoryForm from "$components/prompt-library/categories/CategoryForm.svelte";
+import { isSameObjectId } from "$utils/common";
+import { transformRawData } from "$utils/transformRawData";
 
 export interface Props {
   id: string;
@@ -15,13 +16,12 @@ if (id === undefined) {
   throw new Error("Id is required");
 }
 
-const category = await CategoryModel.getConvertedObj(id);
+const category = await CategoryModel.get(id);
 if (!category || !isSameObjectId(category.tenant_id, Astro.locals.tenant._id)) {
   return Astro.redirect("/404");
 }
 
-const formattedCategory = { ...category, _id: id };
-
+const formattedCategory = transformRawData(category, false);
 let userPermissions = Astro.locals.user.permissions;
 ---
 
