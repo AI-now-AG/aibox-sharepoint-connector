@@ -127,19 +127,14 @@ async function onboardingCheck(context: APIContext, next: MiddlewareNext) {
   }
 
   const userId = context.locals.user?.id?.toString() || "";
-  console.log("Middleware ::: context.locals.user", context.locals.user);
   const user = await UserModel.get(userId);
   if (!user) {
-    console.error("Middleware ::: User not found during onboarding check");
     return next();
   } else {
     if (user.created_by_admin != undefined && user.created_by_admin !== null && user.created_by_admin !== true) {// Self-registration flow
-      console.log("Middleware ::: Self-registration flow detected", user);
       if (user.logins_count <= 1) {// First login
-        console.log("Middleware ::: First login - redirect to subscription");
         return context.redirect("/subscription");
       } else if (!user.is_complete_self_registration) {// Incomplete subscription
-        console.log("Middleware ::: Incomplete subscription - redirect to subscription");
         return context.redirect("/subscription");
       }
     }
