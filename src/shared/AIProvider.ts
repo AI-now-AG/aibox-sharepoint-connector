@@ -191,7 +191,7 @@ export function getModelName(tenant: any, model: string) {
   const activeModels = getActiveModels(tenant, defaultModelName);
 
   const matchingModel = activeModels.find((m: any) => model == m.provider);
-  //console.log("getModelName() debug", { activeModels, matchingModel });
+  //console.log("getModelName() debug", { activeModels, matchingModel, model });
 
   if (matchingModel && matchingModel.provider == PromptModel.AzureOpenAI) {
     return `${matchingModel.modelName} (Azure)`;

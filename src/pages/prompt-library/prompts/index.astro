@@ -3,7 +3,7 @@ import Layout from "$layouts/Layout.astro";
 import { useTranslations } from "$i18n/utils";
 import PromptModel from "$data/models/prompt.model";
 import CategoryModel from "$data/models/category.model";
-import { type CardItem } from "$components/Card.svelte";
+import { type PromptCardItem } from "$components/prompt-interface/PromptItem.svelte";
 import PromptToolbar from "$components/prompt-library/prompts/PromptToolbar.svelte";
 import PromptListFilter from "./PromptListFilter.svelte";
 import { Permission } from "$types/Users";
@@ -46,7 +46,7 @@ const categoryListArray: CategoryItem[] = categoryArray.map((category) => {
 
 const categories = await Promise.all(calls);
 
-const promptsEnriched: CardItem[] = prompts.map((prompt) => {
+const promptsEnriched: PromptCardItem[] = prompts.map((prompt) => {
   const category = categories.find(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (category: any) => category?._id.toString() === prompt.category?.toString()
@@ -59,12 +59,13 @@ const promptsEnriched: CardItem[] = prompts.map((prompt) => {
 
   const tags = [category?.title, group?.title].filter(Boolean) as string[];
   return {
+    id: prompt._id.toString(),
     title: prompt.title,
     description: prompt.description,
     instruction: prompt.prompt,
-    id: prompt._id.toString(),
     group: prompt.group?.toString(),
     tags,
+    model: prompt.model,
   };
 });
 let userPermissions = Astro.locals.user.permissions;

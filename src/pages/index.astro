@@ -4,7 +4,7 @@ import { actions } from "astro:actions";
 import AIChatWidget from "$pages/home/AIChatWidget.svelte";
 import { useTranslations } from "$i18n/utils";
 import { TourType } from "$types/Users";
-import type { CardItem } from "$components/Card.svelte";
+import { type PromptCardItem } from "$components/prompt-interface/PromptItem.svelte";
 import CategoryModel from "$data/models/category.model";
 import PromptModel from "$data/models/prompt.model";
 const t = useTranslations();
@@ -53,7 +53,7 @@ const calls = prompts.map(async (prompt) => {
 const categories = (await Promise.all(calls)) as any;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const promptsEnriched: CardItem[] = prompts.map((prompt: any) => {
+const promptsEnriched: PromptCardItem[] = prompts.map((prompt: any) => {
   const category = categories.find(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (category: any) => category?._id.toString() === prompt.category?.toString(),
@@ -66,15 +66,15 @@ const promptsEnriched: CardItem[] = prompts.map((prompt: any) => {
 
   const tags = [category?.title, group?.title].filter(Boolean) as string[];
   return {
+    id: prompt._id.toString(),
     title: prompt.title,
     description: prompt.description,
     instruction: prompt.prompt,
-    id: prompt._id.toString(),
     category: prompt.category?.toString(),
     group: prompt.group?.toString(),
-    model: prompt.model,
     predefined_input: prompt.predefined_input,
     tags,
+    model: prompt.model,
   };
 });
 ---
