@@ -84,7 +84,7 @@ const auth0Webhook: Handler = async (
         // Send welcome email for social login
         if (["windowslive", "google-oauth2"].includes(data.connection)) {
           const { user_name: email, user_id: userId, connection } = data;
-          await triggerWelcomeEmail(email);
+          // await triggerWelcomeEmail(email);
           await triggerSignupAlertEmail(userId, email, connection);
         }
       }
@@ -93,7 +93,7 @@ const auth0Webhook: Handler = async (
       // See: https://auth0.com/docs/customize/log-streams/event-filters#user-behavioral-success
       if (eventType == "sv") {
         const { email, user_id: userId } = data.details.query;
-        await triggerWelcomeEmail(email);
+        // await triggerWelcomeEmail(email);
         await triggerVerifiedAlertEmail(userId, email, data.connection);
         await updateUserAttributesInDatabase(userId, {
           email_verified: true,
