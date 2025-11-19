@@ -74,9 +74,11 @@ export default {
     collection.find<Document<Prompt>>({}).sort({ created_at: 1 }).toArray(),
 
   listByCategoryIds: async (categoryIds: ObjectId[]) => {
-    return collection.find<Document<Prompt>>({
-      category: { $in: categoryIds },
-    });
+    return collection
+      .find<Document<Prompt>>({
+        category: { $in: categoryIds },
+      })
+      .toArray();
   },
 
   getMaxPosition: async (groupId: ObjectId) => {
