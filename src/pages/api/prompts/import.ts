@@ -10,7 +10,7 @@ import CategoryModel, {
   type Category,
   type Group,
 } from "$data/models/category.model";
-import { CsvColumn, type CsvRowRaw } from "$types/PromptCsv.types";
+import { CsvColumn, type CsvRowRaw } from "$types/PromptCsv";
 
 const isValidRows = (rows: CsvRowRaw[]) => {
   const requiredColumns = Object.values(CsvColumn);
@@ -131,6 +131,9 @@ const syncPrompts = async (rows: CsvRowRaw[], user: User) => {
       prompt: item.instruction,
       model: item.model ?? "",
       predefined_input: item.predefined_input ?? "",
+      promptTool: item.prompt_tool ?? "",
+      reasoningEffort: item.reasoning_effort ?? "",
+      textVerbosity: item.text_verbosity ?? "",
     };
     await PromptModel.add(newPrompt);
   }
