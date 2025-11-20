@@ -44,6 +44,7 @@ interface BillingInformation {
   street: string;
   zipCode: string;
   location: string;
+  country: string;
   contactPhone: string;
   contactName: string;
   billingMethod: BillingMethod;

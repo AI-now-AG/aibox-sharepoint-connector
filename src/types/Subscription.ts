@@ -97,3 +97,20 @@ export interface CategoryItem {
   value: string;
   tags: string[];
 }
+
+export enum CountryCode {
+  CH = "CH",
+  DE = "DE",
+  AU = "AU",
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const CountryMap: Record<CountryCode, any> = {
+  [CountryCode.CH]: { title: "Schweiz", value: CountryCode.CH },
+  [CountryCode.DE]: { title: "Deutschland", value: CountryCode.DE },
+  [CountryCode.AU]: { title: "Österreich", value: CountryCode.AU },
+};
+
+export const Countries = [
+  CountryMap[CountryCode.CH], CountryMap[CountryCode.DE], CountryMap[CountryCode.AU],
+]

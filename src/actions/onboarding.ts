@@ -23,6 +23,7 @@ import {
   AudioOptionLabels,
   BillingMethod,
   type ProductKeys,
+  CountryCode,
 } from "$types/Subscription";
 import { UserRole, TourType } from "$types/Users";
 import { TenantFeature } from "$types/TenantFeature";
@@ -74,6 +75,7 @@ const BillingInfoParamsSchema = z.object({
   address: z.string(),
   zip_code: z.string(),
   location: z.string(),
+  country: z.string().default(CountryCode.CH),
   email: z.string(),
 });
 

@@ -7,7 +7,7 @@
   import { useTranslations } from "$i18n/utils";
   import Dropdown from "$components/subscription/Dropdown.svelte";
   import { storeOrganizationInfo, subscription } from "$stores/subscription";
-  import { Languges } from "$types/TenantFeature";
+  import { LanguageCode, Languges } from "$types/TenantFeature";
   import { posthogClientCaptureWithoutTenant } from "$utils/posthogClient";
   import { EventName, ScreenName } from "$types/Posthog";
 
@@ -22,7 +22,7 @@
 
   const init = $subscription.organizationInfo;
 
-  let selectedLanguage: string = $state(init?.defaultLanguage ?? "de");
+  let selectedLanguage: string = $state(init?.defaultLanguage ?? LanguageCode.De);
 
   let organizationName = $state(init?.organizationName ?? "");
 
@@ -104,7 +104,7 @@
     if (validateForm()) {
       storeOrganizationInfo({
         organizationName,
-        defaultLanguage: selectedLanguage || "de",
+        defaultLanguage: selectedLanguage || LanguageCode.De,
         selectedTags: selectedTag ? [selectedTag] : [],
         selectedCategories,
       });

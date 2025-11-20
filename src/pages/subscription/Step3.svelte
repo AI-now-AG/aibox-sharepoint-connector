@@ -15,10 +15,13 @@
     SubscriptionPackageId,
     AudioOptionId,
     BillingMethod,
+    Countries,
+    CountryCode,
   } from "$types/Subscription";
   import { isValidEmail } from "$utils/common";
   import { EventName, ScreenName } from "$types/Posthog";
   import { posthogClientCaptureWithoutTenant } from "$utils/posthogClient";
+  import Dropdown from "$components/form/Dropdown.svelte";
 
   interface Props {
     accountEmail: string;
@@ -34,6 +37,7 @@
   let street = $state(initBillingInfo?.street ?? "");
   let zipCode = $state(initBillingInfo?.zipCode ?? "");
   let location = $state(initBillingInfo?.location ?? "");
+  let country = $state(initBillingInfo?.country ?? CountryCode.CH);
 
   let contactPhone = $state(initBillingInfo?.contactPhone ?? "");
   let contactName = $state(initBillingInfo?.contactName ?? "");
@@ -113,6 +117,7 @@
         address: street,
         zip_code: zipCode,
         location: location,
+        country: country || CountryCode.CH,
         email: billingEmail,
       },
       language: $subscription.organizationInfo?.defaultLanguage,
@@ -136,6 +141,7 @@
         street,
         zipCode,
         location,
+        country,
         contactPhone,
         contactName,
         billingEmail,
@@ -291,14 +297,12 @@
       class="block md:flex lg:flex flex-row md:space-x-8 space-x-0 lg:space-x-8"
     >
       <div class="flex-1 flex flex-col mb-4">
-        <Input
-          id="country"
-          label={t("subscription.country") + " *"}
-          value={"Schweiz"}
-          containerClasses="h-[56px] shadow-lg"
-          labelClasses="text-sm"
-          classes="text-base"
-          disabled={true}
+        <Dropdown
+          label={`${t("subscription.country")}`}
+          labelClasses="mb-3"
+          placeholderClasses="h-[56px]"
+          options={Countries}
+          bind:value={country}
         />
       </div>
       <div class="flex-1 flex flex-col mb-4">
@@ -324,9 +328,7 @@
       {t("subscription.billing-method")}
     </p>
 
-    <div
-      class="flex flex-row md:space-x-8 space-x-0 lg:space-x-8"
-    >
+    <div class="flex flex-row md:space-x-8 space-x-0 lg:space-x-8">
       <div
         class="flex flex-row bg-white shadow-md rounded-lg flex flex-col justify-between space-y-2 px-6 py-4 w-full"
       >
