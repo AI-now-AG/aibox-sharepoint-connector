@@ -8,9 +8,11 @@ import {
   SUPER_ADMIN_ROUTES,
   FEATURE_MAP_ROUTES,
   SUPER_USER_ROUTES,
+  SKIP_CHEKING_ONBOARDING_ROUTES,
 } from "$constants";
 import type { APIContext, MiddlewareNext } from "astro";
 import TenantModel from "$data/models/tenant.model";
+import UserModel from "$data/models/user.model";
 import { TenantFeature } from "$types/TenantFeature";
 import { defaultLang } from "$i18n/ui";
 import { setLanguage } from "$i18n/utils";
@@ -114,6 +116,33 @@ async function authenticate(context: APIContext, next: MiddlewareNext) {
   return next();
 }
 
+async function onboardingCheck(context: APIContext, next: MiddlewareNext) {
+  const skipCheckSubscriptionPath = wildcardMatchInArray(
+    context.url.pathname,
+    SKIP_CHEKING_ONBOARDING_ROUTES,
+  );
+
+  if (skipCheckSubscriptionPath) {
+    return next();
+  }
+
+  const userId = context.locals.user?.id?.toString() || "";
+  const user = await UserModel.get(userId);
+  if (!user) {
+    return next();
+  } else {
+    if (user.created_by_admin != undefined && user.created_by_admin !== null && user.created_by_admin !== true) {// Self-registration flow
+      if (user.logins_count <= 1) {// First login
+        return context.redirect("/subscription");
+      } else if (!user.is_complete_self_registration) {// Incomplete subscription
+        return context.redirect("/subscription");
+      }
+    }
+  }
+
+  return next();
+}
+
 async function restrictAccess(context: APIContext, next: MiddlewareNext) {
   // Restrict access for non Super Admin users
   const matchSAPaths = wildcardMatchInArray(
@@ -204,6 +233,7 @@ async function initI18n(context: APIContext, next: MiddlewareNext) {
 export const onRequest = sequence(
   requestOrigin,
   authenticate,
+  onboardingCheck,
   restrictAccess,
   initI18n,
 );

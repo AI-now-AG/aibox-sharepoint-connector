@@ -56,6 +56,28 @@ export function posthogServerCapture(tenant: { is_on_posthog?: boolean, _id: Obj
 }
 
 /**
+   * Captures an event with optional properties without tenant check
+   *
+   * @example
+   * ```ts
+   * posthogServerCaptureWithoutTenant({
+   *   distinctId: userId?.toString(),
+   *   event: EventName.OnboardingStep1,
+   *   properties: {
+   *    page_name: auth0User.data.nickname,
+   *   }
+   * })
+   * ```
+   *
+   * @param props {@link EventMessage}
+   * @returns 
+*/
+export function posthogServerCaptureWithoutTenant(props: EventMessage) {
+    console.log("posthogServerCaptureWithoutTenant", props)
+    getPosthogServerInstance?.()?.capture(props)
+}
+
+/**
    * Identify a user and set their properties.
    *
    * @example
@@ -86,3 +108,4 @@ export function posthogServerIdentify(tenant: { is_on_posthog?: boolean, _id: Ob
     console.log("posthogServerIdentify", newProperties)
     getPosthogServerInstance?.()?.identify(newProperties)
 }
+

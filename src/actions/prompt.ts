@@ -1,7 +1,7 @@
 import { defineAction } from "astro:actions";
 import { z } from "zod";
 import { transformRawData } from "$utils/transformRawData";
-import promptModel, { type Prompt } from "$data/models/prompt.model";
+import PromptModel, { type Prompt } from "$data/models/prompt.model";
 import ConfigurationModel from "$data/models/configuration.model";
 import createChatModel from "$utils/chatModel";
 import { htmlToMarkdown } from "$utils/textFormatting";
@@ -48,7 +48,7 @@ export const prompt = {
     handler: async (input) => {
       const items: Prompt[] = [];
       for (const [index, item] of input.entries()) {
-        const updateResult = await promptModel.findAndUpdate(item._id, {
+        const updateResult = await PromptModel.update(item._id, {
           position: index,
         });
         items.push(transformRawData(updateResult));

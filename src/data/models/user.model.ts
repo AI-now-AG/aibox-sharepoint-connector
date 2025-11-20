@@ -41,6 +41,8 @@ const UserSchema = z.object({
   navState: z.record(z.string(), z.boolean()).optional(),
   tours: z.array(UserTour).optional(),
   api_token: z.string().nullish().default(null),
+  created_by_admin: z.boolean().nullish().default(false),
+  is_complete_self_registration: z.boolean().nullish().default(false),
 });
 
 export const UserFilterParamsSchema = z.object({

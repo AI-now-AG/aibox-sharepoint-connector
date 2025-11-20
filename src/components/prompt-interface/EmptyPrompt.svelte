@@ -1,5 +1,5 @@
 <script lang="ts">
-  import AddPromptDialog from "$components/prompt-interface/AddPromptDialog.svelte";
+  import AddPromptDialog from "$components/prompt-library/prompts/AddPromptDialog.svelte";
   import { preventDefault } from "$utils/common";
   import { useTranslations } from "$i18n/utils";
 

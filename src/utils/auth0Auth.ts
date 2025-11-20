@@ -1,5 +1,5 @@
 import { authenticationClient, managementClient } from "$data/auth0/client";
-import { SG_VERIFICATION_TEMPLATE, SG_WELCOME_TEMPLATE } from "$constants";
+import { SG_VERIFICATION_TEMPLATE } from "$constants";
 import sendMail from "$utils/mail";
 import { getEnvVar } from "$utils/env";
 
@@ -85,25 +85,6 @@ export const sendVerificationEmail = async (userId: string, email: string) => {
   } catch (error) {
     console.error("Error sending verification email:", error);
     //throw new Error("Failed to send verification email.");
-  }
-};
-
-export const sendWelcomeEmail = async (email: string) => {
-  try {
-    // Send welcome email via SendGrid
-    await sendMail({
-      from: {
-        name: "AI now AG",
-        email: "info@ainow.ch",
-      },
-      to: email,
-      templateId: SG_WELCOME_TEMPLATE,
-    });
-
-    console.log(`Welcome email sent successfully: ${email}`);
-  } catch (error) {
-    console.error("Error sending welcome email:", error);
-    //throw new Error("Failed to send welcome email.");
   }
 };
 

@@ -95,9 +95,10 @@
     input = "";
   }
 
-  function handleFilesDropped(droppedFiles: FilesDroppedEvent) {
+  function handleFilesDropped(droppedFiles: FilesDroppedEvent | any) {
     console.log("Files dropped:", droppedFiles);
-    const newFiles = droppedFiles.map(({ file }) => file);
+    const items = Array.isArray(droppedFiles) ? droppedFiles : droppedFiles?.files ?? [];
+    const newFiles = items.map(({ file }: any) => file);
 
     // Merge and remove duplicates by name + size
     const combined = [...files, ...newFiles];
@@ -110,9 +111,15 @@
     files = unique;
   }
 
-  function handleFilesRejected(rejectedFiles: FilesRejectedEvent) {
+  function handleFilesRejected(rejectedFiles: FilesRejectedEvent | any) {
     console.log("Files rejected:", rejectedFiles);
-    rejectedFiles.forEach(({ file, reasons }) => {
+    const items = Array.isArray(rejectedFiles)
+      ? rejectedFiles
+      : Array.isArray(rejectedFiles?.files)
+        ? rejectedFiles.files
+        : [];
+
+    items.forEach(({ file, reasons }: any) => {
       const reason = reasons.includes("FILE_TOO_LARGE")
         ? t("prompt-execution.upload-file.exceed-5mb-size-limit")
         : reasons.includes("INVALID_MIMETYPE")
@@ -140,8 +147,8 @@
       isDragging = false;
     },
   }}
-  onfilesdropped={(e) => handleFilesDropped(e.detail)}
-  onfilesrejected={(e) => handleFilesRejected(e.detail)}
+  onfilesdropped={(e: any) => handleFilesDropped(e.detail)}
+  onfilesrejected={(e: any) => handleFilesRejected(e.detail)}
 >
   <div class="flex-1 relative">
     <textarea

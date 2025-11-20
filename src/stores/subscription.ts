@@ -44,6 +44,9 @@ interface BillingInformation {
   street: string;
   zipCode: string;
   location: string;
+  country: string;
+  contactPhone: string;
+  contactName: string;
   billingMethod: BillingMethod;
   billingEmail: string;
 }
@@ -51,7 +54,8 @@ interface BillingInformation {
 interface OrganizationInformation {
   organizationName: string;
   defaultLanguage: string;
-  useCases: string[];
+  selectedTags: string[];
+  selectedCategories: string[];
 }
 
 interface StripeCheckout {
@@ -77,7 +81,7 @@ export type {
   OrganizationInformation,
 };
 
-const storageItemKey = "aiboxsubscription";
+const storageItemKey = "aiboxSubscription";
 const initialData =
   typeof window !== "undefined"
     ? JSON.parse(localStorage.getItem(storageItemKey) || "{}")

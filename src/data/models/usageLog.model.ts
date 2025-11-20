@@ -64,7 +64,9 @@ export default {
 
   listByTenant: async (tenantId: string | ObjectId) => {
     const _tenantId = toObjectId(tenantId);
-    return collection.find<Document<UsageLog>>({ tenant_id: _tenantId });
+    return collection
+      .find<Document<UsageLog>>({ tenant_id: _tenantId })
+      .toArray();
   },
 
   listUsageSummary: async (tenantId: string | ObjectId, month: string) => {
@@ -73,9 +75,11 @@ export default {
     // Get date range for the month
     const { start, end } = getMonthRange(month);
 
-    return collection.find<Document<UsageLog>>({
-      tenant_id: _tenantId, // Filter by tenant ID
-      created_at: { $gte: start, $lt: end }, // Filter by date range for the month
-    });
+    return collection
+      .find<Document<UsageLog>>({
+        tenant_id: _tenantId, // Filter by tenant ID
+        created_at: { $gte: start, $lt: end }, // Filter by date range for the month
+      })
+      .toArray();
   },
 };

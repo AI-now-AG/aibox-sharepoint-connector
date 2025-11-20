@@ -5,7 +5,7 @@ import StepComponent from "./Complete.svelte";
 
 const t = useTranslations();
 
-const defaultLanguage = Astro.locals.tenant.default_language || "en";
+const defaultLanguage = Astro.locals?.tenant?.default_language || "en";
 ---
 
 <SubscriptionLayout title={t("subscription.congratulations-desciption")}>

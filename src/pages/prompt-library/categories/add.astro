@@ -1,8 +1,8 @@
 ---
 import Layout from "$layouts/Layout.astro";
-import CategoryForm from "$pages/prompt-library/categories/CategoryForm.svelte";
 import { FeaturePermission } from "$types/Users";
 import { isFeaturePermissionEnabled } from "$utils/permission";
+import CategoryForm from "$components/prompt-library/categories/CategoryForm.svelte";
 
 let userPermissions = Astro.locals.user.permissions;
 ---

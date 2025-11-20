@@ -1,150 +1,146 @@
 <script lang="ts">
-  import AudioOptionList from "$components/subscription/AudioOptionList.svelte";
-  import SubsciptionSteps from "$components/subscription/SubsciptionSteps.svelte";
-  import SubscriptionPackageList from "$components/subscription/SubscriptionPackageList.svelte";
-  import { useTranslations } from "$i18n/utils";
-  import { SubscriptionPackages } from "$data/subscription-packages";
+  import type { TagItem, CategoryItem } from "$types/Subscription";
   import AlertDialog from "$components/AlertDialog.svelte";
-  import {
-    storeAudioOptions,
-    storePlan,
-    type AudioOption,
-    type SubscriptionPlan,
-    subscription,
-  } from "$stores/subscription";
+  import Input from "$components/form/Input.svelte";
+  import SubsciptionSteps from "$components/subscription/SubsciptionSteps.svelte";
+  import TagCategorySelector from "$components/subscription/TagCategorySelector.svelte";
+  import { useTranslations } from "$i18n/utils";
+  import Dropdown from "$components/subscription/Dropdown.svelte";
+  import { storeOrganizationInfo, subscription } from "$stores/subscription";
+  import { LanguageCode, Languges } from "$types/TenantFeature";
+  import { posthogClientCaptureWithoutTenant } from "$utils/posthogClient";
+  import { EventName, ScreenName } from "$types/Posthog";
 
   interface Props {
     defaultLanguage?: string;
+    tags: TagItem[];
+    categories: CategoryItem[];
   }
-  let { defaultLanguage = "en" }: Props = $props();
+
+  let { defaultLanguage = "en", tags = [], categories = [] }: Props = $props();
   const t = useTranslations(defaultLanguage);
 
-  let totalPrice: any = $state("");
+  const init = $subscription.organizationInfo;
 
-  const initSelectedPackageId = $subscription.plan?.id || "";
-  let initSelectedAudioOptionIds: string[] =
-    $subscription.audioOptions?.map((option) => {
-      return option.id;
-    }) || [];
-  let selectedPackageId = $state(initSelectedPackageId);
-  let selectedAudioOptionIds: string[] = $state(initSelectedAudioOptionIds);
+  let selectedLanguage: string = $state(
+    init?.defaultLanguage ?? LanguageCode.De,
+  );
+
+  let organizationName = $state(init?.organizationName ?? "");
+
+  let selectedTag: string = $state(init?.selectedTags?.[0] ?? ""); // single tag only
+  let selectedCategories: string[] = $state(init?.selectedCategories ?? []); //  (auto-set when tag changes)
 
   let alertModal: HTMLDialogElement | undefined = $state();
   let alertMessage = $state("");
-
-  // Calculate total price (include package and audio options)
-  $effect(() => {
-    let packagePrice = 0;
-    let audioOptionsTotalPrice = 0;
-
-    // Get package price
-    if (selectedPackageId) {
-      let selectedPackage =
-        SubscriptionPackages.plan[
-          selectedPackageId as keyof typeof SubscriptionPackages.plan
-        ];
-      if (selectedPackage) {
-        packagePrice = selectedPackage?.price || 0;
-      }
-    }
-
-    // Get audio options price
-    if (selectedAudioOptionIds.length > 0) {
-      selectedAudioOptionIds.forEach((audioOptionId) => {
-        let audioOption =
-          SubscriptionPackages.audioOptions[
-            audioOptionId as keyof typeof SubscriptionPackages.audioOptions
-          ];
-        if (audioOption) {
-          audioOptionsTotalPrice += audioOption?.price || 0;
-        }
-      });
-    }
-
-    totalPrice = packagePrice + audioOptionsTotalPrice;
-  });
 
   function showAlert(message: any) {
     alertMessage = message;
     alertModal?.showModal();
   }
 
+  function validateForm() {
+    if (!organizationName) {
+      showAlert(t("subscription.validate-empty-organization-name-message"));
+      return false;
+    }
+
+    if (!selectedLanguage) {
+      showAlert(t("subscription.validate-empty-language-message"));
+      return false;
+    }
+
+    if (!selectedTag) {
+      showAlert(t("subscription.validate-unselected-tags-message"));
+      return false;
+    }
+
+    if (selectedCategories.length === 0) {
+      showAlert(t("subscription.validate-empty-categories-message"));
+      return false;
+    }
+
+    return true;
+  }
+
   function handleNext() {
-    if (!selectedPackageId) {
-      showAlert(t("subscription.please-select-package"));
-      return;
-    }
+    if (validateForm()) {
+      storeOrganizationInfo({
+        organizationName,
+        defaultLanguage: selectedLanguage || LanguageCode.De,
+        selectedTags: selectedTag ? [selectedTag] : [],
+        selectedCategories,
+      });
 
-    const selectedPackage: SubscriptionPlan = {
-      ...SubscriptionPackages.plan[
-        selectedPackageId as keyof typeof SubscriptionPackages.plan
-      ],
-      id: selectedPackageId,
-    };
-    if (selectedPackage) {
-      storePlan(selectedPackage);
-    }
+      posthogClientCaptureWithoutTenant(EventName.AiboxOnboardingStep1, {
+        page_name: ScreenName.OnboardingStep1,
+      });
 
-    let selectedAudioOptions: AudioOption[] = [];
-    if (selectedAudioOptionIds?.length > 0) {
-      for (let i = 0; i < selectedAudioOptionIds.length; i++) {
-        const id = selectedAudioOptionIds[i];
-        const selectedOption: AudioOption = {
-          ...SubscriptionPackages.audioOptions[
-            id as keyof typeof SubscriptionPackages.audioOptions
-          ],
-          id: id,
-        };
-        if (selectedOption) {
-          selectedAudioOptions.push(selectedOption);
-        }
-      }
+      window.location.href = "/subscription/step2";
     }
-    storeAudioOptions(selectedAudioOptions);
-
-    window.location.href = "/subscription/step2";
   }
 </script>
 
 <div class="max-w-5xl mx-auto">
+  <!-- mobile steps -->
   <div
     class="bg-[#491EFF] p-4 rounded-lg mb-6 flex md:hidden lg:hidden items-center justify-center"
   >
-    <SubsciptionSteps currentStep={1} {defaultLanguage} />
+    <SubsciptionSteps currentStep={2} {defaultLanguage} />
   </div>
-  <!-- Pakage Plan -->
-  <h1 class="font-sanns text-3xl font-bold text-black mt-2">
-    {t("subscription.choose-your-plan")}
+
+  <h1 class="font-sans text-3xl font-bold text-black mt-2">
+    {t("subscription.customize-your-aibox")}
   </h1>
+
   <p class="font-sans text-base font-medium text-gray-600 mt-6 mb-10">
-    {@html t("subscription.choose-your-plan-description")}
+    {t("subscription.customize-your-aibox-description")}
   </p>
-  <div
-    class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-10 text-black"
-  >
-    <SubscriptionPackageList bind:selectedPackageId {defaultLanguage} />
+
+  <!-- Form -->
+  <div class="w-full mx-auto">
+    <div class="block md:flex lg:flex flex-row md:space-x-8 lg:space-x-8">
+      <div class="flex-1 flex flex-col mb-4">
+        <Input
+          id="organization-name"
+          label={t("subscription.organization-name")}
+          value={organizationName}
+          placeholder={t("subscription.organization-name-placeholder")}
+          inputChange={(event: any) => (organizationName = event.value)}
+          containerClasses="h-[56px] shadow-xl"
+          labelClasses="text-sm"
+          classes="text-base"
+        />
+      </div>
+
+      <div class="flex-1 flex flex-col mb-4">
+        <Dropdown
+          label={`${t("subscription.language")}`}
+          placeholder={t("tenant.german-language")}
+          options={Languges}
+          bind:value={selectedLanguage}
+        />
+      </div>
+    </div>
   </div>
 
-  <!-- Audio to Text Options -->
-  <h1 class="font-sanns text-3xl font-bold text-black mt-2">
-    {t("subscription.audio-to-text-options")}
-  </h1>
-  <p class="font-sans text-base font-medium text-gray-600 mt-6 mb-6">
-    {@html t("subscription.choose-your-plan-description")}
-  </p>
-  <div class="mt-4">
-    <AudioOptionList bind:selectedAudioOptionIds {defaultLanguage} />
+  <!-- TAGS & CATEGORIES -->
+  <div class="font-sans font-bold text-base mt-10 mb-4">
+    {t("subscription.choose-categories")}
   </div>
 
+  <TagCategorySelector
+    {tags}
+    {categories}
+    bind:selectedTag
+    bind:selectedCategories
+  />
+
+  <!-- NEXT -->
   <div class="w-full flex items-center justify-end rounded-lg p-4">
-    <p class="text-gray-600 text-right mr-4 font-bold font-inter text-sm">
-      {t("subscription.total-price-for-plan", { total: totalPrice })}
-    </p>
     <button
       class="btn btn-active btn-primary min-w-[144px]"
-      onclick={() => {
-        handleNext();
-      }}
+      onclick={handleNext}
     >
       {t("common.next")}
     </button>

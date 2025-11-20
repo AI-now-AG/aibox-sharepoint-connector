@@ -1,24 +1,24 @@
 class Log {
-  static TAG = "AINOW - AIBOX - ";
+  static TAG = "[AINOW] [AIBOX]";
   log = (type: string, what?: string, message?: unknown) => {
-    if (process.env.MODE === "development") {
+    if (import.meta.env.MODE === "development") {
       what = what ?? "GENERAL";
       switch (type) {
         case "DEBUG":
           console.log(
-            "\x1b[33m" + Log.TAG + " - " + type + " ::: " + what + " ::: ",
+            "\x1b[33m" + Log.TAG + " - [" + type + "] ::: " + what + " ::: ",
             JSON.stringify(message),
           );
           break;
         case "ERROR":
           console.log(
-            "\x1b[31m" + Log.TAG + " - " + type + " ::: " + what + " ::: ",
+            "\x1b[31m" + Log.TAG + " - [" + type + "] ::: " + what + " ::: ",
             JSON.stringify(message),
           );
           break;
         default:
           console.log(
-            "\x1b[36m" + Log.TAG + " - " + type + " ::: " + what + " ::: ",
+            "\x1b[36m" + Log.TAG + " - [" + type + "] ::: " + what + " ::: ",
             JSON.stringify(message),
           );
           break;

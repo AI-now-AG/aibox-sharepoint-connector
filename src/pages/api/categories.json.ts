@@ -4,33 +4,17 @@ import { z } from "zod";
 import slug from "slug";
 import CategoryModel from "$data/models/category.model";
 import type { Category, Group } from "$data/models/category.model";
-
-const GroupParamSchema = z.object({
-  _id: z.string().optional(),
-  title: z.string(),
-  active: z.boolean().optional(),
-  position: z.number().optional(),
-});
-
-const CreateCategoryParamsSchema = z.object({
-  _id: z.string().optional(),
-  title: z.string(),
-  groups: z.array(GroupParamSchema),
-});
-
-export type CreateCategoryParams = z.infer<typeof CreateCategoryParamsSchema>;
-export type GroupParam = z.infer<typeof GroupParamSchema>;
-
-const CategoryParamsSchema = z.object({
-  _id: z.string(),
-});
-
-export type CategoryParams = z.infer<typeof CategoryParamsSchema>;
+import {
+  CategoryParamsSchema,
+  CreateCategoryParamsSchema,
+  type CategoryParams,
+} from "$types/CategoryAPI";
 
 export const GET: APIRoute = async (ctx) => {
   try {
-    const result = await CategoryModel.listByTenant(ctx.locals.user.tenant_id);
-    const categories = await result.toArray();
+    const categories = await CategoryModel.listByTenant(
+      ctx.locals.user.tenant_id,
+    );
     return new Response(
       JSON.stringify(
         categories.map((category) => ({
@@ -118,7 +102,6 @@ export const PUT: APIRoute = async (ctx) => {
   const params = await ctx.request.json();
   const data = CreateCategoryParamsSchema.parse(params);
 
-  console.log("data", data);
   const groups = data.groups.reduce<Group[]>((uniqueGroups, group) => {
     if (!uniqueGroups.some((g) => g.title === group.title)) {
       const groupId = ObjectId.isValid(group._id || "")
