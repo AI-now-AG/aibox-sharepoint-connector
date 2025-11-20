@@ -173,7 +173,7 @@
           class={`px-6 py-3 rounded-2xl text-sm font-semibold transition border shadow-md
             ${
               selectedTag === tag.value
-                ? "bg-secondary text-white border-transparent scale-[1.03]"
+                ? "bg-primary text-white border-transparent scale-[1.03]"
                 : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
             }
           `}
@@ -189,7 +189,11 @@
   <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 mb-10 text-black">
     {#each filteredCategories as category}
       <label
-        class="cursor-pointer flex items-center justify-between w-full h-[64px] px-4 rounded-xl shadow-md bg-white hover:bg-gray-50"
+        class={`cursor-pointer flex items-center justify-between w-full h-[64px] px-4 rounded-xl shadow-md ${
+          selectedCategories.includes(category.value)
+            ? "bg-[#A1E1F8]"
+            : "bg-white"
+        }`}
         in:fade
         out:fly
       >
