@@ -33,19 +33,30 @@
   onMount(async function () {
     if (category) {
       title = category.title;
-      groups = category.groups.map((group) => ({
-        id: group?._id?.toString(),
-        title: group.title,
-        active: group?.active,
-      }));
-
-      selectedTags = category.tags.map((item) => {
-        const tag = tags.find((tag: TagItem) => tag._id === item);
-        return {
-          _id: item,
-          title: tag?.title || "",
-        };
-      });
+      if (
+        category.groups &&
+        Array.isArray(category.groups) &&
+        category.groups.length > 0
+      ) {
+        groups = category.groups.map((group) => ({
+          id: group?._id?.toString(),
+          title: group.title,
+          active: group?.active,
+        }));
+      }
+      if (
+        category.tags &&
+        Array.isArray(category.tags) &&
+        category.tags.length > 0
+      ) {
+        selectedTags = category.tags.map((item) => {
+          const tag = tags.find((tag: TagItem) => tag._id === item);
+          return {
+            _id: item,
+            title: tag?.title || "",
+          };
+        });
+      }
     }
   });
 
