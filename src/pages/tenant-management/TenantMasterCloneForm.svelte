@@ -14,7 +14,8 @@
     ThemeMap,
     Themes,
   } from "$types/TenantFeature";
-  import { onMount } from "svelte";
+  import type { TagItem, CategoryItem } from "$types/Subscription";
+  import TagCategorySelector from "$components/subscription/TagCategorySelector.svelte";
   import SubscriptionPackageList from "$components/subscription/SubscriptionPackageList.svelte";
   import AudioOptionList from "$components/subscription/AudioOptionList.svelte";
   import { SubscriptionPackages } from "$data/subscription-packages";
@@ -23,11 +24,11 @@
     SubscriptionPackageId,
   } from "$types/Subscription";
 
-  const t = useTranslations();
   interface Props {
-    masterTenantId: string;
+    tags: TagItem[];
+    categories: CategoryItem[];
   }
-  let { masterTenantId }: Props = $props();
+  let { tags = [], categories = [] }: Props = $props();
 
   let loading = $state(false);
   let alertModal: HTMLDialogElement | undefined = $state();
@@ -43,32 +44,13 @@
   let selectedPackageId = $state("");
   let selectedAudioOptionIds: string[] = $state([]);
 
-  let categories: any[] = $state([]);
+  let selectedTag: string = $state(""); // single tag only
   let selectedCategories: string[] = $state([]);
 
-  onMount(async () => {
-    try {
-      loading = true;
-      const { error, data } = await actions.category.listByTenant({
-        _id: masterTenantId,
-      });
+  const t = useTranslations();
 
-      if (error) {
-        showAlert(error?.toString());
-      } else {
-        data.forEach((category: any) => {
-          categories.push({
-            title: category.title,
-            value: category._id.toString(),
-          });
-        });
-      }
-    } catch (error: any) {
-      showAlert(error?.toString());
-    } finally {
-      loading = false;
-    }
-  });
+  //$inspect(selectedTag);
+  //$inspect(selectedCategories);
 
   // Calculate total price (include package and audio options)
   $effect(() => {
@@ -132,6 +114,35 @@
 
     if (error) throw new Error(t("tenant.setup-tenant-data-failed"));
     return data;
+  }
+
+  // Select single tag
+  function selectTag(tagId: string) {
+    // Unselect tag → clear categories
+    if (selectedTag === tagId) {
+      selectedTag = "";
+      selectedCategories = [];
+      return;
+    }
+
+    // Select this tag
+    selectedTag = tagId;
+
+    // Auto-select categories belonging to this tag
+    const autoCategories = categories
+      .filter((cat) => cat.tags?.includes(tagId))
+      .map((cat) => cat.value);
+
+    selectedCategories = autoCategories;
+  }
+
+  // Toggle category checkbox
+  function toggleCategory(id: string) {
+    if (selectedCategories.includes(id)) {
+      selectedCategories = selectedCategories.filter((x) => x !== id);
+    } else {
+      selectedCategories = [...selectedCategories, id];
+    }
   }
 
   function validateForm() {
@@ -262,47 +273,23 @@
 
     <div class="divider"></div>
 
-    <h1 class="font-sanns text-3xl font-bold text-black mt-6 mb-10">
+    <!-- TAGS -->
+    <h2 class="font-sanns text-3xl font-bold text-black mt-6 mb-10">
       {t("tenant.choose-categories")}
-    </h1>
-
-    <div
-      class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 mb-10 text-black"
-    >
-      {#each categories as category}
-        {#if selectedCategories.includes(category.value)}
-          <button
-            class="btn btn-primary w-full h-[56px] shadow-xl py-2"
-            onclick={() => {
-              selectedCategories = selectedCategories.filter(
-                (item) => item !== category.value,
-              );
-            }}
-            ><span class="w-full text-left py-2">
-              {category.title}
-            </span></button
-          >
-        {:else}
-          <button
-            class="btn btn-primary w-full h-[56px] shadow-xl bg-white text-gray-600 py-2 border-0"
-            onclick={() => {
-              selectedCategories.push(category.value);
-            }}
-          >
-            <span class="w-full text-left py-2">
-              {category.title}
-            </span></button
-          >
-        {/if}
-      {/each}
-    </div>
+    </h2>
+    <TagCategorySelector
+      {tags}
+      {categories}
+      bind:selectedTag
+      bind:selectedCategories
+    />
 
     <div class="divider"></div>
 
-    <!-- Pakage Plan -->
-    <h1 class="font-sanns text-3xl font-bold text-black mt-6 mb-10">
+    <!-- Pakage Plans -->
+    <h2 class="font-sanns text-3xl font-bold text-black mt-6 mb-10">
       {t("subscription.choose-your-plan")}
-    </h1>
+    </h2>
 
     <div
       class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-10 text-black"

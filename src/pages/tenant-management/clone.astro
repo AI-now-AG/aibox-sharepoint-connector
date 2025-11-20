@@ -1,12 +1,30 @@
 ---
-import { TENANT_MASTER_DEV, TENANT_MASTER_PROD } from "$constants";
 import Layout from "$layouts/Layout.astro";
-import { isProd } from "$utils/env";
-import TenantForm from "./TenantMasterCloneForm.svelte";
+import { ObjectId } from "mongodb";
+import GlobalTagModel from "$data/models/globalTag.model";
+import GlobalCategoryModel from "$data/models/globalCategory.model";
+import { type TagItem, type CategoryItem } from "$types/Subscription";
+import CloneTenantForm from "./TenantMasterCloneForm.svelte";
 
-const masterTenantId = isProd() ? TENANT_MASTER_PROD : TENANT_MASTER_DEV;
+const allTags = await GlobalTagModel.list();
+const allCategories = await GlobalCategoryModel.list();
+
+const tags: TagItem[] = allTags.map((tag) => {
+  return {
+    title: tag.title,
+    value: tag._id.toString(),
+  };
+});
+
+const categories: CategoryItem[] = allCategories.map((category) => {
+  return {
+    title: category.title,
+    value: category._id.toString(),
+    tags: category.tags?.map((t: ObjectId) => t.toString()) ?? [],
+  };
+});
 ---
 
 <Layout>
-  <TenantForm masterTenantId={masterTenantId} client:load />
+  <CloneTenantForm {tags} {categories} client:load />
 </Layout>
