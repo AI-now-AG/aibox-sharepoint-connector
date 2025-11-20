@@ -16,7 +16,7 @@
     AudioOptionId,
     BillingMethod,
   } from "$types/Subscription";
-  import { isValidEmail, isValidPhone } from "$utils/common";
+  import { isValidEmail } from "$utils/common";
   import { EventName, ScreenName } from "$types/Posthog";
   import { posthogClientCaptureWithoutTenant } from "$utils/posthogClient";
 
@@ -85,10 +85,10 @@
       return false;
     }
 
-    if (!isValidPhone(contactPhone)) {
-      showAlert(t("subscription.validate-invalid-contact-phone-message"));
-      return false;
-    }
+    // if (!isValidPhone(contactPhone)) {
+    //   showAlert(t("subscription.validate-invalid-contact-phone-message"));
+    //   return false;
+    // }
 
     if (!contactName) {
       showAlert(t("subscription.validate-empty-contact-name-message"));
