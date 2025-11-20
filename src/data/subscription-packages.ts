@@ -19,16 +19,16 @@ export const SubscriptionPackages = {
         en: [
           "1 User included",
           "Additional user CHF 20.-",
-          "Manage your own use cases",
-          "No storage of user data",
-          "<b>100 Credits included</b>",
+          "All AI models included",
+          "AI image generation",
+          "Support via email",
         ],
         de: [
           "1 Benutzer inklusive",
           "Zusätzlicher Benutzer CHF 20.-",
-          "Eigene Anwendungen verwalten",
-          "Keine Speicherung von Nutzerdaten",
-          "<b>100 Credits inklusive</b>",
+          "Alle KI Modelle inkl.",
+          "KI Bilderstellung",
+          "Standardsupport E-Mail",
         ],
       },
     },
@@ -50,15 +50,13 @@ export const SubscriptionPackages = {
           "15 Users included",
           "Additional User CHF 15.-",
           "User Management included",
-          "Option Private LLM (CH/EU)",
-          "<b>400 Credits included</b>",
+          "Online kickoff with team",
         ],
         de: [
           "15 Benutzer inklusive",
           "Zusätzlicher Benutzer CHF 15.-",
           "Benutzerverwaltung inklusive",
-          "Optional privates LLM (CH/EU)",
-          "<b>400 Credits inklusive</b>",
+          "Online Kickoff mit Team",
         ],
       },
     },
@@ -79,21 +77,18 @@ export const SubscriptionPackages = {
         en: [
           "30 Users included",
           "Additional User CHF 10.-",
-          "Premium Support",
-          "Optional Enterprise Login",
-          "<b>800 Credits included</b>",
+          "Personal Support",
+          "Dedicated AI Models possible",
         ],
         de: [
           "30 Benutzer inklusive",
           "Zusätzlicher Benutzer CHF 10.-",
-          "Premium-Support",
-          "Optionale Enterprise Login",
-          "<b>800 Credits inklusive</b>",
+          "Persönlicher Support",
+          "Dediziertes KI möglich",
         ],
       },
     },
   },
-  // Applied changes from this ticket: https://ainow.atlassian.net/browse/AINOW-1430
   audioOptions: { // Select [Subtitle Studio Plus] or [Subtitle Studio Basic] | [Audio to Text Large] or [Audio to Text Basic]
     AudioPremium: { // Change from [Audio zu Text Premium] to [Subtitle Studio Plus]
       id: AudioOptionId.AudioPremium,
@@ -101,11 +96,11 @@ export const SubscriptionPackages = {
         en: "Subtitle Studio Plus",
         de: "Untertitel Studio Plus",
       },
-      price: 300, // Change from [150] to [300] => https://ainow.atlassian.net/browse/AINOW-1571
+      price: 300, // Change from [150] to [300]
       currency: "CHF",
-      priceText: "150 CHF / pro Monat",
+      priceText: "300 CHF / pro Monat",
     },
-    AudioBasisAddOnSubtitle: { // Change from [Add-On Subtitle] to [Subtitle Studio Basic]
+    AudioBasisAddOnSubtitle: { // Change from [Add-On Subtitle] to [Subtitle Studio Basic] ==> REMOVED 
       id: AudioOptionId.AudioBasisAddOnSubtitle,
       name: {
         en: "Subtitle Studio Basic",
