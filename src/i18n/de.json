@@ -667,5 +667,6 @@
   "subscription.trial-days-period": "14 Tage kostenlos testen",
   "subscription.country.ch": "Schweiz",
   "subscription.country.de": "Deutschland",
-  "subscription.country.at": "Österreich"
+  "subscription.country.at": "Österreich",
+  "tenant.comment": "Kommentar"
 }

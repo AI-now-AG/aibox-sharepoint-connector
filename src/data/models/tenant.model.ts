@@ -71,6 +71,7 @@ const TenantSchema = z.object({
   is_restrict_user_managment: z.boolean().optional().default(false),
   is_trial: z.boolean().optional().default(false),
   is_on_posthog: z.boolean().optional().default(false),
+  comment: z.string().optional(),
   metadata: z.record(z.any()).nullish(),
   billing_method: z
     .nativeEnum(BillingMethod)
@@ -230,7 +231,7 @@ export default {
       updated_at: now,
     };
 
-     
+
     delete (newTenant as any)._id; // ensure no ID conflict
 
     // insert the new tenant

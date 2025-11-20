@@ -667,5 +667,6 @@
   "subscription.trial-days-period": " 14 days free trial",
   "subscription.country.ch": "Switzerland",
   "subscription.country.de": "Germany",
-  "subscription.country.at": "Austria"
+  "subscription.country.at": "Austria",
+  "tenant.comment": "Comment"
 }
