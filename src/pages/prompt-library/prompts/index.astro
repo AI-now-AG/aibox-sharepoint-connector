@@ -63,6 +63,7 @@ const promptsEnriched: PromptCardItem[] = prompts.map((prompt) => {
     id: prompt._id.toString(),
     group: prompt.group?.toString() ?? "",
     tags,
+    model: prompt.model,
   };
 });
 let userPermissions = Astro.locals.user.permissions;
