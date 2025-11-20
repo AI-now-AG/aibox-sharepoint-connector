@@ -123,9 +123,9 @@
     </h1>
 
     <!-- Ribbon -->
-    <div class="flex flex-1 items-center justify-start">
+    <div class="flex flex-1 items-center justify-end">
       <span
-        class="px-4 py-1 bg-[#FEE4E2] text-[#B42318] text-sm font-semibold rounded-md rotate-[5deg] shadow-md"
+        class="px-6 py-4 bg-[#FEE4E2] text-[#B42318] text-md font-semibold rounded-md rotate-[0deg] shadow-md"
       >
         {t("subscription.trial-days-period")}
       </span>
