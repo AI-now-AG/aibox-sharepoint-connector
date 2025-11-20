@@ -15,13 +15,14 @@
     SubscriptionPackageId,
     AudioOptionId,
     BillingMethod,
-    Countries,
     CountryCode,
   } from "$types/Subscription";
   import { isValidEmail } from "$utils/common";
   import { EventName, ScreenName } from "$types/Posthog";
   import { posthogClientCaptureWithoutTenant } from "$utils/posthogClient";
   import Dropdown from "$components/form/Dropdown.svelte";
+  import { useTranslatedCountryList } from "$utils/subscription";
+  import log from "$utils/log";
 
   interface Props {
     accountEmail: string;
@@ -29,6 +30,8 @@
   }
   let { accountEmail, defaultLanguage = "en" }: Props = $props();
   const t = useTranslations(defaultLanguage);
+  const conuntryOptions = useTranslatedCountryList();
+
   let loading = $state(false);
 
   const initBillingInfo = $subscription.billingInfo;
@@ -301,7 +304,7 @@
           label={`${t("subscription.country")}`}
           labelClasses="mb-3"
           placeholderClasses="h-[56px]"
-          options={Countries}
+          options={conuntryOptions}
           bind:value={country}
         />
       </div>

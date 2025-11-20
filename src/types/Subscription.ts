@@ -99,18 +99,18 @@ export interface CategoryItem {
 }
 
 export enum CountryCode {
-  CH = "CH",
-  DE = "DE",
-  AU = "AU",
+  CH = "CH", // Switzerland
+  DE = "DE", // Germany
+  AT = "AT", // Austria
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const CountryMap: Record<CountryCode, any> = {
   [CountryCode.CH]: { title: "Schweiz", value: CountryCode.CH },
   [CountryCode.DE]: { title: "Deutschland", value: CountryCode.DE },
-  [CountryCode.AU]: { title: "Österreich", value: CountryCode.AU },
+  [CountryCode.AT]: { title: "Österreich", value: CountryCode.AT },
 };
 
 export const Countries = [
-  CountryMap[CountryCode.CH], CountryMap[CountryCode.DE], CountryMap[CountryCode.AU],
+  CountryMap[CountryCode.CH], CountryMap[CountryCode.DE], CountryMap[CountryCode.AT],
 ]
