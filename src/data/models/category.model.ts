@@ -62,23 +62,27 @@ export default {
     return collection.deleteMany({ tenant_id: objectId });
   },
 
-  list: async () =>
-    collection
+  list: async () => {
+    return collection
       .find<Document<Category>>({})
-      .sort({ position: 1, created_at: 1 }),
+      .sort({ position: 1, created_at: 1 })
+      .toArray();
+  },
 
   listByTenant: async (tenantId: string | ObjectId) => {
     const _tenantId = toObjectId(tenantId);
     return collection
       .find<Document<Category>>({ tenant_id: _tenantId })
-      .sort({ position: 1, created_at: 1 });
+      .sort({ position: 1, created_at: 1 })
+      .toArray();
   },
 
   listActiveByTenant: async (tenantId: string | ObjectId) => {
     const _tenantId = toObjectId(tenantId);
     return collection
       .find<Document<Category>>({ tenant_id: _tenantId, active: true })
-      .sort({ position: 1, created_at: 1 });
+      .sort({ position: 1, created_at: 1 })
+      .toArray();
   },
 
   get: async (id: string): Promise<Category | null> => {
@@ -108,13 +112,5 @@ export default {
       .sort({ position: -1 })
       .limit(1)
       .next();
-  },
-
-  listByTenantAndIds: async (tenantId: string | ObjectId, ids: ObjectId[]) => {
-    const _tenantId = toObjectId(tenantId);
-    return collection.find<Document<Category>>({
-      tenant_id: _tenantId,
-      _id: { $in: ids },
-    });
   },
 };

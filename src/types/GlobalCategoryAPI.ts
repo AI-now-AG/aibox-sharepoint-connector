@@ -7,7 +7,6 @@ export {
   type CategoryList,
 } from "./CategoryAPI";
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const CreateCategoryParamsSchema = z.object({
   _id: z.string().optional(),
   title: z.string(),

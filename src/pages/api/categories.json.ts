@@ -12,8 +12,9 @@ import {
 
 export const GET: APIRoute = async (ctx) => {
   try {
-    const result = await CategoryModel.listByTenant(ctx.locals.user.tenant_id);
-    const categories = await result.toArray();
+    const categories = await CategoryModel.listByTenant(
+      ctx.locals.user.tenant_id,
+    );
     return new Response(
       JSON.stringify(
         categories.map((category) => ({

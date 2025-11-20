@@ -33,10 +33,9 @@ const generateKnowledgeBaseDescription = async (
 
 export const GET: APIRoute = async (ctx: APIContext) => {
   try {
-    const result = await KnowledgeBaseModel.listByTenant(
+    const documents = await KnowledgeBaseModel.listByTenant(
       ctx.locals.user.tenant_id,
     );
-    const documents = await result.toArray();
     return new Response(
       JSON.stringify(
         documents.map((doc) => ({

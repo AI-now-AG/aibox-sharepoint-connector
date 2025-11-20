@@ -8,6 +8,8 @@ import CategoryModel, {
   type Group,
 } from "$data/models/category.model";
 import PromptModel, { type Prompt } from "$data/models/prompt.model";
+import GlobalCategoryModel from "$data/models/globalCategory.model";
+import GlobalPromptModel from "$data/models/globalPrompt.model";
 import SubscriptionModel, {
   type Subscription,
 } from "$data/models/subscription.model";
@@ -104,11 +106,8 @@ export const cloneMasterTenant = {
       const selectedCategoryIds = input.use_cases.map(
         (categoryId) => new ObjectId(categoryId),
       );
-      const categoryCursor = await CategoryModel.listByTenantAndIds(
-        masterTenantId,
-        selectedCategoryIds,
-      );
-      const categories = await categoryCursor.toArray();
+      const categories =
+        await GlobalCategoryModel.listByIds(selectedCategoryIds);
 
       // Clone each category and store mapping
       const categoryIdMap = new Map();
@@ -140,9 +139,8 @@ export const cloneMasterTenant = {
 
       // Clone prompts with updated categoryId
       const originalCategoryIds = categories.map((c) => c._id);
-      const promptCursor =
-        await PromptModel.listByCategoryIds(originalCategoryIds);
-      const prompts = await promptCursor.toArray();
+      const prompts =
+        await GlobalPromptModel.listByCategoryIds(originalCategoryIds);
 
       const newPrompts = prompts.map((prompt: Prompt) => ({
         ...prompt,
