@@ -662,5 +662,6 @@
   "subscription.validate-empty-contact-phone-message": "Bitte Telefonnummer erfassen",
   "subscription.validate-empty-contact-name-message": "Bitte Kontaktnamen erfassen",
   "subscription.validate-invalid-contact-phone-message": "Bitte gültige Telefonnummer erfassen",
-  "nav.global-assistant-library": "Globale Assistenten Bibliothek"
+  "nav.global-assistant-library": "Globale Assistenten Bibliothek",
+  "subscription.validate-unselected-tags-message": "Bitte wählen Sie einen Geschäftsbereich (Tag)."
 }

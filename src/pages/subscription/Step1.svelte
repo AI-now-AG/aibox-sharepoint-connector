@@ -88,7 +88,7 @@
     }
 
     if (!selectedTag) {
-      showAlert("Please choose a business area (tag).");
+      showAlert(t("subscription.validate-unselected-tags-message"));
       return false;
     }
 
