@@ -45,6 +45,7 @@ export const POST: APIRoute = async ({ request }) => {
           sub?.add_ons,
         ),
         "Subscription Price": tenant.totalPrice ?? "-",
+        "Comment": tenant.comment ?? "-",
         "Number of Users": userCounts[tenant._id] ?? "-",
         Language: tenant.default_language ?? "-",
         "Company Name": billing.company_name ?? "-",

@@ -172,6 +172,7 @@
 
   async function exportTenants() {
     try {
+      loading = true;
       const response = await fetch("/api/export-tenants", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -179,6 +180,7 @@
           tenants: tenants,
         }),
       });
+      loading = false;
 
       if (!response.ok) throw new Error("Export Tenants failed");
 
