@@ -81,6 +81,36 @@ export default {
       .toArray();
   },
 
+  listForExport: async () => {
+    // Execute the aggregation
+    return collection
+      .aggregate([
+        {
+          $match: {},
+        },
+        {
+          $lookup: {
+            from: "categories",
+            localField: "category",
+            foreignField: "_id",
+            as: "category",
+          },
+        },
+        {
+          $lookup: {
+            from: "knowlegebases",
+            localField: "knowledgebase",
+            foreignField: "_id",
+            as: "knowledgebase",
+          },
+        },
+        {
+          $unwind: "$category",
+        },
+      ])
+      .toArray();
+  },
+
   getMaxPosition: async (groupId: ObjectId) => {
     return collection
       .find<Document<Prompt>>({ group: groupId })
