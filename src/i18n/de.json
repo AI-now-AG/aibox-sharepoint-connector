@@ -663,7 +663,7 @@
   "subscription.validate-empty-contact-name-message": "Bitte Kontaktnamen erfassen",
   "subscription.validate-invalid-contact-phone-message": "Bitte gültige Telefonnummer erfassen",
   "nav.global-assistant-library": "Globale Assistenten Bibliothek",
-  "subscription.validate-unselected-tags-message": "Bitte wählen Sie einen Geschäftsbereich (Tag).",
+  "subscription.validate-unselected-tags-message": "Bitte wähle deinen Sektor aus",
   "subscription.trial-days-period": "14 Tage kostenlos testen",
   "subscription.country.ch": "Schweiz",
   "subscription.country.de": "Deutschland",
