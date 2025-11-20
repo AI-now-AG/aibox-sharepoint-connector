@@ -117,9 +117,20 @@
     <SubsciptionSteps currentStep={1} {defaultLanguage} />
   </div>
   <!-- Pakage Plan -->
-  <h1 class="font-sanns text-3xl font-bold text-black mt-2">
-    {t("subscription.choose-your-plan")}
-  </h1>
+  <div class="flex items-center justify-between mt-2 mb-2">
+    <h1 class="font-sanns text-3xl font-bold text-black mr-4">
+      {t("subscription.choose-your-plan")}
+    </h1>
+
+    <!-- Ribbon -->
+    <div class="flex flex-1 items-center justify-start">
+      <span
+        class="px-4 py-1 bg-[#FEE4E2] text-[#B42318] text-sm font-semibold rounded-md rotate-[5deg] shadow-md"
+      >
+        {t("subscription.trial-days-period")}
+      </span>
+    </div>
+  </div>
   <p class="font-sans text-base font-medium text-gray-600 mt-6 mb-10">
     {@html t("subscription.choose-your-plan-description")}
   </p>

@@ -663,5 +663,6 @@
   "subscription.validate-empty-contact-name-message": "Please input your contact name ",
   "subscription.validate-invalid-contact-phone-message": "Please input valid phone number",
   "nav.global-assistant-library": "Global Assistant Library",
-  "subscription.validate-unselected-tags-message": "Please choose a business area (tag)."
+  "subscription.validate-unselected-tags-message": "Please choose a business area (tag).",
+  "subscription.trial-days-period": " 14 days free trial"
 }
