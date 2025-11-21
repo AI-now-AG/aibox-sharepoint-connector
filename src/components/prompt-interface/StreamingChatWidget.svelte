@@ -102,11 +102,12 @@
   let loading: boolean = $state(false);
 
   let isShowAttachmentButton = $state(
-    currentPrompt?.model != PromptModel.Perplexity,
+    true,
+    //currentPrompt?.model != PromptModel.Perplexity,
   );
 
   $effect(() => {
-    isShowAttachmentButton = currentPrompt?.model != PromptModel.Perplexity;
+    //isShowAttachmentButton = currentPrompt?.model != PromptModel.Perplexity;
   });
 
   const providerInfo = useProviderInfo($tenant);
