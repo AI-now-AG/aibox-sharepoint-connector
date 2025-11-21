@@ -415,6 +415,10 @@
             placeholder={t("prompt-execution.reasoning-level.placeholder")}
             options={[
               {
+                title: t("prompt-execution.reasoning-effort.level-none"),
+                value: ReasoningEffortOption.None,
+              },
+              {
                 title: t("prompt-execution.reasoning-effort.level-minimal"),
                 value: ReasoningEffortOption.Minimal,
               },

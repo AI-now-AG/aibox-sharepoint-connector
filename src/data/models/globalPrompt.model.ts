@@ -1,6 +1,7 @@
 import { ObjectId } from "mongodb";
 import { db, toObjectId, type Document } from "../mongodb";
 import { z } from "zod";
+import { ReasoningEffortOption } from "$types/AIProvider";
 
 const PromptSchema = z.object({
   _id: z.instanceof(ObjectId),
@@ -12,7 +13,7 @@ const PromptSchema = z.object({
   prompt: z.string(),
   predefined_input: z.string().optional(),
   model: z.string().nullish(),
-  reasoningEffort: z.string().nullish(),
+  reasoningEffort: z.string().nullish().default(ReasoningEffortOption.None),
   textVerbosity: z.string().nullish(),
   promptTool: z.string().nullish(),
   documents: z.array(z.instanceof(ObjectId)).optional(),

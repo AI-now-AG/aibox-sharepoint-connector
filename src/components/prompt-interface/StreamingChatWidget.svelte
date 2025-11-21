@@ -231,7 +231,7 @@
     if (isResponseModel) {
       payload.previousResponseId = previousResponseId;
       payload.reasoningEffort =
-        currentPrompt?.reasoningEffort || ReasoningEffortOption.Low;
+        currentPrompt?.reasoningEffort || ReasoningEffortOption.None;
       payload.verbosity =
         currentPrompt?.textVerbosity || TextVerbosityOption.Low;
     } else {

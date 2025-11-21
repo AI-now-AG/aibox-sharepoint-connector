@@ -218,7 +218,7 @@
     }
 
     if (isResponseModel) {
-      payload.reasoningEffort = ReasoningEffortOption.Low;
+      payload.reasoningEffort = ReasoningEffortOption.None;
       payload.verbosity = TextVerbosityOption.Low;
     }
 
