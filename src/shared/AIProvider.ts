@@ -56,7 +56,7 @@ export const ModelNameProviderPromptMap: Record<string, string> = {
 export const CustomSortOrder: { [key: string]: number } = {
   [PromptModel.Default]: 1, // Default - gpt-4o, Legacy (Text)
   [PromptModel.OpenAI]: 2, // gpt-4o, Legacy (Text)
-  [PromptModel.OpenAIGpt5]: 3, // gpt-5 (Text & Tools)
+  [PromptModel.OpenAIGpt5]: 3, // gpt-5.1 (Text & Tools)
   [PromptModel.AzureOpenAI]: 4, // gpt-4o (Azure)
   [PromptModel.Perplexity]: 5, // Perplexity Sonar (Text & Websuche)
   [PromptModel.Claude]: 6, // Claude Sonnet (Text)

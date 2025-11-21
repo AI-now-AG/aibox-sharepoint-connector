@@ -73,8 +73,8 @@
   let selectedModel: string = $state("");
   let selectedPromptTool: any = $state("");
 
-  let selectedReasoningLevel: any = $state("low");
-  let selectedTextVerbosity: any = $state("low");
+  let selectedReasoningLevel: any = $state(ReasoningEffortOption.None);
+  let selectedTextVerbosity: any = $state(TextVerbosityOption.Low);
 
   let promptTitle = $state("");
   let initHtml = $state("<p></p>");

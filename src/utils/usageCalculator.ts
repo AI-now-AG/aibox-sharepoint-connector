@@ -31,7 +31,7 @@ const unitLabels: Record<string, string> = {
  *  Example:
  *      + OpenAI gpt-4o: 40000 input tokens = 1 request
  *      + OpenAI gpt-4o: 10000 output tokens = 1 request
- *  *   + OpenAI gpt-5: 80000 input tokens = 1 request
+ *      + OpenAI gpt-5: 80000 input tokens = 1 request
  *      + OpenAI gpt-5: 10000 output tokens = 1 request
  */
 const TOKEN_CREDIT_MAPPING: Record<string, TokenCreditRate> = {
@@ -241,7 +241,7 @@ const _calculateOpenAIGpt5Usage = (
 
   // gpt-5
   const gpt5Items = usageData.filter(
-    (item: UsageLog) => item.model == ModelName.Gpt5,
+    (item: UsageLog) => item.model == ModelName.Gpt5Old,
   );
   const gpt5InputTokens = gpt5Items.reduce(
     (sum: number, item: UsageLog) => sum + (item.input_tokens ?? 0),
@@ -251,7 +251,7 @@ const _calculateOpenAIGpt5Usage = (
     (sum: number, item: UsageLog) => sum + (item.output_tokens ?? 0),
     0,
   );
-  const { inputCredits: gpt4oInputCredits, outputCredits: gpt4oOutputCredits } =
+  const { inputCredits: gpt5InputCredits, outputCredits: gpt5OutputCredits } =
     _tokensToCredits(
       ApiKeyProvider.OpenAIGpt5,
       gpt5InputTokens,
@@ -261,13 +261,13 @@ const _calculateOpenAIGpt5Usage = (
     model: "gpt-5 Input",
     amount: gpt5InputTokens,
     unit: unitLabels.tokens,
-    credits: gpt4oInputCredits,
+    credits: gpt5InputCredits,
   });
   usageItems.push({
     model: "gpt-5 Output",
     amount: gpt5OutputTokens,
     unit: unitLabels.tokens,
-    credits: gpt4oOutputCredits,
+    credits: gpt5OutputCredits,
   });
 
   const openAiWebsearchRequests = gpt5Items.reduce(
@@ -281,8 +281,56 @@ const _calculateOpenAIGpt5Usage = (
     amount: openAiWebsearchRequests,
     unit: unitLabels.requests,
     credits: _requestsToCredits(
-      ModelName.Gpt5,
+      ModelName.Gpt5Old,
       openAiWebsearchRequests,
+    ),
+  });
+
+
+  // gpt-5.1
+  const gpt51Items = usageData.filter(
+    (item: UsageLog) => item.model == ModelName.Gpt5,
+  );
+  const gpt51InputTokens = gpt51Items.reduce(
+    (sum: number, item: UsageLog) => sum + (item.input_tokens ?? 0),
+    0,
+  );
+  const gpt51OutputTokens = gpt51Items.reduce(
+    (sum: number, item: UsageLog) => sum + (item.output_tokens ?? 0),
+    0,
+  );
+  const { inputCredits: gpt51InputCredits, outputCredits: gpt51OutputCredits } =
+    _tokensToCredits(
+      ApiKeyProvider.OpenAIGpt5,
+      gpt51InputTokens,
+      gpt51OutputTokens,
+    );
+  usageItems.push({
+    model: "gpt-5.1 Input",
+    amount: gpt51InputTokens,
+    unit: unitLabels.tokens,
+    credits: gpt51InputCredits,
+  });
+  usageItems.push({
+    model: "gpt-5.1 Output",
+    amount: gpt51OutputTokens,
+    unit: unitLabels.tokens,
+    credits: gpt51OutputCredits,
+  });
+
+  const openAi51WebsearchRequests = gpt51Items.reduce(
+    (sum: number, item: UsageLog) =>
+      sum + (item.metadata?.websearch_count ?? 0),
+    0,
+  );
+
+  usageItems.push({
+    model: "gpt-5.1 Websearch",
+    amount: openAi51WebsearchRequests,
+    unit: unitLabels.requests,
+    credits: _requestsToCredits(
+      ModelName.Gpt5,
+      openAi51WebsearchRequests,
     ),
   });
 

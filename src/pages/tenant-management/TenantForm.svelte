@@ -38,6 +38,7 @@
   import { TextModel } from "$types/UsageTracking";
   import { SubscriptionPackages } from "$data/subscription-packages";
   import { onMount } from "svelte";
+  import { ModelName, ReasoningEffortOption } from "$types/AIProvider";
 
   const t = useTranslations();
   let loading = $state(false);
@@ -338,13 +339,13 @@
     selectedThemes = Themes.find((item) => item.value === tenantData.theme);
   }
   if (tenantData && !tenantData.openai_chat_model) {
-    tenantData.openai_chat_model = "gpt-4o";
+    tenantData.openai_chat_model = ModelName.Gpt4o;
   }
   if (tenantData && !tenantData.openai_gpt5_chat_model) {
-    tenantData.openai_gpt5_chat_model = "gpt-5";
+    tenantData.openai_gpt5_chat_model = ModelName.Gpt5;
   }
   if (tenantData && !tenantData.openai_gpt5_reasoning_effort) {
-    tenantData.openai_gpt5_reasoning_effort = "low";
+    tenantData.openai_gpt5_reasoning_effort = ReasoningEffortOption.None;
   }
 
   function togglePassword(field: HTMLInputElement) {

@@ -74,8 +74,8 @@
   let selectedModel: string = $state("");
   let selectedPromptTool: any = $state("");
 
-  let selectedReasoningLevel: any = $state("low");
-  let selectedTextVerbosity: any = $state("low");
+  let selectedReasoningLevel: any = $state(ReasoningEffortOption.None);
+  let selectedTextVerbosity: any = $state(TextVerbosityOption.Low);
 
   let selectedGroup: Group | any = $state();
   let previousCategoryId: string | null = $state(null);
@@ -172,8 +172,10 @@
         selectedModel = PromptModel.OpenAI;
       }
 
-      selectedReasoningLevel = promptDetails.reasoningEffort || "low";
-      selectedTextVerbosity = promptDetails.textVerbosity || "low";
+      selectedReasoningLevel =
+        promptDetails.reasoningEffort || ReasoningEffortOption.None;
+      selectedTextVerbosity =
+        promptDetails.textVerbosity || TextVerbosityOption.Low;
 
       selectedPromptTool = promptDetails.promptTool || "";
 

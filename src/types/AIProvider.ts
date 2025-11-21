@@ -1,7 +1,8 @@
 export enum ModelName {
   // OpenAI
   Gpt4o = "gpt-4o", // Text & Tools (Image) (Azure)
-  Gpt5 = "gpt-5", // Text & Tools (Image, Thinking)
+  Gpt5Old = "gpt-5", // Text & Tools (Image, Thinking)
+  Gpt5 = "gpt-5.1", // Text & Tools (Image, Thinking)
   Dalle = "dall-e-3", // Image Generation
   GptImage = "gpt-image-1", // Prompt Image tool
 
@@ -34,6 +35,7 @@ export enum TextVerbosityOption {
 }
 
 export enum ReasoningEffortOption {
+  None = "none",
   Minimal = "minimal",
   Low = "low",
   Medium = "medium",
