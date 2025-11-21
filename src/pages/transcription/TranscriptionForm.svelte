@@ -1708,7 +1708,8 @@
           {/if}
 
           <!-- Text Improvement Completion Warning -->
-          {#if isTranscipted && !isTranscribing && improvementStats && improvementStats.completionPercentage < 80}
+          <!-- Only show for partial failures (1-79%). Complete failures (0%) or success (≥80%) don't show warning -->
+          {#if isTranscipted && !isTranscribing && improvementStats && typeof improvementStats.completionPercentage === 'number' && improvementStats.totalSentences > 0 && improvementStats.completionPercentage > 0 && improvementStats.completionPercentage < 80}
             <div class="px-4 pb-4 pt-0">
               <div role="alert" class="alert alert-warning">
                 <svg xmlns="http://www.w3.org/2000/svg"
@@ -1721,11 +1722,13 @@
                         d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
                 <div class="flex-1">
-                  <p class="text-sm font-medium">Text Improvement Incomplete</p>
+                  <p class="text-sm font-medium">{t("transcription.warning.improvement-incomplete")}</p>
                   <p class="text-xs mt-1">
-                    Only {improvementStats.completionPercentage}% of sentences were successfully improved
-                    ({improvementStats.improvedSentences} out of {improvementStats.totalSentences} sentences).
-                    Some sentences may retain their original transcription quality.
+                    {t("transcription.warning.improvement-incomplete-details", {
+                      completionPercentage: improvementStats.completionPercentage,
+                      improvedSentences: improvementStats.improvedSentences,
+                      totalSentences: improvementStats.totalSentences
+                    })}
                   </p>
                 </div>
               </div>

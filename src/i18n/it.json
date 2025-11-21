@@ -630,6 +630,8 @@
   "transcription.alert.large-files-time": "Large files may take 5-10 minutes. You can safely navigate away and return later.",
   "transcription.success.completed": "Transcription completed successfully!",
   "transcription.success.files-ready": "Your files are ready for download",
+  "transcription.warning.improvement-incomplete": "Text Improvement Incomplete",
+  "transcription.warning.improvement-incomplete-details": "Only {completionPercentage}% of sentences were successfully improved ({improvedSentences} out of {totalSentences} sentences). Some sentences may retain their original transcription quality.",
   "transcription.error.failed": "Transcription failed",
   "transcription.error.try-again": "Please try again or contact support if the issue persists",
   "transcription.button.remove-file": "Remove file",
