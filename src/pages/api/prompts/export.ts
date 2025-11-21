@@ -30,6 +30,7 @@ export const GET: APIRoute = async (ctx: APIContext) => {
         [CsvColumn.Group]: group,
         [CsvColumn.Model]: prompt.model,
         [CsvColumn.PredefinedInput]: prompt.predefined_input,
+        [CsvColumn.ReasoningEffort]: prompt.reasoning_effort,
       };
     });
 

@@ -8,6 +8,7 @@ export enum CsvColumn {
   Group = "group",
   Model = "model",
   PredefinedInput = "predefined_input",
+  ReasoningEffort = "reasoning_effort",
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -19,6 +20,7 @@ const CsvRowRawSchema = z.object({
   group: z.string().optional(),
   model: z.string().optional(),
   predefined_input: z.string().optional(),
+  reasoning_effort: z.string().optional(),
 });
 
 export type CsvRowRaw = z.infer<typeof CsvRowRawSchema>;
