@@ -11,6 +11,7 @@ export const ModelNameMap: Record<string, string> = {
   "claude-sonnet-4-0": "Claude Sonnet",
   sonar: "Perplexity Sonar",
   "gemini-2.5-flash": "Gemini 2.5 Flash",
+  "gpt-5": "gpt-5.1",
 };
 
 const ModelNameExceptions: Record<string, string> = {
