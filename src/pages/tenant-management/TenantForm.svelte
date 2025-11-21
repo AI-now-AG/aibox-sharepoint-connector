@@ -341,7 +341,11 @@
   if (tenantData && !tenantData.openai_chat_model) {
     tenantData.openai_chat_model = ModelName.Gpt4o;
   }
-  if (tenantData && !tenantData.openai_gpt5_chat_model) {
+  if (
+    tenantData &&
+    (!tenantData.openai_gpt5_chat_model ||
+      tenantData.openai_gpt5_chat_model === ModelName.Gpt5Old)
+  ) {
     tenantData.openai_gpt5_chat_model = ModelName.Gpt5;
   }
   if (tenantData && !tenantData.openai_gpt5_reasoning_effort) {
