@@ -11,6 +11,7 @@ import CategoryModel, {
   type Group,
 } from "$data/models/category.model";
 import { CsvColumn, type CsvRowRaw } from "$types/PromptCsv";
+import { ReasoningEffortOption } from "$types/AIProvider";
 
 const isValidRows = (rows: CsvRowRaw[]) => {
   const requiredColumns = Object.values(CsvColumn);
@@ -132,7 +133,7 @@ const syncPrompts = async (rows: CsvRowRaw[], user: User) => {
       model: item.model ?? "",
       predefined_input: item.predefined_input ?? "",
       promptTool: item.prompt_tool ?? "",
-      reasoningEffort: item.reasoning_effort ?? "",
+      reasoningEffort: item.reasoning_effort ?? ReasoningEffortOption.None,
       textVerbosity: item.text_verbosity ?? "",
     };
     await PromptModel.add(newPrompt);
