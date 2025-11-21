@@ -3,13 +3,14 @@ import { z } from "zod";
 import slug from "slug";
 import { ObjectId } from "mongodb";
 import { parseString } from "fast-csv";
-import type { User } from "lucia";
 import { client } from "$data/mongodb";
-import PromptModel, { type Prompt } from "$data/models/prompt.model";
-import CategoryModel, {
+import GlobalPromptModel, {
+  type Prompt,
+} from "$data/models/globalPrompt.model";
+import GlobalCategoryModel, {
   type Category,
   type Group,
-} from "$data/models/category.model";
+} from "$data/models/globalCategory.model";
 import { CsvColumn, type CsvRowRaw } from "$types/PromptCsv";
 
 const isValidRows = (rows: CsvRowRaw[]) => {
@@ -27,7 +28,7 @@ const isValidRows = (rows: CsvRowRaw[]) => {
   return true;
 };
 
-const syncCategoriesWithGroups = async (rows: CsvRowRaw[], user: User) => {
+const syncGlobalCategoriesWithGroups = async (rows: CsvRowRaw[]) => {
   // Group categories by their name and ensure uniqueness
   const categories = rows
     .map((item: CsvRowRaw) => {
@@ -50,10 +51,7 @@ const syncCategoriesWithGroups = async (rows: CsvRowRaw[], user: User) => {
 
   // Iterate through each category and execute the check & create/update process
   for (const [title, groups] of Object.entries(categories)) {
-    const category = await CategoryModel.getByTitleAndTenant(
-      title,
-      user.tenant_id,
-    );
+    const category = await GlobalCategoryModel.getByTitle(title);
     if (category) {
       const existingGroups = category.groups.map((group: Group) => group.title);
       const diffGroups = groups.filter(
@@ -70,7 +68,7 @@ const syncCategoriesWithGroups = async (rows: CsvRowRaw[], user: User) => {
       const update = {
         groups: [...category.groups, ...newGroups],
       };
-      await CategoryModel.update(category._id.toString(), update);
+      await GlobalCategoryModel.update(category._id, update);
     } else {
       const newGroups: Group[] = groups.map((group: string) => ({
         _id: new ObjectId(),
@@ -80,12 +78,10 @@ const syncCategoriesWithGroups = async (rows: CsvRowRaw[], user: User) => {
         position: 0,
       }));
 
-      const newCategory: Category = {
+      const newCategory: Partial<Category> = {
         title,
         groups: Array.from(newGroups),
         slug: slug(title),
-        tenant_id: user.tenant_id,
-        creator_id: user.id,
         active: true,
         position: 0,
         created_at: new Date(),
@@ -96,13 +92,13 @@ const syncCategoriesWithGroups = async (rows: CsvRowRaw[], user: User) => {
             '<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"> <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" color="currentColor"> <path d="M10.55 3c-3.852.007-5.87.102-7.159 1.39C2 5.783 2 8.022 2 12.5s0 6.717 1.391 8.109C4.783 22 7.021 22 11.501 22c4.478 0 6.717 0 8.108-1.391c1.29-1.29 1.384-3.307 1.391-7.16" /> <path d="M11.056 13C10.332 3.866 16.802 1.276 21.98 2.164c.209 3.027-1.273 4.16-4.093 4.684c.545.57 1.507 1.286 1.403 2.18c-.074.638-.506.95-1.372 1.576c-1.896 1.37-4.093 2.234-6.863 2.396" /> <path d="M9 17c2-5.5 3.96-7.364 6-9" /> </g> </svg>',
           ),
       };
-      await CategoryModel.add(newCategory);
+      await GlobalCategoryModel.create(newCategory);
     }
   }
 };
 
-const syncPrompts = async (rows: CsvRowRaw[], user: User) => {
-  const categories = await CategoryModel.listByTenant(user.tenant_id);
+const syncGlobalPrompts = async (rows: CsvRowRaw[]) => {
+  const categories = await GlobalCategoryModel.list();
 
   for (const item of rows) {
     // Get the _id of the category that matches item.category, or undefined if not found.
@@ -117,15 +113,13 @@ const syncPrompts = async (rows: CsvRowRaw[], user: User) => {
     );
     const promptGroup = findGroup ? findGroup._id : undefined;
 
-    const newPrompt: Prompt = {
+    const newPrompt: Partial<Prompt> = {
       title: item.title,
       description: item.description,
       category: promptCategory,
       group: promptGroup,
       knowledgebase: [],
       position: 0,
-      tenant_id: user.tenant_id,
-      creator_id: user.id,
       created_at: new Date(),
       updated_at: new Date(),
       prompt: item.instruction,
@@ -135,7 +129,7 @@ const syncPrompts = async (rows: CsvRowRaw[], user: User) => {
       reasoningEffort: item.reasoning_effort ?? "",
       textVerbosity: item.text_verbosity ?? "",
     };
-    await PromptModel.add(newPrompt);
+    await GlobalPromptModel.create(newPrompt);
   }
 };
 
@@ -190,10 +184,10 @@ export const POST: APIRoute = async (ctx: APIContext) => {
       session.startTransaction();
 
       // Sync all categories
-      await syncCategoriesWithGroups(rows, ctx.locals.user);
+      await syncGlobalCategoriesWithGroups(rows);
 
       // Sync all prompts
-      await syncPrompts(rows, ctx.locals.user);
+      await syncGlobalPrompts(rows);
 
       // If everything goes well, commit the transaction
       await session.commitTransaction();

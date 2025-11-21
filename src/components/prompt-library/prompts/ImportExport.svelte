@@ -5,14 +5,21 @@
   import ImportUploadDialog from "./ImportUploadDialog.svelte";
   import { addToast } from "$stores/toast";
 
+  interface Props {
+    apiEndPointImport?: string;
+    apiEndPointExport?: string;
+  }
+
+  let {
+    apiEndPointImport = "/api/prompts/import",
+    apiEndPointExport = "/api/prompts/export",
+  }: Props = $props();
+
   const t = useTranslations();
-  let loading = $state(false);
 
   let fileUploadModal: HTMLDialogElement | undefined = $state();
   let inputFile: File | undefined = $state();
-
-  const importUrl: string = "/api/prompts/import";
-  const exportUrl: string = "/api/prompts/export";
+  let loading = $state(false);
 
   async function startImport() {
     if (!inputFile) {
@@ -27,7 +34,7 @@
     data.append("file", inputFile);
 
     loading = true;
-    const response = await fetch(importUrl, {
+    const response = await fetch(apiEndPointImport, {
       method: "POST",
       body: data,
     });
@@ -64,7 +71,7 @@
 
   function downloadExport() {
     loading = true;
-    fetch(exportUrl)
+    fetch(apiEndPointExport)
       .then(async (response) => {
         const blob = await response.blob();
         const blobUrl = URL.createObjectURL(

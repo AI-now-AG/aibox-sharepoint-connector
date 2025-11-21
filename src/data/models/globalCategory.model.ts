@@ -16,7 +16,7 @@ const CategorySchema = z.object({
   icon: z.string().optional(),
   active: z.boolean().default(true).optional(),
   position: z.number().default(0).optional(),
-  tags: z.array(z.instanceof(ObjectId)),
+  tags: z.array(z.instanceof(ObjectId)).optional(),
   created_at: z
     .date()
     .optional()
@@ -91,6 +91,12 @@ export default {
     const doc = await collection.findOne<Document<Category>>({ _id });
     if (!doc) return null;
     return doc;
+  },
+
+  getByTitle: async (title: string) => {
+    return collection.findOne<Document<Category>>({
+      title,
+    });
   },
 
   getMaxPosition: async () => {

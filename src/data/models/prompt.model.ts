@@ -51,6 +51,17 @@ export default {
     return collection.insertMany(validatedDocs);
   },
 
+  update: async (id: string, updatedPrompt: Partial<Prompt>) => {
+    const _id = new ObjectId(id);
+    const validated = PromptSchema.partial().parse(updatedPrompt);
+    const result = await collection.findOneAndUpdate(
+      { _id },
+      { $set: { ...validated } },
+      { returnDocument: "after" },
+    );
+    return result;
+  },
+
   remove: async (id: string) => {
     const _id = new ObjectId(id);
     return collection.deleteOne({ _id });
@@ -93,13 +104,13 @@ export default {
       .toArray();
   },
 
-  listForExportByTenant: async (id: ObjectId) => {
+  listForExportByTenant: async (tenantId: ObjectId) => {
     // Execute the aggregation
     return collection
       .aggregate([
         {
           $match: {
-            tenant_id: id,
+            tenant_id: tenantId,
           },
         },
         {
@@ -123,17 +134,6 @@ export default {
         },
       ])
       .toArray();
-  },
-
-  update: async (id: string, updatedPrompt: Partial<Prompt>) => {
-    const _id = new ObjectId(id);
-    const validated = PromptSchema.partial().parse(updatedPrompt);
-    const result = await collection.findOneAndUpdate(
-      { _id },
-      { $set: { ...validated } },
-      { returnDocument: "after" },
-    );
-    return result;
   },
 
   getMaxPosition: async (groupId: ObjectId) => {
