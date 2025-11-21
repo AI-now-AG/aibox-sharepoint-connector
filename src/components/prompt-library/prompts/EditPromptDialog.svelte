@@ -419,10 +419,6 @@
                 value: ReasoningEffortOption.None,
               },
               {
-                title: t("prompt-execution.reasoning-effort.level-minimal"),
-                value: ReasoningEffortOption.Minimal,
-              },
-              {
                 title: t("prompt-execution.reasoning-effort.level-low"),
                 value: ReasoningEffortOption.Low,
               },
