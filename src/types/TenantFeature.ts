@@ -64,6 +64,8 @@ export enum ThemeCode {
   AIBox = "aibox",
   Somedia = "somedia",
   Weihnachtsmann = "weihnachtsmann",
+  SunriseBusiness = "sunriseBusiness",
+  SunriseBusinessAlt = "sunrise-business",
 }
 
 export const ThemeMap: Record<ThemeCode, any> = {
@@ -72,8 +74,10 @@ export const ThemeMap: Record<ThemeCode, any> = {
   [ThemeCode.AIBox]: { title: "aibox", value: ThemeCode.AIBox },
   [ThemeCode.Somedia]: { title: "Somedia", value: ThemeCode.Somedia },
   [ThemeCode.Weihnachtsmann]: { title: "Weihnachtsmann", value: ThemeCode.Weihnachtsmann },
+  [ThemeCode.SunriseBusiness]: { title: "Sunrise Business (Red)", value: ThemeCode.SunriseBusiness },
+  [ThemeCode.SunriseBusinessAlt]: { title: "Sunrise Business", value: ThemeCode.SunriseBusinessAlt },
 };
 
 export const Themes = [
-  ThemeMap[ThemeCode.Light], ThemeMap[ThemeCode.Dark], ThemeMap[ThemeCode.AIBox], ThemeMap[ThemeCode.Somedia]
+  ThemeMap[ThemeCode.Light], ThemeMap[ThemeCode.Dark], ThemeMap[ThemeCode.AIBox], ThemeMap[ThemeCode.Somedia], ThemeMap[ThemeCode.SunriseBusiness], ThemeMap[ThemeCode.SunriseBusinessAlt]
 ]
