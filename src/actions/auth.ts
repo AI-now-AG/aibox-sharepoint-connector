@@ -11,7 +11,7 @@ const ProfileUpdateSchema = z.object({
 
 export const auth = {
   emailVerification: defineAction({
-    handler: async (input, context): Promise<any> => {
+    handler: async (input, context) => {
       try {
         const { auth0_sub: userId, email } = context.locals.user;
         await sendVerificationEmail(userId, email);
@@ -24,7 +24,7 @@ export const auth = {
   }),
   updateProfile: defineAction({
     input: ProfileUpdateSchema,
-    handler: async (input, context): Promise<void> => {
+    handler: async (input, context) => {
       try {
         const { id, auth0_sub: auth0Sub } = context.locals.user;
         const { name } = input;

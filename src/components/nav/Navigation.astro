@@ -25,10 +25,7 @@ const categories = await cached(
   `categories:${Astro.locals.user.tenant_id}`,
   1000 * 60 * 0.5,
   async () => {
-    const cursor = await await Category.listActiveByTenant(
-      Astro.locals.user.tenant_id
-    );
-    return await cursor.toArray();
+    return await Category.listActiveByTenant(Astro.locals.user.tenant_id);
   }
 );
 
@@ -307,8 +304,22 @@ if (auth.isSuperAdmin(Astro.locals)) {
         path: `/tenant-management`,
       },
       {
-        title: t("nav.system-config"),
+        title: t("nav.global-assistant-library"),
         isOpened: navState[`super-admin-menu-id-1`] ?? false,
+        items: [
+          {
+            title: "Assistants",
+            path: `/admin/global-prompt-library/prompts`,
+          },
+          {
+            title: "Categories",
+            path: `/admin/global-prompt-library/categories`,
+          },
+        ],
+      },
+      {
+        title: t("nav.system-config"),
+        isOpened: navState[`super-admin-menu-id-2`] ?? false,
         items: [
           {
             title: t("nav.settings.instructions"),
@@ -322,7 +333,7 @@ if (auth.isSuperAdmin(Astro.locals)) {
       },
       {
         title: t("nav.reports"),
-        isOpened: navState[`super-admin-menu-id-2`] ?? false,
+        isOpened: navState[`super-admin-menu-id-3`] ?? false,
         items: [
           {
             title: t("nav.usage-per-tenant"),
@@ -491,7 +502,6 @@ const modules = [...menuItems];
             <details
               data-id={`subtitle-menu`}
               open={mod.isOpened}
-              id="onboardingId5"
               class="active:bg-transparent"
             >
               <summary
@@ -638,49 +648,6 @@ const modules = [...menuItems];
           />
         )
       }
-      <!-- {
-        adminMenus.map((mod, index) => (
-          <li class="active:bg-transparent">
-            <details
-              data-id={`admin-menu`}
-              open={mod.isOpened}
-              class="active:bg-transparent"
-              id="onboardingNewTenantId1"
-            >
-              <summary
-                class={
-                  isNavCollapsed
-                    ? "tooltip tooltip-right flex justify-center"
-                    : ""
-                }
-                data-tip={isNavCollapsed ? mod.title : ""}
-              >
-                <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
-                  {mod.icon && <Fragment set:html={mod.icon} />}
-                </div>
-                <span class={isNavCollapsed ? "hidden" : ""}>{mod.title}</span>
-              </summary>
-              {"items" in mod && (
-                <ul
-                  class={`active:bg-transparent ${isNavCollapsed ? "hidden" : ""}`}
-                >
-                  {mod.items?.map((sub) => (
-                    <li class="pl-1 active:bg-transparent">
-                      <MenuItem {...sub} />
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </details>
-            {index < adminMenus.length - 1 && (
-              <div
-                class={`mx-6 my-1 pointer-events-none ${isNavCollapsed ? "hidden" : ""}`}
-              />
-            )}
-          </li>
-        ))
-      } -->
-
       {
         adminMenus.map((mod, index) => (
           <li class="active:bg-transparent">
@@ -688,6 +655,7 @@ const modules = [...menuItems];
               data-id={`admin-menu`}
               open={mod.isOpened}
               class="active:bg-transparent"
+              id="onboardingId5"
             >
               <summary
                 class={

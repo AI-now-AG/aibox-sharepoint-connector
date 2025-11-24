@@ -1,0 +1,58 @@
+---
+import Layout from "$layouts/Layout.astro";
+import { svgIcons } from "$assets/icons";
+import { useTranslations } from "$i18n/utils";
+import { ObjectId } from "mongodb";
+import GlobalCategoryModel from "$data/models/globalCategory.model";
+import GlobalTagModel from "$data/models/globalTag.model";
+import CategoryList from "./CategoryList.svelte";
+
+import { Permission } from "$types/Users";
+import type { CategoryItem } from "$types/GlobalCategoryAPI";
+
+const t = useTranslations();
+const categories = await GlobalCategoryModel.list();
+const tags = await GlobalTagModel.list();
+
+// Build a map for faster lookup
+const tagMap = new Map(tags.map((tag) => [tag._id.toString(), tag.title]));
+
+const categoriesEnriched: CategoryItem[] = categories.map((category) => {
+  const categoryTags: string[] = (category.tags ?? []).map((tagId: ObjectId) =>
+    tagMap.get(tagId.toString()) || "Unknown"
+  );
+
+  return {
+    id: category._id.toString(),
+    title: category.title,
+    tags: categoryTags,
+    active: category.active,
+  };
+});
+
+let userPermissions = Astro.locals.user.permissions;
+---
+
+<Layout>
+  <div
+    class="container max-w-5xl mx-auto p-6 grid grid-cols-1 md:grid-cols-[1fr_max-content] gap-8"
+  >
+    <h1 class="pt-2 lg:pt-8 text-4xl font-bold">
+      {t("prompt-library.categories.title")}
+    </h1>
+
+    {
+      userPermissions.includes(Permission.AdminAll) && (
+        <a
+          href="categories/add"
+          class="mt-2 lg:mt-8 btn btn-outline font-normal grow-0"
+        >
+          <span set:html={svgIcons.add} />
+          {t("prompt-library.categories.add")}
+        </a>
+      )
+    }
+  </div>
+
+  <CategoryList items={categoriesEnriched} client:load />
+</Layout>

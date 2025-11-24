@@ -1,11 +1,11 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { actions } from "astro:actions";
-  import { driver } from "driver.js";
+  import { driver, type DriveStep } from "driver.js";
   import "driver.js/dist/driver.css";
 
   import { useTranslations } from "$i18n/utils";
-  import { TourType } from "$types/Users";
+  import { TourType, UserRole } from "$types/Users";
   import { isOnboarding } from "$stores";
 
   const t = useTranslations();
@@ -24,15 +24,28 @@
     });
   }
 
+  function isSupperUserOrAdmin() {
+    const userRoles = user?.roles || [];
+    console.log("User roles:", userRoles);
+    return [UserRole.SuperUser, UserRole.Admin].some((role) =>
+      userRoles.includes(role.toString().trim()),
+    );
+  }
+
   async function checkOnboarding() {
     const { logins_count = 0, tours } = user || {};
     if (logins_count <= 1) {
       if (tours) {
+        let hasOnboardingTour = false;
         for (let i = 0; i < tours.length; i++) {
           const tour = tours[i];
-          if (tour.type === TourType.Onboarding && tour.active) {
-            return true;
+          if (tour.type === TourType.Onboarding) {
+            hasOnboardingTour = true;
+            return tour.active;
           }
+        }
+        if (!hasOnboardingTour) {
+          return true;
         }
       } else {
         return true;
@@ -45,6 +58,63 @@
     const shouldOnboarding = await checkOnboarding();
     if (shouldOnboarding) {
       $isOnboarding = true;
+
+      const _steps: DriveStep[] = [
+        {
+          element: "#onboardingId0",
+          popover: {
+            showButtons: ["next"],
+            popoverClass: "driverjs-theme",
+            title: t("onboarding.step-0.title"),
+            description: t("onboarding.step-0.description"),
+            nextBtnText: t("onboarding.step-0.next-btn-text"),
+          },
+        },
+        {
+          element: "#onboardingId1",
+          popover: {
+            popoverClass: "driverjs-theme",
+            title: t("onboarding.step-1.title"),
+            description: t("onboarding.step-1.description"),
+          },
+        },
+        {
+          element: "#onboardingId2",
+          popover: {
+            popoverClass: "driverjs-theme",
+            title: t("onboarding.step-2.title"),
+            description: t("onboarding.step-2.description"),
+          },
+        },
+        {
+          element: "#onboardingId3",
+          popover: {
+            popoverClass: "driverjs-theme",
+            title: t("onboarding.step-3.title"),
+            description: t("onboarding.step-3.description"),
+          },
+        },
+        {
+          element: "#onboardingId4",
+          popover: {
+            popoverClass: "driverjs-theme",
+            title: t("onboarding.step-4.title"),
+            description: t("onboarding.step-4.description"),
+          },
+        },
+      ];
+
+      if (isSupperUserOrAdmin()) {
+        _steps.push({
+          element: "#onboardingId5",
+          popover: {
+            popoverClass: "driverjs-theme",
+            title: t("onboarding.step-5.title"),
+            description: t("onboarding.step-5.description"),
+          },
+        });
+      }
+
       const driverObj = driver({
         popoverClass: "driverjs-theme",
         overlayClickBehavior: "nextStep",
@@ -59,50 +129,7 @@
           markAsOnboarded();
           $isOnboarding = false;
         },
-        steps: [
-          {
-            element: "#onboardingId0",
-            popover: {
-              showButtons: ["next"],
-              popoverClass: "driverjs-theme",
-              title: t("onboarding.step-0.title"),
-              description: t("onboarding.step-0.description"),
-              nextBtnText: t("onboarding.step-0.next-btn-text"),
-            },
-          },
-          {
-            element: "#onboardingId1",
-            popover: {
-              popoverClass: "driverjs-theme",
-              title: t("onboarding.step-1.title"),
-              description: t("onboarding.step-1.description"),
-            },
-          },
-          {
-            element: "#onboardingId2",
-            popover: {
-              popoverClass: "driverjs-theme",
-              title: t("onboarding.step-2.title"),
-              description: t("onboarding.step-2.description"),
-            },
-          },
-          {
-            element: "#onboardingId3",
-            popover: {
-              popoverClass: "driverjs-theme",
-              title: t("onboarding.step-3.title"),
-              description: t("onboarding.step-3.description"),
-            },
-          },
-          {
-            element: "#onboardingId4",
-            popover: {
-              popoverClass: "driverjs-theme",
-              title: t("onboarding.step-4.title"),
-              description: t("onboarding.step-4.description"),
-            },
-          },
-        ],
+        steps: _steps,
         onPopoverRender: (popover, { config, state }) => {
           _popover = document.getElementById("driver-popover-content");
           if (state?.activeStep?.element == "#onboardingId0") {
@@ -131,7 +158,8 @@
           if (
             _step.element == "#onboardingId1" ||
             _step.element == "#onboardingId3" ||
-            _step.element == "#onboardingId4"
+            _step.element == "#onboardingId4" ||
+            _step.element == "#onboardingId5"
           ) {
             const computedStyle = _popover
               ? getComputedStyle(_popover)

@@ -588,7 +588,11 @@
           provider: defaultTextFeature,
         });
         // Add AudioToText feature if ANY audio feature is enabled (standard, pro, or ElevenLabs)
-        if (isAudioToTextChecked || isAzureAudioProEnabled || isAudioToElevenLabsChecked) {
+        if (
+          isAudioToTextChecked ||
+          isAzureAudioProEnabled ||
+          isAudioToElevenLabsChecked
+        ) {
           tenantData.included_features.push({
             name: TenantFeature.AudioToText,
             provider: audioSelectedProvider.value,
@@ -600,7 +604,7 @@
             ...allTranscriptionTypes,
             ...audioStandardArray
               .filter((item) => item.checked)
-              .map((item) => item.type)
+              .map((item) => item.type),
           ];
         }
         if (isAzureAudioProEnabled) {
@@ -608,7 +612,7 @@
             ...allTranscriptionTypes,
             ...audioProArray
               .filter((item) => item.checked)
-              .map((item) => item.type)
+              .map((item) => item.type),
           ];
         }
         if (isAudioToElevenLabsChecked) {
@@ -616,7 +620,7 @@
             ...allTranscriptionTypes,
             ...audioElevenLabsArray
               .filter((item) => item.checked)
-              .map((item) => item.type)
+              .map((item) => item.type),
           ];
         }
         tenantData.transcription_types = allTranscriptionTypes;
@@ -749,7 +753,11 @@
           provider: defaultTextFeature,
         });
         // Add AudioToText feature if ANY audio feature is enabled (standard, pro, or ElevenLabs)
-        if (isAudioToTextChecked || isAzureAudioProEnabled || isAudioToElevenLabsChecked) {
+        if (
+          isAudioToTextChecked ||
+          isAzureAudioProEnabled ||
+          isAudioToElevenLabsChecked
+        ) {
           tenantData.included_features.push({
             name: TenantFeature.AudioToText,
             provider: audioSelectedProvider.value,
@@ -1253,6 +1261,20 @@
           readonly
           value={activeUsers}
         />
+      </div>
+    </div>
+
+    <div class="flex flex-row space-x-4">
+      <div class="flex-1 flex flex-col mb-4">
+        <span class="mb-2 text-base-content font-medium text-sm"
+          >{t("tenant.comment")}</span
+        >
+        <textarea
+          name="comment"
+          id="comment"
+          class="input input-bordered w-full py-2 text-gray-500"
+          bind:value={tenantData.comment}
+        ></textarea>
       </div>
     </div>
 
@@ -2333,27 +2355,6 @@
             <label class="label cursor-pointer ml-2" for="disable-create-user">
               <span class="label-text text-base-content ml-2"
                 >{t("tenant.restrict-user-managment")}</span
-              >
-            </label>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="container mx-auto">
-      <div class="bg-base-100 shadow-sm rounded-lg my-4">
-        <div class="flex p-4 items-center justify-between">
-          <div class="flex items-center">
-            <input
-              id="is-trial-tenant"
-              type="checkbox"
-              class="checkbox checkbox-primary"
-              value="is-trial-tenant"
-              bind:checked={tenantData.is_trial}
-            />
-            <label class="label cursor-pointer ml-2" for="is-trial-tenant">
-              <span class="label-text text-base-content ml-2"
-                >{t("tenant.trial")}</span
               >
             </label>
           </div>

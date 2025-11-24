@@ -1,40 +1,62 @@
 <script lang="ts">
-  import type { CreateCategoryParams } from "$pages/api/categories.json";
+  import { type CreateCategoryParams } from "$types/GlobalCategoryAPI";
   import { onMount } from "svelte";
   import { useTranslations } from "$i18n/utils";
   import { addToast } from "$stores/toast";
   import { svgIcons } from "$assets/icons";
-  import GroupList, { type GroupItem } from "./GroupList.svelte";
+  import GroupList, {
+    type GroupItem,
+  } from "$components/prompt-library/categories/GroupList.svelte";
+  import TagManagerDialog from "./TagManagerDialog.svelte";
+  import { type TagItem } from "$types/TagInput";
+  import TagsInput from "./TagsInput.svelte";
   import { preventDefault } from "$utils/common";
-  import { tenant } from "$stores";
-  import { EventName, ScreenName } from "$types/Posthog";
-  import { posthogClientCapture } from "$utils/posthogClient";
-  const t = useTranslations();
 
-  /**
-   * TODO: Please question the user flow of creating groups here. It will be more natural
-   * to create groups on demand when creating prompts.
-   */
+  const t = useTranslations();
 
   let title: string | undefined = $state();
   let groups: GroupItem[] = $state([]);
+  let selectedTags: TagItem[] = $state([]);
 
   interface Props {
     category?: CreateCategoryParams | undefined;
+    tags: TagItem[];
     isEditable?: boolean;
   }
 
-  let { category = undefined, isEditable = false }: Props = $props();
+  let { category = undefined, tags = [], isEditable = false }: Props = $props();
+  let tagDialog: HTMLDialogElement | undefined = $state();
   let isSaving = $state(false);
+
+  $inspect(selectedTags);
 
   onMount(async function () {
     if (category) {
       title = category.title;
-      groups = category.groups.map((group) => ({
-        id: group?._id?.toString(),
-        title: group.title,
-        active: group?.active,
-      }));
+      if (
+        category.groups &&
+        Array.isArray(category.groups) &&
+        category.groups.length > 0
+      ) {
+        groups = category.groups.map((group) => ({
+          id: group?._id?.toString(),
+          title: group.title,
+          active: group?.active,
+        }));
+      }
+      if (
+        category.tags &&
+        Array.isArray(category.tags) &&
+        category.tags.length > 0
+      ) {
+        selectedTags = category.tags.map((item) => {
+          const tag = tags.find((tag: TagItem) => tag._id === item);
+          return {
+            _id: item,
+            title: tag?.title || "",
+          };
+        });
+      }
     }
   });
 
@@ -54,10 +76,11 @@
           active: item.active,
         })),
         ...(category?._id && { _id: category._id }),
+        tags: selectedTags.map((item) => item._id),
       };
 
       try {
-        const response = await fetch("/api/categories.json", {
+        const response = await fetch("/api/admin/global-categories.json", {
           method: category ? "PUT" : "POST",
           body: JSON.stringify(newCategory),
           headers: {
@@ -67,13 +90,6 @@
         const data = await response.json();
 
         groups = [];
-
-        posthogClientCapture($tenant, EventName.AiboxCategorySaved, {
-          page_name: ScreenName.CreateOrUpdateCategory,
-          screen_mode: category ? "update" : "create",
-          use_case: title || category?.title || "-",
-        });
-
         title = undefined;
 
         addToast({
@@ -133,8 +149,19 @@
         </div>
       </div>
 
-      <div class="mt-7 mb-20">
+      <div class="mt-7 mb-7">
         <GroupList bind:items={groups} />
+      </div>
+
+      <div class="grid grid-cols-1 gap-4 justify-center mb-10">
+        <div>
+          <p class="mb-2">Tags</p>
+          <TagsInput
+            tagList={tags}
+            bind:tags={selectedTags}
+            bind:managerDialog={tagDialog}
+          />
+        </div>
       </div>
 
       {#if isEditable}
@@ -161,3 +188,5 @@
     </div>
   </div>
 </div>
+
+<TagManagerDialog bind:tagDialog />

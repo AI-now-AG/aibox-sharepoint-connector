@@ -16,7 +16,7 @@
   import Loading from "$components/Loading.svelte";
   import { addToast } from "$stores/toast";
   import { useTranslations } from "$i18n/utils";
-  import EmptyActiion from "./EmptyAction.svelte";
+  import EmptyActiion from "../../prompt-interface/EmptyAction.svelte";
 
   const t = useTranslations();
   let loading = $state(false);

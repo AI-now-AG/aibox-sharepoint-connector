@@ -90,3 +90,12 @@ export const getSubscriptionAddOnName = (
   const firstOption = addOnOptions?.[0] as AudioOptionId | undefined;
   return firstOption ? AudioOptionLabels[firstOption] || "-" : "-";
 };
+
+export function isValidPhone(phone: string): boolean {
+  const trimmed = phone.trim();
+
+  // E.164 format: + followed by 8–15 digits (e.g., +84901234567)
+  const regex = /^\+?[1-9]\d{7,14}$/;
+
+  return regex.test(trimmed);
+}

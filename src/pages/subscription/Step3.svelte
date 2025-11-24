@@ -15,8 +15,14 @@
     SubscriptionPackageId,
     AudioOptionId,
     BillingMethod,
+    CountryCode,
   } from "$types/Subscription";
   import { isValidEmail } from "$utils/common";
+  import { EventName, ScreenName } from "$types/Posthog";
+  import { posthogClientCaptureWithoutTenant } from "$utils/posthogClient";
+  import Dropdown from "$components/form/Dropdown.svelte";
+  import { useTranslatedCountryList } from "$utils/subscription";
+  import log from "$utils/log";
 
   interface Props {
     accountEmail: string;
@@ -24,6 +30,8 @@
   }
   let { accountEmail, defaultLanguage = "en" }: Props = $props();
   const t = useTranslations(defaultLanguage);
+  const conuntryOptions = useTranslatedCountryList(defaultLanguage);
+
   let loading = $state(false);
 
   const initBillingInfo = $subscription.billingInfo;
@@ -32,6 +40,11 @@
   let street = $state(initBillingInfo?.street ?? "");
   let zipCode = $state(initBillingInfo?.zipCode ?? "");
   let location = $state(initBillingInfo?.location ?? "");
+  let country = $state(initBillingInfo?.country ?? CountryCode.CH);
+
+  let contactPhone = $state(initBillingInfo?.contactPhone ?? "");
+  let contactName = $state(initBillingInfo?.contactName ?? "");
+
   let billingEmail = $state(initBillingInfo?.billingEmail ?? "");
   let billingMethod = $state(
     initBillingInfo?.billingMethod ?? BillingMethod.MonthlyInvoice,
@@ -74,6 +87,21 @@
       return false;
     }
 
+    if (!contactPhone) {
+      showAlert(t("subscription.validate-empty-contact-phone-message"));
+      return false;
+    }
+
+    // if (!isValidPhone(contactPhone)) {
+    //   showAlert(t("subscription.validate-invalid-contact-phone-message"));
+    //   return false;
+    // }
+
+    if (!contactName) {
+      showAlert(t("subscription.validate-empty-contact-name-message"));
+      return false;
+    }
+
     if (!isValidEmail(billingEmail)) {
       showAlert(t("subscription.validate-invalid-email-message"));
       return false;
@@ -92,6 +120,7 @@
         address: street,
         zip_code: zipCode,
         location: location,
+        country: country || CountryCode.CH,
         email: billingEmail,
       },
       language: $subscription.organizationInfo?.defaultLanguage,
@@ -115,6 +144,9 @@
         street,
         zipCode,
         location,
+        country,
+        contactPhone,
+        contactName,
         billingEmail,
         billingMethod,
       });
@@ -130,9 +162,15 @@
           storeStripeCheckout({
             customerId: result.stripeCustomerId,
           });
+          posthogClientCaptureWithoutTenant(EventName.AiboxOnboardingStep3, {
+            page_name: ScreenName.OnboardingStep3,
+          });
           window.location.href = result.url || "";
         }
       } else {
+        posthogClientCaptureWithoutTenant(EventName.AiboxOnboardingStep3, {
+          page_name: ScreenName.OnboardingStep3,
+        });
         window.location.href = "/subscription/step4";
       }
     }
@@ -155,60 +193,6 @@
 
   <!-- Form -->
   <div class="w-full mx-auto">
-    <!-- Billing method -->
-    <p class="font-sans text-base font-medium text-gray-600 mt-6 mb-4">
-      {t("subscription.billing-method")}
-    </p>
-
-    <div
-      class="block md:flex lg:flex flex-row md:space-x-8 space-x-0 lg:space-x-8"
-    >
-      <div class="flex-1 flex flex-col mb-4">
-        <div
-          class="bg-white shadow-md rounded-lg flex flex-col justify-between space-y-2 px-6 py-4 w-full"
-        >
-          <div class="flex items-center">
-            <input
-              type="radio"
-              id="stripe-checkout"
-              name="billing_method"
-              class="radio"
-              value={BillingMethod.CreditCard}
-              checked={billingMethod == BillingMethod.CreditCard}
-              onchange={() => {
-                billingMethod = BillingMethod.CreditCard;
-              }}
-            />
-            <label
-              for="stripe-checkout"
-              class="ml-2 text-sm font-medium text-[#0F172A]"
-              >{t("subscription.billing-method-stripe")}</label
-            >
-          </div>
-          <div class="flex items-center">
-            <input
-              type="radio"
-              id="monthly-invoice"
-              name="billing_method"
-              class="radio"
-              value={BillingMethod.MonthlyInvoice}
-              checked={billingMethod == BillingMethod.MonthlyInvoice}
-              onchange={() => {
-                billingMethod = BillingMethod.MonthlyInvoice;
-              }}
-            />
-            <label
-              for="monthly-invoice"
-              class="ml-2 text-sm font-medium text-[#0F172A]"
-              >{t("subscription.monthly-invoice-email")}</label
-            >
-          </div>
-        </div>
-      </div>
-      <div class="flex-1 flex flex-col mb-4"></div>
-    </div>
-    <div class="divider mb-6"></div>
-
     <!-- Billing form -->
     <div
       class="block md:flex lg:flex flex-row md:space-x-8 space-x-0 lg:space-x-8"
@@ -283,13 +267,45 @@
     >
       <div class="flex-1 flex flex-col mb-4">
         <Input
-          id="country"
-          label={t("subscription.country") + " *"}
-          value={"Schweiz"}
+          id="contact-phone"
+          label={t("subscription.contact-phone") + " *"}
+          value={contactPhone}
+          placeholder={t("subscription.contact-phone-placeholder")}
+          inputChange={(event: any) => {
+            contactPhone = event.value;
+          }}
           containerClasses="h-[56px] shadow-lg"
           labelClasses="text-sm"
           classes="text-base"
-          disabled={true}
+        />
+      </div>
+
+      <div class="flex-1 flex flex-col mb-4">
+        <Input
+          id="contact-name"
+          label={t("subscription.contact-name") + " *"}
+          value={contactName}
+          placeholder={t("subscription.contact-name-placeholder")}
+          inputChange={(event: any) => {
+            contactName = event.value;
+          }}
+          containerClasses="h-[56px] shadow-lg"
+          labelClasses="text-sm"
+          classes="text-base"
+        />
+      </div>
+    </div>
+
+    <div
+      class="block md:flex lg:flex flex-row md:space-x-8 space-x-0 lg:space-x-8"
+    >
+      <div class="flex-1 flex flex-col mb-4">
+        <Dropdown
+          label={`${t("subscription.country")}`}
+          labelClasses="mb-3"
+          placeholderClasses="h-[56px]"
+          options={conuntryOptions}
+          bind:value={country}
         />
       </div>
       <div class="flex-1 flex flex-col mb-4">
@@ -306,6 +322,55 @@
           classes="text-base"
           disabled={isEmailDisabled}
         />
+      </div>
+    </div>
+
+    <div class="divider mb-6"></div>
+    <!-- Billing method -->
+    <p class="font-sans text-base font-medium text-gray-600 mt-6 mb-4">
+      {t("subscription.billing-method")}
+    </p>
+
+    <div class="flex flex-row md:space-x-8 space-x-0 lg:space-x-8">
+      <div
+        class="flex flex-row bg-white shadow-md rounded-lg flex flex-col justify-between space-y-2 px-6 py-4 w-full"
+      >
+        <div class="flex flex-1 items-center">
+          <input
+            type="radio"
+            id="stripe-checkout"
+            name="billing_method"
+            class="radio"
+            value={BillingMethod.CreditCard}
+            checked={billingMethod == BillingMethod.CreditCard}
+            onchange={() => {
+              billingMethod = BillingMethod.CreditCard;
+            }}
+          />
+          <label
+            for="stripe-checkout"
+            class="ml-2 text-sm font-medium text-[#0F172A]"
+            >{t("subscription.billing-method-stripe")}</label
+          >
+        </div>
+        <div class="flex flex-1 items-center">
+          <input
+            type="radio"
+            id="monthly-invoice"
+            name="billing_method"
+            class="radio"
+            value={BillingMethod.MonthlyInvoice}
+            checked={billingMethod == BillingMethod.MonthlyInvoice}
+            onchange={() => {
+              billingMethod = BillingMethod.MonthlyInvoice;
+            }}
+          />
+          <label
+            for="monthly-invoice"
+            class="ml-2 text-sm font-medium text-[#0F172A]"
+            >{t("subscription.monthly-invoice-email")}</label
+          >
+        </div>
       </div>
     </div>
   </div>

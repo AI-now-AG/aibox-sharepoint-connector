@@ -11,8 +11,7 @@ export const GET: APIRoute = async (ctx: APIContext) => {
 
   try {
     // Fetch your MongoDB data (Prompts by tenant)
-    const promptsCursor = await PromptModel.listForExportByTenant(tenantId);
-    const prompts = await promptsCursor.toArray();
+    const prompts = await PromptModel.listForExportByTenant(tenantId);
 
     // Prepare the CSV data with appropriate headers
     const csvData: CsvRowRaw[] = prompts.map((prompt) => {

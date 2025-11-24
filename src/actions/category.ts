@@ -17,19 +17,6 @@ const CategoryInputListIdentifierSchema = z.array(
   }),
 );
 
-const CategoryItemSchema = z.object({
-  id: z.string(),
-  title: z.string(),
-  active: z.boolean().optional(),
-});
-
-export const ViewCategorySchema = z.object({
-  updated: z.boolean(),
-  items: z.array(CategoryItemSchema),
-});
-
-export type ViewCategory = z.infer<typeof CategoryItemSchema>;
-
 export const category = {
   activate: defineAction({
     input: CategoryInputIdentifierSchema,
@@ -44,9 +31,8 @@ export const category = {
   listByTenant: defineAction({
     input: TenantIdentifierSchema,
     handler: async (input) => {
-      const categoriesCursor = await CategoryModel.listByTenant(input._id);
-      const categories = await categoriesCursor.toArray();
-      return transformRawData(categories)
+      const categories = await CategoryModel.listByTenant(input._id);
+      return transformRawData(categories);
     },
   }),
 
@@ -70,7 +56,7 @@ export const category = {
         const currentItem = await CategoryModel.get(item._id);
 
         if (currentItem && currentItem.position !== index) {
-          const updateResult = await CategoryModel.findAndUpdate(item._id, {
+          const updateResult = await CategoryModel.update(item._id, {
             position: index,
           });
           items.push(transformRawData(updateResult));
@@ -79,6 +65,7 @@ export const category = {
           items.push(transformRawData(currentItem));
         }
       }
+
       return { updated, items };
     },
   }),

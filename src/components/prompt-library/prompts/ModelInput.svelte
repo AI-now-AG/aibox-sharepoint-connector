@@ -42,12 +42,12 @@
   $inspect(selectedModel);
 
   const getModelLabel = (provider: any) => {
-    const key = ProviderModelMap[provider.name] as keyof typeof $tenant;
+    const key = ProviderModelMap[provider?.name] as keyof typeof $tenant;
     const rawModel = $tenant?.[key] || "gpt-4o";
     const modelLabel = ModelNameMap[rawModel] || rawModel;
 
     let title;
-    switch (provider.name) {
+    switch (provider?.name) {
       case PromptModel.OpenAI:
         title = `${modelLabel} (${t("home.model-option-text-tools")})`;
         break;

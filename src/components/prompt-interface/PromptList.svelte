@@ -11,7 +11,7 @@
 
 <script lang="ts">
   import PromptItem from "$components/prompt-interface/PromptItem.svelte";
-  import EditPromptDialog from "$components/prompt-interface/EditPromptDialog.svelte";
+  import EditPromptDialog from "$components/prompt-library/prompts/EditPromptDialog.svelte";
   import PromptOrderDialog from "$components/prompt-interface/PromptOrderDialog.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import Loading from "$components/Loading.svelte";

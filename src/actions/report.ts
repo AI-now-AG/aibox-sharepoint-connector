@@ -29,8 +29,7 @@ export const report = {
 
       const formattedMonth = month.replace(/(\d{2})-(\d{4})/, "$2-$1");
       const monthName = dayjs(formattedMonth, "MM-YYYY").format("MMMM YYYY");
-      const usageCursor = await UsageLogModel.listUsageSummary(tenantId, month);
-      const usages = await usageCursor.toArray();
+      const usages = await UsageLogModel.listUsageSummary(tenantId, month);
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const usageData: UsageRow[] = calculateUsage(tenant, usages);
@@ -61,11 +60,7 @@ export const report = {
       const creditUsageData: CreditUsage[] = [];
 
       for (const tenant of tenants) {
-        const usageCursor = await UsageLogModel.listUsageSummary(
-          tenant._id,
-          month,
-        );
-        const usages = await usageCursor.toArray();
+        const usages = await UsageLogModel.listUsageSummary(tenant._id, month);
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const usageData: UsageRow[] = calculateUsage(tenant, usages);

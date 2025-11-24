@@ -8,29 +8,21 @@ import CategoryModel, {
   type Group,
 } from "$data/models/category.model";
 import PromptModel, { type Prompt } from "$data/models/prompt.model";
+import GlobalCategoryModel from "$data/models/globalCategory.model";
+import GlobalPromptModel from "$data/models/globalPrompt.model";
 import SubscriptionModel, {
   type Subscription,
 } from "$data/models/subscription.model";
 import TranscriptionModel, {
   type Transcription,
 } from "$data/models/transcription.model";
-import {
-  SubscriptionPackageId,
-  AudioOptionId,
-} from "$types/Subscription";
+import { SubscriptionPackageId, AudioOptionId } from "$types/Subscription";
 import { TenantFeature, ThemeCode } from "$types/TenantFeature";
 import organizationsManagement from "$data/auth0/organizations-manager";
 import { isProd } from "$utils/env";
 import { randomString } from "$utils/common";
-import {
-  getTranscriptionTypes,
-  hasSubtitleEditor,
-} from "$utils/onboarding";
-import {
-  TENANT_MASTER_DEV,
-  TENANT_MASTER_PROD,
-} from "$constants";
-
+import { getTranscriptionTypes, hasSubtitleEditor } from "$utils/onboarding";
+import { TENANT_MASTER_DEV, TENANT_MASTER_PROD } from "$constants";
 
 const masterTenantId = isProd() ? TENANT_MASTER_PROD : TENANT_MASTER_DEV;
 
@@ -53,7 +45,7 @@ const TenantInputParamsSchema = z.object({
 // step 1: createOrganization()  - Create Auth0 organization
 // step 2: setupTenantData() - Clone tenant, override configs & import categories / prompts
 
-export const cloneMasterTeant = {
+export const cloneMasterTenant = {
   createOrganization: defineAction({
     input: OrganizationNameInputParamsSchema,
     handler: async (input) => {
@@ -107,18 +99,15 @@ export const cloneMasterTeant = {
         included_features: includedFeatures,
         transcription_types: transcriptionTypes,
         subtitle_editor: subtitleEditorEnabled,
-        totalPrice: input.totalPrice
+        totalPrice: input.totalPrice,
       });
 
       // Find all categories for the original tenant
       const selectedCategoryIds = input.use_cases.map(
         (categoryId) => new ObjectId(categoryId),
       );
-      const categoryCursor = await CategoryModel.listByTenantAndIds(
-        masterTenantId,
-        selectedCategoryIds,
-      );
-      const categories = await categoryCursor.toArray();
+      const categories =
+        await GlobalCategoryModel.listByIds(selectedCategoryIds);
 
       // Clone each category and store mapping
       const categoryIdMap = new Map();
@@ -150,9 +139,8 @@ export const cloneMasterTeant = {
 
       // Clone prompts with updated categoryId
       const originalCategoryIds = categories.map((c) => c._id);
-      const promptCursor =
-        await PromptModel.listByCategoryIds(originalCategoryIds);
-      const prompts = await promptCursor.toArray();
+      const prompts =
+        await GlobalPromptModel.listByCategoryIds(originalCategoryIds);
 
       const newPrompts = prompts.map((prompt: Prompt) => ({
         ...prompt,
@@ -207,5 +195,4 @@ export const cloneMasterTeant = {
       return transformRawData(data);
     },
   }),
-
 };

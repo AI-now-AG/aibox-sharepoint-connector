@@ -7,6 +7,8 @@
   import subscription from "$stores/subscription";
   import { SubscriptionPackageId, AudioOptionId } from "$types/Subscription";
   import { isTrulyEmpty } from "$utils/common";
+  import { EventName, ScreenName } from "$types/Posthog";
+  import { posthogClientCaptureWithoutTenant } from "$utils/posthogClient";
 
   interface Props {
     defaultLanguage?: string;
@@ -55,7 +57,7 @@
         location: $subscription.billingInfo?.location ?? "",
         email: $subscription.billingInfo?.billingEmail ?? "",
       },
-      use_cases: $subscription.organizationInfo?.useCases ?? [],
+      use_cases: $subscription.organizationInfo?.selectedCategories ?? [],
       stripe_customer_id: $subscription.stripeCheckout?.customerId ?? "",
     });
 
@@ -96,6 +98,10 @@
 
       // After successful subscription creation, reset the subscription store
       $subscription = {};
+
+      posthogClientCaptureWithoutTenant(EventName.AiboxOnboardingCompleted, {
+        page_name: ScreenName.OnboardingCompleted,
+      });
 
       // All steps successful, redirect
       window.location.href = "/subscription/complete";

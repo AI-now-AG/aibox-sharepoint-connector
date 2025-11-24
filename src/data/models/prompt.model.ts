@@ -68,17 +68,18 @@ export default {
     return collection.findOne<Document<Prompt>>({ _id });
   },
 
-  getByTitleAndTenant: async (title: string, tenantId: ObjectId) => {
-    return collection.findOne<Document<Prompt>>({ title, tenant_id: tenantId });
+  list: async () => {
+    return collection
+      .find<Document<Prompt>>({})
+      .sort({ created_at: 1 })
+      .toArray();
   },
-
-  list: async () =>
-    collection.find<Document<Prompt>>({}).sort({ created_at: 1 }),
 
   listByTenant: async (id: ObjectId) => {
     return collection
       .find<Document<Prompt>>({ tenant_id: id })
-      .sort({ position: 1, created_at: 1 });
+      .sort({ position: 1, created_at: 1 })
+      .toArray();
   },
 
   listByCategory: async (categoryId: string | ObjectId) => {
@@ -91,68 +92,45 @@ export default {
       .toArray();
   },
 
-  listByCategoryIds: async (categoryIds: ObjectId[]) => {
-    return collection.find<Document<Prompt>>({
-      category: { $in: categoryIds },
-    });
-  },
-
   listForExportByTenant: async (id: ObjectId) => {
     // Execute the aggregation
-    return collection.aggregate([
-      {
-        $match: {
-          tenant_id: id,
+    return collection
+      .aggregate([
+        {
+          $match: {
+            tenant_id: id,
+          },
         },
-      },
-      {
-        $lookup: {
-          from: "categories",
-          localField: "category",
-          foreignField: "_id",
-          as: "category",
+        {
+          $lookup: {
+            from: "categories",
+            localField: "category",
+            foreignField: "_id",
+            as: "category",
+          },
         },
-      },
-      {
-        $lookup: {
-          from: "knowlegebases",
-          localField: "knowledgebase",
-          foreignField: "_id",
-          as: "knowledgebase",
+        {
+          $lookup: {
+            from: "knowlegebases",
+            localField: "knowledgebase",
+            foreignField: "_id",
+            as: "knowledgebase",
+          },
         },
-      },
-      {
-        $unwind: "$category",
-      },
-    ]);
+        {
+          $unwind: "$category",
+        },
+      ])
+      .toArray();
   },
 
   update: async (id: string, updatedPrompt: Partial<Prompt>) => {
-    const _id = new ObjectId(id);
-    const validated = PromptSchema.partial().parse(updatedPrompt);
-    const result = await collection.updateOne(
-      { _id },
-      { $set: { ...validated } },
-    );
-    return result;
-  },
-
-  findAndUpdate: async (id: string, updatedPrompt: Partial<Prompt>) => {
     const _id = new ObjectId(id);
     const validated = PromptSchema.partial().parse(updatedPrompt);
     const result = await collection.findOneAndUpdate(
       { _id },
       { $set: { ...validated } },
       { returnDocument: "after" },
-    );
-    return result;
-  },
-
-  updatePromptField: async (id: string, newPrompt: string) => {
-    const _id = new ObjectId(id);
-    const result = await collection.updateOne(
-      { _id },
-      { $set: { prompt: newPrompt } },
     );
     return result;
   },

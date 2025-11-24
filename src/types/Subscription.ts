@@ -87,3 +87,30 @@ export enum RoutePath {
   Step3 = "step3",
   Step4 = "step4",
 }
+
+export interface TagItem {
+  title: string;
+  value: string;
+}
+export interface CategoryItem {
+  title: string;
+  value: string;
+  tags: string[];
+}
+
+export enum CountryCode {
+  CH = "CH", // Switzerland
+  DE = "DE", // Germany
+  AT = "AT", // Austria
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const CountryMap: Record<CountryCode, any> = {
+  [CountryCode.CH]: { title: "Schweiz", value: CountryCode.CH },
+  [CountryCode.DE]: { title: "Deutschland", value: CountryCode.DE },
+  [CountryCode.AT]: { title: "Österreich", value: CountryCode.AT },
+};
+
+export const Countries = [
+  CountryMap[CountryCode.CH], CountryMap[CountryCode.DE], CountryMap[CountryCode.AT],
+]

@@ -9,6 +9,8 @@ import CategoryModel, {
   type Group,
 } from "$data/models/category.model";
 import PromptModel, { type Prompt } from "$data/models/prompt.model";
+import GlobalCategoryModel from "$data/models/globalCategory.model";
+import GlobalPromptModel from "$data/models/globalPrompt.model";
 import SubscriptionModel, {
   type Subscription,
 } from "$data/models/subscription.model";
@@ -21,6 +23,7 @@ import {
   AudioOptionLabels,
   BillingMethod,
   type ProductKeys,
+  CountryCode,
 } from "$types/Subscription";
 import { UserRole, TourType } from "$types/Users";
 import { TenantFeature } from "$types/TenantFeature";
@@ -36,7 +39,6 @@ import {
   getCustomerByEmail,
   createCheckoutSession,
 } from "$utils/stripe";
-
 import {
   getTranscriptionTypes,
   hasSubtitleEditor,
@@ -73,6 +75,7 @@ const BillingInfoParamsSchema = z.object({
   address: z.string(),
   zip_code: z.string(),
   location: z.string(),
+  country: z.string().default(CountryCode.CH),
   email: z.string(),
 });
 
@@ -159,7 +162,7 @@ export const onboarding = {
             line1: billingInfo.address,
             city: billingInfo.location,
             postal_code: billingInfo.zip_code,
-            country: "CH",
+            country: billingInfo.country,
           },
           preferred_locales: [language],
         };
@@ -192,6 +195,9 @@ export const onboarding = {
           customer: stripeCustomerId,
           success_url: successUrl,
           cancel_url: cancelUrl,
+          subscription_data: {
+            trial_period_days: 14,
+          },
         });
 
         return { url: session?.url, stripeCustomerId };
@@ -301,7 +307,7 @@ export const onboarding = {
         default_language: input.language,
         stripe_customer_id: input.stripe_customer_id,
         subtitle_editor: subtitleEditorEnabled,
-        totalPrice: ""
+        totalPrice: "",
       });
 
       // Update the current tenant for the logged-in user
@@ -312,6 +318,8 @@ export const onboarding = {
         roles: newRoles,
         permissions: assignPermissions(newRoles),
         logins_count: 0,
+        created_by_admin: null,
+        is_complete_self_registration: true,
       });
       await UserModel.addTour(userId, {
         type: TourType.OnboardingNewTenant,
@@ -322,11 +330,8 @@ export const onboarding = {
       const selectedCategoryIds = input.use_cases.map(
         (categoryId) => new ObjectId(categoryId),
       );
-      const categoryCursor = await CategoryModel.listByTenantAndIds(
-        masterTenantId,
-        selectedCategoryIds,
-      );
-      const categories = await categoryCursor.toArray();
+      const categories =
+        await GlobalCategoryModel.listByIds(selectedCategoryIds);
 
       // Clone each category and store mapping
       const categoryIdMap = new Map();
@@ -358,9 +363,8 @@ export const onboarding = {
 
       // Clone prompts with updated categoryId
       const originalCategoryIds = categories.map((c) => c._id);
-      const promptCursor =
-        await PromptModel.listByCategoryIds(originalCategoryIds);
-      const prompts = await promptCursor.toArray();
+      const prompts =
+        await GlobalPromptModel.listByCategoryIds(originalCategoryIds);
 
       const newPrompts = prompts.map((prompt: Prompt) => ({
         ...prompt,

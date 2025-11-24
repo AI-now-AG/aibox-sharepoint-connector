@@ -132,6 +132,21 @@ export async function GET(context: APIContext): Promise<Response> {
     }
   })
 
-  // ✅ Redirect back to the app after successful login
+  const user = await UserModel.get(userId?.toString() || "");
+  if (!user) {
+    return new Response(null, {
+      status: 400,
+    });
+  } else {
+    if (user.created_by_admin != undefined && user.created_by_admin !== null && user.created_by_admin !== true) {// Self-registration flow
+      if (user.logins_count <= 1) {// First login
+        return context.redirect("/subscription");
+      } else if (!user.is_complete_self_registration) {// Incomplete subscription
+        return context.redirect("/subscription");
+      }
+    }
+  }
+
+  // ✅ Redirect to Home page after successful login
   return context.redirect("/");
 }
