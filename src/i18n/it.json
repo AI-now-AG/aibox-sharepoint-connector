@@ -475,11 +475,11 @@
   "home.model-option-text-websearch": "Text & Websearch",
   "prompt-execution.models.openai-gpt-5-with-tools": "gpt-5.1 (Text & Tools)",
   "prompt-execution.reasoning-level": "Reasoning level",
-  "prompt-execution.reasoning-level.placeholder": "super fast | fast | balanced | high",
+  "prompt-execution.reasoning-level.placeholder": "chose reasoning level",
   "prompt-execution.reasoning-effort.level-minimal": "Minimal reasoning (fastest response)",
-  "prompt-execution.reasoning-effort.level-low": "Quick reasoning (longer response)",
-  "prompt-execution.reasoning-effort.level-medium": "Balanced reasoning (moderate response time)",
-  "prompt-execution.reasoning-effort.level-high": "Deep reasoning (slowest response)",
+  "prompt-execution.reasoning-effort.level-low": "Low reasoning (increased response time)",
+  "prompt-execution.reasoning-effort.level-medium": "Medium reasoning (longer response time)",
+  "prompt-execution.reasoning-effort.level-high": "High reasoning (slowest response)",
   "prompt-execution.text-verbosity": "Text verbosity",
   "prompt-execution.text-verbosity.placeholder": "low | medium | high",
   "prompt-execution.verbosity.level-low": "Short Answer",
@@ -669,5 +669,5 @@
   "subscription.country.de": "Germany",
   "subscription.country.at": "Austria",
   "tenant.comment": "Comment",
-  "prompt-execution.reasoning-effort.level-none": "No reasoning (fastest response time)"
+  "prompt-execution.reasoning-effort.level-none": "No reasoning (instant response)"
 }

@@ -475,11 +475,11 @@
   "home.model-option-text-websearch": "Text & Websuche",
   "prompt-execution.models.openai-gpt-5-with-tools": "gpt-5.1 (Text & Tools)",
   "prompt-execution.reasoning-level": "Denktiefe",
-  "prompt-execution.reasoning-level.placeholder": "superschnell |schnell | mittel | hoch",
+  "prompt-execution.reasoning-level.placeholder": "wähle die Denkdauer aus",
   "prompt-execution.reasoning-effort.level-minimal": "Minimales Denken (schnellste Antwort)",
-  "prompt-execution.reasoning-effort.level-low": "Schnelles Denken (längere Antwortzeit)",
-  "prompt-execution.reasoning-effort.level-medium": "Ausgewogenes Denken und Antwortzeit",
-  "prompt-execution.reasoning-effort.level-high": "Längeres Denken (komplexe Aufgaben)",
+  "prompt-execution.reasoning-effort.level-low": "Wenig Denken (leicht erhöhte Antwortzeit)",
+  "prompt-execution.reasoning-effort.level-medium": "Mittleres Denken (längere Antwortzeit)",
+  "prompt-execution.reasoning-effort.level-high": "Längeres Denken (für komplexe Tasks)",
   "prompt-execution.text-verbosity": "Ausführlichkeit",
   "prompt-execution.text-verbosity.placeholder": "niedrig | mittel | hoch",
   "prompt-execution.verbosity.level-low": "Kurze Antwort",
@@ -669,5 +669,5 @@
   "subscription.country.de": "Deutschland",
   "subscription.country.at": "Österreich",
   "tenant.comment": "Kommentar",
-  "prompt-execution.reasoning-effort.level-none": "Keine Begründung (schnellste Reaktionszeit)"
+  "prompt-execution.reasoning-effort.level-none": "Kein Nachdenken (sofortige Antwort)"
 }
