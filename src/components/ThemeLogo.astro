@@ -29,6 +29,16 @@ const isTenantManagement = /^\/tenant-management\/[a-fA-F0-9]+$/.test(pathname);
         class="h-8 hidden in-data-[theme=somedia]:block"
       />
       <img
+        src="/logo-sunrise-business-logo.png"
+        alt="Sunrise Business Logo"
+        class="h-8 hidden in-data-[theme=sunriseBusiness]:block"
+      />
+      <img
+        src="/logo-sunrise-business-logo.png"
+        alt="Sunrise Business Logo"
+        class="h-8 hidden in-data-[theme=sunrise-business]:block"
+      />
+      <img
         src="/aibox-logo-text.svg"
         alt="light logo"
         class="logo-light h-8 w-auto hidden in-data-[theme=light]:block"
@@ -41,7 +51,7 @@ const isTenantManagement = /^\/tenant-management\/[a-fA-F0-9]+$/.test(pathname);
       <img
         src="/aibox-logo-text.svg"
         alt="Aibox Default Logo"
-        class="h-8 block in-data-[theme=weihnachtsmann]:hidden in-data-[theme=somedia]:hidden in-data-[theme=light]:hidden in-data-[theme=dark]:hidden"
+        class="h-8 block in-data-[theme=weihnachtsmann]:hidden in-data-[theme=somedia]:hidden in-data-[theme=sunriseBusiness]:hidden in-data-[theme=sunrise-business]:hidden in-data-[theme=light]:hidden in-data-[theme=dark]:hidden"
       />
     </>
   ) : from === "home" ? (
@@ -58,6 +68,18 @@ const isTenantManagement = /^\/tenant-management\/[a-fA-F0-9]+$/.test(pathname);
           src="/soki-somedia.png"
           alt="somedia logo"
           class="h-12 hidden in-data-[theme=somedia]:inline"
+        />
+      ) : theme === ThemeCode.SunriseBusiness ? (
+        <img
+          src="/logo-sunrise-business.png"
+          alt="Sunrise Business logo"
+          class="h-20 hidden in-data-[theme=sunriseBusiness]:inline"
+        />
+      ) : theme === ThemeCode.SunriseBusinessAlt ? (
+        <img
+          src="/logo-sunrise-business.png"
+          alt="Sunrise Business logo"
+          class="h-20 hidden in-data-[theme=sunrise-business]:inline"
         />
       ) : theme === ThemeCode.Light ? (
         <img
@@ -94,6 +116,18 @@ const isTenantManagement = /^\/tenant-management\/[a-fA-F0-9]+$/.test(pathname);
           alt="somedia Logo"
           class="h-8 hidden in-data-[theme=somedia]:block"
         />
+      ) : theme === ThemeCode.SunriseBusiness ? (
+        <img
+          src="/logo-sunrise-business-logo.png"
+          alt="Sunrise Business Logo"
+          class="h-8 hidden in-data-[theme=sunriseBusiness]:block"
+        />
+      ) : theme === ThemeCode.SunriseBusinessAlt ? (
+        <img
+          src="/logo-sunrise-business-logo.png"
+          alt="Sunrise Business Logo"
+          class="h-8 hidden in-data-[theme=sunrise-business]:block"
+        />
       ) : theme === ThemeCode.Light ? (
         <img
           src="/aibox-logo-text.svg"
@@ -110,7 +144,7 @@ const isTenantManagement = /^\/tenant-management\/[a-fA-F0-9]+$/.test(pathname);
         <img
           src="/aibox-logo-text.svg"
           alt="Aibox Default Logo"
-          class="h-8 block in-data-[theme=weihnachtsmann]:hidden in-data-[theme=somedia]:hidden in-data-[theme=light]:hidden in-data-[theme=dark]:hidden"
+          class="h-8 block in-data-[theme=weihnachtsmann]:hidden in-data-[theme=somedia]:hidden in-data-[theme=sunriseBusiness]:hidden in-data-[theme=sunrise-business]:hidden in-data-[theme=light]:hidden in-data-[theme=dark]:hidden"
         />
       )}
     </>

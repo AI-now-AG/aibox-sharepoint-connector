@@ -148,6 +148,76 @@
   --noise: 0; */
 }
 
+@plugin "daisyui/theme" {
+  name: "sunriseBusiness";
+  default: false;
+  prefersdark: false;
+  color-scheme: "light";
+  --color-base-100: oklch(100.000% 0.000 89.876);
+  --color-base-200: oklch(97.156% 0.006 350.797);
+  --color-base-300: oklch(93.280% 0.015 350.105);
+  --color-base-content: oklch(24.419% 0.006 0.594);
+  --color-primary: oklch(58.731% 0.235 9.955);
+  --color-primary-content: oklch(100.000% 0.000 89.876);
+  --color-secondary: oklch(72.659% 0.176 41.204);
+  --color-secondary-content: oklch(100.000% 0.000 89.876);
+  --color-accent: oklch(84.247% 0.154 80.498);
+  --color-accent-content: oklch(24.419% 0.006 0.594);
+  --color-neutral: oklch(24.419% 0.006 0.594);
+  --color-neutral-content: oklch(97.156% 0.006 350.797);
+  --color-info: oklch(47.369% 0.169 257.166);
+  --color-info-content: oklch(100.000% 0.000 89.876);
+  --color-success: oklch(50.766% 0.133 152.258);
+  --color-success-content: oklch(100.000% 0.000 89.876);
+  --color-warning: oklch(81.975% 0.171 78.466);
+  --color-warning-content: oklch(24.419% 0.006 0.594);
+  --color-error: oklch(57.168% 0.231 23.939);
+  --color-error-content: oklch(100.000% 0.000 89.876);
+  --radius-selector: 1rem;
+  --radius-field: 0.5rem;
+  --radius-box: 1rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
+@plugin "daisyui/theme" {
+  name: "sunrise-business";
+  default: false;
+  prefersdark: false;
+  color-scheme: "light";
+  --color-primary: oklch(56.6% 0.218 26.4);
+  --color-primary-content: oklch(100% 0 0);
+  --color-secondary: oklch(32% 0.02 260);
+  --color-secondary-content: oklch(100% 0 0);
+  --color-accent: oklch(83% 0.18 85);
+  --color-accent-content: oklch(0% 0 0);
+  --color-neutral: oklch(25% 0 0);
+  --color-neutral-content: oklch(100% 0 0);
+  --color-base-100: oklch(100% 0 0);
+  --color-base-200: oklch(96% 0 0);
+  --color-base-300: oklch(92% 0 0);
+  --color-base-content: oklch(20% 0.01 260);
+  --color-info: oklch(72% 0.15 230);
+  --color-info-content: oklch(0% 0 0);
+  --color-success: oklch(65% 0.18 150);
+  --color-success-content: oklch(0% 0 0);
+  --color-warning: oklch(85% 0.18 85);
+  --color-warning-content: oklch(0% 0 0);
+  --color-error: oklch(60% 0.22 25);
+  --color-error-content: oklch(100% 0 0);
+  --radius-selector: 2rem;
+  --radius-field: 0.5rem;
+  --radius-box: 1rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
