@@ -31,7 +31,6 @@ export const report = {
       const monthName = dayjs(formattedMonth, "MM-YYYY").format("MMMM YYYY");
       const usages = await UsageLogModel.listUsageSummary(tenantId, month);
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const usageData: UsageRow[] = calculateUsage(tenant, usages);
       const totalCreditsUsed = sumCreditsUsed(usageData);
 
@@ -62,7 +61,6 @@ export const report = {
       for (const tenant of tenants) {
         const usages = await UsageLogModel.listUsageSummary(tenant._id, month);
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const usageData: UsageRow[] = calculateUsage(tenant, usages);
         const totalCreditsUsed = sumCreditsUsed(usageData);
         const subscription = await SubscriptionModel.findByTenant(tenant._id);

@@ -281,7 +281,7 @@ const _calculateOpenAIGpt5Usage = (
     amount: openAiWebsearchRequests,
     unit: unitLabels.requests,
     credits: _requestsToCredits(
-      ModelName.Gpt5Old,
+      ModelName.Gpt5,
       openAiWebsearchRequests,
     ),
   });
