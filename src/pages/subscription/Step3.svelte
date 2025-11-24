@@ -30,7 +30,7 @@
   }
   let { accountEmail, defaultLanguage = "en" }: Props = $props();
   const t = useTranslations(defaultLanguage);
-  const conuntryOptions = useTranslatedCountryList();
+  const conuntryOptions = useTranslatedCountryList(defaultLanguage);
 
   let loading = $state(false);
 
