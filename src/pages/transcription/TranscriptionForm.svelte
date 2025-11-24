@@ -1027,7 +1027,7 @@
     }
 
     // Track posthog events based on category
-    if (category === AudioCategory.AudioPro) {
+    if (category === AudioCategory.AudioToText || category === AudioCategory.AudioPro) {
       // Audio to Text was created
       console.log("Audio to Text was created");
       posthogClientCapture($tenant, EventName.AiboxTranscriptionCreated, {
