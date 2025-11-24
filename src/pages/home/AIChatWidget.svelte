@@ -14,6 +14,7 @@
     markdownToHtml,
     buildCitationLinks,
     stripMarkdownFormatting,
+    getLatestMarkdownHeader,
   } from "$utils/textFormatting";
   import AIModelDropdown from "./AIModelDropdown.svelte";
   import { tenant, user } from "$stores";
@@ -39,6 +40,7 @@
   import PromptItem from "$components/prompt-interface/PromptItem.svelte";
   import { EventName, ScreenName } from "$types/Posthog";
   import { posthogClientCapture } from "$utils/posthogClient";
+  import log from "$utils/log";
 
   const t = useTranslations();
 
@@ -89,6 +91,8 @@
   let selectedModel: PromptModel = $state(PromptModel.OpenAI);
   let isDisableSelectModel: boolean = $state(false);
   let currentMessage = $state("");
+  let thinkingMessage = $state("");
+  let cotMessage = $state("");
   let currentStreamingImageUrl: string = $state("");
   let isFetching: boolean = $state(false);
   let isGenerating: boolean = $state(false);
@@ -447,10 +451,18 @@
 
       case "reasoning":
         isResoningThingking = true;
+        const cotChunkMessage = data?.content?.[0]?.text;
+        log.d("🤔 thinkingMessage", cotChunkMessage);
+        if (cotChunkMessage) {
+          cotMessage += cotChunkMessage;
+          thinkingMessage = getLatestMarkdownHeader(cotMessage);
+        }
         break;
 
       case "chunk":
         isResoningThingking = false;
+        cotMessage = "";
+        thinkingMessage = "";
         handleChunkEvent(data, state);
         break;
 
@@ -806,6 +818,7 @@
       {isFetching}
       {isGenerating}
       {isResoningThingking}
+      {thinkingMessage}
       promptResultTrackging={{
         page_name: ScreenName.Home,
         use_case: selectedPrompt?.title || "-",

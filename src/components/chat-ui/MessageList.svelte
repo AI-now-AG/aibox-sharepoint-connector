@@ -47,6 +47,7 @@
     isFetching: boolean;
     isGenerating: boolean;
     isResoningThingking?: boolean;
+    thinkingMessage?: string;
     infoText?: string;
     updateMessageRating?: Function;
     promptResultTrackging?: MessagePromptResultTracking;
@@ -59,6 +60,7 @@
     isFetching = false,
     isGenerating = false,
     isResoningThingking = false,
+    thinkingMessage = "",
     infoText = "",
     updateMessageRating = () => null,
     promptResultTrackging,
@@ -585,8 +587,13 @@
                       ></span>
                       {#if isResoningThingking}
                         <span class="ml-2"
-                          >{t("prompt-execution.thinking")}</span
-                        >
+                          >{t("prompt-execution.thinking")}
+                        </span>
+                        {#if thinkingMessage}
+                          <span class="text-blue-600 ml-2"
+                            >{@html markdownToHtml(thinkingMessage)}</span
+                          >
+                        {/if}
                       {/if}
                     </div>
                   {/if}

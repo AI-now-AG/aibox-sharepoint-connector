@@ -30,11 +30,13 @@
     markdownToHtml,
     buildCitationLinks,
     stripMarkdownFormatting,
+    getLatestMarkdownHeader,
   } from "$utils/textFormatting";
   import { readFileContent } from "$utils/fileReader";
   import { TRANSCRIPTION_API_URL } from "astro:env/client";
   import { EventName, ScreenName } from "$types/Posthog";
   import { posthogClientCapture } from "$utils/posthogClient";
+  import log from "$utils/log";
 
   const t = useTranslations();
 
@@ -87,6 +89,8 @@
   let files: File[] = $state([]);
   let messageHistory: MessageHistory = $state(messages);
   let currentMessage = $state("");
+  let thinkingMessage = $state("");
+  let cotMessage = $state("");
   let currentStreamingImageUrl: string = $state("");
   let isFetching: boolean = $state(false);
   let isGenerating: boolean = $state(false);
@@ -458,10 +462,18 @@
 
       case "reasoning":
         isResoningThingking = true;
+        const cotChunkMessage = data?.content?.[0]?.text;
+        log.d("🤔 thinkingMessage", cotChunkMessage);
+        if (cotChunkMessage) {
+          cotMessage += cotChunkMessage;
+          thinkingMessage = getLatestMarkdownHeader(cotMessage);
+        }
         break;
 
       case "chunk":
         isResoningThingking = false;
+        cotMessage = "";
+        thinkingMessage = "";
         handleChunkEvent(data, state);
         break;
 
@@ -660,6 +672,7 @@
     {isFetching}
     {isGenerating}
     {isResoningThingking}
+    {thinkingMessage}
     updateMessageRating={(
       index: number,
       selectedRating: MessageThumbRating | null,
