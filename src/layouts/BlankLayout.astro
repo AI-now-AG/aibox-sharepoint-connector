@@ -10,7 +10,7 @@ interface Props {
 }
 const t = useTranslations();
 
-const { title = t("site.title"), description = t("site.description") } =
+const { title = t("site.title"), description = "" } =
   Astro.props;
 
 let theme = "light";
