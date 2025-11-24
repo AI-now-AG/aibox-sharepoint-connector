@@ -40,7 +40,6 @@
   import PromptItem from "$components/prompt-interface/PromptItem.svelte";
   import { EventName, ScreenName } from "$types/Posthog";
   import { posthogClientCapture } from "$utils/posthogClient";
-  import log from "$utils/log";
 
   const t = useTranslations();
 
@@ -452,7 +451,6 @@
       case "reasoning":
         isResoningThingking = true;
         const cotChunkMessage = data?.content?.[0]?.text;
-        log.d("🤔 thinkingMessage", cotChunkMessage);
         if (cotChunkMessage) {
           cotMessage += cotChunkMessage;
           thinkingMessage = getLatestMarkdownHeader(cotMessage);

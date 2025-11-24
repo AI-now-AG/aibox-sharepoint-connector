@@ -45,7 +45,6 @@
   import { TRANSCRIPTION_API_URL } from "astro:env/client";
   import { EventName, ScreenName } from "$types/Posthog";
   import { posthogClientCapture } from "$utils/posthogClient";
-  import log from "$utils/log";
 
   const t = useTranslations();
 
@@ -492,7 +491,6 @@
       case "reasoning":
         isResoningThingking = true;
         const cotChunkMessage = data?.content?.[0]?.text;
-        log.d("🤔 thinkingMessage", cotChunkMessage);
         if (cotChunkMessage) {
           cotMessage += cotChunkMessage;
           thinkingMessage = getLatestMarkdownHeader(cotMessage);
