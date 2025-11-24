@@ -17,6 +17,7 @@ import { TenantFeature } from "$types/TenantFeature";
 import { defaultLang } from "$i18n/ui";
 import { setLanguage } from "$i18n/utils";
 import { wildcardMatchInArray } from "$utils/wildcardMatch";
+import { isEnterpriseConnection } from "$utils/auth0";
 
 async function requestOrigin(context: APIContext, next: MiddlewareNext) {
   const path = context.url.pathname;
@@ -131,8 +132,14 @@ async function onboardingCheck(context: APIContext, next: MiddlewareNext) {
   if (!user) {
     return next();
   } else {
+    const auth0Sub = typeof user.auth0_sub === "string"
+      ? user.auth0_sub
+      : String(user.auth0_sub ?? "");
+    if (isEnterpriseConnection(auth0Sub)) {
+      return next();
+    }
     if (user.created_by_admin != undefined && user.created_by_admin !== null && user.created_by_admin !== true) {// Self-registration flow
-      if (user.logins_count <= 1) {// First login
+      if ((user.logins_count as number) <= 1) {// First login
         return context.redirect("/subscription");
       } else if (!user.is_complete_self_registration) {// Incomplete subscription
         return context.redirect("/subscription");
