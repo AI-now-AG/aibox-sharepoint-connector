@@ -101,10 +101,10 @@
   let isResoningThingking: boolean = $state(false);
   let loading: boolean = $state(false);
 
-  let isShowAttachmentButton = $state(
-    true,
-    //currentPrompt?.model != PromptModel.Perplexity,
-  );
+  // let isShowAttachmentButton = $state(
+  //   currentPrompt?.model != PromptModel.Perplexity,
+  // );
+  let isShowAttachmentButton = $state(true);
 
   $effect(() => {
     //isShowAttachmentButton = currentPrompt?.model != PromptModel.Perplexity;

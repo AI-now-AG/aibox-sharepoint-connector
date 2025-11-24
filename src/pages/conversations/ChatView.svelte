@@ -94,7 +94,8 @@
   let previousResponseId: string | null = $state(lastResponseId);
   let loading = $state(false);
 
-  let isShowAttachmentButton = $state(model != PromptModel.Perplexity);
+  //let isShowAttachmentButton = $state(model != PromptModel.Perplexity);
+  let isShowAttachmentButton = $state(true);
 
   const providerInfo = useProviderInfo($tenant);
   let toolOptions = getPromptTools(
