@@ -239,57 +239,57 @@ const _calculateOpenAIGpt5Usage = (
     return item.provider == ApiKeyProvider.OpenAIGpt5;
   });
 
-  // gpt-5
-  const gpt5Items = usageData.filter(
-    (item: UsageLog) => item.model == ModelName.Gpt5Old,
-  );
-  const gpt5InputTokens = gpt5Items.reduce(
-    (sum: number, item: UsageLog) => sum + (item.input_tokens ?? 0),
-    0,
-  );
-  const gpt5OutputTokens = gpt5Items.reduce(
-    (sum: number, item: UsageLog) => sum + (item.output_tokens ?? 0),
-    0,
-  );
-  const { inputCredits: gpt5InputCredits, outputCredits: gpt5OutputCredits } =
-    _tokensToCredits(
-      ApiKeyProvider.OpenAIGpt5,
-      gpt5InputTokens,
-      gpt5OutputTokens,
-    );
-  usageItems.push({
-    model: "gpt-5 Input",
-    amount: gpt5InputTokens,
-    unit: unitLabels.tokens,
-    credits: gpt5InputCredits,
-  });
-  usageItems.push({
-    model: "gpt-5 Output",
-    amount: gpt5OutputTokens,
-    unit: unitLabels.tokens,
-    credits: gpt5OutputCredits,
-  });
+  // // gpt-5
+  // const gpt5Items = usageData.filter(
+  //   (item: UsageLog) => item.model == ModelName.Gpt5Old,
+  // );
+  // const gpt5InputTokens = gpt5Items.reduce(
+  //   (sum: number, item: UsageLog) => sum + (item.input_tokens ?? 0),
+  //   0,
+  // );
+  // const gpt5OutputTokens = gpt5Items.reduce(
+  //   (sum: number, item: UsageLog) => sum + (item.output_tokens ?? 0),
+  //   0,
+  // );
+  // const { inputCredits: gpt5InputCredits, outputCredits: gpt5OutputCredits } =
+  //   _tokensToCredits(
+  //     ApiKeyProvider.OpenAIGpt5,
+  //     gpt5InputTokens,
+  //     gpt5OutputTokens,
+  //   );
+  // usageItems.push({
+  //   model: "gpt-5 Input",
+  //   amount: gpt5InputTokens,
+  //   unit: unitLabels.tokens,
+  //   credits: gpt5InputCredits,
+  // });
+  // usageItems.push({
+  //   model: "gpt-5 Output",
+  //   amount: gpt5OutputTokens,
+  //   unit: unitLabels.tokens,
+  //   credits: gpt5OutputCredits,
+  // });
 
-  const openAiWebsearchRequests = gpt5Items.reduce(
-    (sum: number, item: UsageLog) =>
-      sum + (item.metadata?.websearch_count ?? 0),
-    0,
-  );
+  // const openAiWebsearchRequests = gpt5Items.reduce(
+  //   (sum: number, item: UsageLog) =>
+  //     sum + (item.metadata?.websearch_count ?? 0),
+  //   0,
+  // );
 
-  usageItems.push({
-    model: "gpt-5 Websearch",
-    amount: openAiWebsearchRequests,
-    unit: unitLabels.requests,
-    credits: _requestsToCredits(
-      ModelName.Gpt5,
-      openAiWebsearchRequests,
-    ),
-  });
+  // usageItems.push({
+  //   model: "gpt-5 Websearch",
+  //   amount: openAiWebsearchRequests,
+  //   unit: unitLabels.requests,
+  //   credits: _requestsToCredits(
+  //     ModelName.Gpt5,
+  //     openAiWebsearchRequests,
+  //   ),
+  // });
 
 
   // gpt-5.1
   const gpt51Items = usageData.filter(
-    (item: UsageLog) => item.model == ModelName.Gpt5,
+    (item: UsageLog) => item.model == ModelName.Gpt5 || item.model == ModelName.Gpt5Old,
   );
   const gpt51InputTokens = gpt51Items.reduce(
     (sum: number, item: UsageLog) => sum + (item.input_tokens ?? 0),
@@ -676,7 +676,7 @@ export const calculateUsage = (tenant: Tenant, rawUsages: UsageLog[]) => {
   const useOpenAIGpt5PrivateKey =
     tenant.metadata?.openaiGpt5PrivateKeyEnabled ?? false;
   usageData.push({
-    provider: "OpenAI GPT-5",
+    provider: "OpenAI GPT-5.1",
     details: _calculateOpenAIGpt5Usage(rawUsages, useOpenAIGpt5PrivateKey),
   });
 
