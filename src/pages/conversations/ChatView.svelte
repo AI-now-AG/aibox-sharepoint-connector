@@ -216,13 +216,11 @@
 
     if (isResponseModel) {
       payload.previousResponseId = previousResponseId;
+      payload.reasoningEffort =
+        promptData?.reasoningEffort || ReasoningEffortOption.None;
+      payload.verbosity = promptData?.textVerbosity || TextVerbosityOption.Low;
     } else {
       payload.messageHistory = messageHistory;
-    }
-
-    if (isResponseModel) {
-      payload.reasoningEffort = ReasoningEffortOption.None;
-      payload.verbosity = TextVerbosityOption.Low;
     }
 
     return payload;
