@@ -467,7 +467,6 @@
         break;
 
       case "chunk":
-        console.log("MY AIBOX - Summary Detailed", cotMessage);
         isResoningThingking = false;
         cotMessage = "";
         thinkingMessage = "";

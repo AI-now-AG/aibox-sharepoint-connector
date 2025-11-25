@@ -498,7 +498,6 @@
         break;
 
       case "chunk":
-        console.log("PROMPT EXECUTION AREA - Summary Detailed", cotMessage);
         isResoningThingking = false;
         cotMessage = "";
         thinkingMessage = "";
