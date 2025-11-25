@@ -1,8 +1,8 @@
 import { useTranslations } from "$i18n/utils";
 import { Countries } from "$types/Subscription";
 
-export const useTranslatedCountryList = () => {
-  const t = useTranslations();
+export const useTranslatedCountryList = (defaultLanguage: string) => {
+  const t = useTranslations(defaultLanguage);
 
   return Countries.map((country) => ({
     ...country,
