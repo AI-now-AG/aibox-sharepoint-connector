@@ -13,6 +13,7 @@ import {
   type CreatePromptParams,
   type PromptParams,
 } from "$types/PromptAPI";
+import { ReasoningEffortOption } from "$types/AIProvider";
 
 const instructions = `
   You are a helpful assistant who writes helpful descriptions of prompts for users that will use these prompts for a UI:
@@ -68,6 +69,7 @@ export const POST: APIRoute<CreatePromptParams> = async (ctx) => {
     ),
     documents: data.documents?.map((doc) => stringToObjectId.parse(doc)),
     description,
+    reasoningEffort: data.reasoningEffort ?? ReasoningEffortOption.None,
     position: newPosition,
     tenant_id: ctx.locals.user.tenant_id,
     creator_id: ctx.locals.user.id,
@@ -128,6 +130,7 @@ export const PUT: APIRoute<CreatePromptParams> = async (ctx) => {
     ),
     documents: data.documents?.map((doc) => stringToObjectId.parse(doc)),
     description,
+    reasoningEffort: data.reasoningEffort ?? ReasoningEffortOption.None,
     updated_at: new Date(),
   };
 

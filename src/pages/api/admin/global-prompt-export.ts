@@ -1,17 +1,17 @@
-import type { APIContext, APIRoute } from "astro";
+import type { APIRoute } from "astro";
 import dayjs from "dayjs";
 import { writeToString } from "fast-csv";
-import PromptModel from "$data/models/prompt.model";
+import GlobalPromptModel from "$data/models/globalPrompt.model";
 import type { Group } from "$data/models/category.model";
 import { CsvColumn, type CsvRowRaw } from "$types/PromptCsv";
 
-export const GET: APIRoute = async (ctx: APIContext) => {
-  const { tenant_id: tenantId } = ctx.locals.user;
-  const filename = `Prompts-Export-${dayjs().format("YYYY-MM-DD")}.csv`;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const GET: APIRoute = async () => {
+  const filename = `Global-Prompts-Export-${dayjs().format("YYYY-MM-DD")}.csv`;
 
   try {
     // Fetch your MongoDB data (Prompts by tenant)
-    const prompts = await PromptModel.listForExportByTenant(tenantId);
+    const prompts = await GlobalPromptModel.listForExport();
 
     // Prepare the CSV data with appropriate headers
     const csvData: CsvRowRaw[] = prompts.map((prompt) => {

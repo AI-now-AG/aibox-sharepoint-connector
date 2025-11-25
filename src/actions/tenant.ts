@@ -29,6 +29,7 @@ import {
   AudioOptionId,
 } from "$types/Subscription";
 import { EncryptedUserPassword, UserRole } from "$types/Users";
+import { ModelName, ReasoningEffortOption } from "$types/AIProvider";
 
 const TenantInputParamsSchema = z.object({
   name: z.string(),
@@ -38,10 +39,10 @@ const TenantInputParamsSchema = z.object({
   theme: z.nativeEnum(ThemeCode),
   primary_color: z.string().optional(),
   api_key_providers: z.array(TextFeatureSchema).optional(),
-  openai_chat_model: z.string().optional().default("gpt-4o"),
+  openai_chat_model: z.string().optional().default(ModelName.Gpt4o),
   openai_api_key: z.string().optional(),
-  openai_gpt5_chat_model: z.string().optional().default("gpt-5"),
-  openai_gpt5_reasoning_effort: z.string().optional().default("low"),
+  openai_gpt5_chat_model: z.string().optional().default(ModelName.Gpt5),
+  openai_gpt5_reasoning_effort: z.string().optional().default(ReasoningEffortOption.None),
   openai_gpt5_api_key: z.string().optional(),
   azure_openai_api_key: z.string().optional(),
   azure_openai_endpoint: z.string().optional(),

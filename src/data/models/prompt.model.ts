@@ -1,6 +1,7 @@
 import { ObjectId } from "mongodb";
 import { db, toObjectId, type Document } from "../mongodb";
 import { z } from "zod";
+import { ReasoningEffortOption } from "$types/AIProvider";
 
 const PromptSchema = z.object({
   tenant_id: z.instanceof(ObjectId).optional(),
@@ -13,7 +14,7 @@ const PromptSchema = z.object({
   prompt: z.string(),
   predefined_input: z.string().optional(),
   model: z.string().nullish(),
-  reasoningEffort: z.string().nullish(),
+  reasoningEffort: z.string().nullish().default(ReasoningEffortOption.None),
   textVerbosity: z.string().nullish(),
   promptTool: z.string().nullish(),
   documents: z.array(z.instanceof(ObjectId)).optional(),
@@ -48,6 +49,17 @@ export default {
 
     // Insert all at once
     return collection.insertMany(validatedDocs);
+  },
+
+  update: async (id: string, updatedPrompt: Partial<Prompt>) => {
+    const _id = new ObjectId(id);
+    const validated = PromptSchema.partial().parse(updatedPrompt);
+    const result = await collection.findOneAndUpdate(
+      { _id },
+      { $set: { ...validated } },
+      { returnDocument: "after" },
+    );
+    return result;
   },
 
   remove: async (id: string) => {
@@ -92,13 +104,13 @@ export default {
       .toArray();
   },
 
-  listForExportByTenant: async (id: ObjectId) => {
+  listForExportByTenant: async (tenantId: ObjectId) => {
     // Execute the aggregation
     return collection
       .aggregate([
         {
           $match: {
-            tenant_id: id,
+            tenant_id: tenantId,
           },
         },
         {
@@ -122,17 +134,6 @@ export default {
         },
       ])
       .toArray();
-  },
-
-  update: async (id: string, updatedPrompt: Partial<Prompt>) => {
-    const _id = new ObjectId(id);
-    const validated = PromptSchema.partial().parse(updatedPrompt);
-    const result = await collection.findOneAndUpdate(
-      { _id },
-      { $set: { ...validated } },
-      { returnDocument: "after" },
-    );
-    return result;
   },
 
   getMaxPosition: async (groupId: ObjectId) => {

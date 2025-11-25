@@ -1,6 +1,5 @@
-import type { APIContext, APIRoute } from "astro";
+import type { APIRoute } from "astro";
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const GET: APIRoute = async (ctx: APIContext) => {
+export const GET: APIRoute = async () => {
   return new Response(JSON.stringify([]));
 };

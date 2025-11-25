@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ReasoningEffortOption } from "./AIProvider";
 
 export const CreatePromptParamsSchema = z.object({
   _id: z.string().optional(),
@@ -9,7 +10,7 @@ export const CreatePromptParamsSchema = z.object({
   prompt: z.string(),
   predefined_input: z.string().optional(),
   model: z.string().nullish(),
-  reasoningEffort: z.string().nullish(),
+  reasoningEffort: z.string().nullish().default(ReasoningEffortOption.None),
   textVerbosity: z.string().nullish(),
   promptTool: z.string().nullish(),
   documents: z.array(z.string()).optional(),

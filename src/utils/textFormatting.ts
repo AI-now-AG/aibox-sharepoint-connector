@@ -373,3 +373,29 @@ export function isHtmlContentEmpty(html: string): boolean {
   const clean = html.trim().toLowerCase();
   return clean === "" || clean === "<p></p>" || clean === "<p><br></p>";
 }
+
+export function getLatestMarkdownHeader(text: string): string {
+  // Match **content** with content allowed to span across newlines
+  const closedRegex = /\*\*([\s\S]*?)\*\*/g;
+
+  let match: RegExpExecArray | null;
+  let lastClosedHeader = "";
+
+  // Find the last fully closed header
+  while ((match = closedRegex.exec(text)) !== null) {
+    lastClosedHeader = match[1].trim();
+  }
+
+  if (lastClosedHeader) {
+    return lastClosedHeader;
+  }
+
+  // If no closed header exists, check for a partial opening `**`
+  const lastOpenIndex = text.lastIndexOf("**");
+  if (lastOpenIndex !== -1) {
+    const partial = text.slice(lastOpenIndex + 2).trim();
+    return partial; // may be empty, caller decides if to show
+  }
+
+  return "";
+}

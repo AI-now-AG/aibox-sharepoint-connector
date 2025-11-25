@@ -2,6 +2,7 @@
   import { svgIcons } from "$assets/icons";
   import { preventDefault } from "$utils/common";
   import AddPromptDialog from "$components/prompt-library/prompts/AddPromptDialog.svelte";
+  import ImportExport from "$components/prompt-library/prompts/ImportExport.svelte";
   import { useTranslations } from "$i18n/utils";
 
   interface Props {
@@ -21,6 +22,11 @@
 </script>
 
 <div class="flex gap-2">
+  <ImportExport
+    apiEndPointImport="/api/admin/global-prompt-import"
+    apiEndPointExport="/api/admin/global-prompt-export"
+  />
+
   <button
     class="btn btn-outline font-normal grow-0"
     onclick={preventDefault(addPrompt)}

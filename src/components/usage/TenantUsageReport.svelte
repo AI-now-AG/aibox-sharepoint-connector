@@ -50,7 +50,7 @@
     if (error) {
       console.error(error);
       addToast({
-        message: "Something went wrong",
+        message: error.message || "Something went wrong",
         type: "error",
       });
     } else {

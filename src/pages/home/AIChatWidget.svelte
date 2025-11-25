@@ -14,6 +14,7 @@
     markdownToHtml,
     buildCitationLinks,
     stripMarkdownFormatting,
+    getLatestMarkdownHeader,
   } from "$utils/textFormatting";
   import AIModelDropdown from "./AIModelDropdown.svelte";
   import { tenant, user } from "$stores";
@@ -39,6 +40,7 @@
   import PromptItem from "$components/prompt-interface/PromptItem.svelte";
   import { EventName, ScreenName } from "$types/Posthog";
   import { posthogClientCapture } from "$utils/posthogClient";
+  import { log } from "node_modules/astro/dist/core/logger/core";
 
   const t = useTranslations();
 
@@ -89,6 +91,8 @@
   let selectedModel: PromptModel = $state(PromptModel.OpenAI);
   let isDisableSelectModel: boolean = $state(false);
   let currentMessage = $state("");
+  let thinkingMessage = $state("");
+  let cotMessage = $state("");
   let currentStreamingImageUrl: string = $state("");
   let isFetching: boolean = $state(false);
   let isGenerating: boolean = $state(false);
@@ -193,8 +197,10 @@
 
     if (isResponseModel) {
       payload.previousResponseId = previousResponseId;
-      payload.reasoningEffort = ReasoningEffortOption.Low;
-      payload.verbosity = TextVerbosityOption.Low;
+      payload.reasoningEffort =
+        selectedPrompt?.reasoningEffort || ReasoningEffortOption.None;
+      payload.verbosity =
+        selectedPrompt?.textVerbosity || TextVerbosityOption.Low;
     } else {
       payload.messageHistory = $sharedMessageHistory;
     }
@@ -447,10 +453,18 @@
 
       case "reasoning":
         isResoningThingking = true;
+        const cotChunkMessage = data?.content?.[0]?.text;
+        if (cotChunkMessage) {
+          cotMessage += cotChunkMessage;
+          thinkingMessage = getLatestMarkdownHeader(cotMessage);
+        }
         break;
 
       case "chunk":
+        console.log("HOME - Summary Detailed", cotMessage);
         isResoningThingking = false;
+        cotMessage = "";
+        thinkingMessage = "";
         handleChunkEvent(data, state);
         break;
 
@@ -806,6 +820,7 @@
       {isFetching}
       {isGenerating}
       {isResoningThingking}
+      {thinkingMessage}
       promptResultTrackging={{
         page_name: ScreenName.Home,
         use_case: selectedPrompt?.title || "-",
