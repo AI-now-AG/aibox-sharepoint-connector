@@ -1709,7 +1709,7 @@
 
           <!-- Text Improvement Completion Warning -->
           <!-- Only show for partial failures (1-79%). Complete failures (0%) or success (≥80%) don't show warning -->
-          {#if isTranscipted && !isTranscribing && improvementStats && typeof improvementStats.completionPercentage === 'number' && improvementStats.totalSentences > 0 && improvementStats.completionPercentage > 0 && improvementStats.completionPercentage < 80}
+          {#if isTranscipted && !isTranscribing && improvementStats && typeof improvementStats.completionPercentage === 'number' && improvementStats.totalSentences > 0 && improvementStats.completionPercentage >= 0 && improvementStats.completionPercentage < 80}
             <div class="px-4 pb-4 pt-0">
               <div role="alert" class="alert alert-warning">
                 <svg xmlns="http://www.w3.org/2000/svg"
