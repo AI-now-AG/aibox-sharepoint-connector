@@ -668,6 +668,10 @@
   "subscription.country.at": "Austria",
   "tenant.comment": "Comment",
   "transcription.warning.improvement-incomplete": "Text Improvement Incomplete",
-  "transcription.warning.improvement-incomplete-details": "Only {completionPercentage}% of sentences were successfully improved ({improvedSentences} out of {totalSentences} sentences). Some sentences may retain their original transcription quality.",
-  "prompt-execution.reasoning-effort.level-none": "No reasoning (instant response)"
+  "transcription.warning.improvement-incomplete-details": "Only ${completionPercentage}% of sentences were successfully improved (${improvedSentences} out of ${totalSentences} sentences). Some sentences may retain their original transcription quality.",
+  "prompt-execution.reasoning-effort.level-none": "No reasoning (instant response)",
+  "nav.create-image.nano-banana-pro": "Nano Banana Pro",
+  "create-image.create-nano-banana-pro-image-title": "Create Nano Banana Pro Image",
+  "create-image.create-nano-banana-pro-image-description": "Create images from the latest and most popular model from Gemini",
+  "tenant.image-creation.nano-banana-pro": "Nano Banana Pro"
 }

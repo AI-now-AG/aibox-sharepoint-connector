@@ -668,6 +668,10 @@
   "subscription.country.at": "Österreich",
   "tenant.comment": "Kommentar",
   "transcription.warning.improvement-incomplete": "Textverbesserung unvollständig",
-  "transcription.warning.improvement-incomplete-details": "Nur {completionPercentage}% der Sätze wurden erfolgreich verbessert ({improvedSentences} von {totalSentences} Sätzen). Einige Sätze behalten möglicherweise ihre ursprüngliche Transkriptionsqualität.",
-  "prompt-execution.reasoning-effort.level-none": "Kein Nachdenken (sofortige Antwort)"
+  "transcription.warning.improvement-incomplete-details": "Nur ${completionPercentage}% der Sätze wurden erfolgreich verbessert (${improvedSentences} von ${totalSentences} Sätzen). Einige Sätze behalten möglicherweise ihre ursprüngliche Transkriptionsqualität.",
+  "prompt-execution.reasoning-effort.level-none": "Kein Nachdenken (sofortige Antwort)",
+  "nav.create-image.nano-banana-pro": "Nano Banana Pro",
+  "create-image.create-nano-banana-pro-image-title": "Bilder mit Nano Banana Pro erstellen",
+  "create-image.create-nano-banana-pro-image-description": "Erstelle Bilder mit dem neuesten und beliebtesten Modell von Gemini",
+  "tenant.image-creation.nano-banana-pro": "Nano Banana Pro"
 }
