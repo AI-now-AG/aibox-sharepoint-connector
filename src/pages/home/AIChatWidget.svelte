@@ -103,7 +103,8 @@
   const apiProvider = apiKeyProviders?.find((item: any) => {
     return item.default && item.active;
   });
-  let isDisableFileInput = $state(apiProvider?.name == PromptModel.Perplexity);
+  //let isDisableFileInput = $state(apiProvider?.name == PromptModel.Perplexity);
+  let isDisableFileInput = $state(false);
 
   const providerInfo = useProviderInfo($tenant);
 
@@ -113,9 +114,9 @@
 
   $effect(() => {
     isDisableSelectModel = $sharedMessageHistory.length > 0 || isFetching;
-    isDisableFileInput =
-      selectedModel === PromptModel.Perplexity ||
-      selectedPrompt?.model === PromptModel.Perplexity;
+    // isDisableFileInput =
+    //   selectedModel === PromptModel.Perplexity ||
+    //   selectedPrompt?.model === PromptModel.Perplexity;
   });
 
   // === Derived State ===
