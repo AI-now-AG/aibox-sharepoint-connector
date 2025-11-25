@@ -35,6 +35,7 @@ export enum ScreenName {
   GptImageGeneration = 'gpt_image_generation',
   FluxImageGeneration = 'flux_image_generation',
   NanoBananaImageGeneration = 'nano_banana_image_generation',
+  NanoBananaProImageGeneration = 'nano_banana_pro_image_generation',
   CreateOrUpdateKnowledgeBase = 'create_or_update_knowledge_base',
   CreateOrUpdateCategory = 'create_or_update_category',
   CreateOrUpdateAudioInstruction = 'create_or_update_audio_instruction',

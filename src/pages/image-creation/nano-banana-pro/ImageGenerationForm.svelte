@@ -10,9 +10,9 @@
   import MessageList from "$components/chat-ui/MessageList.svelte";
   import { tenant, user } from "$stores";
   import {
-    nanoBananaImageMessageHistory,
-    nanoBananaImageFiles,
-  } from "$stores/nanoBananaImageMessageHistory";
+    nanoBananaProImageMessageHistory,
+    nanoBananaProImageFiles,
+  } from "$stores/nanoBananaProImageMessageHistory";
   import {
     markdownToHtml,
     stripMarkdownFormatting,
@@ -59,14 +59,14 @@
 
   // Restore files on mount
   onMount(() => {
-    if ($nanoBananaImageFiles && $nanoBananaImageFiles.length > 0) {
-      files = [...$nanoBananaImageFiles];
+    if ($nanoBananaProImageFiles && $nanoBananaProImageFiles.length > 0) {
+      files = [...$nanoBananaProImageFiles];
     }
   });
 
   // Save files whenever they change
   $effect(() => {
-    $nanoBananaImageFiles = files;
+    $nanoBananaProImageFiles = files;
   });
 
   // === API Configuration ===
@@ -86,12 +86,12 @@
     const payload: RequestPayload = {
       tenantId: $tenant?._id?.toString()!,
       provider: ApiKeyProvider.Gemini,
-      model: ModelName.Gemini25FlashImage,
+      model: ModelName.Gemini3ProImage,
       prompt: input || promptForAttachedFilesOnly,
       stream: true,
       fileUrls,
       tool: PromptToolOption.Image,
-      messageHistory: $nanoBananaImageMessageHistory,
+      messageHistory: $nanoBananaProImageMessageHistory,
     };
 
     return payload;
@@ -140,8 +140,8 @@
         currentStreamingImageUrl = formattedUrl;
 
         posthogClientCapture($tenant, EventName.AiboxImageCreated, {
-          page_name: ScreenName.NanoBananaImageGeneration,
-          model: ModelName.Gemini25FlashImage,
+          page_name: ScreenName.NanoBananaProImageGeneration,
+          model: ModelName.Gemini3ProImage,
         });
       }
     }
@@ -189,7 +189,7 @@
       content: requestBody.prompt,
       fileUrls: fileUrls,
     };
-    nanoBananaImageMessageHistory.update((messages) => [
+    nanoBananaProImageMessageHistory.update((messages) => [
       ...messages,
       newUserMessage,
     ]);
@@ -221,7 +221,7 @@
       content: requestBody.prompt,
       fileUrls: fileUrls,
     };
-    nanoBananaImageMessageHistory.update((messages) => [
+    nanoBananaProImageMessageHistory.update((messages) => [
       ...messages,
       errorUserMessage,
     ]);
@@ -230,7 +230,7 @@
       role: MessageRole.Assistant,
       content: errorMessage,
     };
-    nanoBananaImageMessageHistory.update((messages) => [
+    nanoBananaProImageMessageHistory.update((messages) => [
       ...messages,
       failedMessage,
     ]);
@@ -252,7 +252,7 @@
       imageUrl,
     };
 
-    nanoBananaImageMessageHistory.update((messages) => [
+    nanoBananaProImageMessageHistory.update((messages) => [
       ...messages,
       newAssistantMessage,
     ]);
@@ -476,8 +476,8 @@
     input = "";
     files = [];
     isFetching = false;
-    $nanoBananaImageMessageHistory = [];
-    $nanoBananaImageFiles = [];
+    $nanoBananaProImageMessageHistory = [];
+    $nanoBananaProImageFiles = [];
 
     window.scrollTo({
       top: 0,
@@ -491,12 +491,14 @@
     <h1 class="pt-2 mb-2 lg:pt-8 text-4xl font-bold">
       {t("create-image.create-nano-banana-pro-image-title")}
     </h1>
-    <p class="m-0">{t("create-image.create-nano-banana-pro-image-description")}</p>
+    <p class="m-0">
+      {t("create-image.create-nano-banana-pro-image-description")}
+    </p>
 
     <!-- Output (Follow-Up) -->
-    {#if $nanoBananaImageMessageHistory.length > 0}
+    {#if $nanoBananaProImageMessageHistory.length > 0}
       <MessageList
-        messages={$nanoBananaImageMessageHistory}
+        messages={$nanoBananaProImageMessageHistory}
         {isFetching}
         {isGenerating}
         {currentMessage}
@@ -506,10 +508,10 @@
 
     <!-- Prompt Textarea -->
     <div
-      class={`mt-8  ${$nanoBananaImageMessageHistory.length > 0 ? "sticky bottom-0 bg-base-200" : ""}`}
+      class={`mt-8  ${$nanoBananaProImageMessageHistory.length > 0 ? "sticky bottom-0 bg-base-200" : ""}`}
       transition:slide={{ duration: 500 }}
     >
-      {#if $nanoBananaImageMessageHistory.length > 0}
+      {#if $nanoBananaProImageMessageHistory.length > 0}
         <div class="my-4">
           <button
             onclick={startNewChat}
@@ -527,15 +529,15 @@
         bind:input
         bind:files
         {isFetching}
-        stickyFooter={$nanoBananaImageMessageHistory.length > 0}
+        stickyFooter={$nanoBananaProImageMessageHistory.length > 0}
         onsend={submitForm}
       />
     </div>
 
     <!-- Output (Normal) -->
-    {#if $nanoBananaImageMessageHistory.length == 0}
+    {#if $nanoBananaProImageMessageHistory.length == 0}
       <MessageList
-        messages={$nanoBananaImageMessageHistory}
+        messages={$nanoBananaProImageMessageHistory}
         {isFetching}
         {isGenerating}
         {currentMessage}

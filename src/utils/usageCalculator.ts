@@ -63,6 +63,7 @@ const REQUEST_CREDIT_MAPPING: Record<string, number> = {
   [ModelName.Sonar]: 12,
   [ModelName.Gemini25Flash]: 2,
   [ModelName.Gemini25FlashImage]: 2,
+  [ModelName.Gemini3ProImage]: 2,
   [ModelName.Gpt4o]: 10,
   [ModelName.Gpt5]: 10,
 };
@@ -545,18 +546,33 @@ const _calculateGeminiUsage = (
     ),
   });
 
-  // GPT Image
+  // Gemini 2.5 Flash Image
   const geminiImageItems = usageData.filter(
     (item: UsageLog) => { return item.model == ModelName.Gemini25FlashImage && item.type == "image" },
   );
   const geminiImageRequests = geminiImageItems.length;
   usageItems.push({
-    model: "gemini Image",
+    model: "gemini 2.5 Flash Image",
     amount: geminiImageRequests,
     unit: unitLabels.images,
     credits: _requestsToCredits(
       ModelName.Gemini25FlashImage,
       geminiImageRequests
+    ),
+  });
+
+  // Gemini 3.0 Pro Image
+  const gemini3ProImageItems = usageData.filter(
+    (item: UsageLog) => { return item.model == ModelName.Gemini3ProImage && item.type == "image" },
+  );
+  const gemini3ProImageRequests = gemini3ProImageItems.length;
+  usageItems.push({
+    model: "gemini 3 Pro Image",
+    amount: gemini3ProImageRequests,
+    unit: unitLabels.images,
+    credits: _requestsToCredits(
+      ModelName.Gemini3ProImage,
+      gemini3ProImageRequests
     ),
   });
 
