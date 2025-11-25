@@ -374,32 +374,16 @@ export function isHtmlContentEmpty(html: string): boolean {
   return clean === "" || clean === "<p></p>" || clean === "<p><br></p>";
 }
 
+export function getLatestMarkdownHeader(text: string) {
+  // Match **some content** where "some content" does not contain newlines
+  const regex = /\*\*(.*?)\*\*/g;
 
-export /**
- * Return the *latest* markdown header of the form **content**
- * - Supports content that spans newlines.
- * - If a closing `**` hasn't arrived yet, returns the content after the last `**` (partial header).
- * - Returns null if there is no `**` at all.
- */
-  function getLatestMarkdownHeader(text: string): string {
-  // Match ** ... ** with dot matching newlines
-  const closedRegex = /\*\*([\s\S]*?)\*\*/g;
+  let match;
+  let lastHeader = "";
 
-  let match: RegExpExecArray | null;
-  let lastClosed: string | null = null;
-
-  // Find all closed matches; keep the last one
-  while ((match = closedRegex.exec(text)) !== null) {
-    lastClosed = match[1];
-  }
-  if (lastClosed !== null) return lastClosed.trim();
-
-  // No closed match found — check for an opening '**' (partial header)
-  const lastOpen = text.lastIndexOf("**");
-  if (lastOpen !== -1) {
-    // return everything after the last '**' as the current partial header
-    return text.slice(lastOpen + 2).trim();
+  while ((match = regex.exec(text)) !== null) {
+    lastHeader = match[1].trim(); // capture group 1
   }
 
-  return "";
+  return lastHeader;
 }
