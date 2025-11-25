@@ -186,12 +186,9 @@
   async function copyTextToClipboard(content: string, index: number) {
     marked.setOptions({ breaks: true });
     const html = await marked.parse(content);
-    console.log("Original HTML content:\n", html);
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
     const text = extractTextWithStructure(doc.body).trim();
-    console.log("------------------------------------------------");
-    console.log("Extracted plain text with structure:\n", text);
 
     try {
       await navigator.clipboard.writeText(text);
@@ -579,7 +576,7 @@
                 <div class="card mt-2 gap-4 min-h-[50vh]" transition:fade>
                   {#if isFetching}
                     <div
-                      class="chat-bubble bg-base-100 text-base-content flex flex-row"
+                      class="chat-bubble bg-base-100 text-base-content flex flex-row items-center justify-center"
                     >
                       <span
                         id="thinking-indicator"
@@ -587,13 +584,10 @@
                       ></span>
                       {#if isResoningThingking}
                         <span class="ml-2"
-                          >{t("prompt-execution.thinking")}
+                          >{thinkingMessage
+                            ? thinkingMessage + "..."
+                            : t("prompt-execution.thinking")}
                         </span>
-                        {#if thinkingMessage}
-                          <span class="text-blue-600 ml-2"
-                            >{@html markdownToHtml(thinkingMessage)}</span
-                          >
-                        {/if}
                       {/if}
                     </div>
                   {/if}
