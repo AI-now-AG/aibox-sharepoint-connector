@@ -186,12 +186,9 @@
   async function copyTextToClipboard(content: string, index: number) {
     marked.setOptions({ breaks: true });
     const html = await marked.parse(content);
-    console.log("Original HTML content:\n", html);
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
     const text = extractTextWithStructure(doc.body).trim();
-    console.log("------------------------------------------------");
-    console.log("Extracted plain text with structure:\n", text);
 
     try {
       await navigator.clipboard.writeText(text);
