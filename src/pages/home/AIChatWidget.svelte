@@ -461,7 +461,6 @@
         break;
 
       case "chunk":
-        console.log("HOME - Summary Detailed", cotMessage);
         isResoningThingking = false;
         cotMessage = "";
         thinkingMessage = "";
