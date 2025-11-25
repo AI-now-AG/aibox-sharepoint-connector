@@ -24,7 +24,6 @@ export const sendPasswordResetEmail = async (userId: string, email: string) => {
       to: email,
       templateId: SG_PASSWORD_RESET_TEMPLATE,
       dynamicTemplateData: {
-        email,
         url: ticket,
       },
     });
