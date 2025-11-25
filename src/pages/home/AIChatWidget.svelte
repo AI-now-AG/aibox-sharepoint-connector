@@ -196,8 +196,10 @@
 
     if (isResponseModel) {
       payload.previousResponseId = previousResponseId;
-      payload.reasoningEffort = ReasoningEffortOption.None;
-      payload.verbosity = TextVerbosityOption.Low;
+      payload.reasoningEffort =
+        selectedPrompt?.reasoningEffort || ReasoningEffortOption.None;
+      payload.verbosity =
+        selectedPrompt?.textVerbosity || TextVerbosityOption.Low;
     } else {
       payload.messageHistory = $sharedMessageHistory;
     }
