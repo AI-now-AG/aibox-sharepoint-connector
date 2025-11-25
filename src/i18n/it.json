@@ -666,5 +666,7 @@
   "subscription.country.de": "Germany",
   "subscription.country.at": "Austria",
   "tenant.comment": "Comment",
+  "transcription.warning.improvement-incomplete": "Text Improvement Incomplete",
+  "transcription.warning.improvement-incomplete-details": "Only ${completionPercentage}% of sentences were successfully improved (${improvedSentences} out of ${totalSentences} sentences). Some sentences may retain their original transcription quality.",
   "prompt-execution.reasoning-effort.level-none": "No reasoning (instant response)"
 }

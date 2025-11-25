@@ -666,5 +666,7 @@
   "subscription.country.de": "Deutschland",
   "subscription.country.at": "Österreich",
   "tenant.comment": "Kommentar",
+  "transcription.warning.improvement-incomplete": "Textverbesserung unvollständig",
+  "transcription.warning.improvement-incomplete-details": "Nur ${completionPercentage}% der Sätze wurden erfolgreich verbessert (${improvedSentences} von ${totalSentences} Sätzen). Einige Sätze behalten möglicherweise ihre ursprüngliche Transkriptionsqualität.",
   "prompt-execution.reasoning-effort.level-none": "Kein Nachdenken (sofortige Antwort)"
 }
