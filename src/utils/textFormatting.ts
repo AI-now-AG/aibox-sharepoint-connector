@@ -374,16 +374,28 @@ export function isHtmlContentEmpty(html: string): boolean {
   return clean === "" || clean === "<p></p>" || clean === "<p><br></p>";
 }
 
-export function getLatestMarkdownHeader(text: string) {
-  // Match **some content** where "some content" does not contain newlines
-  const regex = /\*\*(.*?)\*\*/g;
+export function getLatestMarkdownHeader(text: string): string {
+  // Match **content** with content allowed to span across newlines
+  const closedRegex = /\*\*([\s\S]*?)\*\*/g;
 
-  let match;
-  let lastHeader = "";
+  let match: RegExpExecArray | null;
+  let lastClosedHeader = "";
 
-  while ((match = regex.exec(text)) !== null) {
-    lastHeader = match[1].trim(); // capture group 1
+  // Find the last fully closed header
+  while ((match = closedRegex.exec(text)) !== null) {
+    lastClosedHeader = match[1].trim();
   }
 
-  return lastHeader;
+  if (lastClosedHeader) {
+    return lastClosedHeader;
+  }
+
+  // If no closed header exists, check for a partial opening `**`
+  const lastOpenIndex = text.lastIndexOf("**");
+  if (lastOpenIndex !== -1) {
+    const partial = text.slice(lastOpenIndex + 2).trim();
+    return partial; // may be empty, caller decides if to show
+  }
+
+  return "";
 }
