@@ -84,6 +84,7 @@
   "prompt-execution.upload-file.supportted-files": "PDF, JSON, TXT, PNG, SVG, JPEG",
   "prompt-execution.upload-file.maximum-size": "max. file size: 5 MB",
   "prompt-execution.upload-file.exceed-5mb-size-limit": "File size exceeds the 5 MB limit. Please upload a file smaller than 5 MB",
+  "prompt-execution.upload-file.max-size-exceeded": "File size exceeds the ${size} limit. Please upload a smaller file",
   "prompt-emptyscreen.description": "Get started with predefined use cases below.",
   "prompt-emptyscreen.nousecase": "No Assistants available",
   "prompt-emptyscreen.create.usecaseLbl": "Get started by creating a new Assistant for this use case",
@@ -666,5 +667,11 @@
   "subscription.country.de": "Germany",
   "subscription.country.at": "Austria",
   "tenant.comment": "Comment",
-  "prompt-execution.reasoning-effort.level-none": "No reasoning (instant response)"
+  "transcription.warning.improvement-incomplete": "Text Improvement Incomplete",
+  "transcription.warning.improvement-incomplete-details": "Only {completionPercentage}% of sentences were successfully improved ({improvedSentences} out of {totalSentences} sentences). Some sentences may retain their original transcription quality.",
+  "prompt-execution.reasoning-effort.level-none": "No reasoning (instant response)",
+  "nav.create-image.nano-banana-pro": "Nano Banana Pro",
+  "create-image.create-nano-banana-pro-image-title": "Create Nano Banana Pro Image",
+  "create-image.create-nano-banana-pro-image-description": "Create images from the latest and most popular model from Gemini",
+  "tenant.image-creation.nano-banana-pro": "Nano Banana Pro"
 }

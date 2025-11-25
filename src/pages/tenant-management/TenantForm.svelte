@@ -129,6 +129,7 @@
   let dalleEnabled: boolean = $state(false);
   let gptImageEnabled: boolean = $state(false);
   let nanoBananaImageEnabled: boolean = $state(false);
+  let nanoBananaProImageEnabled: boolean = $state(false);
   let fluxEnabled: boolean = $state(false);
   let claudeEnabled: boolean = $state(false);
   let geminiEnabled: boolean = $state(false);
@@ -307,6 +308,12 @@
       (item: any) =>
         item.name == TenantFeature.CreateImage &&
         item.provider == ApiKeyProvider.Gemini,
+    );
+
+    nanoBananaProImageEnabled = tenantData.included_features?.some(
+      (item: any) =>
+        item.name == TenantFeature.CreateImage &&
+        item.provider == ApiKeyProvider.GeminiPro,
     );
 
     fluxEnabled = tenantData.included_features?.some(
@@ -658,6 +665,13 @@
           });
         }
 
+        if (nanoBananaProImageEnabled) {
+          tenantData.included_features.push({
+            name: TenantFeature.CreateImage,
+            provider: ApiKeyProvider.GeminiPro,
+          });
+        }
+
         if (tenantAdminEmail && isValidEmail(tenantAdminEmail)) {
           tenantData.tenant_admin_email = tenantAdminEmail;
         }
@@ -810,6 +824,13 @@
           tenantData.included_features.push({
             name: TenantFeature.CreateImage,
             provider: ApiKeyProvider.Gemini,
+          });
+        }
+
+        if (nanoBananaProImageEnabled) {
+          tenantData.included_features.push({
+            name: TenantFeature.CreateImage,
+            provider: ApiKeyProvider.GeminiPro,
           });
         }
 
@@ -2219,9 +2240,8 @@
 
     <div class="container mx-auto">
       <!-- DALL-E (Open AI) Section -->
-      <div class="collapse bg-base-100 shadow-sm rounded-lg mb-4">
-        <input type="checkbox" />
-        <div class="collapse-title flex items-center justify-between gap-4">
+      <div class="p-4 bg-base-100 shadow-sm rounded-lg mb-4">
+        <div class="flex items-center justify-between gap-4">
           <div class="flex items-center">
             <input
               id="image-dalle-model"
@@ -2237,6 +2257,7 @@
           </div>
         </div>
       </div>
+
       <!-- Flux -->
       <div
         class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
@@ -2294,10 +2315,10 @@
           </div>
         </div>
       </div>
+
       <!-- GPT Image Section -->
-      <div class="collapse bg-base-100 shadow-sm rounded-lg mb-4">
-        <input type="checkbox" />
-        <div class="collapse-title flex items-center justify-between gap-4">
+      <div class="p-4  bg-base-100 shadow-sm rounded-lg mb-4">
+        <div class="flex items-center justify-between gap-4">
           <div class="flex items-center">
             <input
               id="gpt-image-model"
@@ -2315,9 +2336,8 @@
       </div>
 
       <!-- Gemini Nano Banana Image Section -->
-      <div class="collapse bg-base-100 shadow-sm rounded-lg mb-4">
-        <input type="checkbox" />
-        <div class="collapse-title flex items-center justify-between gap-4">
+      <div class="p-4 bg-base-100 shadow-sm rounded-lg mb-4">
+        <div class="flex items-center justify-between gap-4">
           <div class="flex items-center">
             <input
               id="nano-banana-image-model"
@@ -2331,6 +2351,28 @@
             >
               <span class="label-text text-base-content"
                 >{t("tenant.image-creation.nano-banana")}</span
+              >
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gemini Nano Banana Pro Image Section -->
+      <div class="p-4 bg-base-100 shadow-sm rounded-lg mb-4">
+        <div class="flex items-center justify-between gap-4">
+          <div class="flex items-center">
+            <input
+              id="nano-banana-pro-image-model"
+              type="checkbox"
+              bind:checked={nanoBananaProImageEnabled}
+              class="checkbox checkbox-primary z-10"
+            />
+            <label
+              class="label cursor-pointer ml-2"
+              for="nano-banana-pro-image-model"
+            >
+              <span class="label-text text-base-content"
+                >{t("tenant.image-creation.nano-banana-pro")}</span
               >
             </label>
           </div>
