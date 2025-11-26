@@ -51,34 +51,6 @@
     });
   }
 
-  function pickEmoji(tag: TagItem) {
-    const emoji = prompt("Enter emoji:");
-    if (!emoji) return;
-    tag.icon = emoji;
-    updateTag(tag);
-  }
-
-  function pickImage(tag: TagItem) {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "image/*";
-
-    input.onchange = async (e: Event) => {
-      const target = e.target as HTMLInputElement | null;
-      const file = target?.files?.[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = () => {
-        tag.icon = reader.result as string; // base64 result
-        updateTag(tag);
-      };
-      reader.readAsDataURL(file);
-    };
-
-    input.click();
-  }
-
   let iconPickerDialog: HTMLDialogElement;
   let selectedTag: TagItem | null = null;
 
