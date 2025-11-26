@@ -1,4 +1,4 @@
-import type { APIContext, APIRoute } from "astro";
+import type { APIRoute } from "astro";
 import { z } from "zod";
 import GlobalTagModel, { type Tag } from "$data/models/globalTag.model";
 
@@ -15,8 +15,7 @@ const TagParamsSchema = z.object({
 
 export type TagParams = z.infer<typeof TagParamsSchema>;
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const GET: APIRoute = async (ctx: APIContext) => {
+export const GET: APIRoute = async () => {
   try {
     const tags = await GlobalTagModel.list();
     return new Response(

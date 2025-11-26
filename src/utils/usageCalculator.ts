@@ -31,7 +31,7 @@ const unitLabels: Record<string, string> = {
  *  Example:
  *      + OpenAI gpt-4o: 40000 input tokens = 1 request
  *      + OpenAI gpt-4o: 10000 output tokens = 1 request
- *  *   + OpenAI gpt-5: 80000 input tokens = 1 request
+ *      + OpenAI gpt-5: 80000 input tokens = 1 request
  *      + OpenAI gpt-5: 10000 output tokens = 1 request
  */
 const TOKEN_CREDIT_MAPPING: Record<string, TokenCreditRate> = {
@@ -239,50 +239,98 @@ const _calculateOpenAIGpt5Usage = (
     return item.provider == ApiKeyProvider.OpenAIGpt5;
   });
 
-  // gpt-5
-  const gpt5Items = usageData.filter(
-    (item: UsageLog) => item.model == ModelName.Gpt5,
+  // // gpt-5
+  // const gpt5Items = usageData.filter(
+  //   (item: UsageLog) => item.model == ModelName.Gpt5Old,
+  // );
+  // const gpt5InputTokens = gpt5Items.reduce(
+  //   (sum: number, item: UsageLog) => sum + (item.input_tokens ?? 0),
+  //   0,
+  // );
+  // const gpt5OutputTokens = gpt5Items.reduce(
+  //   (sum: number, item: UsageLog) => sum + (item.output_tokens ?? 0),
+  //   0,
+  // );
+  // const { inputCredits: gpt5InputCredits, outputCredits: gpt5OutputCredits } =
+  //   _tokensToCredits(
+  //     ApiKeyProvider.OpenAIGpt5,
+  //     gpt5InputTokens,
+  //     gpt5OutputTokens,
+  //   );
+  // usageItems.push({
+  //   model: "gpt-5 Input",
+  //   amount: gpt5InputTokens,
+  //   unit: unitLabels.tokens,
+  //   credits: gpt5InputCredits,
+  // });
+  // usageItems.push({
+  //   model: "gpt-5 Output",
+  //   amount: gpt5OutputTokens,
+  //   unit: unitLabels.tokens,
+  //   credits: gpt5OutputCredits,
+  // });
+
+  // const openAiWebsearchRequests = gpt5Items.reduce(
+  //   (sum: number, item: UsageLog) =>
+  //     sum + (item.metadata?.websearch_count ?? 0),
+  //   0,
+  // );
+
+  // usageItems.push({
+  //   model: "gpt-5 Websearch",
+  //   amount: openAiWebsearchRequests,
+  //   unit: unitLabels.requests,
+  //   credits: _requestsToCredits(
+  //     ModelName.Gpt5,
+  //     openAiWebsearchRequests,
+  //   ),
+  // });
+
+
+  // gpt-5.1
+  const gpt51Items = usageData.filter(
+    (item: UsageLog) => item.model == ModelName.Gpt5 || item.model == ModelName.Gpt5Old,
   );
-  const gpt5InputTokens = gpt5Items.reduce(
+  const gpt51InputTokens = gpt51Items.reduce(
     (sum: number, item: UsageLog) => sum + (item.input_tokens ?? 0),
     0,
   );
-  const gpt5OutputTokens = gpt5Items.reduce(
+  const gpt51OutputTokens = gpt51Items.reduce(
     (sum: number, item: UsageLog) => sum + (item.output_tokens ?? 0),
     0,
   );
-  const { inputCredits: gpt4oInputCredits, outputCredits: gpt4oOutputCredits } =
+  const { inputCredits: gpt51InputCredits, outputCredits: gpt51OutputCredits } =
     _tokensToCredits(
       ApiKeyProvider.OpenAIGpt5,
-      gpt5InputTokens,
-      gpt5OutputTokens,
+      gpt51InputTokens,
+      gpt51OutputTokens,
     );
   usageItems.push({
-    model: "gpt-5 Input",
-    amount: gpt5InputTokens,
+    model: "gpt-5.1 Input",
+    amount: gpt51InputTokens,
     unit: unitLabels.tokens,
-    credits: gpt4oInputCredits,
+    credits: gpt51InputCredits,
   });
   usageItems.push({
-    model: "gpt-5 Output",
-    amount: gpt5OutputTokens,
+    model: "gpt-5.1 Output",
+    amount: gpt51OutputTokens,
     unit: unitLabels.tokens,
-    credits: gpt4oOutputCredits,
+    credits: gpt51OutputCredits,
   });
 
-  const openAiWebsearchRequests = gpt5Items.reduce(
+  const openAi51WebsearchRequests = gpt51Items.reduce(
     (sum: number, item: UsageLog) =>
       sum + (item.metadata?.websearch_count ?? 0),
     0,
   );
 
   usageItems.push({
-    model: "gpt-5 Websearch",
-    amount: openAiWebsearchRequests,
+    model: "gpt-5.1 Websearch",
+    amount: openAi51WebsearchRequests,
     unit: unitLabels.requests,
     credits: _requestsToCredits(
       ModelName.Gpt5,
-      openAiWebsearchRequests,
+      openAi51WebsearchRequests,
     ),
   });
 
@@ -628,7 +676,7 @@ export const calculateUsage = (tenant: Tenant, rawUsages: UsageLog[]) => {
   const useOpenAIGpt5PrivateKey =
     tenant.metadata?.openaiGpt5PrivateKeyEnabled ?? false;
   usageData.push({
-    provider: "OpenAI GPT-5",
+    provider: "OpenAI GPT-5.1",
     details: _calculateOpenAIGpt5Usage(rawUsages, useOpenAIGpt5PrivateKey),
   });
 

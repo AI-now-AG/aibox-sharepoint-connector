@@ -41,6 +41,8 @@ export enum ScreenName {
   BillingUsage = 'billing_usage',
   AddPromptDialog = 'add_prompt_dialog',
   EditPromptDialog = 'edit_prompt_dialog',
+  AudioToText = 'audio_to_text',
+  SubtitleGeneration = 'subtitle_generation',
   OnboardingStep1 = 'onboarding_step_1',
   OnboardingStep2 = 'onboarding_step_2',
   OnboardingStep3 = 'onboarding_step_3',

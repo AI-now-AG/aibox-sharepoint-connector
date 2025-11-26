@@ -11,7 +11,7 @@ import ConversationModel, {
 import "$styles/global.css";
 
 import { useTranslations } from "$i18n/utils";
-import { isSocialConnection } from "$utils/auth0";
+//import { isSocialConnection } from "$utils/auth0";
 import { transformRawData } from "$utils/transformRawData";
 import { cached } from "$utils/cache";
 
@@ -44,10 +44,10 @@ switch (Astro.locals.user?.tenant_id?.toString()) {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const { user, tenant, locale } = Astro.locals;
+const { user, tenant } = Astro.locals;
 const userInfo = { ...user, id: user.id?.toString() };
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const isSocialAuth = isSocialConnection(userInfo?.auth0_sub);
+//const isSocialAuth = isSocialConnection(userInfo?.auth0_sub);
 
 const conversations = await cached(
   `conversations:${Astro.locals.user.tenant_id}`,
