@@ -16,7 +16,7 @@
     selectedCategories = $bindable([]),
   }: Props = $props();
 
-  const defaultTagIconColor = "#291981";
+  const defaultTagIconColor = "#491EFF";
   const defaultTagEmoij = "🇨🇭";
 
   // categories for selected tag
@@ -77,7 +77,7 @@
       >
         <div class="flex items-center gap-3">
           <div
-            class="w-10 h-10 flex items-center justify-center rounded-lg"
+            class="flex w-10 h-10 flex items-center justify-center rounded-lg"
             style={`color:${tag.iconColor || defaultTagIconColor}; background:${bgOpacity(tag.iconColor || defaultTagIconColor)}`}
           >
             {#if tag.icon}
@@ -97,22 +97,23 @@
             {/if}
           </div>
 
-          <div class="font-semibold text-[15px] text-gray-900 leading-tight">
+          <div
+            class="flex-1 font-semibold text-[15px] text-gray-900 leading-tight"
+          >
             {tag.title}
           </div>
+          {#if selectedTag === tag.value}
+            <div
+              class="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-xs"
+            >
+              ✓
+            </div>
+          {/if}
         </div>
 
         <div class="text-[13px] text-gray-500 mt-2 leading-snug pr-6">
           {tag.description}
         </div>
-
-        {#if selectedTag === tag.value}
-          <div
-            class="absolute top-3 right-3 w-5 h-5 rounded-full bg-[#2453FF] text-white flex items-center justify-center text-xs"
-          >
-            ✓
-          </div>
-        {/if}
       </button>
     {/each}
   </div>
