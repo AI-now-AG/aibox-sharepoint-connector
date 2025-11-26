@@ -31,7 +31,7 @@
   let backgroundColor = $state("background-color: white;");
   $effect(() => {
     if (selectedAudioOptionIds.includes(id)) {
-      backgroundColor = "background-color: #A1E1F8;";
+      backgroundColor = "background-color: #dbe9fe;";
       selected = true;
     } else {
       backgroundColor = "background-color: white;";

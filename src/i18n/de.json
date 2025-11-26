@@ -683,5 +683,7 @@
   "prompt-library.global.new-tag-title": "Neuer Tag-Titel",
   "nav.admin.assistants": "Assistentinnen",
   "nav.admin.categories": "Kategorien",
-  "nav.admin.tags": "Tags"
+  "nav.admin.tags": "Tags",
+  "subscription.choose-business-branch": "Wählen Sie Ihre Geschäftsfiliale aus",
+  "subscription.select-sub-categories-for": "Wählen Sie Unterkategorien für ${tagName} aus."
 }

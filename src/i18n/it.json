@@ -683,5 +683,7 @@
   "prompt-library.global.new-tag-title": "New tag title",
   "nav.admin.assistants": "Assistants",
   "nav.admin.categories": "Categories",
-  "nav.admin.tags": "Tags"
+  "nav.admin.tags": "Tags",
+  "subscription.choose-business-branch": "Select Your Business Branch",
+  "subscription.select-sub-categories-for": "Select Subcategories for ${tagName}"
 }
