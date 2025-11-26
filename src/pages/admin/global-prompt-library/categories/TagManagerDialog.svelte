@@ -160,7 +160,7 @@
         <input
           class="input input-sm input-bordered flex-1"
           bind:value={tag.title}
-          oninput={() => updateTag(tag)}
+          onblur={() => updateTag(tag)}
         />
 
         <!-- DESCRIPTION -->
@@ -168,7 +168,7 @@
           class="input input-sm input-bordered flex-[1.5]"
           placeholder="Description"
           bind:value={tag.description}
-          oninput={() => updateTag(tag)}
+          onblur={() => updateTag(tag)}
         />
 
         <!-- ICON PICKER -->
@@ -198,7 +198,7 @@
           type="color"
           class="w-10 h-10 rounded cursor-pointer"
           bind:value={tag.iconColor}
-          oninput={() => updateTag(tag)}
+          onblur={() => updateTag(tag)}
         />
 
         <!-- DELETE -->
