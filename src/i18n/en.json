@@ -424,7 +424,7 @@
   "subscription.organization-name": "aibox organization name ",
   "subscription.organization-name-placeholder": "Mustermann",
   "subscription.language": "Default language",
-  "subscription.choose-categories": "Chose default assistants for your aibox",
+  "subscription.choose-categories": "Chose the option that describes your organization to tailor your aibox experience",
   "subscription.validate-empty-language-message": "Please select your default language",
   "subscription.validate-empty-categories-message": "Please select your assistants",
   "subscription.creating-your-account": "We are creating your aibox organization...",
@@ -684,6 +684,6 @@
   "nav.admin.assistants": "Assistants",
   "nav.admin.categories": "Categories",
   "nav.admin.tags": "Tags",
-  "subscription.choose-business-branch": "Select Your Business Branch",
+  "subscription.choose-business-branch": "Select Your aibox template",
   "subscription.select-sub-categories-for": "Select Subcategories for ${tagName}"
 }

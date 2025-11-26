@@ -424,7 +424,7 @@
   "subscription.organization-name": "Name aibox Organisation",
   "subscription.organization-name-placeholder": "Mustermann",
   "subscription.language": "Sprache aibox",
-  "subscription.choose-categories": "Wähle den Bereich und die Assistenten für deine aibox:",
+  "subscription.choose-categories": "Wähle die Option, die deine Organisation beschreibt, um dein aibox Erlebnis anzupassen.",
   "subscription.validate-empty-language-message": "Bitte wähle deine Sprache aus",
   "subscription.validate-empty-categories-message": "Bitte wähle deine Assistenten aus",
   "subscription.creating-your-account": "Wir erstellen deine aibox Organisation...",
@@ -680,10 +680,10 @@
   "common.choose-icon": "Symbol auswählen",
   "common.choose-emoji": "Emoji auswählen",
   "common.choose-image": "Bild auswählen",
-  "prompt-library.global.new-tag-title": "Neuer Tag-Titel",
-  "nav.admin.assistants": "Assistentinnen",
+  "prompt-library.global.new-tag-title": "Neuer Tag Titel",
+  "nav.admin.assistants": "Assistenten",
   "nav.admin.categories": "Kategorien",
   "nav.admin.tags": "Tags",
-  "subscription.choose-business-branch": "Wählen Sie Ihre Geschäftsfiliale aus",
-  "subscription.select-sub-categories-for": "Wählen Sie Unterkategorien für ${tagName} aus."
+  "subscription.choose-business-branch": "Wähle deine passende aibox Vorlage",
+  "subscription.select-sub-categories-for": "Wähle die Kategorien für ${tagName} aus."
 }
