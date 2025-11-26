@@ -80,6 +80,7 @@ if (selectedTranscriptionType === TranscriptionType.Largefile) {
       transcriptionType={selectedTranscriptionType}
       folderName={Astro.locals.tenant.org_name}
       usecaseId={transcriptions?._id.toString()}
+      usecaseName={transcriptions?.name}
       category={transcriptions?.category ?? AudioCategory.AudioPro}
       
       client:load

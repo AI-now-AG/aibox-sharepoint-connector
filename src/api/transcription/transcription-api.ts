@@ -28,6 +28,12 @@ export interface TranscriptionResult {
     srt?: string;
     ass?: string;
     json?: string;
+    improvement_stats?: {
+      totalSentences: number;
+      improvedSentences: number;
+      failedSentences: number;
+      completionPercentage: number;
+    };
   };
   duration?: number;
   language?: string;

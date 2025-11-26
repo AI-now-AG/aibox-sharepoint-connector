@@ -21,6 +21,7 @@
     markdownToHtml,
     buildCitationLinks,
     stripMarkdownFormatting,
+    getLatestMarkdownHeader,
   } from "$utils/textFormatting";
   import ScrollToBottom from "$components/display/ScrollToBottom.svelte";
   import MessageInput from "$components/chat-ui/MessageInput.svelte";
@@ -91,6 +92,8 @@
 
   // === State Management ===
   let currentMessage = $state("");
+  let cotMessage = $state("");
+  let thinkingMessage = $state("");
   let currentMessageHistory = $derived(
     $messageHistories[promptId] || getMessageHistory(promptId) || [],
   );
@@ -231,7 +234,7 @@
     if (isResponseModel) {
       payload.previousResponseId = previousResponseId;
       payload.reasoningEffort =
-        currentPrompt?.reasoningEffort || ReasoningEffortOption.Low;
+        currentPrompt?.reasoningEffort || ReasoningEffortOption.None;
       payload.verbosity =
         currentPrompt?.textVerbosity || TextVerbosityOption.Low;
     } else {
@@ -487,10 +490,17 @@
 
       case "reasoning":
         isResoningThingking = true;
+        const cotChunkMessage = data?.content?.[0]?.text;
+        if (cotChunkMessage) {
+          cotMessage += cotChunkMessage;
+          thinkingMessage = getLatestMarkdownHeader(cotMessage);
+        }
         break;
 
       case "chunk":
         isResoningThingking = false;
+        cotMessage = "";
+        thinkingMessage = "";
         handleChunkEvent(data, state);
         break;
 
@@ -724,6 +734,7 @@
     {isFetching}
     {isGenerating}
     {isResoningThingking}
+    {thinkingMessage}
     promptResultTrackging={{
       page_name: ScreenName.PromptExecutionArea,
       use_case: currentPrompt?.title || "-",
@@ -780,6 +791,7 @@
     {isFetching}
     {isGenerating}
     {isResoningThingking}
+    {thinkingMessage}
     promptResultTrackging={{
       page_name: ScreenName.PromptExecutionArea,
       use_case: currentPrompt?.title || "-",

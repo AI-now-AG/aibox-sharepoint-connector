@@ -30,6 +30,7 @@
     markdownToHtml,
     buildCitationLinks,
     stripMarkdownFormatting,
+    getLatestMarkdownHeader,
   } from "$utils/textFormatting";
   import { readFileContent } from "$utils/fileReader";
   import { TRANSCRIPTION_API_URL } from "astro:env/client";
@@ -87,6 +88,8 @@
   let files: File[] = $state([]);
   let messageHistory: MessageHistory = $state(messages);
   let currentMessage = $state("");
+  let thinkingMessage = $state("");
+  let cotMessage = $state("");
   let currentStreamingImageUrl: string = $state("");
   let isFetching: boolean = $state(false);
   let isGenerating: boolean = $state(false);
@@ -213,13 +216,11 @@
 
     if (isResponseModel) {
       payload.previousResponseId = previousResponseId;
+      payload.reasoningEffort =
+        promptData?.reasoningEffort || ReasoningEffortOption.None;
+      payload.verbosity = promptData?.textVerbosity || TextVerbosityOption.Low;
     } else {
       payload.messageHistory = messageHistory;
-    }
-
-    if (isResponseModel) {
-      payload.reasoningEffort = ReasoningEffortOption.Low;
-      payload.verbosity = TextVerbosityOption.Low;
     }
 
     return payload;
@@ -458,10 +459,17 @@
 
       case "reasoning":
         isResoningThingking = true;
+        const cotChunkMessage = data?.content?.[0]?.text;
+        if (cotChunkMessage) {
+          cotMessage += cotChunkMessage;
+          thinkingMessage = getLatestMarkdownHeader(cotMessage);
+        }
         break;
 
       case "chunk":
         isResoningThingking = false;
+        cotMessage = "";
+        thinkingMessage = "";
         handleChunkEvent(data, state);
         break;
 
@@ -660,6 +668,7 @@
     {isFetching}
     {isGenerating}
     {isResoningThingking}
+    {thinkingMessage}
     updateMessageRating={(
       index: number,
       selectedRating: MessageThumbRating | null,
