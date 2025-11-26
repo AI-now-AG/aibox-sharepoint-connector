@@ -684,6 +684,6 @@
   "nav.admin.assistants": "Assistants",
   "nav.admin.categories": "Categories",
   "nav.admin.tags": "Tags",
-  "subscription.choose-business-branch": "Select Your aibox template",
+  "subscription.choose-business-branch": "Select your aibox template",
   "subscription.select-sub-categories-for": "Select Subcategories for ${tagName}"
 }

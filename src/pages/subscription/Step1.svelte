@@ -128,6 +128,7 @@
     {tags}
     {categories}
     titleAlignCenter
+    {defaultLanguage}
     bind:selectedTag
     bind:selectedCategories
   />
