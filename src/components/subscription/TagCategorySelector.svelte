@@ -82,10 +82,10 @@
                 <img src={tag.icon} alt="" class="w-6 h-6" />
               {:else}
                 <!-- Emoji -->
-                <span class="text-3xl">{tag.icon}</span>
+                <span class="text-2xl">{tag.icon}</span>
               {/if}
             {:else}
-              <span class="text-3xl">{defaultTagEmoij}</span>
+              <span class="text-2xl">{defaultTagEmoij}</span>
             {/if}
           </div>
 

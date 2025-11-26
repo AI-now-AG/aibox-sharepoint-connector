@@ -101,7 +101,7 @@ export function isValidPhone(phone: string): boolean {
 }
 
 
-export function bgOpacity(color: string, opacity = 0.6) {
+export function bgOpacity(color: string, opacity = 0.4) {
   return `${color}${Math.round(opacity * 255)
     .toString(16)
     .padStart(2, "0")}`;
