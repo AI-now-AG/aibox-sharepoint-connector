@@ -211,7 +211,7 @@ const triggerRegistrationEmail = async (
     // Send user verification email
     await sendVerificationEmail(userId, email);
   } else {
-    await sendPasswordResetEmail(email, connection);
+    await sendPasswordResetEmail(userId, email);
   }
 };
 
