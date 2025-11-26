@@ -51,6 +51,7 @@
     });
   }
 
+  let emojiDialog: HTMLDialogElement;
   let iconPickerDialog: HTMLDialogElement;
   let selectedTag: TagItem | null = null;
 
@@ -60,11 +61,7 @@
   }
 
   async function chooseEmoji() {
-    const emoji = prompt("Enter emoji:");
-    if (emoji && selectedTag) {
-      selectedTag.icon = emoji;
-      await updateTag(selectedTag);
-    }
+    emojiDialog?.showModal();
     iconPickerDialog.close();
   }
 
@@ -100,7 +97,29 @@
     await loadTags();
   }
 
-  onMount(loadTags);
+  function setupEmojiPicker() {
+    if (document) {
+      const picker = document.querySelector("emoji-picker");
+      if (picker) {
+        picker.addEventListener("emoji-click", async (event: any) => {
+          console.log((event as CustomEvent).detail);
+          const detail = (event as CustomEvent).detail;
+          const emoji = detail?.unicode || "";
+          if (emoji && selectedTag) {
+            console.log("emoji && selectedTag", emoji, selectedTag);
+            selectedTag.icon = emoji;
+            emojiDialog?.close();
+            await updateTag(selectedTag);
+          }
+        });
+      }
+    }
+  }
+
+  onMount(() => {
+    loadTags();
+    setupEmojiPicker();
+  });
 
   function cancelEdit() {
     tagDialog?.close();
@@ -223,6 +242,19 @@
       <button class="btn" onclick={() => iconPickerDialog.close()}>
         Close
       </button>
+    </div>
+  </div>
+</dialog>
+
+<!-- EMOJI PICKER MODAL -->
+<dialog bind:this={emojiDialog} class="modal">
+  <div class="modal-box max-w-sm">
+    <h3 class="font-bold text-lg mb-4">Choose Emoji</h3>
+
+    <emoji-picker class="light"></emoji-picker>
+
+    <div class="modal-action">
+      <button class="btn" onclick={() => emojiDialog.close()}> Close </button>
     </div>
   </div>
 </dialog>
