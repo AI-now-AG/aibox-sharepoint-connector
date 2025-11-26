@@ -679,5 +679,9 @@
   "common.add": "Hinzufügen",
   "common.choose-icon": "Symbol auswählen",
   "common.choose-emoji": "Emoji auswählen",
-  "common.choose-image": "Bild auswählen"
+  "common.choose-image": "Bild auswählen",
+  "prompt-library.global.new-tag-title": "Neuer Tag-Titel",
+  "nav.admin.assistants": "Assistentinnen",
+  "nav.admin.categories": "Kategorien",
+  "nav.admin.tags": "Tags"
 }

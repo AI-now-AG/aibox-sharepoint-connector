@@ -679,5 +679,9 @@
   "common.add": "Add",
   "common.choose-icon": "Choose Icon",
   "common.choose-emoji": "Choose Emoji",
-  "common.choose-image": "Choose Image"
+  "common.choose-image": "Choose Image",
+  "prompt-library.global.new-tag-title": "New tag title",
+  "nav.admin.assistants": "Assistants",
+  "nav.admin.categories": "Categories",
+  "nav.admin.tags": "Tags"
 }

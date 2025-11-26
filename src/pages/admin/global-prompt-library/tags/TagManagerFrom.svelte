@@ -5,6 +5,7 @@
   import { type TagItem } from "$types/TagInput";
   import { useTranslations } from "$i18n/utils";
   import { bgOpacity } from "$utils/common";
+  import Loading from "$components/Loading.svelte";
 
   const t = useTranslations();
 
@@ -113,96 +114,98 @@
     }
   }
 
-  function cancelEdit() {
-    navigate(window.location.href);
-  }
-
   onMount(() => {
     loadTags();
     setupEmojiPicker();
   });
 </script>
 
-<div class="w-full max-w-6xl relative">
-  <div class="flex justify-between">
-    <h3 class="text-lg font-bold py-4">
+<div
+  class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14 sticky bg-base-200 top-0 z-40"
+>
+  <div class="flex items-center pt-5 pb-2">
+    <button class="mr-4" onclick={() => window.history.back()}>
+      {@html svgIcons.back}
+    </button>
+    <h1 class="text-4xl font-bold">
       {t("prompt-library.global.manage-tags")}
-    </h3>
+    </h1>
   </div>
-
-  <div class="flex gap-2 mb-2">
-    <input
-      type="text"
-      class="input input-sm input-bordered w-full"
-      placeholder="New tag title"
-      bind:value={newTitle}
-      onkeydown={(e) => e.key === "Enter" && createTag()}
-    />
-    <button class="btn btn-sm btn-primary" onclick={createTag}
-      >{t("common.add")}</button
-    >
-  </div>
-
-  <div class="divider"></div>
-
-  {#each tags as tag (tag._id)}
-    <div class="flex items-center gap-3 mb-2">
-      <!-- TITLE -->
+</div>
+<div class="px-8 mb-10">
+  <div class="container w-full mx-auto p-6">
+    <div class="flex gap-2 mb-2">
       <input
-        class="input input-sm input-bordered flex-1"
-        bind:value={tag.title}
-        onblur={() => updateTag(tag)}
+        type="text"
+        class="input input-md input-bordered w-full"
+        placeholder={t("prompt-library.global.new-tag-title")}
+        bind:value={newTitle}
+        onkeydown={(e) => e.key === "Enter" && createTag()}
       />
+      <button class="btn btn-md btn-primary" onclick={createTag}
+        >{t("common.add")}</button
+      >
+    </div>
 
-      <!-- DESCRIPTION -->
-      <input
-        class="input input-sm input-bordered flex-[1.5]"
-        placeholder="Description"
-        bind:value={tag.description}
-        onblur={() => updateTag(tag)}
-      />
+    <div class="divider"></div>
 
-      <!-- ICON PICKER -->
-      <div class="relative flex justify-center items-center">
-        <button
-          class="btn btn-sm h-[36px] w-[36px] w-full border rounded-lg flex justify-center items-center"
-          style={`background:${bgOpacity(tag.iconColor || defaultTagIconColor)}`}
-          onclick={() => openIconPicker(tag)}
-        >
-          {#if tag.icon}
-            {#if tag.icon.startsWith("data:image")}
-              <img src={tag.icon} alt="" class="w-6 h-6 rounded object-cover" />
+    {#each tags as tag (tag._id)}
+      <div class="flex items-center gap-3 mb-2">
+        <!-- TITLE -->
+        <input
+          class="input input-md input-bordered flex-1"
+          bind:value={tag.title}
+          onblur={() => updateTag(tag)}
+        />
+
+        <!-- DESCRIPTION -->
+        <input
+          class="input input-md input-bordered flex-[1.5]"
+          placeholder="Description"
+          bind:value={tag.description}
+          onblur={() => updateTag(tag)}
+        />
+
+        <!-- ICON PICKER -->
+        <div class="relative flex justify-center items-center">
+          <button
+            class="btn btn-sm h-[36px] w-[36px] w-full border rounded-lg flex justify-center items-center"
+            style={`background:${bgOpacity(tag.iconColor || defaultTagIconColor)}`}
+            onclick={() => openIconPicker(tag)}
+          >
+            {#if tag.icon}
+              {#if tag.icon.startsWith("data:image")}
+                <img
+                  src={tag.icon}
+                  alt=""
+                  class="w-6 h-6 rounded object-cover"
+                />
+              {:else}
+                <span class="text-2xl">{tag.icon}</span>
+              {/if}
             {:else}
-              <span class="text-2xl">{tag.icon}</span>
+              <span class="text-2xl opacity-60">🇨🇭</span>
             {/if}
-          {:else}
-            <span class="text-2xl opacity-60">🇨🇭</span>
-          {/if}
+          </button>
+        </div>
+
+        <input
+          type="color"
+          class="w-10 h-10 rounded cursor-pointer"
+          bind:value={tag.iconColor}
+          onblur={() => updateTag(tag)}
+        />
+
+        <!-- DELETE -->
+        <button
+          class="btn btn-sm w-[46px] flex justify-center items-center text-red-600 hover:bg-gray-200 bg-red-200"
+          onclick={() => deleteTag(tag._id)}
+        >
+          {@html svgIcons.trash}
         </button>
       </div>
-
-      <input
-        type="color"
-        class="w-10 h-10 rounded cursor-pointer"
-        bind:value={tag.iconColor}
-        onblur={() => updateTag(tag)}
-      />
-
-      <!-- DELETE -->
-      <button
-        class="btn btn-sm btn-error w-[46px] flex justify-center items-center"
-        onclick={() => deleteTag(tag._id)}
-      >
-        {@html svgIcons.trash}
-      </button>
-    </div>
-  {/each}
-
-  {#if loading}
-    <p>{t("common.loading")}...</p>
-  {/if}
-
-  <div></div>
+    {/each}
+  </div>
 </div>
 
 <!-- ICON PICKER MODAL -->
@@ -250,3 +253,5 @@
     </div>
   </div>
 </dialog>
+
+<Loading show={loading} />

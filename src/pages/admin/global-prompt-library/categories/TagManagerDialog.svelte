@@ -205,7 +205,7 @@
 
         <!-- DELETE -->
         <button
-          class="btn btn-sm btn-error w-[46px] flex justify-center items-center"
+           class="btn btn-sm w-[46px] flex justify-center items-center text-red-600 hover:bg-gray-200 bg-red-200"
           onclick={() => deleteTag(tag._id)}
         >
           {@html svgIcons.trash}
