@@ -16,6 +16,9 @@
     selectedCategories = $bindable([]),
   }: Props = $props();
 
+  const defaultTagIconColor = "#291981";
+  const defaultTagEmoij = "🇨🇭";
+
   // categories for selected tag
   const filteredCategories = $derived(
     !selectedTag
@@ -51,30 +54,74 @@
       selectedCategories = [...selectedCategories, id];
     }
   }
+
+  function bgOpacity(color: string, opacity = 0.1) {
+    return `${color}${Math.round(opacity * 255)
+      .toString(16)
+      .padStart(2, "0")}`;
+  }
 </script>
 
 <!-- TAGS -->
-<div class="mb-6 w-full">
-  <div class="flex flex-wrap justify-start w-full gap-3">
+<div class="w-full mb-6">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
     {#each tags as tag}
       <button
-        class={`px-6 py-3 rounded-2xl text-sm font-semibold transition border shadow-md
-            ${
-              selectedTag === tag.value
-                ? "bg-primary text-white border-transparent scale-[1.03]"
-                : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
-            }
-          `}
+        class={`w-full text-left p-4 rounded-xl border transition shadow-sm relative
+        ${
+          selectedTag === tag.value
+            ? "border-[#2453FF] bg-white shadow-md"
+            : "border-gray-200 bg-white hover:bg-gray-50"
+        }`}
         onclick={() => selectTag(tag.value)}
       >
-        {tag.title}
+        <div class="flex items-center gap-3">
+          <div
+            class="w-10 h-10 flex items-center justify-center rounded-lg"
+            style={`color:${tag.iconColor || defaultTagIconColor}; background:${bgOpacity(tag.iconColor || defaultTagIconColor)}`}
+          >
+            {#if tag.icon}
+              {#if tag.icon.trim().startsWith("data:image")}
+                <!-- Support icon image  -->
+                <img src={tag.icon} alt="" class={`w-6 h-6`} />
+              {:else}
+                <!-- Support Emoij -->
+                <span class="text-3xl">
+                  {tag.icon}
+                </span>
+              {/if}
+            {:else}
+              <span class="text-3xl">
+                {defaultTagEmoij}
+              </span>
+            {/if}
+          </div>
+
+          <div class="font-semibold text-[15px] text-gray-900 leading-tight">
+            {tag.title}
+          </div>
+        </div>
+
+        <div class="text-[13px] text-gray-500 mt-2 leading-snug pr-6">
+          {tag.description}
+        </div>
+
+        {#if selectedTag === tag.value}
+          <div
+            class="absolute top-3 right-3 w-5 h-5 rounded-full bg-[#2453FF] text-white flex items-center justify-center text-xs"
+          >
+            ✓
+          </div>
+        {/if}
       </button>
     {/each}
   </div>
 </div>
 
 <!-- CATEGORIES (checkbox version) -->
-<div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 mb-10 text-black">
+<div
+  class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 mb-10 text-black mt-6"
+>
   {#each filteredCategories as category}
     <label
       class={`cursor-pointer flex items-center justify-between w-full h-[64px] px-4 rounded-xl shadow-md ${

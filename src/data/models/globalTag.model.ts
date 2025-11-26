@@ -5,6 +5,9 @@ import { z } from "zod";
 const TagSchema = z.object({
   _id: z.instanceof(ObjectId),
   title: z.string(),
+  description: z.string().default(""),
+  icon: z.string().nullish(),
+  iconColor: z.string().nullish(),
   created_at: z
     .date()
     .optional()
