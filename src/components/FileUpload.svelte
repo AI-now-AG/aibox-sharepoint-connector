@@ -37,6 +37,9 @@
     ],
   };
 
+  const MAX_IMAGE_SIZE_MB = 7;
+  const MAX_OTHER_SIZE_MB = 32;
+
   interface Props {
     files?: File[];
     modal: any;
@@ -146,17 +149,34 @@
     return false;
   }
 
-  function isFileSizeValid(size: number) {
-    if (size <= 5 * 1024 * 1024) {
+  function isFileSizeValid(size: number, type: string) {
+    // Convert bytes → MB
+    const sizeInMB = size / (1024 * 1024);
+
+    // Default max size is for PDFs / other files
+    let maxSizeMB = MAX_OTHER_SIZE_MB;
+
+    // If the file is an image, apply smaller limit
+    if (type.startsWith("image/")) {
+      maxSizeMB = MAX_IMAGE_SIZE_MB;
+    }
+
+    // Check if the file size exceeds allowed max
+    if (sizeInMB <= maxSizeMB) {
       fileErrorMessage = "";
       return true;
     }
-    fileErrorMessage = t("prompt-execution.upload-file.exceed-5mb-size-limit");
+
+    // Set localized error message with correct limit
+    fileErrorMessage = t("prompt-execution.upload-file.max-size-exceeded", {
+      size: `${maxSizeMB} MB`,
+    });
+
     return false;
   }
 
   function isFileValid(size: number, type: string) {
-    if (isFileTypeValid(type) && isFileSizeValid(size)) {
+    if (isFileTypeValid(type) && isFileSizeValid(size, type)) {
       return true;
     }
     return false;

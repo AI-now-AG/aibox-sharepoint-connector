@@ -55,7 +55,8 @@
   }
 
   interface APIConfiguration {
-    apiUrl: string;
+    executePromptUrl: string;
+    uploadBlobUrl: string;
     accessToken: string;
   }
 
@@ -104,12 +105,13 @@
   let isResoningThingking: boolean = $state(false);
   let loading: boolean = $state(false);
 
-  let isShowAttachmentButton = $state(
-    currentPrompt?.model != PromptModel.Perplexity,
-  );
+  // let isShowAttachmentButton = $state(
+  //   currentPrompt?.model != PromptModel.Perplexity,
+  // );
+  let isShowAttachmentButton = $state(true);
 
   $effect(() => {
-    isShowAttachmentButton = currentPrompt?.model != PromptModel.Perplexity;
+    //isShowAttachmentButton = currentPrompt?.model != PromptModel.Perplexity;
   });
 
   const providerInfo = useProviderInfo($tenant);
@@ -179,7 +181,8 @@
   // === API Configuration ===
   async function getAPIConfiguration(): Promise<APIConfiguration> {
     return {
-      apiUrl: `${TRANSCRIPTION_API_URL}/api/prompt/execute`,
+      executePromptUrl: `${TRANSCRIPTION_API_URL}/api/prompt/execute`,
+      uploadBlobUrl: `${TRANSCRIPTION_API_URL}/api/blob/upload`,
       accessToken: $user?.api_token as string,
     };
   }
@@ -595,7 +598,7 @@
       isGenerating = selectedPromptTool == PromptToolOption.Image;
 
       // Make API request
-      const response = await fetch(config.apiUrl, {
+      const response = await fetch(config.executePromptUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -665,10 +668,14 @@
 
     let uploadedFileUrls = [];
     if (fileDataList.length > 0) {
-      const uploadResponse = await fetch("/.netlify/functions/blobFileUpload", {
+      // Get API configuration
+      const config = await getAPIConfiguration();
+
+      const uploadResponse = await fetch(config.uploadBlobUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${config.accessToken}`,
         },
         body: JSON.stringify({
           files: fileDataList,
