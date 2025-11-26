@@ -90,7 +90,7 @@
           </div>
 
           <div
-            class="flex-1 font-semibold text-[15px] text-gray-900 leading-tight"
+            class="flex-1 font-semibold text-lg text-gray-900 leading-tight"
           >
             {tag.title}
           </div>
@@ -105,7 +105,7 @@
         </div>
 
         <!-- DESCRIPTION -->
-        <div class="text-[13px] text-gray-500 leading-snug pr-6">
+        <div class="text-sm text-gray-500 leading-[20px] pr-4">
           {tag.description}
         </div>
       </button>
