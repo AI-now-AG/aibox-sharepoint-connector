@@ -79,10 +79,44 @@
     input.click();
   }
 
+  let iconPickerDialog: HTMLDialogElement;
+  let selectedTag: TagItem | null = null;
+
   function openIconPicker(tag: TagItem) {
-    const choice = confirm("OK = Emoji, Cancel = Upload Image");
-    if (choice) pickEmoji(tag);
-    else pickImage(tag);
+    selectedTag = tag;
+    iconPickerDialog.showModal();
+  }
+
+  async function chooseEmoji() {
+    const emoji = prompt("Enter emoji:");
+    if (emoji && selectedTag) {
+      selectedTag.icon = emoji;
+      await updateTag(selectedTag);
+    }
+    iconPickerDialog.close();
+  }
+
+  function chooseImage() {
+    if (!selectedTag) return;
+
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+
+    input.onchange = async (e: Event) => {
+      const file = (e.target as HTMLInputElement)?.files?.[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = async () => {
+        selectedTag!.icon = reader.result as string;
+        await updateTag(selectedTag!);
+      };
+      reader.readAsDataURL(file);
+    };
+
+    input.click();
+    iconPickerDialog.close();
   }
 
   async function deleteTag(id: string) {
@@ -178,5 +212,38 @@
     {#if loading}
       <p>{t("common.loading")}...</p>
     {/if}
+
+    <div></div>
+  </div>
+</dialog>
+
+<!-- ICON PICKER MODAL -->
+<dialog bind:this={iconPickerDialog} class="modal">
+  <div class="modal-box max-w-sm">
+    <h3 class="font-bold text-lg mb-4">Choose Icon</h3>
+
+    <div class="grid grid-cols-1 gap-3">
+      <!-- Emoji Button -->
+      <button
+        class="btn btn-outline w-full flex items-center gap-2"
+        onclick={() => chooseEmoji()}
+      >
+        😊 <span>Choose Emoji</span>
+      </button>
+
+      <!-- Image Upload Button -->
+      <button
+        class="btn btn-outline w-full flex items-center gap-2"
+        onclick={() => chooseImage()}
+      >
+        🖼️ <span>Upload Image</span>
+      </button>
+    </div>
+
+    <div class="modal-action">
+      <button class="btn" onclick={() => iconPickerDialog.close()}>
+        Close
+      </button>
+    </div>
   </div>
 </dialog>
