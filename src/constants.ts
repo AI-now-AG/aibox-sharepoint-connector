@@ -42,8 +42,13 @@ export const SUPER_ADMIN_ROUTES = [
   "/reports/*",
   "/settings/instruction",
   "/settings/instruction/*",
-  "settings/prompt-refinement",
-  "settings/prompt-refinement/*",
+  "/settings/prompt-refinement",
+  "/settings/prompt-refinement/*",
+  "/admin",
+  "/admin/*",
+  "/admin/global-prompt-library/tags",
+  "/admin/global-prompt-library/categories",
+  "/admin/global-prompt-library/prompts",
 ];
 
 export const FEATURE_MAP_ROUTES = {

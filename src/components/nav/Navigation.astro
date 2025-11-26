@@ -323,12 +323,16 @@ if (auth.isSuperAdmin(Astro.locals)) {
         isOpened: navState[`super-admin-menu-id-1`] ?? false,
         items: [
           {
-            title: "Assistants",
+            title: t("nav.admin.assistants"),
             path: `/admin/global-prompt-library/prompts`,
           },
           {
-            title: "Categories",
+            title: t("nav.admin.categories"),
             path: `/admin/global-prompt-library/categories`,
+          },
+           {
+            title: t("nav.admin.tags"),
+            path: `/admin/global-prompt-library/tags`,
           },
         ],
       },

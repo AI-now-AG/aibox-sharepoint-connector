@@ -23,6 +23,7 @@
     AudioOptionId,
     SubscriptionPackageId,
   } from "$types/Subscription";
+  import { tenant } from "$stores";
 
   interface Props {
     tags: TagItem[];
@@ -273,13 +274,10 @@
 
     <div class="divider"></div>
 
-    <!-- TAGS -->
-    <h2 class="font-sanns text-3xl font-bold text-black mt-6 mb-10">
-      {t("tenant.choose-categories")}
-    </h2>
     <TagCategorySelector
       {tags}
       {categories}
+      defaultLanguage={$tenant?.default_language ?? ""}
       bind:selectedTag
       bind:selectedCategories
     />

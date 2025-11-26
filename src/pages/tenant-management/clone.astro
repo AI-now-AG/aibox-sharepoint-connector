@@ -13,6 +13,9 @@ const tags: TagItem[] = allTags.map((tag) => {
   return {
     title: tag.title,
     value: tag._id.toString(),
+    description: tag.description,
+    icon: tag.icon,
+    iconColor: tag.iconColor,
   };
 });
 
