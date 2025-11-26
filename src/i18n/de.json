@@ -675,5 +675,9 @@
   "create-image.create-nano-banana-pro-image-description": "Erstelle Bilder mit dem neuesten und beliebtesten Modell von Gemini",
   "tenant.image-creation.nano-banana-pro": "Nano Banana Pro",
   "prompt-library.global.manage-tags": "Tags verwalten",
-  "common.loading": "Tags verwalten"
+  "common.loading": "Laden",
+  "common.add": "Hinzufügen",
+  "common.choose-icon": "Symbol auswählen",
+  "common.choose-emoji": "Emoji auswählen",
+  "common.choose-image": "Bild auswählen"
 }

@@ -20,6 +20,10 @@
   let newTitle: string = $state("");
   let loading: boolean = $state(false);
 
+  let emojiDialog: HTMLDialogElement;
+  let iconPickerDialog: HTMLDialogElement;
+  let selectedTag: TagItem | null = null;
+
   async function loadTags() {
     loading = true;
     const res = await fetch("/api/admin/global-tags.json");
@@ -54,9 +58,14 @@
     });
   }
 
-  let emojiDialog: HTMLDialogElement;
-  let iconPickerDialog: HTMLDialogElement;
-  let selectedTag: TagItem | null = null;
+  async function deleteTag(id: string) {
+    await fetch("/api/admin/global-tags.json", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ _id: id }),
+    });
+    await loadTags();
+  }
 
   function openIconPicker(tag: TagItem) {
     selectedTag = tag;
@@ -91,15 +100,6 @@
     iconPickerDialog.close();
   }
 
-  async function deleteTag(id: string) {
-    await fetch("/api/admin/global-tags.json", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ _id: id }),
-    });
-    await loadTags();
-  }
-
   function setupEmojiPicker() {
     if (document) {
       const picker = document.querySelector("emoji-picker");
@@ -119,15 +119,15 @@
     }
   }
 
-  onMount(() => {
-    loadTags();
-    setupEmojiPicker();
-  });
-
   function cancelEdit() {
     tagDialog?.close();
     navigate(window.location.href);
   }
+
+  onMount(() => {
+    loadTags();
+    setupEmojiPicker();
+  });
 </script>
 
 <dialog class="modal" bind:this={tagDialog}>
@@ -149,7 +149,9 @@
         bind:value={newTitle}
         onkeydown={(e) => e.key === "Enter" && createTag()}
       />
-      <button class="btn btn-sm btn-primary" onclick={createTag}>Add</button>
+      <button class="btn btn-sm btn-primary" onclick={createTag}
+        >{t("common.add")}</button
+      >
     </div>
 
     <div class="divider"></div>
@@ -222,7 +224,7 @@
 <!-- ICON PICKER MODAL -->
 <dialog bind:this={iconPickerDialog} class="modal">
   <div class="modal-box max-w-sm">
-    <h3 class="font-bold text-lg mb-4">Choose Icon</h3>
+    <h3 class="font-bold text-lg mb-4">{t("common.choose-icon")}</h3>
 
     <div class="grid grid-cols-1 gap-3">
       <!-- Emoji Button -->
@@ -230,7 +232,7 @@
         class="btn btn-outline w-full flex items-center gap-2"
         onclick={() => chooseEmoji()}
       >
-        😊 <span>Choose Emoji</span>
+        😊 <span>{t("common.choose-emoji")}</span>
       </button>
 
       <!-- Image Upload Button -->
@@ -238,13 +240,13 @@
         class="btn btn-outline w-full flex items-center gap-2"
         onclick={() => chooseImage()}
       >
-        🖼️ <span>Upload Image</span>
+        🖼️ <span>{t("common.choose-image")}</span>
       </button>
     </div>
 
     <div class="modal-action">
       <button class="btn" onclick={() => iconPickerDialog.close()}>
-        Close
+        {t("common.close")}
       </button>
     </div>
   </div>
@@ -253,12 +255,14 @@
 <!-- EMOJI PICKER MODAL -->
 <dialog bind:this={emojiDialog} class="modal">
   <div class="modal-box max-w-sm">
-    <h3 class="font-bold text-lg mb-4">Choose Emoji</h3>
+    <h3 class="font-bold text-lg mb-4">{t("common.choose-emoji")}</h3>
 
     <emoji-picker class="light"></emoji-picker>
 
     <div class="modal-action">
-      <button class="btn" onclick={() => emojiDialog.close()}> Close </button>
+      <button class="btn" onclick={() => emojiDialog.close()}>
+        {t("common.close")}
+      </button>
     </div>
   </div>
 </dialog>
