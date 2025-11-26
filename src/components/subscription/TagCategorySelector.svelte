@@ -1,6 +1,7 @@
 <script lang="ts">
   import { fade, fly } from "svelte/transition";
   import type { TagItem, CategoryItem } from "$types/Subscription";
+  import { bgOpacity } from "$utils/common";
 
   interface Props {
     tags: TagItem[];
@@ -54,12 +55,6 @@
       selectedCategories = [...selectedCategories, id];
     }
   }
-
-  function bgOpacity(color: string, opacity = 0.1) {
-    return `${color}${Math.round(opacity * 255)
-      .toString(16)
-      .padStart(2, "0")}`;
-  }
 </script>
 
 <!-- TAGS -->
@@ -67,7 +62,7 @@
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
     {#each tags as tag}
       <button
-        class={`w-full text-left p-4 rounded-xl border transition shadow-sm relative
+        class={`w-full p-4 rounded-xl border transition shadow-sm text-left flex flex-col gap-2
         ${
           selectedTag === tag.value
             ? "border-[#2453FF] bg-white shadow-md"
@@ -75,25 +70,22 @@
         }`}
         onclick={() => selectTag(tag.value)}
       >
+        <!-- ⭐ TOP ROW ALWAYS ALIGNED -->
         <div class="flex items-center gap-3">
           <div
-            class="flex w-10 h-10 flex items-center justify-center rounded-lg"
+            class="flex w-10 h-10 items-center justify-center rounded-lg shrink-0"
             style={`color:${tag.iconColor || defaultTagIconColor}; background:${bgOpacity(tag.iconColor || defaultTagIconColor)}`}
           >
             {#if tag.icon}
               {#if tag.icon.trim().startsWith("data:image")}
-                <!-- Support icon image  -->
-                <img src={tag.icon} alt="" class={`w-6 h-6`} />
+                <!-- Image icon -->
+                <img src={tag.icon} alt="" class="w-6 h-6" />
               {:else}
-                <!-- Support Emoij -->
-                <span class="text-3xl">
-                  {tag.icon}
-                </span>
+                <!-- Emoji -->
+                <span class="text-3xl">{tag.icon}</span>
               {/if}
             {:else}
-              <span class="text-3xl">
-                {defaultTagEmoij}
-              </span>
+              <span class="text-3xl">{defaultTagEmoij}</span>
             {/if}
           </div>
 
@@ -102,16 +94,18 @@
           >
             {tag.title}
           </div>
+
           {#if selectedTag === tag.value}
             <div
-              class="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-xs"
+              class="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-xs shrink-0"
             >
               ✓
             </div>
           {/if}
         </div>
 
-        <div class="text-[13px] text-gray-500 mt-2 leading-snug pr-6">
+        <!-- DESCRIPTION -->
+        <div class="text-[13px] text-gray-500 leading-snug pr-6">
           {tag.description}
         </div>
       </button>

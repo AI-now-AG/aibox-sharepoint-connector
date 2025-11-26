@@ -171,6 +171,13 @@
           </button>
         </div>
 
+        <input
+          type="color"
+          class="w-10 h-10 rounded cursor-pointer"
+          bind:value={tag.iconColor}
+          oninput={() => updateTag(tag)}
+        />
+
         <!-- DELETE -->
         <button
           class="btn btn-sm btn-error w-[50px] flex justify-center items-center"

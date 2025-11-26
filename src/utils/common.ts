@@ -99,3 +99,10 @@ export function isValidPhone(phone: string): boolean {
 
   return regex.test(trimmed);
 }
+
+
+export function bgOpacity(color: string, opacity = 0.6) {
+  return `${color}${Math.round(opacity * 255)
+    .toString(16)
+    .padStart(2, "0")}`;
+}
