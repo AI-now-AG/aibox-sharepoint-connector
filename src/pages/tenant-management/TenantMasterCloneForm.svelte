@@ -23,6 +23,7 @@
     AudioOptionId,
     SubscriptionPackageId,
   } from "$types/Subscription";
+  import { tenant } from "$stores";
 
   interface Props {
     tags: TagItem[];
@@ -276,6 +277,7 @@
     <TagCategorySelector
       {tags}
       {categories}
+      defaultLanguage={$tenant?.default_language ?? ""}
       bind:selectedTag
       bind:selectedCategories
     />
