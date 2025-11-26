@@ -91,6 +91,9 @@ export enum RoutePath {
 export interface TagItem {
   title: string;
   value: string;
+  description: string;
+  icon?: string | null | undefined;
+  iconColor?: string | null | undefined;
 }
 export interface CategoryItem {
   title: string;

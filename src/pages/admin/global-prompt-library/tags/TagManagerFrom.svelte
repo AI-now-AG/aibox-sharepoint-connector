@@ -5,12 +5,7 @@
   import { type TagItem } from "$types/TagInput";
   import { useTranslations } from "$i18n/utils";
   import { bgOpacity } from "$utils/common";
-
-  interface Props {
-    tagDialog?: HTMLDialogElement;
-  }
-
-  let { tagDialog = $bindable() }: Props = $props();
+  import Loading from "$components/Loading.svelte";
 
   const t = useTranslations();
 
@@ -119,37 +114,35 @@
     }
   }
 
-  function cancelEdit() {
-    tagDialog?.close();
-    navigate(window.location.href);
-  }
-
   onMount(() => {
     loadTags();
     setupEmojiPicker();
   });
 </script>
 
-<dialog class="modal" bind:this={tagDialog}>
-  <div class="modal-box w-8/12 max-w-6xl relative">
-    <div class="flex justify-between">
-      <h3 class="text-lg font-bold py-4">
-        {t("prompt-library.global.manage-tags")}
-      </h3>
-      <button class="btn btn-sm btn-circle btn-ghost" onclick={cancelEdit}>
-        {@html svgIcons.closeMenu}
-      </button>
-    </div>
-
+<div
+  class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14 sticky bg-base-200 top-0 z-40"
+>
+  <div class="flex items-center pt-5 pb-2">
+    <button class="mr-4" onclick={() => window.history.back()}>
+      {@html svgIcons.back}
+    </button>
+    <h1 class="text-4xl font-bold">
+      {t("prompt-library.global.manage-tags")}
+    </h1>
+  </div>
+</div>
+<div class="px-8 mb-10">
+  <div class="container w-full mx-auto p-6">
     <div class="flex gap-2 mb-2">
       <input
         type="text"
-        class="input input-sm input-bordered w-full"
-        placeholder="New tag title"
+        class="input input-md input-bordered w-full"
+        placeholder={t("prompt-library.global.new-tag-title")}
         bind:value={newTitle}
         onkeydown={(e) => e.key === "Enter" && createTag()}
       />
-      <button class="btn btn-sm btn-primary" onclick={createTag}
+      <button class="btn btn-md btn-primary" onclick={createTag}
         >{t("common.add")}</button
       >
     </div>
@@ -160,14 +153,14 @@
       <div class="flex items-center gap-3 mb-2">
         <!-- TITLE -->
         <input
-          class="input input-sm input-bordered flex-1"
+          class="input input-md input-bordered flex-1"
           bind:value={tag.title}
           onblur={() => updateTag(tag)}
         />
 
         <!-- DESCRIPTION -->
         <input
-          class="input input-sm input-bordered flex-[1.5]"
+          class="input input-md input-bordered flex-[1.5]"
           placeholder="Description"
           bind:value={tag.description}
           onblur={() => updateTag(tag)}
@@ -205,21 +198,15 @@
 
         <!-- DELETE -->
         <button
-           class="btn btn-sm w-[46px] flex justify-center items-center text-red-600 hover:bg-gray-200 bg-red-200"
+          class="btn btn-sm w-[46px] flex justify-center items-center text-red-600 hover:bg-gray-200 bg-red-200"
           onclick={() => deleteTag(tag._id)}
         >
           {@html svgIcons.trash}
         </button>
       </div>
     {/each}
-
-    {#if loading}
-      <p>{t("common.loading")}...</p>
-    {/if}
-
-    <div></div>
   </div>
-</dialog>
+</div>
 
 <!-- ICON PICKER MODAL -->
 <dialog bind:this={iconPickerDialog} class="modal">
@@ -266,3 +253,5 @@
     </div>
   </div>
 </dialog>
+
+<Loading show={loading} />

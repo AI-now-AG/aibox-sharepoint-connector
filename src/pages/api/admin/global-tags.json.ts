@@ -5,6 +5,9 @@ import GlobalTagModel, { type Tag } from "$data/models/globalTag.model";
 const CreateTagParamsSchema = z.object({
   _id: z.string().optional(),
   title: z.string(),
+  description: z.string().default(""),
+  icon: z.string().nullish(),
+  iconColor: z.string().nullish(),
 });
 
 export type CreateTagParams = z.infer<typeof CreateTagParamsSchema>;
@@ -23,6 +26,9 @@ export const GET: APIRoute = async () => {
         tags.map((tag) => ({
           _id: tag._id,
           title: tag.title,
+          description: tag.description,
+          icon: tag.icon,
+          iconColor: tag.iconColor
         })),
       ),
       { status: 200 },
@@ -72,6 +78,9 @@ export const PUT: APIRoute = async (ctx) => {
 
   const tag: Partial<Tag> = {
     title: data.title,
+    description: data.description,
+    icon: data.icon,
+    iconColor: data.iconColor
   };
 
   try {

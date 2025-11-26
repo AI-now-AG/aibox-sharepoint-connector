@@ -1,0 +1,14 @@
+---
+import Layout from "$layouts/Layout.astro";
+import TagManagerFrom from "./TagManagerFrom.svelte";
+---
+
+<Layout>
+  <div>
+    <TagManagerFrom client:load />
+  </div>
+</Layout>
+
+<script
+  type="module"
+  src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>

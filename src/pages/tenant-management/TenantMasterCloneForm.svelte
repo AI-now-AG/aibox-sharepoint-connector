@@ -273,10 +273,6 @@
 
     <div class="divider"></div>
 
-    <!-- TAGS -->
-    <h2 class="font-sanns text-3xl font-bold text-black mt-6 mb-10">
-      {t("tenant.choose-categories")}
-    </h2>
     <TagCategorySelector
       {tags}
       {categories}
