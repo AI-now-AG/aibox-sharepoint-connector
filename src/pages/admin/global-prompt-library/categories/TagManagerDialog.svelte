@@ -4,6 +4,7 @@
   import { svgIcons } from "$assets/icons";
   import { type TagItem } from "$types/TagInput";
   import { useTranslations } from "$i18n/utils";
+  import { bgOpacity } from "$utils/common";
 
   interface Props {
     tagDialog?: HTMLDialogElement;
@@ -12,6 +13,8 @@
   let { tagDialog = $bindable() }: Props = $props();
 
   const t = useTranslations();
+
+  const defaultTagIconColor = "#491EFF";
 
   let tags: TagItem[] = $state([]);
   let newTitle: string = $state("");
@@ -152,7 +155,7 @@
     <div class="divider"></div>
 
     {#each tags as tag (tag._id)}
-      <div class="flex items-center gap-3 mb-3">
+      <div class="flex items-center gap-3 mb-2">
         <!-- TITLE -->
         <input
           class="input input-sm input-bordered flex-1"
@@ -169,9 +172,10 @@
         />
 
         <!-- ICON PICKER -->
-        <div class="relative w-[70px] flex justify-center items-center">
+        <div class="relative flex justify-center items-center">
           <button
-            class="btn btn-sm w-full border rounded-lg flex justify-center items-center"
+            class="btn btn-sm h-[36px] w-[36px] w-full border rounded-lg flex justify-center items-center"
+            style={`background:${bgOpacity(tag.iconColor || defaultTagIconColor)}`}
             onclick={() => openIconPicker(tag)}
           >
             {#if tag.icon}
@@ -185,7 +189,7 @@
                 <span class="text-2xl">{tag.icon}</span>
               {/if}
             {:else}
-              <span class="text-xs opacity-60">Icon</span>
+              <span class="text-2xl opacity-60">🇨🇭</span>
             {/if}
           </button>
         </div>
@@ -199,7 +203,7 @@
 
         <!-- DELETE -->
         <button
-          class="btn btn-sm btn-error w-[50px] flex justify-center items-center"
+          class="btn btn-sm btn-error w-[46px] flex justify-center items-center"
           onclick={() => deleteTag(tag._id)}
         >
           {@html svgIcons.trash}
