@@ -60,7 +60,7 @@ export default {
   list: async () => {
     return collection
       .find<Document<Tag>>({})
-      .sort({ position: 1, created_at: 1 })
+      .sort({ position: 1, created_at: -1 })
       .toArray();
   },
 
