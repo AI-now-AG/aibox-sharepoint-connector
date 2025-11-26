@@ -1,4 +1,5 @@
 import ticketsManager from "$data/auth0/tickets-manager";
+import { isProd } from "$utils/env";
 import {
   SG_PASSWORD_RESET_TEMPLATE,
   SG_VERIFICATION_TEMPLATE,
@@ -8,9 +9,13 @@ import { getEnvVar } from "$utils/env";
 
 export const sendPasswordResetEmail = async (userId: string, email: string) => {
   try {
+    const redirectUrl = isProd()
+      ? "https://aibox-app.com/"
+      : "https://test.aibox-app.com/";
     // Step 1: Create password reset ticket
     const ticketResponse = await ticketsManager.createPasswordResetTicket({
       user_id: userId,
+      result_url: redirectUrl,
     });
     const { ticket } = ticketResponse.data;
     console.log(`Password reset - ticket response: ${ticket}`);
