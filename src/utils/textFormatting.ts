@@ -123,8 +123,8 @@ export function markdownToHtml(text: string) {
       {
         name: "list",
         renderer(this, token) {
-          const ulClass = "list-disc list-inside space-y-1 ml-4 mb-3";
-          const olClass = "list-decimal list-inside space-y-1 ml-4 mb-3";
+          const ulClass = "list-disc space-y-1 ml-4 mb-3";
+          const olClass = "list-decimal space-y-1 ml-4 mb-3";
 
           const body = (token.items || [])
             .map(
