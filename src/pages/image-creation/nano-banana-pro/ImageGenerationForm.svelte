@@ -27,8 +27,9 @@
     messageContent: string;
     citations: any[];
     currentImageUrl: string;
+    currentImageThoughtSignature?: string;
+    currentImageMimeType?: string;
   }
-
   interface APIConfiguration {
     apiUrl: string;
     accessToken: string;
@@ -44,6 +45,11 @@
     messageHistory?: Message[];
     promptTool?: string;
     model?: string;
+    thinkingConfig?: {
+      includeThoughts?: boolean;
+      thinkingBudget?: number;
+      thinkingLevel?: string;
+    };
   }
 
   const t = useTranslations();
@@ -92,6 +98,9 @@
       fileUrls,
       tool: PromptToolOption.Image,
       messageHistory: $nanoBananaProImageMessageHistory,
+      thinkingConfig: {
+        includeThoughts: false, // Enable this to true for thinking during generate the image. BUT, IMPORTANT NOTE - Multi-turn on Azure backend must support thoughtSignatur
+      },
     };
 
     return payload;
@@ -129,6 +138,7 @@
 
   function handleImagesEvent(data: any, state: StreamingState): void {
     console.log("🖼️ Images generated:", data.images?.length || 0);
+    console.log("🖼️ Images generated data:", data);
 
     if (data.images && data.images.length > 0) {
       const firstImage = data.images[0];
@@ -138,6 +148,11 @@
         const formattedUrl = formatImageUrl(imageData);
         state.currentImageUrl = formattedUrl;
         currentStreamingImageUrl = formattedUrl;
+
+        state.currentImageThoughtSignature = firstImage.thoughtSignature;
+        state.currentImageMimeType =
+          firstImage.mimeType ||
+          (firstImage.format ? `image/${firstImage.format}` : undefined);
 
         posthogClientCapture($tenant, EventName.AiboxImageCreated, {
           page_name: ScreenName.NanoBananaProImageGeneration,
@@ -151,12 +166,16 @@
     console.log("🔧 Tool outputs received:", data.outputs.length);
 
     data.outputs.forEach((output: any) => {
-      if (output.image || output.result) {
+      if ((output.image || output.result) && !state.currentImageUrl) {
         const imageData = extractImageFromData(output);
-        if (imageData && !state.currentImageUrl) {
+        if (imageData) {
           const formattedUrl = formatImageUrl(imageData);
           state.currentImageUrl = formattedUrl;
           currentStreamingImageUrl = formattedUrl;
+          state.currentImageThoughtSignature = output.thoughtSignature;
+          state.currentImageMimeType =
+            output.mimeType ||
+            (output.format ? `image/${output.format}` : undefined);
         }
       }
     });
@@ -194,8 +213,20 @@
       newUserMessage,
     ]);
 
-    // Handle assistant message
-    addAssistantMessage(responseText, finalImageUrl);
+    const thoughtSignature =
+      state.currentImageThoughtSignature || data.images?.[0]?.thoughtSignature;
+    console.log("handleCompleteEvent -> thoughtSignature", thoughtSignature);
+    const imageMimeType =
+      state.currentImageMimeType ||
+      data.images?.[0]?.mimeType ||
+      (data.images?.[0]?.format ? `image/${data.images[0].format}` : undefined);
+
+    addAssistantMessage(
+      responseText,
+      finalImageUrl,
+      thoughtSignature,
+      imageMimeType,
+    );
 
     // Clean up and reset states
     resetUIState();
@@ -244,14 +275,20 @@
     throw new Error(data.error);
   }
 
-  function addAssistantMessage(responseText: string, imageUrl: string): void {
+  function addAssistantMessage(
+    responseText: string,
+    imageUrl: string,
+    imageThoughtSignature?: string,
+    imageMimeType?: string,
+  ): void {
     const newAssistantMessage: Message = {
       role: MessageRole.Assistant,
       content: responseText,
       rawData: stripMarkdownFormatting(responseText),
       imageUrl,
+      imageThoughtSignature,
+      imageMimeType,
     };
-
     nanoBananaProImageMessageHistory.update((messages) => [
       ...messages,
       newAssistantMessage,
