@@ -107,7 +107,7 @@
           value={organizationName}
           placeholder={t("subscription.organization-name-placeholder")}
           inputChange={(event: any) => (organizationName = event.value)}
-          containerClasses="h-[56px] shadow-xl"
+          containerClasses="h-[54px] shadow-xl"
           labelClasses="text-sm"
           classes="text-base"
         />
@@ -124,14 +124,11 @@
     </div>
   </div>
 
-  <!-- TAGS & CATEGORIES -->
-  <div class="font-sans font-bold text-base mt-10 mb-4">
-    {t("subscription.choose-categories")}
-  </div>
-
   <TagCategorySelector
     {tags}
     {categories}
+    titleAlignCenter
+    {defaultLanguage}
     bind:selectedTag
     bind:selectedCategories
   />

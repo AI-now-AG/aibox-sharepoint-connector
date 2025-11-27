@@ -4,7 +4,11 @@ import { ObjectId } from "mongodb";
 import SubscriptionLayout from "$layouts/SubscriptionLayout.astro";
 import GlobalTagModel from "$data/models/globalTag.model";
 import GlobalCategoryModel from "$data/models/globalCategory.model";
-import { RoutePath, type TagItem, type CategoryItem } from "$types/Subscription";
+import {
+  RoutePath,
+  type TagItem,
+  type CategoryItem,
+} from "$types/Subscription";
 import Step1 from "./Step1.svelte";
 import Step2 from "./Step2.svelte";
 import Step3 from "./Step3.svelte";
@@ -42,6 +46,9 @@ if (step == RoutePath.Step1) {
     return {
       title: tag.title,
       value: tag._id.toString(),
+      description: tag.description,
+      icon: tag.icon,
+      iconColor: tag.iconColor,
     };
   });
 

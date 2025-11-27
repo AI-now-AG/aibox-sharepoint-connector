@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { useTranslations } from "$i18n/utils";
   import Tags, { type Tag } from "svelte-tags-input";
 
   interface Props {
@@ -12,6 +13,8 @@
     tags = $bindable([]),
     managerDialog = $bindable(),
   }: Props = $props();
+
+  const t = useTranslations();
 </script>
 
 <div class="my-tags-input">
@@ -33,12 +36,12 @@
       managerDialog?.show();
     }}
   >
-    <span>Manage tags</span>
+    <span>{t("prompt-library.global.manage-tags")}</span>
   </button>
 </div>
 
 <style>
-   .my-tags-input :global(.svelte-tags-input-layout) {
+  .my-tags-input :global(.svelte-tags-input-layout) {
     min-height: 40px;
     border-radius: 8px;
     border-color: #dcdbdf;

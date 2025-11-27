@@ -1,58 +1,38 @@
-import { authenticationClient, managementClient } from "$data/auth0/client";
-import { SG_VERIFICATION_TEMPLATE } from "$constants";
+import ticketsManager from "$data/auth0/tickets-manager";
+import { isProd } from "$utils/env";
+import {
+  SG_PASSWORD_RESET_TEMPLATE,
+  SG_VERIFICATION_TEMPLATE,
+} from "$constants";
 import sendMail from "$utils/mail";
 import { getEnvVar } from "$utils/env";
 
-export const getAccessToken = async () => {
-  const AUTH0_TENANT = getEnvVar("AUTH0_TENANT");
-  const API_AUDIENCE = `https://${AUTH0_TENANT}.eu.auth0.com/api/v2/`;
-
+export const sendPasswordResetEmail = async (userId: string, email: string) => {
   try {
-    const response = await authenticationClient.oauth.clientCredentialsGrant({
-      audience: API_AUDIENCE,
+    const redirectUrl = isProd()
+      ? "https://aibox-app.com/"
+      : "https://test.aibox-app.com/";
+    // Step 1: Create password reset ticket
+    const ticketResponse = await ticketsManager.createPasswordResetTicket({
+      user_id: userId,
+      result_url: redirectUrl,
     });
-    return response.data.access_token;
-  } catch (error) {
-    console.error("Error getting Auth0 token:", error);
-    throw error;
-  }
-};
+    const { ticket } = ticketResponse.data;
+    console.log(`Password reset - ticket response: ${ticket}`);
 
-export const sendPasswordResetEmail = async (
-  email: string,
-  connection: string,
-) => {
-  try {
-    const AUTH0_TENANT = getEnvVar("AUTH0_TENANT");
-    const CLIENT_ID = getEnvVar("AUTH0_CLIENT_ID");
-
-    // Prepare request body
-    const requestBody = {
-      client_id: CLIENT_ID,
-      email,
-      connection,
-    };
-
-    // Call Auth0 API to trigger password reset email
-    const response = await fetch(
-      `https://${AUTH0_TENANT}.eu.auth0.com/dbconnections/change_password`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestBody),
+    // Step 2: Send verification email via SendGrid
+    await sendMail({
+      from: {
+        name: "AI now AG",
+        email: "no-reply@ainow.ch",
       },
-    );
-
-    // Check if the response is OK
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(
-        `Error sending password reset email: ${errorData.error_description || response.statusText}`,
-      );
-    }
-
-    console.log(`Password reset email sent to ${email}`);
-    return await response.text();
+      to: email,
+      templateId: SG_PASSWORD_RESET_TEMPLATE,
+      dynamicTemplateData: {
+        url: ticket,
+      },
+    });
+    console.log(`Password reset email sent successfully: ${email}`);
   } catch (error) {
     console.error("Failed to send password reset email:", error);
     //throw new Error("Failed to send password reset email.");
@@ -61,12 +41,12 @@ export const sendPasswordResetEmail = async (
 
 export const sendVerificationEmail = async (userId: string, email: string) => {
   try {
-    // Step 1: Trigger Auth0's Standard Email Verification
-    const ticketResponse = await managementClient.tickets.verifyEmail({
+    // Step 1: Create verify email ticket
+    const ticketResponse = await ticketsManager.createVerifyEmailTicket({
       user_id: userId,
     });
     const { ticket } = ticketResponse.data;
-    console.log(`Email verification ticket URL: ${ticket}`);
+    console.log(`Verification email - ticket response: ${ticket}`);
 
     // Step 2: Send verification email via SendGrid
     await sendMail({

@@ -42,8 +42,13 @@ export const SUPER_ADMIN_ROUTES = [
   "/reports/*",
   "/settings/instruction",
   "/settings/instruction/*",
-  "settings/prompt-refinement",
-  "settings/prompt-refinement/*",
+  "/settings/prompt-refinement",
+  "/settings/prompt-refinement/*",
+  "/admin",
+  "/admin/*",
+  "/admin/global-prompt-library/tags",
+  "/admin/global-prompt-library/categories",
+  "/admin/global-prompt-library/prompts",
 ];
 
 export const FEATURE_MAP_ROUTES = {
@@ -51,13 +56,13 @@ export const FEATURE_MAP_ROUTES = {
 };
 
 export const SKIP_CHEKING_ONBOARDING_ROUTES = [
-  '/subscription',
-  '/subscription/*',
-  '/logout',
-  '/logout/*',
-  '/api/logout',
-  '/_actions/*'
-]
+  "/subscription",
+  "/subscription/*",
+  "/logout",
+  "/logout/*",
+  "/api/logout",
+  "/_actions/*",
+];
 
 // Auth0
 export const AUTH0_SESSION_STATE = "auth0_state";
@@ -76,6 +81,7 @@ export const AUTH0_AUTH_WINDOWS_CON_PROD = "con_Si1JPT62XNjp9gVp";
 
 // SendGrid
 export const SG_VERIFICATION_TEMPLATE = "d-69ed72334042458783f985ada5dbe61d";
+export const SG_PASSWORD_RESET_TEMPLATE = "d-6eee3ae854944c4ebd17e1d7264975d5";
 export const SG_NEW_TENANT_TEMPLATE = "d-87847bafc967448e93d99a411edece3a";
 
 // Tenants
