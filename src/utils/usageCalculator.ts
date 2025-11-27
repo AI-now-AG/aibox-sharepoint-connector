@@ -63,7 +63,7 @@ const REQUEST_CREDIT_MAPPING: Record<string, number> = {
   [ModelName.Sonar]: 12,
   [ModelName.Gemini25Flash]: 2,
   [ModelName.Gemini25FlashImage]: 2,
-  [ModelName.Gemini3ProImage]: 2,
+  [ModelName.Gemini3ProImage]: 0.75,
   [ModelName.Gpt4o]: 10,
   [ModelName.Gpt5]: 10,
 };
