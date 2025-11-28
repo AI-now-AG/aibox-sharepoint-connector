@@ -10,6 +10,8 @@ export interface Message {
   imageUrl?: string;
   fileUrls?: string[];
   thumbRating?: MessageThumbRating | null;
+  imageThoughtSignature?: string; // new
+  imageMimeType?: string;         // optional helper
 }
 
 export enum MessageThumbRating {

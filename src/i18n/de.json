@@ -685,5 +685,10 @@
   "nav.admin.categories": "Kategorien",
   "nav.admin.tags": "Tags",
   "subscription.choose-business-branch": "Wähle deine passende aibox Vorlage",
-  "subscription.select-sub-categories-for": "Wähle die Kategorien für ${tagName} aus."
+  "subscription.select-sub-categories-for": "Wähle die Kategorien für ${tagName} aus.",
+  "usage.table.use-case": "Anwendungsfall",
+  "usage.table.amount": "Anzahl",
+  "usage.table.unit": "Einheit",
+  "usage.table.credits": "Credits",
+  "usage.table.credits-total": "Credits gesamt"
 }
