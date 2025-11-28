@@ -579,7 +579,7 @@
   "common.no-content-available": "Kein Inhalt verfügbar.",
   "nav.create-image.nano-banana": "Nano Banana",
   "create-image.create-nano-banana-image-title": "Bilder mit Nano Banana erstellen",
-  "create-image.create-nano-banana-image-description": "Erstelle Bilder mit dem neuesten und beliebtesten Modell von Gemini",
+  "create-image.create-nano-banana-image-description": "Erstelle Bilder mit dem schnellen Modell von Gemini 2.5",
   "tenant.image-creation.nano-banana": "Nano Banana",
   "subtitle-editor.auto-saved": "Automatisch gespeichert",
   "subtitle-editor.auto-saved-data-loaded": "Automatisch gespeicherte Daten geladen",
@@ -686,9 +686,9 @@
   "nav.admin.tags": "Tags",
   "subscription.choose-business-branch": "Wähle deine passende aibox Vorlage",
   "subscription.select-sub-categories-for": "Wähle die Kategorien für ${tagName} aus.",
-  "usage.table.use-case": "Anwendungsfall",
+  "usage.table.use-case": "Modell",
   "usage.table.amount": "Anzahl",
   "usage.table.unit": "Einheit",
-  "usage.table.credits": "Credits",
+  "usage.table.credits": "Genutzte Credits",
   "usage.table.credits-total": "Credits gesamt"
 }
