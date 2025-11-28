@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useTranslations } from "$i18n/utils";
 import { type Tenant } from "$data/models/tenant.model";
 import { type UsageLog } from "$data/models/usageLog.model";
@@ -682,101 +681,71 @@ const _calculateFluxUsage = (rawUsages: UsageLog[], usePrivateKey: boolean) => {
 export const calculateUsage = (tenant: Tenant, rawUsages: UsageLog[]) => {
   const usageData: UsageRow[] = [];
 
-  const isProviderActiveForTenant = (providersToCheck: ApiKeyProvider[]) => {
-    const providers = tenant.api_key_providers ?? [];
-    return providersToCheck.some((provider) =>
-      providers.some(
-        (item: { name: string; active: boolean }) => item.name === provider && item.active === true,
-      ),
-    );
-  };
-
-  const addUsageRow = (
-    label: string,
-    details: UsageItem[],
-    providerKeys: ApiKeyProvider[],
-  ) => {
-
-    usageData.push({
-      provider: label,
-      details,
-    });
-
-  };
-
   // OpenAI
   const useOpenAIPrivateKey = tenant.metadata?.openaiPrivateKeyEnabled ?? false;
-  addUsageRow(
-    "OpenAI",
-    _calculateOpenAIUsage(rawUsages, useOpenAIPrivateKey),
-    [ApiKeyProvider.OpenAI],
-  );
+  usageData.push({
+    provider: "OpenAI",
+    details: _calculateOpenAIUsage(rawUsages, useOpenAIPrivateKey),
+  });
 
   // OpenAI GPT5
   const useOpenAIGpt5PrivateKey =
     tenant.metadata?.openaiGpt5PrivateKeyEnabled ?? false;
-  addUsageRow(
-    "OpenAI GPT-5.1",
-    _calculateOpenAIGpt5Usage(rawUsages, useOpenAIGpt5PrivateKey),
-    [ApiKeyProvider.OpenAIGpt5],
-  );
+  usageData.push({
+    provider: "OpenAI GPT-5.1",
+    details: _calculateOpenAIGpt5Usage(rawUsages, useOpenAIGpt5PrivateKey),
+  });
 
   // AzureOpenAI
   const useAzureOpenAIPrivateKey =
     tenant.metadata?.azureOpenaiPrivateKeyEnabled ?? false;
-  addUsageRow(
-    "Azure OpenAI",
-    _calculateAzureOpenAIUsage(rawUsages, useAzureOpenAIPrivateKey),
-    [ApiKeyProvider.AzureOpenAI],
-  );
+  usageData.push({
+    provider: "Azure OpenAI",
+    details: _calculateAzureOpenAIUsage(rawUsages, useAzureOpenAIPrivateKey),
+  });
 
   // Perplexity
   const usePerplexityPrivateKey =
     tenant.metadata?.perplexityPrivateKeyEnabled ?? false;
-  addUsageRow(
-    "Perplexity",
-    _calculatePerplexityUsage(rawUsages, usePerplexityPrivateKey),
-    [ApiKeyProvider.Perplexity],
-  );
+  usageData.push({
+    provider: "Perplexity",
+    details: _calculatePerplexityUsage(rawUsages, usePerplexityPrivateKey),
+  });
 
   // Claude
   const useClaudePrivateKey = tenant.metadata?.claudePrivateKeyEnabled ?? false;
-  addUsageRow(
-    "Claude",
-    _calculateClaudeUsage(rawUsages, useClaudePrivateKey),
-    [ApiKeyProvider.Claude],
-  );
+  usageData.push({
+    provider: "Claude",
+    details: _calculateClaudeUsage(rawUsages, useClaudePrivateKey),
+  });
 
   // Gemini
   const useGeminiPrivateKey = tenant.metadata?.geminiPrivateKeyEnabled ?? false;
-  addUsageRow(
-    "Gemini",
-    _calculateGeminiUsage(rawUsages, useGeminiPrivateKey),
-    [ApiKeyProvider.Gemini, ApiKeyProvider.GeminiPro],
-  );
+  usageData.push({
+    provider: "Gemini",
+    details: _calculateGeminiUsage(rawUsages, useGeminiPrivateKey),
+  });
 
   // Audio
   const useSpeechPrivateKey = tenant.metadata?.speechPrivateKeyEnabled ?? false;
   const useElevenLabsPrivateKey =
     tenant.metadata?.elevenLabsPrivateKeyEnabled ?? false;
-  addUsageRow(
-    "Audio",
-    _calculateAudioUsage(
+  usageData.push({
+    provider: "Audio",
+    details: _calculateAudioUsage(
       rawUsages,
       useAzureOpenAIPrivateKey,
       useSpeechPrivateKey,
       useElevenLabsPrivateKey,
     ),
-    [ApiKeyProvider.AzureOpenAI, ApiKeyProvider.ElevenLabs],
-  );
+  });
 
   // Flux
   const useFluxPrivateKey = tenant.metadata?.fluxPrivateKeyEnabled ?? false;
-  addUsageRow(
-    "Flux",
-    _calculateFluxUsage(rawUsages, useFluxPrivateKey),
-    [ApiKeyProvider.Flux],
-  );
+  usageData.push({
+    provider: "Flux",
+    details: _calculateFluxUsage(rawUsages, useFluxPrivateKey),
+  });
 
   return usageData;
 };
