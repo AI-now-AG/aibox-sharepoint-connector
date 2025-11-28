@@ -123,12 +123,14 @@ export function markdownToHtml(text: string) {
       {
         name: "list",
         renderer(this, token) {
-          const ulClass = "list-disc list-inside space-y-1 ml-4 mb-3";
-          const olClass = "list-decimal list-inside space-y-1 ml-4 mb-3";
+          const ulClass = "list-disc space-y-1 ml-4 mb-3";
+          const olClass = "list-decimal space-y-1 ml-4 mb-3";
 
           const body = (token.items || [])
-            .map((item: Tokens.ListItem) =>
-              this.parser.parseInline(item.tokens || []),
+            .map(
+              (item: Tokens.ListItem) =>
+                //this.parser.parseInline(item.tokens || []),
+                this.parser.parse(item.tokens || []), // Handle block tokens inside list items
             )
             .map((html: string) => `<li>${html}</li>`)
             .join("");
@@ -146,7 +148,8 @@ export function markdownToHtml(text: string) {
         renderer(this, token) {
           const outerWrapper = "w-full max-w-full overflow-x-auto my-4";
           const innerWrapper = "inline-block min-w-max align-top";
-          const tableClass = "border-collapse table-auto rounded-lg overflow-hidden shadow-md";
+          const tableClass =
+            "border-collapse table-auto rounded-lg overflow-hidden shadow-md";
 
           const thClass =
             "p-2 border-r border-primary last:border-r-0 font-semibold text-sm";
@@ -170,7 +173,8 @@ export function markdownToHtml(text: string) {
                   return `<td class="${tdClass}">${inner}</td>`;
                 })
                 .join("");
-              const extraClass = rowIndex % 2 === 0 ? "bg-base-100" : "bg-base-300";
+              const extraClass =
+                rowIndex % 2 === 0 ? "bg-base-100" : "bg-base-300";
               return `<tr class="${trClass} ${extraClass}">${cols}</tr>`;
             })
             .join("");
