@@ -8,6 +8,7 @@
   import { tenant, tenant as tenantStore } from "$stores";
   import { EventName, ScreenName } from "$types/Posthog";
   import { posthogClientCapture } from "$utils/posthogClient";
+  import { svgIcons } from "$assets/icons";
 
   const t = useTranslations();
 
@@ -23,6 +24,7 @@
   let usageData: UsageRow[] = $state([]);
   let selectedTenant: string = $state("");
   let selectedMonth: string = $state("");
+  let expandedProviders: Record<string, boolean> = $state({});
 
   if (tenants.length == 0) {
     selectedTenant = $tenantStore?._id?.toString() ?? "";
@@ -56,6 +58,13 @@
     } else {
       usageInfo = data.overview;
       usageData = data.data;
+      expandedProviders = data.data.reduce(
+        (acc: Record<string, boolean>, row: UsageRow) => {
+          acc[row.provider] = false;
+          return acc;
+        },
+        {},
+      );
     }
   };
 
@@ -66,6 +75,17 @@
     return number.toLocaleString("de-CH", {
       maximumFractionDigits: 2,
     });
+  };
+
+  const toggleProvider = (provider: string) => {
+    expandedProviders = {
+      ...expandedProviders,
+      [provider]: !expandedProviders[provider],
+    };
+  };
+
+  const getProviderCredits = (details: UsageRow["details"]) => {
+    return details.reduce((total, item) => total + item.credits, 0);
   };
 </script>
 
@@ -86,76 +106,105 @@
   {:else}
     {#if usageInfo}
       <div class="mb-8">
-        <table class="table table-xs border w-auto">
-          <colgroup>
-            <col class="w-[150]" />
-            <col class="w-auto" />
-          </colgroup>
-          <tbody>
-            <tr class="bg-base-100 text-sm">
-              <td class="bg-base-300 text-sm font-medium"
-                ><strong>{t("usage.summary.tenant")}</strong></td
-              >
-              <td class="text-sm font-medium">{usageInfo.tenant}</td>
-            </tr>
-            <tr class="bg-base-100 text-sm">
-              <td class="bg-base-300 text-sm font-medium"
-                ><strong>{t("usage.summary.month")}</strong></td
-              >
-              <td class="text-sm font-medium">{usageInfo.month}</td>
-            </tr>
-            <tr class="bg-base-100 text-sm">
-              <td class="bg-base-300 text-sm font-medium"
-                ><strong>{t("usage.summary.credits-used")}</strong></td
-              >
-              <td class="text-sm font-medium"
-                >{formatNumber(usageInfo.creditsUsed)}</td
-              >
-            </tr>
-          </tbody>
-        </table>
+        <div
+          class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-base-100 border rounded-xl shadow-sm p-4"
+        >
+          <div>
+            <p class="text-xs uppercase text-gray-500">
+              {t("usage.summary.tenant")}
+            </p>
+            <p class="text-base font-semibold mt-1">{usageInfo.tenant}</p>
+          </div>
+          <div>
+            <p class="text-xs uppercase text-gray-500">
+              {t("usage.summary.month")}
+            </p>
+            <p class="text-base font-semibold mt-1">{usageInfo.month}</p>
+          </div>
+          <div>
+            <p class="text-xs uppercase text-gray-500">
+              {t("usage.summary.credits-used")}
+            </p>
+            <p class="text-base font-semibold mt-1">
+              {formatNumber(usageInfo.creditsUsed)}
+            </p>
+          </div>
+        </div>
       </div>
     {/if}
     {#each usageData as row}
-      <div class="mb-4">
-        <table class="table border min-w-full relative">
-          <colgroup>
-            <col class="w-auto" />
-            <col class="w-[150]" />
-            <col class="w-[100]" />
-            <col class="w-[120]" />
-            <col class="w-[100]" />
-          </colgroup>
-          <thead>
-            <tr class="bg-base-300">
-              <th
-                class="py-3 px-4 text-left font-semibold text-sm text-base-content"
-                >{row.provider}</th
-              >
-              <th class="py-3 px-4 text-left font-semibold text-sm">&nbsp;</th>
-              <th class="py-3 px-4 text-left font-semibold text-sm">&nbsp;</th>
-              <th class="py-3 px-4 text-left font-semibold text-sm">&nbsp;</th>
-              <th class="py-3 px-4 text-left font-semibold text-sm">&nbsp;</th>
-            </tr>
-          </thead>
-          <tbody>
-            {#each row.details as item}
-              <tr class="bg-base-100 text-sm">
-                <td class="py-3 px-4 text-sm font-medium">{item.model}</td>
-                <td class="py-3 px-4 text-sm font-medium"
-                  >{formatNumber(item.amount)}</td
-                >
-                <td class="py-3 px-4 text-sm font-medium">{item.unit}</td>
-                <td class="py-3 px-4 text-sm font-medium"
-                  >{!item.private ? formatNumber(item.credits) : "private key"}
-                </td>
-                <td class="py-3 px-4 text-sm font-medium"
-                  >{!item.private ? t("usage.units.credits") : "-"}</td
-                >
+      <div class="mb-4 border rounded-lg overflow-hidden">
+        <button
+          type="button"
+          class="flex w-full items-center justify-between bg-base-300 px-4 py-3 text-left"
+          onclick={() => toggleProvider(row.provider)}
+        >
+          <span class="text-sm font-semibold text-base-content"
+            >{row.provider}</span
+          >
+          <div class="flex items-center gap-4">
+            <span class="text-sm font-semibold text-base-content"
+              >{t("usage.table.credits-total")}: {formatNumber(
+                getProviderCredits(row.details),
+              )}</span
+            >
+            <span
+              class={`text-lg transition-transform ${
+                expandedProviders[row.provider] ? "rotate-180" : ""
+              }`}>{@html svgIcons.arrowDownFill}</span
+            >
+          </div>
+        </button>
+
+        {#if expandedProviders[row.provider]}
+          <table class="table table-sm border-t min-w-full relative">
+            <colgroup>
+              <col class="w-auto" />
+              <col class="w-[160]" />
+              <col class="w-[140]" />
+              <col class="w-[140]" />
+            </colgroup>
+            <thead>
+              <tr class="bg-base-200 text-xs uppercase tracking-wide">
+                <th class="py-2 px-4 text-left font-semibold">
+                  {t("usage.table.use-case")}
+                </th>
+                <th class="py-2 px-4 text-right font-semibold">
+                  {t("usage.table.amount")}
+                </th>
+                <th class="py-2 px-4 text-left font-semibold">
+                  {t("usage.table.unit")}
+                </th>
+                <th class="py-2 px-4 text-right font-semibold">
+                  {t("usage.table.credits")}
+                </th>
               </tr>
-            {/each}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {#each row.details as item}
+                <tr class="bg-base-100 text-sm">
+                  <td class="py-3 px-4 text-sm font-medium">{item.model}</td>
+                  <td class="py-3 px-4 text-sm font-medium text-right">
+                    {formatNumber(item.amount)}
+                  </td>
+                  <td class="py-3 px-4 text-sm font-medium">{item.unit}</td>
+                  <td class="py-3 px-4 text-sm font-semibold text-right">
+                    {#if !item.private}
+                      <div class="flex items-center justify-end gap-2">
+                        <span>{formatNumber(item.credits)}</span>
+                        <span class="text-xs text-gray-500"
+                          >{t("usage.units.credits")}</span
+                        >
+                      </div>
+                    {:else}
+                      <span class="text-xs text-gray-500">private key</span>
+                    {/if}
+                  </td>
+                </tr>
+              {/each}
+            </tbody>
+          </table>
+        {/if}
       </div>
     {/each}
   {/if}
