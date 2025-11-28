@@ -1,7 +1,7 @@
 import { useTranslations } from "$i18n/utils";
 import { type Tenant } from "$data/models/tenant.model";
 import { type UsageLog } from "$data/models/usageLog.model";
-import { ApiKeyProvider } from "$types/TenantFeature";
+import { ApiKeyProvider, TenantFeature } from "$types/TenantFeature";
 import {
   TextModel,
   AudioModel,
@@ -681,71 +681,111 @@ const _calculateFluxUsage = (rawUsages: UsageLog[], usePrivateKey: boolean) => {
 export const calculateUsage = (tenant: Tenant, rawUsages: UsageLog[]) => {
   const usageData: UsageRow[] = [];
 
+  const isProviderActive = (
+    providerName: ApiKeyProvider
+  ): boolean => {
+    return (tenant.api_key_providers ?? []).some(
+      p => (p.name?.toString()?.toLowerCase() === providerName.toString()?.toLowerCase()) && p.active == true
+    );
+  }
+
+  const isFeatureActive = (
+    providerName: ApiKeyProvider
+  ): boolean => {
+    return (tenant.included_features ?? []).some(
+      p => p.provider?.toString()?.toLowerCase() === providerName.toString()?.toLowerCase()
+    );
+  }
+
+  const isAudioActive = (
+    providerName: ApiKeyProvider
+  ): boolean => {
+    return (tenant.included_features ?? []).some(
+      p => (p.provider?.toString()?.toLowerCase() == providerName.toString()?.toLowerCase()) && p.name == TenantFeature.AudioToText
+    );
+  }
+
   // OpenAI
   const useOpenAIPrivateKey = tenant.metadata?.openaiPrivateKeyEnabled ?? false;
-  usageData.push({
-    provider: "OpenAI",
-    details: _calculateOpenAIUsage(rawUsages, useOpenAIPrivateKey),
-  });
+  if (isProviderActive(ApiKeyProvider.OpenAI)) {
+    usageData.push({
+      provider: "OpenAI",
+      details: _calculateOpenAIUsage(rawUsages, useOpenAIPrivateKey),
+    });
+  }
 
   // OpenAI GPT5
   const useOpenAIGpt5PrivateKey =
     tenant.metadata?.openaiGpt5PrivateKeyEnabled ?? false;
-  usageData.push({
-    provider: "OpenAI GPT-5.1",
-    details: _calculateOpenAIGpt5Usage(rawUsages, useOpenAIGpt5PrivateKey),
-  });
+  if (isProviderActive(ApiKeyProvider.OpenAIGpt5)) {
+    usageData.push({
+      provider: "OpenAI GPT-5.1",
+      details: _calculateOpenAIGpt5Usage(rawUsages, useOpenAIGpt5PrivateKey),
+    });
+  }
 
   // AzureOpenAI
   const useAzureOpenAIPrivateKey =
     tenant.metadata?.azureOpenaiPrivateKeyEnabled ?? false;
-  usageData.push({
-    provider: "Azure OpenAI",
-    details: _calculateAzureOpenAIUsage(rawUsages, useAzureOpenAIPrivateKey),
-  });
+  if (isProviderActive(ApiKeyProvider.AzureOpenAI)) {
+    usageData.push({
+      provider: "Azure OpenAI",
+      details: _calculateAzureOpenAIUsage(rawUsages, useAzureOpenAIPrivateKey),
+    });
+  }
 
   // Perplexity
   const usePerplexityPrivateKey =
     tenant.metadata?.perplexityPrivateKeyEnabled ?? false;
-  usageData.push({
-    provider: "Perplexity",
-    details: _calculatePerplexityUsage(rawUsages, usePerplexityPrivateKey),
-  });
+  if (isProviderActive(ApiKeyProvider.Perplexity)) {
+    usageData.push({
+      provider: "Perplexity",
+      details: _calculatePerplexityUsage(rawUsages, usePerplexityPrivateKey),
+    });
+  }
 
   // Claude
   const useClaudePrivateKey = tenant.metadata?.claudePrivateKeyEnabled ?? false;
-  usageData.push({
-    provider: "Claude",
-    details: _calculateClaudeUsage(rawUsages, useClaudePrivateKey),
-  });
+  if (isProviderActive(ApiKeyProvider.Claude)) {
+    usageData.push({
+      provider: "Claude",
+      details: _calculateClaudeUsage(rawUsages, useClaudePrivateKey),
+    });
+  }
 
   // Gemini
   const useGeminiPrivateKey = tenant.metadata?.geminiPrivateKeyEnabled ?? false;
-  usageData.push({
-    provider: "Gemini",
-    details: _calculateGeminiUsage(rawUsages, useGeminiPrivateKey),
-  });
+  if (isProviderActive(ApiKeyProvider.Gemini)) {
+    usageData.push({
+      provider: "Gemini",
+      details: _calculateGeminiUsage(rawUsages, useGeminiPrivateKey),
+    });
+  }
 
   // Audio
   const useSpeechPrivateKey = tenant.metadata?.speechPrivateKeyEnabled ?? false;
   const useElevenLabsPrivateKey =
     tenant.metadata?.elevenLabsPrivateKeyEnabled ?? false;
-  usageData.push({
-    provider: "Audio",
-    details: _calculateAudioUsage(
-      rawUsages,
-      useAzureOpenAIPrivateKey,
-      useSpeechPrivateKey,
-      useElevenLabsPrivateKey,
-    ),
-  });
+  if (isAudioActive(ApiKeyProvider.OpenAI) || isAudioActive(ApiKeyProvider.ElevenLabs)) {
+    usageData.push({
+      provider: "Audio",
+      details: _calculateAudioUsage(
+        rawUsages,
+        useAzureOpenAIPrivateKey,
+        useSpeechPrivateKey,
+        useElevenLabsPrivateKey,
+      ),
+    });
+  }
 
   // Flux
   const useFluxPrivateKey = tenant.metadata?.fluxPrivateKeyEnabled ?? false;
-  usageData.push({
-    provider: "Flux",
-    details: _calculateFluxUsage(rawUsages, useFluxPrivateKey),
-  });
+  if (isFeatureActive(ApiKeyProvider.Flux)) {
+    usageData.push({
+      provider: "Flux",
+      details: _calculateFluxUsage(rawUsages, useFluxPrivateKey),
+    });
+  }
 
   return usageData;
 };
