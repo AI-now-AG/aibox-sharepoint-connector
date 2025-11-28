@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useTranslations } from "$i18n/utils";
 import { type Tenant } from "$data/models/tenant.model";
 import { type UsageLog } from "$data/models/usageLog.model";
@@ -679,14 +680,12 @@ export const calculateUsage = (tenant: Tenant, rawUsages: UsageLog[]) => {
     details: UsageItem[],
     providerKeys: ApiKeyProvider[],
   ) => {
-    if (!details.length) return;
 
-    if (isProviderActiveForTenant(providerKeys)) {
-      usageData.push({
-        provider: label,
-        details,
-      });
-    }
+    usageData.push({
+      provider: label,
+      details,
+    });
+
   };
 
   // OpenAI
