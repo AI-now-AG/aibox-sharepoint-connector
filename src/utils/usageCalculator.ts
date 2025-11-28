@@ -681,71 +681,109 @@ const _calculateFluxUsage = (rawUsages: UsageLog[], usePrivateKey: boolean) => {
 export const calculateUsage = (tenant: Tenant, rawUsages: UsageLog[]) => {
   const usageData: UsageRow[] = [];
 
+  const isProviderActiveForTenant = (providersToCheck: ApiKeyProvider[]) => {
+    const providers = tenant.api_key_providers ?? [];
+    if (!providers.length) {
+      return true;
+    }
+    return providersToCheck.some((provider) =>
+      providers.some(
+        (item: { name: string; active: boolean }) => item.name === provider && item.active === true,
+      ),
+    );
+  };
+
+  const addUsageRow = (
+    label: string,
+    details: UsageItem[],
+    providerKeys: ApiKeyProvider[],
+  ) => {
+    const hasUsage = details.some(
+      (item) => (item.amount ?? 0) > 0 || (item.credits ?? 0) > 0,
+    );
+    if (!hasUsage) return;
+
+    if (isProviderActiveForTenant(providerKeys)) {
+      usageData.push({
+        provider: label,
+        details,
+      });
+    }
+  };
+
   // OpenAI
   const useOpenAIPrivateKey = tenant.metadata?.openaiPrivateKeyEnabled ?? false;
-  usageData.push({
-    provider: "OpenAI",
-    details: _calculateOpenAIUsage(rawUsages, useOpenAIPrivateKey),
-  });
+  addUsageRow(
+    "OpenAI",
+    _calculateOpenAIUsage(rawUsages, useOpenAIPrivateKey),
+    [ApiKeyProvider.OpenAI],
+  );
 
   // OpenAI GPT5
   const useOpenAIGpt5PrivateKey =
     tenant.metadata?.openaiGpt5PrivateKeyEnabled ?? false;
-  usageData.push({
-    provider: "OpenAI GPT-5.1",
-    details: _calculateOpenAIGpt5Usage(rawUsages, useOpenAIGpt5PrivateKey),
-  });
+  addUsageRow(
+    "OpenAI GPT-5.1",
+    _calculateOpenAIGpt5Usage(rawUsages, useOpenAIGpt5PrivateKey),
+    [ApiKeyProvider.OpenAIGpt5],
+  );
 
   // AzureOpenAI
   const useAzureOpenAIPrivateKey =
     tenant.metadata?.azureOpenaiPrivateKeyEnabled ?? false;
-  usageData.push({
-    provider: "Azure OpenAI",
-    details: _calculateAzureOpenAIUsage(rawUsages, useAzureOpenAIPrivateKey),
-  });
+  addUsageRow(
+    "Azure OpenAI",
+    _calculateAzureOpenAIUsage(rawUsages, useAzureOpenAIPrivateKey),
+    [ApiKeyProvider.AzureOpenAI],
+  );
 
   // Perplexity
   const usePerplexityPrivateKey =
     tenant.metadata?.perplexityPrivateKeyEnabled ?? false;
-  usageData.push({
-    provider: "Perplexity",
-    details: _calculatePerplexityUsage(rawUsages, usePerplexityPrivateKey),
-  });
+  addUsageRow(
+    "Perplexity",
+    _calculatePerplexityUsage(rawUsages, usePerplexityPrivateKey),
+    [ApiKeyProvider.Perplexity],
+  );
 
   // Claude
   const useClaudePrivateKey = tenant.metadata?.claudePrivateKeyEnabled ?? false;
-  usageData.push({
-    provider: "Claude",
-    details: _calculateClaudeUsage(rawUsages, useClaudePrivateKey),
-  });
+  addUsageRow(
+    "Claude",
+    _calculateClaudeUsage(rawUsages, useClaudePrivateKey),
+    [ApiKeyProvider.Claude],
+  );
 
   // Gemini
   const useGeminiPrivateKey = tenant.metadata?.geminiPrivateKeyEnabled ?? false;
-  usageData.push({
-    provider: "Gemini",
-    details: _calculateGeminiUsage(rawUsages, useGeminiPrivateKey),
-  });
+  addUsageRow(
+    "Gemini",
+    _calculateGeminiUsage(rawUsages, useGeminiPrivateKey),
+    [ApiKeyProvider.Gemini, ApiKeyProvider.GeminiPro],
+  );
 
   // Audio
   const useSpeechPrivateKey = tenant.metadata?.speechPrivateKeyEnabled ?? false;
   const useElevenLabsPrivateKey =
     tenant.metadata?.elevenLabsPrivateKeyEnabled ?? false;
-  usageData.push({
-    provider: "Audio",
-    details: _calculateAudioUsage(
+  addUsageRow(
+    "Audio",
+    _calculateAudioUsage(
       rawUsages,
       useAzureOpenAIPrivateKey,
       useSpeechPrivateKey,
       useElevenLabsPrivateKey,
     ),
-  });
+    [ApiKeyProvider.AzureOpenAI, ApiKeyProvider.ElevenLabs],
+  );
 
   // Flux
   const useFluxPrivateKey = tenant.metadata?.fluxPrivateKeyEnabled ?? false;
-  usageData.push({
-    provider: "Flux",
-    details: _calculateFluxUsage(rawUsages, useFluxPrivateKey),
-  });
+  addUsageRow(
+    "Flux",
+    _calculateFluxUsage(rawUsages, useFluxPrivateKey),
+    [ApiKeyProvider.Flux],
+  );
 
   return usageData;
 };

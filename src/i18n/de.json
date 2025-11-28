@@ -82,7 +82,7 @@
   "prompt-execution.historyRemove.info": "Beim Schliessen des Browsers, gehen alle bisher erstellten Daten verloren.",
   "prompt-execution.upload-file.drag": "Datei per Drag & Drop verschieben oder <span style=\"color: #491EFF;\">Datei auswählen</span>",
   "prompt-execution.upload-file.supportted-files": "PDF, JSON, TXT, PNG, SVG, JPEG",
-  "prompt-execution.upload-file.maximum-size": "Maximale Dateigrösse: 5 MB",
+  "prompt-execution.upload-file.maximum-size": "Maximale Dateigrösse Dokumente 32 MB, für Bilder 7 MB",
   "prompt-execution.upload-file.exceed-5mb-size-limit": "Datei darf nicht grösser sein als 5 MB, bitte Dateigrösse reduzieren und neu hochladen",
   "prompt-execution.upload-file.max-size-exceeded": "Datei darf nicht grösser sein als ${size}, bitte Dateigrösse reduzieren und neu hochladen",
   "prompt-emptyscreen.description": "Starten Sie mit vordefinierten Use Case unten.",
@@ -685,5 +685,10 @@
   "nav.admin.categories": "Kategorien",
   "nav.admin.tags": "Tags",
   "subscription.choose-business-branch": "Wähle deine passende aibox Vorlage",
-  "subscription.select-sub-categories-for": "Wähle die Kategorien für ${tagName} aus."
+  "subscription.select-sub-categories-for": "Wähle die Kategorien für ${tagName} aus.",
+  "usage.table.use-case": "Anwendungsfall",
+  "usage.table.amount": "Anzahl",
+  "usage.table.unit": "Einheit",
+  "usage.table.credits": "Credits",
+  "usage.table.credits-total": "Credits gesamt"
 }
