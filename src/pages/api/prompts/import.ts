@@ -10,6 +10,7 @@ import CategoryModel, {
   type Category,
   type Group,
 } from "$data/models/category.model";
+import { clearAllCache } from "$utils/cache";
 import { CsvColumn, type CsvRowRaw } from "$types/PromptCsv";
 import { ReasoningEffortOption } from "$types/AIProvider";
 
@@ -215,6 +216,9 @@ export const POST: APIRoute = async (ctx: APIContext) => {
       // End the session after the transaction
       session.endSession();
     }
+
+    // clear all cache entries for this tenant
+    clearAllCache(ctx.locals.tenant._id?.toString());
 
     // Respond with the parsed rows
     return new Response(JSON.stringify({ data: rows }), { status: 200 });
