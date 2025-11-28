@@ -202,6 +202,21 @@ if (
     path: "/image-creation/nano-banana",
   });
 }
+
+// Image Assistant > Gemini Nano Banana Pro
+if (
+  auth.hasFeatureWithProvider(
+    Astro.locals,
+    TenantFeature.CreateImage,
+    ApiKeyProvider.GeminiPro
+  )
+) {
+  createImageItems.push({
+    title: t("nav.create-image.nano-banana-pro"),
+    path: "/image-creation/nano-banana-pro",
+  });
+}
+
 if (createImageItems.length > 0) {
   createImageMenus.push({
     title: t("nav.create-image"),

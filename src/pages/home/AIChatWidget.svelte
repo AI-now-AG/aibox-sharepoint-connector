@@ -40,7 +40,6 @@
   import PromptItem from "$components/prompt-interface/PromptItem.svelte";
   import { EventName, ScreenName } from "$types/Posthog";
   import { posthogClientCapture } from "$utils/posthogClient";
-  import { log } from "node_modules/astro/dist/core/logger/core";
 
   const t = useTranslations();
 
