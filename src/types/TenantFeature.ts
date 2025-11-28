@@ -18,7 +18,7 @@ export enum ApiKeyProvider {
   ElevenLabs = "eleven-labs",
   Claude = "claude",
   Gemini = "gemini",
-  GeminiPro = "gemini-pro",
+  GeminiPro = "gemini-pro"
 }
 
 export enum AudioCategory {
