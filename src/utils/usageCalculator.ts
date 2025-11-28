@@ -682,10 +682,7 @@ export const calculateUsage = (tenant: Tenant, rawUsages: UsageLog[]) => {
     details: UsageItem[],
     providerKeys: ApiKeyProvider[],
   ) => {
-    const hasUsage = details.some(
-      (item) => (item.amount ?? 0) > 0 || (item.credits ?? 0) > 0,
-    );
-    if (!hasUsage) return;
+    if (!details.length) return;
 
     if (isProviderActiveForTenant(providerKeys)) {
       usageData.push({
