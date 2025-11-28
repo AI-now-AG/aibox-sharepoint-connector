@@ -20,18 +20,19 @@ interface Props {
 }
 
 const { conversations = [] } = Astro.props as Props;
+const { tenant } = Astro.locals;
 
 const categories = await cached(
-  `categories:${Astro.locals.user.tenant_id}`,
-  1000 * 60 * 0.5,
+  `${tenant._id?.toString()}:categories`,
+  60 * 5,
   async () => {
     return await Category.listActiveByTenant(Astro.locals.user.tenant_id);
   }
 );
 
 const transcriptions = await cached(
-  `transcriptions:${Astro.locals.user.tenant_id}`,
-  1000 * 60 * 2,
+  `${tenant._id?.toString()}:transcriptions`,
+  60 * 5,
   async () => {
     const data = await TranscriptionModel.listByTenant(
       Astro.locals.user.tenant_id
@@ -315,7 +316,7 @@ if (auth.isSuperAdmin(Astro.locals)) {
             title: t("nav.admin.categories"),
             path: `/admin/global-prompt-library/categories`,
           },
-           {
+          {
             title: t("nav.admin.tags"),
             path: `/admin/global-prompt-library/tags`,
           },

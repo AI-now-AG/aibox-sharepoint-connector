@@ -4,6 +4,7 @@ import { z } from "zod";
 import slug from "slug";
 import CategoryModel from "$data/models/category.model";
 import type { Category, Group } from "$data/models/category.model";
+import { clearAllCache } from "$utils/cache";
 import {
   CategoryParamsSchema,
   CreateCategoryParamsSchema,
@@ -82,6 +83,10 @@ export const POST: APIRoute = async (ctx) => {
 
   try {
     await CategoryModel.add(newCategory);
+
+    // clear all cache entries for this tenant
+    clearAllCache(tenantId?.toString());
+
     return new Response(JSON.stringify({ message: "Category added" }), {
       status: 200,
     });
@@ -133,6 +138,9 @@ export const PUT: APIRoute = async (ctx) => {
   try {
     await CategoryModel.update(data._id!, newCategory);
 
+    // clear all cache entries for this tenant
+    clearAllCache(ctx.locals.tenant._id?.toString());
+
     return new Response(
       JSON.stringify({
         message: "Category updated",
@@ -161,6 +169,10 @@ export const DELETE: APIRoute<CategoryParams> = async (ctx) => {
 
     if (data._id) {
       const result = await CategoryModel.remove(data._id.toString());
+
+      // clear all cache entries for this tenant
+      clearAllCache(ctx.locals.tenant._id?.toString());
+
       return new Response(JSON.stringify(result), { status: 200 });
     }
 
