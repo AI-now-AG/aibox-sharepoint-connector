@@ -667,9 +667,6 @@ export const calculateUsage = (tenant: Tenant, rawUsages: UsageLog[]) => {
 
   const isProviderActiveForTenant = (providersToCheck: ApiKeyProvider[]) => {
     const providers = tenant.api_key_providers ?? [];
-    if (!providers.length) {
-      return true;
-    }
     return providersToCheck.some((provider) =>
       providers.some(
         (item: { name: string; active: boolean }) => item.name === provider && item.active === true,
