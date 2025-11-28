@@ -97,7 +97,9 @@
 
   function handleFilesDropped(droppedFiles: FilesDroppedEvent | any) {
     console.log("Files dropped:", droppedFiles);
-    const items = Array.isArray(droppedFiles) ? droppedFiles : droppedFiles?.files ?? [];
+    const items = Array.isArray(droppedFiles)
+      ? droppedFiles
+      : (droppedFiles?.files ?? []);
     const newFiles = items.map(({ file }: any) => file);
 
     // Merge and remove duplicates by name + size
@@ -120,14 +122,11 @@
         : [];
 
     items.forEach(({ file, reasons }: any) => {
-      const reason = reasons.includes("FILE_TOO_LARGE")
-        ? t("prompt-execution.upload-file.exceed-5mb-size-limit")
-        : reasons.includes("INVALID_MIMETYPE")
-          ? t("transcription.file-validation.unsupported-type")
-          : "Unknown error occurred";
-      addToast({
-        message: `${file.name} - ${reason}`,
-        type: "error",
+      reasons.forEach((reason: string) => {
+        addToast({
+          message: `${file.name} - ${reason || "Unknown error occurred"}`,
+          type: "error",
+        });
       });
     });
   }
@@ -139,7 +138,6 @@
   use:dndFileUpload={{
     enabled: allowFileUpload,
     acceptedTypes,
-    maxSize: 5 * 1024 * 1024, // 5 MB
     onDragStart: () => {
       isDragging = true;
     },

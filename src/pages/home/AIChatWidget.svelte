@@ -51,7 +51,8 @@
   }
 
   interface APIConfiguration {
-    apiUrl: string;
+    executePromptUrl: string;
+    uploadBlobUrl: string;
     accessToken: string;
   }
 
@@ -103,10 +104,11 @@
   let filteredPrompts: any[] = $state([]);
   let selectedPrompt = $state<any>();
 
-  const apiProvider = apiKeyProviders?.find((item: any) => {
-    return item.default && item.active;
-  });
-  let isDisableFileInput = $state(apiProvider?.name == PromptModel.Perplexity);
+  // const apiProvider = apiKeyProviders?.find((item: any) => {
+  //   return item.default && item.active;
+  // });
+  //let isDisableFileInput = $state(apiProvider?.name == PromptModel.Perplexity);
+  let isDisableFileInput = $state(false);
 
   const providerInfo = useProviderInfo($tenant);
 
@@ -116,9 +118,9 @@
 
   $effect(() => {
     isDisableSelectModel = $sharedMessageHistory.length > 0 || isFetching;
-    isDisableFileInput =
-      selectedModel === PromptModel.Perplexity ||
-      selectedPrompt?.model === PromptModel.Perplexity;
+    // isDisableFileInput =
+    //   selectedModel === PromptModel.Perplexity ||
+    //   selectedPrompt?.model === PromptModel.Perplexity;
   });
 
   // === Derived State ===
@@ -142,7 +144,8 @@
   // === API Configuration ===
   async function getAPIConfiguration(): Promise<APIConfiguration> {
     return {
-      apiUrl: `${TRANSCRIPTION_API_URL}/api/prompt/execute`,
+      executePromptUrl: `${TRANSCRIPTION_API_URL}/api/prompt/execute`,
+      uploadBlobUrl: `${TRANSCRIPTION_API_URL}/api/blob/upload`,
       accessToken: $user?.api_token as string,
     };
   }
@@ -545,7 +548,7 @@
       const requestBody = buildRequestPayload(fileUrls);
 
       // Make API request
-      const response = await fetch(config.apiUrl, {
+      const response = await fetch(config.executePromptUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -615,10 +618,14 @@
 
     let uploadedFileUrls = [];
     if (fileDataList.length > 0) {
-      const uploadResponse = await fetch("/.netlify/functions/blobFileUpload", {
+      // Get API configuration
+      const config = await getAPIConfiguration();
+
+      const uploadResponse = await fetch(config.uploadBlobUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${config.accessToken}`,
         },
         body: JSON.stringify({
           files: fileDataList,
