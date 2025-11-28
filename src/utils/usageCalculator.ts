@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useTranslations } from "$i18n/utils";
 import { type Tenant } from "$data/models/tenant.model";
 import { type UsageLog } from "$data/models/usageLog.model";
@@ -683,9 +684,6 @@ export const calculateUsage = (tenant: Tenant, rawUsages: UsageLog[]) => {
 
   const isProviderActiveForTenant = (providersToCheck: ApiKeyProvider[]) => {
     const providers = tenant.api_key_providers ?? [];
-    if (!providers.length) {
-      return true;
-    }
     return providersToCheck.some((provider) =>
       providers.some(
         (item: { name: string; active: boolean }) => item.name === provider && item.active === true,
@@ -698,14 +696,12 @@ export const calculateUsage = (tenant: Tenant, rawUsages: UsageLog[]) => {
     details: UsageItem[],
     providerKeys: ApiKeyProvider[],
   ) => {
-    if (!details.length) return;
 
-    if (isProviderActiveForTenant(providerKeys)) {
-      usageData.push({
-        provider: label,
-        details,
-      });
-    }
+    usageData.push({
+      provider: label,
+      details,
+    });
+
   };
 
   // OpenAI
