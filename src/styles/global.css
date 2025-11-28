@@ -300,3 +300,10 @@
     border-color: var(--color-gray-200, currentColor);
   }
 }
+
+@layer components {
+  /* Make circle buttons truly circular in aibox theme */
+  .btn.btn-circle {
+    --radius-field: 9999px;
+  }
+}

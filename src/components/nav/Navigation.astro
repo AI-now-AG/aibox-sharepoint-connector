@@ -515,7 +515,13 @@ const modules = [...menuItems];
           </li>
         ))
       }
-      <div class="mx-6 my-2 pointer-events-none nav-spacer"></div>
+      {
+        subtitleStudioMenus.length > 0 && (
+          <div
+            class={`mx-6 my-2 pointer-events-none ${isNavCollapsed ? "hidden" : ""}`}
+          />
+        )
+      }
       {
         subtitleStudioMenus.map((mod) => (
           <li class="active:bg-transparent">
