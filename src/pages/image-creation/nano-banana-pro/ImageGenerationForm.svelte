@@ -137,9 +137,6 @@
   }
 
   function handleImagesEvent(data: any, state: StreamingState): void {
-    console.log("🖼️ Images generated:", data.images?.length || 0);
-    console.log("🖼️ Images generated data:", data);
-
     if (data.images && data.images.length > 0) {
       const firstImage = data.images[0];
       const imageData = extractImageFromData(firstImage);
@@ -163,8 +160,6 @@
   }
 
   function handleToolOutputsEvent(data: any, state: StreamingState): void {
-    console.log("🔧 Tool outputs received:", data.outputs.length);
-
     data.outputs.forEach((output: any) => {
       if ((output.image || output.result) && !state.currentImageUrl) {
         const imageData = extractImageFromData(output);
@@ -187,11 +182,6 @@
     requestBody: RequestPayload,
     fileUrls?: string[],
   ): any {
-    console.log(`✅ Complete! Processing time: ${data.processingTimeMs}ms`);
-    if (data.responseId) {
-      console.log(`Response ID: ${data.responseId}`);
-    }
-
     const finalImageUrl = formatImageUrl(
       state.currentImageUrl ||
         data.images?.[0]?.result ||
@@ -215,7 +205,6 @@
 
     const thoughtSignature =
       state.currentImageThoughtSignature || data.images?.[0]?.thoughtSignature;
-    console.log("handleCompleteEvent -> thoughtSignature", thoughtSignature);
     const imageMimeType =
       state.currentImageMimeType ||
       data.images?.[0]?.mimeType ||
@@ -391,7 +380,6 @@
       const { done, value } = await reader.read();
 
       if (done) {
-        console.log("✅ Stream completed");
         break;
       }
 

@@ -6,6 +6,7 @@ import { transformRawData } from "$utils/transformRawData";
 import TranscriptionModel, {
   type Transcription,
 } from "$data/models/transcription.model";
+import { clearAllCache } from "$utils/cache";
 import { AudioCategory } from "$types/TenantFeature";
 
 const TranscribeInputParamsSchema = z.object({
@@ -42,7 +43,7 @@ export const transcription = {
 
   create: defineAction({
     input: TranscribeInputParamsSchema,
-    handler: async (input) => {
+    handler: async (input, context) => {
       const session = client.startSession();
       session.startTransaction();
       try {
@@ -52,6 +53,10 @@ export const transcription = {
         };
         const insertResult = await TranscriptionModel.add(update);
         await session.commitTransaction();
+
+        // clear all cache entries for this tenant
+        clearAllCache(context.locals.tenant._id?.toString());
+
         return transformRawData(insertResult);
       } catch (error) {
         await session.abortTransaction();
@@ -64,7 +69,7 @@ export const transcription = {
 
   update: defineAction({
     input: TranscribeUpdateInputParamsSchema,
-    handler: async (input) => {
+    handler: async (input, context) => {
       const session = client.startSession();
       session.startTransaction();
       try {
@@ -80,6 +85,10 @@ export const transcription = {
         );
 
         await session.commitTransaction();
+
+        // clear all cache entries for this tenant
+        clearAllCache(context.locals.tenant._id?.toString());
+
         return transformRawData(updatedDocument);
       } catch (error) {
         await session.abortTransaction();
@@ -92,29 +101,37 @@ export const transcription = {
 
   active: defineAction({
     input: TranscribeInputIdentifierSchema,
-    handler: async (input) => {
+    handler: async (input, context) => {
       const updateResult = await TranscriptionModel.updateActiveStatus(
         input._id,
         true,
       );
+
+      // clear all cache entries for this tenant
+      clearAllCache(context.locals.tenant._id?.toString());
+
       return transformRawData(updateResult);
     },
   }),
 
   deactive: defineAction({
     input: TranscribeInputIdentifierSchema,
-    handler: async (input) => {
+    handler: async (input, context) => {
       const updateResult = await TranscriptionModel.updateActiveStatus(
         input._id,
         false,
       );
+
+      // clear all cache entries for this tenant
+      clearAllCache(context.locals.tenant._id?.toString());
+
       return transformRawData(updateResult);
     },
   }),
 
   delete: defineAction({
     input: TranscribeInputIdentifierSchema,
-    handler: async (input) => {
+    handler: async (input, context) => {
       const transcription = await TranscriptionModel.get(input._id);
       if (!transcription) throw new Error("Transcription does not exist.");
 
@@ -124,6 +141,10 @@ export const transcription = {
         session.startTransaction();
         await TranscriptionModel.remove(input._id);
         await session.commitTransaction();
+
+        // clear all cache entries for this tenant
+        clearAllCache(context.locals.tenant._id?.toString());
+
         return transformRawData({});
       } catch (error) {
         await session.abortTransaction();
