@@ -258,6 +258,7 @@ export default {
     const _tenantId = toObjectId(tenantId);
     return await collection.countDocuments({
       tenant_id: _tenantId,
+      roles: { $in: [UserRole.User] },
     });
   },
 
