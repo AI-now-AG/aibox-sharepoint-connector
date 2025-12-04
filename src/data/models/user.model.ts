@@ -258,7 +258,7 @@ export default {
     const _tenantId = toObjectId(tenantId);
     return await collection.countDocuments({
       tenant_id: _tenantId,
-      roles: { $in: [UserRole.User] },
+      roles: { $nin: [UserRole.SuperAdmin] },
     });
   },
 
@@ -267,6 +267,7 @@ export default {
     return await collection.countDocuments({
       tenant_id: _tenantId,
       blocked: false,
+      roles: { $nin: [UserRole.SuperAdmin] },
     });
   },
 
