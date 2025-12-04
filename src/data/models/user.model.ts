@@ -254,6 +254,13 @@ export default {
     );
   },
 
+  countUsersByTenant: async (tenantId: string | ObjectId) => {
+    const _tenantId = toObjectId(tenantId);
+    return await collection.countDocuments({
+      tenant_id: _tenantId,
+    });
+  },
+
   countActiveUsersByTenant: async (tenantId: string | ObjectId) => {
     const _tenantId = toObjectId(tenantId);
     return await collection.countDocuments({

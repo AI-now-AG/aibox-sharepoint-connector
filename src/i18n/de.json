@@ -690,5 +690,7 @@
   "usage.table.amount": "Anzahl",
   "usage.table.unit": "Einheit",
   "usage.table.credits": "Genutzte Credits",
-  "usage.table.credits-total": "Credits gesamt"
+  "usage.table.credits-total": "Credits gesamt",
+  "tenant.user-limit": "Benutzerlimit",
+  "tenant.reached-user-limit": "Ihr Mandant hat das Benutzerlimit erreicht."
 }

@@ -1,8 +1,9 @@
-import { defineAction } from "astro:actions";
+import { defineAction, ActionError } from "astro:actions";
 import { ObjectId } from "mongodb";
 import { client } from "$data/mongodb";
 import { z } from "zod";
 import { transformRawData } from "$utils/transformRawData";
+import { useTranslations } from "$i18n/utils";
 import {
   assignPermissions,
   UserFilterParamsSchema,
@@ -71,6 +72,8 @@ const assignMemberRoles = async (
   }
 };
 
+const t = useTranslations();
+
 export const user = {
   get: defineAction({
     input: UserInputIdentifierSchema,
@@ -92,7 +95,19 @@ export const user = {
   create: defineAction({
     input: UserInputParamsSchema,
     handler: async (input, context) => {
-      const { _id: tenantId, org_id: organizationId } = context.locals.tenant;
+      const {
+        _id: tenantId,
+        org_id: organizationId,
+        max_user_limit: maxUserLimit,
+      } = context.locals.tenant;
+
+      const countUsers = await UserModel.countUsersByTenant(tenantId);
+      if (maxUserLimit && maxUserLimit > 0 && countUsers >= maxUserLimit) {
+        throw new ActionError({
+          code: "BAD_REQUEST",
+          message: t("tenant.reached-user-limit"),
+        });
+      }
 
       const session = client.startSession();
       session.startTransaction();
