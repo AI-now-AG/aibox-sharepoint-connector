@@ -2317,7 +2317,7 @@
       </div>
 
       <!-- GPT Image Section -->
-      <div class="p-4  bg-base-100 shadow-sm rounded-lg mb-4">
+      <div class="p-4 bg-base-100 shadow-sm rounded-lg mb-4">
         <div class="flex items-center justify-between gap-4">
           <div class="flex items-center">
             <input
@@ -2388,45 +2388,57 @@
       <p class="font-medium text-md">{t("user.user-management")}</p>
     </div>
 
-    <div class="container mx-auto">
-      <div class="bg-base-100 shadow-sm rounded-lg my-4">
-        <div class="flex p-4 items-center justify-between">
-          <div class="flex items-center">
-            <input
-              id="disable-create-user"
-              type="checkbox"
-              class="checkbox checkbox-primary"
-              value="disable-create-user"
-              bind:checked={tenantData.is_restrict_user_managment}
-            />
-            <label class="label cursor-pointer ml-2" for="disable-create-user">
-              <span class="label-text text-base-content ml-2"
-                >{t("tenant.restrict-user-managment")}</span
+    <div class="flex flex-row space-x-4">
+      <div class="flex-1 flex flex-col mb-4">
+        <div class="bg-base-100 shadow-sm rounded-lg my-4 p-2">
+          <div class="flex p-2 items-center justify-between">
+            <div class="flex items-center">
+              <input
+                id="disable-create-user"
+                type="checkbox"
+                class="checkbox checkbox-primary"
+                value="disable-create-user"
+                bind:checked={tenantData.is_restrict_user_managment}
+              />
+              <label
+                class="label cursor-pointer ml-2"
+                for="disable-create-user"
               >
-            </label>
+                <span class="label-text text-base-content ml-2"
+                  >{t("tenant.restrict-user-managment")}</span
+                >
+              </label>
+            </div>
+          </div>
+          <div class="flex p-2 items-center justify-between">
+            <div class="flex items-center">
+              <input
+                id="is-on-posthog"
+                type="checkbox"
+                class="checkbox checkbox-primary"
+                value="is-on-posthog"
+                bind:checked={tenantData.is_on_posthog}
+              />
+              <label class="label cursor-pointer ml-2" for="is-on-posthog">
+                <span class="label-text text-base-content ml-2"
+                  >{t("tenant.posthog")}</span
+                >
+              </label>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="container mx-auto">
-      <div class="bg-base-100 shadow-sm rounded-lg my-4">
-        <div class="flex p-4 items-center justify-between">
-          <div class="flex items-center">
-            <input
-              id="is-on-posthog"
-              type="checkbox"
-              class="checkbox checkbox-primary"
-              value="is-on-posthog"
-              bind:checked={tenantData.is_on_posthog}
-            />
-            <label class="label cursor-pointer ml-2" for="is-on-posthog">
-              <span class="label-text text-base-content ml-2"
-                >{t("tenant.posthog")}</span
-              >
-            </label>
-          </div>
-        </div>
+      <div class="flex-1 flex flex-col mb-4">
+        <span class="mb-2 text-base-content font-medium text-sm"
+          >User Limit</span
+        >
+        <input
+          type="text"
+          placeholder=""
+          class="input input-bordered w-full"
+          bind:value={tenantData.name}
+        />
       </div>
     </div>
   </div>
