@@ -56,6 +56,9 @@
     childRefDropdownFilter?.hideDropdownFilter();
   }
 
+  //$inspect(selectedUser);
+  //$inspect(users);
+
   $effect(() => {
     if (searchValue == "" || searchValue) {
       hideDropdownFilter();
@@ -259,11 +262,13 @@
           <td
             class="py-3 px-4 text-sm font-medium relative relative-dropdown rounded-r-lg"
           >
-            <DropdownSection
-              options={getOptions(user)}
-              class={"dropdown-end"}
-            />
-          </td>
+            {#key user?._id}
+              <DropdownSection
+                options={getOptions(user)}
+                class={"dropdown-end"}
+              />
+            {/key}</td
+          >
         </tr>
       {/each}
     </SortableTable>
