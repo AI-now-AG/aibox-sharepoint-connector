@@ -14,9 +14,9 @@ const t = useTranslations();
 const transcriptionTypes = Astro.locals.tenant?.transcription_types;
 
 const hasSubtitle = [
-  AudioCategory.Subtitle,
-  AudioCategory.SubtitleJson,
-  AudioCategory.SubtitleLarge,
+  // AudioCategory.Subtitle,      // Deprecated: Allegro (M) - commented for future restoration
+  // AudioCategory.SubtitleJson,  // Deprecated: commented for future restoration
+  // AudioCategory.SubtitleLarge, // Deprecated: Adagio (L) - commented for future restoration
   AudioCategory.Subtitle11Labs,
 ].some((type) => transcriptionTypes?.includes(type));
 
@@ -50,11 +50,11 @@ if (Astro.locals.tenant) {
     cards.push({
       title: t("settings.transcription.subtitles-title"),
       category: [
-        AudioCategory.Subtitle,
-        AudioCategory.SubtitleJson,
-        ...(speech_api_key && speech_region
-          ? [AudioCategory.SubtitleLarge]
-          : []),
+        // AudioCategory.Subtitle,      // Deprecated: Allegro (M) - commented for future restoration
+        // AudioCategory.SubtitleJson,  // Deprecated: commented for future restoration
+        // ...(speech_api_key && speech_region
+        //   ? [AudioCategory.SubtitleLarge]
+        //   : []),                      // Deprecated: Adagio (L) - commented for future restoration
         ...(elevenLabs_api_key ? [AudioCategory.Subtitle11Labs] : []),
       ],
       toggle: hasSubtitle,

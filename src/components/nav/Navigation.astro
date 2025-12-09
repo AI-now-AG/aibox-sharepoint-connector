@@ -87,9 +87,9 @@ const audioToTextTranscriptions = activeTranscriptions
 const subtitleTranscriptions = activeTranscriptions
   .filter(
     (tran) =>
-      tran.category == AudioCategory.Subtitle ||
-      tran.category == AudioCategory.SubtitleJson ||
-      tran.category == AudioCategory.SubtitleLarge ||
+      // tran.category == AudioCategory.Subtitle ||      // Deprecated: Allegro (M) - commented for future restoration
+      // tran.category == AudioCategory.SubtitleJson ||  // Deprecated: commented for future restoration
+      // tran.category == AudioCategory.SubtitleLarge || // Deprecated: Adagio (L) - commented for future restoration
       tran.category == AudioCategory.Subtitle11Labs
   )
   .map((tran) => ({
@@ -114,7 +114,8 @@ if (subtitleTranscriptions.length > 0) {
   });
 }
 
-if (Astro.locals.tenant.subtitle_editor) {
+// Subtitle Editor is always available when Subtitle Studio is active
+if (Astro.locals.tenant.subtitle_studio_active) {
   subtitleFeatureItems.push({
     title: t("settings.transcription.subtitle-editor"),
     path: `/subtitle-studio/editor`,
@@ -129,7 +130,8 @@ if (transcriptionTypes.includes(AudioCategory.AudioPro)) {
   });
 }
 
-if (audioFeatureItems.length > 0) {
+// Show Audio Assistant menu only if audio_assistant_active flag is true
+if (Astro.locals.tenant.audio_assistant_active && audioFeatureItems.length > 0) {
   audioToTextMenus.push({
     title: t("nav.audiotool"),
     icon: svgIcons.audio,
@@ -138,7 +140,8 @@ if (audioFeatureItems.length > 0) {
   });
 }
 
-if (subtitleFeatureItems.length > 0) {
+// Show Subtitle Studio menu only if subtitle_studio_active flag is true
+if (Astro.locals.tenant.subtitle_studio_active && subtitleFeatureItems.length > 0) {
   subtitleStudioMenus.push({
     title: t("nav.subtitle-studio"),
     icon: svgIcons.subtitle,

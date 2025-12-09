@@ -88,8 +88,17 @@
     ...(tenant?.metadata ?? {}),
   };
 
-  if (tenantData && tenantData.subtitle_editor === undefined) {
-    tenantData.subtitle_editor = false;
+  // subtitle_editor is deprecated - Subtitle Editor is now always active when Subtitle Studio is active
+  // if (tenantData && tenantData.subtitle_editor === undefined) {
+  //   tenantData.subtitle_editor = false;
+  // }
+
+  // Initialize new active flags with defaults
+  if (tenantData && tenantData.audio_assistant_active === undefined) {
+    tenantData.audio_assistant_active = true;
+  }
+  if (tenantData && tenantData.subtitle_studio_active === undefined) {
+    tenantData.subtitle_studio_active = true;
   }
 
   // Subscription & billing
@@ -173,6 +182,9 @@
   let tenantAdminEmail = $state("");
   let tenantAdminEmailErrorMessage = $state("");
 
+  // ==========================================
+  // AUDIO ASSISTANT Arrays
+  // ==========================================
   const audioStandardArray = $state([
     {
       title: t("tenant.audio-to-text"),
@@ -181,20 +193,21 @@
         tenantData?.transcription_types?.includes(AudioCategory.AudioToText) ||
         false,
     },
-    {
-      title: t("tenant.subtitles"),
-      type: AudioCategory.Subtitle,
-      checked:
-        tenantData?.transcription_types?.includes(AudioCategory.Subtitle) ||
-        false,
-    },
-    {
-      title: t("tenant.subtitles-json"),
-      type: AudioCategory.SubtitleJson,
-      checked:
-        tenantData?.transcription_types?.includes(AudioCategory.SubtitleJson) ||
-        false,
-    },
+    // Deprecated: Subtitle (Allegro M) and SubtitleJson - commented for future restoration
+    // {
+    //   title: t("tenant.subtitles"),
+    //   type: AudioCategory.Subtitle,
+    //   checked:
+    //     tenantData?.transcription_types?.includes(AudioCategory.Subtitle) ||
+    //     false,
+    // },
+    // {
+    //   title: t("tenant.subtitles-json"),
+    //   type: AudioCategory.SubtitleJson,
+    //   checked:
+    //     tenantData?.transcription_types?.includes(AudioCategory.SubtitleJson) ||
+    //     false,
+    // },
   ]);
   let isAudioToTextChecked = $derived(
     audioStandardArray.some((item: any) => item.checked),
@@ -215,14 +228,15 @@
         tenantData?.transcription_types?.includes(AudioCategory.AudioPro) ||
         false,
     },
-    {
-      title: t("tenant.subtitle-large"),
-      type: AudioCategory.SubtitleLarge,
-      checked:
-        tenantData?.transcription_types?.includes(
-          AudioCategory.SubtitleLarge,
-        ) || false,
-    },
+    // Deprecated: SubtitleLarge (Adagio L) - commented for future restoration
+    // {
+    //   title: t("tenant.subtitle-large"),
+    //   type: AudioCategory.SubtitleLarge,
+    //   checked:
+    //     tenantData?.transcription_types?.includes(
+    //       AudioCategory.SubtitleLarge,
+    //     ) || false,
+    // },
   ]);
   let isAzureAudioProEnabled: boolean = $derived(
     audioProArray.some((item: any) => item.checked),
@@ -235,7 +249,31 @@
       .join(", "),
   );
 
-  const audioElevenLabsArray = $state([
+  // ==========================================
+  // SUBTITLE STUDIO Arrays
+  // ==========================================
+  // Deprecated: SubtitleJson - commented for future restoration
+  // const subtitleStudioArray = $state([
+  //   {
+  //     title: t("tenant.subtitles-json"),
+  //     type: AudioCategory.SubtitleJson,
+  //     checked:
+  //       tenantData?.transcription_types?.includes(AudioCategory.SubtitleJson) ||
+  //       false,
+  //   },
+  // ]);
+  // let isSubtitleStudioChecked = $derived(
+  //   subtitleStudioArray.some((item: any) => item.checked),
+  // );
+  //
+  // const subtitleStudioInfo = $derived(
+  //   subtitleStudioArray
+  //     .filter((e) => e.checked === true)
+  //     .map((e) => e.title)
+  //     .join(", "),
+  // );
+
+  const subtitleStudio11LabsArray = $state([
     {
       title: t("tenant.subtitle-elevenLabs"),
       type: AudioCategory.Subtitle11Labs,
@@ -245,31 +283,26 @@
         ) || false,
     },
   ]);
-  let isAudioToElevenLabsChecked = $derived(
-    audioElevenLabsArray.some((item: any) => item.checked),
+  let isSubtitleStudio11LabsChecked = $derived(
+    subtitleStudio11LabsArray.some((item: any) => item.checked),
   );
 
-  const audioElevenLabsInfo = $derived(
-    audioElevenLabsArray
+  const subtitleStudio11LabsInfo = $derived(
+    subtitleStudio11LabsArray
       .filter((e) => e.checked === true)
       .map((e) => e.title)
       .join(", "),
   );
 
-  // Check if any subtitle features are enabled
+  // Legacy arrays for backwards compatibility (keeping the old names)
+  const audioElevenLabsArray = subtitleStudio11LabsArray;
+  let isAudioToElevenLabsChecked = $derived(isSubtitleStudio11LabsChecked);
+  const audioElevenLabsInfo = subtitleStudio11LabsInfo;
+
+  // Check if any subtitle features are enabled (simplified - only 11Labs remains)
   const isAnySubtitleFeatureEnabled = $derived(
-    audioStandardArray.some(
-      (item) =>
-        item.checked &&
-        (item.type === AudioCategory.Subtitle ||
-          item.type === AudioCategory.SubtitleJson),
-    ) ||
-      audioProArray.some(
-        (item) => item.checked && item.type === AudioCategory.SubtitleLarge,
-      ) ||
-      audioElevenLabsArray.some(
-        (item) => item.checked && item.type === AudioCategory.Subtitle11Labs,
-      ),
+    // subtitleStudioArray.some((item) => item.checked) || // Deprecated: SubtitleJson
+    subtitleStudio11LabsArray.some((item) => item.checked),
   );
 
   let selectedLanguage: string = $state(LanguageCode.De);
@@ -782,6 +815,7 @@
             provider: audioSelectedProvider.value,
           });
         }
+        // Collect transcription types from AUDIO ASSISTANT arrays
         updatedTranscriptionTypes = audioStandardArray
           .filter((item) => item.checked)
           .map((item) => item.type);
@@ -791,9 +825,16 @@
             .filter((item) => item.checked)
             .map((item) => item.type),
         ];
+        // Collect transcription types from SUBTITLE STUDIO arrays
         updatedTranscriptionTypes = [
           ...updatedTranscriptionTypes,
-          ...audioElevenLabsArray
+          ...subtitleStudioArray
+            .filter((item) => item.checked)
+            .map((item) => item.type),
+        ];
+        updatedTranscriptionTypes = [
+          ...updatedTranscriptionTypes,
+          ...subtitleStudio11LabsArray
             .filter((item) => item.checked)
             .map((item) => item.type),
         ];
@@ -1898,10 +1939,21 @@
 
     <div class="divider"></div>
 
-    <!-- Audio tools -->
-    <div class="mb-3 flex flex-row items-center gap-2">
-      {@html svgIcons.audioToText}
-      <p class="font-medium text-md">{t("nav.audiotool")}</p>
+    <!-- AUDIO ASSISTANT Section -->
+    <div class="mb-3 flex flex-row items-center justify-between">
+      <div class="flex flex-row items-center gap-2">
+        {@html svgIcons.audioToText}
+        <p class="font-medium text-md">{t("nav.audiotool")}</p>
+      </div>
+      <!-- Active Toggle -->
+      <label class="flex items-center gap-2">
+        <span class="label-text">{t("tenant.tenants.tenant.active")}</span>
+        <input
+          type="checkbox"
+          class="toggle toggle-primary"
+          bind:checked={tenantData.audio_assistant_active}
+        />
+      </label>
     </div>
     <div class="container mx-auto">
       <!-- Audio Whisper Section -->
@@ -1914,10 +1966,17 @@
             <input
               id="audio-whisper-model"
               type="checkbox"
+              bind:checked={audioStandardArray[0].checked}
+              class="checkbox checkbox-primary z-10"
+            />
+            <!-- Original: disabled parent checkbox that reflected child state
+            <input
+              id="audio-whisper-model"
+              type="checkbox"
               checked={isAudioToTextChecked}
               class="checkbox checkbox-primary z-10"
               disabled
-            />
+            /> -->
             <label class="label cursor-pointer ml-2" for="audio-whisper-model">
               <span class="label-text text-base-content"
                 >{t("tenant.audio.whisper.model.title")}</span
@@ -1933,7 +1992,7 @@
 
         <div class="collapse-content space-y-6">
           <div class="flex flex-col gap-4 mx-8">
-            <!-- Checkboxes for Audio to Text & Subtitles -->
+            <!-- Simplified: Features section removed since only one feature exists
             <div class="rounded-lg">
               <span class="text-sm font-semibold">{t("tenant.features")}</span>
               <div class="flex flex-wrap gap-4 mt-2">
@@ -1957,6 +2016,7 @@
                 {/each}
               </div>
             </div>
+            -->
 
             <div class="alert">
               <span class="text-sm"
@@ -1977,10 +2037,17 @@
             <input
               id="audio-pro-model"
               type="checkbox"
+              bind:checked={audioProArray[0].checked}
+              class="checkbox checkbox-primary z-10"
+            />
+            <!-- Original: disabled parent checkbox that reflected child state
+            <input
+              id="audio-pro-model"
+              type="checkbox"
               checked={isAzureAudioProEnabled}
               class="checkbox checkbox-primary z-10"
               disabled
-            />
+            /> -->
             <label class="label cursor-pointer ml-2" for="audio-pro-model">
               <span class="label-text text-base-content"
                 >{t("tenant.settings.large-file-azure")}</span
@@ -1994,8 +2061,8 @@
           </div>
         </div>
         <div class="collapse-content space-y-4">
+          <!-- Simplified: Features section removed since only one feature exists
           <div class="grid grid-cols-2 gap-4 mx-8">
-            <!-- Checkboxes for Audio Pro & Subtitles Large -->
             <div class="rounded-lg">
               <span class="text-sm font-semibold">{t("tenant.features")}</span>
               <div class="flex flex-wrap gap-4 mt-2">
@@ -2020,6 +2087,7 @@
               </div>
             </div>
           </div>
+          -->
 
           <div class="grid grid-cols-2 gap-4 mx-8">
             <div class="w-full">
@@ -2071,7 +2139,122 @@
         </div>
       </div>
 
-      <!-- 11Labs File Azure Section -->
+      <!-- Model Selection (for Audio Assistant) -->
+      <div class="container mx-auto">
+        <div class="bg-base-100 shadow-sm rounded-lg my-4">
+          <div class="flex p-4 items-center justify-between">
+            <div class="flex items-center justify-between">
+              <label class="label cursor-pointer" for="">
+                <span class="label-text text-base-content"
+                  >{t("tenant.text.improvement.llm")}</span
+                >
+              </label>
+            </div>
+            <div class="flex gap-4">
+              {#each providerValues as option}
+                <div class="flex items-center">
+                  <input
+                    type="radio"
+                    id="radio-text-{option.value}"
+                    name="text-prompt-provider"
+                    class="radio radio-sm radio-primary"
+                    value={option}
+                    bind:group={audioSelectedProvider}
+                  />
+                  <label
+                    for="radio-text-{option.value}"
+                    class="ml-2 font-medium text-sm">{option.label}</label
+                  >
+                </div>
+              {/each}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- SUBTITLE STUDIO Section -->
+    <div class="mb-3 flex flex-row items-center justify-between">
+      <div class="flex flex-row items-center gap-2">
+        {@html svgIcons.subtitle}
+        <p class="font-medium text-md">{t("nav.subtitle-studio")}</p>
+      </div>
+      <!-- Active Toggle -->
+      <label class="flex items-center gap-2">
+        <span class="label-text">{t("tenant.tenants.tenant.active")}</span>
+        <input
+          type="checkbox"
+          class="toggle toggle-primary"
+          bind:checked={tenantData.subtitle_studio_active}
+        />
+      </label>
+    </div>
+    <div class="container mx-auto">
+      <!-- Deprecated: SubtitleJson Section - commented for future restoration -->
+      <!-- <div
+        class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
+      >
+        <input type="checkbox" />
+        <div class="collapse-title flex items-center justify-between gap-4">
+          <div class="flex items-center">
+            <input
+              id="subtitle-json-model"
+              type="checkbox"
+              checked={isSubtitleStudioChecked}
+              class="checkbox checkbox-primary z-10"
+              disabled
+            />
+            <label class="label cursor-pointer ml-2" for="subtitle-json-model">
+              <span class="label-text text-base-content"
+                >{t("tenant.subtitles-json")}</span
+              >
+            </label>
+          </div>
+          <div class="flex mb-2">
+            <span class="text-base-content/50 font-medium text-sm"
+              >{subtitleStudioInfo}</span
+            >
+          </div>
+        </div>
+
+        <div class="collapse-content space-y-6">
+          <div class="flex flex-col gap-4 mx-8">
+            <div class="rounded-lg">
+              <span class="text-sm font-semibold">{t("tenant.features")}</span>
+              <div class="flex flex-wrap gap-4 mt-2">
+                {#each subtitleStudioArray as item, index}
+                  <div class="flex items-center">
+                    <input
+                      id="subtitle-studio-{item.type}"
+                      type="checkbox"
+                      bind:checked={subtitleStudioArray[index].checked}
+                      class="checkbox checkbox-primary checkbox-sm z-10"
+                    />
+                    <label
+                      class="label cursor-pointer ml-2"
+                      for="subtitle-studio-{item.type}"
+                    >
+                      <span class="label-text text-base-content"
+                        >{item.title}</span
+                      >
+                    </label>
+                  </div>
+                {/each}
+              </div>
+            </div>
+
+            <div class="alert">
+              <span class="text-sm"
+                >{t("tenant.whisper.model.configured.for.azure.openai")}</span
+              >
+            </div>
+          </div>
+        </div>
+      </div> -->
+
+      <!-- 11Labs Subtitle Section -->
       <div
         class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
       >
@@ -2081,10 +2264,17 @@
             <input
               id="audio-elevenLabs-model"
               type="checkbox"
+              bind:checked={audioElevenLabsArray[0].checked}
+              class="checkbox checkbox-primary z-10"
+            />
+            <!-- Original: disabled parent checkbox that reflected child state
+            <input
+              id="audio-elevenLabs-model"
+              type="checkbox"
               checked={isAudioToElevenLabsChecked}
               class="checkbox checkbox-primary z-10"
               disabled
-            />
+            /> -->
             <label
               class="label cursor-pointer ml-2"
               for="audio-elevenLabs-model"
@@ -2101,8 +2291,8 @@
           </div>
         </div>
         <div class="collapse-content space-y-4">
+          <!-- Simplified: Features section removed since only one feature exists
           <div class="grid grid-cols-2 gap-4 mx-8">
-            <!-- Checkboxes for Audio Pro & Subtitles Large -->
             <div class="rounded-lg">
               <span class="text-sm font-semibold">{t("tenant.features")}</span>
               <div class="flex flex-wrap gap-4 mt-2">
@@ -2127,6 +2317,7 @@
               </div>
             </div>
           </div>
+          -->
 
           <div class="grid grid-cols-1 gap-4 mx-8">
             <div class="w-full">
@@ -2166,68 +2357,8 @@
         </div>
       </div>
 
-      <!-- Model Selection -->
-      <div class="container mx-auto">
-        <div class="bg-base-100 shadow-sm rounded-lg my-4">
-          <div class="flex p-4 items-center justify-between">
-            <div class="flex items-center justify-between">
-              <label class="label cursor-pointer" for="">
-                <span class="label-text text-base-content"
-                  >{t("tenant.text.improvement.llm")}</span
-                >
-                <!-- <span class="text-sm font-semibold"
-                >{t("tenant.text.improvement.llm")}</span
-              > -->
-              </label>
-            </div>
-            <div class="flex gap-4">
-              {#each providerValues as option}
-                <div class="flex items-center">
-                  <input
-                    type="radio"
-                    id="radio-text-{option.value}"
-                    name="text-prompt-provider"
-                    class="radio radio-sm radio-primary"
-                    value={option}
-                    bind:group={audioSelectedProvider}
-                  />
-                  <label
-                    for="radio-text-{option.value}"
-                    class="ml-2 font-medium text-sm">{option.label}</label
-                  >
-                </div>
-              {/each}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Subtitle Editor Feature -->
-      {#if isAnySubtitleFeatureEnabled}
-        <div class="container mx-auto" transition:slide={{ duration: 300 }}>
-          <div class="bg-base-100 shadow-sm rounded-lg my-4">
-            <div class="flex p-4 items-center justify-between">
-              <div class="flex items-center">
-                <input
-                  id="subtitle-editor-feature"
-                  type="checkbox"
-                  class="checkbox checkbox-primary"
-                  value="subtitle-editor-feature"
-                  bind:checked={tenantData.subtitle_editor}
-                />
-                <label
-                  class="label cursor-pointer ml-2"
-                  for="subtitle-editor-feature"
-                >
-                  <span class="label-text text-base-content ml-2"
-                    >{t("settings.transcription.subtitle-editor")}</span
-                  >
-                </label>
-              </div>
-            </div>
-          </div>
-        </div>
-      {/if}
+      <!-- Note: Subtitle Editor is now always available when Subtitle Studio is active -->
+      <!-- The subtitle_editor checkbox has been removed - controlled by subtitle_studio_active flag -->
     </div>
 
     <div class="divider"></div>

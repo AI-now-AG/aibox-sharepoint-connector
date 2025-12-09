@@ -295,7 +295,8 @@ export const onboarding = {
           return item.name !== TenantFeature.AudioToText;
         });
       }
-      const subtitleEditorEnabled = hasSubtitleEditor(input.add_ons ?? []);
+      // Subtitle Studio is active if AudioPremium is selected (includes subtitle features)
+      const subtitleStudioActive = hasSubtitleEditor(input.add_ons ?? []);
       const newTenant = await TenantModel.copyTenant(masterTenantId, {
         name: input.name,
         org_id: input.org_id,
@@ -306,7 +307,8 @@ export const onboarding = {
         transcription_types: transcriptionTypes,
         default_language: input.language,
         stripe_customer_id: input.stripe_customer_id,
-        subtitle_editor: subtitleEditorEnabled,
+        audio_assistant_active: true,
+        subtitle_studio_active: subtitleStudioActive,
         totalPrice: "",
       });
 

@@ -17,9 +17,10 @@ export const getTranscriptionTypes = (
   if (selectedAddOns?.includes(AudioOptionId.AudioBasis)) {
     transcriptionTypes.push(AudioCategory.AudioToText);
   }
-  if (selectedAddOns?.includes(AudioOptionId.AudioBasisAddOnSubtitle)) {
-    transcriptionTypes.push(AudioCategory.Subtitle);
-  }
+  // Deprecated: Subtitle (Allegro M) - commented for future restoration
+  // if (selectedAddOns?.includes(AudioOptionId.AudioBasisAddOnSubtitle)) {
+  //   transcriptionTypes.push(AudioCategory.Subtitle);
+  // }
   if (selectedAddOns?.includes(AudioOptionId.AudioBasisAddOnLarge)) {
     transcriptionTypes.push(AudioCategory.AudioPro);
   }
@@ -28,19 +29,24 @@ export const getTranscriptionTypes = (
   if (selectedAddOns?.includes(AudioOptionId.AudioPremium)) {
     transcriptionTypes = [
       AudioCategory.AudioToText,
-      AudioCategory.Subtitle,
+      // AudioCategory.Subtitle,      // Deprecated: Allegro (M) - commented for future restoration
       AudioCategory.AudioPro,
-      AudioCategory.SubtitleLarge,
+      // AudioCategory.SubtitleLarge, // Deprecated: Adagio (L) - commented for future restoration
       AudioCategory.Subtitle11Labs,
+      // AudioCategory.SubtitleJson,  // Deprecated: commented for future restoration
     ];
   }
 
   return transcriptionTypes;
 };
 
+// Deprecated: Subtitle Editor is now always active when Subtitle Studio is active
+// This function is kept for backwards compatibility but always returns true for AudioPremium
+// which includes Subtitle Studio access
 export const hasSubtitleEditor = (
   selectedAddOns: AudioOptionId[] = [],
 ): boolean => {
+  // Subtitle Editor is always available when Subtitle Studio is active
   return selectedAddOns?.includes(AudioOptionId.AudioPremium);
 };
 

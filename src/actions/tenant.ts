@@ -61,7 +61,9 @@ const TenantInputParamsSchema = z.object({
   gemini_chat_model: z.string().optional(),
   included_features: z.array(IncludedFeaturesSchema),
   transcription_types: z.array(z.nativeEnum(AudioCategory)).optional(),
-  subtitle_editor: z.boolean().optional().default(false),
+  // subtitle_editor: z.boolean().optional().default(false), // Deprecated: Subtitle Editor is now always active when Subtitle Studio is active
+  audio_assistant_active: z.boolean().optional().default(true),
+  subtitle_studio_active: z.boolean().optional().default(true),
   is_restrict_user_managment: z
     .boolean()
     .optional()
