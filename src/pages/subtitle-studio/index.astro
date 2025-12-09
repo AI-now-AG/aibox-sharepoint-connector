@@ -14,7 +14,8 @@ const t = useTranslations();
       <p class="text-lg mb-8">Professional subtitle creation and editing tools for your content.</p>
       
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {Astro.locals.tenant?.subtitle_editor && (
+        {/* subtitle_editor is deprecated - Subtitle Editor is always available when Subtitle Studio is active */}
+        {Astro.locals.tenant?.subtitle_studio_active && (
           <div class="card bg-base-100 shadow-xl">
             <div class="card-body">
               <h2 class="card-title">{t("settings.transcription.subtitle-editor")}</h2>
