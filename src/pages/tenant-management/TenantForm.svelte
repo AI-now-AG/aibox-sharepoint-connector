@@ -826,12 +826,13 @@
             .map((item) => item.type),
         ];
         // Collect transcription types from SUBTITLE STUDIO arrays
-        updatedTranscriptionTypes = [
-          ...updatedTranscriptionTypes,
-          ...subtitleStudioArray
-            .filter((item) => item.checked)
-            .map((item) => item.type),
-        ];
+        // Deprecated: SubtitleJson - commented for future restoration
+        // updatedTranscriptionTypes = [
+        //   ...updatedTranscriptionTypes,
+        //   ...subtitleStudioArray
+        //     .filter((item) => item.checked)
+        //     .map((item) => item.type),
+        // ];
         updatedTranscriptionTypes = [
           ...updatedTranscriptionTypes,
           ...subtitleStudio11LabsArray
