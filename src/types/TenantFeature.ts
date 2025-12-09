@@ -23,18 +23,18 @@ export enum ApiKeyProvider {
 
 export enum AudioCategory {
   AudioToText = "audio-to-text",
-  // Subtitle = "subtitle",           // Deprecated: Allegro (M) - commented for future restoration
-  // SubtitleJson = "subtitle-json",  // Deprecated: commented for future restoration
-  // SubtitleLarge = "subtitle-large", // Deprecated: Adagio (L) - commented for future restoration
+  Subtitle = "subtitle",           // Deprecated: Allegro (M) - commented for future restoration
+  SubtitleJson = "subtitle-json",  // Deprecated: commented for future restoration
+  SubtitleLarge = "subtitle-large", // Deprecated: Adagio (L) - commented for future restoration
   Subtitle11Labs = "subtitle-11Labs",
   AudioPro = "audio-pro",
 }
 
 export const AudioCategoryLabels: Record<AudioCategory, string> = {
   [AudioCategory.AudioToText]: t("nav.audiotool.audio-to-text"),
-  // [AudioCategory.Subtitle]: t("tenant.subtitles"),       // Deprecated: Allegro (M)
-  // [AudioCategory.SubtitleJson]: t("tenant.subtitles-json"), // Deprecated: commented for future restoration
-  // [AudioCategory.SubtitleLarge]: t("tenant.subtitle-large"), // Deprecated: Adagio (L)
+  [AudioCategory.Subtitle]: t("tenant.subtitles"),       // Deprecated: Allegro (M)
+  [AudioCategory.SubtitleJson]: t("tenant.subtitles-json"), // Deprecated: commented for future restoration
+  [AudioCategory.SubtitleLarge]: t("tenant.subtitle-large"), // Deprecated: Adagio (L)
   [AudioCategory.Subtitle11Labs]: t("tenant.subtitle-elevenLabs"),
   [AudioCategory.AudioPro]: t("tenant.audio-pro"),
 };
