@@ -2141,7 +2141,7 @@
       </div>
 
       <!-- Model Selection (for Audio Assistant) -->
-      <div class="container mx-auto">
+      <!-- <div class="container mx-auto">
         <div class="bg-base-100 shadow-sm rounded-lg my-4">
           <div class="flex p-4 items-center justify-between">
             <div class="flex items-center justify-between">
@@ -2171,7 +2171,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </div> -->
     </div>
 
     <div class="divider"></div>
