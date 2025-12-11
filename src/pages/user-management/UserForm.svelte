@@ -212,9 +212,9 @@
 </script>
 
 <div
-  class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14 sticky bg-base-200 top-0 z-10"
+  class="grid grid-cols-1 md:grid-cols-[1fr_max-content] py-6 sticky bg-base-200 top-0 z-10"
 >
-  <div class="flex items-center pt-5 pb-2">
+  <div class="flex items-center">
     <button
       class="mr-4"
       onclick={() => (window.location.href = "/user-management")}
@@ -243,210 +243,205 @@
     </div>
   </div>
 </div>
-<div class="px-8 mb-10">
-  <div class="container w-full mx-auto p-6">
-    <div class="flex flex-row space-x-4">
-      <div class="flex-1 flex flex-col mb-4">
-        <Input
-          id="name"
-          label={t("common.name")}
-          value={userData.name ?? ""}
-          placeholder={t("common.name")}
-          inputChange={(event: any) => {
-            userData.name = event.value;
-          }}
-          disabled={isEnterpriseAuth}
-          required
-        />
-      </div>
 
-      <div class="flex-1 flex flex-col mb-4">
-        <Input
-          id="email"
-          label={t("user.e-mail")}
-          value={userData.email ?? ""}
-          placeholder={t("user.e-mail")}
-          inputChange={(event: any) => {
-            userData.email = event.value;
-          }}
-          disabled={isEnterpriseAuth || isRestrictUserManagment}
-          required
-        />
-      </div>
+<div class="mb-10">
+  <div class="flex flex-row space-x-4">
+    <div class="flex-1 flex flex-col mb-4">
+      <Input
+        id="name"
+        label={t("common.name")}
+        value={userData.name ?? ""}
+        placeholder={t("common.name")}
+        inputChange={(event: any) => {
+          userData.name = event.value;
+        }}
+        disabled={isEnterpriseAuth}
+        required
+      />
     </div>
 
-    <div class="">
-      <div class="mb-5 text-base-content font-medium text-sm">
-        {t("user.role")}
-      </div>
+    <div class="flex-1 flex flex-col mb-4">
+      <Input
+        id="email"
+        label={t("user.e-mail")}
+        value={userData.email ?? ""}
+        placeholder={t("user.e-mail")}
+        inputChange={(event: any) => {
+          userData.email = event.value;
+        }}
+        disabled={isEnterpriseAuth || isRestrictUserManagment}
+        required
+      />
+    </div>
+  </div>
 
+  <div class="">
+    <div class="mb-5 text-base-content font-medium text-sm">
+      {t("user.role")}
+    </div>
+
+    <div class="flex items-center">
       <div class="flex items-center">
-        <div class="flex items-center">
-          <input
-            type="radio"
-            id="role-admin"
-            name="role"
-            class="radio"
-            value={UserRole.Admin}
-            checked={role == UserRole.Admin || role == UserRole.SuperAdmin}
-            onchange={() => {
-              role = UserRole.Admin;
-            }}
-            disabled={isUpdateRoleDisabled}
-          />
-          <label for="role-admin" class="ml-2 font-medium text-sm"
-            >{t("user.admin")}</label
-          >
+        <input
+          type="radio"
+          id="role-admin"
+          name="role"
+          class="radio"
+          value={UserRole.Admin}
+          checked={role == UserRole.Admin || role == UserRole.SuperAdmin}
+          onchange={() => {
+            role = UserRole.Admin;
+          }}
+          disabled={isUpdateRoleDisabled}
+        />
+        <label for="role-admin" class="ml-2 font-medium text-sm"
+          >{t("user.admin")}</label
+        >
+      </div>
+      <div class="flex items-center ml-8">
+        <input
+          type="radio"
+          id="role-super-user"
+          name="role"
+          class="radio"
+          value={UserRole.SuperUser}
+          checked={role == UserRole.SuperUser}
+          onchange={() => {
+            role = UserRole.SuperUser;
+          }}
+          disabled={isUpdateRoleDisabled}
+        />
+        <label for="role-super-user" class="ml-2 font-medium text-sm"
+          >{t("user.super-user")}</label
+        >
+      </div>
+      <div class="flex items-center ml-8">
+        <input
+          type="radio"
+          id="role-user"
+          name="role"
+          class="radio"
+          value={UserRole.User}
+          checked={role == UserRole.User}
+          onchange={() => {
+            role = UserRole.User;
+          }}
+          disabled={isUpdateRoleDisabled}
+        />
+        <label for="role-user" class="ml-2 font-medium text-sm"
+          >{t("user.user")}</label
+        >
+      </div>
+    </div>
+
+    {#if mode == MODE.Edit}
+      <div class="divider"></div>
+
+      <div class="w-full mb-4 font-medium">
+        {t("user.additional-infos")}
+      </div>
+      <div class="flex flex-row space-x-4 text-sm">
+        <div class="flex-1 flex flex-col mb-4">
+          <table class="border-separate border-spacing-x-0 border-spacing-y-3">
+            <colgroup>
+              <col class="w-36" />
+              <col class="w-auto" />
+            </colgroup>
+            <tbody>
+              <tr class="mb-4">
+                <td class="text-base-content/80">{t("user.signed-up")}</td>
+                <td class="text-base">
+                  {dayjs(userData.created_at, "DD.MM.YYYY").format(
+                    "dddd DD.MM.YYYY",
+                  )}
+                </td>
+              </tr>
+              <tr class="mb-4">
+                <td class="text-base-content/80">{t("user.logins")}</td>
+                <td class="text-base-content/80"
+                  >{userData.logins_count ?? "-"}</td
+                >
+              </tr>
+              <tr class="">
+                <td class="text-base-content/80">{t("user.organization")}</td>
+                <td class="text-base">{tenant?.name ?? "-"}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-        <div class="flex items-center ml-8">
-          <input
-            type="radio"
-            id="role-super-user"
-            name="role"
-            class="radio"
-            value={UserRole.SuperUser}
-            checked={role == UserRole.SuperUser}
-            onchange={() => {
-              role = UserRole.SuperUser;
-            }}
-            disabled={isUpdateRoleDisabled}
-          />
-          <label for="role-super-user" class="ml-2 font-medium text-sm"
-            >{t("user.super-user")}</label
-          >
-        </div>
-        <div class="flex items-center ml-8">
-          <input
-            type="radio"
-            id="role-user"
-            name="role"
-            class="radio"
-            value={UserRole.User}
-            checked={role == UserRole.User}
-            onchange={() => {
-              role = UserRole.User;
-            }}
-            disabled={isUpdateRoleDisabled}
-          />
-          <label for="role-user" class="ml-2 font-medium text-sm"
-            >{t("user.user")}</label
-          >
+
+        <div class="flex-1 flex flex-col mb-4">
+          <table class="border-separate border-spacing-x-0 border-spacing-y-3">
+            <colgroup>
+              <col class="w-36" />
+              <col class="w-auto" />
+            </colgroup>
+            <tbody>
+              <tr class="mb-4">
+                <td class="text-base-content/80">{t("user.latest-login")}</td>
+                <td class="text-base">
+                  {userData.last_login
+                    ? dayjs(userData.last_login, "DD.MM.YYYY").format(
+                        "dddd DD.MM.YYYY",
+                      )
+                    : "-"}
+                </td>
+              </tr>
+              <tr class="mb-4">
+                <td class="text-base-content/80">{t("user.status")}</td>
+                <td
+                  class="text-base"
+                  style={`color: ${getUserStatus(userData.blocked, userData.email_verified).color}`}
+                >
+                  {getUserStatus(userData.blocked, userData.email_verified)
+                    .text}</td
+                >
+              </tr>
+              <tr class="mb-4">
+                <td class="text-base-content/80">{t("user.id")}</td>
+                <td class="text-base"> {userData.auth0_sub}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
-      {#if mode == MODE.Edit}
-        <div class="divider"></div>
+      <div class="divider"></div>
 
-        <div class="w-full mb-4 font-medium">
-          {t("user.additional-infos")}
+      {#if userData.email != $currentUser?.email && !isRestrictUserManagment}
+        <div class="flex items-center">
+          <button
+            class="flex items-center text-base-content/80"
+            onclick={(e) => {
+              confirmBlockModal?.showModal();
+            }}
+          >
+            <span class="w-5 h-5 flex items-center">
+              {@html svgIcons.block}</span
+            >
+            <span class="text-sm font-semibold ml-1 text-left"
+              >{userData.blocked
+                ? t("user.un-block-user")
+                : t("user.block-user")}</span
+            >
+          </button>
+
+          <button
+            class="flex items-center text-error/60 ml-8"
+            onclick={(e) => {
+              confirmDeleteModal?.showModal();
+            }}
+          >
+            <span class="w-5 h-5 flex items-center">
+              {@html svgIcons.trash}</span
+            >
+            <span class="text-sm font-semibold ml-1 text-left text-error/60"
+              >{t("user.delete-user")}</span
+            >
+          </button>
         </div>
-        <div class="flex flex-row space-x-4 text-sm">
-          <div class="flex-1 flex flex-col mb-4">
-            <table
-              class="border-separate border-spacing-x-0 border-spacing-y-3"
-            >
-              <colgroup>
-                <col class="w-36" />
-                <col class="w-auto" />
-              </colgroup>
-              <tbody>
-                <tr class="mb-4">
-                  <td class="text-base-content/80">{t("user.signed-up")}</td>
-                  <td class="text-base">
-                    {dayjs(userData.created_at, "DD.MM.YYYY").format(
-                      "dddd DD.MM.YYYY",
-                    )}
-                  </td>
-                </tr>
-                <tr class="mb-4">
-                  <td class="text-base-content/80">{t("user.logins")}</td>
-                  <td class="text-base-content/80"
-                    >{userData.logins_count ?? "-"}</td
-                  >
-                </tr>
-                <tr class="">
-                  <td class="text-base-content/80">{t("user.organization")}</td>
-                  <td class="text-base">{tenant?.name ?? "-"}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div class="flex-1 flex flex-col mb-4">
-            <table
-              class="border-separate border-spacing-x-0 border-spacing-y-3"
-            >
-              <colgroup>
-                <col class="w-36" />
-                <col class="w-auto" />
-              </colgroup>
-              <tbody>
-                <tr class="mb-4">
-                  <td class="text-base-content/80">{t("user.latest-login")}</td>
-                  <td class="text-base">
-                    {userData.last_login
-                      ? dayjs(userData.last_login, "DD.MM.YYYY").format(
-                          "dddd DD.MM.YYYY",
-                        )
-                      : "-"}
-                  </td>
-                </tr>
-                <tr class="mb-4">
-                  <td class="text-base-content/80">{t("user.status")}</td>
-                  <td
-                    class="text-base"
-                    style={`color: ${getUserStatus(userData.blocked, userData.email_verified).color}`}
-                  >
-                    {getUserStatus(userData.blocked, userData.email_verified)
-                      .text}</td
-                  >
-                </tr>
-                <tr class="mb-4">
-                  <td class="text-base-content/80">{t("user.id")}</td>
-                  <td class="text-base"> {userData.auth0_sub}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="divider"></div>
-
-        {#if userData.email != $currentUser?.email && !isRestrictUserManagment}
-          <div class="flex items-center">
-            <button
-              class="flex items-center text-base-content/80"
-              onclick={(e) => {
-                confirmBlockModal?.showModal();
-              }}
-            >
-              <span class="w-5 h-5 flex items-center">
-                {@html svgIcons.block}</span
-              >
-              <span class="text-sm font-semibold ml-1 text-left"
-                >{userData.blocked
-                  ? t("user.un-block-user")
-                  : t("user.block-user")}</span
-              >
-            </button>
-
-            <button
-              class="flex items-center text-error/60 ml-8"
-              onclick={(e) => {
-                confirmDeleteModal?.showModal();
-              }}
-            >
-              <span class="w-5 h-5 flex items-center">
-                {@html svgIcons.trash}</span
-              >
-              <span class="text-sm font-semibold ml-1 text-left text-error/60"
-                >{t("user.delete-user")}</span
-              >
-            </button>
-          </div>
-        {/if}
       {/if}
-    </div>
+    {/if}
   </div>
 </div>
 
