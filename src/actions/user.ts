@@ -85,10 +85,23 @@ export const user = {
 
   listByTenant: defineAction({
     input: z.intersection(UserFilterParamsSchema, TenantInputIdentifierSchema),
-    handler: async (input) => {
+    handler: async (input, context) => {
       const tenantId = new ObjectId(input.tenantId);
+      const maxUserLimit = context.locals.tenant?.max_user_limit || 0;
       const data = await UserModel.listByTenant(tenantId, input);
-      return transformRawData(data);
+
+      let limitReached = false;
+      const countUsers = await UserModel.countUsersByTenant(tenantId);
+      if (maxUserLimit && maxUserLimit > 0 && countUsers >= maxUserLimit) {
+        limitReached = true;
+      }
+
+      return transformRawData({
+        total: data.length || 0,
+        max_user_limit: maxUserLimit,
+        limit_reached: limitReached,
+        users: data,
+      });
     },
   }),
 

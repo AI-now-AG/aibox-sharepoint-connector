@@ -82,6 +82,9 @@ import email from "$assets/icons/email.svg?raw";
 import share from "$assets/icons/share.svg?raw";
 import thumbUp from "$assets/icons/thumb-up.svg?raw";
 import thumbDown from "$assets/icons/thumb-down.svg?raw";
+import alertSuccess from "$assets/icons/alert-success.svg?raw";
+import alertWarning from "$assets/icons/alert-warning.svg?raw";
+import alertError from "$assets/icons/alert-error.svg?raw";
 
 export const svgIcons = {
   menuSettings,
@@ -167,5 +170,8 @@ export const svgIcons = {
   email,
   share,
   thumbUp,
-  thumbDown
+  thumbDown,
+  alertSuccess,
+  alertWarning,
+  alertError,
 };

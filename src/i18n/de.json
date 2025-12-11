@@ -692,5 +692,6 @@
   "usage.table.credits": "Genutzte Credits",
   "usage.table.credits-total": "Credits gesamt",
   "tenant.user-limit": "Benutzerlimit",
-  "tenant.reached-user-limit": "Ihr Mandant hat das Benutzerlimit erreicht."
+  "tenant.reached-user-limit": "Ihr Mandant hat das Benutzerlimit erreicht.",
+  "tenant.reached-user-limit-contact-upgrade": "Sie haben das Benutzerlimit Ihres Abonnements erreicht. Entfernen Sie ungenutzte Benutzer oder kontaktieren Sie den <a href=\"mailto:support@aibox-app.ch\" class=\"underline\">Support</a>, um ein Upgrade durchzuführen."
 }
