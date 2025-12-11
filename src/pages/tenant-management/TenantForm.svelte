@@ -305,6 +305,35 @@
     subtitleStudio11LabsArray.some((item) => item.checked),
   );
 
+  // Check if any Audio Assistant features are enabled
+  const isAnyAudioAssistantFeatureEnabled = $derived(
+    audioStandardArray.some((item) => item.checked) ||
+    audioProArray.some((item) => item.checked),
+  );
+
+  // Auto-sync parent active toggles with sub-feature checkboxes
+  $effect(() => {
+    // Sync Audio Assistant active toggle with sub-features
+    if (isAnyAudioAssistantFeatureEnabled && !tenantData.audio_assistant_active) {
+      // If any feature is checked but toggle is off, enable it
+      tenantData.audio_assistant_active = true;
+    } else if (!isAnyAudioAssistantFeatureEnabled && tenantData.audio_assistant_active) {
+      // If no features are checked but toggle is on, disable it
+      tenantData.audio_assistant_active = false;
+    }
+  });
+
+  $effect(() => {
+    // Sync Subtitle Studio active toggle with sub-features
+    if (isAnySubtitleFeatureEnabled && !tenantData.subtitle_studio_active) {
+      // If any feature is checked but toggle is off, enable it
+      tenantData.subtitle_studio_active = true;
+    } else if (!isAnySubtitleFeatureEnabled && tenantData.subtitle_studio_active) {
+      // If no features are checked but toggle is on, disable it
+      tenantData.subtitle_studio_active = false;
+    }
+  });
+
   let selectedLanguage: string = $state(LanguageCode.De);
   let selectedThemes: { title: string; value: string } | undefined = $state(
     ThemeMap[ThemeCode.AIBox],
