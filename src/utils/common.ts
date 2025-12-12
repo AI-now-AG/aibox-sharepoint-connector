@@ -24,8 +24,7 @@ export function formatDateToDDMMYY(date: string | Date): string {
 }
 
 export const isValidEmail = (email: string) => {
-  const emailRegex = /^[\w.+-]+@[\w.-]+\.\w{2,3}$/;
-  return emailRegex.test(email);
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 };
 
 export const preventDefault = (fn: any) => {
@@ -68,7 +67,6 @@ export function isSameObjectId(a: unknown, b: unknown): boolean {
   return strA === strB;
 }
 
-
 export const getSubscriptionAddOnName = (
   forOption: "audiototext" | "subtitle" = "audiototext",
   planAddOns: Array<any> = [],
@@ -76,17 +74,17 @@ export const getSubscriptionAddOnName = (
   const addOnOptions: Array<any> =
     forOption == "audiototext"
       ? planAddOns.filter((option: any) => {
-        return (
-          option == AudioOptionId.AudioBasis ||
-          option == AudioOptionId.AudioBasisAddOnLarge
-        );
-      }) || []
+          return (
+            option == AudioOptionId.AudioBasis ||
+            option == AudioOptionId.AudioBasisAddOnLarge
+          );
+        }) || []
       : planAddOns.filter((option: any) => {
-        return (
-          option == AudioOptionId.AudioBasisAddOnSubtitle ||
-          option == AudioOptionId.AudioPremium
-        );
-      }) || [];
+          return (
+            option == AudioOptionId.AudioBasisAddOnSubtitle ||
+            option == AudioOptionId.AudioPremium
+          );
+        }) || [];
   const firstOption = addOnOptions?.[0] as AudioOptionId | undefined;
   return firstOption ? AudioOptionLabels[firstOption] || "-" : "-";
 };
@@ -99,7 +97,6 @@ export function isValidPhone(phone: string): boolean {
 
   return regex.test(trimmed);
 }
-
 
 export function bgOpacity(color: string, opacity = 0.4) {
   return `${color}${Math.round(opacity * 255)
