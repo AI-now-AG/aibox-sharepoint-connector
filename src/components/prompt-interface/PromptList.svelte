@@ -10,6 +10,7 @@
 </script>
 
 <script lang="ts">
+  import { navigate } from "astro:transitions/client";
   import PromptItem from "$components/prompt-interface/PromptItem.svelte";
   import EditPromptDialog from "$components/prompt-library/prompts/EditPromptDialog.svelte";
   import PromptOrderDialog from "$components/prompt-interface/PromptOrderDialog.svelte";
@@ -76,11 +77,6 @@
     confirmDeleteModal?.showModal();
   }
 
-  function removeDeletedItem(deletedId: string) {
-    items = items?.filter((item: any) => item.id !== deletedId);
-    orderCards = orderCards?.filter((item: any) => item.id !== deletedId);
-  }
-
   async function deleteCard() {
     try {
       loading = true;
@@ -101,12 +97,14 @@
           errorData.message || t("prompt-library.delete.prompt.failed"),
         );
       }
-      removeDeletedItem(selectedDeletePromptId);
+
       loading = false;
       addToast({
         message: t("prompt-library.delete.prompt.success"),
         type: "success",
       });
+
+      navigate(window.location.href);
     } catch (error) {
       loading = false;
       addToast({

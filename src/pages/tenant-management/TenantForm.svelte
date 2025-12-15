@@ -1350,20 +1350,6 @@
       </div>
       <div class="flex-1 flex flex-col mb-4">
         <span class="mb-2 text-base-content font-medium text-sm"
-          >{t("subscription.number-of-active-user")}</span
-        >
-        <input
-          type="number"
-          class="input input-bordered bg-base-200 w-full"
-          readonly
-          value={activeUsers}
-        />
-      </div>
-    </div>
-
-    <div class="flex flex-row space-x-4">
-      <div class="flex-1 flex flex-col mb-4">
-        <span class="mb-2 text-base-content font-medium text-sm"
           >{t("tenant.comment")}</span
         >
         <textarea
@@ -1372,6 +1358,31 @@
           class="input input-bordered w-full py-2 text-gray-500"
           bind:value={tenantData.comment}
         ></textarea>
+      </div>
+    </div>
+
+    <div class="flex flex-row space-x-4">
+      <div class="flex-1 flex flex-col mb-4">
+        <span class="mb-2 text-base-content font-medium text-sm"
+          >{t("tenant.user-limit")}</span
+        >
+        <input
+          type="number"
+          placeholder=""
+          class="input input-bordered w-full"
+          bind:value={tenantData.max_user_limit}
+        />
+      </div>
+      <div class="flex-1 flex flex-col mb-4">
+        <span class="mb-2 text-base-content font-medium text-sm"
+          >{t("subscription.number-of-active-user")}</span
+        >
+        <input
+          type="number"
+          class="input input-bordered bg-base-200 w-full"
+          readonly
+          value={activeUsers}
+        />
       </div>
     </div>
 
@@ -2478,7 +2489,7 @@
       </div>
 
       <!-- GPT Image Section -->
-      <div class="p-4  bg-base-100 shadow-sm rounded-lg mb-4">
+      <div class="p-4 bg-base-100 shadow-sm rounded-lg mb-4">
         <div class="flex items-center justify-between gap-4">
           <div class="flex items-center">
             <input
@@ -2549,43 +2560,43 @@
       <p class="font-medium text-md">{t("user.user-management")}</p>
     </div>
 
-    <div class="container mx-auto">
-      <div class="bg-base-100 shadow-sm rounded-lg my-4">
-        <div class="flex p-4 items-center justify-between">
-          <div class="flex items-center">
-            <input
-              id="disable-create-user"
-              type="checkbox"
-              class="checkbox checkbox-primary"
-              value="disable-create-user"
-              bind:checked={tenantData.is_restrict_user_managment}
-            />
-            <label class="label cursor-pointer ml-2" for="disable-create-user">
-              <span class="label-text text-base-content ml-2"
-                >{t("tenant.restrict-user-managment")}</span
+    <div class="flex flex-row space-x-4">
+      <div class="flex-1 flex flex-col mb-4">
+        <div class="bg-base-100 shadow-sm rounded-lg my-4 p-2">
+          <div class="flex p-2 items-center justify-between">
+            <div class="flex items-center">
+              <input
+                id="disable-create-user"
+                type="checkbox"
+                class="checkbox checkbox-primary"
+                value="disable-create-user"
+                bind:checked={tenantData.is_restrict_user_managment}
+              />
+              <label
+                class="label cursor-pointer ml-2"
+                for="disable-create-user"
               >
-            </label>
+                <span class="label-text text-base-content ml-2"
+                  >{t("tenant.restrict-user-managment")}</span
+                >
+              </label>
+            </div>
           </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="container mx-auto">
-      <div class="bg-base-100 shadow-sm rounded-lg my-4">
-        <div class="flex p-4 items-center justify-between">
-          <div class="flex items-center">
-            <input
-              id="is-on-posthog"
-              type="checkbox"
-              class="checkbox checkbox-primary"
-              value="is-on-posthog"
-              bind:checked={tenantData.is_on_posthog}
-            />
-            <label class="label cursor-pointer ml-2" for="is-on-posthog">
-              <span class="label-text text-base-content ml-2"
-                >{t("tenant.posthog")}</span
-              >
-            </label>
+          <div class="flex p-2 items-center justify-between">
+            <div class="flex items-center">
+              <input
+                id="is-on-posthog"
+                type="checkbox"
+                class="checkbox checkbox-primary"
+                value="is-on-posthog"
+                bind:checked={tenantData.is_on_posthog}
+              />
+              <label class="label cursor-pointer ml-2" for="is-on-posthog">
+                <span class="label-text text-base-content ml-2"
+                  >{t("tenant.posthog")}</span
+                >
+              </label>
+            </div>
           </div>
         </div>
       </div>

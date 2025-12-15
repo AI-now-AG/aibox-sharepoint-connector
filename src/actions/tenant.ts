@@ -42,7 +42,10 @@ const TenantInputParamsSchema = z.object({
   openai_chat_model: z.string().optional().default(ModelName.Gpt4o),
   openai_api_key: z.string().optional(),
   openai_gpt5_chat_model: z.string().optional().default(ModelName.Gpt5),
-  openai_gpt5_reasoning_effort: z.string().optional().default(ReasoningEffortOption.None),
+  openai_gpt5_reasoning_effort: z
+    .string()
+    .optional()
+    .default(ReasoningEffortOption.None),
   openai_gpt5_api_key: z.string().optional(),
   azure_openai_api_key: z.string().optional(),
   azure_openai_endpoint: z.string().optional(),
@@ -70,6 +73,7 @@ const TenantInputParamsSchema = z.object({
     .default(() => false),
   is_trial: z.boolean().optional().default(false),
   is_on_posthog: z.boolean().optional().default(false),
+  max_user_limit: z.number().nullish().default(0),
   comment: z.string().optional(),
   metadata: z.record(z.any()).optional(),
   tenant_admin_email: z.string().optional(),
@@ -97,7 +101,7 @@ const CreateTenantAdminSchema = z.object({
   _id: z.string(),
   org_id: z.string().optional(),
   tenant_admin_email: z.string().optional(),
-  role: z.string().default("admin")
+  role: z.string().default("admin"),
 });
 
 const SubscriptionInputParamsSchema = z.object({
@@ -107,7 +111,7 @@ const SubscriptionInputParamsSchema = z.object({
     .optional(),
   add_ons: z.array(z.nativeEnum(AudioOptionId)).optional(),
   start_date: z.coerce.date().nullable().optional(),
-  cancelled_date: z.coerce.date().nullable().optional()
+  cancelled_date: z.coerce.date().nullable().optional(),
 });
 
 const assignMemberRoles = async (
@@ -153,7 +157,7 @@ const setupTenantAdmin = async (
   organizationId: string,
   email: string,
   name?: string,
-  role: "admin" | "sa" = "admin"
+  role: "admin" | "sa" = "admin",
 ) => {
   let user;
   let userId;
@@ -161,7 +165,7 @@ const setupTenantAdmin = async (
   const oldRoles: string[] = [];
   const newRoles: UserRole[] = [UserRole.User, UserRole.Admin];
   if (role === "sa") {
-    newRoles.push(UserRole.SuperAdmin)
+    newRoles.push(UserRole.SuperAdmin);
   }
 
   const existingUsers = await usersManagement.getByEmail(email?.trim());
@@ -240,7 +244,7 @@ export const tenant = {
             organizationId,
             input.tenant_admin_email,
             input.role === "admin" ? "Admin" : "Supper Admin",
-            input.role as "admin" | "sa"
+            input.role as "admin" | "sa",
           );
         }
         await session.commitTransaction();

@@ -254,11 +254,20 @@ export default {
     );
   },
 
+  countUsersByTenant: async (tenantId: string | ObjectId) => {
+    const _tenantId = toObjectId(tenantId);
+    return await collection.countDocuments({
+      tenant_id: _tenantId,
+      roles: { $nin: [UserRole.SuperAdmin] },
+    });
+  },
+
   countActiveUsersByTenant: async (tenantId: string | ObjectId) => {
     const _tenantId = toObjectId(tenantId);
     return await collection.countDocuments({
       tenant_id: _tenantId,
       blocked: false,
+      roles: { $nin: [UserRole.SuperAdmin] },
     });
   },
 

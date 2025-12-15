@@ -1,10 +1,33 @@
 ---
 import Layout from "$layouts/Layout.astro";
+import UserModel from "$data/models/user.model";
+import { svgIcons } from "$assets/icons";
+import { useTranslations } from "$i18n/utils";
 import UserForm from "./UserForm.svelte";
 
+const t = useTranslations();
+
 const tenant = Astro.locals.tenant;
+
+const maxUserLimit = Astro.locals.tenant?.max_user_limit || 0;
+const countUsers = await UserModel.countUsersByTenant(tenant._id);
+let limitReached = false;
+if (maxUserLimit && maxUserLimit > 0 && countUsers >= maxUserLimit) {
+  limitReached = true;
+}
 ---
 
 <Layout>
-  <UserForm user={undefined} tenant={tenant} client:load />
+  <div class="container w-full mx-auto p-6">
+    {
+      limitReached ? (
+        <div role="alert" class="alert alert-warning mb-10">
+          <span set:html={svgIcons.alertWarning} />
+          <span set:html={t("tenant.reached-user-limit-contact-upgrade")} />
+        </div>
+      ) : (
+        <UserForm user={undefined} tenant={tenant} client:load />
+      )
+    }
+  </div>
 </Layout>

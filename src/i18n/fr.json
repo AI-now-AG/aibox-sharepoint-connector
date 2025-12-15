@@ -690,5 +690,8 @@
   "usage.table.amount": "Amount",
   "usage.table.unit": "Unit",
   "usage.table.credits": "Credits Used",
-  "usage.table.credits-total": "Total Credits"
+  "usage.table.credits-total": "Total Credits",
+  "tenant.user-limit": "User Limit",
+  "tenant.reached-user-limit": "Your tenant has reached the user limit",
+  "tenant.reached-user-limit-contact-upgrade": "You've reached your subscription’s user limit. Remove unused users or contact <a href=\"mailto:support@aibox-app.ch\" class=\"underline\">support</a> to upgrade."
 }

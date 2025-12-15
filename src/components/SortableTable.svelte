@@ -31,7 +31,7 @@
       return rowData;
     }
 
-    rowData = rowData?.sort((a: any, b: any) => {
+    rowData = [...rowData]?.sort((a: any, b: any) => {
       const aValue = a[col] ?? "";
       const bValue = b[col] ?? "";
 

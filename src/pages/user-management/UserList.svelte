@@ -1,9 +1,11 @@
 <script lang="ts">
   import { actions } from "astro:actions";
+  import { navigate } from "astro:transitions/client";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
   import { onMount } from "svelte";
   import log from "$utils/log";
+  import { tenant } from "$stores";
   import { addToast } from "$stores/toast";
   import Loading from "$components/Loading.svelte";
   import { user as currentUser } from "$stores";
@@ -36,6 +38,11 @@
     { key: "", name: "" },
     { key: "", name: "" },
   ];
+  let total: number = $state(0);
+  let limitReached: boolean = $state(false);
+  let isRestrictUserManagement: boolean = $state(
+    $tenant?.is_restrict_user_managment || false,
+  );
   let users: any = $state([]);
 
   let searchValue: string = $state("");
@@ -55,6 +62,9 @@
   function hideDropdownFilter() {
     childRefDropdownFilter?.hideDropdownFilter();
   }
+
+  //$inspect(selectedUser);
+  //$inspect(users);
 
   $effect(() => {
     if (searchValue == "" || searchValue) {
@@ -76,7 +86,10 @@
       ...filterStatusesParams,
     });
     if (!error) {
-      users = data;
+      console.log("data", data);
+      total = data.total;
+      limitReached = data.limit_reached || false;
+      users = data.users;
     } else {
       log.e(error, "Error fetching users");
     }
@@ -204,6 +217,29 @@
 </script>
 
 <div class="container max-w-7xl mx-auto py-6">
+  <div class="flex space-y-2 justify-between items-center">
+    <h1 class="text-4xl font-bold">
+      {t("user.user-management")}
+    </h1>
+    {#if !isRestrictUserManagement}
+      <button
+        onclick={() => navigate("/user-management/add")}
+        class="btn btn-outline font-normal"
+        disabled={limitReached}
+      >
+        {@html svgIcons.add}
+        {t("user.add-new-user")}
+      </button>
+    {/if}
+  </div>
+
+  {#if limitReached}
+    <div role="alert" class="alert alert-warning my-3">
+      {@html svgIcons.alertSuccess}
+      <span>{@html t("tenant.reached-user-limit-contact-upgrade")}</span>
+    </div>
+  {/if}
+
   <InputSearch bind:value={searchValue} onsearch={fetchUsers} />
 
   <DropdownFilter
@@ -223,7 +259,7 @@
 
   <div class="mt-10">
     <h2 class="text-lg font-normal mb-4">
-      {t("user.all-users") + ` (${users?.length ?? 0})`}
+      {t("user.all-users") + ` (${total})`}
     </h2>
 
     <SortableTable {columnData} bind:rowData={users}>
@@ -259,11 +295,13 @@
           <td
             class="py-3 px-4 text-sm font-medium relative relative-dropdown rounded-r-lg"
           >
-            <DropdownSection
-              options={getOptions(user)}
-              class={"dropdown-end"}
-            />
-          </td>
+            {#key user?._id}
+              <DropdownSection
+                options={getOptions(user)}
+                class={"dropdown-end"}
+              />
+            {/key}</td
+          >
         </tr>
       {/each}
     </SortableTable>
