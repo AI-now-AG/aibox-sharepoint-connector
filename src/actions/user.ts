@@ -1,8 +1,9 @@
-import { defineAction } from "astro:actions";
+import { defineAction, ActionError } from "astro:actions";
 import { ObjectId } from "mongodb";
 import { client } from "$data/mongodb";
 import { z } from "zod";
 import { transformRawData } from "$utils/transformRawData";
+import { useTranslations } from "$i18n/utils";
 import {
   assignPermissions,
   UserFilterParamsSchema,
@@ -71,6 +72,8 @@ const assignMemberRoles = async (
   }
 };
 
+const t = useTranslations();
+
 export const user = {
   get: defineAction({
     input: UserInputIdentifierSchema,
@@ -82,17 +85,42 @@ export const user = {
 
   listByTenant: defineAction({
     input: z.intersection(UserFilterParamsSchema, TenantInputIdentifierSchema),
-    handler: async (input) => {
+    handler: async (input, context) => {
       const tenantId = new ObjectId(input.tenantId);
+      const maxUserLimit = context.locals.tenant?.max_user_limit || 0;
       const data = await UserModel.listByTenant(tenantId, input);
-      return transformRawData(data);
+
+      let limitReached = false;
+      const countUsers = await UserModel.countUsersByTenant(tenantId);
+      if (maxUserLimit && maxUserLimit > 0 && countUsers >= maxUserLimit) {
+        limitReached = true;
+      }
+
+      return transformRawData({
+        total: data.length || 0,
+        max_user_limit: maxUserLimit,
+        limit_reached: limitReached,
+        users: data,
+      });
     },
   }),
 
   create: defineAction({
     input: UserInputParamsSchema,
     handler: async (input, context) => {
-      const { _id: tenantId, org_id: organizationId } = context.locals.tenant;
+      const {
+        _id: tenantId,
+        org_id: organizationId,
+        max_user_limit: maxUserLimit,
+      } = context.locals.tenant;
+
+      const countUsers = await UserModel.countUsersByTenant(tenantId);
+      if (maxUserLimit && maxUserLimit > 0 && countUsers >= maxUserLimit) {
+        throw new ActionError({
+          code: "BAD_REQUEST",
+          message: t("tenant.reached-user-limit"),
+        });
+      }
 
       const session = client.startSession();
       session.startTransaction();

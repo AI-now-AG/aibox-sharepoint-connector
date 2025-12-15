@@ -25,5 +25,7 @@ const data = transformRawData(user);
 ---
 
 <Layout>
-  <UserForm user={data} tenant={tenant} client:load />
+  <div class="container w-full mx-auto p-6">
+    <UserForm user={data} tenant={tenant} client:load />
+  </div>
 </Layout>

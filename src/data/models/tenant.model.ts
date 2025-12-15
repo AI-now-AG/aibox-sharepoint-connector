@@ -49,7 +49,10 @@ const TenantSchema = z.object({
   openai_api_key: z.string().nullish().default(null),
   openai_gpt5_chat_model: z.string().optional().default(ModelName.Gpt5),
   openai_gpt5_api_key: z.string().optional(),
-  openai_gpt5_reasoning_effort: z.string().optional().default(ReasoningEffortOption.None),
+  openai_gpt5_reasoning_effort: z
+    .string()
+    .optional()
+    .default(ReasoningEffortOption.None),
   azure_openai_api_key: z.string().nullish().default(null),
   azure_openai_endpoint: z.string().nullish().default(null),
   azure_openai_instance_name: z.string().nullish().default(null),
@@ -80,6 +83,7 @@ const TenantSchema = z.object({
   billing_info: BillingInfoSchema.optional(),
   stripe_customer_id: z.string().nullish().default(null),
   totalPrice: z.string().optional(),
+  max_user_limit: z.number().nullish().default(0),
   created_at: z
     .date()
     .optional()
@@ -178,7 +182,9 @@ export default {
       },
     ];
 
-    const data = await collection.aggregate<Document<Tenant & { subscription?: any }>>(pipeline).toArray();
+    const data = await collection
+      .aggregate<Document<Tenant & { subscription?: any }>>(pipeline)
+      .toArray();
 
     return data;
   },
@@ -231,7 +237,6 @@ export default {
       created_at: now,
       updated_at: now,
     };
-
 
     delete (newTenant as any)._id; // ensure no ID conflict
 
