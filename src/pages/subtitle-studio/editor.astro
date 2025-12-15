@@ -5,8 +5,8 @@ import SubtitleUpload from "./SubtitleUpload.svelte";
 
 const t = useTranslations();
 
-// Check if the user has subtitle editor feature enabled
-if (!Astro.locals.tenant?.subtitle_editor) {
+// Check if the user has Subtitle Studio active (subtitle editor is always available when Subtitle Studio is active)
+if (!Astro.locals.tenant?.subtitle_studio_active) {
   return Astro.redirect("/404");
 }
 

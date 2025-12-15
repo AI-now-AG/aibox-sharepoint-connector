@@ -27,12 +27,12 @@ if (typeParam === TranscriptionType.Plaintext) {
   defaultCategory = AudioCategory.AudioToText;
 } else if (typeParam === TranscriptionType.Subtitles) {
   selectedTranType = [
-    AudioCategory.Subtitle,
-    AudioCategory.SubtitleJson,
-    AudioCategory.SubtitleLarge,
+    // AudioCategory.Subtitle,      // Deprecated: Allegro (M) - commented for future restoration
+    // AudioCategory.SubtitleJson,  // Deprecated: commented for future restoration
+    // AudioCategory.SubtitleLarge, // Deprecated: Adagio (L) - commented for future restoration
     AudioCategory.Subtitle11Labs,
   ];
-  defaultCategory = AudioCategory.Subtitle;
+  defaultCategory = AudioCategory.Subtitle11Labs; // Only 11Labs remains active
 } else if (typeParam === TranscriptionType.Largefile) {
   selectedTranType = [AudioCategory.AudioPro];
   defaultCategory = AudioCategory.AudioPro;

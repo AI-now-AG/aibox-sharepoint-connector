@@ -2241,7 +2241,9 @@
       {/if}
 
       <!-- Subtitle Editor Button -->
-      {#if (assFileUrl || srtFileUrl) && audioFile && $tenant?.subtitle_editor && (category === AudioCategory.Subtitle || category === AudioCategory.SubtitleLarge || category === AudioCategory.Subtitle11Labs)}
+      <!-- Original: $tenant?.subtitle_editor && (category === AudioCategory.Subtitle || category === AudioCategory.SubtitleLarge || category === AudioCategory.Subtitle11Labs) -->
+      <!-- Deprecated: subtitle_editor, AudioCategory.Subtitle, AudioCategory.SubtitleLarge - commented for future restoration -->
+      {#if (assFileUrl || srtFileUrl) && audioFile && $tenant?.subtitle_studio_active && (category === AudioCategory.Subtitle11Labs)}
         <button
           class="btn bg-neutral btn-sm text-white"
           onclick={openSubtitleEditor}

@@ -27,9 +27,9 @@ if (typeParam === TranscriptionType.Plaintext) {
   selectedTranType = [AudioCategory.AudioToText];
 } else if (typeParam === TranscriptionType.Subtitles) {
   selectedTranType = [
-    AudioCategory.Subtitle,
-    AudioCategory.SubtitleJson,
-    AudioCategory.SubtitleLarge,
+    // AudioCategory.Subtitle,      // Deprecated: Allegro (M) - commented for future restoration
+    // AudioCategory.SubtitleJson,  // Deprecated: commented for future restoration
+    // AudioCategory.SubtitleLarge, // Deprecated: Adagio (L) - commented for future restoration
     AudioCategory.Subtitle11Labs,
   ];
 } else if (typeParam === TranscriptionType.Largefile) {

@@ -53,21 +53,24 @@
 
   let subtitleList = $state(
     [
-      preDefineCategory.includes(AudioCategory.Subtitle) && {
-        title: t("settings.transcription.subtitle-standard"),
-        checked: category === AudioCategory.Subtitle,
-        category: AudioCategory.Subtitle,
-      },
-      preDefineCategory.includes(AudioCategory.SubtitleLarge) && {
-        title: t("settings.transcription.subtitle-large"),
-        checked: category === AudioCategory.SubtitleLarge,
-        category: AudioCategory.SubtitleLarge,
-      },
-      preDefineCategory.includes(AudioCategory.SubtitleJson) && {
-        title: t("settings.transcription.subtitles-title-json"),
-        checked: category === AudioCategory.SubtitleJson,
-        category: AudioCategory.SubtitleJson,
-      },
+      // Deprecated: Subtitle (Allegro M) - commented for future restoration
+      // preDefineCategory.includes(AudioCategory.Subtitle) && {
+      //   title: t("settings.transcription.subtitle-standard"),
+      //   checked: category === AudioCategory.Subtitle,
+      //   category: AudioCategory.Subtitle,
+      // },
+      // Deprecated: SubtitleLarge (Adagio L) - commented for future restoration
+      // preDefineCategory.includes(AudioCategory.SubtitleLarge) && {
+      //   title: t("settings.transcription.subtitle-large"),
+      //   checked: category === AudioCategory.SubtitleLarge,
+      //   category: AudioCategory.SubtitleLarge,
+      // },
+      // Deprecated: SubtitleJson - commented for future restoration
+      // preDefineCategory.includes(AudioCategory.SubtitleJson) && {
+      //   title: t("settings.transcription.subtitles-title-json"),
+      //   checked: category === AudioCategory.SubtitleJson,
+      //   category: AudioCategory.SubtitleJson,
+      // },
       preDefineCategory.includes(AudioCategory.Subtitle11Labs) && {
         title: t("tenant.subtitle-elevenLabs"),
         checked: category === AudioCategory.Subtitle11Labs,
@@ -226,7 +229,9 @@
           </label>
         </div>
       </div>
-      {#if preDefineCategory.includes(AudioCategory.Subtitle) || preDefineCategory.includes(AudioCategory.SubtitleLarge) || preDefineCategory.includes(AudioCategory.SubtitleJson) || preDefineCategory.includes(AudioCategory.Subtitle11Labs)}
+      <!-- Original: {#if preDefineCategory.includes(AudioCategory.Subtitle) || preDefineCategory.includes(AudioCategory.SubtitleLarge) || preDefineCategory.includes(AudioCategory.SubtitleJson) || preDefineCategory.includes(AudioCategory.Subtitle11Labs)} -->
+      <!-- Deprecated: Subtitle, SubtitleLarge, SubtitleJson - commented for future restoration -->
+      {#if preDefineCategory.includes(AudioCategory.Subtitle11Labs)}
         <div class="mb-4">
           <p class="mb-2">{t("prompt-library.add.prompts.group")}</p>
           <div class="dropdown dropdown-bottom min-w-xs">

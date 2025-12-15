@@ -60,7 +60,9 @@ const TenantSchema = z.object({
   azure_openai_chat_model: z.string().nullish().default(null),
   included_features: z.array(IncludedFeaturesSchema).optional(),
   transcription_types: z.array(z.nativeEnum(AudioCategory)).optional(),
-  subtitle_editor: z.boolean().optional().default(false),
+  // subtitle_editor: z.boolean().optional().default(false), // Deprecated: Subtitle Editor is now always active when Subtitle Studio is active
+  audio_assistant_active: z.boolean().optional().default(true),
+  subtitle_studio_active: z.boolean().optional().default(true),
   speech_api_key: z.string().nullish(),
   elevenLabs_api_key: z.string().optional(),
   speech_region: z.string().nullish(),
