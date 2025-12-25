@@ -25,7 +25,7 @@
   let dataSources = $state<VectorDataSource[]>([]);
   let loading = $state(false);
 
-  const apiBase = import.meta.env.PUBLIC_TRANSCRIPTION_SERVICE_DOMAIN || "";
+  const apiBase = import.meta.env.TRANSCRIPTION_API_URL || "";
 
   async function fetchVectorKBData() {
     if (!tenantId) return;

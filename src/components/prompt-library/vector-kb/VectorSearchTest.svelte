@@ -15,7 +15,7 @@
   let error = $state<string | null>(null);
   let searchTime = $state<number | null>(null);
 
-  const apiBase = import.meta.env.PUBLIC_TRANSCRIPTION_SERVICE_DOMAIN || "";
+  const apiBase = import.meta.env.TRANSCRIPTION_API_URL || "";
 
   async function performSearch() {
     if (!query.trim()) {
