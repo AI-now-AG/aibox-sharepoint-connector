@@ -7,6 +7,7 @@ import {
   AudioModel,
   ImageModel,
   WebsearchModel,
+  EmbeddingModel,
   type UsageRow,
   type UsageItem,
   type TokenCreditRate,
@@ -83,6 +84,24 @@ const DURATION_CREDIT_MAPPING: Record<string, number> = {
   [AudioModel.ElevenLabs]: 10,
 };
 
+/**
+ * Mapping configuration for embedding models with token rates.
+ *
+ * Format: model => tokens per 1 credit
+ *
+ * Examples:
+ *   - text-embedding-3-small: 1 credit = 500,000 tokens
+ *   - text-embedding-3-large: 1 credit = 200,000 tokens
+ *   - text-embedding-ada-002: 1 credit = 1,000,000 tokens
+ *   - text-embedding-004: 1 credit = 500,000 tokens
+ */
+const EMBEDDING_TOKEN_CREDIT_MAPPING: Record<string, number> = {
+  [EmbeddingModel.TextEmbedding3Small]: 500000,
+  [EmbeddingModel.TextEmbedding3Large]: 200000,
+  [EmbeddingModel.TextEmbeddingAda002]: 1000000,
+  [EmbeddingModel.TextEmbedding004]: 500000,
+};
+
 const _tokensToCredits = (
   provider: ApiKeyProvider,
   inputTokens: number = 0,
@@ -130,6 +149,18 @@ const _durationsToCredits = (
   // durations is milliseconds
   const minutes = Math.ceil(durationSeconds / 60);
   return Math.ceil(minutes / rate);
+};
+
+const _embeddingTokensToCredits = (
+  model: string,
+  tokens: number,
+): number => {
+  const rate = EMBEDDING_TOKEN_CREDIT_MAPPING[model.toLowerCase()];
+  if (!rate) {
+    // Default rate for unknown models
+    return Math.ceil(tokens / 500000);
+  }
+  return Math.ceil(tokens / rate);
 };
 
 const _skipUsageIfPrivateKeyUsed = (
@@ -678,6 +709,39 @@ const _calculateFluxUsage = (rawUsages: UsageLog[], usePrivateKey: boolean) => {
   return _skipUsageIfPrivateKeyUsed(usageItems, usePrivateKey);
 };
 
+const _calculateEmbeddingUsage = (rawUsages: UsageLog[]) => {
+  const usageItems: UsageItem[] = [];
+
+  // Filter embedding type usage logs
+  const usageData = rawUsages.filter((item: UsageLog) => {
+    return item.type === "embedding";
+  });
+
+  // Group by model
+  const modelGroups: Record<string, { tokens: number; count: number }> = {};
+
+  usageData.forEach((item: UsageLog) => {
+    const model = item.model || "unknown";
+    if (!modelGroups[model]) {
+      modelGroups[model] = { tokens: 0, count: 0 };
+    }
+    modelGroups[model].tokens += item.input_tokens ?? 0;
+    modelGroups[model].count += 1;
+  });
+
+  // Create usage items for each model
+  Object.entries(modelGroups).forEach(([model, data]) => {
+    usageItems.push({
+      model: model,
+      amount: data.tokens,
+      unit: unitLabels.tokens,
+      credits: _embeddingTokensToCredits(model, data.tokens),
+    });
+  });
+
+  return usageItems;
+};
+
 export const calculateUsage = (tenant: Tenant, rawUsages: UsageLog[]) => {
   const usageData: UsageRow[] = [];
 
@@ -784,6 +848,15 @@ export const calculateUsage = (tenant: Tenant, rawUsages: UsageLog[]) => {
     usageData.push({
       provider: "Flux",
       details: _calculateFluxUsage(rawUsages, useFluxPrivateKey),
+    });
+  }
+
+  // Embedding (Vector KB) - always show if there's embedding usage
+  const embeddingUsageItems = _calculateEmbeddingUsage(rawUsages);
+  if (embeddingUsageItems.length > 0) {
+    usageData.push({
+      provider: "Embedding (Vector KB)",
+      details: embeddingUsageItems,
     });
   }
 

@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import { db, toObjectId, type Document } from "../mongodb";
 import { z } from "zod";
-import { ReasoningEffortOption } from "$types/AIProvider";
+import { ReasoningEffortOption, VectorKBScope } from "$types/AIProvider";
 
 const PromptSchema = z.object({
   tenant_id: z.instanceof(ObjectId).optional(),
@@ -19,6 +19,11 @@ const PromptSchema = z.object({
   promptTool: z.string().nullish(),
   documents: z.array(z.instanceof(ObjectId)).optional(),
   position: z.number().default(0).optional(),
+  // Vector KB fields
+  vector_kb_enabled: z.boolean().optional().default(false),
+  vector_kb_scope: z.nativeEnum(VectorKBScope).nullish(),
+  vector_kb_folder_ids: z.array(z.instanceof(ObjectId)).optional(),
+  vector_kb_data_source_ids: z.array(z.instanceof(ObjectId)).optional(),
   created_at: z.date().optional(),
   updated_at: z.date(),
 });

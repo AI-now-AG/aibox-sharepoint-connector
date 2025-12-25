@@ -4,6 +4,7 @@ export enum UsageType {
   Transcription = "transcription",
   Speech = "speech",
   Websearch = "websearch",
+  Embedding = "embedding",
 }
 
 export enum TextModel {
@@ -30,6 +31,13 @@ export enum ImageModel {
 export enum WebsearchModel {
   Sonar = "sonar",
   SonarPro = "sonar-pro",
+}
+
+export enum EmbeddingModel {
+  TextEmbedding3Small = "text-embedding-3-small",
+  TextEmbedding3Large = "text-embedding-3-large",
+  TextEmbeddingAda002 = "text-embedding-ada-002",
+  TextEmbedding004 = "text-embedding-004",
 }
 
 export interface UsageItem {

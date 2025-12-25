@@ -242,24 +242,35 @@ const adminMenus = [];
 const supperAdminMenus = [];
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+const textAssistantItems: Array<any> = [
+  {
+    title: t("nav.settings.prompts"),
+    path: "/prompt-library/prompts",
+  },
+  {
+    title: t("nav.settings.knowledge-base"),
+    path: "/prompt-library/knowledge-base",
+  },
+  {
+    title: t("nav.settings.categories"),
+    path: "/prompt-library/categories",
+  },
+];
+
+// Add Vector KB if enabled for tenant
+if (Astro.locals.tenant.vector_kb_enabled) {
+  textAssistantItems.push({
+    title: "Vector Knowledge Base",
+    path: "/prompt-library/vector-kb",
+  });
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const settingsItems: Array<any> = [
   {
     title: t("nav.text-assistant"),
     isOpened: navState[`admin-menu-id-0`] ?? false,
-    items: [
-      {
-        title: t("nav.settings.prompts"),
-        path: "/prompt-library/prompts",
-      },
-      {
-        title: t("nav.settings.knowledge-base"),
-        path: "/prompt-library/knowledge-base",
-      },
-      {
-        title: t("nav.settings.categories"),
-        path: "/prompt-library/categories",
-      },
-    ],
+    items: textAssistantItems,
   },
 ];
 

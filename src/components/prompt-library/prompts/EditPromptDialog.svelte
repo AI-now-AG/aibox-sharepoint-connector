@@ -18,6 +18,7 @@
     PromptToolOption,
     ReasoningEffortOption,
     TextVerbosityOption,
+    VectorKBScope,
   } from "$types/AIProvider";
   import { getPromptTools, useProviderInfo } from "$shared/AIProvider";
   import { tenant } from "$stores";
@@ -27,6 +28,7 @@
   } from "$utils/textFormatting";
   import { EventName, ScreenName } from "$types/Posthog";
   import { posthogClientCapture } from "$utils/posthogClient";
+  import VectorKBScopeSelector from "$components/prompt-library/vector-kb/VectorKBScopeSelector.svelte";
 
   const t = useTranslations();
 
@@ -93,6 +95,15 @@
   let isDataLoaded = false;
 
   let titleInput: HTMLInputElement | undefined = $state();
+
+  // Vector KB state
+  let vectorKbEnabled = $state(false);
+  let vectorKbScope = $state<VectorKBScope>(VectorKBScope.All);
+  let vectorKbFolderIds = $state<string[]>([]);
+  let vectorKbDataSourceIds = $state<string[]>([]);
+
+  // Check if tenant has Vector KB enabled
+  const tenantVectorKbEnabled = $derived($tenant?.vector_kb_enabled ?? false);
 
   const providerInfo = useProviderInfo($tenant);
 
@@ -190,6 +201,17 @@
           knowledgeBases.find((e) => e._id == kbObj._id.toString()),
         )
         .filter((kb: any) => kb !== undefined) as KnowledgeBase[];
+
+      // Populate Vector KB state
+      vectorKbEnabled = promptDetails.vector_kb_enabled || false;
+      vectorKbScope = promptDetails.vector_kb_scope || VectorKBScope.All;
+      vectorKbFolderIds =
+        promptDetails.vector_kb_folder_ids?.map((id: any) => id.toString()) ||
+        [];
+      vectorKbDataSourceIds =
+        promptDetails.vector_kb_data_source_ids?.map((id: any) =>
+          id.toString(),
+        ) || [];
     } catch (error) {
       promptDialog?.close();
       addToast({
@@ -215,6 +237,17 @@
         textVerbosity: selectedTextVerbosity || null,
         promptTool: selectedPromptTool || null,
         knowledgebase: selectedKnowledgeBases.map((inst) => inst._id),
+        // Vector KB fields
+        vector_kb_enabled: vectorKbEnabled,
+        vector_kb_scope: vectorKbEnabled ? vectorKbScope : null,
+        vector_kb_folder_ids:
+          vectorKbEnabled && vectorKbScope === VectorKBScope.Folder
+            ? vectorKbFolderIds
+            : [],
+        vector_kb_data_source_ids:
+          vectorKbEnabled && vectorKbScope === VectorKBScope.DataSource
+            ? vectorKbDataSourceIds
+            : [],
         ...(selectedCategory && { category: selectedCategory._id }),
         ...(selectedGroup && { group: selectedGroup._id }),
         ...(selectedEditPromptId && { _id: selectedEditPromptId }),
@@ -273,6 +306,11 @@
     initHtml = "<p></p>";
     selectedKnowledgeBases = [];
     selectedEditPromptId = null;
+    // Reset Vector KB state
+    vectorKbEnabled = false;
+    vectorKbScope = VectorKBScope.All;
+    vectorKbFolderIds = [];
+    vectorKbDataSourceIds = [];
   }
 
   function handleKeyDown(event: any) {
@@ -377,6 +415,19 @@
           }}
         />
       </div>
+
+      <!-- Vector Knowledge Base -->
+      {#if tenantVectorKbEnabled}
+        <div class="border border-base-300 rounded-lg p-4 bg-base-100">
+          <VectorKBScopeSelector
+            tenantId={$tenant?._id?.toString() ?? ""}
+            bind:vectorKbEnabled
+            bind:selectedScope={vectorKbScope}
+            bind:selectedFolderIds={vectorKbFolderIds}
+            bind:selectedDataSourceIds={vectorKbDataSourceIds}
+          />
+        </div>
+      {/if}
 
       {#if Array.isArray(promptTools) && promptTools.length > 0}
         <div

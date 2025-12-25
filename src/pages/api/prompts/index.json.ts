@@ -75,6 +75,15 @@ export const POST: APIRoute<CreatePromptParams> = async (ctx) => {
     creator_id: ctx.locals.user.id,
     created_at: new Date(),
     updated_at: new Date(),
+    // Vector KB fields
+    vector_kb_enabled: data.vector_kb_enabled ?? false,
+    vector_kb_scope: data.vector_kb_scope ?? null,
+    vector_kb_folder_ids: data.vector_kb_folder_ids?.map((id) =>
+      stringToObjectId.parse(id),
+    ),
+    vector_kb_data_source_ids: data.vector_kb_data_source_ids?.map((id) =>
+      stringToObjectId.parse(id),
+    ),
   };
 
   try {
@@ -132,6 +141,15 @@ export const PUT: APIRoute<CreatePromptParams> = async (ctx) => {
     description,
     reasoningEffort: data.reasoningEffort ?? ReasoningEffortOption.None,
     updated_at: new Date(),
+    // Vector KB fields
+    vector_kb_enabled: data.vector_kb_enabled ?? false,
+    vector_kb_scope: data.vector_kb_scope ?? null,
+    vector_kb_folder_ids: data.vector_kb_folder_ids?.map((id) =>
+      stringToObjectId.parse(id),
+    ),
+    vector_kb_data_source_ids: data.vector_kb_data_source_ids?.map((id) =>
+      stringToObjectId.parse(id),
+    ),
   };
 
   try {
@@ -212,6 +230,11 @@ export const GET: APIRoute = async (ctx) => {
         category: prompt.category,
         group: prompt.group,
         predefined_input: prompt.predefined_input,
+        // Vector KB fields
+        vector_kb_enabled: prompt.vector_kb_enabled ?? false,
+        vector_kb_scope: prompt.vector_kb_scope ?? null,
+        vector_kb_folder_ids: prompt.vector_kb_folder_ids ?? [],
+        vector_kb_data_source_ids: prompt.vector_kb_data_source_ids ?? [],
       };
 
       return new Response(JSON.stringify(promptData));

@@ -52,6 +52,7 @@
     messageContent: string;
     citations: any[];
     currentImageUrl: string;
+    ragSources: any[];
   }
 
   interface APIConfiguration {
@@ -330,6 +331,12 @@
       console.log(`Response ID: ${data.responseId}`);
     }
 
+    // Capture RAG sources from response
+    const ragSources = data.ragSources || state.ragSources || [];
+    if (ragSources.length > 0) {
+      console.log(`📚 RAG Sources: ${ragSources.length} chunks retrieved`);
+    }
+
     const finalImageUrl = formatImageUrl(
       state.currentImageUrl ||
         data.images?.[0]?.result ||
@@ -354,9 +361,10 @@
         responseText,
         state.citations,
         finalImageUrl,
+        ragSources,
       );
     } else {
-      addAssistantMessage(responseText, finalImageUrl);
+      addAssistantMessage(responseText, finalImageUrl, ragSources);
     }
 
     // Clean up and reset states
@@ -413,6 +421,7 @@
     responseText: string,
     citations: any[],
     imageUrl: string,
+    sources?: any[],
   ): void {
     console.log("📚 Citations sent:", citations);
 
@@ -423,17 +432,19 @@
       content: markdownWithLinks,
       rawData: stripMarkdownFormatting(markdownWithLinks),
       imageUrl,
+      sources: sources && sources.length > 0 ? sources : undefined,
     };
 
     addMessageToHistory(groupId, promptId, newAssistantMessage);
   }
 
-  function addAssistantMessage(responseText: string, imageUrl: string): void {
+  function addAssistantMessage(responseText: string, imageUrl: string, sources?: any[]): void {
     const newAssistantMessage: Message = {
       role: MessageRole.Assistant,
       content: responseText,
       rawData: stripMarkdownFormatting(responseText),
       imageUrl,
+      sources: sources && sources.length > 0 ? sources : undefined,
     };
 
     addMessageToHistory(groupId, promptId, newAssistantMessage);
@@ -545,6 +556,7 @@
       messageContent: "",
       citations: [],
       currentImageUrl: "",
+      ragSources: [],
     };
 
     while (true) {
