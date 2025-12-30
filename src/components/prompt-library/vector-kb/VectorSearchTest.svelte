@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { SourceAttribution } from "$types/MessageHistory";
+  import { TRANSCRIPTION_API_URL } from "astro:env/client";
 
   interface Props {
     tenantId: string;
@@ -15,7 +16,7 @@
   let error = $state<string | null>(null);
   let searchTime = $state<number | null>(null);
 
-  const apiBase = import.meta.env.TRANSCRIPTION_API_URL || "";
+  const apiBase = TRANSCRIPTION_API_URL || "";
 
   async function performSearch() {
     if (!query.trim()) {

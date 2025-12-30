@@ -2,6 +2,7 @@
   import { onMount } from "svelte";
   import { VectorKBScope } from "$types/AIProvider";
   import type { VectorFolder, VectorDataSource } from "$types/VectorKB";
+  import { TRANSCRIPTION_API_URL } from "astro:env/client";
 
   interface Props {
     tenantId: string;
@@ -25,7 +26,7 @@
   let dataSources = $state<VectorDataSource[]>([]);
   let loading = $state(false);
 
-  const apiBase = import.meta.env.TRANSCRIPTION_API_URL || "";
+  const apiBase = TRANSCRIPTION_API_URL || "";
 
   async function fetchVectorKBData() {
     if (!tenantId) return;
