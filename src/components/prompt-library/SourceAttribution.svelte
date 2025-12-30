@@ -6,6 +6,7 @@
     score: number;
     pageNumber?: number;
     snippet: string;
+    content?: string; // Full chunk content for expandable view
     chunkIndex?: number;
   }
 
@@ -33,6 +34,18 @@
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength).trim() + "...";
   }
+
+  function hasExpandableContent(source: SourceAttribution): boolean {
+    // If we have full content and it's longer than the snippet
+    if (source.content && source.content.length > source.snippet.length) {
+      return true;
+    }
+    return false;
+  }
+
+  function getFullContent(source: SourceAttribution): string {
+    return source.content || source.snippet;
+  }
 </script>
 
 {#if sources && sources.length > 0}
@@ -44,7 +57,7 @@
       <div class="flex items-center gap-2">
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          class="h-5 w-5 text-info"
+          class="h-5 w-5 text-primary"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -104,9 +117,34 @@
               </div>
 
               {#if source.snippet}
-                <div class="mt-2 text-xs text-base-content/70 bg-base-100 p-2 rounded border border-base-300">
-                  <p class="italic">"{truncateSnippet(source.snippet)}"</p>
-                </div>
+                {#if hasExpandableContent(source)}
+                  <!-- Expandable snippet with custom details/summary -->
+                  <details class="mt-2 group">
+                    <summary class="flex items-start justify-between gap-2 cursor-pointer bg-base-100 border border-base-300 rounded p-2 hover:bg-base-200 transition-colors list-none [&::-webkit-details-marker]:hidden">
+                      <div class="flex-1 min-w-0">
+                        <p class="text-xs text-base-content/70 italic line-clamp-2">"{source.snippet}"</p>
+                        <span class="text-base-content/50 text-[10px] mt-1 block group-open:hidden">Click to expand</span>
+                        <span class="text-base-content/50 text-[10px] mt-1 hidden group-open:block">Click to collapse</span>
+                      </div>
+                      <svg
+                        class="h-4 w-4 text-base-content/50 shrink-0 mt-0.5 transition-transform group-open:rotate-180"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </summary>
+                    <div class="mt-2 max-h-[40vh] overflow-y-auto">
+                      <pre class="text-xs text-base-content/80 whitespace-pre-wrap font-mono bg-base-200 p-3 rounded border border-base-300">{getFullContent(source)}</pre>
+                    </div>
+                  </details>
+                {:else}
+                  <!-- Short snippet - no expansion needed -->
+                  <div class="mt-2 text-xs text-base-content/70 bg-base-100 p-2 rounded border border-base-300">
+                    <p class="italic">"{source.snippet}"</p>
+                  </div>
+                {/if}
               {/if}
             </div>
           </div>
