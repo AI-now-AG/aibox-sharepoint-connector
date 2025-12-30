@@ -31,9 +31,19 @@
   // API base URL - will be set from config
   let apiBase = $state("");
 
+  // Track the last loaded dataSourceId to detect changes
+  let lastLoadedId = $state<string | null>(null);
+
   export function open() {
     dialog?.showModal();
-    if (chunks.length === 0) {
+    // Fetch chunks if this is a different data source or chunks are empty
+    if (dataSourceId !== lastLoadedId || chunks.length === 0) {
+      // Reset state for new data source
+      chunks = [];
+      currentPage = 1;
+      totalChunks = 0;
+      error = null;
+      lastLoadedId = dataSourceId;
       fetchChunks();
     }
   }
