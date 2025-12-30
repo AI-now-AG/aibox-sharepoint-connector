@@ -601,12 +601,16 @@
                   <td>{formatFileSize(source.file_size_bytes)}</td>
                   <td>{source.chunk_count}</td>
                   <td>
-                    <span class="badge {statusBadge.class}">{statusBadge.text}</span>
-                    {#if source.error_message}
-                      <span class="text-xs text-error ml-1" title={source.error_message}>
-                        (error)
-                      </span>
-                    {/if}
+                    <div class="flex items-center gap-1">
+                      <span class="badge {statusBadge.class}">{statusBadge.text}</span>
+                      {#if source.error_message}
+                        <div class="tooltip tooltip-left" data-tip={source.error_message}>
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-error cursor-help" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        </div>
+                      {/if}
+                    </div>
                   </td>
                   <td>
                     <div class="flex gap-1">
