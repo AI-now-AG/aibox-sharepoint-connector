@@ -16,6 +16,7 @@ export const sendPasswordResetEmail = async (userId: string, email: string) => {
     const ticketResponse = await ticketsManager.createPasswordResetTicket({
       user_id: userId,
       result_url: redirectUrl,
+      mark_email_as_verified: true,
     });
     const { ticket } = ticketResponse.data;
     console.log(`Password reset - ticket response: ${ticket}`);

@@ -21,7 +21,7 @@ if (!user || !isSameObjectId(user.tenant_id, Astro.locals.tenant._id)) {
   return Astro.redirect("/404");
 }
 
-const data = transformRawData(user);
+const data = transformRawData(user, false);
 ---
 
 <Layout>
