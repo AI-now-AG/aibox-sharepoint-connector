@@ -97,6 +97,15 @@ const auth0Webhook: Handler = async (
         });
       }
 
+      // Trigger successfully changed password
+      // See: https://auth0.com/docs/customize/log-streams/event-filters#user/behavioral-success
+      if (eventType == "scp") {
+        const { user_id: userId } = data.user_id;
+        await updateUserAttributesInDatabase(userId, {
+          email_verified: true,
+        });
+      }
+
       // Trigger successful logout
       // See: https://auth0.com/docs/customize/log-streams/event-filters#logout-success
       if (eventType == "slo") {
