@@ -191,6 +191,8 @@
 
   async function deleteUser() {
     const { _id = "" } = userData;
+
+    loading = true;
     let result = await actions.user.delete({
       _id,
     });
@@ -213,6 +215,8 @@
 
   async function resetPassword() {
     const { _id = "" } = userData;
+
+    loading = true;
     let result = await actions.user.sendResetPasswordEmail({
       _id,
     });

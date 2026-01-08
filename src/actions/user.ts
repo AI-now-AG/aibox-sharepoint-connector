@@ -355,7 +355,7 @@ export const user = {
       if (!user) {
         throw new Error("User does not exists.");
       }
-      const userId = user._id?.toString();
+      const userId = user.auth0_sub?.toString();
       const email = user.email;
 
       await sendPasswordResetEmail(userId, email);
