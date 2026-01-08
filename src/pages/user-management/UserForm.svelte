@@ -352,7 +352,7 @@
                 <td class="text-base-content/80">{t("user.signed-up")}</td>
                 <td class="text-base">
                   {dayjs(userData.created_at, "DD.MM.YYYY").format(
-                    "dddd DD.MM.YYYY",
+                    "DD.MM.YYYY",
                   )}
                 </td>
               </tr>
