@@ -2620,11 +2620,11 @@
     <div class="mb-3 flex flex-row items-center justify-between">
       <div class="flex flex-row items-center gap-2">
         {@html svgIcons.document}
-        <p class="font-medium text-md">Vector Knowledge Base</p>
+        <p class="font-medium text-md">{t("tenant.vector-kb.title")}</p>
       </div>
       <!-- Active Toggle -->
       <label class="flex items-center gap-2">
-        <span class="label-text">Enable Vector KB</span>
+        <span class="label-text">{t("tenant.vector-kb.enable")}</span>
         <input
           type="checkbox"
           class="toggle toggle-primary"
@@ -2641,7 +2641,7 @@
             <div class="flex items-center justify-between">
               <div class="flex items-center">
                 <span class="label-text text-base-content font-medium">
-                  Embedding Configuration
+                  {t("tenant.vector-kb.embedding-config")}
                 </span>
               </div>
             </div>
@@ -2651,7 +2651,7 @@
               <!-- Embedding Provider -->
               <div class="w-full">
                 <span class="mb-2 text-base-content font-medium text-sm">
-                  Embedding Provider*
+                  {t("tenant.vector-kb.embedding-provider")}*
                 </span>
                 <select
                   class="select select-bordered w-full mt-1"
@@ -2670,7 +2670,7 @@
                 </select>
                 {#if availableEmbeddingProviders().length === 0}
                   <p class="text-sm text-warning mt-1">
-                    Configure OpenAI, Azure OpenAI, or Gemini API keys first
+                    {t("tenant.vector-kb.embedding-provider-warning")}
                   </p>
                 {/if}
               </div>
@@ -2678,7 +2678,7 @@
               <!-- Embedding Model -->
               <div class="w-full">
                 <span class="mb-2 text-base-content font-medium text-sm">
-                  Embedding Model*
+                  {t("tenant.vector-kb.embedding-model")}*
                 </span>
                 <select
                   class="select select-bordered w-full mt-1"
@@ -2695,7 +2695,7 @@
               <!-- Chunk Size -->
               <div class="w-full">
                 <span class="mb-2 text-base-content font-medium text-sm">
-                  Chunk Size (characters)
+                  {t("tenant.vector-kb.chunk-size")}
                 </span>
                 <input
                   type="number"
@@ -2705,14 +2705,14 @@
                   max="2000"
                 />
                 <p class="text-xs text-base-content/60 mt-1">
-                  Maximum size of text chunks in characters (100-2000). Default: 800
+                  {t("tenant.vector-kb.chunk-size-help")}
                 </p>
               </div>
 
               <!-- Chunk Overlap -->
               <div class="w-full">
                 <span class="mb-2 text-base-content font-medium text-sm">
-                  Chunk Overlap (characters)
+                  {t("tenant.vector-kb.chunk-overlap")}
                 </span>
                 <input
                   type="number"
@@ -2722,7 +2722,7 @@
                   max="500"
                 />
                 <p class="text-xs text-base-content/60 mt-1">
-                  Overlap between chunks in characters (0-500). Default: 200
+                  {t("tenant.vector-kb.chunk-overlap-help")}
                 </p>
               </div>
             </div>
@@ -2731,7 +2731,7 @@
               <!-- Top K Results -->
               <div class="w-full">
                 <span class="mb-2 text-base-content font-medium text-sm">
-                  Top K Results
+                  {t("tenant.vector-kb.top-k")}
                 </span>
                 <input
                   type="number"
@@ -2741,14 +2741,14 @@
                   max="20"
                 />
                 <p class="text-xs text-base-content/60 mt-1">
-                  Number of chunks to retrieve (1-20). Default: 5
+                  {t("tenant.vector-kb.top-k-help")}
                 </p>
               </div>
 
               <!-- Similarity Threshold -->
               <div class="w-full">
                 <span class="mb-2 text-base-content font-medium text-sm">
-                  Similarity Threshold
+                  {t("tenant.vector-kb.similarity-threshold")}
                 </span>
                 <input
                   type="number"
@@ -2759,7 +2759,7 @@
                   step="0.05"
                 />
                 <p class="text-xs text-base-content/60 mt-1">
-                  Minimum similarity score (0-1). Default: 0.7
+                  {t("tenant.vector-kb.similarity-threshold-help")}
                 </p>
               </div>
             </div>
@@ -2768,7 +2768,7 @@
               <!-- Max Storage -->
               <div class="w-full">
                 <span class="mb-2 text-base-content font-medium text-sm">
-                  Max Storage (MB)
+                  {t("tenant.vector-kb.max-storage")}
                 </span>
                 <input
                   type="number"
@@ -2778,7 +2778,7 @@
                   max="10000"
                 />
                 <p class="text-xs text-base-content/60 mt-1">
-                  Maximum storage limit in MB. Default: 500
+                  {t("tenant.vector-kb.max-storage-help")}
                 </p>
               </div>
               <div class="w-full"></div>
@@ -2791,8 +2791,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
           </svg>
           <span>
-            Vector KB allows semantic search across uploaded documents (PDF, TXT, DOCX).
-            Documents are automatically chunked and embedded for RAG-based retrieval.
+            {t("tenant.vector-kb.info")}
           </span>
         </div>
       </div>
@@ -2800,7 +2799,7 @@
       <div class="container mx-auto">
         <div class="alert mb-4">
           <span class="text-sm text-base-content/60">
-            Enable Vector KB to configure semantic search and RAG capabilities for this tenant.
+            {t("tenant.vector-kb.enable-hint")}
           </span>
         </div>
       </div>
