@@ -439,6 +439,20 @@
               >{t("user.delete-user")}</span
             >
           </button>
+
+          <button
+            class="flex items-center text-base-content/80 ml-8"
+            onclick={(e) => {
+              //confirmDeleteModal?.showModal();
+            }}
+          >
+            <span class="w-5 h-5 flex items-center">
+              {@html svgIcons.email}</span
+            >
+            <span class="text-sm font-semibold ml-1 text-left"
+              >{t("user.reset-password")}</span
+            >
+          </button>
         </div>
       {/if}
     {/if}
