@@ -695,5 +695,10 @@
   "tenant.reached-user-limit": "Your tenant has reached the user limit",
   "tenant.reached-user-limit-contact-upgrade": "You've reached your subscription’s user limit. Remove unused users or contact <a href=\"mailto:support@aibox-app.ch\" class=\"underline\">support</a> to upgrade.",
   "nav.settings.vector-knowledge-base": "Knowledge Base Advanced",
-  "user.reset-password": "Reset via Email"
+  "user.reset-password": "Reset via Email",
+  "user.reset-password-confirm-message": "Reset Password Email",
+  "user.reset-password-description-message": "Do you want to send a password reset email to ${email}",
+  "user.reset-password-successful": "Password reset complete",
+  "user.reset-password-failed": "Password reset failed - please try again",
+  "common.confirm": "Confirm"
 }

@@ -15,6 +15,7 @@ import organizationsManagement from "$data/auth0/organizations-manager";
 import rolesManagement from "$data/auth0/roles-manager";
 import { isEnterpriseConnection } from "$utils/auth0";
 import { EncryptedUserPassword, TourType, UserRole } from "$types/Users";
+import { sendPasswordResetEmail } from "$utils/auth0Auth";
 
 const UserInputParamsSchema = z.object({
   name: z.string(),
@@ -344,6 +345,23 @@ export const user = {
       } finally {
         session.endSession();
       }
+    },
+  }),
+
+  sendResetPasswordEmail: defineAction({
+    input: UserInputIdentifierSchema,
+    handler: async (input) => {
+      const user = await UserModel.get(input._id);
+      if (!user) {
+        throw new Error("User does not exists.");
+      }
+      const userId = user._id?.toString();
+      const email = user.email;
+
+      await sendPasswordResetEmail(userId, email);
+      return transformRawData({
+        success: true,
+      });
     },
   }),
 };

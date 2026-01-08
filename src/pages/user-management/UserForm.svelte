@@ -37,6 +37,7 @@
   let confirmUpdateModal: HTMLDialogElement | undefined = $state();
   let confirmBlockModal: HTMLDialogElement | undefined = $state();
   let confirmDeleteModal: HTMLDialogElement | undefined = $state();
+  let confirmResetPwdModal: HTMLDialogElement | undefined = $state();
 
   let alertModal: HTMLDialogElement | undefined = $state();
   let alertMessage = $state("");
@@ -205,6 +206,27 @@
       log.e(error, "Error deleting user");
       addToast({
         message: t("user.delete-failed"),
+        type: "error",
+      });
+    }
+  }
+
+  async function resetPassword() {
+    const { _id = "" } = userData;
+    let result = await actions.user.sendResetPasswordEmail({
+      _id,
+    });
+    loading = false;
+    const { error } = result;
+    if (!error) {
+      addToast({
+        message: t("user.reset-password-successful"),
+        type: "success",
+      });
+    } else {
+      log.e(error, "Error deleting user");
+      addToast({
+        message: t("user.reset-password-failed"),
         type: "error",
       });
     }
@@ -443,7 +465,7 @@
           <button
             class="flex items-center text-base-content/80 ml-8"
             onclick={(e) => {
-              //confirmDeleteModal?.showModal();
+              confirmResetPwdModal?.showModal();
             }}
           >
             <span class="w-5 h-5 flex items-center">
@@ -484,6 +506,18 @@
   confirm={deleteUser}
   title={t("user.delete-confirm-message")}
   description={t("user.delete-description-message")}
+/>
+
+<!-- confirm reset password dialog -->
+<ConfirmDialog
+  bind:modal={confirmResetPwdModal}
+  confirm={resetPassword}
+  title={t("user.reset-password-confirm-message")}
+  description={t("user.reset-password-description-message", {
+    email: userData?.email,
+  })}
+  okLabel={t("common.confirm")}
+  cancelLabel={t("common.cancel")}
 />
 
 <AlertDialog bind:modal={alertModal} bind:message={alertMessage} />

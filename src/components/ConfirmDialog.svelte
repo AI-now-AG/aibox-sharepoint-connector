@@ -8,6 +8,8 @@
     confirm: any;
     title?: string;
     description?: string;
+    okLabel?: string;
+    cancelLabel?: string;
   }
 
   let {
@@ -15,6 +17,8 @@
     confirm,
     title = "",
     description = "",
+    okLabel = "",
+    cancelLabel = "",
   }: Props = $props();
 </script>
 
@@ -37,10 +41,11 @@
         <button
           id="yes_button"
           class="btn btn-warning flex-1"
-          onclick={() => confirm()}>{t("common.yes")}</button
+          onclick={() => confirm()}
+          >{okLabel ? okLabel : t("common.yes")}</button
         >
         <button id="no_button" class="btn btn-success flex-1" onclick={() => {}}
-          >{t("common.no")}</button
+          >{cancelLabel ? cancelLabel : t("common.no")}</button
         >
       </div>
     </form>
