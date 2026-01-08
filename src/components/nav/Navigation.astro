@@ -248,19 +248,19 @@ const textAssistantItems: Array<any> = [
     path: "/prompt-library/prompts",
   },
   {
-    title: t("nav.settings.knowledge-base"),
-    path: "/prompt-library/knowledge-base",
-  },
-  {
     title: t("nav.settings.categories"),
     path: "/prompt-library/categories",
+  },
+  {
+    title: t("nav.settings.knowledge-base"),
+    path: "/prompt-library/knowledge-base",
   },
 ];
 
 // Add Vector KB if enabled for tenant
 if (Astro.locals.tenant.vector_kb_enabled) {
   textAssistantItems.push({
-    title: "Vector Knowledge Base",
+    title: t("nav.settings.vector-knowledge-base"),
     path: "/prompt-library/vector-kb",
   });
 }

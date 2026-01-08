@@ -382,7 +382,7 @@
   "usage.units.credits": "Credits",
   "home.new-chat": "Neuer Chat",
   "tenant.settings.private-api-key": "Privater API Key",
-  "nav.text-prompts": "BUSINESS ASSISTENT",
+  "nav.text-prompts": "KI ASSISTENT",
   "tenant.subtitle-elevenLabs": "Subtitle Virtuoso ",
   "tenant.validate-elevenLabs-key": "Bitte ElevenLabs-Schlüssel eingeben",
   "settings.transcription.elevenLabs-audio-tag": "Audio Events anzeigen (z. B. \"Musik spielt\")",
@@ -651,7 +651,7 @@
   "home.search-prompt": "Suche Assistenten",
   "tenant.posthog": "Posthog (Tracking, Feedback und Umfragen)",
   "user.super-user": "Super User",
-  "nav.text-assistant": "Business Assistenten",
+  "nav.text-assistant": "KI Assistenten",
   "nav.organization-settings": "Organisation",
   "subscription.contact-phone": "Telefonnummer",
   "subscription.contact-phone-placeholder": "+41 43 888 77 64",
@@ -693,5 +693,6 @@
   "usage.table.credits-total": "Credits gesamt",
   "tenant.user-limit": "Benutzerlimit",
   "tenant.reached-user-limit": "Ihr Mandant hat das Benutzerlimit erreicht.",
-  "tenant.reached-user-limit-contact-upgrade": "Du hast das Benutzerlimit deines Abonnements erreicht. Entferne ungenutzte Benutzer oder kontaktiere den Support unter <a href=\"mailto:support@aibox-app.ch\">support@aibox-app.ch\n</a>."
+  "tenant.reached-user-limit-contact-upgrade": "Du hast das Benutzerlimit deines Abonnements erreicht. Entferne ungenutzte Benutzer oder kontaktiere den Support unter <a href=\"mailto:support@aibox-app.ch\">support@aibox-app.ch\n</a>.",
+  "nav.settings.vector-knowledge-base": "Knowledge Base Erweitert"
 }
