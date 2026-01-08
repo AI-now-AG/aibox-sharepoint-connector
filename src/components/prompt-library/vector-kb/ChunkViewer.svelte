@@ -131,7 +131,7 @@
               <div class="flex items-center justify-between mb-2">
                 <div class="flex items-center gap-2">
                   <span class="badge badge-primary">Chunk {chunk.chunk_index + 1}</span>
-                  <span class="badge badge-ghost">{chunk.token_count} tokens</span>
+                  <span class="badge badge-ghost">{chunk.content.length} chars</span>
                   {#if chunk.metadata?.page_number}
                     <span class="badge badge-outline">Page {chunk.metadata.page_number}</span>
                   {/if}

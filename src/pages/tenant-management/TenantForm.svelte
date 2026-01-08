@@ -2695,7 +2695,7 @@
               <!-- Chunk Size -->
               <div class="w-full">
                 <span class="mb-2 text-base-content font-medium text-sm">
-                  Chunk Size (tokens)
+                  Chunk Size (characters)
                 </span>
                 <input
                   type="number"
@@ -2705,14 +2705,14 @@
                   max="2000"
                 />
                 <p class="text-xs text-base-content/60 mt-1">
-                  Size of text chunks (100-2000). Default: 800
+                  Maximum size of text chunks in characters (100-2000). Default: 800
                 </p>
               </div>
 
               <!-- Chunk Overlap -->
               <div class="w-full">
                 <span class="mb-2 text-base-content font-medium text-sm">
-                  Chunk Overlap (tokens)
+                  Chunk Overlap (characters)
                 </span>
                 <input
                   type="number"
@@ -2722,7 +2722,7 @@
                   max="500"
                 />
                 <p class="text-xs text-base-content/60 mt-1">
-                  Overlap between chunks (0-500). Default: 200
+                  Overlap between chunks in characters (0-500). Default: 200
                 </p>
               </div>
             </div>
