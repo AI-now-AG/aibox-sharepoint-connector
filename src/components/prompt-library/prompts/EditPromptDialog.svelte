@@ -5,6 +5,7 @@
   import SingleInput from "$components/prompt-library/prompts/SingleInput.svelte";
   import MultiInput from "$components/prompt-library/prompts/MultiInput.svelte";
   import ModelInput from "$components/prompt-library/prompts/ModelInput.svelte";
+  import KBTypeCard from "$components/prompt-library/prompts/KBTypeCard.svelte";
   import type { CreatePromptParams } from "$types/PromptAPI";
   import { addToast } from "$stores/toast";
   import RefinementButton from "$components/prompt-interface/RefinementButton.svelte";
@@ -48,7 +49,7 @@
     selectedEditPromptId = $bindable(null),
     promptDialog = $bindable(),
     dialogMode = "update",
-    dialogTitle = t("prompt-library.edit.title"),
+    dialogTitle = t("assistant-dialog.title.edit"),
     apiEndPointPrompt = "/api/prompts/index.json",
     apiEndPointCategory = "/api/categories.json",
     apiEndPointKnowledgeBase = "/api/knowledge-base.json",
@@ -66,6 +67,8 @@
     _id: string;
     title: string;
   };
+
+  type KBType = "none" | "basic" | "advanced";
 
   let categories: Category[] = $state([]);
   let selectedCategory: Category | undefined = $state();
@@ -95,6 +98,9 @@
   let isDataLoaded = false;
 
   let titleInput: HTMLInputElement | undefined = $state();
+
+  // Knowledge Base type state
+  let kbType = $state<KBType>("none");
 
   // Vector KB state
   let vectorKbEnabled = $state(false);
@@ -170,16 +176,13 @@
       }
 
       selectedModel = promptDetails.model?.toString() || "";
-      // Handle deprecated models. Deprecated — removal imminent
+      // Handle deprecated models
       if (
         [
           PromptModel.OpenAIWithTools,
           PromptModel.OpenAIWithImageTools,
         ].includes(selectedModel as PromptModel)
       ) {
-        console.log(
-          `[DEPRECATION WARNING]: ${selectedModel} is deprecated and will be removed soon. Please switch to ${PromptModel.OpenAI}.`,
-        );
         selectedModel = PromptModel.OpenAI;
       }
 
@@ -212,6 +215,15 @@
         promptDetails.vector_kb_data_source_ids?.map((id: any) =>
           id.toString(),
         ) || [];
+
+      // Determine kbType from existing data
+      if (promptDetails.vector_kb_enabled) {
+        kbType = "advanced";
+      } else if (promptDetails.knowledgebase?.length > 0) {
+        kbType = "basic";
+      } else {
+        kbType = "none";
+      }
     } catch (error) {
       promptDialog?.close();
       addToast({
@@ -253,9 +265,9 @@
         ...(selectedEditPromptId && { _id: selectedEditPromptId }),
       };
 
-      let httpMethod = "PUT"; // FOR UPDATING EXISING
+      let httpMethod = "PUT";
       if (dialogMode == "clone") {
-        httpMethod = "POST"; // FOR CREATING NEW
+        httpMethod = "POST";
       }
       const response = await fetch(apiEndPointPrompt, {
         method: httpMethod,
@@ -306,7 +318,7 @@
     initHtml = "<p></p>";
     selectedKnowledgeBases = [];
     selectedEditPromptId = null;
-    // Reset Vector KB state
+    kbType = "none";
     vectorKbEnabled = false;
     vectorKbScope = VectorKBScope.All;
     vectorKbFolderIds = [];
@@ -326,6 +338,19 @@
     }
   });
 
+  // Sync kbType with form data
+  $effect(() => {
+    if (kbType === "none") {
+      selectedKnowledgeBases = [];
+      vectorKbEnabled = false;
+    } else if (kbType === "basic") {
+      vectorKbEnabled = false;
+    } else if (kbType === "advanced") {
+      selectedKnowledgeBases = [];
+      vectorKbEnabled = true;
+    }
+  });
+
   let isFormValid = $derived(
     promptTitle?.trim() !== "" &&
       !isHtmlContentEmpty(promptText) &&
@@ -333,7 +358,6 @@
       selectedGroup !== undefined,
   );
 
-  // Fetch prompt details when selectedEditPromptId changes
   $effect(() => {
     if (selectedEditPromptId) {
       getPromptDetail(selectedEditPromptId);
@@ -342,213 +366,277 @@
 </script>
 
 <dialog class="modal" bind:this={promptDialog}>
-  <div class="modal-box w-8/12 max-w-5xl relative">
-    <div class="flex justify-between">
-      <h3 class="text-lg font-bold py-4">{dialogTitle}</h3>
+  <div class="modal-box w-11/12 max-w-4xl max-h-[90vh] overflow-y-auto">
+    <!-- Header -->
+    <div class="flex justify-between items-start pb-4 border-b border-base-300">
+      <div>
+        <h3 class="text-xl font-bold">{t("assistant-dialog.title.edit")}</h3>
+        <p class="text-sm text-base-content/60 mt-1">
+          {t("assistant-dialog.subtitle")}
+        </p>
+      </div>
       <button class="btn btn-sm btn-circle btn-ghost" onclick={cancelEdit}>
         {@html svgIcons.closeMenu}
       </button>
     </div>
+
     <LoadingSpinner {isLoading} />
-    <form class="rounded-sm pt-6 space-y-6">
-      <div class="grid grid-cols-1 gap-4 justify-center">
-        <p class="mb-2">
-          {t("prompt-library.add.prompts.title")}*
-        </p>
-        <input
-          type="text"
-          bind:value={promptTitle}
-          placeholder="e.g. Create three sports headlines"
-          class="input input-bordered w-full min-w-xs"
-          onkeydown={handleKeyDown}
-          bind:this={titleInput}
-        />
-      </div>
 
-      <div class="mb-4 relative">
-        <p class="mb-2">{t("prompt-library.add.prompts.instructions")}*</p>
-        {#key initHtml}
-          <TextEditor
-            oncreate={() => {
-              setTimeout(() => {
-                titleInput?.focus({ preventScroll: true });
-              }, 100);
-            }}
-            bind:html={promptText}
-            cssClass="h-[200px] mt-3"
-          />
-          <RefinementButton
-            promptText={promptDetails?.prompt || ""}
-            {selectedModel}
-            bind:isLoading
-            disabled={isHtmlContentEmpty(promptText)}
-            onResultReady={(output: string) => {
-              promptText = normalizeTextToHtml(output);
-              initHtml = normalizeTextToHtml(output);
-            }}
-          />
-        {/key}
-      </div>
-
-      <div class="mb-4">
-        <p class="mb-2">{t("prompt-library.add.prompts.predefined-input")}</p>
-        <textarea
-          bind:value={promptPredefinedInput}
-          placeholder=""
-          class="input input-bordered min-w-xs shadow-sm appearance-none min-h-32 w-full py-2 px-3"
-        ></textarea>
-      </div>
-
-      <div
-        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 justify-center"
-      >
-        <MultiInput
-          title={t("prompt-library.add.prompts.knowledge-base")}
-          placeholder="e.g. Knowledge base"
-          items={knowledgeBases}
-          bind:selectedItems={selectedKnowledgeBases}
-        />
-        <ModelInput
-          bind:selectedModel
-          onValueChange={(_value: any) => {
-            selectedPromptTool = PromptToolOption.None;
-          }}
-        />
-      </div>
-
-      <!-- Vector Knowledge Base -->
-      {#if tenantVectorKbEnabled}
-        <div class="border border-base-300 rounded-lg p-4 bg-base-100">
-          <VectorKBScopeSelector
-            tenantId={$tenant?._id?.toString() ?? ""}
-            bind:vectorKbEnabled
-            bind:selectedScope={vectorKbScope}
-            bind:selectedFolderIds={vectorKbFolderIds}
-            bind:selectedDataSourceIds={vectorKbDataSourceIds}
-          />
+    <form class="pt-6 space-y-6">
+      <!-- Section 1: General Configuration -->
+      <section>
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+            {@html svgIcons.settings}
+          </div>
+          <h4 class="font-semibold text-lg">{t("assistant-dialog.section.general")}</h4>
         </div>
-      {/if}
 
-      {#if Array.isArray(promptTools) && promptTools.length > 0}
-        <div
-          class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 justify-center"
-        >
-          <div class={"flex-1 min-w-3xs "}></div>
+        <!-- Title + Category + Use Case row -->
+        <div class="grid grid-cols-1 gap-4 mb-4">
+          <div>
+            <p class="text-sm font-medium mb-2">
+              {t("prompt-library.add.prompts.title")}<span class="text-error">*</span>
+            </p>
+            <input
+              type="text"
+              bind:value={promptTitle}
+              placeholder="e.g. HR Chatbot"
+              class="input input-bordered w-full"
+              onkeydown={handleKeyDown}
+              bind:this={titleInput}
+            />
+          </div>
+        </div>
 
-          <Dropdown
-            classes={"flex-1 min-w-3xs "}
-            label={t("prompt-execution.prompt-tool")}
-            placeholder={t("prompt-execution.prompt-tool.placeholder")}
-            options={[
-              {
-                title: t("prompt-execution.prompt-tool.placeholder"),
-                value: PromptToolOption.None,
-              },
-              ...promptTools.map((item: Option) => {
-                return {
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <p class="text-sm font-medium mb-2">
+              {t("prompt-library.add.prompts.category")}<span class="text-error">*</span>
+            </p>
+            <SingleInput
+              title=""
+              placeholder={t("assistant-dialog.select-category")}
+              items={categories}
+              bind:selectedItem={selectedCategory}
+              displayTop={false}
+            />
+          </div>
+
+          <div>
+            <p class="text-sm font-medium mb-2">
+              {t("prompt-library.add.prompts.group")}<span class="text-error">*</span>
+            </p>
+            {#if selectedCategory}
+              <SingleInput
+                title=""
+                placeholder={t("assistant-dialog.select-usecase")}
+                items={selectedCategory.groups}
+                bind:selectedItem={selectedGroup}
+                displayTop={false}
+              />
+            {:else}
+              <select class="select select-bordered w-full select-disabled" disabled>
+                <option>{t("assistant-dialog.select-category-first")}</option>
+              </select>
+            {/if}
+          </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="mb-4 relative">
+          <p class="text-sm font-medium mb-2">
+            {t("prompt-library.add.prompts.instructions")}<span class="text-error">*</span>
+          </p>
+          {#key initHtml}
+            <TextEditor
+              oncreate={() => {
+                setTimeout(() => {
+                  titleInput?.focus({ preventScroll: true });
+                }, 100);
+              }}
+              bind:html={promptText}
+              cssClass="!h-[200px] mt-3"
+            />
+            <RefinementButton
+              promptText={promptDetails?.prompt || ""}
+              {selectedModel}
+              bind:isLoading
+              disabled={isHtmlContentEmpty(promptText)}
+              onResultReady={(output: string) => {
+                promptText = normalizeTextToHtml(output);
+                initHtml = normalizeTextToHtml(output);
+              }}
+            />
+          {/key}
+        </div>
+
+        <!-- Predefined Input -->
+        <div>
+          <p class="text-sm font-medium mb-2">{t("prompt-library.add.prompts.predefined-input")}</p>
+          <textarea
+            bind:value={promptPredefinedInput}
+            placeholder={t("assistant-dialog.predefined-input.placeholder")}
+            class="textarea textarea-bordered w-full min-h-20"
+          ></textarea>
+        </div>
+      </section>
+
+      <div class="divider my-2"></div>
+
+      <!-- Section 2: Knowledge Base -->
+      <section>
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary">
+            {@html svgIcons.document}
+          </div>
+          <h4 class="font-semibold text-lg">{t("assistant-dialog.section.kb")}</h4>
+        </div>
+
+        <!-- KB Type Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <KBTypeCard
+            type="none"
+            title={t("assistant-dialog.kb.none.title")}
+            description={t("assistant-dialog.kb.none.desc")}
+            bind:selected={kbType}
+          />
+          <KBTypeCard
+            type="basic"
+            title={t("assistant-dialog.kb.basic.title")}
+            description={t("assistant-dialog.kb.basic.desc")}
+            bind:selected={kbType}
+          />
+          {#if tenantVectorKbEnabled}
+            <KBTypeCard
+              type="advanced"
+              title={t("assistant-dialog.kb.advanced.title")}
+              description={t("assistant-dialog.kb.advanced.desc")}
+              bind:selected={kbType}
+            />
+          {/if}
+        </div>
+
+        <!-- Conditional: Basic KB selector -->
+        {#if kbType === "basic"}
+          <div class="bg-base-200 rounded-lg p-4">
+            <p class="text-sm font-medium mb-2">{t("assistant-dialog.kb.select-source")}</p>
+            <MultiInput
+              title=""
+              placeholder={t("assistant-dialog.kb.search-placeholder")}
+              items={knowledgeBases}
+              bind:selectedItems={selectedKnowledgeBases}
+            />
+          </div>
+        {/if}
+
+        <!-- Conditional: Advanced Vector KB -->
+        {#if kbType === "advanced"}
+          <div class="bg-base-200 rounded-lg p-4">
+            <VectorKBScopeSelector
+              tenantId={$tenant?._id?.toString() ?? ""}
+              bind:vectorKbEnabled
+              bind:selectedScope={vectorKbScope}
+              bind:selectedFolderIds={vectorKbFolderIds}
+              bind:selectedDataSourceIds={vectorKbDataSourceIds}
+            />
+          </div>
+        {/if}
+      </section>
+
+      <div class="divider my-2"></div>
+
+      <!-- Section 3: AI Configuration -->
+      <section>
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center text-accent">
+            {@html svgIcons.aitool}
+          </div>
+          <h4 class="font-semibold text-lg">{t("assistant-dialog.section.ai")}</h4>
+        </div>
+
+        <!-- 2x2 Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <ModelInput
+            bind:selectedModel
+            onValueChange={(_value: any) => {
+              selectedPromptTool = PromptToolOption.None;
+            }}
+          />
+
+          {#if Array.isArray(promptTools) && promptTools.length > 0}
+            <Dropdown
+              label={t("prompt-execution.prompt-tool")}
+              placeholder={t("prompt-execution.prompt-tool.placeholder")}
+              options={[
+                {
+                  title: t("prompt-execution.prompt-tool.placeholder"),
+                  value: PromptToolOption.None,
+                },
+                ...promptTools.map((item: Option) => ({
                   title: item.title,
                   value: item.value,
-                };
-              }),
-            ]}
-            bind:value={selectedPromptTool}
-          />
+                })),
+              ]}
+              bind:value={selectedPromptTool}
+            />
+          {:else}
+            <div></div>
+          {/if}
+
+          {#if selectedModel.includes(PromptModel.OpenAIGpt5)}
+            <Dropdown
+              label={t("prompt-execution.reasoning-level")}
+              placeholder={t("prompt-execution.reasoning-level.placeholder")}
+              options={[
+                { title: t("prompt-execution.reasoning-effort.level-none"), value: ReasoningEffortOption.None },
+                { title: t("prompt-execution.reasoning-effort.level-low"), value: ReasoningEffortOption.Low },
+                { title: t("prompt-execution.reasoning-effort.level-medium"), value: ReasoningEffortOption.Medium },
+                { title: t("prompt-execution.reasoning-effort.level-high"), value: ReasoningEffortOption.High },
+              ]}
+              bind:value={selectedReasoningLevel}
+            />
+
+            <Dropdown
+              label={t("prompt-execution.text-verbosity")}
+              placeholder={t("prompt-execution.text-verbosity.placeholder")}
+              options={[
+                { title: t("prompt-execution.verbosity.level-low"), value: TextVerbosityOption.Low },
+                { title: t("prompt-execution.verbosity.level-medium"), value: TextVerbosityOption.Medium },
+                { title: t("prompt-execution.verbosity.level-high"), value: TextVerbosityOption.High },
+              ]}
+              bind:value={selectedTextVerbosity}
+            />
+          {/if}
         </div>
-      {/if}
-
-      {#if selectedModel.includes(PromptModel.OpenAIGpt5)}
-        <div
-          class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 justify-center"
-        >
-          <Dropdown
-            classes={"flex-1 min-w-3xs "}
-            label={t("prompt-execution.reasoning-level")}
-            placeholder={t("prompt-execution.reasoning-level.placeholder")}
-            options={[
-              {
-                title: t("prompt-execution.reasoning-effort.level-none"),
-                value: ReasoningEffortOption.None,
-              },
-              {
-                title: t("prompt-execution.reasoning-effort.level-low"),
-                value: ReasoningEffortOption.Low,
-              },
-              {
-                title: t("prompt-execution.reasoning-effort.level-medium"),
-                value: ReasoningEffortOption.Medium,
-              },
-              {
-                title: t("prompt-execution.reasoning-effort.level-high"),
-                value: ReasoningEffortOption.High,
-              },
-            ]}
-            bind:value={selectedReasoningLevel}
-          />
-
-          <Dropdown
-            classes={"flex-1 min-w-3xs "}
-            label={t("prompt-execution.text-verbosity")}
-            placeholder={t("prompt-execution.text-verbosity.placeholder")}
-            options={[
-              {
-                title: t("prompt-execution.verbosity.level-low"),
-                value: TextVerbosityOption.Low,
-              },
-              {
-                title: t("prompt-execution.verbosity.level-medium"),
-                value: TextVerbosityOption.Medium,
-              },
-              {
-                title: t("prompt-execution.verbosity.level-high"),
-                value: TextVerbosityOption.High,
-              },
-            ]}
-            bind:value={selectedTextVerbosity}
-          />
-        </div>
-      {/if}
-
-      <div
-        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 justify-center"
-      >
-        <SingleInput
-          title={`${t("prompt-library.add.prompts.category")}*`}
-          placeholder="e.g. Editing"
-          items={categories}
-          bind:selectedItem={selectedCategory}
-        />
-
-        {#if selectedCategory}
-          <SingleInput
-            title={`${t("prompt-library.add.prompts.group")}*`}
-            placeholder="e.g. Headlines"
-            items={selectedCategory.groups}
-            bind:selectedItem={selectedGroup}
-          />
-        {/if}
-      </div>
-
-      {#if isEditable}
-        <div class="flex justify-end">
-          <button
-            class="btn btn-outline px-8 font-normal mr-2"
-            onclick={preventDefault(cancelEdit)}
-          >
-            {t("common.cancel")}
-          </button>
-          <button
-            class={`btn btn-active btn-primary px-8 font-normal ${(!isFormValid || isSaving) && "btn-disabled"}`}
-            onclick={preventDefault(savePrompt)}
-          >
-            {#if isSaving}
-              <span class="loading loading-spinner"></span>
-              {t("prompt-library.add.prompts.saving")}
-            {:else}
-              {t("prompt-library.add.prompts.save")}
-            {/if}
-          </button>
-        </div>
-      {/if}
+      </section>
     </form>
+
+    <!-- Footer -->
+    {#if isEditable}
+      <div class="flex justify-end gap-2 pt-6 mt-6 border-t border-base-300">
+        <button class="btn btn-outline" onclick={preventDefault(cancelEdit)}>
+          {t("common.cancel")}
+        </button>
+        <button
+          class="btn btn-primary"
+          onclick={preventDefault(savePrompt)}
+          disabled={!isFormValid || isSaving}
+        >
+          {#if isSaving}
+            <span class="loading loading-spinner loading-sm"></span>
+          {/if}
+          {t("assistant-dialog.save-changes")}
+        </button>
+      </div>
+    {/if}
   </div>
+  <form method="dialog" class="modal-backdrop"><button>close</button></form>
 </dialog>
+
+<style>
+  section :global(svg) {
+    width: 18px;
+    height: 18px;
+  }
+</style>
