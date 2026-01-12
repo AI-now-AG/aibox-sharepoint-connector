@@ -780,6 +780,6 @@
   "vector-kb.folder-name-required": "Bitte Ordnernamen eingeben",
   "vector-kb.delete-folder": "Ordner löschen",
   "vector-kb.delete-file": "Datei löschen",
-  "vector-kb.title": "Vektor-Wissensdatenbank",
-  "vector-kb.not-enabled": "Die Vektor-Wissensdatenbank ist für diesen Mandanten nicht aktiviert. Bitte kontaktieren Sie Ihren Administrator, um diese Funktion zu aktivieren."
+  "vector-kb.title": "Knowledge Base Advanced",
+  "vector-kb.not-enabled": "Die erweiterte Knowledge Base ist für diesen Account nicht aktiviert. Bitte kontaktiere deinen Administrator, um diese Funktion zu aktivieren."
 }

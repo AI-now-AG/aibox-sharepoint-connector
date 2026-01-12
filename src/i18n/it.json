@@ -780,6 +780,6 @@
   "vector-kb.folder-name-required": "Please enter a folder name",
   "vector-kb.delete-folder": "Delete Folder",
   "vector-kb.delete-file": "Delete File",
-  "vector-kb.title": "Vector Knowledge Base",
+  "vector-kb.title": "Knowledge Base Advanced",
   "vector-kb.not-enabled": "Vector Knowledge Base is not enabled for this tenant. Please contact your administrator to enable this feature."
 }
