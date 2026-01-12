@@ -2,10 +2,14 @@
   import { onMount } from "svelte";
   import { svgIcons } from "$assets/icons";
   import Loading from "$components/Loading.svelte";
+  import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import ChunkViewer from "./ChunkViewer.svelte";
   import type { VectorFolder, VectorDataSource, StorageUsage } from "$types/VectorKB";
   import { DataSourceStatus } from "$types/VectorKB";
   import { getTranscriptionConfig } from "$api/transcription/transcription-api";
+  import { useTranslations } from "$i18n/utils";
+
+  const t = useTranslations();
 
   interface Props {
     tenantId: string;
@@ -21,7 +25,7 @@
   let storageUsage = $state<StorageUsage | null>(null);
   let error = $state<string | null>(null);
   let currentFolderId = $state<string | null>(null);
-  let breadcrumbs = $state<{ id: string | null; name: string }[]>([{ id: null, name: "Root" }]);
+  let breadcrumbs = $state<{ id: string | null; name: string }[]>([{ id: null, name: "" }]);
 
   // File upload state
   let fileInput: HTMLInputElement;
@@ -38,6 +42,10 @@
   // Chunk viewer state
   let chunkViewerRef: ChunkViewer;
   let selectedDataSource = $state<VectorDataSource | null>(null);
+
+  // Delete confirmation dialog state
+  let confirmDeleteModal: HTMLDialogElement | undefined = $state();
+  let deleteTarget = $state<{ type: "file" | "folder"; id: string; name: string } | null>(null);
 
   // API base URL - will be set from config
   let apiBase = $state("");
@@ -154,7 +162,7 @@
     currentFolderId = folderId;
 
     if (folderId === null) {
-      breadcrumbs = [{ id: null, name: "Root" }];
+      breadcrumbs = [{ id: null, name: "" }];
     } else {
       const existingIndex = breadcrumbs.findIndex(b => b.id === folderId);
       if (existingIndex >= 0) {
@@ -211,10 +219,13 @@
     fetchData(); // Refresh list
   }
 
-  async function deleteDataSource(id: string) {
-    if (!confirm("Are you sure you want to delete this file? All associated chunks will also be deleted.")) {
-      return;
-    }
+  function confirmDeleteDataSource(id: string, name: string) {
+    deleteTarget = { type: "file", id, name };
+    confirmDeleteModal?.showModal();
+  }
+
+  async function executeDelete() {
+    if (!deleteTarget) return;
 
     try {
       // Ensure we have API URL
@@ -223,19 +234,36 @@
         apiBase = config.apiUrl;
       }
 
-      const response = await fetch(`${apiBase}/api/vector-kb/data-sources/${id}`, {
-        method: "DELETE",
-      });
+      if (deleteTarget.type === "file") {
+        const response = await fetch(`${apiBase}/api/vector-kb/data-sources/${deleteTarget.id}`, {
+          method: "DELETE",
+        });
 
-      const result = await response.json();
+        const result = await response.json();
 
-      if (result.success) {
-        fetchData();
+        if (result.success) {
+          fetchData();
+        } else {
+          alert("Failed to delete: " + result.error);
+        }
       } else {
-        alert("Failed to delete: " + result.error);
+        // folder
+        const response = await fetch(`${apiBase}/api/vector-kb/folders/${deleteTarget.id}`, {
+          method: "DELETE",
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          fetchData();
+        } else {
+          alert("Failed to delete folder: " + result.error);
+        }
       }
     } catch (e) {
-      alert("Error deleting file: " + (e as Error).message);
+      alert("Error deleting: " + (e as Error).message);
+    } finally {
+      deleteTarget = null;
     }
   }
 
@@ -289,7 +317,7 @@
 
   async function saveFolder() {
     if (!folderName.trim()) {
-      alert("Please enter a folder name");
+      alert(t("vector-kb.folder-name-required"));
       return;
     }
 
@@ -349,32 +377,9 @@
     }
   }
 
-  async function deleteFolder(folder: VectorFolder) {
-    if (!confirm(`Are you sure you want to delete the folder "${folder.name}"? All files inside will also be deleted.`)) {
-      return;
-    }
-
-    try {
-      // Ensure we have API URL
-      if (!apiBase) {
-        const config = await getTranscriptionConfig();
-        apiBase = config.apiUrl;
-      }
-
-      const response = await fetch(`${apiBase}/api/vector-kb/folders/${folder._id}`, {
-        method: "DELETE",
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
-        fetchData();
-      } else {
-        alert("Failed to delete folder: " + result.error);
-      }
-    } catch (e) {
-      alert("Error deleting folder: " + (e as Error).message);
-    }
+  function confirmDeleteFolder(folder: VectorFolder) {
+    deleteTarget = { type: "folder", id: folder._id, name: folder.name };
+    confirmDeleteModal?.showModal();
   }
 
   function formatFileSize(bytes: number): string {
@@ -386,13 +391,13 @@
   function getStatusBadge(status: DataSourceStatus): { class: string; text: string } {
     switch (status) {
       case DataSourceStatus.Pending:
-        return { class: "badge-warning", text: "Pending" };
+        return { class: "badge-warning", text: t("vector-kb.status.pending") };
       case DataSourceStatus.Processing:
-        return { class: "badge-info", text: "Processing" };
+        return { class: "badge-info", text: t("vector-kb.status.processing") };
       case DataSourceStatus.Completed:
-        return { class: "badge-success", text: "Completed" };
+        return { class: "badge-success", text: t("vector-kb.status.completed") };
       case DataSourceStatus.Failed:
-        return { class: "badge-error", text: "Failed" };
+        return { class: "badge-error", text: t("vector-kb.status.failed") };
       default:
         return { class: "badge-ghost", text: status };
     }
@@ -417,7 +422,7 @@
   <!-- Storage Usage & Toolbar - always show -->
   <div class="flex items-center justify-between mb-4 p-4 bg-base-100 rounded-lg">
     <div class="flex items-center gap-4">
-      <span class="text-sm font-medium">Storage Usage:</span>
+      <span class="text-sm font-medium">{t("vector-kb.storage-usage")}:</span>
       <progress
         class="progress progress-primary w-48"
         value={storageUsage?.usedPercentage ?? 0}
@@ -429,15 +434,17 @@
       </span>
     </div>
     <div class="flex gap-2">
-      <button
-        class="btn btn-outline btn-sm"
-        onclick={openCreateFolderDialog}
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
-        </svg>
-        New Folder
-      </button>
+      {#if currentFolderId === null}
+        <button
+          class="btn btn-secondary btn-sm"
+          onclick={openCreateFolderDialog}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+          </svg>
+          {t("vector-kb.new-folder")}
+        </button>
+      {/if}
       <button
         class="btn btn-primary btn-sm"
         disabled={uploading}
@@ -445,10 +452,10 @@
       >
         {#if uploading}
           <span class="loading loading-spinner loading-sm"></span>
-          Uploading...
+          {t("vector-kb.uploading")}
         {:else}
           {@html svgIcons.upload}
-          Upload Files
+          {t("vector-kb.upload-files")}
         {/if}
       </button>
     </div>
@@ -475,8 +482,8 @@
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
                     <path d="M3.75 3A1.75 1.75 0 002 4.75v3.26a3.235 3.235 0 011.75-.51h12.5c.644 0 1.245.188 1.75.51V6.75A1.75 1.75 0 0016.25 5h-4.836a.25.25 0 01-.177-.073L9.823 3.513A1.75 1.75 0 008.586 3H3.75zM3.75 9A1.75 1.75 0 002 10.75v4.5c0 .966.784 1.75 1.75 1.75h12.5A1.75 1.75 0 0018 15.25v-4.5A1.75 1.75 0 0016.25 9H3.75z" />
                   </svg>
+                  {crumb.name}
                 {/if}
-                {crumb.name}
               </button>
             {:else}
               <span class="inline-flex items-center gap-1.5 font-medium text-base-content">
@@ -525,7 +532,7 @@
     })()}
     {#if filteredFolders.length > 0}
       <div class="mb-6">
-        <h3 class="text-lg font-semibold mb-2">Folders</h3>
+        <h3 class="text-lg font-semibold mb-2">{t("vector-kb.folders")}</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {#each filteredFolders as folder}
             <div class="card bg-base-100 shadow hover:shadow-md transition-shadow">
@@ -552,13 +559,13 @@
                           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                           </svg>
-                          Rename
+                          {t("vector-kb.rename")}
                         </button>
                       </li>
                       <li>
-                        <button class="text-error" onclick={() => deleteFolder(folder)}>
+                        <button class="text-error" onclick={() => confirmDeleteFolder(folder)}>
                           {@html svgIcons.trash}
-                          Delete
+                          {t("vector-kb.delete")}
                         </button>
                       </li>
                     </ul>
@@ -577,17 +584,17 @@
     <!-- Data Sources (Files) -->
     {#if dataSources.length > 0}
       <div>
-        <h3 class="text-lg font-semibold mb-2">Files</h3>
+        <h3 class="text-lg font-semibold mb-2">{t("vector-kb.files")}</h3>
         <div class="overflow-x-auto">
           <table class="table table-zebra">
             <thead>
               <tr>
-                <th>File Name</th>
-                <th>Type</th>
-                <th>Size</th>
-                <th>Chunks</th>
-                <th>Status</th>
-                <th>Actions</th>
+                <th>{t("vector-kb.file-name")}</th>
+                <th>{t("vector-kb.type")}</th>
+                <th>{t("vector-kb.size")}</th>
+                <th>{t("vector-kb.chunks")}</th>
+                <th>{t("vector-kb.status")}</th>
+                <th>{t("vector-kb.actions")}</th>
               </tr>
             </thead>
             <tbody>
@@ -629,14 +636,14 @@
                         <button
                           class="btn btn-xs btn-warning"
                           onclick={() => retryProcessing(source._id)}
-                          title="Retry processing"
+                          title={t("vector-kb.retry")}
                         >
-                          Retry
+                          {t("vector-kb.retry")}
                         </button>
                       {/if}
                       <button
                         class="btn btn-xs btn-error"
-                        onclick={() => deleteDataSource(source._id)}
+                        onclick={() => confirmDeleteDataSource(source._id, source.original_file_name)}
                         title="Delete file"
                       >
                         {@html svgIcons.trash}
@@ -653,17 +660,19 @@
       <div class="text-center py-12">
         <div class="flex flex-col items-center gap-4">
           {@html svgIcons.empty || ''}
-          <p class="text-base-content/60">No files or folders yet</p>
+          <p class="text-base-content/60">{t("vector-kb.no-files-or-folders")}</p>
           <div class="flex gap-2">
-            <button
-              class="btn btn-outline"
-              onclick={openCreateFolderDialog}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
-              </svg>
-              Create Folder
-            </button>
+            {#if currentFolderId === null}
+              <button
+                class="btn btn-secondary"
+                onclick={openCreateFolderDialog}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                </svg>
+                {t("vector-kb.create-folder")}
+              </button>
+            {/if}
             <button
               class="btn btn-primary"
               disabled={uploading}
@@ -674,7 +683,7 @@
               {:else}
                 {@html svgIcons.upload}
               {/if}
-              Upload File
+              {t("vector-kb.upload-file")}
             </button>
           </div>
         </div>
@@ -687,34 +696,34 @@
 <dialog bind:this={folderDialog} class="modal">
   <div class="modal-box">
     <h3 class="text-lg font-bold mb-4">
-      {folderDialogMode === "create" ? "Create New Folder" : "Rename Folder"}
+      {folderDialogMode === "create" ? t("vector-kb.create-new-folder") : t("vector-kb.rename-folder")}
     </h3>
     <div class="space-y-4">
       <div class="form-control">
         <label class="label">
-          <span class="label-text font-medium">Folder Name *</span>
+          <span class="label-text font-medium">{t("vector-kb.folder-name")} *</span>
         </label>
         <input
           type="text"
           class="input input-bordered w-full"
-          placeholder="Enter folder name"
+          placeholder={t("vector-kb.enter-folder-name")}
           bind:value={folderName}
         />
       </div>
       <div class="form-control">
         <label class="label">
-          <span class="label-text font-medium">Description (optional)</span>
+          <span class="label-text font-medium">{t("vector-kb.description-optional")}</span>
         </label>
         <textarea
           class="textarea textarea-bordered w-full"
-          placeholder="Enter folder description"
+          placeholder={t("vector-kb.enter-folder-description")}
           bind:value={folderDescription}
           rows="2"
         ></textarea>
       </div>
     </div>
     <div class="modal-action">
-      <button class="btn btn-ghost" onclick={closeFolderDialog}>Cancel</button>
+      <button class="btn btn-ghost" onclick={closeFolderDialog}>{t("vector-kb.cancel")}</button>
       <button
         class="btn btn-primary"
         disabled={!folderName.trim() || savingFolder}
@@ -723,7 +732,7 @@
         {#if savingFolder}
           <span class="loading loading-spinner loading-sm"></span>
         {/if}
-        {folderDialogMode === "create" ? "Create" : "Save"}
+        {folderDialogMode === "create" ? t("vector-kb.create") : t("vector-kb.save")}
       </button>
     </div>
   </div>
@@ -740,3 +749,13 @@
     dataSourceName={selectedDataSource.original_file_name}
   />
 {/if}
+
+<!-- Delete Confirmation Dialog -->
+<ConfirmDialog
+  bind:modal={confirmDeleteModal}
+  confirm={executeDelete}
+  title={deleteTarget?.type === "folder" ? t("vector-kb.delete-folder") : t("vector-kb.delete-file")}
+  description={deleteTarget?.type === "folder"
+    ? t("vector-kb.confirm-delete-folder", { name: deleteTarget?.name ?? "" })
+    : t("vector-kb.confirm-delete-file")}
+/>

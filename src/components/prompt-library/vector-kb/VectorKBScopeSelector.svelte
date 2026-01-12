@@ -66,12 +66,12 @@
   });
 
   let selectedFilesText = $derived(() => {
-    if (selectedDataSourceIds.length === 0) return t("assistant-dialog.vector-kb.select-files-placeholder");
+    if (selectedDataSourceIds.length === 0) return "Select files...";
     if (selectedDataSourceIds.length === 1) {
       const ds = dataSources.find((d) => d._id === selectedDataSourceIds[0]);
       return ds?.original_file_name || "1 file";
     }
-    return `${selectedDataSourceIds.length} ${t("assistant-dialog.kb.files-selected")}`;
+    return `${selectedDataSourceIds.length} Select Files`;
   });
 
   // Auto-enable vectorKbEnabled when component mounts
@@ -210,8 +210,6 @@
   <!-- Folder Selection Dropdown -->
   {#if selectedScope === VectorKBScope.Folder}
     <div class="space-y-2">
-      <p class="text-sm font-medium text-base-content/70">{t("assistant-dialog.kb.select-folders")}</p>
-
       {#if loading}
         <div class="flex items-center gap-2 text-sm text-base-content/60">
           <span class="loading loading-spinner loading-sm"></span>
@@ -285,15 +283,13 @@
   <!-- File Selection Dropdown -->
   {#if selectedScope === VectorKBScope.DataSource}
     <div class="space-y-2">
-      <p class="text-sm font-medium text-base-content/70">{t("assistant-dialog.kb.select-files")}</p>
-
       {#if loading}
         <div class="flex items-center gap-2 text-sm text-base-content/60">
           <span class="loading loading-spinner loading-sm"></span>
-          {t("assistant-dialog.vector-kb.loading-files")}
+          Loading files...
         </div>
       {:else if dataSources.length === 0}
-        <p class="text-sm text-base-content/60">{t("assistant-dialog.vector-kb.no-files")}</p>
+        <p class="text-sm text-base-content/60">No processed files available</p>
       {:else}
         <div class="relative" bind:this={fileDropdownRef}>
           <!-- Dropdown trigger -->
@@ -323,7 +319,7 @@
                   <input
                     type="text"
                     class="input input-sm input-bordered w-full pl-8"
-                    placeholder={t("assistant-dialog.vector-kb.search-files")}
+                    placeholder="Search files..."
                     bind:value={fileSearchQuery}
                     onclick={(e) => e.stopPropagation()}
                   />
@@ -365,7 +361,7 @@
     {:else if selectedScope === VectorKBScope.Folder}
       {t("assistant-dialog.vector-kb.info.folder")}
     {:else}
-      {t("assistant-dialog.vector-kb.info.file")}
+      Only the selected files will be searched for relevant context.
     {/if}
   </p>
 </div>
