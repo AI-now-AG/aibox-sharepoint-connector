@@ -436,7 +436,7 @@
     <div class="flex gap-2">
       {#if currentFolderId === null}
         <button
-          class="btn btn-secondary btn-sm"
+          class="btn btn-sm"
           onclick={openCreateFolderDialog}
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -664,7 +664,7 @@
           <div class="flex gap-2">
             {#if currentFolderId === null}
               <button
-                class="btn btn-secondary"
+                class="btn btn-primary"
                 onclick={openCreateFolderDialog}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -55,23 +55,34 @@
     )
   );
 
+  // Filter to only valid (existing) folder IDs
+  let validSelectedFolderIds = $derived(
+    selectedFolderIds.filter((id) => folders.some((f) => f._id === id))
+  );
+
+  let validSelectedDataSourceIds = $derived(
+    selectedDataSourceIds.filter((id) => dataSources.some((ds) => ds._id === id))
+  );
+
   // Selected items display text
   let selectedFoldersText = $derived(() => {
-    if (selectedFolderIds.length === 0) return t("assistant-dialog.vector-kb.select-folders-placeholder");
-    if (selectedFolderIds.length === 1) {
-      const folder = folders.find((f) => f._id === selectedFolderIds[0]);
-      return folder?.name || "1 folder";
+    const count = validSelectedFolderIds.length;
+    if (count === 0) return t("assistant-dialog.vector-kb.select-folders-placeholder");
+    if (count === 1) {
+      const folder = folders.find((f) => f._id === validSelectedFolderIds[0]);
+      return folder?.name || t("assistant-dialog.vector-kb.select-folders-placeholder");
     }
-    return `${selectedFolderIds.length} ${t("assistant-dialog.kb.folders-selected")}`;
+    return `${count} ${t("assistant-dialog.kb.folders-selected")}`;
   });
 
   let selectedFilesText = $derived(() => {
-    if (selectedDataSourceIds.length === 0) return "Select files...";
-    if (selectedDataSourceIds.length === 1) {
-      const ds = dataSources.find((d) => d._id === selectedDataSourceIds[0]);
-      return ds?.original_file_name || "1 file";
+    const count = validSelectedDataSourceIds.length;
+    if (count === 0) return "Select files...";
+    if (count === 1) {
+      const ds = dataSources.find((d) => d._id === validSelectedDataSourceIds[0]);
+      return ds?.original_file_name || "Select files..."
     }
-    return `${selectedDataSourceIds.length} Select Files`;
+    return `${count} Select Filess`;
   });
 
   // Auto-enable vectorKbEnabled when component mounts

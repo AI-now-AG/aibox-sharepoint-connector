@@ -705,7 +705,7 @@
   "tenant.vector-kb.chunk-size-help": "Maximale Grösse der Textblöcke in Zeichen (100-2000). Standard: 800",
   "tenant.vector-kb.chunk-overlap": "Chunk-Überlappung (Zeichen)",
   "tenant.vector-kb.chunk-overlap-help": "Überlappung zwischen Chunks in Zeichen (0-500). Standard: 200",
-  "tenant.vector-kb.top-k": "Top K Ergebnisse",
+  "tenant.vector-kb.top-k": "Anzahl Chunks",
   "tenant.vector-kb.top-k-help": "Anzahl der abzurufenden Chunks (1-20). Standard: 5",
   "tenant.vector-kb.similarity-threshold": "Ähnlichkeitsschwelle",
   "tenant.vector-kb.similarity-threshold-help": "Minimaler Ähnlichkeitswert (0-1). Standard: 0.7",
@@ -779,5 +779,7 @@
   "vector-kb.confirm-delete-folder": "Ordner \"${name}\" löschen? Alle darin enthaltenen Dateien werden ebenfalls gelöscht.",
   "vector-kb.folder-name-required": "Bitte Ordnernamen eingeben",
   "vector-kb.delete-folder": "Ordner löschen",
-  "vector-kb.delete-file": "Datei löschen"
+  "vector-kb.delete-file": "Datei löschen",
+  "vector-kb.title": "Vektor-Wissensdatenbank",
+  "vector-kb.not-enabled": "Die Vektor-Wissensdatenbank ist für diesen Mandanten nicht aktiviert. Bitte kontaktieren Sie Ihren Administrator, um diese Funktion zu aktivieren."
 }

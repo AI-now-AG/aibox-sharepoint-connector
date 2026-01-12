@@ -705,7 +705,7 @@
   "tenant.vector-kb.chunk-size-help": "Maximum size of text chunks in characters (100-2000). Default: 800",
   "tenant.vector-kb.chunk-overlap": "Chunk Overlap (characters)",
   "tenant.vector-kb.chunk-overlap-help": "Overlap between chunks in characters (0-500). Default: 200",
-  "tenant.vector-kb.top-k": "Top K Results",
+  "tenant.vector-kb.top-k": "Nr. of Chunks",
   "tenant.vector-kb.top-k-help": "Number of chunks to retrieve (1-20). Default: 5",
   "tenant.vector-kb.similarity-threshold": "Similarity Threshold",
   "tenant.vector-kb.similarity-threshold-help": "Minimum similarity score (0-1). Default: 0.7",
@@ -779,5 +779,7 @@
   "vector-kb.confirm-delete-folder": "Are you sure you want to delete the folder \"${name}\"? All files inside will also be deleted.",
   "vector-kb.folder-name-required": "Please enter a folder name",
   "vector-kb.delete-folder": "Delete Folder",
-  "vector-kb.delete-file": "Delete File"
+  "vector-kb.delete-file": "Delete File",
+  "vector-kb.title": "Vector Knowledge Base",
+  "vector-kb.not-enabled": "Vector Knowledge Base is not enabled for this tenant. Please contact your administrator to enable this feature."
 }
