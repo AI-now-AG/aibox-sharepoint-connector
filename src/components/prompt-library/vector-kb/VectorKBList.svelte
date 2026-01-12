@@ -391,13 +391,13 @@
   function getStatusBadge(status: DataSourceStatus): { class: string; text: string } {
     switch (status) {
       case DataSourceStatus.Pending:
-        return { class: "badge-warning", text: t("vector-kb.status.pending") };
+        return { class: "badge-soft badge-warning", text: t("vector-kb.status.pending") };
       case DataSourceStatus.Processing:
-        return { class: "badge-info", text: t("vector-kb.status.processing") };
+        return { class: "badge-soft badge-info", text: t("vector-kb.status.processing") };
       case DataSourceStatus.Completed:
-        return { class: "badge-success", text: t("vector-kb.status.completed") };
+        return { class: "badge-soft badge-success", text: t("vector-kb.status.completed") };
       case DataSourceStatus.Failed:
-        return { class: "badge-error", text: t("vector-kb.status.failed") };
+        return { class: "badge-soft badge-error", text: t("vector-kb.status.failed") };
       default:
         return { class: "badge-ghost", text: status };
     }
@@ -642,7 +642,7 @@
                         </button>
                       {/if}
                       <button
-                        class="btn btn-xs btn-error"
+                        class="btn btn-xs btn-ghost text-error hover:bg-error/10"
                         onclick={() => confirmDeleteDataSource(source._id, source.original_file_name)}
                         title="Delete file"
                       >
