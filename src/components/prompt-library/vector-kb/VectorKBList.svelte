@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onMount, onDestroy } from "svelte";
   import { svgIcons } from "$assets/icons";
   import Loading from "$components/Loading.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
@@ -49,6 +49,11 @@
 
   // API base URL - will be set from config
   let apiBase = $state("");
+
+  // SSE connection for real-time status updates
+  let eventSource: EventSource | null = null;
+  let reconnectAttempts = 0;
+  const MAX_RECONNECT_ATTEMPTS = 5;
 
   function openChunkViewer(source: VectorDataSource) {
     selectedDataSource = source;
@@ -155,6 +160,8 @@
       error = (e as Error).message;
     } finally {
       loading = false;
+      // Connect to SSE for real-time status updates
+      connectSSE();
     }
   }
 
@@ -172,6 +179,8 @@
       }
     }
 
+    // Disconnect SSE before fetching new folder data (will reconnect after fetch)
+    disconnectSSE();
     fetchData();
   }
 
@@ -403,8 +412,70 @@
     }
   }
 
+  function connectSSE() {
+    if (!apiBase || !tenantId) return;
+
+    // Close existing connection if any
+    disconnectSSE();
+
+    const sseUrl = `${apiBase}/api/vector-kb/status-stream?tenantId=${tenantId}&folderId=${currentFolderId || "root"}`;
+
+    eventSource = new EventSource(sseUrl);
+
+    eventSource.onopen = () => {
+      console.log("[VectorKB] SSE connected");
+      reconnectAttempts = 0;
+    };
+
+    eventSource.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+
+        if (data.type === "status_update") {
+          // Update the specific data source in the list
+          dataSources = dataSources.map((ds) => {
+            if (ds._id === data.dataSourceId) {
+              return {
+                ...ds,
+                status: data.status,
+                error_message: data.errorMessage,
+                chunk_count: data.chunkCount ?? ds.chunk_count,
+              };
+            }
+            return ds;
+          });
+        }
+      } catch (e) {
+        console.error("[VectorKB] SSE message parse error:", e);
+      }
+    };
+
+    eventSource.onerror = () => {
+      console.log("[VectorKB] SSE connection error, attempting reconnect...");
+      disconnectSSE();
+
+      // Attempt reconnection with exponential backoff
+      if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+        reconnectAttempts++;
+        const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 30000);
+        setTimeout(connectSSE, delay);
+      }
+    };
+  }
+
+  function disconnectSSE() {
+    if (eventSource) {
+      eventSource.close();
+      eventSource = null;
+    }
+  }
+
   onMount(() => {
     fetchData();
+  });
+
+  onDestroy(() => {
+    disconnectSSE();
   });
 </script>
 
