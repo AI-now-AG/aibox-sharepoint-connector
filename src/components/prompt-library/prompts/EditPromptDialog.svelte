@@ -456,7 +456,7 @@
                 }, 100);
               }}
               bind:html={promptText}
-              cssClass="!h-[200px] mt-3"
+              cssClass="h-[200px] mt-3"
             />
             <RefinementButton
               promptText={promptDetails?.prompt || ""}
