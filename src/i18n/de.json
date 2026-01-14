@@ -781,5 +781,11 @@
   "vector-kb.delete-folder": "Ordner löschen",
   "vector-kb.delete-file": "Datei löschen",
   "vector-kb.title": "Knowledge Base Advanced",
-  "vector-kb.not-enabled": "Die erweiterte Knowledge Base ist für diesen Account nicht aktiviert. Bitte kontaktiere deinen Administrator, um diese Funktion zu aktivieren."
+  "vector-kb.not-enabled": "Die erweiterte Knowledge Base ist für diesen Account nicht aktiviert. Bitte kontaktiere deinen Administrator, um diese Funktion zu aktivieren.",
+  "user.reset-password": "Passwort zurücksetzen",
+  "user.reset-password-confirm-message": "Passwort per E-Mail zurücksetzen",
+  "user.reset-password-description-message": "E-Mail senden an ${email} um neues Passwort zu erstellen?",
+  "user.reset-password-successful": "E-Mail wurde versendet",
+  "user.reset-password-failed": "Passwort zurücksetzen fehlgeschlagen, bitte versuche es erneut",
+  "common.confirm": "Ja"
 }
