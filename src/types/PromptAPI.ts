@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ReasoningEffortOption } from "./AIProvider";
+import { ReasoningEffortOption, VectorKBScope } from "./AIProvider";
 
 export const CreatePromptParamsSchema = z.object({
   _id: z.string().optional(),
@@ -14,6 +14,11 @@ export const CreatePromptParamsSchema = z.object({
   textVerbosity: z.string().nullish(),
   promptTool: z.string().nullish(),
   documents: z.array(z.string()).optional(),
+  // Vector KB fields
+  vector_kb_enabled: z.boolean().optional().default(false),
+  vector_kb_scope: z.nativeEnum(VectorKBScope).nullish(),
+  vector_kb_folder_ids: z.array(z.string()).optional(),
+  vector_kb_data_source_ids: z.array(z.string()).optional(),
 });
 
 export type CreatePromptParams = z.infer<typeof CreatePromptParamsSchema>;

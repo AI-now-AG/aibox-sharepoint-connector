@@ -29,7 +29,7 @@ import {
   AudioOptionId,
 } from "$types/Subscription";
 import { EncryptedUserPassword, UserRole } from "$types/Users";
-import { ModelName, ReasoningEffortOption } from "$types/AIProvider";
+import { ModelName, ReasoningEffortOption, EmbeddingProvider } from "$types/AIProvider";
 
 const TenantInputParamsSchema = z.object({
   name: z.string(),
@@ -79,6 +79,15 @@ const TenantInputParamsSchema = z.object({
   tenant_admin_email: z.string().optional(),
   billing_info: z.record(z.any()).optional(),
   totalPrice: z.string().optional(),
+  // Vector KB Configuration
+  vector_kb_enabled: z.boolean().optional().default(false),
+  vector_kb_embedding_provider: z.nativeEnum(EmbeddingProvider).nullish(),
+  vector_kb_embedding_model: z.string().nullish(),
+  vector_kb_chunk_size: z.number().optional().default(800),
+  vector_kb_chunk_overlap: z.number().optional().default(200),
+  vector_kb_max_storage_mb: z.number().optional().default(500),
+  vector_kb_top_k: z.number().optional().default(5),
+  vector_kb_similarity_threshold: z.number().optional().default(0.7),
 });
 
 const TenanKeyEncryptSchema = z.object({

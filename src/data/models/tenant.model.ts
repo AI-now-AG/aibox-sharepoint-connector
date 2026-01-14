@@ -9,7 +9,7 @@ import {
   ThemeCode,
 } from "$types/TenantFeature";
 import { BillingMethod } from "$types/Subscription";
-import { ModelName, ReasoningEffortOption } from "$types/AIProvider";
+import { ModelName, ReasoningEffortOption, EmbeddingProvider } from "$types/AIProvider";
 
 export const TenantFilterParamsSchema = z.object({
   searchValue: z.string().nullish(),
@@ -86,6 +86,15 @@ const TenantSchema = z.object({
   stripe_customer_id: z.string().nullish().default(null),
   totalPrice: z.string().optional(),
   max_user_limit: z.number().nullish().default(0),
+  // Vector KB Configuration
+  vector_kb_enabled: z.boolean().optional().default(false),
+  vector_kb_embedding_provider: z.nativeEnum(EmbeddingProvider).nullish(),
+  vector_kb_embedding_model: z.string().nullish(),
+  vector_kb_chunk_size: z.number().optional().default(800),
+  vector_kb_chunk_overlap: z.number().optional().default(200),
+  vector_kb_max_storage_mb: z.number().optional().default(500),
+  vector_kb_top_k: z.number().optional().default(5),
+  vector_kb_similarity_threshold: z.number().optional().default(0.7),
   created_at: z
     .date()
     .optional()

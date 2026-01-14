@@ -38,7 +38,8 @@
   import { TextModel } from "$types/UsageTracking";
   import { SubscriptionPackages } from "$data/subscription-packages";
   import { onMount } from "svelte";
-  import { ModelName, ReasoningEffortOption } from "$types/AIProvider";
+  import { ModelName, ReasoningEffortOption, EmbeddingProvider } from "$types/AIProvider";
+  import { EMBEDDING_MODELS, DEFAULT_VECTOR_KB_CONFIG } from "$types/VectorKB";
 
   const t = useTranslations();
   let loading = $state(false);
@@ -101,6 +102,26 @@
     tenantData.subtitle_studio_active = true;
   }
 
+  // Initialize Vector KB defaults
+  if (tenantData && tenantData.vector_kb_enabled === undefined) {
+    tenantData.vector_kb_enabled = false;
+  }
+  if (tenantData && tenantData.vector_kb_chunk_size === undefined) {
+    tenantData.vector_kb_chunk_size = DEFAULT_VECTOR_KB_CONFIG.chunkSize;
+  }
+  if (tenantData && tenantData.vector_kb_chunk_overlap === undefined) {
+    tenantData.vector_kb_chunk_overlap = DEFAULT_VECTOR_KB_CONFIG.chunkOverlap;
+  }
+  if (tenantData && tenantData.vector_kb_max_storage_mb === undefined) {
+    tenantData.vector_kb_max_storage_mb = DEFAULT_VECTOR_KB_CONFIG.maxStorageMB;
+  }
+  if (tenantData && tenantData.vector_kb_top_k === undefined) {
+    tenantData.vector_kb_top_k = DEFAULT_VECTOR_KB_CONFIG.topK;
+  }
+  if (tenantData && tenantData.vector_kb_similarity_threshold === undefined) {
+    tenantData.vector_kb_similarity_threshold = DEFAULT_VECTOR_KB_CONFIG.similarityThreshold;
+  }
+
   // Subscription & billing
   let selectedPlan: SubscriptionPackageId = $state(
     subscription?.plan_name ?? "",
@@ -142,6 +163,35 @@
   let fluxEnabled: boolean = $state(false);
   let claudeEnabled: boolean = $state(false);
   let geminiEnabled: boolean = $state(false);
+
+  // Vector KB state
+  let vectorKbEnabled: boolean = $state(tenantData?.vector_kb_enabled ?? false);
+  let selectedEmbeddingProvider: EmbeddingProvider = $state(
+    tenantData?.vector_kb_embedding_provider ?? EmbeddingProvider.OpenAI
+  );
+  let selectedEmbeddingModel: string = $state(
+    tenantData?.vector_kb_embedding_model ?? "text-embedding-3-small"
+  );
+
+  // Compute available embedding providers based on configured API keys
+  let availableEmbeddingProviders = $derived(() => {
+    const providers: { value: EmbeddingProvider; label: string }[] = [];
+    if (openAIEnabled || tenantData?.openai_api_key) {
+      providers.push({ value: EmbeddingProvider.OpenAI, label: "OpenAI" });
+    }
+    if (azureOpenAIEnabled || tenantData?.azure_openai_api_key) {
+      providers.push({ value: EmbeddingProvider.AzureOpenAI, label: "Azure OpenAI" });
+    }
+    if (geminiEnabled || tenantData?.gemini_api_key) {
+      providers.push({ value: EmbeddingProvider.Gemini, label: "Gemini" });
+    }
+    return providers;
+  });
+
+  // Compute available embedding models based on selected provider
+  let availableEmbeddingModels = $derived(() => {
+    return EMBEDDING_MODELS[selectedEmbeddingProvider] || [];
+  });
 
   let openAIKeyField: HTMLInputElement;
   let openAIGpt5KeyField: HTMLInputElement;
@@ -648,6 +698,12 @@
         tenantData.perplexity_chat_model = selectedPerplexityModel;
         tenantData.anthropic_chat_model = selectedClaudeModel;
         tenantData.gemini_chat_model = selectedGeminiModel;
+
+        // Vector KB settings
+        tenantData.vector_kb_enabled = vectorKbEnabled;
+        tenantData.vector_kb_embedding_provider = vectorKbEnabled ? selectedEmbeddingProvider : null;
+        tenantData.vector_kb_embedding_model = vectorKbEnabled ? selectedEmbeddingModel : null;
+
         updateTextFeature(ApiKeyProvider.OpenAI, openAIEnabled);
         updateTextFeature(ApiKeyProvider.OpenAIGpt5, openAIGpt5Enabled);
         updateTextFeature(ApiKeyProvider.AzureOpenAI, azureOpenAIEnabled);
@@ -816,6 +872,12 @@
         tenantData.perplexity_chat_model = selectedPerplexityModel;
         tenantData.anthropic_chat_model = selectedClaudeModel;
         tenantData.gemini_chat_model = selectedGeminiModel;
+
+        // Vector KB settings
+        tenantData.vector_kb_enabled = vectorKbEnabled;
+        tenantData.vector_kb_embedding_provider = vectorKbEnabled ? selectedEmbeddingProvider : null;
+        tenantData.vector_kb_embedding_model = vectorKbEnabled ? selectedEmbeddingModel : null;
+
         updateTextFeature(ApiKeyProvider.OpenAI, openAIEnabled);
         updateTextFeature(ApiKeyProvider.OpenAIGpt5, openAIGpt5Enabled);
         updateTextFeature(ApiKeyProvider.AzureOpenAI, azureOpenAIEnabled);
@@ -2551,6 +2613,197 @@
         </div>
       </div>
     </div>
+
+    <div class="divider"></div>
+
+    <!-- Vector Knowledge Base Section -->
+    <div class="mb-3 flex flex-row items-center justify-between">
+      <div class="flex flex-row items-center gap-2">
+        {@html svgIcons.document}
+        <p class="font-medium text-md">{t("tenant.vector-kb.title")}</p>
+      </div>
+      <!-- Active Toggle -->
+      <label class="flex items-center gap-2">
+        <span class="label-text">{t("tenant.vector-kb.enable")}</span>
+        <input
+          type="checkbox"
+          class="toggle toggle-primary"
+          bind:checked={vectorKbEnabled}
+        />
+      </label>
+    </div>
+
+    {#if vectorKbEnabled}
+      <div class="container mx-auto" transition:slide>
+        <div class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4">
+          <input type="checkbox" checked />
+          <div class="collapse-title">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center">
+                <span class="label-text text-base-content font-medium">
+                  {t("tenant.vector-kb.embedding-config")}
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="collapse-content">
+            <div class="grid grid-cols-2 gap-4 mx-4 mb-4">
+              <!-- Embedding Provider -->
+              <div class="w-full">
+                <span class="mb-2 text-base-content font-medium text-sm">
+                  {t("tenant.vector-kb.embedding-provider")}*
+                </span>
+                <select
+                  class="select select-bordered w-full mt-1"
+                  bind:value={selectedEmbeddingProvider}
+                  onchange={() => {
+                    // Reset model when provider changes
+                    const models = EMBEDDING_MODELS[selectedEmbeddingProvider];
+                    if (models && models.length > 0) {
+                      selectedEmbeddingModel = models[0].value;
+                    }
+                  }}
+                >
+                  {#each availableEmbeddingProviders() as provider}
+                    <option value={provider.value}>{provider.label}</option>
+                  {/each}
+                </select>
+                {#if availableEmbeddingProviders().length === 0}
+                  <p class="text-sm text-warning mt-1">
+                    {t("tenant.vector-kb.embedding-provider-warning")}
+                  </p>
+                {/if}
+              </div>
+
+              <!-- Embedding Model -->
+              <div class="w-full">
+                <span class="mb-2 text-base-content font-medium text-sm">
+                  {t("tenant.vector-kb.embedding-model")}*
+                </span>
+                <select
+                  class="select select-bordered w-full mt-1"
+                  bind:value={selectedEmbeddingModel}
+                >
+                  {#each availableEmbeddingModels() as model}
+                    <option value={model.value}>{model.label}</option>
+                  {/each}
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 mx-4 mb-4">
+              <!-- Chunk Size -->
+              <div class="w-full">
+                <span class="mb-2 text-base-content font-medium text-sm">
+                  {t("tenant.vector-kb.chunk-size")}
+                </span>
+                <input
+                  type="number"
+                  class="input input-bordered w-full mt-1"
+                  bind:value={tenantData.vector_kb_chunk_size}
+                  min="100"
+                  max="2000"
+                />
+                <p class="text-xs text-base-content/60 mt-1">
+                  {t("tenant.vector-kb.chunk-size-help")}
+                </p>
+              </div>
+
+              <!-- Chunk Overlap -->
+              <div class="w-full">
+                <span class="mb-2 text-base-content font-medium text-sm">
+                  {t("tenant.vector-kb.chunk-overlap")}
+                </span>
+                <input
+                  type="number"
+                  class="input input-bordered w-full mt-1"
+                  bind:value={tenantData.vector_kb_chunk_overlap}
+                  min="0"
+                  max="500"
+                />
+                <p class="text-xs text-base-content/60 mt-1">
+                  {t("tenant.vector-kb.chunk-overlap-help")}
+                </p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 mx-4 mb-4">
+              <!-- Top K Results -->
+              <div class="w-full">
+                <span class="mb-2 text-base-content font-medium text-sm">
+                  {t("tenant.vector-kb.top-k")}
+                </span>
+                <input
+                  type="number"
+                  class="input input-bordered w-full mt-1"
+                  bind:value={tenantData.vector_kb_top_k}
+                  min="1"
+                  max="20"
+                />
+                <p class="text-xs text-base-content/60 mt-1">
+                  {t("tenant.vector-kb.top-k-help")}
+                </p>
+              </div>
+
+              <!-- Similarity Threshold -->
+              <div class="w-full">
+                <span class="mb-2 text-base-content font-medium text-sm">
+                  {t("tenant.vector-kb.similarity-threshold")}
+                </span>
+                <input
+                  type="number"
+                  class="input input-bordered w-full mt-1"
+                  bind:value={tenantData.vector_kb_similarity_threshold}
+                  min="0"
+                  max="1"
+                  step="0.05"
+                />
+                <p class="text-xs text-base-content/60 mt-1">
+                  {t("tenant.vector-kb.similarity-threshold-help")}
+                </p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 mx-4 mb-4">
+              <!-- Max Storage -->
+              <div class="w-full">
+                <span class="mb-2 text-base-content font-medium text-sm">
+                  {t("tenant.vector-kb.max-storage")}
+                </span>
+                <input
+                  type="number"
+                  class="input input-bordered w-full mt-1"
+                  bind:value={tenantData.vector_kb_max_storage_mb}
+                  min="50"
+                  max="10000"
+                />
+                <p class="text-xs text-base-content/60 mt-1">
+                  {t("tenant.vector-kb.max-storage-help")}
+                </p>
+              </div>
+              <div class="w-full"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert alert-info mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <span>
+            {t("tenant.vector-kb.info")}
+          </span>
+        </div>
+      </div>
+    {:else}
+      <div class="container mx-auto">
+        <div class="alert mb-4">
+          <span class="text-sm text-base-content/60">
+            {t("tenant.vector-kb.enable-hint")}
+          </span>
+        </div>
+      </div>
+    {/if}
 
     <div class="divider"></div>
 

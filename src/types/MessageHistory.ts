@@ -3,6 +3,15 @@ export enum MessageRole {
   User = "user",
 }
 
+// Source attribution for Vector KB RAG responses
+export interface SourceAttribution {
+  fileName: string;
+  score: number;
+  pageNumber?: number;
+  snippet: string;
+  chunkIndex?: number;
+}
+
 export interface Message {
   role: MessageRole;
   content: string;
@@ -12,6 +21,7 @@ export interface Message {
   thumbRating?: MessageThumbRating | null;
   imageThoughtSignature?: string; // new
   imageMimeType?: string;         // optional helper
+  sources?: SourceAttribution[];  // Vector KB sources for RAG responses
 }
 
 export enum MessageThumbRating {
