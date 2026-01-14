@@ -781,5 +781,11 @@
   "vector-kb.delete-folder": "Delete Folder",
   "vector-kb.delete-file": "Delete File",
   "vector-kb.title": "Knowledge Base Advanced",
-  "vector-kb.not-enabled": "Vector Knowledge Base is not enabled for this tenant. Please contact your administrator to enable this feature."
+  "vector-kb.not-enabled": "Vector Knowledge Base is not enabled for this tenant. Please contact your administrator to enable this feature.",
+  "user.reset-password": "Reset Password",
+  "user.reset-password-confirm-message": "Reset Password Email",
+  "user.reset-password-description-message": "Do you want to send a password reset email to ${email}",
+  "user.reset-password-successful": "Email for password reset sent",
+  "user.reset-password-failed": "Password reset failed - please try again",
+  "common.confirm": "Confirm"
 }
