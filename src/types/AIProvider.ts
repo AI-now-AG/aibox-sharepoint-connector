@@ -49,3 +49,17 @@ export enum PromptToolOption {
   Websearch = "websearch",
   Thinking = "thinking",
 }
+
+// Vector KB Embedding Providers
+export enum EmbeddingProvider {
+  OpenAI = "openai",
+  AzureOpenAI = "azure_openai",
+  Gemini = "gemini",
+}
+
+// Vector KB Scope for prompts
+export enum VectorKBScope {
+  All = "all",
+  Folder = "folder",
+  DataSource = "data_source",
+}

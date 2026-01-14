@@ -58,7 +58,8 @@ export async function getTranscriptionConfig(): Promise<TranscriptionConfig> {
   const { apiKey, apiUrl } = await configResponse.json();
   return {
     apiKey,
-    apiUrl: apiUrl || process.env.AZURE_BACKEND_URL || 'http://localhost:3000',
+    // Use the configured URL, fallback to localhost:3000
+    apiUrl: apiUrl || 'http://localhost:3000',
   };
 }
 

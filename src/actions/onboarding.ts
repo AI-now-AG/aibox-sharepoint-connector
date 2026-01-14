@@ -368,7 +368,7 @@ export const onboarding = {
       const prompts =
         await GlobalPromptModel.listByCategoryIds(originalCategoryIds);
 
-      const newPrompts = prompts.map((prompt: Prompt) => ({
+      const newPrompts = prompts.map((prompt) => ({
         ...prompt,
         tenant_id: newTenant.insertedId,
         category: categoryIdMap.get(prompt.category?.toString()),
@@ -376,6 +376,11 @@ export const onboarding = {
         documents: [],
         created_at: new Date(),
         updated_at: new Date(),
+        // Vector KB fields (preserve from source or use defaults)
+        vector_kb_enabled: (prompt as any).vector_kb_enabled ?? false,
+        vector_kb_scope: (prompt as any).vector_kb_scope ?? null,
+        vector_kb_folder_ids: [],
+        vector_kb_data_source_ids: [],
       }));
 
       console.log("Prompt Categories:", categoryIdMap);

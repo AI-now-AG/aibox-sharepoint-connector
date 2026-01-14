@@ -136,6 +136,11 @@ const syncPrompts = async (rows: CsvRowRaw[], user: User) => {
       promptTool: item.prompt_tool ?? "",
       reasoningEffort: item.reasoning_effort ?? ReasoningEffortOption.None,
       textVerbosity: item.text_verbosity ?? "",
+      // Vector KB fields (defaults for imported prompts)
+      vector_kb_enabled: false,
+      vector_kb_scope: null,
+      vector_kb_folder_ids: [],
+      vector_kb_data_source_ids: [],
     };
     await PromptModel.add(newPrompt);
   }
