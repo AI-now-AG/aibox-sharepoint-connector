@@ -45,7 +45,11 @@
 
   // Delete confirmation dialog state
   let confirmDeleteModal: HTMLDialogElement | undefined = $state();
-  let deleteTarget = $state<{ type: "file" | "folder"; id: string; name: string } | null>(null);
+  let deleteTarget = $state<{ type: "file" | "folder" | "multiple"; id: string; name: string; ids?: string[] } | null>(null);
+
+  // Multi-select state
+  let selectedFiles = $state<Set<string>>(new Set());
+  let deletingMultiple = $state(false);
 
   // API base URL - will be set from config
   let apiBase = $state("");
@@ -54,6 +58,48 @@
   let eventSource: EventSource | null = null;
   let reconnectAttempts = 0;
   const MAX_RECONNECT_ATTEMPTS = 5;
+
+  // Sorting state
+  type SortField = "name" | "type" | "size" | "status" | "date";
+  type SortDirection = "asc" | "desc";
+  let sortField = $state<SortField>("name");
+  let sortDirection = $state<SortDirection>("asc");
+
+  // Derived sorted data sources
+  let sortedDataSources = $derived.by(() => {
+    const sorted = [...dataSources];
+    sorted.sort((a, b) => {
+      let comparison = 0;
+      switch (sortField) {
+        case "name":
+          comparison = a.original_file_name.localeCompare(b.original_file_name);
+          break;
+        case "type":
+          comparison = a.file_type.localeCompare(b.file_type);
+          break;
+        case "size":
+          comparison = a.file_size_bytes - b.file_size_bytes;
+          break;
+        case "status":
+          comparison = a.status.localeCompare(b.status);
+          break;
+        case "date":
+          comparison = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+          break;
+      }
+      return sortDirection === "asc" ? comparison : -comparison;
+    });
+    return sorted;
+  });
+
+  function toggleSort(field: SortField) {
+    if (sortField === field) {
+      sortDirection = sortDirection === "asc" ? "desc" : "asc";
+    } else {
+      sortField = field;
+      sortDirection = "asc";
+    }
+  }
 
   function openChunkViewer(source: VectorDataSource) {
     selectedDataSource = source;
@@ -233,6 +279,41 @@
     confirmDeleteModal?.showModal();
   }
 
+  // Multi-select functions
+  function toggleFileSelection(id: string) {
+    const newSet = new Set(selectedFiles);
+    if (newSet.has(id)) {
+      newSet.delete(id);
+    } else {
+      newSet.add(id);
+    }
+    selectedFiles = newSet;
+  }
+
+  function toggleSelectAll() {
+    if (selectedFiles.size === dataSources.length) {
+      selectedFiles = new Set();
+    } else {
+      selectedFiles = new Set(dataSources.map(ds => ds._id));
+    }
+  }
+
+  function confirmDeleteMultiple() {
+    if (selectedFiles.size === 0) return;
+    const ids = Array.from(selectedFiles);
+    deleteTarget = {
+      type: "multiple",
+      id: "",
+      name: `${ids.length} ${t("vector-kb.files").toLowerCase()}`,
+      ids
+    };
+    confirmDeleteModal?.showModal();
+  }
+
+  function clearSelection() {
+    selectedFiles = new Set();
+  }
+
   async function executeDelete() {
     if (!deleteTarget) return;
 
@@ -243,7 +324,34 @@
         apiBase = config.apiUrl;
       }
 
-      if (deleteTarget.type === "file") {
+      if (deleteTarget.type === "multiple" && deleteTarget.ids) {
+        // Delete multiple files
+        deletingMultiple = true;
+        const ids = deleteTarget.ids;
+        let failedCount = 0;
+
+        for (const id of ids) {
+          try {
+            const response = await fetch(`${apiBase}/api/vector-kb/data-sources/${id}`, {
+              method: "DELETE",
+            });
+            const result = await response.json();
+            if (!result.success) {
+              failedCount++;
+            }
+          } catch {
+            failedCount++;
+          }
+        }
+
+        deletingMultiple = false;
+        clearSelection();
+
+        if (failedCount > 0) {
+          alert(`Failed to delete ${failedCount} file(s)`);
+        }
+        fetchData();
+      } else if (deleteTarget.type === "file") {
         const response = await fetch(`${apiBase}/api/vector-kb/data-sources/${deleteTarget.id}`, {
           method: "DELETE",
         });
@@ -297,6 +405,34 @@
       }
     } catch (e) {
       alert("Error retrying: " + (e as Error).message);
+    }
+  }
+
+  async function downloadFile(id: string, fileName: string) {
+    try {
+      // Ensure we have API URL
+      if (!apiBase) {
+        const config = await getTranscriptionConfig();
+        apiBase = config.apiUrl;
+      }
+
+      const response = await fetch(`${apiBase}/api/vector-kb/data-sources/${id}/download`);
+      const result = await response.json();
+
+      if (result.success && result.data?.downloadUrl) {
+        // Create a temporary anchor to trigger download with original filename
+        const link = document.createElement("a");
+        link.href = result.data.downloadUrl;
+        link.download = fileName;
+        link.target = "_blank";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else {
+        alert("Failed to download: " + (result.error || "Unknown error"));
+      }
+    } catch (e) {
+      alert("Error downloading: " + (e as Error).message);
     }
   }
 
@@ -598,6 +734,8 @@
         console.log(`[VectorKB] Filter check: "${f.name}" parentId=${parentId} currentFolderId=${currentFolderId} -> ${matches}`);
         return matches;
       });
+      // Sort folders alphabetically by name
+      result.sort((a, b) => a.name.localeCompare(b.name));
       console.log("[VectorKB] Filtered folders:", result.length);
       return result;
     })()}
@@ -655,29 +793,165 @@
     <!-- Data Sources (Files) -->
     {#if dataSources.length > 0}
       <div>
-        <h3 class="text-lg font-semibold mb-2">{t("vector-kb.files")}</h3>
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-lg font-semibold">{t("vector-kb.files")}</h3>
+          {#if selectedFiles.size > 0}
+            <div class="flex items-center gap-2">
+              <span class="text-sm text-base-content/70">
+                {selectedFiles.size} {t("vector-kb.selected")}
+              </span>
+              <button
+                class="btn btn-error btn-sm"
+                onclick={confirmDeleteMultiple}
+                disabled={deletingMultiple}
+              >
+                {#if deletingMultiple}
+                  <span class="loading loading-spinner loading-xs"></span>
+                {:else}
+                  {@html svgIcons.trash}
+                {/if}
+                {t("vector-kb.delete-selected")}
+              </button>
+              <button
+                class="btn btn-ghost btn-sm"
+                onclick={clearSelection}
+              >
+                {t("vector-kb.clear-selection")}
+              </button>
+            </div>
+          {/if}
+        </div>
         <div class="overflow-x-auto">
           <table class="table table-zebra">
             <thead>
               <tr>
-                <th>{t("vector-kb.file-name")}</th>
-                <th>{t("vector-kb.type")}</th>
-                <th>{t("vector-kb.size")}</th>
-                <th>{t("vector-kb.chunks")}</th>
-                <th>{t("vector-kb.status")}</th>
+                <th class="w-12">
+                  <label>
+                    <input
+                      type="checkbox"
+                      class="checkbox checkbox-sm"
+                      checked={selectedFiles.size === dataSources.length && dataSources.length > 0}
+                      indeterminate={selectedFiles.size > 0 && selectedFiles.size < dataSources.length}
+                      onchange={toggleSelectAll}
+                    />
+                  </label>
+                </th>
+                <th>
+                  <button
+                    class="flex items-center gap-1 hover:text-primary transition-colors"
+                    onclick={() => toggleSort("name")}
+                  >
+                    {t("vector-kb.file-name")}
+                    {#if sortField === "name"}
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        {#if sortDirection === "asc"}
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                        {:else}
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        {/if}
+                      </svg>
+                    {:else}
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                      </svg>
+                    {/if}
+                  </button>
+                </th>
+                <th class="hidden md:table-cell">
+                  <button
+                    class="flex items-center gap-1 hover:text-primary transition-colors"
+                    onclick={() => toggleSort("type")}
+                  >
+                    {t("vector-kb.type")}
+                    {#if sortField === "type"}
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        {#if sortDirection === "asc"}
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                        {:else}
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        {/if}
+                      </svg>
+                    {:else}
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                      </svg>
+                    {/if}
+                  </button>
+                </th>
+                <th class="hidden lg:table-cell">
+                  <button
+                    class="flex items-center gap-1 hover:text-primary transition-colors"
+                    onclick={() => toggleSort("size")}
+                  >
+                    {t("vector-kb.size")}
+                    {#if sortField === "size"}
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        {#if sortDirection === "asc"}
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                        {:else}
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        {/if}
+                      </svg>
+                    {:else}
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                      </svg>
+                    {/if}
+                  </button>
+                </th>
+                <th class="hidden xl:table-cell">{t("vector-kb.chunks")}</th>
+                <th>
+                  <button
+                    class="flex items-center gap-1 hover:text-primary transition-colors"
+                    onclick={() => toggleSort("status")}
+                  >
+                    {t("vector-kb.status")}
+                    {#if sortField === "status"}
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        {#if sortDirection === "asc"}
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                        {:else}
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        {/if}
+                      </svg>
+                    {:else}
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                      </svg>
+                    {/if}
+                  </button>
+                </th>
                 <th>{t("vector-kb.actions")}</th>
               </tr>
             </thead>
             <tbody>
-              {#each dataSources as source}
+              {#each sortedDataSources as source}
                 {@const statusBadge = getStatusBadge(source.status)}
-                <tr>
-                  <td class="font-medium">{source.original_file_name}</td>
+                <tr class={selectedFiles.has(source._id) ? "bg-primary/10" : ""}>
                   <td>
+                    <label>
+                      <input
+                        type="checkbox"
+                        class="checkbox checkbox-sm"
+                        checked={selectedFiles.has(source._id)}
+                        onchange={() => toggleFileSelection(source._id)}
+                      />
+                    </label>
+                  </td>
+                  <td>
+                    <div class="font-medium break-words">
+                      {source.original_file_name}
+                    </div>
+                    <!-- Show type and size below filename only when Type column is hidden -->
+                    <div class="text-xs text-base-content/60 md:hidden">
+                      {source.file_type.toUpperCase()} • {formatFileSize(source.file_size_bytes)}
+                    </div>
+                  </td>
+                  <td class="hidden md:table-cell">
                     <span class="badge badge-ghost">{source.file_type.toUpperCase()}</span>
                   </td>
-                  <td>{formatFileSize(source.file_size_bytes)}</td>
-                  <td>{source.chunk_count}</td>
+                  <td class="hidden lg:table-cell">{formatFileSize(source.file_size_bytes)}</td>
+                  <td class="hidden xl:table-cell">{source.chunk_count}</td>
                   <td>
                     <div class="flex items-center gap-1">
                       <span class="badge {statusBadge.class}">{statusBadge.text}</span>
@@ -696,13 +970,22 @@
                         <button
                           class="btn btn-xs btn-ghost"
                           onclick={() => openChunkViewer(source)}
-                          title="View chunks"
+                          title={t("vector-kb.view-chunks")}
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                           </svg>
                         </button>
                       {/if}
+                      <button
+                        class="btn btn-xs btn-ghost"
+                        onclick={() => downloadFile(source._id, source.original_file_name)}
+                        title={t("vector-kb.download")}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                      </button>
                       {#if source.status === DataSourceStatus.Failed}
                         <button
                           class="btn btn-xs btn-warning"
@@ -715,7 +998,7 @@
                       <button
                         class="btn btn-xs btn-ghost text-error hover:bg-error/10"
                         onclick={() => confirmDeleteDataSource(source._id, source.original_file_name)}
-                        title="Delete file"
+                        title={t("vector-kb.delete")}
                       >
                         {@html svgIcons.trash}
                       </button>
@@ -728,37 +1011,51 @@
         </div>
       </div>
     {:else if filteredFolders.length === 0}
-      <div class="text-center py-12">
+      <!-- Empty state with drop zone -->
+      <button
+        type="button"
+        class="w-full border-2 border-dashed border-base-300 rounded-xl p-12 hover:border-primary/50 hover:bg-primary/5 transition-all duration-200 cursor-pointer group"
+        onclick={() => fileInput?.click()}
+        ondragover={(e) => { e.preventDefault(); e.currentTarget.classList.add('border-primary', 'bg-primary/10'); }}
+        ondragleave={(e) => { e.currentTarget.classList.remove('border-primary', 'bg-primary/10'); }}
+        ondrop={(e) => {
+          e.preventDefault();
+          e.currentTarget.classList.remove('border-primary', 'bg-primary/10');
+          if (e.dataTransfer?.files) {
+            const input = fileInput;
+            const dt = new DataTransfer();
+            for (const file of e.dataTransfer.files) {
+              dt.items.add(file);
+            }
+            input.files = dt.files;
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+        }}
+      >
         <div class="flex flex-col items-center gap-4">
-          {@html svgIcons.empty || ''}
-          <p class="text-base-content/60">{t("vector-kb.no-files-or-folders")}</p>
-          <div class="flex gap-2">
-            {#if currentFolderId === null}
-              <button
-                class="btn btn-primary"
-                onclick={openCreateFolderDialog}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
-                </svg>
-                {t("vector-kb.create-folder")}
-              </button>
-            {/if}
-            <button
-              class="btn btn-primary"
-              disabled={uploading}
-              onclick={() => fileInput?.click()}
-            >
-              {#if uploading}
-                <span class="loading loading-spinner loading-sm"></span>
-              {:else}
-                {@html svgIcons.upload}
-              {/if}
-              {t("vector-kb.upload-file")}
-            </button>
+          <div class="w-16 h-16 rounded-full bg-base-200 group-hover:bg-primary/20 flex items-center justify-center transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-base-content/40 group-hover:text-primary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            </svg>
+          </div>
+          <div class="text-center">
+            <p class="text-base font-medium text-base-content/70 group-hover:text-base-content transition-colors">
+              {t("vector-kb.drop-files-here")}
+            </p>
+            <p class="text-sm text-base-content/50 mt-1">
+              {t("vector-kb.or-click-to-browse")}
+            </p>
+          </div>
+          <div class="flex items-center gap-4 text-xs text-base-content/40">
+            <span class="flex items-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              PDF, TXT, DOCX
+            </span>
           </div>
         </div>
-      </div>
+      </button>
     {/if}
   {/if}
 </div>
@@ -825,8 +1122,14 @@
 <ConfirmDialog
   bind:modal={confirmDeleteModal}
   confirm={executeDelete}
-  title={deleteTarget?.type === "folder" ? t("vector-kb.delete-folder") : t("vector-kb.delete-file")}
+  title={deleteTarget?.type === "folder"
+    ? t("vector-kb.delete-folder")
+    : deleteTarget?.type === "multiple"
+      ? t("vector-kb.delete-selected")
+      : t("vector-kb.delete-file")}
   description={deleteTarget?.type === "folder"
     ? t("vector-kb.confirm-delete-folder", { name: deleteTarget?.name ?? "" })
-    : t("vector-kb.confirm-delete-file")}
+    : deleteTarget?.type === "multiple"
+      ? t("vector-kb.confirm-delete-multiple")
+      : t("vector-kb.confirm-delete-file")}
 />
