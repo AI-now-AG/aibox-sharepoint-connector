@@ -127,23 +127,24 @@ async function onboardingCheck(context: APIContext, next: MiddlewareNext) {
     return next();
   }
 
-  const userId = context.locals.user?.id?.toString() || "";
-  const user = await UserModel.get(userId);
-  if (!user) {
+  // Check if user and tenant are available
+  const { user, tenant } = context.locals;
+  if (!user || !tenant) {
     return next();
-  } else {
-    const auth0Sub = typeof user.auth0_sub === "string"
-      ? user.auth0_sub
-      : String(user.auth0_sub ?? "");
-    if (isEnterpriseConnection(auth0Sub)) {
-      return next();
-    }
-    if (user.created_by_admin != undefined && user.created_by_admin !== null && user.created_by_admin !== true) {// Self-registration flow
-      if ((user.logins_count as number) <= 1) {// First login
-        return context.redirect("/subscription");
-      } else if (!user.is_complete_self_registration) {// Incomplete subscription
-        return context.redirect("/subscription");
-      }
+  }
+
+  // Skip onboarding check for Enterprise Connection users
+  if (isEnterpriseConnection(user.auth0_sub)) {
+    return next();
+  }
+
+  // Self-registration flow
+  if (tenant.is_trial === true) {
+    const isFirstLogin = (user.logins_count ?? 0) <= 1;
+    const hasIncompleteRegistration = !user.is_complete_self_registration;
+
+    if (isFirstLogin || hasIncompleteRegistration) {
+      return context.redirect("/subscription");
     }
   }
 

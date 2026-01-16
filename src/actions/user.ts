@@ -150,7 +150,6 @@ export const user = {
           roles: input.roles,
           permissions: assignPermissions(input.roles),
           tenant_id: tenantId,
-          created_by_admin: true,
         };
         const result = await UserModel.add(newUser);
 
