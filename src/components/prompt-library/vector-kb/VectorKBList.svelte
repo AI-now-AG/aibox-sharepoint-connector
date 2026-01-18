@@ -625,7 +625,7 @@
   onchange={handleFileUpload}
 />
 
-<div class="container max-w-5xl mx-auto px-6">
+<div class="w-full px-4 lg:px-6">
   <!-- Storage Usage & Toolbar - always show -->
   <div class="flex items-center justify-between mb-4 p-4 bg-base-100 rounded-lg">
     <div class="flex items-center gap-4">
@@ -899,7 +899,7 @@
                     {/if}
                   </button>
                 </th>
-                <th class="hidden xl:table-cell">{t("vector-kb.chunks")}</th>
+                <th>{t("vector-kb.chunks")}</th>
                 <th>
                   <button
                     class="flex items-center gap-1 hover:text-primary transition-colors"
@@ -938,20 +938,21 @@
                       />
                     </label>
                   </td>
-                  <td>
-                    <div class="font-medium break-words">
+                  <td class="max-w-xs">
+                    <div class="text-sm font-medium line-clamp-2" title={source.original_file_name}>
                       {source.original_file_name}
                     </div>
-                    <!-- Show type and size below filename only when Type column is hidden -->
-                    <div class="text-xs text-base-content/60 md:hidden">
-                      {source.file_type.toUpperCase()} • {formatFileSize(source.file_size_bytes)}
+                    <!-- Show when Grösse column is hidden (<1024px) -->
+                    <div class="text-xs text-base-content/60 lg:hidden">
+                      <!-- Show Typ only when Typ column is hidden (<768px) -->
+                      <span class="md:hidden">{source.file_type.toUpperCase()} • </span>{formatFileSize(source.file_size_bytes)}
                     </div>
                   </td>
                   <td class="hidden md:table-cell">
                     <span class="badge badge-ghost">{source.file_type.toUpperCase()}</span>
                   </td>
                   <td class="hidden lg:table-cell">{formatFileSize(source.file_size_bytes)}</td>
-                  <td class="hidden xl:table-cell">{source.chunk_count}</td>
+                  <td>{source.chunk_count}</td>
                   <td>
                     <div class="flex items-center gap-1">
                       <span class="badge {statusBadge.class}">{statusBadge.text}</span>
@@ -965,7 +966,53 @@
                     </div>
                   </td>
                   <td>
-                    <div class="flex gap-1">
+                    <!-- 3-dot dropdown menu for screens < 1280px -->
+                    <div class="dropdown dropdown-end xl:hidden">
+                      <button tabindex="0" class="btn btn-ghost btn-sm btn-circle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
+                        </svg>
+                      </button>
+                      <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-44">
+                        {#if source.status === DataSourceStatus.Completed}
+                          <li>
+                            <button onclick={() => openChunkViewer(source)}>
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                              </svg>
+                              {t("vector-kb.view-chunks")}
+                            </button>
+                          </li>
+                        {/if}
+                        <li>
+                          <button onclick={() => downloadFile(source._id, source.original_file_name)}>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            {t("vector-kb.download")}
+                          </button>
+                        </li>
+                        {#if source.status === DataSourceStatus.Failed}
+                          <li>
+                            <button onclick={() => retryProcessing(source._id)}>
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                              </svg>
+                              {t("vector-kb.retry")}
+                            </button>
+                          </li>
+                        {/if}
+                        <li>
+                          <button class="text-error" onclick={() => confirmDeleteDataSource(source._id, source.original_file_name)}>
+                            {@html svgIcons.trash}
+                            {t("vector-kb.delete")}
+                          </button>
+                        </li>
+                      </ul>
+                    </div>
+
+                    <!-- Individual buttons for screens >= 1280px -->
+                    <div class="hidden xl:flex gap-1">
                       {#if source.status === DataSourceStatus.Completed}
                         <button
                           class="btn btn-xs btn-ghost"
