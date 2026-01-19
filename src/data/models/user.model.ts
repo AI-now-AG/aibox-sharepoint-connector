@@ -297,6 +297,7 @@ export default {
     if (search.trim()) {
       const safeSearch = escapeRegex(search.trim());
       baseMatch.$or = [
+        { name: { $regex: safeSearch, $options: "i" } },
         { username: { $regex: safeSearch, $options: "i" } },
         { email: { $regex: safeSearch, $options: "i" } },
       ];
