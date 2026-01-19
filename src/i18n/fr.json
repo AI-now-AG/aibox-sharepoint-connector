@@ -782,10 +782,22 @@
   "vector-kb.delete-file": "Delete File",
   "vector-kb.title": "Knowledge Base Advanced",
   "vector-kb.not-enabled": "Vector Knowledge Base is not enabled for this tenant. Please contact your administrator to enable this feature.",
+  "vector-kb.download": "Download",
+  "vector-kb.view-chunks": "View chunks",
+  "vector-kb.drop-files-here": "Drop files here to upload",
+  "vector-kb.or-click-to-browse": "or click to browse from your computer",
+  "vector-kb.selected": "selected",
+  "vector-kb.delete-selected": "Delete Selected",
+  "vector-kb.clear-selection": "Clear",
+  "vector-kb.confirm-delete-multiple": "Are you sure you want to delete the selected files? All associated chunks will also be deleted.",
   "user.reset-password": "Reset Password",
   "user.reset-password-confirm-message": "Reset Password Email",
   "user.reset-password-description-message": "Do you want to send a password reset email to ${email}",
   "user.reset-password-successful": "Email for password reset sent",
   "user.reset-password-failed": "Password reset failed - please try again",
-  "common.confirm": "Confirm"
+  "common.confirm": "Confirm",
+  "nav.user-list-report": "User List",
+  "user-list-report.export": "Export",
+  "user.tenant": "Tenant",
+  "user.roles": "Roles"
 }

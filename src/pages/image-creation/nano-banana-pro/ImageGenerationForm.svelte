@@ -99,7 +99,9 @@
       tool: PromptToolOption.Image,
       messageHistory: $nanoBananaProImageMessageHistory,
       thinkingConfig: {
-        includeThoughts: false, // Enable this to true for thinking during generate the image. BUT, IMPORTANT NOTE - Multi-turn on Azure backend must support thoughtSignatur
+        includeThoughts: true, // Enable this to true for thinking during generate the image. BUT, IMPORTANT NOTE - Multi-turn on Azure backend must support thoughtSignatur
+        thinkingBudget: 500,
+        thinkingLevel: "MEDIUM",
       },
     };
 

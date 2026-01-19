@@ -274,4 +274,83 @@ export default {
   delete: async (id: string) => {
     return await collection.deleteOne({ _id: new ObjectId(id) });
   },
+
+  listForExport: async ({
+    page = 1,
+    pageSize = 50,
+    search = "",
+  }: {
+    page?: number;
+    pageSize?: number;
+    search?: string;
+  }) => {
+    const skip = (page - 1) * pageSize;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const baseMatch: any = {};
+
+    if (search.trim()) {
+      baseMatch.$or = [
+        { username: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    // Build pipeline dynamically
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const pipeline: any[] = [
+      {
+        // 🔍 search happens HERE (before lookups)
+        $match: baseMatch,
+      },
+      {
+        $lookup: {
+          from: "tenants",
+          localField: "tenant_id",
+          foreignField: "_id",
+          as: "tenant",
+        },
+      },
+      {
+        $unwind: "$tenant",
+      },
+      {
+        $project: {
+          _id: 1,
+          name: 1,
+          email: 1,
+          last_login: 1,
+          logins_count: 1,
+          blocked: 1,
+          email_verified: 1,
+          auth0_sub: 1,
+          roles: 1,
+          created_at: 1,
+          updated_at: 1,
+          tenant: {
+            _id: 1,
+            name: 1,
+          },
+        },
+      },
+      { $sort: { created_at: 1 } },
+    ];
+
+    // ✅ Only paginate if pageSize > 0
+    if (pageSize > 0) {
+      pipeline.push({ $skip: skip });
+      pipeline.push({ $limit: pageSize });
+    }
+
+    const result = await collection.aggregate(pipeline).toArray();
+    const total = await collection.countDocuments(baseMatch);
+
+    return {
+      data: result,
+      total: total,
+      page,
+      pageSize,
+      search,
+    };
+  },
 };
