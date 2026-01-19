@@ -22,9 +22,9 @@ const CsvRowRawSchema = z.object({
   roles: z.string().optional(),
   last_login: z.string().optional(),
   logins_count: z.string().optional(),
-  email_verified: z.boolean().optional(),
-  blocked: z.boolean().optional(),
-  auth0_sub: z.string().optional(),
+  email_verified: z.string().optional(),
+  blocked: z.string().optional(),
+  auth0_sub: z.string(),
   created_at: z.string().optional(),
   updated_at: z.string().optional(),
 });
