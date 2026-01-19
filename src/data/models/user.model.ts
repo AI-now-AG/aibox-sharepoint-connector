@@ -277,7 +277,7 @@ export default {
 
   listForExport: async ({
     page = 1,
-    pageSize = 50,
+    pageSize = 20,
     search = "",
   }: {
     page?: number;
@@ -342,8 +342,24 @@ export default {
       pipeline.push({ $limit: pageSize });
     }
 
+    const totalResult = await collection
+      .aggregate([
+        { $match: baseMatch },
+        {
+          $lookup: {
+            from: "tenants",
+            localField: "tenant_id",
+            foreignField: "_id",
+            as: "tenant",
+          },
+        },
+        { $unwind: "$tenant" },
+        { $count: "count" },
+      ])
+      .toArray();
+
     const result = await collection.aggregate(pipeline).toArray();
-    const total = await collection.countDocuments(baseMatch);
+    const total = totalResult[0]?.count ?? 0;
 
     return {
       data: result,
