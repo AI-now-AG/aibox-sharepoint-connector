@@ -289,10 +289,16 @@ export default {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const baseMatch: any = {};
 
+    // escape regex
+    const escapeRegex = (text: string): string => {
+      return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    };
+
     if (search.trim()) {
+      const safeSearch = escapeRegex(search.trim());
       baseMatch.$or = [
-        { username: { $regex: search, $options: "i" } },
-        { email: { $regex: search, $options: "i" } },
+        { username: { $regex: safeSearch, $options: "i" } },
+        { email: { $regex: safeSearch, $options: "i" } },
       ];
     }
 
