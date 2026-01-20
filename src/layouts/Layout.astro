@@ -5,6 +5,7 @@ import Head from "./Head.astro";
 import Navigation from "$components/nav/Navigation.astro";
 import OnboardingTour from "$components/onboarding/OnboardingTour.svelte";
 import ConversationDialog from "$components/conversation/ConversationDialog.svelte";
+import BackendWarmup from "$components/BackendWarmup.svelte";
 import ConversationModel, {
   type Conversation,
 } from "$data/models/conversation.model";
@@ -97,5 +98,6 @@ const conversations = await cached(
     <div class="z-[11]">
       <OnboardingTour user={userInfo} client:load />
     </div>
+    <BackendWarmup client:load />
   </body>
 </html>
