@@ -58,7 +58,11 @@ export default {
     return collection.insertOne(doc);
   },
 
-  update: async (id: string | ObjectId, update: Partial<Conversation>, isReturnUpdatedData: boolean = true) => {
+  update: async (
+    id: string | ObjectId,
+    update: Partial<Conversation>,
+    isReturnUpdatedData: boolean = true,
+  ) => {
     const objectId = toObjectId(id);
     const validated = ChatConversationSchema.partial().parse(update);
 
@@ -83,9 +87,9 @@ export default {
     );
 
     if (isReturnUpdatedData) {
-      return updatedDocument
+      return updatedDocument;
     }
-    return { success: true }
+    return { success: true };
   },
 
   // New function to update the messages array using $push
@@ -95,12 +99,19 @@ export default {
     // Validate the incoming message object
     const validatedMessage = MessageSchema.parse(message);
 
+    const expiresAt = (() => {
+      const d = new Date();
+      d.setDate(d.getDate() + 30); // add 30 days
+      return d;
+    })();
+
     return await collection.findOneAndUpdate(
       { _id: objectId },
       {
         $push: { messages: validatedMessage },
         $set: {
           updated_at: new Date(),
+          expires_at: expiresAt,
         },
       },
       {
@@ -111,7 +122,7 @@ export default {
   updateMessageRating: async (
     id: string | ObjectId,
     messageIndex: number,
-    newRating: MessageThumbRating | null
+    newRating: MessageThumbRating | null,
   ) => {
     const objectId = toObjectId(id);
 
@@ -124,12 +135,12 @@ export default {
       {
         $set: {
           [`messages.${messageIndex}.thumbRating`]: newRating,
-          updated_at: new Date()
+          updated_at: new Date(),
         },
       },
       {
         returnDocument: "after",
-      }
+      },
     );
   },
 
