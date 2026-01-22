@@ -47,6 +47,7 @@ export const lucia = new Lucia(adapter, {
       logins_count: attributes.logins_count,
       tours: attributes.tours,
       api_token: attributes.api_token,
+      is_complete_self_registration: attributes.is_complete_self_registration,
     };
   },
 });

@@ -320,7 +320,6 @@ export const onboarding = {
         roles: newRoles,
         permissions: assignPermissions(newRoles),
         logins_count: 0,
-        created_by_admin: null,
         is_complete_self_registration: true,
       });
       await UserModel.addTour(userId, {
