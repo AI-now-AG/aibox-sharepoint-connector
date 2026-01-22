@@ -1,0 +1,23 @@
+---
+// Component
+import Layout from "$layouts/Layout.astro";
+---
+
+<Layout title="Flowmate">
+  <div
+    class="container max-w-8xl mx-auto p-6 grid grid-cols-3 md:grid-cols-[1fr_max-content] items-center gap-8"
+  >
+    <h1 class="text-3xl font-bold">FlowMate</h1>
+
+    <div class="content-icenter">
+      <integration-center
+        token="csgkZ23B7lyoDE9l96R-sNf31-rwI07IKTLw7WiP1aQu5Y3qkprBBo5lOlOWpqsMJfe8emE6esWs1fQs5Lwk-Vzm6uItwL4e0o0H9AX1apYmv0qLh4PzI0aNpJXXhhpyqF0Z-jrBip4s8C-K8SgNVEbHwKoi_P3mxnwiHcSMVSI"
+        groups="dev,test"
+        language="de"></integration-center>
+    </div>
+
+    <script
+      src="https://integration-center.cloud-ecosystem.workers.dev/build/integration-center.js"
+    ></script>
+  </div>
+</Layout>
