@@ -9,4 +9,4 @@ export const useTranslatedCountryList = (defaultLanguage: string) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     title: t(`subscription.country.${country.value?.toLowerCase()}` as any),
   }));
-};  
+};

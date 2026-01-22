@@ -4,6 +4,7 @@
   import { actions } from "astro:actions";
   import { addToast } from "$stores/toast";
   import { useTranslations } from "$i18n/utils";
+  import { getRoleString } from "$utils/roles";
   import { debounce, preventDefault, formatDateToDDMMYY } from "$utils/common";
   import Loading from "$components/Loading.svelte";
   import Pagination from "$components/Pagination.svelte";
@@ -159,7 +160,7 @@
               <td class="py-3 px-4 text-sm font-medium">{user.email}</td>
               <td class="py-3 px-4 text-sm font-medium">{user.tenant?.name}</td>
               <td class="py-3 px-4 text-sm font-medium"
-                >{user.roles?.join(", ")}</td
+                >{getRoleString(user.roles)}</td
               >
               <td class="py-3 px-4 text-sm font-medium"
                 >{user.last_login

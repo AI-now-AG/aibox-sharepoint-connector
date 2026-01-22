@@ -796,8 +796,9 @@
   "user.reset-password-successful": "E-Mail wurde versendet",
   "user.reset-password-failed": "Passwort zurücksetzen fehlgeschlagen, bitte versuche es erneut",
   "common.confirm": "Ja",
-  "nav.user-list-report": "User List",
+  "nav.user-list-report": "Benutzerliste",
   "user-list-report.export": "Export",
   "user.tenant": "Tenant",
-  "user.roles": "Roles"
+  "user.roles": "Rollen",
+  "user.super-admin": "Super Admin"
 }

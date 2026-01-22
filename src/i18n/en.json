@@ -799,5 +799,6 @@
   "nav.user-list-report": "User List",
   "user-list-report.export": "Export",
   "user.tenant": "Tenant",
-  "user.roles": "Roles"
+  "user.roles": "Roles",
+  "user.super-admin": "Super Admin"
 }
