@@ -134,16 +134,12 @@
         <colgroup>
           <col class="w-auto" />
           <col class="w-[250]" />
-          <col class="w-[250]" />
           <col class="w-[120]" />
           <col class="w-[150]" />
           <col class="w-[120]" />
         </colgroup>
         <thead>
           <tr class="bg-base-300">
-            <th class="py-3 px-4 text-left font-semibold text-sm"
-              >{t("common.name")}</th
-            >
             <th class="py-3 px-4 text-left font-semibold text-sm"
               >{t("user.e-mail")}</th
             >
@@ -160,7 +156,6 @@
         <tbody>
           {#each users as user}
             <tr class="bg-base-100 text-sm">
-              <td class="py-3 px-4 text-sm font-medium">{user.name || "-"}</td>
               <td class="py-3 px-4 text-sm font-medium">{user.email}</td>
               <td class="py-3 px-4 text-sm font-medium">{user.tenant?.name}</td>
               <td class="py-3 px-4 text-sm font-medium"
@@ -174,7 +169,7 @@
               <td class="py-3 px-4 text-sm font-medium text-center">
                 {#if user.blocked}
                   <span style={`color: #FF6F70`}>{t("user.blocked")}</span>
-                {:else if user.email_verified}
+                {:else if !user.email_verified}
                   <span style={`color: rgba(43, 52, 64, 0.2)`}
                     >{t("user.un-veriried")}</span
                   >
