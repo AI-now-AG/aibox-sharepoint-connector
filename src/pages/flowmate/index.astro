@@ -1,6 +1,33 @@
 ---
 // Component
 import Layout from "$layouts/Layout.astro";
+import { cached } from "$utils/cache";
+
+const adminToken =
+  "gjECis74Yf_o6cBjVfteQ2pIFBDXCHVLcgFphFUs46k8ejdjPRI-KqpLyWR8dpbIpJZD-ogVSyYbZVJ7FrYMmBH8OvXqNsiLrxZx8-_fBoHSuUbpkNVB39fz19EG4xzxCwy4iNfTl6T9vpE_aoF8fjskFhl-Lk0LHMeJaWC0k9w";
+const cacheKey = `${Astro.locals.user.id?.toString()}:flowmate:icenter`;
+const userToken = await cached(cacheKey, 60 * 60, async () => {
+  const res = await fetch(
+    "https://api.platform.openintegrationhub.com/impersonate",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${adminToken}`,
+      },
+      body: JSON.stringify({
+        username: `${Astro.locals.user.email}`,
+      }),
+    },
+  );
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch integration-center token");
+  }
+
+  const { token } = await res.json();
+  return token;
+});
 ---
 
 <Layout title="Flowmate">
@@ -10,10 +37,8 @@ import Layout from "$layouts/Layout.astro";
     <h1 class="text-3xl font-bold">FlowMate</h1>
 
     <div class="content-icenter">
-      <integration-center
-        token="csgkZ23B7lyoDE9l96R-sNf31-rwI07IKTLw7WiP1aQu5Y3qkprBBo5lOlOWpqsMJfe8emE6esWs1fQs5Lwk-Vzm6uItwL4e0o0H9AX1apYmv0qLh4PzI0aNpJXXhhpyqF0Z-jrBip4s8C-K8SgNVEbHwKoi_P3mxnwiHcSMVSI"
-        groups="dev,test"
-        language="de"></integration-center>
+      <integration-center token={userToken} groups="dev,test" language="de"
+      ></integration-center>
     </div>
 
     <script
