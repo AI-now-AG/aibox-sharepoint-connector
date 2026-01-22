@@ -64,7 +64,7 @@
         </label>
         <label class="flex items-center space-x-2">
           <input type="radio" class="radio border-base-content w-5 h-5" />
-          <span class="label-text">Trial</span>
+          <span class="label-text">Internal</span>
         </label>
         <label class="flex items-center space-x-2">
           <input type="radio" class="radio border-base-content w-5 h-5" />

@@ -8,7 +8,7 @@
   import { addToast } from "$stores/toast";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import Loading from "$components/Loading.svelte";
-  import InputSearchFilter from "./InputSearchFilter.svelte";
+  import TenantSearchFilter from "./TenantSearchFilter.svelte";
   import dayjs from "dayjs";
   import { AudioOptionId, SubscriptionPackageId } from "$types/Subscription";
   import { SubscriptionPackages } from "$data/subscription-packages";
@@ -247,7 +247,7 @@
 
 <div class="px-8">
   <div class="container max-w-full mx-auto p-6">
-    <InputSearchFilter
+    <TenantSearchFilter
       bind:value={searchValue}
       bind:showArchived
       onsearch={fetchTenants}
