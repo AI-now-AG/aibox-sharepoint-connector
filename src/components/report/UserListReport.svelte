@@ -137,7 +137,7 @@
           <col class="w-[250]" />
           <col class="w-[120]" />
           <col class="w-[150]" />
-          <col class="w-[120]" />
+          <col class="w-[150]" />
         </colgroup>
         <thead>
           <tr class="bg-base-300">
