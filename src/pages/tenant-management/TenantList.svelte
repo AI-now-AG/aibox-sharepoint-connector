@@ -220,7 +220,7 @@
     <div class="dropdown dropdown-end mt-2 lg:mt-8">
       <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
       <!-- svelte-ignore a11y_label_has_associated_control -->
-      <label tabindex="0" class="btn btn-outline font-normal grow-0">
+      <label tabindex="0" class="btn btn-primary font-normal grow-0">
         {@html svgIcons.add}
         {t("tenant.tenants.add-new-tenant")}
       </label>
