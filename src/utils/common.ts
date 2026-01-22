@@ -38,6 +38,18 @@ export function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+export function debounce<T extends (...args: any[]) => void>(
+  fn: T,
+  delay = 300,
+) {
+  let t: ReturnType<typeof setTimeout>;
+
+  return (...args: Parameters<T>) => {
+    clearTimeout(t);
+    t = setTimeout(() => fn(...args), delay);
+  };
+}
+
 export function tryParse(input: string): object | string {
   let result;
   try {
