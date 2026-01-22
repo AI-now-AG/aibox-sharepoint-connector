@@ -1,11 +1,12 @@
 ---
-// Component
 import Layout from "$layouts/Layout.astro";
 import { cached } from "$utils/cache";
 
 const adminToken =
   "gjECis74Yf_o6cBjVfteQ2pIFBDXCHVLcgFphFUs46k8ejdjPRI-KqpLyWR8dpbIpJZD-ogVSyYbZVJ7FrYMmBH8OvXqNsiLrxZx8-_fBoHSuUbpkNVB39fz19EG4xzxCwy4iNfTl6T9vpE_aoF8fjskFhl-Lk0LHMeJaWC0k9w";
-const cacheKey = `${Astro.locals.user.id?.toString()}:flowmate:icenter`;
+
+const cacheKey = `${Astro.locals.user.id}:flowmate:icenter`;
+
 const userToken = await cached(cacheKey, 60 * 60, async () => {
   const res = await fetch(
     "https://api.platform.openintegrationhub.com/impersonate",
@@ -16,9 +17,9 @@ const userToken = await cached(cacheKey, 60 * 60, async () => {
         Authorization: `Bearer ${adminToken}`,
       },
       body: JSON.stringify({
-        username: `${Astro.locals.user.email}`,
+        username: Astro.locals.user.email,
       }),
-    },
+    }
   );
 
   if (!res.ok) {
@@ -30,19 +31,21 @@ const userToken = await cached(cacheKey, 60 * 60, async () => {
 });
 ---
 
-<Layout title="Flowmate">
-  <div
-    class="container max-w-8xl mx-auto p-6 grid grid-cols-3 md:grid-cols-[1fr_max-content] items-center gap-8"
-  >
-    <h1 class="text-3xl font-bold">FlowMate - Integration Center</h1>
+<Layout title="FlowMate">
+  <script
+    src="https://integration-center.cloud-ecosystem.workers.dev/build/integration-center.js"
+    defer
+  ></script>
 
-    <div class="content-icenter">
-      <integration-center token={userToken} groups="dev,test" language="de"
-      ></integration-center>
-    </div>
+  <div class="container max-w-8xl mx-auto p-6">
+    <h1 class="text-3xl font-bold mb-6">
+      FlowMate - Integration Center
+    </h1>
 
-    <script
-      src="https://integration-center.cloud-ecosystem.workers.dev/build/integration-center.js"
-    ></script>
+    <integration-center
+      token={userToken}
+      groups="dev,test"
+      language="de"
+    ></integration-center>
   </div>
 </Layout>
