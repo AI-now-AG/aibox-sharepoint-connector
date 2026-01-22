@@ -131,7 +131,10 @@ if (transcriptionTypes.includes(AudioCategory.AudioPro)) {
 }
 
 // Show Audio Assistant menu only if audio_assistant_active flag is true
-if (Astro.locals.tenant.audio_assistant_active && audioFeatureItems.length > 0) {
+if (
+  Astro.locals.tenant.audio_assistant_active &&
+  audioFeatureItems.length > 0
+) {
   audioToTextMenus.push({
     title: t("nav.audiotool"),
     icon: svgIcons.audio,
@@ -141,7 +144,10 @@ if (Astro.locals.tenant.audio_assistant_active && audioFeatureItems.length > 0) 
 }
 
 // Show Subtitle Studio menu only if subtitle_studio_active flag is true
-if (Astro.locals.tenant.subtitle_studio_active && subtitleFeatureItems.length > 0) {
+if (
+  Astro.locals.tenant.subtitle_studio_active &&
+  subtitleFeatureItems.length > 0
+) {
   subtitleStudioMenus.push({
     title: t("nav.subtitle-studio"),
     icon: svgIcons.subtitle,
@@ -376,6 +382,10 @@ if (auth.isSuperAdmin(Astro.locals)) {
           {
             title: t("nav.credit-usage-all"),
             path: `/reports/credit-usage-all`,
+          },
+          {
+            title: t("nav.user-list-report"),
+            path: `/reports/user-list`,
           },
         ],
       },

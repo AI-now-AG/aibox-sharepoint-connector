@@ -273,4 +273,106 @@ export default {
   delete: async (id: string) => {
     return await collection.deleteOne({ _id: new ObjectId(id) });
   },
+
+  listForExport: async ({
+    page = 1,
+    pageSize = 20,
+    search = "",
+  }: {
+    page?: number;
+    pageSize?: number;
+    search?: string;
+  }) => {
+    const skip = (page - 1) * pageSize;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const baseMatch: any = {};
+
+    // escape regex
+    const escapeRegex = (text: string): string => {
+      return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    };
+
+    if (search.trim()) {
+      const safeSearch = escapeRegex(search.trim());
+      baseMatch.$or = [
+        { name: { $regex: safeSearch, $options: "i" } },
+        { username: { $regex: safeSearch, $options: "i" } },
+        { email: { $regex: safeSearch, $options: "i" } },
+      ];
+    }
+
+    // Build pipeline dynamically
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const pipeline: any[] = [
+      {
+        // 🔍 search happens HERE (before lookups)
+        $match: baseMatch,
+      },
+      {
+        $lookup: {
+          from: "tenants",
+          localField: "tenant_id",
+          foreignField: "_id",
+          as: "tenant",
+        },
+      },
+      {
+        $unwind: "$tenant",
+      },
+      {
+        $project: {
+          _id: 1,
+          name: 1,
+          email: 1,
+          last_login: 1,
+          logins_count: 1,
+          blocked: 1,
+          email_verified: 1,
+          auth0_sub: 1,
+          roles: 1,
+          created_at: 1,
+          updated_at: 1,
+          tenant: {
+            _id: 1,
+            name: 1,
+          },
+        },
+      },
+      { $sort: { created_at: 1 } },
+    ];
+
+    // ✅ Only paginate if pageSize > 0
+    if (pageSize > 0) {
+      pipeline.push({ $skip: skip });
+      pipeline.push({ $limit: pageSize });
+    }
+
+    const totalResult = await collection
+      .aggregate([
+        { $match: baseMatch },
+        {
+          $lookup: {
+            from: "tenants",
+            localField: "tenant_id",
+            foreignField: "_id",
+            as: "tenant",
+          },
+        },
+        { $unwind: "$tenant" },
+        { $count: "count" },
+      ])
+      .toArray();
+
+    const result = await collection.aggregate(pipeline).toArray();
+    const total = totalResult[0]?.count ?? 0;
+
+    return {
+      data: result,
+      total: total,
+      page,
+      pageSize,
+      search,
+    };
+  },
 };

@@ -1,0 +1,14 @@
+---
+import Layout from "$layouts/Layout.astro";
+import { svgIcons } from "$assets/icons";
+import { useTranslations } from "$i18n/utils";
+import UserListReport from "$components/report/UserListReport.svelte";
+
+const t = useTranslations();
+---
+
+<Layout>
+  <div class="container max-w-6xl mx-auto grid grid-cols-1 px-14">
+    <UserListReport client:load />
+  </div>
+</Layout>

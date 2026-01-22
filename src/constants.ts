@@ -20,6 +20,7 @@ export const SUPER_USER_ROUTES = [
   "/prompt-library/categories/*",
   "/settings/transcription",
   "/settings/transcription/*",
+  "/reports/*",
 ];
 
 export const ADMIN_ROUTES = [
