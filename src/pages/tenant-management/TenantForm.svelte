@@ -39,7 +39,7 @@
   import { SubscriptionPackages } from "$data/subscription-packages";
   import { onMount } from "svelte";
   import { ModelName, ReasoningEffortOption, EmbeddingProvider } from "$types/AIProvider";
-  import { EMBEDDING_MODELS, DEFAULT_VECTOR_KB_CONFIG } from "$types/VectorKB";
+  import { EMBEDDING_MODELS, DEFAULT_VECTOR_KB_CONFIG, DEFAULT_RAG_ENHANCEMENT_CONFIG } from "$types/VectorKB";
 
   const t = useTranslations();
   let loading = $state(false);
@@ -120,6 +120,38 @@
   }
   if (tenantData && tenantData.vector_kb_similarity_threshold === undefined) {
     tenantData.vector_kb_similarity_threshold = DEFAULT_VECTOR_KB_CONFIG.similarityThreshold;
+  }
+
+  // Initialize RAG Enhancement defaults
+  if (tenantData && tenantData.vector_kb_rerank_enabled === undefined) {
+    tenantData.vector_kb_rerank_enabled = DEFAULT_RAG_ENHANCEMENT_CONFIG.rerankEnabled;
+  }
+  if (tenantData && tenantData.vector_kb_rerank_top_n === undefined) {
+    tenantData.vector_kb_rerank_top_n = DEFAULT_RAG_ENHANCEMENT_CONFIG.rerankTopN;
+  }
+  if (tenantData && tenantData.vector_kb_rerank_candidates === undefined) {
+    tenantData.vector_kb_rerank_candidates = DEFAULT_RAG_ENHANCEMENT_CONFIG.rerankCandidates;
+  }
+  if (tenantData && tenantData.vector_kb_hybrid_enabled === undefined) {
+    tenantData.vector_kb_hybrid_enabled = DEFAULT_RAG_ENHANCEMENT_CONFIG.hybridEnabled;
+  }
+  if (tenantData && tenantData.vector_kb_hybrid_alpha === undefined) {
+    tenantData.vector_kb_hybrid_alpha = DEFAULT_RAG_ENHANCEMENT_CONFIG.hybridAlpha;
+  }
+  if (tenantData && tenantData.vector_kb_answerability_enabled === undefined) {
+    tenantData.vector_kb_answerability_enabled = DEFAULT_RAG_ENHANCEMENT_CONFIG.answerabilityEnabled;
+  }
+  if (tenantData && tenantData.vector_kb_answerability_threshold === undefined) {
+    tenantData.vector_kb_answerability_threshold = DEFAULT_RAG_ENHANCEMENT_CONFIG.answerabilityThreshold;
+  }
+  if (tenantData && tenantData.vector_kb_compression_enabled === undefined) {
+    tenantData.vector_kb_compression_enabled = DEFAULT_RAG_ENHANCEMENT_CONFIG.compressionEnabled;
+  }
+  if (tenantData && tenantData.vector_kb_multihop_enabled === undefined) {
+    tenantData.vector_kb_multihop_enabled = DEFAULT_RAG_ENHANCEMENT_CONFIG.multiHopEnabled;
+  }
+  if (tenantData && tenantData.vector_kb_max_hops === undefined) {
+    tenantData.vector_kb_max_hops = DEFAULT_RAG_ENHANCEMENT_CONFIG.maxHops;
   }
 
   // Subscription & billing
@@ -2782,6 +2814,197 @@
                 </p>
               </div>
               <div class="w-full"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RAG Enhancements Section -->
+        <div class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4">
+          <input type="checkbox" />
+          <div class="collapse-title">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center">
+                <span class="label-text text-base-content font-medium">
+                  {t("tenant.vector-kb.rag-enhancements")}
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="collapse-content">
+            <!-- Reranking -->
+            <div class="bg-base-200/50 rounded-lg p-4 mx-4 mb-4">
+              <div class="flex items-center justify-between mb-3">
+                <div>
+                  <span class="text-base-content font-medium text-sm">
+                    {t("tenant.vector-kb.rerank-title")}
+                  </span>
+                  <p class="text-xs text-base-content/60">
+                    {t("tenant.vector-kb.rerank-description")}
+                  </p>
+                </div>
+                <input
+                  type="checkbox"
+                  class="toggle toggle-primary toggle-sm"
+                  bind:checked={tenantData.vector_kb_rerank_enabled}
+                />
+              </div>
+              {#if tenantData.vector_kb_rerank_enabled}
+                <div class="grid grid-cols-2 gap-4 mt-3">
+                  <div class="w-full">
+                    <span class="text-base-content text-xs">
+                      {t("tenant.vector-kb.rerank-top-n")}
+                    </span>
+                    <input
+                      type="number"
+                      class="input input-bordered input-sm w-full mt-1"
+                      bind:value={tenantData.vector_kb_rerank_top_n}
+                      min="1"
+                      max="20"
+                    />
+                  </div>
+                  <div class="w-full">
+                    <span class="text-base-content text-xs">
+                      {t("tenant.vector-kb.rerank-candidates")}
+                    </span>
+                    <input
+                      type="number"
+                      class="input input-bordered input-sm w-full mt-1"
+                      bind:value={tenantData.vector_kb_rerank_candidates}
+                      min="10"
+                      max="100"
+                    />
+                  </div>
+                </div>
+              {/if}
+            </div>
+
+            <!-- Hybrid Search -->
+            <div class="bg-base-200/50 rounded-lg p-4 mx-4 mb-4">
+              <div class="flex items-center justify-between mb-3">
+                <div>
+                  <span class="text-base-content font-medium text-sm">
+                    {t("tenant.vector-kb.hybrid-title")}
+                  </span>
+                  <p class="text-xs text-base-content/60">
+                    {t("tenant.vector-kb.hybrid-description")}
+                  </p>
+                </div>
+                <input
+                  type="checkbox"
+                  class="toggle toggle-primary toggle-sm"
+                  bind:checked={tenantData.vector_kb_hybrid_enabled}
+                />
+              </div>
+              {#if tenantData.vector_kb_hybrid_enabled}
+                <div class="mt-3">
+                  <div class="w-full max-w-xs">
+                    <span class="text-base-content text-xs">
+                      {t("tenant.vector-kb.hybrid-alpha")}
+                    </span>
+                    <input
+                      type="number"
+                      class="input input-bordered input-sm w-full mt-1"
+                      bind:value={tenantData.vector_kb_hybrid_alpha}
+                      min="0"
+                      max="1"
+                      step="0.1"
+                    />
+                    <p class="text-xs text-base-content/60 mt-1">
+                      {t("tenant.vector-kb.hybrid-alpha-help")}
+                    </p>
+                  </div>
+                </div>
+              {/if}
+            </div>
+
+            <!-- Answerability Check -->
+            <div class="bg-base-200/50 rounded-lg p-4 mx-4 mb-4">
+              <div class="flex items-center justify-between mb-3">
+                <div>
+                  <span class="text-base-content font-medium text-sm">
+                    {t("tenant.vector-kb.answerability-title")}
+                  </span>
+                  <p class="text-xs text-base-content/60">
+                    {t("tenant.vector-kb.answerability-description")}
+                  </p>
+                </div>
+                <input
+                  type="checkbox"
+                  class="toggle toggle-primary toggle-sm"
+                  bind:checked={tenantData.vector_kb_answerability_enabled}
+                />
+              </div>
+              {#if tenantData.vector_kb_answerability_enabled}
+                <div class="mt-3">
+                  <div class="w-full max-w-xs">
+                    <span class="text-base-content text-xs">
+                      {t("tenant.vector-kb.answerability-threshold")}
+                    </span>
+                    <input
+                      type="number"
+                      class="input input-bordered input-sm w-full mt-1"
+                      bind:value={tenantData.vector_kb_answerability_threshold}
+                      min="0"
+                      max="1"
+                      step="0.1"
+                    />
+                  </div>
+                </div>
+              {/if}
+            </div>
+
+            <!-- Context Compression -->
+            <div class="bg-base-200/50 rounded-lg p-4 mx-4 mb-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <span class="text-base-content font-medium text-sm">
+                    {t("tenant.vector-kb.compression-title")}
+                  </span>
+                  <p class="text-xs text-base-content/60">
+                    {t("tenant.vector-kb.compression-description")}
+                  </p>
+                </div>
+                <input
+                  type="checkbox"
+                  class="toggle toggle-primary toggle-sm"
+                  bind:checked={tenantData.vector_kb_compression_enabled}
+                />
+              </div>
+            </div>
+
+            <!-- Multi-hop RAG -->
+            <div class="bg-base-200/50 rounded-lg p-4 mx-4 mb-4">
+              <div class="flex items-center justify-between mb-3">
+                <div>
+                  <span class="text-base-content font-medium text-sm">
+                    {t("tenant.vector-kb.multihop-title")}
+                  </span>
+                  <p class="text-xs text-base-content/60">
+                    {t("tenant.vector-kb.multihop-description")}
+                  </p>
+                </div>
+                <input
+                  type="checkbox"
+                  class="toggle toggle-primary toggle-sm"
+                  bind:checked={tenantData.vector_kb_multihop_enabled}
+                />
+              </div>
+              {#if tenantData.vector_kb_multihop_enabled}
+                <div class="mt-3">
+                  <div class="w-full max-w-xs">
+                    <span class="text-base-content text-xs">
+                      {t("tenant.vector-kb.multihop-max-hops")}
+                    </span>
+                    <input
+                      type="number"
+                      class="input input-bordered input-sm w-full mt-1"
+                      bind:value={tenantData.vector_kb_max_hops}
+                      min="1"
+                      max="5"
+                    />
+                  </div>
+                </div>
+              {/if}
             </div>
           </div>
         </div>

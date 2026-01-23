@@ -181,3 +181,22 @@ export const DEFAULT_VECTOR_KB_CONFIG = {
   topK: 5,
   similarityThreshold: 0.7,
 };
+
+// Default RAG Enhancement configuration values
+export const DEFAULT_RAG_ENHANCEMENT_CONFIG = {
+  // Reranking
+  rerankEnabled: false,
+  rerankTopN: 5,
+  rerankCandidates: 30,
+  // Hybrid Search
+  hybridEnabled: false,
+  hybridAlpha: 0.5,
+  // Answerability
+  answerabilityEnabled: false,
+  answerabilityThreshold: 0.6,
+  // Compression
+  compressionEnabled: false,
+  // Multi-hop
+  multiHopEnabled: false,
+  maxHops: 3,
+};
