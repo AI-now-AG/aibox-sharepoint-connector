@@ -32,6 +32,7 @@ const userToken = await cached(cacheKey, 60 * 60, async () => {
   return token;
 });
 
+const language = tenant.default_language || "de";
 const groups = [tenant.org_name || "default"];
 groups.push(isProd() ? "prod" : "dev");
 ---
@@ -44,7 +45,9 @@ groups.push(isProd() ? "prod" : "dev");
   <div class="container max-w-8xl mx-auto p-6">
     <h1 class="text-3xl font-bold mb-6">FlowMate - Integration Center</h1>
 
-    <integration-center token={userToken} groups={groups.join(',')} language="de"
-    ></integration-center>
+    <integration-center
+      token={userToken}
+      groups={groups.join(",")}
+      language={language}></integration-center>
   </div>
 </Layout>
