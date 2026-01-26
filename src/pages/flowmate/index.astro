@@ -1,7 +1,9 @@
 ---
 import Layout from "$layouts/Layout.astro";
+import { isProd } from "$utils/env";
 import { cached } from "$utils/cache";
 
+const { tenant } = Astro.locals;
 const adminToken =
   "gjECis74Yf_o6cBjVfteQ2pIFBDXCHVLcgFphFUs46k8ejdjPRI-KqpLyWR8dpbIpJZD-ogVSyYbZVJ7FrYMmBH8OvXqNsiLrxZx8-_fBoHSuUbpkNVB39fz19EG4xzxCwy4iNfTl6T9vpE_aoF8fjskFhl-Lk0LHMeJaWC0k9w";
 
@@ -19,7 +21,7 @@ const userToken = await cached(cacheKey, 60 * 60, async () => {
       body: JSON.stringify({
         username: Astro.locals.user.email,
       }),
-    }
+    },
   );
 
   if (!res.ok) {
@@ -29,23 +31,20 @@ const userToken = await cached(cacheKey, 60 * 60, async () => {
   const { token } = await res.json();
   return token;
 });
+
+const groups = [tenant.org_name || "default"];
+groups.push(isProd() ? "prod" : "dev");
 ---
 
 <Layout title="FlowMate">
   <script
     src="https://integration-center.cloud-ecosystem.workers.dev/build/integration-center.js"
-    defer
-  ></script>
+    defer></script>
 
   <div class="container max-w-8xl mx-auto p-6">
-    <h1 class="text-3xl font-bold mb-6">
-      FlowMate - Integration Center
-    </h1>
+    <h1 class="text-3xl font-bold mb-6">FlowMate - Integration Center</h1>
 
-    <integration-center
-      token={userToken}
-      groups="dev,test"
-      language="de"
+    <integration-center token={userToken} groups={groups.join(',')} language="de"
     ></integration-center>
   </div>
 </Layout>
