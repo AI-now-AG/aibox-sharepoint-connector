@@ -594,7 +594,6 @@
   "instructions.citation-instruction-description": "Diese Anweisung teilt der KI mit, wie sie Quellen zitieren soll, wenn sie Fragen basierend auf abgerufenen Dokumenten (Vektor-Wissensbasis) beantwortet.",
   "instructions.citation-instruction": "Zitieranweisung",
   "instructions.citation-instruction-placeholder": "Geben Sie eine benutzerdefinierte Zitieranweisung ein oder lassen Sie das Feld leer, um die Standardeinstellung zu verwenden...",
-  "instructions.citation-instruction-empty-hint": "Leer lassen, um die Standard-Zitieranweisung zu verwenden",
   "prompt-library.add.prompts.instructions.toast-completed-improvement": "Instruktion wurde verbessert",
   "prompt-library.add.prompts.instructions.improve-instruction": "Instruktion verbessern",
   "nav.settings.prompt-refinement": "Prompt Optimierung",

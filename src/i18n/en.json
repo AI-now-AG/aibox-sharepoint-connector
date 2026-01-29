@@ -594,7 +594,6 @@
   "instructions.citation-instruction-description": "This instruction tells the AI how to cite sources when answering questions based on retrieved documents (Vector Knowledge Base).",
   "instructions.citation-instruction": "Citation Instruction",
   "instructions.citation-instruction-placeholder": "Enter custom citation instruction or leave empty to use default...",
-  "instructions.citation-instruction-empty-hint": "Leave empty to use the default citation instruction",
   "prompt-library.add.prompts.instructions.toast-completed-improvement": "Improvement completed!",
   "prompt-library.add.prompts.instructions.improve-instruction": "Improve Instruction",
   "nav.settings.prompt-refinement": "Prompt Refinement",

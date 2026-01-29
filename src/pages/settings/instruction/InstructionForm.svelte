@@ -189,9 +189,6 @@
             placeholder={t("instructions.citation-instruction-placeholder")}
             bind:value={citationInstructionData[selectedLang as 'en' | 'de']}
           ></textarea>
-          <p class="text-xs text-base-content/50 mt-1">
-            {t("instructions.citation-instruction-empty-hint")}
-          </p>
         </div>
       </div>
     </div>
