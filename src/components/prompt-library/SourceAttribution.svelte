@@ -1,5 +1,6 @@
 <script lang="ts">
   import { svgIcons } from "$assets/icons";
+  import type { SourceType, SourceAttribution as SourceAttributionType } from "$types/MessageHistory";
 
   interface SourceAttribution {
     fileName: string;
@@ -8,14 +9,21 @@
     snippet: string;
     content?: string; // Full chunk content for expandable view
     chunkIndex?: number;
+    // Debug fields
+    vectorScore?: number;
+    textScore?: number;
+    fusedScore?: number;
+    rerankScore?: number;
+    sourceType?: SourceType;
   }
 
   interface Props {
     sources: SourceAttribution[];
     collapsed?: boolean;
+    showDebug?: boolean; // Show debug badges for sources
   }
 
-  let { sources, collapsed = true }: Props = $props();
+  let { sources, collapsed = true, showDebug = false }: Props = $props();
 
   let isExpanded = $state(!collapsed);
 
@@ -45,6 +53,32 @@
 
   function getFullContent(source: SourceAttribution): string {
     return source.content || source.snippet;
+  }
+
+  function getSourceTypeBadge(sourceType?: SourceType): { label: string; class: string } {
+    switch (sourceType) {
+      case 'hybrid':
+        return { label: 'V+T', class: 'badge-primary' };
+      case 'text':
+        return { label: 'T', class: 'badge-accent' };
+      case 'vector':
+      default:
+        return { label: 'V', class: 'badge-secondary' };
+    }
+  }
+
+  function formatDebugScores(source: SourceAttribution): string {
+    const parts: string[] = [];
+    if (source.vectorScore !== undefined) {
+      parts.push(`Vector: ${(source.vectorScore * 100).toFixed(1)}%`);
+    }
+    if (source.textScore !== undefined) {
+      parts.push(`Text: ${source.textScore.toFixed(2)}`);
+    }
+    if (source.fusedScore !== undefined) {
+      parts.push(`RRF: ${source.fusedScore.toFixed(4)}`);
+    }
+    return parts.join(' | ');
   }
 </script>
 
@@ -109,7 +143,23 @@
                         Chunk {source.chunkIndex + 1}
                       </span>
                     {/if}
+                    <!-- Source type badge (debug mode) -->
+                    {#if showDebug && source.sourceType}
+                      {@const typeBadge = getSourceTypeBadge(source.sourceType)}
+                      <span
+                        class="badge badge-xs {typeBadge.class}"
+                        title={source.sourceType === 'hybrid' ? 'Hybrid (Vector + Text)' : source.sourceType === 'text' ? 'Text Search' : 'Vector Search'}
+                      >
+                        {typeBadge.label}
+                      </span>
+                    {/if}
                   </div>
+                  <!-- Debug scores tooltip -->
+                  {#if showDebug && (source.vectorScore !== undefined || source.textScore !== undefined)}
+                    <div class="text-xs text-base-content/50 mt-1">
+                      {formatDebugScores(source)}
+                    </div>
+                  {/if}
                 </div>
                 <span class="badge {getScoreColor(source.score)} badge-sm shrink-0">
                   {formatScore(source.score)} match
