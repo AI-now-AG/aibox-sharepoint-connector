@@ -153,6 +153,9 @@
   if (tenantData && tenantData.vector_kb_max_hops === undefined) {
     tenantData.vector_kb_max_hops = DEFAULT_RAG_ENHANCEMENT_CONFIG.maxHops;
   }
+  if (tenantData && tenantData.vector_kb_debug_enabled === undefined) {
+    tenantData.vector_kb_debug_enabled = false;
+  }
 
   // Subscription & billing
   let selectedPlan: SubscriptionPackageId = $state(
@@ -3005,6 +3008,25 @@
                   </div>
                 </div>
               {/if}
+            </div>
+
+            <!-- Debug Panel -->
+            <div class="bg-base-200/50 rounded-lg p-4 mx-4 mb-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <span class="text-base-content font-medium text-sm">
+                    {t("tenant.vector-kb.debug-title")}
+                  </span>
+                  <p class="text-xs text-base-content/60">
+                    {t("tenant.vector-kb.debug-description")}
+                  </p>
+                </div>
+                <input
+                  type="checkbox"
+                  class="toggle toggle-primary toggle-sm"
+                  bind:checked={tenantData.vector_kb_debug_enabled}
+                />
+              </div>
             </div>
           </div>
         </div>

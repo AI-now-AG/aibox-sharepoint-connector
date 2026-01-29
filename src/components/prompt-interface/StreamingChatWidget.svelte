@@ -53,6 +53,7 @@
     citations: any[];
     currentImageUrl: string;
     ragSources: any[];
+    ragDebug: any;
   }
 
   interface APIConfiguration {
@@ -331,8 +332,9 @@
       console.log(`Response ID: ${data.responseId}`);
     }
 
-    // Capture RAG sources from response
+    // Capture RAG sources and debug info from response
     const ragSources = data.ragSources || state.ragSources || [];
+    const ragDebug = data.ragDebug || state.ragDebug || null;
     if (ragSources.length > 0) {
       console.log(`📚 RAG Sources: ${ragSources.length} chunks retrieved`);
     }
@@ -362,9 +364,10 @@
         state.citations,
         finalImageUrl,
         ragSources,
+        ragDebug,
       );
     } else {
-      addAssistantMessage(responseText, finalImageUrl, ragSources);
+      addAssistantMessage(responseText, finalImageUrl, ragSources, ragDebug);
     }
 
     // Clean up and reset states
@@ -422,6 +425,7 @@
     citations: any[],
     imageUrl: string,
     sources?: any[],
+    ragDebug?: any,
   ): void {
     console.log("📚 Citations sent:", citations);
 
@@ -433,18 +437,20 @@
       rawData: stripMarkdownFormatting(markdownWithLinks),
       imageUrl,
       sources: sources && sources.length > 0 ? sources : undefined,
+      ragDebug: ragDebug || undefined,
     };
 
     addMessageToHistory(groupId, promptId, newAssistantMessage);
   }
 
-  function addAssistantMessage(responseText: string, imageUrl: string, sources?: any[]): void {
+  function addAssistantMessage(responseText: string, imageUrl: string, sources?: any[], ragDebug?: any): void {
     const newAssistantMessage: Message = {
       role: MessageRole.Assistant,
       content: responseText,
       rawData: stripMarkdownFormatting(responseText),
       imageUrl,
       sources: sources && sources.length > 0 ? sources : undefined,
+      ragDebug: ragDebug || undefined,
     };
 
     addMessageToHistory(groupId, promptId, newAssistantMessage);
@@ -557,6 +563,7 @@
       citations: [],
       currentImageUrl: "",
       ragSources: [],
+      ragDebug: null,
     };
 
     while (true) {

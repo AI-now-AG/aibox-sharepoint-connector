@@ -4,9 +4,15 @@ import ConfigurationModel, {
   ProviderInstructionSchema,
 } from "$data/models/configuration.model";
 
+const CitationInstructionSchema = z.object({
+  en: z.string(),
+  de: z.string(),
+});
+
 export const ConfigurationSchema = z.object({
   defaultInstructions: z.array(ProviderInstructionSchema).optional(),
   promptRefinementInstruction: z.string().optional(),
+  citationInstruction: CitationInstructionSchema.optional(),
 });
 
 const ConfigurationIdentifierSchema = z.object({
@@ -26,6 +32,9 @@ export const configurations = {
         if (input.promptRefinementInstruction !== undefined) {
           update.promptRefinementInstruction =
             input.promptRefinementInstruction;
+        }
+        if (input.citationInstruction !== undefined) {
+          update.citationInstruction = input.citationInstruction;
         }
 
         if (Object.keys(update).length === 0) {
