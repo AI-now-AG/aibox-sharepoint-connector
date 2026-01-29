@@ -717,7 +717,7 @@
   "tenant.vector-kb.max-storage-help": "Maximales Speicherlimit in MB. Standard: 500",
   "tenant.vector-kb.info": "Vektor KB ermöglicht semantische Suche in hochgeladenen Dokumenten (PDF, TXT, DOCX). Dokumente werden in Chunks aufgeteilt, eingebettet und für Retrieval-Augmented Generation (RAG) gespeichert.",
   "tenant.vector-kb.enable-hint": "Aktivieren Sie Vektor KB, um semantische Suche und RAG-Funktionen für diesen Tenant zu konfigurieren.",
-  "tenant.vector-kb.rag-enhancements": "RAG Verbesserungen",
+  "tenant.vector-kb.rag-enhancements": "Erweiterte Sucheinstellungen",
   "tenant.vector-kb.rerank-title": "Reranking",
   "tenant.vector-kb.rerank-description": "Verbessert die Relevanz durch Kombination von Vektor- und Keyword-Scores",
   "tenant.vector-kb.rerank-top-n": "Finale Ergebnisse",
