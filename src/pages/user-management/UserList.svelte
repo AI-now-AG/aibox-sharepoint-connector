@@ -10,6 +10,7 @@
   import Loading from "$components/Loading.svelte";
   import { user as currentUser } from "$stores";
   import { formatDateToDDMMYY } from "$utils/common";
+  import { getRoleString } from "$utils/roles";
   import DropdownSection from "$components/DropdownSection.svelte";
   import { type Option } from "$components/DropdownOptions.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
@@ -18,7 +19,6 @@
   import SortableTable, {
     type ColumnData,
   } from "$components/SortableTable.svelte";
-  import { UserRole } from "$types/Users";
 
   const t = useTranslations();
   let loading = $state(false);
@@ -98,23 +98,6 @@
   onMount(async () => {
     await fetchUsers();
   });
-
-  function getRoleString(roles: any[] = []) {
-    const isSupperAdmin = roles?.some((role) =>
-      [UserRole.SuperAdmin].includes(role),
-    );
-    const isAdmin = roles?.some((role) => [UserRole.Admin].includes(role));
-    const isSuperUser = roles?.some((role) =>
-      [UserRole.SuperUser].includes(role),
-    );
-    return isSupperAdmin
-      ? "Supper Admin"
-      : isAdmin
-        ? t("user.admin")
-        : isSuperUser
-          ? t("user.super-user")
-          : t("user.user");
-  }
 
   function getUserStatus(isBlocked: boolean, isVerified: boolean) {
     if (isBlocked) {

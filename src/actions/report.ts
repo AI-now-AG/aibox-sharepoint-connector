@@ -83,4 +83,15 @@ export const report = {
       return transformRawData(results);
     },
   }),
+  userListReport: defineAction({
+    input: z.object({
+      page: z.number().optional(),
+      pageSize: z.number().optional(),
+      search: z.string().optional(),
+    }),
+    handler: async (input) => {
+      const results = await UserModel.listForExport(input);
+      return transformRawData(results);
+    },
+  }),
 };
