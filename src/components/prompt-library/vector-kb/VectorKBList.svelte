@@ -625,7 +625,7 @@
   onchange={handleFileUpload}
 />
 
-<div class="w-full px-4 lg:px-6">
+<div class="container max-w-5xl mx-auto p-6 space-y-4">
   <!-- Storage Usage & Toolbar - always show -->
   <div class="flex items-center justify-between mb-4 p-4 bg-base-100 rounded-lg">
     <div class="flex items-center gap-4">
