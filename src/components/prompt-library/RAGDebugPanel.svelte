@@ -66,6 +66,9 @@
         {#if debug.wasMultiHop}
           <span class="badge badge-xs badge-warning">Multi-hop</span>
         {/if}
+        {#if debug.wasMultiQuery}
+          <span class="badge badge-xs badge-info">Multi-query</span>
+        {/if}
         {#if debug.wasAnswerabilityChecked}
           <span class="badge badge-xs {getDecisionColor(debug.answerabilityDecision)}">
             {debug.answerabilityDecision || 'checked'}
@@ -263,6 +266,29 @@
                   <span class="text-base-content/50">Sub-queries:</span>
                   <ul class="list-disc list-inside mt-1 text-base-content/70">
                     {#each debug.multiHopQueries as query}
+                      <li class="truncate" title={query}>{query}</li>
+                    {/each}
+                  </ul>
+                </div>
+              {/if}
+            </div>
+          </div>
+        {/if}
+
+        <!-- Multi-query Section -->
+        {#if debug.wasMultiQuery}
+          <div class="space-y-1">
+            <div class="font-semibold text-base-content/70">Multi-query</div>
+            <div class="pl-2">
+              <div>
+                <span class="text-base-content/50">Variations:</span>
+                <span class="ml-1">{debug.multiQueryVariations?.length ?? 'N/A'}</span>
+              </div>
+              {#if debug.multiQueryVariations && debug.multiQueryVariations.length > 0}
+                <div class="mt-1">
+                  <span class="text-base-content/50">Query variations:</span>
+                  <ul class="list-disc list-inside mt-1 text-base-content/70">
+                    {#each debug.multiQueryVariations as query}
                       <li class="truncate" title={query}>{query}</li>
                     {/each}
                   </ul>

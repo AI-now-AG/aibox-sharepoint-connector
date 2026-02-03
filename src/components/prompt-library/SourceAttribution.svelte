@@ -7,9 +7,8 @@
     score: number;
     pageNumber?: number;
     snippet: string;
-    content?: string; // Full chunk content for expandable view
+    content?: string;
     chunkIndex?: number;
-    // Debug fields
     vectorScore?: number;
     textScore?: number;
     fusedScore?: number;
