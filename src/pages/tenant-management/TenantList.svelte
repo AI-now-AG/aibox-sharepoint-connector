@@ -305,9 +305,6 @@
                 >{t("tenant.total-price")}</th
               >
               <th class="py-3 px-4 text-left font-bold text-xs uppercase"
-                >{t("tenant.subscription-start-date")}</th
-              >
-              <th class="py-3 px-4 text-left font-bold text-xs uppercase"
                 >{t("tenant.tenants.tenant.active")}</th
               >
               <th class="py-3 px-4">&nbsp;</th>
@@ -370,17 +367,6 @@
                           tenant.subscription?.add_ons,
                         )}</span
                   >
-                </td>
-
-                <td class="py-3 px-4">
-                  <span class="text text-sm font-medium">
-                    {tenant.subscription?.start_date
-                      ? formatDate(
-                          tenant.subscription?.start_date,
-                          "DD.MM.YYYY",
-                        )
-                      : "-"}
-                  </span>
                 </td>
 
                 <td class="py-3 px-4">
