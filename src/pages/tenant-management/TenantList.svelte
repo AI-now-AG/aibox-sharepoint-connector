@@ -14,13 +14,19 @@
   import TenantSearchFilter from "./TenantSearchFilter.svelte";
   import Pagination from "$components/Pagination.svelte";
 
+  interface Props {
+    resellerCodes: string[];
+  }
+
+  let { resellerCodes = [] }: Props = $props();
+
   const t = useTranslations();
   let loading = $state(false);
 
   let tenants: any = $state([]);
   let page: number = $state(1);
   let total: number = $state(0);
-  let pageSize: number = $state(5);
+  let pageSize: number = $state(10);
 
   let searchValue: string = $state("");
   let statusFlag: string = $state("");
@@ -30,7 +36,10 @@
   let confirmUpdateModal: HTMLDialogElement | undefined = $state();
   let confirmDeleteModal: HTMLDialogElement | undefined = $state();
 
-  $inspect(tenants);
+  const resellerCodeOptions = resellerCodes.map((c) => ({
+    title: c,
+    value: c,
+  }));
 
   onMount(async () => {
     await fetchTenants();
@@ -260,6 +269,7 @@
 <div class="px-8">
   <div class="container max-w-full mx-auto p-6">
     <TenantSearchFilter
+      {resellerCodeOptions}
       bind:value={searchValue}
       bind:statusFlag
       bind:resellerCode
@@ -292,10 +302,10 @@
                 >{t("tenant.subscription")}</th
               >
               <th class="py-3 px-4 text-left font-bold text-xs uppercase"
-                >{"tenant.flag-status.trial"}</th
+                >{t("tenant.flag-status.trial")}</th
               >
               <th class="py-3 px-4 text-left font-bold text-xs uppercase"
-                >{"tenant.flag-status.interal"}</th
+                >{t("tenant.flag-status.internal")}</th
               >
               <th class="py-3 px-4 text-left font-bold text-xs uppercase"
                 >{t("tenant.total-price")}</th

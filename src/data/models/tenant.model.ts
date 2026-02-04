@@ -181,6 +181,13 @@ export default {
     return collection.find<Document<Tenant>>({}).toArray();
   },
 
+  listAllResellerCodes: async () => {
+    return await collection.distinct("reseller_code", {
+      is_reseller: true,
+      reseller_code: { $ne: null },
+    });
+  },
+
   fetchPaginatedList: async (filterParams: TenantFilterParams) => {
     const { page, pageSize, searchValue, statusFlag, resellerCode } =
       filterParams;
@@ -198,7 +205,7 @@ export default {
       // Search filter
       if (searchValue) {
         const safeSearch = escapeRegex(searchValue.trim());
-        (baseMatch.$or ??= []).push(
+        (baseMatch.$and ??= []).push(
           { name: { $regex: safeSearch, $options: "i" } },
           { org_name: { $regex: safeSearch, $options: "i" } },
         );
@@ -206,22 +213,22 @@ export default {
 
       // Status flag filter
       if (statusFlag === FlagStatus.Internal) {
-        (baseMatch.$or ??= []).push({ is_internal: true });
+        (baseMatch.$and ??= []).push({ is_internal: true });
       }
 
       // Reseller flag filter
       if (statusFlag === FlagStatus.Reseller) {
-        (baseMatch.$or ??= []).push({ is_reseller: true });
+        (baseMatch.$and ??= []).push({ is_reseller: true });
       }
 
       // Archived flag filter
       if (statusFlag === FlagStatus.Archived) {
-        (baseMatch.$or ??= []).push({ active: false });
+        (baseMatch.$and ??= []).push({ active: false });
       }
 
       // Reseller code filter
       if (resellerCode) {
-        (baseMatch.$or ??= []).$or.push({ reseller_code: resellerCode });
+        (baseMatch.$and ??= []).push({ reseller_code: resellerCode });
       }
     }
 

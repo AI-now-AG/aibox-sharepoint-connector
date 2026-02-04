@@ -36,7 +36,9 @@
       <!-- Page numbers -->
       {#each Array(totalPages) as _, i}
         <button
-          class="join-item btn btn-sm {page === i + 1 ? 'btn-primary' : ''}"
+          class="join-item btn btn-sm {page === i + 1
+            ? 'btn-primary pointer-events-none'
+            : ''}"
           onclick={() => goTo(i + 1)}
         >
           {i + 1}

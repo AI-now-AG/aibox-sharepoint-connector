@@ -3,11 +3,12 @@
   import { useTranslations } from "$i18n/utils";
   import { preventDefault } from "$utils/common";
   import { FlagStatus } from "$types/TenantMgnt";
-  import Dropdown from "$components/form/Dropdown.svelte";
+  import Dropdown, { type Option } from "$components/form/Dropdown.svelte";
 
   const t = useTranslations();
 
   interface Props {
+    resellerCodeOptions: Option[];
     value?: string;
     statusFlag?: string;
     resellerCode?: string;
@@ -16,6 +17,7 @@
   }
 
   let {
+    resellerCodeOptions = [],
     value = $bindable(""),
     statusFlag = $bindable(""),
     resellerCode = $bindable(""),
@@ -41,7 +43,7 @@
   };
 
   function onResellerCodeChange(value: string) {
-    statusFlag = value;
+    resellerCode = value;
     onfilter();
   }
 
@@ -93,7 +95,7 @@
         <p class="mb-2 label">Reseller Code</p>
         <Dropdown
           classes={"w-full"}
-          options={[{ title: "0001", value: "0001" }]}
+          options={resellerCodeOptions}
           bind:value={resellerCode}
           onValueChange={(value: string) => {
             onResellerCodeChange(value);
