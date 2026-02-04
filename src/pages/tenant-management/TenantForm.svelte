@@ -1226,6 +1226,12 @@
 
     <div class="flex space-x-2 ml-auto">
       <button
+        class="btn btn-outline"
+        onclick={() => (window.location.href = "/tenant-management")}
+      >
+        {t("common.cancel")}
+      </button>
+      <button
         class="btn btn-primary"
         onclick={() => {
           mode == MODE.Edit ? confirmUpdateModal?.showModal() : createTenant();
@@ -1233,20 +1239,14 @@
       >
         {t("common.save")}
       </button>
-      <button
-        class="btn btn-outline"
-        onclick={() => (window.location.href = "/tenant-management")}
-      >
-        {t("common.cancel")}
-      </button>
     </div>
   </div>
 </div>
 
 <div class="px-8 mb-10">
-  <div class="flex items-start gap-10 p-6">
+  <div class="grid grid-cols-1 md:grid-cols-8 gap-10 p-6">
     <!-- MAIN CONTENT -->
-    <div class="flex-[4]">
+    <div class="col-span-6">
       <!-- General settings -->
       <div class="p-5 mb-8 bg-base-100 rounded-lg">
         <div class="mb-4 flex flex-row items-center gap-2">
@@ -3105,13 +3105,13 @@
     </div>
 
     <!-- RIGHT SIDEBAR -->
-    <div class="flex-[1]">
+    <div class="col-span-2">
       <!-- User Management -->
       <div class="p-5 mb-8 bg-base-100 rounded-lg">
         <h5 class="mb-4 label">{"User Management"}</h5>
-        <div class="flex flex-col mb-8">
+        <div class="flex flex-col gap-2 mb-8">
           <button
-            class={"mb-3 mr-2 btn btn-sm btn-outline font-normal grow-0 w-auto " +
+            class={"mb-3 btn btn-outline font-normal grow-0 w-auto " +
               `${mode == MODE.Edit ? "" : "btn-disabled"}`}
             onclick={() => {
               addTenantAdminFor = "admin";
@@ -3123,7 +3123,7 @@
           </button>
 
           <button
-            class={"btn btn-sm btn-secondary font-normal grow-0 w-auto " +
+            class={"btn btn-secondary font-normal grow-0 w-auto " +
               `${mode == MODE.Edit ? "" : "btn-disabled"}`}
             onclick={() => {
               addTenantAdminFor = "sa";
@@ -3143,8 +3143,11 @@
             value="disable-create-user"
             bind:checked={tenantData.is_restrict_user_managment}
           />
-          <label class="label cursor-pointer ml-2" for="disable-create-user">
-            <span class="label-text text-base-content ml-2"
+          <label
+            class="label cursor-pointer ml-2 whitespace-normal"
+            for="disable-create-user"
+          >
+            <span class="label-text text-base-content text-sm ml-2"
               >{t("tenant.restrict-user-managment")}</span
             >
           </label>
@@ -3154,17 +3157,49 @@
       <!-- Status & conditions -->
       <div class="p-5 mb-8 bg-base-100 rounded-lg">
         <h5 class="mb-4 label">{"Status & conditions"}</h5>
-        <div class="flex p-2 items-center justify-between">
+        <div class="flex flex-col gap-2">
+          <div class="flex items-center p-3 bg-base-300/40 rounded-md">
+            <input
+              id="is-internal"
+              type="checkbox"
+              class="toggle toggle-primary"
+            />
+            <label
+              class="label cursor-pointer ml-2 whitespace-normal"
+              for="is-internal"
+            >
+              <span class="label-text text-base-content text-sm ml-2"
+                >{"Internal"}</span
+              >
+            </label>
+          </div>
+          <div class="flex items-center p-3 bg-base-300/40 rounded-md">
+            <input
+              id="is-reseller"
+              type="checkbox"
+              class="toggle toggle-primary"
+            />
+            <label
+              class="label cursor-pointer ml-2 whitespace-normal"
+              for="is-reseller"
+            >
+              <span class="label-text text-base-content text-sm ml-2"
+                >{"Reseller"}</span
+              >
+            </label>
+          </div>
           <div class="flex items-center p-3 bg-base-300/40 rounded-md">
             <input
               id="is-on-posthog"
               type="checkbox"
               class="toggle toggle-primary"
-              value="is-on-posthog"
               bind:checked={tenantData.is_on_posthog}
             />
-            <label class="label cursor-pointer ml-2" for="is-on-posthog">
-              <span class="label-text text-base-content ml-2"
+            <label
+              class="label cursor-pointer ml-2 whitespace-normal"
+              for="is-on-posthog"
+            >
+              <span class="label-text text-base-content text-sm ml-2"
                 >{t("tenant.posthog")}</span
               >
             </label>
@@ -3177,7 +3212,7 @@
         <h5 class="mb-4 label">{"User Limits"}</h5>
 
         <div class="flex flex-row space-x-4">
-          <div class="flex-1 flex flex-col mb-4">
+          <div class="flex-1 flex flex-col">
             <span class="mb-2 text-base-content font-medium text-sm"
               >{t("tenant.user-limit")}</span
             >
@@ -3188,16 +3223,34 @@
               bind:value={tenantData.max_user_limit}
             />
           </div>
-          <div class="flex-1 flex flex-col mb-4">
+          <div class="flex-1 flex flex-col">
             <span class="mb-2 text-base-content font-medium text-sm"
-              >{t("subscription.number-of-active-user")}</span
+              >{"Additional"}</span
             >
             <input
               type="number"
-              class="input input-bordered bg-base-200 w-full"
-              readonly
-              value={activeUsers}
+              class="input input-bordered w-full"
+              value={0}
             />
+          </div>
+        </div>
+
+        <div class="divider mt-3 mb-2"></div>
+
+        <progress class="progress progress-primary w-full" value="60" max="100"
+        ></progress>
+
+        <div class="flex flex-row space-x-4">
+          <div class="flex-1 flex flex-col mb-4">
+            <p class="text-xs text-base-content/60">
+              {t("subscription.number-of-active-user")}
+              {activeUsers}
+            </p>
+          </div>
+          <div class="flex-1 flex flex-col mb-4">
+            <p class="text-xs text-base-content/60 text-right">
+              {"60% used"}
+            </p>
           </div>
         </div>
       </div>
