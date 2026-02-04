@@ -833,6 +833,7 @@
   "vector-kb.error-storage-limit-exceeded": "Speicherlimit überschritten. Bitte löschen Sie einige Dateien oder kontaktieren Sie den Support, um Ihr Speicherlimit zu erhöhen.",
   "vector-kb.error-file-too-large": "Dateigrösse überschreitet das Maximum. Bitte laden Sie eine kleinere Datei hoch.",
   "vector-kb.storage-warning-90": "Sie haben über 90% Ihres Speichers verbraucht. Löschen Sie ungenutzte Dateien oder <a href=\"mailto:support@aibox-app.ch\" class=\"underline\">kontaktieren Sie den Support</a>, um Ihr Limit zu erhöhen.",
+  "vector-kb.error-duplicate-file": "Die Datei \"${name}\" existiert bereits in diesem Ordner. Bitte benennen Sie die Datei um oder löschen Sie die vorhandene zuerst.",
   "user.reset-password": "Passwort zurücksetzen",
   "user.reset-password-confirm-message": "Passwort per E-Mail zurücksetzen",
   "user.reset-password-description-message": "E-Mail senden an ${email} um neues Passwort zu erstellen?",

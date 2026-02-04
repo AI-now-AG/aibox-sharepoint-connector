@@ -248,7 +248,24 @@
       apiBase = config.apiUrl;
     }
 
+    // Build a set of existing filenames in the current folder for duplicate detection
+    const existingFileNames = new Set(
+      dataSources.map((ds) => ds.original_file_name.toLowerCase())
+    );
+
     for (const file of Array.from(files)) {
+      // Check for duplicate filename
+      if (existingFileNames.has(file.name.toLowerCase())) {
+        const errorMessage = t("vector-kb.error-duplicate-file", { name: file.name });
+        addToast({
+          message: errorMessage,
+          type: "error",
+          timeout: 5000,
+        });
+        uploadError = errorMessage;
+        continue; // Skip this file
+      }
+
       try {
         const formData = new FormData();
         formData.append("tenantId", tenantId);
@@ -265,7 +282,10 @@
 
         const result = await response.json();
 
-        if (!result.success) {
+        if (result.success) {
+          // Track this filename so subsequent files in the same batch are caught
+          existingFileNames.add(file.name.toLowerCase());
+        } else {
           console.error("Upload failed:", result.error);
 
           // Determine the appropriate error message based on the error type
