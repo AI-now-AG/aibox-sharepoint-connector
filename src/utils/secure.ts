@@ -6,9 +6,32 @@ const ALGORITHM = "aes-256-cbc";
 const ENCRYPTION_KEY =
   "b23d8f13bf1e2cda7d3ca36645f62b61c6d01a5a745377e27291a1977bec2ab4";
 
+/**
+ * Check if text is already in encrypted format
+ * Encrypted format: 32-char hex IV + ":" + hex encrypted data
+ */
+function isAlreadyEncrypted(text: string): boolean {
+  if (!text || !text.includes(":")) {
+    return false;
+  }
+  const parts = text.split(":");
+  const ivPart = parts[0];
+  // IV should be exactly 32 hex characters (16 bytes)
+  if (ivPart.length !== IV_LENGTH * 2) {
+    return false;
+  }
+  // Check if IV part is valid hex
+  return /^[0-9a-fA-F]+$/.test(ivPart);
+}
+
 // Function to encrypt the API key
 export function encrypt(text: string): string {
   try {
+    // Skip if already encrypted to prevent double-encryption
+    if (isAlreadyEncrypted(text)) {
+      return text;
+    }
+
     const iv = crypto.randomBytes(IV_LENGTH);
     const cipher = crypto.createCipheriv(
       ALGORITHM,
