@@ -1220,7 +1220,7 @@
     >
       {@html svgIcons.back}
     </button>
-    <h1 class="text-4xl font-bold">
+    <h1 class="text-3xl font-bold">
       {headerTitle}
     </h1>
 
@@ -1319,16 +1319,6 @@
                 },
                 { value: SubscriptionPackageId.Teams, title: "aibox Teams" },
                 { value: SubscriptionPackageId.Pro, title: "aibox Pro" },
-                { value: SubscriptionExtraPackage.Test, title: "Test" },
-                {
-                  value: SubscriptionExtraPackage.TeamsReseller,
-                  title: "aibox Teams (Reseller)",
-                },
-                {
-                  value: SubscriptionExtraPackage.ProReseller,
-                  title: "aibox Pro (Reseller)",
-                },
-                { value: SubscriptionExtraPackage.Internal, title: "Internal" },
                 {
                   value: SubscriptionExtraPackage.Enterprise,
                   title: "aibox Enterprise",
