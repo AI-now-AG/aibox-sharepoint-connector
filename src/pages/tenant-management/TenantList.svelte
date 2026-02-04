@@ -321,7 +321,7 @@
               <tr class="h-16 bg-base-100 hover:bg-base-300 text-sm">
                 <td class="py-3 px-4 text-sm font-medium">
                   <a
-                    class="underline underline-offset-2"
+                    class="hover:underline hover:underline-offset-2"
                     href="/tenant-management/{tenant._id}">{tenant.name}</a
                   >
                 </td>
@@ -389,7 +389,7 @@
                       >{t("tenant.tenants.tenant.active")}
                     </span>
                   {:else}
-                    <span class={"badge badge-soft badge-ghost badge-sm"}
+                    <span class={"badge badge-soft badge-error badge-sm"}
                       >{t("tenant.tenants.tenant.archived")}
                     </span>
                   {/if}
