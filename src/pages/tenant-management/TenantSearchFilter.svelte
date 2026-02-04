@@ -74,7 +74,7 @@
     </div>
     <div class="flex-1">
       <p class="mb-2 label">{t("tenant.flag-status-label")}</p>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-2">
         {#each flagOptions as flag}
           <label class="flex items-center space-x-2">
             <input

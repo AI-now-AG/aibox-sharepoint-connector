@@ -833,5 +833,6 @@
   "tenant.flag-status.internal": "Internal",
   "tenant.flag-status.reseller": "Reseller",
   "tenant.flag-status.archived": "Archived",
-  "tenant.reseller-code": "Archived"
+  "tenant.reseller-code": "Archived",
+  "pagination.showing-range-of-total": "Showing ${from} to ${to} of ${total} results"
 }

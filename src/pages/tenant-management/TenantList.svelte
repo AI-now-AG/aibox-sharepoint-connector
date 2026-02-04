@@ -26,7 +26,10 @@
   let tenants: any = $state([]);
   let page: number = $state(1);
   let total: number = $state(0);
-  let pageSize: number = $state(10);
+  let pageSize: number = $state(5);
+
+  const from = $derived(total === 0 ? 0 : (page - 1) * pageSize + 1);
+  const to = $derived(Math.min(page * pageSize, total));
 
   let searchValue: string = $state("");
   let statusFlag: string = $state("");
@@ -451,12 +454,17 @@
         <Loading show={loading} partial={true} />
       </div>
 
-      <Pagination
-        bind:page
-        {pageSize}
-        {total}
-        onPageChange={handlePageChange}
-      />
+      <div class="grid grid-cols-1 md:grid-cols-[1fr_max-content]">
+        <div class="mt-4 text-sm text-base-content/60">
+          {t("pagination.showing-range-of-total", { from, to, total })}
+        </div>
+        <Pagination
+          bind:page
+          {pageSize}
+          {total}
+          onPageChange={handlePageChange}
+        />
+      </div>
     </div>
 
     <!-- confirm update dialog -->
