@@ -29,7 +29,11 @@ import {
   AudioOptionId,
 } from "$types/Subscription";
 import { EncryptedUserPassword, UserRole } from "$types/Users";
-import { ModelName, ReasoningEffortOption, EmbeddingProvider } from "$types/AIProvider";
+import {
+  ModelName,
+  ReasoningEffortOption,
+  EmbeddingProvider,
+} from "$types/AIProvider";
 
 const TenantInputParamsSchema = z.object({
   name: z.string(),
@@ -232,7 +236,7 @@ export const tenant = {
   list: defineAction({
     input: TenantFilterParamsSchema,
     handler: async (input) => {
-      const data = await TenantModel.list(input);
+      const data = await TenantModel.fetchPaginatedList(input);
       return transformRawData(data, false);
     },
   }),

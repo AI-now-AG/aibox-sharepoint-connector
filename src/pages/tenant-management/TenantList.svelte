@@ -6,24 +6,31 @@
   import log from "$utils/log";
   import { tenant as currentTenant } from "$stores";
   import { addToast } from "$stores/toast";
+  import { formatDate, getSubscriptionAddOnName } from "$utils/common";
+  import { AudioOptionId, SubscriptionPackageId } from "$types/Subscription";
+  import { SubscriptionPackages } from "$data/subscription-packages";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import Loading from "$components/Loading.svelte";
   import TenantSearchFilter from "./TenantSearchFilter.svelte";
-  import dayjs from "dayjs";
-  import { AudioOptionId, SubscriptionPackageId } from "$types/Subscription";
-  import { SubscriptionPackages } from "$data/subscription-packages";
-  import { getSubscriptionAddOnName } from "$utils/common";
+  import Pagination from "$components/Pagination.svelte";
 
   const t = useTranslations();
   let loading = $state(false);
 
   let tenants: any = $state([]);
-  let showArchived: boolean = $state(false);
+  let page: number = $state(1);
+  let total: number = $state(0);
+  let pageSize: number = $state(5);
+
   let searchValue: string = $state("");
+  let statusFlag: string = $state("");
+  let resellerCode: string = $state("");
 
   let selectedTenant: any = $state(null);
   let confirmUpdateModal: HTMLDialogElement | undefined = $state();
   let confirmDeleteModal: HTMLDialogElement | undefined = $state();
+
+  $inspect(tenants);
 
   onMount(async () => {
     await fetchTenants();
@@ -32,17 +39,26 @@
   const fetchTenants = async () => {
     loading = true;
     const { data, error } = await actions.tenant.list({
+      page,
+      pageSize,
       searchValue,
-      showArchived,
+      statusFlag,
+      resellerCode,
     });
 
     loading = false;
 
     if (!error) {
-      tenants = data;
+      tenants = data.data;
+      total = data.total;
     } else {
       log.e(error, "Error fetching tenants");
     }
+  };
+
+  const handlePageChange = (p: number) => {
+    page = p;
+    fetchTenants();
   };
 
   function confirmUpdateStatus(tenant: any) {
@@ -188,7 +204,7 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `Tenants-Export-${dayjs(new Date(), "DD.MM.YYYY HH-mm-ss").format("DD.MM.YYYY HH-mm-ss")}.csv`;
+      a.download = `Tenants-Export-${formatDate(new Date(), "DD.MM.YYYY HH-mm-ss")}.csv`;
       a.click();
       URL.revokeObjectURL(url);
     } catch (err: any) {
@@ -249,51 +265,52 @@
   <div class="container max-w-full mx-auto p-6">
     <TenantSearchFilter
       bind:value={searchValue}
-      bind:showArchived
+      bind:statusFlag
+      bind:resellerCode
       onsearch={fetchTenants}
       onfilter={fetchTenants}
     />
 
     <div>
       <h2 class="text-lg font-normal mb-4">
-        {t("tenant.tenants.all-tenants", { amount: tenants.length })}
+        {t("tenant.tenants.all-tenants", { amount: total })}
       </h2>
 
       <div class="relative">
         <table
-          class="border-separate border-spacing-x-0 border-spacing-y-3 min-w-full relative"
+          class="border-separate border-spacing-x-0 min-w-full relative"
           style="font-family:Inter;"
         >
           <thead>
-            <tr class="bg-base-300 rounded-lg">
-              <th class="py-3 px-4 text-left font-normal text-xs rounded-l-lg"
+            <tr class="bg-base-300">
+              <th class="py-3 px-4 text-left font-bold text-xs uppercase"
                 >{t("tenant.tenants.tenant.display-name")}</th
               >
-              <th class="py-3 px-4 text-left font-normal text-xs"
+              <th class="py-3 px-4 text-left font-bold text-xs uppercase"
                 >{t("tenant.subscription")}</th
               >
-              <th class="py-3 px-4 text-left font-normal text-xs"
+              <th class="py-3 px-4 text-left font-bold text-xs uppercase"
                 >{t("tenant.audio-subscription")}</th
               >
-              <th class="py-3 px-4 text-left font-normal text-xs"
+              <th class="py-3 px-4 text-left font-bold text-xs uppercase"
                 >{t("tenant.subtitle-subscription")}</th
               >
-              <th class="py-3 px-4 text-left font-normal text-xs"
+              <th class="py-3 px-4 text-left font-bold text-xs uppercase"
                 >{t("tenant.total-price")}</th
               >
-              <th class="py-3 px-4 text-left font-normal text-xs"
+              <th class="py-3 px-4 text-left font-bold text-xs uppercase"
                 >{t("tenant.subscription-start-date")}</th
               >
-              <th class="py-3 px-4 text-left font-normal text-xs"
+              <th class="py-3 px-4 text-left font-bold text-xs uppercase"
                 >{t("tenant.tenants.tenant.active")}</th
               >
-              <th class="py-3 px-4 rounded-r-lg"></th>
+              <th class="py-3 px-4">&nbsp;</th>
             </tr>
           </thead>
           <tbody>
             {#each tenants as tenant}
-              <tr class="h-16 bg-base-100 hover:bg-base-300 text-sm rounded-lg">
-                <td class="py-3 px-4 text-sm font-medium rounded-l-lg">
+              <tr class="h-16 bg-base-100 hover:bg-base-300 text-sm">
+                <td class="py-3 px-4 text-sm font-medium">
                   <a
                     class="underline underline-offset-2"
                     href="/tenant-management/{tenant._id}">{tenant.name}</a
@@ -338,10 +355,10 @@
                 <td class="py-3 px-4">
                   <span class="text text-sm font-medium">
                     {tenant.subscription?.start_date
-                      ? dayjs(
+                      ? formatDate(
                           tenant.subscription?.start_date,
                           "DD.MM.YYYY",
-                        ).format("DD.MM.YYYY")
+                        )
                       : "-"}
                   </span>
                 </td>
@@ -357,9 +374,7 @@
                   >
                 </td>
 
-                <td
-                  class="py-3 px-4 text-right relative relative-dropdown rounded-r-lg"
-                >
+                <td class="py-3 px-4 text-right relative relative-dropdown">
                   <div class="dropdown dropdown-hover dropdown-end">
                     <button class="btn btn-ghost btn-sm z-50">
                       {@html svgIcons.threeDot}
@@ -414,6 +429,13 @@
 
         <Loading show={loading} partial={true} />
       </div>
+
+      <Pagination
+        bind:page
+        {pageSize}
+        {total}
+        onPageChange={handlePageChange}
+      />
     </div>
 
     <!-- confirm update dialog -->

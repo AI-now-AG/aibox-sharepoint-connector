@@ -17,7 +17,7 @@ export const GET: APIRoute = async (ctx: APIContext) => {
     const yesNo = (value?: boolean) => (value ? "Yes" : "No");
 
     // Fetch your MongoDB data
-    const results = await UserModel.listForExport({ pageSize: 0 });
+    const results = await UserModel.fetchPaginatedReports({ pageSize: 0 });
     const { data: users } = results;
 
     // Prepare the CSV data with appropriate headers

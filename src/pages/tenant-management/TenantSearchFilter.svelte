@@ -2,23 +2,35 @@
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
   import { preventDefault } from "$utils/common";
+  import { FlagStatus } from "$types/TenantMgnt";
+  import Dropdown from "$components/form/Dropdown.svelte";
 
   const t = useTranslations();
 
   interface Props {
     value?: string;
-    showArchived?: boolean;
+    statusFlag?: string;
+    resellerCode?: string;
     onsearch: Function;
     onfilter: Function;
   }
 
   let {
     value = $bindable(""),
-    showArchived = $bindable(false),
+    statusFlag = $bindable(""),
+    resellerCode = $bindable(""),
     onsearch,
     onfilter,
   }: Props = $props();
+
   let typingTimeout: any;
+
+  const flagOptions = [
+    { label: "Trial", value: FlagStatus.Trial },
+    { label: "Internal", value: FlagStatus.Internal },
+    { label: "Reseller", value: FlagStatus.Reseller },
+    { label: "Archived", value: FlagStatus.Archived },
+  ];
 
   const onSearch = ({ target }: any) => {
     clearTimeout(typingTimeout);
@@ -28,12 +40,15 @@
     }, 300);
   };
 
-  const onFilter = ({ target }: any) => {
-    showArchived = !showArchived;
-    setTimeout(() => (target.checked = showArchived), 0);
+  function onFlagStatusChange({ target }: any) {
+    statusFlag = target.value;
     onfilter();
-    console.log("dispatch filter", { value });
-  };
+  }
+
+  function onResellerCodeChange(value: string) {
+    statusFlag = value;
+    onfilter();
+  }
 </script>
 
 <div class="px-5 py-5 bg-base-100 rounded-lg items-center mb-10">
@@ -42,7 +57,7 @@
     <h3 class="ml-2 text-1xl font-bold">FILTER</h3>
   </div>
 
-  <div class="flex items-center gap-6">
+  <div class="flex items-center gap-10">
     <div class="flex-1">
       <p class="mb-1 label">Search</p>
       <label class="input input-bordered flex items-center gap-2 w-full">
@@ -56,33 +71,35 @@
       </label>
     </div>
     <div class="flex-1">
-      <p class="mb-1 label">Status Flags</p>
+      <p class="mb-2 label">Status Flags</p>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-        <label class="flex items-center space-x-2">
-          <input type="radio" class="radio border-base-content w-5 h-5" />
-          <span class="label-text">Trial</span>
-        </label>
-        <label class="flex items-center space-x-2">
-          <input type="radio" class="radio border-base-content w-5 h-5" />
-          <span class="label-text">Internal</span>
-        </label>
-        <label class="flex items-center space-x-2">
-          <input type="radio" class="radio border-base-content w-5 h-5" />
-          <span class="label-text">Reseller</span>
-        </label>
-        <label class="flex items-center space-x-2">
-          <input
-            type="radio"
-            class="radio border-base-content w-5 h-5"
-            checked={showArchived}
-            onclick={preventDefault(onFilter)}
-          />
-          <span class="label-text">Archived</span>
-        </label>
+        {#each flagOptions as flag}
+          <label class="flex items-center space-x-2">
+            <input
+              type="radio"
+              name="status_flag"
+              value={flag.value}
+              class="radio border-base-content w-5 h-5"
+              checked={statusFlag === flag.value}
+              onchange={preventDefault(onFlagStatusChange)}
+            />
+            <span class="label-text">{flag.label}</span>
+          </label>
+        {/each}
       </div>
     </div>
     <div class="flex-1">
-      <p class="mb-1 label">Reseller Code</p>
+      <div class="pl-0 lg:pl-24">
+        <p class="mb-2 label">Reseller Code</p>
+        <Dropdown
+          classes={"w-full"}
+          options={[{ title: "0001", value: "0001" }]}
+          bind:value={resellerCode}
+          onValueChange={(value: string) => {
+            onResellerCodeChange(value);
+          }}
+        />
+      </div>
     </div>
   </div>
 </div>

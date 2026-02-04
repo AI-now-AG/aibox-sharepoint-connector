@@ -19,8 +19,22 @@ export function capitalizeFirst(text: string) {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
-export function formatDateToDDMMYY(date: string | Date): string {
-  return dayjs(date).format("DD.MM.YYYY");
+export function formatDate(
+  date: string | Date | number | null | undefined,
+  format = "DD.MM.YYYY",
+): string {
+  if (!date) return "";
+
+  if (!date) return "";
+
+  const d = dayjs(date);
+
+  if (!d.isValid()) {
+    console.warn("Invalid date:", date);
+    return "";
+  }
+
+  return d.format(format);
 }
 
 export const isValidEmail = (email: string) => {

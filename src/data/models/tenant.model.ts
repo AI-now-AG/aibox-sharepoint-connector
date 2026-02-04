@@ -9,11 +9,19 @@ import {
   ThemeCode,
 } from "$types/TenantFeature";
 import { BillingMethod } from "$types/Subscription";
-import { ModelName, ReasoningEffortOption, EmbeddingProvider } from "$types/AIProvider";
+import { FlagStatus } from "$types/TenantMgnt";
+import {
+  ModelName,
+  ReasoningEffortOption,
+  EmbeddingProvider,
+} from "$types/AIProvider";
 
 export const TenantFilterParamsSchema = z.object({
+  page: z.number().default(1),
+  pageSize: z.number().default(20),
   searchValue: z.string().nullish(),
-  showArchived: z.boolean(),
+  statusFlag: z.string().nullish(),
+  resellerCode: z.string().nullish(),
 });
 export type TenantFilterParams = z.infer<typeof TenantFilterParamsSchema>;
 
@@ -153,25 +161,48 @@ export default {
     );
   },
 
-  list: async (filterParams?: TenantFilterParams) => {
-    const filter: any = {
-      active: true,
+  list: async () => {
+    return collection.find<Document<Tenant>>({}).toArray();
+  },
+
+  fetchPaginatedList: async (filterParams: TenantFilterParams) => {
+    const { page, pageSize, searchValue, statusFlag, resellerCode } =
+      filterParams;
+    const skip = (page - 1) * pageSize;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const baseMatch: any = {};
+
+    // escape regex
+    const escapeRegex = (text: string): string => {
+      return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     };
 
-    if (filterParams) {
-      const { searchValue, showArchived } = filterParams;
-
+    if (searchValue || statusFlag || resellerCode) {
       if (searchValue) {
-        filter.name = { $regex: searchValue, $options: "i" };
+        const safeSearch = escapeRegex(searchValue.trim());
+        baseMatch.$or = [
+          { name: { $regex: safeSearch, $options: "i" } },
+          { org_name: { $regex: safeSearch, $options: "i" } },
+        ];
       }
 
-      if (showArchived) {
-        filter.active = false;
+      if (statusFlag === FlagStatus.Internal) {
+        //filter.active = false;
+      }
+
+      if (resellerCode) {
+        //filter.active = false;
       }
     }
 
-    const pipeline = [
-      { $match: filter },
+    // Build pipeline dynamically
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const pipeline: any[] = [
+      {
+        // 🔍 search happens HERE (before lookups)
+        $match: baseMatch,
+      },
       {
         $lookup: {
           from: "subscriptions",
@@ -188,16 +219,43 @@ export default {
       },
       {
         $project: {
-          subscriptions: 0, // hide the full array coz only need one
+          _id: 1,
+          name: 1,
+          totalPrice: 1,
+          active: 1,
+          is_trial: 1,
+          subscription: 1,
         },
       },
+      { $sort: { created_at: 1 } },
+      { $skip: skip },
+      { $limit: pageSize },
     ];
 
-    const data = await collection
-      .aggregate<Document<Tenant & { subscription?: any }>>(pipeline)
+    const totalResult = await collection
+      .aggregate([
+        { $match: baseMatch },
+        {
+          $lookup: {
+            from: "subscriptions",
+            localField: "_id",
+            foreignField: "tenant_id",
+            as: "subscriptions",
+          },
+        },
+        { $count: "count" },
+      ])
       .toArray();
 
-    return data;
+    const result = await collection.aggregate(pipeline).toArray();
+    const total = totalResult[0]?.count ?? 0;
+
+    return {
+      data: result,
+      total: total,
+      page,
+      pageSize,
+    };
   },
 
   get: async (id: string | ObjectId): Promise<Tenant | null> => {
