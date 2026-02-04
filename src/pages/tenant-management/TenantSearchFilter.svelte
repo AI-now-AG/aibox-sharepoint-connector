@@ -40,13 +40,13 @@
     }, 300);
   };
 
-  function onFlagStatusChange({ target }: any) {
-    statusFlag = target.value;
+  function onResellerCodeChange(value: string) {
+    statusFlag = value;
     onfilter();
   }
 
-  function onResellerCodeChange(value: string) {
-    statusFlag = value;
+  function toggleFlagStatus(value: string) {
+    statusFlag = statusFlag === value ? "" : value;
     onfilter();
   }
 </script>
@@ -81,7 +81,7 @@
               value={flag.value}
               class="radio border-base-content w-5 h-5"
               checked={statusFlag === flag.value}
-              onchange={preventDefault(onFlagStatusChange)}
+              onclick={() => toggleFlagStatus(flag.value)}
             />
             <span class="label-text">{flag.label}</span>
           </label>

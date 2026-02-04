@@ -267,8 +267,14 @@
       bind:value={searchValue}
       bind:statusFlag
       bind:resellerCode
-      onsearch={fetchTenants}
-      onfilter={fetchTenants}
+      onsearch={() => {
+        page = 1;
+        fetchTenants();
+      }}
+      onfilter={() => {
+        page = 1;
+        fetchTenants();
+      }}
     />
 
     <div>
@@ -290,10 +296,10 @@
                 >{t("tenant.subscription")}</th
               >
               <th class="py-3 px-4 text-left font-bold text-xs uppercase"
-                >{t("tenant.audio-subscription")}</th
+                >{"Trial"}</th
               >
               <th class="py-3 px-4 text-left font-bold text-xs uppercase"
-                >{t("tenant.subtitle-subscription")}</th
+                >{"Internal"}</th
               >
               <th class="py-3 px-4 text-left font-bold text-xs uppercase"
                 >{t("tenant.total-price")}</th
@@ -318,27 +324,41 @@
                 </td>
 
                 <td class="py-3 px-4">
-                  <span class="text text-sm font-medium">
+                  <span class="block text text-sm font-medium">
                     {tenant.subscription?.plan_name}
                   </span>
+                  {#if tenant.subscription?.add_ons}
+                    <span class="block pt-1">
+                      <span class="badge badge-ghost badge-sm">
+                        {getSubscriptionAddOnName(
+                          "audiototext",
+                          tenant.subscription?.add_ons,
+                        )}
+                      </span>
+                      <span class="badge badge-ghost badge-sm">
+                        {getSubscriptionAddOnName(
+                          "subtitle",
+                          tenant.subscription?.add_ons,
+                        )}
+                      </span>
+                    </span>
+                  {/if}
                 </td>
 
                 <td class="py-3 px-4">
-                  <span class="text text-sm font-medium">
-                    {getSubscriptionAddOnName(
-                      "audiototext",
-                      tenant.subscription?.add_ons,
-                    )}
-                  </span>
+                  {#if tenant.subscription?.is_trial}
+                    <span class="badge badge-soft badge-success">Yes</span>
+                  {:else}
+                    <span class="badge badge-soft badge-warning">No</span>
+                  {/if}
                 </td>
 
                 <td class="py-3 px-4">
-                  <span class="text text-sm font-medium">
-                    {getSubscriptionAddOnName(
-                      "subtitle",
-                      tenant.subscription?.add_ons,
-                    )}
-                  </span>
+                  {#if tenant.is_internal}
+                    <span class="badge badge-soft badge-success">Yes</span>
+                  {:else}
+                    <span class="badge badge-soft badge-warning">No</span>
+                  {/if}
                 </td>
 
                 <td class="py-3 px-4">
@@ -364,14 +384,15 @@
                 </td>
 
                 <td class="py-3 px-4">
-                  <span
-                    class={tenant.active == 1
-                      ? "text-success text-sm font-medium"
-                      : "text-sm font-medium text-neutral/70"}
-                    >{tenant.active == 1
-                      ? t("tenant.tenants.tenant.active")
-                      : t("tenant.tenants.tenant.archived")}</span
-                  >
+                  {#if tenant.active}
+                    <span class={"badge badge-soft badge-success badge-sm"}
+                      >{t("tenant.tenants.tenant.active")}
+                    </span>
+                  {:else}
+                    <span class={"badge badge-soft badge-ghost badge-sm"}
+                      >{t("tenant.tenants.tenant.archived")}
+                    </span>
+                  {/if}
                 </td>
 
                 <td class="py-3 px-4 text-right relative relative-dropdown">

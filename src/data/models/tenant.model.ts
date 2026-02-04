@@ -15,6 +15,7 @@ import {
   ReasoningEffortOption,
   EmbeddingProvider,
 } from "$types/AIProvider";
+import type { active } from "sortablejs";
 
 export const TenantFilterParamsSchema = z.object({
   page: z.number().default(1),
@@ -85,6 +86,10 @@ const TenantSchema = z.object({
   is_restrict_user_managment: z.boolean().optional().default(false),
   is_trial: z.boolean().optional().default(false),
   is_on_posthog: z.boolean().optional().default(false),
+  is_internal: z.boolean().optional().default(false),
+  is_reseller: z.boolean().optional().default(false),
+  reseller_code: z.string().nullish(),
+  owned_by_reseller: z.string().nullish(),
   comment: z.string().optional(),
   metadata: z.record(z.any()).nullish(),
   billing_method: z
@@ -191,20 +196,35 @@ export default {
     };
 
     if (searchValue || statusFlag || resellerCode) {
+      baseMatch.$or = [];
+
+      // Search filter
       if (searchValue) {
         const safeSearch = escapeRegex(searchValue.trim());
-        baseMatch.$or = [
+        baseMatch.$or.push(
           { name: { $regex: safeSearch, $options: "i" } },
           { org_name: { $regex: safeSearch, $options: "i" } },
-        ];
+        );
       }
 
+      // Status flag filter
       if (statusFlag === FlagStatus.Internal) {
-        //filter.active = false;
+        baseMatch.$or.push({ is_internal: true });
       }
 
+      // Reseller flag filter
+      if (statusFlag === FlagStatus.Reseller) {
+        baseMatch.$or.push({ is_reseller: true });
+      }
+
+      // Archived flag filter
+      if (statusFlag === FlagStatus.Archived) {
+        baseMatch.$or.push({ active: false });
+      }
+
+      // Reseller code filter
       if (resellerCode) {
-        //filter.active = false;
+        baseMatch.$or.push({ reseller_code: resellerCode });
       }
     }
 
@@ -235,7 +255,9 @@ export default {
           name: 1,
           totalPrice: 1,
           active: 1,
-          is_trial: 1,
+          is_internal: 1,
+          is_reseller: 1,
+          owned_by_reseller: 1,
           subscription: 1,
         },
       },
