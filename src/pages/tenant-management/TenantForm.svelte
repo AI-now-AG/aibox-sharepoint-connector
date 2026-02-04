@@ -38,8 +38,16 @@
   import { TextModel } from "$types/UsageTracking";
   import { SubscriptionPackages } from "$data/subscription-packages";
   import { onMount } from "svelte";
-  import { ModelName, ReasoningEffortOption, EmbeddingProvider } from "$types/AIProvider";
-  import { EMBEDDING_MODELS, DEFAULT_VECTOR_KB_CONFIG, DEFAULT_RAG_ENHANCEMENT_CONFIG } from "$types/VectorKB";
+  import {
+    ModelName,
+    ReasoningEffortOption,
+    EmbeddingProvider,
+  } from "$types/AIProvider";
+  import {
+    EMBEDDING_MODELS,
+    DEFAULT_VECTOR_KB_CONFIG,
+    DEFAULT_RAG_ENHANCEMENT_CONFIG,
+  } from "$types/VectorKB";
 
   const t = useTranslations();
   let loading = $state(false);
@@ -119,36 +127,49 @@
     tenantData.vector_kb_top_k = DEFAULT_VECTOR_KB_CONFIG.topK;
   }
   if (tenantData && tenantData.vector_kb_similarity_threshold === undefined) {
-    tenantData.vector_kb_similarity_threshold = DEFAULT_VECTOR_KB_CONFIG.similarityThreshold;
+    tenantData.vector_kb_similarity_threshold =
+      DEFAULT_VECTOR_KB_CONFIG.similarityThreshold;
   }
 
   // Initialize RAG Enhancement defaults
   if (tenantData && tenantData.vector_kb_rerank_enabled === undefined) {
-    tenantData.vector_kb_rerank_enabled = DEFAULT_RAG_ENHANCEMENT_CONFIG.rerankEnabled;
+    tenantData.vector_kb_rerank_enabled =
+      DEFAULT_RAG_ENHANCEMENT_CONFIG.rerankEnabled;
   }
   if (tenantData && tenantData.vector_kb_rerank_top_n === undefined) {
-    tenantData.vector_kb_rerank_top_n = DEFAULT_RAG_ENHANCEMENT_CONFIG.rerankTopN;
+    tenantData.vector_kb_rerank_top_n =
+      DEFAULT_RAG_ENHANCEMENT_CONFIG.rerankTopN;
   }
   if (tenantData && tenantData.vector_kb_rerank_candidates === undefined) {
-    tenantData.vector_kb_rerank_candidates = DEFAULT_RAG_ENHANCEMENT_CONFIG.rerankCandidates;
+    tenantData.vector_kb_rerank_candidates =
+      DEFAULT_RAG_ENHANCEMENT_CONFIG.rerankCandidates;
   }
   if (tenantData && tenantData.vector_kb_hybrid_enabled === undefined) {
-    tenantData.vector_kb_hybrid_enabled = DEFAULT_RAG_ENHANCEMENT_CONFIG.hybridEnabled;
+    tenantData.vector_kb_hybrid_enabled =
+      DEFAULT_RAG_ENHANCEMENT_CONFIG.hybridEnabled;
   }
   if (tenantData && tenantData.vector_kb_hybrid_alpha === undefined) {
-    tenantData.vector_kb_hybrid_alpha = DEFAULT_RAG_ENHANCEMENT_CONFIG.hybridAlpha;
+    tenantData.vector_kb_hybrid_alpha =
+      DEFAULT_RAG_ENHANCEMENT_CONFIG.hybridAlpha;
   }
   if (tenantData && tenantData.vector_kb_answerability_enabled === undefined) {
-    tenantData.vector_kb_answerability_enabled = DEFAULT_RAG_ENHANCEMENT_CONFIG.answerabilityEnabled;
+    tenantData.vector_kb_answerability_enabled =
+      DEFAULT_RAG_ENHANCEMENT_CONFIG.answerabilityEnabled;
   }
-  if (tenantData && tenantData.vector_kb_answerability_threshold === undefined) {
-    tenantData.vector_kb_answerability_threshold = DEFAULT_RAG_ENHANCEMENT_CONFIG.answerabilityThreshold;
+  if (
+    tenantData &&
+    tenantData.vector_kb_answerability_threshold === undefined
+  ) {
+    tenantData.vector_kb_answerability_threshold =
+      DEFAULT_RAG_ENHANCEMENT_CONFIG.answerabilityThreshold;
   }
   if (tenantData && tenantData.vector_kb_compression_enabled === undefined) {
-    tenantData.vector_kb_compression_enabled = DEFAULT_RAG_ENHANCEMENT_CONFIG.compressionEnabled;
+    tenantData.vector_kb_compression_enabled =
+      DEFAULT_RAG_ENHANCEMENT_CONFIG.compressionEnabled;
   }
   if (tenantData && tenantData.vector_kb_multihop_enabled === undefined) {
-    tenantData.vector_kb_multihop_enabled = DEFAULT_RAG_ENHANCEMENT_CONFIG.multiHopEnabled;
+    tenantData.vector_kb_multihop_enabled =
+      DEFAULT_RAG_ENHANCEMENT_CONFIG.multiHopEnabled;
   }
   if (tenantData && tenantData.vector_kb_max_hops === undefined) {
     tenantData.vector_kb_max_hops = DEFAULT_RAG_ENHANCEMENT_CONFIG.maxHops;
@@ -202,10 +223,10 @@
   // Vector KB state
   let vectorKbEnabled: boolean = $state(tenantData?.vector_kb_enabled ?? false);
   let selectedEmbeddingProvider: EmbeddingProvider = $state(
-    tenantData?.vector_kb_embedding_provider ?? EmbeddingProvider.OpenAI
+    tenantData?.vector_kb_embedding_provider ?? EmbeddingProvider.OpenAI,
   );
   let selectedEmbeddingModel: string = $state(
-    tenantData?.vector_kb_embedding_model ?? "text-embedding-3-small"
+    tenantData?.vector_kb_embedding_model ?? "text-embedding-3-small",
   );
 
   // Compute available embedding providers based on configured API keys
@@ -215,7 +236,10 @@
       providers.push({ value: EmbeddingProvider.OpenAI, label: "OpenAI" });
     }
     if (azureOpenAIEnabled || tenantData?.azure_openai_api_key) {
-      providers.push({ value: EmbeddingProvider.AzureOpenAI, label: "Azure OpenAI" });
+      providers.push({
+        value: EmbeddingProvider.AzureOpenAI,
+        label: "Azure OpenAI",
+      });
     }
     if (geminiEnabled || tenantData?.gemini_api_key) {
       providers.push({ value: EmbeddingProvider.Gemini, label: "Gemini" });
@@ -393,16 +417,22 @@
   // Check if any Audio Assistant features are enabled
   const isAnyAudioAssistantFeatureEnabled = $derived(
     audioStandardArray.some((item) => item.checked) ||
-    audioProArray.some((item) => item.checked),
+      audioProArray.some((item) => item.checked),
   );
 
   // Auto-sync parent active toggles with sub-feature checkboxes
   $effect(() => {
     // Sync Audio Assistant active toggle with sub-features
-    if (isAnyAudioAssistantFeatureEnabled && !tenantData.audio_assistant_active) {
+    if (
+      isAnyAudioAssistantFeatureEnabled &&
+      !tenantData.audio_assistant_active
+    ) {
       // If any feature is checked but toggle is off, enable it
       tenantData.audio_assistant_active = true;
-    } else if (!isAnyAudioAssistantFeatureEnabled && tenantData.audio_assistant_active) {
+    } else if (
+      !isAnyAudioAssistantFeatureEnabled &&
+      tenantData.audio_assistant_active
+    ) {
       // If no features are checked but toggle is on, disable it
       tenantData.audio_assistant_active = false;
     }
@@ -413,7 +443,10 @@
     if (isAnySubtitleFeatureEnabled && !tenantData.subtitle_studio_active) {
       // If any feature is checked but toggle is off, enable it
       tenantData.subtitle_studio_active = true;
-    } else if (!isAnySubtitleFeatureEnabled && tenantData.subtitle_studio_active) {
+    } else if (
+      !isAnySubtitleFeatureEnabled &&
+      tenantData.subtitle_studio_active
+    ) {
       // If no features are checked but toggle is on, disable it
       tenantData.subtitle_studio_active = false;
     }
@@ -736,8 +769,12 @@
 
         // Vector KB settings
         tenantData.vector_kb_enabled = vectorKbEnabled;
-        tenantData.vector_kb_embedding_provider = vectorKbEnabled ? selectedEmbeddingProvider : null;
-        tenantData.vector_kb_embedding_model = vectorKbEnabled ? selectedEmbeddingModel : null;
+        tenantData.vector_kb_embedding_provider = vectorKbEnabled
+          ? selectedEmbeddingProvider
+          : null;
+        tenantData.vector_kb_embedding_model = vectorKbEnabled
+          ? selectedEmbeddingModel
+          : null;
 
         updateTextFeature(ApiKeyProvider.OpenAI, openAIEnabled);
         updateTextFeature(ApiKeyProvider.OpenAIGpt5, openAIGpt5Enabled);
@@ -910,8 +947,12 @@
 
         // Vector KB settings
         tenantData.vector_kb_enabled = vectorKbEnabled;
-        tenantData.vector_kb_embedding_provider = vectorKbEnabled ? selectedEmbeddingProvider : null;
-        tenantData.vector_kb_embedding_model = vectorKbEnabled ? selectedEmbeddingModel : null;
+        tenantData.vector_kb_embedding_provider = vectorKbEnabled
+          ? selectedEmbeddingProvider
+          : null;
+        tenantData.vector_kb_embedding_model = vectorKbEnabled
+          ? selectedEmbeddingModel
+          : null;
 
         updateTextFeature(ApiKeyProvider.OpenAI, openAIEnabled);
         updateTextFeature(ApiKeyProvider.OpenAIGpt5, openAIGpt5Enabled);
@@ -1201,913 +1242,913 @@
     </div>
   </div>
 </div>
+
 <div class="px-8 mb-10">
-  <div class="container w-full mx-auto p-6">
-    <div class="flex flex-row space-x-4">
-      <div class="flex-1 flex flex-col mb-4">
-        <span class="mb-2 text-base-content font-medium text-sm"
-          >{t("tenant.tenants.tenant.display-name")}*</span
-        >
-        <input
-          type="text"
-          placeholder={t("tenant.tenants.tenant.display-name")}
-          class="input input-bordered w-full"
-          bind:value={tenantData.name}
-        />
-      </div>
-
-      <div class="flex-1 flex flex-col mb-4">
-        <span class="mb-2 text-base-content font-medium text-sm"
-          >{t("tenant.tenants.tenant.name")}*</span
-        >
-        <input
-          type="text"
-          placeholder={t("tenant.tenants.tenant.identification-name")}
-          class="input input-bordered w-full"
-          use:trimInput
-          use:toLowerCase
-          use:replaceSpecialChars
-          bind:value={tenantData.org_name}
-        />
-      </div>
-    </div>
-
-    <div class="flex flex-row space-x-4">
-      <div class="flex-1 flex flex-col mb-4">
-        <Dropdown
-          label={`${t("tenant.language")}*`}
-          options={Languges}
-          bind:value={selectedLanguage}
-        />
-      </div>
-
-      <div class="flex-1 flex flex-col mb-4">
-        <ThemeItem
-          title={`${t("tenant.theme")}*`}
-          placeholder="e.g Light"
-          items={Themes}
-          bind:selectedItem={selectedThemes}
-        />
-      </div>
-    </div>
-
-    <div class="flex flex-row space-x-4">
-      <div class="flex-1 flex flex-col mb-4">
-        <div class="flex justify-end">
-          <button
-            class={"mt-7 mr-2 btn btn-sm btn-outline font-normal grow-0 w-auto " +
-              `${mode == MODE.Edit ? "" : "btn-disabled"}`}
-            onclick={() => {
-              addTenantAdminFor = "admin";
-              addTenantAdminModal?.show();
-            }}
-          >
-            {@html svgIcons.add}
-            {t("tenant.add-tenant-admin")}
-          </button>
-
-          <button
-            class={"mt-7 btn btn-sm btn-secondary font-normal grow-0 w-auto " +
-              `${mode == MODE.Edit ? "" : "btn-disabled"}`}
-            onclick={() => {
-              addTenantAdminFor = "sa";
-              addTenantAdminModal?.show();
-            }}
-          >
-            {@html svgIcons.add}
-            {t("tenant.add-tenant-supper-admin")}
-          </button>
+  <div class="flex items-start gap-10 p-6">
+    <!-- MAIN CONTENT -->
+    <div class="flex-[4]">
+      <!-- General settings -->
+      <div class="p-5 mb-8 bg-base-100 rounded-lg">
+        <div class="mb-4 flex flex-row items-center gap-2">
+          {@html svgIcons.userGroup}
+          <p class="font-bold text-md">{"General Settings"}</p>
         </div>
-      </div>
-    </div>
-
-    <div class="divider"></div>
-
-    <!-- Subscription & Billing -->
-    <div class="mb-3 flex flex-row items-center gap-2">
-      {@html svgIcons.money}
-      <p class="font-medium text-md">{t("tenant.subscription-billing")}</p>
-    </div>
-    <div class="flex flex-row space-x-4">
-      <div class="flex-1 flex flex-col mb-4">
-        <Dropdown
-          label={t("tenant.subscription")}
-          options={[
-            { value: SubscriptionPackageId.Starter, title: "aibox Starter" },
-            { value: SubscriptionPackageId.Teams, title: "aibox Teams" },
-            { value: SubscriptionPackageId.Pro, title: "aibox Pro" },
-            { value: SubscriptionExtraPackage.Test, title: "Test" },
-            {
-              value: SubscriptionExtraPackage.TeamsReseller,
-              title: "aibox Teams (Reseller)",
-            },
-            {
-              value: SubscriptionExtraPackage.ProReseller,
-              title: "aibox Pro (Reseller)",
-            },
-            { value: SubscriptionExtraPackage.Internal, title: "Internal" },
-            {
-              value: SubscriptionExtraPackage.Enterprise,
-              title: "aibox Enterprise",
-            },
-          ]}
-          bind:value={selectedPlan}
-        />
-      </div>
-      <div class="flex-1 flex flex-col mb-4">
-        <AudioAddonsDropdown
-          title={t("tenant.audio-subscription")}
-          placeholder=""
-          bind:value={selectedAudioToTextOptions}
-          type="audiototext"
-        />
-      </div>
-    </div>
-
-    <div class="flex flex-row space-x-4">
-      <div class="flex-1 flex flex-col mb-4">
-        <AudioAddonsDropdown
-          title={t("tenant.subtitle-subscription")}
-          placeholder=""
-          bind:value={selectedSubtitleStudioOptions}
-          type="subtitlestudio"
-        />
-      </div>
-
-      <div class="flex-1 flex flex-col mb-4">
-        <p class="mb-2">{t("tenant.total-price")}</p>
-        <input
-          type="text"
-          class="input input-bordered w-full"
-          bind:value={tenantData.totalPrice}
-        />
-      </div>
-    </div>
-
-    <div class="flex flex-row space-x-4">
-      <div class="flex-1 flex flex-col mb-4">
-        <p class="mb-2">{t("tenant.subscription-start-date")}</p>
-        <input
-          type="date"
-          bind:value={subscriptionStartDate}
-          class="input input-bordered w-full font-medium pr-10 focus:ring-2 focus:ring-indigo-500"
-        />
-      </div>
-      <div class="flex-1 flex flex-col mb-4">
-        <p class="mb-2">{t("tenant.subscription-cancelled-date")}</p>
-
-        <input
-          type="date"
-          bind:value={subscriptionCancelledDate}
-          class="input input-bordered font-medium w-full min-w-xs"
-        />
-      </div>
-    </div>
-
-    <div class="flex flex-row space-x-4">
-      <div class="flex-1 flex flex-col mb-4">
-        <span class="mb-2 text-base-content font-medium text-sm"
-          >{t("subscription.billing-method")}</span
-        >
-        <input
-          type="text"
-          class="input input-bordered bg-base-200 w-full"
-          readonly
-          value={tenantData.billing_method
-            ? BillingMethodLabels[tenantData.billing_method as BillingMethod]
-            : ""}
-        />
-      </div>
-      <div class="flex-1 flex flex-col mb-4">
-        {#if tenantData.billing_method === BillingMethod.CreditCard}
-          <span class="mb-2 text-base-content font-medium text-sm">&nbsp;</span>
-          <button
-            class="btn btn-sm btn-neutral px-10 self-start font-medium"
-            onclick={goToBillingPortal}
-          >
-            {"Stripe"}
-          </button>
-        {/if}
-      </div>
-    </div>
-    <div class="flex flex-row space-x-4">
-      <div class="flex-1 flex flex-col mb-4">
-        <span class="mb-2 text-base-content font-medium text-sm"
-          >{t("subscription.company-name")}</span
-        >
-        <input
-          type="text"
-          class="input input-bordered w-full"
-          bind:value={tenantData.billing_info.company_name}
-        />
-      </div>
-      <div class="flex-1 flex flex-col mb-4">
-        <span class="mb-2 text-base-content font-medium text-sm"
-          >{t("subscription.billing-email")}</span
-        >
-        <input
-          type="text"
-          class="input input-bordered w-full"
-          bind:value={tenantData.billing_info.email}
-        />
-      </div>
-    </div>
-    <div class="flex flex-row space-x-4">
-      <div class="flex-1 flex flex-col mb-4">
-        <span class="mb-2 text-base-content font-medium text-sm"
-          >{t("subscription.street-number")}</span
-        >
-        <input
-          type="text"
-          class="input input-bordered w-full"
-          bind:value={tenantData.billing_info.address}
-        />
-      </div>
-      <div class="flex-1 flex flex-col mb-4">
-        <span class="mb-2 text-base-content font-medium text-sm"
-          >{t("subscription.zip-code")}</span
-        >
-        <input
-          type="text"
-          class="input input-bordered w-full"
-          bind:value={tenantData.billing_info.zip_code}
-        />
-      </div>
-    </div>
-    <div class="flex flex-row space-x-4">
-      <div class="flex-1 flex flex-col mb-4">
-        <span class="mb-2 text-base-content font-medium text-sm"
-          >{t("subscription.location")}</span
-        >
-        <input
-          type="text"
-          class="input input-bordered w-full"
-          bind:value={tenantData.billing_info.location}
-        />
-      </div>
-      <div class="flex-1 flex flex-col mb-4">
-        <span class="mb-2 text-base-content font-medium text-sm"
-          >{t("tenant.comment")}</span
-        >
-        <textarea
-          name="comment"
-          id="comment"
-          class="input input-bordered w-full py-2 text-gray-500"
-          bind:value={tenantData.comment}
-        ></textarea>
-      </div>
-    </div>
-
-    <div class="flex flex-row space-x-4">
-      <div class="flex-1 flex flex-col mb-4">
-        <span class="mb-2 text-base-content font-medium text-sm"
-          >{t("tenant.user-limit")}</span
-        >
-        <input
-          type="number"
-          placeholder=""
-          class="input input-bordered w-full"
-          bind:value={tenantData.max_user_limit}
-        />
-      </div>
-      <div class="flex-1 flex flex-col mb-4">
-        <span class="mb-2 text-base-content font-medium text-sm"
-          >{t("subscription.number-of-active-user")}</span
-        >
-        <input
-          type="number"
-          class="input input-bordered bg-base-200 w-full"
-          readonly
-          value={activeUsers}
-        />
-      </div>
-    </div>
-
-    <div class="divider"></div>
-
-    <!-- Features -->
-    <div class="mb-3 flex flex-row items-center gap-2">
-      {@html svgIcons.textPrompt}
-      <p class="font-medium text-md">{t("tenant.text.prompt.features")}</p>
-    </div>
-
-    <div class="container mx-auto">
-      <!-- Open AI Section -->
-      <div
-        class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
-      >
-        <input type="checkbox" />
-        <div class="collapse-title">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center">
-              <input
-                id="feature-text-prompt"
-                type="checkbox"
-                bind:checked={openAIEnabled}
-                class="checkbox checkbox-primary z-10"
-                disabled={defaultTextFeature === ApiKeyProvider.OpenAI}
-              />
-              <label
-                class="label cursor-pointer ml-2"
-                for="feature-text-prompt"
-              >
-                <span class="label-text text-base-content"
-                  >{t("tenant.open-ai-provider")}</span
-                >
-              </label>
-            </div>
-            {#if defaultTextFeature === ApiKeyProvider.OpenAI}
-              <span class="mb-2 text-base-content/50 font-medium text-sm"
-                >{t("tenant.default")}</span
-              >
-            {/if}
-          </div>
-        </div>
-        <div class="collapse-content">
-          <div class="grid grid-cols-2 gap-4 mx-8">
-            <div class="w-full">
-              <span class="mb-2 text-base-content font-medium text-sm"
-                >{t("tenant.model.name")}</span
-              >
-              <input
-                type="text"
-                class="input input-bordered mt-2 w-full"
-                placeholder={""}
-                use:trimInput
-                bind:value={tenantData.openai_chat_model}
-                disabled
-              />
-            </div>
-            <div class="w-full">
-              <span class="mb-2 text-base-content font-medium text-sm"
-                >{t("tenant.api-key")}</span
-              >
-
-              <label
-                class="input input-bordered flex items-center gap-2 mt-2 w-full"
-              >
-                <input
-                  bind:this={openAIKeyField}
-                  type="password"
-                  class="grow"
-                  placeholder={t("tenant.api-key")}
-                  bind:value={tenantData.openai_api_key}
-                />
-                <TogglePasswordIcon
-                  change={() => togglePassword(openAIKeyField)}
-                />
-              </label>
-            </div>
-            <div class="grid grid-cols-2 gap-4">
-              <label class="flex flex-row items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={defaultTextFeature === ApiKeyProvider.OpenAI}
-                  class="checkbox checkbox-primary"
-                  onchange={() => toggleTextFeature(ApiKeyProvider.OpenAI)}
-                />
-                <span class="label-text">{t("tenant.mark-as-default")}</span>
-              </label>
-              <label class="flex flex-row items-center gap-2">
-                <input
-                  type="checkbox"
-                  class="checkbox checkbox-primary"
-                  bind:checked={tenantData.metadata.openaiPrivateKeyEnabled}
-                />
-                <span class="label-text"
-                  >{t("tenant.settings.private-api-key")}</span
-                >
-              </label>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Open AI GPT-5 Section -->
-      <div
-        class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
-      >
-        <input type="checkbox" />
-        <div class="collapse-title">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center">
-              <input
-                id="feature-text-prompt-gpt-5"
-                type="checkbox"
-                bind:checked={openAIGpt5Enabled}
-                class="checkbox checkbox-primary z-10"
-                disabled={defaultTextFeature === ApiKeyProvider.OpenAIGpt5}
-              />
-              <label
-                class="label cursor-pointer ml-2"
-                for="feature-text-prompt-gpt-5"
-              >
-                <span class="label-text text-base-content"
-                  >{t("tenant.open-ai-provider")} GPT-5</span
-                >
-              </label>
-            </div>
-            {#if defaultTextFeature === ApiKeyProvider.OpenAIGpt5}
-              <span class="mb-2 text-base-content/50 font-medium text-sm"
-                >{t("tenant.default")}</span
-              >
-            {/if}
-          </div>
-        </div>
-        <div class="collapse-content">
-          <div class="grid grid-cols-2 gap-4 mx-8">
-            <div class="w-full">
-              <span class="mb-2 text-base-content font-medium text-sm"
-                >{t("tenant.model.name")}</span
-              >
-              <input
-                type="text"
-                class="input input-bordered mt-2 w-full"
-                placeholder={""}
-                use:trimInput
-                bind:value={tenantData.openai_gpt5_chat_model}
-                disabled
-              />
-            </div>
-            <div class="w-full">
-              <span class="mb-2 text-base-content font-medium text-sm"
-                >{t("tenant.api-key")}</span
-              >
-              <label
-                class="input input-bordered flex items-center gap-2 mt-2 w-full"
-              >
-                <input
-                  bind:this={openAIGpt5KeyField}
-                  type="password"
-                  class="grow"
-                  placeholder={t("tenant.api-key")}
-                  bind:value={tenantData.openai_gpt5_api_key}
-                />
-                <TogglePasswordIcon
-                  change={() => togglePassword(openAIGpt5KeyField)}
-                />
-              </label>
-            </div>
-
-            <div class="grid grid-cols-2 gap-4">
-              <label class="flex flex-row items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={defaultTextFeature === ApiKeyProvider.OpenAIGpt5}
-                  class="checkbox checkbox-primary"
-                  onchange={() => toggleTextFeature(ApiKeyProvider.OpenAIGpt5)}
-                />
-                <span class="label-text">{t("tenant.mark-as-default")}</span>
-              </label>
-              <label class="flex flex-row items-center gap-2">
-                <input
-                  type="checkbox"
-                  class="checkbox checkbox-primary"
-                  bind:checked={tenantData.metadata.openaiGpt5PrivateKeyEnabled}
-                />
-                <span class="label-text"
-                  >{t("tenant.settings.private-api-key")}</span
-                >
-              </label>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Azure Section -->
-      <div
-        class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
-      >
-        <input type="checkbox" />
-        <div class="collapse-title">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center">
-              <input
-                id="feature-azure-section"
-                type="checkbox"
-                bind:checked={azureOpenAIEnabled}
-                class="checkbox checkbox-primary z-10"
-                disabled={defaultTextFeature === ApiKeyProvider.AzureOpenAI}
-              />
-              <label
-                class="label cursor-pointer ml-2"
-                for="feature-azure-section"
-              >
-                <span class="label-text text-base-content"
-                  >{t("tenant.azure-open-ai-provider")}</span
-                >
-              </label>
-            </div>
-            {#if defaultTextFeature === ApiKeyProvider.AzureOpenAI}
-              <span class="mb-2 text-base-content/50 font-medium text-sm"
-                >{t("tenant.default")}</span
-              >
-            {/if}
-          </div>
-        </div>
-        <div class="collapse-content">
-          <div class="grid grid-cols-2 gap-4 mx-8">
-            <div class="w-full">
-              <span class="mb-2 text-base-content font-medium text-sm"
-                >{t("tenant.azure-open-ai-provider")}</span
-              >
-
-              <label
-                class="input input-bordered flex items-center gap-2 mt-2 w-full"
-              >
-                <input
-                  bind:this={azureOpenAIKeyField}
-                  type="password"
-                  class="grow"
-                  placeholder={t("tenant.api-key")}
-                  bind:value={tenantData.azure_openai_api_key}
-                />
-                <TogglePasswordIcon
-                  change={() => togglePassword(azureOpenAIKeyField)}
-                />
-              </label>
-            </div>
-            <div class="w-full">
-              <span class="mb-2 text-base-content font-medium text-sm"
-                >{t("tenant.azure-open-ai-instance-name")}</span
-              >
-              <input
-                type="text"
-                class="input input-bordered mt-2 w-full"
-                placeholder={""}
-                use:trimInput
-                bind:value={tenantData.azure_openai_instance_name}
-              />
-            </div>
-
-            <div class="w-full">
-              <span class="mb-2 ttext-base-content font-medium text-sm"
-                >{t("tenant.azure-open-ai-endpoint")}</span
-              >
-              <input
-                type="text"
-                class="input input-bordered mt-2 w-full"
-                placeholder={""}
-                bind:value={tenantData.azure_openai_endpoint}
-              />
-            </div>
-            <div class="w-full">
-              <span class="mb-2 text-base-content font-medium text-sm"
-                >{t("tenant.azure-open-ai-transciption-model")}</span
-              >
-              <input
-                type="text"
-                class="input input-bordered mt-2 w-full"
-                placeholder={""}
-                use:trimInput
-                bind:value={tenantData.azure_openai_whisper_model}
-              />
-            </div>
-
-            <div class="w-full">
-              <span class="mb-2 text-base-content font-medium text-sm"
-                >{t("tenant.azure-open-ai-text-model")}</span
-              >
-              <input
-                type="text"
-                class="input input-bordered mt-2 w-full"
-                placeholder={""}
-                use:trimInput
-                bind:value={tenantData.azure_openai_chat_model}
-              />
-            </div>
-            <div></div>
-            <div class="grid grid-cols-2 gap-4">
-              <label class="flex flex-row items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={defaultTextFeature === ApiKeyProvider.AzureOpenAI}
-                  class="checkbox checkbox-primary"
-                  onchange={() => toggleTextFeature(ApiKeyProvider.AzureOpenAI)}
-                />
-                <span class="label-text">{t("tenant.mark-as-default")}</span>
-              </label>
-              <label class="flex flex-row items-center gap-2">
-                <input
-                  type="checkbox"
-                  class="checkbox checkbox-primary"
-                  bind:checked={
-                    tenantData.metadata.azureOpenaiPrivateKeyEnabled
-                  }
-                />
-                <span class="label-text"
-                  >{t("tenant.settings.private-api-key")}</span
-                >
-              </label>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Perplexity Section -->
-      <div
-        class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
-      >
-        <input type="checkbox" />
-        <div class="collapse-title">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center">
-              <input
-                id="feature-perplexity-section"
-                type="checkbox"
-                bind:checked={perplexityEnabled}
-                class="checkbox checkbox-primary z-10"
-                disabled={defaultTextFeature === ApiKeyProvider.Perplexity}
-              />
-              <label
-                class="label cursor-pointer ml-2"
-                for="feature-perplexity-section"
-              >
-                <span class="label-text text-base-content"
-                  >{t("tenant.perplexity.name")}</span
-                >
-              </label>
-            </div>
-            {#if defaultTextFeature === ApiKeyProvider.Perplexity}
-              <span class="mb-2 text-base-content/50 font-medium text-sm"
-                >{t("tenant.default")}</span
-              >
-            {/if}
-          </div>
-        </div>
-        <div class="collapse-content">
-          <div class="grid grid-cols-2 gap-4 mx-8 mb-[30]">
-            <div class="w-full z-20">
-              <Dropdown
-                label={`${t("tenant.model.name")}*`}
-                options={[
-                  {
-                    value: "sonar",
-                    title: "sonar",
-                  },
-                ]}
-                bind:value={selectedPerplexityModel}
-              />
-            </div>
-            <div class="w-full">
-              <span class="mb-2 text-base-content font-medium text-sm"
-                >{t("tenant.api-key")}</span
-              >
-
-              <label
-                class="input input-bordered flex items-center gap-2 mt-1 w-full"
-              >
-                <input
-                  bind:this={perplexityKeyField}
-                  type="password"
-                  class="grow"
-                  placeholder={t("tenant.api-key")}
-                  bind:value={tenantData.perplexity_api_key}
-                />
-                <TogglePasswordIcon
-                  change={() => togglePassword(perplexityKeyField)}
-                />
-              </label>
-            </div>
-            <div class="grid grid-cols-2 gap-4">
-              <label class="flex flex-row items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={defaultTextFeature === ApiKeyProvider.Perplexity}
-                  class="checkbox checkbox-primary"
-                  onchange={() => toggleTextFeature(ApiKeyProvider.Perplexity)}
-                />
-                <span class="label-text">{t("tenant.mark-as-default")}</span>
-              </label>
-              <label class="flex flex-row items-center gap-2">
-                <input
-                  type="checkbox"
-                  class="checkbox checkbox-primary"
-                  bind:checked={tenantData.metadata.perplexityPrivateKeyEnabled}
-                />
-                <span class="label-text"
-                  >{t("tenant.settings.private-api-key")}</span
-                >
-              </label>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Claude Section -->
-      <div
-        class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
-      >
-        <input type="checkbox" />
-        <div class="collapse-title">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center">
-              <input
-                id="feature-claude-section"
-                type="checkbox"
-                bind:checked={claudeEnabled}
-                class="checkbox checkbox-primary z-10"
-                disabled={defaultTextFeature === ApiKeyProvider.Claude}
-              />
-              <label
-                class="label cursor-pointer ml-2"
-                for="feature-claude-section"
-              >
-                <span class="label-text text-base-content"
-                  >{t("tenant.claude.name")}</span
-                >
-              </label>
-            </div>
-            {#if defaultTextFeature === ApiKeyProvider.Claude}
-              <span class="mb-2 text-base-content/50 font-medium text-sm"
-                >{t("tenant.default")}</span
-              >
-            {/if}
-          </div>
-        </div>
-        <div class="collapse-content">
-          <div class="grid grid-cols-2 gap-4 mx-8 mb-[30]">
-            <div class="w-full z-20">
-              <Dropdown
-                label={`${t("tenant.model.name")}*`}
-                options={[
-                  {
-                    value: "claude-sonnet-4-0",
-                    title: "claude-sonnet-4-0",
-                  },
-                ]}
-                bind:value={selectedClaudeModel}
-              />
-            </div>
-            <div class="w-full">
-              <span class="mb-2 text-base-content font-medium text-sm"
-                >{t("tenant.api-key")}</span
-              >
-
-              <label
-                class="input input-bordered flex items-center gap-2 mt-1 w-full"
-              >
-                <input
-                  bind:this={claudeKeyField}
-                  type="password"
-                  class="grow"
-                  placeholder={t("tenant.api-key")}
-                  bind:value={tenantData.anthropic_api_key}
-                />
-                <TogglePasswordIcon
-                  change={() => togglePassword(claudeKeyField)}
-                />
-              </label>
-            </div>
-            <div class="grid grid-cols-2 gap-4">
-              <label class="flex flex-row items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={defaultTextFeature === ApiKeyProvider.Claude}
-                  class="checkbox checkbox-primary"
-                  onchange={() => toggleTextFeature(ApiKeyProvider.Claude)}
-                />
-                <span class="label-text">{t("tenant.mark-as-default")}</span>
-              </label>
-              <label class="flex flex-row items-center gap-2">
-                <input
-                  type="checkbox"
-                  class="checkbox checkbox-primary"
-                  bind:checked={tenantData.metadata.claudePrivateKeyEnabled}
-                />
-                <span class="label-text"
-                  >{t("tenant.settings.private-api-key")}</span
-                >
-              </label>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Gemini Section -->
-      <div
-        class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
-      >
-        <input type="checkbox" />
-        <div class="collapse-title">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center">
-              <input
-                id="feature-gemini-section"
-                type="checkbox"
-                bind:checked={geminiEnabled}
-                class="checkbox checkbox-primary z-10"
-                disabled={defaultTextFeature === ApiKeyProvider.Gemini}
-              />
-              <label
-                class="label cursor-pointer ml-2"
-                for="feature-gemini-section"
-              >
-                <span class="label-text text-base-content"
-                  >{t("tenant.gemini.name")}</span
-                >
-              </label>
-            </div>
-            {#if defaultTextFeature === ApiKeyProvider.Gemini}
-              <span class="mb-2 text-base-content/50 font-medium text-sm"
-                >{t("tenant.default")}</span
-              >
-            {/if}
-          </div>
-        </div>
-        <div class="collapse-content">
-          <div class="grid grid-cols-2 gap-4 mx-8 mb-[30]">
-            <div class="w-full z-20">
-              <Dropdown
-                label={`${t("tenant.model.name")}*`}
-                options={[
-                  {
-                    value: TextModel.Gemini,
-                    title: "gemini-2.5-flash",
-                  },
-                ]}
-                bind:value={selectedGeminiModel}
-              />
-            </div>
-            <div class="w-full">
-              <span class="mb-2 text-base-content font-medium text-sm"
-                >{t("tenant.api-key")}</span
-              >
-
-              <label
-                class="input input-bordered flex items-center gap-2 mt-1 w-full"
-              >
-                <input
-                  bind:this={geminiKeyField}
-                  type="password"
-                  class="grow"
-                  placeholder={t("tenant.api-key")}
-                  bind:value={tenantData.gemini_api_key}
-                />
-                <TogglePasswordIcon
-                  change={() => togglePassword(geminiKeyField)}
-                />
-              </label>
-            </div>
-            <div class="grid grid-cols-2 gap-4">
-              <label class="flex flex-row items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={defaultTextFeature === ApiKeyProvider.Gemini}
-                  class="checkbox checkbox-primary"
-                  onchange={() => toggleTextFeature(ApiKeyProvider.Gemini)}
-                />
-                <span class="label-text">{t("tenant.mark-as-default")}</span>
-              </label>
-              <label class="flex flex-row items-center gap-2">
-                <input
-                  type="checkbox"
-                  class="checkbox checkbox-primary"
-                  bind:checked={tenantData.metadata.geminiPrivateKeyEnabled}
-                />
-                <span class="label-text"
-                  >{t("tenant.settings.private-api-key")}</span
-                >
-              </label>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="divider"></div>
-
-    <!-- AUDIO ASSISTANT Section -->
-    <div class="mb-3 flex flex-row items-center justify-between">
-      <div class="flex flex-row items-center gap-2">
-        {@html svgIcons.audioToText}
-        <p class="font-medium text-md">{t("nav.audiotool")}</p>
-      </div>
-      <!-- Active Toggle -->
-      <label class="flex items-center gap-2">
-        <span class="label-text">{t("tenant.tenants.tenant.active")}</span>
-        <input
-          type="checkbox"
-          class="toggle toggle-primary"
-          bind:checked={tenantData.audio_assistant_active}
-        />
-      </label>
-    </div>
-    <div class="container mx-auto">
-      <!-- Audio Whisper Section -->
-      <div
-        class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
-      >
-        <input type="checkbox" />
-        <div class="collapse-title flex items-center justify-between gap-4">
-          <div class="flex items-center">
+        <div class="flex flex-row space-x-4">
+          <div class="flex-1 flex flex-col mb-4">
+            <span class="mb-2 text-base-content font-medium text-sm"
+              >{t("tenant.tenants.tenant.display-name")}*</span
+            >
             <input
-              id="audio-whisper-model"
-              type="checkbox"
-              bind:checked={audioStandardArray[0].checked}
-              class="checkbox checkbox-primary z-10"
+              type="text"
+              placeholder={t("tenant.tenants.tenant.display-name")}
+              class="input input-bordered w-full"
+              bind:value={tenantData.name}
             />
-            <!-- Original: disabled parent checkbox that reflected child state
+          </div>
+
+          <div class="flex-1 flex flex-col mb-4">
+            <span class="mb-2 text-base-content font-medium text-sm"
+              >{t("tenant.tenants.tenant.name")}*</span
+            >
+            <input
+              type="text"
+              placeholder={t("tenant.tenants.tenant.identification-name")}
+              class="input input-bordered w-full"
+              use:trimInput
+              use:toLowerCase
+              use:replaceSpecialChars
+              bind:value={tenantData.org_name}
+            />
+          </div>
+        </div>
+
+        <div class="flex flex-row space-x-4">
+          <div class="flex-1 flex flex-col mb-4">
+            <Dropdown
+              label={`${t("tenant.language")}*`}
+              options={Languges}
+              bind:value={selectedLanguage}
+            />
+          </div>
+
+          <div class="flex-1 flex flex-col mb-4">
+            <ThemeItem
+              title={`${t("tenant.theme")}*`}
+              placeholder="e.g Light"
+              items={Themes}
+              bind:selectedItem={selectedThemes}
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Subscription & Billing -->
+      <div class="p-5 mb-8 bg-base-100 rounded-lg">
+        <div class="mb-3 flex flex-row items-center gap-2">
+          {@html svgIcons.money}
+          <p class="font-medium text-md">{t("tenant.subscription-billing")}</p>
+        </div>
+        <div class="flex flex-row space-x-4">
+          <div class="flex-1 flex flex-col mb-4">
+            <Dropdown
+              label={t("tenant.subscription")}
+              options={[
+                {
+                  value: SubscriptionPackageId.Starter,
+                  title: "aibox Starter",
+                },
+                { value: SubscriptionPackageId.Teams, title: "aibox Teams" },
+                { value: SubscriptionPackageId.Pro, title: "aibox Pro" },
+                { value: SubscriptionExtraPackage.Test, title: "Test" },
+                {
+                  value: SubscriptionExtraPackage.TeamsReseller,
+                  title: "aibox Teams (Reseller)",
+                },
+                {
+                  value: SubscriptionExtraPackage.ProReseller,
+                  title: "aibox Pro (Reseller)",
+                },
+                { value: SubscriptionExtraPackage.Internal, title: "Internal" },
+                {
+                  value: SubscriptionExtraPackage.Enterprise,
+                  title: "aibox Enterprise",
+                },
+              ]}
+              bind:value={selectedPlan}
+            />
+          </div>
+          <div class="flex-1 flex flex-col mb-4">
+            <AudioAddonsDropdown
+              title={t("tenant.audio-subscription")}
+              placeholder=""
+              bind:value={selectedAudioToTextOptions}
+              type="audiototext"
+            />
+          </div>
+        </div>
+
+        <div class="flex flex-row space-x-4">
+          <div class="flex-1 flex flex-col mb-4">
+            <AudioAddonsDropdown
+              title={t("tenant.subtitle-subscription")}
+              placeholder=""
+              bind:value={selectedSubtitleStudioOptions}
+              type="subtitlestudio"
+            />
+          </div>
+
+          <div class="flex-1 flex flex-col mb-4">
+            <p class="mb-2">{t("tenant.total-price")}</p>
+            <input
+              type="text"
+              class="input input-bordered w-full"
+              bind:value={tenantData.totalPrice}
+            />
+          </div>
+        </div>
+
+        <div class="flex flex-row space-x-4">
+          <div class="flex-1 flex flex-col mb-4">
+            <p class="mb-2">{t("tenant.subscription-start-date")}</p>
+            <input
+              type="date"
+              bind:value={subscriptionStartDate}
+              class="input input-bordered w-full font-medium pr-10 focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+          <div class="flex-1 flex flex-col mb-4">
+            <p class="mb-2">{t("tenant.subscription-cancelled-date")}</p>
+
+            <input
+              type="date"
+              bind:value={subscriptionCancelledDate}
+              class="input input-bordered font-medium w-full min-w-xs"
+            />
+          </div>
+        </div>
+
+        <div class="flex flex-row space-x-4">
+          <div class="flex-1 flex flex-col mb-4">
+            <span class="mb-2 text-base-content font-medium text-sm"
+              >{t("subscription.billing-method")}</span
+            >
+            <input
+              type="text"
+              class="input input-bordered bg-base-200 w-full"
+              readonly
+              value={tenantData.billing_method
+                ? BillingMethodLabels[
+                    tenantData.billing_method as BillingMethod
+                  ]
+                : ""}
+            />
+          </div>
+          <div class="flex-1 flex flex-col mb-4">
+            {#if tenantData.billing_method === BillingMethod.CreditCard}
+              <span class="mb-2 text-base-content font-medium text-sm"
+                >&nbsp;</span
+              >
+              <button
+                class="btn btn-sm btn-neutral px-10 self-start font-medium"
+                onclick={goToBillingPortal}
+              >
+                {"Stripe"}
+              </button>
+            {/if}
+          </div>
+        </div>
+        <div class="flex flex-row space-x-4">
+          <div class="flex-1 flex flex-col mb-4">
+            <span class="mb-2 text-base-content font-medium text-sm"
+              >{t("subscription.company-name")}</span
+            >
+            <input
+              type="text"
+              class="input input-bordered w-full"
+              bind:value={tenantData.billing_info.company_name}
+            />
+          </div>
+          <div class="flex-1 flex flex-col mb-4">
+            <span class="mb-2 text-base-content font-medium text-sm"
+              >{t("subscription.billing-email")}</span
+            >
+            <input
+              type="text"
+              class="input input-bordered w-full"
+              bind:value={tenantData.billing_info.email}
+            />
+          </div>
+        </div>
+        <div class="flex flex-row space-x-4">
+          <div class="flex-1 flex flex-col mb-4">
+            <span class="mb-2 text-base-content font-medium text-sm"
+              >{t("subscription.street-number")}</span
+            >
+            <input
+              type="text"
+              class="input input-bordered w-full"
+              bind:value={tenantData.billing_info.address}
+            />
+          </div>
+          <div class="flex-1 flex flex-col mb-4">
+            <span class="mb-2 text-base-content font-medium text-sm"
+              >{t("subscription.zip-code")}</span
+            >
+            <input
+              type="text"
+              class="input input-bordered w-full"
+              bind:value={tenantData.billing_info.zip_code}
+            />
+          </div>
+        </div>
+        <div class="flex flex-row space-x-4">
+          <div class="flex-1 flex flex-col mb-4">
+            <span class="mb-2 text-base-content font-medium text-sm"
+              >{t("subscription.location")}</span
+            >
+            <input
+              type="text"
+              class="input input-bordered w-full"
+              bind:value={tenantData.billing_info.location}
+            />
+          </div>
+          <div class="flex-1 flex flex-col mb-4">
+            <span class="mb-2 text-base-content font-medium text-sm"
+              >{t("tenant.comment")}</span
+            >
+            <textarea
+              name="comment"
+              id="comment"
+              class="input input-bordered w-full py-2 text-gray-500"
+              bind:value={tenantData.comment}
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="flex flex-row space-x-4">
+          <div class="flex-1 flex flex-col mb-4">
+            <span class="mb-2 text-base-content font-medium text-sm"
+              >{t("tenant.user-limit")}</span
+            >
+            <input
+              type="number"
+              placeholder=""
+              class="input input-bordered w-full"
+              bind:value={tenantData.max_user_limit}
+            />
+          </div>
+          <div class="flex-1 flex flex-col mb-4">
+            <span class="mb-2 text-base-content font-medium text-sm"
+              >{t("subscription.number-of-active-user")}</span
+            >
+            <input
+              type="number"
+              class="input input-bordered bg-base-200 w-full"
+              readonly
+              value={activeUsers}
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Features -->
+      <div class="p-5 mb-8 bg-base-100 rounded-lg">
+        <div class="mb-3 flex flex-row items-center gap-2">
+          {@html svgIcons.textPrompt}
+          <p class="font-medium text-md">{t("tenant.text.prompt.features")}</p>
+        </div>
+
+        <div class="container mx-auto">
+          <!-- Open AI Section -->
+          <div
+            class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
+          >
+            <input type="checkbox" />
+            <div class="collapse-title">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                  <input
+                    id="feature-text-prompt"
+                    type="checkbox"
+                    bind:checked={openAIEnabled}
+                    class="checkbox checkbox-primary z-10"
+                    disabled={defaultTextFeature === ApiKeyProvider.OpenAI}
+                  />
+                  <label
+                    class="label cursor-pointer ml-2"
+                    for="feature-text-prompt"
+                  >
+                    <span class="label-text text-base-content"
+                      >{t("tenant.open-ai-provider")}</span
+                    >
+                  </label>
+                </div>
+                {#if defaultTextFeature === ApiKeyProvider.OpenAI}
+                  <span class="mb-2 text-base-content/50 font-medium text-sm"
+                    >{t("tenant.default")}</span
+                  >
+                {/if}
+              </div>
+            </div>
+            <div class="collapse-content">
+              <div class="grid grid-cols-2 gap-4 mx-8">
+                <div class="w-full">
+                  <span class="mb-2 text-base-content font-medium text-sm"
+                    >{t("tenant.model.name")}</span
+                  >
+                  <input
+                    type="text"
+                    class="input input-bordered mt-2 w-full"
+                    placeholder={""}
+                    use:trimInput
+                    bind:value={tenantData.openai_chat_model}
+                    disabled
+                  />
+                </div>
+                <div class="w-full">
+                  <span class="mb-2 text-base-content font-medium text-sm"
+                    >{t("tenant.api-key")}</span
+                  >
+
+                  <label
+                    class="input input-bordered flex items-center gap-2 mt-2 w-full"
+                  >
+                    <input
+                      bind:this={openAIKeyField}
+                      type="password"
+                      class="grow"
+                      placeholder={t("tenant.api-key")}
+                      bind:value={tenantData.openai_api_key}
+                    />
+                    <TogglePasswordIcon
+                      change={() => togglePassword(openAIKeyField)}
+                    />
+                  </label>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                  <label class="flex flex-row items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={defaultTextFeature === ApiKeyProvider.OpenAI}
+                      class="checkbox checkbox-primary"
+                      onchange={() => toggleTextFeature(ApiKeyProvider.OpenAI)}
+                    />
+                    <span class="label-text">{t("tenant.mark-as-default")}</span
+                    >
+                  </label>
+                  <label class="flex flex-row items-center gap-2">
+                    <input
+                      type="checkbox"
+                      class="checkbox checkbox-primary"
+                      bind:checked={tenantData.metadata.openaiPrivateKeyEnabled}
+                    />
+                    <span class="label-text"
+                      >{t("tenant.settings.private-api-key")}</span
+                    >
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Open AI GPT-5 Section -->
+          <div
+            class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
+          >
+            <input type="checkbox" />
+            <div class="collapse-title">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                  <input
+                    id="feature-text-prompt-gpt-5"
+                    type="checkbox"
+                    bind:checked={openAIGpt5Enabled}
+                    class="checkbox checkbox-primary z-10"
+                    disabled={defaultTextFeature === ApiKeyProvider.OpenAIGpt5}
+                  />
+                  <label
+                    class="label cursor-pointer ml-2"
+                    for="feature-text-prompt-gpt-5"
+                  >
+                    <span class="label-text text-base-content"
+                      >{t("tenant.open-ai-provider")} GPT-5</span
+                    >
+                  </label>
+                </div>
+                {#if defaultTextFeature === ApiKeyProvider.OpenAIGpt5}
+                  <span class="mb-2 text-base-content/50 font-medium text-sm"
+                    >{t("tenant.default")}</span
+                  >
+                {/if}
+              </div>
+            </div>
+            <div class="collapse-content">
+              <div class="grid grid-cols-2 gap-4 mx-8">
+                <div class="w-full">
+                  <span class="mb-2 text-base-content font-medium text-sm"
+                    >{t("tenant.model.name")}</span
+                  >
+                  <input
+                    type="text"
+                    class="input input-bordered mt-2 w-full"
+                    placeholder={""}
+                    use:trimInput
+                    bind:value={tenantData.openai_gpt5_chat_model}
+                    disabled
+                  />
+                </div>
+                <div class="w-full">
+                  <span class="mb-2 text-base-content font-medium text-sm"
+                    >{t("tenant.api-key")}</span
+                  >
+                  <label
+                    class="input input-bordered flex items-center gap-2 mt-2 w-full"
+                  >
+                    <input
+                      bind:this={openAIGpt5KeyField}
+                      type="password"
+                      class="grow"
+                      placeholder={t("tenant.api-key")}
+                      bind:value={tenantData.openai_gpt5_api_key}
+                    />
+                    <TogglePasswordIcon
+                      change={() => togglePassword(openAIGpt5KeyField)}
+                    />
+                  </label>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                  <label class="flex flex-row items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={defaultTextFeature === ApiKeyProvider.OpenAIGpt5}
+                      class="checkbox checkbox-primary"
+                      onchange={() =>
+                        toggleTextFeature(ApiKeyProvider.OpenAIGpt5)}
+                    />
+                    <span class="label-text">{t("tenant.mark-as-default")}</span
+                    >
+                  </label>
+                  <label class="flex flex-row items-center gap-2">
+                    <input
+                      type="checkbox"
+                      class="checkbox checkbox-primary"
+                      bind:checked={
+                        tenantData.metadata.openaiGpt5PrivateKeyEnabled
+                      }
+                    />
+                    <span class="label-text"
+                      >{t("tenant.settings.private-api-key")}</span
+                    >
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Azure Section -->
+          <div
+            class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
+          >
+            <input type="checkbox" />
+            <div class="collapse-title">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                  <input
+                    id="feature-azure-section"
+                    type="checkbox"
+                    bind:checked={azureOpenAIEnabled}
+                    class="checkbox checkbox-primary z-10"
+                    disabled={defaultTextFeature === ApiKeyProvider.AzureOpenAI}
+                  />
+                  <label
+                    class="label cursor-pointer ml-2"
+                    for="feature-azure-section"
+                  >
+                    <span class="label-text text-base-content"
+                      >{t("tenant.azure-open-ai-provider")}</span
+                    >
+                  </label>
+                </div>
+                {#if defaultTextFeature === ApiKeyProvider.AzureOpenAI}
+                  <span class="mb-2 text-base-content/50 font-medium text-sm"
+                    >{t("tenant.default")}</span
+                  >
+                {/if}
+              </div>
+            </div>
+            <div class="collapse-content">
+              <div class="grid grid-cols-2 gap-4 mx-8">
+                <div class="w-full">
+                  <span class="mb-2 text-base-content font-medium text-sm"
+                    >{t("tenant.azure-open-ai-provider")}</span
+                  >
+
+                  <label
+                    class="input input-bordered flex items-center gap-2 mt-2 w-full"
+                  >
+                    <input
+                      bind:this={azureOpenAIKeyField}
+                      type="password"
+                      class="grow"
+                      placeholder={t("tenant.api-key")}
+                      bind:value={tenantData.azure_openai_api_key}
+                    />
+                    <TogglePasswordIcon
+                      change={() => togglePassword(azureOpenAIKeyField)}
+                    />
+                  </label>
+                </div>
+                <div class="w-full">
+                  <span class="mb-2 text-base-content font-medium text-sm"
+                    >{t("tenant.azure-open-ai-instance-name")}</span
+                  >
+                  <input
+                    type="text"
+                    class="input input-bordered mt-2 w-full"
+                    placeholder={""}
+                    use:trimInput
+                    bind:value={tenantData.azure_openai_instance_name}
+                  />
+                </div>
+
+                <div class="w-full">
+                  <span class="mb-2 ttext-base-content font-medium text-sm"
+                    >{t("tenant.azure-open-ai-endpoint")}</span
+                  >
+                  <input
+                    type="text"
+                    class="input input-bordered mt-2 w-full"
+                    placeholder={""}
+                    bind:value={tenantData.azure_openai_endpoint}
+                  />
+                </div>
+                <div class="w-full">
+                  <span class="mb-2 text-base-content font-medium text-sm"
+                    >{t("tenant.azure-open-ai-transciption-model")}</span
+                  >
+                  <input
+                    type="text"
+                    class="input input-bordered mt-2 w-full"
+                    placeholder={""}
+                    use:trimInput
+                    bind:value={tenantData.azure_openai_whisper_model}
+                  />
+                </div>
+
+                <div class="w-full">
+                  <span class="mb-2 text-base-content font-medium text-sm"
+                    >{t("tenant.azure-open-ai-text-model")}</span
+                  >
+                  <input
+                    type="text"
+                    class="input input-bordered mt-2 w-full"
+                    placeholder={""}
+                    use:trimInput
+                    bind:value={tenantData.azure_openai_chat_model}
+                  />
+                </div>
+                <div></div>
+                <div class="grid grid-cols-2 gap-4">
+                  <label class="flex flex-row items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={defaultTextFeature ===
+                        ApiKeyProvider.AzureOpenAI}
+                      class="checkbox checkbox-primary"
+                      onchange={() =>
+                        toggleTextFeature(ApiKeyProvider.AzureOpenAI)}
+                    />
+                    <span class="label-text">{t("tenant.mark-as-default")}</span
+                    >
+                  </label>
+                  <label class="flex flex-row items-center gap-2">
+                    <input
+                      type="checkbox"
+                      class="checkbox checkbox-primary"
+                      bind:checked={
+                        tenantData.metadata.azureOpenaiPrivateKeyEnabled
+                      }
+                    />
+                    <span class="label-text"
+                      >{t("tenant.settings.private-api-key")}</span
+                    >
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Perplexity Section -->
+          <div
+            class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
+          >
+            <input type="checkbox" />
+            <div class="collapse-title">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                  <input
+                    id="feature-perplexity-section"
+                    type="checkbox"
+                    bind:checked={perplexityEnabled}
+                    class="checkbox checkbox-primary z-10"
+                    disabled={defaultTextFeature === ApiKeyProvider.Perplexity}
+                  />
+                  <label
+                    class="label cursor-pointer ml-2"
+                    for="feature-perplexity-section"
+                  >
+                    <span class="label-text text-base-content"
+                      >{t("tenant.perplexity.name")}</span
+                    >
+                  </label>
+                </div>
+                {#if defaultTextFeature === ApiKeyProvider.Perplexity}
+                  <span class="mb-2 text-base-content/50 font-medium text-sm"
+                    >{t("tenant.default")}</span
+                  >
+                {/if}
+              </div>
+            </div>
+            <div class="collapse-content">
+              <div class="grid grid-cols-2 gap-4 mx-8 mb-[30]">
+                <div class="w-full z-20">
+                  <Dropdown
+                    label={`${t("tenant.model.name")}*`}
+                    options={[
+                      {
+                        value: "sonar",
+                        title: "sonar",
+                      },
+                    ]}
+                    bind:value={selectedPerplexityModel}
+                  />
+                </div>
+                <div class="w-full">
+                  <span class="mb-2 text-base-content font-medium text-sm"
+                    >{t("tenant.api-key")}</span
+                  >
+
+                  <label
+                    class="input input-bordered flex items-center gap-2 mt-1 w-full"
+                  >
+                    <input
+                      bind:this={perplexityKeyField}
+                      type="password"
+                      class="grow"
+                      placeholder={t("tenant.api-key")}
+                      bind:value={tenantData.perplexity_api_key}
+                    />
+                    <TogglePasswordIcon
+                      change={() => togglePassword(perplexityKeyField)}
+                    />
+                  </label>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                  <label class="flex flex-row items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={defaultTextFeature === ApiKeyProvider.Perplexity}
+                      class="checkbox checkbox-primary"
+                      onchange={() =>
+                        toggleTextFeature(ApiKeyProvider.Perplexity)}
+                    />
+                    <span class="label-text">{t("tenant.mark-as-default")}</span
+                    >
+                  </label>
+                  <label class="flex flex-row items-center gap-2">
+                    <input
+                      type="checkbox"
+                      class="checkbox checkbox-primary"
+                      bind:checked={
+                        tenantData.metadata.perplexityPrivateKeyEnabled
+                      }
+                    />
+                    <span class="label-text"
+                      >{t("tenant.settings.private-api-key")}</span
+                    >
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Claude Section -->
+          <div
+            class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
+          >
+            <input type="checkbox" />
+            <div class="collapse-title">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                  <input
+                    id="feature-claude-section"
+                    type="checkbox"
+                    bind:checked={claudeEnabled}
+                    class="checkbox checkbox-primary z-10"
+                    disabled={defaultTextFeature === ApiKeyProvider.Claude}
+                  />
+                  <label
+                    class="label cursor-pointer ml-2"
+                    for="feature-claude-section"
+                  >
+                    <span class="label-text text-base-content"
+                      >{t("tenant.claude.name")}</span
+                    >
+                  </label>
+                </div>
+                {#if defaultTextFeature === ApiKeyProvider.Claude}
+                  <span class="mb-2 text-base-content/50 font-medium text-sm"
+                    >{t("tenant.default")}</span
+                  >
+                {/if}
+              </div>
+            </div>
+            <div class="collapse-content">
+              <div class="grid grid-cols-2 gap-4 mx-8 mb-[30]">
+                <div class="w-full z-20">
+                  <Dropdown
+                    label={`${t("tenant.model.name")}*`}
+                    options={[
+                      {
+                        value: "claude-sonnet-4-0",
+                        title: "claude-sonnet-4-0",
+                      },
+                    ]}
+                    bind:value={selectedClaudeModel}
+                  />
+                </div>
+                <div class="w-full">
+                  <span class="mb-2 text-base-content font-medium text-sm"
+                    >{t("tenant.api-key")}</span
+                  >
+
+                  <label
+                    class="input input-bordered flex items-center gap-2 mt-1 w-full"
+                  >
+                    <input
+                      bind:this={claudeKeyField}
+                      type="password"
+                      class="grow"
+                      placeholder={t("tenant.api-key")}
+                      bind:value={tenantData.anthropic_api_key}
+                    />
+                    <TogglePasswordIcon
+                      change={() => togglePassword(claudeKeyField)}
+                    />
+                  </label>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                  <label class="flex flex-row items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={defaultTextFeature === ApiKeyProvider.Claude}
+                      class="checkbox checkbox-primary"
+                      onchange={() => toggleTextFeature(ApiKeyProvider.Claude)}
+                    />
+                    <span class="label-text">{t("tenant.mark-as-default")}</span
+                    >
+                  </label>
+                  <label class="flex flex-row items-center gap-2">
+                    <input
+                      type="checkbox"
+                      class="checkbox checkbox-primary"
+                      bind:checked={tenantData.metadata.claudePrivateKeyEnabled}
+                    />
+                    <span class="label-text"
+                      >{t("tenant.settings.private-api-key")}</span
+                    >
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Gemini Section -->
+          <div
+            class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
+          >
+            <input type="checkbox" />
+            <div class="collapse-title">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                  <input
+                    id="feature-gemini-section"
+                    type="checkbox"
+                    bind:checked={geminiEnabled}
+                    class="checkbox checkbox-primary z-10"
+                    disabled={defaultTextFeature === ApiKeyProvider.Gemini}
+                  />
+                  <label
+                    class="label cursor-pointer ml-2"
+                    for="feature-gemini-section"
+                  >
+                    <span class="label-text text-base-content"
+                      >{t("tenant.gemini.name")}</span
+                    >
+                  </label>
+                </div>
+                {#if defaultTextFeature === ApiKeyProvider.Gemini}
+                  <span class="mb-2 text-base-content/50 font-medium text-sm"
+                    >{t("tenant.default")}</span
+                  >
+                {/if}
+              </div>
+            </div>
+            <div class="collapse-content">
+              <div class="grid grid-cols-2 gap-4 mx-8 mb-[30]">
+                <div class="w-full z-20">
+                  <Dropdown
+                    label={`${t("tenant.model.name")}*`}
+                    options={[
+                      {
+                        value: TextModel.Gemini,
+                        title: "gemini-2.5-flash",
+                      },
+                    ]}
+                    bind:value={selectedGeminiModel}
+                  />
+                </div>
+                <div class="w-full">
+                  <span class="mb-2 text-base-content font-medium text-sm"
+                    >{t("tenant.api-key")}</span
+                  >
+
+                  <label
+                    class="input input-bordered flex items-center gap-2 mt-1 w-full"
+                  >
+                    <input
+                      bind:this={geminiKeyField}
+                      type="password"
+                      class="grow"
+                      placeholder={t("tenant.api-key")}
+                      bind:value={tenantData.gemini_api_key}
+                    />
+                    <TogglePasswordIcon
+                      change={() => togglePassword(geminiKeyField)}
+                    />
+                  </label>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                  <label class="flex flex-row items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={defaultTextFeature === ApiKeyProvider.Gemini}
+                      class="checkbox checkbox-primary"
+                      onchange={() => toggleTextFeature(ApiKeyProvider.Gemini)}
+                    />
+                    <span class="label-text">{t("tenant.mark-as-default")}</span
+                    >
+                  </label>
+                  <label class="flex flex-row items-center gap-2">
+                    <input
+                      type="checkbox"
+                      class="checkbox checkbox-primary"
+                      bind:checked={tenantData.metadata.geminiPrivateKeyEnabled}
+                    />
+                    <span class="label-text"
+                      >{t("tenant.settings.private-api-key")}</span
+                    >
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AUDIO ASSISTANT Section -->
+      <div class="p-5 mb-8 bg-base-100 rounded-lg">
+        <div class="mb-3 flex flex-row items-center justify-between">
+          <div class="flex flex-row items-center gap-2">
+            {@html svgIcons.audioToText}
+            <p class="font-medium text-md">{t("nav.audiotool")}</p>
+          </div>
+          <!-- Active Toggle -->
+          <label class="flex items-center gap-2">
+            <span class="label-text">{t("tenant.tenants.tenant.active")}</span>
+            <input
+              type="checkbox"
+              class="toggle toggle-primary"
+              bind:checked={tenantData.audio_assistant_active}
+            />
+          </label>
+        </div>
+        <div class="container mx-auto">
+          <!-- Audio Whisper Section -->
+          <div
+            class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
+          >
+            <input type="checkbox" />
+            <div class="collapse-title flex items-center justify-between gap-4">
+              <div class="flex items-center">
+                <input
+                  id="audio-whisper-model"
+                  type="checkbox"
+                  bind:checked={audioStandardArray[0].checked}
+                  class="checkbox checkbox-primary z-10"
+                />
+                <!-- Original: disabled parent checkbox that reflected child state
             <input
               id="audio-whisper-model"
               type="checkbox"
@@ -2115,22 +2156,25 @@
               class="checkbox checkbox-primary z-10"
               disabled
             /> -->
-            <label class="label cursor-pointer ml-2" for="audio-whisper-model">
-              <span class="label-text text-base-content"
-                >{t("tenant.audio.whisper.model.title")}</span
-              >
-            </label>
-          </div>
-          <div class="flex mb-2">
-            <span class="text-base-content/50 font-medium text-sm"
-              >{audioStandardInfo}</span
-            >
-          </div>
-        </div>
+                <label
+                  class="label cursor-pointer ml-2"
+                  for="audio-whisper-model"
+                >
+                  <span class="label-text text-base-content"
+                    >{t("tenant.audio.whisper.model.title")}</span
+                  >
+                </label>
+              </div>
+              <div class="flex mb-2">
+                <span class="text-base-content/50 font-medium text-sm"
+                  >{audioStandardInfo}</span
+                >
+              </div>
+            </div>
 
-        <div class="collapse-content space-y-6">
-          <div class="flex flex-col gap-4 mx-8">
-            <!-- Simplified: Features section removed since only one feature exists
+            <div class="collapse-content space-y-6">
+              <div class="flex flex-col gap-4 mx-8">
+                <!-- Simplified: Features section removed since only one feature exists
             <div class="rounded-lg">
               <span class="text-sm font-semibold">{t("tenant.features")}</span>
               <div class="flex flex-wrap gap-4 mt-2">
@@ -2156,29 +2200,31 @@
             </div>
             -->
 
-            <div class="alert">
-              <span class="text-sm"
-                >{t("tenant.whisper.model.configured.for.azure.openai")}</span
-              >
+                <div class="alert">
+                  <span class="text-sm"
+                    >{t(
+                      "tenant.whisper.model.configured.for.azure.openai",
+                    )}</span
+                  >
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      <!-- Large File Azure Section -->
-      <div
-        class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
-      >
-        <input type="checkbox" />
-        <div class="collapse-title flex items-center justify-between gap-4">
-          <div class="flex items-center">
-            <input
-              id="audio-pro-model"
-              type="checkbox"
-              bind:checked={audioProArray[0].checked}
-              class="checkbox checkbox-primary z-10"
-            />
-            <!-- Original: disabled parent checkbox that reflected child state
+          <!-- Large File Azure Section -->
+          <div
+            class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
+          >
+            <input type="checkbox" />
+            <div class="collapse-title flex items-center justify-between gap-4">
+              <div class="flex items-center">
+                <input
+                  id="audio-pro-model"
+                  type="checkbox"
+                  bind:checked={audioProArray[0].checked}
+                  class="checkbox checkbox-primary z-10"
+                />
+                <!-- Original: disabled parent checkbox that reflected child state
             <input
               id="audio-pro-model"
               type="checkbox"
@@ -2186,20 +2232,20 @@
               class="checkbox checkbox-primary z-10"
               disabled
             /> -->
-            <label class="label cursor-pointer ml-2" for="audio-pro-model">
-              <span class="label-text text-base-content"
-                >{t("tenant.settings.large-file-azure")}</span
-              >
-            </label>
-          </div>
-          <div class="flex mb-2">
-            <span class="text-base-content/50 font-medium text-sm"
-              >{audioProInfo}</span
-            >
-          </div>
-        </div>
-        <div class="collapse-content space-y-4">
-          <!-- Simplified: Features section removed since only one feature exists
+                <label class="label cursor-pointer ml-2" for="audio-pro-model">
+                  <span class="label-text text-base-content"
+                    >{t("tenant.settings.large-file-azure")}</span
+                  >
+                </label>
+              </div>
+              <div class="flex mb-2">
+                <span class="text-base-content/50 font-medium text-sm"
+                  >{audioProInfo}</span
+                >
+              </div>
+            </div>
+            <div class="collapse-content space-y-4">
+              <!-- Simplified: Features section removed since only one feature exists
           <div class="grid grid-cols-2 gap-4 mx-8">
             <div class="rounded-lg">
               <span class="text-sm font-semibold">{t("tenant.features")}</span>
@@ -2227,58 +2273,58 @@
           </div>
           -->
 
-          <div class="grid grid-cols-2 gap-4 mx-8">
-            <div class="w-full">
-              <span class="mb-2 text-base-content font-medium text-sm"
-                >{t("tenant.settings.large-file-azure-apiKey")}
-              </span>
+              <div class="grid grid-cols-2 gap-4 mx-8">
+                <div class="w-full">
+                  <span class="mb-2 text-base-content font-medium text-sm"
+                    >{t("tenant.settings.large-file-azure-apiKey")}
+                  </span>
 
-              <label
-                class="input input-bordered flex items-center gap-2 mt-2 w-full"
-              >
-                <input
-                  bind:this={azureOpenAIKeyProField}
-                  type="password"
-                  class="grow"
-                  placeholder={t("tenant.api-key")}
-                  bind:value={tenantData.speech_api_key}
-                />
-                <TogglePasswordIcon
-                  change={() => togglePassword(azureOpenAIKeyProField)}
-                />
-              </label>
-            </div>
-            <div class="w-full">
-              <span class="mb-2 text-base-content font-medium text-sm"
-                >{t("tenant.settings.large-file-azure-region")}</span
-              >
-              <input
-                type="text"
-                class="input input-bordered mt-2 w-full"
-                placeholder={""}
-                use:trimInput
-                bind:value={tenantData.speech_region}
-              />
+                  <label
+                    class="input input-bordered flex items-center gap-2 mt-2 w-full"
+                  >
+                    <input
+                      bind:this={azureOpenAIKeyProField}
+                      type="password"
+                      class="grow"
+                      placeholder={t("tenant.api-key")}
+                      bind:value={tenantData.speech_api_key}
+                    />
+                    <TogglePasswordIcon
+                      change={() => togglePassword(azureOpenAIKeyProField)}
+                    />
+                  </label>
+                </div>
+                <div class="w-full">
+                  <span class="mb-2 text-base-content font-medium text-sm"
+                    >{t("tenant.settings.large-file-azure-region")}</span
+                  >
+                  <input
+                    type="text"
+                    class="input input-bordered mt-2 w-full"
+                    placeholder={""}
+                    use:trimInput
+                    bind:value={tenantData.speech_region}
+                  />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-4 mx-8">
+                <label class="flex flex-row items-center gap-2">
+                  <input
+                    type="checkbox"
+                    class="checkbox checkbox-primary"
+                    bind:checked={tenantData.metadata.speechPrivateKeyEnabled}
+                  />
+                  <span class="label-text"
+                    >{t("tenant.settings.private-api-key")}</span
+                  >
+                </label>
+              </div>
             </div>
           </div>
 
-          <div class="grid grid-cols-2 gap-4 mx-8">
-            <label class="flex flex-row items-center gap-2">
-              <input
-                type="checkbox"
-                class="checkbox checkbox-primary"
-                bind:checked={tenantData.metadata.speechPrivateKeyEnabled}
-              />
-              <span class="label-text"
-                >{t("tenant.settings.private-api-key")}</span
-              >
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <!-- Model Selection (for Audio Assistant) -->
-      <!-- <div class="container mx-auto">
+          <!-- Model Selection (for Audio Assistant) -->
+          <!-- <div class="container mx-auto">
         <div class="bg-base-100 shadow-sm rounded-lg my-4">
           <div class="flex p-4 items-center justify-between">
             <div class="flex items-center justify-between">
@@ -2309,29 +2355,29 @@
           </div>
         </div>
       </div> -->
-    </div>
-
-    <div class="divider"></div>
-
-    <!-- SUBTITLE STUDIO Section -->
-    <div class="mb-3 flex flex-row items-center justify-between">
-      <div class="flex flex-row items-center gap-2">
-        {@html svgIcons.subtitle}
-        <p class="font-medium text-md">{t("nav.subtitle-studio")}</p>
+        </div>
       </div>
-      <!-- Active Toggle -->
-      <label class="flex items-center gap-2">
-        <span class="label-text">{t("tenant.tenants.tenant.active")}</span>
-        <input
-          type="checkbox"
-          class="toggle toggle-primary"
-          bind:checked={tenantData.subtitle_studio_active}
-        />
-      </label>
-    </div>
-    <div class="container mx-auto">
-      <!-- Deprecated: SubtitleJson Section - commented for future restoration -->
-      <!-- <div
+
+      <!-- SUBTITLE STUDIO Section -->
+      <div class="p-5 mb-8 bg-base-100 rounded-lg">
+        <div class="mb-3 flex flex-row items-center justify-between">
+          <div class="flex flex-row items-center gap-2">
+            {@html svgIcons.subtitle}
+            <p class="font-medium text-md">{t("nav.subtitle-studio")}</p>
+          </div>
+          <!-- Active Toggle -->
+          <label class="flex items-center gap-2">
+            <span class="label-text">{t("tenant.tenants.tenant.active")}</span>
+            <input
+              type="checkbox"
+              class="toggle toggle-primary"
+              bind:checked={tenantData.subtitle_studio_active}
+            />
+          </label>
+        </div>
+        <div class="container mx-auto">
+          <!-- Deprecated: SubtitleJson Section - commented for future restoration -->
+          <!-- <div
         class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
       >
         <input type="checkbox" />
@@ -2392,20 +2438,20 @@
         </div>
       </div> -->
 
-      <!-- 11Labs Subtitle Section -->
-      <div
-        class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
-      >
-        <input type="checkbox" />
-        <div class="collapse-title flex items-center justify-between gap-4">
-          <div class="flex items-center">
-            <input
-              id="audio-elevenLabs-model"
-              type="checkbox"
-              bind:checked={audioElevenLabsArray[0].checked}
-              class="checkbox checkbox-primary z-10"
-            />
-            <!-- Original: disabled parent checkbox that reflected child state
+          <!-- 11Labs Subtitle Section -->
+          <div
+            class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
+          >
+            <input type="checkbox" />
+            <div class="collapse-title flex items-center justify-between gap-4">
+              <div class="flex items-center">
+                <input
+                  id="audio-elevenLabs-model"
+                  type="checkbox"
+                  bind:checked={audioElevenLabsArray[0].checked}
+                  class="checkbox checkbox-primary z-10"
+                />
+                <!-- Original: disabled parent checkbox that reflected child state
             <input
               id="audio-elevenLabs-model"
               type="checkbox"
@@ -2413,23 +2459,23 @@
               class="checkbox checkbox-primary z-10"
               disabled
             /> -->
-            <label
-              class="label cursor-pointer ml-2"
-              for="audio-elevenLabs-model"
-            >
-              <span class="label-text text-base-content"
-                >{t("tenant.subtitle-elevenLabs.title")}</span
-              >
-            </label>
-          </div>
-          <div class="flex mb-2">
-            <span class="text-base-content/50 font-medium text-sm"
-              >{audioElevenLabsInfo}</span
-            >
-          </div>
-        </div>
-        <div class="collapse-content space-y-4">
-          <!-- Simplified: Features section removed since only one feature exists
+                <label
+                  class="label cursor-pointer ml-2"
+                  for="audio-elevenLabs-model"
+                >
+                  <span class="label-text text-base-content"
+                    >{t("tenant.subtitle-elevenLabs.title")}</span
+                  >
+                </label>
+              </div>
+              <div class="flex mb-2">
+                <span class="text-base-content/50 font-medium text-sm"
+                  >{audioElevenLabsInfo}</span
+                >
+              </div>
+            </div>
+            <div class="collapse-content space-y-4">
+              <!-- Simplified: Features section removed since only one feature exists
           <div class="grid grid-cols-2 gap-4 mx-8">
             <div class="rounded-lg">
               <span class="text-sm font-semibold">{t("tenant.features")}</span>
@@ -2457,644 +2503,687 @@
           </div>
           -->
 
-          <div class="grid grid-cols-1 gap-4 mx-8">
-            <div class="w-full">
-              <span class="mb-2 text-base-content font-medium text-sm"
-                >{t("tenant.settings.large-file-azure-apiKey")}
-              </span>
+              <div class="grid grid-cols-1 gap-4 mx-8">
+                <div class="w-full">
+                  <span class="mb-2 text-base-content font-medium text-sm"
+                    >{t("tenant.settings.large-file-azure-apiKey")}
+                  </span>
 
-              <label
-                class="input input-bordered flex items-center gap-2 mt-2 w-full"
-              >
-                <input
-                  bind:this={elevenLabsAIKeyField}
-                  type="password"
-                  class="grow"
-                  placeholder={t("tenant.api-key")}
-                  bind:value={tenantData.elevenLabs_api_key}
-                />
-                <TogglePasswordIcon
-                  change={() => togglePassword(elevenLabsAIKeyField)}
-                />
-              </label>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-2 gap-4 mx-8">
-            <label class="flex flex-row items-center gap-2">
-              <input
-                type="checkbox"
-                class="checkbox checkbox-primary"
-                bind:checked={tenantData.metadata.elevenLabsPrivateKeyEnabled}
-              />
-              <span class="label-text"
-                >{t("tenant.settings.private-api-key")}</span
-              >
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <!-- Note: Subtitle Editor is now always available when Subtitle Studio is active -->
-      <!-- The subtitle_editor checkbox has been removed - controlled by subtitle_studio_active flag -->
-    </div>
-
-    <div class="divider"></div>
-
-    <!-- Image creation -->
-    <div class="mb-3 flex flex-row items-center gap-2">
-      {@html svgIcons.image}
-      <p class="font-medium text-md">{t("tenant.image-creation")}</p>
-    </div>
-
-    <div class="container mx-auto">
-      <!-- DALL-E (Open AI) Section -->
-      <div class="p-4 bg-base-100 shadow-sm rounded-lg mb-4">
-        <div class="flex items-center justify-between gap-4">
-          <div class="flex items-center">
-            <input
-              id="image-dalle-model"
-              type="checkbox"
-              bind:checked={dalleEnabled}
-              class="checkbox checkbox-primary z-10"
-            />
-            <label class="label cursor-pointer ml-2" for="image-dalle-model">
-              <span class="label-text text-base-content"
-                >{t("tenant.image-creation.dalle")}</span
-              >
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <!-- Flux -->
-      <div
-        class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
-      >
-        <input type="checkbox" />
-        <div class="collapse-title flex items-center justify-between gap-4">
-          <div class="flex items-center">
-            <input
-              id="image-flux-model"
-              type="checkbox"
-              bind:checked={fluxEnabled}
-              class="checkbox checkbox-primary z-10"
-            />
-            <label class="label cursor-pointer ml-2" for="image-flux-model">
-              <span class="label-text text-base-content"
-                >{t("tenant.image-creation.flux")}</span
-              >
-            </label>
-          </div>
-        </div>
-
-        <div class="collapse-content space-y-6">
-          <div class="grid grid-cols-2 gap-4 mx-8">
-            <div class="w-full">
-              <span class="mb-2 text-base-content/50 font-medium text-sm"
-                >{t("tenant.image-creation.flux.api-key")}</span
-              >
-              <label
-                class="input input-bordered flex items-center gap-2 mt-2 w-full"
-              >
-                <input
-                  bind:this={falOpenAIKeyField}
-                  type="password"
-                  class="grow"
-                  placeholder={t("tenant.api-key")}
-                  bind:value={tenantData.fal_ai_api_key}
-                />
-                <TogglePasswordIcon
-                  change={() => togglePassword(falOpenAIKeyField)}
-                />
-              </label>
-            </div>
-            <div class="w-full">
-              <label class="flex flex-row items-center gap-2 mt-10">
-                <input
-                  type="checkbox"
-                  class="checkbox checkbox-primary"
-                  bind:checked={tenantData.metadata.fluxPrivateKeyEnabled}
-                />
-                <span class="label-text"
-                  >{t("tenant.settings.private-api-key")}</span
-                >
-              </label>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- GPT Image Section -->
-      <div class="p-4 bg-base-100 shadow-sm rounded-lg mb-4">
-        <div class="flex items-center justify-between gap-4">
-          <div class="flex items-center">
-            <input
-              id="gpt-image-model"
-              type="checkbox"
-              bind:checked={gptImageEnabled}
-              class="checkbox checkbox-primary z-10"
-            />
-            <label class="label cursor-pointer ml-2" for="gpt-image-model">
-              <span class="label-text text-base-content"
-                >{t("tenant.image-creation.gpt")}</span
-              >
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <!-- Gemini Nano Banana Image Section -->
-      <div class="p-4 bg-base-100 shadow-sm rounded-lg mb-4">
-        <div class="flex items-center justify-between gap-4">
-          <div class="flex items-center">
-            <input
-              id="nano-banana-image-model"
-              type="checkbox"
-              bind:checked={nanoBananaImageEnabled}
-              class="checkbox checkbox-primary z-10"
-            />
-            <label
-              class="label cursor-pointer ml-2"
-              for="nano-banana-image-model"
-            >
-              <span class="label-text text-base-content"
-                >{t("tenant.image-creation.nano-banana")}</span
-              >
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <!-- Gemini Nano Banana Pro Image Section -->
-      <div class="p-4 bg-base-100 shadow-sm rounded-lg mb-4">
-        <div class="flex items-center justify-between gap-4">
-          <div class="flex items-center">
-            <input
-              id="nano-banana-pro-image-model"
-              type="checkbox"
-              bind:checked={nanoBananaProImageEnabled}
-              class="checkbox checkbox-primary z-10"
-            />
-            <label
-              class="label cursor-pointer ml-2"
-              for="nano-banana-pro-image-model"
-            >
-              <span class="label-text text-base-content"
-                >{t("tenant.image-creation.nano-banana-pro")}</span
-              >
-            </label>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="divider"></div>
-
-    <!-- Vector Knowledge Base Section -->
-    <div class="mb-3 flex flex-row items-center justify-between">
-      <div class="flex flex-row items-center gap-2">
-        {@html svgIcons.document}
-        <p class="font-medium text-md">{t("tenant.vector-kb.title")}</p>
-      </div>
-      <!-- Active Toggle -->
-      <label class="flex items-center gap-2">
-        <span class="label-text">{t("tenant.vector-kb.enable")}</span>
-        <input
-          type="checkbox"
-          class="toggle toggle-primary"
-          bind:checked={vectorKbEnabled}
-        />
-      </label>
-    </div>
-
-    {#if vectorKbEnabled}
-      <div class="container mx-auto" transition:slide>
-        <div class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4">
-          <input type="checkbox" checked />
-          <div class="collapse-title">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center">
-                <span class="label-text text-base-content font-medium">
-                  {t("tenant.vector-kb.embedding-config")}
-                </span>
+                  <label
+                    class="input input-bordered flex items-center gap-2 mt-2 w-full"
+                  >
+                    <input
+                      bind:this={elevenLabsAIKeyField}
+                      type="password"
+                      class="grow"
+                      placeholder={t("tenant.api-key")}
+                      bind:value={tenantData.elevenLabs_api_key}
+                    />
+                    <TogglePasswordIcon
+                      change={() => togglePassword(elevenLabsAIKeyField)}
+                    />
+                  </label>
+                </div>
               </div>
-            </div>
-          </div>
-          <div class="collapse-content">
-            <div class="grid grid-cols-2 gap-4 mx-4 mb-4">
-              <!-- Embedding Provider -->
-              <div class="w-full">
-                <span class="mb-2 text-base-content font-medium text-sm">
-                  {t("tenant.vector-kb.embedding-provider")}*
-                </span>
-                <select
-                  class="select select-bordered w-full mt-1"
-                  bind:value={selectedEmbeddingProvider}
-                  onchange={() => {
-                    // Reset model when provider changes
-                    const models = EMBEDDING_MODELS[selectedEmbeddingProvider];
-                    if (models && models.length > 0) {
-                      selectedEmbeddingModel = models[0].value;
+
+              <div class="grid grid-cols-2 gap-4 mx-8">
+                <label class="flex flex-row items-center gap-2">
+                  <input
+                    type="checkbox"
+                    class="checkbox checkbox-primary"
+                    bind:checked={
+                      tenantData.metadata.elevenLabsPrivateKeyEnabled
                     }
-                  }}
+                  />
+                  <span class="label-text"
+                    >{t("tenant.settings.private-api-key")}</span
+                  >
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Note: Subtitle Editor is now always available when Subtitle Studio is active -->
+          <!-- The subtitle_editor checkbox has been removed - controlled by subtitle_studio_active flag -->
+        </div>
+      </div>
+
+      <!-- Image creation -->
+      <div class="p-5 mb-8 bg-base-100 rounded-lg">
+        <div class="mb-3 flex flex-row items-center gap-2">
+          {@html svgIcons.image}
+          <p class="font-medium text-md">{t("tenant.image-creation")}</p>
+        </div>
+
+        <div class="container mx-auto">
+          <!-- DALL-E (Open AI) Section -->
+          <div class="p-4 bg-base-100 shadow-sm rounded-lg mb-4">
+            <div class="flex items-center justify-between gap-4">
+              <div class="flex items-center">
+                <input
+                  id="image-dalle-model"
+                  type="checkbox"
+                  bind:checked={dalleEnabled}
+                  class="checkbox checkbox-primary z-10"
+                />
+                <label
+                  class="label cursor-pointer ml-2"
+                  for="image-dalle-model"
                 >
-                  {#each availableEmbeddingProviders() as provider}
-                    <option value={provider.value}>{provider.label}</option>
-                  {/each}
-                </select>
-                {#if availableEmbeddingProviders().length === 0}
-                  <p class="text-sm text-warning mt-1">
-                    {t("tenant.vector-kb.embedding-provider-warning")}
-                  </p>
-                {/if}
+                  <span class="label-text text-base-content"
+                    >{t("tenant.image-creation.dalle")}</span
+                  >
+                </label>
               </div>
+            </div>
+          </div>
 
-              <!-- Embedding Model -->
-              <div class="w-full">
-                <span class="mb-2 text-base-content font-medium text-sm">
-                  {t("tenant.vector-kb.embedding-model")}*
-                </span>
-                <select
-                  class="select select-bordered w-full mt-1"
-                  bind:value={selectedEmbeddingModel}
+          <!-- Flux -->
+          <div
+            class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
+          >
+            <input type="checkbox" />
+            <div class="collapse-title flex items-center justify-between gap-4">
+              <div class="flex items-center">
+                <input
+                  id="image-flux-model"
+                  type="checkbox"
+                  bind:checked={fluxEnabled}
+                  class="checkbox checkbox-primary z-10"
+                />
+                <label class="label cursor-pointer ml-2" for="image-flux-model">
+                  <span class="label-text text-base-content"
+                    >{t("tenant.image-creation.flux")}</span
+                  >
+                </label>
+              </div>
+            </div>
+
+            <div class="collapse-content space-y-6">
+              <div class="grid grid-cols-2 gap-4 mx-8">
+                <div class="w-full">
+                  <span class="mb-2 text-base-content/50 font-medium text-sm"
+                    >{t("tenant.image-creation.flux.api-key")}</span
+                  >
+                  <label
+                    class="input input-bordered flex items-center gap-2 mt-2 w-full"
+                  >
+                    <input
+                      bind:this={falOpenAIKeyField}
+                      type="password"
+                      class="grow"
+                      placeholder={t("tenant.api-key")}
+                      bind:value={tenantData.fal_ai_api_key}
+                    />
+                    <TogglePasswordIcon
+                      change={() => togglePassword(falOpenAIKeyField)}
+                    />
+                  </label>
+                </div>
+                <div class="w-full">
+                  <label class="flex flex-row items-center gap-2 mt-10">
+                    <input
+                      type="checkbox"
+                      class="checkbox checkbox-primary"
+                      bind:checked={tenantData.metadata.fluxPrivateKeyEnabled}
+                    />
+                    <span class="label-text"
+                      >{t("tenant.settings.private-api-key")}</span
+                    >
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- GPT Image Section -->
+          <div class="p-4 bg-base-100 shadow-sm rounded-lg mb-4">
+            <div class="flex items-center justify-between gap-4">
+              <div class="flex items-center">
+                <input
+                  id="gpt-image-model"
+                  type="checkbox"
+                  bind:checked={gptImageEnabled}
+                  class="checkbox checkbox-primary z-10"
+                />
+                <label class="label cursor-pointer ml-2" for="gpt-image-model">
+                  <span class="label-text text-base-content"
+                    >{t("tenant.image-creation.gpt")}</span
+                  >
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Gemini Nano Banana Image Section -->
+          <div class="p-4 bg-base-100 shadow-sm rounded-lg mb-4">
+            <div class="flex items-center justify-between gap-4">
+              <div class="flex items-center">
+                <input
+                  id="nano-banana-image-model"
+                  type="checkbox"
+                  bind:checked={nanoBananaImageEnabled}
+                  class="checkbox checkbox-primary z-10"
+                />
+                <label
+                  class="label cursor-pointer ml-2"
+                  for="nano-banana-image-model"
                 >
-                  {#each availableEmbeddingModels() as model}
-                    <option value={model.value}>{model.label}</option>
-                  {/each}
-                </select>
+                  <span class="label-text text-base-content"
+                    >{t("tenant.image-creation.nano-banana")}</span
+                  >
+                </label>
               </div>
             </div>
+          </div>
 
-            <div class="grid grid-cols-2 gap-4 mx-4 mb-4">
-              <!-- Chunk Size -->
-              <div class="w-full">
-                <span class="mb-2 text-base-content font-medium text-sm">
-                  {t("tenant.vector-kb.chunk-size")}
-                </span>
+          <!-- Gemini Nano Banana Pro Image Section -->
+          <div class="p-4 bg-base-100 shadow-sm rounded-lg mb-4">
+            <div class="flex items-center justify-between gap-4">
+              <div class="flex items-center">
                 <input
-                  type="number"
-                  class="input input-bordered w-full mt-1"
-                  bind:value={tenantData.vector_kb_chunk_size}
-                  min="100"
-                  max="2000"
+                  id="nano-banana-pro-image-model"
+                  type="checkbox"
+                  bind:checked={nanoBananaProImageEnabled}
+                  class="checkbox checkbox-primary z-10"
                 />
-                <p class="text-xs text-base-content/60 mt-1">
-                  {t("tenant.vector-kb.chunk-size-help")}
-                </p>
+                <label
+                  class="label cursor-pointer ml-2"
+                  for="nano-banana-pro-image-model"
+                >
+                  <span class="label-text text-base-content"
+                    >{t("tenant.image-creation.nano-banana-pro")}</span
+                  >
+                </label>
               </div>
-
-              <!-- Chunk Overlap -->
-              <div class="w-full">
-                <span class="mb-2 text-base-content font-medium text-sm">
-                  {t("tenant.vector-kb.chunk-overlap")}
-                </span>
-                <input
-                  type="number"
-                  class="input input-bordered w-full mt-1"
-                  bind:value={tenantData.vector_kb_chunk_overlap}
-                  min="0"
-                  max="500"
-                />
-                <p class="text-xs text-base-content/60 mt-1">
-                  {t("tenant.vector-kb.chunk-overlap-help")}
-                </p>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-4 mx-4 mb-4">
-              <!-- Top K Results -->
-              <div class="w-full">
-                <span class="mb-2 text-base-content font-medium text-sm">
-                  {t("tenant.vector-kb.top-k")}
-                </span>
-                <input
-                  type="number"
-                  class="input input-bordered w-full mt-1"
-                  bind:value={tenantData.vector_kb_top_k}
-                  min="1"
-                  max="20"
-                />
-                <p class="text-xs text-base-content/60 mt-1">
-                  {t("tenant.vector-kb.top-k-help")}
-                </p>
-              </div>
-
-              <!-- Similarity Threshold -->
-              <div class="w-full">
-                <span class="mb-2 text-base-content font-medium text-sm">
-                  {t("tenant.vector-kb.similarity-threshold")}
-                </span>
-                <input
-                  type="number"
-                  class="input input-bordered w-full mt-1"
-                  bind:value={tenantData.vector_kb_similarity_threshold}
-                  min="0"
-                  max="1"
-                  step="0.05"
-                />
-                <p class="text-xs text-base-content/60 mt-1">
-                  {t("tenant.vector-kb.similarity-threshold-help")}
-                </p>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-4 mx-4 mb-4">
-              <!-- Max Storage -->
-              <div class="w-full">
-                <span class="mb-2 text-base-content font-medium text-sm">
-                  {t("tenant.vector-kb.max-storage")}
-                </span>
-                <input
-                  type="number"
-                  class="input input-bordered w-full mt-1"
-                  bind:value={tenantData.vector_kb_max_storage_mb}
-                  min="50"
-                  max="10000"
-                />
-                <p class="text-xs text-base-content/60 mt-1">
-                  {t("tenant.vector-kb.max-storage-help")}
-                </p>
-              </div>
-              <div class="w-full"></div>
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- RAG Enhancements Section -->
-        <div class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4">
-          <input type="checkbox" />
-          <div class="collapse-title">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center">
-                <span class="label-text text-base-content font-medium">
-                  {t("tenant.vector-kb.rag-enhancements")}
-                </span>
-              </div>
-            </div>
+      <!-- Vector Knowledge Base Section -->
+      <div class="p-5 mb-8 bg-base-100 rounded-lg">
+        <div class="mb-3 flex flex-row items-center justify-between">
+          <div class="flex flex-row items-center gap-2">
+            {@html svgIcons.document}
+            <p class="font-medium text-md">{t("tenant.vector-kb.title")}</p>
           </div>
-          <div class="collapse-content">
-            <!-- Reranking -->
-            <div class="bg-base-200/50 rounded-lg p-4 mx-4 mb-4">
-              <div class="flex items-center justify-between mb-3">
-                <div>
-                  <span class="text-base-content font-medium text-sm">
-                    {t("tenant.vector-kb.rerank-title")}
-                  </span>
-                  <p class="text-xs text-base-content/60">
-                    {t("tenant.vector-kb.rerank-description")}
-                  </p>
-                </div>
-                <input
-                  type="checkbox"
-                  class="toggle toggle-primary toggle-sm"
-                  bind:checked={tenantData.vector_kb_rerank_enabled}
-                />
-              </div>
-              {#if tenantData.vector_kb_rerank_enabled}
-                <div class="grid grid-cols-2 gap-4 mt-3">
-                  <div class="w-full">
-                    <span class="text-base-content text-xs">
-                      {t("tenant.vector-kb.rerank-top-n")}
-                    </span>
-                    <input
-                      type="number"
-                      class="input input-bordered input-sm w-full mt-1"
-                      bind:value={tenantData.vector_kb_rerank_top_n}
-                      min="1"
-                      max="20"
-                    />
-                  </div>
-                  <div class="w-full">
-                    <span class="text-base-content text-xs">
-                      {t("tenant.vector-kb.rerank-candidates")}
-                    </span>
-                    <input
-                      type="number"
-                      class="input input-bordered input-sm w-full mt-1"
-                      bind:value={tenantData.vector_kb_rerank_candidates}
-                      min="10"
-                      max="100"
-                    />
-                  </div>
-                </div>
-              {/if}
-            </div>
+          <!-- Active Toggle -->
+          <label class="flex items-center gap-2">
+            <span class="label-text">{t("tenant.vector-kb.enable")}</span>
+            <input
+              type="checkbox"
+              class="toggle toggle-primary"
+              bind:checked={vectorKbEnabled}
+            />
+          </label>
+        </div>
 
-            <!-- Hybrid Search -->
-            <div class="bg-base-200/50 rounded-lg p-4 mx-4 mb-4">
-              <div class="flex items-center justify-between mb-3">
-                <div>
-                  <span class="text-base-content font-medium text-sm">
-                    {t("tenant.vector-kb.hybrid-title")}
-                  </span>
-                  <p class="text-xs text-base-content/60">
-                    {t("tenant.vector-kb.hybrid-description")}
-                  </p>
+        {#if vectorKbEnabled}
+          <div class="container mx-auto" transition:slide>
+            <div
+              class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
+            >
+              <input type="checkbox" checked />
+              <div class="collapse-title">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center">
+                    <span class="label-text text-base-content font-medium">
+                      {t("tenant.vector-kb.embedding-config")}
+                    </span>
+                  </div>
                 </div>
-                <input
-                  type="checkbox"
-                  class="toggle toggle-primary toggle-sm"
-                  bind:checked={tenantData.vector_kb_hybrid_enabled}
-                />
               </div>
-              {#if tenantData.vector_kb_hybrid_enabled}
-                <div class="mt-3">
-                  <div class="w-full max-w-xs">
-                    <span class="text-base-content text-xs">
-                      {t("tenant.vector-kb.hybrid-alpha")}
+              <div class="collapse-content">
+                <div class="grid grid-cols-2 gap-4 mx-4 mb-4">
+                  <!-- Embedding Provider -->
+                  <div class="w-full">
+                    <span class="mb-2 text-base-content font-medium text-sm">
+                      {t("tenant.vector-kb.embedding-provider")}*
+                    </span>
+                    <select
+                      class="select select-bordered w-full mt-1"
+                      bind:value={selectedEmbeddingProvider}
+                      onchange={() => {
+                        // Reset model when provider changes
+                        const models =
+                          EMBEDDING_MODELS[selectedEmbeddingProvider];
+                        if (models && models.length > 0) {
+                          selectedEmbeddingModel = models[0].value;
+                        }
+                      }}
+                    >
+                      {#each availableEmbeddingProviders() as provider}
+                        <option value={provider.value}>{provider.label}</option>
+                      {/each}
+                    </select>
+                    {#if availableEmbeddingProviders().length === 0}
+                      <p class="text-sm text-warning mt-1">
+                        {t("tenant.vector-kb.embedding-provider-warning")}
+                      </p>
+                    {/if}
+                  </div>
+
+                  <!-- Embedding Model -->
+                  <div class="w-full">
+                    <span class="mb-2 text-base-content font-medium text-sm">
+                      {t("tenant.vector-kb.embedding-model")}*
+                    </span>
+                    <select
+                      class="select select-bordered w-full mt-1"
+                      bind:value={selectedEmbeddingModel}
+                    >
+                      {#each availableEmbeddingModels() as model}
+                        <option value={model.value}>{model.label}</option>
+                      {/each}
+                    </select>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mx-4 mb-4">
+                  <!-- Chunk Size -->
+                  <div class="w-full">
+                    <span class="mb-2 text-base-content font-medium text-sm">
+                      {t("tenant.vector-kb.chunk-size")}
                     </span>
                     <input
                       type="number"
-                      class="input input-bordered input-sm w-full mt-1"
-                      bind:value={tenantData.vector_kb_hybrid_alpha}
-                      min="0"
-                      max="1"
-                      step="0.1"
+                      class="input input-bordered w-full mt-1"
+                      bind:value={tenantData.vector_kb_chunk_size}
+                      min="100"
+                      max="2000"
                     />
                     <p class="text-xs text-base-content/60 mt-1">
-                      {t("tenant.vector-kb.hybrid-alpha-help")}
+                      {t("tenant.vector-kb.chunk-size-help")}
+                    </p>
+                  </div>
+
+                  <!-- Chunk Overlap -->
+                  <div class="w-full">
+                    <span class="mb-2 text-base-content font-medium text-sm">
+                      {t("tenant.vector-kb.chunk-overlap")}
+                    </span>
+                    <input
+                      type="number"
+                      class="input input-bordered w-full mt-1"
+                      bind:value={tenantData.vector_kb_chunk_overlap}
+                      min="0"
+                      max="500"
+                    />
+                    <p class="text-xs text-base-content/60 mt-1">
+                      {t("tenant.vector-kb.chunk-overlap-help")}
                     </p>
                   </div>
                 </div>
-              {/if}
-            </div>
 
-            <!-- Answerability Check -->
-            <div class="bg-base-200/50 rounded-lg p-4 mx-4 mb-4">
-              <div class="flex items-center justify-between mb-3">
-                <div>
-                  <span class="text-base-content font-medium text-sm">
-                    {t("tenant.vector-kb.answerability-title")}
-                  </span>
-                  <p class="text-xs text-base-content/60">
-                    {t("tenant.vector-kb.answerability-description")}
-                  </p>
-                </div>
-                <input
-                  type="checkbox"
-                  class="toggle toggle-primary toggle-sm"
-                  bind:checked={tenantData.vector_kb_answerability_enabled}
-                />
-              </div>
-              {#if tenantData.vector_kb_answerability_enabled}
-                <div class="mt-3">
-                  <div class="w-full max-w-xs">
-                    <span class="text-base-content text-xs">
-                      {t("tenant.vector-kb.answerability-threshold")}
+                <div class="grid grid-cols-2 gap-4 mx-4 mb-4">
+                  <!-- Top K Results -->
+                  <div class="w-full">
+                    <span class="mb-2 text-base-content font-medium text-sm">
+                      {t("tenant.vector-kb.top-k")}
                     </span>
                     <input
                       type="number"
-                      class="input input-bordered input-sm w-full mt-1"
-                      bind:value={tenantData.vector_kb_answerability_threshold}
+                      class="input input-bordered w-full mt-1"
+                      bind:value={tenantData.vector_kb_top_k}
+                      min="1"
+                      max="20"
+                    />
+                    <p class="text-xs text-base-content/60 mt-1">
+                      {t("tenant.vector-kb.top-k-help")}
+                    </p>
+                  </div>
+
+                  <!-- Similarity Threshold -->
+                  <div class="w-full">
+                    <span class="mb-2 text-base-content font-medium text-sm">
+                      {t("tenant.vector-kb.similarity-threshold")}
+                    </span>
+                    <input
+                      type="number"
+                      class="input input-bordered w-full mt-1"
+                      bind:value={tenantData.vector_kb_similarity_threshold}
                       min="0"
                       max="1"
-                      step="0.1"
+                      step="0.05"
                     />
+                    <p class="text-xs text-base-content/60 mt-1">
+                      {t("tenant.vector-kb.similarity-threshold-help")}
+                    </p>
                   </div>
                 </div>
-              {/if}
-            </div>
 
-            <!-- Context Compression -->
-            <div class="bg-base-200/50 rounded-lg p-4 mx-4 mb-4">
-              <div class="flex items-center justify-between">
-                <div>
-                  <span class="text-base-content font-medium text-sm">
-                    {t("tenant.vector-kb.compression-title")}
-                  </span>
-                  <p class="text-xs text-base-content/60">
-                    {t("tenant.vector-kb.compression-description")}
-                  </p>
-                </div>
-                <input
-                  type="checkbox"
-                  class="toggle toggle-primary toggle-sm"
-                  bind:checked={tenantData.vector_kb_compression_enabled}
-                />
-              </div>
-            </div>
-
-            <!-- Multi-hop RAG -->
-            <div class="bg-base-200/50 rounded-lg p-4 mx-4 mb-4">
-              <div class="flex items-center justify-between mb-3">
-                <div>
-                  <span class="text-base-content font-medium text-sm">
-                    {t("tenant.vector-kb.multihop-title")}
-                  </span>
-                  <p class="text-xs text-base-content/60">
-                    {t("tenant.vector-kb.multihop-description")}
-                  </p>
-                </div>
-                <input
-                  type="checkbox"
-                  class="toggle toggle-primary toggle-sm"
-                  bind:checked={tenantData.vector_kb_multihop_enabled}
-                />
-              </div>
-              {#if tenantData.vector_kb_multihop_enabled}
-                <div class="mt-3">
-                  <div class="w-full max-w-xs">
-                    <span class="text-base-content text-xs">
-                      {t("tenant.vector-kb.multihop-max-hops")}
+                <div class="grid grid-cols-2 gap-4 mx-4 mb-4">
+                  <!-- Max Storage -->
+                  <div class="w-full">
+                    <span class="mb-2 text-base-content font-medium text-sm">
+                      {t("tenant.vector-kb.max-storage")}
                     </span>
                     <input
                       type="number"
-                      class="input input-bordered input-sm w-full mt-1"
-                      bind:value={tenantData.vector_kb_max_hops}
-                      min="1"
-                      max="5"
+                      class="input input-bordered w-full mt-1"
+                      bind:value={tenantData.vector_kb_max_storage_mb}
+                      min="50"
+                      max="10000"
+                    />
+                    <p class="text-xs text-base-content/60 mt-1">
+                      {t("tenant.vector-kb.max-storage-help")}
+                    </p>
+                  </div>
+                  <div class="w-full"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- RAG Enhancements Section -->
+            <div
+              class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
+            >
+              <input type="checkbox" />
+              <div class="collapse-title">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center">
+                    <span class="label-text text-base-content font-medium">
+                      {t("tenant.vector-kb.rag-enhancements")}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="collapse-content">
+                <!-- Reranking -->
+                <div class="bg-base-200/50 rounded-lg p-4 mx-4 mb-4">
+                  <div class="flex items-center justify-between mb-3">
+                    <div>
+                      <span class="text-base-content font-medium text-sm">
+                        {t("tenant.vector-kb.rerank-title")}
+                      </span>
+                      <p class="text-xs text-base-content/60">
+                        {t("tenant.vector-kb.rerank-description")}
+                      </p>
+                    </div>
+                    <input
+                      type="checkbox"
+                      class="toggle toggle-primary toggle-sm"
+                      bind:checked={tenantData.vector_kb_rerank_enabled}
+                    />
+                  </div>
+                  {#if tenantData.vector_kb_rerank_enabled}
+                    <div class="grid grid-cols-2 gap-4 mt-3">
+                      <div class="w-full">
+                        <span class="text-base-content text-xs">
+                          {t("tenant.vector-kb.rerank-top-n")}
+                        </span>
+                        <input
+                          type="number"
+                          class="input input-bordered input-sm w-full mt-1"
+                          bind:value={tenantData.vector_kb_rerank_top_n}
+                          min="1"
+                          max="20"
+                        />
+                      </div>
+                      <div class="w-full">
+                        <span class="text-base-content text-xs">
+                          {t("tenant.vector-kb.rerank-candidates")}
+                        </span>
+                        <input
+                          type="number"
+                          class="input input-bordered input-sm w-full mt-1"
+                          bind:value={tenantData.vector_kb_rerank_candidates}
+                          min="10"
+                          max="100"
+                        />
+                      </div>
+                    </div>
+                  {/if}
+                </div>
+
+                <!-- Hybrid Search -->
+                <div class="bg-base-200/50 rounded-lg p-4 mx-4 mb-4">
+                  <div class="flex items-center justify-between mb-3">
+                    <div>
+                      <span class="text-base-content font-medium text-sm">
+                        {t("tenant.vector-kb.hybrid-title")}
+                      </span>
+                      <p class="text-xs text-base-content/60">
+                        {t("tenant.vector-kb.hybrid-description")}
+                      </p>
+                    </div>
+                    <input
+                      type="checkbox"
+                      class="toggle toggle-primary toggle-sm"
+                      bind:checked={tenantData.vector_kb_hybrid_enabled}
+                    />
+                  </div>
+                  {#if tenantData.vector_kb_hybrid_enabled}
+                    <div class="mt-3">
+                      <div class="w-full max-w-xs">
+                        <span class="text-base-content text-xs">
+                          {t("tenant.vector-kb.hybrid-alpha")}
+                        </span>
+                        <input
+                          type="number"
+                          class="input input-bordered input-sm w-full mt-1"
+                          bind:value={tenantData.vector_kb_hybrid_alpha}
+                          min="0"
+                          max="1"
+                          step="0.1"
+                        />
+                        <p class="text-xs text-base-content/60 mt-1">
+                          {t("tenant.vector-kb.hybrid-alpha-help")}
+                        </p>
+                      </div>
+                    </div>
+                  {/if}
+                </div>
+
+                <!-- Answerability Check -->
+                <div class="bg-base-200/50 rounded-lg p-4 mx-4 mb-4">
+                  <div class="flex items-center justify-between mb-3">
+                    <div>
+                      <span class="text-base-content font-medium text-sm">
+                        {t("tenant.vector-kb.answerability-title")}
+                      </span>
+                      <p class="text-xs text-base-content/60">
+                        {t("tenant.vector-kb.answerability-description")}
+                      </p>
+                    </div>
+                    <input
+                      type="checkbox"
+                      class="toggle toggle-primary toggle-sm"
+                      bind:checked={tenantData.vector_kb_answerability_enabled}
+                    />
+                  </div>
+                  {#if tenantData.vector_kb_answerability_enabled}
+                    <div class="mt-3">
+                      <div class="w-full max-w-xs">
+                        <span class="text-base-content text-xs">
+                          {t("tenant.vector-kb.answerability-threshold")}
+                        </span>
+                        <input
+                          type="number"
+                          class="input input-bordered input-sm w-full mt-1"
+                          bind:value={
+                            tenantData.vector_kb_answerability_threshold
+                          }
+                          min="0"
+                          max="1"
+                          step="0.1"
+                        />
+                      </div>
+                    </div>
+                  {/if}
+                </div>
+
+                <!-- Context Compression -->
+                <div class="bg-base-200/50 rounded-lg p-4 mx-4 mb-4">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <span class="text-base-content font-medium text-sm">
+                        {t("tenant.vector-kb.compression-title")}
+                      </span>
+                      <p class="text-xs text-base-content/60">
+                        {t("tenant.vector-kb.compression-description")}
+                      </p>
+                    </div>
+                    <input
+                      type="checkbox"
+                      class="toggle toggle-primary toggle-sm"
+                      bind:checked={tenantData.vector_kb_compression_enabled}
                     />
                   </div>
                 </div>
-              {/if}
-            </div>
 
-            <!-- Debug Panel -->
-            <div class="bg-base-200/50 rounded-lg p-4 mx-4 mb-4">
-              <div class="flex items-center justify-between">
-                <div>
-                  <span class="text-base-content font-medium text-sm">
-                    {t("tenant.vector-kb.debug-title")}
-                  </span>
-                  <p class="text-xs text-base-content/60">
-                    {t("tenant.vector-kb.debug-description")}
-                  </p>
+                <!-- Multi-hop RAG -->
+                <div class="bg-base-200/50 rounded-lg p-4 mx-4 mb-4">
+                  <div class="flex items-center justify-between mb-3">
+                    <div>
+                      <span class="text-base-content font-medium text-sm">
+                        {t("tenant.vector-kb.multihop-title")}
+                      </span>
+                      <p class="text-xs text-base-content/60">
+                        {t("tenant.vector-kb.multihop-description")}
+                      </p>
+                    </div>
+                    <input
+                      type="checkbox"
+                      class="toggle toggle-primary toggle-sm"
+                      bind:checked={tenantData.vector_kb_multihop_enabled}
+                    />
+                  </div>
+                  {#if tenantData.vector_kb_multihop_enabled}
+                    <div class="mt-3">
+                      <div class="w-full max-w-xs">
+                        <span class="text-base-content text-xs">
+                          {t("tenant.vector-kb.multihop-max-hops")}
+                        </span>
+                        <input
+                          type="number"
+                          class="input input-bordered input-sm w-full mt-1"
+                          bind:value={tenantData.vector_kb_max_hops}
+                          min="1"
+                          max="5"
+                        />
+                      </div>
+                    </div>
+                  {/if}
                 </div>
-                <input
-                  type="checkbox"
-                  class="toggle toggle-primary toggle-sm"
-                  bind:checked={tenantData.vector_kb_debug_enabled}
-                />
+
+                <!-- Debug Panel -->
+                <div class="bg-base-200/50 rounded-lg p-4 mx-4 mb-4">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <span class="text-base-content font-medium text-sm">
+                        {t("tenant.vector-kb.debug-title")}
+                      </span>
+                      <p class="text-xs text-base-content/60">
+                        {t("tenant.vector-kb.debug-description")}
+                      </p>
+                    </div>
+                    <input
+                      type="checkbox"
+                      class="toggle toggle-primary toggle-sm"
+                      bind:checked={tenantData.vector_kb_debug_enabled}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
+
+            <div class="alert alert-info mb-4">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                class="stroke-current shrink-0 w-6 h-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                ></path>
+              </svg>
+              <span>
+                {t("tenant.vector-kb.info")}
+              </span>
+            </div>
           </div>
-        </div>
-
-        <div class="alert alert-info mb-4">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
-          <span>
-            {t("tenant.vector-kb.info")}
-          </span>
-        </div>
+        {:else}
+          <div class="container mx-auto">
+            <div class="alert mb-4">
+              <span class="text-sm text-base-content/60">
+                {t("tenant.vector-kb.enable-hint")}
+              </span>
+            </div>
+          </div>
+        {/if}
       </div>
-    {:else}
-      <div class="container mx-auto">
-        <div class="alert mb-4">
-          <span class="text-sm text-base-content/60">
-            {t("tenant.vector-kb.enable-hint")}
-          </span>
-        </div>
-      </div>
-    {/if}
-
-    <div class="divider"></div>
-
-    <!-- User Managment -->
-    <div class="mb-3 flex flex-row items-center gap-2">
-      {@html svgIcons.userGroup}
-      <p class="font-medium text-md">{t("user.user-management")}</p>
     </div>
 
-    <div class="flex flex-row space-x-4">
-      <div class="flex-1 flex flex-col mb-4">
-        <div class="bg-base-100 shadow-sm rounded-lg my-4 p-2">
-          <div class="flex p-2 items-center justify-between">
-            <div class="flex items-center">
-              <input
-                id="disable-create-user"
-                type="checkbox"
-                class="checkbox checkbox-primary"
-                value="disable-create-user"
-                bind:checked={tenantData.is_restrict_user_managment}
-              />
-              <label
-                class="label cursor-pointer ml-2"
-                for="disable-create-user"
+    <!-- RIGHT SIDEBAR -->
+    <div class="flex-[1]">
+      <!-- User Management -->
+      <div class="p-5 mb-8 bg-base-100 rounded-lg">
+        <h5 class="mb-4 label">{"User Management"}</h5>
+        <div class="flex flex-col mb-8">
+          <button
+            class={"mb-3 mr-2 btn btn-sm btn-outline font-normal grow-0 w-auto " +
+              `${mode == MODE.Edit ? "" : "btn-disabled"}`}
+            onclick={() => {
+              addTenantAdminFor = "admin";
+              addTenantAdminModal?.show();
+            }}
+          >
+            {@html svgIcons.add}
+            {t("tenant.add-tenant-admin")}
+          </button>
+
+          <button
+            class={"btn btn-sm btn-secondary font-normal grow-0 w-auto " +
+              `${mode == MODE.Edit ? "" : "btn-disabled"}`}
+            onclick={() => {
+              addTenantAdminFor = "sa";
+              addTenantAdminModal?.show();
+            }}
+          >
+            {@html svgIcons.add}
+            {t("tenant.add-tenant-supper-admin")}
+          </button>
+        </div>
+
+        <div class="flex items-center">
+          <input
+            id="disable-create-user"
+            type="checkbox"
+            class="checkbox checkbox-primary"
+            value="disable-create-user"
+            bind:checked={tenantData.is_restrict_user_managment}
+          />
+          <label class="label cursor-pointer ml-2" for="disable-create-user">
+            <span class="label-text text-base-content ml-2"
+              >{t("tenant.restrict-user-managment")}</span
+            >
+          </label>
+        </div>
+      </div>
+
+      <!-- Status & conditions -->
+      <div class="p-5 mb-8 bg-base-100 rounded-lg">
+        <h5 class="mb-4 label">{"Status & conditions"}</h5>
+        <div class="flex p-2 items-center justify-between">
+          <div class="flex items-center">
+            <input
+              id="is-on-posthog"
+              type="checkbox"
+              class="checkbox checkbox-primary"
+              value="is-on-posthog"
+              bind:checked={tenantData.is_on_posthog}
+            />
+            <label class="label cursor-pointer ml-2" for="is-on-posthog">
+              <span class="label-text text-base-content ml-2"
+                >{t("tenant.posthog")}</span
               >
-                <span class="label-text text-base-content ml-2"
-                  >{t("tenant.restrict-user-managment")}</span
-                >
-              </label>
-            </div>
-          </div>
-          <div class="flex p-2 items-center justify-between">
-            <div class="flex items-center">
-              <input
-                id="is-on-posthog"
-                type="checkbox"
-                class="checkbox checkbox-primary"
-                value="is-on-posthog"
-                bind:checked={tenantData.is_on_posthog}
-              />
-              <label class="label cursor-pointer ml-2" for="is-on-posthog">
-                <span class="label-text text-base-content ml-2"
-                  >{t("tenant.posthog")}</span
-                >
-              </label>
-            </div>
+            </label>
           </div>
         </div>
       </div>

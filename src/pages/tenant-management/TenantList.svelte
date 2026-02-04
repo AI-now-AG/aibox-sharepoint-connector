@@ -270,7 +270,7 @@
 </div>
 
 <div class="px-8">
-  <div class="container max-w-full mx-auto p-6">
+  <div class="max-w-full mx-auto p-6">
     <TenantSearchFilter
       {resellerCodeOptions}
       bind:value={searchValue}
