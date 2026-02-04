@@ -1488,7 +1488,7 @@
             <textarea
               name="comment"
               id="comment"
-              class="input input-bordered w-full py-2 text-gray-500"
+              class="input input-bordered w-full py-2 text-gray-500 min-h-24"
               bind:value={tenantData.comment}
             ></textarea>
           </div>
