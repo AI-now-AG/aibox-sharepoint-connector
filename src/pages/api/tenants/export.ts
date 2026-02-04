@@ -1,13 +1,18 @@
+import TenantModel from "$data/models/tenant.model";
 import UserModel from "$data/models/user.model";
 import { getSubscriptionAddOnName } from "$utils/common";
 import type { APIRoute } from "astro";
 import dayjs from "dayjs";
 import { writeToString } from "fast-csv";
 
-export const POST: APIRoute = async ({ request }) => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const POST: APIRoute = async (ctx: APIContext) => {
   try {
-    const body = await request.json();
-    const { tenants = [] } = body;
+    const results = await TenantModel.fetchPaginatedList({
+      page: 1,
+      pageSize: 0,
+    });
+    const { data: tenants } = results;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const userCounts: any = {};
@@ -29,10 +34,10 @@ export const POST: APIRoute = async ({ request }) => {
         "Tenant Name": tenant.name ?? "-",
         Status: tenant.active ? "Active" : "Archived",
         "Date created": `${dayjs(tenant.created_at, "DD.MM.YYYY HH-mm-ss").format("DD.MM.YYYY HH-mm-ss")}`,
-        "Subscription start date": sub.start_date
+        "Subscription start date": sub?.start_date
           ? `${dayjs(sub.start_date, "DD.MM.YYYY").format("DD.MM.YYYY")}`
           : "-",
-        "Subscription cancelled date": sub.cancelled_date
+        "Subscription cancelled date": sub?.cancelled_date
           ? `${dayjs(sub.cancelled_date, "DD.MM.YYYY").format("DD.MM.YYYY")}`
           : "-",
         Subscription: sub?.plan_name ?? "-",
@@ -45,7 +50,7 @@ export const POST: APIRoute = async ({ request }) => {
           sub?.add_ons,
         ),
         "Subscription Price": tenant.totalPrice ?? "-",
-        "Comment": tenant.comment ?? "-",
+        Comment: tenant.comment ?? "-",
         "Number of Users": userCounts[tenant._id] ?? "-",
         Language: tenant.default_language ?? "-",
         "Company Name": billing.company_name ?? "-",

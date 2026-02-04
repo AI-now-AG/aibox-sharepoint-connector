@@ -6,7 +6,7 @@ import UserModel from "$data/models/user.model";
 import { CsvColumn, type CsvRowRaw } from "$types/UserCsv";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const GET: APIRoute = async (ctx: APIContext) => {
+export const POST: APIRoute = async (ctx: APIContext) => {
   const filename = `Users-Export-${dayjs().format("YYYY-MM-DD")}.csv`;
 
   try {

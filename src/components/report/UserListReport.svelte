@@ -60,7 +60,9 @@
 
   const exportUserList = async () => {
     loading = true;
-    fetch("/api/users/export")
+    fetch("/api/users/export", {
+      method: "POST",
+    })
       .then(async (response) => {
         const blob = await response.blob();
         const blobUrl = URL.createObjectURL(

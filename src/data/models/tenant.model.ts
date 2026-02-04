@@ -15,7 +15,6 @@ import {
   ReasoningEffortOption,
   EmbeddingProvider,
 } from "$types/AIProvider";
-import type { active } from "sortablejs";
 
 export const TenantFilterParamsSchema = z.object({
   page: z.number().default(1),
@@ -196,12 +195,10 @@ export default {
     };
 
     if (searchValue || statusFlag || resellerCode) {
-      baseMatch.$or = [];
-
       // Search filter
       if (searchValue) {
         const safeSearch = escapeRegex(searchValue.trim());
-        baseMatch.$or.push(
+        (baseMatch.$or ??= []).push(
           { name: { $regex: safeSearch, $options: "i" } },
           { org_name: { $regex: safeSearch, $options: "i" } },
         );
@@ -209,22 +206,22 @@ export default {
 
       // Status flag filter
       if (statusFlag === FlagStatus.Internal) {
-        baseMatch.$or.push({ is_internal: true });
+        (baseMatch.$or ??= []).push({ is_internal: true });
       }
 
       // Reseller flag filter
       if (statusFlag === FlagStatus.Reseller) {
-        baseMatch.$or.push({ is_reseller: true });
+        (baseMatch.$or ??= []).push({ is_reseller: true });
       }
 
       // Archived flag filter
       if (statusFlag === FlagStatus.Archived) {
-        baseMatch.$or.push({ active: false });
+        (baseMatch.$or ??= []).push({ active: false });
       }
 
       // Reseller code filter
       if (resellerCode) {
-        baseMatch.$or.push({ reseller_code: resellerCode });
+        (baseMatch.$or ??= []).$or.push({ reseller_code: resellerCode });
       }
     }
 
@@ -262,9 +259,20 @@ export default {
         },
       },
       { $sort: { created_at: 1 } },
-      { $skip: skip },
-      { $limit: pageSize },
     ];
+
+    // Trial flag filter
+    if (statusFlag === FlagStatus.Trial) {
+      pipeline.push({
+        $match: { "subscriptions.is_trial": true },
+      });
+    }
+
+    // ✅ Only paginate if pageSize > 0
+    if (pageSize > 0) {
+      pipeline.push({ $skip: skip });
+      pipeline.push({ $limit: pageSize });
+    }
 
     const totalResult = await collection
       .aggregate([

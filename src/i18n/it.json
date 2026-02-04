@@ -826,5 +826,12 @@
   "user-list-report.export": "Export",
   "user.tenant": "Tenant",
   "user.roles": "Roles",
-  "user.super-admin": "Super Admin"
+  "user.super-admin": "Super Admin",
+  "tenant.search-label": "Search",
+  "tenant.flag-status-label": "Internal",
+  "tenant.flag-status.trial": "Trial",
+  "tenant.flag-status.internal": "Internal",
+  "tenant.flag-status.reseller": "Reseller",
+  "tenant.flag-status.archived": "Archived",
+  "tenant.reseller-code": "Archived"
 }

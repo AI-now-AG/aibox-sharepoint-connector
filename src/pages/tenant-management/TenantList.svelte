@@ -189,12 +189,8 @@
   async function exportTenants() {
     try {
       loading = true;
-      const response = await fetch("/api/export-tenants", {
+      const response = await fetch("/api/tenants/export", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          tenants: tenants,
-        }),
       });
       loading = false;
 
@@ -296,10 +292,10 @@
                 >{t("tenant.subscription")}</th
               >
               <th class="py-3 px-4 text-left font-bold text-xs uppercase"
-                >{"Trial"}</th
+                >{"tenant.flag-status.trial"}</th
               >
               <th class="py-3 px-4 text-left font-bold text-xs uppercase"
-                >{"Internal"}</th
+                >{"tenant.flag-status.interal"}</th
               >
               <th class="py-3 px-4 text-left font-bold text-xs uppercase"
                 >{t("tenant.total-price")}</th
@@ -344,17 +340,25 @@
 
                 <td class="py-3 px-4">
                   {#if tenant.subscription?.is_trial}
-                    <span class="badge badge-soft badge-success">Yes</span>
+                    <span class="badge badge-soft badge-success"
+                      >{t("common.yes")}</span
+                    >
                   {:else}
-                    <span class="badge badge-soft badge-warning">No</span>
+                    <span class="badge badge-soft badge-warning"
+                      >{t("common.no")}</span
+                    >
                   {/if}
                 </td>
 
                 <td class="py-3 px-4">
                   {#if tenant.is_internal}
-                    <span class="badge badge-soft badge-success">Yes</span>
+                    <span class="badge badge-soft badge-success"
+                      >{t("common.yes")}</span
+                    >
                   {:else}
-                    <span class="badge badge-soft badge-warning">No</span>
+                    <span class="badge badge-soft badge-warning"
+                      >{t("common.no")}</span
+                    >
                   {/if}
                 </td>
 

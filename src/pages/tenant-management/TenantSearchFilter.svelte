@@ -26,10 +26,10 @@
   let typingTimeout: any;
 
   const flagOptions = [
-    { label: "Trial", value: FlagStatus.Trial },
-    { label: "Internal", value: FlagStatus.Internal },
-    { label: "Reseller", value: FlagStatus.Reseller },
-    { label: "Archived", value: FlagStatus.Archived },
+    { label: t("tenant.flag-status.trial"), value: FlagStatus.Trial },
+    { label: t("tenant.flag-status.internal"), value: FlagStatus.Internal },
+    { label: t("tenant.flag-status.reseller"), value: FlagStatus.Reseller },
+    { label: t("tenant.flag-status.archived"), value: FlagStatus.Archived },
   ];
 
   const onSearch = ({ target }: any) => {
@@ -59,7 +59,7 @@
 
   <div class="flex items-center gap-10">
     <div class="flex-1">
-      <p class="mb-1 label">Search</p>
+      <p class="mb-1 label">{t("tenant.search-label")}</p>
       <label class="input input-bordered flex items-center gap-2 w-full">
         {@html svgIcons.search}
         <input
@@ -71,7 +71,7 @@
       </label>
     </div>
     <div class="flex-1">
-      <p class="mb-2 label">Status Flags</p>
+      <p class="mb-2 label">{t("tenant.flag-status-label")}</p>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
         {#each flagOptions as flag}
           <label class="flex items-center space-x-2">
