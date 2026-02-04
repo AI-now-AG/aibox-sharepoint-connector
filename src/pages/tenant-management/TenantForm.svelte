@@ -1358,12 +1358,28 @@
           </div>
 
           <div class="flex-1 flex flex-col mb-4">
-            <p class="mb-2">{t("tenant.total-price")}</p>
+            <span class="mb-2 text-base-content font-medium text-sm"
+              >{t("subscription.billing-method")}</span
+            >
             <input
               type="text"
-              class="input input-bordered w-full"
-              bind:value={tenantData.totalPrice}
+              class="input input-bordered bg-base-200 w-full"
+              readonly
+              value={tenantData.billing_method
+                ? BillingMethodLabels[
+                    tenantData.billing_method as BillingMethod
+                  ]
+                : ""}
             />
+
+            {#if tenantData.billing_method === BillingMethod.CreditCard}
+              <button
+                class="btn btn-sm btn-neutral px-10 self-start font-medium"
+                onclick={goToBillingPortal}
+              >
+                {"Stripe"}
+              </button>
+            {/if}
           </div>
         </div>
 
@@ -1389,33 +1405,14 @@
 
         <div class="flex flex-row space-x-4">
           <div class="flex-1 flex flex-col mb-4">
-            <span class="mb-2 text-base-content font-medium text-sm"
-              >{t("subscription.billing-method")}</span
-            >
+            <p class="mb-2">{t("tenant.total-price")}</p>
             <input
               type="text"
-              class="input input-bordered bg-base-200 w-full"
-              readonly
-              value={tenantData.billing_method
-                ? BillingMethodLabels[
-                    tenantData.billing_method as BillingMethod
-                  ]
-                : ""}
+              class="input input-bordered w-full"
+              bind:value={tenantData.totalPrice}
             />
           </div>
-          <div class="flex-1 flex flex-col mb-4">
-            {#if tenantData.billing_method === BillingMethod.CreditCard}
-              <span class="mb-2 text-base-content font-medium text-sm"
-                >&nbsp;</span
-              >
-              <button
-                class="btn btn-sm btn-neutral px-10 self-start font-medium"
-                onclick={goToBillingPortal}
-              >
-                {"Stripe"}
-              </button>
-            {/if}
-          </div>
+          <div class="flex-1 flex flex-col mb-4">&nbsp;</div>
         </div>
       </div>
 
@@ -1441,11 +1438,14 @@
             <span class="mb-2 text-base-content font-medium text-sm"
               >{t("subscription.billing-email")}</span
             >
-            <input
-              type="text"
-              class="input input-bordered w-full"
-              bind:value={tenantData.billing_info.email}
-            />
+            <label class="input input-bordered w-full">
+              {@html svgIcons.inputEmailIcon}
+              <input
+                type="text"
+                class=""
+                bind:value={tenantData.billing_info.email}
+              />
+            </label>
           </div>
         </div>
         <div class="flex flex-row space-x-4">
@@ -3236,6 +3236,20 @@
         </div>
 
         <div class="divider mt-3 mb-2"></div>
+
+        <div class="flex flex-row space-x-4">
+          <div class="flex-1 flex flex-col">
+            <p class="text-xs text-base-content/60">
+              {"Total Limit"}
+              {activeUsers}
+            </p>
+          </div>
+          <div class="flex-1 flex flex-col">
+            <p class="text-xs text-bold text-right">
+              {"5"}
+            </p>
+          </div>
+        </div>
 
         <progress class="progress progress-primary w-full" value="60" max="100"
         ></progress>

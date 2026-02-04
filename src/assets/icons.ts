@@ -85,6 +85,7 @@ import thumbDown from "$assets/icons/thumb-down.svg?raw";
 import alertSuccess from "$assets/icons/alert-success.svg?raw";
 import alertWarning from "$assets/icons/alert-warning.svg?raw";
 import alertError from "$assets/icons/alert-error.svg?raw";
+import inputEmailIcon from "$assets/icons/input-email-icon.svg?raw";
 
 export const svgIcons = {
   menuSettings,
@@ -174,4 +175,5 @@ export const svgIcons = {
   alertSuccess,
   alertWarning,
   alertError,
+  inputEmailIcon,
 };
