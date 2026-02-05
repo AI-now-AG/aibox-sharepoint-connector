@@ -32,7 +32,7 @@
     BillingMethod,
     BillingMethodLabels,
   } from "$types/Subscription";
-  import Dropdown from "$components/form/Dropdown.svelte";
+  import Dropdown, { type Option } from "$components/form/Dropdown.svelte";
   import AudioAddonsDropdown from "./AudioAddonsDropdown.svelte";
   import ThemeItem from "./ThemeItem.svelte";
   import { TextModel } from "$types/UsageTracking";
@@ -57,6 +57,7 @@
     subscription?: any;
     activeUsers?: number;
     isStripeInTestMode?: boolean;
+    resellerCodes: string[];
   }
 
   let {
@@ -64,6 +65,7 @@
     subscription,
     activeUsers = 0,
     isStripeInTestMode = false,
+    resellerCodes = [],
   }: Props = $props();
 
   let addTenantAdminFor: "admin" | "sa" = $state("admin");
@@ -76,6 +78,11 @@
     Create: "create",
     Edit: "edit",
   };
+
+  const resellerCodeOptions = resellerCodes.map((c) => ({
+    title: c,
+    value: c,
+  }));
 
   // mode
   const mode = tenant ? MODE.Edit : MODE.Create;
@@ -1375,6 +1382,21 @@
 
         <div class="flex flex-row space-x-4">
           <div class="flex-1 flex flex-col mb-4">
+            <p class="mb-2">{t("tenant.total-price")}</p>
+            <label class="input input-bordered w-full">
+              {@html svgIcons.inputDollarIcon}
+              <input
+                type="text"
+                class="font-medium"
+                bind:value={tenantData.totalPrice}
+              />
+            </label>
+          </div>
+          <div class="flex-1 flex flex-col mb-4">&nbsp;</div>
+        </div>
+
+        <div class="flex flex-row space-x-4">
+          <div class="flex-1 flex flex-col mb-4">
             <p class="mb-2">{t("tenant.subscription-start-date")}</p>
             <input
               type="date"
@@ -1388,19 +1410,38 @@
             <input
               type="date"
               bind:value={subscriptionCancelledDate}
-              class="input input-bordered font-medium w-full min-w-xs"
+              class="input input-bordered font-medium w-full"
             />
           </div>
         </div>
 
         <div class="flex flex-row space-x-4">
-          <div class="flex-1 flex flex-col mb-4">
-            <p class="mb-2">{t("tenant.total-price")}</p>
-            <input
-              type="text"
-              class="input input-bordered w-full"
-              bind:value={tenantData.totalPrice}
-            />
+          <div class="flex-1 flex justify-between mb-4">
+            <div class="flex items-center">
+              <input
+                id="sub-trial-phase"
+                type="checkbox"
+                class="toggle toggle-primary"
+                bind:checked={tenantData.is_on_posthog}
+              />
+              <label
+                class="label cursor-pointer whitespace-normal"
+                for="sub-trial-phase"
+              >
+                <span class="label-text text-base-content ml-2"
+                  >{"Trial Phase"}</span
+                >
+              </label>
+            </div>
+
+            <div class="flex items-center">
+              <p class="mr-2">{"Start Date"}</p>
+              <input
+                type="date"
+                bind:value={subscriptionCancelledDate}
+                class="input input-bordered font-medium w-36"
+              />
+            </div>
           </div>
           <div class="flex-1 flex flex-col mb-4">&nbsp;</div>
         </div>
@@ -1471,6 +1512,10 @@
               bind:value={tenantData.billing_info.location}
             />
           </div>
+          <div class="flex-1 flex flex-col mb-4">&nbsp;</div>
+        </div>
+
+        <div class="flex flex-row space-x-4">
           <div class="flex-1 flex flex-col mb-4">
             <span class="mb-2 text-base-content font-medium text-sm"
               >{t("tenant.comment")}</span
@@ -3137,7 +3182,7 @@
             class="label cursor-pointer ml-2 whitespace-normal"
             for="disable-create-user"
           >
-            <span class="label-text text-base-content text-sm ml-2"
+            <span class="label-text text-base-content text-sm"
               >{t("tenant.restrict-user-managment")}</span
             >
           </label>
@@ -3153,30 +3198,41 @@
               id="is-internal"
               type="checkbox"
               class="toggle toggle-primary"
+              bind:checked={tenantData.is_internal}
             />
             <label
               class="label cursor-pointer ml-2 whitespace-normal"
               for="is-internal"
             >
-              <span class="label-text text-base-content text-sm ml-2"
+              <span class="label-text text-base-content text-sm"
                 >{"Internal"}</span
               >
             </label>
           </div>
           <div class="flex items-center p-3 bg-base-300/40 rounded-md">
-            <input
-              id="is-reseller"
-              type="checkbox"
-              class="toggle toggle-primary"
-            />
-            <label
-              class="label cursor-pointer ml-2 whitespace-normal"
-              for="is-reseller"
-            >
-              <span class="label-text text-base-content text-sm ml-2"
-                >{"Reseller"}</span
+            <div class="mr-auto">
+              <input
+                id="is-reseller"
+                type="checkbox"
+                class="toggle toggle-primary"
+                bind:checked={tenantData.is_reseller}
+              />
+              <label
+                class="label cursor-pointer ml-2 whitespace-normal"
+                for="is-reseller"
               >
-            </label>
+                <span class="label-text text-base-content text-sm"
+                  >{"Reseller"}</span
+                >
+              </label>
+            </div>
+            <input
+              type="text"
+              class="input input-bordered input-sm w-32 disabled:bg-base-100"
+              placeholder="Enter Code"
+              bind:value={tenantData.reseller_code}
+              disabled={!tenantData.is_reseller}
+            />
           </div>
           <div class="flex items-center p-3 bg-base-300/40 rounded-md">
             <input
@@ -3189,10 +3245,19 @@
               class="label cursor-pointer ml-2 whitespace-normal"
               for="is-on-posthog"
             >
-              <span class="label-text text-base-content text-sm ml-2"
+              <span class="label-text text-base-content text-sm"
                 >{t("tenant.posthog")}</span
               >
             </label>
+          </div>
+          <div class="flex-1 flex flex-col mt-4">
+            <span class="mb-2 text-base-content font-medium text-sm"
+              >{`Owned By Reseller Code`}</span
+            >
+            <Dropdown
+              options={resellerCodeOptions}
+              bind:value={tenantData.owned_by_reseller}
+            />
           </div>
         </div>
       </div>

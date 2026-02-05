@@ -22,6 +22,7 @@ const SubscriptionSchema = z.object({
   start_date: z.coerce.date().nullable().optional(),
   cancelled_date: z.coerce.date().nullable().optional(),
   is_trial: z.boolean().optional().default(false), // tenant marker flag only; currently not used in any logic
+  trial_start_date: z.coerce.date().nullable().optional(), // currently not used in any logic
   created_at: z
     .date()
     .optional()
