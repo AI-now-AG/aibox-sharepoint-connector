@@ -32,7 +32,7 @@
     BillingMethod,
     BillingMethodLabels,
   } from "$types/Subscription";
-  import Dropdown, { type Option } from "$components/form/Dropdown.svelte";
+  import Dropdown from "$components/form/Dropdown.svelte";
   import AudioAddonsDropdown from "./AudioAddonsDropdown.svelte";
   import ThemeItem from "./ThemeItem.svelte";
   import { TextModel } from "$types/UsageTracking";
@@ -211,10 +211,17 @@
   let selectedSubtitleStudioOptions: AudioOptionId[] = $state(
     initSubtitleStudioOptions,
   );
-  tenantData.billing_info = tenant?.billing_info ?? {};
-  let subscriptionStartDate: any = $state("");
-  let subscriptionCancelledDate: any = $state("");
 
+  tenantData.billing_info = tenant?.billing_info ?? {};
+
+  let subscriptionData = $state({
+    is_trial: subscription?.is_trial ?? false,
+    trial_start_date: subscription?.trial_start_date?.split("T")[0] ?? "",
+    start_date: subscription?.start_date?.split("T")[0] ?? "",
+    cancelled_date: subscription?.cancelled_date?.split("T")[0] ?? "",
+  });
+
+  // Features enabled
   let openAIEnabled: boolean = $state(false);
   let openAIGpt5Enabled: boolean = $state(false);
   let azureOpenAIEnabled: boolean = $state(false);
@@ -544,6 +551,9 @@
   }
   if (tenantData && !tenantData.openai_gpt5_reasoning_effort) {
     tenantData.openai_gpt5_reasoning_effort = ReasoningEffortOption.None;
+  }
+  if (tenantData && !tenantData.owned_by_reseller) {
+    tenantData.owned_by_reseller = "";
   }
 
   function togglePassword(field: HTMLInputElement) {
@@ -1062,12 +1072,10 @@
               ...selectedAudioToTextOptions,
               ...selectedSubtitleStudioOptions,
             ],
-            start_date: subscriptionStartDate
-              ? new Date(subscriptionStartDate)
-              : null,
-            cancelled_date: subscriptionCancelledDate
-              ? new Date(subscriptionCancelledDate)
-              : null,
+            start_date: subscriptionData.start_date || null,
+            cancelled_date: subscriptionData.cancelled_date || null,
+            is_trial: subscriptionData.is_trial || false,
+            trial_start_date: subscriptionData.trial_start_date || null,
           },
         });
         loading = false;
@@ -1205,14 +1213,6 @@
 
     if (!tenant.totalPrice) {
       tenant.totalPrice = calculateTotalPrice();
-    }
-
-    if (subscription?.start_date) {
-      subscriptionStartDate = subscription.start_date.split("T")[0];
-    }
-
-    if (subscription?.cancelled_date) {
-      subscriptionCancelledDate = subscription.cancelled_date.split("T")[0];
     }
   });
 </script>
@@ -1358,25 +1358,29 @@
             <span class="mb-2 text-base-content font-medium text-sm"
               >{t("subscription.billing-method")}</span
             >
-            <input
-              type="text"
-              class="input input-bordered bg-base-200 w-full"
-              readonly
-              value={tenantData.billing_method
-                ? BillingMethodLabels[
-                    tenantData.billing_method as BillingMethod
-                  ]
-                : ""}
-            />
-
-            {#if tenantData.billing_method === BillingMethod.CreditCard}
-              <button
-                class="btn btn-sm btn-neutral px-10 self-start font-medium"
-                onclick={goToBillingPortal}
-              >
-                {"Stripe"}
-              </button>
-            {/if}
+            <div class="join">
+              <div class="w-full">
+                <label class="input input-bordered bg-base-200 w-full">
+                  <input
+                    type="text"
+                    readonly
+                    value={tenantData.billing_method
+                      ? BillingMethodLabels[
+                          tenantData.billing_method as BillingMethod
+                        ]
+                      : ""}
+                  />
+                </label>
+              </div>
+              {#if tenantData.billing_method === BillingMethod.CreditCard}
+                <button
+                  class="btn btn-neutral px-10 self-start font-medium"
+                  onclick={goToBillingPortal}
+                >
+                  {"Stripe"}
+                </button>
+              {/if}
+            </div>
           </div>
         </div>
 
@@ -1400,7 +1404,7 @@
             <p class="mb-2">{t("tenant.subscription-start-date")}</p>
             <input
               type="date"
-              bind:value={subscriptionStartDate}
+              bind:value={subscriptionData.start_date}
               class="input input-bordered w-full font-medium pr-10 focus:ring-2 focus:ring-indigo-500"
             />
           </div>
@@ -1409,7 +1413,7 @@
 
             <input
               type="date"
-              bind:value={subscriptionCancelledDate}
+              bind:value={subscriptionData.cancelled_date}
               class="input input-bordered font-medium w-full"
             />
           </div>
@@ -1422,7 +1426,7 @@
                 id="sub-trial-phase"
                 type="checkbox"
                 class="toggle toggle-primary"
-                bind:checked={tenantData.is_on_posthog}
+                bind:checked={subscriptionData.is_trial}
               />
               <label
                 class="label cursor-pointer whitespace-normal"
@@ -1438,7 +1442,7 @@
               <p class="mr-2">{"Start Date"}</p>
               <input
                 type="date"
-                bind:value={subscriptionCancelledDate}
+                bind:value={subscriptionData.trial_start_date}
                 class="input input-bordered font-medium w-36"
               />
             </div>
