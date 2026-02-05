@@ -20,7 +20,7 @@ export const TenantFilterParamsSchema = z.object({
   page: z.number().default(1),
   pageSize: z.number().default(20),
   searchValue: z.string().nullish(),
-  statusFlag: z.string().nullish(),
+  statusFlags: z.array(z.string()).optional().default([]),
   resellerCode: z.string().nullish(),
 });
 export type TenantFilterParams = z.infer<typeof TenantFilterParamsSchema>;
@@ -189,7 +189,7 @@ export default {
   },
 
   fetchPaginatedList: async (filterParams: TenantFilterParams) => {
-    const { page, pageSize, searchValue, statusFlag, resellerCode } =
+    const { page, pageSize, searchValue, statusFlags, resellerCode } =
       filterParams;
     const skip = (page - 1) * pageSize;
 
@@ -201,7 +201,7 @@ export default {
       return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     };
 
-    if (searchValue || statusFlag || resellerCode) {
+    if (searchValue || statusFlags.length > 0 || resellerCode) {
       // Search filter
       if (searchValue) {
         const safeSearch = escapeRegex(searchValue.trim());
@@ -212,17 +212,17 @@ export default {
       }
 
       // Status flag filter
-      if (statusFlag === FlagStatus.Internal) {
+      if (statusFlags.includes(FlagStatus.Internal)) {
         (baseMatch.$and ??= []).push({ is_internal: true });
       }
 
       // Reseller flag filter
-      if (statusFlag === FlagStatus.Reseller) {
+      if (statusFlags.includes(FlagStatus.Reseller)) {
         (baseMatch.$and ??= []).push({ is_reseller: true });
       }
 
       // Archived flag filter
-      if (statusFlag === FlagStatus.Archived) {
+      if (statusFlags.includes(FlagStatus.Archived)) {
         (baseMatch.$and ??= []).push({ active: false });
       }
 
@@ -230,6 +230,8 @@ export default {
       if (resellerCode) {
         (baseMatch.$and ??= []).push({ reseller_code: resellerCode });
       }
+    } else {
+      (baseMatch.$and ??= []).push({ active: true });
     }
 
     // Build pipeline dynamically
@@ -269,7 +271,7 @@ export default {
     ];
 
     // Trial flag filter
-    if (statusFlag === FlagStatus.Trial) {
+    if (statusFlags.includes(FlagStatus.Trial)) {
       pipeline.push({
         $match: { "subscriptions.is_trial": true },
       });

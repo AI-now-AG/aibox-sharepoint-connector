@@ -10,7 +10,7 @@
   interface Props {
     resellerCodeOptions: Option[];
     value?: string;
-    statusFlag?: string;
+    statusFlags?: string[];
     resellerCode?: string;
     onsearch: Function;
     onfilter: Function;
@@ -19,7 +19,7 @@
   let {
     resellerCodeOptions = [],
     value = $bindable(""),
-    statusFlag = $bindable(""),
+    statusFlags = $bindable([]),
     resellerCode = $bindable(""),
     onsearch,
     onfilter,
@@ -48,7 +48,11 @@
   }
 
   function toggleFlagStatus(value: string) {
-    statusFlag = statusFlag === value ? "" : value;
+    if (statusFlags.includes(value)) {
+      statusFlags = statusFlags.filter((v) => v !== value);
+    } else {
+      statusFlags = [...statusFlags, value];
+    }
     onfilter();
   }
 </script>
@@ -78,11 +82,11 @@
         {#each flagOptions as flag}
           <label class="flex items-center space-x-2">
             <input
-              type="radio"
+              type="checkbox"
               name="status_flag"
               value={flag.value}
-              class="radio border-base-content w-5 h-5"
-              checked={statusFlag === flag.value}
+              class="checkbox"
+              checked={statusFlags.includes(flag.value)}
               onclick={() => toggleFlagStatus(flag.value)}
             />
             <span class="label-text">{flag.label}</span>
