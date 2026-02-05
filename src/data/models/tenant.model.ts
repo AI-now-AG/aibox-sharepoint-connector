@@ -20,7 +20,7 @@ export const TenantFilterParamsSchema = z.object({
   page: z.number().default(1),
   pageSize: z.number().default(20),
   searchValue: z.string().nullish(),
-  statusFlags: z.array(z.string()).optional().default([]),
+  statusFlags: z.array(z.string()),
   resellerCode: z.string().nullish(),
 });
 export type TenantFilterParams = z.infer<typeof TenantFilterParamsSchema>;

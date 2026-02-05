@@ -11,6 +11,7 @@ export const POST: APIRoute = async (ctx: APIContext) => {
     const results = await TenantModel.fetchPaginatedList({
       page: 1,
       pageSize: 0,
+      statusFlags: [],
     });
     const { data: tenants } = results;
 
