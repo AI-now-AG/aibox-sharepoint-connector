@@ -831,7 +831,7 @@
   "vector-kb.confirm-delete-multiple": "Are you sure you want to delete the selected files? All associated chunks will also be deleted.",
   "vector-kb.upload-failed": "Failed to upload file. Please try again.",
   "vector-kb.error-storage-limit-exceeded": "Storage limit exceeded. Please delete some files or contact support to increase your storage limit.",
-  "vector-kb.error-file-too-large": "File size exceeds the maximum allowed size. Please upload a smaller file.",
+  "vector-kb.error-file-too-large": "File size exceeds the maximum allowed size (25 MB). Please upload a smaller file.",
   "vector-kb.storage-warning-90": "You have used over 90% of your storage. Consider deleting unused files or <a href=\"mailto:support@aibox-app.ch\" class=\"underline\">contact support</a> to increase your limit.",
   "vector-kb.error-duplicate-file": "The file \"${name}\" already exists in this folder. Please rename the file or delete the existing one first.",
   "user.reset-password": "Reset Password",
@@ -844,5 +844,13 @@
   "user-list-report.export": "Export",
   "user.tenant": "Tenant",
   "user.roles": "Roles",
-  "user.super-admin": "Super Admin"
+  "user.super-admin": "Super Admin",
+  "tenant.search-label": "Search",
+  "tenant.flag-status-label": "Internal",
+  "tenant.flag-status.trial": "Trial",
+  "tenant.flag-status.internal": "Internal",
+  "tenant.flag-status.reseller": "Reseller",
+  "tenant.flag-status.archived": "Archived",
+  "tenant.reseller-code": "Archived",
+  "pagination.showing-range-of-total": "Showing ${from} to ${to} of ${total} results"
 }
