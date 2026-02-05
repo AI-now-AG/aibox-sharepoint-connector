@@ -59,7 +59,7 @@
     <label
       tabindex={disabled ? -1 : 0}
       class={"select select-bordered w-full rounded-lg " +
-        (value ? "" : "text-[#a29bd6]") +
+        (value ? "" : "text-base-content/30") +
         (disabled ? " pointer-events-none opacity-50 bg-gray-200 " : " ") +
         placeholderClasses}
     >

@@ -264,6 +264,7 @@ export default {
           active: 1,
           is_internal: 1,
           is_reseller: 1,
+          reseller_code: 1,
           owned_by_reseller: 1,
           subscription: 1,
         },

@@ -847,6 +847,8 @@
   "user.super-admin": "Super Admin",
   "tenant.search-label": "Suche",
   "tenant.flag-status-label": "Status Flags",
+  "tenant.filter-reseller-code-label": "Reseller Code",
+  "tenant.filter-reseller-code-placeholder": "All Codes",
   "tenant.flag-status.trial": "Trial",
   "tenant.flag-status.internal": "Internal",
   "tenant.flag-status.reseller": "Reseller",

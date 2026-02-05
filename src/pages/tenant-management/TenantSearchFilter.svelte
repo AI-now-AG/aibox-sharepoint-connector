@@ -60,7 +60,7 @@
 <div class="px-5 py-5 bg-base-100 rounded-lg items-center mb-10">
   <div class="inline-flex items-center mb-2">
     {@html svgIcons.filter}
-    <h3 class="ml-2 text-1xl font-bold uppercase text-base-content/80">
+    <h3 class="ml-2 text-normal font-normal">
       {t("tenant.filter-label")}
     </h3>
   </div>
@@ -72,14 +72,16 @@
         {@html svgIcons.search}
         <input
           type="text"
-          class="grow text-sm"
+          class="grow"
           placeholder={t("tenant.tenants.seach-place-holder")}
           oninput={preventDefault(onSearch)}
         />
       </label>
     </div>
     <div class="col-span-4">
-      <p class="mb-2 text-base-content/80">{t("tenant.flag-status-label")}</p>
+      <p class="mb-2 text-base-content/80">
+        {t("tenant.flag-status-label")}
+      </p>
       <div class="grid grid-cols-2 2xl:grid-cols-4 max-w-md gap-2">
         {#each flagOptions as flag}
           <label class="flex items-center space-x-2">
@@ -91,17 +93,19 @@
               checked={statusFlags.includes(flag.value)}
               onclick={() => toggleFlagStatus(flag.value)}
             />
-            <span class="font-normal">{flag.label}</span>
+            <span class="text-sm font-normal">{flag.label}</span>
           </label>
         {/each}
       </div>
     </div>
     <div class="col-span-2">
-      <p class="mb-2 text-base-content/80">{"Reseller Code"}</p>
+      <p class="mb-2 text-base-content/80">
+        {t("tenant.filter-reseller-code-label")}
+      </p>
       <Dropdown
         classes={"w-full"}
         options={resellerCodeOptions}
-        placeholder={"All Codes"}
+        placeholder={t("tenant.filter-reseller-code-placeholder")}
         bind:value={resellerCode}
         onValueChange={(value: string) => {
           onResellerCodeChange(value);
