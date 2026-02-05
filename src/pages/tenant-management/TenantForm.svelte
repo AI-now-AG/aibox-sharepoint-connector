@@ -11,6 +11,7 @@
   import {
     trimInput,
     toLowerCase,
+    toUpperCase,
     replaceSpecialChars,
   } from "$components/actions/Input.svelte";
   import InputDialog from "$components/InputDialog.svelte";
@@ -3249,6 +3250,9 @@
               type="text"
               class="input input-bordered input-sm w-32 disabled:bg-base-100"
               placeholder="Enter Code"
+              use:trimInput
+              use:toUpperCase
+              use:replaceSpecialChars
               bind:value={tenantData.reseller_code}
               disabled={!tenantData.is_reseller}
             />
