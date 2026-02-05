@@ -1288,7 +1288,9 @@
       <div class="p-5 mb-8 bg-base-100 rounded-lg">
         <div class="mb-4 flex flex-row items-center gap-2">
           {@html svgIcons.userGroup}
-          <p class="font-bold text-md">{t("tenant.detail.general-settings")}</p>
+          <p class="font-medium text-md">
+            {t("tenant.detail.general-settings")}
+          </p>
         </div>
         <div class="flex flex-row space-x-4">
           <div class="flex-1 flex flex-col mb-4">
@@ -3165,7 +3167,9 @@
     <div class="col-span-2">
       <!-- User Management -->
       <div class="p-5 mb-8 bg-base-100 rounded-lg">
-        <h5 class="mb-4 label">{t("tenant.detail.user-management")}</h5>
+        <h5 class="mb-4 text-sm uppercase text-base-content/80">
+          {t("tenant.detail.user-management")}
+        </h5>
         <div class="flex flex-col gap-2 mb-8">
           <button
             class={"mb-3 btn btn-outline font-normal grow-0 w-auto " +
@@ -3213,7 +3217,9 @@
 
       <!-- Status & conditions -->
       <div class="p-5 mb-8 bg-base-100 rounded-lg">
-        <h5 class="mb-4 label">{t("tenant.detail.status-conditions")}</h5>
+        <h5 class="mb-4 text-sm uppercase text-base-content/80">
+          {t("tenant.detail.status-conditions")}
+        </h5>
         <div class="flex flex-col gap-2">
           <div class="flex items-center p-3 bg-base-300/40 rounded-md">
             <input
@@ -3291,7 +3297,9 @@
 
       <!-- User Limits -->
       <div class="p-5 mb-8 bg-base-100 rounded-lg">
-        <h5 class="mb-4 label">{t("tenant.detail.user-limits")}</h5>
+        <h5 class="mb-4 text-sm uppercase text-base-content/80">
+          {t("tenant.detail.user-limits")}
+        </h5>
 
         <div class="flex flex-row space-x-4">
           <div class="flex-1 flex flex-col">
