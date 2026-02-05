@@ -239,7 +239,9 @@
     (tenant.included_user_limit || 0) + (tenant.extra_user_limit || 0),
   );
   let userUsagePercent = $derived(
-    ((activeUsers * 100) / totalUserLimit).toFixed(0),
+    totalUserLimit > 0
+      ? Math.min(100, Math.round((activeUsers / totalUserLimit) * 100))
+      : 0,
   );
 
   $effect(() => {
