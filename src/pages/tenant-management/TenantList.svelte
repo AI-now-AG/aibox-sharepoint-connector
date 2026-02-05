@@ -321,7 +321,7 @@
           </thead>
           <tbody>
             {#each tenants as tenant}
-              <tr class="h-16 bg-base-100 hover:bg-base-300 text-sm">
+              <tr class="h-16 bg-base-100 hover:bg-base-300/30 text-sm">
                 <td class="py-3 px-4 text-sm font-medium">
                   <a
                     class="hover:underline hover:underline-offset-2"

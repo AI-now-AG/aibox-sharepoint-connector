@@ -1386,7 +1386,7 @@
             <label class="input input-bordered w-full">
               {@html svgIcons.inputDollarIcon}
               <input
-                type="text"
+                type="number"
                 class="font-medium"
                 bind:value={tenantData.totalPrice}
               />
