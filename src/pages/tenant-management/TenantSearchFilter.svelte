@@ -59,8 +59,8 @@
     <h3 class="ml-2 text-1xl font-bold">FILTER</h3>
   </div>
 
-  <div class="flex items-center gap-10">
-    <div class="flex-1">
+  <div class="grid grid-cols-1 xl:grid-cols-10 gap-10">
+    <div class="col-span-4">
       <p class="mb-1 label">{t("tenant.search-label")}</p>
       <label class="input input-bordered flex items-center gap-2 w-full">
         {@html svgIcons.search}
@@ -72,9 +72,9 @@
         />
       </label>
     </div>
-    <div class="flex-1">
+    <div class="col-span-4">
       <p class="mb-2 label">{t("tenant.flag-status-label")}</p>
-      <div class="grid grid-cols-2 2xl:grid-cols-4 gap-2">
+      <div class="grid grid-cols-2 2xl:grid-cols-4 max-w-md gap-2">
         {#each flagOptions as flag}
           <label class="flex items-center space-x-2">
             <input
@@ -90,18 +90,16 @@
         {/each}
       </div>
     </div>
-    <div class="flex-1">
-      <div class="pl-0 lg:pl-24">
-        <p class="mb-2 label">{"Reseller Code"}</p>
-        <Dropdown
-          classes={"w-full"}
-          options={resellerCodeOptions}
-          bind:value={resellerCode}
-          onValueChange={(value: string) => {
-            onResellerCodeChange(value);
-          }}
-        />
-      </div>
+    <div class="col-span-2">
+      <p class="mb-2 label">{"Reseller Code"}</p>
+      <Dropdown
+        classes={"w-full"}
+        options={resellerCodeOptions}
+        bind:value={resellerCode}
+        onValueChange={(value: string) => {
+          onResellerCodeChange(value);
+        }}
+      />
     </div>
   </div>
 </div>
