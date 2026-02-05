@@ -92,7 +92,7 @@
   "tenant.tenants": "Tenants",
   "tenant.tenants.add-new-tenant": "New tenant",
   "tenant.tenants.add-tenant": "Add tenant",
-  "tenant.tenants.seach-place-holder": "Type here",
+  "tenant.tenants.seach-place-holder": "Search tenants",
   "tenant.tenants.show-archived": "Show archived",
   "tenant.tenants.all-tenants": "All tenants (${amount})",
   "tenant.tenants.tenant.display-name": "Display name",

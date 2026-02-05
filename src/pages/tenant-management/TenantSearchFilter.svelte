@@ -60,12 +60,12 @@
 <div class="px-5 py-5 bg-base-100 rounded-lg items-center mb-10">
   <div class="inline-flex items-center mb-2">
     {@html svgIcons.filter}
-    <h3 class="ml-2 text-1xl font-bold">FILTER</h3>
+    <h3 class="ml-2 text-1xl font-bold text-base-content/80">FILTERS</h3>
   </div>
 
   <div class="grid grid-cols-1 xl:grid-cols-10 gap-10">
     <div class="col-span-4">
-      <p class="mb-1 label">{t("tenant.search-label")}</p>
+      <p class="mb-1 text-base-content/80">{t("tenant.search-label")}</p>
       <label class="input input-bordered flex items-center gap-2 w-full">
         {@html svgIcons.search}
         <input
@@ -77,7 +77,7 @@
       </label>
     </div>
     <div class="col-span-4">
-      <p class="mb-2 label">{t("tenant.flag-status-label")}</p>
+      <p class="mb-2 text-base-content/80">{t("tenant.flag-status-label")}</p>
       <div class="grid grid-cols-2 2xl:grid-cols-4 max-w-md gap-2">
         {#each flagOptions as flag}
           <label class="flex items-center space-x-2">
@@ -85,20 +85,21 @@
               type="checkbox"
               name="status_flag"
               value={flag.value}
-              class="checkbox"
+              class="checkbox checkbox-sm checkbox-neutral"
               checked={statusFlags.includes(flag.value)}
               onclick={() => toggleFlagStatus(flag.value)}
             />
-            <span class="label-text">{flag.label}</span>
+            <span class="font-normal">{flag.label}</span>
           </label>
         {/each}
       </div>
     </div>
     <div class="col-span-2">
-      <p class="mb-2 label">{"Reseller Code"}</p>
+      <p class="mb-2 text-base-content/80">{"Reseller Code"}</p>
       <Dropdown
         classes={"w-full"}
         options={resellerCodeOptions}
+        placeholder={"All Codes"}
         bind:value={resellerCode}
         onValueChange={(value: string) => {
           onResellerCodeChange(value);

@@ -287,7 +287,7 @@
     />
 
     <div>
-      <h2 class="text-lg font-normal mb-4">
+      <h2 class="text-lg font-normal text-base-content/80 mb-4">
         {t("tenant.tenants.all-tenants", { amount: total })}
       </h2>
 
@@ -298,22 +298,22 @@
         >
           <thead>
             <tr class="bg-base-300">
-              <th class="py-3 px-4 text-left font-bold text-xs uppercase"
+              <th class="py-3 px-4 text-left font-normal text-xs uppercase"
                 >{t("tenant.tenants.tenant.display-name")}</th
               >
-              <th class="py-3 px-4 text-left font-bold text-xs uppercase"
+              <th class="py-3 px-4 text-left font-normal text-xs uppercase"
                 >{t("tenant.subscription")}</th
               >
-              <th class="py-3 px-4 text-left font-bold text-xs uppercase"
+              <th class="py-3 px-4 text-left font-normal text-xs uppercase"
                 >{t("tenant.flag-status.trial")}</th
               >
-              <th class="py-3 px-4 text-left font-bold text-xs uppercase"
+              <th class="py-3 px-4 text-left font-normal text-xs uppercase"
                 >{t("tenant.flag-status.internal")}</th
               >
-              <th class="py-3 px-4 text-left font-bold text-xs uppercase"
+              <th class="py-3 px-4 text-left font-normal text-xs uppercase"
                 >{t("tenant.total-price")}</th
               >
-              <th class="py-3 px-4 text-left font-bold text-xs uppercase"
+              <th class="py-3 px-4 text-left font-normal text-xs uppercase"
                 >{t("tenant.tenants.tenant.active")}</th
               >
               <th class="py-3 px-4">&nbsp;</th>
