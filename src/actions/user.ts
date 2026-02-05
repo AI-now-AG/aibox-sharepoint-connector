@@ -88,7 +88,12 @@ export const user = {
     input: z.intersection(UserFilterParamsSchema, TenantInputIdentifierSchema),
     handler: async (input, context) => {
       const tenantId = new ObjectId(input.tenantId);
-      const maxUserLimit = context.locals.tenant?.max_user_limit || 0;
+      const {
+        included_user_limit: includedUserLimit,
+        extra_user_limit: extraUserLimit,
+      } = context.locals.tenant;
+
+      const maxUserLimit = (includedUserLimit || 0) + (extraUserLimit || 0);
       const data = await UserModel.listByTenant(tenantId, input);
 
       let limitReached = false;
@@ -112,9 +117,11 @@ export const user = {
       const {
         _id: tenantId,
         org_id: organizationId,
-        max_user_limit: maxUserLimit,
+        included_user_limit: includedUserLimit,
+        extra_user_limit: extraUserLimit,
       } = context.locals.tenant;
 
+      const maxUserLimit = (includedUserLimit || 0) + (extraUserLimit || 0);
       const countUsers = await UserModel.countUsersByTenant(tenantId);
       if (maxUserLimit && maxUserLimit > 0 && countUsers >= maxUserLimit) {
         throw new ActionError({

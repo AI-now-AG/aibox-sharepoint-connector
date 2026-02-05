@@ -28,6 +28,7 @@
   import {
     SubscriptionPackageId,
     SubscriptionExtraPackage,
+    SubscriptionIncludedUsers,
     AudioOptionId,
     BillingMethod,
     BillingMethodLabels,
@@ -186,7 +187,19 @@
   }
 
   // Subscription & billing
-  let selectedPlan: SubscriptionPackageId = $state(
+  const subscriptionOptions = [
+    {
+      value: SubscriptionPackageId.Starter,
+      title: "aibox Starter",
+    },
+    { value: SubscriptionPackageId.Teams, title: "aibox Teams" },
+    { value: SubscriptionPackageId.Pro, title: "aibox Pro" },
+    {
+      value: SubscriptionExtraPackage.Enterprise,
+      title: "aibox Enterprise",
+    },
+  ];
+  let selectedPlan: SubscriptionPackageId | SubscriptionExtraPackage = $state(
     subscription?.plan_name ?? "",
   );
   const planAddOns = subscription?.add_ons ?? [];
@@ -219,6 +232,23 @@
     trial_start_date: subscription?.trial_start_date?.split("T")[0] ?? "",
     start_date: subscription?.start_date?.split("T")[0] ?? "",
     cancelled_date: subscription?.cancelled_date?.split("T")[0] ?? "",
+  });
+
+  // User Limits
+  let totalUserLimit = $derived(
+    (tenant.included_user_limit || 0) + (tenant.extra_user_limit || 0),
+  );
+  let userUsagePercent = $derived(
+    ((activeUsers * 100) / totalUserLimit).toFixed(0),
+  );
+
+  $effect(() => {
+    if (selectedPlan) {
+      tenant.included_user_limit = SubscriptionIncludedUsers[selectedPlan];
+    }
+    if (selectedPlan && selectedPlan == SubscriptionExtraPackage.Enterprise) {
+      tenant.extra_user_limit = 0;
+    }
   });
 
   // Features enabled
@@ -551,9 +581,6 @@
   }
   if (tenantData && !tenantData.openai_gpt5_reasoning_effort) {
     tenantData.openai_gpt5_reasoning_effort = ReasoningEffortOption.None;
-  }
-  if (tenantData && !tenantData.owned_by_reseller) {
-    tenantData.owned_by_reseller = "";
   }
 
   function togglePassword(field: HTMLInputElement) {
@@ -1319,18 +1346,7 @@
           <div class="flex-1 flex flex-col mb-4">
             <Dropdown
               label={t("tenant.subscription")}
-              options={[
-                {
-                  value: SubscriptionPackageId.Starter,
-                  title: "aibox Starter",
-                },
-                { value: SubscriptionPackageId.Teams, title: "aibox Teams" },
-                { value: SubscriptionPackageId.Pro, title: "aibox Pro" },
-                {
-                  value: SubscriptionExtraPackage.Enterprise,
-                  title: "aibox Enterprise",
-                },
-              ]}
+              options={subscriptionOptions}
               bind:value={selectedPlan}
             />
           </div>
@@ -1359,22 +1375,19 @@
               >{t("subscription.billing-method")}</span
             >
             <div class="join">
-              <div class="w-full">
-                <label class="input input-bordered bg-base-200 w-full">
-                  <input
-                    type="text"
-                    readonly
-                    value={tenantData.billing_method
-                      ? BillingMethodLabels[
-                          tenantData.billing_method as BillingMethod
-                        ]
-                      : ""}
-                  />
-                </label>
-              </div>
+              <input
+                type="text"
+                class="input input-bordered bg-base-200 disabled:border-gray-200 w-full join-item"
+                disabled={true}
+                value={tenantData.billing_method
+                  ? BillingMethodLabels[
+                      tenantData.billing_method as BillingMethod
+                    ]
+                  : ""}
+              />
               {#if tenantData.billing_method === BillingMethod.CreditCard}
                 <button
-                  class="btn btn-neutral px-10 self-start font-medium"
+                  class="btn btn-neutral px-10 self-start font-medium join-item"
                   onclick={goToBillingPortal}
                 >
                   {"Stripe"}
@@ -3273,13 +3286,14 @@
         <div class="flex flex-row space-x-4">
           <div class="flex-1 flex flex-col">
             <span class="mb-2 text-base-content font-medium text-sm"
-              >{t("tenant.user-limit")}</span
+              >{"Included"}</span
             >
             <input
               type="number"
               placeholder=""
-              class="input input-bordered w-full"
-              bind:value={tenantData.max_user_limit}
+              class="input input-bordered disabled:bg-base-300/40 disabled:border-gray-200 w-full"
+              bind:value={tenantData.included_user_limit}
+              disabled={true}
             />
           </div>
           <div class="flex-1 flex flex-col">
@@ -3288,8 +3302,9 @@
             >
             <input
               type="number"
-              class="input input-bordered w-full"
-              value={0}
+              class="input input-bordered disabled:bg-base-300/40 disabled:border-gray-200 w-full"
+              bind:value={tenantData.extra_user_limit}
+              disabled={tenantData.included_user_limit == 0}
             />
           </div>
         </div>
@@ -3298,20 +3313,24 @@
 
         <div class="flex flex-row space-x-4">
           <div class="flex-1 flex flex-col">
-            <p class="text-xs text-base-content/60">
+            <p class="text-xs text-medium">
               {"Total Limit"}
-              {activeUsers}
             </p>
           </div>
           <div class="flex-1 flex flex-col">
             <p class="text-xs text-bold text-right">
-              {"5"}
+              {totalUserLimit}
             </p>
           </div>
         </div>
 
-        <progress class="progress progress-primary w-full" value="60" max="100"
-        ></progress>
+        {#if totalUserLimit}
+          <progress
+            class="progress progress-primary w-full"
+            value={userUsagePercent}
+            max="100"
+          ></progress>
+        {/if}
 
         <div class="flex flex-row space-x-4">
           <div class="flex-1 flex flex-col mb-4">
@@ -3321,9 +3340,11 @@
             </p>
           </div>
           <div class="flex-1 flex flex-col mb-4">
-            <p class="text-xs text-base-content/60 text-right">
-              {"60% used"}
-            </p>
+            {#if totalUserLimit}
+              <p class="text-xs text-base-content/60 text-right">
+                {userUsagePercent}% used
+              </p>
+            {/if}
           </div>
         </div>
       </div>
