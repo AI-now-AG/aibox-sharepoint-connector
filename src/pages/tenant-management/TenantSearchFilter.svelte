@@ -60,7 +60,9 @@
 <div class="px-5 py-5 bg-base-100 rounded-lg items-center mb-10">
   <div class="inline-flex items-center mb-2">
     {@html svgIcons.filter}
-    <h3 class="ml-2 text-1xl font-bold text-base-content/80">FILTERS</h3>
+    <h3 class="ml-2 text-1xl font-bold uppercase text-base-content/80">
+      {t("tenant.filter-label")}
+    </h3>
   </div>
 
   <div class="grid grid-cols-1 xl:grid-cols-10 gap-10">

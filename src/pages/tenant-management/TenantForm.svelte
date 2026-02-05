@@ -1288,7 +1288,7 @@
       <div class="p-5 mb-8 bg-base-100 rounded-lg">
         <div class="mb-4 flex flex-row items-center gap-2">
           {@html svgIcons.userGroup}
-          <p class="font-bold text-md">{"General Settings"}</p>
+          <p class="font-bold text-md">{t("tenant.detail.general-settings")}</p>
         </div>
         <div class="flex flex-row space-x-4">
           <div class="flex-1 flex flex-col mb-4">
@@ -1449,13 +1449,13 @@
                 for="sub-trial-phase"
               >
                 <span class="label-text text-base-content ml-2"
-                  >{"Trial Phase"}</span
+                  >{t("tenant.detail.sub-trial-phase")}</span
                 >
               </label>
             </div>
 
             <div class="flex items-center">
-              <p class="mr-2">{"Start Date"}</p>
+              <p class="mr-2">{t("tenant.detail.sub-trial-start-date")}</p>
               <input
                 type="date"
                 bind:value={subscriptionData.trial_start_date}
@@ -1471,7 +1471,9 @@
       <div class="p-5 mb-8 bg-base-100 rounded-lg">
         <div class="mb-3 flex flex-row items-center gap-2">
           {@html svgIcons.money}
-          <p class="font-medium text-md">{"Contact & Address"}</p>
+          <p class="font-medium text-md">
+            {t("tenant.detail.contact-address")}
+          </p>
         </div>
 
         <div class="flex flex-row space-x-4">
@@ -3163,7 +3165,7 @@
     <div class="col-span-2">
       <!-- User Management -->
       <div class="p-5 mb-8 bg-base-100 rounded-lg">
-        <h5 class="mb-4 label">{"User Management"}</h5>
+        <h5 class="mb-4 label">{t("tenant.detail.user-management")}</h5>
         <div class="flex flex-col gap-2 mb-8">
           <button
             class={"mb-3 btn btn-outline font-normal grow-0 w-auto " +
@@ -3211,7 +3213,7 @@
 
       <!-- Status & conditions -->
       <div class="p-5 mb-8 bg-base-100 rounded-lg">
-        <h5 class="mb-4 label">{"Status & conditions"}</h5>
+        <h5 class="mb-4 label">{t("tenant.detail.status-conditions")}</h5>
         <div class="flex flex-col gap-2">
           <div class="flex items-center p-3 bg-base-300/40 rounded-md">
             <input
@@ -3249,7 +3251,7 @@
             <input
               type="text"
               class="input input-bordered input-sm w-32 disabled:bg-base-100"
-              placeholder="Enter Code"
+              placeholder={t("tenant.detail.input-reseller-code-placeholder")}
               maxlength="15"
               use:trimInput
               use:toUpperCase
@@ -3276,9 +3278,10 @@
           </div>
           <div class="flex-1 flex flex-col mt-4">
             <span class="mb-2 text-base-content font-medium text-sm"
-              >{`Owned By Reseller Code`}</span
+              >{t("tenant.detail.owned-reseller-code")}</span
             >
             <Dropdown
+              placeholder={t("tenant.detail.select-reseller-code-placeholder")}
               options={resellerCodeOptions}
               bind:value={tenantData.owned_by_reseller}
             />
@@ -3288,12 +3291,12 @@
 
       <!-- User Limits -->
       <div class="p-5 mb-8 bg-base-100 rounded-lg">
-        <h5 class="mb-4 label">{"User Limits"}</h5>
+        <h5 class="mb-4 label">{t("tenant.detail.user-limits")}</h5>
 
         <div class="flex flex-row space-x-4">
           <div class="flex-1 flex flex-col">
             <span class="mb-2 text-base-content font-medium text-sm"
-              >{"Included"}</span
+              >{t("tenant.detail.included-user-limits")}</span
             >
             <input
               type="number"
@@ -3305,7 +3308,7 @@
           </div>
           <div class="flex-1 flex flex-col">
             <span class="mb-2 text-base-content font-medium text-sm"
-              >{"Additional"}</span
+              >{t("tenant.detail.extra-user-limits")}</span
             >
             <input
               type="number"
@@ -3321,7 +3324,7 @@
         <div class="flex flex-row space-x-4">
           <div class="flex-1 flex flex-col">
             <p class="text-xs text-medium">
-              {"Total Limit"}
+              {t("tenant.detail.total-user-limits")}
             </p>
           </div>
           <div class="flex-1 flex flex-col">
@@ -3349,7 +3352,9 @@
           <div class="flex-1 flex flex-col mb-4">
             {#if totalUserLimit}
               <p class="text-xs text-base-content/60 text-right">
-                {userUsagePercent}% used
+                {t("tenant.detail.users-used-percentage", {
+                  percentage: userUsagePercent,
+                })}
               </p>
             {/if}
           </div>
