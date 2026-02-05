@@ -1,9 +1,14 @@
 import { EmbeddingProvider, VectorKBScope } from "./AIProvider";
 
-// Re-export for convenience
 export { EmbeddingProvider, VectorKBScope };
 
-// Data source processing status
+export enum ChunkingStrategy {
+  Fixed = "fixed",
+  Semantic = "semantic",
+  Heading = "heading",
+  Paragraph = "paragraph",
+}
+
 export enum DataSourceStatus {
   Pending = "pending",
   Processing = "processing",
@@ -11,14 +16,12 @@ export enum DataSourceStatus {
   Failed = "failed",
 }
 
-// Supported file types for Vector KB
 export enum VectorFileType {
   PDF = "pdf",
   TXT = "txt",
   DOCX = "docx",
 }
 
-// Vector folder structure
 export interface VectorFolder {
   _id: string;
   tenant_id: string;
@@ -30,13 +33,11 @@ export interface VectorFolder {
   created_at: string;
 }
 
-// Vector folder with counts (for list views)
 export interface VectorFolderWithCounts extends VectorFolder {
   data_source_count: number;
   child_count?: number;
 }
 
-// Folder tree node for hierarchical view
 export interface FolderTreeNode extends VectorFolder {
   children: FolderTreeNode[];
   data_source_count: number;
@@ -182,21 +183,18 @@ export const DEFAULT_VECTOR_KB_CONFIG = {
   similarityThreshold: 0.7,
 };
 
-// Default RAG Enhancement configuration values
 export const DEFAULT_RAG_ENHANCEMENT_CONFIG = {
-  // Reranking
   rerankEnabled: false,
   rerankTopN: 5,
   rerankCandidates: 30,
-  // Hybrid Search
   hybridEnabled: false,
   hybridAlpha: 0.5,
-  // Answerability
   answerabilityEnabled: false,
   answerabilityThreshold: 0.6,
-  // Compression
   compressionEnabled: false,
-  // Multi-hop
   multiHopEnabled: false,
   maxHops: 3,
+  chunkingStrategy: ChunkingStrategy.Fixed,
+  multiQueryEnabled: false,
+  multiQueryCount: 3,
 };

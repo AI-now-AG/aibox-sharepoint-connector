@@ -8,6 +8,7 @@
   import { DataSourceStatus } from "$types/VectorKB";
   import { getTranscriptionConfig } from "$api/transcription/transcription-api";
   import { useTranslations } from "$i18n/utils";
+  import { addToast } from "$stores/toast";
 
   const t = useTranslations();
 
@@ -24,7 +25,9 @@
   let dataSources = $state<VectorDataSource[]>([]);
   let storageUsage = $state<StorageUsage | null>(null);
   let error = $state<string | null>(null);
+  let uploadError = $state<string | null>(null);
   let currentFolderId = $state<string | null>(null);
+  let storageWarning = $derived(storageUsage !== null && storageUsage.usedPercentage >= 90);
   let breadcrumbs = $state<{ id: string | null; name: string }[]>([{ id: null, name: "" }]);
 
   // File upload state
@@ -237,6 +240,7 @@
     if (!files || files.length === 0) return;
 
     uploading = true;
+    uploadError = null; // Clear any previous error
 
     // Ensure we have API URL
     if (!apiBase) {
@@ -244,7 +248,24 @@
       apiBase = config.apiUrl;
     }
 
+    // Build a set of existing filenames in the current folder for duplicate detection
+    const existingFileNames = new Set(
+      dataSources.map((ds) => ds.original_file_name.toLowerCase())
+    );
+
     for (const file of Array.from(files)) {
+      // Check for duplicate filename
+      if (existingFileNames.has(file.name.toLowerCase())) {
+        const errorMessage = t("vector-kb.error-duplicate-file", { name: file.name });
+        addToast({
+          message: errorMessage,
+          type: "error",
+          timeout: 5000,
+        });
+        uploadError = errorMessage;
+        continue; // Skip this file
+      }
+
       try {
         const formData = new FormData();
         formData.append("tenantId", tenantId);
@@ -261,11 +282,41 @@
 
         const result = await response.json();
 
-        if (!result.success) {
+        if (result.success) {
+          // Track this filename so subsequent files in the same batch are caught
+          existingFileNames.add(file.name.toLowerCase());
+        } else {
           console.error("Upload failed:", result.error);
+
+          // Determine the appropriate error message based on the error type
+          let errorMessage = t("vector-kb.upload-failed");
+          const errorLower = (result.error || "").toLowerCase();
+
+          if (errorLower.includes("storage limit") || errorLower.includes("storage exceeded")) {
+            errorMessage = t("vector-kb.error-storage-limit-exceeded");
+          } else if (errorLower.includes("file size") || errorLower.includes("too large") || errorLower.includes("25mb") || errorLower.includes("25 mb")) {
+            errorMessage = t("vector-kb.error-file-too-large");
+          }
+
+          // Show toast notification
+          addToast({
+            message: errorMessage,
+            type: "error",
+            timeout: 5000,
+          });
+
+          // Set inline error for display
+          uploadError = errorMessage;
         }
       } catch (e) {
         console.error("Upload error:", e);
+        const errorMessage = t("vector-kb.upload-failed");
+        addToast({
+          message: errorMessage,
+          type: "error",
+          timeout: 5000,
+        });
+        uploadError = errorMessage;
       }
     }
 
@@ -625,13 +676,13 @@
   onchange={handleFileUpload}
 />
 
-<div class="w-full px-4 lg:px-6">
+<div class="container max-w-5xl mx-auto p-6 space-y-4">
   <!-- Storage Usage & Toolbar - always show -->
   <div class="flex items-center justify-between mb-4 p-4 bg-base-100 rounded-lg">
     <div class="flex items-center gap-4">
       <span class="text-sm font-medium">{t("vector-kb.storage-usage")}:</span>
       <progress
-        class="progress progress-primary w-48"
+        class="progress w-48 {storageWarning ? 'progress-warning' : 'progress-primary'}"
         value={storageUsage?.usedPercentage ?? 0}
         max="100"
       ></progress>
@@ -667,6 +718,31 @@
       </button>
     </div>
   </div>
+
+  <!-- Storage Warning Banner (90%+ usage) -->
+  {#if storageWarning}
+    <div role="alert" class="alert alert-warning mb-4">
+      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+      </svg>
+      <span>{@html t("vector-kb.storage-warning-90")}</span>
+    </div>
+  {/if}
+
+  <!-- Upload Error Banner -->
+  {#if uploadError}
+    <div role="alert" class="alert alert-error mb-4">
+      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <span>{uploadError}</span>
+      <button class="btn btn-sm btn-ghost" onclick={() => uploadError = null}>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+  {/if}
 
   <!-- Breadcrumbs - only show when inside a folder -->
   {#if breadcrumbs.length > 1}
