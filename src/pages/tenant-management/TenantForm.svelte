@@ -3250,6 +3250,7 @@
               type="text"
               class="input input-bordered input-sm w-32 disabled:bg-base-100"
               placeholder="Enter Code"
+              maxlength="15"
               use:trimInput
               use:toUpperCase
               use:replaceSpecialChars
