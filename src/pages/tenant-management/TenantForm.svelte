@@ -1281,9 +1281,9 @@
 </div>
 
 <div class="px-8 mb-10">
-  <div class="grid grid-cols-1 md:grid-cols-8 gap-10 p-6">
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-10 p-6">
     <!-- MAIN CONTENT -->
-    <div class="col-span-6">
+    <div class="col-span-8 2xl:col-span-9">
       <!-- General settings -->
       <div class="p-5 mb-8 bg-base-100 rounded-lg">
         <div class="mb-4 flex flex-row items-center gap-2">
@@ -3164,7 +3164,7 @@
     </div>
 
     <!-- RIGHT SIDEBAR -->
-    <div class="col-span-2">
+    <div class="col-span-4 2xl:col-span-3">
       <!-- User Management -->
       <div class="p-5 mb-8 bg-base-100 rounded-lg">
         <h5 class="mb-4 font-medium">
