@@ -18,14 +18,14 @@ export const SubscriptionPackages = {
       features: {
         en: [
           "1 User included",
-          "Additional user CHF 20.-",
+          "Additional user CHF 25.-",
           "All AI models included",
           "AI image generation",
           "Support via email",
         ],
         de: [
           "1 Benutzer inklusive",
-          "Zusätzlicher Benutzer CHF 20.-",
+          "Zusätzlicher Benutzer CHF 25.-",
           "Alle KI Modelle inkl.",
           "KI Bilderstellung",
           "Standardsupport E-Mail",
@@ -47,16 +47,16 @@ export const SubscriptionPackages = {
       priceText: "179 CHF / pro Monat",
       features: {
         en: [
-          "15 Users included",
-          "Additional User CHF 15.-",
-          "User Management included",
-          "Online kickoff with team",
+          "25 Users included",
+          "Additional User CHF 17.-",
+          "200 MB Knowledge Data included",
+          "Personal Support",
         ],
         de: [
-          "15 Benutzer inklusive",
-          "Zusätzlicher Benutzer CHF 15.-",
-          "Benutzerverwaltung inklusive",
-          "Online Kickoff mit Team",
+          "25 Benutzer inklusive",
+          "Zusätzlicher Benutzer CHF 17.-",
+          "200 MB Wissensdaten inklusive",
+          "Persönlicher Support",
         ],
       },
     },
