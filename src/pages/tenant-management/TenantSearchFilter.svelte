@@ -109,6 +109,7 @@
         classes={"w-full"}
         options={resellerCodeOptions}
         placeholder={t("tenant.filter-reseller-code-placeholder")}
+        allowClear={true}
         bind:value={resellerCode}
         onValueChange={(value: string) => {
           onResellerCodeChange(value);
