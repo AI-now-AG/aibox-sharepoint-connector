@@ -1287,7 +1287,7 @@
       <!-- General settings -->
       <div class="p-5 mb-8 bg-base-100 rounded-lg">
         <div class="mb-4 flex flex-row items-center gap-2">
-          {@html svgIcons.userGroup}
+          {@html svgIcons.tune}
           <p class="font-medium text-md">
             {t("tenant.detail.general-settings")}
           </p>
