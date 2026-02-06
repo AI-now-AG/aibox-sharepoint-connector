@@ -1472,7 +1472,7 @@
       <!-- Contact & Address -->
       <div class="p-5 mb-8 bg-base-100 rounded-lg">
         <div class="mb-3 flex flex-row items-center gap-2">
-          {@html svgIcons.money}
+          {@html svgIcons.home}
           <p class="font-medium text-md">
             {t("tenant.detail.contact-address")}
           </p>

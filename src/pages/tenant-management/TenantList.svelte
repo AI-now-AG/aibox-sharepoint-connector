@@ -298,25 +298,25 @@
         >
           <thead>
             <tr class="bg-base-300">
-              <th class="py-3 px-4 text-left font-normal text-xs"
+              <th class="py-2 px-4 text-left font-normal text-xs"
                 >{t("tenant.tenants.tenant.display-name")}</th
               >
-              <th class="py-3 px-4 text-left font-normal text-xs"
+              <th class="py-2 px-4 text-left font-normal text-xs"
                 >{t("tenant.subscription")}</th
               >
-              <th class="py-3 px-4 text-left font-normal text-xs"
+              <th class="py-2 px-4 text-left font-normal text-xs"
                 >{t("tenant.flag-status.trial")}</th
               >
-              <th class="py-3 px-4 text-left font-normal text-xs"
+              <th class="py-2 px-4 text-left font-normal text-xs"
                 >{t("tenant.flag-status.internal")}</th
               >
-              <th class="py-3 px-4 text-left font-normal text-xs"
+              <th class="py-2 px-4 text-left font-normal text-xs"
                 >{t("tenant.filter-reseller-code-label")}</th
               >
-              <th class="py-3 px-4 text-left font-normal text-xs"
+              <th class="py-2 px-4 text-left font-normal text-xs"
                 >{t("tenant.total-price")}</th
               >
-              <th class="py-3 px-4 text-left font-normal text-xs"
+              <th class="py-2 px-4 text-left font-normal text-xs"
                 >{t("tenant.tenants.tenant.active")}</th
               >
               <th class="py-3 px-4">&nbsp;</th>
@@ -324,15 +324,15 @@
           </thead>
           <tbody>
             {#each tenants as tenant}
-              <tr class="h-16 bg-base-100 hover:bg-base-300/30 text-sm">
-                <td class="py-3 px-4 text-sm font-medium">
+              <tr class="h-12 bg-base-100 hover:bg-base-300/30 text-sm">
+                <td class="py-2 px-4 text-sm font-medium">
                   <a
                     class="hover:underline hover:underline-offset-2"
                     href="/tenant-management/{tenant._id}">{tenant.name}</a
                   >
                 </td>
 
-                <td class="py-3 px-4">
+                <td class="py-2 px-4">
                   <span class="block text text-sm font-medium">
                     {tenant.subscription?.plan_name}
                   </span>
@@ -354,7 +354,7 @@
                   {/if}
                 </td>
 
-                <td class="py-3 px-4">
+                <td class="py-2 px-4">
                   {#if tenant.subscription?.is_trial}
                     <span class="badge badge-soft badge-success"
                       >{t("common.yes")}</span
@@ -366,7 +366,7 @@
                   {/if}
                 </td>
 
-                <td class="py-3 px-4">
+                <td class="py-2 px-4">
                   {#if tenant.is_internal}
                     <span class="badge badge-soft badge-success"
                       >{t("common.yes")}</span
@@ -378,11 +378,11 @@
                   {/if}
                 </td>
 
-                <td class="py-3 px-4">
+                <td class="py-2 px-4">
                   {tenant.reseller_code}
                 </td>
 
-                <td class="py-3 px-4">
+                <td class="py-2 px-4">
                   <span class="text-warning text-sm font-medium"
                     >{tenant.totalPrice
                       ? tenant.totalPrice + " CHF"
@@ -393,7 +393,7 @@
                   >
                 </td>
 
-                <td class="py-3 px-4">
+                <td class="py-2 px-4">
                   {#if tenant.active}
                     <span class={"badge badge-soft badge-success badge-sm"}
                       >{t("tenant.tenants.tenant.active")}
@@ -405,7 +405,7 @@
                   {/if}
                 </td>
 
-                <td class="py-3 px-4 text-right relative relative-dropdown">
+                <td class="py-2 px-4 text-right relative relative-dropdown">
                   <div class="dropdown dropdown-hover dropdown-end">
                     <button class="btn btn-ghost btn-sm z-50">
                       {@html svgIcons.threeDot}
