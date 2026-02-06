@@ -20,6 +20,7 @@ import {
   SubscriptionPackageId,
   AudioOptionId,
   SubscriptionIncludedUsers,
+  BillingMethod,
 } from "$types/Subscription";
 import { TenantFeature, ThemeCode } from "$types/TenantFeature";
 import organizationsManagement from "$data/auth0/organizations-manager";
@@ -102,6 +103,7 @@ export const cloneMasterTenant = {
         name: input.name,
         org_id: input.org_id,
         org_name: input.org_name,
+        billing_method: BillingMethod.MonthlyInvoice,
         default_language: input.language,
         theme: input.theme,
         included_features: includedFeatures,
