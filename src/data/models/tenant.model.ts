@@ -266,6 +266,8 @@ export default {
           is_reseller: 1,
           reseller_code: 1,
           owned_by_reseller: 1,
+          included_user_limit: 1,
+          extra_user_limit: 1,
           subscription: 1,
         },
       },

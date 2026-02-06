@@ -16,13 +16,25 @@ export const POST: APIRoute = async (ctx: APIContext) => {
     const { data: tenants } = results;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const userCounts: any = {};
-    for (let i = 0; i < tenants.length; i++) {
-      const tenant = tenants[i];
+    const userAllowedCounts: any = {};
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const userActiveCounts: any = {};
+
+    for (const tenant of tenants) {
+      // Calculate allowed users
+      const {
+        included_user_limit: includedUserLimit,
+        extra_user_limit: extraUserLimit,
+      } = tenant;
+      const maxUserLimit = (includedUserLimit || 0) + (extraUserLimit || 0);
+      userAllowedCounts[tenant._id] = maxUserLimit;
+
+      // Calculate allowed users
       const totalActiveUsers = await UserModel.countActiveUsersByTenant(
         tenant._id,
       );
-      userCounts[tenant._id] = totalActiveUsers;
+      userActiveCounts[tenant._id] = totalActiveUsers;
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -52,7 +64,8 @@ export const POST: APIRoute = async (ctx: APIContext) => {
         ),
         "Subscription Price": tenant.totalPrice ?? "-",
         Comment: tenant.comment ?? "-",
-        "Number of Users": userCounts[tenant._id] ?? "-",
+        "Total User allowed": userAllowedCounts[tenant._id] ?? "-",
+        "Total User active": userActiveCounts[tenant._id] ?? "-",
         Language: tenant.default_language ?? "-",
         "Company Name": billing.company_name ?? "-",
         "E-Mail": billing.email ?? "-",
