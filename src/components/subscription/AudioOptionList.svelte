@@ -67,6 +67,7 @@
           name={option.name}
           price={option.price}
           currency={option.currency}
+          pricePrefix={option.pricePrefix}
           {defaultLanguage}
           bind:selectedAudioOptionIds
           onSelect={({ id }: { id: string }) => {

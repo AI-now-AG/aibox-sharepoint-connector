@@ -100,6 +100,7 @@ export const SubscriptionPackages = {
       },
       price: 300,
       currency: "CHF",
+      pricePrefix: "",
       priceText: "300 CHF / pro Monat",
     },
     AudioBasisAddOnSubtitle: {
@@ -111,6 +112,7 @@ export const SubscriptionPackages = {
       },
       price: 50,
       currency: "CHF",
+      pricePrefix: "",
       priceText: "50 CHF / pro Monat",
     },
     AudioBasisAddOnLarge: {
@@ -122,6 +124,7 @@ export const SubscriptionPackages = {
       },
       price: 49,
       currency: "CHF",
+      pricePrefix: "",
       priceText: "49 CHF / pro Monat",
     },
     AudioBasis: {
@@ -132,6 +135,7 @@ export const SubscriptionPackages = {
       },
       price: 29,
       currency: "CHF",
+      pricePrefix: "",
       priceText: "29 CHF / pro Monat",
     },
     // NEW ""Audio to Text" option
@@ -143,7 +147,8 @@ export const SubscriptionPackages = {
       },
       price: 29,
       currency: "CHF",
-      priceText: "Ab 29 CHF / pro Monat",
+      pricePrefix: "Ab ",
+      priceText: "29 CHF / pro Monat",
     },
   },
 };

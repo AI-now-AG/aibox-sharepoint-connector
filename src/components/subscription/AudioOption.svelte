@@ -8,6 +8,7 @@
     features?: Record<string, string[]>;
     price?: number;
     currency?: string;
+    pricePrefix?: string;
     onSelect?: Function;
     selectedAudioOptionIds?: string[];
     disabled?: boolean;
@@ -19,6 +20,7 @@
     name = { en: "", de: "" },
     price,
     currency,
+    pricePrefix = "",
     onSelect,
     selectedAudioOptionIds = $bindable([]),
     disabled = false,
@@ -63,6 +65,9 @@
     {name?.[defaultLanguage]}
   </h2>
   <p class="text-2xl font-medium text-right text-[#0F172A]">
+    {#if pricePrefix}
+      <span class="text-base font-medium">{pricePrefix}</span>
+    {/if}
     {currency}
     {price}
     <span class="text-base font-medium">/ {t("subscription.per-month")}</span>
