@@ -92,7 +92,9 @@
     mode == MODE.Create
       ? t("tenant.tenants.add-tenant")
       : tenant.name || t("common.edit");
-  let tenantData = $state(tenant ?? {});
+  let tenantData = $state(
+    tenant ?? {},
+  );
   tenantData.metadata = {
     openaiPrivateKeyEnabled: false,
     openaiGpt5PrivateKeyEnabled: false,
@@ -237,7 +239,7 @@
 
   // User Limits
   let totalUserLimit = $derived(
-    (tenant.included_user_limit || 0) + (tenant.extra_user_limit || 0),
+    (tenant?.included_user_limit || 0) + (tenant?.extra_user_limit || 0),
   );
   let userUsagePercent = $derived(
     totalUserLimit > 0
@@ -581,6 +583,10 @@
   }
   if (tenantData && !tenantData.openai_gpt5_reasoning_effort) {
     tenantData.openai_gpt5_reasoning_effort = ReasoningEffortOption.None;
+  }
+
+  if (tenantData && !tenantData.owned_by_reseller) {
+    tenantData.owned_by_reseller = "";
   }
 
   function togglePassword(field: HTMLInputElement) {
