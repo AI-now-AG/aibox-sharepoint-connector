@@ -21,6 +21,7 @@
     placeholderClasses?: string;
     dropdownBoxClasses?: string;
     disabled?: boolean;
+    allowClear?: boolean;
     children?: import("svelte").Snippet;
     onValueChange?: Function;
   }
@@ -35,6 +36,7 @@
     placeholderClasses = "",
     dropdownBoxClasses = "",
     disabled = false,
+    allowClear = false,
     children,
     onValueChange,
   }: Props = $props();
@@ -82,7 +84,11 @@
               (option.value === value ? " bg-primary text-white" : "")}
             on:click|preventDefault={() => {
               if (!disabled) {
-                value = option.value;
+                if (allowClear && value === option.value) {
+                  value = "";
+                } else {
+                  value = option.value;
+                }
                 onValueChange?.(value);
                 blur();
               }

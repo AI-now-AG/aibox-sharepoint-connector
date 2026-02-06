@@ -92,9 +92,7 @@
     mode == MODE.Create
       ? t("tenant.tenants.add-tenant")
       : tenant.name || t("common.edit");
-  let tenantData = $state(
-    tenant ?? {},
-  );
+  let tenantData = $state(tenant ?? {});
   tenantData.metadata = {
     openaiPrivateKeyEnabled: false,
     openaiGpt5PrivateKeyEnabled: false,
@@ -3292,6 +3290,7 @@
             <Dropdown
               placeholder={t("tenant.detail.select-reseller-code-placeholder")}
               options={resellerCodeOptions}
+              allowClear={true}
               bind:value={tenantData.owned_by_reseller}
               disabled={tenantData.is_reseller}
             />

@@ -73,7 +73,7 @@ export const POST: APIRoute = async (ctx: APIContext) => {
         ZIP: billing.zip_code ?? "-",
         "Is Trial": sub?.is_trial ? "Yes" : "",
         "Is Internal": tenant.is_internal ? "Yes" : "",
-        "Reseller Code": tenant.reseller_code ?? "-",
+        "Reseller Code": tenant.owned_by_reseller ?? "-",
         "OpenAI is private key": meta.openaiPrivateKeyEnabled ? "Yes" : "",
         "Open AI GPT-5 is private key": meta.openaiGpt5PrivateKeyEnabled
           ? "Yes"
