@@ -3167,7 +3167,7 @@
     <div class="col-span-2">
       <!-- User Management -->
       <div class="p-5 mb-8 bg-base-100 rounded-lg">
-        <h5 class="mb-4 text-sm uppercase text-base-content/80">
+        <h5 class="mb-4 font-medium">
           {t("tenant.detail.user-management")}
         </h5>
         <div class="flex flex-col gap-2 mb-8">
@@ -3217,7 +3217,7 @@
 
       <!-- Status & conditions -->
       <div class="p-5 mb-8 bg-base-100 rounded-lg">
-        <h5 class="mb-4 text-sm uppercase text-base-content/80">
+        <h5 class="mb-4 font-medium">
           {t("tenant.detail.status-conditions")}
         </h5>
         <div class="flex flex-col gap-2">
@@ -3297,7 +3297,7 @@
 
       <!-- User Limits -->
       <div class="p-5 mb-8 bg-base-100 rounded-lg">
-        <h5 class="mb-4 text-sm uppercase text-base-content/80">
+        <h5 class="mb-4 font-medium">
           {t("tenant.detail.user-limits")}
         </h5>
 
