@@ -65,8 +65,8 @@
     </h3>
   </div>
 
-  <div class="grid grid-cols-1 xl:grid-cols-10 gap-10">
-    <div class="col-span-4">
+  <div class="grid grid-cols-1 xl:grid-cols-12 gap-10">
+    <div class="col-span-3 xl:col-span-4">
       <p class="mb-1 text-base-content/80">{t("tenant.search-label")}</p>
       <label
         class="input input-bordered flex items-center gap-2 w-full max-w-sm
@@ -81,11 +81,11 @@
         />
       </label>
     </div>
-    <div class="col-span-4">
+    <div class="col-span-6 xl:col-span-5">
       <p class="mb-2 text-base-content/80">
         {t("tenant.flag-status-label")}
       </p>
-      <div class="grid grid-cols-2 2xl:grid-cols-4 max-w-md gap-2">
+      <div class="grid grid-cols-2 lg:grid-cols-4 max-w-md pt-1 gap-2">
         {#each flagOptions as flag}
           <label class="flex items-center space-x-2">
             <input
@@ -101,7 +101,7 @@
         {/each}
       </div>
     </div>
-    <div class="col-span-2">
+    <div class="col-span-3 xl:col-span-3">
       <p class="mb-2 text-base-content/80">
         {t("tenant.filter-reseller-code-label")}
       </p>

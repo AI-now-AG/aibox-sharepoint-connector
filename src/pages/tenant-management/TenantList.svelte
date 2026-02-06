@@ -291,7 +291,7 @@
         {t("tenant.tenants.all-tenants", { amount: total })}
       </h2>
 
-      <div class="relative">
+      <div class="overflow-x-auto relative">
         <table
           class="border-separate border-spacing-x-0 min-w-full relative"
           style="font-family:Inter;"
