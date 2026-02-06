@@ -7,7 +7,7 @@ import CategoryModel, {
   type Category,
   type Group,
 } from "$data/models/category.model";
-import PromptModel, { type Prompt } from "$data/models/prompt.model";
+import PromptModel from "$data/models/prompt.model";
 import GlobalCategoryModel from "$data/models/globalCategory.model";
 import GlobalPromptModel from "$data/models/globalPrompt.model";
 import SubscriptionModel, {
@@ -200,6 +200,8 @@ export const cloneMasterTenant = {
         tenant_id: newTenant.insertedId,
         plan_name: input.plan_name,
         add_ons: input.add_ons,
+        is_trial: true,
+        trial_start_date: new Date(),
       };
       await SubscriptionModel.create(subscription);
 

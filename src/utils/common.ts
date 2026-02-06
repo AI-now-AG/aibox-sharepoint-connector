@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AudioOptionId, AudioOptionLabels } from "$types/Subscription";
 import dayjs from "dayjs";
 
 export function isTrulyEmpty(obj: any) {
@@ -92,28 +91,6 @@ export function isSameObjectId(a: unknown, b: unknown): boolean {
   if (!strA || !strB) return false;
   return strA === strB;
 }
-
-export const getSubscriptionAddOnName = (
-  forOption: "audiototext" | "subtitle" = "audiototext",
-  planAddOns: Array<any> = [],
-) => {
-  const addOnOptions: Array<any> =
-    forOption == "audiototext"
-      ? planAddOns.filter((option: any) => {
-          return (
-            option == AudioOptionId.AudioBasis ||
-            option == AudioOptionId.AudioBasisAddOnLarge
-          );
-        }) || []
-      : planAddOns.filter((option: any) => {
-          return (
-            option == AudioOptionId.AudioBasisAddOnSubtitle ||
-            option == AudioOptionId.AudioPremium
-          );
-        }) || [];
-  const firstOption = addOnOptions?.[0] as AudioOptionId | undefined;
-  return firstOption ? AudioOptionLabels[firstOption] || "-" : "-";
-};
 
 export function isValidPhone(phone: string): boolean {
   const trimmed = phone.trim();

@@ -7,7 +7,8 @@
   import log from "$utils/log";
   import { tenant as currentTenant } from "$stores";
   import { addToast } from "$stores/toast";
-  import { formatDate, getSubscriptionAddOnName } from "$utils/common";
+  import { formatDate } from "$utils/common";
+  import { getSubscriptionAddOnName } from "$utils/subscription";
   import { AudioOptionId, SubscriptionPackageId } from "$types/Subscription";
   import { SubscriptionPackages } from "$data/subscription-packages";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
