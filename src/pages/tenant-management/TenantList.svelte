@@ -1,5 +1,6 @@
 <script lang="ts">
   import { actions } from "astro:actions";
+  import { navigate } from "astro:transitions/client";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
   import { onMount } from "svelte";
@@ -241,31 +242,13 @@
       {t("prompt-library.prompts.export")}
     </button>
 
-    <div class="dropdown dropdown-end mt-2 lg:mt-8">
-      <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
-      <!-- svelte-ignore a11y_label_has_associated_control -->
-      <label tabindex="0" class="btn btn-primary font-normal grow-0">
-        {@html svgIcons.add}
-        {t("tenant.tenants.add-new-tenant")}
-      </label>
-
-      <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
-      <ul
-        tabindex="0"
-        class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52"
-      >
-        <li>
-          <a href="/tenant-management/add">
-            {t("tenant.add-empty-tenant")}
-          </a>
-        </li>
-        <li>
-          <a href="/tenant-management/clone">
-            {t("tenant.clone-from-master-tenant")}
-          </a>
-        </li>
-      </ul>
-    </div>
+    <button
+      onclick={() => navigate("/tenant-management/clone")}
+      class="btn btn-primary font-normal"
+    >
+      {@html svgIcons.add}
+      {t("tenant.tenants.add-new-tenant")}
+    </button>
   </div>
 </div>
 
