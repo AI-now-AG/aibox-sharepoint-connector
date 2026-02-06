@@ -8,7 +8,7 @@ import CategoryModel, {
   type Category,
   type Group,
 } from "$data/models/category.model";
-import PromptModel, { type Prompt } from "$data/models/prompt.model";
+import PromptModel from "$data/models/prompt.model";
 import GlobalCategoryModel from "$data/models/globalCategory.model";
 import GlobalPromptModel from "$data/models/globalPrompt.model";
 import SubscriptionModel, {

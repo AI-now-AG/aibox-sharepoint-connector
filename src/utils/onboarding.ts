@@ -17,12 +17,20 @@ export const getTranscriptionTypes = (
   if (selectedAddOns?.includes(AudioOptionId.AudioBasis)) {
     transcriptionTypes.push(AudioCategory.AudioToText);
   }
-  // Deprecated: Subtitle (Allegro M) - commented for future restoration
+
+  // : Subtitle (Allegro M) - commented for future restoration
   // if (selectedAddOns?.includes(AudioOptionId.AudioBasisAddOnSubtitle)) {
   //   transcriptionTypes.push(AudioCategory.Subtitle);
   // }
+
   if (selectedAddOns?.includes(AudioOptionId.AudioBasisAddOnLarge)) {
     transcriptionTypes.push(AudioCategory.AudioPro);
+  }
+
+  // NEW "Audio to Text" option (Audio Basis/Large are deprecated)
+  // Includes Audio Basis + Audio Large
+  if (selectedAddOns?.includes(AudioOptionId.AudioToText)) {
+    transcriptionTypes = [AudioCategory.AudioToText, AudioCategory.AudioPro];
   }
 
   // Audio Premium
