@@ -283,7 +283,7 @@ export default {
           subscription: 1,
         },
       },
-      { $sort: { created_at: 1 } },
+      { $sort: { name: 1 } },
     ];
 
     // Trial flag filter
@@ -326,7 +326,11 @@ export default {
     totalPipeline.push({ $count: "count" });
 
     const totalResult = await collection.aggregate(totalPipeline).toArray();
-    const result = await collection.aggregate(pipeline).toArray();
+    const result = await collection
+      .aggregate(pipeline, {
+        collation: { locale: "en", strength: 2 },
+      })
+      .toArray();
     const total = totalResult[0]?.count ?? 0;
 
     return {
