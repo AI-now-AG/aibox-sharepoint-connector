@@ -272,6 +272,7 @@ export default {
           extra_user_limit: 1,
           billing_info: 1,
           metadata: 1,
+          azure_openai_instance_name: 1,
           subscription: 1,
         },
       },
