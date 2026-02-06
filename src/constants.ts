@@ -97,7 +97,7 @@ export const STRIPE_PRODUCTS_DEV = {
   AudioBasis: "price_1SDLj7BIpWAJAQFJVWvkacQr",
   AudioBasisAddOnLarge: "price_1SDLmiBIpWAJAQFJB2Bx17di",
   AudioBasisAddOnSubtitle: "price_1SDLpGBIpWAJAQFJT04nekfl",
-  AudioPremium: "price_1SDLqEBIpWAJAQFJBWBsQiEn",
+  AudioPremium: "price_1SxnsZBIpWAJAQFJyk1xgYvE",
   AudioToText: "price_1SxmtABIpWAJAQFJqfDt7TlV",
 };
 export const STRIPE_PRODUCTS_PROD = {
@@ -107,7 +107,7 @@ export const STRIPE_PRODUCTS_PROD = {
   AudioBasis: "price_1SDLj7BIpWAJAQFJVWvkacQr",
   AudioBasisAddOnLarge: "price_1SDLukBTLa4XuBC9xBgIpfaG",
   AudioBasisAddOnSubtitle: "price_1SDLwMBTLa4XuBC9j3KYiEav",
-  AudioPremium: "price_1SDLwqBTLa4XuBC9Bbg6FFCr",
+  AudioPremium: "price_1SxntCBTLa4XuBC9PtxNsCkB",
   AudioToText: "price_1SxmuJBTLa4XuBC9kCvTIX2L",
 };
 export const STRIPE_TAX_RATE_DEV = "txr_1RPNDiBIpWAJAQFJ9jD4Jlpj";
