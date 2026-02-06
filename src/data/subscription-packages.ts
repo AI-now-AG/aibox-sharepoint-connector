@@ -12,7 +12,7 @@ export const SubscriptionPackages = {
         en: "For single users & beginners",
         de: "Einzelanwender & Einsteiger",
       },
-      price: 29, // Change from [25] to [29]
+      price: 29,
       currency: "CHF",
       priceText: "29 CHF / pro Monat",
       features: {
@@ -70,9 +70,9 @@ export const SubscriptionPackages = {
         en: "Power Teams & Heavy Usage",
         de: "Grosse Teams & intensive Nutzung",
       },
-      price: 279,
+      price: 339,
       currency: "CHF",
-      priceText: "279 CHF / pro Monat",
+      priceText: "339 CHF / pro Monat",
       features: {
         en: [
           "30 Users included",
@@ -98,7 +98,7 @@ export const SubscriptionPackages = {
         en: "Subtitle Studio Plus",
         de: "Untertitel Studio Plus",
       },
-      price: 300, // Change from [150] to [300]
+      price: 300,
       currency: "CHF",
       priceText: "300 CHF / pro Monat",
     },
@@ -109,7 +109,7 @@ export const SubscriptionPackages = {
         en: "Subtitle Studio Basic",
         de: "Untertitel Studio Basis",
       },
-      price: 50, // Change from [25] to [50]
+      price: 50,
       currency: "CHF",
       priceText: "50 CHF / pro Monat",
     },
@@ -120,19 +120,30 @@ export const SubscriptionPackages = {
         en: "Audio to Text Large",
         de: "Audio zu Text Large",
       },
-      price: 49, // Change from [15] to [49]
+      price: 49,
       currency: "CHF",
       priceText: "49 CHF / pro Monat",
     },
     AudioBasis: {
       id: AudioOptionId.AudioBasis,
       name: {
-        en: "Audio zu Text Basis",
+        en: "Audio to Text Basis",
         de: "Audio zu Text Basis",
       },
-      price: 29, // Change from [25] to [29]
+      price: 29,
       currency: "CHF",
       priceText: "29 CHF / pro Monat",
+    },
+    // NEW ""Audio to Text" option
+    AudioToText: {
+      id: AudioOptionId.AudioToText,
+      name: {
+        en: "Audio to Text",
+        de: "Audio zu Text",
+      },
+      price: 29,
+      currency: "CHF",
+      priceText: "Ab 29 CHF / pro Monat",
     },
   },
 };

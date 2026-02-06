@@ -35,6 +35,10 @@
             value: AudioOptionId.AudioBasisAddOnLarge,
             title: AudioOptionLabels.AudioBasisAddOnLarge,
           },
+          {
+            value: AudioOptionId.AudioToText, // NEW
+            title: AudioOptionLabels.AudioToText,
+          },
         ]
       : [
           {

@@ -5,8 +5,9 @@
 
   // Applied changes from this ticket: https://ainow.atlassian.net/browse/AINOW-1430
   const audioToTextOptions = [
-    SubscriptionPackages.audioOptions.AudioBasis, // [Audio to Text Basic]
-    SubscriptionPackages.audioOptions.AudioBasisAddOnLarge, // [Audio to Text Large]
+    //SubscriptionPackages.audioOptions.AudioBasis, // [Audio to Text Basic]
+    //SubscriptionPackages.audioOptions.AudioBasisAddOnLarge, // [Audio to Text Large]
+    SubscriptionPackages.audioOptions.AudioToText, // [Audio to Text]
   ];
   const subtitleStudioOptions = [
     SubscriptionPackages.audioOptions.AudioPremium, // [Subtitle Studio Plus]
@@ -14,8 +15,9 @@
 
   // Select [Subtitle Studio Plus] or [Subtitle Studio Basic] | [Audio to Text Large] or [Audio to Text Basic]
   const audioToTextGroup = [
-    AudioOptionId.AudioBasis, // [Audio to Text Basic]
-    AudioOptionId.AudioBasisAddOnLarge, // [Audio to Text Large]
+    //AudioOptionId.AudioBasis, // [Audio to Text Basic]
+    //AudioOptionId.AudioBasisAddOnLarge, // [Audio to Text Large]
+    AudioOptionId.AudioToText, // [Audio to Text]
   ];
   const subtitleStudioGroup = [
     AudioOptionId.AudioBasisAddOnSubtitle, // [Subtitle Studio Basic]

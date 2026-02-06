@@ -21,6 +21,7 @@ import {
   SubscriptionPackageId,
   AudioOptionId,
   AudioOptionLabels,
+  SubscriptionIncludedUsers,
   BillingMethod,
   type ProductKeys,
   CountryCode,
@@ -297,6 +298,9 @@ export const onboarding = {
       }
       // Subtitle Studio is active if AudioPremium is selected (includes subtitle features)
       const subtitleStudioActive = hasSubtitleEditor(input.add_ons ?? []);
+      const includedUserLimit =
+        SubscriptionIncludedUsers[input.plan_name as SubscriptionPackageId] ||
+        10;
       const newTenant = await TenantModel.copyTenant(masterTenantId, {
         name: input.name,
         org_id: input.org_id,
@@ -310,6 +314,7 @@ export const onboarding = {
         audio_assistant_active: true,
         subtitle_studio_active: subtitleStudioActive,
         totalPrice: "",
+        included_user_limit: includedUserLimit, // default included users
       });
 
       // Update the current tenant for the logged-in user

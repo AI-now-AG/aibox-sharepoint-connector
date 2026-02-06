@@ -16,7 +16,11 @@ import SubscriptionModel, {
 import TranscriptionModel, {
   type Transcription,
 } from "$data/models/transcription.model";
-import { SubscriptionPackageId, AudioOptionId } from "$types/Subscription";
+import {
+  SubscriptionPackageId,
+  AudioOptionId,
+  SubscriptionIncludedUsers,
+} from "$types/Subscription";
 import { TenantFeature, ThemeCode } from "$types/TenantFeature";
 import organizationsManagement from "$data/auth0/organizations-manager";
 import { isProd } from "$utils/env";
@@ -91,6 +95,9 @@ export const cloneMasterTenant = {
       }
       // Subtitle Studio is active if AudioPremium is selected (includes subtitle features)
       const subtitleStudioActive = hasSubtitleEditor(input.add_ons ?? []);
+      const includedUserLimit =
+        SubscriptionIncludedUsers[input.plan_name as SubscriptionPackageId] ||
+        10;
       const newTenant = await TenantModel.copyTenant(masterTenantId, {
         name: input.name,
         org_id: input.org_id,
@@ -102,6 +109,7 @@ export const cloneMasterTenant = {
         audio_assistant_active: true,
         subtitle_studio_active: subtitleStudioActive,
         totalPrice: input.totalPrice,
+        included_user_limit: includedUserLimit, // default included users
       });
 
       // Find all categories for the original tenant

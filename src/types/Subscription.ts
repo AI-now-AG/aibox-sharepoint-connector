@@ -47,6 +47,9 @@ export enum AudioOptionId {
 
   /** [Subtitle Studio Plus] => Included Subtitle editor */
   AudioPremium = "AudioPremium",
+
+  /** NEW "Audio To Text" option */
+  AudioToText = "AudioToText",
 }
 
 export type ProductKeys =
@@ -59,6 +62,7 @@ export const AudioOptionLabels: Record<AudioOptionId, string> = {
   [AudioOptionId.AudioBasisAddOnLarge]: "Audio to Text Large", // [Audio to Text Large]
   [AudioOptionId.AudioBasisAddOnSubtitle]: "Subtitle Studio Basic", // [Subtitle Studio Basic]
   [AudioOptionId.AudioPremium]: "Subtitle Studio Plus", // [Subtitle Studio Plus]
+  [AudioOptionId.AudioToText]: "Audio to Text", // [Audio to Text]
 };
 
 export enum BillingMethod {
