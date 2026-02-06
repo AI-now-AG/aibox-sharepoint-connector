@@ -34,6 +34,7 @@ import {
   ReasoningEffortOption,
   EmbeddingProvider,
 } from "$types/AIProvider";
+import { ChunkingStrategy } from "$types/VectorKB";
 
 const TenantInputParamsSchema = z.object({
   name: z.string(),
@@ -109,6 +110,12 @@ const TenantInputParamsSchema = z.object({
   vector_kb_multihop_enabled: z.boolean().optional().default(false),
   vector_kb_max_hops: z.number().optional().default(3),
   vector_kb_debug_enabled: z.boolean().optional().default(false),
+  vector_kb_chunking_strategy: z
+    .nativeEnum(ChunkingStrategy)
+    .optional()
+    .default(ChunkingStrategy.Fixed),
+  vector_kb_multi_query_enabled: z.boolean().optional().default(false),
+  vector_kb_multi_query_count: z.number().optional().default(3),
 });
 
 const TenanKeyEncryptSchema = z.object({

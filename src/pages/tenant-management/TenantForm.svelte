@@ -186,6 +186,18 @@
   if (tenantData && tenantData.vector_kb_debug_enabled === undefined) {
     tenantData.vector_kb_debug_enabled = false;
   }
+  if (tenantData && tenantData.vector_kb_chunking_strategy === undefined) {
+    tenantData.vector_kb_chunking_strategy =
+      DEFAULT_RAG_ENHANCEMENT_CONFIG.chunkingStrategy;
+  }
+  if (tenantData && tenantData.vector_kb_multi_query_enabled === undefined) {
+    tenantData.vector_kb_multi_query_enabled =
+      DEFAULT_RAG_ENHANCEMENT_CONFIG.multiQueryEnabled;
+  }
+  if (tenantData && tenantData.vector_kb_multi_query_count === undefined) {
+    tenantData.vector_kb_multi_query_count =
+      DEFAULT_RAG_ENHANCEMENT_CONFIG.multiQueryCount;
+  }
 
   // Subscription & billing
   const subscriptionOptions = [
@@ -2765,6 +2777,7 @@
 
         {#if vectorKbEnabled}
           <div class="container mx-auto" transition:slide>
+            <!-- Section 1: Embedding Configuration -->
             <div
               class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
             >
@@ -2823,6 +2836,59 @@
                     </select>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            <!-- Section 2: Indexing Settings -->
+            <div
+              class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
+            >
+              <input type="checkbox" checked />
+              <div class="collapse-title">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="label-text text-base-content font-medium">
+                      {t("tenant.vector-kb.indexing-settings")}
+                    </span>
+                    <span class="badge badge-xs badge-ghost"
+                      >{t("tenant.vector-kb.indexing-settings-hint")}</span
+                    >
+                  </div>
+                </div>
+              </div>
+              <div class="collapse-content">
+                <!-- Chunking Strategy -->
+                <div class="bg-base-200/50 rounded-lg p-4 mx-4 mb-4">
+                  <div class="flex items-center justify-between mb-3">
+                    <div>
+                      <span class="text-base-content font-medium text-sm">
+                        {t("tenant.vector-kb.chunking-strategy-title")}
+                      </span>
+                      <p class="text-xs text-base-content/60">
+                        {t("tenant.vector-kb.chunking-strategy-description")}
+                      </p>
+                    </div>
+                  </div>
+                  <div class="w-full max-w-xs">
+                    <select
+                      class="select select-bordered select-sm w-full"
+                      bind:value={tenantData.vector_kb_chunking_strategy}
+                    >
+                      <option value="fixed"
+                        >{t("tenant.vector-kb.chunking-fixed")}</option
+                      >
+                      <option value="paragraph"
+                        >{t("tenant.vector-kb.chunking-paragraph")}</option
+                      >
+                      <option value="heading"
+                        >{t("tenant.vector-kb.chunking-heading")}</option
+                      >
+                      <option value="semantic"
+                        >{t("tenant.vector-kb.chunking-semantic")}</option
+                      >
+                    </select>
+                  </div>
+                </div>
 
                 <div class="grid grid-cols-2 gap-4 mx-4 mb-4">
                   <!-- Chunk Size -->
@@ -2861,6 +2927,46 @@
                 </div>
 
                 <div class="grid grid-cols-2 gap-4 mx-4 mb-4">
+                  <!-- Max Storage -->
+                  <div class="w-full">
+                    <span class="mb-2 text-base-content font-medium text-sm">
+                      {t("tenant.vector-kb.max-storage")}
+                    </span>
+                    <input
+                      type="number"
+                      class="input input-bordered w-full mt-1"
+                      bind:value={tenantData.vector_kb_max_storage_mb}
+                      min="50"
+                      max="10000"
+                    />
+                    <p class="text-xs text-base-content/60 mt-1">
+                      {t("tenant.vector-kb.max-storage-help")}
+                    </p>
+                  </div>
+                  <div class="w-full"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Section 3: Search Settings -->
+            <div
+              class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
+            >
+              <input type="checkbox" checked />
+              <div class="collapse-title">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="label-text text-base-content font-medium">
+                      {t("tenant.vector-kb.search-settings")}
+                    </span>
+                    <span class="badge badge-xs badge-ghost"
+                      >{t("tenant.vector-kb.search-settings-hint")}</span
+                    >
+                  </div>
+                </div>
+              </div>
+              <div class="collapse-content">
+                <div class="grid grid-cols-2 gap-4 mx-4 mb-4">
                   <!-- Top K Results -->
                   <div class="w-full">
                     <span class="mb-2 text-base-content font-medium text-sm">
@@ -2896,30 +3002,10 @@
                     </p>
                   </div>
                 </div>
-
-                <div class="grid grid-cols-2 gap-4 mx-4 mb-4">
-                  <!-- Max Storage -->
-                  <div class="w-full">
-                    <span class="mb-2 text-base-content font-medium text-sm">
-                      {t("tenant.vector-kb.max-storage")}
-                    </span>
-                    <input
-                      type="number"
-                      class="input input-bordered w-full mt-1"
-                      bind:value={tenantData.vector_kb_max_storage_mb}
-                      min="50"
-                      max="10000"
-                    />
-                    <p class="text-xs text-base-content/60 mt-1">
-                      {t("tenant.vector-kb.max-storage-help")}
-                    </p>
-                  </div>
-                  <div class="w-full"></div>
-                </div>
               </div>
             </div>
 
-            <!-- RAG Enhancements Section -->
+            <!-- Section 4: Advanced Search Enhancements -->
             <div
               class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
             >
@@ -3015,6 +3101,41 @@
                         <p class="text-xs text-base-content/60 mt-1">
                           {t("tenant.vector-kb.hybrid-alpha-help")}
                         </p>
+                      </div>
+                    </div>
+                  {/if}
+                </div>
+
+                <!-- Multi-Query Search -->
+                <div class="bg-base-200/50 rounded-lg p-4 mx-4 mb-4">
+                  <div class="flex items-center justify-between mb-3">
+                    <div>
+                      <span class="text-base-content font-medium text-sm">
+                        {t("tenant.vector-kb.multi-query-title")}
+                      </span>
+                      <p class="text-xs text-base-content/60">
+                        {t("tenant.vector-kb.multi-query-description")}
+                      </p>
+                    </div>
+                    <input
+                      type="checkbox"
+                      class="toggle toggle-primary toggle-sm"
+                      bind:checked={tenantData.vector_kb_multi_query_enabled}
+                    />
+                  </div>
+                  {#if tenantData.vector_kb_multi_query_enabled}
+                    <div class="mt-3">
+                      <div class="w-full max-w-xs">
+                        <span class="text-base-content text-xs">
+                          {t("tenant.vector-kb.multi-query-count")}
+                        </span>
+                        <input
+                          type="number"
+                          class="input input-bordered input-sm w-full mt-1"
+                          bind:value={tenantData.vector_kb_multi_query_count}
+                          min="2"
+                          max="5"
+                        />
                       </div>
                     </div>
                   {/if}
