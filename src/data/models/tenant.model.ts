@@ -260,6 +260,8 @@ export default {
         $project: {
           _id: 1,
           name: 1,
+          default_language: 1,
+          comment: 1,
           totalPrice: 1,
           active: 1,
           is_internal: 1,
@@ -268,6 +270,8 @@ export default {
           owned_by_reseller: 1,
           included_user_limit: 1,
           extra_user_limit: 1,
+          billing_info: 1,
+          metadata: 1,
           subscription: 1,
         },
       },
