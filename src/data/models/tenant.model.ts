@@ -229,7 +229,7 @@ export default {
 
       // Reseller code filter
       if (resellerCode) {
-        (baseMatch.$and ??= []).push({ reseller_code: resellerCode });
+        (baseMatch.$and ??= []).push({ owned_by_reseller: resellerCode });
       }
     } else {
       (baseMatch.$and ??= []).push({ active: true });
@@ -275,7 +275,7 @@ export default {
     // Trial flag filter
     if (statusFlags.includes(FlagStatus.Trial)) {
       pipeline.push({
-        $match: { "subscriptions.is_trial": true },
+        $match: { "subscription.is_trial": true },
       });
     }
 
@@ -285,21 +285,33 @@ export default {
       pipeline.push({ $limit: pageSize });
     }
 
-    const totalResult = await collection
-      .aggregate([
-        { $match: baseMatch },
-        {
-          $lookup: {
-            from: "subscriptions",
-            localField: "_id",
-            foreignField: "tenant_id",
-            as: "subscriptions",
-          },
+    const totalPipeline: any[] = [
+      { $match: baseMatch },
+      {
+        $lookup: {
+          from: "subscriptions",
+          localField: "_id",
+          foreignField: "tenant_id",
+          as: "subscriptions",
         },
-        { $count: "count" },
-      ])
-      .toArray();
+      },
+      {
+        $addFields: {
+          subscription: { $arrayElemAt: ["$subscriptions", 0] },
+        },
+      },
+    ];
 
+    // ✅ merge trial filter only when needed
+    if (statusFlags.includes(FlagStatus.Trial)) {
+      totalPipeline.push({
+        $match: { "subscription.is_trial": true },
+      });
+    }
+
+    totalPipeline.push({ $count: "count" });
+
+    const totalResult = await collection.aggregate(totalPipeline).toArray();
     const result = await collection.aggregate(pipeline).toArray();
     const total = totalResult[0]?.count ?? 0;
 

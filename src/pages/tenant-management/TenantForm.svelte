@@ -249,9 +249,6 @@
     if (selectedPlan) {
       tenant.included_user_limit = SubscriptionIncludedUsers[selectedPlan];
     }
-    if (selectedPlan && selectedPlan == SubscriptionExtraPackage.Enterprise) {
-      tenant.extra_user_limit = 0;
-    }
   });
 
   // Features enabled
@@ -3322,7 +3319,7 @@
               type="number"
               class="input input-bordered disabled:bg-base-300/40 disabled:border-gray-200 w-full"
               bind:value={tenantData.extra_user_limit}
-              disabled={tenantData.included_user_limit == 0}
+              disabled={!selectedPlan}
             />
           </div>
         </div>

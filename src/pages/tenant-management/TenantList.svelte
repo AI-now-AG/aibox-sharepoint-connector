@@ -379,7 +379,7 @@
                 </td>
 
                 <td class="py-2 px-4">
-                  {tenant.reseller_code}
+                  {tenant.owned_by_reseller}
                 </td>
 
                 <td class="py-2 px-4">
