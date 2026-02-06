@@ -218,17 +218,18 @@
   const planAddOns = subscription?.add_ons ?? [];
   const initAudioToTextOptions =
     planAddOns.filter((option: any) => {
-      return (
-        option == AudioOptionId.AudioBasis ||
-        option == AudioOptionId.AudioBasisAddOnLarge
-      );
+      return [
+        AudioOptionId.AudioBasis,
+        AudioOptionId.AudioBasisAddOnLarge,
+        AudioOptionId.AudioToText,
+      ].includes(option);
     }) || [];
   const initSubtitleStudioOptions =
     planAddOns.filter((option: any) => {
-      return (
-        option == AudioOptionId.AudioBasisAddOnSubtitle ||
-        option == AudioOptionId.AudioPremium
-      );
+      return [
+        AudioOptionId.AudioBasisAddOnSubtitle,
+        AudioOptionId.AudioPremium,
+      ].includes(option);
     }) || [];
 
   let selectedAudioToTextOptions: AudioOptionId[] = $state(
