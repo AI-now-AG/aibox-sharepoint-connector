@@ -58,26 +58,29 @@ export const POST: APIRoute = async (ctx: APIContext) => {
         "E-Mail": billing.email ?? "-",
         "Street, Nr.": billing.address ?? "-",
         ZIP: billing.zip_code ?? "-",
-        "OpenAI is private key": meta.openaiPrivateKeyEnabled ? "Yes" : "No",
+        "Is Trial": sub?.is_trial ? "Yes" : "",
+        "Is Internal": tenant.is_internal ? "Yes" : "",
+        "Reseller Code": tenant.reseller_code ?? "-",
+        "OpenAI is private key": meta.openaiPrivateKeyEnabled ? "Yes" : "",
         "Open AI GPT-5 is private key": meta.openaiGpt5PrivateKeyEnabled
           ? "Yes"
-          : "No",
+          : "",
         "Azure OpenAI is private key": meta.azureOpenaiPrivateKeyEnabled
           ? "Yes"
-          : "No",
+          : "",
         "Azure OpenAI ressource name": tenant.azure_openai_instance_name ?? "-",
         "Perplexitiy is private key": meta.perplexityPrivateKeyEnabled
           ? "Yes"
-          : "No",
-        "Claude is private key": meta.claudePrivateKeyEnabled ? "Yes" : "No",
-        "Gemini is private key": meta.geminiPrivateKeyEnabled ? "Yes" : "No",
+          : "",
+        "Claude is private key": meta.claudePrivateKeyEnabled ? "Yes" : "",
+        "Gemini is private key": meta.geminiPrivateKeyEnabled ? "Yes" : "",
         "Azure Speech is private key": meta.speechPrivateKeyEnabled
           ? "Yes"
-          : "No",
+          : "",
         "Eleven Labs is private key": meta.elevenLabsPrivateKeyEnabled
           ? "Yes"
-          : "No",
-        "Flux is private key": meta.fluxPrivateKeyEnabled ? "Yes" : "No",
+          : "",
+        "Flux is private key": meta.fluxPrivateKeyEnabled ? "Yes" : "",
       };
     });
 
