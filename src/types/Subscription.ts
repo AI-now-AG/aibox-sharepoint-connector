@@ -8,10 +8,6 @@ export enum SubscriptionPackageId {
 }
 
 export enum SubscriptionExtraPackage {
-  Test = "Test",
-  TeamsReseller = "TeamsReseller",
-  ProReseller = "ProReseller",
-  Internal = "Internal",
   Enterprise = "Enterprise",
 }
 
@@ -22,12 +18,15 @@ export const SubscriptionPackageLabels: Record<
   [SubscriptionPackageId.Starter]: "aibox Starter",
   [SubscriptionPackageId.Teams]: "aibox Teams",
   [SubscriptionPackageId.Pro]: "aibox Pro",
-  [SubscriptionExtraPackage.Test]: "Test",
-  [SubscriptionExtraPackage.TeamsReseller]: "aibox Teams (Reseller)",
-  [SubscriptionExtraPackage.ProReseller]: "aibox Pro (Reseller)",
-  [SubscriptionExtraPackage.Internal]: "Internal",
   [SubscriptionExtraPackage.Enterprise]: "aibox Enterprise",
 };
+
+export enum SubscriptionIncludedUsers {
+  Starter = 1,
+  Teams = 15,
+  Pro = 30,
+  Enterprise = 0,
+}
 
 export enum SubscriptionStatus {
   Active = "active",
@@ -65,11 +64,13 @@ export const AudioOptionLabels: Record<AudioOptionId, string> = {
 export enum BillingMethod {
   CreditCard = "credit_card",
   MonthlyInvoice = "monthly_invoice",
+  YearlyInvoice = "yearly_invoice",
 }
 
 export const BillingMethodLabels: Record<BillingMethod, string> = {
   [BillingMethod.CreditCard]: t("subscription.billing-method-stripe"),
   [BillingMethod.MonthlyInvoice]: t("subscription.monthly-invoice-email"),
+  [BillingMethod.YearlyInvoice]: t("subscription.yearly-invoice-email"),
 };
 
 export const SubscriptionStep = {
@@ -115,5 +116,7 @@ export const CountryMap: Record<CountryCode, any> = {
 };
 
 export const Countries = [
-  CountryMap[CountryCode.CH], CountryMap[CountryCode.DE], CountryMap[CountryCode.AT],
-]
+  CountryMap[CountryCode.CH],
+  CountryMap[CountryCode.DE],
+  CountryMap[CountryCode.AT],
+];

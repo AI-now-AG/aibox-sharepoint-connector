@@ -90,7 +90,7 @@ export const report = {
       search: z.string().optional(),
     }),
     handler: async (input) => {
-      const results = await UserModel.listForExport(input);
+      const results = await UserModel.fetchPaginatedReports(input);
       return transformRawData(results);
     },
   }),

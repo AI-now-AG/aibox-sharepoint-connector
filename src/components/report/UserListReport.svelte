@@ -5,7 +5,7 @@
   import { addToast } from "$stores/toast";
   import { useTranslations } from "$i18n/utils";
   import { getRoleString } from "$utils/roles";
-  import { debounce, preventDefault, formatDateToDDMMYY } from "$utils/common";
+  import { debounce, preventDefault, formatDate } from "$utils/common";
   import Loading from "$components/Loading.svelte";
   import Pagination from "$components/Pagination.svelte";
 
@@ -13,11 +13,11 @@
 
   let loading: boolean = $state(false);
   let page: number = $state(1);
-  let total = $state(0);
+  let total: number = $state(0);
+  let pageSize: number = $state(20);
+
   let search: string = $state("");
   let users: Record<string, any>[] = $state([]);
-
-  const PAGE_SIZE = 20;
 
   onMount(() => {
     fetchUserListReport();
@@ -41,7 +41,7 @@
 
     const { data, error } = await actions.report.userListReport({
       page,
-      pageSize: PAGE_SIZE,
+      pageSize,
       search,
     });
     loading = false;
@@ -60,7 +60,9 @@
 
   const exportUserList = async () => {
     loading = true;
-    fetch("/api/users/export")
+    fetch("/api/users/export", {
+      method: "POST",
+    })
       .then(async (response) => {
         const blob = await response.blob();
         const blobUrl = URL.createObjectURL(
@@ -163,9 +165,7 @@
                 >{getRoleString(user.roles)}</td
               >
               <td class="py-3 px-4 text-sm font-medium"
-                >{user.last_login
-                  ? formatDateToDDMMYY(user.last_login)
-                  : "-"}</td
+                >{user.last_login ? formatDate(user.last_login) : "-"}</td
               >
               <td class="py-3 px-4 text-sm font-medium text-center">
                 {#if user.blocked}
@@ -184,12 +184,7 @@
       </table>
     </div>
 
-    <Pagination
-      bind:page
-      pageSize={PAGE_SIZE}
-      {total}
-      onPageChange={handlePageChange}
-    />
+    <Pagination bind:page {pageSize} {total} onPageChange={handlePageChange} />
   {/if}
 </div>
 

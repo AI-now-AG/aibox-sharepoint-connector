@@ -12,7 +12,6 @@ import {
 } from "$constants";
 import type { APIContext, MiddlewareNext } from "astro";
 import TenantModel from "$data/models/tenant.model";
-import UserModel from "$data/models/user.model";
 import { TenantFeature } from "$types/TenantFeature";
 import { defaultLang } from "$i18n/ui";
 import { setLanguage } from "$i18n/utils";

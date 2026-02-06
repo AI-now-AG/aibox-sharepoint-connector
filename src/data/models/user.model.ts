@@ -274,7 +274,7 @@ export default {
     return await collection.deleteOne({ _id: new ObjectId(id) });
   },
 
-  listForExport: async ({
+  fetchPaginatedReports: async ({
     page = 1,
     pageSize = 20,
     search = "",
@@ -372,7 +372,6 @@ export default {
       total: total,
       page,
       pageSize,
-      search,
     };
   },
 };

@@ -1,22 +1,40 @@
+import type { APIContext, APIRoute } from "astro";
+import TenantModel from "$data/models/tenant.model";
 import UserModel from "$data/models/user.model";
 import { getSubscriptionAddOnName } from "$utils/common";
-import type { APIRoute } from "astro";
 import dayjs from "dayjs";
 import { writeToString } from "fast-csv";
 
-export const POST: APIRoute = async ({ request }) => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const POST: APIRoute = async (ctx: APIContext) => {
   try {
-    const body = await request.json();
-    const { tenants = [] } = body;
+    const results = await TenantModel.fetchPaginatedList({
+      page: 1,
+      pageSize: 0,
+      statusFlags: [],
+    });
+    const { data: tenants } = results;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const userCounts: any = {};
-    for (let i = 0; i < tenants.length; i++) {
-      const tenant = tenants[i];
+    const userAllowedCounts: any = {};
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const userActiveCounts: any = {};
+
+    for (const tenant of tenants) {
+      // Calculate allowed users
+      const {
+        included_user_limit: includedUserLimit,
+        extra_user_limit: extraUserLimit,
+      } = tenant;
+      const maxUserLimit = (includedUserLimit || 0) + (extraUserLimit || 0);
+      userAllowedCounts[tenant._id] = maxUserLimit;
+
+      // Calculate allowed users
       const totalActiveUsers = await UserModel.countActiveUsersByTenant(
         tenant._id,
       );
-      userCounts[tenant._id] = totalActiveUsers;
+      userActiveCounts[tenant._id] = totalActiveUsers;
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -29,10 +47,10 @@ export const POST: APIRoute = async ({ request }) => {
         "Tenant Name": tenant.name ?? "-",
         Status: tenant.active ? "Active" : "Archived",
         "Date created": `${dayjs(tenant.created_at, "DD.MM.YYYY HH-mm-ss").format("DD.MM.YYYY HH-mm-ss")}`,
-        "Subscription start date": sub.start_date
+        "Subscription start date": sub?.start_date
           ? `${dayjs(sub.start_date, "DD.MM.YYYY").format("DD.MM.YYYY")}`
           : "-",
-        "Subscription cancelled date": sub.cancelled_date
+        "Subscription cancelled date": sub?.cancelled_date
           ? `${dayjs(sub.cancelled_date, "DD.MM.YYYY").format("DD.MM.YYYY")}`
           : "-",
         Subscription: sub?.plan_name ?? "-",
@@ -45,33 +63,37 @@ export const POST: APIRoute = async ({ request }) => {
           sub?.add_ons,
         ),
         "Subscription Price": tenant.totalPrice ?? "-",
-        "Comment": tenant.comment ?? "-",
-        "Number of Users": userCounts[tenant._id] ?? "-",
+        Comment: tenant.comment ?? "-",
+        "Total User allowed": userAllowedCounts[tenant._id] ?? "-",
+        "Total User active": userActiveCounts[tenant._id] ?? "-",
         Language: tenant.default_language ?? "-",
         "Company Name": billing.company_name ?? "-",
         "E-Mail": billing.email ?? "-",
         "Street, Nr.": billing.address ?? "-",
         ZIP: billing.zip_code ?? "-",
-        "OpenAI is private key": meta.openaiPrivateKeyEnabled ? "Yes" : "No",
+        "Is Trial": sub?.is_trial ? "Yes" : "",
+        "Is Internal": tenant.is_internal ? "Yes" : "",
+        "Reseller Code": tenant.owned_by_reseller ?? "-",
+        "OpenAI is private key": meta.openaiPrivateKeyEnabled ? "Yes" : "",
         "Open AI GPT-5 is private key": meta.openaiGpt5PrivateKeyEnabled
           ? "Yes"
-          : "No",
+          : "",
         "Azure OpenAI is private key": meta.azureOpenaiPrivateKeyEnabled
           ? "Yes"
-          : "No",
+          : "",
         "Azure OpenAI ressource name": tenant.azure_openai_instance_name ?? "-",
         "Perplexitiy is private key": meta.perplexityPrivateKeyEnabled
           ? "Yes"
-          : "No",
-        "Claude is private key": meta.claudePrivateKeyEnabled ? "Yes" : "No",
-        "Gemini is private key": meta.geminiPrivateKeyEnabled ? "Yes" : "No",
+          : "",
+        "Claude is private key": meta.claudePrivateKeyEnabled ? "Yes" : "",
+        "Gemini is private key": meta.geminiPrivateKeyEnabled ? "Yes" : "",
         "Azure Speech is private key": meta.speechPrivateKeyEnabled
           ? "Yes"
-          : "No",
+          : "",
         "Eleven Labs is private key": meta.elevenLabsPrivateKeyEnabled
           ? "Yes"
-          : "No",
-        "Flux is private key": meta.fluxPrivateKeyEnabled ? "Yes" : "No",
+          : "",
+        "Flux is private key": meta.fluxPrivateKeyEnabled ? "Yes" : "",
       };
     });
 

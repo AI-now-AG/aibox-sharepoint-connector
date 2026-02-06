@@ -6,24 +6,43 @@
   import log from "$utils/log";
   import { tenant as currentTenant } from "$stores";
   import { addToast } from "$stores/toast";
-  import ConfirmDialog from "$components/ConfirmDialog.svelte";
-  import Loading from "$components/Loading.svelte";
-  import InputSearchFilter from "./InputSearchFilter.svelte";
-  import dayjs from "dayjs";
+  import { formatDate, getSubscriptionAddOnName } from "$utils/common";
   import { AudioOptionId, SubscriptionPackageId } from "$types/Subscription";
   import { SubscriptionPackages } from "$data/subscription-packages";
-  import { getSubscriptionAddOnName } from "$utils/common";
+  import ConfirmDialog from "$components/ConfirmDialog.svelte";
+  import Loading from "$components/Loading.svelte";
+  import TenantSearchFilter from "./TenantSearchFilter.svelte";
+  import Pagination from "$components/Pagination.svelte";
+
+  interface Props {
+    resellerCodes: string[];
+  }
+
+  let { resellerCodes = [] }: Props = $props();
 
   const t = useTranslations();
   let loading = $state(false);
 
   let tenants: any = $state([]);
-  let showArchived: boolean = $state(false);
+  let page: number = $state(1);
+  let total: number = $state(0);
+  let pageSize: number = $state(10);
+
+  const from = $derived(total === 0 ? 0 : (page - 1) * pageSize + 1);
+  const to = $derived(Math.min(page * pageSize, total));
+
   let searchValue: string = $state("");
+  let statusFlags: string[] = $state([]);
+  let resellerCode: string = $state("");
 
   let selectedTenant: any = $state(null);
   let confirmUpdateModal: HTMLDialogElement | undefined = $state();
   let confirmDeleteModal: HTMLDialogElement | undefined = $state();
+
+  const resellerCodeOptions = resellerCodes.map((c) => ({
+    title: c,
+    value: c,
+  }));
 
   onMount(async () => {
     await fetchTenants();
@@ -32,17 +51,26 @@
   const fetchTenants = async () => {
     loading = true;
     const { data, error } = await actions.tenant.list({
+      page,
+      pageSize,
       searchValue,
-      showArchived,
+      statusFlags,
+      resellerCode,
     });
 
     loading = false;
 
     if (!error) {
-      tenants = data;
+      tenants = data.data;
+      total = data.total;
     } else {
       log.e(error, "Error fetching tenants");
     }
+  };
+
+  const handlePageChange = (p: number) => {
+    page = p;
+    fetchTenants();
   };
 
   function confirmUpdateStatus(tenant: any) {
@@ -173,12 +201,8 @@
   async function exportTenants() {
     try {
       loading = true;
-      const response = await fetch("/api/export-tenants", {
+      const response = await fetch("/api/tenants/export", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          tenants: tenants,
-        }),
       });
       loading = false;
 
@@ -188,7 +212,7 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `Tenants-Export-${dayjs(new Date(), "DD.MM.YYYY HH-mm-ss").format("DD.MM.YYYY HH-mm-ss")}.csv`;
+      a.download = `Tenants-Export-${formatDate(new Date(), "DD.MM.YYYY HH-mm-ss")}.csv`;
       a.click();
       URL.revokeObjectURL(url);
     } catch (err: any) {
@@ -220,7 +244,7 @@
     <div class="dropdown dropdown-end mt-2 lg:mt-8">
       <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
       <!-- svelte-ignore a11y_label_has_associated_control -->
-      <label tabindex="0" class="btn btn-outline font-normal grow-0">
+      <label tabindex="0" class="btn btn-primary font-normal grow-0">
         {@html svgIcons.add}
         {t("tenant.tenants.add-new-tenant")}
       </label>
@@ -246,85 +270,121 @@
 </div>
 
 <div class="px-8">
-  <div class="container max-w-full mx-auto p-6">
-    <InputSearchFilter
+  <div class="max-w-full mx-auto p-6">
+    <TenantSearchFilter
+      {resellerCodeOptions}
       bind:value={searchValue}
-      bind:showArchived
-      onsearch={fetchTenants}
-      onfilter={fetchTenants}
+      bind:statusFlags
+      bind:resellerCode
+      onsearch={() => {
+        page = 1;
+        fetchTenants();
+      }}
+      onfilter={() => {
+        page = 1;
+        fetchTenants();
+      }}
     />
 
     <div>
+      <!--
       <h2 class="text-lg font-normal mb-4">
-        {t("tenant.tenants.all-tenants", { amount: tenants.length })}
+        {t("tenant.tenants.all-tenants", { amount: total })}
       </h2>
+      -->
 
-      <div class="relative">
+      <div class="overflow-x-auto relative">
         <table
-          class="border-separate border-spacing-x-0 border-spacing-y-3 min-w-full relative"
+          class="border-separate border-spacing-x-0 min-w-full relative"
           style="font-family:Inter;"
         >
           <thead>
-            <tr class="bg-base-300 rounded-lg">
-              <th class="py-3 px-4 text-left font-normal text-xs rounded-l-lg"
+            <tr class="bg-base-300">
+              <th class="py-2 px-4 text-left font-normal text-xs"
                 >{t("tenant.tenants.tenant.display-name")}</th
               >
-              <th class="py-3 px-4 text-left font-normal text-xs"
+              <th class="py-2 px-4 text-left font-normal text-xs"
                 >{t("tenant.subscription")}</th
               >
-              <th class="py-3 px-4 text-left font-normal text-xs"
-                >{t("tenant.audio-subscription")}</th
+              <th class="py-2 px-4 text-left font-normal text-xs"
+                >{t("tenant.flag-status.trial")}</th
               >
-              <th class="py-3 px-4 text-left font-normal text-xs"
-                >{t("tenant.subtitle-subscription")}</th
+              <th class="py-2 px-4 text-left font-normal text-xs"
+                >{t("tenant.flag-status.internal")}</th
               >
-              <th class="py-3 px-4 text-left font-normal text-xs"
+              <th class="py-2 px-4 text-left font-normal text-xs"
+                >{t("tenant.filter-reseller-code-label")}</th
+              >
+              <th class="py-2 px-4 text-left font-normal text-xs"
                 >{t("tenant.total-price")}</th
               >
-              <th class="py-3 px-4 text-left font-normal text-xs"
-                >{t("tenant.subscription-start-date")}</th
-              >
-              <th class="py-3 px-4 text-left font-normal text-xs"
+              <th class="py-2 px-4 text-left font-normal text-xs"
                 >{t("tenant.tenants.tenant.active")}</th
               >
-              <th class="py-3 px-4 rounded-r-lg"></th>
+              <th class="py-3 px-4">&nbsp;</th>
             </tr>
           </thead>
           <tbody>
             {#each tenants as tenant}
-              <tr class="h-16 bg-base-100 hover:bg-base-300 text-sm rounded-lg">
-                <td class="py-3 px-4 text-sm font-medium rounded-l-lg">
+              <tr class="h-12 bg-base-100 hover:bg-base-300/30 text-sm">
+                <td class="py-2 px-4 text-sm font-medium">
                   <a
-                    class="underline underline-offset-2"
+                    class="hover:underline hover:underline-offset-2"
                     href="/tenant-management/{tenant._id}">{tenant.name}</a
                   >
                 </td>
 
-                <td class="py-3 px-4">
-                  <span class="text text-sm font-medium">
+                <td class="py-2 px-4">
+                  <span class="block text text-sm font-medium">
                     {tenant.subscription?.plan_name}
                   </span>
+                  {#if tenant.subscription?.add_ons}
+                    <span class="block pt-1">
+                      <span class="badge badge-ghost badge-sm">
+                        {getSubscriptionAddOnName(
+                          "audiototext",
+                          tenant.subscription?.add_ons,
+                        )}
+                      </span>
+                      <span class="badge badge-ghost badge-sm">
+                        {getSubscriptionAddOnName(
+                          "subtitle",
+                          tenant.subscription?.add_ons,
+                        )}
+                      </span>
+                    </span>
+                  {/if}
                 </td>
 
-                <td class="py-3 px-4">
-                  <span class="text text-sm font-medium">
-                    {getSubscriptionAddOnName(
-                      "audiototext",
-                      tenant.subscription?.add_ons,
-                    )}
-                  </span>
+                <td class="py-2 px-4">
+                  {#if tenant.subscription?.is_trial}
+                    <span class="badge badge-soft badge-success"
+                      >{t("common.yes")}</span
+                    >
+                  {:else}
+                    <span class="badge badge-soft badge-warning"
+                      >{t("common.no")}</span
+                    >
+                  {/if}
                 </td>
 
-                <td class="py-3 px-4">
-                  <span class="text text-sm font-medium">
-                    {getSubscriptionAddOnName(
-                      "subtitle",
-                      tenant.subscription?.add_ons,
-                    )}
-                  </span>
+                <td class="py-2 px-4">
+                  {#if tenant.is_internal}
+                    <span class="badge badge-soft badge-success"
+                      >{t("common.yes")}</span
+                    >
+                  {:else}
+                    <span class="badge badge-soft badge-warning"
+                      >{t("common.no")}</span
+                    >
+                  {/if}
                 </td>
 
-                <td class="py-3 px-4">
+                <td class="py-2 px-4">
+                  {tenant.owned_by_reseller}
+                </td>
+
+                <td class="py-2 px-4">
                   <span class="text-warning text-sm font-medium"
                     >{tenant.totalPrice
                       ? tenant.totalPrice + " CHF"
@@ -335,31 +395,19 @@
                   >
                 </td>
 
-                <td class="py-3 px-4">
-                  <span class="text text-sm font-medium">
-                    {tenant.subscription?.start_date
-                      ? dayjs(
-                          tenant.subscription?.start_date,
-                          "DD.MM.YYYY",
-                        ).format("DD.MM.YYYY")
-                      : "-"}
-                  </span>
+                <td class="py-2 px-4">
+                  {#if tenant.active}
+                    <span class={"badge badge-soft badge-success badge-sm"}
+                      >{t("tenant.tenants.tenant.active")}
+                    </span>
+                  {:else}
+                    <span class={"badge badge-soft badge-error badge-sm"}
+                      >{t("tenant.tenants.tenant.archived")}
+                    </span>
+                  {/if}
                 </td>
 
-                <td class="py-3 px-4">
-                  <span
-                    class={tenant.active == 1
-                      ? "text-success text-sm font-medium"
-                      : "text-sm font-medium text-neutral/70"}
-                    >{tenant.active == 1
-                      ? t("tenant.tenants.tenant.active")
-                      : t("tenant.tenants.tenant.archived")}</span
-                  >
-                </td>
-
-                <td
-                  class="py-3 px-4 text-right relative relative-dropdown rounded-r-lg"
-                >
+                <td class="py-2 px-4 text-right relative relative-dropdown">
                   <div class="dropdown dropdown-hover dropdown-end">
                     <button class="btn btn-ghost btn-sm z-50">
                       {@html svgIcons.threeDot}
@@ -413,6 +461,18 @@
         </table>
 
         <Loading show={loading} partial={true} />
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-[1fr_max-content]">
+        <div class="mt-4 text-sm text-base-content/60">
+          {t("pagination.showing-range-of-total", { from, to, total })}
+        </div>
+        <Pagination
+          bind:page
+          {pageSize}
+          {total}
+          onPageChange={handlePageChange}
+        />
       </div>
     </div>
 

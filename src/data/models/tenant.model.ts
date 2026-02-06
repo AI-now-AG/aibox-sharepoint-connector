@@ -9,12 +9,20 @@ import {
   ThemeCode,
 } from "$types/TenantFeature";
 import { BillingMethod } from "$types/Subscription";
-import { ModelName, ReasoningEffortOption, EmbeddingProvider } from "$types/AIProvider";
+import { FlagStatus } from "$types/TenantMgnt";
+import {
+  ModelName,
+  ReasoningEffortOption,
+  EmbeddingProvider,
+} from "$types/AIProvider";
 import { ChunkingStrategy } from "$types/VectorKB";
 
 export const TenantFilterParamsSchema = z.object({
+  page: z.number().default(1),
+  pageSize: z.number().default(20),
   searchValue: z.string().nullish(),
-  showArchived: z.boolean(),
+  statusFlags: z.array(z.string()),
+  resellerCode: z.string().nullish(),
 });
 export type TenantFilterParams = z.infer<typeof TenantFilterParamsSchema>;
 
@@ -78,6 +86,10 @@ const TenantSchema = z.object({
   is_restrict_user_managment: z.boolean().optional().default(false),
   is_trial: z.boolean().optional().default(false),
   is_on_posthog: z.boolean().optional().default(false),
+  is_internal: z.boolean().optional().default(false),
+  is_reseller: z.boolean().optional().default(false),
+  reseller_code: z.string().nullish(),
+  owned_by_reseller: z.string().nullish(),
   comment: z.string().optional(),
   metadata: z.record(z.any()).nullish(),
   billing_method: z
@@ -86,7 +98,8 @@ const TenantSchema = z.object({
   billing_info: BillingInfoSchema.optional(),
   stripe_customer_id: z.string().nullish().default(null),
   totalPrice: z.string().optional(),
-  max_user_limit: z.number().nullish().default(0),
+  extra_user_limit: z.number().nullish().default(0),
+  included_user_limit: z.number().nullish().default(0),
   // Vector KB Configuration
   vector_kb_enabled: z.boolean().optional().default(false),
   vector_kb_embedding_provider: z.nativeEnum(EmbeddingProvider).nullish(),
@@ -108,7 +121,10 @@ const TenantSchema = z.object({
   vector_kb_multihop_enabled: z.boolean().optional().default(false),
   vector_kb_max_hops: z.number().optional().default(3),
   vector_kb_debug_enabled: z.boolean().optional().default(false),
-  vector_kb_chunking_strategy: z.nativeEnum(ChunkingStrategy).optional().default(ChunkingStrategy.Fixed),
+  vector_kb_chunking_strategy: z
+    .nativeEnum(ChunkingStrategy)
+    .optional()
+    .default(ChunkingStrategy.Fixed),
   vector_kb_multi_query_enabled: z.boolean().optional().default(false),
   vector_kb_multi_query_count: z.number().optional().default(3),
   created_at: z
@@ -169,25 +185,70 @@ export default {
     );
   },
 
-  list: async (filterParams?: TenantFilterParams) => {
-    const filter: any = {
-      active: true,
+  list: async () => {
+    return collection.find<Document<Tenant>>({}).toArray();
+  },
+
+  listAllResellerCodes: async () => {
+    return await collection.distinct("reseller_code", {
+      is_reseller: true,
+      reseller_code: { $ne: null },
+    });
+  },
+
+  fetchPaginatedList: async (filterParams: TenantFilterParams) => {
+    const { page, pageSize, searchValue, statusFlags, resellerCode } =
+      filterParams;
+    const skip = (page - 1) * pageSize;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const baseMatch: any = {};
+
+    // escape regex
+    const escapeRegex = (text: string): string => {
+      return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     };
 
-    if (filterParams) {
-      const { searchValue, showArchived } = filterParams;
-
+    if (searchValue || statusFlags.length > 0 || resellerCode) {
+      // Search filter
       if (searchValue) {
-        filter.name = { $regex: searchValue, $options: "i" };
+        const safeSearch = escapeRegex(searchValue.trim());
+        (baseMatch.$and ??= []).push(
+          { name: { $regex: safeSearch, $options: "i" } },
+          { org_name: { $regex: safeSearch, $options: "i" } },
+        );
       }
 
-      if (showArchived) {
-        filter.active = false;
+      // Status flag filter
+      if (statusFlags.includes(FlagStatus.Internal)) {
+        (baseMatch.$and ??= []).push({ is_internal: true });
       }
+
+      // Reseller flag filter
+      if (statusFlags.includes(FlagStatus.Reseller)) {
+        (baseMatch.$and ??= []).push({ is_reseller: true });
+      }
+
+      // Archived flag filter
+      if (statusFlags.includes(FlagStatus.Archived)) {
+        (baseMatch.$and ??= []).push({ active: false });
+      }
+
+      // Reseller code filter
+      if (resellerCode) {
+        (baseMatch.$and ??= []).push({ owned_by_reseller: resellerCode });
+      }
+    } else {
+      (baseMatch.$and ??= []).push({ active: true });
     }
 
-    const pipeline = [
-      { $match: filter },
+    // Build pipeline dynamically
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const pipeline: any[] = [
+      {
+        // 🔍 search happens HERE (before lookups)
+        $match: baseMatch,
+      },
       {
         $lookup: {
           from: "subscriptions",
@@ -204,16 +265,76 @@ export default {
       },
       {
         $project: {
-          subscriptions: 0, // hide the full array coz only need one
+          _id: 1,
+          name: 1,
+          default_language: 1,
+          comment: 1,
+          totalPrice: 1,
+          active: 1,
+          is_internal: 1,
+          is_reseller: 1,
+          reseller_code: 1,
+          owned_by_reseller: 1,
+          included_user_limit: 1,
+          extra_user_limit: 1,
+          billing_info: 1,
+          metadata: 1,
+          azure_openai_instance_name: 1,
+          subscription: 1,
+        },
+      },
+      { $sort: { created_at: 1 } },
+    ];
+
+    // Trial flag filter
+    if (statusFlags.includes(FlagStatus.Trial)) {
+      pipeline.push({
+        $match: { "subscription.is_trial": true },
+      });
+    }
+
+    // ✅ Only paginate if pageSize > 0
+    if (pageSize > 0) {
+      pipeline.push({ $skip: skip });
+      pipeline.push({ $limit: pageSize });
+    }
+
+    const totalPipeline: any[] = [
+      { $match: baseMatch },
+      {
+        $lookup: {
+          from: "subscriptions",
+          localField: "_id",
+          foreignField: "tenant_id",
+          as: "subscriptions",
+        },
+      },
+      {
+        $addFields: {
+          subscription: { $arrayElemAt: ["$subscriptions", 0] },
         },
       },
     ];
 
-    const data = await collection
-      .aggregate<Document<Tenant & { subscription?: any }>>(pipeline)
-      .toArray();
+    // ✅ merge trial filter only when needed
+    if (statusFlags.includes(FlagStatus.Trial)) {
+      totalPipeline.push({
+        $match: { "subscription.is_trial": true },
+      });
+    }
 
-    return data;
+    totalPipeline.push({ $count: "count" });
+
+    const totalResult = await collection.aggregate(totalPipeline).toArray();
+    const result = await collection.aggregate(pipeline).toArray();
+    const total = totalResult[0]?.count ?? 0;
+
+    return {
+      data: result,
+      total: total,
+      page,
+      pageSize,
+    };
   },
 
   get: async (id: string | ObjectId): Promise<Tenant | null> => {

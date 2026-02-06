@@ -39,6 +39,8 @@ const tenantData = transformRawData(tenant);
 const subscription = await SubscriptionModel.getOrCreateSubscription(id);
 const subscriptionData = transformRawData(subscription, false);
 const countActiveUsers = await UserModel.countActiveUsersByTenant(id);
+
+const resellerCodes = await TenantModel.listAllResellerCodes();
 ---
 
 <Layout>
@@ -47,6 +49,7 @@ const countActiveUsers = await UserModel.countActiveUsersByTenant(id);
     subscription={subscriptionData}
     activeUsers={countActiveUsers}
     isStripeInTestMode={isTestMode()}
+    {resellerCodes}
     client:load
   />
 </Layout>

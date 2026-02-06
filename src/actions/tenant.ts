@@ -29,7 +29,11 @@ import {
   AudioOptionId,
 } from "$types/Subscription";
 import { EncryptedUserPassword, UserRole } from "$types/Users";
-import { ModelName, ReasoningEffortOption, EmbeddingProvider } from "$types/AIProvider";
+import {
+  ModelName,
+  ReasoningEffortOption,
+  EmbeddingProvider,
+} from "$types/AIProvider";
 import { ChunkingStrategy } from "$types/VectorKB";
 
 const TenantInputParamsSchema = z.object({
@@ -74,7 +78,12 @@ const TenantInputParamsSchema = z.object({
     .default(() => false),
   is_trial: z.boolean().optional().default(false),
   is_on_posthog: z.boolean().optional().default(false),
-  max_user_limit: z.number().nullish().default(0),
+  is_internal: z.boolean().optional().default(false),
+  is_reseller: z.boolean().optional().default(false),
+  reseller_code: z.string().nullish(),
+  owned_by_reseller: z.string().nullish(),
+  included_user_limit: z.number().nullish().default(0),
+  extra_user_limit: z.number().nullish().default(0),
   comment: z.string().optional(),
   metadata: z.record(z.any()).optional(),
   tenant_admin_email: z.string().optional(),
@@ -101,7 +110,10 @@ const TenantInputParamsSchema = z.object({
   vector_kb_multihop_enabled: z.boolean().optional().default(false),
   vector_kb_max_hops: z.number().optional().default(3),
   vector_kb_debug_enabled: z.boolean().optional().default(false),
-  vector_kb_chunking_strategy: z.nativeEnum(ChunkingStrategy).optional().default(ChunkingStrategy.Fixed),
+  vector_kb_chunking_strategy: z
+    .nativeEnum(ChunkingStrategy)
+    .optional()
+    .default(ChunkingStrategy.Fixed),
   vector_kb_multi_query_enabled: z.boolean().optional().default(false),
   vector_kb_multi_query_count: z.number().optional().default(3),
 });
@@ -135,8 +147,10 @@ const SubscriptionInputParamsSchema = z.object({
     .or(z.literal(""))
     .optional(),
   add_ons: z.array(z.nativeEnum(AudioOptionId)).optional(),
-  start_date: z.coerce.date().nullable().optional(),
-  cancelled_date: z.coerce.date().nullable().optional(),
+  start_date: z.coerce.date().nullish(),
+  cancelled_date: z.coerce.date().nullish(),
+  is_trial: z.boolean().optional().default(false),
+  trial_start_date: z.coerce.date().nullish(),
 });
 
 const assignMemberRoles = async (
@@ -248,7 +262,7 @@ export const tenant = {
   list: defineAction({
     input: TenantFilterParamsSchema,
     handler: async (input) => {
-      const data = await TenantModel.list(input);
+      const data = await TenantModel.fetchPaginatedList(input);
       return transformRawData(data, false);
     },
   }),
