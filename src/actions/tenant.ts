@@ -88,7 +88,7 @@ const TenantInputParamsSchema = z.object({
   metadata: z.record(z.any()).optional(),
   tenant_admin_email: z.string().optional(),
   billing_info: z.record(z.any()).optional(),
-  totalPrice: z.string().optional(),
+  totalPrice: z.string().nullish().default(null),
   // Vector KB Configuration
   vector_kb_enabled: z.boolean().optional().default(false),
   vector_kb_embedding_provider: z.nativeEnum(EmbeddingProvider).nullish(),
