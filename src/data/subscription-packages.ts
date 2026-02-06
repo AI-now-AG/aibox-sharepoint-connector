@@ -42,9 +42,9 @@ export const SubscriptionPackages = {
         en: "For small & growing teams",
         de: "Für kleine & wachsende Teams",
       },
-      price: 149,
+      price: 179,
       currency: "CHF",
-      priceText: "149 CHF / pro Monat",
+      priceText: "179 CHF / pro Monat",
       features: {
         en: [
           "15 Users included",
@@ -70,9 +70,9 @@ export const SubscriptionPackages = {
         en: "Power Teams & Heavy Usage",
         de: "Grosse Teams & intensive Nutzung",
       },
-      price: 249,
+      price: 279,
       currency: "CHF",
-      priceText: "249 CHF / pro Monat",
+      priceText: "279 CHF / pro Monat",
       features: {
         en: [
           "30 Users included",
@@ -89,8 +89,10 @@ export const SubscriptionPackages = {
       },
     },
   },
-  audioOptions: { // Select [Subtitle Studio Plus] or [Subtitle Studio Basic] | [Audio to Text Large] or [Audio to Text Basic]
-    AudioPremium: { // Change from [Audio zu Text Premium] to [Subtitle Studio Plus]
+  audioOptions: {
+    // Select [Subtitle Studio Plus] or [Subtitle Studio Basic] | [Audio to Text Large] or [Audio to Text Basic]
+    AudioPremium: {
+      // Change from [Audio zu Text Premium] to [Subtitle Studio Plus]
       id: AudioOptionId.AudioPremium,
       name: {
         en: "Subtitle Studio Plus",
@@ -100,7 +102,8 @@ export const SubscriptionPackages = {
       currency: "CHF",
       priceText: "300 CHF / pro Monat",
     },
-    AudioBasisAddOnSubtitle: { // Change from [Add-On Subtitle] to [Subtitle Studio Basic] ==> REMOVED 
+    AudioBasisAddOnSubtitle: {
+      // Change from [Add-On Subtitle] to [Subtitle Studio Basic] ==> REMOVED
       id: AudioOptionId.AudioBasisAddOnSubtitle,
       name: {
         en: "Subtitle Studio Basic",
@@ -110,7 +113,8 @@ export const SubscriptionPackages = {
       currency: "CHF",
       priceText: "50 CHF / pro Monat",
     },
-    AudioBasisAddOnLarge: {  // Change from [Add-On Audio XL] to [Audio to Text Large]
+    AudioBasisAddOnLarge: {
+      // Change from [Add-On Audio XL] to [Audio to Text Large]
       id: AudioOptionId.AudioBasisAddOnLarge,
       name: {
         en: "Audio to Text Large",
