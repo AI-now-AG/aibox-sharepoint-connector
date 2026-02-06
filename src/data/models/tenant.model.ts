@@ -97,7 +97,7 @@ const TenantSchema = z.object({
     .default(BillingMethod.MonthlyInvoice),
   billing_info: BillingInfoSchema.optional(),
   stripe_customer_id: z.string().nullish().default(null),
-  totalPrice: z.string().optional(),
+  totalPrice: z.string().nullish().default(null),
   extra_user_limit: z.number().nullish().default(0),
   included_user_limit: z.number().nullish().default(0),
   // Vector KB Configuration
