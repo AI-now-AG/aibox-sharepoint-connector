@@ -869,5 +869,6 @@
   "tenant.detail.extra-user-limits": "Additional",
   "tenant.detail.total-user-limits": "Total Limit",
   "tenant.detail.users-used-percentage": "${percentage}% used",
-  "pagination.showing-range-of-total": "Showing ${from} to ${to} of ${total} results"
+  "pagination.showing-range-of-total": "Showing ${from} to ${to} of ${total} results",
+  "subscription.yearly-invoice-email": "Yearly invoice"
 }

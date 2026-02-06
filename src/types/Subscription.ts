@@ -64,11 +64,13 @@ export const AudioOptionLabels: Record<AudioOptionId, string> = {
 export enum BillingMethod {
   CreditCard = "credit_card",
   MonthlyInvoice = "monthly_invoice",
+  YearlyInvoice = "yearly_invoice",
 }
 
 export const BillingMethodLabels: Record<BillingMethod, string> = {
   [BillingMethod.CreditCard]: t("subscription.billing-method-stripe"),
   [BillingMethod.MonthlyInvoice]: t("subscription.monthly-invoice-email"),
+  [BillingMethod.YearlyInvoice]: t("subscription.yearly-invoice-email"),
 };
 
 export const SubscriptionStep = {
