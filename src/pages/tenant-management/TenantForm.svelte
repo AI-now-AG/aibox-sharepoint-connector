@@ -3287,6 +3287,7 @@
               placeholder={t("tenant.detail.select-reseller-code-placeholder")}
               options={resellerCodeOptions}
               bind:value={tenantData.owned_by_reseller}
+              disabled={tenantData.is_reseller}
             />
           </div>
         </div>
