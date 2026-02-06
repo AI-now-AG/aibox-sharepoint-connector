@@ -68,7 +68,10 @@
   <div class="grid grid-cols-1 xl:grid-cols-10 gap-10">
     <div class="col-span-4">
       <p class="mb-1 text-base-content/80">{t("tenant.search-label")}</p>
-      <label class="input input-bordered flex items-center gap-2 w-full">
+      <label
+        class="input input-bordered flex items-center gap-2 w-full max-w-sm
+"
+      >
         {@html svgIcons.search}
         <input
           type="text"
