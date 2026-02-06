@@ -15,6 +15,7 @@ import {
   ReasoningEffortOption,
   EmbeddingProvider,
 } from "$types/AIProvider";
+import { ChunkingStrategy } from "$types/VectorKB";
 
 export const TenantFilterParamsSchema = z.object({
   page: z.number().default(1),
@@ -120,6 +121,12 @@ const TenantSchema = z.object({
   vector_kb_multihop_enabled: z.boolean().optional().default(false),
   vector_kb_max_hops: z.number().optional().default(3),
   vector_kb_debug_enabled: z.boolean().optional().default(false),
+  vector_kb_chunking_strategy: z
+    .nativeEnum(ChunkingStrategy)
+    .optional()
+    .default(ChunkingStrategy.Fixed),
+  vector_kb_multi_query_enabled: z.boolean().optional().default(false),
+  vector_kb_multi_query_count: z.number().optional().default(3),
   created_at: z
     .date()
     .optional()
@@ -260,6 +267,8 @@ export default {
         $project: {
           _id: 1,
           name: 1,
+          default_language: 1,
+          comment: 1,
           totalPrice: 1,
           active: 1,
           is_internal: 1,
@@ -268,6 +277,9 @@ export default {
           owned_by_reseller: 1,
           included_user_limit: 1,
           extra_user_limit: 1,
+          billing_info: 1,
+          metadata: 1,
+          azure_openai_instance_name: 1,
           subscription: 1,
         },
       },
