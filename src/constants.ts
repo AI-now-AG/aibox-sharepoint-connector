@@ -94,21 +94,21 @@ export const STRIPE_PRODUCTS_DEV = {
   Starter: "price_1SDLbSBIpWAJAQFJROPWUvM3",
   Teams: "price_1SxnbeBIpWAJAQFJXdbaFiAe",
   Pro: "price_1SxncJBIpWAJAQFJNnUy4MYh",
-  AudioBasis: "price_1SDLj7BIpWAJAQFJVWvkacQr",
-  AudioBasisAddOnLarge: "price_1SDLmiBIpWAJAQFJB2Bx17di",
+  AudioBasis: "price_1SDLj7BIpWAJAQFJVWvkacQr", // Basis + Large merged into AudioToText
+  AudioBasisAddOnLarge: "price_1SDLmiBIpWAJAQFJB2Bx17di", // Basis + Large merged into AudioToText
   AudioBasisAddOnSubtitle: "price_1SDLpGBIpWAJAQFJT04nekfl",
-  AudioPremium: "price_1SxnsZBIpWAJAQFJyk1xgYvE",
   AudioToText: "price_1SxmtABIpWAJAQFJqfDt7TlV",
+  AudioPremium: "price_1SxnsZBIpWAJAQFJyk1xgYvE",
 };
 export const STRIPE_PRODUCTS_PROD = {
   Starter: "price_1SDLtnBTLa4XuBC9pwut7szi",
   Teams: "price_1SxndQBTLa4XuBC93GkZ0nXr",
   Pro: "price_1Sxnd1BTLa4XuBC9bwLQBHEX",
-  AudioBasis: "price_1SDLj7BIpWAJAQFJVWvkacQr",
-  AudioBasisAddOnLarge: "price_1SDLukBTLa4XuBC9xBgIpfaG",
+  AudioBasis: "price_1SDLt7BTLa4XuBC9lP214stV", // Basis + Large merged into AudioToText
+  AudioBasisAddOnLarge: "price_1SDLukBTLa4XuBC9xBgIpfaG", // Basis + Large merged into AudioToText
   AudioBasisAddOnSubtitle: "price_1SDLwMBTLa4XuBC9j3KYiEav",
-  AudioPremium: "price_1SxntCBTLa4XuBC9PtxNsCkB",
   AudioToText: "price_1SxmuJBTLa4XuBC9kCvTIX2L",
+  AudioPremium: "price_1SxntCBTLa4XuBC9PtxNsCkB",
 };
 export const STRIPE_TAX_RATE_DEV = "txr_1RPNDiBIpWAJAQFJ9jD4Jlpj";
 export const STRIPE_TAX_RATE_PROD = "txr_1RQOYKBTLa4XuBC9iZoAKkz1";
