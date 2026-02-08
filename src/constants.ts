@@ -103,7 +103,7 @@ export const STRIPE_PRODUCTS_PROD = {
   Starter: "price_1SDLtnBTLa4XuBC9pwut7szi",
   Teams: "price_1RQOSuBTLa4XuBC9nmmXyldF",
   Pro: "price_1RQOSsBTLa4XuBC9QgPti4FX",
-  AudioBasis: "price_1SDLj7BIpWAJAQFJVWvkacQr",
+  AudioBasis: "price_1SDLt7BTLa4XuBC9lP214stV",
   AudioBasisAddOnLarge: "price_1SDLukBTLa4XuBC9xBgIpfaG",
   AudioBasisAddOnSubtitle: "price_1SDLwMBTLa4XuBC9j3KYiEav",
   AudioPremium: "price_1SDLwqBTLa4XuBC9Bbg6FFCr",
