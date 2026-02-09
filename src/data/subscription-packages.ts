@@ -147,7 +147,11 @@ export const SubscriptionPackages = {
         en: "Audio to Text",
         de: "Audio zu Text",
       },
-      price: 29,
+      prices: {
+        Starter: 29,
+        Teams: 79,
+        Pro: 119,
+      },
       currency: "CHF",
       pricePrefix: "Ab ",
       priceText: "29 CHF / pro Monat",

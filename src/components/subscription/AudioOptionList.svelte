@@ -26,12 +26,40 @@
 
   interface Props {
     selectedAudioOptionIds?: string[];
+    selectedPackageId?: string;
     defaultLanguage?: string;
   }
   let {
     selectedAudioOptionIds = $bindable([]),
+    selectedPackageId = "",
     defaultLanguage = "en",
   }: Props = $props();
+
+  const isDisabled = $derived(!selectedPackageId);
+
+  // Clear audio selections when plan is deselected
+  $effect(() => {
+    if (!selectedPackageId && selectedAudioOptionIds.length > 0) {
+      selectedAudioOptionIds = [];
+    }
+  });
+
+  function getResolvedPrice(option: (typeof audioToTextOptions)[0]) {
+    if ("prices" in option && option.prices) {
+      if (selectedPackageId && option.prices[selectedPackageId as keyof typeof option.prices]) {
+        return option.prices[selectedPackageId as keyof typeof option.prices];
+      }
+      return Math.min(...Object.values(option.prices));
+    }
+    return option.price;
+  }
+
+  function getResolvedPricePrefix(option: (typeof audioToTextOptions)[0]) {
+    if (selectedPackageId && "prices" in option) {
+      return "";
+    }
+    return option.pricePrefix ?? "";
+  }
 
   function handleSelectPackage(id: string) {
     let currentGroup: AudioOptionId[] | undefined;
@@ -65,9 +93,10 @@
         <AudioOption
           id={option.id}
           name={option.name}
-          price={option.price}
+          price={getResolvedPrice(option)}
           currency={option.currency}
-          pricePrefix={option.pricePrefix}
+          pricePrefix={getResolvedPricePrefix(option)}
+          disabled={isDisabled}
           {defaultLanguage}
           bind:selectedAudioOptionIds
           onSelect={({ id }: { id: string }) => {
@@ -85,6 +114,7 @@
           name={option.name}
           price={option.price}
           currency={option.currency}
+          disabled={isDisabled}
           {defaultLanguage}
           bind:selectedAudioOptionIds
           onSelect={({ id }: { id: string }) => {

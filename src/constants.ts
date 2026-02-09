@@ -98,6 +98,9 @@ export const STRIPE_PRODUCTS_DEV = {
   AudioBasisAddOnLarge: "price_1SDLmiBIpWAJAQFJB2Bx17di", // Basis + Large merged into AudioToText
   AudioBasisAddOnSubtitle: "price_1SDLpGBIpWAJAQFJT04nekfl",
   AudioToText: "price_1SxmtABIpWAJAQFJqfDt7TlV",
+  AudioToText_Starter: "price_1SxmtABIpWAJAQFJqfDt7TlV", // 29 CHF
+  AudioToText_Teams: "price_1SypxcBIpWAJAQFJtnoLAwqG", // 79 CHF
+  AudioToText_Pro: "price_1SypyDBIpWAJAQFJBDlIPzK6", // 119 CHF
   AudioPremium: "price_1SxnsZBIpWAJAQFJyk1xgYvE",
 };
 export const STRIPE_PRODUCTS_PROD = {
@@ -108,6 +111,9 @@ export const STRIPE_PRODUCTS_PROD = {
   AudioBasisAddOnLarge: "price_1SDLukBTLa4XuBC9xBgIpfaG", // Basis + Large merged into AudioToText
   AudioBasisAddOnSubtitle: "price_1SDLwMBTLa4XuBC9j3KYiEav",
   AudioToText: "price_1SxmuJBTLa4XuBC9kCvTIX2L",
+  AudioToText_Starter: "price_1SxmuJBTLa4XuBC9kCvTIX2L", // 29 CHF
+  AudioToText_Teams: "price_1SyvkuBTLa4XuBC99S9VlJY6", // 79 CHF
+  AudioToText_Pro: "price_1SyvlHBTLa4XuBC9bjC4KA2f", // 119 CHF 
   AudioPremium: "price_1SxntCBTLa4XuBC9PtxNsCkB",
 };
 export const STRIPE_TAX_RATE_DEV = "txr_1RPNDiBIpWAJAQFJ9jD4Jlpj";

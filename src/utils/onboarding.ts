@@ -58,9 +58,23 @@ export const hasSubtitleEditor = (
   return selectedAddOns?.includes(AudioOptionId.AudioPremium);
 };
 
-export const getStripePrices = (keysToFind: ProductKeys[]): string[] => {
+export const getStripePrices = (
+  keysToFind: ProductKeys[],
+  planName?: string,
+): string[] => {
   const products = isProd() ? STRIPE_PRODUCTS_PROD : STRIPE_PRODUCTS_DEV;
-  return keysToFind.map((key) => products[key]).filter(Boolean);
+  return keysToFind
+    .map((key) => {
+      if (planName && key === "AudioToText") {
+        const compositeKey = `${key}_${planName}` as ProductKeys;
+        return (
+          products[compositeKey as keyof typeof products] ||
+          products[key as keyof typeof products]
+        );
+      }
+      return products[key as keyof typeof products];
+    })
+    .filter(Boolean);
 };
 
 export const getStripeTaxRate = (): string => {

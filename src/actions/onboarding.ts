@@ -132,7 +132,7 @@ export const onboarding = {
           planName as ProductKeys,
           ...(addOns as ProductKeys[]),
         ];
-        const priceIds = getStripePrices(selectedPackages);
+        const priceIds = getStripePrices(selectedPackages, planName);
 
         // Get the `Host` header (domain)
         const host = request.headers.get("host");

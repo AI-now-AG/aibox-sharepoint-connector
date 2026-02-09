@@ -52,9 +52,13 @@ export enum AudioOptionId {
   AudioToText = "AudioToText",
 }
 
+export type AudioPlanCompositeKey =
+  `${Extract<keyof typeof AudioOptionId, "AudioToText">}_${keyof typeof SubscriptionPackageId}`;
+
 export type ProductKeys =
   | keyof typeof SubscriptionPackageId
-  | keyof typeof AudioOptionId;
+  | keyof typeof AudioOptionId
+  | AudioPlanCompositeKey;
 
 // Applied changes from this ticket: https://ainow.atlassian.net/browse/AINOW-1430
 export const AudioOptionLabels: Record<AudioOptionId, string> = {
