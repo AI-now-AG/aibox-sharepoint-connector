@@ -459,6 +459,29 @@
     }
   }
 
+  async function reindexDataSource(id: string) {
+    try {
+      if (!apiBase) {
+        const config = await getTranscriptionConfig();
+        apiBase = config.apiUrl;
+      }
+
+      const response = await fetch(`${apiBase}/api/vector-kb/data-sources/${id}/reindex`, {
+        method: "POST",
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        fetchData();
+      } else {
+        alert("Failed to reindex: " + result.error);
+      }
+    } catch (e) {
+      alert("Error reindexing: " + (e as Error).message);
+    }
+  }
+
   async function downloadFile(id: string, fileName: string) {
     try {
       // Ensure we have API URL
@@ -897,7 +920,7 @@
             </div>
           {/if}
         </div>
-        <div class="overflow-x-auto">
+        <div class="overflow-x-clip">
           <table class="table table-zebra">
             <thead>
               <tr>
@@ -1059,6 +1082,14 @@
                               {t("vector-kb.view-chunks")}
                             </button>
                           </li>
+                          <li>
+                            <button onclick={() => reindexDataSource(source._id)}>
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                              </svg>
+                              {t("vector-kb.reindex")}
+                            </button>
+                          </li>
                         {/if}
                         <li>
                           <button onclick={() => downloadFile(source._id, source.original_file_name)}>
@@ -1097,6 +1128,15 @@
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                        </button>
+                        <button
+                          class="btn btn-xs btn-ghost"
+                          onclick={() => reindexDataSource(source._id)}
+                          title={t("vector-kb.reindex")}
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                           </svg>
                         </button>
                       {/if}

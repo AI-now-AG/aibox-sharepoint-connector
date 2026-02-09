@@ -73,6 +73,9 @@ export interface VectorChunk {
   metadata: {
     page_number: number | null;
     section_title: string | null;
+    document_title: string | null;
+    document_language: string | null;
+    source: string | null;
     file_name?: string;
   };
   created_at: string;
