@@ -28,6 +28,13 @@ export enum SubscriptionIncludedUsers {
   Enterprise = 0,
 }
 
+export enum SubscriptionIncludedKbMB {
+  Starter = 10,
+  Teams = 100,
+  Pro = 200,
+  Enterprise = 0,
+}
+
 export enum SubscriptionStatus {
   Active = "active",
   Canceled = "canceled",
