@@ -27,7 +27,6 @@ import {
   type ProductKeys,
   CountryCode,
 } from "$types/Subscription";
-import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
 import { UserRole, TourType } from "$types/Users";
 import { TenantFeature } from "$types/TenantFeature";
 import { SocialProvider } from "$types/Auth0Auth";
@@ -374,68 +373,6 @@ export const onboarding = {
         categoryIdMap.set(category._id.toString(), newCatId);
       }
 
-      // Clone regular KB entries from master tenant
-      const kbIdMap = new Map<string, ObjectId>();
-      try {
-        const masterKbEntries = await KnowledgeBaseModel.listByTenant(
-          new ObjectId(masterTenantId),
-        );
-        for (const kb of masterKbEntries) {
-          const oldId = kb._id!.toString();
-          const { insertedId: newKbId } = await KnowledgeBaseModel.add({
-            ...kb,
-            _id: undefined,
-            tenant_id: newTenant.insertedId,
-            created_at: new Date(),
-            updated_at: new Date(),
-          });
-          kbIdMap.set(oldId, newKbId);
-        }
-        console.log(
-          `[Onboarding] Cloned ${masterKbEntries.length} regular KB entries`,
-        );
-      } catch (kbError) {
-        console.error("[Onboarding] Regular KB clone error:", kbError);
-      }
-
-      // Clone Vector KB data via backend endpoint
-      let folderIdMap: Record<string, string> = {};
-      let dataSourceIdMap: Record<string, string> = {};
-      try {
-        const apiUrl =
-          import.meta.env.TRANSCRIPTION_API_URL || "http://localhost:3005";
-        const cloneResponse = await fetch(
-          `${apiUrl}/api/vector-kb/clone-tenant`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              sourceTenantId: masterTenantId,
-              targetTenantId: newTenant.insertedId.toString(),
-              userId,
-            }),
-          },
-        );
-        if (cloneResponse.ok) {
-          const cloneResult = await cloneResponse.json();
-          if (cloneResult.success) {
-            folderIdMap = cloneResult.data.folderIdMap || {};
-            dataSourceIdMap = cloneResult.data.dataSourceIdMap || {};
-            console.log(
-              `[Onboarding] Vector KB cloned: ${cloneResult.data.stats?.folders} folders, ${cloneResult.data.stats?.dataSources} data sources, ${cloneResult.data.stats?.chunks} chunks`,
-            );
-          }
-        } else {
-          console.error(
-            "[Onboarding] Vector KB clone failed:",
-            cloneResponse.status,
-            await cloneResponse.text(),
-          );
-        }
-      } catch (vectorKbError) {
-        console.error("[Onboarding] Vector KB clone error:", vectorKbError);
-      }
-
       // Clone prompts with updated categoryId
       const originalCategoryIds = categories.map((c) => c._id);
       const prompts =
@@ -449,27 +386,11 @@ export const onboarding = {
         documents: [],
         created_at: new Date(),
         updated_at: new Date(),
-        // Regular KB: map IDs via kbIdMap
-        knowledgebase: ((prompt as any).knowledgebase ?? [])
-          .map((id: ObjectId) => kbIdMap.get(id.toString()))
-          .filter(Boolean),
-        // Vector KB fields: map IDs via folderIdMap / dataSourceIdMap
+        // Vector KB fields (no data cloned, start empty)
         vector_kb_enabled: (prompt as any).vector_kb_enabled ?? false,
         vector_kb_scope: (prompt as any).vector_kb_scope ?? null,
-        vector_kb_folder_ids: ((prompt as any).vector_kb_folder_ids ?? [])
-          .map((id: ObjectId) => {
-            const mapped = folderIdMap[id.toString()];
-            return mapped ? new ObjectId(mapped) : null;
-          })
-          .filter(Boolean),
-        vector_kb_data_source_ids: (
-          (prompt as any).vector_kb_data_source_ids ?? []
-        )
-          .map((id: ObjectId) => {
-            const mapped = dataSourceIdMap[id.toString()];
-            return mapped ? new ObjectId(mapped) : null;
-          })
-          .filter(Boolean),
+        vector_kb_folder_ids: [],
+        vector_kb_data_source_ids: [],
       }));
 
       console.log("Prompt Categories:", categoryIdMap);
