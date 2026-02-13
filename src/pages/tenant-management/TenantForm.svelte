@@ -258,11 +258,6 @@
       : 0,
   );
 
-  $effect(() => {
-    if (selectedPlan) {
-      tenant.included_user_limit = SubscriptionIncludedUsers[selectedPlan];
-    }
-  });
 
   // Features enabled
   let openAIEnabled: boolean = $state(false);
@@ -3436,7 +3431,6 @@
               placeholder=""
               class="input input-bordered disabled:bg-base-300/40 disabled:border-gray-200 w-full"
               bind:value={tenantData.included_user_limit}
-              disabled={true}
             />
           </div>
           <div class="flex-1 flex flex-col">
