@@ -23,8 +23,8 @@ export const SubscriptionPackageLabels: Record<
 
 export enum SubscriptionIncludedUsers {
   Starter = 1,
-  Teams = 15,
-  Pro = 30,
+  Teams = 10,
+  Pro = 25,
   Enterprise = 0,
 }
 
