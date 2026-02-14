@@ -1,7 +1,7 @@
 import type { APIContext, APIRoute } from "astro";
 import TenantModel from "$data/models/tenant.model";
 import UserModel from "$data/models/user.model";
-import { getSubscriptionAddOnName } from "$utils/common";
+import { getSubscriptionAddOnName } from "$utils/subscription";
 import dayjs from "dayjs";
 import { writeToString } from "fast-csv";
 

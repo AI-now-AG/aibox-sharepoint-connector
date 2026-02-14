@@ -218,17 +218,18 @@
   const planAddOns = subscription?.add_ons ?? [];
   const initAudioToTextOptions =
     planAddOns.filter((option: any) => {
-      return (
-        option == AudioOptionId.AudioBasis ||
-        option == AudioOptionId.AudioBasisAddOnLarge
-      );
+      return [
+        AudioOptionId.AudioBasis,
+        AudioOptionId.AudioBasisAddOnLarge,
+        AudioOptionId.AudioToText,
+      ].includes(option);
     }) || [];
   const initSubtitleStudioOptions =
     planAddOns.filter((option: any) => {
-      return (
-        option == AudioOptionId.AudioBasisAddOnSubtitle ||
-        option == AudioOptionId.AudioPremium
-      );
+      return [
+        AudioOptionId.AudioBasisAddOnSubtitle,
+        AudioOptionId.AudioPremium,
+      ].includes(option);
     }) || [];
 
   let selectedAudioToTextOptions: AudioOptionId[] = $state(
@@ -257,11 +258,6 @@
       : 0,
   );
 
-  $effect(() => {
-    if (selectedPlan) {
-      tenant.included_user_limit = SubscriptionIncludedUsers[selectedPlan];
-    }
-  });
 
   // Features enabled
   let openAIEnabled: boolean = $state(false);
@@ -3435,7 +3431,6 @@
               placeholder=""
               class="input input-bordered disabled:bg-base-300/40 disabled:border-gray-200 w-full"
               bind:value={tenantData.included_user_limit}
-              disabled={true}
             />
           </div>
           <div class="flex-1 flex flex-col">

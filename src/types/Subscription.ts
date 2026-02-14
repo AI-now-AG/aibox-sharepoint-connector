@@ -23,8 +23,15 @@ export const SubscriptionPackageLabels: Record<
 
 export enum SubscriptionIncludedUsers {
   Starter = 1,
-  Teams = 15,
-  Pro = 30,
+  Teams = 10,
+  Pro = 25,
+  Enterprise = 0,
+}
+
+export enum SubscriptionIncludedKbMB {
+  Starter = 10,
+  Teams = 100,
+  Pro = 200,
   Enterprise = 0,
 }
 
@@ -47,11 +54,18 @@ export enum AudioOptionId {
 
   /** [Subtitle Studio Plus] => Included Subtitle editor */
   AudioPremium = "AudioPremium",
+
+  /** NEW "Audio To Text" option */
+  AudioToText = "AudioToText",
 }
+
+export type AudioPlanCompositeKey =
+  `${Extract<keyof typeof AudioOptionId, "AudioToText">}_${keyof typeof SubscriptionPackageId}`;
 
 export type ProductKeys =
   | keyof typeof SubscriptionPackageId
-  | keyof typeof AudioOptionId;
+  | keyof typeof AudioOptionId
+  | AudioPlanCompositeKey;
 
 // Applied changes from this ticket: https://ainow.atlassian.net/browse/AINOW-1430
 export const AudioOptionLabels: Record<AudioOptionId, string> = {
@@ -59,6 +73,7 @@ export const AudioOptionLabels: Record<AudioOptionId, string> = {
   [AudioOptionId.AudioBasisAddOnLarge]: "Audio to Text Large", // [Audio to Text Large]
   [AudioOptionId.AudioBasisAddOnSubtitle]: "Subtitle Studio Basic", // [Subtitle Studio Basic]
   [AudioOptionId.AudioPremium]: "Subtitle Studio Plus", // [Subtitle Studio Plus]
+  [AudioOptionId.AudioToText]: "Audio to Text", // [Audio to Text]
 };
 
 export enum BillingMethod {

@@ -8,7 +8,7 @@ import CategoryModel, {
   type Category,
   type Group,
 } from "$data/models/category.model";
-import PromptModel, { type Prompt } from "$data/models/prompt.model";
+import PromptModel from "$data/models/prompt.model";
 import GlobalCategoryModel from "$data/models/globalCategory.model";
 import GlobalPromptModel from "$data/models/globalPrompt.model";
 import SubscriptionModel, {
@@ -21,6 +21,8 @@ import {
   SubscriptionPackageId,
   AudioOptionId,
   AudioOptionLabels,
+  SubscriptionIncludedUsers,
+  SubscriptionIncludedKbMB,
   BillingMethod,
   type ProductKeys,
   CountryCode,
@@ -131,7 +133,7 @@ export const onboarding = {
           planName as ProductKeys,
           ...(addOns as ProductKeys[]),
         ];
-        const priceIds = getStripePrices(selectedPackages);
+        const priceIds = getStripePrices(selectedPackages, planName);
 
         // Get the `Host` header (domain)
         const host = request.headers.get("host");
@@ -297,6 +299,12 @@ export const onboarding = {
       }
       // Subtitle Studio is active if AudioPremium is selected (includes subtitle features)
       const subtitleStudioActive = hasSubtitleEditor(input.add_ons ?? []);
+      const includedUserLimit =
+        SubscriptionIncludedUsers[input.plan_name as SubscriptionPackageId] ||
+        10;
+      const includedKbMB =
+        SubscriptionIncludedKbMB[input.plan_name as SubscriptionPackageId] ||
+        10;
       const newTenant = await TenantModel.copyTenant(masterTenantId, {
         name: input.name,
         org_id: input.org_id,
@@ -310,6 +318,9 @@ export const onboarding = {
         audio_assistant_active: true,
         subtitle_studio_active: subtitleStudioActive,
         totalPrice: "",
+        included_user_limit: includedUserLimit, // default included users
+        vector_kb_enabled: true,
+        vector_kb_max_storage_mb: includedKbMB,
       });
 
       // Update the current tenant for the logged-in user
@@ -375,7 +386,7 @@ export const onboarding = {
         documents: [],
         created_at: new Date(),
         updated_at: new Date(),
-        // Vector KB fields (preserve from source or use defaults)
+        // Vector KB fields (no data cloned, start empty)
         vector_kb_enabled: (prompt as any).vector_kb_enabled ?? false,
         vector_kb_scope: (prompt as any).vector_kb_scope ?? null,
         vector_kb_folder_ids: [],
@@ -413,6 +424,8 @@ export const onboarding = {
         tenant_id: newTenant.insertedId,
         plan_name: input.plan_name,
         add_ons: input.add_ons,
+        is_trial: true,
+        trial_start_date: new Date(),
       };
       await SubscriptionModel.create(subscription);
 

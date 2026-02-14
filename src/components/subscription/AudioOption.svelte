@@ -8,6 +8,7 @@
     features?: Record<string, string[]>;
     price?: number;
     currency?: string;
+    pricePrefix?: string;
     onSelect?: Function;
     selectedAudioOptionIds?: string[];
     disabled?: boolean;
@@ -19,6 +20,7 @@
     name = { en: "", de: "" },
     price,
     currency,
+    pricePrefix = "",
     onSelect,
     selectedAudioOptionIds = $bindable([]),
     disabled = false,
@@ -28,13 +30,20 @@
   const t = useTranslations(defaultLanguage);
   let selected: boolean = $state(false);
 
-  let backgroundColor = $state("background-color: white;");
+  let backgroundClass = $state("bg-base-100");
+  let textClass = $state("text-base-content");
   $effect(() => {
-    if (selectedAudioOptionIds.includes(id)) {
-      backgroundColor = "background-color: #dbe9fe;";
+    if (disabled) {
+      backgroundClass = "bg-base-200";
+      textClass = "text-base-content/40";
+      selected = false;
+    } else if (selectedAudioOptionIds.includes(id)) {
+      backgroundClass = "bg-primary/10";
+      textClass = "text-base-content";
       selected = true;
     } else {
-      backgroundColor = "background-color: white;";
+      backgroundClass = "bg-base-100";
+      textClass = "text-base-content";
       selected = false;
     }
   });
@@ -45,8 +54,9 @@
 </script>
 
 <button
-  class="bg-white shadow-xl rounded-lg flex justify-between items-center px-6 py-4 w-full"
-  style={backgroundColor}
+  class="{backgroundClass} shadow-xl rounded-lg flex justify-between items-center px-6 py-4 w-full transition-all duration-200"
+  class:opacity-50={disabled}
+  class:cursor-not-allowed={disabled}
   onclick={() => {
     handleSelect();
   }}
@@ -59,10 +69,13 @@
     value="text-prompt"
     {disabled}
   />
-  <h2 class="text-sm font-medium text-[#0F172A] text-left flex-1 px-4">
+  <h2 class="{textClass} text-sm font-medium text-left flex-1 px-4">
     {name?.[defaultLanguage]}
   </h2>
-  <p class="text-2xl font-medium text-right text-[#0F172A]">
+  <p class="{textClass} text-2xl font-medium text-right">
+    {#if pricePrefix}
+      <span class="text-base font-medium">{pricePrefix}</span>
+    {/if}
     {currency}
     {price}
     <span class="text-base font-medium">/ {t("subscription.per-month")}</span>
