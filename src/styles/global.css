@@ -218,6 +218,41 @@
   --noise: 0;
 }
 
+@plugin "daisyui/theme" {
+  name: "aiboxHome";
+  default: false;
+  prefersdark: false;
+  color-scheme: "light";
+  --color-base-100: oklch(100% 0 0);
+  --color-base-200: oklch(97.466% 0.011 259.822);
+  --color-base-300: oklch(93.268% 0.016 262.751);
+  --color-base-content: oklch(39% 0.195 277.366);
+  --color-primary: oklch(42.551% 0.161 282.339);
+  --color-primary-content: oklch(98% 0.002 247.839);
+  --color-secondary: oklch(70% 0.183 293.541);
+  --color-secondary-content: oklch(96% 0.003 264.542);
+  --color-accent: #6FCFBC;
+  --color-accent-content: oklch(98% 0.003 247.858);
+  --color-neutral: oklch(19.616% 0.063 257.651);
+  --color-neutral-content: oklch(83.923% 0.012 257.651);
+  --color-info: oklch(88% 0.059 254.128);
+  --color-info-content: oklch(17.625% 0.017 214.515);
+  --color-success: oklch(84% 0.143 164.978);
+  --color-success-content: oklch(16.098% 0.015 197.823);
+  --color-warning: oklch(82% 0.189 84.429);
+  --color-warning-content: oklch(17.834% 0.009 71.47);
+  --color-error: oklch(73.092% 0.11 20.076);
+  --color-error-content: oklch(14.618% 0.022 20.076);
+  --radius-selector: 1rem;
+  --radius-field: 0.5rem;
+  --radius-box: 1rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
