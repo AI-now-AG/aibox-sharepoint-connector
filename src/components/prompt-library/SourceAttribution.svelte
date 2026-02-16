@@ -6,6 +6,8 @@
     fileName: string;
     score: number;
     pageNumber?: number;
+    sectionTitle?: string;
+    documentLanguage?: string;
     snippet: string;
     content?: string;
     chunkIndex?: number;
@@ -137,9 +139,19 @@
                         Page {source.pageNumber}
                       </span>
                     {/if}
+                    {#if source.sectionTitle}
+                      <span class="badge badge-info badge-outline badge-sm" title="Section: {source.sectionTitle}">
+                        {source.sectionTitle}
+                      </span>
+                    {/if}
                     {#if source.chunkIndex !== undefined}
                       <span class="badge badge-ghost badge-sm">
                         Chunk {source.chunkIndex + 1}
+                      </span>
+                    {/if}
+                    {#if showDebug && source.documentLanguage}
+                      <span class="badge badge-ghost badge-xs" title="Detected language">
+                        {source.documentLanguage}
                       </span>
                     {/if}
                     <!-- Source type badge (debug mode) -->

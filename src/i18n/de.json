@@ -802,6 +802,8 @@
   "vector-kb.rename": "Umbenennen",
   "vector-kb.delete": "Löschen",
   "vector-kb.retry": "Erneut versuchen",
+  "vector-kb.reindex": "Neu indexieren",
+  "vector-kb.reindex-started": "Neuindexierung gestartet. Die Datei wird mit verbesserten Embeddings erneut verarbeitet.",
   "vector-kb.no-files-or-folders": "Noch keine Dateien oder Ordner vorhanden",
   "vector-kb.create-folder": "Ordner erstellen",
   "vector-kb.upload-file": "Datei hochladen",
