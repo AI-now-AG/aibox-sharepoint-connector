@@ -19,8 +19,10 @@ const SubscriptionSchema = z.object({
   metadata: z.record(z.any()).nullish(),
   add_ons: z.array(z.nativeEnum(AudioOptionId)).optional(),
   notes: z.string().optional(),
-  start_date: z.coerce.date().nullable().optional(),
-  cancelled_date: z.coerce.date().nullable().optional(),
+  start_date: z.coerce.date().nullish(),
+  cancelled_date: z.coerce.date().nullish(),
+  is_trial: z.boolean().optional().default(false), // tenant marker flag only; currently not used in any logic
+  trial_start_date: z.coerce.date().nullish(), // currently not used in any logic
   created_at: z
     .date()
     .optional()

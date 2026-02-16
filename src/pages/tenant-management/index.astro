@@ -1,8 +1,11 @@
 ---
 import Layout from "$layouts/Layout.astro";
 import TenantList from "$pages/tenant-management/TenantList.svelte";
+import TenantModel from "$data/models/tenant.model";
+
+const resellerCodes = await TenantModel.listAllResellerCodes();
 ---
 
 <Layout>
-    <TenantList client:load />
+  <TenantList resellerCodes={resellerCodes} client:load />
 </Layout>

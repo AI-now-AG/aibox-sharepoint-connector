@@ -6,7 +6,7 @@ import UserModel from "$data/models/user.model";
 import { CsvColumn, type CsvRowRaw } from "$types/UserCsv";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const GET: APIRoute = async (ctx: APIContext) => {
+export const POST: APIRoute = async (ctx: APIContext) => {
   const filename = `Users-Export-${dayjs().format("YYYY-MM-DD")}.csv`;
 
   try {
@@ -17,7 +17,7 @@ export const GET: APIRoute = async (ctx: APIContext) => {
     const yesNo = (value?: boolean) => (value ? "Yes" : "No");
 
     // Fetch your MongoDB data
-    const results = await UserModel.listForExport({ pageSize: 0 });
+    const results = await UserModel.fetchPaginatedReports({ pageSize: 0 });
     const { data: users } = results;
 
     // Prepare the CSV data with appropriate headers

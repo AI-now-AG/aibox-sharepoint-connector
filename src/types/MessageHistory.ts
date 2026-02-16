@@ -9,6 +9,8 @@ export interface SourceAttribution {
   fileName: string;
   score: number;
   pageNumber?: number;
+  sectionTitle?: string;
+  documentLanguage?: string;
   snippet: string;
   chunkIndex?: number;
   content?: string;

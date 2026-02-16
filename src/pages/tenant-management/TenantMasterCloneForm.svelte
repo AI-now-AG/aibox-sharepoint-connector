@@ -69,7 +69,7 @@
       }
     }
 
-    // Get audio options price
+    // Get audio options price (use plan-specific price for AudioToText)
     if (selectedAudioOptionIds.length > 0) {
       selectedAudioOptionIds.forEach((audioOptionId) => {
         let audioOption =
@@ -77,7 +77,19 @@
             audioOptionId as keyof typeof SubscriptionPackages.audioOptions
           ];
         if (audioOption) {
-          audioOptionsTotalPrice += audioOption?.price || 0;
+          if (
+            "prices" in audioOption &&
+            audioOption.prices &&
+            selectedPackageId &&
+            audioOption.prices[selectedPackageId as keyof typeof audioOption.prices]
+          ) {
+            audioOptionsTotalPrice +=
+              audioOption.prices[selectedPackageId as keyof typeof audioOption.prices];
+          } else if ("prices" in audioOption && audioOption.prices) {
+            audioOptionsTotalPrice += Math.min(...Object.values(audioOption.prices));
+          } else {
+            audioOptionsTotalPrice += audioOption?.price || 0;
+          }
         }
       });
     }
@@ -306,6 +318,7 @@
     <div class="mt-4">
       <AudioOptionList
         bind:selectedAudioOptionIds
+        {selectedPackageId}
         defaultLanguage={selectedLanguage}
       />
     </div>

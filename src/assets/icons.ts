@@ -82,9 +82,13 @@ import email from "$assets/icons/email.svg?raw";
 import share from "$assets/icons/share.svg?raw";
 import thumbUp from "$assets/icons/thumb-up.svg?raw";
 import thumbDown from "$assets/icons/thumb-down.svg?raw";
+import home from "$assets/icons/home.svg?raw";
+import tune from "$assets/icons/tune.svg?raw";
 import alertSuccess from "$assets/icons/alert-success.svg?raw";
 import alertWarning from "$assets/icons/alert-warning.svg?raw";
 import alertError from "$assets/icons/alert-error.svg?raw";
+import inputEmailIcon from "$assets/icons/input-email-icon.svg?raw";
+import inputDollarIcon from "$assets/icons/input-dollar-icon.svg?raw";
 
 export const svgIcons = {
   menuSettings,
@@ -171,7 +175,11 @@ export const svgIcons = {
   share,
   thumbUp,
   thumbDown,
+  home,
+  tune,
   alertSuccess,
   alertWarning,
   alertError,
+  inputEmailIcon,
+  inputDollarIcon,
 };

@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AudioOptionId, AudioOptionLabels } from "$types/Subscription";
 import dayjs from "dayjs";
 
 export function isTrulyEmpty(obj: any) {
@@ -19,8 +18,22 @@ export function capitalizeFirst(text: string) {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
-export function formatDateToDDMMYY(date: string | Date): string {
-  return dayjs(date).format("DD.MM.YYYY");
+export function formatDate(
+  date: string | Date | number | null | undefined,
+  format = "DD.MM.YYYY",
+): string {
+  if (!date) return "";
+
+  if (!date) return "";
+
+  const d = dayjs(date);
+
+  if (!d.isValid()) {
+    console.warn("Invalid date:", date);
+    return "";
+  }
+
+  return d.format(format);
 }
 
 export const isValidEmail = (email: string) => {
@@ -78,28 +91,6 @@ export function isSameObjectId(a: unknown, b: unknown): boolean {
   if (!strA || !strB) return false;
   return strA === strB;
 }
-
-export const getSubscriptionAddOnName = (
-  forOption: "audiototext" | "subtitle" = "audiototext",
-  planAddOns: Array<any> = [],
-) => {
-  const addOnOptions: Array<any> =
-    forOption == "audiototext"
-      ? planAddOns.filter((option: any) => {
-          return (
-            option == AudioOptionId.AudioBasis ||
-            option == AudioOptionId.AudioBasisAddOnLarge
-          );
-        }) || []
-      : planAddOns.filter((option: any) => {
-          return (
-            option == AudioOptionId.AudioBasisAddOnSubtitle ||
-            option == AudioOptionId.AudioPremium
-          );
-        }) || [];
-  const firstOption = addOnOptions?.[0] as AudioOptionId | undefined;
-  return firstOption ? AudioOptionLabels[firstOption] || "-" : "-";
-};
 
 export function isValidPhone(phone: string): boolean {
   const trimmed = phone.trim();

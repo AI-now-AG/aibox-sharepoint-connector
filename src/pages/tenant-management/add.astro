@@ -1,8 +1,11 @@
 ---
 import Layout from "$layouts/Layout.astro";
+import TenantModel from "$data/models/tenant.model";
 import TenantForm from "./TenantForm.svelte";
+
+const resellerCodes = await TenantModel.listAllResellerCodes();
 ---
 
 <Layout>
-  <TenantForm client:load />
+  <TenantForm {resellerCodes} client:load />
 </Layout>

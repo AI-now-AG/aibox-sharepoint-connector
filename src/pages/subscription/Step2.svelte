@@ -50,7 +50,7 @@
       }
     }
 
-    // Get audio options price
+    // Get audio options price (use plan-specific price for AudioToText)
     if (selectedAudioOptionIds.length > 0) {
       selectedAudioOptionIds.forEach((audioOptionId) => {
         let audioOption =
@@ -58,7 +58,19 @@
             audioOptionId as keyof typeof SubscriptionPackages.audioOptions
           ];
         if (audioOption) {
-          audioOptionsTotalPrice += audioOption?.price || 0;
+          if (
+            "prices" in audioOption &&
+            audioOption.prices &&
+            selectedPackageId &&
+            audioOption.prices[selectedPackageId as keyof typeof audioOption.prices]
+          ) {
+            audioOptionsTotalPrice +=
+              audioOption.prices[selectedPackageId as keyof typeof audioOption.prices];
+          } else if ("prices" in audioOption && audioOption.prices) {
+            audioOptionsTotalPrice += Math.min(...Object.values(audioOption.prices));
+          } else {
+            audioOptionsTotalPrice += audioOption?.price || 0;
+          }
         }
       });
     }
@@ -91,11 +103,26 @@
     if (selectedAudioOptionIds?.length > 0) {
       for (let i = 0; i < selectedAudioOptionIds.length; i++) {
         const id = selectedAudioOptionIds[i];
-        const selectedOption: AudioOption = {
-          ...SubscriptionPackages.audioOptions[
+        const audioOptionData =
+          SubscriptionPackages.audioOptions[
             id as keyof typeof SubscriptionPackages.audioOptions
-          ],
+          ];
+        let resolvedPrice = audioOptionData?.price || 0;
+        if (
+          "prices" in audioOptionData &&
+          audioOptionData.prices &&
+          selectedPackageId &&
+          audioOptionData.prices[selectedPackageId as keyof typeof audioOptionData.prices]
+        ) {
+          resolvedPrice =
+            audioOptionData.prices[selectedPackageId as keyof typeof audioOptionData.prices];
+        } else if ("prices" in audioOptionData && audioOptionData.prices) {
+          resolvedPrice = Math.min(...Object.values(audioOptionData.prices));
+        }
+        const selectedOption: AudioOption = {
+          ...audioOptionData,
           id: id,
+          price: resolvedPrice,
         };
         if (selectedOption) {
           selectedAudioOptions.push(selectedOption);
@@ -148,7 +175,7 @@
     {@html t("subscription.choose-your-plan-description")}
   </p>
   <div class="mt-4">
-    <AudioOptionList bind:selectedAudioOptionIds {defaultLanguage} />
+    <AudioOptionList bind:selectedAudioOptionIds {selectedPackageId} {defaultLanguage} />
   </div>
 
   <div class="w-full flex items-center justify-end rounded-lg p-4">

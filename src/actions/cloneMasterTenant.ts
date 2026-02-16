@@ -7,7 +7,7 @@ import CategoryModel, {
   type Category,
   type Group,
 } from "$data/models/category.model";
-import PromptModel, { type Prompt } from "$data/models/prompt.model";
+import PromptModel from "$data/models/prompt.model";
 import GlobalCategoryModel from "$data/models/globalCategory.model";
 import GlobalPromptModel from "$data/models/globalPrompt.model";
 import SubscriptionModel, {
@@ -16,7 +16,13 @@ import SubscriptionModel, {
 import TranscriptionModel, {
   type Transcription,
 } from "$data/models/transcription.model";
-import { SubscriptionPackageId, AudioOptionId } from "$types/Subscription";
+import {
+  SubscriptionPackageId,
+  AudioOptionId,
+  SubscriptionIncludedUsers,
+  SubscriptionIncludedKbMB,
+  BillingMethod,
+} from "$types/Subscription";
 import { TenantFeature, ThemeCode } from "$types/TenantFeature";
 import organizationsManagement from "$data/auth0/organizations-manager";
 import { isProd } from "$utils/env";
@@ -91,10 +97,17 @@ export const cloneMasterTenant = {
       }
       // Subtitle Studio is active if AudioPremium is selected (includes subtitle features)
       const subtitleStudioActive = hasSubtitleEditor(input.add_ons ?? []);
+      const includedUserLimit =
+        SubscriptionIncludedUsers[input.plan_name as SubscriptionPackageId] ||
+        10;
+      const includedKbMB =
+        SubscriptionIncludedKbMB[input.plan_name as SubscriptionPackageId] ||
+        10;
       const newTenant = await TenantModel.copyTenant(masterTenantId, {
         name: input.name,
         org_id: input.org_id,
         org_name: input.org_name,
+        billing_method: BillingMethod.MonthlyInvoice,
         default_language: input.language,
         theme: input.theme,
         included_features: includedFeatures,
@@ -102,6 +115,9 @@ export const cloneMasterTenant = {
         audio_assistant_active: true,
         subtitle_studio_active: subtitleStudioActive,
         totalPrice: input.totalPrice,
+        included_user_limit: includedUserLimit, // default included users
+        vector_kb_enabled: true,
+        vector_kb_max_storage_mb: includedKbMB,
       });
 
       // Find all categories for the original tenant
@@ -152,7 +168,7 @@ export const cloneMasterTenant = {
         documents: [],
         created_at: new Date(),
         updated_at: new Date(),
-        // Vector KB fields (preserve from source or use defaults)
+        // Vector KB fields (no data cloned, start empty)
         vector_kb_enabled: (prompt as any).vector_kb_enabled ?? false,
         vector_kb_scope: (prompt as any).vector_kb_scope ?? null,
         vector_kb_folder_ids: [],
@@ -192,6 +208,8 @@ export const cloneMasterTenant = {
         tenant_id: newTenant.insertedId,
         plan_name: input.plan_name,
         add_ons: input.add_ons,
+        is_trial: true,
+        trial_start_date: new Date(),
       };
       await SubscriptionModel.create(subscription);
 
