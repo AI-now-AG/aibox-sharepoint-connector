@@ -4,8 +4,7 @@ import { isProd } from "$utils/env";
 import { cached } from "$utils/cache";
 
 const { tenant } = Astro.locals;
-const adminToken =
-  "gjECis74Yf_o6cBjVfteQ2pIFBDXCHVLcgFphFUs46k8ejdjPRI-KqpLyWR8dpbIpJZD-ogVSyYbZVJ7FrYMmBH8OvXqNsiLrxZx8-_fBoHSuUbpkNVB39fz19EG4xzxCwy4iNfTl6T9vpE_aoF8fjskFhl-Lk0LHMeJaWC0k9w";
+const adminToken = import.meta.env.FLOWMATE_ADMIN_TOKEN;
 
 const cacheKey = `${Astro.locals.user.id}:flowmate:icenter`;
 

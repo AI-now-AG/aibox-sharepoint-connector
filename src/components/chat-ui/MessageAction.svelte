@@ -7,6 +7,7 @@
   interface Props {
     exportToPdfAction: Function;
     sendEmailAction: Function;
+    sendEmailViaFlowmateAction?: Function;
     copyTextToClipboardAction: Function;
     copyHtmlToClipboardAction: Function;
     isHideSendEmailAction?: boolean;
@@ -14,6 +15,7 @@
   const {
     exportToPdfAction,
     sendEmailAction,
+    sendEmailViaFlowmateAction,
     copyTextToClipboardAction,
     copyHtmlToClipboardAction,
     isHideSendEmailAction = false,
@@ -67,6 +69,18 @@
               <span>{t("prompt-execution.result.send-via-email")}</span>
             </button>
           </li>
+          {#if sendEmailViaFlowmateAction}
+            <li>
+              <button
+                onclick={() => {
+                  sendEmailViaFlowmateAction?.();
+                  closeDropdown();
+                }}
+              >
+                <span>{t("prompt-execution.result.send-via-email-flowmate")}</span>
+              </button>
+            </li>
+          {/if}
         {/if}
         <li>
           <button

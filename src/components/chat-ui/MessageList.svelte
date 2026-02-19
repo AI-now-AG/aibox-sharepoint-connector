@@ -75,6 +75,7 @@
   let toEmail = $state("");
   let sendEmailPromptResultError = $state("");
   let sendEmailPromptResultIndex = $state(0);
+  let sendEmailMode: "sendgrid" | "flowmate" = $state("sendgrid");
 
   const handleCopy = (event: any) => {
     const selection = window.getSelection();
@@ -438,6 +439,43 @@
       loading = false;
     }
   }
+
+  async function sendMessageResultViaFlowmate(index: number = 0) {
+    try {
+      const fullHtml = getFullHtmlContent(index, 12, true);
+      const payload = {
+        to: toEmail,
+        subject: t("prompt-execution.result.share-via-mail-subject"),
+        body: fullHtml,
+      };
+
+      loading = true;
+      const res = await fetch("/api/send-email-flowmate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error ?? "Unknown error");
+      }
+
+      addToast({
+        message: t("prompt-execution.result.share-via-mail-flowmate-success"),
+        type: "success",
+      });
+    } catch (err: any) {
+      console.error("Error sending via Flowmate:", err);
+      addToast({
+        message:
+          err.message ?? t("prompt-execution.result.share-via-mail-flowmate-failed"),
+        type: "error",
+      });
+    } finally {
+      loading = false;
+    }
+  }
 </script>
 
 {#if messages.length > 0 || isFetching}
@@ -497,6 +535,12 @@
                           <MessageAction
                             exportToPdfAction={() => exportToPDF(index)}
                             sendEmailAction={() => {
+                              sendEmailMode = "sendgrid";
+                              sendEmailPromptResultIndex = index;
+                              sendEmailToModal?.show();
+                            }}
+                            sendEmailViaFlowmateAction={() => {
+                              sendEmailMode = "flowmate";
                               sendEmailPromptResultIndex = index;
                               sendEmailToModal?.show();
                             }}
@@ -623,7 +667,11 @@
       sendEmailPromptResultError = t("tenant.email-invalid");
     } else {
       sendEmailToModal?.close();
-      sendMessageResultViaEmail(sendEmailPromptResultIndex);
+      if (sendEmailMode === "flowmate") {
+        sendMessageResultViaFlowmate(sendEmailPromptResultIndex);
+      } else {
+        sendMessageResultViaEmail(sendEmailPromptResultIndex);
+      }
       sendEmailPromptResultError = "";
       sendEmailPromptResultIndex = 0;
     }
