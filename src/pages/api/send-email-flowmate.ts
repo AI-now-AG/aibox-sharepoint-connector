@@ -2,30 +2,57 @@ import type { APIRoute } from "astro";
 import { cached } from "$utils/cache";
 
 const OIH_BASE = "https://api.platform.openintegrationhub.com";
-const FLOW_CACHE_KEY = "flowmate:email-flow-id";
+const OIH_ADMIN_TOKEN =
+    "gjECis74Yf_o6cBjVfteQ2pIFBDXCHVLcgFphFUs46k8ejdjPRI-KqpLyWR8dpbIpJZD-ogVSyYbZVJ7FrYMmBH8OvXqNsiLrxZx8-_fBoHSuUbpkNVB39fz19EG4xzxCwy4iNfTl6T9vpE_aoF8fjskFhl-Lk0LHMeJaWC0k9w";
 
-async function getFlowmateFlowId(adminToken: string): Promise<string> {
-    return cached(FLOW_CACHE_KEY, 30 * 60, async () => {
-        // Get all active flows for the tenant (shared flow — no per-user filter)
-        const flowsRes = await fetch(
-            `${OIH_BASE}/flows?filter%5Bstatus%5D=active`,
-            { headers: { Authorization: `Bearer ${adminToken}` } },
+async function getFlowmateFlowId(userEmail: string): Promise<string> {
+    // Cache per user so each user always sends from their own Gmail flow
+    return cached(`${userEmail}:flowmate:email-flow-id`, 30 * 60, async () => {
+        // Step 1: Get OIH internal user _id by aibox email
+        const usersRes = await fetch(
+            `${OIH_BASE}/users?username=${encodeURIComponent(userEmail)}`,
+            { headers: { Authorization: `Bearer ${OIH_ADMIN_TOKEN}` } },
         );
-        if (!flowsRes.ok) throw new Error("Failed to fetch Flowmate flows");
+        if (!usersRes.ok) throw new Error("Failed to fetch Flowmate user");
 
-        const flowsData = await flowsRes.json();
-        const flows: { id: string; description?: string }[] = flowsData.data ?? [];
+        const users = await usersRes.json();
+        const oihUserId = Array.isArray(users) ? users[0]?._id : users._id;
 
-        // Find the Gmail/Google email flow by description keyword
+        // Step 2: If the user has their own flow, use it
+        // Note: combining filter[user] + filter[status] is unreliable in Flowmate API,
+        // so we fetch all user flows and take the first one regardless of reported status
+        if (oihUserId) {
+            const userFlowsRes = await fetch(
+                `${OIH_BASE}/flows?filter%5Buser%5D=${oihUserId}`,
+                { headers: { Authorization: `Bearer ${OIH_ADMIN_TOKEN}` } },
+            );
+            if (userFlowsRes.ok) {
+                const userFlowsData = await userFlowsRes.json();
+                const userFlows: { id: string }[] = userFlowsData.data ?? [];
+                if (userFlows.length > 0) {
+                    return userFlows[0].id;
+                }
+            }
+        }
+
+        // Step 3: Fallback — use first active Gmail flow in the tenant
+        const fallbackRes = await fetch(
+            `${OIH_BASE}/flows?filter%5Bstatus%5D=active`,
+            { headers: { Authorization: `Bearer ${OIH_ADMIN_TOKEN}` } },
+        );
+        if (!fallbackRes.ok) throw new Error("Failed to fetch Flowmate flows");
+
+        const fallbackData = await fallbackRes.json();
+        const allFlows: { id: string; description?: string }[] = fallbackData.data ?? [];
         const emailFlow =
-            flows.find((f) =>
+            allFlows.find((f) =>
                 f.description?.toLowerCase().includes("google") ||
                 f.description?.toLowerCase().includes("gmail"),
-            ) ?? flows[0];
+            ) ?? allFlows[0];
 
         if (!emailFlow) {
             throw new Error(
-                "No active Gmail flow found in Flowmate. Please set up the email flow in the Flowmate Integration Center.",
+                "No active Gmail flow found. Please activate Gmail in the Flowmate Integration Center first.",
             );
         }
 
@@ -44,11 +71,10 @@ export const POST: APIRoute = async ({ request, locals }) => {
             );
         }
 
-        const adminToken = import.meta.env.FLOWMATE_ADMIN_TOKEN;
-        const sender = locals.user?.email ?? "noreply@aibox-app.ch";
+        const userEmail = locals.user?.email ?? "noreply@aibox-app.ch";
 
-        // Resolve shared tenant flow ID (cached 30-min)
-        const flowId = await getFlowmateFlowId(adminToken);
+        // Resolve flow ID for this user (per-user, with tenant fallback)
+        const flowId = await getFlowmateFlowId(userEmail);
 
         // Send both gateway fields (to/subject/body) AND Gmail step fields
         // (htmlMessage/recipients/sender) — gateway validates the former,
@@ -63,7 +89,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
                 htmlMessage: body,
                 contentType: "text/html",
                 recipients: [to],
-                sender,
+                sender: userEmail,
             }),
         });
 
