@@ -54,9 +54,14 @@ const isTenantManagement = /^\/tenant-management\/[a-fA-F0-9]+$/.test(pathname);
         class="h-8 hidden in-data-[theme=aiboxHome]:block"
       />
       <img
+        src="/logo-somedia-ai-assistant.svg"
+        alt="Somedia AI Assistant Logo"
+        class="h-8 hidden in-data-[theme=somediaAssistant]:block"
+      />
+      <img
         src="/aibox-logo-text.svg"
         alt="Aibox Default Logo"
-        class="h-8 block in-data-[theme=weihnachtsmann]:hidden in-data-[theme=somedia]:hidden in-data-[theme=sunriseBusiness]:hidden in-data-[theme=sunrise-business]:hidden in-data-[theme=light]:hidden in-data-[theme=dark]:hidden in-data-[theme=aiboxHome]:hidden"
+        class="h-8 block in-data-[theme=weihnachtsmann]:hidden in-data-[theme=somedia]:hidden in-data-[theme=sunriseBusiness]:hidden in-data-[theme=sunrise-business]:hidden in-data-[theme=light]:hidden in-data-[theme=dark]:hidden in-data-[theme=aiboxHome]:hidden in-data-[theme=somediaAssistant]:hidden"
       />
     </>
   ) : from === "home" ? (
@@ -103,6 +108,12 @@ const isTenantManagement = /^\/tenant-management\/[a-fA-F0-9]+$/.test(pathname);
           src="/aibox-home.svg"
           alt="aibox Home logo"
           class="w-auto h-16 hidden in-data-[theme=aiboxHome]:inline"
+        />
+      ) : theme === ThemeCode.SomediaAssistant ? (
+        <img
+          src="/logo-somedia-ai-assistant.svg"
+          alt="Somedia AI Assistant Logo"
+          class="w-auto h-12 hidden in-data-[theme=somediaAssistant]:inline"
         />
       ) : (
         <img
@@ -157,11 +168,17 @@ const isTenantManagement = /^\/tenant-management\/[a-fA-F0-9]+$/.test(pathname);
           alt="aibox Home Logo"
           class="h-8 hidden in-data-[theme=aiboxHome]:block"
         />
+      ) : theme === ThemeCode.SomediaAssistant ? (
+        <img
+          src="/logo-somedia-ai-assistant.svg"
+          alt="Somedia AI Assistant Logo"
+          class="h-8 hidden in-data-[theme=somediaAssistant]:block"
+        />
       ) : (
         <img
           src="/aibox-logo-text.svg"
           alt="Aibox Default Logo"
-          class="h-8 block in-data-[theme=weihnachtsmann]:hidden in-data-[theme=somedia]:hidden in-data-[theme=sunriseBusiness]:hidden in-data-[theme=sunrise-business]:hidden in-data-[theme=light]:hidden in-data-[theme=dark]:hidden in-data-[theme=aiboxHome]:hidden"
+          class="h-8 block in-data-[theme=weihnachtsmann]:hidden in-data-[theme=somedia]:hidden in-data-[theme=sunriseBusiness]:hidden in-data-[theme=sunrise-business]:hidden in-data-[theme=light]:hidden in-data-[theme=dark]:hidden in-data-[theme=aiboxHome]:hidden in-data-[theme=somediaAssistant]:hidden"
         />
       )}
     </>
