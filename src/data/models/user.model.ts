@@ -50,7 +50,6 @@ export const UserFilterParamsSchema = z.object({
   isBlocked: z.boolean().optional(),
   isVerified: z.boolean().optional(),
   isUnVerified: z.boolean().optional(),
-  isExcludeSA: z.boolean().optional().default(true),
 });
 export type UserFilterParams = z.infer<typeof UserFilterParamsSchema>;
 export type User = z.infer<typeof UserSchema>;
@@ -125,11 +124,6 @@ export default {
       // If specific roles are provided, add them to $in
       if (roles && roles.length > 0) {
         filterRoles.$in = roles.map((role) => new RegExp(role, "i"));
-      }
-
-      // If "isExcludeSA" flag is true, exclude Super Admin
-      if (filterParams.isExcludeSA) {
-        filterRoles.$nin = [new RegExp(`^${UserRole.SuperAdmin}$`, "i")];
       }
 
       // Only assign filter.roles if there's something to filter by

@@ -802,8 +802,6 @@
   "vector-kb.rename": "Rename",
   "vector-kb.delete": "Delete",
   "vector-kb.retry": "Retry",
-  "vector-kb.reindex": "Reindex",
-  "vector-kb.reindex-started": "Reindex started. The file will be re-processed with improved embeddings.",
   "vector-kb.no-files-or-folders": "No files or folders yet",
   "vector-kb.create-folder": "Create Folder",
   "vector-kb.upload-file": "Upload File",
@@ -872,5 +870,6 @@
   "tenant.detail.total-user-limits": "Total Limit",
   "tenant.detail.users-used-percentage": "${percentage}% used",
   "pagination.showing-range-of-total": "Showing ${from} to ${to} of ${total} results",
-  "subscription.yearly-invoice-email": "Yearly invoice"
+  "subscription.yearly-invoice-email": "Yearly invoice",
+  "user.reseller": "Reseller"
 }
