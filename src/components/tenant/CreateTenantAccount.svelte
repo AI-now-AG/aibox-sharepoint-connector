@@ -70,6 +70,19 @@
   let selectedTag: string = $state(""); // single tag only
   let selectedCategories: string[] = $state([]);
 
+  let isFormValid = $derived(
+    organizationName.trim() !== "" &&
+      companyName.trim() !== "" &&
+      street.trim() !== "" &&
+      zipCode.trim() !== "" &&
+      location.trim() !== "" &&
+      contactName.trim() !== "" &&
+      billingEmail.trim() !== "" &&
+      selectedCategories.length > 0 &&
+      selectedPackageId !== "" &&
+      selectedAudioOptionIds.length > 0,
+  );
+
   const t = useTranslations();
 
   // Calculate total price (include package and audio options)
@@ -233,6 +246,7 @@
         onclick={() => {
           createTenant();
         }}
+        disabled={!isFormValid}
       >
         {t("common.save")}
       </button>
