@@ -101,9 +101,10 @@
   });
 
   async function createOrganization() {
-    const { data, error } = await actions.cloneMasterTenant.createOrganization({
-      organization_name: organizationName ?? "",
-    });
+    const { data, error } =
+      await actions.createTenantFormMaster.createOrganization({
+        organization_name: organizationName ?? "",
+      });
 
     if (error) throw new Error(t("tenant.create-organization-failed"));
     return data;
@@ -114,17 +115,18 @@
     organizationName: string,
     organizationDisplayName: string,
   ) {
-    const { data, error } = await actions.cloneMasterTenant.setupTenantData({
-      name: organizationDisplayName ?? "",
-      org_id: organizationId,
-      org_name: organizationName,
-      language: selectedLanguage ?? LanguageCode.De,
-      theme: selectedTheme?.value ?? ThemeCode.AIBox,
-      use_cases: selectedCategories ?? [],
-      plan_name: selectedPackageId as SubscriptionPackageId,
-      add_ons: selectedAudioOptionIds as AudioOptionId[],
-      totalPrice: totalPrice,
-    });
+    const { data, error } =
+      await actions.createTenantFormMaster.setupTenantData({
+        name: organizationDisplayName ?? "",
+        org_id: organizationId,
+        org_name: organizationName,
+        language: selectedLanguage ?? LanguageCode.De,
+        theme: selectedTheme?.value ?? ThemeCode.AIBox,
+        use_cases: selectedCategories ?? [],
+        plan_name: selectedPackageId as SubscriptionPackageId,
+        add_ons: selectedAudioOptionIds as AudioOptionId[],
+        totalPrice: totalPrice,
+      });
 
     console.log("setupTenantData error", error);
 
