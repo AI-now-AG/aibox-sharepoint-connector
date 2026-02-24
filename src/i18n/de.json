@@ -874,5 +874,6 @@
   "user.reseller": "Reseller",
   "nav.reseller": "Reseller",
   "nav.reseller.dashboard": "Dashboard",
-  "nav.reseller.create-account": "Create Account"
+  "nav.reseller.create-account": "Create New Account",
+  "reseller.create-account-title": "Create Tenant Account"
 }
