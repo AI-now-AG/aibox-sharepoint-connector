@@ -223,8 +223,10 @@ export const tenantCreation = {
         tenant_id: newTenant.insertedId,
         plan_name: input.plan_name,
         add_ons: input.add_ons,
-        is_trial: true,
-        trial_start_date: new Date(),
+        ...(!isReseller && {
+          is_trial: true,
+          trial_start_date: new Date(),
+        }),
       };
       await SubscriptionModel.create(subscription);
 
