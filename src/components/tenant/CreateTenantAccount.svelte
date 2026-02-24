@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import { actions } from "astro:actions";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
@@ -133,6 +134,10 @@
     }
 
     totalPrice = String(packagePrice + audioOptionsTotalPrice);
+  });
+
+  onMount(() => {
+    // onMount()
   });
 
   async function createOrganization() {

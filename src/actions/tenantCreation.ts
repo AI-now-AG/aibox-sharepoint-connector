@@ -22,6 +22,7 @@ import {
   SubscriptionIncludedUsers,
   SubscriptionIncludedKbMB,
   BillingMethod,
+  CountryCode,
 } from "$types/Subscription";
 import { TenantFeature, ThemeCode } from "$types/TenantFeature";
 import organizationsManagement from "$data/auth0/organizations-manager";
@@ -36,6 +37,15 @@ const OrganizationNameInputParamsSchema = z.object({
   organization_name: z.string().min(1),
 });
 
+const BillingInfoParamsSchema = z.object({
+  company_name: z.string(),
+  address: z.string(),
+  zip_code: z.string(),
+  location: z.string(),
+  country: z.string().default(CountryCode.CH),
+  email: z.string(),
+});
+
 const TenantInputParamsSchema = z.object({
   name: z.string().min(1),
   org_id: z.string().min(1),
@@ -46,6 +56,7 @@ const TenantInputParamsSchema = z.object({
   add_ons: z.array(z.nativeEnum(AudioOptionId)).optional(),
   use_cases: z.array(z.string()),
   totalPrice: z.string().optional(),
+  billing_info: BillingInfoParamsSchema,
 });
 
 // step 1: createOrganization()  - Create Auth0 organization
@@ -85,6 +96,8 @@ export const tenantCreation = {
   setupTenantData: defineAction({
     input: TenantInputParamsSchema,
     handler: async (input, context) => {
+      const isReseller = context.locals.tenant?.is_reseller || false;
+
       // Clone the tenant
       const transcriptionTypes = getTranscriptionTypes(input.add_ons ?? []);
       const masterTenant = await TenantModel.get(masterTenantId);
@@ -107,9 +120,11 @@ export const tenantCreation = {
         name: input.name,
         org_id: input.org_id,
         org_name: input.org_name,
-        billing_method: BillingMethod.MonthlyInvoice,
+        billing_method: isReseller
+          ? BillingMethod.YearlyInvoice
+          : BillingMethod.MonthlyInvoice,
         default_language: input.language,
-        theme: input.theme,
+        theme: isReseller ? ThemeCode.SomediaAssistant : input.theme,
         included_features: includedFeatures,
         transcription_types: transcriptionTypes,
         audio_assistant_active: true,
