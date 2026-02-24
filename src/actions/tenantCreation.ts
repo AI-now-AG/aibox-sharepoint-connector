@@ -123,6 +123,7 @@ export const tenantCreation = {
         billing_method: isReseller
           ? BillingMethod.YearlyInvoice
           : BillingMethod.MonthlyInvoice,
+        billing_info: input.billing_info,
         default_language: input.language,
         theme: isReseller ? ThemeCode.SomediaAssistant : input.theme,
         included_features: includedFeatures,
