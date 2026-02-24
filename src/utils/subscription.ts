@@ -6,7 +6,7 @@ import {
   AudioOptionLabels,
 } from "$types/Subscription";
 
-export const useTranslatedCountryList = (defaultLanguage: string) => {
+export const useTranslatedCountryList = (defaultLanguage?: string) => {
   const t = useTranslations(defaultLanguage);
 
   return Countries.map((country) => ({

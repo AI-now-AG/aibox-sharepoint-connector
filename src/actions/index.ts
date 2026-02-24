@@ -9,8 +9,7 @@ import { conversation } from "./conversation";
 import { onboarding } from "./onboarding";
 import { report } from "./report";
 import { configurations } from "./configuration";
-import { createTenantFormMaster } from "./createTenantFormMaster";
-import { createTenantForReseller } from "./createTenantForReseller";
+import { tenantCreation } from "./tenantCreation";
 import { globalCategory } from "./globalCategory";
 import { globalPrompt } from "./globalPrompt";
 import { posthog } from "./posthog";
@@ -27,8 +26,7 @@ export const server = {
   onboarding,
   report,
   configurations,
-  createTenantFormMaster,
-  createTenantForReseller,
+  tenantCreation,
   globalCategory,
   globalPrompt,
   posthog,

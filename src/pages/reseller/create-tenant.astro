@@ -5,7 +5,10 @@ import GlobalTagModel from "$data/models/globalTag.model";
 import GlobalCategoryModel from "$data/models/globalCategory.model";
 import { type TagItem, type CategoryItem } from "$types/Subscription";
 import auth from "$auth/auth";
-import CreateTenantAccount from "./CreateTenantAccount.svelte";
+import CreateTenantAccount from "$components/tenant/CreateTenantAccount.svelte";
+import { useTranslations } from "$i18n/utils";
+
+const t = useTranslations();
 
 const allTags = await GlobalTagModel.list();
 const allCategories = await GlobalCategoryModel.list();
@@ -37,5 +40,5 @@ if (
 ---
 
 <Layout>
-  <CreateTenantAccount {tags} {categories} client:load />
+  <CreateTenantAccount pageTitle={t("tenant.clone-from-master-tenant")} {tags} {categories} client:load />
 </Layout>

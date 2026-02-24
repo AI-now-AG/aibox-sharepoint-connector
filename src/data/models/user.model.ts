@@ -121,6 +121,9 @@ export default {
       // Add roles filter
       const filterRoles: Record<string, unknown> = {};
 
+      // Exclude Super Admin
+      filterRoles.$nin = [new RegExp(`^${UserRole.SuperAdmin}$`, "i")];
+
       // If specific roles are provided, add them to $in
       if (roles && roles.length > 0) {
         filterRoles.$in = roles.map((role) => new RegExp(role, "i"));

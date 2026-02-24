@@ -51,7 +51,7 @@ const TenantInputParamsSchema = z.object({
 // step 1: createOrganization()  - Create Auth0 organization
 // step 2: setupTenantData() - Clone tenant, override configs & import categories / prompts
 
-export const createTenantForReseller = {
+export const tenantCreation = {
   createOrganization: defineAction({
     input: OrganizationNameInputParamsSchema,
     handler: async (input) => {
@@ -107,9 +107,9 @@ export const createTenantForReseller = {
         name: input.name,
         org_id: input.org_id,
         org_name: input.org_name,
-        billing_method: BillingMethod.YearlyInvoice,
+        billing_method: BillingMethod.MonthlyInvoice,
         default_language: input.language,
-        theme: input.theme || ThemeCode.Somedia,
+        theme: input.theme,
         included_features: includedFeatures,
         transcription_types: transcriptionTypes,
         audio_assistant_active: true,
@@ -208,8 +208,8 @@ export const createTenantForReseller = {
         tenant_id: newTenant.insertedId,
         plan_name: input.plan_name,
         add_ons: input.add_ons,
-        is_trial: false,
-        trial_start_date: null,
+        is_trial: true,
+        trial_start_date: new Date(),
       };
       await SubscriptionModel.create(subscription);
 

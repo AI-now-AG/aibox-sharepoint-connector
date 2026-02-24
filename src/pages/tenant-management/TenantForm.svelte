@@ -36,7 +36,7 @@
   } from "$types/Subscription";
   import Dropdown from "$components/form/Dropdown.svelte";
   import AudioAddonsDropdown from "./AudioAddonsDropdown.svelte";
-  import ThemeItem from "./ThemeItem.svelte";
+  import ThemeItem from "$components/tenant/ThemeItem.svelte";
   import { TextModel } from "$types/UsageTracking";
   import { SubscriptionPackages } from "$data/subscription-packages";
   import { onMount } from "svelte";
