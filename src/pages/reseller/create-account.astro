@@ -1,11 +1,41 @@
 ---
 import Layout from "$layouts/Layout.astro";
+import { ObjectId } from "mongodb";
+import GlobalTagModel from "$data/models/globalTag.model";
+import GlobalCategoryModel from "$data/models/globalCategory.model";
+import { type TagItem, type CategoryItem } from "$types/Subscription";
+import auth from "$auth/auth";
+import CreateTenantAccount from "./CreateTenantAccount.svelte";
 
+const allTags = await GlobalTagModel.list();
+const allCategories = await GlobalCategoryModel.list();
 
+const tags: TagItem[] = allTags.map((tag) => {
+  return {
+    title: tag.title,
+    value: tag._id.toString(),
+    description: tag.description,
+    icon: tag.icon,
+    iconColor: tag.iconColor,
+  };
+});
+
+const categories: CategoryItem[] = allCategories.map((category) => {
+  return {
+    title: category.title,
+    value: category._id.toString(),
+    tags: category.tags?.map((t: ObjectId) => t.toString()) ?? [],
+  };
+});
+
+if (
+  Astro.locals.tenant?.is_reseller !== true ||
+  !auth.isReseller(Astro.locals)
+) {
+  //return Astro.redirect("/restricted");
+}
 ---
 
 <Layout>
-  <div class="container w-full mx-auto p-6">
-   <h1 class="text-2xl font-bold mb-4">Reseller - Create Account</h1>
-  </div>
+  <CreateTenantAccount {tags} {categories} client:load />
 </Layout>

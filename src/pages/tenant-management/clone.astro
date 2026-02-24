@@ -4,7 +4,7 @@ import { ObjectId } from "mongodb";
 import GlobalTagModel from "$data/models/globalTag.model";
 import GlobalCategoryModel from "$data/models/globalCategory.model";
 import { type TagItem, type CategoryItem } from "$types/Subscription";
-import CloneTenantForm from "./TenantMasterCloneForm.svelte";
+import CreateTenantAccount from "./CreateTenantAccount.svelte";
 
 const allTags = await GlobalTagModel.list();
 const allCategories = await GlobalCategoryModel.list();
@@ -29,5 +29,5 @@ const categories: CategoryItem[] = allCategories.map((category) => {
 ---
 
 <Layout>
-  <CloneTenantForm {tags} {categories} client:load />
+  <CreateTenantAccount {tags} {categories} client:load />
 </Layout>
