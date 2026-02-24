@@ -871,5 +871,8 @@
   "tenant.detail.users-used-percentage": "${percentage}% used",
   "pagination.showing-range-of-total": "Showing ${from} to ${to} of ${total} results",
   "subscription.yearly-invoice-email": "Yearly invoice",
-  "user.reseller": "Reseller"
+  "user.reseller": "Reseller",
+  "nav.reseller": "Reseller",
+  "nav.reseller.dashboard": "Dashboard",
+  "nav.reseller.create-account": "Create Account"
 }
