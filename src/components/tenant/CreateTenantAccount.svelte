@@ -5,9 +5,10 @@
   import { useTranslations } from "$i18n/utils";
   import { addToast } from "$stores/toast";
   import { tenant } from "$stores";
-  import type {
-    AudioOptionId,
-    SubscriptionPackageId,
+  import {
+    CountryCode,
+    type AudioOptionId,
+    type SubscriptionPackageId,
   } from "$types/Subscription";
   import {
     LanguageCode,
@@ -63,7 +64,7 @@
   let location = $state<string>("");
   let contactPhone = $state<string>("");
   let contactName = $state<string>("");
-  let country = $state<string>("");
+  let country = $state<string>(CountryCode.CH);
   let billingEmail = $state<string>("");
 
   let totalPrice: any = $state("");
