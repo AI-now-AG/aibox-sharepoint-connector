@@ -46,6 +46,10 @@ const BillingInfoParamsSchema = z.object({
   email: z.string(),
 });
 
+const TenantConfigParamsSchema = z.object({
+  is_reseller: z.boolean().default(false),
+});
+
 const TenantInputParamsSchema = z.object({
   name: z.string().min(1),
   org_id: z.string().min(1),
@@ -94,12 +98,16 @@ export const tenantCreation = {
     },
   }),
   setupTenantData: defineAction({
-    input: TenantInputParamsSchema,
+    input: z.object({
+      tenant: TenantInputParamsSchema,
+      config: TenantConfigParamsSchema,
+    }),
     handler: async (input, context) => {
-      const isReseller = context.locals.tenant?.is_reseller || false;
+      const { tenant, config } = input;
+      const isReseller = config.is_reseller || false;
 
       // Clone the tenant
-      const transcriptionTypes = getTranscriptionTypes(input.add_ons ?? []);
+      const transcriptionTypes = getTranscriptionTypes(tenant.add_ons ?? []);
       const masterTenant = await TenantModel.get(masterTenantId);
 
       let includedFeatures = masterTenant?.included_features ?? [];
@@ -109,35 +117,35 @@ export const tenantCreation = {
         });
       }
       // Subtitle Studio is active if AudioPremium is selected (includes subtitle features)
-      const subtitleStudioActive = hasSubtitleEditor(input.add_ons ?? []);
+      const subtitleStudioActive = hasSubtitleEditor(tenant.add_ons ?? []);
       const includedUserLimit =
-        SubscriptionIncludedUsers[input.plan_name as SubscriptionPackageId] ||
+        SubscriptionIncludedUsers[tenant.plan_name as SubscriptionPackageId] ||
         10;
       const includedKbMB =
-        SubscriptionIncludedKbMB[input.plan_name as SubscriptionPackageId] ||
+        SubscriptionIncludedKbMB[tenant.plan_name as SubscriptionPackageId] ||
         10;
       const newTenant = await TenantModel.copyTenant(masterTenantId, {
-        name: input.name,
-        org_id: input.org_id,
-        org_name: input.org_name,
+        name: tenant.name,
+        org_id: tenant.org_id,
+        org_name: tenant.org_name,
         billing_method: isReseller
           ? BillingMethod.YearlyInvoice
           : BillingMethod.MonthlyInvoice,
-        billing_info: input.billing_info,
-        default_language: input.language,
-        theme: isReseller ? ThemeCode.SomediaAssistant : input.theme,
+        billing_info: tenant.billing_info,
+        default_language: tenant.language,
+        theme: isReseller ? ThemeCode.SomediaAssistant : tenant.theme,
         included_features: includedFeatures,
         transcription_types: transcriptionTypes,
         audio_assistant_active: true,
         subtitle_studio_active: subtitleStudioActive,
-        totalPrice: input.totalPrice,
+        totalPrice: tenant.totalPrice,
         included_user_limit: includedUserLimit, // default included users
         vector_kb_enabled: true,
         vector_kb_max_storage_mb: includedKbMB,
       });
 
       // Find all categories for the original tenant
-      const selectedCategoryIds = input.use_cases.map(
+      const selectedCategoryIds = tenant.use_cases.map(
         (categoryId) => new ObjectId(categoryId),
       );
       const categories =
@@ -222,8 +230,8 @@ export const tenantCreation = {
       // Create tenant subscription
       const subscription: Partial<Omit<Subscription, "_id">> = {
         tenant_id: newTenant.insertedId,
-        plan_name: input.plan_name,
-        add_ons: input.add_ons,
+        plan_name: tenant.plan_name,
+        add_ons: tenant.add_ons,
         ...(!isReseller && {
           is_trial: true,
           trial_start_date: new Date(),

@@ -154,7 +154,7 @@
     organizationName: string,
     organizationDisplayName: string,
   ) {
-    const { data, error } = await actions.tenantCreation.setupTenantData({
+    const tenantInput = {
       name: organizationDisplayName ?? "",
       org_id: organizationId,
       org_name: organizationName,
@@ -171,9 +171,16 @@
         location: location,
         email: billingEmail,
       },
+    };
+    const tenantConfig = {
+      is_reseller: isReseller,
+    };
+    const { data, error } = await actions.tenantCreation.setupTenantData({
+      tenant: tenantInput,
+      config: tenantConfig,
     });
 
-    console.log("setupTenantData error", error);
+    console.log("setupTenantData respone", { data, error });
 
     if (error) throw new Error(t("tenant.setup-tenant-data-failed"));
     return data;

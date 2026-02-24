@@ -1390,7 +1390,7 @@
             <div class="join">
               <input
                 type="text"
-                class="input input-bordered bg-base-200 disabled:border-gray-200 w-full join-item"
+                class="input input-bordered bg-base-100 disabled:border-gray-200 w-full join-item"
                 disabled={true}
                 value={tenantData.billing_method
                   ? BillingMethodLabels[
