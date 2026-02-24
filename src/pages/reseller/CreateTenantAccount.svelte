@@ -228,7 +228,7 @@
           label={t("subscription.organization-name") + " *"}
           bind:value={organizationName}
           placeholder={t("tenant.tenants.tenant.display-name")}
-          classes="input input-bordered w-full"
+          classes="text-sm w-full"
         />
       </div>
       <div class="flex-1 flex flex-col mb-4">
@@ -249,7 +249,7 @@
           label={t("subscription.company-name") + " *"}
           bind:value={companyName}
           placeholder={t("subscription.company-name-place-holder")}
-          classes="input input-bordered w-full"
+          classes="text-sm w-full"
         />
       </div>
 
@@ -259,7 +259,7 @@
           label={t("subscription.street-number") + " *"}
           bind:value={street}
           placeholder={t("subscription.street-number-placeholder")}
-          classes="input input-bordered w-full"
+          classes="text-sm w-full"
         />
       </div>
     </div>
@@ -273,7 +273,7 @@
           label={t("subscription.zip-code") + " *"}
           bind:value={zipCode}
           placeholder={t("subscription.zip-code-place-holder")}
-          classes="input input-bordered w-full"
+          classes="text-sm w-full"
         />
       </div>
 
@@ -283,7 +283,7 @@
           label={t("subscription.location") + " *"}
           bind:value={location}
           placeholder={t("subscription.location-place-holder")}
-          classes="input input-bordered w-full"
+          classes="text-sm w-full"
         />
       </div>
     </div>
@@ -297,7 +297,7 @@
           label={t("subscription.contact-phone") + " *"}
           bind:value={contactPhone}
           placeholder={t("subscription.contact-phone-placeholder")}
-          classes="input input-bordered w-full"
+          classes="text-sm w-full"
         />
       </div>
 
@@ -307,7 +307,7 @@
           label={t("subscription.contact-name") + " *"}
           bind:value={contactName}
           placeholder={t("subscription.contact-name-placeholder")}
-          classes="input input-bordered w-full"
+          classes="text-sm w-full"
         />
       </div>
     </div>
@@ -319,7 +319,6 @@
         <Dropdown
           label={`${t("subscription.country")}`}
           labelClasses="mb-3"
-          placeholderClasses="h-[56px]"
           options={countryOptions}
           bind:value={country}
         />
@@ -330,7 +329,7 @@
           label={t("subscription.billing-email") + " *"}
           bind:value={billingEmail}
           placeholder={t("subscription.billing-email-plcae-holder")}
-          classes="input input-bordered w-full"
+          classes="text-sm w-full"
         />
       </div>
     </div>
