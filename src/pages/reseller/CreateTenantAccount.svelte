@@ -228,6 +228,7 @@
           label={t("subscription.organization-name") + " *"}
           bind:value={organizationName}
           placeholder={t("tenant.tenants.tenant.display-name")}
+          labelClasses="font-medium text-sm"
           classes="text-sm w-full"
         />
       </div>
@@ -236,6 +237,7 @@
           label={`${t("subscription.language")} *`}
           options={Languges}
           bind:value={selectedLanguage}
+          labelClasses="font-medium text-sm"
         />
       </div>
     </div>
@@ -249,6 +251,7 @@
           label={t("subscription.company-name") + " *"}
           bind:value={companyName}
           placeholder={t("subscription.company-name-place-holder")}
+          labelClasses="font-medium text-sm"
           classes="text-sm w-full"
         />
       </div>
@@ -259,6 +262,7 @@
           label={t("subscription.street-number") + " *"}
           bind:value={street}
           placeholder={t("subscription.street-number-placeholder")}
+          labelClasses="font-medium text-sm"
           classes="text-sm w-full"
         />
       </div>
@@ -283,6 +287,7 @@
           label={t("subscription.location") + " *"}
           bind:value={location}
           placeholder={t("subscription.location-place-holder")}
+          labelClasses="font-medium text-sm"
           classes="text-sm w-full"
         />
       </div>
@@ -297,6 +302,7 @@
           label={t("subscription.contact-phone") + " *"}
           bind:value={contactPhone}
           placeholder={t("subscription.contact-phone-placeholder")}
+          labelClasses="font-medium text-sm"
           classes="text-sm w-full"
         />
       </div>
@@ -307,6 +313,7 @@
           label={t("subscription.contact-name") + " *"}
           bind:value={contactName}
           placeholder={t("subscription.contact-name-placeholder")}
+          labelClasses="font-medium text-sm"
           classes="text-sm w-full"
         />
       </div>
@@ -318,9 +325,9 @@
       <div class="flex-1 flex flex-col mb-4">
         <Dropdown
           label={`${t("subscription.country")}`}
-          labelClasses="mb-3"
           options={countryOptions}
           bind:value={country}
+          labelClasses="font-medium text-sm"
         />
       </div>
       <div class="flex-1 flex flex-col mb-4">
@@ -329,6 +336,7 @@
           label={t("subscription.billing-email") + " *"}
           bind:value={billingEmail}
           placeholder={t("subscription.billing-email-plcae-holder")}
+          labelClasses="font-medium text-sm"
           classes="text-sm w-full"
         />
       </div>

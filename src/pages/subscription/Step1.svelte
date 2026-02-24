@@ -107,7 +107,7 @@
           value={organizationName}
           placeholder={t("subscription.organization-name-placeholder")}
           inputChange={(event: any) => (organizationName = event.value)}
-          containerClasses="h-[54px] shadow-xl"
+          containerClasses="h-[48px] shadow-xl"
           labelClasses="text-sm"
           classes="text-base"
         />

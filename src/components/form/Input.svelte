@@ -40,7 +40,7 @@
 
 <div class="form-control">
   {#if label}
-    <label for={id} class="label pl-0 pb-3">
+    <label for={id} class="label pl-0 pb-2">
       <span class={"label-text text-base-content " + labelClasses}>{label}</span
       >
     </label>

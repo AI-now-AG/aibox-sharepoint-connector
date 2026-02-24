@@ -205,7 +205,7 @@
           inputChange={(event: any) => {
             companyName = event.value;
           }}
-          containerClasses="h-[56px] shadow-lg"
+          containerClasses="h-[50px] shadow-lg"
           labelClasses="text-sm"
           classes="text-base"
         />
@@ -220,7 +220,7 @@
           inputChange={(event: any) => {
             street = event.value;
           }}
-          containerClasses="h-[56px] shadow-lg"
+          containerClasses="h-[50px] shadow-lg"
           labelClasses="text-sm"
           classes="text-base"
         />
@@ -239,7 +239,7 @@
           inputChange={(event: any) => {
             zipCode = event.value;
           }}
-          containerClasses="h-[56px] shadow-lg"
+          containerClasses="h-[50px] shadow-lg"
           labelClasses="text-sm"
           classes="text-base"
         />
@@ -254,7 +254,7 @@
           inputChange={(event: any) => {
             location = event.value;
           }}
-          containerClasses="h-[56px] shadow-lg"
+          containerClasses="h-[50px] shadow-lg"
           labelClasses="text-sm"
           classes="text-base"
         />
@@ -273,7 +273,7 @@
           inputChange={(event: any) => {
             contactPhone = event.value;
           }}
-          containerClasses="h-[56px] shadow-lg"
+          containerClasses="h-[50px] shadow-lg"
           labelClasses="text-sm"
           classes="text-base"
         />
@@ -288,7 +288,7 @@
           inputChange={(event: any) => {
             contactName = event.value;
           }}
-          containerClasses="h-[56px] shadow-lg"
+          containerClasses="h-[50px] shadow-lg"
           labelClasses="text-sm"
           classes="text-base"
         />
@@ -301,8 +301,8 @@
       <div class="flex-1 flex flex-col mb-4">
         <Dropdown
           label={`${t("subscription.country")}`}
-          labelClasses="mb-3"
-          placeholderClasses="h-[56px]"
+          labelClasses="mb-2"
+          placeholderClasses="h-[50px]"
           options={countryOptions}
           bind:value={country}
         />
@@ -316,7 +316,7 @@
           inputChange={(event: any) => {
             billingEmail = event.value;
           }}
-          containerClasses="h-[56px] shadow-md"
+          containerClasses="h-[50px] shadow-md"
           labelClasses="text-sm"
           classes="text-base"
           disabled={isEmailDisabled}
