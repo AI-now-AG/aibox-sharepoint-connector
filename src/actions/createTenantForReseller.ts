@@ -208,8 +208,8 @@ export const createTenantForReseller = {
         tenant_id: newTenant.insertedId,
         plan_name: input.plan_name,
         add_ons: input.add_ons,
-        is_trial: true,
-        trial_start_date: new Date(),
+        is_trial: false,
+        trial_start_date: null,
       };
       await SubscriptionModel.create(subscription);
 
