@@ -6,14 +6,7 @@
   import Loading from "$components/Loading.svelte";
   import AlertDialog from "$components/AlertDialog.svelte";
   import Dropdown from "$components/form/Dropdown.svelte";
-  import ThemeItem from "$pages/tenant-management/ThemeItem.svelte";
-  import {
-    LanguageCode,
-    Languges,
-    ThemeCode,
-    ThemeMap,
-    Themes,
-  } from "$types/TenantFeature";
+  import { LanguageCode, Languges } from "$types/TenantFeature";
   import type { TagItem, CategoryItem } from "$types/Subscription";
   import TagCategorySelector from "$components/subscription/TagCategorySelector.svelte";
   import SubscriptionPackageList from "$components/subscription/SubscriptionPackageList.svelte";
@@ -37,9 +30,6 @@
 
   let organizationName = $state<string>("");
   let selectedLanguage: string = $state(LanguageCode.De);
-  let selectedTheme: { title: string; value: ThemeCode } | undefined = $state(
-    ThemeMap[ThemeCode.AIBox],
-  );
 
   let totalPrice: any = $state("");
   let selectedPackageId = $state("");
@@ -49,10 +39,6 @@
   let selectedCategories: string[] = $state([]);
 
   const t = useTranslations();
-
-  //$inspect(selectedTag);
-  //$inspect(selectedCategories);
-
   // Calculate total price (include package and audio options)
   $effect(() => {
     let packagePrice = 0;
@@ -122,7 +108,6 @@
       org_id: organizationId,
       org_name: organizationName,
       language: selectedLanguage ?? LanguageCode.De,
-      theme: selectedTheme?.value ?? ThemeCode.AIBox,
       use_cases: selectedCategories ?? [],
       plan_name: selectedPackageId as SubscriptionPackageId,
       add_ons: selectedAudioOptionIds as AudioOptionId[],
@@ -133,35 +118,6 @@
 
     if (error) throw new Error(t("tenant.setup-tenant-data-failed"));
     return data;
-  }
-
-  // Select single tag
-  function selectTag(tagId: string) {
-    // Unselect tag → clear categories
-    if (selectedTag === tagId) {
-      selectedTag = "";
-      selectedCategories = [];
-      return;
-    }
-
-    // Select this tag
-    selectedTag = tagId;
-
-    // Auto-select categories belonging to this tag
-    const autoCategories = categories
-      .filter((cat) => cat.tags?.includes(tagId))
-      .map((cat) => cat.value);
-
-    selectedCategories = autoCategories;
-  }
-
-  // Toggle category checkbox
-  function toggleCategory(id: string) {
-    if (selectedCategories.includes(id)) {
-      selectedCategories = selectedCategories.filter((x) => x !== id);
-    } else {
-      selectedCategories = [...selectedCategories, id];
-    }
   }
 
   function validateForm() {
@@ -221,14 +177,8 @@
   class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14 sticky bg-base-200 top-0 z-40"
 >
   <div class="flex items-center pt-5 pb-2">
-    <button
-      class="mr-4"
-      onclick={() => (window.location.href = "/tenant-management")}
-    >
-      {@html svgIcons.back}
-    </button>
     <h1 class="text-4xl font-bold">
-      {t("tenant.clone-from-master-tenant")}
+      {"Create Tenant"}
     </h1>
 
     <div class="flex space-x-2 ml-auto">
@@ -258,7 +208,7 @@
 
     <div class="flex flex-row space-x-4">
       <div class="flex-1 flex flex-col mb-4">
-        <span class="mb-2 text-base-content font-medium text-sm"
+        <span class="mb-2 text-base-content font-medium"
           >{t("tenant.tenants.tenant.display-name")}*</span
         >
         <input
@@ -268,24 +218,11 @@
           bind:value={organizationName}
         />
       </div>
-      <div class="flex-1 flex flex-col mb-4"></div>
-    </div>
-
-    <div class="flex flex-row space-x-4">
       <div class="flex-1 flex flex-col mb-4">
         <Dropdown
           label={`${t("tenant.language")}*`}
           options={Languges}
           bind:value={selectedLanguage}
-        />
-      </div>
-
-      <div class="flex-1 flex flex-col mb-4">
-        <ThemeItem
-          title={`${t("tenant.theme")}*`}
-          placeholder="e.g Light"
-          items={Themes}
-          bind:selectedItem={selectedTheme}
         />
       </div>
     </div>

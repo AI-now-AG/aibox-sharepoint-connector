@@ -50,9 +50,6 @@
 
   const t = useTranslations();
 
-  //$inspect(selectedTag);
-  //$inspect(selectedCategories);
-
   // Calculate total price (include package and audio options)
   $effect(() => {
     let packagePrice = 0;
@@ -81,12 +78,18 @@
             "prices" in audioOption &&
             audioOption.prices &&
             selectedPackageId &&
-            audioOption.prices[selectedPackageId as keyof typeof audioOption.prices]
+            audioOption.prices[
+              selectedPackageId as keyof typeof audioOption.prices
+            ]
           ) {
             audioOptionsTotalPrice +=
-              audioOption.prices[selectedPackageId as keyof typeof audioOption.prices];
+              audioOption.prices[
+                selectedPackageId as keyof typeof audioOption.prices
+              ];
           } else if ("prices" in audioOption && audioOption.prices) {
-            audioOptionsTotalPrice += Math.min(...Object.values(audioOption.prices));
+            audioOptionsTotalPrice += Math.min(
+              ...Object.values(audioOption.prices),
+            );
           } else {
             audioOptionsTotalPrice += audioOption?.price || 0;
           }
@@ -127,35 +130,6 @@
 
     if (error) throw new Error(t("tenant.setup-tenant-data-failed"));
     return data;
-  }
-
-  // Select single tag
-  function selectTag(tagId: string) {
-    // Unselect tag → clear categories
-    if (selectedTag === tagId) {
-      selectedTag = "";
-      selectedCategories = [];
-      return;
-    }
-
-    // Select this tag
-    selectedTag = tagId;
-
-    // Auto-select categories belonging to this tag
-    const autoCategories = categories
-      .filter((cat) => cat.tags?.includes(tagId))
-      .map((cat) => cat.value);
-
-    selectedCategories = autoCategories;
-  }
-
-  // Toggle category checkbox
-  function toggleCategory(id: string) {
-    if (selectedCategories.includes(id)) {
-      selectedCategories = selectedCategories.filter((x) => x !== id);
-    } else {
-      selectedCategories = [...selectedCategories, id];
-    }
   }
 
   function validateForm() {

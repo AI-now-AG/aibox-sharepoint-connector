@@ -131,9 +131,11 @@
         </div>
 
         <!-- DESCRIPTION -->
-        <div class="text-sm text-gray-500 leading-[20px] pr-4">
-          {tag.description}
-        </div>
+        {#if tag.description}
+          <div class="text-sm text-gray-500 leading-[20px] pr-4">
+            {tag.description}
+          </div>
+        {/if}
       </button>
     {/each}
   </div>
