@@ -258,7 +258,6 @@
       : 0,
   );
 
-
   // Features enabled
   let openAIEnabled: boolean = $state(false);
   let openAIGpt5Enabled: boolean = $state(false);
@@ -1447,7 +1446,7 @@
         </div>
 
         <div class="flex flex-row space-x-4">
-          <div class="flex-1 flex justify-between mb-4">
+          <div class="flex-1 flex justify-between flex-col lg:flex-row mb-4">
             <div class="flex items-center">
               <input
                 id="sub-trial-phase"

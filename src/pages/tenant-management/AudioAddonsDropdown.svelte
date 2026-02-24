@@ -98,14 +98,14 @@
 
 <div>
   <p class="mb-2">{title}</p>
-  <div class="dropdown dropdown-bottom w-full min-w-xs">
+  <div class="dropdown dropdown-bottom w-full">
     <label class="input input-bordered flex items-center gap-2 w-full">
       <input
         type="text"
         placeholder={placeholder ?? "Select option..."}
         bind:value={inputValue}
         role="button"
-        class="font-medium w-full min-w-xs"
+        class="font-medium w-full"
         readonly
       />
       {@html svgIcons.dropdownArrowDown}
@@ -114,7 +114,7 @@
     {#if items}
       <ul
         tabindex="-1"
-        class="dropdown-content menu bg-base-100 space-y-2 rounded-box z-1 w-52 p-2 shadow-sm"
+        class="dropdown-content menu bg-base-100 space-y-2 rounded-box z-1 w-52 p-2 shadow-sm w-full"
       >
         {#each items as item}
           <li>
