@@ -31,10 +31,9 @@ const categories: CategoryItem[] = allCategories.map((category) => {
   };
 });
 
-if (
-  Astro.locals.tenant?.is_reseller !== true ||
-  !auth.isReseller(Astro.locals)
-) {
+const isReseller = Astro.locals.tenant?.is_reseller ?? false;
+const resellerCode = Astro.locals.tenant?.reseller_code ?? null;
+if (!isReseller || !auth.isReseller(Astro.locals)) {
   //return Astro.redirect("/restricted");
 }
 ---
@@ -44,7 +43,8 @@ if (
     pageTitle={t("reseller.create-account-title")}
     {tags}
     {categories}
-    isReseller={true} 
+    isReseller={true}
+    {resellerCode}
     client:load
   />
 </Layout>
