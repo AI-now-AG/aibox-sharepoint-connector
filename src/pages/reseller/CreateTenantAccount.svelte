@@ -4,6 +4,7 @@
   import { useTranslations } from "$i18n/utils";
   import { addToast } from "$stores/toast";
   import Loading from "$components/Loading.svelte";
+  import Input from "$components/form/Input.svelte";
   import AlertDialog from "$components/AlertDialog.svelte";
   import Dropdown from "$components/form/Dropdown.svelte";
   import { LanguageCode, Languges } from "$types/TenantFeature";
@@ -28,8 +29,18 @@
   let alertModal: HTMLDialogElement | undefined = $state();
   let alertMessage = $state("");
 
+  const countryOptions = [];
+
   let organizationName = $state<string>("");
   let selectedLanguage: string = $state(LanguageCode.De);
+  let companyName = $state<string>("");
+  let street = $state<string>("");
+  let zipCode = $state<string>("");
+  let location = $state<string>("");
+  let contactPhone = $state<string>("");
+  let contactName = $state<string>("");
+  let country = $state<string>("");
+  let billingEmail = $state<string>("");
 
   let totalPrice: any = $state("");
   let selectedPackageId = $state("");
@@ -39,6 +50,9 @@
   let selectedCategories: string[] = $state([]);
 
   const t = useTranslations();
+
+  $inspect(organizationName);
+
   // Calculate total price (include package and audio options)
   $effect(() => {
     let packagePrice = 0;
@@ -206,23 +220,117 @@
       {t("user.organization")}
     </h1>
 
-    <div class="flex flex-row space-x-4">
+    <div
+      class="block md:flex lg:flex flex-row space-x-0 md:space-x-8 lg:space-x-8"
+    >
       <div class="flex-1 flex flex-col mb-4">
-        <span class="mb-2 text-base-content font-medium"
-          >{t("tenant.tenants.tenant.display-name")}*</span
-        >
-        <input
-          type="text"
-          placeholder={t("tenant.tenants.tenant.display-name")}
-          class="input input-bordered w-full"
+        <Input
+          label={t("subscription.organization-name") + " *"}
           bind:value={organizationName}
+          placeholder={t("tenant.tenants.tenant.display-name")}
+          classes="input input-bordered w-full"
         />
       </div>
       <div class="flex-1 flex flex-col mb-4">
         <Dropdown
-          label={`${t("tenant.language")}*`}
+          label={`${t("subscription.language")} *`}
           options={Languges}
           bind:value={selectedLanguage}
+        />
+      </div>
+    </div>
+
+    <div
+      class="block md:flex lg:flex flex-row space-x-0 md:space-x-8 lg:space-x-8"
+    >
+      <div class="flex-1 flex flex-col mb-4">
+        <Input
+          id="company-name"
+          label={t("subscription.company-name") + " *"}
+          bind:value={companyName}
+          placeholder={t("subscription.company-name-place-holder")}
+          classes="input input-bordered w-full"
+        />
+      </div>
+
+      <div class="flex-1 flex flex-col mb-4">
+        <Input
+          id="street-number"
+          label={t("subscription.street-number") + " *"}
+          bind:value={street}
+          placeholder={t("subscription.street-number-placeholder")}
+          classes="input input-bordered w-full"
+        />
+      </div>
+    </div>
+
+    <div
+      class="block md:flex lg:flex flex-row space-x-0 md:space-x-8 lg:space-x-8"
+    >
+      <div class="flex-1 flex flex-col mb-4">
+        <Input
+          id="zip-code"
+          label={t("subscription.zip-code") + " *"}
+          bind:value={zipCode}
+          placeholder={t("subscription.zip-code-place-holder")}
+          classes="input input-bordered w-full"
+        />
+      </div>
+
+      <div class="flex-1 flex flex-col mb-4">
+        <Input
+          id="location"
+          label={t("subscription.location") + " *"}
+          bind:value={location}
+          placeholder={t("subscription.location-place-holder")}
+          classes="input input-bordered w-full"
+        />
+      </div>
+    </div>
+
+    <div
+      class="block md:flex lg:flex flex-row space-x-0 md:space-x-8 lg:space-x-8"
+    >
+      <div class="flex-1 flex flex-col mb-4">
+        <Input
+          id="contact-phone"
+          label={t("subscription.contact-phone") + " *"}
+          bind:value={contactPhone}
+          placeholder={t("subscription.contact-phone-placeholder")}
+          classes="input input-bordered w-full"
+        />
+      </div>
+
+      <div class="flex-1 flex flex-col mb-4">
+        <Input
+          id="contact-name"
+          label={t("subscription.contact-name") + " *"}
+          bind:value={contactName}
+          placeholder={t("subscription.contact-name-placeholder")}
+          classes="input input-bordered w-full"
+        />
+      </div>
+    </div>
+
+    <div
+      class="block md:flex lg:flex flex-row md:space-x-8 space-x-0 lg:space-x-8"
+    >
+      <div class="flex-1 flex flex-col mb-4">
+        <Dropdown
+          label={`${t("subscription.country")}`}
+          labelClasses="mb-3"
+          placeholderClasses="h-[56px]"
+          options={countryOptions}
+          bind:value={country}
+        />
+      </div>
+      <div class="flex-1 flex flex-col mb-4">
+        <Input
+          id="email"
+          label={t("subscription.billing-email") + " *"}
+          bind:value={billingEmail}
+          placeholder={t("subscription.billing-email-plcae-holder")}
+          classes="input input-bordered w-full"
         />
       </div>
     </div>

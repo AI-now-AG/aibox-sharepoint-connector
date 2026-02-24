@@ -22,7 +22,6 @@
   import { posthogClientCaptureWithoutTenant } from "$utils/posthogClient";
   import Dropdown from "$components/form/Dropdown.svelte";
   import { useTranslatedCountryList } from "$utils/subscription";
-  import log from "$utils/log";
 
   interface Props {
     accountEmail: string;
@@ -30,7 +29,7 @@
   }
   let { accountEmail, defaultLanguage = "en" }: Props = $props();
   const t = useTranslations(defaultLanguage);
-  const conuntryOptions = useTranslatedCountryList(defaultLanguage);
+  const countryOptions = useTranslatedCountryList(defaultLanguage);
 
   let loading = $state(false);
 
@@ -304,7 +303,7 @@
           label={`${t("subscription.country")}`}
           labelClasses="mb-3"
           placeholderClasses="h-[56px]"
-          options={conuntryOptions}
+          options={countryOptions}
           bind:value={country}
         />
       </div>
