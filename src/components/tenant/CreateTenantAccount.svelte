@@ -32,6 +32,7 @@
     backUrl?: string;
     pageTitle?: string;
     isReseller?: boolean;
+    resellerCode?: string;
     tags: TagItem[];
     categories: CategoryItem[];
   }
@@ -39,6 +40,7 @@
     backUrl,
     pageTitle = "",
     isReseller = false,
+    resellerCode = "",
     tags = [],
     categories = [],
   }: Props = $props();
@@ -174,6 +176,7 @@
     };
     const tenantConfig = {
       is_reseller: isReseller,
+      reseller_code: resellerCode,
     };
     const { data, error } = await actions.tenantCreation.setupTenantData({
       tenant: tenantInput,
@@ -223,7 +226,12 @@
             message: t("tenant.create-successful"),
             type: "success",
           });
-          window.location.href = "/tenant-management/" + tenant.id;
+
+          if (isReseller) {
+            window.location.href = "/reseller/dashboard";
+          } else {
+            window.location.href = "/tenant-management/" + tenant.id;
+          }
         }
       } catch (error: any) {
         showAlert(error?.toString());

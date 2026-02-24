@@ -48,6 +48,7 @@ const BillingInfoParamsSchema = z.object({
 
 const TenantConfigParamsSchema = z.object({
   is_reseller: z.boolean().default(false),
+  reseller_code: z.string().nullish(),
 });
 
 const TenantInputParamsSchema = z.object({
@@ -105,6 +106,7 @@ export const tenantCreation = {
     handler: async (input, context) => {
       const { tenant, config } = input;
       const isReseller = config.is_reseller || false;
+      const resellerCode = config.reseller_code || null;
 
       // Clone the tenant
       const transcriptionTypes = getTranscriptionTypes(tenant.add_ons ?? []);
@@ -139,6 +141,7 @@ export const tenantCreation = {
         audio_assistant_active: true,
         subtitle_studio_active: subtitleStudioActive,
         totalPrice: tenant.totalPrice,
+        owned_by_reseller: isReseller ? resellerCode : null,
         included_user_limit: includedUserLimit, // default included users
         vector_kb_enabled: true,
         vector_kb_max_storage_mb: includedKbMB,
