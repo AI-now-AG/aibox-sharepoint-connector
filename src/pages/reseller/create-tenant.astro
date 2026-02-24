@@ -40,5 +40,11 @@ if (
 ---
 
 <Layout>
-  <CreateTenantAccount pageTitle={t("tenant.clone-from-master-tenant")} {tags} {categories} client:load />
+  <CreateTenantAccount
+    pageTitle={t("tenant.clone-from-master-tenant")}
+    {tags}
+    {categories}
+    isReseller={true} 
+    client:load
+  />
 </Layout>

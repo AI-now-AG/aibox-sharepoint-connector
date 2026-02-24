@@ -244,7 +244,7 @@
     </button>
 
     <button
-      onclick={() => navigate("/tenant-management/clone")}
+      onclick={() => navigate("/tenant-management/create")}
       class="btn btn-primary font-normal"
     >
       {@html svgIcons.add}

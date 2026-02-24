@@ -30,10 +30,17 @@
   interface Props {
     backUrl?: string;
     pageTitle?: string;
+    isReseller?: boolean;
     tags: TagItem[];
     categories: CategoryItem[];
   }
-  let { backUrl, pageTitle = "", tags = [], categories = [] }: Props = $props();
+  let {
+    backUrl,
+    pageTitle = "",
+    isReseller = false,
+    tags = [],
+    categories = [],
+  }: Props = $props();
 
   let loading = $state(false);
   let alertModal: HTMLDialogElement | undefined = $state();
@@ -273,12 +280,14 @@
         </div>
 
         <div class="flex-1 flex flex-col mb-4">
-          <ThemeItem
-            title={`${t("tenant.theme")}*`}
-            placeholder="e.g Light"
-            items={Themes}
-            bind:selectedItem={selectedTheme}
-          />
+          {#if !isReseller}
+            <ThemeItem
+              title={`${t("tenant.theme")}*`}
+              placeholder="e.g Light"
+              items={Themes}
+              bind:selectedItem={selectedTheme}
+            />
+          {/if}
         </div>
       </div>
 
