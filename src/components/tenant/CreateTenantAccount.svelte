@@ -437,7 +437,7 @@
         </div>
       </div>
 
-      {#if isReseller}
+      {#if !isReseller}
         <div class="divider"></div>
 
         <p class="font-sans text-base font-medium text-gray-600 mt-6 mb-4">
