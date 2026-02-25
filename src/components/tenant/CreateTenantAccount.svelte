@@ -284,7 +284,7 @@
     <!-- Organization -->
     <div class="p-5 mb-8 bg-base-100 rounded-lg">
       <h2 class="font-sanns text-3xl font-bold text-black mb-6">
-        {t("tenant.detail.general-settings")}
+        {t("user.organization")}
       </h2>
 
       <div
