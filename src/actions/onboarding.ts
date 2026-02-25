@@ -48,8 +48,7 @@ import {
   getStripeTaxRate,
 } from "$utils/onboarding";
 import {
-  TENANT_MASTER_DEV,
-  TENANT_MASTER_PROD,
+  TENANT_MASTER,
   SG_NEW_TENANT_TEMPLATE,
   AUTH0_ROLE_ADMIN_PROD,
   AUTH0_ROLE_ADMIN_DEV,
@@ -60,7 +59,7 @@ import {
 } from "$constants";
 import type Stripe from "stripe";
 
-const masterTenantId = isProd() ? TENANT_MASTER_PROD : TENANT_MASTER_DEV;
+const masterTenantId = isProd() ? TENANT_MASTER.PROD : TENANT_MASTER.DEV;
 const auth0GoogleCon = isProd()
   ? AUTH0_AUTH_GOOGLE_CON_PROD
   : AUTH0_AUTH_GOOGLE_CON_DEV;

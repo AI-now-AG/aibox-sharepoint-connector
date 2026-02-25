@@ -35,6 +35,7 @@
     backUrl?: string;
     pageTitle?: string;
     isReseller?: boolean;
+    isSomedia?: boolean;
     resellerCode?: string;
     tags: TagItem[];
     categories: CategoryItem[];
@@ -43,6 +44,7 @@
     backUrl,
     pageTitle = "",
     isReseller = false,
+    isSomedia = false,
     resellerCode = "",
     tags = [],
     categories = [],
@@ -314,7 +316,7 @@
         </div>
 
         <div class="flex-1 flex flex-col mb-4">
-          {#if !isReseller}
+          {#if !isSomedia}
             <ThemeItem
               title={`${t("tenant.theme")}*`}
               placeholder="e.g Light"
@@ -431,13 +433,19 @@
         </div>
       </div>
 
-      {#if !isReseller}
+      {#if !isSomedia}
         <div class="divider"></div>
 
         <p class="font-sans text-base font-medium text-gray-600 mt-6 mb-4">
           {t("subscription.billing-method")}
         </p>
-        <BillingMethods bind:billingMethod />
+        <BillingMethods
+          bind:billingMethod
+          availableMethods={[
+            BillingMethod.MonthlyInvoice,
+            BillingMethod.YearlyInvoice,
+          ]}
+        />
       {/if}
     </div>
 
@@ -454,7 +462,7 @@
 
     <!-- Package Plans -->
     <div class="p-5 mb-8 bg-base-100 rounded-lg">
-      <h2 class="font-sanns text-3xl font-bold text-black mt-6 mb-10">
+      <h2 class="font-sanns text-3xl font-bold text-black mb-10">
         {t("subscription.choose-your-plan")}
       </h2>
 

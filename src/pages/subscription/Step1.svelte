@@ -124,14 +124,16 @@
     </div>
   </div>
 
-  <TagCategorySelector
-    {tags}
-    {categories}
-    titleAlignCenter
-    {defaultLanguage}
-    bind:selectedTag
-    bind:selectedCategories
-  />
+  <div class="mt-6">
+    <TagCategorySelector
+      {tags}
+      {categories}
+      titleAlignCenter
+      {defaultLanguage}
+      bind:selectedTag
+      bind:selectedCategories
+    />
+  </div>
 
   <!-- NEXT -->
   <div class="w-full flex items-center justify-end rounded-lg p-4">

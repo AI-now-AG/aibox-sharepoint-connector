@@ -7,12 +7,15 @@ import { type TagItem, type CategoryItem } from "$types/Subscription";
 import auth from "$auth/auth";
 import CreateTenantAccount from "$components/tenant/CreateTenantAccount.svelte";
 import TenantCreationSuccess from "$components/tenant/TenantCreationSuccess.svelte";
+import { isProd } from "$utils/env";
 import { useTranslations } from "$i18n/utils";
+import { TENANT_SOMEDIA } from "$constants";
 
 const t = useTranslations();
 
 const allTags = await GlobalTagModel.list();
 const allCategories = await GlobalCategoryModel.list();
+const somediaTenantId = isProd() ? TENANT_SOMEDIA.PROD : TENANT_SOMEDIA.DEV;
 
 const tags: TagItem[] = allTags.map((tag) => {
   return {
@@ -34,8 +37,10 @@ const categories: CategoryItem[] = allCategories.map((category) => {
 
 const isReseller = Astro.locals.tenant?.is_reseller ?? false;
 const resellerCode = Astro.locals.tenant?.reseller_code ?? null;
+const isSomedia =
+  isReseller && somediaTenantId == Astro.locals.tenant?._id.toString();
 if (!isReseller || !auth.isReseller(Astro.locals)) {
-  //return Astro.redirect("/restricted");
+  return Astro.redirect("/restricted");
 }
 
 const tenantId = Astro.url.searchParams.get("tenantId");
@@ -46,16 +51,14 @@ const isCreationSuccess = status === "success" && tenantId;
 <Layout>
   {
     isCreationSuccess ? (
-      <TenantCreationSuccess
-        {tenantId}
-        client:load
-      />
+      <TenantCreationSuccess {tenantId} client:load />
     ) : (
       <CreateTenantAccount
         pageTitle={t("reseller.create-account-title")}
         {tags}
         {categories}
         isReseller={true}
+        {isSomedia}
         {resellerCode}
         client:load
       />

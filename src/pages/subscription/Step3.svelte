@@ -333,7 +333,14 @@
       {t("subscription.billing-method")}
     </p>
 
-    <BillingMethods bind:billingMethod {defaultLanguage} />
+    <BillingMethods
+      bind:billingMethod
+      availableMethods={[
+        BillingMethod.CreditCard,
+        BillingMethod.MonthlyInvoice,
+      ]}
+      {defaultLanguage}
+    />
   </div>
 
   <!-- Next -->

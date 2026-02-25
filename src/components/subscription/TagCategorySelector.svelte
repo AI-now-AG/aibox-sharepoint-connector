@@ -74,7 +74,7 @@
 </script>
 
 <h2
-  class={`font-sanns text-3xl font-bold text-black mt-6 ${titleAlignCenter ? "text-center" : ""}`}
+  class={`font-sanns text-3xl font-bold text-black ${titleAlignCenter ? "text-center" : ""}`}
 >
   {t("subscription.choose-business-branch")}
 </h2>

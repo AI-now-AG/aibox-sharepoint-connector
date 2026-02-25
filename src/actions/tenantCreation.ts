@@ -29,9 +29,9 @@ import organizationsManagement from "$data/auth0/organizations-manager";
 import { isProd } from "$utils/env";
 import { randomString } from "$utils/common";
 import { getTranscriptionTypes, hasSubtitleEditor } from "$utils/onboarding";
-import { TENANT_MASTER_DEV, TENANT_MASTER_PROD } from "$constants";
+import { TENANT_MASTER } from "$constants";
 
-const masterTenantId = isProd() ? TENANT_MASTER_PROD : TENANT_MASTER_DEV;
+const masterTenantId = isProd() ? TENANT_MASTER.PROD : TENANT_MASTER.DEV;
 
 const OrganizationNameInputParamsSchema = z.object({
   organization_name: z.string().min(1),
@@ -49,6 +49,7 @@ const BillingInfoParamsSchema = z.object({
 const TenantConfigParamsSchema = z.object({
   is_reseller: z.boolean().default(false),
   reseller_code: z.string().nullish(),
+  is_somedia: z.boolean().default(false),
 });
 
 const TenantInputParamsSchema = z.object({
@@ -108,6 +109,7 @@ export const tenantCreation = {
       const { tenant, config } = input;
       const isReseller = config.is_reseller || false;
       const resellerCode = config.reseller_code || null;
+      const isSomedia = config.is_somedia || false;
 
       // Clone the tenant
       const transcriptionTypes = getTranscriptionTypes(tenant.add_ons ?? []);
@@ -127,16 +129,17 @@ export const tenantCreation = {
       const includedKbMB =
         SubscriptionIncludedKbMB[tenant.plan_name as SubscriptionPackageId] ||
         10;
+
       const newTenant = await TenantModel.copyTenant(masterTenantId, {
         name: tenant.name,
         org_id: tenant.org_id,
         org_name: tenant.org_name,
-        billing_method: isReseller
+        billing_method: isSomedia
           ? BillingMethod.YearlyInvoice
           : tenant.billing_method,
         billing_info: tenant.billing_info,
         default_language: tenant.language,
-        theme: isReseller ? ThemeCode.SomediaAssistant : tenant.theme,
+        theme: isSomedia ? ThemeCode.SomediaAssistant : tenant.theme,
         included_features: includedFeatures,
         transcription_types: transcriptionTypes,
         audio_assistant_active: true,
@@ -197,7 +200,9 @@ export const tenantCreation = {
         created_at: new Date(),
         updated_at: new Date(),
         // Vector KB fields (no data cloned, start empty)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         vector_kb_enabled: (prompt as any).vector_kb_enabled ?? false,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         vector_kb_scope: (prompt as any).vector_kb_scope ?? null,
         vector_kb_folder_ids: [],
         vector_kb_data_source_ids: [],
@@ -236,10 +241,12 @@ export const tenantCreation = {
         tenant_id: newTenant.insertedId,
         plan_name: tenant.plan_name,
         add_ons: tenant.add_ons,
-        ...(isReseller && {
+        // For Somedia, we start with a subscription that has no trial
+        ...(isSomedia && {
           start_date: new Date(),
         }),
-        ...(!isReseller && {
+        // For non-Somedia and normal case, we start with a trial
+        ...(!isSomedia && {
           is_trial: true,
           trial_start_date: new Date(),
         }),
