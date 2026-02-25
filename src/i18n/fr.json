@@ -872,7 +872,7 @@
   "pagination.showing-range-of-total": "Showing ${from} to ${to} of ${total} results",
   "subscription.yearly-invoice-email": "Yearly invoice",
   "user.reseller": "Reseller",
-  "nav.reseller": "Reseller",
+  "nav.reseller": "RESELLER",
   "nav.reseller.dashboard": "Dashboard",
   "nav.reseller.create-account": "Create New Account",
   "reseller.create-account-title": "Create Tenant Account"
