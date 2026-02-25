@@ -96,26 +96,11 @@ const TenantInputParamsSchema = z.object({
   vector_kb_chunk_size: z.number().optional().default(800),
   vector_kb_chunk_overlap: z.number().optional().default(200),
   vector_kb_max_storage_mb: z.number().optional().default(500),
-  vector_kb_top_k: z.number().optional().default(5),
-  vector_kb_similarity_threshold: z.number().optional().default(0.7),
-  // RAG Enhancement Configuration
-  vector_kb_rerank_enabled: z.boolean().optional().default(false),
-  vector_kb_rerank_top_n: z.number().optional().default(5),
-  vector_kb_rerank_candidates: z.number().optional().default(30),
-  vector_kb_hybrid_enabled: z.boolean().optional().default(false),
-  vector_kb_hybrid_alpha: z.number().optional().default(0.5),
-  vector_kb_answerability_enabled: z.boolean().optional().default(false),
-  vector_kb_answerability_threshold: z.number().optional().default(0.6),
-  vector_kb_compression_enabled: z.boolean().optional().default(false),
-  vector_kb_multihop_enabled: z.boolean().optional().default(false),
-  vector_kb_max_hops: z.number().optional().default(3),
-  vector_kb_debug_enabled: z.boolean().optional().default(false),
   vector_kb_chunking_strategy: z
     .nativeEnum(ChunkingStrategy)
     .optional()
     .default(ChunkingStrategy.Fixed),
-  vector_kb_multi_query_enabled: z.boolean().optional().default(false),
-  vector_kb_multi_query_count: z.number().optional().default(3),
+  vector_kb_debug_enabled: z.boolean().optional().default(false),
 });
 
 const TenanKeyEncryptSchema = z.object({

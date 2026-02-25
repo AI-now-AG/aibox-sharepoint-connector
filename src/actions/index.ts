@@ -13,6 +13,7 @@ import { cloneMasterTenant } from "./cloneMasterTenant";
 import { globalCategory } from "./globalCategory";
 import { globalPrompt } from "./globalPrompt";
 import { posthog } from "./posthog";
+import { ragConfiguration } from "./ragConfiguration";
 
 export const server = {
   tenant,
@@ -30,4 +31,5 @@ export const server = {
   globalCategory,
   globalPrompt,
   posthog,
+  ragConfiguration,
 };

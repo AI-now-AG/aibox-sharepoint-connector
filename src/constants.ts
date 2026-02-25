@@ -45,6 +45,8 @@ export const SUPER_ADMIN_ROUTES = [
   "/settings/instruction/*",
   "/settings/prompt-refinement",
   "/settings/prompt-refinement/*",
+  "/settings/rag-configuration",
+  "/settings/rag-configuration/*",
   "/admin",
   "/admin/*",
   "/admin/global-prompt-library/tags",
