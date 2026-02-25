@@ -275,12 +275,6 @@
       >
         {t("common.save")}
       </button>
-      <button
-        class="btn btn-outline"
-        onclick={() => (window.location.href = "/tenant-management")}
-      >
-        {t("common.cancel")}
-      </button>
     </div>
   </div>
 </div>
