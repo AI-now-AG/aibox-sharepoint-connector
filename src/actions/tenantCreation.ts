@@ -235,6 +235,9 @@ export const tenantCreation = {
         tenant_id: newTenant.insertedId,
         plan_name: tenant.plan_name,
         add_ons: tenant.add_ons,
+        ...(isReseller && {
+          start_date: new Date(),
+        }),
         ...(!isReseller && {
           is_trial: true,
           trial_start_date: new Date(),

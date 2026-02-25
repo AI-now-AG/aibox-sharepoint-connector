@@ -83,8 +83,7 @@
       contactName.trim() !== "" &&
       billingEmail.trim() !== "" &&
       selectedCategories.length > 0 &&
-      selectedPackageId !== "" &&
-      selectedAudioOptionIds.length > 0,
+      selectedPackageId !== "",
   );
 
   const t = useTranslations();
