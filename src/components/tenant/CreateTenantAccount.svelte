@@ -437,12 +437,14 @@
         </div>
       </div>
 
-      <div class="divider"></div>
+      {#if isReseller}
+        <div class="divider"></div>
 
-      <p class="font-sans text-base font-medium text-gray-600 mt-6 mb-4">
-        {t("subscription.billing-method")}
-      </p>
-      <BillingMethods bind:billingMethod />
+        <p class="font-sans text-base font-medium text-gray-600 mt-6 mb-4">
+          {t("subscription.billing-method")}
+        </p>
+        <BillingMethods bind:billingMethod />
+      {/if}
     </div>
 
     <!-- Tag Category selector -->
