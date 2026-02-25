@@ -136,8 +136,7 @@ const TenantInputIdentifierSchema = z.object({
 
 const CreateTenantAdminSchema = z.object({
   _id: z.string(),
-  org_id: z.string().optional(),
-  tenant_admin_email: z.string().optional(),
+  email: z.string().optional(),
   role: z.string().default("admin"),
 });
 
@@ -270,18 +269,21 @@ export const tenant = {
   createAdminUser: defineAction({
     input: CreateTenantAdminSchema,
     handler: async (input) => {
+      const tenant = await TenantModel.get(input._id);
+      if (!tenant) throw new Error("Tenant does not exist.");
+
       const session = client.startSession();
       session.startTransaction();
 
       try {
         const dbOrgId = input._id;
-        const organizationId = input.org_id ?? "";
+        const organizationId = tenant.org_id ?? "";
 
-        if (input.tenant_admin_email) {
+        if (input.email) {
           await setupTenantAdmin(
             dbOrgId,
             organizationId,
-            input.tenant_admin_email,
+            input.email,
             input.role === "admin" ? "Admin" : "Supper Admin",
             input.role as "admin" | "sa",
           );

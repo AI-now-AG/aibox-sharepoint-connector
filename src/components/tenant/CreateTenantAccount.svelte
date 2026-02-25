@@ -69,7 +69,7 @@
   let contactName = $state<string>("");
   let country = $state<string>(CountryCode.CH);
   let billingEmail = $state<string>("");
-  let billingMethod = $state<string>(BillingMethod.MonthlyInvoice);
+  let billingMethod = $state<BillingMethod>(BillingMethod.MonthlyInvoice);
 
   let totalPrice: any = $state("");
   let selectedPackageId = $state("");
@@ -233,9 +233,9 @@
           });
 
           if (isReseller) {
-            window.location.href = "/reseller/dashboard";
+            window.location.href = `/reseller/create-tenant?tenantId=${tenant.id}&status=success`;
           } else {
-            window.location.href = "/tenant-management/" + tenant.id;
+            window.location.href = `/tenant-management/${tenant.id}`;
           }
         }
       } catch (error: any) {

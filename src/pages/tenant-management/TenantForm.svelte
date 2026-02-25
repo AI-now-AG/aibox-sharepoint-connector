@@ -1151,44 +1151,26 @@
   }
 
   async function createTenantAdmin(role: "admin" | "sa" = "admin") {
-    try {
-      loading = true;
-      const { error } =
-        role === "admin"
-          ? await actions.tenant.createAdminUser({
-              _id: tenantData._id,
-              org_id: tenantData.org_id,
-              tenant_admin_email: tenantAdminEmail,
-              role,
-            })
-          : await actions.tenant.createAdminUser({
-              _id: tenantData._id,
-              org_id: tenantData.org_id,
-              tenant_admin_email: tenantAdminEmail,
-              role,
-            });
+    loading = true;
+    const { data, error } = await actions.tenant.createAdminUser({
+      _id: tenantData._id,
+      email: tenantAdminEmail,
+      role,
+    });
 
-      loading = false;
-      if (error) {
-        addToast({
-          message:
-            t("tenant.create-tenant-admin-failed") + " - " + error.toString(),
-          type: "success",
-        });
-      } else {
-        addToast({
-          message: t("tenant.create-tenant-admin-successful"),
-          type: "success",
-        });
-      }
-    } catch (error: any) {
+    loading = false;
+    tenantAdminEmail = "";
+
+    if (error) {
       addToast({
-        message:
-          t("tenant.create-tenant-admin-failed") + " - " + error.toString(),
+        message: `${t("tenant.create-tenant-admin-failed")} - ${error.toString()}`,
         type: "success",
       });
-    } finally {
-      tenantAdminEmail = "";
+    } else {
+      addToast({
+        message: t("tenant.create-tenant-admin-successful"),
+        type: "success",
+      });
     }
   }
 
