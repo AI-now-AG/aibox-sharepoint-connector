@@ -59,6 +59,7 @@ const TenantInputParamsSchema = z.object({
   theme: z.nativeEnum(ThemeCode).default(ThemeCode.AIBox),
   plan_name: z.nativeEnum(SubscriptionPackageId).optional(),
   add_ons: z.array(z.nativeEnum(AudioOptionId)).optional(),
+  billing_method: z.nativeEnum(BillingMethod).optional(),
   use_cases: z.array(z.string()),
   totalPrice: z.string().optional(),
   billing_info: BillingInfoParamsSchema,
@@ -132,7 +133,7 @@ export const tenantCreation = {
         org_name: tenant.org_name,
         billing_method: isReseller
           ? BillingMethod.YearlyInvoice
-          : BillingMethod.MonthlyInvoice,
+          : tenant.billing_method,
         billing_info: tenant.billing_info,
         default_language: tenant.language,
         theme: isReseller ? ThemeCode.SomediaAssistant : tenant.theme,

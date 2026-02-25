@@ -3,7 +3,7 @@
   import SubsciptionSteps from "$components/subscription/SubsciptionSteps.svelte";
   import { useTranslations } from "$i18n/utils";
   import { onMount } from "svelte";
-  import RadarLoading from "./RadarLoading.svelte";
+  import RadarLoading from "$components/subscription/RadarLoading.svelte";
   import subscription from "$stores/subscription";
   import { SubscriptionPackageId, AudioOptionId } from "$types/Subscription";
   import { isTrulyEmpty } from "$utils/common";

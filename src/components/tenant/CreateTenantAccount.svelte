@@ -6,6 +6,7 @@
   import { addToast } from "$stores/toast";
   import { tenant } from "$stores";
   import {
+    BillingMethod,
     CountryCode,
     type AudioOptionId,
     type SubscriptionPackageId,
@@ -18,6 +19,8 @@
     Themes,
   } from "$types/TenantFeature";
   import type { TagItem, CategoryItem } from "$types/Subscription";
+  import { SubscriptionPackages } from "$data/subscription-packages";
+  import { useTranslatedCountryList } from "$utils/subscription";
   import Loading from "$components/Loading.svelte";
   import AlertDialog from "$components/AlertDialog.svelte";
   import Input from "$components/form/Input.svelte";
@@ -26,8 +29,7 @@
   import TagCategorySelector from "$components/subscription/TagCategorySelector.svelte";
   import SubscriptionPackageList from "$components/subscription/SubscriptionPackageList.svelte";
   import AudioOptionList from "$components/subscription/AudioOptionList.svelte";
-  import { SubscriptionPackages } from "$data/subscription-packages";
-  import { useTranslatedCountryList } from "$utils/subscription";
+  import BillingMethods from "$components/subscription/BillingMethods.svelte";
 
   interface Props {
     backUrl?: string;
@@ -50,7 +52,8 @@
   let alertModal: HTMLDialogElement | undefined = $state();
   let alertMessage = $state("");
 
-  const countryOptions = useTranslatedCountryList();
+  const defaultLanguage = $tenant?.default_language ?? "";
+  const countryOptions = useTranslatedCountryList(defaultLanguage);
 
   let organizationName = $state<string>("");
   let selectedLanguage: string = $state(LanguageCode.De);
@@ -66,6 +69,7 @@
   let contactName = $state<string>("");
   let country = $state<string>(CountryCode.CH);
   let billingEmail = $state<string>("");
+  let billingMethod = $state<string>(BillingMethod.MonthlyInvoice);
 
   let totalPrice: any = $state("");
   let selectedPackageId = $state("");
@@ -165,6 +169,7 @@
       use_cases: selectedCategories ?? [],
       plan_name: selectedPackageId as SubscriptionPackageId,
       add_ons: selectedAudioOptionIds as AudioOptionId[],
+      billing_method: billingMethod,
       totalPrice: totalPrice,
       billing_info: {
         company_name: companyName,
@@ -282,10 +287,11 @@
 
 <div class="px-8 mb-10">
   <div class="container w-full mx-auto p-6">
+    <!-- Organization -->
     <div class="p-5 mb-8 bg-base-100 rounded-lg">
-      <h1 class="font-sanns text-3xl font-bold text-black mb-6">
-        {t("user.organization")}
-      </h1>
+      <h2 class="font-sanns text-3xl font-bold text-black mb-6">
+        {t("tenant.detail.general-settings")}
+      </h2>
 
       <div
         class="block md:flex lg:flex flex-row space-x-0 md:space-x-8 lg:space-x-8"
@@ -324,9 +330,13 @@
           {/if}
         </div>
       </div>
+    </div>
 
-      <div class="divider"></div>
-
+    <!-- Contact & Billing -->
+    <div class="p-5 mb-8 bg-base-100 rounded-lg">
+      <h2 class="font-sanns text-3xl font-bold text-black mb-6">
+        {t("tenant.subscription-billing")}
+      </h2>
       <div
         class="block md:flex lg:flex flex-row space-x-0 md:space-x-8 lg:space-x-8"
       >
@@ -429,17 +439,25 @@
 
       <div class="divider"></div>
 
+      <p class="font-sans text-base font-medium text-gray-600 mt-6 mb-4">
+        {t("subscription.billing-method")}
+      </p>
+      <BillingMethods bind:billingMethod />
+    </div>
+
+    <!-- Tag Category selector -->
+    <div class="p-5 mb-8 bg-base-100 rounded-lg">
       <TagCategorySelector
         {tags}
         {categories}
-        defaultLanguage={$tenant?.default_language ?? ""}
+        {defaultLanguage}
         bind:selectedTag
         bind:selectedCategories
       />
+    </div>
 
-      <div class="divider"></div>
-
-      <!-- Pakage Plans -->
+    <!-- Package Plans -->
+    <div class="p-5 mb-8 bg-base-100 rounded-lg">
       <h2 class="font-sanns text-3xl font-bold text-black mt-6 mb-10">
         {t("subscription.choose-your-plan")}
       </h2>
@@ -447,22 +465,21 @@
       <div
         class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-10 text-black"
       >
-        <SubscriptionPackageList
-          bind:selectedPackageId
-          defaultLanguage={selectedLanguage}
-        />
+        <SubscriptionPackageList bind:selectedPackageId {defaultLanguage} />
       </div>
+    </div>
 
-      <!-- Audio to Text Options -->
-      <h1 class="font-sanns text-3xl font-bold text-black mt-6 mb-8">
+    <!-- Audio to Text Options -->
+    <div class="p-5 mb-8 bg-base-100 rounded-lg">
+      <h2 class="font-sanns text-3xl font-bold text-black mb-6">
         {t("subscription.audio-to-text-options")}
-      </h1>
+      </h2>
 
       <div class="mt-4">
         <AudioOptionList
           bind:selectedAudioOptionIds
           {selectedPackageId}
-          defaultLanguage={selectedLanguage}
+          {defaultLanguage}
         />
       </div>
 
