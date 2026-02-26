@@ -61,7 +61,7 @@
   class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14"
 >
   <h1 class="pt-2 lg:pt-8 text-4xl font-bold">
-    {t("tenant.tenants")}
+    {t("reseller.managed-tenant-title")}
   </h1>
 </div>
 
@@ -90,19 +90,19 @@
           </colgroup>
           <thead>
             <tr class="bg-base-300">
-              <th class="py-2 px-4 text-left font-normal text-xs"
+              <th class="py-3 px-4 text-left font-normal text-xs"
                 >{t("tenant.tenants.tenant.display-name")}</th
               >
-              <th class="py-2 px-4 text-left font-normal text-xs"
+              <th class="py-3 px-4 text-left font-normal text-xs"
                 >{t("tenant.subscription")}</th
               >
-              <th class="py-2 px-4 text-left font-normal text-xs"
+              <th class="py-3 px-4 text-left font-normal text-xs"
                 >{t("tenant.subscription-start")}</th
               >
-              <th class="py-2 px-4 text-left font-normal text-xs"
+              <th class="py-3 px-4 text-left font-normal text-xs"
                 >{t("tenant.cancellation-date")}</th
               >
-              <th class="py-2 px-4 text-left font-normal text-xs"
+              <th class="py-3 px-4 text-left font-normal text-xs"
                 >{t("tenant.tenants.tenant.active")}</th
               >
             </tr>

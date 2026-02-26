@@ -876,6 +876,7 @@
   "nav.reseller.dashboard": "Dashboard",
   "nav.reseller.create-account": "Create New Account",
   "reseller.create-account-title": "Create Tenant Account",
+  "reseller.managed-tenant-title": "Managed Tenants",
   "tenant.subscription-start": "Subscription Start",
   "tenant.cancellation-date": "Cancellation Date"
 }
