@@ -266,18 +266,6 @@
     <h1 class="text-4xl font-bold">
       {pageTitle}
     </h1>
-
-    <div class="flex space-x-2 ml-auto">
-      <button
-        class="btn btn-primary"
-        onclick={() => {
-          createTenant();
-        }}
-        disabled={!isFormValid}
-      >
-        {t("common.save")}
-      </button>
-    </div>
   </div>
 </div>
 
@@ -492,6 +480,18 @@
           {t("subscription.total-price-for-plan", { total: totalPrice })}
         </p>
       </div>
+    </div>
+
+    <div class="flex justify-end space-x-2 mt-8">
+      <button
+        class="btn btn-primary"
+        onclick={() => {
+          createTenant();
+        }}
+        disabled={!isFormValid}
+      >
+        {t("common.save")}
+      </button>
     </div>
   </div>
 </div>
