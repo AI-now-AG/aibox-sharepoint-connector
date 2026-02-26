@@ -271,12 +271,6 @@
     />
 
     <div>
-      <!--
-      <h2 class="text-lg font-normal mb-4">
-        {t("tenant.tenants.all-tenants", { amount: total })}
-      </h2>
-      -->
-
       <div class="overflow-x-auto relative">
         <table
           class="border-separate border-spacing-x-0 min-w-full relative"

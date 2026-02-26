@@ -40,7 +40,7 @@ const resellerCode = Astro.locals.tenant?.reseller_code ?? null;
 const isSomedia =
   isReseller && somediaTenantId == Astro.locals.tenant?._id.toString();
 if (!isReseller || !auth.isReseller(Astro.locals)) {
-  return Astro.redirect("/restricted");
+  return Astro.rewrite("/restricted");
 }
 
 const tenantId = Astro.url.searchParams.get("tenantId");

@@ -1,16 +1,18 @@
 ---
 import Layout from "$layouts/Layout.astro";
 import auth from "$auth/auth";
+import ResellerTenantList from "./ResellerTenantList.svelte";
 
-if (Astro.locals.tenant?.is_reseller !== true || !auth.isReseller(Astro.locals)) {
-  return Astro.redirect("/restricted");
+if (
+  Astro.locals.tenant?.is_reseller !== true ||
+  !auth.isReseller(Astro.locals)
+) {
+  return Astro.rewrite("/restricted");
 }
+
+const resellerCode = Astro.locals.tenant.reseller_code;
 ---
 
 <Layout>
-  <div class="container w-full mx-auto p-6">
-   <h1 class="text-2xl font-bold mb-4">Reseller Dashboard</h1>
-   <p>Welcome to the reseller dashboard! Here you can manage your customers, view analytics, and access support resources.</p>
-   <!-- Add more dashboard content here -->
-  </div>
+  <ResellerTenantList {resellerCode} client:load />
 </Layout>
