@@ -184,6 +184,7 @@
     };
     const tenantConfig = {
       is_reseller: isReseller,
+      is_somedia: isSomedia,
       reseller_code: resellerCode,
     };
     const { data, error } = await actions.tenantCreation.setupTenantData({
