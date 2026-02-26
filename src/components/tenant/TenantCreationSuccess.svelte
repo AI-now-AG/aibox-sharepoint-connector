@@ -152,7 +152,7 @@
         erhält vollen Zugriff auf alle Einstellungen.
       </p>
 
-      <div class="flex my-8 gap-2">
+      <div class="flex my-8 gap-4">
         <label class="input input-bordered w-full">
           {@html svgIcons.inputEmailIcon}
           <input
@@ -173,9 +173,14 @@
         </button>
       </div>
 
-      <p class="text-xs text-base-content/60">
-        Der Administrator kann später weitere Benutzer und Rollen hinzufügen.
-      </p>
+      <div class="flex gap-1">
+        <span class="inline-flex w-4 h-4 text-base-content/60"
+          >{@html svgIcons.toastInfo}</span
+        >
+        <p class="text-xs text-base-content/60">
+          Der Administrator kann später weitere Benutzer und Rollen hinzufügen.
+        </p>
+      </div>
     </div>
   </div>
 </div>
