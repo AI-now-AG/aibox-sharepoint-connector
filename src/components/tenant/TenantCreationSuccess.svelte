@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import { fade } from "svelte/transition";
   import { actions } from "astro:actions";
   import { useTranslations } from "$i18n/utils";
   import { isValidEmail } from "$utils/common";
@@ -23,6 +24,9 @@
   let adminEmail = $state("");
   let loading = $state(false);
   let isFormValid = $derived(adminEmail !== "" && isValidEmail(adminEmail));
+
+  let showAdminSuccess = $state(false);
+  let successTimer: ReturnType<typeof setTimeout> | null = null;
 
   onMount(() => {
     fetchTenant();
@@ -81,19 +85,24 @@
         message: `${t("tenant.create-tenant-admin-failed")} - ${error.toString()}`,
         type: "success",
       });
-    } else {
-      addToast({
-        message: t("tenant.create-tenant-admin-successful"),
-        type: "success",
-      });
+      return;
     }
+
+    // show inline success alert
+    showAdminSuccess = true;
+
+    if (successTimer) clearTimeout(successTimer);
+
+    successTimer = setTimeout(() => {
+      showAdminSuccess = false;
+    }, 10000);
   }
 </script>
 
 <div
   class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14 sticky bg-base-200 top-0 z-40"
 >
-  <div class="w-full max-w-4xl mx-auto py-8">
+  <div class="w-full max-w-4xl mx-auto">
     <div class="flex flex-col items-center">
       <div class="inline-flex px-2 py-2 bg-success/10 rounded-full">
         <svg
@@ -109,10 +118,11 @@
       </div>
     </div>
 
-    <div class="mt-5 mb-10 text-center">
+    <div class="mt-3 mb-8 text-center">
       <h1 class="text-3xl font-bold">Kunden-Tenant erfolgreich angelegt!</h1>
     </div>
 
+    <!-- Summary Info  -->
     <div class="p-5 mb-8 bg-base-100 rounded-lg">
       <h3 class="text-2xl font-bold mb-3">Summary</h3>
 
@@ -145,6 +155,7 @@
       </div>
     </div>
 
+    <!-- Add Admin Area  -->
     <div class="p-5 mb-8 bg-base-100 rounded-lg">
       <h3 class="text-2xl font-bold mb-3">Admin-Benutzer anlegen</h3>
       <p>
@@ -182,6 +193,51 @@
         </p>
       </div>
     </div>
+
+    <!-- Confirmation  -->
+    {#if showAdminSuccess}
+      <div transition:fade class="p-5 mb-8 bg-base-100 rounded-lg">
+        <h4 class="text-2xl font-bold mb-2">Admin-Benutzer</h4>
+        <div
+          role="alert"
+          class="alert alert-vertical sm:alert-horizontal bg-warning/30 mb-2"
+        >
+          <div class="text-warning">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6 shrink-0 stroke-current"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-warning-content font-bold">STATUS: GESENDET</h3>
+            <div class="text-xs">
+              <strong
+                >Einladung erfolgreich versendet! Der Admin-Benutzer wurde im</strong
+              >
+              <p>
+                System registriert. Er wird in Kürze eine E-Mail erhalten, um
+                den Zugriff zu bestätigen und sein Passwort zu setzen.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <p class="text-xs text-base-content/60">
+          Laden Sie die Person ein, die die Verwaltung dieses Accounts
+          übernehmen soll. Diese Person erhält vollen Zugriff auf alle
+          Einstellungen.
+        </p>
+      </div>
+    {/if}
   </div>
 </div>
 
