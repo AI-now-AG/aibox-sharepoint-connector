@@ -878,5 +878,21 @@
   "reseller.create-account-title": "Create Tenant Account",
   "reseller.managed-tenant-title": "Managed Tenants",
   "tenant.subscription-start": "Subscription Start",
-  "tenant.cancellation-date": "Cancellation Date"
+  "tenant.cancellation-date": "Cancellation Date",
+  "reseller.created-tenant.tenant-success-created": "Kunden-Tenant erfolgreich angelegt!",
+  "reseller.created-tenant.summary": "Summary",
+  "reseller.created-tenant.organization": "ORGANISATION NAME",
+  "reseller.created-tenant.subscription": "SUBSCRIPTION",
+  "reseller.created-tenant.address": "ADDRESS",
+  "reseller.created-tenant.subscription-start-date": "SUBSCRIPTION START DATE",
+  "reseller.created-tenant.create-admin": "Admin-Benutzer anlegen",
+  "reseller.created-tenant.create-admin-description": "Lade die Person ein, die diesen Account verwalten wird. Diese Person erhält vollen Zugriff auf alle Einstellungen.",
+  "reseller.created-tenant.email-placeholder": "E-Mail-Adresse des Administrators",
+  "reseller.created-tenant.invite": "Einladen",
+  "reseller.created-tenant.create-admin-notes": "Der Administrator kann später weitere Benutzer und Rollen hinzufügen.",
+  "reseller.created-tenant.admin-user": "Admin-Benutzer",
+  "reseller.created-tenant.status-sent": "STATUS: GESENDET",
+  "reseller.created-tenant.invitation-sent": "Einladung erfolgreich versendet!",
+  "reseller.created-tenant.registered-success": "System registriert. Er wird in Kürze eine E-Mail erhalten, um den Zugriff zu bestätigen und sein Passwort zu setzen.",
+  "reseller.created-tenant.invitation-notes": "Laden Sie die Person ein, die die Verwaltung dieses Accounts übernehmen soll. Diese Person erhält vollen Zugriff auf alle Einstellungen."
 }

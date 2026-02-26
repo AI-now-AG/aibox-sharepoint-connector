@@ -878,5 +878,21 @@
   "reseller.create-account-title": "Create Tenant Account",
   "reseller.managed-tenant-title": "Managed Tenants",
   "tenant.subscription-start": "Subscription Start",
-  "tenant.cancellation-date": "Cancellation Date"
+  "tenant.cancellation-date": "Cancellation Date",
+  "reseller.created-tenant.tenant-success-created": "Tenant successfully created!",
+  "reseller.created-tenant.summary": "Summary",
+  "reseller.created-tenant.organization": "ORGANISATION NAME",
+  "reseller.created-tenant.subscription": "SUBSCRIPTION",
+  "reseller.created-tenant.address": "ADDRESS",
+  "reseller.created-tenant.subscription-start-date": "SUBSCRIPTION START DATE",
+  "reseller.created-tenant.create-admin": "Create admin user",
+  "reseller.created-tenant.create-admin-description": "Invite the person who will manage this account. This person will have full access to all settings.",
+  "reseller.created-tenant.email-placeholder": "Administrator email address",
+  "reseller.created-tenant.invite": "Invite",
+  "reseller.created-tenant.create-admin-notes": "The administrator can add more users and roles later.",
+  "reseller.created-tenant.admin-user": "Admin User",
+  "reseller.created-tenant.status-sent": "STATUS: SENT",
+  "reseller.created-tenant.invitation-sent": "Invitation successfully sent!",
+  "reseller.created-tenant.registered-success": "User registered successfully. They will receive an email shortly to confirm access and set their password.",
+  "reseller.created-tenant.invitation-notes": "Invite the person who will manage this account. This person will have full access to all settings."
 }

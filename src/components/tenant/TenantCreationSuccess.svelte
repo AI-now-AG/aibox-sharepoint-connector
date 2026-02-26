@@ -42,6 +42,9 @@
       const billingInfo = data.billing_info;
       const subscriptionInfo = data.subscription;
       const planAddOns = [subscriptionInfo.plan_name];
+      const countryText = billingInfo.country
+        ? t(`subscription.country.${billingInfo.country?.toLowerCase()}` as any)
+        : "";
 
       if (subscriptionInfo.add_ons) {
         const audioAddOn = getSubscriptionAddOnName(
@@ -61,7 +64,7 @@
       address = `
         ${billingInfo.address ?? ""}<br/>
         ${billingInfo.zip_code ?? ""} ${billingInfo.location ?? ""}<br/>
-        ${billingInfo.country ?? ""}<br/>
+        ${countryText || ""}
       `;
       subStartDate = subscriptionInfo.start_date ?? "";
     }
@@ -119,36 +122,44 @@
     </div>
 
     <div class="mt-3 mb-8 text-center">
-      <h1 class="text-3xl font-bold">Kunden-Tenant erfolgreich angelegt!</h1>
+      <h1 class="text-3xl font-bold">
+        {t("reseller.created-tenant.tenant-success-created")}
+      </h1>
     </div>
 
     <!-- Summary Info  -->
     <div class="p-5 mb-8 bg-base-100 rounded-lg">
-      <h3 class="text-2xl font-bold mb-3">Summary</h3>
+      <h3 class="text-2xl font-bold mb-3">
+        {t("reseller.created-tenant.summary")}
+      </h3>
 
       <div class="grid grid-cols-1 md:grid-cols-12 mb-8 gap-10 space-x-8">
         <div class="col-span-12 2xl:col-span-6">
           <p class="text-xs text-base-content/60 font-bold">
-            ORGANISATION NAME
+            {t("reseller.created-tenant.organization")}
           </p>
           <p>{organizationName}</p>
         </div>
         <div class="col-span-12 2xl:col-span-6">
-          <p class="text-xs text-base-content/60 font-bold">SUBSCRIPTION</p>
+          <p class="text-xs text-base-content/60 font-bold">
+            {t("reseller.created-tenant.subscription")}
+          </p>
           <p>{subscription}</p>
         </div>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-12 gap-10 space-x-8">
         <div class="col-span-12 2xl:col-span-6">
-          <p class="text-xs text-base-content/60 font-bold">ADDRESS</p>
+          <p class="text-xs text-base-content/60 font-bold">
+            {t("reseller.created-tenant.address")}
+          </p>
           <p>
             {@html address}
           </p>
         </div>
         <div class="col-span-12 2xl:col-span-6">
           <p class="text-xs text-base-content/60 font-bold">
-            SUBSCRIPTION START DATE
+            {t("reseller.created-tenant.subscription-start-date")}
           </p>
           <p>{subStartDate || "-"}</p>
         </div>
@@ -157,19 +168,20 @@
 
     <!-- Add Admin Area  -->
     <div class="p-5 mb-8 bg-base-100 rounded-lg">
-      <h3 class="text-2xl font-bold mb-3">Admin-Benutzer anlegen</h3>
+      <h3 class="text-2xl font-bold mb-3">
+        {t("reseller.created-tenant.create-admin")}
+      </h3>
       <p>
-        Lade die Person ein, die diesen Account verwalten wird. Diese Person
-        erhält vollen Zugriff auf alle Einstellungen.
+        {t("reseller.created-tenant.create-admin-description")}
       </p>
 
-      <div class="flex my-8 gap-4">
+      <div class="flex max-w-2xl my-8 gap-4">
         <label class="input input-bordered w-full">
           {@html svgIcons.inputEmailIcon}
           <input
             type="text"
             class="font-medium"
-            placeholder="E-Mail-Adresse des Administrators"
+            placeholder={t("reseller.created-tenant.email-placeholder")}
             bind:value={adminEmail}
           />
         </label>
@@ -180,7 +192,7 @@
           onclick={createAdmin}
         >
           {@html svgIcons.add}
-          {"Einladen"}
+          {t("reseller.created-tenant.invite")}
         </button>
       </div>
 
@@ -189,7 +201,7 @@
           >{@html svgIcons.toastInfo}</span
         >
         <p class="text-xs text-base-content/60">
-          Der Administrator kann später weitere Benutzer und Rollen hinzufügen.
+          {t("reseller.created-tenant.create-admin-notes")}
         </p>
       </div>
     </div>
@@ -197,7 +209,9 @@
     <!-- Confirmation  -->
     {#if showAdminSuccess}
       <div transition:fade class="p-5 mb-8 bg-base-100 rounded-lg">
-        <h4 class="text-2xl font-bold mb-2">Admin-Benutzer</h4>
+        <h4 class="text-2xl font-bold mb-2">
+          {t("reseller.created-tenant.admin-user")}
+        </h4>
         <div
           role="alert"
           class="alert alert-vertical sm:alert-horizontal bg-warning/30 mb-2"
@@ -218,23 +232,20 @@
             </svg>
           </div>
           <div>
-            <h3 class="text-warning-content font-bold">STATUS: GESENDET</h3>
+            <h3 class="text-warning-content font-bold">
+              {t("reseller.created-tenant.status-sent")}
+            </h3>
             <div class="text-xs">
-              <strong
-                >Einladung erfolgreich versendet! Der Admin-Benutzer wurde im</strong
-              >
+              <strong>{t("reseller.created-tenant.invitation-sent")}</strong>
               <p>
-                System registriert. Er wird in Kürze eine E-Mail erhalten, um
-                den Zugriff zu bestätigen und sein Passwort zu setzen.
+                {t("reseller.created-tenant.registered-success")}
               </p>
             </div>
           </div>
         </div>
 
         <p class="text-xs text-base-content/60">
-          Laden Sie die Person ein, die die Verwaltung dieses Accounts
-          übernehmen soll. Diese Person erhält vollen Zugriff auf alle
-          Einstellungen.
+          {t("reseller.created-tenant.invitation-notes")}
         </p>
       </div>
     {/if}
