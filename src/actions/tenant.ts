@@ -253,7 +253,19 @@ export const tenant = {
   get: defineAction({
     input: TenantInputIdentifierSchema,
     handler: async (input) => {
-      const data = await TenantModel.get(input._id);
+      // Get tenant info
+      const tenant = await TenantModel.get(input._id);
+      if (!tenant) throw new Error("Tenant does not exist.");
+
+      // Get subscription info
+      const subscription = await SubscriptionModel.findByTenant(tenant._id);
+
+      // Combine tenant and subscription data
+      const data = {
+        ...tenant,
+        subscription,
+      };
+
       return transformRawData(data);
     },
   }),

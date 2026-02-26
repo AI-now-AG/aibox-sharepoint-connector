@@ -109,6 +109,14 @@
           </thead>
           <tbody>
             {#each tenants as tenant}
+              {@const audioAddOn = getSubscriptionAddOnName(
+                "audiototext",
+                tenant.subscription?.add_ons,
+              )}
+              {@const subtitleAddOn = getSubscriptionAddOnName(
+                "subtitle",
+                tenant.subscription?.add_ons,
+              )}
               <tr class="h-12 bg-base-100 hover:bg-base-300/30 text-sm">
                 <td class="py-2 px-4 text-sm font-medium">
                   {tenant.name}
@@ -118,22 +126,18 @@
                   <span class="block text text-sm font-medium">
                     {tenant.subscription?.plan_name}
                   </span>
-                  {#if tenant.subscription?.add_ons}
-                    <span class="block pt-1">
+                  <span class="block pt-1">
+                    {#if audioAddOn}
                       <span class="badge badge-ghost badge-sm">
-                        {getSubscriptionAddOnName(
-                          "audiototext",
-                          tenant.subscription?.add_ons,
-                        )}
+                        {audioAddOn}
                       </span>
+                    {/if}
+                    {#if subtitleAddOn}
                       <span class="badge badge-ghost badge-sm">
-                        {getSubscriptionAddOnName(
-                          "subtitle",
-                          tenant.subscription?.add_ons,
-                        )}
+                        {subtitleAddOn}
                       </span>
-                    </span>
-                  {/if}
+                    {/if}
+                  </span>
                 </td>
 
                 <td class="py-2 px-4">

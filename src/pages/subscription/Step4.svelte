@@ -55,6 +55,7 @@
         address: $subscription.billingInfo?.street ?? "",
         zip_code: $subscription.billingInfo?.zipCode ?? "",
         location: $subscription.billingInfo?.location ?? "",
+        country: $subscription.billingInfo?.country ?? "",
         email: $subscription.billingInfo?.billingEmail ?? "",
       },
       use_cases: $subscription.organizationInfo?.selectedCategories ?? [],

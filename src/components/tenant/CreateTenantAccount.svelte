@@ -178,6 +178,7 @@
         address: street,
         zip_code: zipCode,
         location: location,
+        country: country,
         email: billingEmail,
       },
     };
@@ -277,9 +278,7 @@
         {t("user.organization")}
       </h2>
 
-      <div
-        class="block md:flex lg:flex flex-row space-x-0 md:space-x-8 lg:space-x-8"
-      >
+      <div class="block md:flex flex-row space-x-0 md:space-x-8">
         <div class="flex-1 flex flex-col mb-4">
           <Input
             label={t("subscription.organization-name") + " *"}
@@ -292,9 +291,7 @@
         <div class="flex-1 flex flex-col mb-4"></div>
       </div>
 
-      <div
-        class="block md:flex lg:flex flex-row space-x-0 md:space-x-8 lg:space-x-8"
-      >
+      <div class="block md:flex flex-row space-x-0 md:space-x-8">
         <div class="flex-1 flex flex-col mb-4">
           <Dropdown
             label={`${t("tenant.language")}*`}
@@ -321,9 +318,7 @@
       <h2 class="font-sanns text-3xl font-bold text-black mb-6">
         {t("tenant.subscription-billing")}
       </h2>
-      <div
-        class="block md:flex lg:flex flex-row space-x-0 md:space-x-8 lg:space-x-8"
-      >
+      <div class="block md:flex flex-row space-x-0 md:space-x-8">
         <div class="flex-1 flex flex-col mb-4">
           <Input
             id="company-name"
@@ -347,9 +342,7 @@
         </div>
       </div>
 
-      <div
-        class="block md:flex lg:flex flex-row space-x-0 md:space-x-8 lg:space-x-8"
-      >
+      <div class="block md:flex flex-row space-x-0 md:space-x-8">
         <div class="flex-1 flex flex-col mb-4">
           <Input
             id="zip-code"
@@ -372,9 +365,7 @@
         </div>
       </div>
 
-      <div
-        class="block md:flex lg:flex flex-row space-x-0 md:space-x-8 lg:space-x-8"
-      >
+      <div class="block md:flex flex-row space-x-0 md:space-x-8">
         <div class="flex-1 flex flex-col mb-4">
           <Input
             id="contact-phone"

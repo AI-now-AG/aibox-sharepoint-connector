@@ -35,5 +35,5 @@ export const getSubscriptionAddOnName = (
           );
         }) || [];
   const firstOption = addOnOptions?.[0] as AudioOptionId | undefined;
-  return firstOption ? AudioOptionLabels[firstOption] || "-" : "-";
+  return firstOption ? AudioOptionLabels[firstOption] : "";
 };
