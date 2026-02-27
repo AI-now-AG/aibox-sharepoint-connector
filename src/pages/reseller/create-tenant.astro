@@ -22,9 +22,11 @@ const resellerCode = Astro.locals.tenant?.reseller_code ?? null;
 const isSomedia =
   isReseller && somediaTenantId == Astro.locals.tenant?._id.toString();
 
-const tags: TagItem[] = allTags.filter((tag) => {
-    return tag?.resellerCodes && tag.resellerCodes?.includes(resellerCode || "");
-  }).map((tag) => {
+const tags: TagItem[] = allTags
+  .filter((tag) => {
+    return tag?.categories && tag.categories?.includes(resellerCode || "");
+  })
+  .map((tag) => {
     return {
       title: tag.title,
       value: tag._id.toString(),

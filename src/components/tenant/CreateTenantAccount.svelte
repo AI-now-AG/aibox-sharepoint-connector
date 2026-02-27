@@ -437,6 +437,7 @@
         </p>
         <BillingMethods
           bind:billingMethod
+          {defaultLanguage}
           availableMethods={[
             BillingMethod.MonthlyInvoice,
             BillingMethod.YearlyInvoice,

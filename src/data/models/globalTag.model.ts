@@ -8,7 +8,7 @@ const TagSchema = z.object({
   description: z.string().default(""),
   icon: z.string().nullish(),
   iconColor: z.string().nullish(),
-  resellerCodes: z.array(z.string()).default([]),
+  categories: z.array(z.string()).default([]),
   created_at: z
     .date()
     .optional()

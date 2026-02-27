@@ -4,7 +4,7 @@
   import { type TagItem } from "$types/TagInput";
   import { useTranslations } from "$i18n/utils";
   import { bgOpacity } from "$utils/common";
-  import ResellerCodesInput from "./ResellerCodesInput.svelte";
+  import CategoriesInput from "./CategoriesInput.svelte";
   import Loading from "$components/Loading.svelte";
 
   interface Props {
@@ -12,6 +12,7 @@
   }
 
   let { resellerCodes = [] }: Props = $props();
+  const categories = ["self-onboarding", ...resellerCodes];
 
   const t = useTranslations();
 
@@ -41,7 +42,7 @@
       description: item.description ?? "",
       icon: item.icon ?? "🇨🇭",
       iconColor: item.iconColor ?? "#491EFF",
-      resellerCodes: item.resellerCodes ?? [],
+      categories: item.categories ?? [],
     }));
     loading = false;
   }
@@ -175,11 +176,10 @@
 
         <!-- RESELLER CODES -->
         <div class="w-64">
-          <ResellerCodesInput
-            title=""
-            placeholder="Reseller codes"
-            items={resellerCodes}
-            bind:selectedItems={tag.resellerCodes}
+          <CategoriesInput
+            placeholder="Select categories"
+            items={categories}
+            bind:selectedItems={tag.categories}
             onchange={() => updateTag(tag)}
           />
         </div>

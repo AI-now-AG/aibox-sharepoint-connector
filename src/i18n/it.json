@@ -892,7 +892,7 @@
   "reseller.created-tenant.status-sent": "STATUS: SENT",
   "reseller.created-tenant.invitation-sent": "Invitation successfully sent!",
   "reseller.created-tenant.registered-success": "User registered successfully. They will receive an email shortly to confirm access and set their password.",
-  "reseller.created-tenant.user-reached-limit": "The user limit for this tenant has been reached. Please contact support.",
+  "reseller.created-tenant.user-reached-limit": "The user limit for this tenant has been reached. ",
   "reseller.dashboard.managed-tenant-title": "Account Overview",
   "reseller.dashboard.seach-place-holder": "Search tenants",
   "reseller.dashboard.filter-label": "Filters",
