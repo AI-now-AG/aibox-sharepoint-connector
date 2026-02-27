@@ -463,7 +463,8 @@ export const onboarding = {
       const emailSubject = `${subjectPrefix} - New onboarding`;
       const emailContent = `
         <div style="font-family: Arial, sans-serif; padding: 20px;">
-          <h1><strong>New Onboarding Notification</strong></h1>
+          <h3><strong>Tenant successfully created</strong></h3>
+          <p>The following tenant has been created and onboarding has been completed.</p><br/><br/>
           <p><strong>Organization Name:</strong> ${tenant.name}</p>
           <p>
             <strong>Subscription:</strong> ${subscription?.plan_name ?? "-"}<br/> 
