@@ -410,7 +410,7 @@
   "subscription.location": "Location",
   "subscription.location-place-holder": "Zurich",
   "subscription.billing-method": "Billing method",
-  "subscription.monthly-invoice-email": "Setup later or recieve an invoice via email",
+  "subscription.monthly-invoice-email": "Monthly Invoice (email)",
   "subscription.billing-email": "Contact email",
   "subscription.billing-email-plcae-holder": "contact@company.ch",
   "subscription.validate-empty-company-name-message": "Please input your company name ",
@@ -876,7 +876,7 @@
   "nav.reseller.dashboard": "Dashboard",
   "nav.reseller.create-account": "Create New Account",
   "reseller.create-account-title": "Create Tenant Account",
-  "reseller.managed-tenant-title": "Managed Tenants",
+  "reseller.managed-tenant-title": "Account Overview",
   "tenant.subscription-start": "Subscription Start",
   "tenant.cancellation-date": "Cancellation Date",
   "reseller.created-tenant.tenant-success-created": "Tenant successfully created!",
@@ -893,6 +893,5 @@
   "reseller.created-tenant.admin-user": "Admin User",
   "reseller.created-tenant.status-sent": "STATUS: SENT",
   "reseller.created-tenant.invitation-sent": "Invitation successfully sent!",
-  "reseller.created-tenant.registered-success": "User registered successfully. They will receive an email shortly to confirm access and set their password.",
-  "reseller.created-tenant.invitation-notes": "Invite the person who will manage this account. This person will have full access to all settings."
+  "reseller.created-tenant.registered-success": "User registered successfully. They will receive an email shortly to confirm access and set their password."
 }

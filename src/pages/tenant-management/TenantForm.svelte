@@ -1164,14 +1164,15 @@
     if (error) {
       addToast({
         message: `${t("tenant.create-tenant-admin-failed")} - ${error.toString()}`,
-        type: "success",
+        type: "error",
       });
-    } else {
-      addToast({
-        message: t("tenant.create-tenant-admin-successful"),
-        type: "success",
-      });
+      return;
     }
+
+    addToast({
+      message: t("tenant.create-tenant-admin-successful"),
+      type: "success",
+    });
   }
 
   function goToBillingPortal() {

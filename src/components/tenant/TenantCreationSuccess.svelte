@@ -87,7 +87,7 @@
     if (error) {
       addToast({
         message: `${t("tenant.create-tenant-admin-failed")} - ${error.toString()}`,
-        type: "success",
+        type: "error",
       });
       return;
     }
@@ -200,51 +200,44 @@
           {t("reseller.created-tenant.create-admin-notes")}
         </p>
       </div>
-    </div>
 
-    <!-- Confirmation  -->
-    {#if showAdminSuccess}
-      <div transition:fade class="p-5 mb-8 bg-base-100 rounded-lg">
-        <h4 class="text-2xl font-bold mb-2">
-          {t("reseller.created-tenant.admin-user")}
-        </h4>
-        <div
-          role="alert"
-          class="alert alert-vertical sm:alert-horizontal bg-warning/30 mb-2"
-        >
-          <div class="text-warning">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-6 w-6 shrink-0 stroke-current"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
-          <div>
-            <h3 class="text-warning-content font-bold">
-              {t("reseller.created-tenant.status-sent")}
-            </h3>
-            <div class="text-xs">
-              <strong>{t("reseller.created-tenant.invitation-sent")}</strong>
-              <p>
-                {t("reseller.created-tenant.registered-success")}
-              </p>
+      <!-- Confirmation  -->
+      {#if !showAdminSuccess}
+        <div transition:fade class="mt-5">
+          <div
+            role="alert"
+            class="alert alert-vertical sm:alert-horizontal bg-warning/30 mb-2"
+          >
+            <div class="text-warning">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-6 w-6 shrink-0 stroke-current"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-warning-content font-bold">
+                {t("reseller.created-tenant.status-sent")}
+              </h3>
+              <div class="text-xs">
+                <strong>{t("reseller.created-tenant.invitation-sent")}</strong>
+                <p>
+                  {t("reseller.created-tenant.registered-success")}
+                </p>
+              </div>
             </div>
           </div>
         </div>
-
-        <p class="text-xs text-base-content/60">
-          {t("reseller.created-tenant.invitation-notes")}
-        </p>
-      </div>
-    {/if}
+      {/if}
+    </div>
   </div>
 </div>
 

@@ -281,9 +281,22 @@ export const tenant = {
   createAdminUser: defineAction({
     input: CreateTenantAdminSchema,
     handler: async (input) => {
+      // Validate tenant existence
       const tenant = await TenantModel.get(input._id);
       if (!tenant) throw new Error("Tenant does not exist.");
 
+      // Check tenant user limit before creating admin user
+      const {
+        included_user_limit: includedUserLimit,
+        extra_user_limit: extraUserLimit,
+      } = tenant;
+      const maxUserLimit = (includedUserLimit || 0) + (extraUserLimit || 0);
+      const countUsers = await UserModel.countUsersByTenant(input._id);
+      if (maxUserLimit && maxUserLimit > 0 && countUsers >= maxUserLimit) {
+        throw new Error("Tenant user limit has been reached.");
+      }
+
+      // Start transaction to create admin user and assign roles
       const session = client.startSession();
       session.startTransaction();
 
