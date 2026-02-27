@@ -12,15 +12,17 @@ const t = useTranslations();
 const allTags = await GlobalTagModel.list();
 const allCategories = await GlobalCategoryModel.list();
 
-const tags: TagItem[] = allTags.map((tag) => {
-  return {
-    title: tag.title,
-    value: tag._id.toString(),
-    description: tag.description,
-    icon: tag.icon,
-    iconColor: tag.iconColor,
-  };
-});
+const tags: TagItem[] = allTags
+  .filter((tag) => !tag.resellerCodes?.length)
+  .map((tag) => {
+    return {
+      title: tag.title,
+      value: tag._id.toString(),
+      description: tag.description,
+      icon: tag.icon,
+      iconColor: tag.iconColor,
+    };
+  });
 
 const categories: CategoryItem[] = allCategories.map((category) => {
   return {
