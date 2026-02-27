@@ -315,7 +315,7 @@ export const tenantCreation = {
             <p><strong>Contact:</strong> ${tenant.billing_info?.email ?? "-"}</p>
             <p><strong>Created:</strong> ${new Date().toLocaleDateString()}</p>
             <p><strong>Account created by:</strong> ${email}</p>
-            <p><strong>Flow:</strong> Internal</p>
+            <p><strong>Flow:</strong> ${isReseller ? "Reseller" : "Internal"}</p>
              ${
                isReseller
                  ? `<p><strong>Reseller:</strong> ${tenantName}</p>`
