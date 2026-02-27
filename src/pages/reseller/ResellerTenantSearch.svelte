@@ -33,7 +33,9 @@
 
   <div class="grid grid-cols-1 xl:grid-cols-12 gap-10">
     <div class="col-span-3 xl:col-span-4">
-      <p class="mb-1 text-base-content/80">{t("tenant.search-label")}</p>
+      <p class="mb-1 text-base-content/80">
+        {t("reseller.dashboard.search-label")}
+      </p>
       <label
         class="input input-bordered flex items-center gap-2 w-full max-w-sm
 "

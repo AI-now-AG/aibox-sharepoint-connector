@@ -895,6 +895,7 @@
   "reseller.dashboard.managed-tenant-title": "Übersicht Accounts",
   "reseller.dashboard.seach-place-holder": "Hier eingeben",
   "reseller.dashboard.filter-label": "Filters",
+  "reseller.dashboard.search-label": "Suche",
   "reseller.dashboard.tenant-name": "Anzeigename",
   "reseller.dashboard.tenant-subscription": "Abonnement",
   "reseller.dashboard.tenant-subscription-start": "Abo Start",

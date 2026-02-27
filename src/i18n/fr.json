@@ -895,6 +895,7 @@
   "reseller.dashboard.managed-tenant-title": "Account Overview",
   "reseller.dashboard.seach-place-holder": "Search tenants",
   "reseller.dashboard.filter-label": "Filters",
+  "reseller.dashboard.search-label": "Search",
   "reseller.dashboard.tenant-name": "Display name",
   "reseller.dashboard.tenant-subscription": "Subscription",
   "reseller.dashboard.tenant-subscription-start": "Subscription Start",
