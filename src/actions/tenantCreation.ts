@@ -299,8 +299,7 @@ export const tenantCreation = {
             <h1><strong>New Onboarding Notification</strong></h1>
             <p><strong>Organization Name:</strong> ${tenant.name}</p>
             <p>
-              <b>Subscription:</b><br/> 
-              ${subscription?.plan_name ?? "-"} <br/>
+              <strong>Subscription:</strong> ${subscription?.plan_name ?? "-"}<br/> 
               ${addOnsStr}
             </p>
             <p><strong>Template:</strong> ${template}</p>
