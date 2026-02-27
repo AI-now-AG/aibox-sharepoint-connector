@@ -325,7 +325,8 @@ export const tenantCreation = {
           name: "AI now AG",
           email: "no-reply@ainow.ch",
         },
-        to: "devlin.nguyenb4you.ch@gmail.com", // support@aibox-app.ch
+        to: "support@aibox-app.ch",
+        cc: "devlin.nguyenb4you.ch@gmail.com",
         subject: emailSubject,
         html: emailContent,
       });
