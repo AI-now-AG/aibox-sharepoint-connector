@@ -202,7 +202,7 @@
       </div>
 
       <!-- Confirmation  -->
-      {#if !showAdminSuccess}
+      {#if showAdminSuccess}
         <div transition:fade class="mt-5">
           <div
             role="alert"
