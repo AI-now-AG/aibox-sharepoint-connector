@@ -43,7 +43,9 @@ if (step == RoutePath.Step1) {
   const allCategories = await GlobalCategoryModel.list();
 
   tags = allTags
-    .filter((tag) => !tag.resellerCodes?.length)
+    .filter((tag) => {
+      return tag?.categories && tag.categories?.includes("self-onboarding");
+    })
     .map((tag) => {
       return {
         title: tag.title,
