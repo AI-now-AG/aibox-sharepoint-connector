@@ -174,13 +174,15 @@
         />
 
         <!-- RESELLER CODES -->
-        <ResellerCodesInput
-          title=""
-          placeholder="Reseller codes"
-          items={resellerCodes}
-          bind:selectedItems={tag.resellerCodes}
-          onchange={() => updateTag(tag)}
-        />
+        <div class="w-64">
+          <ResellerCodesInput
+            title=""
+            placeholder="Reseller codes"
+            items={resellerCodes}
+            bind:selectedItems={tag.resellerCodes}
+            onchange={() => updateTag(tag)}
+          />
+        </div>
 
         <!-- ICON PICKER -->
         <div class="relative flex justify-center items-center">
