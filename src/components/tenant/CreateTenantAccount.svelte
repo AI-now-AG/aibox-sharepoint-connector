@@ -201,7 +201,7 @@
     const selectedTemplate =
       tags.find((tag) => tag.value == selectedTag)?.title || "";
 
-    const { data, error } = await actions.onboarding.finalize({
+    const { data, error } = await actions.tenantCreation.finalize({
       tenant_id: newTenantId,
       template: selectedTemplate,
     });
