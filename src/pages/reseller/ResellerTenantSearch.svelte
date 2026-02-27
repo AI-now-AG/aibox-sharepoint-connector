@@ -27,7 +27,7 @@
   <div class="inline-flex items-center mb-2">
     {@html svgIcons.filter}
     <h3 class="ml-2 text-normal font-normal">
-      {t("tenant.filter-label")}
+      {t("reseller.dashboard.filter-label")}
     </h3>
   </div>
 
@@ -42,7 +42,7 @@
         <input
           type="text"
           class="grow"
-          placeholder={t("tenant.tenants.seach-place-holder")}
+          placeholder={t("reseller.dashboard.seach-place-holder")}
           oninput={preventDefault(onSearch)}
         />
       </label>

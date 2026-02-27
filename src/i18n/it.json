@@ -876,7 +876,6 @@
   "nav.reseller.dashboard": "Dashboard",
   "nav.reseller.create-account": "Create New Account",
   "reseller.create-account-title": "Create Tenant Account",
-  "reseller.managed-tenant-title": "Account Overview",
   "tenant.subscription-start": "Subscription Start",
   "tenant.cancellation-date": "Cancellation Date",
   "reseller.created-tenant.tenant-success-created": "Tenant successfully created!",
@@ -890,8 +889,15 @@
   "reseller.created-tenant.email-placeholder": "Administrator email address",
   "reseller.created-tenant.invite": "Invite",
   "reseller.created-tenant.create-admin-notes": "The administrator can add more users and roles later.",
-  "reseller.created-tenant.admin-user": "Admin User",
   "reseller.created-tenant.status-sent": "STATUS: SENT",
   "reseller.created-tenant.invitation-sent": "Invitation successfully sent!",
-  "reseller.created-tenant.registered-success": "User registered successfully. They will receive an email shortly to confirm access and set their password."
+  "reseller.created-tenant.registered-success": "User registered successfully. They will receive an email shortly to confirm access and set their password.",
+  "reseller.dashboard.managed-tenant-title": "Account Overview",
+  "reseller.dashboard.seach-place-holder": "Search tenants",
+  "reseller.dashboard.filter-label": "Filters",
+  "reseller.dashboard.tenant-name": "Display name",
+  "reseller.dashboard.tenant-subscription": "Subscription",
+  "reseller.dashboard.tenant-subscription-start": "Subscription Start",
+  "reseller.dashboard.tenant-cancellation-date": "Cancellation Date",
+  "reseller.dashboard.tenant-status": "Status"
 }

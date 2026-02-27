@@ -876,7 +876,6 @@
   "nav.reseller.dashboard": "Dashboard",
   "nav.reseller.create-account": "Neuen Account erstellen",
   "reseller.create-account-title": "Neuen Account erstellen",
-  "reseller.managed-tenant-title": "Übersicht Accounts",
   "tenant.subscription-start": "Abo Start",
   "tenant.cancellation-date": "Abo gekündigt",
   "reseller.created-tenant.tenant-success-created": "Neuen Kunden erfolgreich angelegt!",
@@ -890,8 +889,15 @@
   "reseller.created-tenant.email-placeholder": "E-Mail-Adresse des Administrators",
   "reseller.created-tenant.invite": "Einladen",
   "reseller.created-tenant.create-admin-notes": "Der Administrator kann später weitere Benutzer und Rollen hinzufügen.",
-  "reseller.created-tenant.admin-user": "Admin-Benutzer",
   "reseller.created-tenant.status-sent": "STATUS: GESENDET",
   "reseller.created-tenant.invitation-sent": "Einladung erfolgreich versendet!",
-  "reseller.created-tenant.registered-success": "Benutzer erfasst. Kunde erhält eine E-Mail, um den Zugriff zu bestätigen und ein Passwort zu setzen."
+  "reseller.created-tenant.registered-success": "Benutzer erfasst. Kunde erhält eine E-Mail, um den Zugriff zu bestätigen und ein Passwort zu setzen.",
+  "reseller.dashboard.managed-tenant-title": "Übersicht Accounts",
+  "reseller.dashboard.seach-place-holder": "Hier eingeben",
+  "reseller.dashboard.filter-label": "Filters",
+  "reseller.dashboard.tenant-name": "Anzeigename",
+  "reseller.dashboard.tenant-subscription": "Abonnement",
+  "reseller.dashboard.tenant-subscription-start": "Abo Start",
+  "reseller.dashboard.tenant-cancellation-date": "Abo gekündigt",
+  "reseller.dashboard.tenant-status": "Status"
 }
