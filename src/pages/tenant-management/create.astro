@@ -13,7 +13,7 @@ const allTags = await GlobalTagModel.list();
 const allCategories = await GlobalCategoryModel.list();
 
 const tags: TagItem[] = allTags
-  .filter((tag) => !tag.resellerCodes?.length)
+  //.filter((tag) => !tag.resellerCodes?.length)
   .map((tag) => {
     return {
       title: tag.title,
