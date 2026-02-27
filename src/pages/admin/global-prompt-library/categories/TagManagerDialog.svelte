@@ -35,6 +35,7 @@
       description: item.description ?? "",
       icon: item.icon ?? "🇨🇭",
       iconColor: item.iconColor ?? "#491EFF",
+      resellerCodes: item.resellerCodes ?? [],
     }));
     loading = false;
   }
