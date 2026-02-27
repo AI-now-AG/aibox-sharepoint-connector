@@ -67,8 +67,10 @@
   }
 
   async function finalizeSubscription(newTenantId: string) {
+    const selectedTags = $subscription.organizationInfo?.selectedTags ?? [];
     const { data, error } = await actions.onboarding.finalize({
       tenant_id: newTenantId,
+      tags: selectedTags,
     });
 
     if (error) throw new Error(t("subscription.finalize-subsciption-failed"));

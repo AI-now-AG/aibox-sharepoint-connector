@@ -11,6 +11,7 @@ import CategoryModel, {
 import PromptModel from "$data/models/prompt.model";
 import GlobalCategoryModel from "$data/models/globalCategory.model";
 import GlobalPromptModel from "$data/models/globalPrompt.model";
+import GlobalTagModel from "$data/models/globalTag.model";
 import SubscriptionModel, {
   type Subscription,
 } from "$data/models/subscription.model";
@@ -26,6 +27,7 @@ import {
   BillingMethod,
   type ProductKeys,
   CountryCode,
+  BillingMethodLabels,
 } from "$types/Subscription";
 import { UserRole, TourType } from "$types/Users";
 import { TenantFeature } from "$types/TenantFeature";
@@ -104,8 +106,9 @@ const TenantInputParamsSchema = z.object({
   stripe_customer_id: z.string().optional(),
   totalPrice: z.string().optional(),
 });
-const TenantEmailInputParamsSchema = z.object({
+const FinalizeTenantSchema = z.object({
   tenant_id: z.string().min(1),
+  tags: z.array(z.string()),
 });
 
 // step 1: createOrganization()  - Create Auth0 organization
@@ -387,7 +390,9 @@ export const onboarding = {
         created_at: new Date(),
         updated_at: new Date(),
         // Vector KB fields (no data cloned, start empty)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         vector_kb_enabled: (prompt as any).vector_kb_enabled ?? false,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         vector_kb_scope: (prompt as any).vector_kb_scope ?? null,
         vector_kb_folder_ids: [],
         vector_kb_data_source_ids: [],
@@ -437,9 +442,9 @@ export const onboarding = {
     },
   }),
   finalize: defineAction({
-    input: TenantEmailInputParamsSchema,
+    input: FinalizeTenantSchema,
     handler: async (input, context) => {
-      const { tenant_id: tenantId } = input;
+      const { tenant_id: tenantId, tags: selectedTags } = input;
       const email = context.locals.user.email;
       const tenant = await TenantModel.get(tenantId);
       const subscription = await SubscriptionModel.findByTenant(tenantId);
@@ -453,26 +458,32 @@ export const onboarding = {
           return AudioOptionLabels[name];
         })
         .join(", ");
+      const tag = await GlobalTagModel.get(selectedTags[0] || "");
 
       // send notification email to aibox-support
       const subjectPrefix = isProd() ? "aibox" : "aibox-dev";
       const emailSubject = `${subjectPrefix} - New onboarding`;
       const emailContent = `
         <div style="font-family: Arial, sans-serif; padding: 20px;">
-          <h1><b>New Onboarding Notification</b></h1>
-          <p><b>Organization ID:</b> ${tenant.org_id}</p>
-          <p><b>Organization Name:</b> ${tenant.name}</p>
+          <h1><strong>New Onboarding Notification</strong></h1>
+          <p><strong>Organization Name:</strong> ${tenant.name}</p>
+          <p>
+            <b>Subscription:</b><br/> 
+            ${subscription?.plan_name ?? "-"} <br/>
+            ${addOnsStr}
+          </p>
+          <p><strong>Template:</strong> ${tag?.title ?? "-"}</p>
+          <p><strong>Billing:</strong> ${BillingMethodLabels[tenant.billing_method as BillingMethod] ?? "-"}</p>
           <br/><br/>
-          <h4>Subscription</h4>
-          <p><b>${subscription?.plan_name ?? "-"}</b></p>
-          <p>${addOnsStr}</p>
-          <br/><br/>
-          <h4>Billing</h4>
-          <p><b>Company name:</b> ${tenant.billing_info?.company_name ?? "-"}</p>
-          <p><b>Address:</b> ${tenant.billing_info?.address ?? "-"}</p>
-          <p><b>Zip code:</b> ${tenant.billing_info?.zip_code ?? "-"}</p>
-          <p><b>Location:</b> ${tenant.billing_info?.location ?? "-"}</p>
-          <p><b>Email:</b> ${tenant.billing_info?.email ?? "-"}</p>
+          <p>
+            <strong>Company details:</strong> <br/>
+            ${tenant.billing_info?.company_name ?? "-"} <br/>
+            ${tenant.billing_info?.address ?? "-"} ${tenant.billing_info?.zip_code ?? "-"} <br/>
+            ${tenant.billing_info?.location ?? "-"}
+          </p>
+          <p><strong>Contact:</strong> ${tenant.billing_info?.email ?? "-"}</p>
+          <p><strong>Created:</strong> ${new Date().toLocaleDateString()}</p>
+          <p><strong>Flow:</strong> onboarding</p>
         </div>
       `;
       await sendMail({
