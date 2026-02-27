@@ -145,6 +145,7 @@ export const tenantCreation = {
         audio_assistant_active: true,
         subtitle_studio_active: subtitleStudioActive,
         totalPrice: tenant.totalPrice,
+        is_internal: false,
         owned_by_reseller: isReseller ? resellerCode : null,
         included_user_limit: includedUserLimit, // default included users
         vector_kb_enabled: true,

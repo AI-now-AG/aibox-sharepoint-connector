@@ -302,7 +302,7 @@
         </div>
 
         <div class="flex-1 flex flex-col mb-4">
-          {#if !isSomedia}
+          {#if !isReseller}
             <ThemeItem
               title={`${t("tenant.theme")}*`}
               placeholder="e.g Light"

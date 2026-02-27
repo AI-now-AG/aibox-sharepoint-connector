@@ -317,6 +317,7 @@ export const onboarding = {
         audio_assistant_active: true,
         subtitle_studio_active: subtitleStudioActive,
         totalPrice: "",
+        is_internal: false,
         included_user_limit: includedUserLimit, // default included users
         vector_kb_enabled: true,
         vector_kb_max_storage_mb: includedKbMB,
