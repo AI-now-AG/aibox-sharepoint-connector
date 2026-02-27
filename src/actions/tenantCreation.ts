@@ -292,8 +292,8 @@ export const tenantCreation = {
         .join(", ");
 
       // send notification email to aibox-support
-      const subjectPrefix = isProd() ? "aibox" : "aibox-dev";
-      const emailSubject = `${subjectPrefix} - New onboarding`;
+      const subjectPrefix = isProd() ? "[aibox]" : "[aibox-dev]";
+      const emailSubject = `${subjectPrefix} Tenant Created - ${tenant.name}`;
       const emailContent = `
           <div style="font-family: Arial, sans-serif; padding: 20px;">
             <h3><strong>Tenant successfully created</strong></h3>
