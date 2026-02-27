@@ -66,11 +66,12 @@
     return data;
   }
 
-  async function finalizeSubscription(newTenantId: string) {
-    const selectedTags = $subscription.organizationInfo?.selectedTags ?? [];
+  async function finalizeTenantSetup(newTenantId: string) {
+    const selectedTemplate =
+      $subscription.organizationInfo?.selectedTemplate ?? "";
     const { data, error } = await actions.onboarding.finalize({
       tenant_id: newTenantId,
-      tags: selectedTags,
+      template: selectedTemplate,
     });
 
     if (error) throw new Error(t("subscription.finalize-subsciption-failed"));
@@ -96,8 +97,8 @@
       // Step 3: Setup Tenant
       const tenant = await setupTenantData(organization.id, organization.name);
 
-      // Step 4: Finalize
-      await finalizeSubscription(tenant.id);
+      // Step 4: Finalize Tenant Setup
+      await finalizeTenantSetup(tenant.id);
 
       // After successful subscription creation, reset the subscription store
       $subscription = {};

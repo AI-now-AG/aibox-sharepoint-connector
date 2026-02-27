@@ -11,7 +11,6 @@ import CategoryModel, {
 import PromptModel from "$data/models/prompt.model";
 import GlobalCategoryModel from "$data/models/globalCategory.model";
 import GlobalPromptModel from "$data/models/globalPrompt.model";
-import GlobalTagModel from "$data/models/globalTag.model";
 import SubscriptionModel, {
   type Subscription,
 } from "$data/models/subscription.model";
@@ -108,7 +107,7 @@ const TenantInputParamsSchema = z.object({
 });
 const FinalizeTenantSchema = z.object({
   tenant_id: z.string().min(1),
-  tags: z.array(z.string()),
+  template: z.string().optional(),
 });
 
 // step 1: createOrganization()  - Create Auth0 organization
@@ -444,7 +443,7 @@ export const onboarding = {
   finalize: defineAction({
     input: FinalizeTenantSchema,
     handler: async (input, context) => {
-      const { tenant_id: tenantId, tags: selectedTags } = input;
+      const { tenant_id: tenantId, template } = input;
       const email = context.locals.user.email;
       const tenant = await TenantModel.get(tenantId);
       const subscription = await SubscriptionModel.findByTenant(tenantId);
@@ -458,7 +457,6 @@ export const onboarding = {
           return AudioOptionLabels[name];
         })
         .join(", ");
-      const tag = await GlobalTagModel.get(selectedTags[0] || "");
 
       // send notification email to aibox-support
       const subjectPrefix = isProd() ? "aibox" : "aibox-dev";
@@ -472,18 +470,18 @@ export const onboarding = {
             ${subscription?.plan_name ?? "-"} <br/>
             ${addOnsStr}
           </p>
-          <p><strong>Template:</strong> ${tag?.title ?? "-"}</p>
+          <p><strong>Template:</strong> ${template}</p>
           <p><strong>Billing:</strong> ${BillingMethodLabels[tenant.billing_method as BillingMethod] ?? "-"}</p>
           <br/><br/>
           <p>
             <strong>Company details:</strong> <br/>
             ${tenant.billing_info?.company_name ?? "-"} <br/>
-            ${tenant.billing_info?.address ?? "-"} ${tenant.billing_info?.zip_code ?? "-"} <br/>
-            ${tenant.billing_info?.location ?? "-"}
+            ${tenant.billing_info?.address ?? "-"} <br/>
+            ${tenant.billing_info?.zip_code ?? "-"} ${tenant.billing_info?.zip_code ?? "-"} ${tenant.billing_info?.location ?? "-"}
           </p>
           <p><strong>Contact:</strong> ${tenant.billing_info?.email ?? "-"}</p>
           <p><strong>Created:</strong> ${new Date().toLocaleDateString()}</p>
-          <p><strong>Flow:</strong> onboarding</p>
+          <p><strong>Flow:</strong>Self Onboarding</p>
         </div>
       `;
       await sendMail({

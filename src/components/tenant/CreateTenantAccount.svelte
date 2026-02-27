@@ -191,10 +191,22 @@
       tenant: tenantInput,
       config: tenantConfig,
     });
-
     console.log("setupTenantData respone", { data, error });
 
     if (error) throw new Error(t("tenant.setup-tenant-data-failed"));
+    return data;
+  }
+
+  async function finalizeTenantSetup(newTenantId: string) {
+    const selectedTemplate =
+      tags.find((tag) => tag.value == selectedTag)?.title || "";
+
+    const { data, error } = await actions.onboarding.finalize({
+      tenant_id: newTenantId,
+      template: selectedTemplate,
+    });
+
+    if (error) throw new Error(t("subscription.finalize-subsciption-failed"));
     return data;
   }
 
@@ -221,14 +233,18 @@
     if (validateForm()) {
       try {
         loading = true;
-        // Step 1: Create [Auth0] Organization
+        // Step 1: Create Auth0 Organization
         const organization = await createOrganization();
-        // Step 2: Setup [AIBOX] Tenant
+
+        // Step 2: Setup Tenant Data
         const tenant = await setupTenantData(
           organization.id,
           organization.name,
           organization.display_name,
         );
+
+        // Step 3: Finalize Tenant Setup
+        await finalizeTenantSetup(tenant.id);
 
         if (tenant) {
           addToast({

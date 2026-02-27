@@ -19,13 +19,16 @@ import TranscriptionModel, {
 import {
   SubscriptionPackageId,
   AudioOptionId,
+  AudioOptionLabels,
   SubscriptionIncludedUsers,
   SubscriptionIncludedKbMB,
   BillingMethod,
   CountryCode,
+  BillingMethodLabels,
 } from "$types/Subscription";
 import { TenantFeature, ThemeCode } from "$types/TenantFeature";
 import organizationsManagement from "$data/auth0/organizations-manager";
+import sendMail from "$utils/mail";
 import { isProd } from "$utils/env";
 import { randomString } from "$utils/common";
 import { getTranscriptionTypes, hasSubtitleEditor } from "$utils/onboarding";
@@ -66,8 +69,14 @@ const TenantInputParamsSchema = z.object({
   billing_info: BillingInfoParamsSchema,
 });
 
+const FinalizeTenantSchema = z.object({
+  tenant_id: z.string().min(1),
+  template: z.string().optional(),
+});
+
 // step 1: createOrganization()  - Create Auth0 organization
 // step 2: setupTenantData() - Clone tenant, override configs & import categories / prompts
+// step 3: finalize()  - Send notification emails
 
 export const tenantCreation = {
   createOrganization: defineAction({
@@ -259,6 +268,71 @@ export const tenantCreation = {
       };
 
       return transformRawData(data);
+    },
+  }),
+  finalize: defineAction({
+    input: FinalizeTenantSchema,
+    handler: async (input, context) => {
+      const { tenant_id: tenantId, template } = input;
+      const email = context.locals.user.email;
+      const tenant = await TenantModel.get(tenantId);
+      const subscription = await SubscriptionModel.findByTenant(tenantId);
+
+      if (!tenant) {
+        throw new Error("Tenant not found.");
+      }
+
+      const addOnsStr = subscription?.add_ons
+        ?.map((name: AudioOptionId) => {
+          return AudioOptionLabels[name];
+        })
+        .join(", ");
+
+      // send notification email to aibox-support
+      const subjectPrefix = isProd() ? "aibox" : "aibox-dev";
+      const emailSubject = `${subjectPrefix} - New onboarding`;
+      const emailContent = `
+          <div style="font-family: Arial, sans-serif; padding: 20px;">
+            <h1><strong>New Onboarding Notification</strong></h1>
+            <p><strong>Organization Name:</strong> ${tenant.name}</p>
+            <p>
+              <b>Subscription:</b><br/> 
+              ${subscription?.plan_name ?? "-"} <br/>
+              ${addOnsStr}
+            </p>
+            <p><strong>Template:</strong> ${template}</p>
+            <p><strong>Billing:</strong> ${BillingMethodLabels[tenant.billing_method as BillingMethod] ?? "-"}</p>
+            <br/><br/>
+            <p>
+              <strong>Company details:</strong> <br/>
+              ${tenant.billing_info?.company_name ?? "-"} <br/>
+              ${tenant.billing_info?.address ?? "-"}<br/>
+              ${tenant.billing_info?.zip_code ?? "-"} ${tenant.billing_info?.location ?? "-"}
+            </p>
+            <p><strong>Contact:</strong> ${tenant.billing_info?.email ?? "-"}</p>
+            <p><strong>Created:</strong> ${new Date().toLocaleDateString()}</p>
+            <p><strong>Account created by:</strong> ${email}</p>
+            <p><strong>Flow:</strong> Internal</p>
+             ${
+               tenant.is_reseller
+                 ? `<p><strong>Reseller:</strong> ${tenant.name}</p>`
+                 : ""
+             }
+          </div>
+        `;
+      await sendMail({
+        from: {
+          name: "AI now AG",
+          email: "no-reply@ainow.ch",
+        },
+        to: "support@aibox-app.ch",
+        subject: emailSubject,
+        html: emailContent,
+      });
+
+      return transformRawData({
+        success: true,
+      });
     },
   }),
 };

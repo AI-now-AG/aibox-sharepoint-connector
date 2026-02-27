@@ -65,11 +65,14 @@
 
   function handleNext() {
     if (validateForm()) {
+      const selectedTemplate =
+        tags.find((tag) => tag.value == selectedTag)?.title || "";
       storeOrganizationInfo({
         organizationName,
         defaultLanguage: selectedLanguage || LanguageCode.De,
         selectedTags: selectedTag ? [selectedTag] : [],
         selectedCategories,
+        selectedTemplate,
       });
 
       posthogClientCaptureWithoutTenant(EventName.AiboxOnboardingStep1, {
