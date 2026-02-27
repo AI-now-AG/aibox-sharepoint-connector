@@ -17,15 +17,22 @@ const allTags = await GlobalTagModel.list();
 const allCategories = await GlobalCategoryModel.list();
 const somediaTenantId = isProd() ? TENANT_SOMEDIA.PROD : TENANT_SOMEDIA.DEV;
 
-const tags: TagItem[] = allTags.map((tag) => {
-  return {
-    title: tag.title,
-    value: tag._id.toString(),
-    description: tag.description,
-    icon: tag.icon,
-    iconColor: tag.iconColor,
-  };
-});
+const isReseller = Astro.locals.tenant?.is_reseller ?? false;
+const resellerCode = Astro.locals.tenant?.reseller_code ?? null;
+const isSomedia =
+  isReseller && somediaTenantId == Astro.locals.tenant?._id.toString();
+
+const tags: TagItem[] = allTags.filter((tag) => {
+    return tag?.resellerCodes && tag.resellerCodes?.includes(resellerCode || "");
+  }).map((tag) => {
+    return {
+      title: tag.title,
+      value: tag._id.toString(),
+      description: tag.description,
+      icon: tag.icon,
+      iconColor: tag.iconColor,
+    };
+  });
 
 const categories: CategoryItem[] = allCategories.map((category) => {
   return {
@@ -35,10 +42,7 @@ const categories: CategoryItem[] = allCategories.map((category) => {
   };
 });
 
-const isReseller = Astro.locals.tenant?.is_reseller ?? false;
-const resellerCode = Astro.locals.tenant?.reseller_code ?? null;
-const isSomedia =
-  isReseller && somediaTenantId == Astro.locals.tenant?._id.toString();
+// Check if user is reseller
 if (!isReseller || !auth.isReseller(Astro.locals)) {
   return Astro.rewrite("/restricted");
 }
