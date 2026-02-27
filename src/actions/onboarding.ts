@@ -472,7 +472,7 @@ export const onboarding = {
           </p>
           <p><strong>Template:</strong> ${template}</p>
           <p><strong>Billing:</strong> ${BillingMethodLabels[tenant.billing_method as BillingMethod] ?? "-"}</p>
-          <br/><br/>
+          <br/>
           <p>
             <strong>Company details:</strong> <br/>
             ${tenant.billing_info?.company_name ?? "-"} <br/>
