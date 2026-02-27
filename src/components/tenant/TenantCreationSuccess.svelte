@@ -6,7 +6,6 @@
   import { isValidEmail } from "$utils/common";
   import { getSubscriptionAddOnName } from "$utils/subscription";
   import { svgIcons } from "$assets/icons";
-  import { addToast } from "$stores/toast";
   import Loading from "$components/Loading.svelte";
 
   interface Props {
@@ -25,6 +24,7 @@
   let loading = $state(false);
   let isFormValid = $derived(adminEmail !== "" && isValidEmail(adminEmail));
 
+  let showAdminError = $state(false);
   let showAdminSuccess = $state(false);
 
   onMount(() => {
@@ -74,6 +74,7 @@
   async function createAdmin() {
     loading = true;
     showAdminSuccess = false;
+    showAdminError = false;
 
     const { data, error } = await actions.tenant.createAdminUser({
       _id: tenantId,
@@ -85,10 +86,10 @@
     adminEmail = "";
 
     if (error) {
-      addToast({
-        message: `${t("tenant.create-tenant-admin-failed")} - ${error.toString()}`,
-        type: "error",
-      });
+      showAdminError = true;
+      console.warn(
+        `${t("tenant.create-tenant-admin-failed")} - ${error.toString()}`,
+      );
       return;
     }
 
@@ -201,7 +202,7 @@
         </p>
       </div>
 
-      <!-- Confirmation  -->
+      <!-- Confirmation && Error Handling  -->
       {#if showAdminSuccess}
         <div transition:fade class="mt-5">
           <div
@@ -234,6 +235,33 @@
                 </p>
               </div>
             </div>
+          </div>
+        </div>
+      {/if}
+      {#if showAdminError}
+        <div class="alert alert-warning mt-6 animate-fade-in">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6 shrink-0 stroke-current"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+            />
+          </svg>
+          <span>{t("reseller.created-tenant.user-reached-limit")}</span>
+          <div class="ml-auto">
+            <button
+              class="btn btn-sm btn-ghost btn-circle"
+              onclick={() => (showAdminError = false)}
+              aria-label="Close"
+            >
+              ✕
+            </button>
           </div>
         </div>
       {/if}
