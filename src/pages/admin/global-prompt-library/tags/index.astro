@@ -1,11 +1,14 @@
 ---
 import Layout from "$layouts/Layout.astro";
-import TagManagerFrom from "./TagManagerFrom.svelte";
+import TenantModel from "$data/models/tenant.model";
+import TagManagerForm from "./TagManagerForm.svelte";
+
+const resellerCodes = await TenantModel.listAllResellerCodes();
 ---
 
 <Layout>
   <div>
-    <TagManagerFrom client:load />
+    <TagManagerForm {resellerCodes} client:load />
   </div>
 </Layout>
 
