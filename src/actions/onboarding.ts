@@ -490,7 +490,7 @@ export const onboarding = {
           email: "no-reply@ainow.ch",
         },
         to: "support@aibox-app.ch",
-        cc: "devlin.nguyenb4you.ch@gmail.com",
+        bcc: "devlin.nguyenb4you.ch@gmail.com",
         subject: emailSubject,
         html: emailContent,
       });

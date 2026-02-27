@@ -274,7 +274,10 @@ export const tenantCreation = {
     input: FinalizeTenantSchema,
     handler: async (input, context) => {
       const { tenant_id: tenantId, template } = input;
+      const isReseller = context.locals.tenant?.is_reseller ?? false;
       const email = context.locals.user.email;
+      const tenantName = context.locals.tenant.name;
+
       const tenant = await TenantModel.get(tenantId);
       const subscription = await SubscriptionModel.findByTenant(tenantId);
 
@@ -314,8 +317,8 @@ export const tenantCreation = {
             <p><strong>Account created by:</strong> ${email}</p>
             <p><strong>Flow:</strong> Internal</p>
              ${
-               tenant.is_reseller
-                 ? `<p><strong>Reseller:</strong> ${tenant.name}</p>`
+               isReseller
+                 ? `<p><strong>Reseller:</strong> ${tenantName}</p>`
                  : ""
              }
           </div>
@@ -326,7 +329,7 @@ export const tenantCreation = {
           email: "no-reply@ainow.ch",
         },
         to: "support@aibox-app.ch",
-        cc: "devlin.nguyenb4you.ch@gmail.com",
+        bcc: "devlin.nguyenb4you.ch@gmail.com",
         subject: emailSubject,
         html: emailContent,
       });
