@@ -400,7 +400,7 @@ if (auth.isSuperAdmin(Astro.locals)) {
   });
 }
 
-if (isReseller && auth.isReseller(Astro.locals)) {
+if (isReseller && (auth.isReseller(Astro.locals) || auth.isSuperAdmin(Astro.locals) || auth.isAdmin(Astro.locals))) {
   resellerMenus.push({
     title: t("nav.reseller"),
     icon: svgIcons.storefront,

@@ -15,12 +15,18 @@ const t = useTranslations();
 
 const allTags = await GlobalTagModel.list();
 const allCategories = await GlobalCategoryModel.list();
-const somediaTenantId = isProd() ? TENANT_SOMEDIA_ID.PROD : TENANT_SOMEDIA_ID.DEV;
+const somediaTenantId = isProd()
+  ? TENANT_SOMEDIA_ID.PROD
+  : TENANT_SOMEDIA_ID.DEV;
 
 const isReseller = Astro.locals.tenant?.is_reseller ?? false;
 const resellerCode = Astro.locals.tenant?.reseller_code ?? null;
 const isSomedia =
   isReseller && somediaTenantId == Astro.locals.tenant?._id.toString();
+const hasAccess =
+  auth.isReseller(Astro.locals) ||
+  auth.isSuperAdmin(Astro.locals) ||
+  auth.isAdmin(Astro.locals);
 
 const tags: TagItem[] = allTags
   .filter((tag) => {
@@ -45,7 +51,7 @@ const categories: CategoryItem[] = allCategories.map((category) => {
 });
 
 // Check if user is reseller
-if (!isReseller || !auth.isReseller(Astro.locals)) {
+if (!isReseller || !hasAccess) {
   return Astro.rewrite("/restricted");
 }
 
