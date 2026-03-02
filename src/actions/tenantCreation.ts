@@ -327,7 +327,7 @@ export const tenantCreation = {
           email: "no-reply@ainow.ch",
         },
         to: "support@aibox-app.ch",
-        bcc: "devlin.nguyenb4you.ch@gmail.com",
+        //bcc: "devlin.nguyenb4you.ch@gmail.com",
         subject: emailSubject,
         html: emailContent,
       });
