@@ -297,30 +297,28 @@ export const tenantCreation = {
       const emailContent = `
           <div style="font-family: Arial, sans-serif; padding: 20px;">
             <h3><strong>Tenant successfully created</strong></h3>
-            <p>The following tenant has been created and onboarding has been completed.</p><br/><br/>
-            <p><strong>Organization Name:</strong> ${tenant.name}</p>
             <p>
+              <strong>Organization Name:</strong> ${tenant.name}
               <strong>Subscription:</strong> ${subscription?.plan_name ?? "-"}<br/> 
-              ${addOnsStr}
+              ${addOnsStr ? `${addOnsStr}<br/>` : ""}
+              <strong>Template:</strong> ${template} <br/> 
+              <strong>Billing:</strong> ${BillingMethodLabels[tenant.billing_method as BillingMethod] ?? "-"}
             </p>
-            <p><strong>Template:</strong> ${template}</p>
-            <p><strong>Billing:</strong> ${BillingMethodLabels[tenant.billing_method as BillingMethod] ?? "-"}</p>
-            <br/>
+
             <p>
               <strong>Company details:</strong> <br/>
               ${tenant.billing_info?.company_name ?? "-"} <br/>
               ${tenant.billing_info?.address ?? "-"}<br/>
               ${tenant.billing_info?.zip_code ?? "-"} ${tenant.billing_info?.location ?? "-"}
             </p>
-            <p><strong>Contact:</strong> ${tenant.billing_info?.email ?? "-"}</p>
-            <p><strong>Created:</strong> ${new Date().toLocaleDateString()}</p>
-            <p><strong>Account created by:</strong> ${email}</p>
-            <p><strong>Flow:</strong> ${isReseller ? "Reseller" : "Internal"}</p>
-             ${
-               isReseller
-                 ? `<p><strong>Reseller:</strong> ${tenantName}</p>`
-                 : ""
-             }
+
+            <p>
+              <strong>Contact:</strong> ${tenant.billing_info?.email ?? "-"}<br/>
+              <strong>Created:</strong> ${new Date().toLocaleDateString()}<br/>
+              <strong>Account created by:</strong> ${email}<br/>
+              <strong>Flow:</strong> ${isReseller ? "Reseller" : "Internal"}<br/>
+              ${isReseller ? `<strong>Reseller:</strong> ${tenantName}` : ""}
+            </p>
           </div>
         `;
       await sendMail({
