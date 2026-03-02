@@ -298,7 +298,7 @@ export const tenantCreation = {
           <div style="font-family: Arial, sans-serif; padding: 20px;">
             <h3><strong>Tenant successfully created</strong></h3>
             <p>
-              <strong>Organization Name:</strong> ${tenant.name}
+              <strong>Organization Name:</strong> ${tenant.name}<br/> 
               <strong>Subscription:</strong> ${subscription?.plan_name ?? "-"}<br/> 
               ${addOnsStr ? `${addOnsStr}<br/>` : ""}
               <strong>Template:</strong> ${template} <br/> 
