@@ -242,17 +242,12 @@ const triggerRegistrationEmail = async (
   const resellerTenant = await TenantModel.getByResellerCode(
     tenant.owned_by_reseller,
   );
-  if (!resellerTenant) {
-    await sendPasswordResetEmail(userId, email);
-    return;
-  }
 
   const somediaTenantId = isProd()
     ? TENANT_SOMEDIA_ID.PROD
     : TENANT_SOMEDIA_ID.DEV;
-
   const templateId =
-    resellerTenant._id?.toString() === somediaTenantId
+    resellerTenant?._id?.toString() === somediaTenantId
       ? SG_SOMEDIA_PASSWORD_TEMPLATE
       : undefined;
 
