@@ -225,18 +225,38 @@ const triggerRegistrationEmail = async (
   if (isSignup == true) {
     // Send user verification email
     await sendVerificationEmail(userId, email);
-  } else {
-    // For Somedia tenant, send a customized password reset email with different template
-    const localUser = await UserModel.getAuth0Sub(userId);
-    const somediaTenantId = isProd()
-      ? TENANT_SOMEDIA_ID.PROD
-      : TENANT_SOMEDIA_ID.DEV;
-    const templateId =
-      localUser?.tenant_id?.toString() == somediaTenantId
-        ? SG_SOMEDIA_PASSWORD_TEMPLATE
-        : null;
-    await sendPasswordResetEmail(userId, email, templateId);
+    return;
   }
+
+  // Existing user → password reset flow
+  const localUser = await UserModel.getAuth0Sub(userId);
+  if (!localUser) return;
+
+  const tenant = await TenantModel.get(localUser.tenant_id);
+  if (!tenant?.owned_by_reseller) {
+    await sendPasswordResetEmail(userId, email);
+    return;
+  }
+
+  // Use different email template for Somedia tenant
+  const resellerTenant = await TenantModel.getByResellerCode(
+    tenant.owned_by_reseller,
+  );
+  if (!resellerTenant) {
+    await sendPasswordResetEmail(userId, email);
+    return;
+  }
+
+  const somediaTenantId = isProd()
+    ? TENANT_SOMEDIA_ID.PROD
+    : TENANT_SOMEDIA_ID.DEV;
+
+  const templateId =
+    resellerTenant._id?.toString() === somediaTenantId
+      ? SG_SOMEDIA_PASSWORD_TEMPLATE
+      : undefined;
+
+  await sendPasswordResetEmail(userId, email, templateId);
 };
 
 const triggerSignupAlertEmail = async (
