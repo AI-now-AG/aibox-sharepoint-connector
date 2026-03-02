@@ -1,11 +1,18 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { navigate } from "astro:transitions/client";
   import { svgIcons } from "$assets/icons";
   import { type TagItem } from "$types/TagInput";
   import { useTranslations } from "$i18n/utils";
   import { bgOpacity } from "$utils/common";
+  import CategoriesInput from "./CategoriesInput.svelte";
   import Loading from "$components/Loading.svelte";
+
+  interface Props {
+    resellerCodes: string[];
+  }
+
+  let { resellerCodes = [] }: Props = $props();
+  const categories = ["self-onboarding", ...resellerCodes];
 
   const t = useTranslations();
 
@@ -19,6 +26,11 @@
   let iconPickerDialog: HTMLDialogElement;
   let selectedTag: TagItem | null = null;
 
+  onMount(() => {
+    loadTags();
+    setupEmojiPicker();
+  });
+
   async function loadTags() {
     loading = true;
     const res = await fetch("/api/admin/global-tags.json");
@@ -30,6 +42,7 @@
       description: item.description ?? "",
       icon: item.icon ?? "🇨🇭",
       iconColor: item.iconColor ?? "#491EFF",
+      categories: item.categories ?? [],
     }));
     loading = false;
   }
@@ -113,11 +126,6 @@
       }
     }
   }
-
-  onMount(() => {
-    loadTags();
-    setupEmojiPicker();
-  });
 </script>
 
 <div
@@ -165,6 +173,16 @@
           bind:value={tag.description}
           onblur={() => updateTag(tag)}
         />
+
+        <!-- RESELLER CODES -->
+        <div class="w-64">
+          <CategoriesInput
+            placeholder="Select categories"
+            items={categories}
+            bind:selectedItems={tag.categories}
+            onchange={() => updateTag(tag)}
+          />
+        </div>
 
         <!-- ICON PICKER -->
         <div class="relative flex justify-center items-center">

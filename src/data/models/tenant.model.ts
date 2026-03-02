@@ -42,6 +42,7 @@ export const BillingInfoSchema = z.object({
   address: z.string().optional(),
   zip_code: z.string().optional(),
   location: z.string().optional(),
+  country: z.string().optional(),
   email: z.string().optional(),
 });
 

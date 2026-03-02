@@ -10,6 +10,14 @@ const ROLE_PRIORITY = [
   [UserRole.User, "user.user"],
 ] as const;
 
+const ROLE_MAP: Record<UserRole, UserRole> = {
+  [UserRole.SuperAdmin]: UserRole.SuperAdmin,
+  [UserRole.Admin]: UserRole.Admin,
+  [UserRole.Reseller]: UserRole.Reseller,
+  [UserRole.SuperUser]: UserRole.SuperUser,
+  [UserRole.User]: UserRole.User,
+};
+
 export function getRoleString(roles: UserRole[] = []) {
   for (const [role, key] of ROLE_PRIORITY) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -17,3 +25,13 @@ export function getRoleString(roles: UserRole[] = []) {
   }
   return t("user.user");
 }
+
+export const resolveUserRole = (roles: UserRole[] = []): UserRole => {
+  for (const role of roles) {
+    if (ROLE_MAP[role]) {
+      return ROLE_MAP[role];
+    }
+  }
+
+  return UserRole.User;
+};

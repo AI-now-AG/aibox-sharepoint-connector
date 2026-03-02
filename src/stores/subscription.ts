@@ -56,6 +56,7 @@ interface OrganizationInformation {
   defaultLanguage: string;
   selectedTags: string[];
   selectedCategories: string[];
+  selectedTemplate: string | null;
 }
 
 interface StripeCheckout {

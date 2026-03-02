@@ -7,7 +7,7 @@
   import { bgOpacity } from "$utils/common";
 
   interface Props {
-    tagDialog?: HTMLDialogElement;
+    tagDialog: HTMLDialogElement;
   }
 
   let { tagDialog = $bindable() }: Props = $props();
@@ -35,6 +35,7 @@
       description: item.description ?? "",
       icon: item.icon ?? "🇨🇭",
       iconColor: item.iconColor ?? "#491EFF",
+      categories: item.categories ?? [],
     }));
     loading = false;
   }
@@ -205,7 +206,7 @@
 
         <!-- DELETE -->
         <button
-           class="btn btn-sm w-[46px] flex justify-center items-center text-red-600 hover:bg-gray-200 bg-red-200"
+          class="btn btn-sm w-[46px] flex justify-center items-center text-red-600 hover:bg-gray-200 bg-red-200"
           onclick={() => deleteTag(tag._id)}
         >
           {@html svgIcons.trash}

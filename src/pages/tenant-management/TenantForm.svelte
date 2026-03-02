@@ -36,7 +36,7 @@
   } from "$types/Subscription";
   import Dropdown from "$components/form/Dropdown.svelte";
   import AudioAddonsDropdown from "./AudioAddonsDropdown.svelte";
-  import ThemeItem from "./ThemeItem.svelte";
+  import ThemeItem from "$components/tenant/ThemeItem.svelte";
   import { TextModel } from "$types/UsageTracking";
   import { SubscriptionPackages } from "$data/subscription-packages";
   import { onMount } from "svelte";
@@ -198,7 +198,6 @@
       ? Math.min(100, Math.round((activeUsers / totalUserLimit) * 100))
       : 0,
   );
-
 
   // Features enabled
   let openAIEnabled: boolean = $state(false);
@@ -1093,45 +1092,28 @@
   }
 
   async function createTenantAdmin(role: "admin" | "sa" = "admin") {
-    try {
-      loading = true;
-      const { error } =
-        role === "admin"
-          ? await actions.tenant.createAdminUser({
-              _id: tenantData._id,
-              org_id: tenantData.org_id,
-              tenant_admin_email: tenantAdminEmail,
-              role,
-            })
-          : await actions.tenant.createAdminUser({
-              _id: tenantData._id,
-              org_id: tenantData.org_id,
-              tenant_admin_email: tenantAdminEmail,
-              role,
-            });
+    loading = true;
+    const { data, error } = await actions.tenant.createAdminUser({
+      _id: tenantData._id,
+      email: tenantAdminEmail,
+      role,
+    });
 
-      loading = false;
-      if (error) {
-        addToast({
-          message:
-            t("tenant.create-tenant-admin-failed") + " - " + error.toString(),
-          type: "success",
-        });
-      } else {
-        addToast({
-          message: t("tenant.create-tenant-admin-successful"),
-          type: "success",
-        });
-      }
-    } catch (error: any) {
+    loading = false;
+    tenantAdminEmail = "";
+
+    if (error) {
       addToast({
-        message:
-          t("tenant.create-tenant-admin-failed") + " - " + error.toString(),
-        type: "success",
+        message: `${t("tenant.create-tenant-admin-failed")} - ${error.toString()}`,
+        type: "error",
       });
-    } finally {
-      tenantAdminEmail = "";
+      return;
     }
+
+    addToast({
+      message: t("tenant.create-tenant-admin-successful"),
+      type: "success",
+    });
   }
 
   function goToBillingPortal() {
@@ -1332,7 +1314,7 @@
             <div class="join">
               <input
                 type="text"
-                class="input input-bordered bg-base-200 disabled:border-gray-200 w-full join-item"
+                class="input input-bordered bg-base-100 disabled:bg-base-100 disabled:border-gray-200 w-full join-item"
                 disabled={true}
                 value={tenantData.billing_method
                   ? BillingMethodLabels[
@@ -1388,7 +1370,7 @@
         </div>
 
         <div class="flex flex-row space-x-4">
-          <div class="flex-1 flex justify-between mb-4">
+          <div class="flex-1 flex justify-between flex-col lg:flex-row mb-4">
             <div class="flex items-center">
               <input
                 id="sub-trial-phase"

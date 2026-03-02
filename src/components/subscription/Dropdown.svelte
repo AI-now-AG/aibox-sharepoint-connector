@@ -50,7 +50,7 @@
   <div class="dropdown w-full">
     <label
       tabindex={disabled ? -1 : 0}
-      class={"select select-bordered w-full rounded-lg h-[56px] shadow-xl" +
+      class={"select select-bordered w-full rounded-lg h-[50px] shadow-xl" +
         (disabled ? " pointer-events-none opacity-50 bg-gray-200" : "")}
     >
       {options.find((opt) => opt.value === value)?.title || placeholder}

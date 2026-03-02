@@ -1,0 +1,18 @@
+---
+import Layout from "$layouts/Layout.astro";
+import auth from "$auth/auth";
+import ResellerTenantList from "./ResellerTenantList.svelte";
+
+if (
+  Astro.locals.tenant?.is_reseller !== true ||
+  !auth.isReseller(Astro.locals)
+) {
+  return Astro.rewrite("/restricted");
+}
+
+const resellerCode = Astro.locals.tenant.reseller_code;
+---
+
+<Layout>
+  <ResellerTenantList {resellerCode} client:load />
+</Layout>

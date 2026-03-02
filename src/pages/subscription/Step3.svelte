@@ -21,8 +21,8 @@
   import { EventName, ScreenName } from "$types/Posthog";
   import { posthogClientCaptureWithoutTenant } from "$utils/posthogClient";
   import Dropdown from "$components/form/Dropdown.svelte";
+  import BillingMethods from "$components/subscription/BillingMethods.svelte";
   import { useTranslatedCountryList } from "$utils/subscription";
-  import log from "$utils/log";
 
   interface Props {
     accountEmail: string;
@@ -30,7 +30,7 @@
   }
   let { accountEmail, defaultLanguage = "en" }: Props = $props();
   const t = useTranslations(defaultLanguage);
-  const conuntryOptions = useTranslatedCountryList(defaultLanguage);
+  const countryOptions = useTranslatedCountryList(defaultLanguage);
 
   let loading = $state(false);
 
@@ -62,6 +62,8 @@
       billingEmail = "";
     }
   });
+
+  //$inspect(billingMethod);
 
   function showAlert(message: any) {
     alertMessage = message;
@@ -206,7 +208,7 @@
           inputChange={(event: any) => {
             companyName = event.value;
           }}
-          containerClasses="h-[56px] shadow-lg"
+          containerClasses="h-[50px] shadow-lg"
           labelClasses="text-sm"
           classes="text-base"
         />
@@ -221,7 +223,7 @@
           inputChange={(event: any) => {
             street = event.value;
           }}
-          containerClasses="h-[56px] shadow-lg"
+          containerClasses="h-[50px] shadow-lg"
           labelClasses="text-sm"
           classes="text-base"
         />
@@ -240,7 +242,7 @@
           inputChange={(event: any) => {
             zipCode = event.value;
           }}
-          containerClasses="h-[56px] shadow-lg"
+          containerClasses="h-[50px] shadow-lg"
           labelClasses="text-sm"
           classes="text-base"
         />
@@ -255,7 +257,7 @@
           inputChange={(event: any) => {
             location = event.value;
           }}
-          containerClasses="h-[56px] shadow-lg"
+          containerClasses="h-[50px] shadow-lg"
           labelClasses="text-sm"
           classes="text-base"
         />
@@ -274,7 +276,7 @@
           inputChange={(event: any) => {
             contactPhone = event.value;
           }}
-          containerClasses="h-[56px] shadow-lg"
+          containerClasses="h-[50px] shadow-lg"
           labelClasses="text-sm"
           classes="text-base"
         />
@@ -289,7 +291,7 @@
           inputChange={(event: any) => {
             contactName = event.value;
           }}
-          containerClasses="h-[56px] shadow-lg"
+          containerClasses="h-[50px] shadow-lg"
           labelClasses="text-sm"
           classes="text-base"
         />
@@ -302,9 +304,9 @@
       <div class="flex-1 flex flex-col mb-4">
         <Dropdown
           label={`${t("subscription.country")}`}
-          labelClasses="mb-3"
-          placeholderClasses="h-[56px]"
-          options={conuntryOptions}
+          labelClasses="mb-2"
+          placeholderClasses="h-[50px]"
+          options={countryOptions}
           bind:value={country}
         />
       </div>
@@ -317,7 +319,7 @@
           inputChange={(event: any) => {
             billingEmail = event.value;
           }}
-          containerClasses="h-[56px] shadow-md"
+          containerClasses="h-[50px] shadow-md"
           labelClasses="text-sm"
           classes="text-base"
           disabled={isEmailDisabled}
@@ -331,48 +333,14 @@
       {t("subscription.billing-method")}
     </p>
 
-    <div class="flex flex-row md:space-x-8 space-x-0 lg:space-x-8">
-      <div
-        class="flex flex-row bg-white shadow-md rounded-lg flex flex-col justify-between space-y-2 px-6 py-4 w-full"
-      >
-        <div class="flex flex-1 items-center">
-          <input
-            type="radio"
-            id="stripe-checkout"
-            name="billing_method"
-            class="radio"
-            value={BillingMethod.CreditCard}
-            checked={billingMethod == BillingMethod.CreditCard}
-            onchange={() => {
-              billingMethod = BillingMethod.CreditCard;
-            }}
-          />
-          <label
-            for="stripe-checkout"
-            class="ml-2 text-sm font-medium text-[#0F172A]"
-            >{t("subscription.billing-method-stripe")}</label
-          >
-        </div>
-        <div class="flex flex-1 items-center">
-          <input
-            type="radio"
-            id="monthly-invoice"
-            name="billing_method"
-            class="radio"
-            value={BillingMethod.MonthlyInvoice}
-            checked={billingMethod == BillingMethod.MonthlyInvoice}
-            onchange={() => {
-              billingMethod = BillingMethod.MonthlyInvoice;
-            }}
-          />
-          <label
-            for="monthly-invoice"
-            class="ml-2 text-sm font-medium text-[#0F172A]"
-            >{t("subscription.monthly-invoice-email")}</label
-          >
-        </div>
-      </div>
-    </div>
+    <BillingMethods
+      bind:billingMethod
+      availableMethods={[
+        BillingMethod.CreditCard,
+        BillingMethod.MonthlyInvoice,
+      ]}
+      {defaultLanguage}
+    />
   </div>
 
   <!-- Next -->

@@ -121,8 +121,7 @@ const TenantInputIdentifierSchema = z.object({
 
 const CreateTenantAdminSchema = z.object({
   _id: z.string(),
-  org_id: z.string().optional(),
-  tenant_admin_email: z.string().optional(),
+  email: z.string().optional(),
   role: z.string().default("admin"),
 });
 
@@ -239,7 +238,19 @@ export const tenant = {
   get: defineAction({
     input: TenantInputIdentifierSchema,
     handler: async (input) => {
-      const data = await TenantModel.get(input._id);
+      // Get tenant info
+      const tenant = await TenantModel.get(input._id);
+      if (!tenant) throw new Error("Tenant does not exist.");
+
+      // Get subscription info
+      const subscription = await SubscriptionModel.findByTenant(tenant._id);
+
+      // Combine tenant and subscription data
+      const data = {
+        ...tenant,
+        subscription,
+      };
+
       return transformRawData(data);
     },
   }),
@@ -255,18 +266,34 @@ export const tenant = {
   createAdminUser: defineAction({
     input: CreateTenantAdminSchema,
     handler: async (input) => {
+      // Validate tenant existence
+      const tenant = await TenantModel.get(input._id);
+      if (!tenant) throw new Error("Tenant does not exist.");
+
+      // Check tenant user limit before creating admin user
+      const {
+        included_user_limit: includedUserLimit,
+        extra_user_limit: extraUserLimit,
+      } = tenant;
+      const maxUserLimit = (includedUserLimit || 0) + (extraUserLimit || 0);
+      const countUsers = await UserModel.countUsersByTenant(input._id);
+      if (maxUserLimit && maxUserLimit > 0 && countUsers >= maxUserLimit) {
+        throw new Error("Tenant user limit has been reached.");
+      }
+
+      // Start transaction to create admin user and assign roles
       const session = client.startSession();
       session.startTransaction();
 
       try {
         const dbOrgId = input._id;
-        const organizationId = input.org_id ?? "";
+        const organizationId = tenant.org_id ?? "";
 
-        if (input.tenant_admin_email) {
+        if (input.email) {
           await setupTenantAdmin(
             dbOrgId,
             organizationId,
-            input.tenant_admin_email,
+            input.email,
             input.role === "admin" ? "Admin" : "Supper Admin",
             input.role as "admin" | "sa",
           );
