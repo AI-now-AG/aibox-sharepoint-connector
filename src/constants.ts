@@ -90,13 +90,17 @@ export const SG_SOMEDIA_PASSWORD_TEMPLATE =
 export const SG_NEW_TENANT_TEMPLATE = "d-87847bafc967448e93d99a411edece3a";
 
 // Tenants
-export const TENANT_MASTER = {
+export const TENANT_MASTER_ID = {
   DEV: "67ff572260fa2a8bca5d26d0", // aibox dev master
   PROD: "66cc50d98103241cf3354d3f", // aibox master
 };
-export const TENANT_SOMEDIA = {
+export const TENANT_SOMEDIA_ID = {
   DEV: "671f3f4c44d9f6336b4cdd6a", // Somedia TEST
   PROD: "66aa21a3d40d0b194e280143", // Somedia
+};
+export const TENANT_SOMEDIA_NAME = {
+  DEV: "somedia-dev", // somedia-dev
+  PROD: "somedia", // somedia
 };
 
 // Stripe

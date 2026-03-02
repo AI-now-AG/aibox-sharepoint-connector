@@ -17,7 +17,7 @@ import {
   sendNotificationEmail,
 } from "$utils/auth0Auth";
 import { UserRole } from "$types/Users";
-import { SG_SOMEDIA_PASSWORD_TEMPLATE, TENANT_SOMEDIA } from "$constants";
+import { SG_SOMEDIA_PASSWORD_TEMPLATE, TENANT_SOMEDIA_NAME } from "$constants";
 import { isProd } from "$utils/env";
 
 /**
@@ -73,9 +73,16 @@ const auth0Webhook: Handler = async (
             email,
             connection,
             is_signup: isSignup,
+            tenant: tenantName,
           } = data.details.body || {};
 
-          await triggerRegistrationEmail(userId, email, connection, isSignup);
+          await triggerRegistrationEmail(
+            userId,
+            email,
+            connection,
+            isSignup,
+            tenantName,
+          );
           if (isSignup) {
             await triggerSignupAlertEmail(userId, email, connection);
             await updateAuth0UserMetadata(userId, { signup: true });
@@ -214,30 +221,26 @@ const triggerRegistrationEmail = async (
   userId: string,
   email: string,
   connection: string,
-  isSignup: boolean,
+  isSignup?: boolean,
+  tenantName?: string,
 ) => {
-  console.log(`Trigger registration email`, { email, connection, isSignup });
+  console.log(`Trigger registration email`, {
+    email,
+    connection,
+    isSignup,
+    tenantName,
+  });
 
   if (isSignup == true) {
     // Send user verification email
     await sendVerificationEmail(userId, email);
   } else {
-    // Get user from database, if not exist, skip sending password reset email.
-    const user = await UserModel.get(userId);
-    if (!user) {
-      console.warn(
-        `User not found in database, skip sending password reset email`,
-        { userId, email },
-      );
-      return;
-    }
-
     // For Somedia tenant, send a customized password reset email with different template
-    const somediaTenantId = isProd() ? TENANT_SOMEDIA.PROD : TENANT_SOMEDIA.DEV;
+    const somediaTenantName = isProd()
+      ? TENANT_SOMEDIA_NAME.PROD
+      : TENANT_SOMEDIA_NAME.DEV;
     const templateId =
-      user.tenant_id?.toString() == somediaTenantId
-        ? SG_SOMEDIA_PASSWORD_TEMPLATE
-        : null;
+      tenantName == somediaTenantName ? SG_SOMEDIA_PASSWORD_TEMPLATE : null;
     await sendPasswordResetEmail(userId, email, templateId);
   }
 };

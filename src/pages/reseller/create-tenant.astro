@@ -9,13 +9,13 @@ import CreateTenantAccount from "$components/tenant/CreateTenantAccount.svelte";
 import TenantCreationSuccess from "$components/tenant/TenantCreationSuccess.svelte";
 import { isProd } from "$utils/env";
 import { useTranslations } from "$i18n/utils";
-import { TENANT_SOMEDIA } from "$constants";
+import { TENANT_SOMEDIA_ID } from "$constants";
 
 const t = useTranslations();
 
 const allTags = await GlobalTagModel.list();
 const allCategories = await GlobalCategoryModel.list();
-const somediaTenantId = isProd() ? TENANT_SOMEDIA.PROD : TENANT_SOMEDIA.DEV;
+const somediaTenantId = isProd() ? TENANT_SOMEDIA_ID.PROD : TENANT_SOMEDIA_ID.DEV;
 
 const isReseller = Astro.locals.tenant?.is_reseller ?? false;
 const resellerCode = Astro.locals.tenant?.reseller_code ?? null;
