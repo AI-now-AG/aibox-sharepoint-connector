@@ -25,6 +25,7 @@ import settings from "$assets/icons/settings.svg?raw";
 import admin from "$assets/icons/admin.svg?raw";
 import audio from "$assets/icons/audio.svg?raw";
 import aitool from "$assets/icons/aitool.svg?raw";
+import storefront from "$assets/icons/storefront.svg?raw";
 import editPrompt from "$assets/icons/edit-prompt.svg?raw";
 import closeMenu from "$assets/icons/closeMenu.svg?raw";
 import Lock from "$assets/icons/lock.svg?raw";
@@ -118,6 +119,7 @@ export const svgIcons = {
   admin,
   audio,
   aitool,
+  storefront,
   editPrompt,
   closeMenu,
   Lock,

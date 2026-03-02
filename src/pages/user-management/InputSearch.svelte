@@ -21,7 +21,7 @@
   };
 </script>
 
-<div class="items-center mb-2">
+<div class="items-center my-2">
   <div class="relative w-full">
     <label class="input input-bordered flex items-center gap-2 w-full">
       {@html svgIcons.search}

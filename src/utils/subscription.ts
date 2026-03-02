@@ -6,7 +6,7 @@ import {
   AudioOptionLabels,
 } from "$types/Subscription";
 
-export const useTranslatedCountryList = (defaultLanguage: string) => {
+export const useTranslatedCountryList = (defaultLanguage?: string) => {
   const t = useTranslations(defaultLanguage);
 
   return Countries.map((country) => ({
@@ -35,5 +35,5 @@ export const getSubscriptionAddOnName = (
           );
         }) || [];
   const firstOption = addOnOptions?.[0] as AudioOptionId | undefined;
-  return firstOption ? AudioOptionLabels[firstOption] || "-" : "-";
+  return firstOption ? AudioOptionLabels[firstOption] : "";
 };

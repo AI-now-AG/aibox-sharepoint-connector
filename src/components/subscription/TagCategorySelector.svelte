@@ -74,7 +74,7 @@
 </script>
 
 <h2
-  class={`font-sanns text-3xl font-bold text-black mt-6 ${titleAlignCenter ? "text-center" : ""}`}
+  class={`font-sanns text-3xl font-bold text-black ${titleAlignCenter ? "text-center" : ""}`}
 >
   {t("subscription.choose-business-branch")}
 </h2>
@@ -131,9 +131,11 @@
         </div>
 
         <!-- DESCRIPTION -->
-        <div class="text-sm text-gray-500 leading-[20px] pr-4">
-          {tag.description}
-        </div>
+        {#if tag.description}
+          <div class="text-sm text-gray-500 leading-[20px] pr-4">
+            {tag.description}
+          </div>
+        {/if}
       </button>
     {/each}
   </div>

@@ -11,6 +11,7 @@ import { ApiKeyProvider } from "$types/TenantFeature";
 import TranscriptionModel from "$data/models/transcription.model";
 import { transformRawData } from "$utils/transformRawData";
 import { cached } from "$utils/cache";
+import MenuGroup from "./MenuGroup.astro";
 import ThemeLogo from "$components/ThemeLogo.astro";
 
 const t = useTranslations();
@@ -27,7 +28,7 @@ const categories = await cached(
   60 * 5,
   async () => {
     return await Category.listActiveByTenant(Astro.locals.user.tenant_id);
-  }
+  },
 );
 
 const transcriptions = await cached(
@@ -35,12 +36,13 @@ const transcriptions = await cached(
   60 * 5,
   async () => {
     const data = await TranscriptionModel.listByTenant(
-      Astro.locals.user.tenant_id
+      Astro.locals.user.tenant_id,
     );
     return data;
-  }
+  },
 );
 
+const isReseller = tenant?.is_reseller || false;
 const navState = Astro.locals.user.navState || {};
 const isNavCollapsed = navState["nav-collapsed"] ?? false;
 
@@ -73,7 +75,7 @@ const transcriptionTypes = Astro.locals.tenant.transcription_types ?? [];
 const activeTranscriptions =
   transcriptions?.filter(
     (tran) =>
-      transcriptionTypes.includes(tran.category) && tran.enabled === true
+      transcriptionTypes.includes(tran.category) && tran.enabled === true,
   ) ?? [];
 
 const audioToTextTranscriptions = activeTranscriptions
@@ -90,7 +92,7 @@ const subtitleTranscriptions = activeTranscriptions
       // tran.category == AudioCategory.Subtitle ||      // Deprecated: Allegro (M) - commented for future restoration
       // tran.category == AudioCategory.SubtitleJson ||  // Deprecated: commented for future restoration
       // tran.category == AudioCategory.SubtitleLarge || // Deprecated: Adagio (L) - commented for future restoration
-      tran.category == AudioCategory.Subtitle11Labs
+      tran.category == AudioCategory.Subtitle11Labs,
   )
   .map((tran) => ({
     title: tran.name,
@@ -161,7 +163,7 @@ if (
   auth.hasFeatureWithProvider(
     Astro.locals,
     TenantFeature.CreateImage,
-    ApiKeyProvider.OpenAI
+    ApiKeyProvider.OpenAI,
   )
 ) {
   createImageItems.push({
@@ -175,7 +177,7 @@ if (
   auth.hasFeatureWithProvider(
     Astro.locals,
     TenantFeature.CreateImage,
-    ApiKeyProvider.Flux
+    ApiKeyProvider.Flux,
   )
 ) {
   createImageItems.push({
@@ -189,7 +191,7 @@ if (
   auth.hasFeatureWithProvider(
     Astro.locals,
     TenantFeature.GptImage,
-    ApiKeyProvider.OpenAI
+    ApiKeyProvider.OpenAI,
   )
 ) {
   createImageItems.push({
@@ -203,7 +205,7 @@ if (
   auth.hasFeatureWithProvider(
     Astro.locals,
     TenantFeature.CreateImage,
-    ApiKeyProvider.Gemini
+    ApiKeyProvider.Gemini,
   )
 ) {
   createImageItems.push({
@@ -217,7 +219,7 @@ if (
   auth.hasFeatureWithProvider(
     Astro.locals,
     TenantFeature.CreateImage,
-    ApiKeyProvider.GeminiPro
+    ApiKeyProvider.GeminiPro,
   )
 ) {
   createImageItems.push({
@@ -244,8 +246,9 @@ if (conversations.length > 0) {
   });
 }
 
+const superAdminMenus = [];
 const adminMenus = [];
-const supperAdminMenus = [];
+const resellerMenus = [];
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const textAssistantItems: Array<any> = [
@@ -282,7 +285,7 @@ const settingsItems: Array<any> = [
 
 const hasAudioToTextFeature = auth.hasFeature(
   Astro.locals,
-  TenantFeature.AudioToText
+  TenantFeature.AudioToText,
 );
 if (hasAudioToTextFeature) {
   settingsItems.push({
@@ -311,7 +314,7 @@ if (auth.isAdmin(Astro.locals) || auth.isSuperAdmin(Astro.locals)) {
           path: `/billing/usage`,
         },
       ],
-    }
+    },
   );
 
   adminMenus.push({
@@ -330,10 +333,10 @@ if (auth.isAdmin(Astro.locals) || auth.isSuperAdmin(Astro.locals)) {
 }
 
 if (auth.isSuperAdmin(Astro.locals)) {
-  supperAdminMenus.push({
+  superAdminMenus.push({
     title: t("nav.settings.admin"),
     icon: svgIcons.admin,
-    isOpened: navState[`supper-admin-menu`] ?? false,
+    isOpened: navState[`super-admin-menu`] ?? false,
     items: [
       {
         title: t("nav.tenant-management"),
@@ -369,6 +372,10 @@ if (auth.isSuperAdmin(Astro.locals)) {
             title: t("nav.settings.prompt-refinement"),
             path: `/settings/prompt-refinement`,
           },
+          {
+            title: t("nav.settings.rag-configuration"),
+            path: `/settings/rag-configuration`,
+          },
         ],
       },
       {
@@ -388,6 +395,26 @@ if (auth.isSuperAdmin(Astro.locals)) {
             path: `/reports/user-list`,
           },
         ],
+      },
+    ],
+  });
+}
+
+if (isReseller && auth.isReseller(Astro.locals)) {
+  resellerMenus.push({
+    title: t("nav.reseller"),
+    icon: svgIcons.storefront,
+    isOpened: navState[`reseller-menu`] ?? false,
+    items: [
+      {
+        title: t("nav.reseller.dashboard"),
+        path: `/reseller/dashboard`,
+        isOpened: navState[`reseller-menu-id-0`] ?? false,
+      },
+      {
+        title: t("nav.reseller.create-account"),
+        path: `/reseller/create-tenant`,
+        isOpened: navState[`reseller-menu-id-1`] ?? false,
       },
     ],
   });
@@ -428,6 +455,7 @@ const modules = [...menuItems];
 
   <div class="grow">
     <ul class={`menu w-full ${isNavCollapsed ? "pr-2" : "pr-6"}`}>
+      <!-- AI Tools -->
       <li class="active:bg-transparent">
         <details
           data-id={`ai-tools`}
@@ -476,358 +504,69 @@ const modules = [...menuItems];
           </ul>
         </details>
       </li>
-      {
-        audioToTextMenus.length > 0 && (
-          <div
-            class={`mx-6 my-2 pointer-events-none ${isNavCollapsed ? "hidden" : ""}`}
-          />
-        )
-      }
-      {
-        audioToTextMenus.map((mod) => (
-          <li class="active:bg-transparent">
-            <details
-              data-id={`audio-menu`}
-              open={mod.isOpened}
-              id="onboardingId3"
-              class="active:bg-transparent"
-            >
-              <summary
-                class={
-                  isNavCollapsed
-                    ? "tooltip tooltip-right flex justify-center"
-                    : ""
-                }
-                data-tip={isNavCollapsed ? mod.title : ""}
-              >
-                <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
-                  {mod.icon && <Fragment set:html={mod.icon} />}
-                </div>
-                <span class={isNavCollapsed ? "hidden" : ""}>{mod.title}</span>
-              </summary>
-              {"items" in mod && (
-                <ul
-                  class={`active:bg-transparent ${isNavCollapsed ? "hidden" : ""}`}
-                >
-                  {mod.items?.map((sub, id) => (
-                    <li class="pl-1 active:bg-transparent">
-                      {sub.items ? (
-                        <details
-                          data-id={`audio-menu-id-${id}`}
-                          open={sub.isOpened}
-                          class="active:bg-transparent"
-                        >
-                          <summary>{sub.title}</summary>
-                          {sub.items.length > 0 && (
-                            <ul class="active:bg-transparent">
-                              {sub.items.map((sub1) => (
-                                <li class="pl-1 active:bg-transparent">
-                                  <MenuItem {...sub1} />
-                                </li>
-                              ))}
-                            </ul>
-                          )}
-                        </details>
-                      ) : (
-                        <MenuItem {...sub} />
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </details>
-          </li>
-        ))
-      }
-      {
-        subtitleStudioMenus.length > 0 && (
-          <div
-            class={`mx-6 my-2 pointer-events-none ${isNavCollapsed ? "hidden" : ""}`}
-          />
-        )
-      }
-      {
-        subtitleStudioMenus.map((mod) => (
-          <li class="active:bg-transparent">
-            <details
-              data-id={`subtitle-menu`}
-              open={mod.isOpened}
-              class="active:bg-transparent"
-            >
-              <summary
-                class={
-                  isNavCollapsed
-                    ? "tooltip tooltip-right flex justify-center"
-                    : ""
-                }
-                data-tip={isNavCollapsed ? mod.title : ""}
-              >
-                <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
-                  {mod.icon && <Fragment set:html={mod.icon} />}
-                </div>
-                <span class={isNavCollapsed ? "hidden" : ""}>{mod.title}</span>
-              </summary>
-              {"items" in mod && (
-                <ul
-                  class={`active:bg-transparent ${isNavCollapsed ? "hidden" : ""}`}
-                >
-                  {mod.items?.map((sub, id) => (
-                    <li class="pl-1 active:bg-transparent">
-                      {sub.items ? (
-                        <details
-                          data-id={`subtitle-menu-id-${id}`}
-                          open={sub.isOpened}
-                          class="active:bg-transparent"
-                        >
-                          <summary>{sub.title}</summary>
-                          {sub.items.length > 0 && (
-                            <ul class="active:bg-transparent">
-                              {sub.items.map((sub1) => (
-                                <li class="pl-1 active:bg-transparent">
-                                  <MenuItem {...sub1} />
-                                </li>
-                              ))}
-                            </ul>
-                          )}
-                        </details>
-                      ) : (
-                        <MenuItem {...sub} />
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </details>
-          </li>
-        ))
-      }
 
-      {
-        createImageMenus.length > 0 && (
-          <div
-            class={`mx-6 my-2 pointer-events-none ${isNavCollapsed ? "hidden" : ""}`}
-          />
-        )
-      }
-      {
-        createImageMenus.map((mod) => (
-          <li class="active:bg-transparent">
-            <details
-              data-id={`create-image`}
-              open={mod.isOpened}
-              class="active:bg-transparent"
-              id="onboardingId4"
-            >
-              <summary
-                class={
-                  isNavCollapsed
-                    ? "tooltip tooltip-right flex justify-center"
-                    : ""
-                }
-                data-tip={isNavCollapsed ? mod.title : ""}
-              >
-                <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
-                  {mod.icon && <Fragment set:html={mod.icon} />}
-                </div>
-                <span class={isNavCollapsed ? "hidden" : ""}>{mod.title}</span>
-              </summary>
-              {"items" in mod && (
-                <ul
-                  class={`active:bg-transparent ${isNavCollapsed ? "hidden" : ""}`}
-                >
-                  {mod.items?.map((sub) => (
-                    <li class="pl-1 active:bg-transparent">
-                      <MenuItem {...sub} />
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </details>
-          </li>
-        ))
-      }
+      <!-- Audio Studio Menu Group -->
+      <MenuGroup
+        menus={audioToTextMenus}
+        menuId="audio-menu"
+        isCollapsed={isNavCollapsed}
+        elementId="onboardingId3"
+      />
 
+      <!-- Subtitle Studio Menu Group -->
+      <MenuGroup
+        menus={subtitleStudioMenus}
+        menuId="subtitle-menu"
+        isCollapsed={isNavCollapsed}
+      />
+
+      <!-- Image Studio Menu Group -->
+      <MenuGroup
+        menus={createImageMenus}
+        menuId="create-image"
+        isCollapsed={isNavCollapsed}
+        elementId="onboardingId4"
+      />
+
+      <!-- My aibox Menu Group -->
       {
         myAIBoxMenus.length > 0 && (
-          <div
-            class={`mx-6 my-2 pointer-events-none ${isNavCollapsed ? "hidden" : ""}`}
-          />
+          <MenuGroup
+            menus={myAIBoxMenus}
+            menuId="my-ai-box"
+            isCollapsed={isNavCollapsed}
+          >
+            <ConversationItems
+              conversations={transformRawData(conversations)}
+              routePath={Astro.url.pathname}
+              isCollapsed={isNavCollapsed}
+              client:idle
+            />
+          </MenuGroup>
         )
-      }
-      {
-        myAIBoxMenus.map((mod, index) => (
-          <li class="active:bg-transparent w-full">
-            <details
-              data-id={"my-ai-box"}
-              open={mod.isOpened}
-              class="active:bg-transparent w-full"
-            >
-              <summary
-                class={
-                  isNavCollapsed
-                    ? "tooltip tooltip-right flex justify-center"
-                    : ""
-                }
-                data-tip={isNavCollapsed ? mod.title : ""}
-              >
-                <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
-                  {mod.icon && <Fragment set:html={mod.icon} />}
-                </div>
-                <span class={isNavCollapsed ? "hidden" : ""}>{mod.title}</span>
-              </summary>
-              <ConversationItems
-                conversations={transformRawData(conversations)}
-                routePath={Astro.url.pathname}
-                isCollapsed={isNavCollapsed}
-                client:idle
-              />
-            </details>
-            {index < myAIBoxMenus.length - 1 && (
-              <div
-                class={`mx-6 my-1 pointer-events-none ${isNavCollapsed ? "hidden" : ""}`}
-              />
-            )}
-          </li>
-        ))
       }
 
-      {
-        adminMenus.length > 0 && (
-          <div
-            class={`mx-6 my-2 pointer-events-none ${isNavCollapsed ? "hidden" : ""}`}
-          />
-        )
-      }
-      {
-        adminMenus.map((mod, index) => (
-          <li class="active:bg-transparent">
-            <details
-              data-id={`admin-menu`}
-              open={mod.isOpened}
-              class="active:bg-transparent"
-              id="onboardingId5"
-            >
-              <summary
-                class={
-                  isNavCollapsed
-                    ? "tooltip tooltip-right flex justify-center"
-                    : ""
-                }
-                data-tip={isNavCollapsed ? mod.title : ""}
-              >
-                <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
-                  {mod.icon && <Fragment set:html={mod.icon} />}
-                </div>
-                <span class={isNavCollapsed ? "hidden" : ""}>{mod.title}</span>
-              </summary>
-              {"items" in mod && (
-                <ul
-                  class={`active:bg-transparent ${isNavCollapsed ? "hidden" : ""}`}
-                >
-                  {mod.items?.map((sub, _index) => (
-                    <li class="pl-1 active:bg-transparent">
-                      {sub.items ? (
-                        <details
-                          data-id={`admin-menu-id-${_index}`}
-                          open={sub.isOpened}
-                          class="active:bg-transparent"
-                        >
-                          <summary>{sub.title}</summary>
-                          {sub.items.length > 0 && (
-                            <ul class="active:bg-transparent">
-                              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                              {sub.items.map((sub1: any) => (
-                                <li class="pl-1 active:bg-transparent">
-                                  <MenuItem {...sub1} />
-                                </li>
-                              ))}
-                            </ul>
-                          )}
-                        </details>
-                      ) : (
-                        <MenuItem {...sub} />
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </details>
-            {index < adminMenus.length - 1 && (
-              <div
-                class={`mx-6 my-1 pointer-events-none ${isNavCollapsed ? "hidden" : ""}`}
-              />
-            )}
-          </li>
-        ))
-      }
+      <!-- Admin Menu Group -->
+      <MenuGroup
+        menus={adminMenus}
+        menuId="admin-menu"
+        isCollapsed={isNavCollapsed}
+        elementId="onboardingId5"
+      />
 
-      {
-        supperAdminMenus.length > 0 && (
-          <div
-            class={`divider mx-6 pointer-events-none ${isNavCollapsed ? "hidden" : ""}`}
-          />
-        )
-      }
-      {
-        supperAdminMenus.map((mod, index) => (
-          <li class="active:bg-transparent">
-            <details
-              data-id={`supper-admin-menu`}
-              open={mod.isOpened}
-              class="active:bg-transparent"
-            >
-              <summary
-                class={
-                  isNavCollapsed
-                    ? "tooltip tooltip-right flex justify-center"
-                    : ""
-                }
-                data-tip={isNavCollapsed ? mod.title : ""}
-              >
-                <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
-                  {mod.icon && <Fragment set:html={mod.icon} />}
-                </div>
-                <span class={isNavCollapsed ? "hidden" : ""}>{mod.title}</span>
-              </summary>
-              {"items" in mod && (
-                <ul
-                  class={`active:bg-transparent ${isNavCollapsed ? "hidden" : ""}`}
-                >
-                  {mod.items?.map((sub, _index) => (
-                    <li class="pl-1 active:bg-transparent">
-                      {sub.items ? (
-                        <details
-                          data-id={`super-admin-menu-id-${_index}`}
-                          open={sub.isOpened}
-                          class="active:bg-transparent"
-                        >
-                          <summary>{sub.title}</summary>
-                          {sub.items.length > 0 && (
-                            <ul class="active:bg-transparent">
-                              {sub.items.map((sub1) => (
-                                <li class="pl-1 active:bg-transparent">
-                                  <MenuItem {...sub1} />
-                                </li>
-                              ))}
-                            </ul>
-                          )}
-                        </details>
-                      ) : (
-                        <MenuItem {...sub} />
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </details>
-            {index < supperAdminMenus.length - 1 && (
-              <div
-                class={`mx-6 my-1 pointer-events-none ${isNavCollapsed ? "hidden" : ""}`}
-              />
-            )}
-          </li>
-        ))
-      }
+      <!-- SuperAdmin Menu Group -->
+      <MenuGroup
+        menus={superAdminMenus}
+        menuId="super-admin-menu"
+        isCollapsed={isNavCollapsed}
+      />
+
+      <!-- Reseller Menu Group -->
+      <MenuGroup
+        menus={resellerMenus}
+        menuId="reseller-menu"
+        isCollapsed={isNavCollapsed}
+      />
     </ul>
   </div>
 </nav>
@@ -857,7 +596,7 @@ const modules = [...menuItems];
         element.addEventListener(
           "toggle",
           () => updateNavState(detailsId, element.open),
-          { passive: true }
+          { passive: true },
         );
       }
     }
@@ -891,13 +630,13 @@ const modules = [...menuItems];
         selectorGroups.logo.classList.toggle("hidden", newCollapsed);
 
       selectorGroups.textSpans.forEach((el) =>
-        el.classList.toggle("hidden", newCollapsed)
+        el.classList.toggle("hidden", newCollapsed),
       );
       selectorGroups.subMenus.forEach((el) =>
-        el.classList.toggle("hidden", newCollapsed)
+        el.classList.toggle("hidden", newCollapsed),
       );
       selectorGroups.spacers.forEach((el) =>
-        el.classList.toggle("hidden", newCollapsed)
+        el.classList.toggle("hidden", newCollapsed),
       );
 
       selectorGroups.summaries.forEach((summary) => {
@@ -915,11 +654,11 @@ const modules = [...menuItems];
       // Update accessibility labels
       toggleBtn.setAttribute(
         "aria-label",
-        newCollapsed ? "Expand navigation" : "Collapse navigation"
+        newCollapsed ? "Expand navigation" : "Collapse navigation",
       );
       toggleBtn.setAttribute(
         "title",
-        newCollapsed ? "Expand navigation" : "Collapse navigation"
+        newCollapsed ? "Expand navigation" : "Collapse navigation",
       );
 
       // Update icon

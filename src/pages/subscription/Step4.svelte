@@ -3,7 +3,7 @@
   import SubsciptionSteps from "$components/subscription/SubsciptionSteps.svelte";
   import { useTranslations } from "$i18n/utils";
   import { onMount } from "svelte";
-  import RadarLoading from "./RadarLoading.svelte";
+  import RadarLoading from "$components/subscription/RadarLoading.svelte";
   import subscription from "$stores/subscription";
   import { SubscriptionPackageId, AudioOptionId } from "$types/Subscription";
   import { isTrulyEmpty } from "$utils/common";
@@ -55,6 +55,7 @@
         address: $subscription.billingInfo?.street ?? "",
         zip_code: $subscription.billingInfo?.zipCode ?? "",
         location: $subscription.billingInfo?.location ?? "",
+        country: $subscription.billingInfo?.country ?? "",
         email: $subscription.billingInfo?.billingEmail ?? "",
       },
       use_cases: $subscription.organizationInfo?.selectedCategories ?? [],
@@ -65,9 +66,12 @@
     return data;
   }
 
-  async function finalizeSubscription(newTenantId: string) {
+  async function finalizeTenantSetup(newTenantId: string) {
+    const selectedTemplate =
+      $subscription.organizationInfo?.selectedTemplate ?? "";
     const { data, error } = await actions.onboarding.finalize({
       tenant_id: newTenantId,
+      template: selectedTemplate,
     });
 
     if (error) throw new Error(t("subscription.finalize-subsciption-failed"));
@@ -93,8 +97,8 @@
       // Step 3: Setup Tenant
       const tenant = await setupTenantData(organization.id, organization.name);
 
-      // Step 4: Finalize
-      await finalizeSubscription(tenant.id);
+      // Step 4: Finalize Tenant Setup
+      await finalizeTenantSetup(tenant.id);
 
       // After successful subscription creation, reset the subscription store
       $subscription = {};

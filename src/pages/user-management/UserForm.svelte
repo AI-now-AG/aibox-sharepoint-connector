@@ -13,6 +13,7 @@
   import Input from "$components/form/Input.svelte";
   import { isValidEmail } from "$utils/common";
   import { isEnterpriseConnection } from "$utils/auth0";
+  import { resolveUserRole } from "$utils/roles";
   import { UserRole } from "$types/Users";
 
   const t = useTranslations();
@@ -29,6 +30,7 @@
     Edit: "edit",
   };
   let mode = user ? MODE.Edit : MODE.Create;
+
   const headerTitle =
     mode == MODE.Create
       ? t("user.add-new-user")
@@ -44,39 +46,48 @@
 
   let userData = $state(user ?? {});
 
-  let isEnterpriseAuth = $state(false);
-  let isUpdateRoleDisabled = $state(false);
-
-  const isRestrictUserManagment = tenant.is_restrict_user_managment;
-
-  // Important note: User created on Auth0 with super admin , just the Admin on AI box when go into the detail screen
   let role = $state(UserRole.User);
-  function getUserRole(roles: string[] = []) {
-    return roles?.some(
-      (role) => role === UserRole.SuperAdmin || role === UserRole.Admin,
-    )
-      ? UserRole.Admin
-      : roles?.some((role) => role === UserRole.SuperUser)
-        ? UserRole.SuperUser
-        : UserRole.User;
-  }
+  let roleOptions = $state([
+    { value: UserRole.Admin, label: t("user.admin") },
+    { value: UserRole.SuperUser, label: t("user.super-user") },
+    { value: UserRole.User, label: t("user.user") },
+  ]);
 
-  function isSuperAdmin(roles: string[] = []): boolean {
-    return roles?.some((role) => role === UserRole.SuperAdmin);
-  }
+  let isEnterpriseAuth = $state(false);
+  let isRoleUpdateDisabled = $state(false);
+
+  const isReseller = tenant?.is_reseller ?? false;
+  const isRestrictUserMgmt = tenant?.is_restrict_user_managment ?? false;
+
+  const isSuperAdmin = (roles?: string[]): boolean =>
+    roles?.includes(UserRole.SuperAdmin) ?? false;
 
   onMount(() => {
-    if (mode == MODE.Create && tenant && isRestrictUserManagment) {
+    if (mode == MODE.Create && tenant && isRestrictUserMgmt) {
       window.history.back();
       return;
     }
-    if (isSuperAdmin(userData.roles)) {
-      isUpdateRoleDisabled = true;
-      role = UserRole.SuperAdmin;
-    } else {
-      role = getUserRole(userData.roles);
-    }
+
+    role = resolveUserRole(userData.roles);
     isEnterpriseAuth = isEnterpriseConnection(userData?.auth0_sub);
+
+    if (isSuperAdmin(userData.roles)) {
+      isRoleUpdateDisabled = true;
+      roleOptions = [
+        {
+          value: UserRole.SuperAdmin,
+          label: t("user.super-admin"),
+        },
+        ...roleOptions,
+      ];
+    }
+
+    if (tenant && isReseller) {
+      roleOptions.push({
+        value: UserRole.Reseller,
+        label: t("user.reseller"),
+      });
+    }
   });
 
   function getUserStatus(isBlocked: boolean, isVerified: boolean) {
@@ -295,7 +306,7 @@
         inputChange={(event: any) => {
           userData.email = event.value;
         }}
-        disabled={isEnterpriseAuth || isRestrictUserManagment}
+        disabled={isEnterpriseAuth || isRestrictUserMgmt}
         required
       />
     </div>
@@ -307,57 +318,24 @@
     </div>
 
     <div class="flex items-center">
-      <div class="flex items-center">
-        <input
-          type="radio"
-          id="role-admin"
-          name="role"
-          class="radio"
-          value={UserRole.Admin}
-          checked={role == UserRole.Admin || role == UserRole.SuperAdmin}
-          onchange={() => {
-            role = UserRole.Admin;
-          }}
-          disabled={isUpdateRoleDisabled}
-        />
-        <label for="role-admin" class="ml-2 font-medium text-sm"
-          >{t("user.admin")}</label
-        >
-      </div>
-      <div class="flex items-center ml-8">
-        <input
-          type="radio"
-          id="role-super-user"
-          name="role"
-          class="radio"
-          value={UserRole.SuperUser}
-          checked={role == UserRole.SuperUser}
-          onchange={() => {
-            role = UserRole.SuperUser;
-          }}
-          disabled={isUpdateRoleDisabled}
-        />
-        <label for="role-super-user" class="ml-2 font-medium text-sm"
-          >{t("user.super-user")}</label
-        >
-      </div>
-      <div class="flex items-center ml-8">
-        <input
-          type="radio"
-          id="role-user"
-          name="role"
-          class="radio"
-          value={UserRole.User}
-          checked={role == UserRole.User}
-          onchange={() => {
-            role = UserRole.User;
-          }}
-          disabled={isUpdateRoleDisabled}
-        />
-        <label for="role-user" class="ml-2 font-medium text-sm"
-          >{t("user.user")}</label
-        >
-      </div>
+      {#each roleOptions as option, i (option.value)}
+        <div class={`flex items-center ${i > 0 ? "ml-8" : ""}`}>
+          <input
+            type="radio"
+            id={`role-${option.value}`}
+            name="role"
+            class="radio"
+            value={option.value}
+            checked={role === option.value}
+            onchange={() => (role = option.value)}
+            disabled={isRoleUpdateDisabled}
+          />
+
+          <label for={`role-${option.value}`} class="ml-2 font-medium text-sm">
+            {option.label}
+          </label>
+        </div>
+      {/each}
     </div>
 
     {#if mode == MODE.Edit}
@@ -434,10 +412,10 @@
 
       <div class="divider"></div>
 
-      {#if userData.email != $currentUser?.email && !isRestrictUserManagment}
+      {#if userData.email != $currentUser?.email && !isRestrictUserMgmt}
         <div class="flex items-center">
           <button
-            class="flex items-center text-base-content/80"
+            class="btn btn-sm btn-ghost flex items-center text-base-content/80"
             onclick={(e) => {
               confirmBlockModal?.showModal();
             }}
@@ -453,7 +431,7 @@
           </button>
 
           <button
-            class="flex items-center text-error/60 ml-8"
+            class="btn btn-sm btn-ghost text-error/60 ml-8"
             onclick={(e) => {
               confirmDeleteModal?.showModal();
             }}
@@ -467,7 +445,7 @@
           </button>
 
           <button
-            class="flex items-center text-base-content/80 ml-8"
+            class="btn btn-sm btn-ghost text-base-content/80 ml-8"
             onclick={(e) => {
               confirmResetPwdModal?.showModal();
             }}

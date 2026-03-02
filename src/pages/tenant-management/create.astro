@@ -4,20 +4,25 @@ import { ObjectId } from "mongodb";
 import GlobalTagModel from "$data/models/globalTag.model";
 import GlobalCategoryModel from "$data/models/globalCategory.model";
 import { type TagItem, type CategoryItem } from "$types/Subscription";
-import CloneTenantForm from "./TenantMasterCloneForm.svelte";
+import CreateTenantAccount from "$components/tenant/CreateTenantAccount.svelte";
+import { useTranslations } from "$i18n/utils";
+
+const t = useTranslations();
 
 const allTags = await GlobalTagModel.list();
 const allCategories = await GlobalCategoryModel.list();
 
-const tags: TagItem[] = allTags.map((tag) => {
-  return {
-    title: tag.title,
-    value: tag._id.toString(),
-    description: tag.description,
-    icon: tag.icon,
-    iconColor: tag.iconColor,
-  };
-});
+const tags: TagItem[] = allTags
+  //.filter((tag) => !tag.categories?.length)
+  .map((tag) => {
+    return {
+      title: tag.title,
+      value: tag._id.toString(),
+      description: tag.description,
+      icon: tag.icon,
+      iconColor: tag.iconColor,
+    };
+  });
 
 const categories: CategoryItem[] = allCategories.map((category) => {
   return {
@@ -29,5 +34,11 @@ const categories: CategoryItem[] = allCategories.map((category) => {
 ---
 
 <Layout>
-  <CloneTenantForm {tags} {categories} client:load />
+  <CreateTenantAccount
+    pageTitle={t("tenant.clone-from-master-tenant")}
+    backUrl="/tenant-management"
+    {tags}
+    {categories}
+    client:load
+  />
 </Layout>

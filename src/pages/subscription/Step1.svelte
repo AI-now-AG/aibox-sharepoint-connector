@@ -65,11 +65,14 @@
 
   function handleNext() {
     if (validateForm()) {
+      const selectedTemplate =
+        tags.find((tag) => tag.value == selectedTag)?.title || "";
       storeOrganizationInfo({
         organizationName,
         defaultLanguage: selectedLanguage || LanguageCode.De,
         selectedTags: selectedTag ? [selectedTag] : [],
         selectedCategories,
+        selectedTemplate,
       });
 
       posthogClientCaptureWithoutTenant(EventName.AiboxOnboardingStep1, {
@@ -107,7 +110,7 @@
           value={organizationName}
           placeholder={t("subscription.organization-name-placeholder")}
           inputChange={(event: any) => (organizationName = event.value)}
-          containerClasses="h-[54px] shadow-xl"
+          containerClasses="h-[48px] shadow-xl"
           labelClasses="text-sm"
           classes="text-base"
         />
@@ -124,14 +127,16 @@
     </div>
   </div>
 
-  <TagCategorySelector
-    {tags}
-    {categories}
-    titleAlignCenter
-    {defaultLanguage}
-    bind:selectedTag
-    bind:selectedCategories
-  />
+  <div class="mt-6">
+    <TagCategorySelector
+      {tags}
+      {categories}
+      titleAlignCenter
+      {defaultLanguage}
+      bind:selectedTag
+      bind:selectedCategories
+    />
+  </div>
 
   <!-- NEXT -->
   <div class="w-full flex items-center justify-end rounded-lg p-4">

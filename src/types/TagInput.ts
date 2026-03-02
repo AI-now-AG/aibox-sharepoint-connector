@@ -4,6 +4,7 @@ export interface TagItem {
   description: string;
   icon?: string | null | undefined;
   iconColor?: string | null | undefined;
+  categories?: string[];
 }
 
 export type TagList = TagItem[];

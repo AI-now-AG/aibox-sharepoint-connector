@@ -2,17 +2,18 @@
   import { SubscriptionPackages } from "$data/subscription-packages";
   import SubscriptionPackage from "./SubscriptionPackage.svelte";
 
-  const packages = [
-    SubscriptionPackages.plan.Starter,
-    SubscriptionPackages.plan.Teams,
-    SubscriptionPackages.plan.Pro,
-  ];
   interface Props {
     selectedPackageId?: string;
     defaultLanguage?: string;
   }
   let { selectedPackageId = $bindable(""), defaultLanguage = "en" }: Props =
     $props();
+
+  const packages = [
+    SubscriptionPackages.plan.Starter,
+    SubscriptionPackages.plan.Teams,
+    SubscriptionPackages.plan.Pro,
+  ];
 
   function handleSelectPackage(id: string) {
     selectedPackageId = id;

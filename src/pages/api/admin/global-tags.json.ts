@@ -8,6 +8,7 @@ const CreateTagParamsSchema = z.object({
   description: z.string().default(""),
   icon: z.string().nullish(),
   iconColor: z.string().nullish(),
+  categories: z.array(z.string()).default([]),
 });
 
 export type CreateTagParams = z.infer<typeof CreateTagParamsSchema>;
@@ -28,7 +29,8 @@ export const GET: APIRoute = async () => {
           title: tag.title,
           description: tag.description,
           icon: tag.icon,
-          iconColor: tag.iconColor
+          iconColor: tag.iconColor,
+          categories: tag.categories || [],
         })),
       ),
       { status: 200 },
@@ -52,6 +54,7 @@ export const POST: APIRoute = async (ctx) => {
   // Create the new tag
   const newTag: Partial<Tag> = {
     title: data.title,
+    categories: [],
   };
 
   try {
@@ -80,7 +83,8 @@ export const PUT: APIRoute = async (ctx) => {
     title: data.title,
     description: data.description,
     icon: data.icon,
-    iconColor: data.iconColor
+    iconColor: data.iconColor,
+    categories: data.categories,
   };
 
   try {
