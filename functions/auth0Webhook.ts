@@ -17,6 +17,8 @@ import {
   sendNotificationEmail,
 } from "$utils/auth0Auth";
 import { UserRole } from "$types/Users";
+import { SG_SOMEDIA_PASSWORD_TEMPLATE, TENANT_SOMEDIA } from "$constants";
+import { isProd } from "$utils/env";
 
 /**
  * Handles Auth0 log stream events
@@ -220,7 +222,23 @@ const triggerRegistrationEmail = async (
     // Send user verification email
     await sendVerificationEmail(userId, email);
   } else {
-    await sendPasswordResetEmail(userId, email);
+    // Get user from database, if not exist, skip sending password reset email.
+    const user = await UserModel.get(userId);
+    if (!user) {
+      console.warn(
+        `User not found in database, skip sending password reset email`,
+        { userId, email },
+      );
+      return;
+    }
+
+    // For Somedia tenant, send a customized password reset email with different template
+    const somediaTenantId = isProd() ? TENANT_SOMEDIA.PROD : TENANT_SOMEDIA.DEV;
+    const templateId =
+      user.tenant_id?.toString() == somediaTenantId
+        ? SG_SOMEDIA_PASSWORD_TEMPLATE
+        : null;
+    await sendPasswordResetEmail(userId, email, templateId);
   }
 };
 
