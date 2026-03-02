@@ -98,10 +98,6 @@ export const TENANT_SOMEDIA_ID = {
   DEV: "671f3f4c44d9f6336b4cdd6a", // Somedia TEST
   PROD: "66aa21a3d40d0b194e280143", // Somedia
 };
-export const TENANT_SOMEDIA_NAME = {
-  DEV: "somedia-dev", // somedia-dev
-  PROD: "somedia", // somedia
-};
 
 // Stripe
 export const STRIPE_PRODUCTS = {

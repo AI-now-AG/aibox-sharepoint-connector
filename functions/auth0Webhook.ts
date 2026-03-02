@@ -17,7 +17,7 @@ import {
   sendNotificationEmail,
 } from "$utils/auth0Auth";
 import { UserRole } from "$types/Users";
-import { SG_SOMEDIA_PASSWORD_TEMPLATE, TENANT_SOMEDIA_NAME } from "$constants";
+import { TENANT_SOMEDIA_ID, SG_SOMEDIA_PASSWORD_TEMPLATE } from "$constants";
 import { isProd } from "$utils/env";
 
 /**
@@ -73,16 +73,9 @@ const auth0Webhook: Handler = async (
             email,
             connection,
             is_signup: isSignup,
-            tenant: tenantName,
           } = data.details.body || {};
 
-          await triggerRegistrationEmail(
-            userId,
-            email,
-            connection,
-            isSignup,
-            tenantName,
-          );
+          await triggerRegistrationEmail(userId, email, connection, isSignup);
           if (isSignup) {
             await triggerSignupAlertEmail(userId, email, connection);
             await updateAuth0UserMetadata(userId, { signup: true });
@@ -222,13 +215,11 @@ const triggerRegistrationEmail = async (
   email: string,
   connection: string,
   isSignup?: boolean,
-  tenantName?: string,
 ) => {
   console.log(`Trigger registration email`, {
     email,
     connection,
     isSignup,
-    tenantName,
   });
 
   if (isSignup == true) {
@@ -236,11 +227,14 @@ const triggerRegistrationEmail = async (
     await sendVerificationEmail(userId, email);
   } else {
     // For Somedia tenant, send a customized password reset email with different template
-    const somediaTenantName = isProd()
-      ? TENANT_SOMEDIA_NAME.PROD
-      : TENANT_SOMEDIA_NAME.DEV;
+    const localUser = await UserModel.getAuth0Sub(userId);
+    const somediaTenantId = isProd()
+      ? TENANT_SOMEDIA_ID.PROD
+      : TENANT_SOMEDIA_ID.DEV;
     const templateId =
-      tenantName == somediaTenantName ? SG_SOMEDIA_PASSWORD_TEMPLATE : null;
+      localUser?.tenant_id?.toString() == somediaTenantId
+        ? SG_SOMEDIA_PASSWORD_TEMPLATE
+        : null;
     await sendPasswordResetEmail(userId, email, templateId);
   }
 };
