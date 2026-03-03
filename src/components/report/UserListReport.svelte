@@ -5,7 +5,8 @@
   import { addToast } from "$stores/toast";
   import { useTranslations } from "$i18n/utils";
   import { getRoleString } from "$utils/roles";
-  import { debounce, preventDefault, formatDate } from "$utils/common";
+  import { preventDefault, formatDate } from "$utils/common";
+  import UserSearchFilter from "./UserSearchFilter.svelte";
   import Loading from "$components/Loading.svelte";
   import Pagination from "$components/Pagination.svelte";
 
@@ -16,18 +17,14 @@
   let total: number = $state(0);
   let pageSize: number = $state(20);
 
-  let search: string = $state("");
+  let searchValue: string = $state("");
+  let selectedTenant: string = $state("");
+  let includeUnassigned: boolean = $state(false);
   let users: Record<string, any>[] = $state([]);
 
   onMount(() => {
     fetchUserListReport();
   });
-
-  const debouncedSearch = debounce((value: string) => {
-    page = 1;
-    search = value;
-    fetchUserListReport();
-  }, 300);
 
   const handlePageChange = (p: number) => {
     page = p;
@@ -42,7 +39,7 @@
     const { data, error } = await actions.report.userListReport({
       page,
       pageSize,
-      search,
+      search: searchValue,
     });
     loading = false;
 
@@ -112,20 +109,19 @@
 </div>
 
 <div class="mb-5">
-  <div class="items-center mb-4">
-    <div class="relative w-full">
-      <label class="input input-bordered flex items-center gap-2 w-full">
-        {@html svgIcons.search}
-        <input
-          type="text"
-          class="grow text-sm"
-          placeholder={t("user.search-for-users")}
-          bind:value={search}
-          oninput={(e) => debouncedSearch((e.target as HTMLInputElement).value)}
-        />
-      </label>
-    </div>
-  </div>
+  <UserSearchFilter
+    bind:value={searchValue}
+    bind:selectedTenant
+    bind:includeUnassigned
+    onsearch={() => {
+      page = 1;
+      fetchUserListReport();
+    }}
+    onfilter={() => {
+      page = 1;
+      fetchUserListReport();
+    }}
+  />
 
   {#if users.length === 0}
     {#if !loading}
@@ -133,7 +129,7 @@
     {/if}
   {:else}
     <div class="mb-4">
-      <table class="table border min-w-full relative">
+      <table class="border-separate border-spacing-x-0 min-w-full relative">
         <colgroup>
           <col class="w-auto" />
           <col class="w-[250]" />
@@ -143,15 +139,19 @@
         </colgroup>
         <thead>
           <tr class="bg-base-300">
-            <th class="py-3 px-4 text-left font-semibold text-sm"
+            <th class="py-3 px-4 text-left font-normal text-xs"
               >{t("user.e-mail")}</th
             >
-            <th class="py-3 px-4 font-semibold text-sm">{t("user.tenant")}</th>
-            <th class="py-3 px-4 font-semibold text-sm">{t("user.roles")}</th>
-            <th class="py-3 px-4 font-semibold text-sm"
+            <th class="py-3 px-4 text-left font-normal text-xs"
+              >{t("user.tenant")}</th
+            >
+            <th class="py-3 px-4 text-left font-normal text-xs"
+              >{t("user.roles")}</th
+            >
+            <th class="py-3 px-4 text-left font-normal text-xs"
               >{t("user.latest-login")}</th
             >
-            <th class="py-3 px-4 text-center font-semibold text-sm"
+            <th class="py-3 px-4 text-left font-normal text-xs"
               >{t("user.status")}</th
             >
           </tr>
