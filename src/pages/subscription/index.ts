@@ -8,7 +8,7 @@ export async function GET(context: APIContext): Promise<Response> {
     event: EventName.AiboxOnboardingStarted,
     properties: {
       page_name: ScreenName.OnboardingStep1,
-    }
+    },
   });
   return context.redirect("/subscription/step1");
 }
