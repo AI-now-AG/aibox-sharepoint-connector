@@ -343,6 +343,12 @@ export default {
     return await collection.findOne<Document<Tenant>>({ org_id });
   },
 
+  getByResellerCode: async (resellerCode: string) => {
+    return await collection.findOne<Document<Tenant>>({
+      reseller_code: resellerCode,
+    });
+  },
+
   updateOrgName: async (org_id: string, newOrgName: string) => {
     return collection.updateOne(
       { org_id },

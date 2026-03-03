@@ -3,10 +3,13 @@ import Layout from "$layouts/Layout.astro";
 import auth from "$auth/auth";
 import ResellerTenantList from "./ResellerTenantList.svelte";
 
-if (
-  Astro.locals.tenant?.is_reseller !== true ||
-  !auth.isReseller(Astro.locals)
-) {
+const isReseller = Astro.locals.tenant?.is_reseller === true;
+const hasAccess =
+  auth.isReseller(Astro.locals) ||
+  auth.isSuperAdmin(Astro.locals) ||
+  auth.isAdmin(Astro.locals);
+
+if (!isReseller || !hasAccess) {
   return Astro.rewrite("/restricted");
 }
 

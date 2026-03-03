@@ -85,14 +85,16 @@ export const AUTH0_AUTH_WINDOWS_CON_PROD = "con_Si1JPT62XNjp9gVp";
 // SendGrid
 export const SG_VERIFICATION_TEMPLATE = "d-69ed72334042458783f985ada5dbe61d";
 export const SG_PASSWORD_RESET_TEMPLATE = "d-6eee3ae854944c4ebd17e1d7264975d5";
+export const SG_SOMEDIA_PASSWORD_TEMPLATE =
+  "d-bd2d9c5a0f3d46408eeafc00c632c271";
 export const SG_NEW_TENANT_TEMPLATE = "d-87847bafc967448e93d99a411edece3a";
 
 // Tenants
-export const TENANT_MASTER = {
+export const TENANT_MASTER_ID = {
   DEV: "67ff572260fa2a8bca5d26d0", // aibox dev master
   PROD: "66cc50d98103241cf3354d3f", // aibox master
 };
-export const TENANT_SOMEDIA = {
+export const TENANT_SOMEDIA_ID = {
   DEV: "671f3f4c44d9f6336b4cdd6a", // Somedia TEST
   PROD: "66aa21a3d40d0b194e280143", // Somedia
 };

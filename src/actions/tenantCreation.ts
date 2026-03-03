@@ -32,9 +32,9 @@ import sendMail from "$utils/mail";
 import { isProd } from "$utils/env";
 import { randomString } from "$utils/common";
 import { getTranscriptionTypes, hasSubtitleEditor } from "$utils/onboarding";
-import { TENANT_MASTER } from "$constants";
+import { TENANT_MASTER_ID } from "$constants";
 
-const masterTenantId = isProd() ? TENANT_MASTER.PROD : TENANT_MASTER.DEV;
+const masterTenantId = isProd() ? TENANT_MASTER_ID.PROD : TENANT_MASTER_ID.DEV;
 
 const OrganizationNameInputParamsSchema = z.object({
   organization_name: z.string().min(1),
@@ -327,7 +327,7 @@ export const tenantCreation = {
           email: "no-reply@ainow.ch",
         },
         to: "support@aibox-app.ch",
-        bcc: "devlin.nguyenb4you.ch@gmail.com",
+        //bcc: "devlin.nguyenb4you.ch@gmail.com",
         subject: emailSubject,
         html: emailContent,
       });
