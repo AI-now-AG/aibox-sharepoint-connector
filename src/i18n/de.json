@@ -234,7 +234,7 @@
   "user.block-user": "Benutzer sperren",
   "user.un-block-user": "Benutzer entsperren",
   "user.delete-user-account": "Block User Account",
-  "user.delete-confirm-message": "Möchten Sie diesen Benutzer wirklich löschen?",
+  "user.delete-confirm-message": "Durch das Löschen dieses Benutzers werden alle zugehörigen Daten dauerhaft entfernt. Möchten Sie fortfahren?",
   "user.delete-description-message": "Diese Aktion kann nicht rückgängig gemacht werden.",
   "user.delete-user": "Benutzer löschen",
   "user.all-users": "Alle Benutzer",

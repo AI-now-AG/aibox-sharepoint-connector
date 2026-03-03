@@ -234,7 +234,7 @@
   "user.block-user": "Block user",
   "user.un-block-user": "Unblock user",
   "user.delete-user-account": "Block User Account",
-  "user.delete-confirm-message": "Are you sure you want to delete this user?",
+  "user.delete-confirm-message": "Deleting this user will permanently remove all associated data. Are you sure you want to continue?",
   "user.delete-description-message": "This action is permanent and cannot be undone",
   "user.delete-user": "Delete user",
   "user.all-users": "All User",

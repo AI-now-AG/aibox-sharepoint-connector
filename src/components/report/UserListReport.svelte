@@ -7,6 +7,7 @@
   import { getRoleString } from "$utils/roles";
   import { preventDefault, formatDate } from "$utils/common";
   import UserSearchFilter from "./UserSearchFilter.svelte";
+  import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import Loading from "$components/Loading.svelte";
   import Pagination from "$components/Pagination.svelte";
 
@@ -21,6 +22,9 @@
   let selectedTenant: string = $state("");
   let includeUnassigned: boolean = $state(false);
   let users: Record<string, any>[] = $state([]);
+
+  let selectedUser: any = $state(null);
+  let confirmDeleteModal: HTMLDialogElement | undefined = $state();
 
   onMount(() => {
     fetchUserListReport();
@@ -54,6 +58,32 @@
       total = data.total;
     }
   };
+
+  function onSelectDelete(tenantId: any) {
+    selectedUser = tenantId;
+    confirmDeleteModal?.showModal();
+  }
+
+  async function deleteTenant() {
+    let result = await actions.user.delete({
+      _id: selectedUser,
+    });
+    loading = false;
+    const { error } = result;
+    if (error) {
+      addToast({
+        message: t("user.delete-failed"),
+        type: "error",
+      });
+      return;
+    }
+
+    addToast({
+      message: t("user.delete-successful"),
+      type: "success",
+    });
+    await fetchUserListReport();
+  }
 
   const exportUserList = async () => {
     loading = true;
@@ -136,6 +166,7 @@
           <col class="w-[120]" />
           <col class="w-[150]" />
           <col class="w-[150]" />
+          <col class="w-[100]" />
         </colgroup>
         <thead>
           <tr class="bg-base-300">
@@ -154,6 +185,7 @@
             <th class="py-3 px-4 text-left font-normal text-xs"
               >{t("user.status")}</th
             >
+            <th class="py-3 px-4"></th>
           </tr>
         </thead>
         <tbody>
@@ -178,6 +210,26 @@
                   <span style={`color: 00CA92`}>{t("user.veriried")}</span>
                 {/if}
               </td>
+              <td class="py-2 px-4 text-right relative relative-dropdown">
+                <div class="dropdown dropdown-hover dropdown-end">
+                  <button class="btn btn-ghost btn-sm z-50">
+                    {@html svgIcons.threeDot}
+                  </button>
+                  <ul
+                    class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
+                  >
+                    <li>
+                      <button
+                        class="flex block w-full text-left px-4 py-1 text-sm hover:underline"
+                        onclick={() => onSelectDelete(user._id)}
+                      >
+                        {@html svgIcons.trash}
+                        <span class="ml-1">{t("common.delete")}</span>
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+              </td>
             </tr>
           {/each}
         </tbody>
@@ -189,3 +241,9 @@
 </div>
 
 <Loading show={loading} />
+
+<ConfirmDialog
+  bind:modal={confirmDeleteModal}
+  confirm={deleteTenant}
+  description={t("user.delete-confirm-message")}
+/>
