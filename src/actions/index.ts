@@ -14,6 +14,7 @@ import { globalCategory } from "./globalCategory";
 import { globalPrompt } from "./globalPrompt";
 import { posthog } from "./posthog";
 import { ragConfiguration } from "./ragConfiguration";
+import { globalApiKeys } from "./globalApiKeys";
 
 export const server = {
   tenant,
@@ -32,4 +33,5 @@ export const server = {
   globalPrompt,
   posthog,
   ragConfiguration,
+  globalApiKeys,
 };
