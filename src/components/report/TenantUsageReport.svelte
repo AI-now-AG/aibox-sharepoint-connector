@@ -91,7 +91,12 @@
 </script>
 
 <div class="mt-5">
-  <TenantUsageFilter {isPrivileged} bind:selectedTenant bind:selectedMonth />
+  <TenantUsageFilter
+    {isPrivileged}
+    bind:selectedTenant
+    bind:selectedMonth
+    onsearch={fetchUsages}
+  />
 
   {#if usageData.length === 0}
     {#if !loading}

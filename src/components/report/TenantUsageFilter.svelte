@@ -12,7 +12,7 @@
     isPrivileged?: boolean;
     selectedTenant: string;
     selectedMonth?: string;
-    onsearch: Function;
+    onsearch?: Function;
   }
 
   let {
