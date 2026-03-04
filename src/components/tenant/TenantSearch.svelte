@@ -115,7 +115,7 @@
 
   {#if filteredTenants.length > 0}
     <ul
-      class="dropdown-content menu shadow bg-base-100 rounded-box w-full max-h-[250px] overflow-scroll"
+      class="dropdown-content menu shadow bg-base-100 rounded-box w-full max-h-[250px] flex-nowrap"
       out:fade
     >
       {#each filteredTenants as option}
