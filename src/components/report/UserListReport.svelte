@@ -194,7 +194,9 @@
           {#each users as user}
             <tr class="bg-base-100 text-sm">
               <td class="py-3 px-4 text-sm font-medium">{user.email}</td>
-              <td class="py-3 px-4 text-sm font-medium">{user.tenant?.name}</td>
+              <td class="py-3 px-4 text-sm font-medium"
+                >{user.tenant?.name || "Unknow"}</td
+              >
               <td class="py-3 px-4 text-sm font-medium"
                 >{getRoleString(user.roles)}</td
               >

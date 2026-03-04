@@ -39,6 +39,13 @@
     fetchTenants();
   });
 
+  $effect(() => {
+    if (selectedTenant == "") {
+      searchQuery = "";
+      selectedOption = null;
+    }
+  });
+
   async function fetchTenants() {
     isFetching = true;
 

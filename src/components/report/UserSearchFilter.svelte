@@ -26,6 +26,21 @@
     value = (target as HTMLInputElement).value;
     onsearch?.();
   }, 300);
+
+  const handleTenantChange = () => {
+    includeUnassigned = false;
+    onfilter?.();
+  };
+
+  const handleTenantClear = () => {
+    onfilter?.();
+  };
+
+  const handleUnassignedToggle = () => {
+    includeUnassigned = !includeUnassigned;
+    selectedTenant = "";
+    onfilter?.();
+  };
 </script>
 
 <div class="px-5 py-5 bg-base-100 rounded-lg items-center mb-10">
@@ -61,12 +76,8 @@
       <TenantSearch
         bind:selectedTenant
         placeholder={t("user-list-report.filter.tenant-placeholder")}
-        onselect={() => {
-          onfilter?.();
-        }}
-        onclear={() => {
-          onfilter?.();
-        }}
+        onselect={handleTenantChange}
+        onclear={handleTenantClear}
       />
     </div>
     <div class="col-span-3 xl:col-span-3">
@@ -79,10 +90,7 @@
           name="unscoped_user"
           class="checkbox checkbox-sm checkbox-neutral"
           checked={includeUnassigned}
-          onclick={() => {
-            includeUnassigned = !includeUnassigned;
-            onfilter?.();
-          }}
+          onclick={handleUnassignedToggle}
         />
         <span class="text-sm font-normal"
           >{t("user-list-report.filter.include-unassigned-users")}</span
