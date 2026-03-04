@@ -599,6 +599,7 @@
   "nav.settings.prompt-refinement": "Prompt Optimierung",
   "nav.settings.rag-configuration": "RAG-Konfiguration",
   "nav.settings.global-api-keys": "Globale API-Schlüssel",
+  "global-api-keys.title": "Globale API-Schlüssel",
   "global-api-keys.description": "Konfigurieren Sie gemeinsame API-Schlüssel, die standardmässig von allen Mandanten verwendet werden. Mandanten können diese mit privaten Schlüsseln überschreiben.",
   "global-api-keys.update-success": "Globale API-Schlüssel erfolgreich aktualisiert",
   "global-api-keys.update-failed": "Fehler beim Aktualisieren der globalen API-Schlüssel",
