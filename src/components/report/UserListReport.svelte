@@ -44,6 +44,8 @@
       page,
       pageSize,
       search: searchValue,
+      tenant: selectedTenant,
+      includeUnassigned,
     });
     loading = false;
 

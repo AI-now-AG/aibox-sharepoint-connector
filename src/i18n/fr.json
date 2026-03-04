@@ -909,5 +909,12 @@
   "reseller.dashboard.tenant-subscription": "Subscription",
   "reseller.dashboard.tenant-subscription-start": "Subscription Start",
   "reseller.dashboard.tenant-cancellation-date": "Cancellation Date",
-  "reseller.dashboard.tenant-status": "Status"
+  "reseller.dashboard.tenant-status": "Status",
+  "user-list-report.filter.filter-label": "Filters",
+  "user-list-report.filter.seach-label": "Search tenants",
+  "user-list-report.filter.seach-placeholder": "Search users",
+  "user-list-report.filter.tenant-label": "Tenant",
+  "user-list-report.filter.tenant-placeholder": "Search tenants",
+  "user-list-report.filter.others-label": "Others",
+  "user-list-report.filter.include-unassigned-users": "Include unassigned users"
 }

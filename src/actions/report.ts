@@ -13,12 +13,26 @@ import UserModel from "$data/models/user.model";
 import UsageLogModel from "$data/models/usageLog.model";
 import { calculateUsage, sumCreditsUsed } from "$utils/usageCalculator";
 
+const UsagePerTenantInputParamsSchema = z.object({
+  tenant_id: z.string(),
+  month: z.string(),
+});
+
+const CreditUsageAllInputParamsSchema = z.object({
+  month: z.string(),
+});
+
+const UserListReportInputParamsSchema = z.object({
+  page: z.number().optional(),
+  pageSize: z.number().optional(),
+  search: z.string().optional(),
+  tenant: z.string().optional(),
+  includeUnassigned: z.boolean().optional(),
+});
+
 export const report = {
-  usagePerTeant: defineAction({
-    input: z.object({
-      tenant_id: z.string(),
-      month: z.string(),
-    }),
+  usagePerTenant: defineAction({
+    input: UsagePerTenantInputParamsSchema,
     handler: async (input) => {
       const { tenant_id: tenantId, month } = input;
 
@@ -48,9 +62,7 @@ export const report = {
     },
   }),
   creditUsageAll: defineAction({
-    input: z.object({
-      month: z.string(),
-    }),
+    input: CreditUsageAllInputParamsSchema,
     handler: async (input) => {
       const { month } = input;
 
@@ -84,11 +96,7 @@ export const report = {
     },
   }),
   userListReport: defineAction({
-    input: z.object({
-      page: z.number().optional(),
-      pageSize: z.number().optional(),
-      search: z.string().optional(),
-    }),
+    input: UserListReportInputParamsSchema,
     handler: async (input) => {
       const results = await UserModel.fetchPaginatedReports(input);
       return transformRawData(results);

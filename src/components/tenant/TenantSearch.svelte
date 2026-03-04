@@ -14,11 +14,17 @@
   import { useTranslations } from "$i18n/utils";
 
   interface Props {
-    selectedTenant: string | null;
+    selectedTenant: string;
+    placeholder?: string;
     onselect?: Function;
     onclear?: Function;
   }
-  let { selectedTenant = $bindable(""), onselect, onclear }: Props = $props();
+  let {
+    selectedTenant = $bindable(""),
+    placeholder = "Search tenants",
+    onselect,
+    onclear,
+  }: Props = $props();
 
   const t = useTranslations();
 
@@ -58,7 +64,7 @@
   function onClear() {
     searchQuery = "";
     selectedOption = null;
-    selectedTenant = null;
+    selectedTenant = "";
 
     onclear?.();
   }
@@ -85,7 +91,7 @@
       <input
         type="text"
         class="grow {selectedOption ? 'bg-base-100' : ''}"
-        placeholder={selectedOption ? selectedOption.title : "Search tenants"}
+        placeholder={selectedOption ? selectedOption.title : placeholder}
         bind:value={searchQuery}
         oninput={preventDefault(onSearch)}
       />

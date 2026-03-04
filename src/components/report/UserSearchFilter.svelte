@@ -8,7 +8,7 @@
 
   interface Props {
     value?: string;
-    selectedTenant?: string | null;
+    selectedTenant?: string;
     includeUnassigned?: boolean;
     onsearch: Function;
     onfilter: Function;
@@ -32,13 +32,15 @@
   <div class="inline-flex items-center mb-2">
     {@html svgIcons.filter}
     <h3 class="ml-2 text-normal font-normal">
-      {t("tenant.filter-label")}
+      {t("user-list-report.filter.filter-label")}
     </h3>
   </div>
 
   <div class="grid grid-cols-1 xl:grid-cols-12 gap-10">
     <div class="col-span-3 xl:col-span-4">
-      <p class="mb-1 text-base-content/80">{t("tenant.search-label")}</p>
+      <p class="mb-1 text-base-content/80">
+        {t("user-list-report.filter.seach-label")}
+      </p>
       <label
         class="input input-bordered flex items-center gap-2 w-full max-w-sm
 "
@@ -47,17 +49,18 @@
         <input
           type="text"
           class="grow"
-          placeholder={t("tenant.tenants.seach-place-holder")}
+          placeholder={t("user-list-report.filter.seach-placeholder")}
           oninput={preventDefault(onSearch)}
         />
       </label>
     </div>
     <div class="col-span-6 xl:col-span-5">
       <p class="mb-2 text-base-content/80">
-        {"Tenant"}
+        {t("user-list-report.filter.tenant-label")}
       </p>
       <TenantSearch
         bind:selectedTenant
+        placeholder={t("user-list-report.filter.tenant-placeholder")}
         onselect={() => {
           onfilter?.();
         }}
@@ -68,7 +71,7 @@
     </div>
     <div class="col-span-3 xl:col-span-3">
       <p class="mb-2 text-base-content/80">
-        {"Others"}
+        {t("user-list-report.filter.others-label")}
       </p>
       <label class="flex items-center space-x-2">
         <input
@@ -81,7 +84,9 @@
             onfilter?.();
           }}
         />
-        <span class="text-sm font-normal">Include unassigned users</span>
+        <span class="text-sm font-normal"
+          >{t("user-list-report.filter.include-unassigned-users")}</span
+        >
       </label>
     </div>
   </div>

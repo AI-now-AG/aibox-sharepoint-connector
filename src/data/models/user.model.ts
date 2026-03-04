@@ -275,10 +275,14 @@ export default {
     page = 1,
     pageSize = 20,
     search = "",
+    tenant = "",
+    includeUnassigned = false,
   }: {
     page?: number;
     pageSize?: number;
     search?: string;
+    tenant?: string;
+    includeUnassigned?: boolean;
   }) => {
     const skip = (page - 1) * pageSize;
 
@@ -315,7 +319,10 @@ export default {
         },
       },
       {
-        $unwind: "$tenant",
+        $unwind: {
+          path: "$tenant",
+          preserveNullAndEmptyArrays: true, // important
+        },
       },
       {
         $project: {
@@ -339,27 +346,56 @@ export default {
       { $sort: { created_at: 1 } },
     ];
 
+    if (tenant) {
+      // specific tenant filter
+      pipeline.push({
+        $match: { tenant_id: new ObjectId(tenant) },
+      });
+    } else if (!includeUnassigned) {
+      // only users whose tenant still exists
+      pipeline.push({
+        $match: { tenant: { $ne: null } },
+      });
+    }
+
     // ✅ Only paginate if pageSize > 0
     if (pageSize > 0) {
       pipeline.push({ $skip: skip });
       pipeline.push({ $limit: pageSize });
     }
 
-    const totalResult = await collection
-      .aggregate([
-        { $match: baseMatch },
-        {
-          $lookup: {
-            from: "tenants",
-            localField: "tenant_id",
-            foreignField: "_id",
-            as: "tenant",
-          },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const totalPipeline: any[] = [
+      { $match: baseMatch },
+      {
+        $lookup: {
+          from: "tenants",
+          localField: "tenant_id",
+          foreignField: "_id",
+          as: "tenant",
         },
-        { $unwind: "$tenant" },
-        { $count: "count" },
-      ])
-      .toArray();
+      },
+      {
+        $unwind: {
+          path: "$tenant",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+    ];
+
+    // Same tenant filtering logic
+    if (tenant) {
+      totalPipeline.push({
+        $match: { tenant_id: new ObjectId(tenant) },
+      });
+    } else if (!includeUnassigned) {
+      totalPipeline.push({
+        $match: { tenant: { $ne: null } },
+      });
+    }
+
+    totalPipeline.push({ $count: "count" });
+    const totalResult = await collection.aggregate(totalPipeline).toArray();
 
     const result = await collection.aggregate(pipeline).toArray();
     const total = totalResult[0]?.count ?? 0;
