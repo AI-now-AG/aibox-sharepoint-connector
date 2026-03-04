@@ -105,6 +105,7 @@
       {#each filteredTenants as option}
         <li>
           <button
+            class="w-full text-left flex items-center gap-2"
             onclick={() => {
               onSelect(option);
             }}>{option.title}</button
