@@ -16,12 +16,14 @@
   interface Props {
     selectedTenant: string;
     placeholder?: string;
+    disabled?: boolean;
     onselect?: Function;
     onclear?: Function;
   }
   let {
     selectedTenant = $bindable(""),
     placeholder = "Search tenants",
+    disabled = false,
     onselect,
     onclear,
   }: Props = $props();
@@ -90,7 +92,8 @@
 <div class="dropdown w-full">
   <div class="flex flex-row items-center space-x-2">
     <div
-      class="input flex justify-between items-center gap-2 {isFetching
+      class="input flex justify-between items-center gap-2 {isFetching ||
+      disabled
         ? 'pointer-events-none opacity-50 bg-gray-200'
         : ''}"
     >

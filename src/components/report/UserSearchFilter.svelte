@@ -76,6 +76,7 @@
       <TenantSearch
         bind:selectedTenant
         placeholder={t("user-list-report.filter.tenant-placeholder")}
+        disabled={includeUnassigned}
         onselect={handleTenantChange}
         onclear={handleTenantClear}
       />
@@ -90,6 +91,7 @@
           name="unscoped_user"
           class="checkbox checkbox-sm checkbox-neutral"
           checked={includeUnassigned}
+          disabled={!!selectedTenant}
           onclick={handleUnassignedToggle}
         />
         <span class="text-sm font-normal"
