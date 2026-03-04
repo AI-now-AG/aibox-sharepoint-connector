@@ -8,7 +8,7 @@
 
   interface Props {
     value?: string;
-    selectedTenant?: string;
+    selectedTenant?: string | null;
     includeUnassigned?: boolean;
     onsearch: Function;
     onfilter: Function;
@@ -56,7 +56,15 @@
       <p class="mb-2 text-base-content/80">
         {"Tenant"}
       </p>
-      <TenantSearch />
+      <TenantSearch
+        bind:selectedTenant
+        onselect={() => {
+          onfilter?.();
+        }}
+        onclear={() => {
+          onfilter?.();
+        }}
+      />
     </div>
     <div class="col-span-3 xl:col-span-3">
       <p class="mb-2 text-base-content/80">

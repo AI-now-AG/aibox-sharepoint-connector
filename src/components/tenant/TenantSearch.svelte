@@ -15,8 +15,10 @@
 
   interface Props {
     selectedTenant: string | null;
+    onselect?: Function;
+    onclear?: Function;
   }
-  let { selectedTenant }: Props = $props();
+  let { selectedTenant = $bindable(""), onselect, onclear }: Props = $props();
 
   const t = useTranslations();
 
@@ -57,6 +59,8 @@
     searchQuery = "";
     selectedOption = null;
     selectedTenant = null;
+
+    onclear?.();
   }
 
   function onSelect(option: Option) {
@@ -65,6 +69,8 @@
 
     searchQuery = option.title;
     filteredTenants = [];
+
+    onselect?.(selectedTenant);
   }
 </script>
 
@@ -74,7 +80,9 @@
       {@html svgIcons.search}
       <input
         type="text"
-        class="grow {selectedOption ? 'bg-base-100' : ''}"
+        class="grow
+        {selectedOption ? 'bg-base-100' : ''} 
+        {isFetching ? ' pointer-events-none opacity-50 bg-gray-200 ' : ' '}"
         placeholder={selectedOption ? selectedOption.title : "Search tenants"}
         bind:value={searchQuery}
         oninput={preventDefault(onSearch)}
