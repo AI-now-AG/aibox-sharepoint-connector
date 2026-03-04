@@ -46,8 +46,6 @@
       <TenantSearch
         bind:selectedTenant
         placeholder={t("user-list-report.filter.tenant-placeholder")}
-        onselect={() => onsearch?.()}
-        onclear={() => onsearch?.()}
       />
     </div>
   {/if}
