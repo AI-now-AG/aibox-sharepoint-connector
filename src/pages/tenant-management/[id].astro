@@ -7,6 +7,7 @@ import SubscriptionModel from "$data/models/subscription.model";
 import { transformRawData } from "$utils/transformRawData";
 import { isTestMode } from "$utils/stripe";
 import { decrypt } from "$utils/secure";
+import { actions } from "astro:actions";
 
 export interface Props {
   id: string;
@@ -41,6 +42,12 @@ const subscriptionData = transformRawData(subscription, false);
 const countActiveUsers = await UserModel.countActiveUsersByTenant(id);
 
 const resellerCodes = await TenantModel.listAllResellerCodes();
+
+const { data: globalKeysData } = await Astro.callAction(
+  actions.globalApiKeys.get,
+  {},
+);
+const globalApiKeyStatus = globalKeysData?._hasKeys ?? {};
 ---
 
 <Layout>
@@ -50,6 +57,7 @@ const resellerCodes = await TenantModel.listAllResellerCodes();
     activeUsers={countActiveUsers}
     isStripeInTestMode={isTestMode()}
     {resellerCodes}
+    {globalApiKeyStatus}
     client:load
   />
 </Layout>

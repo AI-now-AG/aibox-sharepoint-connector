@@ -60,6 +60,7 @@
     activeUsers?: number;
     isStripeInTestMode?: boolean;
     resellerCodes: string[];
+    globalApiKeyStatus?: Record<string, boolean>;
   }
 
   let {
@@ -68,6 +69,7 @@
     activeUsers = 0,
     isStripeInTestMode = false,
     resellerCodes = [],
+    globalApiKeyStatus = {},
   }: Props = $props();
 
   let addTenantAdminFor: "admin" | "sa" = $state("admin");
@@ -244,15 +246,9 @@
     return EMBEDDING_MODELS[selectedEmbeddingProvider] || [];
   });
 
-  let openAIKeyField: HTMLInputElement;
-  let openAIGpt5KeyField: HTMLInputElement;
-  let azureOpenAIKeyField: HTMLInputElement;
-  let perplexityKeyField: HTMLInputElement;
   let azureOpenAIKeyProField: HTMLInputElement;
   let elevenLabsAIKeyField: HTMLInputElement;
   let falOpenAIKeyField: HTMLInputElement;
-  let claudeKeyField: HTMLInputElement;
-  let geminiKeyField: HTMLInputElement;
   let defaultTextFeature = $state("");
 
   // API providers
@@ -550,6 +546,119 @@
   );
 
   let selectedGeminiModel: string = $state(tenantData.gemini_chat_model ?? "");
+
+  // ==========================================
+  // TEXT PROVIDER TABLE CONFIG
+  // ==========================================
+  const TEXT_PROVIDERS = [
+    {
+      key: "openai",
+      name: t("tenant.open-ai-provider"),
+      provider: ApiKeyProvider.OpenAI,
+      modelField: "openai_chat_model",
+      apiKeyField: "openai_api_key",
+      privateKeyFlag: "openaiPrivateKeyEnabled",
+      globalKeyField: "openai_api_key",
+      hasExtraConfig: false,
+    },
+    {
+      key: "openai_gpt5",
+      name: t("tenant.open-ai-provider") + " GPT-5",
+      provider: ApiKeyProvider.OpenAIGpt5,
+      modelField: "openai_gpt5_chat_model",
+      apiKeyField: "openai_gpt5_api_key",
+      privateKeyFlag: "openaiGpt5PrivateKeyEnabled",
+      globalKeyField: "openai_gpt5_api_key",
+      hasExtraConfig: false,
+    },
+    {
+      key: "azure_openai",
+      name: t("tenant.azure-open-ai-provider"),
+      provider: ApiKeyProvider.AzureOpenAI,
+      modelField: "azure_openai_chat_model",
+      apiKeyField: "azure_openai_api_key",
+      privateKeyFlag: "azureOpenaiPrivateKeyEnabled",
+      globalKeyField: "azure_openai_api_key",
+      hasExtraConfig: true,
+    },
+    {
+      key: "perplexity",
+      name: t("tenant.perplexity.name"),
+      provider: ApiKeyProvider.Perplexity,
+      modelField: "perplexity_chat_model",
+      apiKeyField: "perplexity_api_key",
+      privateKeyFlag: "perplexityPrivateKeyEnabled",
+      globalKeyField: "perplexity_api_key",
+      hasExtraConfig: false,
+    },
+    {
+      key: "claude",
+      name: t("tenant.claude.name"),
+      provider: ApiKeyProvider.Claude,
+      modelField: "anthropic_chat_model",
+      apiKeyField: "anthropic_api_key",
+      privateKeyFlag: "claudePrivateKeyEnabled",
+      globalKeyField: "anthropic_api_key",
+      hasExtraConfig: false,
+    },
+    {
+      key: "gemini",
+      name: t("tenant.gemini.name"),
+      provider: ApiKeyProvider.Gemini,
+      modelField: "gemini_chat_model",
+      apiKeyField: "gemini_api_key",
+      privateKeyFlag: "geminiPrivateKeyEnabled",
+      globalKeyField: "gemini_api_key",
+      hasExtraConfig: false,
+    },
+  ];
+
+  function getProviderEnabled(key: string): boolean {
+    switch (key) {
+      case "openai": return openAIEnabled;
+      case "openai_gpt5": return openAIGpt5Enabled;
+      case "azure_openai": return azureOpenAIEnabled;
+      case "perplexity": return perplexityEnabled;
+      case "claude": return claudeEnabled;
+      case "gemini": return geminiEnabled;
+      default: return false;
+    }
+  }
+
+  function setProviderEnabled(key: string, value: boolean) {
+    switch (key) {
+      case "openai": openAIEnabled = value; break;
+      case "openai_gpt5": openAIGpt5Enabled = value; break;
+      case "azure_openai": azureOpenAIEnabled = value; break;
+      case "perplexity": perplexityEnabled = value; break;
+      case "claude": claudeEnabled = value; break;
+      case "gemini": geminiEnabled = value; break;
+    }
+  }
+
+  function getProviderModel(key: string): string {
+    switch (key) {
+      case "openai": return tenantData.openai_chat_model || "";
+      case "openai_gpt5": return tenantData.openai_gpt5_chat_model || "";
+      case "azure_openai": return tenantData.azure_openai_chat_model || "";
+      case "perplexity": return selectedPerplexityModel || "";
+      case "claude": return selectedClaudeModel || "";
+      case "gemini": return selectedGeminiModel || "";
+      default: return "";
+    }
+  }
+
+  let azureConfigExpanded = $state(false);
+
+  const keyFieldRefs: Record<string, HTMLInputElement> = {};
+  function trackKeyField(node: HTMLInputElement, key: string) {
+    keyFieldRefs[key] = node;
+    return {
+      destroy() {
+        delete keyFieldRefs[key];
+      },
+    };
+  }
 
   function toggleTextFeature(feature: ApiKeyProvider) {
     defaultTextFeature = defaultTextFeature === feature ? "" : feature;
@@ -1486,609 +1595,191 @@
         </div>
       </div>
 
-      <!-- Features -->
+      <!-- Text Model Management -->
       <div class="p-5 mb-8 bg-base-100 rounded-lg">
-        <div class="mb-3 flex flex-row items-center gap-2">
+        <div class="mb-4 flex flex-row items-center gap-2">
           {@html svgIcons.textPrompt}
-          <p class="font-medium text-md">{t("tenant.text.prompt.features")}</p>
+          <div>
+            <p class="font-medium text-md">{t("tenant.text-model.title")}</p>
+            <p class="text-sm text-base-content/60">{t("tenant.text-model.description")}</p>
+          </div>
         </div>
 
-        <div class="container mx-auto">
-          <!-- Open AI Section -->
-          <div
-            class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
-          >
-            <input type="checkbox" />
-            <div class="collapse-title">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center">
-                  <input
-                    id="feature-text-prompt"
-                    type="checkbox"
-                    bind:checked={openAIEnabled}
-                    class="checkbox checkbox-primary z-10"
-                    disabled={defaultTextFeature === ApiKeyProvider.OpenAI}
-                  />
-                  <label
-                    class="label cursor-pointer ml-2"
-                    for="feature-text-prompt"
-                  >
-                    <span class="label-text text-base-content"
-                      >{t("tenant.open-ai-provider")}</span
-                    >
-                  </label>
-                </div>
-                {#if defaultTextFeature === ApiKeyProvider.OpenAI}
-                  <span class="mb-2 text-base-content/50 font-medium text-sm"
-                    >{t("tenant.default")}</span
-                  >
+        <div class="overflow-x-auto">
+          <table class="table">
+            <thead>
+              <tr class="bg-base-200/50">
+                <th>{t("tenant.text-model.provider")}</th>
+                <th class="text-center w-20">{t("tenant.text-model.active")}</th>
+                <th class="text-center w-20">{t("tenant.text-model.default")}</th>
+                <th class="text-center w-28">{t("tenant.text-model.private-key")}</th>
+                <th>{t("tenant.text-model.api-key-config")}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {#each TEXT_PROVIDERS as p}
+                <tr class="hover:bg-base-200/30">
+                  <!-- Provider/Model -->
+                  <td>
+                    <div>
+                      <span class="font-semibold text-base-content">{p.name}</span>
+                      <div class="text-xs text-base-content/50">{getProviderModel(p.key)}</div>
+                    </div>
+                  </td>
+                  <!-- Active Toggle -->
+                  <td class="text-center">
+                    <input
+                      type="checkbox"
+                      class="toggle toggle-primary toggle-sm"
+                      checked={getProviderEnabled(p.key)}
+                      disabled={defaultTextFeature === p.provider}
+                      onchange={(e) => {
+                        const checked = e.currentTarget.checked;
+                        setProviderEnabled(p.key, checked);
+                        updateTextFeature(p.provider, checked);
+                      }}
+                    />
+                  </td>
+                  <!-- Default Radio -->
+                  <td class="text-center">
+                    <input
+                      type="radio"
+                      name="defaultTextProvider"
+                      class="radio radio-primary radio-sm"
+                      checked={defaultTextFeature === p.provider}
+                      onchange={() => toggleTextFeature(p.provider)}
+                    />
+                  </td>
+                  <!-- Private Key -->
+                  <td class="text-center">
+                    <input
+                      type="checkbox"
+                      class="checkbox checkbox-primary checkbox-sm"
+                      checked={tenantData.metadata?.[p.privateKeyFlag] ?? false}
+                      onchange={(e) => {
+                        tenantData.metadata[p.privateKeyFlag] = e.currentTarget.checked;
+                      }}
+                    />
+                  </td>
+                  <!-- API Key Configuration -->
+                  <td>
+                    {#if tenantData.metadata?.[p.privateKeyFlag]}
+                      <label class="input input-bordered input-sm flex items-center gap-2 w-full">
+                        <input
+                          use:trackKeyField={p.key}
+                          type="password"
+                          class="grow"
+                          placeholder={t("tenant.api-key")}
+                          value={tenantData[p.apiKeyField] ?? ""}
+                          oninput={(e) => {
+                            tenantData[p.apiKeyField] = e.currentTarget.value;
+                          }}
+                        />
+                        <TogglePasswordIcon
+                          change={() => togglePassword(keyFieldRefs[p.key])}
+                        />
+                      </label>
+                    {:else}
+                      <label
+                        class="input input-bordered input-sm flex items-center gap-2 w-full opacity-60"
+                      >
+                        <input
+                          type="text"
+                          class="grow"
+                          disabled
+                          placeholder={globalApiKeyStatus?.[p.globalKeyField]
+                            ? t("tenant.using-system-key")
+                            : t("tenant.no-system-key")}
+                        />
+                        {#if globalApiKeyStatus?.[p.globalKeyField]}
+                          <span class="badge badge-success badge-xs"
+                            >{t("global-api-keys.configured")}</span
+                          >
+                        {:else}
+                          <span class="badge badge-warning badge-xs"
+                            >{t("tenant.no-system-key")}</span
+                          >
+                        {/if}
+                      </label>
+                    {/if}
+                  </td>
+                </tr>
+                <!-- Azure extra config row (expandable) -->
+                {#if p.hasExtraConfig && getProviderEnabled("azure_openai")}
+                  <tr class="bg-base-200/20">
+                    <td colspan="5" class="py-1">
+                      <button
+                        type="button"
+                        class="btn btn-ghost btn-xs gap-1 text-base-content/70"
+                        onclick={() => { azureConfigExpanded = !azureConfigExpanded; }}
+                      >
+                        <svg
+                          class="w-3 h-3 transition-transform {azureConfigExpanded ? 'rotate-90' : ''}"
+                          fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        >
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                        Azure Configuration
+                      </button>
+                    </td>
+                  </tr>
+                  {#if azureConfigExpanded}
+                  <tr class="bg-base-200/20">
+                    <td colspan="5">
+                      <div class="grid grid-cols-2 gap-4 px-4 py-2">
+                        <div class="w-full">
+                          <span class="text-sm font-medium text-base-content"
+                            >{t("tenant.azure-open-ai-instance-name")}</span
+                          >
+                          <input
+                            type="text"
+                            class="input input-bordered input-sm mt-1 w-full"
+                            use:trimInput
+                            bind:value={tenantData.azure_openai_instance_name}
+                          />
+                        </div>
+                        <div class="w-full">
+                          <span class="text-sm font-medium text-base-content"
+                            >{t("tenant.azure-open-ai-endpoint")}</span
+                          >
+                          <input
+                            type="text"
+                            class="input input-bordered input-sm mt-1 w-full"
+                            bind:value={tenantData.azure_openai_endpoint}
+                          />
+                        </div>
+                        <div class="w-full">
+                          <span class="text-sm font-medium text-base-content"
+                            >{t(
+                              "tenant.azure-open-ai-transciption-model",
+                            )}</span
+                          >
+                          <input
+                            type="text"
+                            class="input input-bordered input-sm mt-1 w-full"
+                            use:trimInput
+                            bind:value={tenantData.azure_openai_whisper_model}
+                          />
+                        </div>
+                        <div class="w-full">
+                          <span class="text-sm font-medium text-base-content"
+                            >{t("tenant.azure-open-ai-text-model")}</span
+                          >
+                          <input
+                            type="text"
+                            class="input input-bordered input-sm mt-1 w-full"
+                            use:trimInput
+                            bind:value={tenantData.azure_openai_chat_model}
+                          />
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  {/if}
                 {/if}
-              </div>
-            </div>
-            <div class="collapse-content">
-              <div class="grid grid-cols-2 gap-4 mx-8">
-                <div class="w-full">
-                  <span class="mb-2 text-base-content font-medium text-sm"
-                    >{t("tenant.model.name")}</span
-                  >
-                  <input
-                    type="text"
-                    class="input input-bordered mt-2 w-full"
-                    placeholder={""}
-                    use:trimInput
-                    bind:value={tenantData.openai_chat_model}
-                    disabled
-                  />
-                </div>
-                <div class="w-full">
-                  <span class="mb-2 text-base-content font-medium text-sm"
-                    >{t("tenant.api-key")}</span
-                  >
-
-                  <label
-                    class="input input-bordered flex items-center gap-2 mt-2 w-full"
-                  >
-                    <input
-                      bind:this={openAIKeyField}
-                      type="password"
-                      class="grow"
-                      placeholder={t("tenant.api-key")}
-                      bind:value={tenantData.openai_api_key}
-                    />
-                    <TogglePasswordIcon
-                      change={() => togglePassword(openAIKeyField)}
-                    />
-                  </label>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                  <label class="flex flex-row items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={defaultTextFeature === ApiKeyProvider.OpenAI}
-                      class="checkbox checkbox-primary"
-                      onchange={() => toggleTextFeature(ApiKeyProvider.OpenAI)}
-                    />
-                    <span class="label-text">{t("tenant.mark-as-default")}</span
-                    >
-                  </label>
-                  <label class="flex flex-row items-center gap-2">
-                    <input
-                      type="checkbox"
-                      class="checkbox checkbox-primary"
-                      bind:checked={tenantData.metadata.openaiPrivateKeyEnabled}
-                    />
-                    <span class="label-text"
-                      >{t("tenant.settings.private-api-key")}</span
-                    >
-                  </label>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Open AI GPT-5 Section -->
-          <div
-            class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
-          >
-            <input type="checkbox" />
-            <div class="collapse-title">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center">
-                  <input
-                    id="feature-text-prompt-gpt-5"
-                    type="checkbox"
-                    bind:checked={openAIGpt5Enabled}
-                    class="checkbox checkbox-primary z-10"
-                    disabled={defaultTextFeature === ApiKeyProvider.OpenAIGpt5}
-                  />
-                  <label
-                    class="label cursor-pointer ml-2"
-                    for="feature-text-prompt-gpt-5"
-                  >
-                    <span class="label-text text-base-content"
-                      >{t("tenant.open-ai-provider")} GPT-5</span
-                    >
-                  </label>
-                </div>
-                {#if defaultTextFeature === ApiKeyProvider.OpenAIGpt5}
-                  <span class="mb-2 text-base-content/50 font-medium text-sm"
-                    >{t("tenant.default")}</span
-                  >
-                {/if}
-              </div>
-            </div>
-            <div class="collapse-content">
-              <div class="grid grid-cols-2 gap-4 mx-8">
-                <div class="w-full">
-                  <span class="mb-2 text-base-content font-medium text-sm"
-                    >{t("tenant.model.name")}</span
-                  >
-                  <input
-                    type="text"
-                    class="input input-bordered mt-2 w-full"
-                    placeholder={""}
-                    use:trimInput
-                    bind:value={tenantData.openai_gpt5_chat_model}
-                    disabled
-                  />
-                </div>
-                <div class="w-full">
-                  <span class="mb-2 text-base-content font-medium text-sm"
-                    >{t("tenant.api-key")}</span
-                  >
-                  <label
-                    class="input input-bordered flex items-center gap-2 mt-2 w-full"
-                  >
-                    <input
-                      bind:this={openAIGpt5KeyField}
-                      type="password"
-                      class="grow"
-                      placeholder={t("tenant.api-key")}
-                      bind:value={tenantData.openai_gpt5_api_key}
-                    />
-                    <TogglePasswordIcon
-                      change={() => togglePassword(openAIGpt5KeyField)}
-                    />
-                  </label>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                  <label class="flex flex-row items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={defaultTextFeature === ApiKeyProvider.OpenAIGpt5}
-                      class="checkbox checkbox-primary"
-                      onchange={() =>
-                        toggleTextFeature(ApiKeyProvider.OpenAIGpt5)}
-                    />
-                    <span class="label-text">{t("tenant.mark-as-default")}</span
-                    >
-                  </label>
-                  <label class="flex flex-row items-center gap-2">
-                    <input
-                      type="checkbox"
-                      class="checkbox checkbox-primary"
-                      bind:checked={
-                        tenantData.metadata.openaiGpt5PrivateKeyEnabled
-                      }
-                    />
-                    <span class="label-text"
-                      >{t("tenant.settings.private-api-key")}</span
-                    >
-                  </label>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Azure Section -->
-          <div
-            class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
-          >
-            <input type="checkbox" />
-            <div class="collapse-title">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center">
-                  <input
-                    id="feature-azure-section"
-                    type="checkbox"
-                    bind:checked={azureOpenAIEnabled}
-                    class="checkbox checkbox-primary z-10"
-                    disabled={defaultTextFeature === ApiKeyProvider.AzureOpenAI}
-                  />
-                  <label
-                    class="label cursor-pointer ml-2"
-                    for="feature-azure-section"
-                  >
-                    <span class="label-text text-base-content"
-                      >{t("tenant.azure-open-ai-provider")}</span
-                    >
-                  </label>
-                </div>
-                {#if defaultTextFeature === ApiKeyProvider.AzureOpenAI}
-                  <span class="mb-2 text-base-content/50 font-medium text-sm"
-                    >{t("tenant.default")}</span
-                  >
-                {/if}
-              </div>
-            </div>
-            <div class="collapse-content">
-              <div class="grid grid-cols-2 gap-4 mx-8">
-                <div class="w-full">
-                  <span class="mb-2 text-base-content font-medium text-sm"
-                    >{t("tenant.azure-open-ai-provider")}</span
-                  >
-
-                  <label
-                    class="input input-bordered flex items-center gap-2 mt-2 w-full"
-                  >
-                    <input
-                      bind:this={azureOpenAIKeyField}
-                      type="password"
-                      class="grow"
-                      placeholder={t("tenant.api-key")}
-                      bind:value={tenantData.azure_openai_api_key}
-                    />
-                    <TogglePasswordIcon
-                      change={() => togglePassword(azureOpenAIKeyField)}
-                    />
-                  </label>
-                </div>
-                <div class="w-full">
-                  <span class="mb-2 text-base-content font-medium text-sm"
-                    >{t("tenant.azure-open-ai-instance-name")}</span
-                  >
-                  <input
-                    type="text"
-                    class="input input-bordered mt-2 w-full"
-                    placeholder={""}
-                    use:trimInput
-                    bind:value={tenantData.azure_openai_instance_name}
-                  />
-                </div>
-
-                <div class="w-full">
-                  <span class="mb-2 ttext-base-content font-medium text-sm"
-                    >{t("tenant.azure-open-ai-endpoint")}</span
-                  >
-                  <input
-                    type="text"
-                    class="input input-bordered mt-2 w-full"
-                    placeholder={""}
-                    bind:value={tenantData.azure_openai_endpoint}
-                  />
-                </div>
-                <div class="w-full">
-                  <span class="mb-2 text-base-content font-medium text-sm"
-                    >{t("tenant.azure-open-ai-transciption-model")}</span
-                  >
-                  <input
-                    type="text"
-                    class="input input-bordered mt-2 w-full"
-                    placeholder={""}
-                    use:trimInput
-                    bind:value={tenantData.azure_openai_whisper_model}
-                  />
-                </div>
-
-                <div class="w-full">
-                  <span class="mb-2 text-base-content font-medium text-sm"
-                    >{t("tenant.azure-open-ai-text-model")}</span
-                  >
-                  <input
-                    type="text"
-                    class="input input-bordered mt-2 w-full"
-                    placeholder={""}
-                    use:trimInput
-                    bind:value={tenantData.azure_openai_chat_model}
-                  />
-                </div>
-                <div></div>
-                <div class="grid grid-cols-2 gap-4">
-                  <label class="flex flex-row items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={defaultTextFeature ===
-                        ApiKeyProvider.AzureOpenAI}
-                      class="checkbox checkbox-primary"
-                      onchange={() =>
-                        toggleTextFeature(ApiKeyProvider.AzureOpenAI)}
-                    />
-                    <span class="label-text">{t("tenant.mark-as-default")}</span
-                    >
-                  </label>
-                  <label class="flex flex-row items-center gap-2">
-                    <input
-                      type="checkbox"
-                      class="checkbox checkbox-primary"
-                      bind:checked={
-                        tenantData.metadata.azureOpenaiPrivateKeyEnabled
-                      }
-                    />
-                    <span class="label-text"
-                      >{t("tenant.settings.private-api-key")}</span
-                    >
-                  </label>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Perplexity Section -->
-          <div
-            class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
-          >
-            <input type="checkbox" />
-            <div class="collapse-title">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center">
-                  <input
-                    id="feature-perplexity-section"
-                    type="checkbox"
-                    bind:checked={perplexityEnabled}
-                    class="checkbox checkbox-primary z-10"
-                    disabled={defaultTextFeature === ApiKeyProvider.Perplexity}
-                  />
-                  <label
-                    class="label cursor-pointer ml-2"
-                    for="feature-perplexity-section"
-                  >
-                    <span class="label-text text-base-content"
-                      >{t("tenant.perplexity.name")}</span
-                    >
-                  </label>
-                </div>
-                {#if defaultTextFeature === ApiKeyProvider.Perplexity}
-                  <span class="mb-2 text-base-content/50 font-medium text-sm"
-                    >{t("tenant.default")}</span
-                  >
-                {/if}
-              </div>
-            </div>
-            <div class="collapse-content">
-              <div class="grid grid-cols-2 gap-4 mx-8 mb-[30]">
-                <div class="w-full z-20">
-                  <Dropdown
-                    label={`${t("tenant.model.name")}*`}
-                    options={[
-                      {
-                        value: "sonar",
-                        title: "sonar",
-                      },
-                    ]}
-                    bind:value={selectedPerplexityModel}
-                  />
-                </div>
-                <div class="w-full">
-                  <span class="mb-2 text-base-content font-medium text-sm"
-                    >{t("tenant.api-key")}</span
-                  >
-
-                  <label
-                    class="input input-bordered flex items-center gap-2 mt-1 w-full"
-                  >
-                    <input
-                      bind:this={perplexityKeyField}
-                      type="password"
-                      class="grow"
-                      placeholder={t("tenant.api-key")}
-                      bind:value={tenantData.perplexity_api_key}
-                    />
-                    <TogglePasswordIcon
-                      change={() => togglePassword(perplexityKeyField)}
-                    />
-                  </label>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                  <label class="flex flex-row items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={defaultTextFeature === ApiKeyProvider.Perplexity}
-                      class="checkbox checkbox-primary"
-                      onchange={() =>
-                        toggleTextFeature(ApiKeyProvider.Perplexity)}
-                    />
-                    <span class="label-text">{t("tenant.mark-as-default")}</span
-                    >
-                  </label>
-                  <label class="flex flex-row items-center gap-2">
-                    <input
-                      type="checkbox"
-                      class="checkbox checkbox-primary"
-                      bind:checked={
-                        tenantData.metadata.perplexityPrivateKeyEnabled
-                      }
-                    />
-                    <span class="label-text"
-                      >{t("tenant.settings.private-api-key")}</span
-                    >
-                  </label>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Claude Section -->
-          <div
-            class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
-          >
-            <input type="checkbox" />
-            <div class="collapse-title">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center">
-                  <input
-                    id="feature-claude-section"
-                    type="checkbox"
-                    bind:checked={claudeEnabled}
-                    class="checkbox checkbox-primary z-10"
-                    disabled={defaultTextFeature === ApiKeyProvider.Claude}
-                  />
-                  <label
-                    class="label cursor-pointer ml-2"
-                    for="feature-claude-section"
-                  >
-                    <span class="label-text text-base-content"
-                      >{t("tenant.claude.name")}</span
-                    >
-                  </label>
-                </div>
-                {#if defaultTextFeature === ApiKeyProvider.Claude}
-                  <span class="mb-2 text-base-content/50 font-medium text-sm"
-                    >{t("tenant.default")}</span
-                  >
-                {/if}
-              </div>
-            </div>
-            <div class="collapse-content">
-              <div class="grid grid-cols-2 gap-4 mx-8 mb-[30]">
-                <div class="w-full z-20">
-                  <Dropdown
-                    label={`${t("tenant.model.name")}*`}
-                    options={[
-                      {
-                        value: "claude-sonnet-4-0",
-                        title: "claude-sonnet-4-0",
-                      },
-                    ]}
-                    bind:value={selectedClaudeModel}
-                  />
-                </div>
-                <div class="w-full">
-                  <span class="mb-2 text-base-content font-medium text-sm"
-                    >{t("tenant.api-key")}</span
-                  >
-
-                  <label
-                    class="input input-bordered flex items-center gap-2 mt-1 w-full"
-                  >
-                    <input
-                      bind:this={claudeKeyField}
-                      type="password"
-                      class="grow"
-                      placeholder={t("tenant.api-key")}
-                      bind:value={tenantData.anthropic_api_key}
-                    />
-                    <TogglePasswordIcon
-                      change={() => togglePassword(claudeKeyField)}
-                    />
-                  </label>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                  <label class="flex flex-row items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={defaultTextFeature === ApiKeyProvider.Claude}
-                      class="checkbox checkbox-primary"
-                      onchange={() => toggleTextFeature(ApiKeyProvider.Claude)}
-                    />
-                    <span class="label-text">{t("tenant.mark-as-default")}</span
-                    >
-                  </label>
-                  <label class="flex flex-row items-center gap-2">
-                    <input
-                      type="checkbox"
-                      class="checkbox checkbox-primary"
-                      bind:checked={tenantData.metadata.claudePrivateKeyEnabled}
-                    />
-                    <span class="label-text"
-                      >{t("tenant.settings.private-api-key")}</span
-                    >
-                  </label>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Gemini Section -->
-          <div
-            class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg mb-4"
-          >
-            <input type="checkbox" />
-            <div class="collapse-title">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center">
-                  <input
-                    id="feature-gemini-section"
-                    type="checkbox"
-                    bind:checked={geminiEnabled}
-                    class="checkbox checkbox-primary z-10"
-                    disabled={defaultTextFeature === ApiKeyProvider.Gemini}
-                  />
-                  <label
-                    class="label cursor-pointer ml-2"
-                    for="feature-gemini-section"
-                  >
-                    <span class="label-text text-base-content"
-                      >{t("tenant.gemini.name")}</span
-                    >
-                  </label>
-                </div>
-                {#if defaultTextFeature === ApiKeyProvider.Gemini}
-                  <span class="mb-2 text-base-content/50 font-medium text-sm"
-                    >{t("tenant.default")}</span
-                  >
-                {/if}
-              </div>
-            </div>
-            <div class="collapse-content">
-              <div class="grid grid-cols-2 gap-4 mx-8 mb-[30]">
-                <div class="w-full z-20">
-                  <Dropdown
-                    label={`${t("tenant.model.name")}*`}
-                    options={[
-                      {
-                        value: TextModel.Gemini,
-                        title: "gemini-2.5-flash",
-                      },
-                    ]}
-                    bind:value={selectedGeminiModel}
-                  />
-                </div>
-                <div class="w-full">
-                  <span class="mb-2 text-base-content font-medium text-sm"
-                    >{t("tenant.api-key")}</span
-                  >
-
-                  <label
-                    class="input input-bordered flex items-center gap-2 mt-1 w-full"
-                  >
-                    <input
-                      bind:this={geminiKeyField}
-                      type="password"
-                      class="grow"
-                      placeholder={t("tenant.api-key")}
-                      bind:value={tenantData.gemini_api_key}
-                    />
-                    <TogglePasswordIcon
-                      change={() => togglePassword(geminiKeyField)}
-                    />
-                  </label>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                  <label class="flex flex-row items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={defaultTextFeature === ApiKeyProvider.Gemini}
-                      class="checkbox checkbox-primary"
-                      onchange={() => toggleTextFeature(ApiKeyProvider.Gemini)}
-                    />
-                    <span class="label-text">{t("tenant.mark-as-default")}</span
-                    >
-                  </label>
-                  <label class="flex flex-row items-center gap-2">
-                    <input
-                      type="checkbox"
-                      class="checkbox checkbox-primary"
-                      bind:checked={tenantData.metadata.geminiPrivateKeyEnabled}
-                    />
-                    <span class="label-text"
-                      >{t("tenant.settings.private-api-key")}</span
-                    >
-                  </label>
-                </div>
-              </div>
-            </div>
-          </div>
+              {/each}
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -2254,20 +1945,23 @@
                     >{t("tenant.settings.large-file-azure-apiKey")}
                   </span>
 
-                  <label
-                    class="input input-bordered flex items-center gap-2 mt-2 w-full"
-                  >
-                    <input
-                      bind:this={azureOpenAIKeyProField}
-                      type="password"
-                      class="grow"
-                      placeholder={t("tenant.api-key")}
-                      bind:value={tenantData.speech_api_key}
-                    />
-                    <TogglePasswordIcon
-                      change={() => togglePassword(azureOpenAIKeyProField)}
-                    />
-                  </label>
+                  {#if tenantData.metadata?.speechPrivateKeyEnabled}
+                    <label class="input input-bordered flex items-center gap-2 mt-2 w-full">
+                      <input bind:this={azureOpenAIKeyProField} type="password" class="grow"
+                        placeholder={t("tenant.api-key")} bind:value={tenantData.speech_api_key} />
+                      <TogglePasswordIcon change={() => togglePassword(azureOpenAIKeyProField)} />
+                    </label>
+                  {:else}
+                    <label class="input input-bordered flex items-center gap-2 mt-2 w-full opacity-60">
+                      <input type="text" class="grow" disabled
+                        placeholder={globalApiKeyStatus?.speech_api_key ? t("tenant.using-system-key") : t("tenant.no-system-key")} />
+                      {#if globalApiKeyStatus?.speech_api_key}
+                        <span class="badge badge-success badge-sm">{t("global-api-keys.configured")}</span>
+                      {:else}
+                        <span class="badge badge-warning badge-sm">{t("tenant.no-system-key")}</span>
+                      {/if}
+                    </label>
+                  {/if}
                 </div>
                 <div class="w-full">
                   <span class="mb-2 text-base-content font-medium text-sm"
@@ -2484,20 +2178,23 @@
                     >{t("tenant.settings.large-file-azure-apiKey")}
                   </span>
 
-                  <label
-                    class="input input-bordered flex items-center gap-2 mt-2 w-full"
-                  >
-                    <input
-                      bind:this={elevenLabsAIKeyField}
-                      type="password"
-                      class="grow"
-                      placeholder={t("tenant.api-key")}
-                      bind:value={tenantData.elevenLabs_api_key}
-                    />
-                    <TogglePasswordIcon
-                      change={() => togglePassword(elevenLabsAIKeyField)}
-                    />
-                  </label>
+                  {#if tenantData.metadata?.elevenLabsPrivateKeyEnabled}
+                    <label class="input input-bordered flex items-center gap-2 mt-2 w-full">
+                      <input bind:this={elevenLabsAIKeyField} type="password" class="grow"
+                        placeholder={t("tenant.api-key")} bind:value={tenantData.elevenLabs_api_key} />
+                      <TogglePasswordIcon change={() => togglePassword(elevenLabsAIKeyField)} />
+                    </label>
+                  {:else}
+                    <label class="input input-bordered flex items-center gap-2 mt-2 w-full opacity-60">
+                      <input type="text" class="grow" disabled
+                        placeholder={globalApiKeyStatus?.elevenLabs_api_key ? t("tenant.using-system-key") : t("tenant.no-system-key")} />
+                      {#if globalApiKeyStatus?.elevenLabs_api_key}
+                        <span class="badge badge-success badge-sm">{t("global-api-keys.configured")}</span>
+                      {:else}
+                        <span class="badge badge-warning badge-sm">{t("tenant.no-system-key")}</span>
+                      {/if}
+                    </label>
+                  {/if}
                 </div>
               </div>
 
@@ -2580,20 +2277,23 @@
                   <span class="mb-2 text-base-content/50 font-medium text-sm"
                     >{t("tenant.image-creation.flux.api-key")}</span
                   >
-                  <label
-                    class="input input-bordered flex items-center gap-2 mt-2 w-full"
-                  >
-                    <input
-                      bind:this={falOpenAIKeyField}
-                      type="password"
-                      class="grow"
-                      placeholder={t("tenant.api-key")}
-                      bind:value={tenantData.fal_ai_api_key}
-                    />
-                    <TogglePasswordIcon
-                      change={() => togglePassword(falOpenAIKeyField)}
-                    />
-                  </label>
+                  {#if tenantData.metadata?.fluxPrivateKeyEnabled}
+                    <label class="input input-bordered flex items-center gap-2 mt-2 w-full">
+                      <input bind:this={falOpenAIKeyField} type="password" class="grow"
+                        placeholder={t("tenant.api-key")} bind:value={tenantData.fal_ai_api_key} />
+                      <TogglePasswordIcon change={() => togglePassword(falOpenAIKeyField)} />
+                    </label>
+                  {:else}
+                    <label class="input input-bordered flex items-center gap-2 mt-2 w-full opacity-60">
+                      <input type="text" class="grow" disabled
+                        placeholder={globalApiKeyStatus?.fal_ai_api_key ? t("tenant.using-system-key") : t("tenant.no-system-key")} />
+                      {#if globalApiKeyStatus?.fal_ai_api_key}
+                        <span class="badge badge-success badge-sm">{t("global-api-keys.configured")}</span>
+                      {:else}
+                        <span class="badge badge-warning badge-sm">{t("tenant.no-system-key")}</span>
+                      {/if}
+                    </label>
+                  {/if}
                 </div>
                 <div class="w-full">
                   <label class="flex flex-row items-center gap-2 mt-10">
