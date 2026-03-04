@@ -76,13 +76,15 @@
 
 <div class="dropdown w-full">
   <div class="flex flex-row items-center space-x-2">
-    <div class="input flex justify-between items-center gap-2">
+    <div
+      class="input flex justify-between items-center gap-2 {isFetching
+        ? 'pointer-events-none opacity-50 bg-gray-200'
+        : ''}"
+    >
       {@html svgIcons.search}
       <input
         type="text"
-        class="grow
-        {selectedOption ? 'bg-base-100' : ''} 
-        {isFetching ? ' pointer-events-none opacity-50 bg-gray-200 ' : ' '}"
+        class="grow {selectedOption ? 'bg-base-100' : ''}"
         placeholder={selectedOption ? selectedOption.title : "Search tenants"}
         bind:value={searchQuery}
         oninput={preventDefault(onSearch)}
