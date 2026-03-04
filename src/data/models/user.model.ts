@@ -368,33 +368,16 @@ export default {
 
     // ------------------ TOTAL PIPELINE ------------------
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const totalPipeline: any[] = [...commonStages, { $count: "count" }];
+    const totalPipeline = [...commonStages, { $count: "count" }];
 
-    // Same tenant filtering logic
-    if (tenant) {
-      // specific tenant always wins
-      totalPipeline.push({
-        $match: { tenant_id: new ObjectId(tenant) },
-      });
-    } else {
-      totalPipeline.push({
-        $match: includeUnassigned
-          ? // orphan users only
-            { tenant_id: { $ne: null }, tenant: null }
-          : // valid tenant users only
-            { tenant: { $ne: null } },
-      });
-    }
-
-    totalPipeline.push({ $count: "count" });
-    const totalResult = await collection.aggregate(totalPipeline).toArray();
-
-    const result = await collection.aggregate(pipeline).toArray();
-    const total = totalResult[0]?.count ?? 0;
+    const [result, totalResult] = await Promise.all([
+      collection.aggregate(pipeline).toArray(),
+      collection.aggregate(totalPipeline).toArray(),
+    ]);
 
     return {
       data: result,
-      total: total,
+      total: totalResult[0]?.count ?? 0,
       page,
       pageSize,
     };

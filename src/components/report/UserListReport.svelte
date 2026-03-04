@@ -55,10 +55,11 @@
         message: "Something went wrong",
         type: "error",
       });
-    } else {
-      users = data.data;
-      total = data.total;
+      return;
     }
+
+    users = data.data;
+    total = data.total;
   };
 
   function onSelectDelete(tenantId: any) {
