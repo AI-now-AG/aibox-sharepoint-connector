@@ -106,7 +106,7 @@
         oninput={preventDefault(onSearch)}
       />
       {#if searchQuery?.length > 0}
-        <button onclick={onClear}>
+        <button class="cursor-pointer" onclick={onClear}>
           {@html svgIcons.close}
         </button>
       {/if}
