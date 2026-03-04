@@ -932,5 +932,6 @@
   "user-list-report.filter.tenant-label": "Tenant",
   "user-list-report.filter.tenant-placeholder": "Search tenants",
   "user-list-report.filter.others-label": "Others",
-  "user-list-report.filter.include-unassigned-users": "Include unassigned users"
+  "user-list-report.filter.include-unassigned-users": "Include unassigned users",
+  "usage.show-internal-tenant": "Show internal tenant"
 }
