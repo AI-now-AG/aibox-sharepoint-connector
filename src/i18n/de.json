@@ -599,7 +599,6 @@
   "nav.settings.prompt-refinement": "Prompt Optimierung",
   "nav.settings.rag-configuration": "RAG-Konfiguration",
   "nav.settings.global-api-keys": "Globale API-Schlüssel",
-  "global-api-keys.title": "Globale API-Schlüssel",
   "global-api-keys.description": "Konfigurieren Sie gemeinsame API-Schlüssel, die standardmässig von allen Mandanten verwendet werden. Mandanten können diese mit privaten Schlüsseln überschreiben.",
   "global-api-keys.update-success": "Globale API-Schlüssel erfolgreich aktualisiert",
   "global-api-keys.update-failed": "Fehler beim Aktualisieren der globalen API-Schlüssel",
@@ -922,8 +921,6 @@
   "tenant.text-model.title": "Text-Modell Verwaltung",
   "tenant.text-model.description": "Konfigurieren Sie Ihre LLMs, setzen Sie Standards und verwalten Sie API-Schlüssel effizient.",
   "tenant.text-model.provider": "Anbieter / Modell",
-  "tenant.text-model.active": "Aktiv",
-  "tenant.text-model.default": "Standard",
   "tenant.text-model.private-key": "Privater Schlüssel",
   "tenant.text-model.api-key-config": "API-Schlüssel Konfiguration"
 }

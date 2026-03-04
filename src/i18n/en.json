@@ -599,7 +599,6 @@
   "nav.settings.prompt-refinement": "Prompt Refinement",
   "nav.settings.rag-configuration": "RAG Configuration",
   "nav.settings.global-api-keys": "Global API Keys",
-  "global-api-keys.title": "Global API Keys",
   "global-api-keys.description": "Configure shared API keys used by all tenants by default. Tenants can override with private keys.",
   "global-api-keys.update-success": "Global API keys updated successfully",
   "global-api-keys.update-failed": "Failed to update global API keys",
@@ -922,8 +921,6 @@
   "tenant.text-model.title": "Text Model Management",
   "tenant.text-model.description": "Configure your LLMs, set defaults, and manage API keys efficiently.",
   "tenant.text-model.provider": "Provider / Model",
-  "tenant.text-model.active": "Active",
-  "tenant.text-model.default": "Default",
   "tenant.text-model.private-key": "Private Key",
   "tenant.text-model.api-key-config": "API Key Configuration"
 }

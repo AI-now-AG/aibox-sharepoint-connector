@@ -599,7 +599,6 @@
   "nav.settings.prompt-refinement": "Prompt Refinement",
   "nav.settings.rag-configuration": "RAG Configuration",
   "nav.settings.global-api-keys": "Chiavi API Globali",
-  "global-api-keys.title": "Chiavi API Globali",
   "global-api-keys.description": "Configura le chiavi API condivise utilizzate da tutti i tenant per impostazione predefinita. I tenant possono sovrascriverle con chiavi private.",
   "global-api-keys.update-success": "Chiavi API globali aggiornate con successo",
   "global-api-keys.update-failed": "Aggiornamento delle chiavi API globali non riuscito",
@@ -922,8 +921,6 @@
   "tenant.text-model.title": "Gestione modelli di testo",
   "tenant.text-model.description": "Configura i tuoi LLM, imposta i valori predefiniti e gestisci le chiavi API in modo efficiente.",
   "tenant.text-model.provider": "Fornitore / Modello",
-  "tenant.text-model.active": "Attivo",
-  "tenant.text-model.default": "Predefinito",
   "tenant.text-model.private-key": "Chiave privata",
   "tenant.text-model.api-key-config": "Configurazione chiave API"
 }

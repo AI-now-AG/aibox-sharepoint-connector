@@ -5,12 +5,6 @@ import GlobalApiKeysModel, {
 } from "$data/models/globalApiKeys.model";
 import { encrypt, decrypt } from "$utils/secure";
 
-/** Mask a decrypted key to show only last 4 characters */
-function maskKey(decryptedKey: string): string {
-  if (!decryptedKey || decryptedKey.length <= 4) return decryptedKey;
-  return "••••" + decryptedKey.slice(-4);
-}
-
 const GlobalApiKeysUpdateSchema = z.object({
   _id: z.string(),
   openai_api_key: z.string().nullable().optional(),
@@ -29,24 +23,24 @@ export const globalApiKeys = {
     input: z.object({}),
     handler: async () => {
       const config = await GlobalApiKeysModel.getOrCreate();
-      const masked: Record<string, string | null> = {};
+      const decryptedKeys: Record<string, string | null> = {};
       const hasKeys: Record<string, boolean> = {};
 
       for (const field of API_KEY_FIELDS) {
         const raw = config[field];
         if (raw) {
           const decrypted = decrypt(raw);
-          masked[field] = decrypted ? maskKey(decrypted) : null;
+          decryptedKeys[field] = decrypted || null;
           hasKeys[field] = !!decrypted;
         } else {
-          masked[field] = null;
+          decryptedKeys[field] = null;
           hasKeys[field] = false;
         }
       }
 
       return {
         _id: config._id.toString(),
-        ...masked,
+        ...decryptedKeys,
         _hasKeys: hasKeys,
       };
     },
@@ -59,6 +53,9 @@ export const globalApiKeys = {
         const { _id, ...keyData } = input;
         const updates: Record<string, string | null> = {};
 
+        // Get current config to compare values
+        const currentConfig = await GlobalApiKeysModel.getOrCreate();
+
         for (const field of API_KEY_FIELDS) {
           const value = keyData[field];
           if (value === undefined) continue;
@@ -66,10 +63,10 @@ export const globalApiKeys = {
           if (!value || value === "") {
             // Clear the key
             updates[field] = null;
-          } else if (value.startsWith("••••")) {
-            // Masked value — no change, skip
-            continue;
           } else {
+            // Check if value changed from current
+            const currentDecrypted = currentConfig[field] ? decrypt(currentConfig[field]!) : null;
+            if (value === currentDecrypted) continue; // No change, skip
             // New key value — encrypt before saving
             updates[field] = encrypt(value);
           }

@@ -599,7 +599,6 @@
   "nav.settings.prompt-refinement": "Prompt Refinement",
   "nav.settings.rag-configuration": "RAG Configuration",
   "nav.settings.global-api-keys": "Clés API Globales",
-  "global-api-keys.title": "Clés API Globales",
   "global-api-keys.description": "Configurez les clés API partagées utilisées par défaut par tous les locataires. Les locataires peuvent les remplacer par des clés privées.",
   "global-api-keys.update-success": "Clés API globales mises à jour avec succès",
   "global-api-keys.update-failed": "Échec de la mise à jour des clés API globales",
@@ -922,8 +921,6 @@
   "tenant.text-model.title": "Gestion des modèles de texte",
   "tenant.text-model.description": "Configurez vos LLMs, définissez les valeurs par défaut et gérez les clés API efficacement.",
   "tenant.text-model.provider": "Fournisseur / Modèle",
-  "tenant.text-model.active": "Actif",
-  "tenant.text-model.default": "Par défaut",
   "tenant.text-model.private-key": "Clé privée",
   "tenant.text-model.api-key-config": "Configuration clé API"
 }

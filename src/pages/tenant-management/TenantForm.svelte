@@ -691,6 +691,18 @@
     }
   }
 
+  /**
+   * Check if a provider has a valid API key available:
+   * either the tenant has a private key, or a global key is configured.
+   */
+  function hasApiKey(apiKeyField: string, privateKeyFlag?: string): boolean {
+    // Tenant has their own key
+    if (tenantData[apiKeyField]) return true;
+    // Using global key — check if it's configured
+    if (privateKeyFlag && tenantData.metadata?.[privateKeyFlag]) return false; // private key enabled but no key
+    return !!globalApiKeyStatus?.[apiKeyField];
+  }
+
   function validateForm() {
     if (!tenantData?.name) {
       showAlert(t("tenant.validate-empty-display-name-message"));
@@ -708,7 +720,7 @@
 
     if (
       defaultTextFeature == ApiKeyProvider.OpenAI &&
-      !tenantData.openai_api_key
+      !hasApiKey("openai_api_key", "openaiPrivateKeyEnabled")
     ) {
       showAlert(t("tenant.validate-open-ai-key-message"));
       return false;
@@ -716,7 +728,7 @@
 
     if (
       defaultTextFeature == ApiKeyProvider.OpenAIGpt5 &&
-      !tenantData.openai_gpt5_api_key
+      !hasApiKey("openai_gpt5_api_key", "openaiGpt5PrivateKeyEnabled")
     ) {
       showAlert("[GPT-5] " + t("tenant.validate-open-ai-key-message"));
       return false;
@@ -734,12 +746,12 @@
       return false;
     }
 
-    if (isAudioToTextChecked && !tenantData.azure_openai_api_key) {
+    if (isAudioToTextChecked && !hasApiKey("azure_openai_api_key", "azureOpenaiPrivateKeyEnabled")) {
       showAlert(t("tenant.validate-azure-open-ai-key-message"));
       return false;
     }
 
-    if (tenantData.azure_openai_api_key) {
+    if (tenantData.azure_openai_api_key || (azureOpenAIEnabled && hasApiKey("azure_openai_api_key", "azureOpenaiPrivateKeyEnabled"))) {
       if (!tenantData?.azure_openai_instance_name) {
         showAlert(
           t("tenant.validate-azure-open-ai-instance-name-empty-message"),
@@ -765,7 +777,7 @@
     if (isAudioToTextChecked) {
       if (
         audioSelectedProvider.value === ApiKeyProvider.OpenAI &&
-        !tenantData.openai_api_key
+        !hasApiKey("openai_api_key", "openaiPrivateKeyEnabled")
       ) {
         showAlert(t("tenant.validate-open-ai-key-message"));
         return false;
@@ -773,14 +785,14 @@
 
       if (
         audioSelectedProvider.value === ApiKeyProvider.OpenAIGpt5 &&
-        !tenantData.openai_gpt5_api_key
+        !hasApiKey("openai_gpt5_api_key", "openaiGpt5PrivateKeyEnabled")
       ) {
         showAlert("[GPT-5] " + t("tenant.validate-open-ai-key-message"));
         return false;
       }
     }
 
-    if (isAzureAudioProEnabled && !tenantData.speech_api_key) {
+    if (isAzureAudioProEnabled && !hasApiKey("speech_api_key", "speechPrivateKeyEnabled")) {
       showAlert(t("tenant.validate-azure-speech-service-key"));
       return false;
     }
@@ -792,7 +804,7 @@
       }
     }
 
-    if (isAudioToElevenLabsChecked && !tenantData.elevenLabs_api_key) {
+    if (isAudioToElevenLabsChecked && !hasApiKey("elevenLabs_api_key", "elevenLabsPrivateKeyEnabled")) {
       showAlert(t("tenant.validate-elevenLabs-key"));
       return false;
     }
@@ -1610,8 +1622,8 @@
             <thead>
               <tr class="bg-base-200/50">
                 <th>{t("tenant.text-model.provider")}</th>
-                <th class="text-center w-20">{t("tenant.text-model.active")}</th>
-                <th class="text-center w-20">{t("tenant.text-model.default")}</th>
+                <th class="text-center w-20">{t("common.activate")}</th>
+                <th class="text-center w-20">{t("tenant.default")}</th>
                 <th class="text-center w-28">{t("tenant.text-model.private-key")}</th>
                 <th>{t("tenant.text-model.api-key-config")}</th>
               </tr>
