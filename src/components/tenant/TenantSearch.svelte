@@ -119,7 +119,7 @@
       out:fade
     >
       {#each filteredTenants as option}
-        <li>
+        <li class="w-full">
           <button
             class="w-full text-left flex items-center gap-2"
             onclick={() => {
