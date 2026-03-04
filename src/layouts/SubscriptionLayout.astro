@@ -1,5 +1,6 @@
 ---
 import { svgIcons } from "$assets/icons";
+import PostHogJs from "$components/PostHogJs.astro";
 import Toasts from "$components/toast-notification/Toasts.svelte";
 import SubsciptionSteps from "$components/subscription/SubsciptionSteps.svelte";
 import { SubscriptionStep } from "$types/Subscription";
@@ -31,6 +32,9 @@ const { title, description } = Astro.props;
 // TODO: save theme settings in db
 const theme = Astro.locals?.tenant?.theme || "light";
 const defaultLanguage = Astro.locals?.tenant?.default_language || "en";
+
+const { tenant } = Astro.locals;
+const isPosthogEnabled = tenant && tenant.is_on_posthog;
 ---
 
 <!doctype html>
@@ -50,6 +54,8 @@ const defaultLanguage = Astro.locals?.tenant?.default_language || "en";
         background-color: rgb(250, 250, 250);
       }
     </style>
+
+    {isPosthogEnabled && <PostHogJs />}
   </head>
   <body class="flex min-h-screen">
     <!-- Left Sidebar -->

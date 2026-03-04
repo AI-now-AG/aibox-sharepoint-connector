@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import type { TagItem, CategoryItem } from "$types/Subscription";
   import AlertDialog from "$components/AlertDialog.svelte";
   import Input from "$components/form/Input.svelte";
@@ -33,6 +34,14 @@
 
   let alertModal: HTMLDialogElement | undefined = $state();
   let alertMessage = $state("");
+
+  onMount(() => {
+    if (!init) {
+      posthogClientCaptureWithoutTenant(EventName.AiboxOnboardingStarted, {
+        page_name: ScreenName.OnboardingStep1,
+      });
+    }
+  });
 
   function showAlert(message: any) {
     alertMessage = message;
