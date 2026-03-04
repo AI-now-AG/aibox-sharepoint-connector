@@ -38,7 +38,7 @@
     clearTimeout(typingTimeout);
     typingTimeout = setTimeout(() => {
       value = target.value;
-      onsearch();
+      onsearch?.();
     }, 300);
   };
 

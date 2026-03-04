@@ -2,6 +2,7 @@
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
   import { preventDefault, debounce } from "$utils/common";
+  import TenantSearch from "$components/tenant/TenantSearch.svelte";
 
   const t = useTranslations();
 
@@ -55,7 +56,7 @@
       <p class="mb-2 text-base-content/80">
         {"Tenant"}
       </p>
-      <div class="grid grid-cols-2 lg:grid-cols-4 max-w-md pt-1 gap-2"></div>
+      <TenantSearch />
     </div>
     <div class="col-span-3 xl:col-span-3">
       <p class="mb-2 text-base-content/80">

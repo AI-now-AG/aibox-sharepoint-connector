@@ -175,6 +175,14 @@ export default {
     return collection.find<Document<Tenant>>({}).toArray();
   },
 
+  listActive: async () => {
+    return collection
+      .find<Document<Tenant>>({
+        active: true,
+      })
+      .toArray();
+  },
+
   listAllResellerCodes: async () => {
     return await collection.distinct("reseller_code", {
       is_reseller: true,
