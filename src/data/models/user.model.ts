@@ -303,69 +303,18 @@ export default {
       ];
     }
 
-    // Build pipeline dynamically
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const pipeline: any[] = [
-      {
-        // 🔍 search happens HERE (before lookups)
-        $match: baseMatch,
-      },
-      {
-        $lookup: {
-          from: "tenants",
-          localField: "tenant_id",
-          foreignField: "_id",
-          as: "tenant",
-        },
-      },
-      {
-        $unwind: {
-          path: "$tenant",
-          preserveNullAndEmptyArrays: true, // important
-        },
-      },
-      {
-        $project: {
-          _id: 1,
-          name: 1,
-          email: 1,
-          last_login: 1,
-          logins_count: 1,
-          blocked: 1,
-          email_verified: 1,
-          auth0_sub: 1,
-          roles: 1,
-          created_at: 1,
-          updated_at: 1,
-          tenant: {
-            _id: 1,
-            name: 1,
-          },
-        },
-      },
-      { $sort: { created_at: 1 } },
-    ];
+    const buildTenantMatch = () => {
+      if (tenant) {
+        return { tenant_id: new ObjectId(tenant) };
+      }
 
-    if (tenant) {
-      // specific tenant filter
-      pipeline.push({
-        $match: { tenant_id: new ObjectId(tenant) },
-      });
-    } else if (!includeUnassigned) {
-      // only users whose tenant still exists
-      pipeline.push({
-        $match: { tenant: { $ne: null } },
-      });
-    }
-
-    // ✅ Only paginate if pageSize > 0
-    if (pageSize > 0) {
-      pipeline.push({ $skip: skip });
-      pipeline.push({ $limit: pageSize });
-    }
+      return includeUnassigned
+        ? { tenant_id: { $ne: null }, tenant: null }
+        : { tenant: { $ne: null } };
+    };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const totalPipeline: any[] = [
+    const commonStages: any[] = [
       { $match: baseMatch },
       {
         $lookup: {
@@ -381,16 +330,59 @@ export default {
           preserveNullAndEmptyArrays: true,
         },
       },
+      { $match: buildTenantMatch() },
     ];
+
+    // ------------------ DATA PIPELINE ------------------
+    // Build pipeline dynamically
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const pipeline: any[] = [
+      ...commonStages,
+      {
+        $project: {
+          _id: 1,
+          name: 1,
+          email: 1,
+          last_login: 1,
+          logins_count: 1,
+          blocked: 1,
+          email_verified: 1,
+          auth0_sub: 1,
+          roles: 1,
+          created_at: 1,
+          updated_at: 1,
+          tenant: {
+            _id: "$tenant._id",
+            name: "$tenant.name",
+          },
+        },
+      },
+      { $sort: { created_at: 1 } },
+    ];
+
+    // ✅ Only paginate if pageSize > 0
+    if (pageSize > 0) {
+      pipeline.push({ $skip: skip });
+      pipeline.push({ $limit: pageSize });
+    }
+
+    // ------------------ TOTAL PIPELINE ------------------
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const totalPipeline: any[] = [...commonStages, { $count: "count" }];
 
     // Same tenant filtering logic
     if (tenant) {
+      // specific tenant always wins
       totalPipeline.push({
         $match: { tenant_id: new ObjectId(tenant) },
       });
-    } else if (!includeUnassigned) {
+    } else {
       totalPipeline.push({
-        $match: { tenant: { $ne: null } },
+        $match: includeUnassigned
+          ? // orphan users only
+            { tenant_id: { $ne: null }, tenant: null }
+          : // valid tenant users only
+            { tenant: { $ne: null } },
       });
     }
 

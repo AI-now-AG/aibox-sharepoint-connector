@@ -179,7 +179,7 @@ export default {
     return collection
       .find<Document<Tenant>>({
         active: true,
-        is_internal: { $ne: true },
+        //is_internal: { $ne: true },
       })
       .toArray();
   },
