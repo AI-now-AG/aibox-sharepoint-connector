@@ -927,11 +927,16 @@
   "tenant.text-model.private-key": "Private Key",
   "tenant.text-model.api-key-config": "API Key Configuration",
   "user-list-report.filter.filter-label": "Filters",
-  "user-list-report.filter.seach-label": "Search users",
+  "user-list-report.filter.seach-label": "Search",
   "user-list-report.filter.seach-placeholder": "Search users",
   "user-list-report.filter.tenant-label": "Filter by tenant",
   "user-list-report.filter.tenant-placeholder": "Search tenants",
   "user-list-report.filter.others-label": "Others",
-  "user-list-report.filter.include-unassigned-users": "Include unassigned users",
-  "usage.show-internal-tenant": "Show internal tenant"
+  "user-list-report.filter.include-unassigned-users": "Include users with no tenant",
+  "usage.show-internal-tenant": "Show internal tenant",
+  "subscription.website-url": "Website",
+  "tenant.company": "Company",
+  "tenant.billing-method": "Billing method",
+  "tenant.start-date": "Start Date",
+  "tenant.flags": "Flags"
 }
