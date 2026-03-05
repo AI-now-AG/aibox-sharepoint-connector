@@ -3,30 +3,24 @@
   import { useTranslations } from "$i18n/utils";
   import { preventDefault } from "$utils/common";
   import { svgIcons } from "$assets/icons";
+  import TenantSearch from "$components/tenant/TenantSearch.svelte";
   import Dropdown, { type Option } from "$components/form/Dropdown.svelte";
 
   const t = useTranslations();
 
   interface Props {
-    tenants: any;
-    selectedTenant: string | undefined;
-    selectedMonth?: string | undefined;
-    onsearch: Function;
+    isPrivileged?: boolean;
+    selectedTenant: string;
+    selectedMonth?: string;
+    onsearch?: Function;
   }
 
   let {
-    tenants = [],
-    selectedTenant = $bindable(undefined),
-    selectedMonth = $bindable(undefined),
+    isPrivileged = false,
+    selectedTenant = $bindable(""),
+    selectedMonth = $bindable(""),
     onsearch,
   }: Props = $props();
-
-  const tenantOptions: Option[] = tenants.map((item: any) => {
-    return {
-      value: item._id,
-      title: item.name,
-    };
-  });
 
   // Generate an array of the current month and the previous 6 months
   const getMonthOptions = (): Option[] => {
@@ -43,16 +37,15 @@
 </script>
 
 <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-end mb-10">
-  {#if tenantOptions.length}
+  {#if isPrivileged}
     <div class="form-control">
       <!-- svelte-ignore a11y_label_has_associated_control -->
       <label class="label">
         <span class="label-text">{t("usage.select-tenant")}:</span>
       </label>
-      <Dropdown
-        classes="flex-1"
-        options={tenantOptions}
-        bind:value={selectedTenant}
+      <TenantSearch
+        bind:selectedTenant
+        placeholder={t("user-list-report.filter.tenant-placeholder")}
       />
     </div>
   {/if}
