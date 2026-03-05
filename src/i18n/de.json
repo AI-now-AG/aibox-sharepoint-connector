@@ -234,7 +234,7 @@
   "user.block-user": "Benutzer sperren",
   "user.un-block-user": "Benutzer entsperren",
   "user.delete-user-account": "Block User Account",
-  "user.delete-confirm-message": "Möchten Sie diesen Benutzer wirklich löschen?",
+  "user.delete-confirm-message": "Durch das Löschen dieses Benutzers werden alle zugehörigen Daten dauerhaft entfernt. Möchten Sie fortfahren?",
   "user.delete-description-message": "Diese Aktion kann nicht rückgängig gemacht werden.",
   "user.delete-user": "Benutzer löschen",
   "user.all-users": "Alle Benutzer",
@@ -922,5 +922,18 @@
   "tenant.text-model.description": "Konfigurieren Sie Ihre LLMs, setzen Sie Standards und verwalten Sie API-Schlüssel effizient.",
   "tenant.text-model.provider": "Anbieter / Modell",
   "tenant.text-model.private-key": "Privater Schlüssel",
-  "tenant.text-model.api-key-config": "API-Schlüssel Konfiguration"
+  "tenant.text-model.api-key-config": "API-Schlüssel Konfiguration",
+  "user-list-report.filter.filter-label": "Filters",
+  "user-list-report.filter.seach-label": "Suchen",
+  "user-list-report.filter.seach-placeholder": "Search users",
+  "user-list-report.filter.tenant-label": "Filter by tenant",
+  "user-list-report.filter.tenant-placeholder": "Search tenants",
+  "user-list-report.filter.others-label": "Others",
+  "user-list-report.filter.include-unassigned-users": "Include users with no tenant",
+  "usage.show-internal-tenant": "Show internal tenant",
+  "subscription.website-url": "Website",
+  "tenant.company": "Firma",
+  "tenant.billing-method": "Billing method",
+  "tenant.start-date": "Start Date",
+  "tenant.flags": "Flags"
 }

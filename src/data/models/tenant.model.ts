@@ -175,6 +175,15 @@ export default {
     return collection.find<Document<Tenant>>({}).toArray();
   },
 
+  listActive: async () => {
+    return collection
+      .find<Document<Tenant>>({
+        active: true,
+        //is_internal: { $ne: true },
+      })
+      .toArray();
+  },
+
   listAllResellerCodes: async () => {
     return await collection.distinct("reseller_code", {
       is_reseller: true,
@@ -341,6 +350,12 @@ export default {
 
   getById: async (org_id: string) => {
     return await collection.findOne<Document<Tenant>>({ org_id });
+  },
+
+  getByResellerCode: async (resellerCode: string) => {
+    return await collection.findOne<Document<Tenant>>({
+      reseller_code: resellerCode,
+    });
   },
 
   updateOrgName: async (org_id: string, newOrgName: string) => {
