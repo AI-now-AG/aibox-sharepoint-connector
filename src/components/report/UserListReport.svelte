@@ -18,6 +18,9 @@
   let total: number = $state(0);
   let pageSize: number = $state(20);
 
+  const from = $derived(total === 0 ? 0 : (page - 1) * pageSize + 1);
+  const to = $derived(Math.min(page * pageSize, total));
+
   let searchValue: string = $state("");
   let selectedTenant: string = $state("");
   let includeUnassigned: boolean = $state(false);
@@ -241,7 +244,17 @@
       </table>
     </div>
 
-    <Pagination bind:page {pageSize} {total} onPageChange={handlePageChange} />
+    <div class="grid grid-cols-1 md:grid-cols-[1fr_max-content]">
+      <div class="mt-4 text-sm text-base-content/60">
+        {t("pagination.showing-range-of-total", { from, to, total })}
+      </div>
+      <Pagination
+        bind:page
+        {pageSize}
+        {total}
+        onPageChange={handlePageChange}
+      />
+    </div>
   {/if}
 </div>
 
