@@ -7,14 +7,19 @@ interface TenantFiltersStore {
 }
 
 const storageItemKey = "aibox:tenant-filters";
-const initialData =
+const defaultValues: TenantFiltersStore = {
+  searchValue: "",
+  statusFlags: [],
+  resellerCode: "",
+};
+
+const initialData: TenantFiltersStore =
   typeof window !== "undefined"
-    ? JSON.parse(localStorage.getItem(storageItemKey) || "{}")
-    : {
-        searchValue: "",
-        statusFlags: [],
-        resellerCode: "",
-      };
+    ? {
+        ...defaultValues,
+        ...(JSON.parse(localStorage.getItem(storageItemKey) || "null") || {}),
+      }
+    : defaultValues;
 
 export const tenantFilters = writable<TenantFiltersStore>(initialData);
 
