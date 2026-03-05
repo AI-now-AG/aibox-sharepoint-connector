@@ -7,9 +7,15 @@
   import log from "$utils/log";
   import { tenant as currentTenant } from "$stores";
   import { addToast } from "$stores/toast";
+  import { tenantFilters } from "$stores/tenantFilters";
   import { formatDate } from "$utils/common";
   import { getSubscriptionAddOnName } from "$utils/subscription";
-  import { AudioOptionId, SubscriptionPackageId } from "$types/Subscription";
+  import {
+    AudioOptionId,
+    SubscriptionPackageId,
+    BillingMethod,
+    BillingMethodLabels,
+  } from "$types/Subscription";
   import { SubscriptionPackages } from "$data/subscription-packages";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import Loading from "$components/Loading.svelte";
@@ -28,7 +34,7 @@
   let tenants: any = $state([]);
   let page: number = $state(1);
   let total: number = $state(0);
-  let pageSize: number = $state(10);
+  let pageSize: number = $state(20);
 
   const from = $derived(total === 0 ? 0 : (page - 1) * pageSize + 1);
   const to = $derived(Math.min(page * pageSize, total));
@@ -47,7 +53,19 @@
   }));
 
   onMount(async () => {
+    searchValue = $tenantFilters.searchValue;
+    statusFlags = $tenantFilters.statusFlags;
+    resellerCode = $tenantFilters.resellerCode;
+
     await fetchTenants();
+  });
+
+  $effect(() => {
+    tenantFilters.set({
+      searchValue,
+      statusFlags,
+      resellerCode,
+    });
   });
 
   const fetchTenants = async () => {
@@ -282,16 +300,22 @@
                 >{t("tenant.tenants.tenant.display-name")}</th
               >
               <th class="py-3 px-4 text-left font-normal text-xs"
+                >{t("tenant.company")}</th
+              >
+              <th class="py-3 px-4 text-left font-normal text-xs"
                 >{t("tenant.subscription")}</th
               >
               <th class="py-3 px-4 text-left font-normal text-xs"
-                >{t("tenant.flag-status.trial")}</th
-              >
-              <th class="py-3 px-4 text-left font-normal text-xs"
-                >{t("tenant.flag-status.internal")}</th
+                >{t("tenant.flags")}</th
               >
               <th class="py-3 px-4 text-left font-normal text-xs"
                 >{t("tenant.filter-reseller-code-label")}</th
+              >
+              <th class="py-3 px-4 text-left font-normal text-xs"
+                >{t("tenant.start-date")}</th
+              >
+              <th class="py-3 px-4 text-left font-normal text-xs"
+                >{t("tenant.billing-method")}</th
               >
               <th class="py-3 px-4 text-left font-normal text-xs"
                 >{t("tenant.total-price")}</th
@@ -304,6 +328,7 @@
           </thead>
           <tbody>
             {#each tenants as tenant}
+              {@const subscription = tenant.subscription || null}
               {@const audioAddOn = getSubscriptionAddOnName(
                 "audiototext",
                 tenant.subscription?.add_ons,
@@ -320,9 +345,13 @@
                   >
                 </td>
 
+                <td class="py-2 px-4 text-sm font-medium">
+                  {tenant?.billing_info?.company_name || "-"}
+                </td>
+
                 <td class="py-2 px-4">
                   <span class="block text text-sm font-medium">
-                    {tenant.subscription?.plan_name}
+                    {subscription?.plan_name}
                   </span>
                   <span class="block pt-1">
                     {#if audioAddOn}
@@ -339,27 +368,23 @@
                 </td>
 
                 <td class="py-2 px-4">
-                  {#if tenant.subscription?.is_trial}
-                    <span class="badge badge-soft badge-success"
-                      >{t("common.yes")}</span
-                    >
-                  {:else}
-                    <span class="badge badge-soft badge-warning"
-                      >{t("common.no")}</span
-                    >
-                  {/if}
-                </td>
-
-                <td class="py-2 px-4">
-                  {#if tenant.is_internal}
-                    <span class="badge badge-soft badge-success"
-                      >{t("common.yes")}</span
-                    >
-                  {:else}
-                    <span class="badge badge-soft badge-warning"
-                      >{t("common.no")}</span
-                    >
-                  {/if}
+                  <span class="flex flex-col gap-2">
+                    {#if tenant.is_internal}
+                      <span class="badge badge-sm badge-soft badge-success"
+                        >{"Internal"}</span
+                      >
+                    {/if}
+                    {#if subscription?.is_trial}
+                      <span class="badge badge-sm badge-soft badge-warning"
+                        >{"Trial"}</span
+                      >
+                    {/if}
+                    {#if tenant.is_reseller}
+                      <span class="badge badge-sm badge-soft badge-info"
+                        >{"Reseller"}</span
+                      >
+                    {/if}
+                  </span>
                 </td>
 
                 <td class="py-2 px-4">
@@ -367,12 +392,26 @@
                 </td>
 
                 <td class="py-2 px-4">
+                  {subscription?.is_trial
+                    ? formatDate(subscription.trial_start_date) || "-"
+                    : formatDate(subscription.start_date) || "-"}
+                </td>
+
+                <td class="py-2 px-4">
+                  {tenant.billing_method
+                    ? BillingMethodLabels[
+                        tenant.billing_method as BillingMethod
+                      ]
+                    : ""}
+                </td>
+
+                <td class="py-2 px-4">
                   <span class="text-warning text-sm font-medium"
                     >{tenant.totalPrice
                       ? tenant.totalPrice + " CHF"
                       : calculateTotalPrice(
-                          tenant.subscription?.plan_name,
-                          tenant.subscription?.add_ons,
+                          subscription?.plan_name,
+                          subscription?.add_ons,
                         )}</span
                   >
                 </td>
