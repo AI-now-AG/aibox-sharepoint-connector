@@ -47,8 +47,6 @@
   let confirmUpdateModal: HTMLDialogElement | undefined = $state();
   let confirmDeleteModal: HTMLDialogElement | undefined = $state();
 
-  $inspect($tenantFilters);
-
   const resellerCodeOptions = resellerCodes.map((c) => ({
     title: c,
     value: c,
@@ -379,6 +377,11 @@
                     {#if subscription?.is_trial}
                       <span class="badge badge-sm badge-soft badge-warning"
                         >{"Trial"}</span
+                      >
+                    {/if}
+                    {#if tenant.is_reseller}
+                      <span class="badge badge-sm badge-soft badge-info"
+                        >{"Reseller"}</span
                       >
                     {/if}
                   </span>
