@@ -13,6 +13,12 @@ export const GlobalApiKeysSchema = z.object({
   speech_api_key: z.string().nullable().default(null),
   elevenLabs_api_key: z.string().nullable().default(null),
   fal_ai_api_key: z.string().nullable().default(null),
+  // Provider config fields (plain strings, not encrypted)
+  azure_openai_endpoint: z.string().nullable().default(null),
+  azure_openai_instance_name: z.string().nullable().default(null),
+  azure_openai_chat_model: z.string().nullable().default(null),
+  azure_openai_whisper_model: z.string().nullable().default(null),
+  speech_region: z.string().nullable().default(null),
   created_at: z
     .date()
     .optional()
@@ -39,6 +45,25 @@ export const API_KEY_FIELDS = [
 
 export type ApiKeyField = (typeof API_KEY_FIELDS)[number];
 
+export const CONFIG_FIELDS = [
+  "azure_openai_endpoint",
+  "azure_openai_instance_name",
+  "azure_openai_chat_model",
+  "azure_openai_whisper_model",
+  "speech_region",
+] as const;
+
+export type ConfigField = (typeof CONFIG_FIELDS)[number];
+
+/** Maps each config field to its corresponding tenant metadata private-key flag */
+export const CONFIG_TO_PRIVATE_FLAG: Record<ConfigField, string> = {
+  azure_openai_endpoint: "azureOpenaiPrivateKeyEnabled",
+  azure_openai_instance_name: "azureOpenaiPrivateKeyEnabled",
+  azure_openai_chat_model: "azureOpenaiPrivateKeyEnabled",
+  azure_openai_whisper_model: "azureOpenaiPrivateKeyEnabled",
+  speech_region: "speechPrivateKeyEnabled",
+};
+
 export const collection = db.collection<GlobalApiKeys>("globalApiKeys");
 
 export default {
@@ -62,6 +87,11 @@ export default {
       speech_api_key: null,
       elevenLabs_api_key: null,
       fal_ai_api_key: null,
+      azure_openai_endpoint: null,
+      azure_openai_instance_name: null,
+      azure_openai_chat_model: null,
+      azure_openai_whisper_model: null,
+      speech_region: null,
       created_at: now,
       updated_at: now,
     };

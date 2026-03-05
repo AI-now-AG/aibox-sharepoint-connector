@@ -2,6 +2,7 @@ import { defineAction } from "astro:actions";
 import { z } from "zod";
 import GlobalApiKeysModel, {
   API_KEY_FIELDS,
+  CONFIG_FIELDS,
 } from "$data/models/globalApiKeys.model";
 import { encrypt, decrypt } from "$utils/secure";
 
@@ -16,6 +17,12 @@ const GlobalApiKeysUpdateSchema = z.object({
   speech_api_key: z.string().nullable().optional(),
   elevenLabs_api_key: z.string().nullable().optional(),
   fal_ai_api_key: z.string().nullable().optional(),
+  // Config fields (plain strings, not encrypted)
+  azure_openai_endpoint: z.string().nullable().optional(),
+  azure_openai_instance_name: z.string().nullable().optional(),
+  azure_openai_chat_model: z.string().nullable().optional(),
+  azure_openai_whisper_model: z.string().nullable().optional(),
+  speech_region: z.string().nullable().optional(),
 });
 
 export const globalApiKeys = {
@@ -38,10 +45,22 @@ export const globalApiKeys = {
         }
       }
 
+      // Config fields (plain strings, no encryption)
+      const configValues: Record<string, string | null> = {};
+      const hasConfig: Record<string, boolean> = {};
+
+      for (const field of CONFIG_FIELDS) {
+        const raw = config[field];
+        configValues[field] = raw || null;
+        hasConfig[field] = !!raw;
+      }
+
       return {
         _id: config._id.toString(),
         ...decryptedKeys,
+        ...configValues,
         _hasKeys: hasKeys,
+        _hasConfig: hasConfig,
       };
     },
   }),
@@ -69,6 +88,20 @@ export const globalApiKeys = {
             if (value === currentDecrypted) continue; // No change, skip
             // New key value — encrypt before saving
             updates[field] = encrypt(value);
+          }
+        }
+
+        // Handle config fields (plain strings, no encryption)
+        for (const field of CONFIG_FIELDS) {
+          const value = keyData[field];
+          if (value === undefined) continue;
+
+          if (!value || value === "") {
+            updates[field] = null;
+          } else {
+            const currentValue = currentConfig[field] || null;
+            if (value === currentValue) continue; // No change
+            updates[field] = value; // Store as plain string
           }
         }
 

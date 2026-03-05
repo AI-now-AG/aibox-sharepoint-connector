@@ -606,6 +606,8 @@
   "global-api-keys.not-configured": "Not configured",
   "tenant.using-system-key": "Using System Default Key",
   "tenant.no-system-key": "No System Key Set",
+  "tenant.using-system-config": "Using System Default Config",
+  "tenant.no-system-config": "No System Config Set",
   "rag-config.title": "RAG Configuration",
   "rag-config.description": "Global search and retrieval enhancement settings applied across all tenants.",
   "rag-config.save": "Save Configuration",
