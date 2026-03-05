@@ -7,6 +7,7 @@
   import log from "$utils/log";
   import { tenant as currentTenant } from "$stores";
   import { addToast } from "$stores/toast";
+  import { tenantFilters } from "$stores/tenantFilters";
   import { formatDate } from "$utils/common";
   import { getSubscriptionAddOnName } from "$utils/subscription";
   import {
@@ -46,13 +47,27 @@
   let confirmUpdateModal: HTMLDialogElement | undefined = $state();
   let confirmDeleteModal: HTMLDialogElement | undefined = $state();
 
+  $inspect($tenantFilters);
+
   const resellerCodeOptions = resellerCodes.map((c) => ({
     title: c,
     value: c,
   }));
 
   onMount(async () => {
+    searchValue = $tenantFilters.searchValue;
+    statusFlags = $tenantFilters.statusFlags;
+    resellerCode = $tenantFilters.resellerCode;
+
     await fetchTenants();
+  });
+
+  $effect(() => {
+    tenantFilters.set({
+      searchValue,
+      statusFlags,
+      resellerCode,
+    });
   });
 
   const fetchTenants = async () => {
