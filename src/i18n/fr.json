@@ -929,7 +929,7 @@
   "user-list-report.filter.filter-label": "Filters",
   "user-list-report.filter.seach-label": "Search users",
   "user-list-report.filter.seach-placeholder": "Search users",
-  "user-list-report.filter.tenant-label": "Tenant",
+  "user-list-report.filter.tenant-label": "Filter by tenant",
   "user-list-report.filter.tenant-placeholder": "Search tenants",
   "user-list-report.filter.others-label": "Others",
   "user-list-report.filter.include-unassigned-users": "Include unassigned users",
