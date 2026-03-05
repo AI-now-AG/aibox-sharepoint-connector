@@ -933,5 +933,10 @@
   "user-list-report.filter.tenant-placeholder": "Search tenants",
   "user-list-report.filter.others-label": "Others",
   "user-list-report.filter.include-unassigned-users": "Include unassigned users",
-  "usage.show-internal-tenant": "Show internal tenant"
+  "usage.show-internal-tenant": "Show internal tenant",
+  "subscription.website-url": "Website",
+  "tenant.company": "Firma",
+  "tenant.billing-method": "Billing method",
+  "tenant.start-date": "Start Date",
+  "tenant.flags": "Flags"
 }
