@@ -62,6 +62,7 @@
   let selectedTheme: { title: string; value: ThemeCode } | undefined = $state(
     ThemeMap[ThemeCode.AIBox],
   );
+  let websiteUrl = $state<string>("");
 
   let companyName = $state<string>("");
   let street = $state<string>("");
@@ -83,6 +84,7 @@
   let isFormValid = $derived(
     organizationName.trim() !== "" &&
       companyName.trim() !== "" &&
+      websiteUrl.trim() !== "" &&
       street.trim() !== "" &&
       zipCode.trim() !== "" &&
       location.trim() !== "" &&
@@ -168,6 +170,7 @@
       org_name: organizationName,
       language: selectedLanguage ?? LanguageCode.De,
       theme: selectedTheme?.value ?? ThemeCode.AIBox,
+      website: websiteUrl,
       use_cases: selectedCategories ?? [],
       plan_name: selectedPackageId as SubscriptionPackageId,
       add_ons: selectedAudioOptionIds as AudioOptionId[],
@@ -305,7 +308,15 @@
             classes="text-sm w-full"
           />
         </div>
-        <div class="flex-1 flex flex-col mb-4"></div>
+        <div class="flex-1 flex flex-col mb-4">
+          <Input
+            label={t("subscription.website-url") + " *"}
+            bind:value={websiteUrl}
+            placeholder="https://ihre-website.de"
+            labelClasses="font-medium text-sm"
+            classes="text-sm w-full"
+          />
+        </div>
       </div>
 
       <div class="block md:flex flex-row space-x-0 md:space-x-8">
@@ -314,6 +325,7 @@
             label={`${t("tenant.language")}*`}
             options={Languges}
             bind:value={selectedLanguage}
+            labelClasses="font-medium text-sm"
           />
         </div>
 
@@ -366,6 +378,7 @@
             label={t("subscription.zip-code") + " *"}
             bind:value={zipCode}
             placeholder={t("subscription.zip-code-place-holder")}
+            labelClasses="font-medium text-sm"
             classes="text-sm w-full"
           />
         </div>
