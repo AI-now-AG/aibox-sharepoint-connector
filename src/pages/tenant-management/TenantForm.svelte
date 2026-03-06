@@ -1382,6 +1382,7 @@
               label={`${t("tenant.language")}*`}
               options={Languges}
               bind:value={selectedLanguage}
+              labelClasses="font-medium text-sm"
             />
           </div>
 
@@ -1408,6 +1409,7 @@
               label={t("tenant.subscription")}
               options={subscriptionOptions}
               bind:value={selectedPlan}
+              labelClasses="font-medium text-sm"
             />
           </div>
           <div class="flex-1 flex flex-col mb-4">
@@ -1459,7 +1461,7 @@
 
         <div class="flex flex-row space-x-4">
           <div class="flex-1 flex flex-col mb-4">
-            <p class="mb-2">{t("tenant.total-price")}</p>
+            <p class="mb-2 font-medium text-sm">{t("tenant.total-price")}</p>
             <label class="input input-bordered w-full">
               {@html svgIcons.inputDollarIcon}
               <input
@@ -1474,7 +1476,9 @@
 
         <div class="flex flex-row space-x-4">
           <div class="flex-1 flex flex-col mb-4">
-            <p class="mb-2">{t("tenant.subscription-start-date")}</p>
+            <p class="mb-2 font-medium text-sm">
+              {t("tenant.subscription-start-date")}
+            </p>
             <input
               type="date"
               bind:value={subscriptionData.start_date}
@@ -1482,7 +1486,9 @@
             />
           </div>
           <div class="flex-1 flex flex-col mb-4">
-            <p class="mb-2">{t("tenant.subscription-cancelled-date")}</p>
+            <p class="mb-2 font-medium text-sm">
+              {t("tenant.subscription-cancelled-date")}
+            </p>
 
             <input
               type="date"
@@ -2776,6 +2782,7 @@
               allowClear={true}
               bind:value={tenantData.owned_by_reseller}
               disabled={tenantData.is_reseller}
+              labelClasses="font-medium text-sm"
             />
           </div>
         </div>
