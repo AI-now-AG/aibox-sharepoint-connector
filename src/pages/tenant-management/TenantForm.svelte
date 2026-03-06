@@ -752,23 +752,25 @@
     }
 
     if (tenantData.azure_openai_api_key || (azureOpenAIEnabled && hasApiKey("azure_openai_api_key", "azureOpenaiPrivateKeyEnabled"))) {
-      if (!tenantData?.azure_openai_instance_name) {
+      // Only require config fields on the tenant when private key is enabled.
+      // Otherwise, global config is used (checked via globalApiKeyStatus).
+      if (!tenantData?.azure_openai_instance_name && !globalApiKeyStatus?.azure_openai_instance_name) {
         showAlert(
           t("tenant.validate-azure-open-ai-instance-name-empty-message"),
         );
         return false;
       }
-      if (!tenantData?.azure_openai_endpoint) {
+      if (!tenantData?.azure_openai_endpoint && !globalApiKeyStatus?.azure_openai_endpoint) {
         showAlert(t("tenant.validate-azure-open-ai-endpoint-empty-message"));
         return false;
       }
-      if (!tenantData?.azure_openai_whisper_model) {
+      if (!tenantData?.azure_openai_whisper_model && !globalApiKeyStatus?.azure_openai_whisper_model) {
         showAlert(
           t("tenant.validate-azure-open-ai-transciption-model-empty-message"),
         );
         return false;
       }
-      if (!tenantData?.azure_openai_chat_model) {
+      if (!tenantData?.azure_openai_chat_model && !globalApiKeyStatus?.azure_openai_chat_model) {
         showAlert(t("tenant.validate-azure-open-ai-text-model-empty-message"));
         return false;
       }
@@ -797,8 +799,8 @@
       return false;
     }
 
-    if (tenantData.speech_api_key) {
-      if (!tenantData?.speech_region) {
+    if (hasApiKey("speech_api_key", "speechPrivateKeyEnabled")) {
+      if (!tenantData?.speech_region && !globalApiKeyStatus?.speech_region) {
         showAlert(t("tenant.validate-azure-speech-service-region"));
         return false;
       }
@@ -1739,51 +1741,36 @@
                   <tr class="bg-base-200/20">
                     <td colspan="5">
                       <div class="grid grid-cols-2 gap-4 px-4 py-2">
-                        <div class="w-full">
-                          <span class="text-sm font-medium text-base-content"
-                            >{t("tenant.azure-open-ai-instance-name")}</span
-                          >
-                          <input
-                            type="text"
-                            class="input input-bordered input-sm mt-1 w-full"
-                            use:trimInput
-                            bind:value={tenantData.azure_openai_instance_name}
-                          />
-                        </div>
-                        <div class="w-full">
-                          <span class="text-sm font-medium text-base-content"
-                            >{t("tenant.azure-open-ai-endpoint")}</span
-                          >
-                          <input
-                            type="text"
-                            class="input input-bordered input-sm mt-1 w-full"
-                            bind:value={tenantData.azure_openai_endpoint}
-                          />
-                        </div>
-                        <div class="w-full">
-                          <span class="text-sm font-medium text-base-content"
-                            >{t(
-                              "tenant.azure-open-ai-transciption-model",
-                            )}</span
-                          >
-                          <input
-                            type="text"
-                            class="input input-bordered input-sm mt-1 w-full"
-                            use:trimInput
-                            bind:value={tenantData.azure_openai_whisper_model}
-                          />
-                        </div>
-                        <div class="w-full">
-                          <span class="text-sm font-medium text-base-content"
-                            >{t("tenant.azure-open-ai-text-model")}</span
-                          >
-                          <input
-                            type="text"
-                            class="input input-bordered input-sm mt-1 w-full"
-                            use:trimInput
-                            bind:value={tenantData.azure_openai_chat_model}
-                          />
-                        </div>
+                        {#each [
+                          { field: "azure_openai_instance_name", label: t("tenant.azure-open-ai-instance-name") },
+                          { field: "azure_openai_endpoint", label: t("tenant.azure-open-ai-endpoint") },
+                          { field: "azure_openai_whisper_model", label: t("tenant.azure-open-ai-transciption-model") },
+                          { field: "azure_openai_chat_model", label: t("tenant.azure-open-ai-text-model") },
+                        ] as acf}
+                          <div class="w-full">
+                            <span class="text-sm font-medium text-base-content">{acf.label}</span>
+                            {#if tenantData.metadata?.azureOpenaiPrivateKeyEnabled}
+                              <input
+                                type="text"
+                                class="input input-bordered input-sm mt-1 w-full"
+                                use:trimInput
+                                bind:value={tenantData[acf.field]}
+                              />
+                            {:else}
+                              <label class="input input-bordered input-sm mt-1 w-full opacity-60 flex items-center gap-2">
+                                <input type="text" class="grow" disabled
+                                  placeholder={globalApiKeyStatus?.[acf.field]
+                                    ? t("tenant.using-system-config")
+                                    : t("tenant.no-system-config")} />
+                                {#if globalApiKeyStatus?.[acf.field]}
+                                  <span class="badge badge-success badge-xs">{t("global-api-keys.configured")}</span>
+                                {:else}
+                                  <span class="badge badge-warning badge-xs">{t("tenant.no-system-config")}</span>
+                                {/if}
+                              </label>
+                            {/if}
+                          </div>
+                        {/each}
                       </div>
                     </td>
                   </tr>
@@ -1979,13 +1966,27 @@
                   <span class="mb-2 text-base-content font-medium text-sm"
                     >{t("tenant.settings.large-file-azure-region")}</span
                   >
-                  <input
-                    type="text"
-                    class="input input-bordered mt-2 w-full"
-                    placeholder={""}
-                    use:trimInput
-                    bind:value={tenantData.speech_region}
-                  />
+                  {#if tenantData.metadata?.speechPrivateKeyEnabled}
+                    <input
+                      type="text"
+                      class="input input-bordered mt-2 w-full"
+                      placeholder={""}
+                      use:trimInput
+                      bind:value={tenantData.speech_region}
+                    />
+                  {:else}
+                    <label class="input input-bordered mt-2 w-full opacity-60 flex items-center gap-2">
+                      <input type="text" class="grow" disabled
+                        placeholder={globalApiKeyStatus?.speech_region
+                          ? t("tenant.using-system-config")
+                          : t("tenant.no-system-config")} />
+                      {#if globalApiKeyStatus?.speech_region}
+                        <span class="badge badge-success badge-sm">{t("global-api-keys.configured")}</span>
+                      {:else}
+                        <span class="badge badge-warning badge-sm">{t("tenant.no-system-config")}</span>
+                      {/if}
+                    </label>
+                  {/if}
                 </div>
               </div>
 
