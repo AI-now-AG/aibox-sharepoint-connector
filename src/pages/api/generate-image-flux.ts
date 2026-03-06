@@ -1,10 +1,10 @@
-import { decrypt } from "$utils/secure";
 import type { APIContext, APIRoute } from "astro";
 import { fal } from "@fal-ai/client";
 import type { ImageSize } from "@fal-ai/client/endpoints";
 import { ApiKeyProvider } from "$types/TenantFeature";
 import { UsageType } from "$types/UsageTracking";
 import UsageLogModel, { type UsageLog } from "$data/models/usageLog.model";
+import { getGlobalApiKeys, resolveApiKey } from "$utils/resolveApiKey";
 
 const recordImageUsage = async (ctx: APIContext) => {
   try {
@@ -24,17 +24,17 @@ const recordImageUsage = async (ctx: APIContext) => {
 export const POST: APIRoute = async (ctx: APIContext) => {
   const { request } = ctx;
   try {
-    if (!ctx.locals.tenant?.fal_ai_api_key) {
-      console.log("fal_ai_api_key", ctx.locals.tenant?.fal_ai_api_key);
+    const globalKeys = await getGlobalApiKeys();
+    const apiKey = resolveApiKey("fal_ai_api_key", ctx.locals.tenant, globalKeys);
+    if (!apiKey) {
       return new Response(
-        JSON.stringify({ error: "Missing FAL.AI's API Key!!!" }),
+        JSON.stringify({ error: "FAL.AI API key not configured" }),
         {
           status: 400,
           headers: { "Content-Type": "application/json" },
         },
       );
     }
-    const apiKey = decrypt(ctx.locals.tenant?.fal_ai_api_key || "");
     fal.config({
       credentials: apiKey,
     });

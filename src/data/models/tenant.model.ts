@@ -180,8 +180,8 @@ export default {
     return collection
       .find<Document<Tenant>>({
         active: true,
-        //is_internal: { $ne: true },
       })
+      .sort({ name: 1 })
       .toArray();
   },
 
@@ -273,6 +273,7 @@ export default {
           owned_by_reseller: 1,
           included_user_limit: 1,
           extra_user_limit: 1,
+          billing_method: 1,
           billing_info: 1,
           metadata: 1,
           azure_openai_instance_name: 1,
@@ -285,7 +286,7 @@ export default {
     // Trial flag filter
     if (statusFlags.includes(FlagStatus.Trial)) {
       pipeline.push({
-        $match: { "subscription.is_trial": true },
+        $match: { active: true, "subscription.is_trial": true },
       });
     }
 

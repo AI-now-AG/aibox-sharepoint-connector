@@ -32,7 +32,7 @@ const instructions = `
 `;
 
 const generatePromptDescription = async (ctx: APIContext, prompt: string) => {
-  const model = createChatModel(ctx);
+  const model = await createChatModel(ctx);
 
   const messages = [new SystemMessage(instructions), new HumanMessage(prompt)];
   const parser = new StringOutputParser();

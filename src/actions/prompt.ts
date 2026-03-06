@@ -101,7 +101,7 @@ export const prompt = {
 
       try {
         // Initialize the chat model for this request
-        const chatModel = createChatModel(context);
+        const chatModel = await createChatModel(context);
 
         // Construct a conversation history with system + human messages
         const messages: BaseMessage[] = [
