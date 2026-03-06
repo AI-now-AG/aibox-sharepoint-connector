@@ -353,7 +353,7 @@
                   <span class="block text text-sm font-medium">
                     {subscription?.plan_name}
                   </span>
-                  <span class="block pt-1">
+                  <span class="flex flex-col gap-1 pt-1">
                     {#if audioAddOn}
                       <span class="badge badge-ghost badge-sm">
                         {audioAddOn}
