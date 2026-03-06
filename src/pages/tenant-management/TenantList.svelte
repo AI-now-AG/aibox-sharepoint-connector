@@ -248,7 +248,7 @@
 <div
   class="container max-w-full mx-auto grid grid-cols-1 md:grid-cols-[1fr_max-content] px-14"
 >
-  <h1 class="pt-2 lg:pt-8 text-4xl font-bold">
+  <h1 class="text-4xl font-bold">
     {t("tenant.tenants")}
   </h1>
   <div>
