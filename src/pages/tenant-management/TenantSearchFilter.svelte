@@ -78,6 +78,7 @@
           type="text"
           class="grow"
           placeholder={t("tenant.tenants.seach-place-holder")}
+          {value}
           oninput={preventDefault(onSearch)}
         />
       </label>
