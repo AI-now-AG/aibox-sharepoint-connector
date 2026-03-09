@@ -350,21 +350,25 @@
                 </td>
 
                 <td class="py-2 px-4">
-                  <span class="block text text-sm font-medium">
-                    {subscription?.plan_name}
-                  </span>
-                  <span class="flex flex-col gap-1 pt-1">
-                    {#if audioAddOn}
-                      <span class="badge badge-ghost badge-sm">
-                        {audioAddOn}
-                      </span>
+                  <div class="flex flex-col gap-1">
+                    <span class="text-sm font-medium">
+                      {subscription?.plan_name}
+                    </span>
+                    {#if audioAddOn || subtitleAddOn}
+                      <div class="flex flex-wrap gap-1">
+                        {#if audioAddOn}
+                          <span class="badge badge-ghost badge-sm whitespace-nowrap">
+                            {audioAddOn}
+                          </span>
+                        {/if}
+                        {#if subtitleAddOn}
+                          <span class="badge badge-ghost badge-sm whitespace-nowrap">
+                            {subtitleAddOn}
+                          </span>
+                        {/if}
+                      </div>
                     {/if}
-                    {#if subtitleAddOn}
-                      <span class="badge badge-ghost badge-sm">
-                        {subtitleAddOn}
-                      </span>
-                    {/if}
-                  </span>
+                  </div>
                 </td>
 
                 <td class="py-2 px-4">

@@ -645,20 +645,19 @@
   :global([id^="exportedTextElement-"] table) {
     table-layout: auto;
     border-collapse: collapse;
-    width: auto; /* do NOT force 100% */
-    max-width: none;
-    min-width: 0; /* ensure it doesn't force parent's min width */
+    width: max-content;
+    min-width: 100%;
   }
 
   :global([id^="exportedTextElement-"] th),
   :global([id^="exportedTextElement-"] td) {
-    white-space: normal;
-    overflow-wrap: anywhere;
-    word-break: break-word;
+    white-space: nowrap;
+    word-break: normal;
+    overflow-wrap: normal;
   }
 
   :global([id^="exportedTextElement-"] > .overflow-x-auto) {
-    contain: inline-size;
+    overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
 </style>
