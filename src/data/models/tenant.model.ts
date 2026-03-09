@@ -175,6 +175,15 @@ export default {
     return collection.find<Document<Tenant>>({}).toArray();
   },
 
+  listActive: async () => {
+    return collection
+      .find<Document<Tenant>>({
+        active: true,
+      })
+      .sort({ name: 1 })
+      .toArray();
+  },
+
   listAllResellerCodes: async () => {
     return await collection.distinct("reseller_code", {
       is_reseller: true,
@@ -263,6 +272,7 @@ export default {
           owned_by_reseller: 1,
           included_user_limit: 1,
           extra_user_limit: 1,
+          billing_method: 1,
           billing_info: 1,
           metadata: 1,
           azure_openai_instance_name: 1,
@@ -275,7 +285,18 @@ export default {
     // Trial flag filter
     if (statusFlags.includes(FlagStatus.Trial)) {
       pipeline.push({
-        $match: { "subscription.is_trial": true },
+        $match: { active: true, "subscription.is_trial": true },
+      });
+    }
+
+    // Paying flag filter
+    if (statusFlags.includes(FlagStatus.Paying)) {
+      pipeline.push({
+        $match: {
+          active: true,
+          is_internal: false,
+          "subscription.is_trial": false,
+        },
       });
     }
 
@@ -306,6 +327,17 @@ export default {
     if (statusFlags.includes(FlagStatus.Trial)) {
       totalPipeline.push({
         $match: { "subscription.is_trial": true },
+      });
+    }
+
+    // Paying flag filter
+    if (statusFlags.includes(FlagStatus.Paying)) {
+      totalPipeline.push({
+        $match: {
+          active: true,
+          is_internal: false,
+          "subscription.is_trial": false,
+        },
       });
     }
 

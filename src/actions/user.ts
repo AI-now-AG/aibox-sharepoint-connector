@@ -337,20 +337,18 @@ export const user = {
         throw new Error("User does not exists.");
       }
 
-      const session = client.startSession();
-      session.startTransaction();
+      // Delete from your database FIRST
+      const deleteResult = await UserModel.delete(input._id);
+
+      // Try deleting from Auth0 (but don't break flow if it fails)
       try {
         await usersManagement.deleteUser(user?.auth0_sub);
-        const updateResult = await UserModel.delete(input._id);
-
-        await session.commitTransaction();
-        return transformRawData(updateResult);
       } catch (error) {
-        await session.abortTransaction();
-        throw error;
-      } finally {
-        session.endSession();
+        console.error("Auth0 delete failed:", error);
+        // We intentionally ignore this error
       }
+
+      return transformRawData(deleteResult);
     },
   }),
 

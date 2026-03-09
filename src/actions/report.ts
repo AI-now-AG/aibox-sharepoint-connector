@@ -13,18 +13,36 @@ import UserModel from "$data/models/user.model";
 import UsageLogModel from "$data/models/usageLog.model";
 import { calculateUsage, sumCreditsUsed } from "$utils/usageCalculator";
 
+const UsagePerTenantInputParamsSchema = z.object({
+  tenant_id: z.string(),
+  month: z.string(),
+});
+
+const CreditUsageAllInputParamsSchema = z.object({
+  month: z.string(),
+  includeInternal: z.boolean().optional(),
+});
+
+const UserListReportInputParamsSchema = z.object({
+  page: z.number().optional(),
+  pageSize: z.number().optional(),
+  search: z.string().optional(),
+  tenant: z.string().optional(),
+  includeUnassigned: z.boolean().optional(),
+});
+
 export const report = {
-  usagePerTeant: defineAction({
-    input: z.object({
-      tenant_id: z.string(),
-      month: z.string(),
-    }),
+  usagePerTenant: defineAction({
+    input: UsagePerTenantInputParamsSchema,
     handler: async (input) => {
       const { tenant_id: tenantId, month } = input;
 
       const tenant = await TenantModel.get(tenantId);
       if (!tenant) {
-        throw new Error("Tenant does not exist.");
+        return transformRawData({
+          overview: null,
+          data: [],
+        });
       }
 
       const formattedMonth = month.replace(/(\d{2})-(\d{4})/, "$2-$1");
@@ -39,26 +57,29 @@ export const report = {
         month: monthName,
         creditsUsed: totalCreditsUsed,
       };
-      const results = {
+      const result = {
         overview,
         data: usageData,
       };
 
-      return transformRawData(results);
+      return transformRawData(result);
     },
   }),
   creditUsageAll: defineAction({
-    input: z.object({
-      month: z.string(),
-    }),
+    input: CreditUsageAllInputParamsSchema,
     handler: async (input) => {
-      const { month } = input;
+      const { month, includeInternal } = input;
 
-      const tenants = await TenantModel.list();
+      const tenants = await TenantModel.listActive();
 
       const creditUsageData: CreditUsage[] = [];
 
       for (const tenant of tenants) {
+        // Skip tenants based on internal status if includeInternal is specified
+        if (includeInternal !== tenant.is_internal) {
+          continue;
+        }
+
         const usages = await UsageLogModel.listUsageSummary(tenant._id, month);
 
         const usageData: UsageRow[] = calculateUsage(tenant, usages);
@@ -84,11 +105,7 @@ export const report = {
     },
   }),
   userListReport: defineAction({
-    input: z.object({
-      page: z.number().optional(),
-      pageSize: z.number().optional(),
-      search: z.string().optional(),
-    }),
+    input: UserListReportInputParamsSchema,
     handler: async (input) => {
       const results = await UserModel.fetchPaginatedReports(input);
       return transformRawData(results);

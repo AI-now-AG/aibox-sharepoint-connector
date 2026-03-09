@@ -97,7 +97,7 @@
 </script>
 
 <div>
-  <p class="mb-2">{title}</p>
+  <p class="mb-2 font-medium text-sm">{title}</p>
   <div class="dropdown dropdown-bottom w-full">
     <label class="input input-bordered flex items-center gap-2 w-full">
       <input

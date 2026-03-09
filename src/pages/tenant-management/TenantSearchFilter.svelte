@@ -32,13 +32,14 @@
     { label: t("tenant.flag-status.internal"), value: FlagStatus.Internal },
     { label: t("tenant.flag-status.reseller"), value: FlagStatus.Reseller },
     { label: t("tenant.flag-status.archived"), value: FlagStatus.Archived },
+    { label: t("tenant.flag-status.paying"), value: FlagStatus.Paying },
   ];
 
   const onSearch = ({ target }: any) => {
     clearTimeout(typingTimeout);
     typingTimeout = setTimeout(() => {
       value = target.value;
-      onsearch();
+      onsearch?.();
     }, 300);
   };
 
@@ -85,7 +86,7 @@
       <p class="mb-2 text-base-content/80">
         {t("tenant.flag-status-label")}
       </p>
-      <div class="grid grid-cols-2 lg:grid-cols-4 max-w-md pt-1 gap-2">
+      <div class="grid grid-cols-2 lg:grid-cols-3 max-w-md gap-2">
         {#each flagOptions as flag}
           <label class="flex items-center space-x-2">
             <input

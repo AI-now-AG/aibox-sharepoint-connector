@@ -3,4 +3,5 @@ export enum FlagStatus {
   Internal = "internal",
   Reseller = "reseller",
   Archived = "archived",
+  Paying = "paying",
 }

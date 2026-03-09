@@ -2,22 +2,22 @@
   import { actions } from "astro:actions";
   import { addToast } from "$stores/toast";
   import { useTranslations } from "$i18n/utils";
+  import { svgIcons } from "$assets/icons";
+  import { tenant } from "$stores";
   import type { UsageOverview, UsageRow } from "$types/UsageTracking";
-  import Loading from "$components/Loading.svelte";
-  import TenantUsageFilter from "./TenantUsageFilter.svelte";
-  import { tenant, tenant as tenantStore } from "$stores";
   import { EventName, ScreenName } from "$types/Posthog";
   import { posthogClientCapture } from "$utils/posthogClient";
-  import { svgIcons } from "$assets/icons";
+  import Loading from "$components/Loading.svelte";
+  import TenantUsageFilter from "./TenantUsageFilter.svelte";
 
   const t = useTranslations();
 
   interface Props {
-    tenants?: any;
-    isPosthogCaptureUsageRequest?: boolean;
+    isPrivileged?: boolean;
+    enablePosthogTracking?: boolean;
   }
 
-  let { tenants = [], isPosthogCaptureUsageRequest = false }: Props = $props();
+  let { isPrivileged = false, enablePosthogTracking = false }: Props = $props();
 
   let loading: boolean = $state(false);
   let usageInfo: UsageOverview | undefined = $state();
@@ -26,8 +26,8 @@
   let selectedMonth: string = $state("");
   let expandedProviders: Record<string, boolean> = $state({});
 
-  if (tenants.length == 0) {
-    selectedTenant = $tenantStore?._id?.toString() ?? "";
+  if (!isPrivileged) {
+    selectedTenant = $tenant?._id?.toString() ?? "";
   }
 
   const fetchUsages = async () => {
@@ -36,13 +36,13 @@
     usageInfo = undefined;
     usageData = [];
 
-    const { data, error } = await actions.report.usagePerTeant({
+    const { data, error } = await actions.report.usagePerTenant({
       tenant_id: selectedTenant,
       month: selectedMonth,
     });
     loading = false;
 
-    if (isPosthogCaptureUsageRequest) {
+    if (enablePosthogTracking) {
       posthogClientCapture($tenant, EventName.AiboxUsageRequested, {
         page_name: ScreenName.BillingUsage,
         use_case: selectedMonth || "-",
@@ -55,17 +55,18 @@
         message: error.message || "Something went wrong",
         type: "error",
       });
-    } else {
-      usageInfo = data.overview;
-      usageData = data.data;
-      expandedProviders = data.data.reduce(
-        (acc: Record<string, boolean>, row: UsageRow) => {
-          acc[row.provider] = false;
-          return acc;
-        },
-        {},
-      );
+      return;
     }
+
+    usageInfo = data.overview;
+    usageData = data.data;
+    expandedProviders = data.data.reduce(
+      (acc: Record<string, boolean>, row: UsageRow) => {
+        acc[row.provider] = false;
+        return acc;
+      },
+      {},
+    );
   };
 
   const formatNumber = (input: any) => {
@@ -91,7 +92,7 @@
 
 <div class="mt-5">
   <TenantUsageFilter
-    {tenants}
+    {isPrivileged}
     bind:selectedTenant
     bind:selectedMonth
     onsearch={fetchUsages}

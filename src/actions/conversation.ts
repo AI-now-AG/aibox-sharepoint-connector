@@ -52,7 +52,7 @@ const generateConversationTitle = async (
   promptTitle: string,
   userInput: string,
 ) => {
-  const model = createChatModel(ctx);
+  const model = await createChatModel(ctx);
 
   const instructionsWithPrompt = `
     Generate a short conversation title of max 30 characters. 
