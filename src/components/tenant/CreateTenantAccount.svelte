@@ -4,7 +4,8 @@
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
   import { addToast } from "$stores/toast";
-  import { tenant } from "$stores";
+  import { tenant, user } from "$stores";
+  import { PromptModel } from "$types/PromptModel";
   import {
     BillingMethod,
     CountryCode,
@@ -30,6 +31,7 @@
   import SubscriptionPackageList from "$components/subscription/SubscriptionPackageList.svelte";
   import AudioOptionList from "$components/subscription/AudioOptionList.svelte";
   import BillingMethods from "$components/subscription/BillingMethods.svelte";
+  import { TRANSCRIPTION_API_URL } from "astro:env/client";
 
   interface Props {
     backUrl?: string;
@@ -200,6 +202,54 @@
     return data;
   }
 
+  async function generateKbForTenant(newTenantId: string) {
+    const executePromptUrl = `${TRANSCRIPTION_API_URL}/api/prompt/execute`;
+    const accessToken = $user?.api_token as string;
+
+    const payload = {
+      tenantId: $tenant?._id?.toString(),
+      provider: PromptModel.Gemini,
+      systemMessage: `You are a research assistant. Generate a comprehensive company overview in the same language as the company's website.
+Include: company overview, main products and services, target customers, unique value propositions, and any other relevant information.
+Format the output as clear structured text suitable for an internal knowledge base.
+Be factual and concise.`,
+      prompt: `Company: ${companyName}\nWebsite: ${websiteUrl}`,
+    };
+
+    let kbContent = "";
+    try {
+      // Make API request
+      const response = await fetch(executePromptUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await response.json();
+      kbContent = result.data.response;
+    } catch (error) {
+      console.log("Generate kb content failed", error);
+    }
+
+    const { data, error } =
+      await actions.tenantCreation.createTenantKnowledgeBase({
+        tenant_id: newTenantId,
+        company_name: companyName,
+        content: kbContent,
+      });
+
+    if (error) {
+      console.warn("[generateKb] KB generation failed (non-blocking):", error);
+      addToast({
+        message: t("tenant.create-kb-generation-warning"),
+        type: "info",
+      });
+    }
+  }
+
   async function finalizeTenantSetup(newTenantId: string) {
     const selectedTemplate =
       tags.find((tag) => tag.value == selectedTag)?.title || "";
@@ -232,22 +282,6 @@
     return true;
   }
 
-  async function generateKbForTenant(tenantId: string) {
-    const { error } = await actions.tenantCreation.generateKb({
-      tenant_id: tenantId,
-      company_name: companyName,
-      website_url: websiteUrl,
-    });
-
-    if (error) {
-      console.warn("[generateKb] KB generation failed (non-blocking):", error);
-      addToast({
-        message: t("tenant.create-kb-generation-warning"),
-        type: "info",
-      });
-    }
-  }
-
   async function createTenant() {
     if (validateForm()) {
       try {
@@ -262,11 +296,11 @@
           organization.display_name,
         );
 
-        // Step 3: Finalize Tenant Setup
-        await finalizeTenantSetup(tenant.id);
-
-        // Step 4: Generate KB from Gemini + websearch (best effort, non-blocking)
+        // Step 3: Generate KB from Gemini + websearch (best effort, non-blocking)
         await generateKbForTenant(tenant.id);
+
+        // Step 4: Finalize Tenant Setup
+        await finalizeTenantSetup(tenant.id);
 
         if (tenant) {
           addToast({

@@ -8,8 +8,6 @@ import CategoryModel, {
   type Group,
 } from "$data/models/category.model";
 import PromptModel from "$data/models/prompt.model";
-import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
-import ConfigurationModel from "$data/models/configuration.model";
 import GlobalCategoryModel from "$data/models/globalCategory.model";
 import GlobalPromptModel from "$data/models/globalPrompt.model";
 import SubscriptionModel, {
@@ -18,6 +16,7 @@ import SubscriptionModel, {
 import TranscriptionModel, {
   type Transcription,
 } from "$data/models/transcription.model";
+import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
 import {
   SubscriptionPackageId,
   AudioOptionId,
@@ -28,16 +27,13 @@ import {
   CountryCode,
   BillingMethodLabels,
 } from "$types/Subscription";
-import { TenantFeature, ThemeCode, ApiKeyProvider } from "$types/TenantFeature";
+import { TenantFeature, ThemeCode } from "$types/TenantFeature";
 import organizationsManagement from "$data/auth0/organizations-manager";
 import sendMail from "$utils/mail";
 import { isProd } from "$utils/env";
 import { randomString } from "$utils/common";
 import { getTranscriptionTypes, hasSubtitleEditor } from "$utils/onboarding";
 import { TENANT_MASTER_ID } from "$constants";
-import createChatModel from "$utils/chatModel";
-import { HumanMessage, SystemMessage } from "@langchain/core/messages";
-import { StringOutputParser } from "@langchain/core/output_parsers";
 
 const masterTenantId = isProd() ? TENANT_MASTER_ID.PROD : TENANT_MASTER_ID.DEV;
 
@@ -73,6 +69,12 @@ const TenantInputParamsSchema = z.object({
   use_cases: z.array(z.string()),
   totalPrice: z.string().optional(),
   billing_info: BillingInfoParamsSchema,
+});
+
+const SetupKbSchema = z.object({
+  tenant_id: z.string().min(1),
+  company_name: z.string().min(1),
+  content: z.string().min(1),
 });
 
 const FinalizeTenantSchema = z.object({
@@ -277,6 +279,31 @@ export const tenantCreation = {
       return transformRawData(data);
     },
   }),
+  createTenantKnowledgeBase: defineAction({
+    input: SetupKbSchema,
+    handler: async (input) => {
+      const { tenant_id: tenantId, company_name: companyName, content } = input;
+
+      // Create KB entry for the new tenant
+      const tenantObjectId = new ObjectId(tenantId);
+      const { insertedId } = await KnowledgeBaseModel.add({
+        tenant_id: tenantObjectId,
+        title: `[Über] ${companyName}`,
+        description: `Auto-generated knowledge base about ${companyName}`,
+        knowledge_base: content,
+        updated_at: new Date(),
+        created_at: new Date(),
+      });
+
+      // Assign the new KB to all prompts of this tenant
+      await PromptModel.addKbToTenantPrompts(tenantObjectId, insertedId);
+
+      return transformRawData({
+        success: true,
+        knowledgeBaseId: insertedId,
+      });
+    },
+  }),
   finalize: defineAction({
     input: FinalizeTenantSchema,
     handler: async (input, context) => {
@@ -342,64 +369,6 @@ export const tenantCreation = {
       return transformRawData({
         success: true,
       });
-    },
-  }),
-  generateKb: defineAction({
-    input: z.object({
-      tenant_id: z.string().min(1),
-      company_name: z.string().min(1),
-      website_url: z.string().min(1),
-    }),
-    handler: async (input, context) => {
-      const { tenant_id, company_name, website_url } = input;
-
-      // 1. Get the KB generation system prompt from global config
-      const config = await ConfigurationModel.get();
-      const systemInstruction =
-        config?.promptKbGenerationInstruction ||
-        `You are a research assistant. Generate a comprehensive company overview in the same language as the company's website.
-Include: company overview, main products and services, target customers, unique value propositions, and any other relevant information.
-Format the output as clear structured text suitable for an internal knowledge base.
-Be factual and concise.`;
-
-      // 2. Create Gemini model via shared utility (handles API key resolution + usage tracking)
-      const baseModel = await createChatModel(context, {
-        customProvider: ApiKeyProvider.Gemini,
-      });
-      const modelWithSearch = baseModel.bindTools([{ googleSearch: {} }]);
-
-      const humanPrompt = `Company: ${company_name}\nWebsite: ${website_url}`;
-
-      const messages = [
-        new SystemMessage(systemInstruction),
-        new HumanMessage(humanPrompt),
-      ];
-
-      const parser = new StringOutputParser();
-      const result = await modelWithSearch.invoke(messages);
-      const kbContent = await parser.invoke(result);
-
-      console.log(`modelWithSearch`, { result });
-
-      // 3. Create KB entry for the new tenant
-      const tenantObjectId = new ObjectId(tenant_id);
-      const { insertedId } = await KnowledgeBaseModel.add({
-        tenant_id: tenantObjectId,
-        title: `[Über] ${company_name}`,
-        description: `Auto-generated knowledge base about ${company_name}`,
-        knowledge_base: kbContent,
-        updated_at: new Date(),
-        created_at: new Date(),
-      });
-
-      // 4. Assign the new KB to all prompts of this tenant
-      //await PromptModel.addKbToTenantPrompts(tenantObjectId, insertedId);
-
-      console.log(
-        `[generateKb] KB created (${insertedId}) and assigned to all prompts for tenant ${tenant_id}`,
-      );
-
-      return transformRawData({ success: true, kb_id: insertedId });
     },
   }),
 };
