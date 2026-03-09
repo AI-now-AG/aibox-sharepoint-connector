@@ -379,6 +379,8 @@ Be factual and concise.`;
       const result = await modelWithSearch.invoke(messages);
       const kbContent = await parser.invoke(result);
 
+      console.log(`modelWithSearch`, { result });
+
       // 3. Create KB entry for the new tenant
       const tenantObjectId = new ObjectId(tenant_id);
       const { insertedId } = await KnowledgeBaseModel.add({
@@ -391,7 +393,7 @@ Be factual and concise.`;
       });
 
       // 4. Assign the new KB to all prompts of this tenant
-      await PromptModel.addKbToTenantPrompts(tenantObjectId, insertedId);
+      //await PromptModel.addKbToTenantPrompts(tenantObjectId, insertedId);
 
       console.log(
         `[generateKb] KB created (${insertedId}) and assigned to all prompts for tenant ${tenant_id}`,
