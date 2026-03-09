@@ -232,6 +232,22 @@
     return true;
   }
 
+  async function generateKbForTenant(tenantId: string) {
+    const { error } = await actions.tenantCreation.generateKb({
+      tenant_id: tenantId,
+      company_name: companyName,
+      website_url: websiteUrl,
+    });
+
+    if (error) {
+      console.warn("[generateKb] KB generation failed (non-blocking):", error);
+      addToast({
+        message: t("tenant.create-kb-generation-warning"),
+        type: "info",
+      });
+    }
+  }
+
   async function createTenant() {
     if (validateForm()) {
       try {
@@ -248,6 +264,9 @@
 
         // Step 3: Finalize Tenant Setup
         await finalizeTenantSetup(tenant.id);
+
+        // Step 4: Generate KB from Gemini + websearch (best effort, non-blocking)
+        await generateKbForTenant(tenant.id);
 
         if (tenant) {
           addToast({

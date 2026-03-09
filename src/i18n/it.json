@@ -135,6 +135,7 @@
   "tenant.validate-azure-open-ai-transciption-model-empty-message": "Please input Azure OpenAI Whisper model",
   "tenant.validate-azure-open-ai-text-model-empty-message": "Please input Azure OpenAI Text model",
   "tenant.create-successful": "Create tenant successful",
+  "tenant.create-kb-generation-warning": "Tenant creato, ma la generazione automatica della knowledge base non è stata completata. Puoi aggiungere la knowledge base manualmente.",
   "tenant.update-successful": "Update tenant successful",
   "transcription": "Audio to text",
   "transcription.page-description": "Convert audio recordings, spoken text or meetings into text for further use.\\n\\nPlease be aware of the rate limits of 3 transcription requests per minute!",
