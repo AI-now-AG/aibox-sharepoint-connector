@@ -872,6 +872,7 @@
   "tenant.flag-status.internal": "Internal",
   "tenant.flag-status.reseller": "Reseller",
   "tenant.flag-status.archived": "Archived",
+  "tenant.flag-status.paying": "Active Paying",
   "tenant.reseller-code": "Archived",
   "tenant.filter-label": "Filters",
   "tenant.detail.general-settings": "General Settings",
@@ -940,5 +941,9 @@
   "tenant.company": "Company",
   "tenant.billing-method": "Billing method",
   "tenant.start-date": "Start Date",
-  "tenant.flags": "Flags"
+  "tenant.flags": "Flags",
+  "nav.settings.prompt-kb-generation": "Prompt KB Generation",
+  "prompt-kb-generation.title": "Prompt for KB Generation",
+  "prompt-kb-generation.update-setting-successfull": "Prompt KB generation updated successfully",
+  "prompt-kb-generation.update-setting-failed": "Update prompt KB generation failed"
 }

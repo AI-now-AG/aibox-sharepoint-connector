@@ -1,0 +1,25 @@
+---
+import Layout from "$layouts/Layout.astro";
+import PromptKbGenerationForm from "./PromptKbGenerationForm.svelte";
+import { useTranslations } from "$i18n/utils";
+import { actions } from "astro:actions";
+
+const t = useTranslations();
+
+const { data: configuration } = await Astro.callAction(
+  actions.configurations.get,
+  {}
+);
+---
+
+<Layout>
+  <div class="container max-w-5xl mx-auto p-6 space-y-4">
+    <h1 class="text-4xl font-bold">{t("prompt-kb-generation.title")}</h1>
+    <PromptKbGenerationForm
+      configurationId={configuration?._id.toString() ?? ""}
+      promptKbGenerationInstruction={configuration?.promptKbGenerationInstruction ||
+        ""}
+      client:load
+    />
+  </div>
+</Layout>
