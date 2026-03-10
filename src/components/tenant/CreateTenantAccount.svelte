@@ -34,6 +34,7 @@
   import AudioOptionList from "$components/subscription/AudioOptionList.svelte";
   import BillingMethods from "$components/subscription/BillingMethods.svelte";
   import { TRANSCRIPTION_API_URL } from "astro:env/client";
+  import { captureException } from "$utils/sentry";
 
   interface Props {
     backUrl?: string;
@@ -215,7 +216,7 @@
   }
 
   async function generateKbForTenant(newTenantId: string) {
-    const executePromptUrl = `${TRANSCRIPTION_API_URL}/api/prompt/execute`;
+    const executePromptUrl = `${TRANSCRIPTION_API_URL}/api/prompt/execute1`;
     const accessToken = $user?.api_token as string;
 
     const payload = {
@@ -228,6 +229,7 @@
 
     let kbContent = "";
     const MAX_RETRIES = 3;
+    let lastError: unknown;
 
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
       try {
@@ -248,6 +250,7 @@
         kbContent = result.data.response;
         break; // success — exit retry loop
       } catch (err) {
+        lastError = err;
         console.warn(
           `[generateKb] Attempt ${attempt}/${MAX_RETRIES} failed:`,
           err,
@@ -256,6 +259,17 @@
           await new Promise((resolve) => setTimeout(resolve, 1000 * attempt)); // back-off: 1s, 2s
         }
       }
+    }
+
+    if (!kbContent) {
+      captureException(
+        lastError ?? new Error("generateKb: empty kbContent after retries"),
+        {
+          tenantId: newTenantId,
+          companyName,
+          websiteUrl,
+        },
+      );
     }
 
     const { data, error } =
