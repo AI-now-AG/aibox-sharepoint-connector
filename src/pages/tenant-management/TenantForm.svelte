@@ -15,7 +15,7 @@
     replaceSpecialChars,
   } from "$components/actions/Input.svelte";
   import InputDialog from "$components/InputDialog.svelte";
-  import { isValidEmail } from "$utils/validation;
+  import { isValidEmail } from "$utils/validation";
   import {
     TenantFeature,
     ApiKeyProvider,
@@ -615,36 +615,62 @@
 
   function getProviderEnabled(key: string): boolean {
     switch (key) {
-      case "openai": return openAIEnabled;
-      case "openai_gpt5": return openAIGpt5Enabled;
-      case "azure_openai": return azureOpenAIEnabled;
-      case "perplexity": return perplexityEnabled;
-      case "claude": return claudeEnabled;
-      case "gemini": return geminiEnabled;
-      default: return false;
+      case "openai":
+        return openAIEnabled;
+      case "openai_gpt5":
+        return openAIGpt5Enabled;
+      case "azure_openai":
+        return azureOpenAIEnabled;
+      case "perplexity":
+        return perplexityEnabled;
+      case "claude":
+        return claudeEnabled;
+      case "gemini":
+        return geminiEnabled;
+      default:
+        return false;
     }
   }
 
   function setProviderEnabled(key: string, value: boolean) {
     switch (key) {
-      case "openai": openAIEnabled = value; break;
-      case "openai_gpt5": openAIGpt5Enabled = value; break;
-      case "azure_openai": azureOpenAIEnabled = value; break;
-      case "perplexity": perplexityEnabled = value; break;
-      case "claude": claudeEnabled = value; break;
-      case "gemini": geminiEnabled = value; break;
+      case "openai":
+        openAIEnabled = value;
+        break;
+      case "openai_gpt5":
+        openAIGpt5Enabled = value;
+        break;
+      case "azure_openai":
+        azureOpenAIEnabled = value;
+        break;
+      case "perplexity":
+        perplexityEnabled = value;
+        break;
+      case "claude":
+        claudeEnabled = value;
+        break;
+      case "gemini":
+        geminiEnabled = value;
+        break;
     }
   }
 
   function getProviderModel(key: string): string {
     switch (key) {
-      case "openai": return tenantData.openai_chat_model || "";
-      case "openai_gpt5": return tenantData.openai_gpt5_chat_model || "";
-      case "azure_openai": return tenantData.azure_openai_chat_model || "";
-      case "perplexity": return selectedPerplexityModel || "";
-      case "claude": return selectedClaudeModel || "";
-      case "gemini": return selectedGeminiModel || "";
-      default: return "";
+      case "openai":
+        return tenantData.openai_chat_model || "";
+      case "openai_gpt5":
+        return tenantData.openai_gpt5_chat_model || "";
+      case "azure_openai":
+        return tenantData.azure_openai_chat_model || "";
+      case "perplexity":
+        return selectedPerplexityModel || "";
+      case "claude":
+        return selectedClaudeModel || "";
+      case "gemini":
+        return selectedGeminiModel || "";
+      default:
+        return "";
     }
   }
 
@@ -746,31 +772,50 @@
       return false;
     }
 
-    if (isAudioToTextChecked && !hasApiKey("azure_openai_api_key", "azureOpenaiPrivateKeyEnabled")) {
+    if (
+      isAudioToTextChecked &&
+      !hasApiKey("azure_openai_api_key", "azureOpenaiPrivateKeyEnabled")
+    ) {
       showAlert(t("tenant.validate-azure-open-ai-key-message"));
       return false;
     }
 
-    if (tenantData.azure_openai_api_key || (azureOpenAIEnabled && hasApiKey("azure_openai_api_key", "azureOpenaiPrivateKeyEnabled"))) {
+    if (
+      tenantData.azure_openai_api_key ||
+      (azureOpenAIEnabled &&
+        hasApiKey("azure_openai_api_key", "azureOpenaiPrivateKeyEnabled"))
+    ) {
       // Only require config fields on the tenant when private key is enabled.
       // Otherwise, global config is used (checked via globalApiKeyStatus).
-      if (!tenantData?.azure_openai_instance_name && !globalApiKeyStatus?.azure_openai_instance_name) {
+      if (
+        !tenantData?.azure_openai_instance_name &&
+        !globalApiKeyStatus?.azure_openai_instance_name
+      ) {
         showAlert(
           t("tenant.validate-azure-open-ai-instance-name-empty-message"),
         );
         return false;
       }
-      if (!tenantData?.azure_openai_endpoint && !globalApiKeyStatus?.azure_openai_endpoint) {
+      if (
+        !tenantData?.azure_openai_endpoint &&
+        !globalApiKeyStatus?.azure_openai_endpoint
+      ) {
         showAlert(t("tenant.validate-azure-open-ai-endpoint-empty-message"));
         return false;
       }
-      if (!tenantData?.azure_openai_whisper_model && !globalApiKeyStatus?.azure_openai_whisper_model) {
+      if (
+        !tenantData?.azure_openai_whisper_model &&
+        !globalApiKeyStatus?.azure_openai_whisper_model
+      ) {
         showAlert(
           t("tenant.validate-azure-open-ai-transciption-model-empty-message"),
         );
         return false;
       }
-      if (!tenantData?.azure_openai_chat_model && !globalApiKeyStatus?.azure_openai_chat_model) {
+      if (
+        !tenantData?.azure_openai_chat_model &&
+        !globalApiKeyStatus?.azure_openai_chat_model
+      ) {
         showAlert(t("tenant.validate-azure-open-ai-text-model-empty-message"));
         return false;
       }
@@ -794,7 +839,10 @@
       }
     }
 
-    if (isAzureAudioProEnabled && !hasApiKey("speech_api_key", "speechPrivateKeyEnabled")) {
+    if (
+      isAzureAudioProEnabled &&
+      !hasApiKey("speech_api_key", "speechPrivateKeyEnabled")
+    ) {
       showAlert(t("tenant.validate-azure-speech-service-key"));
       return false;
     }
@@ -806,7 +854,10 @@
       }
     }
 
-    if (isAudioToElevenLabsChecked && !hasApiKey("elevenLabs_api_key", "elevenLabsPrivateKeyEnabled")) {
+    if (
+      isAudioToElevenLabsChecked &&
+      !hasApiKey("elevenLabs_api_key", "elevenLabsPrivateKeyEnabled")
+    ) {
       showAlert(t("tenant.validate-elevenLabs-key"));
       return false;
     }
