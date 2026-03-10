@@ -44,28 +44,16 @@
                             "schema": {
                                 "type": "object",
                                 "required": [
-                                    "tenant_id",
                                     "folder_id",
-                                    "user_id",
                                     "external_file_id",
                                     "file_name",
                                     "is_deleted"
                                 ],
                                 "properties": {
-                                    "tenant_id": {
-                                        "type": "string",
-                                        "description": "aibox tenant ID (MongoDB ObjectId)",
-                                        "example": "6579a1b2c3d4e5f678901234"
-                                    },
                                     "folder_id": {
                                         "type": "string",
-                                        "description": "Vector KB folder ID (MongoDB ObjectId)",
+                                        "description": "Vector KB folder ID (MongoDB ObjectId). Tenant and user are derived from this on the server.",
                                         "example": "6579a1b2c3d4e5f678905678"
-                                    },
-                                    "user_id": {
-                                        "type": "string",
-                                        "description": "aibox user ID who set up the integration (MongoDB ObjectId)",
-                                        "example": "6579a1b2c3d4e5f678909012"
                                     },
                                     "external_file_id": {
                                         "type": "string",
@@ -267,28 +255,16 @@
             "ConnectorUpdateRequest": {
                 "type": "object",
                 "required": [
-                    "tenant_id",
                     "folder_id",
-                    "user_id",
                     "external_file_id",
                     "file_name",
                     "is_deleted"
                 ],
                 "properties": {
-                    "tenant_id": {
-                        "type": "string",
-                        "description": "aibox tenant ID (MongoDB ObjectId)",
-                        "example": "6579a1b2c3d4e5f678901234"
-                    },
                     "folder_id": {
                         "type": "string",
-                        "description": "Vector KB folder ID (MongoDB ObjectId)",
+                        "description": "Vector KB folder ID (MongoDB ObjectId). Tenant and user are derived from this on the server.",
                         "example": "6579a1b2c3d4e5f678905678"
-                    },
-                    "user_id": {
-                        "type": "string",
-                        "description": "aibox user ID who set up the integration (MongoDB ObjectId)",
-                        "example": "6579a1b2c3d4e5f678909012"
                     },
                     "external_file_id": {
                         "type": "string",
