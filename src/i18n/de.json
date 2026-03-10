@@ -943,6 +943,7 @@
   "tenant.billing-method": "Zahlungsmethode",
   "tenant.start-date": "Start Datum",
   "tenant.flags": "Flags",
+  "tenant.create-kb-generation-warning": "Tenant wurde erstellt, aber die automatische KB-Generierung konnte nicht abgeschlossen werden. Sie können die Wissensdatenbank manuell hinzufügen.",
   "nav.settings.prompt-kb-generation": "Prompt KB-Generierung",
   "prompt-kb-generation.title": "Prompt für KB-Generierung",
   "prompt-kb-generation.update-setting-successfull": "Prompt KB-Generierung erfolgreich gespeichert",

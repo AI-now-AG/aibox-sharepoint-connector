@@ -943,6 +943,7 @@
   "tenant.billing-method": "Billing method",
   "tenant.start-date": "Start Date",
   "tenant.flags": "Flags",
+  "tenant.create-kb-generation-warning": "Tenant created, but KB auto-generation could not be completed. You can add the knowledge base manually.",
   "nav.settings.prompt-kb-generation": "Prompt KB Generation",
   "prompt-kb-generation.title": "Prompt for KB Generation",
   "prompt-kb-generation.update-setting-successfull": "Prompt KB generation updated successfully",
