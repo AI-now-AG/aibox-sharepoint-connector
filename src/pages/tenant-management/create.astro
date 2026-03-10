@@ -3,6 +3,7 @@ import Layout from "$layouts/Layout.astro";
 import { ObjectId } from "mongodb";
 import GlobalTagModel from "$data/models/globalTag.model";
 import GlobalCategoryModel from "$data/models/globalCategory.model";
+import ConfigurationModel from "$data/models/configuration.model";
 import { type TagItem, type CategoryItem } from "$types/Subscription";
 import CreateTenantAccount from "$components/tenant/CreateTenantAccount.svelte";
 import { useTranslations } from "$i18n/utils";
@@ -31,6 +32,9 @@ const categories: CategoryItem[] = allCategories.map((category) => {
     tags: category.tags?.map((t: ObjectId) => t.toString()) ?? [],
   };
 });
+
+const configuration = await ConfigurationModel.get();
+const promptKbInstruction = configuration?.promptKbGenerationInstruction || "";
 ---
 
 <Layout>
@@ -39,6 +43,7 @@ const categories: CategoryItem[] = allCategories.map((category) => {
     backUrl="/tenant-management"
     {tags}
     {categories}
+    {promptKbInstruction}
     client:load
   />
 </Layout>

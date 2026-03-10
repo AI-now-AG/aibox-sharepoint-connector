@@ -3,6 +3,7 @@
   import { actions } from "astro:actions";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
+  import { isValidEmail, isValidUrl } from "$utils/validation";
   import { addToast } from "$stores/toast";
   import { tenant, user } from "$stores";
   import { PromptModel } from "$types/PromptModel";
@@ -36,12 +37,14 @@
   interface Props {
     backUrl?: string;
     pageTitle?: string;
+    tags: TagItem[];
+    categories: CategoryItem[];
     isReseller?: boolean;
     isSomedia?: boolean;
     resellerCode?: string;
-    tags: TagItem[];
-    categories: CategoryItem[];
+    promptKbInstruction?: string;
   }
+
   let {
     backUrl,
     pageTitle = "",
@@ -50,6 +53,7 @@
     resellerCode = "",
     tags = [],
     categories = [],
+    promptKbInstruction = "",
   }: Props = $props();
 
   let loading = $state(false);
@@ -95,6 +99,13 @@
       selectedCategories.length > 0 &&
       selectedPackageId !== "",
   );
+
+  const DEFAULT_PROMPT_KB_INSTRUCTION = `
+    You are a research assistant. Generate a comprehensive company overview in the same language as the company's website.
+    Include: company overview, main products and services, target customers, unique value propositions, and any other relevant information.
+    Format the output as clear structured text suitable for an internal knowledge base.
+    Be factual and concise.
+  `;
 
   const t = useTranslations();
 
@@ -209,29 +220,40 @@
     const payload = {
       tenantId: $tenant?._id?.toString(),
       provider: PromptModel.Gemini,
-      systemMessage: `You are a research assistant. Generate a comprehensive company overview in the same language as the company's website.
-Include: company overview, main products and services, target customers, unique value propositions, and any other relevant information.
-Format the output as clear structured text suitable for an internal knowledge base.
-Be factual and concise.`,
+      systemMessage: promptKbInstruction || DEFAULT_PROMPT_KB_INSTRUCTION,
       prompt: `Company: ${companyName}\nWebsite: ${websiteUrl}`,
     };
 
     let kbContent = "";
-    try {
-      // Make API request
-      const response = await fetch(executePromptUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify(payload),
-      });
+    const MAX_RETRIES = 3;
 
-      const result = await response.json();
-      kbContent = result.data.response;
-    } catch (error) {
-      console.log("Generate kb content failed", error);
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        const response = await fetch(executePromptUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const result = await response.json();
+        kbContent = result.data.response;
+        break; // success — exit retry loop
+      } catch (err) {
+        console.warn(
+          `[generateKb] Attempt ${attempt}/${MAX_RETRIES} failed:`,
+          err,
+        );
+        if (attempt < MAX_RETRIES) {
+          await new Promise((resolve) => setTimeout(resolve, 1000 * attempt)); // back-off: 1s, 2s
+        }
+      }
     }
 
     const { data, error } =
@@ -266,6 +288,16 @@ Be factual and concise.`,
   function validateForm() {
     if (!organizationName) {
       showAlert(t("tenant.validate-empty-display-name-message"));
+      return false;
+    }
+
+    if (!isValidEmail(billingEmail)) {
+      showAlert(t("subscription.validate-invalid-email-message"));
+      return false;
+    }
+
+    if (!isValidUrl(websiteUrl)) {
+      showAlert(t("subscription.validate-invalid-website-message"));
       return false;
     }
 
@@ -315,7 +347,11 @@ Be factual and concise.`,
           }
         }
       } catch (error: any) {
-        showAlert(error?.toString());
+        const message =
+          (error as Error)?.message ||
+          error?.toString() ||
+          "Something went wrong. Please try again.";
+        showAlert(message);
       } finally {
         loading = false;
       }

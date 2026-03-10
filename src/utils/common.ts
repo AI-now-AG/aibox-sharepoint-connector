@@ -36,10 +36,6 @@ export function formatDate(
   return d.format(format);
 }
 
-export const isValidEmail = (email: string) => {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-};
-
 export const preventDefault = (fn: any) => {
   return function (this: any, event: any) {
     event.preventDefault();

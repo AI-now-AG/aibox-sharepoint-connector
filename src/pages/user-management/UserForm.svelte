@@ -11,7 +11,7 @@
   import log from "$utils/log";
   import dayjs from "dayjs";
   import Input from "$components/form/Input.svelte";
-  import { isValidEmail } from "$utils/common";
+  import { isValidEmail } from "$utils/validation";
   import { isEnterpriseConnection } from "$utils/auth0";
   import { resolveUserRole } from "$utils/roles";
   import { UserRole } from "$types/Users";

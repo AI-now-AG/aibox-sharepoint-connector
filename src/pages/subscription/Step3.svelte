@@ -17,7 +17,7 @@
     BillingMethod,
     CountryCode,
   } from "$types/Subscription";
-  import { isValidEmail } from "$utils/common";
+  import { isValidEmail } from "$utils/validation";
   import { EventName, ScreenName } from "$types/Posthog";
   import { posthogClientCaptureWithoutTenant } from "$utils/posthogClient";
   import Dropdown from "$components/form/Dropdown.svelte";

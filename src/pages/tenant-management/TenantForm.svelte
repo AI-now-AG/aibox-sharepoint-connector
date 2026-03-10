@@ -15,7 +15,7 @@
     replaceSpecialChars,
   } from "$components/actions/Input.svelte";
   import InputDialog from "$components/InputDialog.svelte";
-  import { isValidEmail } from "$utils/common";
+  import { isValidEmail } from "$utils/validation";
   import {
     TenantFeature,
     ApiKeyProvider,
@@ -615,36 +615,62 @@
 
   function getProviderEnabled(key: string): boolean {
     switch (key) {
-      case "openai": return openAIEnabled;
-      case "openai_gpt5": return openAIGpt5Enabled;
-      case "azure_openai": return azureOpenAIEnabled;
-      case "perplexity": return perplexityEnabled;
-      case "claude": return claudeEnabled;
-      case "gemini": return geminiEnabled;
-      default: return false;
+      case "openai":
+        return openAIEnabled;
+      case "openai_gpt5":
+        return openAIGpt5Enabled;
+      case "azure_openai":
+        return azureOpenAIEnabled;
+      case "perplexity":
+        return perplexityEnabled;
+      case "claude":
+        return claudeEnabled;
+      case "gemini":
+        return geminiEnabled;
+      default:
+        return false;
     }
   }
 
   function setProviderEnabled(key: string, value: boolean) {
     switch (key) {
-      case "openai": openAIEnabled = value; break;
-      case "openai_gpt5": openAIGpt5Enabled = value; break;
-      case "azure_openai": azureOpenAIEnabled = value; break;
-      case "perplexity": perplexityEnabled = value; break;
-      case "claude": claudeEnabled = value; break;
-      case "gemini": geminiEnabled = value; break;
+      case "openai":
+        openAIEnabled = value;
+        break;
+      case "openai_gpt5":
+        openAIGpt5Enabled = value;
+        break;
+      case "azure_openai":
+        azureOpenAIEnabled = value;
+        break;
+      case "perplexity":
+        perplexityEnabled = value;
+        break;
+      case "claude":
+        claudeEnabled = value;
+        break;
+      case "gemini":
+        geminiEnabled = value;
+        break;
     }
   }
 
   function getProviderModel(key: string): string {
     switch (key) {
-      case "openai": return tenantData.openai_chat_model || "";
-      case "openai_gpt5": return tenantData.openai_gpt5_chat_model || "";
-      case "azure_openai": return tenantData.azure_openai_chat_model || "";
-      case "perplexity": return selectedPerplexityModel || "";
-      case "claude": return selectedClaudeModel || "";
-      case "gemini": return selectedGeminiModel || "";
-      default: return "";
+      case "openai":
+        return tenantData.openai_chat_model || "";
+      case "openai_gpt5":
+        return tenantData.openai_gpt5_chat_model || "";
+      case "azure_openai":
+        return tenantData.azure_openai_chat_model || "";
+      case "perplexity":
+        return selectedPerplexityModel || "";
+      case "claude":
+        return selectedClaudeModel || "";
+      case "gemini":
+        return selectedGeminiModel || "";
+      default:
+        return "";
     }
   }
 
@@ -746,12 +772,19 @@
       return false;
     }
 
-    if (isAudioToTextChecked && !hasApiKey("azure_openai_api_key", "azureOpenaiPrivateKeyEnabled")) {
+    if (
+      isAudioToTextChecked &&
+      !hasApiKey("azure_openai_api_key", "azureOpenaiPrivateKeyEnabled")
+    ) {
       showAlert(t("tenant.validate-azure-open-ai-key-message"));
       return false;
     }
 
-    if (tenantData.azure_openai_api_key || (azureOpenAIEnabled && hasApiKey("azure_openai_api_key", "azureOpenaiPrivateKeyEnabled"))) {
+    if (
+      tenantData.azure_openai_api_key ||
+      (azureOpenAIEnabled &&
+        hasApiKey("azure_openai_api_key", "azureOpenaiPrivateKeyEnabled"))
+    ) {
       if (!tenantData?.azure_openai_instance_name) {
         showAlert(
           t("tenant.validate-azure-open-ai-instance-name-empty-message"),
@@ -792,7 +825,10 @@
       }
     }
 
-    if (isAzureAudioProEnabled && !hasApiKey("speech_api_key", "speechPrivateKeyEnabled")) {
+    if (
+      isAzureAudioProEnabled &&
+      !hasApiKey("speech_api_key", "speechPrivateKeyEnabled")
+    ) {
       showAlert(t("tenant.validate-azure-speech-service-key"));
       return false;
     }
@@ -804,7 +840,10 @@
       }
     }
 
-    if (isAudioToElevenLabsChecked && !hasApiKey("elevenLabs_api_key", "elevenLabsPrivateKeyEnabled")) {
+    if (
+      isAudioToElevenLabsChecked &&
+      !hasApiKey("elevenLabs_api_key", "elevenLabsPrivateKeyEnabled")
+    ) {
       showAlert(t("tenant.validate-elevenLabs-key"));
       return false;
     }
@@ -1613,7 +1652,9 @@
           {@html svgIcons.textPrompt}
           <div>
             <p class="font-medium text-md">{t("tenant.text-model.title")}</p>
-            <p class="text-sm text-base-content/60">{t("tenant.text-model.description")}</p>
+            <p class="text-sm text-base-content/60">
+              {t("tenant.text-model.description")}
+            </p>
           </div>
         </div>
 
@@ -1624,7 +1665,9 @@
                 <th>{t("tenant.text-model.provider")}</th>
                 <th class="text-center w-20">{t("common.activate")}</th>
                 <th class="text-center w-20">{t("tenant.default")}</th>
-                <th class="text-center w-28">{t("tenant.text-model.private-key")}</th>
+                <th class="text-center w-28"
+                  >{t("tenant.text-model.private-key")}</th
+                >
                 <th>{t("tenant.text-model.api-key-config")}</th>
               </tr>
             </thead>
@@ -1634,8 +1677,12 @@
                   <!-- Provider/Model -->
                   <td>
                     <div>
-                      <span class="font-semibold text-base-content">{p.name}</span>
-                      <div class="text-xs text-base-content/50">{getProviderModel(p.key)}</div>
+                      <span class="font-semibold text-base-content"
+                        >{p.name}</span
+                      >
+                      <div class="text-xs text-base-content/50">
+                        {getProviderModel(p.key)}
+                      </div>
                     </div>
                   </td>
                   <!-- Active Toggle -->
@@ -1669,14 +1716,17 @@
                       class="checkbox checkbox-primary checkbox-sm"
                       checked={tenantData.metadata?.[p.privateKeyFlag] ?? false}
                       onchange={(e) => {
-                        tenantData.metadata[p.privateKeyFlag] = e.currentTarget.checked;
+                        tenantData.metadata[p.privateKeyFlag] =
+                          e.currentTarget.checked;
                       }}
                     />
                   </td>
                   <!-- API Key Configuration -->
                   <td>
                     {#if tenantData.metadata?.[p.privateKeyFlag]}
-                      <label class="input input-bordered input-sm flex items-center gap-2 w-full">
+                      <label
+                        class="input input-bordered input-sm flex items-center gap-2 w-full"
+                      >
                         <input
                           use:trackKeyField={p.key}
                           type="password"
@@ -1723,70 +1773,81 @@
                       <button
                         type="button"
                         class="btn btn-ghost btn-xs gap-1 text-base-content/70"
-                        onclick={() => { azureConfigExpanded = !azureConfigExpanded; }}
+                        onclick={() => {
+                          azureConfigExpanded = !azureConfigExpanded;
+                        }}
                       >
                         <svg
-                          class="w-3 h-3 transition-transform {azureConfigExpanded ? 'rotate-90' : ''}"
-                          fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                          class="w-3 h-3 transition-transform {azureConfigExpanded
+                            ? 'rotate-90'
+                            : ''}"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
                         >
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M9 5l7 7-7 7"
+                          />
                         </svg>
                         Azure Configuration
                       </button>
                     </td>
                   </tr>
                   {#if azureConfigExpanded}
-                  <tr class="bg-base-200/20">
-                    <td colspan="5">
-                      <div class="grid grid-cols-2 gap-4 px-4 py-2">
-                        <div class="w-full">
-                          <span class="text-sm font-medium text-base-content"
-                            >{t("tenant.azure-open-ai-instance-name")}</span
-                          >
-                          <input
-                            type="text"
-                            class="input input-bordered input-sm mt-1 w-full"
-                            use:trimInput
-                            bind:value={tenantData.azure_openai_instance_name}
-                          />
+                    <tr class="bg-base-200/20">
+                      <td colspan="5">
+                        <div class="grid grid-cols-2 gap-4 px-4 py-2">
+                          <div class="w-full">
+                            <span class="text-sm font-medium text-base-content"
+                              >{t("tenant.azure-open-ai-instance-name")}</span
+                            >
+                            <input
+                              type="text"
+                              class="input input-bordered input-sm mt-1 w-full"
+                              use:trimInput
+                              bind:value={tenantData.azure_openai_instance_name}
+                            />
+                          </div>
+                          <div class="w-full">
+                            <span class="text-sm font-medium text-base-content"
+                              >{t("tenant.azure-open-ai-endpoint")}</span
+                            >
+                            <input
+                              type="text"
+                              class="input input-bordered input-sm mt-1 w-full"
+                              bind:value={tenantData.azure_openai_endpoint}
+                            />
+                          </div>
+                          <div class="w-full">
+                            <span class="text-sm font-medium text-base-content"
+                              >{t(
+                                "tenant.azure-open-ai-transciption-model",
+                              )}</span
+                            >
+                            <input
+                              type="text"
+                              class="input input-bordered input-sm mt-1 w-full"
+                              use:trimInput
+                              bind:value={tenantData.azure_openai_whisper_model}
+                            />
+                          </div>
+                          <div class="w-full">
+                            <span class="text-sm font-medium text-base-content"
+                              >{t("tenant.azure-open-ai-text-model")}</span
+                            >
+                            <input
+                              type="text"
+                              class="input input-bordered input-sm mt-1 w-full"
+                              use:trimInput
+                              bind:value={tenantData.azure_openai_chat_model}
+                            />
+                          </div>
                         </div>
-                        <div class="w-full">
-                          <span class="text-sm font-medium text-base-content"
-                            >{t("tenant.azure-open-ai-endpoint")}</span
-                          >
-                          <input
-                            type="text"
-                            class="input input-bordered input-sm mt-1 w-full"
-                            bind:value={tenantData.azure_openai_endpoint}
-                          />
-                        </div>
-                        <div class="w-full">
-                          <span class="text-sm font-medium text-base-content"
-                            >{t(
-                              "tenant.azure-open-ai-transciption-model",
-                            )}</span
-                          >
-                          <input
-                            type="text"
-                            class="input input-bordered input-sm mt-1 w-full"
-                            use:trimInput
-                            bind:value={tenantData.azure_openai_whisper_model}
-                          />
-                        </div>
-                        <div class="w-full">
-                          <span class="text-sm font-medium text-base-content"
-                            >{t("tenant.azure-open-ai-text-model")}</span
-                          >
-                          <input
-                            type="text"
-                            class="input input-bordered input-sm mt-1 w-full"
-                            use:trimInput
-                            bind:value={tenantData.azure_openai_chat_model}
-                          />
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
+                      </td>
+                    </tr>
                   {/if}
                 {/if}
               {/each}
@@ -1958,19 +2019,40 @@
                   </span>
 
                   {#if tenantData.metadata?.speechPrivateKeyEnabled}
-                    <label class="input input-bordered flex items-center gap-2 mt-2 w-full">
-                      <input bind:this={azureOpenAIKeyProField} type="password" class="grow"
-                        placeholder={t("tenant.api-key")} bind:value={tenantData.speech_api_key} />
-                      <TogglePasswordIcon change={() => togglePassword(azureOpenAIKeyProField)} />
+                    <label
+                      class="input input-bordered flex items-center gap-2 mt-2 w-full"
+                    >
+                      <input
+                        bind:this={azureOpenAIKeyProField}
+                        type="password"
+                        class="grow"
+                        placeholder={t("tenant.api-key")}
+                        bind:value={tenantData.speech_api_key}
+                      />
+                      <TogglePasswordIcon
+                        change={() => togglePassword(azureOpenAIKeyProField)}
+                      />
                     </label>
                   {:else}
-                    <label class="input input-bordered flex items-center gap-2 mt-2 w-full opacity-60">
-                      <input type="text" class="grow" disabled
-                        placeholder={globalApiKeyStatus?.speech_api_key ? t("tenant.using-system-key") : t("tenant.no-system-key")} />
+                    <label
+                      class="input input-bordered flex items-center gap-2 mt-2 w-full opacity-60"
+                    >
+                      <input
+                        type="text"
+                        class="grow"
+                        disabled
+                        placeholder={globalApiKeyStatus?.speech_api_key
+                          ? t("tenant.using-system-key")
+                          : t("tenant.no-system-key")}
+                      />
                       {#if globalApiKeyStatus?.speech_api_key}
-                        <span class="badge badge-success badge-sm">{t("global-api-keys.configured")}</span>
+                        <span class="badge badge-success badge-sm"
+                          >{t("global-api-keys.configured")}</span
+                        >
                       {:else}
-                        <span class="badge badge-warning badge-sm">{t("tenant.no-system-key")}</span>
+                        <span class="badge badge-warning badge-sm"
+                          >{t("tenant.no-system-key")}</span
+                        >
                       {/if}
                     </label>
                   {/if}
@@ -2191,19 +2273,40 @@
                   </span>
 
                   {#if tenantData.metadata?.elevenLabsPrivateKeyEnabled}
-                    <label class="input input-bordered flex items-center gap-2 mt-2 w-full">
-                      <input bind:this={elevenLabsAIKeyField} type="password" class="grow"
-                        placeholder={t("tenant.api-key")} bind:value={tenantData.elevenLabs_api_key} />
-                      <TogglePasswordIcon change={() => togglePassword(elevenLabsAIKeyField)} />
+                    <label
+                      class="input input-bordered flex items-center gap-2 mt-2 w-full"
+                    >
+                      <input
+                        bind:this={elevenLabsAIKeyField}
+                        type="password"
+                        class="grow"
+                        placeholder={t("tenant.api-key")}
+                        bind:value={tenantData.elevenLabs_api_key}
+                      />
+                      <TogglePasswordIcon
+                        change={() => togglePassword(elevenLabsAIKeyField)}
+                      />
                     </label>
                   {:else}
-                    <label class="input input-bordered flex items-center gap-2 mt-2 w-full opacity-60">
-                      <input type="text" class="grow" disabled
-                        placeholder={globalApiKeyStatus?.elevenLabs_api_key ? t("tenant.using-system-key") : t("tenant.no-system-key")} />
+                    <label
+                      class="input input-bordered flex items-center gap-2 mt-2 w-full opacity-60"
+                    >
+                      <input
+                        type="text"
+                        class="grow"
+                        disabled
+                        placeholder={globalApiKeyStatus?.elevenLabs_api_key
+                          ? t("tenant.using-system-key")
+                          : t("tenant.no-system-key")}
+                      />
                       {#if globalApiKeyStatus?.elevenLabs_api_key}
-                        <span class="badge badge-success badge-sm">{t("global-api-keys.configured")}</span>
+                        <span class="badge badge-success badge-sm"
+                          >{t("global-api-keys.configured")}</span
+                        >
                       {:else}
-                        <span class="badge badge-warning badge-sm">{t("tenant.no-system-key")}</span>
+                        <span class="badge badge-warning badge-sm"
+                          >{t("tenant.no-system-key")}</span
+                        >
                       {/if}
                     </label>
                   {/if}
@@ -2290,19 +2393,40 @@
                     >{t("tenant.image-creation.flux.api-key")}</span
                   >
                   {#if tenantData.metadata?.fluxPrivateKeyEnabled}
-                    <label class="input input-bordered flex items-center gap-2 mt-2 w-full">
-                      <input bind:this={falOpenAIKeyField} type="password" class="grow"
-                        placeholder={t("tenant.api-key")} bind:value={tenantData.fal_ai_api_key} />
-                      <TogglePasswordIcon change={() => togglePassword(falOpenAIKeyField)} />
+                    <label
+                      class="input input-bordered flex items-center gap-2 mt-2 w-full"
+                    >
+                      <input
+                        bind:this={falOpenAIKeyField}
+                        type="password"
+                        class="grow"
+                        placeholder={t("tenant.api-key")}
+                        bind:value={tenantData.fal_ai_api_key}
+                      />
+                      <TogglePasswordIcon
+                        change={() => togglePassword(falOpenAIKeyField)}
+                      />
                     </label>
                   {:else}
-                    <label class="input input-bordered flex items-center gap-2 mt-2 w-full opacity-60">
-                      <input type="text" class="grow" disabled
-                        placeholder={globalApiKeyStatus?.fal_ai_api_key ? t("tenant.using-system-key") : t("tenant.no-system-key")} />
+                    <label
+                      class="input input-bordered flex items-center gap-2 mt-2 w-full opacity-60"
+                    >
+                      <input
+                        type="text"
+                        class="grow"
+                        disabled
+                        placeholder={globalApiKeyStatus?.fal_ai_api_key
+                          ? t("tenant.using-system-key")
+                          : t("tenant.no-system-key")}
+                      />
                       {#if globalApiKeyStatus?.fal_ai_api_key}
-                        <span class="badge badge-success badge-sm">{t("global-api-keys.configured")}</span>
+                        <span class="badge badge-success badge-sm"
+                          >{t("global-api-keys.configured")}</span
+                        >
                       {:else}
-                        <span class="badge badge-warning badge-sm">{t("tenant.no-system-key")}</span>
+                        <span class="badge badge-warning badge-sm"
+                          >{t("tenant.no-system-key")}</span
+                        >
                       {/if}
                     </label>
                   {/if}

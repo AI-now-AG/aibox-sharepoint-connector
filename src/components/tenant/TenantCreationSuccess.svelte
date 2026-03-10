@@ -3,7 +3,7 @@
   import { fade } from "svelte/transition";
   import { actions } from "astro:actions";
   import { useTranslations } from "$i18n/utils";
-  import { isValidEmail } from "$utils/common";
+  import { isValidEmail } from "$utils/validation";
   import { getSubscriptionAddOnName } from "$utils/subscription";
   import { svgIcons } from "$assets/icons";
   import Loading from "$components/Loading.svelte";
