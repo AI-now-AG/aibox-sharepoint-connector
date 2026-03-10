@@ -416,7 +416,7 @@
         </div>
         <div class="flex-1 flex flex-col mb-4">
           <Input
-            label={t("subscription.website-url") + " *"}
+            label={t("tenant.website-url") + " *"}
             bind:value={websiteUrl}
             placeholder="https://ihre-website.de"
             labelClasses="font-medium text-sm"

@@ -938,7 +938,7 @@
   "user-list-report.filter.others-label": "Andere",
   "user-list-report.filter.include-unassigned-users": "Benutzer ohne Tenant",
   "usage.show-internal-tenant": "Interne anzeigen",
-  "subscription.website-url": "Website",
+  "tenant.website-url": "Website",
   "tenant.company": "Firma",
   "tenant.billing-method": "Zahlungsmethode",
   "tenant.start-date": "Start Datum",

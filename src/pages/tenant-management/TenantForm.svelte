@@ -734,6 +734,7 @@
       showAlert(t("tenant.validate-empty-display-name-message"));
       return false;
     }
+
     if (!tenantData?.org_name) {
       showAlert(t("tenant.validate-empty-identification-name-message"));
       return false;
@@ -1445,6 +1446,22 @@
               bind:selectedItem={selectedThemes}
             />
           </div>
+        </div>
+
+        <div class="flex flex-row space-x-4">
+          <div class="flex-1 flex flex-col mb-4">
+            <span class="mb-2 text-base-content font-medium text-sm"
+              >{t("tenant.website-url")}</span
+            >
+            <input
+              type="text"
+              placeholder={t("tenant.tenants.tenant.display-name")}
+              class="input input-bordered w-full"
+              bind:value={tenantData.website}
+            />
+          </div>
+
+          <div class="flex-1 flex flex-col mb-4"></div>
         </div>
       </div>
 
