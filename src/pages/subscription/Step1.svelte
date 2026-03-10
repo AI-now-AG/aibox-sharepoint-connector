@@ -9,7 +9,7 @@
   import Dropdown from "$components/subscription/Dropdown.svelte";
   import { storeOrganizationInfo, subscription } from "$stores/subscription";
   import { LanguageCode, Languges } from "$types/TenantFeature";
-  import { posthogClientCaptureWithoutTenant } from "$utils/posthogClient";
+  import { posthogClientCaptureGlobal } from "$utils/posthogClient";
   import { EventName, ScreenName } from "$types/Posthog";
 
   interface Props {
@@ -37,7 +37,7 @@
 
   onMount(() => {
     if (!init) {
-      posthogClientCaptureWithoutTenant(EventName.AiboxOnboardingStarted, {
+      posthogClientCaptureGlobal(EventName.AiboxOnboardingStarted, {
         page_name: ScreenName.OnboardingStep1,
       });
     }
@@ -84,7 +84,7 @@
         selectedTemplate,
       });
 
-      posthogClientCaptureWithoutTenant(EventName.AiboxOnboardingStep1, {
+      posthogClientCaptureGlobal(EventName.AiboxOnboardingStep1, {
         page_name: ScreenName.OnboardingStep1,
       });
 

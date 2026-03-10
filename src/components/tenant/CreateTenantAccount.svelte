@@ -34,7 +34,7 @@
   import AudioOptionList from "$components/subscription/AudioOptionList.svelte";
   import BillingMethods from "$components/subscription/BillingMethods.svelte";
   import { TRANSCRIPTION_API_URL } from "astro:env/client";
-  import { captureException } from "$utils/sentry";
+  import { posthogClientCaptureGlobal } from "$utils/posthogClient";
 
   interface Props {
     backUrl?: string;
@@ -263,14 +263,11 @@
     }
 
     if (!kbContent) {
-      captureException(
-        lastError ?? new Error("generateKb: empty kbContent after retries"),
-        {
-          tenantId: newTenantId,
-          companyName,
-          websiteUrl,
-        },
-      );
+      posthogClientCaptureGlobal("tenant_kb_generate_failed", {
+        tenantId: newTenantId,
+        companyName,
+        websiteUrl,
+      });
     }
 
     const { data, error } =

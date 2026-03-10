@@ -61,7 +61,7 @@ export function posthogServerCapture(
     tenant_name: tenant.name?.toString() || "-",
     ...props,
   };
-  console.log("posthogServerCapture", newProperties);
+  console.log("PostHog Server Capture", newProperties);
   getPosthogServerInstance?.()?.capture(newProperties);
 }
 
@@ -70,7 +70,7 @@ export function posthogServerCapture(
  *
  * @example
  * ```ts
- * posthogServerCaptureWithoutTenant({
+ * posthogServerCaptureGlobal({
  *   distinctId: userId?.toString(),
  *   event: EventName.OnboardingStep1,
  *   properties: {
@@ -82,8 +82,8 @@ export function posthogServerCapture(
  * @param props {@link EventMessage}
  * @returns
  */
-export function posthogServerCaptureWithoutTenant(props: EventMessage) {
-  console.log("posthogServerCaptureWithoutTenant", props);
+export function posthogServerCaptureGlobal(props: EventMessage) {
+  console.log("PostHog Server Global Capture", props);
   getPosthogServerInstance?.()?.capture(props);
 }
 
@@ -122,6 +122,6 @@ export function posthogServerIdentify(
     tenant_name: tenant.name?.toString() || "-",
     ...props,
   };
-  console.log("posthogServerIdentify", newProperties);
+  console.log("PostHog Server Identify", newProperties);
   getPosthogServerInstance?.()?.identify(newProperties);
 }
