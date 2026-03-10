@@ -1,0 +1,64 @@
+{
+    "title": "aibox SharePoint Connector",
+    "description": "SharePoint connector for aibox. Syncs files from SharePoint into the aibox Knowledge Base.\nUsed by FlowMate to automatically create, update, and delete documents when SharePoint content changes.\n",
+    "docsUrl": "",
+    "url": "https://api.aibox-app.com",
+    "rateLimit": -1,
+    "authFormat": {},
+    "envVars": {},
+    "credentials": {
+        "fields": {
+            "server": {
+                "label": "Server",
+                "viewClass": "SelectView",
+                "model": [
+                    "https://api.aibox-app.com - Production",
+                    "http://localhost:8888 - Development",
+                    "http://test.aibox-app.com/ - Testing",
+                    "https://staging.aibox-app.com - Staging",
+                    "--- Custom URL"
+                ],
+                "required": true
+            },
+            "otherServer": {
+                "label": "Custom Server URL",
+                "viewClass": "TextFieldView"
+            },
+            "auth_ConnectorApiKey": {
+                "label": "X-Connector-API-Key (ConnectorApiKey)",
+                "viewClass": "TextFieldView",
+                "note": "API key for connector authentication"
+            }
+        }
+    },
+    "triggers": {
+        "lookup": {
+            "main": "./lib/lookups/lookup.js",
+            "title": "Function to run a lookup",
+            "description": "Function to call an internal trigger or action"
+        }
+    },
+    "actions": {
+        "execute": {
+            "main": "./lib/lookups/execute.js",
+            "title": "Function to run a execute",
+            "description": "Function to call an internal trigger or action"
+        },
+        "updateVectorKB": {
+            "main": "./lib/actions/action.js",
+            "title": "Create, update, or delete a file in Vector KB",
+            "description": "Receives file sync updates from an external connector.\n- When `is_deleted` is false: downloads the file from `download_url`, chunks it, generates embeddings, and stores chunks.\n- When `is_deleted` is true: removes the data source and all associated chunks.\n- Idempotent on `external_file_id` within a folder -- calling with the same ID updates rather than duplicates.\n",
+            "callParams": {
+                "operationId": "updateVectorKB",
+                "pathName": "/api/connector/vector-kb/update",
+                "method": "post",
+                "requestContentType": "application/json",
+                "responseContentType": "application/json"
+            },
+            "metadata": {
+                "in": "./lib/schemas/updateVectorKB.in.json",
+                "out": "./lib/schemas/updateVectorKB.out.json"
+            }
+        }
+    }
+}

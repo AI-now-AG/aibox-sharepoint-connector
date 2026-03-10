@@ -1,0 +1,355 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "aibox SharePoint Connector",
+        "description": "SharePoint connector for aibox. Syncs files from SharePoint into the aibox Knowledge Base.\nUsed by FlowMate to automatically create, update, and delete documents when SharePoint content changes.\n",
+        "version": "1.0.0",
+        "contact": {
+            "name": "aibox Team"
+        }
+    },
+    "servers": [
+        {
+            "url": "https://api.aibox-app.com",
+            "description": "Production"
+        },
+        {
+            "url": "http://localhost:8888",
+            "description": "Development"
+        },
+        {
+            "url": "http://test.aibox-app.com/",
+            "description": "Testing"
+        },
+        {
+            "url": "https://staging.aibox-app.com",
+            "description": "Staging"
+        }
+    ],
+    "security": [
+        {
+            "ConnectorApiKey": []
+        }
+    ],
+    "paths": {
+        "/api/connector/vector-kb/update": {
+            "post": {
+                "operationId": "updateVectorKB",
+                "summary": "Create, update, or delete a file in Vector KB",
+                "description": "Receives file sync updates from an external connector.\n- When `is_deleted` is false: downloads the file from `download_url`, chunks it, generates embeddings, and stores chunks.\n- When `is_deleted` is true: removes the data source and all associated chunks.\n- Idempotent on `external_file_id` within a folder — calling with the same ID updates rather than duplicates.\n",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "tenant_id",
+                                    "folder_id",
+                                    "user_id",
+                                    "external_file_id",
+                                    "file_name",
+                                    "is_deleted"
+                                ],
+                                "properties": {
+                                    "tenant_id": {
+                                        "type": "string",
+                                        "description": "aibox tenant ID (MongoDB ObjectId)",
+                                        "example": "6579a1b2c3d4e5f678901234"
+                                    },
+                                    "folder_id": {
+                                        "type": "string",
+                                        "description": "Vector KB folder ID (MongoDB ObjectId)",
+                                        "example": "6579a1b2c3d4e5f678905678"
+                                    },
+                                    "user_id": {
+                                        "type": "string",
+                                        "description": "aibox user ID who set up the integration (MongoDB ObjectId)",
+                                        "example": "6579a1b2c3d4e5f678909012"
+                                    },
+                                    "external_file_id": {
+                                        "type": "string",
+                                        "description": "Unique file identifier from the source system (e.g., SharePoint item ID)",
+                                        "example": "01ABCDEFGHIJKLMNOP"
+                                    },
+                                    "file_name": {
+                                        "type": "string",
+                                        "description": "File name including extension (used for type detection)",
+                                        "example": "Corporate-Policy-2024.pdf"
+                                    },
+                                    "download_url": {
+                                        "type": "string",
+                                        "format": "uri",
+                                        "description": "URL to download the file content. Required when is_deleted is false.",
+                                        "example": "https://graph.microsoft.com/v1.0/sites/.../content"
+                                    },
+                                    "is_deleted": {
+                                        "type": "boolean",
+                                        "description": "If true, the file and its chunks will be removed from Vector KB"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Operation completed successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "action": {
+                                            "type": "string",
+                                            "enum": [
+                                                "created",
+                                                "updated",
+                                                "deleted",
+                                                "not_found"
+                                            ],
+                                            "description": "The action that was performed"
+                                        },
+                                        "data_source_id": {
+                                            "type": "string",
+                                            "description": "ID of the created/updated data source (not present for delete)",
+                                            "example": "6579a1b2c3d4e5f678903456"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message",
+                                            "example": "Invalid or missing connector API key"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid or missing API key",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message",
+                                            "example": "Invalid or missing connector API key"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Tenant or folder not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message",
+                                            "example": "Invalid or missing connector API key"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "413": {
+                        "description": "File too large or storage capacity exceeded",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message",
+                                            "example": "Invalid or missing connector API key"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Unsupported file type or download failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message",
+                                            "example": "Invalid or missing connector API key"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Human-readable error message",
+                                            "example": "Invalid or missing connector API key"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "ConnectorApiKey": {
+                "type": "apiKey",
+                "in": "header",
+                "name": "X-Connector-API-Key",
+                "description": "API key for connector authentication"
+            }
+        },
+        "schemas": {
+            "ConnectorUpdateRequest": {
+                "type": "object",
+                "required": [
+                    "tenant_id",
+                    "folder_id",
+                    "user_id",
+                    "external_file_id",
+                    "file_name",
+                    "is_deleted"
+                ],
+                "properties": {
+                    "tenant_id": {
+                        "type": "string",
+                        "description": "aibox tenant ID (MongoDB ObjectId)",
+                        "example": "6579a1b2c3d4e5f678901234"
+                    },
+                    "folder_id": {
+                        "type": "string",
+                        "description": "Vector KB folder ID (MongoDB ObjectId)",
+                        "example": "6579a1b2c3d4e5f678905678"
+                    },
+                    "user_id": {
+                        "type": "string",
+                        "description": "aibox user ID who set up the integration (MongoDB ObjectId)",
+                        "example": "6579a1b2c3d4e5f678909012"
+                    },
+                    "external_file_id": {
+                        "type": "string",
+                        "description": "Unique file identifier from the source system (e.g., SharePoint item ID)",
+                        "example": "01ABCDEFGHIJKLMNOP"
+                    },
+                    "file_name": {
+                        "type": "string",
+                        "description": "File name including extension (used for type detection)",
+                        "example": "Corporate-Policy-2024.pdf"
+                    },
+                    "download_url": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "URL to download the file content. Required when is_deleted is false.",
+                        "example": "https://graph.microsoft.com/v1.0/sites/.../content"
+                    },
+                    "is_deleted": {
+                        "type": "boolean",
+                        "description": "If true, the file and its chunks will be removed from Vector KB"
+                    }
+                }
+            },
+            "ConnectorUpdateResponse": {
+                "type": "object",
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "action": {
+                        "type": "string",
+                        "enum": [
+                            "created",
+                            "updated",
+                            "deleted",
+                            "not_found"
+                        ],
+                        "description": "The action that was performed"
+                    },
+                    "data_source_id": {
+                        "type": "string",
+                        "description": "ID of the created/updated data source (not present for delete)",
+                        "example": "6579a1b2c3d4e5f678903456"
+                    }
+                }
+            },
+            "ErrorResponse": {
+                "type": "object",
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "error": {
+                        "type": "string",
+                        "description": "Human-readable error message",
+                        "example": "Invalid or missing connector API key"
+                    }
+                }
+            }
+        }
+    }
+}
