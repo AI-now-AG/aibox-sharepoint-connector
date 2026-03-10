@@ -47,7 +47,10 @@ const { data: globalKeysData } = await Astro.callAction(
   actions.globalApiKeys.get,
   {},
 );
-const globalApiKeyStatus = globalKeysData?._hasKeys ?? {};
+const globalApiKeyStatus = {
+  ...(globalKeysData?._hasKeys ?? {}),
+  ...(globalKeysData?._hasConfig ?? {}),
+};
 ---
 
 <Layout>

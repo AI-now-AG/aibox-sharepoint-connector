@@ -290,6 +290,17 @@ export default {
       });
     }
 
+    // Paying flag filter
+    if (statusFlags.includes(FlagStatus.Paying)) {
+      pipeline.push({
+        $match: {
+          active: true,
+          is_internal: false,
+          "subscription.is_trial": false,
+        },
+      });
+    }
+
     // ✅ Only paginate if pageSize > 0
     if (pageSize > 0) {
       pipeline.push({ $skip: skip });
@@ -317,6 +328,17 @@ export default {
     if (statusFlags.includes(FlagStatus.Trial)) {
       totalPipeline.push({
         $match: { "subscription.is_trial": true },
+      });
+    }
+
+    // Paying flag filter
+    if (statusFlags.includes(FlagStatus.Paying)) {
+      totalPipeline.push({
+        $match: {
+          active: true,
+          is_internal: false,
+          "subscription.is_trial": false,
+        },
       });
     }
 

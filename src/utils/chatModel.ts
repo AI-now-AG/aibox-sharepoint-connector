@@ -5,7 +5,7 @@ import type { APIContext } from "astro";
 import type { ActionAPIContext } from "astro:actions";
 import { TenantFeature, ApiKeyProvider } from "$types/TenantFeature";
 import log from "./log";
-import { getGlobalApiKeys, resolveApiKey } from "./resolveApiKey";
+import { getGlobalApiKeys, resolveApiKey, resolveConfig } from "./resolveApiKey";
 import { UsageTrackerCallbackHandler } from "$callbackLLM/UsageTrackerCallbackHandler";
 import { UsageType } from "$types/UsageTracking";
 
@@ -155,8 +155,8 @@ export const createChatModel = async (
   // Azure OpenAI
   if (provider == ApiKeyProvider.AzureOpenAI) {
     const azureOpenAIApiKey = resolveApiKey("azure_openai_api_key", tenant, globalKeys);
-    const azureOpenAIApiInstanceName = tenant?.azure_openai_instance_name || "";
-    const azureOpenAIApiDeploymentName = tenant?.azure_openai_chat_model || "";
+    const azureOpenAIApiInstanceName = resolveConfig("azure_openai_instance_name", tenant, globalKeys);
+    const azureOpenAIApiDeploymentName = resolveConfig("azure_openai_chat_model", tenant, globalKeys);
     const azureOpenAIApiVersion =
       import.meta.env.AZURE_OPENAI_API_VERSION || "2024-08-01-preview";
 

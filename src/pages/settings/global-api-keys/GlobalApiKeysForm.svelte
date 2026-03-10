@@ -17,7 +17,13 @@
     speech_api_key: string | null;
     elevenLabs_api_key: string | null;
     fal_ai_api_key: string | null;
+    azure_openai_endpoint: string | null;
+    azure_openai_instance_name: string | null;
+    azure_openai_chat_model: string | null;
+    azure_openai_whisper_model: string | null;
+    speech_region: string | null;
     _hasKeys: Record<string, boolean>;
+    _hasConfig: Record<string, boolean>;
   }
 
   interface Props {
@@ -28,16 +34,25 @@
   let { configId, keys }: Props = $props();
 
   const providers = [
-    { field: "openai_api_key" as const, label: "OpenAI" },
-    { field: "openai_gpt5_api_key" as const, label: "OpenAI GPT-5" },
-    { field: "azure_openai_api_key" as const, label: "Azure OpenAI" },
-    { field: "perplexity_api_key" as const, label: "Perplexity" },
-    { field: "anthropic_api_key" as const, label: "Anthropic (Claude)" },
-    { field: "gemini_api_key" as const, label: "Google Gemini" },
-    { field: "speech_api_key" as const, label: "Azure Speech" },
-    { field: "elevenLabs_api_key" as const, label: "ElevenLabs" },
-    { field: "fal_ai_api_key" as const, label: "Fal.ai (Flux)" },
-  ] as const;
+    { field: "openai_api_key" as const, label: "OpenAI", configFields: [] as { field: string; label: string; placeholder: string }[] },
+    { field: "openai_gpt5_api_key" as const, label: "OpenAI GPT-5", configFields: [] as { field: string; label: string; placeholder: string }[] },
+    { field: "azure_openai_api_key" as const, label: "Azure OpenAI", configFields: [
+      { field: "azure_openai_endpoint", label: t("tenant.azure-open-ai-endpoint"), placeholder: "https://myresource.openai.azure.com" },
+      { field: "azure_openai_instance_name", label: t("tenant.azure-open-ai-instance-name"), placeholder: "myresource" },
+      { field: "azure_openai_chat_model", label: t("tenant.azure-open-ai-text-model"), placeholder: "gpt-4o" },
+      { field: "azure_openai_whisper_model", label: t("tenant.azure-open-ai-transciption-model"), placeholder: "whisper-1" },
+    ] },
+    { field: "perplexity_api_key" as const, label: "Perplexity", configFields: [] as { field: string; label: string; placeholder: string }[] },
+    { field: "anthropic_api_key" as const, label: "Anthropic (Claude)", configFields: [] as { field: string; label: string; placeholder: string }[] },
+    { field: "gemini_api_key" as const, label: "Google Gemini", configFields: [] as { field: string; label: string; placeholder: string }[] },
+    { field: "speech_api_key" as const, label: "Azure Speech", configFields: [
+      { field: "speech_region", label: t("tenant.settings.large-file-azure-region"), placeholder: "westeurope" },
+    ] },
+    { field: "elevenLabs_api_key" as const, label: "ElevenLabs", configFields: [] as { field: string; label: string; placeholder: string }[] },
+    { field: "fal_ai_api_key" as const, label: "Fal.ai (Flux)", configFields: [] as { field: string; label: string; placeholder: string }[] },
+  ];
+
+  const allConfigFields = providers.flatMap(p => p.configFields);
 
   let formData = $state<Record<string, string>>({});
   let visibility = $state<Record<string, boolean>>({});
@@ -48,9 +63,16 @@
     formData[p.field] = keys?.[p.field] ?? "";
     visibility[p.field] = false;
   }
+  for (const c of allConfigFields) {
+    formData[c.field] = keys?.[c.field] ?? "";
+  }
 
   function isConfigured(field: string): boolean {
     return keys?._hasKeys?.[field] ?? false;
+  }
+
+  function isConfiguredConfig(field: string): boolean {
+    return keys?._hasConfig?.[field] ?? false;
   }
 
   function toggleVisibility(field: string) {
@@ -70,6 +92,11 @@
         const value = formData[p.field];
         if (value === undefined) continue;
         payload[p.field] = value || null;
+      }
+      for (const c of allConfigFields) {
+        const value = formData[c.field];
+        if (value === undefined) continue;
+        payload[c.field] = value || null;
       }
 
       const { data, error } = await actions.globalApiKeys.update(payload);
@@ -98,10 +125,10 @@
 <form onsubmit={preventDefault(save)}>
   <div class="bg-base-200 rounded-lg p-6 space-y-3">
     {#each providers as provider}
+      <!-- API Key row -->
       <div
         class="flex items-center gap-4 bg-base-100 rounded-lg px-4 py-3"
       >
-        <!-- Status dot + Provider name -->
         <div class="flex items-center gap-2 min-w-48">
           {#if isConfigured(provider.field)}
             <span class="badge badge-success badge-xs"></span>
@@ -111,7 +138,6 @@
           <span class="font-medium">{provider.label}</span>
         </div>
 
-        <!-- API Key input -->
         <label class="input input-bordered flex items-center gap-2 flex-1">
           <input
             type={visibility[provider.field] ? "text" : "password"}
@@ -160,6 +186,33 @@
           </button>
         </label>
       </div>
+
+      <!-- Collapsible config fields for this provider -->
+      {#if provider.configFields.length > 0}
+        <div class="collapse collapse-arrow bg-base-100 shadow-sm rounded-lg">
+          <input type="checkbox" />
+          <div class="collapse-title text-sm font-medium">
+            {provider.label} Configuration
+          </div>
+          <div class="collapse-content">
+            <div class="grid grid-cols-2 gap-4">
+              {#each provider.configFields as cf}
+                <div class="w-full">
+                  <span class="text-sm font-medium text-base-content">
+                    {cf.label}
+                  </span>
+                  <input
+                    type="text"
+                    class="input input-bordered input-sm mt-1 w-full"
+                    placeholder={cf.placeholder}
+                    bind:value={formData[cf.field]}
+                  />
+                </div>
+              {/each}
+            </div>
+          </div>
+        </div>
+      {/if}
     {/each}
   </div>
 

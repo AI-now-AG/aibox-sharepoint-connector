@@ -1,6 +1,8 @@
 import GlobalApiKeysModel, {
   type GlobalApiKeys,
   type ApiKeyField,
+  type ConfigField,
+  CONFIG_TO_PRIVATE_FLAG,
 } from "$data/models/globalApiKeys.model";
 import { decrypt } from "./secure";
 
@@ -71,5 +73,36 @@ export function resolveApiKey(
   }
 
   // 3. Environment variable fallback
+  return envFallback;
+}
+
+/**
+ * Resolve a config field using the 3-tier chain:
+ *   1. Tenant private value (if privateKeyEnabled flag is true AND tenant has a value)
+ *   2. Global config value (if set)
+ *   3. Environment variable / default fallback
+ *
+ * Unlike resolveApiKey(), config values are NOT encrypted.
+ */
+export function resolveConfig(
+  configName: ConfigField,
+  tenant: any,
+  globalKeys: GlobalApiKeys | null,
+  envFallback: string = "",
+): string {
+  const privateFlag = CONFIG_TO_PRIVATE_FLAG[configName];
+
+  // 1. Tenant private config
+  if (tenant?.metadata?.[privateFlag] && tenant[configName]) {
+    return tenant[configName];
+  }
+
+  // 2. Global config
+  if (globalKeys) {
+    const globalValue = globalKeys[configName];
+    if (globalValue) return globalValue;
+  }
+
+  // 3. Fallback
   return envFallback;
 }
