@@ -348,6 +348,7 @@ export const tenantCreation = {
 
             <p>
               <strong>Contact:</strong> ${tenant.billing_info?.email ?? "-"}<br/>
+              <strong>Website:</strong> ${tenant?.website ?? "-"}<br/>
               <strong>Created:</strong> ${new Date().toLocaleDateString()}<br/>
               <strong>Account created by:</strong> ${email}<br/>
               <strong>Flow:</strong> ${isReseller ? "Reseller" : "Internal"}<br/>
