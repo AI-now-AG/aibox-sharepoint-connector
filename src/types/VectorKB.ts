@@ -26,6 +26,10 @@ export interface VectorFolder {
   parent_folder_id: string | null;
   description?: string;
   data_source_count?: number;
+  source_type?: 'manual' | 'sharepoint';
+  last_synced_at?: string | null;
+  sync_status?: 'idle' | 'syncing' | 'error';
+  sync_error_message?: string | null;
   created_by: string;
   created_at: string;
 }
@@ -52,6 +56,8 @@ export interface VectorDataSource {
   file_size_bytes: number;
   blob_url: string;
   blob_name: string;
+  external_file_id?: string | null;
+  external_download_url?: string | null;
   chunk_count: number;
   status: DataSourceStatus;
   error_message?: string | null;

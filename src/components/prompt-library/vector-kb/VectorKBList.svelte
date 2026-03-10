@@ -59,6 +59,86 @@
   let reconnectAttempts = 0;
   const MAX_RECONNECT_ATTEMPTS = 5;
 
+  // SharePoint folder state
+  let sharepointDialog: HTMLDialogElement;
+  let sharepointFolderName = $state("");
+  let sharepointFolderDescription = $state("");
+  let savingSharePoint = $state(false);
+
+  function formatRelativeTime(dateString: string | null | undefined): string {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffMins < 1) return t("vector-kb.synced-just-now");
+    if (diffMins < 60) return t("vector-kb.synced-ago").replace("{time}", `${diffMins}m`);
+    if (diffHours < 24) return t("vector-kb.synced-ago").replace("{time}", `${diffHours}h`);
+    return t("vector-kb.synced-ago").replace("{time}", `${diffDays}d`);
+  }
+
+  function openSharePointDialog() {
+    sharepointFolderName = "";
+    sharepointFolderDescription = "";
+    sharepointDialog?.showModal();
+  }
+
+  function closeSharePointDialog() {
+    sharepointDialog?.close();
+    sharepointFolderName = "";
+    sharepointFolderDescription = "";
+  }
+
+  async function createSharePointFolder() {
+    if (!sharepointFolderName.trim()) {
+      alert(t("vector-kb.folder-name-required"));
+      return;
+    }
+
+    savingSharePoint = true;
+    try {
+      if (!apiBase) {
+        const config = await getTranscriptionConfig();
+        apiBase = config.apiUrl;
+      }
+
+      const response = await fetch(`${apiBase}/api/vector-kb/folders/sharepoint`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tenantId,
+          name: sharepointFolderName.trim(),
+          description: sharepointFolderDescription.trim(),
+          parentFolderId: currentFolderId,
+          createdBy: userId,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        const folderId = result.data?._id;
+        closeSharePointDialog();
+        fetchData();
+
+        // Open FlowMate Integration Center with auto-filled context
+        if (folderId) {
+          const flowmateUrl = `/flowmate?folder_id=${folderId}`;
+          window.open(flowmateUrl, '_blank');
+        }
+      } else {
+        alert("Failed to create SharePoint folder: " + result.error);
+      }
+    } catch (e) {
+      alert("Error creating SharePoint folder: " + (e as Error).message);
+    } finally {
+      savingSharePoint = false;
+    }
+  }
+
   // Sorting state
   type SortField = "name" | "type" | "size" | "status" | "date";
   type SortDirection = "asc" | "desc";
@@ -642,15 +722,32 @@
     </div>
     <div class="flex gap-2">
       {#if currentFolderId === null}
-        <button
-          class="btn btn-sm"
-          onclick={openCreateFolderDialog}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
-          </svg>
-          {t("vector-kb.new-folder")}
-        </button>
+        <div class="dropdown dropdown-end">
+          <button tabindex="0" class="btn btn-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            {t("vector-kb.new-folder")}
+          </button>
+          <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-56">
+            <li>
+              <button onclick={openCreateFolderDialog}>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                </svg>
+                {t("vector-kb.new-folder")}
+              </button>
+            </li>
+            <li>
+              <button onclick={openSharePointDialog}>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+                </svg>
+                {t("vector-kb.connect-sharepoint")}
+              </button>
+            </li>
+          </ul>
+        </div>
       {/if}
       <button
         class="btn btn-primary btn-sm"
@@ -751,10 +848,19 @@
                     class="flex items-center gap-2 flex-1 text-left cursor-pointer"
                     onclick={() => navigateToFolder(folder._id, folder.name)}
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-warning" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                    </svg>
-                    <span class="font-medium">{folder.name}</span>
+                    {#if folder.source_type === 'sharepoint'}
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-info" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+                      </svg>
+                    {:else}
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-warning" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                      </svg>
+                    {/if}
+                    <span class="font-medium truncate">{folder.name}</span>
+                    {#if folder.source_type === 'sharepoint'}
+                      <span class="badge badge-info badge-sm">{t("vector-kb.sharepoint-badge")}</span>
+                    {/if}
                   </button>
                   <div class="dropdown dropdown-end">
                     <button tabindex="0" class="btn btn-ghost btn-xs btn-circle">
@@ -780,7 +886,14 @@
                     </ul>
                   </div>
                 </div>
-                {#if folder.description}
+                {#if folder.source_type === 'sharepoint' && folder.last_synced_at}
+                  <p class="text-xs text-base-content/50 mt-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    {formatRelativeTime(folder.last_synced_at)}
+                  </p>
+                {:else if folder.description}
                   <p class="text-sm text-base-content/60 mt-1">{folder.description}</p>
                 {/if}
               </div>
@@ -1148,6 +1261,59 @@
           <span class="loading loading-spinner loading-sm"></span>
         {/if}
         {folderDialogMode === "create" ? t("vector-kb.create") : t("vector-kb.save")}
+      </button>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
+
+<!-- SharePoint Connect Dialog -->
+<dialog bind:this={sharepointDialog} class="modal">
+  <div class="modal-box">
+    <h3 class="text-lg font-bold mb-4">{t("vector-kb.connect-sharepoint-title")}</h3>
+    <div class="space-y-4">
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text font-medium">{t("vector-kb.folder-name")} *</span>
+        </label>
+        <input
+          type="text"
+          class="input input-bordered w-full"
+          placeholder={t("vector-kb.enter-folder-name")}
+          bind:value={sharepointFolderName}
+        />
+      </div>
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text font-medium">{t("vector-kb.description-optional")}</span>
+        </label>
+        <textarea
+          class="textarea textarea-bordered w-full"
+          placeholder={t("vector-kb.enter-folder-description")}
+          bind:value={sharepointFolderDescription}
+          rows="2"
+        ></textarea>
+      </div>
+      <div class="alert alert-info text-sm">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span>{t("vector-kb.folder-id-info")}</span>
+      </div>
+    </div>
+    <div class="modal-action">
+      <button class="btn btn-ghost" onclick={closeSharePointDialog}>{t("vector-kb.cancel")}</button>
+      <button
+        class="btn btn-primary"
+        disabled={!sharepointFolderName.trim() || savingSharePoint}
+        onclick={createSharePointFolder}
+      >
+        {#if savingSharePoint}
+          <span class="loading loading-spinner loading-sm"></span>
+        {/if}
+        {t("vector-kb.connect-sharepoint")}
       </button>
     </div>
   </div>
