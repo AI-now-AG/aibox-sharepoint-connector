@@ -216,7 +216,7 @@
   }
 
   async function generateKbForTenant(newTenantId: string) {
-    const executePromptUrl = `${TRANSCRIPTION_API_URL}/api/prompt/execute1`;
+    const executePromptUrl = `${TRANSCRIPTION_API_URL}/api/prompt/execute`;
     const accessToken = $user?.api_token as string;
 
     const payload = {
