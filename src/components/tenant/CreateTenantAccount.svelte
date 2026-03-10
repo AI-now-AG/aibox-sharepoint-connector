@@ -7,6 +7,7 @@
   import { addToast } from "$stores/toast";
   import { tenant, user } from "$stores";
   import { PromptModel } from "$types/PromptModel";
+  import { PromptToolOption } from "$types/AIProvider";
   import {
     BillingMethod,
     CountryCode,
@@ -222,6 +223,7 @@
       provider: PromptModel.Gemini,
       systemMessage: promptKbInstruction || DEFAULT_PROMPT_KB_INSTRUCTION,
       prompt: `Company: ${companyName}\nWebsite: ${websiteUrl}`,
+      tool: PromptToolOption.Websearch,
     };
 
     let kbContent = "";
