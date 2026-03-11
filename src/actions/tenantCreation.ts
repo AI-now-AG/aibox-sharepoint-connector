@@ -62,7 +62,7 @@ const TenantInputParamsSchema = z.object({
   org_name: z.string().min(1),
   language: z.string().min(1),
   theme: z.nativeEnum(ThemeCode).default(ThemeCode.AIBox),
-  website: z.string().min(1),
+  website: z.string().optional(),
   plan_name: z.nativeEnum(SubscriptionPackageId).optional(),
   add_ons: z.array(z.nativeEnum(AudioOptionId)).optional(),
   billing_method: z.nativeEnum(BillingMethod).optional(),
