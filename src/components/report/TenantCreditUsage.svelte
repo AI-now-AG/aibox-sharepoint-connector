@@ -102,44 +102,46 @@
     {/if}
   {:else}
     <div class="mb-4">
-      <table class="table border min-w-full relative">
-        <colgroup>
-          <col class="w-auto" />
-          <col class="w-[250]" />
-          <col class="w-[150]" />
-          <col class="w-[150]" />
-        </colgroup>
-        <thead>
-          <tr class="bg-base-300">
-            <th class="py-3 px-4 text-left font-semibold text-sm"
-              >{t("credit-usage.tenant-name")}</th
-            >
-            <th class="py-3 px-4 text-left font-semibold text-sm"
-              >{t("credit-usage.subscription")}</th
-            >
-            <th class="py-3 px-4 text-center font-semibold text-sm"
-              >{t("credit-usage.credits-used")}</th
-            >
-            <th class="py-3 px-4 text-center font-semibold text-sm"
-              >{t("credit-usage.active-users")}</th
-            >
-          </tr>
-        </thead>
-        <tbody>
-          {#each creditUsageData as item}
-            <tr class="bg-base-100 text-sm">
-              <td class="py-3 px-4 text-sm font-medium">{item.tenantName}</td>
-              <td class="py-3 px-4 text-sm font-medium">{item.planName}</td>
-              <td class="py-3 px-4 text-sm font-medium text-center"
-                >{item.creditsUsed}</td
+      <div class="overflow-x-auto relative">
+        <table class="table table-fixed border min-w-full relative">
+          <colgroup>
+            <col class="w-auto min-w-[150]" />
+            <col class="w-[250]" />
+            <col class="w-[150]" />
+            <col class="w-[150]" />
+          </colgroup>
+          <thead>
+            <tr class="bg-base-300">
+              <th class="py-3 px-4 text-left font-semibold text-sm"
+                >{t("credit-usage.tenant-name")}</th
               >
-              <td class="py-3 px-4 text-sm font-medium text-center"
-                >{item.activeUsers}</td
+              <th class="py-3 px-4 text-left font-semibold text-sm"
+                >{t("credit-usage.subscription")}</th
+              >
+              <th class="py-3 px-4 text-center font-semibold text-sm"
+                >{t("credit-usage.credits-used")}</th
+              >
+              <th class="py-3 px-4 text-center font-semibold text-sm"
+                >{t("credit-usage.active-users")}</th
               >
             </tr>
-          {/each}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {#each creditUsageData as item}
+              <tr class="bg-base-100 text-sm">
+                <td class="py-3 px-4 text-sm font-medium">{item.tenantName}</td>
+                <td class="py-3 px-4 text-sm font-medium">{item.planName}</td>
+                <td class="py-3 px-4 text-sm font-medium text-center"
+                  >{item.creditsUsed}</td
+                >
+                <td class="py-3 px-4 text-sm font-medium text-center"
+                  >{item.activeUsers}</td
+                >
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+      </div>
     </div>
   {/if}
 </div>
