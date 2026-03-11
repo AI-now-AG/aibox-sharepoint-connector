@@ -221,7 +221,7 @@
     const payload = {
       tenantId: $tenant?._id?.toString(),
       provider: PromptModel.Gemini,
-      systemMessage: promptKbInstruction || DEFAULT_PROMPT_KB_INSTRUCTION,
+      systemMessage: [promptKbInstruction || DEFAULT_PROMPT_KB_INSTRUCTION],
       prompt: `Company: ${companyName}\nWebsite: ${websiteUrl}`,
       tool: PromptToolOption.Websearch,
     };
