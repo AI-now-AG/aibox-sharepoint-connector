@@ -92,7 +92,6 @@
   let isFormValid = $derived(
     organizationName.trim() !== "" &&
       companyName.trim() !== "" &&
-      websiteUrl.trim() !== "" &&
       street.trim() !== "" &&
       zipCode.trim() !== "" &&
       location.trim() !== "" &&
@@ -310,7 +309,7 @@
       return false;
     }
 
-    if (!isValidUrl(websiteUrl)) {
+    if (websiteUrl && !isValidUrl(websiteUrl)) {
       showAlert(t("subscription.validate-invalid-website-message"));
       return false;
     }
@@ -342,8 +341,10 @@
           organization.display_name,
         );
 
-        // Step 3: Generate KB from Gemini + websearch (best effort, non-blocking)
-        await generateKbForTenant(tenant.id);
+        // Step 3: Generate KB from Gemini + websearch (Optional)
+        if (websiteUrl) {
+          await generateKbForTenant(tenant.id);
+        }
 
         // Step 4: Finalize Tenant Setup
         await finalizeTenantSetup(tenant.id);
@@ -413,7 +414,7 @@
         </div>
         <div class="flex-1 flex flex-col mb-4">
           <Input
-            label={t("tenant.website-url") + " *"}
+            label={t("tenant.website-url")}
             bind:value={websiteUrl}
             placeholder="https://ihre-website.de"
             labelClasses="font-medium text-sm"

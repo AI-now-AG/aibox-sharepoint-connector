@@ -3,10 +3,7 @@ export const isValidEmail = (email: string): boolean => {
 };
 
 export const isValidUrl = (url: string): boolean => {
-  try {
-    const parsed = new URL(url);
-    return parsed.protocol === "http:" || parsed.protocol === "https:";
-  } catch {
-    return false;
-  }
+  // Allows optional http(s):// prefix, requires at least one dot (TLD), optional path/query
+  const urlRegex = /^(https?:\/\/)?[\w-]+(\.[\w-]+)+([/?#].*)?$/i;
+  return urlRegex.test(url.trim());
 };
