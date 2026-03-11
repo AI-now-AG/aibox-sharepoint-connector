@@ -18,7 +18,7 @@ const generateKnowledgeBaseDescription = async (
   ctx: APIContext,
   knowledgeBase: string,
 ) => {
-  const model = createChatModel(ctx);
+  const model = await createChatModel(ctx);
 
   const messages = [
     new SystemMessage(knowledgeBaseInfo),

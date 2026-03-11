@@ -88,7 +88,12 @@ export const user = {
     input: z.intersection(UserFilterParamsSchema, TenantInputIdentifierSchema),
     handler: async (input, context) => {
       const tenantId = new ObjectId(input.tenantId);
-      const maxUserLimit = context.locals.tenant?.max_user_limit || 0;
+      const {
+        included_user_limit: includedUserLimit,
+        extra_user_limit: extraUserLimit,
+      } = context.locals.tenant;
+
+      const maxUserLimit = (includedUserLimit || 0) + (extraUserLimit || 0);
       const data = await UserModel.listByTenant(tenantId, input);
 
       let limitReached = false;
@@ -112,9 +117,11 @@ export const user = {
       const {
         _id: tenantId,
         org_id: organizationId,
-        max_user_limit: maxUserLimit,
+        included_user_limit: includedUserLimit,
+        extra_user_limit: extraUserLimit,
       } = context.locals.tenant;
 
+      const maxUserLimit = (includedUserLimit || 0) + (extraUserLimit || 0);
       const countUsers = await UserModel.countUsersByTenant(tenantId);
       if (maxUserLimit && maxUserLimit > 0 && countUsers >= maxUserLimit) {
         throw new ActionError({
@@ -330,20 +337,18 @@ export const user = {
         throw new Error("User does not exists.");
       }
 
-      const session = client.startSession();
-      session.startTransaction();
+      // Delete from your database FIRST
+      const deleteResult = await UserModel.delete(input._id);
+
+      // Try deleting from Auth0 (but don't break flow if it fails)
       try {
         await usersManagement.deleteUser(user?.auth0_sub);
-        const updateResult = await UserModel.delete(input._id);
-
-        await session.commitTransaction();
-        return transformRawData(updateResult);
       } catch (error) {
-        await session.abortTransaction();
-        throw error;
-      } finally {
-        session.endSession();
+        console.error("Auth0 delete failed:", error);
+        // We intentionally ignore this error
       }
+
+      return transformRawData(deleteResult);
     },
   }),
 

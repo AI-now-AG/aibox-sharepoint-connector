@@ -9,11 +9,20 @@ import {
   ThemeCode,
 } from "$types/TenantFeature";
 import { BillingMethod } from "$types/Subscription";
-import { ModelName, ReasoningEffortOption, EmbeddingProvider } from "$types/AIProvider";
+import { FlagStatus } from "$types/TenantMgnt";
+import {
+  ModelName,
+  ReasoningEffortOption,
+  EmbeddingProvider,
+} from "$types/AIProvider";
+import { ChunkingStrategy } from "$types/VectorKB";
 
 export const TenantFilterParamsSchema = z.object({
+  page: z.number().default(1),
+  pageSize: z.number().default(20),
   searchValue: z.string().nullish(),
-  showArchived: z.boolean(),
+  statusFlags: z.array(z.string()),
+  resellerCode: z.string().nullish(),
 });
 export type TenantFilterParams = z.infer<typeof TenantFilterParamsSchema>;
 
@@ -33,6 +42,7 @@ export const BillingInfoSchema = z.object({
   address: z.string().optional(),
   zip_code: z.string().optional(),
   location: z.string().optional(),
+  country: z.string().optional(),
   email: z.string().optional(),
 });
 
@@ -77,6 +87,10 @@ const TenantSchema = z.object({
   is_restrict_user_managment: z.boolean().optional().default(false),
   is_trial: z.boolean().optional().default(false),
   is_on_posthog: z.boolean().optional().default(false),
+  is_internal: z.boolean().optional().default(false),
+  is_reseller: z.boolean().optional().default(false),
+  reseller_code: z.string().nullish(),
+  owned_by_reseller: z.string().nullish(),
   comment: z.string().optional(),
   metadata: z.record(z.any()).nullish(),
   billing_method: z
@@ -84,8 +98,9 @@ const TenantSchema = z.object({
     .default(BillingMethod.MonthlyInvoice),
   billing_info: BillingInfoSchema.optional(),
   stripe_customer_id: z.string().nullish().default(null),
-  totalPrice: z.string().optional(),
-  max_user_limit: z.number().nullish().default(0),
+  totalPrice: z.string().nullish().default(null),
+  extra_user_limit: z.number().nullish().default(0),
+  included_user_limit: z.number().nullish().default(0),
   // Vector KB Configuration
   vector_kb_enabled: z.boolean().optional().default(false),
   vector_kb_embedding_provider: z.nativeEnum(EmbeddingProvider).nullish(),
@@ -93,8 +108,11 @@ const TenantSchema = z.object({
   vector_kb_chunk_size: z.number().optional().default(800),
   vector_kb_chunk_overlap: z.number().optional().default(200),
   vector_kb_max_storage_mb: z.number().optional().default(500),
-  vector_kb_top_k: z.number().optional().default(5),
-  vector_kb_similarity_threshold: z.number().optional().default(0.7),
+  vector_kb_chunking_strategy: z
+    .nativeEnum(ChunkingStrategy)
+    .optional()
+    .default(ChunkingStrategy.Fixed),
+  vector_kb_debug_enabled: z.boolean().optional().default(false),
   created_at: z
     .date()
     .optional()
@@ -153,25 +171,79 @@ export default {
     );
   },
 
-  list: async (filterParams?: TenantFilterParams) => {
-    const filter: any = {
-      active: true,
+  list: async () => {
+    return collection.find<Document<Tenant>>({}).toArray();
+  },
+
+  listActive: async () => {
+    return collection
+      .find<Document<Tenant>>({
+        active: true,
+      })
+      .sort({ name: 1 })
+      .toArray();
+  },
+
+  listAllResellerCodes: async () => {
+    return await collection.distinct("reseller_code", {
+      is_reseller: true,
+      reseller_code: { $ne: null },
+    });
+  },
+
+  fetchPaginatedList: async (filterParams: TenantFilterParams) => {
+    const { page, pageSize, searchValue, statusFlags, resellerCode } =
+      filterParams;
+    const skip = (page - 1) * pageSize;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const baseMatch: any = {};
+
+    // escape regex
+    const escapeRegex = (text: string): string => {
+      return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     };
 
-    if (filterParams) {
-      const { searchValue, showArchived } = filterParams;
-
+    if (searchValue || statusFlags.length > 0 || resellerCode) {
+      // Search filter
       if (searchValue) {
-        filter.name = { $regex: searchValue, $options: "i" };
+        const safeSearch = escapeRegex(searchValue.trim());
+        (baseMatch.$and ??= []).push(
+          { name: { $regex: safeSearch, $options: "i" } },
+          { org_name: { $regex: safeSearch, $options: "i" } },
+        );
       }
 
-      if (showArchived) {
-        filter.active = false;
+      // Status flag filter
+      if (statusFlags.includes(FlagStatus.Internal)) {
+        (baseMatch.$and ??= []).push({ is_internal: true });
       }
+
+      // Reseller flag filter
+      if (statusFlags.includes(FlagStatus.Reseller)) {
+        (baseMatch.$and ??= []).push({ is_reseller: true });
+      }
+
+      // Archived flag filter
+      if (statusFlags.includes(FlagStatus.Archived)) {
+        (baseMatch.$and ??= []).push({ active: false });
+      }
+
+      // Reseller code filter
+      if (resellerCode) {
+        (baseMatch.$and ??= []).push({ owned_by_reseller: resellerCode });
+      }
+    } else {
+      (baseMatch.$and ??= []).push({ active: true });
     }
 
-    const pipeline = [
-      { $match: filter },
+    // Build pipeline dynamically
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const pipeline: any[] = [
+      {
+        // 🔍 search happens HERE (before lookups)
+        $match: baseMatch,
+      },
       {
         $lookup: {
           from: "subscriptions",
@@ -188,16 +260,103 @@ export default {
       },
       {
         $project: {
-          subscriptions: 0, // hide the full array coz only need one
+          _id: 1,
+          name: 1,
+          default_language: 1,
+          comment: 1,
+          totalPrice: 1,
+          active: 1,
+          is_internal: 1,
+          is_reseller: 1,
+          reseller_code: 1,
+          owned_by_reseller: 1,
+          included_user_limit: 1,
+          extra_user_limit: 1,
+          billing_method: 1,
+          billing_info: 1,
+          metadata: 1,
+          azure_openai_instance_name: 1,
+          subscription: 1,
+        },
+      },
+      { $sort: { name: 1 } },
+    ];
+
+    // Trial flag filter
+    if (statusFlags.includes(FlagStatus.Trial)) {
+      pipeline.push({
+        $match: { active: true, "subscription.is_trial": true },
+      });
+    }
+
+    // Paying flag filter
+    if (statusFlags.includes(FlagStatus.Paying)) {
+      pipeline.push({
+        $match: {
+          active: true,
+          is_internal: false,
+          "subscription.is_trial": false,
+        },
+      });
+    }
+
+    // ✅ Only paginate if pageSize > 0
+    if (pageSize > 0) {
+      pipeline.push({ $skip: skip });
+      pipeline.push({ $limit: pageSize });
+    }
+
+    const totalPipeline: any[] = [
+      { $match: baseMatch },
+      {
+        $lookup: {
+          from: "subscriptions",
+          localField: "_id",
+          foreignField: "tenant_id",
+          as: "subscriptions",
+        },
+      },
+      {
+        $addFields: {
+          subscription: { $arrayElemAt: ["$subscriptions", 0] },
         },
       },
     ];
 
-    const data = await collection
-      .aggregate<Document<Tenant & { subscription?: any }>>(pipeline)
-      .toArray();
+    // ✅ merge trial filter only when needed
+    if (statusFlags.includes(FlagStatus.Trial)) {
+      totalPipeline.push({
+        $match: { "subscription.is_trial": true },
+      });
+    }
 
-    return data;
+    // Paying flag filter
+    if (statusFlags.includes(FlagStatus.Paying)) {
+      totalPipeline.push({
+        $match: {
+          active: true,
+          is_internal: false,
+          "subscription.is_trial": false,
+        },
+      });
+    }
+
+    totalPipeline.push({ $count: "count" });
+
+    const totalResult = await collection.aggregate(totalPipeline).toArray();
+    const result = await collection
+      .aggregate(pipeline, {
+        collation: { locale: "en", strength: 2 },
+      })
+      .toArray();
+    const total = totalResult[0]?.count ?? 0;
+
+    return {
+      data: result,
+      total: total,
+      page,
+      pageSize,
+    };
   },
 
   get: async (id: string | ObjectId): Promise<Tenant | null> => {
@@ -214,6 +373,12 @@ export default {
 
   getById: async (org_id: string) => {
     return await collection.findOne<Document<Tenant>>({ org_id });
+  },
+
+  getByResellerCode: async (resellerCode: string) => {
+    return await collection.findOne<Document<Tenant>>({
+      reseller_code: resellerCode,
+    });
   },
 
   updateOrgName: async (org_id: string, newOrgName: string) => {

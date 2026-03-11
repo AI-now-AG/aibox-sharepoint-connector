@@ -8,13 +8,13 @@
   import Dropdown, { type Option } from "$components/form/Dropdown.svelte";
   import type { CreditUsage } from "$types/UsageTracking";
   import Loading from "$components/Loading.svelte";
-  import { tenant as tenantStore } from "$stores";
 
   const t = useTranslations();
 
   let loading: boolean = $state(false);
   let creditUsageData: CreditUsage[] = $state([]);
   let selectedMonth: string = $state("");
+  let includeInternal: boolean = $state(false);
 
   const getMonthOptions = (): Option[] => {
     return Array.from({ length: 6 }, (_, i) => {
@@ -33,6 +33,7 @@
 
     const { data, error } = await actions.report.creditUsageAll({
       month: selectedMonth,
+      includeInternal,
     });
     loading = false;
 
@@ -48,6 +49,13 @@
   };
 
   const monthOptions = getMonthOptions();
+
+  const handleInternalToggle = () => {
+    includeInternal = !includeInternal;
+    if (selectedMonth) {
+      fetchCreditUsages();
+    }
+  };
 </script>
 
 <div class="mt-5">
@@ -69,6 +77,20 @@
         onclick={preventDefault(fetchCreditUsages)}
         disabled={!selectedMonth || loading}>{@html svgIcons.search}</button
       >
+    </div>
+    <div class="form-control flex justify-end">
+      <label class="flex items-center space-x-2">
+        <input
+          type="checkbox"
+          name="unscoped_user"
+          class="checkbox checkbox-sm checkbox-neutral"
+          checked={includeInternal}
+          onclick={handleInternalToggle}
+        />
+        <span class="text-sm font-normal"
+          >{t("usage.show-internal-tenant")}</span
+        >
+      </label>
     </div>
   </div>
 

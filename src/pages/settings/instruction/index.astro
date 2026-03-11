@@ -15,6 +15,7 @@ const configuration = data;
     <h1 class="text-4xl font-bold">{t("instructions.title")}</h1>
     <InstructionForm
       instructions={configuration?.defaultInstructions ?? []}
+      citationInstruction={configuration?.citationInstruction}
       configurationId={configuration?._id.toString() ?? ""}
       client:load
     />

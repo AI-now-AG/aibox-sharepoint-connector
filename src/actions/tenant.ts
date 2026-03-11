@@ -29,7 +29,12 @@ import {
   AudioOptionId,
 } from "$types/Subscription";
 import { EncryptedUserPassword, UserRole } from "$types/Users";
-import { ModelName, ReasoningEffortOption, EmbeddingProvider } from "$types/AIProvider";
+import {
+  ModelName,
+  ReasoningEffortOption,
+  EmbeddingProvider,
+} from "$types/AIProvider";
+import { ChunkingStrategy } from "$types/VectorKB";
 
 const TenantInputParamsSchema = z.object({
   name: z.string(),
@@ -73,12 +78,17 @@ const TenantInputParamsSchema = z.object({
     .default(() => false),
   is_trial: z.boolean().optional().default(false),
   is_on_posthog: z.boolean().optional().default(false),
-  max_user_limit: z.number().nullish().default(0),
+  is_internal: z.boolean().optional().default(false),
+  is_reseller: z.boolean().optional().default(false),
+  reseller_code: z.string().nullish(),
+  owned_by_reseller: z.string().nullish(),
+  included_user_limit: z.number().nullish().default(0),
+  extra_user_limit: z.number().nullish().default(0),
   comment: z.string().optional(),
   metadata: z.record(z.any()).optional(),
   tenant_admin_email: z.string().optional(),
   billing_info: z.record(z.any()).optional(),
-  totalPrice: z.string().optional(),
+  totalPrice: z.string().nullish().default(null),
   // Vector KB Configuration
   vector_kb_enabled: z.boolean().optional().default(false),
   vector_kb_embedding_provider: z.nativeEnum(EmbeddingProvider).nullish(),
@@ -86,8 +96,11 @@ const TenantInputParamsSchema = z.object({
   vector_kb_chunk_size: z.number().optional().default(800),
   vector_kb_chunk_overlap: z.number().optional().default(200),
   vector_kb_max_storage_mb: z.number().optional().default(500),
-  vector_kb_top_k: z.number().optional().default(5),
-  vector_kb_similarity_threshold: z.number().optional().default(0.7),
+  vector_kb_chunking_strategy: z
+    .nativeEnum(ChunkingStrategy)
+    .optional()
+    .default(ChunkingStrategy.Fixed),
+  vector_kb_debug_enabled: z.boolean().optional().default(false),
 });
 
 const TenanKeyEncryptSchema = z.object({
@@ -108,8 +121,7 @@ const TenantInputIdentifierSchema = z.object({
 
 const CreateTenantAdminSchema = z.object({
   _id: z.string(),
-  org_id: z.string().optional(),
-  tenant_admin_email: z.string().optional(),
+  email: z.string().optional(),
   role: z.string().default("admin"),
 });
 
@@ -119,8 +131,10 @@ const SubscriptionInputParamsSchema = z.object({
     .or(z.literal(""))
     .optional(),
   add_ons: z.array(z.nativeEnum(AudioOptionId)).optional(),
-  start_date: z.coerce.date().nullable().optional(),
-  cancelled_date: z.coerce.date().nullable().optional(),
+  start_date: z.coerce.date().nullish(),
+  cancelled_date: z.coerce.date().nullish(),
+  is_trial: z.boolean().optional().default(false),
+  trial_start_date: z.coerce.date().nullish(),
 });
 
 const assignMemberRoles = async (
@@ -224,7 +238,19 @@ export const tenant = {
   get: defineAction({
     input: TenantInputIdentifierSchema,
     handler: async (input) => {
-      const data = await TenantModel.get(input._id);
+      // Get tenant info
+      const tenant = await TenantModel.get(input._id);
+      if (!tenant) throw new Error("Tenant does not exist.");
+
+      // Get subscription info
+      const subscription = await SubscriptionModel.findByTenant(tenant._id);
+
+      // Combine tenant and subscription data
+      const data = {
+        ...tenant,
+        subscription,
+      };
+
       return transformRawData(data);
     },
   }),
@@ -232,26 +258,55 @@ export const tenant = {
   list: defineAction({
     input: TenantFilterParamsSchema,
     handler: async (input) => {
-      const data = await TenantModel.list(input);
+      const data = await TenantModel.fetchPaginatedList(input);
       return transformRawData(data, false);
+    },
+  }),
+
+  listActive: defineAction({
+    handler: async () => {
+      const tenants = await TenantModel.listActive();
+      const data = tenants.map((tenant) => ({
+        _id: tenant._id,
+        name: tenant.name,
+        org_name: tenant.org_name,
+      }));
+
+      return transformRawData(data);
     },
   }),
 
   createAdminUser: defineAction({
     input: CreateTenantAdminSchema,
     handler: async (input) => {
+      // Validate tenant existence
+      const tenant = await TenantModel.get(input._id);
+      if (!tenant) throw new Error("Tenant does not exist.");
+
+      // Check tenant user limit before creating admin user
+      const {
+        included_user_limit: includedUserLimit,
+        extra_user_limit: extraUserLimit,
+      } = tenant;
+      const maxUserLimit = (includedUserLimit || 0) + (extraUserLimit || 0);
+      const countUsers = await UserModel.countUsersByTenant(input._id);
+      if (maxUserLimit && maxUserLimit > 0 && countUsers >= maxUserLimit) {
+        throw new Error("Tenant user limit has been reached.");
+      }
+
+      // Start transaction to create admin user and assign roles
       const session = client.startSession();
       session.startTransaction();
 
       try {
         const dbOrgId = input._id;
-        const organizationId = input.org_id ?? "";
+        const organizationId = tenant.org_id ?? "";
 
-        if (input.tenant_admin_email) {
+        if (input.email) {
           await setupTenantAdmin(
             dbOrgId,
             organizationId,
-            input.tenant_admin_email,
+            input.email,
             input.role === "admin" ? "Admin" : "Supper Admin",
             input.role as "admin" | "sa",
           );

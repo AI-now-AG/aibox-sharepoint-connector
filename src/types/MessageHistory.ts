@@ -3,13 +3,60 @@ export enum MessageRole {
   User = "user",
 }
 
-// Source attribution for Vector KB RAG responses
+export type SourceType = 'vector' | 'text' | 'hybrid';
+
 export interface SourceAttribution {
   fileName: string;
   score: number;
   pageNumber?: number;
+  sectionTitle?: string;
+  documentLanguage?: string;
   snippet: string;
   chunkIndex?: number;
+  content?: string;
+  vectorScore?: number;
+  textScore?: number;
+  fusedScore?: number;
+  rerankScore?: number;
+  sourceType?: SourceType;
+}
+
+export interface FilteredChunkInfo {
+  fileName: string;
+  score: number;
+  reason: 'rerank_cutoff' | 'below_threshold';
+  snippet?: string;
+  content?: string;
+  pageNumber?: number;
+}
+
+export interface RAGDebugInfo {
+  searchMode: 'vector' | 'hybrid';
+  similarityThreshold: number;
+  vectorResultCount: number;
+  vectorTopScore?: number;
+  textResultCount?: number;
+  textTopScore?: number;
+  hybridAlpha?: number;
+  totalUniqueChunks?: number;
+  wasReranked: boolean;
+  rerankLatencyMs?: number;
+  rerankInputCount?: number;
+  rerankOutputCount?: number;
+  filteredChunks?: FilteredChunkInfo[];
+  wasAnswerabilityChecked: boolean;
+  answerabilityThreshold?: number;
+  answerabilityConfidence?: number;
+  answerabilityDecision?: 'answer' | 'clarify' | 'decline';
+  wasCompressed: boolean;
+  originalContextLength?: number;
+  compressedContextLength?: number;
+  compressionRatio?: number;
+  wasMultiHop: boolean;
+  hopCount?: number;
+  multiHopQueries?: string[];
+  wasMultiQuery?: boolean;
+  multiQueryVariations?: string[];
 }
 
 export interface Message {
@@ -19,9 +66,10 @@ export interface Message {
   imageUrl?: string;
   fileUrls?: string[];
   thumbRating?: MessageThumbRating | null;
-  imageThoughtSignature?: string; // new
-  imageMimeType?: string;         // optional helper
-  sources?: SourceAttribution[];  // Vector KB sources for RAG responses
+  imageThoughtSignature?: string;
+  imageMimeType?: string;
+  sources?: SourceAttribution[];
+  ragDebug?: RAGDebugInfo | null;
 }
 
 export enum MessageThumbRating {

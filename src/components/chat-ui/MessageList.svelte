@@ -19,6 +19,7 @@
   import ImageCard from "./ImageCard.svelte";
   import FileAttachmentList from "./FileAttachmentList.svelte";
   import SourceAttribution from "$components/prompt-library/SourceAttribution.svelte";
+  import RAGDebugPanel from "$components/prompt-library/RAGDebugPanel.svelte";
   import { tenant, user } from "$stores";
   import { useTranslations } from "$i18n/utils";
   import { markdownToHtml, textToHtml } from "$utils/textFormatting";
@@ -486,7 +487,7 @@
           <div class="flex flex-col">
             <div class="mt-2 overflow-y-scroll h-full min-h-screen">
               <div class="card gap-4 chat-container" transition:fade>
-                {#each messages as { role, content, imageUrl, fileUrls, thumbRating, sources }, index}
+                {#each messages as { role, content, imageUrl, fileUrls, thumbRating, sources, ragDebug }, index}
                   <div
                     class={`chat-bubble text-base-content ${role === MessageRole.User ? `bg-base-200` : `bg-base-100`}`}
                   >
@@ -556,7 +557,10 @@
                     <!-- Source Attribution for RAG responses -->
                     {#if role === MessageRole.Assistant && sources && sources.length > 0}
                       <div class="ml-14 mr-4">
-                        <SourceAttribution {sources} collapsed={true} />
+                        <SourceAttribution {sources} collapsed={true} showDebug={!!ragDebug && $tenant?.vector_kb_debug_enabled} />
+                        {#if ragDebug && $tenant?.vector_kb_debug_enabled}
+                          <RAGDebugPanel debug={ragDebug} collapsed={true} />
+                        {/if}
                       </div>
                     {/if}
                     <!-- // TODO: Enable rating feature later after revise UI design -->

@@ -8,10 +8,6 @@ export enum SubscriptionPackageId {
 }
 
 export enum SubscriptionExtraPackage {
-  Test = "Test",
-  TeamsReseller = "TeamsReseller",
-  ProReseller = "ProReseller",
-  Internal = "Internal",
   Enterprise = "Enterprise",
 }
 
@@ -22,12 +18,22 @@ export const SubscriptionPackageLabels: Record<
   [SubscriptionPackageId.Starter]: "aibox Starter",
   [SubscriptionPackageId.Teams]: "aibox Teams",
   [SubscriptionPackageId.Pro]: "aibox Pro",
-  [SubscriptionExtraPackage.Test]: "Test",
-  [SubscriptionExtraPackage.TeamsReseller]: "aibox Teams (Reseller)",
-  [SubscriptionExtraPackage.ProReseller]: "aibox Pro (Reseller)",
-  [SubscriptionExtraPackage.Internal]: "Internal",
   [SubscriptionExtraPackage.Enterprise]: "aibox Enterprise",
 };
+
+export enum SubscriptionIncludedUsers {
+  Starter = 1,
+  Teams = 10,
+  Pro = 25,
+  Enterprise = 0,
+}
+
+export enum SubscriptionIncludedKbMB {
+  Starter = 10,
+  Teams = 100,
+  Pro = 200,
+  Enterprise = 0,
+}
 
 export enum SubscriptionStatus {
   Active = "active",
@@ -48,11 +54,18 @@ export enum AudioOptionId {
 
   /** [Subtitle Studio Plus] => Included Subtitle editor */
   AudioPremium = "AudioPremium",
+
+  /** NEW "Audio To Text" option */
+  AudioToText = "AudioToText",
 }
+
+export type AudioPlanCompositeKey =
+  `${Extract<keyof typeof AudioOptionId, "AudioToText">}_${keyof typeof SubscriptionPackageId}`;
 
 export type ProductKeys =
   | keyof typeof SubscriptionPackageId
-  | keyof typeof AudioOptionId;
+  | keyof typeof AudioOptionId
+  | AudioPlanCompositeKey;
 
 // Applied changes from this ticket: https://ainow.atlassian.net/browse/AINOW-1430
 export const AudioOptionLabels: Record<AudioOptionId, string> = {
@@ -60,16 +73,19 @@ export const AudioOptionLabels: Record<AudioOptionId, string> = {
   [AudioOptionId.AudioBasisAddOnLarge]: "Audio to Text Large", // [Audio to Text Large]
   [AudioOptionId.AudioBasisAddOnSubtitle]: "Subtitle Studio Basic", // [Subtitle Studio Basic]
   [AudioOptionId.AudioPremium]: "Subtitle Studio Plus", // [Subtitle Studio Plus]
+  [AudioOptionId.AudioToText]: "Audio to Text", // [Audio to Text]
 };
 
 export enum BillingMethod {
   CreditCard = "credit_card",
   MonthlyInvoice = "monthly_invoice",
+  YearlyInvoice = "yearly_invoice",
 }
 
 export const BillingMethodLabels: Record<BillingMethod, string> = {
   [BillingMethod.CreditCard]: t("subscription.billing-method-stripe"),
   [BillingMethod.MonthlyInvoice]: t("subscription.monthly-invoice-email"),
+  [BillingMethod.YearlyInvoice]: t("subscription.yearly-invoice-email"),
 };
 
 export const SubscriptionStep = {
@@ -115,5 +131,7 @@ export const CountryMap: Record<CountryCode, any> = {
 };
 
 export const Countries = [
-  CountryMap[CountryCode.CH], CountryMap[CountryCode.DE], CountryMap[CountryCode.AT],
-]
+  CountryMap[CountryCode.CH],
+  CountryMap[CountryCode.DE],
+  CountryMap[CountryCode.AT],
+];

@@ -1,9 +1,9 @@
-import { decrypt } from "$utils/secure";
 import type { APIContext, APIRoute } from "astro";
 import { OpenAI } from "openai";
 import { ApiKeyProvider } from "$types/TenantFeature";
 import { UsageType } from "$types/UsageTracking";
 import UsageLogModel, { type UsageLog } from "$data/models/usageLog.model";
+import { getGlobalApiKeys, resolveApiKey } from "$utils/resolveApiKey";
 
 const recordImageUsage = async (ctx: APIContext) => {
   try {
@@ -24,10 +24,15 @@ export const POST: APIRoute = async (ctx: APIContext) => {
   const { request } = ctx;
 
   try {
-    const apiKey = decrypt(ctx.locals.tenant?.openai_api_key || "");
-    const openai = new OpenAI({
-      apiKey: apiKey,
-    });
+    const globalKeys = await getGlobalApiKeys();
+    const apiKey = resolveApiKey("openai_api_key", ctx.locals.tenant, globalKeys);
+    if (!apiKey) {
+      return new Response(JSON.stringify({ error: "OpenAI API key not configured" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+    const openai = new OpenAI({ apiKey });
 
     const formData = await request.formData();
     const prompt = formData.get("prompt") as string;

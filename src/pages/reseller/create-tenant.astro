@@ -1,0 +1,79 @@
+---
+import Layout from "$layouts/Layout.astro";
+import { ObjectId } from "mongodb";
+import GlobalTagModel from "$data/models/globalTag.model";
+import GlobalCategoryModel from "$data/models/globalCategory.model";
+import { type TagItem, type CategoryItem } from "$types/Subscription";
+import auth from "$auth/auth";
+import CreateTenantAccount from "$components/tenant/CreateTenantAccount.svelte";
+import TenantCreationSuccess from "$components/tenant/TenantCreationSuccess.svelte";
+import { isProd } from "$utils/env";
+import { useTranslations } from "$i18n/utils";
+import { TENANT_SOMEDIA_ID } from "$constants";
+
+const t = useTranslations();
+
+const allTags = await GlobalTagModel.list();
+const allCategories = await GlobalCategoryModel.list();
+const somediaTenantId = isProd()
+  ? TENANT_SOMEDIA_ID.PROD
+  : TENANT_SOMEDIA_ID.DEV;
+
+const isReseller = Astro.locals.tenant?.is_reseller ?? false;
+const resellerCode = Astro.locals.tenant?.reseller_code ?? null;
+const isSomedia =
+  isReseller && somediaTenantId == Astro.locals.tenant?._id.toString();
+const hasAccess =
+  auth.isReseller(Astro.locals) ||
+  auth.isSuperAdmin(Astro.locals) ||
+  auth.isAdmin(Astro.locals);
+
+const tags: TagItem[] = allTags
+  .filter((tag) => {
+    return tag?.categories && tag.categories?.includes(resellerCode || "");
+  })
+  .map((tag) => {
+    return {
+      title: tag.title,
+      value: tag._id.toString(),
+      description: tag.description,
+      icon: tag.icon,
+      iconColor: tag.iconColor,
+    };
+  });
+
+const categories: CategoryItem[] = allCategories.map((category) => {
+  return {
+    title: category.title,
+    value: category._id.toString(),
+    tags: category.tags?.map((t: ObjectId) => t.toString()) ?? [],
+  };
+});
+
+// Check if user is reseller
+if (!isReseller || !hasAccess) {
+  return Astro.rewrite("/restricted");
+}
+
+const tenantId = Astro.url.searchParams.get("tenantId");
+const status = Astro.url.searchParams.get("status");
+const isCreationSuccess = status === "success" && tenantId;
+---
+
+<Layout>
+  {
+    isCreationSuccess ? (
+      <TenantCreationSuccess {tenantId} client:load />
+    ) : (
+      <CreateTenantAccount
+        pageTitle={t("reseller.create-account-title")}
+        {tags}
+        {categories}
+        isReseller={true}
+        {isSomedia}
+        {resellerCode}
+        client:load
+      />
+    )
+  }
+</Layout>

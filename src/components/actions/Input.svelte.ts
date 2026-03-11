@@ -26,6 +26,19 @@ export function toLowerCase(node: HTMLInputElement) {
   }
 }
 
+/** UpperCase value */
+export function toUpperCase(node: HTMLInputElement) {
+  const updateVal = () => {
+    node.value = node.value?.toUpperCase();
+  };
+
+  try {
+    node.addEventListener("input", updateVal);
+  } catch (error) {
+    console.log("Action toLowerCase error", error);
+  }
+}
+
 /** Replace special characters */
 export function replaceSpecialChars(node: HTMLInputElement) {
   const updateVal = () => {

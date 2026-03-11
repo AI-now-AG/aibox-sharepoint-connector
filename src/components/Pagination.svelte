@@ -15,9 +15,36 @@
 
   function goTo(p: number) {
     if (p < 1 || p > totalPages) return;
+    page = p;
+    onPageChange?.(p);
+  }
 
-    page = p; // update bound state
-    onPageChange?.(p); // 🔥 emit event
+  function getVisiblePages() {
+    const delta = 2; // pages around current page
+    const range: (number | string)[] = [];
+
+    const start = Math.max(2, page - delta);
+    const end = Math.min(totalPages - 1, page + delta);
+
+    range.push(1);
+
+    if (start > 2) {
+      range.push("...");
+    }
+
+    for (let i = start; i <= end; i++) {
+      range.push(i);
+    }
+
+    if (end < totalPages - 1) {
+      range.push("...");
+    }
+
+    if (totalPages > 1) {
+      range.push(totalPages);
+    }
+
+    return range;
   }
 </script>
 
@@ -33,14 +60,19 @@
         «
       </button>
 
-      <!-- Page numbers -->
-      {#each Array(totalPages) as _, i}
-        <button
-          class="join-item btn btn-sm {page === i + 1 ? 'btn-primary' : ''}"
-          onclick={() => goTo(i + 1)}
-        >
-          {i + 1}
-        </button>
+      {#each getVisiblePages() as p}
+        {#if p === "..."}
+          <button class="join-item btn btn-sm btn-disabled">...</button>
+        {:else}
+          <button
+            class="join-item btn btn-sm {page === p
+              ? 'btn-primary pointer-events-none'
+              : ''}"
+            onclick={() => goTo(p as number)}
+          >
+            {p}
+          </button>
+        {/if}
       {/each}
 
       <!-- Next -->

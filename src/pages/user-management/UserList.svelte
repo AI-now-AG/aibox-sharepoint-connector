@@ -9,7 +9,7 @@
   import { addToast } from "$stores/toast";
   import Loading from "$components/Loading.svelte";
   import { user as currentUser } from "$stores";
-  import { formatDateToDDMMYY } from "$utils/common";
+  import { formatDate } from "$utils/common";
   import { getRoleString } from "$utils/roles";
   import DropdownSection from "$components/DropdownSection.svelte";
   import { type Option } from "$components/DropdownOptions.svelte";
@@ -266,7 +266,7 @@
             {user.logins_count ?? "-"}
           </td>
           <td class="py-3 px-4 text-sm font-medium">
-            {user.last_login ? formatDateToDDMMYY(user.last_login) : "-"}
+            {user.last_login ? formatDate(user.last_login) : "-"}
           </td>
           <td
             class="py-3 px-4 text-sm font-medium"

@@ -1,11 +1,26 @@
 ---
+import { POSTHOG_API_HOST } from "$types/Posthog";
 const userId = Astro.locals?.user?.id?.toString() || "anonymous";
 const userEmail = Astro.locals?.user?.email || "";
+
+// Use environment-based key
+const serialized = JSON.stringify({
+  key: import.meta.env.PUBLIC_POSTHOG_KEY,
+  apiHost: POSTHOG_API_HOST,
+  userId,
+  userEmail,
+});
 ---
 
-<div id="posthog-user" data-user-id={userId} data-user-email={userEmail}></div>
+<script
+  is:inline
+  type="text/javascript"
+  define:vars={{ serialized }}
+  id="posthog-js"
+>
+  const POSTHOG_CONFIG = JSON.parse(serialized);
+  //console.log("Initializing PostHog with config:", POSTHOG_CONFIG);
 
-<script is:inline type="text/javascript" id="posthog-js">
   // eslint-disable-next-line @typescript-eslint/no-unused-expressions
   !(function (t, e) {
     // eslint-disable-next-line no-var
@@ -57,14 +72,13 @@ const userEmail = Astro.locals?.user?.email || "";
       (e.__SV = 1));
   })(document, window.posthog || []);
 
-  posthog.init("phc_bJ5bQTIBkxqCtA2BQYlIm1aiVtQ6ybcy7RLTWjH5chd", {
-    api_host: "https://eu.i.posthog.com",
+  posthog.init(POSTHOG_CONFIG.key, {
+    api_host: POSTHOG_CONFIG.apiHost,
     defaults: "2025-05-24",
     loaded: function (posthog) {
-      const el = document.getElementById("posthog-user");
-      const userId = el.dataset.userId;
-      const userEmail = el.dataset.userEmail;
-      posthog.identify(userId, { email: userEmail });
+      posthog.identify(POSTHOG_CONFIG.userId, {
+        email: POSTHOG_CONFIG.userEmail,
+      });
     },
     opt_in_site_apps: true,
     // disable_session_recording: true // Off HERE

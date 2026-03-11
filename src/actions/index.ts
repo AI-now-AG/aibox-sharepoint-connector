@@ -9,10 +9,12 @@ import { conversation } from "./conversation";
 import { onboarding } from "./onboarding";
 import { report } from "./report";
 import { configurations } from "./configuration";
-import { cloneMasterTenant } from "./cloneMasterTenant";
+import { tenantCreation } from "./tenantCreation";
 import { globalCategory } from "./globalCategory";
 import { globalPrompt } from "./globalPrompt";
 import { posthog } from "./posthog";
+import { ragConfiguration } from "./ragConfiguration";
+import { globalApiKeys } from "./globalApiKeys";
 
 export const server = {
   tenant,
@@ -26,8 +28,10 @@ export const server = {
   onboarding,
   report,
   configurations,
-  cloneMasterTenant,
+  tenantCreation,
   globalCategory,
   globalPrompt,
   posthog,
+  ragConfiguration,
+  globalApiKeys,
 };

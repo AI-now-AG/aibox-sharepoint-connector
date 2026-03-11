@@ -1,0 +1,42 @@
+---
+import Layout from "$layouts/Layout.astro";
+import RagConfigForm from "./RagConfigForm.svelte";
+import { useTranslations } from "$i18n/utils";
+import { actions } from "astro:actions";
+
+const t = useTranslations();
+
+const { data: ragConfig } = await Astro.callAction(
+  actions.ragConfiguration.get,
+  {},
+);
+---
+
+<Layout>
+  <div class="container max-w-5xl mx-auto p-6 space-y-4">
+    <h1 class="text-4xl font-bold">{t("rag-config.title")}</h1>
+    <p class="text-base-content/60">{t("rag-config.description")}</p>
+    <RagConfigForm
+      configId={ragConfig?._id?.toString() ?? ""}
+      config={ragConfig
+        ? {
+            top_k: ragConfig.top_k,
+            similarity_threshold: ragConfig.similarity_threshold,
+            rerank_enabled: ragConfig.rerank_enabled,
+            rerank_top_n: ragConfig.rerank_top_n,
+            rerank_candidates: ragConfig.rerank_candidates,
+            hybrid_enabled: ragConfig.hybrid_enabled,
+            hybrid_alpha: ragConfig.hybrid_alpha,
+            multi_query_enabled: ragConfig.multi_query_enabled,
+            multi_query_count: ragConfig.multi_query_count,
+            answerability_enabled: ragConfig.answerability_enabled,
+            answerability_threshold: ragConfig.answerability_threshold,
+            compression_enabled: ragConfig.compression_enabled,
+            multihop_enabled: ragConfig.multihop_enabled,
+            max_hops: ragConfig.max_hops,
+          }
+        : null}
+      client:load
+    />
+  </div>
+</Layout>

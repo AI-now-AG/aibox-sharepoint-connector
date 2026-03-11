@@ -25,6 +25,7 @@ import settings from "$assets/icons/settings.svg?raw";
 import admin from "$assets/icons/admin.svg?raw";
 import audio from "$assets/icons/audio.svg?raw";
 import aitool from "$assets/icons/aitool.svg?raw";
+import storefront from "$assets/icons/storefront.svg?raw";
 import editPrompt from "$assets/icons/edit-prompt.svg?raw";
 import closeMenu from "$assets/icons/closeMenu.svg?raw";
 import Lock from "$assets/icons/lock.svg?raw";
@@ -82,9 +83,13 @@ import email from "$assets/icons/email.svg?raw";
 import share from "$assets/icons/share.svg?raw";
 import thumbUp from "$assets/icons/thumb-up.svg?raw";
 import thumbDown from "$assets/icons/thumb-down.svg?raw";
+import home from "$assets/icons/home.svg?raw";
+import tune from "$assets/icons/tune.svg?raw";
 import alertSuccess from "$assets/icons/alert-success.svg?raw";
 import alertWarning from "$assets/icons/alert-warning.svg?raw";
 import alertError from "$assets/icons/alert-error.svg?raw";
+import inputEmailIcon from "$assets/icons/input-email-icon.svg?raw";
+import inputDollarIcon from "$assets/icons/input-dollar-icon.svg?raw";
 
 export const svgIcons = {
   menuSettings,
@@ -114,6 +119,7 @@ export const svgIcons = {
   admin,
   audio,
   aitool,
+  storefront,
   editPrompt,
   closeMenu,
   Lock,
@@ -171,7 +177,11 @@ export const svgIcons = {
   share,
   thumbUp,
   thumbDown,
+  home,
+  tune,
   alertSuccess,
   alertWarning,
   alertError,
+  inputEmailIcon,
+  inputDollarIcon,
 };

@@ -7,7 +7,11 @@ import {
 import sendMail from "$utils/mail";
 import { getEnvVar } from "$utils/env";
 
-export const sendPasswordResetEmail = async (userId: string, email: string) => {
+export const sendPasswordResetEmail = async (
+  userId: string,
+  email: string,
+  templateId?: string | null,
+) => {
   try {
     const redirectUrl = isProd()
       ? "https://aibox-app.com/"
@@ -28,7 +32,7 @@ export const sendPasswordResetEmail = async (userId: string, email: string) => {
         email: "no-reply@ainow.ch",
       },
       to: email,
-      templateId: SG_PASSWORD_RESET_TEMPLATE,
+      templateId: templateId || SG_PASSWORD_RESET_TEMPLATE,
       dynamicTemplateData: {
         url: ticket,
       },

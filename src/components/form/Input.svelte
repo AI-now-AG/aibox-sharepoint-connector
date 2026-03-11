@@ -13,13 +13,13 @@
     icon?: string | null;
     type?: HTMLInputAttributes["type"];
     required?: boolean;
-    inputChange?: any;
+    inputChange?: Function;
   }
 
   let {
     id = "",
     label = "",
-    value = "",
+    value = $bindable(""),
     placeholder = "",
     classes = "",
     containerClasses = "",
@@ -32,14 +32,19 @@
   }: Props = $props();
 
   function handleChange(event: Event) {
-    inputChange({ value: (event.target as HTMLInputElement)?.value });
+    const newValue = (event.target as HTMLInputElement)?.value;
+    value = newValue;
+    inputChange?.({ value: newValue });
   }
 </script>
 
 <div class="form-control">
-  <label for={id} class="label pl-0 pb-3">
-    <span class={"label-text text-base-content " + labelClasses}>{label}</span>
-  </label>
+  {#if label}
+    <label for={id} class="label pl-0 pb-2">
+      <span class={"label-text text-base-content " + labelClasses}>{label}</span
+      >
+    </label>
+  {/if}
   <div
     class={"input flex justify-between items-center gap-2 w-full " +
       containerClasses}

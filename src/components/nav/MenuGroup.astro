@@ -1,0 +1,93 @@
+---
+import MenuItem from "./MenuItem.astro";
+
+interface MenuItemType {
+  title: string;
+  path?: string;
+  icon?: string;
+  isOpened?: boolean;
+  items?: MenuItemType[];
+}
+
+interface Props {
+  menus: MenuItemType[];
+  menuId: string;
+  isCollapsed?: boolean;
+  showDivider?: boolean;
+  elementId?: string;
+}
+
+const {
+  menus,
+  menuId,
+  isCollapsed = false,
+  showDivider = false,
+  elementId = null,
+} = Astro.props;
+---
+
+{
+  menus.length > 0 && (
+    <div
+      class={`${
+        showDivider
+          ? "divider mx-6 pointer-events-none"
+          : "mx-6 my-2 pointer-events-none"
+      } ${isCollapsed ? "hidden" : ""}`}
+    />
+  )
+}
+
+{
+  menus.map((mod, index) => (
+    <li class="active:bg-transparent">
+      <details
+        data-id={`${menuId}`}
+        open={mod.isOpened}
+        class="active:bg-transparent"
+        id={index == 0 ? elementId : undefined}
+      >
+        <summary
+          class={isCollapsed ? "tooltip tooltip-right flex justify-center" : ""}
+          data-tip={isCollapsed ? mod.title : ""}
+        >
+          <div slot="icon" class="[&>svg]:h-5 [&>svg]:w-5">
+            {mod.icon && <Fragment set:html={mod.icon} />}
+          </div>
+
+          <span class={isCollapsed ? "hidden" : ""}>{mod.title}</span>
+        </summary>
+
+        {mod.items && (
+          <ul class={`active:bg-transparent ${isCollapsed ? "hidden" : ""}`}>
+            {mod.items.map((sub, subIndex) => (
+              <li class="pl-1 active:bg-transparent">
+                {sub.items ? (
+                  <details
+                    data-id={`${menuId}-id-${subIndex}`}
+                    open={sub.isOpened}
+                    class="active:bg-transparent"
+                  >
+                    <summary>{sub.title}</summary>
+
+                    <ul>
+                      {sub.items.map((child) => (
+                        <li class="pl-1 active:bg-transparent">
+                          <MenuItem {...child} />
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                ) : (
+                  <MenuItem {...sub} />
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <slot />
+      </details>
+    </li>
+  ))
+}

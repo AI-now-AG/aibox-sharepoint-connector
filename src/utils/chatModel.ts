@@ -3,9 +3,9 @@ import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { ChatOpenAI, AzureChatOpenAI } from "@langchain/openai";
 import type { APIContext } from "astro";
 import type { ActionAPIContext } from "astro:actions";
-import { decrypt } from "./secure";
 import { TenantFeature, ApiKeyProvider } from "$types/TenantFeature";
 import log from "./log";
+import { getGlobalApiKeys, resolveApiKey, resolveConfig } from "./resolveApiKey";
 import { UsageTrackerCallbackHandler } from "$callbackLLM/UsageTrackerCallbackHandler";
 import { UsageType } from "$types/UsageTracking";
 
@@ -113,13 +113,14 @@ const createGeminiModel = (apiKey: string, model: string, tenantId: string) => {
   });
 };
 
-export const createChatModel = (
+export const createChatModel = async (
   ctx: APIContext | ActionAPIContext,
   overrides?: ChatConfigOverrides,
 ) => {
   const { tenant } = ctx.locals;
   const { included_features: features } = ctx.locals.tenant;
   const { customModel, customProvider } = overrides || {};
+  const globalKeys = await getGlobalApiKeys();
 
   // Find the text prompts feature in enabled features
   const textPromptsProvider = features?.find(
@@ -142,7 +143,7 @@ export const createChatModel = (
 
   // Perplexity AI
   if (provider == ApiKeyProvider.Perplexity) {
-    const perplexityApiKey = decrypt(tenant?.perplexity_api_key || "");
+    const perplexityApiKey = resolveApiKey("perplexity_api_key", tenant, globalKeys);
     const perplexityModel: string = tenant?.perplexity_chat_model || "sonar";
     return createPerplexityModel(
       perplexityApiKey,
@@ -153,9 +154,9 @@ export const createChatModel = (
 
   // Azure OpenAI
   if (provider == ApiKeyProvider.AzureOpenAI) {
-    const azureOpenAIApiKey = decrypt(tenant?.azure_openai_api_key || "");
-    const azureOpenAIApiInstanceName = tenant?.azure_openai_instance_name || "";
-    const azureOpenAIApiDeploymentName = tenant?.azure_openai_chat_model || "";
+    const azureOpenAIApiKey = resolveApiKey("azure_openai_api_key", tenant, globalKeys);
+    const azureOpenAIApiInstanceName = resolveConfig("azure_openai_instance_name", tenant, globalKeys);
+    const azureOpenAIApiDeploymentName = resolveConfig("azure_openai_chat_model", tenant, globalKeys);
     const azureOpenAIApiVersion =
       import.meta.env.AZURE_OPENAI_API_VERSION || "2024-08-01-preview";
 
@@ -170,7 +171,7 @@ export const createChatModel = (
 
   // Claude (Anthropic)
   if (provider == ApiKeyProvider.Claude) {
-    const anthropicApiKey = decrypt(tenant?.anthropic_api_key || "");
+    const anthropicApiKey = resolveApiKey("anthropic_api_key", tenant, globalKeys);
     const anthropicModel: string =
       tenant?.anthropic_chat_model || "claude-sonnet-4-20250514";
     return createClaudeModel(
@@ -182,7 +183,7 @@ export const createChatModel = (
 
   // Gemini (Google GenAI)
   if (provider == ApiKeyProvider.Gemini) {
-    const geminiApiKey = decrypt(tenant?.gemini_api_key || "");
+    const geminiApiKey = resolveApiKey("gemini_api_key", tenant, globalKeys);
     const geminiModel: string = tenant?.gemini_chat_model || "gemini-2.5-flash";
     return createGeminiModel(
       geminiApiKey,
@@ -192,7 +193,7 @@ export const createChatModel = (
   }
 
   // OpenAI
-  const apiKey = decrypt(tenant?.openai_api_key || "");
+  const apiKey = resolveApiKey("openai_api_key", tenant, globalKeys);
   return createOpenAIModel(
     apiKey,
     import.meta.env.OPENAI_MODEL || "gpt-4o",

@@ -8,7 +8,7 @@ import CategoryModel, {
   type Category,
   type Group,
 } from "$data/models/category.model";
-import PromptModel, { type Prompt } from "$data/models/prompt.model";
+import PromptModel from "$data/models/prompt.model";
 import GlobalCategoryModel from "$data/models/globalCategory.model";
 import GlobalPromptModel from "$data/models/globalPrompt.model";
 import SubscriptionModel, {
@@ -21,9 +21,12 @@ import {
   SubscriptionPackageId,
   AudioOptionId,
   AudioOptionLabels,
+  SubscriptionIncludedUsers,
+  SubscriptionIncludedKbMB,
   BillingMethod,
   type ProductKeys,
   CountryCode,
+  BillingMethodLabels,
 } from "$types/Subscription";
 import { UserRole, TourType } from "$types/Users";
 import { TenantFeature } from "$types/TenantFeature";
@@ -46,8 +49,7 @@ import {
   getStripeTaxRate,
 } from "$utils/onboarding";
 import {
-  TENANT_MASTER_DEV,
-  TENANT_MASTER_PROD,
+  TENANT_MASTER_ID,
   SG_NEW_TENANT_TEMPLATE,
   AUTH0_ROLE_ADMIN_PROD,
   AUTH0_ROLE_ADMIN_DEV,
@@ -58,7 +60,7 @@ import {
 } from "$constants";
 import type Stripe from "stripe";
 
-const masterTenantId = isProd() ? TENANT_MASTER_PROD : TENANT_MASTER_DEV;
+const masterTenantId = isProd() ? TENANT_MASTER_ID.PROD : TENANT_MASTER_ID.DEV;
 const auth0GoogleCon = isProd()
   ? AUTH0_AUTH_GOOGLE_CON_PROD
   : AUTH0_AUTH_GOOGLE_CON_DEV;
@@ -103,8 +105,9 @@ const TenantInputParamsSchema = z.object({
   stripe_customer_id: z.string().optional(),
   totalPrice: z.string().optional(),
 });
-const TenantEmailInputParamsSchema = z.object({
+const FinalizeTenantSchema = z.object({
   tenant_id: z.string().min(1),
+  template: z.string().optional(),
 });
 
 // step 1: createOrganization()  - Create Auth0 organization
@@ -131,7 +134,7 @@ export const onboarding = {
           planName as ProductKeys,
           ...(addOns as ProductKeys[]),
         ];
-        const priceIds = getStripePrices(selectedPackages);
+        const priceIds = getStripePrices(selectedPackages, planName);
 
         // Get the `Host` header (domain)
         const host = request.headers.get("host");
@@ -297,6 +300,12 @@ export const onboarding = {
       }
       // Subtitle Studio is active if AudioPremium is selected (includes subtitle features)
       const subtitleStudioActive = hasSubtitleEditor(input.add_ons ?? []);
+      const includedUserLimit =
+        SubscriptionIncludedUsers[input.plan_name as SubscriptionPackageId] ||
+        10;
+      const includedKbMB =
+        SubscriptionIncludedKbMB[input.plan_name as SubscriptionPackageId] ||
+        10;
       const newTenant = await TenantModel.copyTenant(masterTenantId, {
         name: input.name,
         org_id: input.org_id,
@@ -310,6 +319,10 @@ export const onboarding = {
         audio_assistant_active: true,
         subtitle_studio_active: subtitleStudioActive,
         totalPrice: "",
+        is_internal: false,
+        included_user_limit: includedUserLimit, // default included users
+        vector_kb_enabled: true,
+        vector_kb_max_storage_mb: includedKbMB,
       });
 
       // Update the current tenant for the logged-in user
@@ -375,8 +388,10 @@ export const onboarding = {
         documents: [],
         created_at: new Date(),
         updated_at: new Date(),
-        // Vector KB fields (preserve from source or use defaults)
+        // Vector KB fields (no data cloned, start empty)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         vector_kb_enabled: (prompt as any).vector_kb_enabled ?? false,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         vector_kb_scope: (prompt as any).vector_kb_scope ?? null,
         vector_kb_folder_ids: [],
         vector_kb_data_source_ids: [],
@@ -413,6 +428,8 @@ export const onboarding = {
         tenant_id: newTenant.insertedId,
         plan_name: input.plan_name,
         add_ons: input.add_ons,
+        is_trial: true,
+        trial_start_date: new Date(),
       };
       await SubscriptionModel.create(subscription);
 
@@ -424,9 +441,9 @@ export const onboarding = {
     },
   }),
   finalize: defineAction({
-    input: TenantEmailInputParamsSchema,
+    input: FinalizeTenantSchema,
     handler: async (input, context) => {
-      const { tenant_id: tenantId } = input;
+      const { tenant_id: tenantId, template } = input;
       const email = context.locals.user.email;
       const tenant = await TenantModel.get(tenantId);
       const subscription = await SubscriptionModel.findByTenant(tenantId);
@@ -442,24 +459,32 @@ export const onboarding = {
         .join(", ");
 
       // send notification email to aibox-support
-      const subjectPrefix = isProd() ? "aibox" : "aibox-dev";
-      const emailSubject = `${subjectPrefix} - New onboarding`;
+      const subjectPrefix = isProd() ? "[aibox]" : "[aibox-dev]";
+      const emailSubject = `${subjectPrefix} Tenant Created - ${tenant.name}`;
       const emailContent = `
         <div style="font-family: Arial, sans-serif; padding: 20px;">
-          <h1><b>New Onboarding Notification</b></h1>
-          <p><b>Organization ID:</b> ${tenant.org_id}</p>
-          <p><b>Organization Name:</b> ${tenant.name}</p>
-          <br/><br/>
-          <h4>Subscription</h4>
-          <p><b>${subscription?.plan_name ?? "-"}</b></p>
-          <p>${addOnsStr}</p>
-          <br/><br/>
-          <h4>Billing</h4>
-          <p><b>Company name:</b> ${tenant.billing_info?.company_name ?? "-"}</p>
-          <p><b>Address:</b> ${tenant.billing_info?.address ?? "-"}</p>
-          <p><b>Zip code:</b> ${tenant.billing_info?.zip_code ?? "-"}</p>
-          <p><b>Location:</b> ${tenant.billing_info?.location ?? "-"}</p>
-          <p><b>Email:</b> ${tenant.billing_info?.email ?? "-"}</p>
+          <h3><strong>Tenant successfully created</strong></h3>
+          <p>
+            <strong>Organization Name:</strong> ${tenant.name}<br/> 
+            <strong>Subscription:</strong> ${subscription?.plan_name ?? "-"}<br/> 
+            ${addOnsStr ? `${addOnsStr}<br/>` : ""}
+            <strong>Template:</strong> ${template}<br/>
+            <strong>Billing:</strong> ${BillingMethodLabels[tenant.billing_method as BillingMethod] ?? "-"}
+          </p>
+
+          <p>
+            <strong>Company details:</strong> <br/>
+            ${tenant.billing_info?.company_name ?? "-"} <br/>
+            ${tenant.billing_info?.address ?? "-"} <br/>
+            ${tenant.billing_info?.zip_code ?? "-"} ${tenant.billing_info?.zip_code ?? "-"} ${tenant.billing_info?.location ?? "-"}
+          </p>
+
+          <p>
+            <strong>Contact:</strong> ${tenant.billing_info?.email ?? "-"}<br/>
+            <strong>Created:</strong> ${new Date().toLocaleDateString()}<br/>
+            <strong>Account created by:</strong> ${email}<br/>
+            <strong>Flow:</strong>Self Onboarding
+          </p>
         </div>
       `;
       await sendMail({
@@ -468,6 +493,7 @@ export const onboarding = {
           email: "no-reply@ainow.ch",
         },
         to: "support@aibox-app.ch",
+        //bcc: "devlin.nguyenb4you.ch@gmail.com",
         subject: emailSubject,
         html: emailContent,
       });

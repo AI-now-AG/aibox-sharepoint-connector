@@ -1,9 +1,14 @@
 import { EmbeddingProvider, VectorKBScope } from "./AIProvider";
 
-// Re-export for convenience
 export { EmbeddingProvider, VectorKBScope };
 
-// Data source processing status
+export enum ChunkingStrategy {
+  Fixed = "fixed",
+  Semantic = "semantic",
+  Heading = "heading",
+  Paragraph = "paragraph",
+}
+
 export enum DataSourceStatus {
   Pending = "pending",
   Processing = "processing",
@@ -11,14 +16,12 @@ export enum DataSourceStatus {
   Failed = "failed",
 }
 
-// Supported file types for Vector KB
 export enum VectorFileType {
   PDF = "pdf",
   TXT = "txt",
   DOCX = "docx",
 }
 
-// Vector folder structure
 export interface VectorFolder {
   _id: string;
   tenant_id: string;
@@ -34,13 +37,11 @@ export interface VectorFolder {
   created_at: string;
 }
 
-// Vector folder with counts (for list views)
 export interface VectorFolderWithCounts extends VectorFolder {
   data_source_count: number;
   child_count?: number;
 }
 
-// Folder tree node for hierarchical view
 export interface FolderTreeNode extends VectorFolder {
   children: FolderTreeNode[];
   data_source_count: number;
@@ -78,6 +79,9 @@ export interface VectorChunk {
   metadata: {
     page_number: number | null;
     section_title: string | null;
+    document_title: string | null;
+    document_language: string | null;
+    source: string | null;
     file_name?: string;
   };
   created_at: string;
@@ -186,4 +190,20 @@ export const DEFAULT_VECTOR_KB_CONFIG = {
   maxStorageMB: 500,
   topK: 5,
   similarityThreshold: 0.7,
+};
+
+export const DEFAULT_RAG_ENHANCEMENT_CONFIG = {
+  rerankEnabled: false,
+  rerankTopN: 5,
+  rerankCandidates: 30,
+  hybridEnabled: false,
+  hybridAlpha: 0.5,
+  answerabilityEnabled: false,
+  answerabilityThreshold: 0.6,
+  compressionEnabled: false,
+  multiHopEnabled: false,
+  maxHops: 3,
+  chunkingStrategy: ChunkingStrategy.Fixed,
+  multiQueryEnabled: false,
+  multiQueryCount: 3,
 };

@@ -50,7 +50,6 @@ export const UserFilterParamsSchema = z.object({
   isBlocked: z.boolean().optional(),
   isVerified: z.boolean().optional(),
   isUnVerified: z.boolean().optional(),
-  isExcludeSA: z.boolean().optional().default(true),
 });
 export type UserFilterParams = z.infer<typeof UserFilterParamsSchema>;
 export type User = z.infer<typeof UserSchema>;
@@ -122,14 +121,12 @@ export default {
       // Add roles filter
       const filterRoles: Record<string, unknown> = {};
 
+      // Exclude Super Admin
+      filterRoles.$nin = [new RegExp(`^${UserRole.SuperAdmin}$`, "i")];
+
       // If specific roles are provided, add them to $in
       if (roles && roles.length > 0) {
         filterRoles.$in = roles.map((role) => new RegExp(role, "i"));
-      }
-
-      // If "isExcludeSA" flag is true, exclude Super Admin
-      if (filterParams.isExcludeSA) {
-        filterRoles.$nin = [new RegExp(`^${UserRole.SuperAdmin}$`, "i")];
       }
 
       // Only assign filter.roles if there's something to filter by
@@ -274,14 +271,18 @@ export default {
     return await collection.deleteOne({ _id: new ObjectId(id) });
   },
 
-  listForExport: async ({
+  fetchPaginatedReports: async ({
     page = 1,
     pageSize = 20,
     search = "",
+    tenant = "",
+    includeUnassigned = false,
   }: {
     page?: number;
     pageSize?: number;
     search?: string;
+    tenant?: string;
+    includeUnassigned?: boolean;
   }) => {
     const skip = (page - 1) * pageSize;
 
@@ -302,13 +303,19 @@ export default {
       ];
     }
 
-    // Build pipeline dynamically
+    const buildTenantMatch = () => {
+      if (tenant) {
+        return { tenant_id: new ObjectId(tenant) };
+      }
+
+      return includeUnassigned
+        ? { tenant_id: { $ne: null }, tenant: null }
+        : { tenant: { $ne: null } };
+    };
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const pipeline: any[] = [
-      {
-        // 🔍 search happens HERE (before lookups)
-        $match: baseMatch,
-      },
+    const commonStages: any[] = [
+      { $match: baseMatch },
       {
         $lookup: {
           from: "tenants",
@@ -318,8 +325,19 @@ export default {
         },
       },
       {
-        $unwind: "$tenant",
+        $unwind: {
+          path: "$tenant",
+          preserveNullAndEmptyArrays: true,
+        },
       },
+      { $match: buildTenantMatch() },
+    ];
+
+    // ------------------ DATA PIPELINE ------------------
+    // Build pipeline dynamically
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const pipeline: any[] = [
+      ...commonStages,
       {
         $project: {
           _id: 1,
@@ -334,8 +352,8 @@ export default {
           created_at: 1,
           updated_at: 1,
           tenant: {
-            _id: 1,
-            name: 1,
+            _id: "$tenant._id",
+            name: "$tenant.name",
           },
         },
       },
@@ -348,31 +366,20 @@ export default {
       pipeline.push({ $limit: pageSize });
     }
 
-    const totalResult = await collection
-      .aggregate([
-        { $match: baseMatch },
-        {
-          $lookup: {
-            from: "tenants",
-            localField: "tenant_id",
-            foreignField: "_id",
-            as: "tenant",
-          },
-        },
-        { $unwind: "$tenant" },
-        { $count: "count" },
-      ])
-      .toArray();
+    // ------------------ TOTAL PIPELINE ------------------
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const totalPipeline = [...commonStages, { $count: "count" }];
 
-    const result = await collection.aggregate(pipeline).toArray();
-    const total = totalResult[0]?.count ?? 0;
+    const [result, totalResult] = await Promise.all([
+      collection.aggregate(pipeline).toArray(),
+      collection.aggregate(totalPipeline).toArray(),
+    ]);
 
     return {
       data: result,
-      total: total,
+      total: totalResult[0]?.count ?? 0,
       page,
       pageSize,
-      search,
     };
   },
 };

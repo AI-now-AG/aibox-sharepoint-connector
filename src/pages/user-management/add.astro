@@ -9,7 +9,7 @@ const t = useTranslations();
 
 const tenant = Astro.locals.tenant;
 
-const maxUserLimit = Astro.locals.tenant?.max_user_limit || 0;
+const maxUserLimit = (Astro.locals.tenant?.included_user_limit || 0) + (Astro.locals.tenant?.extra_user_limit || 0);
 const countUsers = await UserModel.countUsersByTenant(tenant._id);
 let limitReached = false;
 if (maxUserLimit && maxUserLimit > 0 && countUsers >= maxUserLimit) {

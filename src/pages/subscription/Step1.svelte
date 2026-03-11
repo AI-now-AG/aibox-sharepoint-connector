@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import type { TagItem, CategoryItem } from "$types/Subscription";
   import AlertDialog from "$components/AlertDialog.svelte";
   import Input from "$components/form/Input.svelte";
@@ -34,6 +35,14 @@
   let alertModal: HTMLDialogElement | undefined = $state();
   let alertMessage = $state("");
 
+  onMount(() => {
+    if (!init) {
+      posthogClientCaptureWithoutTenant(EventName.AiboxOnboardingStarted, {
+        page_name: ScreenName.OnboardingStep1,
+      });
+    }
+  });
+
   function showAlert(message: any) {
     alertMessage = message;
     alertModal?.showModal();
@@ -65,11 +74,14 @@
 
   function handleNext() {
     if (validateForm()) {
+      const selectedTemplate =
+        tags.find((tag) => tag.value == selectedTag)?.title || "";
       storeOrganizationInfo({
         organizationName,
         defaultLanguage: selectedLanguage || LanguageCode.De,
         selectedTags: selectedTag ? [selectedTag] : [],
         selectedCategories,
+        selectedTemplate,
       });
 
       posthogClientCaptureWithoutTenant(EventName.AiboxOnboardingStep1, {
@@ -107,7 +119,7 @@
           value={organizationName}
           placeholder={t("subscription.organization-name-placeholder")}
           inputChange={(event: any) => (organizationName = event.value)}
-          containerClasses="h-[54px] shadow-xl"
+          containerClasses="h-[48px] shadow-xl"
           labelClasses="text-sm"
           classes="text-base"
         />
@@ -124,14 +136,16 @@
     </div>
   </div>
 
-  <TagCategorySelector
-    {tags}
-    {categories}
-    titleAlignCenter
-    {defaultLanguage}
-    bind:selectedTag
-    bind:selectedCategories
-  />
+  <div class="mt-6">
+    <TagCategorySelector
+      {tags}
+      {categories}
+      titleAlignCenter
+      {defaultLanguage}
+      bind:selectedTag
+      bind:selectedCategories
+    />
+  </div>
 
   <!-- NEXT -->
   <div class="w-full flex items-center justify-end rounded-lg p-4">

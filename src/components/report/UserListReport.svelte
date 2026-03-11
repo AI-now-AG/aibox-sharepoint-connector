@@ -5,7 +5,9 @@
   import { addToast } from "$stores/toast";
   import { useTranslations } from "$i18n/utils";
   import { getRoleString } from "$utils/roles";
-  import { debounce, preventDefault, formatDateToDDMMYY } from "$utils/common";
+  import { preventDefault, formatDate } from "$utils/common";
+  import UserSearchFilter from "./UserSearchFilter.svelte";
+  import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import Loading from "$components/Loading.svelte";
   import Pagination from "$components/Pagination.svelte";
 
@@ -13,21 +15,23 @@
 
   let loading: boolean = $state(false);
   let page: number = $state(1);
-  let total = $state(0);
-  let search: string = $state("");
+  let total: number = $state(0);
+  let pageSize: number = $state(20);
+
+  const from = $derived(total === 0 ? 0 : (page - 1) * pageSize + 1);
+  const to = $derived(Math.min(page * pageSize, total));
+
+  let searchValue: string = $state("");
+  let selectedTenant: string = $state("");
+  let includeUnassigned: boolean = $state(false);
   let users: Record<string, any>[] = $state([]);
 
-  const PAGE_SIZE = 20;
+  let selectedUser: any = $state(null);
+  let confirmDeleteModal: HTMLDialogElement | undefined = $state();
 
   onMount(() => {
     fetchUserListReport();
   });
-
-  const debouncedSearch = debounce((value: string) => {
-    page = 1;
-    search = value;
-    fetchUserListReport();
-  }, 300);
 
   const handlePageChange = (p: number) => {
     page = p;
@@ -41,8 +45,10 @@
 
     const { data, error } = await actions.report.userListReport({
       page,
-      pageSize: PAGE_SIZE,
-      search,
+      pageSize,
+      search: searchValue,
+      tenant: selectedTenant,
+      includeUnassigned,
     });
     loading = false;
 
@@ -52,15 +58,44 @@
         message: "Something went wrong",
         type: "error",
       });
-    } else {
-      users = data.data;
-      total = data.total;
+      return;
     }
+
+    users = data.data;
+    total = data.total;
   };
+
+  function onSelectDelete(tenantId: any) {
+    selectedUser = tenantId;
+    confirmDeleteModal?.showModal();
+  }
+
+  async function deleteTenant() {
+    let result = await actions.user.delete({
+      _id: selectedUser,
+    });
+    loading = false;
+    const { error } = result;
+    if (error) {
+      addToast({
+        message: t("user.delete-failed"),
+        type: "error",
+      });
+      return;
+    }
+
+    addToast({
+      message: t("user.delete-successful"),
+      type: "success",
+    });
+    await fetchUserListReport();
+  }
 
   const exportUserList = async () => {
     loading = true;
-    fetch("/api/users/export")
+    fetch("/api/users/export", {
+      method: "POST",
+    })
       .then(async (response) => {
         const blob = await response.blob();
         const blobUrl = URL.createObjectURL(
@@ -110,20 +145,19 @@
 </div>
 
 <div class="mb-5">
-  <div class="items-center mb-4">
-    <div class="relative w-full">
-      <label class="input input-bordered flex items-center gap-2 w-full">
-        {@html svgIcons.search}
-        <input
-          type="text"
-          class="grow text-sm"
-          placeholder={t("user.search-for-users")}
-          bind:value={search}
-          oninput={(e) => debouncedSearch((e.target as HTMLInputElement).value)}
-        />
-      </label>
-    </div>
-  </div>
+  <UserSearchFilter
+    bind:value={searchValue}
+    bind:selectedTenant
+    bind:includeUnassigned
+    onsearch={() => {
+      page = 1;
+      fetchUserListReport();
+    }}
+    onfilter={() => {
+      page = 1;
+      fetchUserListReport();
+    }}
+  />
 
   {#if users.length === 0}
     {#if !loading}
@@ -131,41 +165,47 @@
     {/if}
   {:else}
     <div class="mb-4">
-      <table class="table border min-w-full relative">
+      <table class="border-separate border-spacing-x-0 min-w-full relative">
         <colgroup>
           <col class="w-auto" />
           <col class="w-[250]" />
           <col class="w-[120]" />
           <col class="w-[150]" />
           <col class="w-[150]" />
+          <col class="w-[100]" />
         </colgroup>
         <thead>
           <tr class="bg-base-300">
-            <th class="py-3 px-4 text-left font-semibold text-sm"
+            <th class="py-3 px-4 text-left font-normal text-xs"
               >{t("user.e-mail")}</th
             >
-            <th class="py-3 px-4 font-semibold text-sm">{t("user.tenant")}</th>
-            <th class="py-3 px-4 font-semibold text-sm">{t("user.roles")}</th>
-            <th class="py-3 px-4 font-semibold text-sm"
+            <th class="py-3 px-4 text-left font-normal text-xs"
+              >{t("user.tenant")}</th
+            >
+            <th class="py-3 px-4 text-left font-normal text-xs"
+              >{t("user.roles")}</th
+            >
+            <th class="py-3 px-4 text-left font-normal text-xs"
               >{t("user.latest-login")}</th
             >
-            <th class="py-3 px-4 text-center font-semibold text-sm"
+            <th class="py-3 px-4 text-left font-normal text-xs"
               >{t("user.status")}</th
             >
+            <th class="py-3 px-4"></th>
           </tr>
         </thead>
         <tbody>
           {#each users as user}
             <tr class="bg-base-100 text-sm">
               <td class="py-3 px-4 text-sm font-medium">{user.email}</td>
-              <td class="py-3 px-4 text-sm font-medium">{user.tenant?.name}</td>
+              <td class="py-3 px-4 text-sm font-medium"
+                >{user.tenant?.name || "Unknow"}</td
+              >
               <td class="py-3 px-4 text-sm font-medium"
                 >{getRoleString(user.roles)}</td
               >
               <td class="py-3 px-4 text-sm font-medium"
-                >{user.last_login
-                  ? formatDateToDDMMYY(user.last_login)
-                  : "-"}</td
+                >{user.last_login ? formatDate(user.last_login) : "-"}</td
               >
               <td class="py-3 px-4 text-sm font-medium text-center">
                 {#if user.blocked}
@@ -178,19 +218,50 @@
                   <span style={`color: 00CA92`}>{t("user.veriried")}</span>
                 {/if}
               </td>
+              <td class="py-2 px-4 text-right relative relative-dropdown">
+                <div class="dropdown dropdown-hover dropdown-end">
+                  <button class="btn btn-ghost btn-sm z-50">
+                    {@html svgIcons.threeDot}
+                  </button>
+                  <ul
+                    class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
+                  >
+                    <li>
+                      <button
+                        class="flex block w-full text-left px-4 py-1 text-sm hover:underline"
+                        onclick={() => onSelectDelete(user._id)}
+                      >
+                        {@html svgIcons.trash}
+                        <span class="ml-1">{t("common.delete")}</span>
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+              </td>
             </tr>
           {/each}
         </tbody>
       </table>
     </div>
 
-    <Pagination
-      bind:page
-      pageSize={PAGE_SIZE}
-      {total}
-      onPageChange={handlePageChange}
-    />
+    <div class="grid grid-cols-1 md:grid-cols-[1fr_max-content]">
+      <div class="mt-4 text-sm text-base-content/60">
+        {t("pagination.showing-range-of-total", { from, to, total })}
+      </div>
+      <Pagination
+        bind:page
+        {pageSize}
+        {total}
+        onPageChange={handlePageChange}
+      />
+    </div>
   {/if}
 </div>
 
 <Loading show={loading} />
+
+<ConfirmDialog
+  bind:modal={confirmDeleteModal}
+  confirm={deleteTenant}
+  description={t("user.delete-confirm-message")}
+/>

@@ -42,15 +42,19 @@ if (step == RoutePath.Step1) {
   const allTags = await GlobalTagModel.list();
   const allCategories = await GlobalCategoryModel.list();
 
-  tags = allTags.map((tag) => {
-    return {
-      title: tag.title,
-      value: tag._id.toString(),
-      description: tag.description,
-      icon: tag.icon,
-      iconColor: tag.iconColor,
-    };
-  });
+  tags = allTags
+    .filter((tag) => {
+      return tag?.categories && tag.categories?.includes("self-onboarding");
+    })
+    .map((tag) => {
+      return {
+        title: tag.title,
+        value: tag._id.toString(),
+        description: tag.description,
+        icon: tag.icon,
+        iconColor: tag.iconColor,
+      };
+    });
 
   categories = allCategories.map((category) => {
     return {
