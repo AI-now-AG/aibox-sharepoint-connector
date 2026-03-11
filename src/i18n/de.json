@@ -944,8 +944,12 @@
   "tenant.start-date": "Start Datum",
   "tenant.flags": "Flags",
   "tenant.create-kb-generation-warning": "Tenant wurde erstellt, aber die automatische KB-Generierung konnte nicht abgeschlossen werden. Sie können die Wissensdatenbank manuell hinzufügen.",
-  "nav.settings.prompt-kb-generation": "Prompt KB-Generierung",
-  "prompt-kb-generation.title": "Prompt für KB-Generierung",
-  "prompt-kb-generation.update-setting-successfull": "Prompt KB-Generierung erfolgreich gespeichert",
-  "prompt-kb-generation.update-setting-failed": "Prompt KB-Generierung konnte nicht gespeichert werden."
+  "nav.settings.global-prompts": "Globale Prompts",
+  "global-prompts.title": "Globale Prompts",
+  "global-prompts.refinement-title": "Prompt für Assistenzverbesserung",
+  "global-prompts.refinement-description": "Wird verwendet, um Assistenzanweisungen zu verbessern.",
+  "global-prompts.kb-generation-title": "Prompt für KB-Generierung",
+  "global-prompts.kb-generation-description": "Wird zur automatischen Erstellung von Wissensdatenbankeinträgen verwendet.",
+  "global-prompts.save-success": "Globale Prompts erfolgreich gespeichert",
+  "global-prompts.save-failed": "Globale Prompts konnten nicht gespeichert werden"
 }

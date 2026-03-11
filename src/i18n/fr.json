@@ -944,8 +944,12 @@
   "tenant.start-date": "Start Date",
   "tenant.flags": "Flags",
   "tenant.create-kb-generation-warning": "Tenant created, but KB auto-generation could not be completed. You can add the knowledge base manually.",
-  "nav.settings.prompt-kb-generation": "Prompt KB Generation",
-  "prompt-kb-generation.title": "Prompt for KB Generation",
-  "prompt-kb-generation.update-setting-successfull": "Prompt KB generation updated successfully",
-  "prompt-kb-generation.update-setting-failed": "Update prompt KB generation failed"
+  "nav.settings.global-prompts": "Global Prompts",
+  "global-prompts.title": "Global Prompts",
+  "global-prompts.refinement-title": "Prompt for Improvement",
+  "global-prompts.refinement-description": "Used to improve and refine assistant instructions",
+  "global-prompts.kb-generation-title": "Prompt for KB Generation",
+  "global-prompts.kb-generation-description": "Used to auto-generate knowledge base entries when creating a tenant",
+  "global-prompts.save-success": "Global prompts saved successfully",
+  "global-prompts.save-failed": "Failed to save global prompts"
 }
