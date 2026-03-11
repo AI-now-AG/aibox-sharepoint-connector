@@ -951,5 +951,14 @@
   "global-prompts.kb-generation-title": "Prompt for KB Generation",
   "global-prompts.kb-generation-description": "Used to auto-generate knowledge base entries when creating a tenant",
   "global-prompts.save-success": "Global prompts saved successfully",
-  "global-prompts.save-failed": "Failed to save global prompts"
+  "global-prompts.save-failed": "Failed to save global prompts",
+  "kb.add-dialog.title": "Add Knowledge Base",
+  "kb.add-dialog.empty-kb-title": "Blank Knowledge Base",
+  "kb.add-dialog.company-kb-title": "Generate from Website",
+  "kb.add-dialog.company-name-label": "Company Name",
+  "kb.add-dialog.website-url-label": "Website URL",
+  "kb.add-dialog.generate-button": "Generate Knowledge Base",
+  "kb.add-dialog.create-failed": "Failed to create the knowledge base.",
+  "kb.add-dialog.success-title": "Knowledge Base created!",
+  "kb.add-dialog.success-message": "This Knowledge Base has been added to all Assistants."
 }

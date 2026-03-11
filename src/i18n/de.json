@@ -951,5 +951,14 @@
   "global-prompts.kb-generation-title": "Prompt für KB-Generierung",
   "global-prompts.kb-generation-description": "Wird zur automatischen Erstellung von Wissensdatenbankeinträgen verwendet.",
   "global-prompts.save-success": "Globale Prompts erfolgreich gespeichert",
-  "global-prompts.save-failed": "Globale Prompts konnten nicht gespeichert werden"
+  "global-prompts.save-failed": "Globale Prompts konnten nicht gespeichert werden",
+  "kb.add-dialog.title": "Knowledge Base hinzufügen",
+  "kb.add-dialog.empty-kb-title": "Leere Knowledge Base",
+  "kb.add-dialog.company-kb-title": "Aus Website generieren",
+  "kb.add-dialog.company-name-label": "Unternehmensname",
+  "kb.add-dialog.website-url-label": "Website-URL",
+  "kb.add-dialog.generate-button": "Knowledge Base generieren",
+  "kb.add-dialog.create-failed": "Die Knowledge Base konnte nicht erstellt werden.",
+  "kb.add-dialog.success-title": "Knowledge Base erstellt!",
+  "kb.add-dialog.success-message": "Diese Knowledge Base wurde allen Assistenten hinzugefügt."
 }

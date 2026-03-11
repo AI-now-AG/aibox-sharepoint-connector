@@ -1455,7 +1455,7 @@
             >
             <input
               type="text"
-              placeholder={t("tenant.tenants.tenant.display-name")}
+              placeholder="e.g. ainow.ch"
               class="input input-bordered w-full"
               bind:value={tenantData.website}
             />

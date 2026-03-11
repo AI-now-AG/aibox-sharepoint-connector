@@ -418,7 +418,7 @@
           <Input
             label={t("tenant.website-url")}
             bind:value={websiteUrl}
-            placeholder="https://ihre-website.de"
+            placeholder="e.g. ainow.ch"
             labelClasses="font-medium text-sm"
             classes="text-sm w-full"
           />
