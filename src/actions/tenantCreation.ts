@@ -288,7 +288,7 @@ export const tenantCreation = {
       const tenantObjectId = new ObjectId(tenantId);
       const { insertedId } = await KnowledgeBaseModel.add({
         tenant_id: tenantObjectId,
-        title: `[Über] ${companyName}`,
+        title: `Über ${companyName}`,
         description: `Auto-generated knowledge base about ${companyName}`,
         knowledge_base: content,
         updated_at: new Date(),

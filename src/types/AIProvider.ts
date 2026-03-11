@@ -48,6 +48,7 @@ export enum PromptToolOption {
   Image = "image",
   Websearch = "websearch",
   Thinking = "thinking",
+  UrlContext = "urlcontext",
 }
 
 // Vector KB Embedding Providers
