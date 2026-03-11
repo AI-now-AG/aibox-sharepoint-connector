@@ -246,7 +246,9 @@
         }
 
         const result = await response.json();
-        kbContent = result.data.response;
+        const { response: content } = result.data;
+
+        const kbContent = content.at(-1)?.text ?? "";
         if (!kbContent) throw new Error("Empty response content from API");
         break; // success — exit retry loop
       } catch (err) {
