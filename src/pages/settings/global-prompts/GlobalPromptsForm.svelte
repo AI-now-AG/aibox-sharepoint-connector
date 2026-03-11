@@ -1,9 +1,9 @@
 <script lang="ts">
-  import Loading from "$components/Loading.svelte";
+  import { actions } from "astro:actions";
   import { useTranslations } from "$i18n/utils";
   import { addToast } from "$stores/toast";
   import { preventDefault } from "$utils/common";
-  import { actions } from "astro:actions";
+  import Loading from "$components/Loading.svelte";
 
   const t = useTranslations();
 
@@ -48,8 +48,12 @@
   <!-- Prompt Refinement -->
   <div class="card shadow-lg my-6">
     <div class="card-body bg-base-100 rounded-xl">
-      <h2 class="text-xl font-semibold">{t("global-prompts.refinement-title")}</h2>
-      <p class="text-sm text-base-content/60">{t("global-prompts.refinement-description")}</p>
+      <h2 class="text-xl font-semibold">
+        {t("global-prompts.refinement-title")}
+      </h2>
+      <p class="text-sm text-base-content/60">
+        {t("global-prompts.refinement-description")}
+      </p>
       <textarea
         id="global-prompt-refinement"
         class="textarea textarea-bordered h-64 w-full mt-2"
@@ -61,8 +65,12 @@
   <!-- Prompt KB Generation -->
   <div class="card shadow-lg my-6">
     <div class="card-body bg-base-100 rounded-xl">
-      <h2 class="text-xl font-semibold">{t("global-prompts.kb-generation-title")}</h2>
-      <p class="text-sm text-base-content/60">{t("global-prompts.kb-generation-description")}</p>
+      <h2 class="text-xl font-semibold">
+        {t("global-prompts.kb-generation-title")}
+      </h2>
+      <p class="text-sm text-base-content/60">
+        {t("global-prompts.kb-generation-description")}
+      </p>
       <textarea
         id="global-prompt-kb-generation"
         class="textarea textarea-bordered h-64 w-full mt-2"
