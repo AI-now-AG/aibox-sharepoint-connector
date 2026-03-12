@@ -5,7 +5,11 @@ import type { APIContext } from "astro";
 import type { ActionAPIContext } from "astro:actions";
 import { TenantFeature, ApiKeyProvider } from "$types/TenantFeature";
 import log from "./log";
-import { getGlobalApiKeys, resolveApiKey, resolveConfig } from "./resolveApiKey";
+import {
+  getGlobalApiKeys,
+  resolveApiKey,
+  resolveConfig,
+} from "./resolveApiKey";
 import { UsageTrackerCallbackHandler } from "$callbackLLM/UsageTrackerCallbackHandler";
 import { UsageType } from "$types/UsageTracking";
 
@@ -143,7 +147,11 @@ export const createChatModel = async (
 
   // Perplexity AI
   if (provider == ApiKeyProvider.Perplexity) {
-    const perplexityApiKey = resolveApiKey("perplexity_api_key", tenant, globalKeys);
+    const perplexityApiKey = resolveApiKey(
+      "perplexity_api_key",
+      tenant,
+      globalKeys,
+    );
     const perplexityModel: string = tenant?.perplexity_chat_model || "sonar";
     return createPerplexityModel(
       perplexityApiKey,
@@ -154,9 +162,21 @@ export const createChatModel = async (
 
   // Azure OpenAI
   if (provider == ApiKeyProvider.AzureOpenAI) {
-    const azureOpenAIApiKey = resolveApiKey("azure_openai_api_key", tenant, globalKeys);
-    const azureOpenAIApiInstanceName = resolveConfig("azure_openai_instance_name", tenant, globalKeys);
-    const azureOpenAIApiDeploymentName = resolveConfig("azure_openai_chat_model", tenant, globalKeys);
+    const azureOpenAIApiKey = resolveApiKey(
+      "azure_openai_api_key",
+      tenant,
+      globalKeys,
+    );
+    const azureOpenAIApiInstanceName = resolveConfig(
+      "azure_openai_instance_name",
+      tenant,
+      globalKeys,
+    );
+    const azureOpenAIApiDeploymentName = resolveConfig(
+      "azure_openai_chat_model",
+      tenant,
+      globalKeys,
+    );
     const azureOpenAIApiVersion =
       import.meta.env.AZURE_OPENAI_API_VERSION || "2024-08-01-preview";
 
@@ -171,9 +191,13 @@ export const createChatModel = async (
 
   // Claude (Anthropic)
   if (provider == ApiKeyProvider.Claude) {
-    const anthropicApiKey = resolveApiKey("anthropic_api_key", tenant, globalKeys);
+    const anthropicApiKey = resolveApiKey(
+      "anthropic_api_key",
+      tenant,
+      globalKeys,
+    );
     const anthropicModel: string =
-      tenant?.anthropic_chat_model || "claude-sonnet-4-20250514";
+      tenant?.anthropic_chat_model || "claude-sonnet-4-6";
     return createClaudeModel(
       anthropicApiKey,
       anthropicModel,
