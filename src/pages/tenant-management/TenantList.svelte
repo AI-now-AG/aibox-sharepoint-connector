@@ -291,9 +291,21 @@
     <div>
       <div class="overflow-x-auto relative">
         <table
-          class="border-separate border-spacing-x-0 min-w-full relative"
+          class="table table-fixed border-separate border-spacing-x-0 min-w-full relative"
           style="font-family:Inter;"
         >
+          <colgroup>
+            <col class="w-auto min-w-[150]" />
+            <col class="w-[200]" />
+            <col class="w-[180]" />
+            <col class="w-[100]" />
+            <col class="w-[150]" />
+            <col class="w-[120]" />
+            <col class="w-[180]" />
+            <col class="w-[100]" />
+            <col class="w-[80]" />
+            <col class="w-[70]" />
+          </colgroup>
           <thead>
             <tr class="bg-base-300">
               <th class="py-3 px-4 text-left font-normal text-xs"
