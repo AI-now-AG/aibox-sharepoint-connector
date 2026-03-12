@@ -109,7 +109,7 @@
   }
 
   function openWebsiteKbDialog() {
-    websiteKbDialog?.showModal();
+    websiteKbDialog?.show();
   }
 </script>
 
