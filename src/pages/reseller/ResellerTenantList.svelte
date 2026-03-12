@@ -78,11 +78,11 @@
     <div>
       <div class="overflow-x-auto relative">
         <table
-          class="border-separate border-spacing-x-0 min-w-full relative"
+          class="table table-fixed border-separate border-spacing-x-0 min-w-full relative"
           style="font-family:Inter;"
         >
           <colgroup>
-            <col class="w-auto" />
+            <col class="w-auto min-w-[180]" />
             <col class="w-[250]" />
             <col class="w-[150]" />
             <col class="w-[150]" />
