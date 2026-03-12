@@ -68,7 +68,7 @@
       provider: PromptModel.Gemini,
       systemMessage: [promptKbInstruction || DEFAULT_PROMPT_KB_INSTRUCTION],
       prompt: `Company: ${companyName}\nWebsite: ${websiteUrl}`,
-      tool: PromptToolOption.Websearch,
+      tool: PromptToolOption.UrlContext,
     };
 
     let kbContent = "";
@@ -87,7 +87,12 @@
         if (!response.ok)
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         const result = await response.json();
-        kbContent = result.data.response;
+        const { response: content } = result.data;
+        console.log("[AddKbDialog] prompt execute response", { content });
+
+        kbContent = Array.isArray(content)
+          ? (content.at(-1)?.text ?? "")
+          : (content ?? "");
         if (!kbContent) throw new Error("Empty response content from API");
         break;
       } catch (err) {
@@ -191,7 +196,6 @@
       </div>
     {/if}
   </div>
-
 </dialog>
 
 <Loading show={loading} />

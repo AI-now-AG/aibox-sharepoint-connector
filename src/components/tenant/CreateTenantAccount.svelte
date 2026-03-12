@@ -223,7 +223,7 @@
       provider: PromptModel.Gemini,
       systemMessage: [promptKbInstruction || DEFAULT_PROMPT_KB_INSTRUCTION],
       prompt: `Company: ${companyName}\nWebsite: ${websiteUrl}`,
-      tool: PromptToolOption.Websearch,
+      tool: PromptToolOption.UrlContext,
     };
 
     let kbContent = "";
@@ -246,7 +246,12 @@
         }
 
         const result = await response.json();
-        const kbContent = result.data.response ?? "";
+        const { response: content } = result.data;
+        console.log("[generateKb] prompt execute response", { content });
+
+        kbContent = Array.isArray(content)
+          ? (content.at(-1)?.text ?? "")
+          : (content ?? "");
         if (!kbContent) throw new Error("Empty response content from API");
         break; // success — exit retry loop
       } catch (err) {
