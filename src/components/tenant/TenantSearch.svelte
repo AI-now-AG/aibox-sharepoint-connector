@@ -2,6 +2,7 @@
   export interface Option {
     value: string;
     title: string;
+    active?: boolean;
   }
 </script>
 
@@ -17,6 +18,7 @@
     selectedTenant: string;
     placeholder?: string;
     disabled?: boolean;
+    includeInactive?: boolean;
     onselect?: Function;
     onclear?: Function;
   }
@@ -24,6 +26,7 @@
     selectedTenant = $bindable(""),
     placeholder = "Search tenants",
     disabled = false,
+    includeInactive = false,
     onselect,
     onclear,
   }: Props = $props();
@@ -51,11 +54,21 @@
   async function fetchTenants() {
     isFetching = true;
 
-    const { data } = await actions.tenant.listActive();
-    options = data.map((tenant: any) => ({
-      value: tenant._id,
-      title: tenant.name,
-    }));
+    if (includeInactive) {
+      const { data } = await actions.tenant.listAll();
+      options = data.map((tenant: any) => ({
+        value: tenant._id,
+        title: tenant.active ? tenant.name : `${tenant.name} (inactive)`,
+        active: tenant.active,
+      }));
+    } else {
+      const { data } = await actions.tenant.listActive();
+      options = data.map((tenant: any) => ({
+        value: tenant._id,
+        title: tenant.name,
+        active: true,
+      }));
+    }
 
     isFetching = false;
   }
@@ -121,7 +134,7 @@
       {#each filteredTenants as option}
         <li class="w-full">
           <button
-            class="w-full text-left flex items-center gap-2"
+            class="w-full text-left flex items-center gap-2 {option.active === false ? 'opacity-60' : ''}"
             onclick={() => {
               onSelect(option);
             }}>{option.title}</button

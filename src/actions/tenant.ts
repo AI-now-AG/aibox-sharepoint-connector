@@ -276,6 +276,22 @@ export const tenant = {
     },
   }),
 
+  listAll: defineAction({
+    handler: async () => {
+      const tenants = await TenantModel.list();
+      const data = tenants
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map((tenant) => ({
+          _id: tenant._id,
+          name: tenant.name,
+          org_name: tenant.org_name,
+          active: tenant.active ?? true,
+        }));
+
+      return transformRawData(data);
+    },
+  }),
+
   createAdminUser: defineAction({
     input: CreateTenantAdminSchema,
     handler: async (input) => {
