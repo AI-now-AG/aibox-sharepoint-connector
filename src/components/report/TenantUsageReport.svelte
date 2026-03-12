@@ -160,7 +160,7 @@
         {#if expandedProviders[row.provider]}
           <table class="table table-sm border-t min-w-full relative">
             <colgroup>
-              <col class="w-auto" />
+              <col class="w-auto min-w-[150]" />
               <col class="w-[160]" />
               <col class="w-[140]" />
               <col class="w-[140]" />
