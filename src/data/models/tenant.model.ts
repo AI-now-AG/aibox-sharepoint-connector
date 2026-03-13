@@ -173,7 +173,7 @@ export default {
   },
 
   list: async () => {
-    return collection.find<Document<Tenant>>({}).toArray();
+    return collection.find<Document<Tenant>>({}).sort({ name: 1 }).toArray();
   },
 
   listActive: async () => {
