@@ -62,7 +62,7 @@ const REQUEST_CREDIT_MAPPING: Record<string, number> = {
   [ModelName.GptImage]: 0.33,
   [ModelName.FluxDev]: 2,
   [ModelName.Sonar]: 12,
-  [ModelName.Gemini31FlashLite]: 2,
+  [ModelName.Gemini31FlashLite]: 7,
   [ModelName.Gemini25FlashImage]: 2,
   [ModelName.Gemini3ProImage]: 0.75,
   [ModelName.Gpt4o]: 10,
