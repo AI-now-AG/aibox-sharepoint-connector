@@ -208,7 +208,8 @@ export const createChatModel = async (
   // Gemini (Google GenAI)
   if (provider == ApiKeyProvider.Gemini) {
     const geminiApiKey = resolveApiKey("gemini_api_key", tenant, globalKeys);
-    const geminiModel: string = tenant?.gemini_chat_model || "gemini-2.5-flash";
+    const geminiModel: string =
+      tenant?.gemini_chat_model || "gemini-3.1-flash-lite-preview";
     return createGeminiModel(
       geminiApiKey,
       geminiModel,

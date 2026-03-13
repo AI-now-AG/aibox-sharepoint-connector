@@ -41,7 +41,7 @@ const TOKEN_CREDIT_MAPPING: Record<string, TokenCreditRate> = {
   [ApiKeyProvider.AzureOpenAI]: { input: 40000, output: 10000 },
   [ApiKeyProvider.Perplexity]: { input: 100000, output: 100000 },
   [ApiKeyProvider.Claude]: { input: 33000, output: 6500 },
-  [ApiKeyProvider.Gemini]: { input: 330000, output: 40000 },
+  [ApiKeyProvider.Gemini]: { input: 400000, output: 66000 },
 };
 
 /**
@@ -62,7 +62,7 @@ const REQUEST_CREDIT_MAPPING: Record<string, number> = {
   [ModelName.GptImage]: 0.33,
   [ModelName.FluxDev]: 2,
   [ModelName.Sonar]: 12,
-  [ModelName.Gemini25Flash]: 2,
+  [ModelName.Gemini31FlashLite]: 2,
   [ModelName.Gemini25FlashImage]: 2,
   [ModelName.Gemini3ProImage]: 0.75,
   [ModelName.Gpt4o]: 10,
@@ -513,7 +513,7 @@ const _calculateGeminiUsage = (
     amount: geminiWebsearchRequests,
     unit: unitLabels.requests,
     credits: _requestsToCredits(
-      ModelName.Gemini25Flash,
+      ModelName.Gemini31FlashLite,
       geminiWebsearchRequests,
     ),
   });

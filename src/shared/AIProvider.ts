@@ -10,7 +10,7 @@ const t = useTranslations();
 export const ModelNameMap: Record<string, string> = {
   "claude-sonnet-4-6": "Claude Sonnet",
   sonar: "Perplexity Sonar",
-  "gemini-2.5-flash": "Gemini 2.5 Flash",
+  "gemini-3.1-flash-lite-preview": "Gemini 3.1 Flash-Lite",
   "gpt-5": "gpt-5.1",
 };
 

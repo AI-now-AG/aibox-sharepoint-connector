@@ -16,7 +16,7 @@ export enum ModelName {
   ClaudeSonnet46 = "claude-sonnet-4-6", // Text
 
   // Google
-  Gemini25Flash = "gemini-2.5-flash", // Text & Tools (Websearch, Thinking)
+  Gemini31FlashLite = "gemini-3.1-flash-lite-preview", // Text & Tools (Websearch, Thinking)
   Gemini25FlashImage = "gemini-2.5-flash-image", // Image Generation
   Gemini3ProImage = "gemini-3-pro-image-preview", // Image Generation
 
