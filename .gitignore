@@ -29,5 +29,8 @@ yarn.lock
 # jetbrains setting folder
 .idea/
 
+# Claude setting folder
+.claude/
+
 # logs files
 src/shared/tasks/*

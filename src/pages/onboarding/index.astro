@@ -1,0 +1,27 @@
+---
+import OnboardingLayout from "$layouts/Onboarding.astro";
+import SelfOnboardingForm from "./SelfOnboardingForm.svelte";
+import GlobalTagModel from "$data/models/globalTag.model";
+import { useTranslations } from "$i18n/utils";
+import type { TagItem } from "$types/Subscription";
+
+const t = useTranslations();
+
+const defaultLanguage = Astro.locals.tenant?.default_language || "en";
+
+const allTags = await GlobalTagModel.list();
+
+const tags: TagItem[] = allTags
+  .filter((tag) => tag?.categories && tag.categories?.includes("self-onboarding"))
+  .map((tag) => ({
+    title: tag.title,
+    value: tag._id.toString(),
+    description: tag.description,
+    icon: tag.icon,
+    iconColor: tag.iconColor,
+  }));
+---
+
+<OnboardingLayout title={t("self-onboarding.page-title")}>
+  <SelfOnboardingForm {tags} {defaultLanguage} client:load />
+</OnboardingLayout>
