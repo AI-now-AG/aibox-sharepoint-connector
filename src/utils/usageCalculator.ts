@@ -41,7 +41,7 @@ const TOKEN_CREDIT_MAPPING: Record<string, TokenCreditRate> = {
   [ApiKeyProvider.AzureOpenAI]: { input: 40000, output: 10000 },
   [ApiKeyProvider.Perplexity]: { input: 100000, output: 100000 },
   [ApiKeyProvider.Claude]: { input: 33000, output: 6500 },
-  [ApiKeyProvider.Gemini]: { input: 330000, output: 40000 },
+  [ApiKeyProvider.Gemini]: { input: 400000, output: 66000 },
 };
 
 /**
@@ -62,7 +62,7 @@ const REQUEST_CREDIT_MAPPING: Record<string, number> = {
   [ModelName.GptImage]: 0.33,
   [ModelName.FluxDev]: 2,
   [ModelName.Sonar]: 12,
-  [ModelName.Gemini25Flash]: 2,
+  [ModelName.Gemini31FlashLite]: 7,
   [ModelName.Gemini25FlashImage]: 2,
   [ModelName.Gemini3ProImage]: 0.75,
   [ModelName.Gpt4o]: 10,
@@ -151,10 +151,7 @@ const _durationsToCredits = (
   return Math.ceil(minutes / rate);
 };
 
-const _embeddingTokensToCredits = (
-  model: string,
-  tokens: number,
-): number => {
+const _embeddingTokensToCredits = (model: string, tokens: number): number => {
   const rate = EMBEDDING_TOKEN_CREDIT_MAPPING[model.toLowerCase()];
   if (!rate) {
     // Default rate for unknown models
@@ -227,12 +224,8 @@ const _calculateOpenAIUsage = (
     model: "gpt-4o Websearch",
     amount: openAiWebsearchRequests,
     unit: unitLabels.requests,
-    credits: _requestsToCredits(
-      ModelName.Gpt4o,
-      openAiWebsearchRequests,
-    ),
+    credits: _requestsToCredits(ModelName.Gpt4o, openAiWebsearchRequests),
   });
-
 
   // DALL-E
   const dalleItems = usageData.filter(
@@ -271,57 +264,9 @@ const _calculateOpenAIGpt5Usage = (
     return item.provider == ApiKeyProvider.OpenAIGpt5;
   });
 
-  // // gpt-5
-  // const gpt5Items = usageData.filter(
-  //   (item: UsageLog) => item.model == ModelName.Gpt5Old,
-  // );
-  // const gpt5InputTokens = gpt5Items.reduce(
-  //   (sum: number, item: UsageLog) => sum + (item.input_tokens ?? 0),
-  //   0,
-  // );
-  // const gpt5OutputTokens = gpt5Items.reduce(
-  //   (sum: number, item: UsageLog) => sum + (item.output_tokens ?? 0),
-  //   0,
-  // );
-  // const { inputCredits: gpt5InputCredits, outputCredits: gpt5OutputCredits } =
-  //   _tokensToCredits(
-  //     ApiKeyProvider.OpenAIGpt5,
-  //     gpt5InputTokens,
-  //     gpt5OutputTokens,
-  //   );
-  // usageItems.push({
-  //   model: "gpt-5 Input",
-  //   amount: gpt5InputTokens,
-  //   unit: unitLabels.tokens,
-  //   credits: gpt5InputCredits,
-  // });
-  // usageItems.push({
-  //   model: "gpt-5 Output",
-  //   amount: gpt5OutputTokens,
-  //   unit: unitLabels.tokens,
-  //   credits: gpt5OutputCredits,
-  // });
-
-  // const openAiWebsearchRequests = gpt5Items.reduce(
-  //   (sum: number, item: UsageLog) =>
-  //     sum + (item.metadata?.websearch_count ?? 0),
-  //   0,
-  // );
-
-  // usageItems.push({
-  //   model: "gpt-5 Websearch",
-  //   amount: openAiWebsearchRequests,
-  //   unit: unitLabels.requests,
-  //   credits: _requestsToCredits(
-  //     ModelName.Gpt5,
-  //     openAiWebsearchRequests,
-  //   ),
-  // });
-
-
   // gpt-5.1
   const gpt51Items = usageData.filter(
-    (item: UsageLog) => item.model == ModelName.Gpt5 || item.model == ModelName.Gpt5Old,
+    (item: UsageLog) => item.model == ModelName.Gpt5,
   );
   const gpt51InputTokens = gpt51Items.reduce(
     (sum: number, item: UsageLog) => sum + (item.input_tokens ?? 0),
@@ -360,12 +305,8 @@ const _calculateOpenAIGpt5Usage = (
     model: "gpt-5.1 Websearch",
     amount: openAi51WebsearchRequests,
     unit: unitLabels.requests,
-    credits: _requestsToCredits(
-      ModelName.Gpt5,
-      openAi51WebsearchRequests,
-    ),
+    credits: _requestsToCredits(ModelName.Gpt5, openAi51WebsearchRequests),
   });
-
 
   // GPT Image
   const gptImageItems = usageData.filter(
@@ -572,15 +513,15 @@ const _calculateGeminiUsage = (
     amount: geminiWebsearchRequests,
     unit: unitLabels.requests,
     credits: _requestsToCredits(
-      ModelName.Gemini25Flash,
+      ModelName.Gemini31FlashLite,
       geminiWebsearchRequests,
     ),
   });
 
   // Gemini 2.5 Flash Image
-  const geminiImageItems = usageData.filter(
-    (item: UsageLog) => { return item.model == ModelName.Gemini25FlashImage && item.type == "image" },
-  );
+  const geminiImageItems = usageData.filter((item: UsageLog) => {
+    return item.model == ModelName.Gemini25FlashImage && item.type == "image";
+  });
   const geminiImageRequests = geminiImageItems.length;
   usageItems.push({
     model: "gemini 2.5 Flash Image",
@@ -588,14 +529,14 @@ const _calculateGeminiUsage = (
     unit: unitLabels.images,
     credits: _requestsToCredits(
       ModelName.Gemini25FlashImage,
-      geminiImageRequests
+      geminiImageRequests,
     ),
   });
 
   // Gemini 3.0 Pro Image
-  const gemini3ProImageItems = usageData.filter(
-    (item: UsageLog) => { return item.model == ModelName.Gemini3ProImage && item.type == "image" },
-  );
+  const gemini3ProImageItems = usageData.filter((item: UsageLog) => {
+    return item.model == ModelName.Gemini3ProImage && item.type == "image";
+  });
   const gemini3ProImageRequests = gemini3ProImageItems.length;
   usageItems.push({
     model: "gemini 3 Pro Image",
@@ -603,7 +544,7 @@ const _calculateGeminiUsage = (
     unit: unitLabels.images,
     credits: _requestsToCredits(
       ModelName.Gemini3ProImage,
-      gemini3ProImageRequests
+      gemini3ProImageRequests,
     ),
   });
 
@@ -745,29 +686,30 @@ const _calculateEmbeddingUsage = (rawUsages: UsageLog[]) => {
 export const calculateUsage = (tenant: Tenant, rawUsages: UsageLog[]) => {
   const usageData: UsageRow[] = [];
 
-  const isProviderActive = (
-    providerName: ApiKeyProvider
-  ): boolean => {
+  const isProviderActive = (providerName: ApiKeyProvider): boolean => {
     return (tenant.api_key_providers ?? []).some(
-      p => (p.name?.toString()?.toLowerCase() === providerName.toString()?.toLowerCase()) && p.active == true
+      (p) =>
+        p.name?.toString()?.toLowerCase() ===
+          providerName.toString()?.toLowerCase() && p.active == true,
     );
-  }
+  };
 
-  const isFeatureActive = (
-    providerName: ApiKeyProvider
-  ): boolean => {
+  const isFeatureActive = (providerName: ApiKeyProvider): boolean => {
     return (tenant.included_features ?? []).some(
-      p => p.provider?.toString()?.toLowerCase() === providerName.toString()?.toLowerCase()
+      (p) =>
+        p.provider?.toString()?.toLowerCase() ===
+        providerName.toString()?.toLowerCase(),
     );
-  }
+  };
 
-  const isAudioActive = (
-    providerName: ApiKeyProvider
-  ): boolean => {
+  const isAudioActive = (providerName: ApiKeyProvider): boolean => {
     return (tenant.included_features ?? []).some(
-      p => (p.provider?.toString()?.toLowerCase() == providerName.toString()?.toLowerCase()) && p.name == TenantFeature.AudioToText
+      (p) =>
+        p.provider?.toString()?.toLowerCase() ==
+          providerName.toString()?.toLowerCase() &&
+        p.name == TenantFeature.AudioToText,
     );
-  }
+  };
 
   // OpenAI
   const useOpenAIPrivateKey = tenant.metadata?.openaiPrivateKeyEnabled ?? false;
@@ -830,7 +772,10 @@ export const calculateUsage = (tenant: Tenant, rawUsages: UsageLog[]) => {
   const useSpeechPrivateKey = tenant.metadata?.speechPrivateKeyEnabled ?? false;
   const useElevenLabsPrivateKey =
     tenant.metadata?.elevenLabsPrivateKeyEnabled ?? false;
-  if (isAudioActive(ApiKeyProvider.OpenAI) || isAudioActive(ApiKeyProvider.ElevenLabs)) {
+  if (
+    isAudioActive(ApiKeyProvider.OpenAI) ||
+    isAudioActive(ApiKeyProvider.ElevenLabs)
+  ) {
     usageData.push({
       provider: "Audio",
       details: _calculateAudioUsage(

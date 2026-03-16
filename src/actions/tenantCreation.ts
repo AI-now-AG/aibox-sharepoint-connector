@@ -16,6 +16,7 @@ import SubscriptionModel, {
 import TranscriptionModel, {
   type Transcription,
 } from "$data/models/transcription.model";
+import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
 import {
   SubscriptionPackageId,
   AudioOptionId,
@@ -61,12 +62,19 @@ const TenantInputParamsSchema = z.object({
   org_name: z.string().min(1),
   language: z.string().min(1),
   theme: z.nativeEnum(ThemeCode).default(ThemeCode.AIBox),
+  website: z.string().optional(),
   plan_name: z.nativeEnum(SubscriptionPackageId).optional(),
   add_ons: z.array(z.nativeEnum(AudioOptionId)).optional(),
   billing_method: z.nativeEnum(BillingMethod).optional(),
   use_cases: z.array(z.string()),
   totalPrice: z.string().optional(),
   billing_info: BillingInfoParamsSchema,
+});
+
+const SetupKbSchema = z.object({
+  tenant_id: z.string().min(1),
+  company_name: z.string().min(1),
+  content: z.string().min(1),
 });
 
 const FinalizeTenantSchema = z.object({
@@ -149,6 +157,7 @@ export const tenantCreation = {
         billing_info: tenant.billing_info,
         default_language: tenant.language,
         theme: isSomedia ? ThemeCode.SomediaAssistant : tenant.theme,
+        website: tenant.website,
         included_features: includedFeatures,
         transcription_types: transcriptionTypes,
         audio_assistant_active: true,
@@ -270,6 +279,31 @@ export const tenantCreation = {
       return transformRawData(data);
     },
   }),
+  createTenantKnowledgeBase: defineAction({
+    input: SetupKbSchema,
+    handler: async (input) => {
+      const { tenant_id: tenantId, company_name: companyName, content } = input;
+
+      // Create KB entry for the new tenant
+      const tenantObjectId = new ObjectId(tenantId);
+      const { insertedId } = await KnowledgeBaseModel.add({
+        tenant_id: tenantObjectId,
+        title: `Über ${companyName}`,
+        description: `Auto-generated knowledge base about ${companyName}`,
+        knowledge_base: content,
+        updated_at: new Date(),
+        created_at: new Date(),
+      });
+
+      // Assign the new KB to all prompts of this tenant
+      await PromptModel.addKbToTenantPrompts(tenantObjectId, insertedId);
+
+      return transformRawData({
+        success: true,
+        knowledgeBaseId: insertedId,
+      });
+    },
+  }),
   finalize: defineAction({
     input: FinalizeTenantSchema,
     handler: async (input, context) => {
@@ -314,6 +348,7 @@ export const tenantCreation = {
 
             <p>
               <strong>Contact:</strong> ${tenant.billing_info?.email ?? "-"}<br/>
+              <strong>Website:</strong> ${tenant?.website ?? "-"}<br/>
               <strong>Created:</strong> ${new Date().toLocaleDateString()}<br/>
               <strong>Account created by:</strong> ${email}<br/>
               <strong>Flow:</strong> ${isReseller ? "Reseller" : "Internal"}<br/>

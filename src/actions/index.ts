@@ -4,7 +4,7 @@ import { category } from "./category";
 import { prompt } from "./prompt";
 import { transcription } from "./transcription";
 import { user } from "./user";
-import { knowledgebase } from "./knowledgebase";
+import { knowledgeBase } from "./knowledgeBase";
 import { conversation } from "./conversation";
 import { onboarding } from "./onboarding";
 import { report } from "./report";
@@ -23,7 +23,7 @@ export const server = {
   transcription,
   auth,
   user,
-  knowledgebase,
+  knowledgeBase,
   conversation,
   onboarding,
   report,

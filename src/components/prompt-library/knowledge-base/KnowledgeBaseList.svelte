@@ -11,12 +11,14 @@
 
 <script lang="ts">
   import { navigate } from "astro:transitions/client";
+  import { svgIcons } from "$assets/icons";
   import KnowledgeBaseItem from "./KnowledgeBaseItem.svelte";
+  import KbFromWebsiteDialog from "./KbFromWebsiteDialog.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import Loading from "$components/Loading.svelte";
   import { addToast } from "$stores/toast";
   import { useTranslations } from "$i18n/utils";
-  import EmptyActiion from "../../prompt-interface/EmptyAction.svelte";
+  import EmptyAction from "../../prompt-interface/EmptyAction.svelte";
 
   const t = useTranslations();
   let loading = $state(false);
@@ -25,28 +27,31 @@
     title?: string;
     isEditable?: boolean;
     items?: KnowledgeBaseCardItem[];
+    tenantId?: string;
+    promptKbInstruction?: string;
   }
 
   let {
     title = t("prompt-library.knowledgebase.all"),
     isEditable = false,
-    items = [],
+    items = $bindable([]),
+    tenantId = "",
+    promptKbInstruction = "",
   }: Props = $props();
 
   let selectedEditKnowledgeBaseId: string = $state("");
   let selectedDeletePKnowledgeBaseId: string = "";
 
   let confirmDeleteModal: HTMLDialogElement | undefined = $state();
+  let websiteKbDialog: HTMLDialogElement | undefined = $state();
 
   async function editCard(index: number) {
     selectedEditKnowledgeBaseId = items[index]?.id ?? "";
-    //window.location.href = `/prompt-library/knowledge-base/${selectedEditKnowledgeBaseId}`;
     navigate(`/prompt-library/knowledge-base/${selectedEditKnowledgeBaseId}`);
   }
 
   async function duplicateCard(index: number) {
     selectedEditKnowledgeBaseId = items[index]?.id ?? "";
-    //window.location.href = `/prompt-library/knowledge-base/${selectedEditKnowledgeBaseId}?mode=clone`;
     navigate(
       `/prompt-library/knowledge-base/${selectedEditKnowledgeBaseId}?mode=clone`,
     );
@@ -98,9 +103,51 @@
       });
     }
   }
+
+  function onModalClosed() {
+    navigate(window.location.href);
+  }
+
+  function openWebsiteKbDialog() {
+    websiteKbDialog?.show();
+  }
 </script>
 
 <div class="container max-w-5xl mx-auto p-6 space-y-4">
+  {#if isEditable}
+    <div class="flex justify-end">
+      <div class="dropdown dropdown-end">
+        <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+        <div tabindex="0" role="button" class="btn btn-outline font-normal">
+          {@html svgIcons.add}
+          {t("prompt-library.knowledgebase.add")}
+        </div>
+        <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+        <ul
+          tabindex="0"
+          class="dropdown-content menu bg-base-100 rounded-xl shadow z-10 w-56 p-2 mt-1"
+        >
+          <li>
+            <a
+              href="/prompt-library/knowledge-base/add"
+              class="flex items-center gap-2"
+            >
+              📄 {t("kb.add-dialog.empty-kb-title")}
+            </a>
+          </li>
+          <li>
+            <button
+              class="flex items-center gap-2 w-full"
+              onclick={openWebsiteKbDialog}
+            >
+              🌐 {t("kb.add-dialog.company-kb-title")}
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  {/if}
+
   {#if items?.length > 0}
     <h1 class="text-lg font-normal text-base-content/80">
       {title}
@@ -123,15 +170,27 @@
         />
       {/each}
     </div>
-  {:else}
-    <EmptyActiion
+  {:else if !isEditable}
+    <EmptyAction
       title={t("knowledgebase.empty.title")}
       description={t("knowledgebase.empty.description")}
       ctaLabel={t("prompt-library.knowledgebase.add")}
       ctaUrl="/prompt-library/knowledge-base/add"
     />
+  {:else}
+    <EmptyAction
+      title={t("knowledgebase.empty.title")}
+      description={t("knowledgebase.empty.description")}
+    />
   {/if}
 </div>
+
+<KbFromWebsiteDialog
+  bind:modal={websiteKbDialog}
+  {tenantId}
+  {promptKbInstruction}
+  {onModalClosed}
+/>
 
 <ConfirmDialog
   bind:modal={confirmDeleteModal}

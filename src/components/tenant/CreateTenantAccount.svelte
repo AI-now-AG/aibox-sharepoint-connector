@@ -3,8 +3,11 @@
   import { actions } from "astro:actions";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
+  import { isValidEmail, isValidUrl } from "$utils/validation";
   import { addToast } from "$stores/toast";
-  import { tenant } from "$stores";
+  import { tenant, user } from "$stores";
+  import { PromptModel } from "$types/PromptModel";
+  import { PromptToolOption } from "$types/AIProvider";
   import {
     BillingMethod,
     CountryCode,
@@ -30,16 +33,20 @@
   import SubscriptionPackageList from "$components/subscription/SubscriptionPackageList.svelte";
   import AudioOptionList from "$components/subscription/AudioOptionList.svelte";
   import BillingMethods from "$components/subscription/BillingMethods.svelte";
+  import { TRANSCRIPTION_API_URL } from "astro:env/client";
+  import { posthogClientCaptureGlobal } from "$utils/posthogClient";
 
   interface Props {
     backUrl?: string;
     pageTitle?: string;
+    tags: TagItem[];
+    categories: CategoryItem[];
     isReseller?: boolean;
     isSomedia?: boolean;
     resellerCode?: string;
-    tags: TagItem[];
-    categories: CategoryItem[];
+    promptKbInstruction?: string;
   }
+
   let {
     backUrl,
     pageTitle = "",
@@ -48,6 +55,7 @@
     resellerCode = "",
     tags = [],
     categories = [],
+    promptKbInstruction = "",
   }: Props = $props();
 
   let loading = $state(false);
@@ -62,6 +70,7 @@
   let selectedTheme: { title: string; value: ThemeCode } | undefined = $state(
     ThemeMap[ThemeCode.AIBox],
   );
+  let websiteUrl = $state<string>("");
 
   let companyName = $state<string>("");
   let street = $state<string>("");
@@ -91,6 +100,13 @@
       selectedCategories.length > 0 &&
       selectedPackageId !== "",
   );
+
+  const DEFAULT_PROMPT_KB_INSTRUCTION = `
+    You are a research assistant. Generate a comprehensive company overview in the same language as the company's website.
+    Include: company overview, main products and services, target customers, unique value propositions, and any other relevant information.
+    Format the output as clear structured text suitable for an internal knowledge base.
+    Be factual and concise.
+  `;
 
   const t = useTranslations();
 
@@ -168,6 +184,7 @@
       org_name: organizationName,
       language: selectedLanguage ?? LanguageCode.De,
       theme: selectedTheme?.value ?? ThemeCode.AIBox,
+      website: websiteUrl,
       use_cases: selectedCategories ?? [],
       plan_name: selectedPackageId as SubscriptionPackageId,
       add_ons: selectedAudioOptionIds as AudioOptionId[],
@@ -197,6 +214,82 @@
     return data;
   }
 
+  async function generateKbForTenant(newTenantId: string) {
+    const executePromptUrl = `${TRANSCRIPTION_API_URL}/api/prompt/execute`;
+    const accessToken = $user?.api_token as string;
+
+    const payload = {
+      tenantId: $tenant?._id?.toString(),
+      provider: PromptModel.Gemini,
+      systemMessage: [promptKbInstruction || DEFAULT_PROMPT_KB_INSTRUCTION],
+      prompt: `Company: ${companyName}\nWebsite: ${websiteUrl}`,
+      tool: PromptToolOption.UrlContext,
+    };
+
+    let kbContent = "";
+    const MAX_RETRIES = 3;
+    let lastError: unknown;
+
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        const response = await fetch(executePromptUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const result = await response.json();
+        const { response: content } = result.data;
+        console.log("[generateKb] prompt execute response", { content });
+
+        kbContent = Array.isArray(content)
+          ? (content.at(-1)?.text ?? "")
+          : (content ?? "");
+        if (!kbContent) throw new Error("Empty response content from API");
+        break; // success — exit retry loop
+      } catch (err) {
+        lastError = err;
+        console.warn(
+          `[generateKb] Attempt ${attempt}/${MAX_RETRIES} failed:`,
+          err,
+        );
+        if (attempt < MAX_RETRIES) {
+          await new Promise((resolve) => setTimeout(resolve, 1000 * attempt)); // back-off: 1s, 2s
+        }
+      }
+    }
+
+    if (!kbContent) {
+      posthogClientCaptureGlobal("tenant_kb_generate_failed", {
+        tenantId: newTenantId,
+        companyName,
+        websiteUrl,
+      });
+    }
+
+    const { data, error } =
+      await actions.tenantCreation.createTenantKnowledgeBase({
+        tenant_id: newTenantId,
+        company_name: companyName,
+        content: kbContent,
+      });
+
+    if (error) {
+      console.warn("[generateKb] KB generation failed (non-blocking):", error);
+      addToast({
+        message: t("tenant.create-kb-generation-warning"),
+        type: "info",
+      });
+    }
+  }
+
   async function finalizeTenantSetup(newTenantId: string) {
     const selectedTemplate =
       tags.find((tag) => tag.value == selectedTag)?.title || "";
@@ -213,6 +306,16 @@
   function validateForm() {
     if (!organizationName) {
       showAlert(t("tenant.validate-empty-display-name-message"));
+      return false;
+    }
+
+    if (!isValidEmail(billingEmail)) {
+      showAlert(t("subscription.validate-invalid-email-message"));
+      return false;
+    }
+
+    if (websiteUrl && !isValidUrl(websiteUrl)) {
+      showAlert(t("subscription.validate-invalid-website-message"));
       return false;
     }
 
@@ -243,7 +346,12 @@
           organization.display_name,
         );
 
-        // Step 3: Finalize Tenant Setup
+        // Step 3: Generate KB from Gemini + websearch (Optional)
+        if (websiteUrl) {
+          await generateKbForTenant(tenant.id);
+        }
+
+        // Step 4: Finalize Tenant Setup
         await finalizeTenantSetup(tenant.id);
 
         if (tenant) {
@@ -259,7 +367,11 @@
           }
         }
       } catch (error: any) {
-        showAlert(error?.toString());
+        const message =
+          (error as Error)?.message ||
+          error?.toString() ||
+          "Something went wrong. Please try again.";
+        showAlert(message);
       } finally {
         loading = false;
       }
@@ -305,7 +417,15 @@
             classes="text-sm w-full"
           />
         </div>
-        <div class="flex-1 flex flex-col mb-4"></div>
+        <div class="flex-1 flex flex-col mb-4">
+          <Input
+            label={t("tenant.website-url")}
+            bind:value={websiteUrl}
+            placeholder="e.g. ainow.ch"
+            labelClasses="font-medium text-sm"
+            classes="text-sm w-full"
+          />
+        </div>
       </div>
 
       <div class="block md:flex flex-row space-x-0 md:space-x-8">
@@ -314,6 +434,7 @@
             label={`${t("tenant.language")}*`}
             options={Languges}
             bind:value={selectedLanguage}
+            labelClasses="font-medium text-sm"
           />
         </div>
 
@@ -366,6 +487,7 @@
             label={t("subscription.zip-code") + " *"}
             bind:value={zipCode}
             placeholder={t("subscription.zip-code-place-holder")}
+            labelClasses="font-medium text-sm"
             classes="text-sm w-full"
           />
         </div>

@@ -54,6 +54,7 @@ const TenantSchema = z.object({
   default_language: z.string().nullish().default("en"),
   theme: z.nativeEnum(ThemeCode).default(ThemeCode.AIBox),
   primary_color: z.string().nullish(),
+  website: z.string().url().nullish(),
   api_key_providers: z.array(TextFeatureSchema).optional(),
   openai_chat_model: z.string().nullish().default(ModelName.Gpt4o),
   openai_api_key: z.string().nullish().default(null),
@@ -172,7 +173,7 @@ export default {
   },
 
   list: async () => {
-    return collection.find<Document<Tenant>>({}).toArray();
+    return collection.find<Document<Tenant>>({}).sort({ name: 1 }).toArray();
   },
 
   listActive: async () => {

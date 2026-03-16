@@ -13,7 +13,7 @@
     subscription,
   } from "$stores/subscription";
   import { EventName, ScreenName } from "$types/Posthog";
-  import { posthogClientCaptureWithoutTenant } from "$utils/posthogClient";
+  import { posthogClientCaptureGlobal } from "$utils/posthogClient";
 
   interface Props {
     defaultLanguage?: string;
@@ -62,12 +62,18 @@
             "prices" in audioOption &&
             audioOption.prices &&
             selectedPackageId &&
-            audioOption.prices[selectedPackageId as keyof typeof audioOption.prices]
+            audioOption.prices[
+              selectedPackageId as keyof typeof audioOption.prices
+            ]
           ) {
             audioOptionsTotalPrice +=
-              audioOption.prices[selectedPackageId as keyof typeof audioOption.prices];
+              audioOption.prices[
+                selectedPackageId as keyof typeof audioOption.prices
+              ];
           } else if ("prices" in audioOption && audioOption.prices) {
-            audioOptionsTotalPrice += Math.min(...Object.values(audioOption.prices));
+            audioOptionsTotalPrice += Math.min(
+              ...Object.values(audioOption.prices),
+            );
           } else {
             audioOptionsTotalPrice += audioOption?.price || 0;
           }
@@ -112,10 +118,14 @@
           "prices" in audioOptionData &&
           audioOptionData.prices &&
           selectedPackageId &&
-          audioOptionData.prices[selectedPackageId as keyof typeof audioOptionData.prices]
+          audioOptionData.prices[
+            selectedPackageId as keyof typeof audioOptionData.prices
+          ]
         ) {
           resolvedPrice =
-            audioOptionData.prices[selectedPackageId as keyof typeof audioOptionData.prices];
+            audioOptionData.prices[
+              selectedPackageId as keyof typeof audioOptionData.prices
+            ];
         } else if ("prices" in audioOptionData && audioOptionData.prices) {
           resolvedPrice = Math.min(...Object.values(audioOptionData.prices));
         }
@@ -130,7 +140,7 @@
       }
     }
     storeAudioOptions(selectedAudioOptions);
-    posthogClientCaptureWithoutTenant(EventName.AiboxOnboardingStep2, {
+    posthogClientCaptureGlobal(EventName.AiboxOnboardingStep2, {
       page_name: ScreenName.OnboardingStep2,
     });
     window.location.href = "/subscription/step3";
@@ -175,7 +185,11 @@
     {@html t("subscription.choose-your-plan-description")}
   </p>
   <div class="mt-4">
-    <AudioOptionList bind:selectedAudioOptionIds {selectedPackageId} {defaultLanguage} />
+    <AudioOptionList
+      bind:selectedAudioOptionIds
+      {selectedPackageId}
+      {defaultLanguage}
+    />
   </div>
 
   <div class="w-full flex items-center justify-end rounded-lg p-4">
