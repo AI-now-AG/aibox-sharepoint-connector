@@ -251,7 +251,8 @@
           <td class="py-3 px-4 text-sm font-medium rounded-l-lg">
             <a
               class="underline underline-offset-2"
-              href="/user-management/{user._id}">{user.name ?? "-"}</a
+              href="/user-management/{user._id}"
+              ><span class="break-all">{user.name ?? "-"}</span></a
             >
           </td>
           <td
