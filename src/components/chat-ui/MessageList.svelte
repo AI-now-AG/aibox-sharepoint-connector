@@ -26,7 +26,7 @@
   import Loading from "$components/Loading.svelte";
   import { addToast } from "$stores/toast";
   import InputDialog from "$components/InputDialog.svelte";
-  import { isValidEmail } from "$utils/common";
+  import { isValidEmail } from "$utils/validation";
   import MessageAction from "$components/chat-ui/MessageAction.svelte";
   import { TRANSCRIPTION_API_URL } from "astro:env/client";
   import { marked } from "marked";
@@ -513,7 +513,12 @@
                     <!-- Source Attribution for RAG responses -->
                     {#if role === MessageRole.Assistant && sources && sources.length > 0}
                       <div class="ml-14 mr-4">
-                        <SourceAttribution {sources} collapsed={true} showDebug={!!ragDebug && $tenant?.vector_kb_debug_enabled} />
+                        <SourceAttribution
+                          {sources}
+                          collapsed={true}
+                          showDebug={!!ragDebug &&
+                            $tenant?.vector_kb_debug_enabled}
+                        />
                         {#if ragDebug && $tenant?.vector_kb_debug_enabled}
                           <RAGDebugPanel debug={ragDebug} collapsed={true} />
                         {/if}

@@ -51,6 +51,7 @@ export async function getGlobalApiKeys(): Promise<GlobalApiKeys | null> {
  */
 export function resolveApiKey(
   keyName: ApiKeyField,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   tenant: any,
   globalKeys: GlobalApiKeys | null,
   envFallback: string = "",
@@ -86,6 +87,7 @@ export function resolveApiKey(
  */
 export function resolveConfig(
   configName: ConfigField,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   tenant: any,
   globalKeys: GlobalApiKeys | null,
   envFallback: string = "",

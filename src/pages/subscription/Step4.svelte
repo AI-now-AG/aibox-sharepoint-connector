@@ -8,7 +8,7 @@
   import { SubscriptionPackageId, AudioOptionId } from "$types/Subscription";
   import { isTrulyEmpty } from "$utils/common";
   import { EventName, ScreenName } from "$types/Posthog";
-  import { posthogClientCaptureWithoutTenant } from "$utils/posthogClient";
+  import { posthogClientCaptureGlobal } from "$utils/posthogClient";
 
   interface Props {
     defaultLanguage?: string;
@@ -103,7 +103,7 @@
       // After successful subscription creation, reset the subscription store
       $subscription = {};
 
-      posthogClientCaptureWithoutTenant(EventName.AiboxOnboardingCompleted, {
+      posthogClientCaptureGlobal(EventName.AiboxOnboardingCompleted, {
         page_name: ScreenName.OnboardingCompleted,
       });
 

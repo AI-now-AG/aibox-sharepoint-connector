@@ -1,7 +1,6 @@
 export enum ModelName {
   // OpenAI
   Gpt4o = "gpt-4o", // Text & Tools (Image) (Azure)
-  Gpt5Old = "gpt-5", // Text & Tools (Image, Thinking)
   Gpt5 = "gpt-5.1", // Text & Tools (Image, Thinking)
   Dalle = "dall-e-3", // Image Generation
   GptImage = "gpt-image-1", // Prompt Image tool
@@ -14,10 +13,10 @@ export enum ModelName {
   ElevenLabs = "scribe_v1", // Audio Transcription
 
   // Claude
-  ClaudeSonnet40 = "claude-sonnet-4-0", // Text
+  ClaudeSonnet46 = "claude-sonnet-4-6", // Text
 
   // Google
-  Gemini25Flash = "gemini-2.5-flash", // Text & Tools (Websearch, Thinking)
+  Gemini31FlashLite = "gemini-3.1-flash-lite-preview", // Text & Tools (Websearch, Thinking)
   Gemini25FlashImage = "gemini-2.5-flash-image", // Image Generation
   Gemini3ProImage = "gemini-3-pro-image-preview", // Image Generation
 
@@ -48,6 +47,7 @@ export enum PromptToolOption {
   Image = "image",
   Websearch = "websearch",
   Thinking = "thinking",
+  UrlContext = "urlcontext",
 }
 
 // Vector KB Embedding Providers

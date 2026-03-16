@@ -60,40 +60,42 @@
   }
 </script>
 
-<table
-  class="border-separate border-spacing-x-0 border-spacing-y-3 min-w-full relative"
-  style="font-family:Inter;"
->
-  <colgroup>
-    {#each columnData as data}
-      <col class={data.class ?? "w-auto"} />
-    {/each}
-  </colgroup>
-  <thead>
-    <tr class="bg-base-300 rounded-lg">
-      {#each columnData as data, colIndex}
-        <th
-          class={"py-3 px-4 text-left font-normal text-xs" +
-            getFirstLastColCssClass(colIndex, columnData.length)}
-          onclick={() => sort(data.key ?? "")}
-        >
-          <span class="inline-flex justify-center items-center">
-            {data.name}
-            <span class="ml-1">
-              {@html data.key
-                ? sortColumn === data.key
-                  ? sortDirection === "asc"
-                    ? svgIcons.arrowUp
-                    : svgIcons.arrowDown
-                  : svgIcons.arrowUpDown
-                : ""}
-            </span>
-          </span>
-        </th>
+<div class="overflow-x-auto relative">
+  <table
+    class="table table-fixed border-separate border-spacing-x-0 border-spacing-y-3 min-w-full relative"
+    style="font-family:Inter;"
+  >
+    <colgroup>
+      {#each columnData as data}
+        <col class={data.class ?? "w-auto min-w-[150]"} />
       {/each}
-    </tr>
-  </thead>
-  <tbody>
-    {@render children?.()}
-  </tbody>
-</table>
+    </colgroup>
+    <thead>
+      <tr class="bg-base-300 rounded-lg">
+        {#each columnData as data, colIndex}
+          <th
+            class={"py-3 px-4 text-left font-normal text-xs" +
+              getFirstLastColCssClass(colIndex, columnData.length)}
+            onclick={() => sort(data.key ?? "")}
+          >
+            <span class="inline-flex justify-center items-center">
+              {data.name}
+              <span class="ml-1">
+                {@html data.key
+                  ? sortColumn === data.key
+                    ? sortDirection === "asc"
+                      ? svgIcons.arrowUp
+                      : svgIcons.arrowDown
+                    : svgIcons.arrowUpDown
+                  : ""}
+              </span>
+            </span>
+          </th>
+        {/each}
+      </tr>
+    </thead>
+    <tbody>
+      {@render children?.()}
+    </tbody>
+  </table>
+</div>

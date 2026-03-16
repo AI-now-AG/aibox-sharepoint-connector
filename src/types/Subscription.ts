@@ -72,7 +72,7 @@ export const AudioOptionLabels: Record<AudioOptionId, string> = {
   [AudioOptionId.AudioBasis]: "Audio to Text Basic", // [Audio to Text Basic]
   [AudioOptionId.AudioBasisAddOnLarge]: "Audio to Text Large", // [Audio to Text Large]
   [AudioOptionId.AudioBasisAddOnSubtitle]: "Subtitle Studio Basic", // [Subtitle Studio Basic]
-  [AudioOptionId.AudioPremium]: "Subtitle Studio Plus", // [Subtitle Studio Plus]
+  [AudioOptionId.AudioPremium]: "Subtitle Studio", // [Subtitle Studio Plus]
   [AudioOptionId.AudioToText]: "Audio to Text", // [Audio to Text]
 };
 

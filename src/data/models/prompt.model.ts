@@ -148,4 +148,11 @@ export default {
       .limit(1)
       .next();
   },
+
+  addKbToTenantPrompts: async (tenantId: ObjectId, kbId: ObjectId) => {
+    return collection.updateMany(
+      { tenant_id: tenantId },
+      { $addToSet: { knowledgebase: kbId } },
+    );
+  },
 };

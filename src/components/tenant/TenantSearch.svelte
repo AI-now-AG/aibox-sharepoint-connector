@@ -2,6 +2,7 @@
   export interface Option {
     value: string;
     title: string;
+    active?: boolean;
   }
 </script>
 
@@ -17,6 +18,7 @@
     selectedTenant: string;
     placeholder?: string;
     disabled?: boolean;
+    includeInactive?: boolean;
     onselect?: Function;
     onclear?: Function;
   }
@@ -24,6 +26,7 @@
     selectedTenant = $bindable(""),
     placeholder = "Search tenants",
     disabled = false,
+    includeInactive = true,
     onselect,
     onclear,
   }: Props = $props();
@@ -51,19 +54,32 @@
   async function fetchTenants() {
     isFetching = true;
 
-    const { data } = await actions.tenant.listActive();
-    options = data.map((tenant: any) => ({
-      value: tenant._id,
-      title: tenant.name,
-    }));
+    const { data } = await actions.tenant.listAll();
+    options = data
+      .filter((tenant: any) => includeInactive || tenant.active)
+      .map((tenant: any) => ({
+        value: tenant._id,
+        title: tenant.name,
+        active: tenant.active,
+      }));
 
     isFetching = false;
   }
 
   function filterTenants() {
-    filteredTenants = options.filter((option) => {
-      return option.title?.toLowerCase()?.includes(searchQuery?.toLowerCase());
-    });
+    const query = searchQuery?.toLowerCase() ?? "";
+
+    filteredTenants = options
+      .filter((option) => option.title?.toLowerCase().includes(query))
+      .sort((a, b) => {
+        const score = (t: string) =>
+          t === query ? 0 : t.startsWith(query) ? 1 : 2;
+        return (
+          score(a.title.toLowerCase()) - score(b.title.toLowerCase()) ||
+          a.title.localeCompare(b.title)
+        );
+      })
+      .slice(0, 10);
   }
 
   const onSearch = debounce(() => {
@@ -82,7 +98,8 @@
     selectedOption = option;
     selectedTenant = option.value;
 
-    searchQuery = option.title;
+    searchQuery =
+      option.active === false ? `${option.title} (inactive)` : option.title;
     filteredTenants = [];
 
     onselect?.(selectedTenant);
@@ -92,17 +109,21 @@
 <div class="dropdown w-full">
   <div class="flex flex-row items-center space-x-2">
     <div
-      class="input flex justify-between items-center gap-2 {isFetching ||
-      disabled
-        ? 'pointer-events-none opacity-50 bg-gray-200'
+      class="w-full input flex justify-between items-center gap-2 {disabled
+        ? 'pointer-events-none opacity-50'
         : ''}"
     >
-      {@html svgIcons.search}
+      {#if isFetching}
+        <span class="loading loading-sm loading-dots"></span>
+      {:else}
+        {@html svgIcons.search}
+      {/if}
       <input
         type="text"
-        class="grow {selectedOption ? 'bg-base-100' : ''}"
+        class="grow {selectedOption ? 'bg-base-100 cursor-default' : ''}"
         placeholder={selectedOption ? selectedOption.title : placeholder}
         bind:value={searchQuery}
+        readonly={!!selectedOption || isFetching}
         oninput={preventDefault(onSearch)}
       />
       {#if searchQuery?.length > 0}
@@ -121,11 +142,16 @@
       {#each filteredTenants as option}
         <li class="w-full">
           <button
-            class="w-full text-left flex items-center gap-2"
+            class="w-full text-left flex items-center justify-between gap-2"
             onclick={() => {
               onSelect(option);
-            }}>{option.title}</button
+            }}
           >
+            <span>{option.title}</span>
+            {#if option.active === false}
+              <span class="badge badge-sm badge-warning">inactive</span>
+            {/if}
+          </button>
         </li>
       {/each}
     </ul>

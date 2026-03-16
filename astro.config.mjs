@@ -13,7 +13,7 @@ export default defineConfig({
     svelte(),
     sentry({
       sourceMapsUploadOptions: {
-        project: import.meta.env.SENTRY_PROJECT,
+        project: import.meta.env.SENTRY_PROJECT || "aibox",
         authToken: import.meta.env.SENTRY_AUTH_TOKEN,
       },
     }),

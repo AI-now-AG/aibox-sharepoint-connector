@@ -9,10 +9,9 @@ export enum UsageType {
 
 export enum TextModel {
   Gpt4o = "gpt-4o",
-  Gpt5Old = "gpt-5",
   Gpt5 = "gpt-5.1",
-  ClaudeSonnet = "claude-sonnet-4-0",
-  Gemini = "gemini-2.5-flash",
+  ClaudeSonnet = "claude-sonnet-4-6",
+  Gemini = "gemini-3.1-flash-lite-preview",
 }
 
 export enum AudioModel {

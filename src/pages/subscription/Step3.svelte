@@ -17,9 +17,9 @@
     BillingMethod,
     CountryCode,
   } from "$types/Subscription";
-  import { isValidEmail } from "$utils/common";
+  import { isValidEmail } from "$utils/validation";
   import { EventName, ScreenName } from "$types/Posthog";
-  import { posthogClientCaptureWithoutTenant } from "$utils/posthogClient";
+  import { posthogClientCaptureGlobal } from "$utils/posthogClient";
   import Dropdown from "$components/form/Dropdown.svelte";
   import BillingMethods from "$components/subscription/BillingMethods.svelte";
   import { useTranslatedCountryList } from "$utils/subscription";
@@ -164,13 +164,13 @@
           storeStripeCheckout({
             customerId: result.stripeCustomerId,
           });
-          posthogClientCaptureWithoutTenant(EventName.AiboxOnboardingStep3, {
+          posthogClientCaptureGlobal(EventName.AiboxOnboardingStep3, {
             page_name: ScreenName.OnboardingStep3,
           });
           window.location.href = result.url || "";
         }
       } else {
-        posthogClientCaptureWithoutTenant(EventName.AiboxOnboardingStep3, {
+        posthogClientCaptureGlobal(EventName.AiboxOnboardingStep3, {
           page_name: ScreenName.OnboardingStep3,
         });
         window.location.href = "/subscription/step4";
