@@ -13,6 +13,7 @@ export const ConfigurationSchema = z.object({
   defaultInstructions: z.array(ProviderInstructionSchema).optional(),
   promptRefinementInstruction: z.string().optional(),
   promptKbGenerationInstruction: z.string().optional(),
+  selfOnboardingIndustryInstruction: z.string().optional(),
   citationInstruction: CitationInstructionSchema.optional(),
 });
 
@@ -40,6 +41,10 @@ export const configurations = {
         if (input.promptKbGenerationInstruction !== undefined) {
           update.promptKbGenerationInstruction =
             input.promptKbGenerationInstruction;
+        }
+        if (input.selfOnboardingIndustryInstruction !== undefined) {
+          update.selfOnboardingIndustryInstruction =
+            input.selfOnboardingIndustryInstruction;
         }
 
         if (Object.keys(update).length === 0) {

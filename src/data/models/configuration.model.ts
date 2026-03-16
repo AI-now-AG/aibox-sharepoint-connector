@@ -25,6 +25,7 @@ export const ConfigurationSchema = z.object({
   defaultInstructions: z.array(ProviderInstructionSchema),
   promptRefinementInstruction: z.string().nullish().default(null),
   promptKbGenerationInstruction: z.string().nullish().default(null),
+  selfOnboardingIndustryInstruction: z.string().nullish().default(null),
   citationInstruction: InstructionSchema.optional(),
   created_at: z
     .date()

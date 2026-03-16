@@ -960,5 +960,7 @@
   "kb.add-dialog.generate-button": "Generate Knowledge Base",
   "kb.add-dialog.create-failed": "Failed to create the knowledge base.",
   "kb.add-dialog.success-title": "Knowledge Base created!",
-  "kb.add-dialog.success-message": "This Knowledge Base has been added to all Assistants."
+  "kb.add-dialog.success-message": "This Knowledge Base has been added to all Assistants.",
+  "global-prompts.self-onboarding-industry-title": "Self-Onboarding Industry Detection",
+  "global-prompts.self-onboarding-industry-description": "Guides industry identification during the user self-onboarding flow"
 }
