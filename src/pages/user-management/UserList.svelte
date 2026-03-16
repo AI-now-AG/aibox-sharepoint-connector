@@ -257,7 +257,7 @@
           <td
             class="py-3 px-4 text-base-content flex items-center text-sm font-medium h-16"
           >
-            {user.email}
+            <span class="break-all">{user.email}</span>
           </td>
           <td class="py-3 px-4 text-sm font-medium"
             >{getRoleString(user.roles)}</td
