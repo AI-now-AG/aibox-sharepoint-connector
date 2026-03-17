@@ -251,13 +251,14 @@
           <td class="py-3 px-4 text-sm font-medium rounded-l-lg">
             <a
               class="underline underline-offset-2"
-              href="/user-management/{user._id}">{user.name ?? "-"}</a
+              href="/user-management/{user._id}"
+              ><span class="break-all">{user.name ?? "-"}</span></a
             >
           </td>
           <td
             class="py-3 px-4 text-base-content flex items-center text-sm font-medium h-16"
           >
-            {user.email}
+            <span class="break-all">{user.email}</span>
           </td>
           <td class="py-3 px-4 text-sm font-medium"
             >{getRoleString(user.roles)}</td
