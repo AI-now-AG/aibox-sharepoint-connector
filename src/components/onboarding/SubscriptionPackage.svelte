@@ -1,6 +1,6 @@
 <script lang="ts">
   import { svgIcons } from "$assets/icons";
-  import { useTranslations } from "$i18n/utils";
+  import { useTranslations, getLanguage } from "$i18n/utils";
 
   interface Props {
     id: string;
@@ -11,7 +11,6 @@
     currency?: string;
     onSelect?: Function;
     selectedPackageId?: string;
-    defaultLanguage?: string;
   }
 
   let {
@@ -23,10 +22,10 @@
     currency,
     onSelect,
     selectedPackageId = $bindable(""),
-    defaultLanguage = "en",
   }: Props = $props();
 
-  const t = useTranslations(defaultLanguage);
+  const t = useTranslations();
+  const defaultLanguage = getLanguage();
 
   let backgroundColor = $state("background-color: white;");
   $effect(() => {

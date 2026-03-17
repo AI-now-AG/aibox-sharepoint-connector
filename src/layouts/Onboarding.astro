@@ -1,5 +1,6 @@
 ---
 import PostHogJs from "$components/PostHogJs.astro";
+import SharedVariables from "$components/theme/SharedVariables.svelte";
 import Toasts from "$components/toast-notification/Toasts.svelte";
 
 interface Props {
@@ -39,6 +40,9 @@ const isPosthogEnabled = tenant && tenant.is_on_posthog;
     class="min-h-screen flex items-center justify-center p-6"
     style="background-color: #491EFF;"
   >
+    <!-- Shared variables for all Svelte components -->
+    <!-- Initialize app locale for useTranslations() -->
+    <SharedVariables locale={Astro.locals.locale} client:load />
     <slot />
     <Toasts client:load />
   </body>

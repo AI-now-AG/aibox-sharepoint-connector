@@ -7,12 +7,12 @@ import type { TagItem } from "$types/Subscription";
 
 const t = useTranslations();
 
-const defaultLanguage = Astro.locals.tenant?.default_language || "en";
-
 const allTags = await GlobalTagModel.list();
 
 const tags: TagItem[] = allTags
-  .filter((tag) => tag?.categories && tag.categories?.includes("self-onboarding"))
+  .filter(
+    (tag) => tag?.categories && tag.categories?.includes("self-onboarding"),
+  )
   .map((tag) => ({
     title: tag.title,
     value: tag._id.toString(),
@@ -20,8 +20,12 @@ const tags: TagItem[] = allTags
     icon: tag.icon,
     iconColor: tag.iconColor,
   }));
+
+if (Astro.locals.tenant?.is_trial !== true) {
+  //return Astro.rewrite("/restricted");
+}
 ---
 
 <OnboardingLayout title={t("self-onboarding.page-title")}>
-  <SelfOnboardingForm {tags} {defaultLanguage} client:load />
+  <SelfOnboardingForm {tags} client:load />
 </OnboardingLayout>

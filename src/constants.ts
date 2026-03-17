@@ -56,8 +56,8 @@ export const FEATURE_MAP_ROUTES = {
 };
 
 export const SKIP_CHEKING_ONBOARDING_ROUTES = [
-  "/subscription",
-  "/subscription/*",
+  "/onboarding",
+  "/onboarding/*",
   "/logout",
   "/logout/*",
   "/api/logout",

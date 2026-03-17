@@ -1,0 +1,169 @@
+<script lang="ts">
+  import type { TagItem } from "$types/Subscription";
+  import { useTranslations } from "$i18n/utils";
+  import { bgOpacity } from "$utils/common";
+
+  interface Props {
+    tags: TagItem[];
+    organizationName: string;
+    websiteUrl: string;
+    selectedTag: string;
+    oncreate: () => void;
+  }
+
+  let {
+    tags = [],
+    organizationName = $bindable(""),
+    websiteUrl = $bindable(""),
+    selectedTag = $bindable(""),
+    oncreate,
+  }: Props = $props();
+
+  const t = useTranslations();
+
+  const defaultTagIconColor = "#491EFF";
+  const defaultTagEmoji = "🏢";
+
+  let showIndustryPicker = $state(false);
+
+  function selectTag(tagId: string) {
+    selectedTag = selectedTag === tagId ? "" : tagId;
+  }
+</script>
+
+<!-- Header -->
+<div class="flex items-center gap-3 mb-2">
+  <img src="/favicon.svg" alt="aibox" class="w-9 h-9 rounded-lg" />
+  <h1 class="text-2xl font-bold text-gray-900">
+    {t("self-onboarding.card-title")}
+  </h1>
+</div>
+
+<p class="text-sm text-gray-500 mb-7">{t("self-onboarding.card-subtitle")}</p>
+
+<!-- Organisation name -->
+<div class="mb-5">
+  <label for="org-name" class="block text-sm font-semibold text-gray-900 mb-2">
+    {t("self-onboarding.org-name-label")}
+  </label>
+  <input
+    id="org-name"
+    type="text"
+    class="input input-bordered w-full"
+    placeholder={t("self-onboarding.org-name-placeholder")}
+    bind:value={organizationName}
+  />
+</div>
+
+<!-- Website URL -->
+<div class="mb-1">
+  <label
+    for="website-url"
+    class="block text-sm font-semibold text-gray-900 mb-2"
+  >
+    {t("self-onboarding.website-label")}
+    <span class="font-normal text-gray-400 ml-1">
+      ({t("self-onboarding.optional")})
+    </span>
+  </label>
+  <input
+    id="website-url"
+    type="url"
+    class="input input-bordered w-full"
+    placeholder={t("self-onboarding.website-placeholder")}
+    bind:value={websiteUrl}
+  />
+</div>
+
+<p class="text-xs text-gray-400 mt-2 mb-5">
+  {t("self-onboarding.website-hint")}
+</p>
+
+<!-- Manual industry picker toggle -->
+<button
+  type="button"
+  class="flex items-center gap-1.5 text-[#491EFF] font-medium text-sm mb-5 hover:underline cursor-pointer"
+  onclick={() => (showIndustryPicker = !showIndustryPicker)}
+>
+  <svg
+    class={`w-4 h-4 transition-transform duration-200 ${showIndustryPicker ? "rotate-180" : ""}`}
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2.5"
+    viewBox="0 0 24 24"
+  >
+    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"
+    ></path>
+  </svg>
+  {t("self-onboarding.manual-industry")}
+</button>
+
+<!-- Collapsible industry card grid -->
+{#if showIndustryPicker}
+  {#if tags.length === 0}
+    <p class="text-sm text-gray-400 mb-5">{t("self-onboarding.no-tags")}</p>
+  {:else}
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+      {#each tags as tag}
+        <button
+          type="button"
+          class={`w-full p-3 rounded-xl border-2 transition-all duration-150 text-left flex flex-col gap-1.5
+            ${
+              selectedTag === tag.value
+                ? "border-[#2453FF] bg-white shadow-md"
+                : "border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm"
+            }`}
+          onclick={() => selectTag(tag.value)}
+        >
+          <div class="flex items-center gap-2.5">
+            <div
+              class="flex w-8 h-8 items-center justify-center rounded-lg shrink-0"
+              style={`color:${tag.iconColor || defaultTagIconColor}; background:${bgOpacity(tag.iconColor || defaultTagIconColor)}`}
+            >
+              {#if tag.icon}
+                {#if tag.icon.trim().startsWith("data:image")}
+                  <img src={tag.icon} alt="" class="w-5 h-5 object-contain" />
+                {:else}
+                  <span class="text-lg leading-none">{tag.icon}</span>
+                {/if}
+              {:else}
+                <span class="text-lg leading-none">{defaultTagEmoji}</span>
+              {/if}
+            </div>
+
+            <span
+              class="flex-1 font-semibold text-sm text-gray-900 leading-tight"
+            >
+              {tag.title}
+            </span>
+
+            {#if selectedTag === tag.value}
+              <div
+                class="w-4 h-4 rounded-full bg-[#2453FF] text-white flex items-center justify-center shrink-0"
+                style="font-size: 9px;"
+              >
+                ✓
+              </div>
+            {/if}
+          </div>
+
+          {#if tag.description}
+            <p class="text-xs text-gray-400 leading-snug pl-[42px]">
+              {tag.description}
+            </p>
+          {/if}
+        </button>
+      {/each}
+    </div>
+  {/if}
+{/if}
+
+<!-- CTA -->
+<button
+  type="button"
+  class="btn w-full rounded-full py-3 font-bold text-white text-base"
+  style="background-color: #3730C7; border-color: #3730C7;"
+  onclick={oncreate}
+>
+  {t("self-onboarding.create-btn")}
+</button>

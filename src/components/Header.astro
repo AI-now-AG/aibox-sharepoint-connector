@@ -40,6 +40,7 @@ function pickTenant(tenant: Tenant) {
 <InitializeTheme />
 
 <!-- Shared variables for all .svelte components -->
+<!-- Initialize app locale for useTranslations() -->
 <SharedVariables
   tenant={transformRawData(pickTenant(Astro.locals.tenant))}
   user={transformRawData(pickUser(Astro.locals.user))}

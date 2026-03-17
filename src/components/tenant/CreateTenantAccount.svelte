@@ -29,10 +29,10 @@
   import Input from "$components/form/Input.svelte";
   import Dropdown from "$components/form/Dropdown.svelte";
   import ThemeItem from "./ThemeItem.svelte";
-  import TagCategorySelector from "$components/subscription/TagCategorySelector.svelte";
-  import SubscriptionPackageList from "$components/subscription/SubscriptionPackageList.svelte";
-  import AudioOptionList from "$components/subscription/AudioOptionList.svelte";
-  import BillingMethods from "$components/subscription/BillingMethods.svelte";
+  import TagCategorySelector from "$components/onboarding/TagCategorySelector.svelte";
+  import SubscriptionPackageList from "$components/onboarding/SubscriptionPackageList.svelte";
+  import AudioOptionList from "$components/onboarding/AudioOptionList.svelte";
+  import BillingMethods from "$components/onboarding/BillingMethods.svelte";
   import { TRANSCRIPTION_API_URL } from "astro:env/client";
   import { posthogClientCaptureGlobal } from "$utils/posthogClient";
 
