@@ -8,7 +8,7 @@
     organizationName: string;
     websiteUrl: string;
     selectedTag: string;
-    oncreate: () => void;
+    oncreate: Function;
   }
 
   let {

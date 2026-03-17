@@ -30,35 +30,23 @@
   // ── Step definitions (depend on whether a website was provided) ────────────
   const stepDefs: StepDef[] = websiteUrl.trim()
     ? [
-        {
-          key: "analyse-website",
-          label: t("self-onboarding.step-analyse-website"),
-        },
-        { key: "create-aibox", label: t("self-onboarding.step-create-aibox") },
-        { key: "create-kb", label: t("self-onboarding.step-create-kb") },
-        {
-          key: "configure-assistants",
-          label: t("self-onboarding.step-configure-assistants"),
-        },
-        {
-          key: "finalize-setup",
-          label: t("self-onboarding.step-finalize-setup"),
-        },
+        { key: "analyse-website",      label: t("self-onboarding.step-analyse-website") },
+        { key: "create-aibox",         label: t("self-onboarding.step-create-aibox") },
+        { key: "create-kb",            label: t("self-onboarding.step-create-kb") },
+        { key: "configure-assistants", label: t("self-onboarding.step-configure-assistants") },
+        { key: "finalize-setup",       label: t("self-onboarding.step-finalize-setup") },
       ]
     : [
-        { key: "create-aibox", label: t("self-onboarding.step-create-aibox") },
-        {
-          key: "configure-assistants",
-          label: t("self-onboarding.step-configure-assistants"),
-        },
-        {
-          key: "finalize-setup",
-          label: t("self-onboarding.step-finalize-setup"),
-        },
+        { key: "create-aibox",         label: t("self-onboarding.step-create-aibox") },
+        { key: "configure-assistants", label: t("self-onboarding.step-configure-assistants") },
+        { key: "finalize-setup",       label: t("self-onboarding.step-finalize-setup") },
       ];
 
-  // Advances as each step completes; when === stepDefs.length all are done
+  // currentStepIndex drives both the step status icons and the progress bar.
+  // Value n means steps 0…n-1 are Completed, step n is Active, n+1… are Pending.
+  // When n === stepDefs.length all steps are Completed and we transition away.
   let currentStepIndex = $state(0);
+  let error = $state<string | null>(null);
 
   const steps: Step[] = $derived(
     stepDefs.map((def, i) => ({
@@ -72,35 +60,69 @@
     })),
   );
 
-  // Progress: 0 % at step 0, 100 % once all steps done
   const progressPercent = $derived((currentStepIndex / stepDefs.length) * 100);
 
-  // ── Timer — starts on mount, cleans up on unmount ──────────────────────────
-  const STEP_DURATION_MS = 1500;
+  // ── API stubs — replace body with real fetch/action call later ─────────────
+  const STUB_DELAY_MS = 1500;
+  const delay = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
+  async function analyseWebsite(): Promise<void> {
+    // TODO: POST /api/onboarding/analyse-website  { websiteUrl }
+    await delay(STUB_DELAY_MS);
+  }
+
+  async function createAibox(): Promise<void> {
+    // TODO: POST /api/onboarding/create-aibox
+    await delay(STUB_DELAY_MS);
+  }
+
+  async function createKB(): Promise<void> {
+    // TODO: POST /api/onboarding/create-kb
+    await delay(STUB_DELAY_MS);
+  }
+
+  async function configureAssistants(): Promise<void> {
+    // TODO: POST /api/onboarding/configure-assistants
+    await delay(STUB_DELAY_MS);
+  }
+
+  async function finalizeSetup(): Promise<void> {
+    // TODO: POST /api/onboarding/finalize-setup
+    await delay(STUB_DELAY_MS);
+  }
+
+  // Map each step key to its handler so the runner stays generic
+  const stepHandlers: Record<string, () => Promise<void>> = {
+    "analyse-website":      analyseWebsite,
+    "create-aibox":         createAibox,
+    "create-kb":            createKB,
+    "configure-assistants": configureAssistants,
+    "finalize-setup":       finalizeSetup,
+  };
+
+  // ── Sequential runner — starts on mount, respects unmount via cancelled flag ─
   $effect(() => {
-    const totalSteps = stepDefs.length;
-    const timers: ReturnType<typeof setTimeout>[] = [];
+    let cancelled = false;
 
-    for (let i = 1; i <= totalSteps; i++) {
-      timers.push(
-        setTimeout(() => {
-          currentStepIndex = i; // i === totalSteps → all Completed, none Active
-        }, i * STEP_DURATION_MS),
-      );
+    async function run() {
+      try {
+        for (let i = 0; i < stepDefs.length; i++) {
+          if (cancelled) return;
+          currentStepIndex = i;                       // mark step as Active
+          await stepHandlers[stepDefs[i].key]?.();
+        }
+        if (cancelled) return;
+        currentStepIndex = stepDefs.length;           // mark all as Completed
+        oncomplete();
+      } catch (err) {
+        if (!cancelled) {
+          error = err instanceof Error ? err.message : "An unexpected error occurred";
+        }
+      }
     }
 
-    // Brief "all done" pause before transitioning to success
-    timers.push(
-      setTimeout(
-        () => {
-          oncomplete();
-        },
-        (totalSteps + 1) * STEP_DURATION_MS,
-      ),
-    );
-
-    return () => timers.forEach(clearTimeout);
+    run();
+    return () => { cancelled = true; };
   });
 </script>
 
@@ -124,10 +146,18 @@
   ></div>
 </div>
 
+<!-- Error state -->
+{#if error}
+  <div class="rounded-xl bg-red-50 border border-red-200 px-4 py-3 mb-5 text-sm text-red-600">
+    {error}
+  </div>
+{/if}
+
 <!-- Step list -->
 <ul class="space-y-5">
   {#each steps as step}
     <li class="flex items-center gap-4">
+
       <!-- Status icon -->
       {#if step.status === StepStatus.Completed}
         <div
@@ -136,23 +166,22 @@
         >
           ✓
         </div>
+
       {:else if step.status === StepStatus.Active}
-        <!-- Pulsing dot, animating -->
-        <div
-          class="w-6 h-6 rounded-full flex items-center justify-center shrink-0"
-          style="background-color: #491EFF; font-size: 11px;"
-        >
+        <!-- Pulsing dot, no border while animating -->
+        <div class="w-6 h-6 flex items-center justify-center shrink-0">
           <div class="relative flex items-center justify-center">
             <div
-              class="absolute w-6 h-6 rounded-full animate-ping opacity-75"
+              class="absolute w-2.5 h-2.5 rounded-full animate-ping opacity-75"
               style="background-color: #491EFF;"
             ></div>
             <div
               class="w-2.5 h-2.5 rounded-full"
-              style="background-color: #dedde2;"
+              style="background-color: #491EFF;"
             ></div>
           </div>
         </div>
+
       {:else}
         <!-- Pending -->
         <div class="w-6 h-6 rounded-full bg-gray-200 shrink-0"></div>
@@ -161,13 +190,12 @@
       <!-- Label -->
       <span
         class={`text-sm font-semibold ${
-          step.status === StepStatus.Pending
-            ? "text-gray-400"
-            : "text-[#491EFF]"
+          step.status === StepStatus.Pending ? "text-gray-400" : "text-[#491EFF]"
         }`}
       >
         {step.label}
       </span>
+
     </li>
   {/each}
 </ul>
