@@ -21,7 +21,7 @@
   } as const;
   type View = (typeof View)[keyof typeof View];
 
-  let currentView: View = $state(View.Processing);
+  let currentView: View = $state(View.Form);
 
   // ── Shared form state (passed down + needed by success view) ───────────────
   let organizationName = $state("");
