@@ -102,10 +102,8 @@
   );
 
   const DEFAULT_PROMPT_KB_INSTRUCTION = `
-    You are a research assistant. Generate a comprehensive company overview in the same language as the company's website.
-    Include: company overview, main products and services, target customers, unique value propositions, and any other relevant information.
-    Format the output as clear structured text suitable for an internal knowledge base.
-    Be factual and concise.
+    Generate a short company overview in the website’s language. Include key info (products, customers, value). 
+    Keep it clear and concise.
   `;
 
   const t = useTranslations();
@@ -173,7 +171,7 @@
     return data;
   }
 
-  async function setupTenantData(
+  async function initializeTenant(
     organizationId: string,
     organizationName: string,
     organizationDisplayName: string,
@@ -204,11 +202,11 @@
       is_somedia: isSomedia,
       reseller_code: resellerCode,
     };
-    const { data, error } = await actions.tenantCreation.setupTenantData({
+    const { data, error } = await actions.tenantCreation.initializeTenant({
       tenant: tenantInput,
       config: tenantConfig,
     });
-    console.log("setupTenantData respone", { data, error });
+    console.log("initializeTenant respone", { data, error });
 
     if (error) throw new Error(t("tenant.setup-tenant-data-failed"));
     return data;
@@ -294,7 +292,7 @@
     const selectedTemplate =
       tags.find((tag) => tag.value == selectedTag)?.title || "";
 
-    const { data, error } = await actions.tenantCreation.finalize({
+    const { data, error } = await actions.tenantCreation.completeTenantSetup({
       tenant_id: newTenantId,
       template: selectedTemplate,
     });
@@ -339,8 +337,8 @@
         // Step 1: Create Auth0 Organization
         const organization = await createOrganization();
 
-        // Step 2: Setup Tenant Data
-        const tenant = await setupTenantData(
+        // Step 2: Initialize tenant
+        const tenant = await initializeTenant(
           organization.id,
           organization.name,
           organization.display_name,
@@ -559,7 +557,6 @@
         </p>
         <BillingMethods
           bind:billingMethod
-          {defaultLanguage}
           availableMethods={[
             BillingMethod.MonthlyInvoice,
             BillingMethod.YearlyInvoice,
@@ -573,7 +570,6 @@
       <TagCategorySelector
         {tags}
         {categories}
-        {defaultLanguage}
         bind:selectedTag
         bind:selectedCategories
       />
@@ -599,11 +595,7 @@
       </h2>
 
       <div class="mt-4">
-        <AudioOptionList
-          bind:selectedAudioOptionIds
-          {selectedPackageId}
-          {defaultLanguage}
-        />
+        <AudioOptionList bind:selectedAudioOptionIds {selectedPackageId} />
       </div>
 
       <div class="w-full flex items-center justify-end rounded-lg p-4">

@@ -24,9 +24,9 @@
   let currentView: View = $state(View.Form);
 
   // ── Shared form state (passed down + needed by success view) ───────────────
-  let organizationName = $state("");
-  let websiteUrl = $state("");
-  let selectedTag = $state("");
+  let organizationName: string = $state("");
+  let websiteUrl: string = $state("");
+  let selectedTag: string = $state("");
 
   const selectedTagTitle = $derived(
     tags.find((tag) => tag.value === selectedTag)?.title ?? "",
@@ -57,7 +57,10 @@
     />
   {:else if currentView === View.Processing}
     <ProcessingView
+      {tags}
+      {organizationName}
       {websiteUrl}
+      {selectedTag}
       oncomplete={() => (currentView = View.Success)}
     />
   {:else if currentView === View.Success}

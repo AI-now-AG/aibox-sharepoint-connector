@@ -1,5 +1,6 @@
 ---
 import OnboardingLayout from "$layouts/Onboarding.astro";
+import { ONBOARDING_CATEGORY } from "$types/TagInput";
 import SelfOnboardingForm from "./SelfOnboardingForm.svelte";
 import GlobalTagModel from "$data/models/globalTag.model";
 import { useTranslations } from "$i18n/utils";
@@ -11,7 +12,7 @@ const allTags = await GlobalTagModel.list();
 
 const tags: TagItem[] = allTags
   .filter(
-    (tag) => tag?.categories && tag.categories?.includes("self-onboarding"),
+    (tag) => tag?.categories && tag.categories?.includes(ONBOARDING_CATEGORY),
   )
   .map((tag) => ({
     title: tag.title,
