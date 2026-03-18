@@ -13,7 +13,7 @@ export const ConfigurationSchema = z.object({
   defaultInstructions: z.array(ProviderInstructionSchema).optional(),
   promptRefinementInstruction: z.string().optional(),
   promptKbGenerationInstruction: z.string().optional(),
-  selfOnboardingIndustryInstruction: z.string().optional(),
+  onboardingIndustryInstruction: z.string().optional(),
   citationInstruction: CitationInstructionSchema.optional(),
 });
 
@@ -42,9 +42,9 @@ export const configurations = {
           update.promptKbGenerationInstruction =
             input.promptKbGenerationInstruction;
         }
-        if (input.selfOnboardingIndustryInstruction !== undefined) {
-          update.selfOnboardingIndustryInstruction =
-            input.selfOnboardingIndustryInstruction;
+        if (input.onboardingIndustryInstruction !== undefined) {
+          update.onboardingIndustryInstruction =
+            input.onboardingIndustryInstruction;
         }
 
         if (Object.keys(update).length === 0) {

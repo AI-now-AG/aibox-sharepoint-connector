@@ -99,7 +99,38 @@
       ? (content.at(-1)?.text ?? "")
       : (content ?? "");
 
-    throw new Error(kbContent);
+    const newResponse = await fetch(executePromptUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({
+        tenantId: $tenant?._id?.toString(),
+        provider: PromptModel.Gemini,
+        systemMessage: [industryInstruction || DEFAULT_KB_INSTRUCTION],
+        prompt: `Company: ${organizationName}\nWebsite: ${websiteUrl}`,
+        tool: PromptToolOption.UrlContext,
+      }),
+    });
+
+    if (!newResponse.ok) {
+      console.warn(
+        "SelfOnboarding -> analyseWebsite() failed",
+        `HTTP ${response.status}: ${response.statusText}`,
+      );
+      throw new Error(
+        `${t("self-onboarding.error-analyse-website")} - HTTP ${response.status}: ${response.statusText}`,
+      );
+    }
+
+    const newJson = await newResponse.json();
+    const { response: newContent } = json.data;
+    const aaa = Array.isArray(newContent)
+      ? (newContent.at(-1)?.text ?? "")
+      : (newContent ?? "");
+
+    throw new Error(aaa);
   }
 
   async function createAibox(): Promise<void> {

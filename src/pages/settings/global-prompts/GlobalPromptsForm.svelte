@@ -11,14 +11,14 @@
     configurationId: string;
     promptRefinementInstruction: string;
     promptKbGenerationInstruction: string;
-    selfOnboardingIndustryInstruction: string;
+    onboardingIndustryInstruction: string;
   }
 
   let {
     configurationId,
     promptRefinementInstruction,
     promptKbGenerationInstruction,
-    selfOnboardingIndustryInstruction,
+    onboardingIndustryInstruction,
   }: Props = $props();
 
   let loading: boolean = $state(false);
@@ -29,7 +29,7 @@
       _id: configurationId,
       promptRefinementInstruction,
       promptKbGenerationInstruction,
-      selfOnboardingIndustryInstruction,
+      onboardingIndustryInstruction,
     });
 
     if (!error) {
@@ -94,7 +94,7 @@
       <textarea
         id="global-prompt-self-onboarding-industry"
         class="textarea textarea-bordered h-64 w-full mt-2"
-        bind:value={selfOnboardingIndustryInstruction}
+        bind:value={onboardingIndustryInstruction}
       ></textarea>
     </div>
   </div>

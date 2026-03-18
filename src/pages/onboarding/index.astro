@@ -33,7 +33,7 @@ if (Astro.locals.tenant?.is_trial !== true) {
   <SelfOnboardingForm
     {tags}
     promptKbInstruction={config?.promptKbGenerationInstruction || ""}
-    industryInstruction={config?.selfOnboardingIndustryInstruction || ""}
+    industryInstruction={config?.onboardingIndustryInstruction || ""}
     client:load
   />
 </OnboardingLayout>
