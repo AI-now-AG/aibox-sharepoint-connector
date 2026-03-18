@@ -2,7 +2,7 @@
   import { actions } from "astro:actions";
   import { TRANSCRIPTION_API_URL } from "astro:env/client";
   import { useTranslations } from "$i18n/utils";
-  import { user } from "$stores";
+  import { user, tenant } from "$stores";
   import { PromptModel } from "$types/PromptModel";
   import { PromptToolOption } from "$types/AIProvider";
   import type { TagItem } from "$types/Subscription";
@@ -112,7 +112,7 @@
     const accessToken = $user?.api_token as string;
 
     const payload = {
-      tenantId: $user?.tenant_id,
+      tenantId: $tenant?._id?.toString(),
       provider: PromptModel.Gemini,
       systemMessage: [DEFAULT_KB_INSTRUCTION],
       prompt: `Company: ${organizationName}\nWebsite: ${websiteUrl}`,

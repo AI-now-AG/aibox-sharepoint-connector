@@ -1,4 +1,6 @@
 ---
+import { transformRawData } from "$utils/transformRawData";
+import { pickUser, pickTenant } from "$utils/viewModels";
 import PostHogJs from "$components/PostHogJs.astro";
 import SharedVariables from "$components/theme/SharedVariables.svelte";
 import Toasts from "$components/toast-notification/Toasts.svelte";
@@ -42,7 +44,12 @@ const isPosthogEnabled = tenant && tenant.is_on_posthog;
   >
     <!-- Shared variables for all Svelte components -->
     <!-- Initialize app locale for useTranslations() -->
-    <SharedVariables locale={Astro.locals.locale} client:load />
+    <SharedVariables
+      tenant={transformRawData(pickTenant(Astro.locals.tenant))}
+      user={transformRawData(pickUser(Astro.locals.user))}
+      locale={Astro.locals.locale}
+      client:load
+    />
     <slot />
     <Toasts client:load />
   </body>

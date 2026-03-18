@@ -2,38 +2,15 @@
 import InitializeTheme from "$components/theme/InitializeTheme.astro";
 import SharedVariables from "$components/theme/SharedVariables.svelte";
 import Toasts from "$components/toast-notification/Toasts.svelte";
-import type { User } from "lucia";
-import { type Tenant } from "$data/models/tenant.model";
 import { transformRawData } from "$utils/transformRawData";
+import { pickUser, pickTenant } from "$utils/viewModels";
 import { svgIcons } from "$assets/icons";
 import { useTranslations } from "$i18n/utils";
-import { omitWithWildcard } from "$utils/wildcardMatch";
 import HeaderLogout from "$components/HeaderLogout.svelte";
 import ThemeLogo from "./ThemeLogo.astro";
 
 const user = Astro.locals.user;
 const t = useTranslations();
-
-function pickUser(user: User) {
-  return {
-    _id: user.id,
-    name: user.name,
-    username: user.username,
-    email: user.email,
-    api_token: user.api_token,
-    picture: user.picture,
-  };
-}
-
-function pickTenant(tenant: Tenant) {
-  const excludedFields = [
-    "*_api_key",
-    "billing_info",
-    "billing_method",
-    "metadata",
-  ];
-  return omitWithWildcard(tenant, excludedFields);
-}
 ---
 
 <!-- Set default theme -->
