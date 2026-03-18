@@ -63,7 +63,6 @@
 <div class="overflow-x-auto relative">
   <table
     class="table table-fixed border-separate border-spacing-x-0 border-spacing-y-3 min-w-full relative"
-    style="font-family:Inter;"
   >
     <colgroup>
       {#each columnData as data}

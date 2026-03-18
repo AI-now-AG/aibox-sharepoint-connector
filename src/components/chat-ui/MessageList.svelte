@@ -571,7 +571,7 @@
                       </div>
                       <div class="flex-1 p-4 pt-2.5">
                         <p class="font-bold text-sm">aibox</p>
-                        <div class="mt-2 text-sm">{@html currentMessage}</div>
+                        <div class="mt-2 text-sm w-full max-w-full overflow-x-auto">{@html currentMessage}</div>
                       </div>
                     </div>
                   </div>
@@ -647,11 +647,14 @@
     box-sizing: border-box;
   }
 
+  :global([id^="exportedTextElement-"] .overflow-x-auto) {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
   :global([id^="exportedTextElement-"] table) {
     table-layout: auto;
     border-collapse: collapse;
-    width: max-content;
-    min-width: 100%;
   }
 
   :global([id^="exportedTextElement-"] th),
@@ -661,8 +664,8 @@
     overflow-wrap: normal;
   }
 
-  :global([id^="exportedTextElement-"] > .overflow-x-auto) {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+  :global([id^="exportedTextElement-"] td:last-child) {
+    white-space: normal;
+    min-width: 150px;
   }
 </style>

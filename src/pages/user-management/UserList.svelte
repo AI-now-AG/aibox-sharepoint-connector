@@ -256,7 +256,7 @@
             >
           </td>
           <td
-            class="py-3 px-4 text-base-content flex items-center text-sm font-medium h-16"
+            class="py-3 px-4 text-base-content text-sm font-medium"
           >
             <span class="break-all">{user.email}</span>
           </td>
