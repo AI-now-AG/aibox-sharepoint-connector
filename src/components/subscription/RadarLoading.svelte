@@ -13,7 +13,7 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: #2196f3;
+    background: var(--color-primary);
     position: absolute;
     -webkit-animation-timing-function: linear;
     -webkit-animation: scaler 4s infinite; /* Chrome, Safari, Opera */
@@ -26,7 +26,7 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: #2196f3;
+    background: var(--color-primary);
     position: absolute;
     -webkit-animation-timing-function: linear;
     -webkit-animation: scaler 4s infinite; /* Chrome, Safari, Opera */
@@ -41,7 +41,7 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: #2196f3;
+    background: var(--color-primary);
     position: absolute;
     -webkit-animation-timing-function: linear;
     -webkit-animation: scaler 4s infinite; /* Chrome, Safari, Opera */
@@ -56,7 +56,7 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: #2196f3;
+    background: var(--color-primary);
     position: absolute;
     -webkit-animation-timing-function: linear;
     -webkit-animation: scaler 4s infinite; /* Chrome, Safari, Opera */

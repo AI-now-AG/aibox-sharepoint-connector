@@ -43,8 +43,7 @@
 </script>
 
 <button
-  class="card bg-white shadow-2xl rounded-2xl p-6 relative"
-  style={backgroundColor}
+  class="card shadow-2xl rounded-2xl p-6 relative {selectedPackageId === id ? 'bg-info/30' : 'bg-base-100'}"
   onclick={() => {
     handleSelect();
   }}
@@ -58,7 +57,7 @@
       {description?.[defaultLanguage]}
     </div>
   </div>
-  <h2 class="text-2xl font-medium text-[#491EFF] text-left mt-3">
+  <h2 class="text-2xl font-medium text-primary text-left mt-3">
     {name?.[defaultLanguage]}
   </h2>
   <p class="text-4xl font-medium my-2 text-left mt-6">

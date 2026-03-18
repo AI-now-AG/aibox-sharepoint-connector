@@ -21,7 +21,7 @@
         >✕</button
       >
     </form>
-    <p id="alert_message" style="color: rgb(159 18 57);">{message}</p>
+    <p id="alert_message" class="text-error">{message}</p>
     {#if okText}
       <div class="flex justify-between gap-4 mt-6">
         <button

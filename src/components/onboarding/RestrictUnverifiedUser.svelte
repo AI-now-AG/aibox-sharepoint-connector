@@ -109,10 +109,9 @@
       })}
     </div>
     <button
-      class="ml-2 btn btn-xs btn-circle btn-ghost"
+      class="ml-2 btn btn-xs btn-circle btn-ghost leading-none"
       aria-label="Close"
-      onclick={() => (isClosed = true)}
-      style="line-height: 1;">✕</button
+      onclick={() => (isClosed = true)}>✕</button
     >
   </div>
 
