@@ -2,13 +2,14 @@
   import type { TagItem } from "$types/Subscription";
   import { useTranslations } from "$i18n/utils";
   import { bgOpacity } from "$utils/common";
+  import { isValidUrl } from "$utils/validation";
 
   interface Props {
     tags: TagItem[];
     organizationName: string;
     websiteUrl: string;
     selectedTag: string;
-    oncreate: Function;
+    oncreate: () => void;
   }
 
   let {
@@ -25,6 +26,12 @@
   const defaultTagEmoji = "🏢";
 
   let showIndustryPicker = $state(false);
+
+  // org name required; URL optional but must be valid when provided
+  const canCreate = $derived(
+    organizationName.trim().length > 0 &&
+      (websiteUrl.trim() === "" || isValidUrl(websiteUrl)),
+  );
 
   function selectTag(tagId: string) {
     selectedTag = selectedTag === tagId ? "" : tagId;
@@ -161,8 +168,9 @@
 <!-- CTA -->
 <button
   type="button"
-  class="btn w-full rounded-full py-3 font-bold text-white text-base"
-  style="background-color: #3730C7; border-color: #3730C7;"
+  class="btn w-full rounded-full py-3 font-bold text-white text-base transition-opacity"
+  style="background-color: #3730C7; border-color: #3730C7; {!canCreate ? 'opacity: 0.4; cursor: not-allowed;' : ''}"
+  disabled={!canCreate}
   onclick={oncreate}
 >
   {t("self-onboarding.create-btn")}

@@ -272,21 +272,32 @@
         </div>
       {:else if step.status === StepStatus.Active}
         <!-- Pulsing dot, no border while animating -->
-        <div class="w-6 h-6 flex items-center justify-center shrink-0">
+        <div
+          class="w-6 h-6 flex items-center justify-center rounded-full bg-primary/80 shrink-0"
+        >
           <div class="relative flex items-center justify-center">
             <div
-              class="absolute w-2.5 h-2.5 rounded-full animate-ping opacity-75"
+              class="absolute w-6 h-6 rounded-full animate-ping opacity-75"
               style="background-color: #491EFF;"
             ></div>
             <div
               class="w-2.5 h-2.5 rounded-full"
-              style="background-color: #491EFF;"
+              style="background-color: #eee;"
             ></div>
           </div>
         </div>
       {:else}
         <!-- Pending -->
-        <div class="w-6 h-6 rounded-full bg-gray-200 shrink-0"></div>
+        <div
+          class="w-6 h-6 flex items-center justify-center rounded-full bg-gray-200 shrink-0"
+        >
+          <div class="relative flex items-center justify-center">
+            <div
+              class="w-2.5 h-2.5 rounded-full"
+              style="background-color: #ccc;"
+            ></div>
+          </div>
+        </div>
       {/if}
 
       <!-- Label -->
