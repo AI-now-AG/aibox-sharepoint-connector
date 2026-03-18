@@ -270,7 +270,7 @@ export const onboarding = {
       });
 
       return transformRawData({
-        knowledgeBaseId: insertedId,
+        id: insertedId,
         insertedCount: acknowledged ? 1 : 0,
       });
     },

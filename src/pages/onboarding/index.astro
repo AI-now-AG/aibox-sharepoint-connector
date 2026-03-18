@@ -1,13 +1,15 @@
 ---
 import OnboardingLayout from "$layouts/Onboarding.astro";
+import ConfigurationModel from "$data/models/configuration.model";
+import GlobalTagModel from "$data/models/globalTag.model";
 import { ONBOARDING_CATEGORY } from "$types/TagInput";
 import SelfOnboardingForm from "./SelfOnboardingForm.svelte";
-import GlobalTagModel from "$data/models/globalTag.model";
 import { useTranslations } from "$i18n/utils";
 import type { TagItem } from "$types/Subscription";
 
 const t = useTranslations();
 
+const config = await ConfigurationModel.get();
 const allTags = await GlobalTagModel.list();
 
 const tags: TagItem[] = allTags
@@ -28,5 +30,10 @@ if (Astro.locals.tenant?.is_trial !== true) {
 ---
 
 <OnboardingLayout title={t("self-onboarding.page-title")}>
-  <SelfOnboardingForm {tags} client:load />
+  <SelfOnboardingForm
+    {tags}
+    promptKbInstruction={config?.promptKbGenerationInstruction || ""}
+    industryInstruction={config?.selfOnboardingIndustryInstruction || ""}
+    client:load
+  />
 </OnboardingLayout>

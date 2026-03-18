@@ -299,8 +299,7 @@ export const tenantCreation = {
       await PromptModel.addKbToTenantPrompts(tenantObjectId, insertedId);
 
       return transformRawData({
-        success: true,
-        knowledgeBaseId: insertedId,
+        id: insertedId,
       });
     },
   }),

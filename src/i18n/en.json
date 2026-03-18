@@ -25,7 +25,7 @@
   "login.email": "Email",
   "login.password": "Password",
   "login.submit": "Sign in",
-  "welcome.title": "Welcome to aibox!",
+  "welcome.title": "Welcome to your AI World",
   "prompt-library.add.category.save": "Save Category",
   "prompt-library.prompts.title": "Assistant Library",
   "prompt-library.prompts.add": "Add Assistant",
@@ -314,7 +314,7 @@
   "onboarding.skip": "Skip",
   "onboarding.next": "Next",
   "onboarding.done": "Done",
-  "onboarding.step-0.title": "Welcome to aibox",
+  "onboarding.step-0.title": "Welcome to your AI World",
   "onboarding.step-0.description": "We'd be happy to show you how to generate your first AI results for your company.<br/><br/> Let’s go on a tour.",
   "onboarding.step-0.next-btn-text": "Start now",
   "onboarding.step-1.title": "All Assistants at a glance",
@@ -992,5 +992,10 @@
   "self-onboarding.summary-industry": "Industry",
   "self-onboarding.trial-title": "14 days free trial",
   "self-onboarding.trial-description": "Full access to all features. No credit card required.",
-  "self-onboarding.start-btn": "Start aibox"
+  "self-onboarding.start-btn": "Start aibox",
+  "self-onboarding.error-analyse-website": "We couldn't analyse your website. Please check the URL and try again.",
+  "self-onboarding.error-create-aibox": "We couldn't create your aibox. Please try again or contact support.",
+  "self-onboarding.error-create-kb": "We couldn't create your knowledge base. Please try again.",
+  "self-onboarding.error-configure-assistants": "We couldn't configure your AI assistants. Please try again.",
+  "self-onboarding.error-finalize-setup": "We couldn't finalize your aibox setup. Please try again."
 }

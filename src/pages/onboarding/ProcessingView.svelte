@@ -1,27 +1,18 @@
 <script lang="ts">
-  import { actions } from "astro:actions";
-  import { TRANSCRIPTION_API_URL } from "astro:env/client";
   import { useTranslations } from "$i18n/utils";
-  import { user, tenant } from "$stores";
-  import { PromptModel } from "$types/PromptModel";
-  import { PromptToolOption } from "$types/AIProvider";
-  import type { TagItem } from "$types/Subscription";
+
+  interface StepConfig {
+    key: string;
+    label: string;
+    run: () => Promise<void>;
+  }
 
   interface Props {
-    tags: TagItem[];
-    organizationName: string;
-    websiteUrl: string;
-    selectedTag?: string;
+    steps: StepConfig[];
     oncomplete: () => void;
   }
 
-  let {
-    tags = [],
-    organizationName,
-    websiteUrl,
-    selectedTag,
-    oncomplete,
-  }: Props = $props();
+  let { steps, oncomplete }: Props = $props();
 
   const t = useTranslations();
 
@@ -33,172 +24,19 @@
   } as const;
   type StepStatus = (typeof StepStatus)[keyof typeof StepStatus];
 
-  interface StepDef {
-    key: string;
-    label: string;
-  }
-
-  interface Step extends StepDef {
-    status: StepStatus;
-  }
-
-  // ── Step definitions (depend on whether a website was provided) ────────────
-  const stepDefs: StepDef[] = websiteUrl.trim()
-    ? [
-        {
-          key: "analyse-website",
-          label: t("self-onboarding.step-analyse-website"),
-        },
-        { key: "create-aibox", label: t("self-onboarding.step-create-aibox") },
-        { key: "create-kb", label: t("self-onboarding.step-create-kb") },
-        {
-          key: "configure-assistants",
-          label: t("self-onboarding.step-configure-assistants"),
-        },
-        {
-          key: "finalize-setup",
-          label: t("self-onboarding.step-finalize-setup"),
-        },
-      ]
-    : [
-        { key: "create-aibox", label: t("self-onboarding.step-create-aibox") },
-        {
-          key: "configure-assistants",
-          label: t("self-onboarding.step-configure-assistants"),
-        },
-        {
-          key: "finalize-setup",
-          label: t("self-onboarding.step-finalize-setup"),
-        },
-      ];
-
-  // currentStepIndex drives both the step status icons and the progress bar.
-  // Value n means steps 0…n-1 are Completed, step n is Active, n+1… are Pending.
-  // When n === stepDefs.length all steps are Completed and we transition away.
+  // currentStepIndex drives status icons and progress bar.
+  // n means steps 0…n-1 are Completed, step n is Active, n+1… are Pending.
+  // When n === steps.length all steps are Completed.
   let currentStepIndex = $state(0);
   let error = $state<string | null>(null);
 
-  // Set by createAibox, consumed by all subsequent steps.
-  // Set by analyseWebsite, consumed by createKB.
-  // Plain let is fine — the runner is sequential so values are always written before read.
-  let newTenantId: string | null = null;
-  let kbContent: string = "";
+  const progressPercent = $derived((currentStepIndex / steps.length) * 100);
 
-  const DEFAULT_KB_INSTRUCTION = `
-    Generate a short company overview in the website’s language. Include key info (products, customers, value). 
-    Keep it clear and concise.
-  `;
-
-  const steps: Step[] = $derived(
-    stepDefs.map((def, i) => ({
-      ...def,
-      status:
-        i < currentStepIndex
-          ? StepStatus.Completed
-          : i === currentStepIndex
-            ? StepStatus.Active
-            : StepStatus.Pending,
-    })),
-  );
-
-  const progressPercent = $derived((currentStepIndex / stepDefs.length) * 100);
-
-  // ── Remaining stubs (configureAssistants, finalizeSetup) ──────────────────
-  const STUB_DELAY_MS = 1500;
-  const delay = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
-
-  async function analyseWebsite(): Promise<void> {
-    const executePromptUrl = `${TRANSCRIPTION_API_URL}/api/prompt/execute`;
-    const accessToken = $user?.api_token as string;
-
-    const payload = {
-      tenantId: $tenant?._id?.toString(),
-      provider: PromptModel.Gemini,
-      systemMessage: [DEFAULT_KB_INSTRUCTION],
-      prompt: `Company: ${organizationName}\nWebsite: ${websiteUrl}`,
-      tool: PromptToolOption.UrlContext,
-    };
-
-    const response = await fetch(executePromptUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok)
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-
-    const result = await response.json();
-    const { response: content } = result.data;
-    console.log("[ProcessingView] analyseWebsite response", { content });
-
-    kbContent = Array.isArray(content)
-      ? (content.at(-1)?.text ?? "")
-      : (content ?? "");
-
-    throw Error(kbContent);
+  function stepStatus(i: number): StepStatus {
+    if (i < currentStepIndex) return StepStatus.Completed;
+    if (i === currentStepIndex) return StepStatus.Active;
+    return StepStatus.Pending;
   }
-
-  async function createAibox(): Promise<void> {
-    const { data: orgResult, error: orgError } =
-      await actions.onboarding.createOrganization({
-        organization_name: organizationName,
-      });
-
-    if (orgError) throw new Error(t("subscription.create-organization-failed"));
-    if (!orgResult)
-      throw new Error(t("subscription.create-organization-failed"));
-
-    const { error: assignError } =
-      await actions.onboarding.assignUserToOrganization({
-        org_id: orgResult.id,
-      });
-
-    if (assignError) throw new Error(t("subscription.create-memeber-failed"));
-
-    const { data: tenantResult, error: tenantError } =
-      await actions.onboarding.initializeTenant({
-        org_name: organizationName,
-        org_id: orgResult.id,
-      });
-
-    if (tenantError)
-      throw new Error(t("subscription.setup-tenant-data-failed"));
-
-    newTenantId = tenantResult._id;
-  }
-
-  async function createKB(): Promise<void> {
-    const { error } = await actions.tenantCreation.createTenantKnowledgeBase({
-      tenant_id: newTenantId!,
-      company_name: organizationName,
-      content: kbContent,
-    });
-
-    if (error) throw new Error(t("kb.add-dialog.create-failed"));
-  }
-
-  async function configureAssistants(): Promise<void> {
-    // TODO: POST /api/onboarding/configure-assistants  { tenantId: newTenantId }
-    await delay(STUB_DELAY_MS);
-  }
-
-  async function finalizeSetup(): Promise<void> {
-    // TODO: POST /api/onboarding/finalize-setup  { tenantId: newTenantId }
-    await delay(STUB_DELAY_MS);
-  }
-
-  // Map each step key to its handler so the runner stays generic
-  const stepHandlers: Record<string, () => Promise<void>> = {
-    "analyse-website": analyseWebsite,
-    "create-aibox": createAibox,
-    "create-kb": createKB,
-    "configure-assistants": configureAssistants,
-    "finalize-setup": finalizeSetup,
-  };
 
   // ── Sequential runner — starts on mount, respects unmount via cancelled flag ─
   $effect(() => {
@@ -206,13 +44,13 @@
 
     async function run() {
       try {
-        for (let i = 0; i < stepDefs.length; i++) {
+        for (let i = 0; i < steps.length; i++) {
           if (cancelled) return;
-          currentStepIndex = i; // mark step as Active
-          await stepHandlers[stepDefs[i].key]?.();
+          currentStepIndex = i;
+          await steps[i].run();
         }
         if (cancelled) return;
-        currentStepIndex = stepDefs.length; // mark all as Completed
+        currentStepIndex = steps.length;
         oncomplete();
       } catch (err) {
         if (!cancelled) {
@@ -260,17 +98,18 @@
 
 <!-- Step list -->
 <ul class="space-y-5">
-  {#each steps as step}
+  {#each steps as step, i}
+    {@const status = stepStatus(i)}
     <li class="flex items-center gap-4">
       <!-- Status icon -->
-      {#if step.status === StepStatus.Completed}
+      {#if status === StepStatus.Completed}
         <div
           class="w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-white"
           style="background-color: #22C55E; font-size: 11px;"
         >
           ✓
         </div>
-      {:else if step.status === StepStatus.Active}
+      {:else if status === StepStatus.Active}
         <!-- Pulsing dot, no border while animating -->
         <div
           class="w-6 h-6 flex items-center justify-center rounded-full bg-primary/80 shrink-0"
@@ -302,11 +141,7 @@
 
       <!-- Label -->
       <span
-        class={`text-sm font-semibold ${
-          step.status === StepStatus.Pending
-            ? "text-gray-400"
-            : "text-[#491EFF]"
-        }`}
+        class={`text-sm font-semibold ${status === StepStatus.Pending ? "text-gray-400" : "text-[#491EFF]"}`}
       >
         {step.label}
       </span>
