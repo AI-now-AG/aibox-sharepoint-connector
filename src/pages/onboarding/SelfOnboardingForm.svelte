@@ -241,6 +241,7 @@
       await actions.onboarding.initializeTenant({
         org_name: organizationName,
         org_id: orgResult.id,
+        website: websiteUrl,
       });
 
     if (tenantError || !tenantResult) {
