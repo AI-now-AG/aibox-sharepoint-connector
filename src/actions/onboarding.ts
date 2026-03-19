@@ -64,6 +64,7 @@ const OrganizationIdInputSchema = z.object({
 const SetupTenantInputSchema = z.object({
   org_id: z.string().min(1),
   org_name: z.string().min(1),
+  website: z.string().optional(),
 });
 
 const SetupKbInputSchema = z.object({
@@ -187,10 +188,11 @@ export const onboarding = {
         included_features: includedFeatures,
         transcription_types: transcriptionTypes,
         default_language: "de",
+        website: input.website,
         stripe_customer_id: null,
         audio_assistant_active: true,
         subtitle_studio_active: false,
-        totalPrice: "",
+        totalPrice: "0",
         is_internal: false,
         included_user_limit: includedUserLimit, // default included users
         vector_kb_enabled: true,

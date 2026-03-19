@@ -34,7 +34,7 @@
   import AudioOptionList from "$components/onboarding/AudioOptionList.svelte";
   import BillingMethods from "$components/onboarding/BillingMethods.svelte";
   import { TRANSCRIPTION_API_URL } from "astro:env/client";
-  import { posthogClientCaptureGlobal } from "$utils/posthogClient";
+  import { posthogClientCaptureException } from "$utils/posthogClient";
 
   interface Props {
     backUrl?: string;
@@ -265,7 +265,7 @@
     }
 
     if (!kbContent) {
-      posthogClientCaptureGlobal("tenant_kb_generate_failed", {
+      posthogClientCaptureException(lastError, {
         tenantId: newTenantId,
         companyName,
         websiteUrl,

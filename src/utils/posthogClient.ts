@@ -96,3 +96,11 @@ export function posthogClientCaptureGlobal(
   console.log("PostHog Client Global Capture", event_name, properties, options);
   getPostHogClientInstance?.()?.capture(event_name, properties, options);
 }
+
+export function posthogClientCaptureException(
+  error: unknown,
+  properties: Properties,
+) {
+  console.log("PostHog Client Capture Exception", error, properties);
+  getPostHogClientInstance?.()?.captureException(error, properties);
+}

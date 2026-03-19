@@ -10,7 +10,10 @@
   import FormView from "./FormView.svelte";
   import ProcessingView from "./ProcessingView.svelte";
   import SuccessView from "./SuccessView.svelte";
-  import { posthogClientCaptureGlobal } from "$utils/posthogClient";
+  import {
+    posthogClientCaptureGlobal,
+    posthogClientCaptureException,
+  } from "$utils/posthogClient";
   import { EventName, ScreenName } from "$types/Posthog";
 
   interface Props {
@@ -322,6 +325,13 @@
     currentView = View.Success;
   }
 
+  function handleError(err: unknown, stepKey: string): void {
+    posthogClientCaptureException(err, {
+      stepKey,
+      organizationName,
+    });
+  }
+
   // ── Steps — $derived so label translations stay reactive ──────────────────
   interface StepConfig {
     key: string;
@@ -390,7 +400,7 @@
       oncreate={handleCreate}
     />
   {:else if currentView === View.Processing}
-    <ProcessingView {steps} oncomplete={handleComplete} />
+    <ProcessingView {steps} oncomplete={handleComplete} onerror={handleError} />
   {:else if currentView === View.Success}
     <SuccessView {result} {organizationName} {selectedTagName} />
   {/if}

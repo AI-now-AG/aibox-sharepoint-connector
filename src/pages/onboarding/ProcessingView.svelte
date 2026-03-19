@@ -1,6 +1,8 @@
 <script lang="ts">
   import { useTranslations } from "$i18n/utils";
 
+  type OnStepError = (err: unknown, stepKey: string) => void;
+
   interface StepConfig {
     key: string;
     label: string;
@@ -10,9 +12,10 @@
   interface Props {
     steps: StepConfig[];
     oncomplete: () => void;
+    onerror?: OnStepError;
   }
 
-  let { steps, oncomplete }: Props = $props();
+  let { steps, oncomplete, onerror }: Props = $props();
 
   const t = useTranslations();
 
@@ -56,6 +59,7 @@
         if (!cancelled) {
           error =
             err instanceof Error ? err.message : "An unexpected error occurred";
+          onerror?.(err, steps[currentStepIndex]?.key ?? "unknown");
         }
       }
     }
