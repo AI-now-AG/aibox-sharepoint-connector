@@ -168,7 +168,10 @@
       `Company: ${organizationName}\nWebsite: ${websiteUrl}`,
     );
     kbContent = kbText;
-    result.pagesAnalysed = kbCitations?.length ?? 1;
+    result.pagesAnalysed = kbCitations?.length
+      ? new Set(kbCitations.flatMap((c) => c.sources?.map((s: any) => s.uri)))
+          .size
+      : 1;
 
     // Fetch industry classification to auto-select the industry tag
     const { text: industryText } = await executePrompt(
