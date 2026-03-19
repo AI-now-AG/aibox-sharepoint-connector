@@ -1483,12 +1483,12 @@
                 >
               </p>
               <div class="flex flex-wrap justify-center gap-2 mt-3">
-                <span class="badge badge-outline badge-sm">MP3</span>
-                <span class="badge badge-outline badge-sm">WAV</span>
-                <span class="badge badge-outline badge-sm">MP4</span>
-                <span class="badge badge-outline badge-sm">WebM</span>
-                <span class="badge badge-outline badge-sm">MOV</span>
-                <span class="badge badge-outline badge-sm">AVI</span>
+                <span class="badge badge-ghost badge-sm">MP3</span>
+                <span class="badge badge-ghost badge-sm">WAV</span>
+                <span class="badge badge-ghost badge-sm">MP4</span>
+                <span class="badge badge-ghost badge-sm">WebM</span>
+                <span class="badge badge-ghost badge-sm">MOV</span>
+                <span class="badge badge-ghost badge-sm">AVI</span>
               </div>
               <p
                 class="text-xs text-base-content/40 mt-4 transition-opacity duration-200 hover:opacity-60"
