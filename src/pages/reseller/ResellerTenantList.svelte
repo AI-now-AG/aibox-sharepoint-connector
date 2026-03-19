@@ -153,11 +153,11 @@
 
                 <td class="py-2 px-4">
                   {#if tenant.active}
-                    <span class={"badge badge-sm badge-outline text-success"}
+                    <span class={"badge badge-sm badge-success"}
                       >{t("tenant.tenants.tenant.active")}
                     </span>
                   {:else}
-                    <span class={"badge badge-sm badge-outline text-error"}
+                    <span class={"badge badge-sm badge-error"}
                       >{t("tenant.tenants.tenant.archived")}
                     </span>
                   {/if}

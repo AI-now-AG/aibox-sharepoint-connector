@@ -385,17 +385,17 @@
                 <td class="py-2 px-4">
                   <span class="flex flex-col gap-2">
                     {#if tenant.is_internal}
-                      <span class="badge badge-sm badge-outline text-primary"
+                      <span class="badge badge-sm badge-primary"
                         >{"Internal"}</span
                       >
                     {/if}
                     {#if subscription?.is_trial}
-                      <span class="badge badge-sm badge-outline text-warning"
+                      <span class="badge badge-sm badge-warning"
                         >{"Trial"}</span
                       >
                     {/if}
                     {#if tenant.is_reseller}
-                      <span class="badge badge-sm badge-outline text-info"
+                      <span class="badge badge-sm badge-info"
                         >{"Reseller"}</span
                       >
                     {/if}
@@ -433,11 +433,11 @@
 
                 <td class="py-2 px-4">
                   {#if tenant.active}
-                    <span class={"badge badge-sm badge-outline text-success"}
+                    <span class={"badge badge-sm badge-success"}
                       >{t("tenant.tenants.tenant.active")}
                     </span>
                   {:else}
-                    <span class={"badge badge-sm badge-outline text-error"}
+                    <span class={"badge badge-sm badge-error"}
                       >{t("tenant.tenants.tenant.archived")}
                     </span>
                   {/if}
