@@ -32,26 +32,34 @@
 
 <!-- Stats row -->
 <div class="flex gap-3 mb-5">
-  <div class="flex-1 bg-gray-100 rounded-xl p-4 text-center">
-    <p class="text-2xl font-bold" style="color: #491EFF;">
-      {result.assistants}
-    </p>
-    <p class="text-xs text-gray-500 mt-1">
-      {t("self-onboarding.stat-assistants")}
-    </p>
-  </div>
-  <div class="flex-1 bg-gray-100 rounded-xl p-4 text-center">
-    <p class="text-2xl font-bold" style="color: #491EFF;">
-      {result.pagesAnalysed}
-    </p>
-    <p class="text-xs text-gray-500 mt-1">{t("self-onboarding.stat-pages")}</p>
-  </div>
-  <div class="flex-1 bg-gray-100 rounded-xl p-4 text-center">
-    <p class="text-2xl font-bold" style="color: #491EFF;">
-      {result.knowledgeBases}
-    </p>
-    <p class="text-xs text-gray-500 mt-1">{t("self-onboarding.stat-kb")}</p>
-  </div>
+  {#if result.assistants}
+    <div class="flex-1 bg-gray-100 rounded-xl p-4 text-center">
+      <p class="text-2xl font-bold" style="color: #491EFF;">
+        {result.assistants}
+      </p>
+      <p class="text-xs text-gray-500 mt-1">
+        {t("self-onboarding.stat-assistants")}
+      </p>
+    </div>
+  {/if}
+  {#if result.pagesAnalysed}
+    <div class="flex-1 bg-gray-100 rounded-xl p-4 text-center">
+      <p class="text-2xl font-bold" style="color: #491EFF;">
+        {result.pagesAnalysed}
+      </p>
+      <p class="text-xs text-gray-500 mt-1">
+        {t("self-onboarding.stat-pages")}
+      </p>
+    </div>
+  {/if}
+  {#if result.knowledgeBases}
+    <div class="flex-1 bg-gray-100 rounded-xl p-4 text-center">
+      <p class="text-2xl font-bold" style="color: #491EFF;">
+        {result.knowledgeBases}
+      </p>
+      <p class="text-xs text-gray-500 mt-1">{t("self-onboarding.stat-kb")}</p>
+    </div>
+  {/if}
 </div>
 
 <!-- Organization + Industry summary -->
