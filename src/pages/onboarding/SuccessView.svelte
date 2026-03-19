@@ -10,10 +10,10 @@
   interface Props {
     result: OnboardingResult;
     organizationName: string;
-    selectedTagTitle: string;
+    selectedTagName: string;
   }
 
-  let { result, organizationName, selectedTagTitle }: Props = $props();
+  let { result, organizationName, selectedTagName }: Props = $props();
 
   const t = useTranslations();
 </script>
@@ -68,7 +68,7 @@
     <span class="text-sm text-gray-500"
       >{t("self-onboarding.summary-industry")}</span
     >
-    <span class="text-sm font-bold text-gray-900">{selectedTagTitle}</span>
+    <span class="text-sm font-bold text-gray-900">{selectedTagName}</span>
   </div>
 </div>
 
@@ -89,10 +89,11 @@
 </div>
 
 <!-- CTA -->
-<button
+<a
   type="button"
   class="btn w-full rounded-full py-3 font-bold text-white text-base"
   style="background-color: #3730C7; border-color: #3730C7;"
+  href="/"
 >
   {t("self-onboarding.start-btn")} →
-</button>
+</a>

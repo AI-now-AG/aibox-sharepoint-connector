@@ -25,7 +25,7 @@ const tags: TagItem[] = allTags
   }));
 
 if (Astro.locals.tenant?.is_trial !== true) {
-  //return Astro.rewrite("/restricted");
+  return Astro.rewrite("/restricted");
 }
 ---
 

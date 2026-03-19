@@ -134,8 +134,8 @@ export const onboarding = {
     handler: async (input, context) => {
       const { org_id: organizationId } = input;
 
-      // delete current user in trial organization
-      // move current user to new organization
+      // Delete current user in trial organization
+      // Move current user to new organization
       await organizationsManagement.deleteMembers(
         context.locals.tenant.org_id,
         [context.locals.user.auth0_sub],
@@ -144,7 +144,7 @@ export const onboarding = {
         context.locals.user.auth0_sub,
       ]);
 
-      // setup admin role
+      // Setup admin role
       const roleAdminId = isProd()
         ? AUTH0_ROLE_ADMIN.PROD
         : AUTH0_ROLE_ADMIN.DEV;
@@ -197,22 +197,8 @@ export const onboarding = {
         vector_kb_max_storage_mb: includedKbMB,
       });
 
-      // Update the current tenant for the logged-in user
+      // Create audio transcriptions
       const { id: userId } = context.locals.user;
-      const newRoles = [UserRole.Admin];
-      await UserModel.update(userId, {
-        tenant_id: newTenant.insertedId,
-        roles: newRoles,
-        permissions: assignPermissions(newRoles),
-        logins_count: 0,
-        is_complete_self_registration: true,
-      });
-      await UserModel.addTour(userId, {
-        type: TourType.OnboardingNewTenant,
-        active: true,
-      });
-
-      // Find all audio transcriptions for the original tenant
       const transcriptions = await TranscriptionModel.listByTenantAndCategories(
         masterTenantId,
         transcriptionTypes,
@@ -362,13 +348,27 @@ export const onboarding = {
         throw new Error("Tenant not found.");
       }
 
+      // Update the current tenant for the logged-in user
+      const { id: userId } = context.locals.user;
+      const newRoles = [UserRole.Admin];
+      await UserModel.update(userId, {
+        tenant_id: new ObjectId(tenantId),
+        roles: newRoles,
+        permissions: assignPermissions(newRoles),
+        logins_count: 0,
+        is_complete_self_registration: true,
+      });
+      await UserModel.addTour(userId, {
+        type: TourType.OnboardingNewTenant,
+        active: true,
+      });
+
+      // Send notification email to aibox-support
       const addOnsStr = subscription?.add_ons
         ?.map((name: AudioOptionId) => {
           return AudioOptionLabels[name];
         })
         .join(", ");
-
-      // send notification email to aibox-support
       const subjectPrefix = isProd() ? "[aibox]" : "[aibox-dev]";
       const emailSubject = `${subjectPrefix} Tenant Created - ${tenant.name}`;
       const emailContent = `
@@ -383,14 +383,6 @@ export const onboarding = {
           </p>
 
           <p>
-            <strong>Company details:</strong> <br/>
-            ${tenant.billing_info?.company_name ?? "-"} <br/>
-            ${tenant.billing_info?.address ?? "-"} <br/>
-            ${tenant.billing_info?.zip_code ?? "-"} ${tenant.billing_info?.zip_code ?? "-"} ${tenant.billing_info?.location ?? "-"}
-          </p>
-
-          <p>
-            <strong>Contact:</strong> ${tenant.billing_info?.email ?? "-"}<br/>
             <strong>Created:</strong> ${new Date().toLocaleDateString()}<br/>
             <strong>Account created by:</strong> ${email}<br/>
             <strong>Flow:</strong>Self Onboarding
@@ -403,7 +395,7 @@ export const onboarding = {
           email: "no-reply@ainow.ch",
         },
         to: "support@aibox-app.ch",
-        //bcc: "devlin.nguyenb4you.ch@gmail.com",
+        bcc: "devlin.nguyenb4you.ch@gmail.com",
         subject: emailSubject,
         html: emailContent,
       });
