@@ -610,13 +610,13 @@
   function getStatusBadge(status: DataSourceStatus): { class: string; text: string } {
     switch (status) {
       case DataSourceStatus.Pending:
-        return { class: "bg-warning/15 text-warning border-warning/30", text: t("vector-kb.status.pending") };
+        return { class: "badge-outline text-warning", text: t("vector-kb.status.pending") };
       case DataSourceStatus.Processing:
-        return { class: "bg-info/15 text-info border-info/30", text: t("vector-kb.status.processing") };
+        return { class: "badge-outline text-info", text: t("vector-kb.status.processing") };
       case DataSourceStatus.Completed:
-        return { class: "bg-success/15 text-success border-success/30", text: t("vector-kb.status.completed") };
+        return { class: "badge-outline text-success", text: t("vector-kb.status.completed") };
       case DataSourceStatus.Failed:
-        return { class: "bg-error/15 text-error border-error/30", text: t("vector-kb.status.failed") };
+        return { class: "badge-outline text-error", text: t("vector-kb.status.failed") };
       default:
         return { class: "badge-ghost", text: status };
     }
