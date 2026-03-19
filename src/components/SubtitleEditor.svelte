@@ -749,7 +749,7 @@
 
       <!-- Export Dropdown -->
       <div class="dropdown dropdown-end">
-        <div tabindex="0" role="button" class="btn btn-success btn-sm">
+        <div tabindex="0" role="button" class="btn btn-primary btn-outline btn-sm">
           {@html svgIcons.fileExport} Export
         </div>
         <ul
@@ -859,7 +859,7 @@
                         }}
                         class="btn btn-xs btn-circle {isPlaying &&
                         currentRowIndices.includes(index)
-                          ? 'btn-success text-success-content'
+                          ? 'btn-primary text-primary-content'
                           : 'btn-ghost hover:btn-primary'}"
                       >
                         {isPlaying && currentRowIndices.includes(index) ? "⏸️" : "▶️"}
@@ -937,7 +937,7 @@
                           e.stopPropagation();
                           deleteRow(index);
                         }}
-                        class="btn btn-xs btn-outline btn-error join-item"
+                        class="btn btn-xs btn-outline btn-ghost text-base-content/50 hover:text-error hover:bg-error/10 join-item"
                         title={t("subtitle-editor.delete-title")}
                       >
                         {@html svgIcons.trash}
@@ -947,7 +947,7 @@
                           e.stopPropagation();
                           addRowAfter(index);
                         }}
-                        class="btn btn-xs btn-outline btn-success join-item"
+                        class="btn btn-xs btn-outline btn-ghost text-base-content/50 hover:text-primary hover:bg-primary/10 join-item"
                         title={t("subtitle-editor.add-after-title")}
                       >
                         {@html svgIcons.add}
@@ -1122,7 +1122,7 @@
                       statusText = t("subtitle-editor.media-removed");
                       setTimeout(() => (statusText = ""), 3000);
                     }}
-                    class="btn btn-xs btn-ghost text-error hover:bg-error/20"
+                    class="btn btn-xs btn-ghost text-base-content/50 hover:text-error hover:bg-error/10"
                     title={t("subtitle-editor.remove-media")}
                   >
                     ✕
@@ -1189,7 +1189,7 @@
                         statusText = t("subtitle-editor.media-removed");
                         setTimeout(() => (statusText = ""), 3000);
                       }}
-                      class="btn btn-xs btn-ghost text-error hover:bg-error/20"
+                      class="btn btn-xs btn-ghost text-base-content/50 hover:text-error hover:bg-error/10"
                       title={t("subtitle-editor.remove-media")}
                     >
                       ✕
@@ -1229,7 +1229,7 @@
                   statusText = t("subtitle-editor.media-removed");
                   setTimeout(() => (statusText = ""), 3000);
                 }}
-                class="btn btn-xs btn-ghost text-error hover:bg-error/20"
+                class="btn btn-xs btn-ghost text-base-content/50 hover:text-error hover:bg-error/10"
                 title={t("subtitle-editor.remove-media")}
               >
                 ✕

@@ -165,17 +165,17 @@
     {/if}
   {:else}
     <div class="mb-4">
-      <div class="overflow-x-auto relative">
+      <div class="overflow-visible relative">
         <table
-          class="table table-fixed border-separate border-spacing-x-0 min-w-full relative"
+          class="table table-auto border-separate border-spacing-x-0 w-full relative"
         >
           <colgroup>
-            <col class="w-auto min-w-[180]" />
-            <col class="w-[250]" />
-            <col class="w-[120]" />
-            <col class="w-[150]" />
-            <col class="w-[150]" />
-            <col class="w-[100]" />
+            <col class="w-auto" />
+            <col class="w-auto" />
+            <col class="w-[100px]" />
+            <col class="w-[120px]" />
+            <col class="w-[120px]" />
+            <col class="w-[60px]" />
           </colgroup>
           <thead>
             <tr class="bg-base-300">

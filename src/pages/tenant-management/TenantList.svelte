@@ -289,21 +289,21 @@
     />
 
     <div>
-      <div class="overflow-x-auto relative">
+      <div class="overflow-visible relative">
         <table
-          class="table table-fixed border-separate border-spacing-x-0 min-w-full relative"
+          class="table table-auto border-separate border-spacing-x-0 w-full relative"
         >
           <colgroup>
-            <col class="w-auto min-w-[150]" />
-            <col class="w-[200]" />
-            <col class="w-[180]" />
-            <col class="w-[100]" />
-            <col class="w-[150]" />
-            <col class="w-[120]" />
-            <col class="w-[180]" />
-            <col class="w-[100]" />
-            <col class="w-[80]" />
-            <col class="w-[70]" />
+            <col class="w-auto" />
+            <col class="w-auto" />
+            <col class="w-[100px]" />
+            <col class="w-[80px]" />
+            <col class="w-[100px]" />
+            <col class="w-[100px]" />
+            <col class="w-[120px]" />
+            <col class="w-[80px]" />
+            <col class="w-[80px]" />
+            <col class="w-[50px]" />
           </colgroup>
           <thead>
             <tr class="bg-base-300">
@@ -385,17 +385,17 @@
                 <td class="py-2 px-4">
                   <span class="flex flex-col gap-2">
                     {#if tenant.is_internal}
-                      <span class="badge badge-sm badge-soft badge-success"
+                      <span class="badge badge-sm bg-primary/15 text-primary border-primary/30"
                         >{"Internal"}</span
                       >
                     {/if}
                     {#if subscription?.is_trial}
-                      <span class="badge badge-sm badge-soft badge-warning"
+                      <span class="badge badge-sm bg-warning/15 text-warning border-warning/30"
                         >{"Trial"}</span
                       >
                     {/if}
                     {#if tenant.is_reseller}
-                      <span class="badge badge-sm badge-soft badge-info"
+                      <span class="badge badge-sm bg-info/15 text-info border-info/30"
                         >{"Reseller"}</span
                       >
                     {/if}
@@ -433,11 +433,11 @@
 
                 <td class="py-2 px-4">
                   {#if tenant.active}
-                    <span class={"badge badge-soft badge-success badge-sm"}
+                    <span class={"badge badge-sm bg-success/15 text-success border-success/30"}
                       >{t("tenant.tenants.tenant.active")}
                     </span>
                   {:else}
-                    <span class={"badge badge-soft badge-error badge-sm"}
+                    <span class={"badge badge-sm bg-error/15 text-error border-error/30"}
                       >{t("tenant.tenants.tenant.archived")}
                     </span>
                   {/if}

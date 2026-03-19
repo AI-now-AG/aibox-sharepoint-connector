@@ -1787,7 +1787,7 @@
                             : t("tenant.no-system-key")}
                         />
                         {#if globalApiKeyStatus?.[p.globalKeyField]}
-                          <span class="badge badge-success badge-xs"
+                          <span class="badge bg-primary/15 text-primary border-primary/30 badge-xs"
                             >{t("global-api-keys.configured")}</span
                           >
                         {:else}
@@ -1859,7 +1859,7 @@
                                       : t("tenant.no-system-config")}
                                   />
                                   {#if globalApiKeyStatus?.[acf.field]}
-                                    <span class="badge badge-success badge-xs"
+                                    <span class="badge bg-primary/15 text-primary border-primary/30 badge-xs"
                                       >{t("global-api-keys.configured")}</span
                                     >
                                   {:else}
@@ -2072,7 +2072,7 @@
                           : t("tenant.no-system-key")}
                       />
                       {#if globalApiKeyStatus?.speech_api_key}
-                        <span class="badge badge-success badge-sm"
+                        <span class="badge bg-primary/15 text-primary border-primary/30 badge-sm"
                           >{t("global-api-keys.configured")}</span
                         >
                       {:else}
@@ -2108,7 +2108,7 @@
                           : t("tenant.no-system-config")}
                       />
                       {#if globalApiKeyStatus?.speech_region}
-                        <span class="badge badge-success badge-sm"
+                        <span class="badge bg-primary/15 text-primary border-primary/30 badge-sm"
                           >{t("global-api-keys.configured")}</span
                         >
                       {:else}
@@ -2350,7 +2350,7 @@
                           : t("tenant.no-system-key")}
                       />
                       {#if globalApiKeyStatus?.elevenLabs_api_key}
-                        <span class="badge badge-success badge-sm"
+                        <span class="badge bg-primary/15 text-primary border-primary/30 badge-sm"
                           >{t("global-api-keys.configured")}</span
                         >
                       {:else}
@@ -2470,7 +2470,7 @@
                           : t("tenant.no-system-key")}
                       />
                       {#if globalApiKeyStatus?.fal_ai_api_key}
-                        <span class="badge badge-success badge-sm"
+                        <span class="badge bg-primary/15 text-primary border-primary/30 badge-sm"
                           >{t("global-api-keys.configured")}</span
                         >
                       {:else}
