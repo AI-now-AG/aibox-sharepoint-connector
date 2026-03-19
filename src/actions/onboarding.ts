@@ -381,6 +381,7 @@ export const onboarding = {
             <strong>Subscription:</strong> ${subscription?.plan_name ?? "-"}<br/> 
             ${addOnsStr ? `${addOnsStr}<br/>` : ""} 
             <strong>Template:</strong> ${tagName}<br/>
+            <strong>Website:</strong> ${tenant?.website || "-"}<br/>
             <strong>Billing:</strong> ${BillingMethodLabels[tenant.billing_method as BillingMethod] ?? "-"}
           </p>
 
