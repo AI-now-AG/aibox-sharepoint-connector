@@ -137,9 +137,9 @@
   }
 
   // Reads industryContent (set by analyseWebsite) and matches it against available tags.
-  // Falls back to "KMU Allgemein" if no match is found or industryContent is empty.
+  // Falls back to "KMU generell" if no match is found or industryContent is empty.
   function resolveTag(): string {
-    const FALLBACK_TAG_NAME = "KMU Allgemein";
+    const FALLBACK_TAG_NAME = "KMU generell";
     const fallback = tags.find((tag) => tag.title === FALLBACK_TAG_NAME);
 
     const match = industryContent.match(/<industry>(.*?)<\/industry>/i);
