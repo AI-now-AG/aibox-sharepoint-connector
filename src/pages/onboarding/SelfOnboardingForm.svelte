@@ -56,9 +56,9 @@
   // ── Pipeline context — plain let, shared between step closures ─────────────
   // Sequential runner guarantees write-before-read; no $state needed.
   let newTenantId: string | null = null; // set by createAibox, used by createKB + configureAssistants
-  let kbContent: string = "";            // set by analyseWebsite, used by createKB
-  let industryContent: string = "";      // set by analyseWebsite, used by resolveTag
-  let newKbId: string | null = null;     // set by createKB, used by configureAssistants
+  let kbContent: string = ""; // set by analyseWebsite, used by createKB
+  let industryContent: string = ""; // set by analyseWebsite, used by resolveTag
+  let newKbId: string | null = null; // set by createKB, used by configureAssistants
 
   // ── Default prompts (fallback when not provided via props) ─────────────────
   const DEFAULT_KB_INSTRUCTION = `
@@ -163,12 +163,12 @@
   // Step 1 (URL flow only): fetches KB content + detects industry from the website.
   async function analyseWebsite(): Promise<void> {
     // Fetch company overview for the knowledge base
-    const { text: kbText, citations } = await executePrompt(
+    const { text: kbText, citations: kbCitations } = await executePrompt(
       promptKbInstruction || DEFAULT_KB_INSTRUCTION,
       `Company: ${organizationName}\nWebsite: ${websiteUrl}`,
     );
     kbContent = kbText;
-    result.pagesAnalysed = citations ? citations?.length : 1;
+    result.pagesAnalysed = kbCitations?.length ?? 1;
 
     // Fetch industry classification to auto-select the industry tag
     const { text: industryText } = await executePrompt(
@@ -177,9 +177,6 @@
     );
     industryContent = industryText;
     selectedTag = resolveTag();
-
-    // DEBUG: inspect kbContent in the error banner — remove before release
-    throw new Error(kbContent);
   }
 
   // Step 2: creates the Auth0 org, adds the user, and initialises the tenant.
