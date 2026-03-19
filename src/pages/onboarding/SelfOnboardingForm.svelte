@@ -180,6 +180,13 @@
     );
     industryContent = industryText;
     selectedTag = resolveTag();
+
+    console.info("SelfOnboarding -> analyseWebsite() done", {
+      kbContent,
+      citations: kbCitations,
+      industryContent,
+      selectedTag,
+    });
   }
 
   // Step 2: creates the Auth0 org, adds the user, and initialises the tenant.
@@ -194,6 +201,7 @@
       console.error("SelfOnboarding -> createAibox() failed", orgError);
       throw new Error(t("self-onboarding.error-create-aibox"));
     }
+    console.info("SelfOnboarding -> createAibox() org created", orgResult.id);
 
     // 2. Move the current user into the new organisation
     const { error: assignError } =
@@ -205,6 +213,10 @@
       console.error("SelfOnboarding -> createAibox() failed", assignError);
       throw new Error(t("self-onboarding.error-create-aibox"));
     }
+    console.info(
+      "SelfOnboarding -> createAibox() user assigned to org",
+      orgResult.id,
+    );
 
     // 3. Clone master tenant and create subscription
     const { data: tenantResult, error: tenantError } =
@@ -219,6 +231,10 @@
     }
 
     newTenantId = tenantResult.id;
+    console.info(
+      "SelfOnboarding -> createAibox() tenant initialised",
+      newTenantId,
+    );
   }
 
   // Step 3 (URL flow only): creates the knowledge base entry from scraped content.
@@ -236,6 +252,10 @@
 
     newKbId = data.id;
     result.knowledgeBases = data.insertedCount;
+    console.info("SelfOnboarding -> createKB() done", {
+      id: newKbId,
+      knowledgeBases: result.knowledgeBases,
+    });
   }
 
   // Step 4: clones global prompt categories/templates for the selected industry tag.
@@ -257,6 +277,10 @@
     }
 
     result.assistants = data.insertedCount;
+    console.info("SelfOnboarding -> configureAssistants() done", {
+      assistants: result.assistants,
+      selectedTag,
+    });
   }
 
   // Step 5: sends notification emails to support and the user.
@@ -270,6 +294,10 @@
       console.error("SelfOnboarding -> finalizeSetup() failed", error);
       throw new Error(t("self-onboarding.error-finalize-setup"));
     }
+
+    console.info(
+      "SelfOnboarding -> finalizeSetup() done — onboarding complete",
+    );
   }
 
   // ── Steps — $derived so label translations stay reactive ──────────────────
