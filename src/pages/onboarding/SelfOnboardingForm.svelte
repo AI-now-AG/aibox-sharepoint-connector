@@ -185,7 +185,7 @@
       kbContent,
       citations: kbCitations,
       industryContent,
-      selectedTag,
+      selectedTag: selectedTagName,
     });
   }
 
@@ -279,7 +279,7 @@
     result.assistants = data.insertedCount;
     console.info("SelfOnboarding -> configureAssistants() done", {
       assistants: result.assistants,
-      selectedTag,
+      selectedTag: selectedTagName,
     });
   }
 
