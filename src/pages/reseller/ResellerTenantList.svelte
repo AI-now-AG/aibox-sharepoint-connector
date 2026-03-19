@@ -79,7 +79,6 @@
       <div class="overflow-x-auto relative">
         <table
           class="table table-fixed border-separate border-spacing-x-0 min-w-full relative"
-          style="font-family:Inter;"
         >
           <colgroup>
             <col class="w-auto min-w-[180]" />
