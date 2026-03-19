@@ -86,8 +86,10 @@
     <industry>Value</industry>
   `;
 
-  // ── Helpers ────────────────────────────────────────────────────────────────
+  // ── Inspects ────────────────────────────────────────────────────────────────
+  $inspect(selectedTagName);
 
+  // ── Helpers ────────────────────────────────────────────────────────────────
   // Calls the AI prompt API with retry logic (up to 3 attempts, exponential back-off).
   // Returns extracted text and optional URL citations.
   async function executePrompt(
@@ -173,9 +175,23 @@
 
   // ── Step functions ─────────────────────────────────────────────────────────
 
-  // Step 1 (URL flow only): fetches KB content + detects industry from the website.
+  // Called from FormView when user clicks "Check your industry".
+  // Runs industry detection independently, before processing starts.
+  async function checkIndustry(): Promise<void> {
+    const { text: industryText } = await executePrompt(
+      industryInstruction || DEFAULT_INDUSTRY_INSTRUCTION,
+      `Website URL: ${websiteUrl}`,
+    );
+    industryContent = industryText;
+    selectedTag = resolveTag();
+    console.info("SelfOnboarding -> checkIndustry() done", {
+      industryContent,
+      selectedTag: selectedTagName,
+    });
+  }
+
+  // Step 1 (URL flow only): fetches KB content from the website.
   async function analyseWebsite(): Promise<void> {
-    // Fetch company overview for the knowledge base
     const { text: kbText, citations: kbCitations } = await executePrompt(
       promptKbInstruction || DEFAULT_KB_INSTRUCTION,
       `Company: ${organizationName}\nWebsite: ${websiteUrl}`,
@@ -185,20 +201,9 @@
       ? new Set(kbCitations.flatMap((c) => c.sources?.map((s: any) => s.uri)))
           .size
       : 1;
-
-    // Fetch industry classification to auto-select the industry tag
-    const { text: industryText } = await executePrompt(
-      industryInstruction || DEFAULT_INDUSTRY_INSTRUCTION,
-      `Website URL: ${websiteUrl}`,
-    );
-    industryContent = industryText;
-    selectedTag = resolveTag();
-
     console.info("SelfOnboarding -> analyseWebsite() done", {
       kbContent,
       citations: kbCitations,
-      industryContent,
-      selectedTag: selectedTagName,
     });
   }
 
@@ -398,6 +403,7 @@
       bind:websiteUrl
       bind:selectedTag
       oncreate={handleCreate}
+      oncheckindustry={checkIndustry}
     />
   {:else if currentView === View.Processing}
     <ProcessingView {steps} oncomplete={handleComplete} onerror={handleError} />

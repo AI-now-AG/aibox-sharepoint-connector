@@ -10,6 +10,7 @@
     websiteUrl: string;
     selectedTag: string;
     oncreate: () => void;
+    oncheckindustry: () => Promise<void>;
   }
 
   let {
@@ -18,6 +19,7 @@
     websiteUrl = $bindable(""),
     selectedTag = $bindable(""),
     oncreate,
+    oncheckindustry,
   }: Props = $props();
 
   const t = useTranslations();
@@ -26,11 +28,49 @@
   const defaultTagEmoji = "🏢";
 
   let showIndustryPicker = $state(false);
+  let checkingIndustry = $state(false);
+  let industryDetected = $state(false);
+  let checkError = $state<string | null>(null);
+
+  // Human-readable title of the currently selected tag
+  const selectedTagTitle = $derived(
+    tags.find((tag) => tag.value === selectedTag)?.title ?? "",
+  );
+
+  // Show the button when URL is valid; reset detected state if URL changes
+  const hasValidUrl = $derived(
+    websiteUrl.trim().length > 0 && isValidUrl(websiteUrl),
+  );
+
+  $effect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    websiteUrl; // track dependency
+    industryDetected = false;
+    checkError = null;
+  });
+
+  async function handleCheckIndustry() {
+    checkingIndustry = true;
+    checkError = null;
+    try {
+      await oncheckindustry();
+      industryDetected = true;
+      showIndustryPicker = true; // open picker so user can review / change
+    } catch (err) {
+      checkError =
+        err instanceof Error
+          ? err.message
+          : t("self-onboarding.error-analyse-website");
+    } finally {
+      checkingIndustry = false;
+    }
+  }
 
   // org name required; URL optional but must be valid when provided
   const canCreate = $derived(
     organizationName.trim().length > 0 &&
-      (websiteUrl.trim() === "" || isValidUrl(websiteUrl)),
+      (websiteUrl.trim() === "" || isValidUrl(websiteUrl)) &&
+      selectedTag,
   );
 
   function selectTag(tagId: string) {
@@ -82,9 +122,57 @@
   />
 </div>
 
-<p class="text-xs text-gray-400 mt-2 mb-5">
+<p class="text-xs text-gray-400 mt-2 mb-3">
   {t("self-onboarding.website-hint")}
 </p>
+
+<!-- Check your industry button -->
+{#if hasValidUrl && !industryDetected}
+  <button
+    type="button"
+    class="btn btn-sm rounded-full font-semibold mb-4"
+    style="background-color: #491EFF; border-color: #491EFF; color: white;"
+    disabled={checkingIndustry}
+    onclick={handleCheckIndustry}
+  >
+    {#if checkingIndustry}
+      <span class="loading loading-spinner loading-xs"></span>
+    {/if}
+    {t("self-onboarding.check-industry-btn")}
+  </button>
+{/if}
+
+<!-- Industry detection error -->
+{#if checkError}
+  <p class="text-xs text-red-500 mb-3">{checkError}</p>
+{/if}
+
+<!-- Industry detected success banner -->
+{#if industryDetected && selectedTagTitle}
+  <div
+    class="flex items-center gap-3 rounded-xl border px-4 py-3 mb-4"
+    style="background-color: #EEF2FF; border-color: #818CF8;"
+  >
+    <div
+      class="w-5 h-5 rounded-full flex items-center justify-center shrink-0"
+      style="background-color: #491EFF;"
+    >
+      <svg
+        class="w-3 h-3 text-white"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="3"
+        viewBox="0 0 24 24"
+      >
+        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"
+        ></path>
+      </svg>
+    </div>
+    <p class="text-sm text-gray-700">
+      {t("self-onboarding.industry-detected", { industry: selectedTagTitle })}
+    </p>
+  </div>
+{/if}
 
 <!-- Manual industry picker toggle -->
 <button
@@ -169,7 +257,9 @@
 <button
   type="button"
   class="btn w-full rounded-full py-3 font-bold text-white text-base transition-opacity"
-  style="background-color: #3730C7; border-color: #3730C7; {!canCreate ? 'opacity: 0.4; cursor: not-allowed;' : ''}"
+  style="background-color: #3730C7; border-color: #3730C7; {!canCreate
+    ? 'opacity: 0.4; cursor: not-allowed;'
+    : ''}"
   disabled={!canCreate}
   onclick={oncreate}
 >
