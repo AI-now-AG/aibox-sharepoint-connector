@@ -31,11 +31,8 @@
   let checkingIndustry = $state(false);
   let industryDetected = $state(false);
   let checkError = $state<string | null>(null);
-
-  // Human-readable title of the currently selected tag
-  const selectedTagTitle = $derived(
-    tags.find((tag) => tag.value === selectedTag)?.title ?? "",
-  );
+  // Frozen at detection time — unaffected by manual tag selection afterwards
+  let detectedTagTitle = $state("");
 
   // Show the button when URL is valid; reset detected state if URL changes
   const hasValidUrl = $derived(
@@ -46,6 +43,7 @@
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     websiteUrl; // track dependency
     industryDetected = false;
+    detectedTagTitle = "";
     checkError = null;
   });
 
@@ -54,6 +52,9 @@
     checkError = null;
     try {
       await oncheckindustry();
+      // Snapshot the resolved title before the user can change selectedTag manually
+      detectedTagTitle =
+        tags.find((tag) => tag.value === selectedTag)?.title ?? "";
       industryDetected = true;
       showIndustryPicker = true; // open picker so user can review / change
     } catch (err) {
@@ -148,7 +149,7 @@
 {/if}
 
 <!-- Industry detected success banner -->
-{#if industryDetected && selectedTagTitle}
+{#if industryDetected && detectedTagTitle}
   <div
     class="flex items-center gap-3 rounded-xl border px-4 py-3 mb-4"
     style="background-color: #EEF2FF; border-color: #818CF8;"
@@ -169,7 +170,7 @@
       </svg>
     </div>
     <p class="text-sm text-gray-700">
-      {t("self-onboarding.industry-detected", { industry: selectedTagTitle })}
+      {t("self-onboarding.industry-detected", { industry: detectedTagTitle })}
     </p>
   </div>
 {/if}
