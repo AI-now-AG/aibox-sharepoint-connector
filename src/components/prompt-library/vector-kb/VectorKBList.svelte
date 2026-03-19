@@ -1159,7 +1159,7 @@
                         </button>
                       {/if}
                       <button
-                        class="btn btn-xs btn-ghost text-base-content/50 hover:text-error hover:bg-error/10"
+                        class="btn btn-xs btn-ghost text-base-content/60 hover:bg-error hover:text-white"
                         onclick={() => confirmDeleteDataSource(source._id, source.original_file_name)}
                         title={t("vector-kb.delete")}
                       >

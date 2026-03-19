@@ -937,7 +937,7 @@
                           e.stopPropagation();
                           deleteRow(index);
                         }}
-                        class="btn btn-xs btn-outline btn-ghost text-base-content/50 hover:text-error hover:bg-error/10 join-item"
+                        class="btn btn-xs btn-ghost text-base-content/60 hover:bg-error hover:text-white join-item"
                         title={t("subtitle-editor.delete-title")}
                       >
                         {@html svgIcons.trash}
@@ -947,7 +947,7 @@
                           e.stopPropagation();
                           addRowAfter(index);
                         }}
-                        class="btn btn-xs btn-outline btn-ghost text-base-content/50 hover:text-primary hover:bg-primary/10 join-item"
+                        class="btn btn-xs btn-ghost text-base-content/60 hover:bg-primary hover:text-white join-item"
                         title={t("subtitle-editor.add-after-title")}
                       >
                         {@html svgIcons.add}
@@ -1122,7 +1122,7 @@
                       statusText = t("subtitle-editor.media-removed");
                       setTimeout(() => (statusText = ""), 3000);
                     }}
-                    class="btn btn-xs btn-ghost text-base-content/50 hover:text-error hover:bg-error/10"
+                    class="btn btn-xs btn-ghost text-base-content/60 hover:bg-error hover:text-white"
                     title={t("subtitle-editor.remove-media")}
                   >
                     ✕
@@ -1189,7 +1189,7 @@
                         statusText = t("subtitle-editor.media-removed");
                         setTimeout(() => (statusText = ""), 3000);
                       }}
-                      class="btn btn-xs btn-ghost text-base-content/50 hover:text-error hover:bg-error/10"
+                      class="btn btn-xs btn-ghost text-base-content/60 hover:bg-error hover:text-white"
                       title={t("subtitle-editor.remove-media")}
                     >
                       ✕
@@ -1229,7 +1229,7 @@
                   statusText = t("subtitle-editor.media-removed");
                   setTimeout(() => (statusText = ""), 3000);
                 }}
-                class="btn btn-xs btn-ghost text-base-content/50 hover:text-error hover:bg-error/10"
+                class="btn btn-xs btn-ghost text-base-content/60 hover:bg-error hover:text-white"
                 title={t("subtitle-editor.remove-media")}
               >
                 ✕

@@ -431,7 +431,7 @@
           </button>
 
           <button
-            class="btn btn-sm btn-ghost text-base-content/80 hover:text-error ml-8"
+            class="btn btn-sm btn-outline border-base-300 text-base-content/80 hover:bg-error hover:text-white hover:border-error ml-8"
             onclick={(e) => {
               confirmDeleteModal?.showModal();
             }}
