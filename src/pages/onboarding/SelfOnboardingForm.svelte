@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import { actions } from "astro:actions";
   import { TRANSCRIPTION_API_URL } from "astro:env/client";
   import type { TagItem } from "$types/Subscription";
@@ -9,6 +10,8 @@
   import FormView from "./FormView.svelte";
   import ProcessingView from "./ProcessingView.svelte";
   import SuccessView from "./SuccessView.svelte";
+  import { posthogClientCaptureGlobal } from "$utils/posthogClient";
+  import { EventName, ScreenName } from "$types/Posthog";
 
   interface Props {
     tags: TagItem[];
@@ -29,6 +32,13 @@
   type View = (typeof View)[keyof typeof View];
 
   let currentView: View = $state(View.Form);
+
+  // Track when the onboarding page is first shown
+  onMount(() => {
+    posthogClientCaptureGlobal(EventName.AiboxOnboardingNew, {
+      page_name: ScreenName.Onboarding,
+    });
+  });
 
   // ── Form state ─────────────────────────────────────────────────────────────
   let organizationName = $state("");
@@ -300,6 +310,18 @@
     );
   }
 
+  // ── View handlers ──────────────────────────────────────────────────────────
+  function handleCreate(): void {
+    currentView = View.Processing;
+  }
+
+  function handleComplete(): void {
+    posthogClientCaptureGlobal(EventName.AiboxOnboardingCreated, {
+      page_name: ScreenName.Onboarding,
+    });
+    currentView = View.Success;
+  }
+
   // ── Steps — $derived so label translations stay reactive ──────────────────
   interface StepConfig {
     key: string;
@@ -365,10 +387,10 @@
       bind:organizationName
       bind:websiteUrl
       bind:selectedTag
-      oncreate={() => (currentView = View.Processing)}
+      oncreate={handleCreate}
     />
   {:else if currentView === View.Processing}
-    <ProcessingView {steps} oncomplete={() => (currentView = View.Success)} />
+    <ProcessingView {steps} oncomplete={handleComplete} />
   {:else if currentView === View.Success}
     <SuccessView {result} {organizationName} {selectedTagName} />
   {/if}
