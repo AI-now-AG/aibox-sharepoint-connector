@@ -447,7 +447,7 @@
       <div class="grow md:w-1/2 p-2 pb-4 h-full">
         <div class="grid space-y-6 h-full" transition:fade>
           <div class="flex flex-col">
-            <div class="mt-2 overflow-y-scroll h-full min-h-screen">
+            <div class="mt-2 overflow-y-auto h-full">
               <div class="card gap-4 chat-container" transition:fade>
                 {#each messages as { role, content, imageUrl, fileUrls, thumbRating, sources, ragDebug }, index}
                   <div
@@ -645,9 +645,6 @@
   :global([id^="exportedTextElement-"]) {
     max-width: 100%;
     box-sizing: border-box;
-  }
-
-  :global([id^="exportedTextElement-"] .overflow-x-auto) {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
@@ -655,13 +652,16 @@
   :global([id^="exportedTextElement-"] table) {
     table-layout: auto;
     border-collapse: collapse;
+    width: 100%;
+    max-width: 100%;
   }
 
   :global([id^="exportedTextElement-"] th),
   :global([id^="exportedTextElement-"] td) {
-    white-space: nowrap;
-    word-break: normal;
-    overflow-wrap: normal;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    max-width: 300px;
   }
 
   :global([id^="exportedTextElement-"] td:last-child) {
