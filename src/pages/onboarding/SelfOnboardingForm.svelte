@@ -212,7 +212,7 @@
     // 1. Create Auth0 organisation
     const { data: orgResult, error: orgError } =
       await actions.onboarding.createOrganization({
-        organization_name: organizationName,
+        name: organizationName,
       });
 
     if (orgError || !orgResult) {
@@ -239,8 +239,9 @@
     // 3. Clone master tenant and create subscription
     const { data: tenantResult, error: tenantError } =
       await actions.onboarding.initializeTenant({
-        org_name: organizationName,
+        name: organizationName,
         org_id: orgResult.id,
+        org_name: orgResult.name,
         website: websiteUrl,
       });
 
@@ -260,7 +261,7 @@
   async function createKB(): Promise<void> {
     const { data, error } = await actions.onboarding.createTenantKnowledgeBase({
       tenant_id: newTenantId!,
-      org_name: organizationName,
+      name: organizationName,
       content: kbContent,
     });
 

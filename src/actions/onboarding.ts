@@ -54,7 +54,7 @@ const auth0WindowsCon = isProd()
   : AUTH0_AUTH_WINDOWS_CON.DEV;
 
 const OrganizationNameInputSchema = z.object({
-  organization_name: z.string().min(1),
+  name: z.string().min(1),
 });
 
 const OrganizationIdInputSchema = z.object({
@@ -62,6 +62,7 @@ const OrganizationIdInputSchema = z.object({
 });
 
 const SetupTenantInputSchema = z.object({
+  name: z.string().min(1),
   org_id: z.string().min(1),
   org_name: z.string().min(1),
   website: z.string().optional(),
@@ -69,7 +70,7 @@ const SetupTenantInputSchema = z.object({
 
 const SetupKbInputSchema = z.object({
   tenant_id: z.string().min(1),
-  org_name: z.string().min(1),
+  name: z.string().min(1),
   content: z.string().min(1),
 });
 
@@ -88,7 +89,7 @@ export const onboarding = {
   createOrganization: defineAction({
     input: OrganizationNameInputSchema,
     handler: async (input, context) => {
-      const { organization_name: organizationName } = input;
+      const { name: organizationName } = input;
       const { user } = context.locals;
       const name = organizationName
         .toLowerCase()
@@ -180,7 +181,7 @@ export const onboarding = {
       const includedKbMB =
         SubscriptionIncludedKbMB[SubscriptionPackageId.Teams] || 10;
       const newTenant = await TenantModel.copyTenant(masterTenantId, {
-        name: input.org_name,
+        name: input.name,
         org_id: input.org_id,
         org_name: input.org_name,
         billing_method: BillingMethod.CreditCard,
@@ -240,11 +241,7 @@ export const onboarding = {
   createTenantKnowledgeBase: defineAction({
     input: SetupKbInputSchema,
     handler: async (input) => {
-      const {
-        tenant_id: tenantId,
-        org_name: organizationName,
-        content,
-      } = input;
+      const { tenant_id: tenantId, name: organizationName, content } = input;
 
       // Create KB entry for the new tenant
       const tenantObjectId = new ObjectId(tenantId);
