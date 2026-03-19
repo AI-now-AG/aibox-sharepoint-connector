@@ -569,9 +569,9 @@
                           <img src="/aibox-logo-dark.svg" alt="aibox logo" />
                         </div>
                       </div>
-                      <div class="flex-1 p-4 pt-2.5">
+                      <div class="flex-1 p-4 pt-2.5 min-w-0">
                         <p class="font-bold text-sm">aibox</p>
-                        <div class="mt-2 text-sm w-full max-w-full overflow-x-auto">{@html currentMessage}</div>
+                        <div class="mt-2 text-sm w-full max-w-full overflow-x-auto break-words">{@html currentMessage}</div>
                       </div>
                     </div>
                   </div>
