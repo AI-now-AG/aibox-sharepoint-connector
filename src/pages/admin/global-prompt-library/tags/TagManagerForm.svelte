@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { svgIcons } from "$assets/icons";
-  import { type TagItem } from "$types/TagInput";
+  import { type TagItem, ONBOARDING_CATEGORY } from "$types/TagInput";
   import { useTranslations } from "$i18n/utils";
   import { bgOpacity } from "$utils/common";
   import CategoriesInput from "./CategoriesInput.svelte";
@@ -12,7 +12,7 @@
   }
 
   let { resellerCodes = [] }: Props = $props();
-  const categories = ["self-onboarding", ...resellerCodes];
+  const categories = [ONBOARDING_CATEGORY, ...resellerCodes];
 
   const t = useTranslations();
 

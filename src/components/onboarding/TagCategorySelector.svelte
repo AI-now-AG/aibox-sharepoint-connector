@@ -5,7 +5,6 @@
   import { useTranslations } from "$i18n/utils";
 
   interface Props {
-    defaultLanguage?: string;
     tags: TagItem[];
     categories: CategoryItem[];
     selectedTag: string;
@@ -14,7 +13,6 @@
   }
 
   let {
-    defaultLanguage = "en",
     tags = [],
     categories = [],
     selectedTag = $bindable(""),
@@ -22,7 +20,7 @@
     titleAlignCenter = false,
   }: Props = $props();
 
-  const t = useTranslations(defaultLanguage);
+  const t = useTranslations();
 
   const defaultTagIconColor = "#491EFF";
   const defaultTagEmoij = "🇨🇭";

@@ -88,22 +88,6 @@ export const BillingMethodLabels: Record<BillingMethod, string> = {
   [BillingMethod.YearlyInvoice]: t("subscription.yearly-invoice-email"),
 };
 
-export const SubscriptionStep = {
-  Step0: 0,
-  Step1: 1,
-  Step2: 2,
-  Step3: 3,
-  Step4: 4,
-  Completed: 5,
-};
-
-export enum RoutePath {
-  Step1 = "step1",
-  Step2 = "step2",
-  Step3 = "step3",
-  Step4 = "step4",
-}
-
 export interface TagItem {
   title: string;
   value: string;
@@ -111,6 +95,7 @@ export interface TagItem {
   icon?: string | null | undefined;
   iconColor?: string | null | undefined;
 }
+
 export interface CategoryItem {
   title: string;
   value: string;
