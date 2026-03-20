@@ -180,8 +180,6 @@
   function buildRequestPayload(fileUrls: string[]): RequestPayload {
     const isResponseModel = [
       PromptModel.OpenAI,
-      PromptModel.OpenAIWithTools, // Deprecated — removal imminent
-      PromptModel.OpenAIWithImageTools, // Deprecated — removal imminent
       PromptModel.OpenAIGpt5,
     ].includes(model);
 

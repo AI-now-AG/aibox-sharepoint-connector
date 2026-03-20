@@ -7,7 +7,4 @@ export enum PromptModel {
   Claude = "claude",
   Gemini = "gemini",
   NanoBanana = "nano_banana",
-
-  OpenAIWithTools = "openai:tools", // Deprecated — removal imminent
-  OpenAIWithImageTools = "openai:tools:image", // Deprecated — removal imminent
 }

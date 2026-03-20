@@ -41,6 +41,7 @@
     NanoBananaPromptTools,
     resolveAPIProvider,
     getModelName,
+    isProviderActive,
   } from "$shared/AIProvider";
   import { TRANSCRIPTION_API_URL } from "astro:env/client";
   import { EventName, ScreenName } from "$types/Posthog";
@@ -191,12 +192,9 @@
 
   // === Request Builder ===
   function buildRequestPayload(fileUrls: string[]): RequestPayload {
-    let isResponseModel = [
-      PromptModel.OpenAI,
-      PromptModel.OpenAIWithTools, // Deprecated — removal imminent
-      PromptModel.OpenAIWithImageTools, // Deprecated — removal imminent
-      PromptModel.OpenAIGpt5,
-    ].includes(currentPrompt?.model);
+    let isResponseModel = [PromptModel.OpenAI, PromptModel.OpenAIGpt5].includes(
+      currentPrompt?.model,
+    );
 
     const isGeminiImageModel = [PromptModel.NanoBanana].includes(
       currentPrompt?.model,
@@ -208,10 +206,16 @@
         | PromptModel
         | undefined,
     );
-    const requestModel = isGeminiImageModel
+    let requestModel = isGeminiImageModel
       ? ModelName.Gemini25FlashImage
       : undefined;
 
+    if (
+      currentPrompt?.model &&
+      !isProviderActive($tenant, currentPrompt.model)
+    ) {
+    }
+    requestModel;
     const promptForAttachedFilesOnly = fileUrls.length > 0 ? " " : "";
 
     const payload: RequestPayload = {
@@ -443,7 +447,12 @@
     addMessageToHistory(groupId, promptId, newAssistantMessage);
   }
 
-  function addAssistantMessage(responseText: string, imageUrl: string, sources?: any[], ragDebug?: any): void {
+  function addAssistantMessage(
+    responseText: string,
+    imageUrl: string,
+    sources?: any[],
+    ragDebug?: any,
+  ): void {
     const newAssistantMessage: Message = {
       role: MessageRole.Assistant,
       content: responseText,
