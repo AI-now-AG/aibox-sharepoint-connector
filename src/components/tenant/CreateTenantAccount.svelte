@@ -3,6 +3,7 @@
   import { actions } from "astro:actions";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
+  import { normalizeUrl } from "$utils/common";
   import { isValidEmail, isValidUrl } from "$utils/validation";
   import { addToast } from "$stores/toast";
   import { tenant, user } from "$stores";
@@ -220,7 +221,7 @@
       tenantId: $tenant?._id?.toString(),
       provider: PromptModel.Gemini,
       systemMessage: [promptKbInstruction || DEFAULT_PROMPT_KB_INSTRUCTION],
-      prompt: `Company: ${companyName}\nWebsite: ${websiteUrl}`,
+      prompt: `Company: ${companyName}\nWebsite: ${normalizeUrl(websiteUrl)}`,
       tool: PromptToolOption.UrlContext,
     };
 

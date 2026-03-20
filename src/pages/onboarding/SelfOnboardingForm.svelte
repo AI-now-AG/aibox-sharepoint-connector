@@ -4,6 +4,7 @@
   import { TRANSCRIPTION_API_URL } from "astro:env/client";
   import type { TagItem } from "$types/Subscription";
   import { useTranslations } from "$i18n/utils";
+  import { normalizeUrl } from "$utils/common";
   import { user, tenant } from "$stores";
   import { PromptModel } from "$types/PromptModel";
   import { PromptToolOption } from "$types/AIProvider";
@@ -89,7 +90,6 @@
   // ── Inspects ────────────────────────────────────────────────────────────────
   $inspect(selectedTagName);
 
-  // ── Helpers ────────────────────────────────────────────────────────────────
   // Calls the AI prompt API with retry logic (up to 3 attempts, exponential back-off).
   // Returns extracted text and optional URL citations.
   async function executePrompt(
@@ -178,9 +178,23 @@
   // Called from FormView when user clicks "Check your industry".
   // Runs industry detection independently, before processing starts.
   async function checkIndustry(): Promise<void> {
+    // Verify the URL is reachable before calling the AI (server-side GET, 5 s timeout)
+    const { error: urlError } = await actions.onboarding.checkUrl({
+      url: normalizeUrl(websiteUrl),
+    });
+    if (urlError) {
+      console.error(
+        "SelfOnboarding -> checkIndustry() URL not reachable",
+        websiteUrl,
+        urlError,
+      );
+      throw new Error(t("self-onboarding.error-url-not-reachable"));
+    }
+    console.info("SelfOnboarding -> checkIndustry() URL reachable", websiteUrl);
+
     const { text: industryText } = await executePrompt(
       industryInstruction || DEFAULT_INDUSTRY_INSTRUCTION,
-      `Website URL: ${websiteUrl}`,
+      `Website URL: ${normalizeUrl(websiteUrl)}`,
     );
     industryContent = industryText;
     selectedTag = resolveTag();
@@ -194,7 +208,7 @@
   async function analyseWebsite(): Promise<void> {
     const { text: kbText, citations: kbCitations } = await executePrompt(
       promptKbInstruction || DEFAULT_KB_INSTRUCTION,
-      `Company: ${organizationName}\nWebsite: ${websiteUrl}`,
+      `Company: ${organizationName}\nWebsite: ${normalizeUrl(websiteUrl)}`,
     );
     kbContent = kbText;
     result.pagesAnalysed = kbCitations?.length

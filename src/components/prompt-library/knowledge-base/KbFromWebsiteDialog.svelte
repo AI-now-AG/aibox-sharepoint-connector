@@ -4,6 +4,7 @@
   import { tenant, user } from "$stores";
   import { addToast } from "$stores/toast";
   import { useTranslations } from "$i18n/utils";
+  import { normalizeUrl } from "$utils/common";
   import { isValidUrl } from "$utils/validation";
   import { PromptModel } from "$types/PromptModel";
   import { PromptToolOption } from "$types/AIProvider";
@@ -65,7 +66,7 @@
       tenantId,
       provider: PromptModel.Gemini,
       systemMessage: [promptKbInstruction || DEFAULT_PROMPT_KB_INSTRUCTION],
-      prompt: `Company: ${companyName}\nWebsite: ${websiteUrl}`,
+      prompt: `Company: ${companyName}\nWebsite: ${normalizeUrl(websiteUrl)}`,
       tool: PromptToolOption.UrlContext,
     };
 

@@ -119,6 +119,7 @@
     type="url"
     class="input input-bordered w-full"
     placeholder={t("self-onboarding.website-placeholder")}
+    disabled={checkingIndustry}
     bind:value={websiteUrl}
   />
 </div>

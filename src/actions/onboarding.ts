@@ -416,4 +416,21 @@ export const onboarding = {
       });
     },
   }),
+  checkUrl: defineAction({
+    input: z.object({ url: z.string().url() }),
+    handler: async ({ url }) => {
+      try {
+        const res = await fetch(url, {
+          method: "GET",
+          signal: AbortSignal.timeout(5000),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return { reachable: true };
+      } catch (err) {
+        throw new Error(
+          err instanceof Error ? err.message : "URL not reachable",
+        );
+      }
+    },
+  }),
 };
