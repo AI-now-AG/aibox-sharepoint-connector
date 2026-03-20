@@ -996,7 +996,7 @@
   "self-onboarding.error-url-not-reachable": "Diese Website konnte nicht erreicht werden. Bitte überprüfe die URL und versuche es erneut.",
   "self-onboarding.check-industry-btn": "Branche erkennen",
   "self-onboarding.industry-detected": "Wir haben deine Branche erkannt: \"${industry}\". Du kannst sie unten manuell ändern.",
-  "self-onboarding.error-analyse-website": "Deine Website konnte nicht analysiert werden. Bitte überprüfe die URL und versuche es erneut.",
+  "self-onboarding.error-analyse-website": "Deine Website konnte nicht analysiert werden. Bitte überprüfe die URL und versuche es erneut. Andernfalls kannst du die URL auch leer lassen und die Branche manuell auswählen.",
   "self-onboarding.error-create-aibox": "Deine aibox konnte nicht erstellt werden. Bitte versuche es erneut oder kontaktiere den Support.",
   "self-onboarding.error-create-kb": "Deine Knowledge Base konnte nicht erstellt werden. Bitte versuche es erneut.",
   "self-onboarding.error-configure-assistants": "Deine KI-Assistenten konnten nicht konfiguriert werden. Bitte versuche es erneut.",

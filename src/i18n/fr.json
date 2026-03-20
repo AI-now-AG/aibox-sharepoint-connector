@@ -996,7 +996,7 @@
   "self-onboarding.error-url-not-reachable": "We couldn't reach this website. Please check the URL and try again.",
   "self-onboarding.check-industry-btn": "Check your industry",
   "self-onboarding.industry-detected": "We detected your industry as  \"${industry}\".You can change it manually below.",
-  "self-onboarding.error-analyse-website": "We couldn't analyse your website. Please check the URL and try again.",
+  "self-onboarding.error-analyse-website": "We couldn't analyse your website. Please check the URL and try again. You can also leave URL empty and select your industry below.",
   "self-onboarding.error-create-aibox": "We couldn't create your aibox. Please try again or contact support.",
   "self-onboarding.error-create-kb": "We couldn't create your knowledge base. Please try again.",
   "self-onboarding.error-configure-assistants": "We couldn't configure your AI assistants. Please try again.",
