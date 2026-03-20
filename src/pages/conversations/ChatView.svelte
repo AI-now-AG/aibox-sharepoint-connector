@@ -23,6 +23,8 @@
     useProviderInfo,
     getModelName,
     resolveAPIProvider,
+    isProviderActive,
+    getProviderModelName,
   } from "$shared/AIProvider";
   import { tenant, user } from "$stores";
   import { PromptModel } from "$types/PromptModel";
@@ -36,6 +38,7 @@
   import { TRANSCRIPTION_API_URL } from "astro:env/client";
   import { EventName, ScreenName } from "$types/Posthog";
   import { posthogClientCapture } from "$utils/posthogClient";
+  import type { ApiKeyProvider } from "$types/TenantFeature";
 
   const t = useTranslations();
 
@@ -185,10 +188,28 @@
 
     const provider: any = resolveAPIProvider(model);
 
+    let requestModel: string | undefined;
+
+    // Force Gemini image model when generating images
     const isGeminiImageModel = [PromptModel.NanoBanana].includes(model);
-    const requestModel = isGeminiImageModel
-      ? ModelName.Gemini25FlashImage
-      : undefined;
+    if (isGeminiImageModel) {
+      requestModel = ModelName.Gemini25FlashImage;
+    }
+
+    // If selected model is inactive → fallback to default provider model
+    if (model && !isProviderActive($tenant, model as any)) {
+      const providerModel = getProviderModelName($tenant, model as any);
+      const fallbackModel = providerInfo?.defaultProviderModelName;
+      console.warn(
+        `[Prompt Execution] Model ${providerModel} not active → using fallback`,
+        {
+          requestedModel: providerModel,
+          fallbackModel,
+        },
+      );
+
+      requestModel = fallbackModel;
+    }
 
     isGenerating = selectedPromptTool == PromptToolOption.Image;
 

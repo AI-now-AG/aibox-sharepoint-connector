@@ -203,7 +203,7 @@ export function getModelName(tenant: any, model: string) {
   // only here we resolve exceptions
   console.warn(`Model ${model} not active → using fallback`, {
     requestedModel: model,
-    defaultModelName,
+    fallbackModel: defaultModelName,
   });
   return defaultModelName;
 }

@@ -42,6 +42,7 @@
     resolveAPIProvider,
     getModelName,
     isProviderActive,
+    getProviderModelName,
   } from "$shared/AIProvider";
   import { TRANSCRIPTION_API_URL } from "astro:env/client";
   import { EventName, ScreenName } from "$types/Posthog";
@@ -196,26 +197,41 @@
       currentPrompt?.model,
     );
 
-    const isGeminiImageModel = [PromptModel.NanoBanana].includes(
-      currentPrompt?.model,
-    );
-
     const provider: any = resolveAPIProvider(
       currentPrompt?.model,
       providerInfo?.defaultProviderPromptModelName as unknown as
         | PromptModel
         | undefined,
     );
-    let requestModel = isGeminiImageModel
-      ? ModelName.Gemini25FlashImage
-      : undefined;
 
+    let requestModel: string | undefined;
+
+    // Force Gemini image model when generating images
+    const isGeminiImageModel = [PromptModel.NanoBanana].includes(
+      currentPrompt?.model,
+    );
+    if (isGeminiImageModel) {
+      requestModel = ModelName.Gemini25FlashImage;
+    }
+
+    // If selected model is inactive → fallback to default provider model
     if (
       currentPrompt?.model &&
       !isProviderActive($tenant, currentPrompt.model)
     ) {
+      const providerModel = getProviderModelName($tenant, currentPrompt.model);
+      const fallbackModel = providerInfo?.defaultProviderModelName;
+      console.warn(
+        `[Prompt Execution] Model ${providerModel} not active → using fallback`,
+        {
+          requestedModel: providerModel,
+          fallbackModel,
+        },
+      );
+
+      requestModel = fallbackModel;
     }
-    requestModel;
+
     const promptForAttachedFilesOnly = fileUrls.length > 0 ? " " : "";
 
     const payload: RequestPayload = {
