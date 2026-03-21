@@ -60,7 +60,7 @@
   }
 </script>
 
-<div class="overflow-visible relative">
+<div class="overflow-x-auto pb-14 relative">
   <table
     class="table table-auto border-separate border-spacing-x-0 border-spacing-y-3 w-full relative"
   >

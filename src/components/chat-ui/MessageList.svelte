@@ -442,7 +442,7 @@
 </script>
 
 {#if messages.length > 0 || isFetching}
-  <div class="flex-1 h-full min-w-0 overflow-x-hidden">
+  <div class="flex-1 h-full min-w-0">
     <div class="flex flex-wrap h-full">
       <div class="grow md:w-1/2 p-2 pb-4 h-full min-w-0">
         <div class="grid space-y-6 h-full" transition:fade>
@@ -451,7 +451,7 @@
               <div class="card gap-4 chat-container" transition:fade>
                 {#each messages as { role, content, imageUrl, fileUrls, thumbRating, sources, ragDebug }, index}
                   <div
-                    class={`chat-bubble text-base-content overflow-hidden ${role === MessageRole.User ? `bg-base-200` : `bg-base-100`}`}
+                    class={`chat-bubble text-base-content ${role === MessageRole.User ? `bg-base-200` : `bg-base-100`}`}
                   >
                     <div class="flex items-start min-w-0">
                       <!-- Avatar -->
@@ -562,7 +562,7 @@
                 {/each}
 
                 {#if currentMessage}
-                  <div class="chat-bubble bg-base-100 text-base-content overflow-hidden">
+                  <div class="chat-bubble bg-base-100 text-base-content">
                     <div class="flex items-start min-w-0">
                       <div class="avatar">
                         <div class="w-10 rounded-full">
