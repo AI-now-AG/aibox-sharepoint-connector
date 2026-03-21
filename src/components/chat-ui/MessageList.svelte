@@ -472,7 +472,7 @@
                             {role == MessageRole.User ? username : `aibox`}
                           </p>
                           <div
-                            class="mt-2 text-sm w-0 min-w-full box-border overflow-x-auto overflow-y-hidden block break-words whitespace-normal"
+                            class="mt-2 text-sm w-full max-w-full break-words whitespace-normal overflow-x-auto"
                             id={`exportedTextElement-${index}`}
                           >
                             {@html role == MessageRole.User
@@ -642,6 +642,15 @@
 <Loading show={loading} />
 
 <style>
+  :global([id^="exportedTextElement-"]) {
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    display: block;
+  }
+
   :global([id^="exportedTextElement-"] table) {
     table-layout: auto;
     border-collapse: collapse;

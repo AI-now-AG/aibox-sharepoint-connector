@@ -165,7 +165,7 @@
     {/if}
   {:else}
     <div class="mb-4">
-      <div class="overflow-visible relative">
+      <div class="overflow-x-auto pb-14 relative">
         <table
           class="table table-auto border-separate border-spacing-x-0 w-full relative"
         >

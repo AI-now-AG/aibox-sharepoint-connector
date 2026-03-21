@@ -920,7 +920,7 @@
             </div>
           {/if}
         </div>
-        <div class="overflow-visible">
+        <div class="overflow-x-auto pb-14">
           <table class="table bg-base-100 rounded-lg">
             <thead>
               <tr class="bg-base-300">
