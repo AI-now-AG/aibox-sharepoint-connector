@@ -643,7 +643,8 @@
 
 <style>
   :global([id^="exportedTextElement-"]) {
-    max-width: 100%;
+    width: 0;
+    min-width: 100%;
     box-sizing: border-box;
     overflow-x: auto;
     overflow-y: hidden;
