@@ -667,17 +667,17 @@
     const durationPerChar = duration / charCount;
     let classes = "font-bold";
 
-    // Color logic - using -content variants for stronger contrast
+    // Color logic matching the original HTML implementation
     if (durationPerChar <= 0.05) {
-      classes += " text-error-content"; // Red - too fast
+      classes += " text-red-600"; // Red - too fast
     } else if (durationPerChar >= 0.1) {
-      classes += " text-info-content"; // Blue - too slow
+      classes += " text-blue-600"; // Blue - too slow
     } else if (durationPerChar > 0.05 && durationPerChar < 0.075) {
-      classes += " text-warning-content"; // Orange - getting better
+      classes += " text-orange-500"; // Orange - getting better
     } else if (durationPerChar >= 0.075 && durationPerChar < 0.1) {
-      classes += " text-success-content"; // Green - good timing
+      classes += " text-green-600"; // Green - good timing
     } else {
-      classes += " text-success-content"; // Green - good timing (fallback)
+      classes += " text-green-600"; // Green - good timing (fallback)
     }
 
     // Check for lines exceeding 36 characters and add red horizontal line indicator
