@@ -110,7 +110,7 @@ export async function GET(context: APIContext): Promise<Response> {
   // 🪙 Generate a short-lived API JWT tied to this Lucia session
   //    - Expires at the same time as the Lucia session
   //    - Can be used for authenticated API requests to our backend
-  const apiToken = createApiToken(session);
+  const apiToken = createApiToken(session, tenant._id.toString());
 
   // 💾 Store the API token in the user record
   await UserModel.upsertByAuth0Sub(auth0User.data.sub, {

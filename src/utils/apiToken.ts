@@ -2,10 +2,11 @@ import jwt from "jsonwebtoken";
 import type { Session } from "lucia";
 
 const jwtSecret = import.meta.env.API_JWT_SECRET || "254106bc6b8951a96357f87b";
-export function createApiToken(session: Session) {
+export function createApiToken(session: Session, tenantId?: string) {
   const payload = {
     sub: session.userId,
     sid: session.id, // Lucia session ID
+    ...(tenantId && { tid: tenantId }), // Tenant ID for integration service
   };
 
   // Calculate remaining time until Lucia session expiry

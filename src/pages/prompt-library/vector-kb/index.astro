@@ -8,15 +8,16 @@ const tenant = Astro.locals.tenant;
 const user = Astro.locals.user;
 const tenantId = tenant?._id?.toString() ?? "";
 const userId = user?.id?.toString() ?? "system";
+const apiToken = user?.api_token || "";
+const integrationApiUrl = import.meta.env.INTEGRATION_API_URL || "";
+const transcriptionApiUrl = import.meta.env.TRANSCRIPTION_API_URL || process.env.TRANSCRIPTION_API_URL || "";
 
 // Check if Vector KB is enabled for this tenant
 const vectorKbEnabled = tenant?.vector_kb_enabled ?? false;
 ---
 
 <Layout>
-  <div
-    class="container max-w-5xl mx-auto p-6 grid grid-cols-1 md:grid-cols-[1fr_max-content] gap-8"
-  >
+  <div class="container max-w-8xl mx-auto px-6 lg:px-14">
     <h1 class="pt-2 lg:pt-8 text-4xl font-bold">
       {t("vector-kb.title")}
     </h1>
@@ -26,10 +27,13 @@ const vectorKbEnabled = tenant?.vector_kb_enabled ?? false;
     <VectorKBList
       tenantId={tenantId}
       userId={userId}
+      apiUrl={transcriptionApiUrl}
+      integrationApiUrl={integrationApiUrl}
+      apiToken={apiToken}
       client:load
     />
   ) : (
-    <div class="container max-w-5xl mx-auto p-6 space-y-4">
+    <div class="container max-w-5xl mx-auto px-6">
       <div class="alert alert-warning">
         <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />

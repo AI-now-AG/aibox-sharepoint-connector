@@ -1,0 +1,14 @@
+---
+import Layout from "$layouts/Layout.astro";
+import IntegrationsDashboard from "$components/integrations/IntegrationsDashboard.svelte";
+
+const { user } = Astro.locals;
+const apiToken = user.api_token || "";
+const integrationApiUrl = import.meta.env.INTEGRATION_API_URL || "";
+---
+
+<Layout title="Integrations">
+  <div class="container max-w-8xl mx-auto px-6 lg:px-14 py-6">
+    <IntegrationsDashboard client:load apiToken={apiToken} integrationApiUrl={integrationApiUrl} />
+  </div>
+</Layout>

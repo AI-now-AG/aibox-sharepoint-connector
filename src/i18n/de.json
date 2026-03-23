@@ -721,6 +721,7 @@
   "tenant.reached-user-limit": "Ihr Mandant hat das Benutzerlimit erreicht.",
   "tenant.reached-user-limit-contact-upgrade": "Du hast das Benutzerlimit deines Abonnements erreicht. Entferne ungenutzte Benutzer oder kontaktiere den Support unter <a href=\"mailto:support@aibox-app.ch\">support@aibox-app.ch\n</a>.",
   "nav.settings.vector-knowledge-base": "Knowledge Base Plus ",
+  "nav.settings.integrations": "Integrationen",
   "tenant.vector-kb.title": "Vektor Knowledge Base",
   "tenant.vector-kb.enable": "Vektor KB aktivieren",
   "tenant.vector-kb.embedding-config": "Embedding Konfiguration",

@@ -4,11 +4,12 @@
   import Loading from "$components/Loading.svelte";
   import ConfirmDialog from "$components/ConfirmDialog.svelte";
   import ChunkViewer from "./ChunkViewer.svelte";
+  import SharePointFolderBrowser from "./SharePointFolderBrowser.svelte";
   import type { VectorFolder, VectorDataSource, StorageUsage } from "$types/VectorKB";
   import { DataSourceStatus } from "$types/VectorKB";
   import { getTranscriptionConfig } from "$api/transcription/transcription-api";
+  import { createSyncJob } from "$api/integration/integration-api";
   import { useTranslations } from "$i18n/utils";
-  import { addToast } from "$stores/toast";
 
   const t = useTranslations();
 
@@ -16,18 +17,18 @@
     tenantId: string;
     userId?: string;
     apiUrl?: string;
+    integrationApiUrl?: string;
+    apiToken?: string;
   }
 
-  let { tenantId, userId = "system"}: Props = $props();
+  let { tenantId, userId = "system", apiUrl = "", integrationApiUrl = "", apiToken = "" }: Props = $props();
 
   let loading = $state(true);
   let folders = $state<VectorFolder[]>([]);
   let dataSources = $state<VectorDataSource[]>([]);
   let storageUsage = $state<StorageUsage | null>(null);
   let error = $state<string | null>(null);
-  let uploadError = $state<string | null>(null);
   let currentFolderId = $state<string | null>(null);
-  let storageWarning = $derived(storageUsage !== null && storageUsage.usedPercentage >= 90);
   let breadcrumbs = $state<{ id: string | null; name: string }[]>([{ id: null, name: "" }]);
 
   // File upload state
@@ -54,19 +55,18 @@
   let selectedFiles = $state<Set<string>>(new Set());
   let deletingMultiple = $state(false);
 
-  // API base URL - will be set from config
-  let apiBase = $state("");
+  // API base URL - prefer prop, fallback to Netlify function
+  let apiBase = $state(apiUrl || "");
 
   // SSE connection for real-time status updates
   let eventSource: EventSource | null = null;
   let reconnectAttempts = 0;
   const MAX_RECONNECT_ATTEMPTS = 5;
 
-  // SharePoint folder state
+  // SharePoint folder browser state
   let sharepointDialog: HTMLDialogElement;
-  let sharepointFolderName = $state("");
-  let sharepointFolderDescription = $state("");
   let savingSharePoint = $state(false);
+  let sharepointBrowserActive = $state(false);
 
   function formatRelativeTime(dateString: string | null | undefined): string {
     if (!dateString) return "";
@@ -84,23 +84,16 @@
   }
 
   function openSharePointDialog() {
-    sharepointFolderName = "";
-    sharepointFolderDescription = "";
+    sharepointBrowserActive = true;
     sharepointDialog?.showModal();
   }
 
   function closeSharePointDialog() {
     sharepointDialog?.close();
-    sharepointFolderName = "";
-    sharepointFolderDescription = "";
+    sharepointBrowserActive = false;
   }
 
-  async function createSharePointFolder() {
-    if (!sharepointFolderName.trim()) {
-      alert(t("vector-kb.folder-name-required"));
-      return;
-    }
-
+  async function handleSharePointFolderSelected(selection: { connectionId: string; remoteFolderId: string; remoteFolderPath: string }) {
     savingSharePoint = true;
     try {
       if (!apiBase) {
@@ -108,13 +101,18 @@
         apiBase = config.apiUrl;
       }
 
+      // Extract a folder name from the path (last part)
+      const pathParts = selection.remoteFolderPath.split(" > ");
+      const folderName = pathParts[pathParts.length - 1] || "SharePoint Sync";
+
+      // 1. Create KB folder with source_type: 'sharepoint'
       const response = await fetch(`${apiBase}/api/vector-kb/folders/sharepoint`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           tenantId,
-          name: sharepointFolderName.trim(),
-          description: sharepointFolderDescription.trim(),
+          name: folderName,
+          description: `Synced from SharePoint: ${selection.remoteFolderPath}`,
           parentFolderId: currentFolderId,
           createdBy: userId,
         }),
@@ -122,21 +120,47 @@
 
       const result = await response.json();
 
-      if (result.success) {
-        const folderId = result.data?._id;
-        closeSharePointDialog();
-        fetchData();
-
-        // Open FlowMate Integration Center with auto-filled context
-        if (folderId) {
-          const flowmateUrl = `/flowmate?folder_id=${folderId}`;
-          window.open(flowmateUrl, '_blank');
-        }
-      } else {
-        alert("Failed to create SharePoint folder: " + result.error);
+      if (!result.success) {
+        alert("Failed to create folder: " + result.error);
+        return;
       }
+
+      const folderId = result.data?._id;
+
+      // 2. Create sync job linking SharePoint folder to KB folder
+      if (folderId && integrationApiUrl && apiToken) {
+        const syncResult = await createSyncJob(
+          integrationApiUrl,
+          {
+            connection_id: selection.connectionId,
+            remote_folder_id: selection.remoteFolderId,
+            remote_folder_path: selection.remoteFolderPath,
+            aibox_folder_id: folderId,
+          },
+          apiToken
+        );
+
+        if (!syncResult.success) {
+          console.error("[VectorKB] Failed to create sync job:", syncResult.error);
+
+          // Duplicate sync job — clean up the orphaned KB folder
+          if (syncResult.status === 409) {
+            await fetch(`${apiBase}/api/vector-kb/folders/${folderId}`, {
+              method: "DELETE",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ tenantId }),
+            }).catch(() => {});
+            alert("This SharePoint folder is already synced.");
+          } else {
+            alert("Folder created but sync job failed: " + (syncResult.error || "Unknown error"));
+          }
+        }
+      }
+
+      closeSharePointDialog();
+      fetchData();
     } catch (e) {
-      alert("Error creating SharePoint folder: " + (e as Error).message);
+      alert("Error: " + (e as Error).message);
     } finally {
       savingSharePoint = false;
     }
@@ -320,7 +344,6 @@
     if (!files || files.length === 0) return;
 
     uploading = true;
-    uploadError = null; // Clear any previous error
 
     // Ensure we have API URL
     if (!apiBase) {
@@ -328,24 +351,7 @@
       apiBase = config.apiUrl;
     }
 
-    // Build a set of existing filenames in the current folder for duplicate detection
-    const existingFileNames = new Set(
-      dataSources.map((ds) => ds.original_file_name.toLowerCase())
-    );
-
     for (const file of Array.from(files)) {
-      // Check for duplicate filename
-      if (existingFileNames.has(file.name.toLowerCase())) {
-        const errorMessage = t("vector-kb.error-duplicate-file", { name: file.name });
-        addToast({
-          message: errorMessage,
-          type: "error",
-          timeout: 5000,
-        });
-        uploadError = errorMessage;
-        continue; // Skip this file
-      }
-
       try {
         const formData = new FormData();
         formData.append("tenantId", tenantId);
@@ -362,41 +368,11 @@
 
         const result = await response.json();
 
-        if (result.success) {
-          // Track this filename so subsequent files in the same batch are caught
-          existingFileNames.add(file.name.toLowerCase());
-        } else {
+        if (!result.success) {
           console.error("Upload failed:", result.error);
-
-          // Determine the appropriate error message based on the error type
-          let errorMessage = t("vector-kb.upload-failed");
-          const errorLower = (result.error || "").toLowerCase();
-
-          if (errorLower.includes("storage limit") || errorLower.includes("storage exceeded")) {
-            errorMessage = t("vector-kb.error-storage-limit-exceeded");
-          } else if (errorLower.includes("file size") || errorLower.includes("too large") || errorLower.includes("25mb") || errorLower.includes("25 mb")) {
-            errorMessage = t("vector-kb.error-file-too-large");
-          }
-
-          // Show toast notification
-          addToast({
-            message: errorMessage,
-            type: "error",
-            timeout: 5000,
-          });
-
-          // Set inline error for display
-          uploadError = errorMessage;
         }
       } catch (e) {
         console.error("Upload error:", e);
-        const errorMessage = t("vector-kb.upload-failed");
-        addToast({
-          message: errorMessage,
-          type: "error",
-          timeout: 5000,
-        });
-        uploadError = errorMessage;
       }
     }
 
@@ -536,29 +512,6 @@
       }
     } catch (e) {
       alert("Error retrying: " + (e as Error).message);
-    }
-  }
-
-  async function reindexDataSource(id: string) {
-    try {
-      if (!apiBase) {
-        const config = await getTranscriptionConfig();
-        apiBase = config.apiUrl;
-      }
-
-      const response = await fetch(`${apiBase}/api/vector-kb/data-sources/${id}/reindex`, {
-        method: "POST",
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
-        fetchData();
-      } else {
-        alert("Failed to reindex: " + result.error);
-      }
-    } catch (e) {
-      alert("Error reindexing: " + (e as Error).message);
     }
   }
 
@@ -779,13 +732,13 @@
   onchange={handleFileUpload}
 />
 
-<div class="container max-w-5xl mx-auto p-6 space-y-4">
+<div class="container max-w-8xl mx-auto px-6 lg:px-14">
   <!-- Storage Usage & Toolbar - always show -->
   <div class="flex items-center justify-between mb-4 p-4 bg-base-100 rounded-lg">
     <div class="flex items-center gap-4">
       <span class="text-sm font-medium">{t("vector-kb.storage-usage")}:</span>
       <progress
-        class="progress w-48 {storageWarning ? 'progress-warning' : 'progress-primary'}"
+        class="progress progress-primary w-48"
         value={storageUsage?.usedPercentage ?? 0}
         max="100"
       ></progress>
@@ -838,31 +791,6 @@
       </button>
     </div>
   </div>
-
-  <!-- Storage Warning Banner (90%+ usage) -->
-  {#if storageWarning}
-    <div role="alert" class="alert alert-warning mb-4">
-      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-      </svg>
-      <span>{@html t("vector-kb.storage-warning-90")}</span>
-    </div>
-  {/if}
-
-  <!-- Upload Error Banner -->
-  {#if uploadError}
-    <div role="alert" class="alert alert-error mb-4">
-      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-      <span>{uploadError}</span>
-      <button class="btn btn-sm btn-ghost" onclick={() => uploadError = null}>
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
-    </div>
-  {/if}
 
   <!-- Breadcrumbs - only show when inside a folder -->
   {#if breadcrumbs.length > 1}
@@ -1033,7 +961,7 @@
             </div>
           {/if}
         </div>
-        <div class="overflow-x-clip">
+        <div class="overflow-x-auto">
           <table class="table table-zebra">
             <thead>
               <tr>
@@ -1195,14 +1123,6 @@
                               {t("vector-kb.view-chunks")}
                             </button>
                           </li>
-                          <li>
-                            <button onclick={() => reindexDataSource(source._id)}>
-                              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                              </svg>
-                              {t("vector-kb.reindex")}
-                            </button>
-                          </li>
                         {/if}
                         <li>
                           <button onclick={() => downloadFile(source._id, source.original_file_name)}>
@@ -1241,15 +1161,6 @@
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                          </svg>
-                        </button>
-                        <button
-                          class="btn btn-xs btn-ghost"
-                          onclick={() => reindexDataSource(source._id)}
-                          title={t("vector-kb.reindex")}
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                           </svg>
                         </button>
                       {/if}
@@ -1385,53 +1296,30 @@
   </form>
 </dialog>
 
-<!-- SharePoint Connect Dialog -->
+<!-- SharePoint Folder Browser Dialog -->
 <dialog bind:this={sharepointDialog} class="modal">
-  <div class="modal-box">
+  <div class="modal-box max-w-2xl">
     <h3 class="text-lg font-bold mb-4">{t("vector-kb.connect-sharepoint-title")}</h3>
-    <div class="space-y-4">
-      <div class="form-control">
-        <label class="label">
-          <span class="label-text font-medium">{t("vector-kb.folder-name")} *</span>
-        </label>
-        <input
-          type="text"
-          class="input input-bordered w-full"
-          placeholder={t("vector-kb.enter-folder-name")}
-          bind:value={sharepointFolderName}
-        />
+    {#if savingSharePoint}
+      <div class="flex flex-col items-center justify-center py-12">
+        <span class="loading loading-spinner loading-lg"></span>
+        <p class="mt-3 text-base-content/60">Creating folder and sync job...</p>
       </div>
-      <div class="form-control">
-        <label class="label">
-          <span class="label-text font-medium">{t("vector-kb.description-optional")}</span>
-        </label>
-        <textarea
-          class="textarea textarea-bordered w-full"
-          placeholder={t("vector-kb.enter-folder-description")}
-          bind:value={sharepointFolderDescription}
-          rows="2"
-        ></textarea>
+    {:else if sharepointBrowserActive && integrationApiUrl && apiToken}
+      <SharePointFolderBrowser
+        {integrationApiUrl}
+        {apiToken}
+        onSelect={handleSharePointFolderSelected}
+        onClose={closeSharePointDialog}
+      />
+    {:else}
+      <div class="text-center py-8 text-base-content/50">
+        <p>Integration service not configured.</p>
       </div>
-      <div class="alert alert-info text-sm">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <span>{t("vector-kb.folder-id-info")}</span>
+      <div class="modal-action">
+        <button class="btn btn-ghost" onclick={closeSharePointDialog}>{t("vector-kb.cancel")}</button>
       </div>
-    </div>
-    <div class="modal-action">
-      <button class="btn btn-ghost" onclick={closeSharePointDialog}>{t("vector-kb.cancel")}</button>
-      <button
-        class="btn btn-primary"
-        disabled={!sharepointFolderName.trim() || savingSharePoint}
-        onclick={createSharePointFolder}
-      >
-        {#if savingSharePoint}
-          <span class="loading loading-spinner loading-sm"></span>
-        {/if}
-        {t("vector-kb.connect-sharepoint")}
-      </button>
-    </div>
+    {/if}
   </div>
   <form method="dialog" class="modal-backdrop">
     <button>close</button>
