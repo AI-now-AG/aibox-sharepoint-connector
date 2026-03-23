@@ -610,13 +610,13 @@
   function getStatusBadge(status: DataSourceStatus): { class: string; text: string } {
     switch (status) {
       case DataSourceStatus.Pending:
-        return { class: "badge-soft badge-warning", text: t("vector-kb.status.pending") };
+        return { class: "badge-warning", text: t("vector-kb.status.pending") };
       case DataSourceStatus.Processing:
-        return { class: "badge-soft badge-info", text: t("vector-kb.status.processing") };
+        return { class: "badge-info", text: t("vector-kb.status.processing") };
       case DataSourceStatus.Completed:
-        return { class: "badge-soft badge-success", text: t("vector-kb.status.completed") };
+        return { class: "badge-success", text: t("vector-kb.status.completed") };
       case DataSourceStatus.Failed:
-        return { class: "badge-soft badge-error", text: t("vector-kb.status.failed") };
+        return { class: "badge-error", text: t("vector-kb.status.failed") };
       default:
         return { class: "badge-ghost", text: status };
     }
@@ -794,7 +794,7 @@
             {:else}
               <span class="inline-flex items-center gap-1.5 font-medium text-base-content">
                 <!-- Folder icon for current folder -->
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4 text-warning">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4 text-primary">
                   <path d="M3.75 3A1.75 1.75 0 002 4.75v3.26a3.235 3.235 0 011.75-.51h12.5c.644 0 1.245.188 1.75.51V6.75A1.75 1.75 0 0016.25 5h-4.836a.25.25 0 01-.177-.073L9.823 3.513A1.75 1.75 0 008.586 3H3.75zM3.75 9A1.75 1.75 0 002 10.75v4.5c0 .966.784 1.75 1.75 1.75h12.5A1.75 1.75 0 0018 15.25v-4.5A1.75 1.75 0 0016.25 9H3.75z" />
                 </svg>
                 {crumb.name}
@@ -850,7 +850,7 @@
                     class="flex items-center gap-2 flex-1 text-left cursor-pointer"
                     onclick={() => navigateToFolder(folder._id, folder.name)}
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-warning" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
                     </svg>
                     <span class="font-medium">{folder.name}</span>
@@ -920,10 +920,10 @@
             </div>
           {/if}
         </div>
-        <div class="overflow-x-clip">
-          <table class="table table-zebra">
+        <div class="overflow-x-auto pb-14">
+          <table class="table bg-base-100 rounded-lg">
             <thead>
-              <tr>
+              <tr class="bg-base-300">
                 <th class="w-12">
                   <label>
                     <input
@@ -1026,7 +1026,7 @@
             <tbody>
               {#each sortedDataSources as source}
                 {@const statusBadge = getStatusBadge(source.status)}
-                <tr class={selectedFiles.has(source._id) ? "bg-primary/10" : ""}>
+                <tr class="{selectedFiles.has(source._id) ? 'bg-primary/10' : ''} hover:bg-base-200/50">
                   <td>
                     <label>
                       <input
@@ -1159,7 +1159,7 @@
                         </button>
                       {/if}
                       <button
-                        class="btn btn-xs btn-ghost text-error hover:bg-error/10"
+                        class="btn btn-xs btn-ghost text-base-content/60 hover:bg-error hover:text-white"
                         onclick={() => confirmDeleteDataSource(source._id, source.original_file_name)}
                         title={t("vector-kb.delete")}
                       >

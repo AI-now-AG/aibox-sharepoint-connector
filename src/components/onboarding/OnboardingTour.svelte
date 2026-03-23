@@ -185,15 +185,15 @@
   }
 
   :global(.driver-popover.driverjs-theme .driver-popover-description ul li) {
-    margin-left: 2vw;
+    margin-left: 1.25rem;
   }
   :global(.driver-popover.driverjs-theme .driver-popover-title) {
-    color: #491eff;
-    margin-bottom: 2vh;
+    color: var(--color-primary);
+    margin-bottom: 0.75rem;
   }
 
   :global(.driver-popover.driverjs-theme .driver-popover-description) {
-    margin-bottom: 2vh;
+    margin-bottom: 0.75rem;
   }
 
   :global(.driver-popover.driverjs-theme .driver-popover-navigation-btns) {
@@ -201,25 +201,27 @@
   }
 
   :global(.driver-popover.driverjs-theme button) {
-    border-radius: 8px;
-    padding: 16px;
-    padding-top: 6px;
-    padding-bottom: 6px;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    padding-top: 0.375rem;
+    padding-bottom: 0.375rem;
     border: none;
     font-weight: 700;
   }
 
   :global(.driver-popover.driverjs-theme .driver-popover-next-btn) {
-    background-color: #4338ca;
+    background-color: var(--color-primary);
     color: white;
     text-shadow: none;
   }
 
   :global(.driver-popover.driverjs-theme .driver-popover-close-btn) {
-    color: #9b9b9b;
+    color: var(--color-base-content);
+    opacity: 0.4;
   }
 
   :global(.driver-popover.driverjs-theme .driver-popover-close-btn:hover) {
-    color: #000;
+    color: var(--color-base-content);
+    opacity: 1;
   }
 </style>

@@ -171,7 +171,7 @@
                       <div class="flex items-center gap-2 min-w-0 flex-1">
                         <span class="truncate text-xs font-medium" title={chunk.fileName}>{chunk.fileName}</span>
                         {#if chunk.pageNumber}
-                          <span class="badge badge-outline badge-xs shrink-0">Page {chunk.pageNumber}</span>
+                          <span class="badge badge-ghost badge-xs shrink-0">Page {chunk.pageNumber}</span>
                         {/if}
                       </div>
                       <span class="badge badge-ghost badge-xs shrink-0 ml-2">{formatPercentage(chunk.score)}</span>

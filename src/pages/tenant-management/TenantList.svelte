@@ -289,22 +289,21 @@
     />
 
     <div>
-      <div class="overflow-x-auto relative">
+      <div class="overflow-x-auto pb-14 relative">
         <table
-          class="table table-fixed border-separate border-spacing-x-0 min-w-full relative"
-          style="font-family:Inter;"
+          class="table table-auto border-separate border-spacing-x-0 w-full relative"
         >
           <colgroup>
-            <col class="w-auto min-w-[150]" />
-            <col class="w-[200]" />
-            <col class="w-[180]" />
-            <col class="w-[100]" />
-            <col class="w-[150]" />
-            <col class="w-[120]" />
-            <col class="w-[180]" />
-            <col class="w-[100]" />
-            <col class="w-[80]" />
-            <col class="w-[70]" />
+            <col class="w-auto" />
+            <col class="w-auto" />
+            <col class="w-[100px]" />
+            <col class="w-[80px]" />
+            <col class="w-[100px]" />
+            <col class="w-[100px]" />
+            <col class="w-[120px]" />
+            <col class="w-[80px]" />
+            <col class="w-[80px]" />
+            <col class="w-[50px]" />
           </colgroup>
           <thead>
             <tr class="bg-base-300">
@@ -362,37 +361,41 @@
                 </td>
 
                 <td class="py-2 px-4">
-                  <span class="block text text-sm font-medium">
-                    {subscription?.plan_name}
-                  </span>
-                  <span class="flex flex-col gap-1 pt-1">
-                    {#if audioAddOn}
-                      <span class="badge badge-ghost badge-sm">
-                        {audioAddOn}
-                      </span>
+                  <div class="flex flex-col gap-1">
+                    <span class="text-sm font-medium">
+                      {subscription?.plan_name}
+                    </span>
+                    {#if audioAddOn || subtitleAddOn}
+                      <div class="flex flex-wrap gap-1">
+                        {#if audioAddOn}
+                          <span class="badge badge-ghost badge-sm whitespace-nowrap">
+                            {audioAddOn}
+                          </span>
+                        {/if}
+                        {#if subtitleAddOn}
+                          <span class="badge badge-ghost badge-sm whitespace-nowrap">
+                            {subtitleAddOn}
+                          </span>
+                        {/if}
+                      </div>
                     {/if}
-                    {#if subtitleAddOn}
-                      <span class="badge badge-ghost badge-sm">
-                        {subtitleAddOn}
-                      </span>
-                    {/if}
-                  </span>
+                  </div>
                 </td>
 
                 <td class="py-2 px-4">
                   <span class="flex flex-col gap-2">
                     {#if tenant.is_internal}
-                      <span class="badge badge-sm badge-soft badge-success"
+                      <span class="badge badge-sm badge-primary"
                         >{"Internal"}</span
                       >
                     {/if}
                     {#if subscription?.is_trial}
-                      <span class="badge badge-sm badge-soft badge-warning"
+                      <span class="badge badge-sm badge-warning"
                         >{"Trial"}</span
                       >
                     {/if}
                     {#if tenant.is_reseller}
-                      <span class="badge badge-sm badge-soft badge-info"
+                      <span class="badge badge-sm badge-info"
                         >{"Reseller"}</span
                       >
                     {/if}
@@ -430,11 +433,11 @@
 
                 <td class="py-2 px-4">
                   {#if tenant.active}
-                    <span class={"badge badge-soft badge-success badge-sm"}
+                    <span class={"badge badge-sm badge-success"}
                       >{t("tenant.tenants.tenant.active")}
                     </span>
                   {:else}
-                    <span class={"badge badge-soft badge-error badge-sm"}
+                    <span class={"badge badge-sm badge-error"}
                       >{t("tenant.tenants.tenant.archived")}
                     </span>
                   {/if}

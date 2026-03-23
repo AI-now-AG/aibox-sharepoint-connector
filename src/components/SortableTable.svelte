@@ -60,14 +60,13 @@
   }
 </script>
 
-<div class="overflow-x-auto relative">
+<div class="overflow-x-auto pb-14 relative">
   <table
-    class="table table-fixed border-separate border-spacing-x-0 border-spacing-y-3 min-w-full relative"
-    style="font-family:Inter;"
+    class="table table-auto border-separate border-spacing-x-0 border-spacing-y-3 w-full relative"
   >
     <colgroup>
       {#each columnData as data}
-        <col class={data.class ?? "w-auto min-w-[150]"} />
+        <col class={data.class ?? "w-auto"} />
       {/each}
     </colgroup>
     <thead>

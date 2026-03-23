@@ -669,17 +669,15 @@
 
     // Color logic matching the original HTML implementation
     if (durationPerChar <= 0.05) {
-      classes += " text-error"; // Red - too fast
+      classes += " text-red-600"; // Red - too fast
     } else if (durationPerChar >= 0.1) {
-      classes += " text-info"; // Blue - too slow
+      classes += " text-blue-600"; // Blue - too slow
     } else if (durationPerChar > 0.05 && durationPerChar < 0.075) {
-      // Interpolate between red and green (orange-ish)
-      classes += " text-warning"; // Orange/yellow - getting better
+      classes += " text-orange-500"; // Orange - getting better
     } else if (durationPerChar >= 0.075 && durationPerChar < 0.1) {
-      // Interpolate between green and blue (green-ish)
-      classes += " text-success"; // Green - good timing
+      classes += " text-green-600"; // Green - good timing
     } else {
-      classes += " text-success"; // Green - good timing (fallback)
+      classes += " text-green-600"; // Green - good timing (fallback)
     }
 
     // Check for lines exceeding 36 characters and add red horizontal line indicator
@@ -749,7 +747,7 @@
 
       <!-- Export Dropdown -->
       <div class="dropdown dropdown-end">
-        <div tabindex="0" role="button" class="btn btn-success btn-sm">
+        <div tabindex="0" role="button" class="btn btn-primary btn-outline btn-sm">
           {@html svgIcons.fileExport} Export
         </div>
         <ul
@@ -859,7 +857,7 @@
                         }}
                         class="btn btn-xs btn-circle {isPlaying &&
                         currentRowIndices.includes(index)
-                          ? 'btn-success text-success-content'
+                          ? 'btn-primary text-primary-content'
                           : 'btn-ghost hover:btn-primary'}"
                       >
                         {isPlaying && currentRowIndices.includes(index) ? "⏸️" : "▶️"}
@@ -916,9 +914,7 @@
                   </td>
                   <td class="p-1 text-center">
                     <div
-                      class="text-sm font-mono {currentRowIndices.includes(index)
-                        ? 'font-bold text-base-content'
-                        : getCharCountClass(dialogue, updateTrigger)}"
+                      class="text-sm font-mono {getCharCountClass(dialogue, updateTrigger)}"
                     >
                       {#if dialogue.text.split(/\\N|\\n|\r\n|\r|\n/).length > 1}
                         {@html dialogue.text
@@ -937,7 +933,7 @@
                           e.stopPropagation();
                           deleteRow(index);
                         }}
-                        class="btn btn-xs btn-outline btn-error join-item"
+                        class="btn btn-xs btn-ghost text-base-content/60 hover:bg-error hover:text-white join-item"
                         title={t("subtitle-editor.delete-title")}
                       >
                         {@html svgIcons.trash}
@@ -947,7 +943,7 @@
                           e.stopPropagation();
                           addRowAfter(index);
                         }}
-                        class="btn btn-xs btn-outline btn-success join-item"
+                        class="btn btn-xs btn-ghost text-base-content/60 hover:bg-primary hover:text-white join-item"
                         title={t("subtitle-editor.add-after-title")}
                       >
                         {@html svgIcons.add}
@@ -1122,7 +1118,7 @@
                       statusText = t("subtitle-editor.media-removed");
                       setTimeout(() => (statusText = ""), 3000);
                     }}
-                    class="btn btn-xs btn-ghost text-error hover:bg-error/20"
+                    class="btn btn-xs btn-ghost text-base-content/60 hover:bg-error hover:text-white"
                     title={t("subtitle-editor.remove-media")}
                   >
                     ✕
@@ -1189,7 +1185,7 @@
                         statusText = t("subtitle-editor.media-removed");
                         setTimeout(() => (statusText = ""), 3000);
                       }}
-                      class="btn btn-xs btn-ghost text-error hover:bg-error/20"
+                      class="btn btn-xs btn-ghost text-base-content/60 hover:bg-error hover:text-white"
                       title={t("subtitle-editor.remove-media")}
                     >
                       ✕
@@ -1229,7 +1225,7 @@
                   statusText = t("subtitle-editor.media-removed");
                   setTimeout(() => (statusText = ""), 3000);
                 }}
-                class="btn btn-xs btn-ghost text-error hover:bg-error/20"
+                class="btn btn-xs btn-ghost text-base-content/60 hover:bg-error hover:text-white"
                 title={t("subtitle-editor.remove-media")}
               >
                 ✕
@@ -1483,12 +1479,12 @@
                 >
               </p>
               <div class="flex flex-wrap justify-center gap-2 mt-3">
-                <span class="badge badge-outline badge-sm">MP3</span>
-                <span class="badge badge-outline badge-sm">WAV</span>
-                <span class="badge badge-outline badge-sm">MP4</span>
-                <span class="badge badge-outline badge-sm">WebM</span>
-                <span class="badge badge-outline badge-sm">MOV</span>
-                <span class="badge badge-outline badge-sm">AVI</span>
+                <span class="badge badge-ghost badge-sm">MP3</span>
+                <span class="badge badge-ghost badge-sm">WAV</span>
+                <span class="badge badge-ghost badge-sm">MP4</span>
+                <span class="badge badge-ghost badge-sm">WebM</span>
+                <span class="badge badge-ghost badge-sm">MOV</span>
+                <span class="badge badge-ghost badge-sm">AVI</span>
               </div>
               <p
                 class="text-xs text-base-content/40 mt-4 transition-opacity duration-200 hover:opacity-60"

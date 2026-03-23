@@ -135,12 +135,12 @@
                       {source.fileName}
                     </span>
                     {#if source.pageNumber}
-                      <span class="badge badge-outline badge-sm">
+                      <span class="badge badge-ghost badge-sm">
                         Page {source.pageNumber}
                       </span>
                     {/if}
                     {#if source.sectionTitle}
-                      <span class="badge badge-info badge-outline badge-sm" title="Section: {source.sectionTitle}">
+                      <span class="badge badge-info badge-sm" title="Section: {source.sectionTitle}">
                         {source.sectionTitle}
                       </span>
                     {/if}

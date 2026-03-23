@@ -431,7 +431,7 @@
           </button>
 
           <button
-            class="btn btn-sm btn-ghost text-error/60 ml-8"
+            class="btn btn-sm btn-outline border-base-300 text-base-content/80 hover:bg-error hover:text-white hover:border-error ml-8"
             onclick={(e) => {
               confirmDeleteModal?.showModal();
             }}
@@ -439,7 +439,7 @@
             <span class="w-5 h-5 flex items-center">
               {@html svgIcons.trash}</span
             >
-            <span class="text-sm font-semibold ml-1 text-left text-error/60"
+            <span class="text-sm font-semibold ml-1 text-left"
               >{t("user.delete-user")}</span
             >
           </button>
