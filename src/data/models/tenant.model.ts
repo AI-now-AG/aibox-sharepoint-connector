@@ -60,10 +60,6 @@ const TenantSchema = z.object({
   openai_api_key: z.string().nullish().default(null),
   openai_gpt5_chat_model: z.string().optional().default(ModelName.Gpt5),
   openai_gpt5_api_key: z.string().optional(),
-  openai_gpt5_reasoning_effort: z
-    .string()
-    .optional()
-    .default(ReasoningEffortOption.None),
   azure_openai_api_key: z.string().nullish().default(null),
   azure_openai_endpoint: z.string().nullish().default(null),
   azure_openai_instance_name: z.string().nullish().default(null),

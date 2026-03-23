@@ -11,12 +11,14 @@
     configurationId: string;
     promptRefinementInstruction: string;
     promptKbGenerationInstruction: string;
+    onboardingIndustryInstruction: string;
   }
 
   let {
     configurationId,
     promptRefinementInstruction,
     promptKbGenerationInstruction,
+    onboardingIndustryInstruction,
   }: Props = $props();
 
   let loading: boolean = $state(false);
@@ -27,6 +29,7 @@
       _id: configurationId,
       promptRefinementInstruction,
       promptKbGenerationInstruction,
+      onboardingIndustryInstruction,
     });
 
     if (!error) {
@@ -75,6 +78,23 @@
         id="global-prompt-kb-generation"
         class="textarea textarea-bordered h-64 w-full mt-2"
         bind:value={promptKbGenerationInstruction}
+      ></textarea>
+    </div>
+  </div>
+
+  <!-- Self-Onboarding Industry Detection -->
+  <div class="card shadow-lg my-6">
+    <div class="card-body bg-base-100 rounded-xl">
+      <h2 class="text-xl font-semibold">
+        {t("global-prompts.self-onboarding-industry-title")}
+      </h2>
+      <p class="text-sm text-base-content/60">
+        {t("global-prompts.self-onboarding-industry-description")}
+      </p>
+      <textarea
+        id="global-prompt-self-onboarding-industry"
+        class="textarea textarea-bordered h-64 w-full mt-2"
+        bind:value={onboardingIndustryInstruction}
       ></textarea>
     </div>
   </div>

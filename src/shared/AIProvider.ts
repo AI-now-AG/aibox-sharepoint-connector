@@ -11,7 +11,7 @@ export const ModelNameMap: Record<string, string> = {
   "claude-sonnet-4-6": "Claude Sonnet",
   sonar: "Perplexity Sonar",
   "gemini-3.1-flash-lite-preview": "Gemini 3.1 Flash-Lite",
-  "gpt-5": "gpt-5.1",
+  "gpt-5.1": "gpt-5.1",
 };
 
 const ModelNameExceptions: Record<string, string> = {
@@ -67,8 +67,6 @@ export const CustomSortOrder: { [key: string]: number } = {
 
 const APIProviderMap: Record<string, string> = {
   [PromptModel.OpenAI]: "openai-response",
-  [PromptModel.OpenAIWithTools]: "openai-response", // Deprecated — removal imminent
-  [PromptModel.OpenAIWithImageTools]: "openai-response", // Deprecated — removal imminent
   [PromptModel.AzureOpenAI]: "azure-openai-chat",
   [PromptModel.OpenAIGpt5]: "openai-gpt-5-response",
   [PromptModel.NanoBanana]: "gemini",
@@ -203,7 +201,11 @@ export function getModelName(tenant: any, model: string) {
   }
 
   // only here we resolve exceptions
-  return resolveModelName(model) || defaultModelName;
+  console.warn(`Model ${model} not active → using fallback`, {
+    requestedModel: model,
+    fallbackModel: defaultModelName,
+  });
+  return defaultModelName;
 }
 
 export function useProviderInfo(tenant: any) {
@@ -223,6 +225,7 @@ export function useProviderInfo(tenant: any) {
     const providerName = defaultProvider.name;
     const key = ProviderModelMap[providerName] as keyof typeof tenant;
     const rawModel = tenant?.[key] || "gpt-4o";
+
     return ModelNameMap[rawModel] || rawModel;
   };
 

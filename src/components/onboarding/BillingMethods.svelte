@@ -5,15 +5,13 @@
   interface Props {
     billingMethod: string;
     availableMethods?: BillingMethod[];
-    defaultLanguage?: string;
   }
   let {
     billingMethod = $bindable(""),
     availableMethods = Object.values(BillingMethod),
-    defaultLanguage = "en",
   }: Props = $props();
 
-  const t = useTranslations(defaultLanguage);
+  const t = useTranslations();
 
   const billingOptions = [
     {

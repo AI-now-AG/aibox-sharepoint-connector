@@ -91,7 +91,7 @@ export default {
         },
         {
           $lookup: {
-            from: "categories",
+            from: "global_categories",
             localField: "category",
             foreignField: "_id",
             as: "category",
