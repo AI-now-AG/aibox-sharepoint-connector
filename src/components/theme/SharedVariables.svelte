@@ -2,11 +2,21 @@
   import { setLanguage } from "$i18n/utils";
   import { user as userStore, tenant as tenantStore } from "$stores";
 
-  let { tenant, user, locale } = $props();
+  interface Props {
+    tenant?: any;
+    user?: any;
+    locale: string;
+  }
+
+  let { tenant, user, locale }: Props = $props();
 
   // update global stores
-  $userStore = user;
-  $tenantStore = tenant;
+  if (user) {
+    $userStore = user;
+  }
+  if (tenant) {
+    $tenantStore = tenant;
+  }
 
   // share language for all components
   setLanguage(locale);

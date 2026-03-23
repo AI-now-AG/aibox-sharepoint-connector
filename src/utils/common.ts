@@ -18,6 +18,11 @@ export function capitalizeFirst(text: string) {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
+export function normalizeUrl(url: string): string {
+  const trimmed = url.trim();
+  return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+}
+
 export function formatDate(
   date: string | Date | number | null | undefined,
   format = "DD.MM.YYYY",

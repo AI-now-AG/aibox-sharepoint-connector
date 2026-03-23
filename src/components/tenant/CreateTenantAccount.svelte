@@ -3,6 +3,7 @@
   import { actions } from "astro:actions";
   import { svgIcons } from "$assets/icons";
   import { useTranslations } from "$i18n/utils";
+  import { normalizeUrl } from "$utils/common";
   import { isValidEmail, isValidUrl } from "$utils/validation";
   import { addToast } from "$stores/toast";
   import { tenant, user } from "$stores";
@@ -29,12 +30,12 @@
   import Input from "$components/form/Input.svelte";
   import Dropdown from "$components/form/Dropdown.svelte";
   import ThemeItem from "./ThemeItem.svelte";
-  import TagCategorySelector from "$components/subscription/TagCategorySelector.svelte";
-  import SubscriptionPackageList from "$components/subscription/SubscriptionPackageList.svelte";
-  import AudioOptionList from "$components/subscription/AudioOptionList.svelte";
-  import BillingMethods from "$components/subscription/BillingMethods.svelte";
+  import TagCategorySelector from "$components/onboarding/TagCategorySelector.svelte";
+  import SubscriptionPackageList from "$components/onboarding/SubscriptionPackageList.svelte";
+  import AudioOptionList from "$components/onboarding/AudioOptionList.svelte";
+  import BillingMethods from "$components/onboarding/BillingMethods.svelte";
   import { TRANSCRIPTION_API_URL } from "astro:env/client";
-  import { posthogClientCaptureGlobal } from "$utils/posthogClient";
+  import { posthogClientCaptureException } from "$utils/posthogClient";
 
   interface Props {
     backUrl?: string;
@@ -102,10 +103,8 @@
   );
 
   const DEFAULT_PROMPT_KB_INSTRUCTION = `
-    You are a research assistant. Generate a comprehensive company overview in the same language as the company's website.
-    Include: company overview, main products and services, target customers, unique value propositions, and any other relevant information.
-    Format the output as clear structured text suitable for an internal knowledge base.
-    Be factual and concise.
+    Generate a short company overview in the website’s language. Include key info (products, customers, value). 
+    Keep it clear and concise.
   `;
 
   const t = useTranslations();
@@ -173,7 +172,7 @@
     return data;
   }
 
-  async function setupTenantData(
+  async function initializeTenant(
     organizationId: string,
     organizationName: string,
     organizationDisplayName: string,
@@ -204,11 +203,11 @@
       is_somedia: isSomedia,
       reseller_code: resellerCode,
     };
-    const { data, error } = await actions.tenantCreation.setupTenantData({
+    const { data, error } = await actions.tenantCreation.initializeTenant({
       tenant: tenantInput,
       config: tenantConfig,
     });
-    console.log("setupTenantData respone", { data, error });
+    console.log("initializeTenant respone", { data, error });
 
     if (error) throw new Error(t("tenant.setup-tenant-data-failed"));
     return data;
@@ -222,7 +221,7 @@
       tenantId: $tenant?._id?.toString(),
       provider: PromptModel.Gemini,
       systemMessage: [promptKbInstruction || DEFAULT_PROMPT_KB_INSTRUCTION],
-      prompt: `Company: ${companyName}\nWebsite: ${websiteUrl}`,
+      prompt: `Company: ${companyName}\nWebsite: ${normalizeUrl(websiteUrl)}`,
       tool: PromptToolOption.UrlContext,
     };
 
@@ -267,7 +266,7 @@
     }
 
     if (!kbContent) {
-      posthogClientCaptureGlobal("tenant_kb_generate_failed", {
+      posthogClientCaptureException(lastError, {
         tenantId: newTenantId,
         companyName,
         websiteUrl,
@@ -294,7 +293,7 @@
     const selectedTemplate =
       tags.find((tag) => tag.value == selectedTag)?.title || "";
 
-    const { data, error } = await actions.tenantCreation.finalize({
+    const { data, error } = await actions.tenantCreation.completeTenantSetup({
       tenant_id: newTenantId,
       template: selectedTemplate,
     });
@@ -339,8 +338,8 @@
         // Step 1: Create Auth0 Organization
         const organization = await createOrganization();
 
-        // Step 2: Setup Tenant Data
-        const tenant = await setupTenantData(
+        // Step 2: Initialize tenant
+        const tenant = await initializeTenant(
           organization.id,
           organization.name,
           organization.display_name,
@@ -559,7 +558,6 @@
         </p>
         <BillingMethods
           bind:billingMethod
-          {defaultLanguage}
           availableMethods={[
             BillingMethod.MonthlyInvoice,
             BillingMethod.YearlyInvoice,
@@ -573,7 +571,6 @@
       <TagCategorySelector
         {tags}
         {categories}
-        {defaultLanguage}
         bind:selectedTag
         bind:selectedCategories
       />
@@ -599,11 +596,7 @@
       </h2>
 
       <div class="mt-4">
-        <AudioOptionList
-          bind:selectedAudioOptionIds
-          {selectedPackageId}
-          {defaultLanguage}
-        />
+        <AudioOptionList bind:selectedAudioOptionIds {selectedPackageId} />
       </div>
 
       <div class="w-full flex items-center justify-end rounded-lg p-4">

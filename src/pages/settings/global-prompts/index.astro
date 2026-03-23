@@ -21,6 +21,8 @@ const { data: configuration } = await Astro.callAction(
         ""}
       promptKbGenerationInstruction={configuration?.promptKbGenerationInstruction ||
         ""}
+      onboardingIndustryInstruction={configuration?.onboardingIndustryInstruction ||
+        ""}
       client:load
     />
   </div>

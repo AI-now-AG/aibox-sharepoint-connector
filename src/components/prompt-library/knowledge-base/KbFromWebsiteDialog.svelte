@@ -4,6 +4,7 @@
   import { tenant, user } from "$stores";
   import { addToast } from "$stores/toast";
   import { useTranslations } from "$i18n/utils";
+  import { normalizeUrl } from "$utils/common";
   import { isValidUrl } from "$utils/validation";
   import { PromptModel } from "$types/PromptModel";
   import { PromptToolOption } from "$types/AIProvider";
@@ -38,10 +39,8 @@
   );
 
   const DEFAULT_PROMPT_KB_INSTRUCTION = `
-    You are a research assistant. Generate a comprehensive company overview in the same language as the company's website.
-    Include: company overview, main products and services, target customers, unique value propositions, and any other relevant information.
-    Format the output as clear structured text suitable for an internal knowledge base.
-    Be factual and concise.
+    Generate a short company overview in the website’s language. Include key info (products, customers, value). 
+    Keep it clear and concise.
   `;
 
   function reset() {
@@ -67,43 +66,35 @@
       tenantId,
       provider: PromptModel.Gemini,
       systemMessage: [promptKbInstruction || DEFAULT_PROMPT_KB_INSTRUCTION],
-      prompt: `Company: ${companyName}\nWebsite: ${websiteUrl}`,
+      prompt: `Company: ${companyName}\nWebsite: ${normalizeUrl(websiteUrl)}`,
       tool: PromptToolOption.UrlContext,
     };
 
     let kbContent = "";
-    const MAX_RETRIES = 3;
 
-    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-      try {
-        const response = await fetch(executePromptUrl, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify(payload),
-        });
-        if (!response.ok)
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        const result = await response.json();
-        const { response: content } = result.data;
-        console.log("[AddKbDialog] prompt execute response", { content });
+    try {
+      const response = await fetch(executePromptUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(payload),
+      });
+      if (!response.ok)
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      const result = await response.json();
+      const { response: content } = result.data;
+      console.log("[AddKbDialog] prompt execute response", { content });
 
-        kbContent = Array.isArray(content)
-          ? (content.at(-1)?.text ?? "")
-          : (content ?? "");
-        if (!kbContent) throw new Error("Empty response content from API");
-        break;
-      } catch (err) {
-        console.warn(
-          `[AddKbDialog] Attempt ${attempt}/${MAX_RETRIES} failed:`,
-          err,
-        );
-        if (attempt < MAX_RETRIES) {
-          await new Promise((r) => setTimeout(r, 1000 * attempt));
-        }
-      }
+      kbContent = Array.isArray(content)
+        ? (content.at(-1)?.text ?? "")
+        : (content ?? "");
+    } catch (err) {
+      console.error("[AddKbDialog] fetch failed:", err);
+      loading = false;
+      addToast({ message: t("kb.add-dialog.create-failed"), type: "error" });
+      return;
     }
 
     const { data, error } =

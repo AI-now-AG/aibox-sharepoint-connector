@@ -37,11 +37,11 @@ import { TENANT_MASTER_ID } from "$constants";
 
 const masterTenantId = isProd() ? TENANT_MASTER_ID.PROD : TENANT_MASTER_ID.DEV;
 
-const OrganizationNameInputParamsSchema = z.object({
+const OrganizationNameInputSchema = z.object({
   organization_name: z.string().min(1),
 });
 
-const BillingInfoParamsSchema = z.object({
+const BillingInfoInputSchema = z.object({
   company_name: z.string(),
   address: z.string(),
   zip_code: z.string(),
@@ -50,7 +50,7 @@ const BillingInfoParamsSchema = z.object({
   email: z.string(),
 });
 
-const TenantConfigParamsSchema = z.object({
+const TenantConfignputSchema = z.object({
   is_reseller: z.boolean().default(false),
   reseller_code: z.string().nullish(),
   is_somedia: z.boolean().default(false),
@@ -68,27 +68,27 @@ const TenantInputParamsSchema = z.object({
   billing_method: z.nativeEnum(BillingMethod).optional(),
   use_cases: z.array(z.string()),
   totalPrice: z.string().optional(),
-  billing_info: BillingInfoParamsSchema,
+  billing_info: BillingInfoInputSchema,
 });
 
-const SetupKbSchema = z.object({
+const SetupKbInputSchema = z.object({
   tenant_id: z.string().min(1),
   company_name: z.string().min(1),
   content: z.string().min(1),
 });
 
-const FinalizeTenantSchema = z.object({
+const FinalizeTenantInputSchema = z.object({
   tenant_id: z.string().min(1),
   template: z.string().optional(),
 });
 
 // step 1: createOrganization()  - Create Auth0 organization
-// step 2: setupTenantData() - Clone tenant, override configs & import categories / prompts
-// step 3: finalize()  - Send notification emails
+// step 2: initializeTenant() - Clone tenant, override configs & import categories / prompts
+// step 3: finalizeOnboarding()  - Send notification emails
 
 export const tenantCreation = {
   createOrganization: defineAction({
-    input: OrganizationNameInputParamsSchema,
+    input: OrganizationNameInputSchema,
     handler: async (input) => {
       const { organization_name: organizationName } = input;
       const name = organizationName
@@ -117,10 +117,10 @@ export const tenantCreation = {
       return transformRawData(organizationResult.data);
     },
   }),
-  setupTenantData: defineAction({
+  initializeTenant: defineAction({
     input: z.object({
       tenant: TenantInputParamsSchema,
-      config: TenantConfigParamsSchema,
+      config: TenantConfignputSchema,
     }),
     handler: async (input, context) => {
       const { tenant, config } = input;
@@ -280,7 +280,7 @@ export const tenantCreation = {
     },
   }),
   createTenantKnowledgeBase: defineAction({
-    input: SetupKbSchema,
+    input: SetupKbInputSchema,
     handler: async (input) => {
       const { tenant_id: tenantId, company_name: companyName, content } = input;
 
@@ -299,13 +299,12 @@ export const tenantCreation = {
       await PromptModel.addKbToTenantPrompts(tenantObjectId, insertedId);
 
       return transformRawData({
-        success: true,
-        knowledgeBaseId: insertedId,
+        id: insertedId,
       });
     },
   }),
-  finalize: defineAction({
-    input: FinalizeTenantSchema,
+  completeTenantSetup: defineAction({
+    input: FinalizeTenantInputSchema,
     handler: async (input, context) => {
       const { tenant_id: tenantId, template } = input;
       const isReseller = context.locals.tenant?.is_reseller ?? false;

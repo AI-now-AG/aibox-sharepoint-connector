@@ -11,6 +11,7 @@ import CategoryModel, {
 import PromptModel from "$data/models/prompt.model";
 import GlobalCategoryModel from "$data/models/globalCategory.model";
 import GlobalPromptModel from "$data/models/globalPrompt.model";
+import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
 import SubscriptionModel, {
   type Subscription,
 } from "$data/models/subscription.model";
@@ -24,8 +25,6 @@ import {
   SubscriptionIncludedUsers,
   SubscriptionIncludedKbMB,
   BillingMethod,
-  type ProductKeys,
-  CountryCode,
   BillingMethodLabels,
 } from "$types/Subscription";
 import { UserRole, TourType } from "$types/Users";
@@ -36,184 +35,61 @@ import sendMail from "$utils/mail";
 import { isProd } from "$utils/env";
 import { randomString } from "$utils/common";
 import { isSocialConnection } from "$utils/auth0";
-import {
-  createCustomer,
-  updateCustomer,
-  getCustomerByEmail,
-  createCheckoutSession,
-} from "$utils/stripe";
-import {
-  getTranscriptionTypes,
-  hasSubtitleEditor,
-  getStripePrices,
-  getStripeTaxRate,
-} from "$utils/onboarding";
+import {} from "$utils/stripe";
+import { getTranscriptionTypes } from "$utils/onboarding";
 import {
   TENANT_MASTER_ID,
   SG_NEW_TENANT_TEMPLATE,
-  AUTH0_ROLE_ADMIN_PROD,
-  AUTH0_ROLE_ADMIN_DEV,
-  AUTH0_AUTH_GOOGLE_CON_DEV,
-  AUTH0_AUTH_WINDOWS_CON_DEV,
-  AUTH0_AUTH_GOOGLE_CON_PROD,
-  AUTH0_AUTH_WINDOWS_CON_PROD,
+  AUTH0_ROLE_ADMIN,
+  AUTH0_AUTH_WINDOWS_CON,
+  AUTH0_AUTH_GOOGLE_CON,
 } from "$constants";
-import type Stripe from "stripe";
 
 const masterTenantId = isProd() ? TENANT_MASTER_ID.PROD : TENANT_MASTER_ID.DEV;
 const auth0GoogleCon = isProd()
-  ? AUTH0_AUTH_GOOGLE_CON_PROD
-  : AUTH0_AUTH_GOOGLE_CON_DEV;
+  ? AUTH0_AUTH_GOOGLE_CON.PROD
+  : AUTH0_AUTH_GOOGLE_CON.DEV;
 const auth0WindowsCon = isProd()
-  ? AUTH0_AUTH_WINDOWS_CON_PROD
-  : AUTH0_AUTH_WINDOWS_CON_DEV;
+  ? AUTH0_AUTH_WINDOWS_CON.PROD
+  : AUTH0_AUTH_WINDOWS_CON.DEV;
 
-const OrganizationNameInputParamsSchema = z.object({
-  organization_name: z.string().min(1),
+const OrganizationNameInputSchema = z.object({
+  name: z.string().min(1),
 });
 
-const BillingInfoParamsSchema = z.object({
-  company_name: z.string(),
-  address: z.string(),
-  zip_code: z.string(),
-  location: z.string(),
-  country: z.string().default(CountryCode.CH),
-  email: z.string(),
-});
-
-const CheckoutInputParamsSchema = z.object({
-  plan_name: z.nativeEnum(SubscriptionPackageId).optional(),
-  add_ons: z.array(z.nativeEnum(AudioOptionId)).optional(),
-  billing_info: BillingInfoParamsSchema,
-  language: z.string().optional().default("en"),
-});
-
-const OrganizationIdInputParamsSchema = z.object({
+const OrganizationIdInputSchema = z.object({
   org_id: z.string().min(1),
 });
 
-const TenantInputParamsSchema = z.object({
+const SetupTenantInputSchema = z.object({
   name: z.string().min(1),
   org_id: z.string().min(1),
   org_name: z.string().min(1),
-  language: z.string().min(1),
-  plan_name: z.nativeEnum(SubscriptionPackageId).optional(),
-  add_ons: z.array(z.nativeEnum(AudioOptionId)).optional(),
-  billing_method: z.nativeEnum(BillingMethod).optional(),
-  billing_info: BillingInfoParamsSchema,
-  use_cases: z.array(z.string()),
-  stripe_customer_id: z.string().optional(),
-  totalPrice: z.string().optional(),
-});
-const FinalizeTenantSchema = z.object({
-  tenant_id: z.string().min(1),
-  template: z.string().optional(),
+  website: z.string().optional(),
 });
 
-// step 1: createOrganization()  - Create Auth0 organization
-// step 2: createMember()  - Create Auth0 user, move user from trial org to new org
-// step 3: setupTenantData() - Clone tenant & import categories / prompts
-// step 4: finalize()  - Send notification emails
+const SetupKbInputSchema = z.object({
+  tenant_id: z.string().min(1),
+  name: z.string().min(1),
+  content: z.string().min(1),
+});
+
+const ConfigureAssistantsInputSchema = z.object({
+  tenant_id: z.string().min(1),
+  tag_id: z.string().min(1),
+  kb_id: z.string().optional(),
+});
+
+const FinalizeTenantInputSchema = z.object({
+  tenant_id: z.string().min(1),
+  tag_name: z.string().optional(),
+});
 
 export const onboarding = {
-  createStripeSession: defineAction({
-    input: CheckoutInputParamsSchema,
-    handler: async (input, context) => {
-      try {
-        const { request } = context;
-        const { user } = context.locals;
-        const {
-          plan_name: planName,
-          add_ons: addOns,
-          billing_info: billingInfo,
-          language,
-        } = input;
-        const { default_language: defaultLanguage } = context.locals.tenant;
-
-        const selectedPackages = [
-          planName as ProductKeys,
-          ...(addOns as ProductKeys[]),
-        ];
-        const priceIds = getStripePrices(selectedPackages, planName);
-
-        // Get the `Host` header (domain)
-        const host = request.headers.get("host");
-
-        // Get the protocol, typically 'https' in production
-        const protocol = request.headers.get("x-forwarded-proto") || "https"; // Default to 'https' if not available
-
-        // Combine protocol and host to form the full URL
-        const fullDomain = `${protocol}://${host}`;
-
-        if (!priceIds.length) {
-          throw new Error("Product prices are required.");
-        }
-
-        // Generate dynamic success URL with user-specific data
-        const successUrl = `${fullDomain}/subscription/step4?referer=stripe`;
-        const cancelUrl = `${fullDomain}/subscription?referer=stripe`;
-
-        // Lookup customer by email
-        let stripeCustomerId = null;
-        const customerEmail = user.email; // billingInfo.email
-        const existingCustomer = await getCustomerByEmail(customerEmail);
-
-        // Define common data for creation and update
-        const customerData = {
-          name: billingInfo.company_name,
-          address: {
-            line1: billingInfo.address,
-            city: billingInfo.location,
-            postal_code: billingInfo.zip_code,
-            country: billingInfo.country,
-          },
-          preferred_locales: [language],
-        };
-
-        // Create new customer if not found
-        if (!existingCustomer) {
-          const newCustomer = await createCustomer({
-            email: customerEmail,
-            ...customerData,
-          });
-          stripeCustomerId = newCustomer?.id;
-        } else {
-          // Update existing customer
-          updateCustomer(existingCustomer.id, customerData);
-          stripeCustomerId = existingCustomer.id;
-        }
-
-        const taxtRate = getStripeTaxRate();
-        const session = await createCheckoutSession({
-          mode: "subscription",
-          line_items: priceIds.map((id: string) => ({
-            price: id,
-            quantity: 1,
-            tax_rates: [taxtRate],
-          })),
-          locale:
-            (defaultLanguage as Stripe.Checkout.SessionCreateParams.Locale) ||
-            "auto",
-          //automatic_tax: { enabled: true }, // Enable automatic tax calculation
-          customer: stripeCustomerId,
-          success_url: successUrl,
-          cancel_url: cancelUrl,
-          subscription_data: {
-            trial_period_days: 14,
-          },
-        });
-
-        return { url: session?.url, stripeCustomerId };
-      } catch (error) {
-        console.error("Stripe checkout error:", error);
-        throw error;
-      }
-    },
-  }),
   createOrganization: defineAction({
-    input: OrganizationNameInputParamsSchema,
+    input: OrganizationNameInputSchema,
     handler: async (input, context) => {
-      const { organization_name: organizationName } = input;
+      const { name: organizationName } = input;
       const { user } = context.locals;
       const name = organizationName
         .toLowerCase()
@@ -255,13 +131,13 @@ export const onboarding = {
       return transformRawData(organizationResult.data);
     },
   }),
-  createMember: defineAction({
-    input: OrganizationIdInputParamsSchema,
+  assignUserToOrganization: defineAction({
+    input: OrganizationIdInputSchema,
     handler: async (input, context) => {
       const { org_id: organizationId } = input;
 
-      // delete current user in trial organization
-      // move current user to new organization
+      // Delete current user in trial organization
+      // Move current user to new organization
       await organizationsManagement.deleteMembers(
         context.locals.tenant.org_id,
         [context.locals.user.auth0_sub],
@@ -270,10 +146,10 @@ export const onboarding = {
         context.locals.user.auth0_sub,
       ]);
 
-      // setup admin role
+      // Setup admin role
       const roleAdminId = isProd()
-        ? AUTH0_ROLE_ADMIN_PROD
-        : AUTH0_ROLE_ADMIN_DEV;
+        ? AUTH0_ROLE_ADMIN.PROD
+        : AUTH0_ROLE_ADMIN.DEV;
       await organizationsManagement.addMemberRoles(
         organizationId,
         context.locals.user.auth0_sub,
@@ -285,11 +161,13 @@ export const onboarding = {
       });
     },
   }),
-  setupTenantData: defineAction({
-    input: TenantInputParamsSchema,
+  initializeTenant: defineAction({
+    input: SetupTenantInputSchema,
     handler: async (input, context) => {
       // Clone the tenant
-      const transcriptionTypes = getTranscriptionTypes(input.add_ons ?? []);
+      const transcriptionTypes = getTranscriptionTypes([
+        AudioOptionId.AudioToText,
+      ]);
       const masterTenant = await TenantModel.get(masterTenantId);
 
       let includedFeatures = masterTenant?.included_features ?? [];
@@ -298,112 +176,32 @@ export const onboarding = {
           return item.name !== TenantFeature.AudioToText;
         });
       }
-      // Subtitle Studio is active if AudioPremium is selected (includes subtitle features)
-      const subtitleStudioActive = hasSubtitleEditor(input.add_ons ?? []);
       const includedUserLimit =
-        SubscriptionIncludedUsers[input.plan_name as SubscriptionPackageId] ||
-        10;
+        SubscriptionIncludedUsers[SubscriptionPackageId.Teams] || 10;
       const includedKbMB =
-        SubscriptionIncludedKbMB[input.plan_name as SubscriptionPackageId] ||
-        10;
+        SubscriptionIncludedKbMB[SubscriptionPackageId.Teams] || 10;
       const newTenant = await TenantModel.copyTenant(masterTenantId, {
         name: input.name,
         org_id: input.org_id,
         org_name: input.org_name,
-        billing_method: input.billing_method,
-        billing_info: input.billing_info,
+        billing_method: BillingMethod.CreditCard,
+        billing_info: {},
         included_features: includedFeatures,
         transcription_types: transcriptionTypes,
-        default_language: input.language,
-        stripe_customer_id: input.stripe_customer_id,
+        default_language: "de",
+        website: input.website,
+        stripe_customer_id: null,
         audio_assistant_active: true,
-        subtitle_studio_active: subtitleStudioActive,
-        totalPrice: "",
+        subtitle_studio_active: false,
+        totalPrice: "0",
         is_internal: false,
         included_user_limit: includedUserLimit, // default included users
         vector_kb_enabled: true,
         vector_kb_max_storage_mb: includedKbMB,
       });
 
-      // Update the current tenant for the logged-in user
+      // Create audio transcriptions
       const { id: userId } = context.locals.user;
-      const newRoles = [UserRole.Admin];
-      await UserModel.update(userId, {
-        tenant_id: newTenant.insertedId,
-        roles: newRoles,
-        permissions: assignPermissions(newRoles),
-        logins_count: 0,
-        is_complete_self_registration: true,
-      });
-      await UserModel.addTour(userId, {
-        type: TourType.OnboardingNewTenant,
-        active: true,
-      });
-
-      // Find all categories for the original tenant
-      const selectedCategoryIds = input.use_cases.map(
-        (categoryId) => new ObjectId(categoryId),
-      );
-      const categories =
-        await GlobalCategoryModel.listByIds(selectedCategoryIds);
-
-      // Clone each category and store mapping
-      const categoryIdMap = new Map();
-      const groupIdMap = new Map();
-      for (const category of categories) {
-        // Clone each group and store mapping
-        const newGroups: Group[] = [];
-        for (const group of category.groups) {
-          const newGroupId = new ObjectId();
-          newGroups.push({
-            ...group,
-            _id: newGroupId,
-          });
-          groupIdMap.set(group._id?.toString(), newGroupId);
-        }
-
-        const newCategory: Category = {
-          ...category,
-          title: category.title,
-          tenant_id: newTenant.insertedId,
-          groups: newGroups,
-          created_at: new Date(),
-          updated_at: new Date(),
-        };
-
-        const { insertedId: newCatId } = await CategoryModel.add(newCategory);
-        categoryIdMap.set(category._id.toString(), newCatId);
-      }
-
-      // Clone prompts with updated categoryId
-      const originalCategoryIds = categories.map((c) => c._id);
-      const prompts =
-        await GlobalPromptModel.listByCategoryIds(originalCategoryIds);
-
-      const newPrompts = prompts.map((prompt) => ({
-        ...prompt,
-        tenant_id: newTenant.insertedId,
-        category: categoryIdMap.get(prompt.category?.toString()),
-        group: groupIdMap.get(prompt.group?.toString()),
-        documents: [],
-        created_at: new Date(),
-        updated_at: new Date(),
-        // Vector KB fields (no data cloned, start empty)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        vector_kb_enabled: (prompt as any).vector_kb_enabled ?? false,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        vector_kb_scope: (prompt as any).vector_kb_scope ?? null,
-        vector_kb_folder_ids: [],
-        vector_kb_data_source_ids: [],
-      }));
-
-      console.log("Prompt Categories:", categoryIdMap);
-      console.log("Prompt Groups:", groupIdMap);
-      if (newPrompts.length > 0) {
-        await PromptModel.insertMultiple(newPrompts);
-      }
-
-      // Find all audio transcriptions for the original tenant
       const transcriptions = await TranscriptionModel.listByTenantAndCategories(
         masterTenantId,
         transcriptionTypes,
@@ -426,8 +224,8 @@ export const onboarding = {
       // Create tenant subscription
       const subscription: Partial<Omit<Subscription, "_id">> = {
         tenant_id: newTenant.insertedId,
-        plan_name: input.plan_name,
-        add_ons: input.add_ons,
+        plan_name: SubscriptionPackageId.Teams,
+        add_ons: [AudioOptionId.AudioToText],
         is_trial: true,
         trial_start_date: new Date(),
       };
@@ -440,10 +238,107 @@ export const onboarding = {
       return transformRawData(data);
     },
   }),
-  finalize: defineAction({
-    input: FinalizeTenantSchema,
+  createTenantKnowledgeBase: defineAction({
+    input: SetupKbInputSchema,
+    handler: async (input) => {
+      const { tenant_id: tenantId, name: organizationName, content } = input;
+
+      // Create KB entry for the new tenant
+      const tenantObjectId = new ObjectId(tenantId);
+      const { acknowledged, insertedId } = await KnowledgeBaseModel.add({
+        tenant_id: tenantObjectId,
+        title: `Über ${organizationName}`,
+        description: `Auto-generated knowledge base about ${organizationName}`,
+        knowledge_base: content,
+        updated_at: new Date(),
+        created_at: new Date(),
+      });
+
+      return transformRawData({
+        id: insertedId,
+        insertedCount: acknowledged ? 1 : 0,
+      });
+    },
+  }),
+  configureAssistants: defineAction({
+    input: ConfigureAssistantsInputSchema,
+    handler: async (input) => {
+      const { tenant_id: tenantId, tag_id: tagId, kb_id: kbId } = input;
+
+      // Find all categories for the original tenant
+      const categories = await GlobalCategoryModel.listByTag(tagId);
+
+      // Clone each category and store mapping
+      const categoryIdMap = new Map();
+      const groupIdMap = new Map();
+      for (const category of categories) {
+        // Clone each group and store mapping
+        const newGroups: Group[] = [];
+        for (const group of category.groups) {
+          const newGroupId = new ObjectId();
+          newGroups.push({
+            ...group,
+            _id: newGroupId,
+          });
+          groupIdMap.set(group._id?.toString(), newGroupId);
+        }
+
+        const newCategory: Category = {
+          ...category,
+          title: category.title,
+          tenant_id: new ObjectId(tenantId),
+          groups: newGroups,
+          created_at: new Date(),
+          updated_at: new Date(),
+        };
+
+        const { insertedId: newCatId } = await CategoryModel.add(newCategory);
+        categoryIdMap.set(category._id.toString(), newCatId);
+      }
+
+      // Clone prompts with updated categoryId
+      const originalCategoryIds = categories.map((c) => c._id);
+      const prompts =
+        await GlobalPromptModel.listByCategoryIds(originalCategoryIds);
+
+      const newPrompts = prompts.map((prompt) => ({
+        ...prompt,
+        tenant_id: new ObjectId(tenantId),
+        category: categoryIdMap.get(prompt.category?.toString()),
+        group: groupIdMap.get(prompt.group?.toString()),
+        documents: [],
+        ...(kbId && {
+          knowledgebase: [new ObjectId(kbId)],
+        }),
+        created_at: new Date(),
+        updated_at: new Date(),
+        // Vector KB fields (no data cloned, start empty)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        vector_kb_enabled: (prompt as any).vector_kb_enabled ?? false,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        vector_kb_scope: (prompt as any).vector_kb_scope ?? null,
+        vector_kb_folder_ids: [],
+        vector_kb_data_source_ids: [],
+      }));
+
+      console.log("Onboarding >> Prompt Categories:", categoryIdMap);
+      console.log("Onboarding >> Prompt Groups:", groupIdMap);
+
+      let insertedCount = 0;
+      if (newPrompts.length > 0) {
+        const insertResult = await PromptModel.insertMultiple(newPrompts);
+        insertedCount = insertResult.insertedCount;
+      }
+
+      return transformRawData({
+        insertedCount,
+      });
+    },
+  }),
+  finalizeOnboarding: defineAction({
+    input: FinalizeTenantInputSchema,
     handler: async (input, context) => {
-      const { tenant_id: tenantId, template } = input;
+      const { tenant_id: tenantId, tag_name: tagName } = input;
       const email = context.locals.user.email;
       const tenant = await TenantModel.get(tenantId);
       const subscription = await SubscriptionModel.findByTenant(tenantId);
@@ -452,13 +347,27 @@ export const onboarding = {
         throw new Error("Tenant not found.");
       }
 
+      // Update the current tenant for the logged-in user
+      const { id: userId } = context.locals.user;
+      const newRoles = [UserRole.Admin];
+      await UserModel.update(userId, {
+        tenant_id: new ObjectId(tenantId),
+        roles: newRoles,
+        permissions: assignPermissions(newRoles),
+        logins_count: 0,
+        is_complete_self_registration: true,
+      });
+      await UserModel.addTour(userId, {
+        type: TourType.OnboardingNewTenant,
+        active: true,
+      });
+
+      // Send notification email to aibox-support
       const addOnsStr = subscription?.add_ons
         ?.map((name: AudioOptionId) => {
           return AudioOptionLabels[name];
         })
         .join(", ");
-
-      // send notification email to aibox-support
       const subjectPrefix = isProd() ? "[aibox]" : "[aibox-dev]";
       const emailSubject = `${subjectPrefix} Tenant Created - ${tenant.name}`;
       const emailContent = `
@@ -467,20 +376,13 @@ export const onboarding = {
           <p>
             <strong>Organization Name:</strong> ${tenant.name}<br/> 
             <strong>Subscription:</strong> ${subscription?.plan_name ?? "-"}<br/> 
-            ${addOnsStr ? `${addOnsStr}<br/>` : ""}
-            <strong>Template:</strong> ${template}<br/>
+            ${addOnsStr ? `${addOnsStr}<br/>` : ""} 
+            <strong>Template:</strong> ${tagName}<br/>
+            <strong>Website:</strong> ${tenant?.website || "-"}<br/>
             <strong>Billing:</strong> ${BillingMethodLabels[tenant.billing_method as BillingMethod] ?? "-"}
           </p>
 
           <p>
-            <strong>Company details:</strong> <br/>
-            ${tenant.billing_info?.company_name ?? "-"} <br/>
-            ${tenant.billing_info?.address ?? "-"} <br/>
-            ${tenant.billing_info?.zip_code ?? "-"} ${tenant.billing_info?.zip_code ?? "-"} ${tenant.billing_info?.location ?? "-"}
-          </p>
-
-          <p>
-            <strong>Contact:</strong> ${tenant.billing_info?.email ?? "-"}<br/>
             <strong>Created:</strong> ${new Date().toLocaleDateString()}<br/>
             <strong>Account created by:</strong> ${email}<br/>
             <strong>Flow:</strong>Self Onboarding
@@ -493,7 +395,7 @@ export const onboarding = {
           email: "no-reply@ainow.ch",
         },
         to: "support@aibox-app.ch",
-        //bcc: "devlin.nguyenb4you.ch@gmail.com",
+        bcc: "devlin.nguyenb4you.ch@gmail.com",
         subject: emailSubject,
         html: emailContent,
       });
@@ -512,6 +414,23 @@ export const onboarding = {
       return transformRawData({
         success: true,
       });
+    },
+  }),
+  checkUrl: defineAction({
+    input: z.object({ url: z.string().url() }),
+    handler: async ({ url }) => {
+      try {
+        const res = await fetch(url, {
+          method: "GET",
+          signal: AbortSignal.timeout(5000),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return { reachable: true };
+      } catch (err) {
+        throw new Error(
+          err instanceof Error ? err.message : "URL not reachable",
+        );
+      }
     },
   }),
 };
