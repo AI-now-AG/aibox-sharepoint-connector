@@ -916,9 +916,7 @@
                   </td>
                   <td class="p-1 text-center">
                     <div
-                      class="text-sm font-mono {currentRowIndices.includes(index)
-                        ? 'font-bold text-base-content'
-                        : getCharCountClass(dialogue, updateTrigger)}"
+                      class="text-sm font-mono {getCharCountClass(dialogue, updateTrigger)}"
                     >
                       {#if dialogue.text.split(/\\N|\\n|\r\n|\r|\n/).length > 1}
                         {@html dialogue.text
