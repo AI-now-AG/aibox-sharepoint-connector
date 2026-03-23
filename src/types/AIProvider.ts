@@ -36,7 +36,6 @@ export enum TextVerbosityOption {
 
 export enum ReasoningEffortOption {
   None = "none",
-  Minimal = "minimal",
   Low = "low",
   Medium = "medium",
   High = "high",

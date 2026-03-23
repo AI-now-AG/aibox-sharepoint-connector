@@ -41,6 +41,8 @@
     NanoBananaPromptTools,
     resolveAPIProvider,
     getModelName,
+    isProviderActive,
+    getProviderModelName,
   } from "$shared/AIProvider";
   import { TRANSCRIPTION_API_URL } from "astro:env/client";
   import { EventName, ScreenName } from "$types/Posthog";
@@ -191,14 +193,7 @@
 
   // === Request Builder ===
   function buildRequestPayload(fileUrls: string[]): RequestPayload {
-    let isResponseModel = [
-      PromptModel.OpenAI,
-      PromptModel.OpenAIWithTools, // Deprecated — removal imminent
-      PromptModel.OpenAIWithImageTools, // Deprecated — removal imminent
-      PromptModel.OpenAIGpt5,
-    ].includes(currentPrompt?.model);
-
-    const isGeminiImageModel = [PromptModel.NanoBanana].includes(
+    let isResponseModel = [PromptModel.OpenAI, PromptModel.OpenAIGpt5].includes(
       currentPrompt?.model,
     );
 
@@ -208,9 +203,34 @@
         | PromptModel
         | undefined,
     );
-    const requestModel = isGeminiImageModel
-      ? ModelName.Gemini25FlashImage
-      : undefined;
+
+    let requestModel: string | undefined;
+
+    // Force Gemini image model when generating images
+    const isGeminiImageModel = [PromptModel.NanoBanana].includes(
+      currentPrompt?.model,
+    );
+    if (isGeminiImageModel) {
+      requestModel = ModelName.Gemini25FlashImage;
+    }
+
+    // If selected model is inactive → fallback to default provider model
+    if (
+      currentPrompt?.model &&
+      !isProviderActive($tenant, currentPrompt.model)
+    ) {
+      const providerModel = getProviderModelName($tenant, currentPrompt.model);
+      const fallbackModel = providerInfo?.defaultProviderModelName;
+      console.warn(
+        `[Prompt Execution] Model ${providerModel} not active → using fallback`,
+        {
+          requestedModel: providerModel,
+          fallbackModel,
+        },
+      );
+
+      requestModel = fallbackModel;
+    }
 
     const promptForAttachedFilesOnly = fileUrls.length > 0 ? " " : "";
 
@@ -443,7 +463,12 @@
     addMessageToHistory(groupId, promptId, newAssistantMessage);
   }
 
-  function addAssistantMessage(responseText: string, imageUrl: string, sources?: any[], ragDebug?: any): void {
+  function addAssistantMessage(
+    responseText: string,
+    imageUrl: string,
+    sources?: any[],
+    ragDebug?: any,
+  ): void {
     const newAssistantMessage: Message = {
       role: MessageRole.Assistant,
       content: responseText,
