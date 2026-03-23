@@ -519,9 +519,6 @@
   if (tenantData && !tenantData.openai_gpt5_chat_model) {
     tenantData.openai_gpt5_chat_model = ModelName.Gpt5;
   }
-  if (tenantData && !tenantData.openai_gpt5_reasoning_effort) {
-    tenantData.openai_gpt5_reasoning_effort = ReasoningEffortOption.None;
-  }
 
   if (tenantData && !tenantData.owned_by_reseller) {
     tenantData.owned_by_reseller = "";
