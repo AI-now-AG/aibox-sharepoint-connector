@@ -146,8 +146,7 @@ export function markdownToHtml(text: string) {
       {
         name: "table",
         renderer(this, token) {
-          const outerWrapper = "w-full max-w-full overflow-x-auto my-4";
-          const innerWrapper = "inline-block min-w-max align-top";
+          const outerWrapper = "w-0 min-w-full overflow-x-auto my-4";
           const tableClass =
             "border-collapse table-auto rounded-lg overflow-hidden shadow-md";
 
@@ -181,12 +180,10 @@ export function markdownToHtml(text: string) {
 
           return `
             <div class="${outerWrapper}">
-              <div class="${innerWrapper}">
-                <table class="${tableClass}">
-                  <thead class="bg-primary text-white"><tr>${header}</tr></thead>
-                  <tbody>${body}</tbody>
-                </table>
-              </div>
+              <table class="${tableClass}">
+                <thead class="bg-primary text-white"><tr>${header}</tr></thead>
+                <tbody>${body}</tbody>
+              </table>
             </div>
           `;
         },

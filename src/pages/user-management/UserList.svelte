@@ -30,13 +30,13 @@
   let { tenantId = "" }: Props = $props();
 
   const columnData: ColumnData[] = [
-    { key: "name", name: t("common.name") },
-    { key: "email", name: t("user.e-mail") },
-    { key: "", name: t("user.role") },
-    { key: "logins_count", name: t("user.logins") },
-    { key: "last_login", name: t("user.latest-login") },
-    { key: "", name: "" },
-    { key: "", name: "" },
+    { key: "name", name: t("common.name"), class: "w-auto" },
+    { key: "email", name: t("user.e-mail"), class: "w-auto" },
+    { key: "", name: t("user.role"), class: "w-[100px]" },
+    { key: "logins_count", name: t("user.logins"), class: "w-[80px]" },
+    { key: "last_login", name: t("user.latest-login"), class: "w-[140px]" },
+    { key: "", name: "", class: "w-[120px]" },
+    { key: "", name: "", class: "w-[50px]" },
   ];
   let total: number = $state(0);
   let limitReached: boolean = $state(false);
@@ -251,13 +251,14 @@
           <td class="py-3 px-4 text-sm font-medium rounded-l-lg">
             <a
               class="underline underline-offset-2"
-              href="/user-management/{user._id}">{user.name ?? "-"}</a
+              href="/user-management/{user._id}"
+              ><span class="break-all">{user.name ?? "-"}</span></a
             >
           </td>
           <td
-            class="py-3 px-4 text-base-content flex items-center text-sm font-medium h-16"
+            class="py-3 px-4 text-base-content text-sm font-medium"
           >
-            {user.email}
+            <span class="break-all">{user.email}</span>
           </td>
           <td class="py-3 px-4 text-sm font-medium"
             >{getRoleString(user.roles)}</td

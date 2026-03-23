@@ -143,7 +143,7 @@ async function onboardingCheck(context: APIContext, next: MiddlewareNext) {
     const hasIncompleteRegistration = !user.is_complete_self_registration;
 
     if (isFirstLogin || hasIncompleteRegistration) {
-      return context.redirect("/subscription");
+      return context.redirect("/onboarding");
     }
   }
 

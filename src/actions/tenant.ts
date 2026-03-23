@@ -47,10 +47,6 @@ const TenantInputParamsSchema = z.object({
   openai_chat_model: z.string().optional().default(ModelName.Gpt4o),
   openai_api_key: z.string().optional(),
   openai_gpt5_chat_model: z.string().optional().default(ModelName.Gpt5),
-  openai_gpt5_reasoning_effort: z
-    .string()
-    .optional()
-    .default(ReasoningEffortOption.None),
   openai_gpt5_api_key: z.string().optional(),
   azure_openai_api_key: z.string().optional(),
   azure_openai_endpoint: z.string().optional(),
@@ -270,6 +266,20 @@ export const tenant = {
         _id: tenant._id,
         name: tenant.name,
         org_name: tenant.org_name,
+      }));
+
+      return transformRawData(data);
+    },
+  }),
+
+  listAll: defineAction({
+    handler: async () => {
+      const tenants = await TenantModel.list();
+      const data = tenants.map((tenant) => ({
+        _id: tenant._id,
+        name: tenant.name,
+        org_name: tenant.org_name,
+        active: tenant.active ?? true,
       }));
 
       return transformRawData(data);

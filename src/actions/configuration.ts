@@ -12,6 +12,8 @@ const CitationInstructionSchema = z.object({
 export const ConfigurationSchema = z.object({
   defaultInstructions: z.array(ProviderInstructionSchema).optional(),
   promptRefinementInstruction: z.string().optional(),
+  promptKbGenerationInstruction: z.string().optional(),
+  onboardingIndustryInstruction: z.string().optional(),
   citationInstruction: CitationInstructionSchema.optional(),
 });
 
@@ -35,6 +37,14 @@ export const configurations = {
         }
         if (input.citationInstruction !== undefined) {
           update.citationInstruction = input.citationInstruction;
+        }
+        if (input.promptKbGenerationInstruction !== undefined) {
+          update.promptKbGenerationInstruction =
+            input.promptKbGenerationInstruction;
+        }
+        if (input.onboardingIndustryInstruction !== undefined) {
+          update.onboardingIndustryInstruction =
+            input.onboardingIndustryInstruction;
         }
 
         if (Object.keys(update).length === 0) {

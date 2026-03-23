@@ -176,15 +176,6 @@
       }
 
       selectedModel = promptDetails.model?.toString() || "";
-      // Handle deprecated models
-      if (
-        [
-          PromptModel.OpenAIWithTools,
-          PromptModel.OpenAIWithImageTools,
-        ].includes(selectedModel as PromptModel)
-      ) {
-        selectedModel = PromptModel.OpenAI;
-      }
 
       selectedReasoningLevel =
         promptDetails.reasoningEffort || ReasoningEffortOption.None;
@@ -386,17 +377,23 @@
       <!-- Section 1: General Configuration -->
       <section>
         <div class="flex items-center gap-2 mb-4">
-          <div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+          <div
+            class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary"
+          >
             {@html svgIcons.settings}
           </div>
-          <h4 class="font-semibold text-lg">{t("assistant-dialog.section.general")}</h4>
+          <h4 class="font-semibold text-lg">
+            {t("assistant-dialog.section.general")}
+          </h4>
         </div>
 
         <!-- Title + Category + Use Case row -->
         <div class="grid grid-cols-1 gap-4 mb-4">
           <div>
             <p class="text-sm font-medium mb-2">
-              {t("prompt-library.add.prompts.title")}<span class="text-error">*</span>
+              {t("prompt-library.add.prompts.title")}<span class="text-error"
+                >*</span
+              >
             </p>
             <input
               type="text"
@@ -412,7 +409,9 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
             <p class="text-sm font-medium mb-2">
-              {t("prompt-library.add.prompts.category")}<span class="text-error">*</span>
+              {t("prompt-library.add.prompts.category")}<span class="text-error"
+                >*</span
+              >
             </p>
             <SingleInput
               title=""
@@ -425,7 +424,9 @@
 
           <div>
             <p class="text-sm font-medium mb-2">
-              {t("prompt-library.add.prompts.group")}<span class="text-error">*</span>
+              {t("prompt-library.add.prompts.group")}<span class="text-error"
+                >*</span
+              >
             </p>
             {#if selectedCategory}
               <SingleInput
@@ -436,7 +437,10 @@
                 displayTop={false}
               />
             {:else}
-              <select class="select select-bordered w-full select-disabled" disabled>
+              <select
+                class="select select-bordered w-full select-disabled"
+                disabled
+              >
                 <option>{t("assistant-dialog.select-category-first")}</option>
               </select>
             {/if}
@@ -446,7 +450,9 @@
         <!-- Instructions -->
         <div class="mb-4 relative">
           <p class="text-sm font-medium mb-2">
-            {t("prompt-library.add.prompts.instructions")}<span class="text-error">*</span>
+            {t("prompt-library.add.prompts.instructions")}<span
+              class="text-error">*</span
+            >
           </p>
           {#key initHtml}
             <TextEditor
@@ -473,7 +479,9 @@
 
         <!-- Predefined Input -->
         <div>
-          <p class="text-sm font-medium mb-2">{t("prompt-library.add.prompts.predefined-input")}</p>
+          <p class="text-sm font-medium mb-2">
+            {t("prompt-library.add.prompts.predefined-input")}
+          </p>
           <textarea
             bind:value={promptPredefinedInput}
             placeholder={t("assistant-dialog.predefined-input.placeholder")}
@@ -487,10 +495,14 @@
       <!-- Section 2: Knowledge Base -->
       <section>
         <div class="flex items-center gap-2 mb-4">
-          <div class="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary">
+          <div
+            class="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary"
+          >
             {@html svgIcons.document}
           </div>
-          <h4 class="font-semibold text-lg">{t("assistant-dialog.section.kb")}</h4>
+          <h4 class="font-semibold text-lg">
+            {t("assistant-dialog.section.kb")}
+          </h4>
         </div>
 
         <!-- KB Type Cards -->
@@ -520,7 +532,9 @@
         <!-- Conditional: Basic KB selector -->
         {#if kbType === "basic"}
           <div class="bg-base-200 rounded-lg p-4">
-            <p class="text-sm font-medium mb-2">{t("assistant-dialog.kb.select-source")}</p>
+            <p class="text-sm font-medium mb-2">
+              {t("assistant-dialog.kb.select-source")}
+            </p>
             <MultiInput
               title=""
               placeholder={t("assistant-dialog.kb.search-placeholder")}
@@ -549,10 +563,14 @@
       <!-- Section 3: AI Configuration -->
       <section>
         <div class="flex items-center gap-2 mb-4">
-          <div class="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center text-accent">
+          <div
+            class="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center text-accent"
+          >
             {@html svgIcons.aitool}
           </div>
-          <h4 class="font-semibold text-lg">{t("assistant-dialog.section.ai")}</h4>
+          <h4 class="font-semibold text-lg">
+            {t("assistant-dialog.section.ai")}
+          </h4>
         </div>
 
         <!-- 2x2 Grid -->
@@ -589,10 +607,22 @@
               label={t("prompt-execution.reasoning-level")}
               placeholder={t("prompt-execution.reasoning-level.placeholder")}
               options={[
-                { title: t("prompt-execution.reasoning-effort.level-none"), value: ReasoningEffortOption.None },
-                { title: t("prompt-execution.reasoning-effort.level-low"), value: ReasoningEffortOption.Low },
-                { title: t("prompt-execution.reasoning-effort.level-medium"), value: ReasoningEffortOption.Medium },
-                { title: t("prompt-execution.reasoning-effort.level-high"), value: ReasoningEffortOption.High },
+                {
+                  title: t("prompt-execution.reasoning-effort.level-none"),
+                  value: ReasoningEffortOption.None,
+                },
+                {
+                  title: t("prompt-execution.reasoning-effort.level-low"),
+                  value: ReasoningEffortOption.Low,
+                },
+                {
+                  title: t("prompt-execution.reasoning-effort.level-medium"),
+                  value: ReasoningEffortOption.Medium,
+                },
+                {
+                  title: t("prompt-execution.reasoning-effort.level-high"),
+                  value: ReasoningEffortOption.High,
+                },
               ]}
               bind:value={selectedReasoningLevel}
             />
@@ -601,9 +631,18 @@
               label={t("prompt-execution.text-verbosity")}
               placeholder={t("prompt-execution.text-verbosity.placeholder")}
               options={[
-                { title: t("prompt-execution.verbosity.level-low"), value: TextVerbosityOption.Low },
-                { title: t("prompt-execution.verbosity.level-medium"), value: TextVerbosityOption.Medium },
-                { title: t("prompt-execution.verbosity.level-high"), value: TextVerbosityOption.High },
+                {
+                  title: t("prompt-execution.verbosity.level-low"),
+                  value: TextVerbosityOption.Low,
+                },
+                {
+                  title: t("prompt-execution.verbosity.level-medium"),
+                  value: TextVerbosityOption.Medium,
+                },
+                {
+                  title: t("prompt-execution.verbosity.level-high"),
+                  value: TextVerbosityOption.High,
+                },
               ]}
               bind:value={selectedTextVerbosity}
             />

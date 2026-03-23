@@ -78,11 +78,10 @@
     <div>
       <div class="overflow-x-auto relative">
         <table
-          class="border-separate border-spacing-x-0 min-w-full relative"
-          style="font-family:Inter;"
+          class="table table-fixed border-separate border-spacing-x-0 min-w-full relative"
         >
           <colgroup>
-            <col class="w-auto" />
+            <col class="w-auto min-w-[180]" />
             <col class="w-[250]" />
             <col class="w-[150]" />
             <col class="w-[150]" />
@@ -154,11 +153,11 @@
 
                 <td class="py-2 px-4">
                   {#if tenant.active}
-                    <span class={"badge badge-soft badge-success badge-sm"}
+                    <span class={"badge badge-sm badge-success"}
                       >{t("tenant.tenants.tenant.active")}
                     </span>
                   {:else}
-                    <span class={"badge badge-soft badge-error badge-sm"}
+                    <span class={"badge badge-sm badge-error"}
                       >{t("tenant.tenants.tenant.archived")}
                     </span>
                   {/if}

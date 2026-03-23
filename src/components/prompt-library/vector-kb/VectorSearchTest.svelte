@@ -185,7 +185,7 @@
               <div class="flex items-start justify-between gap-2">
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-2 flex-wrap">
-                    <span class="badge badge-outline badge-sm">#{index + 1}</span>
+                    <span class="badge badge-ghost badge-sm">#{index + 1}</span>
                     <span class="font-medium text-sm truncate max-w-[250px]" title={result.fileName}>
                       {result.fileName}
                     </span>

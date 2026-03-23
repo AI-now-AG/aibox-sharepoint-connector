@@ -1693,12 +1693,12 @@
           <!-- Success State Summary -->
           {#if isTranscipted && !isTranscribing}
             <div class="px-4 pb-4 pt-0">
-              <div class="bg-success/10 border border-success/20 rounded-lg p-3 flex items-center gap-3">
-                <svg class="w-5 h-5 text-success shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="bg-primary/10 border border-primary/20 rounded-lg p-3 flex items-center gap-3">
+                <svg class="w-5 h-5 text-primary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <div class="flex-1 min-w-0">
-                  <p class="text-sm font-medium text-success">{t("transcription.success.completed")}</p>
+                  <p class="text-sm font-medium text-primary">{t("transcription.success.completed")}</p>
                   {#if category === AudioCategory.Subtitle || category === AudioCategory.SubtitleLarge || category === AudioCategory.Subtitle11Labs || category === AudioCategory.SubtitleJson}
                     <p class="text-xs text-base-content/60 mt-0.5">{t("transcription.success.files-ready")}</p>
                   {/if}

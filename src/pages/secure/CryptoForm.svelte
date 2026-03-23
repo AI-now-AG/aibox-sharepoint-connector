@@ -41,8 +41,7 @@
 <div class="container max-w-full mx-auto p-6">
   <div class="max-w-full">
     <label
-      class="input input-bordered flex items-center gap-2"
-      style="background-color: white;"
+      class="input input-bordered flex items-center gap-2 bg-base-100"
     >
       <input
         type="text"
@@ -56,7 +55,7 @@
       />
     </label>
     <div>
-      <textarea class="mt-2 text-xs" style="width: 100%; color: red;" rows="3"
+      <textarea class="mt-2 text-xs w-full text-error" rows="3"
         >{encryptedKey}</textarea
       >
     </div>
@@ -72,8 +71,7 @@
 
   <div class="max-w-full mt-20">
     <label
-      class="input input-bordered flex items-center gap-2"
-      style="background-color: white;"
+      class="input input-bordered flex items-center gap-2 bg-base-100"
     >
       <input
         type="text"
@@ -87,7 +85,7 @@
       />
     </label>
     <div>
-      <textarea class="mt-2 text-xs" style="width: 100%; color: green;" rows="3"
+      <textarea class="mt-2 text-xs w-full text-success" rows="3"
         >{decryptedKey}</textarea
       >
     </div>

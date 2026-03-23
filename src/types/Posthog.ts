@@ -20,11 +20,8 @@ export enum EventName {
 
   AiboxRating = "aibox_rating",
 
-  AiboxOnboardingStarted = "aibox_onboarding_started",
-  AiboxOnboardingStep1 = "aibox_onboarding_step1",
-  AiboxOnboardingStep2 = "aibox_onboarding_step2",
-  AiboxOnboardingStep3 = "aibox_onboarding_step3",
-  AiboxOnboardingCompleted = "aibox_onboarding_completed",
+  AiboxOnboardingNew = "aibox_onboarding_new",
+  AiboxOnboardingCreated = "aibox_onboarding_created",
 }
 
 export enum ScreenName {
@@ -44,10 +41,7 @@ export enum ScreenName {
   EditPromptDialog = "edit_prompt_dialog",
   AudioToText = "audio_to_text",
   SubtitleGeneration = "subtitle_generation",
-  OnboardingStep1 = "onboarding_step_1",
-  OnboardingStep2 = "onboarding_step_2",
-  OnboardingStep3 = "onboarding_step_3",
-  OnboardingCompleted = "onboarding_completed",
+  Onboarding = "onboarding_screen",
 }
 
 export interface IdentifyMessage {

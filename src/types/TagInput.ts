@@ -8,3 +8,5 @@ export interface TagItem {
 }
 
 export type TagList = TagItem[];
+
+export const ONBOARDING_CATEGORY = "self-onboarding";

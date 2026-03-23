@@ -72,7 +72,7 @@ export const AudioOptionLabels: Record<AudioOptionId, string> = {
   [AudioOptionId.AudioBasis]: "Audio to Text Basic", // [Audio to Text Basic]
   [AudioOptionId.AudioBasisAddOnLarge]: "Audio to Text Large", // [Audio to Text Large]
   [AudioOptionId.AudioBasisAddOnSubtitle]: "Subtitle Studio Basic", // [Subtitle Studio Basic]
-  [AudioOptionId.AudioPremium]: "Subtitle Studio Plus", // [Subtitle Studio Plus]
+  [AudioOptionId.AudioPremium]: "Subtitle Studio", // [Subtitle Studio Plus]
   [AudioOptionId.AudioToText]: "Audio to Text", // [Audio to Text]
 };
 
@@ -88,22 +88,6 @@ export const BillingMethodLabels: Record<BillingMethod, string> = {
   [BillingMethod.YearlyInvoice]: t("subscription.yearly-invoice-email"),
 };
 
-export const SubscriptionStep = {
-  Step0: 0,
-  Step1: 1,
-  Step2: 2,
-  Step3: 3,
-  Step4: 4,
-  Completed: 5,
-};
-
-export enum RoutePath {
-  Step1 = "step1",
-  Step2 = "step2",
-  Step3 = "step3",
-  Step4 = "step4",
-}
-
 export interface TagItem {
   title: string;
   value: string;
@@ -111,6 +95,7 @@ export interface TagItem {
   icon?: string | null | undefined;
   iconColor?: string | null | undefined;
 }
+
 export interface CategoryItem {
   title: string;
   value: string;

@@ -134,9 +134,9 @@
                 <div class="flex items-center gap-2 flex-wrap">
                   <span class="badge badge-primary">Chunk {chunk.chunk_index + 1}</span>
                   <span class="badge badge-ghost">{chunk.content.length} chars</span>
-                  <span class="badge badge-ghost badge-outline">{chunk.token_count} tokens</span>
+                  <span class="badge badge-ghost">{chunk.token_count} tokens</span>
                   {#if chunk.metadata?.page_number}
-                    <span class="badge badge-outline">Page {chunk.metadata.page_number}</span>
+                    <span class="badge badge-ghost">Page {chunk.metadata.page_number}</span>
                   {/if}
                   {#if chunk.metadata?.document_language}
                     <span class="badge badge-ghost badge-sm">{chunk.metadata.document_language}</span>

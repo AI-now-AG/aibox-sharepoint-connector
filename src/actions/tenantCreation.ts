@@ -16,6 +16,7 @@ import SubscriptionModel, {
 import TranscriptionModel, {
   type Transcription,
 } from "$data/models/transcription.model";
+import KnowledgeBaseModel from "$data/models/knowledgeBase.model";
 import {
   SubscriptionPackageId,
   AudioOptionId,
@@ -36,11 +37,11 @@ import { TENANT_MASTER_ID } from "$constants";
 
 const masterTenantId = isProd() ? TENANT_MASTER_ID.PROD : TENANT_MASTER_ID.DEV;
 
-const OrganizationNameInputParamsSchema = z.object({
+const OrganizationNameInputSchema = z.object({
   organization_name: z.string().min(1),
 });
 
-const BillingInfoParamsSchema = z.object({
+const BillingInfoInputSchema = z.object({
   company_name: z.string(),
   address: z.string(),
   zip_code: z.string(),
@@ -49,7 +50,7 @@ const BillingInfoParamsSchema = z.object({
   email: z.string(),
 });
 
-const TenantConfigParamsSchema = z.object({
+const TenantConfignputSchema = z.object({
   is_reseller: z.boolean().default(false),
   reseller_code: z.string().nullish(),
   is_somedia: z.boolean().default(false),
@@ -61,26 +62,33 @@ const TenantInputParamsSchema = z.object({
   org_name: z.string().min(1),
   language: z.string().min(1),
   theme: z.nativeEnum(ThemeCode).default(ThemeCode.AIBox),
+  website: z.string().optional(),
   plan_name: z.nativeEnum(SubscriptionPackageId).optional(),
   add_ons: z.array(z.nativeEnum(AudioOptionId)).optional(),
   billing_method: z.nativeEnum(BillingMethod).optional(),
   use_cases: z.array(z.string()),
   totalPrice: z.string().optional(),
-  billing_info: BillingInfoParamsSchema,
+  billing_info: BillingInfoInputSchema,
 });
 
-const FinalizeTenantSchema = z.object({
+const SetupKbInputSchema = z.object({
+  tenant_id: z.string().min(1),
+  company_name: z.string().min(1),
+  content: z.string().min(1),
+});
+
+const FinalizeTenantInputSchema = z.object({
   tenant_id: z.string().min(1),
   template: z.string().optional(),
 });
 
 // step 1: createOrganization()  - Create Auth0 organization
-// step 2: setupTenantData() - Clone tenant, override configs & import categories / prompts
-// step 3: finalize()  - Send notification emails
+// step 2: initializeTenant() - Clone tenant, override configs & import categories / prompts
+// step 3: finalizeOnboarding()  - Send notification emails
 
 export const tenantCreation = {
   createOrganization: defineAction({
-    input: OrganizationNameInputParamsSchema,
+    input: OrganizationNameInputSchema,
     handler: async (input) => {
       const { organization_name: organizationName } = input;
       const name = organizationName
@@ -109,10 +117,10 @@ export const tenantCreation = {
       return transformRawData(organizationResult.data);
     },
   }),
-  setupTenantData: defineAction({
+  initializeTenant: defineAction({
     input: z.object({
       tenant: TenantInputParamsSchema,
-      config: TenantConfigParamsSchema,
+      config: TenantConfignputSchema,
     }),
     handler: async (input, context) => {
       const { tenant, config } = input;
@@ -149,6 +157,7 @@ export const tenantCreation = {
         billing_info: tenant.billing_info,
         default_language: tenant.language,
         theme: isSomedia ? ThemeCode.SomediaAssistant : tenant.theme,
+        website: tenant.website,
         included_features: includedFeatures,
         transcription_types: transcriptionTypes,
         audio_assistant_active: true,
@@ -270,8 +279,32 @@ export const tenantCreation = {
       return transformRawData(data);
     },
   }),
-  finalize: defineAction({
-    input: FinalizeTenantSchema,
+  createTenantKnowledgeBase: defineAction({
+    input: SetupKbInputSchema,
+    handler: async (input) => {
+      const { tenant_id: tenantId, company_name: companyName, content } = input;
+
+      // Create KB entry for the new tenant
+      const tenantObjectId = new ObjectId(tenantId);
+      const { insertedId } = await KnowledgeBaseModel.add({
+        tenant_id: tenantObjectId,
+        title: `Über ${companyName}`,
+        description: `Auto-generated knowledge base about ${companyName}`,
+        knowledge_base: content,
+        updated_at: new Date(),
+        created_at: new Date(),
+      });
+
+      // Assign the new KB to all prompts of this tenant
+      await PromptModel.addKbToTenantPrompts(tenantObjectId, insertedId);
+
+      return transformRawData({
+        id: insertedId,
+      });
+    },
+  }),
+  completeTenantSetup: defineAction({
+    input: FinalizeTenantInputSchema,
     handler: async (input, context) => {
       const { tenant_id: tenantId, template } = input;
       const isReseller = context.locals.tenant?.is_reseller ?? false;
@@ -314,6 +347,7 @@ export const tenantCreation = {
 
             <p>
               <strong>Contact:</strong> ${tenant.billing_info?.email ?? "-"}<br/>
+              <strong>Website:</strong> ${tenant?.website ?? "-"}<br/>
               <strong>Created:</strong> ${new Date().toLocaleDateString()}<br/>
               <strong>Account created by:</strong> ${email}<br/>
               <strong>Flow:</strong> ${isReseller ? "Reseller" : "Internal"}<br/>

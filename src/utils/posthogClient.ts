@@ -71,7 +71,7 @@ export function posthogClientCapture(
     tenant_name: tenant.name?.toString() || "-",
     ...properties,
   };
-  console.log("posthogClientCapture", event_name, newProperties, options);
+  console.log("PostHog Client Capture", event_name, newProperties, options);
   getPostHogClientInstance?.()?.capture(event_name, newProperties, options);
 }
 
@@ -80,7 +80,7 @@ export function posthogClientCapture(
  *
  * @example
  * ```ts
- * posthogClientCaptureWithoutTenant(EventName.OnboardingStep1, {
+ * posthogClientCaptureGlobal(EventName.OnboardingStep1, {
  *     page_name: auth0User.data.nickname,
  * })
  * ```
@@ -88,16 +88,19 @@ export function posthogClientCapture(
  * @param props {@link EventMessage}
  * @returns
  */
-export function posthogClientCaptureWithoutTenant(
+export function posthogClientCaptureGlobal(
   event_name: AiboxEventName | EventName,
   properties: Properties,
   options?: CaptureOptions,
 ) {
-  console.log(
-    "posthogClientCaptureWithoutTenant",
-    event_name,
-    properties,
-    options,
-  );
+  console.log("PostHog Client Global Capture", event_name, properties, options);
   getPostHogClientInstance?.()?.capture(event_name, properties, options);
+}
+
+export function posthogClientCaptureException(
+  error: unknown,
+  properties: Properties,
+) {
+  console.log("PostHog Client Capture Exception", error, properties);
+  getPostHogClientInstance?.()?.captureException(error, properties);
 }

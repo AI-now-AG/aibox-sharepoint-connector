@@ -18,6 +18,11 @@ export function capitalizeFirst(text: string) {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
+export function normalizeUrl(url: string): string {
+  const trimmed = url.trim();
+  return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+}
+
 export function formatDate(
   date: string | Date | number | null | undefined,
   format = "DD.MM.YYYY",
@@ -35,10 +40,6 @@ export function formatDate(
 
   return d.format(format);
 }
-
-export const isValidEmail = (email: string) => {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-};
 
 export const preventDefault = (fn: any) => {
   return function (this: any, event: any) {

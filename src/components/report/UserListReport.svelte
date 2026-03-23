@@ -165,83 +165,89 @@
     {/if}
   {:else}
     <div class="mb-4">
-      <table class="border-separate border-spacing-x-0 min-w-full relative">
-        <colgroup>
-          <col class="w-auto" />
-          <col class="w-[250]" />
-          <col class="w-[120]" />
-          <col class="w-[150]" />
-          <col class="w-[150]" />
-          <col class="w-[100]" />
-        </colgroup>
-        <thead>
-          <tr class="bg-base-300">
-            <th class="py-3 px-4 text-left font-normal text-xs"
-              >{t("user.e-mail")}</th
-            >
-            <th class="py-3 px-4 text-left font-normal text-xs"
-              >{t("user.tenant")}</th
-            >
-            <th class="py-3 px-4 text-left font-normal text-xs"
-              >{t("user.roles")}</th
-            >
-            <th class="py-3 px-4 text-left font-normal text-xs"
-              >{t("user.latest-login")}</th
-            >
-            <th class="py-3 px-4 text-left font-normal text-xs"
-              >{t("user.status")}</th
-            >
-            <th class="py-3 px-4"></th>
-          </tr>
-        </thead>
-        <tbody>
-          {#each users as user}
-            <tr class="bg-base-100 text-sm">
-              <td class="py-3 px-4 text-sm font-medium">{user.email}</td>
-              <td class="py-3 px-4 text-sm font-medium"
-                >{user.tenant?.name || "Unknow"}</td
+      <div class="overflow-x-auto pb-14 relative">
+        <table
+          class="table table-auto border-separate border-spacing-x-0 w-full relative"
+        >
+          <colgroup>
+            <col class="w-auto" />
+            <col class="w-auto" />
+            <col class="w-[100px]" />
+            <col class="w-[120px]" />
+            <col class="w-[120px]" />
+            <col class="w-[60px]" />
+          </colgroup>
+          <thead>
+            <tr class="bg-base-300">
+              <th class="py-3 px-4 text-left font-normal text-xs"
+                >{t("user.e-mail")}</th
               >
-              <td class="py-3 px-4 text-sm font-medium"
-                >{getRoleString(user.roles)}</td
+              <th class="py-3 px-4 text-left font-normal text-xs"
+                >{t("user.tenant")}</th
               >
-              <td class="py-3 px-4 text-sm font-medium"
-                >{user.last_login ? formatDate(user.last_login) : "-"}</td
+              <th class="py-3 px-4 text-left font-normal text-xs"
+                >{t("user.roles")}</th
               >
-              <td class="py-3 px-4 text-sm font-medium text-center">
-                {#if user.blocked}
-                  <span style={`color: #FF6F70`}>{t("user.blocked")}</span>
-                {:else if !user.email_verified}
-                  <span style={`color: rgba(43, 52, 64, 0.2)`}
-                    >{t("user.un-veriried")}</span
-                  >
-                {:else}
-                  <span style={`color: 00CA92`}>{t("user.veriried")}</span>
-                {/if}
-              </td>
-              <td class="py-2 px-4 text-right relative relative-dropdown">
-                <div class="dropdown dropdown-hover dropdown-end">
-                  <button class="btn btn-ghost btn-sm z-50">
-                    {@html svgIcons.threeDot}
-                  </button>
-                  <ul
-                    class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
-                  >
-                    <li>
-                      <button
-                        class="flex block w-full text-left px-4 py-1 text-sm hover:underline"
-                        onclick={() => onSelectDelete(user._id)}
-                      >
-                        {@html svgIcons.trash}
-                        <span class="ml-1">{t("common.delete")}</span>
-                      </button>
-                    </li>
-                  </ul>
-                </div>
-              </td>
+              <th class="py-3 px-4 text-left font-normal text-xs"
+                >{t("user.latest-login")}</th
+              >
+              <th class="py-3 px-4 text-left font-normal text-xs"
+                >{t("user.status")}</th
+              >
+              <th class="py-3 px-4"></th>
             </tr>
-          {/each}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {#each users as user}
+              <tr class="bg-base-100 text-sm">
+                <td class="py-3 px-4 text-sm font-medium"
+                  ><span class="break-all">{user.email}</span></td
+                >
+                <td class="py-3 px-4 text-sm font-medium"
+                  >{user.tenant?.name || "Unknow"}</td
+                >
+                <td class="py-3 px-4 text-sm font-medium"
+                  >{getRoleString(user.roles)}</td
+                >
+                <td class="py-3 px-4 text-sm font-medium"
+                  >{user.last_login ? formatDate(user.last_login) : "-"}</td
+                >
+                <td class="py-3 px-4 text-sm font-medium text-center">
+                  {#if user.blocked}
+                    <span style={`color: #FF6F70`}>{t("user.blocked")}</span>
+                  {:else if !user.email_verified}
+                    <span style={`color: rgba(43, 52, 64, 0.2)`}
+                      >{t("user.un-veriried")}</span
+                    >
+                  {:else}
+                    <span style={`color: 00CA92`}>{t("user.veriried")}</span>
+                  {/if}
+                </td>
+                <td class="py-2 px-4 text-right relative relative-dropdown">
+                  <div class="dropdown dropdown-hover dropdown-end">
+                    <button class="btn btn-ghost btn-sm z-50">
+                      {@html svgIcons.threeDot}
+                    </button>
+                    <ul
+                      class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
+                    >
+                      <li>
+                        <button
+                          class="flex block w-full text-left px-4 py-1 text-sm hover:underline"
+                          onclick={() => onSelectDelete(user._id)}
+                        >
+                          {@html svgIcons.trash}
+                          <span class="ml-1">{t("common.delete")}</span>
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
+                </td>
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-[1fr_max-content]">

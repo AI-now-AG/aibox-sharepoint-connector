@@ -86,6 +86,15 @@ export default {
       .toArray();
   },
 
+  listByTag: async (tagId: ObjectId | string) => {
+    const _tagId = toObjectId(tagId);
+    return collection
+      .find<Document<Category>>({
+        tags: { $in: [_tagId] },
+      })
+      .toArray();
+  },
+
   get: async (id: string | ObjectId): Promise<Category | null> => {
     const _id = toObjectId(id);
     const doc = await collection.findOne<Document<Category>>({ _id });

@@ -26,7 +26,7 @@ const isEditable = isFeaturePermissionEnabled(
 const promptId = Astro.url?.searchParams?.get?.("promptId") ?? "";
 ---
 
-<div class="container max-w-6xl mx-auto grid grid-cols-1 px-14">
+<div class="container max-w-6xl mx-auto grid grid-cols-1 px-4 lg:px-14">
   <ContentHeader
     title={useCaseTitle}
     currentCategoryId={categoryId}

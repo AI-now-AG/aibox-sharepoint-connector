@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { useTranslations } from "$i18n/utils";
+  import { useTranslations, getLanguage } from "$i18n/utils";
 
   interface Props {
     id: string;
@@ -12,7 +12,6 @@
     onSelect?: Function;
     selectedAudioOptionIds?: string[];
     disabled?: boolean;
-    defaultLanguage?: string;
   }
 
   let {
@@ -24,10 +23,10 @@
     onSelect,
     selectedAudioOptionIds = $bindable([]),
     disabled = false,
-    defaultLanguage = "en",
   }: Props = $props();
 
-  const t = useTranslations(defaultLanguage);
+  const t = useTranslations();
+  const defaultLanguage = getLanguage();
   let selected: boolean = $state(false);
 
   let backgroundClass = $state("bg-base-100");

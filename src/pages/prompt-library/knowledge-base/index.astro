@@ -3,7 +3,6 @@ import Layout from "$layouts/Layout.astro";
 import { useTranslations } from "$i18n/utils";
 import { FeaturePermission } from "$types/Users";
 import KnowledgeBaseList from "$components/prompt-library/knowledge-base/KnowledgeBaseList.svelte";
-import { svgIcons } from "$assets/icons";
 import { actions } from "astro:actions";
 import { isFeaturePermissionEnabled } from "$utils/permission";
 
@@ -12,12 +11,14 @@ const tenant = Astro.locals.tenant;
 const tenantId = tenant?._id?.toString() ?? "";
 let userPermissions = Astro.locals.user.permissions;
 
-const { data, error } = await Astro.callAction(
-  actions.knowledgebase.listByTenant,
-  {
-    tenant_id: tenantId,
-  }
-);
+const [kbResult, configResult] = await Promise.all([
+  Astro.callAction(actions.knowledgeBase.listByTenant, { tenant_id: tenantId }),
+  Astro.callAction(actions.configurations.get, {}),
+]);
+
+const { data, error } = kbResult;
+const promptKbInstruction =
+  configResult.data?.promptKbGenerationInstruction ?? "";
 
 let items = [];
 
@@ -35,28 +36,10 @@ if (!error) {
 ---
 
 <Layout>
-  <div
-    class="container max-w-5xl mx-auto p-6 grid grid-cols-1 md:grid-cols-[1fr_max-content] gap-8"
-  >
+  <div class="container max-w-5xl mx-auto p-6">
     <h1 class="pt-2 lg:pt-8 text-4xl font-bold">
       {t("prompt-library.knowledgebase.title")}
     </h1>
-
-    {
-      isFeaturePermissionEnabled(
-        FeaturePermission.AddKnowledgeBaseInKnowledgeBaseList,
-        userPermissions
-      ) &&
-        items.length > 0 && (
-          <a
-            href="/prompt-library/knowledge-base/add"
-            class="mt-2 lg:mt-8 btn btn-outline font-normal grow-0"
-          >
-            <span set:html={svgIcons.add} />
-            {t("prompt-library.knowledgebase.add")}
-          </a>
-        )
-    }
   </div>
 
   <KnowledgeBaseList
@@ -65,6 +48,8 @@ if (!error) {
       userPermissions
     )}
     items={items}
+    {tenantId}
+    {promptKbInstruction}
     client:load
   />
 </Layout>

@@ -23,16 +23,17 @@ export const getSubscriptionAddOnName = (
   const addOnOptions: Array<any> =
     forOption == "audiototext"
       ? planAddOns.filter((option: any) => {
-          return (
-            option == AudioOptionId.AudioBasis ||
-            option == AudioOptionId.AudioBasisAddOnLarge
-          );
+          return [
+            AudioOptionId.AudioBasis,
+            AudioOptionId.AudioBasisAddOnLarge,
+            AudioOptionId.AudioToText,
+          ].includes(option);
         }) || []
       : planAddOns.filter((option: any) => {
-          return (
-            option == AudioOptionId.AudioBasisAddOnSubtitle ||
-            option == AudioOptionId.AudioPremium
-          );
+          return [
+            AudioOptionId.AudioBasisAddOnSubtitle,
+            AudioOptionId.AudioPremium,
+          ].includes(option);
         }) || [];
   const firstOption = addOnOptions?.[0] as AudioOptionId | undefined;
   return firstOption ? AudioOptionLabels[firstOption] : "";

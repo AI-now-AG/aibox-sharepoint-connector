@@ -9,7 +9,7 @@ import {
   extractTextFromTxt,
 } from "$utils/documentExtractor";
 
-export const knowledgebase = {
+export const knowledgeBase = {
   listByTenant: defineAction({
     input: z.object({
       tenant_id: z.string(),

@@ -1,0 +1,39 @@
+---
+import OnboardingLayout from "$layouts/Onboarding.astro";
+import ConfigurationModel from "$data/models/configuration.model";
+import GlobalTagModel from "$data/models/globalTag.model";
+import { ONBOARDING_CATEGORY } from "$types/TagInput";
+import SelfOnboardingForm from "./SelfOnboardingForm.svelte";
+import { useTranslations } from "$i18n/utils";
+import type { TagItem } from "$types/Subscription";
+
+const t = useTranslations();
+
+const config = await ConfigurationModel.get();
+const allTags = await GlobalTagModel.list();
+
+const tags: TagItem[] = allTags
+  .filter(
+    (tag) => tag?.categories && tag.categories?.includes(ONBOARDING_CATEGORY),
+  )
+  .map((tag) => ({
+    title: tag.title,
+    value: tag._id.toString(),
+    description: tag.description,
+    icon: tag.icon,
+    iconColor: tag.iconColor,
+  }));
+
+if (Astro.locals.tenant?.is_trial !== true) {
+  return Astro.rewrite("/restricted");
+}
+---
+
+<OnboardingLayout title={t("self-onboarding.page-title")}>
+  <SelfOnboardingForm
+    {tags}
+    promptKbInstruction={config?.promptKbGenerationInstruction || ""}
+    industryInstruction={config?.onboardingIndustryInstruction || ""}
+    client:load
+  />
+</OnboardingLayout>

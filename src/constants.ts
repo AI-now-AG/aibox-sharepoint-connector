@@ -42,11 +42,8 @@ export const SUPER_ADMIN_ROUTES = [
   "/reports",
   "/reports/*",
   "/settings/instruction",
-  "/settings/instruction/*",
-  "/settings/prompt-refinement",
-  "/settings/prompt-refinement/*",
+  "/settings/global-prompts",
   "/settings/rag-configuration",
-  "/settings/rag-configuration/*",
   "/admin",
   "/admin/*",
   "/admin/global-prompt-library/tags",
@@ -59,8 +56,8 @@ export const FEATURE_MAP_ROUTES = {
 };
 
 export const SKIP_CHEKING_ONBOARDING_ROUTES = [
-  "/subscription",
-  "/subscription/*",
+  "/onboarding",
+  "/onboarding/*",
   "/logout",
   "/logout/*",
   "/api/logout",
@@ -75,12 +72,18 @@ export const AUTH_AUTHORIZE_SCOPES = [
   "email",
   "ainow/roles",
 ];
-export const AUTH0_ROLE_ADMIN_DEV = "rol_gkr3eCUL4jGIFgVu";
-export const AUTH0_ROLE_ADMIN_PROD = "rol_ekmcY6vrW5QiG5NF";
-export const AUTH0_AUTH_GOOGLE_CON_DEV = "con_kW37LrJ1vOiVrqMO";
-export const AUTH0_AUTH_WINDOWS_CON_DEV = "con_RcwIKnfC9eq1QjFm";
-export const AUTH0_AUTH_GOOGLE_CON_PROD = "con_jB6o4Tj6BeetKBc5";
-export const AUTH0_AUTH_WINDOWS_CON_PROD = "con_Si1JPT62XNjp9gVp";
+export const AUTH0_ROLE_ADMIN = {
+  DEV: "rol_gkr3eCUL4jGIFgVu",
+  PROD: "rol_ekmcY6vrW5QiG5NF",
+};
+export const AUTH0_AUTH_GOOGLE_CON = {
+  DEV: "con_kW37LrJ1vOiVrqMO",
+  PROD: "con_jB6o4Tj6BeetKBc5",
+};
+export const AUTH0_AUTH_WINDOWS_CON = {
+  DEV: "con_RcwIKnfC9eq1QjFm",
+  PROD: "con_Si1JPT62XNjp9gVp",
+};
 
 // SendGrid
 export const SG_VERIFICATION_TEMPLATE = "d-69ed72334042458783f985ada5dbe61d";
