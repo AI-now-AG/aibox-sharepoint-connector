@@ -132,5 +132,9 @@ export async function updateIntegrationSettings(
 // --- OAuth ---
 
 export function getOAuthStartUrl(baseUrl: string, apiToken: string): string {
-  return `${baseUrl}/api/oauth/microsoft/start?token=${encodeURIComponent(apiToken)}`;
+  const params = new URLSearchParams({
+    token: apiToken,
+    return_to: window.location.origin,
+  });
+  return `${baseUrl}/api/oauth/microsoft/start?${params.toString()}`;
 }
